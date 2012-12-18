@@ -1,0 +1,125 @@
+#topbar-right input.search-database
+{
+    background: white url(../images/frfr/searchdatabase.gif) .2em center no-repeat;
+}
+
+.listview-quicksearch input.search-within-results
+{
+    background: white url(../images/frfr/searchwithinresults.gif) .2em center no-repeat;
+}
+
+.listview-quicksearch input.search-within-results2
+{
+    background: white url(../images/frfr/searchwithinresults2.gif) .2em center no-repeat;
+}
+
+div.modelviewer-quality div
+{
+    float: left;
+    width: 61px;
+    height: 22px;
+    margin-right: 10px;
+    background: url(../images/frfr/modelviewer-picshures.gif) left center no-repeat;
+}
+
+div.modelviewer-model div
+{
+    margin-left: 25px;
+    margin-right: 10px;
+    float: left;
+    width: 58px;
+    height: 22px;
+    background: url(../images/frfr/modelviewer-picshures.gif) -500px center no-repeat;
+}
+
+a.modelviewer-help span
+{
+    display: block;
+    width: 53px;
+    height: 22px;
+    background: url(../images/frfr/modelviewer-picshures.gif) -100px center no-repeat;
+}
+
+a:hover.modelviewer-help span
+{
+    background-position: -200px center;
+}
+
+a.modelviewer-close span
+{
+    display: block;
+    width: 77px;
+    height: 22px;
+    background: url(../images/frfr/modelviewer-picshures.gif) -300px center no-repeat;
+}
+
+a:hover.modelviewer-close span
+{
+    background-position: -400px center;
+}
+
+a.screenshotviewer-prev b
+{
+    display: block;
+    width: 110px;
+    height: 22px;
+    background: url(../images/frfr/screenshotviewer-picshures.gif?2) -200px center no-repeat;
+}
+
+a.screenshotviewer-next b
+{
+    display: block;
+    width: 89px;
+    height: 22px;
+    background: url(../images/frfr/screenshotviewer-picshures.gif?2) -320px center no-repeat;
+}
+
+a.screenshotviewer-cover span
+{
+    width: 77px;
+    height: 22px;
+}
+
+a.screenshotviewer-cover b
+{
+    display: block;
+    width: 77px;
+    height: 22px;
+    background: url(../images/frfr/screenshotviewer-picshures.gif?2) -100px center no-repeat;
+}
+
+a.screenshotviewer-original span
+{
+    display: block;
+    width: 93px;
+    height: 22px;
+    background: url(../images/frfr/screenshotviewer-picshures.gif?2) -440px center no-repeat;
+}
+
+a:hover.screenshotviewer-original span
+{
+    background-position: -540px center;
+}
+
+a.screenshotviewer-close span
+{
+    display: block;
+    width: 77px;
+    height: 22px;
+    background: url(../images/frfr/screenshotviewer-picshures.gif?2) 0 center no-repeat;
+}
+
+a:hover.screenshotviewer-close span
+{
+    background-position: -100px center;
+}
+
+#su_searchbox
+{
+    left: -49px !important;
+}
+
+#su_weights
+{
+    width: 550px !important;
+}

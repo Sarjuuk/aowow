@@ -1,0 +1,1501 @@
+$WowheadTalentCalculator.registerClass(4, [
+    {
+        "n": "Assassinat",
+        "t": [
+            {
+                "i": 276,
+                "n": "Evisc\u00e9ration am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre technique Evisc\u00e9ration de 7%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre technique Evisc\u00e9ration de 14%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre technique Evisc\u00e9ration de 20%."
+                ],
+                "s": [
+                    14162,
+                    14163,
+                    14164
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Ability_Rogue_Eviscerate"
+            },
+            {
+                "i": 272,
+                "n": "Attaques impitoyables",
+                "m": 2,
+                "d": [
+                    "Lorsque vous tuez un adversaire qui vous fait gagner de l'exp\u00e9rience ou de l'honneur, vous avez 20% de chances d'infliger un coup critique lors de votre prochaine attaque avec Attaque pernicieuse, H\u00e9morragie, Attaque sournoise, Estropier, Embuscade ou Frappe fantomatique. Dure 20 s.",
+                    "Lorsque vous tuez un adversaire qui vous fait gagner de l'exp\u00e9rience ou de l'honneur, vous avez 40% de chances d'infliger un coup critique lors de votre prochaine attaque avec Attaque pernicieuse, H\u00e9morragie, Attaque sournoise, Estropier, Embuscade ou Frappe fantomatique. Dure 20 s."
+                ],
+                "s": [
+                    14144,
+                    14148
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Ability_FiegnDead"
+            },
+            {
+                "i": 270,
+                "n": "Malice",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances d'infliger un coup critique de 1%.",
+                    "Augmente vos chances d'infliger un coup critique de 2%.",
+                    "Augmente vos chances d'infliger un coup critique de 3%.",
+                    "Augmente vos chances d'infliger un coup critique de 4%.",
+                    "Augmente vos chances d'infliger un coup critique de 5%."
+                ],
+                "s": [
+                    14138,
+                    14139,
+                    14140,
+                    14141,
+                    14142
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Ability_Racial_BloodRage"
+            },
+            {
+                "i": 273,
+                "n": "N\u00e9m\u00e9sis",
+                "m": 3,
+                "d": [
+                    "Conf\u00e8re \u00e0 vos coups de gr\u00e2ce en m\u00eal\u00e9e 20% de chances d'ajouter un point de combo \u00e0 votre cible.",
+                    "Conf\u00e8re \u00e0 vos coups de gr\u00e2ce en m\u00eal\u00e9e 40% de chances d'ajouter un point de combo \u00e0 votre cible.",
+                    "Conf\u00e8re \u00e0 vos coups de gr\u00e2ce en m\u00eal\u00e9e 60% de chances d'ajouter un point de combo \u00e0 votre cible."
+                ],
+                "s": [
+                    14156,
+                    14160,
+                    14161
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Ability_Druid_Disembowel"
+            },
+            {
+                "i": 2068,
+                "n": "Eclaboussure de sang",
+                "m": 2,
+                "d": [
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Garrot et Rupture de 15%.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Garrot et Rupture de 30%."
+                ],
+                "s": [
+                    51632,
+                    51633
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Ability_Rogue_BloodSplatter"
+            },
+            {
+                "i": 277,
+                "n": "Blessures transper\u00e7antes",
+                "m": 3,
+                "d": [
+                    "Augmente vos chances d'infliger un coup critique avec la technique Attaque sournoise de 10% et vos chances d'infliger un coup critique avec la technique Estropier de 5%.",
+                    "Augmente vos chances d'infliger un coup critique avec la technique Attaque sournoise de 20% et vos chances d'infliger un coup critique avec la technique Estropier de 10%.",
+                    "Augmente vos chances d'infliger un coup critique avec la technique Attaque sournoise de 30% et vos chances d'infliger un coup critique avec la technique Estropier de 15%."
+                ],
+                "s": [
+                    13733,
+                    13865,
+                    13866
+                ],
+                "x": 3,
+                "y": 1,
+                "iconname": "Ability_BackStab"
+            },
+            {
+                "i": 382,
+                "n": "Vigueur",
+                "m": 1,
+                "d": [
+                    "Augmente votre maximum d'Energie de 10."
+                ],
+                "s": [
+                    14983
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Nature_EarthBindTotem"
+            },
+            {
+                "i": 278,
+                "n": "Exposer l'armure am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en \u00e9nergie de votre technique Exposer l'armure de 5.",
+                    "R\u00e9duit le co\u00fbt en \u00e9nergie de votre technique Exposer l'armure de 10."
+                ],
+                "s": [
+                    14168,
+                    14169
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Ability_Warrior_Riposte"
+            },
+            {
+                "i": 269,
+                "n": "Mortalit\u00e9",
+                "m": 5,
+                "d": [
+                    "Augmente de 6% le bonus aux d\u00e9g\u00e2ts des coups critiques de toutes vos techniques de combo g\u00e9n\u00e9rant des points et ne n\u00e9cessitant pas d'\u00eatre camoufl\u00e9.",
+                    "Augmente de 12% le bonus aux d\u00e9g\u00e2ts des coups critiques de toutes vos techniques de combo g\u00e9n\u00e9rant des points et ne n\u00e9cessitant pas d'\u00eatre camoufl\u00e9.",
+                    "Augmente de 18% le bonus aux d\u00e9g\u00e2ts des coups critiques de toutes vos techniques de combo g\u00e9n\u00e9rant des points et ne n\u00e9cessitant pas d'\u00eatre camoufl\u00e9.",
+                    "Augmente de 24% le bonus aux d\u00e9g\u00e2ts des coups critiques de toutes vos techniques de combo g\u00e9n\u00e9rant des points et ne n\u00e9cessitant pas d'\u00eatre camoufl\u00e9.",
+                    "Augmente de 30% le bonus aux d\u00e9g\u00e2ts des coups critiques de toutes vos techniques de combo g\u00e9n\u00e9rant des points et ne n\u00e9cessitant pas d'\u00eatre camoufl\u00e9."
+                ],
+                "s": [
+                    14128,
+                    14132,
+                    14135,
+                    14136,
+                    14137
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Ability_CriticalStrike",
+                "r": [
+                    2,
+                    5
+                ]
+            },
+            {
+                "i": 682,
+                "n": "Poisons abominables",
+                "m": 3,
+                "d": [
+                    "Augmente de 7% les points de d\u00e9g\u00e2ts inflig\u00e9s par vos poisons et votre technique Envenimer et donne \u00e0 vos poisons de d\u00e9g\u00e2ts sur la dur\u00e9e 10% de chances suppl\u00e9mentaires de r\u00e9sister aux effets de dissipation.",
+                    "Augmente de 14% les points de d\u00e9g\u00e2ts inflig\u00e9s par vos poisons et votre technique Envenimer et donne \u00e0 vos poisons de d\u00e9g\u00e2ts sur la dur\u00e9e 20% de chances suppl\u00e9mentaires de r\u00e9sister aux effets de dissipation.",
+                    "Augmente de 20% les points de d\u00e9g\u00e2ts inflig\u00e9s par vos poisons et votre technique Envenimer et donne \u00e0 vos poisons de d\u00e9g\u00e2ts sur la dur\u00e9e 30% de chances suppl\u00e9mentaires de r\u00e9sister aux effets de dissipation."
+                ],
+                "s": [
+                    16513,
+                    16514,
+                    16515
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Ability_Rogue_FeignDeath"
+            },
+            {
+                "i": 268,
+                "n": "Poisons am\u00e9lior\u00e9s",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances d'appliquer Poison mortel sur votre cible de 4% et la fr\u00e9quence \u00e0 laquelle vous appliquez Poison instantan\u00e9 sur votre cible de 10%.",
+                    "Augmente vos chances d'appliquer Poison mortel sur votre cible de 8% et la fr\u00e9quence \u00e0 laquelle vous appliquez Poison instantan\u00e9 sur votre cible de 20%.",
+                    "Augmente vos chances d'appliquer Poison mortel sur votre cible de 12% et la fr\u00e9quence \u00e0 laquelle vous appliquez Poison instantan\u00e9 sur votre cible de 30%.",
+                    "Augmente vos chances d'appliquer Poison mortel sur votre cible de 16% et la fr\u00e9quence \u00e0 laquelle vous appliquez Poison instantan\u00e9 sur votre cible de 40%.",
+                    "Augmente vos chances d'appliquer Poison mortel sur votre cible de 20% et la fr\u00e9quence \u00e0 laquelle vous appliquez Poison instantan\u00e9 sur votre cible de 50%."
+                ],
+                "s": [
+                    14113,
+                    14114,
+                    14115,
+                    14116,
+                    14117
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Ability_Poisons"
+            },
+            {
+                "i": 1721,
+                "n": "Pied l\u00e9ger",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 15% la dur\u00e9e de tous les effets affectant le mouvement et augmente de 8% votre vitesse de d\u00e9placement. Ne se cumule pas avec les autres effets qui augmentent la vitesse de d\u00e9placement.",
+                    "R\u00e9duit de 30% la dur\u00e9e de tous les effets affectant le mouvement et augmente de 15% votre vitesse de d\u00e9placement. Ne se cumule pas avec les autres effets qui augmentent la vitesse de d\u00e9placement."
+                ],
+                "s": [
+                    31208,
+                    31209
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Ability_Rogue_FleetFooted"
+            },
+            {
+                "i": 280,
+                "n": "Sang froid",
+                "m": 1,
+                "d": [
+                    "Lorsque vous d\u00e9clenchez ce talent, vos chances d'infliger un coup critique avec votre prochaine technique offensive augmentent de 100%."
+                ],
+                "s": [
+                    14177
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Ice_Lament"
+            },
+            {
+                "i": 279,
+                "n": "Aiguillon perfide am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "Lorsqu'elle est affect\u00e9e par votre technique Aiguillon perfide, la cible subit 3% de points de d\u00e9g\u00e2ts suppl\u00e9mentaires de toutes les sources.",
+                    "Lorsqu'elle est affect\u00e9e par votre technique Aiguillon perfide, la cible subit 6% de points de d\u00e9g\u00e2ts suppl\u00e9mentaires de toutes les sources.",
+                    "Lorsqu'elle est affect\u00e9e par votre technique Aiguillon perfide, la cible subit 9% de points de d\u00e9g\u00e2ts suppl\u00e9mentaires de toutes les sources."
+                ],
+                "s": [
+                    14174,
+                    14175,
+                    14176
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Ability_Rogue_KidneyShot"
+            },
+            {
+                "i": 1762,
+                "n": "R\u00e9tablissement rapide",
+                "m": 2,
+                "d": [
+                    "Augmente tous les effets de soins utilis\u00e9s sur vous de 10%. De plus, vous \u00eates rembours\u00e9 de 40% du co\u00fbt en \u00e9nergie de vos coups de gr\u00e2ce s\u2019ils ne touchent pas la cible.",
+                    "Augmente tous les effets de soins utilis\u00e9s sur vous de 20%. De plus, vous \u00eates rembours\u00e9 de 80% du co\u00fbt en \u00e9nergie de vos coups de gr\u00e2ce s\u2019ils ne touchent pas la cible."
+                ],
+                "s": [
+                    31244,
+                    31245
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Ability_Rogue_QuickRecovery"
+            },
+            {
+                "i": 283,
+                "n": "Scelle le destin",
+                "m": 5,
+                "d": [
+                    "Les coups critiques inflig\u00e9s par les techniques qui ajoutent un point de combo ont 20% de chances de vous faire gagner un point de combo suppl\u00e9mentaire.",
+                    "Les coups critiques inflig\u00e9s par les techniques qui ajoutent un point de combo ont 40% de chances de vous faire gagner un point de combo suppl\u00e9mentaire.",
+                    "Les coups critiques inflig\u00e9s par les techniques qui ajoutent un point de combo ont 60% de chances de vous faire gagner un point de combo suppl\u00e9mentaire.",
+                    "Les coups critiques inflig\u00e9s par les techniques qui ajoutent un point de combo ont 80% de chances de vous faire gagner un point de combo suppl\u00e9mentaire.",
+                    "Les coups critiques inflig\u00e9s par les techniques qui ajoutent un point de combo ont 100% de chances de vous faire gagner un point de combo suppl\u00e9mentaire."
+                ],
+                "s": [
+                    14186,
+                    14190,
+                    14193,
+                    14194,
+                    14195
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "Spell_Shadow_ChillTouch",
+                "r": [
+                    12,
+                    1
+                ]
+            },
+            {
+                "i": 274,
+                "n": "Meurtre",
+                "m": 2,
+                "d": [
+                    "Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 2%.",
+                    "Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 4%."
+                ],
+                "s": [
+                    14158,
+                    14159
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Shadow_DeathScream"
+            },
+            {
+                "i": 2065,
+                "n": "Breuvage mortel",
+                "m": 2,
+                "d": [
+                    "Quand vous appliquez Poison instantan\u00e9, douloureux ou de distraction mentale \u00e0 une cible, vous avez 50% de chances d'appliquer Poison affaiblissant.",
+                    "Quand vous appliquez Poison instantan\u00e9, douloureux ou de distraction mentale \u00e0 une cible, vous avez 100% de chances d'appliquer Poison affaiblissant."
+                ],
+                "s": [
+                    51625,
+                    51626
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Rogue_DeadlyBrew"
+            },
+            {
+                "i": 281,
+                "n": "Outrance meurtri\u00e8re",
+                "m": 1,
+                "d": [
+                    "Lorsque vous \u00eates camoufl\u00e9 et pendant 20 secondes apr\u00e8s la fin du camouflage, vous r\u00e9g\u00e9n\u00e9rez 30% d'\u00e9nergie suppl\u00e9mentaire."
+                ],
+                "s": [
+                    58426
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Ability_Hunter_RapidKilling"
+            },
+            {
+                "i": 1723,
+                "n": "Anesth\u00e9sie nerveuse",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 2%.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 4%.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 6%."
+                ],
+                "s": [
+                    31380,
+                    31382,
+                    31383
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Rogue_DeadenedNerves"
+            },
+            {
+                "i": 2069,
+                "n": "Attaques focalis\u00e9es",
+                "m": 3,
+                "d": [
+                    "Vos frappes critiques en m\u00eal\u00e9e ont 33% de chances de vous donner 2 points d'\u00e9nergie.",
+                    "Vos frappes critiques en m\u00eal\u00e9e ont 66% de chances de vous donner 2 points d'\u00e9nergie.",
+                    "Vos frappes critiques en m\u00eal\u00e9e ont 100% de chances de vous donner 2 points d'\u00e9nergie."
+                ],
+                "s": [
+                    51634,
+                    51635,
+                    51636
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Ability_Rogue_FocusedAttacks"
+            },
+            {
+                "i": 1718,
+                "n": "D\u00e9couverte des faiblesses",
+                "m": 3,
+                "d": [
+                    "D\u00e9g\u00e2ts des techniques offensives augment\u00e9s de 2%.",
+                    "D\u00e9g\u00e2ts des techniques offensives augment\u00e9s de 4%.",
+                    "D\u00e9g\u00e2ts des techniques offensives augment\u00e9s de 6%."
+                ],
+                "s": [
+                    31234,
+                    31235,
+                    31236
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Ability_Rogue_FindWeakness"
+            },
+            {
+                "i": 1715,
+                "n": "Ma\u00eetre empoisonneur",
+                "m": 3,
+                "d": [
+                    "Augmente de 1% les chances de coup critique de toutes les attaques contre une cible que vous avez empoisonn\u00e9e, r\u00e9duit de 17% la dur\u00e9e de tous les effets de poison appliqu\u00e9s sur vous et conf\u00e8re \u00e0 Envenimer 33% de chances de ne pas consommer Poison mortel.",
+                    "Augmente de 2% les chances de coup critique de toutes les attaques contre une cible que vous avez empoisonn\u00e9e, r\u00e9duit de 34% la dur\u00e9e de tous les effets de poison appliqu\u00e9s sur vous et conf\u00e8re \u00e0 Envenimer 66% de chances de ne pas consommer Poison mortel.",
+                    "Augmente de 3% les chances de coup critique de toutes les attaques contre une cible que vous avez empoisonn\u00e9e, r\u00e9duit de 50% la dur\u00e9e de tous les effets de poison appliqu\u00e9s sur vous et conf\u00e8re \u00e0 Envenimer 100% de chances de ne pas consommer Poison mortel."
+                ],
+                "s": [
+                    31226,
+                    31227,
+                    58410
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Creature_Poison_06"
+            },
+            {
+                "i": 1719,
+                "n": "Estropier",
+                "m": 1,
+                "d": [
+                    "Attaque instantan\u00e9ment avec les deux armes et inflige <percent>% des d\u00e9g\u00e2ts des armes plus 44 points de d\u00e9g\u00e2ts avec chacune d'elles. Les d\u00e9g\u00e2ts sont augment\u00e9s de 20% contre les cibles empoisonn\u00e9es. Vous gagnez 2 points de combo."
+                ],
+                "s": [
+                    1329
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Ability_Rogue_ShadowStrikes",
+                "r": [
+                    18,
+                    1
+                ]
+            },
+            {
+                "i": 2066,
+                "n": "Retour \u00e0 l'envoyeur",
+                "m": 3,
+                "d": [
+                    "Chaque fois qu'un membre de votre groupe ou raid bloque, esquive ou pare une attaque, vos chances de critique avec les actions de combo sont augment\u00e9es de 2% pendant 8 s.",
+                    "Chaque fois qu'un membre de votre groupe ou raid bloque, esquive ou pare une attaque, vos chances de critique avec les actions de combo sont augment\u00e9es de 4% pendant 8 s.",
+                    "Chaque fois qu'un membre de votre groupe ou raid bloque, esquive ou pare une attaque, vos chances de critique avec les actions de combo sont augment\u00e9es de 6% pendant 8 s."
+                ],
+                "s": [
+                    51627,
+                    51628,
+                    51629
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Rogue_TurntheTables"
+            },
+            {
+                "i": 2070,
+                "n": "Tailler dans le vif",
+                "m": 5,
+                "d": [
+                    "Vos techniques Evisc\u00e9ration et Envenimer ont 20% de chances de r\u00e9initialiser la dur\u00e9e de D\u00e9biter \u00e0 son maximum de 5 points de combo.",
+                    "Vos techniques Evisc\u00e9ration et Envenimer ont 40% de chances de r\u00e9initialiser la dur\u00e9e de D\u00e9biter \u00e0 son maximum de 5 points de combo.",
+                    "Vos techniques Evisc\u00e9ration et Envenimer ont 60% de chances de r\u00e9initialiser la dur\u00e9e de D\u00e9biter \u00e0 son maximum de 5 points de combo.",
+                    "Vos techniques Evisc\u00e9ration et Envenimer ont 80% de chances de r\u00e9initialiser la dur\u00e9e de D\u00e9biter \u00e0 son maximum de 5 points de combo.",
+                    "Vos techniques Evisc\u00e9ration et Envenimer ont 100% de chances de r\u00e9initialiser la dur\u00e9e de D\u00e9biter \u00e0 son maximum de 5 points de combo."
+                ],
+                "s": [
+                    51664,
+                    51665,
+                    51667,
+                    51668,
+                    51669
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Rogue_CutToTheChase"
+            },
+            {
+                "i": 2071,
+                "n": "Soif de sang",
+                "m": 1,
+                "d": [
+                    "Vous fait enrager, ce qui augmente tous les d\u00e9g\u00e2ts caus\u00e9s de 5%. N\u00e9cessite qu'un effet de saignement soit actif sur la cible. Dure 1 min."
+                ],
+                "s": [
+                    51662
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Rogue_HungerforBlood"
+            }
+        ]
+    },
+    {
+        "n": "Combat",
+        "t": [
+            {
+                "i": 203,
+                "n": "Suriner am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "Augmente la dur\u00e9e de l'effet de votre technique Suriner de 0.5 sec.",
+                    "Augmente la dur\u00e9e de l'effet de votre technique Suriner de 1 sec.",
+                    "Augmente la dur\u00e9e de l'effet de votre technique Suriner de 1.5 sec."
+                ],
+                "s": [
+                    13741,
+                    13793,
+                    13792
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Ability_Gouge"
+            },
+            {
+                "i": 201,
+                "n": "Attaque pernicieuse am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 3 le co\u00fbt en \u00e9nergie de votre technique Attaque pernicieuse.",
+                    "R\u00e9duit de 5 le co\u00fbt en \u00e9nergie de votre technique Attaque pernicieuse."
+                ],
+                "s": [
+                    13732,
+                    13863
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Shadow_RitualOfSacrifice"
+            },
+            {
+                "i": 221,
+                "n": "Sp\u00e9cialisation Ambidextrie",
+                "m": 5,
+                "d": [
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche de 10%.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche de 20%.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche de 30%.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche de 40%.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche de 50%."
+                ],
+                "s": [
+                    13715,
+                    13848,
+                    13849,
+                    13851,
+                    13852
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Ability_DualWield"
+            },
+            {
+                "i": 1827,
+                "n": "D\u00e9biter am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Augmente la dur\u00e9e de votre technique D\u00e9biter de 25%.",
+                    "Augmente la dur\u00e9e de votre technique D\u00e9biter de 50%."
+                ],
+                "s": [
+                    14165,
+                    14166
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Ability_Rogue_SliceDice"
+            },
+            {
+                "i": 187,
+                "n": "D\u00e9viation",
+                "m": 3,
+                "d": [
+                    "Augmente vos chances de Parer de 2%.",
+                    "Augmente vos chances de Parer de 4%.",
+                    "Augmente vos chances de Parer de 6%."
+                ],
+                "s": [
+                    13713,
+                    13853,
+                    13854
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Ability_Parry"
+            },
+            {
+                "i": 181,
+                "n": "Pr\u00e9cision",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances de toucher avec les armes et les attaques empoisonn\u00e9es de 1%.",
+                    "Augmente vos chances de toucher avec les armes et les attaques empoisonn\u00e9es de 2%.",
+                    "Augmente vos chances de toucher avec les armes et les attaques empoisonn\u00e9es de 3%.",
+                    "Augmente vos chances de toucher avec les armes et les attaques empoisonn\u00e9es de 4%.",
+                    "Augmente vos chances de toucher avec les armes et les attaques empoisonn\u00e9es de 5%."
+                ],
+                "s": [
+                    13705,
+                    13832,
+                    13843,
+                    13844,
+                    13845
+                ],
+                "x": 3,
+                "y": 1,
+                "iconname": "Ability_Marksmanship"
+            },
+            {
+                "i": 204,
+                "n": "Endurcissement",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos techniques Sprint et Evasion de 30 sec. et augmente votre total d'Endurance de 2%.",
+                    "R\u00e9duit le temps de recharge de vos techniques Sprint et Evasion de 60 sec. et augmente votre total d'Endurance de 4%."
+                ],
+                "s": [
+                    13742,
+                    13872
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Shadow_ShadowWard"
+            },
+            {
+                "i": 301,
+                "n": "Riposte",
+                "m": 1,
+                "d": [
+                    "Une attaque disponible apr\u00e8s avoir par\u00e9 une attaque de l'adversaire. Elle inflige 150% des d\u00e9g\u00e2ts de l'arme et r\u00e9duit la vitesse d'attaque en m\u00eal\u00e9e de la cible de 20% pendant 30 s. Vous gagnez 1 points de combo."
+                ],
+                "s": [
+                    14251
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Ability_Warrior_Challange",
+                "r": [
+                    4,
+                    3
+                ]
+            },
+            {
+                "i": 182,
+                "n": "Combat rapproch\u00e9",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances d'infliger un coup critique avec les Dagues et les Armes de pugilat de 1%.",
+                    "Augmente vos chances d'infliger un coup critique avec les Dagues et les Armes de pugilat de 2%.",
+                    "Augmente vos chances d'infliger un coup critique avec les Dagues et les Armes de pugilat de 3%.",
+                    "Augmente vos chances d'infliger un coup critique avec les Dagues et les Armes de pugilat de 4%.",
+                    "Augmente vos chances d'infliger un coup critique avec les Dagues et les Armes de pugilat de 5%."
+                ],
+                "s": [
+                    13706,
+                    13804,
+                    13805,
+                    13806,
+                    13807
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "INV_Weapon_ShortBlade_05",
+                "r": [
+                    2,
+                    5
+                ]
+            },
+            {
+                "i": 206,
+                "n": "Coup de pied am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Conf\u00e8re \u00e0 votre technique Coup de pied 50% de chances de rendre la cible muette pendant 2 s.",
+                    "Conf\u00e8re \u00e0 votre technique Coup de pied 100% de chances de rendre la cible muette pendant 2 s."
+                ],
+                "s": [
+                    13754,
+                    13867
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Ability_Kick"
+            },
+            {
+                "i": 222,
+                "n": "Sprint am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Conf\u00e8re 50% de chances d'annuler tous les effets affectant le mouvement lorsque vous activez votre technique Sprint.",
+                    "Conf\u00e8re 100% de chances d'annuler tous les effets affectant le mouvement lorsque vous activez votre technique Sprint."
+                ],
+                "s": [
+                    13743,
+                    13875
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Ability_Rogue_Sprint"
+            },
+            {
+                "i": 186,
+                "n": "R\u00e9flexes \u00e9clairs",
+                "m": 3,
+                "d": [
+                    "Augmente vos chances d'esquiver de 2% et vous octroie un bonus de 4 \u00e0 la h\u00e2te en m\u00eal\u00e9e.",
+                    "Augmente vos chances d'esquiver de 4% et vous octroie un bonus de 7 \u00e0 la h\u00e2te en m\u00eal\u00e9e.",
+                    "Augmente vos chances d'esquiver de 6% et vous octroie un bonus de 10 \u00e0 la h\u00e2te en m\u00eal\u00e9e."
+                ],
+                "s": [
+                    13712,
+                    13788,
+                    13789
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Nature_Invisibilty"
+            },
+            {
+                "i": 1122,
+                "n": "Agressivit\u00e9",
+                "m": 5,
+                "d": [
+                    "Augmente de 3% les points de d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Attaque pernicieuse, Attaque sournoise et Evisc\u00e9ration.",
+                    "Augmente de 6% les points de d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Attaque pernicieuse, Attaque sournoise et Evisc\u00e9ration.",
+                    "Augmente de 9% les points de d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Attaque pernicieuse, Attaque sournoise et Evisc\u00e9ration.",
+                    "Augmente de 12% les points de d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Attaque pernicieuse, Attaque sournoise et Evisc\u00e9ration.",
+                    "Augmente de 15% les points de d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Attaque pernicieuse, Attaque sournoise et Evisc\u00e9ration."
+                ],
+                "s": [
+                    18427,
+                    18428,
+                    18429,
+                    61330,
+                    61331
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Ability_Racial_Avatar"
+            },
+            {
+                "i": 184,
+                "n": "Sp\u00e9cialisation Masse",
+                "m": 5,
+                "d": [
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 3% de l'armure de votre adversaire.",
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 6% de l'armure de votre adversaire.",
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 9% de l'armure de votre adversaire.",
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 12% de l'armure de votre adversaire.",
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 15% de l'armure de votre adversaire."
+                ],
+                "s": [
+                    13709,
+                    13800,
+                    13801,
+                    13802,
+                    13803
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "INV_Mace_01"
+            },
+            {
+                "i": 223,
+                "n": "D\u00e9luge de lames",
+                "m": 1,
+                "d": [
+                    "Augmente votre vitesse d'attaque de 20%. De plus, vos attaques frappent un adversaire proche suppl\u00e9mentaire. Dure 15 s."
+                ],
+                "s": [
+                    13877
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Ability_Warrior_PunishingBlow"
+            },
+            {
+                "i": 242,
+                "n": "Taillader et trancher",
+                "m": 5,
+                "d": [
+                    "Vous conf\u00e8re 1% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir frapp\u00e9 votre cible avec votre \u00e9p\u00e9e ou votre hache.",
+                    "Vous conf\u00e8re 2% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir frapp\u00e9 votre cible avec votre \u00e9p\u00e9e ou votre hache.",
+                    "Vous conf\u00e8re 3% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir frapp\u00e9 votre cible avec votre \u00e9p\u00e9e ou votre hache.",
+                    "Vous conf\u00e8re 4% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir frapp\u00e9 votre cible avec votre \u00e9p\u00e9e ou votre hache.",
+                    "Vous conf\u00e8re 5% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir frapp\u00e9 votre cible avec votre \u00e9p\u00e9e ou votre hache."
+                ],
+                "s": [
+                    13960,
+                    13961,
+                    13962,
+                    13963,
+                    13964
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "INV_Sword_27"
+            },
+            {
+                "i": 1703,
+                "n": "Expertise en armes",
+                "m": 2,
+                "d": [
+                    "Augmente votre expertise de 5.",
+                    "Augmente votre expertise de 10."
+                ],
+                "s": [
+                    30919,
+                    30920
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "Spell_Holy_BlessingOfStrength",
+                "r": [
+                    14,
+                    1
+                ]
+            },
+            {
+                "i": 1706,
+                "n": "Tournoiement de lames",
+                "m": 2,
+                "d": [
+                    "Augmente de 5% les d\u00e9g\u00e2ts inflig\u00e9s par Attaque pernicieuse et Attaque sournoise. De plus, vos attaques en m\u00eal\u00e9e qui infligent des d\u00e9g\u00e2ts ont 10% de chances d'h\u00e9b\u00e9ter la cible pendant 4 s.",
+                    "Augmente de 10% les d\u00e9g\u00e2ts inflig\u00e9s par Attaque pernicieuse et Attaque sournoise. De plus, vos attaques en m\u00eal\u00e9e qui infligent des d\u00e9g\u00e2ts ont 10% de chances d'h\u00e9b\u00e9ter la cible pendant 8 s."
+                ],
+                "s": [
+                    31124,
+                    31126
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Ability_Rogue_BladeTwisting"
+            },
+            {
+                "i": 1705,
+                "n": "Vitalit\u00e9",
+                "m": 3,
+                "d": [
+                    "Augmente votre taux de r\u00e9g\u00e9n\u00e9ration d'\u00e9nergie de 8%.",
+                    "Augmente votre taux de r\u00e9g\u00e9n\u00e9ration d'\u00e9nergie de 16%.",
+                    "Augmente votre taux de r\u00e9g\u00e9n\u00e9ration d'\u00e9nergie de 25%."
+                ],
+                "s": [
+                    31122,
+                    31123,
+                    61329
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Warrior_Revenge"
+            },
+            {
+                "i": 205,
+                "n": "Pouss\u00e9e d'adr\u00e9naline",
+                "m": 1,
+                "d": [
+                    "Augmente la vitesse de r\u00e9g\u00e9n\u00e9ration de votre Energie de 100% pendant 15 s."
+                ],
+                "s": [
+                    13750
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Shadow_ShadowWordDominate"
+            },
+            {
+                "i": 1707,
+                "n": "Nerfs d'acier",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 15% les d\u00e9g\u00e2ts subis lorsque vous \u00eates affect\u00e9 par des effets d'\u00e9tourdissement et de peur.",
+                    "R\u00e9duit de 30% les d\u00e9g\u00e2ts subis lorsque vous \u00eates affect\u00e9 par des effets d'\u00e9tourdissement et de peur."
+                ],
+                "s": [
+                    31130,
+                    31131
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Rogue_NervesOfSteel"
+            },
+            {
+                "i": 2072,
+                "n": "Sp\u00e9cialisation Armes de jet",
+                "m": 2,
+                "d": [
+                    "Augmente la port\u00e9e de Lancer et Lancer mortel de 2 m\u00e8tres et conf\u00e8re \u00e0 votre Lancer mortel 50% de chances d'interrompre la cible pendant 3 s.",
+                    "Augmente la port\u00e9e de Lancer et Lancer mortel de 4 m\u00e8tres et conf\u00e8re \u00e0 votre Lancer mortel 100% de chances d'interrompre la cible pendant 3 s."
+                ],
+                "s": [
+                    5952,
+                    51679
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Ability_Rogue_ThrowingSpecialization"
+            },
+            {
+                "i": 1825,
+                "n": "Toute-puissance de combat",
+                "m": 5,
+                "d": [
+                    "Conf\u00e8re \u00e0 vos attaques de m\u00eal\u00e9e avec la main gauche r\u00e9ussies 20% de chances de g\u00e9n\u00e9rer 3 points d'\u00e9nergie.",
+                    "Conf\u00e8re \u00e0 vos attaques de m\u00eal\u00e9e avec la main gauche r\u00e9ussies 20% de chances de g\u00e9n\u00e9rer 6 points d'\u00e9nergie.",
+                    "Conf\u00e8re \u00e0 vos attaques de m\u00eal\u00e9e avec la main gauche r\u00e9ussies 20% de chances de g\u00e9n\u00e9rer 9 points d'\u00e9nergie.",
+                    "Conf\u00e8re \u00e0 vos attaques de m\u00eal\u00e9e avec la main gauche r\u00e9ussies 20% de chances de g\u00e9n\u00e9rer 12 points d'\u00e9nergie.",
+                    "Conf\u00e8re \u00e0 vos attaques de m\u00eal\u00e9e avec la main gauche r\u00e9ussies 20% de chances de g\u00e9n\u00e9rer 15 points d'\u00e9nergie."
+                ],
+                "s": [
+                    35541,
+                    35550,
+                    35551,
+                    35552,
+                    35553
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "INV_Weapon_Shortblade_38"
+            },
+            {
+                "i": 2073,
+                "n": "Avantage d\u00e9loyal",
+                "m": 2,
+                "d": [
+                    "Chaque fois que vous esquivez une attaque, vous b\u00e9n\u00e9ficiez d'un Avantage d\u00e9loyal, qui vous permet de contre-attaquer en infligeant 50% des d\u00e9g\u00e2ts de votre arme en main droite. Cela ne peut se produire plus d'une fois par seconde.",
+                    "Chaque fois que vous esquivez une attaque, vous b\u00e9n\u00e9ficiez d'un Avantage d\u00e9loyal, qui vous permet de contre-attaquer en infligeant 100% des d\u00e9g\u00e2ts de votre arme en main droite. Cela ne peut se produire plus d'une fois par seconde."
+                ],
+                "s": [
+                    51672,
+                    51674
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Rogue_UnfairAdvantage"
+            },
+            {
+                "i": 1709,
+                "n": "Attaques surprises",
+                "m": 1,
+                "d": [
+                    "Vos coups de gr\u00e2ce ne peuvent plus \u00eatre esquiv\u00e9s et les d\u00e9g\u00e2ts de vos techniques Attaque pernicieuse, Attaque sournoise, Kriss, H\u00e9morragie et Suriner sont augment\u00e9s de 10%."
+                ],
+                "s": [
+                    32601
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Ability_Rogue_SurpriseAttack",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 2074,
+                "n": "Combat sauvage",
+                "m": 2,
+                "d": [
+                    "Augmente votre total de puissance d'attaque de 2% et tous les d\u00e9g\u00e2ts physiques inflig\u00e9s aux ennemis que vous avez empoisonn\u00e9s sont augment\u00e9s de 2%.",
+                    "Augmente votre total de puissance d'attaque de 4% et tous les d\u00e9g\u00e2ts physiques inflig\u00e9s aux ennemis que vous avez empoisonn\u00e9s sont augment\u00e9s de 4%."
+                ],
+                "s": [
+                    51682,
+                    58413
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Creature_Disease_03"
+            },
+            {
+                "i": 2075,
+                "n": "Attaquer les faibles",
+                "m": 5,
+                "d": [
+                    "Les d\u00e9g\u00e2ts de vos coups critiques sont augment\u00e9s de 4% quand la cible a moins de points de vie que vous (en pourcentage du total de points de vie).",
+                    "Les d\u00e9g\u00e2ts de vos coups critiques sont augment\u00e9s de 8% quand la cible a moins de points de vie que vous (en pourcentage du total de points de vie).",
+                    "Les d\u00e9g\u00e2ts de vos coups critiques sont augment\u00e9s de 12% quand la cible a moins de points de vie que vous (en pourcentage du total de points de vie).",
+                    "Les d\u00e9g\u00e2ts de vos coups critiques sont augment\u00e9s de 16% quand la cible a moins de points de vie que vous (en pourcentage du total de points de vie).",
+                    "Les d\u00e9g\u00e2ts de vos coups critiques sont augment\u00e9s de 20% quand la cible a moins de points de vie que vous (en pourcentage du total de points de vie)."
+                ],
+                "s": [
+                    51685,
+                    51686,
+                    51687,
+                    51688,
+                    51689
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Rogue_PreyontheWeak"
+            },
+            {
+                "i": 2076,
+                "n": "S\u00e9rie meurtri\u00e8re",
+                "m": 1,
+                "d": [
+                    "Marche \u00e0 travers les ombres d'ennemi en ennemi se trouvant \u00e0 moins de 10 m\u00e8tres et attaque un ennemi toutes les 0,5 sec. avec les deux armes jusqu'\u00e0 ce que 5 assauts aient \u00e9t\u00e9 effectu\u00e9s. Augmente tous les d\u00e9g\u00e2ts de 20% pendant ce temps. Peut toucher la m\u00eame cible plusieurs fois. Ne peut pas toucher les cibles invisibles ou camoufl\u00e9es."
+                ],
+                "s": [
+                    51690
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Rogue_MurderSpree"
+            }
+        ]
+    },
+    {
+        "n": "Finesse",
+        "t": [
+            {
+                "i": 2244,
+                "n": "Frappes implacables",
+                "m": 5,
+                "d": [
+                    "Vos coups de gr\u00e2ce ont 4% de chances par point de combo de vous rendre 25 points d'\u00e9nergie.",
+                    "Vos coups de gr\u00e2ce ont 8% de chances par point de combo de vous rendre 25 points d'\u00e9nergie.",
+                    "Vos coups de gr\u00e2ce ont 12% de chances par point de combo de vous rendre 25 points d'\u00e9nergie.",
+                    "Vos coups de gr\u00e2ce ont 16% de chances par point de combo de vous rendre 25 points d'\u00e9nergie.",
+                    "Vos coups de gr\u00e2ce ont 20% de chances par point de combo de vous rendre 25 points d'\u00e9nergie."
+                ],
+                "s": [
+                    14179,
+                    58422,
+                    58423,
+                    58424,
+                    58425
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Ability_Warrior_DecisiveStrike"
+            },
+            {
+                "i": 241,
+                "n": "Ma\u00eetre des illusions",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit les chances de vos ennemis de vous d\u00e9tecter lorsque vous \u00eates en camouflage.",
+                    "R\u00e9duit les chances de vos ennemis de vous d\u00e9tecter lorsque vous \u00eates en camouflage. Plus efficace que Ma\u00eetre des illusions (Rang 1).",
+                    "R\u00e9duit les chances de vos ennemis de vous d\u00e9tecter lorsque vous \u00eates en camouflage. Plus efficace que Ma\u00eetre des illusions (Rang 2)."
+                ],
+                "s": [
+                    13958,
+                    13970,
+                    13971
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Shadow_Charm"
+            },
+            {
+                "i": 261,
+                "n": "Opportunit\u00e9",
+                "m": 2,
+                "d": [
+                    "Augmente de 10% les d\u00e9g\u00e2ts inflig\u00e9s avec vos techniques Attaque sournoise, Estropier, Garrot et Embuscade.",
+                    "Augmente de 20% les d\u00e9g\u00e2ts inflig\u00e9s avec vos techniques Attaque sournoise, Estropier, Garrot et Embuscade."
+                ],
+                "s": [
+                    14057,
+                    14072
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Ability_Warrior_WarCry"
+            },
+            {
+                "i": 1700,
+                "n": "Passe-passe",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 1% la probabilit\u00e9 que vous soyez touch\u00e9 par un coup critique inflig\u00e9 par une attaque en m\u00eal\u00e9e ou \u00e0 distance, et augmente la r\u00e9duction du niveau de menace de votre technique Feinte de 10%.",
+                    "R\u00e9duit de 2% la probabilit\u00e9 que vous soyez touch\u00e9 par un coup critique inflig\u00e9 par une attaque en m\u00eal\u00e9e ou \u00e0 distance, et augmente la r\u00e9duction du niveau de menace de votre technique Feinte de 20%."
+                ],
+                "s": [
+                    30892,
+                    30893
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Ability_Rogue_Feint"
+            },
+            {
+                "i": 262,
+                "n": "Coup tordu",
+                "m": 2,
+                "d": [
+                    "Augmente la port\u00e9e de vos techniques C\u00e9cit\u00e9 et Assommer de 2 m\u00e8tres et r\u00e9duit leur co\u00fbt en \u00e9nergie de 25%.",
+                    "Augmente la port\u00e9e de vos techniques C\u00e9cit\u00e9 et Assommer de 5 m\u00e8tres et r\u00e9duit leur co\u00fbt en \u00e9nergie de 50%."
+                ],
+                "s": [
+                    14076,
+                    14094
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Ability_Sap"
+            },
+            {
+                "i": 244,
+                "n": "Dissimulation",
+                "m": 3,
+                "d": [
+                    "Augmente de 5% votre vitesse de d\u00e9placement lorsque vous \u00eates camoufl\u00e9 et r\u00e9duit de 2 sec. le temps de recharge de votre technique Camouflage.",
+                    "Augmente de 10% votre vitesse de d\u00e9placement lorsque vous \u00eates camoufl\u00e9 et r\u00e9duit de 4 sec. le temps de recharge de votre technique Camouflage.",
+                    "Augmente de 15% votre vitesse de d\u00e9placement lorsque vous \u00eates camoufl\u00e9 et r\u00e9duit de 6 sec. le temps de recharge de votre technique Camouflage."
+                ],
+                "s": [
+                    13975,
+                    14062,
+                    14063
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Ability_Stealth"
+            },
+            {
+                "i": 247,
+                "n": "Insaisissable",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos techniques Disparition et C\u00e9cit\u00e9 de 30 sec. et de votre technique Cape d'ombre de 15 sec.",
+                    "R\u00e9duit le temps de recharge de vos techniques Disparition et C\u00e9cit\u00e9 de 60 sec. et de votre technique Cape d'ombre de 30 sec."
+                ],
+                "s": [
+                    13981,
+                    14066
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Magic_LesserInvisibilty"
+            },
+            {
+                "i": 303,
+                "n": "Frappe fantomatique",
+                "m": 1,
+                "d": [
+                    "Une attaque qui inflige 125% des d\u00e9g\u00e2ts de l'arme (180% si une dague est \u00e9quip\u00e9e) et qui augmente vos chances d'esquiver de 15% pendant 7 s. Vous gagnez 1 point de combo."
+                ],
+                "s": [
+                    14278
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Shadow_Curse"
+            },
+            {
+                "i": 1123,
+                "n": "Lames dentel\u00e9es",
+                "m": 3,
+                "d": [
+                    "Vos attaques ignorent jusqu'\u00e0 3% de l'Armure de votre cible. Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre technique Rupture de 10%.",
+                    "Vos attaques ignorent jusqu'\u00e0 6% de l'Armure de votre cible. Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre technique Rupture de 20%.",
+                    "Vos attaques ignorent jusqu'\u00e0 9% de l'Armure de votre cible. Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre technique Rupture de 30%."
+                ],
+                "s": [
+                    14171,
+                    14172,
+                    14173
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "INV_Sword_17"
+            },
+            {
+                "i": 246,
+                "n": "Pr\u00e9paratifs",
+                "m": 3,
+                "d": [
+                    "Vous conf\u00e8re 33% de chances d'ajouter un point de combo \u00e0 votre cible apr\u00e8s avoir esquiv\u00e9 son attaque ou enti\u00e8rement r\u00e9sist\u00e9 \u00e0 un de ses sorts. Ne peut pas se produire plus d'une fois par seconde.",
+                    "Vous conf\u00e8re 66% de chances d'ajouter un point de combo \u00e0 votre cible apr\u00e8s avoir esquiv\u00e9 son attaque ou enti\u00e8rement r\u00e9sist\u00e9 \u00e0 un de ses sorts. Ne peut pas se produire plus d'une fois par seconde.",
+                    "Vous conf\u00e8re 100% de chances d'ajouter un point de combo \u00e0 votre cible apr\u00e8s avoir esquiv\u00e9 son attaque ou enti\u00e8rement r\u00e9sist\u00e9 \u00e0 un de ses sorts. Ne peut pas se produire plus d'une fois par seconde."
+                ],
+                "s": [
+                    13983,
+                    14070,
+                    14071
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Nature_MirrorImage"
+            },
+            {
+                "i": 245,
+                "n": "Initiative",
+                "m": 3,
+                "d": [
+                    "Vous conf\u00e8re 33% de chances de gagner un point de combo suppl\u00e9mentaire lorsque vous utilisez les techniques Embuscade, Garrot et Coup bas.",
+                    "Vous conf\u00e8re 66% de chances de gagner un point de combo suppl\u00e9mentaire lorsque vous utilisez les techniques Embuscade, Garrot et Coup bas.",
+                    "Vous conf\u00e8re 100% de chances de gagner un point de combo suppl\u00e9mentaire lorsque vous utilisez les techniques Embuscade, Garrot et Coup bas."
+                ],
+                "s": [
+                    13976,
+                    13979,
+                    13980
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Shadow_Fumble"
+            },
+            {
+                "i": 263,
+                "n": "Embuscade am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente les chances d'infliger un coup critique avec votre technique Embuscade de 25%.",
+                    "Augmente les chances d'infliger un coup critique avec votre technique Embuscade de 50%."
+                ],
+                "s": [
+                    14079,
+                    14080
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Ability_Rogue_Ambush"
+            },
+            {
+                "i": 1701,
+                "n": "Sens amplifi\u00e9s",
+                "m": 2,
+                "d": [
+                    "Augmente votre d\u00e9tection du camouflage et r\u00e9duit de 2% la probabilit\u00e9 que vous soyez touch\u00e9 par les sorts et les attaques \u00e0 distance.",
+                    "Augmente votre d\u00e9tection du camouflage et r\u00e9duit de 4% la probabilit\u00e9 que vous soyez touch\u00e9 par les sorts et les attaques \u00e0 distance. Plus efficace que Sens amplifi\u00e9s (Rang 1)."
+                ],
+                "s": [
+                    30894,
+                    30895
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Ability_Ambush"
+            },
+            {
+                "i": 284,
+                "n": "Pr\u00e9paration",
+                "m": 1,
+                "d": [
+                    "Lorsque vous la d\u00e9clenchez, cette technique met imm\u00e9diatement fin au temps de recharge de vos techniques Evasion, Sprint, Disparition, Sang froid et Pas de l'ombre."
+                ],
+                "s": [
+                    14185
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Shadow_AntiShadow"
+            },
+            {
+                "i": 265,
+                "n": "Coups fourr\u00e9s",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 10 le co\u00fbt en \u00e9nergie de vos techniques Coup bas et Garrot. De plus, vos techniques sp\u00e9ciales infligent 10% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles qui poss\u00e8dent moins de 35% de leurs points de vie.",
+                    "R\u00e9duit de 20 le co\u00fbt en \u00e9nergie de vos techniques Coup bas et Garrot. De plus, vos techniques sp\u00e9ciales infligent 20% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles qui poss\u00e8dent moins de 35% de leurs points de vie."
+                ],
+                "s": [
+                    14082,
+                    14083
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Shadow_SummonSuccubus"
+            },
+            {
+                "i": 681,
+                "n": "H\u00e9morragie",
+                "m": 1,
+                "d": [
+                    "Une frappe instantan\u00e9e qui inflige 110% des d\u00e9g\u00e2ts de l'arme (159.5% si une dague est \u00e9quip\u00e9e) \u00e0 l'adversaire et provoque une h\u00e9morragie. Augmente tous les d\u00e9g\u00e2ts physiques inflig\u00e9s \u00e0 la cible de <bonus> au maximum. Utilisable 10 fois ou pendant 15 s. Vous gagnez 1 point de combo."
+                ],
+                "s": [
+                    16511
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Shadow_LifeDrain",
+                "r": [
+                    8,
+                    3
+                ]
+            },
+            {
+                "i": 1713,
+                "n": "Ma\u00eetre de la discr\u00e9tion",
+                "m": 3,
+                "d": [
+                    "Les attaques effectu\u00e9es alors que vous \u00eates camoufl\u00e9 et pendant les 6 secondes suivant l'annulation du camouflage infligent 4% de d\u00e9g\u00e2ts suppl\u00e9mentaires.",
+                    "Les attaques effectu\u00e9es alors que vous \u00eates camoufl\u00e9 et pendant les 6 secondes suivant l'annulation du camouflage infligent 7% de d\u00e9g\u00e2ts suppl\u00e9mentaires.",
+                    "Les attaques effectu\u00e9es alors que vous \u00eates camoufl\u00e9 et pendant les 6 secondes suivant l'annulation du camouflage infligent 10% de d\u00e9g\u00e2ts suppl\u00e9mentaires."
+                ],
+                "s": [
+                    31221,
+                    31222,
+                    31223
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Ability_Rogue_MasterOfSubtlety"
+            },
+            {
+                "i": 1702,
+                "n": "Meurtrier",
+                "m": 5,
+                "d": [
+                    "Augmente votre puissance d'attaque de 2%.",
+                    "Augmente votre puissance d'attaque de 4%.",
+                    "Augmente votre puissance d'attaque de 6%.",
+                    "Augmente votre puissance d'attaque de 8%.",
+                    "Augmente votre puissance d'attaque de 10%."
+                ],
+                "s": [
+                    30902,
+                    30903,
+                    30904,
+                    30905,
+                    30906
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "INV_Weapon_Crossbow_11"
+            },
+            {
+                "i": 1711,
+                "n": "Linceul d'ombres",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit les d\u00e9g\u00e2ts que vous infligent les attaques \u00e0 zone d'effet de 10%.",
+                    "R\u00e9duit les d\u00e9g\u00e2ts que vous infligent les attaques \u00e0 zone d'effet de 20%.",
+                    "R\u00e9duit les d\u00e9g\u00e2ts que vous infligent les attaques \u00e0 zone d'effet de 30%."
+                ],
+                "s": [
+                    31211,
+                    31212,
+                    31213
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Rogue_EnvelopingShadows"
+            },
+            {
+                "i": 381,
+                "n": "Pr\u00e9m\u00e9ditation",
+                "m": 1,
+                "d": [
+                    "Lorsqu'elle est utilis\u00e9e, cette technique ajoute 2 points de combo \u00e0 la cible. Vous devez ajouter \u00e0 ces points de combo ou les utiliser avant 20 s sinon les points de combo sont perdus."
+                ],
+                "s": [
+                    14183
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Shadow_Possession",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 1722,
+                "n": "Trompe-la-mort",
+                "m": 3,
+                "d": [
+                    "Vous avez 33% de chances qu'une attaque infligeant des d\u00e9g\u00e2ts qui devrait normalement vous tuer r\u00e9duise \u00e0 10% votre vie maximale. De plus, r\u00e9duit tous les d\u00e9g\u00e2ts subis jusqu'\u00e0 90% pendant 3 s (modifi\u00e9 par r\u00e9silience). Cet effet ne peut se produire plus d'une fois par minute.",
+                    "Vous avez 66% de chances qu'une attaque infligeant des d\u00e9g\u00e2ts qui devrait normalement vous tuer r\u00e9duise \u00e0 10% votre vie maximale. De plus, r\u00e9duit tous les d\u00e9g\u00e2ts subis jusqu'\u00e0 90% pendant 3 s (modifi\u00e9 par r\u00e9silience). Cet effet ne peut se produire plus d'une fois par minute.",
+                    "Vous avez 100% de chances qu'une attaque infligeant des d\u00e9g\u00e2ts qui devrait normalement vous tuer r\u00e9duise \u00e0 10% votre vie maximale. De plus, r\u00e9duit tous les d\u00e9g\u00e2ts subis jusqu'\u00e0 90% pendant 3 s (modifi\u00e9 par r\u00e9silience). Cet effet ne peut se produire plus d'une fois par minute."
+                ],
+                "s": [
+                    31228,
+                    31229,
+                    31230
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Rogue_CheatDeath"
+            },
+            {
+                "i": 1712,
+                "n": "Vocation pernicieuse",
+                "m": 5,
+                "d": [
+                    "Augmente votre total d'Agilit\u00e9 de 3% et augmente de 2% suppl\u00e9mentaires le bonus aux d\u00e9g\u00e2ts d'Attaque sournoise et H\u00e9morragie.",
+                    "Augmente votre total d'Agilit\u00e9 de 6% et augmente de 4% suppl\u00e9mentaires le bonus aux d\u00e9g\u00e2ts d'Attaque sournoise et H\u00e9morragie.",
+                    "Augmente votre total d'Agilit\u00e9 de 9% et augmente de 6% suppl\u00e9mentaires le bonus aux d\u00e9g\u00e2ts d'Attaque sournoise et H\u00e9morragie.",
+                    "Augmente votre total d'Agilit\u00e9 de 12% et augmente de 8% suppl\u00e9mentaires le bonus aux d\u00e9g\u00e2ts d'Attaque sournoise et H\u00e9morragie.",
+                    "Augmente votre total d'Agilit\u00e9 de 15% et augmente de 10% suppl\u00e9mentaires le bonus aux d\u00e9g\u00e2ts d'Attaque sournoise et H\u00e9morragie."
+                ],
+                "s": [
+                    31216,
+                    31217,
+                    31218,
+                    31219,
+                    31220
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Ability_Rogue_SinisterCalling",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 2077,
+                "n": "Assaillir",
+                "m": 2,
+                "d": [
+                    "Vos coups avec Embuscade et Attaque sournoise ont 50% de chances de d\u00e9s\u00e9quilibrer la cible, ce qui augmente le temps entre ses attaques en m\u00eal\u00e9e et \u00e0 distance de 20% et r\u00e9duit sa vitesse de d\u00e9placement de 50% pendant 8 s.",
+                    "Vos coups avec Embuscade et Attaque sournoise ont 100% de chances de d\u00e9s\u00e9quilibrer la cible, ce qui augmente le temps entre ses attaques en m\u00eal\u00e9e et \u00e0 distance de 20% et r\u00e9duit sa vitesse de d\u00e9placement de 50% pendant 8 s."
+                ],
+                "s": [
+                    51692,
+                    51696
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Ability_Rogue_Waylay"
+            },
+            {
+                "i": 2078,
+                "n": "Honneur des voleurs",
+                "m": 3,
+                "d": [
+                    "Chaque fois qu'un membre de votre groupe r\u00e9ussit un coup critique avec un sort de d\u00e9g\u00e2ts ou de soins ou une technique, vous avez 33% de chances de gagner un point de combo sur votre cible actuelle. Cet effet ne peut se produire plus d'une fois toutes les secondes.",
+                    "Chaque fois qu'un membre de votre groupe r\u00e9ussit un coup critique avec un sort de d\u00e9g\u00e2ts ou de soins ou une technique, vous avez 66% de chances de gagner un point de combo sur votre cible actuelle. Cet effet ne peut se produire plus d'une fois toutes les secondes.",
+                    "Chaque fois qu'un membre de votre groupe r\u00e9ussit un coup critique avec un sort de d\u00e9g\u00e2ts ou de soins ou une technique, vous avez 100% de chances de gagner un point de combo sur votre cible actuelle. Cet effet ne peut se produire plus d'une fois toutes les secondes."
+                ],
+                "s": [
+                    51698,
+                    51700,
+                    51701
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Rogue_HonorAmongstThieves"
+            },
+            {
+                "i": 1714,
+                "n": "Pas de l'ombre",
+                "m": 1,
+                "d": [
+                    "Vous tentez de marcher \u00e0 travers les ombres et de r\u00e9appara\u00eetre derri\u00e8re votre ennemi. Votre vitesse de d\u00e9placement est augment\u00e9e de 70% pendant 3 s. Les d\u00e9g\u00e2ts de votre prochaine technique sont augment\u00e9s de 20% et la menace g\u00e9n\u00e9r\u00e9e est r\u00e9duite de 50%. Dure 10 s."
+                ],
+                "s": [
+                    36554
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Ability_Rogue_Shadowstep"
+            },
+            {
+                "i": 2079,
+                "n": "Tours pendables",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de 5 sec. et le co\u00fbt en \u00e9nergie de 5 de vos techniques Ficelles du m\u00e9tier, Distraction et Pas de l'ombre, et le temps de recharge de votre Pr\u00e9paration de 1.5 min.",
+                    "R\u00e9duit le temps de recharge de 10 sec. et le co\u00fbt en \u00e9nergie de 10 de vos techniques Ficelles du m\u00e9tier, Distraction et Pas de l'ombre, et le temps de recharge de votre Pr\u00e9paration de 3 min."
+                ],
+                "s": [
+                    58414,
+                    58415
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Rogue_WrongfullyAccused"
+            },
+            {
+                "i": 2080,
+                "n": "Ombres meurtri\u00e8res",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit de 4 le co\u00fbt en \u00e9nergie de vos techniques Attaque sournoise et Embuscade et de 1 le co\u00fbt en \u00e9nergie d'H\u00e9morragie. Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 1%.",
+                    "R\u00e9duit de 8 le co\u00fbt en \u00e9nergie de vos techniques Attaque sournoise et Embuscade et de 2 le co\u00fbt en \u00e9nergie d'H\u00e9morragie. Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 2%.",
+                    "R\u00e9duit de 12 le co\u00fbt en \u00e9nergie de vos techniques Attaque sournoise et Embuscade et de 3 le co\u00fbt en \u00e9nergie d'H\u00e9morragie. Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 3%.",
+                    "R\u00e9duit de 16 le co\u00fbt en \u00e9nergie de vos techniques Attaque sournoise et Embuscade et de 4 le co\u00fbt en \u00e9nergie d'H\u00e9morragie. Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 4%.",
+                    "R\u00e9duit de 20 le co\u00fbt en \u00e9nergie de vos techniques Attaque sournoise et Embuscade et de 5 le co\u00fbt en \u00e9nergie d'H\u00e9morragie. Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 5%."
+                ],
+                "s": [
+                    51708,
+                    51709,
+                    51710,
+                    51711,
+                    51712
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Rogue_SlaughterfromtheShadows"
+            },
+            {
+                "i": 2081,
+                "n": "Danse de l'ombre",
+                "m": 1,
+                "d": [
+                    "Entame la Danse de l'ombre, qui dure 6 s. et permet l'utilisation d'Assommer, Garrot, Embuscade, Coup bas, Pr\u00e9m\u00e9ditation, Vol \u00e0 la tire et D\u00e9sarmement de pi\u00e8ge m\u00eame sans \u00eatre camoufl\u00e9."
+                ],
+                "s": [
+                    51713
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Rogue_ShadowDance"
+            }
+        ]
+    }
+])

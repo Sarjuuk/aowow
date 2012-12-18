@@ -1,0 +1,1553 @@
+$WowheadTalentCalculator.registerClass(8, [
+    {
+        "n": "Arcanes",
+        "t": [
+            {
+                "i": 74,
+                "n": "Subtilit\u00e9 des arcanes",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 15% les chances que vos sorts b\u00e9n\u00e9fiques soient dissip\u00e9s et r\u00e9duit de 20% la menace g\u00e9n\u00e9r\u00e9e par vos sorts des Arcanes.",
+                    "R\u00e9duit de 30% les chances que vos sorts b\u00e9n\u00e9fiques soient dissip\u00e9s et r\u00e9duit de 40% la menace g\u00e9n\u00e9r\u00e9e par vos sorts des Arcanes."
+                ],
+                "s": [
+                    11210,
+                    12592
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Holy_DispelMagic"
+            },
+            {
+                "i": 76,
+                "n": "Focalisation des arcanes",
+                "m": 3,
+                "d": [
+                    "Augmente les chances de toucher et r\u00e9duit le co\u00fbt en mana de vos sorts des Arcanes de 1%.",
+                    "Augmente les chances de toucher et r\u00e9duit le co\u00fbt en mana de vos sorts des Arcanes de 2%.",
+                    "Augmente les chances de toucher et r\u00e9duit le co\u00fbt en mana de vos sorts des Arcanes de 3%."
+                ],
+                "s": [
+                    11222,
+                    12839,
+                    12840
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Holy_Devotion"
+            },
+            {
+                "i": 80,
+                "n": "Stabilit\u00e9 arcanique",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit de 20% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Projectiles des arcanes et D\u00e9flagration des arcanes.",
+                    "R\u00e9duit de 40% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Projectiles des arcanes et D\u00e9flagration des arcanes.",
+                    "R\u00e9duit de 60% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Projectiles des arcanes et D\u00e9flagration des arcanes.",
+                    "R\u00e9duit de 80% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Projectiles des arcanes et D\u00e9flagration des arcanes.",
+                    "R\u00e9duit de 100% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Projectiles des arcanes et D\u00e9flagration des arcanes."
+                ],
+                "s": [
+                    11237,
+                    12463,
+                    12464,
+                    16769,
+                    16770
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Nature_StarFall"
+            },
+            {
+                "i": 85,
+                "n": "Robustesse des arcanes",
+                "m": 3,
+                "d": [
+                    "Augmente votre Armure d'un montant \u00e9gal \u00e0 50% de votre Intelligence.",
+                    "Augmente votre Armure d'un montant \u00e9gal \u00e0 100% de votre Intelligence.",
+                    "Augmente votre Armure d'un montant \u00e9gal \u00e0 150% de votre Intelligence."
+                ],
+                "s": [
+                    28574,
+                    54658,
+                    54659
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Arcane_ArcaneResilience"
+            },
+            {
+                "i": 1650,
+                "n": "Absorption de magie",
+                "m": 2,
+                "d": [
+                    "Augmente toutes les r\u00e9sistances de 0,5 par niveau. Tous les sorts auxquels vous r\u00e9sistez enti\u00e8rement restaurent 1% de votre total de mana. Temps de recharge d'1 sec.",
+                    "Augmente toutes les r\u00e9sistances d'1 par niveau. Tous les sorts auxquels vous r\u00e9sistez enti\u00e8rement restaurent 2% de votre total de mana. Temps de recharge d'1 sec."
+                ],
+                "s": [
+                    29441,
+                    29444
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Nature_AstralRecalGroup"
+            },
+            {
+                "i": 75,
+                "n": "Concentration des arcanes",
+                "m": 5,
+                "d": [
+                    "Vous conf\u00e8re 2% de chances d'entrer dans un \u00e9tat d'Id\u00e9es claires apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec un sort \u00e0 la cible. Cet \u00e9tat r\u00e9duit le co\u00fbt en mana de votre prochain sort de 100%.",
+                    "Vous conf\u00e8re 4% de chances d'entrer dans un \u00e9tat d'Id\u00e9es claires apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec un sort \u00e0 la cible. Cet \u00e9tat r\u00e9duit le co\u00fbt en mana de votre prochain sort de 100%.",
+                    "Vous conf\u00e8re 6% de chances d'entrer dans un \u00e9tat d'Id\u00e9es claires apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec un sort \u00e0 la cible. Cet \u00e9tat r\u00e9duit le co\u00fbt en mana de votre prochain sort de 100%.",
+                    "Vous conf\u00e8re 8% de chances d'entrer dans un \u00e9tat d'Id\u00e9es claires apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec un sort \u00e0 la cible. Cet \u00e9tat r\u00e9duit le co\u00fbt en mana de votre prochain sort de 100%.",
+                    "Vous conf\u00e8re 10% de chances d'entrer dans un \u00e9tat d'Id\u00e9es claires apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec un sort \u00e0 la cible. Cet \u00e9tat r\u00e9duit le co\u00fbt en mana de votre prochain sort de 100%."
+                ],
+                "s": [
+                    11213,
+                    12574,
+                    12575,
+                    12576,
+                    12577
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Shadow_ManaBurn"
+            },
+            {
+                "i": 82,
+                "n": "Harmonisation de la magie",
+                "m": 2,
+                "d": [
+                    "Augmente de 3 m\u00e8tres la port\u00e9e de vos sorts des Arcanes et de 25% les effets de vos sorts Amplification de la magie et Att\u00e9nuation de la magie.",
+                    "Augmente de 6 m\u00e8tres la port\u00e9e de vos sorts des Arcanes et de 50% les effets de vos sorts Amplification de la magie et Att\u00e9nuation de la magie."
+                ],
+                "s": [
+                    11247,
+                    12606
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Nature_AbolishMagic"
+            },
+            {
+                "i": 81,
+                "n": "Impact des sorts",
+                "m": 3,
+                "d": [
+                    "Augmente de 2% suppl\u00e9mentaires les d\u00e9g\u00e2ts de vos sorts Explosion des arcanes, D\u00e9flagration des arcanes, Vague explosive, Trait de feu, Br\u00fblure, Boule de feu, Javelot de glace et C\u00f4ne de froid.",
+                    "Augmente de 4% suppl\u00e9mentaires les d\u00e9g\u00e2ts de vos sorts Explosion des arcanes, D\u00e9flagration des arcanes, Vague explosive, Trait de feu, Br\u00fblure, Boule de feu, Javelot de glace et C\u00f4ne de froid.",
+                    "Augmente de 6% suppl\u00e9mentaires les d\u00e9g\u00e2ts de vos sorts Explosion des arcanes, D\u00e9flagration des arcanes, Vague explosive, Trait de feu, Br\u00fblure, Boule de feu, Javelot de glace et C\u00f4ne de froid."
+                ],
+                "s": [
+                    11242,
+                    12467,
+                    12469
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Nature_WispSplode"
+            },
+            {
+                "i": 1845,
+                "n": "Etudiant de la raison",
+                "m": 3,
+                "d": [
+                    "Augmente votre total d'Esprit de 4%.",
+                    "Augmente votre total d'Esprit de 7%.",
+                    "Augmente votre total d'Esprit de 10%."
+                ],
+                "s": [
+                    44397,
+                    44398,
+                    44399
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Ability_Mage_StudentOfTheMind"
+            },
+            {
+                "i": 2211,
+                "n": "Focalisation de la magie",
+                "m": 1,
+                "d": [
+                    "Augmente de 3% les chances de coup critique de la cible avec les sorts. Quand la cible r\u00e9ussit un coup critique, les chances de coup critique avec les sorts du lanceur sont augment\u00e9es de 3% pendant 10 s. Ne peut \u00eatre lanc\u00e9 sur soi-m\u00eame."
+                ],
+                "s": [
+                    54646
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Arcane_StudentOfMagic"
+            },
+            {
+                "i": 83,
+                "n": "Sauvegarde des arcanes",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 17% le mana perdu par point de d\u00e9g\u00e2ts re\u00e7u lorsque Bouclier de mana est actif et augmente de 25% les r\u00e9sistances conf\u00e9r\u00e9es par Armure du mage.",
+                    "R\u00e9duit de 33% le mana perdu par point de d\u00e9g\u00e2ts re\u00e7u lorsque Bouclier de mana est actif et augmente de 50% les r\u00e9sistances conf\u00e9r\u00e9es par Armure du mage."
+                ],
+                "s": [
+                    11252,
+                    12605
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Shadow_DetectLesserInvisibility"
+            },
+            {
+                "i": 88,
+                "n": "Contresort am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Votre Contresort r\u00e9duit \u00e9galement la cible au silence pendant 2 s.",
+                    "Votre Contresort r\u00e9duit \u00e9galement la cible au silence pendant 4 s."
+                ],
+                "s": [
+                    11255,
+                    12598
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Frost_IceShock"
+            },
+            {
+                "i": 1142,
+                "n": "M\u00e9ditation des arcanes",
+                "m": 3,
+                "d": [
+                    "Vous conf\u00e8re 17% de votre vitesse de r\u00e9cup\u00e9ration du mana normale pendant l'incantation.",
+                    "Vous conf\u00e8re 33% de votre vitesse de r\u00e9cup\u00e9ration du mana normale pendant l'incantation.",
+                    "Vous conf\u00e8re 50% de votre vitesse de r\u00e9cup\u00e9ration du mana normale pendant l'incantation."
+                ],
+                "s": [
+                    18462,
+                    18463,
+                    18464
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Shadow_SiphonMana"
+            },
+            {
+                "i": 2222,
+                "n": "Tourmenter les faibles",
+                "m": 3,
+                "d": [
+                    "Vos techniques Eclair de givre, Boule de feu, Eclair de givrefeu, Explosion pyrotechnique, Projectiles des arcanes, D\u00e9flagration des arcanes et Barrage des arcanes infligent 4% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles pi\u00e9g\u00e9es ou ralenties.",
+                    "Vos techniques Eclair de givre, Boule de feu, Eclair de givrefeu, Explosion pyrotechnique, Projectiles des arcanes, D\u00e9flagration des arcanes et Barrage des arcanes infligent 8% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles pi\u00e9g\u00e9es ou ralenties.",
+                    "Vos techniques Eclair de givre, Boule de feu, Eclair de givrefeu, Explosion pyrotechnique, Projectiles des arcanes, D\u00e9flagration des arcanes et Barrage des arcanes infligent 12% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles pi\u00e9g\u00e9es ou ralenties."
+                ],
+                "s": [
+                    29447,
+                    55339,
+                    55340
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Ability_Mage_TormentOfTheWeak"
+            },
+            {
+                "i": 1724,
+                "n": "Transfert am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana de Transfert de 25% et pendant 4 s apr\u00e8s l'avoir lanc\u00e9, la probabilit\u00e9 que vous soyez touch\u00e9 par tous les sorts et attaques est r\u00e9duite de 15%.",
+                    "R\u00e9duit le co\u00fbt en mana de Transfert de 50% et pendant 4 s apr\u00e8s l'avoir lanc\u00e9, la probabilit\u00e9 que vous soyez touch\u00e9 par tous les sorts et attaques est r\u00e9duite de 30%."
+                ],
+                "s": [
+                    31569,
+                    31570
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Arcane_Blink"
+            },
+            {
+                "i": 86,
+                "n": "Pr\u00e9sence spirituelle",
+                "m": 1,
+                "d": [
+                    "Lorsque cette technique est activ\u00e9e, votre prochain sort de mage dont le temps d'incantation est inf\u00e9rieur \u00e0 10 sec. devient un sort instantan\u00e9."
+                ],
+                "s": [
+                    12043
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Nature_EnchantArmor"
+            },
+            {
+                "i": 77,
+                "n": "Esprit des arcanes",
+                "m": 5,
+                "d": [
+                    "Augmente votre total d'Intelligence de 3%.",
+                    "Augmente votre total d'Intelligence de 6%.",
+                    "Augmente votre total d'Intelligence de 9%.",
+                    "Augmente votre total d'Intelligence de 12%.",
+                    "Augmente votre total d'Intelligence de 15%."
+                ],
+                "s": [
+                    11232,
+                    12500,
+                    12501,
+                    12502,
+                    12503
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Shadow_Charm"
+            },
+            {
+                "i": 1726,
+                "n": "Cape prismatique",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 2% et r\u00e9duit le temps de disparition de votre sort Invisibilit\u00e9 de 1 sec.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 4% et r\u00e9duit le temps de disparition de votre sort Invisibilit\u00e9 de 2 sec.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 6% et r\u00e9duit le temps de disparition de votre sort Invisibilit\u00e9 de 3 sec."
+                ],
+                "s": [
+                    31574,
+                    31575,
+                    54354
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Arcane_PrismaticCloak"
+            },
+            {
+                "i": 421,
+                "n": "Instabilit\u00e9 des arcanes",
+                "m": 3,
+                "d": [
+                    "Augmente de 1% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts et vos chances de coup critique.",
+                    "Augmente de 2% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts et vos chances de coup critique.",
+                    "Augmente de 3% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts et vos chances de coup critique."
+                ],
+                "s": [
+                    15058,
+                    15059,
+                    15060
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "Spell_Shadow_Teleport",
+                "r": [
+                    15,
+                    1
+                ]
+            },
+            {
+                "i": 1725,
+                "n": "Toute-puissance des arcanes",
+                "m": 2,
+                "d": [
+                    "Augmente de 15% les chances de coup critique de tous les sorts infligeant des d\u00e9g\u00e2ts lanc\u00e9s sous l'effet d'Id\u00e9es claires ou Pr\u00e9sence spirituelle.",
+                    "Augmente de 30% les chances de coup critique de tous les sorts infligeant des d\u00e9g\u00e2ts lanc\u00e9s sous l'effet d'Id\u00e9es claires ou Pr\u00e9sence spirituelle."
+                ],
+                "s": [
+                    31571,
+                    31572
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Arcane_ArcanePotency",
+                "r": [
+                    15,
+                    1
+                ]
+            },
+            {
+                "i": 1727,
+                "n": "Renforcement arcanique",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de votre sort Projectiles des arcanes d'un montant \u00e9gal \u00e0 15% de votre puissance des sorts et les d\u00e9g\u00e2ts de D\u00e9flagration des arcanes de 3% de votre puissance des sorts. De plus, augmente les d\u00e9g\u00e2ts de tous les membres du groupe et du raid se trouvant \u00e0 moins de 100 m\u00e8tres de 1%.",
+                    "Augmente les d\u00e9g\u00e2ts de votre sort Projectiles des arcanes d'un montant \u00e9gal \u00e0 30% de votre puissance des sorts et les d\u00e9g\u00e2ts de D\u00e9flagration des arcanes de 6% de votre puissance des sorts. De plus, augmente les d\u00e9g\u00e2ts de tous les membres du groupe et du raid se trouvant \u00e0 moins de 100 m\u00e8tres de 2%.",
+                    "Augmente les d\u00e9g\u00e2ts de votre sort Projectiles des arcanes d'un montant \u00e9gal \u00e0 45% de votre puissance des sorts et les d\u00e9g\u00e2ts de D\u00e9flagration des arcanes de 9% de votre puissance des sorts. De plus, augmente les d\u00e9g\u00e2ts de tous les membres du groupe et du raid se trouvant \u00e0 moins de 100 m\u00e8tres de 3%."
+                ],
+                "s": [
+                    31579,
+                    31582,
+                    31583
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Nature_StarFall"
+            },
+            {
+                "i": 87,
+                "n": "Pouvoir des arcanes",
+                "m": 1,
+                "d": [
+                    "Lorsqu'il est activ\u00e9, vos sorts infligent 20% de points de d\u00e9g\u00e2ts suppl\u00e9mentaires et ils vous co\u00fbtent 20% de points de mana suppl\u00e9mentaires. Cet effet dure 15 s."
+                ],
+                "s": [
+                    12042
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Nature_Lightning",
+                "r": [
+                    18,
+                    3
+                ]
+            },
+            {
+                "i": 1844,
+                "n": "Absorption de l'incantateur",
+                "m": 3,
+                "d": [
+                    "Lorsque votre Bouclier de mana, Gardien de givre, Gardien de feu ou Barri\u00e8re de glace absorbe des d\u00e9g\u00e2ts, les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts sont augment\u00e9s de 5% du montant absorb\u00e9 pendant 10 s.",
+                    "Lorsque votre Bouclier de mana, Gardien de givre, Gardien de feu ou Barri\u00e8re de glace absorbe des d\u00e9g\u00e2ts, les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts sont augment\u00e9s de 10% du montant absorb\u00e9 pendant 10 s.",
+                    "Lorsque votre Bouclier de mana, Gardien de givre, Gardien de feu ou Barri\u00e8re de glace absorbe des d\u00e9g\u00e2ts, les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts sont augment\u00e9s de 15% du montant absorb\u00e9 pendant 10 s."
+                ],
+                "s": [
+                    44394,
+                    44395,
+                    44396
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Mage_IncantersAbsorbtion"
+            },
+            {
+                "i": 1843,
+                "n": "Flux arcaniques",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos sorts Pr\u00e9sence spirituelle, Pouvoir des arcanes et Invisibilit\u00e9 de 15% et le temps de recharge de votre sort Evocation de 1 min.",
+                    "R\u00e9duit le temps de recharge de vos sorts Pr\u00e9sence spirituelle, Pouvoir des arcanes et Invisibilit\u00e9 de 30% et le temps de recharge de votre sort Evocation de 2 min."
+                ],
+                "s": [
+                    44378,
+                    44379
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Ability_Mage_PotentSpirit",
+                "r": [
+                    21,
+                    1
+                ]
+            },
+            {
+                "i": 1728,
+                "n": "Ma\u00eetrise mentale",
+                "m": 5,
+                "d": [
+                    "Augmente la puissance des sorts d'un montant \u00e9gal \u00e0 3% de votre Intelligence totale.",
+                    "Augmente la puissance des sorts d'un montant \u00e9gal \u00e0 6% de votre Intelligence totale.",
+                    "Augmente la puissance des sorts d'un montant \u00e9gal \u00e0 9% de votre Intelligence totale.",
+                    "Augmente la puissance des sorts d'un montant \u00e9gal \u00e0 12% de votre Intelligence totale.",
+                    "Augmente la puissance des sorts d'un montant \u00e9gal \u00e0 15% de votre Intelligence totale."
+                ],
+                "s": [
+                    31584,
+                    31585,
+                    31586,
+                    31587,
+                    31588
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Arcane_MindMastery"
+            },
+            {
+                "i": 1729,
+                "n": "Lenteur",
+                "m": 1,
+                "d": [
+                    "R\u00e9duit la vitesse de d\u00e9placement de la cible de 60%, augmente le temps entre les attaques \u00e0 distance de 60% et augmente le temps d'incantation de 30%. Dure 15 s. Lenteur ne peut affecter qu'une seule cible \u00e0 la fois."
+                ],
+                "s": [
+                    31589
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Nature_Slow"
+            },
+            {
+                "i": 2209,
+                "n": "Barrage de projectiles",
+                "m": 5,
+                "d": [
+                    "Conf\u00e8re \u00e0 votre D\u00e9flagration des arcanes 8% de chances et \u00e0 vos sorts Barrage des arcanes, Boule de feu, Eclair de givre et Eclair de givrefeu 4% de chances de r\u00e9duire la dur\u00e9e de canalisation du prochain sort Projectiles des arcanes de 2.5 sec. et r\u00e9duit le co\u00fbt en mana de 100%. Des projectiles sont tir\u00e9s toutes les 0,5 sec.",
+                    "Conf\u00e8re \u00e0 votre D\u00e9flagration des arcanes 16% de chances et \u00e0 vos sorts Barrage des arcanes, Boule de feu, Eclair de givre et Eclair de givrefeu 8% de chances de r\u00e9duire la dur\u00e9e de canalisation du prochain sort Projectiles des arcanes de 2.5 sec. et r\u00e9duit le co\u00fbt en mana de 100%. Des projectiles sont tir\u00e9s toutes les 0,5 sec.",
+                    "Conf\u00e8re \u00e0 votre D\u00e9flagration des arcanes 24% de chances et \u00e0 vos sorts Barrage des arcanes, Boule de feu, Eclair de givre et Eclair de givrefeu 12% de chances de r\u00e9duire la dur\u00e9e de canalisation du prochain sort Projectiles des arcanes de 2.5 sec. et r\u00e9duit le co\u00fbt en mana de 100%. Des projectiles sont tir\u00e9s toutes les 0,5 sec.",
+                    "Conf\u00e8re \u00e0 votre D\u00e9flagration des arcanes 32% de chances et \u00e0 vos sorts Barrage des arcanes, Boule de feu, Eclair de givre et Eclair de givrefeu 16% de chances de r\u00e9duire la dur\u00e9e de canalisation du prochain sort Projectiles des arcanes de 2.5 sec. et r\u00e9duit le co\u00fbt en mana de 100%. Des projectiles sont tir\u00e9s toutes les 0,5 sec.",
+                    "Conf\u00e8re \u00e0 votre D\u00e9flagration des arcanes 40% de chances et \u00e0 vos sorts Barrage des arcanes, Boule de feu, Eclair de givre et Eclair de givrefeu 20% de chances de r\u00e9duire la dur\u00e9e de canalisation du prochain sort Projectiles des arcanes de 2.5 sec. et r\u00e9duit le co\u00fbt en mana de 100%. Des projectiles sont tir\u00e9s toutes les 0,5 sec."
+                ],
+                "s": [
+                    44404,
+                    54486,
+                    54488,
+                    54489,
+                    54490
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Mage_MissileBarrage"
+            },
+            {
+                "i": 1846,
+                "n": "Pr\u00e9sence de vent du N\u00e9ant",
+                "m": 3,
+                "d": [
+                    "Augmente de 2% votre h\u00e2te des sorts.",
+                    "Augmente de 4% votre h\u00e2te des sorts.",
+                    "Augmente de 6% votre h\u00e2te des sorts."
+                ],
+                "s": [
+                    44400,
+                    44402,
+                    44403
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Mage_NetherWindPresence"
+            },
+            {
+                "i": 1826,
+                "n": "Puissance des sorts",
+                "m": 2,
+                "d": [
+                    "Augmente les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de tous vos sorts de 25%.",
+                    "Augmente les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de tous vos sorts de 50%."
+                ],
+                "s": [
+                    35578,
+                    35581
+                ],
+                "x": 2,
+                "y": 9,
+                "iconname": "Spell_Arcane_ArcaneTorrent"
+            },
+            {
+                "i": 1847,
+                "n": "Barrage des arcanes",
+                "m": 1,
+                "d": [
+                    "Lance plusieurs projectiles sur la cible ennemie et lui inflige 386 to 471 points de d\u00e9g\u00e2ts des Arcanes."
+                ],
+                "s": [
+                    44425
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Mage_ArcaneBarrage"
+            }
+        ]
+    },
+    {
+        "n": "Feu",
+        "t": [
+            {
+                "i": 27,
+                "n": "Trait de feu am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de votre sort Trait de feu de 1 secondes.",
+                    "R\u00e9duit le temps de recharge de votre sort Trait de feu de 2 secondes."
+                ],
+                "s": [
+                    11078,
+                    11080
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Fire_Fireball"
+            },
+            {
+                "i": 1141,
+                "n": "Incin\u00e9ration",
+                "m": 3,
+                "d": [
+                    "Augmente de 2% les chances d'infliger un coup critique avec vos sorts Trait de feu, Br\u00fblure, D\u00e9flagration des arcanes et C\u00f4ne de froid.",
+                    "Augmente de 4% les chances d'infliger un coup critique avec vos sorts Trait de feu, Br\u00fblure, D\u00e9flagration des arcanes et C\u00f4ne de froid.",
+                    "Augmente de 6% les chances d'infliger un coup critique avec vos sorts Trait de feu, Br\u00fblure, D\u00e9flagration des arcanes et C\u00f4ne de froid."
+                ],
+                "s": [
+                    18459,
+                    18460,
+                    54734
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Fire_FlameShock"
+            },
+            {
+                "i": 26,
+                "n": "Boule de feu am\u00e9lior\u00e9e",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit le temps d'incantation de votre sort Boule de feu de 0.1 secondes.",
+                    "R\u00e9duit le temps d'incantation de votre sort Boule de feu de 0.2 secondes.",
+                    "R\u00e9duit le temps d'incantation de votre sort Boule de feu de 0.3 secondes.",
+                    "R\u00e9duit le temps d'incantation de votre sort Boule de feu de 0.4 secondes.",
+                    "R\u00e9duit le temps d'incantation de votre sort Boule de feu de 0.5 secondes."
+                ],
+                "s": [
+                    11069,
+                    12338,
+                    12339,
+                    12340,
+                    12341
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Fire_FlameBolt"
+            },
+            {
+                "i": 34,
+                "n": "Enflammer",
+                "m": 5,
+                "d": [
+                    "Les coups critiques caus\u00e9s par vos sorts de Feu enflamment la cible, ce qui lui inflige un montant de d\u00e9g\u00e2ts suppl\u00e9mentaire \u00e9gal \u00e0 8% des d\u00e9g\u00e2ts de votre sort en 4 s.",
+                    "Les coups critiques caus\u00e9s par vos sorts de Feu enflamment la cible, ce qui lui inflige un montant de d\u00e9g\u00e2ts suppl\u00e9mentaire \u00e9gal \u00e0 16% des d\u00e9g\u00e2ts de votre sort en 4 s.",
+                    "Les coups critiques caus\u00e9s par vos sorts de Feu enflamment la cible, ce qui lui inflige un montant de d\u00e9g\u00e2ts suppl\u00e9mentaire \u00e9gal \u00e0 24% des d\u00e9g\u00e2ts de votre sort en 4 s.",
+                    "Les coups critiques caus\u00e9s par vos sorts de Feu enflamment la cible, ce qui lui inflige un montant de d\u00e9g\u00e2ts suppl\u00e9mentaire \u00e9gal \u00e0 32% des d\u00e9g\u00e2ts de votre sort en 4 s.",
+                    "Les coups critiques caus\u00e9s par vos sorts de Feu enflamment la cible, ce qui lui inflige un montant de d\u00e9g\u00e2ts suppl\u00e9mentaire \u00e9gal \u00e0 40% des d\u00e9g\u00e2ts de votre sort en 4 s."
+                ],
+                "s": [
+                    11119,
+                    11120,
+                    12846,
+                    12847,
+                    12848
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Fire_Incinerate"
+            },
+            {
+                "i": 2212,
+                "n": "D\u00e9termination br\u00fblante",
+                "m": 2,
+                "d": [
+                    "Quand vous \u00eates interrompu ou r\u00e9duit au silence, vous avez 50% de chances de devenir insensible au prochain m\u00e9canisme d'interruption ou de silence. Dure 20 s.",
+                    "Quand vous \u00eates interrompu ou r\u00e9duit au silence, vous avez 100% de chances de devenir insensible au prochain m\u00e9canisme d'interruption ou de silence. Dure 20 s."
+                ],
+                "s": [
+                    54747,
+                    54749
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Fire_TotemOfWrath"
+            },
+            {
+                "i": 31,
+                "n": "Monde en flammes",
+                "m": 3,
+                "d": [
+                    "Augmente de 2% vos chances de r\u00e9aliser un coup critique avec vos sorts Choc de flammes, Explosion pyrotechnique, Vague explosive, Souffle du dragon, Bombe vivante, Blizzard et Explosion des arcanes.",
+                    "Augmente de 4% vos chances de r\u00e9aliser un coup critique avec vos sorts Choc de flammes, Explosion pyrotechnique, Vague explosive, Souffle du dragon, Bombe vivante, Blizzard et Explosion des arcanes.",
+                    "Augmente de 6% vos chances de r\u00e9aliser un coup critique avec vos sorts Choc de flammes, Explosion pyrotechnique, Vague explosive, Souffle du dragon, Bombe vivante, Blizzard et Explosion des arcanes."
+                ],
+                "s": [
+                    11108,
+                    12349,
+                    12350
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Ability_Mage_WorldInFlames"
+            },
+            {
+                "i": 28,
+                "n": "Jet de flammes",
+                "m": 2,
+                "d": [
+                    "Augmente la port\u00e9e de tous les sorts de Feu except\u00e9 Eclair de givrefeu de 3 m\u00e8tres.",
+                    "Augmente la port\u00e9e de tous les sorts de Feu except\u00e9 Eclair de givrefeu de 6 m\u00e8tres."
+                ],
+                "s": [
+                    11100,
+                    12353
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Fire_Flare"
+            },
+            {
+                "i": 30,
+                "n": "Impact",
+                "m": 3,
+                "d": [
+                    "Conf\u00e8re 4% de chances \u00e0 vos sorts de d\u00e9g\u00e2ts de permettre \u00e0 votre prochain Trait de feu d'\u00e9tourdir la cible pendant 2 s.",
+                    "Conf\u00e8re 7% de chances \u00e0 vos sorts de d\u00e9g\u00e2ts de permettre \u00e0 votre prochain Trait de feu d'\u00e9tourdir la cible pendant 2 s.",
+                    "Conf\u00e8re 10% de chances \u00e0 vos sorts de d\u00e9g\u00e2ts de permettre \u00e0 votre prochain Trait de feu d'\u00e9tourdir la cible pendant 2 s."
+                ],
+                "s": [
+                    11103,
+                    12357,
+                    12358
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Fire_MeteorStorm"
+            },
+            {
+                "i": 29,
+                "n": "Explosion pyrotechnique",
+                "m": 1,
+                "d": [
+                    "Lance un immense rocher enflamm\u00e9 qui inflige 141 to 188 points de d\u00e9g\u00e2ts de Feu et 56 points de d\u00e9g\u00e2ts de Feu suppl\u00e9mentaires en 12 s."
+                ],
+                "s": [
+                    11366
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Fire_Fireball02"
+            },
+            {
+                "i": 23,
+                "n": "Ame ardente",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez des sorts de Feu de 35% et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e par vos sorts de Feu de 10%.",
+                    "R\u00e9duit l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez des sorts de Feu de 70% et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e par vos sorts de Feu de 20%."
+                ],
+                "s": [
+                    11083,
+                    12351
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Fire_Fire"
+            },
+            {
+                "i": 25,
+                "n": "Br\u00fblure am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente vos chances de coup critique avec Br\u00fblure, Boule de feu et Eclair de givrefeu de 1% suppl\u00e9mentaires et vos sorts de Br\u00fblure infligeant des d\u00e9g\u00e2ts ont 33% de chances de rendre votre cible vuln\u00e9rable aux d\u00e9g\u00e2ts de sorts. Cette vuln\u00e9rabilit\u00e9 augmente les chances de coup critique avec les sorts contre cette cible de 5% et dure 30 s.",
+                    "Augmente vos chances de coup critique avec Br\u00fblure, Boule de feu et Eclair de givrefeu de 2% suppl\u00e9mentaires et vos sorts de Br\u00fblure infligeant des d\u00e9g\u00e2ts ont 66% de chances de rendre votre cible vuln\u00e9rable aux d\u00e9g\u00e2ts de sorts. Cette vuln\u00e9rabilit\u00e9 augmente les chances de coup critique avec les sorts contre cette cible de 5% et dure 30 s.",
+                    "Augmente vos chances de coup critique avec Br\u00fblure, Boule de feu et Eclair de givrefeu de 3% suppl\u00e9mentaires et vos sorts de Br\u00fblure infligeant des d\u00e9g\u00e2ts ont 100% de chances de rendre votre cible vuln\u00e9rable aux d\u00e9g\u00e2ts de sorts. Cette vuln\u00e9rabilit\u00e9 augmente les chances de coup critique avec les sorts contre cette cible de 5% et dure 30 s."
+                ],
+                "s": [
+                    11095,
+                    12872,
+                    12873
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Fire_SoulBurn"
+            },
+            {
+                "i": 24,
+                "n": "Boucliers de la fournaise",
+                "m": 2,
+                "d": [
+                    "Conf\u00e8re \u00e0 vos sorts Gardien de feu et Gardien de givre 15% de chances de renvoyer les sorts tant qu'ils sont actifs. De plus, votre Armure de la fournaise a 50% de chances d'affecter les attaques \u00e0 distance et les sorts.",
+                    "Conf\u00e8re \u00e0 vos sorts Gardien de feu et Gardien de givre 30% de chances de renvoyer les sorts tant qu'ils sont actifs. De plus, votre Armure de la fournaise a 100% de chances d'affecter les attaques \u00e0 distance et les sorts."
+                ],
+                "s": [
+                    11094,
+                    13043
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Fire_FireArmor"
+            },
+            {
+                "i": 1639,
+                "n": "Ma\u00eetre des \u00e9l\u00e9ments",
+                "m": 3,
+                "d": [
+                    "Les coups critiques obtenus avec les sorts vous rendront 10% de leur co\u00fbt en mana de base.",
+                    "Les coups critiques obtenus avec les sorts vous rendront 20% de leur co\u00fbt en mana de base.",
+                    "Les coups critiques obtenus avec les sorts vous rendront 30% de leur co\u00fbt en mana de base."
+                ],
+                "s": [
+                    29074,
+                    29075,
+                    29076
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_Fire_MasterOfElements"
+            },
+            {
+                "i": 1730,
+                "n": "Jouer avec le feu",
+                "m": 3,
+                "d": [
+                    "Augmente tous les d\u00e9g\u00e2ts des sorts caus\u00e9s de 1% et tous les d\u00e9g\u00e2ts des sorts subis de 1%.",
+                    "Augmente tous les d\u00e9g\u00e2ts des sorts caus\u00e9s de 2% et tous les d\u00e9g\u00e2ts des sorts subis de 2%.",
+                    "Augmente tous les d\u00e9g\u00e2ts des sorts caus\u00e9s de 3% et tous les d\u00e9g\u00e2ts des sorts subis de 3%."
+                ],
+                "s": [
+                    31638,
+                    31639,
+                    31640
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Fire_PlayingWithFire"
+            },
+            {
+                "i": 33,
+                "n": "Masse critique",
+                "m": 3,
+                "d": [
+                    "Augmente de 2% vos chances d'infliger un coup critique avec vos sorts de Feu.",
+                    "Augmente de 4% vos chances d'infliger un coup critique avec vos sorts de Feu.",
+                    "Augmente de 6% vos chances d'infliger un coup critique avec vos sorts de Feu."
+                ],
+                "s": [
+                    11115,
+                    11367,
+                    11368
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Nature_WispHeal"
+            },
+            {
+                "i": 32,
+                "n": "Vague explosive",
+                "m": 1,
+                "d": [
+                    "Une vague de flammes rayonne autour du lanceur et inflige \u00e0 tous les ennemis pris dans l'explosion 154 to 187 points de d\u00e9g\u00e2ts de Feu, en plus de les faire tomber \u00e0 la renverse et de les h\u00e9b\u00e9ter pendant 6 s."
+                ],
+                "s": [
+                    11113
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Holy_Excorcism_02",
+                "r": [
+                    8,
+                    1
+                ]
+            },
+            {
+                "i": 1731,
+                "n": "Vitesse flamboyante",
+                "m": 2,
+                "d": [
+                    "Vous conf\u00e8re 5% de chances, lorsque vous \u00eates touch\u00e9 par une attaque en m\u00eal\u00e9e ou \u00e0 distance, de voir votre vitesse de d\u00e9placement augmenter de 50% et de dissiper tous les effets affectant le mouvement. Cet effet dure 8 s.",
+                    "Vous conf\u00e8re 10% de chances, lorsque vous \u00eates touch\u00e9 par une attaque en m\u00eal\u00e9e ou \u00e0 distance, de voir votre vitesse de d\u00e9placement augmenter de 50% et de dissiper tous les effets affectant le mouvement. Cet effet dure 8 s."
+                ],
+                "s": [
+                    31641,
+                    31642
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Fire_BurningSpeed"
+            },
+            {
+                "i": 35,
+                "n": "Puissance du feu",
+                "m": 5,
+                "d": [
+                    "Augmente de 2% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu.",
+                    "Augmente de 4% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu.",
+                    "Augmente de 6% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu.",
+                    "Augmente de 8% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu.",
+                    "Augmente de 10% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu."
+                ],
+                "s": [
+                    11124,
+                    12378,
+                    12398,
+                    12399,
+                    12400
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Fire_Immolation"
+            },
+            {
+                "i": 1733,
+                "n": "Pyromane",
+                "m": 3,
+                "d": [
+                    "Augmente les chances de r\u00e9ussir un coup critique de 1% et permet \u00e0 17% de votre r\u00e9g\u00e9n\u00e9ration de mana de se poursuivre pendant les incantations.",
+                    "Augmente les chances de r\u00e9ussir un coup critique de 2% et permet \u00e0 33% de votre r\u00e9g\u00e9n\u00e9ration de mana de se poursuivre pendant les incantations.",
+                    "Augmente les chances de r\u00e9ussir un coup critique de 3% et permet \u00e0 50% de votre r\u00e9g\u00e9n\u00e9ration de mana de se poursuivre pendant les incantations."
+                ],
+                "s": [
+                    34293,
+                    34295,
+                    34296
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Fire_Burnout"
+            },
+            {
+                "i": 36,
+                "n": "Combustion",
+                "m": 1,
+                "d": [
+                    "Lorsqu'il est activ\u00e9, ce sort augmente votre bonus aux d\u00e9g\u00e2ts des coups critiques avec les sorts de d\u00e9g\u00e2ts de Feu de 50%, et chaque fois que vous touchez avec un sort de ce type vous augmentez vos chances de coup critique avec les sorts de d\u00e9g\u00e2ts de Feu de 10%. Cet effet dure jusqu'\u00e0 ce que vous ayez inflig\u00e9 3 coups critiques non p\u00e9riodiques avec des sorts de Feu."
+                ],
+                "s": [
+                    11129
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Fire_SealOfFire",
+                "r": [
+                    14,
+                    3
+                ]
+            },
+            {
+                "i": 1732,
+                "n": "Fureur de lave",
+                "m": 2,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de tous les sorts contre les cibles disposant de moins de 35% de leurs points de vie de 6%.",
+                    "Augmente les d\u00e9g\u00e2ts de tous les sorts contre les cibles disposant de moins de 35% de leurs points de vie de 12%."
+                ],
+                "s": [
+                    31679,
+                    31680
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Fire_MoltenBlood"
+            },
+            {
+                "i": 1848,
+                "n": "Revanche ardente",
+                "m": 2,
+                "d": [
+                    "Lorsque vous avez moins de 35% de vie, tous les d\u00e9g\u00e2ts subis sont r\u00e9duits de 10%, le temps d'incantation de votre sort Explosion pyrotechnique est r\u00e9duit de 1.75.2 sec. et son temps de recharge est augment\u00e9 de 2.5.1 sec. De plus, les attaques en m\u00eal\u00e9e et \u00e0 distance contre vous ont 101% de chances de faire tomber l'arme en main droite et les armes \u00e0 distance de l'attaquant.",
+                    "Lorsque vous avez moins de 35% de vie, tous les d\u00e9g\u00e2ts subis sont r\u00e9duits de 20%, le temps d'incantation de votre sort Explosion pyrotechnique est r\u00e9duit de 3.5.1 sec. et son temps de recharge est augment\u00e9 de 5 sec. De plus, les attaques en m\u00eal\u00e9e et \u00e0 distance contre vous ont 101% de chances de faire tomber l'arme en main droite et les armes \u00e0 distance de l'attaquant."
+                ],
+                "s": [
+                    64353,
+                    64357
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Ability_Mage_FieryPayback"
+            },
+            {
+                "i": 1734,
+                "n": "Feu surpuissant",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de vos sorts Boule de feu, Eclair de givrefeu et Explosion pyrotechnique d'un montant \u00e9gal \u00e0 5% de votre puissance des sorts. De plus, chaque fois que votre talent Enflammer inflige des d\u00e9g\u00e2ts, vous avez 33% de chances de r\u00e9cup\u00e9rer 2% de votre mana de base.",
+                    "Augmente les d\u00e9g\u00e2ts de vos sorts Boule de feu, Eclair de givrefeu et Explosion pyrotechnique d'un montant \u00e9gal \u00e0 10% de votre puissance des sorts. De plus, chaque fois que votre talent Enflammer inflige des d\u00e9g\u00e2ts, vous avez 67% de chances de r\u00e9cup\u00e9rer 2% de votre mana de base.",
+                    "Augmente les d\u00e9g\u00e2ts de vos sorts Boule de feu, Eclair de givrefeu et Explosion pyrotechnique d'un montant \u00e9gal \u00e0 15% de votre puissance des sorts. De plus, chaque fois que votre talent Enflammer inflige des d\u00e9g\u00e2ts, vous avez 100% de chances de r\u00e9cup\u00e9rer 2% de votre mana de base."
+                ],
+                "s": [
+                    31656,
+                    31657,
+                    31658
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Fire_FlameBolt"
+            },
+            {
+                "i": 1849,
+                "n": "Boute-flammes",
+                "m": 2,
+                "d": [
+                    "Lorsqu'ils infligent des d\u00e9g\u00e2ts, vos sorts Vague explosive et Souffle du dragon ont 50% de chances de rendre l'incantation de votre prochain sort Choc de flammes instantan\u00e9e et sans co\u00fbt en mana. Dure 10 s.",
+                    "Lorsqu'ils infligent des d\u00e9g\u00e2ts, vos sorts Vague explosive et Souffle du dragon ont 100% de chances de rendre l'incantation de votre prochain sort Choc de flammes instantan\u00e9e et sans co\u00fbt en mana. Dure 10 s."
+                ],
+                "s": [
+                    44442,
+                    44443
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Mage_FireStarter",
+                "r": [
+                    24,
+                    1
+                ]
+            },
+            {
+                "i": 1735,
+                "n": "Souffle du dragon",
+                "m": 1,
+                "d": [
+                    "Les cibles qui se trouvent dans une zone en forme de c\u00f4ne en face du lanceur de sorts subissent 370 to 431 points de d\u00e9g\u00e2ts de Feu et sont d\u00e9sorient\u00e9es pendant 5 s. Toute attaque directe qui inflige des d\u00e9g\u00e2ts r\u00e9veille la cible. Interrompt l'attaque lors de son utilisation."
+                ],
+                "s": [
+                    31661
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "INV_Misc_Head_Dragon_01",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 1850,
+                "n": "Chaleur continue",
+                "m": 3,
+                "d": [
+                    "Chaque fois que vous obtenez 2 coups critiques non p\u00e9riodiques de suite avec Boule de feu, Trait de feu, Br\u00fblure, Bombe vivante ou Eclair de givrefeu, vous avez 33% de chances que votre prochain sort Explosion pyrotechnique lanc\u00e9 dans les 10 s soit instantan\u00e9.",
+                    "Chaque fois que vous obtenez 2 coups critiques non p\u00e9riodiques de suite avec Boule de feu, Trait de feu, Br\u00fblure, Bombe vivante ou Eclair de givrefeu, vous avez 66% de chances que votre prochain sort Explosion pyrotechnique lanc\u00e9 dans les 10 s soit instantan\u00e9.",
+                    "Chaque fois que vous obtenez 2 coups critiques non p\u00e9riodiques de suite avec Boule de feu, Trait de feu, Br\u00fblure, Bombe vivante ou Eclair de givrefeu, vous avez 100% de chances que votre prochain sort Explosion pyrotechnique lanc\u00e9 dans les 10 s soit instantan\u00e9."
+                ],
+                "s": [
+                    44445,
+                    44446,
+                    44448
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Mage_HotStreak"
+            },
+            {
+                "i": 1851,
+                "n": "Ardeur \u00e9puisante",
+                "m": 5,
+                "d": [
+                    "Augmente de 10% votre bonus de d\u00e9g\u00e2ts des critiques r\u00e9ussis avec tous les sorts, mais vos critiques non p\u00e9riodiques avec les sorts co\u00fbtent 1% du co\u00fbt du sort en plus.",
+                    "Augmente de 20% votre bonus de d\u00e9g\u00e2ts des critiques r\u00e9ussis avec tous les sorts, mais vos critiques non p\u00e9riodiques avec les sorts co\u00fbtent 2% du co\u00fbt du sort en plus.",
+                    "Augmente de 30% votre bonus de d\u00e9g\u00e2ts des critiques r\u00e9ussis avec tous les sorts, mais vos critiques non p\u00e9riodiques avec les sorts co\u00fbtent 3% du co\u00fbt du sort en plus.",
+                    "Augmente de 40% votre bonus de d\u00e9g\u00e2ts des critiques r\u00e9ussis avec tous les sorts, mais vos critiques non p\u00e9riodiques avec les sorts co\u00fbtent 4% du co\u00fbt du sort en plus.",
+                    "Augmente de 50% votre bonus de d\u00e9g\u00e2ts des critiques r\u00e9ussis avec tous les sorts, mais vos critiques non p\u00e9riodiques avec les sorts co\u00fbtent 5% du co\u00fbt du sort en plus."
+                ],
+                "s": [
+                    44449,
+                    44469,
+                    44470,
+                    44471,
+                    44472
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Mage_Burnout"
+            },
+            {
+                "i": 1852,
+                "n": "Bombe vivante",
+                "m": 1,
+                "d": [
+                    "La cible devient une bombe vivante qui inflige 612 points de d\u00e9g\u00e2ts de Feu en 12 s. Au bout de 12 s. ou quand le sort est dissip\u00e9, la cible explose en infligeant 306 points de d\u00e9g\u00e2ts de Feu \u00e0 tous les ennemis se trouvant \u00e0 moins de 0 m\u00e8tres."
+                ],
+                "s": [
+                    44457
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Mage_LivingBomb"
+            }
+        ]
+    },
+    {
+        "n": "Givre",
+        "t": [
+            {
+                "i": 38,
+                "n": "Morsure de givre",
+                "m": 3,
+                "d": [
+                    "Donne \u00e0 vos effets d'engourdissement 5% de chances de geler la cible pendant 5 s.",
+                    "Donne \u00e0 vos effets d'engourdissement 10% de chances de geler la cible pendant 5 s.",
+                    "Donne \u00e0 vos effets d'engourdissement 15% de chances de geler la cible pendant 5 s."
+                ],
+                "s": [
+                    11071,
+                    12496,
+                    12497
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Frost_FrostArmor"
+            },
+            {
+                "i": 37,
+                "n": "Eclair de givre am\u00e9lior\u00e9",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit le temps d'incantation de votre sort Eclair de givre de 0.1 sec.",
+                    "R\u00e9duit le temps d'incantation de votre sort Eclair de givre de 0.2 sec.",
+                    "R\u00e9duit le temps d'incantation de votre sort Eclair de givre de 0.3 sec.",
+                    "R\u00e9duit le temps d'incantation de votre sort Eclair de givre de 0.4 sec.",
+                    "R\u00e9duit le temps d'incantation de votre sort Eclair de givre de 0.5 sec."
+                ],
+                "s": [
+                    11070,
+                    12473,
+                    16763,
+                    16765,
+                    16766
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Frost_FrostBolt02"
+            },
+            {
+                "i": 62,
+                "n": "Iceberg",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit de 7% le temps de recharge de vos sorts Nova de givre, C\u00f4ne de froid, Bloc de glace et Veines glaciales.",
+                    "R\u00e9duit de 14% le temps de recharge de vos sorts Nova de givre, C\u00f4ne de froid, Bloc de glace et Veines glaciales.",
+                    "R\u00e9duit de 20% le temps de recharge de vos sorts Nova de givre, C\u00f4ne de froid, Bloc de glace et Veines glaciales."
+                ],
+                "s": [
+                    31670,
+                    31672,
+                    55094
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Frost_IceFloes"
+            },
+            {
+                "i": 73,
+                "n": "Eclats de glace",
+                "m": 3,
+                "d": [
+                    "Augmente de 33% les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de vos sorts de Givre.",
+                    "Augmente de 66% les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de vos sorts de Givre.",
+                    "Augmente de 100% les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de vos sorts de Givre."
+                ],
+                "s": [
+                    11207,
+                    12672,
+                    15047
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Frost_IceShard"
+            },
+            {
+                "i": 70,
+                "n": "Protection contre le Givre",
+                "m": 2,
+                "d": [
+                    "Augmente de 25% l'armure et les r\u00e9sistances octroy\u00e9es par vos sorts Armure de givre et Armure de glace. De plus, donne \u00e0 vos sorts Gardien de givre et Gardien de feu 15% de chances d'absorber les d\u00e9g\u00e2ts des sorts et de rendre un montant de mana \u00e9gal aux d\u00e9g\u00e2ts absorb\u00e9s.",
+                    "Augmente de 50% l'armure et les r\u00e9sistances octroy\u00e9es par vos sorts Armure de givre et Armure de glace. De plus, donne \u00e0 vos sorts Gardien de givre et Gardien de feu 30% de chances d'absorber les d\u00e9g\u00e2ts des sorts et de rendre un montant de mana \u00e9gal aux d\u00e9g\u00e2ts absorb\u00e9s."
+                ],
+                "s": [
+                    11189,
+                    28332
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Frost_FrostWard"
+            },
+            {
+                "i": 1649,
+                "n": "Pr\u00e9cision",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana et augmente vos chances de toucher avec les sorts de 1%.",
+                    "R\u00e9duit le co\u00fbt en mana et augmente vos chances de toucher avec les sorts de 2%.",
+                    "R\u00e9duit le co\u00fbt en mana et augmente vos chances de toucher avec les sorts de 3%."
+                ],
+                "s": [
+                    29438,
+                    29439,
+                    29440
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Ice_MagicDamage"
+            },
+            {
+                "i": 65,
+                "n": "Gel prolong\u00e9",
+                "m": 3,
+                "d": [
+                    "Augmente la dur\u00e9e de vos effets d'engourdissement de 1 seconde, r\u00e9duit la vitesse de la cible de 4% suppl\u00e9mentaires et r\u00e9duit les soins qu'elle re\u00e7oit de 7%.",
+                    "Augmente la dur\u00e9e de vos effets d'engourdissement de 2 secondes, r\u00e9duit la vitesse de la cible de 7% suppl\u00e9mentaires et r\u00e9duit les soins qu'elle re\u00e7oit de 13%.",
+                    "Augmente la dur\u00e9e de vos effets d'engourdissement de 3 secondes, r\u00e9duit la vitesse de la cible de 10% suppl\u00e9mentaires et r\u00e9duit les soins qu'elle re\u00e7oit de 20%."
+                ],
+                "s": [
+                    11175,
+                    12569,
+                    12571
+                ],
+                "x": 3,
+                "y": 1,
+                "iconname": "Spell_Frost_Wisp"
+            },
+            {
+                "i": 61,
+                "n": "Glace per\u00e7ante",
+                "m": 3,
+                "d": [
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Givre de 2%.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Givre de 4%.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Givre de 6%."
+                ],
+                "s": [
+                    11151,
+                    12952,
+                    12953
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Frost_Frostbolt"
+            },
+            {
+                "i": 69,
+                "n": "Veines glaciales",
+                "m": 1,
+                "d": [
+                    "Acc\u00e9l\u00e8re vos lancers de sorts en augmentant la vitesse d'incantation des sorts de 20% et r\u00e9duit de 100% les interruptions caus\u00e9es par les attaques infligeant des d\u00e9g\u00e2ts pendant les incantations. Dure 20 s."
+                ],
+                "s": [
+                    12472
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Frost_ColdHearted"
+            },
+            {
+                "i": 63,
+                "n": "Blizzard am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "Ajoute un effet d'engourdissement \u00e0 votre sort Blizzard. Il r\u00e9duit la vitesse de d\u00e9placement de la cible de 25%. Dure 1 s.",
+                    "Ajoute un effet d'engourdissement \u00e0 votre sort Blizzard. Il r\u00e9duit la vitesse de d\u00e9placement de la cible de 40%. Dure 1 s.",
+                    "Ajoute un effet d'engourdissement \u00e0 votre sort Blizzard. Il r\u00e9duit la vitesse de d\u00e9placement de la cible de 50%. Dure 1 s."
+                ],
+                "s": [
+                    11185,
+                    12487,
+                    12488
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Frost_IceStorm"
+            },
+            {
+                "i": 741,
+                "n": "Allonge arctique",
+                "m": 2,
+                "d": [
+                    "Augmente la port\u00e9e de vos sorts Eclair de givre, Javelot de glace, Cong\u00e9lation et Blizzard et les rayons d'effet de vos sorts Nova de givre et C\u00f4ne de froid de 10%.",
+                    "Augmente la port\u00e9e de vos sorts Eclair de givre, Javelot de glace, Cong\u00e9lation et Blizzard et les rayons d'effet de vos sorts Nova de givre et C\u00f4ne de froid de 20%."
+                ],
+                "s": [
+                    16757,
+                    16758
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Shadow_DarkRitual"
+            },
+            {
+                "i": 66,
+                "n": "Canalisation du givre",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit de 4% le co\u00fbt en mana de tous vos sorts et r\u00e9duit de 4% la menace que g\u00e9n\u00e8rent vos sorts de Givre.",
+                    "R\u00e9duit de 7% le co\u00fbt en mana de tous vos sorts et r\u00e9duit de 7% la menace que g\u00e9n\u00e8rent vos sorts de Givre.",
+                    "R\u00e9duit de 10% le co\u00fbt en mana de tous vos sorts et r\u00e9duit de 10% la menace que g\u00e9n\u00e8rent vos sorts de Givre."
+                ],
+                "s": [
+                    11160,
+                    12518,
+                    12519
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Frost_Stun"
+            },
+            {
+                "i": 67,
+                "n": "Fracasser",
+                "m": 3,
+                "d": [
+                    "Augmente de 17% vos chances d'infliger un coup critique avec tous les sorts lorsque vous attaquez des cibles gel\u00e9es.",
+                    "Augmente de 34% vos chances d'infliger un coup critique avec tous les sorts lorsque vous attaquez des cibles gel\u00e9es.",
+                    "Augmente de 50% vos chances d'infliger un coup critique avec tous les sorts lorsque vous attaquez des cibles gel\u00e9es."
+                ],
+                "s": [
+                    11170,
+                    12982,
+                    12983
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Frost_FrostShock"
+            },
+            {
+                "i": 72,
+                "n": "Morsure du froid",
+                "m": 1,
+                "d": [
+                    "Lorsqu'il est activ\u00e9, ce sort met fin \u00e0 tous les temps de recharge des sorts de Givre que vous avez lanc\u00e9s r\u00e9cemment."
+                ],
+                "s": [
+                    11958
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Frost_WizardMark"
+            },
+            {
+                "i": 64,
+                "n": "C\u00f4ne de froid am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "Augmente de 15% les points de d\u00e9g\u00e2ts inflig\u00e9s par votre sort C\u00f4ne de froid.",
+                    "Augmente de 25% les points de d\u00e9g\u00e2ts inflig\u00e9s par votre sort C\u00f4ne de froid.",
+                    "Augmente de 35% les points de d\u00e9g\u00e2ts inflig\u00e9s par votre sort C\u00f4ne de froid."
+                ],
+                "s": [
+                    11190,
+                    12489,
+                    12490
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Frost_Glacier"
+            },
+            {
+                "i": 1736,
+                "n": "Coeur de gel",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit les d\u00e9g\u00e2ts que vous infligent tous les sorts de 2%.",
+                    "R\u00e9duit les d\u00e9g\u00e2ts que vous infligent tous les sorts de 4%.",
+                    "R\u00e9duit les d\u00e9g\u00e2ts que vous infligent tous les sorts de 6%."
+                ],
+                "s": [
+                    31667,
+                    31668,
+                    31669
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Frost_FrozenCore"
+            },
+            {
+                "i": 1737,
+                "n": "Froid comme la glace",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 10% le temps de recharge de vos sorts Morsure du froid, Barri\u00e8re de glace et Invocation d'un \u00e9l\u00e9mentaire d'eau.",
+                    "R\u00e9duit de 20% le temps de recharge de vos sorts Morsure du froid, Barri\u00e8re de glace et Invocation d'un \u00e9l\u00e9mentaire d'eau."
+                ],
+                "s": [
+                    55091,
+                    55092
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Ability_Mage_ColdAsIce",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 68,
+                "n": "Froid hivernal",
+                "m": 3,
+                "d": [
+                    "Augmente de 1% vos chances de r\u00e9ussir un coup critique avec Eclair de givre et vos sorts de Givre infligeant des d\u00e9g\u00e2ts ont 33% de chances de d\u00e9clencher l\u2019effet de Froid hivernal, qui augmente les chances de critique des sorts de 1% pendant 15 s. Cumulable jusqu\u2019\u00e0 15001 fois.",
+                    "Augmente de 2% vos chances de r\u00e9ussir un coup critique avec Eclair de givre et vos sorts de Givre infligeant des d\u00e9g\u00e2ts ont 66% de chances de d\u00e9clencher l\u2019effet de Froid hivernal, qui augmente les chances de critique des sorts de 1% pendant 15 s. Cumulable jusqu\u2019\u00e0 15001 fois.",
+                    "Augmente de 3% vos chances de r\u00e9ussir un coup critique avec Eclair de givre et vos sorts de Givre infligeant des d\u00e9g\u00e2ts ont 100% de chances de d\u00e9clencher l\u2019effet de Froid hivernal, qui augmente les chances de critique des sorts de 1% pendant 15 s. Cumulable jusqu\u2019\u00e0 15001 fois."
+                ],
+                "s": [
+                    11180,
+                    28592,
+                    28593
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Frost_ChillingBlast"
+            },
+            {
+                "i": 2214,
+                "n": "Barri\u00e8re bris\u00e9e",
+                "m": 2,
+                "d": [
+                    "Conf\u00e8re \u00e0 votre sort Barri\u00e8re de glace 50% de chances de geler tous les ennemis se trouvant \u00e0 moins de 0 m\u00e8tres pendant 8 s quand la barri\u00e8re est d\u00e9truite.",
+                    "Conf\u00e8re \u00e0 votre sort Barri\u00e8re de glace 100% de chances de geler tous les ennemis se trouvant \u00e0 moins de 0 m\u00e8tres pendant 8 s quand la barri\u00e8re est d\u00e9truite."
+                ],
+                "s": [
+                    44745,
+                    54787
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Mage_ShatterShield",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 71,
+                "n": "Barri\u00e8re de glace",
+                "m": 1,
+                "d": [
+                    "Vous prot\u00e8ge instantan\u00e9ment en absorbant 438 points de d\u00e9g\u00e2ts. Dure 1 min. Tant que le bouclier tient, l'incantation de sorts n'est pas retard\u00e9e par les d\u00e9g\u00e2ts."
+                ],
+                "s": [
+                    11426
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Ice_Lament",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 1738,
+                "n": "Vents arctiques",
+                "m": 5,
+                "d": [
+                    "Augmente tous les d\u00e9g\u00e2ts de Givre que vous causez de 1% et r\u00e9duit la probabilit\u00e9 que les attaques en m\u00eal\u00e9e et \u00e0 distance vous touchent de 1%.",
+                    "Augmente tous les d\u00e9g\u00e2ts de Givre que vous causez de 2% et r\u00e9duit la probabilit\u00e9 que les attaques en m\u00eal\u00e9e et \u00e0 distance vous touchent de 2%.",
+                    "Augmente tous les d\u00e9g\u00e2ts de Givre que vous causez de 3% et r\u00e9duit la probabilit\u00e9 que les attaques en m\u00eal\u00e9e et \u00e0 distance vous touchent de 3%.",
+                    "Augmente tous les d\u00e9g\u00e2ts de Givre que vous causez de 4% et r\u00e9duit la probabilit\u00e9 que les attaques en m\u00eal\u00e9e et \u00e0 distance vous touchent de 4%.",
+                    "Augmente tous les d\u00e9g\u00e2ts de Givre que vous causez de 5% et r\u00e9duit la probabilit\u00e9 que les attaques en m\u00eal\u00e9e et \u00e0 distance vous touchent de 5%."
+                ],
+                "s": [
+                    31674,
+                    31675,
+                    31676,
+                    31677,
+                    31678
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Frost_ArcticWinds"
+            },
+            {
+                "i": 1740,
+                "n": "Eclair de givre surpuissant",
+                "m": 2,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de votre sort Eclair de givre d'un montant \u00e9gal \u00e0 5% de votre puissance des sorts et r\u00e9duit son temps d'incantation de 0.1.1 sec.",
+                    "Augmente les d\u00e9g\u00e2ts de votre sort Eclair de givre d'un montant \u00e9gal \u00e0 10% de votre puissance des sorts et r\u00e9duit son temps d'incantation de 0.2.1 sec."
+                ],
+                "s": [
+                    31682,
+                    31683
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Frost_FrostBolt02"
+            },
+            {
+                "i": 1853,
+                "n": "Doigts de givre",
+                "m": 2,
+                "d": [
+                    "Donne \u00e0 vos effets d'engourdissement 7% de chances de d\u00e9clencher l\u2019effet Doigts de givre, qui permet \u00e0 vos 2 prochains sorts d'agir comme si la cible \u00e9tait Gel\u00e9e. Dure 15 s.",
+                    "Donne \u00e0 vos effets d'engourdissement 15% de chances de d\u00e9clencher l\u2019effet Doigts de givre, qui permet \u00e0 vos 2 prochains sorts d'agir comme si la cible \u00e9tait Gel\u00e9e. Dure 15 s."
+                ],
+                "s": [
+                    44543,
+                    44545
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Ability_Mage_WintersGrasp"
+            },
+            {
+                "i": 1854,
+                "n": "Gel mental",
+                "m": 3,
+                "d": [
+                    "Vos sorts de Givre infligeant des d\u00e9g\u00e2ts et pouvant transir ont 5% de chances de supprimer le temps d'incantation et le co\u00fbt en mana de votre prochain sort Boule de feu ou Eclair de givrefeu.",
+                    "Vos sorts de Givre infligeant des d\u00e9g\u00e2ts et pouvant transir ont 10% de chances de supprimer le temps d'incantation et le co\u00fbt en mana de votre prochain sort Boule de feu ou Eclair de givrefeu.",
+                    "Vos sorts de Givre infligeant des d\u00e9g\u00e2ts et pouvant transir ont 15% de chances de supprimer le temps d'incantation et le co\u00fbt en mana de votre prochain sort Boule de feu ou Eclair de givrefeu."
+                ],
+                "s": [
+                    44546,
+                    44548,
+                    44549
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Mage_BrainFreeze"
+            },
+            {
+                "i": 1741,
+                "n": "Invocation d'un \u00e9l\u00e9mentaire d'eau",
+                "m": 1,
+                "d": [
+                    "Invoque un \u00e9l\u00e9mentaire d'eau qui se bat pour le lanceur de sorts?(s70937)[][ pendant 45 s]."
+                ],
+                "s": [
+                    31687
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Frost_SummonWaterElemental_2"
+            },
+            {
+                "i": 1855,
+                "n": "Hiver persistant",
+                "m": 3,
+                "d": [
+                    "Augmente la dur\u00e9e de votre sort Invocation d'un \u00e9l\u00e9mentaire d'eau de 5 sec. et votre sort Eclair de givre a 33% de chances de conf\u00e9rer l'effet de Requinquage \u00e0 un maximum de 10 membres du groupe ou raid avec une r\u00e9g\u00e9n\u00e9ration de mana \u00e9gale \u00e0 1% de leur maximum de mana toutes les 5 secondes pendant 15 s. Cet effet ne peut se produire plus d'une fois toutes les 6 sec.",
+                    "Augmente la dur\u00e9e de votre sort Invocation d'un \u00e9l\u00e9mentaire d'eau de 10 sec. et votre sort Eclair de givre a 66% de chances de conf\u00e9rer l'effet de Requinquage \u00e0 un maximum de 10 membres du groupe ou raid avec une r\u00e9g\u00e9n\u00e9ration de mana \u00e9gale \u00e0 1% de leur maximum de mana toutes les 5 secondes pendant 15 s. Cet effet ne peut se produire plus d'une fois toutes les 6 sec.",
+                    "Augmente la dur\u00e9e de votre sort Invocation d'un \u00e9l\u00e9mentaire d'eau de 15 sec. et votre sort Eclair de givre a 100% de chances de conf\u00e9rer l'effet de Requinquage \u00e0 un maximum de 10 membres du groupe ou raid avec une r\u00e9g\u00e9n\u00e9ration de mana \u00e9gale \u00e0 1% de leur maximum de mana toutes les 5 secondes pendant 15 s. Cet effet ne peut se produire plus d'une fois toutes les 6 sec."
+                ],
+                "s": [
+                    44557,
+                    44560,
+                    44561
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Frost_SummonWaterElemental_2",
+                "r": [
+                    24,
+                    1
+                ]
+            },
+            {
+                "i": 1856,
+                "n": "Transi jusqu'aux os",
+                "m": 5,
+                "d": [
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair de givre, Eclair de givrefeu et Javelot de glace de 1% et r\u00e9duit la vitesse de d\u00e9placement de toutes les cibles transies de 2% suppl\u00e9mentaires.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair de givre, Eclair de givrefeu et Javelot de glace de 2% et r\u00e9duit la vitesse de d\u00e9placement de toutes les cibles transies de 4% suppl\u00e9mentaires.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair de givre, Eclair de givrefeu et Javelot de glace de 3% et r\u00e9duit la vitesse de d\u00e9placement de toutes les cibles transies de 6% suppl\u00e9mentaires.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair de givre, Eclair de givrefeu et Javelot de glace de 4% et r\u00e9duit la vitesse de d\u00e9placement de toutes les cibles transies de 8% suppl\u00e9mentaires.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair de givre, Eclair de givrefeu et Javelot de glace de 5% et r\u00e9duit la vitesse de d\u00e9placement de toutes les cibles transies de 10% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    44566,
+                    44567,
+                    44568,
+                    44570,
+                    44571
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Mage_ChilledToTheBone"
+            },
+            {
+                "i": 1857,
+                "n": "Cong\u00e9lation",
+                "m": 1,
+                "d": [
+                    "Etourdit la cible pendant 5 s. Utilisable uniquement sur les cibles gel\u00e9es. Inflige de  \u00e0  points de d\u00e9g\u00e2ts aux cibles insensibles de mani\u00e8re permanente aux \u00e9tourdissements."
+                ],
+                "s": [
+                    44572
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Mage_DeepFreeze"
+            }
+        ]
+    }
+])

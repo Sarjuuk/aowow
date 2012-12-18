@@ -1,0 +1,1525 @@
+$WowheadTalentCalculator.registerClass(1, [
+    {
+        "n": "Armes",
+        "t": [
+            {
+                "i": 124,
+                "n": "Frappe h\u00e9ro\u00efque am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en rage de votre technique Frappe h\u00e9ro\u00efque de 1 points.",
+                    "R\u00e9duit le co\u00fbt en rage de votre technique Frappe h\u00e9ro\u00efque de 2 points.",
+                    "R\u00e9duit le co\u00fbt en rage de votre technique Frappe h\u00e9ro\u00efque de 3 points."
+                ],
+                "s": [
+                    12282,
+                    12663,
+                    12664
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Ability_Rogue_Ambush"
+            },
+            {
+                "i": 130,
+                "n": "D\u00e9viation",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances de Parer de 1%.",
+                    "Augmente vos chances de Parer de 2%.",
+                    "Augmente vos chances de Parer de 3%.",
+                    "Augmente vos chances de Parer de 4%.",
+                    "Augmente vos chances de Parer de 5%."
+                ],
+                "s": [
+                    16462,
+                    16463,
+                    16464,
+                    16465,
+                    16466
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Ability_Parry"
+            },
+            {
+                "i": 127,
+                "n": "Pourfendre am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Augmente de 10% les d\u00e9g\u00e2ts de saignement inflig\u00e9s par votre technique Pourfendre.",
+                    "Augmente de 20% les d\u00e9g\u00e2ts de saignement inflig\u00e9s par votre technique Pourfendre."
+                ],
+                "s": [
+                    12286,
+                    12658
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Ability_Gouge"
+            },
+            {
+                "i": 126,
+                "n": "Charge am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente la quantit\u00e9 de Rage g\u00e9n\u00e9r\u00e9e par votre technique Charge de 5.",
+                    "Augmente la quantit\u00e9 de Rage g\u00e9n\u00e9r\u00e9e par votre technique Charge de 10."
+                ],
+                "s": [
+                    12285,
+                    12697
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Ability_Warrior_Charge"
+            },
+            {
+                "i": 641,
+                "n": "Volont\u00e9 de fer",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit de 7% la dur\u00e9e de tous les effets d'\u00e9tourdissement et de charme utilis\u00e9s contre vous.",
+                    "R\u00e9duit de 14% la dur\u00e9e de tous les effets d'\u00e9tourdissement et de charme utilis\u00e9s contre vous.",
+                    "R\u00e9duit de 20% la dur\u00e9e de tous les effets d'\u00e9tourdissement et de charme utilis\u00e9s contre vous."
+                ],
+                "s": [
+                    12300,
+                    12959,
+                    12960
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Magic_MageArmor"
+            },
+            {
+                "i": 128,
+                "n": "Ma\u00eetrise tactique",
+                "m": 3,
+                "d": [
+                    "Vous conservez jusqu'\u00e0 5 points de rage suppl\u00e9mentaires lorsque vous changez de posture. Augmente aussi consid\u00e9rablement la menace g\u00e9n\u00e9r\u00e9e par vos techniques Sanguinaire et Frappe mortelle quand vous \u00eates en posture d\u00e9fensive.",
+                    "Vous conservez jusqu'\u00e0 10 points de rage suppl\u00e9mentaires lorsque vous changez de posture. Augmente aussi consid\u00e9rablement la menace g\u00e9n\u00e9r\u00e9e par vos techniques Sanguinaire et Frappe mortelle quand vous \u00eates en posture d\u00e9fensive (Plus efficace que le Rang 1).",
+                    "Vous conservez jusqu'\u00e0 15 points de rage suppl\u00e9mentaires lorsque vous changez de posture. Augmente aussi consid\u00e9rablement la menace g\u00e9n\u00e9r\u00e9e par vos techniques Sanguinaire et Frappe mortelle quand vous \u00eates en posture d\u00e9fensive (Plus efficace que le Rang 2)."
+                ],
+                "s": [
+                    12295,
+                    12676,
+                    12677
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Nature_EnchantArmor"
+            },
+            {
+                "i": 131,
+                "n": "Fulgurance am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente de 25% vos chances d'infliger un coup critique avec la technique Fulgurance.",
+                    "Augmente de 50% vos chances d'infliger un coup critique avec la technique Fulgurance."
+                ],
+                "s": [
+                    12290,
+                    12963
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "INV_Sword_05"
+            },
+            {
+                "i": 137,
+                "n": "Ma\u00eetrise de la Rage",
+                "m": 1,
+                "d": [
+                    "G\u00e9n\u00e8re 1 point de rage toutes les 3 secondes."
+                ],
+                "s": [
+                    12296
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Holy_BlessingOfStamina"
+            },
+            {
+                "i": 662,
+                "n": "Empaler",
+                "m": 2,
+                "d": [
+                    "Augmente de 10% le bonus aux d\u00e9g\u00e2ts des coups critiques r\u00e9ussis avec vos techniques.",
+                    "Augmente de 20% le bonus aux d\u00e9g\u00e2ts des coups critiques r\u00e9ussis avec vos techniques."
+                ],
+                "s": [
+                    16493,
+                    16494
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Ability_SearingArrow"
+            },
+            {
+                "i": 121,
+                "n": "Blessures profondes",
+                "m": 3,
+                "d": [
+                    "Vos coups critiques font saigner l'adversaire et lui infligent 16% des points de d\u00e9g\u00e2ts moyens de votre arme de m\u00eal\u00e9e en 6 s.",
+                    "Vos coups critiques font saigner l'adversaire et lui infligent 32% des points de d\u00e9g\u00e2ts moyens de votre arme de m\u00eal\u00e9e en 6 s.",
+                    "Vos coups critiques font saigner l'adversaire et lui infligent 48% des points de d\u00e9g\u00e2ts moyens de votre arme de m\u00eal\u00e9e en 6 s."
+                ],
+                "s": [
+                    12834,
+                    12849,
+                    12867
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Ability_BackStab",
+                "r": [
+                    8,
+                    2
+                ]
+            },
+            {
+                "i": 136,
+                "n": "Sp\u00e9cialisation Arme 2M",
+                "m": 3,
+                "d": [
+                    "Augmente les points de d\u00e9g\u00e2ts que vous infligez avec les armes de m\u00eal\u00e9e \u00e0 deux mains de 2%.",
+                    "Augmente les points de d\u00e9g\u00e2ts que vous infligez avec les armes de m\u00eal\u00e9e \u00e0 deux mains de 4%.",
+                    "Augmente les points de d\u00e9g\u00e2ts que vous infligez avec les armes de m\u00eal\u00e9e \u00e0 deux mains de 6%."
+                ],
+                "s": [
+                    12163,
+                    12711,
+                    12712
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "INV_Axe_09"
+            },
+            {
+                "i": 2232,
+                "n": "Go\u00fbt du sang",
+                "m": 3,
+                "d": [
+                    "Chaque fois que votre technique Pourfendre inflige des d\u00e9g\u00e2ts, vous avez 33% de chances de permettre l'utilisation de votre technique Fulgurance pendant 9 s. 1 charge. Cet effet ne peut se produire plus d'une fois toutes les 6 sec.",
+                    "Chaque fois que votre technique Pourfendre inflige des d\u00e9g\u00e2ts, vous avez 66% de chances de permettre l'utilisation de votre technique Fulgurance pendant 9 s. 1 charge. Cet effet ne peut se produire plus d'une fois toutes les 6 sec.",
+                    "Chaque fois que votre technique Pourfendre inflige des d\u00e9g\u00e2ts, vous avez 100% de chances de permettre l'utilisation de votre technique Fulgurance pendant 9 s. 1 charge. Cet effet ne peut se produire plus d'une fois toutes les 6 sec."
+                ],
+                "s": [
+                    56636,
+                    56637,
+                    56638
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Ability_Rogue_HungerforBlood"
+            },
+            {
+                "i": 132,
+                "n": "Sp\u00e9cialisation Hache d'hast",
+                "m": 5,
+                "d": [
+                    "Augmente de 1% vos chances d'infliger un coup critique avec les haches et les armes d'hast ainsi que les d\u00e9g\u00e2ts de ces critiques.",
+                    "Augmente de 2% vos chances d'infliger un coup critique avec les haches et les armes d'hast ainsi que les d\u00e9g\u00e2ts de ces critiques.",
+                    "Augmente de 3% vos chances d'infliger un coup critique avec les haches et les armes d'hast ainsi que les d\u00e9g\u00e2ts de ces critiques.",
+                    "Augmente de 4% vos chances d'infliger un coup critique avec les haches et les armes d'hast ainsi que les d\u00e9g\u00e2ts de ces critiques.",
+                    "Augmente de 5% vos chances d'infliger un coup critique avec les haches et les armes d'hast ainsi que les d\u00e9g\u00e2ts de ces critiques."
+                ],
+                "s": [
+                    12700,
+                    12781,
+                    12783,
+                    12784,
+                    12785
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "INV_Axe_06"
+            },
+            {
+                "i": 133,
+                "n": "Attaques circulaires",
+                "m": 1,
+                "d": [
+                    "Vos 5 prochaines attaques de m\u00eal\u00e9e frappent un adversaire proche suppl\u00e9mentaire."
+                ],
+                "s": [
+                    12328
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Ability_Rogue_SliceDice"
+            },
+            {
+                "i": 125,
+                "n": "Sp\u00e9cialisation Masse",
+                "m": 5,
+                "d": [
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 3% de l'armure de votre adversaire.",
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 6% de l'armure de votre adversaire.",
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 9% de l'armure de votre adversaire.",
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 12% de l'armure de votre adversaire.",
+                    "Vos attaques avec les masses ignorent jusqu'\u00e0 15% de l'armure de votre adversaire."
+                ],
+                "s": [
+                    12284,
+                    12701,
+                    12702,
+                    12703,
+                    12704
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "INV_Mace_01"
+            },
+            {
+                "i": 123,
+                "n": "Sp\u00e9cialisation Ep\u00e9e",
+                "m": 5,
+                "d": [
+                    "Vous conf\u00e8re 2% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec votre \u00e9p\u00e9e. Cet effet ne survient pas plus d'une fois toutes les 6 secondes.",
+                    "Vous conf\u00e8re 4% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec votre \u00e9p\u00e9e. Cet effet ne survient pas plus d'une fois toutes les 6 secondes.",
+                    "Vous conf\u00e8re 6% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec votre \u00e9p\u00e9e. Cet effet ne survient pas plus d'une fois toutes les 6 secondes.",
+                    "Vous conf\u00e8re 8% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec votre \u00e9p\u00e9e. Cet effet ne survient pas plus d'une fois toutes les 6 secondes.",
+                    "Vous conf\u00e8re 10% de chances de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire sur la m\u00eame cible apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts avec votre \u00e9p\u00e9e. Cet effet ne survient pas plus d'une fois toutes les 6 secondes."
+                ],
+                "s": [
+                    12281,
+                    12812,
+                    12813,
+                    12814,
+                    12815
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "INV_Sword_27"
+            },
+            {
+                "i": 134,
+                "n": "Ma\u00eetrise des armes",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit la probabilit\u00e9 que vos attaques soient esquiv\u00e9es de 1% et r\u00e9duit la dur\u00e9e de tous les effets de d\u00e9sarmement utilis\u00e9s contre vous de 25%. Non cumulable avec les autres effets qui r\u00e9duisent la dur\u00e9e du d\u00e9sarmement.",
+                    "R\u00e9duit la probabilit\u00e9 que vos attaques soient esquiv\u00e9es de 2% et r\u00e9duit la dur\u00e9e de tous les effets de d\u00e9sarmement utilis\u00e9s contre vous de 50%. Non cumulable avec les autres effets qui r\u00e9duisent la dur\u00e9e du d\u00e9sarmement."
+                ],
+                "s": [
+                    20504,
+                    20505
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Ability_Warrior_WeaponMastery"
+            },
+            {
+                "i": 129,
+                "n": "Brise-genou am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "Conf\u00e8re \u00e0 votre technique Brise-genou 5% de chances d'immobiliser votre cible pendant 5 s.",
+                    "Conf\u00e8re \u00e0 votre technique Brise-genou 10% de chances d'immobiliser votre cible pendant 5 s.",
+                    "Conf\u00e8re \u00e0 votre technique Brise-genou 15% de chances d'immobiliser votre cible pendant 5 s."
+                ],
+                "s": [
+                    12289,
+                    12668,
+                    23695
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Ability_ShockWave"
+            },
+            {
+                "i": 1859,
+                "n": "Traumatisme",
+                "m": 2,
+                "d": [
+                    "Vos coups critiques normaux en m\u00eal\u00e9e augmentent l'efficacit\u00e9 des effets de saignement sur la cible de 15% pendant 1 min.",
+                    "Vos coups critiques normaux en m\u00eal\u00e9e augmentent l'efficacit\u00e9 des effets de saignement sur la cible de 30% pendant 1 min."
+                ],
+                "s": [
+                    46854,
+                    46855
+                ],
+                "x": 3,
+                "y": 5,
+                "iconname": "Ability_Warrior_BloodNova"
+            },
+            {
+                "i": 1663,
+                "n": "Second souffle",
+                "m": 2,
+                "d": [
+                    "Chaque fois que vous \u00eates atteint par un effet d'\u00e9tourdissement ou d'immobilisation, vous gagnez 100 points de rage et 5% de votre total de points de vie en 10 s.",
+                    "Chaque fois que vous \u00eates atteint par un effet d'\u00e9tourdissement ou d'immobilisation, vous gagnez 200 points de rage et 10% de votre total de points de vie en 10 s."
+                ],
+                "s": [
+                    29834,
+                    29838
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Hunter_Harass"
+            },
+            {
+                "i": 135,
+                "n": "Frappe mortelle",
+                "m": 1,
+                "d": [
+                    "Une attaque vicieuse qui inflige les d\u00e9g\u00e2ts de l'arme plus 85 et blesse la cible. L'effet des sorts de soins dont elle est la cible est r\u00e9duit de 50% pendant 10 s."
+                ],
+                "s": [
+                    12294
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Ability_Warrior_SavageBlow",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 1862,
+                "n": "Force des armes",
+                "m": 2,
+                "d": [
+                    "Augmente votre total de Force et d'Endurance de 2% et votre expertise de 2.",
+                    "Augmente votre total de Force et d'Endurance de 4% et votre expertise de 4."
+                ],
+                "s": [
+                    46865,
+                    46866
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Warrior_OffensiveStance"
+            },
+            {
+                "i": 2233,
+                "n": "Heurtoir am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de frappe de votre technique Heurtoir de 0.5 sec.",
+                    "R\u00e9duit le temps de frappe de votre technique Heurtoir de 1 sec."
+                ],
+                "s": [
+                    12862,
+                    12330
+                ],
+                "x": 3,
+                "y": 6,
+                "iconname": "Ability_Warrior_DecisiveStrike"
+            },
+            {
+                "i": 2283,
+                "n": "Mastodonte",
+                "m": 1,
+                "d": [
+                    "Votre technique Charge est \u00e0 pr\u00e9sent utilisable en combat, mais son temps de recharge est augment\u00e9 de 5 sec. Apr\u00e8s une Charge, votre prochaine technique Heurtoir ou Frappe mortelle b\u00e9n\u00e9ficie de 25% de chances suppl\u00e9mentaires d'\u00eatre critique si elle est utilis\u00e9e dans les 10 s."
+                ],
+                "s": [
+                    64976
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Ability_Warrior_BullRush"
+            },
+            {
+                "i": 1824,
+                "n": "Frappe mortelle am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre technique Frappe mortelle de 3% et r\u00e9duit le temps de recharge de 0.333 sec.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre technique Frappe mortelle de 6% et r\u00e9duit le temps de recharge de 0.666 sec.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre technique Frappe mortelle de 10% et r\u00e9duit le temps de recharge de 1 sec."
+                ],
+                "s": [
+                    35446,
+                    35448,
+                    35449
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Ability_Warrior_SavageBlow",
+                "r": [
+                    20,
+                    1
+                ]
+            },
+            {
+                "i": 1860,
+                "n": "Assaut continuel",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos techniques Fulgurance et Vengeance de 2 secondes et augmente les d\u00e9g\u00e2ts inflig\u00e9s par ces deux techniques de 10%. De plus, si vous frappez un personnage-joueur avec Fulgurance alors qu'il est en train d'incanter un sort, ses d\u00e9g\u00e2ts et soins magiques sont r\u00e9duits de 25% pendant 6 s.",
+                    "R\u00e9duit le temps de recharge de vos techniques Fulgurance et Vengeance de 4 secondes et augmente les d\u00e9g\u00e2ts inflig\u00e9s par ces deux techniques de 20%. De plus, si vous frappez un personnage-joueur avec Fulgurance alors qu'il est en train d'incanter un sort, ses d\u00e9g\u00e2ts et soins magiques sont r\u00e9duits de 50% pendant 6 s."
+                ],
+                "s": [
+                    46859,
+                    46860
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Ability_Warrior_UnrelentingAssault"
+            },
+            {
+                "i": 1662,
+                "n": "Mort soudaine",
+                "m": 3,
+                "d": [
+                    "Vos coups en m\u00eal\u00e9e ont 3% de chances de permettre l'utilisation d'Ex\u00e9cution quel que soit le montant de points de vie restant \u00e0 la cible. De plus, vous conservez 3 points de rage apr\u00e8s avoir utilis\u00e9 Ex\u00e9cution.",
+                    "Vos coups en m\u00eal\u00e9e ont 6% de chances de permettre l'utilisation d'Ex\u00e9cution quel que soit le montant de points de vie restant \u00e0 la cible. De plus, vous conservez 7 points de rage apr\u00e8s avoir utilis\u00e9 Ex\u00e9cution.",
+                    "Vos coups en m\u00eal\u00e9e ont 9% de chances de permettre l'utilisation d'Ex\u00e9cution quel que soit le montant de points de vie restant \u00e0 la cible. De plus, vous conservez 10 points de rage apr\u00e8s avoir utilis\u00e9 Ex\u00e9cution."
+                ],
+                "s": [
+                    29723,
+                    29725,
+                    29724
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Warrior_ImprovedDisciplines"
+            },
+            {
+                "i": 1661,
+                "n": "Rage infinie",
+                "m": 1,
+                "d": [
+                    "Vous g\u00e9n\u00e9rez 25% de rage suppl\u00e9mentaires lorsque vous infligez des d\u00e9g\u00e2ts."
+                ],
+                "s": [
+                    29623
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Ability_Warrior_EndlessRage"
+            },
+            {
+                "i": 1664,
+                "n": "Fr\u00e9n\u00e9sie sanglante",
+                "m": 2,
+                "d": [
+                    "Augmente votre vitesse d'attaque en m\u00eal\u00e9e de 5%. De plus, vos techniques Pourfendre et Blessures profondes augmentent aussi tous les d\u00e9g\u00e2ts physiques inflig\u00e9s \u00e0 cette cible de 2%.",
+                    "Augmente votre vitesse d'attaque en m\u00eal\u00e9e de 10%. De plus, vos techniques Pourfendre et Blessures profondes augmentent aussi tous les d\u00e9g\u00e2ts physiques inflig\u00e9s \u00e0 cette cible de 4%."
+                ],
+                "s": [
+                    29836,
+                    29859
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Warrior_BloodFrenzy"
+            },
+            {
+                "i": 2231,
+                "n": "D\u00e9molisseurs",
+                "m": 5,
+                "d": [
+                    "Vos coups critiques en m\u00eal\u00e9e vous font Enrager, ce qui augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 2% pendant 12 s. Cet effet ne se cumule pas avec Enrager.",
+                    "Vos coups critiques en m\u00eal\u00e9e vous font Enrager, ce qui augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 4% pendant 12 s. Cet effet ne se cumule pas avec Enrager.",
+                    "Vos coups critiques en m\u00eal\u00e9e vous font Enrager, ce qui augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 6% pendant 12 s. Cet effet ne se cumule pas avec Enrager.",
+                    "Vos coups critiques en m\u00eal\u00e9e vous font Enrager, ce qui augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 8% pendant 12 s. Cet effet ne se cumule pas avec Enrager.",
+                    "Vos coups critiques en m\u00eal\u00e9e vous font Enrager, ce qui augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 10% pendant 12 s. Cet effet ne se cumule pas avec Enrager."
+                ],
+                "s": [
+                    46867,
+                    56611,
+                    56612,
+                    56613,
+                    56614
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Warrior_Trauma"
+            },
+            {
+                "i": 1863,
+                "n": "Temp\u00eate de lames",
+                "m": 1,
+                "d": [
+                    "Ex\u00e9cute instantan\u00e9ment une attaque Tourbillon sur un maximum de 0 cibles et pendant les prochaines 6 s, vous ex\u00e9cuterez une attaque Tourbillon toutes les 1 sec. Tant que vous \u00eates sous l'effet de Temp\u00eate de lames, vous pouvez vous d\u00e9placer mais vous ne pouvez pas ex\u00e9cuter d'autres techniques. Cependant, vous ne ressentez ni piti\u00e9, ni remords, ni peur et vous ne pouvez \u00eatre arr\u00eat\u00e9 \u00e0 moins d'\u00eatre tu\u00e9."
+                ],
+                "s": [
+                    46924
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Warrior_Bladestorm"
+            }
+        ]
+    },
+    {
+        "n": "Fureur",
+        "t": [
+            {
+                "i": 2250,
+                "n": "Arm\u00e9 jusqu'aux dents",
+                "m": 3,
+                "d": [
+                    "Augmente votre puissance d'attaque de 1 pour chaque tranche de 108 points de votre valeur d'armure.",
+                    "Augmente votre puissance d'attaque de 2 pour chaque tranche de 108 points de votre valeur d'armure.",
+                    "Augmente votre puissance d'attaque de 3 pour chaque tranche de 108 points de votre valeur d'armure."
+                ],
+                "s": [
+                    61216,
+                    61221,
+                    61222
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "INV_Shoulder_22"
+            },
+            {
+                "i": 158,
+                "n": "Voix tonitruante",
+                "m": 2,
+                "d": [
+                    "Augmente de 25% la zone d'effet et la dur\u00e9e de vos techniques Cri de guerre, Cri d\u00e9moralisant et Cri de commandement.",
+                    "Augmente de 50% la zone d'effet et la dur\u00e9e de vos techniques Cri de guerre, Cri d\u00e9moralisant et Cri de commandement."
+                ],
+                "s": [
+                    12321,
+                    12835
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Nature_Purge"
+            },
+            {
+                "i": 157,
+                "n": "Cruaut\u00e9",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances d'infliger un coup critique avec les armes de m\u00eal\u00e9e de 1%.",
+                    "Augmente vos chances d'infliger un coup critique avec les armes de m\u00eal\u00e9e de 2%.",
+                    "Augmente vos chances d'infliger un coup critique avec les armes de m\u00eal\u00e9e de 3%.",
+                    "Augmente vos chances d'infliger un coup critique avec les armes de m\u00eal\u00e9e de 4%.",
+                    "Augmente vos chances d'infliger un coup critique avec les armes de m\u00eal\u00e9e de 5%."
+                ],
+                "s": [
+                    12320,
+                    12852,
+                    12853,
+                    12855,
+                    12856
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Ability_Rogue_Eviscerate"
+            },
+            {
+                "i": 161,
+                "n": "Cri d\u00e9moralisant am\u00e9lior\u00e9",
+                "m": 5,
+                "d": [
+                    "Augmente la r\u00e9duction de puissance d'attaque en m\u00eal\u00e9e de votre Cri d\u00e9moralisant de 8%.",
+                    "Augmente la r\u00e9duction de puissance d'attaque en m\u00eal\u00e9e de votre Cri d\u00e9moralisant de 16%.",
+                    "Augmente la r\u00e9duction de puissance d'attaque en m\u00eal\u00e9e de votre Cri d\u00e9moralisant de 24%.",
+                    "Augmente la r\u00e9duction de puissance d'attaque en m\u00eal\u00e9e de votre Cri d\u00e9moralisant de 32%.",
+                    "Augmente la r\u00e9duction de puissance d'attaque en m\u00eal\u00e9e de votre Cri d\u00e9moralisant de 40%."
+                ],
+                "s": [
+                    12324,
+                    12876,
+                    12877,
+                    12878,
+                    12879
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Ability_Warrior_WarCry"
+            },
+            {
+                "i": 159,
+                "n": "Col\u00e8re d\u00e9cha\u00een\u00e9e",
+                "m": 5,
+                "d": [
+                    "Vous conf\u00e8re une chance de gagner un point de rage suppl\u00e9mentaire quand vous infligez des d\u00e9g\u00e2ts en m\u00eal\u00e9e avec une arme.",
+                    "Vous conf\u00e8re une chance de gagner un point de rage suppl\u00e9mentaire quand vous infligez des d\u00e9g\u00e2ts en m\u00eal\u00e9e avec une arme. L'effet se produit plus souvent qu'avec Col\u00e8re d\u00e9cha\u00een\u00e9e (Rang 1).",
+                    "Vous conf\u00e8re une chance de gagner un point de rage suppl\u00e9mentaire quand vous infligez des d\u00e9g\u00e2ts en m\u00eal\u00e9e avec une arme. L'effet se produit plus souvent qu'avec Col\u00e8re d\u00e9cha\u00een\u00e9e (Rang 2).",
+                    "Vous conf\u00e8re une chance de gagner un point de rage suppl\u00e9mentaire quand vous infligez des d\u00e9g\u00e2ts en m\u00eal\u00e9e avec une arme. L'effet se produit plus souvent qu'avec Col\u00e8re d\u00e9cha\u00een\u00e9e (Rang 3).",
+                    "Vous conf\u00e8re une chance de gagner un point de rage suppl\u00e9mentaire quand vous infligez des d\u00e9g\u00e2ts en m\u00eal\u00e9e avec une arme. L'effet se produit plus souvent qu'avec Col\u00e8re d\u00e9cha\u00een\u00e9e (Rang 4)."
+                ],
+                "s": [
+                    12322,
+                    12999,
+                    13000,
+                    13001,
+                    13002
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Nature_StoneClawTotem"
+            },
+            {
+                "i": 166,
+                "n": "Encha\u00eenement am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "Augmente le bonus de d\u00e9g\u00e2ts inflig\u00e9 par votre technique Encha\u00eenement de 40%.",
+                    "Augmente le bonus de d\u00e9g\u00e2ts inflig\u00e9 par votre technique Encha\u00eenement de 80%.",
+                    "Augmente le bonus de d\u00e9g\u00e2ts inflig\u00e9 par votre technique Encha\u00eenement de 120%."
+                ],
+                "s": [
+                    12329,
+                    12950,
+                    20496
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Ability_Warrior_Cleave"
+            },
+            {
+                "i": 160,
+                "n": "Hurlement per\u00e7ant",
+                "m": 1,
+                "d": [
+                    "Tous les ennemis se trouvant \u00e0 moins de 10 m\u00e8tres du guerrier sont h\u00e9b\u00e9t\u00e9s, et leur vitesse de d\u00e9placement est r\u00e9duite de 50% pendant 6 s."
+                ],
+                "s": [
+                    12323
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Shadow_DeathScream"
+            },
+            {
+                "i": 661,
+                "n": "Folie sanguinaire",
+                "m": 3,
+                "d": [
+                    "R\u00e9g\u00e9n\u00e8re 2% de votre nombre total de points de vie sur 6 s apr\u00e8s avoir re\u00e7u un coup critique.",
+                    "R\u00e9g\u00e9n\u00e8re 4% de votre nombre total de points de vie sur 6 s apr\u00e8s avoir re\u00e7u un coup critique.",
+                    "R\u00e9g\u00e9n\u00e8re 6% de votre nombre total de points de vie sur 6 s apr\u00e8s avoir re\u00e7u un coup critique."
+                ],
+                "s": [
+                    16487,
+                    16489,
+                    16492
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Shadow_SummonImp"
+            },
+            {
+                "i": 154,
+                "n": "Pr\u00e9sence imp\u00e9rieuse",
+                "m": 5,
+                "d": [
+                    "Augmente de 5% le bonus \u00e0 la puissance d'attaque en m\u00eal\u00e9e de votre Cri de guerre et le bonus aux points de vie de votre Cri de commandement.",
+                    "Augmente de 10% le bonus \u00e0 la puissance d'attaque en m\u00eal\u00e9e de votre Cri de guerre et le bonus aux points de vie de votre Cri de commandement.",
+                    "Augmente de 15% le bonus \u00e0 la puissance d'attaque en m\u00eal\u00e9e de votre Cri de guerre et le bonus aux points de vie de votre Cri de commandement.",
+                    "Augmente de 20% le bonus \u00e0 la puissance d'attaque en m\u00eal\u00e9e de votre Cri de guerre et le bonus aux points de vie de votre Cri de commandement.",
+                    "Augmente de 25% le bonus \u00e0 la puissance d'attaque en m\u00eal\u00e9e de votre Cri de guerre et le bonus aux points de vie de votre Cri de commandement."
+                ],
+                "s": [
+                    12318,
+                    12857,
+                    12858,
+                    12860,
+                    12861
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Nature_FocusedMind"
+            },
+            {
+                "i": 1581,
+                "n": "Sp\u00e9cialisation Ambidextrie",
+                "m": 5,
+                "d": [
+                    "Augmente de 5% les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche.",
+                    "Augmente de 10% les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche.",
+                    "Augmente de 15% les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche.",
+                    "Augmente de 20% les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche.",
+                    "Augmente de 25% les points de d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche."
+                ],
+                "s": [
+                    23584,
+                    23585,
+                    23586,
+                    23587,
+                    23588
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Ability_DualWield"
+            },
+            {
+                "i": 1542,
+                "n": "Ex\u00e9cution am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en rage de votre technique Ex\u00e9cution de 2.",
+                    "R\u00e9duit le co\u00fbt en rage de votre technique Ex\u00e9cution de 5."
+                ],
+                "s": [
+                    20502,
+                    20503
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "INV_Sword_48"
+            },
+            {
+                "i": 155,
+                "n": "Enrager",
+                "m": 5,
+                "d": [
+                    "Vous conf\u00e8re 30% de chances de b\u00e9n\u00e9ficier d'un bonus aux d\u00e9g\u00e2ts en m\u00eal\u00e9e de 2% pendant 12 s lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts. Cet effet ne se cumule pas avec D\u00e9molisseurs.",
+                    "Vous conf\u00e8re 30% de chances de b\u00e9n\u00e9ficier d'un bonus aux d\u00e9g\u00e2ts en m\u00eal\u00e9e de 4% pendant 12 s lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts. Cet effet ne se cumule pas avec D\u00e9molisseurs.",
+                    "Vous conf\u00e8re 30% de chances de b\u00e9n\u00e9ficier d'un bonus aux d\u00e9g\u00e2ts en m\u00eal\u00e9e de 6% pendant 12 s lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts. Cet effet ne se cumule pas avec D\u00e9molisseurs.",
+                    "Vous conf\u00e8re 30% de chances de b\u00e9n\u00e9ficier d'un bonus aux d\u00e9g\u00e2ts en m\u00eal\u00e9e de 8% pendant 12 s lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts. Cet effet ne se cumule pas avec D\u00e9molisseurs.",
+                    "Vous conf\u00e8re 30% de chances de b\u00e9n\u00e9ficier d'un bonus aux d\u00e9g\u00e2ts en m\u00eal\u00e9e de 10% pendant 12 s lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts. Cet effet ne se cumule pas avec D\u00e9molisseurs."
+                ],
+                "s": [
+                    12317,
+                    13045,
+                    13046,
+                    13047,
+                    13048
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Shadow_UnholyFrenzy"
+            },
+            {
+                "i": 1657,
+                "n": "Pr\u00e9cision",
+                "m": 3,
+                "d": [
+                    "Augmente vos chances de toucher l'ennemi avec vos armes de m\u00eal\u00e9e de 1%.",
+                    "Augmente vos chances de toucher l'ennemi avec vos armes de m\u00eal\u00e9e de 2%.",
+                    "Augmente vos chances de toucher l'ennemi avec vos armes de m\u00eal\u00e9e de 3%."
+                ],
+                "s": [
+                    29590,
+                    29591,
+                    29592
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Ability_Marksmanship"
+            },
+            {
+                "i": 165,
+                "n": "Souhait mortel",
+                "m": 1,
+                "d": [
+                    "Lorsque cette technique est activ\u00e9e, vous enragez et vos d\u00e9g\u00e2ts physiques sont augment\u00e9s de 20%, mais tous les d\u00e9g\u00e2ts subis sont augment\u00e9s de 5%. Dure 30 s."
+                ],
+                "s": [
+                    12292
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Shadow_DeathPact"
+            },
+            {
+                "i": 1543,
+                "n": "Interception am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de votre technique Interception de 5 sec.",
+                    "R\u00e9duit le temps de recharge de votre technique Interception de 10 sec."
+                ],
+                "s": [
+                    29888,
+                    29889
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Ability_Rogue_Sprint"
+            },
+            {
+                "i": 1541,
+                "n": "Rage berserker am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "La technique Rage berserker g\u00e9n\u00e8re 10 points de rage quand elle est utilis\u00e9e.",
+                    "La technique Rage berserker g\u00e9n\u00e8re 20 points de rage quand elle est utilis\u00e9e."
+                ],
+                "s": [
+                    20500,
+                    20501
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Nature_AncestralGuardian"
+            },
+            {
+                "i": 156,
+                "n": "Rafale",
+                "m": 5,
+                "d": [
+                    "Lorsque vous infligez un coup critique en m\u00eal\u00e9e, augmente votre vitesse d'attaque de 5% pour les 3 prochains coups.",
+                    "Lorsque vous infligez un coup critique en m\u00eal\u00e9e, augmente votre vitesse d'attaque de 10% pour les 3 prochains coups.",
+                    "Lorsque vous infligez un coup critique en m\u00eal\u00e9e, augmente votre vitesse d'attaque de 15% pour les 3 prochains coups.",
+                    "Lorsque vous infligez un coup critique en m\u00eal\u00e9e, augmente votre vitesse d'attaque de 20% pour les 3 prochains coups.",
+                    "Lorsque vous infligez un coup critique en m\u00eal\u00e9e, augmente votre vitesse d'attaque de 25% pour les 3 prochains coups."
+                ],
+                "s": [
+                    12319,
+                    12971,
+                    12972,
+                    12973,
+                    12974
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Ability_GhoulFrenzy"
+            },
+            {
+                "i": 1864,
+                "n": "Intensifier la rage",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos techniques Rage sanguinaire, Rage berserker, T\u00e9m\u00e9rit\u00e9 et Souhait mortel de 11%.",
+                    "R\u00e9duit le temps de recharge de vos techniques Rage sanguinaire, Rage berserker, T\u00e9m\u00e9rit\u00e9 et Souhait mortel de 22%.",
+                    "R\u00e9duit le temps de recharge de vos techniques Rage sanguinaire, Rage berserker, T\u00e9m\u00e9rit\u00e9 et Souhait mortel de 33%."
+                ],
+                "s": [
+                    46908,
+                    46909,
+                    56924
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Warrior_EndlessRage"
+            },
+            {
+                "i": 167,
+                "n": "Sanguinaire",
+                "m": 1,
+                "d": [
+                    "Attaque instantan\u00e9ment la cible et lui inflige  points de d\u00e9g\u00e2ts. De plus, les 3 prochaines attaques de m\u00eal\u00e9e r\u00e9ussies rendent 1% du maximum de points de vie. Cet effet dure 8 s. Les d\u00e9g\u00e2ts sont proportionnels \u00e0 votre puissance d'attaque."
+                ],
+                "s": [
+                    23881
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Nature_BloodLust",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 1655,
+                "n": "Tourbillon am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de votre technique Tourbillon de 10%.",
+                    "Augmente les d\u00e9g\u00e2ts de votre technique Tourbillon de 20%."
+                ],
+                "s": [
+                    29721,
+                    29776
+                ],
+                "x": 3,
+                "y": 6,
+                "iconname": "Ability_Whirlwind"
+            },
+            {
+                "i": 1865,
+                "n": "Attaques furieuses",
+                "m": 2,
+                "d": [
+                    "Vos attaques de m\u00eal\u00e9e normales ont une chance de r\u00e9duire tous les soins prodigu\u00e9s \u00e0 la cible de 25% pendant 10 s. Cet effet est cumulable jusqu'\u00e0 10001 fois.",
+                    "Vos attaques de m\u00eal\u00e9e normales ont une chance de r\u00e9duire tous les soins prodigu\u00e9s \u00e0 la cible de 25% pendant 10 s. Cet effet est cumulable jusqu'\u00e0 10001 fois. Se produit plus souvent qu'Attaques furieuses (Rang 1)."
+                ],
+                "s": [
+                    46910,
+                    46911
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Ability_Warrior_FuriousResolve"
+            },
+            {
+                "i": 1658,
+                "n": "Posture berserker am\u00e9lior\u00e9e",
+                "m": 5,
+                "d": [
+                    "Augmente la Force de 4% et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e de 2% lorsque vous \u00eates en posture berserker.",
+                    "Augmente la Force de 8% et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e de 4% lorsque vous \u00eates en posture berserker.",
+                    "Augmente la Force de 12% et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e de 6% lorsque vous \u00eates en posture berserker.",
+                    "Augmente la Force de 16% et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e de 8% lorsque vous \u00eates en posture berserker.",
+                    "Augmente la Force de 20% et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e de 10% lorsque vous \u00eates en posture berserker."
+                ],
+                "s": [
+                    29759,
+                    29760,
+                    29761,
+                    29762,
+                    29763
+                ],
+                "x": 3,
+                "y": 7,
+                "iconname": "Ability_Racial_Avatar"
+            },
+            {
+                "i": 1868,
+                "n": "Fureur h\u00e9ro\u00efque",
+                "m": 1,
+                "d": [
+                    "Dissipe tous les effets d'immobilisation et met fin au temps de recharge de votre technique Interception."
+                ],
+                "s": [
+                    60970
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_HeroicLeap"
+            },
+            {
+                "i": 1659,
+                "n": "Saccager",
+                "m": 1,
+                "d": [
+                    "Augmente de 5% les chances de coup critique en m\u00eal\u00e9e et \u00e0 distance de tous les membres du groupe ou raid se trouvant \u00e0 moins de 100 m\u00e8tres."
+                ],
+                "s": [
+                    29801
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Ability_Warrior_Rampage",
+                "r": [
+                    18,
+                    1
+                ]
+            },
+            {
+                "i": 1866,
+                "n": "Afflux sanguin",
+                "m": 3,
+                "d": [
+                    "Vos coups r\u00e9ussis avec Frappe h\u00e9ro\u00efque, Sanguinaire et Tourbillon ont 7% de chances de rendre votre prochain Heurtoir instantan\u00e9 pendant 5 s.",
+                    "Vos coups r\u00e9ussis avec Frappe h\u00e9ro\u00efque, Sanguinaire et Tourbillon ont 13% de chances de rendre votre prochain Heurtoir instantan\u00e9 pendant 5 s.",
+                    "Vos coups r\u00e9ussis avec Frappe h\u00e9ro\u00efque, Sanguinaire et Tourbillon ont 20% de chances de rendre votre prochain Heurtoir instantan\u00e9 pendant 5 s."
+                ],
+                "s": [
+                    46913,
+                    46914,
+                    46915
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Warrior_Bloodsurge",
+                "r": [
+                    18,
+                    1
+                ]
+            },
+            {
+                "i": 2234,
+                "n": "Fureur sans fin",
+                "m": 5,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Heurtoir, Tourbillon et Sanguinaire de 2%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Heurtoir, Tourbillon et Sanguinaire de 4%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Heurtoir, Tourbillon et Sanguinaire de 6%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Heurtoir, Tourbillon et Sanguinaire de 8%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos techniques Heurtoir, Tourbillon et Sanguinaire de 10%."
+                ],
+                "s": [
+                    56927,
+                    56929,
+                    56930,
+                    56931,
+                    56932
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Warrior_IntensifyRage"
+            },
+            {
+                "i": 1867,
+                "n": "Poigne du titan",
+                "m": 1,
+                "d": [
+                    "Vous permet de manier les haches, les masses et les \u00e9p\u00e9es \u00e0 deux mains d\u2019une seule main. Lorsque vous portez une arme \u00e0 deux mains d'une seule main, les d\u00e9g\u00e2ts physiques que vous infligez sont r\u00e9duits de 10%."
+                ],
+                "s": [
+                    46917
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Warrior_TitansGrip"
+            }
+        ]
+    },
+    {
+        "n": "Protection",
+        "t": [
+            {
+                "i": 142,
+                "n": "Rage sanguinaire am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente la rage instantan\u00e9e g\u00e9n\u00e9r\u00e9e par votre technique Rage sanguinaire de 25%.",
+                    "Augmente la rage instantan\u00e9e g\u00e9n\u00e9r\u00e9e par votre technique Rage sanguinaire de 50%."
+                ],
+                "s": [
+                    12301,
+                    12818
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Ability_Racial_BloodRage"
+            },
+            {
+                "i": 1601,
+                "n": "Sp\u00e9cialisation Bouclier",
+                "m": 5,
+                "d": [
+                    "Augmente de 1% vos chances de bloquer les attaques avec un bouclier, avec 20% de chances de g\u00e9n\u00e9rer 5 points de Rage quand vous bloquez, esquivez ou parez.",
+                    "Augmente de 2% vos chances de bloquer les attaques avec un bouclier, avec 40% de chances de g\u00e9n\u00e9rer 5 points de Rage quand vous bloquez, esquivez ou parez.",
+                    "Augmente de 3% vos chances de bloquer les attaques avec un bouclier, avec 60% de chances de g\u00e9n\u00e9rer 5 points de Rage quand vous bloquez, esquivez ou parez.",
+                    "Augmente de 4% vos chances de bloquer les attaques avec un bouclier, avec 80% de chances de g\u00e9n\u00e9rer 5 points de Rage quand vous bloquez, esquivez ou parez.",
+                    "Augmente de 5% vos chances de bloquer les attaques avec un bouclier, avec 100% de chances de g\u00e9n\u00e9rer 5 points de Rage quand vous bloquez, esquivez ou parez."
+                ],
+                "s": [
+                    12298,
+                    12724,
+                    12725,
+                    12726,
+                    12727
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "INV_Shield_06"
+            },
+            {
+                "i": 141,
+                "n": "Coup de tonnerre am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le co\u00fbt de votre technique Coup de tonnerre de 1 points de rage et augmente les d\u00e9g\u00e2ts de 10% et l'effet de ralentissement de 4% suppl\u00e9mentaires.",
+                    "R\u00e9duit le co\u00fbt de votre technique Coup de tonnerre de 2 points de rage et augmente les d\u00e9g\u00e2ts de 20% et l'effet de ralentissement de 7% suppl\u00e9mentaires.",
+                    "R\u00e9duit le co\u00fbt de votre technique Coup de tonnerre de 4 points de rage et augmente les d\u00e9g\u00e2ts de 30% et l'effet de ralentissement de 10% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    12287,
+                    12665,
+                    12666
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Ability_ThunderClap"
+            },
+            {
+                "i": 144,
+                "n": "Emulation",
+                "m": 3,
+                "d": [
+                    "Augmente de 5% vos chances de r\u00e9aliser un coup critique avec les techniques Frappe h\u00e9ro\u00efque, Coup de tonnerre et Encha\u00eenement.",
+                    "Augmente de 10% vos chances de r\u00e9aliser un coup critique avec les techniques Frappe h\u00e9ro\u00efque, Coup de tonnerre et Encha\u00eenement.",
+                    "Augmente de 15% vos chances de r\u00e9aliser un coup critique avec les techniques Frappe h\u00e9ro\u00efque, Coup de tonnerre et Encha\u00eenement."
+                ],
+                "s": [
+                    50685,
+                    50686,
+                    50687
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Ability_Warrior_Incite"
+            },
+            {
+                "i": 138,
+                "n": "Anticipation",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances d'esquiver une attaque de 1%.",
+                    "Augmente vos chances d'esquiver une attaque de 2%.",
+                    "Augmente vos chances d'esquiver une attaque de 3%.",
+                    "Augmente vos chances d'esquiver une attaque de 4%.",
+                    "Augmente vos chances d'esquiver une attaque de 5%."
+                ],
+                "s": [
+                    12297,
+                    12750,
+                    12751,
+                    12752,
+                    12753
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Nature_MirrorImage"
+            },
+            {
+                "i": 153,
+                "n": "Dernier rempart",
+                "m": 1,
+                "d": [
+                    "Activ\u00e9e, cette technique vous conf\u00e8re temporairement 30% de votre maximum de points de vie en plus pendant 20 s. Lorsque l'effet expire, les points de vie sont perdus."
+                ],
+                "s": [
+                    12975
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Holy_AshesToAshes"
+            },
+            {
+                "i": 147,
+                "n": "Vengeance am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de votre technique Vengeance de 30% et permet \u00e0 Vengeance de frapper une cible suppl\u00e9mentaire, lui infligeant 50% de ses d\u00e9g\u00e2ts.",
+                    "Augmente les d\u00e9g\u00e2ts de votre technique Vengeance de 60% et permet \u00e0 Vengeance de frapper une cible suppl\u00e9mentaire."
+                ],
+                "s": [
+                    12797,
+                    12799
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Ability_Warrior_Revenge"
+            },
+            {
+                "i": 1654,
+                "n": "Ma\u00eetrise du bouclier",
+                "m": 2,
+                "d": [
+                    "Augmente de 15% votre valeur de blocage et r\u00e9duit de 10 sec. le temps de recharge de votre technique Ma\u00eetrise du blocage.",
+                    "Augmente de 30% votre valeur de blocage et r\u00e9duit de 20 sec. le temps de recharge de votre technique Ma\u00eetrise du blocage."
+                ],
+                "s": [
+                    29598,
+                    29599
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Ability_Warrior_ShieldMastery"
+            },
+            {
+                "i": 140,
+                "n": "R\u00e9sistance",
+                "m": 5,
+                "d": [
+                    "Augmente la valeur d'armure des objets de 2% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 6%.",
+                    "Augmente la valeur d'armure des objets de 4% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 12%.",
+                    "Augmente la valeur d'armure des objets de 6% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 18%.",
+                    "Augmente la valeur d'armure des objets de 8% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 24%.",
+                    "Augmente la valeur d'armure des objets de 10% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 30%."
+                ],
+                "s": [
+                    12299,
+                    12761,
+                    12762,
+                    12763,
+                    12764
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Holy_Devotion"
+            },
+            {
+                "i": 2247,
+                "n": "Renvoi de sort am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit la probabilit\u00e9 que vous soyez touch\u00e9 par les sorts de 2%, et quand la technique est utilis\u00e9e, elle renvoie le premier sort lanc\u00e9 contre les 2 membres du groupe les plus proches se trouvant \u00e0 moins de 20 m\u00e8tres.",
+                    "R\u00e9duit la probabilit\u00e9 que vous soyez touch\u00e9 par les sorts de 4%, et quand la technique est utilis\u00e9e, elle renvoie le premier sort lanc\u00e9 contre les 4 membres du groupe les plus proches se trouvant \u00e0 moins de 20 m\u00e8tres."
+                ],
+                "s": [
+                    59088,
+                    59089
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Ability_Warrior_ShieldReflection"
+            },
+            {
+                "i": 151,
+                "n": "D\u00e9sarmement am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de votre technique D\u00e9sarmement de 10 secondes et fait subir \u00e0 la cible 5% de d\u00e9g\u00e2ts suppl\u00e9mentaires quand elle est d\u00e9sarm\u00e9e.",
+                    "R\u00e9duit le temps de recharge de votre technique D\u00e9sarmement de 20 secondes et fait subir \u00e0 la cible 10% de d\u00e9g\u00e2ts suppl\u00e9mentaires quand elle est d\u00e9sarm\u00e9e."
+                ],
+                "s": [
+                    12313,
+                    12804
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Ability_Warrior_Disarm"
+            },
+            {
+                "i": 146,
+                "n": "Percer",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en rage de vos techniques Fracasser armure et D\u00e9vaster de 1.",
+                    "R\u00e9duit le co\u00fbt en rage de vos techniques Fracasser armure et D\u00e9vaster de 2.",
+                    "R\u00e9duit le co\u00fbt en rage de vos techniques Fracasser armure et D\u00e9vaster de 3."
+                ],
+                "s": [
+                    12308,
+                    12810,
+                    12811
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Ability_Warrior_Sunder"
+            },
+            {
+                "i": 150,
+                "n": "Disciplines am\u00e9lior\u00e9es",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos techniques Mur protecteur, Repr\u00e9sailles et T\u00e9m\u00e9rit\u00e9 de 30 sec.",
+                    "R\u00e9duit le temps de recharge de vos techniques Mur protecteur, Repr\u00e9sailles et T\u00e9m\u00e9rit\u00e9 de 60 sec."
+                ],
+                "s": [
+                    12312,
+                    12803
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Ability_Warrior_ShieldWall"
+            },
+            {
+                "i": 152,
+                "n": "Coup traumatisant",
+                "m": 1,
+                "d": [
+                    "Etourdit l'adversaire pendant 5 s et lui inflige  points de d\u00e9g\u00e2ts (en fonction de la puissance d'attaque)."
+                ],
+                "s": [
+                    12809
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Ability_ThunderBolt"
+            },
+            {
+                "i": 149,
+                "n": "Imposition du silence",
+                "m": 2,
+                "d": [
+                    "Conf\u00e8re \u00e0 vos techniques Coup de bouclier et Lancer h\u00e9ro\u00efque 50% de chances de r\u00e9duire la cible au silence pendant 3 s et augmente les d\u00e9g\u00e2ts de votre technique Heurt de bouclier de 5%.",
+                    "Conf\u00e8re \u00e0 vos techniques Coup de bouclier et Lancer h\u00e9ro\u00efque 100% de chances de r\u00e9duire la cible au silence pendant 3 s et augmente les d\u00e9g\u00e2ts de votre technique Heurt de bouclier de 10%."
+                ],
+                "s": [
+                    12311,
+                    12958
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Ability_Warrior_ShieldBash"
+            },
+            {
+                "i": 702,
+                "n": "Sp\u00e9cialisation Arme 1M",
+                "m": 5,
+                "d": [
+                    "Augmente de 2% les d\u00e9g\u00e2ts physiques que vous infligez quand une arme de m\u00eal\u00e9e \u00e0 une main est \u00e9quip\u00e9e.",
+                    "Augmente de 4% les d\u00e9g\u00e2ts physiques que vous infligez quand une arme de m\u00eal\u00e9e \u00e0 une main est \u00e9quip\u00e9e.",
+                    "Augmente de 6% les d\u00e9g\u00e2ts physiques que vous infligez quand une arme de m\u00eal\u00e9e \u00e0 une main est \u00e9quip\u00e9e.",
+                    "Augmente de 8% les d\u00e9g\u00e2ts physiques que vous infligez quand une arme de m\u00eal\u00e9e \u00e0 une main est \u00e9quip\u00e9e.",
+                    "Augmente de 10% les d\u00e9g\u00e2ts physiques que vous infligez quand une arme de m\u00eal\u00e9e \u00e0 une main est \u00e9quip\u00e9e."
+                ],
+                "s": [
+                    16538,
+                    16539,
+                    16540,
+                    16541,
+                    16542
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "INV_Sword_20"
+            },
+            {
+                "i": 1652,
+                "n": "Posture d\u00e9fensive am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Lorsque vous \u00eates en posture d\u00e9fensive, tous les d\u00e9g\u00e2ts des sorts sont r\u00e9duits de 3% et lorsque vous parez, bloquez ou esquivez une attaque, vous avez 50% de chances d'enrager, ce qui augmente les d\u00e9g\u00e2ts physiques inflig\u00e9s de 5% pendant 12 s.",
+                    "Lorsque vous \u00eates en posture d\u00e9fensive, tous les d\u00e9g\u00e2ts des sorts sont r\u00e9duits de 6% et lorsque vous parez, bloquez ou esquivez une attaque, vous avez 100% de chances d'enrager, ce qui augmente les d\u00e9g\u00e2ts physiques inflig\u00e9s de 10% pendant 12 s."
+                ],
+                "s": [
+                    29593,
+                    29594
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Warrior_DefensiveStance"
+            },
+            {
+                "i": 148,
+                "n": "Vigilance",
+                "m": 1,
+                "d": [
+                    "Focalise votre regard protecteur sur une cible appartenant au groupe ou raid, ce qui r\u00e9duit les d\u00e9g\u00e2ts qu'elle subit de 3% et vous transf\u00e8re <threat>% de la menace qu'elle g\u00e9n\u00e8re. De plus, chaque fois qu'elle est touch\u00e9e par une attaque, le temps de recharge de votre Provocation prend fin. Dure 30 min. Une seule cible \u00e0 la fois peut b\u00e9n\u00e9ficier de cet effet."
+                ],
+                "s": [
+                    50720
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Ability_Warrior_Vigilance",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 1660,
+                "n": "Rage focalis\u00e9e",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en rage de vos techniques offensives de 1.",
+                    "R\u00e9duit le co\u00fbt en rage de vos techniques offensives de 2.",
+                    "R\u00e9duit le co\u00fbt en rage de vos techniques offensives de 3."
+                ],
+                "s": [
+                    29787,
+                    29790,
+                    29792
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Warrior_FocusedRage"
+            },
+            {
+                "i": 1653,
+                "n": "Vitalit\u00e9",
+                "m": 3,
+                "d": [
+                    "Augmente votre total de Force de 2%, d'Endurance de 3% et votre expertise de 2.",
+                    "Augmente votre total de Force de 4%, d'Endurance de 6% et votre expertise de 4.",
+                    "Augmente votre total de Force de 6%, d'Endurance de 9% et votre expertise de 6."
+                ],
+                "s": [
+                    29140,
+                    29143,
+                    29144
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "INV_Helmet_21"
+            },
+            {
+                "i": 1870,
+                "n": "Prot\u00e9ger",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit les d\u00e9g\u00e2ts subis par la cible de votre technique Intervention de 15% pendant 6 s.",
+                    "R\u00e9duit les d\u00e9g\u00e2ts subis par la cible de votre technique Intervention de 30% pendant 6 s."
+                ],
+                "s": [
+                    46945,
+                    46949
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Ability_Warrior_Safeguard"
+            },
+            {
+                "i": 2236,
+                "n": "Porteguerre",
+                "m": 1,
+                "d": [
+                    "Vos techniques Charge, Interception et Intervention sont \u00e0 pr\u00e9sent utilisables en combat et avec n'importe quelle posture. De plus, Intervention dissipe tous les effets affectant le d\u00e9placement."
+                ],
+                "s": [
+                    57499
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Warrior_Warbringer"
+            },
+            {
+                "i": 1666,
+                "n": "D\u00e9vaster",
+                "m": 1,
+                "d": [
+                    "Fracasse l'armure de la cible, provoquant l'effet Fracasser armure. De plus, inflige 120% des d\u00e9g\u00e2ts de l'arme plus 58 pour chaque Fracasser armure sur la cible. L'effet de fracassement d'armure peut \u00eatre cumul\u00e9 jusqu'\u00e0 58 fois."
+                ],
+                "s": [
+                    20243
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "INV_Sword_11"
+            },
+            {
+                "i": 1893,
+                "n": "Blocage critique",
+                "m": 3,
+                "d": [
+                    "Vos blocages r\u00e9ussis ont 20% de chances de bloquer le double du montant normal. Augmente vos chances d'infliger un coup critique avec votre technique Heurt de bouclier de 5% suppl\u00e9mentaires.",
+                    "Vos blocages r\u00e9ussis ont 40% de chances de bloquer le double du montant normal. Augmente vos chances d'infliger un coup critique avec votre technique Heurt de bouclier de 10% suppl\u00e9mentaires.",
+                    "Vos blocages r\u00e9ussis ont 60% de chances de bloquer le double du montant normal. Augmente vos chances d'infliger un coup critique avec votre technique Heurt de bouclier de 15% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    47294,
+                    47295,
+                    47296
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Warrior_CriticalBlock"
+            },
+            {
+                "i": 1871,
+                "n": "Ep\u00e9e et bouclier",
+                "m": 3,
+                "d": [
+                    "Augmente les chances de coup critique de votre technique D\u00e9vaster de 5%, et quand votre technique D\u00e9vaster ou Vengeance inflige des d\u00e9g\u00e2ts, elle a 10% de chances de mettre fin au temps de recharge de votre technique Heurt de bouclier et de r\u00e9duire son co\u00fbt de 100% pendant 5 s.",
+                    "Augmente les chances de coup critique de votre technique D\u00e9vaster de 10%, et quand votre technique D\u00e9vaster ou Vengeance inflige des d\u00e9g\u00e2ts, elle a 20% de chances de mettre fin au temps de recharge de votre technique Heurt de bouclier et de r\u00e9duire son co\u00fbt de 100% pendant 5 s.",
+                    "Augmente les chances de coup critique de votre technique D\u00e9vaster de 15%, et quand votre technique D\u00e9vaster ou Vengeance inflige des d\u00e9g\u00e2ts, elle a 30% de chances de mettre fin au temps de recharge de votre technique Heurt de bouclier et de r\u00e9duire son co\u00fbt de 100% pendant 5 s."
+                ],
+                "s": [
+                    46951,
+                    46952,
+                    46953
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Warrior_SwordandBoard",
+                "r": [
+                    22,
+                    1
+                ]
+            },
+            {
+                "i": 2246,
+                "n": "Bouclier de d\u00e9g\u00e2ts",
+                "m": 2,
+                "d": [
+                    "Chaque fois qu'une attaque en m\u00eal\u00e9e vous inflige des d\u00e9g\u00e2ts ou que vous la bloquez, vous infligez un montant de d\u00e9g\u00e2ts \u00e9gal \u00e0 10% de votre valeur de blocage.",
+                    "Chaque fois qu'une attaque en m\u00eal\u00e9e vous inflige des d\u00e9g\u00e2ts ou que vous la bloquez, vous infligez un montant de d\u00e9g\u00e2ts \u00e9gal \u00e0 20% de votre valeur de blocage."
+                ],
+                "s": [
+                    58872,
+                    58874
+                ],
+                "x": 2,
+                "y": 9,
+                "iconname": "INV_Shield_31"
+            },
+            {
+                "i": 1872,
+                "n": "Onde de choc",
+                "m": 1,
+                "d": [
+                    "Projette une onde de force devant le guerrier, qui inflige  points de d\u00e9g\u00e2ts (en fonction de la puissance d'attaque) et \u00e9tourdit toutes les cibles ennemies se trouvant \u00e0 moins de 10 m\u00e8tres dans un c\u00f4ne devant lui pendant 4 s."
+                ],
+                "s": [
+                    46968
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Warrior_Shockwave"
+            }
+        ]
+    }
+])

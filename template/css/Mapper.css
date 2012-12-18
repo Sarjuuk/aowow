@@ -1,0 +1,59 @@
+/*
+ Mapper.css version 294
+*/
+.mapper {
+position:relative;
+margin-top:10px;
+border:3px solid #404040;
+background-color:black;
+}
+
+.mapper .pin {
+position:absolute;
+width:1px;
+height:1px;
+font-size:1px;
+}
+
+.mapper .pin a {
+position:relative;
+width:11px;
+height:11px;
+left:-5px;
+top:-5px;
+background:url(../images/map-pin-yellow.png) no-repeat;
+display:block;
+}
+
+.mapper .pin-1 a {
+background-image:url(../images/map-pin-green.png);
+}
+
+.mapper .pin-2 a {
+background-image:url(../images/map-pin-red.png);
+}
+
+.mapper .pin-3 a {
+background-image:url(../images/map-pin-blue.png);
+}
+
+.mapper .pin-4 a {
+background-image:url(../images/map-pin-purple.png);
+}
+
+.mapper .glow {
+margin:0 2px;
+font-size:12px;
+font-weight:bold;
+color:white;
+cursor:default;
+white-space:nowrap;
+}
+
+.mapper .glow a {
+text-decoration:none;
+}
+
+.mapper .glow a:hover {
+text-decoration:underline;
+}

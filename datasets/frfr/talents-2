@@ -1,0 +1,1411 @@
+$WowheadTalentCalculator.registerClass(2, [
+    {
+        "n": "Sacr\u00e9",
+        "t": [
+            {
+                "i": 1432,
+                "n": "Focalisation spirituelle",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit de 14% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Lumi\u00e8re sacr\u00e9e et Eclair lumineux.",
+                    "R\u00e9duit de 28% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Lumi\u00e8re sacr\u00e9e et Eclair lumineux.",
+                    "R\u00e9duit de 42% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Lumi\u00e8re sacr\u00e9e et Eclair lumineux.",
+                    "R\u00e9duit de 56% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Lumi\u00e8re sacr\u00e9e et Eclair lumineux.",
+                    "R\u00e9duit de 70% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Lumi\u00e8re sacr\u00e9e et Eclair lumineux."
+                ],
+                "s": [
+                    20205,
+                    20206,
+                    20207,
+                    20209,
+                    20208
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Arcane_Blink"
+            },
+            {
+                "i": 1463,
+                "n": "Sceaux des purs",
+                "m": 5,
+                "d": [
+                    "Augmente de 3% les d\u00e9g\u00e2ts inflig\u00e9s par vos Sceaux de pi\u00e9t\u00e9, de vengeance et de corruption ainsi que les effets de leurs Jugements.",
+                    "Augmente de 6% les d\u00e9g\u00e2ts inflig\u00e9s par vos Sceaux de pi\u00e9t\u00e9, de vengeance et de corruption ainsi que les effets de leurs Jugements.",
+                    "Augmente de 9% les d\u00e9g\u00e2ts inflig\u00e9s par vos Sceaux de pi\u00e9t\u00e9, de vengeance et de corruption ainsi que les effets de leurs Jugements.",
+                    "Augmente de 12% les d\u00e9g\u00e2ts inflig\u00e9s par vos Sceaux de pi\u00e9t\u00e9, de vengeance et de corruption ainsi que les effets de leurs Jugements.",
+                    "Augmente de 15% les d\u00e9g\u00e2ts inflig\u00e9s par vos Sceaux de pi\u00e9t\u00e9, de vengeance et de corruption ainsi que les effets de leurs Jugements."
+                ],
+                "s": [
+                    20224,
+                    20225,
+                    20330,
+                    20331,
+                    20332
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Ability_ThunderBolt"
+            },
+            {
+                "i": 1444,
+                "n": "Lumi\u00e8re gu\u00e9risseuse",
+                "m": 3,
+                "d": [
+                    "Augmente le montant de points de vie rendus par vos sorts Lumi\u00e8re sacr\u00e9e et Eclair lumineux ainsi que l'efficacit\u00e9 des sorts Horion sacr\u00e9 de 4%.",
+                    "Augmente le montant de points de vie rendus par vos sorts Lumi\u00e8re sacr\u00e9e et Eclair lumineux ainsi que l'efficacit\u00e9 des sorts Horion sacr\u00e9 de 8%.",
+                    "Augmente le montant de points de vie rendus par vos sorts Lumi\u00e8re sacr\u00e9e et Eclair lumineux ainsi que l'efficacit\u00e9 des sorts Horion sacr\u00e9 de 12%."
+                ],
+                "s": [
+                    20237,
+                    20238,
+                    20239
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Holy_HolyBolt"
+            },
+            {
+                "i": 1449,
+                "n": "Intelligence divine",
+                "m": 5,
+                "d": [
+                    "Augmente votre total d'Intelligence de 2%.",
+                    "Augmente votre total d'Intelligence de 4%.",
+                    "Augmente votre total d'Intelligence de 6%.",
+                    "Augmente votre total d'Intelligence de 8%.",
+                    "Augmente votre total d'Intelligence de 10%."
+                ],
+                "s": [
+                    20257,
+                    20258,
+                    20259,
+                    20260,
+                    20261
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Nature_Sleep"
+            },
+            {
+                "i": 1628,
+                "n": "Foi inflexible",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 15% la dur\u00e9e de tous les effets de Peur et de D\u00e9sorientation.",
+                    "R\u00e9duit de 30% la dur\u00e9e de tous les effets de Peur et de D\u00e9sorientation."
+                ],
+                "s": [
+                    9453,
+                    25836
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Holy_UnyieldingFaith"
+            },
+            {
+                "i": 1435,
+                "n": "Ma\u00eetrise des auras",
+                "m": 1,
+                "d": [
+                    "Permet \u00e0 votre Aura de concentration de rendre toutes les cibles affect\u00e9es insensibles aux effets de silence et d'interruption ainsi que d'am\u00e9liorer les effets de toutes les autres auras de 100%. Dure 6 s."
+                ],
+                "s": [
+                    31821
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Holy_AuraMastery"
+            },
+            {
+                "i": 1461,
+                "n": "Illumination",
+                "m": 5,
+                "d": [
+                    "Lorsque vous obtenez un effet critique avec Eclair lumineux, Lumi\u00e8re sacr\u00e9e, ou le sort de soins Horion sacr\u00e9, vous avez 20% de chances de recevoir un montant de mana \u00e9gal \u00e0 30% du co\u00fbt de base du sort.",
+                    "Lorsque vous obtenez un effet critique avec Eclair lumineux, Lumi\u00e8re sacr\u00e9e, ou le sort de soins Horion sacr\u00e9, vous avez 40% de chances de recevoir un montant de mana \u00e9gal \u00e0 30% du co\u00fbt de base du sort.",
+                    "Lorsque vous obtenez un effet critique avec Eclair lumineux, Lumi\u00e8re sacr\u00e9e, ou le sort de soins Horion sacr\u00e9, vous avez 60% de chances de recevoir un montant de mana \u00e9gal \u00e0 30% du co\u00fbt de base du sort.",
+                    "Lorsque vous obtenez un effet critique avec Eclair lumineux, Lumi\u00e8re sacr\u00e9e, ou le sort de soins Horion sacr\u00e9, vous avez 80% de chances de recevoir un montant de mana \u00e9gal \u00e0 30% du co\u00fbt de base du sort.",
+                    "Lorsque vous obtenez un effet critique avec Eclair lumineux, Lumi\u00e8re sacr\u00e9e, ou le sort de soins Horion sacr\u00e9, vous avez 100% de chances de recevoir un montant de mana \u00e9gal \u00e0 30% du co\u00fbt de base du sort."
+                ],
+                "s": [
+                    20210,
+                    20212,
+                    20213,
+                    20214,
+                    20215
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Holy_GreaterHeal"
+            },
+            {
+                "i": 1443,
+                "n": "Imposition des mains am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "La cible de votre sort Imposition des mains b\u00e9n\u00e9ficie d'une r\u00e9duction de 10% des d\u00e9g\u00e2ts physiques qu'elle subit pendant 15 s. De plus, le temps de recharge de votre sort Imposition des mains est r\u00e9duit de 2 min.",
+                    "La cible de votre sort Imposition des mains b\u00e9n\u00e9ficie d'une r\u00e9duction de 20% des d\u00e9g\u00e2ts physiques qu'elle subit pendant 15 s. De plus, le temps de recharge de votre sort Imposition des mains est r\u00e9duit de 4 min."
+                ],
+                "s": [
+                    20234,
+                    20235
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Holy_LayOnHands"
+            },
+            {
+                "i": 1450,
+                "n": "Aura de concentration am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente de 5% suppl\u00e9mentaires l'effet de votre Aura de concentration, et tant que n'importe quelle Aura est active, r\u00e9duit de 10% la dur\u00e9e de tout effet de silence ou d'interruption utilis\u00e9 contre un membre du groupe affect\u00e9. La r\u00e9duction de dur\u00e9e ne se cumule avec aucun autre effet.",
+                    "Augmente de 10% suppl\u00e9mentaires l'effet de votre Aura de concentration, et tant que n'importe quelle Aura est active, r\u00e9duit de 20% la dur\u00e9e de tout effet de silence ou d'interruption utilis\u00e9 contre un membre du groupe affect\u00e9. La r\u00e9duction de dur\u00e9e ne se cumule avec aucun autre effet.",
+                    "Augmente de 15% suppl\u00e9mentaires l'effet de votre Aura de concentration, et tant que n'importe quelle Aura est active, r\u00e9duit de 30% la dur\u00e9e de tout effet de silence ou d'interruption utilis\u00e9 contre un membre du groupe affect\u00e9. La r\u00e9duction de dur\u00e9e ne se cumule avec aucun autre effet."
+                ],
+                "s": [
+                    20254,
+                    20255,
+                    20256
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Holy_MindSooth"
+            },
+            {
+                "i": 1446,
+                "n": "B\u00e9n\u00e9diction de sagesse am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente l'effet de votre sort de B\u00e9n\u00e9diction de sagesse de 10%.",
+                    "Augmente l'effet de votre sort B\u00e9n\u00e9diction de sagesse de 20%."
+                ],
+                "s": [
+                    20244,
+                    20245
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Holy_SealOfWisdom"
+            },
+            {
+                "i": 2198,
+                "n": "Mains b\u00e9nies",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana de Main de libert\u00e9, Main de sacrifice et Main de salut de 15% en plus d'augmenter l'efficacit\u00e9 de Main de salut de 50% et celle de Main de sacrifice de 5% suppl\u00e9mentaires.",
+                    "R\u00e9duit le co\u00fbt en mana de Main de libert\u00e9, Main de sacrifice et Main de salut de 30% en plus d'augmenter l'efficacit\u00e9 de Main de salut de 100% et celle de Main de sacrifice de 10% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    53660,
+                    53661
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Ability_Paladin_BlessedHands"
+            },
+            {
+                "i": 1742,
+                "n": "Pur de coeur",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 15% la dur\u00e9e des effets de mal\u00e9diction, de maladie et de poison.",
+                    "R\u00e9duit de 30% la dur\u00e9e des effets de mal\u00e9diction, de maladie et de poison."
+                ],
+                "s": [
+                    31822,
+                    31823
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Holy_PureOfHeart"
+            },
+            {
+                "i": 1433,
+                "n": "Faveur divine",
+                "m": 1,
+                "d": [
+                    "Une fois activ\u00e9, conf\u00e8re 100% de chances \u00e0 votre prochain sort Eclair lumineux, Lumi\u00e8re sacr\u00e9e ou Horion sacr\u00e9 d'avoir un effet critique."
+                ],
+                "s": [
+                    20216
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Holy_Heal",
+                "r": [
+                    6,
+                    5
+                ]
+            },
+            {
+                "i": 1465,
+                "n": "Lumi\u00e8re sanctifi\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente de 2% vos chances de r\u00e9aliser un effet critique avec vos sorts Lumi\u00e8re sacr\u00e9e et Horion sacr\u00e9.",
+                    "Augmente de 4% vos chances de r\u00e9aliser un effet critique avec vos sorts Lumi\u00e8re sacr\u00e9e et Horion sacr\u00e9.",
+                    "Augmente de 6% vos chances de r\u00e9aliser un effet critique avec vos sorts Lumi\u00e8re sacr\u00e9e et Horion sacr\u00e9."
+                ],
+                "s": [
+                    20359,
+                    20360,
+                    20361
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Holy_HealingAura"
+            },
+            {
+                "i": 1743,
+                "n": "Puissance purifiante",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 5% le co\u00fbt en mana de vos sorts Epuration, Purification et Cons\u00e9cration et r\u00e9duit de 17% le temps de recharge de vos sorts Exorcisme et Col\u00e8re divine.",
+                    "R\u00e9duit de 10% le co\u00fbt en mana de vos sorts Epuration, Purification et Cons\u00e9cration et r\u00e9duit de 33% le temps de recharge de vos sorts Exorcisme et Col\u00e8re divine."
+                ],
+                "s": [
+                    31825,
+                    31826
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Holy_PurifyingPower"
+            },
+            {
+                "i": 1627,
+                "n": "Puissance sacr\u00e9e",
+                "m": 5,
+                "d": [
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts du Sacr\u00e9 de 1%.",
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts du Sacr\u00e9 de 2%.",
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts du Sacr\u00e9 de 3%.",
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts du Sacr\u00e9 de 4%.",
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts du Sacr\u00e9 de 5%."
+                ],
+                "s": [
+                    5923,
+                    5924,
+                    5925,
+                    5926,
+                    25829
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Holy_Power"
+            },
+            {
+                "i": 1745,
+                "n": "Gr\u00e2ce de la lumi\u00e8re",
+                "m": 3,
+                "d": [
+                    "Conf\u00e8re \u00e0 votre sort Lumi\u00e8re sacr\u00e9e 33% de chances de r\u00e9duire le temps d'incantation de votre prochain sort Lumi\u00e8re sacr\u00e9e de 0.5 sec. Cet effet dure 15 s.",
+                    "Conf\u00e8re \u00e0 votre sort Lumi\u00e8re sacr\u00e9e 66% de chances de r\u00e9duire le temps d'incantation de votre prochain sort Lumi\u00e8re sacr\u00e9e de 0.5 sec. Cet effet dure 15 s.",
+                    "Conf\u00e8re \u00e0 votre sort Lumi\u00e8re sacr\u00e9e 100% de chances de r\u00e9duire le temps d'incantation de votre prochain sort Lumi\u00e8re sacr\u00e9e de 0.5 sec. Cet effet dure 15 s."
+                ],
+                "s": [
+                    31833,
+                    31835,
+                    31836
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Holy_LightsGrace"
+            },
+            {
+                "i": 1502,
+                "n": "Horion sacr\u00e9",
+                "m": 1,
+                "d": [
+                    "L'\u00e9nergie sacr\u00e9e frappe la cible et inflige 314 to 341 points de d\u00e9g\u00e2ts du Sacr\u00e9 \u00e0 un ennemi, ou bien rend \u00e0 un alli\u00e9 481 to 520 points de vie."
+                ],
+                "s": [
+                    20473
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Holy_SearingLight",
+                "r": [
+                    12,
+                    1
+                ]
+            },
+            {
+                "i": 1744,
+                "n": "Vie b\u00e9nie",
+                "m": 3,
+                "d": [
+                    "Vous conf\u00e8re 4% de chances que les attaques contre vous n'infligent que la moiti\u00e9 des d\u00e9g\u00e2ts.",
+                    "Vous conf\u00e8re 7% de chances que les attaques contre vous n'infligent que la moiti\u00e9 des d\u00e9g\u00e2ts.",
+                    "Vous conf\u00e8re 10% de chances que les attaques contre vous n'infligent que la moiti\u00e9 des d\u00e9g\u00e2ts."
+                ],
+                "s": [
+                    31828,
+                    31829,
+                    31830
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Holy_BlessedLife"
+            },
+            {
+                "i": 2190,
+                "n": "Purification sacr\u00e9e",
+                "m": 3,
+                "d": [
+                    "Votre sort Epuration a 10% de chances d'augmenter la r\u00e9sistance de la cible aux maladies, \u00e0 la magie et au poison de 30% pendant 10 s.",
+                    "Votre sort Epuration a 20% de chances d'augmenter la r\u00e9sistance de la cible aux maladies, \u00e0 la magie et au poison de 30% pendant 10 s.",
+                    "Votre sort Epuration a 30% de chances d'augmenter la r\u00e9sistance de la cible aux maladies, \u00e0 la magie et au poison de 30% pendant 10 s."
+                ],
+                "s": [
+                    53551,
+                    53552,
+                    53553
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Ability_Paladin_SacredCleansing"
+            },
+            {
+                "i": 1746,
+                "n": "Soutien sacr\u00e9",
+                "m": 5,
+                "d": [
+                    "Augmente la puissance de vos sorts de 4% de votre total d'Intelligence.",
+                    "Augmente la puissance de vos sorts de 8% de votre total d'Intelligence.",
+                    "Augmente la puissance de vos sorts de 12% de votre total d'Intelligence.",
+                    "Augmente la puissance de vos sorts de 16% de votre total d'Intelligence.",
+                    "Augmente la puissance de vos sorts de 20% de votre total d'Intelligence."
+                ],
+                "s": [
+                    31837,
+                    31838,
+                    31839,
+                    31840,
+                    31841
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Holy_HolyGuidance"
+            },
+            {
+                "i": 1747,
+                "n": "Illumination divine",
+                "m": 1,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana de tous les sorts de 50% pendant 15 s."
+                ],
+                "s": [
+                    31842
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Holy_DivineIllumination"
+            },
+            {
+                "i": 2199,
+                "n": "Jugements des purs",
+                "m": 5,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Sceau et de Jugement de 5%, et vos sorts de Jugement augmentent votre vitesse d'incantation et votre h\u00e2te en m\u00eal\u00e9e de 3% pendant 1 min.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Sceau et de Jugement de 10%, et vos sorts de Jugement augmentent votre vitesse d'incantation et votre h\u00e2te en m\u00eal\u00e9e de 6% pendant 1 min.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Sceau et de Jugement de 15%, et vos sorts de Jugement augmentent votre vitesse d'incantation et votre h\u00e2te en m\u00eal\u00e9e de 9% pendant 1 min.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Sceau et de Jugement de 20%, et vos sorts de Jugement augmentent votre vitesse d'incantation et votre h\u00e2te en m\u00eal\u00e9e de 12% pendant 1 min.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Sceau et de Jugement de 25%, et vos sorts de Jugement augmentent votre vitesse d'incantation et votre h\u00e2te en m\u00eal\u00e9e de 15% pendant 1 min."
+                ],
+                "s": [
+                    53671,
+                    53673,
+                    54151,
+                    54154,
+                    54155
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Paladin_JudgementofthePure"
+            },
+            {
+                "i": 2193,
+                "n": "Impr\u00e9gnation de lumi\u00e8re",
+                "m": 2,
+                "d": [
+                    "Vos coups critiques avec Horion sacr\u00e9 r\u00e9duisent le temps d'incantation de votre prochain sort Eclair lumineux de 0.75.2 sec. ou augmentent les chances de critique de votre prochaine Lumi\u00e8re sacr\u00e9e de 10%. De plus, votre Eclair lumineux rend aux cibles affect\u00e9es par Bouclier saint 50% de points de vie suppl\u00e9mentaires en 12 s.",
+                    "Vos coups critiques avec Horion sacr\u00e9 r\u00e9duisent le temps d'incantation de votre prochain sort Eclair lumineux de 1.5.1 sec. ou augmentent les chances de critique de votre prochaine Lumi\u00e8re sacr\u00e9e de 20%. De plus, votre Eclair lumineux rend aux cibles affect\u00e9es par Bouclier saint 100% de points de vie suppl\u00e9mentaires en 12 s."
+                ],
+                "s": [
+                    53569,
+                    53576
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Paladin_InfusionofLight",
+                "r": [
+                    17,
+                    1
+                ]
+            },
+            {
+                "i": 2191,
+                "n": "Jugements \u00e9clair\u00e9s",
+                "m": 2,
+                "d": [
+                    "Augmente de 15 m\u00e8tres la port\u00e9e de votre Jugement de Lumi\u00e8re et de votre Jugement de sagesse en plus d'augmenter de 2% vos chances de toucher.",
+                    "Augmente de 30 m\u00e8tres la port\u00e9e de votre Jugement de Lumi\u00e8re et de votre Jugement de sagesse en plus d'augmenter de 4% vos chances de toucher."
+                ],
+                "s": [
+                    53556,
+                    53557
+                ],
+                "x": 2,
+                "y": 9,
+                "iconname": "Ability_Paladin_EnlightenedJudgements"
+            },
+            {
+                "i": 2192,
+                "n": "Guide de lumi\u00e8re",
+                "m": 1,
+                "d": [
+                    "La cible devient un guide de lumi\u00e8re pour tous les membres de votre groupe ou raid se trouvant dans un rayon de 60 m\u00e8tres. Tous les soins que vous lancez sur ces cibles soignent \u00e9galement le Guide pour un montant de points de vie \u00e9gal \u00e0 100% des soins prodigu\u00e9s. Une seule cible \u00e0 la fois peut \u00eatre le Guide de lumi\u00e8re. Dure 1 min."
+                ],
+                "s": [
+                    53563
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Paladin_BeaconofLight"
+            }
+        ]
+    },
+    {
+        "n": "Protection",
+        "t": [
+            {
+                "i": 1442,
+                "n": "Divinit\u00e9",
+                "m": 5,
+                "d": [
+                    "Augmente tous les soins que vous prodiguez et tous les effets de soins sur vous de 1%.",
+                    "Augmente tous les soins que vous prodiguez et tous les effets de soins sur vous de 2%.",
+                    "Augmente tous les soins que vous prodiguez et tous les effets de soins sur vous de 3%.",
+                    "Augmente tous les soins que vous prodiguez et tous les effets de soins sur vous de 4%.",
+                    "Augmente tous les soins que vous prodiguez et tous les effets de soins sur vous de 5%."
+                ],
+                "s": [
+                    63646,
+                    63647,
+                    63648,
+                    63649,
+                    63650
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Holy_BlindingHeal"
+            },
+            {
+                "i": 2185,
+                "n": "Force divine",
+                "m": 5,
+                "d": [
+                    "Augmente votre total de Force de 3%.",
+                    "Augmente votre total de Force de 6%.",
+                    "Augmente votre total de Force de 9%.",
+                    "Augmente votre total de Force de 12%.",
+                    "Augmente votre total de Force de 15%."
+                ],
+                "s": [
+                    20262,
+                    20263,
+                    20264,
+                    20265,
+                    20266
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Ability_GolemThunderClap"
+            },
+            {
+                "i": 1748,
+                "n": "Sto\u00efcisme",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit la dur\u00e9e de tous les effets d'\u00e9tourdissement de 10% suppl\u00e9mentaires, et r\u00e9duit la probabilit\u00e9 que vos sorts utiles et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 10% suppl\u00e9mentaires.",
+                    "R\u00e9duit la dur\u00e9e de tous les effets d'\u00e9tourdissement de 20% suppl\u00e9mentaires, et r\u00e9duit la probabilit\u00e9 que vos sorts utiles et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 20% suppl\u00e9mentaires.",
+                    "R\u00e9duit la dur\u00e9e de tous les effets d'\u00e9tourdissement de 30% suppl\u00e9mentaires, et r\u00e9duit la probabilit\u00e9 que vos sorts utiles et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 30% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    31844,
+                    31845,
+                    53519
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Holy_Stoicism"
+            },
+            {
+                "i": 1425,
+                "n": "Faveur du Gardien",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de votre Main de protection de 60 sec. et augmente la dur\u00e9e de votre Main de libert\u00e9 de 2 sec.",
+                    "R\u00e9duit le temps de recharge de votre Main de protection de 2 min. et augmente la dur\u00e9e de votre Main de libert\u00e9 de 4 sec."
+                ],
+                "s": [
+                    20174,
+                    20175
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Holy_SealOfProtection"
+            },
+            {
+                "i": 1629,
+                "n": "Anticipation",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances d'esquiver de 1%.",
+                    "Augmente vos chances d'esquiver de 2%.",
+                    "Augmente vos chances d'esquiver de 3%.",
+                    "Augmente vos chances d'esquiver de 4%.",
+                    "Augmente vos chances d'esquiver de 5%."
+                ],
+                "s": [
+                    20096,
+                    20097,
+                    20098,
+                    20099,
+                    20100
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Magic_LesserInvisibilty"
+            },
+            {
+                "i": 2280,
+                "n": "Sacrifice divin",
+                "m": 1,
+                "d": [
+                    "30% de tous les d\u00e9g\u00e2ts subis par les membres du groupe se trouvant \u00e0 moins de 30 m\u00e8tres sont redirig\u00e9s vers le paladin (jusqu'\u00e0 un maximum de 40% des points de vie du paladin multipli\u00e9 par le nombre de membres du groupe). Les d\u00e9g\u00e2ts qui font passer le paladin sous les 20% de points de vie interrompent l'effet. Dure 10 s."
+                ],
+                "s": [
+                    64205
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "spell_holy_powerwordbarrier"
+            },
+            {
+                "i": 1501,
+                "n": "Fureur vertueuse am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Tant que la Fureur vertueuse est active, tous les d\u00e9g\u00e2ts subis sont r\u00e9duits de 2%.",
+                    "Tant que la Fureur vertueuse est active, tous les d\u00e9g\u00e2ts subis sont r\u00e9duits de 4%.",
+                    "Tant que la Fureur vertueuse est active, tous les d\u00e9g\u00e2ts subis sont r\u00e9duits de 6%."
+                ],
+                "s": [
+                    20468,
+                    20469,
+                    20470
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Holy_SealOfFury"
+            },
+            {
+                "i": 1423,
+                "n": "R\u00e9sistance",
+                "m": 5,
+                "d": [
+                    "Augmente la valeur d'armure des objets de 2% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 6%.",
+                    "Augmente la valeur d'armure des objets de 4% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 12%.",
+                    "Augmente la valeur d'armure des objets de 6% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 18%.",
+                    "Augmente la valeur d'armure des objets de 8% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 24%.",
+                    "Augmente la valeur d'armure des objets de 10% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 30%."
+                ],
+                "s": [
+                    20143,
+                    20144,
+                    20145,
+                    20146,
+                    20147
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Holy_Devotion"
+            },
+            {
+                "i": 2281,
+                "n": "Gardien divin",
+                "m": 2,
+                "d": [
+                    "Lorsque Sacrifice divin est actif, les membres de votre groupe ou raid dans un rayon de 0 m\u00e8tres subissent 10% de d\u00e9g\u00e2ts en moins pendant 6 s. De plus, augmente la dur\u00e9e de votre Bouclier saint de 50% et le montant absorb\u00e9 de 10%.",
+                    "Lorsque Sacrifice divin est actif, les membres de votre groupe ou raid dans un rayon de 0 m\u00e8tres subissent 20% de d\u00e9g\u00e2ts en moins pendant 6 s. De plus, augmente la dur\u00e9e de votre Bouclier saint de 100% et le montant absorb\u00e9 de 20%."
+                ],
+                "s": [
+                    53527,
+                    53530
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "spell_holy_powerwordbarrier",
+                "r": [
+                    5,
+                    1
+                ]
+            },
+            {
+                "i": 1521,
+                "n": "Marteau de la justice am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de votre sort Marteau de la justice de 10 sec.",
+                    "R\u00e9duit le temps de recharge de votre sort Marteau de la justice de 20 sec."
+                ],
+                "s": [
+                    20487,
+                    20488
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Holy_SealOfMight"
+            },
+            {
+                "i": 1422,
+                "n": "Aura de d\u00e9votion am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente de 17% le bonus d'armure que conf\u00e8re votre Aura de d\u00e9votion et augmente de 2% le montant de points de vie rendus \u00e0 toute cible affect\u00e9e par une de vos Auras.",
+                    "Augmente de 34% le bonus d'armure que conf\u00e8re votre Aura de d\u00e9votion et augmente de 4% le montant de points de vie rendus \u00e0 toute cible affect\u00e9e par une de vos Auras.",
+                    "Augmente de 50% le bonus d'armure que conf\u00e8re votre Aura de d\u00e9votion et augmente de 6% le montant de points de vie rendus \u00e0 toute cible affect\u00e9e par une de vos Auras."
+                ],
+                "s": [
+                    20138,
+                    20139,
+                    20140
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Holy_DevotionAura"
+            },
+            {
+                "i": 1431,
+                "n": "B\u00e9n\u00e9diction du sanctuaire",
+                "m": 1,
+                "d": [
+                    "Place une B\u00e9n\u00e9diction sur la cible alli\u00e9e qui r\u00e9duit les d\u00e9g\u00e2ts inflig\u00e9s par toutes les sources de 3% pendant 10 min et augmente la Force et l'Endurance de 10%. De plus, quand la cible bloque, pare ou esquive une attaque de m\u00eal\u00e9e, la cible re\u00e7oit 2% de son mana maximum affich\u00e9. Les personnages ne peuvent b\u00e9n\u00e9ficier que des effets d'une seule B\u00e9n\u00e9diction par paladin \u00e0 la fois."
+                ],
+                "s": [
+                    20911
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Nature_LightningShield"
+            },
+            {
+                "i": 1426,
+                "n": "R\u00e9tribution",
+                "m": 5,
+                "d": [
+                    "Conf\u00e8re 2% de chances lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire avec les 4 frappes suivantes dans les 8 s.",
+                    "Conf\u00e8re 4% de chances lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire avec les 4 frappes suivantes dans les 8 s.",
+                    "Conf\u00e8re 6% de chances lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire avec les 4 frappes suivantes dans les 8 s.",
+                    "Conf\u00e8re 8% de chances lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire avec les 4 frappes suivantes dans les 8 s.",
+                    "Conf\u00e8re 10% de chances lorsque vous \u00eates victime d'une attaque qui vous inflige des d\u00e9g\u00e2ts ou que vous l'avez bloqu\u00e9e de b\u00e9n\u00e9ficier d'une attaque suppl\u00e9mentaire avec les 4 frappes suivantes dans les 8 s."
+                ],
+                "s": [
+                    20177,
+                    20179,
+                    20181,
+                    20180,
+                    20182
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Holy_BlessingOfStrength"
+            },
+            {
+                "i": 1750,
+                "n": "Devoir sacr\u00e9",
+                "m": 2,
+                "d": [
+                    "Augmente votre total d'Endurance de 2% et r\u00e9duit le temps de recharge de vos sorts Bouclier divin et Protection divine de 30 sec.",
+                    "Augmente votre total d'Endurance de 4% et r\u00e9duit le temps de recharge de vos sorts Bouclier divin et Protection divine de 60 sec."
+                ],
+                "s": [
+                    31848,
+                    31849
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Holy_DivineIntervention"
+            },
+            {
+                "i": 1429,
+                "n": "Sp\u00e9cialisation Arme 1M",
+                "m": 3,
+                "d": [
+                    "Augmente tous les d\u00e9g\u00e2ts que vous infligez de 4% quand une arme de m\u00eal\u00e9e \u00e0 une main est \u00e9quip\u00e9e.",
+                    "Augmente tous les d\u00e9g\u00e2ts que vous infligez de 7% quand une arme de m\u00eal\u00e9e \u00e0 une main est \u00e9quip\u00e9e.",
+                    "Augmente tous les d\u00e9g\u00e2ts que vous infligez de 10% quand une arme de m\u00eal\u00e9e \u00e0 une main est \u00e9quip\u00e9e."
+                ],
+                "s": [
+                    20196,
+                    20197,
+                    20198
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "INV_Sword_20"
+            },
+            {
+                "i": 2282,
+                "n": "Harmonisation spirituelle",
+                "m": 2,
+                "d": [
+                    "Une technique passive qui donne des points de mana au paladin lorsqu'il est soign\u00e9 par les sorts d'autres cibles alli\u00e9es. La quantit\u00e9 de mana re\u00e7ue est \u00e9gale \u00e0 5% des points de vie rendus.",
+                    "Une technique passive qui donne des points de mana au paladin lorsqu'il est soign\u00e9 par les sorts d'autres cibles alli\u00e9es. La quantit\u00e9 de mana re\u00e7ue est \u00e9gale \u00e0 10% des points de vie rendus."
+                ],
+                "s": [
+                    31785,
+                    33776
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Holy_ReviveChampion"
+            },
+            {
+                "i": 1430,
+                "n": "Bouclier sacr\u00e9",
+                "m": 1,
+                "d": [
+                    "Augmente les chances de bloquer de 30% pendant 10 s et inflige 79 points de d\u00e9g\u00e2ts du Sacr\u00e9 pour chaque attaque bloqu\u00e9e pendant qu'il est actif. Chaque blocage d\u00e9pense une charge. 8 charges."
+                ],
+                "s": [
+                    20925
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Holy_BlessingOfProtection",
+                "r": [
+                    11,
+                    1
+                ]
+            },
+            {
+                "i": 1751,
+                "n": "Ardent d\u00e9fenseur",
+                "m": 3,
+                "d": [
+                    "Les d\u00e9g\u00e2ts qui vous font descendre sous les 35% de points de vie sont r\u00e9duits de 7%. De plus, les attaques qui normalement vous tueraient vous rendent jusqu'\u00e0 10% de votre maximum de points de vie (en fonction de votre d\u00e9fense). Cet effet de soins ne peut se produire plus d'une fois toutes les 2 min.",
+                    "Les d\u00e9g\u00e2ts qui vous font descendre sous les 35% de points de vie sont r\u00e9duits de 13%. De plus, les attaques qui normalement vous tueraient vous rendent jusqu'\u00e0 20% de votre maximum de points de vie (en fonction de votre d\u00e9fense). Cet effet de soins ne peut se produire plus d'une fois toutes les 2 min.",
+                    "Les d\u00e9g\u00e2ts qui vous font descendre sous les 35% de points de vie sont r\u00e9duits de 20%. De plus, les attaques qui normalement vous tueraient vous rendent jusqu'\u00e0 30% de votre maximum de points de vie (en fonction de votre d\u00e9fense). Cet effet de soins ne peut se produire plus d'une fois toutes les 2 min."
+                ],
+                "s": [
+                    31850,
+                    31851,
+                    31852
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Holy_ArdentDefender"
+            },
+            {
+                "i": 1421,
+                "n": "Redoute",
+                "m": 3,
+                "d": [
+                    "Augmente votre valeur de blocage de 10% et les attaques en m\u00eal\u00e9e et \u00e0 distance contre vous qui infligent des d\u00e9g\u00e2ts ont 10% de chances d\u2019augmenter vos chances de blocage de 10%. Dure 10 s ou bloque 5 attaques.",
+                    "Augmente votre valeur de blocage de 20% et les attaques en m\u00eal\u00e9e et \u00e0 distance contre vous qui infligent des d\u00e9g\u00e2ts ont 10% de chances d\u2019augmenter vos chances de blocage de 20%. Dure 10 s ou bloque 5 attaques.",
+                    "Augmente votre valeur de blocage de 30% et les attaques en m\u00eal\u00e9e et \u00e0 distance contre vous qui infligent des d\u00e9g\u00e2ts ont 10% de chances d\u2019augmenter vos chances de blocage de 30%. Dure 10 s ou bloque 5 attaques."
+                ],
+                "s": [
+                    20127,
+                    20130,
+                    20135
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Ability_Defend"
+            },
+            {
+                "i": 1753,
+                "n": "Expertise en combat",
+                "m": 3,
+                "d": [
+                    "Augmente votre expertise de 2, ainsi que votre total d'Endurance et vos chances de coup critique de 2%.",
+                    "Augmente votre expertise de 4, ainsi que votre total d'Endurance et vos chances de coup critique de 4%.",
+                    "Augmente votre expertise de 6, ainsi que votre total d'Endurance et vos chances de coup critique de 6%."
+                ],
+                "s": [
+                    31858,
+                    31859,
+                    31860
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Holy_WeaponMastery"
+            },
+            {
+                "i": 2195,
+                "n": "Touch\u00e9 par la Lumi\u00e8re",
+                "m": 3,
+                "d": [
+                    "Augmente votre puissance des sorts d'un montant \u00e9gal \u00e0 20% de votre Force et augmente les points de vie rendus par vos soins critiques de 10%.",
+                    "Augmente votre puissance des sorts d'un montant \u00e9gal \u00e0 40% de votre Force et augmente les points de vie rendus par vos soins critiques de 20%.",
+                    "Augmente votre puissance des sorts d'un montant \u00e9gal \u00e0 60% de votre Force et augmente les points de vie rendus par vos soins critiques de 30%."
+                ],
+                "s": [
+                    53590,
+                    53591,
+                    53592
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Paladin_TouchedbyLight"
+            },
+            {
+                "i": 1754,
+                "n": "Bouclier du vengeur",
+                "m": 1,
+                "d": [
+                    "Lance sur un ennemi un bouclier sacr\u00e9 qui inflige de  \u00e0  points de d\u00e9g\u00e2ts du Sacr\u00e9, l'h\u00e9b\u00e8te et rebondit ensuite sur des ennemis proches. Le sort frappe 3 cibles au total. Dure 10 s."
+                ],
+                "s": [
+                    31935
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Holy_AvengersShield",
+                "r": [
+                    16,
+                    1
+                ]
+            },
+            {
+                "i": 2194,
+                "n": "Gard\u00e9 par la Lumi\u00e8re",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit les d\u00e9g\u00e2ts des sorts subis de 3% et conf\u00e8re 50% de chances de r\u00e9initialiser la dur\u00e9e de votre Supplique divine lorsque vous touchez un ennemi. De plus, le risque que votre Supplique divine soit dissip\u00e9e est r\u00e9duit de 50%.",
+                    "R\u00e9duit les d\u00e9g\u00e2ts des sorts subis de 6% et conf\u00e8re 100% de chances de r\u00e9initialiser la dur\u00e9e de votre Supplique divine lorsque vous touchez un ennemi. De plus, le risque que votre Supplique divine soit dissip\u00e9e est r\u00e9duit de 100%."
+                ],
+                "s": [
+                    53583,
+                    53585
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Paladin_GaurdedbytheLight"
+            },
+            {
+                "i": 2204,
+                "n": "Bouclier du templier",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 1% et conf\u00e8re \u00e0 votre Bouclier du vengeur 33% de chances de r\u00e9duire vos cibles au silence pendant 3 s.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 2% et conf\u00e8re \u00e0 votre Bouclier du vengeur 66% de chances de r\u00e9duire vos cibles au silence pendant 3 s.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 3% et conf\u00e8re \u00e0 votre Bouclier du vengeur 100% de chances de r\u00e9duire vos cibles au silence pendant 3 s."
+                ],
+                "s": [
+                    53709,
+                    53710,
+                    53711
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Paladin_ShieldoftheTemplar",
+                "r": [
+                    21,
+                    1
+                ]
+            },
+            {
+                "i": 2200,
+                "n": "Jugements des justes",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de votre Marteau de la justice de 5 sec., augmente la dur\u00e9e de l'effet de votre Sceau de justice de 0.5 sec. et vos sorts de Jugement r\u00e9duisent \u00e9galement la vitesse d'attaque en m\u00eal\u00e9e de la cible de 10%.",
+                    "R\u00e9duit le temps de recharge de votre Marteau de la justice de 10 sec., augmente la dur\u00e9e de l'effet de votre Sceau de justice de 1 sec. et vos sorts de Jugement r\u00e9duisent \u00e9galement la vitesse d'attaque en m\u00eal\u00e9e de la cible de 20%."
+                ],
+                "s": [
+                    53695,
+                    53696
+                ],
+                "x": 2,
+                "y": 9,
+                "iconname": "Ability_Paladin_JudgementsoftheJust"
+            },
+            {
+                "i": 2196,
+                "n": "Marteau du vertueux",
+                "m": 1,
+                "d": [
+                    "Frappe avec un marteau la cible actuelle ainsi que 2 cibles proches suppl\u00e9mentaires au plus, infligeant 4 fois par seconde les d\u00e9g\u00e2ts de votre arme en main droite sous forme de d\u00e9g\u00e2ts du Sacr\u00e9."
+                ],
+                "s": [
+                    53595
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Paladin_HammeroftheRighteous"
+            }
+        ]
+    },
+    {
+        "n": "Vindicte",
+        "t": [
+            {
+                "i": 1403,
+                "n": "D\u00e9viation",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances de Parer de 1%.",
+                    "Augmente vos chances de Parer de 2%.",
+                    "Augmente vos chances de Parer de 3%.",
+                    "Augmente vos chances de Parer de 4%.",
+                    "Augmente vos chances de Parer de 5%."
+                ],
+                "s": [
+                    20060,
+                    20061,
+                    20062,
+                    20063,
+                    20064
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Ability_Parry"
+            },
+            {
+                "i": 1407,
+                "n": "B\u00e9n\u00e9diction",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana de tous les sorts \u00e0 l'incantation instantan\u00e9e de 2%.",
+                    "R\u00e9duit le co\u00fbt en mana de tous les sorts \u00e0 l'incantation instantan\u00e9e de 4%.",
+                    "R\u00e9duit le co\u00fbt en mana de tous les sorts \u00e0 l'incantation instantan\u00e9e de 6%.",
+                    "R\u00e9duit le co\u00fbt en mana de tous les sorts \u00e0 l'incantation instantan\u00e9e de 8%.",
+                    "R\u00e9duit le co\u00fbt en mana de tous les sorts \u00e0 l'incantation instantan\u00e9e de 10%."
+                ],
+                "s": [
+                    20101,
+                    20102,
+                    20103,
+                    20104,
+                    20105
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Frost_WindWalkOn"
+            },
+            {
+                "i": 1631,
+                "n": "Jugements am\u00e9lior\u00e9s",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos sorts de Jugement de 1 sec.",
+                    "R\u00e9duit le temps de recharge de vos sorts de Jugement de 2 sec."
+                ],
+                "s": [
+                    25956,
+                    25957
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Holy_RighteousFury"
+            },
+            {
+                "i": 1464,
+                "n": "Coeur du Crois\u00e9",
+                "m": 3,
+                "d": [
+                    "En plus des effets normaux, vos sorts de Jugement augmentent de 1% suppl\u00e9mentaires les chances de coup critique de toutes les attaques effectu\u00e9es contre cette cible.",
+                    "En plus des effets normaux, vos sorts de Jugement augmentent de 2% suppl\u00e9mentaires les chances de coup critique de toutes les attaques effectu\u00e9es contre cette cible.",
+                    "En plus des effets normaux, vos sorts de Jugement augmentent de 3% suppl\u00e9mentaires les chances de coup critique de toutes les attaques effectu\u00e9es contre cette cible."
+                ],
+                "s": [
+                    20335,
+                    20336,
+                    20337
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Holy_HolySmite"
+            },
+            {
+                "i": 1401,
+                "n": "B\u00e9n\u00e9diction de puissance am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente le bonus \u00e0 la puissance d'attaque conf\u00e9r\u00e9 par votre B\u00e9n\u00e9diction de puissance de 12%.",
+                    "Augmente le bonus \u00e0 la puissance d'attaque conf\u00e9r\u00e9 par votre B\u00e9n\u00e9diction de puissance de 25%."
+                ],
+                "s": [
+                    20042,
+                    20045
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Holy_FistOfJustice"
+            },
+            {
+                "i": 1633,
+                "n": "Justification",
+                "m": 2,
+                "d": [
+                    "Conf\u00e8re aux attaques du paladin qui infligent des d\u00e9g\u00e2ts une chance de r\u00e9duire la puissance d'attaque de la cible de 23 pendant 10 s.",
+                    "Conf\u00e8re aux attaques du paladin qui infligent des d\u00e9g\u00e2ts une chance de r\u00e9duire la puissance d'attaque de la cible de 46 pendant 10 s."
+                ],
+                "s": [
+                    9452,
+                    26016
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Holy_Vindication"
+            },
+            {
+                "i": 1411,
+                "n": "Conviction",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances d'infliger un coup critique avec tous les sorts et les attaques de 1%.",
+                    "Augmente vos chances d'infliger un coup critique avec tous les sorts et les attaques de 2%.",
+                    "Augmente vos chances d'infliger un coup critique avec tous les sorts et les attaques de 3%.",
+                    "Augmente vos chances d'infliger un coup critique avec tous les sorts et les attaques de 4%.",
+                    "Augmente vos chances d'infliger un coup critique avec tous les sorts et les attaques de 5%."
+                ],
+                "s": [
+                    20117,
+                    20118,
+                    20119,
+                    20120,
+                    20121
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Holy_RetributionAura"
+            },
+            {
+                "i": 1481,
+                "n": "Sceau d'autorit\u00e9",
+                "m": 1,
+                "d": [
+                    "Toutes les attaques en m\u00eal\u00e9e infligent de  \u00e0  points de d\u00e9g\u00e2ts du Sacr\u00e9 suppl\u00e9mentaires. Quand il est utilis\u00e9 avec des attaques ou techniques qui frappent une cible unique, ces d\u00e9g\u00e2ts du Sacr\u00e9 suppl\u00e9mentaires s'abattent sur un maximum de 2 cibles suppl\u00e9mentaires. Dure 30 min.<br \/><br \/>Lib\u00e9rez l'\u00e9nergie de ce Sceau pour juger un ennemi et lui infliger instantan\u00e9ment de  \u00e0  points de d\u00e9g\u00e2ts du Sacr\u00e9."
+                ],
+                "s": [
+                    20375
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Ability_Warrior_InnerRage"
+            },
+            {
+                "i": 1634,
+                "n": "Poursuite de la justice",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit la dur\u00e9e de tous les effets de d\u00e9sarmement de 25% et augmente votre vitesse de d\u00e9placement et la vitesse de d\u00e9placement de votre monture de 8%. Ne s'additionne pas avec les autres effets qui augmentent la vitesse de d\u00e9placement.",
+                    "R\u00e9duit la dur\u00e9e de tous les effets de d\u00e9sarmement de 50% et augmente votre vitesse de d\u00e9placement et la vitesse de d\u00e9placement de votre monture de 15%. Ne s'additionne pas avec les autres effets qui augmentent la vitesse de d\u00e9placement."
+                ],
+                "s": [
+                    26022,
+                    26023
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Holy_PersuitofJustice"
+            },
+            {
+                "i": 1632,
+                "n": "Oeil pour oeil",
+                "m": 2,
+                "d": [
+                    "Tous les coups critiques contre vous infligent \u00e9galement 5% des d\u00e9g\u00e2ts que vous subissez \u00e0 l'attaquant. Les points de d\u00e9g\u00e2ts caus\u00e9s par Oeil pour oeil ne peuvent exc\u00e9der 50% du total des points de vie du paladin.",
+                    "Tous les coups critiques contre vous infligent \u00e9galement 10% des d\u00e9g\u00e2ts que vous subissez \u00e0 l'attaquant. Les points de d\u00e9g\u00e2ts caus\u00e9s par Oeil pour oeil ne peuvent exc\u00e9der 50% du total des points de vie du paladin."
+                ],
+                "s": [
+                    9799,
+                    25988
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Holy_EyeforanEye"
+            },
+            {
+                "i": 1761,
+                "n": "Bataille sainte",
+                "m": 3,
+                "d": [
+                    "Augmente vos chances de r\u00e9ussir des coups critiques avec tous les sorts et attaques de 1% et augmente les d\u00e9g\u00e2ts inflig\u00e9s par Exorcisme et Inquisition de 5%.",
+                    "Augmente vos chances de r\u00e9ussir des coups critiques avec tous les sorts et attaques de 2% et augmente les d\u00e9g\u00e2ts inflig\u00e9s par Exorcisme et Inquisition de 10%.",
+                    "Augmente vos chances de r\u00e9ussir des coups critiques avec tous les sorts et attaques de 3% et augmente les d\u00e9g\u00e2ts inflig\u00e9s par Exorcisme et Inquisition de 15%."
+                ],
+                "s": [
+                    32043,
+                    35396,
+                    35397
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Holy_HolySmite"
+            },
+            {
+                "i": 1755,
+                "n": "Croisade",
+                "m": 3,
+                "d": [
+                    "Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 1% et tous les d\u00e9g\u00e2ts inflig\u00e9s aux humano\u00efdes, d\u00e9mons, morts-vivants et \u00e9l\u00e9mentaires de 1% suppl\u00e9mentaires.",
+                    "Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 2% et tous les d\u00e9g\u00e2ts inflig\u00e9s aux humano\u00efdes, d\u00e9mons, morts-vivants et \u00e9l\u00e9mentaires de 2% suppl\u00e9mentaires.",
+                    "Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 3% et tous les d\u00e9g\u00e2ts inflig\u00e9s aux humano\u00efdes, d\u00e9mons, morts-vivants et \u00e9l\u00e9mentaires de 3% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    31866,
+                    31867,
+                    31868
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_Holy_Crusade"
+            },
+            {
+                "i": 1410,
+                "n": "Sp\u00e9cialisation Arme 2M",
+                "m": 3,
+                "d": [
+                    "Augmente les points de d\u00e9g\u00e2ts que vous infligez avec les armes de m\u00eal\u00e9e \u00e0 deux mains de 2%.",
+                    "Augmente les points de d\u00e9g\u00e2ts que vous infligez avec les armes de m\u00eal\u00e9e \u00e0 deux mains de 4%.",
+                    "Augmente les points de d\u00e9g\u00e2ts que vous infligez avec les armes de m\u00eal\u00e9e \u00e0 deux mains de 6%."
+                ],
+                "s": [
+                    20111,
+                    20112,
+                    20113
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "INV_Hammer_04"
+            },
+            {
+                "i": 1756,
+                "n": "Vindicte sanctifi\u00e9e",
+                "m": 1,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par Aura de vindicte de 50%, et tous les d\u00e9g\u00e2ts inflig\u00e9s par les cibles alli\u00e9es affect\u00e9es par l'une de vos Auras sont augment\u00e9s de 3%."
+                ],
+                "s": [
+                    31869
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Holy_MindVision"
+            },
+            {
+                "i": 1402,
+                "n": "Vengeance",
+                "m": 3,
+                "d": [
+                    "Apr\u00e8s un coup critique obtenu en frappant avec une arme, ou avec un sort ou une technique, vous infligez 1% de points de d\u00e9g\u00e2ts physiques et du Sacr\u00e9 suppl\u00e9mentaires pendant 30 s. Cet effet est cumulable jusqu'\u00e0 30001 fois.",
+                    "Apr\u00e8s un coup critique obtenu en frappant avec une arme, ou avec un sort ou une technique, vous infligez 2% de points de d\u00e9g\u00e2ts physiques et du Sacr\u00e9 suppl\u00e9mentaires pendant 30 s. Cet effet est cumulable jusqu'\u00e0 30001 fois.",
+                    "Apr\u00e8s un coup critique obtenu en frappant avec une arme, ou avec un sort ou une technique, vous infligez 3% de points de d\u00e9g\u00e2ts physiques et du Sacr\u00e9 suppl\u00e9mentaires pendant 30 s. Cet effet est cumulable jusqu'\u00e0 30001 fois."
+                ],
+                "s": [
+                    20049,
+                    20056,
+                    20057
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "Ability_Racial_Avatar",
+                "r": [
+                    6,
+                    5
+                ]
+            },
+            {
+                "i": 1757,
+                "n": "Dessein divin",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit la probabilit\u00e9 que vous soyez touch\u00e9 par les sorts et les attaques \u00e0 distance de 2% et conf\u00e8re \u00e0 votre sort Main de libert\u00e9 50% de chances d'annuler tous les effets d'\u00e9tourdissement sur la cible.",
+                    "R\u00e9duit la probabilit\u00e9 que vous soyez touch\u00e9 par les sorts et les attaques \u00e0 distance de 4% et conf\u00e8re \u00e0 votre sort Main de libert\u00e9 100% de chances d'annuler tous les effets d'\u00e9tourdissement sur la cible."
+                ],
+                "s": [
+                    31871,
+                    31872
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Holy_DivinePurpose"
+            },
+            {
+                "i": 2176,
+                "n": "L'art de la guerre",
+                "m": 2,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de vos techniques de Jugement, Inquisition et Temp\u00eate divine de 5%, et quand vous r\u00e9ussissez un coup critique avec vos attaques de m\u00eal\u00e9e, le temps d'incantation de votre prochain Eclair lumineux ou Exorcisme est r\u00e9duit de 0.75.2 sec.",
+                    "Augmente les d\u00e9g\u00e2ts de vos techniques de Jugement, Inquisition et Temp\u00eate divine de 10%, et quand vous r\u00e9ussissez un coup critique avec vos attaques de m\u00eal\u00e9e, votre prochain sort Eclair lumineux ou Exorcisme est instantan\u00e9."
+                ],
+                "s": [
+                    53486,
+                    53488
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Paladin_ArtofWar"
+            },
+            {
+                "i": 1441,
+                "n": "Repentir",
+                "m": 1,
+                "d": [
+                    "Plonge la cible ennemie dans une transe m\u00e9ditative qui la stup\u00e9fie pendant 1 min. au maximum et annule l'effet de Vengeance vertueuse. Si la cible subit des d\u00e9g\u00e2ts, elle se r\u00e9veille. Ne fonctionne que sur les d\u00e9mons, les draconiens, les g\u00e9ants, les humano\u00efdes et les morts-vivants."
+                ],
+                "s": [
+                    20066
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Holy_PrayerOfHealing"
+            },
+            {
+                "i": 1758,
+                "n": "Jugements des sages",
+                "m": 3,
+                "d": [
+                    "Vos sorts de Jugement infligeant des d\u00e9g\u00e2ts ont 33% de chances de conf\u00e9rer \u00e0 jusqu'\u00e0 10 membres du groupe ou raid l'effet Requinquage, qui les fait b\u00e9n\u00e9ficier d'une r\u00e9g\u00e9n\u00e9ration de mana \u00e9gale \u00e0 1% de leur maximum de mana toutes les 5 sec. pendant 15 s., ainsi que de vous rendre instantan\u00e9ment 25% de votre mana de base.",
+                    "Vos sorts de Jugement infligeant des d\u00e9g\u00e2ts ont 66% de chances de conf\u00e9rer \u00e0 jusqu'\u00e0 10 membres du groupe ou raid l'effet Requinquage, qui les fait b\u00e9n\u00e9ficier d'une r\u00e9g\u00e9n\u00e9ration de mana \u00e9gale \u00e0 1% de leur maximum de mana toutes les 5 sec. pendant 15 s., ainsi que de vous rendre instantan\u00e9ment 25% de votre mana de base.",
+                    "Vos sorts de Jugement infligeant des d\u00e9g\u00e2ts ont 100% de chances de conf\u00e9rer \u00e0 jusqu'\u00e0 10 membres du groupe ou raid l'effet Requinquage, qui les fait b\u00e9n\u00e9ficier d'une r\u00e9g\u00e9n\u00e9ration de mana \u00e9gale \u00e0 1% de leur maximum de mana toutes les 5 sec. pendant 15 s., ainsi que de vous rendre instantan\u00e9ment 25% de votre mana de base."
+                ],
+                "s": [
+                    31876,
+                    31877,
+                    31878
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Paladin_JudgementoftheWise"
+            },
+            {
+                "i": 1759,
+                "n": "Fanatisme",
+                "m": 3,
+                "d": [
+                    "Augmente de 6% les chances d'obtenir un coup critique avec tous les Jugements qui peuvent en infliger et r\u00e9duit la menace de toutes les actions de 10%, sauf sous l'effet de Fureur vertueuse.",
+                    "Augmente de 12% les chances d'obtenir un coup critique avec tous les Jugements qui peuvent en infliger et r\u00e9duit la menace de toutes les actions de 20%, sauf sous l'effet de Fureur vertueuse.",
+                    "Augmente de 18% les chances d'obtenir un coup critique avec tous les Jugements qui peuvent en infliger et r\u00e9duit la menace de toutes les actions de 30%, sauf sous l'effet de Fureur vertueuse."
+                ],
+                "s": [
+                    31879,
+                    31880,
+                    31881
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Holy_Fanaticism",
+                "r": [
+                    17,
+                    1
+                ]
+            },
+            {
+                "i": 2147,
+                "n": "Courroux sanctifi\u00e9",
+                "m": 2,
+                "d": [
+                    "Augmente les chances de coup critique de Marteau de courroux de 25%, r\u00e9duit le temps de recharge de Courroux vengeur de 30 sec. et tant que vous \u00eates affect\u00e9 par Courroux vengeur 25% de tous les d\u00e9g\u00e2ts inflig\u00e9s \u00e9vitent les effets de r\u00e9duction des d\u00e9g\u00e2ts.",
+                    "Augmente les chances de coup critique de Marteau de courroux de 50%, r\u00e9duit le temps de recharge de Courroux vengeur de 60 sec. et tant que vous \u00eates affect\u00e9 par Courroux vengeur 50% de tous les d\u00e9g\u00e2ts inflig\u00e9s \u00e9vitent les effets de r\u00e9duction des d\u00e9g\u00e2ts."
+                ],
+                "s": [
+                    53375,
+                    53376
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Ability_Paladin_SanctifiedWrath"
+            },
+            {
+                "i": 2148,
+                "n": "Vindicte rapide",
+                "m": 3,
+                "d": [
+                    "Vos Auras augmentent \u00e9galement les vitesses d'incantation et d'attaque en m\u00eal\u00e9e et \u00e0 distance de 1%.",
+                    "Vos Auras augmentent \u00e9galement les vitesses d'incantation et d'attaque en m\u00eal\u00e9e et \u00e0 distance de 2%.",
+                    "Vos Auras augmentent \u00e9galement les vitesses d'incantation et d'attaque en m\u00eal\u00e9e et \u00e0 distance de 3%."
+                ],
+                "s": [
+                    53379,
+                    53484,
+                    53648
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Paladin_SwiftRetribution"
+            },
+            {
+                "i": 1823,
+                "n": "Inquisition",
+                "m": 1,
+                "d": [
+                    "Une attaque instantan\u00e9e qui inflige 75% des d\u00e9g\u00e2ts de l'arme."
+                ],
+                "s": [
+                    35395
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Holy_CrusaderStrike"
+            },
+            {
+                "i": 2179,
+                "n": "Fourreau de lumi\u00e8re",
+                "m": 3,
+                "d": [
+                    "Augmente votre puissance des sorts d'un montant \u00e9gal \u00e0 10% de votre puissance d'attaque et vos sorts de soins critiques rendent \u00e0 la cible un montant de points de vie \u00e9gal \u00e0 20% des points de vie rendus en 12 secondes.",
+                    "Augmente votre puissance des sorts d'un montant \u00e9gal \u00e0 20% de votre puissance d'attaque et vos sorts de soins critiques rendent \u00e0 la cible un montant de points de vie \u00e9gal \u00e0 40% des points de vie rendus en 12 secondes.",
+                    "Augmente votre puissance des sorts d'un montant \u00e9gal \u00e0 30% de votre puissance d'attaque et vos sorts de soins critiques rendent \u00e0 la cible un montant de points de vie \u00e9gal \u00e0 60% des points de vie rendus en 12 secondes."
+                ],
+                "s": [
+                    53501,
+                    53502,
+                    53503
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Paladin_SheathofLight"
+            },
+            {
+                "i": 2149,
+                "n": "Vengeance vertueuse",
+                "m": 3,
+                "d": [
+                    "Quand vos sorts de Jugement, Inquisition ou Temp\u00eate divine infligent un coup critique, votre cible subira 10% de d\u00e9g\u00e2ts suppl\u00e9mentaires en 8 s.",
+                    "Quand vos sorts de Jugement, Inquisition ou Temp\u00eate divine infligent un coup critique, votre cible subira 20% de d\u00e9g\u00e2ts suppl\u00e9mentaires en 8 s.",
+                    "Quand vos sorts de Jugement, Inquisition ou Temp\u00eate divine infligent un coup critique, votre cible subira 30% de d\u00e9g\u00e2ts suppl\u00e9mentaires en 8 s."
+                ],
+                "s": [
+                    53380,
+                    53381,
+                    53382
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Paladin_RighteousVengeance"
+            },
+            {
+                "i": 2150,
+                "n": "Temp\u00eate divine",
+                "m": 1,
+                "d": [
+                    "Une attaque instantan\u00e9e avec une arme qui inflige 110% des d\u00e9g\u00e2ts de l'arme \u00e0 un maximum de 1 ennemis se trouvant \u00e0 moins de 0 m\u00e8tres. La Temp\u00eate divine soigne jusqu'\u00e0 3 membres du groupe ou du raid pour un total de 25% des d\u00e9g\u00e2ts inflig\u00e9s."
+                ],
+                "s": [
+                    53385
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Paladin_DivineStorm"
+            }
+        ]
+    }
+])

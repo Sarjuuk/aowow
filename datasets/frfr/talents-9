@@ -1,0 +1,1481 @@
+$WowheadTalentCalculator.registerClass(9, [
+    {
+        "n": "Affliction",
+        "t": [
+            {
+                "i": 1284,
+                "n": "Mal\u00e9diction d'agonie am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Mal\u00e9diction d'agonie de 5%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Mal\u00e9diction d'agonie de 10%."
+                ],
+                "s": [
+                    18827,
+                    18829
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Shadow_CurseOfSargeras"
+            },
+            {
+                "i": 1005,
+                "n": "Suppression",
+                "m": 3,
+                "d": [
+                    "Augmente de 1% vos chances de toucher avec les sorts, et r\u00e9duit de 2% le co\u00fbt en mana de vos sorts d'Affliction.",
+                    "Augmente de 2% vos chances de toucher avec les sorts, et r\u00e9duit de 4% le co\u00fbt en mana de vos sorts d'Affliction.",
+                    "Augmente de 3% vos chances de toucher avec les sorts, et r\u00e9duit de 6% le co\u00fbt en mana de vos sorts d'Affliction."
+                ],
+                "s": [
+                    18174,
+                    18175,
+                    18176
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Shadow_UnsummonBuilding"
+            },
+            {
+                "i": 1003,
+                "n": "Corruption am\u00e9lior\u00e9e",
+                "m": 5,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre Corruption de 2% et augmente les chances de coup critique de votre Graine de Corruption de 1%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre Corruption de 4% et augmente les chances de coup critique de votre Graine de Corruption de 2%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre Corruption de 6% et augmente les chances de coup critique de votre Graine de Corruption de 3%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre Corruption de 8% et augmente les chances de coup critique de votre Graine de Corruption de 4%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre Corruption de 10% et augmente les chances de coup critique de votre Graine de Corruption de 5%."
+                ],
+                "s": [
+                    17810,
+                    17811,
+                    17812,
+                    17813,
+                    17814
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Shadow_AbominationExplosion"
+            },
+            {
+                "i": 1006,
+                "n": "Mal\u00e9diction de faiblesse am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente de 10% le montant de puissance d'attaque r\u00e9duit par votre Mal\u00e9diction de faiblesse.",
+                    "Augmente de 20% le montant de puissance d'attaque r\u00e9duit par votre Mal\u00e9diction de faiblesse."
+                ],
+                "s": [
+                    18179,
+                    18180
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Shadow_CurseOfMannoroth"
+            },
+            {
+                "i": 1101,
+                "n": "Drain d'\u00e2me am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Vous rend 7% de votre maximum de points de mana si vous tuez la cible pendant que vous drainez son \u00e2me. De plus, vos sorts d'Affliction g\u00e9n\u00e8rent 10% de menace en moins.",
+                    "Vous rend 15% de votre maximum de points de mana si vous tuez la cible pendant que vous drainez son \u00e2me. De plus, vos sorts d'Affliction g\u00e9n\u00e8rent 20% de menace en moins."
+                ],
+                "s": [
+                    18213,
+                    18372
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Shadow_Haunting"
+            },
+            {
+                "i": 1007,
+                "n": "Connexion am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente de 10% le montant de mana octroy\u00e9 par votre sort Connexion.",
+                    "Augmente de 20% le montant de mana octroy\u00e9 par votre sort Connexion."
+                ],
+                "s": [
+                    18182,
+                    18183
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Shadow_BurningSpirit"
+            },
+            {
+                "i": 1004,
+                "n": "Siphon d'\u00e2me",
+                "m": 2,
+                "d": [
+                    "Augmente le montant de points drain\u00e9 par vos sorts Drain de vie et Drain d'\u00e2me de 3% suppl\u00e9mentaires pour chaque effet d'Affliction sur la cible, jusqu'\u00e0 un maximum de 9% d'effet suppl\u00e9mentaire.",
+                    "Augmente le montant de points drain\u00e9 par vos sorts Drain de vie et Drain d'\u00e2me de 6% suppl\u00e9mentaires pour chaque effet d'Affliction sur la cible, jusqu'\u00e0 un maximum de 18% d'effet suppl\u00e9mentaire."
+                ],
+                "s": [
+                    17804,
+                    17805
+                ],
+                "x": 3,
+                "y": 1,
+                "iconname": "Spell_Shadow_LifeDrain02"
+            },
+            {
+                "i": 2205,
+                "n": "Peur am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Votre sort Peur inflige un Cauchemar \u00e0 la cible lorsque l'effet de peur prend fin. Cauchemar r\u00e9duit la vitesse de d\u00e9placement de la cible de 15% pendant 5 s.",
+                    "Votre sort Peur inflige un Cauchemar \u00e0 la cible lorsque l'effet de peur prend fin. Cauchemar r\u00e9duit la vitesse de d\u00e9placement de la cible de 30% pendant 5 s."
+                ],
+                "s": [
+                    53754,
+                    53759
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Shadow_Possession"
+            },
+            {
+                "i": 1001,
+                "n": "Concentration corrompue",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit de 23% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Drain de vie, Drain de mana, Drain d'\u00e2me, Affliction instable et Hanter.",
+                    "R\u00e9duit de 46% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez les sorts Drain de vie, Drain de mana, Drain d'\u00e2me, Affliction instable et Hanter.",
+                    "R\u00e9duit de 70% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez Drain de vie, Drain de mana, Drain d'\u00e2me, Affliction instable et Hanter."
+                ],
+                "s": [
+                    17783,
+                    17784,
+                    17785
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Shadow_FingerOfDeath"
+            },
+            {
+                "i": 1061,
+                "n": "Mal\u00e9diction amplifi\u00e9e",
+                "m": 1,
+                "d": [
+                    "R\u00e9duit le temps de recharge global de vos Mal\u00e9dictions de 0.5.1 sec."
+                ],
+                "s": [
+                    18288
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Shadow_Contagion"
+            },
+            {
+                "i": 1021,
+                "n": "Allonge sinistre",
+                "m": 2,
+                "d": [
+                    "Augmente la port\u00e9e de vos sorts d'Affliction de 10%.",
+                    "Augmente la port\u00e9e de vos sorts d'Affliction de 20%."
+                ],
+                "s": [
+                    18218,
+                    18219
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Shadow_CallofBone"
+            },
+            {
+                "i": 1002,
+                "n": "Cr\u00e9puscule",
+                "m": 2,
+                "d": [
+                    "Conf\u00e8re \u00e0 vos sorts Corruption et Drain de vie, 2% de chances de vous plonger dans un \u00e9tat de Transe de l'ombre apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts \u00e0 un adversaire. Cet \u00e9tat r\u00e9duit le temps d'incantation de votre prochain sort Trait de l'ombre de 100%.",
+                    "Conf\u00e8re \u00e0 vos sorts Corruption et Drain de vie 4% de chances de vous plonger dans un \u00e9tat de Transe de l'ombre apr\u00e8s avoir inflig\u00e9 des d\u00e9g\u00e2ts \u00e0 un adversaire. Cet \u00e9tat r\u00e9duit le temps d'incantation de votre prochain sort Trait de l'ombre de 100%."
+                ],
+                "s": [
+                    18094,
+                    18095
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Shadow_Twilight"
+            },
+            {
+                "i": 1764,
+                "n": "Corruption surpuissante",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de votre sort Corruption d'un montant \u00e9gal \u00e0 12% de votre puissance des sorts.",
+                    "Augmente les d\u00e9g\u00e2ts de votre sort Corruption d'un montant \u00e9gal \u00e0 24% de votre puissance des sorts.",
+                    "Augmente les d\u00e9g\u00e2ts de votre sort Corruption d'un montant \u00e9gal \u00e0 36% de votre puissance des sorts."
+                ],
+                "s": [
+                    32381,
+                    32382,
+                    32383
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_Shadow_AbominationExplosion"
+            },
+            {
+                "i": 1763,
+                "n": "Etreinte de l'ombre",
+                "m": 5,
+                "d": [
+                    "Vos sorts Trait de l'ombre et Hanter provoquent aussi l'effet Etreinte de l'ombre, qui augmente tous les d\u00e9g\u00e2ts d'Ombre p\u00e9riodiques que vous infligez \u00e0 la cible de 1%, et r\u00e9duit tous les soins p\u00e9riodiques prodigu\u00e9s \u00e0 la cible de 2%. Dure 12 s. Cumulable jusqu'\u00e0 12001 fois.",
+                    "Vos sorts Trait de l'ombre et Hanter provoquent aussi l'effet Etreinte de l'ombre, qui augmente tous les d\u00e9g\u00e2ts d'Ombre p\u00e9riodiques que vous infligez \u00e0 la cible de 2%, et r\u00e9duit tous les soins p\u00e9riodiques prodigu\u00e9s \u00e0 la cible de 4%. Dure 12 s. Cumulable jusqu'\u00e0 12001 fois.",
+                    "Vos sorts Trait de l'ombre et Hanter provoquent aussi l'effet Etreinte de l'ombre, qui augmente tous les d\u00e9g\u00e2ts d'Ombre p\u00e9riodiques que vous infligez \u00e0 la cible de 3%, et r\u00e9duit tous les soins p\u00e9riodiques prodigu\u00e9s \u00e0 la cible de 6%. Dure 12 s. Cumulable jusqu'\u00e0 12001 fois.",
+                    "Vos sorts Trait de l'ombre et Hanter provoquent aussi l'effet Etreinte de l'ombre, qui augmente tous les d\u00e9g\u00e2ts d'Ombre p\u00e9riodiques que vous infligez \u00e0 la cible de 4%, et r\u00e9duit tous les soins p\u00e9riodiques prodigu\u00e9s \u00e0 la cible de 8%. Dure 12 s. Cumulable jusqu'\u00e0 12001 fois.",
+                    "Vos sorts Trait de l'ombre et Hanter provoquent aussi l'effet Etreinte de l'ombre, qui augmente tous les d\u00e9g\u00e2ts d'Ombre p\u00e9riodiques que vous infligez \u00e0 la cible de 5%, et r\u00e9duit tous les soins p\u00e9riodiques prodigu\u00e9s \u00e0 la cible de 10%. Dure 12 s. Cumulable jusqu'\u00e0 12001 fois."
+                ],
+                "s": [
+                    32385,
+                    32387,
+                    32392,
+                    32393,
+                    32394
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Shadow_ShadowEmbrace"
+            },
+            {
+                "i": 1041,
+                "n": "Siphon de vie",
+                "m": 1,
+                "d": [
+                    "Quand vous infligez des d\u00e9g\u00e2ts avec votre sort Corruption, vous recevez instantan\u00e9ment un montant de points de vie \u00e9gal \u00e0 <percent>% des d\u00e9g\u00e2ts inflig\u00e9s. De plus, les d\u00e9g\u00e2ts inflig\u00e9s par les effets sur la dur\u00e9e de votre Corruption, votre Graine de Corruption et votre Affliction instable sont augment\u00e9s de 5%."
+                ],
+                "s": [
+                    63108
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Shadow_Requiem"
+            },
+            {
+                "i": 1081,
+                "n": "Mal\u00e9diction d'\u00e9puisement",
+                "m": 1,
+                "d": [
+                    "R\u00e9duit la vitesse de la cible de 30% pendant 12 s. La cible ne peut \u00eatre victime que d'une mal\u00e9diction par d\u00e9moniste pr\u00e9sent \u00e0 la fois."
+                ],
+                "s": [
+                    18223
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Shadow_GrimWard",
+                "r": [
+                    9,
+                    1
+                ]
+            },
+            {
+                "i": 1873,
+                "n": "Chasseur corrompu am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Votre chasseur corrompu re\u00e7oit 4% de son maximum de mana chaque fois qu'il touche avec sa technique Morsure de l'ombre et le temps de recharge de cette technique est r\u00e9duit de 2 sec. Augmente \u00e9galement l'effet de l'Intelligence gangren\u00e9e de votre chasseur corrompu de 5%.",
+                    "Votre chasseur corrompu re\u00e7oit 8% de son maximum de mana chaque fois qu'il touche avec sa technique Morsure de l'ombre et le temps de recharge de cette technique est r\u00e9duit de 4 sec. Augmente \u00e9galement l'effet de l'Intelligence gangren\u00e9e de votre chasseur corrompu de 10%."
+                ],
+                "s": [
+                    54037,
+                    54038
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Shadow_SummonFelHunter"
+            },
+            {
+                "i": 1042,
+                "n": "Ma\u00eetrise de l'ombre",
+                "m": 5,
+                "d": [
+                    "Augmente de 3% les points de d\u00e9g\u00e2ts inflig\u00e9s ou les points de vie drain\u00e9s par vos sorts d'Ombre et la technique Morsure de l'ombre de votre chasseur corrompu.",
+                    "Augmente de 6% les points de d\u00e9g\u00e2ts inflig\u00e9s ou les points de vie drain\u00e9s par vos sorts d'Ombre et la technique Morsure de l'ombre de votre chasseur corrompu.",
+                    "Augmente de 9% les points de d\u00e9g\u00e2ts inflig\u00e9s ou les points de vie drain\u00e9s par vos sorts d'Ombre et la technique Morsure de l'ombre de votre chasseur corrompu.",
+                    "Augmente de 12% les points de d\u00e9g\u00e2ts inflig\u00e9s ou les points de vie drain\u00e9s par vos sorts d'Ombre et la technique Morsure de l'ombre de votre chasseur corrompu.",
+                    "Augmente de 15% les points de d\u00e9g\u00e2ts inflig\u00e9s ou les points de vie drain\u00e9s par vos sorts d'Ombre et la technique Morsure de l'ombre de votre chasseur corrompu."
+                ],
+                "s": [
+                    18271,
+                    18272,
+                    18273,
+                    18274,
+                    18275
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "Spell_Shadow_ShadeTrueSight",
+                "r": [
+                    14,
+                    1
+                ]
+            },
+            {
+                "i": 1878,
+                "n": "Eradication",
+                "m": 3,
+                "d": [
+                    "Quand vous infligez des d\u00e9g\u00e2ts avec Corruption, vous avez 6% de chances d'augmenter votre vitesse d'incantation des sorts de 6% pendant 10 s.",
+                    "Quand vous infligez des d\u00e9g\u00e2ts avec Corruption, vous avez 6% de chances d'augmenter votre vitesse d'incantation des sorts de 12% pendant 10 s.",
+                    "Quand vous infligez des d\u00e9g\u00e2ts avec Corruption, vous avez 6% de chances d'augmenter votre vitesse d'incantation des sorts de 20% pendant 10 s."
+                ],
+                "s": [
+                    47195,
+                    47196,
+                    47197
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Warlock_Eradication"
+            },
+            {
+                "i": 1669,
+                "n": "Contagion",
+                "m": 5,
+                "d": [
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par Mal\u00e9diction d'agonie, Corruption et Graine de Corruption de 1% et r\u00e9duit la probabilit\u00e9 que vos sorts d'Affliction et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 6% suppl\u00e9mentaires.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par Mal\u00e9diction d'agonie, Corruption et Graine de Corruption de 2% et r\u00e9duit la probabilit\u00e9 que vos sorts d'Affliction et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 12% suppl\u00e9mentaires.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par Mal\u00e9diction d'agonie, Corruption et Graine de Corruption de 3% et r\u00e9duit la probabilit\u00e9 que vos sorts d'Affliction et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 18% suppl\u00e9mentaires.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par Mal\u00e9diction d'agonie, Corruption et Graine de Corruption de 4% et r\u00e9duit la probabilit\u00e9 que vos sorts d'Affliction et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 24% suppl\u00e9mentaires.",
+                    "Augmente les points de d\u00e9g\u00e2ts inflig\u00e9s par Mal\u00e9diction d'agonie, Corruption et Graine de Corruption de 5% et r\u00e9duit la probabilit\u00e9 que vos sorts d'Affliction et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 30% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    30060,
+                    30061,
+                    30062,
+                    30063,
+                    30064
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Shadow_PainfulAfflictions"
+            },
+            {
+                "i": 1022,
+                "n": "Pacte noir",
+                "m": 1,
+                "d": [
+                    "Draine 305 points de mana \u00e0 votre d\u00e9mon invoqu\u00e9 et vous rend 100% du montant."
+                ],
+                "s": [
+                    18220
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Shadow_DarkRitual"
+            },
+            {
+                "i": 1668,
+                "n": "Hurlement de terreur am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps d'incantation de votre sort Hurlement de terreur de 0.8 sec.",
+                    "R\u00e9duit le temps d'incantation de votre sort Hurlement de terreur de 1.5 sec."
+                ],
+                "s": [
+                    30054,
+                    30057
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Spell_Shadow_DeathScream"
+            },
+            {
+                "i": 1667,
+                "n": "Impr\u00e9cation",
+                "m": 3,
+                "d": [
+                    "Augmente vos d\u00e9g\u00e2ts des sorts de 1% et augmente les chances de coup critique p\u00e9riodique de vos sorts Corruption et Affliction instable de 3%.",
+                    "Augmente vos d\u00e9g\u00e2ts des sorts de 2% et augmente les chances de coup critique p\u00e9riodique de vos sorts Corruption et Affliction instable de 6%.",
+                    "Augmente vos d\u00e9g\u00e2ts des sorts de 3% et augmente les chances de coup critique p\u00e9riodique de vos sorts Corruption et Affliction instable de 9%."
+                ],
+                "s": [
+                    32477,
+                    32483,
+                    32484
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Shadow_CurseOfAchimonde"
+            },
+            {
+                "i": 1875,
+                "n": "Caresse de la mort",
+                "m": 3,
+                "d": [
+                    "Augmente le montant de points de vie drain\u00e9s par votre Drain de vie de 10% quand vous disposez de 20% ou moins de vos points de vie, et augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts d'Ombre de 4% quand votre cible dispose de 35% ou moins de ses points de vie.",
+                    "Augmente le montant de points de vie drain\u00e9s par votre Drain de vie de 20% quand vous disposez de 20% ou moins de vos points de vie, et augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts d'Ombre de 8% quand votre cible dispose de 35% ou moins de ses points de vie.",
+                    "Augmente le montant de points de vie drain\u00e9s par votre Drain de vie de 30% quand vous disposez de 20% ou moins de vos points de vie, et augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts d'Ombre de 12% quand votre cible dispose de 35% ou moins de ses points de vie."
+                ],
+                "s": [
+                    47198,
+                    47199,
+                    47200
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Shadow_DeathsEmbrace"
+            },
+            {
+                "i": 1670,
+                "n": "Affliction instable",
+                "m": 1,
+                "d": [
+                    "L\u2019\u00e9nergie de l\u2019Ombre d\u00e9truit lentement la cible, infligeant 550 points de d\u00e9g\u00e2ts en 15 s. De plus, si l'Affliction instable est dissip\u00e9e, celui qui la dissipe subit 990 points de d\u00e9g\u00e2ts et est r\u00e9duit au silence pendant 5 s. Une cible ne peut \u00eatre victime que d'une seule Affliction instable ou Immolation par d\u00e9moniste."
+                ],
+                "s": [
+                    30108
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Shadow_UnstableAffliction_3",
+                "r": [
+                    19,
+                    5
+                ]
+            },
+            {
+                "i": 2245,
+                "n": "Pand\u00e9mie",
+                "m": 1,
+                "d": [
+                    "Les d\u00e9g\u00e2ts p\u00e9riodiques de vos sorts Corruption et Affliction instable peuvent \u00eatre critiques et infliger 100% de d\u00e9g\u00e2ts suppl\u00e9mentaires. Augmente \u00e9galement le bonus aux d\u00e9g\u00e2ts des coups critiques r\u00e9ussis avec votre sort Hanter de 100%."
+                ],
+                "s": [
+                    58435
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Shadow_UnstableAffliction_2",
+                "r": [
+                    24,
+                    1
+                ]
+            },
+            {
+                "i": 1876,
+                "n": "Affliction \u00e9ternelle",
+                "m": 5,
+                "d": [
+                    "Vos sorts Corruption et Affliction instable b\u00e9n\u00e9ficient de 1% suppl\u00e9mentaires de votre bonus aux d\u00e9g\u00e2ts des sorts, et vos sorts Drain de vie, Drain d'\u00e2me, Trait de l'ombre et Hanter ont 20% de chances de r\u00e9initialiser la dur\u00e9e de votre sort Corruption sur la cible.",
+                    "Vos sorts Corruption et Affliction instable b\u00e9n\u00e9ficient de 2% suppl\u00e9mentaires de votre bonus aux d\u00e9g\u00e2ts des sorts, et vos sorts Drain de vie, Drain d'\u00e2me, Trait de l'ombre et Hanter ont 40% de chances de r\u00e9initialiser la dur\u00e9e de votre sort Corruption sur la cible.",
+                    "Vos sorts Corruption et Affliction instable b\u00e9n\u00e9ficient de 3% suppl\u00e9mentaires de votre bonus aux d\u00e9g\u00e2ts des sorts, et vos sorts Drain de vie, Drain d'\u00e2me, Trait de l'ombre et Hanter ont 60% de chances de r\u00e9initialiser la dur\u00e9e de votre sort Corruption sur la cible.",
+                    "Vos sorts Corruption et Affliction instable b\u00e9n\u00e9ficient de 4% suppl\u00e9mentaires de votre bonus aux d\u00e9g\u00e2ts des sorts, et vos sorts Drain de vie, Drain d'\u00e2me, Trait de l'ombre et Hanter ont 80% de chances de r\u00e9initialiser la dur\u00e9e de votre sort Corruption sur la cible.",
+                    "Vos sorts Corruption et Affliction instable b\u00e9n\u00e9ficient de 5% suppl\u00e9mentaires de votre bonus aux d\u00e9g\u00e2ts des sorts, et vos sorts Drain de vie, Drain d'\u00e2me, Trait de l'ombre et Hanter ont 100% de chances de r\u00e9initialiser la dur\u00e9e de votre sort Corruption sur la cible."
+                ],
+                "s": [
+                    47201,
+                    47202,
+                    47203,
+                    47204,
+                    47205
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Warlock_EverlastingAffliction"
+            },
+            {
+                "i": 2041,
+                "n": "Hanter",
+                "m": 1,
+                "d": [
+                    "Vous envoyez une \u00e2me fantomatique \u00e0 l'int\u00e9rieur de la cible, ce qui lui inflige 405 to 474 points de d\u00e9g\u00e2ts d'Ombre et augmente tous les d\u00e9g\u00e2ts inflig\u00e9s par vos effets de d\u00e9g\u00e2ts d'Ombre sur la dur\u00e9e de 20% pendant 12 s. Quand le sort Hanter prend fin ou est dissip\u00e9, l'\u00e2me vous revient et vous soigne pour un montant de points de vie \u00e9gal \u00e0 100% des d\u00e9g\u00e2ts qu'elle a inflig\u00e9s \u00e0 la cible."
+                ],
+                "s": [
+                    48181
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Warlock_Haunt"
+            }
+        ]
+    },
+    {
+        "n": "D\u00e9monologie",
+        "t": [
+            {
+                "i": 1221,
+                "n": "Pierre de soins am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente le montant de points de vie restaur\u00e9s par votre Pierre de soin de 10%.",
+                    "Augmente le montant de points de vie restaur\u00e9s par votre Pierre de soin de 20%."
+                ],
+                "s": [
+                    18692,
+                    18693
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "INV_Stone_04"
+            },
+            {
+                "i": 1222,
+                "n": "Diablotin am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "Augmente les effets des sorts Eclair de feu, Bouclier de feu et Pacte de sang de votre diablotin de 10%.",
+                    "Augmente les effets des sorts Eclair de feu, Bouclier de feu et Pacte de sang de votre diablotin de 20%.",
+                    "Augmente les effets des sorts Eclair de feu, Bouclier de feu et Pacte de sang de votre diablotin de 30%."
+                ],
+                "s": [
+                    18694,
+                    18695,
+                    18696
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Shadow_SummonImp"
+            },
+            {
+                "i": 1223,
+                "n": "Baiser d\u00e9moniaque",
+                "m": 3,
+                "d": [
+                    "Augmente votre total d'Endurance de 4%.",
+                    "Augmente votre total d'Endurance de 7%.",
+                    "Augmente votre total d'Endurance de 10%."
+                ],
+                "s": [
+                    18697,
+                    18698,
+                    18699
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Shadow_Metamorphosis"
+            },
+            {
+                "i": 1883,
+                "n": "Synergie gangren\u00e9e",
+                "m": 2,
+                "d": [
+                    "Vous avez 50% de chances de rendre \u00e0 votre familier un montant de points de vie \u00e9gal \u00e0 15% du montant de d\u00e9g\u00e2ts que vous infligez avec des sorts.",
+                    "Vous avez 100% de chances de rendre \u00e0 votre familier un montant de points de vie \u00e9gal \u00e0 15% du montant de d\u00e9g\u00e2ts que vous infligez avec des sorts."
+                ],
+                "s": [
+                    47230,
+                    47231
+                ],
+                "x": 3,
+                "y": 0,
+                "iconname": "Spell_Shadow_FelMending"
+            },
+            {
+                "i": 1224,
+                "n": "Captation de vie am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente le montant de points de vie transf\u00e9r\u00e9s par votre sort Captation de vie de 10% et r\u00e9duit le co\u00fbt initial en points de vie de 10%. De plus, votre d\u00e9mon invoqu\u00e9 subit 15% de d\u00e9g\u00e2ts en moins pendant qu'il est sous l'effet de votre Captation de vie.",
+                    "Augmente le montant de points de vie transf\u00e9r\u00e9s par votre sort Captation de vie de 20% et r\u00e9duit le co\u00fbt initial en points de vie de 20%. De plus, votre d\u00e9mon invoqu\u00e9 subit 30% de d\u00e9g\u00e2ts en moins pendant qu'il est sous l'effet de votre Captation de vie."
+                ],
+                "s": [
+                    18703,
+                    18704
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Shadow_LifeDrain"
+            },
+            {
+                "i": 1225,
+                "n": "Brutalit\u00e9 d\u00e9moniaque",
+                "m": 3,
+                "d": [
+                    "Augmente de 10% l'efficacit\u00e9 des sorts Tourment, Consumer les ombres, Sacrifice et Souffrance de votre marcheur du Vide, et augmente de 1% le bonus \u00e0 la puissance d'attaque de l'effet Fr\u00e9n\u00e9sie d\u00e9moniaque de votre gangregarde.",
+                    "Augmente de 20% l'efficacit\u00e9 des sorts Tourment, Consumer les ombres, Sacrifice et Souffrance de votre marcheur du Vide, et augmente de 2% le bonus \u00e0 la puissance d'attaque de l'effet Fr\u00e9n\u00e9sie d\u00e9moniaque de votre gangregarde.",
+                    "Augmente de 30% l'efficacit\u00e9 des sorts Tourment, Consumer les ombres, Sacrifice et Souffrance de votre marcheur du Vide, et augmente de 3% le bonus \u00e0 la puissance d'attaque de l'effet Fr\u00e9n\u00e9sie d\u00e9moniaque de votre gangregarde."
+                ],
+                "s": [
+                    18705,
+                    18706,
+                    18707
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Shadow_SummonVoidWalker"
+            },
+            {
+                "i": 1242,
+                "n": "Vitalit\u00e9 gangren\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente de 5% l'Endurance et l'Intelligence de votre diablotin, marcheur du Vide, succube, chasseur corrompu et gangregarde et de 1% votre maximum de points de vie et de mana.",
+                    "Augmente de 10% l'Endurance et l'Intelligence de votre diablotin, marcheur du Vide, succube, chasseur corrompu et gangregarde et de 2% votre maximum de points de vie et de mana.",
+                    "Augmente de 15% l'Endurance et l'Intelligence de votre diablotin, marcheur du Vide, succube, chasseur corrompu et gangregarde et de 3% votre maximum de points de vie et de mana."
+                ],
+                "s": [
+                    18731,
+                    18743,
+                    18744
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Holy_MagicalSentry"
+            },
+            {
+                "i": 1243,
+                "n": "Succube am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le temps d'incantation de la S\u00e9duction de votre succube de 22% et augmente la dur\u00e9e de ses sorts S\u00e9duction et Invisibilit\u00e9 inf\u00e9rieure de 10%.",
+                    "R\u00e9duit le temps d'incantation de la S\u00e9duction de votre succube de 44% et augmente la dur\u00e9e de ses sorts S\u00e9duction et Invisibilit\u00e9 inf\u00e9rieure de 20%.",
+                    "R\u00e9duit le temps d'incantation de la S\u00e9duction de votre succube de 66% et augmente la dur\u00e9e de ses sorts S\u00e9duction et Invisibilit\u00e9 inf\u00e9rieure de 30%."
+                ],
+                "s": [
+                    18754,
+                    18755,
+                    18756
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Shadow_SummonSuccubus"
+            },
+            {
+                "i": 1282,
+                "n": "Lien spirituel",
+                "m": 1,
+                "d": [
+                    "Une fois activ\u00e9, 20% de tous les points de d\u00e9g\u00e2ts inflig\u00e9s au lanceur de sorts sont subis \u00e0 sa place par son diablotin, son marcheur du Vide, sa succube, son chasseur corrompu, son gangregarde ou son d\u00e9mon asservi. Ces d\u00e9g\u00e2ts ne peuvent \u00eatre \u00e9vit\u00e9s. Dure aussi longtemps que le d\u00e9mon est actif et sous contr\u00f4le."
+                ],
+                "s": [
+                    19028
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Shadow_GatherShadows"
+            },
+            {
+                "i": 1226,
+                "n": "Domination corrompue",
+                "m": 1,
+                "d": [
+                    "Le temps d'incantation de votre prochain sort d'invocation de diablotin, de marcheur du Vide, de succube, de chasseur corrompu ou de gangregarde est r\u00e9duit de 5.5 sec. et son co\u00fbt en mana est r\u00e9duit de 50%."
+                ],
+                "s": [
+                    18708
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Nature_RemoveCurse"
+            },
+            {
+                "i": 1671,
+                "n": "Egide d\u00e9moniaque",
+                "m": 3,
+                "d": [
+                    "Augmente de 10% l'efficacit\u00e9 de votre Armure d\u00e9moniaque et de votre Gangrarmure.",
+                    "Augmente de 20% l'efficacit\u00e9 de votre Armure d\u00e9moniaque et de votre Gangrarmure.",
+                    "Augmente de 30% l'efficacit\u00e9 de votre Armure d\u00e9moniaque et de votre Gangrarmure."
+                ],
+                "s": [
+                    30143,
+                    30144,
+                    30145
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Shadow_RagingScream"
+            },
+            {
+                "i": 1262,
+                "n": "Puissance impie",
+                "m": 5,
+                "d": [
+                    "Augmente de 4% les d\u00e9g\u00e2ts inflig\u00e9s par les attaques de m\u00eal\u00e9e du marcheur du Vide, de la succube, du chasseur corrompu et du gangregarde et par l'Eclair de feu du diablotin.",
+                    "Augmente de 8% les d\u00e9g\u00e2ts inflig\u00e9s par les attaques de m\u00eal\u00e9e du marcheur du Vide, de la succube, du chasseur corrompu et du gangregarde et par l'Eclair de feu du diablotin.",
+                    "Augmente de 12% les d\u00e9g\u00e2ts inflig\u00e9s par les attaques de m\u00eal\u00e9e du marcheur du Vide, de la succube, du chasseur corrompu et du gangregarde et par l'Eclair de feu du diablotin.",
+                    "Augmente de 16% les d\u00e9g\u00e2ts inflig\u00e9s par les attaques de m\u00eal\u00e9e du marcheur du Vide, de la succube, du chasseur corrompu et du gangregarde et par l'Eclair de feu du diablotin.",
+                    "Augmente de 20% les d\u00e9g\u00e2ts inflig\u00e9s par les attaques de m\u00eal\u00e9e du marcheur du Vide, de la succube, du chasseur corrompu et du gangregarde et par l'Eclair de feu du diablotin."
+                ],
+                "s": [
+                    18769,
+                    18770,
+                    18771,
+                    18772,
+                    18773
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Shadow_ShadowWordDominate",
+                "r": [
+                    8,
+                    1
+                ]
+            },
+            {
+                "i": 1227,
+                "n": "Ma\u00eetre invocateur",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps d'incantation de vos sorts d'invocations de diablotin, de succube, de marcheur du Vide, de chasseur corrompu et de gangregarde de 2 sec. et leur co\u00fbt en mana de 20%.",
+                    "R\u00e9duit le temps d'incantation de vos sorts d'invocations de diablotin, de succube, de marcheur du Vide, de chasseur corrompu et de gangregarde de 4 sec. et leur co\u00fbt en mana de 40%."
+                ],
+                "s": [
+                    18709,
+                    18710
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Shadow_ImpPhaseShift",
+                "r": [
+                    9,
+                    1
+                ]
+            },
+            {
+                "i": 1281,
+                "n": "Festin de mana",
+                "m": 1,
+                "d": [
+                    "Lorsque vous recevez du mana gr\u00e2ce aux sorts Drain de mana ou Connexion, votre d\u00e9mon invoqu\u00e9 re\u00e7oit lui aussi 100% de ce montant de mana."
+                ],
+                "s": [
+                    30326
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Shadow_ManaFeed",
+                "r": [
+                    11,
+                    5
+                ]
+            },
+            {
+                "i": 1261,
+                "n": "Ma\u00eetre conjurateur",
+                "m": 2,
+                "d": [
+                    "Augmente de 150% les scores de combat conf\u00e9r\u00e9s par vos Pierres de feu et Pierres de sort invoqu\u00e9es.",
+                    "Augmente de 300% les scores de combat conf\u00e9r\u00e9s par vos Pierres de feu et Pierres de sort invoqu\u00e9es."
+                ],
+                "s": [
+                    18767,
+                    18768
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "INV_Ammo_FireTar"
+            },
+            {
+                "i": 1244,
+                "n": "Ma\u00eetre d\u00e9monologue",
+                "m": 5,
+                "d": [
+                    "Fait b\u00e9n\u00e9ficier le d\u00e9moniste et le d\u00e9mon invoqu\u00e9 d'un effet aussi longtemps que le d\u00e9mon est actif.<br \/><br \/>Diablotin - Augmente vos d\u00e9g\u00e2ts de Feu de 1%, et augmente les chances d'effet critique de vos sorts de Feu de 1%.<br \/><br \/>Marcheur du Vide - R\u00e9duit les d\u00e9g\u00e2ts physiques subis de 2%.<br \/><br \/>Succube - Augmente vos d\u00e9g\u00e2ts d'Ombre de 1%, et augmente les chances d'effet critique de vos sorts d'Ombre de 1%.<br \/><br \/>Chasseur corrompu - R\u00e9duit tous les d\u00e9g\u00e2ts des sorts subis de 2%.<br \/><br \/>Gangregarde - Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 1%, et r\u00e9duit tous les d\u00e9g\u00e2ts subis de 1%.",
+                    "Fait b\u00e9n\u00e9ficier le d\u00e9moniste et le d\u00e9mon invoqu\u00e9 d'un effet aussi longtemps que le d\u00e9mon est actif.<br \/><br \/>Diablotin - Augmente vos d\u00e9g\u00e2ts de Feu de 2%, et augmente les chances d'effet critique de vos sorts de Feu de 2%.<br \/><br \/>Marcheur du Vide - R\u00e9duit les d\u00e9g\u00e2ts physiques subis de 4%.<br \/><br \/>Succube - Augmente vos d\u00e9g\u00e2ts d'Ombre de 2%, et augmente les chances d'effet critique de vos sorts d'Ombre de 2%.<br \/><br \/>Chasseur corrompu - R\u00e9duit tous les d\u00e9g\u00e2ts des sorts subis de 4%.<br \/><br \/>Gangregarde - Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 2%, et r\u00e9duit tous les d\u00e9g\u00e2ts subis de 2%.",
+                    "Fait b\u00e9n\u00e9ficier le d\u00e9moniste et le d\u00e9mon invoqu\u00e9 d'un effet aussi longtemps que le d\u00e9mon est actif.<br \/><br \/>Diablotin - Augmente vos d\u00e9g\u00e2ts de Feu de 3%, et augmente les chances d'effet critique de vos sorts de Feu de 3%.<br \/><br \/>Marcheur du Vide - R\u00e9duit les d\u00e9g\u00e2ts physiques subis de 6%.<br \/><br \/>Succube - Augmente vos d\u00e9g\u00e2ts d'Ombre de 3%, et augmente les chances d'effet critique de vos sorts d'Ombre de 3%.<br \/><br \/>Chasseur corrompu - R\u00e9duit tous les d\u00e9g\u00e2ts des sorts subis de 6%.<br \/><br \/>Gangregarde - Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 3%, et r\u00e9duit tous les d\u00e9g\u00e2ts subis de 3%.",
+                    "Fait b\u00e9n\u00e9ficier le d\u00e9moniste et le d\u00e9mon invoqu\u00e9 d'un effet aussi longtemps que le d\u00e9mon est actif.<br \/><br \/>Diablotin - Augmente vos d\u00e9g\u00e2ts de Feu de 4%, et augmente les chances d'effet critique de vos sorts de Feu de 4%.<br \/><br \/>Marcheur du Vide - R\u00e9duit les d\u00e9g\u00e2ts physiques subis de 8%.<br \/><br \/>Succube - Augmente vos d\u00e9g\u00e2ts d'Ombre de 4%, et augmente les chances d'effet critique de vos sorts d'Ombre de 4%.<br \/><br \/>Chasseur corrompu - R\u00e9duit tous les d\u00e9g\u00e2ts des sorts subis de 8%.<br \/><br \/>Gangregarde - Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 4%, et r\u00e9duit tous les d\u00e9g\u00e2ts subis de 4%.",
+                    "Fait b\u00e9n\u00e9ficier le d\u00e9moniste et le d\u00e9mon invoqu\u00e9 d'un effet aussi longtemps que le d\u00e9mon est actif.<br \/><br \/>Diablotin - Augmente vos d\u00e9g\u00e2ts de Feu de 5%, et augmente les chances d'effet critique de vos sorts de Feu de 5%.<br \/><br \/>Marcheur du Vide - R\u00e9duit les d\u00e9g\u00e2ts physiques subis de 10%.<br \/><br \/>Succube - Augmente vos d\u00e9g\u00e2ts d'Ombre de 5%, et augmente les chances d'effet critique de vos sorts d'Ombre de 5%.<br \/><br \/>Chasseur corrompu - R\u00e9duit tous les d\u00e9g\u00e2ts des sorts subis de 10%.<br \/><br \/>Gangregarde - Augmente tous les d\u00e9g\u00e2ts inflig\u00e9s de 5%, et r\u00e9duit tous les d\u00e9g\u00e2ts subis de 5%."
+                ],
+                "s": [
+                    23785,
+                    23822,
+                    23823,
+                    23824,
+                    23825
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "Spell_Shadow_ShadowPact",
+                "r": [
+                    11,
+                    5
+                ]
+            },
+            {
+                "i": 1283,
+                "n": "Coeur de la fournaise",
+                "m": 3,
+                "d": [
+                    "Augmente la dur\u00e9e de votre Immolation de 3 sec., et vous avez 4% de chances de b\u00e9n\u00e9ficier de l'effet Coeur de la fournaise quand votre Corruption inflige des d\u00e9g\u00e2ts. L'effet Coeur de la fournaise rend plus puissants vos 3 prochains sorts Incin\u00e9rer ou Feu de l'\u00e2me lanc\u00e9s dans les 15 s.<br \/><br \/>Incin\u00e9rer - Augmente les d\u00e9g\u00e2ts inflig\u00e9s de 6% et r\u00e9duit le temps d'incantation de 10%.<br \/><br \/>Feu de l'\u00e2me - Augmente les d\u00e9g\u00e2ts inflig\u00e9s de 6% et augmente les chances de coup critique de 5%.",
+                    "Augmente la dur\u00e9e de votre Immolation de 6 sec., et vous avez 8% de chances de b\u00e9n\u00e9ficier de l'effet Coeur de la fournaise quand votre Corruption inflige des d\u00e9g\u00e2ts. L'effet Coeur de la fournaise rend plus puissants vos 3 prochains sorts Incin\u00e9rer ou Feu de l'\u00e2me lanc\u00e9s dans les 15 s.<br \/><br \/>Incin\u00e9rer - Augmente les d\u00e9g\u00e2ts inflig\u00e9s de 12% et r\u00e9duit le temps d'incantation de 20%.<br \/><br \/>Feu de l'\u00e2me - Augmente les d\u00e9g\u00e2ts inflig\u00e9s de 12% et augmente les chances de coup critique de 10%.",
+                    "Augmente la dur\u00e9e de votre Immolation de 9 sec., et vous avez 12% de chances de b\u00e9n\u00e9ficier de l'effet Coeur de la fournaise quand votre Corruption inflige des d\u00e9g\u00e2ts. L'effet Coeur de la fournaise rend plus puissants vos 3 prochains sorts Incin\u00e9rer ou Feu de l'\u00e2me lanc\u00e9s dans les 15 s.<br \/><br \/>Incin\u00e9rer - Augmente les d\u00e9g\u00e2ts inflig\u00e9s de 18% et r\u00e9duit le temps d'incantation de 30%.<br \/><br \/>Feu de l'\u00e2me - Augmente les d\u00e9g\u00e2ts inflig\u00e9s de 18% et augmente les chances de coup critique de 15%."
+                ],
+                "s": [
+                    47245,
+                    47246,
+                    47247
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Ability_Warlock_MoltenCore"
+            },
+            {
+                "i": 1680,
+                "n": "R\u00e9silience d\u00e9moniaque",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit de 1% la probabilit\u00e9 que vous soyez touch\u00e9 par un coup critique inflig\u00e9 en m\u00eal\u00e9e ou par un sort et r\u00e9duit de 5% tous les d\u00e9g\u00e2ts que subit votre d\u00e9mon invoqu\u00e9.",
+                    "R\u00e9duit de 2% la probabilit\u00e9 que vous soyez touch\u00e9 par un coup critique inflig\u00e9 en m\u00eal\u00e9e ou par un sort et r\u00e9duit de 10% tous les d\u00e9g\u00e2ts que subit votre d\u00e9mon invoqu\u00e9.",
+                    "R\u00e9duit de 3% la probabilit\u00e9 que vous soyez touch\u00e9 par un coup critique inflig\u00e9 en m\u00eal\u00e9e ou par un sort et r\u00e9duit de 15% tous les d\u00e9g\u00e2ts que subit votre d\u00e9mon invoqu\u00e9."
+                ],
+                "s": [
+                    30319,
+                    30320,
+                    30321
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Shadow_DemonicFortitude"
+            },
+            {
+                "i": 1880,
+                "n": "Renforcement d\u00e9moniaque",
+                "m": 1,
+                "d": [
+                    "Conf\u00e8re un renforcement au d\u00e9mon invoqu\u00e9 du d\u00e9moniste.<br \/><br \/>Diablotin - Augmente ses chances de critique avec les sorts de 20% pendant 30 s.<br \/><br \/>Marcheur du Vide - Augmente ses points de vie de 20% et augmente la menace g\u00e9n\u00e9r\u00e9e par ses sorts et attaques de 20% pendant 20 s.<br \/><br \/>Succube - Disparition imm\u00e9diate qui la fait entrer dans un \u00e9tat d'invisibilit\u00e9 am\u00e9lior\u00e9e. L'effet de disparition annule tous les \u00e9tourdissements, ralentissements et effets affectant le d\u00e9placement sur la succube.<br \/><br \/>Chasseur corrompu - Dissipe tous les effets magiques sur le chasseur corrompu.<br \/><br \/>Gangregarde - Augmente sa vitesse d'attaque de 20%, annule tous les \u00e9tourdissements, ralentissements et effets affectant le d\u00e9placement et rend le gangregarde insensible \u00e0 ces effets pendant 15 s."
+                ],
+                "s": [
+                    47193
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Ability_Warlock_DemonicEmpowerment",
+                "r": [
+                    15,
+                    5
+                ]
+            },
+            {
+                "i": 1263,
+                "n": "Connaissance d\u00e9moniaque",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de vos sorts d'un montant \u00e9gal \u00e0 4% du total de l'Endurance plus l'Intelligence de votre d\u00e9mon actif.",
+                    "Augmente les d\u00e9g\u00e2ts de vos sorts d'un montant \u00e9gal \u00e0 8% du total de l'Endurance plus l'Intelligence de votre d\u00e9mon actif.",
+                    "Augmente les d\u00e9g\u00e2ts de vos sorts d'un montant \u00e9gal \u00e0 12% du total de l'Endurance plus l'Intelligence de votre d\u00e9mon actif."
+                ],
+                "s": [
+                    35691,
+                    35692,
+                    35693
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Shadow_ImprovedVampiricEmbrace"
+            },
+            {
+                "i": 1673,
+                "n": "Tactique d\u00e9moniaque",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances de coup critique en m\u00eal\u00e9e et avec les sorts ainsi que celles de votre d\u00e9mon invoqu\u00e9 de 2%.",
+                    "Augmente vos chances de coup critique en m\u00eal\u00e9e et avec les sorts ainsi que celles de votre d\u00e9mon invoqu\u00e9 de 4%.",
+                    "Augmente vos chances de coup critique en m\u00eal\u00e9e et avec les sorts ainsi que celles de votre d\u00e9mon invoqu\u00e9 de 6%.",
+                    "Augmente vos chances de coup critique en m\u00eal\u00e9e et avec les sorts ainsi que celles de votre d\u00e9mon invoqu\u00e9 de 8%.",
+                    "Augmente vos chances de coup critique en m\u00eal\u00e9e et avec les sorts ainsi que celles de votre d\u00e9mon invoqu\u00e9 de 10%."
+                ],
+                "s": [
+                    30242,
+                    30245,
+                    30246,
+                    30247,
+                    30248
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Shadow_DemonicTactics"
+            },
+            {
+                "i": 2261,
+                "n": "D\u00e9cimation",
+                "m": 2,
+                "d": [
+                    "Lorsque vous touchez avec Trait de l'ombre, Incin\u00e9rer ou Feu de l'\u00e2me une cible qui dispose de 35% ou moins de ses points de vie, le temps d'incantation de Feu de l'\u00e2me est r\u00e9duit de 20% pendant 10 s. Les Feux de l'\u00e2me lanc\u00e9s sous l'effet de D\u00e9cimation ne co\u00fbtent pas de fragment.",
+                    "Lorsque vous touchez avec Trait de l'ombre, Incin\u00e9rer ou Feu de l'\u00e2me une cible qui dispose de 35% ou moins de ses points de vie, le temps d'incantation de votre sort Feu de l'\u00e2me est r\u00e9duit de 40% pendant 10 s. Les Feux de l'\u00e2me lanc\u00e9s sous l'effet de D\u00e9cimation ne co\u00fbtent pas de fragment."
+                ],
+                "s": [
+                    63156,
+                    63158
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Fire_Fireball02"
+            },
+            {
+                "i": 1882,
+                "n": "Tactique d\u00e9moniaque am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente les chances de coup critique de votre d\u00e9mon invoqu\u00e9, les rendant \u00e9gales \u00e0 10% de vos propres chances.",
+                    "Augmente les chances de coup critique de votre d\u00e9mon invoqu\u00e9, les rendant \u00e9gales \u00e0 20% de vos propres chances.",
+                    "Augmente les chances de coup critique de votre d\u00e9mon invoqu\u00e9, les rendant \u00e9gales \u00e0 30% de vos propres chances."
+                ],
+                "s": [
+                    54347,
+                    54348,
+                    54349
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Warlock_ImprovedDemonicTactics",
+                "r": [
+                    20,
+                    5
+                ]
+            },
+            {
+                "i": 1672,
+                "n": "Invocation d'un gangregarde",
+                "m": 1,
+                "d": [
+                    "Invoque un gangregarde qui ex\u00e9cute les ordres du d\u00e9moniste."
+                ],
+                "s": [
+                    30146
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Shadow_SummonFelGuard"
+            },
+            {
+                "i": 1884,
+                "n": "Instrument de vengeance",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos sorts Renforcement d\u00e9moniaque, M\u00e9tamorphe et Domination corrompue de 10%.",
+                    "R\u00e9duit le temps de recharge de vos sorts Renforcement d\u00e9moniaque, M\u00e9tamorphe et Domination corrompue de 20%.",
+                    "R\u00e9duit le temps de recharge de vos sorts Renforcement d\u00e9moniaque, M\u00e9tamorphe et Domination corrompue de 30%."
+                ],
+                "s": [
+                    63117,
+                    63121,
+                    63123
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Shadow_DemonicEmpathy"
+            },
+            {
+                "i": 1885,
+                "n": "Pacte d\u00e9moniaque",
+                "m": 5,
+                "d": [
+                    "Augmente vos d\u00e9g\u00e2ts des sorts de 2%, et les critiques de votre familier appliquent l'effet Pacte d\u00e9moniaque sur les membres de votre groupe ou raid. Le Pacte d\u00e9moniaque augmente la puissance des sorts de 2% de vos d\u00e9g\u00e2ts des sorts pendant 45 s. Cet effet a un temps de recharge de 20 sec. Ne fonctionne pas sur les d\u00e9mons asservis.",
+                    "Augmente vos d\u00e9g\u00e2ts des sorts de 4%, et les critiques de votre familier appliquent l'effet Pacte d\u00e9moniaque sur les membres de votre groupe ou raid. Le Pacte d\u00e9moniaque augmente la puissance des sorts de 4% de vos d\u00e9g\u00e2ts des sorts pendant 45 s. Cet effet a un temps de recharge de 20 sec. Ne fonctionne pas sur les d\u00e9mons asservis.",
+                    "Augmente vos d\u00e9g\u00e2ts des sorts de 6%, et les critiques de votre familier appliquent l'effet Pacte d\u00e9moniaque sur les membres de votre groupe ou raid. Le Pacte d\u00e9moniaque augmente la puissance des sorts de 6% de vos d\u00e9g\u00e2ts des sorts pendant 45 s. Cet effet a un temps de recharge de 20 sec. Ne fonctionne pas sur les d\u00e9mons asservis.",
+                    "Augmente vos d\u00e9g\u00e2ts des sorts de 8%, et les critiques de votre familier appliquent l'effet Pacte d\u00e9moniaque sur les membres de votre groupe ou raid. Le Pacte d\u00e9moniaque augmente la puissance des sorts de 8% de vos d\u00e9g\u00e2ts des sorts pendant 45 s. Cet effet a un temps de recharge de 20 sec. Ne fonctionne pas sur les d\u00e9mons asservis.",
+                    "Augmente vos d\u00e9g\u00e2ts des sorts de 10%, et les critiques de votre familier appliquent l'effet Pacte d\u00e9moniaque sur les membres de votre groupe ou raid. Le Pacte d\u00e9moniaque augmente la puissance des sorts de 10% de vos d\u00e9g\u00e2ts des sorts pendant 45 s. Cet effet a un temps de recharge de 20 sec. Ne fonctionne pas sur les d\u00e9mons asservis."
+                ],
+                "s": [
+                    47236,
+                    47237,
+                    47238,
+                    47239,
+                    47240
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Spell_Shadow_DemonicPact"
+            },
+            {
+                "i": 1886,
+                "n": "M\u00e9tamorphe",
+                "m": 1,
+                "d": [
+                    "Vous vous transformez en d\u00e9mon pendant 30 s. Cette forme augmente votre armure de 600% et vos d\u00e9g\u00e2ts de 20%, r\u00e9duit la probabilit\u00e9 que vous soyez touch\u00e9 par des coups critiques en m\u00eal\u00e9e de 6% et r\u00e9duit la dur\u00e9e des effets d'\u00e9tourdissement et de ralentissement qui vous affectent de 50%. Vous b\u00e9n\u00e9ficiez de techniques d\u00e9moniaques sp\u00e9cifiques en plus de vos techniques normales. Temps de recharge de 3 minutes."
+                ],
+                "s": [
+                    59672
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Spell_Shadow_DemonForm"
+            }
+        ]
+    },
+    {
+        "n": "Destruction",
+        "t": [
+            {
+                "i": 944,
+                "n": "Trait de l'ombre am\u00e9lior\u00e9",
+                "m": 5,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Trait de l'ombre de 2%, et votre Trait de l'ombre a \u00e9galement 20% de chances de rendre votre cible vuln\u00e9rable aux d\u00e9g\u00e2ts des sorts, ce qui augmente les chances de coup critique des sorts contre cette cible de 5%. L'effet dure 30 s.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Trait de l'ombre de 4%, et votre Trait de l'ombre a \u00e9galement 40% de chances de rendre votre cible vuln\u00e9rable aux d\u00e9g\u00e2ts des sorts, ce qui augmente les chances de coup critique des sorts contre cette cible de 5%. L'effet dure 30 s.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Trait de l'ombre de 6%, et votre Trait de l'ombre a \u00e9galement 60% de chances de rendre votre cible vuln\u00e9rable aux d\u00e9g\u00e2ts des sorts, ce qui augmente les chances de coup critique des sorts contre cette cible de 5%. L'effet dure 30 s.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Trait de l'ombre de 8%, et votre Trait de l'ombre a \u00e9galement 80% de chances de rendre votre cible vuln\u00e9rable aux d\u00e9g\u00e2ts des sorts, ce qui augmente les chances de coup critique des sorts contre cette cible de 5%. L'effet dure 30 s.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Trait de l'ombre de 10%, et votre Trait de l'ombre a \u00e9galement 100% de chances de rendre votre cible vuln\u00e9rable aux d\u00e9g\u00e2ts des sorts, ce qui augmente les chances de coup critique des sorts contre cette cible de 5%. L'effet dure 30 s."
+                ],
+                "s": [
+                    17793,
+                    17796,
+                    17801,
+                    17802,
+                    17803
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Shadow_ShadowBolt"
+            },
+            {
+                "i": 943,
+                "n": "Fl\u00e9au",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit le temps d'incantation de vos sorts Trait de l'ombre, Trait du chaos et Immolation de 0.1 sec. et Feu de l'\u00e2me de 0.4 sec.",
+                    "R\u00e9duit le temps d'incantation de vos sorts Trait de l'ombre, Trait du chaos et Immolation de 0.2 sec. et Feu de l'\u00e2me de 0.8 sec.",
+                    "R\u00e9duit le temps d'incantation de vos sorts Trait de l'ombre, Trait du chaos et Immolation de 0.3 sec. et Feu de l'\u00e2me de 1.2 sec.",
+                    "R\u00e9duit le temps d'incantation de vos sorts Trait de l'ombre, Trait du chaos et Immolation de 0.4 sec. et Feu de l'\u00e2me de 1.6 sec.",
+                    "R\u00e9duit le temps d'incantation de vos sorts Trait de l'ombre, Trait du chaos et Immolation de 0.5 sec. et Feu de l'\u00e2me de 2 sec."
+                ],
+                "s": [
+                    17788,
+                    17789,
+                    17790,
+                    17791,
+                    17792
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Shadow_DeathPact"
+            },
+            {
+                "i": 982,
+                "n": "Cons\u00e9quences",
+                "m": 2,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts p\u00e9riodiques inflig\u00e9s par votre Immolation de 3%, et votre Conflagration a 50% de chances d'h\u00e9b\u00e9ter la cible pendant 5 s.",
+                    "Augmente les d\u00e9g\u00e2ts p\u00e9riodiques inflig\u00e9s par votre Immolation de 6%, et votre Conflagration a 100% de chances d'h\u00e9b\u00e9ter la cible pendant 5 s."
+                ],
+                "s": [
+                    18119,
+                    18120
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Fire_Fire"
+            },
+            {
+                "i": 1887,
+                "n": "Peau de la fournaise",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 2%.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 4%.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 6%."
+                ],
+                "s": [
+                    63349,
+                    63350,
+                    63351
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Ability_Mage_MoltenArmor"
+            },
+            {
+                "i": 941,
+                "n": "Cataclysme",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana de vos sorts de Destruction de 4%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos sorts de Destruction de 7%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos sorts de Destruction de 10%."
+                ],
+                "s": [
+                    17778,
+                    17779,
+                    17780
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Fire_WindsofWoe"
+            },
+            {
+                "i": 983,
+                "n": "Puissance d\u00e9moniaque",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge du sort Fouet de la douleur de votre succube de 3 sec. et le temps d'incantation du sort Eclair de feu de votre Diablotin de 0.25.2 sec.",
+                    "R\u00e9duit le temps de recharge du sort Fouet de la douleur de votre succube de 6 sec. et le temps d'incantation du sort Eclair de feu de votre Diablotin de 0.5.2 sec."
+                ],
+                "s": [
+                    18126,
+                    18127
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Fire_FireBolt"
+            },
+            {
+                "i": 963,
+                "n": "Br\u00fblure de l'ombre",
+                "m": 1,
+                "d": [
+                    "Frappe instantan\u00e9ment la cible et lui inflige 87 to 100 points de d\u00e9g\u00e2ts d'Ombre. Si la cible meurt dans les 5 s sous l'effet du sort Br\u00fblure de l'ombre et rapporte de l'exp\u00e9rience ou de l'honneur, le lanceur gagne un Fragment d'\u00e2me."
+                ],
+                "s": [
+                    17877
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Shadow_ScourgeBuild"
+            },
+            {
+                "i": 967,
+                "n": "Ruine",
+                "m": 5,
+                "d": [
+                    "Augmente de 20% les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de vos sorts de Destruction et le sort Eclair de feu de votre diablotin.",
+                    "Augmente de 40% les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de vos sorts de Destruction et le sort Eclair de feu de votre diablotin.",
+                    "Augmente de 60% les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de vos sorts de Destruction et le sort Eclair de feu de votre diablotin.",
+                    "Augmente de 80% les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de vos sorts de Destruction et le sort Eclair de feu de votre diablotin.",
+                    "Augmente de 100% les points de d\u00e9g\u00e2ts suppl\u00e9mentaires inflig\u00e9s par les coups critiques de vos sorts de Destruction et le sort Eclair de feu de votre diablotin."
+                ],
+                "s": [
+                    17959,
+                    59738,
+                    59739,
+                    59740,
+                    59741
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Shadow_ShadowWordPain"
+            },
+            {
+                "i": 985,
+                "n": "Intensit\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit de 35% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez ou canalisez tout sort de Destruction.",
+                    "R\u00e9duit de 70% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez ou canalisez tout sort de Destruction."
+                ],
+                "s": [
+                    18135,
+                    18136
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Fire_LavaSpawn"
+            },
+            {
+                "i": 964,
+                "n": "Allonge de destruction",
+                "m": 2,
+                "d": [
+                    "Augmente de 10% la port\u00e9e de vos sorts de Destruction et r\u00e9duit de 10% la menace g\u00e9n\u00e9r\u00e9e par les sorts de Destruction.",
+                    "Augmente de 20% la port\u00e9e de vos sorts de Destruction et r\u00e9duit de 20% la menace g\u00e9n\u00e9r\u00e9e par les sorts de Destruction."
+                ],
+                "s": [
+                    17917,
+                    17918
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Shadow_CorpseExplode"
+            },
+            {
+                "i": 965,
+                "n": "Douleur br\u00fblante am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente de 4% les chances d'infliger un coup critique avec votre sort Douleur br\u00fblante.",
+                    "Augmente de 7% les chances d'infliger un coup critique avec votre sort Douleur br\u00fblante.",
+                    "Augmente de 10% les chances d'infliger un coup critique avec votre sort Douleur br\u00fblante."
+                ],
+                "s": [
+                    17927,
+                    17929,
+                    17930
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_Fire_SoulBurn"
+            },
+            {
+                "i": 1817,
+                "n": "Contrecoup",
+                "m": 3,
+                "d": [
+                    "Augmente vos chances d'infliger un coup critique avec les sorts de 1% suppl\u00e9mentaires et vous conf\u00e8re 8% de chances lorsque vous \u00eates touch\u00e9 par une attaque physique de r\u00e9duire le temps d'incantation de votre prochain sort Trait de l'ombre ou Incin\u00e9rer de 100%. Cet effet dure 8 s et ne peut se produire plus d'une fois toutes les 8 secondes.",
+                    "Augmente vos chances d'infliger un coup critique avec les sorts de 2% suppl\u00e9mentaires et vous conf\u00e8re 16% de chances lorsque vous \u00eates touch\u00e9 par une attaque physique de r\u00e9duire le temps d'incantation de votre prochain sort Trait de l'ombre ou Incin\u00e9rer de 100%. Cet effet dure 8 s et ne peut se produire plus d'une fois toutes les 8 secondes.",
+                    "Augmente vos chances d'infliger un coup critique avec les sorts de 3% suppl\u00e9mentaires et vous conf\u00e8re 25% de chances lorsque vous \u00eates touch\u00e9 par une attaque physique de r\u00e9duire le temps d'incantation de votre prochain sort Trait de l'ombre ou Incin\u00e9rer de 100%. Cet effet dure 8 s et ne peut se produire plus d'une fois toutes les 8 secondes."
+                ],
+                "s": [
+                    34935,
+                    34938,
+                    34939
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Fire_PlayingWithFire",
+                "r": [
+                    8,
+                    2
+                ]
+            },
+            {
+                "i": 961,
+                "n": "Immolation am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Immolation de 10%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Immolation de 20%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Immolation de 30%."
+                ],
+                "s": [
+                    17815,
+                    17833,
+                    17834
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Fire_Immolation"
+            },
+            {
+                "i": 981,
+                "n": "D\u00e9vastation",
+                "m": 1,
+                "d": [
+                    "Augmente de 5% vos chances d'infliger un coup critique avec vos sorts de Destruction."
+                ],
+                "s": [
+                    18130
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Fire_FlameShock",
+                "r": [
+                    7,
+                    5
+                ]
+            },
+            {
+                "i": 1679,
+                "n": "Protection du N\u00e9ant",
+                "m": 3,
+                "d": [
+                    "Apr\u00e8s avoir \u00e9t\u00e9 touch\u00e9 par un sort, vous avez 10% de chances de recevoir la Protection du N\u00e9ant, qui r\u00e9duit tous les d\u00e9g\u00e2ts de la m\u00eame \u00e9cole de 30% pendant 8 s.",
+                    "Apr\u00e8s avoir \u00e9t\u00e9 touch\u00e9 par un sort, vous avez 20% de chances de recevoir la Protection du N\u00e9ant, qui r\u00e9duit tous les d\u00e9g\u00e2ts de la m\u00eame \u00e9cole de 30% pendant 8 s.",
+                    "Apr\u00e8s avoir \u00e9t\u00e9 touch\u00e9 par un sort, vous avez 30% de chances de recevoir la Protection du N\u00e9ant, qui r\u00e9duit tous les d\u00e9g\u00e2ts de la m\u00eame \u00e9cole de 30% pendant 8 s."
+                ],
+                "s": [
+                    30299,
+                    30301,
+                    30302
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Shadow_NetherProtection"
+            },
+            {
+                "i": 966,
+                "n": "Temp\u00eate ardente",
+                "m": 5,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu de 3% et r\u00e9duit le temps d'incantation de votre sort Incin\u00e9rer de 0.05.2 sec.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu de 6% et r\u00e9duit le temps d'incantation de votre sort Incin\u00e9rer de 0.1.2 sec.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu de 9% et r\u00e9duit le temps d'incantation de votre sort Incin\u00e9rer de 0.15.2 sec.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu de 12% et r\u00e9duit le temps d'incantation de votre sort Incin\u00e9rer de 0.2.2 sec.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts de Feu de 15% et r\u00e9duit le temps d'incantation de votre sort Incin\u00e9rer de 0.25.2 sec."
+                ],
+                "s": [
+                    17954,
+                    17955,
+                    17956,
+                    17957,
+                    17958
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Fire_SelfDestruct"
+            },
+            {
+                "i": 968,
+                "n": "Conflagration",
+                "m": 1,
+                "d": [
+                    "?s56235[Cause][Consomme] un effet d'Immolation ou d'Ombreflamme sur la cible ennemie pour lui infliger instantan\u00e9ment un montant de d\u00e9g\u00e2ts \u00e9gal \u00e0 60% de votre Immolation ou votre Ombreflamme et inflige 40% de d\u00e9g\u00e2ts suppl\u00e9mentaires en 6 s."
+                ],
+                "s": [
+                    17962
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Fire_Fireball",
+                "r": [
+                    12,
+                    3
+                ]
+            },
+            {
+                "i": 1678,
+                "n": "Suceur d'\u00e2me",
+                "m": 3,
+                "d": [
+                    "Conf\u00e8re \u00e0 vos sorts Trait de l'ombre, Br\u00fblure de l'ombre, Trait du chaos, Feu de l'\u00e2me, Incin\u00e9rer, Douleur br\u00fblante et Conflagration 10% de chances de vous rendre un montant de points de vie \u00e9gal \u00e0 20% des d\u00e9g\u00e2ts inflig\u00e9s.",
+                    "Conf\u00e8re \u00e0 vos sorts Trait de l'ombre, Br\u00fblure de l'ombre, Trait du chaos, Feu de l'\u00e2me, Incin\u00e9rer, Douleur br\u00fblante et Conflagration 20% de chances de vous rendre un montant de points de vie \u00e9gal \u00e0 20% des d\u00e9g\u00e2ts inflig\u00e9s.",
+                    "Conf\u00e8re \u00e0 vos sorts Trait de l'ombre, Br\u00fblure de l'ombre, Trait du chaos, Feu de l'\u00e2me, Incin\u00e9rer, Douleur br\u00fblante et Conflagration 30% de chances de vous rendre un montant de points de vie \u00e9gal \u00e0 20% des d\u00e9g\u00e2ts inflig\u00e9s."
+                ],
+                "s": [
+                    30293,
+                    30295,
+                    30296
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Shadow_SoulLeech_3"
+            },
+            {
+                "i": 986,
+                "n": "Pyroclasme",
+                "m": 3,
+                "d": [
+                    "Quand vous r\u00e9ussissez un coup critique avec Douleur br\u00fblante ou Conflagration, les d\u00e9g\u00e2ts de vos sorts de Feu et d'Ombre sont augment\u00e9s de 2% pendant 10 s.",
+                    "Quand vous r\u00e9ussissez un coup critique avec Douleur br\u00fblante ou Conflagration, les d\u00e9g\u00e2ts de vos sorts de Feu et d'Ombre sont augment\u00e9s de 4% pendant 10 s.",
+                    "Quand vous r\u00e9ussissez un coup critique avec Douleur br\u00fblante ou Conflagration, les d\u00e9g\u00e2ts de vos sorts de Feu et d'Ombre sont augment\u00e9s de 6% pendant 10 s."
+                ],
+                "s": [
+                    18096,
+                    18073,
+                    63245
+                ],
+                "x": 3,
+                "y": 6,
+                "iconname": "Spell_Fire_Volcano"
+            },
+            {
+                "i": 1677,
+                "n": "Ombre et flammes",
+                "m": 5,
+                "d": [
+                    "Vos sorts Trait de l'ombre, Br\u00fblure de l'ombre, Trait du chaos et Incin\u00e9rer b\u00e9n\u00e9ficient de 4% suppl\u00e9mentaires des effets du bonus relatif aux d\u00e9g\u00e2ts des sorts.",
+                    "Vos sorts Trait de l'ombre, Br\u00fblure de l'ombre, Trait du chaos et Incin\u00e9rer b\u00e9n\u00e9ficient de 8% suppl\u00e9mentaires des effets du bonus relatif aux d\u00e9g\u00e2ts des sorts.",
+                    "Vos sorts Trait de l'ombre, Br\u00fblure de l'ombre, Trait du chaos et Incin\u00e9rer b\u00e9n\u00e9ficient de 12% suppl\u00e9mentaires des effets du bonus relatif aux d\u00e9g\u00e2ts des sorts.",
+                    "Vos sorts Trait de l'ombre, Br\u00fblure de l'ombre, Trait du chaos et Incin\u00e9rer b\u00e9n\u00e9ficient de 16% suppl\u00e9mentaires des effets du bonus relatif aux d\u00e9g\u00e2ts des sorts.",
+                    "Vos sorts Trait de l'ombre, Br\u00fblure de l'ombre, Trait du chaos et Incin\u00e9rer b\u00e9n\u00e9ficient de 20% suppl\u00e9mentaires des effets du bonus relatif aux d\u00e9g\u00e2ts des sorts."
+                ],
+                "s": [
+                    30288,
+                    30289,
+                    30290,
+                    30291,
+                    30292
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Shadow_ShadowandFlame"
+            },
+            {
+                "i": 1889,
+                "n": "Suceur d'\u00e2me am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "L'effet de votre Suceur d'\u00e2me rend \u00e9galement \u00e0 vous-m\u00eame et \u00e0 votre d\u00e9mon invoqu\u00e9 un montant de mana \u00e9gal \u00e0 1% du maximum de mana, et il a 50% de chances de faire b\u00e9n\u00e9ficier jusqu'\u00e0 10 membres du groupe ou raid d'une r\u00e9g\u00e9n\u00e9ration de mana \u00e9gale \u00e0 1% du maximum de mana toutes les 5 sec. Dure 15 s.",
+                    "L'effet de votre Suceur d'\u00e2me rend \u00e9galement \u00e0 vous-m\u00eame et \u00e0 votre d\u00e9mon invoqu\u00e9 un montant de mana \u00e9gal \u00e0 2% du maximum de mana, et il a 100% de chances de faire b\u00e9n\u00e9ficier jusqu'\u00e0 10 membres du groupe ou raid d'une r\u00e9g\u00e9n\u00e9ration de mana \u00e9gale \u00e0 1% du maximum de mana toutes les 5 sec. Dure 15 s."
+                ],
+                "s": [
+                    54117,
+                    54118
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Ability_Warlock_ImprovedSoulLeech",
+                "r": [
+                    17,
+                    3
+                ]
+            },
+            {
+                "i": 1888,
+                "n": "Explosion de fum\u00e9es",
+                "m": 3,
+                "d": [
+                    "Quand vous lancez Conflagration, le temps d'incantation et le temps de recharge global de vos trois prochains sorts de Destruction est r\u00e9duit de 10%. Dure 15 s.",
+                    "Quand vous lancez Conflagration, le temps d'incantation et le temps de recharge global de vos trois prochains sorts de Destruction est r\u00e9duit de 20%. Dure 15 s.",
+                    "Quand vous lancez Conflagration, le temps d'incantation et le temps de recharge global de vos trois prochains sorts de Destruction est r\u00e9duit de 30%. Dure 15 s."
+                ],
+                "s": [
+                    47258,
+                    47259,
+                    47260
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Warlock_Backdraft",
+                "r": [
+                    16,
+                    1
+                ]
+            },
+            {
+                "i": 1676,
+                "n": "Furie de l'ombre",
+                "m": 1,
+                "d": [
+                    "La furie de l'ombre est lib\u00e9r\u00e9e. Elle inflige 343 to 408 points de d\u00e9g\u00e2ts d'Ombre et \u00e9tourdit tous les ennemis dans un rayon de 8 m\u00e8tres pendant 3 s."
+                ],
+                "s": [
+                    30283
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Shadow_Shadowfury"
+            },
+            {
+                "i": 2045,
+                "n": "Diablotin surpuissant",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre diablotin de 10%, et tous les coups critiques qu'il r\u00e9ussit ont 33% de chances d'augmenter les chances de coup critique de votre prochain sort de 100%. Cet effet dure 8 s.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre diablotin de 20%, et tous les coups critiques qu'il r\u00e9ussit ont 66% de chances d'augmenter les chances de coup critique de votre prochain sort de 100%. Cet effet dure 8 s.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre diablotin de 30%, et tous les coups critiques qu'il r\u00e9ussit ont 100% de chances d'augmenter les chances de coup critique de votre prochain sort de 100%. Cet effet dure 8 s."
+                ],
+                "s": [
+                    47220,
+                    47221,
+                    47223
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Warlock_EmpoweredImp"
+            },
+            {
+                "i": 1890,
+                "n": "Feu et soufre",
+                "m": 5,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Incin\u00e9rer et Trait du chaos aux cibles affect\u00e9es par votre Immolation de 2%, et les chances de coup critique de votre sort Conflagration sont augment\u00e9es de 5%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Incin\u00e9rer et Trait du chaos aux cibles affect\u00e9es par votre Immolation de 4%, et les chances de coup critique de votre sort Conflagration sont augment\u00e9es de 10%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Incin\u00e9rer et Trait du chaos aux cibles affect\u00e9es par votre Immolation de 6%, et les chances de coup critique de votre sort Conflagration sont augment\u00e9es de 15%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Incin\u00e9rer et Trait du chaos aux cibles affect\u00e9es par votre Immolation de 8%, et les chances de coup critique de votre sort Conflagration sont augment\u00e9es de 20%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Incin\u00e9rer et Trait du chaos aux cibles affect\u00e9es par votre Immolation de 10%, et les chances de coup critique de votre sort Conflagration sont augment\u00e9es de 25%."
+                ],
+                "s": [
+                    47266,
+                    47267,
+                    47268,
+                    47269,
+                    47270
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Warlock_FireandBrimstone"
+            },
+            {
+                "i": 1891,
+                "n": "Trait du chaos",
+                "m": 1,
+                "d": [
+                    "Lance un \u00e9clair de feu chaotique sur l'ennemi et lui inflige 837 to 1062 points de d\u00e9g\u00e2ts de Feu. On ne peut pas r\u00e9sister \u00e0 Trait du chaos, et il traverse tous les effets d'absorption."
+                ],
+                "s": [
+                    50796
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Warlock_ChaosBolt"
+            }
+        ]
+    }
+])

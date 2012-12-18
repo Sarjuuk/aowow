@@ -1,0 +1,1148 @@
+var g_pet_icons = {
+    "1": "Ability_Hunter_Pet_Wolf",
+    "2": "Ability_Hunter_Pet_Cat",
+    "3": "Ability_Hunter_Pet_Spider",
+    "4": "Ability_Hunter_Pet_Bear",
+    "5": "Ability_Hunter_Pet_Boar",
+    "6": "Ability_Hunter_Pet_Crocolisk",
+    "7": "Ability_Hunter_Pet_Vulture",
+    "8": "Ability_Hunter_Pet_Crab",
+    "9": "Ability_Hunter_Pet_Gorilla",
+    "11": "Ability_Hunter_Pet_Raptor",
+    "12": "Ability_Hunter_Pet_TallStrider",
+    "20": "Ability_Hunter_Pet_Scorpid",
+    "21": "Ability_Hunter_Pet_Turtle",
+    "24": "Ability_Hunter_Pet_Bat",
+    "25": "Ability_Hunter_Pet_Hyena",
+    "26": "Ability_Hunter_Pet_Owl",
+    "27": "Ability_Hunter_Pet_WindSerpent",
+    "30": "Ability_Hunter_Pet_DragonHawk",
+    "31": "Ability_Hunter_Pet_Ravager",
+    "32": "Ability_Hunter_Pet_WarpStalker",
+    "33": "Ability_Hunter_Pet_Sporebat",
+    "34": "Ability_Hunter_Pet_NetherRay",
+    "35": "Spell_Nature_GuardianWard",
+    "37": "Ability_Hunter_Pet_Moth",
+    "38": "Ability_Hunter_Pet_Chimera",
+    "39": "Ability_Hunter_Pet_Devilsaur",
+    "41": "Ability_Hunter_Pet_Silithid",
+    "42": "Ability_Hunter_Pet_Worm",
+    "43": "Ability_Hunter_Pet_Rhino",
+    "44": "Ability_Hunter_Pet_Wasp",
+    "45": "Ability_Hunter_Pet_CoreHound",
+    "46": "Ability_Druid_PrimalPrecision"
+}
+
+var g_pet_talents = [
+    {
+        "n": "[Ferocity]",
+        "t": [
+            {
+                "i": 2107,
+                "n": "[Cobra Reflexes]",
+                "m": 2,
+                "d": [
+                    "[Increases your pet's attack speed by 15%.  Your pet will hit faster but each hit will do less damage.]",
+                    "[Increases your pet's attack speed by 30%.  Your pet will hit faster but each hit will do less damage.]"
+                ],
+                "s": [
+                    61682,
+                    61683
+                ],
+                "x": 0,
+                "y": 0
+            },
+            {
+                "i": 2203,
+                "n": "[Dive]",
+                "m": 1,
+                "d": [
+                    "[Increases your pet's movement speed by 80% for 16 seg.]"
+                ],
+                "s": [
+                    23145
+                ],
+                "x": 1,
+                "y": 0,
+                "f": [
+                    7,
+                    37,
+                    44
+                ]
+            },
+            {
+                "i": 2109,
+                "n": "[Dash]",
+                "m": 1,
+                "d": [
+                    "[Increases your pet's movement speed by 80% for 16 seg.]"
+                ],
+                "s": [
+                    61684
+                ],
+                "x": 1,
+                "y": 0,
+                "f": [
+                    1,
+                    2,
+                    11,
+                    12,
+                    25,
+                    39,
+                    45,
+                    46
+                ]
+            },
+            {
+                "i": 2112,
+                "n": "[Great Stamina]",
+                "m": 3,
+                "d": [
+                    "[Increases your pet's total Stamina by 4%.]",
+                    "[Increases your pet's total Stamina by 8%.]",
+                    "[Increases your pet's total Stamina by 12%.]"
+                ],
+                "s": [
+                    61686,
+                    61687,
+                    61688
+                ],
+                "x": 2,
+                "y": 0
+            },
+            {
+                "i": 2113,
+                "n": "[Natural Armor]",
+                "m": 2,
+                "d": [
+                    "[Increases your pet's armor by 5%.]",
+                    "[Increases your pet's armor by 10%.]"
+                ],
+                "s": [
+                    61689,
+                    61690
+                ],
+                "x": 3,
+                "y": 0
+            },
+            {
+                "i": 2124,
+                "n": "[Improved Cower]",
+                "m": 2,
+                "d": [
+                    "[The movement speed penalty of your pet's Cower is reduced by 50%.]",
+                    "[The movement speed penalty of your pet's Cower is reduced by 100%.]"
+                ],
+                "s": [
+                    53180,
+                    53181
+                ],
+                "x": 0,
+                "y": 1
+            },
+            {
+                "i": 2128,
+                "n": "[Bloodthirsty]",
+                "m": 2,
+                "d": [
+                    "[Your pet's attacks have a 10% chance to increase its happiness by 5% and heal 5% of its total health.]",
+                    "[Your pet's attacks have a 20% chance to increase its happiness by 5% and heal 5% of its total health.]"
+                ],
+                "s": [
+                    53186,
+                    53187
+                ],
+                "x": 1,
+                "y": 1
+            },
+            {
+                "i": 2125,
+                "n": "[Spiked Collar]",
+                "m": 3,
+                "d": [
+                    "[Your pet does an additional 3% damage with all attacks.]",
+                    "[Your pet does an additional 6% damage with all attacks.]",
+                    "[Your pet does an additional 9% damage with all attacks.]"
+                ],
+                "s": [
+                    53182,
+                    53183,
+                    53184
+                ],
+                "x": 2,
+                "y": 1
+            },
+            {
+                "i": 2151,
+                "n": "[Boar's Speed]",
+                "m": 1,
+                "d": [
+                    "[Increases your pet's movement speed by 30%.]"
+                ],
+                "s": [
+                    19596
+                ],
+                "x": 3,
+                "y": 1
+            },
+            {
+                "i": 2106,
+                "n": "[Culling the Herd]",
+                "m": 3,
+                "d": [
+                    "[When your pet's Claw, Bite, or Smack ability deals a critical strike, you and your pet deal 1% increased damage for 10 seg.]",
+                    "[When your pet's Claw, Bite, or Smack ability deals a critical strike, you and your pet deal 2% increased damage for 10 seg.]",
+                    "[When your pet's Claw, Bite, or Smack ability deals a critical strike, you and your pet deal 3% increased damage for 10 seg.]"
+                ],
+                "s": [
+                    61680,
+                    61681,
+                    52858
+                ],
+                "x": 0,
+                "y": 2
+            },
+            {
+                "i": 2152,
+                "n": "[Lionhearted]",
+                "m": 2,
+                "d": [
+                    "[Reduces the duration of all Stun and Fear effects used against your pet by 15%.]",
+                    "[Reduces the duration of all Stun and Fear effects used against your pet by 30%.]"
+                ],
+                "s": [
+                    53409,
+                    53411
+                ],
+                "x": 2,
+                "y": 2
+            },
+            {
+                "i": 2219,
+                "n": "[Swoop]",
+                "m": 1,
+                "d": [
+                    "[Your pet swoops at an enemy, immobilizing the target for 1 seg, and adds 25% melee attack power to the pet's next attack.]"
+                ],
+                "s": [
+                    52825
+                ],
+                "x": 3,
+                "y": 2,
+                "f": [
+                    7,
+                    37,
+                    44
+                ]
+            },
+            {
+                "i": 2111,
+                "n": "[Charge]",
+                "m": 1,
+                "d": [
+                    "[Your pet charges an enemy, immobilizing the target for 1 seg, and increasing the pet's melee attack power by 25% for its next attack.]"
+                ],
+                "s": [
+                    61685
+                ],
+                "x": 3,
+                "y": 2,
+                "f": [
+                    1,
+                    2,
+                    11,
+                    12,
+                    25,
+                    39,
+                    45,
+                    46
+                ]
+            },
+            {
+                "i": 2156,
+                "n": "[Heart of the Phoenix]",
+                "m": 1,
+                "d": [
+                    "[When your pet dies, it will miraculously return to life with full health.]"
+                ],
+                "s": [
+                    55709
+                ],
+                "x": 1,
+                "y": 3,
+                "r": [
+                    6,
+                    2
+                ]
+            },
+            {
+                "i": 2129,
+                "n": "[Spider's Bite]",
+                "m": 3,
+                "d": [
+                    "[Increases the critical strike chance of your pet by 3%.]",
+                    "[Increases the critical strike chance of your pet by 6%.]",
+                    "[Increases the critical strike chance of your pet by 9%.]"
+                ],
+                "s": [
+                    53203,
+                    53204,
+                    53205
+                ],
+                "x": 2,
+                "y": 3
+            },
+            {
+                "i": 2154,
+                "n": "[Great Resistance]",
+                "m": 3,
+                "d": [
+                    "[Your pet takes 5% less damage from Arcane, Fire, Frost, Nature and Shadow magic.]",
+                    "[Your pet takes 10% less damage from Arcane, Fire, Frost, Nature and Shadow magic.]",
+                    "[Your pet takes 15% less damage from Arcane, Fire, Frost, Nature and Shadow magic.]"
+                ],
+                "s": [
+                    53427,
+                    53429,
+                    53430
+                ],
+                "x": 3,
+                "y": 3
+            },
+            {
+                "i": 2155,
+                "n": "[Rabid]",
+                "m": 1,
+                "d": [
+                    "[Your pet goes into a killing frenzy.  Successful attacks have a chance to increase attack power by 5%.  This effect will stack up to 5 times.  Lasts 20 seg.]"
+                ],
+                "s": [
+                    53401
+                ],
+                "x": 0,
+                "y": 4
+            },
+            {
+                "i": 2153,
+                "n": "[Lick Your Wounds]",
+                "m": 1,
+                "d": [
+                    "[Your pet heals itself for 100% of its total health over 5 seg while channeling.]"
+                ],
+                "s": [
+                    53426
+                ],
+                "x": 1,
+                "y": 4,
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 2157,
+                "n": "[Call of the Wild]",
+                "m": 1,
+                "d": [
+                    "[Your pet roars, increasing your pet's and your melee and ranged attack power by 10%.  Lasts 20 seg.]"
+                ],
+                "s": [
+                    53434
+                ],
+                "x": 2,
+                "y": 4,
+                "r": [
+                    14,
+                    3
+                ]
+            },
+            {
+                "i": 2254,
+                "n": "[Shark Attack]",
+                "m": 2,
+                "d": [
+                    "[Your pet does an additional 3% damage with all attacks.]",
+                    "[Your pet does an additional 6% damage with all attacks.]"
+                ],
+                "s": [
+                    62759,
+                    62760
+                ],
+                "x": 0,
+                "y": 5
+            },
+            {
+                "i": 2253,
+                "n": "[Wild Hunt]",
+                "m": 2,
+                "d": [
+                    "[Increases the contribution your pet gets from your Stamina by 20% and attack power by 15%.]",
+                    "[Increases the contribution your pet gets from your Stamina by 40% and attack power by 30%.]"
+                ],
+                "s": [
+                    62758,
+                    62762
+                ],
+                "x": 2,
+                "y": 5,
+                "r": [
+                    18,
+                    1
+                ]
+            }
+        ],
+        "icon": "Ability_Druid_KingoftheJungle",
+        "f": [
+            1,
+            2,
+            7,
+            11,
+            12,
+            25,
+            37,
+            39,
+            44,
+            45,
+            46
+        ]
+    },
+    {
+        "n": "[Tenacity]",
+        "t": [
+            {
+                "i": 2114,
+                "n": "[Cobra Reflexes]",
+                "m": 2,
+                "d": [
+                    "[Increases your pet's attack speed by 15%.  Your pet will hit faster but each hit will do less damage.]",
+                    "[Increases your pet's attack speed by 30%.  Your pet will hit faster but each hit will do less damage.]"
+                ],
+                "s": [
+                    61682,
+                    61683
+                ],
+                "x": 0,
+                "y": 0
+            },
+            {
+                "i": 2237,
+                "n": "[Charge]",
+                "m": 1,
+                "d": [
+                    "[Your pet charges an enemy, immobilizing the target for 1 seg, and increasing the pet's melee attack power by 25% for its next attack.]"
+                ],
+                "s": [
+                    61685
+                ],
+                "x": 1,
+                "y": 0,
+                "f": [
+                    4,
+                    5,
+                    6,
+                    8,
+                    9,
+                    20,
+                    21,
+                    32,
+                    42,
+                    43
+                ]
+            },
+            {
+                "i": 2116,
+                "n": "[Great Stamina]",
+                "m": 3,
+                "d": [
+                    "[Increases your pet's total Stamina by 4%.]",
+                    "[Increases your pet's total Stamina by 8%.]",
+                    "[Increases your pet's total Stamina by 12%.]"
+                ],
+                "s": [
+                    61686,
+                    61687,
+                    61688
+                ],
+                "x": 2,
+                "y": 0
+            },
+            {
+                "i": 2117,
+                "n": "[Natural Armor]",
+                "m": 2,
+                "d": [
+                    "[Increases your pet's armor by 5%.]",
+                    "[Increases your pet's armor by 10%.]"
+                ],
+                "s": [
+                    61689,
+                    61690
+                ],
+                "x": 3,
+                "y": 0
+            },
+            {
+                "i": 2126,
+                "n": "[Spiked Collar]",
+                "m": 3,
+                "d": [
+                    "[Your pet does an additional 3% damage with all attacks.]",
+                    "[Your pet does an additional 6% damage with all attacks.]",
+                    "[Your pet does an additional 9% damage with all attacks.]"
+                ],
+                "s": [
+                    53182,
+                    53183,
+                    53184
+                ],
+                "x": 0,
+                "y": 1
+            },
+            {
+                "i": 2160,
+                "n": "[Boar's Speed]",
+                "m": 1,
+                "d": [
+                    "[Increases your pet's movement speed by 30%.]"
+                ],
+                "s": [
+                    19596
+                ],
+                "x": 1,
+                "y": 1
+            },
+            {
+                "i": 2173,
+                "n": "[Blood of the Rhino]",
+                "m": 2,
+                "d": [
+                    "[Increases your pet's total Stamina by 2% and increases all healing effects on your pet by 20%.]",
+                    "[Increases your pet's total Stamina by 4% and increases all healing effects on your pet by 40%.]"
+                ],
+                "s": [
+                    53481,
+                    53482
+                ],
+                "x": 2,
+                "y": 1,
+                "r": [
+                    2,
+                    3
+                ]
+            },
+            {
+                "i": 2122,
+                "n": "[Pet Barding]",
+                "m": 2,
+                "d": [
+                    "[Increases your pet's armor by 5% and chance to Dodge by 1%.]",
+                    "[Increases your pet's armor by 10% and chance to Dodge by 2%.]"
+                ],
+                "s": [
+                    53175,
+                    53176
+                ],
+                "x": 3,
+                "y": 1,
+                "r": [
+                    3,
+                    2
+                ]
+            },
+            {
+                "i": 2110,
+                "n": "[Culling the Herd]",
+                "m": 3,
+                "d": [
+                    "[When your pet's Claw, Bite, or Smack ability deals a critical strike, you and your pet deal 1% increased damage for 10 seg.]",
+                    "[When your pet's Claw, Bite, or Smack ability deals a critical strike, you and your pet deal 2% increased damage for 10 seg.]",
+                    "[When your pet's Claw, Bite, or Smack ability deals a critical strike, you and your pet deal 3% increased damage for 10 seg.]"
+                ],
+                "s": [
+                    61680,
+                    61681,
+                    52858
+                ],
+                "x": 0,
+                "y": 2
+            },
+            {
+                "i": 2123,
+                "n": "[Guard Dog]",
+                "m": 2,
+                "d": [
+                    "[Your pet's Growl generates 10% additional threat and 10% of its total happiness.]",
+                    "[Your pet's Growl generates 20% additional threat and 10% of its total happiness.]"
+                ],
+                "s": [
+                    53178,
+                    53179
+                ],
+                "x": 1,
+                "y": 2
+            },
+            {
+                "i": 2162,
+                "n": "[Lionhearted]",
+                "m": 2,
+                "d": [
+                    "[Reduces the duration of all Stun and Fear effects used against your pet by 15%.]",
+                    "[Reduces the duration of all Stun and Fear effects used against your pet by 30%.]"
+                ],
+                "s": [
+                    53409,
+                    53411
+                ],
+                "x": 2,
+                "y": 2
+            },
+            {
+                "i": 2277,
+                "n": "[Thunderstomp]",
+                "m": 1,
+                "d": [
+                    "[Shakes the ground with thundering force, doing 3 - 6 Nature damage to all enemies within 8 yards.  This ability causes a moderate amount of additional threat.]"
+                ],
+                "s": [
+                    63900
+                ],
+                "x": 3,
+                "y": 2
+            },
+            {
+                "i": 2163,
+                "n": "[Grace of the Mantis]",
+                "m": 2,
+                "d": [
+                    "[Reduces the chance your pet will be critically hit by melee attacks by 2%.]",
+                    "[Reduces the chance your pet will be critically hit by melee attacks by 4%.]"
+                ],
+                "s": [
+                    53450,
+                    53451
+                ],
+                "x": 2,
+                "y": 3
+            },
+            {
+                "i": 2161,
+                "n": "[Great Resistance]",
+                "m": 3,
+                "d": [
+                    "[Your pet takes 5% less damage from Arcane, Fire, Frost, Nature and Shadow magic.]",
+                    "[Your pet takes 10% less damage from Arcane, Fire, Frost, Nature and Shadow magic.]",
+                    "[Your pet takes 15% less damage from Arcane, Fire, Frost, Nature and Shadow magic.]"
+                ],
+                "s": [
+                    53427,
+                    53429,
+                    53430
+                ],
+                "x": 3,
+                "y": 3
+            },
+            {
+                "i": 2171,
+                "n": "[Last Stand]",
+                "m": 1,
+                "d": [
+                    "[Your pet temporarily gains 30% of its maximum health for 20 seg.  After the effect expires, the health is lost.]"
+                ],
+                "s": [
+                    53478
+                ],
+                "x": 0,
+                "y": 4
+            },
+            {
+                "i": 2170,
+                "n": "[Taunt]",
+                "m": 1,
+                "d": [
+                    "[Your pet taunts the target to attack it for 3 seg.]"
+                ],
+                "s": [
+                    53477
+                ],
+                "x": 1,
+                "y": 4,
+                "r": [
+                    9,
+                    2
+                ]
+            },
+            {
+                "i": 2172,
+                "n": "[Roar of Sacrifice]",
+                "m": 1,
+                "d": [
+                    "[Protects a friendly target from critical strikes, making attacks against that target unable to be critical strikes, but 20% of all damage taken by that target is also taken by the pet.  Lasts 12 seg.]"
+                ],
+                "s": [
+                    53480
+                ],
+                "x": 2,
+                "y": 4,
+                "r": [
+                    12,
+                    2
+                ]
+            },
+            {
+                "i": 2169,
+                "n": "[Intervene]",
+                "m": 1,
+                "d": [
+                    "[Your pet runs at high speed towards a group member, intercepting the next melee or ranged attack made against them.]"
+                ],
+                "s": [
+                    53476
+                ],
+                "x": 3,
+                "y": 4
+            },
+            {
+                "i": 2258,
+                "n": "[Silverback]",
+                "m": 2,
+                "d": [
+                    "[Your pet's Growl also heals it for 1% of its total health.]",
+                    "[Your pet's Growl also heals it for 2% of its total health.]"
+                ],
+                "s": [
+                    62764,
+                    62765
+                ],
+                "x": 1,
+                "y": 5
+            },
+            {
+                "i": 2255,
+                "n": "[Wild Hunt]",
+                "m": 2,
+                "d": [
+                    "[Increases the contribution your pet gets from your Stamina by 20% and attack power by 15%.]",
+                    "[Increases the contribution your pet gets from your Stamina by 40% and attack power by 30%.]"
+                ],
+                "s": [
+                    62758,
+                    62762
+                ],
+                "x": 2,
+                "y": 5,
+                "r": [
+                    16,
+                    1
+                ]
+            }
+        ],
+        "icon": "Ability_Druid_DemoralizingRoar",
+        "f": [
+            4,
+            5,
+            6,
+            8,
+            9,
+            20,
+            21,
+            32,
+            42,
+            43
+        ]
+    },
+    {
+        "n": "[Cunning]",
+        "t": [
+            {
+                "i": 2118,
+                "n": "[Cobra Reflexes]",
+                "m": 2,
+                "d": [
+                    "[Increases your pet's attack speed by 15%.  Your pet will hit faster but each hit will do less damage.]",
+                    "[Increases your pet's attack speed by 30%.  Your pet will hit faster but each hit will do less damage.]"
+                ],
+                "s": [
+                    61682,
+                    61683
+                ],
+                "x": 0,
+                "y": 0
+            },
+            {
+                "i": 2119,
+                "n": "[Dash]",
+                "m": 1,
+                "d": [
+                    "[Increases your pet's movement speed by 80% for 16 seg.]"
+                ],
+                "s": [
+                    61684
+                ],
+                "x": 1,
+                "y": 0,
+                "f": [
+                    3,
+                    31,
+                    35,
+                    41
+                ]
+            },
+            {
+                "i": 2201,
+                "n": "[Dive]",
+                "m": 1,
+                "d": [
+                    "[Increases your pet's movement speed by 80% for 16 seg.]"
+                ],
+                "s": [
+                    23145
+                ],
+                "x": 1,
+                "y": 0,
+                "f": [
+                    24,
+                    26,
+                    27,
+                    30,
+                    33,
+                    34,
+                    38
+                ]
+            },
+            {
+                "i": 2120,
+                "n": "[Great Stamina]",
+                "m": 3,
+                "d": [
+                    "[Increases your pet's total Stamina by 4%.]",
+                    "[Increases your pet's total Stamina by 8%.]",
+                    "[Increases your pet's total Stamina by 12%.]"
+                ],
+                "s": [
+                    61686,
+                    61687,
+                    61688
+                ],
+                "x": 2,
+                "y": 0
+            },
+            {
+                "i": 2121,
+                "n": "[Natural Armor]",
+                "m": 2,
+                "d": [
+                    "[Increases your pet's armor by 5%.]",
+                    "[Increases your pet's armor by 10%.]"
+                ],
+                "s": [
+                    61689,
+                    61690
+                ],
+                "x": 3,
+                "y": 0
+            },
+            {
+                "i": 2165,
+                "n": "[Boar's Speed]",
+                "m": 1,
+                "d": [
+                    "[Increases your pet's movement speed by 30%.]"
+                ],
+                "s": [
+                    19596
+                ],
+                "x": 0,
+                "y": 1
+            },
+            {
+                "i": 2207,
+                "n": "[Mobility]",
+                "m": 2,
+                "d": [
+                    "[Reduces the cooldown on your pet's Dash ability by 8 sec.]",
+                    "[Reduces the cooldown on your pet's Dash ability by 16 sec.]"
+                ],
+                "s": [
+                    53483,
+                    53485
+                ],
+                "x": 1,
+                "y": 1,
+                "r": [
+                    1,
+                    1
+                ],
+                "f": [
+                    3,
+                    31,
+                    35,
+                    41
+                ]
+            },
+            {
+                "i": 2208,
+                "n": "[Mobility]",
+                "m": 2,
+                "d": [
+                    "[Reduces the cooldown on your pet's Dive ability by 8 sec.]",
+                    "[Reduces the cooldown on your pet's Dive ability by 16 sec.]"
+                ],
+                "s": [
+                    53554,
+                    53555
+                ],
+                "x": 1,
+                "y": 1,
+                "r": [
+                    2,
+                    1
+                ],
+                "f": [
+                    24,
+                    26,
+                    27,
+                    30,
+                    33,
+                    34,
+                    38
+                ]
+            },
+            {
+                "i": 2182,
+                "n": "[Owl's Focus]",
+                "m": 2,
+                "d": [
+                    "[Your pet has a 15% chance after using an ability that the next ability will cost no Focus if used within 8 seg.]",
+                    "[Your pet has a 30% chance after using an ability that the next ability will cost no Focus if used within 8 seg.]"
+                ],
+                "s": [
+                    53514,
+                    53516
+                ],
+                "x": 2,
+                "y": 1
+            },
+            {
+                "i": 2127,
+                "n": "[Spiked Collar]",
+                "m": 3,
+                "d": [
+                    "[Your pet does an additional 3% damage with all attacks.]",
+                    "[Your pet does an additional 6% damage with all attacks.]",
+                    "[Your pet does an additional 9% damage with all attacks.]"
+                ],
+                "s": [
+                    53182,
+                    53183,
+                    53184
+                ],
+                "x": 3,
+                "y": 1
+            },
+            {
+                "i": 2166,
+                "n": "[Culling the Herd]",
+                "m": 3,
+                "d": [
+                    "[When your pet's Claw, Bite, or Smack ability deals a critical strike, you and your pet deal 1% increased damage for 10 seg.]",
+                    "[When your pet's Claw, Bite, or Smack ability deals a critical strike, you and your pet deal 2% increased damage for 10 seg.]",
+                    "[When your pet's Claw, Bite, or Smack ability deals a critical strike, you and your pet deal 3% increased damage for 10 seg.]"
+                ],
+                "s": [
+                    61680,
+                    61681,
+                    52858
+                ],
+                "x": 0,
+                "y": 2
+            },
+            {
+                "i": 2167,
+                "n": "[Lionhearted]",
+                "m": 2,
+                "d": [
+                    "[Reduces the duration of all Stun and Fear effects used against your pet by 15%.]",
+                    "[Reduces the duration of all Stun and Fear effects used against your pet by 30%.]"
+                ],
+                "s": [
+                    53409,
+                    53411
+                ],
+                "x": 1,
+                "y": 2
+            },
+            {
+                "i": 2206,
+                "n": "[Carrion Feeder]",
+                "m": 1,
+                "d": [
+                    "[Your pet can generate health and happiness by eating a corpse.  Will not work on the remains of elemental or mechanical creatures.]"
+                ],
+                "s": [
+                    54044
+                ],
+                "x": 2,
+                "y": 2
+            },
+            {
+                "i": 2168,
+                "n": "[Great Resistance]",
+                "m": 3,
+                "d": [
+                    "[Your pet takes 5% less damage from Arcane, Fire, Frost, Nature and Shadow magic.]",
+                    "[Your pet takes 10% less damage from Arcane, Fire, Frost, Nature and Shadow magic.]",
+                    "[Your pet takes 15% less damage from Arcane, Fire, Frost, Nature and Shadow magic.]"
+                ],
+                "s": [
+                    53427,
+                    53429,
+                    53430
+                ],
+                "x": 1,
+                "y": 3
+            },
+            {
+                "i": 2177,
+                "n": "[Cornered]",
+                "m": 2,
+                "d": [
+                    "[When at less than 35% health, your pet does 25% more damage and has a 30% reduced chance to be critically hit.]",
+                    "[When at less than 35% health, your pet does 50% more damage and has a 60% reduced chance to be critically hit.]"
+                ],
+                "s": [
+                    52234,
+                    53497
+                ],
+                "x": 2,
+                "y": 3
+            },
+            {
+                "i": 2183,
+                "n": "[Feeding Frenzy]",
+                "m": 2,
+                "d": [
+                    "[Your pet does 8% additional damage to targets with less than 35% health.]",
+                    "[Your pet does 16% additional damage to targets with less than 35% health.]"
+                ],
+                "s": [
+                    53511,
+                    53512
+                ],
+                "x": 3,
+                "y": 3,
+                "r": [
+                    9,
+                    3
+                ]
+            },
+            {
+                "i": 2181,
+                "n": "[Wolverine Bite]",
+                "m": 1,
+                "d": [
+                    "[A fierce attack causing 5 damage, modified by pet level, that your pet can use after it makes a critical attack.  Cannot be dodged, blocked or parried.]"
+                ],
+                "s": [
+                    53508
+                ],
+                "x": 0,
+                "y": 4
+            },
+            {
+                "i": 2184,
+                "n": "[Roar of Recovery]",
+                "m": 1,
+                "d": [
+                    "[Your pet's inspiring roar restores 30% of your total mana over 9 seg.]"
+                ],
+                "s": [
+                    53517
+                ],
+                "x": 1,
+                "y": 4
+            },
+            {
+                "i": 2175,
+                "n": "[Bullheaded]",
+                "m": 1,
+                "d": [
+                    "[Removes all movement impairing effects and all effects which cause loss of control of your pet, and reduces damage done to your pet by 20% for 12 seg.]"
+                ],
+                "s": [
+                    53490
+                ],
+                "x": 2,
+                "y": 4,
+                "r": [
+                    14,
+                    2
+                ]
+            },
+            {
+                "i": 2257,
+                "n": "[Grace of the Mantis]",
+                "m": 2,
+                "d": [
+                    "[Reduces the chance your pet will be critically hit by melee attacks by 2%.]",
+                    "[Reduces the chance your pet will be critically hit by melee attacks by 4%.]"
+                ],
+                "s": [
+                    53450,
+                    53451
+                ],
+                "x": 3,
+                "y": 4
+            },
+            {
+                "i": 2256,
+                "n": "[Wild Hunt]",
+                "m": 2,
+                "d": [
+                    "[Increases the contribution your pet gets from your Stamina by 20% and attack power by 15%.]",
+                    "[Increases the contribution your pet gets from your Stamina by 40% and attack power by 30%.]"
+                ],
+                "s": [
+                    62758,
+                    62762
+                ],
+                "x": 0,
+                "y": 5,
+                "r": [
+                    16,
+                    1
+                ]
+            },
+            {
+                "i": 2278,
+                "n": "[Roar of Sacrifice]",
+                "m": 1,
+                "d": [
+                    "[Protects a friendly target from critical strikes, making attacks against that target unable to be critical strikes, but 20% of all damage taken by that target is also taken by the pet.  Lasts 12 seg.]"
+                ],
+                "s": [
+                    53480
+                ],
+                "x": 3,
+                "y": 5,
+                "r": [
+                    19,
+                    2
+                ]
+            }
+        ],
+        "icon": "Ability_EyeOfTheOwl",
+        "f": [
+            3,
+            24,
+            26,
+            27,
+            30,
+            31,
+            33,
+            34,
+            35,
+            38,
+            41
+        ]
+    }
+]

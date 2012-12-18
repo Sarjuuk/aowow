@@ -1,0 +1,1475 @@
+$WowheadTalentCalculator.registerClass(7, [
+    {
+        "n": "El\u00e9mentaire",
+        "t": [
+            {
+                "i": 564,
+                "n": "Convection",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana de vos Horions ainsi que de vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Explosion de lave et Cisaille de vent de 2%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos Horions ainsi que de vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Explosion de lave et Cisaille de vent de 4%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos Horions ainsi que de vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Explosion de lave et Cisaille de vent de 6%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos Horions ainsi que de vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Explosion de lave et Cisaille de vent de 8%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos Horions ainsi que de vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Explosion de lave et Cisaille de vent de 10%."
+                ],
+                "s": [
+                    16039,
+                    16109,
+                    16110,
+                    16111,
+                    16112
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Nature_WispSplode"
+            },
+            {
+                "i": 563,
+                "n": "Commotion",
+                "m": 5,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Orage et Explosion de lave ainsi que vos Horions de 1%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Orage et Explosion de lave ainsi que vos Horions de 2%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Orage et Explosion de lave ainsi que vos Horions de 3%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Orage et Explosion de lave ainsi que vos Horions de 4%.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Orage et Explosion de lave ainsi que vos Horions de 5%."
+                ],
+                "s": [
+                    16035,
+                    16105,
+                    16106,
+                    16107,
+                    16108
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Fire_Fireball"
+            },
+            {
+                "i": 561,
+                "n": "Appel des flammes",
+                "m": 3,
+                "d": [
+                    "Augmente de 5% les d\u00e9g\u00e2ts inflig\u00e9s par vos Totems de feu et votre Nova de feu, et de 2% les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Explosion de lave.",
+                    "Augmente de 10% les d\u00e9g\u00e2ts inflig\u00e9s par vos Totems de feu et votre Nova de feu, et de 4% les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Explosion de lave.",
+                    "Augmente de 15% les d\u00e9g\u00e2ts inflig\u00e9s par vos Totems de feu et votre Nova de feu, et de 6% les d\u00e9g\u00e2ts inflig\u00e9s par votre sort Explosion de lave."
+                ],
+                "s": [
+                    16038,
+                    16160,
+                    16161
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Fire_Immolation"
+            },
+            {
+                "i": 1640,
+                "n": "Protection contre les \u00e9l\u00e9ments",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 2%.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 4%.",
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 6%."
+                ],
+                "s": [
+                    28996,
+                    28997,
+                    28998
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Nature_SpiritArmor"
+            },
+            {
+                "i": 1645,
+                "n": "D\u00e9vastation \u00e9l\u00e9mentaire",
+                "m": 3,
+                "d": [
+                    "Vos coups critiques non p\u00e9riodiques obtenus avec des sorts offensifs augmentent de 3% vos chances d'obtenir un coup critique avec les attaques de m\u00eal\u00e9e pendant 10 s.",
+                    "Vos coups critiques non p\u00e9riodiques obtenus avec des sorts offensifs augmentent de 6% vos chances d'obtenir un coup critique avec les attaques de m\u00eal\u00e9e pendant 10 s.",
+                    "Vos coups critiques non p\u00e9riodiques obtenus avec des sorts offensifs augmentent de 9% vos chances d'obtenir un coup critique avec les attaques de m\u00eal\u00e9e pendant 10 s."
+                ],
+                "s": [
+                    30160,
+                    29179,
+                    29180
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Fire_ElementalDevastation"
+            },
+            {
+                "i": 575,
+                "n": "R\u00e9verb\u00e9ration",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos Horions et de Cisaille de vent de 0.2 secondes.",
+                    "R\u00e9duit le temps de recharge de vos Horions et de Cisaille de vent de 0.4 secondes.",
+                    "R\u00e9duit le temps de recharge de vos Horions et de Cisaille de vent de 0.6 secondes.",
+                    "R\u00e9duit le temps de recharge de vos Horions et de Cisaille de vent de 0.8 secondes.",
+                    "R\u00e9duit le temps de recharge de vos Horions et de Cisaille de vent de 1 secondes."
+                ],
+                "s": [
+                    16040,
+                    16113,
+                    16114,
+                    16115,
+                    16116
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Frost_FrostWard"
+            },
+            {
+                "i": 574,
+                "n": "Focalisation \u00e9l\u00e9mentaire",
+                "m": 1,
+                "d": [
+                    "Apr\u00e8s avoir r\u00e9ussi un coup critique non p\u00e9riodique avec un sort de d\u00e9g\u00e2ts de Feu, de Givre ou de Nature, vous entrez dans un \u00e9tat d'Id\u00e9es claires. Id\u00e9es claires r\u00e9duit le co\u00fbt en mana de vos 2 prochains sorts de d\u00e9g\u00e2ts ou de soins de 40%."
+                ],
+                "s": [
+                    16164
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Shadow_ManaBurn"
+            },
+            {
+                "i": 565,
+                "n": "Fureur \u00e9l\u00e9mentaire",
+                "m": 5,
+                "d": [
+                    "Augmente de 20% le bonus aux d\u00e9g\u00e2ts des coups critiques obtenus avec vos Totems incendiaires et de magma ainsi qu'avec les sorts de Feu, de Givre et de Nature.",
+                    "Augmente de 40% le bonus aux d\u00e9g\u00e2ts des coups critiques obtenus avec vos Totems incendiaires et de magma ainsi qu'avec les sorts de Feu, de Givre et de Nature.",
+                    "Augmente de 60% le bonus aux d\u00e9g\u00e2ts des coups critiques obtenus avec vos Totems incendiaires et de magma ainsi qu'avec les sorts de Feu, de Givre et de Nature.",
+                    "Augmente de 80% le bonus aux d\u00e9g\u00e2ts des coups critiques obtenus avec vos Totems incendiaires et de magma ainsi qu'avec les sorts de Feu, de Givre et de Nature.",
+                    "Augmente de 100% le bonus aux d\u00e9g\u00e2ts des coups critiques obtenus avec vos Totems incendiaires et de magma ainsi qu'avec les sorts de Feu, de Givre et de Nature."
+                ],
+                "s": [
+                    16089,
+                    60184,
+                    60185,
+                    60187,
+                    60188
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Fire_Volcano"
+            },
+            {
+                "i": 567,
+                "n": "Nova de feu am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre Nova de feu de 10% et r\u00e9duit le temps de recharge de 2 sec.",
+                    "Augmente les d\u00e9g\u00e2ts inflig\u00e9s par votre Nova de feu de 20% et r\u00e9duit le temps de recharge de 4 sec."
+                ],
+                "s": [
+                    16086,
+                    16544
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Fire_SealOfFire"
+            },
+            {
+                "i": 1642,
+                "n": "Oeil du cyclone",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit de 23% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez les sorts Eclair, Cha\u00eene d'\u00e9clairs, Explosion de lave ou Mal\u00e9fice.",
+                    "R\u00e9duit de 46% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez les sorts Eclair, Cha\u00eene d'\u00e9clairs, Explosion de lave ou Mal\u00e9fice.",
+                    "R\u00e9duit de 70% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez les sorts Eclair, Cha\u00eene d'\u00e9clairs, Explosion de lave ou Mal\u00e9fice."
+                ],
+                "s": [
+                    29062,
+                    29064,
+                    29065
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_Shadow_SoulLeech_2"
+            },
+            {
+                "i": 1641,
+                "n": "Allonge \u00e9l\u00e9mentaire",
+                "m": 2,
+                "d": [
+                    "Augmente la port\u00e9e de vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Nova de feu et Explosion de lave de 3 m\u00e8tres, augmente le rayon de votre sort Orage de 10% et augmente la port\u00e9e de votre Horion de flammes de 7 m\u00e8tres.",
+                    "Augmente la port\u00e9e de vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Nova de feu et Explosion de lave de 6 m\u00e8tres, augmente le rayon de votre sort Orage de 20% et augmente la port\u00e9e de votre Horion de flammes de 15 m\u00e8tres."
+                ],
+                "s": [
+                    28999,
+                    29000
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Nature_StormReach"
+            },
+            {
+                "i": 562,
+                "n": "Appel de la foudre",
+                "m": 1,
+                "d": [
+                    "Augmente vos chances de r\u00e9aliser un coup critique avec vos sorts Eclair, Cha\u00eene d'\u00e9clairs et Orage de 5% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    16041
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Nature_CallStorm",
+                "r": [
+                    6,
+                    1
+                ]
+            },
+            {
+                "i": 1682,
+                "n": "Temp\u00eate continuelle",
+                "m": 3,
+                "d": [
+                    "R\u00e9g\u00e9n\u00e8re une quantit\u00e9 de mana \u00e9gale \u00e0 4% de votre Intelligence toutes les 5 sec., m\u00eame pendant l'incantation.",
+                    "R\u00e9g\u00e9n\u00e8re une quantit\u00e9 de mana \u00e9gale \u00e0 8% de votre Intelligence toutes les 5 sec., m\u00eame pendant l'incantation.",
+                    "R\u00e9g\u00e9n\u00e8re une quantit\u00e9 de mana \u00e9gale \u00e0 12% de votre Intelligence toutes les 5 sec., m\u00eame pendant l'incantation."
+                ],
+                "s": [
+                    30664,
+                    30665,
+                    30666
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Nature_UnrelentingStorm"
+            },
+            {
+                "i": 1685,
+                "n": "Pr\u00e9cision \u00e9l\u00e9mentaire",
+                "m": 3,
+                "d": [
+                    "Augmente de 1% vos chances de toucher avec les sorts de Feu, de Givre et de Nature, et r\u00e9duit de 10% la menace g\u00e9n\u00e9r\u00e9e par les sorts de Feu, Givre et Nature.",
+                    "Augmente de 2% vos chances de toucher avec les sorts de Feu, de Givre et de Nature, et r\u00e9duit de 20% la menace g\u00e9n\u00e9r\u00e9e par les sorts de Feu, Givre et Nature.",
+                    "Augmente de 3% vos chances de toucher avec les sorts de Feu, de Givre et de Nature, et r\u00e9duit de 30% la menace g\u00e9n\u00e9r\u00e9e par les sorts de Feu, Givre et Nature."
+                ],
+                "s": [
+                    30672,
+                    30673,
+                    30674
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Nature_ElementalPrecision_1"
+            },
+            {
+                "i": 721,
+                "n": "Ma\u00eetrise de la foudre",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit le temps d'incantation de vos sorts Eclair, Cha\u00eene d'\u00e9clairs et Explosion de lave de 0.1 sec.",
+                    "R\u00e9duit le temps d'incantation de vos sorts Eclair, Cha\u00eene d'\u00e9clairs et Explosion de lave de 0.2 sec.",
+                    "R\u00e9duit le temps d'incantation de vos sorts Eclair, Cha\u00eene d'\u00e9clairs et Explosion de lave de 0.3 sec.",
+                    "R\u00e9duit le temps d'incantation de vos sorts Eclair, Cha\u00eene d'\u00e9clairs et Explosion de lave de 0.4 sec.",
+                    "R\u00e9duit le temps d'incantation de vos sorts Eclair, Cha\u00eene d'\u00e9clairs et Explosion de lave de 0.5 sec."
+                ],
+                "s": [
+                    16578,
+                    16579,
+                    16580,
+                    16581,
+                    16582
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Lightning_LightningBolt01",
+                "r": [
+                    7,
+                    5
+                ]
+            },
+            {
+                "i": 573,
+                "n": "Ma\u00eetrise \u00e9l\u00e9mentaire",
+                "m": 1,
+                "d": [
+                    "Lorsqu'elle est activ\u00e9e, votre prochain sort Eclair, Cha\u00eene d'\u00e9clairs ou Explosion de lave b\u00e9n\u00e9ficie d'une incantation instantan\u00e9e. De plus, vous b\u00e9n\u00e9ficiez d'un bonus \u00e0 la h\u00e2te des sorts de 15% pendant 15 s. Ma\u00eetrise \u00e9l\u00e9mentaire partage le temps de recharge de Rapidit\u00e9 de la nature."
+                ],
+                "s": [
+                    16166
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Nature_WispHeal",
+                "r": [
+                    11,
+                    1
+                ]
+            },
+            {
+                "i": 2052,
+                "n": "Temp\u00eate, terre et feu",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le temps de recharge de votre sort Cha\u00eene d'\u00e9clairs de 0,75 sec., votre Totem de lien terrestre a 33% de chances d'enraciner les cibles pendant 5 s et les d\u00e9g\u00e2ts p\u00e9riodiques inflig\u00e9s par votre Horion de flammes sont augment\u00e9s de 20%.",
+                    "R\u00e9duit le temps de recharge de votre sort Cha\u00eene d'\u00e9clairs de 1,5 sec., votre Totem de lien terrestre a 66% de chances d'enraciner les cibles pendant 5 s \u00e0 son lancement et les d\u00e9g\u00e2ts p\u00e9riodiques inflig\u00e9s par votre Horion de flammes sont augment\u00e9s de 40%.",
+                    "R\u00e9duit le temps de recharge de votre sort Cha\u00eene d'\u00e9clairs de 2,5 sec., votre Totem de lien terrestre a 100% de chances d'enraciner les cibles pendant 5 s \u00e0 son lancement et les d\u00e9g\u00e2ts p\u00e9riodiques inflig\u00e9s par votre Horion de flammes sont augment\u00e9s de 60%."
+                ],
+                "s": [
+                    51483,
+                    51485,
+                    51486
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Shaman_StormEarthFire"
+            },
+            {
+                "i": 2262,
+                "n": "Echos tonitruants",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de vos sorts Horion de flammes et Horion de givre de 1 sec. suppl\u00e9mentaires, en plus d'augmenter les d\u00e9g\u00e2ts directs qu'ils infligent de 10% suppl\u00e9mentaires.",
+                    "R\u00e9duit le temps de recharge de vos sorts Horion de flammes et Horion de givre de 2 sec. suppl\u00e9mentaires, en plus d'augmenter les d\u00e9g\u00e2ts directs qu'ils infligent de 20% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    63370,
+                    63372
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Spell_Fire_BlueFlameRing"
+            },
+            {
+                "i": 2049,
+                "n": "Serment des \u00e9l\u00e9ments",
+                "m": 2,
+                "d": [
+                    "Quand vous \u00eates sous l'effet d'Id\u00e9es claires alors que Focalisation \u00e9l\u00e9mentaire est active, vous infligez 5% de d\u00e9g\u00e2ts suppl\u00e9mentaires avec les sorts. De plus, les membres du groupe ou raid se trouvant \u00e0 moins de 100 m\u00e8tres b\u00e9n\u00e9ficient d'un bonus de 3% \u00e0 leurs chances de coup critique avec les sorts.",
+                    "Quand vous \u00eates sous l'effet d'Id\u00e9es claires alors que Focalisation \u00e9l\u00e9mentaire est active, vous infligez 10% de d\u00e9g\u00e2ts suppl\u00e9mentaires avec les sorts. De plus, les membres du groupe ou raid se trouvant \u00e0 moins de 100 m\u00e8tres b\u00e9n\u00e9ficient d'un bonus de 5% \u00e0 leurs chances de coup critique avec les sorts."
+                ],
+                "s": [
+                    51466,
+                    51470
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Shaman_ElementalOath",
+                "r": [
+                    15,
+                    1
+                ]
+            },
+            {
+                "i": 1686,
+                "n": "Surcharge de foudre",
+                "m": 3,
+                "d": [
+                    "Donne \u00e0 vos sorts Eclair et Cha\u00eene d'\u00e9clairs 11% de chances de lancer un second sort semblable sur la m\u00eame cible sans co\u00fbt suppl\u00e9mentaire. Ce sort inflige la moiti\u00e9 des d\u00e9g\u00e2ts et ne g\u00e9n\u00e8re pas de menace.",
+                    "Donne \u00e0 vos sorts Eclair et Cha\u00eene d'\u00e9clairs 22% de chances de lancer un second sort semblable sur la m\u00eame cible sans co\u00fbt suppl\u00e9mentaire. Ce sort inflige la moiti\u00e9 des d\u00e9g\u00e2ts et ne g\u00e9n\u00e8re pas de menace.",
+                    "Donne \u00e0 vos sorts Eclair et Cha\u00eene d'\u00e9clairs 33% de chances de lancer un second sort semblable sur la m\u00eame cible sans co\u00fbt suppl\u00e9mentaire. Ce sort inflige la moiti\u00e9 des d\u00e9g\u00e2ts et ne g\u00e9n\u00e8re pas de menace."
+                ],
+                "s": [
+                    30675,
+                    30678,
+                    30679
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Nature_LightningOverload"
+            },
+            {
+                "i": 2050,
+                "n": "Transfert astral",
+                "m": 3,
+                "d": [
+                    "Quand vous \u00eates \u00e9tourdi, apeur\u00e9 ou r\u00e9duit au silence, vous entrez dans le Plan astral afin de r\u00e9duire tous les d\u00e9g\u00e2ts subis de 10% pendant la dur\u00e9e de l'effet d'\u00e9tourdissement, de peur ou de silence.",
+                    "Quand vous \u00eates \u00e9tourdi, apeur\u00e9 ou r\u00e9duit au silence, vous entrez dans le Plan astral afin de r\u00e9duire tous les d\u00e9g\u00e2ts subis de 20% pendant la dur\u00e9e de l'effet d'\u00e9tourdissement, de peur ou de silence.",
+                    "Quand vous \u00eates \u00e9tourdi, apeur\u00e9 ou r\u00e9duit au silence, vous entrez dans le Plan astral afin de r\u00e9duire tous les d\u00e9g\u00e2ts subis de 30% pendant la dur\u00e9e de l'effet d'\u00e9tourdissement, de peur ou de silence."
+                ],
+                "s": [
+                    51474,
+                    51478,
+                    51479
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Shaman_AstralShift"
+            },
+            {
+                "i": 1687,
+                "n": "Totem de courroux",
+                "m": 1,
+                "d": [
+                    "Invoque un Totem de courroux qui dispose de 5 points de vie aux pieds du lanceur de sorts. Il augmente de 100 la puissance des sorts de tous les membres du groupe et du raid, et augmente de 3% les chances de coup critique de toutes les attaques contre les ennemis se trouvant \u00e0 moins de 0 m\u00e8tres. Dure 5 min."
+                ],
+                "s": [
+                    30706
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Fire_TotemOfWrath"
+            },
+            {
+                "i": 2051,
+                "n": "Flots de lave",
+                "m": 3,
+                "d": [
+                    "Augmente le bonus aux d\u00e9g\u00e2ts des coups critiques de votre sort Explosion de lave de 6% suppl\u00e9mentaires, et lorsque votre Horion de flammes est dissip\u00e9, votre vitesse d'incantation des sorts est augment\u00e9e de 10% pendant 6 s.",
+                    "Augmente le bonus aux d\u00e9g\u00e2ts des coups critiques de votre sort Explosion de lave de 12% suppl\u00e9mentaires, et lorsque votre Horion de flammes est dissip\u00e9, votre vitesse d'incantation des sorts est augment\u00e9e de 20% pendant 6 s.",
+                    "Augmente le bonus aux d\u00e9g\u00e2ts des coups critiques de votre sort Explosion de lave de 24% suppl\u00e9mentaires, et lorsque votre Horion de flammes est dissip\u00e9, votre vitesse d'incantation des sorts est augment\u00e9e de 30% pendant 6 s."
+                ],
+                "s": [
+                    51480,
+                    51481,
+                    51482
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Shaman_LavaFlow"
+            },
+            {
+                "i": 2252,
+                "n": "Chamanisme",
+                "m": 5,
+                "d": [
+                    "Vos sorts \u00c9clair et Cha\u00eene d'\u00e9clairs b\u00e9n\u00e9ficient de 4% suppl\u00e9mentaires et votre Explosion de lave de 5% suppl\u00e9mentaires des effets de vos bonus aux d\u00e9g\u00e2ts.",
+                    "Vos sorts \u00c9clair et Cha\u00eene d'\u00e9clairs b\u00e9n\u00e9ficient de 8% suppl\u00e9mentaires et votre Explosion de lave de 10% suppl\u00e9mentaires des effets de vos bonus aux d\u00e9g\u00e2ts.",
+                    "Vos sorts \u00c9clair et Cha\u00eene d'\u00e9clairs b\u00e9n\u00e9ficient de 12% suppl\u00e9mentaires et votre Explosion de lave de 15% suppl\u00e9mentaires des effets de vos bonus aux d\u00e9g\u00e2ts.",
+                    "Vos sorts \u00c9clair et Cha\u00eene d'\u00e9clairs b\u00e9n\u00e9ficient de 16% suppl\u00e9mentaires et votre Explosion de lave de 20% suppl\u00e9mentaires des effets de vos bonus aux d\u00e9g\u00e2ts.",
+                    "Vos sorts \u00c9clair et Cha\u00eene d'\u00e9clairs b\u00e9n\u00e9ficient de 20% suppl\u00e9mentaires et votre Explosion de lave de 25% suppl\u00e9mentaires des effets de vos bonus aux d\u00e9g\u00e2ts."
+                ],
+                "s": [
+                    62097,
+                    62098,
+                    62099,
+                    62100,
+                    62101
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Spell_unused2"
+            },
+            {
+                "i": 2053,
+                "n": "Orage",
+                "m": 1,
+                "d": [
+                    "Vous appelez la foudre, qui vous charge d'\u00e9nergie et inflige des d\u00e9g\u00e2ts aux ennemis se trouvant \u00e0 moins de 10 m\u00e8tres. Vous rend 8% de mana et inflige 551 to 630 points de d\u00e9g\u00e2ts de Nature \u00e0 tous les ennemis proches, les faisant tomber \u00e0 la renverse 20 m\u00e8tres plus loin. Ce sort est utilisable quand vous \u00eates \u00e9tourdi."
+                ],
+                "s": [
+                    51490
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Spell_Shaman_ThunderStorm"
+            }
+        ]
+    },
+    {
+        "n": "Am\u00e9lioration",
+        "t": [
+            {
+                "i": 610,
+                "n": "Totems renforc\u00e9s",
+                "m": 3,
+                "d": [
+                    "Augmente de 5% l'effet de vos Totems de Force de la Terre et Langue de feu.",
+                    "Augmente de 10% l'effet de vos Totems de Force de la Terre et Langue de feu.",
+                    "Augmente de 15% l'effet de vos Totems de Force de la Terre et Langue de feu."
+                ],
+                "s": [
+                    16259,
+                    16295,
+                    52456
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Nature_EarthBindTotem"
+            },
+            {
+                "i": 2101,
+                "n": "Emprise de la terre",
+                "m": 2,
+                "d": [
+                    "Augmente les points de vie de votre Totem de griffes de pierre de 25% et le rayon de votre Totem de lien terrestre de 10%, en plus de r\u00e9duire le temps de recharge des deux totems de 15%.",
+                    "Augmente les points de vie de votre Totem de griffes de pierre de 50% et le rayon de votre Totem de lien terrestre de 20%, en plus de r\u00e9duire le temps de recharge des deux totems de 30%."
+                ],
+                "s": [
+                    16043,
+                    16130
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Nature_StoneClawTotem"
+            },
+            {
+                "i": 614,
+                "n": "Connaissance ancestrale",
+                "m": 5,
+                "d": [
+                    "Augmente votre Intelligence de 2%.",
+                    "Augmente votre Intelligence de 4%.",
+                    "Augmente votre Intelligence de 6%.",
+                    "Augmente votre Intelligence de 8%.",
+                    "Augmente votre Intelligence de 10%."
+                ],
+                "s": [
+                    17485,
+                    17486,
+                    17487,
+                    17488,
+                    17489
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Shadow_GrimWard"
+            },
+            {
+                "i": 609,
+                "n": "Totems gardiens",
+                "m": 2,
+                "d": [
+                    "Augmente de 10% le montant de points d'armure augment\u00e9s par votre Totem Peau de pierre et r\u00e9duit le temps de recharge de votre Totem de gl\u00e8be de 1 sec.",
+                    "Augmente de 20% le montant de points d'armure augment\u00e9s par votre Totem Peau de pierre et r\u00e9duit le temps de recharge de votre Totem de gl\u00e8be de 2 sec."
+                ],
+                "s": [
+                    16258,
+                    16293
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Nature_StoneSkinTotem"
+            },
+            {
+                "i": 613,
+                "n": "Frappe foudroyante",
+                "m": 5,
+                "d": [
+                    "Augmente de 1% vos chances d'infliger un coup critique avec tous les sorts et attaques.",
+                    "Augmente de 2% vos chances d'infliger un coup critique avec tous les sorts et attaques.",
+                    "Augmente de 3% vos chances d'infliger un coup critique avec tous les sorts et attaques.",
+                    "Augmente de 4% vos chances d'infliger un coup critique avec tous les sorts et attaques.",
+                    "Augmente de 5% vos chances d'infliger un coup critique avec tous les sorts et attaques."
+                ],
+                "s": [
+                    16255,
+                    16302,
+                    16303,
+                    16304,
+                    16305
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Ability_ThunderBolt"
+            },
+            {
+                "i": 605,
+                "n": "Loup fant\u00f4me am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps d'incantation de votre sort Loup fant\u00f4me de 1 secondes.",
+                    "R\u00e9duit le temps d'incantation de votre sort Loup fant\u00f4me de 2 secondes."
+                ],
+                "s": [
+                    16262,
+                    16287
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Nature_SpiritWolf"
+            },
+            {
+                "i": 607,
+                "n": "Boucliers am\u00e9lior\u00e9s",
+                "m": 3,
+                "d": [
+                    "Augmente de 5% les d\u00e9g\u00e2ts inflig\u00e9s par les orbes de votre Bouclier de foudre, de 5% la quantit\u00e9 de mana obtenue gr\u00e2ce aux orbes de votre Bouclier d'eau et de 5% la quantit\u00e9 de soins obtenus avec vos orbes de Bouclier de terre.",
+                    "Augmente de 10% les d\u00e9g\u00e2ts inflig\u00e9s par les orbes de votre Bouclier de foudre, de 10% la quantit\u00e9 de mana obtenue gr\u00e2ce aux orbes de votre Bouclier d'eau et de 10% la quantit\u00e9 de soins obtenus avec vos orbes de Bouclier de terre.",
+                    "Augmente de 15% les d\u00e9g\u00e2ts inflig\u00e9s par les orbes de votre Bouclier de foudre, de 15% la quantit\u00e9 de mana obtenue gr\u00e2ce aux orbes de votre Bouclier d'eau et de 15% la quantit\u00e9 de soins obtenus avec vos orbes de Bouclier de terre."
+                ],
+                "s": [
+                    16261,
+                    16290,
+                    51881
+                ],
+                "x": 3,
+                "y": 1,
+                "iconname": "Spell_Nature_LightningShield"
+            },
+            {
+                "i": 611,
+                "n": "Armes \u00e9l\u00e9mentaires",
+                "m": 3,
+                "d": [
+                    "Augmente de 13% les d\u00e9g\u00e2ts inflig\u00e9s par l'effet de votre Arme Furie-des-vents, de 10% les d\u00e9g\u00e2ts des sorts de votre Arme Langue de feu et de 10% le bonus aux soins de votre Arme Viveterre.",
+                    "Augmente de 27% les d\u00e9g\u00e2ts inflig\u00e9s par l'effet de votre Arme Furie-des-vents, de 20% les d\u00e9g\u00e2ts des sorts de votre Arme Langue de feu et de 20% le bonus aux soins de votre Arme Viveterre.",
+                    "Augmente de 40% les d\u00e9g\u00e2ts inflig\u00e9s par l'effet de votre Arme Furie-des-vents, de 30% les d\u00e9g\u00e2ts des sorts de votre Arme Langue de feu et de 30% le bonus aux soins de votre Arme Viveterre."
+                ],
+                "s": [
+                    16266,
+                    29079,
+                    29080
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Fire_FlameTounge"
+            },
+            {
+                "i": 617,
+                "n": "Focalisation chamanique",
+                "m": 1,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana de vos Horions de 45%."
+                ],
+                "s": [
+                    43338
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Nature_ElementalAbsorption"
+            },
+            {
+                "i": 601,
+                "n": "Anticipation",
+                "m": 3,
+                "d": [
+                    "Augmente de 1% vos chances d'esquiver et r\u00e9duit de 16% la dur\u00e9e de tous les effets de d\u00e9sarmement utilis\u00e9s contre vous. Non cumulable avec les autres effets qui r\u00e9duisent la dur\u00e9e du d\u00e9sarmement.",
+                    "Augmente de 2% vos chances d'esquiver et r\u00e9duit de 25% la dur\u00e9e de tous les effets de d\u00e9sarmement utilis\u00e9s contre vous. Non cumulable avec les autres effets qui r\u00e9duisent la dur\u00e9e du d\u00e9sarmement.",
+                    "Augmente de 3% vos chances d'esquiver et r\u00e9duit de 50% la dur\u00e9e de tous les effets de d\u00e9sarmement utilis\u00e9s contre vous. Non cumulable avec les autres effets qui r\u00e9duisent la dur\u00e9e du d\u00e9sarmement."
+                ],
+                "s": [
+                    16254,
+                    16271,
+                    16272
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Nature_MirrorImage"
+            },
+            {
+                "i": 602,
+                "n": "Rafale",
+                "m": 5,
+                "d": [
+                    "Lorsque vous infligez un coup critique, augmente votre vitesse d'attaque de 6% pour les 3 prochaines attaques.",
+                    "Lorsque vous infligez un coup critique, augmente votre vitesse d'attaque de 12% pour les 3 prochaines attaques.",
+                    "Lorsque vous infligez un coup critique, augmente votre vitesse d'attaque de 18% pour les 3 prochaines attaques.",
+                    "Lorsque vous infligez un coup critique, augmente votre vitesse d'attaque de 24% pour les 3 prochaines attaques.",
+                    "Lorsque vous infligez un coup critique, augmente votre vitesse d'attaque de 30% pour les 3 prochaines attaques."
+                ],
+                "s": [
+                    16256,
+                    16281,
+                    16282,
+                    16283,
+                    16284
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Ability_GhoulFrenzy",
+                "r": [
+                    4,
+                    5
+                ]
+            },
+            {
+                "i": 615,
+                "n": "R\u00e9sistance",
+                "m": 5,
+                "d": [
+                    "Augmente votre Endurance de 2% et r\u00e9duit sur vous la dur\u00e9e des effets ralentissant le mouvement de 6%.",
+                    "Augmente votre Endurance de 4% et r\u00e9duit sur vous la dur\u00e9e des effets ralentissant le mouvement de 12%.",
+                    "Augmente votre Endurance de 6% et r\u00e9duit sur vous la dur\u00e9e des effets ralentissant le mouvement de 18%.",
+                    "Augmente votre Endurance de 8% et r\u00e9duit sur vous la dur\u00e9e des effets ralentissant le mouvement de 24%.",
+                    "Augmente votre Endurance de 10% et r\u00e9duit sur vous la dur\u00e9e des effets ralentissant le mouvement de 30%."
+                ],
+                "s": [
+                    16252,
+                    16306,
+                    16307,
+                    16308,
+                    16309
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Holy_Devotion"
+            },
+            {
+                "i": 1647,
+                "n": "Totems Furie-des-vents am\u00e9lior\u00e9s",
+                "m": 2,
+                "d": [
+                    "Augmente la h\u00e2te en m\u00eal\u00e9e de votre totem Furie-des-vents de 2%.",
+                    "Augmente la h\u00e2te en m\u00eal\u00e9e de votre totem Furie-des-vents de 4%."
+                ],
+                "s": [
+                    29192,
+                    29193
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Nature_Windfury"
+            },
+            {
+                "i": 616,
+                "n": "Armes spirituelles",
+                "m": 1,
+                "d": [
+                    "Donne une chance de parer les attaques de m\u00eal\u00e9e des ennemis et r\u00e9duit toute la menace g\u00e9n\u00e9r\u00e9e de 30%."
+                ],
+                "s": [
+                    16268
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Ability_Parry"
+            },
+            {
+                "i": 2083,
+                "n": "Dext\u00e9rit\u00e9 mentale",
+                "m": 3,
+                "d": [
+                    "Augmente votre puissance d'attaque de 33% de votre Intelligence.",
+                    "Augmente votre puissance d'attaque de 66% de votre Intelligence.",
+                    "Augmente votre puissance d'attaque de 100% de votre Intelligence."
+                ],
+                "s": [
+                    51883,
+                    51884,
+                    51885
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Nature_BloodLust"
+            },
+            {
+                "i": 1689,
+                "n": "Rage lib\u00e9r\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente votre expertise de 3, et augmente de 4% la puissance d'attaque de tous les membres du groupe ou du raid s'ils se trouvent \u00e0 moins de 0 m\u00e8tres du chaman.",
+                    "Augmente votre expertise de 6, et augmente de 7% la puissance d'attaque de tous les membres du groupe ou du raid s'ils se trouvent \u00e0 moins de 0 m\u00e8tres du chaman.",
+                    "Augmente votre expertise de 9, et augmente de 10% la puissance d'attaque de tous les membres du groupe ou du raid s'ils se trouvent \u00e0 moins de 0 m\u00e8tres du chaman."
+                ],
+                "s": [
+                    30802,
+                    30808,
+                    30809
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Nature_UnleashedRage"
+            },
+            {
+                "i": 1643,
+                "n": "Ma\u00eetrise des armes",
+                "m": 3,
+                "d": [
+                    "Augmente de 4% les d\u00e9g\u00e2ts que vous infligez avec toutes les armes.",
+                    "Augmente de 7% les d\u00e9g\u00e2ts que vous infligez avec toutes les armes.",
+                    "Augmente de 10% les d\u00e9g\u00e2ts que vous infligez avec toutes les armes."
+                ],
+                "s": [
+                    29082,
+                    29084,
+                    29086
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Ability_Hunter_SwiftStrike"
+            },
+            {
+                "i": 2263,
+                "n": "Puissance gel\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente de 5% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Fouet de lave et Horion sur les cibles affect\u00e9es par l'effet de votre Attaque Arme de givre, et votre Horion de givre a 50% de chances d'immobiliser la cible dans la glace pendant 5 s. lorsqu'il est utilis\u00e9 sur des cibles se trouvant \u00e0 15 m\u00e8tres ou plus de vous.",
+                    "Augmente de 10% les d\u00e9g\u00e2ts inflig\u00e9s par vos sorts Eclair, Cha\u00eene d'\u00e9clairs, Fouet de lave et Horion sur les cibles affect\u00e9es par l'effet de votre Attaque Arme de givre, et votre Horion de givre a 100% de chances d'immobiliser la cible dans la glace pendant 5 s. lorsqu'il est utilis\u00e9 sur des cibles se trouvant \u00e0 15 m\u00e8tres ou plus de vous."
+                ],
+                "s": [
+                    63373,
+                    63374
+                ],
+                "x": 3,
+                "y": 5,
+                "iconname": "Spell_Fire_BlueCano"
+            },
+            {
+                "i": 1692,
+                "n": "Sp\u00e9cialisation Ambidextrie",
+                "m": 3,
+                "d": [
+                    "Augmente de 2% suppl\u00e9mentaires vos chances de toucher lorsque vous portez deux armes.",
+                    "Augmente de 4% suppl\u00e9mentaires vos chances de toucher lorsque vous portez deux armes.",
+                    "Augmente de 6% suppl\u00e9mentaires vos chances de toucher lorsque vous portez deux armes."
+                ],
+                "s": [
+                    30816,
+                    30818,
+                    30819
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_DualWieldSpecialization",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 1690,
+                "n": "Ambidextrie",
+                "m": 1,
+                "d": [
+                    "Permet d'\u00e9quiper les armes \u00e0 une main dans la main gauche."
+                ],
+                "s": [
+                    30798
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Ability_DualWield",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 901,
+                "n": "Frappe-temp\u00eate",
+                "m": 1,
+                "d": [
+                    "Attaque instantan\u00e9ment avec les deux armes. De plus, les 4 prochaines sources de d\u00e9g\u00e2ts de Nature inflig\u00e9s \u00e0 la cible par le chaman sont augment\u00e9es de 20%. Dure 12 s."
+                ],
+                "s": [
+                    17364
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Shaman_Stormstrike"
+            },
+            {
+                "i": 2055,
+                "n": "Horion statique",
+                "m": 3,
+                "d": [
+                    "Vous avez 2% de chances de toucher votre cible avec une charge d'orbe de Bouclier de foudre quand vous infligez des d\u00e9g\u00e2ts avec des attaques et techniques de m\u00eal\u00e9e, et votre Bouclier de foudre gagne 2 charges suppl\u00e9mentaires.",
+                    "Vous avez 4% de chances de toucher votre cible avec une charge d'orbe de Bouclier de foudre quand vous infligez des d\u00e9g\u00e2ts avec des attaques et techniques de m\u00eal\u00e9e, et votre Bouclier de foudre gagne 4 charges suppl\u00e9mentaires.",
+                    "Vous avez 6% de chances de toucher votre cible avec une charge d'orbe de Bouclier de foudre quand vous infligez des d\u00e9g\u00e2ts avec des attaques et techniques de m\u00eal\u00e9e, et votre Bouclier de foudre gagne 6 charges suppl\u00e9mentaires."
+                ],
+                "s": [
+                    51525,
+                    51526,
+                    51527
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Spell_Shaman_StaticShock"
+            },
+            {
+                "i": 2249,
+                "n": "Fouet de lave",
+                "m": 1,
+                "d": [
+                    "Vous chargez votre arme en main gauche de lave, infligeant instantan\u00e9ment 100% des d\u00e9g\u00e2ts de l'arme en main gauche. Les d\u00e9g\u00e2ts sont augment\u00e9s de 25% si votre arme en main gauche est enchant\u00e9e avec Langue de feu."
+                ],
+                "s": [
+                    60103
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Ability_Shaman_Lavalash",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 2054,
+                "n": "Frappe-temp\u00eate am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Quand vous utilisez Frappe-temp\u00eate, vous avez 50% de chances de recevoir imm\u00e9diatement 20% de votre mana de base.",
+                    "Quand vous utilisez Frappe-temp\u00eate, vous avez 100% de chances de recevoir imm\u00e9diatement 20% de votre mana de base."
+                ],
+                "s": [
+                    51521,
+                    51522
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Shaman_ImprovedStormstrike",
+                "r": [
+                    20,
+                    1
+                ]
+            },
+            {
+                "i": 1691,
+                "n": "Rapidit\u00e9 mentale",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana de vos sorts instantan\u00e9s de chaman de 2% et augmente la puissance de vos sorts d'un montant \u00e9gal \u00e0 10% de votre puissance d'attaque.",
+                    "R\u00e9duit le co\u00fbt en mana de vos sorts instantan\u00e9s de chaman de 4% et augmente la puissance de vos sorts d'un montant \u00e9gal \u00e0 20% de votre puissance d'attaque.",
+                    "R\u00e9duit le co\u00fbt en mana de vos sorts instantan\u00e9s de chaman de 6% et augmente la puissance de vos sorts d'un montant \u00e9gal \u00e0 30% de votre puissance d'attaque."
+                ],
+                "s": [
+                    30812,
+                    30813,
+                    30814
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Nature_MentalQuickness"
+            },
+            {
+                "i": 1693,
+                "n": "Rage du chaman",
+                "m": 1,
+                "d": [
+                    "R\u00e9duit tous les d\u00e9g\u00e2ts subis de 30% et donne \u00e0 vos attaques en m\u00eal\u00e9e r\u00e9ussies une chance de r\u00e9g\u00e9n\u00e9rer un montant de mana \u00e9gal \u00e0 15% de votre puissance d'attaque. Ce sort peut \u00eatre utilis\u00e9 alors que vous \u00eates \u00e9tourdi. Dure 15 s."
+                ],
+                "s": [
+                    30823
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Nature_ShamanRage"
+            },
+            {
+                "i": 2056,
+                "n": "Puissance terrestre",
+                "m": 2,
+                "d": [
+                    "Votre Totem de lien terrestre a 50% de chances \u00e0 chacune de ses pulsations d'enlever tous les effets de ralentissement sur vous ainsi que sur les cibles alli\u00e9es proches, et votre Horion de terre r\u00e9duit la vitesse d'attaque des ennemis de 5% suppl\u00e9mentaires.",
+                    "Votre Totem de lien terrestre a 100% de chances \u00e0 chacune de ses pulsations d'enlever tous les effets de ralentissement sur vous ainsi que sur les cibles alli\u00e9es proches, et votre Horion de terre r\u00e9duit la vitesse d'attaque des ennemis de 10% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    51523,
+                    51524
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Nature_EarthElemental_Totem"
+            },
+            {
+                "i": 2057,
+                "n": "Arme du Maelstr\u00f6m",
+                "m": 5,
+                "d": [
+                    "Quand vous infligez des d\u00e9g\u00e2ts avec une arme de m\u00eal\u00e9e, vous avez une chance de r\u00e9duire le temps d'incantation de votre prochain sort Eclair, Cha\u00eene d'\u00e9clairs, Vague de soins inf\u00e9rieurs, Salve de gu\u00e9rison, Vague de soins ou Mal\u00e9fice de 20%. Cumulable jusqu'\u00e0 5 fois. Dure 30 s.",
+                    "Quand vous infligez des d\u00e9g\u00e2ts avec une arme de m\u00eal\u00e9e, vous avez une chance (plus \u00e9lev\u00e9e qu'au rang 1) de r\u00e9duire le temps d'incantation de votre prochain sort Eclair, Cha\u00eene d'\u00e9clairs, Vague de soins inf\u00e9rieurs, Salve de gu\u00e9rison, Vague de soins ou Mal\u00e9fice de 20%. Cumulable jusqu'\u00e0 5 fois. Dure 30 s.",
+                    "Quand vous infligez des d\u00e9g\u00e2ts avec une arme de m\u00eal\u00e9e, vous avez une chance (plus \u00e9lev\u00e9e qu'au rang 2) de r\u00e9duire le temps d'incantation de votre prochain sort Eclair, Cha\u00eene d'\u00e9clairs, Vague de soins inf\u00e9rieurs, Salve de gu\u00e9rison, Vague de soins ou Mal\u00e9fice de 20%. Cumulable jusqu'\u00e0 5 fois. Dure 30 s.",
+                    "Quand vous infligez des d\u00e9g\u00e2ts avec une arme de m\u00eal\u00e9e, vous avez une chance (plus \u00e9lev\u00e9e qu'au rang 3) de r\u00e9duire le temps d'incantation de votre prochain sort Eclair, Cha\u00eene d'\u00e9clairs, Vague de soins inf\u00e9rieurs, Salve de gu\u00e9rison, Vague de soins ou Mal\u00e9fice de 20%. Cumulable jusqu'\u00e0 5 fois. Dure 30 s.",
+                    "Quand vous infligez des d\u00e9g\u00e2ts avec une arme de m\u00eal\u00e9e, vous avez une chance (plus \u00e9lev\u00e9e qu'au rang 4) de r\u00e9duire le temps d'incantation de votre prochain sort Eclair, Cha\u00eene d'\u00e9clairs, Vague de soins inf\u00e9rieurs, Salve de gu\u00e9rison, Vague de soins ou Mal\u00e9fice de 20%. Cumulable jusqu'\u00e0 5 fois. Dure 30 s."
+                ],
+                "s": [
+                    51528,
+                    51529,
+                    51530,
+                    51531,
+                    51532
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Spell_Shaman_MaelstromWeapon"
+            },
+            {
+                "i": 2058,
+                "n": "Esprit farouche",
+                "m": 1,
+                "d": [
+                    "Invoque deux Esprits du loup qui ob\u00e9issent au chaman. Dure 45 s."
+                ],
+                "s": [
+                    51533
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Spell_Shaman_FeralSpirit"
+            }
+        ]
+    },
+    {
+        "n": "Restauration",
+        "t": [
+            {
+                "i": 586,
+                "n": "Vague de soins am\u00e9lior\u00e9e",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit le temps d'incantation de votre sort Vague de soins de 0.1 secondes.",
+                    "R\u00e9duit le temps d'incantation de votre sort Vague de soins de 0.2 secondes.",
+                    "R\u00e9duit le temps d'incantation de votre sort Vague de soins de 0.3 secondes.",
+                    "R\u00e9duit le temps d'incantation de votre sort Vague de soins de 0.4 secondes.",
+                    "R\u00e9duit le temps d'incantation de votre sort Vague de soins de 0.5 secondes."
+                ],
+                "s": [
+                    16182,
+                    16226,
+                    16227,
+                    16228,
+                    16229
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Nature_MagicImmunity"
+            },
+            {
+                "i": 595,
+                "n": "Focalisation tot\u00e9mique",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit le co\u00fbt en mana de vos totems de 5%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos totems de 10%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos totems de 15%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos totems de 20%.",
+                    "R\u00e9duit le co\u00fbt en mana de vos totems de 25%."
+                ],
+                "s": [
+                    16173,
+                    16222,
+                    16223,
+                    16224,
+                    16225
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Nature_MoonGlow"
+            },
+            {
+                "i": 589,
+                "n": "R\u00e9incarnation am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de votre sort R\u00e9incarnation de 7 min. et augmente les montants de points de vie et de mana avec lesquels vous vous r\u00e9incarnez de 10% suppl\u00e9mentaires.",
+                    "R\u00e9duit le temps de recharge de votre sort R\u00e9incarnation de 15 min. et augmente les montants de points de vie et de mana avec lesquels vous vous r\u00e9incarnez de 20% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    16184,
+                    16209
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Nature_Reincarnation"
+            },
+            {
+                "i": 1646,
+                "n": "Gr\u00e2ce gu\u00e9risseuse",
+                "m": 3,
+                "d": [
+                    "Diminue le niveau de menace g\u00e9n\u00e9r\u00e9 par vos sorts de soins de 5% et r\u00e9duit la probabilit\u00e9 que vos sorts utiles et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 10%.",
+                    "Diminue le niveau de menace g\u00e9n\u00e9r\u00e9 par vos sorts de soins de 10% et r\u00e9duit la probabilit\u00e9 que vos sorts utiles et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 20%.",
+                    "Diminue le niveau de menace g\u00e9n\u00e9r\u00e9 par vos sorts de soins de 15% et r\u00e9duit la probabilit\u00e9 que vos sorts utiles et vos effets de d\u00e9g\u00e2ts sur la dur\u00e9e soient dissip\u00e9s de 30%."
+                ],
+                "s": [
+                    29187,
+                    29189,
+                    29191
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Nature_HealingTouch"
+            },
+            {
+                "i": 593,
+                "n": "Focalisation des flots",
+                "m": 5,
+                "d": [
+                    "R\u00e9duit de 1% le co\u00fbt en mana de vos sorts de soins.",
+                    "R\u00e9duit de 2% le co\u00fbt en mana de vos sorts de soins.",
+                    "R\u00e9duit de 3% le co\u00fbt en mana de vos sorts de soins.",
+                    "R\u00e9duit de 4% le co\u00fbt en mana de vos sorts de soins.",
+                    "R\u00e9duit de 5% le co\u00fbt en mana de vos sorts de soins."
+                ],
+                "s": [
+                    16179,
+                    16214,
+                    16215,
+                    16216,
+                    16217
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Frost_ManaRecharge"
+            },
+            {
+                "i": 583,
+                "n": "Bouclier d'eau am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "Vous avez 33% de chances de recevoir instantan\u00e9ment du mana comme si vous consommiez un orbe de Bouclier d'eau quand vous obtenez un effet critique avec vos sorts Vague de soins ou Remous, 19.8% de chances quand vous obtenez un effet critique avec votre sort Vague de soins inf\u00e9rieurs, et 9.9% de chances quand vous obtenez un effet critique avec votre sort Salve de gu\u00e9rison.",
+                    "Vous avez 66% de chances de recevoir instantan\u00e9ment du mana comme si vous consommiez un orbe de Bouclier d'eau quand vous obtenez un effet critique avec vos sorts Vague de soins ou Remous, 39.6% de chances quand vous obtenez un effet critique avec votre sort Vague de soins inf\u00e9rieurs, et 19.8% de chances quand vous obtenez un effet critique avec votre sort Salve de gu\u00e9rison.",
+                    "Vous avez 100% de chances de recevoir instantan\u00e9ment du mana comme si vous consommiez un orbe de Bouclier d'eau quand vous obtenez un effet critique avec vos sorts Vague de soins ou Remous, 60% de chances quand vous obtenez un effet critique avec votre sort Vague de soins inf\u00e9rieurs, et 30% de chances quand vous obtenez un effet critique avec votre sort Salve de gu\u00e9rison."
+                ],
+                "s": [
+                    16180,
+                    16196,
+                    16198
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Ability_Shaman_WaterShield"
+            },
+            {
+                "i": 587,
+                "n": "Focalisation des soins",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit de 23% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez tout sort de soins de chaman.",
+                    "R\u00e9duit de 46% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez tout sort de soins de chaman.",
+                    "R\u00e9duit de 70% l'interruption caus\u00e9e par les attaques infligeant des d\u00e9g\u00e2ts pendant que vous incantez tout sort de soins de chaman."
+                ],
+                "s": [
+                    16181,
+                    16230,
+                    16232
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Nature_HealingWaveLesser"
+            },
+            {
+                "i": 582,
+                "n": "Force des flots",
+                "m": 1,
+                "d": [
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts Vague de soins, Vague de soins inf\u00e9rieurs et Salve de gu\u00e9rison de 60%. Chaque soin critique r\u00e9duit les chances de 20%. Dure 20 s."
+                ],
+                "s": [
+                    55198
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Frost_Frostbolt"
+            },
+            {
+                "i": 581,
+                "n": "Gu\u00e9rison des anciens",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit de 3% les d\u00e9g\u00e2ts physiques subis par votre cible pendant 15 s. apr\u00e8s avoir re\u00e7u un effet critique de l'un de vos sorts de soins.",
+                    "R\u00e9duit de 7% les d\u00e9g\u00e2ts physiques subis par votre cible pendant 15 s. apr\u00e8s avoir re\u00e7u un effet critique de l'un de vos sorts de soins.",
+                    "R\u00e9duit de 10% les d\u00e9g\u00e2ts physiques subis par votre cible pendant 15 s. apr\u00e8s avoir re\u00e7u un effet critique de l'un de vos sorts de soins."
+                ],
+                "s": [
+                    16176,
+                    16235,
+                    16240
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Nature_UndyingStrength"
+            },
+            {
+                "i": 588,
+                "n": "Totems de restauration",
+                "m": 3,
+                "d": [
+                    "Augmente de 7% les effets de votre Totem Fontaine de mana et augmente de 15% le montant de points de vie rendus par votre Totem gu\u00e9risseur.",
+                    "Augmente de 12% les effets de votre Totem Fontaine de mana et augmente de 30% le montant de points de vie rendus par votre Totem gu\u00e9risseur.",
+                    "Augmente de 20% les effets de votre Totem Fontaine de mana et augmente de 45% le montant de points de vie rendus par votre Totem gu\u00e9risseur."
+                ],
+                "s": [
+                    16187,
+                    16205,
+                    16206
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Nature_ManaRegenTotem"
+            },
+            {
+                "i": 594,
+                "n": "Ma\u00eetrise des flots",
+                "m": 5,
+                "d": [
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts de soins et d'\u00e9clair de 1%.",
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts de soins et d'\u00e9clair de 2%.",
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts de soins et d'\u00e9clair de 3%.",
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts de soins et d'\u00e9clair de 4%.",
+                    "Augmente les chances d'obtenir un effet critique avec vos sorts de soins et d'\u00e9clair de 5%."
+                ],
+                "s": [
+                    16194,
+                    16218,
+                    16219,
+                    16220,
+                    16221
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Nature_Tranquility"
+            },
+            {
+                "i": 1648,
+                "n": "Flots de soins",
+                "m": 3,
+                "d": [
+                    "Augmente le montant de points de vie rendus par votre sort Vague de soins de 8%.",
+                    "Augmente le montant de points de vie rendus par votre sort Vague de soins de 16%.",
+                    "Augmente le montant de points de vie rendus par votre sort Vague de soins de 25%."
+                ],
+                "s": [
+                    29206,
+                    29205,
+                    29202
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Nature_HealingWay"
+            },
+            {
+                "i": 591,
+                "n": "Rapidit\u00e9 de la nature",
+                "m": 1,
+                "d": [
+                    "Lorsque cette technique est activ\u00e9e, votre prochain sort de Nature dont le temps d'incantation de base est inf\u00e9rieur \u00e0 10 sec. devient un sort instantan\u00e9. Rapidit\u00e9 de la nature partage le temps de recharge de Ma\u00eetrise \u00e9l\u00e9mentaire."
+                ],
+                "s": [
+                    16188
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Nature_RavenForm"
+            },
+            {
+                "i": 1695,
+                "n": "Esprit focalis\u00e9",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit de 10% la dur\u00e9e de tous les effets de silence ou d'interruption utilis\u00e9s contre le chaman. Cet effet ne se cumule pas avec d'autres effets similaires.",
+                    "R\u00e9duit de 20% la dur\u00e9e de tous les effets de silence ou d'interruption utilis\u00e9s contre le chaman. Cet effet ne se cumule pas avec d'autres effets similaires.",
+                    "R\u00e9duit de 30% la dur\u00e9e de tous les effets de silence ou d'interruption utilis\u00e9s contre le chaman. Cet effet ne se cumule pas avec d'autres effets similaires."
+                ],
+                "s": [
+                    30864,
+                    30865,
+                    30866
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Nature_FocusedMind"
+            },
+            {
+                "i": 592,
+                "n": "Purification",
+                "m": 5,
+                "d": [
+                    "Augmente de 2% l'efficacit\u00e9 de vos sorts de soins.",
+                    "Augmente de 4% l'efficacit\u00e9 de vos sorts de soins.",
+                    "Augmente de 6% l'efficacit\u00e9 de vos sorts de soins.",
+                    "Augmente de 8% l'efficacit\u00e9 de vos sorts de soins.",
+                    "Augmente de 10% l'efficacit\u00e9 de vos sorts de soins."
+                ],
+                "s": [
+                    16178,
+                    16210,
+                    16211,
+                    16212,
+                    16213
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Frost_WizardMark"
+            },
+            {
+                "i": 1699,
+                "n": "Gardien de la nature",
+                "m": 5,
+                "d": [
+                    "Chaque fois qu'une attaque vous inflige des d\u00e9g\u00e2ts qui vous font passer sous les 30% de points de vie, votre maximum de points de vie augmente de 3% pendant 10 s. et votre niveau de menace envers cette cible est r\u00e9duit. Temps de recharge de 30 secondes.",
+                    "Chaque fois qu'une attaque vous inflige des d\u00e9g\u00e2ts qui vous font passer sous les 30% de points de vie, votre maximum de points de vie augmente de 6% pendant 10 s. et votre niveau de menace envers cette cible est r\u00e9duit. Temps de recharge de 30 secondes.",
+                    "Chaque fois qu'une attaque vous inflige des d\u00e9g\u00e2ts qui vous font passer sous les 30% de points de vie, votre maximum de points de vie augmente de 9% pendant 10 s. et votre niveau de menace envers cette cible est r\u00e9duit. Temps de recharge de 30 secondes.",
+                    "Chaque fois qu'une attaque vous inflige des d\u00e9g\u00e2ts qui vous font passer sous les 30% de points de vie, votre maximum de points de vie augmente de 12% pendant 10 s. et votre niveau de menace envers cette cible est r\u00e9duit. Temps de recharge de 30 secondes.",
+                    "Chaque fois qu'une attaque vous inflige des d\u00e9g\u00e2ts qui vous font passer sous les 30% de points de vie, votre maximum de points de vie augmente de 15% pendant 10 s. et votre niveau de menace envers cette cible est r\u00e9duit. Temps de recharge de 30 secondes."
+                ],
+                "s": [
+                    30881,
+                    30883,
+                    30884,
+                    30885,
+                    30886
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Nature_NatureGuardian"
+            },
+            {
+                "i": 590,
+                "n": "Totem de vague de mana",
+                "m": 1,
+                "d": [
+                    "Invoque aux pieds du lanceur de sorts un Totem de vague de mana pendant  sec. Il dispose d'un montant de points de vie \u00e9gal \u00e0 10% de ceux du lanceur et rend <mana>% du total de mana toutes les 3 secondes aux membres du groupe qui se trouvent \u00e0 moins de 0 m\u00e8tres."
+                ],
+                "s": [
+                    16190
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Frost_SummonWaterElemental",
+                "r": [
+                    9,
+                    3
+                ]
+            },
+            {
+                "i": 2084,
+                "n": "Purifier l'esprit",
+                "m": 1,
+                "d": [
+                    "Purifie l'esprit d'une cible alli\u00e9e en annulant 1 effet de poison, 1 effet de maladie et 1 effet de mal\u00e9diction."
+                ],
+                "s": [
+                    51886
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Shaman_CleanseSpirit",
+                "r": [
+                    14,
+                    5
+                ]
+            },
+            {
+                "i": 2060,
+                "n": "B\u00e9n\u00e9diction des Eternels",
+                "m": 2,
+                "d": [
+                    "Augmente les chances d'effet critique de vos sorts de 2% et augmente les chances d'appliquer sur la cible l'effet de soins sur la dur\u00e9e de Viveterre de 40% quand elle dispose de 35% ou moins de ses points de vie.",
+                    "Augmente les chances d'effet critique de vos sorts de 4% et augmente les chances d'appliquer l'effet de soins sur la dur\u00e9e de Viveterre de 80% quand la cible dispose de 35% ou moins de ses points de vie."
+                ],
+                "s": [
+                    51554,
+                    51555
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Spell_Shaman_BlessingOfEternals"
+            },
+            {
+                "i": 1697,
+                "n": "Salve de gu\u00e9rison am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente de 10% le montant de points de vie rendus par votre sort Salve de gu\u00e9rison.",
+                    "Augmente de 20% le montant de points de vie rendus par votre sort Salve de gu\u00e9rison."
+                ],
+                "s": [
+                    30872,
+                    30873
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Nature_HealingWaveGreater"
+            },
+            {
+                "i": 1696,
+                "n": "B\u00e9n\u00e9diction de la nature",
+                "m": 3,
+                "d": [
+                    "Augmente vos soins d'un montant \u00e9gal \u00e0 5% de votre Intelligence.",
+                    "Augmente vos soins d'un montant \u00e9gal \u00e0 10% de votre Intelligence.",
+                    "Augmente vos soins d'un montant \u00e9gal \u00e0 15% de votre Intelligence."
+                ],
+                "s": [
+                    30867,
+                    30868,
+                    30869
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Nature_NatureBlessing"
+            },
+            {
+                "i": 2061,
+                "n": "Eveil ancestral",
+                "m": 3,
+                "d": [
+                    "Quand vous r\u00e9ussissez des soins critiques avec Vague de soins, Vague de soins inf\u00e9rieurs ou Remous, vous invoquez un Esprit ancestral \u00e0 votre aide. Il rend instantan\u00e9ment \u00e0 la cible alli\u00e9e membre du groupe ou raid dans un rayon de 40 m\u00e8tres dont le pourcentage de points de vie est le plus bas 10% du montant soign\u00e9.",
+                    "Quand vous r\u00e9ussissez des soins critiques avec Vague de soins, Vague de soins inf\u00e9rieurs ou Remous, vous invoquez un Esprit ancestral \u00e0 votre aide. Il rend instantan\u00e9ment \u00e0 la cible alli\u00e9e membre du groupe ou raid dans un rayon de 40 m\u00e8tres dont le pourcentage de points de vie est le plus bas 20% du montant soign\u00e9.",
+                    "Quand vous r\u00e9ussissez des soins critiques avec Vague de soins, Vague de soins inf\u00e9rieurs ou Remous, vous invoquez un Esprit ancestral \u00e0 votre aide. Il rend instantan\u00e9ment \u00e0 la cible alli\u00e9e membre du groupe ou raid dans un rayon de 40 m\u00e8tres dont le pourcentage de points de vie est le plus bas 30% du montant soign\u00e9."
+                ],
+                "s": [
+                    51556,
+                    51557,
+                    51558
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Shaman_AncestralAwakening"
+            },
+            {
+                "i": 1698,
+                "n": "Bouclier de terre",
+                "m": 1,
+                "d": [
+                    "Prot\u00e8ge la cible avec un bouclier de terre, qui r\u00e9duit de 30% le temps d'incantation ou de canalisation de sort perdu quand elle subit des d\u00e9g\u00e2ts. Les attaques rendent <heal> points de vie \u00e0 la cible prot\u00e9g\u00e9e. Cet effet ne peut se produire qu\u2019une fois toutes les quelques secondes. 6 charges. Dure 10 min. Bouclier de terre ne peut \u00eatre plac\u00e9 que sur une cible \u00e0 la fois et un seul Bouclier \u00e9l\u00e9mentaire peut \u00eatre actif sur une cible \u00e0 la fois."
+                ],
+                "s": [
+                    974
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Nature_SkinofEarth"
+            },
+            {
+                "i": 2059,
+                "n": "Bouclier de terre am\u00e9lior\u00e9",
+                "m": 2,
+                "d": [
+                    "Augmente le nombre de charges de votre Bouclier de terre de 1, et augmente les soins prodigu\u00e9s par votre Bouclier de terre de 5%.",
+                    "Augmente le nombre de charges de votre Bouclier de terre de 2, et augmente les soins prodigu\u00e9s par votre Bouclier de terre de 10%."
+                ],
+                "s": [
+                    51560,
+                    51561
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Nature_SkinofEarth",
+                "r": [
+                    22,
+                    1
+                ]
+            },
+            {
+                "i": 2063,
+                "n": "Raz-de-mar\u00e9e",
+                "m": 5,
+                "d": [
+                    "Vous avez 20% de chances apr\u00e8s avoir lanc\u00e9 Salve de gu\u00e9rison ou Remous de r\u00e9duire le temps d'incantation de votre sort Vague de soins de 30% et d'augmenter les chances d'effet critique de votre sort Vague de soins inf\u00e9rieurs de 25% jusqu'\u00e0 ce que deux de ces sorts aient \u00e9t\u00e9 lanc\u00e9s. De plus, votre Vague de soins b\u00e9n\u00e9ficie de 4% suppl\u00e9mentaires des effets du bonus relatif aux soins et votre Vague de soins inf\u00e9rieurs de 2% suppl\u00e9mentaires des effets du bonus relatif aux soins.",
+                    "Vous avez 40% de chances apr\u00e8s avoir lanc\u00e9 Salve de gu\u00e9rison ou Remous de r\u00e9duire le temps d'incantation de votre sort Vague de soins de 30% et d'augmenter les chances d'effet critique de votre sort Vague de soins inf\u00e9rieurs de 25% jusqu'\u00e0 ce que deux de ces sorts aient \u00e9t\u00e9 lanc\u00e9s. De plus, votre Vague de soins b\u00e9n\u00e9ficie de 8% suppl\u00e9mentaires des effets du bonus relatif aux soins et votre Vague de soins inf\u00e9rieurs de 4% suppl\u00e9mentaires des effets du bonus relatif aux soins.",
+                    "Vous avez 60% de chances apr\u00e8s avoir lanc\u00e9 Salve de gu\u00e9rison ou Remous de r\u00e9duire le temps d'incantation de votre sort Vague de soins de 30% et d'augmenter les chances d'effet critique de votre sort Vague de soins inf\u00e9rieurs de 25% jusqu'\u00e0 ce que deux de ces sorts aient \u00e9t\u00e9 lanc\u00e9s. De plus, votre Vague de soins b\u00e9n\u00e9ficie de 12% suppl\u00e9mentaires des effets du bonus relatif aux soins et votre Vague de soins inf\u00e9rieurs de 6% suppl\u00e9mentaires des effets du bonus relatif aux soins.",
+                    "Vous avez 80% de chances apr\u00e8s avoir lanc\u00e9 Salve de gu\u00e9rison ou Remous de r\u00e9duire le temps d'incantation de votre sort Vague de soins de 30% et d'augmenter les chances d'effet critique de votre sort Vague de soins inf\u00e9rieurs de 25% jusqu'\u00e0 ce que deux de ces sorts aient \u00e9t\u00e9 lanc\u00e9s. De plus, votre Vague de soins b\u00e9n\u00e9ficie de 16% suppl\u00e9mentaires des effets du bonus relatif aux soins et votre Vague de soins inf\u00e9rieurs de 8% suppl\u00e9mentaires des effets du bonus relatif aux soins.",
+                    "Vous avez 100% de chances apr\u00e8s avoir lanc\u00e9 Salve de gu\u00e9rison ou Remous de r\u00e9duire le temps d'incantation de votre sort Vague de soins de 30% et d'augmenter les chances d'effet critique de votre sort Vague de soins inf\u00e9rieurs de 25% jusqu'\u00e0 ce que deux de ces sorts aient \u00e9t\u00e9 lanc\u00e9s. De plus, votre Vague de soins b\u00e9n\u00e9ficie de 20% suppl\u00e9mentaires des effets du bonus relatif aux soins et votre Vague de soins inf\u00e9rieurs de 10% suppl\u00e9mentaires des effets du bonus relatif aux soins."
+                ],
+                "s": [
+                    51562,
+                    51563,
+                    51564,
+                    51565,
+                    51566
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Spell_Shaman_TidalWaves"
+            },
+            {
+                "i": 2064,
+                "n": "Remous",
+                "m": 1,
+                "d": [
+                    "Rend \u00e0 une cible alli\u00e9e 639 to 692 points de vie plus 665 points de vie en 15 s. Votre prochaine Salve de gu\u00e9rison lanc\u00e9e sur cette cible primaire dans les 15 s consommera l'effet de soins sur la dur\u00e9e et augmentera le montant de soins de votre Salve de gu\u00e9rison de 25%."
+                ],
+                "s": [
+                    61295
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "spell_nature_riptide"
+            }
+        ]
+    }
+])

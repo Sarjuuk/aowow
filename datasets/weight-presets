@@ -1,0 +1,74 @@
+/* FILE ARCHIVED ON 9:47:44 Dez 27, 2009 */
+var wt_presets = {
+	1: {
+		pve: {
+			fury: {exprtng:100,str:82,critstrkrtng:66,agi:53,armorpenrtng:52,hitrtng:48,hastertng:36,atkpwr:31,armor:5},
+			prot: {sta:100,dodgertng:90,defrtng:86,block:81,agi:67,parryrtng:67,blockrtng:48,str:48,exprtng:19,hitrtng:10,armorpenrtng:10,critstrkrtng:7,armor:6,hastertng:1,atkpwr:1}
+		}
+	},
+	2: {
+		pve: {
+			holy: {int:100,manargn:88,splpwr:58,critstrkrtng:46,hastertng:35},
+			prot: {sta:100,dodgertng:94,block:86,defrtng:86,exprtng:79,agi:76,parryrtng:76,hitrtng:58,blockrtng:52,str:50,armor:6,atkpwr:6,splpwr:4,critstrkrtng:3},
+			retrib: {mledps:470,hitrtng:100,str:80,exprtng:66,critstrkrtng:40,atkpwr:34,agi:32,hastertng:30,armorpenrtng:22,splpwr:9}
+		}
+	},
+	3: {
+		pve: {
+			beast: {rgddps:213,hitrtng:100,agi:58,critstrkrtng:40,int:37,atkpwr:30,armorpenrtng:28,hastertng:21},
+			marks: {rgddps:379,hitrtng:100,agi:74,critstrkrtng:57,armorpenrtng:40,int:39,atkpwr:32,hastertng:24},
+			surv: {rgddps:181,hitrtng:100,agi:76,critstrkrtng:42,int:35,hastertng:31,atkpwr:29,armorpenrtng:26}
+		}
+	},
+	4: {
+		pve: {
+			assas: {mledps:170,agi:100,exprtng:87,hitrtng:83,critstrkrtng:81,atkpwr:65,armorpenrtng:65,hastertng:64,str:55},
+			combat: {mledps:220,armorpenrtng:100,agi:100,exprtng:82,hitrtng:80,critstrkrtng:75,hastertng:73,str:55,atkpwr:50},
+			subtle: {mledps:228,exprtng:100,agi:100,hitrtng:80,armorpenrtng:75,critstrkrtng:75,hastertng:75,str:55,atkpwr:50}
+		}
+	},
+	5: {
+		pve: {
+			disc: {splpwr:100,manargn:67,int:65,hastertng:59,critstrkrtng:48,spi:22},
+			holy: {manargn:100,int:69,splpwr:60,spi:52,critstrkrtng:38,hastertng:31},
+			shadow: {hitrtng:100,shasplpwr:76,splpwr:76,critstrkrtng:54,hastertng:50,spi:16,int:16}
+		}
+	},
+	6: {
+		pve: {
+			blooddps: {mledps:360,armorpenrtng:100,str:99,hitrtng:91,exprtng:90,critstrkrtng:57,hastertng:55,atkpwr:36,armor:1},
+			frostdps: {mledps:337,hitrtng:100,str:97,exprtng:81,armorpenrtng:61,critstrkrtng:45,atkpwr:35,hastertng:28,armor:1},
+			frosttank: {mledps:419,parryrtng:100,hitrtng:97,str:96,defrtng:85,exprtng:69,dodgertng:61,agi:61,sta:61,critstrkrtng:49,atkpwr:41,armorpenrtng:31,armor:5},
+			unholydps: {mledps:209,str:100,hitrtng:66,exprtng:51,hastertng:48,critstrkrtng:45,atkpwr:34,armorpenrtng:32,armor:1}
+		}
+	},
+	7: {
+		pve: {
+			elem: {hitrtng:100,splpwr:60,hastertng:56,critstrkrtng:40,int:11},
+			enhance: {mledps:135,hitrtng:100,exprtng:84,agi:55,int:55,critstrkrtng:55,hastertng:42,str:35,atkpwr:32,splpwr:29,armorpenrtng:26},
+			resto: {manargn:100,int:85,splpwr:77,critstrkrtng:62,hastertng:35}
+		}
+	},
+	8: {
+		pve: {
+			arcane: {hitrtng:100,hastertng:54,arcsplpwr:49,splpwr:49,critstrkrtng:37,int:34,frosplpwr:24,firsplpwr:24,spi:14},
+			fire: {hitrtng:100,hastertng:53,firsplpwr:46,splpwr:46,critstrkrtng:43,frosplpwr:23,arcsplpwr:23,int:13},
+			frost: {hitrtng:100,hastertng:42,frosplpwr:39,splpwr:39,arcsplpwr:19,firsplpwr:19,critstrkrtng:19,int:6}
+		}
+	},
+	9: {
+		pve: {
+			afflic: {hitrtng:100,shasplpwr:72,splpwr:72,hastertng:61,critstrkrtng:38,firsplpwr:36,spi:34,int:15},
+			demo: {hitrtng:100,hastertng:50,firsplpwr:45,shasplpwr:45,splpwr:45,critstrkrtng:31,spi:29,int:13},
+			destro: {hitrtng:100,firsplpwr:47,splpwr:47,hastertng:46,spi:26,shasplpwr:23,critstrkrtng:16,int:13}
+		}
+	},
+	11: {
+		pve: {
+			balance: {hitrtng:100,splpwr:66,hastertng:54,critstrkrtng:43,spi:22,int:22},
+			feraldps: {agi:100,armorpenrtng:90,str:80,critstrkrtng:55,exprtng:50,hitrtng:50,feratkpwr:40,atkpwr:40,hastertng:35},
+			feraltank: {agi:100,sta:75,dodgertng:65,defrtng:60,exprtng:16,str:10,armor:10,hitrtng:8,hastertng:5,atkpwr:4,feratkpwr:4,critstrkrtng:3},
+			resto: {splpwr:100,manargn:73,hastertng:57,int:51,spi:32,critstrkrtng:11}
+		}
+	}
+};

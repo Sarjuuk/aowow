@@ -1,0 +1,1475 @@
+$WowheadTalentCalculator.registerClass(7, [
+    {
+        "n": "[Elemental]",
+        "t": [
+            {
+                "i": 564,
+                "n": "[Convection]",
+                "m": 5,
+                "d": [
+                    "[Reduces the mana cost of your Shock, Lightning Bolt, Chain Lightning, Lava Burst, and Wind Shear spells by 2%.]",
+                    "[Reduces the mana cost of your Shock, Lightning Bolt, Chain Lightning, Lava Burst, and Wind Shear spells by 4%.]",
+                    "[Reduces the mana cost of your Shock, Lightning Bolt, Chain Lightning, Lava Burst, and Wind Shear spells by 6%.]",
+                    "[Reduces the mana cost of your Shock, Lightning Bolt, Chain Lightning, Lava Burst, and Wind Shear spells by 8%.]",
+                    "[Reduces the mana cost of your Shock, Lightning Bolt, Chain Lightning, Lava Burst, and Wind Shear spells by 10%.]"
+                ],
+                "s": [
+                    16039,
+                    16109,
+                    16110,
+                    16111,
+                    16112
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Nature_WispSplode"
+            },
+            {
+                "i": 563,
+                "n": "[Concussion]",
+                "m": 5,
+                "d": [
+                    "[Increases the damage done by your Lightning Bolt, Chain Lightning, Thunderstorm, Lava Burst and Shock spells by 1%.]",
+                    "[Increases the damage done by your Lightning Bolt, Chain Lightning, Thunderstorm, Lava Burst and Shock spells by 2%.]",
+                    "[Increases the damage done by your Lightning Bolt, Chain Lightning, Thunderstorm, Lava Burst and Shock spells by 3%.]",
+                    "[Increases the damage done by your Lightning Bolt, Chain Lightning, Thunderstorm, Lava Burst and Shock spells by 4%.]",
+                    "[Increases the damage done by your Lightning Bolt, Chain Lightning, Thunderstorm, Lava Burst and Shock spells by 5%.]"
+                ],
+                "s": [
+                    16035,
+                    16105,
+                    16106,
+                    16107,
+                    16108
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Fire_Fireball"
+            },
+            {
+                "i": 561,
+                "n": "[Call of Flame]",
+                "m": 3,
+                "d": [
+                    "[Increases the damage done by your Fire Totems and Fire Nova by 5%, and damage done by your Lava Burst spell by 2%.]",
+                    "[Increases the damage done by your Fire Totems and Fire Nova by 10%, and damage done by your Lava Burst spell by 4%.]",
+                    "[Increases the damage done by your Fire Totems and Fire Nova by 15%, and damage done by your Lava Burst spell by 6%.]"
+                ],
+                "s": [
+                    16038,
+                    16160,
+                    16161
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Fire_Immolation"
+            },
+            {
+                "i": 1640,
+                "n": "[Elemental Warding]",
+                "m": 3,
+                "d": [
+                    "[Reduces all damage taken by 2%.]",
+                    "[Reduces all damage taken by 4%.]",
+                    "[Reduces all damage taken by 6%.]"
+                ],
+                "s": [
+                    28996,
+                    28997,
+                    28998
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Nature_SpiritArmor"
+            },
+            {
+                "i": 1645,
+                "n": "[Elemental Devastation]",
+                "m": 3,
+                "d": [
+                    "[Your non-periodic offensive spell crits will increase your chance to get a critical strike with melee attacks by 3% for 10 seg.]",
+                    "[Your non-periodic offensive spell crits will increase your chance to get a critical strike with melee attacks by 6% for 10 seg.]",
+                    "[Your non-periodic offensive spell crits will increase your chance to get a critical strike with melee attacks by 9% for 10 seg.]"
+                ],
+                "s": [
+                    30160,
+                    29179,
+                    29180
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Fire_ElementalDevastation"
+            },
+            {
+                "i": 575,
+                "n": "[Reverberation]",
+                "m": 5,
+                "d": [
+                    "[Reduces the cooldown of your Shock spells and Wind Shear by 0.2 sec.]",
+                    "[Reduces the cooldown of your Shock spells and Wind Shear by 0.4 sec.]",
+                    "[Reduces the cooldown of your Shock spells and Wind Shear by 0.6 sec.]",
+                    "[Reduces the cooldown of your Shock and Wind Shear spells by 0.8 sec.]",
+                    "[Reduces the cooldown of your Shock and Wind Shear spells by 1 sec.]"
+                ],
+                "s": [
+                    16040,
+                    16113,
+                    16114,
+                    16115,
+                    16116
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Frost_FrostWard"
+            },
+            {
+                "i": 574,
+                "n": "[Elemental Focus]",
+                "m": 1,
+                "d": [
+                    "[After landing a non-periodic critical strike with a Fire, Frost, or Nature damage spell, you enter a Clearcasting state.  The Clearcasting state reduces the mana cost of your next 2 damage or healing spells by 40%.]"
+                ],
+                "s": [
+                    16164
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Shadow_ManaBurn"
+            },
+            {
+                "i": 565,
+                "n": "[Elemental Fury]",
+                "m": 5,
+                "d": [
+                    "[Increases the critical strike damage bonus of your Searing and Magma Totems and your Fire, Frost, and Nature spells by 20%.]",
+                    "[Increases the critical strike damage bonus of your Searing and Magma Totems and your Fire, Frost, and Nature spells by 40%.]",
+                    "[Increases the critical strike damage bonus of your Searing and Magma Totems and your Fire, Frost, and Nature spells by 60%.]",
+                    "[Increases the critical strike damage bonus of your Searing and Magma Totems and your Fire, Frost, and Nature spells by 80%.]",
+                    "[Increases the critical strike damage bonus of your Searing and Magma Totems and your Fire, Frost, and Nature spells by 100%.]"
+                ],
+                "s": [
+                    16089,
+                    60184,
+                    60185,
+                    60187,
+                    60188
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Fire_Volcano"
+            },
+            {
+                "i": 567,
+                "n": "[Improved Fire Nova]",
+                "m": 2,
+                "d": [
+                    "[Increases the damage done by your Fire Nova by 10% and reduces the cooldown by 2 sec.]",
+                    "[Increases the damage done by your Fire Nova by 20% and reduces the cooldown by 4 sec.]"
+                ],
+                "s": [
+                    16086,
+                    16544
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Fire_SealOfFire"
+            },
+            {
+                "i": 1642,
+                "n": "[Eye of the Storm]",
+                "m": 3,
+                "d": [
+                    "[Reduces the pushback suffered from damaging attacks while casting Lightning Bolt, Chain Lightning, Lava Burst and Hex spells by 23%.]",
+                    "[Reduces the pushback suffered from damaging attacks while casting Lightning Bolt, Chain Lightning, Lava Burst and Hex spells by 46%.]",
+                    "[Reduces the pushback suffered from damaging attacks while casting Lightning Bolt, Chain Lightning, Lava Burst and Hex spells by 70%.]"
+                ],
+                "s": [
+                    29062,
+                    29064,
+                    29065
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_Shadow_SoulLeech_2"
+            },
+            {
+                "i": 1641,
+                "n": "[Elemental Reach]",
+                "m": 2,
+                "d": [
+                    "[Increases the range of your Lightning Bolt, Chain Lightning, Fire Nova, and Lava Burst spells by 3 yards, increases the radius of your Thunderstorm spell by 10%, and increases the range of your Flame Shock by 7 yards.]",
+                    "[Increases the range of your Lightning Bolt, Chain Lightning, Fire Nova, and Lava Burst spells by 6 yards, increases the radius of your Thunderstorm spell by 20%, and increases the range of your Flame Shock by 15 yards.]"
+                ],
+                "s": [
+                    28999,
+                    29000
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Nature_StormReach"
+            },
+            {
+                "i": 562,
+                "n": "[Call of Thunder]",
+                "m": 1,
+                "d": [
+                    "[Increases the critical strike chance of your Lightning Bolt, Chain Lightning and Thunderstorm spells by an additional 5%.]"
+                ],
+                "s": [
+                    16041
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Nature_CallStorm",
+                "r": [
+                    6,
+                    1
+                ]
+            },
+            {
+                "i": 1682,
+                "n": "[Unrelenting Storm]",
+                "m": 3,
+                "d": [
+                    "[Regenerate mana equal to 4% of your Intellect every 5 sec, even while casting.]",
+                    "[Regenerate mana equal to 8% of your Intellect every 5 sec, even while casting.]",
+                    "[Regenerate mana equal to 12% of your Intellect every 5 sec, even while casting.]"
+                ],
+                "s": [
+                    30664,
+                    30665,
+                    30666
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Nature_UnrelentingStorm"
+            },
+            {
+                "i": 1685,
+                "n": "[Elemental Precision]",
+                "m": 3,
+                "d": [
+                    "[Increases your chance to hit with Fire, Frost and Nature spells by 1% and reduces the threat caused by Fire, Frost and Nature spells by 10%.]",
+                    "[Increases your chance to hit with Fire, Frost and Nature spells by 2% and reduces the threat caused by Fire, Frost and Nature spells by 20%.]",
+                    "[Increases your chance to hit with Fire, Frost and Nature spells by 3% and reduces the threat caused by Fire, Frost and Nature spells by 30%.]"
+                ],
+                "s": [
+                    30672,
+                    30673,
+                    30674
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Nature_ElementalPrecision_1"
+            },
+            {
+                "i": 721,
+                "n": "[Lightning Mastery]",
+                "m": 5,
+                "d": [
+                    "[Reduces the cast time of your Lightning Bolt, Chain Lightning, and Lava Burst spells by 0.1 sec.]",
+                    "[Reduces the cast time of your Lightning Bolt, Chain Lightning, and Lava Burst spells by 0.2 sec.]",
+                    "[Reduces the cast time of your Lightning Bolt, Chain Lightning, and Lava Burst spells by 0.3 sec.]",
+                    "[Reduces the cast time of your Lightning Bolt, Chain Lightning, and Lava Burst spells by 0.4 sec.]",
+                    "[Reduces the cast time of your Lightning Bolt, Chain Lightning, and Lava Burst spells by 0.5 sec.]"
+                ],
+                "s": [
+                    16578,
+                    16579,
+                    16580,
+                    16581,
+                    16582
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Lightning_LightningBolt01",
+                "r": [
+                    7,
+                    5
+                ]
+            },
+            {
+                "i": 573,
+                "n": "[Elemental Mastery]",
+                "m": 1,
+                "d": [
+                    "[When activated, your next Lightning Bolt, Chain Lightning or Lava Burst spell becomes an instant cast spell. In addition, you gain 15% spell haste for 15 seg. Elemental Mastery shares a cooldown with Nature's Swiftness.]"
+                ],
+                "s": [
+                    16166
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Nature_WispHeal",
+                "r": [
+                    11,
+                    1
+                ]
+            },
+            {
+                "i": 2052,
+                "n": "[Storm, Earth and Fire]",
+                "m": 3,
+                "d": [
+                    "[Reduces the cooldown of your Chain Lightning spell by .75 sec, your Earthbind Totem also has a 33% chance to root targets for 5 seg when cast and the periodic damage done by your Flame Shock is increased by 20%.]",
+                    "[Reduces the cooldown of your Chain Lightning spell by 1.5 sec, your Earthbind Totem also has a 66% chance to root targets for 5 seg when cast and the periodic damage done by your Flame Shock is increased by 40%.]",
+                    "[Reduces the cooldown of your Chain Lightning spell by 2.5 sec, your Earthbind Totem also has a 100% chance to root targets for 5 seg when cast and the periodic damage done by your Flame Shock is increased by 60%.]"
+                ],
+                "s": [
+                    51483,
+                    51485,
+                    51486
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Shaman_StormEarthFire"
+            },
+            {
+                "i": 2262,
+                "n": "[Booming Echoes]",
+                "m": 2,
+                "d": [
+                    "[Reduces the cooldown of your Flame Shock and Frost Shock spells by an additional 1 sec., and increases the direct damage done by your Flame Shock and Frost Shock spells by an additional 10%.]",
+                    "[Reduces the cooldown of your Flame Shock and Frost Shock spells by an additional 2 sec., and increases the direct damage done by your Flame Shock and Frost Shock spells by an additional 20%.]"
+                ],
+                "s": [
+                    63370,
+                    63372
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Spell_Fire_BlueFlameRing"
+            },
+            {
+                "i": 2049,
+                "n": "[Elemental Oath]",
+                "m": 2,
+                "d": [
+                    "[While Clearcasting from Elemental Focus is active, you deal 5% more spell damage. In addition, party and raid members within 100 yards receive a 3% bonus to their spell critical strike chance.]",
+                    "[While Clearcasting from Elemental Focus is active, you deal 10% more spell damage. In addition, party and raid members within 100 yards receive a 5% bonus to their spell critical strike chance.]"
+                ],
+                "s": [
+                    51466,
+                    51470
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Shaman_ElementalOath",
+                "r": [
+                    15,
+                    1
+                ]
+            },
+            {
+                "i": 1686,
+                "n": "[Lightning Overload]",
+                "m": 3,
+                "d": [
+                    "[Gives your Lightning Bolt and Chain Lightning spells a 11% chance to cast a second, similar spell on the same target at no additional cost that causes half damage and no threat.]",
+                    "[Gives your Lightning Bolt and Chain Lightning spells a 22% chance to cast a second, similar spell on the same target at no additional cost that causes half damage and no threat.]",
+                    "[Gives your Lightning Bolt and Chain Lightning spells a 33% chance to cast a second, similar spell on the same target at no additional cost that causes half damage and no threat.]"
+                ],
+                "s": [
+                    30675,
+                    30678,
+                    30679
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Nature_LightningOverload"
+            },
+            {
+                "i": 2050,
+                "n": "[Astral Shift]",
+                "m": 3,
+                "d": [
+                    "[When stunned, feared or silenced you  shift into the Astral Plane reducing all damage taken by 10% for the duration of the stun, fear or silence effect.]",
+                    "[When stunned, feared or silenced you  shift into the Astral Plane reducing all damage taken by 20% for the duration of the stun, fear or silence effect.]",
+                    "[When stunned, feared or silenced you shift into the Astral Plane reducing all damage taken by 30% for the duration of the stun, fear or silence effect.]"
+                ],
+                "s": [
+                    51474,
+                    51478,
+                    51479
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Shaman_AstralShift"
+            },
+            {
+                "i": 1687,
+                "n": "[Totem of Wrath]",
+                "m": 1,
+                "d": [
+                    "[Summons a Totem of Wrath with 5 health at the feet of the caster.  The totem increases spell power by 100 for all party and raid members, and increases the critical strike chance of all attacks by 3% against all enemies within 0 yards.  Lasts 5 min.]"
+                ],
+                "s": [
+                    30706
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Fire_TotemOfWrath"
+            },
+            {
+                "i": 2051,
+                "n": "[Lava Flows]",
+                "m": 3,
+                "d": [
+                    "[Increases the critical strike damage bonus of your Lava Burst spell by an additional 6%, and when your Flame Shock is dispelled your spell casting speed is increased by 10% for 6 seg.]",
+                    "[Increases the critical strike damage bonus of your Lava Burst spell by an additional 12%, and when your Flame Shock is dispelled your spell casting speed is increased by 20% for 6 seg.]",
+                    "[Increases the critical strike damage bonus of your Lava Burst spell by an additional 24%, and when your Flame Shock is dispelled your spell casting speed is increased by 30% for 6 seg.]"
+                ],
+                "s": [
+                    51480,
+                    51481,
+                    51482
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Shaman_LavaFlow"
+            },
+            {
+                "i": 2252,
+                "n": "[Shamanism]",
+                "m": 5,
+                "d": [
+                    "[Your Lightning Bolt and Chain Lightning spells gain an additional 4% and your Lava Burst gains an additional 5% of your bonus damage effects.]",
+                    "[Your Lightning Bolt and Chain Lightning spells gain an additional 8% and your Lava Burst gains an additional 10% of your bonus damage effects.]",
+                    "[Your Lightning Bolt and Chain Lightning spells gain an additional 12% and your Lava Burst gains an additional 15% of your bonus damage effects.]",
+                    "[Your Lightning Bolt and Chain Lightning spells gain an additional 16% and your Lava Burst gains an additional 20% of your bonus damage effects.]",
+                    "[Your Lightning Bolt and Chain Lightning spells gain an additional 20% and your Lava Burst gains an additional 25% of your bonus damage effects.]"
+                ],
+                "s": [
+                    62097,
+                    62098,
+                    62099,
+                    62100,
+                    62101
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Spell_unused2"
+            },
+            {
+                "i": 2053,
+                "n": "[Thunderstorm]",
+                "m": 1,
+                "d": [
+                    "[You call down a bolt of lightning, energizing you and damaging nearby enemies within 10 yards. Restores 8% mana to you and deals 551 - 630 Nature damage to all nearby enemies, knocking them back 20 yards. This spell is usable while stunned.]"
+                ],
+                "s": [
+                    51490
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Spell_Shaman_ThunderStorm"
+            }
+        ]
+    },
+    {
+        "n": "[Enhancement]",
+        "t": [
+            {
+                "i": 610,
+                "n": "[Enhancing Totems]",
+                "m": 3,
+                "d": [
+                    "[Increases the effect of your Strength of Earth and Flametongue Totems by 5%.]",
+                    "[Increases the effect of your Strength of Earth and Flametongue Totems by 10%.]",
+                    "[Increases the effect of your Strength of Earth and Flametongue Totems by 15%.]"
+                ],
+                "s": [
+                    16259,
+                    16295,
+                    52456
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Nature_EarthBindTotem"
+            },
+            {
+                "i": 2101,
+                "n": "[Earth's Grasp]",
+                "m": 2,
+                "d": [
+                    "[Increases the health of your Stoneclaw Totem by 25% and the radius of your Earthbind Totem by 10%, and reduces the cooldown of both totems by 15%.]",
+                    "[Increases the health of your Stoneclaw Totem by 50% and the radius of your Earthbind Totem by 20%, and reduces the cooldown of both totems by 30%.]"
+                ],
+                "s": [
+                    16043,
+                    16130
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Nature_StoneClawTotem"
+            },
+            {
+                "i": 614,
+                "n": "[Ancestral Knowledge]",
+                "m": 5,
+                "d": [
+                    "[Increases your Intellect by 2%.]",
+                    "[Increases your Intellect by 4%.]",
+                    "[Increases your Intellect by 6%.]",
+                    "[Increases your Intellect by 8%.]",
+                    "[Increases your Intellect by 10%.]"
+                ],
+                "s": [
+                    17485,
+                    17486,
+                    17487,
+                    17488,
+                    17489
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Shadow_GrimWard"
+            },
+            {
+                "i": 609,
+                "n": "[Guardian Totems]",
+                "m": 2,
+                "d": [
+                    "[Increases the amount of armor increased by your Stoneskin Totem by 10% and reduces the cooldown of your Grounding Totem by 1 sec.]",
+                    "[Increases the amount of armor increased by your Stoneskin Totem by 20% and reduces the cooldown of your Grounding Totem by 2 sec.]"
+                ],
+                "s": [
+                    16258,
+                    16293
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Nature_StoneSkinTotem"
+            },
+            {
+                "i": 613,
+                "n": "[Thundering Strikes]",
+                "m": 5,
+                "d": [
+                    "[Improves your chance to get a critical strike with all spells and attacks by 1%.]",
+                    "[Improves your chance to get a critical strike with all spells and attacks by 2%.]",
+                    "[Improves your chance to get a critical strike with all spells and attacks by 3%.]",
+                    "[Improves your chance to get a critical strike with all spells and attacks by 4%.]",
+                    "[Improves your chance to get a critical strike with all spells and attacks by 5%.]"
+                ],
+                "s": [
+                    16255,
+                    16302,
+                    16303,
+                    16304,
+                    16305
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Ability_ThunderBolt"
+            },
+            {
+                "i": 605,
+                "n": "[Improved Ghost Wolf]",
+                "m": 2,
+                "d": [
+                    "[Reduces the cast time of your Ghost Wolf spell by 1 sec.]",
+                    "[Reduces the cast time of your Ghost Wolf spell by 2 sec.]"
+                ],
+                "s": [
+                    16262,
+                    16287
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Nature_SpiritWolf"
+            },
+            {
+                "i": 607,
+                "n": "[Improved Shields]",
+                "m": 3,
+                "d": [
+                    "[Increases the damage done by your Lightning Shield orbs by 5%, increases the amount of mana gained from your Water Shield orbs by 5% and increases the amount of healing done by your Earth Shield orbs by 5%.]",
+                    "[Increases the damage done by your Lightning Shield orbs by 10%, increases the amount of mana gained from your Water Shield orbs by 10% and increases the amount of healing done by your Earth Shield orbs by 10%.]",
+                    "[Increases the damage done by your Lightning Shield orbs by 15%, increases the amount of mana gained from your Water Shield orbs by 15% and increases the amount of healing done by your Earth Shield orbs by 15%.]"
+                ],
+                "s": [
+                    16261,
+                    16290,
+                    51881
+                ],
+                "x": 3,
+                "y": 1,
+                "iconname": "Spell_Nature_LightningShield"
+            },
+            {
+                "i": 611,
+                "n": "[Elemental Weapons]",
+                "m": 3,
+                "d": [
+                    "[Increases the damage caused by your Windfury Weapon effect by 13%  increases the spell damage on your Flametongue Weapon by 10% and increases the bonus healing on your Earthliving Weapon by 10%.]",
+                    "[Increases the damage caused by your Windfury Weapon effect by 27%  increases the spell damage on your Flametongue Weapon by 20% and increases the bonus healing on your Earthliving Weapon by 20%.]",
+                    "[Increases the damage caused by your Windfury Weapon effect by 40%  increases the spell damage on your Flametongue Weapon by 30% and increases the bonus healing on your Earthliving Weapon by 30%.]"
+                ],
+                "s": [
+                    16266,
+                    29079,
+                    29080
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Fire_FlameTounge"
+            },
+            {
+                "i": 617,
+                "n": "[Shamanistic Focus]",
+                "m": 1,
+                "d": [
+                    "[Reduces the mana cost of your Shock spells by 45%.]"
+                ],
+                "s": [
+                    43338
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Nature_ElementalAbsorption"
+            },
+            {
+                "i": 601,
+                "n": "[Anticipation]",
+                "m": 3,
+                "d": [
+                    "[Increases your chance to dodge by an additional 1%, and reduces the duration of all Disarm effects used against you by 16%. This does not stack with other Disarm duration reducing effects.]",
+                    "[Increases your chance to dodge by an additional 2%, and reduces the duration of all Disarm effects used against you by 25%. This does not stack with other Disarm duration reducing effects.]",
+                    "[Increases your chance to dodge by an additional 3%, and reduces the duration of all Disarm effects used against you by 50%. This does not stack with other Disarm duration reducing effects.]"
+                ],
+                "s": [
+                    16254,
+                    16271,
+                    16272
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Nature_MirrorImage"
+            },
+            {
+                "i": 602,
+                "n": "[Flurry]",
+                "m": 5,
+                "d": [
+                    "[Increases your attack speed by 6% for your next 3 swings after dealing a critical strike.]",
+                    "[Increases your attack speed by 12% for your next 3 swings after dealing a critical strike.]",
+                    "[Increases your attack speed by 18% for your next 3 swings after dealing a critical strike.]",
+                    "[Increases your attack speed by 24% for your next 3 swings after dealing a critical strike.]",
+                    "[Increases your attack speed by 30% for your next 3 swings after dealing a critical strike.]"
+                ],
+                "s": [
+                    16256,
+                    16281,
+                    16282,
+                    16283,
+                    16284
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Ability_GhoulFrenzy",
+                "r": [
+                    4,
+                    5
+                ]
+            },
+            {
+                "i": 615,
+                "n": "[Toughness]",
+                "m": 5,
+                "d": [
+                    "[Increases your Stamina by 2%, and reduces the duration of movement slowing effects on you by 6%.]",
+                    "[Increases your Stamina by 4%, and reduces the duration of movement slowing effects on you by 12%.]",
+                    "[Increases your Stamina by 6%, and reduces the duration of movement slowing effects on you by 18%.]",
+                    "[Increases your Stamina by 8%, and reduces the duration of movement slowing effects on you by 24%.]",
+                    "[Increases your Stamina by 10%, and reduces the duration of movement slowing effects on you by 30%.]"
+                ],
+                "s": [
+                    16252,
+                    16306,
+                    16307,
+                    16308,
+                    16309
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Holy_Devotion"
+            },
+            {
+                "i": 1647,
+                "n": "[Improved Windfury Totem]",
+                "m": 2,
+                "d": [
+                    "[Increases the melee haste granted by your Windfury totem by 2%.]",
+                    "[Increases the melee haste granted by your Windfury totem by 4%.]"
+                ],
+                "s": [
+                    29192,
+                    29193
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Nature_Windfury"
+            },
+            {
+                "i": 616,
+                "n": "[Spirit Weapons]",
+                "m": 1,
+                "d": [
+                    "[Gives a chance to parry enemy melee attacks and reduces all threat generated by 30%.]"
+                ],
+                "s": [
+                    16268
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Ability_Parry"
+            },
+            {
+                "i": 2083,
+                "n": "[Mental Dexterity]",
+                "m": 3,
+                "d": [
+                    "[Increases your Attack Power by 33% of your Intellect.]",
+                    "[Increases your Attack Power by 66% of your Intellect.]",
+                    "[Increases your Attack Power by 100% of your Intellect.]"
+                ],
+                "s": [
+                    51883,
+                    51884,
+                    51885
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Nature_BloodLust"
+            },
+            {
+                "i": 1689,
+                "n": "[Unleashed Rage]",
+                "m": 3,
+                "d": [
+                    "[Increases your expertise by 3, and increases all party and raid members' attack power by 4% while within 0 yards of the Shaman.]",
+                    "[Increases your expertise by 6, and increases all party and raid members' attack power by 7% while within 0 yards of the Shaman.]",
+                    "[Increases your expertise by 9, and increases all party and raid members' attack power by 10% while within 0 yards of the Shaman.]"
+                ],
+                "s": [
+                    30802,
+                    30808,
+                    30809
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Nature_UnleashedRage"
+            },
+            {
+                "i": 1643,
+                "n": "[Weapon Mastery]",
+                "m": 3,
+                "d": [
+                    "[Increases the damage you deal with all weapons by 4%.]",
+                    "[Increases the damage you deal with all weapons by 7%.]",
+                    "[Increases the damage you deal with all weapons by 10%.]"
+                ],
+                "s": [
+                    29082,
+                    29084,
+                    29086
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Ability_Hunter_SwiftStrike"
+            },
+            {
+                "i": 2263,
+                "n": "[Frozen Power]",
+                "m": 2,
+                "d": [
+                    "[Increases the damage done by your Lightning Bolt, Chain Lightning, Lava Lash and Shock spells by 5% on targets afflicted by your Frostbrand Attack effect, and your Frost Shock has a 50% chance to root the target in ice for 5 seg. when used on targets at or further than 15 yards from you.]",
+                    "[Increases the damage done by your Lightning Bolt, Chain Lightning, Lava Lash and Shock spells by 10% on targets afflicted by your Frostbrand Attack effect, and your Frost Shock has a 100% chance to root the target in ice for 5 seg. when used on targets at or further than 15 yards from you.]"
+                ],
+                "s": [
+                    63373,
+                    63374
+                ],
+                "x": 3,
+                "y": 5,
+                "iconname": "Spell_Fire_BlueCano"
+            },
+            {
+                "i": 1692,
+                "n": "[Dual Wield Specialization]",
+                "m": 3,
+                "d": [
+                    "[Increases your chance to hit while dual wielding by an additional 2%.]",
+                    "[Increases your chance to hit while dual wielding by an additional 4%.]",
+                    "[Increases your chance to hit while dual wielding by an additional 6%.]"
+                ],
+                "s": [
+                    30816,
+                    30818,
+                    30819
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_DualWieldSpecialization",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 1690,
+                "n": "[Dual Wield]",
+                "m": 1,
+                "d": [
+                    "[Allows one-hand and off-hand weapons to be equipped in the off-hand.]"
+                ],
+                "s": [
+                    30798
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Ability_DualWield",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 901,
+                "n": "[Stormstrike]",
+                "m": 1,
+                "d": [
+                    "[Instantly attack with both weapons.  In addition, the next 4 sources of Nature damage dealt to the target from the Shaman are increased by 20%. Lasts 12 seg.]"
+                ],
+                "s": [
+                    17364
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Shaman_Stormstrike"
+            },
+            {
+                "i": 2055,
+                "n": "[Static Shock]",
+                "m": 3,
+                "d": [
+                    "[You have a 2% chance to hit your target with a Lightning Shield orb charge when you deal damage with melee attacks and abilities, and your Lightning Shield gains 2 additional charges.]",
+                    "[You have a 4% chance to hit your target with a Lightning Shield orb charge when you deal damage with melee attacks and abilities, and your Lightning Shield gains 4 additional charges.]",
+                    "[You have a 6% chance to hit your target with a Lightning Shield orb charge when you deal damage with melee attacks and abilities, and your Lightning Shield gains 6 additional charges.]"
+                ],
+                "s": [
+                    51525,
+                    51526,
+                    51527
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Spell_Shaman_StaticShock"
+            },
+            {
+                "i": 2249,
+                "n": "[Lava Lash]",
+                "m": 1,
+                "d": [
+                    "[You charge your off-hand weapon with lava, instantly dealing 100% off-hand Weapon damage. Damage is increased by 25% if your off-hand weapon is enchanted with Flametongue.]"
+                ],
+                "s": [
+                    60103
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Ability_Shaman_Lavalash",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 2054,
+                "n": "[Improved Stormstrike]",
+                "m": 2,
+                "d": [
+                    "[When you Stormstrike, you have a 50% chance to immediately grant you 20% of your base mana.]",
+                    "[When you Stormstrike, you have a 100% chance to immediately grant you 20% of your base mana.]"
+                ],
+                "s": [
+                    51521,
+                    51522
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Shaman_ImprovedStormstrike",
+                "r": [
+                    20,
+                    1
+                ]
+            },
+            {
+                "i": 1691,
+                "n": "[Mental Quickness]",
+                "m": 3,
+                "d": [
+                    "[Reduces the mana cost of your instant cast Shaman spells by 2% and increases your spell power by an amount equal to 10% of your attack power.]",
+                    "[Reduces the mana cost of your instant cast Shaman spells by 4% and increases your spell power by an amount equal to 20% of your attack power.]",
+                    "[Reduces the mana cost of your instant cast Shaman spells by 6% and increases your spell power by an amount equal to 30% of your attack power.]"
+                ],
+                "s": [
+                    30812,
+                    30813,
+                    30814
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Nature_MentalQuickness"
+            },
+            {
+                "i": 1693,
+                "n": "[Shamanistic Rage]",
+                "m": 1,
+                "d": [
+                    "[Reduces all damage taken by 30% and gives your successful melee attacks a chance to regenerate mana equal to 15% of your attack power. This spell is usable while stunned. Lasts 15 seg.]"
+                ],
+                "s": [
+                    30823
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Nature_ShamanRage"
+            },
+            {
+                "i": 2056,
+                "n": "[Earthen Power]",
+                "m": 2,
+                "d": [
+                    "[Your Earthbind Totem's pulses have a 50% chance to also remove all snare effects from you and nearby friendly targets, and your Earth Shock reduces enemy attack speed by an additional 5%.]",
+                    "[Your Earthbind Totem's pulses have a 100% chance to also remove all snare effects from you and nearby friendly targets, and your Earth Shock reduces enemy attack speed by an additional 10%.]"
+                ],
+                "s": [
+                    51523,
+                    51524
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Nature_EarthElemental_Totem"
+            },
+            {
+                "i": 2057,
+                "n": "[Maelstrom Weapon]",
+                "m": 5,
+                "d": [
+                    "[When you deal damage with a melee weapon, you have a chance to reduce the cast time of your next Lightning Bolt, Chain Lightning, Lesser Healing Wave, Healing Wave, Chain Heal, or Hex spell by 20%. Stacks up to 5 times. Lasts 30 seg.]",
+                    "[When you deal damage with a melee weapon, you have a chance (higher than rank 1) to reduce the cast time of your next Lightning Bolt, Chain Lightning, Lesser Healing Wave, Healing Wave, Chain Heal, or Hex spell by 20%. Stacks up to 5 times. Lasts 30 seg.]",
+                    "[When you deal damage with a melee weapon, you have a chance (higher than rank 2) to reduce the cast time of your next Lightning Bolt, Chain Lightning, Lesser Healing Wave, Healing Wave, Chain Heal, or Hex spell by 20%. Stacks up to 5 times. Lasts 30 seg.]",
+                    "[When you deal damage with a melee weapon, you have a chance (higher than rank 3) to reduce the cast time of your next Lightning Bolt, Chain Lightning, Lesser Healing Wave, Healing Wave, Chain Heal, or Hex spell by 20%. Stacks up to 5 times. Lasts 30 seg.]",
+                    "[When you deal damage with a melee weapon, you have a chance (higher than rank 4) to reduce the cast time of your next Lightning Bolt, Chain Lightning, Lesser Healing Wave, Healing Wave, Chain Heal, or Hex spell by 20%. Stacks up to 5 times. Lasts 30 seg.]"
+                ],
+                "s": [
+                    51528,
+                    51529,
+                    51530,
+                    51531,
+                    51532
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Spell_Shaman_MaelstromWeapon"
+            },
+            {
+                "i": 2058,
+                "n": "[Feral Spirit]",
+                "m": 1,
+                "d": [
+                    "[Summons two Spirit Wolves under the command of the Shaman, lasting 45 seg.]"
+                ],
+                "s": [
+                    51533
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Spell_Shaman_FeralSpirit"
+            }
+        ]
+    },
+    {
+        "n": "[Restoration]",
+        "t": [
+            {
+                "i": 586,
+                "n": "[Improved Healing Wave]",
+                "m": 5,
+                "d": [
+                    "[Reduces the casting time of your Healing Wave spell by 0.1 sec.]",
+                    "[Reduces the casting time of your Healing Wave spell by 0.2 sec.]",
+                    "[Reduces the casting time of your Healing Wave spell by 0.3 sec.]",
+                    "[Reduces the casting time of your Healing Wave spell by 0.4 sec.]",
+                    "[Reduces the casting time of your Healing Wave spell by 0.5 sec.]"
+                ],
+                "s": [
+                    16182,
+                    16226,
+                    16227,
+                    16228,
+                    16229
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Nature_MagicImmunity"
+            },
+            {
+                "i": 595,
+                "n": "[Totemic Focus]",
+                "m": 5,
+                "d": [
+                    "[Reduces the mana cost of your totems by 5%.]",
+                    "[Reduces the mana cost of your totems by 10%.]",
+                    "[Reduces the mana cost of your totems by 15%.]",
+                    "[Reduces the mana cost of your totems by 20%.]",
+                    "[Reduces the mana cost of your totems by 25%.]"
+                ],
+                "s": [
+                    16173,
+                    16222,
+                    16223,
+                    16224,
+                    16225
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Nature_MoonGlow"
+            },
+            {
+                "i": 589,
+                "n": "[Improved Reincarnation]",
+                "m": 2,
+                "d": [
+                    "[Reduces the cooldown of your Reincarnation spell by 7 min and increases the amount of health and mana recovered when reincarnating by an additional 10%.]",
+                    "[Reduces the cooldown of your Reincarnation spell by 15 min and increases the amount of health and mana recovered when reincarnating by an additional 20%.]"
+                ],
+                "s": [
+                    16184,
+                    16209
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Nature_Reincarnation"
+            },
+            {
+                "i": 1646,
+                "n": "[Healing Grace]",
+                "m": 3,
+                "d": [
+                    "[Reduces the threat generated by your healing spells by 5% and reduces the chance your helpful spells and damage over time effects will be dispelled by 10%.]",
+                    "[Reduces the threat generated by your healing spells by 10% and reduces the chance your helpful spells and damage over time effects will be dispelled by 20%.]",
+                    "[Reduces the threat generated by your healing spells by 15% and reduces the chance your helpful spells and damage over time effects will be dispelled by 30%.]"
+                ],
+                "s": [
+                    29187,
+                    29189,
+                    29191
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Nature_HealingTouch"
+            },
+            {
+                "i": 593,
+                "n": "[Tidal Focus]",
+                "m": 5,
+                "d": [
+                    "[Reduces the mana cost of your healing spells by 1%.]",
+                    "[Reduces the mana cost of your healing spells by 2%.]",
+                    "[Reduces the mana cost of your healing spells by 3%.]",
+                    "[Reduces the mana cost of your healing spells by 4%.]",
+                    "[Reduces the mana cost of your healing spells by 5%.]"
+                ],
+                "s": [
+                    16179,
+                    16214,
+                    16215,
+                    16216,
+                    16217
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Frost_ManaRecharge"
+            },
+            {
+                "i": 583,
+                "n": "[Improved Water Shield]",
+                "m": 3,
+                "d": [
+                    "[You have a 33% chance to instantly gain mana as if you consumed a Water Shield Orb when you gain a critical effect from your Healing Wave or Riptide spells, a 19.8% chance when you gain a critical effect from your Lesser Healing Wave spell, and a 9.9% chance when you gain a critical effect from your Chain Heal spell.]",
+                    "[You have a 66% chance to instantly gain mana as if you consumed a Water Shield Orb when you gain a critical effect from your Healing Wave or Riptide spells, a 39.6% chance when you gain a critical effect from your Lesser Healing Wave spell, and a 19.8% chance when you gain a critical effect from your Chain Heal spell.]",
+                    "[You have a 100% chance to instantly gain mana as if you consumed a Water Shield Orb when you gain a critical effect from your Healing Wave or Riptide spells, a 60% chance when you gain a critical effect from your Lesser Healing Wave spell, and a 30% chance when you gain a critical effect from your Chain Heal spell.]"
+                ],
+                "s": [
+                    16180,
+                    16196,
+                    16198
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Ability_Shaman_WaterShield"
+            },
+            {
+                "i": 587,
+                "n": "[Healing Focus]",
+                "m": 3,
+                "d": [
+                    "[Reduces the pushback suffered from damaging attacks while casting any Shaman healing spell by 23%.]",
+                    "[Reduces the pushback suffered from damaging attacks while casting any Shaman healing spell by 46%.]",
+                    "[Reduces the pushback suffered from damaging attacks while casting any Shaman healing spell by 70%.]"
+                ],
+                "s": [
+                    16181,
+                    16230,
+                    16232
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Nature_HealingWaveLesser"
+            },
+            {
+                "i": 582,
+                "n": "[Tidal Force]",
+                "m": 1,
+                "d": [
+                    "[Increases the critical effect chance of your Healing Wave, Lesser Healing Wave and Chain Heal by 60%. Each critical heal reduces the chance by 20%. Lasts 20 seg.]"
+                ],
+                "s": [
+                    55198
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Frost_Frostbolt"
+            },
+            {
+                "i": 581,
+                "n": "[Ancestral Healing]",
+                "m": 3,
+                "d": [
+                    "[Reduces your target's physical damage taken by 3% for 15 seg after getting a critical effect from one of your healing spells.]",
+                    "[Reduces your target's physical damage taken by 7% for 15 seg after getting a critical effect from one of your healing spells.]",
+                    "[Reduces your target's physical damage taken by 10% for 15 seg after getting a critical effect from one of your healing spells.]"
+                ],
+                "s": [
+                    16176,
+                    16235,
+                    16240
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Nature_UndyingStrength"
+            },
+            {
+                "i": 588,
+                "n": "[Restorative Totems]",
+                "m": 3,
+                "d": [
+                    "[Increases the effect of your Mana Spring Totem by 7%, and increases the amount healed by your Healing Stream Totem by 15%.]",
+                    "[Increases the effect of your Mana Spring Totem by 12%, and increases the amount healed by your Healing Stream Totem by 30%.]",
+                    "[Increases the effect of your Mana Spring Totem by 20%, and increases the amount healed by your Healing Stream Totem by 45%.]"
+                ],
+                "s": [
+                    16187,
+                    16205,
+                    16206
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Nature_ManaRegenTotem"
+            },
+            {
+                "i": 594,
+                "n": "[Tidal Mastery]",
+                "m": 5,
+                "d": [
+                    "[Increases the critical effect chance of your healing and lightning spells by 1%.]",
+                    "[Increases the critical effect chance of your healing and lightning spells by 2%.]",
+                    "[Increases the critical effect chance of your healing and lightning spells by 3%.]",
+                    "[Increases the critical effect chance of your healing and lightning spells by 4%.]",
+                    "[Increases the critical effect chance of your healing and lightning spells by 5%.]"
+                ],
+                "s": [
+                    16194,
+                    16218,
+                    16219,
+                    16220,
+                    16221
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Nature_Tranquility"
+            },
+            {
+                "i": 1648,
+                "n": "[Healing Way]",
+                "m": 3,
+                "d": [
+                    "[Increases the amount healed by your Healing Wave spell by 8%.]",
+                    "[Increases the amount healed by your Healing Wave spell by 16%.]",
+                    "[Increases the amount healed by your Healing Wave spell by 25%.]"
+                ],
+                "s": [
+                    29206,
+                    29205,
+                    29202
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Nature_HealingWay"
+            },
+            {
+                "i": 591,
+                "n": "[Nature's Swiftness]",
+                "m": 1,
+                "d": [
+                    "[When activated, your next Nature spell with a base casting time less than 10 sec. becomes an instant cast spell. Nature's Swiftness shares a cooldown with Elemental Mastery.]"
+                ],
+                "s": [
+                    16188
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Nature_RavenForm"
+            },
+            {
+                "i": 1695,
+                "n": "[Focused Mind]",
+                "m": 3,
+                "d": [
+                    "[Reduces the duration of any Silence or Interrupt effects used against the Shaman by 10%. This effect does not stack with other similar effects.]",
+                    "[Reduces the duration of any Silence or Interrupt effects used against the Shaman by 20%. This effect does not stack with other similar effects.]",
+                    "[Reduces the duration of any Silence or Interrupt effects used against the Shaman by 30%. This effect does not stack with other similar effects.]"
+                ],
+                "s": [
+                    30864,
+                    30865,
+                    30866
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Nature_FocusedMind"
+            },
+            {
+                "i": 592,
+                "n": "[Purification]",
+                "m": 5,
+                "d": [
+                    "[Increases the effectiveness of your healing spells by 2%.]",
+                    "[Increases the effectiveness of your healing spells by 4%.]",
+                    "[Increases the effectiveness of your healing spells by 6%.]",
+                    "[Increases the effectiveness of your healing spells by 8%.]",
+                    "[Increases the effectiveness of your healing spells by 10%.]"
+                ],
+                "s": [
+                    16178,
+                    16210,
+                    16211,
+                    16212,
+                    16213
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Frost_WizardMark"
+            },
+            {
+                "i": 1699,
+                "n": "[Nature's Guardian]",
+                "m": 5,
+                "d": [
+                    "[Whenever a damaging attack brings you below 30% health, your maximum health is increased by 3% for 10 seg and your threat level towards the attacker is reduced.  30 second cooldown.]",
+                    "[Whenever a damaging attack brings you below 30% health, your maximum health is increased by 6% for 10 seg and your threat level towards the attacker is reduced.  30 second cooldown.]",
+                    "[Whenever a damaging attack brings you below 30% health, your maximum health is increased by 9% for 10 seg and your threat level towards the attacker is reduced.  30 second cooldown.]",
+                    "[Whenever a damaging attack brings you below 30% health, your maximum health is increased by 12% for 10 seg and your threat level towards the attacker is reduced.  30 second cooldown.]",
+                    "[Whenever a damaging attack brings you below 30% health, your maximum health is increased by 15% for 10 seg and your threat level towards the attacker is reduced.  30 second cooldown.]"
+                ],
+                "s": [
+                    30881,
+                    30883,
+                    30884,
+                    30885,
+                    30886
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Nature_NatureGuardian"
+            },
+            {
+                "i": 590,
+                "n": "[Mana Tide Totem]",
+                "m": 1,
+                "d": [
+                    "[Summons a Mana Tide Totem with 10% of the caster's health at the feet of the caster for  sec that restores <mana>% of total mana every 3 seconds to group members within 0 yards.]"
+                ],
+                "s": [
+                    16190
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Frost_SummonWaterElemental",
+                "r": [
+                    9,
+                    3
+                ]
+            },
+            {
+                "i": 2084,
+                "n": "[Cleanse Spirit]",
+                "m": 1,
+                "d": [
+                    "[Cleanse the spirit of a friendly target, removing 1 poison effect, 1 disease effect, and 1 curse effect.]"
+                ],
+                "s": [
+                    51886
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Shaman_CleanseSpirit",
+                "r": [
+                    14,
+                    5
+                ]
+            },
+            {
+                "i": 2060,
+                "n": "[Blessing of the Eternals]",
+                "m": 2,
+                "d": [
+                    "[Increases the critical effect chance of your spells by 2%, and increases the chance to apply the Earthliving heal over time effect on the target by 40% when they are at or under 35% total health.]",
+                    "[Increases the critical effect chance of your spells by 4%, and increases the chance to apply the Earthliving heal over time effect on the target by 80% when they are at or under 35% total health.]"
+                ],
+                "s": [
+                    51554,
+                    51555
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Spell_Shaman_BlessingOfEternals"
+            },
+            {
+                "i": 1697,
+                "n": "[Improved Chain Heal]",
+                "m": 2,
+                "d": [
+                    "[Increases the amount healed by your Chain Heal spell by 10%.]",
+                    "[Increases the amount healed by your Chain Heal spell by 20%.]"
+                ],
+                "s": [
+                    30872,
+                    30873
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Nature_HealingWaveGreater"
+            },
+            {
+                "i": 1696,
+                "n": "[Nature's Blessing]",
+                "m": 3,
+                "d": [
+                    "[Increases your healing by an amount equal to 5% of your Intellect.]",
+                    "[Increases your healing by an amount equal to 10% of your Intellect.]",
+                    "[Increases your healing by an amount equal to 15% of your Intellect.]"
+                ],
+                "s": [
+                    30867,
+                    30868,
+                    30869
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Nature_NatureBlessing"
+            },
+            {
+                "i": 2061,
+                "n": "[Ancestral Awakening]",
+                "m": 3,
+                "d": [
+                    "[When you critically heal with your Healing Wave, Lesser Healing Wave or Riptide you summon an Ancestral spirit to aid you, instantly healing the lowest percentage health friendly party or raid target within 40 yards for 10% of the amount healed.]",
+                    "[When you critically heal with your Healing Wave, Lesser Healing Wave or Riptide you summon an Ancestral spirit to aid you, instantly healing the lowest percentage health friendly party or raid target within 40 yards for 20% of the amount healed.]",
+                    "[When you critically heal with your Healing Wave, Lesser Healing Wave or Riptide you summon an Ancestral spirit to aid you, instantly healing the lowest percentage health friendly party or raid target within 40 yards for 30% of the amount healed.]"
+                ],
+                "s": [
+                    51556,
+                    51557,
+                    51558
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Shaman_AncestralAwakening"
+            },
+            {
+                "i": 1698,
+                "n": "[Earth Shield]",
+                "m": 1,
+                "d": [
+                    "[Protects the target with an earthen shield, reducing casting or channeling time lost when damaged by 30%  and causing attacks to heal the shielded target for <heal>.  This effect can only occur once every few seconds.  6 charges.  Lasts 10 min.  Earth Shield can only be placed on one target at a time and only one Elemental Shield can be active on a target at a time.]"
+                ],
+                "s": [
+                    974
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Nature_SkinofEarth"
+            },
+            {
+                "i": 2059,
+                "n": "[Improved Earth Shield]",
+                "m": 2,
+                "d": [
+                    "[Increases the amount of charges for your Earth Shield by 1, and increases the healing done by your Earth Shield by 5%.]",
+                    "[Increases the amount of charges for your Earth Shield by 2, and increases the healing done by your Earth Shield by 10%.]"
+                ],
+                "s": [
+                    51560,
+                    51561
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Nature_SkinofEarth",
+                "r": [
+                    22,
+                    1
+                ]
+            },
+            {
+                "i": 2063,
+                "n": "[Tidal Waves]",
+                "m": 5,
+                "d": [
+                    "[When you cast Chain Heal or Riptide, you have a 20% chance to lower the cast time of your Healing Wave spell by 30% and increase the critical effect chance of your Lesser Healing Wave spell by 25%, until two such spells have been cast. In addition, your Healing Wave gains an additional 4% of your bonus healing effects and your Lesser Healing Wave gains an additional 2% of your bonus healing effects.]",
+                    "[When you cast Chain Heal or Riptide, you have a 40% chance to lower the cast time of your Healing Wave spell by 30% and increase the critical effect chance of your Lesser Healing Wave spell by 25%, until two such spells have been cast. In addition, your Healing Wave gains an additional 8% of your bonus healing effects and your Lesser Healing Wave gains an additional 4% of your bonus healing effects.]",
+                    "[When you cast Chain Heal or Riptide, you have a 60% chance to lower the cast time of your Healing Wave spell by 30% and increase the critical effect chance of your Lesser Healing Wave spell by 25%, until two such spells have been cast. In addition, your Healing Wave gains an additional 12% of your bonus healing effects and your Lesser Healing Wave gains an additional 6% of your bonus healing effects.]",
+                    "[When you cast Chain Heal or Riptide, you have a 80% chance to lower the cast time of your Healing Wave spell by 30% and increase the critical effect chance of your Lesser Healing Wave spell by 25%, until two such spells have been cast. In addition, your Healing Wave gains an additional 16% of your bonus healing effects and your Lesser Healing Wave gains an additional 8% of your bonus healing effects.]",
+                    "[When you cast Chain Heal or Riptide, you have a 100% chance to lower the cast time of your Healing Wave spell by 30% and increase the critical effect chance of your Lesser Healing Wave spell by 25%, until two such spells have been cast. In addition, your Healing Wave gains an additional 20% of your bonus healing effects and your Lesser Healing Wave gains an additional 10% of your bonus healing effects.]"
+                ],
+                "s": [
+                    51562,
+                    51563,
+                    51564,
+                    51565,
+                    51566
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Spell_Shaman_TidalWaves"
+            },
+            {
+                "i": 2064,
+                "n": "[Riptide]",
+                "m": 1,
+                "d": [
+                    "[Heals a friendly target for 639 - 692 and another 665 over 15 seg.  Your next Chain Heal cast on that primary target within 15 seg will consume the healing over time effect and increase the amount of the Chain Heal by 25%.]"
+                ],
+                "s": [
+                    61295
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "spell_nature_riptide"
+            }
+        ]
+    }
+])

@@ -1,0 +1,1553 @@
+$WowheadTalentCalculator.registerClass(8, [
+    {
+        "n": "Arkan",
+        "t": [
+            {
+                "i": 74,
+                "n": "Arkanes Feingef\u00fchl",
+                "m": 2,
+                "d": [
+                    "Verringert die Chance, dass sowohl Eure hilfreichen Zauber als auch Effekte, die Schaden im Laufe der Zeit verursachen, gebannt werden, um 15% und Eure Arkanzauber verursachen 20% weniger Bedrohung.",
+                    "Verringert die Chance, dass sowohl Eure hilfreichen Zauber als auch Effekte, die Schaden im Laufe der Zeit verursachen, gebannt werden, um 30% und Eure Arkanzauber verursachen 40% weniger Bedrohung."
+                ],
+                "s": [
+                    11210,
+                    12592
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Holy_DispelMagic"
+            },
+            {
+                "i": 76,
+                "n": "Arkaner Fokus",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht Eure Trefferchance und verringert die Manakosten Eurer Arkanzauber um 1%.",
+                    "Erh\u00f6ht Eure Trefferchance und verringert die Manakosten Eurer Arkanzauber um 2%.",
+                    "Erh\u00f6ht Eure Trefferchance und verringert die Manakosten Eurer Arkanzauber um 3%."
+                ],
+                "s": [
+                    11222,
+                    12839,
+                    12840
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Holy_Devotion"
+            },
+            {
+                "i": 80,
+                "n": "Arkane Stabilit\u00e4t",
+                "m": 5,
+                "d": [
+                    "Verringert die Dauer der durch erlittenen Schaden verursachten Zauberzeiterh\u00f6hung beim Wirken von 'Arkanschlag' oder die Zauberzeitverringerung beim Kanalisieren von 'Arkane Geschosse' um 20%.",
+                    "Verringert die Dauer der durch erlittenen Schaden verursachten Zauberzeiterh\u00f6hung beim Wirken von 'Arkanschlag' oder die Zauberzeitverringerung beim Kanalisieren von 'Arkane Geschosse' um 40%.",
+                    "Verringert die Dauer der durch erlittenen Schaden verursachten Zauberzeiterh\u00f6hung beim Wirken von 'Arkanschlag' oder die Zauberzeitverringerung beim Kanalisieren von 'Arkane Geschosse' um 60%.",
+                    "Verringert die Dauer der durch erlittenen Schaden verursachten Zauberzeiterh\u00f6hung beim Wirken von 'Arkanschlag' oder die Zauberzeitverringerung beim Kanalisieren von 'Arkane Geschosse' um 80%.",
+                    "Verringert die Dauer der durch erlittenen Schaden verursachten Zauberzeiterh\u00f6hung beim Wirken von 'Arkanschlag' oder die Zauberzeitverringerung beim Kanalisieren von 'Arkane Geschosse' um 100%."
+                ],
+                "s": [
+                    11237,
+                    12463,
+                    12464,
+                    16769,
+                    16770
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Nature_StarFall"
+            },
+            {
+                "i": 85,
+                "n": "Arkane Seelenst\u00e4rke",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht Eure R\u00fcstung um einen Betrag, der 50% Eurer Intelligenz entspricht.",
+                    "Erh\u00f6ht Eure R\u00fcstung um einen Betrag, der 100% Eurer Intelligenz entspricht.",
+                    "Erh\u00f6ht Eure R\u00fcstung um einen Betrag, der 150% Eurer Intelligenz entspricht."
+                ],
+                "s": [
+                    28574,
+                    54658,
+                    54659
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Arcane_ArcaneResilience"
+            },
+            {
+                "i": 1650,
+                "n": "Magische Vereinnahmung",
+                "m": 2,
+                "d": [
+                    "Erh\u00f6ht alle Widerstandsarten um 0,5 pro Stufe. Durch jeden Zauber, dem Ihr vollst\u00e4ndig widersteht, werden 1% Eures gesamten Manas wiederhergestellt. 1 Sek. Abklingzeit.",
+                    "Erh\u00f6ht alle Widerstandsarten um 1 pro Stufe. Durch jeden Zauber, dem Ihr vollst\u00e4ndig widersteht, werden 2% Eures gesamten Manas wiederhergestellt. 1 Sek. Abklingzeit."
+                ],
+                "s": [
+                    29441,
+                    29444
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Nature_AstralRecalGroup"
+            },
+            {
+                "i": 75,
+                "n": "Arkane Konzentration",
+                "m": 5,
+                "d": [
+                    "Gew\u00e4hrt Euch eine Chance von 2%, in einen Freizauberzustand zu gelangen, nachdem ein beliebiger Schaden zuf\u00fcgender Zauber ein Ziel getroffen hat. Der Freizauberzustand verringert die Manakosten Eures n\u00e4chsten Schadenszaubers um 100%.",
+                    "Gew\u00e4hrt Euch eine Chance von 4%, in einen Freizauberzustand zu gelangen, nachdem ein beliebiger Schaden zuf\u00fcgender Zauber ein Ziel getroffen hat. Der Freizauberzustand verringert die Manakosten Eures n\u00e4chsten Schadenszaubers um 100%.",
+                    "Gew\u00e4hrt Euch eine Chance von 6%, in einen Freizauberzustand zu gelangen, nachdem ein beliebiger Schaden zuf\u00fcgender Zauber ein Ziel getroffen hat. Der Freizauberzustand verringert die Manakosten Eures n\u00e4chsten Schadenszaubers um 100%.",
+                    "Gew\u00e4hrt Euch eine Chance von 8%, in einen Freizauberzustand zu gelangen, nachdem ein beliebiger Schaden zuf\u00fcgender Zauber ein Ziel getroffen hat. Der Freizauberzustand verringert die Manakosten Eures n\u00e4chsten Schadenszaubers um 100%.",
+                    "Gew\u00e4hrt Euch eine Chance von 10%, in einen Freizauberzustand zu gelangen, nachdem ein beliebiger Schaden zuf\u00fcgender Zauber ein Ziel getroffen hat. Der Freizauberzustand verringert die Manakosten Eures n\u00e4chsten Schadenszaubers um 100%."
+                ],
+                "s": [
+                    11213,
+                    12574,
+                    12575,
+                    12576,
+                    12577
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Shadow_ManaBurn"
+            },
+            {
+                "i": 82,
+                "n": "Einklang der Magie",
+                "m": 2,
+                "d": [
+                    "Erh\u00f6ht die Reichweite Eurer Arkanzauber um 3 Meter und die Effekte Eurer Zauber 'Magie verst\u00e4rken' und 'Magie d\u00e4mpfen' um 25%.",
+                    "Erh\u00f6ht die Reichweite Eurer Arkanzauber um 6 Meter und die Effekte Eurer Zauber 'Magie verst\u00e4rken' und 'Magie d\u00e4mpfen' um 50%."
+                ],
+                "s": [
+                    11247,
+                    12606
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Nature_AbolishMagic"
+            },
+            {
+                "i": 81,
+                "n": "Zaubereinschlag",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht den Schaden Eurer Zauber 'Arkane Explosion', 'Arkanschlag', 'Druckwelle', 'Feuerschlag', 'Versengen', 'Feuerball', 'Eislanze' und 'K\u00e4ltekegel' um zus\u00e4tzliche 2%.",
+                    "Erh\u00f6ht den Schaden Eurer Zauber 'Arkane Explosion', 'Arkanschlag', 'Druckwelle', 'Feuerschlag', 'Versengen', 'Feuerball', 'Eislanze' und 'K\u00e4ltekegel' um zus\u00e4tzliche 4%.",
+                    "Erh\u00f6ht den Schaden Eurer Zauber 'Arkane Explosion', 'Arkanschlag', 'Druckwelle', 'Feuerschlag', 'Versengen', 'Feuerball', 'Eislanze' und 'K\u00e4ltekegel' um zus\u00e4tzliche 6%."
+                ],
+                "s": [
+                    11242,
+                    12467,
+                    12469
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Nature_WispSplode"
+            },
+            {
+                "i": 1845,
+                "n": "Geisteswissenschaften",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht Eure gesamte Willenskraft um 4%.",
+                    "Erh\u00f6ht Eure gesamte Willenskraft um 7%.",
+                    "Erh\u00f6ht Eure gesamte Willenskraft um 10%."
+                ],
+                "s": [
+                    44397,
+                    44398,
+                    44399
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Ability_Mage_StudentOfTheMind"
+            },
+            {
+                "i": 2211,
+                "n": "Magie fokussieren",
+                "m": 1,
+                "d": [
+                    "Erh\u00f6ht die kritische Zaubertrefferchance des Ziels um 3%. Erzielt das Ziel einen kritischen Treffer, wird die kritische Zaubertrefferchance des Zaubernden 10 Sek. lang um 3% erh\u00f6ht. Kann nur auf Andere gewirkt werden."
+                ],
+                "s": [
+                    54646
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Arcane_StudentOfMagic"
+            },
+            {
+                "i": 83,
+                "n": "Arkane Schilde",
+                "m": 2,
+                "d": [
+                    "Verringert bei aktiviertem Manaschild den Manaverlust f\u00fcr jeden absorbierten Schadenspunkt um 17% und erh\u00f6ht die von der magischen R\u00fcstung gew\u00e4hrten Widerst\u00e4nde um 25%.",
+                    "Verringert bei aktiviertem Manaschild den Manaverlust f\u00fcr jeden absorbierten Schadenspunkt um 33% und erh\u00f6ht die von der magischen R\u00fcstung gew\u00e4hrten Widerst\u00e4nde um 50%."
+                ],
+                "s": [
+                    11252,
+                    12605
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Shadow_DetectLesserInvisibility"
+            },
+            {
+                "i": 88,
+                "n": "Verbesserter Gegenzauber",
+                "m": 2,
+                "d": [
+                    "Euer 'Gegenzauber' bringt das Ziel auch 2 Sek. lang zum Schweigen.",
+                    "Euer 'Gegenzauber' bringt das Ziel auch 4 Sek. lang zum Schweigen."
+                ],
+                "s": [
+                    11255,
+                    12598
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Frost_IceShock"
+            },
+            {
+                "i": 1142,
+                "n": "Arkane Meditation",
+                "m": 3,
+                "d": [
+                    "Erm\u00f6glicht, dass 17% Eurer Manaregeneration w\u00e4hrend des Zauberwirkens weiterl\u00e4uft.",
+                    "Erm\u00f6glicht, dass 33% Eurer Manaregeneration w\u00e4hrend des Zauberwirkens weiterl\u00e4uft.",
+                    "Erm\u00f6glicht, dass 50% Eurer Manaregeneration w\u00e4hrend des Zauberwirkens weiterl\u00e4uft."
+                ],
+                "s": [
+                    18462,
+                    18463,
+                    18464
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Shadow_SiphonMana"
+            },
+            {
+                "i": 2222,
+                "n": "Die Schwachen qu\u00e4len",
+                "m": 3,
+                "d": [
+                    "Eure Zauber 'Frostblitz', 'Feuerball', 'Frostfeuerblitz', 'Pyroschlag', 'Arkane Geschosse', 'Arkanschlag' und 'Arkanbeschuss' f\u00fcgen verlangsamten oder bewegungseingeschr\u00e4nkten Zielen 4% mehr Schaden zu.",
+                    "Eure Zauber 'Frostblitz', 'Feuerball', 'Frostfeuerblitz', 'Pyroschlag', 'Arkane Geschosse', 'Arkanschlag' und 'Arkanbeschuss' f\u00fcgen verlangsamten oder bewegungseingeschr\u00e4nkten Zielen 8% mehr Schaden zu.",
+                    "Eure Zauber 'Frostblitz', 'Feuerball', 'Frostfeuerblitz', 'Pyroschlag', 'Arkane Geschosse', 'Arkanschlag' und 'Arkanbeschuss' f\u00fcgen verlangsamten oder bewegungseingeschr\u00e4nkten Zielen 12% mehr Schaden zu."
+                ],
+                "s": [
+                    29447,
+                    55339,
+                    55340
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Ability_Mage_TormentOfTheWeak"
+            },
+            {
+                "i": 1724,
+                "n": "Verbessertes Blinzeln",
+                "m": 2,
+                "d": [
+                    "Verringert die Manakosten von 'Blinzeln' um 25% und verringert nach dem Blinzeln 4 Sek. lang die Chance, dass Ihr von Zaubern und Angriffen getroffen werdet, um 15%.",
+                    "Verringert die Manakosten von 'Blinzeln' um 50% und verringert nach dem Blinzeln 4 Sek. lang die Chance, dass Ihr von Zaubern und Angriffen getroffen werdet, um 30%."
+                ],
+                "s": [
+                    31569,
+                    31570
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Arcane_Blink"
+            },
+            {
+                "i": 86,
+                "n": "Geistesgegenwart",
+                "m": 1,
+                "d": [
+                    "Bei Aktivierung wird Euer n\u00e4chster Magierzauber mit einer Zauberzeit von weniger als 10 Sekunden ein Sofortzauber."
+                ],
+                "s": [
+                    12043
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Nature_EnchantArmor"
+            },
+            {
+                "i": 77,
+                "n": "Arkaner Geist",
+                "m": 5,
+                "d": [
+                    "Erh\u00f6ht Eure gesamte Intelligenz um 3%.",
+                    "Erh\u00f6ht Eure gesamte Intelligenz um 6%.",
+                    "Erh\u00f6ht Eure gesamte Intelligenz um 9%.",
+                    "Erh\u00f6ht Eure gesamte Intelligenz um 12%.",
+                    "Erh\u00f6ht Eure gesamte Intelligenz um 15%."
+                ],
+                "s": [
+                    11232,
+                    12500,
+                    12501,
+                    12502,
+                    12503
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Shadow_Charm"
+            },
+            {
+                "i": 1726,
+                "n": "Prismatischer Mantel",
+                "m": 3,
+                "d": [
+                    "Verringert jeglichen erlittenen Schaden um 2% und die Verblassungszeit Eures Zaubers 'Unsichtbarkeit' um 1 Sek.",
+                    "Verringert jeglichen erlittenen Schaden um 4% und die Verblassungszeit Eures Zaubers 'Unsichtbarkeit' um 2 Sek.",
+                    "Verringert jeglichen erlittenen Schaden um 6% und verringert die Dauer des Verblassens Eures Zaubers 'Unsichtbarkeit' um 3 Sek."
+                ],
+                "s": [
+                    31574,
+                    31575,
+                    54354
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Arcane_PrismaticCloak"
+            },
+            {
+                "i": 421,
+                "n": "Arkane Instabilit\u00e4t",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht den verursachten Schaden Eurer Zauber und Eure kritische Trefferchance um 1%.",
+                    "Erh\u00f6ht den verursachten Schaden Eurer Zauber und Eure kritische Trefferchance um 2%.",
+                    "Erh\u00f6ht den verursachten Schaden Eurer Zauber und Eure kritische Trefferchance um 3%."
+                ],
+                "s": [
+                    15058,
+                    15059,
+                    15060
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "Spell_Shadow_Teleport",
+                "r": [
+                    15,
+                    1
+                ]
+            },
+            {
+                "i": 1725,
+                "n": "Arkane Kraft",
+                "m": 2,
+                "d": [
+                    "Erh\u00f6ht die kritische Zaubertrefferchance Eures n\u00e4chsten Zaubers, nachdem der Freizauberzustand oder 'Geistesgegenwart' aktiv wurde, um 15%.",
+                    "Erh\u00f6ht die kritische Zaubertrefferchance Eures n\u00e4chsten Zaubers, nachdem der Freizauberzustand oder 'Geistesgegenwart' aktiv wurde, um 30%."
+                ],
+                "s": [
+                    31571,
+                    31572
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Arcane_ArcanePotency",
+                "r": [
+                    15,
+                    1
+                ]
+            },
+            {
+                "i": 1727,
+                "n": "Arkane Erm\u00e4chtigung",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht den Schaden Eures Zaubers 'Arkane Geschosse' um einen Wert, der 15% Eurer Zaubermacht entspricht und den Schaden Eures Zaubers 'Arkanschlag' um 3% Eurer Zaubermacht. Zudem wird der verursachte Schaden aller Gruppen- und Schlachtzugsmitglieder im Umkreis von 100 Metern um 1% erh\u00f6ht.",
+                    "Erh\u00f6ht den Schaden Eures Zaubers 'Arkane Geschosse' um einen Wert, der 30% Eurer Zaubermacht entspricht und den Schaden Eures Zaubers 'Arkanschlag' um 6% Eurer Zaubermacht. Zudem wird der verursachte Schaden aller Gruppen- und Schlachtzugsmitglieder im Umkreis von 100 Metern um 2% erh\u00f6ht.",
+                    "Erh\u00f6ht den Schaden Eures Zaubers 'Arkane Geschosse' um einen Wert, der 45% Eurer Zaubermacht entspricht und den Schaden Eures Zaubers 'Arkanschlag' um 9% Eurer Zaubermacht. Zudem wird der verursachte Schaden aller Gruppen- und Schlachtzugsmitglieder im Umkreis von 100 Metern um 3% erh\u00f6ht."
+                ],
+                "s": [
+                    31579,
+                    31582,
+                    31583
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Nature_StarFall"
+            },
+            {
+                "i": 87,
+                "n": "Arkane Macht",
+                "m": 1,
+                "d": [
+                    "Bei Aktivierung f\u00fcgen Eure Zauber 20% mehr Schaden zu, jedoch kostet das Wirken 20% mehr Mana. Dieser Effekt h\u00e4lt 15 Sek. lang an."
+                ],
+                "s": [
+                    12042
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Nature_Lightning",
+                "r": [
+                    18,
+                    3
+                ]
+            },
+            {
+                "i": 1844,
+                "n": "Absorption des Beschw\u00f6rers",
+                "m": 3,
+                "d": [
+                    "Wenn ein Effekt Eurer F\u00e4higkeiten 'Manaschild', 'Frostzauberschutz', 'Feuerzauberschutz' oder 'Eisbarriere' Schaden absorbiert, wird Euer Zauberschaden 10 Sek. lang um 5% des absorbierten Betrags erh\u00f6ht.",
+                    "Wenn ein Effekt Eurer F\u00e4higkeiten 'Manaschild', 'Frostzauberschutz', 'Feuerzauberschutz' oder 'Eisbarriere' Schaden absorbiert, wird Euer Zauberschaden 10 Sek. lang um 10% des absorbierten Betrags erh\u00f6ht.",
+                    "Wenn ein Effekt Eurer F\u00e4higkeiten 'Manaschild', 'Frostzauberschutz', 'Feuerzauberschutz' oder 'Eisbarriere' Schaden absorbiert, wird Euer Zauberschaden 10 Sek. lang um 15% des absorbierten Betrags erh\u00f6ht."
+                ],
+                "s": [
+                    44394,
+                    44395,
+                    44396
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Ability_Mage_IncantersAbsorbtion"
+            },
+            {
+                "i": 1843,
+                "n": "Arkaner Fluss",
+                "m": 2,
+                "d": [
+                    "Verringert die Abklingzeit Eurer Zauber 'Geistesgegenwart', 'Arkane Macht' und 'Unsichtbarkeit' um 15% und die Abklingzeit des Zaubers 'Hervorrufung' um 1 Min.",
+                    "Verringert die Abklingzeit Eurer Zauber 'Geistesgegenwart', 'Arkane Macht' und 'Unsichtbarkeit' um 30% und die Abklingzeit des Zaubers 'Hervorrufung' um 2 Min."
+                ],
+                "s": [
+                    44378,
+                    44379
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Ability_Mage_PotentSpirit",
+                "r": [
+                    21,
+                    1
+                ]
+            },
+            {
+                "i": 1728,
+                "n": "Geistesbeherrschung",
+                "m": 5,
+                "d": [
+                    "Eure Zaubermacht wird um 3% Eurer gesamten Intelligenz erh\u00f6ht.",
+                    "Eure Zaubermacht wird um 6% Eurer gesamten Intelligenz erh\u00f6ht.",
+                    "Eure Zaubermacht wird um 9% Eurer gesamten Intelligenz erh\u00f6ht.",
+                    "Eure Zaubermacht wird um 12% Eurer gesamten Intelligenz erh\u00f6ht.",
+                    "Eure Zaubermacht wird um 15% Eurer gesamten Intelligenz erh\u00f6ht."
+                ],
+                "s": [
+                    31584,
+                    31585,
+                    31586,
+                    31587,
+                    31588
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Arcane_MindMastery"
+            },
+            {
+                "i": 1729,
+                "n": "Verlangsamen",
+                "m": 1,
+                "d": [
+                    "Verlangsamt das Bewegungstempo des Ziels um 60%, erh\u00f6ht die Zeit zwischen Distanzangriffen um 60% und erh\u00f6ht die Zauberzeit um 30%. H\u00e4lt 15 Sek. lang an. 'Verlangsamen' kann immer nur auf ein Ziel wirken."
+                ],
+                "s": [
+                    31589
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Nature_Slow"
+            },
+            {
+                "i": 2209,
+                "n": "Geschosssalve",
+                "m": 5,
+                "d": [
+                    "Verleiht Eurem Zauber 'Arkanschlag' eine Chance von 8% sowie Euren Zaubern 'Arkanbeschuss', 'Feuerball', 'Frostblitz' und 'Frostfeuerblitz' eine Chance von 4%, die Kanalisierungsdauer Eures n\u00e4chsten Wirkens von 'Arkane Geschosse' um 2.5 Sek. zu verringern, die Manakosten um 100% zu verringern und alle 0,5 Sek. Geschosse zu feuern.",
+                    "Verleiht Eurem Zauber 'Arkanschlag' eine Chance von 16% sowie Euren Zaubern 'Arkanbeschuss', 'Feuerball', 'Frostblitz' und 'Frostfeuerblitz' eine Chance von 8%, die Kanalisierungsdauer Eures n\u00e4chsten Wirkens von 'Arkane Geschosse' um 2.5 Sek. zu verringern, die Manakosten um 100% zu verringern und alle 0,5 Sek. Geschosse zu feuern.",
+                    "Verleiht Eurem Zauber 'Arkanschlag' eine Chance von 24% sowie Euren Zaubern 'Arkanbeschuss', 'Feuerball', 'Frostblitz' und 'Frostfeuerblitz' eine Chance von 12%, die Kanalisierungsdauer Eures n\u00e4chsten Wirkens von 'Arkane Geschosse' um 2.5 Sek. zu verringern, die Manakosten um 100% zu verringern und alle 0,5 Sek. Geschosse zu feuern.",
+                    "Verleiht Eurem Zauber 'Arkanschlag' eine Chance von 32% sowie Euren Zaubern 'Arkanbeschuss', 'Feuerball', 'Frostblitz' und 'Frostfeuerblitz' eine Chance von 16%, die Kanalisierungsdauer Eures n\u00e4chsten Wirkens von 'Arkane Geschosse' um 2.5 Sek. zu verringern, die Manakosten um 100% zu verringern und alle 0,5 Sek. Geschosse zu feuern.",
+                    "Verleiht Eurem Zauber 'Arkanschlag' eine Chance von 40% sowie Euren Zaubern 'Arkanbeschuss', 'Feuerball', 'Frostblitz' und 'Frostfeuerblitz' eine Chance von 20%, die Kanalisierungsdauer Eures n\u00e4chsten Wirkens von 'Arkane Geschosse' um 2.5 Sek. zu verringern, die Manakosten um 100% zu verringern und alle 0,5 Sek. Geschosse zu feuern."
+                ],
+                "s": [
+                    44404,
+                    54486,
+                    54488,
+                    54489,
+                    54490
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Mage_MissileBarrage"
+            },
+            {
+                "i": 1846,
+                "n": "Pr\u00e4senz des Netherwinds",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht Euer Zaubertempo um 2%.",
+                    "Erh\u00f6ht Euer Zaubertempo um 4%.",
+                    "Erh\u00f6ht Euer Zaubertempo um 6%."
+                ],
+                "s": [
+                    44400,
+                    44402,
+                    44403
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Mage_NetherWindPresence"
+            },
+            {
+                "i": 1826,
+                "n": "Zauberkraft",
+                "m": 2,
+                "d": [
+                    "Erh\u00f6ht den Schadensbonus bei kritischen Treffern aller Zauber um 25%.",
+                    "Erh\u00f6ht den Schadensbonus bei kritischen Treffern aller Zauber um 50%."
+                ],
+                "s": [
+                    35578,
+                    35581
+                ],
+                "x": 2,
+                "y": 9,
+                "iconname": "Spell_Arcane_ArcaneTorrent"
+            },
+            {
+                "i": 1847,
+                "n": "Arkanbeschuss",
+                "m": 1,
+                "d": [
+                    "Schleudert mehrere Geschosse auf das feindliche Ziel und verursacht 386 bis 471 Arkanschaden."
+                ],
+                "s": [
+                    44425
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Mage_ArcaneBarrage"
+            }
+        ]
+    },
+    {
+        "n": "Feuer",
+        "t": [
+            {
+                "i": 27,
+                "n": "Verbesserter Feuerschlag",
+                "m": 2,
+                "d": [
+                    "Verringert die Abklingzeit Eures Zaubers 'Feuerschlag' um 1 Sek.",
+                    "Verringert die Abklingzeit Eures Zaubers 'Feuerschlag' um 2 Sek."
+                ],
+                "s": [
+                    11078,
+                    11080
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Fire_Fireball"
+            },
+            {
+                "i": 1141,
+                "n": "Verbrennung",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht die kritische Trefferchance Eurer Zauber 'Feuerschlag', 'Versengen', 'Arkanschlag' und 'K\u00e4ltekegel' um 2%.",
+                    "Erh\u00f6ht die kritische Trefferchance Eurer Zauber 'Feuerschlag', 'Versengen', 'Arkanschlag' und 'K\u00e4ltekegel' um 4%.",
+                    "Erh\u00f6ht die kritische Trefferchance Eurer Zauber 'Feuerschlag', 'Versengen', 'Arkanschlag' und 'K\u00e4ltekegel' um 6%."
+                ],
+                "s": [
+                    18459,
+                    18460,
+                    54734
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Fire_FlameShock"
+            },
+            {
+                "i": 26,
+                "n": "Verbesserter Feuerball",
+                "m": 5,
+                "d": [
+                    "Verringert die Zauberzeit Eures Zaubers 'Feuerball' um 0.1 Sek.",
+                    "Verringert die Zauberzeit Eures Zaubers 'Feuerball' um 0.2 Sek.",
+                    "Verringert die Zauberzeit Eures Zaubers 'Feuerball' um 0.3 Sek.",
+                    "Verringert die Zauberzeit Eures Zaubers 'Feuerball' um 0.4 Sek.",
+                    "Verringert die Zauberzeit Eures Zaubers 'Feuerball' um 0.5 Sek."
+                ],
+                "s": [
+                    11069,
+                    12338,
+                    12339,
+                    12340,
+                    12341
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Fire_FlameBolt"
+            },
+            {
+                "i": 34,
+                "n": "Entz\u00fcnden",
+                "m": 5,
+                "d": [
+                    "Eure kritischen Treffer mit Feuerzaubern lassen das Ziel 4 Sek. lang brennen, es erleidet w\u00e4hrenddessen zus\u00e4tzlich 8% des Schadens des Zaubers.",
+                    "Eure kritischen Treffer mit Feuerzaubern lassen das Ziel 4 Sek. lang brennen, es erleidet w\u00e4hrenddessen zus\u00e4tzlich 16% des Schadens des Zaubers.",
+                    "Eure kritischen Treffer mit Feuerzaubern lassen das Ziel 4 Sek. lang brennen, es erleidet w\u00e4hrenddessen zus\u00e4tzlich 24% des Schadens des Zaubers.",
+                    "Eure kritischen Treffer mit Feuerzaubern lassen das Ziel 4 Sek. lang brennen, es erleidet w\u00e4hrenddessen zus\u00e4tzlich 32% des Schadens des Zaubers.",
+                    "Eure kritischen Treffer mit Feuerzaubern lassen das Ziel 4 Sek. lang brennen, es erleidet w\u00e4hrenddessen zus\u00e4tzlich 40% des Schadens des Zaubers."
+                ],
+                "s": [
+                    11119,
+                    11120,
+                    12846,
+                    12847,
+                    12848
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Fire_Incinerate"
+            },
+            {
+                "i": 2212,
+                "n": "Brennende Entschlossenheit",
+                "m": 2,
+                "d": [
+                    "Werdet Ihr beim Zauberwirken unterbrochen oder zum Schweigen gebracht, habt Ihr eine Chance von 50%, 20 Sek. lang gegen Stille- oder Unterbrechungseffekte immun zu werden.",
+                    "Werdet Ihr beim Zauberwirken unterbrochen oder zum Schweigen gebracht, habt Ihr eine Chance von 100%, 20 Sek. lang gegen Stille- oder Unterbrechungseffekte immun zu werden."
+                ],
+                "s": [
+                    54747,
+                    54749
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Fire_TotemOfWrath"
+            },
+            {
+                "i": 31,
+                "n": "Welt in Flammen",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht die kritische Trefferchance Eurer Zauber 'Flammensto\u00df', 'Pyroschlag', 'Druckwelle', 'Drachenodem', 'Lebende Bombe', 'Blizzard' und 'Arkane Explosion' um 2%.",
+                    "Erh\u00f6ht die kritische Trefferchance Eurer Zauber 'Flammensto\u00df', 'Pyroschlag', 'Druckwelle', 'Drachenodem', 'Lebende Bombe', 'Blizzard' und 'Arkane Explosion' um 4%.",
+                    "Erh\u00f6ht die kritische Trefferchance Eurer Zauber 'Flammensto\u00df', 'Pyroschlag', 'Druckwelle', 'Drachenodem', 'Lebende Bombe', 'Blizzard' und 'Arkane Explosion' um 6%."
+                ],
+                "s": [
+                    11108,
+                    12349,
+                    12350
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Ability_Mage_WorldInFlames"
+            },
+            {
+                "i": 28,
+                "n": "Flammenwerfen",
+                "m": 2,
+                "d": [
+                    "Erh\u00f6ht die Reichweite Eurer Feuerzauber, mit Ausnahme von 'Frostfeuerblitz', um 3 Meter.",
+                    "Erh\u00f6ht die Reichweite Eurer Feuerzauber, mit Ausnahme von 'Frostfeuerblitz', um 6 Meter."
+                ],
+                "s": [
+                    11100,
+                    12353
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Fire_Flare"
+            },
+            {
+                "i": 30,
+                "n": "Einschlag",
+                "m": 3,
+                "d": [
+                    "Gew\u00e4hrt Euren Schaden verursachenden Zaubern eine Chance von 4%, dass das n\u00e4chste Wirken von 'Feuerschlag' das Ziel 2 Sek. lang bet\u00e4ubt.",
+                    "Gew\u00e4hrt Euren Schaden verursachenden Zaubern eine Chance von 7%, dass das n\u00e4chste Wirken von 'Feuerschlag' das Ziel 2 Sek. lang bet\u00e4ubt.",
+                    "Gew\u00e4hrt Euren Schaden verursachenden Zaubern eine Chance von 10%, dass das n\u00e4chste Wirken von 'Feuerschlag' das Ziel 2 Sek. lang bet\u00e4ubt."
+                ],
+                "s": [
+                    11103,
+                    12357,
+                    12358
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Fire_MeteorStorm"
+            },
+            {
+                "i": 29,
+                "n": "Pyroschlag",
+                "m": 1,
+                "d": [
+                    "Schleudert einen immensen feurigen Felsen, der 141 bis 188 Feuerschaden sowie zus\u00e4tzlich 12 Sek. lang insgesamt 56 Feuerschaden verursacht."
+                ],
+                "s": [
+                    11366
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Fire_Fireball02"
+            },
+            {
+                "i": 23,
+                "n": "Brennende Seele",
+                "m": 2,
+                "d": [
+                    "Verringert die Dauer der durch erlittenen Schaden verursachten Zauberzeiterh\u00f6hung beim Wirken von Feuerzaubern um 35% und die von Euren Feuerzaubern verursachte Bedrohung um 10%.",
+                    "Verringert die Dauer der durch erlittenen Schaden verursachten Zauberzeiterh\u00f6hung beim Wirken von Feuerzaubern um 70% und die von Euren Feuerzaubern verursachte Bedrohung um 20%."
+                ],
+                "s": [
+                    11083,
+                    12351
+                ],
+                "x": 3,
+                "y": 2,
+                "iconname": "Spell_Fire_Fire"
+            },
+            {
+                "i": 25,
+                "n": "Verbessertes Versengen",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht die kritische Trefferchance Eurer Zauber 'Versengen', 'Feuerball' und 'Frostfeuerblitz' um 1%. Zudem hat Euer Zauber 'Versengen' eine Chance von 33%, dass sein Ziel f\u00fcr Zauberschaden verwundbar wird, wodurch die kritische Zaubertrefferchance gegen dieses Ziel 30 Sek. lang um 5% erh\u00f6ht wird.",
+                    "Erh\u00f6ht die kritische Trefferchance Eurer Zauber 'Versengen', 'Feuerball' und 'Frostfeuerblitz' um 2%. Zudem hat Euer Zauber 'Versengen' eine Chance von 66%, dass sein Ziel f\u00fcr Zauberschaden verwundbar wird, wodurch die kritische Zaubertrefferchance gegen dieses Ziel 30 Sek. lang um 5% erh\u00f6ht wird.",
+                    "Erh\u00f6ht die kritische Trefferchance Eurer Zauber 'Versengen', 'Feuerball' und 'Frostfeuerblitz' um 3%. Zudem hat Euer Zauber 'Versengen' eine Chance von 100%, dass sein Ziel f\u00fcr Zauberschaden verwundbar wird, wodurch die kritische Zaubertrefferchance gegen dieses Ziel 30 Sek. lang um 5% erh\u00f6ht wird."
+                ],
+                "s": [
+                    11095,
+                    12872,
+                    12873
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Fire_SoulBurn"
+            },
+            {
+                "i": 24,
+                "n": "Gl\u00fchende Schilde",
+                "m": 2,
+                "d": [
+                    "Verleiht Euren Zaubern 'Feuerzauberschutz' und 'Frostzauberschutz' eine Chance von 15%, die jeweils betroffene Zauberart zu reflektieren. Zus\u00e4tzlich hat Eure 'Gl\u00fchende R\u00fcstung' eine Chance von 50%, auch Distanzangriffe und Schadenszauber zu betreffen.",
+                    "Verleiht Euren Zaubern 'Feuerzauberschutz' und 'Frostzauberschutz' eine Chance von 30%, die jeweils betroffene Zauberart zu reflektieren. Zus\u00e4tzlich hat 'Gl\u00fchende R\u00fcstung' eine Chance von 100%, auch Distanzangriffe und Offensivzauber zu betreffen."
+                ],
+                "s": [
+                    11094,
+                    13043
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Fire_FireArmor"
+            },
+            {
+                "i": 1639,
+                "n": "Meister der Elemente",
+                "m": 3,
+                "d": [
+                    "Durch kritische Zaubertreffer erhaltet Ihr 10% der Grundmanakosten des Zaubers zur\u00fcck.",
+                    "Durch kritische Zaubertreffer erhaltet Ihr 20% der Grundmanakosten des Zaubers zur\u00fcck.",
+                    "Durch kritische Zaubertreffer erhaltet Ihr 30% der Grundmanakosten des Zaubers zur\u00fcck."
+                ],
+                "s": [
+                    29074,
+                    29075,
+                    29076
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_Fire_MasterOfElements"
+            },
+            {
+                "i": 1730,
+                "n": "Spiel mit dem Feuer",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht jeglichen verursachten Zauberschaden um 1% und jeglichen erlittenen Zauberschaden um 1%.",
+                    "Erh\u00f6ht jeglichen verursachten Zauberschaden um 2% und jeglichen erlittenen Zauberschaden um 2%.",
+                    "Erh\u00f6ht jeglichen verursachten Zauberschaden um 3% und jeglichen erlittenen Zauberschaden um 3%."
+                ],
+                "s": [
+                    31638,
+                    31639,
+                    31640
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Fire_PlayingWithFire"
+            },
+            {
+                "i": 33,
+                "n": "Kritische Masse",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht die Chance f\u00fcr einen kritischen Treffer Eurer Feuerzauber um 2%.",
+                    "Erh\u00f6ht die Chance f\u00fcr einen kritischen Treffer Eurer Feuerzauber um 4%.",
+                    "Erh\u00f6ht die Chance f\u00fcr einen kritischen Treffer Eurer Feuerzauber um 6%."
+                ],
+                "s": [
+                    11115,
+                    11367,
+                    11368
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Nature_WispHeal"
+            },
+            {
+                "i": 32,
+                "n": "Druckwelle",
+                "m": 1,
+                "d": [
+                    "Eine Flammenwelle geht vom Zaubernden aus. Alle Feinde, die sich im Radius der Flammen befinden, erleiden 154 bis 187 Feuerschaden, werden zur\u00fcckgesto\u00dfen und sind 6 Sek. lang benommen."
+                ],
+                "s": [
+                    11113
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Holy_Excorcism_02",
+                "r": [
+                    8,
+                    1
+                ]
+            },
+            {
+                "i": 1731,
+                "n": "Hei\u00dfe Sohlen",
+                "m": 2,
+                "d": [
+                    "Verleiht Euch eine Chance von 5%, dass nach einem erlittenen Nahkampf- oder Distanztreffer Euer Bewegungstempo um 50% erh\u00f6ht wird und alle bewegungseinschr\u00e4nkenden Effekte entfernt werden. H\u00e4lt 8 Sek. lang an.",
+                    "Verleiht Euch eine Chance von 10%, dass nach einem erlittenen Nahkampf- oder Distanztreffer Euer Bewegungstempo um 50% erh\u00f6ht wird und alle bewegungseinschr\u00e4nkenden Effekte entfernt werden. H\u00e4lt 8 Sek. lang an."
+                ],
+                "s": [
+                    31641,
+                    31642
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Fire_BurningSpeed"
+            },
+            {
+                "i": 35,
+                "n": "Feuermacht",
+                "m": 5,
+                "d": [
+                    "Erh\u00f6ht den Schaden Eurer Feuerzauber um 2%.",
+                    "Erh\u00f6ht den Schaden Eurer Feuerzauber um 4%.",
+                    "Erh\u00f6ht den Schaden Eurer Feuerzauber um 6%.",
+                    "Erh\u00f6ht den Schaden Eurer Feuerzauber um 8%.",
+                    "Erh\u00f6ht den Schaden Eurer Feuerzauber um 10%."
+                ],
+                "s": [
+                    11124,
+                    12378,
+                    12398,
+                    12399,
+                    12400
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Fire_Immolation"
+            },
+            {
+                "i": 1733,
+                "n": "Brandstifter",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht die kritische Trefferchance um 1% und gestattet, dass 17% Eurer Manaregeneration w\u00e4hrend des Zauberwirkens weiterl\u00e4uft.",
+                    "Erh\u00f6ht die kritische Trefferchance um 2% und gestattet, dass 33% Eurer Manaregeneration w\u00e4hrend des Zauberwirkens weiterl\u00e4uft.",
+                    "Erh\u00f6ht die kritische Trefferchance um 3% und gestattet, dass 50% Eurer Manaregeneration w\u00e4hrend des Zauberwirkens weiterl\u00e4uft."
+                ],
+                "s": [
+                    34293,
+                    34295,
+                    34296
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Fire_Burnout"
+            },
+            {
+                "i": 36,
+                "n": "Ein\u00e4schern",
+                "m": 1,
+                "d": [
+                    "Wenn aktiviert, wird der kritische Schadensbonus Eurer Feuerzauber um 50% erh\u00f6ht und jeder Feuerschadenszauber, den Ihr wirkt, erh\u00f6ht die kritische Trefferchance Eurer Feuerschadenszauber um 10%. Dieser Effekt h\u00e4lt an, bis Ihr 3 unregelm\u00e4\u00dfige kritische Treffer mit Feuerzaubern erzielt habt."
+                ],
+                "s": [
+                    11129
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Fire_SealOfFire",
+                "r": [
+                    14,
+                    3
+                ]
+            },
+            {
+                "i": 1732,
+                "n": "Gl\u00fchender Zorn",
+                "m": 2,
+                "d": [
+                    "Erh\u00f6ht den Schaden aller Zauber gegen Ziele, die \u00fcber weniger als 35% Gesundheit verf\u00fcgen um 6%.",
+                    "Erh\u00f6ht den Schaden aller Zauber gegen Ziele, die \u00fcber weniger als 35% Gesundheit verf\u00fcgen um 12%."
+                ],
+                "s": [
+                    31679,
+                    31680
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Fire_MoltenBlood"
+            },
+            {
+                "i": 1848,
+                "n": "Feurige Rache",
+                "m": 2,
+                "d": [
+                    "Besitzt Ihr weniger als 35% Gesundheit, wird jeglicher erlittene Schaden um 10% verringert. Zus\u00e4tzlich wird die Zauberzeit von 'Pyroschlag' um 1.75.2 Sek. verringert, w\u00e4hrend die Abklingzeit um 2.5.1 Sek. erh\u00f6ht wird. Zudem besteht eine Chance von 101%, dass bei gegen Euch gef\u00fchrten Nahkampf- oder Distanzangriffen die Waffenhand- und Distanzwaffe des Angreifers entwaffnet wird.",
+                    "Besitzt Ihr weniger als 35% Gesundheit, wird jeglicher erlittene Schaden um 20% verringert. Zus\u00e4tzlich wird die Zauberzeit von 'Pyroschlag' um 3.5.1 Sek. verringert, w\u00e4hrend die Abklingzeit um 5 Sek. erh\u00f6ht wird. Zudem besteht eine Chance von 101%, dass bei gegen Euch gef\u00fchrten Nahkampf- oder Distanzangriffen die Waffenhand- und Distanzwaffe des Angreifers entwaffnet wird."
+                ],
+                "s": [
+                    64353,
+                    64357
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Ability_Mage_FieryPayback"
+            },
+            {
+                "i": 1734,
+                "n": "Machtvolles Feuer",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht den Schaden Eurer Zauber 'Feuerball', 'Frostfeuerblitz' und 'Pyroschlag' um einen Wert, der 5% Eurer Zaubermacht entspricht. Zudem besteht jedes Mal, wenn Euer Talent 'Entz\u00fcnden' Schaden verursacht, eine Chance von 33%, dass Ihr 2% Eures Grundmanas gewinnt.",
+                    "Erh\u00f6ht den Schaden Eurer Zauber 'Feuerball', 'Frostfeuerblitz' und 'Pyroschlag' um einen Wert, der 10% Eurer Zaubermacht entspricht. Zudem besteht jedes Mal, wenn Euer Talent 'Entz\u00fcnden' Schaden verursacht, eine Chance von 67%, dass Ihr 2% Eures Grundmanas gewinnt.",
+                    "Erh\u00f6ht den Schaden Eurer Zauber 'Feuerball', 'Frostfeuerblitz' und 'Pyroschlag' um einen Wert, der 15% Eurer Zaubermacht entspricht. Zudem besteht jedes Mal, wenn Euer Talent 'Entz\u00fcnden' Schaden verursacht, eine Chance von 100%, dass Ihr 2% Eures Grundmanas gewinnt."
+                ],
+                "s": [
+                    31656,
+                    31657,
+                    31658
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Fire_FlameBolt"
+            },
+            {
+                "i": 1849,
+                "n": "Feuerteufel",
+                "m": 2,
+                "d": [
+                    "Wenn Eure Zauber 'Druckwelle' und 'Drachenodem' Schaden verursachen, besteht eine Chance von 50%, dass Euer n\u00e4chstes Wirken von 'Flammensto\u00df' zu einem Spontanzauber wird und kein Mana kostet. H\u00e4lt 10 Sek. lang an.",
+                    "Wenn Eure Zauber 'Druckwelle' und 'Drachenodem' Schaden verursachen, besteht eine Chance von 100%, dass Euer n\u00e4chstes Wirken von 'Flammensto\u00df' zu einem Spontanzauber wird und kein Mana kostet. H\u00e4lt 10 Sek. lang an."
+                ],
+                "s": [
+                    44442,
+                    44443
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Mage_FireStarter",
+                "r": [
+                    24,
+                    1
+                ]
+            },
+            {
+                "i": 1735,
+                "n": "Drachenodem",
+                "m": 1,
+                "d": [
+                    "Zielen in einem kegelf\u00f6rmigen Bereich vor dem Zaubernden wird 370 bis 431 Feuerschaden zugef\u00fcgt und sie werden 5 Sek. lang desorientiert. Jeder Angriff, der direkten Schaden zuf\u00fcgt, l\u00e4sst das Ziel wieder zu sich kommen. Stoppt Euren Angriff bei Benutzung."
+                ],
+                "s": [
+                    31661
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "INV_Misc_Head_Dragon_01",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 1850,
+                "n": "Kampfeshitze",
+                "m": 3,
+                "d": [
+                    "Jedes Mal, wenn Ihr mit 'Feuerball', 'Feuerschlag', 'Versengen', 'Lebende Bombe' oder 'Frostfeuerblitz' 2 unregelm\u00e4\u00dfige kritische Zaubertreffer in Folge erzielt, besteht eine Chance von 33%, dass Euer n\u00e4chstes Wirken von 'Pyroschlag' innerhalb von 10 Sek. zu einem Spontanzauber wird.",
+                    "Jedes Mal, wenn Ihr mit 'Feuerball', 'Feuerschlag', 'Versengen', 'Lebende Bombe' oder 'Frostfeuerblitz' 2 unregelm\u00e4\u00dfige kritische Zaubertreffer in Folge erzielt, besteht eine Chance von 66%, dass Euer n\u00e4chstes Wirken von 'Pyroschlag' innerhalb von 10 Sek. zu einem Spontanzauber wird.",
+                    "Jedes Mal, wenn Ihr mit 'Feuerball', 'Feuerschlag', 'Versengen', 'Lebende Bombe' oder 'Frostfeuerblitz' 2 unregelm\u00e4\u00dfige kritische Zaubertreffer in Folge erzielt, besteht eine Chance von 100%, dass Euer n\u00e4chstes Wirken von 'Pyroschlag' innerhalb von 10 Sek. zu einem Spontanzauber wird."
+                ],
+                "s": [
+                    44445,
+                    44446,
+                    44448
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Ability_Mage_HotStreak"
+            },
+            {
+                "i": 1851,
+                "n": "Ausgebrannt",
+                "m": 5,
+                "d": [
+                    "Erh\u00f6ht den kritischen Schadensbonus aller Eurer Zauber um 10%, Eure unregelm\u00e4\u00dfigen kritischen Zaubertreffer kosten jedoch zus\u00e4tzliche 1% der Manakosten des jeweiligen Zaubers.",
+                    "Erh\u00f6ht den kritischen Schadensbonus aller Eurer Zauber um 20%, Eure unregelm\u00e4\u00dfigen kritischen Zaubertreffer kosten jedoch zus\u00e4tzliche 2% der Manakosten des jeweiligen Zaubers.",
+                    "Erh\u00f6ht den kritischen Schadensbonus aller Eurer Zauber um 30%, Eure unregelm\u00e4\u00dfigen kritischen Zaubertreffer kosten jedoch zus\u00e4tzliche 3% der Manakosten des jeweiligen Zaubers.",
+                    "Erh\u00f6ht den kritischen Schadensbonus aller Eurer Zauber um 40%, Eure unregelm\u00e4\u00dfigen kritischen Zaubertreffer kosten jedoch zus\u00e4tzliche 4% der Manakosten des jeweiligen Zaubers.",
+                    "Erh\u00f6ht den kritischen Schadensbonus aller Eurer Zauber um 50%, Eure unregelm\u00e4\u00dfigen kritischen Zaubertreffer kosten jedoch zus\u00e4tzliche 5% der Manakosten des jeweiligen Zaubers."
+                ],
+                "s": [
+                    44449,
+                    44469,
+                    44470,
+                    44471,
+                    44472
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Mage_Burnout"
+            },
+            {
+                "i": 1852,
+                "n": "Lebende Bombe",
+                "m": 1,
+                "d": [
+                    "Das Ziel wird zu einer lebenden Bombe und erleidet im Verlauf von 12 Sek. 612 Feuerschaden. Nach Ablauf von 12 Sek., oder wenn der Zauber gebannt wird, explodiert das Ziel und f\u00fcgt allen Feinden im Umkreis von 0 Metern 306 Feuerschaden zu."
+                ],
+                "s": [
+                    44457
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Mage_LivingBomb"
+            }
+        ]
+    },
+    {
+        "n": "Frost",
+        "t": [
+            {
+                "i": 38,
+                "n": "Erfrierung",
+                "m": 3,
+                "d": [
+                    "Gew\u00e4hrt Euren K\u00e4lteeffekten eine Chance von 5%, das Ziel 5 Sek. lang einzufrieren.",
+                    "Gew\u00e4hrt Euren K\u00e4lteeffekten eine Chance von 10%, das Ziel 5 Sek. lang einzufrieren.",
+                    "Gew\u00e4hrt Euren K\u00e4lteeffekten eine Chance von 15%, das Ziel 5 Sek. lang einzufrieren."
+                ],
+                "s": [
+                    11071,
+                    12496,
+                    12497
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Frost_FrostArmor"
+            },
+            {
+                "i": 37,
+                "n": "Verbesserter Frostblitz",
+                "m": 5,
+                "d": [
+                    "Verringert die Zauberzeit Eures Zaubers 'Frostblitz' um 0.1 Sek.",
+                    "Verringert die Zauberzeit Eures Zaubers 'Frostblitz' um 0.2 Sek.",
+                    "Verringert die Zauberzeit Eures Zaubers 'Frostblitz' um 0.3 Sek.",
+                    "Verringert die Zauberzeit Eures Zaubers 'Frostblitz' um 0.4 Sek.",
+                    "Verringert die Zauberzeit Eures Zaubers 'Frostblitz' um 0.5 Sek."
+                ],
+                "s": [
+                    11070,
+                    12473,
+                    16763,
+                    16765,
+                    16766
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Frost_FrostBolt02"
+            },
+            {
+                "i": 62,
+                "n": "Eisschollen",
+                "m": 3,
+                "d": [
+                    "Verringert die Abklingzeit Eurer Zauber 'Frostnova', 'K\u00e4ltekegel', 'Eisige Adern' und 'Eisblock' um 7%.",
+                    "Verringert die Abklingzeit Eurer Zauber 'Frostnova', 'K\u00e4ltekegel', 'Eisige Adern' und 'Eisblock' um 14%.",
+                    "Verringert die Abklingzeit Eurer Zauber 'Frostnova', 'K\u00e4ltekegel', 'Eisige Adern' und 'Eisblock' um 20%."
+                ],
+                "s": [
+                    31670,
+                    31672,
+                    55094
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Frost_IceFloes"
+            },
+            {
+                "i": 73,
+                "n": "Eissplitter",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht den Schadensbonus Eurer kritischen Treffer mit Frostzaubern um 33%.",
+                    "Erh\u00f6ht den Schadensbonus Eurer kritischen Treffer mit Frostzaubern um 66%.",
+                    "Erh\u00f6ht den Schadensbonus Eurer kritischen Treffer mit Frostzaubern um 100%."
+                ],
+                "s": [
+                    11207,
+                    12672,
+                    15047
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Frost_IceShard"
+            },
+            {
+                "i": 70,
+                "n": "Schutz des Frostes",
+                "m": 2,
+                "d": [
+                    "Erh\u00f6ht die von Euren Zaubern 'Frostr\u00fcstung' und 'Eisr\u00fcstung' verliehene R\u00fcstung und Widerst\u00e4nde um 25%. Verleiht Euren Zaubern 'Frostzauberschutz' und 'Feuerzauberschutz' eine Chance von 15%, die jeweils gesch\u00fctzte Zauberart zu negieren und Mana in H\u00f6he des absorbierten Schadens zu regenerieren.",
+                    "Erh\u00f6ht die von Euren Zaubern 'Frostr\u00fcstung' und 'Eisr\u00fcstung' verliehene R\u00fcstung und Widerst\u00e4nde um 50%. Verleiht Euren Zaubern 'Frostzauberschutz' und 'Feuerzauberschutz' eine Chance von 30%, die jeweils gesch\u00fctzte Zauberart zu negieren und Mana in H\u00f6he des absorbierten Schadens zu regenerieren."
+                ],
+                "s": [
+                    11189,
+                    28332
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Frost_FrostWard"
+            },
+            {
+                "i": 1649,
+                "n": "Pr\u00e4zision",
+                "m": 3,
+                "d": [
+                    "Verringert die Manakosten und erh\u00f6ht Eure Zaubertrefferchance um 1%.",
+                    "Verringert die Manakosten und erh\u00f6ht Eure Zaubertrefferchance um 2%.",
+                    "Verringert die Manakosten und erh\u00f6ht Eure Zaubertrefferchance um 3%."
+                ],
+                "s": [
+                    29438,
+                    29439,
+                    29440
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Ice_MagicDamage"
+            },
+            {
+                "i": 65,
+                "n": "Dauerfrost",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht die Dauer Eurer K\u00e4lteeffekte um 1 Sekunde, verlangsamt das Tempo des Ziels zus\u00e4tzlich um 4% und verringert die erhaltene Heilung des Ziels um 7%.",
+                    "Erh\u00f6ht die Dauer Eurer K\u00e4lteeffekte um 2 Sekunden, verlangsamt das Tempo des Ziels zus\u00e4tzlich um 7% und verringert die erhaltene Heilung des Ziels um 13%.",
+                    "Erh\u00f6ht die Dauer Eurer K\u00e4lteeffekte um 3 Sekunden, verlangsamt das Tempo des Ziels zus\u00e4tzlich um 10% und verringert die erhaltene Heilung des Ziels um 20%."
+                ],
+                "s": [
+                    11175,
+                    12569,
+                    12571
+                ],
+                "x": 3,
+                "y": 1,
+                "iconname": "Spell_Frost_Wisp"
+            },
+            {
+                "i": 61,
+                "n": "Stechendes Eis",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht den Schaden Eurer Frostzauber um 2%.",
+                    "Erh\u00f6ht den Schaden Eurer Frostzauber um 4%.",
+                    "Erh\u00f6ht den Schaden Eurer Frostzauber um 6%."
+                ],
+                "s": [
+                    11151,
+                    12952,
+                    12953
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Frost_Frostbolt"
+            },
+            {
+                "i": 69,
+                "n": "Eisige Adern",
+                "m": 1,
+                "d": [
+                    "Beschleunigt Euer Wirken von Zaubern, erh\u00f6ht das Zaubertempo um 20% und verringert die Dauer der durch erlittenen Schaden verursachten Zauberzeiterh\u00f6hung beim Wirken von Zaubern um 100%. H\u00e4lt 20 Sek. lang an."
+                ],
+                "s": [
+                    12472
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Frost_ColdHearted"
+            },
+            {
+                "i": 63,
+                "n": "Verbesserter Blizzard",
+                "m": 3,
+                "d": [
+                    "F\u00fcgt Eurem Zauber 'Blizzard' einen K\u00e4lteeffekt hinzu. Dieser Effekt verringert das Bewegungstempo des Ziels um 25%. H\u00e4lt 1 Sek. lang an.",
+                    "F\u00fcgt Eurem Zauber 'Blizzard' einen K\u00e4lteeffekt hinzu. Dieser Effekt verringert das Bewegungstempo des Ziels um 40%. H\u00e4lt 1 Sek. lang an.",
+                    "F\u00fcgt Eurem Zauber 'Blizzard' einen K\u00e4lteeffekt hinzu. Dieser Effekt verringert das Bewegungstempo des Ziels um 50%. H\u00e4lt 1 Sek. lang an."
+                ],
+                "s": [
+                    11185,
+                    12487,
+                    12488
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Spell_Frost_IceStorm"
+            },
+            {
+                "i": 741,
+                "n": "Arktische Reichweite",
+                "m": 2,
+                "d": [
+                    "Erh\u00f6ht die Reichweite Eurer Zauber 'Frostblitz', 'Eislanze', 'Tieffrieren' und 'Blizzard' und den Radius Eurer Zauber 'Frostnova' und 'K\u00e4ltekegel' um 10%.",
+                    "Erh\u00f6ht die Reichweite Eurer Zauber 'Frostblitz', 'Eislanze', 'Tieffrieren' und 'Blizzard' und den Radius Eurer Zauber 'Frostnova' und 'K\u00e4ltekegel' um 20%."
+                ],
+                "s": [
+                    16757,
+                    16758
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_Shadow_DarkRitual"
+            },
+            {
+                "i": 66,
+                "n": "Frostkanalisierung",
+                "m": 3,
+                "d": [
+                    "Verringert die Manakosten aller Zauber um 4% und verringert die von Euren Frostzaubern verursachte Bedrohung um 4%.",
+                    "Verringert die Manakosten aller Zauber um 7% und verringert die von Euren Frostzaubern verursachte Bedrohung um 7%.",
+                    "Verringert die Manakosten aller Zauber um 10% und verringert die von Euren Frostzaubern verursachte Bedrohung um 10%."
+                ],
+                "s": [
+                    11160,
+                    12518,
+                    12519
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_Frost_Stun"
+            },
+            {
+                "i": 67,
+                "n": "Zertr\u00fcmmern",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht die kritische Trefferchance aller Eurer Zauber gegen gefrorene Ziele um 17%.",
+                    "Erh\u00f6ht die kritische Trefferchance aller Eurer Zauber gegen gefrorene Ziele um 34%.",
+                    "Erh\u00f6ht die kritische Trefferchance aller Eurer Zauber gegen gefrorene Ziele um 50%."
+                ],
+                "s": [
+                    11170,
+                    12982,
+                    12983
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Frost_FrostShock"
+            },
+            {
+                "i": 72,
+                "n": "K\u00e4lteeinbruch",
+                "m": 1,
+                "d": [
+                    "Bei Aktivierung schlie\u00dft dieser Zauber die Abklingzeit all Eurer gerade gewirkten Frostzauber ab."
+                ],
+                "s": [
+                    11958
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Frost_WizardMark"
+            },
+            {
+                "i": 64,
+                "n": "Verbesserter K\u00e4ltekegel",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht den Schaden, den Euer Zauber 'K\u00e4ltekegel' zuf\u00fcgt, um 15%.",
+                    "Erh\u00f6ht den Schaden, den Euer Zauber 'K\u00e4ltekegel' zuf\u00fcgt, um 25%.",
+                    "Erh\u00f6ht den Schaden, den Euer Zauber 'K\u00e4ltekegel' zuf\u00fcgt, um 35%."
+                ],
+                "s": [
+                    11190,
+                    12489,
+                    12490
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Frost_Glacier"
+            },
+            {
+                "i": 1736,
+                "n": "Gefrorener Kern",
+                "m": 3,
+                "d": [
+                    "Verringert jeglichen durch Zauber erlittenen Schaden um 2%.",
+                    "Verringert jeglichen durch Zauber erlittenen Schaden um 4%.",
+                    "Verringert jeglichen durch Zauber erlittenen Schaden um 6%."
+                ],
+                "s": [
+                    31667,
+                    31668,
+                    31669
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Frost_FrozenCore"
+            },
+            {
+                "i": 1737,
+                "n": "Eisesk\u00e4lte",
+                "m": 2,
+                "d": [
+                    "Verringert die Abklingzeit Eurer Zauber 'K\u00e4lteeinbruch', 'Eisbarriere' und 'Wasserelementar beschw\u00f6ren' um 10%.",
+                    "Verringert die Abklingzeit Eurer Zauber 'K\u00e4lteeinbruch', 'Eisbarriere' und 'Wasserelementar beschw\u00f6ren' um 20%."
+                ],
+                "s": [
+                    55091,
+                    55092
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Ability_Mage_ColdAsIce",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 68,
+                "n": "Winterk\u00e4lte",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht die kritische Trefferchance Eures Zaubers 'Frostblitz' zus\u00e4tzlich um 1% und verleiht Euren Frostschadenszaubern eine Chance von 33%, den Effekt 'Winterk\u00e4lte' hervorzurufen, der die kritische Zaubertrefferchance gegen das Ziel 15 Sek. lang um 1% erh\u00f6ht. Bis zu 1-mal stapelbar.",
+                    "Erh\u00f6ht die kritische Trefferchance Eures Zaubers 'Frostblitz' zus\u00e4tzlich um 2% und verleiht Euren Frostschadenszaubern eine Chance von 66%, den Effekt 'Winterk\u00e4lte' hervorzurufen, der die kritische Zaubertrefferchance gegen das Ziel 15 Sek. lang um 1% erh\u00f6ht. Bis zu 1-mal stapelbar.",
+                    "Erh\u00f6ht die kritische Trefferchance Eures Zaubers 'Frostblitz' zus\u00e4tzlich um 3% und verleiht Euren Frostschadenszaubern eine Chance von 100%, den Effekt 'Winterk\u00e4lte' hervorzurufen, der die kritische Zaubertrefferchance gegen das Ziel 15 Sek. lang um 1% erh\u00f6ht. Bis zu 1-mal stapelbar."
+                ],
+                "s": [
+                    11180,
+                    28592,
+                    28593
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Frost_ChillingBlast"
+            },
+            {
+                "i": 2214,
+                "n": "Splitternde Barriere",
+                "m": 2,
+                "d": [
+                    "Verleiht Eurer 'Eisbarriere' eine Chance von 50%, 8 Sek. lang alle Feinde im Umkreis von 0 Metern festzufrieren, wenn sie zerst\u00f6rt wird.",
+                    "Verleiht Eurer 'Eisbarriere' eine Chance von 100%, 8 Sek. lang alle Feinde im Umkreis von 0 Metern festzufrieren, wenn sie zerst\u00f6rt wird."
+                ],
+                "s": [
+                    44745,
+                    54787
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Ability_Mage_ShatterShield",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 71,
+                "n": "Eisbarriere",
+                "m": 1,
+                "d": [
+                    "Schirmt Euch sofort ab und absorbiert 438 Schaden. H\u00e4lt 1 Min. lang an. Solange der Schild h\u00e4lt, werden Zauber durch erlittenen Schaden nicht verz\u00f6gert."
+                ],
+                "s": [
+                    11426
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_Ice_Lament",
+                "r": [
+                    13,
+                    1
+                ]
+            },
+            {
+                "i": 1738,
+                "n": "Arktische Winde",
+                "m": 5,
+                "d": [
+                    "Erh\u00f6ht s\u00e4mtlichen von Euch verursachten Frostschaden um 1% und verringert die Chance, dass Euch Nahkampf- und Distanzangriffe treffen, um 1%.",
+                    "Erh\u00f6ht s\u00e4mtlichen von Euch verursachten Frostschaden um 2% und verringert die Chance, dass Euch Nahkampf- und Distanzangriffe treffen, um 2%.",
+                    "Erh\u00f6ht s\u00e4mtlichen von Euch verursachten Frostschaden um 3% und verringert die Chance, dass Euch Nahkampf- und Distanzangriffe treffen, um 3%.",
+                    "Erh\u00f6ht s\u00e4mtlichen von Euch verursachten Frostschaden um 4% und verringert die Chance, dass Euch Nahkampf- und Distanzangriffe treffen, um 4%.",
+                    "Erh\u00f6ht s\u00e4mtlichen von Euch verursachten Frostschaden um 5% und verringert die Chance, dass Euch Nahkampf- und Distanzangriffe treffen, um 5%."
+                ],
+                "s": [
+                    31674,
+                    31675,
+                    31676,
+                    31677,
+                    31678
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Frost_ArcticWinds"
+            },
+            {
+                "i": 1740,
+                "n": "Machtvoller Frostblitz",
+                "m": 2,
+                "d": [
+                    "Erh\u00f6ht den Schaden Eures Zaubers 'Frostblitz' um einen Wert, der 5% Eurer Zaubermacht entspricht und verringert seine Zauberzeit um 0.1.1 Sek.",
+                    "Erh\u00f6ht den Schaden Eures Zaubers 'Frostblitz' um einen Wert, der 10% Eurer Zaubermacht entspricht und verringert seine Zauberzeit um 0.2.1 Sek."
+                ],
+                "s": [
+                    31682,
+                    31683
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Frost_FrostBolt02"
+            },
+            {
+                "i": 1853,
+                "n": "Eisige Finger",
+                "m": 2,
+                "d": [
+                    "Verleiht Euren K\u00e4lteeffekten eine Chance von 7%, den Effekt 'Eisige Finger' hervorzurufen. Die eisigen Finger bewirken, dass Eure n\u00e4chsten 2 gewirkten Zauber einen Effekt haben, den sie auf ein gefrorenes Ziel h\u00e4tten. H\u00e4lt 15 Sek. lang an.",
+                    "Verleiht Euren K\u00e4lteeffekten eine Chance von 15%, den Effekt 'Eisige Finger' hervorzurufen. Die eisigen Finger bewirken, dass Eure n\u00e4chsten 2 gewirkten Zauber einen Effekt haben, den sie auf ein gefrorenes Ziel h\u00e4tten. H\u00e4lt 15 Sek. lang an."
+                ],
+                "s": [
+                    44543,
+                    44545
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Ability_Mage_WintersGrasp"
+            },
+            {
+                "i": 1854,
+                "n": "Hirnfrost",
+                "m": 3,
+                "d": [
+                    "Eure Frostzauber mit K\u00e4lteeffekten haben eine Chance von 5%, Euer n\u00e4chstes Wirken von 'Feuerball' oder 'Frostfeuerblitz' zu einem Spontanzauber werden zu lassen, der kein Mana kostet.",
+                    "Eure Frostzauber mit K\u00e4lteeffekten haben eine Chance von 10%, Euer n\u00e4chstes Wirken von 'Feuerball' oder 'Frostfeuerblitz' zu einem Spontanzauber werden zu lassen, der kein Mana kostet.",
+                    "Eure Frostzauber mit K\u00e4lteeffekten haben eine Chance von 15%, Euer n\u00e4chstes Wirken von 'Feuerball' oder 'Frostfeuerblitz' zu einem Spontanzauber werden zu lassen, der kein Mana kostet."
+                ],
+                "s": [
+                    44546,
+                    44548,
+                    44549
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Mage_BrainFreeze"
+            },
+            {
+                "i": 1741,
+                "n": "Wasserelementar beschw\u00f6ren",
+                "m": 1,
+                "d": [
+                    "Beschw\u00f6rt einen Wasserelementar, der?(s70937)[ ][ 45 Sek. lang ]f\u00fcr den Zaubernden k\u00e4mpft."
+                ],
+                "s": [
+                    31687
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_Frost_SummonWaterElemental_2"
+            },
+            {
+                "i": 1855,
+                "n": "Anhaltender Winter",
+                "m": 3,
+                "d": [
+                    "Erh\u00f6ht die Dauer Eures Zaubers 'Wasserelementar beschw\u00f6ren' um 5 Sek. Euer Zauber 'Frostblitz' hat eine Chance von 33%, 10 Gruppen- oder Schlachtzugsmitgliedern einen Manaregenerationseffekt zu gew\u00e4hren, der 15 Sek. alle 5 Sek. 1% ihres maximalen Manas wiederherstellt. Dieser Effekt kann nur ein Mal alle 6 Sek. auftreten.",
+                    "Erh\u00f6ht die Dauer Eures Zaubers 'Wasserelementar beschw\u00f6ren' um 10 Sek. Euer Zauber 'Frostblitz' hat eine Chance von 66%, 10 Gruppen- oder Schlachtzugsmitgliedern einen Manaregenerationseffekt zu gew\u00e4hren, der 15 Sek. alle 5 Sek. 1% ihres maximalen Manas wiederherstellt. Dieser Effekt kann nur ein Mal alle 6 Sek. auftreten.",
+                    "Erh\u00f6ht die Dauer Eures Zaubers 'Wasserelementar beschw\u00f6ren' um 15 Sek. Euer Zauber 'Frostblitz' hat eine Chance von 100%, 10 Gruppen- oder Schlachtzugsmitgliedern einen Manaregenerationseffekt zu gew\u00e4hren, der 15 Sek. alle 5 Sek. 1% ihres maximalen Manas wiederherstellt. Dieser Effekt kann nur ein Mal alle 6 Sek. auftreten."
+                ],
+                "s": [
+                    44557,
+                    44560,
+                    44561
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Frost_SummonWaterElemental_2",
+                "r": [
+                    24,
+                    1
+                ]
+            },
+            {
+                "i": 1856,
+                "n": "Durchgefroren",
+                "m": 5,
+                "d": [
+                    "Erh\u00f6ht den von Euren Zaubern 'Frostblitz', 'Frostfeuerblitz' und 'Eislanze' verursachten Schaden um 1% und verringert das Bewegungstempo aller Ziele, welche von K\u00e4lteeffekten betroffen sind, um zus\u00e4tzliche 2%.",
+                    "Erh\u00f6ht den von Euren Zaubern 'Frostblitz', 'Frostfeuerblitz' und 'Eislanze' verursachten Schaden um 2% und verringert das Bewegungstempo aller Ziele, welche von K\u00e4lteeffekten betroffen sind, um zus\u00e4tzliche 4%.",
+                    "Erh\u00f6ht den von Euren Zaubern 'Frostblitz', 'Frostfeuerblitz' und 'Eislanze' verursachten Schaden um 3% und verringert das Bewegungstempo aller Ziele, welche von K\u00e4lteeffekten betroffen sind, um zus\u00e4tzliche 6%.",
+                    "Erh\u00f6ht den von Euren Zaubern 'Frostblitz', 'Frostfeuerblitz' und 'Eislanze' verursachten Schaden um 4% und verringert das Bewegungstempo aller Ziele, welche von K\u00e4lteeffekten betroffen sind, um zus\u00e4tzliche 8%.",
+                    "Erh\u00f6ht den von Euren Zaubern 'Frostblitz', 'Frostfeuerblitz' und 'Eislanze' verursachten Schaden um 5% und verringert das Bewegungstempo aller Ziele, welche von K\u00e4lteeffekten betroffen sind, um zus\u00e4tzliche 10%."
+                ],
+                "s": [
+                    44566,
+                    44567,
+                    44568,
+                    44570,
+                    44571
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Ability_Mage_ChilledToTheBone"
+            },
+            {
+                "i": 1857,
+                "n": "Tieffrieren",
+                "m": 1,
+                "d": [
+                    "Bet\u00e4ubt das Ziel 5 Sek. lang. Funktioniert nur bei eingefrorenen Zielen. F\u00fcgt Zielen, die dauerhaft gegen Bet\u00e4ubungseffekte immun sind,  bis  Schaden zu."
+                ],
+                "s": [
+                    44572
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Mage_DeepFreeze"
+            }
+        ]
+    }
+])

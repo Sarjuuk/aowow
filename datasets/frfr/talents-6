@@ -1,0 +1,1567 @@
+$WowheadTalentCalculator.registerClass(6, [
+    {
+        "n": "Sang",
+        "t": [
+            {
+                "i": 1939,
+                "n": "Boucherie",
+                "m": 2,
+                "d": [
+                    "Chaque fois que vous tuez un ennemi qui rapporte de l'exp\u00e9rience ou de l'honneur, vous g\u00e9n\u00e9rez jusqu'\u00e0 10 points de puissance runique. De plus, vous g\u00e9n\u00e9rez 1 point de puissance runique toutes les 5 sec. pendant que vous \u00eates en combat.",
+                    "Chaque fois que vous tuez un ennemi qui rapporte de l'exp\u00e9rience ou de l'honneur, vous g\u00e9n\u00e9rez jusqu'\u00e0 20 points de puissance runique. De plus, vous g\u00e9n\u00e9rez 2 points de puissance runique toutes les 5 sec. pendant que vous \u00eates en combat."
+                ],
+                "s": [
+                    48979,
+                    49483
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "INV_Axe_68"
+            },
+            {
+                "i": 1945,
+                "n": "Subversion",
+                "m": 3,
+                "d": [
+                    "Augmente les chances de coup critique de Frappe de sang, Frappe du Fl\u00e9au, Frappe au coeur et An\u00e9antissement de 3%, et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e lorsque vous \u00eates en Pr\u00e9sence de sang ou impie de 8%.",
+                    "Augmente les chances de coup critique de Frappe de sang, Frappe du Fl\u00e9au, Frappe au coeur et An\u00e9antissement de 6%, et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e lorsque vous \u00eates en Pr\u00e9sence de sang ou impie de 16%.",
+                    "Augmente les chances de coup critique de Frappe de sang, Frappe du Fl\u00e9au, Frappe au coeur et An\u00e9antissement de 9%, et r\u00e9duit la menace g\u00e9n\u00e9r\u00e9e lorsque vous \u00eates en Pr\u00e9sence de sang ou impie de 25%."
+                ],
+                "s": [
+                    48997,
+                    49490,
+                    49491
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_DeathKnight_Subversion"
+            },
+            {
+                "i": 2017,
+                "n": "Barri\u00e8re de lames",
+                "m": 5,
+                "d": [
+                    "Chaque fois que vos runes de sang sont en cours de recharge, vous b\u00e9n\u00e9ficiez de l'effet Barri\u00e8re de lames, qui r\u00e9duit les d\u00e9g\u00e2ts subis de 1% pendant 10 s.",
+                    "Chaque fois que vos runes de sang sont en cours de recharge, vous b\u00e9n\u00e9ficiez de l'effet Barri\u00e8re de lames, qui r\u00e9duit les d\u00e9g\u00e2ts subis de 2% pendant 10 s.",
+                    "Chaque fois que vos runes de sang sont en cours de recharge, vous b\u00e9n\u00e9ficiez de l'effet Barri\u00e8re de lames, qui r\u00e9duit les d\u00e9g\u00e2ts subis de 3% pendant 10 s.",
+                    "Chaque fois que vos runes de sang sont en cours de recharge, vous b\u00e9n\u00e9ficiez de l'effet Barri\u00e8re de lames, qui r\u00e9duit les d\u00e9g\u00e2ts subis de 4% pendant 10 s.",
+                    "Chaque fois que vos runes de sang sont en cours de recharge, vous b\u00e9n\u00e9ficiez de l'effet Barri\u00e8re de lames, qui r\u00e9duit les d\u00e9g\u00e2ts subis de 5% pendant 10 s."
+                ],
+                "s": [
+                    49182,
+                    49500,
+                    49501,
+                    55225,
+                    55226
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Ability_UpgradeMoonGlaive"
+            },
+            {
+                "i": 1938,
+                "n": "Armure tranchante",
+                "m": 5,
+                "d": [
+                    "Augmente votre puissance d'attaque de 1 pour chaque tranche de 180 points de votre valeur d'armure.",
+                    "Augmente votre puissance d'attaque de 2 pour chaque tranche de 180 points de votre valeur d'armure.",
+                    "Augmente votre puissance d'attaque de 3 pour chaque tranche de 180 points de votre valeur d'armure.",
+                    "Augmente votre puissance d'attaque de 4 pour chaque tranche de 180 points de votre valeur d'armure.",
+                    "Augmente votre puissance d'attaque de 5 pour chaque tranche de 180 points de votre valeur d'armure."
+                ],
+                "s": [
+                    48978,
+                    49390,
+                    49391,
+                    49392,
+                    49393
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "INV_Shoulder_36"
+            },
+            {
+                "i": 1948,
+                "n": "Odeur du sang",
+                "m": 3,
+                "d": [
+                    "Vous avez 15% de chances apr\u00e8s avoir esquiv\u00e9, par\u00e9 ou subi des d\u00e9g\u00e2ts directs de b\u00e9n\u00e9ficier de l'effet Odeur du sang, qui fait g\u00e9n\u00e9rer \u00e0 votre prochain coup en m\u00eal\u00e9e 10 points de puissance runique.",
+                    "Vous avez 15% de chances apr\u00e8s avoir esquiv\u00e9, par\u00e9 ou subi des d\u00e9g\u00e2ts directs de b\u00e9n\u00e9ficier de l'effet Odeur du sang, qui fait g\u00e9n\u00e9rer \u00e0 vos 2 prochains coups en m\u00eal\u00e9e 10 points de puissance runique.",
+                    "Vous avez 15% de chances apr\u00e8s avoir esquiv\u00e9, par\u00e9 ou subi des d\u00e9g\u00e2ts directs de b\u00e9n\u00e9ficier de l'effet Odeur du sang, qui fait g\u00e9n\u00e9rer \u00e0 vos 3 prochains coups en m\u00eal\u00e9e 10 points de puissance runique."
+                ],
+                "s": [
+                    49004,
+                    49508,
+                    49509
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Ability_Rogue_BloodyEye"
+            },
+            {
+                "i": 2217,
+                "n": "Sp\u00e9cialisation Arme 2M",
+                "m": 2,
+                "d": [
+                    "Augmente les points de d\u00e9g\u00e2ts que vous infligez avec les armes de m\u00eal\u00e9e \u00e0 deux mains de 2%.",
+                    "Augmente les points de d\u00e9g\u00e2ts que vous infligez avec les armes de m\u00eal\u00e9e \u00e0 deux mains de 4%."
+                ],
+                "s": [
+                    55107,
+                    55108
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "INV_Sword_68"
+            },
+            {
+                "i": 1941,
+                "n": "Connexion runique",
+                "m": 1,
+                "d": [
+                    "Convertit 1 Rune de sang en 10% de vos points de vie maximum."
+                ],
+                "s": [
+                    48982
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_DeathKnight_RuneTap"
+            },
+            {
+                "i": 1943,
+                "n": "Sombre conviction",
+                "m": 5,
+                "d": [
+                    "Augmente de 1% vos chances d'infliger un coup critique avec les armes, les sorts et les techniques.",
+                    "Augmente de 2% vos chances d'infliger un coup critique avec les armes, les sorts et les techniques.",
+                    "Augmente de 3% vos chances d'infliger un coup critique avec les armes, les sorts et les techniques.",
+                    "Augmente de 4% vos chances d'infliger un coup critique avec les armes, les sorts et les techniques.",
+                    "Augmente de 5% vos chances d'infliger un coup critique avec les armes, les sorts et les techniques."
+                ],
+                "s": [
+                    48987,
+                    49477,
+                    49478,
+                    49479,
+                    49480
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_DeathKnight_DarkConviction"
+            },
+            {
+                "i": 2086,
+                "n": "Ma\u00eetrise des runes de la mort",
+                "m": 3,
+                "d": [
+                    "Chaque fois que vous touchez avec Frappe de mort ou An\u00e9antissement, il y a 33% de chances que les runes de givre et impie deviennent des runes de la mort lors de leur activation. Les runes de la mort comptent comme une rune de sang, de givre ou impie.",
+                    "Chaque fois que vous touchez avec Frappe de mort ou An\u00e9antissement, il y a 66% de chances que les runes de givre et impie deviennent des runes de la mort lors de leur activation. Les runes de la mort comptent comme une rune de sang, de givre ou impie.",
+                    "Chaque fois que vous touchez avec Frappe de mort ou An\u00e9antissement, il y a 100% de chances que les runes de givre et impie deviennent des runes de la mort lors de leur activation. Les runes de la mort comptent comme une rune de sang, de givre ou impie."
+                ],
+                "s": [
+                    49467,
+                    50033,
+                    50034
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "INV_Sword_62"
+            },
+            {
+                "i": 1942,
+                "n": "Connexion runique am\u00e9lior\u00e9e",
+                "m": 3,
+                "d": [
+                    "Augmente de 33% les points de vie prodigu\u00e9s par Connexion runique et r\u00e9duit son temps de recharge de 10 sec.",
+                    "Augmente de 66% les points de vie prodigu\u00e9s par Connexion runique et r\u00e9duit son temps de recharge de 20 sec.",
+                    "Augmente de 100% les points de vie prodigu\u00e9s par Connexion runique et r\u00e9duit son temps de recharge de 30 sec."
+                ],
+                "s": [
+                    48985,
+                    49488,
+                    49489
+                ],
+                "x": 0,
+                "y": 3,
+                "iconname": "Spell_DeathKnight_RuneTap",
+                "r": [
+                    6,
+                    1
+                ]
+            },
+            {
+                "i": 2018,
+                "n": "D\u00e9viation de sort",
+                "m": 3,
+                "d": [
+                    "Vous avez une chance \u00e9gale \u00e0 votre chance de parer que les sorts de d\u00e9g\u00e2ts directs vous infligent 15% de d\u00e9g\u00e2ts en moins.",
+                    "Vous avez une chance \u00e9gale \u00e0 votre chance de parer que les sorts de d\u00e9g\u00e2ts directs vous infligent 30% de d\u00e9g\u00e2ts en moins.",
+                    "Vous avez une chance \u00e9gale \u00e0 votre chance de parer que les sorts de d\u00e9g\u00e2ts directs vous infligent 45% de d\u00e9g\u00e2ts en moins."
+                ],
+                "s": [
+                    49145,
+                    49495,
+                    49497
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_DeathKnight_SpellDeflection"
+            },
+            {
+                "i": 1953,
+                "n": "Vendetta",
+                "m": 3,
+                "d": [
+                    "Chaque fois que vous tuez une cible qui rapporte de l'exp\u00e9rience ou de l'honneur, vous \u00eates soign\u00e9 pour un montant \u00e9gal \u00e0 2% au plus de votre maximum de points de vie.",
+                    "Chaque fois que vous tuez une cible qui rapporte de l'exp\u00e9rience ou de l'honneur, vous \u00eates soign\u00e9 pour un montant \u00e9gal \u00e0 4% au plus de votre maximum de points de vie.",
+                    "Chaque fois que vous tuez une cible qui rapporte de l'exp\u00e9rience ou de l'honneur, vous \u00eates soign\u00e9 pour un montant \u00e9gal \u00e0 6% au plus de votre maximum de points de vie."
+                ],
+                "s": [
+                    49015,
+                    50154,
+                    55136
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_DeathKnight_Vendetta"
+            },
+            {
+                "i": 2015,
+                "n": "Frappes sanglantes",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de Frappe de sang de 5% et de Frappe au coeur de 15%, en plus d'augmenter les d\u00e9g\u00e2ts de Furoncle sanglant de 10%.",
+                    "Augmente les d\u00e9g\u00e2ts de Frappe de sang de 10% et de Frappe au coeur de 30%, en plus d'augmenter les d\u00e9g\u00e2ts de Furoncle sanglant de 20%.",
+                    "Augmente les d\u00e9g\u00e2ts de Frappe de sang de 15% et de Frappe au coeur de 45%, en plus d'augmenter les d\u00e9g\u00e2ts de Furoncle sanglant de 30%."
+                ],
+                "s": [
+                    48977,
+                    49394,
+                    49395
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Deathknight_DeathStrike"
+            },
+            {
+                "i": 1950,
+                "n": "V\u00e9t\u00e9ran de la Troisi\u00e8me guerre",
+                "m": 3,
+                "d": [
+                    "Augmente votre total de Force de 2%, votre Endurance de 1% et votre expertise de 2.",
+                    "Augmente votre total de Force de 4%, votre Endurance de 2% et votre expertise de 4.",
+                    "Augmente votre total de Force de 6%, votre Endurance de 3% et votre expertise de 6."
+                ],
+                "s": [
+                    49006,
+                    49526,
+                    50029
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Misc_WarsongFocus"
+            },
+            {
+                "i": 1949,
+                "n": "Marque de sang",
+                "m": 1,
+                "d": [
+                    "Place une Marque de sang sur un ennemi. Chaque fois que l'ennemi marqu\u00e9 inflige des d\u00e9g\u00e2ts \u00e0 une cible, cette cible re\u00e7oit 4% de ses points de vie maximum. Dure 20 s ou jusqu'\u00e0 20 coups."
+                ],
+                "s": [
+                    49005
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Ability_Hunter_RapidKilling"
+            },
+            {
+                "i": 1944,
+                "n": "Vengeance sanglante",
+                "m": 3,
+                "d": [
+                    "Conf\u00e8re un bonus de 1% aux d\u00e9g\u00e2ts physiques que vous infligez pendant 30 s apr\u00e8s avoir r\u00e9ussi un coup critique avec une arme, un sort ou une technique. L'effet est cumulable jusqu'\u00e0 30001 fois.",
+                    "Conf\u00e8re un bonus de 2% aux d\u00e9g\u00e2ts physiques que vous infligez pendant 30 s apr\u00e8s avoir r\u00e9ussi un coup critique avec une arme, un sort ou une technique. L'effet est cumulable jusqu'\u00e0 30001 fois.",
+                    "Conf\u00e8re un bonus de 3% aux d\u00e9g\u00e2ts physiques que vous infligez pendant 30 s apr\u00e8s avoir r\u00e9ussi un coup critique avec une arme, un sort ou une technique. L'effet est cumulable jusqu'\u00e0 30001 fois."
+                ],
+                "s": [
+                    48988,
+                    49503,
+                    49504
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "Ability_BackStab",
+                "r": [
+                    7,
+                    5
+                ]
+            },
+            {
+                "i": 2105,
+                "n": "Puissance de l'abomination",
+                "m": 2,
+                "d": [
+                    "Augmente de 5% la puissance d'attaque des membres du groupe ou du raid se trouvant \u00e0 moins de 100 m\u00e8tres. Augmente \u00e9galement votre total de Force de 1%.",
+                    "Augmente de 10% la puissance d'attaque des membres du groupe ou du raid se trouvant \u00e0 moins de 100 m\u00e8tres. Augmente \u00e9galement votre total de Force de 2%."
+                ],
+                "s": [
+                    53137,
+                    53138
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Ability_Warrior_IntensifyRage"
+            },
+            {
+                "i": 1960,
+                "n": "Vers de sang",
+                "m": 3,
+                "d": [
+                    "Vos coups port\u00e9s avec des armes ont 3% de chances de faire produire \u00e0 la cible de 2 \u00e0 4 vers de sang. Les vers de sang attaquent vos ennemis et vous rendent un montant de points de vie \u00e9gal aux d\u00e9g\u00e2ts qu'ils infligent pendant 20 sec. ou jusqu'\u00e0 ce qu'ils soient tu\u00e9s.",
+                    "Vos coups port\u00e9s avec des armes ont 6% de chances de faire produire \u00e0 la cible de 2 \u00e0 4 vers de sang. Les vers de sang attaquent vos ennemis et vous rendent un montant de points de vie \u00e9gal aux d\u00e9g\u00e2ts qu'ils infligent pendant 20 sec. ou jusqu'\u00e0 ce qu'ils soient tu\u00e9s.",
+                    "Vos coups port\u00e9s avec des armes ont 9% de chances de faire produire \u00e0 la cible de 2 \u00e0 4 vers de sang. Les vers de sang attaquent vos ennemis et vous rendent un montant de points de vie \u00e9gal aux d\u00e9g\u00e2ts qu'ils infligent pendant 20 sec. ou jusqu'\u00e0 ce qu'ils soient tu\u00e9s."
+                ],
+                "s": [
+                    49027,
+                    49542,
+                    49543
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Shadow_SoulLeech"
+            },
+            {
+                "i": 1954,
+                "n": "Hyst\u00e9rie",
+                "m": 1,
+                "d": [
+                    "Plonge une unit\u00e9 alli\u00e9e dans une fr\u00e9n\u00e9sie meurtri\u00e8re pendant 30 s. La cible est enrag\u00e9e, ce qui augmente les d\u00e9g\u00e2ts physiques qu'elle inflige de 20%, mais elle subit aussi toutes les secondes un montant de d\u00e9g\u00e2ts \u00e9gal \u00e0 1% de ses points de vie maximum."
+                ],
+                "s": [
+                    49016
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_DeathKnight_BladedArmor"
+            },
+            {
+                "i": 1936,
+                "n": "Pr\u00e9sence de sang am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Quand vous \u00eates en Pr\u00e9sence de givre ou impie, vous conservez 2% des soins de Pr\u00e9sence de sang, et les soins qui vous sont prodigu\u00e9s sont augment\u00e9s de 5% en Pr\u00e9sence de sang.",
+                    "Quand vous \u00eates en Pr\u00e9sence de givre ou impie, vous conservez 4% des soins de Pr\u00e9sence de sang, et les soins qui vous sont prodigu\u00e9s sont augment\u00e9s de 10% en Pr\u00e9sence de sang."
+                ],
+                "s": [
+                    50365,
+                    50371
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Deathknight_BloodPresence"
+            },
+            {
+                "i": 2259,
+                "n": "Frappe de mort am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Augmente de 15% les d\u00e9g\u00e2ts de votre Frappe de mort, de 3% ses chances de coup critique et de 25% les soins prodigu\u00e9s.",
+                    "Augmente de 30% les d\u00e9g\u00e2ts de votre Frappe de mort, de 6% ses chances de coup critique et de 50% les soins prodigu\u00e9s."
+                ],
+                "s": [
+                    62905,
+                    62908
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Spell_DeathKnight_Butcher2"
+            },
+            {
+                "i": 1955,
+                "n": "Mal\u00e9diction soudaine",
+                "m": 3,
+                "d": [
+                    "Vos Frappes de sang et Frappes au coeur ont 5% de chances de lancer un Voile mortel gratuit sur votre cible.",
+                    "Vos Frappes de sang et Frappes au coeur ont 10% de chances de lancer un Voile mortel gratuit sur votre cible.",
+                    "Vos Frappes de sang et Frappes au coeur ont 15% de chances de lancer un Voile mortel gratuit sur votre cible."
+                ],
+                "s": [
+                    49018,
+                    49529,
+                    49530
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Shadow_PainSpike"
+            },
+            {
+                "i": 2019,
+                "n": "Sang vampirique",
+                "m": 1,
+                "d": [
+                    "Conf\u00e8re temporairement au chevalier de la mort 15% de son maximum de points de vie et augmente le montant de points de vie g\u00e9n\u00e9r\u00e9 par les sorts et effets de 35% pendant 10 s. Quand l'effet se termine, ces points de vie sont perdus."
+                ],
+                "s": [
+                    55233
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "Spell_Shadow_LifeDrain"
+            },
+            {
+                "i": 1959,
+                "n": "Volont\u00e9 de la n\u00e9cropole",
+                "m": 3,
+                "d": [
+                    "Les d\u00e9g\u00e2ts qui vous feraient descendre \u00e0 moins de 35% de vos points de vie ou que vous subissez alors que vous ne disposez que de 35% de vos points de vie sont r\u00e9duits de 5%.",
+                    "Les d\u00e9g\u00e2ts qui vous feraient descendre \u00e0 moins de 35% de vos points de vie ou que vous subissez alors que vous ne disposez que de 35% de vos points de vie sont r\u00e9duits de 10%.",
+                    "Les d\u00e9g\u00e2ts qui vous feraient descendre \u00e0 moins de 35% de vos points de vie ou que vous subissez alors que vous ne disposez que de 35% de vos points de vie sont r\u00e9duits de 15%."
+                ],
+                "s": [
+                    49189,
+                    50149,
+                    50150
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Ability_Creature_Cursed_02"
+            },
+            {
+                "i": 1957,
+                "n": "Frappe au coeur",
+                "m": 1,
+                "d": [
+                    "Frappe instantan\u00e9ment la cible et son alli\u00e9 le plus proche, infligeant 50% des d\u00e9g\u00e2ts de l'arme plus <bonus> \u00e0 la cible principale et 25% des d\u00e9g\u00e2ts de l'arme plus  \u00e0 la cible secondaire. Chaque cible subit 10% de d\u00e9g\u00e2ts suppl\u00e9mentaires pour chacune de vos maladies actives sur elle?s58616[, et la vitesse de d\u00e9placement est r\u00e9duite de 50% pendant 10 s.][.]"
+                ],
+                "s": [
+                    55050
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "INV_Weapon_Shortblade_40"
+            },
+            {
+                "i": 1958,
+                "n": "Puissance de Mograine",
+                "m": 3,
+                "d": [
+                    "Augmente de 15% le bonus aux d\u00e9g\u00e2ts des coups critiques inflig\u00e9s avec vos techniques Furoncle sanglant, Frappe de sang, Frappe de mort et Frappe au c\u0153ur.",
+                    "Augmente de 30% le bonus aux d\u00e9g\u00e2ts des coups critiques inflig\u00e9s avec vos techniques Furoncle sanglant, Frappe de sang, Frappe de mort et Frappe au c\u0153ur.",
+                    "Augmente de 45% le bonus aux d\u00e9g\u00e2ts des coups critiques inflig\u00e9s avec vos techniques Furoncle sanglant, Frappe de sang, Frappe de mort et Frappe au c\u0153ur."
+                ],
+                "s": [
+                    49023,
+                    49533,
+                    49534
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_Deathknight_ClassIcon"
+            },
+            {
+                "i": 2034,
+                "n": "Gorg\u00e9 de sang",
+                "m": 5,
+                "d": [
+                    "Quand vous disposez de plus de 75% de vos points de vie, vous infligez 2% de d\u00e9g\u00e2ts suppl\u00e9mentaires. De plus, vos attaques ignorent jusqu'\u00e0 2% de l'armure de votre adversaire \u00e0 tout moment.",
+                    "Quand vous disposez de plus de 75% de vos points de vie, vous infligez 4% de d\u00e9g\u00e2ts suppl\u00e9mentaires. De plus, vos attaques ignorent jusqu'\u00e0 4% de l'armure de votre adversaire \u00e0 tout moment.",
+                    "Quand vous disposez de plus de 75% de vos points de vie, vous infligez 6% de d\u00e9g\u00e2ts suppl\u00e9mentaires. De plus, vos attaques ignorent jusqu'\u00e0 6% de l'armure de votre adversaire \u00e0 tout moment.",
+                    "Quand vous disposez de plus de 75% de vos points de vie, vous infligez 8% de d\u00e9g\u00e2ts suppl\u00e9mentaires. De plus, vos attaques ignorent jusqu'\u00e0 8% de l'armure de votre adversaire \u00e0 tout moment.",
+                    "Quand vous disposez de plus de 75% de vos points de vie, vous infligez 10% de d\u00e9g\u00e2ts suppl\u00e9mentaires. De plus, vos attaques ignorent jusqu'\u00e0 10% de l'armure de votre adversaire \u00e0 tout moment."
+                ],
+                "s": [
+                    61154,
+                    61155,
+                    61156,
+                    61157,
+                    61158
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Spell_Nature_Reincarnation"
+            },
+            {
+                "i": 1961,
+                "n": "Arme runique dansante",
+                "m": 1,
+                "d": [
+                    "Invoque une seconde arme runique qui combat toute seule pendant 12 s., en effectuant les m\u00eames attaques que le chevalier de la mort mais en infligeant 50% de d\u00e9g\u00e2ts de moins que lui."
+                ],
+                "s": [
+                    49028
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "INV_Sword_07"
+            }
+        ]
+    },
+    {
+        "n": "Givre",
+        "t": [
+            {
+                "i": 2031,
+                "n": "Toucher de glace am\u00e9lior\u00e9",
+                "m": 3,
+                "d": [
+                    "Votre Toucher de glace inflige 5% de d\u00e9g\u00e2ts suppl\u00e9mentaires, et votre Fi\u00e8vre de givre r\u00e9duit les vitesses d'attaque en m\u00eal\u00e9e et \u00e0 distance de 2% suppl\u00e9mentaires.",
+                    "Votre Toucher de glace inflige 10% de d\u00e9g\u00e2ts suppl\u00e9mentaires, et votre Fi\u00e8vre de givre r\u00e9duit les vitesses d'attaque en m\u00eal\u00e9e et \u00e0 distance de 4% suppl\u00e9mentaires.",
+                    "Votre Toucher de glace inflige 15% de d\u00e9g\u00e2ts suppl\u00e9mentaires, et votre Fi\u00e8vre de givre r\u00e9duit les vitesses d'attaque en m\u00eal\u00e9e et \u00e0 distance de 6% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    49175,
+                    50031,
+                    51456
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_DeathKnight_IceTouch"
+            },
+            {
+                "i": 2020,
+                "n": "Ma\u00eetrise de la puissance runique",
+                "m": 2,
+                "d": [
+                    "Augmente votre puissance runique maximale de 15.",
+                    "Augmente votre puissance runique maximale de 30."
+                ],
+                "s": [
+                    49455,
+                    50147
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Arcane_Arcane01"
+            },
+            {
+                "i": 1968,
+                "n": "R\u00e9sistance",
+                "m": 5,
+                "d": [
+                    "Augmente la valeur d'armure des objets de 2% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 6%.",
+                    "Augmente la valeur d'armure des objets de 4% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 12%.",
+                    "Augmente la valeur d'armure des objets de 6% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 18%.",
+                    "Augmente la valeur d'armure des objets de 8% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 24%.",
+                    "Augmente la valeur d'armure des objets de 10% et r\u00e9duit la dur\u00e9e de tous les effets affectant le d\u00e9placement de 30%."
+                ],
+                "s": [
+                    49042,
+                    49786,
+                    49787,
+                    49788,
+                    49789
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Holy_Devotion"
+            },
+            {
+                "i": 2035,
+                "n": "Allonge glaciale",
+                "m": 2,
+                "d": [
+                    "Augmente la port\u00e9e de vos sorts Toucher de glace, Cha\u00eenes de glace et Rafale hurlante de 5 m\u00e8tres.",
+                    "Augmente la port\u00e9e de vos sorts Toucher de glace, Cha\u00eenes de glace et Rafale hurlante de 10 m\u00e8tres."
+                ],
+                "s": [
+                    55061,
+                    55062
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Frost_ManaRecharge"
+            },
+            {
+                "i": 1973,
+                "n": "Glace noire",
+                "m": 5,
+                "d": [
+                    "Augmente vos d\u00e9g\u00e2ts de Givre et d'Ombre de 2%.",
+                    "Augmente vos d\u00e9g\u00e2ts de Givre et d'Ombre de 4%.",
+                    "Augmente vos d\u00e9g\u00e2ts de Givre et d'Ombre de 6%.",
+                    "Augmente vos d\u00e9g\u00e2ts de Givre et d'Ombre de 8%.",
+                    "Augmente vos d\u00e9g\u00e2ts de Givre et d'Ombre de 10%."
+                ],
+                "s": [
+                    49140,
+                    49661,
+                    49662,
+                    49663,
+                    49664
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_Shadow_DarkRitual"
+            },
+            {
+                "i": 2022,
+                "n": "Nerfs d'acier glac\u00e9",
+                "m": 3,
+                "d": [
+                    "Augmente de 1% vos chances de toucher avec les armes de m\u00eal\u00e9e \u00e0 une main, et augmente de 8% les d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche.",
+                    "Augmente de 2% vos chances de toucher avec les armes de m\u00eal\u00e9e \u00e0 une main, et augmente de 16% les d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche.",
+                    "Augmente de 3% vos chances de toucher avec les armes de m\u00eal\u00e9e \u00e0 une main, et augmente de 25% les d\u00e9g\u00e2ts inflig\u00e9s par l'arme que vous utilisez en main gauche."
+                ],
+                "s": [
+                    49226,
+                    50137,
+                    50138
+                ],
+                "x": 3,
+                "y": 1,
+                "iconname": "Ability_DualWield"
+            },
+            {
+                "i": 2042,
+                "n": "Serres de glace",
+                "m": 5,
+                "d": [
+                    "Vous volez la chaleur des victimes de votre Fi\u00e8vre de givre, de sorte que lorsque leur vitesse d'attaque en m\u00eal\u00e9e est r\u00e9duite, la v\u00f4tre augmente de 4% pendant les 20 prochaines sec.",
+                    "Vous volez la chaleur des victimes de votre Fi\u00e8vre de givre, de sorte que lorsque leur vitesse d'attaque en m\u00eal\u00e9e est r\u00e9duite, la v\u00f4tre augmente de 8% pendant les 20 prochaines sec.",
+                    "Vous volez la chaleur des victimes de votre Fi\u00e8vre de givre, de sorte que lorsque leur vitesse d'attaque en m\u00eal\u00e9e est r\u00e9duite, la v\u00f4tre augmente de 12% pendant les 20 prochaines sec.",
+                    "Vous volez la chaleur des victimes de votre Fi\u00e8vre de givre, de sorte que lorsque leur vitesse d'attaque en m\u00eal\u00e9e est r\u00e9duite, la v\u00f4tre augmente de 16% pendant les 20 prochaines sec.",
+                    "Vous volez la chaleur des victimes de votre Fi\u00e8vre de givre, de sorte que lorsque leur vitesse d'attaque en m\u00eal\u00e9e est r\u00e9duite, la v\u00f4tre augmente de 20% pendant les 20 prochaines sec."
+                ],
+                "s": [
+                    50880,
+                    50884,
+                    50885,
+                    50886,
+                    50887
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Deathknight_IcyTalons",
+                "r": [
+                    0,
+                    3
+                ]
+            },
+            {
+                "i": 2215,
+                "n": "Changeliche",
+                "m": 1,
+                "d": [
+                    "Utilise de l'\u00e9nergie impie pour devenir mort-vivant pendant 10 s. Tant que vous \u00eates mort-vivant, vous \u00eates insensible aux effets de charme, de peur et de sommeil."
+                ],
+                "s": [
+                    49039
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "Spell_Shadow_RaiseDead"
+            },
+            {
+                "i": 2048,
+                "n": "Annihilation",
+                "m": 3,
+                "d": [
+                    "Augmente vos chances de r\u00e9aliser un coup critique avec vos techniques sp\u00e9ciales de m\u00eal\u00e9e de 1%. De plus, il y a 33% de chances que votre An\u00e9antissement inflige ses d\u00e9g\u00e2ts sans consommer de maladie.",
+                    "Augmente vos chances de r\u00e9aliser un coup critique avec vos techniques sp\u00e9ciales de m\u00eal\u00e9e de 2%. De plus, il y a 66% de chances que votre An\u00e9antissement inflige ses d\u00e9g\u00e2ts sans consommer de maladie.",
+                    "Augmente vos chances de r\u00e9aliser un coup critique avec vos techniques sp\u00e9ciales de m\u00eal\u00e9e de 3%. De plus, il y a 100% de chances que votre An\u00e9antissement inflige ses d\u00e9g\u00e2ts sans consommer de maladie."
+                ],
+                "s": [
+                    51468,
+                    51472,
+                    51473
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "INV_Weapon_Hand_18"
+            },
+            {
+                "i": 2044,
+                "n": "Machine \u00e0 tuer",
+                "m": 5,
+                "d": [
+                    "Vos attaques en m\u00eal\u00e9e ont une chance de conf\u00e9rer un coup critique \u00e0 votre prochain sort Toucher de glace, Rafale hurlante, ou Frappe de givre.",
+                    "Vos attaques en m\u00eal\u00e9e ont une chance de conf\u00e9rer un coup critique \u00e0 votre prochain sort Toucher de glace, Rafale hurlante, ou Frappe de givre. L'effet se produit plus souvent qu'avec Machine \u00e0 tuer (rang 1).",
+                    "Vos attaques en m\u00eal\u00e9e ont une chance de conf\u00e9rer un coup critique \u00e0 votre prochain sort Toucher de glace, Rafale hurlante, ou Frappe de givre. L'effet se produit plus souvent qu'avec Machine \u00e0 tuer (rang 2).",
+                    "Vos attaques en m\u00eal\u00e9e ont une chance de conf\u00e9rer un coup critique \u00e0 votre prochain sort Toucher de glace, Rafale hurlante, ou Frappe de givre. L'effet se produit plus souvent qu'avec Machine \u00e0 tuer (rang 3).",
+                    "Vos attaques en m\u00eal\u00e9e ont une chance de conf\u00e9rer un coup critique \u00e0 votre prochain sort Toucher de glace, Rafale hurlante, ou Frappe de givre. L'effet se produit plus souvent qu'avec Machine \u00e0 tuer (rang 4)."
+                ],
+                "s": [
+                    51123,
+                    51127,
+                    51128,
+                    51129,
+                    51130
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "INV_Sword_122"
+            },
+            {
+                "i": 1981,
+                "n": "Froid de la tombe",
+                "m": 2,
+                "d": [
+                    "Vos sorts Cha\u00eenes de glace, Rafale hurlante, Toucher de glace et An\u00e9antissement g\u00e9n\u00e8rent 2,5 points de puissance runique suppl\u00e9mentaires.",
+                    "Vos sorts Cha\u00eenes de glace, Rafale hurlante, Toucher de glace et An\u00e9antissement g\u00e9n\u00e8rent 5 points de puissance runique suppl\u00e9mentaires."
+                ],
+                "s": [
+                    49149,
+                    50115
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Spell_Frost_FrostShock"
+            },
+            {
+                "i": 1971,
+                "n": "Hiver sans fin",
+                "m": 2,
+                "d": [
+                    "Votre Force est augment\u00e9e de 2% et le co\u00fbt de votre Gel de l'esprit est r\u00e9duit \u00e0 10 points de puissance runique.",
+                    "Votre Force est augment\u00e9e de 4% et votre Gel de l'esprit ne co\u00fbte plus de puissance runique."
+                ],
+                "s": [
+                    49137,
+                    49657
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_Shadow_Twilight"
+            },
+            {
+                "i": 1990,
+                "n": "Plaques d'effroi algides",
+                "m": 3,
+                "d": [
+                    "R\u00e9duit les chances de vous toucher en m\u00eal\u00e9e de 1%.",
+                    "R\u00e9duit les chances de vous toucher en m\u00eal\u00e9e de 2%.",
+                    "R\u00e9duit les chances de vous toucher en m\u00eal\u00e9e de 3%."
+                ],
+                "s": [
+                    49186,
+                    51108,
+                    51109
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "INV_CHEST_MAIL_04"
+            },
+            {
+                "i": 2030,
+                "n": "Pourriture des glaciers",
+                "m": 3,
+                "d": [
+                    "Vos sorts Toucher de glace, Rafale hurlante et Frappe de givre infligent 7% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles malades.",
+                    "Vos sorts Toucher de glace, Rafale hurlante et Frappe de givre infligent 13% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles malades.",
+                    "Vos sorts Toucher de glace, Rafale hurlante et Frappe de givre infligent 20% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles malades."
+                ],
+                "s": [
+                    49471,
+                    49790,
+                    49791
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Nature_RemoveDisease"
+            },
+            {
+                "i": 1980,
+                "n": "Froid de la mort",
+                "m": 1,
+                "d": [
+                    "Quand il est activ\u00e9, il fait de votre prochain sort Toucher de glace, Rafale hurlante, Frappe de givre ou An\u00e9antissement un coup critique si utilis\u00e9 en 30 s maximum."
+                ],
+                "s": [
+                    49796
+                ],
+                "x": 3,
+                "y": 4,
+                "iconname": "Spell_Shadow_SoulLeech_2"
+            },
+            {
+                "i": 2223,
+                "n": "Serres de glace am\u00e9lior\u00e9es",
+                "m": 1,
+                "d": [
+                    "Augmente la h\u00e2te en m\u00eal\u00e9e de tous les membres de votre groupe ou raid \u00e0 moins de 100 m\u00e8tres de 20% et votre h\u00e2te de 5% suppl\u00e9mentaires."
+                ],
+                "s": [
+                    55610
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Deathknight_IcyTalons",
+                "r": [
+                    6,
+                    5
+                ]
+            },
+            {
+                "i": 1993,
+                "n": "Combat impitoyable",
+                "m": 2,
+                "d": [
+                    "Toucher de glace, Rafale hurlante, An\u00e9antissement et Frappe de givre infligent 6% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles qui disposent de moins de 35% de leurs points de vie.",
+                    "Toucher de glace, Rafale hurlante, An\u00e9antissement et Frappe de givre infligent 12% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles qui disposent de moins de 35% de leurs points de vie."
+                ],
+                "s": [
+                    49024,
+                    49538
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "INV_Sword_112"
+            },
+            {
+                "i": 1992,
+                "n": "Frimas",
+                "m": 3,
+                "d": [
+                    "Augmente les chances de coup critique de vos sorts Toucher de glace et An\u00e9antissement de 5% et l'incantation d'An\u00e9antissement a 5% de chances de r\u00e9initialiser le temps de recharge de Rafale hurlante en plus de permettre \u00e0 votre prochaine Rafale hurlante de ne pas consommer de runes.",
+                    "Augmente les chances de coup critique de vos sorts Toucher de glace et An\u00e9antissement de 10% et l'incantation d'An\u00e9antissement a 10% de chances de r\u00e9initialiser le temps de recharge de Rafale hurlante en plus de permettre \u00e0 votre prochaine Rafale hurlante de ne pas consommer de runes.",
+                    "Augmente les chances de coup critique de vos sorts Toucher de glace et An\u00e9antissement de 15% et l'incantation d'An\u00e9antissement a 15% de chances de r\u00e9initialiser le temps de recharge de Rafale hurlante en plus de permettre \u00e0 votre prochaine Rafale hurlante de ne pas consommer de runes."
+                ],
+                "s": [
+                    49188,
+                    56822,
+                    59057
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Frost_FreezingBreath"
+            },
+            {
+                "i": 2260,
+                "n": "Engelures",
+                "m": 3,
+                "d": [
+                    "Les victimes de votre Fi\u00e8vre de givre sont transies, ce qui r\u00e9duit leur vitesse de d\u00e9placement de 15% pendant 10 s.",
+                    "Les victimes de votre Fi\u00e8vre de givre sont transies, ce qui r\u00e9duit leur vitesse de d\u00e9placement de 30% pendant 10 s.",
+                    "Les victimes de votre Fi\u00e8vre de givre sont transies, ce qui r\u00e9duit leur vitesse de d\u00e9placement de 50% pendant 10 s."
+                ],
+                "s": [
+                    50040,
+                    50041,
+                    50043
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Frost_Wisp"
+            },
+            {
+                "i": 1999,
+                "n": "Froid d\u00e9vorant",
+                "m": 1,
+                "d": [
+                    "Eradique toute chaleur de la terre autour du chevalier de la mort. Les ennemis se trouvant \u00e0 moins de 0 m\u00e8tres sont pris dans la glace, ce qui les emp\u00eache de r\u00e9aliser toute action pendant 10 s et leur fait contracter la Fi\u00e8vre de givre. Les ennemis sont consid\u00e9r\u00e9s comme gel\u00e9s, mais tous les d\u00e9g\u00e2ts autres que les maladies brisent la glace."
+                ],
+                "s": [
+                    49203
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "INV_Staff_15"
+            },
+            {
+                "i": 2029,
+                "n": "Pr\u00e9sence de givre am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Quand vous \u00eates en Pr\u00e9sence de sang ou impie, vous conservez 4% de l'Endurance de Pr\u00e9sence de givre, et les d\u00e9g\u00e2ts qui vous sont inflig\u00e9s sont r\u00e9duits de 1% suppl\u00e9mentaires en Pr\u00e9sence de givre.",
+                    "Quand vous \u00eates en Pr\u00e9sence de sang ou impie, vous conservez 8% de l'Endurance de Pr\u00e9sence de givre, et les d\u00e9g\u00e2ts qui vous sont inflig\u00e9s sont r\u00e9duits de 2% suppl\u00e9mentaires en Pr\u00e9sence de givre."
+                ],
+                "s": [
+                    50384,
+                    50385
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Deathknight_FrostPresence"
+            },
+            {
+                "i": 2284,
+                "n": "Menace de Thassarian",
+                "m": 3,
+                "d": [
+                    "Lorsque vous utilisez deux armes en m\u00eame temps, vos Frappes de mort, An\u00e9antissements, Frappes de peste, Frappes runiques, Frappes de sang et Frappes de givre ont 30% de chances d'\u00e9galement infliger des d\u00e9g\u00e2ts avec votre arme tenue en main gauche.",
+                    "Lorsque vous utilisez deux armes en m\u00eame temps, vos Frappes de mort, An\u00e9antissements, Frappes de peste, Frappes runiques, Frappes de sang et Frappes de givre ont 60% de chances d'\u00e9galement infliger des d\u00e9g\u00e2ts avec votre arme tenue en main gauche.",
+                    "Lorsque vous utilisez deux armes en m\u00eame temps, vos Frappes de mort, An\u00e9antissements, Frappes de peste, Frappes runiques, Frappes de sang et Frappes de givre ont 100% de chances d'\u00e9galement infliger des d\u00e9g\u00e2ts avec votre arme tenue en main gauche."
+                ],
+                "s": [
+                    65661,
+                    66191,
+                    66192
+                ],
+                "x": 0,
+                "y": 7,
+                "iconname": "Ability_DualWieldSpecialization"
+            },
+            {
+                "i": 2210,
+                "n": "Sang du Nord",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de Frappe de sang et Frappe de givre de 3%. De plus, chaque fois que vous touchez avec Frappe de sang ou Pestilence, il y a 30% de chances que la rune de sang devienne une rune de la mort \u00e0 son activation. Les runes de la mort comptent comme une rune de sang, de givre ou impie.",
+                    "Augmente les d\u00e9g\u00e2ts de Frappe de sang et Frappe de givre de 6%. De plus, chaque fois que vous touchez avec Frappe de sang ou Pestilence, il y a 60% de chances que la rune de sang devienne une rune de la mort \u00e0 son activation. Les runes de la mort comptent comme une rune de sang, de givre ou impie.",
+                    "Augmente les d\u00e9g\u00e2ts de Frappe de sang et Frappe de givre de 10%. De plus, chaque fois que vous touchez avec Frappe de sang ou Pestilence, il y a 100% de chances que la rune de sang devienne une rune de la mort \u00e0 son activation. Les runes de la mort comptent comme une rune de sang, de givre ou impie."
+                ],
+                "s": [
+                    54639,
+                    54638,
+                    54637
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "INV_Weapon_Shortblade_79"
+            },
+            {
+                "i": 1979,
+                "n": "Armure incassable",
+                "m": 1,
+                "d": [
+                    "Renforce votre armure d'une \u00e9paisse couche de glace qui augmente votre armure de 25% et votre Force de 20% pendant 20 s."
+                ],
+                "s": [
+                    51271
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "INV_Armor_Helm_Plate_Naxxramas_RaidWarrior_C_01"
+            },
+            {
+                "i": 1997,
+                "n": "Acclimatation",
+                "m": 3,
+                "d": [
+                    "Quand vous \u00eates touch\u00e9 par un sort, vous avez 10% de chances d'am\u00e9liorer votre r\u00e9sistance \u00e0 ce type de magie pendant 18 sec. Cumulable jusqu'\u00e0 3 fois.",
+                    "Quand vous \u00eates touch\u00e9 par un sort, vous avez 20% de chances d'am\u00e9liorer votre r\u00e9sistance \u00e0 ce type de magie pendant 18 sec. Cumulable jusqu'\u00e0 3 fois.",
+                    "Quand vous \u00eates touch\u00e9 par un sort, vous avez 30% de chances d'am\u00e9liorer votre r\u00e9sistance \u00e0 ce type de magie pendant 18 sec. Cumulable jusqu'\u00e0 3 fois."
+                ],
+                "s": [
+                    49200,
+                    50151,
+                    50152
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Fire_ElementalDevastation"
+            },
+            {
+                "i": 1975,
+                "n": "Frappe de givre",
+                "m": 1,
+                "d": [
+                    "Frappe instantan\u00e9ment l'ennemi et lui inflige 55% des d\u00e9g\u00e2ts de l'arme plus 47.85 sous forme de d\u00e9g\u00e2ts de Givre."
+                ],
+                "s": [
+                    49143
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Spell_DeathKnight_EmpowerRuneBlade2"
+            },
+            {
+                "i": 2040,
+                "n": "Ruse de Fielsang",
+                "m": 3,
+                "d": [
+                    "Augmente de 15% le bonus aux d\u00e9g\u00e2ts des coups critiques r\u00e9ussis avec vos techniques Frappe de sang, Frappe de givre, Rafale hurlante et An\u00e9antissement en plus d'augmenter de 2 sec. la dur\u00e9e de votre Robustesse glaciale.",
+                    "Augmente de 30% le bonus aux d\u00e9g\u00e2ts des coups critiques r\u00e9ussis avec vos techniques Frappe de sang, Frappe de givre, Rafale hurlante et An\u00e9antissement en plus d'augmenter de 4 sec. la dur\u00e9e de votre Robustesse glaciale.",
+                    "Augmente de 45% le bonus aux d\u00e9g\u00e2ts des coups critiques r\u00e9ussis avec vos techniques Frappe de sang, Frappe de givre, Rafale hurlante et An\u00e9antissement en plus d'augmenter de 6 sec. la dur\u00e9e de votre Robustesse glaciale."
+                ],
+                "s": [
+                    50187,
+                    50190,
+                    50191
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "INV-Sword_53"
+            },
+            {
+                "i": 1998,
+                "n": "Traqueur de la toundra",
+                "m": 5,
+                "d": [
+                    "Vos sorts et techniques infligent 3% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles souffrant de la Fi\u00e8vre de givre. Augmente \u00e9galement votre expertise de 1.",
+                    "Vos sorts et techniques infligent 6% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles souffrant de la Fi\u00e8vre de givre. Augmente \u00e9galement votre expertise de 2.",
+                    "Vos sorts et techniques infligent 9% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles souffrant de la Fi\u00e8vre de givre. Augmente \u00e9galement votre expertise de 3.",
+                    "Vos sorts et techniques infligent 12% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles souffrant de la Fi\u00e8vre de givre. Augmente \u00e9galement votre expertise de 4.",
+                    "Vos sorts et techniques infligent 15% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles souffrant de la Fi\u00e8vre de givre. Augmente \u00e9galement votre expertise de 5."
+                ],
+                "s": [
+                    49202,
+                    50127,
+                    50128,
+                    50129,
+                    50130
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "Spell_Nature_Tranquility"
+            },
+            {
+                "i": 1989,
+                "n": "Rafale hurlante",
+                "m": 1,
+                "d": [
+                    "Un vent glacial frappe la cible et inflige 198 to 215 points de d\u00e9g\u00e2ts de Givre \u00e0 tous les ennemis se trouvant \u00e0 moins de 10 m\u00e8tres."
+                ],
+                "s": [
+                    49184
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Spell_Frost_ArcticWinds"
+            }
+        ]
+    },
+    {
+        "n": "Impie",
+        "t": [
+            {
+                "i": 2082,
+                "n": "Attaques vicieuses",
+                "m": 2,
+                "d": [
+                    "Augmente de 3% les chances de coup critique et de 15% le bonus de d\u00e9g\u00e2ts des coups critiques de vos sorts Frappe de peste et Frappe du Fl\u00e9au.",
+                    "Augmente de 6% les chances de coup critique et de 30% le bonus de d\u00e9g\u00e2ts des coups critiques de vos sorts Frappe de peste et Frappe du Fl\u00e9au."
+                ],
+                "s": [
+                    51745,
+                    51746
+                ],
+                "x": 0,
+                "y": 0,
+                "iconname": "Spell_Deathknight_PlagueStrike"
+            },
+            {
+                "i": 1932,
+                "n": "Virulence",
+                "m": 3,
+                "d": [
+                    "Augmente vos chances de toucher avec vos sorts de 1% et r\u00e9duit de 10% la probabilit\u00e9 que vos maladies de d\u00e9g\u00e2ts sur la dur\u00e9e puissent \u00eatre soign\u00e9es.",
+                    "Augmente vos chances de toucher avec vos sorts de 2% et r\u00e9duit de 20% la probabilit\u00e9 que vos maladies de d\u00e9g\u00e2ts sur la dur\u00e9e puissent \u00eatre soign\u00e9es.",
+                    "Augmente vos chances de toucher avec vos sorts de 3% et r\u00e9duit de 30% la probabilit\u00e9 que vos maladies de d\u00e9g\u00e2ts sur la dur\u00e9e puissent \u00eatre soign\u00e9es."
+                ],
+                "s": [
+                    48962,
+                    49567,
+                    49568
+                ],
+                "x": 1,
+                "y": 0,
+                "iconname": "Spell_Shadow_BurningSpirit"
+            },
+            {
+                "i": 2218,
+                "n": "Anticipation",
+                "m": 5,
+                "d": [
+                    "Augmente vos chances d'esquiver une attaque de 1%.",
+                    "Augmente vos chances d'esquiver une attaque de 2%.",
+                    "Augmente vos chances d'esquiver une attaque de 3%.",
+                    "Augmente vos chances d'esquiver une attaque de 4%.",
+                    "Augmente vos chances d'esquiver une attaque de 5%."
+                ],
+                "s": [
+                    55129,
+                    55130,
+                    55131,
+                    55132,
+                    55133
+                ],
+                "x": 2,
+                "y": 0,
+                "iconname": "Spell_Nature_MirrorImage"
+            },
+            {
+                "i": 1963,
+                "n": "Epid\u00e9mie",
+                "m": 2,
+                "d": [
+                    "Augmente la dur\u00e9e de Peste de sang et Fi\u00e8vre de givre de 3 sec.",
+                    "Augmente la dur\u00e9e de Peste de sang et Fi\u00e8vre de givre de 6 sec."
+                ],
+                "s": [
+                    49036,
+                    49562
+                ],
+                "x": 0,
+                "y": 1,
+                "iconname": "Spell_Shadow_ShadowWordPain"
+            },
+            {
+                "i": 1933,
+                "n": "Morbidit\u00e9",
+                "m": 3,
+                "d": [
+                    "Augmente de 5% les d\u00e9g\u00e2ts et les soins de votre sort Voile mortel et r\u00e9duit le temps de recharge de votre sort Mort et d\u00e9composition de 5 sec.",
+                    "Augmente de 10% les d\u00e9g\u00e2ts et les soins de votre sort Voile mortel et r\u00e9duit le temps de recharge de votre sort Mort et d\u00e9composition de 10 sec.",
+                    "Augmente de 15% les d\u00e9g\u00e2ts et les soins de votre sort Voile mortel et r\u00e9duit le temps de recharge de votre sort Mort et d\u00e9composition de 15 sec."
+                ],
+                "s": [
+                    48963,
+                    49564,
+                    49565
+                ],
+                "x": 1,
+                "y": 1,
+                "iconname": "Spell_Shadow_DeathAndDecay"
+            },
+            {
+                "i": 2025,
+                "n": "Autorit\u00e9 impie",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de votre technique Poigne de la mort de 5 sec.",
+                    "R\u00e9duit le temps de recharge de votre technique Poigne de la mort de 10 sec."
+                ],
+                "s": [
+                    49588,
+                    49589
+                ],
+                "x": 2,
+                "y": 1,
+                "iconname": "Spell_DeathKnight_Strangulate"
+            },
+            {
+                "i": 1934,
+                "n": "Morts voraces",
+                "m": 3,
+                "d": [
+                    "Augmente votre total de Force de 1% et la part de votre Force et de votre Endurance que re\u00e7oivent vos goules de 20%.",
+                    "Augmente votre total de Force de 2% et la part de votre Force et de votre Endurance que re\u00e7oivent vos goules de 40%.",
+                    "Augmente votre total de Force de 3% et la part de votre Force et de votre Endurance que re\u00e7oivent vos goules de 60%."
+                ],
+                "s": [
+                    48965,
+                    49571,
+                    49572
+                ],
+                "x": 3,
+                "y": 1,
+                "iconname": "Spell_DeathKnight_Gnaw_Ghoul"
+            },
+            {
+                "i": 2008,
+                "n": "Pouss\u00e9e de fi\u00e8vre",
+                "m": 3,
+                "d": [
+                    "Augmente les d\u00e9g\u00e2ts de Frappe de peste de 10% et de Frappe du Fl\u00e9au de 7%.",
+                    "Augmente les d\u00e9g\u00e2ts de Frappe de peste de 20% et de Frappe du Fl\u00e9au de 13%.",
+                    "Augmente les d\u00e9g\u00e2ts de Frappe de peste de 30% et de Frappe du Fl\u00e9au de 20%."
+                ],
+                "s": [
+                    49013,
+                    55236,
+                    55237
+                ],
+                "x": 0,
+                "y": 2,
+                "iconname": "Spell_Shadow_PlagueCloud"
+            },
+            {
+                "i": 2047,
+                "n": "N\u00e9crose",
+                "m": 5,
+                "d": [
+                    "Vos attaques automatiques infligent 4% de d\u00e9g\u00e2ts d'Ombre suppl\u00e9mentaires.",
+                    "Vos attaques automatiques infligent 8% de d\u00e9g\u00e2ts d'Ombre suppl\u00e9mentaires.",
+                    "Vos attaques automatiques infligent 12% de d\u00e9g\u00e2ts d'Ombre suppl\u00e9mentaires.",
+                    "Vos attaques automatiques infligent 16% de d\u00e9g\u00e2ts d'Ombre suppl\u00e9mentaires.",
+                    "Vos attaques automatiques infligent 20% de d\u00e9g\u00e2ts d'Ombre suppl\u00e9mentaires."
+                ],
+                "s": [
+                    51459,
+                    51462,
+                    51463,
+                    51464,
+                    51465
+                ],
+                "x": 1,
+                "y": 2,
+                "iconname": "INV_Weapon_Shortblade_60"
+            },
+            {
+                "i": 1985,
+                "n": "Explosion morbide",
+                "m": 1,
+                "d": [
+                    "Fait exploser un cadavre et inflige 166 points de d\u00e9g\u00e2ts d'Ombre \u00e0 tous les ennemis se trouvant \u00e0 moins de 0 m\u00e8tres. Utilise un cadavre proche si la cible n'en est pas un. N'affecte pas les cadavres m\u00e9caniques ou d'\u00e9l\u00e9mentaires."
+                ],
+                "s": [
+                    49158
+                ],
+                "x": 2,
+                "y": 2,
+                "iconname": "Ability_Creature_Disease_02"
+            },
+            {
+                "i": 2039,
+                "n": "Sur un cheval p\u00e2le",
+                "m": 2,
+                "d": [
+                    "Vous devenez aussi difficile \u00e0 arr\u00eater que la mort elle-m\u00eame. La dur\u00e9e de tous les effets d'\u00e9tourdissement et de peur contre vous est r\u00e9duite de 10%, et la vitesse de votre monture est augment\u00e9e de 10%. Ne s'additionne pas avec les autres effets qui augmentent la vitesse de d\u00e9placement.",
+                    "Vous devenez aussi difficile \u00e0 arr\u00eater que la mort elle-m\u00eame. La dur\u00e9e de tous les effets d'\u00e9tourdissement et de peur contre vous est r\u00e9duite de 20%, et la vitesse de votre monture est augment\u00e9e de 20%. Ne s'additionne pas avec les autres effets qui augmentent la vitesse de d\u00e9placement."
+                ],
+                "s": [
+                    49146,
+                    51267
+                ],
+                "x": 1,
+                "y": 3,
+                "iconname": "Spell_DeathKnight_SummonDeathCharger"
+            },
+            {
+                "i": 2004,
+                "n": "Lame incrust\u00e9e de sang",
+                "m": 3,
+                "d": [
+                    "Vos attaques automatiques ont 10% de chances de causer une Frappe incrust\u00e9e de sang, qui inflige 25% des d\u00e9g\u00e2ts de l'arme plus 12.5.1% pour chacune de vos maladies sur la cible.",
+                    "Vos attaques automatiques ont 20% de chances de causer une Frappe incrust\u00e9e de sang, qui inflige 25% des d\u00e9g\u00e2ts de l'arme plus 12.5.1% pour chacune de vos maladies sur la cible.",
+                    "Vos attaques automatiques ont 30% de chances de causer une Frappe incrust\u00e9e de sang, qui inflige 25% des d\u00e9g\u00e2ts de l'arme plus 12.5.1% pour chacune de vos maladies sur la cible."
+                ],
+                "s": [
+                    49219,
+                    49627,
+                    49628
+                ],
+                "x": 2,
+                "y": 3,
+                "iconname": "Ability_CriticalStrike"
+            },
+            {
+                "i": 2225,
+                "n": "Nuit des morts",
+                "m": 2,
+                "d": [
+                    "R\u00e9duit le temps de recharge de R\u00e9animation morbide de 45 sec. et celui d'Arm\u00e9e des morts de 2 min. R\u00e9duit \u00e9galement les d\u00e9g\u00e2ts inflig\u00e9s \u00e0 votre familier par les attaques \u00e0 zone d'effet des cr\u00e9atures de 45%.",
+                    "R\u00e9duit le temps de recharge de R\u00e9animation morbide de 90 sec. et celui d'Arm\u00e9e des morts de 4 min. R\u00e9duit \u00e9galement les d\u00e9g\u00e2ts inflig\u00e9s \u00e0 votre familier par les attaques \u00e0 zone d'effet des cr\u00e9atures de 90%."
+                ],
+                "s": [
+                    55620,
+                    55623
+                ],
+                "x": 3,
+                "y": 3,
+                "iconname": "Spell_DeathKnight_ArmyOfTheDead"
+            },
+            {
+                "i": 1996,
+                "n": "Chancre impie",
+                "m": 1,
+                "d": [
+                    "Un essaim infect d'insectes impies s'abat sur les victimes de votre Voile mortel et leur inflige un montant de d\u00e9g\u00e2ts \u00e9gal \u00e0 10% des d\u00e9g\u00e2ts inflig\u00e9s par Voile mortel en 10 s, en plus d'emp\u00eacher toutes les maladies pr\u00e9sentes sur ces victimes d'\u00eatre dissip\u00e9es."
+                ],
+                "s": [
+                    49194
+                ],
+                "x": 0,
+                "y": 4,
+                "iconname": "Spell_Shadow_Contagion"
+            },
+            {
+                "i": 2005,
+                "n": "Impuret\u00e9",
+                "m": 5,
+                "d": [
+                    "Le bonus \u00e0 la puissance d'attaque de vos sorts est augment\u00e9 de 4%.",
+                    "Le bonus \u00e0 la puissance d'attaque de vos sorts est augment\u00e9 de 8%.",
+                    "Le bonus \u00e0 la puissance d'attaque de vos sorts est augment\u00e9 de 12%.",
+                    "Le bonus \u00e0 la puissance d'attaque de vos sorts est augment\u00e9 de 16%.",
+                    "Vos sorts re\u00e7oivent un b\u00e9n\u00e9fice suppl\u00e9mentaire de 20% de votre puissance d'attaque."
+                ],
+                "s": [
+                    49220,
+                    49633,
+                    49635,
+                    49636,
+                    49638
+                ],
+                "x": 1,
+                "y": 4,
+                "iconname": "Spell_Shadow_ShadowandFlame"
+            },
+            {
+                "i": 2011,
+                "n": "Complainte",
+                "m": 2,
+                "d": [
+                    "Vos sorts Frappe de mort, Frappe de peste et Frappe du Fl\u00e9au g\u00e9n\u00e8rent 2,5 points de puissance runique suppl\u00e9mentaires.",
+                    "Vos sorts Frappe de mort, Frappe de peste et Frappe du Fl\u00e9au g\u00e9n\u00e8rent 5 points de puissance runique suppl\u00e9mentaires."
+                ],
+                "s": [
+                    49223,
+                    49599
+                ],
+                "x": 2,
+                "y": 4,
+                "iconname": "Spell_Shadow_Shadesofdarkness"
+            },
+            {
+                "i": 2226,
+                "n": "Violation",
+                "m": 2,
+                "d": [
+                    "Vos Frappes de peste et Frappes du Fl\u00e9au provoquent l'effet Terre profan\u00e9e. Les cibles dans la zone sont ralenties de 25% par les bras avides des morts tant que vous restez sur la terre impie. Dure 20 s.",
+                    "Vos Frappes de peste et Frappes du Fl\u00e9au provoquent l'effet Terre profan\u00e9e. Les cibles dans la zone sont ralenties de 50% par les bras avides des morts tant que vous restez sur la terre impie. Dure 20 s."
+                ],
+                "s": [
+                    55666,
+                    55667
+                ],
+                "x": 0,
+                "y": 5,
+                "iconname": "Spell_Shadow_Shadowfiend"
+            },
+            {
+                "i": 2009,
+                "n": "Suppression de la magie",
+                "m": 3,
+                "d": [
+                    "Toutes les formes de magie vous infligent 2% de d\u00e9g\u00e2ts en moins. De plus, votre Carapace anti-magie absorbe 8% de d\u00e9g\u00e2ts des sorts suppl\u00e9mentaires.",
+                    "Toutes les formes de magie vous infligent 4% de d\u00e9g\u00e2ts en moins. De plus, votre Carapace anti-magie absorbe 16% de d\u00e9g\u00e2ts des sorts suppl\u00e9mentaires.",
+                    "Toutes les formes de magie vous infligent 6% de d\u00e9g\u00e2ts en moins. De plus, votre Carapace anti-magie absorbe 25% de d\u00e9g\u00e2ts des sorts suppl\u00e9mentaires."
+                ],
+                "s": [
+                    49224,
+                    49610,
+                    49611
+                ],
+                "x": 1,
+                "y": 5,
+                "iconname": "Spell_Shadow_AntiMagicShell"
+            },
+            {
+                "i": 2001,
+                "n": "Moisson",
+                "m": 3,
+                "d": [
+                    "Chaque fois que vous touchez avec Frappe de sang ou Pestilence, il y a 33% de chances que la rune de sang devienne une rune de la mort lors de son activation. Les runes de la mort comptent comme une rune de sang, de givre ou impie.",
+                    "Chaque fois que vous touchez avec Frappe de sang ou Pestilence, il y a 66% de chances que la rune de sang devienne une rune de la mort lors de son activation. Les runes de la mort comptent comme une rune de sang, de givre ou impie.",
+                    "Chaque fois que vous touchez avec Frappe de sang ou Pestilence, il y a 100% de chances que la rune de sang devienne une rune de la mort lors de son activation. Les runes de la mort comptent comme une rune de sang, de givre ou impie."
+                ],
+                "s": [
+                    49208,
+                    56834,
+                    56835
+                ],
+                "x": 2,
+                "y": 5,
+                "iconname": "Spell_Shadow_ShadeTrueSight"
+            },
+            {
+                "i": 1984,
+                "n": "Ma\u00eetre des goules",
+                "m": 1,
+                "d": [
+                    "R\u00e9duit le temps de recharge de R\u00e9animation morbide de 60 sec. et la goule invoqu\u00e9e par votre sort R\u00e9animation morbide est consid\u00e9r\u00e9e comme un familier sous votre contr\u00f4le. Contrairement aux goules normales de chevalier de la mort, votre familier n'a pas de dur\u00e9e limit\u00e9e."
+                ],
+                "s": [
+                    52143
+                ],
+                "x": 3,
+                "y": 5,
+                "iconname": "Spell_Shadow_AnimateDead",
+                "r": [
+                    12,
+                    2
+                ]
+            },
+            {
+                "i": 2285,
+                "n": "D\u00e9solation",
+                "m": 5,
+                "d": [
+                    "Vos Frappes de sang vous font infliger 1% de d\u00e9g\u00e2ts suppl\u00e9mentaires avec toutes les attaques pendant 20 s.",
+                    "Vos Frappes de sang vous font infliger 2% de d\u00e9g\u00e2ts suppl\u00e9mentaires avec toutes les attaques pendant 20 s.",
+                    "Vos Frappes de sang vous font infliger 3% de d\u00e9g\u00e2ts suppl\u00e9mentaires avec toutes les attaques pendant 20 s.",
+                    "Vos Frappes de sang vous font infliger 4% de d\u00e9g\u00e2ts suppl\u00e9mentaires avec toutes les attaques pendant 20 s.",
+                    "Vos Frappes de sang vous font infliger 5% de d\u00e9g\u00e2ts suppl\u00e9mentaires avec toutes les attaques pendant 20 s."
+                ],
+                "s": [
+                    66799,
+                    66814,
+                    66815,
+                    66816,
+                    66817
+                ],
+                "x": 0,
+                "y": 6,
+                "iconname": "Spell_Shadow_UnholyFrenzy"
+            },
+            {
+                "i": 2221,
+                "n": "Zone anti-magie",
+                "m": 1,
+                "d": [
+                    "Place une grande Zone anti-magie stationnaire qui r\u00e9duit de 75% les d\u00e9g\u00e2ts des sorts inflig\u00e9s aux membres du groupe ou du raid se trouvant \u00e0 l'int\u00e9rieur. La Zone anti-magie dure 10 s. ou jusqu'\u00e0 ce que  points de d\u00e9g\u00e2ts des sorts aient \u00e9t\u00e9 absorb\u00e9s."
+                ],
+                "s": [
+                    51052
+                ],
+                "x": 1,
+                "y": 6,
+                "iconname": "Spell_DeathKnight_AntiMagicZone",
+                "r": [
+                    17,
+                    3
+                ]
+            },
+            {
+                "i": 2013,
+                "n": "Pr\u00e9sence impie am\u00e9lior\u00e9e",
+                "m": 2,
+                "d": [
+                    "Quand vous \u00eates en Pr\u00e9sence de sang ou de givre, vous conservez l'augmentation de la vitesse de d\u00e9placement de 8% de Pr\u00e9sence impie, et le temps de recharge de vos runes est 5% plus rapide en Pr\u00e9sence impie.",
+                    "Quand vous \u00eates en Pr\u00e9sence de sang ou de givre, vous conservez l'augmentation de la vitesse de d\u00e9placement de 15% de Pr\u00e9sence impie, et le temps de recharge de vos runes est 10% plus rapide en Pr\u00e9sence impie."
+                ],
+                "s": [
+                    50391,
+                    50392
+                ],
+                "x": 2,
+                "y": 6,
+                "iconname": "Spell_Deathknight_UnholyPresence"
+            },
+            {
+                "i": 2085,
+                "n": "Fr\u00e9n\u00e9sie de la goule",
+                "m": 1,
+                "d": [
+                    "Conf\u00e8re \u00e0 votre familier un bonus de 25% \u00e0 la h\u00e2te pendant 30 s et lui rend 60% de ses points de vie pendant la dur\u00e9e de l'effet."
+                ],
+                "s": [
+                    63560
+                ],
+                "x": 3,
+                "y": 6,
+                "iconname": "Ability_GhoulFrenzy",
+                "r": [
+                    19,
+                    1
+                ]
+            },
+            {
+                "i": 1962,
+                "n": "Fi\u00e8vre de la crypte",
+                "m": 3,
+                "d": [
+                    "Vos maladies entra\u00eenent \u00e9galement la Fi\u00e8vre de la crypte, qui augmente de 10% les d\u00e9g\u00e2ts inflig\u00e9s par les maladies \u00e0 la cible.",
+                    "Vos maladies entra\u00eenent \u00e9galement la Fi\u00e8vre de la crypte, qui augmente de 20% les d\u00e9g\u00e2ts inflig\u00e9s par les maladies \u00e0 la cible.",
+                    "Vos maladies entra\u00eenent \u00e9galement la Fi\u00e8vre de la crypte, qui augmente de 30% les d\u00e9g\u00e2ts inflig\u00e9s par les maladies \u00e0 la cible."
+                ],
+                "s": [
+                    49032,
+                    49631,
+                    49632
+                ],
+                "x": 1,
+                "y": 7,
+                "iconname": "Spell_Nature_NullifyDisease"
+            },
+            {
+                "i": 2007,
+                "n": "Bouclier d'os",
+                "m": 1,
+                "d": [
+                    "Le chevalier de la mort est entour\u00e9 de 3 os tourbillonnants. Tant qu'il reste au moins un os, toutes les attaques contre le chevalier infligent 20% de d\u00e9g\u00e2ts en moins et les attaques, techniques et sorts du chevalier infligent 2% de d\u00e9g\u00e2ts en plus. Chaque attaque infligeant des d\u00e9g\u00e2ts consomme un os. Dure 5 min."
+                ],
+                "s": [
+                    49222
+                ],
+                "x": 2,
+                "y": 7,
+                "iconname": "INV_Chest_Leather_13"
+            },
+            {
+                "i": 2003,
+                "n": "Peste galopante",
+                "m": 3,
+                "d": [
+                    "Quand vos maladies infligent des d\u00e9g\u00e2ts \u00e0 un ennemi, il y a une chance \u00e9gale \u00e0 vos chances de coup critique en m\u00eal\u00e9e qu'elles infligent 33% de d\u00e9g\u00e2ts suppl\u00e9mentaires \u00e0 la cible et \u00e0 tous les ennemis se trouvant \u00e0 moins de 8 m\u00e8tres. Ignore les cibles porteuses d'un effet de sort annul\u00e9 lorsque des d\u00e9g\u00e2ts sont subis.",
+                    "Quand vos maladies infligent des d\u00e9g\u00e2ts \u00e0 un ennemi, il y a une chance \u00e9gale \u00e0 vos chances de coup critique en m\u00eal\u00e9e qu'elles infligent 66% de d\u00e9g\u00e2ts suppl\u00e9mentaires \u00e0 la cible et \u00e0 tous les ennemis se trouvant \u00e0 moins de 8 m\u00e8tres. Ignore les cibles porteuses d'un effet de sort annul\u00e9 lorsque des d\u00e9g\u00e2ts sont subis.",
+                    "Quand vos maladies infligent des d\u00e9g\u00e2ts \u00e0 un ennemi, vous avez une chance \u00e9gale \u00e0 vos chances de coup critique en m\u00eal\u00e9e qu'elles infligent 100% de d\u00e9g\u00e2ts suppl\u00e9mentaires \u00e0 la cible et \u00e0 tous les ennemis se trouvant \u00e0 moins de 8 m\u00e8tres. Ignore les cibles porteuses d'un effet de sort annul\u00e9 lorsque des d\u00e9g\u00e2ts sont subis."
+                ],
+                "s": [
+                    49217,
+                    49654,
+                    49655
+                ],
+                "x": 0,
+                "y": 8,
+                "iconname": "Spell_Shadow_CallofBone"
+            },
+            {
+                "i": 2043,
+                "n": "Porte-peste d'\u00e9b\u00e8ne",
+                "m": 3,
+                "d": [
+                    "Votre Fi\u00e8vre de la crypte devient une Peste d'\u00e9b\u00e8ne, qui augmente les d\u00e9g\u00e2ts magiques subis de 4% en plus d'augmenter les d\u00e9g\u00e2ts inflig\u00e9s par les maladies. Augmente en permanence vos chances de coup critique avec les armes et les sorts de 1%.",
+                    "Votre Fi\u00e8vre de la crypte devient une Peste d'\u00e9b\u00e8ne, qui augmente les d\u00e9g\u00e2ts magiques subis de 9% en plus d'augmenter les d\u00e9g\u00e2ts inflig\u00e9s par les maladies. Augmente en permanence vos chances de coup critique avec les armes et les sorts de 2%.",
+                    "Votre Fi\u00e8vre de la crypte devient une Peste d'\u00e9b\u00e8ne, qui augmente les d\u00e9g\u00e2ts magiques subis de 13% en plus d'augmenter les d\u00e9g\u00e2ts inflig\u00e9s par les maladies. Augmente en permanence vos chances de coup critique avec les armes et les sorts de 3%."
+                ],
+                "s": [
+                    51099,
+                    51160,
+                    51161
+                ],
+                "x": 1,
+                "y": 8,
+                "iconname": "Ability_Creature_Cursed_03",
+                "r": [
+                    24,
+                    3
+                ]
+            },
+            {
+                "i": 2216,
+                "n": "Frappe du Fl\u00e9au",
+                "m": 1,
+                "d": [
+                    "Une frappe impie qui inflige 70% des d\u00e9g\u00e2ts de l'arme sous forme de d\u00e9g\u00e2ts physiques plus 238. De plus, pour chacune de vos maladies sur la cible, vous infligez un montant suppl\u00e9mentaire de d\u00e9g\u00e2ts d'Ombre \u00e9gal \u00e0 12% des d\u00e9g\u00e2ts physiques inflig\u00e9s."
+                ],
+                "s": [
+                    55090
+                ],
+                "x": 2,
+                "y": 8,
+                "iconname": "Spell_DeathKnight_ScourgeStrike"
+            },
+            {
+                "i": 2036,
+                "n": "Rage de Vaillefendre",
+                "m": 5,
+                "d": [
+                    "Vos sorts et techniques infligent 2% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles atteintes de la Peste de sang. Augmente \u00e9galement votre expertise de 1.",
+                    "Vos sorts et techniques infligent 4% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles atteintes de la Peste de sang. Augmente \u00e9galement votre expertise de 2.",
+                    "Vos sorts et techniques infligent 6% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles atteintes de la Peste de sang. Augmente \u00e9galement votre expertise de 3.",
+                    "Vos sorts et techniques infligent 8% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles atteintes de la Peste de sang. Augmente \u00e9galement votre expertise de 4.",
+                    "Vos sorts et techniques infligent 10% de d\u00e9g\u00e2ts suppl\u00e9mentaires aux cibles atteintes de la Peste de sang. Augmente \u00e9galement votre expertise de 5."
+                ],
+                "s": [
+                    50117,
+                    50118,
+                    50119,
+                    50120,
+                    50121
+                ],
+                "x": 1,
+                "y": 9,
+                "iconname": "INV_Weapon_Halberd14"
+            },
+            {
+                "i": 2000,
+                "n": "Invocation d'une gargouille",
+                "m": 1,
+                "d": [
+                    "Une gargouille bombarde la cible et lui inflige des d\u00e9g\u00e2ts de Nature modifi\u00e9s par la puissance d'attaque du chevalier de la mort. Persiste pendant 30 s."
+                ],
+                "s": [
+                    49206
+                ],
+                "x": 1,
+                "y": 10,
+                "iconname": "Ability_Hunter_Pet_Bat"
+            }
+        ]
+    }
+])
