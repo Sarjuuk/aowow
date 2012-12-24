@@ -57,12 +57,3 @@
 	height:554px!important;
 	margin-left:0;
 }
-
-#pc-itself .mastery {
-	background:url('images/talent/pet-tree-glow.png');
-}
-
-#pc-itself p.mastery {
-	background:url('images/talent/summary-glow.png') repeat scroll center 64px transparent;
-}
-

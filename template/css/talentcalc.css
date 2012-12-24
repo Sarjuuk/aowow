@@ -116,6 +116,14 @@ color:white;
 float:left;
 }
 
+.talentcalc-upper-class a {
+text-decoration:none;
+}
+
+.talentcalc-upper-class a:hover {
+text-decoration:underline;
+}
+
 .talentcalc-upper-reqlevel {
 float:right;
 }
