@@ -1,113 +1,150 @@
-var tc_loaded = false,
-tc_object, tc_classId = -1,
-tc_classIcons = {},
-tc_build = "",
-tc_glyphs = "";
+var
+    tc_loaded     = false,
+    tc_object,
+    tc_classId    = -1,
+    tc_classIcons = {},
+    tc_build      = '',
+    tc_glyphs     = '';
 
 function tc_init() {
-	var c;
-	g_initPath([1, 0]);
-	ge("tc-classes").className = "choose";
-	var e = g_sortJsonArray(g_chr_classes, g_chr_classes);
-	c = ge("tc-classes-inner");
-	for (var d = 0, b = e.length; d < b; ++d) {
-		var h = e[d],
-		f = Icon.create("class_" + g_file_classes[h], 1, null, "javascript:;"),
-		g = Icon.getLink(f);
-		tc_classIcons[h] = f;
-		if (Browser.ie6) {
-			g.onfocus = tb
-		}
-		g.onclick = tc_classClick.bind(g, h);
-		g.onmouseover = tc_classOver.bind(g, h);
-		g.onmouseout = Tooltip.hide;
-		ae(c, f)
-	}
-	var a = ce("div");
-	a.className = "clear";
-	ae(c, a);
-	tc_object = new TalentCalc();
-	tc_object.initialize("tc-itself", {
-		onChange: tc_onChange
-	});
-	tc_readPound();
-	setInterval(tc_readPound, 1000)
+    var
+        _,
+        clear;
+
+    g_initPath([1, 0]);
+
+    ge('tc-classes').className = 'choose';
+
+    var classes = g_sortJsonArray(g_chr_classes, g_chr_classes);
+
+    _ = ge('tc-classes-inner');
+    for (var i = 0, len = classes.length; i < len; ++i) {
+        var
+            classId = classes[i],
+            icon    = Icon.create('class_' + g_file_classes[classId], 1, null, 'javascript:;'),
+            link    = Icon.getLink(icon);
+
+        tc_classIcons[classId] = icon;
+
+        if (Browser.ie6) {
+            link.onfocus = tb;
+        }
+
+        link.onclick     = tc_classClick.bind(link, classId);
+        link.onmouseover = tc_classOver.bind(link, classId);
+        link.onmouseout  = Tooltip.hide;
+
+        ae(_, icon);
+    }
+    clear = ce('div');
+    clear.className = 'clear';
+    ae(_, clear);
+
+    tc_object = new TalentCalc();
+    tc_object.initialize('tc-itself', {
+        onChange: tc_onChange,
+        mode: TalentCalc.MODE_DEFAULT
+    });
+
+    ge('tc-itself').className += ' choose';
+
+    tc_readPound();
+    setInterval(tc_readPound, 1000);
 }
 
-function tc_classClick(a) {
-	if (tc_object.setClass(a)) {
-		Tooltip.hide()
-	}
-	return false
+function tc_classClick(classId) {
+    if (tc_object.setClass(classId)) {
+        Tooltip.hide();
+    }
+
+    return false;
 }
 
-function tc_classOver(a) {
-	Tooltip.show(this, "<b>" + g_chr_classes[a] + "</b>", 0, 0, "c" + a)
+function tc_classOver(classId) {
+    Tooltip.show(this, '<b>' + g_chr_classes[classId] + '</b>', 0, 0, 'c' + classId);
 }
 
-function tc_onChange(a, e, d) {
-	var c;
-	if (e.classId != tc_classId) {
-		if (!tc_loaded) {
-			var c = ge("tc-classes");
-			de(gE(c, "p")[0]);
-			c.className = "";
-			tc_loaded = true
-		}
-		if (tc_classId != -1) {
-			c = tc_classIcons[tc_classId];
-			c.className = tc_classIcons[tc_classId].className.replace("iconmedium-gold", "")
-		}
-		tc_classId = e.classId;
-		c = tc_classIcons[tc_classId];
-		c.className += " iconmedium-gold";
-		g_initPath([1, 0, tc_classId])
-	}
-	tc_build = a.getWhBuild();
-	tc_glyphs = a.getWhGlyphs();
-	var b = "#" + tc_build;
-	if (tc_glyphs != "") {
-		b += ":" + tc_glyphs
-	}
-	location.replace(b);
-	var g = document.title;
-	if (g.indexOf("/") != -1) {
-		var f = g.indexOf("- ");
-		if (f != -1) {
-			g = g.substring(f + 2)
-		}
-	}
-	document.title = g_chr_classes[tc_classId] + " (" + d[0].k + "/" + d[1].k + "/" + d[2].k + ") - " + g
+function tc_onChange(tc, info, data) {
+    var _;
+
+    if (info.classId != tc_classId) { // Class change
+        if (!tc_loaded) {
+            _ = ge('tc-itself');
+            _.className = _.className.replace('choose', '');
+
+            _ = ge('tc-classes');
+            de(gE(_, 'p')[0]); // Removes 'Choose a class:'
+            _.className = '';
+
+            tc_loaded = true;
+        }
+
+        if (tc_classId != -1) {
+            _ = tc_classIcons[tc_classId];
+            _.className = tc_classIcons[tc_classId].className.replace('iconmedium-gold-selected', '');
+        }
+        tc_classId = info.classId;
+
+        _ = tc_classIcons[tc_classId];
+        _.className += ' iconmedium-gold-selected';
+
+        g_initPath([1, 0, tc_classId]);
+    }
+
+    tc_build  = tc.getWhBuild();
+    tc_glyphs = tc.getWhGlyphs();
+
+    var url = '#' + tc_build;
+    if (tc_glyphs != '') {
+        url += ':' + tc_glyphs
+    }
+    location.replace(url);
+
+    var buff = document.title;
+    if (buff.indexOf('/') != -1) {
+        var pos = buff.indexOf('- ');
+        if (pos != -1) {
+            buff = buff.substring(pos + 2);
+        }
+    }
+    document.title = g_chr_classes[tc_classId] + ' (' + data[0].k + '/' + data[1].k + '/' + data[2].k + ') - ' + buff;
 }
 
 function tc_readPound() {
-	if (location.hash) {
-		if (location.hash.indexOf("-") != -1) {
-			var d = location.hash.substr(1).split("-"),
-			a = d[0] || "",
-			f = d[1] || "",
-			c = -1;
-			for (var g in g_file_classes) {
-				if (g_file_classes[g] == a) {
-					c = g;
-					break
-				}
-			}
-			if (c != -1) {
-				tc_object.setBlizzBuild(c, f)
-			}
-		} else {
-			var d = location.hash.substr(1).split(":"),
-			e = d[0] || "",
-			b = d[1] || "";
-			if (tc_build != e) {
-				tc_build = e;
-				tc_object.setWhBuild(tc_build)
-			}
-			if (tc_glyphs != b) {
-				tc_glyphs = b;
-				tc_object.setWhGlyphs(tc_glyphs)
-			}
-		}
-	}
+    if (location.hash) {
+        if (location.hash.indexOf('-') != -1) { // Blizz-Build
+            var
+                pounds  = location.hash.substr(1).split('-'),
+                classs  = pounds[0] || '',
+                build   = pounds[1] || '',
+                classId = -1;
+
+            for (var i in g_file_classes) {
+                if (g_file_classes[i] == classs) {
+                    classId = i;
+                    break;
+                }
+            }
+
+            if (classId != -1) {
+                tc_object.setBlizzBuild(classId, build);
+            }
+        }
+        else { // WH-Build
+            var
+                pounds = location.hash.substr(1).split(':'),
+                build  = pounds[0] || '',
+                glyphs = pounds[1] || '';
+
+            if (tc_build != build) {
+                tc_build = build;
+                tc_object.setWhBuild(tc_build);
+            }
+
+            if (tc_glyphs != glyphs) {
+                tc_glyphs = glyphs;
+                tc_object.setWhGlyphs(tc_glyphs);
+            }
+        }
+    }
 };
