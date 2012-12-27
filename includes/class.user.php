@@ -88,7 +88,7 @@ class User
             self::$timeout      = intval($query['timeout']);
             self::$groups       = intval($query['userGroups']);
             self::$perms        = intval($query['userPerms']);
-            self::$banned       = $query['active'] == 1 && $query['unbanDate'] > time();
+            self::$banned       = $query['isActive'] == 1 && $query['unbanDate'] > time();
             self::$unbanDate    = intval($query['unbanDate']);
             self::$bannedBy     = intval($query['bannedBy']);
             self::$banReason    = $query['banReason'];
@@ -177,7 +177,6 @@ class User
         }
         else
         {
-
             if (self::$passHash[0] == '$')                  // salted hash -> aowow-password
             {
                 if (!self::verifyCrypt($pass))
@@ -191,6 +190,7 @@ class User
                     return AUTH_WRONGPASS;
             }
         }
+
         if (self::$banned)
             return AUTH_BANNED;
 
@@ -220,7 +220,7 @@ class User
 
     private static function hashCrypt($pass)
     {
-        return crypt($pass, self::$createSalt());
+        return crypt($pass, self::createSalt());
     }
 
     private static function hashSHA1($pass)
@@ -235,7 +235,7 @@ class User
 
     private static function verifySHA1($pass)
     {
-        return self::$passHash == self::$hashSHA1($pass);
+        return self::$passHash == self::hashSHA1($pass);
     }
 
     private static function convertAuthInfo($pass)
