@@ -551,10 +551,10 @@ function g_getCursorPos(e) {
         y;
 
 	if (window.innerHeight) {
-    
+
         // ok, something of a workaround here... MS9+ sends a MSEventObj istead of mouseEvent . whatever
         // but the properties for that are client[X|Y] DIAF!
-    
+
         if (!e.pageX || !e.pageY) {
             x = e.clientX;
             y = e.clientY
@@ -1001,12 +1001,17 @@ function g_initHeaderMenus() {
 			d = d.substr(0, j)
 		}
 		//c.menu = [[0, "Deutsch", (g_locale.id != 3 ? d.replace(g, "de") : null)], [0, "English", (g_locale.id != 0 ? d.replace(g, "www") : null)], [0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? d.replace(g, "es") : null)], [0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? d.replace(g, "fr") : null)], [0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? d.replace(g, "ru") : null)]];
+
+        var rel = d.match(/()\?((item|quest|spell|achievement|npc|object)=([0-9]+))/);
+        rel = rel[2] || "";
+
 		c.menu = [
-			[0, "Deutsch", (g_locale.id != 3 ? "?locale=3" : null)],
-			[0, "English", (g_locale.id != 0 ? "?locale=0" : null)],
-			[0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? "?locale=6" : null)],
-			[0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? "?locale=2" : null)],
-			[0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? "?locale=8" : null)]];
+			[0, "Deutsch", (g_locale.id != 3 ? "?locale=3" : null), , {rel: rel + " domain=de"}],
+			[0, "English", (g_locale.id != 0 ? "?locale=0" : null), , {rel: rel + " domain=en"}],
+			[0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? "?locale=6" : null), , {rel: rel + " domain=es"}],
+			[0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? "?locale=2" : null), , {rel: rel + " domain=fr"}],
+			[0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? "?locale=8" : null), , {rel: rel + " domain=ru"}]
+        ];
 		c.menu.rightAligned = 1;
 		if (g_locale.id != 25) {
 			c.menu[{
@@ -2120,6 +2125,7 @@ function g_getLocaleFromDomain(a) {
 	return (c[a] ? c[a] : 0)
 }
 g_getLocaleFromDomain.L = {
+   www: 0,
 	fr: 2,
 	de: 3,
 	es: 6,
@@ -3246,10 +3252,12 @@ var Menu = {
 				if (R.newWindow) {
 					V.target = "_blank"
 				}
-
 				if (R.className) {
 					T.className += " "+R.className
 				}
+                if (R[4] != null && R[4].rel) {
+                    V.rel = R[4].rel
+                }
 				if (R[4] != null && R[4].className) {
 					T.className += " "+R[4].className
 				}
@@ -9599,8 +9607,12 @@ Listview.templates = {
 				if (a.reqclass) {
 					var b = Listview.funcBox.assocBinFlags(a.reqclass, g_chr_classes);
 					var c = b[0];
-					var d = $("<a>").css("background-image", 'url("' + g_staticUrl + "/images/wow/icons/tiny?class_" + g_file_classes[c] + '.gif")').addClass("icontiny").addClass("c" + c).attr("href", "?class=" + c).text(g_chr_classes[c]);
-					$(e).append(d)
+					var d = ce("a");
+                    d.style.backgroundImage = 'url("' + g_staticUrl + "/images/wow/icons/tiny?class_" + g_file_classes[c] + '.gif")';
+                    d.className = "icontiny c" + c;
+                    d.href = "?class=" + c;
+                    ae(d, ct(g_chr_classes[c]));
+					ae(e, d);
 				}
 			},
 			sortFunc: function (d, c, e) {
@@ -12742,14 +12754,14 @@ var LiveSearch = new function () {
 	var
         currentTextbox,
         lastSearch = {},
-        lastDiv, 
-        timer, 
-        prepared, 
-        container, 
-        cancelNext, 
-        hasData, 
-        summary, 
-        selection, 
+        lastDiv,
+        timer,
+        prepared,
+        container,
+        cancelNext,
+        hasData,
+        summary,
+        selection,
         LIVESEARCH_DELAY = 500;
 
 	function setText(textbox, txt) {

@@ -53,7 +53,6 @@ $lang = array(
         'serversideHint' => "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
     ),
     'game' => array (
-        'remaining'     => "%s restantes",
         'requires'      => "Requiert",
         'cooldown'      => "%s de recharge",
         'classes'       => "Classes",
@@ -146,6 +145,7 @@ $lang = array(
         'zonePartOf'    => "Cette zone fait partie de la zone",
     ),
     'spell' => array(
+        'remaining'     => "%s restantes",
         'castIn'        => "%s s d'incantation",
         'instantPhys'   => "Incantation immédiate",
         'instantMagic'  => "Instantanée",
