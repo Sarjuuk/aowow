@@ -9,7 +9,7 @@ ini_set('serialize_precision', 4);
 require('includes/defines.php');
 require('config/config.php');
 
-$e = $AoWoWconf['debug'] === true ? (E_ALL & ~(E_DEPRECATED|E_USER_DEPRECATED|E_STRICT)) : 0;
+$e = !!$AoWoWconf['debug'] ? (E_ALL & ~(E_DEPRECATED|E_USER_DEPRECATED|E_STRICT)) : 0;
 error_reporting($e);
 
 require('includes/Smarty-2.6.26/libs/Smarty.class.php');    // Libraray: http://www.smarty.net/
@@ -17,6 +17,9 @@ require('includes/DbSimple/Generic.php');                   // Libraray: http://
 require('includes/utilities.php');
 require('includes/class.user.php');
 require('includes/class.database.php');
+
+// debug: measure execution times
+Util::execTime(!!$AoWoWconf['debug']);
 
 // Setup Smarty
 class Smarty_AoWoW extends Smarty
@@ -140,6 +143,8 @@ if (isset($_COOKIE[COOKIE_AUTH]))
 }
 else
     User::init(0);
+
+User::setLocale();
 
 // assign lang/locale, userdata, characters and custom profiles
 User::assignUserToTemplate($smarty, true);

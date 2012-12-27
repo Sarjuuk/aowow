@@ -233,6 +233,23 @@ class Util
         'large'  => 'style="background-image: url(/images/icons/large/%s.jpg)"',
     );
 
+    private static $execTime = 0.0;
+
+    public static function execTime($set = false)
+    {
+        if ($set)
+        {
+            self::$execTime = microTime(true);
+            return;
+        }
+
+        $newTime        = microTime(true);
+        $tDiff          = $newTime - self::$execTime;
+        self::$execTime = $newTime;
+
+        return self::formatTime($tDiff * 1000, true);
+    }
+
     public static function colorByRarity($idx)
     {
         if (!isset(self::$rarityColorStings))
@@ -293,8 +310,8 @@ class Util
             $sec -= $time['s'];
         }
 
-        if ($sec % 1)
-            $time['ms'] = $sec * 1000;
+        if (($sec * 1000) % 1000)
+            $time['ms'] = (int)($sec * 1000);
 
         return $time;
     }
@@ -328,7 +345,7 @@ class Util
             if (isset($s['s']))
                 $fmt[] = $s['s']." ".Lang::$main['seconds'];
             if (isset($s['ms']))
-                $fmt[] = $s['ms']." ".Lang::$main['milliseconds'];
+                $fmt[] = $s['ms']." ".Lang::$main['millisecs'];
         }
 
         return implode(' ', $fmt);
