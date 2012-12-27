@@ -94,8 +94,8 @@ switch ($pageCall)
         include $pageCall.'.php';
         break;
     /* other */
-    case 'build':
-        include 'tools/dataset-assembler/'.$pageParam.'.php';
+    case '':                                                // no parameter given -> MainPage
+        include 'pages/main.php';
         break;
     case 'latest-comments':
     case 'latest-screenshots':
@@ -107,13 +107,16 @@ switch ($pageCall)
     case 'random':
         include 'pages/miscTools.php';
         break;
-    case '':                                                // no parameter given -> MainPage
-        include 'pages/main.php';
-        break;
     case 'setup':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
             include 'setup/syncronize.php';
+            break;
+        }
+    case 'build':
+        if (User::isInGroup(U_GROUP_EMPLOYEE) && !empty($pageParam))
+        {
+            include 'setup/tools/dataset-assembler/'.$pageParam.'.php';
             break;
         }
     default:                                                // unk parameter given -> ErrorPage

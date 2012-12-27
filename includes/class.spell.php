@@ -1230,13 +1230,13 @@ class Spell
         // append periodic cost
         if ($this->template['powerPerSecond'] > 0)
             $x .= sprintf(Lang::$spell['costPerSec'], $this->template['powerPerSecond']);
-        
+
         // append level cost
         if ($this->template['powerCostPerLevel'] > 0)
             $x .= sprintf(Lang::$spell['costPerLevel'], $this->template['powerCostPerLevel']);
 
         $x .= '<br />';
-            
+
         if ($reqWrapper)
             $x .= '</td><th>';
 
@@ -1262,7 +1262,7 @@ class Spell
 
         $x .= '<table width="100%"><tr><td>';
 
-        // cast times 
+        // cast times
         if ($this->template['interruptFlagsChannel'])
             $x .= Lang::$spell['channeled'];
         else if ($this->template['castTime'])
@@ -1340,6 +1340,94 @@ class Spell
 
         return true;   // todo: false if error
     }
+
+    public function getTalentHead()
+    {
+        // upper: cost :: range
+        // lower: time :: cool
+        $x = '';
+
+        // power cost: pct over static
+        $cost = '';
+
+        if ($this->template['powerCostPercent'] > 0)
+            $cost .= $this->template['powerCostPercent']."% ".sprintf(Lang::$spell['pctCostOf'], strtolower(Lang::$spell['powerTypes'][$this->template['powerType']]));
+        else if ($this->template['powerCost'] > 0 || $this->template['powerPerSecond'] > 0 || $this->template['powerCostPerLevel'] > 0)
+            $cost .= ($this->template['powerType'] == 1 ? $this->template['powerCost'] / 10 : $this->template['powerCost']).' '.ucFirst(Lang::$spell['powerTypes'][$this->template['powerType']]);
+
+        // append periodic cost
+        if ($this->template['powerPerSecond'] > 0)
+            $cost .= sprintf(Lang::$spell['costPerSec'], $this->template['powerPerSecond']);
+
+        // append level cost
+        if ($this->template['powerCostPerLevel'] > 0)
+            $cost .= sprintf(Lang::$spell['costPerLevel'], $this->template['powerCostPerLevel']);
+
+
+        // ranges
+        $range = '';
+
+        if ($this->template['rangeMaxHostile'])
+        {
+            // minRange exists; show as range
+            if ($this->template['rangeMinHostile'])
+                $range .= sprintf(Lang::$spell['range'], $this->template['rangeMinHostile'].' - '.$this->template['rangeMaxHostile']);
+            // friend and hostile differ; do color
+            else if ($this->template['rangeMaxHostile'] != $this->template['rangeMaxFriend'])
+                $range .= sprintf(Lang::$spell['range'], '<span class="q10">'.$this->template['rangeMaxHostile'].'</span> - <span class="q2">'.$this->template['rangeMaxHostile']. '</span>');
+            // hardcode: "melee range"
+            else if ($this->template['rangeMaxHostile'] == 5)
+                $range .= Lang::$spell['meleeRange'];
+            // regular case
+            else
+                $range .= sprintf(Lang::$spell['range'], $this->template['rangeMaxHostile']);
+        }
+
+        // cast times
+        $time = '';
+
+        if ($this->template['interruptFlagsChannel'])
+            $time .= Lang::$spell['channeled'];
+        else if ($this->template['castTime'])
+            $time .= sprintf(Lang::$spell['castIn'], $this->template['castTime'] / 1000);
+        else if ($this->template['attributes0'] & 0x10)     // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only
+            $time .= Lang::$spell['instantPhys'];
+        else                                                // instant cast
+            $time .= Lang::$spell['instantMagic'];
+
+        // cooldown or categorycooldown
+        $cool = '';
+
+        if ($this->template['recoveryTime'])
+            $cool.= sprintf(Lang::$game['cooldown'], Util::formatTime($this->template['recoveryTime'], true)).'</th>';
+        else if ($this->template['recoveryCategory'])
+            $cool.= sprintf(Lang::$game['cooldown'], Util::formatTime($this->template['recoveryCategory'], true)).'</th>';
+
+
+        // assemble parts
+
+        // upper
+        if ($cost && $range)
+            $x .= '<table width="100%"><tr><td>'.$cost.'</td><th>'.$range.'</th></tr></table>';
+        else if ($cost)
+            $x .= $cost;
+        else if ($range)
+            $x .= $range;
+
+        if (($cost xor $range) && ($time xor $cool))
+            $x .= '<br />';
+
+        // lower
+        if ($time && $cool)
+            $x .= '<table width="100%"><tr><td>'.$time.'</td><th>'.$cool.'</th></tr></table>';
+        else if ($time)
+            $x .= $time;
+        else if ($cool)
+            $x .= $cool;
+
+        return $x;
+    }
+
 
     public function getListviewData()
     {
