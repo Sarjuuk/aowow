@@ -371,49 +371,65 @@ function sp(a) {
 		a.stopPropagation()
 	}
 }
-function sc(h, i, d, f, g) {
-	var e = new Date();
-	var c = h + "=" + escape(d) + "; ";
-	e.setDate(e.getDate() + i);
-	c += "expires=" + e.toUTCString() + "; ";
-	if (f) {
-		c += "path=" + f + "; "
+
+// Set cookie
+function sc(z, y, x, w, v) {
+	var a = new Date();
+	var b = z + "=" + escape(x) + "; ";
+	a.setDate(a.getDate() + y);
+	b += "expires=" + a.toUTCString() + "; ";
+	if (w) {
+		b += "path=" + w + "; ";
 	}
-	if (g) {
-		c += "domain=" + g + "; "
+	if (v) {
+		b += "domain=" + v + "; ";
 	}
-	document.cookie = c;
-	gc.C[h] = d
+	document.cookie = b;
+    gc(z);
+	gc.C[z] = x;
 }
-function dc(a) {
-	sc(a, -1);
-	gc.C[a] = null
+
+// Delete cookie
+function dc(z) {
+	sc(z, -1);
+	gc.C[z] = null;
 }
-function gc(f) {
-	if (gc.I == null) {
-		var e = unescape(document.cookie).split("; ");
+
+// Get all cookies (return value is cached)
+function gc(z) {
+	if (gc.I == null) { // Initialize cookie table
+		var words = unescape(document.cookie).split("; ");
+
 		gc.C = {};
-		for (var c = 0, a = e.length; c < a; ++c) {
-			var g = e[c].indexOf("="),
-			b,
-			d;
-			if (g != -1) {
-				b = e[c].substr(0, g);
-				d = e[c].substr(g + 1)
-			} else {
-				b = e[c];
-				d = ""
+		for (var i = 0, len = words.length; i < len; ++i) {
+			var
+                pos = words[i].indexOf("="),
+                name,
+                value;
+
+			if (pos != -1) {
+				name  = words[i].substr(0, pos);
+				value = words[i].substr(pos + 1);
 			}
-			gc.C[b] = d
+            else {
+				name  = words[i];
+				value = "";
+			}
+
+			gc.C[name] = value;
 		}
-		gc.I = 1
+
+		gc.I = 1;
 	}
-	if (!f) {
-		return gc.C
-	} else {
-		return gc.C[f]
+
+	if (!z) {
+		return gc.C;
+	}
+    else {
+		return gc.C[z];
 	}
 }
+
 function ns(a) {
 	if (Browser.ie) {
 		a.onfocus = tb;
@@ -1003,7 +1019,7 @@ function g_initHeaderMenus() {
 		//c.menu = [[0, "Deutsch", (g_locale.id != 3 ? d.replace(g, "de") : null)], [0, "English", (g_locale.id != 0 ? d.replace(g, "www") : null)], [0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? d.replace(g, "es") : null)], [0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? d.replace(g, "fr") : null)], [0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? d.replace(g, "ru") : null)]];
 
         var rel = d.match(/()\?((item|quest|spell|achievement|npc|object)=([0-9]+))/);
-        rel = rel[2] || "";
+        rel = (rel && rel[2]) ? rel[2] : "";
 
 		c.menu = [
 			[0, "Deutsch", (g_locale.id != 3 ? "?locale=3" : null), , {rel: rel + " domain=de"}],
