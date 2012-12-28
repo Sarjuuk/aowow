@@ -536,10 +536,10 @@ class Spell
     // required for item-sets-bonuses and socket-bonuses
     public function getStatGain()
     {
-        $stats = array();
+        $stats = [];
         for ($i = 1; $i <= 3; $i++)
         {
-            if (!in_array($this->template["effect".$i."AuraId"], array(13,22,29,34,35,83,84,85,99,124,135,143,158,161,189,230,235,240,250)))
+            if (!in_array($this->template["effect".$i."AuraId"], [13, 22, 29, 34, 35, 83, 84, 85, 99, 124, 135, 143, 158, 161, 189, 230, 235, 240, 250]))
                 continue;
 
             $mv = $this->template["effect".$i."MiscValue"];
@@ -552,10 +552,10 @@ class Spell
                     if ($mv < 0)                            // all stats
                     {
                         for ($j = 0; $j < 5; $j++)
-                            $stats[3 + $j] = $bp;
+                            @$stats[ITEM_MOD_AGILITY + $j] += $bp;
                     }
                     else                                    // one stat
-                        $stats[3 + $mv] = $bp;
+                        @$stats[ITEM_MOD_AGILITY + $mv] += $bp;
 
                     break;
                 }
@@ -563,66 +563,70 @@ class Spell
                 case 230:
                 case 250:
                 {
-                    $stats[2] = $bp;
+                    @$stats[ITEM_MOD_HEALTH] += $bp;
                     break;
                 }
                 case 13:                                    // damage splpwr + physical (dmg & any)
                 {
                     if ($mv == 1)                           // + weapon damage
                     {
-                        $stats[] = $bp;
+                        @$stats[ITEM_MOD_WEAPON_DMG] += $bp;
                         break;
                     }
 
                     if ($mv == 0x7E)                        // full magic mask, also counts towards healing
                     {
-                        $stats[45] = $bp;
-                        $stats[42] = $bp;
+                        @$stats[ITEM_MOD_SPELL_POWER] += $bp;
+                        @$stats[ITEM_MOD_SPELL_DAMAGE_DONE] += $bp;
                     }
                     else
                     {
                         if ($mv & (1 << 1))                 // HolySpellpower (deprecated; still used in randomproperties)
-                            $stats[59] = $bp;
+                            @$stats[ITEM_MOD_HOLY_POWER] += $bp;
 
                         if ($mv & (1 << 2))                 // FireSpellpower (deprecated; still used in randomproperties)
-                            $stats[57] = $bp;
+                            @$stats[ITEM_MOD_FIRE_POWER] += $bp;
 
                         if ($mv & (1 << 3))                 // NatureSpellpower (deprecated; still used in randomproperties)
-                            $stats[61] = $bp;
+                            @$stats[ITEM_MOD_NATURE_POWER] += $bp;
 
                         if ($mv & (1 << 4))                 // FrostSpellpower (deprecated; still used in randomproperties)
-                            $stats[58] = $bp;
+                            @$stats[ITEM_MOD_FROST_POWER] += $bp;
 
                         if ($mv & (1 << 5))                 // ShadowSpellpower (deprecated; still used in randomproperties)
-                            $stats[60] = $bp;
+                            @$stats[ITEM_MOD_SHADOW_POWER] += $bp;
 
                         if ($mv & (1 << 6))                 // ArcaneSpellpower (deprecated; still used in randomproperties)
-                            $stats[62] = $bp;
+                            @$stats[ITEM_MOD_ARCANE_POWER] += $bp;
                     }
 
                     break;
                 }
                 case 135:                                   // healing splpwr (healing & any) .. not as a mask..
                 {
-                    $stats[45] = $bp;
-                    $stats[41] = $bp;
+                    @$stats[ITEM_MOD_SPELL_POWER] += $bp;
+                    @$stats[ITEM_MOD_SPELL_HEALING_DONE] += $bp;
 
                     break;
                 }
                 case 35:                                    // ModPower - MiscVal:type see defined Powers only energy/mana in use
                 {
                     if ($mv == -2)
-                        $stats[1] = $bp;
+                        @$stats[ITEM_MOD_HEALTH] += $bp;
                     if ($mv == 3)
-                        $stats[8] = $bp;
+                        @$stats[ITEM_MOD_ENERGY] += $bp;
                     else if ($mv == 0)
-                        $stats[0] = $bp;
+                        @$stats[ITEM_MOD_MANA] += $bp;
                     else if ($mv == 6)
-                        $stats[11] = $bp;
+                        @$stats[ITEM_MOD_RUNIC_POWER] += $bp;
 
                     break;
                 }
                 case 189:                                   // CombatRating MiscVal:ratingMask
+                    // special case: resilience -  consists of 3 ratings strung together. MOD_CRIT_TAKEN_MELEE|RANGED|SPELL (14,15,16)
+                    if (($mv & 0x1C000) == 0x1C000)
+                        @$stats[ITEM_MOD_RESILIENCE_RATING] += $bp;
+
                     for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
                     {
                         if (!Util::$combatRatingToItemMod[$j])
@@ -631,22 +635,22 @@ class Spell
                         if (($mv & (1 << $j)) == 0)
                             continue;
 
-                        $stats[Util::$combatRatingToItemMod[$j]] = $bp;
+                        @$stats[Util::$combatRatingToItemMod[$j]] += $bp;
                     }
                     break;
                 case 143:                                   // Resistance MiscVal:school
                 case 83:
                 case 22:
 
-                    if ($mv == 2)                           // holy-resistance ONLY if explicitly specified (shouldn't even exist...)
+                    if ($mv == 1)                           // Armor only if explixitly specified
                     {
-                        $stats[53] = $bp;
+                        @$stats[ITEM_MOD_ARMOR] += $bp;
                         break;
                     }
 
-                    if ($mv == 1)                           // Armor only if explixitly specified
+                    if ($mv == 2)                           // holy-resistance ONLY if explicitly specified (shouldn't even exist...)
                     {
-                        $stats[50] = $bp;
+                        @$stats[ITEM_MOD_HOLY_RESISTANCE] += $bp;
                         break;
                     }
 
@@ -658,37 +662,41 @@ class Spell
                         switch ($j)
                         {
                             case 2:
-                                $stats[51] = $bp;  break;
+                                @$stats[ITEM_MOD_FIRE_RESISTANCE] += $bp;
+                                break;
                             case 3:
-                                $stats[55] = $bp;  break;
+                                @$stats[ITEM_MOD_NATURE_RESISTANCE] += $bp;
+                                break;
                             case 4:
-                                $stats[52] = $bp;  break;
+                                @$stats[ITEM_MOD_FROST_RESISTANCE] += $bp;
+                                break;
                             case 5:
-                                $stats[54] = $bp;  break;
+                                @$stats[ITEM_MOD_SHADOW_RESISTANCE] += $bp;
+                                break;
                             case 6:
-                                $stats[56] = $bp;  break;
+                                @$stats[ITEM_MOD_ARCANE_RESISTANCE] += $bp;
+                                break;
                         }
                     }
                     break;
                 case 84:                                    // hp5
                 case 161:
-                    $stats[46] = $bp;
+                    @$stats[ITEM_MOD_HEALTH_REGEN] += $bp;
                     break;
                 case 85:                                    // mp5
-                    $stats[43] = $bp;
+                    @$stats[ITEM_MOD_MANA_REGENERATION] += $bp;
                     break;
                 case 99:                                    // atkpwr
-                    $stats[38] = $bp;
-                    // $stats[40] = $bp;                    // ?contains feratkpwr?
+                    @$stats[ITEM_MOD_ATTACK_POWER] += $bp;
                     break;                                  // ?carries over to rngatkpwr?
                 case 124:                                   // rngatkpwr
-                    $stats[39] = $bp;
+                    @$stats[ITEM_MOD_RANGED_ATTACK_POWER] += $bp;
                     break;
                 case 158:                                   // blockvalue
-                    $stats[15] = $bp;
+                    @$stats[ITEM_MOD_BLOCK_VALUE] += $bp;
                     break;
                 case 240:                                   // ModExpertise
-                    $stats[37] = $bp;
+                    @$stats[ITEM_MOD_EXPERTISE_RATING] += $bp;
                     break;
             }
         }

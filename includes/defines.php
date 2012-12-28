@@ -29,6 +29,11 @@ define('CACHETYPE_PAGE',                    0);
 define('CACHETYPE_TOOLTIP',                 1);
 define('CACHETYPE_BUFF',                    2);             // only used by spells obviously
 
+define('SEARCH_REGULAR',                    0x000001);
+define('SEARCH_OPEN',                       0x000002);
+define('SEARCH_JSON',                       0x000004);
+define('SEARCH_TYPEMASK',                   0xFFFFF0);
+
 // Databases
 define('DB_AOWOW',                          0);
 define('DB_WORLD',                          1);
@@ -288,6 +293,7 @@ define('ITEM_FLAG_UNIQUEEQUIPPED',          0x0080000);
 define('ITEM_FLAG_ACCOUNTBOUND',            0x8000000);
 
 // ItemMod  (differ slightly from client, see g_statToJson)
+define('ITEM_MOD_WEAPON_DMG',               0);             // < custom
 define('ITEM_MOD_MANA',                     1);
 define('ITEM_MOD_HEALTH',                   2);
 define('ITEM_MOD_AGILITY',                  3);             // stats v
@@ -342,7 +348,13 @@ define('ITEM_MOD_FROST_RESISTANCE',         52);
 define('ITEM_MOD_HOLY_RESISTANCE',          53);
 define('ITEM_MOD_SHADOW_RESISTANCE',        54);
 define('ITEM_MOD_NATURE_RESISTANCE',        55);
-define('ITEM_MOD_ARCANE_RESISTANCE',        56);
+define('ITEM_MOD_ARCANE_RESISTANCE',        56);            // custom v
+define('ITEM_MOD_FIRE_POWER',               57);
+define('ITEM_MOD_FROST_POWER',              58);
+define('ITEM_MOD_HOLY_POWER',               59);
+define('ITEM_MOD_SHADOW_POWER',             60);
+define('ITEM_MOD_NATURE_POWER',             61);
+define('ITEM_MOD_ARCANE_POWER',             62);
 
 // AchievementCriteriaCondition
 define('ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH',                       1);         // reset progress on death

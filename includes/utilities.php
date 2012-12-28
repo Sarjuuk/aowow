@@ -7,6 +7,7 @@ if (!defined('AOWOW_REVISION'))
 class Lang
 {
     public static $main;
+    public static $search;
     public static $game;
     public static $filter;
     public static $error;
@@ -203,8 +204,8 @@ class Util
         'meta',                         'red',                          'yellow',                       'blue'
     );
 
-    public static $itemMods                 = array(        // zero-indexed; 49 => "mastrtng"; _[a-z] => taken mods..
-        'mana',             'health',           'dmg',              'agi',              'str',              'int',              'spi',
+    public static $itemMods                 = array(        // zero-indexed; "mastrtng": unused mastery; _[a-z] => taken mods..
+        'dmg',              'mana',             'health',           'agi',              'str',              'int',              'spi',
         'sta',              'energy',           'rage',             'focus',            'runicpwr',         'defrtng',          'dodgertng',
         'parryrtng',        'blockrtng',        'mlehitrtng',       'rgdhitrtng',       'splhitrtng',       'mlecritstrkrtng',  'rgdcritstrkrtng',
         'splcritstrkrtng',  '_mlehitrtng',      '_rgdhitrtng',      '_splhitrtng',      '_mlecritstrkrtng', '_rgdcritstrkrtng', '_splcritstrkrtng',
