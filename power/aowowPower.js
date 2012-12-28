@@ -271,7 +271,7 @@ if (typeof $WowheadPower == "undefined") {
 				locale = $WH.g_getLocaleFromDomain(domain);
 
 				/* edit start */
-				if (domain == "www") {
+				if (in_array(['fr', 'de', 'es', 'ru', 'en'], domain) == -1) {
 					for (i in document.scripts) {
 						if (!document.scripts[i].src)
 							continue;

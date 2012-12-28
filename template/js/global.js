@@ -187,31 +187,38 @@ function number_format(a) {
 	}
 	return number_format(a.substr(0, a.length - 3)) + "," + a.substr(a.length - 3) + x
 }
-function is_array(b) {
-	return !! (b && b.constructor == Array)
+
+function is_array(arr) {
+	return !!(arr && arr.constructor == Array);
 }
-function in_array(c, g, h, e) {
-	if (c == null) {
-		return -1
+
+function in_array(arr, val, func, idx) {
+	if (arr == null) {
+		return -1;
 	}
-	if (h) {
-		return in_arrayf(c, g, h, e)
+
+	if (func) {
+		return in_arrayf(arr, val, func, idx);
 	}
-	for (var d = e || 0, b = c.length; d < b; ++d) {
-		if (c[d] == g) {
-			return d
+
+	for (var i = idx || 0, len = arr.length; i < len; ++i) {
+		if (arr[i] == val) {
+			return i;
 		}
 	}
-	return -1
+
+	return -1;
 }
-function in_arrayf(c, g, h, e) {
-	for (var d = e || 0, b = c.length; d < b; ++d) {
-		if (h(c[d]) == g) {
-			return d
+
+function in_arrayf(arr, val, func, idx) {
+	for (var i = idx || 0, len = arr.length; i < len; ++i) {
+		if (func(arr[i]) == val) {
+			return i;
 		}
 	}
-	return -1
+	return -1;
 }
+
 function rs() {
 	var e = rs.random;
 	var b = "";
