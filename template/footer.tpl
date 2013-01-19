@@ -1,11 +1,11 @@
-    <div id="footer">
-{if isset($mysql)}
-        {$lang.numSQL}: {$mysql.count}<br>
-        {$lang.timeSQL}: {$mysql.time}
-{/if}
-    </div>
-</div>
-</div>
+        <div id="footer">
+    {if isset($mysql)}
+            {$lang.numSQL}: {$mysql.count}<br>
+            {$lang.timeSQL}: {$mysql.time}
+    {/if}
+        </div>
+    </div><!-- #wrapper .nosidebar -->
+</div><!-- #layout -->
 <!--[if lte IE 6]></td><th class="ie6layout-th"></th></tr></table><![endif]-->
 
 <noscript>

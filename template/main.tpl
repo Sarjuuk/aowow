@@ -24,7 +24,7 @@
         <div class="pad"></div>
 
         <form method="get" action="." onsubmit="if(trim(this.elements[0].value) == '') return false">
-            <input type="text" name="search" size="38" id="livesearch-generic" /><input type="submit" value="{$lang.search}" />
+            <input type="text" name="search" size="38" id="livesearch-generic" /><input type="submit" value="{$lang.searchButton}" />
         </form>
 
         <script type="text/javascript">var _ = ge('livesearch-generic'); LiveSearch.attach(_); _.focus();</script>

@@ -14,7 +14,7 @@
             <h1>{$page.title|escape:"html"}</h1>
         </div>
     </div>
-        <div id="wrapper" class="nosidebar">
+    <div id="wrapper" class="nosidebar">
         <div id="toptabs">
             <div id="toptabs-inner">
                 <div id="toptabs-right">
