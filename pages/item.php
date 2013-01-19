@@ -17,7 +17,7 @@ require_once('includes/class.faction.php');
 $id   = intVal($pageParam);
 $item = new Item($id);
 
-$cacheKeyPage = implode(':', [TYPEID_ITEM, CACHETYPE_PAGE, $id, -1, User::$localeId]);
+$cacheKeyPage = implode(':', [CACHETYPE_PAGE, TYPEID_ITEM, $id, -1, User::$localeId]);
 
 if (isset($_GET['xml']))
 {
@@ -54,7 +54,7 @@ else if (isset($_GET['power']))
         $itemString .= 's';
     }
 
-    $cacheKeyTooltip = implode(':', [TYPEID_ITEM, CACHETYPE_TOOLTIP, $itemString, -1, User::$localeId]);
+    $cacheKeyTooltip = implode(':', [CACHETYPE_TOOLTIP, TYPEID_ITEM, $itemString, -1, User::$localeId]);
 
     // output json for tooltips
     if (!$smarty->loadCache($cacheKeyTooltip, $x))

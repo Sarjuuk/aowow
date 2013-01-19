@@ -14,8 +14,8 @@ require_once('includes/class.item.php');
 $id    = intVal($pageParam);
 $spell = new Spell($id);
 
-$cacheKeyPage    = implode(':', [TYPEID_SPELL, CACHETYPE_PAGE,    $id, -1, User::$localeId]);
-$cacheKeyTooltip = implode(':', [TYPEID_SPELL, CACHETYPE_TOOLTIP, $id, -1, User::$localeId]);
+$cacheKeyPage    = implode(':', [CACHETYPE_PAGE,    TYPEID_SPELL, $id, -1, User::$localeId]);
+$cacheKeyTooltip = implode(':', [CACHETYPE_TOOLTIP, TYPEID_SPELL, $id, -1, User::$localeId]);
 
 if (isset($_GET['power']))
 {
@@ -156,7 +156,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             if($row['effect'.$j.'Id'] > 0)
             {
                 // Название эффекта
-                $spell['effect'][$i]['name'] = '('.$row['effect'.$j.'Id'].') '.$spellObj->effectNames[$row['effect'.$j.'Id']];
+                $spell['effect'][$i]['name'] = '('.$row['effect'.$j.'Id'].') '.Util::$spellEffectStrings[$row['effect'.$j.'Id']];
                 // Доп информация в имени
                 if($row['effect'.$j.'MiscValue'])
                 {

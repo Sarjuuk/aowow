@@ -49,8 +49,8 @@ if ($compareString)
     }
     $doneSummary = implode(',', $outSet);
 
-    $iList = new ItemList(array(array('i.entry', 'IN', $items)));
-    foreach ($iList->itemList as $item)
+    $iList = new ItemList(array(['i.entry', $items]));
+    foreach ($iList->container as $item)
     {
         $item->getJsonStats();
         $stats = array();

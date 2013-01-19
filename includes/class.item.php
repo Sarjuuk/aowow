@@ -3,55 +3,21 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-
-/*
--- JOIN
-?_item_template_addon
-    id                                                      // item Id
-    icon
-    subClass                                                // custom of certain categories
-    itemMods                                                // space separated; parsed
-    map                                                     // manually filled..? :(
-    cuFlags
-*/
-
-class Item
+class Item extends BaseType
 {
-    public $Id                      = 0;
-    public $name                    = '';
-    public $tooltip                 = '';
-    public $template                = array();
-    public $json                    = array();
-    public $itemMods                = array();
-    private $ssd                    = null;
+    public    $name       = '';
+    public    $tooltip    = '';
+    public    $json       = [];
+    public    $itemMods   = [];
+    private   $ssd        = null;
+
+    protected $setupQuery = 'SELECT * FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE i.entry = ?d';
 
     public function __construct($data)
     {
-        if (is_array($data))
-            $this->template = $data;
-        else
-           $this->template = DB::Aowow()->selectRow('
-                SELECT
-                    *
-                FROM
-                    item_template i,
-                    ?_item_template_addon iX,
-                    locales_item l
-                WHERE
-                    i.entry = iX.id
-                    AND i.entry = l.entry
-                    AND i.entry = ?d
-                ',
-                intVal($data)
-            );
+        parent::__construct($data);
 
-        if (!$this->template)                               // invalid Id/data passed
-            return false;
-
-        if (!$this->template['entry'])                      // may happen if item_locales is empty and overvwrites entry with NULL
-            $this->template['entry'] = intval($data);
-
-        $this->Id   = $this->template['entry'];             // easier reference
+        // post processing
         $this->name = Util::localizedString($this->template, 'name');
 
         // item is scaling; overwrite other values
@@ -148,8 +114,6 @@ class Item
             if ($this->json['classs'] == ITEM_CLASS_WEAPON && in_array($this->json['subclass'], [5, 6, 10]) && $this->json['dps'] > 54.8)
                 $this->json['feratkpwr'] = max(0, round((($this->json['dmgmin1'] + $this->json['dmgmax1']) / (2 * $this->template['delay'] / 1000) - 54.8) * 14, 0));
         }
-
-        return true;
     }
 
     // use if you JUST need the name
@@ -192,15 +156,6 @@ class Item
         return array(
             'id'       => $this->Id,
             'name'     => $this->name,
-        );
-    }
-
-    public function getDetailedData()
-    {
-       return array(
-            'id'       => $this->Id,
-            'name'     => $this->name,
-            'iconname' => $this->template['icon'],
         );
     }
 
@@ -612,10 +567,10 @@ class Item
                 if ($craftSpell->template["reagent".$i])
                     $reagentItems[$craftSpell->template["reagent".$i]] = $craftSpell->template["reagentCount".$i];
 
-            $reagents = new ItemList(array(array('i.entry', 'IN', array_keys($reagentItems))));
+            $reagents = new ItemList(array(['i.entry', array_keys($reagentItems)]));
             $reqReag  = array();
 
-            foreach ($reagents->itemList as $r)
+            foreach ($reagents->container as $r)
                 $reqReag[] = '<a href="?item='.$r->Id.'">'.$r->name.'</a> ('.$reagentItems[$r->Id].')';
 
             $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->template['spellid_2'].'">'.Util::localizedString($this->template, 'description').'</a></span>';
@@ -970,10 +925,11 @@ class Item
     }
 }
 
-class ItemList
+
+
+class ItemList extends BaseTypeList
 {
-    public $itemList = array();
-    public $filter = NULL;
+    protected $setupQuery = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON  i.entry = l.entry WHERE [filter] [cond] GROUP BY i.entry ORDER BY i.Quality DESC';
 
     public function __construct($conditions)
     {
@@ -982,45 +938,10 @@ class ItemList
         {
             $this->filter = new ItemFilter();
             if (($fiData = $this->filter->init()) === false)
-                return false;
+                return;
         }
 
-        $sql = array();
-        foreach ($conditions as $c)
-        {
-            if (!$c || empty($c))
-                continue;
-
-            if ($c[1] == 'IN' && is_array($c[2]))
-                $sql[] = Util::sqlEscape($c[0]).' IN ('.implode(',', Util::sqlEscape($c[2])).')';
-            else
-                $sql[] = Util::sqlEscape($c[0]).' '.Util::sqlEscape($c[1]).(is_string($c[2]) ? ' "'.Util::sqlEscape($c[2]).'"' : ' '.intval($c[2]));
-        }
-
-        // todo: add strings propperly without them being escaped by simpleDB..?
-        $filterQuery = $this->filter && $this->filter->buildFilterQuery() ? ' AND '.$this->filter->query : NULL;
-
-        $rows = DB::Aowow()->select('
-            SELECT
-                *,
-                l.*
-            FROM
-                item_template i, ?_item_template_addon iX , locales_item l
-            WHERE
-                i.entry = iX.id
-                AND i.entry = l.entry
-                '.$filterQuery.'
-                '.(!empty($sql) ? 'AND ('.implode(" AND ", $sql).')' : null).'
-            GROUP BY
-                i.entry
-            ORDER BY
-                i.Quality DESC'
-        );
-
-        foreach ($rows as $row)
-            $this->itemList[] = new Item($row);
-
-        return true;
+        parent::__construct($conditions);
     }
 }
 

@@ -147,7 +147,7 @@ if (!defined('AOWOW_REVISION'))
             if (!isset($castItems[$spl->Id]))
                 $castItems[$spl->Id] = new ItemList([['spellid_1', '=', $spl->Id], ['name', 'NOT LIKE', 'Scroll of Enchant%']]);  // do not reuse enchantment scrolls
 
-            foreach ($castItems[$spl->Id]->itemList as $item)
+            foreach ($castItems[$spl->Id]->container as $item)
             {
                 $ench['name'][]   = Util::jsEscape(Util::localizedString($item->template, 'name'));
                 $ench['source'][] = -$item->Id;
