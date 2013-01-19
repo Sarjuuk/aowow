@@ -1291,6 +1291,12 @@ a.star-icon-right span
     padding-right: 34px !important;
 }
 
+.bc-icon-right
+{
+    background: url(../../images/icons/bc_icon.gif) right center no-repeat;
+    padding-right: 34px !important;
+}
+
 .wotlk-icon
 {
     background: url(../../images/icons/wotlk_icon.gif) right center no-repeat;
@@ -1299,7 +1305,7 @@ a.star-icon-right span
 
 .wotlk-icon-right
 {
-    background: url(../../images/icons/wotlk.gif) right center no-repeat;
+    background: url(../../images/icons/wotlk_icon.gif) right center no-repeat;
     padding-right: 41px !important;
 }
 
@@ -2428,9 +2434,16 @@ div.live-search-icon
 
 div.live-search-icon div
 {
-    background-image: url(../images/border_small.png);
+    background-image: url(../../images/icons/border_small.png);
     background-position: left center;
     background-repeat: no-repeat;
+}
+
+div.live-search-icon-boss
+ {
+	background-image: url(../../images/icons/boss.gif);
+	background-position: 8px center;
+	background-repeat: no-repeat;
 }
 
 div.live-search-icon-quest-alliance
@@ -2961,10 +2974,12 @@ a:hover, a.open, .text b, .text ol li div, .text li div, .infobox li div, .minib
     text-decoration: underline;
 }
 
+/* probably unnessecary
 #wrapper.nosidebar #main, #wrapper.nosidebar
 {
     min-height: 0;
 }
+*/
 
 #footer a, #beyondfooter a
 {

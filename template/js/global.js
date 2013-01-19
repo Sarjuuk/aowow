@@ -7954,16 +7954,17 @@ Listview.funcBox = {
 			break
 		}
 	},
-	getExpansionText: function (a) {
-		var b = "";
-		if (a.expansion == 1) {
-			b += " bc"
-		} else {
-			if (a.expansion == 2) {
-				b += " wotlk wrath"
-			}
+	getExpansionText: function (line) {
+		var str = '';
+
+		if (line.expansion == 1) {
+			str += ' bc';
 		}
-		return b
+        else if (line.expansion == 2) {
+            str += ' wotlk wrath';
+        }
+
+		return str;
 	}
 };
 Listview.templates = {
@@ -9046,308 +9047,338 @@ Listview.templates = {
 		}
 	},
 	quest: {
-		sort: [1, 2],
+		sort: [1,2],
 		nItemsPerPage: 100,
 		searchable: 1,
 		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			compute: function (c, d) {
-				var m = ce("div");
-				var b = ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(c);
-				ae(b, ct(c.name));
-				ae(m, b)
-				if (c.reqclass) {
-					var k = ce("div");
-					k.className += " small2";
-					var e = Listview.funcBox.assocBinFlags(c.reqclass, g_chr_classes);
-					for (var g = 0, h = e.length; g < h; ++g) {
-						if (g > 0) {
-							ae(k, ct(LANG.comma))
-						}
-						var l = ce("a");
-						l.href = "?class=" + e[g];
-						l.className += "c" + e[g];
-						st(l, g_chr_classes[e[g]]);
-						ae(k, l);
-					}
-					ae(m, k);
-				}
-				if (c.wflags & 1 || (c.wflags & 32) || (c.reqrace && c.reqrace != -1)) {
-					m.style.position = "relative";
-					var n = ce("div");
-					n.className = "small";
-					n.style.fontStyle = "italic";
-					n.style.position = "absolute";
-					n.style.right = "3px";
-					n.style.bottom = "3px";
-					n.style.textAlign = "right";
-					if (c.wflags & 1) {
-						var p = ce("span");
-                        p.style.color = "red";
-                        ae(p, ct(LANG.lvdisabled));
-						ae(n, p);
-					}
-					if (c.wflags & 32) {
-						if (c.wflags & 1) {
-							ae(n, ce("br"));
-							m.style.height = "33px";
-						}
-						var p = ce("span"),
-                        o = LANG.lvquest_autoaccept;
-						if (c.wflags & 64) {
-							p.style.color = "red";
-                            o += " " + LANG.lvquest_hostile;
-						}
-                        ae(p, ct(o));
-						ae(n, p)
-					}
-                    if (c.reqrace && c.reqrace != -1) {
-                        var e = Listview.funcBox.assocBinFlags(c.reqrace, g_chr_races);
-						if (e.length && (c.wflags & 1 || (c.wflags & 32))) {
-							ae(n, ce("br"));
-                            m.style.height = "33px";
-						}
-                        for (var g = 0, h = e.length; g < h; ++g) {
-                            if (g > 0) {
-                                ae(n, ct(LANG.comma))
+		columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                compute: function (quest, td) {
+                    var wrapper = ce('div');
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(quest);
+                    ae(a, ct(quest.name));
+                    ae(wrapper, a);
+
+                    if (quest.reqclass) {
+                        var d = ce('div');
+                        d.className += ' small2';
+
+                        var classes = Listview.funcBox.assocBinFlags(quest.reqclass, g_chr_classes);
+
+                        for (var i = 0, len = classes.length; i < len; ++i) {
+                            if (i > 0) {
+                                ae(d, ct(LANG.comma));
                             }
-                            var l = ce("a");
-                            l.href = "?race=" + e[g];
-                            l.className += "q1";
-                            st(l, g_chr_races[e[g]]);
-                            ae(n, l)
+
+                            var a = ce('a');
+                            a.href = '?class=' + classes[i];
+                            a.className += 'c' + classes[i];
+                            st(a, g_chr_classes[classes[i]]);
+                            ae(d, a);
+                        }
+
+                        ae(wrapper, d);
+                    }
+
+                    if (quest.wflags & 1 || (quest.wflags & 32) || (quest.reqrace && quest.reqrace != -1)) {
+                        wrapper.style.position = 'relative';
+                        var d = ce('div');
+                        d.className = 'small';
+                        d.style.fontStyle = 'italic';
+                        d.style.position = 'absolute';
+                        d.style.right = '3px';
+                        d.style.bottom = '3px';
+                        d.style.textAlign = 'right';
+                        if (quest.wflags & 1) {
+                            var s = ce('span');
+                            s.style.color = 'red';
+                            ae(s, ct(LANG.lvdisabled));
+                            // ae(s, ct(LANG.lvquest_removed));
+                            ae(d, s);
+                        }
+
+                        if (quest.wflags & 32) {
+                            if (quest.wflags & 1) {
+                                ae(d, ce('br'));
+                                wrapper.style.height = '33px';
+                            }
+
+                            var
+                                s = ce('span'),
+                                o = LANG.lvquest_autoaccept;
+                            if (quest.wflags & 64) {
+                                s.style.color = 'red';
+                                o += ' ' + LANG.lvquest_hostile;
+                            }
+                            ae(s, ct(o));
+                            ae(d, s);
+                        }
+
+                        if (quest.reqrace && quest.reqrace != -1) {
+                            var races = Listview.funcBox.assocBinFlags(quest.reqrace, g_chr_races);
+
+                            if (races.length && (quest.wflags & 1 || (quest.wflags & 32))) {
+                                ae(d, ce('br'));
+                                wrapper.style.height = '33px';
+                            }
+
+                            for (var i = 0, len = races.length; i < len; ++i) {
+                                if (i > 0) {
+                                    ae(d, ct(LANG.comma));
+                                }
+
+                                var l = ce('a');
+                                l.href = '?race=' + races[i];
+                                l.className += 'q1';
+                                st(l, g_chr_races[races[i]]);
+                                ae(d, l);
+                            }
+                        }
+
+                        ae(wrapper, d);
+                    }
+
+                    ae(td, wrapper);
+                }
+            },
+            {
+                id: 'level',
+                name: LANG.level,
+                value: 'level',
+                compute: function (quest, td) {
+                    if (quest.type || quest.daily || quest.weekly) {
+                        var d = ce('div');
+                        d.className = 'small';
+                        nw(d);
+
+                        if (quest.daily) {
+                            if (quest.type) {
+                                ae(d, ct(sprintf(LANG.lvquest_daily, g_quest_types[quest.type])));
+                            }
+                            else {
+                                ae(d, ct(LANG.daily));
+                            }
+                        }
+                        else if (quest.weekly) {
+                            if (quest.type) {
+                                ae(d, ct(sprintf(LANG.lvquest_weekly, g_quest_types[quest.type])));
+                            }
+                            else {
+                                ae(d, ct(LANG.weekly));
+                            }
+                        }
+                        else if (quest.type) {
+                            ae(d, ct(g_quest_types[quest.type]));
+                        }
+
+                        ae(td, d);
+                    }
+
+                    return quest.level;
+                },
+                getVisibleText: function (quest) {
+                    var buff = '';
+
+                    if (quest.type) {
+                        buff += ' ' + g_quest_types[quest.type];
+                    }
+
+                    if (quest.daily) {
+                        buff += ' ' + LANG.daily;
+                    }
+                    else if (quest.weekly) {
+                        buff += ' ' + LANG.weekly;
+                    }
+
+                    if (quest.level) {
+                        buff += ' ' + quest.level;
+                    }
+
+                    return buff;
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(a.level, b.level) || strcmp(a.type, b.type);
+                }
+            },
+            {
+                id: 'reqlevel',
+                name: LANG.req,
+                tooltip: LANG.tooltip_reqlevel,
+                value: 'reqlevel'
+            },
+            {
+                id: 'side',
+                name: LANG.side,
+                type: 'text',
+                compute: function (quest, td) {
+                    if (quest.side && quest.side != 3) {
+                        var sp = ce('span');
+                        sp.className = (quest.side == 1 ? 'alliance-icon': 'horde-icon');
+                        sp.onmouseover = function (e) {
+                            Tooltip.showAtCursor(e, g_sides[quest.side], 0, 0, 'q');
+                        };
+                        sp.onmousemove = Tooltip.cursorUpdate;
+                        sp.onmouseout = Tooltip.hide;
+                        ae(td, sp);
+                    }
+                    else if (!quest.side) {
+                        ae(td, ct('??'));
+                    }
+                },
+                getVisibleText: function (quest) {
+                    if (quest.side) {
+                        return g_sides[quest.side];
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_sides[a.side], g_sides[b.side]);
+                }
+            },
+            {
+                id: 'rewards',
+                name: LANG.rewards,
+                compute: function (quest, td) {
+                    var hasIcons = (quest.itemchoices != null || quest.itemrewards != null);
+                    if (hasIcons) {
+                        var
+                            choiceText,
+                            rewardText;
+                        if (quest.itemchoices && quest.itemchoices.length > 1) {
+                            choiceText = LANG.lvquest_pickone;
+                            if (quest.itemrewards && quest.itemrewards.length > 0) {
+                                rewardText = LANG.lvquest_alsoget;
+                            }
+                        }
+
+                        Listview.funcBox.createCenteredIcons(quest.itemchoices, td, choiceText, 2);
+                        Listview.funcBox.createCenteredIcons(quest.itemrewards, td, rewardText, 2);
+                    }
+
+                    if (quest.titlereward && g_titles[quest.titlereward]) {
+                        var title = g_titles[quest.titlereward]['name_' + g_locale.name];
+                        title = title.replace('%s', '<span class="q0">&lt;' + LANG.name + '&gt;</span>');
+                        var span = ce('a');
+                        span.className = 'q1';
+                        span.href = '?title=' + quest.titlereward;
+                        span.innerHTML = title;
+                        ae(td, span);
+                        ae(td, ce('br'));
+                    }
+                },
+                getVisibleText: function (quest) {
+                    var buff = '';
+
+                    if (quest.itemchoices && quest.itemchoices.length) {
+                        buff += ' ' + LANG.lvquest_pickone;
+                        if (quest.itemrewards && quest.itemrewards.length) {
+                            buff += ' ' + LANG.lvquest_alsoget;
                         }
                     }
-					ae(m, n)
-				}
-				ae(d, m);
-			}
-		},
-		{
-			id: "level",
-			name: LANG.level,
-			width: "7%",
-			value: "level",
-			compute: function (a, c) {
-				if (a.type || a.daily || a.weekly) {
-					var b = ce("div");
-					b.className = "small";
-					nw(b);
-					if (a.daily) {
-						if (a.type) {
-							ae(b, ct(sprintf(LANG.lvquest_daily, g_quest_types[a.type])))
-						} else {
-							ae(b, ct(LANG.daily))
-						}
-					} else {
-						if (a.weekly) {
-							if (a.type) {
-								ae(b, ct(sprintf(LANG.lvquest_weekly, g_quest_types[a.type])))
-							} else {
-								ae(b, ct(LANG.weekly))
-							}
-						} else {
-							if (a.type) {
-								ae(b, ct(g_quest_types[a.type]))
-							}
-						}
-					}
-					ae(c, b)
-				}
-				return a.level
-			},
-			getVisibleText: function (a) {
-				var b = "";
-				if (a.type) {
-					b += " " + g_quest_types[a.type]
-				}
-				if (a.daily) {
-					b += " " + LANG.daily
-				} else {
-					if (a.weekly) {
-						b += " " + LANG.weekly
-					}
-				}
-				if (a.level) {
-					b += " " + a.level
-				}
-				return b
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(d.level, c.level) || strcmp(d.type, c.type)
-			}
-		},
-		{
-			id: "reqlevel",
-			name: LANG.req,
-			tooltip: LANG.tooltip_reqlevel,
-			width: "7%",
-			value: "reqlevel"
-		},
-		{
-			id: "side",
-			name: LANG.side,
-			type: "text",
-			compute: function (a, c) {
-				if (a.side && a.side != 3) {
-					var b = ce("span");
-					b.className = (a.side == 1 ? "alliance-icon": "horde-icon");
-					b.onmouseover = function (d) {
-						Tooltip.showAtCursor(d, g_sides[a.side], 0, 0, "q")
-					};
-					b.onmousemove = Tooltip.cursorUpdate;
-					b.onmouseout = Tooltip.hide;
-					ae(c, b)
-				} else {
-					if (!a.side) {
-						ae(c, ct("??"))
-					}
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.side) {
-					return g_sides[a.side]
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_sides[d.side], g_sides[c.side])
-			}
-		},
-		{
-			id: "rewards",
-			name: LANG.rewards,
-			width: "25%",
-			compute: function (b, g) {
-				var a = (b.itemchoices != null || b.itemrewards != null);
-				if (a) {
-					var f, e;
-					if (b.itemchoices && b.itemchoices.length > 1) {
-						f = LANG.lvquest_pickone;
-						if (b.itemrewards && b.itemrewards.length > 0) {
-							e = LANG.lvquest_alsoget
-						}
-					}
-					Listview.funcBox.createCenteredIcons(b.itemchoices, g, f, 2);
-					Listview.funcBox.createCenteredIcons(b.itemrewards, g, e, 2)
-				}
-				if (b.titlereward && g_titles[b.titlereward]) {
-					var d = g_titles[b.titlereward]["name_" + g_locale.name];
-					d = d.replace("%s", '<span class="q0">&lt;' + LANG.name + "&gt;</span>");
-					var c = ce("a");
-					c.className = "q1";
-					c.href = "?title=" + b.titlereward;
-					c.innerHTML = d;
-					ae(g, c);
-					ae(g, ce("br"))
-				}
-			},
-			getVisibleText: function (a) {
-				var b = "";
-				if (a.itemchoices && a.itemchoices.length) {
-					b += " " + LANG.lvquest_pickone;
-					if (a.itemrewards && a.itemrewards.length) {
-						b += " " + LANG.lvquest_alsoget
-					}
-				}
-				if (a.titlereward && g_titles[a.titlereward]) {
-					b += " " + g_titles[a.titlereward]["name_" + g_locale.name]
-				}
-				return b
-			},
-			sortFunc: function (d, c, e) {
-				var g = (d.itemchoices != null ? d.itemchoices.length: 0) + (d.itemrewards != null ? d.itemrewards.length: 0);
-				var f = (c.itemchoices != null ? c.itemchoices.length: 0) + (c.itemrewards != null ? c.itemrewards.length: 0);
-				var i = (d.titlereward && g_titles[d.titlereward] ? g_titles[d.titlereward]["name_" + g_locale.name] : "");
-				var h = (c.titlereward && g_titles[c.titlereward] ? g_titles[c.titlereward]["name_" + g_locale.name] : "");
-				return strcmp(g, f) || strcmp(i, h)
-			}
-		},
-		{
-			id: "experience",
-			name: LANG.exp,
-			value: "xp"
-		},
-		{
-			id: "money",
-			name: LANG.money,
-			compute: function (a, b) {
-				if (a.money > 0 || a.currencyrewards != null) {
-					if (a.money > 0) {
-						Listview.funcBox.appendMoney(b, a.money);
-						if (a.currencyrewards != null) {
-							ae(b, ct(" + "))
-						}
-					}
-					if (a.currencyrewards != null) {
-						Listview.funcBox.appendMoney(b, null, a.side, null, a.currencyrewards)
-					}
-				}
-			},
-			getVisibleText: function (a) {
-				var c = "";
-				for (var b = 0; b < a.currencyrewards.length; ++b) {
-					if (g_gatheredcurrencies[a.currencyrewards[b][0]]) {
-						c += " " + g_gatheredcurrencies[a.currencyrewards[b][0]]["name_" + g_locale.name]
-					}
-				}
-				return c
-			},
-			sortFunc: function (d, c, e) {
-				var g = 0,
-				f = 0;
-				if (d.currencyrewards && d.currencyrewards.length) {
-					for (a in d.currencyrewards) {
-						var b = (d.currencyrewards)[a];
-						g += b[1]
-					}
-				}
-				if (c.currencyrewards && c.currencyrewards.length) {
-					for (a in c.currencyrewards) {
-						var b = (c.currencyrewards)[a];
-						f += b[1]
-					}
-				}
-				return strcmp(g, f) || strcmp(d.money, c.money)
-			}
-		},
-		{
-			id: "reputation",
-			name: LANG.reputation,
-			width: "14%",
-			value: "id",
-			hidden: true
-		},
-		{
-			id: "category",
-			name: LANG.category,
-			type: "text",
-			width: "16%",
-			compute: function (c, d) {
-				if (c.category != 0) {
-					d.className = "small q1";
-					var b = ce("a");
-					b.href = "?quests=" + c.category2 + "." + c.category;
-					ae(b, ct(Listview.funcBox.getQuestCategory(c.category)));
-					ae(d, b)
-				}
-			},
-			getVisibleText: function (a) {
-				return Listview.funcBox.getQuestCategory(a.category)
-			},
-			sortFunc: function (d, c, f) {
-				var e = Listview.funcBox.getQuestCategory;
-				return strcmp(e(d.category), e(c.category))
-			}
-		}],
-		getItemLink: function (a) {
-			return "?quest=" + a.id
+
+                    if (quest.titlereward && g_titles[quest.titlereward]) {
+                        buff += ' ' + g_titles[quest.titlereward]['name_' + g_locale.name];
+                    }
+
+                    return buff;
+                },
+                sortFunc: function (a, b, col) {
+                    var lenA = (a.itemchoices != null ? a.itemchoices.length : 0) + (a.itemrewards != null ? a.itemrewards.length : 0);
+                    var lenB = (b.itemchoices != null ? b.itemchoices.length : 0) + (b.itemrewards != null ? b.itemrewards.length : 0);
+                    var titleA = (a.titlereward && g_titles[a.titlereward] ? g_titles[a.titlereward]['name_' + g_locale.name] : '');
+                    var titleB = (b.titlereward && g_titles[b.titlereward] ? g_titles[b.titlereward]['name_' + g_locale.name] : '');
+                    return strcmp(lenA, lenB) || strcmp(titleA, titleB);
+                }
+            },
+            {
+                id: 'experience',
+                name: LANG.exp,
+                value: 'xp'
+            },
+            {
+                id: 'money',
+                name: LANG.money,
+                compute: function (quest, td) {
+                    if (quest.money > 0 || quest.currencyrewards != null) {
+                        if (quest.money > 0) {
+                            Listview.funcBox.appendMoney(td, quest.money);
+                            if (quest.currencyrewards != null) {
+                                ae(td, ct(' + '));
+                            }
+                        }
+
+                        if (quest.currencyrewards != null) {
+                            Listview.funcBox.appendMoney(td, null, quest.side, null, quest.currencyrewards);
+                        }
+                    }
+                },
+                getVisibleText: function (quest) {
+                    var buff = '';
+                    for (var i = 0; quest.currencyrewards && i < quest.currencyrewards.length; ++i) {
+                        if (g_gatheredcurrencies[quest.currencyrewards[i][0]]) {
+                            buff += ' ' + g_gatheredcurrencies[quest.currencyrewards[i][0]]['name_' + g_locale.name];
+                        }
+                    }
+                    return buff;
+                },
+                sortFunc: function (a, b, col) {
+                    var
+                        lenA = 0,
+                        lenB = 0;
+
+                    if (a.currencyrewards && a.currencyrewards.length) {
+                        for (i in a.currencyrewards) {
+                            var c = (a.currencyrewards)[i];
+                            lenA += c[1];
+                        }
+                    }
+                    if (b.currencyrewards && b.currencyrewards.length) {
+                        for (a in b.currencyrewards) {
+                            var c = (b.currencyrewards)[i];
+                            lenB += c[1];
+                        }
+                    }
+                    return strcmp(lenA, lenB) || strcmp(a.money, b.money);
+                }
+            },
+            {
+                id: 'reputation',
+                name: LANG.reputation,
+                width: '14%',
+                value: 'id',
+                hidden: true
+            },
+            {
+                id: 'category',
+                name: LANG.category,
+                type: 'text',
+                compute: function (quest, td) {
+                    if (quest.category != 0) {
+                        td.className = 'small q1';
+                        var a = ce('a');
+                        a.href = '?quests=' + quest.category2 + '.' + quest.category;
+                        ae(a, ct(Listview.funcBox.getQuestCategory(quest.category)));
+                        ae(td, a);
+                    }
+                },
+                getVisibleText: function (quest) {
+                    return Listview.funcBox.getQuestCategory(quest.category);
+                },
+                sortFunc: function (a, b, col) {
+                    var _ = Listview.funcBox.getQuestCategory;
+                    return strcmp(_(a.category), _(b.category));
+                }
+            }
+        ],
+
+		getItemLink: function (quest) {
+			return '?quest=' + quest.id;
 		}
 	},
 	skill: {
@@ -11367,256 +11398,243 @@ Listview.templates = {
 		nItemsPerPage: 100,
 		searchable: 1,
 		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			span: 2,
-			compute: function (c, j, g) {
-				var b = null;
-				if (c.who && c.completed) {
-					b = "who=" + c.who + "&when=" + c.completed.getTime()
-				}
-				var f = ce("td");
-				f.style.width = "1px";
-				f.style.padding = "0";
-				f.style.borderRight = "none";
-				ae(f, g_achievements.createIcon(c.id, 1));
-				Icon.getLink(f.firstChild).href = this.template.getItemLink(c);
-				Icon.getLink(f.firstChild).rel = b;
-				ae(g, f);
-				j.style.borderLeft = "none";
-				var e = ce("a");
-				e.style.fontFamily = "Verdana, sans-serif";
-				e.href = this.template.getItemLink(c);
-				e.rel = b;
-				ae(e, ct(c.name));
-				ae(j, e);
-				if (c.description != null) {
-					var h = ce("div");
-					h.className = "small";
-					ae(h, ct(c.description));
-					ae(j, h)
-				}
-			},
-			getVisibleText: function (a) {
-				var b = a.name;
-				if (a.description) {
-					b += " " + a.description
-				}
-				return b
-			}
-		},
-		{
-			id: "location",
-			name: LANG.location,
-			type: "text",
-			width: "15%",
-			compute: function (b, d) {
-				if (b.zone) {
-					var c = ce("a");
-					c.className = "q1";
-					c.href = "?zone=" + b.zone;
-					ae(c, ct(g_zones[b.zone]));
-					ae(d, c)
-				}
-			},
-			getVisibleText: function (a) {
-				return Listview.funcBox.arrayText(a.zone, g_zones)
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_zones[d.zone], g_zones[c.zone])
-			},
-            hidden: true
-		},
-        {
-			id: "side",
-			name: LANG.side,
-			type: "text",
-			compute: function (a, c) {
-				if (a.side && a.side != 3) {
-					var b = ce("span");
-					b.className = (a.side == 1 ? "alliance-icon": "horde-icon");
-					b.onmouseover = function (d) {
-						Tooltip.showAtCursor(d, g_sides[a.side], 0, 0, "q")
-					};
-					b.onmousemove = Tooltip.cursorUpdate;
-					b.onmouseout = Tooltip.hide;
-					ae(c, b)
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.side) {
-					return g_sides[a.side]
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_sides[d.side], g_sides[c.side])
-			}
-		},
-		{
-			id: "points",
-			name: LANG.points,
-			type: "number",
-			width: "10%",
-			value: "points",
-			compute: function (a, b) {
-				if (a.points) {
-					Listview.funcBox.appendMoney(b, 0, null, 0, 0, 0, a.points)
-				}
-			}
-		},
-		{
-			id: "rewards",
-			name: LANG.rewards,
-			type: "text",
-			width: "20%",
-			compute: function (h, d) {
-				if (h.rewards) {
-					var c = [];
-					var b = []; // spellrewards not present in 3.x
-					var f = [];
-					for (var e = 0; e < h.rewards.length; e++) {
-						if (h.rewards[e][0] == 11) {
-							f.push(h.rewards[e][1])
-						} else {
-							if (h.rewards[e][0] == 3) {
-								c.push(h.rewards[e][1])
-							} else {
-								if (h.rewards[e][0] == 6) {
-									b.push(h.rewards[e][1])
-								}
-							}
-						}
-					}
-					if (c.length > 0) {
-						for (var e = 0; e < c.length; e++) {
-							if (!g_items[c[e]]) {
-								return
-							}
-							var m = g_items[c[e]];
-							var k = ce("a");
-							k.href = "?item=" + c[e];
-							k.className = "q" + m.quality + " icontiny tinyspecial";
-							k.style.backgroundImage = "url(" + g_staticUrl + "/images/icons/tiny/" + m.icon.toLowerCase() + ".gif)";
-							ae(k, ct(m["name_" + g_locale.name]));
-							var l = ce("span");
-							ae(l, k);
-							ae(d, l);
-							ae(d, ce("br"))
-						}
-					}
-					if (b.length > 0) {
-						for (var e = 0; e < b.length; e++) {
-							if (!g_spells[b[e]]) {
-								return
-							}
-							var m = g_spells[b[e]];
-							var k = ce("a");
-							k.href = "?spell=" + b[e];
-							k.className = "q8 icontiny tinyspecial";
-							k.style.backgroundImage = "url(" + g_staticUrl + "/images/icons/tiny/" + m.icon.toLowerCase() + ".gif)";
-							ae(k, ct(m["name_" + g_locale.name]));
-							var l = ce("span");
-							ae(l, k);
-							ae(d, l);
-							ae(d, ce("br"))
-						}
-					}
-					if (f.length > 0) {
-						for (var e = 0; e < f.length; e++) {
-							if (!g_titles[f[e]]) {
-								return
-							}
-							var g = g_titles[f[e]]["name_" + g_locale.name];
-							g = g.replace("%s", '<span class="q0">&lt;' + LANG.name + "&gt;</span>");
-							var l = ce("a");
-							l.className = "q1";
-							l.href = "?title=" + f[e];
-							l.innerHTML = g;
-							ae(d, l);
-							ae(d, ce("br"))
-						}
-					}
-				} else {
-					if (h.reward) {
-						var l = ce("span");
-						l.className = "q1";
-						ae(l, ct(h.reward));
-						ae(d, l)
-					}
-				}
-			},
-			getVisibleText: function (b) {
-				var d = "";
-				if (b.rewards) {
-					for (var c = 0; c < b.rewards.length; c++) {
-						if (b.rewards[c][0] == 11) {
-							d += " " + g_titles[b.rewards[c][1]]["name_" + g_locale.name].replace("%s", "<" + LANG.name + ">")
-						} else {
-							if (b.rewards[c][0] == 3) {
-								d += " " + g_items[b.rewards[c][1]]["name_" + g_locale.name]
-							} else {
-								if (b.rewards[c][0] == 6) {
-									d += " " + g_spells[b.rewards[c][1]]["name_" + g_locale.name]
-								}
-							}
-						}
-					}
-				} else {
-					if (b.reward) {
-						d += " " + b.reward
-					}
-				}
-				return d
-			},
-			sortFunc: function (d, c, e) {
-				var f = this.getVisibleText(d);
-				var g = this.getVisibleText(c);
-				if (f != "" && g == "") {
-					return -1
-				}
-				if (g != "" && f == "") {
-					return 1
-				}
-				return strcmp(f, g)
-			}
-        },
-		{
-			id: "category",
-			name: LANG.category,
-			type: "text",
-			width: "15%",
-			compute: function (b, d) {
-				d.className = "small";
-				f = "?achievements=";
-				if (b.category != -1 && b.parentcat != -1) {
-                    var c = ce("a");
-					c.className = "q0";
-                    c.href = "?achievements=" + b.parentcat;
-					ae(c, ct(g_achievement_categories[b.parentcat]));
-					ae(d, c);
-					ae(d, ce("br"));
-					f = c.href + "."
-				}
-				var e = ce("a");
-				e.className = "q1";
-				e.href = f + b.category;
-				ae(e, ct(g_achievement_categories[b.category]));
-				ae(d, e)
-			},
-			getVisibleText: function (a) {
-				return g_achievement_categories[a.category]
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_achievement_categories[d.category], g_achievement_categories[c.category])
-			},
-			hidden: true
-		}],
-		getItemLink: function (a) {
-			return "?achievement=" + a.id
+		columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                span: 2,
+                compute: function (achievement, td, tr) {
+                    var rel = null;
+                    if (achievement.who && achievement.completed) {
+                        rel = 'who=' + achievement.who + '&when=' + achievement.completed.getTime();
+                    }
+
+                    var i = ce('td');
+                    i.style.width = '1px';
+                    i.style.padding = '0';
+                    i.style.borderRight = 'none';
+
+                    ae(i, g_achievements.createIcon(achievement.id, 1));
+
+                    Icon.getLink(i.firstChild).href = this.template.getItemLink(achievement);
+                    Icon.getLink(i.firstChild).rel = rel;
+
+                    ae(tr, i);
+                    td.style.borderLeft = 'none';
+
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(achievement);
+                    a.rel = rel;
+                    ae(a, ct(achievement.name));
+                    ae(td, a);
+
+                    if (achievement.description != null) {
+                        var d = ce('div');
+                        d.className = 'small';
+                        ae(d, ct(achievement.description));
+                        ae(td, d);
+                    }
+                },
+                getVisibleText: function (achievement) {
+                    var buff = achievement.name;
+                    if (achievement.description) {
+                        buff += ' ' + achievement.description;
+                    }
+                    return buff;
+                }
+            },
+            {
+                id: 'side',
+                name: LANG.side,
+                type: 'text',
+                compute: function (achievement, td) {
+                    if (achievement.side && achievement.side != 3) {
+                        var sp = ce('span');
+                        sp.className = (achievement.side == 1 ? 'alliance-icon': 'horde-icon');
+                        sp.onmouseover = function (e) {
+                            Tooltip.showAtCursor(e, g_sides[achievement.side], 0, 0, 'q');
+                        };
+                        sp.onmousemove = Tooltip.cursorUpdate;
+                        sp.onmouseout = Tooltip.hide;
+                        ae(td, sp);
+                    }
+                },
+                getVisibleText: function (achievement) {
+                    if (achievement.side) {
+                        return g_sides[achievement.side];
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_sides[a.side], g_sides[b.side]);
+                }
+            },
+            {
+                id: 'points',
+                name: LANG.points,
+                type: 'number',
+                width: '10%',
+                value: 'points',
+                compute: function (achievement, td) {
+                    if (achievement.points) {
+                        Listview.funcBox.appendMoney(td, 0, null, 0, 0, 0, achievement.points);
+                    }
+                }
+            },
+            {
+                id: 'rewards',
+                name: LANG.rewards,
+                type: 'text',
+                width: '20%',
+                compute: function (achievement, td) {
+                    if (achievement.rewards) {
+                        var itemrewards = [];
+                        var spellrewards = []; // not used in 3.3.5
+                        var titlerewards = [];
+                        for (var i = 0; i < achievement.rewards.length; i++) {
+                            if (achievement.rewards[i][0] == 11) {
+                                titlerewards.push(achievement.rewards[i][1]);
+                            }
+                            else  if (achievement.rewards[i][0] == 3) {
+                                itemrewards.push(achievement.rewards[i][1]);
+                            }
+                            else if (achievement.rewards[i][0] == 6) {
+                                spellrewards.push(achievement.rewards[i][1]);
+                            }
+                        }
+                        if (itemrewards.length > 0) {
+                            for (var i = 0; i < itemrewards.length; i++) {
+                                if (!g_items[itemrewards[i]]) {
+                                    return;
+                                }
+
+                                var item = g_items[itemrewards[i]];
+                                var a = ce('a');
+                                a.href = '?item=' + itemrewards[i];
+                                a.className = 'q' + item.quality + ' icontiny tinyspecial';
+                                a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
+                                ae(a, ct(item['name_' + g_locale.name]));
+                                var span = ce('span');
+                                ae(span, a);
+                                ae(td, span);
+                                ae(td, ce('br'));
+                            }
+                        }
+                        if (spellrewards.length > 0) {
+                            for (var i = 0; i < spellrewards.length; i++) {
+                                if (!g_spells[spellrewards[i]]) {
+                                    return;
+                                }
+
+                                var item = g_spells[spellrewards[i]];
+                                var a = ce('a');
+                                a.href = '?spell=' + spellrewards[i];
+                                a.className = 'q8 icontiny tinyspecial';
+                                a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
+                                ae(a, ct(item['name_' + g_locale.name]));
+                                var span = ce('span');
+                                ae(span, a);
+                                ae(td, span);
+                                ae(td, ce('br'));
+                            }
+                        }
+                        if (titlerewards.length > 0) {
+                            for (var i = 0; i < titlerewards.length; i++) {
+                                if (!g_titles[titlerewards[i]]) {
+                                    return;
+                                }
+
+                                var title = g_titles[titlerewards[i]]['name_' + g_locale.name];
+                                title = title.replace('%s', '<span class="q0">&lt;' + LANG.name + '&gt;</span>');
+                                var span = ce('a');
+                                span.className = 'q1';
+                                span.href = '?title=' + titlerewards[i];
+                                span.innerHTML = title;
+                                ae(td, span);
+                                ae(td, ce('br'));
+                            }
+                        }
+                    }
+                    else if (achievement.reward) {
+                        var span = ce('span');
+                        span.className = 'q1';
+                        ae(span, ct(achievement.reward));
+                        ae(td, span);
+                    }
+                },
+                getVisibleText: function (achievement) {
+                    var buff = '';
+                    if (achievement.rewards) {
+                        for (var i = 0; i < achievement.rewards.length; i++) {
+                            if (achievement.rewards[i][0] == 11) {
+                                buff += ' ' + g_titles[achievement.rewards[i][1]]['name_' + g_locale.name].replace('%s', '<' + LANG.name + '>');
+                            }
+                            else if (achievement.rewards[i][0] == 3) {
+                                buff += ' ' + g_items[achievement.rewards[i][1]]['name_' + g_locale.name];
+                            }
+                            else if (achievement.rewards[i][0] == 6) {
+                                buff += ' ' + g_spells[achievement.rewards[i][1]]['name_' + g_locale.name];
+                            }
+                        }
+                    }
+                    else if (achievement.reward) {
+                        buff += ' ' + achievement.reward;
+                    }
+
+                    return buff;
+                },
+                sortFunc: function (a, b, col) {
+                    var text1 = this.getVisibleText(a);
+                    var text2 = this.getVisibleText(b);
+
+                    if (text1 != '' && text2 == '') {
+                        return -1;
+                    }
+                    if (text2 != '' && text1 == '') {
+                        return 1;
+                    }
+
+                    return strcmp(text1, text2);
+                }
+            },
+            {
+                id: 'category',
+                name: LANG.category,
+                type: 'text',
+                width: '15%',
+                compute: function (achievement, td) {
+                    td.className = 'small';
+                    path = '?achievements=';
+                    if (achievement.category != -1 && achievement.parentcat != -1) {
+                        var a2 = ce('a');
+                        a2.className = 'q0';
+                        a2.href = '?achievements=' + achievement.parentcat;
+                        ae(a2, ct(g_achievement_categories[achievement.parentcat]));
+                        ae(td, a2);
+                        ae(td, ce('br'));
+                        path = a2.href + '.';
+                    }
+                    var a = ce('a');
+                    a.className = 'q1';
+                    a.href = path + achievement.category;
+                    ae(a, ct(g_achievement_categories[achievement.category]));
+                    ae(td, a);
+                },
+                getVisibleText: function (achievement) {
+                    return g_achievement_categories[achievement.category];
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_achievement_categories[a.category], g_achievement_categories[b.category]);
+                },
+                hidden: true
+            }
+        ],
+
+		getItemLink: function (achievement) {
+			return '?achievement=' + achievement.id;
 		}
 	},
 	title: {
@@ -11624,210 +11642,250 @@ Listview.templates = {
 		nItemsPerPage: -1,
 		searchable: 1,
 		filtrable: 1,
-		clickable: 0,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			compute: function (e, g, d) {
-				var c = ce("span"),
-				f = ce("span"),
-				b = ct(str_replace(e.name, "%s", ""));
-				g.style.fontFamily = "Verdana, sans-serif";
-				nw(g)
-                ae(f, ct("<" + LANG.name + ">"));
-				f.className = "q0";
-				if (e.name.indexOf("%s") > 0) {
-					ae(c, b);
-					ae(c, f)
-				} else {
-					if (e.name.indexOf("%s") == 0) {
-						ae(c, f);
-						ae(c, b)
-					}
-				}
-				if (e.expansion) {
-					var a = ce("span");
-					a.className = (e.expansion == 1 ? "bc-icon": "wotlk-icon");
-					ae(a, c);
-					ae(g, a)
-				} else {
-					ae(g, c)
-				}
-			},
-			sortFunc: function (d, c, e) {
-				var f = trim(d.name.replace("%s", "").replace(/^[\s,]*(,|the |of the |of )/i, ""));
-				bName = trim(c.name.replace("%s", "").replace(/^[\s,]*(,|the |of the |of )/i, ""));
-				return strcmp(f, bName)
-			},
-			getVisibleText: function (a) {
-				var b = a.name;
-				if (a.expansion == 1) {
-					b += " bc"
-				} else {
-					if (a.expansion == 2) {
-						b += "wotlk wrath"
-					}
-				}
-				return b
-			}
-		},
-		{
-			id: "gender",
-			name: LANG.gender,
-			type: "text",
-			value: "gender",
-			compute: function (c, d) {
-				if (c.gender && c.gender != 3) {
-					var a = g_file_genders[c.gender - 1];
-					var b = ce("span");
-					b.className = a + "-icon";
-					b.onmouseover = function (f) {
-						Tooltip.showAtCursor(f, LANG[a], 0, 0, "q")
-					};
-					b.onmousemove = Tooltip.cursorUpdate;
-					b.onmouseout = Tooltip.hide;
-					ae(d, b)
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.gender && a.gender != 3) {
-					return LANG[g_file_genders[a.gender - 1]]
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(d.gender, c.gender)
-			}
-		},
-		{
-			id: "side",
-			name: LANG.side,
-			type: "text",
-			compute: function (a, c) {
-				if (a.side && a.side != 3) {
-					var b = ce("span");
-					b.className = (a.side == 1 ? "alliance-icon": "horde-icon");
-					b.onmouseover = function (d) {
-						Tooltip.showAtCursor(d, g_sides[a.side], 0, 0, "q")
-					};
-					b.onmousemove = Tooltip.cursorUpdate;
-					b.onmouseout = Tooltip.hide;
-					ae(c, b)
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.side) {
-					return g_sides[a.side]
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_sides[d.side], g_sides[c.side])
-			}
-		},
-		{
-			id: "source",
-			name: LANG.source,
-			type: "text",
-			compute: function (j, d) {
-				if (j.source) {
-					nw(d);
-					d.className = "small";
-					d.style.lineHeight = "18px";
-					var b = 0;
-					for (var k in j.source) {
-						j.source[k].sort(function (l, i) {
-							return i.s - l.s
-						});
-						for (var e = 0, f = j.source[k].length; e < f; ++e) {
-							var c = j.source[k][e];
-							var g = 0;
-							if (j.faction && typeof c != "string" && c.s !== undefined && c.s != -1 && c.s != 2 - j.faction) {
-								continue
-							}
-							if (b++ > 0) {
-								ae(d, ce("br"))
-							}
-							if (typeof c == "string") {
-								ae(d, ct(c))
-							} else {
-								if (c.t) {
-									g = c.t;
-									var h = ce("a");
-                                    o.style.fontFamily = "Verdana, sans-serif";
-									h.href = "?" + g_types[c.t] + "=" + c.ti;
-									h.className = "q1";
-									if (c.s == 1) {
-										h.className += " alliance-icon"
-									}
-									if (c.s == 0) {
-										h.className += " horde-icon"
-									}
-									if (c.t == 5) {
-										h.className += " icontiny";
-										h.style.backgroundImage = "url(" + g_staticUrl + "/images/wow/icons/tiny/quest_start.gif)"
-									}
-									ae(h, ct(c.n));
-									ae(d, h)
-								}
+
+		columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                compute: function (title, td, tr) {
+                    var
+                        sp = ce('a'),
+                        n = ce('span'),
+                        t = ct(str_replace(title.name, '%s', ''));
+
+                    td.style.fontFamily = 'Verdana, sans-serif';
+
+                    // nw(td)
+
+					sp.href = this.template.getItemLink(title);
+
+					if(title.who) {
+						ae(n, ct(title.who));
+                    }
+					else {
+                        ae(n, ct('<' + LANG.name + '>'));
+                        n.className = 'q0';
+                    }
+
+                    if (title.name.indexOf('%s') > 0) { // Prefix title
+                        ae(sp, t);
+                        ae(sp, n);
+                    }
+                    else if (title.name.indexOf('%s') == 0) { // Suffix title
+                        ae(sp, n);
+                        ae(sp, t);
+                    }
+
+                    if (title.expansion) {
+                        var i = ce('span');
+                        i.className = (title.expansion == 1 ? 'bc-icon': 'wotlk-icon');
+                        ae(i, sp);
+                        ae(td, i);
+                    }
+                    else {
+                        ae(td, sp);
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    var
+                        aName = trim(a.name.replace('%s', '').replace(/^[\s,]*(,|the |of the |of )/i, ''));
+                        bName = trim(b.name.replace('%s', '').replace(/^[\s,]*(,|the |of the |of )/i, ''));
+
+                    return strcmp(aName, bName);
+                },
+                getVisibleText: function (title) {
+					var buff = title.name + Listview.funcBox.getExpansionText(title);
+
+                    return buff;
+                }
+            },
+            {
+                id: 'gender',
+                name: LANG.gender,
+                type: 'text',
+                value: 'gender',
+                compute: function (title, td) {
+                    if (title.gender && title.gender != 3) {
+                        var gender = g_file_genders[title.gender - 1];
+                        var sp = ce('span');
+                        sp.className = gender + '-icon';
+                        sp.onmouseover = function (e) {
+                            Tooltip.showAtCursor(e, LANG[gender], 0, 0, 'q');
+                        };
+                        sp.onmousemove = Tooltip.cursorUpdate;
+                        sp.onmouseout = Tooltip.hide;
+                        ae(td, sp);
+                    }
+                },
+                getVisibleText: function (title) {
+                    if (title.gender && title.gender != 3) {
+                        return LANG[g_file_genders[title.gender - 1]];
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(a.gender, b.gender);
+                }
+            },
+            {
+                id: 'side',
+                name: LANG.side,
+                type: 'text',
+                compute: function (title, td) {
+                    if (title.side && title.side != 3) {
+                        var sp = ce('span');
+                        sp.className = (title.side == 1 ? 'alliance-icon': 'horde-icon');
+                        sp.onmouseover = function (e) {
+                            Tooltip.showAtCursor(e, g_sides[title.side], 0, 0, 'q');
+                        };
+                        sp.onmousemove = Tooltip.cursorUpdate;
+                        sp.onmouseout = Tooltip.hide;
+						//ae(sp, ct(g_sides[title.side]));
+                        ae(td, sp);
+                    }
+                },
+                getVisibleText: function (title) {
+                    if (title.side) {
+                        return g_sides[title.side];
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_sides[a.side], g_sides[b.side]);
+                }
+            },
+            {
+                id: 'source',
+                name: LANG.source,
+                type: 'text',
+                compute: function (title, td) {
+                    if (title.source) {
+                        nw(td);
+                        td.className = 'small';
+                        td.style.lineHeight = '18px';
+                        var n = 0;
+
+                        for (var s in title.source) {
+                            title.source[s].sort(function (a, b) {
+                                return b.s - a.s;
+                            });
+
+                            for (var i = 0, len = title.source[s].length; i < len; ++i) {
+                                var sm = title.source[s][i];
+                                var type = 0;
+
+                                if (title.faction && typeof sm != 'string' && sm.s !== undefined && sm.s != -1 && sm.s != 2 - title.faction) {
+                                    continue;
+                                }
+
+                                if (n++ > 0) {
+                                    ae(td, ce('br'));
+                                }
+
+                                if (typeof sm == 'string') {
+                                    ae(td, ct(sm));
+                                }
+                                else  if (sm.t) {
+                                    type = sm.t;
+                                    var a = ce('a');
+                                    // o.style.fontFamily = 'Verdana, sans-serif';
+                                    a.href = '?' + g_types[sm.t] + '=' + sm.ti;
+                                    a.className = 'q1';
+
+                                    if (sm.s == 1) {
+                                        a.className += ' alliance-icon'
+                                    }
+                                    if (sm.s == 0) {
+                                        a.className += ' horde-icon'
+                                    }
+                                    if (sm.t == 5) { // Quests
+                                        a.className += ' icontiny tinyspecial';
+                                        a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/quest_start.gif)';
+                                    }
+
+                                    ae(a, ct(sm.n));
+                                    ae(td, a);
+                                }
+                            }
+                        }
+                    }
+                },
+                /* old: doesn't support text sent by server
+                    getVisibleText: function (l) {
+                        var h = {
+                            achievements: g_achievements,
+                            quests: g_quests
+                        },
+                        m = "",
+                        d = 0;
+                        for (var f in h) {
+                            var g = h[f],
+                            a = l[f];
+                            if (!g || !a) {
+                                continue
+                            }
+                            for (var e = 0, c = a.length; e < c; ++e) {
+                                if (g[a[e]]) {
+                                    var b = (f == "achievements" ? "name": "name_" + g_locale.name);
+                                    if (d++>0) {
+                                        m += " "
+                                    }
+                                    m += g[a[e]][b]
+                                }
+                            }
+                        }
+                        return m
+                    },
+                */
+				getVisibleText: function(title) {
+					var buff = '';
+
+					if(title.source) {
+						for(var s in title.source) {
+							for(var i = 0, len = title.source[s].length; i < len; ++i) {
+								var sm = title.source[s][i];
+								if(typeof sm == 'string') {
+									buff += ' ' + sm;
+                                }
+								else if(sm.t){
+									buff += ' ' + sm.n;
+                                }
 							}
 						}
 					}
-				}
-			},
-			getVisibleText: function (l) {
-				var h = {
-					achievements: g_achievements,
-					quests: g_quests
+
+					return buff;
 				},
-				m = "",
-				d = 0;
-				for (var f in h) {
-					var g = h[f],
-					a = l[f];
-					if (!g || !a) {
-						continue
-					}
-					for (var e = 0, c = a.length; e < c; ++e) {
-						if (g[a[e]]) {
-							var b = (f == "achievements" ? "name": "name_" + g_locale.name);
-							if (d++>0) {
-								m += " "
-							}
-							m += g[a[e]][b]
-						}
-					}
-				}
-				return m
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(this.getVisibleText(d), this.getVisibleText(c))
-			}
-		},
-		{
-			id: "category",
-			name: LANG.category,
-			type: "text",
-			width: "15%",
-			compute: function (c, d) {
-				nw(d);
-				d.className = "small q1";
-				var b = ce("a");
-				b.href = "?titles=" + c.category;
-				ae(b, ct(g_title_categories[c.category]));
-				ae(d, b)
-			},
-			getVisibleText: function (a) {
-				return g_title_categories[a.category]
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_title_categories[d.category], g_title_categories[c.category])
-			},
-			hidden: true
-		}],
-		getItemLink: function (a) {
-			return "?title=" + a.id
+                sortFunc: function (a, b, col) {
+                    return strcmp(this.getVisibleText(a), this.getVisibleText(b));
+                }
+            },
+            {
+                id: 'category',
+                name: LANG.category,
+                type: 'text',
+                width: '15%',
+                compute: function (title, td) {
+                    nw(td);
+                    td.className = 'small q1';
+                    var a = ce('a');
+                    a.href = '?titles=' + title.category;
+                    ae(a, ct(g_title_categories[title.category]));
+                    ae(td, a);
+                },
+                getVisibleText: function (title) {
+                    return g_title_categories[title.category];
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_title_categories[a.category], g_title_categories[b.category]);
+                },
+                hidden: true
+            }
+        ],
+
+		getItemLink: function (title) {
+            return '?title=' + title.id;
 		}
 	},
 	profile: {
@@ -12910,22 +12968,29 @@ var LiveSearch = new function () {
 
 			a.onmouseover = aOver;
 			a.href = "?" + g_types[type] + "=" + typeId;
+
 			if (textbox._append) {
 				a.rel += textbox._append;
 			}
 
+			if(type == 1 && param1 != null) {
+				div.className += ' live-search-icon-boss';
+			}
 			if (type == 3 && param2 != null) {
 				a.className += " q" + param2;
 			}
             else if (type == 4 && param1 != null) {
                 a.className += " q" + param1;
             }
-
-            if ((type == 3 || type == 6 || type == 9 || type == 10) && param1) {
-				div.className += " live-search-icon";
-				div.style.backgroundImage = "url(images/icons/small/" + param1.toLowerCase() + ".jpg)";
+			else if (type == 13) {
+				a.className += ' c' + typeId;
 			}
-            else if (type == 5 && param1 >= 1 && param1 <= 2) {
+
+            if ((type == 3 || type == 6 || type == 9 || type == 10 || type == 13 || type == 14 || type == 15 || type == 17) && param1) {
+				div.className += " live-search-icon";
+				div.style.backgroundImage = "url(" + g_staticUrl + "/images/icons/small/" + param1.toLowerCase() + ".jpg)";
+			}
+            else if ((type == 5 || type == 11) && param1 >= 1 && param1 <= 2) {
                 div.className += " live-search-icon-quest-" + (param1 == 1 ? "alliance" : "horde");
             }
 
@@ -12934,7 +12999,12 @@ var LiveSearch = new function () {
 
 			var buffer = suggz[i];
 			buffer = buffer.replace(regex, highlight);
-			sp2.innerHTML = buffer;
+
+			if (type == 11) {
+				buffer = buffer.replace('%s', '<span class="q0">&lt;'+ LANG.name + '&gt;</span>');
+			}
+
+            sp2.innerHTML = buffer;
 			ae(a, sp2);
 
 			if (type == 6 && param2) {
@@ -13088,7 +13158,7 @@ var LiveSearch = new function () {
 
 		aE(textbox, "focus", onFocus);
 		aE(textbox, "keyup", onKeyUp);
-		aE(textbox, Browser.opera ? "keypress" : "keydown", onKeyDown);
+		aE(textbox, "keydown", onKeyDown);
 	};
 
 	this.reset = function (textbox) {
@@ -13109,7 +13179,7 @@ var Lightbox = new function () {
 	i, f;
 	function p() {
 		aE(d, "click", e);
-		aE(document, Browser.opera ? "keypress": "keydown", g);
+		aE(document, "keydown", g);
 		aE(window, "resize", a);
 		if (Browser.ie6) {
 			aE(window, "scroll", j)
@@ -13117,7 +13187,7 @@ var Lightbox = new function () {
 	}
 	function l() {
 		dE(d, "click", e);
-		dE(document, Browser.opera ? "keypress": "keydown", g);
+		dE(document, "keydown", g);
 		dE(window, "resize", a);
 		if (Browser.ie6) {
 			dE(window, "scroll", j)

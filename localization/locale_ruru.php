@@ -18,9 +18,9 @@ $lang = array(
         'profiles'      => "Ваши персонажи",    // translate.google :x
         'links'         => "Ссылки",
         'pageNotFound'  => "Такое %s не существует.",
-        'alliance'      => "Альянс",
-        'horde'         => "Орда",
         'both'          => "Обе",
+        'gender'        => "Пол",
+        'sex'           => [null, 'Мужчина', 'Женщина'],
         'quickFacts'    => "Краткая информация",
         'screenshots'   => "Изображения",
         'videos'        => "Видео",
@@ -33,7 +33,6 @@ $lang = array(
         'rewards'       => "Награды",
         'gains'         => "Бонус",
         'login'         => "[Login]",
-        'class'         => "класс",
         'forum'         => "[Forum]",
         'days'          => "дн",
         'hours'         => "часы",
@@ -52,11 +51,25 @@ $lang = array(
         'serverside'    => "[Serverside]",
         'serversideHint' => "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
     ),
+    'search' => array(
+        'search'        => "Поиск",
+        'foundResult'   => "Результаты поиска для",
+        'noResult'      => "Ничего не найдено для",
+        'tryAgain'      => "Пожалуйста, попробуйте другие ключевые слова или проверьте правильность запроса.",
+    ),
     'game' => array(
-        'requires'      => "Требует:",
-        'cooldown'      => "Восстановление: %s",
+        'alliance'      => "Альянс",
+        'horde'         => "Орда",
+        'class'         => "класс",
         'classes'       => "Классы",
         'races'         => "Расы",
+        'title'         => "Звание",
+        'titles'        => "Звания",
+        'eventShort'    => "Игровое событие",
+        'event'         => "Событие",
+        'events'        => "Игровые события",
+        'cooldown'      => "Восстановление: %s",
+        'requires'      => "Требует:",
         'reqLevel'      => "Требуется уровень: %s",
         'reqLevelHlm'   => "Требуется уровень: %s",
         'valueDelim'    => " - ",
@@ -143,6 +156,11 @@ $lang = array(
     'zone' => array(
         'zone'          => "Игровая зона",
         'zonePartOf'    => "Эта игровая локация является частью локации",
+    ),
+    'title' => array(
+        'cat'           => array(
+            'Общее',      'PvP',    'Репутация',       'Подземелья и рейды',     'Задания',       'Профессии',      'Игровые события'
+        )
     ),
     'spell' => array(
         'remaining'     => "Осталось: %s",

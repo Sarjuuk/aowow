@@ -1710,7 +1710,7 @@ Summary.prototype = {
 		this.searchName = ce("input");
 		this.searchName.type = "text";
 		aE(this.searchName, "keyup", this.onSearchKeyUp.bind(this));
-		aE(this.searchName, Browser.opera ? "keypress": "keydown", this.onSearchKeyDown.bind(this));
+		aE(this.searchName, "keydown", this.onSearchKeyDown.bind(this));
 		ae(d, this.searchName);
 		this.searchMsg = ce("span");
 		this.searchMsg.style.fontWeight = "bold";

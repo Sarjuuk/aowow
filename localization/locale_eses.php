@@ -18,9 +18,9 @@ $lang = array(
         'profiles'      => "Tus personajes",    // translate.google :x
         'links'         => "Enlaces",
         'pageNotFound'  => "Este %s no existe.",
-        'alliance'      => "Alianza",
-        'horde'         => "Horda",
         'both'          => "Ambos",
+        'gender'        => "Género",
+        'sex'           => [null, 'Hombre', 'Mujer'],
         'quickFacts'    => "Notas rápidas",
         'screenshots'   => "Capturas de pantalla",
         'videos'        => "Videos",
@@ -33,7 +33,6 @@ $lang = array(
         'rewards'       => "Recompensas",
         'gains'         => "Ganancias",
         'login'         => "[Login]",
-        'class'         => "clase",
         'forum'         => "[Forum]",
         'days'          => "dias",
         'hours'         => "horas",
@@ -52,11 +51,26 @@ $lang = array(
         'serverside'    => "[Serverside]",
         'serversideHint' => "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
     ),
+    'search' => array(
+        'search'        => "Búsqueda",
+        'foundResult'   => "Resultados de busqueda para",
+        'noResult'      => "Ningún resultado para",
+        'tryAgain'      => "Por favor, introduzca otras palabras claves o verifique el término ingresado.",
+    ),
     'game' => array(
-        'requires'      => "Requiere",
-        'cooldown'      => "%s de reutilización",
+        'alliance'      => "Alianza",
+        'horde'         => "Horda",
+        'class'         => "clase",
         'classes'       => "Clases",
         'races'         => "Razas",
+        'title'         => "Título",
+        'titles'        => "Títulos",
+        'eventShort'    => "Evento",
+        'event'         => "Suceso mundial ",
+        'events'        => "Eventos del mundo",
+        'cooldown'      => "%s cooldown",
+        'cooldown'      => "%s de reutilización",
+        'requires'      => "Requiere",
         'reqLevel'      => "Necesitas ser de nivel %s",
         'reqLevelHlm'   => "Necesitas ser de nivel %s",
         'valueDelim'    => " - ",
@@ -138,6 +152,11 @@ $lang = array(
     'zone' => array(
         'zone'          => "Zone",
         'zonePartOf'    => "Cette zone fait partie de la zone",
+    ),
+    'title' => array(
+        'cat'           => array(
+            'General',      'Jugador contra Jugador',    'Reputación',       'Mazmorras y bandas',     'Misiones',       'Profesiones',      'Eventos del mundo'
+        )
     ),
     'spell' => array(
         'remaining'     => "%s restantes",

@@ -18,9 +18,9 @@ $lang = array(
         'profiles'      => "Vos personnages",      // translate.google :x
         'links'         => "Liens",
         'pageNotFound'  => "Ce %s n'existe pas.",
-        'alliance'      => "Alliance",
-        'horde'         => "Horde",
         'both'          => "Les deux",
+        'gender'        => "Genre",
+        'sex'           => [null, 'Homme', 'Femme'],
         'quickFacts'    => "En bref",
         'screenshots'   => "Captures d'écran",
         'videos'        => "Vidéos",
@@ -33,7 +33,6 @@ $lang = array(
         'rewards'       => "Récompenses",
         'gains'         => "Gains",
         'login'         => "[Login]",
-        'class'         => "classe",
         'forum'         => "[Forum]",
         'days'          => "jours",
         'hours'         => "heures",
@@ -52,11 +51,25 @@ $lang = array(
         'serverside'    => "[Serverside]",
         'serversideHint' => "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
     ),
+    'search' => array(
+        'search'        => "Recherche",
+        'foundResult'   => "Résultats de recherche pour",
+        'noResult'      => "Aucun résultat pour malordawsne",
+        'tryAgain'      => "Veuillez essayer d'autres mots ou vérifiez l'orthographe des termes de recherche.",
+    ),
     'game' => array (
-        'requires'      => "Requiert",
-        'cooldown'      => "%s de recharge",
+        'alliance'      => "Alliance",
+        'horde'         => "Horde",
+        'class'         => "classe",
         'classes'       => "Classes",
         'races'         => "Races",
+        'title'         => "Titre",
+        'titles'        => "Titres",
+        'eventShort'    => "Évènement",
+        'event'         => "Évènement mondial",
+        'events'        => "Évènements mondiaux",
+        'cooldown'      => "%s de recharge",
+        'requires'      => "Requiert",
         'reqLevel'      => "Niveau %s requis",
         'reqLevelHlm'   => "Requiert Niveau %s",
         'valueDelim'    => " - ",
@@ -143,6 +156,11 @@ $lang = array(
     'zone' => array(
         'zone'          => "Zone",
         'zonePartOf'    => "Cette zone fait partie de la zone",
+    ),
+    'title' => array(
+        'cat'           => array(
+            'Général',      'Joueur ctr. Joueur',    'Réputation',       'Donjons & raids',     'Quêtes',       'Métiers',      'Évènements mondiaux'
+        )
     ),
     'spell' => array(
         'remaining'     => "%s restantes",
