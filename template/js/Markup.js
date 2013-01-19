@@ -140,6 +140,20 @@ var Markup = {
 					return (E || "") + "<t" + (Markup.nTags++) + ">"
 				}
 			});
+			D = D.replace(/(.)?\[span\s*[\s+=:]\s*(.+?)\]/gi,
+			function(F, E, H) {
+				if (E == "\\") {
+					return F.substr(1)
+				} else {
+					var G = Markup._yank(H, [["class", "\\S+"]]);
+					Markup.tags.push({
+						name: "span",
+						close: false,
+						other: G
+					});
+					return (E || "") + "<t" + (Markup.nTags++) + ">"
+				}
+			});
 			B += "|pad|span";
 			A += "|color|span|icon";
 			case Markup.MODE_COMMENT:
@@ -391,9 +405,6 @@ var Markup = {
 			case "s":
 				G += "<del>" + Markup._htmlmize(B[D][1]) + "</del>";
 				break;
-			case "span":
-				G += "<span>" + Markup._htmlmize(B[D][1]) + "</span>";
-				break;
 			case "pad":
 				G += '<div class="pad">' + Markup._htmlmize(B[D][1]) + "</div>";
 				break;
@@ -428,7 +439,14 @@ var Markup = {
 					G += '" />' + Markup._htmlmize(B[D][1]) + '</span>'
 				}
 				break;
-			case "img":
+			case "span":
+				var F = B[D][2];
+				if (F.name != "" && Markup._isUrlSafe(F.name)) {
+					G += '<span class="' + F.class + '" />'
+					G += Markup._htmlmize(B[D][1]) + '</span>'
+				}
+				break;
+            case "img":
 				var F = B[D][2];
 				if (F.src != "" && Markup._isUrlSafe(F.src)) {
 					G += '<img src="' + F.src + '" alt="" class="border"';
