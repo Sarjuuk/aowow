@@ -7,11 +7,9 @@ require_once('includes/class.item.php');
 require_once('includes/class.spell.php');
 require_once('includes/class.faction.php');                 // items may require a faction to use/own
 
-// prefer $_GET over $_COOKIE
-$compareString = '';
-$doneSummary = '';
 $pageData['items'] = array();
 
+// prefer $_GET over $_COOKIE
 if (!empty($_GET['compare']))
     $compareString = $_GET['compare'];
 else if (!empty($_COOKIE['compare_groups']))
@@ -19,7 +17,7 @@ else if (!empty($_COOKIE['compare_groups']))
 
 if ($compareString)
 {
-    $sets = explode(";", $compareString);
+    $sets  = explode(";", $compareString);
     $items = array();
     foreach ($sets as $set)
     {
@@ -27,10 +25,10 @@ if ($compareString)
         $outString = array();
         foreach ($itemsting as $substring)
         {
-            $params = explode(".", $substring);
+            $params  = explode(".", $substring);
             $items[] = (int)$params[0];
             while (sizeof($params) < 7)
-                $params[]  = 0;
+                $params[] = 0;
 
             $outString[] = "[".implode(',', $params)."]";
 
@@ -47,7 +45,7 @@ if ($compareString)
         }
         $outSet[] = "[".implode(',', $outString)."]";
     }
-    $doneSummary = implode(',', $outSet);
+    $pageData['summary'] = "[".implode(',', $outSet)."]";
 
     $iList = new ItemList(array(['i.entry', $items]));
     foreach ($iList->container as $item)
@@ -55,17 +53,21 @@ if ($compareString)
         $item->getJsonStats();
         $stats = array();
         foreach ($item->json as $k => $v)
-                $stats[] = is_numeric($v) || $v[0] == "{" ? '"'.$k.'":'.$v.'' : '"'.$k.'":"'.$v.'"';
+            $stats[] = is_numeric($v) || $v[0] == "{" ? '"'.$k.'":'.$v.'' : '"'.$k.'":"'.$v.'"';
 
         foreach ($item->itemMods as $k => $v)
             if ($v)
                 $stats[] = '"'.Util::$itemMods[$k].'":'.$v;
 
-        $pageData['items'][] = "g_items.add(".$item->json['id'].", {name_".User::$localeString.":'".Util::jsEscape(Util::localizedString($item->template, 'name'))."', quality:".$item->template['Quality'].", icon:'".$item->template['icon']."', jsonequip:{".implode(",", $stats)."}});";
+        $pageData['items'][] = [
+            $item->Id,
+            Util::jsEscape(Util::localizedString($item->template, 'name')),
+            $item->template['Quality'],
+            $item->template['icon'],
+            "{".implode(",", $stats)."}"
+        ];
     }
 }
-
-$pageData['summary'] = "new Summary({template:'compare',id:'compare',parent:'compare-generic',groups:[".$doneSummary."]});";
 
 // Announcements
 $announcements = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = "compare" OR page = "*")');
