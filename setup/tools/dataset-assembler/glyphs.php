@@ -4,9 +4,9 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-	// Create 'glyphs'-file for available locales
-	// this script requires the following dbc-files to be parsed and available
-	// GlyphProperties, Spells, SkillLineAbility
+    // Create 'glyphs'-file for available locales
+    // this script requires the following dbc-files to be parsed and available
+    // GlyphProperties, Spells, SkillLineAbility
 
     /* Example
         40896: {

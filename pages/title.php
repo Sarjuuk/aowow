@@ -81,7 +81,7 @@ if (!$smarty->loadCache(array('achievement', $Id), $pageData))
         }
         $pageData['title'] = ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->name[0]))));
 
-		$smarty->saveCache(array('spell', $Id), $pageData);
+        $smarty->saveCache(array('spell', $Id), $pageData);
     }
     else
     {
@@ -99,9 +99,9 @@ if (!$smarty->loadCache(array('achievement', $Id), $pageData))
 $smarty->updatePageVars(array(
     'title'     => $pageData['title']." - ".Lang::$game['title'],
     'path'      => "[0, 10, ".$title->template['category']."]",
-	'tab'       => 0,                                       // for g_initHeader($tab)
-	'type'      => TYPEID_TITLE,                            // 11:Titles
-	'typeId'    => $Id
+    'tab'       => 0,                                       // for g_initHeader($tab)
+    'type'      => TYPEID_TITLE,                            // 11:Titles
+    'typeId'    => $Id
 ));
 
 $smarty->assign('community', CommunityContent::getAll(TYPEID_TITLE, $Id));  // comments, screenshots, videos

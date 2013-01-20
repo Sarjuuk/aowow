@@ -1,6 +1,6 @@
 {strip}
-	new Listview({ldelim}
-		template:'title',
+    new Listview({ldelim}
+        template:'title',
         {if !isset($params.id)}id:'titles',{/if}
         {if isset($params.note)}_truncated: 1,{/if}
         {foreach from=$params key=k item=v}
@@ -10,24 +10,24 @@
                 {$k}:'{$v}',
             {/if}
         {/foreach}
-		data:[
-			{foreach name=i from=$data item=curr}
-				{ldelim}
+        data:[
+            {foreach name=i from=$data item=curr}
+                {ldelim}
                     category:{$curr.category},
                     expansion:{$curr.expansion},
                     gender:{$curr.gender},
-					id:{$curr.id},
+                    id:{$curr.id},
                     side:{$curr.side},
-					name:'{$curr.name|escape:"javascript"}'
+                    name:'{$curr.name|escape:"javascript"}'
                     {if isset($curr.namefemale)}
                         , namefemale:'{$curr.namefemale|escape:"javascript"}'
                     {/if}
                     {if isset($curr.source)}
                         , source:{$curr.source}
                     {/if}
-				{rdelim}
-				{if $smarty.foreach.i.last}{else},{/if}
-			{/foreach}
-		]
-	{rdelim});
+                {rdelim}
+                {if $smarty.foreach.i.last}{else},{/if}
+            {/foreach}
+        ]
+    {rdelim});
 {/strip}

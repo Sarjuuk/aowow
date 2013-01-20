@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
     // builds image-textures for the talent-calculator
     // spellIcons must be extracted and converted to at least medium size
-	// this script requires the following dbc-files to be parsed and available
+    // this script requires the following dbc-files to be parsed and available
     // Talent, TalentTab, Spell
 
     $query = '

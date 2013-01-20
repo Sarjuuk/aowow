@@ -183,7 +183,7 @@ $lang = array(
         'charges'       => "cargas",
         'expend'        => "[expendable]",  // drop this shit
         'locked'        => "Cerrado",
-        'ratingString'	=> "%s&nbsp;@&nbsp;L%s",
+        'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Heroico",
         'unique'        => "Único",
         'uniqueEquipped'=> "Único-Equipado",
@@ -207,7 +207,7 @@ $lang = array(
         'set'           => "Conjunto",
         'socketBonus'   => "Bono de ranura",
         'socket'        => array(
-			"Ranura meta",          "Ranura roja",      "Ranura amarilla",          "Ranura azul",            -1 => "Ranura prismática  "
+            "Ranura meta",          "Ranura roja",      "Ranura amarilla",          "Ranura azul",            -1 => "Ranura prismática  "
         ),
         'trigger'       => array (
             "Uso: ",                "Equipar: ",        "Probabilidad al acertar: ", null,                      null,

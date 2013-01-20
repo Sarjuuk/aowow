@@ -5,7 +5,7 @@ if (!defined('AOWOW_REVISION'))
 
 
     // builds 'pets'-file for available locales
-	// this script requires the following dbc-files to be parsed and available
+    // this script requires the following dbc-files to be parsed and available
     // CreatureFamily, CreatureDisplayInfo, FactionTemplate, AreaTable
 
     // Todo:
@@ -15,7 +15,7 @@ if (!defined('AOWOW_REVISION'))
     // Since i'm lacking other options this will probably be reimplemented.
 
     /* Example data
-    	30: {
+        30: {
             id:30,
             name:'Forest Spider',
             minlevel:5,

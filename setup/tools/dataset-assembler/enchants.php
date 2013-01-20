@@ -4,9 +4,9 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-	// Create 'enchants'-file for available locales
-	// this script requires the following dbc-files to be parsed and available
-	// Spells, SkillLineAbility, SpellItemEnchantment
+    // Create 'enchants'-file for available locales
+    // this script requires the following dbc-files to be parsed and available
+    // Spells, SkillLineAbility, SpellItemEnchantment
 
     /* Examples
         15: {

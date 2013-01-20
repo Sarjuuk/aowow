@@ -5,7 +5,7 @@ if (!defined('AOWOW_REVISION'))
 
 
     // builds talent-tree-data for the talent-calculator
-	// this script requires the following dbc-files to be parsed and available
+    // this script requires the following dbc-files to be parsed and available
     // Talent, TalentTab, Spell, CreatureFamily
 
     // talents

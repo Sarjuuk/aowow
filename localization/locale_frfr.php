@@ -187,7 +187,7 @@ $lang = array(
         'charges'       => "Charges",
         'expend'        => "expendable",
         'locked'        => "Verrouillé",
-        'ratingString'	=> "%s&nbsp;@&nbsp;L%s",
+        'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Héroïque",
         'unique'        => "Unique",
         'uniqueEquipped'=> "Unique - Equipé",
@@ -211,7 +211,7 @@ $lang = array(
         'set'           => "Set",
         'socketBonus'   => "Bonus de châsse",
         'socket'        => array(
-			"Méta-châsse",          "Châsse rouge",     "Châsse jaune",         "Châsse bleue",           -1 => "Châsse prismatique"
+            "Méta-châsse",          "Châsse rouge",     "Châsse jaune",         "Châsse bleue",           -1 => "Châsse prismatique"
         ),
         'trigger'       => array (
             "Utilise: ",            "Équipé : ",        "Chances quand vous touchez : ", null,                  null,

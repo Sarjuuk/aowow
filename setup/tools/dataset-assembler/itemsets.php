@@ -4,9 +4,9 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-	// Create 'itemsets'-file for available locales (and should probably order the itemests_dbc-table too (see below))
-	// this script requires the following dbc-files to be parsed and available
-	// GlyphProperties, Spells, SkillLineAbility
+    // Create 'itemsets'-file for available locales (and should probably order the itemests_dbc-table too (see below))
+    // this script requires the following dbc-files to be parsed and available
+    // GlyphProperties, Spells, SkillLineAbility
 
     /* Example
         "-447": {                                           // internal id, freely chosen

@@ -4,9 +4,9 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-	// Create 'gems'-file for available locales
-	// this script requires the following dbc-files to be parsed and available
-	// ItemEnchantment, GemProperties, Spells, Icons
+    // Create 'gems'-file for available locales
+    // this script requires the following dbc-files to be parsed and available
+    // ItemEnchantment, GemProperties, Spells, Icons
 
     /* Example
         22460: {
@@ -26,7 +26,7 @@ if (!defined('AOWOW_REVISION'))
 
     include 'includes/class.spell.php';
 
-	$gemQuery = "
+    $gemQuery = "
         SELECT
             it.entry,
             it.name,
