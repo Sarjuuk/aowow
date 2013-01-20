@@ -28,11 +28,13 @@ define('TYPEID_CURRENCY',                   17);
 define('CACHETYPE_PAGE',                    0);
 define('CACHETYPE_TOOLTIP',                 1);
 define('CACHETYPE_BUFF',                    2);             // only used by spells obviously
+define('CACHETYPE_SEARCH',                  3);
 
-define('SEARCH_REGULAR',                    0x000001);
-define('SEARCH_OPEN',                       0x000002);
-define('SEARCH_JSON',                       0x000004);
-define('SEARCH_TYPEMASK',                   0xFFFFF0);
+define('SEARCH_TYPE_REGULAR',               0x10000000);
+define('SEARCH_TYPE_OPEN',                  0x20000000);
+define('SEARCH_TYPE_JSON',                  0x40000000);
+define('SEARCH_MASK_OPEN',                  0x03FFFFFF);
+define('SEARCH_MASK_ALL',                   0x03FFFFFF);
 
 // Databases
 define('DB_AOWOW',                          0);
@@ -110,6 +112,7 @@ define('CLASS_MAGE',                        0x80);
 define('CLASS_WARLOCK',                     0x100);
 define('CLASS_DRUID',                       0x400);
 define('CLASS_MASK_ALL',                    0x5FF);
+
 // RaceMask
 define('RACE_HUMAN',                        0x1);
 define('RACE_ORC',                          0x2);
@@ -121,8 +124,9 @@ define('RACE_GNOME',                        0x40);
 define('RACE_TROLL',                        0x80);
 define('RACE_BLOODELF',                     0x200);
 define('RACE_DRAENEI',                      0x400);
+define('RACE_MASK_ALLIANCE',                0x44D);
+define('RACE_MASK_HORDE',                   0x2B2);
 define('RACE_MASK_ALL',                     0x6FF);
-
 
 // SpellFamilyNames
 define('SPELLFAMILY_GENERIC',               0);
