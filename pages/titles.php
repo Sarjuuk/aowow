@@ -10,7 +10,7 @@ require_once('includes/class.quest.php');
 
 $cat      = Util::extractURLParams($pageParam)[0];
 $path     = [0, 10];
-$cacheKey = implode(':', [CACHETYPE_PAGE, TYPEID_TITLE, -1, $cat || 0, User::$localeId]);
+$cacheKey = implode('_', [CACHETYPE_PAGE, TYPEID_TITLE, -1, isset($cat) ? $cat : -1, User::$localeId]);
 $title    = [ucFirst(Lang::$game['titles'])];
 
 $path[] = $cat;                                             // should be only one parameter anyway

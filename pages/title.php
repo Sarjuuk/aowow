@@ -4,17 +4,19 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require('includes/class.title.php');
-require('includes/class.spell.php');
-require('includes/class.achievement.php');
-require('includes/class.item.php');
-require('includes/class.quest.php');
-require('includes/class.worldevent.php');
-require('includes/class.community.php');
+require_once('includes/class.title.php');
+require_once('includes/class.spell.php');
+require_once('includes/class.achievement.php');
+require_once('includes/class.item.php');
+require_once('includes/class.quest.php');
+require_once('includes/class.worldevent.php');
+require_once('includes/class.community.php');
 
-$Id = intval($pageParam);
+$Id = intVal($pageParam);
 
-if (!$smarty->loadCache(array('achievement', $Id), $pageData))
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPEID_TITLE, $id, -1, User::$localeId]);
+
+if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $title = new Title($Id);
     if ($title->template)
@@ -81,7 +83,7 @@ if (!$smarty->loadCache(array('achievement', $Id), $pageData))
         }
         $pageData['title'] = ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->name[0]))));
 
-        $smarty->saveCache(array('spell', $Id), $pageData);
+        $smarty->saveCache($cacheKeyPage, $pageData);
     }
     else
     {

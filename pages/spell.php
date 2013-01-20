@@ -14,8 +14,8 @@ require_once('includes/class.item.php');
 $id    = intVal($pageParam);
 $spell = new Spell($id);
 
-$cacheKeyPage    = implode(':', [CACHETYPE_PAGE,    TYPEID_SPELL, $id, -1, User::$localeId]);
-$cacheKeyTooltip = implode(':', [CACHETYPE_TOOLTIP, TYPEID_SPELL, $id, -1, User::$localeId]);
+$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPEID_SPELL, $id, -1, User::$localeId]);
+$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPEID_SPELL, $id, -1, User::$localeId]);
 
 if (isset($_GET['power']))
 {

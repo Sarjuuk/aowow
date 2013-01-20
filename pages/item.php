@@ -17,7 +17,7 @@ require_once('includes/class.faction.php');
 $id   = intVal($pageParam);
 $item = new Item($id);
 
-$cacheKeyPage = implode(':', [CACHETYPE_PAGE, TYPEID_ITEM, $id, -1, User::$localeId]);
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPEID_ITEM, $id, -1, User::$localeId]);
 
 if (isset($_GET['xml']))
 {
