@@ -14,7 +14,7 @@ require_once('includes/class.community.php');
 
 $Id = intVal($pageParam);
 
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPEID_TITLE, $id, -1, User::$localeId]);
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPEID_TITLE, $Id, -1, User::$localeId]);
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
@@ -88,9 +88,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     else
     {
         $smarty->updatePageVars(array(
-            'subject'   => ucfirst(Lang::$main['class']),
+            'subject'   => ucfirst(Lang::$game['title']),
             'id'        => $Id,
-            'notFound'  => sprintf(Lang::$main['pageNotFound'], Lang::$main['class']),
+            'notFound'  => sprintf(Lang::$main['pageNotFound'], Lang::$game['title']),
         ));
         $smarty->assign('lang', Lang::$main);
         $smarty->display('404.tpl');
@@ -99,7 +99,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 }
 
 $smarty->updatePageVars(array(
-    'title'     => $pageData['title']." - ".Lang::$game['title'],
+    'title'     => $pageData['title']." - ".ucfirst(Lang::$game['title']),
     'path'      => "[0, 10, ".$title->template['category']."]",
     'tab'       => 0,                                       // for g_initHeader($tab)
     'type'      => TYPEID_TITLE,                            // 11:Titles
