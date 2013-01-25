@@ -55,7 +55,7 @@ if (!defined('AOWOW_REVISION'))
         ... onwards!
     */
 
-    include 'includes/class.spell.php';
+    require 'includes/class.spell.php';
 
     $setList   = DB::Aowow()->Select('SELECT * FROM ?_itemset ORDER BY refSetId DESC');
     $locales   = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];

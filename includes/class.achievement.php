@@ -68,7 +68,7 @@ class Achievement extends BaseType
             return $this->criteria[$idx];
     }
 
-    public function addSelfToJScript(&$gAchievements)
+    public function addGlobalsToJScript(&$gAchievements)
     {
         $gAchievements[$this->Id] = array(
             'icon' => $this->template['iconString'],
@@ -92,13 +92,13 @@ class Achievement extends BaseType
         if (isset($lookup['item']))
         {
             $rewItems = new ItemList(array(['i.entry', $lookup['item']]));
-            $rewItems->addSelfToJScript($gItems);
+            $rewItems->addGlobalsToJScript($gItems);
         }
 
         if (isset($lookup['title']))
         {
             $rewTitles = new TitleList(array(['Id', $lookup['title']]));
-            $rewTitles->addSelfToJScript($gTitles);
+            $rewTitles->addGlobalsToJScript($gTitles);
         }
     }
 
@@ -194,7 +194,7 @@ class Achievement extends BaseType
         return array(
             "n"  => Util::localizedString($this->template, 'name'),
             "s"  => $this->template['faction'],
-            "t"  => TYPEID_ACHIEVEMENT,
+            "t"  => TYPE_ACHIEVEMENT,
             "ti" => $this->Id
         );
     }
@@ -255,13 +255,13 @@ class AchievementList extends BaseTypeList
         if (isset($lookup['item']))
         {
             $rewItems = new ItemList(array(['i.entry', array_unique($lookup['item'])]));
-            $rewItems->addSelfToJScript($gItems);
+            $rewItems->addGlobalsToJScript($gItems);
         }
 
         if (isset($lookup['title']))
         {
             $rewTitles = new TitleList(array(['Id', array_unique($lookup['title'])]));
-            $rewTitles->addSelfToJScript($gTitles);
+            $rewTitles->addGlobalsToJScript($gTitles);
         }
     }
 

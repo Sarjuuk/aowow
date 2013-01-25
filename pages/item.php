@@ -4,20 +4,20 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// require_once('includes/game.php');
-require_once('includes/class.spell.php');
-// require_once('includes/allquests.php');
-require_once('includes/class.item.php');
-// require_once('includes/allnpcs.php');
-// require_once('includes/allobjects.php');
-// require_once('includes/class.community.php'); // wo dont need those .. yet
-// require_once('includes/class.achievement.php');
-require_once('includes/class.faction.php');
+// require 'includes/game.php';
+require 'includes/class.spell.php';
+// require 'includes/allquests.php';
+require 'includes/class.item.php';
+// require 'includes/allnpcs.php';
+// require 'includes/allobjects.php';
+// require 'includes/class.community.php';                  // wo dont need those .. yet
+// require 'includes/class.achievement.php';
+require 'includes/class.faction.php';
 
 $id   = intVal($pageParam);
 $item = new Item($id);
 
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPEID_ITEM, $id, -1, User::$localeId]);
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEM, $id, -1, User::$localeId]);
 
 if (isset($_GET['xml']))
 {
@@ -54,7 +54,7 @@ else if (isset($_GET['power']))
         $itemString .= 's';
     }
 
-    $cacheKeyTooltip = implode(':', [CACHETYPE_TOOLTIP, TYPEID_ITEM, $itemString, -1, User::$localeId]);
+    $cacheKeyTooltip = implode(':', [CACHETYPE_TOOLTIP, TYPE_ITEM, $itemString, -1, User::$localeId]);
 
     // output json for tooltips
     if (!$smarty->loadCache($cacheKeyTooltip, $x))

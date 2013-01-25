@@ -59,7 +59,7 @@ class Quest extends BaseType
     {
         return array(
             "n"  => Util::localizedString($this->template, 'Title'),
-            "t"  => TYPEID_QUEST,
+            "t"  => TYPE_QUEST,
             "ti" => $this->Id,
             "c"  => $this->cat1,
             "c2" => $this->cat2
@@ -138,7 +138,7 @@ class Quest extends BaseType
         if ($tId = $this->template['RewardTitleId'])
         {
             $title = new Title($tId);
-            $title->addSelfToJScript($gTitles);
+            $title->addGlobalsToJScript($gTitles);
         }
     }
 }
@@ -194,19 +194,19 @@ class QuestList extends BaseTypeList
         if (!empty($items))
         {
             $items = new ItemList(array(['i.entry', $items]));
-            $items->addSelfToJScript($gItems);
+            $items->addGlobalsToJScript($gItems);
         }
 
         if (!empty($spells))
         {
             $spells = new SpellList(array(['id', $spells]));
-            $spells->addSelfToJScript($gSpells);
+            $spells->addGlobalsToJScript($gSpells);
         }
 
         if (!empty($titles))
         {
             $titles = new TitleList(array(['id', $titles]));
-            $titles->addSelfToJScript($gTitles);
+            $titles->addGlobalsToJScript($gTitles);
         }
     }
 }

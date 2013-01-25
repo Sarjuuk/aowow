@@ -8,22 +8,22 @@ if (!defined('AOWOW_REVISION'))
  */
 
 // TypeIds
-define('TYPEID_NPC',                        1);
-define('TYPEID_OBJECT',                     2);
-define('TYPEID_ITEM',                       3);
-define('TYPEID_ITEMSET',                    4);
-define('TYPEID_QUEST',                      5);
-define('TYPEID_SPELL',                      6);
-define('TYPEID_ZONE',                       7);
-define('TYPEID_FACTION',                    8);
-define('TYPEID_PET',                        9);
-define('TYPEID_ACHIEVEMENT',                10);
-define('TYPEID_TITLE',                      11);
-define('TYPEID_EVENT',                      12);
-define('TYPEID_CLASS',                      13);
-define('TYPEID_RACE',                       14);
-define('TYPEID_SKILL',                      15);
-define('TYPEID_CURRENCY',                   17);
+define('TYPE_NPC',                          1);
+define('TYPE_OBJECT',                       2);
+define('TYPE_ITEM',                         3);
+define('TYPE_ITEMSET',                      4);
+define('TYPE_QUEST',                        5);
+define('TYPE_SPELL',                        6);
+define('TYPE_ZONE',                         7);
+define('TYPE_FACTION',                      8);
+define('TYPE_PET',                          9);
+define('TYPE_ACHIEVEMENT',                  10);
+define('TYPE_TITLE',                        11);
+define('TYPE_EVENT',                        12);
+define('TYPE_CLASS',                        13);
+define('TYPE_RACE',                         14);
+define('TYPE_SKILL',                        15);
+define('TYPE_CURRENCY',                     17);
 
 define('CACHETYPE_PAGE',                    0);
 define('CACHETYPE_TOOLTIP',                 1);

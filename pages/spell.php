@@ -4,18 +4,18 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require_once('includes/class.spell.php');
-require_once('includes/class.item.php');
-// require_once('includes/allnpcs.php');
-// require_once('includes/allquests.php');
-// require_once('includes/class.community.php');            // not needed .. yet
-// require_once('includes/class.achievement.php');
+require 'includes/class.spell.php';
+require 'includes/class.item.php';
+// require 'includes/allnpcs.php';
+// require 'includes/allquests.php';
+// require 'includes/class.community.php';                  // not needed .. yet
+// require 'includes/class.achievement.php';
 
 $id    = intVal($pageParam);
 $spell = new Spell($id);
 
-$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPEID_SPELL, $id, -1, User::$localeId]);
-$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPEID_SPELL, $id, -1, User::$localeId]);
+$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_SPELL, $id, -1, User::$localeId]);
+$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_SPELL, $id, -1, User::$localeId]);
 
 if (isset($_GET['power']))
 {

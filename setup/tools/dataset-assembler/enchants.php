@@ -50,8 +50,8 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
-    include 'includes/class.spell.php';
-    include 'includes/class.item.php';
+    require 'includes/class.spell.php';
+    require 'includes/class.item.php';
 
     set_time_limit(300);
 

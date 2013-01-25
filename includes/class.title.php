@@ -49,7 +49,7 @@ class Title extends BaseType
         return $data;
     }
 
-    public function addSelfToJScript(&$gTitles)
+    public function addGlobalsToJScript(&$gTitles)
     {
         $gTitles[$this->Id] = ['name' => Util::jsEscape($this->name[GENDER_MALE])];
 

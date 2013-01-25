@@ -33,7 +33,7 @@ class BaseType
     public function getListviewData() { }
 
     // should return data to extend global js variables for a certain type (e.g. g_items)
-    public function addSelfToJScript(&$ref) { }
+    public function addGlobalsToJScript(&$ref) { }
 
     // should return data to extend global js variables for the rewards provided by this type (e.g. g_titles)
     public function addRewardsToJscript(&$ref1, &$ref2 = null, &$ref3 = null) { }
@@ -142,11 +142,11 @@ class BaseTypeList
         return $data;
     }
 
-    public function addSelfToJScript(&$ref)
+    public function addGlobalsToJScript(&$ref)
     {
         // no extra queries required, just call recursively
         foreach ($this->container as $type)
-            $type->addSelfToJScript($ref);
+            $type->addGlobalsToJScript($ref);
     }
 
     public function addRewardsToJScript(&$ref1, &$ref2 = null, &$ref3 = null)
@@ -177,7 +177,7 @@ class Lang
 
     public static function load($loc)
     {
-        if (@(include('localization/locale_'.$loc.'.php')) !== 1)
+        if (@(require 'localization/locale_'.$loc.'.php')) !== 1
             die('File for localization '.$loc.' not found.');
 
         foreach ($lang as $k => $v)

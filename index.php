@@ -5,12 +5,12 @@ define('AOWOW_REVISION', 12);
 if (!file_exists('config/config.php'))
 {
     $cwDir = /*$_SERVER['DOCUMENT_ROOT']; //*/getcwd();
-    include 'setup/setup.php';
+    require 'setup/setup.php';
     exit;
 }
 
 // include all necessities, set up basics
-include 'includes/kernel.php';
+require 'includes/kernel.php';
 
 switch ($pageCall)
 {
@@ -58,13 +58,13 @@ switch ($pageCall)
     case 'zone':
     case 'zones':
         if (file_exists('pages/'.$pageCall.'.php'))
-            include 'pages/'.$pageCall.'.php';
+            require 'pages/'.$pageCall.'.php';
         else
-            include 'pages/error.php';
+            require 'pages/error.php';
         break;
     case 'talent':                                          // tool: talent calculator
     case 'petcalc':                                         // tool: pet talent calculator
-        include 'pages/talent.php';
+        require 'pages/talent.php';
         break;
     /* called by script */
     case 'contactus':
@@ -91,11 +91,11 @@ switch ($pageCall)
         break;
     case 'search':                                          // tool: quick search
     case 'data':                                            // dataset-loader
-        include $pageCall.'.php';
+        require $pageCall.'.php';
         break;
     /* other */
     case '':                                                // no parameter given -> MainPage
-        include 'pages/main.php';
+        require 'pages/main.php';
         break;
     case 'latest-comments':
     case 'latest-screenshots':
@@ -105,25 +105,25 @@ switch ($pageCall)
     case 'missing-videos':
     case 'unrated-comments':
     case 'random':
-        include 'pages/miscTools.php';
+        require 'pages/miscTools.php';
         break;
     case 'setup':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            include 'setup/syncronize.php';
+            require 'setup/syncronize.php';
             break;
         }
     case 'build':
         if (User::isInGroup(U_GROUP_EMPLOYEE) && !empty($pageParam))
         {
-            include 'setup/tools/dataset-assembler/'.$pageParam.'.php';
+            require 'setup/tools/dataset-assembler/'.$pageParam.'.php';
             break;
         }
     default:                                                // unk parameter given -> ErrorPage
         if (isset($_GET['power']))
             die('$WowheadPower.register(0, '.User::$localeId.', {})');
         else                                                // in conjunction with a propper rewriteRule in .htaccess...
-            include 'pages/error.php';
+            require 'pages/error.php';
         break;
 }
 

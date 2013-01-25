@@ -4,24 +4,24 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require_once('includes/class.title.php');
-require_once('includes/class.spell.php');
-require_once('includes/class.achievement.php');
-require_once('includes/class.item.php');
-require_once('includes/class.quest.php');
-require_once('includes/class.worldevent.php');
-require_once('includes/class.community.php');
+require 'includes/class.title.php';
+require 'includes/class.spell.php';
+require 'includes/class.achievement.php';
+require 'includes/class.item.php';
+require 'includes/class.quest.php';
+require 'includes/class.worldevent.php';
+require 'includes/class.community.php';
 
 $Id = intVal($pageParam);
 
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPEID_TITLE, $Id, -1, User::$localeId]);
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, $Id, -1, User::$localeId]);
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $title = new Title($Id);
     if ($title->template)
     {
-        $title->addSelfToJscript($pageData['gTitles']);
+        $title->addGlobalsToJScript($pageData['gTitles']);
 
         $infobox = [];
         $colon   = User::$localeId == LOCALE_FR ? ' : ' : ': '; // Je suis un prick! <_<
@@ -66,7 +66,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     break;
                 case 12:
                     $acvs = new AchievementList(array(['id', $entries]));
-                    $acvs->addSelfToJscript($pageData['gAchievements']);
+                    $acvs->addGlobalsToJScript($pageData['gAchievements']);
                     $acvs->addRewardsToJscript($pageData['gItems'], $pageData['gTitles']);
 
                     $pageData['page']['acvReward'] = $acvs->getListviewData();
@@ -102,11 +102,11 @@ $smarty->updatePageVars(array(
     'title'     => $pageData['title']." - ".ucfirst(Lang::$game['title']),
     'path'      => "[0, 10, ".$title->template['category']."]",
     'tab'       => 0,                                       // for g_initHeader($tab)
-    'type'      => TYPEID_TITLE,                            // 11:Titles
+    'type'      => TYPE_TITLE,                              // 11:Titles
     'typeId'    => $Id
 ));
 
-$smarty->assign('community', CommunityContent::getAll(TYPEID_TITLE, $Id));  // comments, screenshots, videos
+$smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $Id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
 $smarty->assign('data', $pageData);
 $smarty->assign('mysql', DB::Aowow()->getStatistics());

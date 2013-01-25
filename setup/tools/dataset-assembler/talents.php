@@ -24,7 +24,7 @@ if (!defined('AOWOW_REVISION'))
     // t - array of talent-objects
     // f - array:int [pets only] creatureFamilies in that category
 
-    include 'includes/class.spell.php';
+    require 'includes/class.spell.php';
 
     function buildTree($class)
     {

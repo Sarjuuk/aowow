@@ -115,7 +115,7 @@ if (!defined('AOWOW_REVISION'))
         41108 => 'Lay on Hands'
     );
 
-    include 'includes/class.spell.php';
+    require 'includes/class.spell.php';
 
     set_time_limit(300);
 

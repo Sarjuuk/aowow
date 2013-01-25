@@ -159,7 +159,7 @@ class Item extends BaseType
         );
     }
 
-    public function addSelfToJScript(&$gItems)
+    public function addGlobalsToJScript(&$gItems)
     {
         $gItems[$this->Id] = array(
             'name'    => $this->name,

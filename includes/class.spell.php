@@ -928,7 +928,7 @@ class Spell extends BaseType
         );
     }
 
-    public function addSelfToJScript(&$gSpells)
+    public function addGlobalsToJScript(&$gSpells)
     {
         // if the spell creates an item use the itemIcon instead
         if ($this->template['effect1CreateItemId'])

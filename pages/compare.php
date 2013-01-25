@@ -3,11 +3,14 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
-require_once('includes/class.item.php');
-require_once('includes/class.spell.php');
-require_once('includes/class.faction.php');                 // items may require a faction to use/own
+require 'includes/class.item.php';
+require 'includes/class.spell.php';
+require 'includes/class.faction.php';                       // items may require a faction to use/own
 
-$pageData['items'] = array();
+$pageData = array(
+    'summary' => '[]',
+    'items'   => []
+);
 
 // prefer $_GET over $_COOKIE
 if (!empty($_GET['compare']))
