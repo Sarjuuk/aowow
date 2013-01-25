@@ -489,10 +489,10 @@ $WH.g_getCursorPos = function(e) {
 		y;
 
 	if (window.innerHeight) {
-    
+
         // ok, something of a workaround here... MS9+ sends a MSEventObj istead of mouseEvent . whatever
         // but the properties for that are client[X|Y] DIAF!
-    
+
         if (!e.pageX || !e.pageY) {
             x = e.clientX;
             y = e.clientY
@@ -1480,3 +1480,29 @@ $WH.Tooltip = {
 if ($WH.isset("$WowheadPower")) {
 	$WowheadPower.init()
 };
+
+$WH.g_getProfileIcon = function(raceId, classId, gender, level, icon, size) {
+	var raceXclass = {
+		10: {6:1,3:1,8:1,2:1,5:1,4:1,9:1},                  // bloodelf
+		11: {6:1,3:1,8:1,2:1,5:1,7:1,1:1},                  // draenei
+		 3: {6:1,3:1,2:1,5:1,4:1,1:1},                      // dwarf
+		 7: {6:1,8:1,4:1,9:1,1:1},                          // gnome
+		 1: {6:1,8:1,2:1,5:1,4:1,9:1,1:1},                  // human
+		 4: {6:1,11:1,3:1,5:1,4:1,1:1},                     // nightelf
+		 2: {6:1,3:1,4:1,7:1,9:1,1:1},                      // orc
+		 6: {6:1,11:1,3:1,7:1,1:1},                         // tauren
+		 8: {6:1,3:1,8:1,5:1,4:1,7:1,1:1},                  // troll
+		 5: {6:1,8:1,5:1,4:1,9:1,1:1}                       // scourge
+	};
+
+	if( icon) {
+		return isNaN(icon) ? icon : '?profile=avatar' + (size ? '&size=' + size : '') + '&id=' + icon + (size == 'tiny' ? '.gif' : '.jpg');
+	}
+
+	if (!g_file_races[raceId] || !g_file_classes[classId] || !g_file_genders[gender] ||
+	   !raceXclass[raceId] || !raceXclass[raceId][classId] || (classId == 6 && level < 55)) {
+		return 'inv_misc_questionmark';
+    }
+
+	return 'chr_' + g_file_races[raceId] + '_' + g_file_genders[gender] + '_' + g_file_classes[classId] + '0' + (level > 59 ? (Math.floor((level - 60) / 10) + 2) : 1);
+}

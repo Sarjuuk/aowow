@@ -705,7 +705,7 @@ function g_pickerWheel(evt)
 {
 	evt = $E(evt);
 
-	if(evt._wheelDelta < 0)
+	if (evt._wheelDelta < 0)
 		this.scrollTop += 27;
 	else
 		this.scrollTop -= 27;
@@ -826,20 +826,58 @@ function g_sortJsonArray(e, d, f, a) {
 	}
 	return c
 }
-function g_urlize(a, b) {
-	a = str_replace(a, "'", "");
-	a = trim(a);
-	if (b) {
-		a = str_replace(a, " ", "-")
-	} else {
-		a = a.replace(/[^a-z0-9]/ig, "-")
+
+function g_urlize(str, allowLocales, profile) {
+	var ta = ce('textarea');
+	ta.innerHTML = str.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+	str = ta.value;
+
+	str = str_replace(str, ' / ', '-');
+	str = str_replace(str, "'", '');
+
+	if (profile) {
+		str = str_replace(str, '(', '');
+		str = str_replace(str, ')', '');
+		var accents = {
+			"ß": "ss",
+			"á": "a", "ä": "a", "à": "a", "â": "a",
+			"è": "e", "ê": "e", "é": "e", "ë": "e",
+			"í": "i", "î": "i", "ì": "i", "ï": "i",
+			"ñ": "n",
+			"ò": "o", "ó": "o", "ö": "o", "ô": "o",
+			"ú": "u", "ü": "u", "û": "u", "ù": "u",
+			"œ": "oe",
+			"Á": "A", "Ä": "A", "À": "A", "Â": "A",
+			"È": "E", "Ê": "E", "É": "E", "Ë": "E",
+			"Í": "I", "Î": "I", "Ì": "I", "Ï": "I",
+			"Ñ": "N",
+			"Ò": "O", "Ó": "O", "Ö": "O", "Ô": "O",
+			"Ú": "U", "Ü": "U", "Û": "U", "Ù": "U",
+			"œ": "Oe"
+		};
+		for (var character in accents) {
+			str = str.replace(new RegExp(character, "g"), accents[character]);
+		}
 	}
-	a = str_replace(a, "--", "-");
-	a = str_replace(a, "--", "-");
-	a = rtrim(a, "-");
-	a = a.toLowerCase();
-	return a
+
+	str = trim(str);
+	if (allowLocales) {
+		str = str_replace(str, ' ', '-');
+	}
+	else {
+		str = str.replace(/[^a-z0-9]/ig, '-');
+	}
+
+	str = str_replace(str, '--', '-');
+	str = str_replace(str, '--', '-');
+	str = rtrim(str, '-');
+	str = str.replace(/[A-Z]/g, function(x) {
+        return x.toLowerCase();
+    });
+
+	return str;
 }
+
 function g_getLocale(a) {
 	if (a && g_locale.id == 25) {
 		return 0
@@ -901,23 +939,32 @@ function g_createHeader(c) {
 	var b = ge("topbar-generic");
 	if (c != null && c >= 0 && c < mn_path.length) {
 		c = parseInt(c);
-		switch (c) {
-		case 0:
-			Menu.addButtons(b, Menu.explode(mn_database));
-			break;
-		case 1:
-			Menu.addButtons(b, mn_tools);
-			break;
-		case 2:
-			Menu.addButtons(b, Menu.explode(mn_more));
-			break;
-		case 3:
-			Menu.addButtons(b, Menu.explode(mn_forums));
-			break;
-		case 5:
-			pr_initTopBarSearch();
-			break
-		}
+        switch (c) {
+            case 0: // Database
+                Menu.addButtons(b, [
+                    [0, LANG.menu_browse, null, mn_database],       // Browse
+                    [1, mn_tools[7][1], null, mn_tools[7][3]],      // Utilities
+                    [2, mn_tools[7][3][1][1], mn_tools[7][3][1][2]] // Random Page
+                ]);
+                break;
+            case 1:
+                Menu.addButtons(b, [
+                    [0, LANG.calculators, null, mn_tools.slice(0,4)], // Calculators
+                    [1, mn_tools[4][1], mn_tools[4][2]],              // Maps
+                    [2, mn_tools[7][1], null, mn_tools[7][3]],        // Utilities
+                    [3, mn_tools[6][1], null, mn_tools[6][3]]         // Guides
+                ]);
+                break;
+            case 2:
+                Menu.addButtons(b, Menu.explode(mn_more));
+                break;
+            case 3:
+                Menu.addButtons(b, Menu.explode(mn_forums));
+                break;
+            case 5:
+                pr_initTopBarSearch();
+                break
+        }
 	} else {
 		ae(b, ct(String.fromCharCode(160)))
 	}
@@ -2247,17 +2294,20 @@ function g_createOrRegex(c) {
 	}
 	return new RegExp("(" + d + ")", "gi")
 }
-function g_GetExpansionClassName(a) {
-	switch (a) {
+
+function g_GetExpansionClassName(expansion) {
+	switch (expansion) {
 		case 0:
 			return null;
 		case 1:
-			return "bc-icon";
+			return "bc-icon-right";
 		case 2:
-			return "wotlk-icon";
+			return "wotlk-icon-right";
 	}
-	return null
+
+	return null;
 }
+
 function g_addPages(l, b) {
 	function p(r, d) {
 		var i;
@@ -2651,7 +2701,7 @@ var VideoViewer = new function () {
 			var s = divFrom.childNodes[1];
 			ee(s);
 
-			if(video.user)
+			if (video.user)
 			{
 				if (hasFrom1) {
 					ae(s, ct(' ' + LANG.dash + ' '));
@@ -3833,621 +3883,6 @@ Tabs.onShow = function (d, e) {
 		} else {
 			g_scrollTo(c, a)
 		}
-	}
-};
-var Icon = {
-	sizes: ['small', 'medium', 'large'],
-	sizes2: [18, 36, 56],
-	premiumOffsets: [[-56, -36], [-56, 0], [0, 0]],
-
-	create: function (name, size, UNUSED, url, num, qty, noBorder) {
-		var
-            icon = ce('div'),
-            image = ce('ins'),
-            tile = ce('del');
-
-		if (size == null) {
-			size = 1;
-		}
-
-		icon.className = 'icon' + Icon.sizes[size];
-
-		ae(icon, image);
-
-		if (!noBorder)
-            ae(icon, tile);
-
-		Icon.setTexture(icon, size, name);
-
-		if (url) {
-            var a = ce('a');
-			a.href = url;
-			if (url.indexOf('wowhead.com') == -1 && url.substr(0, 5) == 'http:') {
-				a.target = "_blank";
-			}
-			ae(icon, a);
-		}
-        else if (name) {
-			var _ = icon.firstChild.style;
-			var avatarIcon = (_.backgroundImage.indexOf('/avatars/') != -1);
-
-			if (!avatarIcon) {
-				icon.onclick = Icon.onClick;
-
-				var a = ce('a');
-				a.href = "javascript:;";
-				ae(icon, a);
-			}
-		}
-
-		Icon.setNumQty(icon, num, qty);
-
-		return icon;
-	},
-
-	createUser: function (avatar, avatarMore, size, url, isPremium, noBorder) {
-		if (avatar == 2) {
-			avatarMore = g_staticUrl + '/uploads/avatars/' + avatarMore + '.jpg';
-		}
-
-		var icon = Icon.create(avatarMore, size, null, url, null, null, noBorder);
-
-		if (isPremium) {
-			icon.className += ' ' + icon.className + (isPremium == 2 ? '-gold' : '-premium');
-		}
-
-		if (avatar == 2) {
-			Icon.moveTexture(icon, size, Icon.premiumOffsets[size][0], Icon.premiumOffsets[size][1], true);
-		}
-
-		return icon;
-	},
-
-	setTexture: function (icon, size, name) {
-		if (!name) {
-			return;
-		}
-
-		var _ = icon.firstChild.style;
-
-		if (name.indexOf('/') != -1 || name.indexOf('?') != -1) {
-			_.backgroundImage = 'url(' + name + ')';
-		}
-        else {
-			_.backgroundImage = 'url(' + g_staticUrl + '/images/icons/' + Icon.sizes[size] + '/' + escape(name.toLowerCase()) + '.jpg)';
-		}
-
-		Icon.moveTexture(icon, size, 0, 0);
-	},
-
-	moveTexture: function (icon, size, x, y, exact) {
-		var _ = icon.firstChild.style;
-
-		if (x || y) {
-			if (exact) {
-				_.backgroundPosition = x + 'px ' + y + 'px';
-			}
-            else {
-				_.backgroundPosition = (-x * Icon.sizes2[size]) + 'px ' + ( -y * Icon.sizes2[size]) + 'px';
-			}
-		}
-        else if (_.backgroundPosition) {
-            _.backgroundPosition = '';
-		}
-	},
-
-	setNumQty: function (icon, num, qty) {
-		var _ = gE(icon, 'span');
-
-		for (var i = 0, len = _.length; i < len; ++i) {
-			if (_[i]) {
-				de(_[i]);
-			}
-		}
-		if (num != null && ((num > 1 && num < 2147483647) || num.length)) {
-			_ = g_createGlow(num, 'q1');
-			_.style.right = '0';
-			_.style.bottom = '0';
-			_.style.position = 'absolute';
-			ae(icon, _);
-		}
-
-		if (qty != null && qty > 0) {
-			_ = g_createGlow('(' + qty + ')', 'q');
-			_.style.left = '0';
-			_.style.top = '0';
-			_.style.position = 'absolute';
-			ae(icon, _);
-		}
-	},
-
-	getLink: function (icon) {
-		return gE(icon, 'a')[0];
-	},
-
-	showIconName: function (x) {
-		if (x.firstChild) {
-			var _ = x.firstChild.style;
-			if (_.backgroundImage.length && (_.backgroundImage.indexOf(g_staticUrl) >= 4 || g_staticUrl == '')) {
-                var
-                start = _.backgroundImage.lastIndexOf('/'),
-				end   = _.backgroundImage.indexOf('.jpg');
-
-				if (start != -1 && end != -1) {
-					Icon.displayIcon(_.backgroundImage.substring(start + 1, end));
-				}
-			}
-		}
-	},
-
-	onClick: function() {
-		Icon.showIconName(this);
-	},
-
-	displayIcon: function(icon) {
-		if (!Dialog.templates.icondisplay) {
-			var w = 364;
-			switch(g_locale.id) {
-				case 6:
-					w = 380;
-					break;
-
-				case 8:
-					w = 384;
-					break;
-			}
-
-			Dialog.templates.icondisplay = {
-				title: LANG.icon,
-				width: w,
-				buttons: [['arrow', LANG.dialog_original], ['cancel', LANG.close]],
-				fields:
-				[
-					{
-						id: 'icon',
-						label: LANG.dialog_imagename,
-						required: 1,
-						type: 'text',
-						labelAlign: 'left',
-						compute: function(field, value, form, td) {
-							var wrapper = ce('div');
-							td.style.width = '300px';
-							wrapper.style.position = 'relative';
-							wrapper.style.cssFloat = 'left';
-							wrapper.style.paddingRight = '6px';
-							field.style.width = '200px';
-
-							var divIcon = this.iconDiv = ce('div');
-							divIcon.style.position = 'absolute';
-							divIcon.style.top = '-12px';
-							divIcon.style.right = '-70px';
-
-							divIcon.update = function() {
-								setTimeout(function() { field.focus(); field.select(); }, 10);
-								ee(divIcon);
-								ae(divIcon, Icon.create(field.value, 2));
-							};
-
-							ae(divIcon, Icon.create(value, 2));
-							ae(wrapper, divIcon);
-							ae(wrapper, field);
-							ae(td, wrapper);
-						}
-					},
-					{
-						id: 'location',
-						label: " ",
-						required: 1,
-						type: 'caption',
-						compute: function(field, value, form, th, tr) {
-							ee(th);
-							th.style.padding = '3px 3px 0 3px';
-							th.style.lineHeight = '17px';
-							th.style.whiteSpace = 'normal';
-							var wrapper = ce('div');
-							wrapper.style.position = 'relative';
-							wrapper.style.width = '250px';
-
-							var span = ce('span');
-
-							var text = LANG.dialog_seeallusingicon;
-							text = text.replace('$1', '<a href="?items&filter=cr=142;crs=0;crv=' + this.data.icon + '">' + LANG.types[3][3] + '</a>');
-							text = text.replace('$2', '<a href="?spells&filter=cr=15;crs=0;crv=' + this.data.icon + '">' + LANG.types[6][3] + '</a>');
-							text = text.replace('$3', '<a href="?achievements&filter=cr=10;crs=0;crv=' + this.data.icon + '">' + LANG.types[10][3] + '</a>');
-
-							span.innerHTML = text;
-							ae(wrapper, span);
-							ae(th, wrapper);
-						}
-					}
-				],
-
-				onInit: function(form) {
-					this.updateIcon = this.template.updateIcon.bind(this, form);
-				},
-
-				onShow: function(form) {
-					this.updateIcon();
-					if (location.hash && location.hash.indexOf('#icon') == -1) {
-						this.oldHash = location.hash;
-                    }
-					else {
-						this.oldHash = '';
-                    }
-
-					var hash = '#icon';
-
-					// Add icon name on all pages but item, spell and achievement pages (where the name is already available).
-					var nameDisabled = (isset('g_pageInfo') && g_pageInfo.type && in_array([3, 6, 10], g_pageInfo.type) == -1);
-					if (!nameDisabled)
-						hash += ':' + this.data.icon;
-
-					location.hash = hash;
-				},
-
-				onHide: function(form) {
-					if (this.oldHash) {
-						location.hash = this.oldHash;
-                    }
-					else {
-						location.hash = '#.';
-                    }
-				},
-
-				updateIcon: function(form) {
-					this.iconDiv.update();
-				},
-
-				onSubmit: function(unused, data, button, form) {
-					if (button == 'arrow') {
-						var win = window.open(g_staticUrl + '/images/icons/large/' + data.icon.toLowerCase() + '.jpg', '_blank');
-						win.focus();
-						return false;
-					}
-
-					return true;
-				}
-			};
-		}
-
-		if (!Icon.icDialog) {
-			Icon.icDialog = new Dialog();
-        }
-
-		Icon.icDialog.show('icondisplay', {data: {icon: icon}});
-	},
-
-	checkPound: function() {
-		if (location.hash && location.hash.indexOf('#icon') == 0) {
-			var parts = location.hash.split(':');
-			var icon = false;
-			if (parts.length == 2) {
-				icon = parts[1];
-			}
-			else if (parts.length == 1 && isset('g_pageInfo')) {
-				switch(g_pageInfo.type) {
-					case 3: // Item
-						icon = g_items[g_pageInfo.typeId].icon.toLowerCase();
-						break;
-					case 6: // Spell
-						icon = g_spells[g_pageInfo.typeId].icon.toLowerCase();
-						break;
-					case 10: // Achievement
-						icon = g_achievements[g_pageInfo.typeId].icon.toLowerCase();
-						break;
-				}
-			}
-
-			if (icon)
-				Icon.displayIcon(icon);
-		}
-	}
-};
-DomContentLoaded.addEvent(Icon.checkPound);
-
-var RedButton = {
-	create: function (text, enabled, func) {
-		var
-            a = ce('a'),
-            em = ce('em'),
-            b = ce('b'),
-            i = ce('i'),
-            span = ce('span');
-
-		a.href = 'javascript:;';
-		a.className = 'button-red';
-
-		ae(b, i);
-		ae(em, b);
-		ae(em, span);
-		ae(a, em);
-
-		RedButton.setText(a, text);
-		RedButton.enable(a, enabled);
-		RedButton.setFunc(a, func);
-
-		return a;
-	},
-
-	setText: function (button, text) {
-		st(button.firstChild.childNodes[0].firstChild, text); // em, b, i
-		st(button.firstChild.childNodes[1], text); // em, span
-	},
-
-	enable: function (button, enabled) {
-		if (enabled || enabled == null) {
-			button.className = button.className.replace('button-red-disabled', '');
-		}
-        else if (button.className.indexOf('button-red-disabled') == -1) {
-            button.className += ' button-red-disabled';
-		}
-	},
-
-	setFunc: function (button, func) {
-		button.onclick = (func ? func: null);
-	}
-};
-
-var Tooltip = {
-	create: function (h) {
-		var f = ce("div"),
-		k = ce("table"),
-		b = ce("tbody"),
-		e = ce("tr"),
-		c = ce("tr"),
-		a = ce("td"),
-		j = ce("th"),
-		i = ce("th"),
-		g = ce("th");
-		f.className = "tooltip";
-		j.style.backgroundPosition = "top right";
-		i.style.backgroundPosition = "bottom left";
-		g.style.backgroundPosition = "bottom right";
-		if (h) {
-			a.innerHTML = h
-		}
-		ae(e, a);
-		ae(e, j);
-		ae(b, e);
-		ae(c, i);
-		ae(c, g);
-		ae(b, c);
-		ae(k, b);
-		Tooltip.icon = ce("p");
-		Tooltip.icon.style.visibility = "hidden";
-		ae(Tooltip.icon, ce("div"));
-		ae(f, Tooltip.icon);
-		ae(f, k);
-		return f
-	},
-	fix: function (d, b, f) {
-		var e = gE(d, "table")[0],
-		h = gE(e, "td")[0],
-		g = h.childNodes;
-		if (g.length >= 2 && g[0].nodeName == "TABLE" && g[1].nodeName == "TABLE") {
-			g[0].style.whiteSpace = "nowrap";
-			var a;
-			if (g[1].offsetWidth > 300) {
-				a = Math.max(300, g[0].offsetWidth) + 20
-			} else {
-				a = Math.max(g[0].offsetWidth, g[1].offsetWidth) + 20
-			}
-			if (a > 20) {
-				d.style.width = a + "px";
-				g[0].style.width = g[1].style.width = "100%";
-				if (!b && d.offsetHeight > document.body.clientHeight) {
-					e.className = "shrink"
-				}
-			}
-		}
-		if (f) {
-			d.style.visibility = "visible"
-		}
-	},
-	fixSafe: function (c, b, a) {
-		if (Browser.ie) {
-			setTimeout(Tooltip.fix.bind(this, c, b, a), 1)
-		} else {
-			Tooltip.fix(c, b, a)
-		}
-	},
-	append: function (c, b) {
-		var c = $(c);
-		var a = Tooltip.create(b);
-		ae(c, a);
-		Tooltip.fixSafe(a, 1, 1)
-	},
-	prepare: function () {
-		if (Tooltip.tooltip) {
-			return
-		}
-		var b = Tooltip.create();
-		b.style.position = "absolute";
-		b.style.left = b.style.top = "-2323px";
-		var a = ge("layers");
-		ae(a, b);
-		Tooltip.tooltip = b;
-		Tooltip.tooltipTable = gE(b, "table")[0];
-		Tooltip.tooltipTd = gE(b, "td")[0];
-		if (Browser.ie6) {
-			b = ce("iframe");
-			b.src = "javascript:0;";
-			b.frameBorder = 0;
-			ae(a, b);
-			Tooltip.iframe = b
-		}
-	},
-	set: function (b) {
-		var a = Tooltip.tooltip;
-		a.style.width = "550px";
-		a.style.left = "-2323px";
-		a.style.top = "-2323px";
-		Tooltip.tooltipTd.innerHTML = b;
-		a.style.display = "";
-		Tooltip.fix(a, 0, 0)
-	},
-	moveTests: [[null, null], [null, false], [false, null], [false, false]],
-	move: function (m, l, d, o, c, a) {
-		if (!Tooltip.tooltipTable) {
-			return
-		}
-		var k = Tooltip.tooltip,
-		g = Tooltip.tooltipTable.offsetWidth,
-		b = Tooltip.tooltipTable.offsetHeight,
-		p;
-		k.style.width = g + "px";
-		var j, e;
-		for (var f = 0, h = Tooltip.moveTests.length; f < h; ++f) {
-			p = Tooltip.moveTests[f];
-			j = Tooltip.moveTest(m, l, d, o, c, a, p[0], p[1]);
-            break;
-		}
-		k.style.left = j.l + "px";
-		k.style.top = j.t + "px";
-		k.style.visibility = "visible";
-		if (Browser.ie6 && Tooltip.iframe) {
-			var p = Tooltip.iframe;
-			p.style.left = j.l + "px";
-			p.style.top = j.t + "px";
-			p.style.width = g + "px";
-			p.style.height = b + "px";
-			p.style.display = "";
-			p.style.visibility = "visible"
-		}
-	},
-	moveTest: function (e, l, o, z, c, a, m, b) {
-		var k = e,
-		y = l,
-		f = Tooltip.tooltip,
-		i = Tooltip.tooltipTable.offsetWidth,
-		q = Tooltip.tooltipTable.offsetHeight,
-		g = g_getWindowSize(),
-		j = g_getScroll(),
-		h = g.w,
-		p = g.h,
-		d = j.x,
-		w = j.y,
-		v = d,
-		u = w,
-		t = d + h,
-		r = w + p;
-		if (m == null) {
-			m = (e + o + i <= t)
-		}
-		if (b == null) {
-			b = (l - q >= u)
-		}
-		if (m) {
-			e += o + c
-		} else {
-			e = Math.max(e - i, v) - c
-		}
-		if (b) {
-			l -= q + a
-		} else {
-			l += z + a
-		}
-		if (e < v) {
-			e = v
-		} else {
-			if (e + i > t) {
-				e = t - i
-			}
-		}
-		if (l < u) {
-			l = u
-		} else {
-			if (l + q > r) {
-				l = Math.max(w, r - q)
-			}
-		}
-		if (Tooltip.iconVisible) {
-			if (k >= e - 48 && k <= e && y >= l - 4 && y <= l + 48) {
-				l -= 48 - (y - l)
-			}
-		}
-		return g_createRect(e, l, i, q)
-	},
-	show: function (f, e, d, b, c) {
-		if (Tooltip.disabled) {
-			return
-		}
-		if (!d || d < 1) {
-			d = 1
-		}
-		if (!b || b < 1) {
-			b = 1
-		}
-		if (c) {
-			e = '<span class="' + c + '">' + e + "</span>"
-		}
-		var a = ac(f);
-		Tooltip.prepare();
-		Tooltip.set(e);
-		Tooltip.move(a.x, a.y, f.offsetWidth, f.offsetHeight, d, b)
-	},
-	showAtCursor: function (d, f, c, a, b) {
-		if (Tooltip.disabled) {
-			return
-		}
-		if (!c || c < 10) {
-			c = 10
-		}
-		if (!a || a < 10) {
-			a = 10
-		}
-		if (b) {
-			f = '<span class="' + b + '">' + f + "</span>"
-		}
-		d = $E(d);
-		var g = g_getCursorPos(d);
-		Tooltip.prepare();
-		Tooltip.set(f);
-		Tooltip.move(g.x, g.y, 0, 0, c, a)
-	},
-	showAtXY: function (d, a, e, c, b) {
-		if (Tooltip.disabled) {
-			return
-		}
-		Tooltip.prepare();
-		Tooltip.set(d);
-		Tooltip.move(a, e, 0, 0, c, b)
-	},
-	cursorUpdate: function (b, a, d) {
-		if (Tooltip.disabled || !Tooltip.tooltip) {
-			return
-		}
-		b = $E(b);
-		if (!a || a < 10) {
-			a = 10
-		}
-		if (!d || d < 10) {
-			d = 10
-		}
-		var c = g_getCursorPos(b);
-		Tooltip.move(c.x, c.y, 0, 0, a, d)
-	},
-	hide: function () {
-		if (Tooltip.tooltip) {
-			Tooltip.tooltip.style.display = "none";
-			Tooltip.tooltip.visibility = "hidden";
-			Tooltip.tooltipTable.className = "";
-			if (Browser.ie6) {
-				Tooltip.iframe.style.display = "none"
-			}
-			Tooltip.setIcon(null);
-		}
-	},
-	setIcon: function (a) {
-		Tooltip.prepare();
-		if (a) {
-			Tooltip.icon.style.backgroundImage = "url(images/icons/medium/" + a.toLowerCase() + ".jpg)";
-			Tooltip.icon.style.visibility = "visible"
-		} else {
-			Tooltip.icon.style.backgroundImage = "none";
-			Tooltip.icon.style.visibility = "hidden"
-		}
-		Tooltip.iconVisible = a ? 1 : 0
 	}
 };
 var g_listviews = {};
@@ -5979,416 +5414,476 @@ Listview.headerOver = function (b, c, f) {
 	Tooltip.show(b, d, 0, 0, "q")
 };
 Listview.extraCols = {
-	id: {
-		id: "id",
-		name: "ID",
-		width: "5%",
-		value: "id",
-		compute: function (a, b) {
-			if (a.id) {
-				ae(b, ct(a.id))
-			}
-		}
-	},
-	cost: {
-		id: "cost",
-		name: LANG.cost,
-		getValue: function (a) {
-			if (a.cost) {
-				return (a.cost[3] && a.cost[3][0] ? a.cost[3][0][1] : 0) || (a.cost[2] || a.cost[1] || a.cost[0])
-			}
-		},
-		compute: function (f, g) {
-			if (f.cost) {
-				var d = f.cost[0];
-				var c = null;
-				var b = f.cost[2];
-				var a = f.cost[1];
-				var e = 0;
-				if (f.side != null) {
-					c = f.side
-				} else {
-					if (f.react != null) {
-						if (f.react[0] == 1 && f.react[1] == -1) {
-							c = 1
-						} else {
-							if (f.react[0] == -1 && f.react[1] == 1) {
-								c = 2
-							}
-						}
-					}
-				}
-				Listview.funcBox.appendMoney(g, d, c, a, b, f.cost[3]/*e*/)
-			}
-		},
-		sortFunc: function (d, c, e) {
-			if (d.cost == null) {
-				return -1
-			} else {
-				if (c.cost == null) {
-					return 1
-				}
-			}
-			var i = 0,
-			h = 0,
-			g = 0,
-			f = 0;
-			if (d.cost[2] != null) {
-				array_walk(d.cost[2], function (a, b, k, j) {
-
-					i += Math.pow(10, j) + a[1]
-				})
-			}
-			if (c.cost[2] != null) {
-				array_walk(c.cost[2], function (a, b, k, j) {
-
-					h += Math.pow(10, j) + a[1]
-				})
-			}
-
-			if (d.cost[1] != null) {
-				array_walk(d.cost[1], function (a, b, k, j) {
-					g += Math.pow(10, j) + a[1]
-				})
-			}
-			if (c.cost[1] != null) {
-				array_walk(c.cost[1], function (a, b, k, j) {
-					f += Math.pow(10, j) + a[1]
-				})
-			}
-			return strcmp(i, h) || strcmp(g, f) || strcmp(d.cost[0], c.cost[0])
-		}
-	},
-	count: {
-		id: "count",
-		name: LANG.count,
-		width: "11%",
-		value: "count",
-		compute: function (b, c) {
-			if (! (this._totalCount > 0 || b.outof > 0)) {
-				return
-			}
-			if (b.outof) {
-				var a = ce("div");
-				a.className = "small q0";
-				ae(a, ct(sprintf(LANG.lvdrop_outof, b.outof)));
-				ae(c, a)
-			}
-			return b.count
-		},
-		getVisibleText: function (a) {
-			var b = a.count;
-			if (a.outof) {
-				b += " " + a.outof
-			}
-			return b
-		},
-		sortFunc: function (d, c, e) {
-			if (d.count == null) {
-				return -1
-			} else {
-				if (c.count == null) {
-					return 1
-				}
-			}
-			return strcmp(d.count, c.count)
-		}
-	},
-	percent: {
-		id: "percent",
-		name: "%",
-		width: "10%",
-		value: "percent",
-		compute: function (a, b) {
-			if (a.count <= 0) {
-				return "??"
-			}
-			if (a.pctstack) {
-				var text = "";
-				var data = eval("(" + a.pctstack + ")");
-				for (var amt in data) {
-					var pct = (data[amt] * a.percent) / 100;
-					if (pct >= 1.95) {
-						pct = parseFloat(pct.toFixed(0))
-					} else {
-
-						if (pct >= 0.195) {
-							pct = parseFloat(pct.toFixed(1))
-						} else {
-							pct = parseFloat(pct.toFixed(2))
-						}
-					}
-					text += sprintf(LANG.stackof_format, amt, pct) + "<br />"
-				}
-				b.className += " tip";
-                b.onmouseover = function (event) {
-					Tooltip.showAtCursor(event, text, 0, 0, "q")
-				}
-                b.mousemove = function (event) {
-					Tooltip.cursorUpdate(event)
-				}
-                b.mouseout = function () {
-					Tooltip.hide()
-				}
-			}
-			var value = parseFloat(a.percent.toFixed(a.percent >= 1.95 ? 0 : (a.percent >= 0.195 ? 1 : 2)));
-			if (a.pctstack) {
-				var c = ce("span");
-                c.className += " tip";
-                ae(c, ct(value));
-                ae(b, c);
-			} else {
-				return value
-			}
-        },
-		getVisibleText: function (a) {
-			if (a.count <= 0) {
-				return "??"
-			}
-			if (a.percent >= 1.95) {
-				return a.percent.toFixed(0)
-			} else {
-				if (a.percent >= 0.195) {
-					return parseFloat(a.percent.toFixed(1))
-				} else {
-					return parseFloat(a.percent.toFixed(2))
-				}
-			}
-		},
-		sortFunc: function (e, c, f) {
-			if (e.count == null) {
-				return -1
-			} else {
-				if (c.count == null) {
-					return 1
-				}
-			}
-			if (e.percent >= 1.95) {
-				var d = e.percent.toFixed(0)
-			} else {
-				if (e.percent >= 0.195) {
-                    d = parseFloat(e.percent.toFixed(1))
-				} else {
-					d = parseFloat(e.percent.toFixed(2))
-				}
-			}
-			if (c.percent >= 1.95) {
-				var g = c.percent.toFixed(0)
-			} else {
-				if (c.percent >= 0.195) {
-                    g = parseFloat(c.percent.toFixed(1))
-				} else {
-					g = parseFloat(c.percent.toFixed(2))
-				}
-			}
-			return strcmp(d, g)
-		}
-	},
-	stock: {
-		id: "stock",
-		name: LANG.stock,
-		width: "10%",
-		value: "stock",
-		compute: function (a, b) {
-			if (a.stock > 0) {
-				return a.stock
-			} else {
-				b.style.fontFamily = "Verdana, sans-serif";
-				return String.fromCharCode(8734)
-			}
-		},
-		getVisibleText: function (a) {
-			if (a.stock > 0) {
-				return a.stock
-			} else {
-				return String.fromCharCode(8734) + " infinity"
-			}
-		}
-    },
-	currency: {
-		id: "currency",
-		name: LANG.currency,
-		getValue: function (a) {
-			if (a.currency) {
-				return (a.currency[0] ? a.currency[0][1] : 0)
-			}
-		},
-		compute: function (b, c) {
-			if (b.currency) {
-				var a = null;
-				if (b.side != null) {
-					a = b.side
-				} else {
-					if (b.react != null) {
-						if (b.react[0] == 1 && b.react[1] == -1) {
-							a = 1
-						} else {
-							if (b.react[0] == -1 && b.react[1] == 1) {
-								a = 2
-							}
-						}
-					}
-				}
-				Listview.funcBox.appendMoney(c, null, a, null, b.currency)
-			}
-		},
-		sortFunc: function (d, c, e) {
-			if (d.currency == null) {
-				return - 1
-			} else {
-				if (c.currency == null) {
-					return 1
-				}
-			}
-			var g = 0,
-			f = 0;
-			array_walk(d.currency, function (a, b, j, h) {
-				g += Math.pow(10, h) + a[1]
-			});
-			array_walk(c.currency, function (a, b, j, h) {
-				f += Math.pow(10, h) + a[1]
-			});
-			return strcmp(g, f)
+    id: {
+        id: 'id',
+        name: 'ID',
+        width: '5%',
+        value: 'id',
+        compute: function (data, td) {
+            if (data.id) {
+                ae(td, ct(data.id));
+            }
         }
-	},
-	mode: {
-		id: "mode",
-		name: "Mode",
-		after: "name",
-		type: "text",
-		compute: function (a, b) {
-			if (a.modes && a.modes.mode) {
-				if ((a.modes.mode & 120) == 120 || (a.modes.mode & 3) == 3) {
-					return LANG.pr_note_all
-				}
-				return Listview.extraCols.mode.getVisibleText(a)
-			}
-		},
-		getVisibleText: function (f) {
-			var a = !!(f.modes.mode & 26);
-			var g = !!(f.modes.mode & 97);
-			var e = !!(f.modes.mode & 40);
-			var b = !!(f.modes.mode & 80);
-			var d;
-			if (e && !b) {
-				d = 10
-			} else {
-				if (b && !e) {
-					d = 25
-				}
-			}
-			var c;
-			if (a && !g) {
-				c = "normal"
-			} else {
-				if (g && !a) {
-					c = "heroic"
-				}
-			}
-			if (c) {
-				if (d) {
-					return sprintf(LANG["tab_" + c + "X"], d)
-				} else {
-					return LANG["tab_" + c]
-				}
-			}
-			if (d) {
-				return sprintf(LANG.lvzone_xman, d)
-			}
-			return LANG.pr_note_all
-		},
-		sortFunc: function (d, c, e) {
-			if (d.modes && c.modes) {
-				return - strcmp(d.modes.mode, c.modes.mode)
-			}
-		}
-	},
-	requires: {
-		id: "requires",
-		name: LANG.requires,
-		type: "text",
-		compute: function (c, d) {
-			if (c.achievement && g_achievements[c.achievement]) {
-				nw(d);
-				d.className = "small";
-				d.style.lineHeight = "18px";
-				var b = ce("a");
-				b.href = "?achievement=" + c.achievement;
-				b.className = "icontiny";
-				b.style.backgroundImage = "url(" + g_staticUrl + "/images/wow/icons/tiny/" + g_achievements[c.achievement].icon.toLowerCase() + ".gif)";
-				b.style.whiteSpace = "nowrap";
-				st(b, g_achievements[c.achievement]["name_" + g_locale.name]);
-				ae(d, b)
-			}
-		},
-		getVisibleText: function (a) {
-			if (a.achievement && g_achievements[a.achievement]) {
-				return g_achievements[a.achievement].name
-			}
-		},
-		sortFunc: function (d, c, e) {
-			return strcmp(this.getVisibleText(d), this.getVisibleText(c))
-		}
-	},
-	reqskill: {
-		id: "reqskill",
-		name: LANG.skill,
-		width: "10%",
-		value: "reqskill",
-		before: "yield"
-	},
-	yield: {
-		id: "yield",
-		name: LANG.yields,
-		type: "text",
-		align: "left",
-		span: 2,
-		value: "name",
-		compute: function (e, g, d) {
-			if (e.yield && g_items[e.yield]) {
-				var c = ce("td");
-				c.style.width = "1px";
-				c.style.padding = "0";
-				c.style.borderRight = "none";
-				ae(c, g_items.createIcon(e.yield, 1));
-				ae(d, c);
-				g.style.borderLeft = "none";
-				var f = ce("div");
-				var b = ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = "?item=" + e.yield;
-				b.className = "q" + g_items[e.yield].quality;
-				ae(b, ct(g_items[e.yield]["name_" + g_locale.name]));
-				ae(f, b);
-				ae(g, f)
-			}
-		},
-		getVisibleText: function (a) {
-			if (a.yield && g_items[a.yield]) {
-				return g_items[a.yield]["name_" + g_locale.name]
-			}
-		},
-		sortFunc: function (d, c, e) {
-			if (!d.yield || !g_items[d.yield] || !c.yield || !g_items[c.yield]) {
-				return (d.yield && g_items[d.yield] ? 1 : (c.yield && g_items[c.yield] ? -1 : 0))
-			}
-			return - strcmp(g_items[d.yield].quality, g_items[c.yield].quality) || strcmp(g_items[d.yield]["name_" + g_locale.name], g_items[c.yield]["name_" + g_locale.name])
-		}
-	}
+    },
+
+    date: {
+        id: 'obj-date',
+        name: LANG.added,
+        compute: function(data, td) {
+            if (data.date) {
+                if (data.date <= 86400) {
+                    ae(td, ct('???'));
+                }
+                else {
+                    var added   = new Date(data.date * 1000);
+                    var elapsed = (g_serverTime - added) / 1000;
+
+                    return g_formatDate(td, elapsed, added, null, true);
+                }
+            }
+        },
+        sortFunc: function(a, b, col) {
+            if (a.date == b.date) {
+                return 0;
+            }
+            else if (a.date < b.date) {
+                return -1;
+            }
+            else {
+                return 1;
+            }
+        }
+    },
+
+    cost: {
+        id: 'cost',
+        name: LANG.cost,
+        getValue: function (row) {
+            if (row.cost) {
+                return (row.cost[3] && row.cost[3][0] ? row.cost[3][0][1] : 0) || (row.cost[2] || row.cost[1] || row.cost[0])
+    // 5.0      return (row.cost[2] && row.cost[2][0] ? row.cost[2][0][1] : 0) || (row.cost[1] && row.cost[1][0] ? row.cost[1][0][1] : 0) || row.cost[0];
+            }
+        },
+        compute: function (row, td) {
+            if (row.cost) {
+                var money = row.cost[0];
+                var side = null;
+                var items = row.cost[2];
+                var currency = row.cost[1];
+                var achievementPoints = 0;
+
+                if (row.side != null) {
+                    side = row.side;
+                }
+                else  if (row.react != null) {
+                    if (row.react[0] == 1 && row.react[1] == -1) { // Alliance only
+                        side = 1;
+                    }
+                    else if (row.react[0] == -1 && row.react[1] == 1) { // Horde only
+                        side = 2;
+                    }
+                }
+
+                Listview.funcBox.appendMoney(td, money, side, currency, items, row.cost[3]/*achievementPoints*/)
+    // 5.0      Listview.funcBox.appendMoney(td, money, side, items, currency, achievementPoints);
+
+            }
+        },
+        sortFunc: function (a, b, col) {
+            if (a.cost == null) {
+                return -1;
+            }
+            else if (b.cost == null) {
+                return 1;
+            }
+
+            var
+                lena = 0,
+                lenb = 0,
+                lenc = 0,
+                lend = 0;
+
+            if (a.cost[2] != null) {
+                array_walk(a.cost[2], function (x, _, __, i) {
+                    lena += Math.pow(10, i) + x[1];
+                });
+            }
+            if (b.cost[2] != null) {
+                array_walk(b.cost[2], function (x, _, __, i) {
+                    lenb += Math.pow(10, i) + x[1];
+                });
+            }
+            if (a.cost[1] != null) {
+                array_walk(a.cost[1], function (x, _, __, i) {
+                    lenc += Math.pow(10, i) + x[1];
+                });
+            }
+            if (b.cost[1] != null) {
+                array_walk(b.cost[1], function (x, _, __, i) {
+                    lend += Math.pow(10, i) + x[1];
+                });
+            }
+
+            return strcmp(lena, lenb) || strcmp(lenc, lend) || strcmp(a.cost[0], b.cost[0]);
+        }
+    },
+
+    count: {
+        id: 'count',
+        name: LANG.count,
+        value: 'count',
+        compute: function (row, td) {
+            if (!(this._totalCount > 0 || row.outof > 0)) {
+                return;
+            }
+
+            if (row.outof) {
+                var d = ce('div');
+                d.className = 'small q0';
+                ae(d, ct(sprintf(LANG.lvdrop_outof, row.outof)));
+                ae(td, d);
+            }
+            return row.count;
+        },
+        getVisibleText: function (row) {
+            var buff = row.count;
+            if (row.outof) {
+                buff += ' ' + row.outof;
+            }
+
+            return buff;
+        },
+        sortFunc: function (a, b, col) {
+            if (a.count == null) {
+                return -1;
+            }
+            else if (b.count == null) {
+                return 1;
+            }
+
+            return strcmp(a.count, b.count);
+        }
+    },
+
+    percent: {
+        id: 'percent',
+        name: '%',
+        value: 'percent',
+        compute: function (row, td) {
+            if (row.count <= 0) {
+                return '??';
+            }
+
+            if (row.pctstack) {
+                var text = '';
+                var data = eval('(' + row.pctstack + ')');
+
+                for (var amt in data) {
+                    var pct = (data[amt] * row.percent) / 100;
+
+                    if (pct >= 1.95) {
+                        pct = parseFloat(pct.toFixed(0));
+                    }
+                    else if (pct >= 0.195) {
+                        pct = parseFloat(pct.toFixed(1));
+                    }
+                    else {
+                        pct = parseFloat(pct.toFixed(2));
+                    }
+
+                    text += sprintf(LANG.stackof_format, amt, pct) + '<br />';
+                }
+
+                td.className += ' tip';
+                g_addTooltip(td, text);
+            }
+
+            var value = parseFloat(row.percent.toFixed(row.percent >= 1.95 ? 0 : (row.percent >= 0.195 ? 1 : 2)));
+
+            if (row.pctstack) {
+                var sp = ce('span');
+                sp.className += ' tip';
+                ae(sp, ct(value));
+                ae(b, sp);
+            }
+            else {
+                return value;
+            }
+        },
+        getVisibleText: function (row) {
+            if (row.count <= 0) {
+                return '??';
+            }
+
+            if (row.percent >= 1.95) {
+                return row.percent.toFixed(0);
+            }
+            else if (row.percent >= 0.195) {
+                return parseFloat(row.percent.toFixed(1));
+            }
+            else {
+                return parseFloat(row.percent.toFixed(2));
+            }
+        },
+        sortFunc: function (a, b, col) {
+            if (a.count == null) {
+                return -1;
+            }
+            else if (b.count == null) {
+                return 1;
+            }
+
+            if (a.percent >= 1.95) {
+                var acmp = a.percent.toFixed(0);
+            }
+            else if (a.percent >= 0.195) {
+                acmp = parseFloat(a.percent.toFixed(1));
+            }
+            else {
+                acmp = parseFloat(a.percent.toFixed(2));
+            }
+
+            if (b.percent >= 1.95) {
+                var bcmp = b.percent.toFixed(0);
+            }
+            else if (b.percent >= 0.195) {
+                bcmp = parseFloat(b.percent.toFixed(1));
+            }
+            else {
+                bcmp = parseFloat(b.percent.toFixed(2));
+            }
+
+            return strcmp(acmp, bcmp);
+        }
+    },
+
+    stock: {
+        id: 'stock',
+        name: LANG.stock,
+        width: '10%',
+        value: 'stock',
+        compute: function (row, td) {
+            if (row.stock > 0) {
+                return row.stock;
+            }
+            else {
+                td.style.fontFamily = 'Verdana, sans-serif';
+                return String.fromCharCode(8734);
+            }
+        },
+        getVisibleText: function (row) {
+            if (row.stock > 0) {
+                return row.stock;
+            }
+            else {
+                return String.fromCharCode(8734) + ' infinity';
+            }
+        }
+    },
+
+    currency: {
+        id: 'currency',
+        name: LANG.currency,
+        getValue: function (row) {
+            if (row.currency) {
+                return (row.currency[0] ? row.currency[0][1] : 0);
+            }
+        },
+        compute: function (row, td) {
+            if (row.currency) {
+                var side = null;
+                if (row.side != null) {
+                    side = row.side;
+                }
+                else if (row.react != null) {
+                    if (row.react[0] == 1 && row.react[1] == -1) { // Alliance only
+                        side = 1;
+                    }
+                    else if (row.react[0] == -1 && row.react[1] == 1) { // Horde only
+                        side = 2;
+                    }
+                }
+
+                Listview.funcBox.appendMoney(td, null, side, null, row.currency);
+            }
+        },
+        sortFunc: function (a, b, col) {
+            if (a.currency == null) {
+                return -1;
+            }
+            else if (b.currency == null) {
+                return 1;
+            }
+
+            var
+                lena = 0,
+                lenb = 0;
+
+            array_walk(a.currency, function (x, _, __, i) {
+                lena += Math.pow(10, i) + x[1];
+            });
+            array_walk(b.currency, function (x, _, __, i) {
+                lenb += Math.pow(10, i) + x[1];
+            });
+
+            return strcmp(lena, lenb);
+        }
+    },
+
+    mode: {
+        id: 'mode',
+        name: 'Mode',
+        after: 'name',
+        type: 'text',
+        compute: function (row, td) {
+            if (row.modes && row.modes.mode) {
+                if ((row.modes.mode & 120) == 120 || (row.modes.mode & 3) == 3) {
+                    return LANG.pr_note_all;
+                }
+
+                return Listview.extraCols.mode.getVisibleText(row);
+            }
+        },
+        getVisibleText: function (row) {
+            // TODO: Remove magic numbers.
+            var modeNormal = !!(row.modes.mode & 26);
+            var modeHeroic = !!(row.modes.mode & 97);
+            var player10 = !!(row.modes.mode & 40);
+            var player25 = !!(row.modes.mode & 80);
+
+            var specificPlayers;
+            if (player10 && !player25) {
+                specificPlayers = 10;
+            }
+            else if (player25 && !player10) {
+                specificPlayers = 25;
+            }
+
+            var specificMode;
+            if (modeNormal && !modeHeroic) {
+                specificMode = 'normal';
+            }
+            else if (modeHeroic && !modeNormal) {
+                specificMode = 'heroic';
+            }
+
+            if (specificMode) {
+                if (specificPlayers) {
+                    return sprintf(LANG['tab_' + specificMode + 'X'], specificPlayers); // e.g. "Heroic 25"
+                }
+                else {
+                    return LANG['tab_' + specificMode]; // e.g. "Heroic"
+                }
+            }
+
+            if (specificPlayers) {
+                return sprintf(LANG.lvzone_xman, specificPlayers); // e.g. "25-player"
+            }
+
+            return LANG.pr_note_all;
+        },
+        sortFunc: function (a, b, col) {
+            if (a.modes && b.modes) {
+                return -strcmp(a.modes.mode, b.modes.mode);
+            }
+        }
+    },
+
+    requires: {
+        id: 'requires',
+        name: LANG.requires,
+        type: 'text',
+        compute: function (item, td) {
+            if (item.achievement && g_achievements[item.achievement]) {
+                nw(td);
+                td.className = 'small';
+                td.style.lineHeight = '18px';
+
+                var a = ce('a');
+                a.href = '?achievement=' + item.achievement;
+                a.className = 'icontiny tinyspecial';
+                a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + g_achievements[item.achievement].icon.toLowerCase() + '.gif)';
+                a.style.whiteSpace = 'nowrap';
+
+                st(a, g_achievements[item.achievement]['name_' + g_locale.name]);
+                ae(td, a);
+            }
+        },
+        getVisibleText: function (item) {
+            if (item.achievement && g_achievements[item.achievement]) {
+                return g_achievements[item.achievement].name;
+            }
+        },
+        sortFunc: function (a, b, col) {
+            return strcmp(this.getVisibleText(a), this.getVisibleText(b));
+        }
+    },
+
+    reqskill: {
+        id: 'reqskill',
+        name: LANG.skill,
+        width: '10%',
+        value: 'reqskill',
+        before: 'yield'
+    },
+
+    yield: {
+        id: 'yield',
+        name: LANG.yields,
+        type: 'text',
+        align: 'left',
+        span: 2,
+        value: 'name',
+        compute: function (row, td, tr) {
+            if (row.yield && g_items[row.yield]) {
+                var i = ce('td');
+                i.style.width = '1px';
+                i.style.padding = '0';
+                i.style.borderRight = 'none';
+
+                ae(i, g_items.createIcon(row.yield, 1));
+                ae(tr, i);
+                td.style.borderLeft = 'none';
+
+                var wrapper = ce('div');
+
+                var a = ce('a');
+                a.style.fontFamily = 'Verdana, sans-serif';
+                a.href = '?item=' + row.yield;
+                a.className = 'q' + g_items[row.yield].quality;
+                ae(a, ct(g_items[row.yield]['name_' + g_locale.name]));
+                ae(wrapper, a);
+                ae(td, wrapper);
+            }
+        },
+        getVisibleText: function (row) {
+            if (row.yield && g_items[row.yield]) {
+                return g_items[row.yield]['name_' + g_locale.name];
+            }
+        },
+        sortFunc: function (a, b, col) {
+            if (!a.yield || !g_items[a.yield] || !b.yield || !g_items[b.yield]) {
+                return (a.yield && g_items[a.yield] ? 1 : (b.yield && g_items[b.yield] ? -1 : 0));
+            }
+            return -strcmp(g_items[a.yield].quality, g_items[b.yield].quality) ||
+                    strcmp(g_items[a.yield]['name_' + g_locale.name], g_items[b.yield]['name_' + g_locale.name]);
+        }
+    }
 };
 Listview.funcBox = {
-	assocBinFlags: function (d, a) {
-		var c = [];
-		for (var b in a) {
-			if (!isNaN(b) && (d & 1 << b - 1)) {
-				c.push(b)
-			}
-		}
-		c.sort(function (f, e) {
-			return strcmp(a[f], a[e])
-		});
-		return c
-	},
+    assocBinFlags: function (f, arr) {
+        var res = [];
+        for (var i in arr) {
+            if (!isNaN(i) && (f & 1 << i - 1)) {
+                res.push(i);
+            }
+        }
+        res.sort(function (a, b) {
+            return strcmp(arr[a], arr[b]);
+        });
+
+        return res;
+    },
 	createSimpleCol: function (c, d, a, b) {
 		return {
 			id: c,
@@ -6415,30 +5910,31 @@ Listview.funcBox = {
 		}
         (Listview.funcBox.initModeFilter.bind(this, b))()
 	},
-	assocArrCmp: function (e, d, c) {
-		if (e == null) {
-			return -1
-		} else {
-			if (d == null) {
-				return 1
-			}
-		}
-		var h = Math.max(e.length, d.length);
-		for (var g = 0; g < h; ++g) {
-			if (e[g] == null) {
-				return -1
-			} else {
-				if (d[g] == null) {
-					return 1
-				}
-			}
-			var f = strcmp(c[e[g]], c[d[g]]);
-			if (f != 0) {
-				return f
-			}
-		}
-		return 0
-	},
+    assocArrCmp: function (a, b, arr) {
+        if (a == null) {
+            return -1;
+        }
+        else if (b == null) {
+            return 1;
+        }
+
+        var n = Math.max(a.length, b.length);
+        for (var i = 0; i < n; ++i) {
+            if (a[i] == null) {
+                return -1;
+            }
+            else if (b[i] == null) {
+                return 1;
+            }
+
+            var res = strcmp(arr[a[i]], arr[b[i]]);
+            if (res != 0) {
+                return res;
+            }
+        }
+
+        return 0
+    },
 	location: function (f, g) {
 		if (f.location == null) {
 			return -1
@@ -6459,111 +5955,137 @@ Listview.funcBox = {
 			}
 		}
 	},
-	arrayText: function (b, e) {
-		if (b == null) {
-			return
-		} else {
-			if (!is_array(b)) {
-				return e[b]
-			}
-		}
-		var d = "";
-		for (var c = 0, a = b.length; c < a; ++c) {
-			if (c > 0) {
-				d += " "
-			}
-			if (!e[b[c]]) {
-				continue
-			}
-			d += e[b[c]]
-		}
-		return d
-	},
-	createCenteredIcons: function (h, c, q, m) {
-		if (h != null) {
-			var l = ce("div"),
-			a = ce("div");
-			ae(document.body, l);
-			if (q && (h.length != 1 || m != 2)) {
-				var k = ce("div");
-				k.style.position = "relative";
-				k.style.width = "1px";
-				var o = ce("div");
-				o.className = "q0";
-				o.style.position = "absolute";
-				o.style.right = "2px";
-				o.style.lineHeight = "26px";
-				o.style.fontSize = "11px";
-				o.style.whiteSpace = "nowrap";
-				ae(o, ct(q));
-				ae(k, o);
-				ae(l, k);
-				l.style.paddingLeft = o.offsetWidth + "px"
-			}
-			var g = g_items;
-			if (m == 1) {
-				g = g_spells
-			}
-			for (var e = 0, j = h.length; e < j; ++e) {
-				var p;
-				if (h[e] == null) {
-					p = ce("div");
-					p.style.width = p.style.height = "26px"
-				} else {
-					var b, f;
-					if (typeof h[e] == "object") {
-						b = h[e][0];
-						f = h[e][1]
-					} else {
-						b = h[e]
-					}
-					if (b) {
-						p = g.createIcon(b, 0, f)
-					} else {
-						p = Icon.create("inventoryslot_empty", 0, null, "javascript:;")
-					}
-				}
-				if (h.length == 1 && m == 2) {
-					if (b && g_items[b]) {
-						ee(l);
-						var u = g_items[b],
-						r = ce("a"),
-						d = ce("span");
-						d.style.paddingTop = "4px";
-						r.href = "?item=" + b;
-						r.className = "q" + u.quality + " icontiny";
-						r.style.backgroundImage = "url(images/icons/tiny/" + u.icon.toLowerCase() + ".gif)";
-						r.style.whiteSpace = "nowrap";
-						st(r, u["name_" + g_locale.name]);
-						ae(d, r);
-						if (f > 1) {
-							ae(d, ct(" (" + f + ")"))
-						}
-						if (q) {
-							var w = ce("span");
-							w.className = "q0";
-							w.style.fontSize = "11px";
-							w.style.whiteSpace = "nowrap";
-							ae(w, ct(q));
-							ae(l, w);
-							d.style.paddingLeft = w.offsetWidth + "px"
-						}
-						ae(l, d)
-					}
-				} else {
-					p.style.cssFloat = p.style.styleFloat = "left";
-					ae(l, p);
-					l.style.margin = "0 auto";
-					l.style.textAlign = "left";
-					l.style.width = (26 * h.length) + "px"
-				}
-			}
-			a.className = "clear";
-			ae(c, l);
-			ae(c, a);
-			return true
-		}
-	},
+    arrayText: function (arr, lookup) {
+        if (arr == null) {
+            return;
+        }
+        else if (!is_array(arr)) {
+            return lookup[arr];
+        }
+        var buff = "";
+        for (var i = 0, len = arr.length; i < len; ++i) {
+            if (i > 0) {
+                buff += " ";
+            }
+            if (!lookup[arr[i]]) {
+                continue;
+            }
+            buff += lookup[arr[i]];
+        }
+        return buff;
+    },
+    createCenteredIcons: function (arr, td, text, type) {
+        if (arr != null) {
+            var
+                d = ce('div'),
+                d2 = ce('div');
+
+            ae(document.body, d);
+
+            if (text && (arr.length != 1 || type != 2)) {
+                var bibi = ce('div');
+                bibi.style.position = 'relative';
+                bibi.style.width = '1px';
+                var bibi2 = ce('div');
+                bibi2.className = 'q0';
+                bibi2.style.position = 'absolute';
+                bibi2.style.right = '2px';
+                bibi2.style.lineHeight = '26px';
+                bibi2.style.fontSize = '11px';
+                bibi2.style.whiteSpace = 'nowrap';
+                ae(bibi2, ct(text));
+                ae(bibi, bibi2);
+                ae(d, bibi);
+
+                d.style.paddingLeft = bibi2.offsetWidth + 'px';
+            }
+
+            var iconPool = g_items;
+            if (type == 1) {
+                iconPool = g_spells;
+            }
+
+            for (var i = 0, len = arr.length; i < len; ++i) {
+                var icon;
+                if (arr[i] == null) {
+                    icon = ce('div');
+                    icon.style.width = icon.style.height = '26px';
+                }
+                else {
+                    var
+                        id,
+                        num;
+
+                        if (typeof arr[i] == 'object') {
+                        id = arr[i][0];
+                        num = arr[i][1];
+                    }
+                    else {
+                        id = arr[i];
+                    }
+
+                    if (id) {
+                        icon = iconPool.createIcon(id, 0, num);
+                    }
+                    else {
+                        icon = Icon.create('inventoryslot_empty', 0, null, 'javascript:;');
+                    }
+                }
+
+                if (arr.length == 1 && type == 2) { // Tiny text display
+                    if (id && g_items[id]) {
+                        ee(d);
+                        var
+                            item = g_items[id],
+                            a = ce('a'),
+                            sp = ce('span');
+
+                            sp.style.paddingTop = '4px';
+
+                        a.href = '?item=' + id;
+                        a.className = 'q' + item.quality + ' icontiny tinyspecial';
+                        a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
+                        a.style.whiteSpace = 'nowrap';
+
+                        st(a, item['name_' + g_locale.name]);
+                        ae(sp, a);
+
+                        if (num > 1) {
+                            ae(sp, ct(' (' + num + ')'));
+                        }
+
+                        if (text) {
+                            var bibi = ce('span');
+                            bibi.className = 'q0';
+                            bibi.style.fontSize = '11px';
+                            bibi.style.whiteSpace = 'nowrap';
+                            ae(bibi, ct(text));
+                            ae(d, bibi);
+                            sp.style.paddingLeft = bibi.offsetWidth + 'px';
+                        }
+
+                        ae(d, sp);
+                    }
+                }
+                else {
+                    icon.style.cssFloat = icon.style.styleFloat = 'left';
+                    ae(d, icon);
+
+                    d.style.margin = '0 auto';
+                    d.style.textAlign = 'left';
+
+                    d.style.width = (26 * arr.length) + 'px';
+                }
+            }
+
+            d2.className = 'clear';
+
+            ae(td, d);
+            ae(td, d2);
+
+            return true;
+        }
+    },
     createSocketedIcons: function (b, e, c, g, o) {
 		var m = 0,
 		k = ce("div"),
@@ -6599,29 +6121,29 @@ Listview.funcBox = {
 			ae(e, k)
 		}
 	},
-	getItemType: function (c, a, b) {
-		if (b != null && g_item_subsubclasses[c] != null && g_item_subsubclasses[c][a] != null) {
-			return {
-				url: "?items=" + c + "." + a + "." + b,
-				text: g_item_subsubclasses[c][a][b]
-			}
-		} else {
-            if (a != null &&g_item_subclasses[c] != null) {
-                return {
-                    url: "?items=" + c + "." + a,
-                    text: g_item_subclasses[c][a]
-                }
-            } else {
-                return {
-                    url: "?items=" + c,
-                    text: g_item_classes[c]
-                }
-            }
+    getItemType: function (itemClass, itemSubclass, itemSubsubclass) {
+        if (itemSubsubclass != null && g_item_subsubclasses[itemClass] != null && g_item_subsubclasses[itemClass][itemSubclass] != null) {
+            return {
+                url: "?items=" + itemClass + "." + itemSubclass + "." + itemSubsubclass,
+                text: g_item_subsubclasses[itemClass][itemSubclass][itemSubsubclass]
+            };
         }
-	},
-	getQuestCategory: function (a) {
-		return g_quest_sorts[a]
-	},
+        else if (itemSubclass != null &&g_item_subclasses[itemClass] != null) {
+            return {
+                url: "?items=" + itemClass + "." + itemSubclass,
+                text: g_item_subclasses[itemClass][itemSubclass]
+            };
+        }
+        else {
+            return {
+                url: "?items=" + itemClass,
+                text: g_item_classes[itemClass]
+            };
+        }
+    },
+    getQuestCategory: function (category) {
+        return g_quest_sorts[category];
+    },
 	getQuestReputation: function (d, b) {
 		if (b.reprewards) {
 			for (var c = 0, a = b.reprewards.length; c < a; ++c) {
@@ -6674,25 +6196,28 @@ Listview.funcBox = {
 		a.setTime(a.getTime() + b);
 		return [e, a]
 	},
-	getFactionCategory: function (b, a) {
-		if (b) {
-			return g_faction_categories[b]
-		} else {
-			return g_faction_categories[a]
-		}
-	},
-	createTextRange: function (b, a) {
-		b |= 0;
-		a |= 0;
-		if (b > 1 || a > 1) {
-			if (b != a && a > 0) {
-				return b + "-" + a
-			} else {
-				return b + ""
-			}
-		}
-		return null
-	},
+    getFactionCategory: function (category, category2) {
+        if (category) {
+            return g_faction_categories[category];
+        }
+        else {
+            return g_faction_categories[category2];
+        }
+    },
+    createTextRange: function (min, max) {
+        min |= 0;
+        max |= 0;
+        if (min > 1 || max > 1) {
+            if (min != max && max > 0) {
+                return min + "-" + max;
+            }
+            else {
+                return min + "";
+            }
+        }
+
+        return null;
+    },
 	coReport: function (d, b, f) {
 		if (!g_user.id || !g_report_reasons[f]) {
 			return
@@ -7883,911 +7408,1036 @@ Listview.funcBox = {
 			ae(g, k)
 		}
 	},
-	getUpperSource: function (a, b) {
-		switch (a) {
-		case 2:
-			if (b.bd) {
-				return LANG.source_bossdrop
-			}
-			if (b.z) {
-				return LANG.source_zonedrop
-			}
-			break;
-		case 4:
-			return LANG.source_quests;
-		case 5:
-			return LANG.source_vendors
-		}
-		return g_sources[a]
-	},
-	getLowerSource: function (a, d, c) {
-		switch (a) {
-		case 3:
-			if (d.p && g_sources_pvp[d.p]) {
-				return {
-					text: g_sources_pvp[d.p]
-				}
-			}
-			break
-		}
-		switch (c) {
-		case 0:
-		case 1:
-		case 2:
-			if (d.z) {
-				var b = {
-					url: "?zone=" + d.z,
-					text: g_zones[d.z]
-				};
-				if (d.t && a == 5) {
-					b.pretext = LANG.lvitem_vendorin
-				}
-				if (d.dd && d.dd != 99) {
-					if (d.dd < 0) {
-						b.posttext = sprintf(LANG.lvitem_dd, "", (d.dd < -1 ? LANG.lvitem_heroic: LANG.lvitem_normal))
-					} else {
-						b.posttext = sprintf(LANG.lvitem_dd, (d.dd & 1 ? LANG.lvitem_raid10: LANG.lvitem_raid25), (d.dd > 2 ? LANG.lvitem_heroic: LANG.lvitem_normal))
-					}
-				}
-				return b
-			}
-			break;
-		case 5:
-			return {
-				url:
-				"?quests=" + d.c2 + "." + d.c,
-				text: Listview.funcBox.getQuestCategory(d.c)
-			};
-			break;
-		case 6:
-			if (d.c && d.s) {
-				return {
-					url: "?spells=" + d.c + "." + d.s,
-					text: g_spell_skills[d.s]
-				}
-			} else {
-				return {
-					url: "?spells=0",
-					text: "??"
-				}
-			}
-			break
-		}
-	},
-	getExpansionText: function (line) {
-		var str = '';
+    getUpperSource: function (source, sm) {
+        switch (source) {
+            case 2: // Drop
+                if (sm.bd) {
+                    return LANG.source_bossdrop;
+                }
+                if (sm.z) {
+                    return LANG.source_zonedrop;
+                }
+                break;
+            case 4: // Quest
+                return LANG.source_quests;
+            case 5: // Vendor
+                return LANG.source_vendors;
+        }
 
-		if (line.expansion == 1) {
-			str += ' bc';
-		}
+        return g_sources[source];
+    },
+    getLowerSource: function (source, sm, type) {
+        switch (source) {
+            case 3: // PvP
+                if (sm.p && g_sources_pvp[sm.p]) {
+                    return { text: g_sources_pvp[sm.p] };
+                }
+                break;
+        }
+        switch (type) {
+            case 0: // None
+            case 1: // NPC
+            case 2: // Object
+                if (sm.z) {
+                    var res = {
+                        url: "?zone=" + sm.z,
+                        text: g_zones[sm.z]
+                    };
+
+                    if (sm.t && source == 5) {
+                        res.pretext = LANG.lvitem_vendorin;
+                    }
+
+                    if (sm.dd && sm.dd != 99) {
+                        if (sm.dd < 0) { // Dungeon
+                            res.posttext = sprintf(LANG.lvitem_dd, "", (sm.dd < -1 ? LANG.lvitem_heroic : LANG.lvitem_normal));
+                        }
+                        else { // Raid
+                            res.posttext = sprintf(LANG.lvitem_dd, (sm.dd & 1 ? LANG.lvitem_raid10 : LANG.lvitem_raid25), (sm.dd > 2 ? LANG.lvitem_heroic : LANG.lvitem_normal));
+                        }
+                    }
+
+                    return res;
+                }
+                break;
+            case 5: // Quest
+                return {
+                    url: "?quests=" + sm.c2 + "." + sm.c,
+                    text: Listview.funcBox.getQuestCategory(sm.c)
+                };
+                break;
+            case 6: // Spell
+                if (sm.c && sm.s) {
+                    return {
+                        url: "?spells=" + sm.c + "." + sm.s,
+                        text: g_spell_skills[sm.s]
+                    };
+                }
+                else {
+                    return {
+                        url: "?spells=0",
+                        text: "??"
+                    };
+                }
+                break;
+        }
+    },
+    getExpansionText: function (line) {
+        var str = '';
+
+        if (line.expansion == 1) {
+            str += ' bc';
+        }
         else if (line.expansion == 2) {
             str += ' wotlk wrath';
         }
 
-		return str;
-	}
+        return str;
+    }
 };
 Listview.templates = {
-	faction: {
-		sort: [1],
-		nItemsPerPage: -1,
-		searchable: 1,
-		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			compute: function (d, e) {
-				var b = ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(d);
-				ae(b, ct(d.name));
-				if (d.expansion) {
-					var c = ce("span");
-					c.className = (d.expansion == 1 ? "bc-icon": "wotlk-icon");
-					ae(c, b);
-					ae(e, c)
-				} else {
-					ae(e, b)
-				}
-			},
-			getVisibleText: function (a) {
-				var b = a.name;
-				if (a.expansion == 1) {
-					b += " bc"
-				} else {
-					if (a.expansion == 2) {
-						b += "wotlk wrath"
-					}
-				}
-				return b
-			}
-		},
-		{
-			id: "side",
-			name: LANG.side,
-			type: "text",
-			compute: function (a, c) {
-				if (a.side && a.side != 3) {
-					var b = ce("span");
-					b.className = (a.side == 1 ? "alliance-icon": "horde-icon");
-					b.onmouseover = function (d) {
-						Tooltip.showAtCursor(d, g_sides[a.side], 0, 0, "q")
-					};
-					b.onmousemove = Tooltip.cursorUpdate;
-					b.onmouseout = Tooltip.hide;
-					ae(c, b)
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.side) {
-					return g_sides[a.side]
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_sides[d.side], g_sides[c.side])
-			}
-		},
-		{
-			id: "standing",
-			name: LANG.reputation,
-			value: "standing",
-			compute: function (a, b) {
-				b.style.padding = 0;
-				ae(b, g_createReputationBar(a.standing))
-			},
-			hidden: 1
-		},
-		{
-			id: "category",
-			name: LANG.category,
-			type: "text",
-			width: "16%",
-			compute: function (d, e) {
-				if (d.category2 != null) {
-					e.className = "small q1";
-					var b = ce("a"),
-					c = "?factions=" + d.category2;
-					if (d.category) {
-						c += "." + d.category
-					}
-					b.href = c;
-					ae(b, ct(Listview.funcBox.getFactionCategory(d.category, d.category2)));
-					ae(e, b)
-				}
-			},
-			getVisibleText: function (a) {
-				return Listview.funcBox.getFactionCategory(a.category, a.category2)
-			},
-			sortFunc: function (d, c, f) {
-				var e = Listview.funcBox.getFactionCategory;
-				return strcmp(e(d.category, d.category2), e(c.category, c.category2))
-			}
-		}],
-		getItemLink: function (a) {
-			return "?faction=" + a.id
-		}
-	},
-	item: {
-		sort: [1],
-		searchable: 1,
-		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			span: 2,
-			value: "name",
-			compute: function (o, e, l) {
-				var g = ce("td");
-				g.style.width = "1px";
-				g.style.padding = "0";
-				g.style.borderRight = "none";
-				var h = null,
-				p = null;
-				if (o.stack != null) {
-					h = Listview.funcBox.createTextRange(o.stack[0], o.stack[1])
-				}
-				if (o.avail != null) {
-					p = o.avail
-				}
-				ae(g, g_items.createIcon(o.id, (this.iconSize == null ? 1 : this.iconSize), h, p));
-				ae(l, g);
-				e.style.borderLeft = "none";
-				var m = ce("a");
-				m.className = "q" + (7 - parseInt(o.name.charAt(0)));
-				m.style.fontFamily = "Verdana, sans-serif";
-				m.href = this.template.getItemLink(o);
-				if (o.rel) {
-					Icon.getLink(g.firstChild).rel = o.rel;
-					m.rel = o.rel
-				}
-				ae(m, ct(o.name.substring(1)));
-				var b = ce("div");
-				ae(b, m);
-				if (o.reqclass) {
-					var k = ce("div");
-					k.className = "small2";
-					var f = Listview.funcBox.assocBinFlags(o.reqclass, g_chr_classes);
-					for (var j = 0, l = f.length; j < l; ++j) {
-						if (j > 0) {
-							ae(k, ct(", "))
-						}
-						var p = ce("a");
-						p.href = "?class=" + f[j];
-						p.className = "c" + f[j];
-						st(p, g_chr_classes[f[j]]);
-						ae(k, p)
-					}
-					ae(b, k)
-				}
-				if (typeof fi_nExtraCols == "number" && fi_nExtraCols >= 5) {
-					if (o.source != null && o.source.length == 1) {
-						if (q.reqclass) {
-							ae(j, ct(LANG.dash))
-						} else {
-                            var j = ce("div");
-                            j.className = "small2";
-						}
-						var c = (o.sourcemore ? o.sourcemore[0] : {});
-						var k = 0;
-						if (c.t) {
-							k = c.t;
-							var m = ce("a");
-							if (c.q != null) {
-								m.className = "q" + c.q
-							} else {
-								m.className = "q1"
-							}
-							m.href = "?" + g_types[c.t] + "=" + c.ti;
-							if (c.n.length <= 30) {
-								ae(m, ct(c.n))
-							} else {
-								m.title = c.n;
-								ae(m, ct(trim(c.n.substr(0, 27)) + "..."))
-							}
-							ae(j, m)
-						} else {
-							ae(j, ct(Listview.funcBox.getUpperSource(o.source[0], c)))
-						}
-						var f = Listview.funcBox.getLowerSource(o.source[0], c, k);
-						if (f != null) {
-							ae(j, ct(LANG.hyphen));
-							if (f.pretext) {
-								ae(j, ct(f.pretext))
-							}
-							if (f.url) {
-								var m = ce("a");
-								m.className = "q1";
-								m.href = f.url;
-								ae(m, ct(f.text));
-								ae(j, m)
-							} else {
-								ae(j, ct(f.text))
-							}
-							if (f.posttext) {
-								ae(j, ct(f.posttext))
-							}
-						}
-						ae(b, j)
-					}
-				}
-				if (o.heroic || o.reqrace) {
-					b.style.position = "relative";
-					var j = ce("div");
-					j.className = "small";
-					j.style.fontStyle = "italic";
-					j.style.position = "absolute";
-					j.style.right = j.style.bottom = "3px";
-					if (o.heroic) {
-						var t = ce("span");
-						t.className = "q2";
-						ae(t, ct(LANG.lvitem_heroicitem));
-						ae(j, t)
-					}
-					if (o.reqrace) {
-						if ((o.reqrace & 1791) != 1101 && (o.reqrace & 1791) != 690) {
-							if (o.heroic) {
-								ae(j, ce("br"));
-								j.style.bottom = "-6px"
-							}
-							var c = Listview.funcBox.assocBinFlags(o.reqrace, g_chr_races);
-							for (var j = 0, l = c.length; j < l; ++j) {
-								if (j > 0) {
-									ae(j, ct(", "))
-								}
-								var p = ce("a");
-								p.href = "?race=" + c[j];
-								st(p, g_chr_races[c[j]]);
-								ae(j, p)
-							}
-							j.className += " q1";
-						}
-					}
-					ae(b, j)
-				}
-				ae(e, b);
-			},
-			getVisibleText: function (c) {
-				var e = c.name.substring(1);
-				if (c.heroic) {
-					e += " " + LANG.lvitem_heroicitem
-				}
-				if (c.reqrace) {
-					e += " " + Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(c.reqrace, g_chr_races), g_chr_races)
-				}
-				if (c.reqclass) {
-					e += " " + Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(c.reqclass, g_chr_classes), g_chr_classes)
-				}
-				if (typeof fi_nExtraCols == "number" && fi_nExtraCols >= 5) {
-					if (c.source != null && c.source.length == 1) {
-						var d = (c.sourcemore ? c.sourcemore[0] : {});
-						var b = 0;
-						if (d.t) {
-							b = d.t;
-							e += " " + d.n
-						} else {
-							e += " " + Listview.funcBox.getUpperSource(c.source[0], d)
-						}
-						var a = Listview.funcBox.getLowerSource(c.source[0], d, b);
-						if (a != null) {
-							if (a.pretext) {
-								e += " " + a.pretext
-							}
-							e += " " + a.text;
-							if (a.posttext) {
-								e += " " + a.posttext
-							}
-						}
-					}
-				}
-				return e
-			}
-		},
-		{
-			id: "level",
-			name: LANG.level,
-			value: "level",
-			type: "range",
-			getMinValue: function (a) {
-				return a.minlevel ? a.minlevel: a.level
-			},
-			getMaxValue: function (a) {
-				return a.maxlevel ? a.maxlevel: a.level
-			},
-			compute: function (a, b) {
-				if (a.minlevel && a.maxlevel) {
-					if (a.minlevel != a.maxlevel) {
-						return a.minlevel + LANG.hyphen + a.maxlevel
-					} else {
-						return a.minlevel
-					}
-				} else {
-					return a.level
-				}
-			},
-			sortFunc: function (d, c, e) {
-				if (e > 0) {
-					return strcmp(d.minlevel, c.minlevel) || strcmp(d.maxlevel, c.maxlevel) || strcmp(d.level, c.level)
-				} else {
-					return strcmp(d.maxlevel, c.maxlevel) || strcmp(d.minlevel, c.minlevel) || strcmp(d.level, c.level)
-				}
-			}
-		},
-		{
-			id: "reqlevel",
-			name: LANG.req,
-			tooltip: LANG.tooltip_reqlevel,
-			value: "reqlevel",
-			compute: function (a, b) {
-				if (a.reqlevel > 1) {
-					return a.reqlevel
-				}
-			}
-		},
-		{
-			id: "side",
-			name: LANG.side,
-			type: "text",
-			compute: function (a, c) {
-				if (a.side && a.side != 3) {
-					var b = ce("span");
-					b.className = (a.side == 1 ? "alliance-icon": "horde-icon");
-					b.onmouseover = function (d) {
-						Tooltip.showAtCursor(d, g_sides[a.side], 0, 0, "q")
-					};
-					b.onmousemove = Tooltip.cursorUpdate;
-					b.onmouseout = Tooltip.hide;
-					ae(c, b)
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.side) {
-					return g_sides[a.side]
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_sides[d.side], g_sides[c.side])
-			}
-		},
-		{
-			id: "dps",
-			name: LANG.dps,
-			value: "dps",
-			compute: function (a, b) {
-				return (a.dps || 0).toFixed(1)
-			},
-			hidden: true
-		},
-		{
-			id: "speed",
-			name: LANG.speed,
-			value: "speed",
-			compute: function (a, b) {
-				return (a.speed || 0).toFixed(2)
-			},
-			hidden: true
-		},
-		{
-			id: "armor",
-			name: LANG.armor,
-			value: "armor",
-			compute: function (a, b) {
-				if (a.armor > 0) {
-					return a.armor
-				}
-			},
-			hidden: true
-		},
-		{
-			id: "slot",
-			name: LANG.slot,
-			type: "text",
-			compute: function (a, b) {
-				nw(b);
-				return g_item_slots[a.slot]
-			},
-			getVisibleText: function (a) {
-				return g_item_slots[a.slot]
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_item_slots[d.slot], g_item_slots[c.slot])
-			}
-		},
-		{
-			id: "slots",
-			name: LANG.slots,
-			value: "nslots",
-			hidden: true
-		},
-		{
-			id: "skill",
-			name: LANG.skill,
-			value: "skill",
-			hidden: true
-		},
-		{
-			id: "glyph",
-			name: LANG.glyphtype,
-			type: "text",
-			value: "glyph",
-			compute: function (a, b) {
-				if (a.glyph) {
-					return g_item_glyphs[a.glyph]
-				}
-			},
-			getVisibleText: function (a) {
-				return g_item_glyphs[a.glyph]
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_item_glyphs[d.glyph], g_item_glyphs[c.glyph])
-			},
-			hidden: true
-		},
-		{
-			id: "source",
-			name: LANG.source,
-			type: "text",
-			compute: function (k, d) {
-				if (this.iconSize == 0) {
-					d.className = "small"
-				}
-				if (k.source != null) {
-					if (k.source.length == 1) {
-						nw(d);
-						var c = (k.sourcemore ? k.sourcemore[0] : {});
-						var h = 0;
-						if (c.t) {
-							h = c.t;
-							var j = ce("a");
-							if (c.q != null) {
-								j.className = "q" + c.q
-							} else {
-								j.className = "q1"
-							}
-							j.href = "?" + g_types[c.t] + "=" + c.ti;
-							j.style.whiteSpace = "nowrap";
-							if (c.icon) {
-								j.className += " icontiny";
-								j.style.backgroundImage = 'url("images/icons/tiny/' + c.icon.toLowerCase() + '.gif")'
-							}
-							ae(j, ct(c.n));
-							ae(d, j)
-						} else {
-							ae(d, ct(Listview.funcBox.getUpperSource(k.source[0], c)))
-						}
-						var f = Listview.funcBox.getLowerSource(k.source[0], c, h);
-						if (this.iconSize != 0 && f != null) {
-							var b = ce("div");
-							b.className = "small2";
-							if (f.pretext) {
-								ae(b, ct(f.pretext))
-							}
-							if (f.url) {
-								var j = ce("a");
-								j.className = "q1";
-								j.href = f.url;
-								ae(j, ct(f.text));
-								ae(b, j)
-							} else {
-								ae(b, ct(f.text))
-							}
-							if (f.posttext) {
-								ae(b, ct(f.posttext))
-							}
-							ae(d, b)
-						}
-					} else {
-						var l = "";
-						for (var e = 0, g = k.source.length; e < g; ++e) {
-							if (e > 0) {
-								l += LANG.comma
-							}
-							l += g_sources[k.source[e]]
-						}
-						return l
-					}
-				}
-			},
-			getVisibleText: function (c) {
-				if (c.source != null) {
-					if (c.source.length == 1) {
-						var e = "";
-						var d = (c.sourcemore ? c.sourcemore[0] : {});
-						var b = 0;
-						if (d.t) {
-							b = d.t;
-							e += " " + d.n
-						} else {
-							e += " " + Listview.funcBox.getUpperSource(c.source[0], d)
-						}
-						var a = Listview.funcBox.getLowerSource(c.source[0], d, b);
-						if (a != null) {
-							if (a.pretext) {
-								e += " " + a.pretext
-							}
-							e += " " + a.text;
-							if (a.posttext) {
-								e += " " + a.posttext
-							}
-						}
-						return e
-					} else {
-						return Listview.funcBox.arrayText(c.source, g_sources)
-					}
-				}
-			},
-			sortFunc: function (f, d) {
-				var g = Listview.funcBox.assocArrCmp(f.source, d.source, g_sources);
-				if (g != 0) {
-					return g
-				}
-				var e = (f.sourcemore && f.source.length == 1 ? f.sourcemore[0].n: null),
-				c = (d.sourcemore && d.source.length == 1 ? d.sourcemore[0].n: null);
-				return strcmp(e, c)
-			}
-		},
-		{
-			id: "type",
-			name: LANG.type,
-			type: "text",
-			compute: function (d, e) {
-				e.className = "small q1";
-				nw(e);
-				var b = ce("a");
-				var c = Listview.funcBox.getItemType(d.classs, d.subclass, d.subsubclass);
-				b.href = c.url;
-				ae(b, ct(c.text));
-				ae(e, b)
-			},
-			getVisibleText: function (a) {
-				return Listview.funcBox.getItemType(a.classs, a.subclass, a.subsubclass).text
-			},
-			sortFunc: function (d, c, f) {
-				var e = Listview.funcBox.getItemType;
-				return strcmp(e(d.classs, d.subclass, d.subsubclass).text, e(c.classs, c.subclass, c.subsubclass).text)
-			}
-		}],
-		getItemLink: function (a) {
-			return "?item=" + a.id
-		},
-		onBeforeCreate: function () {
-			var b = false;
-			for (var c = 0, a = this.data.length; c < a; ++c) {
-				var d = this.data[c];
-				if (d.slot > 0 && d.slot != 18) {++b
-				} else {
-					d.__nochk = 1
-				}
-			}
-			if (b > 0) {
-				this.mode = 1;
-				this._nComparable = b
-			}
-		},
-		createCbControls: function (d, c) {
-			if (!c && this._nComparable < 15) {
-				return
-			}
-			var g = ce("input"),
-			b = ce("input"),
-			f = ce("input"),
-			a = ce("input"),
-			e = g_user.characters ? array_filter(g_user.characters, function (h) {
-				return h.pinned
-			}) : false;
-			g.type = b.type = f.type = a.type = "button";
-			g.value = LANG.button_compare;
-			b.value = LANG.button_viewin3d;
-			f.value = LANG.button_equip;
-			a.value = LANG.button_deselect;
-			g.onclick = this.template.compareItems.bind(this);
-			b.onclick = this.template.viewIn3d.bind(this);
-			a.onclick = Listview.cbSelect.bind(this, false);
-			if (this._nComparable == 0 || typeof this._nComparable == "undefined") {
-				g.disabled = "disabled";
-				b.disabled = "disabled";
-				f.disabled = "disabled";
-				a.disabled = "disabled";
-				e = false
-			}
-			ae(d, b);
-			ae(d, g);
-			if (e && e.length) {
-				f.onclick = this.template.equipItems.bind(this, e[0]);
-				ae(d, f)
-			}
-			ae(d, a)
-		},
-		compareItems: function () {
-			var b = this.getCheckedRows();
-			if (!b.length) {
-				return
-			}
-			var a = "";
-			array_walk(b, function (c) {
-				if (c.slot == 0 || c.slot == 18) {
-					return
-				}
-				a += c.id + ";"
-			});
-			su_addToSaved(rtrim(a, ";"), b.length)
-		},
-		viewIn3d: function () {
-			var j = this.getCheckedRows();
-			if (!j.length) {
-				return
-			}
-			var g = false,
-			e = false,
-			f = false;
-			var c = {};
-			var d = null;
-			array_walk(j, function (i) {
-				if (in_array(ModelViewer.validSlots, i.slotbak) >= 0 && i.displayid > 0) {
-					var k = ModelViewer.slotMap[i.slotbak];
-					if (c[k]) {
-						e = true
-					}
-					c[k] = i.displayid;
-					g = true
-				} else {
-					if (i.modelviewer) {
-						d = i.modelviewer
-					} else {
-						f = true
-					}
-				}
-			});
-			var h = null;
-			if (d) {
-				if (g || f) {
-					h = LANG.dialog_cantdisplay
-				}
-				ModelViewer.show({
-					type: d.type,
-					displayId: d.displayid,
-					slot: d.slot,
-					message: h
-				})
-			} else {
-				if (e || f) {
-					h = LANG.dialog_cantdisplay
-				}
-				var a = [];
-				for (var b in c) {
-					a.push(parseInt(b));
-					a.push(c[b])
-				}
-				if (a.length > 0) {
-					ModelViewer.show({
-						type: 4,
-						equipList: a,
-						message: h
-					})
-				} else {
-					alert(LANG.message_nothingtoviewin3d)
-				}
-			}
-	},
-		equipItems: function (c) {
-			var b = this.getCheckedRows();
-			if (!b.length) {
-				return
-			}
-			var a = "";
-			array_walk(b, function (d) {
-				if (d.slot == 0 || d.slot == 18) {
-					return
-				}
-				a += d.id + ":"
-			});
-			location.href = g_getProfileUrl(c) + "&items=" + rtrim(a, ":")
-		}
-	},
+    faction: {
+        sort: [1],
+        nItemsPerPage: -1,
+        searchable: 1,
+        filtrable: 1,
+        columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                compute: function (faction, td) {
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(faction);
+                    ae(a, ct(faction.name));
+                    if (faction.expansion) {
+                        var sp = ce('span');
+						sp.className = g_GetExpansionClassName(faction.expansion);
+                        ae(sp, a);
+                        ae(td, sp);
+                    }
+                    else {
+                        ae(td, a);
+                    }
+                },
+                getVisibleText: function (faction) {
+					var buff = faction.name + Listview.funcBox.getExpansionText(faction);
+
+                    return buff;
+                }
+            },
+            {
+                id: 'side',
+                name: LANG.side,
+                type: 'text',
+                compute: function (item, td) {
+                    if (item.side && item.side != 3) {
+                        var sp = ce('span');
+                        sp.className = (item.side == 1 ? 'alliance-icon' : 'horde-icon');
+                        g_addTooltip(sp, g_sides[item.side]);
+
+                        ae(td, sp);
+                    }
+                },
+                getVisibleText: function (item) {
+                    if (item.side) {
+                        return g_sides[item.side];
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_sides[a.side], g_sides[b.side]);
+                }
+            },
+            {
+                id: 'standing',
+                name: LANG.reputation,
+                value: 'standing',
+                compute: function (faction, td) {
+                    td.style.padding = 0;
+                    ae(td, g_createReputationBar(faction.standing));
+                },
+                hidden: 1
+            },
+            {
+                id: 'category',
+                name: LANG.category,
+                type: 'text',
+                width: '16%',
+                compute: function (faction, td) {
+                    if (faction.category2 != null) {
+                        td.className = 'small q1';
+                        var
+                            a = ce('a'),
+                            href = '?factions=' + faction.category2;
+
+                            if (faction.category) {
+                            href += '.' + faction.category;
+                        }
+                        a.href = href;
+                        ae(a, ct(Listview.funcBox.getFactionCategory(faction.category, faction.category2)));
+                        ae(td, a);
+                    }
+                },
+                getVisibleText: function (faction) {
+                    return Listview.funcBox.getFactionCategory(faction.category, faction.category2);
+                },
+                sortFunc: function (a, b, col) {
+                    var _ = Listview.funcBox.getFactionCategory;
+                    return strcmp(_(a.category, a.category2), _(b.category, b.category2));
+                }
+            }
+        ],
+
+        getItemLink: function (faction) {
+            return '?faction=' + faction.id;
+        }
+    },
+    item: {
+        sort: [-2],
+        searchable: 1,
+        filtrable: 1,
+        columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                span: 2,
+                value: 'name',
+                compute: function (item, td, tr) {
+                    var i = ce('td');
+                    i.style.width = '1px';
+                    i.style.padding = '0';
+                    i.style.borderRight = 'none';
+
+                    var
+                        num = null,
+                        qty = null;
+
+                    if (item.stack != null) {
+                        num = Listview.funcBox.createTextRange(item.stack[0], item.stack[1]);
+                    }
+                    if (item.avail != null) {
+                        qty = item.avail;
+                    }
+
+                    if (item.id) {
+                        ae(i, g_items.createIcon(item.id, (this.iconSize == null ? 1 : this.iconSize), num, qty));
+                    }
+                    ae(tr, i);
+                    td.style.borderLeft = 'none';
+
+                    var a = ce('a');
+                    a.className = 'q' + (7 - parseInt(item.name.charAt(0)));
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(item);
+
+                    if (item.rel) {
+                        Icon.getLink(i.firstChild).rel = item.rel;
+                        a.rel = item.rel;
+                    }
+
+                    ae(a, ct(item.name.substring(1)));
+
+                    var wrapper = ce('div');
+                    ae(wrapper, a);
+
+                    if (item.reqclass) {
+                        var d = ce('div');
+                        d.className = 'small2';
+
+                        var classes = Listview.funcBox.assocBinFlags(item.reqclass, g_chr_classes);
+
+                        for (var i = 0, len = classes.length; i < len; ++i) {
+                            if (i > 0) {
+                                ae(d, ct(', '));
+                            }
+                            var a = ce('a');
+                            a.href = '?class=' + classes[i];
+                            a.className = 'c' + classes[i];
+                            st(a, g_chr_classes[classes[i]]);
+                            ae(d, a);
+                        }
+
+                        ae(wrapper, d);
+                    }
+
+                    if (typeof fi_nExtraCols == 'number' && fi_nExtraCols >= 5) {
+                        if (item.source != null && item.source.length == 1) {
+                            if (item.reqclass) {
+                                ae(d, ct(LANG.dash));
+                            }
+                            else {
+                                var d = ce('div');
+                                d.className = 'small2';
+                            }
+
+                            var sm = (item.sourcemore ? item.sourcemore[0] : {});
+                            var type = 0;
+
+                            if (sm.t) {
+                                type = sm.t;
+
+                                var a = ce('a');
+                                if (sm.q != null) {
+                                    a.className = 'q' + sm.q;
+                                }
+                                else {
+                                    a.className = 'q1';
+                                }
+                                a.href = '?' + g_types[sm.t] + '=' + sm.ti;
+
+                                if (sm.n.length <= 30) {
+                                    ae(a, ct(sm.n));
+                                }
+                                else {
+                                    a.title = sm.n;
+                                    ae(a, ct(trim(sm.n.substr(0, 27)) + '...'));
+                                }
+
+                                ae(d, a);
+                            }
+                            else {
+                                ae(d, ct(Listview.funcBox.getUpperSource(item.source[0], sm)));
+                            }
+
+                            var ls = Listview.funcBox.getLowerSource(item.source[0], sm, type);
+
+                            if (ls != null) {
+                                ae(d, ct(LANG.hyphen));
+
+                                if (ls.pretext) {
+                                    ae(d, ct(ls.pretext));
+                                }
+
+                                if (ls.url) {
+                                    var a = ce('a');
+                                    a.className = 'q1';
+                                    a.href = ls.url;
+                                    ae(a, ct(ls.text));
+                                    ae(d, a);
+                                }
+                                else {
+                                    ae(d, ct(ls.text));
+                                }
+
+                                if (ls.posttext) {
+                                    ae(d, ct(ls.posttext));
+                                }
+                            }
+
+                            ae(wrapper, d);
+                        }
+                    }
+
+                    if (item.heroic || item.reqrace) {
+                        wrapper.style.position = 'relative';
+                        var d = ce('div');
+                        d.className = 'small';
+                        d.style.fontStyle = 'italic';
+                        d.style.position = 'absolute';
+                        d.style.right = d.style.bottom = '3px';
+
+                        if (item.heroic) {
+                            var s = ce('span');
+                            s.className = 'q2';
+                            ae(s, ct(LANG.lvitem_heroicitem));
+                            ae(d, s);
+                        }
+
+                        if (item.reqrace) {
+                            if ((item.reqrace & 1791) != 1101 && (item.reqrace & 1791) != 690) {
+                                if (item.heroic) {
+                                    ae(d, ce('br'));
+                                    d.style.bottom = '-6px';
+                                }
+
+                                var races = Listview.funcBox.assocBinFlags(item.reqrace, g_chr_races);
+
+                                for (var i = 0, len = races.length; i < len; ++i) {
+                                    if (i > 0) {
+                                        ae(d, ct(', '));
+                                    }
+                                    var a = ce('a');
+                                    a.href = '?race=' + races[i];
+                                    st(a, g_chr_races[races[i]]);
+                                    ae(d, a);
+                                }
+
+                                d.className += ' q1';
+                            }
+                        }
+
+                        ae(wrapper, d);
+                    }
+
+                    ae(td, wrapper);
+                },
+                getVisibleText: function (item) {
+                    var buff = item.name.substring(1);
+
+                    if (item.heroic) {
+                        buff += ' ' + LANG.lvitem_heroicitem;
+                    }
+
+                    if (item.reqrace) {
+                        buff += ' ' + Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(item.reqrace, g_chr_races), g_chr_races);
+                    }
+
+                    if (item.reqclass) {
+                        buff += ' ' + Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(item.reqclass, g_chr_classes), g_chr_classes);
+                    }
+
+                    if (typeof fi_nExtraCols == 'number' && fi_nExtraCols >= 5) {
+                        if (item.source != null && item.source.length == 1) {
+                            var sm = (item.sourcemore ? item.sourcemore[0] : {});
+                            var type = 0;
+
+                            if (sm.t) {
+                                type = sm.t;
+                                buff += ' ' + sm.n;
+                            }
+                            else {
+                                buff += ' ' + Listview.funcBox.getUpperSource(item.source[0], sm);
+                            }
+
+                            var ls = Listview.funcBox.getLowerSource(item.source[0], sm, type);
+
+                            if (ls != null) {
+                                if (ls.pretext) {
+                                    buff += ' ' + ls.pretext;
+                                }
+
+                                buff += ' ' + ls.text;
+
+                                if (ls.posttext) {
+                                    buff += ' ' + ls.posttext;
+                                }
+                            }
+                        }
+                    }
+
+                    return buff;
+                }
+            },
+            {
+                id: 'level',
+                name: LANG.level,
+                value: 'level',
+                type: 'range',
+                getMinValue: function (item) {
+                    return item.minlevel ? item.minlevel: item.level;
+                },
+                getMaxValue: function (item) {
+                    return item.maxlevel ? item.maxlevel: item.level;
+                },
+                compute: function (item, td) {
+                    if (item.minlevel && item.maxlevel) {
+                        if (item.minlevel != item.maxlevel) {
+                            return item.minlevel + LANG.hyphen + item.maxlevel;
+                        }
+                        else {
+                            return item.minlevel;
+                        }
+                    }
+                    else {
+                        return item.level;
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    if (col > 0) {
+                        return strcmp(a.minlevel, b.minlevel) || strcmp(a.maxlevel, b.maxlevel) || strcmp(a.level, b.level);
+                    }
+                    else {
+                        return strcmp(a.maxlevel, b.maxlevel) || strcmp(a.minlevel, b.minlevel) || strcmp(a.level, b.level);
+                    }
+                }
+            },
+            {
+                id: 'reqlevel',
+                name: LANG.req,
+                tooltip: LANG.tooltip_reqlevel,
+                value: 'reqlevel',
+                compute: function (item, td) {
+                    if (item.reqlevel > 1) {
+                        return item.reqlevel;
+                    }
+                }
+            },
+            {
+                id: 'side',
+                name: LANG.side,
+                type: 'text',
+                compute: function (item, td) {
+                    if (item.side && item.side != 3) {
+                        var sp = ce('span');
+                        sp.className = (item.side == 1 ? 'alliance-icon': 'horde-icon');
+                        g_addTooltip(sp, g_sides[item.side]);
+                        ae(td, sp);
+                    }
+                },
+                getVisibleText: function (item) {
+                    if (item.side) {
+                        return g_sides[item.side];
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_sides[a.side], g_sides[b.side]);
+                }
+            },
+            {
+                id: 'dps',
+                name: LANG.dps,
+                value: 'dps',
+                compute: function (item, td) {
+                    return (item.dps || 0).toFixed(1);
+                },
+                hidden: true
+            },
+            {
+                id: 'speed',
+                name: LANG.speed,
+                value: 'speed',
+                compute: function (item, td) {
+                    return (item.speed || 0).toFixed(2);
+                },
+                hidden: true
+            },
+            {
+                id: 'armor',
+                name: LANG.armor,
+                value: 'armor',
+                compute: function (item, td) {
+                    if (item.armor > 0) {
+                        return item.armor;
+                    }
+                },
+                hidden: true
+            },
+            {
+                id: 'slot',
+                name: LANG.slot,
+                type: 'text',
+                compute: function (item, td) {
+                    nw(td);
+
+                    return g_item_slots[item.slot];
+                },
+                getVisibleText: function (item) {
+                    return g_item_slots[item.slot];
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_item_slots[a.slot], g_item_slots[b.slot]);
+                }
+            },
+            {
+                id: 'slots',
+                name: LANG.slots,
+                value: 'nslots',
+                hidden: true
+            },
+            {
+                id: 'skill',
+                name: LANG.skill,
+                value: 'skill',
+                hidden: true
+            },
+            {
+                id: 'glyph',
+                name: LANG.glyphtype,
+                type: 'text',
+                value: 'glyph',
+                compute: function (item, td) {
+                    if (item.glyph) {
+                        return g_item_glyphs[item.glyph];
+                    }
+                },
+                getVisibleText: function (item) {
+                    return g_item_glyphs[item.glyph];
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_item_glyphs[a.glyph], g_item_glyphs[b.glyph]);
+                },
+                hidden: true
+            },
+            {
+                id: 'source',
+                name: LANG.source,
+                type: 'text',
+                compute: function (item, td) {
+                    if (this.iconSize == 0) {
+                        td.className = 'small';
+                    }
+                    if (item.source != null) {
+                        if (item.source.length == 1) {
+                            nw(td);
+
+                            var sm = (item.sourcemore ? item.sourcemore[0] : {});
+                            var type = 0;
+
+                            if (sm.t) {
+                                type = sm.t;
+
+                                var a = ce('a');
+                                if (sm.q != null) {
+                                    a.className = 'q' + sm.q;
+                                }
+                                else {
+                                    a.className = 'q1';
+                                }
+                                a.href = '?' + g_types[sm.t] + '=' + sm.ti;
+                                a.style.whiteSpace = 'nowrap';
+
+                                if (sm.icon) {
+                                    a.className += ' icontiny tinyspecial';
+                                    a.style.backgroundImage = 'url("' + g_staticUrl + '/images/icons/tiny/' + sm.icon.toLowerCase() + '.gif")';
+                                }
+
+                                ae(a, ct(sm.n));
+                                ae(td, a);
+                            }
+                            else {
+                                ae(td, ct(Listview.funcBox.getUpperSource(item.source[0], sm)));
+                            }
+
+                            var ls = Listview.funcBox.getLowerSource(item.source[0], sm, type);
+
+                            if (this.iconSize != 0 && ls != null) {
+                                var div = ce('div');
+                                div.className = 'small2';
+
+                                if (ls.pretext) {
+                                    ae(div, ct(ls.pretext));
+                                }
+
+                                if (ls.url) {
+                                    var a = ce('a');
+                                    a.className = 'q1';
+                                    a.href = ls.url;
+                                    ae(a, ct(ls.text));
+                                    ae(div, a);
+                                }
+                                else {
+                                    ae(div, ct(ls.text));
+                                }
+
+                                if (ls.posttext) {
+                                    ae(div, ct(ls.posttext));
+                                }
+
+                                ae(td, div);
+                            }
+                        }
+                        else {
+                            var buff = '';
+                            for (var i = 0, len = item.source.length; i < len; ++i) {
+                                if (i > 0) {
+                                    buff += LANG.comma;
+                                }
+                                buff += g_sources[item.source[i]];
+                            }
+                            return buff;
+                        }
+                    }
+                },
+                getVisibleText: function (item) {
+                    if (item.source != null) {
+                        if (item.source.length == 1) {
+                            var buff = '';
+
+                            var sm = (item.sourcemore ? item.sourcemore[0] : {});
+                            var type = 0;
+
+                            if (sm.t) {
+                                type = sm.t;
+                                buff += ' ' + sm.n;
+                            }
+                            else {
+                                buff += ' ' + Listview.funcBox.getUpperSource(item.source[0], sm);
+                            }
+
+                            var ls = Listview.funcBox.getLowerSource(item.source[0], sm, type);
+
+                            if (ls != null) {
+                                if (ls.pretext) {
+                                    buff += ' ' + ls.pretext;
+                                }
+
+                                buff += ' ' + ls.text;
+
+                                if (ls.posttext) {
+                                    buff += ' ' + ls.posttext;
+                                }
+                            }
+
+                            return buff;
+                        }
+                        else {
+                            return Listview.funcBox.arrayText(item.source, g_sources);
+                        }
+                    }
+                },
+                sortFunc: function (a, b) {
+                    var res = Listview.funcBox.assocArrCmp(a.source, b.source, g_sources);
+                    if (res != 0) {
+                        return res;
+                    }
+
+                    var
+                        na = (a.sourcemore && a.source.length == 1 ? a.sourcemore[0].n: null),
+                        nb = (b.sourcemore && b.source.length == 1 ? b.sourcemore[0].n: null);
+
+                    return strcmp(na, nb);
+                }
+            },
+            {
+                id: 'type',
+                name: LANG.type,
+                type: 'text',
+                compute: function (item, td) {
+                    td.className = 'small q1';
+                    nw(td);
+                    var a = ce('a');
+
+                    var it = Listview.funcBox.getItemType(item.classs, item.subclass, item.subsubclass);
+
+                    a.href = it.url;
+                    ae(a, ct(it.text));
+                    ae(td, a);
+                },
+                getVisibleText: function (item) {
+                    return Listview.funcBox.getItemType(item.classs, item.subclass, item.subsubclass).text;
+                },
+                sortFunc: function (a, b, col) {
+                    var _ = Listview.funcBox.getItemType;
+                    return strcmp(_(a.classs, a.subclass, a.subsubclass).text, _(b.classs, b.subclass, b.subsubclass).text);
+                }
+            }
+        ],
+
+        getItemLink: function (item) {
+            return '?item=' + item.id;
+        },
+
+        onBeforeCreate: function () {
+            var nComparable = false;
+
+            for (var i = 0, len = this.data.length; i < len; ++i) {
+                var item = this.data[i];
+
+                if ((item.slot > 0 && item.slot != 18) || (in_array(ModelViewer.validSlots, item.slotbak) >= 0 && item.displayid > 0) || item.modelviewer) { // Equippable, and not a bag, or has a model
+                    ++nComparable;
+                }
+                else {
+                    item.__nochk = 1;
+                }
+            }
+
+            if (nComparable > 0) {
+                this.mode = 1;
+                this._nComparable = nComparable;
+            }
+        },
+
+        createCbControls: function (div, topBar) {
+            if (!topBar && this._nComparable < 15) {
+                return;
+            }
+
+            var
+                iCompare  = ce('input'),
+                iViewIn3d = ce('input'),
+                iEquip    = ce('input'),
+                iDeselect = ce('input'),
+                pinnedChr = g_user.characters ? array_filter(g_user.characters, function (row) {
+                    return row.pinned;
+                }) : false;
+
+            iCompare.type = iViewIn3d.type = iEquip.type = iDeselect.type = 'button';
+
+            iCompare.value  = LANG.button_compare;
+            iViewIn3d.value = LANG.button_viewin3d;
+            iEquip.value    = LANG.button_equip;
+            iDeselect.value = LANG.button_deselect;
+
+            iCompare.onclick  = this.template.compareItems.bind(this);
+            iViewIn3d.onclick = this.template.viewIn3d.bind(this);
+            iDeselect.onclick = Listview.cbSelect.bind(this, false);
+
+            if (this._nComparable == 0 || typeof this._nComparable == 'undefined') {
+                iCompare.disabled  = 'disabled';
+                iViewIn3d.disabled = 'disabled';
+                iEquip.disabled    = 'disabled';
+                iDeselect.disabled = 'disabled';
+                pinnedChr = false;
+            }
+
+            ae(div, iCompare);
+            ae(div, iViewIn3d);
+
+            if (pinnedChr && pinnedChr.length) {
+                iEquip.onclick = this.template.equipItems.bind(this, pinnedChr[0]);
+                ae(div, iEquip);
+            }
+
+            ae(div, iDeselect);
+        },
+
+        compareItems: function () {
+            var rows = this.getCheckedRows();
+            if (!rows.length) {
+                return;
+            }
+
+            var data = '';
+            array_walk(rows, function (x) {
+                if (x.slot == 0 || x.slot == 18) {
+                    return;
+                }
+
+                data += x.id + ';';
+            });
+            su_addToSaved(rtrim(data, ';'), rows.length);
+        },
+
+        viewIn3d: function () {
+            var rows = this.getCheckedRows();
+            if (!rows.length) {
+                return;
+            }
+
+            var
+                hasData = false,
+                repeatData = false,
+                badData = false;
+            var data = {};
+            var model = null;
+            array_walk(rows, function (x) {
+                if (in_array(ModelViewer.validSlots, x.slotbak) >= 0 && x.displayid > 0) {
+                    var slot = ModelViewer.slotMap[x.slotbak];
+                    if (data[slot]) {
+                        repeatData = true;
+                    }
+                    data[slot] = x.displayid;
+                    hasData = true;
+                }
+                else if (x.modelviewer) {
+                    model = x.modelviewer;
+                }
+                else {
+                    badData = true;
+                }
+            });
+
+            var message = null;
+            if (model) {
+                if (hasData || badData) {
+                    message = LANG.dialog_cantdisplay;
+                }
+                ModelViewer.show({
+                    type: model.type,
+                    displayId: model.displayid,
+                    slot: model.slot,
+                    message: message
+                });
+            }
+            else {
+                if (repeatData || badData) {
+                    message = LANG.dialog_cantdisplay;
+                }
+                var equipList = [];
+                for (var i in data) {
+                    equipList.push(parseInt(i));
+                    equipList.push(data[i]);
+                }
+                if (equipList.length > 0) {
+                    ModelViewer.show({
+                        type: 4,
+                        equipList: equipList,
+                        message: message
+                    });
+                }
+                else {
+                    alert(LANG.message_nothingtoviewin3d);
+                }
+            }
+        },
+
+        equipItems: function (character) {
+            var rows = this.getCheckedRows();
+            if (!rows.length) {
+                return;
+            }
+
+            var data = '';
+            array_walk(rows, function (x) {
+                if (x.slot == 0 || x.slot == 18) {
+                    return;
+                }
+                data += x.id + ':';
+            });
+            location.href = g_getProfileUrl(character) + '&items=' + rtrim(data, ':');
+        }
+    },
 	itemset: {
 		sort: [1],
 		nItemsPerPage: 75,
 		searchable: 1,
 		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			compute: function (c, g) {
-				var b = ce("a");
-				b.className = "q" + (7 - parseInt(c.name.charAt(0)));
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(c);
-				ae(b, ct(c.name.substring(1)));
-				var f = ce("div");
-				f.style.position = "relative";
-				ae(f, b);
-				if (c.heroic) {
-					var e = ce("div");
-					e.className = "small q2";
-					e.style.fontStyle = "italic";
-					e.style.position = "absolute";
-					e.style.right = "3px";
-					e.style.bottom = "3px";
-					ae(e, ct(LANG.lvitem_heroicitem));
-					ae(f, e)
-				}
-				ae(g, f);
-				if (c.note) {
-					var e = ce("div");
-					e.className = "small";
-					ae(e, ct(g_itemset_notes[c.note]));
-					ae(g, e)
-				}
-			},
-			getVisibleText: function (a) {
-				var b = a.name.substring(1);
-				if (a.note) {
-					b += " " + g_itemset_notes[a.note]
-				}
-				return b
-			}
-		},
-		{
-			id: "level",
-			name: LANG.level,
-			type: "range",
-			getMinValue: function (a) {
-				return a.minlevel
-			},
-			getMaxValue: function (a) {
-				return a.maxlevel
-			},
-			compute: function (a, b) {
-				if (a.minlevel > 0 && a.maxlevel > 0) {
-					if (a.minlevel != a.maxlevel) {
-						return a.minlevel + LANG.hyphen + a.maxlevel
-					} else {
-						return a.minlevel
-					}
-				} else {
-					return - 1
-				}
-			},
-			sortFunc: function (d, c, e) {
-				if (e > 0) {
-					return strcmp(d.minlevel, c.minlevel) || strcmp(d.maxlevel, c.maxlevel)
-				} else {
-					return strcmp(d.maxlevel, c.maxlevel) || strcmp(d.minlevel, c.minlevel)
-				}
-			}
-		},
-		{
-			id: "pieces",
-			name: LANG.pieces,
-			getValue: function (a) {
-				return a.pieces.length
-			},
-			compute: function (a, b) {
-				b.style.padding = "0";
-				Listview.funcBox.createCenteredIcons(a.pieces, b)
-			},
-			sortFunc: function (d, c) {
-				var f = (d.pieces != null ? d.pieces.length: 0);
-				var e = (c.pieces != null ? c.pieces.length: 0);
-				return strcmp(f, e)
-			}
-		},
-		{
-			id: "type",
-			name: LANG.type,
-			type: "text",
-			compute: function (a, b) {
-				return g_itemset_types[a.type]
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_itemset_types[d.type], g_itemset_types[c.type])
-			}
-		},
-		{
-			id: "classes",
-			name: LANG.classes,
-			type: "text",
-			width: "20%",
-			getVisibleText: function (d) {
-				var e = "";
-				if (d.reqclass) {
-					var c = Listview.funcBox.assocBinFlags(d.reqclass, g_chr_classes);
-					for (var b = 0, a = c.length; b < a; ++b) {
-						if (b > 0) {
-							e += LANG.comma
-						}
-						e += g_chr_classes[c[b]]
-					}
-				}
-				return e
-			},
-			compute: function (f, h) {
-				if (f.reqclass) {
-					var c = Listview.funcBox.assocBinFlags(f.reqclass, g_chr_classes);
-					var g = ce("div");
-					g.style.width = (26 * c.length) + "px";
-					g.style.margin = "0 auto";
-					for (var b = 0, a = c.length; b < a; ++b) {
-						var e = Icon.create("class_" + g_file_classes[c[b]], 0, null, "?class=" + c[b]);
-						e.style.cssFloat = e.style.styleFloat = "left";
-						ae(g, e)
-					}
-					ae(h, g)
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(d.reqclass, g_chr_classes), Listview.funcBox.assocBinFlags(c.reqclass, g_chr_classes), g_chr_classes)
-			}
-		}],
-		getItemLink: function (a) {
-			return "?itemset=" + a.id
+		columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                compute: function (itemSet, td) {
+                    var a = ce('a');
+                    a.className = 'q' + (7 - parseInt(itemSet.name.charAt(0)));
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(itemSet);
+                    ae(a, ct(itemSet.name.substring(1)));
+
+                    var div = ce('div');
+                    div.style.position = 'relative';
+                    ae(div, a);
+
+                    if (itemSet.heroic) {
+                        var d = ce('div');
+                        d.className = 'small q2';
+                        d.style.fontStyle = 'italic';
+                        d.style.position = 'absolute';
+                        d.style.right = '3px';
+                        d.style.bottom = '3px';
+                        ae(d, ct(LANG.lvitem_heroicitem));
+                        ae(div, d);
+                    }
+
+                    ae(td, div);
+
+                    if (itemSet.note) {
+                        var d = ce('div');
+                        d.className = 'small';
+                        ae(d, ct(g_itemset_notes[itemSet.note]));
+                        ae(td, d);
+                    }
+                },
+                getVisibleText: function (itemSet) {
+                    var buff = itemSet.name.substring(1);
+                    if (itemSet.note) {
+                        buff += ' ' + g_itemset_notes[itemSet.note];
+                    }
+                    return buff;
+                }
+            },
+            {
+                id: 'level',
+                name: LANG.level,
+                type: 'range',
+                getMinValue: function (itemSet) {
+                    return itemSet.minlevel;
+                },
+                getMaxValue: function (itemSet) {
+                    return itemSet.maxlevel;
+                },
+                compute: function (itemSet, td) {
+                    if (itemSet.minlevel > 0 && itemSet.maxlevel > 0) {
+                        if (itemSet.minlevel != itemSet.maxlevel) {
+                            return itemSet.minlevel + LANG.hyphen + itemSet.maxlevel;
+                        }
+                        else {
+                            return itemSet.minlevel;
+                        }
+                    }
+                    else {
+                        return - 1;
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    if (col > 0) {
+                        return strcmp(a.minlevel, b.minlevel) || strcmp(a.maxlevel, b.maxlevel);
+                    }
+                    else {
+                        return strcmp(a.maxlevel, b.maxlevel) || strcmp(a.minlevel, b.minlevel);
+                    }
+                }
+            },
+            {
+                id: 'pieces',
+                name: LANG.pieces,
+                getValue: function (itemSet) {
+                    return itemSet.pieces.length;
+                },
+                compute: function (itemSet, td) {
+                    td.style.padding = '0';
+                    Listview.funcBox.createCenteredIcons(itemSet.pieces, td);
+                },
+                sortFunc: function (a, b) {
+                    var lena = (a.pieces != null ? a.pieces.length: 0);
+                    var lenb = (b.pieces != null ? b.pieces.length: 0);
+                    return strcmp(lena, lenb);
+                }
+            },
+            {
+                id: 'type',
+                name: LANG.type,
+                type: 'text',
+                compute: function (itemSet, td) {
+                    return g_itemset_types[itemSet.type];
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_itemset_types[a.type], g_itemset_types[b.type]);
+                }
+            },
+            {
+                id: 'classes',
+                name: LANG.classes,
+                type: 'text',
+                width: '20%',
+                getVisibleText: function (itemSet) {
+                    var str = '';
+                    if (itemSet.reqclass) {
+                        var classes = Listview.funcBox.assocBinFlags(itemSet.reqclass, g_chr_classes);
+
+                        for (var i = 0, len = classes.length; i < len; ++i) {
+                            if (i > 0) {
+                                str += LANG.comma;
+                            }
+                            str += g_chr_classes[classes[i]];
+                        }
+                    }
+                    return str;
+                },
+                compute: function (itemSet, td) {
+                    if (itemSet.reqclass) {
+                        var classes = Listview.funcBox.assocBinFlags(itemSet.reqclass, g_chr_classes);
+
+                        var d = ce('div');
+                        d.style.width = (26 * classes.length) + 'px';
+                        d.style.margin = '0 auto';
+
+                        for (var i = 0, len = classes.length; i < len; ++i) {
+                            var icon = Icon.create('class_' + g_file_classes[classes[i]], 0, null, '?class=' + classes[i]);
+                            icon.style.cssFloat = icon.style.styleFloat = 'left';
+                            g_addTooltip(icon, g_chr_classes[classes[i]], 'c' + classes[i]);
+
+                            ae(d, icon);
+                        }
+
+                        ae(td, d);
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(a.reqclass, g_chr_classes), Listview.funcBox.assocBinFlags(b.reqclass, g_chr_classes), g_chr_classes);
+                }
+            }
+        ],
+
+		getItemLink: function (itemSet) {
+			return '?itemset=' + itemSet.id;
 		}
 	},
 	npc: {
@@ -9221,11 +8871,8 @@ Listview.templates = {
                     if (quest.side && quest.side != 3) {
                         var sp = ce('span');
                         sp.className = (quest.side == 1 ? 'alliance-icon': 'horde-icon');
-                        sp.onmouseover = function (e) {
-                            Tooltip.showAtCursor(e, g_sides[quest.side], 0, 0, 'q');
-                        };
-                        sp.onmousemove = Tooltip.cursorUpdate;
-                        sp.onmouseout = Tooltip.hide;
+                        g_addTooltip(sp, g_sides[quest.side]);
+
                         ae(td, sp);
                     }
                     else if (!quest.side) {
@@ -9314,7 +8961,7 @@ Listview.templates = {
                         }
 
                         if (quest.currencyrewards != null) {
-                            Listview.funcBox.appendMoney(td, null, quest.side, null, quest.currencyrewards);
+                            Listview.funcBox.appendMoney(td, null, null, quest.side, null, quest.currencyrewards);    // todo: update appendMoney ..!important!
                         }
                     }
                 },
@@ -10110,10 +9757,8 @@ Listview.templates = {
 					if (a.heroicLevel) {
 						var f = ce("span");
 						f.className = "heroic-icon";
-                        f.onmouseover = function (d) {Tooltip.showAtCursor(d, LANG.tooltip_heroicmodeavailable + LANG.qty.replace("$1", a.heroicLevel), 0, 0, 'q')};
-                        f.onmousemove = Tooltip.cursorUpdate;
-                        f.onmouseout = Tooltip.hide;
-						ae(e, f)
+                        g_addTooltip(f, LANG.tooltip_heroicmodeavailable + LANG.qty.replace("$1", a.heroicLevel));
+						ae(e, f);
 					}
 					ae(b, ct(c));
 					ae(d, b)
@@ -11455,11 +11100,8 @@ Listview.templates = {
                     if (achievement.side && achievement.side != 3) {
                         var sp = ce('span');
                         sp.className = (achievement.side == 1 ? 'alliance-icon': 'horde-icon');
-                        sp.onmouseover = function (e) {
-                            Tooltip.showAtCursor(e, g_sides[achievement.side], 0, 0, 'q');
-                        };
-                        sp.onmousemove = Tooltip.cursorUpdate;
-                        sp.onmouseout = Tooltip.hide;
+                        g_addTooltip(sp, g_sides[achievement.side]);
+
                         ae(td, sp);
                     }
                 },
@@ -11662,7 +11304,7 @@ Listview.templates = {
 
 					sp.href = this.template.getItemLink(title);
 
-					if(title.who) {
+					if (title.who) {
 						ae(n, ct(title.who));
                     }
 					else {
@@ -11712,11 +11354,8 @@ Listview.templates = {
                         var gender = g_file_genders[title.gender - 1];
                         var sp = ce('span');
                         sp.className = gender + '-icon';
-                        sp.onmouseover = function (e) {
-                            Tooltip.showAtCursor(e, LANG[gender], 0, 0, 'q');
-                        };
-                        sp.onmousemove = Tooltip.cursorUpdate;
-                        sp.onmouseout = Tooltip.hide;
+                        g_addTooltip(sp, LANG[gender]);
+
                         ae(td, sp);
                     }
                 },
@@ -11737,12 +11376,8 @@ Listview.templates = {
                     if (title.side && title.side != 3) {
                         var sp = ce('span');
                         sp.className = (title.side == 1 ? 'alliance-icon': 'horde-icon');
-                        sp.onmouseover = function (e) {
-                            Tooltip.showAtCursor(e, g_sides[title.side], 0, 0, 'q');
-                        };
-                        sp.onmousemove = Tooltip.cursorUpdate;
-                        sp.onmouseout = Tooltip.hide;
-						//ae(sp, ct(g_sides[title.side]));
+                        g_addTooltip(sp, g_sides[title.side]);
+
                         ae(td, sp);
                     }
                 },
@@ -11841,14 +11476,14 @@ Listview.templates = {
 				getVisibleText: function(title) {
 					var buff = '';
 
-					if(title.source) {
+					if (title.source) {
 						for(var s in title.source) {
 							for(var i = 0, len = title.source[s].length; i < len; ++i) {
 								var sm = title.source[s][i];
-								if(typeof sm == 'string') {
+								if (typeof sm == 'string') {
 									buff += ' ' + sm;
                                 }
-								else if(sm.t){
+								else if (sm.t){
 									buff += ' ' + sm.n;
                                 }
 							}
@@ -11888,439 +11523,453 @@ Listview.templates = {
             return '?title=' + title.id;
 		}
 	},
-	profile: {
-		sort: [],
-		nItemsPerPage: 50,
-		searchable: 1,
-		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			value: "name",
-			type: "text",
-			align: "left",
-			span: 2,
-			compute: function (f, c, h) {
-				if (f.level) {
-					var e = ce("td");
-					e.style.width = "1px";
-					e.style.padding = "0";
-					e.style.borderRight = "none";
-					ae(e, Icon.create(f.icon ? f.icon: "chr_" + g_file_races[f.race] + "_" + g_file_genders[f.gender] + "_" + g_file_classes[f.classs] + "0" + (f.level > 59 ? (Math.floor((f.level - 60) / 10) + 2) : 1), 1, null, this.template.getItemLink(f)));
-					ae(h, e);
-					c.style.borderLeft = "none"
-				} else {
-					c.colSpan = 2
-				}
-				var b = ce("div");
-				b.style.position = "relative";
-				var k = ce("a");
-				k.style.fontFamily = "Verdana, sans-serif";
-				k.href = this.template.getItemLink(f);
-				if (f.pinned) {
-					k.className = "star-icon-right"
-				}
-				ae(k, ct(f.name));
-				ae(b, k);
-				var g = ce("div");
-				g.className = "small";
-				g.style.marginRight = "20px";
-				if (f.guild) {
-					var k = ce("a");
-					k.className = "q1";
-					k.href = "?profiles=" + f.region + "." + f.realm + "&filter=cr=9;crs=0;crv=" + str_replace(urlencode(f.guild), " ", "+") + "&roster=1";
-					ae(k, ct(f.guild));
-					ae(g, ct("<"));
-					ae(g, k);
-					ae(g, ct(">"))
-				} else {
-					if (f.description) {
-						ae(g, ct(f.description))
-					}
-				}
-				var l = ce("span"),
-				j = "";
-				l.className = "q10";
-				if (f.deleted) {
-					j = LANG.lvcomment_deleted
-				}
-				ae(l, ct(j));
-				ae(g, l);
-				ae(b, g);
-				var g = ce("div");
-				g.className = "small";
-				g.style.fontStyle = "italic";
-				g.style.position = "absolute";
-				g.style.right = "3px";
-				g.style.bottom = "0px";
-				if (f.published === 0) {
-					ae(g, ct(LANG.privateprofile))
-				}
-				ae(b, g);
-				ae(c, b)
-			},
-			getVisibleText: function (a) {
-				var b = a.name;
-				if (a.guild) {
-					b += " " + a.guild
-				}
-				return b
-			}
-		},
-		{
-			id: "faction",
-			name: LANG.faction,
-			type: "text",
-			compute: function (a, f) {
-				if (!a.size && a.members === undefined && !a.level) {
-					return
-				}
-				var e = ce("div"),
-				c = ce("div"),
-				b;
-				b = Icon.create("faction_" + g_file_factions[a.faction + 1], 0);
-				b.onmouseover = function (d) {
-					Tooltip.showAtCursor(d, g_sides[a.faction + 1], 0, 0, "q")
-				};
-				b.onmousemove = Tooltip.cursorUpdate;
-				b.onmouseout = Tooltip.hide;
-				b.style.cssFloat = b.style.syleFloat = "left";
-				e.style.margin = "0 auto";
-				e.style.textAlign = "left";
-				e.style.width = "26px";
-				c.className = "clear";
-				ae(e, b);
-				ae(f, e);
-				ae(f, c)
-			},
-			getVisibleText: function (a) {
-				return g_sides[a.faction + 1]
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(this.getVisibleText(d), this.getVisibleText(c))
-			}
-		},
-		{
-			id: "members",
-			name: LANG.members,
-			value: "members",
-			hidden: 1
-		},
-		{
-			id: "size",
-			name: "Size",
-			value: "size",
-			hidden: 1
-		},
-		{
-			id: "rank",
-			name: "Rank",
-			value: "rank",
-			hidden: 1
-		},
-		{
-			id: "race",
-			name: LANG.race,
-			type: "text",
-			compute: function (a, f) {
-				if (a.race) {
-					var e = ce("div"),
-					c = ce("div"),
-					b;
-					b = Icon.create("race_" + g_file_races[a.race] + "_" + g_file_genders[a.gender], 0, null, "?race=" + a.race);
-					b.onmouseover = function (d) {
-						Tooltip.showAtCursor(d, g_chr_races[a.race], 0, 0, "q")
-					};
-					b.onmousemove = Tooltip.cursorUpdate;
-					b.onmouseout = Tooltip.hide;
-					b.style.cssFloat = b.style.syleFloat = "left";
-					e.style.margin = "0 auto";
-					e.style.textAlign = "left";
-					e.style.width = "26px";
-					c.className = "clear";
-					ae(e, b);
-					ae(f, e);
-					ae(f, c)
-				}
-			},
-			getVisibleText: function (a) {
-				return g_file_genders[a.gender] + " " + g_chr_races[a.race]
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_chr_races[d.race], g_chr_races[c.race])
-			},
-			hidden: 1
-		},
-		{
-			id: "classs",
-			name: LANG.classs,
-			type: "text",
-			compute: function (a, f) {
-				if (a.classs) {
-					var e = ce("div"),
-					c = ce("div"),
-					b;
-					b = Icon.create("class_" + g_file_classes[a.classs], 0, null, "?class=" + a.classs);
-					b.onmouseover = function (d) {
-						Tooltip.showAtCursor(d, g_chr_classes[a.classs], 0, 0, "q")
-					};
-					b.onmousemove = Tooltip.cursorUpdate;
-					b.onmouseout = Tooltip.hide;
-					b.style.cssFloat = b.style.syleFloat = "left";
-					e.style.margin = "0 auto";
-					e.style.textAlign = "left";
-					e.style.width = "26px";
-					c.className = "clear";
-					ae(e, b);
-					ae(f, e);
-					ae(f, c)
-				} else {
-					return -1
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.classs) {
-					return g_chr_classes[a.classs]
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(this.getVisibleText(d), this.getVisibleText(c))
-			},
-			hidden: 1
-		},
-		{
-			id: "level",
-			name: LANG.level,
-			value: "level",
-			hidden: 1
-		},
-		{
-			id: "talents",
-			name: LANG.talents,
-			type: "text",
-			compute: function (e, j) {
-				if (!e.level) {
-					return
-				}
-				var i = [e.talenttree1, e.talenttree2, e.talenttree3],
-				f = pr_getSpecFromTalents(e.classs, i),
-				c,
-				g,
-				b = ce("a");
-				var h = ce("div");
-				h.style.width = "82px";
-				h.style.height = "23px";
-				h.style.margin = "0 auto";
-				h.style.lineHeight = "23px";
-				h.style.backgroundImage = "url(" + f.icon + ")";
-				h.style.backgroundRepeat = "no-repeat";
-				h.style.backgroundPosition = "left";
-				var b = ce("a");
-				b.className = "small q1";
-				b.style.padding = "7px 0 7px 28px";
-				b.style.fontWeight = "bold";
-				b.rel = "np";
-				b.href = this.template.getItemLink(e) + "#talents";
-				b.onmouseover = function (a) {
-					Tooltip.showAtCursor(a, f.name, 0, 0, "q")
-				};
-				b.onmousemove = Tooltip.cursorUpdate;
-				b.onmouseout = Tooltip.hide;
-				ae(b, ct(e.talenttree1 + " / " + e.talenttree2 + " / " + e.talenttree3));
-				ae(h, b);
-				ae(j, h)
-			},
-			getVisibleText: function (a) {
-				if (a.talenttree1 || a.talenttree2 || a.talenttree3) {
-					if (a.talentspec > 0) {
-						return g_chr_specs[a.classs][a.talentspec - 1]
-					} else {
-						return g_chr_specs[0]
-					}
-				} else {
-					return g_chr_specs["-1"]
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(this.getVisibleText(d), this.getVisibleText(c))
-			},
-			hidden: 1
-		},
-		{
-			id: "gearscore",
-			name: LANG.gearscore,
-			tooltip: LANG.gearscore_real,
-			value: "gearscore",
-			compute: function (a, c) {
-				var b = (a.level ? a.level: (a.members !== undefined ? 80 : 0));
-				if (isNaN(a.gearscore) || !b) {
-					return
-				}
-				c.className = "q" + pr_getGearScoreQuality(b, a.gearscore, (in_array([2, 6, 7, 11], a.classs) != -1));
-				return (a.gearscore ? number_format(a.gearscore) : 0)
-			},
-			hidden: 1
-		},
-		{
-			id: "achievementpoints",
-			name: LANG.points,
-			value: "achievementpoints",
-			tooltip: LANG.tooltip_achievementpoints,
-			compute: function (a, b) {
-				if (a.achievementpoints) {
-					Listview.funcBox.appendMoney(b, 0, null, 0, 0, 0, a.achievementpoints)
-				}
-			},
-			hidden: 1
-		},
-		{
-			id: "wins",
-			name: LANG.wins,
-			value: "wins",
-			hidden: 1
-		},
-		{
-			id: "losses",
-			name: LANG.losses,
-			compute: function (a, b) {
-				return a.games - a.wins
-			},
-			hidden: 1
-		},
-		{
-			id: "guildrank",
-			name: LANG.guildrank,
-			value: "guildrank",
-			compute: function (c, d) {
-				if (c.guildrank > 0) {
-					return sprintf(LANG.rankno, c.guildrank)
-				} else {
-					if (c.guildrank == 0) {
-						var a = ce("b");
-						ae(a, ct(LANG.guildleader));
-						ae(d, a)
-					}
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.guildrank > 0) {
-					return sprintf(LANG.rankno, a.guildrank)
-				} else {
-					if (a.guildrank == 0) {
-						return LANG.guildleader
-					}
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp((d.guildrank >= 0 ? d.guildrank: 11), (c.guildrank >= 0 ? c.guildrank: 11))
-			},
-			hidden: 1
-		},
-		{
-			id: "rating",
-			name: LANG.rating,
-			value: "rating",
-			compute: function (a, b) {
-				if (a.roster) {
-					return a.arenateam[a.roster].rating
-				}
-				return a.rating
-			},
-			sortFunc: function (d, c, e) {
-				if (d.roster && c.roster) {
-					return strcmp(d.arenateam[d.roster].rating, c.arenateam[c.roster].rating)
-				}
-				return strcmp(d.rating, c.rating)
-			},
-			hidden: 1
-		},
-		{
-			id: "location",
-			name: LANG.location,
-			type: "text",
-			compute: function (c, e) {
-				var b;
-				if (c.region) {
-					if (c.realm) {
-						b = ce("a");
-						b.className = "q1";
-						b.href = "?profiles=" + c.region + "." + c.realm;
-						ae(b, ct(c.realmname));
-						ae(e, b);
-						ae(e, ce("br"))
-					}
-					var d = ce("small");
-					b = ce("a");
-					b.className = "q1";
-					b.href = "?profiles=" + c.region;
-					ae(b, ct(c.region.toUpperCase()));
-					ae(d, b);
-					if (c.battlegroup) {
-						ae(d, ct(LANG.hyphen));
-						b = ce("a");
-						b.className = "q1";
-						b.href = "?profiles=" + c.region + "." + c.battlegroup;
-						ae(b, ct(c.battlegroupname));
-						ae(d, b)
-					}
-					ae(e, d)
-				}
-			},
-			getVisibleText: function (a) {
-				var b = "";
-				if (a.region) {
-					b += " " + a.region
-				}
-				if (a.battlegroup) {
-					b += " " + a.battlegroup
-				}
-				if (a.realm) {
-					b += " " + a.realm
-				}
-				return trim(b)
-			},
-			sortFunc: function (d, c, e) {
-				if (d.region != c.region) {
-					return strcmp(d.region, c.region)
-				}
-				if (d.battlegroup != c.battlegroup) {
-					return strcmp(d.battlegroup, c.battlegroup)
-				}
-				return strcmp(d.realm, c.realm)
-			}
-		},
-		{
-			id: "guild",
-			name: LANG.guild,
-			value: "guild",
-			type: "text",
-			compute: function (c, d) {
-				if (!c.region || !c.battlegroup || !c.realm || !c.guild) {
-					return
-				}
-				var b = ce("a");
-				b.className = "q1";
-				b.href = "?profiles=" + c.region + "." + c.realm + "&filter=cr=9;crs=0;crv=" + str_replace(urlencode(c.guild), " ", "+") + "&roster=1";
-				ae(b, ct(c.guild));
-				ae(d, b)
-			}
-		}],
-		getItemLink: function (a) {
-			if (a.size !== undefined) {
-				return "?profiles=" + a.region + "." + a.realm + "&filter=cr=" + (a.size == 2 ? 12 : (a.size == 3 ? 15 : 18)) + ";crs=0;crv=" + str_replace(urlencode(a.name), " ", "+") + "&roster=" + (a.size == 5 ? 4 : a.size)
-			} else {
-				if (a.members !== undefined) {
-					return "?profiles=" + a.region + "." + a.realm + "&filter=cr=9;crs=0;crv=" + str_replace(urlencode(a.name), " ", "+") + "&roster=1"
-				} else {
-					if (a.region && a.realm) {
-						return "?profile=" + a.region + "." + a.realm + "." + g_cleanCharacterName(a.name)
-					} else {
-						return "?profile=" + a.id
-					}
-				}
-			}
-		}
-	},
+    profile: {
+        sort: [],
+        nItemsPerPage: 50,
+        searchable: 1,
+        filtrable: 1,
+        columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                value: 'name',
+                type: 'text',
+                align: 'left',
+                span: 2,
+                compute: function (profile, td, tr) {
+                    if (profile.level) {
+                        var i = ce('td');
+                        i.style.width = '1px';
+                        i.style.padding = '0';
+                        i.style.borderRight = 'none';
+
+                        ae(i, Icon.create($WH.g_getProfileIcon(profile.race, profile.classs, profile.gender, profile.level, profile.icon ? profile.icon : profile.id, 'medium'), 1, null, this.getItemLink(profile)));
+                        ae(tr, i);
+
+                        td.style.borderLeft = 'none';
+                    }
+                    else {
+                        td.colSpan = 2;
+                    }
+
+                    var wrapper = ce('div');
+                    wrapper.style.position = 'relative';
+
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(profile);
+                    if (profile.pinned) {
+                        a.className = 'star-icon-right';
+                    }
+                    ae(a, ct(profile.name));
+                    ae(wrapper, a);
+
+                    var d = ce('div');
+                    d.className = 'small';
+                    d.style.marginRight = '20px';
+
+                    if (profile.guild && typeof(profile.guild) != 'number') {
+                        var a = ce('a');
+                        a.className = 'q1';
+                        a.href = '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.guild);
+                        ae(a, ct(profile.guild));
+                        ae(d, ct('<'));
+                        ae(d, a);
+                        ae(d, ct('>'));
+                    }
+                    else if (profile.description) {
+                        ae(d, ct(profile.description));
+                    }
+
+                    var
+                        s = ce('span'),
+                        foo = '';
+
+                    s.className = 'q10';
+                    if (profile.deleted) {
+                        foo = LANG.lvcomment_deleted;
+                    }
+                    ae(s, ct(foo));
+                    ae(d, s);
+                    ae(wrapper, d);
+
+                    var d = ce('div');
+                    d.className = 'small';
+                    d.style.fontStyle = 'italic';
+                    d.style.position = 'absolute';
+                    d.style.right = '3px';
+                    d.style.bottom = '0px';
+                    tr.__status = d;    // todo: wtf is that for..?
+
+                    if (profile.published === 0) {
+                        ae(d, ct(LANG.privateprofile));
+                    }
+
+                    ae(wrapper, d);
+                    ae(td, wrapper);
+                },
+                getVisibleText: function (profile) {
+                    var buff = profile.name;
+                    if (profile.guild && typeof(profile.guild) != 'number') {
+                        buff += ' ' + profile.guild;
+                    }
+                    return buff;
+                }
+            },
+            {
+                id: 'faction',
+                name: LANG.faction,
+                type: 'text',
+                compute: function (profile, td) {
+                    if (!profile.size && profile.members === undefined && !profile.level) {
+                        return;
+                    }
+
+                    var
+                        d = ce('div'),
+                        d2 = ce('div'),
+                        icon;
+
+                    icon = Icon.create('faction_' + g_file_factions[parseInt(profile.faction) + 1], 0);
+                    icon.style.cssFloat = icon.style.syleFloat = 'left';
+                    g_addTooltip(icon, g_sides[parseInt(profile.faction) + 1]);
+
+                    d.style.margin = '0 auto';
+                    d.style.textAlign = 'left';
+                    d.style.width = '26px';
+                    d2.className = 'clear';
+
+                    ae(d, icon);
+                    ae(td, d);
+                    ae(td, d2);
+                },
+                getVisibleText: function (profile) {
+                    return g_sides[profile.faction + 1];
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(this.getVisibleText(a), this.getVisibleText(b));
+                }
+            },
+            {
+                id: 'members',
+                name: LANG.members,
+                value: 'members',
+                hidden: 1
+            },
+            {
+                id: 'size',
+                name: 'Size',
+                value: 'size',
+                hidden: 1
+            },
+            {
+                id: 'rank',
+                name: 'Rank',
+                value: 'rank',
+                hidden: 1
+            },
+            {
+                id: 'race',
+                name: LANG.race,
+                type: 'text',
+                compute: function (profile, td) {
+                    if (profile.race) {
+                        var
+                            d = ce('div'),
+                            d2 = ce('div'),
+                            icon;
+
+                        icon = Icon.create('race_' + g_file_races[profile.race] + '_' + g_file_genders[profile.gender], 0, null, '?race=' + profile.race);
+                        icon.style.cssFloat = icon.style.syleFloat = 'left';
+                        g_addTooltip(icon, g_chr_races[profile.race]);
+
+                        d.style.margin = '0 auto';
+                        d.style.textAlign = 'left';
+                        d.style.width = '26px';
+                        d2.className = 'clear';
+
+                        ae(d, icon);
+                        ae(td, d);
+                        ae(td, d2);
+                    }
+                },
+                getVisibleText: function (profile) {
+                    return g_file_genders[profile.gender] + ' ' + g_chr_races[profile.race];
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_chr_races[a.race], g_chr_races[b.race]);
+                },
+                hidden: 1
+            },
+            {
+                id: 'classs',
+                name: LANG.classs,
+                type: 'text',
+                compute: function (profile, td) {
+                    if (profile.classs) {
+                        var
+                            d  = ce('div'),
+                            d2 = ce('div'),
+                            icon;
+
+                        icon = Icon.create('class_' + g_file_classes[profile.classs], 0, null, '?class=' + profile.classs);
+                        icon.style.cssFloat = icon.style.syleFloat = 'left';
+
+                        g_addTooltip(icon, g_chr_classes[profile.classs], 'c' + profile.classs);
+
+                        d.style.margin = '0 auto';
+                        d.style.textAlign = 'left';
+                        d.style.width = '26px';
+                        d2.className = 'clear';
+
+                        ae(d, icon);
+                        ae(td, d);
+                        ae(td, d2);
+                    }
+                    else {
+                        return -1;
+                    }
+                },
+                getVisibleText: function (profile) {
+                    if (profile.classs) {
+                        return g_chr_classes[profile.classs];
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(this.getVisibleText(a), this.getVisibleText(b));
+                },
+                hidden: 1
+            },
+            {
+                id: 'level',
+                name: LANG.level,
+                value: 'level',
+                hidden: 1
+            },
+            {
+                id: 'talents',
+                name: LANG.talents,
+                type: 'text',
+                compute: function (profile, td) {
+                    if (!profile.level) {
+                        return;
+                    }
+
+					var spent = [profile.talenttree1, profile.talenttree2, profile.talenttree3];
+					var specData = pr_getSpecFromTalents(profile.classs, spent);
+                    var a = ce('a');
+
+					a.className = 'icontiny tinyspecial tip q1';
+					a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
+                    a.rel = 'np';
+                    a.href = this.template.getItemLink(profile) + '#talents';
+                    g_addTooltip(a, specData.name);
+
+                    ae(a, ct(profile.talenttree1 + ' / ' + profile.talenttree2 + ' / ' + profile.talenttree3));
+
+                    ae(td, a);
+                },
+                getVisibleText: function (profile) {
+                    if (profile.talenttree1 || profile.talenttree2 || profile.talenttree3) {
+                        if (profile.talentspec > 0) {
+                            return g_chr_specs[profile.classs][profile.talentspec - 1];
+                        }
+                        else {
+                            return g_chr_specs[0];
+                        }
+                    }
+                    else {
+                        return g_chr_specs['-1'];
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(this.getVisibleText(a), this.getVisibleText(b));
+                },
+                hidden: 1
+            },
+            {
+                id: 'gearscore',
+                name: LANG.gearscore,
+                tooltip: LANG.gearscore_real,
+                value: 'gearscore',
+                compute: function (profile, td) {
+                    var level = (profile.level ? profile.level: (profile.members !== undefined ? 80 : 0));
+
+                    if (isNaN(profile.gearscore) || !level) {
+                        return;
+                    }
+
+                    td.className = 'q' + pr_getGearScoreQuality(level, profile.gearscore, (in_array([2, 6, 7, 11], profile.classs) != -1));
+
+                    return (profile.gearscore ? number_format(profile.gearscore) : 0);
+                },
+                hidden: 1
+            },
+            {
+                id: 'achievementpoints',
+                name: LANG.points,
+                value: 'achievementpoints',
+                tooltip: LANG.tooltip_achievementpoints,
+                compute: function (profile, td) {
+                    if (profile.achievementpoints) {
+                        Listview.funcBox.appendMoney(td, 0, null, 0, 0, 0, profile.achievementpoints);
+                    }
+                },
+                hidden: 1
+            },
+            {
+                id: 'wins',
+                name: LANG.wins,
+                value: 'wins',
+                hidden: 1
+            },
+            {
+                id: 'losses',
+                name: LANG.losses,
+                compute: function (profile, td) {
+                    return profile.games - profile.wins;
+                },
+                hidden: 1
+            },
+            {
+                id: 'guildrank',
+                name: LANG.guildrank,
+                value: 'guildrank',
+                compute: function (profile, td) {
+                    if (profile.guildrank > 0) {
+                        return sprintf(LANG.rankno, profile.guildrank);
+                    }
+                    else if (profile.guildrank == 0) {
+                        var b = ce('b');
+                        ae(b, ct(LANG.guildleader));
+                        ae(td, b);
+                    }
+                },
+                getVisibleText: function (profile) {
+                    if (profile.guildrank > 0) {
+                        return sprintf(LANG.rankno, profile.guildrank);
+                    }
+                    else if (profile.guildrank == 0) {
+                        return LANG.guildleader;
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp((a.guildrank >= 0 ? a.guildrank : 11), (b.guildrank >= 0 ? b.guildrank : 11));
+                },
+                hidden: 1
+            },
+            {
+                id: 'rating',
+                name: LANG.rating,
+                value: 'rating',
+                compute: function (profile, td) {
+                    if (profile.roster) {
+                        return profile.arenateam[profile.roster].rating;
+                    }
+
+                    return profile.rating;
+                },
+                sortFunc: function (a, b, col) {
+                    if (a.roster && b.roster) {
+                        return strcmp(a.arenateam[a.roster].rating, b.arenateam[b.roster].rating);
+                    }
+
+                    return strcmp(a.rating, b.rating);
+                },
+                hidden: 1
+            },
+            {
+                id: 'location',
+                name: LANG.location,
+                type: 'text',
+                compute: function (profile, td) {
+                    var a;
+
+                    if (profile.region) {
+                        if (profile.realm) {
+                            a = ce('a');
+                            a.className = 'q1';
+                            a.href = '?profiles=' + profile.region + '.' + profile.realm;
+                            ae(a, ct(profile.realmname));
+                            ae(td, a);
+                            ae(td, ce('br'));
+                        }
+
+                        var s = ce('small');
+                        a = ce('a');
+                        a.className = 'q1';
+                        a.href = '?profiles=' + profile.region;
+                        ae(a, ct(profile.region.toUpperCase()));
+                        ae(s, a);
+
+                        if (profile.subregion) {
+                            ae(s, ct(LANG.hyphen));
+
+                            a = ce('a');
+                            a.className = 'q1';
+                            a.href = '?profiles=' + profile.region + '.' + profile.subregion;
+                            ae(a, ct(profile.subregionname));
+                            ae(s, a);
+                        }
+
+                        ae(td, s);
+                    }
+                },
+                getVisibleText: function (profile) {
+                    var buff = '';
+                    if (profile.region) {
+                        buff += ' ' + profile.region;
+                    }
+                    if (profile.subregion) {
+                        buff += ' ' + profile.subregion;
+                    }
+                    if (profile.realm) {
+                        buff += ' ' + profile.realm;
+                    }
+
+                    return trim(buff);
+                },
+                sortFunc: function (a, b, col) {
+                    if (a.region != b.region) {
+                        return strcmp(a.region, b.region);
+                    }
+                    if (a.subregion != b.subregion) {
+                        return strcmp(a.subregion, b.subregion);
+                    }
+                    return strcmp(a.realm, b.realm);
+                }
+            },
+            {
+                id: 'guild',
+                name: LANG.guild,
+                value: 'guild',
+                type: 'text',
+                compute: function (profile, td) {
+                    if (!profile.region || !profile.subregion || !profile.realm || !profile.guild || typeof(profile.guild) == 'number') {
+                        return;
+                    }
+
+                    var a = ce('a');
+                    a.className = 'q1';
+                    a.href = '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.guild);
+                    ae(a, ct(profile.guild));
+                    ae(td, a);
+                }
+            }
+        ],
+
+        getItemLink: function (profile) {
+            if (profile.size !== undefined) {
+				return '?arena-team=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name);
+            }
+            else if (profile.members !== undefined) {
+                return '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name);
+            }
+            else {
+				return g_getProfileUrl(profile);
+            }
+        }
+    },
 	model: {
 		sort: [],
 		mode: 3,
@@ -12390,233 +12039,271 @@ Listview.templates = {
 		sort: [1],
 		searchable: 1,
 		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			span: 2,
-			value: "name",
-			compute: function (c, g, e) {
-				var d = ce("td");
-				d.style.width = "1px";
-				d.style.padding = "0";
-				d.style.borderRight = "none";
-				ae(d, Icon.create(c.icon, 0, null, this.template.getItemLink(c)));
-				ae(e, d);
-				g.style.borderLeft = "none";
-				var f = ce("div");
-				var b = ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(c);
-				ae(b, ct(c.name));
-				ae(f, b);
-				ae(g, f)
-			}
-		},
-		{
-			id: "category",
-			name: LANG.category,
-			type: "text",
-			width: "15%",
-			compute: function (c, d) {
-				d.className = "small";
-				var b = ce("a");
-				b.className = "q1";
-				b.href = "?currencies=" + c.category;
-				ae(b, ct(g_currency_categories[c.category]));
-				ae(d, b)
-			},
-			getVisibleText: function (a) {
-				return g_currency_categories[a.category]
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_currency_categories[d.category], g_currency_categories[c.category])
-			}
-		}],
-		getItemLink: function (a) {
-			return "?currency=" + a.id
+		columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                span: 2,
+                value: 'name',
+                compute: function (currency, td, tr) {
+                    var i = ce('td');
+                    i.style.width = '1px';
+                    i.style.padding = '0';
+                    i.style.borderRight = 'none';
+
+                    ae(i, Icon.create(currency.icon, 0, null, this.template.getItemLink(currency)));
+                    ae(tr, i);
+                    td.style.borderLeft = 'none';
+
+                    var wrapper = ce('div');
+
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(currency);
+                    ae(a, ct(currency.name));
+
+                    ae(wrapper, a);
+
+                    ae(td, wrapper);
+                }
+            },
+            {
+                id: 'category',
+                name: LANG.category,
+                type: 'text',
+                width: '15%',
+                compute: function (currency, td) {
+                    td.className = 'small';
+
+                    var a = ce('a');
+                    a.className = 'q1';
+                    a.href = '?currencies=' + currency.category;
+                    ae(a, ct(g_currency_categories[currency.category]));
+                    ae(td, a);
+                },
+                getVisibleText: function (currency) {
+                    return g_currency_categories[currency.category];
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_currency_categories[a.category], g_currency_categories[b.category]);
+                }
+            }
+        ],
+
+		getItemLink: function (currency) {
+			return '?currency=' + currency.id;
 		}
 	},
 	classs: {
 		sort: [1],
 		searchable: 1,
 		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			span: 2,
-			value: "name",
-			compute: function (e, k, g) {
-				var c = ce("td");
-				c.style.width = "1px";
-				c.style.padding = "0";
-				c.style.borderRight = "none";
-				ae(c, Icon.create("class_" + g_file_classes[e.id], 0, null, this.template.getItemLink(e)));
-				ae(g, c);
-				k.style.borderLeft = "none";
-				var j = ce("div");
-				var b = ce("a");
-				b.className = "c" + e.id;
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(e);
-				ae(b, ct(e.name));
-				if (e.expansion) {
-					var f = ce("span");
-					f.className = g_GetExpansionClassName(e.expansion);
-					ae(f, b);
-					ae(j, f)
-				} else {
-					ae(j, b)
-				}
-				if (e.hero) {
-					j.style.position = "relative";
-					var h = ce("div");
-					h.className = "small";
-					h.style.fontStyle = "italic";
-					h.style.position = "absolute";
-					h.style.right = "3px";
-					h.style.bottom = "0px";
-					ae(h, ct(LANG.lvclass_hero));
-					ae(j, h)
-				}
-				ae(k, j)
-			}
-		},
-		{
-			id: "races",
-			name: LANG.races,
-			type: "text",
-			compute: function (e, g) {
-				if (e.races) {
-					var f = Listview.funcBox.assocBinFlags(e.races, g_chr_races);
-					g.className = "q1";
-					for (var d = 0, b = f.length; d < b; ++d) {
-						if (d > 0) {
-							ae(g, ct(LANG.comma))
-						}
-						var c = ce("a");
-						c.href = "?race=" + f[d];
-						ae(c, ct(g_chr_races[f[d]]));
-						ae(g, c)
-					}
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.races) {
-					return Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(a.races, g_chr_races), g_chr_races)
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(d.races, g_chr_races), Listview.funcBox.assocBinFlags(c.races, g_chr_races), g_chr_races)
-			}
-		}],
-		getItemLink: function (a) {
-			return "?class=" + a.id
+		columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                span: 2,
+                value: 'name',
+                compute: function (classs, td, tr) {
+                    var i = ce('td');
+                    i.style.width = '1px';
+                    i.style.padding = '0';
+                    i.style.borderRight = 'none';
+
+                    ae(i, Icon.create('class_' + g_file_classes[classs.id], 0, null, this.template.getItemLink(classs)));
+                    ae(tr, i);
+                    td.style.borderLeft = 'none';
+
+                    // force minimum width to fix overlap display bug
+                    td.style.width = '225px';
+
+                    var wrapper = ce('div');
+
+                    var a = ce('a');
+                    a.className = 'c' + classs.id;
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(classs);
+                    ae(a, ct(classs.name));
+
+                    if (classs.expansion) {
+                        var sp = ce('span');
+                        sp.className = g_GetExpansionClassName(classs.expansion);
+                        ae(sp, a);
+                        ae(wrapper, sp);
+                    }
+                    else {
+                        ae(wrapper, a);
+                    }
+
+                    if (classs.hero) {
+                        wrapper.style.position = 'relative';
+                        var d = ce('div');
+                        d.className = 'small';
+                        d.style.fontStyle = 'italic';
+                        d.style.position = 'absolute';
+                        d.style.right = '3px';
+                        d.style.bottom = '0px';
+                        ae(d, ct(LANG.lvclass_hero));
+                        ae(wrapper, d);
+                    }
+                    ae(td, wrapper);
+                }
+            },
+            {
+                id: 'races',
+                name: LANG.races,
+                type: 'text',
+                compute: function (classs, td) {
+                    if (classs.races) {
+                        var races = Listview.funcBox.assocBinFlags(classs.races, g_chr_races);
+
+                        td.className = 'q1';
+                        for (var i = 0, len = races.length; i < len; ++i) {
+                            if (i > 0) {
+                                ae(td, ct(LANG.comma));
+                            }
+                            var a = ce('a');
+                            a.href = '?race=' + races[i];
+                            ae(a, ct(g_chr_races[races[i]]));
+                            ae(td, a);
+                        }
+                    }
+                },
+                getVisibleText: function (classs) {
+                    if (classs.races) {
+                        return Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(classs.races, g_chr_races), g_chr_races);
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(a.races, g_chr_races), Listview.funcBox.assocBinFlags(b.races, g_chr_races), g_chr_races);
+                }
+            }
+        ],
+
+		getItemLink: function (classs) {
+			return '?class=' + classs.id;
 		}
 	},
 	race: {
 		sort: [1],
 		searchable: 1,
 		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			span: 2,
-			value: "name",
-			compute: function (g, e, j) {
-				var h = ce("div"),
-				k;
-				h.style.margin = "0 auto";
-				h.style.textAlign = "left";
-				h.style.width = "52px";
-				k = Icon.create("race_" + g_file_races[g.id] + "_" + g_file_genders[0], 0, null, this.template.getItemLink(g));
-				k.style.cssFloat = k.style.styleFloat = "left";
-				ae(h, k);
-				k = Icon.create("race_" + g_file_races[g.id] + "_" + g_file_genders[1], 0, null, this.template.getItemLink(g));
-				k.style.cssFloat = k.style.styleFloat = "left";
-				ae(h, k);
-				var f = ce("td");
-				f.style.width = "1px";
-				f.style.padding = "0";
-				f.style.borderRight = "none";
-				ae(f, h);
-				ae(j, f);
-				e.style.borderLeft = "none";
-				var b = ce("div");
-				var l = ce("a");
-				l.style.fontFamily = "Verdana, sans-serif";
-				l.href = this.template.getItemLink(g);
-				ae(l, ct(g.name));
-				if (g.expansion) {
-					var c = ce("span");
-					c.className = g_GetExpansionClassName(g.expansion);
-					ae(c, l);
-					ae(b, c)
-				} else {
-					ae(b, l)
-				}
-				ae(e, b)
-			}
-		},
-		{
-			id: "side",
-			name: LANG.side,
-			type: "text",
-			compute: function (a, c) {
-				if (a.side && a.side != 3) {
-					var b = ce("span");
-					b.className = (a.side == 1 ? "alliance-icon": "horde-icon");
-					b.onmouseover = function (d) {
-						Tooltip.showAtCursor(d, g_sides[a.side], 0, 0, "q")
-					};
-					b.onmousemove = Tooltip.cursorUpdate;
-					b.onmouseout = Tooltip.hide;
-					ae(c, b)
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.side) {
-					return g_sides[a.side]
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_sides[d.side], g_sides[c.side])
-			}
-		},
-		{
-			id: "classes",
-			name: LANG.classes,
-			type: "text",
-			compute: function (e, h) {
-				if (e.classes) {
-					var c = Listview.funcBox.assocBinFlags(e.classes, g_chr_classes);
-					var g = ce("div");
-					g.style.width = (26 * c.length) + "px";
-					g.style.margin = "0 auto";
-					for (var b = 0, a = c.length; b < a; ++b) {
-						var f = Icon.create("class_" + g_file_classes[c[b]], 0, null, "?class=" + c[b]);
-						f.style.cssFloat = f.style.styleFloat = "left";
-						ae(g, f)
-					}
-					ae(h, g)
-				}
-			},
-			getVisibleText: function (a) {
-				if (a.classes) {
-					return Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(a.classes, g_chr_classes), g_chr_classes)
-				}
-			},
-			sortFunc: function (d, c, e) {
-				return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(d.classes, g_chr_classes), Listview.funcBox.assocBinFlags(c.classes, g_chr_classes), g_chr_classes)
-			}
-		}],
-		getItemLink: function (a) {
-			return "?race=" + a.id
+		columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                span: 2,
+                value: 'name',
+                compute: function (race, td, tr) {
+                    var
+                        d = ce('div'),
+                        icon;
+
+                    d.style.margin = '0 auto';
+                    d.style.textAlign = 'left';
+                    d.style.width = '52px';
+
+                    icon = Icon.create('race_' + g_file_races[race.id] + '_' + g_file_genders[0], 0, null, this.template.getItemLink(race));
+                    icon.style.cssFloat = icon.style.styleFloat = 'left';
+                    ae(d, icon);
+
+                    icon = Icon.create('race_' + g_file_races[race.id] + '_' + g_file_genders[1], 0, null, this.template.getItemLink(race));
+                    icon.style.cssFloat = icon.style.styleFloat = 'left';
+                    ae(d, icon);
+
+                    var i = ce('td');
+                    i.style.width = '1px';
+                    i.style.padding = '0';
+                    i.style.borderRight = 'none';
+
+                    ae(i, d);
+                    ae(tr, i);
+                    td.style.borderLeft = 'none';
+
+                    var wrapper = ce('div');
+
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(race);
+                    ae(a, ct(race.name));
+
+                    if (race.expansion) {
+                        var sp = ce('span');
+                        sp.className = g_GetExpansionClassName(race.expansion);
+                        ae(sp, a);
+                        ae(wrapper, sp);
+                    }
+                    else {
+                        ae(wrapper, a);
+                    }
+                    ae(td, wrapper);
+                }
+            },
+            {
+                id: 'side',
+                name: LANG.side,
+                type: 'text',
+                compute: function (race, td) {
+                    if (race.side && race.side != 3) {
+                        var sp = ce('span');
+                        sp.className = (race.side == 1 ? 'alliance-icon' : 'horde-icon');
+                        g_addTooltip(sp, g_sides[race.side]);
+
+                        ae(td, sp);
+                    }
+                },
+                getVisibleText: function (race) {
+                    if (race.side) {
+                        return g_sides[race.side];
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp(g_sides[a.side], g_sides[b.side]);
+                }
+            },
+            {
+                id: 'classes',
+                name: LANG.classes,
+                type: 'text',
+                compute: function (race, td) {
+                    if (race.classes) {
+                        var classes = Listview.funcBox.assocBinFlags(race.classes, g_chr_classes);
+
+                        var d = ce('div');
+                        d.style.width = (26 * classes.length) + 'px';
+                        d.style.margin = '0 auto';
+
+                        for (var i = 0, len = classes.length; i < len; ++i) {
+                            var icon = Icon.create('class_' + g_file_classes[classes[i]], 0, null, '?class=' + classes[i]);
+
+                            g_addTooltip(icon, g_chr_classes[classes[i]], 'c' + classes[i]);
+
+                            icon.style.cssFloat = icon.style.styleFloat = 'left';
+                            ae(d, icon);
+                        }
+
+                        ae(td, d);
+                    }
+                },
+                getVisibleText: function (race) {
+                    if (race.classes) {
+                        return Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(race.classes, g_chr_classes), g_chr_classes);
+                    }
+                },
+                sortFunc: function (a, b, col) {
+                    return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(a.classes, g_chr_classes), Listview.funcBox.assocBinFlags(b.classes, g_chr_classes), g_chr_classes);
+                }
+            }
+        ],
+
+		getItemLink: function (race) {
+			return '?race=' + race.id;
 		}
 	}
 };
@@ -12831,8 +12518,779 @@ g_holidays.createIcon = function (d, b, a, c) {
     return Icon.create(g_holidays.getIcon(d), b, null, "?event=" + d, a, c)
 };
 
+/*
+Global Profiler-related functions
+*/
+
+function g_cleanCharacterName(name) {
+	return (name.match && name.match(/^[A-Z]/) ? name.charAt(0).toLowerCase() + name.substr(1) : name);
+}
+
+function g_getProfileUrl(profile) {
+	if (profile.region) { // Armory character
+		return '?profile=' + profile.region + '.' + profile.realm + '.' + g_cleanCharacterName(profile.name);
+	}
+	else { // Custom profile
+		return '?profile=' + profile.id;
+	}
+}
+
+function g_getProfileRealmUrl(profile) {
+	return '?profiles=' + profile.region + '.' + profile.realm;
+}
+
+var Icon = {
+    sizes: ['small', 'medium', 'large'],
+    sizes2: [18, 36, 56],
+    premiumOffsets: [[-56, -36], [-56, 0], [0, 0]],
+
+    create: function (name, size, UNUSED, url, num, qty, noBorder) {
+        var
+            icon  = ce('div'),
+            image = ce('ins'),
+            tile  = ce('del');
+
+        if (size == null) {
+            size = 1;
+        }
+
+        icon.className = 'icon' + Icon.sizes[size];
+
+        ae(icon, image);
+
+        if (!noBorder) {
+            ae(icon, tile);
+        }
+
+        Icon.setTexture(icon, size, name);
+
+        if (url) {
+            var a = ce('a');
+            a.href = url;
+            if (url.indexOf('wowhead.com') == -1 && url.substr(0, 5) == 'http:') {
+                a.target = "_blank";
+            }
+            ae(icon, a);
+        }
+        else if (name) {
+            var _ = icon.firstChild.style;
+            var avatarIcon = (_.backgroundImage.indexOf('/avatars/') != -1);
+
+            if (!avatarIcon) {
+                icon.onclick = Icon.onClick;
+
+                var a = ce('a');
+                a.href = "javascript:;";
+                ae(icon, a);
+            }
+        }
+
+        Icon.setNumQty(icon, num, qty);
+
+        return icon;
+    },
+
+    createUser: function (avatar, avatarMore, size, url, isPremium, noBorder) {
+        if (avatar == 2) {
+            avatarMore = g_staticUrl + '/uploads/avatars/' + avatarMore + '.jpg';
+        }
+
+        var icon = Icon.create(avatarMore, size, null, url, null, null, noBorder);
+
+        if (isPremium) {
+            icon.className += ' ' + icon.className + (isPremium == 2 ? '-gold' : '-premium');
+        }
+
+        if (avatar == 2) {
+            Icon.moveTexture(icon, size, Icon.premiumOffsets[size][0], Icon.premiumOffsets[size][1], true);
+        }
+
+        return icon;
+    },
+
+    setTexture: function (icon, size, name) {
+        if (!name) {
+            return;
+        }
+
+        var _ = icon.firstChild.style;
+
+        if (name.indexOf('/') != -1 || name.indexOf('?') != -1) {
+            _.backgroundImage = 'url(' + name + ')';
+        }
+        else {
+            _.backgroundImage = 'url(' + g_staticUrl + '/images/icons/' + Icon.sizes[size] + '/' + escape(name.toLowerCase()) + '.jpg)';
+        }
+
+        Icon.moveTexture(icon, size, 0, 0);
+    },
+
+    moveTexture: function (icon, size, x, y, exact) {
+        var _ = icon.firstChild.style;
+
+        if (x || y) {
+            if (exact) {
+                _.backgroundPosition = x + 'px ' + y + 'px';
+            }
+            else {
+                _.backgroundPosition = (-x * Icon.sizes2[size]) + 'px ' + ( -y * Icon.sizes2[size]) + 'px';
+            }
+        }
+        else if (_.backgroundPosition) {
+            _.backgroundPosition = '';
+        }
+    },
+
+    setNumQty: function (icon, num, qty) {
+        var _ = gE(icon, 'span');
+
+        for (var i = 0, len = _.length; i < len; ++i) {
+            if (_[i]) {
+                de(_[i]);
+            }
+        }
+        if (num != null && ((num > 1 && num < 2147483647) || num.length)) {
+            _ = g_createGlow(num, 'q1');
+            _.style.right = '0';
+            _.style.bottom = '0';
+            _.style.position = 'absolute';
+            ae(icon, _);
+        }
+
+        if (qty != null && qty > 0) {
+            _ = g_createGlow('(' + qty + ')', 'q');
+            _.style.left = '0';
+            _.style.top = '0';
+            _.style.position = 'absolute';
+            ae(icon, _);
+        }
+    },
+
+    getLink: function (icon) {
+        return gE(icon, 'a')[0];
+    },
+
+    showIconName: function (x) {
+        if (x.firstChild) {
+            var _ = x.firstChild.style;
+            if (_.backgroundImage.length && (_.backgroundImage.indexOf(g_staticUrl) >= 4 || g_staticUrl == '')) {
+                var
+                    start = _.backgroundImage.lastIndexOf('/'),
+                    end   = _.backgroundImage.indexOf('.jpg');
+
+                if (start != -1 && end != -1) {
+                    Icon.displayIcon(_.backgroundImage.substring(start + 1, end));
+                }
+            }
+        }
+    },
+
+    onClick: function() {
+        Icon.showIconName(this);
+    },
+
+    displayIcon: function(icon) {
+        if (!Dialog.templates.icondisplay) {
+            var w = 364;
+            switch (g_locale.id) {
+                case 6:
+                    w = 380;
+                    break;
+
+                case 8:
+                    w = 384;
+                    break;
+            }
+
+            Dialog.templates.icondisplay = {
+                title: LANG.icon,
+                width: w,
+                buttons: [['arrow', LANG.dialog_original], ['cancel', LANG.close]],
+                fields:
+                [
+                    {
+                        id: 'icon',
+                        label: LANG.dialog_imagename,
+                        required: 1,
+                        type: 'text',
+                        labelAlign: 'left',
+                        compute: function(field, value, form, td) {
+                            var wrapper = ce('div');
+                            td.style.width = '300px';
+                            wrapper.style.position = 'relative';
+                            wrapper.style.cssFloat = 'left';
+                            wrapper.style.paddingRight = '6px';
+                            field.style.width = '200px';
+
+                            var divIcon = this.iconDiv = ce('div');
+                            divIcon.style.position = 'absolute';
+                            divIcon.style.top = '-12px';
+                            divIcon.style.right = '-70px';
+
+                            divIcon.update = function() {
+                                setTimeout(function() {
+                                    field.focus();
+                                    field.select();
+                                }, 10);
+                                ee(divIcon);
+                                ae(divIcon, Icon.create(field.value, 2));
+                            };
+
+                            ae(divIcon, Icon.create(value, 2));
+                            ae(wrapper, divIcon);
+                            ae(wrapper, field);
+                            ae(td, wrapper);
+                        }
+                    },
+                    {
+                        id: 'location',
+                        label: " ",
+                        required: 1,
+                        type: 'caption',
+                        compute: function(field, value, form, th, tr) {
+                            ee(th);
+                            th.style.padding = '3px 3px 0 3px';
+                            th.style.lineHeight = '17px';
+                            th.style.whiteSpace = 'normal';
+                            var wrapper = ce('div');
+                            wrapper.style.position = 'relative';
+                            wrapper.style.width = '250px';
+
+                            var span = ce('span');
+
+                            var text = LANG.dialog_seeallusingicon;
+                            text = text.replace('$1', '<a href="?items&filter=cr=142;crs=0;crv=' + this.data.icon + '">' + LANG.types[3][3] + '</a>');
+                            text = text.replace('$2', '<a href="?spells&filter=cr=15;crs=0;crv=' + this.data.icon + '">' + LANG.types[6][3] + '</a>');
+                            text = text.replace('$3', '<a href="?achievements&filter=cr=10;crs=0;crv=' + this.data.icon + '">' + LANG.types[10][3] + '</a>');
+
+                            span.innerHTML = text;
+                            ae(wrapper, span);
+                            ae(th, wrapper);
+                        }
+                    }
+                ],
+
+                onInit: function(form) {
+                    this.updateIcon = this.template.updateIcon.bind(this, form);
+                },
+
+                onShow: function(form) {
+                    this.updateIcon();
+                    if (location.hash && location.hash.indexOf('#icon') == -1) {
+                        this.oldHash = location.hash;
+                    }
+                    else {
+                        this.oldHash = '';
+                    }
+
+                    var hash = '#icon';
+
+                    // Add icon name on all pages but item, spell and achievement pages (where the name is already available).
+                    var nameDisabled = (isset('g_pageInfo') && g_pageInfo.type && in_array([3, 6, 10], g_pageInfo.type) == -1);
+                    if (!nameDisabled) {
+                        hash += ':' + this.data.icon;
+                    }
+
+                    location.hash = hash;
+                },
+
+                onHide: function(form) {
+                    if (this.oldHash) {
+                        location.hash = this.oldHash;
+                    }
+                    else {
+                        location.hash = '#.';
+                    }
+                },
+
+                updateIcon: function(form) {
+                    this.iconDiv.update();
+                },
+
+                onSubmit: function(unused, data, button, form) {
+                    if (button == 'arrow') {
+                        var win = window.open(g_staticUrl + '/images/icons/large/' + data.icon.toLowerCase() + '.jpg', '_blank');
+                        win.focus();
+                        return false;
+                    }
+
+                    return true;
+                }
+            };
+        }
+
+        if (!Icon.icDialog) {
+            Icon.icDialog = new Dialog();
+        }
+
+        Icon.icDialog.show('icondisplay', {data: {icon: icon}});
+    },
+
+    checkPound: function() {
+        if (location.hash && location.hash.indexOf('#icon') == 0) {
+            var parts = location.hash.split(':');
+            var icon = false;
+            if (parts.length == 2) {
+                icon = parts[1];
+            }
+            else if (parts.length == 1 && isset('g_pageInfo')) {
+                switch (g_pageInfo.type) {
+                    case 3: // Item
+                        icon = g_items[g_pageInfo.typeId].icon.toLowerCase();
+                        break;
+                    case 6: // Spell
+                        icon = g_spells[g_pageInfo.typeId].icon.toLowerCase();
+                        break;
+                    case 10: // Achievement
+                        icon = g_achievements[g_pageInfo.typeId].icon.toLowerCase();
+                        break;
+                }
+            }
+
+            if (icon) {
+                Icon.displayIcon(icon);
+            }
+        }
+    }
+};
+DomContentLoaded.addEvent(Icon.checkPound);
+
+var RedButton = {
+    create: function (text, enabled, func) {
+        var
+            a    = ce('a'),
+            em   = ce('em'),
+            b    = ce('b'),
+            i    = ce('i'),
+            span = ce('span');
+
+        a.href = 'javascript:;';
+        a.className = 'button-red';
+
+        ae(b, i);
+        ae(em, b);
+        ae(em, span);
+        ae(a, em);
+
+        RedButton.setText(a, text);
+        RedButton.enable(a, enabled);
+        RedButton.setFunc(a, func);
+
+        return a;
+    },
+
+    setText: function (button, text) {
+        st(button.firstChild.childNodes[0].firstChild, text); // em, b, i
+        st(button.firstChild.childNodes[1], text); // em, span
+    },
+
+    enable: function (button, enabled) {
+        if (enabled || enabled == null) {
+            button.className = button.className.replace('button-red-disabled', '');
+        }
+        else if (button.className.indexOf('button-red-disabled') == -1) {
+            button.className += ' button-red-disabled';
+        }
+    },
+
+    setFunc: function (button, func) {
+        button.onclick = (func ? func: null);
+    }
+};
+
+var Tooltip = {
+    create: function (htmlTooltip, secondary) {
+        var
+            d   = ce('div'),
+            t   = ce('table'),
+            tb  = ce('tbody'),
+            tr1 = ce('tr'),
+            tr2 = ce('tr'),
+            td  = ce('td'),
+            th1 = ce('th'),
+            th2 = ce('th'),
+            th3 = ce('th');
+
+        d.className = 'tooltip';
+
+        th1.style.backgroundPosition = 'top right';
+        th2.style.backgroundPosition = 'bottom left';
+        th3.style.backgroundPosition = 'bottom right';
+
+        if (htmlTooltip) {
+            td.innerHTML = htmlTooltip;
+        }
+
+        ae(tr1, td);
+        ae(tr1, th1);
+        ae(tb, tr1);
+        ae(tr2, th2);
+        ae(tr2, th3);
+        ae(tb, tr2);
+        ae(t, tb);
+
+        if (!secondary) {
+            Tooltip.icon = ce('p');
+            Tooltip.icon.style.visibility = 'hidden';
+            ae(Tooltip.icon, ce('div'));
+            ae(d, Tooltip.icon);
+        }
+
+        ae(d, t);
+
+        if (!secondary) {
+            var img = ce('div');
+            img.className = 'tooltip-powered';
+            ae(d, img);
+            Tooltip.logo = img;
+        }
+
+        return d;
+    },
+
+    getMultiPartHtml: function (upper, lower) {
+        return '<table><tr><td>' + upper + '</td></tr></table><table><tr><td>' + lower + '</td></tr></table>';
+    },
+
+    fix: function (tooltip, noShrink, visible) {
+        var
+        table     = gE(tooltip, 'table')[0],
+        td        = gE(table, 'td')[0],
+        c         = td.childNodes;
+
+        if (c.length >= 2 && c[0].nodeName == 'TABLE' && c[1].nodeName == 'TABLE') {
+            c[0].style.whiteSpace = 'nowrap';
+
+            var m;
+            if (c[1].offsetWidth > 300) {
+                m = Math.max(300, c[0].offsetWidth) + 20;
+            }
+            else {
+                m = Math.max(c[0].offsetWidth, c[1].offsetWidth) + 20;
+            }
+
+            if (m > 20) {
+                tooltip.style.width = m + 'px';
+                c[0].style.width = c[1].style.width = '100%';
+
+                if (!noShrink && tooltip.offsetHeight > document.body.clientHeight) {
+                    table.className = 'shrink';
+                }
+            }
+        }
+
+        if (visible) {
+            tooltip.style.visibility = 'visible';
+        }
+    },
+
+    fixSafe: function (p1, p2, p3) {
+        Tooltip.fix(p1, p2, p3);
+    },
+
+    append: function (el, htmlTooltip) {
+        var el = $(el);
+        var tooltip = Tooltip.create(htmlTooltip);
+        ae(el, tooltip);
+
+        Tooltip.fixSafe(tooltip, 1, 1);
+    },
+
+    prepare: function () {
+        if (Tooltip.tooltip) {
+            return;
+        }
+
+        var _ = Tooltip.create();
+        _.style.position = 'absolute';
+        _.style.left = _.style.top = '-2323px';
+
+        ae(document.body, _);
+
+        Tooltip.tooltip = _;
+        Tooltip.tooltipTable = gE(_, 'table')[0];
+        Tooltip.tooltipTd = gE(_, 'td')[0];
+
+        var _ = Tooltip.create(null, true);
+        _.style.position = 'absolute';
+        _.style.left = _.style.top = '-2323px';
+
+        ae(document.body, _);
+
+        Tooltip.tooltip2      = _;
+        Tooltip.tooltipTable2 = gE(_, 'table')[0];
+        Tooltip.tooltipTd2    = gE(_, 'td')[0];
+    },
+
+    set: function (text, text2) {
+        var _ = Tooltip.tooltip;
+
+        _.style.width = '550px';
+        _.style.left = '-2323px';
+        _.style.top = '-2323px';
+
+        if (text.nodeName) {
+            ee(Tooltip.tooltipTd);
+            ae(Tooltip.tooltipTd, text);
+        }
+        else {
+            Tooltip.tooltipTd.innerHTML = text;
+        }
+
+        _.style.display = '';
+
+        Tooltip.fix(_, 0, 0);
+
+        if (text2) {
+            Tooltip.showSecondary = true;
+            var _ = Tooltip.tooltip2;
+
+            _.style.width = '550px';
+            _.style.left  = '-2323px';
+            _.style.top   = '-2323px';
+
+            if (text2.nodeName) {
+                ee(Tooltip.tooltipTd2);
+                ae(Tooltip.tooltipTd2, text2);
+            }
+            else {
+                Tooltip.tooltipTd2.innerHTML = text2;
+            }
+
+            _.style.display = '';
+
+            Tooltip.fix(_, 0, 0);
+        }
+        else {
+            Tooltip.showSecondary = false;
+        }
+    },
+
+    moveTests: [
+        [null, null],  // Top right
+        [null, false], // Bottom right
+        [false, null],  // Top left
+        [false, false]  // Bottom left
+    ],
+
+    move: function (x, y, width, height, paddX, paddY) {
+        if (!Tooltip.tooltipTable) {
+            return;
+        }
+
+        var
+            tooltip = Tooltip.tooltip,
+            tow = Tooltip.tooltipTable.offsetWidth,
+            toh = Tooltip.tooltipTable.offsetHeight,
+            tt2     = Tooltip.tooltip2,
+            tt2w    = Tooltip.showSecondary ? Tooltip.tooltipTable2.offsetWidth : 0,
+            tt2h    = Tooltip.showSecondary ? Tooltip.tooltipTable2.offsetHeight : 0,
+            _;
+
+        tooltip.style.width = tow + 'px';
+        tt2.style.width     = tt2w + 'px';
+
+        var
+            rect,
+            safe;
+
+        for (var i = 0, len = Tooltip.moveTests.length; i < len; ++i) {
+            _ = Tooltip.moveTests[i];
+
+            rect = Tooltip.moveTest(x, y, width, height, paddX, paddY, _[0], _[1]);
+            break;
+        }
+
+        tooltip.style.left       = rect.l + 'px';
+        tooltip.style.top        = rect.t + 'px';
+        tooltip.style.visibility = 'visible';
+
+        if (Tooltip.showSecondary) {
+            tt2.style.left       = rect.l + tow + 'px';
+            tt2.style.top        = rect.t + 'px';
+            tt2.style.visibility = 'visible';
+        }
+    },
+
+    moveTest: function (left, top, width, height, paddX, paddY, rightAligned, topAligned) {
+        var
+            bakLeft = left,
+            bakTop  = top,
+            tooltip = Tooltip.tooltip,
+            tow     = Tooltip.tooltipTable.offsetWidth,
+            toh     = Tooltip.tooltipTable.offsetHeight,
+            tt2     = Tooltip.tooltip2,
+            tt2w    = Tooltip.showSecondary ? Tooltip.tooltipTable2.offsetWidth : 0,
+            tt2h    = Tooltip.showSecondary ? Tooltip.tooltipTable2.offsetHeight : 0,
+            winSize = g_getWindowSize(),
+            scroll  = g_getScroll(),
+            bcw     = winSize.w,
+            bch     = winSize.h,
+            bsl     = scroll.x,
+            bst     = scroll.y,
+            minX    = bsl,
+            minY    = bst,
+            maxX    = bsl + bcw,
+            maxY    = bst + bch;
+
+            if (rightAligned == null) {
+            rightAligned = (left + width + tow + tt2w <= maxX);
+        }
+
+        if (topAligned == null) {
+            topAligned = (top - Math.max(toh, tt2h) >= minY);
+        }
+
+        if (rightAligned) {
+            left += width + paddX;
+        }
+        else {
+            left = Math.max(left - (tow + tt2w), minX) - paddX;
+        }
+
+        if (topAligned) {
+            top -= Math.max(toh, tt2h) + paddY;
+        }
+        else {
+            top += height + paddY;
+        }
+
+        if (left < minX) {
+            left = minX;
+        }
+        else if (left + tow + tt2w > maxX) {
+            left = maxX - (tow + tt2w);
+        }
+
+        if (top < minY) {
+            top = minY;
+        }
+        else if (top + Math.max(toh, tt2h) > maxY) {
+            top = Math.max(bst, maxY - Math.max(toh, tt2h));
+        }
+
+        if (Tooltip.iconVisible) {
+            if (bakLeft >= left - 48 && bakLeft <= left && bakTop >= top - 4 && bakTop <= top + 48) {
+                top -= 48 - (bakTop - top);
+            }
+        }
+
+        return g_createRect(left, top, tow, toh);
+    },
+
+    show: function (_this, text, paddX, paddY, spanClass, text2) {
+        if (Tooltip.disabled) {
+            return;
+        }
+
+        if (!paddX || paddX < 1) {
+            paddX = 1;
+        }
+
+        if (!paddY || paddY < 1) {
+            paddY = 1;
+        }
+
+        if (spanClass) {
+            text = '<span class="' + spanClass + '">' + text + '</span>';
+        }
+
+        var coords = ac(_this);
+
+        Tooltip.prepare();
+        Tooltip.set(text, text2);
+        Tooltip.move(coords.x, coords.y, _this.offsetWidth, _this.offsetHeight, paddX, paddY);
+    },
+
+    showAtCursor: function (e, text, paddX, paddY, spanClass, text2) {
+        if (Tooltip.disabled) {
+            return;
+        }
+
+        if (!paddX || paddX < 10) {
+            paddX = 10;
+        }
+        if (!paddY || paddY < 10) {
+            paddY = 10;
+        }
+
+        if (spanClass) {
+            text = '<span class="' + spanClass + '">' + text + '</span>';
+            if (text2) {
+                text2 = '<span class="' + spanClass + '">' + text2 + '</span>';
+            }
+        }
+
+        e = $E(e);
+        var pos = g_getCursorPos(e);
+
+        Tooltip.prepare();
+        Tooltip.set(text, text2);
+        Tooltip.move(pos.x, pos.y, 0, 0, paddX, paddY);
+    },
+
+    showAtXY: function (text, x, y, paddX, paddY, text2) {
+        if (Tooltip.disabled) {
+            return;
+        }
+
+        Tooltip.prepare();
+        Tooltip.set(text, text2);
+        Tooltip.move(x, y, 0, 0, paddX, paddY);
+    },
+
+    cursorUpdate: function (e, x, y) { // Used along with showAtCursor
+        if (Tooltip.disabled || !Tooltip.tooltip) {
+            return;
+        }
+
+        e = $E(e);
+
+        if (!x || x < 10) {
+            x = 10;
+        }
+        if (!y || y < 10) {
+            y = 10;
+        }
+
+        var pos = g_getCursorPos(e);
+        Tooltip.move(pos.x, pos.y, 0, 0, x, y);
+    },
+
+    hide: function () {
+        if (Tooltip.tooltip) {
+            Tooltip.tooltip.style.display  = 'none';
+            Tooltip.tooltip.visibility     = 'hidden';
+            Tooltip.tooltipTable.className = '';
+
+            Tooltip.setIcon(null);
+        }
+
+        if (Tooltip.tooltip2) {
+            Tooltip.tooltip2.style.display  = 'none';
+            Tooltip.tooltip2.visibility     = 'hidden';
+            Tooltip.tooltipTable2.className = '';
+        }
+    },
+
+    setIcon: function (icon) {
+        Tooltip.prepare();
+
+        if (icon) {
+            Tooltip.icon.style.backgroundImage = 'url(images/icons/medium/' + icon.toLowerCase() + '.jpg)';
+            Tooltip.icon.style.visibility      = 'visible';
+        }
+        else {
+            Tooltip.icon.style.backgroundImage = 'none';
+            Tooltip.icon.style.visibility      = 'hidden';
+        }
+
+        Tooltip.iconVisible = icon ? 1 : 0;
+    }
+};
+
 var LiveSearch = new function () {
-	var
+    var
         currentTextbox,
         lastSearch = {},
         lastDiv,
@@ -12845,116 +13303,116 @@ var LiveSearch = new function () {
         selection,
         LIVESEARCH_DELAY = 500;
 
-	function setText(textbox, txt) {
-		textbox.value = txt;
-		textbox.selectionStart = textbox.selectionEnd = txt.length;
-	}
+    function setText(textbox, txt) {
+        textbox.value = txt;
+        textbox.selectionStart = textbox.selectionEnd = txt.length;
+    }
 
-	function colorDiv(div, fromOver) {
-		if (lastDiv) {
-			lastDiv.className = lastDiv.className.replace("live-search-selected", "");
-		}
+    function colorDiv(div, fromOver) {
+        if (lastDiv) {
+            lastDiv.className = lastDiv.className.replace("live-search-selected", "");
+        }
 
-		lastDiv = div;
-		lastDiv.className += " live-search-selected";
-		selection = div.i;
+        lastDiv = div;
+        lastDiv.className += " live-search-selected";
+        selection = div.i;
 
-		if (!fromOver) {
-			show();
-			setTimeout(setText.bind(0, currentTextbox, g_getTextContent(div.firstChild.firstChild.childNodes[1])), 1);
-			cancelNext = 1;
-		}
-	}
+        if (!fromOver) {
+            show();
+            setTimeout(setText.bind(0, currentTextbox, g_getTextContent(div.firstChild.firstChild.childNodes[1])), 1);
+            cancelNext = 1;
+        }
+    }
 
-	function aOver() {
-		colorDiv(this.parentNode.parentNode, 1);
-	}
+    function aOver() {
+        colorDiv(this.parentNode.parentNode, 1);
+    }
 
-	function isVisible() {
-		if (!container) {
-			return false;
-		}
+    function isVisible() {
+        if (!container) {
+            return false;
+        }
 
-		return container.style.display != "none";
-	}
+        return container.style.display != "none";
+    }
 
-	function adjust(fromResize) {
-		if (fromResize == 1 && !isVisible()) {
-			return;
-		}
+    function adjust(fromResize) {
+        if (fromResize == 1 && !isVisible()) {
+            return;
+        }
 
-		if (currentTextbox == null) {
-			return;
-		}
+        if (currentTextbox == null) {
+            return;
+        }
 
-		var c = ac(currentTextbox);
-		container.style.left  = (c[0] - 2) + "px";
-		container.style.top   = (c[1] + currentTextbox.offsetHeight + 1) + "px";
-		container.style.width = currentTextbox.offsetWidth + "px";
-	}
+        var c = ac(currentTextbox);
+        container.style.left  = (c[0] - 2) + "px";
+        container.style.top   = (c[1] + currentTextbox.offsetHeight + 1) + "px";
+        container.style.width = currentTextbox.offsetWidth + "px";
+    }
 
-	function prepare() {
-		if (prepared) {
-			return;
-		}
+    function prepare() {
+        if (prepared) {
+            return;
+        }
 
-		prepared = 1;
+        prepared = 1;
 
-		container = ce("div");
-		container.className = "live-search";
-		container.style.display = "none";
+        container = ce("div");
+        container.className = "live-search";
+        container.style.display = "none";
 
-		ae(ge("layers"), container);
-		aE(window, "resize", adjust.bind(0, 1));
-		aE(document, "click", hide);
-	}
+        ae(ge("layers"), container);
+        aE(window, "resize", adjust.bind(0, 1));
+        aE(document, "click", hide);
+    }
 
-	function show() {
-		if (container && !isVisible()) {
-			adjust();
-			container.style.display = "";
-		}
-	}
+    function show() {
+        if (container && !isVisible()) {
+            adjust();
+            container.style.display = "";
+        }
+    }
 
-	function hide() {
-		if (container) {
-			container.style.display = "none";
-		}
-	}
+    function hide() {
+        if (container) {
+            container.style.display = "none";
+        }
+    }
 
-	function highlight(match) {
-		return "<b><u>" + match + "</u></b>";
-	}
+    function highlight(match) {
+        return "<b><u>" + match + "</u></b>";
+    }
 
-	function display(textbox, search, suggz, dataz) {
-		prepare();
-		show();
-		lastA = null;
-		hasData = 1;
-		selection = null;
+    function display(textbox, search, suggz, dataz) {
+        prepare();
+        show();
+        lastA = null;
+        hasData = 1;
+        selection = null;
 
-		while (container.firstChild) {
-			de(container.firstChild);
-		}
+        while (container.firstChild) {
+            de(container.firstChild);
+        }
 
-		if (!Browser.ie6) {
-			ae(container, ce("em"));
-			ae(container, ce("var"));
-			ae(container, ce("strong"));
-		}
+        if (!Browser.ie6) {
+            ae(container, ce("em"));
+            ae(container, ce("var"));
+            ae(container, ce("strong"));
+        }
 
-		search = search.replace(/[^a-z0-9\-]/i, " ");
-		search = trim(search.replace(/\s+/g, " "));
+        search = search.replace(/[^a-z0-9\-]/i, " ");
+        search = trim(search.replace(/\s+/g, " "));
 
-		var regex = g_createOrRegex(search);
+        var regex = g_createOrRegex(search);
 
-		for (var i = 0, len = suggz.length; i < len; ++i) {
-			var pos = suggz[i].lastIndexOf("(");
-			if (pos != -1) {
-				suggz[i] = suggz[i].substr(0, pos - 1);
-			}
+        for (var i = 0, len = suggz.length; i < len; ++i) {
+            var pos = suggz[i].lastIndexOf("(");
+            if (pos != -1) {
+                suggz[i] = suggz[i].substr(0, pos - 1);
+            }
 
-			var
+            var
                 type   = dataz[i][0],
                 typeId = dataz[i][1],
                 param1 = dataz[i][2],
@@ -12966,139 +13424,139 @@ var LiveSearch = new function () {
                 div2   = ce("div");
                 div.i  = i;
 
-			a.onmouseover = aOver;
-			a.href = "?" + g_types[type] + "=" + typeId;
+            a.onmouseover = aOver;
+            a.href = "?" + g_types[type] + "=" + typeId;
 
-			if (textbox._append) {
-				a.rel += textbox._append;
-			}
+            if (textbox._append) {
+                a.rel += textbox._append;
+            }
 
-			if(type == 1 && param1 != null) {
-				div.className += ' live-search-icon-boss';
-			}
-			if (type == 3 && param2 != null) {
-				a.className += " q" + param2;
-			}
+            if (type == 1 && param1 != null) {
+                div.className += ' live-search-icon-boss';
+            }
+            if (type == 3 && param2 != null) {
+                a.className += " q" + param2;
+            }
             else if (type == 4 && param1 != null) {
                 a.className += " q" + param1;
             }
-			else if (type == 13) {
-				a.className += ' c' + typeId;
-			}
+            else if (type == 13) {
+                a.className += ' c' + typeId;
+            }
 
             if ((type == 3 || type == 6 || type == 9 || type == 10 || type == 13 || type == 14 || type == 15 || type == 17) && param1) {
-				div.className += " live-search-icon";
-				div.style.backgroundImage = "url(" + g_staticUrl + "/images/icons/small/" + param1.toLowerCase() + ".jpg)";
-			}
+                div.className += " live-search-icon";
+                div.style.backgroundImage = "url(" + g_staticUrl + "/images/icons/small/" + param1.toLowerCase() + ".jpg)";
+            }
             else if ((type == 5 || type == 11) && param1 >= 1 && param1 <= 2) {
                 div.className += " live-search-icon-quest-" + (param1 == 1 ? "alliance" : "horde");
             }
 
-			ae(sp, ct(LANG.types[type][0]));
-			ae(a, sp);
+            ae(sp, ct(LANG.types[type][0]));
+            ae(a, sp);
 
-			var buffer = suggz[i];
-			buffer = buffer.replace(regex, highlight);
+            var buffer = suggz[i];
+            buffer = buffer.replace(regex, highlight);
 
-			if (type == 11) {
-				buffer = buffer.replace('%s', '<span class="q0">&lt;'+ LANG.name + '&gt;</span>');
-			}
+            if (type == 11) {
+                buffer = buffer.replace('%s', '<span class="q0">&lt;'+ LANG.name + '&gt;</span>');
+            }
 
             sp2.innerHTML = buffer;
-			ae(a, sp2);
+            ae(a, sp2);
 
-			if (type == 6 && param2) {
-				ae(a, ct(" (" + param2 + ")"));
-			}
+            if (type == 6 && param2) {
+                ae(a, ct(" (" + param2 + ")"));
+            }
 
-			ae(div2, a);
-			ae(div, div2);
-			ae(container, div);
-		}
-	}
+            ae(div2, a);
+            ae(div, div2);
+            ae(container, div);
+        }
+    }
 
-	function receive(xhr, opt) {
-		var text = xhr.responseText;
-		if (text.charAt(0) != "[" || text.charAt(text.length - 1) != "]") {
-			return;
-		}
+    function receive(xhr, opt) {
+        var text = xhr.responseText;
+        if (text.charAt(0) != "[" || text.charAt(text.length - 1) != "]") {
+            return;
+        }
 
-		var a = eval(text);
-		var search = a[0];
+        var a = eval(text);
+        var search = a[0];
 
-		if (search == opt.search) {
-			if (a.length == 8) {
-				display(opt.textbox, search, a[1], a[7]);
-			}
+        if (search == opt.search) {
+            if (a.length == 8) {
+                display(opt.textbox, search, a[1], a[7]);
+            }
             else {
-				hide();
-			}
-		}
-	}
+                hide();
+            }
+        }
+    }
 
-	function fetch(textbox, search) {
-		var url = "?search=" + urlencode(search);
+    function fetch(textbox, search) {
+        var url = "?search=" + urlencode(search);
 
-		if (textbox._type) {
-			url += "&json&type=" + textbox._type;
-		}
+        if (textbox._type) {
+            url += "&json&type=" + textbox._type;
+        }
         else {
-			url += "&opensearch";
-		}
+            url += "&opensearch";
+        }
 
-		new Ajax(url, {
-			onSuccess: receive,
-			textbox: textbox,
-			search: search
-		})
-	}
+        new Ajax(url, {
+            onSuccess: receive,
+            textbox: textbox,
+            search: search
+        })
+    }
 
-	function preFetch(textbox, search) {
-		if (cancelNext) {
-			cancelNext = 0;
-			return;
-		}
-		hasData = 0;
-		if (timer > 0) {
-			clearTimeout(timer);
-			timer = 0;
-		}
-		timer = setTimeout(fetch.bind(0, textbox, search), LIVESEARCH_DELAY);
-	}
+    function preFetch(textbox, search) {
+        if (cancelNext) {
+            cancelNext = 0;
+            return;
+        }
+        hasData = 0;
+        if (timer > 0) {
+            clearTimeout(timer);
+            timer = 0;
+        }
+        timer = setTimeout(fetch.bind(0, textbox, search), LIVESEARCH_DELAY);
+    }
 
-	function cycle(dir) {
-		if (!isVisible()) {
-			if (hasData) {
-				show();
-			}
-			return;
-		}
+    function cycle(dir) {
+        if (!isVisible()) {
+            if (hasData) {
+                show();
+            }
+            return;
+        }
 
-		var firstNode = (container.childNodes[0].nodeName == "EM" ? container.childNodes[3] : container.firstChild);
-		var bakDiv = dir ? firstNode : container.lastChild;
+        var firstNode = (container.childNodes[0].nodeName == "EM" ? container.childNodes[3] : container.firstChild);
+        var bakDiv = dir ? firstNode : container.lastChild;
 
-		if (lastDiv == null) {
-			colorDiv(bakDiv);
-		}
+        if (lastDiv == null) {
+            colorDiv(bakDiv);
+        }
         else {
-			var div = dir ? lastDiv.nextSibling: lastDiv.previousSibling;
-			if (div) {
-				if (div.nodeName == "STRONG") {
-					div = container.lastChild;
-				}
-				colorDiv(div);
-			}
+            var div = dir ? lastDiv.nextSibling: lastDiv.previousSibling;
+            if (div) {
+                if (div.nodeName == "STRONG") {
+                    div = container.lastChild;
+                }
+                colorDiv(div);
+            }
             else {
-				colorDiv(bakDiv);
-			}
-		}
-	}
+                colorDiv(bakDiv);
+            }
+        }
+    }
 
-	function onKeyUp(e) {
-		e = $E(e);
-		var textbox = e._target;
+    function onKeyUp(e) {
+        e = $E(e);
+        var textbox = e._target;
 
-		switch (e.keyCode) {
+        switch (e.keyCode) {
             case 48:
             case 96:
             case 107:
@@ -13108,27 +13566,27 @@ var LiveSearch = new function () {
                     break;
                 }
                 break;
-		}
+        }
 
-		var search = trim(textbox.value.replace(/\s+/g, " "));
-		if (search == lastSearch[textbox.id]) {
-			return;
-		}
+        var search = trim(textbox.value.replace(/\s+/g, " "));
+        if (search == lastSearch[textbox.id]) {
+            return;
+        }
 
-		lastSearch[textbox.id] = search;
-		if (search.length) {
-			preFetch(textbox, search);
-		}
+        lastSearch[textbox.id] = search;
+        if (search.length) {
+            preFetch(textbox, search);
+        }
         else {
-			hide();
-		}
-	}
+            hide();
+        }
+    }
 
-	function onKeyDown(e) {
-		e = $E(e);
-		var textbox = e._target;
+    function onKeyDown(e) {
+        e = $E(e);
+        var textbox = e._target;
 
-		switch (e.keyCode) {
+        switch (e.keyCode) {
             case 27:
                 hide();
                 break;
@@ -13138,709 +13596,773 @@ var LiveSearch = new function () {
             case 40:
                 cycle(1);
                 break
-		}
-	}
+        }
+    }
 
-	function onFocus(e) {
-		e = $E(e);
-		var textbox = e._target;
+    function onFocus(e) {
+        e = $E(e);
+        var textbox = e._target;
 
-		if (textbox != document) {
-			currentTextbox = textbox;
-		}
-	}
+        if (textbox != document) {
+            currentTextbox = textbox;
+        }
+    }
 
-	this.attach = function (textbox) {
-		if (textbox.getAttribute("autocomplete") == "off") {
-			return;
-		}
-		textbox.setAttribute("autocomplete", "off");
+    this.attach = function (textbox) {
+        if (textbox.getAttribute("autocomplete") == "off") {
+            return;
+        }
+        textbox.setAttribute("autocomplete", "off");
 
-		aE(textbox, "focus", onFocus);
-		aE(textbox, "keyup", onKeyUp);
-		aE(textbox, "keydown", onKeyDown);
-	};
+        aE(textbox, "focus", onFocus);
+        aE(textbox, "keyup", onKeyUp);
+        aE(textbox, "keydown", onKeyDown);
+    };
 
-	this.reset = function (textbox) {
-		lastSearch[textbox.id] = null;
-		textbox.value = "";
-		hasData = 0;
-		hide();
-	};
+    this.reset = function (textbox) {
+        lastSearch[textbox.id] = null;
+        textbox.value = "";
+        hasData = 0;
+        hide();
+    };
 
-	this.hide = function () {
-		hide();
-	}
+    this.hide = function () {
+        hide();
+    }
 };
 
 var Lightbox = new function () {
-	var d, m, o, h = {},
-	c = {},
-	i, f;
-	function p() {
-		aE(d, "click", e);
-		aE(document, "keydown", g);
-		aE(window, "resize", a);
-		if (Browser.ie6) {
-			aE(window, "scroll", j)
-		}
-	}
-	function l() {
-		dE(d, "click", e);
-		dE(document, "keydown", g);
-		dE(window, "resize", a);
-		if (Browser.ie6) {
-			dE(window, "scroll", j)
-		}
-	}
-	function b() {
-		if (i) {
-			return
-		}
-		i = 1;
-		var q = ge("layers");
-		d = ce("div");
-		d.className = "lightbox-overlay";
-		m = ce("div");
-		m.className = "lightbox-outer";
-		o = ce("div");
-		o.className = "lightbox-inner";
-		d.style.display = m.style.display = "none";
-		ae(q, d);
-		ae(m, o);
-		ae(q, m)
-	}
-	function g(q) {
-		q = $E(q);
-		switch (q.keyCode) {
-		case 27:
-			e();
-			break
-		}
-	}
-	function a(q) {
-		if (q != 1234) {
-			if (c.onResize) {
-				c.onResize()
-			}
-		}
-		d.style.height = document.body.offsetHeight + "px";
-		if (Browser.ie6) {
-			j()
-		}
-	}
-	function j() {
-		var r = g_getScroll().y,
-		q = g_getWindowSize().h;
-		m.style.top = (r + q / 2) + "px"
-	}
-	function e() {
-		l();
-		if (c.onHide) {
-			c.onHide()
-		}
-		d.style.display = m.style.display = "none";
-		g_enableScroll(true)
-	}
-	function k() {
-		d.style.display = m.style.display = h[f].style.display = ""
-	}
-	this.setSize = function (q, r) {
-		o.style.visibility = "hidden";
-		o.style.width = q + "px";
-		o.style.height = r + "px";
-		o.style.left = -parseInt(q / 2) + "px";
-		o.style.top = -parseInt(r / 2) + "px";
-		o.style.visibility = "visible"
-	};
-	this.show = function (v, u, q) {
-		c = u || {};
-		b();
-		p();
-		if (f != v && h[f] != null) {
-			h[f].style.display = "none"
-		}
-		f = v;
-		var t = 0,
-		r;
-		if (h[v] == null) {
-			t = 1;
-			r = ce("div");
-			ae(o, r);
-			h[v] = r
-		} else {
-			r = h[v]
-		}
-		if (c.onShow) {
-			c.onShow(r, t, q)
-		}
-		a(1234);
-		k();
-		g_enableScroll(false)
-	};
-	this.reveal = function () {
-		k()
-	};
-	this.hide = function () {
-		e()
-	};
-	this.isVisible = function () {
-		return (d && d.style.display != "none")
-	}
+    var
+        overlay,
+        outer,
+        inner,
+        divs = {},
+
+        funcs = {},
+
+        prepared,
+        lastId;
+
+        function hookEvents() {
+        aE(overlay, 'click', hide);
+        aE(document, 'keydown', onKeyDown);
+        aE(window, 'resize', onResize);
+    }
+
+    function unhookEvents() {
+        dE(overlay, 'click', hide);
+        dE(document, 'keydown', onKeyDown);
+        dE(window, 'resize', onResize);
+    }
+
+    function prepare() {
+        if (prepared) {
+            return;
+        }
+
+        prepared = 1;
+
+        var dest = document.body;
+
+        overlay = ce('div');
+        overlay.className = 'lightbox-overlay';
+
+        outer = ce('div');
+        outer.className = 'lightbox-outer';
+
+        inner = ce('div');
+        inner.className = 'lightbox-inner';
+
+        overlay.style.display = outer.style.display = 'none';
+
+        ae(dest, overlay);
+        ae(outer, inner);
+        ae(dest, outer);
+    }
+
+    function onKeyDown(e) {
+        e = $E(e);
+        switch (e.keyCode) {
+        case 27: // Escape
+            hide();
+            break;
+        }
+    }
+
+    function onResize(fake) {
+        if (fake != 1234) {
+            if (funcs.onResize) {
+                funcs.onResize();
+            }
+        }
+
+        overlay.style.height = document.body.offsetHeight + 'px';
+    }
+
+    function hide() {
+        if(!prepared) {
+            return;
+        }
+
+        unhookEvents();
+
+        if (funcs.onHide) {
+            funcs.onHide();
+        }
+
+        overlay.style.display = outer.style.display = 'none';
+
+        g_enableScroll(true);
+    }
+
+    function reveal() {
+        overlay.style.display = outer.style.display = divs[lastId].style.display = '';
+        Lightbox.setSize(inner.offsetWidth, inner.offsetHeight, 1);
+    }
+
+    this.setSize = function (w, h, auto) {
+        if(!Browser.ie) {
+            inner.style.visibility = 'hidden';
+        }
+
+        if (!auto) {
+            inner.style.width = w + 'px';
+            if (h) {
+                inner.style.height = h + 'px';
+            }
+        }
+
+        inner.style.left = -parseInt(w / 2) + 'px';
+        if (h) {
+            inner.style.top    = -parseInt(h / 2) + 'px';
+        }
+        inner.style.visibility = 'visible';
+    };
+
+    this.show = function (id, _funcs, opt) {
+        funcs = _funcs || {};
+
+        prepare();
+
+        hookEvents();
+
+        if (lastId != id && divs[lastId] != null) {
+            divs[lastId].style.display = 'none';
+        }
+
+        lastId = id;
+
+        var
+            first = 0,
+            d;
+
+        if (divs[id] == null) {
+            first = 1;
+            d = ce('div');
+            ae(inner, d);
+            divs[id] = d;
+        }
+        else {
+            d = divs[id];
+        }
+
+        if (funcs.onShow) {
+            funcs.onShow(d, first, opt);
+        }
+
+        onResize(1234);
+        reveal();
+
+        g_enableScroll(false);
+    };
+
+    this.reveal = function () {
+        reveal();
+    };
+
+    this.hide = function () {
+        hide();
+    };
+
+    this.isVisible = function () {
+        return (overlay && overlay.style.display != 'none');
+    }
 };
 
 var ModelViewer = new function () {
-	var d, A, C = [],
-	h,
-	w,
-	o,
-	z,
-	g,
-	q,
-	r,
-	e,
-	m,
-	u,
-	l,
-	p = [
-        {id: 10, name: g_chr_races[10], model: "bloodelf" },
-        {id: 11, name: g_chr_races[11], model: "draenei" },
-        {id: 3, name: g_chr_races[3], model: "dwarf" },
-        {id: 7, name: g_chr_races[7], model: "gnome" },
-        {id: 1, name: g_chr_races[1], model: "human" },
-        {id: 4, name: g_chr_races[4], model: "nightelf" },
-        {id: 2, name: g_chr_races[2], model: "orc" },
-        {id: 6, name: g_chr_races[6], model: "tauren" },
-        {id: 8, name: g_chr_races[8], model: "troll" },
-        {id: 5, name: g_chr_races[5], model: "scourge"}
-    ],
-	i = [
-        {id: 1, name: LANG.female, model: "female" },
-        {id: 0, name: LANG.male, model: "male" }
-    ];
-	function y() {
-		w.style.display = "none";
-		o.style.display = "none";
-		z.style.display = "none"
-	}
-	function a() {
-		var D, E;
-		if (q.style.display == "") {
-			D = (q.selectedIndex >= 0 ? q.options[q.selectedIndex].value: "")
-		} else {
-			D = (r.selectedIndex >= 0 ? r.options[r.selectedIndex].value: "")
-		}
-		E = (e.selectedIndex >= 0 ? e.options[e.selectedIndex].value: 0);
-		return {
-			r: D,
-			s: E
-		}
-	}
-	function c(D, E) {
-		return (!isNaN(D) && D > 0 && in_array(p, D, function (F) {
-			return F.id
-		}) != -1 && !isNaN(E) && E >= 0 && E <= 1)
-	}
-	function v() {
-		if (u == 2 && !f()) {
-			u = 0
-		}
-		if (u == 2) {
-			var G = '<object id="3dviewer-plugin" type="application/x-zam-wowmodel" width="600" height="400"><param name="model" value="' + d + '" /><param name="modelType" value="' + A + '" /><param name="contentPath" value="http://static.wowhead.com/modelviewer/" />';
-			if (A == 16 && C.length) {
-				G += '<param name="equipList" value="' + C.join(",") + '" />'
-			}
-			G += '<param name="bgColor" value="#181818" /></object>';
-			z.innerHTML = G;
-			z.style.display = ""
-		} else {
-			if (u == 1) {
-				var G = '<applet id="3dviewer-java" code="org.jdesktop.applet.util.JNLPAppletLauncher" width="600" height="400" archive="http://static.wowhead.com/modelviewer/applet-launcher.jar,http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jar,http://download.java.net/media/gluegen/webstart/gluegen-rt.jar,http://download.java.net/media/java3d/webstart/release/vecmath/latest/vecmath.jar,http://static.wowhead.com/modelviewer/ModelView510.jar"><param name="jnlp_href" value="http://static.wowhead.com/modelviewer/ModelView.jnlp"><param name="codebase_lookup" value="false"><param name="cache_option" value="no"><param name="subapplet.classname" value="modelview.ModelViewerApplet"><param name="subapplet.displayname" value="Model Viewer Applet"><param name="progressbar" value="true"><param name="jnlpNumExtensions" value="1"><param name="jnlpExtension1" value="http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jnlp"><param name="contentPath" value="http://static.wowhead.com/modelviewer/"><param name="model" value="' + d + '"><param name="modelType" value="' + A + '">';
-				if (A == 16 && C.length) {
-					G += '<param name="equipList" value="' + C.join(",") + '">'
-				}
-				G += '<param name="bgColor" value="#181818"></applet>';
-				o.innerHTML = G;
-				o.style.display = ""
-			} else {
-				var J = {
-					model: d,
-					modelType: A,
-					contentPath: "http://static.wowhead.com/modelviewer/",
-					blur: (OS.mac ? "0": "1")
-				};
-				var I = {
-					quality: "high",
-					allowscriptaccess: "always",
-					menu: false,
-					bgcolor: "#181818"
-				};
-				var D = {};
-				if (A == 16 && C.length) {
-					J.equipList = C.join(",")
-				}
-				swfobject.embedSWF("http://static.wowhead.com/modelviewer/ModelView.swf", "dsjkgbdsg2346", "600", "400", "10.0.0", "http://static.wowhead.com/modelviewer/expressInstall.swf", J, I, D);
-				w.style.display = ""
-			}
-		}
-		var K = a(),
-		F = K.r,
-		H = K.s;
-		if (!h.noPound) {
-			var E = "#modelviewer";
-			switch (h.type) {
-			case 1:
-				E += ":1:" + h.displayId + ":" + (h.humanoid | 0);
-				break;
-			case 2:
-				E += ":2:" + h.displayId;
-				break;
-			case 3:
-				E += ":3:" + h.displayId + ":" + (h.slot | 0);
-				break;
-			case 4:
-				E += ":4:" + C.join(";");
-				break
-			}
-			if (F && H) {
-				E += ":" + F + "+" + H
-			} else {
-				E += ":"
-			}
-			if (h.extraPound != null) {
-				E += ":" + h.extraPound
-			}
-			location.replace(rtrim(E, ":"))
-		}
-	}
+    var
+        model,
+        modelType,
+        equipList = [],
+        optBak,
+        _w,
+        _o,
+        _z,
+        modelDiv,
+        raceSel1,
+        raceSel2,
+        sexSel,
+        oldHash,
+        mode,
+        readExtraPound,
 
-	function b() {
-		var H = a(),
-		E = H.r,
-		F = H.s;
-		if (!E) {
-			if (e.style.display == "none") {
-				return
-			}
-			e.style.display = "none";
-			d = C[1];
-			switch (h.slot) {
-			case 1:
-				A = 2;
-				break;
-			case 3:
-				A = 4;
-				break;
-			default:
-				A = 1
-			}
-		} else {
-			if (e.style.display == "none") {
-				e.style.display = ""
-			}
-			var H = function (I) {
-				return I.id
-			};
-			var G = in_array(p, E, H);
-			var D = in_array(i, F, H);
-			if (G != -1 && D != -1) {
-				d = p[G].model + i[D].model;
-				A = 16
-			}
-		}
-		y();
-		v()
-	}
-	function j(D) {
-		if (D == u) {
-			return
-		}
-		g_setSelectedLink(this, "modelviewer-mode");
-		y();
-		if (u == null) {
-			u = D;
-			setTimeout(v, 50)
-		} else {
-			u = D;
-			sc("modelviewer_mode", 7, D, "/", location.hostname);
-			// sc("modelviewer_mode", 7, D, "/", ".wowhead.com");
-			v()
-		}
-	}
-	function t(I, D) {
-		var K = -1,
-		L = -1,
-		E, H;
-		if (D.race != null && D.sex != null) {
-			K = D.race;
-			L = D.sex;
-			g.style.display = "none";
-			I = 0
-		} else {
-			g.style.display = ""
-		}
-		if (K == -1 && L == -1) {
-			if (location.hash) {
-				var J = location.hash.match(/modelviewer:.*?([0-9]+)\+([0-9]+)/);
-				if (J != null) {
-					if (c(J[1], J[2])) {
-						K = J[1];
-						L = J[2];
-						e.style.display = ""
-					}
-				}
-			}
-		}
-		if (I) {
-			E = q;
-			H = 1;
-			q.style.display = "";
-			q.selectedIndex = -1;
-			r.style.display = "none";
-			if (L == -1) {
-				e.style.display = "none"
-			}
-		} else {
-			if (K == -1 && L == -1) {
-				var O = (g_user && g_user.settings ? g_user.settings.modelrace: 1),
-				G = (g_user && g_user.settings ? g_user.settings.modelgender - 1 : 0);
-				if (c(O, G)) {
-					K = O;
-					L = G
-				} else {
-					K = 1;
-					L = 0
-				}
-			}
-			E = r;
-			H = 0;
-			q.style.display = "none";
-			r.style.display = "";
-			e.style.display = ""
-		}
-		if (L != -1) {
-			e.selectedIndex = L
-		}
-		if (K != -1 && L != -1) {
-			var N = function (P) {
-				return P.id
-			};
-			var M = in_array(p, K, N);
-			var F = in_array(i, L, N);
-			if (M != -1 && F != -1) {
-				d = p[M].model + i[F].model;
-				A = 16;
-				M += H;
-				if (Browser.opera) {
-					setTimeout(function () {
-						E.selectedIndex = M
-					},
-					1)
-				} else {
-					E.selectedIndex = M
-				}
-				e.selectedIndex = F
-			}
-		}
-	}
-	function f() {
-		var E = navigator.mimeTypes["application/x-zam-wowmodel"];
-		if (E) {
-			var D = E.enabledPlugin;
-			if (D) {
-				return true
-			}
-		}
-		return false
-	}
-	function k() {
-		if (!h.noPound) {
-			if (!h.fromTag && m && m.indexOf("modelviewer") == -1) {
-				location.replace(m)
-			} else {
-				location.replace("#.")
-			}
-		}
-		if (h.onHide) {
-			h.onHide()
-		}
-	}
-	function B(Q, K, H) {
-		var G, E;
-		if (!H.displayAd || g_user.premium) {
-			Lightbox.setSize(620, 452)
-		} else {
-			Lightbox.setSize(749, 546)
-		}
-		if (K) {
-			Q.className = "modelviewer";
-			var P = ce("div");
-			w = ce("div");
-			o = ce("div");
-			z = ce("div");
-			var O = ce("div");
-			O.id = "dsjkgbdsg2346";
-			ae(w, O);
-			P.className = "modelviewer-screen";
-			w.style.display = o.style.display = z.style.display = "none";
-			ae(P, w);
-			ae(P, o);
-			ae(P, z);
-			var M = ce("div");
-			M.style.backgroundColor = "#181818";
-			M.style.margin = "0";
-			ae(M, P);
-			ae(Q, M);
-			G = ce("a"),
-			E = ce("a");
-			G.className = "modelviewer-help";
-			G.href = "?help=modelviewer";
-			G.target = "_blank";
-			ae(G, ce("span"));
-			E.className = "modelviewer-close";
-			E.href = "javascript:;";
-			E.onclick = Lightbox.hide;
-			ae(E, ce("span"));
-			ae(Q, E);
-			ae(Q, G);
-			var N = ce("div"),
-			F = ce("span"),
-			G = ce("a"),
-			E = ce("a");
-			N.className = "modelviewer-quality";
-			G.href = E.href = "javascript:;";
-			ae(G, ct("Flash"));
-			ae(E, ct("Java"));
-			G.onclick = j.bind(G, 0);
-			E.onclick = j.bind(E, 1);
-			ae(F, G);
-			ae(F, ct(" " + String.fromCharCode(160)));
-			ae(F, E);
-			if (f()) {
-				var D = ce("a");
-				D.href = "javascript:;";
-				ae(D, ct("Plugin"));
-				D.onclick = j.bind(D, 2);
-				ae(F, ct(" " + String.fromCharCode(160)));
-				ae(F, D)
-			}
-			ae(N, ce("div"));
-			ae(N, F);
-			ae(Q, N);
-			g = ce("div");
-			g.className = "modelviewer-model";
-			var O = function (V, U) {
-				return strcmp(V.name, U.name)
-			};
-			p.sort(O);
-			i.sort(O);
-			q = ce("select");
-			r = ce("select");
-			e = ce("select");
-			q.onchange = r.onchange = e.onchange = b;
-			ae(q, ce("option"));
-			for (var J = 0, L = p.length; J < L; ++J) {
-				var I = ce("option");
-				I.value = p[J].id;
-				ae(I, ct(p[J].name));
-				ae(q, I)
-			}
-			for (var J = 0, L = p.length; J < L; ++J) {
-				var I = ce("option");
-				I.value = p[J].id;
-				ae(I, ct(p[J].name));
-				ae(r, I)
-			}
-			for (var J = 0, L = i.length; J < L; ++J) {
-				var I = ce("option");
-				I.value = i[J].id;
-				ae(I, ct(i[J].name));
-				ae(e, I)
-			}
-			e.style.display = "none";
-			ae(g, ce("div"));
-			ae(g, q);
-			ae(g, r);
-			ae(g, e);
-			ae(Q, g);
-			N = ce("div");
-			N.className = "clear";
-			ae(Q, N);
-			if (H.displayAd) {
-				N = ce("div");
-				N.id = "modelviewer-ad";
-				N.style.paddingBottom = "10px";
-				ae(Q, N)
-			}
-		}
-		switch (H.type) {
-		case 1:
-			g.style.display = "none";
-			if (H.humanoid) {
-				A = 32
-			} else {
-				A = 8
-			}
-			d = H.displayId;
-			break;
-		case 2:
-			g.style.display = "none";
-			A = 64;
-			d = H.displayId;
-			break;
-		case 3:
-			C = [H.slot, H.displayId];
-			if (in_array([4, 5, 6, 7, 8, 9, 10, 16, 19, 20], H.slot) != -1) {
-				t(0, H)
-			} else {
-				switch (H.slot) {
-				case 1:
-					A = 2;
-					break;
-				case 3:
-					A = 4;
-					break;
-				default:
-					A = 1
-				}
-				d = H.displayId;
-				t(1, H)
-			}
-			break;
-		case 4:
-			C = H.equipList;
-			t(0, H)
-		}
-		var S = ge("modelviewer-ad");
-		if (K) {
-			if (gc("modelviewer_mode") == "2" && f()) {
-				D.onclick()
-			} else {
-				if (gc("modelviewer_mode") == "1") {
-					E.onclick()
-				} else {
-					G.onclick()
-				}
-			}
-		} else {
-			if (S) {
-				ee(S)
-			}
-			y();
-			setTimeout(v, 1)
-		}
-		var R = "?tracker/modelviewer/";
-		if (H.fromTag) {
-			R += "custom/";
-			switch (H.type) {
-			case 1:
-				R += "1:" + H.displayId + ":" + (H.humanoid | 0);
-				break;
-			case 2:
-				R += "2:" + H.displayId;
-				break;
-			case 3:
-				R += "3:" + H.displayId + ":" + (H.slot | 0);
-				break;
-			case 4:
-				R += "4:" + C.join(".");
-				break
-			}
-		} else {
-			switch (H.type) {
-			case 1:
-				R += "npc/" + (H.typeId ? H.typeId: "display/" + H.displayId);
-				break;
-			case 2:
-				R += "object/" + H.typeId;
-				break;
-			case 3:
-				R += "item/" + H.typeId;
-				break;
-			case 4:
-				R += "itemset/" + H.typeId;
-				break
-			}
-		}
-		var T = function () {
-			if (isset("pageTracker") && pageTracker != null) {
-				pageTracker._trackPageview(R)
-			}
-		};
-		if (DomContentLoaded) {
-			DomContentLoaded.addDelayedEvent(T)
-		} else {
-			T()
-		}
-		m = location.hash
-	}
-	this.checkPound = function () {
-		if (location.hash && location.hash.indexOf("#modelviewer") == 0) {
-			var H = location.hash.split(":");
-			if (H.length >= 3) {
-				H.shift();
-				var F = parseInt(H.shift());
-				var E = {
-					type: F,
-					displayAd: 1
-				};
-				switch (F) {
-				case 1:
-					E.displayId = parseInt(H.shift());
-					var D = parseInt(H.shift());
-					if (D == 1) {
-						E.humanoid = 1
-					}
-					break;
-				case 2:
-					E.displayId = parseInt(H.shift());
-					break;
-				case 3:
-					E.displayId = parseInt(H.shift());
-					E.slot = parseInt(H.shift());
-					break;
-				case 4:
-					var G = H.shift();
-					E.equipList = G.split(";");
-					break
-				}
-				if (E.displayId || E.equipList) {
-					ModelViewer.show(E)
-				}
-				if (l != null) {
-					if (H.length > 0 && H[H.length - 1]) {
-						l(H[H.length - 1])
-					}
-				}
-			} else {
-				if (l != null && H.length == 2 && H[1]) {
-					l(H[1])
-				} else {
-					var I = ge("dsgndslgn464d");
-					if (I) {
-						I.onclick()
-					}
-				}
-			}
-		}
-	};
-	this.addExtraPound = function (D) {
-		l = D
-	};
-	this.show = function (D) {
-		h = D;
-		Lightbox.show("modelviewer", {
-			onShow: B,
-			onHide: k
-		},
-		D)
-	};
-	DomContentLoaded.addEvent(this.checkPound)
+    races = [
+        {id: 10, name: g_chr_races[10], model: 'bloodelf' },
+        {id: 11, name: g_chr_races[11], model: 'draenei' },
+        {id: 3,  name: g_chr_races[3],  model: 'dwarf' },
+        {id: 7,  name: g_chr_races[7],  model: 'gnome' },
+        {id: 1,  name: g_chr_races[1],  model: 'human' },
+        {id: 4,  name: g_chr_races[4],  model: 'nightelf' },
+        {id: 2,  name: g_chr_races[2],  model: 'orc' },
+        {id: 6,  name: g_chr_races[6],  model: 'tauren' },
+        {id: 8,  name: g_chr_races[8],  model: 'troll' },
+        {id: 5,  name: g_chr_races[5],  model: 'scourge' }
+    ],
+
+    sexes = [
+        {id: 0, name: LANG.male,   model: 'male' },
+        {id: 1, name: LANG.female, model: 'female' }
+    ];
+
+    function clear() {
+        _w.style.display = 'none';
+        _o.style.display = 'none';
+        _z.style.display = 'none';
+    }
+
+    function getRaceSex() {
+        var
+            race,
+            sex;
+
+        if (raceSel1.style.display == '') {
+            race = (raceSel1.selectedIndex >= 0 ? raceSel1.options[raceSel1.selectedIndex].value : '');
+        }
+        else {
+            race = (raceSel2.selectedIndex >= 0 ? raceSel2.options[raceSel2.selectedIndex].value : '');
+        }
+
+        sex = (sexSel.selectedIndex >= 0 ? sexSel.options[sexSel.selectedIndex].value : 0);
+
+        return { r: race, s: sex };
+    }
+
+    function isRaceSexValid(race, sex) {
+        return (!isNaN(race) && race > 0 && in_array(races, race, function (x) {
+            return x.id;
+        }) != -1 && !isNaN(sex) && sex >= 0 && sex <= 1);
+    }
+
+    function render() {
+        if (mode == 2 && !f()) {
+            mode = 0;
+        }
+        if (mode == 2) {
+            var G = '<object id="3dviewer-plugin" type="application/x-zam-wowmodel" width="600" height="400"><param name="model" value="' + model + '" /><param name="modelType" value="' + modelType + '" /><param name="contentPath" value="http://static.wowhead.com/modelviewer/" />';
+            if (modelType == 16 && equipList.length) {
+                G += '<param name="equipList" value="' + equipList.join(',') + '" />';
+            }
+            G += '<param name="bgColor" value="#181818" /></object>';
+            _z.innerHTML = G;
+            _z.style.display = '';
+        }
+        else {
+            if (mode == 1) {
+                var G = '<applet id="3dviewer-java" code="org.jdesktop.applet.util.JNLPAppletLauncher" width="600" height="400" archive="http://static.wowhead.com/modelviewer/applet-launcher.jar,http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jar,http://download.java.net/media/gluegen/webstart/gluegen-rt.jar,http://download.java.net/media/java3d/webstart/release/vecmath/latest/vecmath.jar,http://static.wowhead.com/modelviewer/ModelView510.jar"><param name="jnlp_href" value="http://static.wowhead.com/modelviewer/ModelView.jnlp"><param name="codebase_lookup" value="false"><param name="cache_option" value="no"><param name="subapplet.classname" value="modelview.ModelViewerApplet"><param name="subapplet.displayname" value="Model Viewer Applet"><param name="progressbar" value="true"><param name="jnlpNumExtensions" value="1"><param name="jnlpExtension1" value="http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jnlp"><param name="contentPath" value="http://static.wowhead.com/modelviewer/"><param name="model" value="' + model + '"><param name="modelType" value="' + modelType + '">';
+                if (modelType == 16 && equipList.length) {
+                    G += '<param name="equipList" value="' + equipList.join(',') + '">';
+                }
+                G += '<param name="bgColor" value="#181818"></applet>';
+                _o.innerHTML = G;
+                _o.style.display = '';
+            }
+            else {
+                var flashVars = {
+                    model: model,
+                    modelType: modelType,
+                    contentPath: 'http://static.wowhead.com/modelviewer/'
+                };
+
+                var params = {
+                    quality: 'high',
+                    allowscriptaccess: 'always',
+                    allowfullscreen: true,
+                    menu: false,
+                    bgcolor: '#181818',
+                    wmode: 'direct'
+                };
+
+                var attributes = { };
+
+                if (modelType == 16 && equipList.length) {
+                    flashVars.equipList = equipList.join(',');
+                }
+                swfobject.embedSWF('http://static.wowhead.com/modelviewer/ModelView.swf', 'dsjkgbdsg2346', '600', '400', '10.0.0', 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
+                _w.style.display = '';
+            }
+        }
+        var
+            foo  = getRaceSex(),
+            race = foo.r,
+            sex  = foo.s;
+
+        if (!optBak.noPound) {
+            var url = '#modelviewer';
+            switch (optBak.type) {
+                case 1: // npc
+                    url += ':1:' + optBak.displayId + ':' + (optBak.humanoid | 0);
+                    break;
+                case 2: // object
+                    url += ':2:' + optBak.displayId;
+                    break;
+                case 3: // item
+                    url += ':3:' + optBak.displayId + ':' + (optBak.slot | 0);
+                    break;
+                case 4: // item set
+                    url += ':4:' + equipList.join(';');
+                    break;
+            }
+            if (race && sex) {
+                url += ':' + race + '+' + sex;
+            }
+            else {
+                url += ':';
+            }
+
+            if (optBak.extraPound != null) {
+                url += ':' + optBak.extraPound;
+            }
+            location.replace(rtrim(url, ':'));
+        }
+    }
+
+    function onSelChange() {
+        var
+            foo  = getRaceSex(),
+            race = foo.r,
+            sex  = foo.s;
+
+        if (!race) {
+            if (sexSel.style.display == 'none') {
+                return;
+            }
+
+            sexSel.style.display = 'none';
+
+            model = equipList[1];
+            switch (optBak.slot) {
+                case 1:
+                    modelType = 2; // Helm
+                    break;
+                case 3:
+                    modelType = 4; // Shoulder
+                    break;
+                default:
+                    modelType = 1; // Item
+            }
+        }
+        else {
+            if (sexSel.style.display == 'none') {
+                sexSel.style.display = '';
+            }
+
+            var foo = function (x) {
+                return x.id;
+            };
+            var raceIndex = in_array(races, race, foo);
+            var sexIndex = in_array(sexes, sex, foo);
+
+            if (raceIndex != -1 && sexIndex != -1) {
+                model = races[raceIndex].model + sexes[sexIndex].model;
+                modelType = 16;
+            }
+        }
+
+        clear();
+        render();
+    }
+    function j(D) {
+        if (D == mode) {
+            return;
+        }
+        g_setSelectedLink(this, 'modelviewer-mode');
+        clear();
+        if (mode == null) {
+            mode = D;
+            setTimeout(render, 50);
+        }
+        else {
+            mode = D;
+            sc('modelviewer_mode', 7, D, '/', location.hostname);
+            // sc('modelviewer_mode', 7, D, '/', '.wowhead.com');
+            render();
+        }
+    }
+
+    function initRaceSex(allowNoRace, opt) {
+        var
+            race = -1,
+            sex  = -1,
+
+            sel,
+            offset;
+
+        if (opt.race != null && opt.sex != null) {
+            race = opt.race;
+            sex = opt.sex;
+
+            modelDiv.style.display = 'none';
+            allowNoRace = 0;
+        }
+        else {
+            modelDiv.style.display = '';
+        }
+
+        if (race == -1 && sex == -1) {
+            if (location.hash) {
+                var matches = location.hash.match(/modelviewer:.*?([0-9]+)\+([0-9]+)/);
+                if (matches != null) {
+                    if (isRaceSexValid(matches[1], matches[2])) {
+                        race = matches[1];
+                        sex  = matches[2];
+                        sexSel.style.display = '';
+                    }
+                }
+            }
+        }
+
+        if (allowNoRace) {
+            sel    = raceSel1;
+            offset = 1;
+
+            raceSel1.style.display = '';
+            raceSel1.selectedIndex = -1;
+            raceSel2.style.display = 'none';
+            if (sex == -1) {
+                sexSel.style.display = 'none';
+            }
+        }
+        else {
+            if (race == -1 && sex == -1) {
+                var
+                    cooRace = (g_user && g_user.settings ? g_user.settings.modelrace: 1),
+                    cooSex  = (g_user && g_user.settings ? g_user.settings.modelgender - 1 : 0);
+
+                if (isRaceSexValid(cooRace, cooSex)) {
+                    race = cooRace;
+                    sex  = cooSex;
+                }
+                else {
+                    // Default
+                    race = 1; // Human
+                    sex  = 0; // Male
+                }
+            }
+
+            sel    = raceSel2;
+            offset = 0;
+
+            raceSel1.style.display = 'none';
+            raceSel2.style.display = '';
+            sexSel.style.display   = '';
+        }
+
+        if (sex != -1) {
+            sexSel.selectedIndex = sex;
+        }
+
+        if (race != -1 && sex != -1) {
+            var foo = function (x) {
+                return x.id;
+            };
+
+            var raceIndex = in_array(races, race, foo);
+            var sexIndex  = in_array(sexes, sex, foo);
+
+            if (raceIndex != -1 && sexIndex != -1) {
+                model = races[raceIndex].model + sexes[sexIndex].model;
+                modelType = 16;
+
+                raceIndex += offset;
+
+                sel.selectedIndex = raceIndex;
+                sexSel.selectedIndex = sexIndex;
+            }
+        }
+    }
+
+    function f() {
+        var E = navigator.mimeTypes['application/x-zam-wowmodel'];
+        if (E) {
+            var D = E.enabledPlugin;
+            if (D) {
+                return true
+            }
+        }
+        return false
+    }
+
+    function onHide() {
+        if (!optBak.noPound) {
+            if (!optBak.fromTag && oldHash && oldHash.indexOf('modelviewer') == -1) {
+                location.replace(oldHash);
+            }
+            else {
+                location.replace('#.');
+            }
+        }
+
+        if (optBak.onHide) {
+            optBak.onHide();
+        }
+    }
+
+    function onShow(dest, first, opt) {
+        var
+            G,
+            E;
+
+        if (!opt.displayAd || g_user.premium) {
+            Lightbox.setSize(620, 452);
+        }
+        else {
+            Lightbox.setSize(749, 546);
+        }
+
+        if (first) {
+            dest.className = 'modelviewer';
+            var screen = ce('div');
+            _w = ce('div');
+            _o = ce('div');
+            _z = ce('div');
+            var flashDiv = ce('div');
+            flashDiv.id = 'dsjkgbdsg2346';
+            ae(_w, flashDiv);
+            screen.className = 'modelviewer-screen';
+            _w.style.display = _o.style.display = _z.style.display = 'none';
+            ae(screen, _w);
+            ae(screen, _o);
+            ae(screen, _z);
+            var screenbg = ce('div');
+            screenbg.style.backgroundColor = '#181818';
+            screenbg.style.margin = '0';
+            ae(screenbg, screen);
+            ae(dest, screenbg);
+            G = ce('a'),
+            E = ce('a');
+            G.className = 'modelviewer-help';
+            G.href = '?help=modelviewer';
+            G.target = '_blank';
+            ae(G, ce('span'));
+            E.className = 'modelviewer-close';
+            E.href = 'javascript:;';
+            E.onclick = Lightbox.hide;
+            ae(E, ce('span'));
+            ae(dest, E);
+            ae(dest, G);
+            var N = ce('div'),
+            F = ce('span'),
+            G = ce('a'),
+            E = ce('a');
+            N.className = 'modelviewer-quality';
+            G.href = E.href = 'javascript:;';
+            ae(G, ct('Flash'));
+            ae(E, ct('Java'));
+            G.onclick = j.bind(G, 0);
+            E.onclick = j.bind(E, 1);
+            ae(F, G);
+            ae(F, ct(' ' + String.fromCharCode(160)));
+            ae(F, E);
+            if (f()) {
+                var D = ce('a');
+                D.href = 'javascript:;';
+                ae(D, ct('Plugin'));
+                D.onclick = j.bind(D, 2);
+                ae(F, ct(' ' + String.fromCharCode(160)));
+                ae(F, D)
+            }
+            ae(N, ce('div'));
+            ae(N, F);
+            ae(dest, N);
+
+            modelDiv = ce('div');
+            modelDiv.className = 'modelviewer-model';
+
+            var foo = function (a, b) {
+                return strcmp(a.name, b.name);
+            };
+
+            races.sort(foo);
+            sexes.sort(foo);
+
+            raceSel1 = ce('select');
+            raceSel2 = ce('select');
+            sexSel   = ce('select');
+            raceSel1.onchange = raceSel2.onchange = sexSel.onchange = onSelChange;
+
+            ae(raceSel1, ce('option'));
+            for (var i = 0, len = races.length; i < len; ++i) {
+                var o = ce('option');
+                o.value = races[i].id;
+                ae(o, ct(races[i].name));
+                ae(raceSel1, o);
+            }
+
+            for (var i = 0, len = races.length; i < len; ++i) {
+                var o = ce('option');
+                o.value = races[i].id;
+                ae(o, ct(races[i].name));
+                ae(raceSel2, o);
+            }
+
+            for (var i = 0, len = sexes.length; i < len; ++i) {
+                var o = ce('option');
+                o.value = sexes[i].id;
+                ae(o, ct(sexes[i].name));
+                ae(sexSel, o);
+            }
+            sexSel.style.display = 'none';
+            ae(modelDiv, ce('div'));
+            ae(modelDiv, raceSel1);
+            ae(modelDiv, raceSel2);
+            ae(modelDiv, sexSel);
+            ae(dest, modelDiv);
+            d = ce('div');
+            d.className = 'clear';
+            ae(dest, d);
+        }
+
+        switch (opt.type) {
+        case 1: // NPC
+            modelDiv.style.display = 'none';
+            if (opt.humanoid) {
+                modelType = 32; // Humanoid NPC
+            }
+            else {
+                modelType = 8; // NPC
+            }
+            model = opt.displayId;
+            break;
+        case 2: // Object
+            modelDiv.style.display = 'none';
+            modelType = 64; // Object
+            model = opt.displayId;
+            break;
+        case 3: // Item
+            equipList = [opt.slot, opt.displayId];
+            if (in_array([4, 5, 6, 7, 8, 9, 10, 16, 19, 20], opt.slot) != -1) {
+                initRaceSex(0, opt)
+            }
+            else {
+                switch (opt.slot) {
+                case 1:
+                    modelType = 2; // Helm
+                    break;
+                case 3:
+                    modelType = 4; // Shoulder
+                    break;
+                default:
+                    modelType = 1; // Item
+                }
+
+                model = opt.displayId;
+
+                initRaceSex(1, opt);
+            }
+            break;
+        case 4: // Item Set
+            equipList = opt.equipList;
+            initRaceSex(0, opt)
+        }
+
+        if (first) {
+            if (gc('modelviewer_mode') == '2' && f()) {
+                D.onclick()
+            } else {
+                if (gc('modelviewer_mode') == '1') {
+                    E.onclick()
+                } else {
+                    G.onclick()
+                }
+            }
+        }
+        else {
+
+            clear();
+            setTimeout(render, 1);
+        }
+
+        oldHash = location.hash;
+    }
+
+    this.checkPound = function () {
+        if (location.hash && location.hash.indexOf('#modelviewer') == 0) {
+            var parts = location.hash.split(':');
+            if (parts.length >= 3) {
+                parts.shift(); // - #modelviewer
+                var type = parseInt(parts.shift());
+                var opt = { type: type };
+                switch (type) {
+                    case 1: // npc
+                        opt.displayId = parseInt(parts.shift());
+                        var humanoid = parseInt(parts.shift());
+                        if (humanoid == 1) {
+                            opt.humanoid = 1;
+                        }
+                        break;
+                    case 2: // object
+                        opt.displayId = parseInt(parts.shift());
+                        break;
+                    case 3: // item
+                        opt.displayId = parseInt(parts.shift());
+                        opt.slot = parseInt(parts.shift());
+                        break;
+                    case 4: // item set
+                        var list = parts.shift();
+                        opt.equipList = list.split(';');
+                        break;
+                }
+                if (opt.displayId || opt.equipList) {
+                    ModelViewer.show(opt);
+                }
+
+                if (readExtraPound != null) {
+                    if (parts.length > 0 && parts[parts.length - 1]) {
+                        readExtraPound(parts[parts.length - 1]);
+                    }
+                }
+            }
+            else if (readExtraPound != null && parts.length == 2 && parts[1]) {
+                readExtraPound(parts[1]);
+            }
+            else {
+                var foo = ge('dsgndslgn464d');
+                if (foo) {
+                    foo.onclick();
+                }
+            }
+        }
+    };
+
+    this.addExtraPound = function (func) {
+        readExtraPound = func;
+    };
+
+    this.show = function (opt) {
+        optBak = opt;
+
+        Lightbox.show('modelviewer', {
+            onShow: onShow,
+            onHide: onHide
+        }, opt);
+    };
+
+    DomContentLoaded.addEvent(this.checkPound)
 };
 
 var g_screenshots = {};
 var ScreenshotViewer = new function () {
-	var
+    var
         screenshots,
         pos,
         imgWidth,
@@ -13859,126 +14381,126 @@ var ScreenshotViewer = new function () {
         aOriginal,
         divFrom,
         divCaption,
-	    loadingImage,
-	    lightboxComponents;
+        loadingImage,
+        lightboxComponents;
 
-	function computeDimensions(captionExtraHeight) {
-		var screenshot = screenshots[pos];
+    function computeDimensions(captionExtraHeight) {
+        var screenshot = screenshots[pos];
 
-		var availHeight = Math.max(50, Math.min(618, g_getWindowSize().h - 72 - captionExtraHeight));
+        var availHeight = Math.max(50, Math.min(618, g_getWindowSize().h - 72 - captionExtraHeight));
 
-		if (mode != 1 || screenshot.id || screenshot.resize) {
-			desiredScale = Math.min(772 / screenshot.width, 618 / screenshot.height);
-			scale        = Math.min(772 / screenshot.width, availHeight / screenshot.height);
-		}
+        if (mode != 1 || screenshot.id || screenshot.resize) {
+            desiredScale = Math.min(772 / screenshot.width, 618 / screenshot.height);
+            scale        = Math.min(772 / screenshot.width, availHeight / screenshot.height);
+        }
         else {
-			desiredScale = scale = 1;
-		}
+            desiredScale = scale = 1;
+        }
 
-		if (desiredScale > 1) {
-			desiredScale = 1;
-		}
+        if (desiredScale > 1) {
+            desiredScale = 1;
+        }
 
-		if (scale > 1) {
-			scale = 1;
-		}
+        if (scale > 1) {
+            scale = 1;
+        }
 
-		imgWidth = Math.round(scale * screenshot.width);
-		imgHeight = Math.round(scale * screenshot.height);
-		var lbWidth = Math.max(480, imgWidth);
+        imgWidth = Math.round(scale * screenshot.width);
+        imgHeight = Math.round(scale * screenshot.height);
+        var lbWidth = Math.max(480, imgWidth);
 
-		Lightbox.setSize(lbWidth + 20, imgHeight + 52 + captionExtraHeight);
+        Lightbox.setSize(lbWidth + 20, imgHeight + 52 + captionExtraHeight);
 
-		if (Browser.ie6) {
-			screen.style.width = lbWidth + 'px';
-			if (screenshots.length > 1) {
-				aPrev.style.height = aNext.style.height = imgHeight + 'px'
-			} else {
-				aCover.style.height = imgHeight + 'px'
-			}
-		}
-		if (captionExtraHeight) {
-			imgDiv.firstChild.width = imgWidth;
-			imgDiv.firstChild.height = imgHeight;
-		}
-	}
+        if (Browser.ie6) {
+            screen.style.width = lbWidth + 'px';
+            if (screenshots.length > 1) {
+                aPrev.style.height = aNext.style.height = imgHeight + 'px'
+            } else {
+                aCover.style.height = imgHeight + 'px'
+            }
+        }
+        if (captionExtraHeight) {
+            imgDiv.firstChild.width = imgWidth;
+            imgDiv.firstChild.height = imgHeight;
+        }
+    }
 
-	function getPound(pos) {
-		var
+    function getPound(pos) {
+        var
             screenshot = screenshots[pos],
             buff = '#screenshots:';
 
-		if (mode == 0) {
-			buff += 'id=' + screenshot.id;
-		}
+        if (mode == 0) {
+            buff += 'id=' + screenshot.id;
+        }
         else {
-			buff += collectionId + ':' + (pos + 1);
-		}
-		return buff;
-	}
+            buff += collectionId + ':' + (pos + 1);
+        }
+        return buff;
+    }
 
-	function render(resizing) {
-		if (resizing && (scale == desiredScale) && g_getWindowSize().h > container.offsetHeight) {
-			return;
-		}
-		container.style.visibility = 'hidden';
-		var
+    function render(resizing) {
+        if (resizing && (scale == desiredScale) && g_getWindowSize().h > container.offsetHeight) {
+            return;
+        }
+        container.style.visibility = 'hidden';
+        var
             screenshot = screenshots[pos],
             resized = (screenshot.width > 772 || screenshot.height > 618);
 
-		computeDimensions(0);
+        computeDimensions(0);
 
-		var url = (screenshot.url ? screenshot.url: g_staticUrl + '/uploads/screenshots/' + (resized ? 'resized/': 'normal/') + screenshot.id + '.jpg');
+        var url = (screenshot.url ? screenshot.url: g_staticUrl + '/uploads/screenshots/' + (resized ? 'resized/': 'normal/') + screenshot.id + '.jpg');
 
-		var html =
+        var html =
             '<img src="' + url + '"'
         + ' width="' + imgWidth + '"'
         + ' height="' + imgHeight + '"';
-		if (Browser.ie6) {
-			html += ' galleryimg="no"';
-		}
-		html += '>';
+        if (Browser.ie6) {
+            html += ' galleryimg="no"';
+        }
+        html += '>';
 
-		imgDiv.innerHTML = html;
+        imgDiv.innerHTML = html;
 
-		if (!resizing) {
-			if (screenshot.url) {
-				aOriginal.href = url;
-			}
+        if (!resizing) {
+            if (screenshot.url) {
+                aOriginal.href = url;
+            }
             else {
-				aOriginal.href = g_staticUrl + '/uploads/screenshots/normal/' + screenshot.id + '.jpg';
-			}
-			if (!screenshot.user && typeof g_pageInfo == 'object') {
-				screenshot.user = g_pageInfo.username;
-			}
+                aOriginal.href = g_staticUrl + '/uploads/screenshots/normal/' + screenshot.id + '.jpg';
+            }
+            if (!screenshot.user && typeof g_pageInfo == 'object') {
+                screenshot.user = g_pageInfo.username;
+            }
 
-			var
+            var
                 hasFrom1 = (screenshot.date && screenshot.user),
                 hasFrom2 = (screenshots.length > 1);
 
             if (hasFrom1) {
-				var
+                var
                     postedOn = new Date(screenshot.date),
                     elapsed = (g_serverTime - postedOn) / 1000;
-				var a = divFrom.firstChild.childNodes[1];
-				a.href = '?user=' + screenshot.user;
-				a.innerHTML = screenshot.user;
+                var a = divFrom.firstChild.childNodes[1];
+                a.href = '?user=' + screenshot.user;
+                a.innerHTML = screenshot.user;
 
-				var s = divFrom.firstChild.childNodes[3];
-				ee(s);
-				Listview.funcBox.coFormatDate(s, elapsed, postedOn);
+                var s = divFrom.firstChild.childNodes[3];
+                ee(s);
+                Listview.funcBox.coFormatDate(s, elapsed, postedOn);
 
-				divFrom.firstChild.style.display = '';
-			}
+                divFrom.firstChild.style.display = '';
+            }
             else {
-				divFrom.firstChild.style.display = 'none';
-			}
+                divFrom.firstChild.style.display = 'none';
+            }
 
-			var s = divFrom.childNodes[1];
+            var s = divFrom.childNodes[1];
             ee(s);
-			if(screenshot.user) {
-				if (hasFrom1) {
-					ae(s, ct(' ' + LANG.dash + ' '));
+            if (screenshot.user) {
+                if (hasFrom1) {
+                    ae(s, ct(' ' + LANG.dash + ' '));
                 }
                 var a = ce('a');
                 a.href = 'javascript:;';
@@ -13992,85 +14514,85 @@ var ScreenshotViewer = new function () {
                 ae(s, a);
             }
 
-			s = divFrom.childNodes[2];
+            s = divFrom.childNodes[2];
 
-			if (hasFrom2) {
-				var buff = '';
-				if(screenshot.user) {
-					buff = LANG.dash;
+            if (hasFrom2) {
+                var buff = '';
+                if (screenshot.user) {
+                    buff = LANG.dash;
                 }
-				buff += (pos + 1) + LANG.lvpage_of + screenshots.length;
+                buff += (pos + 1) + LANG.lvpage_of + screenshots.length;
 
-				s.innerHTML = buff;
-				s.style.display = '';
-			}
+                s.innerHTML = buff;
+                s.style.display = '';
+            }
             else {
-				s.style.display = 'none';
-			}
-
-			divFrom.style.display = (hasFrom1 || hasFrom2 ? '': 'none');
-
-			if (g_getLocale(true) != 0 && screenshot.caption) {
-				screenshot.caption = '';
+                s.style.display = 'none';
             }
 
-			var hasCaption = (screenshot.caption != null && screenshot.caption.length);
-			var hasSubject = (screenshot.subject != null && screenshot.subject.length && screenshot.type && screenshot.typeId);
+            divFrom.style.display = (hasFrom1 || hasFrom2 ? '': 'none');
 
-			if (hasCaption || hasSubject) {
-				var html = '';
+            if (g_getLocale(true) != 0 && screenshot.caption) {
+                screenshot.caption = '';
+            }
 
-				if (hasSubject) {
-					html += LANG.types[screenshot.type][0] + LANG.colon;
-					html += '<a href="?' + g_types[screenshot.type] + '=' + screenshot.typeId + '">';
-					html += screenshot.subject;
-					html += '</a>';
-				}
+            var hasCaption = (screenshot.caption != null && screenshot.caption.length);
+            var hasSubject = (screenshot.subject != null && screenshot.subject.length && screenshot.type && screenshot.typeId);
 
-				if (hasCaption) {
-					if (hasSubject) {
-						html += LANG.dash;
+            if (hasCaption || hasSubject) {
+                var html = '';
+
+                if (hasSubject) {
+                    html += LANG.types[screenshot.type][0] + LANG.colon;
+                    html += '<a href="?' + g_types[screenshot.type] + '=' + screenshot.typeId + '">';
+                    html += screenshot.subject;
+                    html += '</a>';
+                }
+
+                if (hasCaption) {
+                    if (hasSubject) {
+                        html += LANG.dash;
                     }
-					html += (screenshot.noMarkup ? screenshot.caption : Markup.toHtml(screenshot.caption, { mode: Markup.MODE_SIGNATURE }));
-				}
+                    html += (screenshot.noMarkup ? screenshot.caption : Markup.toHtml(screenshot.caption, { mode: Markup.MODE_SIGNATURE }));
+                }
 
                 divCaption.innerHTML = html;
-				divCaption.style.display = '';
-			}
+                divCaption.style.display = '';
+            }
             else {
-				divCaption.style.display = 'none';
-			}
+                divCaption.style.display = 'none';
+            }
 
-			if (screenshots.length > 1) {
-				aPrev.href = getPound(peekPos(-1));
-				aNext.href = getPound(peekPos(1));
+            if (screenshots.length > 1) {
+                aPrev.href = getPound(peekPos(-1));
+                aNext.href = getPound(peekPos(1));
 
-				aPrev.style.display = aNext.style.display = '';
-				aCover.style.display = 'none';
-			}
+                aPrev.style.display = aNext.style.display = '';
+                aCover.style.display = 'none';
+            }
             else {
-				aPrev.style.display = aNext.style.display = 'none';
-				aCover.style.display = '';
-			}
+                aPrev.style.display = aNext.style.display = 'none';
+                aCover.style.display = '';
+            }
 
-			location.replace(getPound(pos));
-		}
+            location.replace(getPound(pos));
+        }
 
-		Lightbox.reveal();
+        Lightbox.reveal();
 
-		if (divCaption.offsetHeight > 18) {
-			computeDimensions(divCaption.offsetHeight - 18);
-		}
-		container.style.visibility = 'visible';
+        if (divCaption.offsetHeight > 18) {
+            computeDimensions(divCaption.offsetHeight - 18);
+        }
+        container.style.visibility = 'visible';
     }
 
-	function peekPos(change) {
-		var foo = pos;
-		foo += change;
+    function peekPos(change) {
+        var foo = pos;
+        foo += change;
 
-		if (foo < 0) {
-			foo = screenshots.length - 1;
-		}
+        if (foo < 0) {
+            foo = screenshots.length - 1;
+        }
         else if (foo >= screenshots.length) {
             foo = 0;
         }
@@ -14078,23 +14600,23 @@ var ScreenshotViewer = new function () {
         return foo;
     }
 
-	function prevScreenshot() {
-		pos = peekPos(-1);
-		onRender();
+    function prevScreenshot() {
+        pos = peekPos(-1);
+        onRender();
 
-		return false;
-	}
+        return false;
+    }
 
-	function nextScreenshot() {
-		pos = peekPos(1);
-		onRender();
+    function nextScreenshot() {
+        pos = peekPos(1);
+        onRender();
 
-		return false;
-	}
+        return false;
+    }
 
-	function onKeyUp(e) {
-		e = $E(e);
-		switch (e.keyCode) {
+    function onKeyUp(e) {
+        e = $E(e);
+        switch (e.keyCode) {
             case 37: // Left
                 prevScreenshot();
                 break;
@@ -14104,192 +14626,192 @@ var ScreenshotViewer = new function () {
         }
     }
 
-	function onResize() {
-		render(1);
-	}
-
-	function onHide() {
-		cancelImageLoading();
-
-		if (screenshots.length > 1) {
-			dE(document, 'keyup', onKeyUp);
-        }
-
-		if (oldHash && mode == 0) {
-			if (oldHash.indexOf(':id=') != -1) {
-				oldHash = '#screenshots';
-			}
-			location.replace(oldHash);
-		}
-        else {
-			location.replace('#.');
-        }
-	}
-
-	function onShow(dest, first, opt) {
-		if (typeof opt.screenshots == 'string') {
-			screenshots = g_screenshots[opt.screenshots];
-			mode = 1;
-			collectionId = opt.screenshots;
-		}
-        else {
-			screenshots = opt.screenshots;
-			mode = 0;
-			collectionId = null;
-        }
-		container = dest;
-
-		pos = 0;
-		if (opt.pos && opt.pos >= 0 && opt.pos < screenshots.length) {
-			pos = opt.pos;
-		}
-
-		if (first) {
-			dest.className = 'screenshotviewer';
-
-			screen = ce('div');
-
-			screen.className = 'screenshotviewer-screen';
-
-			aPrev = ce('a');
-			aNext = ce('a');
-			aPrev.className = 'screenshotviewer-prev';
-			aNext.className = 'screenshotviewer-next';
-			aPrev.href = 'javascript:;';
-			aNext.href = 'javascript:;';
-
-			var foo = ce('span');
-			ae(foo, ce('b'));
-			// var b = ce('b');
-			// ae(b, ct(LANG.previous));
-			// ae(foo, b);
-			ae(aPrev, foo);
-			var foo = ce('span');
-			ae(foo, ce('b'));
-			// var b = ce('b');
-			// ae(b, ct(LANG.next));
-			// ae(foo, b);
-			ae(aNext, foo);
-
-			aPrev.onclick = prevScreenshot;
-			aNext.onclick = nextScreenshot;
-
-			aCover = ce('a');
-			aCover.className = 'screenshotviewer-cover';
-			aCover.href = 'javascript:;';
-			aCover.onclick = Lightbox.hide;
-			var foo = ce('span');
-			ae(foo, ce('b'));
-			// var b = ce('b');
-			// ae(b, ct(LANG.close));
-			// ae(foo, b);
-			ae(aCover, foo);
-			if (Browser.ie6) {
-				ns(aPrev);
-				ns(aNext);
-				aPrev.onmouseover = aNext.onmouseover = aCover.onmouseover = function () {
-					this.firstChild.style.display = 'block';
-				};
-				aPrev.onmouseout = aNext.onmouseout = aCover.onmouseout = function () {
-					this.firstChild.style.display = '';
-                };
-
-			}
-			ae(screen, aPrev);
-			ae(screen, aNext);
-			ae(screen, aCover);
-
-			imgDiv = ce('div');
-			ae(screen, imgDiv);
-
-			ae(dest, screen);
-
-			var aClose = ce('a');
-			aClose.className = 'screenshotviewer-close';
-			// aClose.className = 'dialog-x';
-			aClose.href = 'javascript:;';
-			aClose.onclick = Lightbox.hide;
-			ae(aClose, ce('span'));
-			// ae(aClose, ct(LANG.close));
-			ae(dest, aClose);
-
-			aOriginal = ce('a');
-			aOriginal.className = 'screenshotviewer-original';
-			// aOriginal.className = 'dialog-arrow';
-			aOriginal.href = 'javascript:;';
-			aOriginal.target = '_blank';
-			ae(aOriginal, ce('span'));
-			// ae(aOriginal, ct(LANG.original));
-			ae(dest, aOriginal);
-
-			divFrom = ce('div');
-			divFrom.className = 'screenshotviewer-from';
-			var sp = ce('span');
-			ae(sp, ct(LANG.lvscreenshot_from));
-			ae(sp, ce('a'));
-			ae(sp, ct(' '));
-			ae(sp, ce('span'));
-			ae(divFrom, sp);
-			ae(divFrom, ce('span'));
-			ae(divFrom, ce('span'));
-			ae(dest, divFrom);
-
-			divCaption = ce('div');
-			divCaption.className = 'screenshotviewer-caption';
-			ae(dest, divCaption);
-			var d = ce('div');
-			d.className = 'clear';
-			ae(dest, d);
-		}
-
-		oldHash = location.hash;
-
-		if (screenshots.length > 1) {
-			aE(document, 'keyup', onKeyUp);
-        }
-
-		onRender();
+    function onResize() {
+        render(1);
     }
 
-	function onRender() {
-		var screenshot = screenshots[pos];
-		if (!screenshot.width || !screenshot.height) {
-			if (loadingImage) {
-				loadingImage.onload = null;
-				loadingImage.onerror = null;
-			}
-			else {
-				container.className = '';
-				lightboxComponents = [];
-				while(container.firstChild) {
-					lightboxComponents.push(container.firstChild);
-					de(container.firstChild);
-				}
-			}
+    function onHide() {
+        cancelImageLoading();
 
-			var lightboxTimer = setTimeout(function() {
-				screenshot.width = 126;
-				screenshot.height = 22;
-				computeDimensions(0);
-				screenshot.width = null;
-				screenshot.height = null;
+        if (screenshots.length > 1) {
+            dE(document, 'keyup', onKeyUp);
+        }
 
-				var div = ce('div');
-				div.style.margin = '0 auto';
-				div.style.width = '126px';
-				var img = ce('img');
-				img.src = g_staticUrl + '/template/images/progress-anim.gif';
-				img.width = 126;
-				img.height = 22;
-				ae(div, img);
-				ae(container, div);
+        if (oldHash && mode == 0) {
+            if (oldHash.indexOf(':id=') != -1) {
+                oldHash = '#screenshots';
+            }
+            location.replace(oldHash);
+        }
+        else {
+            location.replace('#.');
+        }
+    }
 
-				Lightbox.reveal();
-				container.style.visiblity = 'visible';
-			}, 150);
+    function onShow(dest, first, opt) {
+        if (typeof opt.screenshots == 'string') {
+            screenshots = g_screenshots[opt.screenshots];
+            mode = 1;
+            collectionId = opt.screenshots;
+        }
+        else {
+            screenshots = opt.screenshots;
+            mode = 0;
+            collectionId = null;
+        }
+        container = dest;
 
-			loadingImage = new Image();
-			loadingImage.onload = (function(screen, timer) {
+        pos = 0;
+        if (opt.pos && opt.pos >= 0 && opt.pos < screenshots.length) {
+            pos = opt.pos;
+        }
+
+        if (first) {
+            dest.className = 'screenshotviewer';
+
+            screen = ce('div');
+
+            screen.className = 'screenshotviewer-screen';
+
+            aPrev = ce('a');
+            aNext = ce('a');
+            aPrev.className = 'screenshotviewer-prev';
+            aNext.className = 'screenshotviewer-next';
+            aPrev.href = 'javascript:;';
+            aNext.href = 'javascript:;';
+
+            var foo = ce('span');
+            ae(foo, ce('b'));
+            // var b = ce('b');
+            // ae(b, ct(LANG.previous));
+            // ae(foo, b);
+            ae(aPrev, foo);
+            var foo = ce('span');
+            ae(foo, ce('b'));
+            // var b = ce('b');
+            // ae(b, ct(LANG.next));
+            // ae(foo, b);
+            ae(aNext, foo);
+
+            aPrev.onclick = prevScreenshot;
+            aNext.onclick = nextScreenshot;
+
+            aCover = ce('a');
+            aCover.className = 'screenshotviewer-cover';
+            aCover.href = 'javascript:;';
+            aCover.onclick = Lightbox.hide;
+            var foo = ce('span');
+            ae(foo, ce('b'));
+            // var b = ce('b');
+            // ae(b, ct(LANG.close));
+            // ae(foo, b);
+            ae(aCover, foo);
+            if (Browser.ie6) {
+                ns(aPrev);
+                ns(aNext);
+                aPrev.onmouseover = aNext.onmouseover = aCover.onmouseover = function () {
+                    this.firstChild.style.display = 'block';
+                };
+                aPrev.onmouseout = aNext.onmouseout = aCover.onmouseout = function () {
+                    this.firstChild.style.display = '';
+                };
+
+            }
+            ae(screen, aPrev);
+            ae(screen, aNext);
+            ae(screen, aCover);
+
+            imgDiv = ce('div');
+            ae(screen, imgDiv);
+
+            ae(dest, screen);
+
+            var aClose = ce('a');
+            aClose.className = 'screenshotviewer-close';
+            // aClose.className = 'dialog-x';
+            aClose.href = 'javascript:;';
+            aClose.onclick = Lightbox.hide;
+            ae(aClose, ce('span'));
+            // ae(aClose, ct(LANG.close));
+            ae(dest, aClose);
+
+            aOriginal = ce('a');
+            aOriginal.className = 'screenshotviewer-original';
+            // aOriginal.className = 'dialog-arrow';
+            aOriginal.href = 'javascript:;';
+            aOriginal.target = '_blank';
+            ae(aOriginal, ce('span'));
+            // ae(aOriginal, ct(LANG.original));
+            ae(dest, aOriginal);
+
+            divFrom = ce('div');
+            divFrom.className = 'screenshotviewer-from';
+            var sp = ce('span');
+            ae(sp, ct(LANG.lvscreenshot_from));
+            ae(sp, ce('a'));
+            ae(sp, ct(' '));
+            ae(sp, ce('span'));
+            ae(divFrom, sp);
+            ae(divFrom, ce('span'));
+            ae(divFrom, ce('span'));
+            ae(dest, divFrom);
+
+            divCaption = ce('div');
+            divCaption.className = 'screenshotviewer-caption';
+            ae(dest, divCaption);
+            var d = ce('div');
+            d.className = 'clear';
+            ae(dest, d);
+        }
+
+        oldHash = location.hash;
+
+        if (screenshots.length > 1) {
+            aE(document, 'keyup', onKeyUp);
+        }
+
+        onRender();
+    }
+
+    function onRender() {
+        var screenshot = screenshots[pos];
+        if (!screenshot.width || !screenshot.height) {
+            if (loadingImage) {
+                loadingImage.onload = null;
+                loadingImage.onerror = null;
+            }
+            else {
+                container.className = '';
+                lightboxComponents = [];
+                while(container.firstChild) {
+                    lightboxComponents.push(container.firstChild);
+                    de(container.firstChild);
+                }
+            }
+
+            var lightboxTimer = setTimeout(function() {
+                screenshot.width = 126;
+                screenshot.height = 22;
+                computeDimensions(0);
+                screenshot.width = null;
+                screenshot.height = null;
+
+                var div = ce('div');
+                div.style.margin = '0 auto';
+                div.style.width = '126px';
+                var img = ce('img');
+                img.src = g_staticUrl + '/template/images/progress-anim.gif';
+                img.width = 126;
+                img.height = 22;
+                ae(div, img);
+                ae(container, div);
+
+                Lightbox.reveal();
+                container.style.visiblity = 'visible';
+            }, 150);
+
+            loadingImage = new Image();
+            loadingImage.onload = (function(screen, timer) {
                 clearTimeout(timer);
                 screen.width = this.width;
                 screen.height = this.height;
@@ -14297,217 +14819,218 @@ var ScreenshotViewer = new function () {
                 restoreLightbox();
                 render();
             }).bind(loadingImage, screenshot, lightboxTimer);
-			loadingImage.onerror = (function(timer) {
+            loadingImage.onerror = (function(timer) {
                 clearTimeout(timer);
                 loadingImage = null;
                 Lightbox.hide();
                 restoreLightbox();
             }).bind(loadingImage, lightboxTimer);
-			loadingImage.src = (screenshot.url ? screenshot.url : g_staticUrl + '/uploads/screenshots/normal/' + screenshot.id + '.jpg');
-		}
-		else {
-			render();
-		}
-	}
+            loadingImage.src = (screenshot.url ? screenshot.url : g_staticUrl + '/uploads/screenshots/normal/' + screenshot.id + '.jpg');
+        }
+        else {
+            render();
+        }
+    }
 
-	function cancelImageLoading() {
-		if (!loadingImage) {
-			return;
-		}
+    function cancelImageLoading() {
+        if (!loadingImage) {
+            return;
+        }
 
-		loadingImage.onload = null;
-		loadingImage.onerror = null;
-		loadingImage = null;
+        loadingImage.onload = null;
+        loadingImage.onerror = null;
+        loadingImage = null;
 
-		restoreLightbox();
-	}
+        restoreLightbox();
+    }
 
-	function restoreLightbox() {
-		if (!lightboxComponents) {
-			return;
-		}
+    function restoreLightbox() {
+        if (!lightboxComponents) {
+            return;
+        }
 
-		ee(container);
-		container.className = 'screenshotviewer';
-		for (var i = 0; i < lightboxComponents.length; ++i)
-			ae(container, lightboxComponents[i]);
-		lightboxComponents = null;
-	}
+        ee(container);
+        container.className = 'screenshotviewer';
+        for (var i = 0; i < lightboxComponents.length; ++i)
+            ae(container, lightboxComponents[i]);
+        lightboxComponents = null;
+    }
 
-	this.checkPound = function () {
-		if (location.hash && location.hash.indexOf('#screenshots') == 0) {
-			if (!g_listviews['screenshots']) { // Standalone screenshot viewer
-				var parts = location.hash.split(':');
-				if (parts.length == 3) {
-					var
+    this.checkPound = function () {
+        if (location.hash && location.hash.indexOf('#screenshots') == 0) {
+            if (!g_listviews['screenshots']) { // Standalone screenshot viewer
+                var parts = location.hash.split(':');
+                if (parts.length == 3) {
+                    var
                         collection = g_screenshots[parts[1]],
                         p = parseInt(parts[2]);
 
                     if (collection && p >= 1 && p <= collection.length) {
-						ScreenshotViewer.show({
-							screenshots: parts[1],
-							pos: p - 1
-						});
-					}
-				}
-			}
-		}
-	}
-
-	this.show = function (opt) {
-		Lightbox.show('screenshotviewer', {
-			onShow: onShow,
-			onHide: onHide,
-			onResize: onResize
-		}, opt);
+                        ScreenshotViewer.show({
+                            screenshots: parts[1],
+                            pos: p - 1
+                        });
+                    }
+                }
+            }
+        }
     }
 
-	DomContentLoaded.addEvent(this.checkPound)
+    this.show = function (opt) {
+        Lightbox.show('screenshotviewer', {
+            onShow: onShow,
+            onHide: onHide,
+            onResize: onResize
+        }, opt);
+    }
+
+    DomContentLoaded.addEvent(this.checkPound)
 };
 
 var Dialog = function () {
 var
     _self = this,
-	_template,
-	_onSubmit = null,
+    _template,
+    _onSubmit = null,
     _templateName,
 
     _funcs = {},
-	_data,
+    _data,
 
-	_inited = false,
+    _inited = false,
     _form = ce('form'),
-	_elements = {};
+    _elements = {};
 
-	_form.onsubmit = function () {
-		_processForm();
-		return false
-	};
+    _form.onsubmit = function () {
+        _processForm();
+        return false
+    };
 
-	this.show = function (template, opt) {
-		if (template) {
-			_templateName = template;
-			_template = Dialog.templates[_templateName];
-			_self.template = _template;
-		}
+    this.show = function (template, opt) {
+        if (template) {
+            _templateName = template;
+            _template = Dialog.templates[_templateName];
+            _self.template = _template;
+        }
         else {
-			return;
-		}
+            return;
+        }
 
-		if (_template.onInit && !_inited) {
+        if (_template.onInit && !_inited) {
             (_template.onInit.bind(_self, _form, opt))();
-		}
-
-		if(opt.onBeforeShow) {
-			_funcs.onBeforeShow = opt.onBeforeShow.bind(_self, _form);
         }
 
-		if(_template.onBeforeShow) {
-			_template.onBeforeShow = _template.onBeforeShow.bind(_self, _form);
+        if (opt.onBeforeShow) {
+            _funcs.onBeforeShow = opt.onBeforeShow.bind(_self, _form);
         }
 
-		if(opt.onShow) {
-			_funcs.onShow = opt.onShow.bind(_self, _form);
+        if (_template.onBeforeShow) {
+            _template.onBeforeShow = _template.onBeforeShow.bind(_self, _form);
         }
 
-		if (_template.onShow) {
-			_template.onShow = _template.onShow.bind(_self, _form);
-		}
-
-		if(opt.onHide) {
-			_funcs.onHide = opt.onHide.bind(_self, _form);
+        if (opt.onShow) {
+            _funcs.onShow = opt.onShow.bind(_self, _form);
         }
 
-		if(_template.onHide) {
-			_template.onHide = _template.onHide.bind(_self, _form);
+        if (_template.onShow) {
+            _template.onShow = _template.onShow.bind(_self, _form);
         }
 
-		if (opt.onSubmit) {
-			_funcs.onSubmit = opt.onSubmit;
-		}
+        if (opt.onHide) {
+            _funcs.onHide = opt.onHide.bind(_self, _form);
+        }
 
-		if(_template.onSubmit)
-			_onSubmit = _template.onSubmit.bind(_self, _form);
+        if (_template.onHide) {
+            _template.onHide = _template.onHide.bind(_self, _form);
+        }
 
-		if (opt.data) {
-			_inited = false;
-			_data = {};
-			cO(_data, opt.data);
-		}
+        if (opt.onSubmit) {
+            _funcs.onSubmit = opt.onSubmit;
+        }
+
+        if (_template.onSubmit)
+            _onSubmit = _template.onSubmit.bind(_self, _form);
+
+        if (opt.data) {
+            _inited = false;
+            _data = {};
+            cO(_data, opt.data);
+        }
         _self.data = _data;
 
-		Lightbox.show('dialog-' + _templateName, {
-			onShow: _onShow,
-			onHide: _onHide
-		});
-	};
+        Lightbox.show('dialog-' + _templateName, {
+            onShow: _onShow,
+            onHide: _onHide
+        });
+    };
 
-	this.getValue = function (id) {
-		return _getValue(id);
-	};
+    this.getValue = function (id) {
+        return _getValue(id);
+    };
 
-	this.setValue = function (id, value) {
-		_setValue(id, value);
-	};
+    this.setValue = function (id, value) {
+        _setValue(id, value);
+    };
 
-	this.getSelectedValue = function (id) {
-		return _getSelectedValue(id);
-	};
+    this.getSelectedValue = function (id) {
+        return _getSelectedValue(id);
+    };
 
-	this.getCheckedValue = function (id) {
-		return _getCheckedValue(id);
-	};
+    this.getCheckedValue = function (id) {
+        return _getCheckedValue(id);
+    };
 
-	function _onShow(dest, first) {
-		if (first || !_inited) {
-			_initForm(dest);
-		}
-
-		if(_template.onBeforeShow) {
-			_template.onBeforeShow();
+    function _onShow(dest, first) {
+        if (first || !_inited) {
+            _initForm(dest);
         }
 
-		if(_funcs.onBeforeShow) {
-			_funcs.onBeforeShow();
+        if (_template.onBeforeShow) {
+            _template.onBeforeShow();
         }
 
-		Lightbox.setSize(_template.width, _template.height);
-		dest.className = 'dialog';
-
-		_updateForm();
-
-		if (_template.onShow) {
-			_template.onShow();
-		}
-
-		if(_funcs.onShow) {
-			_funcs.onShow();
+        if (_funcs.onBeforeShow) {
+            _funcs.onBeforeShow();
         }
-	}
 
-	function _initForm(dest) {
-		ee(dest);
-		ee(_form);
+        Lightbox.setSize(_template.width, _template.height);
+        dest.className = 'dialog';
 
-		var container = ce('div');
-		container.className = 'text';
-		ae(dest, container);
-		ae(container, _form);
+        _updateForm();
+
+        if (_template.onShow) {
+            _template.onShow();
+        }
+
+        if (_funcs.onShow) {
+            _funcs.onShow();
+        }
+    }
+
+    function _initForm(dest) {
+        ee(dest);
+        ee(_form);
+
+        var container = ce('div');
+        container.className = 'text';
+        ae(dest, container);
+        ae(container, _form);
         if (_template.title) {
-			var h = ce('h1');
-			ae(h, ct(_template.title));
-			ae(_form, h);
-		}
+            var h = ce('h1');
+            ae(h, ct(_template.title));
+            ae(_form, h);
+        }
 
-		var t = ce('table'),
-		tb = ce('tbody'),
-        mergeCell = false;
+        var
+            t         = ce('table'),
+            tb        = ce('tbody'),
+            mergeCell = false;
 
-		ae(t, tb);
-		ae(_form, t);
+        ae(t, tb);
+        ae(_form, t);
 
-		for (var i = 0, len = _template.fields.length; i < len; ++i) {
-			var
+        for (var i = 0, len = _template.fields.length; i < len; ++i) {
+            var
                 field = _template.fields[i],
                 element;
 
@@ -14517,33 +15040,33 @@ var
                 td = ce('td');
             }
 
-			field.__tr = tr;
+            field.__tr = tr;
 
-			if (_data[field.id] == null) {
-				_data[field.id] = (field.value ? field.value: '');
-			}
+            if (_data[field.id] == null) {
+                _data[field.id] = (field.value ? field.value: '');
+            }
 
-			var options;
-			if (field.options) {
-				options = [];
+            var options;
+            if (field.options) {
+                options = [];
 
-				if (field.optorder) {
-					cO(options, field.optorder);
+                if (field.optorder) {
+                    cO(options, field.optorder);
                 }
-				else {
+                else {
                     for (var j in field.options) {
                         options.push(j);
                     }
-				}
+                }
 
-				if (field.sort) {
-					options.sort(function (a, b) {
-						return field.sort * strcmp(field.options[a], field.options[b]);
-					});
-				}
-			}
+                if (field.sort) {
+                    options.sort(function (a, b) {
+                        return field.sort * strcmp(field.options[a], field.options[b]);
+                    });
+                }
+            }
 
-			switch (field.type) {
+            switch (field.type) {
                 case 'caption':
                     th.colSpan = 2;
                     th.style.textAlign = 'left';
@@ -14619,20 +15142,20 @@ var
                     ae(td, f);
 
                     break;
-				case 'dynamic':
-					td.colSpan = 2;
-					td.style.textAlign = 'left';
-					td.style.padding = 0;
+                case 'dynamic':
+                    td.colSpan = 2;
+                    td.style.textAlign = 'left';
+                    td.style.padding = 0;
 
-					if(field.compute)
-						(field.compute.bind(_self, null, _data[field.id], _form, td, tr))();
+                    if (field.compute)
+                        (field.compute.bind(_self, null, _data[field.id], _form, td, tr))();
 
-					ae(tr, td);
-					ae(tb, tr);
+                    ae(tr, td);
+                    ae(tb, tr);
 
-					element = td;
+                    element = td;
 
-					break;
+                    break;
                 case 'checkbox':
                 case 'radio':
                     var k = 0;
@@ -14686,7 +15209,7 @@ var
                     var f = element = ce('input');
                     f.name = field.id;
 
-                    if(field.size) {
+                    if (field.size) {
                         f.size = field.size;
                     }
 
@@ -14705,83 +15228,83 @@ var
                     f.setAttribute('type', field.type);
                     ae(td, f);
                     break;
-			}
+            }
 
-			if (field.label) {
-				if (field.type == 'textarea') {
-					if (field.labelAlign) {
-						td.style.textAlign = field.labelAlign;
+            if (field.label) {
+                if (field.type == 'textarea') {
+                    if (field.labelAlign) {
+                        td.style.textAlign = field.labelAlign;
                     }
-					td.colSpan = 2;
-				}
+                    td.colSpan = 2;
+                }
                 else {
-					if(field.labelAlign) {
-						th.style.textAlign = field.labelAlign;
+                    if (field.labelAlign) {
+                        th.style.textAlign = field.labelAlign;
                     }
-					ae(th, ct(field.label));
-					ae(tr, th);
-				}
-			}
+                    ae(th, ct(field.label));
+                    ae(tr, th);
+                }
+            }
 
-			if (field.type != 'checkbox' && field.type != 'radio') {
-				if (field.width) {
-					f.style.width = field.width;
-				}
+            if (field.type != 'checkbox' && field.type != 'radio') {
+                if (field.width) {
+                    f.style.width = field.width;
+                }
 
-				if (field.compute  && field.type != 'caption' && field.type != 'dynamic') {
+                if (field.compute  && field.type != 'caption' && field.type != 'dynamic') {
                     (field.compute.bind(_self, f, _data[field.id], _form, td, tr))();
-				}
-			}
+                }
+            }
 
-			if (field.caption) {
-				var s = ce('small');
-				if(field.type != 'textarea')
-					s.style.paddingLeft = '2px';
-				s.className = 'q0'; // commented in 5.0?
-				ae(s, ct(field.caption));
-				ae(td, s);
-			}
+            if (field.caption) {
+                var s = ce('small');
+                if (field.type != 'textarea')
+                    s.style.paddingLeft = '2px';
+                s.className = 'q0'; // commented in 5.0?
+                ae(s, ct(field.caption));
+                ae(td, s);
+            }
 
-			ae(tr, td);
-			ae(tb, tr);
+            ae(tr, td);
+            ae(tb, tr);
 
-			mergeCell = field.mergeCell;
-			_elements[field.id] = element;
-		}
+            mergeCell = field.mergeCell;
+            _elements[field.id] = element;
+        }
 
-		for (var i = _template.buttons.length; i > 0; --i) {
-			var
+        for (var i = _template.buttons.length; i > 0; --i) {
+            var
                 button = _template.buttons[i - 1],
-                a = ce('a');
+                a      = ce('a');
 
             a.href = 'javascript:;';
-			a.onclick = _processForm.bind(a, button[0]);
-			a.className = 'dialog-' + button[0];
-			ae(a, ct(button[1]));
+            a.onclick = _processForm.bind(a, button[0]);
+            a.className = 'dialog-' + button[0];
+            ae(a, ct(button[1]));
 /* custom for lost buttons texture, no longer in use on 2.5.2012
-			a.onclick = _processForm.bind(a, button);
-			a.className = 'dialog-' + button;
-			var sp = ce('span');
-			sp.innerHTML = button;
-			ae(a, sp);
+            a.onclick = _processForm.bind(a, button);
+            a.className = 'dialog-' + button;
+            var sp = ce('span');
+            sp.innerHTML = button;
+            ae(a, sp);
 end custom */
-			ae(dest, a);
-		}
+            ae(dest, a);
+        }
 
-		var _ = ce('div');
-		_.className = 'clear';
-		ae(dest, _);
+        var _ = ce('div');
+        _.className = 'clear';
+        ae(dest, _);
 
-		_inited = true;
-	}
+        _inited = true;
+    }
 
-	function _updateForm() {
-		for (var i = 0, len = _template.fields.length; i < len; ++i) {
-			var
+    function _updateForm() {
+        for (var i = 0, len = _template.fields.length; i < len; ++i) {
+            var
                 field = _template.fields[i],
                 f     = _elements[field.id];
 
-			switch (field.type) {
+            switch (field.type) {
                 case 'caption': // Do nothing
                     break;
                 case 'select':
@@ -14799,33 +15322,35 @@ end custom */
                 default:
                     f.value = _data[field.id];
                     break;
-			}
-
-			if (field.update) {
-				(field.update.bind(_self, null, _data[field.id], _form, f))();
             }
-		}
-	}
 
-	function _onHide() {
-		if(_template.onHide)
-			_template.onHide();
-		if(_funcs.onHide)
-			_funcs.onHide();
-	}
+            if (field.update) {
+                (field.update.bind(_self, null, _data[field.id], _form, f))();
+            }
+        }
+    }
 
-	function _processForm(button) {
-		// if (button == 'x') { // Special case
-		if (button == 'cancel') { // Special case
-			return Lightbox.hide();
-		}
+    function _onHide() {
+        if (_template.onHide) {
+            _template.onHide();
+        }
+        if (_funcs.onHide) {
+            _funcs.onHide();
+        }
+    }
 
-		for (var i = 0, len = _template.fields.length; i < len; ++i) {
-			var
-            field = _template.fields[i],
-			newValue;
+    function _processForm(button) {
+        // if (button == 'x') { // Special case
+        if (button == 'cancel') { // Special case
+            return Lightbox.hide();
+        }
 
-			switch (field.type) {
+        for (var i = 0, len = _template.fields.length; i < len; ++i) {
+            var
+                field = _template.fields[i],
+                newValue;
+
+            switch (field.type) {
                 case 'caption': // Do nothing
                     continue;
                 case 'select':
@@ -14835,722 +15360,753 @@ end custom */
                 case 'radio':
                     newValue = _getCheckedValue(field.id);
                     break;
-				case 'dynamic':
-					if (field.getValue) {
-						newValue = field.getValue(field, _data, _form);
-						break;
-					}
+                case 'dynamic':
+                    if (field.getValue) {
+                        newValue = field.getValue(field, _data, _form);
+                        break;
+                    }
                 default:
                     newValue = _getValue(field.id);
                     break;
-			}
-			if (field.validate) {
-				if (!field.validate(newValue, _data, _form)) {
-					return;
-				}
-			}
+            }
+            if (field.validate) {
+                if (!field.validate(newValue, _data, _form)) {
+                    return;
+                }
+            }
 
-			if (newValue && typeof newValue == 'string') {
-				newValue = trim(newValue);
-			}
-			_data[field.id] = newValue;
-		}
-
-		_submitData(button);
-	}
-
-	function _submitData(button) {
-		var ret;
-
-		if(_onSubmit) {
-			ret = _onSubmit(_data, button, _form);
+            if (newValue && typeof newValue == 'string') {
+                newValue = trim(newValue);
+            }
+            _data[field.id] = newValue;
         }
 
-		if (_funcs.onSubmit) {
-			ret = _funcs.onSubmit(_data, button, _form);
-		}
+        _submitData(button);
+    }
 
-		if(ret === undefined || ret)
+    function _submitData(button) {
+        var ret;
+
+        if (_onSubmit) {
+            ret = _onSubmit(_data, button, _form);
+        }
+
+        if (_funcs.onSubmit) {
+            ret = _funcs.onSubmit(_data, button, _form);
+        }
+
+        if (ret === undefined || ret)
             Lightbox.hide();
 
             return false;
-	}
+    }
 
-	function _getValue(id) {
-		return _elements[id].value;
-	}
+    function _getValue(id) {
+        return _elements[id].value;
+    }
 
-	function _setValue(id, value) {
-		_elements[id].value = value;
-	}
+    function _setValue(id, value) {
+        _elements[id].value = value;
+    }
 
-	function _getSelectedValue(id) {
-		var
+    function _getSelectedValue(id) {
+        var
             result = [],
             f = _elements[id];
 
             for (var i = 0, len = f.options.length; i < len; i++) {
-			if (f.options[i].selected) {
-				result.push(parseInt(f.options[i].value) == f.options[i].value ? parseInt(f.options[i].value) : f.options[i].value);
-			}
-		}
-		if (result.length == 1) {
-			result = result[0];
-		}
-		return result;
-	}
+            if (f.options[i].selected) {
+                result.push(parseInt(f.options[i].value) == f.options[i].value ? parseInt(f.options[i].value) : f.options[i].value);
+            }
+        }
+        if (result.length == 1) {
+            result = result[0];
+        }
+        return result;
+    }
 
-	function _getCheckedValue(id) {
-		var
+    function _getCheckedValue(id) {
+        var
             result = [],
             f      = _elements[id];
-		for (var i = 0, len = f.length; i < len; i++) {
-			if (f[i].checked) {
-				result.push(parseInt(f[i].value) == f[i].value ? parseInt(f[i].value) : f[i].value);
-			}
-		}
 
-		return result;
-	}
+        for (var i = 0, len = f.length; i < len; i++) {
+            if (f[i].checked) {
+                result.push(parseInt(f[i].value) == f[i].value ? parseInt(f[i].value) : f[i].value);
+            }
+        }
+
+        return result;
+    }
 };
 Dialog.templates = {};
-var ContactTool = new
-function () {
-	this.general = 0;
-	this.comment = 1;
-	this.post = 2;
-	this.screenshot = 3;
-	this.character = 4;
-	this.video = 5;
-	var d;
-	var c = {
-		0 : [[1, true], [2, true], [8, true], [3, true], [4, true], [5, true], [6, true], [7, true]],
-		1 : [[15, function (f) {
-			return ((f.roles & U_GROUP_MODERATOR) == 0)
-		}], [16, true], [17, true], [18, function (f) {
-			return ((f.roles & U_GROUP_MODERATOR) == 0)
-		}], [19, function (f) {
-			return ((f.roles & U_GROUP_MODERATOR) == 0)
-		}], [20, function (f) {
-			return ((f.roles & U_GROUP_MODERATOR) == 0)
-		}]],
-		2 : [[30, function (f) {
-			return (g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0)
-		}], [37, function (f) {
-			return ((f.roles & U_GROUP_MODERATOR) == 0 && g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0 && g_users[f.user].avatar == 2)
-		}], [31, true], [32, true], [33, function (f) {
-			return (g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0)
-		}], [34, function (f) {
-			return (g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0 && f.op && !f.sticky)
-		}], [35, function (f) {
-			return (g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0)
-		}], [36, function (f) {
-			return (g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0)
-		}]],
-		3 : [[45, true], [46, true], [47, function (f) {
-			return (g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0)
-		}], [48, function (f) {
-			return (g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0)
-		}]],
-		4 : [[60, true], [61, true]],
-		5 : [[45, true], [46, true], [47, function (f) {
-			return (g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0)
-		}], [48, function (f) {
-			return (g_users && g_users[f.user] && (g_users[f.user].roles & U_GROUP_MODERATOR) == 0)
-		}]]
-	};
-	var b = {
-		1 : LANG.ct_resp_error1,
-		2 : LANG.ct_resp_error2,
-		3 : LANG.ct_resp_error3,
-		7 : LANG.ct_resp_error7
-	};
-	var a = null;
-	this.displayError = function (g, f) {
-		alert(f)
-	};
-	this.onShow = function () {
-		if (location.hash && location.hash != "#contact") {
-			a = location.hash
-		}
-		if (this.data.mode == 0) {
-			location.replace("#contact")
-		}
-	};
-	this.onHide = function () {
-		if (a && (a.indexOf("screenshots:") == -1 || a.indexOf("videos:") == -1)) {
-			location.replace(a)
-		} else {
-			location.replace("#.")
-		}
-	};
-	this.onSubmit = function (k, g, j) {
-		if (k.submitting) {
-			return false
-		}
-		for (var h = 0; h < j.elements.length; ++h) {
-			j.elements[h].disabled = true
-		}
-		var l = ["contact=1", "mode=" + urlencode(k.mode), "reason=" + urlencode(k.reason), "desc=" + urlencode(k.description), "ua=" + urlencode(navigator.userAgent), "appname=" + urlencode(navigator.appName), "page=" + urlencode(k.currenturl)];
-		if (k.mode == 0) {
-			if (k.relatedurl) {
-				l.push("relatedurl=" + urlencode(k.relatedurl))
-			}
-			if (k.email) {
-				l.push("email=" + urlencode(k.email))
-			}
-			if (!k.skipCaptcha) {
-				l.push("captcharesponse=" + urlencode(k.captcha_response));
-				l.push("captchachallenge=" + urlencode(k.captcha_challenge))
-			} else {
-				l.push("skipcaptcha=1")
-			}
-		} else {
-			if (k.mode == 1) {
-				l.push("id=" + urlencode(k.comment.id))
-			} else {
-				if (k.mode == 2) {
-					l.push("id=" + urlencode(k.post.id))
-				} else {
-					if (k.mode == 3) {
-						l.push("id=" + urlencode(k.screenshot.id))
-					} else {
-						if (k.mode == 4) {
-							l.push("id=" + urlencode(k.profile.source))
-						} else {
-							if (k.mode == 5) {
-								l.push("id=" + urlencode(k.video.id))
-							}
-						}
-					}
-				}
-			}
-		}
-		k.submitting = true;
-		var f = "?contactus";
-		new Ajax(f, {
-			method: "POST",
-			params: l.join("&"),
-			onSuccess: function (n, i) {
-				var m = n.responseText;
-				if (m == 0) {
-					if (g_user.name) {
-						alert(sprintf(LANG.ct_dialog_thanks_user, g_user.name))
-					} else {
-						alert(LANG.ct_dialog_thanks)
-					}
-					Lightbox.hide()
-				} else {
-					if (b[m]) {
-						alert(b[m])
-					} else {
-						alert("Error: " + m)
-					}
-				}
-			},
-			onFailure: function (m, i) {
-				alert("Failure submitting contact request: " + m.statusText)
-			},
-			onComplete: function (o, n) {
-				for (var m = 0; m < j.elements.length; ++m) {
-					j.elements[m].disabled = false
-				}
-				k.submitting = false
-			}
-		});
-		return false
-	};
-	this.show = function (f) {
-		if (!f) {
-			f = {}
-		}
-		var h = {
-			mode: 0
-		};
-		cO(h, f);
-		h.reasons = c[h.mode];
-		if (location.href.indexOf("#contact") != -1) {
-			h.currenturl = location.href.substr(0, location.href.indexOf("#contact"))
-		} else {
-			h.currenturl = location.href
-		}
-		var g = "contactus";
-		if (h.mode != 0) {
-			g = "reportform"
-		}
-		if (!d) {
-			this.init()
-		}
-		d.show(g, {
-			data: h,
-			onShow: this.onShow,
-			onHide: this.onHide,
-			onSubmit: this.onSubmit
-		})
-	};
-	this.checkPound = function () {
-		if (location.hash && location.hash == "#contact") {
-			ContactTool.show()
-		}
-	};
-	var e = LANG.ct_dialog_contactwowhead;
-	this.init = function () {
-		d = new Dialog();
-		Dialog.templates.contactus = {
-			title: e,
-			width: 550,
-			buttons: [["okay", LANG.dialog_ok], ["cancel", LANG.dialog_cancel]],
-			fields: [{
-				id: "reason",
-				type: "select",
-				label: LANG.ct_dialog_reason,
-				required: 1,
-				options: [],
-				compute: function (n, p, h, l) {
-					ee(n);
-					for (var m = 0; m < this.data.reasons.length; ++m) {
-						var j = this.data.reasons[m][0];
-						var g = this.data.reasons[m][1];
-						var f = false;
-						if (typeof g == "function") {
-							f = g(this.extra)
-						} else {
-							f = g
-						}
-						if (!f) {
-							continue
-						}
-						var k = ce("option");
-						k.value = j;
-						if (p && p == j) {
-							k.selected = true
-						}
-						ae(k, ct(g_contact_reasons[j]));
-						ae(n, k)
-					}
-					n.onchange = function () {
-						if (this.value == 1 || this.value == 2 || this.value == 3) {
-							h.currenturl.parentNode.parentNode.style.display = "";
-							h.relatedurl.parentNode.parentNode.style.display = ""
-						} else {
-							h.currenturl.parentNode.parentNode.style.display = "none";
-							h.relatedurl.parentNode.parentNode.style.display = "none"
-						}
-					}.bind(n);
-					l.style.width = "98%"
-				},
-				validate: function (i, h, g) {
-					var f = "";
-					if (!i || i.length == 0) {
-						f = LANG.ct_dialog_error_reason
-					}
-					if (f == "") {
-						return true
-					}
-					ContactTool.displayError(g.reason, f);
-					g.reason.focus();
-					return false
-				}
-			},
-			{
-				id: "currenturl",
-				type: "text",
-				disabled: true,
-				label: LANG.ct_dialog_currenturl,
-				size: 40
-			},
-			{
-				id: "relatedurl",
-				type: "text",
-				label: LANG.ct_dialog_relatedurl,
-				caption: LANG.ct_dialog_optional,
-				size: 40,
-				validate: function (j, i, h) {
-					var g = "";
-					var f = /^(http(s?)\:\/\/|\/)?([\w]+:\w+@)?([a-zA-Z]{1}([\w\-]+\.)+([\w]{2,5}))(:[\d]{1,5})?((\/?\w+\/)+|\/?)(\w+\.[\w]{3,4})?((\?\w+=\w+)?(&\w+=\w+)*)?/;
-					j = j.trim();
-					if (j.length >= 250) {
-						g = LANG.ct_dialog_error_relatedurl
-					} else {
-						if (j.length > 0 && !f.test(j)) {
-							g = LANG.ct_dialog_error_invalidurl
-						}
-					}
-					if (g == "") {
-						return true
-					}
-					ContactTool.displayError(h.relatedurl, g);
-					h.relatedurl.focus();
-					return false
-				}
-			},
-			{
-				id: "email",
-				type: "text",
-				label: LANG.ct_dialog_email,
-				caption: LANG.ct_dialog_email_caption,
-				compute: function (j, i, g, k, h) {
-					if (g_user.email) {
-						this.data.email = g_user.email;
-						h.style.display = "none"
-					} else {
-						var f = function () {
-							ge("contact-emailwarn").style.display = g_isEmailValid(ge(g.email).value) ? "none": "";
-							Lightbox.reveal()
-						};
-						ge(j).onkeyup = f;
-						ge(j).onblur = f;
-					}
-				},
-				validate: function (i, h, g) {
-					var f = "";
-					i = i.trim();
-					if (i.length >= 100) {
-						f = LANG.ct_dialog_error_emaillen
-					} else {
-						if (i.length > 0 && !g_isEmailValid(i)) {
-							f = LANG.ct_dialog_error_email
-						}
-					}
-					if (f == "") {
-						return true
-					}
-					ContactTool.displayError(g.email, f);
-					g.email.focus();
-					return false
-				}
-			},
-			{
-				id: "description",
-				type: "textarea",
-				caption: LANG.ct_dialog_desc_caption,
-				width: "98%",
-				required: 1,
-				size: [10, 30],
-				validate: function (i, h, g) {
-					var f = "";
-					i = i.trim();
-					if (i.length == 0 || i.length > 10000) {
-						f = LANG.ct_dialog_error_desc
-					}
-					if (f == "") {
-						return true
-					}
-					ContactTool.displayError(g.description, f);
-					g.description.focus();
-					return false
-				}
-			},
-			{
-				id: "noemailwarning",
-				type: "caption",
-				compute: function (h, g, f, i) {
-					var e = ge(i);
-                    e.innerHTML = '<span id="contact-emailwarn" class="q10"' + (g_user.email ? ' style="display: none"': "") + ">" + LANG.ct_dialog_noemailwarning + "</span>";
-                    e.style.whiteSpace = "normal";
-                    e.style.padding = "0 4px";
-				}
-			},
-        /* Captcha.. why..?
-			{
-				id: "captcha_response",
-				type: "dynamic",
-				compute: function (i, h, f, j, g) {
-					if (!g_requireCaptcha()) {
-						this.data.skipCaptcha = true;
-						return
-					}
-					if (g_captchaType == 1) {
-						ge(j).style.height = "130px";
-					} else {
-						ge(j).style.height = "75px")
-					}
-				},
-				update: function (i, h, f, k, g) {
-					if (this.data.skipCaptcha) {
-						return
-					}
-					var j = $("<div/>", {
-						id: "shjlfwhseo3w"
-					});
-					k = ge(k);
-					ae(k,j);
-					g_revealCaptcha("shjlfwhseo3w")
-				},
-				getValue: function (h, g, f) {
-					if (g_captchaType == 1) {
-						return Recaptcha.get_response()
-					} else {
-						return $("input[name=captcha]", f).val()
-					}
-				},
-				validate: function (i, h, g) {
-					var f = "";
-					if (typeof i == "string") {
-						i = trim(i)
-					}
-					if (!h.skipCaptcha && !i) {
-						f = LANG.ct_dialog_error_captcha
-					}
-					if (f == "") {
-						return true
-					}
-					ContactTool.displayError(null, f);
-					if (g_captchaType == 1) {
-						Recaptcha.focus_response_field()
-					} else {
-						$("input[name=captcha]", g).focus()
-					}
-					return false
-				}
-			},
-			{
-				id: "captcha_challenge",
-				type: "dynamic",
-				compute: function (i, h, f, j, g) {},
-				getValue: function (h, g, f) {
-					if (g_captchaType == 1) {
-						return Recaptcha.get_challenge()
-					} else {
-						return $("input[name=captcha]", f).val()
-					}
-				}
-			}
-        */
+
+var ContactTool = new function () {
+    this.general    = 0;
+    this.comment    = 1;
+    this.post       = 2;
+    this.screenshot = 3;
+    this.character  = 4;
+    this.video      = 5;
+    this.guide      = 6;
+
+    var _dialog;
+
+    var contexts = {
+        0: [ // general
+            [1, true], // General feedback
+            [2, true], // Bug report
+            [8, true], // Article misinformation
+            [3, true], // Typo/mistranslation
+            [4, true], // Advertise with us
+            [5, true], // Partnership opportunities
+            [6, true], // Press inquiry
+            [7, true]  // Other
+        ],
+        1: [ // comment
+            [15, function(post) {
+                return ((post.roles & U_GROUP_MODERATOR) == 0);
+            }], // Advertising
+            [16, true], // Inaccurate
+            [17, true], // Out of date
+            [18, function(post) {
+                return ((post.roles & U_GROUP_MODERATOR) == 0);
+            }], // Spam
+            [19, function(post) {
+                return ((post.roles & U_GROUP_MODERATOR) == 0);
+            }], // Vulgar/inappropriate
+            [20, function(post) {
+                return ((post.roles & U_GROUP_MODERATOR) == 0);
+            }] // Other
+        ],
+        2: [ // forum post
+            [30, function(post) {
+                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0);
+            }], // Advertising
+            [37, function(post) {
+                return ((post.roles & U_GROUP_MODERATOR) == 0 && g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0 && g_users[post.user].avatar == 2);
+            }], // Avatar
+            [31, true], // Inaccurate
+            [32, true], // Out of date
+            [33, function(post) {
+                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0);
+            }], // Spam
+            [34, function(post) {
+                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0 && post.op && !post.sticky);
+            }], // Sticky request
+            [35, function(post) {
+                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0);
+            }], // Vulgar/inappropriate
+            [36, function(post) {
+                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0);
+            }]  // Other
+        ],
+        3: [ // screenshot
+            [45, true], // Inaccurate,
+            [46, true], // Out of date,
+            [47, function(screen) {
+                return (g_users && g_users[screen.user] && (g_users[screen.user].roles & U_GROUP_MODERATOR) == 0);
+            }], // Vulgar/inappropriate
+            [48, function(screen) {
+                return (g_users && g_users[screen.user] && (g_users[screen.user].roles & U_GROUP_MODERATOR) == 0);
+            }]  // Other
+        ],
+        4: [ // character
+            [60, true], // Inaccurate completion data
+            [61, true]  // Other
+        ],
+        5: [ // video
+            [45, true], // Inaccurate,
+            [46, true], // Out of date,
+            [47, function(video) {
+                return (g_users && g_users[video.user] && (g_users[video.user].roles & U_GROUP_MODERATOR) == 0);
+            }], // Vulgar/inappropriate
+            [48, function(video) {
+                return (g_users && g_users[video.user] && (g_users[video.user].roles & U_GROUP_MODERATOR) == 0);
+            }]  // Other
+        ],
+        6: [ // Guide
+            [45, true], // Inaccurate,
+            [46, true], // Out of date,
+            [48, true]  // Other
+        ]
+    };
+
+    var errors = {
+        1 : LANG.ct_resp_error1,
+        2 : LANG.ct_resp_error2,
+        3 : LANG.ct_resp_error3,
+        7 : LANG.ct_resp_error7
+    };
+
+    var oldHash = null;
+
+    this.displayError = function (field, message) {
+        alert(message);
+    };
+
+    this.onShow = function () {
+        if (location.hash && location.hash != '#contact') {
+            oldHash = location.hash;
+        }
+        if (this.data.mode == 0) {
+            location.replace('#contact');
+        }
+    };
+
+    this.onHide = function () {
+        if (oldHash && (oldHash.indexOf('screenshots:') == -1 || oldHash.indexOf('videos:') == -1)) {
+            location.replace(oldHash);
+        }
+        else {
+            location.replace('#.');
+        }
+    };
+
+    this.onSubmit = function (data, button, form) {
+        if (data.submitting) {
+            return false;
+        }
+
+        for (var i = 0; i < form.elements.length; ++i) {
+            form.elements[i].disabled = true;
+        }
+
+        var params = [
+            'contact=1',
+            'mode=' + urlencode(data.mode),
+            'reason=' + urlencode(data.reason),
+            'desc=' + urlencode(data.description),
+            'ua=' + urlencode(navigator.userAgent),
+            'appname=' + urlencode(navigator.appName),
+            'page=' + urlencode(data.currenturl)
+        ];
+
+        if (data.mode == 0) { // contact us
+            if (data.relatedurl) {
+                params.push('relatedurl=' + urlencode(data.relatedurl));
+            }
+            if (data.email) {
+                params.push('email=' + urlencode(data.email));
+            }
+        }
+        else if (data.mode == 1) { // comment
+            params.push('id=' + urlencode(data.comment.id));
+        }
+        else if (data.mode == 2) { // forum post
+            params.push('id=' + urlencode(data.post.id));
+        }
+        else if (data.mode == 3) { // screenshot
+            params.push('id=' + urlencode(data.screenshot.id));
+        }
+        else if (data.mode == 4) { // character
+            params.push('id=' + urlencode(data.profile.source));
+        }
+        else if (data.mode == 5) { // video
+            params.push('id=' + urlencode(data.video.id));
+        }
+        else if (data.mode == 6) { // guide
+            params.push('id=' + urlencode(data.guide.id));
+        }
+
+        data.submitting = true;
+        var url = '?contactus';
+        new Ajax(url, {
+            method: 'POST',
+            params: params.join('&'),
+            onSuccess: function (xhr, opt) {
+                var resp = xhr.responseText;
+                if (resp == 0) {
+                    if (g_user.name) {
+                        alert(sprintf(LANG.ct_dialog_thanks_user, g_user.name));
+                    }
+                    else {
+                        alert(LANG.ct_dialog_thanks);
+                    }
+                    Lightbox.hide();
+                }
+                else {
+                    if (errors[resp]) {
+                        alert(errors[resp]);
+                    }
+                    else {
+                        alert('Error: ' + resp);
+                    }
+                }
+            },
+            onFailure: function (xhr, opt) {
+                alert('Failure submitting contact request: ' + xhr.statusText);
+            },
+            onComplete: function (xhr, opt) {
+                for (var i = 0; i < form.elements.length; ++i) {
+                    form.elements[i].disabled = false;
+                }
+                data.submitting = false;
+            }
+        });
+        return false;
+    };
+
+    this.show = function (opt) {
+        if (!opt) {
+            opt = {};
+        }
+        var data = { mode: 0 };
+        cO(data, opt);
+        data.reasons = contexts[data.mode];
+        if (location.href.indexOf('#contact') != -1) {
+            data.currenturl = location.href.substr(0, location.href.indexOf('#contact'));
+        }
+        else {
+            data.currenturl = location.href;
+        }
+        var form = 'contactus';
+        if (data.mode != 0) {
+            form = 'reportform';
+        }
+
+        if (!_dialog) {
+            this.init();
+        }
+
+        _dialog.show(form, {
+            data: data,
+            onShow: this.onShow,
+            onHide: this.onHide,
+            onSubmit: this.onSubmit
+        })
+    };
+
+    this.checkPound = function () {
+        if (location.hash && location.hash == '#contact') {
+            ContactTool.show();
+        }
+    };
+
+    var dialog_contacttitle = LANG.ct_dialog_contactwowhead;
+
+    this.init = function () {
+        _dialog = new Dialog();
+
+        Dialog.templates.contactus = {
+            title: dialog_contacttitle,
+            width: 550,
+            buttons: [['okay', LANG.dialog_ok], ['cancel', LANG.dialog_cancel]],
+
+            fields: [
+                {
+                    id: 'reason',
+                    type: 'select',
+                    label: LANG.ct_dialog_reason,
+                    required: 1,
+                    options: [],
+                    compute: function (field, value, form, td) {
+                        ee(field);
+
+                        for (var i = 0; i < this.data.reasons.length; ++i) {
+                            var id = this.data.reasons[i][0];
+                            var check = this.data.reasons[i][1];
+                            var valid = false;
+                            if (typeof check == 'function') {
+                                valid = check(this.extra);
+                            }
+                            else {
+                                valid = check;
+                            }
+
+                            if (!valid) {
+                                continue;
+                            }
+
+                            var o = ce('option');
+                            o.value = id;
+                            if (value && value == id) {
+                                o.selected = true;
+                            }
+                            ae(o, ct(g_contact_reasons[id]));
+                            ae(field, o);
+                        }
+
+                        field.onchange = function () {
+                            if (this.value == 1 || this.value == 2 || this.value == 3) {
+                                form.currenturl.parentNode.parentNode.style.display = '';
+                                form.relatedurl.parentNode.parentNode.style.display = '';
+                            }
+                            else {
+                                form.currenturl.parentNode.parentNode.style.display = 'none';
+                                form.relatedurl.parentNode.parentNode.style.display = 'none';
+                            }
+                        }.bind(field);
+
+                        td.style.width = '98%';
+                    },
+                    validate: function (newValue, data, form) {
+                        var error = '';
+                        if (!newValue || newValue.length == 0) {
+                            error = LANG.ct_dialog_error_reason;
+                        }
+
+                        if (error == '') {
+                            return true;
+                        }
+
+                        ContactTool.displayError(form.reason, error);
+                        form.reason.focus();
+                        return false;
+                    }
+                },
+                {
+                    id: 'currenturl',
+                    type: 'text',
+                    disabled: true,
+                    label: LANG.ct_dialog_currenturl,
+                    size: 40
+                },
+                {
+                    id: 'relatedurl',
+                    type: 'text',
+                    label: LANG.ct_dialog_relatedurl,
+                    caption: LANG.ct_dialog_optional,
+                    size: 40,
+                    validate: function (newValue, data, form) {
+                        var error = '';
+                        var urlRe = /^(http(s?)\:\/\/|\/)?([\w]+:\w+@)?([a-zA-Z]{1}([\w\-]+\.)+([\w]{2,5}))(:[\d]{1,5})?((\/?\w+\/)+|\/?)(\w+\.[\w]{3,4})?((\?\w+=\w+)?(&\w+=\w+)*)?/;
+                        newValue = newValue.trim();
+                        if (newValue.length >= 250) {
+                            error = LANG.ct_dialog_error_relatedurl;
+                        }
+                        else if (newValue.length > 0 && !urlRe.test(newValue)) {
+                            error = LANG.ct_dialog_error_invalidurl;
+                        }
+
+                        if (error == '') {
+                            return true;
+                        }
+
+                        ContactTool.displayError(form.relatedurl, error);
+                        form.relatedurl.focus();
+                        return false;
+                    }
+                },
+                {
+                    id: 'email',
+                    type: 'text',
+                    label: LANG.ct_dialog_email,
+                    caption: LANG.ct_dialog_email_caption,
+                    compute: function (field, value, form, td, tr) {
+                        if (g_user.email) {
+                            this.data.email = g_user.email;
+                            tr.style.display = 'none';
+                        }
+                        else {
+                            var func = function () {
+                                ge('contact-emailwarn').style.display = g_isEmailValid(ge(form.email).value) ? 'none' : '';
+                                Lightbox.reveal();
+                            };
+
+                            ge(field).onkeyup = func;
+                            ge(field).onblur = func;
+                        }
+                    },
+                    validate: function (newValue, data, form) {
+                        var error = '';
+                        newValue = newValue.trim();
+                        if (newValue.length >= 100) {
+                            error = LANG.ct_dialog_error_emaillen;
+                        }
+                        else if (newValue.length > 0 && !g_isEmailValid(newValue)) {
+                            error = LANG.ct_dialog_error_email;
+                        }
+
+                        if (error == '') {
+                            return true;
+                        }
+
+                        ContactTool.displayError(form.email, error);
+                        form.email.focus();
+                        return false;
+                    }
+                },
+                {
+                    id: 'description',
+                    type: 'textarea',
+                    caption: LANG.ct_dialog_desc_caption,
+                    width: '98%',
+                    required: 1,
+                    size: [10, 30],
+                    validate: function (newValue, data, form) {
+                        var error = '';
+                        newValue = newValue.trim();
+                        if (newValue.length == 0 || newValue.length > 10000) {
+                            error = LANG.ct_dialog_error_desc;
+                        }
+
+                        if (error == '') {
+                            return true;
+                        }
+
+                        ContactTool.displayError(form.description, error);
+                        form.description.focus();
+                        return false;
+                    }
+                },
+                {
+                    id: 'noemailwarning',
+                    type: 'caption',
+                    compute: function (field, value, form, td) {
+                        var td = ge(td);
+                        td.innerHTML = '<span id="contact-emailwarn" class="q10"' + (g_user.email ? ' style="display: none"' : '') + '>' + LANG.ct_dialog_noemailwarning + '</span>';
+                        td.style.whiteSpace = 'normal';
+                        td.style.padding = '0 4px';
+                    }
+                }
             ],
-			onInit: function (f) {},
-			onShow: function (f) {
-				if (this.data.focus && f[this.data.focus]) {
-					setTimeout(g_setCaretPosition.bind(null, f[this.data.focus], f[this.data.focus].value.length), 100)
-				} else {
-					if (f.reason && !f.reason.value) {
-						setTimeout(bindfunc(f.reason.focus, f.reason), 10)
-					} else {
-						if (f.relatedurl && !f.relatedurl.value) {
-							setTimeout(bindfunc(f.relatedurl.focus, f.relatedurl), 10)
-						} else {
-							if (f.email && !f.email.value) {
-								setTimeout(bindfunc(f.email.focus, f.email), 10)
-							} else {
-								if (f.description && !f.description.value) {
-									setTimeout(bindfunc(f.description.focus, f.description), 10)
-								} else {
-									if (f.captcha && !f.captcha.value) {
-										setTimeout(bindfunc(f.captcha.focus, f.captcha), 10)
-									}
-								}
-							}
-						}
-					}
-				}
-				setTimeout(Lightbox.reveal, 250)
-			}
-		};
-		Dialog.templates.reportform = {
-			title: LANG.ct_dialog_report,
-			width: 550,
-            height: 360,
-			buttons: [["okay", LANG.dialog_ok], ["cancel", LANG.dialog_cancel]],
-			fields: [{
-				id: "reason",
-				type: "select",
-				label: LANG.ct_dialog_reason,
-				options: [],
-				compute: function (q, r, h, m) {
-					switch (this.data.mode) {
-					case 1:
-						h.firstChild.innerHTML = sprintf(LANG.ct_dialog_reportcomment, '<a href="?user=' + this.data.comment.user + '">' + this.data.comment.user + "</a>");
-						break;
-					case 2:
-						var p = '<a href="?user=' + this.data.post.user + '">' + this.data.post.user + "</a>";
-						if (this.data.post.op) {
-							h.firstChild.innerHTML = sprintf(LANG.ct_dialog_reporttopic, p)
-						} else {
-							h.firstChild.innerHTML = sprintf(LANG.ct_dialog_reportpost, p)
-						}
-						break;
-					case 3:
-						h.firstChild.innerHTML = sprintf(LANG.ct_dialog_reportscreen, '<a href="?user=' + this.data.screenshot.user + '">' + this.data.screenshot.user + "</a>");
-						break;
-					case 4:
-						ee(h.firstChild);
-						ae(h.firstChild, ct(LANG.ct_dialog_reportchar));
-						break;
-					case 5:
-						h.firstChild.innerHTML = sprintf(LANG.ct_dialog_reportvideo, '<a href="?user=' + this.data.video.user + '">' + this.data.video.user + "</a>");
-						break
-					}
-					h.firstChild.setAttribute("style", "");
-					ee(q);
-					var l;
-					if (this.data.mode == 1) {
-						l = this.data.comment
-					} else {
-						if (this.data.mode == 2) {
-							l = this.data.post
-						} else {
-							if (this.data.mode == 3) {
-								l = this.data.screenshot
-							} else {
-								if (this.data.mode == 4) {
-									l = this.data.profile
-								} else {
-									if (this.data.mode == 5) {
-										l = this.data.video
-									}
-								}
-							}
-						}
-					}
-					ae(q, ce("option", {
-						selected: (!r),
-						value: -1
-					}));
-					for (var n = 0; n < this.data.reasons.length; ++n) {
-						var j = this.data.reasons[n][0];
-						var g = this.data.reasons[n][1];
-						var f = false;
-						if (typeof g == "function") {
-							f = g(l)
-						} else {
-							f = g
-						}
-						if (!f) {
-							continue
-						}
-						var k = ce("option");
-						k.value = j;
-						if (r && r == j) {
-							k.selected = true
-						}
-						ae(k, ct(g_contact_reasons[j]));
-						ae(q, k)
-					}
-					m.style.width = "98%"
-				},
-				validate: function (i, h, g) {
-					var f = "";
-					if (!i || i == -1 || i.length == 0) {
-						f = LANG.ct_dialog_error_reason
-					}
-					if (f == "") {
-						return true
-					}
-					ContactTool.displayError(g.reason, f);
-					g.reason.focus();
-					return false
-				}
-			},
-			{
-				id: "description",
-				type: "textarea",
-				caption: LANG.ct_dialog_desc_caption,
-				width: "98%",
-				required: 1,
-				size: [10, 30],
-				validate: function (i, h, g) {
-					var f = "";
-					i = i.trim();
-					if (i.length == 0 || i.length > 10000) {
-						f = LANG.ct_dialog_error_desc
-					}
-					if (f == "") {
-						return true
-					}
-					ContactTool.displayError(g.description, f);
-					g.description.focus();
-					return false
-				}
-			}],
-			onInit: function (f) {},
-			onShow: function (g) {
-				var h = gE(g, 'select')[0];
-				var f = gE(g, 'textarea')[0];
-				if (this.data.focus && g[this.data.focus]) {
-					setTimeout(g_setCaretPosition.bind(null, g[this.data.focus], g[this.data.focus].value.length), 100)
-				} else {
-					if (!h.value) {
-						setTimeout(bindfunc(h.focus, h), 10)
-					} else {
-						if (!f.value) {
-							setTimeout(bindfunc(f.focus, f), 10)
-						}
-					}
-				}
-			}
-		}
-	};
-	DomContentLoaded.addEvent(this.checkPound)
+
+            onInit: function (form) { },
+
+            onShow: function (form) {
+                if (this.data.focus && form[this.data.focus]) {
+                    setTimeout(g_setCaretPosition.bind(null, form[this.data.focus], form[this.data.focus].value.length), 100);
+                }
+                else if (form['reason'] && !form.reason.value) {
+                    setTimeout(bindfunc(form.reason.focus, form.reason), 10);
+                }
+                else if (form['relatedurl'] && !form.relatedurl.value) {
+                    setTimeout(bindfunc(form.relatedurl.focus, form.relatedurl), 10);
+                }
+                else if (form['email'] && !form.email.value) {
+                    setTimeout(bindfunc(form.email.focus, form.email), 10);
+                }
+                else if (form['description'] && !form.description.value) {
+                    setTimeout(bindfunc(form.description.focus, form.description), 10);
+                }
+
+                setTimeout(Lightbox.reveal, 250);
+            }
+        };
+
+        Dialog.templates.reportform = {
+            title: LANG.ct_dialog_report,
+            width: 550,
+            // height: 360,
+            buttons: [['okay', LANG.dialog_ok], ['cancel', LANG.dialog_cancel]],
+            fields: [
+                {
+                    id: 'reason',
+                    type: 'select',
+                    label: LANG.ct_dialog_reason,
+                    options: [],
+                    compute: function (field, value, form, td) {
+                        switch (this.data.mode) {
+                            case 1: // comment
+                                form.firstChild.innerHTML = sprintf(LANG.ct_dialog_reportcomment, '<a href="?user=' + this.data.comment.user + '">' + this.data.comment.user + '</a>');
+                                break;
+                            case 2: // forum post
+                                var rep = '<a href="?user=' + this.data.post.user + '">' + this.data.post.user + '</a>';
+                                if (this.data.post.op) {
+                                    form.firstChild.innerHTML = sprintf(LANG.ct_dialog_reporttopic, rep);
+                                }
+                                else {
+                                    form.firstChild.innerHTML = sprintf(LANG.ct_dialog_reportpost, rep);
+                                }
+                                break;
+                            case 3: // screenshot
+                                form.firstChild.innerHTML = sprintf(LANG.ct_dialog_reportscreen, '<a href="?user=' + this.data.screenshot.user + '">' + this.data.screenshot.user + '</a>');
+                                break;
+                            case 4: // character
+                                ee(form.firstChild);
+                                ae(form.firstChild, ct(LANG.ct_dialog_reportchar));
+                                break;
+                            case 5: // video
+                                form.firstChild.innerHTML = sprintf(LANG.ct_dialog_reportvideo, '<a href="?user=' + this.data.video.user + '">' + this.data.video.user + '</a>');
+                                break;
+                            case 6: // guide
+                                form.firstChild.innerHTML = 'Report guide';
+                                break;
+                        }
+                        form.firstChild.setAttribute('style', '');
+
+                        ee(field);
+
+                        var extra;
+                        if (this.data.mode == 1) {
+                            extra = this.data.comment;
+                        }
+                        else if (this.data.mode == 2) {
+                            extra = this.data.post;
+                        }
+                        else if (this.data.mode == 3) {
+                            extra = this.data.screenshot;
+                        }
+                        else if (this.data.mode == 4) {
+                            extra = this.data.profile;
+                        }
+                        else if (this.data.mode == 5) {
+                            extra = this.data.video;
+                        }
+                        else if (this.data.mode == 6) {
+                            extra = this.data.guide;
+                        }
+
+                        ae(field, ce('option', { selected: (!value), value: -1 }));
+
+                        for (var i = 0; i < this.data.reasons.length; ++i) {
+                            var id = this.data.reasons[i][0];
+                            var check = this.data.reasons[i][1];
+                            var valid = false;
+                            if (typeof check == 'function') {
+                                valid = check(extra);
+                            }
+                            else {
+                                valid = check;
+                            }
+
+                            if (!valid) {
+                                continue;
+                            }
+
+                            var o = ce('option');
+                            o.value = id;
+                            if (value && value == id) {
+                                o.selected = true;
+                            }
+
+                            ae(o, ct(g_contact_reasons[id]));
+                            ae(field, o);
+                        }
+
+                        td.style.width = '98%';
+                    },
+                    validate: function (newValue, data, form) {
+                        var error = '';
+                        if (!newValue || newValue == -1 || newValue.length == 0) {
+                            error = LANG.ct_dialog_error_reason;
+                        }
+
+                        if (error == '') {
+                            return true;
+                        }
+
+                        ContactTool.displayError(form.reason, error);
+                        form.reason.focus();
+                        return false;
+                    }
+                },
+                {
+                    id: 'description',
+                    type: 'textarea',
+                    caption: LANG.ct_dialog_desc_caption,
+                    width: '98%',
+                    required: 1,
+                    size: [10, 30],
+                    validate: function (newValue, data, form) {
+                        var error = '';
+                        newValue = newValue.trim();
+                        if (newValue.length == 0 || newValue.length > 10000) {
+                            error = LANG.ct_dialog_error_desc;
+                        }
+
+                        if (error == '') {
+                            return true;
+                        }
+
+                        ContactTool.displayError(form.description, error);
+                        form.description.focus();
+                        return false;
+                    }
+                }
+            ],
+
+            onInit: function (form) {},
+
+            onShow: function (form) {
+                /* Work-around for IE7 */
+                var reason = gE(form, 'select')[0];
+                var description = gE(form, 'textarea')[0];
+
+                if (this.data.focus && form[this.data.focus]) {
+                    setTimeout(g_setCaretPosition.bind(null, form[this.data.focus], form[this.data.focus].value.length), 100);
+                }
+                else if (!reason.value) {
+                    setTimeout(bindfunc(reason.focus, reason), 10);
+                }
+                else if (!description.value) {
+                    setTimeout(bindfunc(description.focus, description), 10);
+                }
+            }
+        }
+    };
+
+    DomContentLoaded.addEvent(this.checkPound);
 };
 
-var Links = new function()
-{
-	var dialog = null;
-	var oldHash = null;
+var Links = new function() {
+    var dialog  = null;
+    var oldHash = null;
 
-	var validArmoryTypes = {
-		item: 1
-	};
+    var validArmoryTypes = {
+        item: 1
+    };
 
-	this.onShow = function()
-	{
-		if(location.hash && location.hash != '#links')
-			oldHash = location.hash;
-		location.replace('#links');
-	}
+    this.onShow = function() {
+        if (location.hash && location.hash != '#links') {
+            oldHash = location.hash;
+        }
 
-	this.onHide = function()
-	{
-		if(oldHash && (oldHash.indexOf('screenshots:') == -1 || oldHash.indexOf('videos:') == -1))
-			location.replace(oldHash);
-		else
-			location.replace('#.');
-	}
+        location.replace('#links');
+    }
 
-	this.show = function(opt)
-	{
-		if (!opt || !opt.type || !opt.typeId)
-			return;
+    this.onHide = function() {
+        if (oldHash && (oldHash.indexOf('screenshots:') == -1 || oldHash.indexOf('videos:') == -1)) {
+            location.replace(oldHash);
+        }
+        else {
+            location.replace('#.');
+        }
+    }
 
-		var type = g_types[opt.type];
+    this.show = function(opt) {
+        if (!opt || !opt.type || !opt.typeId) {
+            return;
+        }
 
-		if(!dialog)
-			this.init();
+        var type = g_types[opt.type];
 
-		if (validArmoryTypes[type] && Dialog.templates.links.fields[1].id != 'armoryurl')
-		{
-			Dialog.templates.links.fields.splice(1, 0, {
-				id: 'armoryurl',
-				type: 'text',
-				label: 'Armory URL',
-				size: 40
-			});
-		}
+        if (!dialog) {
+            this.init();
+        }
 
-		var link = '';
-		if (opt.linkColor && opt.linkId && opt.linkName)
-		{
-			link = g_getIngameLink(opt.linkColor, opt.linkId, opt.linkName);
+        if (validArmoryTypes[type] && Dialog.templates.links.fields[1].id != 'armoryurl') {
+            Dialog.templates.links.fields.splice(1, 0, {
+                id: 'armoryurl',
+                type: 'text',
+                label: 'Armory URL',
+                size: 40
+            });
+        }
 
-			if (Dialog.templates.links.fields[Dialog.templates.links.fields.length - 2].id != 'ingamelink')
-			{
-				Dialog.templates.links.fields.splice(Dialog.templates.links.fields.length - 1, 0, {
-					id: 'ingamelink',
-					type: 'text',
-					label: 'Ingame Link',
-					size: 40
-				});
-			}
-		}
+        var link = '';
+        if (opt.linkColor && opt.linkId && opt.linkName) {
+            link = g_getIngameLink(opt.linkColor, opt.linkId, opt.linkName);
 
-		var data = {
-			'wowheadurl': g_staticUrl +'?' + type + '=' + opt.typeId,
-			'armoryurl': 'http://us.battle.net/wow/en/' + type + '/' + opt.typeId,
-			'ingamelink': link,
-			'markuptag': '[' + type + '=' + opt.typeId + ']'
-		};
+            if (Dialog.templates.links.fields[Dialog.templates.links.fields.length - 2].id != 'ingamelink') {
+                Dialog.templates.links.fields.splice(Dialog.templates.links.fields.length - 1, 0, {
+                    id: 'ingamelink',
+                    type: 'text',
+                    label: 'Ingame Link',
+                    size: 40
+                });
+            }
+        }
 
-		dialog.show('links', {
+        var data = {
+            'wowheadurl': g_staticUrl +'?' + type + '=' + opt.typeId,
+            'armoryurl': 'http://us.battle.net/wow/en/' + type + '/' + opt.typeId,
+            'ingamelink': link,
+            'markuptag': '[' + type + '=' + opt.typeId + ']'
+        };
+
+        dialog.show('links', {
             data: data,
             onShow: this.onShow,
             onHide: this.onHide,
@@ -15558,180 +16114,180 @@ var Links = new function()
                 return false;
             }
         });
-	}
+    }
 
-	this.checkPound = function()
-	{
-		if(location.hash && location.hash == '#links')
-		{
-			ge('open-links-button').click();
-		}
-	}
+    this.checkPound = function() {
+        if (location.hash && location.hash == '#links') {
+            ge('open-links-button').click();
+        }
+    }
 
-	this.init = function()
-	{
-		dialog = new Dialog();
+    this.init = function() {
+        dialog = new Dialog();
 
-		Dialog.templates.links = {
-			title: LANG.pr_menu_links || 'Links',
-			width: 425,
-			buttons: [['cancel', LANG.close]],
+        Dialog.templates.links = {
+            title: LANG.pr_menu_links || 'Links',
+            width: 425,
+            buttons: [['cancel', LANG.close]],
 
-			fields:
-				[
-					{
-						id: 'wowheadurl',
-						type: 'text',
-						label: 'Aowow URL',
-						size: 40
-					},
-					{
-						id: 'markuptag',
-						type: 'text',
-						label: 'Markup Tag',
-						size: 40
-					}
-				],
+            fields:
+                [
+                    {
+                        id: 'wowheadurl',
+                        type: 'text',
+                        label: 'Aowow URL',
+                        size: 40
+                    },
+                    {
+                        id: 'markuptag',
+                        type: 'text',
+                        label: 'Markup Tag',
+                        size: 40
+                    }
+                ],
 
-			onInit: function(form)
-			{
+            onInit: function(form) {
 
-			},
+            },
 
-			onShow: function(form)
-			{
-				setTimeout(function() {
-					document.getElementsByName('ingamelink')[0].select();
-				}, 50);
-				setTimeout(Lightbox.reveal, 100);
-			}
-		};
-	};
+            onShow: function(form) {
+                setTimeout(function() {
+                    document.getElementsByName('ingamelink')[0].select();
+                }, 50);
+                setTimeout(Lightbox.reveal, 100);
+            }
+        };
+    };
 
-	DomContentLoaded.addEvent(this.checkPound)
+    DomContentLoaded.addEvent(this.checkPound)
 };
 
-var Announcement = function(opt)
-{
-	if (!opt)
-		opt = {};
+var Announcement = function(opt) {
+    if (!opt) {
+        opt = {};
+    }
 
-	cO(this, opt);
+    cO(this, opt);
 
-	if (this.parent)
-		this.parentDiv = ge(this.parent);
-	else
-		return;
+    if (this.parent) {
+        this.parentDiv = ge(this.parent);
+    }
+    else {
+        return;
+    }
 
-	if (g_user.id == 0 && gc('announcement-' + this.id) == 'closed')
-		return;
+    if (g_user.id == 0 && gc('announcement-' + this.id) == 'closed') {
+        return;
+    }
 
-	this.initialize();
+    this.initialize();
 };
 
 Announcement.prototype = {
-	initialize: function()
-	{
-		// this.parentDiv.style.display = 'none';
-		this.parentDiv.style.opacity = '0';
-		// this.parentDiv.style.height = '0px';
+    initialize: function() {
+        // this.parentDiv.style.display = 'none';
+        this.parentDiv.style.opacity = '0';
+        // this.parentDiv.style.height = '0px';
         /* replaced with..*/
 
-		if (this.mode === undefined || this.mode == 1)
-			this.parentDiv.className = 'announcement announcement-contenttop';
-		else
-			this.parentDiv.className = 'announcement announcement-pagetop';
+        if (this.mode === undefined || this.mode == 1)
+            this.parentDiv.className = 'announcement announcement-contenttop';
+        else
+            this.parentDiv.className = 'announcement announcement-pagetop';
 
-		var div = this.innerDiv = ce('div');
-		div.className = 'announcement-inner text';
-		this.setStyle(this.style);
+        var div = this.innerDiv = ce('div');
+        div.className = 'announcement-inner text';
+        this.setStyle(this.style);
 
-		var a = null;
-		var id = parseInt(this.id);
+        var a = null;
+        var id = parseInt(this.id);
 
-		if(g_user && (g_user.roles & (U_GROUP_ADMIN|U_GROUP_BUREAU)) > 0 && Math.abs(id) > 0)
-		{
-			if(id < 0)
-			{
-				a = ce('a');
-				a.style.cssFloat = a.style.styleFloat = 'right';
-				a.href = '?admin=announcements&id=' + Math.abs(id) + '&status=2';
-				a.onclick = function() { return confirm('Are you sure you want to delete ' + this.name + '?'); };
-				ae(a, ct('Delete'));
-				var small = ce('small');
-				ae(small, a);
-				ae(div, small);
+        if (g_user && (g_user.roles & (U_GROUP_ADMIN|U_GROUP_BUREAU)) > 0 && Math.abs(id) > 0) {
+            if (id < 0) {
+                a = ce('a');
+                a.style.cssFloat = a.style.styleFloat = 'right';
+                a.href = '?admin=announcements&id=' + Math.abs(id) + '&status=2';
+                a.onclick = function() {
+                    return confirm('Are you sure you want to delete ' + this.name + '?');
+                };
+                ae(a, ct('Delete'));
+                var small = ce('small');
+                ae(small, a);
+                ae(div, small);
 
-				a = ce('a');
-				a.style.cssFloat = a.style.styleFloat = 'right';
-				a.style.marginRight = '10px';
-				a.href = '?admin=announcements&id=' + Math.abs(id) + '&status=' + (this.status == 1 ? 0 : 1);
-				a.onclick = function() { return confirm('Are you sure you want to delete ' + this.name + '?'); };
-				ae(a, ct((this.status == 1 ? 'Disable' : 'Enable')));
-				var small = ce('small');
-				ae(small, a);
-				ae(div, small);
-			}
+                a = ce('a');
+                a.style.cssFloat = a.style.styleFloat = 'right';
+                a.style.marginRight = '10px';
+                a.href = '?admin=announcements&id=' + Math.abs(id) + '&status=' + (this.status == 1 ? 0 : 1);
+                a.onclick = function() {
+                    return confirm('Are you sure you want to delete ' + this.name + '?');
+                };
+                ae(a, ct((this.status == 1 ? 'Disable' : 'Enable')));
+                var small = ce('small');
+                ae(small, a);
+                ae(div, small);
+            }
 
-			a = ce('a');
-			a.style.cssFloat = a.style.styleFloat = 'right';
-			a.style.marginRight = '22px';
-			a.href = '?admin=announcements&id=' + Math.abs(id) + '&edit';
-			ae(a, ct('Edit announcement'));
-			var small = ce('small');
-			ae(small, a);
-			ae(div, small);
-		}
+            a = ce('a');
+            a.style.cssFloat = a.style.styleFloat = 'right';
+            a.style.marginRight = '22px';
+            a.href = '?admin=announcements&id=' + Math.abs(id) + '&edit';
+            ae(a, ct('Edit announcement'));
+            var small = ce('small');
+            ae(small, a);
+            ae(div, small);
+        }
 
-		var markupDiv = ce('div');
-		markupDiv.id = this.parent + '-markup';
-		ae(div, markupDiv);
+        var markupDiv = ce('div');
+        markupDiv.id = this.parent + '-markup';
+        ae(div, markupDiv);
 
-		if(id >= 0)
-		{
-			a = ce('a');
+        if (id >= 0) {
+            a = ce('a');
 
-			a.id = 'closeannouncement';
-			a.href = 'javascript:;';
-			a.className = 'announcement-close';
-			if(this.nocookie)
-				a.onclick = this.hide.bind(this);
-			else
-				a.onclick = this.markRead.bind(this);
-			ae(div, a);
-			g_addTooltip(a, LANG.close);
-		}
+            a.id = 'closeannouncement';
+            a.href = 'javascript:;';
+            a.className = 'announcement-close';
+            if (this.nocookie) {
+                a.onclick = this.hide.bind(this);
+            }
+            else {
+                a.onclick = this.markRead.bind(this);
+            }
+            ae(div, a);
+            g_addTooltip(a, LANG.close);
+        }
 
-		ae(div, ce('div', { style: { clear: 'both' } }));
+        ae(div, ce('div', { style: { clear: 'both' } }));
 
-		ae(this.parentDiv, div);
+        ae(this.parentDiv, div);
 
-		this.setText(this.text);
+        this.setText(this.text);
 
-		setTimeout(this.show.bind(this), 500); // Delay to avoid visual lag
-	},
-	show: function()
-	{
-		// $(this.parentDiv).animate({
-			// opacity: 'show',
-			// height: 'show'
-		// },{
-			// duration: 333
-		// });
+        setTimeout(this.show.bind(this), 500); // Delay to avoid visual lag
+    },
+
+    show: function() {
+        // $(this.parentDiv).animate({
+            // opacity: 'show',
+            // height: 'show'
+        // },{
+            // duration: 333
+        // });
         // this.parentDiv.style.display = 'block';
 
         // todo: iron out the quirks
         this.parentDiv.style.opacity = '100';
         this.parentDiv.style.height = (this.parentDiv.offsetHeight + 10) + 'px'; // + margin-bottom of child
-	},
-	hide: function()
-	{
-		// $(this.parentDiv).animate({
-			// opacity: 'hide',
-			// height: 'hide'
-		// },{
-			// duration: 200
-		// });
+    },
+
+    hide: function() {
+        // $(this.parentDiv).animate({
+            // opacity: 'hide',
+            // height: 'hide'
+        // },{
+            // duration: 200
+        // });
         // this.parentDiv.style.display = 'none';
 
         // todo: iron out the quirks
@@ -15740,22 +16296,22 @@ Announcement.prototype = {
         setTimeout(function() {
             this.parentDiv.style.display = 'none';
         }.bind(this), 400);
-	},
-	markRead: function()
-	{
-		// g_setWowheadCookie('announcement-' + this.id, 'closed');
-		sc('announcement-' + this.id, 20, 'closed', "/", location.hostname);
-		this.hide();
-	},
-	setStyle: function(style)
-	{
-		this.style = style;
-		this.innerDiv.setAttribute('style', style);
-	},
-	setText: function(text)
-	{
-		this.text = text;
-		// Markup.printHtml(this.text, this.parent + '-markup');
+    },
+
+    markRead: function() {
+        // g_setWowheadCookie('announcement-' + this.id, 'closed');
+        sc('announcement-' + this.id, 20, 'closed', "/", location.hostname);
+        this.hide();
+    },
+
+    setStyle: function(style) {
+        this.style = style;
+        this.innerDiv.setAttribute('style', style);
+    },
+
+    setText: function(text) {
+        this.text = text;
+        // Markup.printHtml(this.text, this.parent + '-markup');
         ge(this.parent + '-markup').innerHTML = this.text;
-	}
+    }
 };
