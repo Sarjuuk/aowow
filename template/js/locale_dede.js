@@ -727,9 +727,9 @@ var mn_holidays = [
 	[3,"Spieler vs. Spieler","?events=3"]
 ];
 var mn_currencies = [
-	[22,"Dungeon und Schlachtzug"],
-	[2,"Spieler gegen Spieler"],
-	[1,"Verschiedenes"]
+	[22,"Dungeon und Schlachtzug","?currencies=22"],
+	[2,"Spieler gegen Spieler","?currencies=2"],
+	[1,"Verschiedenes","?currencies=1"]
 ];
 var mn_talentCalc = [
 	[6,"Todesritter","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
@@ -2046,6 +2046,16 @@ var g_holiday_categories = {
 	3:"Spieler vs. Spieler",
 	0:"Nicht kategorisiert"
 };
+var g_currency_categories = {
+	"1":"Verschiedenes",
+	"2":"Spieler gegen Spieler",
+	"3":"Unbenutzt",
+	"4":"Classic",
+	"21":"Wrath of the Lich King",
+	"22":"Dungeon und Schlachtzug",
+	"23":"Burning Crusade",
+	"41":"Test"
+};
 var g_user_roles = {
 	1:"Tester",
 	2:"Administrator",
@@ -2499,6 +2509,7 @@ var LANG = {
 	tab_createdby: "Erstellt durch",
 	tab_criteriaof: "Voraussetzung f\u00fcr",
 	tab_currencyfor: "W\u00e4hrung f\u00fcr",
+	tab_currencies: "Währungen",
 	tab_disenchantedfrom: "Entzaubert aus",
 	tab_disenchanting: "Entzaubern",
 	tab_droppedby: "Gedroppt von",
@@ -3178,5 +3189,6 @@ var LANG = {
     tooltip_removefocus: "Fokus entfernen",
     tooltip_gains: "Boni, die oberhalb der gemeinsamen<br />Grundwerte aller Spalten liegen.",
     message_deleteitem: "$1 löschen?",
-    message_deletegroup: "Diese Gruppe löschen?"
+    message_deletegroup: "Diese Gruppe löschen?",
+	calculators: "Rechner",
 };

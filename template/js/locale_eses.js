@@ -608,7 +608,7 @@ var mn_achievements = [
         [131,"Social"],
         [21,"Jugador contra Jugador",,[[152,"Arenas puntuadas"],[153,"Campos de batalla"],[154,"Mundo"]]]
     ]]
-];var mn_holidays = [	[1,"Vacacionales","?events=1"],	[2,"Periódicos","?events=2"],	[3,"Jugador contra Jugador","?events=3"]];var mn_currencies = [    [22,"Mazmorra y banda"],    [1,"Miscelánea"],    [2,"Jugador contra Jugador"]
+];var mn_holidays = [	[1,"Vacacionales","?events=1"],	[2,"Periódicos","?events=2"],	[3,"Jugador contra Jugador","?events=3"]];var mn_currencies = [    [22,"Mazmorra y banda","?currencies=22"],    [1,"Miscelánea","?currencies=1"],    [2,"Jugador contra Jugador","?currencies=2"]
 ];var mn_talentCalc = [
 	[6,"Caballero de la muerte","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
 	[11,"Druida","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -1923,6 +1923,16 @@ var g_holiday_categories = {
 	3:"Jugador contra Jugador",
 	0:"Sin categoría"
 };
+var g_currency_categories = {
+	"1":"Miscel\u00e1nea",
+	"2":"Jugador contra Jugador",
+	"3":"No las uso",
+	"4":"Cl\u00e1sico",
+	"21":"Wrath of the Lich King",
+	"22":"Mazmorra y banda",
+	"23":"Burning Crusade",
+	"41":"Prueba"
+};
 var g_user_roles = {
 	1:"Probador",
 	2:"Administrador",
@@ -2384,6 +2394,7 @@ var LANG = {and:" y ",
 	tab_createdby:"Creado por",
 	tab_criteriaof:"Necesario para",
 	tab_currencyfor:"Moneda para",
+	tab_currencies:"Monedas",
 	tab_disenchantedfrom:"Desencantado de",
 	tab_disenchanting:"Desencantar",
 	tab_droppedby:"Tirado por",

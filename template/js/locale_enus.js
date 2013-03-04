@@ -773,9 +773,9 @@ var mn_holidays = [
     [3,"Player vs. Player","?events=3"]
 ];
 var mn_currencies = [
-    [22,"Dungeon and Raid"],
-    [1,"Miscellaneous"],
-    [2,"Player vs. Player"]
+    [22,"Dungeon and Raid","?currencies=22"],
+    [1,"Miscellaneous","?currencies=1"],
+    [2,"Player vs. Player","?currencies=2"]
 ];
 var mn_talentCalc = [
     [6,"Death Knight","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
@@ -2091,6 +2091,16 @@ var g_holiday_categories = {
     3:"Player vs. Player",
     0:"Uncategorized"
 };
+var g_currency_categories = {
+	"1":"Miscellaneous",
+	"2":"Player vs. Player",
+	"3":"Unused",
+	"4":"Classic",
+	"21":"Wrath of the Lich King",
+	"22":"Dungeon and Raid",
+	"23":"Burning Crusade",
+	"41":"Test"
+};
 var g_user_roles = {
     1:"Tester",
     2:"Administrator",
@@ -2543,6 +2553,7 @@ var LANG = {
     tab_createdby: "Created by",
     tab_criteriaof: "Criteria of",
     tab_currencyfor: "Currency for",
+	tab_currencies: "Currencies",
     tab_disenchantedfrom: "Disenchanted from",
     tab_disenchanting: "Disenchanting",
     tab_droppedby: "Dropped by",
@@ -3222,5 +3233,6 @@ var LANG = {
 	tooltip_removefocus: "Remove focus",
 	tooltip_gains: "Bonuses you gain above the minimum<br />shared stats between all columns.",
 	message_deleteitem: "Delete $1?",
-	message_deletegroup: "Delete this group?"
+	message_deletegroup: "Delete this group?",
+    calculators: "Calculators"
 };
