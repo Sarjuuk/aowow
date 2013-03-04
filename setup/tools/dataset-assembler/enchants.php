@@ -50,17 +50,14 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
-    require 'includes/class.spell.php';
-    require 'includes/class.item.php';
-
     set_time_limit(300);
 
     // from g_item_slots: 13:"One-Hand", 26:"Ranged", 17:"Two-Hand",
     $slotPointer   = [13, 17, 26, 26, 13, 17, 17, 13, 17, null, 17, null, null, 13, null, 13, null, null, null, null, 17];
     $locales       = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
     $enchantSpells = new SpellList([['effect1Id', '=', '53'], ['name_loc0', 'NOT LIKE', 'QA%']]);    // enchantItemPermanent && !qualityAssurance
-    $castItems     = array();
-    $jsonEnchants  = array();
+    $castItems     = [];
+    $jsonEnchants  = [];
 
     // check directory-structure
     foreach (Util::$localeStrings as $dir)
@@ -73,7 +70,7 @@ if (!defined('AOWOW_REVISION'))
     {
         User::useLocale($lId);
 
-        $enchantsOut = array();
+        $enchantsOut = [];
 
         foreach ($enchantSpells->spellList as $spl)
         {

@@ -1,7 +1,7 @@
 <?php
-/* 
+/*
     FETTES ToDo: suchen vereinen und aufräumen!
-    
+
     if &json
         => suche ausm compare heraus (profiler evtl auch noch)
     else if &opensearch
@@ -23,17 +23,17 @@
 
 if (isset($_GET['opensearch']) || isset($_GET['json']))
 {
-    require('opensearch.php');
+    require 'opensearch.php';
     die();
 }
 
 // Необходима функция iteminfo
-require_once('includes/game.php');
-require_once('includes/allspells.php');
-require_once('includes/allquests.php');
-require_once('includes/allitems.php');
-require_once('includes/allnpcs.php');
-require_once('includes/allobjects.php');
+require 'includes/game.php';
+require 'includes/allspells.php';
+require 'includes/allquests.php';
+require 'includes/allitems.php';
+require 'includes/allnpcs.php';
+require 'includes/allobjects.php';
 
 // Настраиваем Smarty ;)
 $smarty->config_load($conf_file, 'search');
@@ -52,7 +52,7 @@ global $npc_cols;
 global $spell_cols;
 
 // Массив всего найденного
-$found = array();
+$found = [];
 
 // Ищем вещи:
 if($_SESSION['locale']>0)
@@ -216,7 +216,7 @@ else
 	$smarty->assign('found', $found);
 
 	// Параметры страницы
-	$page = array();
+	$page = [];
 	// Номер вкладки меню
 	$page['tab'] = 0;
 	// Заголовок страницы

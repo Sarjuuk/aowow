@@ -25,11 +25,6 @@ if (!defined('AOWOW_REVISION'))
 // Ajax can't handle debug, force to false
 $AoWoWconf['debug'] = false;
 
-require_once('includes/kernel.php');
-// require_once('includes/class.filter.php');
-require_once('includes/class.item.php');
-require_once('includes/class.spell.php');
-
 header("Content-type: text/javascript");
 
 // Receives requests from at least 3 characters (although vovhede and 1 character)
@@ -42,14 +37,14 @@ if (strlen($_query) < 3)
 echo "[\"".str_replace('"', '\"', $_query)."\", [\n";
 
 // Item Comparison search
-$foundItems = array();
-$foundSets = array();
-$pieceAssoc = array();
+$foundItems = [];
+$foundSets = [];
+$pieceAssoc = [];
 if ($_type & 0x10) {
 
     $rows = DB::Aowow()->Select('
         SELECT
-            itemsetID as id,
+            id,
             refSetId as idbak,
             CONCAT(7 - quality, ?#) as name,
             minlevel,
@@ -70,9 +65,10 @@ if ($_type & 0x10) {
     );
 
     // parse items, create class-array
+
     foreach ($rows as $row)
     {
-        $row['pieces'] = array();
+        $row['pieces'] = [];
         for ($i=1; $i<=10; $i++)
         {
             if ($row['item'.$i])
@@ -83,7 +79,7 @@ if ($_type & 0x10) {
                 unset($row['item'.$i]);
             }
         }
-        $row['classes'] = array();
+        $row['classes'] = [];
         for ($i = 1; $i < 12; $i++)
             if ($row['reqclass'] & (1 << $i))
                 $row['classes'][] = $i + 1;
@@ -94,17 +90,17 @@ if ($_type & 0x10) {
 }
 if ($_type & 0x18) {                                         // 3 | 4
     $conditions = array(
-        array('i.class', 'IN', [2, 4]),
-        empty($foundItems) ? array(User::$localeId ? 'name_loc'.User::$localeId : 'name', 'LIKE', '%'.$_query.'%') : array('i.entry', 'IN', $foundItems)
+        array('i.class', [2, 4]),
+        empty($foundItems) ? array(User::$localeId ? 'name_loc'.User::$localeId : 'name', $_query) : array('i.entry', $foundItems)
     );
     $iList = new ItemList($conditions);
 
-    $items = array();
-    foreach ($iList->itemList as $id => $item)
+    $items = [];
+    foreach ($iList->container as $id => $item)
     {
         $item->getJsonStats($pieceAssoc);
 
-        $stats = array();
+        $stats = [];
         foreach ($item->json as $k => $v)
         {
             if (!$v && $k != 'classs' && $k != 'subclass')
@@ -123,7 +119,7 @@ if ($_type & 0x18) {                                         // 3 | 4
     $i = 0;
     foreach ($foundSets as $single)
     {
-        $set = array();
+        $set = [];
         foreach ($single as $key => $value)
         {
             if ((is_numeric($value) && $value == 0) || $value === "false")

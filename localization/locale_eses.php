@@ -109,8 +109,8 @@ $lang = array(
         'resetForm'     => "Reiniciar formulario",
         'refineSearch'  => "Sugerencia: Refina tu búsqueda llendo a una <a href=\"javascript:;\" id=\"fi_subcat\">subcategoría</a>.",
     ),
-    'error'  => array(),
-    'account'  => array(),
+    'error'  => [],
+    'account'  => [],
     'talent'  => array(
         'talentCalc'    => "Calculadora de talentos",
         'petCalc'       => "Calculadora de mascotas",

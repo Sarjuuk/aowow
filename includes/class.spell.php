@@ -655,7 +655,7 @@ class Spell extends BaseType
     public function getTooltip()
     {
         // get reagents
-        $reagents = array();
+        $reagents = [];
         for ($j = 1; $j <= 8; $j++)
         {
             if($this->template['reagent'.$j] <= 0)
@@ -670,7 +670,7 @@ class Spell extends BaseType
         $reagents = array_reverse($reagents);
 
         // get tools
-        $tools = array();
+        $tools = [];
         for ($i = 1; $i <= 2; $i++)
         {
             // Tools

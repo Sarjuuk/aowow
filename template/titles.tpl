@@ -3,7 +3,11 @@
         <div id="main">
             <div id="main-precontents"></div>
             <div id="main-contents" class="main-contents">
-
+                {if !empty($announcements)}
+                    {foreach from=$announcements item=item}
+                        {include file='bricks/announcement.tpl' an=$item}
+                    {/foreach}
+                {/if}
                 <script type="text/javascript">
                     g_initPath({$page.path});
                 </script>

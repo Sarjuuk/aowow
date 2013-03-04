@@ -6,17 +6,23 @@ if (!defined('AOWOW_REVISION'))
 
 ini_set('serialize_precision', 4);
 
-require('includes/defines.php');
-require('config/config.php');
+require 'includes/defines.php';
+require 'config/config.php';
 
 $e = !!$AoWoWconf['debug'] ? (E_ALL & ~(E_DEPRECATED|E_USER_DEPRECATED|E_STRICT)) : 0;
 error_reporting($e);
 
-require('includes/Smarty-2.6.26/libs/Smarty.class.php');    // Libraray: http://www.smarty.net/
-require('includes/DbSimple/Generic.php');                   // Libraray: http://en.dklab.ru/lib/DbSimple
-require('includes/utilities.php');
-require('includes/class.user.php');
-require('includes/class.database.php');
+require 'includes/Smarty-2.6.26/libs/Smarty.class.php';     // Libraray: http://www.smarty.net/
+require 'includes/DbSimple/Generic.php';                    // Libraray: http://en.dklab.ru/lib/DbSimple
+require 'includes/utilities.php';
+require 'includes/class.user.php';
+require 'includes/class.database.php';
+
+// autoload any List-Classes
+spl_autoload_register(function ($class) {
+    if (!strpos($class, 'Mysql') && !strpos($class, 'Filter'))
+        require 'includes/class.'.strtr($class, ['List' => '']).'.php';
+});
 
 // debug: measure execution times
 Util::execTime(!!$AoWoWconf['debug']);
@@ -24,7 +30,7 @@ Util::execTime(!!$AoWoWconf['debug']);
 // Setup Smarty
 class Smarty_AoWoW extends Smarty
 {
-    var $config = array();
+    var $config = [];
 
     public function __construct($config)
     {
@@ -87,7 +93,7 @@ class Smarty_AoWoW extends Smarty
         if (!$cache)
             return false;
 
-        $cache = explode("\n", $cache);
+        $cache = explode("\n", $cache, 2);
 
         @list($time, $rev) = explode(' ', $cache[0]);
         $expireTime = $time + $this->config['page']['cacheTimer'];

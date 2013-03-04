@@ -3,7 +3,11 @@
     <div id="main">
         <div id="main-precontents"></div>
         <div id="main-contents" class="main-contents">
-            <div id="announcement-0"></div>
+            {if !empty($announcements)}
+                {foreach from=$announcements item=item}
+                    {include file='bricks/announcement.tpl' an=$item}
+                {/foreach}
+            {/if}
             <div class="text">
                 <h1>{$lang.errNotFound}</h1>
                 <div class="left">

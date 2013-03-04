@@ -4,12 +4,9 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/class.spell.php';
-require 'includes/class.item.php';
 // require 'includes/allnpcs.php';
 // require 'includes/allquests.php';
 // require 'includes/class.community.php';                  // not needed .. yet
-// require 'includes/class.achievement.php';
 
 $id    = intVal($pageParam);
 $spell = new Spell($id);
@@ -108,7 +105,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $spell['info'] = $spellObj->parseText('description');
 
         // Инструменты
-        $spell['tools'] = array();
+        $spell['tools'] = [];
         $i=0;
         for ($j=1;$j<=2;$j++)
         {
@@ -125,7 +122,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
 
         // Реагенты
-        $spell['reagents'] = array();
+        $spell['reagents'] = [];
         $i=0;
         for ($j=1;$j<=8;$j++)
         {
@@ -150,7 +147,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         // Iterate through all effects:
         $i=0;
-        $spell['effect'] = array();
+        $spell['effect'] = [];
         for ($j=1;$j<=3;$j++)
         {
             if($row['effect'.$j.'Id'] > 0)
@@ -171,7 +168,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         //case 106: // "Summon Object (slot 3)"    // 0 spells; skipping
                         //case 107: // "Summon Object (slot 4)"    // 0 spells; skipping
                         {
-                            $spell['effect'][$i]['object'] = array();
+                            $spell['effect'][$i]['object'] = [];
                             $spell['effect'][$i]['object']['entry'] = $row['effect'.$j.'MiscValue'];
                             $spell['effect'][$i]['object']['name'] = DB::Aowow()->selectCell("SELECT name FROM gameobject_template WHERE entry = ? LIMIT 1", $spell['effect'][$i]['object']['entry']).' ('.$spell['effect'][$i]['object']['entry'].')';
                             break;
@@ -240,7 +237,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 // Создает вещь:
                 if($row['effect'.$j.'Id'] == 24)
                 {
-                    $spell['effect'][$i]['item'] = array();
+                    $spell['effect'][$i]['item'] = [];
                     $spell['effect'][$i]['item']['entry'] = $row['effect'.$j.'CreateItemId'];
                     $tmpRow = allitemsinfo($spell['effect'][$i]['item']['entry'], 0);
                     $spell['effect'][$i]['item']['name'] = $tmpRow['name'];
@@ -253,7 +250,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 // Создает спелл
                 if($row['effect'.$j.'TriggerSpell'] > 0)
                 {
-                    $spell['effect'][$i]['spell'] = array();
+                    $spell['effect'][$i]['spell'] = [];
                     $spell['effect'][$i]['spell']['entry'] = $row['effect'.$j.'TriggerSpell'];
                     $spell['effect'][$i]['spell']['name'] = DB::Aowow()->selectCell('SELECT spellname_loc'.User::$localeId.' FROM ?_spell WHERE spellID = ?d LIMIT 1', $spell['effect'][$i]['spell']['entry']);
                     allspellsinfo($spell['effect'][$i]['spell']['entry']);
@@ -292,14 +289,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
         if($seealso)
         {
-            $spell['seealso'] = array();
+            $spell['seealso'] = [];
             foreach($seealso as $i => $row)
                 $spell['seealso'][] = spellinfo2($row);
             unset($seealso);
         }
 */
         // Кто обучает этому спеллу
-        $spell['taughtbynpc'] = array();
+        $spell['taughtbynpc'] = [];
         // Список тренеров, обучающих нужному спеллу
 /*
         $trainers = DB::Aowow()->selectCol('SELECT entry FROM npc_trainer WHERE spell = ?d', $spell['entry']);
@@ -328,7 +325,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
 */
         // Список книг/рецептов, просто обучающих спеллу
-        $spell['taughtbyitem'] = array();
+        $spell['taughtbyitem'] = [];
 /*
         $taughtbyitem = DB::Aowow()->select('
             SELECT ?#, c.entry
@@ -407,7 +404,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             );
             if($taughtbyquest)
             {
-                $spell['taughtbyquest'] = array();
+                $spell['taughtbyquest'] = [];
                 foreach($taughtbyquest as $i=>$questrow)
                     $spell['taughtbyquest'][] = GetQuestInfo($questrow, 0xFFFFFF);
                 unset($taughtbyquest);
@@ -486,7 +483,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
         if($usedbynpc)
         {
-            $spell['usedbynpc'] = array();
+            $spell['usedbynpc'] = [];
             foreach($usedbynpc as $i=>$row)
                 $spell['usedbynpc'][] = creatureinfo2($row);
             unset($usedbynpc);
@@ -510,7 +507,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
         if($usedbyitem)
         {
-            $spell['usedbyitem'] = array();
+            $spell['usedbyitem'] = [];
             foreach($usedbyitem as $i => $row)
                 $spell['usedbyitem'][] = iteminfo2($row, 0);
             unset($usedbyitem);
@@ -526,7 +523,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
         if($usedbyitemset)
         {
-            $spell['usedbyitemset'] = array();
+            $spell['usedbyitemset'] = [];
             foreach($usedbyitemset as $i => $row)
                 $spell['usedbyitemset'][] = itemsetinfo2($row);
             unset($usedbyitemset);
@@ -550,7 +547,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
         if($questreward)
         {
-            $spell['questreward'] = array();
+            $spell['questreward'] = [];
             foreach($questreward as $i => $row)
                 $spell['questreward'][] = GetQuestInfo($row, 0xFFFFFF);
             unset($questreward);
@@ -569,7 +566,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 FROM ?_spellicons s, ?_achievementcriteria c, ?_achievement a
                 LEFT JOIN (?_zones z) ON a.map != -1 AND a.map = z.mapID
                 WHERE
-                    a.icon = s.id
+                    a.iconId = s.id
                     AND a.id = c.refAchievement
                     AND c.type IN (?a)
                     AND c.value1 = ?d
@@ -588,7 +585,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
         if($rows)
         {
-            $spell['criteria_of'] = array();
+            $spell['criteria_of'] = [];
             foreach($rows as $row)
             {
                 allachievementsinfo2($row['id']);

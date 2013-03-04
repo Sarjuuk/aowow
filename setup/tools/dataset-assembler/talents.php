@@ -24,8 +24,6 @@ if (!defined('AOWOW_REVISION'))
     // t - array of talent-objects
     // f - array:int [pets only] creatureFamilies in that category
 
-    require 'includes/class.spell.php';
-
     function buildTree($class)
     {
         global $petFamIcons;    // h8!

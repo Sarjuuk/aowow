@@ -3,14 +3,11 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
-require 'includes/class.item.php';
-require 'includes/class.spell.php';
-require 'includes/class.faction.php';                       // items may require a faction to use/own
-
 $pageData = array(
     'summary' => '[]',
     'items'   => []
 );
+$compareString  = '';
 
 // prefer $_GET over $_COOKIE
 if (!empty($_GET['compare']))
@@ -21,11 +18,11 @@ else if (!empty($_COOKIE['compare_groups']))
 if ($compareString)
 {
     $sets  = explode(";", $compareString);
-    $items = array();
+    $items = [];
     foreach ($sets as $set)
     {
         $itemsting = explode(":", $set);
-        $outString = array();
+        $outString = [];
         foreach ($itemsting as $substring)
         {
             $params  = explode(".", $substring);
@@ -37,14 +34,14 @@ if ($compareString)
 
             // MATCH() AGAINST() for integers would be nice...
             $res = DB::Aowow()->SelectRow(
-                "SELECT itemsetID FROM ?_itemset WHERE
+                "SELECT Id FROM ?_itemset WHERE
                 item1 = ? OR item2 = ? OR item3 = ? OR item4 = ? OR item5 = ? OR
                 item6 = ? OR item7 = ? OR item8 = ? OR item9 = ? OR item10 = ?",
                 (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0]
             );
 
             if ($res)
-                $piecesAssoc[(int)$params[0]] = $res['itemsetID'];
+                $piecesAssoc[(int)$params[0]] = $res['Id'];
         }
         $outSet[] = "[".implode(',', $outString)."]";
     }
@@ -54,7 +51,7 @@ if ($compareString)
     foreach ($iList->container as $item)
     {
         $item->getJsonStats();
-        $stats = array();
+        $stats = [];
         foreach ($item->json as $k => $v)
             $stats[] = is_numeric($v) || $v[0] == "{" ? '"'.$k.'":'.$v.'' : '"'.$k.'":"'.$v.'"';
 

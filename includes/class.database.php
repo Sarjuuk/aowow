@@ -11,9 +11,9 @@ if (!defined('AOWOW_REVISION'))
 
 class DB
 {
-    private static $interfaceCache  = array();
-    private static $optionsCache    = array();
-    private static $connectionCache = array();
+    private static $interfaceCache  = [];
+    private static $optionsCache    = [];
+    private static $connectionCache = [];
 
     private static function createConnectSyntax(&$options)
     {

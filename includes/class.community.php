@@ -15,14 +15,14 @@ class CommunityContent
     private function getComments($type, $typeId)
     {
         // comments
-        return array();
+        return [];
     }
 
     private function getVideos($type, $typeId)
     {
         return DB::Aowow()->Query("
             SELECT
-                v.Id, 
+                v.Id,
                 a.displayName AS user,
                 v.date,
                 v.videoId,

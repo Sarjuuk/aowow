@@ -54,7 +54,7 @@ class Achievement extends BaseType
         {
             $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievement` = ? ORDER BY `order` ASC', $this->Id);
             if (!$result)
-                return array();
+                return [];
 
             if (is_array($result[0]))
                 $this->criteria = $result;
@@ -108,8 +108,8 @@ class Achievement extends BaseType
             return $this->tooltip;
 
         $criteria = $this->getCriteria();
-        $tmp = array();
-        $rows = array();
+        $tmp = [];
+        $rows = [];
         $i = 0;
         foreach ($criteria as $_row)
         {
@@ -224,7 +224,7 @@ class AchievementList extends BaseTypeList
             //"rewards":[[11,137],[3,138]]   [what, entry] 3:item; 11:title, 6:spell(unused)
             if (!empty($acv->template['rewardIds']))
             {
-                $rewards = array();
+                $rewards = [];
                 $rewIds = explode(" ", $acv->template['rewardIds']);
                 foreach ($rewIds as $rewId)
                     $rewards[] = ($rewId > 0 ? "[3,".$rewId."]" :  ($rewId < 0 ? "[11,".-$rewId."]" : NULL));
@@ -322,7 +322,7 @@ class AchievementList extends BaseTypeList
             $series |= DB::Aowow()->SelectCell('SELECT Id FROM ?_achievement WHERE parent = ?d', $acv->Id);
 
             // set rewards
-            $rewardIds = array();
+            $rewardIds = [];
             if ($rStr = $acv->template['reward_loc0'])
             {
 

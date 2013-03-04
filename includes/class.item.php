@@ -176,7 +176,7 @@ class Item extends BaseType
             rand: >0: randomPropId; <0: randomSuffixId
         interactive (set to place javascript/anchors to manipulate level and ratings or link to filters (static tooltips vs popup tooltip))
     */
-    public function createTooltip($enhance = array(), $interactive = false)
+    public function createTooltip($enhance = [], $interactive = false)
     {
         if (!empty($this->tooltip))
             return $this->tooltip;
@@ -404,7 +404,7 @@ class Item extends BaseType
             );
         }
         else
-            $enhance['gems'] = array();
+            $enhance['gems'] = [];
 
         // zero fill empty sockets
         $sockCount = $this->json['nsockets'] + (isset($enhance['sock']) ? 1 : 0);
@@ -561,14 +561,14 @@ class Item extends BaseType
             // todo: aaaand another one for optimization
             $craftSpell   = new Spell($this->template['spellid_2']);
             $craftItem    = new Item($craftSpell->template["effect1CreateItemId"]);
-            $reagentItems = array();
+            $reagentItems = [];
 
             for ($i = 1; $i <= 8; $i++)
                 if ($craftSpell->template["reagent".$i])
                     $reagentItems[$craftSpell->template["reagent".$i]] = $craftSpell->template["reagentCount".$i];
 
             $reagents = new ItemList(array(['i.entry', array_keys($reagentItems)]));
-            $reqReag  = array();
+            $reqReag  = [];
 
             foreach ($reagents->container as $r)
                 $reqReag[] = '<a href="?item='.$r->Id.'">'.$r->name.'</a> ('.$reagentItems[$r->Id].')';
@@ -580,7 +580,7 @@ class Item extends BaseType
 
         // Item Set
         $tmpX    = '';
-        $pieces  = array();
+        $pieces  = [];
         $itemset = DB::Aowow()->selectRow('
             SELECT
                 *
@@ -605,7 +605,7 @@ class Item extends BaseType
             }
             $tmpX .= implode('<br />', $pieces);
 
-            $x .= '<br /><span class="q"><a href="?itemset='.$itemset['itemsetID'].'" class="q">'.Util::localizedString($itemset, 'name').'</a> (0/'.$num.')</span>';
+            $x .= '<br /><span class="q"><a href="?itemset='.$itemset['Id'].'" class="q">'.Util::localizedString($itemset, 'name').'</a> (0/'.$num.')</span>';
 
             if ($itemset['skillID'])                        // bonus requires skill to activate
             {
@@ -843,7 +843,7 @@ class Item extends BaseType
         if ($this->json['socketbonus'] > 0)
         {
             $enh = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?;', $this->json['socketbonus']);
-            $this->json['socketbonusstat'] = array();
+            $this->json['socketbonusstat'] = [];
             $socketbonusstat = Util::parseItemEnchantment($enh);
             foreach ($socketbonusstat as $k => $v)
                 $this->json['socketbonusstat'][] = '"'.$k.'":'.$v;
@@ -874,8 +874,8 @@ class Item extends BaseType
 
             foreach ($subItems as $k => $sI)
             {
-                $jsonEquip = array();
-                $jsonText  = array();
+                $jsonEquip = [];
+                $jsonText  = [];
                 for ($i = 1; $i < 6; $i++)
                 {
                     if ($sI['enchantId'.$i] <= 0)

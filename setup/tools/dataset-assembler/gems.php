@@ -24,8 +24,6 @@ if (!defined('AOWOW_REVISION'))
     // sketchy, but should work
     // Id < 36'000 || ilevel < 70 ? BC : WOTLK
 
-    require 'includes/class.spell.php';
-
     $gemQuery = "
         SELECT
             it.entry,

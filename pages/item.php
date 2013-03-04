@@ -5,14 +5,10 @@ if (!defined('AOWOW_REVISION'))
 
 
 // require 'includes/game.php';
-require 'includes/class.spell.php';
 // require 'includes/allquests.php';
-require 'includes/class.item.php';
 // require 'includes/allnpcs.php';
 // require 'includes/allobjects.php';
 // require 'includes/class.community.php';                  // wo dont need those .. yet
-// require 'includes/class.achievement.php';
-require 'includes/class.faction.php';
 
 $id   = intVal($pageParam);
 $item = new Item($id);
@@ -30,7 +26,7 @@ else if (isset($_GET['power']))
 
     Util::powerUseLocale($_GET['domain']);
 
-    $enh        = array();
+    $enh        = [];
     $itemString = $id;
 
     if (isset($_GET['rand']))
@@ -54,7 +50,8 @@ else if (isset($_GET['power']))
         $itemString .= 's';
     }
 
-    $cacheKeyTooltip = implode(':', [CACHETYPE_TOOLTIP, TYPE_ITEM, $itemString, -1, User::$localeId]);
+    // : are not accepted in filenames
+    $cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_ITEM, str_replace(':', ',', $itemString), -1, User::$localeId]);
 
     // output json for tooltips
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
@@ -93,7 +90,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_cr = drop('creature_loot_template', $item['entry']);
     if($drops_cr)
     {
-        $item['droppedby'] = array();
+        $item['droppedby'] = [];
         foreach($drops_cr as $lootid => $drop)
         {
             $rows = $DB->select('
@@ -127,9 +124,9 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_go = drop('gameobject_loot_template', $item['entry']);
     if($drops_go)
     {
-        $item['containedinobject'] = array();
-        $item['minedfromobject'] = array();
-        $item['gatheredfromobject'] = array();
+        $item['containedinobject'] = [];
+        $item['minedfromobject'] = [];
+        $item['gatheredfromobject'] = [];
         foreach($drops_go as $lootid => $drop)
         {
             // Сундуки
@@ -195,21 +192,21 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     );
     if($rows_soldby)
     {
-        $item['soldby'] = array();
+        $item['soldby'] = [];
         foreach($rows_soldby as $i => $row)
         {
-            $item['soldby'][$i] = array();
+            $item['soldby'][$i] = [];
             $item['soldby'][$i] = creatureinfo2($row);
             $item['soldby'][$i]['stock'] = ($row['stock'] == 0 ? -1 : $row['stock']);
             if($row['ExtendedCost'])
             {
-                $item['soldby'][$i]['cost'] = array();
+                $item['soldby'][$i]['cost'] = [];
                 $extcost = $DB->selectRow('SELECT * FROM ?_item_extended_cost WHERE extendedcostID=?d LIMIT 1', abs($row['ExtendedCost']));
                 if($extcost['reqhonorpoints'])
                     $item['soldby'][$i]['cost']['honor'] = ($row['A'] == 1 ? 1 : -1) * $extcost['reqhonorpoints'];
                 if($extcost['reqarenapoints'])
                     $item['soldby'][$i]['cost']['arena'] = $extcost['reqarenapoints'];
-                $item['soldby'][$i]['cost']['items'] = array();
+                $item['soldby'][$i]['cost']['items'] = [];
                 for ($j=1;$j<=5;$j++)
                     if(($extcost['reqitem'.$j]>0) and ($extcost['reqitemcount'.$j]>0))
                     {
@@ -242,7 +239,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     );
     if($rows_qr)
     {
-        $item['objectiveof'] = array();
+        $item['objectiveof'] = [];
         foreach($rows_qr as $row)
             $item['objectiveof'][] = GetQuestInfo($row, 0xFFFFFF);
     }
@@ -262,7 +259,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     );
     if($rows_qp)
     {
-        $item['providedfor'] = array();
+        $item['providedfor'] = [];
         foreach($rows_qp as $row)
             $item['providedfor'][] = GetQuestInfo($row, 0xFFFFFF);
     }
@@ -293,7 +290,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     );
     if($rows_qrw)
     {
-        $item['rewardof'] = array();
+        $item['rewardof'] = [];
         foreach($rows_qrw as $row)
             $item['rewardof'][] = GetQuestInfo($row, 0xFFFFFF);
     }
@@ -319,7 +316,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
             if($rows_qm)
             {
                 if (!isset($item['rewardof']))
-                    $item['rewardof'] = array();
+                    $item['rewardof'] = [];
                 foreach($rows_qm as $row)
                     $item['rewardof'][] = GetQuestInfo($row, 0xFFFFFF);
             }
@@ -332,7 +329,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_cii = drop('item_loot_template', $item['entry']);
     if($drops_cii)
     {
-        $item['containedinitem'] = array();
+        $item['containedinitem'] = [];
         foreach($drops_cii as $lootid => $drop)
         {
             $rows = $DB->select('
@@ -366,7 +363,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_pp = drop('pickpocketing_loot_template', $item['entry']);
     if($drops_pp)
     {
-        $item['pickpocketingloot'] = array();
+        $item['pickpocketingloot'] = [];
         foreach($drops_pp as $lootid => $drop)
         {
             $rows = $DB->select('
@@ -400,7 +397,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_sk = drop('skinning_loot_template', $item['entry']);
     if($drops_sk)
     {
-        $item['skinnedfrom'] = array();
+        $item['skinnedfrom'] = [];
         foreach($drops_sk as $lootid => $drop)
         {
             $rows = $DB->select('
@@ -438,7 +435,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_pr = drop('prospecting_loot_template', $item['entry']);
     if($drops_pr)
     {
-        $item['prospectingloot'] = array();
+        $item['prospectingloot'] = [];
         foreach($drops_pr as $lootid => $drop)
         {
             $rows = $DB->select('
@@ -474,7 +471,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_de = drop('disenchant_loot_template', $item['entry']);
     if($drops_de)
     {
-        $item['disenchantedfrom'] = array();
+        $item['disenchantedfrom'] = [];
         foreach($drops_de as $lootid => $drop)
         {
             $rows = $DB->select('
@@ -529,7 +526,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
         );
         if($rows_cpi)
         {
-            $item['canbeplacedin'] = array();
+            $item['canbeplacedin'] = [];
             foreach($rows_cpi as $row)
                 $item['canbeplacedin'][] = iteminfo2($row, 0);
         }
@@ -557,11 +554,11 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     );
     if($rows_r)
     {
-        $item['reagentfor'] = array();
+        $item['reagentfor'] = [];
         $quality = 1;
         foreach($rows_r as $i=>$row)
         {
-            $item['reagentfor'][$i] = array();
+            $item['reagentfor'][$i] = [];
             $item['reagentfor'][$i]['entry'] = $row['spellID'];
             $item['reagentfor'][$i]['name'] = $row['spellname_loc'.$_SESSION['locale']];
             $item['reagentfor'][$i]['school'] = $row['resistancesID'];
@@ -604,7 +601,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     );
     if($rows_cf)
     {
-        $item['createdfrom'] = array();
+        $item['createdfrom'] = [];
         foreach($rows_cf as $row)
         {
             $skillrow = $DB->selectRow('
@@ -625,7 +622,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_fi = drop('fishing_loot_template', $item['entry']);
     if($drops_fi)
     {
-        $item['fishedin'] = array();
+        $item['fishedin'] = [];
         foreach($drops_fi as $lootid => $drop)
         {
             // Обычные локации
@@ -672,7 +669,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_mi = drop('milling_loot_template', $item['entry']);
     if($drops_mi)
     {
-        $item['milledfrom'] = array();
+        $item['milledfrom'] = [];
         foreach($drops_mi as $lootid => $drop)
         {
             $rows = $DB->select('
@@ -725,14 +722,14 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     );
     if($rows_cf)
     {
-        $item['currencyfor'] = array();
+        $item['currencyfor'] = [];
         foreach($rows_cf as $row)
         {
             $id=$row['entry'];
-            $item['currencyfor'][$id] = array();
+            $item['currencyfor'][$id] = [];
             $item['currencyfor'][$id] = iteminfo2($row);
             $item['currencyfor'][$id]['maxcount'] = $row['drop-maxcount'];
-            $item['currencyfor'][$id]['cost'] = array();
+            $item['currencyfor'][$id]['cost'] = [];
             if($row['BuyPrice']>0)
                 $npc['sells'][$id]['cost']['money'] = $row['BuyPrice'];
 
@@ -740,7 +737,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
                 $item['currencyfor'][$id]['cost']['honor'] =/* ($row['A']==1?1:-1)* */$row['reqhonorpoints']; //FIXME_BUG
             if($row['reqarenapoints']>0)
                 $item['currencyfor'][$id]['cost']['arena'] = $row['reqarenapoints'];
-            $item['currencyfor'][$id]['cost']['items'] = array();
+            $item['currencyfor'][$id]['cost']['items'] = [];
             for($j=1; $j<=5; $j++)
             if(($row['reqitem'.$j]>0) and ($row['reqitemcount'.$j]>0))
             {
@@ -758,7 +755,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     $drops_sp = drop('spell_loot_template', $item['entry']);
     if($drops_sp)
     {
-        $item['containedinspell'] = array();
+        $item['containedinspell'] = [];
         foreach($drops_sp as $lootid => $drop)
         {
             $rows = $DB->select('
@@ -799,7 +796,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
     );
     if($rows)
     {
-        $item['criteria_of'] = array();
+        $item['criteria_of'] = [];
         foreach($rows as $row)
         {
             allachievementsinfo2($row['id']);
@@ -809,7 +806,7 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
 
     $item['color'] = colorByQuality($item['quality']);
 
-    $smarty->loadCache($cacheKeyPage, $item);
+    $smarty->saveCache($cacheKeyPage, $item);
 }
 
 $page = array(

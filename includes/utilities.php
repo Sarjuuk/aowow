@@ -134,7 +134,7 @@ class BaseTypeList
 
     public function getListviewData()
     {
-        $data = array();
+        $data = [];
         // no extra queries required, just call recursively
         foreach ($this->container as $type)
             $data[] = $type->getListviewData();
@@ -177,7 +177,7 @@ class Lang
 
     public static function load($loc)
     {
-        if (@(require 'localization/locale_'.$loc.'.php')) !== 1
+        if (@(require 'localization/locale_'.$loc.'.php') !== 1)
             die('File for localization '.$loc.' not found.');
 
         foreach ($lang as $k => $v)
@@ -187,7 +187,7 @@ class Lang
     // todo: expand
     public static function getInfoBoxForFlags($flags)
     {
-        $tmp = array();
+        $tmp = [];
 
         if ($flags & CUSTOM_DISABLED)
             $tmp[] = '<span class="tip" onmouseover="Tooltip.showAtCursor(event, \''.self::$main['disabledHint'].'\', 0, 0, \'q\')" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">'.self::$main['disabled'].'</span>';
@@ -216,7 +216,7 @@ class Lang
     {
         $stanceMask &= 0x1F84F213E;                         // clamp to available stances/forms..
 
-        $tmp = array();
+        $tmp = [];
         $i   = 1;
 
         while ($stanceMask)
@@ -236,7 +236,7 @@ class Lang
     {
         $schoolMask &= 0x7F;                                // clamp to available schools..
 
-        $tmp = array();
+        $tmp = [];
         $i   = 1;
 
         while ($schoolMask)
@@ -262,7 +262,7 @@ class Lang
         if (!$classMask)                                    // no restrictions left
             return false;
 
-        $tmp = array();
+        $tmp = [];
         $i   = 1;
 
         while ($classMask)
@@ -288,7 +288,7 @@ class Lang
         if (!$raceMask)                                     // no restrictions left (we don't display 'both factions')
             return false;
 
-        $tmp  = array();
+        $tmp  = [];
         $side = 0;
         $i    = 1;
 
@@ -955,7 +955,7 @@ class Util
 
     public static function parseTime($sec)
     {
-        $time = array();
+        $time = [];
 
         if ($sec >= 3600 * 24)
         {
@@ -990,7 +990,7 @@ class Util
     public static function formatTime($base, $short = false)
     {
         $s = self::parseTime($base / 1000);
-        $fmt = array();
+        $fmt = [];
 
         if ($short)
         {
@@ -1159,7 +1159,7 @@ class Util
         if (!$enchant || empty($enchant))
             return false;
 
-        $jsonStats = array();
+        $jsonStats = [];
         for ($h = 1; $h <= 3; $h++)
         {
             if (isset($amountOverride))                     // itemSuffixes have dynamic amount
@@ -1210,7 +1210,7 @@ class Util
         }
 
         // check if we use these mods
-        $return = array();
+        $return = [];
         foreach ($jsonStats as $k => $v)
         {
             if ($str = Util::$itemMods[$k])

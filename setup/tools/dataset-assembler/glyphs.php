@@ -115,8 +115,6 @@ if (!defined('AOWOW_REVISION'))
         41108 => 'Lay on Hands'
     );
 
-    require 'includes/class.spell.php';
-
     set_time_limit(300);
 
     $glyphList = DB::Aowow()->Select($queryGlyphs);
@@ -142,7 +140,7 @@ if (!defined('AOWOW_REVISION'))
 
             $spl = new Spell($pop['glyphEffect']);
 
-            if ($spl->template['effect1Id'] != 6)
+            if ($spl->template['effect1Id'] != 6 && $spl->template['effect2Id'] != 6 && $spl->template['effect3Id'] != 6)
                 continue;
 
             if ($pop['itemId'] == 42958)                    // Crippling Poison has no skillLine.. oO => hardcode

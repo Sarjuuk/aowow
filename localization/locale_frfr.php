@@ -114,7 +114,7 @@ $lang = array(
         'goStart'       => "Return to the <a href=\"index.php\">homepage</a>",
         'goForum'       => "Feedback <a href=\"?forums&board=1\">forum</a>",
     ),
-    'account'  => array(),
+    'account'  => [],
     'achievement' => array(
         'achievements'  => "hauts faits",
         'criteria'      => "Critères",

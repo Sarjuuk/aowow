@@ -4,12 +4,6 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/class.title.php';
-require 'includes/class.spell.php';
-require 'includes/class.achievement.php';
-require 'includes/class.item.php';
-require 'includes/class.quest.php';
-require 'includes/class.worldevent.php';
 require 'includes/class.community.php';
 
 $Id = intVal($pageParam);
@@ -106,10 +100,16 @@ $smarty->updatePageVars(array(
     'typeId'    => $Id
 ));
 
+// Announcements
+$announcements = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = "title" OR page = "*")');
+foreach ($announcements as $k => $v)
+    $announcements[$k]['text'] = Util::localizedString($v, 'text');
+
 $smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $Id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
 $smarty->assign('data', $pageData);
 $smarty->assign('mysql', DB::Aowow()->getStatistics());
+$smarty->assign('announcements', $announcements);
 $smarty->display('title.tpl');
 
 ?>
