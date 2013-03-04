@@ -160,6 +160,7 @@ $lang = array(
     ),
     'spell' => array(
         'remaining'     => "%s restantes",
+        'untilCanceled' => "hasta que se cancela",
         'castIn'        => "Hechizo de %s seg",
         'instantPhys'   => "Instante",
         'instantMagic'  => "Hechizo instantáneo",
@@ -168,6 +169,7 @@ $lang = array(
         'meleeRange'    => "Alcance de ataques cuerpo a cuerpo",
         'reagents'      => "Componentes",
         'tools'         => "Herramientas",
+        'home'          => "&lt;Posada&gt;",
         'pctCostOf'     => "del %s base",
         'costPerSec'    => ", mas %s por segundo",
         'costPerLevel'  => ", mas %s por nivel",

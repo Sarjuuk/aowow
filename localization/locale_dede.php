@@ -263,6 +263,7 @@ $lang = array(
     ),
     'spell' => array(
         'remaining'     => "Noch %s",
+        'untilCanceled' => "bis Abbruch",
         'castIn'        => "Wirken in %s Sek.",
         'instantPhys'   => "Sofort",
         'instantMagic'  => "Spontanzauber",
@@ -271,6 +272,7 @@ $lang = array(
         'meleeRange'    => "Nahkampfreichweite",
         'reagents'      => "Reagenzien",
         'tools'         => "Extras",
+        'home'          => "%lt;Gasthaus&gt;",
         'pctCostOf'     => "vom Grund%s",
         'costPerSec'    => ", plus %s pro Sekunde",
         'costPerLevel'  => ", plus %s pro Stufe",

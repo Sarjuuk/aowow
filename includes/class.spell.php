@@ -8,6 +8,9 @@ class Spell extends BaseType
     public    $tooltip    = '';
     public    $buff       = '';
 
+    private   $spellVars  = [];
+    private   $refSpells  = [];
+
     protected $setupQuery = 'SELECT * FROM ?_spell WHERE Id = ?d';
 
     // use if you JUST need the name
@@ -188,433 +191,717 @@ class Spell extends BaseType
         return $stats;
     }
 
-    // TODO: optimize, complete, not go stark raving mad
-    public function parseText($type = 'description', $level = MAX_LEVEL)
+    // description-, buff-parsing component
+    private function resolveEvaluation($formula, $level)
     {
-        $lastduration = array('durationBase' => $this->template['duration']);
+        // todo: define unresolvable texts like AP, MHW, ect
 
-        $signs = array('+', '-', '/', '*', '%', '^');
+        $pl    = $PL    = $level;
+        $PlayerName     = Lang::$main['name'];
+        $cond  = $COND  = function($a, $b, $c) { return $a ? $b : $c; };
+        $eq    = $EQ    = function($a, $b)     { return $a == $b;     };
+        $gt    = $GT    = function($a, $b)     { return $a > $b;      };
+        $floor = $FLOOR = function($a)         { return floor($a);    };
 
-        $data = Util::localizedString($this->template, $type);
-        if (empty($data) || $data =="[]")                   // empty tooltip shouldn't be displayed anyway
-            return null;
-
-        // line endings
-        $data = strtr($data, array("\r" => '', "\n" => '<br />'));
-
-        // colors
-        $data = preg_replace('/\|cff([a-f0-9]{6})(.+?)\|r/i', '<span style="color: #$1;">$2</span>', $data);
-
-        $pos = 0;
-        $str = '';
-        while(false!==($npos=strpos($data, '$', $pos)))
+        if (preg_match_all('/\$[a-z]+\b/i', $formula, $vars))
         {
-            if($npos!=$pos)
-                $str .= substr($data, $pos, $npos-$pos);
-            $pos = $npos+1;
+            foreach ($vars[0] as $var)                      // oh lord, forgive me this sin .. but is_callable seems to bug out and function_exists doesn't find lambda-functions >.<
+                if (@eval('return getType('.$var.');') != 'object')
+                    return $formula;
 
-            if('$' == substr($data, $pos, 1))
-            {
-                $str .= '$';
-                $pos++;
-                continue;
-            }
+            return eval('return '.$formula.';');
+        }
 
-            if(!preg_match('/^((([+\-\/*])(\d+);)?(\d*)(?:([lg].*?:.*?);|(\w\d*)))/', substr($data, $pos), $result))
-                continue;
+        // there should not be any letters without a leading $
+        return eval('return '.$formula.';');
+    }
 
-            if(empty($exprData[0]))
-                $exprData[0] = 1;
+    // description-, buff-parsing component
+    private function resolveVariableString($variable, $level)
+    {
+        $signs  = ['+', '-', '/', '*', '%', '^'];
 
-            $op = $result[3];
-            $oparg = $result[4];
-            $lookup = $result[5];
-            $var = $result[6] ? $result[6] : $result[7];
-            $pos += strlen($result[0]);
+        $op     = $variable[2];
+        $oparg  = $variable[3];
+        $lookup = (int)$variable[4];
+        $var    = $variable[6] ? $variable[6] : $variable[8];
+        $effIdx = $variable[6] ? null         : $variable[9];
+        $switch = $variable[7] ? explode(':', $variable[7]) : null;
 
-            if(!$var)
-                continue;
+        if (!$var)
+            return;
 
-            $exprType = strtolower(substr($var, 0, 1));
-            $exprData = explode(':', substr($var, 1));
-            switch($exprType)
-            {
-                case 'r':
-                    // if(!IsSet($this->template['rangeMaxHostile']))
-                        // $this->template = array_merge($this->template, DB::Aowow()->selectRow('SELECT * FROM ?_spellrange WHERE rangeID=? LIMIT 1', $this->template['rangeID']));
+        if (!$effIdx)                                       // if EffectIdx is omitted, assume EffectIdx: 1
+            $effIdx = 1;
 
-                    $base = $this->template['rangeMaxHostile'];
+        // cache at least some lookups.. should be moved to single spellList :/
+        if ($lookup && !isset($this->refSpells[$lookup]))
+            $this->refSpells[$lookup] = new Spell($lookup);
 
-                    if($op && is_numeric($oparg) && is_numeric($base))
+        switch ($var)
+        {
+            case 'a':                                       // EffectRadiusMin
+            case 'A':                                       // EffectRadiusMax (ToDo)
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'RadiusMax'];
+                else
+                    $base = $this->template['effect'.$effIdx.'RadiusMax'];
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return abs($base);
+            case 'b':                                       // PointsPerComboPoint
+            case 'B':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'PointsPerComboPoint'];
+                else
+                    $base = $this->template['effect'.$effIdx.'PointsPerComboPoint'];
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return abs($base);
+/* where the heck is this var...?
+            case 'c':                                       // BasePoints (raw)
+                if ($lookup > 0 && $exprData[0])
+                    $spell = DB::Aowow()->selectRow('SELECT effect'.$exprData[0].'BasePoints, effect'.$exprData[0].'AuraId, effect'.$exprData[0].'MiscValue FROM ?_spell WHERE id=? LIMIT 1', $lookup);
+                else
+                    $spell = $this->template;
+
+                $base = $spell['effect'.$exprData[0].'BasePoints'] + 1;
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                {
+                    $equation = $base.$op.$oparg;
+                    eval("\$base = $equation;");
+                }
+
+                // Aura giving combat ratings (click-interactive)
+                $rType = 0;
+                if ($spell['effect'.$exprData[0].'AuraId'] == 189)
+                {
+                    $mv = $spell['effect'.$exprData[0].'MiscValue'];
+                    for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
                     {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
+                        if (!Util::$combatRatingToItemMod[$j])
+                            continue;
+
+                        if (($mv & (1 << $j)) == 0)
+                            continue;
+
+                        $rType = Util::$combatRatingToItemMod[$j];
+                        break;
                     }
+                }
+                // Aura end
+
+                if ($rType)
+                    $str .= '<!--rtg'.$rType.'-->'.$base."&nbsp;<small>(".Util::setRatingLevel($level, $rType, $base).")</small>";
+                else
                     $str .= $base;
-                    break;
-                case 'z':
-                    $str .= htmlspecialchars('<Home>');
-                    break;
-                case 'c': ###
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT effect'.$exprData[0].'BasePoints, effect'.$exprData[0].'AuraId, effect'.$exprData[0].'MiscValue FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
 
-                    $base = $spell['effect'.$exprData[0].'BasePoints']+1;
+                $lastvalue = $base;
+                break;
+*/
+            case 'd':                                       // SpellDuration
+            case 'D':                                       // todo: min/max?
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['duration'];
+                else
+                    $base = $this->template['duration'];
 
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
+                if ($base < 0)
+                    return Lang::$spell['untilCanceled'];
 
-                    // Aura giving combat ratings
-                    $rType = 0;
-                    if ($spell['effect'.$exprData[0].'AuraId'] == 189)
-                    {
-                        $mv = $spell['effect'.$exprData[0].'MiscValue'];
-                        for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
-                        {
-                            if (!Util::$combatRatingToItemMod[$j])
-                                continue;
+                if ($op && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
 
-                            if (($mv & (1 << $j)) == 0)
-                                continue;
+                return Util::formatTime($base, true);
+            case 'e':                                       // EffectValueMultiplier
+            case 'E':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'ValueMultiplier'];
+                else
+                    $base = $this->template['effect'.$effIdx.'ValueMultiplier'];
 
-                            $rType = Util::$combatRatingToItemMod[$j];
-                            break;
-                        }
-                    }
-                    // Aura end
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
 
-                    if ($rType)
-                        $str .= '<!--rtg'.$rType.'-->'.$base."&nbsp;<small>(".Util::setRatingLevel($level, $rType, $base).")</small>";
-                    else
-                        $str .= $base;
+                return $base;
+            case 'f':                                       // EffectDamageMultiplier
+            case 'F':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'DamageMultiplier'];
+                else
+                    $base = $this->template['effect'.$effIdx.'DamageMultiplier'];
 
-                    $lastvalue = $base;
-                    break;
-                case 's': ###
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT effect'.$exprData[0].'BasePoints, effect'.$exprData[0].'AuraId, effect'.$exprData[0].'MiscValue, effect'.$exprData[0].'DieSides FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
 
-                    if(!$exprData[0]) $exprData[0]=1;
-                        @$base = $spell['effect'.$exprData[0].'BasePoints']+1;
+                return abs($base);
+            case 'g':                                       // boolean choice with casters gender as condition $gX:Y;
+            case 'G':
+                return '&gt;'.$switch[0].'/'.$switch[1].'&lt;';
+            case 'h':                                       // ProcChance
+            case 'H':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['procChance'];
+                else
+                    $base = $this->template['procChance'];
 
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
 
-                    // Aura giving combat ratings
-                    $rType = 0;
-                    if (@$spell['effect'.$exprData[0].'AuraId'] == 189)
-                    {
-                        $mv = $spell['effect'.$exprData[0].'MiscValue'];
-                        for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
-                        {
-                            if (!Util::$combatRatingToItemMod[$j])
-                                continue;
-
-                            if (($mv & (1 << $j)) == 0)
-                                continue;
-
-                            $rType = Util::$combatRatingToItemMod[$j];
-                            break;
-                        }
-                    }
-                    // Aura end
-
-                    if ($rType && $spell['effect'.$exprData[0].'DieSides'] <= 1)
-                        $str .= '<!--rtg'.$rType.'-->'.abs($base)."&nbsp;<small>(".Util::setRatingLevel($level, $rType, abs($base)).")</small>";
-                    else
-                        @$str .= abs($base).($spell['effect'.$exprData[0].'DieSides'] > 1 ? Lang::$game['valueDelim'].abs(($base+$spell['effect'.$exprData[0].'DieSides'])) : '');
-
-                    $lastvalue = $base;
-                    break;
-                case 'o':
-                    if($lookup > 0 && $exprData[0])
-                    {
-                        $spell = DB::Aowow()->selectRow('SELECT duration, effect'.$exprData[0].'BasePoints, effect'.$exprData[0].'Periode, effect'.$exprData[0].'DieSides FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                        // $lastduration = DB::Aowow()->selectRow('SELECT * FROM ?_spellduration WHERE durationID=? LIMIT 1', $spell['durationID']);
-                    }
-                    else
-                        $spell = $this->template;
-
-                    if(!$exprData[0]) $exprData[0] = 1;
-                    $base = $spell['effect'.$exprData[0].'BasePoints']+1;
-
-                    if($spell['effect'.$exprData[0].'Periode'] <= 0) $spell['effect'.$exprData[0].'Periode'] = 5000;
-
-                    $str .= (($spell['duration'] / $spell['effect'.$exprData[0].'Periode']) * abs($base).($spell['effect'.$exprData[0].'DieSides'] > 1 ? '-'.abs(($base+$spell['effect'.$exprData[0].'DieSides'])) : ''));
-                    break;
-                case 't':
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT * FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
-
-                    if(!$exprData[0]) $exprData[0]=1;
-                        $base = $spell['effect'.$exprData[0].'Periode']/1000;
-
-                    // TODO!!
-                    if($base==0)    $base=1;
-                    // !!TODO
-
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= abs($base);
-                    $lastvalue = $base;
-                    break;
-                case 'm': ###
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT effect'.$exprData[0].'BasePoints, effect'.$exprData[0].'AuraId, effect'.$exprData[0].'MiscValue FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
-
-                    // TODO!!
-                    if(!$exprData[0]) $exprData[0] = 1;
-
-                    $base = $spell['effect'.$exprData[0].'BasePoints']+1;
-
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-
-                    // Aura giving combat ratings
-                    $rType = 0;
-                    if ($spell['effect'.$exprData[0].'AuraId'] == 189)
-                    {
-                        $mv = $spell['effect'.$exprData[0].'MiscValue'];
-                        for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
-                        {
-                            if (!Util::$combatRatingToItemMod[$j])
-                                continue;
-
-                            if (($mv & (1 << $j)) == 0)
-                                continue;
-
-                            $rType = Util::$combatRatingToItemMod[$j];
-                            break;
-                        }
-                    }
-                    // Aura end
-
-                    if ($rType)
-                        $str .= '<!--rtg'.$rType.'-->'.abs($base)."&nbsp;<small>(".Util::setRatingLevel($level, $rType, abs($base)).")</small>";
-                    else
-                        $str .= abs($base);
-
-                    $lastvalue = $base;
-                    break;
-                case 'x':
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT effect'.$exprData[0].'ChainTarget FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
-
-                    $base = $spell['effect'.$exprData[0].'ChainTarget'];
-
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= abs($base);
-                    $lastvalue = $base;
-                    break;
-                case 'q':
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT effect'.$exprData[0].'MiscValue FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
-
-                    if(!($exprData[0]))
-                        $exprData[0]=1;
-                    $base = $spell['effect'.$exprData[0].'MiscValue'];
-
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= abs($base);
-                    $lastvalue = $base;
-                    break;
-                case 'a':
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT effect1RadiusMax, effect2RadiusMax, effect3RadiusMax FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
-
-                    $exprData[0] = 1; // TODO
-                    $radius = $this->template['effect'.$exprData[0].'RadiusMax'];
-                    $base = $radius;
-
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= abs($base);
-                    break;
-                case 'h':
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT procChance FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
-
-                    $base = $spell['procChance'];
-
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= abs($base);
-                    break;
-                case 'f':
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT dmg_multiplier'.$exprData[0].' FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
-
-                    $base = $spell['dmg_multiplier'.$exprData[0]];
-
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= abs($base);
-                    break;
-                case 'n':
-                    if($lookup > 0)
-                        $spell = DB::Aowow()->selectRow('SELECT procCharges FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
-
-                    $base = $spell['procCharges'];
-
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= abs($base);
-                    break;
-                case 'd':
-                    if($lookup > 0)
-                    {
-                        $spell = DB::Aowow()->selectRow('SELECT duration as durationBase FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                        @$base = ($spell['durationBase'] > 0 ? $spell['durationBase'] + 1 : 0);
-                    }
-                    else
-                        $base = ($lastduration['durationBase'] > 0 ? $lastduration['durationBase'] : 0);
-
-                    if($op && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= Util::formatTime($base, true);
-                    break;
-                case 'i':
-                    // $base = $this->template['spellTargets'];
+                return abs($base);
+            case 'i':                                       // MaxAffectedTargets
+            case 'I':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['targets'];
+                else
                     $base = $this->template['targets'];
 
-                    if($op && is_numeric($oparg) && is_numeric($base))
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return $base;
+            case 'l':                                       // boolean choice with last value as condition $lX:Y;
+            case 'L':
+                return '$l'.$switch[0].':'.$switch[1];      // resolve later by backtracking
+            case 'm':                                       // BasePoints (minValue)
+            case 'M':                                       // BasePoints (maxValue)
+                if ($lookup)
+                {
+                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'BasePoints'];
+                    $add  = $this->refSpells[$lookup]->template['effect'.$effIdx.'DieSides'];
+                    $mv   = $this->refSpells[$lookup]->template['effect'.$effIdx.'MiscValue'];
+                    $aura = $this->refSpells[$lookup]->template['effect'.$effIdx.'AuraId'];
+
+                }
+                else
+                {
+                    $base = $this->template['effect'.$effIdx.'BasePoints'];
+                    $add  = $this->template['effect'.$effIdx.'DieSides'];
+                    $mv   = $this->template['effect'.$effIdx.'MiscValue'];
+                    $aura = $this->template['effect'.$effIdx.'AuraId'];
+                }
+
+                if (ctype_lower($var))
+                    $add = 1;
+
+                $base += $add;
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                // Aura giving combat ratings
+                $rType = 0;
+                if ($aura == 189)
+                {
+                    for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
                     {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
+                        if (!Util::$combatRatingToItemMod[$j])
+                            continue;
+
+                        if (($mv & (1 << $j)) == 0)
+                            continue;
+
+                        $rType = Util::$combatRatingToItemMod[$j];
+                        break;
                     }
-                    $str .= $base;
-                    break;
-                case 'e':
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT effect_'.$exprData[0].'_proc_value FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
+                }
+                // Aura end
 
-                    $base = $spell['effect_'.$exprData[0].'_proc_value'];
+                if ($rType)
+                    return '<!--rtg'.$rType.'-->'.abs($base)."&nbsp;<small>(".Util::setRatingLevel($level, $rType, abs($base)).")</small>";
+                else
+                    return abs($base);
+            case 'n':                                       // ProcCharges
+            case 'N':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['procCharges'];
+                else
+                    $base = $this->template['procCharges'];
 
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return abs($base);
+            case 'o':                                       // TotalAmount for periodic auras (with variance)
+            case 'O':
+                if ($lookup)
+                {
+                    $base     = $this->refSpells[$lookup]->template['effect'.$effIdx.'BasePoints'];
+                    $add      = $this->refSpells[$lookup]->template['effect'.$effIdx.'DieSides'];
+                    $periode  = $this->refSpells[$lookup]->template['effect'.$effIdx.'Periode'];
+                    $duration = $this->refSpells[$lookup]->template['duration'];
+                }
+                else
+                {
+                    $base     = $this->template['effect'.$effIdx.'BasePoints'];
+                    $add      = $this->template['effect'.$effIdx.'DieSides'];
+                    $periode  = $this->template['effect'.$effIdx.'Periode'];
+                    $duration = $this->template['duration'];
+                }
+
+                if (!$periode)
+                    $periode = 3000;
+
+                $tick = $duration / $periode;
+
+                return (abs($base + 1) * $tick) . ($add > 1 ? Lang::$game['valueDelim'] . (abs($base + $add) * $tick) : null);
+            case 'q':                                       // EffectMiscValue
+            case 'Q':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'MiscValue'];
+                else
+                    $base = $this->template['effect'.$effIdx.'MiscValue'];
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return abs($base);
+            case 'r':                                       // SpellRange
+            case 'R':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['rangeMaxHostile'];
+                else
+                    $base = $this->template['rangeMaxHostile'];
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return $base;
+            case 's':                                       // BasePoints (with variance)
+            case 'S':
+                if ($lookup)
+                {
+                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'BasePoints'];
+                    $add  = $this->refSpells[$lookup]->template['effect'.$effIdx.'DieSides'];
+                    $mv   = $this->refSpells[$lookup]->template['effect'.$effIdx.'MiscValue'];
+                    $aura = $this->refSpells[$lookup]->template['effect'.$effIdx.'AuraId'];
+                }
+                else
+                {
+                    $base = $this->template['effect'.$effIdx.'BasePoints'];
+                    $add  = $this->template['effect'.$effIdx.'DieSides'];
+                    $mv   = $this->template['effect'.$effIdx.'MiscValue'];
+                    $aura = $this->template['effect'.$effIdx.'AuraId'];
+                }
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                // Aura giving combat ratings
+                $rType = 0;
+                if ($aura == 189)
+                {
+                    for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
                     {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
+                        if (!Util::$combatRatingToItemMod[$j])
+                            continue;
+
+                        if (($mv & (1 << $j)) == 0)
+                            continue;
+
+                        $rType = Util::$combatRatingToItemMod[$j];
+                        break;
                     }
+                }
+                // Aura end
 
-                    $str .= $base;
-                    $lastvalue = $base;
+                if ($rType && $add <= 1)
+                    return '<!--rtg'.$rType.'-->'.abs($base + 1)."&nbsp;<small>(".Util::setRatingLevel($level, $rType, abs($base + 1)).")</small>";
+                else
+                    return abs($base + 1) . ($add > 1 ? Lang::$game['valueDelim'] . abs($base + $add) : null);
+            case 't':                                       // Periode
+            case 'T':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'Periode'] / 1000;
+                else
+                    $base = $this->template['effect'.$effIdx.'Periode'] / 1000;
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return abs($base);
+            case 'u':                                       // StackCount
+            case 'U':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['stackAmount'];
+                else
+                    $base = $this->template['stackAmount'];
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return abs($base);
+            case 'v':                                   // MaxTargetLevel
+            case 'V':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['MaxTargetLevel'];
+                else
+                    $base = $this->template['MaxTargetLevel'];
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return $base;
+            case 'x':                                   // ChainTargetCount
+            case 'X':
+                if ($lookup)
+                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'ChainTarget'];
+                else
+                    $base = $this->template['effect'.$effIdx.'ChainTarget'];
+
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    eval("\$base = $base.$op.$oparg;");
+
+                return abs($base);
+            case 'z':                                   // HomeZone
+                return Lang::$spell['home'];
+        }
+    }
+
+    // description-, buff-parsing component
+    private function resolveFormulaString($formula, $precision = 0, $level)
+    {
+        // step 1: formula unpacking redux
+        while (($formStartPos = strpos($formula, '${')) !== false)
+        {
+            $formBrktCnt   = 0;
+            $formPrecision = 0;
+            $formCurPos    = $formStartPos;
+
+            $formOutStr    = '';
+
+            while ($formCurPos <= strlen($formula))
+            {
+                $char = $formula[$formCurPos];
+
+                if ($char == '}')
+                    $formBrktCnt--;
+
+                if ($formBrktCnt)
+                    $formOutStr .= $char;
+
+                if ($char == '{')
+                    $formBrktCnt++;
+
+                if (!$formBrktCnt && $formCurPos != $formStartPos)
                     break;
-                case 'v':
-                    $base = $spell['affected_target_level'];
 
-                    if($op && $oparg > 0 && $base > 0)
+                $formCurPos++;
+            }
+
+            if (@$formula[++$formCurPos] == '.')
+            {
+                $formPrecision = (int)$formula[++$formCurPos];
+                ++$formCurPos;                              // for some odd reason the precision decimal survives if wo dont increment further..
+            }
+
+            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $level);
+
+            $formula = substr_replace($formula, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
+        }
+
+        // step 2: resolve variables
+        $pos = 0;                                           // continue strpos-search from this offset
+        $str = '';
+        while (($npos = strpos($formula, '$', $pos)) !== false)
+        {
+            if ($npos != $pos)
+                $str .= substr($formula, $pos, $npos - $pos);
+
+            $pos = $npos++;
+
+            if ($formula[$pos] == '$')
+                $pos++;
+
+            if (!preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([g])([\w\s]*:[\w\s]*);|([a-z])([123]?)\b)/i', substr($formula, $pos), $result))
+            {
+                $str .= '#';                                // mark as done, reset below
+                continue;
+            }
+
+            $pos += strlen($result[0]);
+            $str .= $this->resolveVariableString($result, $level);
+        }
+        $str .= substr($formula, $pos);
+        $str = str_replace('#', '$', $str);                 // reset marks
+
+        // step 3: try to evaluate result
+        $evaled = $this->resolveEvaluation($str, $level);
+
+        return (int)$evaled ? round($evaled, $precision) : $evaled;
+    }
+
+    // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
+    // although it seems to be pretty fast, even on those pesky test-spells with extra complex tooltips (Ron Test Spell X))
+    public function parseText($type = 'description', $level = MAX_LEVEL)
+    {
+    /* documentation .. sort of
+        bracket use
+            ${}.x - formulas; .x is optional; x:[0-9] .. max-precision of a floatpoint-result; default: 0
+            $[]   - conditionals ... like $?condition[true][false]; alternative $?!(cond1|cond2)[true]$?cond3[elseTrue][false]; ?a40120: has aura 40120; ?s40120: knows spell 40120(?)
+            $<>   - variables
+            ()    - regular use for function-like calls
+
+        variables in use .. caseSensitive
+
+        game variables (optionally replace with textVars)
+            $PlayerName - Cpt. Obvious
+            $PL / $pl   - PlayerLevel
+            $AP         - Atkpwr
+            $RAP        - RngAtkPwr
+            $HND        - hands used by weapon (1H, 2H) => (1, 2)
+            $MWS        - MainhandWeaponSpeed
+            $mw / $MW   - MainhandWeaponDamage Min/Max
+            $rwb / $RWB - RangedWeapon..Bonus? Min/Max
+            $sp         - Spellpower
+            $spa        - Spellpower Arcane
+            $spfi       - Spellpower Fire
+            $spfr       - Spellpower Frost
+            $sph        - Spellpower Holy
+            $spn        - Spellpower Nature
+            $sps        - Spellpower Shadow
+            $bh         - Bonus Healing
+            $pa         - %-ArcaneDmg (as float)         // V seems broken
+            $pfi        - %-FireDmg (as float)
+            $pfr        - %-FrostDmg (as float)
+            $ph         - %-HolyDmg (as float)
+            $pn         - %-NatureDmg (as float)
+            $ps         - %-ShadowDmg (as float)
+            $pbh        - %-HealingBonus (as float)
+            $pbhd       - %-Healing Done (as float)      // all above seem broken
+            $bc2        - baseCritChance? always 3.25 (unsure)
+
+        spell variables (the stuff we can actually parse) rounding... >5 up?
+            $a          - SpellRadius; per EffectIdx
+            $b          - PointsPerComboPoint; per EffectIdx
+            $c          - todo: not found but in use below.. wtf ?!
+            $d / $D     - SpellDuration; appended timeShorthand; d/D maybe base/max duration?; interpret "0" as "until canceled"
+            $e          - EffectValueMultiplier; per EffectIdx
+            $f / $F     - EffectDamageMultiplier; per EffectIdx
+            $g / $G     - Gender-Switch $Gmale:female;
+            $h / $H     - ProcChance
+            $i          - MaxAffectedTargets
+            $l          - LastValue-Switch; last value as condiition $Ltrue:false;
+            $m / $M     - BasePoints; per EffectIdx; m/M +1/+effectDieSides
+            $n          - ProcCharges
+            $o          - TotalAmount (for periodic auras); per EffectIdx
+            $q          - EffectMiscValue; per EffectIdx
+            $r          - SpellRange (hostile)
+            $s / $S     - BasePoints; per EffectIdx; as Range, if applicable
+            $t / $T     - EffectPeriode; per EffectIdx
+            $u          - StackAmount
+            $v          - MaxTargetLevel
+            $x          - MaxAffectedTargets
+            $z          - no place like <Home>
+
+        deviations from standard procedures
+            division    - example: $/10;2687s1 => $2687s1/10
+
+        functions in use .. caseInsensitive
+            $cond(a, b, c) - like SQL, if A is met use B otherwise use C
+            $eq(a, b)      - a == b
+            $floor(a)      - floor()
+            $gt(a, b)      - a > b
+    */
+
+
+    // step 0: get text
+        $data = Util::localizedString($this->template, $type);
+        if (empty($data) || $data == "[]")                  // empty tooltip shouldn't be displayed anyway
+            return null;
+
+    // step 1: if the text is supplemented with text-variables, get and replace them
+        if (empty($this->spellVars[$this->Id]) && $this->template['spellDescriptionVariableId'] > 0)
+        {
+            $spellVars = DB::Aowow()->SelectCell('SELECT vars FROM ?_spellVariables WHERE id = ?d', $this->template['spellDescriptionVariableId']);
+            $spellVars = explode("\n", $spellVars);
+            foreach ($spellVars as $sv)
+                if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $matches))
+                    $this->spellVars[$this->Id][$matches[1]] = $matches[2];
+
+            // replace self-references
+            $reset = true;
+            while ($reset)
+            {
+                $reset = false;
+                foreach ($this->spellVars[$this->Id] as $k => $sv)
+                {
+                    if (preg_match('/\$<(\w*\d*)>/i', $sv, $matches))
                     {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
+                        $this->spellVars[$this->Id][$k] = str_replace('$<'.$matches[1].'>', '${'.$this->spellVars[$this->Id][$matches[1]].'}', $sv);
+                        $reset = true;
                     }
-                    $str .= $base;
-                    break;
-                case 'u':
-                    if($lookup > 0 && $exprData[0])
-                        $spell = DB::Aowow()->selectRow('SELECT effect'.$exprData[0].'MiscValue FROM ?_spell WHERE id=?d LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
+                }
+            }
 
-                    // $base = $spell['effect_'.$exprData[0].'_misc_value'];
-                    if(isset($spell['effect'.$exprData[0].'MiscValue']))
-                        $base = $spell['effect'.$exprData[0].'MiscValue'];
+            // finally, replace SpellDescVars
+            foreach ($this->spellVars[$this->Id] as $k => $sv)
+                $data = str_replace('$<'.$k.'>', $sv, $data);
+        }
 
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= abs($base);
-                    $lastvalue = $base;
-                    break;
-                case 'b': // only used at one spell (14179) should be 20, column 110/111/112?)
-                    if($lookup > 0)
-                        $spell = DB::Aowow()->selectRow('SELECT effect_'.$exprData[0].'_proc_chance FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                    else
-                        $spell = $this->template;
+    // step 2: resolving conditions
+        // aura- or spell-conditions cant be resolved for our purposes, so force them to false for now (todo: strg+f "know" in aowowPower.js ^.^)
+        // \1: full pattern match; \2: any sequence, that may include an aura/spell-ref; \3: any other sequence, between "?$" and "["
+        while (preg_match('/\$\?(([\W\D]*[as]\d+)|([^\[]*))/i', $data, $matches))
+        {
+            $condBrktCnt = 0;
+            $targetPart  = 3;                               // we usually want the second pair of brackets
+            $curPart     = 0;                               // parts: $? 0 [ 1 ] 2 [ 3 ] 4
 
-                    $base = $spell['effect'.$exprData[0].'PointsPerComboPoint'];
+            $condOutStr  = '';
 
-                    if(in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    {
-                        $equation = $base.$op.$oparg;
-                        eval("\$base = $equation;");
-                    }
-                    $str .= abs($base);
-                    $lastvalue = $base;
+            if (!empty($matches[3]))                        // we can do this! -> eval
+            {
+                $cnd = eval('return ('.$matches[3].');');
+                if (is_numeric($cnd) && $cnd)               // only case, deviating from normal; positive result -> use [true]
+                    $targetPart = 1;
+
+                $condStartPos = strpos($data, $matches[3]) - 2;
+                $condCurPos   = $condStartPos;
+
+            }
+            else if (!empty($matches[2]))                   // aura/spell-condition .. use false; TODO (low priority) catch cases and port "know"-param for tooltips from 5.0
+            {                                               // tooltip_enus: Charge to an enemy, stunning it <!--sp58377:0--><!--sp58377-->for <!--sp103828:0-->1 sec<!--sp103828-->.; spells_enus: {"58377": [["", "and 2 additional nearby targets "]], "103828": [["1 sec", "3 sec"]]};
+                $condStartPos = strpos($data, $matches[2]) - 2;
+                $condCurPos   = $condStartPos;
+            }
+            else                                            // empty too? WTF?! GTFO!
+                die('what a terrible failure');
+
+            while ($condCurPos <= strlen($data))            // only hard-exit condition, we'll hit those breaks eventually^^
+            {
+                // we're through with this condition. replace with found result and continue
+                if ($curPart == 4 || $condCurPos == strlen($data))
+                {
+                    $data = substr_replace($data, $condOutStr, $condStartPos, ($condCurPos - $condStartPos));
                     break;
-                case 'l':
-                    if($lastvalue > 1)
-                        $str .= $exprData[1];
-                    else
-                        $str .= $exprData[0];
+                }
+
+                $char = $data[$condCurPos];
+
+                // advance position
+                $condCurPos++;
+
+                if ($char == '[')
+                {
+                    if (!$condBrktCnt)
+                        $curPart++;
+
+                    $condBrktCnt++;
+
+                    if ($condBrktCnt == 1)
+                        continue;
+                }
+                else if ($char == ']')
+                {
+                    if ($condBrktCnt == 1)
+                        $curPart++;
+
+                    $condBrktCnt--;
+
+                    if (!$condBrktCnt)
+                        continue;
+                }
+
+                // we got an elseif .. since they are self-containing we can just remove everything we've got up to here and restart the iteration
+                if ($curPart == 2 && $char == '?')
+                {
+                    $replace = $targetPart == 1 ? $condOutStr.' $' : '$';
+                    $data = substr_replace($data, $replace, $condStartPos, ($condCurPos - $condStartPos) - 1);
                     break;
-                case 'g':
-                    $str .= $exprData[0];
-                    break;
-                default:
-                    $str .= "[{$var} ($op::$oparg::$lookup::$exprData[0])]";
+                }
+
+                if ($curPart == $targetPart)
+                    $condOutStr .= $char;
+
             }
         }
+
+    // step 3: unpack formulas ${ .. }.X
+        // they are stacked recursively but should be balanced .. hf
+        while (($formStartPos = strpos($data, '${')) !== false)
+        {
+            $formBrktCnt   = 0;
+            $formPrecision = 0;
+            $formCurPos    = $formStartPos;
+
+            $formOutStr    = '';
+
+            while ($formCurPos <= strlen($data))            // only hard-exit condition, we'll hit those breaks eventually^^
+            {
+                $char = $data[$formCurPos];
+
+                if ($char == '}')
+                    $formBrktCnt--;
+
+                if ($formBrktCnt)
+                    $formOutStr .= $char;
+
+                if ($char == '{')
+                    $formBrktCnt++;
+
+                if (!$formBrktCnt && $formCurPos != $formStartPos)
+                    break;
+
+                // advance position
+                $formCurPos++;
+            }
+
+            // check for precision-modifiers .. yes, the precrements fullfill a role!
+            if ($formCurPos + 2 < strlen($data) && $data[++$formCurPos] == '.')
+                if ($prec = $data[++$formCurPos])
+                {
+                    $formPrecision = (int)$prec;
+                    ++$formCurPos;                          // for some odd reason the precision decimal survives if wo dont increment further..
+                }
+
+            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $level);
+
+            $data = substr_replace($data, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
+        }
+
+    // step 4: find and eliminate regular variables
+        $pos = 0;                                           // continue strpos-search from this offset
+        $str = '';
+        while (($npos = strpos($data, '$', $pos)) !== false)
+        {
+            if ($npos != $pos)
+                $str .= substr($data, $pos, $npos - $pos);
+
+            $pos = $npos++;
+
+            if ($data[$pos] == '$')
+                $pos++;
+
+            //            ( (op) (oparg); )? (refSpell) ( ([g]ifText:elseText; | (var) (effIdx) )
+            if (!preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([g])([\w\s]*:[\w\s]*);|([a-z])([123]?)\b)/i', substr($data, $pos), $result))
+            {
+                $str .= '#';                                // mark as done, reset below
+                continue;
+            }
+
+            $pos += strlen($result[0]);
+            $str .= $this->resolveVariableString($result, $level);
+        }
         $str .= substr($data, $pos);
-        $str = @preg_replace_callback("|\{([^\}]+)\}|", create_function('$matches', 'return eval("return abs(".$matches[1].");");'), $str);
+        $str = str_replace('#', '$', $str);                 // reset marks
+
+    // step 5: variable-depentant variable-text
+        // special case $lONE:ELSE;
+        while (preg_match('/([\d\.]+) \$l([\w\s]*):([\w\s]*);/i', $str, $m))
+            $str = str_replace($m[1].' $l'.$m[2].':'.$m[3].';', $m[1].' '.($m[1] == 1 ? $m[2] : $m[3]), $str);
+
+    // step 6: HTMLize
+        // colors
+        $str = preg_replace('/\|cff([a-f0-9]{6})(.+?)\|r/i', '<span style="color: #$1;">$2</span>', $str);
+
+        // line endings
+        $str = strtr($str, ["\r" => '', "\n" => '<br />']);
 
         return $str;
     }

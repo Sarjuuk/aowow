@@ -164,6 +164,7 @@ $lang = array(
     ),
     'spell' => array(
         'remaining'     => "%s restantes",
+        'untilCanceled' => "jusqu’à annulation",
         'castIn'        => "%s s d'incantation",
         'instantPhys'   => "Incantation immédiate",
         'instantMagic'  => "Instantanée",
@@ -172,6 +173,7 @@ $lang = array(
         'meleeRange'    => "Allonge",
         'reagents'      => "Composants",
         'tools'         => "Outils",
+        'home'          => "%lt;Auberge&gt;",
         'pctCostOf'     => "de la %s de base",
         'costPerSec'    => ", plus %s par seconde",
         'costPerLevel'  => ", plus %s par niveau",

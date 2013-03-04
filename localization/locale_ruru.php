@@ -164,6 +164,7 @@ $lang = array(
     ),
     'spell' => array(
         'remaining'     => "Осталось: %s",
+        'untilCanceled' => "до отмены",
         'castIn'        => "Применение: %s сек.",
         'instantPhys'   => "Мгновенное действие",
         'instantMagic'  => "Мгновенное действие",
@@ -171,6 +172,7 @@ $lang = array(
         'range'         => "Радиус действия: %s м",
         'meleeRange'    => "Дистанция ближнего боя",
         'reagents'      => "Реагент",
+        'home'          => "%lt;Гостиница&gt;",
         'tools'         => "Инструменты",
         'pctCostOf'     => "от базовой %s",
         'costPerSec'    => ", плюс %s в секунду",

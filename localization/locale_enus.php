@@ -265,6 +265,7 @@ $lang = array(
     ),
     'spell' => array(
         'remaining'     => "%s remaining",
+        'untilCanceled' => "until canceled",
         'castIn'        => "%s sec cast",
         'instantPhys'   => "Instant",
         'instantMagic'  => "Instant cast",
@@ -273,6 +274,7 @@ $lang = array(
         'meleeRange'    => "Melee Range",
         'reagents'      => "Reagents",
         'tools'         => "Tools",
+        'home'          => "&lt;Inn&gt;",
         'pctCostOf'     => "of base %s",
         'costPerSec'    => ", plus %s per second",
         'costPerLevel'  => ", plus %s per level",
