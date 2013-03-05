@@ -17,19 +17,17 @@ class ItemsetList extends BaseType
         parent::__construct($data);
 
         // post processing
-        foreach ($this->templates as $this->curTpl)
+        while ($this->iterate())
         {
-            $Id = $this->curTpl['id'];
-
-            $this->templates[$Id]['classes'] = [];
-            $this->templates[$Id]['pieces']  = [];
+            $this->templates[$this->id]['classes'] = [];
+            $this->templates[$this->id]['pieces']  = [];
 
             for ($i = 1; $i < 12; $i++)
             {
                 if ($this->curTpl['classMask'] & (1 << $i))
                 {
                     $this->classes[] = $i + 1;
-                    $this->templates[$Id]['classes'][] = $i + 1;
+                    $this->templates[$this->id]['classes'][] = $i + 1;
                 }
             }
 
@@ -38,19 +36,16 @@ class ItemsetList extends BaseType
                 if ($piece = $this->curTpl['item'.$i])
                 {
                     $this->pieces[] = $piece;
-                    $this->templates[$Id]['pieces'][] = $piece;
+                    $this->templates[$this->id]['pieces'][] = $piece;
                     $this->pieceToSet[$piece] = $this->id;
                 }
             }
         }
+        $this->reset();
 
         $this->classes    = array_unique($this->classes);
         $this->pieces     = array_unique($this->pieces);
         $this->pieceToSet = array_unique($this->pieceToSet);
-
-
-        // AAARG TODO!
-        $this->curTpl = reset($this->templates);            // restore 'iterator'
     }
 
     public function getListviewData()

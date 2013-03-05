@@ -104,6 +104,7 @@ abstract class BaseType
                 $linking = $c == 'AND' ? ' AND ' : ' OR ';
             else if (is_int($c))
                 $limit   = $c > 0      ? ' LIMIT '.$c : '';
+            else
                 continue;                                   // ignore other possibilities
 
         }
