@@ -132,7 +132,7 @@ if (!defined('AOWOW_REVISION'))
         if ($pop['glyphEffect'])
             $glyphSpells[] = $pop['glyphEffect'];
 
-    $glyphSpells = new SpellList(array(['Id', $glyphSpells]));
+    $glyphSpells = new SpellList(array(['id', $glyphSpells]));
 
     foreach ($locales as $lId)
     {
@@ -145,7 +145,7 @@ if (!defined('AOWOW_REVISION'))
             if (!$pop['glyphEffect'])
                 continue;
 
-            while ($glyphSpells->Id != $pop['glyphEffect'])
+            while ($glyphSpells->id != $pop['glyphEffect'])
                 $glyphSpells->iterate();
 
             if ($glyphSpells->getField('effect1Id') != 6 && $glyphSpells->getField('effect2Id') != 6 && $glyphSpells->getField('effect3Id') != 6)
@@ -193,7 +193,7 @@ if (!defined('AOWOW_REVISION'))
                 $m2 = $glyphSpells->getField('effect2SpellClassMask'.$l[$i]);
                 $m3 = $glyphSpells->getField('effect3SpellClassMask'.$l[$i]);
 
-                if ($glyphSpells->getField('effect'.$i.'Id') != 6 || (!$m1 && !$m2 && !$m3))
+                if ($glyphSpells->getField('effect'.$i.'id') != 6 || (!$m1 && !$m2 && !$m3))
                     continue;
 
                 $where = "SpellFamilyId = ?d AND ((SpellFamilyFlags3 & 0xFFFFFFFF) & ?d OR (SpellFamilyFlags2 & 0xFFFFFFFF) & ?d OR (SpellFamilyFlags1 & 0xFFFFFFFF) & ?d)";

@@ -8,7 +8,7 @@ class QuestList extends BaseType
     public    $cat1       = 0;
     public    $cat2       = 0;
 
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM quest_template a LEFT JOIN locales_quest b ON a.Id = b.entry WHERE [filter] [cond] ORDER BY Id ASC';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM quest_template a LEFT JOIN locales_quest b ON a.Id = b.entry WHERE [filter] [cond] ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM quest_template a LEFT JOIN locales_quest b ON a.Id = b.entry WHERE [filter] [cond]';
 
     // parent::__construct does the job
@@ -17,7 +17,7 @@ class QuestList extends BaseType
     {
         $r = parent::iterate($qty);
 
-        if (!$this->Id)
+        if (!$this->id)
         {
             $this->cat1 = 0;
             $this->cat2 = 0;
@@ -75,10 +75,10 @@ class QuestList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
+            $data[$this->id] = array(
                 "n"  => Util::localizedString($this->curTpl, 'Title'),
                 "t"  => TYPE_QUEST,
-                "ti" => $this->Id,
+                "ti" => $this->id,
                 "c"  => $this->cat1,
                 "c2" => $this->cat2
             );
@@ -96,7 +96,7 @@ class QuestList extends BaseType
             $set = array(
                 'category'  => $this->cat1,
                 'category2' => $this->cat2,
-                'id'        => $this->Id,
+                'id'        => $this->id,
                 'level'     => $this->curTpl['Level'],
                 'reqlevel'  => $this->curTpl['MinLevel'],
                 'name'      => Util::localizedString($this->curTpl, 'Title'),
@@ -161,10 +161,10 @@ class QuestList extends BaseType
             (new ItemList(array(['i.entry', $items])))->addGlobalsToJscript($refs);
 
         if ($spells)
-            (new SpellList(array(['Id', $spells])))->addGlobalsToJscript($refs);
+            (new SpellList(array(['id', $spells])))->addGlobalsToJscript($refs);
 
         if ($titles)
-            (new TitleList(array(['Id', $titles])))->addGlobalsToJscript($refs);
+            (new TitleList(array(['id', $titles])))->addGlobalsToJscript($refs);
     }
 
     public function renderTooltip()

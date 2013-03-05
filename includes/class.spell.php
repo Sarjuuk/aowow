@@ -11,7 +11,7 @@ class SpellList extends BaseType
     private   $spellVars  = [];
     private   $refSpells  = [];
 
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_spell WHERE [filter] [cond] GROUP BY Id ORDER BY Id ASC';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE [filter] [cond] GROUP BY Id ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_spell WHERE [filter] [cond]';
 
     public function __construct($conditions)
@@ -27,13 +27,13 @@ class SpellList extends BaseType
         // if the spell creates an item use the itemIcon instead
         while ($this->iterate())
             if ($this->curTpl['effect1CreateItemId'])
-                $itemIcons[(int)$this->curTpl['effect1CreateItemId']] = $this->Id;
+                $itemIcons[(int)$this->curTpl['effect1CreateItemId']] = $this->id;
 
         if ($itemIcons)
         {
             $itemList = new ItemList(array(['i.entry', array_keys($itemIcons)]));
             while ($itemList->iterate())
-                $this->templates[$itemIcons[$itemList->Id]]['createItemString'] = $itemList->getField('icon');
+                $this->templates[$itemIcons[$itemList->id]]['createItemString'] = $itemList->getField('icon');
         }
 
         $this->reset();                                     // restore 'iterator'
@@ -266,7 +266,7 @@ class SpellList extends BaseType
 
         // cache at least some lookups.. should be moved to single spellList :/
         if ($lookup && !isset($this->refSpells[$lookup]))
-            $this->refSpells[$lookup] = new SpellList(array(['Id', $lookup]));
+            $this->refSpells[$lookup] = new SpellList(array(['id', $lookup]));
 
         switch ($var)
         {
@@ -750,31 +750,31 @@ class SpellList extends BaseType
             return null;
 
     // step 1: if the text is supplemented with text-variables, get and replace them
-        if (empty($this->spellVars[$this->Id]) && $this->curTpl['spellDescriptionVariableId'] > 0)
+        if (empty($this->spellVars[$this->id]) && $this->curTpl['spellDescriptionVariableId'] > 0)
         {
             $spellVars = DB::Aowow()->SelectCell('SELECT vars FROM ?_spellVariables WHERE id = ?d', $this->curTpl['spellDescriptionVariableId']);
             $spellVars = explode("\n", $spellVars);
             foreach ($spellVars as $sv)
                 if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $matches))
-                    $this->spellVars[$this->Id][$matches[1]] = $matches[2];
+                    $this->spellVars[$this->id][$matches[1]] = $matches[2];
 
             // replace self-references
             $reset = true;
             while ($reset)
             {
                 $reset = false;
-                foreach ($this->spellVars[$this->Id] as $k => $sv)
+                foreach ($this->spellVars[$this->id] as $k => $sv)
                 {
                     if (preg_match('/\$<(\w*\d*)>/i', $sv, $matches))
                     {
-                        $this->spellVars[$this->Id][$k] = str_replace('$<'.$matches[1].'>', '${'.$this->spellVars[$this->Id][$matches[1]].'}', $sv);
+                        $this->spellVars[$this->id][$k] = str_replace('$<'.$matches[1].'>', '${'.$this->spellVars[$this->id][$matches[1]].'}', $sv);
                         $reset = true;
                     }
                 }
             }
 
             // finally, replace SpellDescVars
-            foreach ($this->spellVars[$this->Id] as $k => $sv)
+            foreach ($this->spellVars[$this->id] as $k => $sv)
                 $data = str_replace('$<'.$k.'>', $sv, $data);
         }
 
@@ -944,7 +944,7 @@ class SpellList extends BaseType
     {
         while ($this->iterate())
         {
-            if ($Id && $this->Id != $Id)
+            if ($Id && $this->id != $Id)
                 continue;
 
             // doesn't have a buff
@@ -973,7 +973,7 @@ class SpellList extends BaseType
 
             $x .= '</td></tr></table>';
 
-            $this->buffs[$this->Id] = $x;
+            $this->buffs[$this->id] = $x;
         }
 
         return $Id ? $this->buffs[$Id] : true;
@@ -983,7 +983,7 @@ class SpellList extends BaseType
     {
         while ($this->iterate())
         {
-            if ($Id && $this->Id != $Id)
+            if ($Id && $this->id != $Id)
                 continue;
 
             // get reagents
@@ -1033,7 +1033,7 @@ class SpellList extends BaseType
                 $x .= '<table width="100%"><tr><td>';
 
             // name
-            $x .= '<b>'.$this->names[$this->Id].'</b>';
+            $x .= '<b>'.$this->names[$this->id].'</b>';
 
             // rank
             if (!empty($rankText))
@@ -1161,7 +1161,7 @@ class SpellList extends BaseType
             if ($reqWrapper2)
                 $x .= "</table>";
 
-            $this->tooltips[$this->Id] = $x;
+            $this->tooltips[$this->id] = $x;
         }
 
         return $Id ? $this->tooltips[$Id] : true;
@@ -1261,8 +1261,8 @@ class SpellList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
-                'name'  => $this->names[$this->Id],
+            $data[$this->id] = array(
+                'name'  => $this->names[$this->id],
                 'icon'  => $this->curTpl['iconString'],
                 'level' => $this->curTpl['baseLevel'],
             );
@@ -1280,9 +1280,9 @@ class SpellList extends BaseType
         {
             $iconString = isset($this->curTpl['createItemString']) ? 'createItemString' : 'iconString';
 
-            $refs['gSpells'][$this->Id] = array(
+            $refs['gSpells'][$this->id] = array(
                 'icon' => $this->curTpl[$iconString],
-                'name' => $this->names[$this->Id],
+                'name' => $this->names[$this->id],
             );
         }
     }

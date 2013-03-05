@@ -34,14 +34,14 @@ if ($compareString)
 
             // MATCH() AGAINST() for integers would be nice...
             $res = DB::Aowow()->SelectRow(
-                "SELECT Id FROM ?_itemset WHERE
+                "SELECT id FROM ?_itemset WHERE
                 item1 = ? OR item2 = ? OR item3 = ? OR item4 = ? OR item5 = ? OR
                 item6 = ? OR item7 = ? OR item8 = ? OR item9 = ? OR item10 = ?",
                 (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0]
             );
 
             if ($res)
-                $piecesAssoc[(int)$params[0]] = $res['Id'];
+                $piecesAssoc[(int)$params[0]] = $res['id'];
         }
         $outSet[] = "[".implode(',', $outString)."]";
     }
@@ -53,16 +53,16 @@ if ($compareString)
         $iList->extendJsonStats();
         $stats = [];
 
-        foreach ($iList->json[$iList->Id] as $k => $v)
+        foreach ($iList->json[$iList->id] as $k => $v)
             $stats[] = is_numeric($v) || $v[0] == "{" ? '"'.$k.'":'.$v.'' : '"'.$k.'":"'.$v.'"';
 
-        foreach ($iList->itemMods[$iList->Id] as $k => $v)
+        foreach ($iList->itemMods[$iList->id] as $k => $v)
             if ($v)
                 $stats[] = '"'.Util::$itemMods[$k].'":'.$v;
 
         $pageData['items'][] = [
-            $iList->Id,
-            Util::jsEscape($iList->names[$iList->Id]),
+            $iList->id,
+            Util::jsEscape($iList->names[$iList->id]),
             $iList->getField('Quality'),
             $iList->getField('icon'),
             "{".implode(",", $stats)."}"

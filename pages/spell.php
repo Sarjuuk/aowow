@@ -8,10 +8,10 @@ if (!defined('AOWOW_REVISION'))
 // require 'includes/allquests.php';
 // require 'includes/class.community.php';                  // not needed .. yet
 
-$Id    = intVal($pageParam);
+$id    = intVal($pageParam);
 
-$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_SPELL, $Id, -1, User::$localeId]);
-$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_SPELL, $Id, -1, User::$localeId]);
+$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_SPELL, $id, -1, User::$localeId]);
+$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_SPELL, $id, -1, User::$localeId]);
 
 if (isset($_GET['power']))
 {
@@ -21,19 +21,19 @@ if (isset($_GET['power']))
 
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        $spell = new SpellList(array(['Id', $Id]));
+        $spell = new SpellList(array(['id', $id]));
 
         if ($spell->error)
-            die('$WowheadPower.registerSpell('.$Id.', '.User::$localeId.', {});');
+            die('$WowheadPower.registerSpell('.$id.', '.User::$localeId.', {});');
 
-        $x = '$WowheadPower.registerSpell('.$Id.', '.User::$localeId.", {\n";
-        if ($n = $spell->names[$Id])
+        $x = '$WowheadPower.registerSpell('.$id.', '.User::$localeId.", {\n";
+        if ($n = $spell->names[$id])
             $x .= "\tname_".User::$localeString.": '".Util::jsEscape($n)."',\n";
         if ($i = $spell->getField('iconString'))
             $x .= "\ticon: '".Util::jsEscape($i)."',\n";
-        if ($t = $spell->renderTooltip($Id))
+        if ($t = $spell->renderTooltip($id))
             $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($t)."'";
-        if ($b = $spell->renderBuff($Id))
+        if ($b = $spell->renderBuff($id))
             $x .= ",\n\tbuff_".User::$localeString.": '".Util::jsEscape($b)."'\n";
         $x .= '});';
 
@@ -44,17 +44,17 @@ if (isset($_GET['power']))
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $spell = new SpellList(array(['Id', $Id]));
+    $spell = new SpellList(array(['id', $id]));
 
 // v there be dragons v
 
     // Spelldata
-    if ($spellObj = new SpellList(array(['Id', $Id])))
+    if ($spellObj = new SpellList(array(['id', $id])))
     {
         $row = $spellObj->template; // equivalent to 5 layers of panzertape
 
         // Номер спелла
-        $spell['entry'] = $row['Id'];
+        $spell['entry'] = $row['id'];
         // Имя спелла
         $spell['name'] = Util::localizedString($row, 'name');
         // Иконка спелла
@@ -148,14 +148,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $spell['effect'] = [];
         for ($j=1;$j<=3;$j++)
         {
-            if($row['effect'.$j.'Id'] > 0)
+            if($row['effect'.$j.'id'] > 0)
             {
                 // Название эффекта
-                $spell['effect'][$i]['name'] = '('.$row['effect'.$j.'Id'].') '.Util::$spellEffectStrings[$row['effect'.$j.'Id']];
+                $spell['effect'][$i]['name'] = '('.$row['effect'.$j.'id'].') '.Util::$spellEffectStrings[$row['effect'.$j.'id']];
                 // Доп информация в имени
                 if($row['effect'.$j.'MiscValue'])
                 {
-                    switch ($row['effect'.$j.'Id'])
+                    switch ($row['effect'.$j.'id'])
                     {
                         // Если эффект - создание обекта, создаем информацию о нём
                         case 50: // "Summon Object"                // 103 spells, OK
@@ -199,7 +199,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     }
                 }
                 // Если просто урон школой - добавляем подпись школы
-                if($row['effect'.$j.'Id'] == 2 && $spell['school'])
+                if($row['effect'.$j.'id'] == 2 && $spell['school'])
                     $spell['effect'][$i]['name'] .= ' ('.$spell['school'].')';
                 // Радиус действия эффекта
                 if($row['effect'.$j.'RadiusMax'])
@@ -233,7 +233,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 elseif($row['effect'.$j.'AuraId'] > 0)
                     $spell['effect'][$i]['name'] .= ': Unknown Aura ('.$row['effect'.$j.'AuraId'].')';
                 // Создает вещь:
-                if($row['effect'.$j.'Id'] == 24)
+                if($row['effect'.$j.'id'] == 24)
                 {
                     $spell['effect'][$i]['item'] = [];
                     $spell['effect'][$i]['item']['entry'] = $row['effect'.$j.'CreateItemId'];

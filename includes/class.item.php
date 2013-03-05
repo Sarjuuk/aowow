@@ -90,8 +90,9 @@ class ItemList extends BaseType
             if ($addInfoMask & ITEMINFO_JSON)
                 $this->extendJsonStats();
 
-            $tmp = array_merge($this->json[$this->Id], array(
-                'name'         => $this->names[$this->Id],
+            $tmp = array_merge($this->json[$this->id], array(
+                'id'           => $this->id,
+                'name'         => $this->names[$this->id],
                 'quality'      => 7 - $this->curTpl['Quality'],
                 'reqskill'     => $this->curTpl['RequiredSkill'],
                 'reqskillrank' => $this->curTpl['RequiredSkillRank'],
@@ -112,7 +113,7 @@ class ItemList extends BaseType
             if (!in_array($this->curTpl['AllowableClass'], [-1, 0, CLASS_MASK_ALL]))
                 $tmp['reqclass'] = $this->curTpl['AllowableClass'];  // $tmp['classes'] ??
 
-            $data[$this->Id] = $tmp;
+            $data[$this->id] = $tmp;
         }
 
         /* even more complicated crap
@@ -140,8 +141,8 @@ class ItemList extends BaseType
 
         while ($this->iterate())
         {
-            $refs['gItems'][$this->Id] = array(
-                'name'    => $this->names[$this->Id],
+            $refs['gItems'][$this->id] = array(
+                'name'    => $this->names[$this->id],
                 'quality' => $this->curTpl['Quality'],
                 'icon'    => $this->curTpl['icon'],
             );
@@ -161,10 +162,10 @@ class ItemList extends BaseType
         if ($this->error)
             return;
 
-        $name = $this->names[$this->Id];
+        $name = $this->names[$this->id];
 
-        if (!empty($this->tooltip[$this->Id]))
-            return $this->tooltip[$this->Id];
+        if (!empty($this->tooltip[$this->id]))
+            return $this->tooltip[$this->id];
 
         if (!empty($enhance['rand']))
         {
@@ -532,10 +533,10 @@ class ItemList extends BaseType
 
         if ($itemSpellsAndTrigger)
         {
-            $itemSpells = new SpellList(array(['Id', array_keys($itemSpellsAndTrigger)]));
+            $itemSpells = new SpellList(array(['id', array_keys($itemSpellsAndTrigger)]));
             while ($itemSpells->iterate())
                 if ($parsed = $itemSpells->parseText('description', $this->curTpl['RequiredLevel']))
-                    $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->Id]].$parsed;
+                    $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id]].$parsed;
         }
 
 
@@ -556,7 +557,7 @@ class ItemList extends BaseType
                 ?_itemset
             WHERE
                 (item1=?d or item2=?d or item3=?d or item4=?d or item5=?d or item6=?d or item7=?d or item8=?d or item9=?d or item10=?d)',
-            $this->Id, $this->Id, $this->Id, $this->Id, $this->Id, $this->Id, $this->Id, $this->Id, $this->Id, $this->Id
+            $this->id, $this->id, $this->id, $this->id, $this->id, $this->id, $this->id, $this->id, $this->id, $this->id
         );
 
         if ($itemset)
@@ -573,7 +574,7 @@ class ItemList extends BaseType
             }
             $tmpX .= implode('<br />', $pieces);
 
-            $x .= '<br /><span class="q"><a href="?itemset='.$itemset['Id'].'" class="q">'.Util::localizedString($itemset, 'name').'</a> (0/'.$num.')</span>';
+            $x .= '<br /><span class="q"><a href="?itemset='.$itemset['id'].'" class="q">'.Util::localizedString($itemset, 'name').'</a> (0/'.$num.')</span>';
 
             if ($itemset['skillID'])                        // bonus requires skill to activate
             {
@@ -598,13 +599,13 @@ class ItemList extends BaseType
             // todo: get from static prop?
             if ($setSpellsAndIdx)
             {
-                $boni = new SpellList(array(['Id', array_keys($setSpellsAndIdx)]));
+                $boni = new SpellList(array(['id', array_keys($setSpellsAndIdx)]));
                 while ($boni->iterate())
                 {
                     $itemset['spells'][] = array(
                         'tooltip' => $boni->parseText('description', $this->curTpl['RequiredLevel']),
-                        'entry'   => $itemset['spell'.$setSpellsAndIdx[$boni->Id]],
-                        'bonus'   => $itemset['bonus'.$setSpellsAndIdx[$boni->Id]]
+                        'entry'   => $itemset['spell'.$setSpellsAndIdx[$boni->id]],
+                        'bonus'   => $itemset['bonus'.$setSpellsAndIdx[$boni->id]]
                     );
                 }
             }
@@ -632,7 +633,7 @@ class ItemList extends BaseType
         // recipe handling (some stray Techniques have subclass == 0), place at bottom of tooltipp
         if ($this->curTpl['class'] == ITEM_CLASS_RECIPE && ($this->curTpl['subclass'] || $this->curTpl['BagFamily'] == 16))
         {
-            $craftSpell   = new SpellList(array(['Id', (int)$this->curTpl['spellid_2']]));
+            $craftSpell   = new SpellList(array(['id', (int)$this->curTpl['spellid_2']]));
             $craftItem    = new ItemList(array(['i.entry', (int)$craftSpell->curTpl["effect1CreateItemId"]]));
             $reagentItems = [];
 
@@ -648,7 +649,7 @@ class ItemList extends BaseType
             $xCraft = '<div><br />'.$craftItem->renderTooltip(null, $interactive).'</div><br />';
 
             while ($reagents->iterate())
-                $reqReag[] = '<a href="?item='.$reagents->Id.'">'.$reagents->names[$reagents->Id].'</a> ('.$reagentItems[$reagents->Id].')';
+                $reqReag[] = '<a href="?item='.$reagents->id.'">'.$reagents->names[$reagents->id].'</a> ('.$reagentItems[$reagents->id].')';
 
             $xCraft .= '<span class="q1">'.Lang::$game['requires']." ".implode(", ", $reqReag).'</span>';
 
@@ -682,24 +683,24 @@ class ItemList extends BaseType
         $x .= '</td></tr></table>';
 
         // heirloom tooltip scaling
-        if (isset($this->ssd[$this->Id]))
+        if (isset($this->ssd[$this->id]))
         {
             $link = array(
-                $this->Id,                                  // itemId
+                $this->id,                                  // itemId
                 1,                                          // scaleMinLevel
-                $this->ssd[$this->Id]['maxLevel'],          // scaleMaxLevel
-                $this->ssd[$this->Id]['maxLevel'],          // scaleCurLevel
+                $this->ssd[$this->id]['maxLevel'],          // scaleMaxLevel
+                $this->ssd[$this->id]['maxLevel'],          // scaleCurLevel
                 $this->curTpl['ScalingStatDistribution'],   // scaleDist
                 $this->curTpl['ScalingStatValue'],          // scaleFlags
             );
             $x .= '<!--?'.implode(':', $link).'-->';
         }
         else
-            $x .= '<!--?'.$this->Id.':1:'.MAX_LEVEL.':'.MAX_LEVEL.'-->';
+            $x .= '<!--?'.$this->id.':1:'.MAX_LEVEL.':'.MAX_LEVEL.'-->';
 
-        $this->tooltip[$this->Id] = $x;
+        $this->tooltip[$this->id] = $x;
 
-        return $this->tooltip[$this->Id];
+        return $this->tooltip[$this->id];
     }
 
     // from Trinity
@@ -783,7 +784,7 @@ class ItemList extends BaseType
             if (!$this->curTpl['stat_type'.$h])
                 continue;
 
-            @$this->itemMods[$this->Id][$this->curTpl['stat_type'.$h]] += $this->curTpl['stat_value'.$h];
+            @$this->itemMods[$this->id][$this->curTpl['stat_type'.$h]] += $this->curTpl['stat_value'.$h];
         }
 
         // convert Spells
@@ -802,33 +803,33 @@ class ItemList extends BaseType
 
         if ($equipSpells)
         {
-            $eqpSplList = new SpellList(array(['Id', $equipSpells]));
+            $eqpSplList = new SpellList(array(['id', $equipSpells]));
             $stats      = $eqpSplList->getStatGain();
             foreach ($stats as $mId => $qty)
-                @$this->itemMods[$this->Id][$mId] += $qty;
+                @$this->itemMods[$this->id][$mId] += $qty;
         }
 
         // fetch and add socketbonusstats
-        if (@$this->json[$this->Id]['socketbonus'] > 0)
+        if (@$this->json[$this->id]['socketbonus'] > 0)
         {
-            $enh = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?;', $this->json[$this->Id]['socketbonus']);
-            $this->json[$this->Id]['socketbonusstat'] = [];
+            $enh = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?;', $this->json[$this->id]['socketbonus']);
+            $this->json[$this->id]['socketbonusstat'] = [];
             $socketbonusstat = Util::parseItemEnchantment($enh);
             foreach ($socketbonusstat as $k => $v)
-                $this->json[$this->Id]['socketbonusstat'][] = '"'.$k.'":'.$v;
+                $this->json[$this->id]['socketbonusstat'][] = '"'.$k.'":'.$v;
 
-            $this->json[$this->Id]['socketbonusstat'] = "{".implode(',', $this->json[$this->Id]['socketbonusstat'])."}";
+            $this->json[$this->id]['socketbonusstat'] = "{".implode(',', $this->json[$this->id]['socketbonusstat'])."}";
         }
 
         // readdress itemset .. is wrong for virtual sets
         if ($pieceAssoc)
-            $this->json[$this->Id]['itemset'] = $pieceAssoc[$this->Id];
+            $this->json[$this->id]['itemset'] = $pieceAssoc[$this->id];
 
         // gather random Enchantments
         // todo: !important! extremly high sql-load
-        if (@$this->json[$this->Id]['commondrop'] && isset($this->subItems[$this->Id]))
+        if (@$this->json[$this->id]['commondrop'] && isset($this->subItems[$this->id]))
         {
-            foreach ($this->subItems[$this->Id] as $k => $sI)
+            foreach ($this->subItems[$this->id] as $k => $sI)
             {
                 $jsonEquip = [];
                 $jsonText  = [];
@@ -856,27 +857,27 @@ class ItemList extends BaseType
                     }
                 }
 
-                $this->subItems[$this->Id][$k] = array(
+                $this->subItems[$this->id][$k] = array(
                     'name'          => Util::localizedString($sI, 'name'),
                     'enchantment'   => implode(', ', $jsonText),
                     'jsonequip'     => $jsonEquip
                 );
             }
 
-            $this->json[$this->Id]['subitems'] = json_encode($this->subItems[$this->Id], JSON_FORCE_OBJECT);
+            $this->json[$this->id]['subitems'] = json_encode($this->subItems[$this->id], JSON_FORCE_OBJECT);
         }
 
-        foreach ($this->json[$this->Id] as $k => $v)
+        foreach ($this->json[$this->id] as $k => $v)
         {
             if (!isset($v) || $v === "false")
             {
-                unset($this->json[$this->Id][$k]);
+                unset($this->json[$this->id][$k]);
                 continue;
             }
 
             if (!in_array($k, ['classs', 'subclass', 'armor']) && $v === "0")
             {
-                unset($this->json[$this->Id][$k]);
+                unset($this->json[$this->id][$k]);
                 continue;
             }
         }
@@ -885,7 +886,7 @@ class ItemList extends BaseType
     private function parseRating($type, $value, $interactive = false)
     {
         // clamp level range
-        $ssdLvl = isset($this->ssd[$this->Id]) ? $this->ssd[$this->Id]['maxLevel'] : 1;
+        $ssdLvl = isset($this->ssd[$this->id]) ? $this->ssd[$this->id]['maxLevel'] : 1;
         $level  = min(max($this->curTpl['RequiredLevel'], $ssdLvl), MAX_LEVEL);
 
         if (!Lang::$item['statType'][$type])                // unknown rating
@@ -925,45 +926,45 @@ class ItemList extends BaseType
             if ($mask & (1 << $i))
                 $field = Util::$ssdMaskFields[$i];
 
-        return $field ? DB::Aowow()->selectCell("SELECT ?# FROM ?_scalingstatvalues WHERE charLevel = ?", $field, $this->ssd[$this->Id]['maxLevel']) : 0;
+        return $field ? DB::Aowow()->selectCell("SELECT ?# FROM ?_scalingstatvalues WHERE charLevel = ?", $field, $this->ssd[$this->id]['maxLevel']) : 0;
     }
 
     private function initScalingStats()
     {
-        $this->ssd[$this->Id] = DB::Aowow()->selectRow("SELECT * FROM ?_scalingstatdistribution WHERE id = ?", $this->curTpl['ScalingStatDistribution']);
+        $this->ssd[$this->id] = DB::Aowow()->selectRow("SELECT * FROM ?_scalingstatdistribution WHERE id = ?", $this->curTpl['ScalingStatDistribution']);
 
         // stats and ratings
         for ($i = 1; $i <= 10; $i++)
         {
-            if ($this->ssd[$this->Id]['statMod'.$i] <= 0)
+            if ($this->ssd[$this->id]['statMod'.$i] <= 0)
             {
-                $this->templates[$this->Id]['stat_type'.$i]  = 0;
-                $this->templates[$this->Id]['stat_value'.$i] = 0;
+                $this->templates[$this->id]['stat_type'.$i]  = 0;
+                $this->templates[$this->id]['stat_value'.$i] = 0;
             }
             else
             {
-                $this->templates[$this->Id]['stat_type'.$i]  = $this->ssd[$this->Id]['statMod'.$i];
-                $this->templates[$this->Id]['stat_value'.$i] = intVal(($this->getSSDMod('stats') * $this->ssd[$this->Id]['modifier'.$i]) / 10000);
+                $this->templates[$this->id]['stat_type'.$i]  = $this->ssd[$this->id]['statMod'.$i];
+                $this->templates[$this->id]['stat_value'.$i] = intVal(($this->getSSDMod('stats') * $this->ssd[$this->id]['modifier'.$i]) / 10000);
             }
         }
 
         // armor: only replace if set
         if ($ssvArmor = $this->getSSDMod('armor'))
-            $this->templates[$this->Id]['armor'] = $ssvArmor;
+            $this->templates[$this->id]['armor'] = $ssvArmor;
 
         // if set dpsMod in ScalingStatValue use it for min (70% from average), max (130% from average) damage
         if ($extraDPS = $this->getSSDMod('dps'))            // dmg_x2 not used for heirlooms
         {
             $average = $extraDPS * $this->curTpl['delay'] / 1000;
-            $this->templates[$this->Id]['dmg_min1'] = number_format(0.7 * $average);
-            $this->templates[$this->Id]['dmg_max1'] = number_format(1.3 * $average);
+            $this->templates[$this->id]['dmg_min1'] = number_format(0.7 * $average);
+            $this->templates[$this->id]['dmg_max1'] = number_format(1.3 * $average);
         }
 
         // apply Spell Power from ScalingStatValue if set
         if ($spellBonus = $this->getSSDMod('spell'))
         {
-            $this->templates[$this->Id]['stat_type10']  = ITEM_MOD_SPELL_POWER;
-            $this->templates[$this->Id]['stat_value10'] = $spellBonus;
+            $this->templates[$this->id]['stat_type10']  = ITEM_MOD_SPELL_POWER;
+            $this->templates[$this->id]['stat_value10'] = $spellBonus;
         }
     }
 
@@ -977,22 +978,22 @@ class ItemList extends BaseType
                     $randomIds[$key] = -$val;
                 });
 
-            $this->subItems[$this->Id] = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM ?_itemRandomEnchant WHERE Id IN (?a)', $randomIds);
+            $this->subItems[$this->id] = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM ?_itemRandomEnchant WHERE Id IN (?a)', $randomIds);
 
             // subitems may share enchantmentIds
-            foreach ($this->subItems[$this->Id] as $sI)
+            foreach ($this->subItems[$this->id] as $sI)
                 for ($i = 1; $i < 6; $i++)
                     if (!isset($this->rndEnchIds[$sI['enchantId'.$i]]) && $sI['enchantId'.$i])
                         if ($enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $sI['enchantId'.$i]))
-                            $this->rndEnchIds[$enchant['Id']] = $enchant;
+                            $this->rndEnchIds[$enchant['id']] = $enchant;
         }
     }
 
     private function initJsonStats()
     {
         $json = array(
-            'id'          => $this->Id,                     // note to self: lowercase for js-Ids.. ALWAYS!!
-            'name'        => (ITEM_QUALITY_HEIRLOOM - $this->curTpl['Quality']).$this->names[$this->Id],
+            'id'          => $this->id,                     // note to self: lowercase for js-Ids.. ALWAYS!!
+            'name'        => (ITEM_QUALITY_HEIRLOOM - $this->curTpl['Quality']).$this->names[$this->id],
             'icon'        => $this->curTpl['icon'],
             'classs'      => $this->curTpl['class'],
             'subclass'    => $this->curTpl['subclass'],

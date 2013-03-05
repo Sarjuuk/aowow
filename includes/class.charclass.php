@@ -5,7 +5,7 @@ if (!defined('AOWOW_REVISION'))
 
 class CharClassList extends BaseType
 {
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_classes WHERE [cond] ORDER BY Id ASC';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_classes WHERE [cond] ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_classes WHERE [cond]';
 
     public function getListviewData()
@@ -14,9 +14,9 @@ class CharClassList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
-                'Id'     => $this->Id,
-                'name'   => $this->names[$this->Id],
+            $data[$this->id] = array(
+                'id'     => $this->id,
+                'name'   => $this->names[$this->id],
                 'races'  => $this->curTpl['raceMask'],
                 'roles'  => $this->curTpl['roles'],
                 'weapon' => $this->curTpl['weaponTypeMask'],
@@ -25,10 +25,10 @@ class CharClassList extends BaseType
             );
 
             if ($this->curTpl['expansion'] == 2)            // todo: grr, move to db
-                $data[$this->Id]['hero'] = 1;
+                $data[$this->id]['hero'] = 1;
 
             if ($this->curTpl['expansion'])
-                $data[$this->Id]['expansion'] = $this->curTpl['expansion'];
+                $data[$this->id]['expansion'] = $this->curTpl['expansion'];
         }
 
         return $data;
@@ -40,7 +40,7 @@ class CharClassList extends BaseType
             $refs['gClasses'] = [];
 
         while ($this->iterate())
-            $refs['gClasses'][$this->Id] = Util::jsEscape($this->names[$this->Id]);
+            $refs['gClasses'][$this->id] = Util::jsEscape($this->names[$this->id]);
     }
 
     public function addRewardsToJScript(&$ref) { }

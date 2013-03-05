@@ -5,7 +5,7 @@ if (!defined('AOWOW_REVISION'))
 
 class CurrencyList extends BaseType
 {
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_currencies WHERE [cond] ORDER BY Id ASC';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_currencies WHERE [cond] ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_currencies WHERE [cond]';
 
     public function getListviewData()
@@ -14,10 +14,10 @@ class CurrencyList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
-                'Id'        => $this->Id,
+            $data[$this->id] = array(
+                'id'        => $this->id,
                 'category'  => $this->curTpl['category'],
-                'name'      => $this->names[$this->Id],
+                'name'      => $this->names[$this->id],
                 'icon'      => $this->curTpl['iconString']
             );
         }
@@ -34,8 +34,8 @@ class CurrencyList extends BaseType
 
         while ($this->iterate())
         {
-            $refs['gCurrencies'][$this->Id] = array(
-                'name_'.User::$localeString => Util::jsEscape($this->names[$this->Id]),
+            $refs['gCurrencies'][$this->id] = array(
+                'name_'.User::$localeString => Util::jsEscape($this->names[$this->id]),
                 'icon'                      => $this->curTpl['iconString']
             );
         }

@@ -24,7 +24,7 @@
 					{if $curr.note}note:{$curr.note},{/if}
 					{if $curr.pieces}pieces:[{section name=j loop=$curr.pieces}{$curr.pieces[j]}{if $smarty.section.j.last}{else},{/if}{/section}],{/if}
 					{if isset($curr.type)}type:{$curr.type},{/if}
-					id:{$curr.Id}
+					id:{$curr.id}
 				{rdelim}
 				{if $smarty.foreach.i.last}{else},{/if}
 			{/foreach}

@@ -5,7 +5,7 @@ if (!defined('AOWOW_REVISION'))
 
 class CharRaceList extends BaseType
 {
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_races WHERE [cond] ORDER BY Id ASC';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_races WHERE [cond] ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_races WHERE [cond]';
 
     public function getListviewData()
@@ -14,9 +14,9 @@ class CharRaceList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
-                'Id'      => $this->Id,
-                'name'    => $this->names[$this->Id],
+            $data[$this->id] = array(
+                'id'      => $this->id,
+                'name'    => $this->names[$this->id],
                 'classes' => $this->curTpl['classMask'],
                 'faction' => $this->curTpl['factionId'],
                 'leader'  => $this->curTpl['leader'],
@@ -25,7 +25,7 @@ class CharRaceList extends BaseType
             );
 
             if ($this->curTpl['expansion'])
-                $data[$this->Id]['expansion'] = $this->curTpl['expansion'];
+                $data[$this->id]['expansion'] = $this->curTpl['expansion'];
         }
 
         return $data;
@@ -36,7 +36,7 @@ class CharRaceList extends BaseType
         if (!isset($refs['gRaces']))
             $refs['gRaces'] = [];
 
-        $refs['gRaces'][$this->Id] = Util::jsEscape($this->names[$this->Id]);
+        $refs['gRaces'][$this->id] = Util::jsEscape($this->names[$this->id]);
     }
 
     public function addRewardsToJScript(&$ref) { }

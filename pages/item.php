@@ -58,10 +58,10 @@ if (isset($_GET['power']))
 
         $item->renderTooltip($enh);
         $x .= '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($item->names[$item->Id])."',\n";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($item->names[$id])."',\n";
         $x .= "\tquality: ".$item->getField('Quality').",\n";
         $x .= "\ticon: '".Util::jsEscape($item->getField('icon'))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($item->tooltip[$item->Id])."'\n";
+        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($item->tooltip[$id])."'\n";
         $x .= "});";
 
         $smarty->saveCache($cacheKeyTooltip, $x);

@@ -9,7 +9,7 @@ class ItemsetList extends BaseType
     public    $pieces     = [];                             // used to build g_items and search
     public    $pieceToSet = [];
 
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_itemset WHERE [filter] [cond] ORDER BY maxlevel ASC';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_itemset WHERE [filter] [cond] ORDER BY maxlevel ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_itemset WHERE [filter] [cond]';
 
     public function __construct($data)
@@ -19,7 +19,7 @@ class ItemsetList extends BaseType
         // post processing
         foreach ($this->templates as $this->curTpl)
         {
-            $Id = $this->curTpl['Id'];
+            $Id = $this->curTpl['id'];
 
             $this->templates[$Id]['classes'] = [];
             $this->templates[$Id]['pieces']  = [];
@@ -39,7 +39,7 @@ class ItemsetList extends BaseType
                 {
                     $this->pieces[] = $piece;
                     $this->templates[$Id]['pieces'][] = $piece;
-                    $this->pieceToSet[$piece] = $this->Id;
+                    $this->pieceToSet[$piece] = $this->id;
                 }
             }
         }
@@ -59,10 +59,10 @@ class ItemsetList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
-                'Id'       => $this->Id,
+            $data[$this->id] = array(
+                'id'       => $this->id,
                 'idbak'    => $this->curTpl['refSetId'],
-                'name'     => $this->names[$this->Id],
+                'name'     => $this->names[$this->id],
                 'quality'  => 7 - $this->curTpl['quality'],
                 'minlevel' => $this->curTpl['minLevel'],
                 'maxlevel' => $this->curTpl['maxLevel'],
@@ -81,7 +81,7 @@ class ItemsetList extends BaseType
     public function addGlobalsToJscript(&$refs)
     {
         if ($this->classes)
-            (new CharClassList(array(['Id', $this->classes])))->addGlobalsToJscript($refs);
+            (new CharClassList(array(['id', $this->classes])))->addGlobalsToJscript($refs);
 
         if ($this->pieces)
             (new ItemList(array(['i.entry', $this->pieces])))->addGlobalsToJscript($refs);

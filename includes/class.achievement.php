@@ -8,7 +8,7 @@ class AchievementList extends BaseType
     public    $criteria   = [];
     public    $tooltip    = [];
 
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_achievement WHERE [filter] [cond]';
 
     public function __construct($conditions)
@@ -19,7 +19,7 @@ class AchievementList extends BaseType
         while ($this->iterate())
         {
             if (!$this->curTpl['iconString'])
-                $this->templates[$this->Id]['iconString'] = 'INV_Misc_QuestionMark';
+                $this->templates[$this->id]['iconString'] = 'INV_Misc_QuestionMark';
 
             //"rewards":[[11,137],[3,138]]   [type, typeId]
             if (!empty($this->curTpl['rewardIds']))
@@ -29,7 +29,7 @@ class AchievementList extends BaseType
                 foreach ($rewIds as $rewId)
                     $rewards[] = ($rewId > 0 ? [TYPE_ITEM => $rewId] : ($rewId < 0 ? [TYPE_TITLE => -$rewId] : NULL));
 
-                $this->templates[$this->Id]['rewards'] = $rewards;
+                $this->templates[$this->id]['rewards'] = $rewards;
             }
         }
 
@@ -58,7 +58,7 @@ class AchievementList extends BaseType
             (new ItemList(array(['i.entry', array_unique($lookup['item'])])))->addGlobalsToJscript($refs);
 
         if (isset($lookup['title']))
-            (new TitleList(array(['Id', array_unique($lookup['title'])])))->addGlobalsToJscript($refs);
+            (new TitleList(array(['id', array_unique($lookup['title'])])))->addGlobalsToJscript($refs);
     }
 
     public function addGlobalsToJscript(&$refs)
@@ -68,7 +68,7 @@ class AchievementList extends BaseType
 
         while ($this->iterate())
         {
-            $refs['gAchievements'][$this->Id] = array(
+            $refs['gAchievements'][$this->id] = array(
                 'icon' => $this->curTpl['iconString'],
                 'name' => Util::localizedString($this->curTpl, 'name')
             );
@@ -81,8 +81,8 @@ class AchievementList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
-                'id'            => $this->Id,
+            $data[$this->id] = array(
+                'id'            => $this->id,
                 'name'          => Util::localizedString($this->curTpl, 'name'),
                 'description'   => Util::localizedString($this->curTpl, 'description'),
                 'points'        => $this->curTpl['points'],
@@ -98,10 +98,10 @@ class AchievementList extends BaseType
                 foreach ($this->curTpl['rewards'] as $pair)
                     $rewards[] = '['.key($pair).','.current($pair).']';
 
-                $data[$this->Id]['rewards'] = '['.implode(',', $rewards).']';
+                $data[$this->id]['rewards'] = '['.implode(',', $rewards).']';
             }
             else if (!empty ($this->curTpl['reward']))
-                $data[$this->Id]['reward'] = Util::localizedString($this->curTpl, 'reward');
+                $data[$this->id]['reward'] = Util::localizedString($this->curTpl, 'reward');
 
         }
 
@@ -115,8 +115,8 @@ class AchievementList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
-                'id'            => $this->Id,
+            $data[$this->id] = array(
+                'id'            => $this->id,
                 'name'          => Util::localizedString($this->curTpl, 'name'),
                 'description'   => Util::localizedString($this->curTpl, 'description'),
                 'points'        => $this->curTpl['points'],
@@ -134,26 +134,26 @@ class AchievementList extends BaseType
     {
         if (empty($this->criteria))
         {
-            $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievement` = ? ORDER BY `order` ASC', $this->Id);
+            $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievement` = ? ORDER BY `order` ASC', $this->id);
             if (!$result)
                 return [];
 
             if (is_array($result[0]))
-                $this->criteria[$this->Id] = $result;
+                $this->criteria[$this->id] = $result;
             else
-                $this->criteria[$this->Id][] = $result;
+                $this->criteria[$this->id][] = $result;
         }
 
         if ($idx < 0)
-            return $this->criteria[$this->Id];
+            return $this->criteria[$this->id];
         else
-            return $this->criteria[$this->Id][$idx];
+            return $this->criteria[$this->id][$idx];
     }
 
     public function renderTooltip()
     {
-        if (!empty($this->tooltip[$this->Id]))
-            return $this->tooltip[$this->Id];
+        if (!empty($this->tooltip[$this->id]))
+            return $this->tooltip[$this->id];
 
         $criteria = $this->getCriteria();
         $tmp  = [];
@@ -232,9 +232,9 @@ class AchievementList extends BaseType
             $x .= '</td></tr></table>';
 
         // Completed
-        $this->tooltip[$this->Id] = $x;
+        $this->tooltip[$this->id] = $x;
 
-        return $this->tooltip[$this->Id];
+        return $this->tooltip[$this->id];
     }
 
     public function getSourceData()
@@ -243,11 +243,11 @@ class AchievementList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
+            $data[$this->id] = array(
                 "n"  => Util::localizedString($this->curTpl, 'name'),
                 "s"  => $this->curTpl['faction'],
                 "t"  => TYPE_ACHIEVEMENT,
-                "ti" => $this->Id
+                "ti" => $this->id
             );
         }
 
@@ -308,7 +308,7 @@ class AchievementList extends BaseType
 
             // series parent(16) << child(16)
             $series = $this->curTpl['parent'] << 16;
-            $series |= DB::Aowow()->SelectCell('SELECT Id FROM ?_achievement WHERE parent = ?d', $acv->Id);
+            $series |= DB::Aowow()->SelectCell('SELECT Id FROM ?_achievement WHERE parent = ?d', $acv->id);
 
             // set rewards
             $rewardIds = [];
@@ -330,12 +330,12 @@ class AchievementList extends BaseType
                 }
                 else if (stristr($rStr, 'reward:'))         // i haz item
                 {
-                    if (in_array($acv->Id, [3656, 3478]))   // Pilgrim
+                    if (in_array($acv->id, [3656, 3478]))   // Pilgrim
                     {
                         $rewardIds[] = -168;
                         $rewardIds[] = 44810;
                     }
-                    else if (in_array($acv->Id, [1681, 1682]))  // Loremaster
+                    else if (in_array($acv->id, [1681, 1682]))  // Loremaster
                     {
                         $rewardIds[] = -125;
                         $rewardIds[] = 43300;
@@ -345,7 +345,7 @@ class AchievementList extends BaseType
                         $rStr = explode(':', $rStr)[1];     // head-b-gone
                         $rewardIds[] = DB::Aowow()->SelectCell('SELECT entry FROM item_template WHERE name LIKE ?s', '%'.Util::sqlEscape(trim($rStr)));
 
-                        if ($acv->Id == 1956)               // higher learning
+                        if ($acv->id == 1956)               // higher learning
                             $rewardIds[] = 44738;           // pet not in description
                     }
                 }
@@ -368,7 +368,7 @@ class AchievementList extends BaseType
                 isset($rewardIds) ? implode(' ', $rewardIds) : '',
                 $parentCat,
                 $icon,
-                $acv->Id
+                $acv->id
             );
         }
     }

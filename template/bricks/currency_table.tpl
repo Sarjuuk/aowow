@@ -16,7 +16,7 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    id:{$curr.Id},
+                    id:{$curr.id},
                     category:{$curr.category},
                     name:'{$curr.name|escape:"javascript"}',
                     icon:'{$curr.icon}',

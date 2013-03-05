@@ -7,7 +7,7 @@ class TitleList extends BaseType
 {
     private   $sources    = [];
 
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_titles WHERE [cond] ORDER BY Id ASC';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_titles WHERE [cond] ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_titles WHERE [cond]';
 
     public function __construct($data)
@@ -18,9 +18,9 @@ class TitleList extends BaseType
         while ($this->iterate())
         {
             // overwrite names with gender-speciffics
-            $this->names[$this->Id][GENDER_MALE] = Util::localizedString($this->curTpl, 'male');
+            $this->names[$this->id][GENDER_MALE] = Util::localizedString($this->curTpl, 'male');
             if ($this->curTpl['female_loc0'] || $this->curTpl['female_loc'.User::$localeId])
-                $this->names[$this->Id][GENDER_FEMALE] = Util::localizedString($this->curTpl, 'female');
+                $this->names[$this->id][GENDER_FEMALE] = Util::localizedString($this->curTpl, 'female');
 
             // preparse sources
             if (!empty($this->curTpl['source']))
@@ -29,7 +29,7 @@ class TitleList extends BaseType
                 foreach ($sources as $src)
                 {
                     $src = explode(':', $src);
-                    $this->sources[$this->Id][$src[0]][] = $src[1];
+                    $this->sources[$this->id][$src[0]][] = $src[1];
                 }
             }
         }
@@ -42,9 +42,9 @@ class TitleList extends BaseType
 
         while ($this->iterate())
         {
-            $data[$this->Id] = array(
-                'Id'        => $this->Id,
-                'name'      => $this->names[$this->Id][GENDER_MALE],
+            $data[$this->id] = array(
+                'id'        => $this->id,
+                'name'      => $this->names[$this->id][GENDER_MALE],
                 'side'      => $this->curTpl['side'],
                 'gender'    => $this->curTpl['gender'],
                 'expansion' => $this->curTpl['expansion'],
@@ -52,7 +52,7 @@ class TitleList extends BaseType
             );
 
             if (!empty($this->curTpl['source']))
-                $data[$this->Id]['source'] = $this->curTpl['source'];
+                $data[$this->id]['source'] = $this->curTpl['source'];
         }
 
         if (isset($this->name[GENDER_FEMALE]))
@@ -68,10 +68,10 @@ class TitleList extends BaseType
 
         while ($this->iterate())
         {
-            $refs['gTitles'][$this->Id]['name'] = Util::jsEscape($this->names[$this->Id][GENDER_MALE]);
+            $refs['gTitles'][$this->id]['name'] = Util::jsEscape($this->names[$this->id][GENDER_MALE]);
 
-            if (isset($this->names[$this->Id][GENDER_FEMALE]))
-                $refs['gTitles'][$this->Id]['namefemale'] = Util::jsEscape($this->names[$this->Id][GENDER_FEMALE]);
+            if (isset($this->names[$this->id][GENDER_FEMALE]))
+                $refs['gTitles'][$this->id]['namefemale'] = Util::jsEscape($this->names[$this->id][GENDER_FEMALE]);
         }
     }
 
@@ -85,20 +85,20 @@ class TitleList extends BaseType
 
         while ($this->iterate())
         {
-            if (empty($this->sources[$this->Id]))
+            if (empty($this->sources[$this->id]))
                 continue;
 
             foreach (array_keys($sources) as $srcKey)
-                if (isset($this->sources[$this->Id][$srcKey]))
-                    $sources[$srcKey] = array_merge($sources[$srcKey], $this->sources[$this->Id][$srcKey]);
+                if (isset($this->sources[$this->id][$srcKey]))
+                    $sources[$srcKey] = array_merge($sources[$srcKey], $this->sources[$this->id][$srcKey]);
         }
 
         // fill in the details
         if (!empty($sources[4]))
-            $sources[4] = (new QuestList(array(['Id', $sources[4]])))->getSourceData();
+            $sources[4] = (new QuestList(array(['id', $sources[4]])))->getSourceData();
 
         if (!empty($sources[12]))
-            $sources[12] = (new AchievementList(array(['Id', $sources[12]])))->getSourceData();
+            $sources[12] = (new AchievementList(array(['id', $sources[12]])))->getSourceData();
 
         if (!empty($sources[13]))
             $sources[13] = DB::Aowow()->SELECT('SELECT *, Id AS ARRAY_KEY FROM ?_sourceStrings WHERE Id IN (?a)', $sources[13]);

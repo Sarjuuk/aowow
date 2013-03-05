@@ -30,7 +30,7 @@ var lv_comments = [
 var lv_screenshots = [
 {foreach name=forSc from=$community.sc key=number item=sc}
     {ldelim}
-        id:{$sc.Id},
+        id:{$sc.id},
         user:'{$sc.user}',
         date:'{$sc.date|date_format:"%Y/%m/%d %H:%M:%S"}',
         width:{$sc.width},
@@ -50,7 +50,7 @@ var lv_screenshots = [
 var lv_videos = [
 {foreach name=forVi from=$community.vi key=number item=vi}
     {ldelim}
-        id:{$vi.Id},
+        id:{$vi.id},
         user:'{$vi.user}',
         date:'{$vi.date|date_format:"%Y/%m/%d %H:%M:%S"}',
         videoType:1, {* there is only youtube *}

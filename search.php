@@ -113,7 +113,7 @@ if ($searchMask & 0x1)
     if ($data = $classes->getListviewData())
     {
         while ($classes->iterate())
-            $data[$classes->Id]['param1'] = '"class_'.strToLower($classes->getField('fileString')).'"';
+            $data[$classes->id]['param1'] = '"class_'.strToLower($classes->getField('fileString')).'"';
 
         $found['class'] = array(
             'type'     => TYPE_CLASS,
@@ -138,7 +138,7 @@ if ($searchMask & 0x2)
     if ($data = $races->getListviewData())
     {
         while ($races->iterate())
-            $data[$races->Id]['param1'] = '"race_'.strToLower($races->getField('fileString')).'_male"';
+            $data[$races->id]['param1'] = '"race_'.strToLower($races->getField('fileString')).'_male"';
 
         $found['race'] = array(
             'type'     => TYPE_RACE,
@@ -212,7 +212,7 @@ if ($searchMask & 0x10)
     if ($data = $money->getListviewData())
     {
         while ($money->iterate())
-            $data[$money->Id]['param1'] = strToLower($money->getField('iconString'));
+            $data[$money->id]['param1'] = strToLower($money->getField('iconString'));
 
         $found['currency'] = array(
             'type'     => TYPE_CURRENCY,
@@ -232,7 +232,7 @@ if ($searchMask & 0x20)
     if ($data = $sets->getListviewData())
     {
         while ($sets->iterate())
-            $data[$sets->Id]['param1'] = $sets->getField('quality');
+            $data[$sets->id]['param1'] = $sets->getField('quality');
 
         $found['itemset'] = array(
             'type'     => TYPE_ITEMSET,
@@ -248,7 +248,7 @@ if ($searchMask & 0x20)
 if ($searchMask & 0x40)
 {
     if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && $found['itemset']['pieces'])
-        $conditions = [['i.class', [2, 4]], ['i.entry', $foundItems]];
+        $conditions = [['i.class', [2, 4]], ['i.entry', $found['itemset']['pieces']]];
     else
         $conditions = [[User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], 0];
     $items = new ItemList($conditions);
@@ -258,8 +258,8 @@ if ($searchMask & 0x40)
     {
         while ($items->iterate())
         {
-            $data[$items->Id]['param1'] = '"'.$items->getField('icon').'"';
-            $data[$items->Id]['param2'] = $items->getField('Quality');
+            $data[$items->id]['param1'] = '"'.$items->getField('icon').'"';
+            $data[$items->id]['param2'] = $items->getField('Quality');
         }
 
         $found['item'] = array(
@@ -380,7 +380,7 @@ else if ($searchMask & SEARCH_TYPE_OPEN)
                 break;
 
             $names[] = '"'.$data['name'].$set['appendix'].'"';
-            $extra   = [$set['type'], $data['Id']];
+            $extra   = [$set['type'], $data['id']];
 
             if (isset($data['param1']))
                 $extra[] = $data['param1'];
@@ -405,7 +405,7 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
     // // only one match -> redirect to find
     // if ($foundTotal == 1)
     // {
-        // header("Location: ?".Util::$typeStrings[$found[0]['type']].'='.$found[0]['data'][0]['Id']);
+        // header("Location: ?".Util::$typeStrings[$found[0]['type']].'='.$found[0]['data'][0]['id']);
         // die();
     // }
 

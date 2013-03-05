@@ -6,18 +6,18 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/class.community.php';
 
-$Id = intVal($pageParam);
+$id = intVal($pageParam);
 
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, $Id, -1, User::$localeId]);
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, $id, -1, User::$localeId]);
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $title = new TitleList(array(['Id', $Id]));
+    $title = new TitleList(array(['id', $id]));
     if ($title->error)
     {
         $smarty->updatePageVars(array(
             'subject'  => ucfirst(Lang::$game['title']),
-            'id'       => $Id,
+            'id'       => $id,
             'notFound' => sprintf(Lang::$main['pageNotFound'], Lang::$game['title']),
         ));
         $smarty->assign('lang', Lang::$main);
@@ -46,19 +46,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $pageData = array(
             'page' => array(
                 'name'      => $title->getHtmlizedName(),
-                'id'        => $Id,
+                'id'        => $id,
                 'expansion' => Util::$expansionString[$title->getField('expansion')]
             ),
             'infobox' => '[li][ul]'.implode('[/ul][ul]', $infobox).'[/ul][/li]',
         );
 
-        foreach ($title->sources[$Id] as $type => $entries)
+        foreach ($title->sources[$id] as $type => $entries)
         {
             // todo: hidden-/visibleCols by actual use
             switch ($type)
             {
                 case  4:
-                    $quests = new QuestList(array(['Id', $entries]));
+                    $quests = new QuestList(array(['id', $entries]));
                     $quests->addRewardsToJscript($pageData);
 
                     $pageData['page']['questReward'] = $quests->getListviewData();
@@ -70,7 +70,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     );
                     break;
                 case 12:
-                    $acvs = new AchievementList(array(['Id', $entries]));
+                    $acvs = new AchievementList(array(['id', $entries]));
                     $acvs->addGlobalsToJscript($pageData);
                     $acvs->addRewardsToJscript($pageData);
 
@@ -98,7 +98,7 @@ $smarty->updatePageVars(array(
     'path'      => $pageData['path'],
     'tab'       => 0,                                       // for g_initHeader($tab)
     'type'      => TYPE_TITLE,                              // 11:Titles
-    'typeId'    => $Id
+    'typeId'    => $id
 ));
 
 
@@ -107,7 +107,7 @@ $announcements = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags 
 foreach ($announcements as $k => $v)
     $announcements[$k]['text'] = Util::localizedString($v, 'text');
 
-$smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $Id));  // comments, screenshots, videos
+$smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
 $smarty->assign('data', $pageData);
 $smarty->assign('mysql', DB::Aowow()->getStatistics());

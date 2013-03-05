@@ -140,18 +140,18 @@ abstract class BaseType
 
         $this->curTpl = current($this->templates);
         $field        = $this->curTpl ? Util::getIdFieldName($this->curTpl) : null;
-        $this->Id     = $this->curTpl ? $this->curTpl[$field] : 0;
+        $this->id     = $this->curTpl ? $this->curTpl[$field] : 0;
 
         while ($qty--)
             next($this->templates);
 
-        return $this->Id;
+        return $this->id;
     }
 
     public function reset()
     {
         $this->curTpl = reset($this->templates);
-        $this->Id     = $this->curTpl[Util::getIdFieldName($this->curTpl)];
+        $this->id     = $this->curTpl[Util::getIdFieldName($this->curTpl)];
     }
 
     // read-access to templates
@@ -1192,7 +1192,7 @@ class Util
                     break;
                 case 3:
                 case 7:
-                    $spl  = new SpellList(array(['Id', (int)$enchant['object'.$h]]));
+                    $spl  = new SpellList(array(['id', (int)$enchant['object'.$h]]));
                     $gain = $spl->getStatGain();
 
                     foreach ($gain as $k => $v)             // array_merge screws up somehow...
@@ -1264,6 +1264,8 @@ class Util
             return 'entry';
         else if (isset($tpl['Id']))
             return 'Id';
+        else if (isset($tpl['id']))
+            return 'id';
         else if (isset($tpl['ID']))
             return 'ID';
         else

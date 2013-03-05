@@ -105,8 +105,8 @@ if (!defined('AOWOW_REVISION'))
             }
 
             // costy and locale-independant -> cache
-            if (!isset($jsonEnchants[$enchant['Id']]))
-                $jsonEnchants[$enchant['Id']] = Util::parseItemEnchantment($enchant);
+            if (!isset($jsonEnchants[$enchant['id']]))
+                $jsonEnchants[$enchant['id']] = Util::parseItemEnchantment($enchant);
 
             // defaults
             $ench = array(
@@ -117,7 +117,7 @@ if (!defined('AOWOW_REVISION'))
                 'skill'       => -1,                        // modified if skill
                 'slots'       => [],                        // determied per spell but set per item
                 'enchantment' => Util::jsEscape(Util::localizedString($enchant, 'text')),
-                'jsonequip'   => $jsonEnchants[$enchant['Id']],
+                'jsonequip'   => $jsonEnchants[$enchant['id']],
                 'temp'        => 0,                         // always 0
                 'classes'     => 0,                         // modified by item
             );
@@ -132,23 +132,23 @@ if (!defined('AOWOW_REVISION'))
                 $ench['jsonequip']['reqlevel'] = $enchant['requiredLevel'];
 
             // check if the spell has an entry in skill_line_ability -> Source:Profession
-            if ($skill = DB::Aowow()->SelectCell('SELECT skillId FROM ?_skill_line_ability WHERE spellId = ?d', $enchantSpells->Id))
+            if ($skill = DB::Aowow()->SelectCell('SELECT skillId FROM ?_skill_line_ability WHERE spellId = ?d', $enchantSpells->id))
             {
-                $ench['name'][]   = Util::jsEscape($enchantSpells->names[$enchantSpells->Id]));
-                $ench['source'][] = $enchantSpells->Id;
+                $ench['name'][]   = Util::jsEscape($enchantSpells->names[$enchantSpells->id]));
+                $ench['source'][] = $enchantSpells->id;
                 $ench['skill']    = $skill;
                 $ench['slots'][]  = $slot;
             }
 
             // check if this item can be cast via item -> Source:Item
-            if (!isset($castItems[$enchantSpells->Id]))
-                $castItems[$enchantSpells->Id] = new ItemList([['spellid_1', $enchantSpells->Id], ['name', 'Scroll of Enchant%', '!']]);    // do not reuse enchantment scrolls
+            if (!isset($castItems[$enchantSpells->id]))
+                $castItems[$enchantSpells->id] = new ItemList([['spellid_1', $enchantSpells->id], ['name', 'Scroll of Enchant%', '!']]);    // do not reuse enchantment scrolls
 
-            $cI &= $castItems[$enchantSpells->Id];          // this construct is a bit .. unwieldy
+            $cI &= $castItems[$enchantSpells->id];          // this construct is a bit .. unwieldy
             while ($cI->iterate())
             {
-                $ench['name'][]   = Util::jsEscape($cI->names[$cI->Id]);
-                $ench['source'][] = -$cI->Id;
+                $ench['name'][]   = Util::jsEscape($cI->names[$cI->id]);
+                $ench['source'][] = -$cI->id;
                 $ench['icon']     = strTolower($cI->getField('icon'));
                 $ench['slots'][]  = $slot;
 
@@ -171,33 +171,33 @@ if (!defined('AOWOW_REVISION'))
                 continue;
 
             // everything gathered
-            if (isset($enchantsOut[$enchant['Id']]))        // already found, append data
+            if (isset($enchantsOut[$enchant['id']]))        // already found, append data
             {
-                foreach ($enchantsOut[$enchant['Id']] as $k => $v)
+                foreach ($enchantsOut[$enchant['id']] as $k => $v)
                 {
                     if (is_array($v))
                     {
                         while ($pop = array_pop($ench[$k]))
-                            $enchantsOut[$enchant['Id']][$k][] = $pop;
+                            $enchantsOut[$enchant['id']][$k][] = $pop;
                     }
                     else
                     {
                         if ($k == 'quality')                // quality:-1 if spells and items are mixed
                         {
-                            if ($enchantsOut[$enchant['Id']]['source'][0] > 0 && $ench['source'][0] < 0)
-                                $enchantsOut[$enchant['Id']][$k] = -1;
-                            else if ($enchantsOut[$enchant['Id']]['source'][0] < 0 && $ench['source'][0] > 0)
-                                $enchantsOut[$enchant['Id']][$k] = -1;
+                            if ($enchantsOut[$enchant['id']]['source'][0] > 0 && $ench['source'][0] < 0)
+                                $enchantsOut[$enchant['id']][$k] = -1;
+                            else if ($enchantsOut[$enchant['id']]['source'][0] < 0 && $ench['source'][0] > 0)
+                                $enchantsOut[$enchant['id']][$k] = -1;
                             else
-                                $enchantsOut[$enchant['Id']][$k] = $ench[$k];
+                                $enchantsOut[$enchant['id']][$k] = $ench[$k];
                         }
-                        else if ($enchantsOut[$enchant['Id']][$k] <= 0)
-                            $enchantsOut[$enchant['Id']][$k] = $ench[$k];
+                        else if ($enchantsOut[$enchant['id']][$k] <= 0)
+                            $enchantsOut[$enchant['id']][$k] = $ench[$k];
                     }
                 }
             }
             else                                            // nothing yet, create new
-                $enchantsOut[$enchant['Id']] = $ench;
+                $enchantsOut[$enchant['id']] = $ench;
         }
 
         // walk over each entry and strip single-item arrays
