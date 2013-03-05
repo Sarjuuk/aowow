@@ -1,10 +1,13 @@
 {include file='header.tpl'}
 
         <div id="main">
-
             <div id="main-precontents"></div>
-
             <div class="main-contents" id="main-contents">
+                {if !empty($announcements)}
+                    {foreach from=$announcements item=item}
+                        {include file='bricks/announcement.tpl' an=$item}
+                    {/foreach}
+                {/if}
                 <div class="text">
                     <a href="http://www.wowhead.com/?{$query}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
         {if !empty($found)}
