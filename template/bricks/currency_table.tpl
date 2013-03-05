@@ -1,9 +1,9 @@
 {strip}
     new Listview({ldelim}
-        template:'title',
-        {if !isset($params.id)}id:'titles',{/if}
+        template:'currency',
+        {if !isset($params.id)}id:'currencies',{/if}
         {if !isset($params.tabs)}tabs:'listview-generic',{/if}
-        {if !isset($params.name)}name:LANG.tab_titles,{/if}
+        {if !isset($params.name)}name:LANG.tab_currencies,{/if}
         {if !isset($params.parent)}parent:'listview-generic',{/if}
         {if isset($params.note)}_truncated: 1,{/if}
         {foreach from=$params key=k item=v}
@@ -17,17 +17,9 @@
             {foreach name=i from=$data item=curr}
                 {ldelim}
                     id:{$curr.Id},
-                    name:'{$curr.name|escape:"javascript"}',
                     category:{$curr.category},
-                    expansion:{$curr.expansion},
-                    gender:{$curr.gender},
-                    side:{$curr.side}
-                    {if isset($curr.namefemale)}
-                        , namefemale:'{$curr.namefemale|escape:"javascript"}'
-                    {/if}
-                    {if isset($curr.source)}
-                        , source:{$curr.source}
-                    {/if}
+                    name:'{$curr.name|escape:"javascript"}',
+                    icon:'{$curr.icon}',
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

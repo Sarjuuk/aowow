@@ -89,9 +89,9 @@ switch ($pageCall)
         User::writeCookie();
         header('Location: '.(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '.'));
         break;
-    case 'search':                                          // tool: quick search
-    case 'data':                                            // dataset-loader
-        require $pageCall.'.php';
+    case 'data':                                            // tool: dataset-loader
+    case 'search':                                          // tool: searches
+        include $pageCall.'.php';
         break;
     /* other */
     case '':                                                // no parameter given -> MainPage
@@ -107,16 +107,16 @@ switch ($pageCall)
     case 'random':
         require 'pages/miscTools.php';
         break;
+    case 'build':
+        if (User::isInGroup(U_GROUP_EMPLOYEE))
+        {
+            require 'setup/tools/dataset-assembler/'.$pageParam.'.php';
+            break;
+        }
     case 'setup':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
             require 'setup/syncronize.php';
-            break;
-        }
-    case 'build':
-        if (User::isInGroup(U_GROUP_EMPLOYEE) && !empty($pageParam))
-        {
-            require 'setup/tools/dataset-assembler/'.$pageParam.'.php';
             break;
         }
     default:                                                // unk parameter given -> ErrorPage
