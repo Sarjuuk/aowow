@@ -3,29 +3,42 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-class Quest extends BaseType
+class QuestList extends BaseType
 {
     public    $cat1       = 0;
     public    $cat2       = 0;
 
-    protected $setupQuery = 'SELECT * FROM quest_template a LEFT JOIN locales_quest b ON a.Id = b.entry WHERE a.Id = ?';
+    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM quest_template a LEFT JOIN locales_quest b ON a.Id = b.entry WHERE [filter] [cond] ORDER BY Id ASC';
+    protected $matchQuery = 'SELECT COUNT(1) FROM quest_template a LEFT JOIN locales_quest b ON a.Id = b.entry WHERE [filter] [cond]';
 
-    public function __construct($data)
+    // parent::__construct does the job
+
+    public function iterate($qty = 1)
     {
-        parent::__construct($data);
+        $r = parent::iterate($qty);
 
-        // post process
-        $this->cat1 = $this->template['ZoneOrSort'];  // should probably be in a method...
-        foreach (Util::$questClasses as $k => $arr)
+        if (!$this->Id)
         {
-            if (in_array($this->cat1, $arr))
+            $this->cat1 = 0;
+            $this->cat2 = 0;
+        }
+        else
+        {
+            $this->cat1 = $this->curTpl['ZoneOrSort'];  // should probably be in a method...
+            foreach (Util::$questClasses as $k => $arr)
             {
-                $this->cat2 = $k;
-                break;
+                if (in_array($this->cat1, $arr))
+                {
+                    $this->cat2 = $k;
+                    break;
+                }
             }
         }
+
+        return $r;
     }
 
+    // static use START
     public static function getName($id)
     {
         $n = DB::Aowow()->SelectRow('
@@ -54,160 +67,114 @@ class Quest extends BaseType
         else
             return 0;
     }
+    // static use END
 
     public function getSourceData()
     {
-        return array(
-            "n"  => Util::localizedString($this->template, 'Title'),
-            "t"  => TYPE_QUEST,
-            "ti" => $this->Id,
-            "c"  => $this->cat1,
-            "c2" => $this->cat2
-        );
-    }
+        $data = [];
 
-    public function getListviewData()
-    {
-        $data = array(
-            'category'  => $this->cat1,
-            'category2' => $this->cat2,
-            'id'        => $this->Id,
-            'level'     => $this->template['Level'],
-            'reqlevel'  => $this->template['MinLevel'],
-            'name'      => Util::localizedString($this->template, 'Title'),
-            'side'      => Util::sideByRaceMask($this->template['RequiredRaces'])
-        );
-
-        $rewards = [];
-        for ($i = 1; $i < 5; $i++)
-            if ($this->template['RewardItemId'.$i])
-                $rewards[] = [$this->template['RewardItemId'.$i], $this->template['RewardItemCount'.$i]];
-
-        $choices = [];
-        for ($i = 1; $i < 7; $i++)
-            if ($this->template['RewardChoiceItemId'.$i])
-                $choices[] = [$this->template['RewardChoiceItemId'.$i], $this->template['RewardChoiceItemCount'.$i]];
-
-        if (!empty($rewards))
-            $data['itemrewards'] = $rewards;
-
-        if (!empty($choices))
-            $data['itemchoices'] = $choices;
-
-        if ($this->template['RewardTitleId'])
-            $data['titlereward'] = $this->template['RewardTitleId'];
-
-        // todo reprewards .. accesses QuestFactionReward.dbc
+        while ($this->iterate())
+        {
+            $data[$this->Id] = array(
+                "n"  => Util::localizedString($this->curTpl, 'Title'),
+                "t"  => TYPE_QUEST,
+                "ti" => $this->Id,
+                "c"  => $this->cat1,
+                "c2" => $this->cat2
+            );
+        }
 
         return $data;
     }
 
-    public function addRewardsToJscript(&$gItems, &$gSpells, &$gTitles)
+    public function getListviewData()
     {
-        // items
-        $items = [];
-        for ($i = 1; $i < 5; $i++)
-            if ($this->template['RewardItemId'.$i])
-                $items[] = $this->template['RewardItemId'.$i];
+        $data = [];
 
-        for ($i = 1; $i < 7; $i++)
-            if ($this->template['RewardChoiceItemId'.$i])
-                $items[] = $this->template['RewardChoiceItemId'.$i];
-
-        if (!empty($items))
+        while ($this->iterate())
         {
-            $items = new ItemList(array(['entry', $items]));
-            $items->addSelfToJScipt($gItems);
+            $set = array(
+                'category'  => $this->cat1,
+                'category2' => $this->cat2,
+                'id'        => $this->Id,
+                'level'     => $this->curTpl['Level'],
+                'reqlevel'  => $this->curTpl['MinLevel'],
+                'name'      => Util::localizedString($this->curTpl, 'Title'),
+                'side'      => Util::sideByRaceMask($this->curTpl['RequiredRaces'])
+            );
+
+            $rewards = [];
+            for ($i = 1; $i < 5; $i++)
+                if ($this->curTpl['RewardItemId'.$i])
+                    $rewards[] = [$this->curTpl['RewardItemId'.$i], $this->curTpl['RewardItemCount'.$i]];
+
+            $choices = [];
+            for ($i = 1; $i < 7; $i++)
+                if ($this->curTpl['RewardChoiceItemId'.$i])
+                    $choices[] = [$this->curTpl['RewardChoiceItemId'.$i], $this->curTpl['RewardChoiceItemCount'.$i]];
+
+            if ($rewards)
+                $set['itemrewards'] = $rewards;
+
+            if ($choices)
+                $set['itemchoices'] = $choices;
+
+            if ($this->curTpl['RewardTitleId'])
+                $set['titlereward'] = $this->curTpl['RewardTitleId'];
+
+            // todo reprewards .. accesses QuestFactionReward.dbc
         }
 
-        // spells
-        $spells = [];
-        if ($this->template['RewardSpell'])
-            $spells[] = $this->template['RewardSpell'];
-
-        if ($this->template['RewardSpellCast'])
-            $spells[] = $this->template['RewardSpellCast'];
-
-        if (!empty($spells))
-        {
-            $spells = new SpellList(array(['id', $spells]));
-            $spells->addSelfToJScipt($gSpells);
-        }
-
-        // titles
-        if ($tId = $this->template['RewardTitleId'])
-        {
-            $title = new Title($tId);
-            $title->addGlobalsToJScript($gTitles);
-        }
-    }
-}
-
-
-
-class QuestList extends BaseTypeList
-{
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM quest_template a LEFT JOIN locales_quest b ON a.Id = b.entry WHERE [filter] [cond] ORDER BY Id ASC';
-
-    public function __construct($conditions)
-    {
-        // may be called without filtering
-        if (class_exists('QuestFilter'))
-        {
-            $this->filter = new QuestFilter();
-            if (($fiData = $this->filter->init()) === false)
-                return;
-        }
-
-        parent::__construct($conditions);
+        return $data;
     }
 
-    public function addRewardsToJscript(&$gItems, &$gSpells, &$gTitles)
+    public function addRewardsToJscript(&$refs)
     {
         $items  = [];
         $spells = [];
         $titles = [];
 
-        foreach ($this->container as $quest)
+        while ($this->iterate())
         {
             // items
             for ($i = 1; $i < 5; $i++)
-                if ($quest->template['RewardItemId'.$i])
-                    $items[] = $quest->template['RewardItemId'.$i];
+                if ($this->curTpl['RewardItemId'.$i] > 0)
+                    $items[] = $this->curTpl['RewardItemId'.$i];
 
             for ($i = 1; $i < 7; $i++)
-                if ($quest->template['RewardChoiceItemId'.$i])
-                    $items[] = $quest->template['RewardChoiceItemId'.$i];
+                if ($this->curTpl['RewardChoiceItemId'.$i] > 0)
+                    $items[] = $this->curTpl['RewardChoiceItemId'.$i];
 
             // spells
-            if ($quest->template['RewardSpell'])
-                $spells[] = $quest->template['RewardSpell'];
+            if ($this->curTpl['RewardSpell'] > 0)
+                $spells[] = $this->curTpl['RewardSpell'];
 
-            if ($quest->template['RewardSpellCast'])
-                $spells[] = $quest->template['RewardSpellCast'];
+            if ($this->curTpl['RewardSpellCast'] > 0)
+                $spells[] = $this->curTpl['RewardSpellCast'];
 
             // titles
-            if ($quest->template['RewardTitleId'])
-                $titles[] = $quest->template['RewardTitleId'];
+            if ($this->curTpl['RewardTitleId'] > 0)
+                $titles[] = $this->curTpl['RewardTitleId'];
         }
 
-        if (!empty($items))
-        {
-            $items = new ItemList(array(['i.entry', $items]));
-            $items->addGlobalsToJScript($gItems);
-        }
+        if ($items)
+            (new ItemList(array(['i.entry', $items])))->addGlobalsToJscript($refs);
 
-        if (!empty($spells))
-        {
-            $spells = new SpellList(array(['id', $spells]));
-            $spells->addGlobalsToJScript($gSpells);
-        }
+        if ($spells)
+            (new SpellList(array(['Id', $spells])))->addGlobalsToJscript($refs);
 
-        if (!empty($titles))
-        {
-            $titles = new TitleList(array(['id', $titles]));
-            $titles->addGlobalsToJScript($gTitles);
-        }
+        if ($titles)
+            (new TitleList(array(['Id', $titles])))->addGlobalsToJscript($refs);
+    }
+
+    public function renderTooltip()
+    {
+        // todo
+    }
+
+    public function addGlobalsToJScript(&$refs)
+    {
+        // todo
     }
 }
 

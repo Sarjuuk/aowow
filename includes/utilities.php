@@ -3,48 +3,19 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
-class BaseType
+abstract class BaseType
 {
-    public $template      = null;
-    public $Id            = 0;
+    public    $names      = [];
+    public    $Id         = 0;
+    public    $matches    = 0;                              // total matches unaffected by sqlLimit in config
+    public    $error      = true;
+
+    protected $templates  = [];
+    protected $curTpl     = [];                             // lets iterate!
+    protected $filter     = null;
 
     protected $setupQuery = '';
-
-    public function __construct($data)
-    {
-        if (!$this->setupQuery)
-            return false;
-
-        if (is_array($data))
-            $this->template = $data;
-        else
-            $this->template = DB::Aowow()->SelectRow($this->setupQuery, intVal($data));
-
-        if (empty($this->template))
-        {
-            $this->template = null;
-            return false;
-        }
-
-        $this->Id = isset($this->template['Id']) ? (int)$this->template['Id'] : (int)$this->template['entry'];
-    }
-
-    // should return data required to display a listview of any kind
-    public function getListviewData() { }
-
-    // should return data to extend global js variables for a certain type (e.g. g_items)
-    public function addGlobalsToJScript(&$ref) { }
-
-    // should return data to extend global js variables for the rewards provided by this type (e.g. g_titles)
-    public function addRewardsToJscript(&$ref1, &$ref2 = null, &$ref3 = null) { }
-}
-
-class BaseTypeList
-{
-    public $container     = [];
-    public $filter        = null;
-
-    protected $setupQuery = '';
+    protected $matchQuery = '';
 
     /*
     *   condition as array [field, value, operator]
@@ -56,19 +27,34 @@ class BaseTypeList
     *                 ! - negated default value (NOT LIKE; <>; NOT IN)
     *   condition as str
     *       defines linking (AND || OR)
+    *   condition as int
+    *       defines LIMIT
     *
     *   example:
-    *       array(['id', 45], ['name', 'test', '!'], 'OR')
+    *       array(['id', 45], ['name', 'test', '!'], 'OR', 5)
     *   results in
-    *       WHERE id = 45 OR name NOT LIKE %test%;
+    *       WHERE id = 45 OR name NOT LIKE %test% LIMIT 5;
     */
-    public function __construct($conditions)
+    public function __construct($conditions = [])
     {
-        if (!$this->setupQuery)
-            return false;
+        global    $AoWoWconf;                                   // yes i hate myself..
 
-        $sql = [];
-        $linking = ' AND ';
+        $sql       = [];
+        $linking   = ' AND ';
+        $limit     = ' LIMIT '.$AoWoWconf['sqlLimit'];
+        $className = strtr(get_class($this), ['List' => '']);
+
+        if (!$this->setupQuery || !$this->matchQuery)
+            return;
+
+        // may be called without filtering
+        if (class_exists($className.'Filter'))
+        {
+            $fiName = $className.'Filter';
+            $this->filter = new $fiName();
+            if ($this->filter->init() === false)
+                return;
+        }
 
         foreach ($conditions as $c)
         {
@@ -90,6 +76,9 @@ class BaseTypeList
                 else
                     continue;
 
+                if (isset($c[2]) && $c[2] != '!')
+                    $op = $c[2];
+
                 if (is_array($c[1]))
                 {
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
@@ -109,52 +98,84 @@ class BaseTypeList
                 else
                     continue;
 
-                if (isset($c[2]) && $c[2] != '!')
-                    $op = $c[2];
-
                 $sql[] = $field.' '.$op.' '.$val;
             }
             else if (is_string($c))
-                $linking = $c == 'OR' ? ' OR ' : ' AND ';
-            else
+                $linking = $c == 'AND' ? ' AND ' : ' OR ';
+            else if (is_int($c))
+                $limit   = $c > 0      ? ' LIMIT '.$c : '';
                 continue;                                   // ignore other possibilities
 
         }
 
         // todo: add strings propperly without them being escaped by simpleDB..?
-        $this->setupQuery = str_replace('[filter]', $this->filter && $this->filter->buildFilterQuery() ? $this->filter->query.' AND ' : NULL, $this->setupQuery);
-        $this->setupQuery = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                      $this->setupQuery);
+        $this->setupQuery  = str_replace('[filter]', $this->filter && $this->filter->buildFilterQuery() ? $this->filter->query.' AND ' : NULL, $this->setupQuery);
+        $this->setupQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                      $this->setupQuery);
+        $this->setupQuery .= $limit;
 
-        $rows      = DB::Aowow()->Select($this->setupQuery);
-        $className = str_replace('List', '', get_class($this));
+        $this->matchQuery  = str_replace('[filter]', $this->filter && $this->filter->buildFilterQuery() ? $this->filter->query.' AND ' : NULL, $this->matchQuery);
+        $this->matchQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                      $this->matchQuery);
 
-        foreach ($rows as $k => $row)
-            $this->container[$k] = new $className($row);   // free dirty mindfuck galore here...
+        $rows = DB::Aowow()->Select($this->setupQuery);
+        if (!$rows)
+            return;
+
+        $this->matches = DB::Aowow()->SelectCell($this->matchQuery);
+
+        foreach ($rows as $k => $tpl)
+        {
+            $this->names[$k]     = Util::localizedString($tpl, Util::getNameFieldName($tpl));
+            $this->templates[$k] = $tpl;
+        }
+
+        $this->reset();
+
+        $this->error = false;
     }
 
-    public function getListviewData()
+    public function iterate($qty = 1)
     {
-        $data = [];
-        // no extra queries required, just call recursively
-        foreach ($this->container as $type)
-            $data[] = $type->getListviewData();
+        if (!$this->curTpl)                                 // exceeded end of line .. array .. in last iteration
+            reset($this->templates);
 
-        return $data;
+        $this->curTpl = current($this->templates);
+        $field        = $this->curTpl ? Util::getIdFieldName($this->curTpl) : null;
+        $this->Id     = $this->curTpl ? $this->curTpl[$field] : 0;
+
+        while ($qty--)
+            next($this->templates);
+
+        return $this->Id;
     }
 
-    public function addGlobalsToJScript(&$ref)
+    public function reset()
     {
-        // no extra queries required, just call recursively
-        foreach ($this->container as $type)
-            $type->addGlobalsToJScript($ref);
+        $this->curTpl = reset($this->templates);
+        $this->Id     = $this->curTpl[Util::getIdFieldName($this->curTpl)];
     }
 
-    public function addRewardsToJScript(&$ref1, &$ref2 = null, &$ref3 = null)
+    // read-access to templates
+    public function getField($field)
     {
-        // no extra queries required, just call recursively
-        foreach ($this->container as $type)
-            $type->addRewardsToJScript($ref1, $ref2, $ref3);
+        if (!$this->curTpl || !isset($this->curTpl[$field]))
+            return null;
+
+        return $this->curTpl[$field];
     }
+
+    // should return data required to display a listview of any kind
+    // this is a rudimentary example, that will not suffice for most Types
+    abstract public function getListviewData();
+
+    // should return data to extend global js variables for a certain type (e.g. g_items)
+    abstract public function addGlobalsToJScript(&$ref);
+
+    // should return data to extend global js variables for the rewards provided by this type (e.g. g_titles)
+    // rewards will not always be required and only by Achievement and Quest .. but yeah.. maybe it should be merged with addGlobalsToJScript
+    abstract public function addRewardsToJScript(&$ref);
+
+    // NPC, GO, Item, Quest, Spell, Achievement, Profile would require this
+    abstract public function renderTooltip();
 }
 
 class Lang
@@ -234,7 +255,7 @@ class Lang
 
     public static function getMagicSchools($schoolMask)
     {
-        $schoolMask &= 0x7F;                                // clamp to available schools..
+        $schoolMask &= SPELL_ALL_SCHOOLS;                   // clamp to available schools..
 
         $tmp = [];
         $i   = 1;
@@ -335,7 +356,7 @@ class Util
         'enus',         null,           'frfr',         'dede',         null,           null,           'eses',         null,           'ruru'
     );
 
-    private static $typeStrings             = array(        // zero-indexed
+    public static $typeStrings              = array(        // zero-indexed
         null,           'npc',          'object',       'item',         'itemset',      'quest',        'spell',        'zone',         'faction',
         'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency'
     );
@@ -1055,10 +1076,10 @@ class Util
         return strtr(trim($string), array(
             '\\' => '\\\\',
             "'"  => "\\'",
-            '"'  => '\\"',
+            // '"'  => '\\"',
             "\r" => '\\r',
             "\n" => '\\n',
-            '</' => '<\/',
+            // '</' => '<\/',
         ));
     }
 
@@ -1070,7 +1091,7 @@ class Util
         if (!empty($data[$field.'_loc'.User::$localeId]))
             return $data[$field.'_loc'.User::$localeId];
 
-        // locale not enUS; aowow-type localization available
+        // locale not enUS; aowow-type localization available; add brackets
         else if (User::$localeId != LOCALE_EN && isset($data[$field.'_loc0']) && !empty($data[$field.'_loc0']))
             return  '['.$data[$field.'_loc0'].']';
 
@@ -1124,7 +1145,7 @@ class Util
         return sprintf(Lang::$item['ratingString'], '<!--rtg%'.$type.'-->' . $result, '<!--lvl-->' . $level);
     }
 
-    public static function powerUseLocale($domain)
+    public static function powerUseLocale($domain = 'www')
     {
         foreach (Util::$localeStrings as $k => $v)
         {
@@ -1138,7 +1159,6 @@ class Util
 
         if ($domain == 'www')
         {
-            /* todo: dont .. should use locale given by inclusion of aowowPower .. should be fixed in aowowPower.js */
             User::useLocale(LOCALE_EN);
             Lang::load(User::$localeString);
         }
@@ -1172,8 +1192,9 @@ class Util
                     break;
                 case 3:
                 case 7:
-                    $spl  = new Spell($enchant['object'.$h]);
+                    $spl  = new SpellList(array(['Id', (int)$enchant['object'.$h]]));
                     $gain = $spl->getStatGain();
+
                     foreach ($gain as $k => $v)             // array_merge screws up somehow...
                         @$jsonStats[$k] += $v;
                     break;
@@ -1218,6 +1239,35 @@ class Util
         }
 
         return $return;
+    }
+
+
+    // BaseType::_construct craaap!
+    // todo: unify names
+    public static function getNameFieldName($tpl)
+    {
+        if (isset($tpl['name']) || isset($tpl['name_loc0']))
+            return 'name';
+        else if (isset($tpl['title']) || isset($tpl['title_loc0']))
+            return 'title';
+        else if (isset($tpl['male']) || isset($tpl['male_loc']))
+            return 'male';
+        else
+            return null;
+    }
+
+    // BaseType::iterate craaaaaaaaap!!!
+    // todo: unify indizes
+    public static function getIdFieldName($tpl)
+    {
+        if (isset($tpl['entry']))
+            return 'entry';
+        else if (isset($tpl['Id']))
+            return 'Id';
+        else if (isset($tpl['ID']))
+            return 'ID';
+        else
+            return null;
     }
 }
 

@@ -3,51 +3,133 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-class Achievement extends BaseType
+class AchievementList extends BaseType
 {
     public    $criteria   = [];
-    public    $tooltip    = '';
+    public    $tooltip    = [];
 
-    protected $setupQuery = "SELECT * FROM ?_achievement WHERE `Id` = ?";
+    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
+    protected $matchQuery = 'SELECT COUNT(1) FROM ?_achievement WHERE [filter] [cond]';
 
-    public function __construct($data)
+    public function __construct($conditions)
     {
-        parent::__construct($data);
+        parent::__construct($conditions);
 
         // post processing
-        if (!$this->template['iconString'])
-            $this->template['iconString'] = 'INV_Misc_QuestionMark';
+        while ($this->iterate())
+        {
+            if (!$this->curTpl['iconString'])
+                $this->templates[$this->Id]['iconString'] = 'INV_Misc_QuestionMark';
+
+            //"rewards":[[11,137],[3,138]]   [type, typeId]
+            if (!empty($this->curTpl['rewardIds']))
+            {
+                $rewards = [];
+                $rewIds  = explode(" ", $this->curTpl['rewardIds']);
+                foreach ($rewIds as $rewId)
+                    $rewards[] = ($rewId > 0 ? [TYPE_ITEM => $rewId] : ($rewId < 0 ? [TYPE_TITLE => -$rewId] : NULL));
+
+                $this->templates[$this->Id]['rewards'] = $rewards;
+            }
+        }
+
+        $this->reset();                                     // restore 'iterator'
+    }
+
+    public function addRewardsToJScript(&$refs)
+    {
+        // collect Ids to execute in single query
+        $lookup = [];
+
+        while ($this->iterate())
+        {
+            $rewards = explode(" ", $this->curTpl['rewardIds']);
+
+            foreach ($rewards as $reward)
+            {
+                if ($reward > 0)
+                    $lookup['item'][] = $reward;
+                else if ($reward < 0)
+                    $lookup['title'][] = -$reward;
+            }
+        }
+
+        if (isset($lookup['item']))
+            (new ItemList(array(['i.entry', array_unique($lookup['item'])])))->addGlobalsToJscript($refs);
+
+        if (isset($lookup['title']))
+            (new TitleList(array(['Id', array_unique($lookup['title'])])))->addGlobalsToJscript($refs);
+    }
+
+    public function addGlobalsToJscript(&$refs)
+    {
+        if (!isset($refs['gAchievements']))
+            $refs['gAchievements'] = [];
+
+        while ($this->iterate())
+        {
+            $refs['gAchievements'][$this->Id] = array(
+                'icon' => $this->curTpl['iconString'],
+                'name' => Util::localizedString($this->curTpl, 'name')
+            );
+        }
     }
 
     public function getListviewData()
     {
-        return array(
-            'id'            => $this->Id,
-            'name'          => Util::localizedString($this->template, 'name'),
-            'description'   => Util::localizedString($this->template, 'description'),
-            'points'        => $this->template['points'],
-            'faction'       => $this->template['faction'] + 1,
-            'category'      => $this->template['category'],
-            'parentCat'     => $this->template['parentCat'],
-            'rewards'       => empty($this->template['rewards']) ? NULL : $this->template['rewards'],
-            'reward'        => empty($this->template['reward_loc'.User::$localeId]) ? NULL : Util::localizedString($this->template, 'reward'),
-        );
+        $data = [];
+
+        while ($this->iterate())
+        {
+            $data[$this->Id] = array(
+                'id'            => $this->Id,
+                'name'          => Util::localizedString($this->curTpl, 'name'),
+                'description'   => Util::localizedString($this->curTpl, 'description'),
+                'points'        => $this->curTpl['points'],
+                'faction'       => $this->curTpl['faction'] + 1,
+                'category'      => $this->curTpl['category'],
+                'parentCat'     => $this->curTpl['parentCat'],
+            );
+
+            if (!empty($this->curTpl['rewards']))
+            {
+                $rewards = [];
+
+                foreach ($this->curTpl['rewards'] as $pair)
+                    $rewards[] = '['.key($pair).','.current($pair).']';
+
+                $data[$this->Id]['rewards'] = '['.implode(',', $rewards).']';
+            }
+            else if (!empty ($this->curTpl['reward']))
+                $data[$this->Id]['reward'] = Util::localizedString($this->curTpl, 'reward');
+
+        }
+
+        return $data;
     }
 
     // hmm, really needed? .. probably .. needs rename? .. also probably
     public function getDetailedData()
     {
-       return array(
-            'id'            => $this->Id,
-            'name'          => Util::localizedString($this->template, 'name'),
-            'description'   => Util::localizedString($this->template, 'description'),
-            'points'        => $this->template['points'],
-            'iconname'      => $this->template['iconString'],
-            'count'         => $this->template['reqCriteriaCount'],
-            'reward'        => empty($this->template['reward_loc'.User::$localeId]) ? NULL : Util::localizedString($this->template, 'reward'),
-        );
+       $data = [];
+
+        while ($this->iterate())
+        {
+            $data[$this->Id] = array(
+                'id'            => $this->Id,
+                'name'          => Util::localizedString($this->curTpl, 'name'),
+                'description'   => Util::localizedString($this->curTpl, 'description'),
+                'points'        => $this->curTpl['points'],
+                'iconname'      => $this->curTpl['iconString'],
+                'count'         => $this->curTpl['reqCriteriaCount'],
+                'reward'        => empty($this->curTpl['reward_loc'.User::$localeId]) ? NULL : Util::localizedString($this->curTpl, 'reward')
+            );
+        }
+
+        return $data;
     }
 
+    // only for current template
     public function getCriteria($idx = -1)
     {
         if (empty($this->criteria))
@@ -57,63 +139,29 @@ class Achievement extends BaseType
                 return [];
 
             if (is_array($result[0]))
-                $this->criteria = $result;
+                $this->criteria[$this->Id] = $result;
             else
-                $this->criteria[] = $result;
+                $this->criteria[$this->Id][] = $result;
         }
 
         if ($idx < 0)
-            return $this->criteria;
+            return $this->criteria[$this->Id];
         else
-            return $this->criteria[$idx];
+            return $this->criteria[$this->Id][$idx];
     }
 
-    public function addGlobalsToJScript(&$gAchievements)
+    public function renderTooltip()
     {
-        $gAchievements[$this->Id] = array(
-            'icon' => $this->template['iconString'],
-            'name' => Util::localizedString($this->template, 'name'),
-        );
-    }
-
-    public function addRewardsToJscript(&$gItems, &$gTitles)
-    {
-        $rewards = explode(" ", $this->template['rewardIds']);
-
-        $lookup = [];
-        foreach ($rewards as $reward)
-        {
-            if ($reward > 0)
-                $lookup['item'][] = $reward;
-            else if ($reward < 0)
-                $lookup['title'][] = -$reward;
-        }
-
-        if (isset($lookup['item']))
-        {
-            $rewItems = new ItemList(array(['i.entry', $lookup['item']]));
-            $rewItems->addGlobalsToJScript($gItems);
-        }
-
-        if (isset($lookup['title']))
-        {
-            $rewTitles = new TitleList(array(['Id', $lookup['title']]));
-            $rewTitles->addGlobalsToJScript($gTitles);
-        }
-    }
-
-    public function createTooltip()
-    {
-        if (!empty($this->tooltip))
-            return $this->tooltip;
+        if (!empty($this->tooltip[$this->Id]))
+            return $this->tooltip[$this->Id];
 
         $criteria = $this->getCriteria();
-        $tmp = [];
+        $tmp  = [];
         $rows = [];
-        $i = 0;
+        $i    = 0;
         foreach ($criteria as $_row)
         {
-            if($i++ % 2)
+            if ($i++ % 2)
                 $tmp[] = $_row;
             else
                 $rows[] = $_row;
@@ -121,9 +169,9 @@ class Achievement extends BaseType
         if ($tmp)
             $rows = array_merge($rows, $tmp);
 
-        $description = Util::localizedString($this->template, 'description');
-        $name = Util::localizedString($this->template, 'name');
-        $criteria = '';
+        $description = Util::localizedString($this->curTpl, 'description');
+        $name        = Util::localizedString($this->curTpl, 'name');
+        $criteria    = '';
 
         $i = 0;
         foreach ($rows as $crt)
@@ -148,7 +196,7 @@ class Achievement extends BaseType
                 case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
                     if (!$crtName)
-                        $crtName = Item::getName($crt['value1']);
+                        $crtName = Util::getItemName($crt['value1']);
                     break;
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
                     if (!$crtName)
@@ -184,88 +232,29 @@ class Achievement extends BaseType
             $x .= '</td></tr></table>';
 
         // Completed
-        $this->tooltip = $x;
+        $this->tooltip[$this->Id] = $x;
 
-        return $this->tooltip;
+        return $this->tooltip[$this->Id];
     }
 
     public function getSourceData()
     {
-        return array(
-            "n"  => Util::localizedString($this->template, 'name'),
-            "s"  => $this->template['faction'],
-            "t"  => TYPE_ACHIEVEMENT,
-            "ti" => $this->Id
-        );
-    }
-}
+        $data = [];
 
-
-
-class AchievementList extends BaseTypeList
-{
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
-
-    public function __construct($conditions)
-    {
-        // may be called without filtering
-        if (class_exists('AchievementFilter'))
+        while ($this->iterate())
         {
-            $this->filter = new AchievementFilter();
-            if (($fiData = $this->filter->init()) === false)
-                return;
+            $data[$this->Id] = array(
+                "n"  => Util::localizedString($this->curTpl, 'name'),
+                "s"  => $this->curTpl['faction'],
+                "t"  => TYPE_ACHIEVEMENT,
+                "ti" => $this->Id
+            );
         }
 
-        parent::__construct($conditions);
-
-        // post processing
-        foreach ($this->container as $k => $acv)
-        {
-            //"rewards":[[11,137],[3,138]]   [what, entry] 3:item; 11:title, 6:spell(unused)
-            if (!empty($acv->template['rewardIds']))
-            {
-                $rewards = [];
-                $rewIds = explode(" ", $acv->template['rewardIds']);
-                foreach ($rewIds as $rewId)
-                    $rewards[] = ($rewId > 0 ? "[3,".$rewId."]" :  ($rewId < 0 ? "[11,".-$rewId."]" : NULL));
-
-                $this->container[$k]->template['rewards'] = "[".implode(",",$rewards)."]";
-            }
-        }
+        return $data;
     }
 
-    public function addRewardsToJScript(&$gItems, &$gTitles)
-    {
-        // collect Ids to execute in single query
-        $lookup = [];
-
-        foreach ($this->container as $id => $data)
-        {
-            $rewards = explode(" ", $data->template['rewardIds']);
-
-            foreach ($rewards as $reward)
-            {
-                if ($reward > 0)
-                    $lookup['item'][] = $reward;
-                else if ($reward < 0)
-                    $lookup['title'][] = -$reward;
-            }
-        }
-
-        if (isset($lookup['item']))
-        {
-            $rewItems = new ItemList(array(['i.entry', array_unique($lookup['item'])]));
-            $rewItems->addGlobalsToJScript($gItems);
-        }
-
-        if (isset($lookup['title']))
-        {
-            $rewTitles = new TitleList(array(['Id', array_unique($lookup['title'])]));
-            $rewTitles->addGlobalsToJScript($gTitles);
-        }
-    }
-
-    // run once
+    // run once .. should this even be here..?
     public function setupAchievements()
     {
         set_time_limit(120);
@@ -309,21 +298,21 @@ class AchievementList extends BaseTypeList
                 world.achievement_dbc"
         );
 
-        foreach ($this->container as $acv)
+        while ($this->iterate())
         {
             // set iconString
-            $icon = DB::Aowow()->SelectCell('SELECT iconname FROM ?_spellicons WHERE id = ?d', $acv->template['iconId']);
+            $icon = DB::Aowow()->SelectCell('SELECT iconname FROM ?_spellicons WHERE id = ?d', $this->curTpl['iconId']);
 
             // set parentCat
-            $parentCat = DB::Aowow()->SelectCell('SELECT parentCategory FROM ?_achievementcategory WHERE Id = ?d', $acv->template['category']);
+            $parentCat = DB::Aowow()->SelectCell('SELECT parentCategory FROM ?_achievementcategory WHERE Id = ?d', $this->curTpl['category']);
 
             // series parent(16) << child(16)
-            $series = $acv->template['parent'] << 16;
+            $series = $this->curTpl['parent'] << 16;
             $series |= DB::Aowow()->SelectCell('SELECT Id FROM ?_achievement WHERE parent = ?d', $acv->Id);
 
             // set rewards
             $rewardIds = [];
-            if ($rStr = $acv->template['reward_loc0'])
+            if ($rStr = $this->curTpl['reward_loc0'])
             {
 
                 // i can haz title?
@@ -384,4 +373,5 @@ class AchievementList extends BaseTypeList
         }
     }
 }
+
 ?>

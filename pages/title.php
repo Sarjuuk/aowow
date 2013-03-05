@@ -12,43 +12,54 @@ $cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, $Id, -1, User::$locale
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $title = new Title($Id);
-    if ($title->template)
+    $title = new TitleList(array(['Id', $Id]));
+    if ($title->error)
     {
-        $title->addGlobalsToJScript($pageData['gTitles']);
+        $smarty->updatePageVars(array(
+            'subject'  => ucfirst(Lang::$game['title']),
+            'id'       => $Id,
+            'notFound' => sprintf(Lang::$main['pageNotFound'], Lang::$game['title']),
+        ));
+        $smarty->assign('lang', Lang::$main);
+        $smarty->display('404.tpl');
+        exit();
+    }
+    else
+    {
+        $title->addGlobalsToJscript($pageData);
 
         $infobox = [];
         $colon   = User::$localeId == LOCALE_FR ? ' : ' : ': '; // Je suis un prick! <_<
-        if ($title->template['side'] == 1)
+        if ($title->getField('side') == 1)
             $infobox[] = Lang::$main['side'].$colon.'[span class=alliance-icon]'.Lang::$game['alliance'].'[/span]';
-        else if ($title->template['side'] == 2)
+        else if ($title->getField('side') == 2)
             $infobox[] = Lang::$main['side'].$colon.'[span class=horde-icon]'.Lang::$game['horde'].'[/span]';
         else
             $infobox[] = Lang::$main['side'].$colon.Lang::$main['both'];
 
-        if ($title->template['gender'])
-            $infobox[] = Lang::$main['gender'].$colon.'[span class='.($title->template['gender'] == 2 ? 'female' : 'male').'-icon]'.Lang::$main['sex'][$title->template['gender']].'[/span]';
+        if ($g = $title->getField('gender'))
+            $infobox[] = Lang::$main['gender'].$colon.'[span class='.($g == 2 ? 'female' : 'male').'-icon]'.Lang::$main['sex'][$g].'[/span]';
 
-        if ($title->template['eventId'])
-            $infobox[] = Lang::$game['eventShort'].$colon.'[url=?event='.$title->template['eventId'].']'.WorldEvent::getName($title->template['eventId']).'[/url]';
+        if ($e = $title->getField('eventId'))
+            $infobox[] = Lang::$game['eventShort'].$colon.'[url=?event='.$e.']'.WorldEvent::getName($e).'[/url]';
 
         $pageData = array(
             'page' => array(
                 'name'      => $title->getHtmlizedName(),
-                'id'        => $title->Id,
-                'expansion' => Util::$expansionString[$title->template['expansion']]
+                'id'        => $Id,
+                'expansion' => Util::$expansionString[$title->getField('expansion')]
             ),
             'infobox' => '[li][ul]'.implode('[/ul][ul]', $infobox).'[/ul][/li]',
         );
 
-        foreach ($title->source as $type => $entries)
+        foreach ($title->sources[$Id] as $type => $entries)
         {
             // todo: hidden-/visibleCols by actual use
             switch ($type)
             {
                 case  4:
-                    $quests = new QuestList(array(['id', $entries]));
-                    $quests->addRewardsToJscript($pageData['gItems'], $pageData['gSpells'], $pageData['gTitles']);
+                    $quests = new QuestList(array(['Id', $entries]));
+                    $quests->addRewardsToJscript($pageData);
 
                     $pageData['page']['questReward'] = $quests->getListviewData();
                     $pageData['page']['questParams'] = array(
@@ -59,9 +70,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     );
                     break;
                 case 12:
-                    $acvs = new AchievementList(array(['id', $entries]));
-                    $acvs->addGlobalsToJScript($pageData['gAchievements']);
-                    $acvs->addRewardsToJscript($pageData['gItems'], $pageData['gTitles']);
+                    $acvs = new AchievementList(array(['Id', $entries]));
+                    $acvs->addGlobalsToJscript($pageData);
+                    $acvs->addRewardsToJscript($pageData);
 
                     $pageData['page']['acvReward'] = $acvs->getListviewData();
                     $pageData['page']['acvParams'] = array(
@@ -76,29 +87,20 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             }
         }
         $pageData['title'] = ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->name[0]))));
+        $pageData['path']  = '[0, 10, '.$title->getField('category').']';
 
         $smarty->saveCache($cacheKeyPage, $pageData);
-    }
-    else
-    {
-        $smarty->updatePageVars(array(
-            'subject'   => ucfirst(Lang::$game['title']),
-            'id'        => $Id,
-            'notFound'  => sprintf(Lang::$main['pageNotFound'], Lang::$game['title']),
-        ));
-        $smarty->assign('lang', Lang::$main);
-        $smarty->display('404.tpl');
-        exit();
     }
 }
 
 $smarty->updatePageVars(array(
     'title'     => $pageData['title']." - ".ucfirst(Lang::$game['title']),
-    'path'      => "[0, 10, ".$title->template['category']."]",
+    'path'      => $pageData['path'],
     'tab'       => 0,                                       // for g_initHeader($tab)
     'type'      => TYPE_TITLE,                              // 11:Titles
     'typeId'    => $Id
 ));
+
 
 // Announcements
 $announcements = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = "title" OR page = "*")');

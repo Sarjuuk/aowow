@@ -3,7 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-class WorldEvent
+class WorldEvent extends BaseType
 {
 
     public static function getName($id)

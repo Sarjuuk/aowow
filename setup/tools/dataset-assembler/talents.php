@@ -114,12 +114,12 @@ if (!defined('AOWOW_REVISION'))
 
                 for ($k = 0; $k <= ($m - 1); $k++)
                 {
-                    $tSpell = new Spell($talents[$j]['rank'.($k + 1)]);
+                    $tSpell = new SpellList(array(['Id', $talents[$j]['rank'.($k + 1)]]));
                     $d[] = $tSpell->parseText();
                     $s[] = $talents[$j]['rank'.($k + 1)];
 
                     if ($talents[$j]['isSpell'])
-                        $t[] = $tSpell->getTalentHead();
+                        $t[] = $tSpell->getTalentHeadForCurrent();
                 }
 
                 if ($talents[$j]['dependsOn'])

@@ -14,7 +14,7 @@
 
                 <div id="lv-titles" class="listview"></div>
                 <script type="text/javascript">
-                    {include file='bricks/title_table.tpl' data=$data.page params=null}
+                    {include file='bricks/title_table.tpl' data=$data.page params=$data.params}
                 </script>
 
                 <div class="clear"></div>

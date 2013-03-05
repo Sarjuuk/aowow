@@ -1,21 +1,21 @@
 <?php
 /*
 enum(array( // AcctError
-    'ACCT_USERNAME_LENGTH'    => 'activate_usernamelength',
-    'ACCT_PASSWORD_LENGTH'    => 'activate_passwordlength',
-    'ACCT_USERNAME_SYMBOLS'    => 'activate_invalidusername',
-    'ACCT_PASSWORD_SYMBOLS'    => 'activate_invalidpassword',
-    'ACCT_EMAIL_SYMBOLS'    => 'signup_emailinvalid',
+    'ACCT_USERNAME_LENGTH'      => 'activate_usernamelength',
+    'ACCT_PASSWORD_LENGTH'      => 'activate_passwordlength',
+    'ACCT_USERNAME_SYMBOLS'     => 'activate_invalidusername',
+    'ACCT_PASSWORD_SYMBOLS'     => 'activate_invalidpassword',
+    'ACCT_EMAIL_SYMBOLS'        => 'signup_emailinvalid',
 
-    'ACCT_PASSWORDS_NOT_EQUAL'    => 'signup_passwordsnotequal',
-    'ACCT_USERNAME_EXISTS'        => 'activate_usernameinuse',
-    'ACCT_NO_SUCH_ACCT'            => 'signin_un_or_pass_fail',
+    'ACCT_PASSWORDS_NOT_EQUAL'  => 'signup_passwordsnotequal',
+    'ACCT_USERNAME_EXISTS'      => 'activate_usernameinuse',
+    'ACCT_NO_SUCH_ACCT'         => 'signin_un_or_pass_fail',
     'ACCT_IP_LOCKED'            => 'signin_ip_locked',
 
-    'ACCT_SIGNUP_BLOCKED'    => 'signup_blocked',
-    'ACCT_SIGNIN_BLOCKED'    => 'signin_blocked',
+    'ACCT_SIGNUP_BLOCKED'       => 'signup_blocked',
+    'ACCT_SIGNIN_BLOCKED'       => 'signin_blocked',
 
-    'ACCT_INTERNAL_ERROR'    => 'internal_error',
+    'ACCT_INTERNAL_ERROR'       => 'internal_error',
 ));
 
 enum(array( // UserPropsLimits
@@ -97,7 +97,8 @@ function signin()
 
 function signup()
 {
-/*        $username = Get(GET_STRING, 'username', 'POST');
+/*
+        $username = Get(GET_STRING, 'username', 'POST');
         $password = Get(GET_STRING, 'password', 'POST');
         $pwd2 = Get(GET_STRING, 'password2', 'POST');
         $email = Get(GET_STRING, 'email', 'POST');

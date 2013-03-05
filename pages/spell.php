@@ -8,33 +8,33 @@ if (!defined('AOWOW_REVISION'))
 // require 'includes/allquests.php';
 // require 'includes/class.community.php';                  // not needed .. yet
 
-$id    = intVal($pageParam);
-$spell = new Spell($id);
+$Id    = intVal($pageParam);
 
-$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_SPELL, $id, -1, User::$localeId]);
-$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_SPELL, $id, -1, User::$localeId]);
+$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_SPELL, $Id, -1, User::$localeId]);
+$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_SPELL, $Id, -1, User::$localeId]);
 
 if (isset($_GET['power']))
 {
     header('Content-type: application/x-javascript; charsetUTF-8');
 
-    Util::powerUseLocale($_GET['domain']);
+    Util::powerUseLocale(@$_GET['domain']);
 
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        $spell = new Spell($id);
-        if (!$spell->template)
-            die('$WowheadPower.registerSpell(\''.$id.'\', '.User::$localeId.', {})');
+        $spell = new SpellList(array(['Id', $Id]));
 
-        $x = '$WowheadPower.registerSpell('.$id.', '.User::$localeId.",{\n";
-        if ($n = Util::localizedString($spell->template, 'spellname'))
+        if ($spell->error)
+            die('$WowheadPower.registerSpell('.$Id.', '.User::$localeId.', {});');
+
+        $x = '$WowheadPower.registerSpell('.$Id.', '.User::$localeId.", {\n";
+        if ($n = $spell->names[$Id])
             $x .= "\tname_".User::$localeString.": '".Util::jsEscape($n)."',\n";
-        if ($i = $spell->template['iconString'])
+        if ($i = $spell->getField('iconString'))
             $x .= "\ticon: '".Util::jsEscape($i)."',\n";
-        if ($spell->getTooltip())
-            $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($spell->tooltip)."'";
-        if ($spell->getBuff())
-            $x .= ",\n\tbuff_".User::$localeString.": '".Util::jsEscape($spell->buff)."'\n";
+        if ($t = $spell->renderTooltip($Id))
+            $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($t)."'";
+        if ($b = $spell->renderBuff($Id))
+            $x .= ",\n\tbuff_".User::$localeString.": '".Util::jsEscape($b)."'\n";
         $x .= '});';
 
         $smarty->saveCache($cacheKeyTooltip, $x);
@@ -42,16 +42,14 @@ if (isset($_GET['power']))
     die($x);
 }
 
+if (!$smarty->loadCache($cacheKeyPage, $pageData))
+{
+    $spell = new SpellList(array(['Id', $Id]));
 
 // v there be dragons v
 
-
-if (!$smarty->loadCache($cacheKeyPage, $pageData))
-{
-    unset($spell);
-
     // Spelldata
-    if ($spellObj = new Spell($id))
+    if ($spellObj = new SpellList(array(['Id', $Id])))
     {
         $row = $spellObj->template; // equivalent to 5 layers of panzertape
 
@@ -142,7 +140,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $spell['stances'] = Lang::getStances($row['stanceMask']);
 
         // Btt - Buff TollTip
-        if ($buff = $spellObj->getBuff())
+        if ($buff = $spellObj->renderBuff())
             $spell['btt'] = $buff;
 
         // Iterate through all effects:
@@ -566,7 +564,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 FROM ?_spellicons s, ?_achievementcriteria c, ?_achievement a
                 LEFT JOIN (?_zones z) ON a.map != -1 AND a.map = z.mapID
                 WHERE
-                    a.iconId = s.id
+                    a.icon = s.id
                     AND a.id = c.refAchievement
                     AND c.type IN (?a)
                     AND c.value1 = ?d

@@ -55,7 +55,7 @@ if (!defined('AOWOW_REVISION'))
     // from g_item_slots: 13:"One-Hand", 26:"Ranged", 17:"Two-Hand",
     $slotPointer   = [13, 17, 26, 26, 13, 17, 17, 13, 17, null, 17, null, null, 13, null, 13, null, null, null, null, 17];
     $locales       = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
-    $enchantSpells = new SpellList([['effect1Id', '=', '53'], ['name_loc0', 'NOT LIKE', 'QA%']]);    // enchantItemPermanent && !qualityAssurance
+    $enchantSpells = new SpellList([['effect1Id', 53], ['name_loc0', 'QA%', '!']]);     // enchantItemPermanent && !qualityAssurance
     $castItems     = [];
     $jsonEnchants  = [];
 
@@ -72,29 +72,29 @@ if (!defined('AOWOW_REVISION'))
 
         $enchantsOut = [];
 
-        foreach ($enchantSpells->spellList as $spl)
+        while ($enchantSpells->iterate())
         {
-            $enchant = DB::Aowow()->SelectRow('SELECT * FROM ?_itemEnchantment WHERE Id = ?d', $spl->template['effect1MiscValue']);
+            $enchant = DB::Aowow()->SelectRow('SELECT * FROM ?_itemEnchantment WHERE Id = ?d', $enchantSpells->getField('effect1MiscValue'));
             if (!$enchant)                                  // 'shouldn't' happen
                 continue;
 
             // slots have to be recalculated
             $slot = 0;
-            if ($spl->template['equippedItemClass'] == 4)   // armor
+            if ($enchantSpells->getField('equippedItemClass') == 4)   // armor
             {
-                if ($invType = $spl->template['equippedItemInventoryTypeMask'])
-                    $slot = $spl->template['equippedItemInventoryTypeMask'] >> 1;
+                if ($invType = $enchantSpells->getField('equippedItemInventoryTypeMask'))
+                    $slot = $enchantSpells->getField('equippedItemInventoryTypeMask') >> 1;
                 else  /* if (equippedItemSubClassMask == 64) */ // shields have it their own way <_<
                     $slot = (1 << (14 - 1));
             }
-            else if ($spl->template['equippedItemClass'] == 2) // weapon
+            else if ($enchantSpells->getField('equippedItemClass') == 2) // weapon
             {
                 foreach ($slotPointer as $i => $sp)
                 {
                     if (!$sp)
                         continue;
 
-                    if ((1 << $i) & $spl->template['equippedItemSubClassMask'])
+                    if ((1 << $i) & $enchantSpells->getField('equippedItemSubClassMask'))
                     {
                         if ($sp == 13)                      // also mainHand & offHand *siiigh*
                             $slot |= ((1 << (21 - 1)) | (1 << (22 - 1)));
@@ -112,7 +112,7 @@ if (!defined('AOWOW_REVISION'))
             $ench = array(
                 'name'        => [],                        // set by skill or item
                 'quality'     => -1,                        // modified if item
-                'icon'        => strToLower($spl->template['iconString']),  // item over spell
+                'icon'        => strToLower($enchantSpells->getField('iconString')),  // item over spell
                 'source'      => [],                        // <0: item; >0:spell
                 'skill'       => -1,                        // modified if skill
                 'slots'       => [],                        // determied per spell but set per item
@@ -132,37 +132,38 @@ if (!defined('AOWOW_REVISION'))
                 $ench['jsonequip']['reqlevel'] = $enchant['requiredLevel'];
 
             // check if the spell has an entry in skill_line_ability -> Source:Profession
-            if ($skill = DB::Aowow()->SelectCell('SELECT skillId FROM ?_skill_line_ability WHERE spellId = ?d', $spl->Id))
+            if ($skill = DB::Aowow()->SelectCell('SELECT skillId FROM ?_skill_line_ability WHERE spellId = ?d', $enchantSpells->Id))
             {
-                $ench['name'][]   = Util::jsEscape(Util::localizedString($spl->template, 'name'));
-                $ench['source'][] = $spl->Id;
+                $ench['name'][]   = Util::jsEscape($enchantSpells->names[$enchantSpells->Id]));
+                $ench['source'][] = $enchantSpells->Id;
                 $ench['skill']    = $skill;
                 $ench['slots'][]  = $slot;
             }
 
             // check if this item can be cast via item -> Source:Item
-            if (!isset($castItems[$spl->Id]))
-                $castItems[$spl->Id] = new ItemList([['spellid_1', '=', $spl->Id], ['name', 'NOT LIKE', 'Scroll of Enchant%']]);  // do not reuse enchantment scrolls
+            if (!isset($castItems[$enchantSpells->Id]))
+                $castItems[$enchantSpells->Id] = new ItemList([['spellid_1', $enchantSpells->Id], ['name', 'Scroll of Enchant%', '!']]);    // do not reuse enchantment scrolls
 
-            foreach ($castItems[$spl->Id]->container as $item)
+            $cI &= $castItems[$enchantSpells->Id];          // this construct is a bit .. unwieldy
+            while ($cI->iterate())
             {
-                $ench['name'][]   = Util::jsEscape(Util::localizedString($item->template, 'name'));
-                $ench['source'][] = -$item->Id;
-                $ench['icon']     = strTolower($item->template['icon']);
+                $ench['name'][]   = Util::jsEscape($cI->names[$cI->Id]);
+                $ench['source'][] = -$cI->Id;
+                $ench['icon']     = strTolower($cI->getField('icon'));
                 $ench['slots'][]  = $slot;
 
-                if ($item->template['Quality'] > $ench['quality'])
-                    $ench['quality'] = $item->template['Quality'];
+                if ($cI->getField('Quality') > $ench['quality'])
+                    $ench['quality'] = $cI->getField('Quality');
 
-                if ($item->template['AllowableClass'] > 0)
+                if ($cI->getField('AllowableClass') > 0)
                 {
-                    $ench['classes'] = $item->template['AllowableClass'];
-                    $ench['jsonequip']['classes'] = $item->template['AllowableClass'];
+                    $ench['classes'] = $cI->getField('AllowableClass');
+                    $ench['jsonequip']['classes'] = $cI->getField('AllowableClass');
                 }
 
                 if (!isset($ench['jsonequip']['reqlevel']))
-                    if ($item->template['RequiredLevel'] > 0)
-                        $ench['jsonequip']['reqlevel'] = $item->template['RequiredLevel'];
+                    if ($cI->getField('RequiredLevel') > 0)
+                        $ench['jsonequip']['reqlevel'] = $cI->getField('RequiredLevel');
             }
 
             // enchant spell not in use

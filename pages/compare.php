@@ -4,10 +4,10 @@ if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
 $pageData = array(
-    'summary' => '[]',
-    'items'   => []
+    'items'   => null,
+    'summary' => '[]'
 );
-$compareString  = '';
+$compareString = '';
 
 // prefer $_GET over $_COOKIE
 if (!empty($_GET['compare']))
@@ -48,22 +48,23 @@ if ($compareString)
     $pageData['summary'] = "[".implode(',', $outSet)."]";
 
     $iList = new ItemList(array(['i.entry', $items]));
-    foreach ($iList->container as $item)
+    while ($iList->iterate())
     {
-        $item->getJsonStats();
+        $iList->extendJsonStats();
         $stats = [];
-        foreach ($item->json as $k => $v)
+
+        foreach ($iList->json[$iList->Id] as $k => $v)
             $stats[] = is_numeric($v) || $v[0] == "{" ? '"'.$k.'":'.$v.'' : '"'.$k.'":"'.$v.'"';
 
-        foreach ($item->itemMods as $k => $v)
+        foreach ($iList->itemMods[$iList->Id] as $k => $v)
             if ($v)
                 $stats[] = '"'.Util::$itemMods[$k].'":'.$v;
 
         $pageData['items'][] = [
-            $item->Id,
-            Util::jsEscape(Util::localizedString($item->template, 'name')),
-            $item->template['Quality'],
-            $item->template['icon'],
+            $iList->Id,
+            Util::jsEscape($iList->names[$iList->Id]),
+            $iList->getField('Quality'),
+            $iList->getField('icon'),
             "{".implode(",", $stats)."}"
         ];
     }

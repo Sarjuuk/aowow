@@ -127,6 +127,13 @@ if (!defined('AOWOW_REVISION'))
 
     echo "script set up in ".Util::execTime()."<br>\n";
 
+    $glyphSpells = [];
+    foreach ($glyphList as $pop)
+        if ($pop['glyphEffect'])
+            $glyphSpells[] = $pop['glyphEffect'];
+
+    $glyphSpells = new SpellList(array(['Id', $glyphSpells]));
+
     foreach ($locales as $lId)
     {
         User::useLocale($lId);
@@ -138,16 +145,17 @@ if (!defined('AOWOW_REVISION'))
             if (!$pop['glyphEffect'])
                 continue;
 
-            $spl = new Spell($pop['glyphEffect']);
+            while ($glyphSpells->Id != $pop['glyphEffect'])
+                $glyphSpells->iterate();
 
-            if ($spl->template['effect1Id'] != 6 && $spl->template['effect2Id'] != 6 && $spl->template['effect3Id'] != 6)
+            if ($glyphSpells->getField('effect1Id') != 6 && $glyphSpells->getField('effect2Id') != 6 && $glyphSpells->getField('effect3Id') != 6)
                 continue;
 
             if ($pop['itemId'] == 42958)                    // Crippling Poison has no skillLine.. oO => hardcode
             {
                 $glyphsOut[$pop['itemId']] = array(
                     'name'        => Util::jsEscape(Util::localizedString($pop, 'name')),
-                    'description' => Util::jsEscape($spl->parseText()),
+                    'description' => Util::jsEscape($glyphSpells->parseText()),
                     'icon'        => 'ability_poisonsting',
                     'type'        => 0,
                     'classs'      => $pop['classs'],
@@ -158,7 +166,7 @@ if (!defined('AOWOW_REVISION'))
                 continue;
             }
 
-            $description = $spl->parseText();
+            $description = $glyphSpells->parseText();
             $spellFamily = $class2Family[$pop['classs']];
             $classId     = $pop['classs'] - 1;
             $skill       = 0;
@@ -181,11 +189,11 @@ if (!defined('AOWOW_REVISION'))
             while (empty($icons) && $i < 3)
             {
                 $i++;
-                $m1 = $spl->template['effect1SpellClassMask'.$l[$i]];
-                $m2 = $spl->template['effect2SpellClassMask'.$l[$i]];
-                $m3 = $spl->template['effect3SpellClassMask'.$l[$i]];
+                $m1 = $glyphSpells->getField('effect1SpellClassMask'.$l[$i]);
+                $m2 = $glyphSpells->getField('effect2SpellClassMask'.$l[$i]);
+                $m3 = $glyphSpells->getField('effect3SpellClassMask'.$l[$i]);
 
-                if ($spl->template['effect'.$i.'Id'] != 6 || (!$m1 && !$m2 && !$m3))
+                if ($glyphSpells->getField('effect'.$i.'Id') != 6 || (!$m1 && !$m2 && !$m3))
                     continue;
 
                 $where = "SpellFamilyId = ?d AND ((SpellFamilyFlags3 & 0xFFFFFFFF) & ?d OR (SpellFamilyFlags2 & 0xFFFFFFFF) & ?d OR (SpellFamilyFlags1 & 0xFFFFFFFF) & ?d)";

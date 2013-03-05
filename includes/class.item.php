@@ -3,117 +3,34 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-class Item extends BaseType
+class ItemList extends BaseType
 {
-    public    $name       = '';
     public    $tooltip    = '';
     public    $json       = [];
     public    $itemMods   = [];
-    private   $ssd        = null;
 
-    protected $setupQuery = 'SELECT * FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE i.entry = ?d';
+    public    $rndEnchIds = [];
+    public    $subItems   = [];
 
-    public function __construct($data)
+    private   $ssd        = [];
+
+    protected $setupQuery = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] GROUP BY i.entry ORDER BY i.Quality DESC';
+    protected $matchQuery = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond]';
+
+    public function __construct($conditions)
     {
-        parent::__construct($data);
+        parent::__construct($conditions);
 
-        // post processing
-        $this->name = Util::localizedString($this->template, 'name');
-
-        // item is scaling; overwrite other values
-        if ($this->template['ScalingStatDistribution'] > 0 && $this->template['ScalingStatValue'] > 0)
+        while ($this->iterate())
         {
-            $this->ssd = DB::Aowow()->selectRow("SELECT * FROM ?_scalingstatdistribution WHERE id = ?", $this->template['ScalingStatDistribution']);
+            // item is scaling; overwrite other values
+            if ($this->curTpl['ScalingStatDistribution'] > 0 && $this->curTpl['ScalingStatValue'] > 0)
+                $this->initScalingStats();
 
-            // stats and ratings
-            for ($i = 1; $i <= 10; $i++)
-            {
-                if ($this->ssd['statMod'.$i] <= 0)
-                {
-                    $this->template['stat_type'.$i] = 0;
-                    $this->template['stat_value'.$i] = 0;
-                }
-                else
-                {
-                    $this->template['stat_type'.$i] = $this->ssd['statMod'.$i];
-                    $this->template['stat_value'.$i] = intVal(($this->getSSDMod('stats') * $this->ssd['modifier'.$i]) / 10000);
-                }
-            }
-
-            // armor: only replace if set
-            if ($ssvArmor = $this->getSSDMod('armor'))
-                $this->template['armor'] = $ssvArmor;
-
-            // If set dpsMod in ScalingStatValue use it for min (70% from average), max (130% from average) damage
-            if ($extraDPS = $this->getSSDMod('dps'))
-            {
-                $average = $extraDPS * $this->template['delay'] / 1000;
-                $this->template['dmg_min1'] = number_format(0.7 * $average);   // dmg_2 not used for heirlooms
-                $this->template['dmg_max1'] = number_format(1.3 * $average);
-            }
-
-            // Apply Spell Power from ScalingStatValue if set
-            if ($spellBonus = $this->getSSDMod('spell'))
-            {
-                $this->template['stat_type10'] = ITEM_MOD_SPELL_POWER;
-                $this->template['stat_value10'] = $spellBonus;
-            }
+            $this->initJsonStats();
         }
 
-        // create json values; zero-values are filtered later
-        $this->json['id']                = $this->Id;
-        $this->json['name']              = (ITEM_QUALITY_HEIRLOOM - $this->template['Quality']).$this->name;
-        $this->json['icon']              = $this->template['icon'];
-        $this->json['classs']            = $this->template['class'];
-        $this->json['subclass']          = $this->template['subclass'];
-        $this->json['slot']              = $this->template['InventoryType'];
-        $this->json['slotbak']           = $this->template['InventoryType'];
-        $this->json['level']             = $this->template['ItemLevel'];
-        $this->json['reqlevel']          = $this->template['RequiredLevel'];
-        $this->json['displayid']         = $this->template['displayid'];
-        $this->json['commondrop']        = ($this->template['RandomProperty'] > 0 || $this->template['RandomSuffix'] > 0) ? 'true' : null; // string required :(
-        $this->json['holres']            = $this->template['holy_res'];
-        $this->json['firres']            = $this->template['fire_res'];
-        $this->json['natres']            = $this->template['nature_res'];
-        $this->json['frores']            = $this->template['frost_res'];
-        $this->json['shares']            = $this->template['shadow_res'];
-        $this->json['arcres']            = $this->template['arcane_res'];
-        $this->json['armorbonus']        = $this->template['ArmorDamageModifier'];
-        $this->json['armor']             = $this->template['armor'];
-        $this->json['itemset']           = $this->template['itemset'];
-        $this->json['socket1']           = $this->template['socketColor_1'];
-        $this->json['socket2']           = $this->template['socketColor_2'];
-        $this->json['socket3']           = $this->template['socketColor_3'];
-        $this->json['nsockets']          = ($this->json['socket1'] > 0 ? 1 : 0) + ($this->json['socket2'] > 0 ? 1 : 0) + ($this->json['socket3'] > 0 ? 1 : 0);
-        $this->json['socketbonus']       = $this->template['socketBonus'];
-        $this->json['scadist']           = $this->template['ScalingStatDistribution'];
-        $this->json['scaflags']          = $this->template['ScalingStatValue'];
-        if ($this->template['class'] == ITEM_CLASS_WEAPON || $this->template['class'] == ITEM_CLASS_AMMUNITION)
-        {
-            $this->json['dmgtype1']      = $this->template['dmg_type1'];
-            $this->json['dmgmin1']       = $this->template['dmg_min1'] + $this->template['dmg_min2'];
-            $this->json['dmgmax1']       = $this->template['dmg_max1'] + $this->template['dmg_max2'];
-            $this->json['dps']           = !$this->template['delay'] ? 0 : number_format(($this->json['dmgmin1'] + $this->json['dmgmax1']) / (2 * $this->template['delay'] / 1000), 1);
-            $this->json['speed']         = number_format($this->template['delay'] / 1000, 2);
-
-            if (in_array($this->json['subclass'], [2, 3, 18, 19]))
-            {
-                $this->json['rgddmgmin'] = $this->json['dmgmin1'];
-                $this->json['rgddmgmax'] = $this->json['dmgmax1'];
-                $this->json['rgdspeed']  = $this->json['speed'];
-                $this->json['rgddps']    = $this->json['dps'];
-            }
-            else if ($this->template['class'] != ITEM_CLASS_AMMUNITION)
-            {
-                $this->json['mledmgmin'] = $this->json['dmgmin1'];
-                $this->json['mledmgmax'] = $this->json['dmgmax1'];
-                $this->json['mlespeed']  = $this->json['speed'];
-                $this->json['mledps']    = $this->json['dps'];
-            }
-
-            if ($this->json['classs'] == ITEM_CLASS_WEAPON && in_array($this->json['subclass'], [5, 6, 10]) && $this->json['dps'] > 54.8)
-                $this->json['feratkpwr'] = max(0, round((($this->json['dmgmin1'] + $this->json['dmgmax1']) / (2 * $this->template['delay'] / 1000) - 54.8) * 14, 0));
-        }
+        $this->reset();                                     // restore 'iterator'
     }
 
     // use if you JUST need the name
@@ -151,40 +68,108 @@ class Item extends BaseType
     }
     // end static use
 
-    public function getListviewData()
+    public function getListviewData($addInfoMask = 0x0)
     {
-        return array(
-            'id'       => $this->Id,
-            'name'     => $this->name,
-        );
+        /* looks like this data differs per occasion
+        *
+        * maybe split in groups, like:
+        * ITEMINFO_JSON     (0x1): itemMods (including spells) and subitems parsed
+        * ITEMINFO_SUBITEMS (0x2): searched by comparison
+        * ITEMINFO_VENDOR   (0x4): costs-obj, when displayed as vendor
+        * ITEMINFO_LOOT     (0x8): count, stack, pctstack, modes when displaying loot
+        */
+
+        $data = [];
+        while ($this->iterate())
+        {
+            // random item is random
+            if ($this->curTpl['RandomProperty'] > 0 || $this->curTpl['RandomSuffix'] > 0)
+                if ($addInfoMask & ITEMINFO_SUBITEMS)
+                    $this->initSubItems();
+
+            if ($addInfoMask & ITEMINFO_JSON)
+                $this->extendJsonStats();
+
+            $tmp = array_merge($this->json[$this->Id], array(
+                'name'         => $this->names[$this->Id],
+                'quality'      => 7 - $this->curTpl['Quality'],
+                'reqskill'     => $this->curTpl['RequiredSkill'],
+                'reqskillrank' => $this->curTpl['RequiredSkillRank'],
+                'reqspell'     => $this->curTpl['requiredspell'],
+                'reqfaction'   => $this->curTpl['RequiredReputationFaction'],
+                'reqrep'       => $this->curTpl['RequiredReputationRank'],
+                'side'         => Util::sideByRaceMask($this->curTpl['AllowableRace']), // FlagsExtra zur Rate ziehen? 0:Beide; 1: Horde; 2:Allianz
+                'heroic'       => (string)($this->curTpl['Flags'] & 0x8),
+                'nslots'       => $this->curTpl['ContainerSlots'],
+                'buyprice'     => $this->curTpl['BuyPrice'],
+                'sellprice'    => $this->curTpl['SellPrice']
+            ));
+
+            // complicated data
+            if (!in_array($this->curTpl['AllowableRace'], [-1, 0, RACE_MASK_ALL, RACE_MASK_ALLIANCE, RACE_MASK_HORDE]))
+                $tmp['reqrace'] = $this->curTpl['AllowableRace'];
+
+            if (!in_array($this->curTpl['AllowableClass'], [-1, 0, CLASS_MASK_ALL]))
+                $tmp['reqclass'] = $this->curTpl['AllowableClass'];  // $tmp['classes'] ??
+
+            $data[$this->Id] = $tmp;
+        }
+
+        /* even more complicated crap
+            "source":[5],
+            "sourcemore":[{"z":3703}],
+
+            {"source":[5],"sourcemore":[{"n":"Commander Oxheart","t":1,"ti":64606,"z":5842}],
+
+            cost:[]     format unk 0:copper, 1:[items]? 2, 3, 4, 5
+            stack       [unk, unk]
+            avail       unk
+            rel         unk
+            glyph       major | minor (as id)
+            modelviewer
+
+        */
+
+        return $data;
     }
 
-    public function addGlobalsToJScript(&$gItems)
+    public function addGlobalsToJscript(&$refs)
     {
-        $gItems[$this->Id] = array(
-            'name'    => $this->name,
-            'quality' => $this->template['Quality'],
-            'icon'    => $this->template['icon'],
-        );
+        if (!isset($refs['gItems']))
+            $refs['gItems'] = [];
+
+        while ($this->iterate())
+        {
+            $refs['gItems'][$this->Id] = array(
+                'name'    => $this->names[$this->Id],
+                'quality' => $this->curTpl['Quality'],
+                'icon'    => $this->curTpl['icon'],
+            );
+        }
     }
 
     /*
-        enhance (set by comparison tool or formatet external links)
+        enhance (set by comparison tool or formated external links)
             ench: enchantmentId
             sock: bool (extraScoket (gloves, belt))
             gems: array (:-separated itemIds)
             rand: >0: randomPropId; <0: randomSuffixId
         interactive (set to place javascript/anchors to manipulate level and ratings or link to filters (static tooltips vs popup tooltip))
     */
-    public function createTooltip($enhance = [], $interactive = false)
+    public function renderTooltip($enhance = [], $interactive = false)
     {
-        if (!empty($this->tooltip))
-            return $this->tooltip;
+        if ($this->error)
+            return;
 
-        if (isset($enhance['rand']))
+        $name = $this->names[$this->Id];
+
+        if (!empty($this->tooltip[$this->Id]))
+            return $this->tooltip[$this->Id];
+
+        if (!empty($enhance['rand']))
         {
             $rndEnch = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE Id = ?d', $enhance['rand']);
-            $this->name .= ' '.Util::localizedString($rndEnch, 'name');
+            $name   .= ' '.Util::localizedString($rndEnch, 'name');
             $randEnchant['stats'] = '';
 
             for ($i = 1; $i < 6; $i++)
@@ -210,90 +195,90 @@ class Item extends BaseType
         $x .= '<table><tr><td>';
 
         // name; quality
-        $x .= '<b class="q'.$this->template['Quality'].'">'.$this->name.'</b>';
+        $x .= '<b class="q'.$this->curTpl['Quality'].'">'.$name.'</b>';
 
         // heroic tag
-        if (($this->template['Flags'] & ITEM_FLAG_HEROIC) && $this->template['Quality'] == ITEM_QUALITY_EPIC)
+        if (($this->curTpl['Flags'] & ITEM_FLAG_HEROIC) && $this->curTpl['Quality'] == ITEM_QUALITY_EPIC)
             $x .= '<br /><span class="q2">'.Lang::$item['heroic'].'</span>';
 
         // requires map (todo: reparse ?_zones for non-conflicting data; generate Link to zone)
-        if ($this->template['Map'])
+        if ($this->curTpl['Map'])
         {
-            $map = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE mapid=?d LIMIT 1', $this->template['Map']);
+            $map = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE mapid=?d LIMIT 1', $this->curTpl['Map']);
             $x .= '<br />'.Util::localizedString($map, 'name');
         }
 
         // requires area
-        if ($this->template['area'])
+        if ($this->curTpl['area'])
         {
-            $area = DB::Aowow()->selectRow('SELECT * FROM ?_areatable WHERE Id=?d LIMIT 1', $this->template['area']);
+            $area = DB::Aowow()->selectRow('SELECT * FROM ?_areatable WHERE Id=?d LIMIT 1', $this->curTpl['area']);
             $x .= '<br />'.Util::localizedString($area, 'name');
         }
 
         // conjured
-        if ($this->template['Flags'] & ITEM_FLAG_CONJURED)
+        if ($this->curTpl['Flags'] & ITEM_FLAG_CONJURED)
             $x .= '<br />'.Lang::$game['conjured'];
 
         // bonding
-        if (($this->template['Flags'] & ITEM_FLAG_ACCOUNTBOUND) && $this->template['Quality'] == ITEM_QUALITY_HEIRLOOM)
+        if (($this->curTpl['Flags'] & ITEM_FLAG_ACCOUNTBOUND) && $this->curTpl['Quality'] == ITEM_QUALITY_HEIRLOOM)
             $x .= '<br /><!--bo-->'.Lang::$item['bonding'][0];
-        else if ($this->template['bonding'])
-            $x .= '<br /><!--bo-->'.Lang::$item['bonding'][$this->template['bonding']];
+        else if ($this->curTpl['bonding'])
+            $x .= '<br /><!--bo-->'.Lang::$item['bonding'][$this->curTpl['bonding']];
 
         // unique || unique-equipped || unique-limited
-        if ($this->template['maxcount'] == 1)
+        if ($this->curTpl['maxcount'] == 1)
             $x .= '<br />'.Lang::$item['unique'];
-        else if ($this->template['Flags'] & ITEM_FLAG_UNIQUEEQUIPPED)
+        else if ($this->curTpl['Flags'] & ITEM_FLAG_UNIQUEEQUIPPED)
             $x .= '<br />'.Lang::$item['uniqueEquipped'];
-        else if ($this->template['ItemLimitCategory'])
+        else if ($this->curTpl['ItemLimitCategory'])
         {
-            $limit = DB::Aowow()->selectRow("SELECT * FROM ?_itemlimitcategory WHERE id = ?", $this->template['ItemLimitCategory']);
+            $limit = DB::Aowow()->selectRow("SELECT * FROM ?_itemlimitcategory WHERE id = ?", $this->curTpl['ItemLimitCategory']);
             $x .= '<br />'.($limit['isGem'] ? Lang::$item['uniqueEquipped'] : Lang::$item['unique']).': '.Util::localizedString($limit, 'name').' ('.$limit['count'].')';
         }
 
         // max duration
-        if ($this->template['duration'] > 0)
-            $x .= "<br />".Lang::$item['duration'] . ' '. Util::formatTime($this->template['duration'] * 1000) . ($this->template['duration'] < 0 ? ' ('.Lang::$game['realTime'].')' : null);
+        if ($this->curTpl['duration'] > 0)
+            $x .= "<br />".Lang::$item['duration'] . ' '. Util::formatTime($this->curTpl['duration'] * 1000) . ($this->curTpl['duration'] < 0 ? ' ('.Lang::$game['realTime'].')' : null);
 
         // required holiday
-        if ($this->template['HolidayId'])
+        if ($this->curTpl['HolidayId'])
         {
-            $hDay = DB::Aowow()->selectRow("SELECT * FROM ?_holidays WHERE id = ?", $this->template['HolidayId']);
-            $x .= '<br />'.Lang::$game['requires'].' <a href="'.$this->template['HolidayId'].'">'.Util::localizedString($hDay, 'name').'</a>';
+            $hDay = DB::Aowow()->selectRow("SELECT * FROM ?_holidays WHERE id = ?", $this->curTpl['HolidayId']);
+            $x .= '<br />'.Lang::$game['requires'].' <a href="'.$this->curTpl['HolidayId'].'">'.Util::localizedString($hDay, 'name').'</a>';
         }
 
         // maxcount
-        if ($this->template['maxcount'] > 1)
-            $x .= ' ('.$this->template['maxcount'].')';
+        if ($this->curTpl['maxcount'] > 1)
+            $x .= ' ('.$this->curTpl['maxcount'].')';
 
         // item begins a quest
-        if ($this->template['startquest'])
-            $x .= '<br /><a class="q1" href="?quest='.$this->template['startquest'].'">'.Lang::$item['startQuest'].'</a>';
+        if ($this->curTpl['startquest'])
+            $x .= '<br /><a class="q1" href="?quest='.$this->curTpl['startquest'].'">'.Lang::$item['startQuest'].'</a>';
 
         // containerType (slotCount)
-        if ($this->template['ContainerSlots'] > 1)
+        if ($this->curTpl['ContainerSlots'] > 1)
         {
             // word order differs <_<
             if (in_array(User::$localeId, [LOCALE_FR, LOCALE_ES, LOCALE_RU]))
-                $x .= '<br />'.sprintf(Lang::$item['bagSlotString'], Lang::$item['bagFamily'][$this->template['BagFamily']], $this->template['ContainerSlots']);
+                $x .= '<br />'.sprintf(Lang::$item['bagSlotString'], Lang::$item['bagFamily'][$this->curTpl['BagFamily']], $this->curTpl['ContainerSlots']);
             else
-                $x .= '<br />'.sprintf(Lang::$item['bagSlotString'], $this->template['ContainerSlots'], Lang::$item['bagFamily'][$this->template['BagFamily']]);
+                $x .= '<br />'.sprintf(Lang::$item['bagSlotString'], $this->curTpl['ContainerSlots'], Lang::$item['bagFamily'][$this->curTpl['BagFamily']]);
         }
 
-        if (in_array($this->template['class'], [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]))
+        if (in_array($this->curTpl['class'], [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]))
         {
             $x .= '<table width="100%"><tr>';
 
             // Class
-            $x .= '<td>'.Lang::$item['inventoryType'][$this->template['InventoryType']].'</td>';
+            $x .= '<td>'.Lang::$item['inventoryType'][$this->curTpl['InventoryType']].'</td>';
 
             // Subclass
-            if ($this->template['class'] == ITEM_CLASS_ARMOR && $this->template['subclass'] > 0)
-                $x .= '<th><!--asc'.$this->template['subclass'].'-->'.Lang::$item['armorSubclass'][$this->template['subclass']].'</th>';
-            else if ($this->template['class'] == ITEM_CLASS_WEAPON)
-                $x .= '<th>'.Lang::$item['weaponSubClass'][$this->template['subclass']].'</th>';
-            else if ($this->template['class'] == ITEM_CLASS_AMMUNITION)
-                $x .= '<th>'.Lang::$item['projectileSubClass'][$this->template['subclass']].'</th>';
+            if ($this->curTpl['class'] == ITEM_CLASS_ARMOR && $this->curTpl['subclass'] > 0)
+                $x .= '<th><!--asc'.$this->curTpl['subclass'].'-->'.Lang::$item['armorSubclass'][$this->curTpl['subclass']].'</th>';
+            else if ($this->curTpl['class'] == ITEM_CLASS_WEAPON)
+                $x .= '<th>'.Lang::$item['weaponSubClass'][$this->curTpl['subclass']].'</th>';
+            else if ($this->curTpl['class'] == ITEM_CLASS_AMMUNITION)
+                $x .= '<th>'.Lang::$item['projectileSubClass'][$this->curTpl['subclass']].'</th>';
 
             $x .= '</tr></table>';
         }
@@ -301,61 +286,64 @@ class Item extends BaseType
             $x .= '<br />';
 
         // Weapon Stats
-        if (isset($this->json['speed']))
+        if ($this->curTpl['delay'] > 0)
         {
+            $speed   = $this->curTpl['delay'] / 1000;
+            $dmgmin1 = $this->curTpl['dmg_min1'] + $this->curTpl['dmg_min2'];
+            $dmgmax1 = $this->curTpl['dmg_max1'] + $this->curTpl['dmg_max2'];
+            $dps     = $speed ? ($dmgmin1 + $dmgmax1) / (2 * $speed) : 0;
+
             // regular weapon
-            if ($this->template['class'] != ITEM_CLASS_AMMUNITION)
+            if ($this->curTpl['class'] != ITEM_CLASS_AMMUNITION)
             {
                 $x .= '<table width="100%"><tr>';
-                $x .= '<td><!--dmg-->'.sprintf($this->template['dmg_type1'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->template['dmg_min1'].' - '.$this->template['dmg_max1'], Lang::$game['sc'][$this->template['dmg_type1']]).'</td>';
-                $x .= '<th>'.Lang::$item['speed'].' <!--spd-->'.$this->json['speed'].'</th>';
+                $x .= '<td><!--dmg-->'.sprintf($this->curTpl['dmg_type1'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmg_min1'].' - '.$this->curTpl['dmg_max1'], Lang::$game['sc'][$this->curTpl['dmg_type1']]).'</td>';
+                $x .= '<th>'.Lang::$item['speed'].' <!--spd-->'.number_format($speed, 2).'</th>';
                 $x .= '</tr></table>';
 
                 // secondary damage is set
-                if ($this->template['dmg_min2'])
-                    $x .= '+'.sprintf($this->template['dmg_type2'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->template['dmg_min2'].' - '.$this->template['dmg_max2'], Lang::$game['sc'][$this->template['dmg_type2']]).'<br />';
+                if ($this->curTpl['dmg_min2'])
+                    $x .= '+'.sprintf($this->curTpl['dmg_type2'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmg_min2'].' - '.$this->curTpl['dmg_max2'], Lang::$game['sc'][$this->curTpl['dmg_type2']]).'<br />';
 
-                $x .= '<!--dps-->('.$this->json['dps'].' '.Lang::$item['dps'].')<br />';
+                $x .= '<!--dps-->('.number_format($dps, 1).' '.Lang::$item['dps'].')<br />';
 
                 // display FeralAttackPower if set
-                if (isset($this->json['feratkpwr']))
-                    $x .= '<span class="c11"><!--fap-->('.$this->json['feratkpwr'].' '.Lang::$item['fap'].')</span><br />';
+                if (in_array($this->curTpl['subclass'], [5, 6, 10]) && $dps > 54.8)
+                    $x .= '<span class="c11"><!--fap-->('.round(($dps - 54.8) * 14, 0).' '.Lang::$item['fap'].')</span><br />';
             }
             // ammunition
             else
-                $x .= Lang::$item['addsDps'].' '.number_format(($this->json['dmgmin1'] + $this->json['dmgmax1']) / 2, 1).' '.Lang::$item['dps2'].'<br />';
+                $x .= Lang::$item['addsDps'].' '.number_format(($dmgmin1 + $dmgmax1) / 2, 1).' '.Lang::$item['dps2'].'<br />';
         }
 
         // Armor
-        if ($this->template['class'] == ITEM_CLASS_ARMOR && $this->template['ArmorDamageModifier'] > 0)
-            $x .= '<span class="q2"><!--addamr'.$this->template['ArmorDamageModifier'].'--><span>'.($this->template['armor'] + $this->template['ArmorDamageModifier']).' '.Lang::$item['armor'].'</span></span><br />';
-        else if ($this->template['armor'])
-            $x .= '<span><!--amr-->'.$this->template['armor'].' '.Lang::$item['armor'].'</span><br />';
+        if ($this->curTpl['class'] == ITEM_CLASS_ARMOR && $this->curTpl['ArmorDamageModifier'] > 0)
+            $x .= '<span class="q2"><!--addamr'.$this->curTpl['ArmorDamageModifier'].'--><span>'.($this->curTpl['armor'] + $this->curTpl['ArmorDamageModifier']).' '.Lang::$item['armor'].'</span></span><br />';
+        else if ($this->curTpl['armor'])
+            $x .= '<span><!--amr-->'.$this->curTpl['armor'].' '.Lang::$item['armor'].'</span><br />';
 
         // Block
-        if ($this->template['block'])
-            $x .= '<span>'.$this->template['block'].' '.Lang::$item['block'].'</span><br />';
-
-        // Random Enchantment
-        if (($this->template['RandomProperty'] || $this->template['RandomSuffix']) && !isset($enhance['rand']))
-            $x .= '<span class="q2">'.Lang::$item['randEnchant'].'</span><br />';
+        if ($this->curTpl['block'])
+            $x .= '<span>'.$this->curTpl['block'].' '.Lang::$item['block'].'</span><br />';
 
         // Item is a gem (don't mix with sockets)
-        if ($this->template['GemProperties'])
+        if ($this->curTpl['GemProperties'])
         {
-            $gemText = DB::Aowow()->selectRow('SELECT e.* FROM ?_itemenchantment e, ?_gemproperties p WHERE (p.Id = ?d and e.Id = p.itemenchantmentID)', $this->template['GemProperties']);
+            $gemText = DB::Aowow()->selectRow('SELECT e.* FROM ?_itemenchantment e, ?_gemproperties p WHERE (p.Id = ?d and e.Id = p.itemenchantmentID)', $this->curTpl['GemProperties']);
             $x .= Util::localizedString($gemText, 'text').'<br />';
         }
 
-        // if random enchantment is set, prepend stats from it
-        if (isset($enhance['rand']))
+        // Random Enchantment - if random enchantment is set, prepend stats from it
+        if (($this->curTpl['RandomProperty'] || $this->curTpl['RandomSuffix']) && !isset($enhance['rand']))
+            $x .= '<span class="q2">'.Lang::$item['randEnchant'].'</span><br />';
+        else if (isset($enhance['rand']))
             $x .= $randEnchant['stats'];
 
         // itemMods (display stats and save ratings for later use)
         for ($j = 1; $j <= 10; $j++)
         {
-            $type = $this->template['stat_type'.$j];
-            $qty  = $this->template['stat_value'.$j];
+            $type = $this->curTpl['stat_type'.$j];
+            $qty  = $this->curTpl['stat_value'.$j];
 
             if (!$qty || $type <= 0)
                 continue;
@@ -364,13 +352,13 @@ class Item extends BaseType
             if ($type >= ITEM_MOD_AGILITY && $type <= ITEM_MOD_STAMINA)
                 $x .= '<span><!--stat'.$type.'-->+'.$qty.' '.Lang::$item['statType'][$type].'</span><br />';
             else                                            // rating with % for reqLevel
-                $green[] = $this->parseRating($type, $qty, $this->template['RequiredLevel'], $interactive);
+                $green[] = $this->parseRating($type, $qty, $interactive);
         }
 
         // magic resistances
         foreach (Util::$resistanceFields as $j => $rowName)
-            if ($rowName && $this->template[$rowName] != 0)
-                $x .= '+'.$this->template[$rowName].' '.Lang::$game['resistances'][$j].'<br />';
+            if ($rowName && $this->curTpl[$rowName] != 0)
+                $x .= '+'.$this->curTpl[$rowName].' '.Lang::$game['resistances'][$j].'<br />';
 
         // Enchantment
         if (isset($enhance['ench']))
@@ -407,7 +395,7 @@ class Item extends BaseType
             $enhance['gems'] = [];
 
         // zero fill empty sockets
-        $sockCount = $this->json['nsockets'] + (isset($enhance['sock']) ? 1 : 0);
+        $sockCount = $this->curTpl['socketColor_1'] + $this->curTpl['socketColor_2'] + $this->curTpl['socketColor_3'] + (isset($enhance['sock']) ? 1 : 0);
         while ($sockCount > count($enhance['gems']))
             $enhance['gems'][] = 0;
 
@@ -417,11 +405,11 @@ class Item extends BaseType
         // fill native sockets
         for ($j = 1; $j <= 3; $j++)
         {
-            if (!$this->template['socketColor_'.$j])
+            if (!$this->curTpl['socketColor_'.$j])
                 continue;
 
             for ($i = 0; $i < 4; $i++)
-                if (($this->template['socketColor_'.$j] & (1 << $i)))
+                if (($this->curTpl['socketColor_'.$j] & (1 << $i)))
                     $colorId = $i;
 
             $pop       = array_pop($enhance['gems']);
@@ -452,59 +440,59 @@ class Item extends BaseType
         else                                                // prismatic socket placeholder
             $x .= '<!--ps-->';
 
-        if ($this->template['socketBonus'])
+        if ($this->curTpl['socketBonus'])
         {
-            $sbonus = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $this->template['socketBonus']);
+            $sbonus = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $this->curTpl['socketBonus']);
             $x .= '<span class="q'.($hasMatch ? '2' : '0').'">'.Lang::$item['socketBonus'].': '.Util::localizedString($sbonus, 'text').'</span><br />';
         }
 
         // durability
-        if ($this->template['MaxDurability'])
-            $x .= Lang::$item['durability'].' '.$this->template['MaxDurability'].' / '.$this->template['MaxDurability'].'<br />';
+        if ($this->curTpl['MaxDurability'])
+            $x .= Lang::$item['durability'].' '.$this->curTpl['MaxDurability'].' / '.$this->curTpl['MaxDurability'].'<br />';
 
         // required classes
-        if ($classes = Lang::getClassString($this->template['AllowableClass']))
+        if ($classes = Lang::getClassString($this->curTpl['AllowableClass']))
             $x .= Lang::$game['classes'].': '.$classes.'<br />';
 
         // required races
-        if ($races = Lang::getRaceString($this->template['AllowableRace']))
+        if ($races = Lang::getRaceString($this->curTpl['AllowableRace']))
             $x .= Lang::$game['races'].': '.$races['name'].'<br />';
 
         // required honorRank (not used anymore)
-        if ($this->template['requiredhonorrank'])
-            $x .= Lang::$game['requires'].': '.Lang::$game['pvpRank'][$this->template['requiredhonorrank']].'<br />';
+        if ($this->curTpl['requiredhonorrank'])
+            $x .= Lang::$game['requires'].': '.Lang::$game['pvpRank'][$this->curTpl['requiredhonorrank']].'<br />';
 
         // required CityRank..?
         // what the f..
 
         // required level
-        if (($this->template['Flags'] & ITEM_FLAG_ACCOUNTBOUND) && $this->template['Quality'] == ITEM_QUALITY_HEIRLOOM)
+        if (($this->curTpl['Flags'] & ITEM_FLAG_ACCOUNTBOUND) && $this->curTpl['Quality'] == ITEM_QUALITY_HEIRLOOM)
             $x .= sprintf(Lang::$game['reqLevelHlm'], ' 1'.Lang::$game['valueDelim'].MAX_LEVEL.' ('.($interactive ? printf(Util::$changeLevelString, MAX_LEVEL) : '<!--lvl-->'.MAX_LEVEL).')').'<br />';
-        else if ($this->template['RequiredLevel'] > 1)
-            $x .= sprintf(Lang::$game['reqLevel'], $this->template['RequiredLevel']).'<br />';
+        else if ($this->curTpl['RequiredLevel'] > 1)
+            $x .= sprintf(Lang::$game['reqLevel'], $this->curTpl['RequiredLevel']).'<br />';
 
         // item level
-        $x .= Lang::$item['itemLevel'].' '.$this->template['ItemLevel'];
+        $x .= Lang::$item['itemLevel'].' '.$this->curTpl['ItemLevel'];
 
         // required skill
-        if ($this->template['RequiredSkill'])
+        if ($this->curTpl['RequiredSkill'])
         {
-            $skillText = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillID = ?d', $this->template['RequiredSkill']);
-            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?skill='.$this->template['RequiredSkill'].'">'.Util::localizedString($skillText, 'name').'</a>';
-            if ($this->template['RequiredSkillRank'])
-                $x .= ' ('.$this->template['RequiredSkillRank'].')';
+            $skillText = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillID = ?d', $this->curTpl['RequiredSkill']);
+            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?skill='.$this->curTpl['RequiredSkill'].'">'.Util::localizedString($skillText, 'name').'</a>';
+            if ($this->curTpl['RequiredSkillRank'])
+                $x .= ' ('.$this->curTpl['RequiredSkillRank'].')';
         }
 
         // required spell
-        if ($this->template['requiredspell'])
-            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?spell='.$this->template['requiredspell'].'">'.Spell::getName($this->template['requiredspell']).'</a>';
+        if ($this->curTpl['requiredspell'])
+            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?spell='.$this->curTpl['requiredspell'].'">'.Spell::getName($this->curTpl['requiredspell']).'</a>';
 
         // required reputation w/ faction
-        if ($this->template['RequiredReputationFaction'])
-            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href=?faction="'.$this->template['RequiredReputationFaction'].'">'.Faction::getName($this->template['RequiredReputationFaction']).'</a> - '.Lang::$game['rep'][$this->template['RequiredReputationRank']];
+        if ($this->curTpl['RequiredReputationFaction'])
+            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href=?faction="'.$this->curTpl['RequiredReputationFaction'].'">'.Faction::getName($this->curTpl['RequiredReputationFaction']).'</a> - '.Lang::$game['rep'][$this->curTpl['RequiredReputationRank']];
 
         // locked
-        if ($this->template['lockid'])
+        if ($this->curTpl['lockid'])
         {
             $lock = DB::Aowow()->selectRow('
                 SELECT
@@ -513,14 +501,14 @@ class Item extends BaseType
                     ?_lock
                 WHERE
                     lockID = ?d',
-                $this->template['lockid']
+                $this->curTpl['lockid']
             );
             // only use first useful entry
             for ($j = 1; $j <= 5; $j++)
             {
                 if ($lock['type'.$j] == 1)                  // opened by item
                 {
-                    $l = Lang::$game['requires'].' <a class="q1" href="?item='.$lock['lockproperties'.$j].'">'.Item::getName($lock['lockproperties'.$j]).'</a>';
+                    $l = Lang::$game['requires'].' <a class="q1" href="?item='.$lock['lockproperties'.$j].'">'.Util::getItemName($lock['lockproperties'.$j]).'</a>';
                     break;
                 }
                 else if ($lock['type'.$j] == 2)             // opened by skill
@@ -537,16 +525,19 @@ class Item extends BaseType
         $x .= '</td></tr></table>';
 
         // spells on item
+        $itemSpellsAndTrigger = [];
         for ($j = 1; $j <= 5; $j++)
+            if ($this->curTpl['spellid_'.$j] > 0)
+                $itemSpellsAndTrigger[$this->curTpl['spellid_'.$j]] = $this->curTpl['spelltrigger_'.$j];
+
+        if ($itemSpellsAndTrigger)
         {
-            // todo: complete Class SpellList and fetch from List
-            if ($this->template['spellid_'.$j] > 0)
-            {
-                $itemSpell = new Spell($this->template['spellid_'.$j]);
-                if ($parsed = $itemSpell->parseText('description', $this->template['RequiredLevel']))
-                    $green[] = Lang::$item['trigger'][$this->template['spelltrigger_'.$j]] . $parsed;
-            }
+            $itemSpells = new SpellList(array(['Id', array_keys($itemSpellsAndTrigger)]));
+            while ($itemSpells->iterate())
+                if ($parsed = $itemSpells->parseText('description', $this->curTpl['RequiredLevel']))
+                    $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->Id]].$parsed;
         }
+
 
         // lower table (ratings, spells, ect)
         $x .= '<table><tr><td>';
@@ -554,29 +545,6 @@ class Item extends BaseType
             foreach ($green as $j => $bonus)
                 if ($bonus)
                     $x .= '<span class="q2">'.$bonus.'</span><br />';
-
-        // recipe handling (some stray Techniques have subclass == 0)
-        if ($this->template['class'] == ITEM_CLASS_RECIPE && ($this->template['subclass'] == 1 || $this->template['BagFamily'] = 16))
-        {
-            // todo: aaaand another one for optimization
-            $craftSpell   = new Spell($this->template['spellid_2']);
-            $craftItem    = new Item($craftSpell->template["effect1CreateItemId"]);
-            $reagentItems = [];
-
-            for ($i = 1; $i <= 8; $i++)
-                if ($craftSpell->template["reagent".$i])
-                    $reagentItems[$craftSpell->template["reagent".$i]] = $craftSpell->template["reagentCount".$i];
-
-            $reagents = new ItemList(array(['i.entry', array_keys($reagentItems)]));
-            $reqReag  = [];
-
-            foreach ($reagents->container as $r)
-                $reqReag[] = '<a href="?item='.$r->Id.'">'.$r->name.'</a> ('.$reagentItems[$r->Id].')';
-
-            $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->template['spellid_2'].'">'.Util::localizedString($this->template, 'description').'</a></span>';
-            if (isset($craftItem->Id))
-                $x .= '<div><br />'.$craftItem->createTooltip(null, $interactive).'</div><br />';
-        }
 
         // Item Set
         $tmpX    = '';
@@ -600,8 +568,8 @@ class Item extends BaseType
                     continue;
 
                 $num++;
-                $equivalents = Item::getEquivalentSetPieces($itemset['item'.$i]);
-                $pieces[] = '<span><!--si'.implode(':', $equivalents).'--><a href="?item='.$itemset['item'.$i].'">'.Item::getName($itemset['item'.$i]).'</a></span>';
+                $equivalents = ItemList::getEquivalentSetPieces($itemset['item'.$i]);
+                $pieces[]    = '<span><!--si'.implode(':', $equivalents).'--><a href="?item='.$itemset['item'.$i].'">'.ItemList::getName($itemset['item'.$i]).'</a></span>';
             }
             $tmpX .= implode('<br />', $pieces);
 
@@ -610,9 +578,11 @@ class Item extends BaseType
             if ($itemset['skillID'])                        // bonus requires skill to activate
             {
                 $name = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillID=?d', $itemset['skillID']);
-                $x .= '<br />'.Lang::$game['requires'].' <a href="?skills='.$itemset['skillID'].'" class="q1">'.Util::localizedString($name, 'name').'</a>';
+                $x   .= '<br />'.Lang::$game['requires'].' <a href="?skills='.$itemset['skillID'].'" class="q1">'.Util::localizedString($name, 'name').'</a>';
+
                 if ($itemset['skillLevel'])
                     $x .= ' ('.$itemset['skillLevel'].')';
+
                 $x .= '<br />';
             }
 
@@ -620,25 +590,30 @@ class Item extends BaseType
             $x .= '<div class="q0 indent">'.$tmpX.'</div><br />';
 
             // get bonuses
-            $num = 0;
+            $setSpellsAndIdx = [];
             for ($j = 1; $j <= 8; $j++)
-            {
-                if ($itemset['spell'.$j] <= 0)
-                    continue;
+                if ($itemset['spell'.$j] > 0)
+                    $setSpellsAndIdx[$itemset['spell'.$j]] = $j;
 
-                // todo: get from static prop?
-                $bonus = new Spell($itemset['spell'.$j]);
-                $itemset['spells'][$num]['tooltip'] = $bonus->parseText('description', $this->template['RequiredLevel']);
-                $itemset['spells'][$num]['entry']   = $itemset['spell'.$j];
-                $itemset['spells'][$num]['bonus']   = $itemset['bonus'.$j];
-                $num++;
+            // todo: get from static prop?
+            if ($setSpellsAndIdx)
+            {
+                $boni = new SpellList(array(['Id', array_keys($setSpellsAndIdx)]));
+                while ($boni->iterate())
+                {
+                    $itemset['spells'][] = array(
+                        'tooltip' => $boni->parseText('description', $this->curTpl['RequiredLevel']),
+                        'entry'   => $itemset['spell'.$setSpellsAndIdx[$boni->Id]],
+                        'bonus'   => $itemset['bonus'.$setSpellsAndIdx[$boni->Id]]
+                    );
+                }
             }
 
             // sort and list bonuses
             $x .= '<span class="q0">';
-            for ($i = 0; $i < $num; $i++)
+            for ($i = 0; $i < count($itemset['spells']); $i++)
             {
-                for ($j = $i; $j <= $num - 1; $j++)
+                for ($j = $i; $j < count($itemset['spells']); $j++)
                 {
                     if($itemset['spells'][$j]['bonus'] >= $itemset['spells'][$i]['bonus'])
                         continue;
@@ -648,105 +623,93 @@ class Item extends BaseType
                     $itemset['spells'][$j] = $tmp;
                 }
                 $x .= '<span>('.$itemset['spells'][$i]['bonus'].') '.Lang::$item['set'].': <a href="?spell='.$itemset['spells'][$i]['entry'].'">'.$itemset['spells'][$i]['tooltip'].'</a></span>';
-                if ($i < $num - 1)
+                if ($i < count($itemset['spells']) - 1)
                     $x .= '<br />';
             }
             $x .= '</span>';
         }
 
-        // funny, yellow text at the bottom
-        if ($this->template['description'])
-            $x .= '<span class="q">"'.Util::localizedString($this->template, 'description').'"</span>';
+        // recipe handling (some stray Techniques have subclass == 0), place at bottom of tooltipp
+        if ($this->curTpl['class'] == ITEM_CLASS_RECIPE && ($this->curTpl['subclass'] || $this->curTpl['BagFamily'] == 16))
+        {
+            $craftSpell   = new SpellList(array(['Id', (int)$this->curTpl['spellid_2']]));
+            $craftItem    = new ItemList(array(['i.entry', (int)$craftSpell->curTpl["effect1CreateItemId"]]));
+            $reagentItems = [];
+
+            for ($i = 1; $i <= 8; $i++)
+                if ($rId = $craftSpell->getField('reagent'.$i))
+                    $reagentItems[$rId] = $craftSpell->getField('reagentCount'.$i);
+
+            $reagents = new ItemList(array(['i.entry', array_keys($reagentItems)]));
+            $reqReag  = [];
+
+            $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->curTpl['spellid_2'].'">'.Util::localizedString($this->curTpl, 'description').'</a></span>';
+
+            $xCraft = '<div><br />'.$craftItem->renderTooltip(null, $interactive).'</div><br />';
+
+            while ($reagents->iterate())
+                $reqReag[] = '<a href="?item='.$reagents->Id.'">'.$reagents->names[$reagents->Id].'</a> ('.$reagentItems[$reagents->Id].')';
+
+            $xCraft .= '<span class="q1">'.Lang::$game['requires']." ".implode(", ", $reqReag).'</span>';
+
+        }
+
+        // misc (no idea, how to organize the <br /> better)
+        $xMisc = [];
+
+        // funny, yellow text at the bottom, omit if we have a recipe
+        if ($this->curTpl['description'] && !isset($xCraft))
+            $xMisc[] = '<span class="q">"'.Util::localizedString($this->curTpl, 'description').'"</span>';
 
         // readable
-        if ($this->template['PageText'])
-            $x .= '<br /><span class="q2">'.Lang::$item['readClick'].'</span>';
+        if ($this->curTpl['PageText'])
+            $xMisc[] = '<span class="q2">'.Lang::$item['readClick'].'</span>';
 
         // charges (i guess checking first spell is enough (single charges not shown))
-        if ($this->template['spellcharges_1'] > 1)
-            $x .= '<br /><span class="q1">'.$this->template['spellcharges_1'].' '.Lang::$item['charges'].'</span>';
+        if ($this->curTpl['spellcharges_1'] > 1)
+            $xMisc[] = '<span class="q1">'.$this->curTpl['spellcharges_1'].' '.Lang::$item['charges'].'</span>';
+
+        if ($this->curTpl['SellPrice'])
+            $xMisc[] = '<span class="q1">'.Lang::$item['sellPrice'].": ".Util::formatMoney($this->curTpl['SellPrice']).'</span>';
 
         // list required reagents
-        if (!empty($reqReag))
-            $x .= '<span class="q1">'.Lang::$game['requires']." ".implode(", ", $reqReag).'</span>';
+        if (isset($xCraft))
+            $xMisc[] = $xCraft;
+
+        if ($xMisc)
+            $x .= implode('<br />', $xMisc);
+
         $x .= '</td></tr></table>';
 
-        if ($this->template['SellPrice'])
-            $x .= '<span class="q1">'.Lang::$item['sellPrice'].": ".Util::formatMoney($this->template['SellPrice']).'</span>';
-
         // heirloom tooltip scaling
-        if ($this->ssd)
+        if (isset($this->ssd[$this->Id]))
         {
             $link = array(
                 $this->Id,                                  // itemId
                 1,                                          // scaleMinLevel
-                $this->ssd['maxLevel'],                     // scaleMaxLevel
-                $this->ssd['maxLevel'],                     // scaleCurLevel
-                $this->template['ScalingStatDistribution'], // scaleDist
-                $this->template['ScalingStatValue'],        // scaleFlags
+                $this->ssd[$this->Id]['maxLevel'],          // scaleMaxLevel
+                $this->ssd[$this->Id]['maxLevel'],          // scaleCurLevel
+                $this->curTpl['ScalingStatDistribution'],   // scaleDist
+                $this->curTpl['ScalingStatValue'],          // scaleFlags
             );
             $x .= '<!--?'.implode(':', $link).'-->';
         }
         else
             $x .= '<!--?'.$this->Id.':1:'.MAX_LEVEL.':'.MAX_LEVEL.'-->';
 
-        $this->tooltip = $x;
+        $this->tooltip[$this->Id] = $x;
 
-        return $this->tooltip;
-    }
-
-    private function parseRating($type, $value, $level, $interactive = false)
-    {
-        $level = min(max($level, 1), MAX_LEVEL);            // clamp level range
-
-        if (!Lang::$item['statType'][$type])                // unknown rating
-            return sprintf(Lang::$item['statType'][count(Lang::$item['statType']) - 1], $type, $value);
-        else if (in_array($type, Util::$lvlIndepRating))    // level independant Bonus
-            return Lang::$item['trigger'][1] . str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::$item['statType'][$type]);
-        else                                                // rating-Bonuses
-        {
-            // old
-            // $js = '&nbsp;<small>(<a href="javascript:;" onmousedown="return false" onclick="g_setRatingLevel(this,'.$level.','.$type.','.$value.')">';
-            // $js .= Util::setRatingLevel($level, $type, $value);
-            // $js .= '</a>)</small>';
-            if ($interactive)
-                $js = '&nbsp;<small>('.printf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</a>)</small>';
-            else
-                $js = "&nbsp;<small>(".Util::setRatingLevel($level, $type, $value).")</small>";
-
-            return Lang::$item['trigger'][1].str_replace('%d', '<!--rtg'.$type.'-->'.$value.$js, Lang::$item['statType'][$type]);
-        }
-    }
-
-    private function getSSDMod($type)
-    {
-        $mask = $this->template['ScalingStatValue'];
-
-        switch ($type)
-        {
-            case 'stats':   $mask &= 0x04001F;      break;
-            case 'armor':   $mask &= 0xF001E0;      break;
-            case 'dps'  :   $mask &= 0x007E00;      break;
-            case 'spell':   $mask &= 0x008000;      break;
-            default:        $mask &= 0x0;
-        }
-
-        $field = null;
-        for ($i = 0; $i < count(Util::$ssdMaskFields); $i++)
-            if ($mask & (1 << $i))
-                $field = Util::$ssdMaskFields[$i];
-
-        return $field ? DB::Aowow()->selectCell("SELECT ?# FROM ?_scalingstatvalues WHERE charLevel = ?", $field, $this->ssd['maxLevel']) : 0;
+        return $this->tooltip[$this->Id];
     }
 
     // from Trinity
     public function generateEnchSuffixFactor()
     {
-        $rpp = DB::Aowow()->selectRow('SELECT * FROM ?_itemRandomPropPoints WHERE Id = ?', $this->template['ItemLevel']);
+        $rpp = DB::Aowow()->selectRow('SELECT * FROM ?_itemRandomPropPoints WHERE Id = ?', $this->curTpl['ItemLevel']);
         if (!$rpp)
             return 0;
 
-        switch ($this->template['InventoryType'])
+        switch ($this->curTpl['InventoryType'])
         {
             // Items of that type don`t have points
             case INVTYPE_NON_EQUIP:
@@ -795,7 +758,7 @@ class Item extends BaseType
         }
 
         // Select rare/epic modifier
-        switch ($this->template['Quality'])
+        switch ($this->curTpl['Quality'])
         {
             case ITEM_QUALITY_UNCOMMON:
                 return $rpp['uncommon'.$suffixFactor];
@@ -812,137 +775,289 @@ class Item extends BaseType
         return 0;
     }
 
-    public function getJsonStats($pieceAssoc = NULL)
+    public function extendJsonStats($pieceAssoc = NULL)
     {
         // convert ItemMods
         for ($h = 1; $h <= 10; $h++)
         {
-            if (!$this->template['stat_type'.$h])
+            if (!$this->curTpl['stat_type'.$h])
                 continue;
 
-            @$this->itemMods[$this->template['stat_type'.$h]] += $this->template['stat_value'.$h];
+            @$this->itemMods[$this->Id][$this->curTpl['stat_type'.$h]] += $this->curTpl['stat_value'.$h];
         }
 
         // convert Spells
+        $equipSpells = [];
         for ($h = 1; $h <= 5; $h++)
         {
             // only onEquip
-            if ($this->template['spelltrigger_'.$h] != 1)
+            if ($this->curTpl['spelltrigger_'.$h] != 1)
                 continue;
 
-            if ($this->template['spellid_'.$h] <= 0)
+            if ($this->curTpl['spellid_'.$h] <= 0)
                 continue;
 
-            $spl   = new Spell($this->template['spellid_'.$h]);
-            $stats = $spl->getStatGain();
+            $equipSpells[] = $this->curTpl['spellid_'.$h];
+        }
+
+        if ($equipSpells)
+        {
+            $eqpSplList = new SpellList(array(['Id', $equipSpells]));
+            $stats      = $eqpSplList->getStatGain();
             foreach ($stats as $mId => $qty)
-                @$this->itemMods[$mId] += $qty;
+                @$this->itemMods[$this->Id][$mId] += $qty;
         }
 
         // fetch and add socketbonusstats
-        if ($this->json['socketbonus'] > 0)
+        if (@$this->json[$this->Id]['socketbonus'] > 0)
         {
-            $enh = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?;', $this->json['socketbonus']);
-            $this->json['socketbonusstat'] = [];
+            $enh = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?;', $this->json[$this->Id]['socketbonus']);
+            $this->json[$this->Id]['socketbonusstat'] = [];
             $socketbonusstat = Util::parseItemEnchantment($enh);
             foreach ($socketbonusstat as $k => $v)
-                $this->json['socketbonusstat'][] = '"'.$k.'":'.$v;
+                $this->json[$this->Id]['socketbonusstat'][] = '"'.$k.'":'.$v;
 
-            $this->json['socketbonusstat'] = "{".implode(',', $this->json['socketbonusstat'])."}";
+            $this->json[$this->Id]['socketbonusstat'] = "{".implode(',', $this->json[$this->Id]['socketbonusstat'])."}";
         }
 
         // readdress itemset .. is wrong for virtual sets
         if ($pieceAssoc)
-            $this->json['itemset'] = $pieceAssoc[$this->Id];
+            $this->json[$this->Id]['itemset'] = $pieceAssoc[$this->Id];
 
         // gather random Enchantments
-        if ($this->json['commondrop'])
+        // todo: !important! extremly high sql-load
+        if (@$this->json[$this->Id]['commondrop'] && isset($this->subItems[$this->Id]))
         {
-            $randId    = $this->template['RandomProperty'] > 0 ? $this->template['RandomProperty'] : $this->template['RandomSuffix'];
-            $randomIds = DB::Aowow()->selectCol('SELECT ench FROM item_enchantment_template WHERE entry = ?d', $randId);
-            if (!$randomIds)
-                return null;
-
-            if ($this->template['RandomSuffix'] > 0)
-            {
-                array_walk($randomIds, function($val, $key) use(&$randomIds) {
-                    $randomIds[$key] = -$val;
-                });
-            }
-
-            $subItems = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM ?_itemRandomEnchant WHERE Id IN (?a)', $randomIds);
-
-            foreach ($subItems as $k => $sI)
+            foreach ($this->subItems[$this->Id] as $k => $sI)
             {
                 $jsonEquip = [];
                 $jsonText  = [];
+
                 for ($i = 1; $i < 6; $i++)
                 {
                     if ($sI['enchantId'.$i] <= 0)
                         continue;
 
-                    $enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $sI['enchantId'.$i]);
-                    if (!$enchant)
+                    if (!$this->rndEnchIds[$sI['enchantId'.$i]])
                         continue;
+
+                    $eData = $this->rndEnchIds[$sI['enchantId'.$i]];
 
                     if ($sI['allocationPct'.$i] > 0)        // RandomSuffix: scaling Enchantment; enchId < 0
                     {
                         $amount     = intVal($sI['allocationPct'.$i] * $this->generateEnchSuffixFactor() / 10000);
-                        $jsonEquip  = array_merge($jsonEquip, Util::parseItemEnchantment($enchant, $amount));
-                        $jsonText[] = str_replace('$i', $amount, Util::localizedString($enchant, 'text'));
+                        $jsonEquip  = array_merge($jsonEquip, Util::parseItemEnchantment($eData, $amount));
+                        $jsonText[] = str_replace('$i', $amount, Util::localizedString($eData, 'text'));
                     }
                     else                                    // RandomProperty: static Enchantment; enchId > 0
                     {
-                        $jsonText[] = Util::localizedString($enchant, 'text');
-                        $jsonEquip  = array_merge($jsonEquip, Util::parseItemEnchantment($enchant));
+                        $jsonText[] = Util::localizedString($eData, 'text');
+                        $jsonEquip  = array_merge($jsonEquip, Util::parseItemEnchantment($eData));
                     }
                 }
 
-                $subItems[$k] = array(
+                $this->subItems[$this->Id][$k] = array(
                     'name'          => Util::localizedString($sI, 'name'),
                     'enchantment'   => implode(', ', $jsonText),
                     'jsonequip'     => $jsonEquip
                 );
             }
 
-            $this->json['subitems'] = json_encode($subItems, JSON_FORCE_OBJECT);
+            $this->json[$this->Id]['subitems'] = json_encode($this->subItems[$this->Id], JSON_FORCE_OBJECT);
         }
 
-        foreach ($this->json as $key => $value)
+        foreach ($this->json[$this->Id] as $k => $v)
         {
-            if (!isset($value) || $value === "false")
+            if (!isset($v) || $v === "false")
             {
-                unset($this->json[$key]);
+                unset($this->json[$this->Id][$k]);
                 continue;
             }
 
-            if (!in_array($key, array('class', 'subclass')) && $value === "0")
+            if (!in_array($k, ['classs', 'subclass', 'armor']) && $v === "0")
             {
-                unset($this->json[$key]);
+                unset($this->json[$this->Id][$k]);
                 continue;
             }
         }
     }
-}
 
-
-
-class ItemList extends BaseTypeList
-{
-    protected $setupQuery = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON  i.entry = l.entry WHERE [filter] [cond] GROUP BY i.entry ORDER BY i.Quality DESC';
-
-    public function __construct($conditions)
+    private function parseRating($type, $value, $interactive = false)
     {
-        // may be called without filtering
-        if (class_exists('ItemFilter'))
+        // clamp level range
+        $ssdLvl = isset($this->ssd[$this->Id]) ? $this->ssd[$this->Id]['maxLevel'] : 1;
+        $level  = min(max($this->curTpl['RequiredLevel'], $ssdLvl), MAX_LEVEL);
+
+        if (!Lang::$item['statType'][$type])                // unknown rating
+            return sprintf(Lang::$item['statType'][count(Lang::$item['statType']) - 1], $type, $value);
+        else if (in_array($type, Util::$lvlIndepRating))    // level independant Bonus
+            return Lang::$item['trigger'][1] . str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::$item['statType'][$type]);
+        else                                                // rating-Bonuses
         {
-            $this->filter = new ItemFilter();
-            if (($fiData = $this->filter->init()) === false)
-                return;
+            // old
+            // $js = '&nbsp;<small>(<a href="javascript:;" onmousedown="return false" onclick="g_setRatingLevel(this,'.$level.','.$type.','.$value.')">';
+            // $js .= Util::setRatingLevel($level, $type, $value);
+            // $js .= '</a>)</small>';
+            if ($interactive)
+                $js = '&nbsp;<small>('.printf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</a>)</small>';
+            else
+                $js = "&nbsp;<small>(".Util::setRatingLevel($level, $type, $value).")</small>";
+
+            return Lang::$item['trigger'][1].str_replace('%d', '<!--rtg'.$type.'-->'.$value.$js, Lang::$item['statType'][$type]);
+        }
+    }
+
+    private function getSSDMod($type)
+    {
+        $mask = $this->curTpl['ScalingStatValue'];
+
+        switch ($type)
+        {
+            case 'stats':   $mask &= 0x04001F;      break;
+            case 'armor':   $mask &= 0xF001E0;      break;
+            case 'dps'  :   $mask &= 0x007E00;      break;
+            case 'spell':   $mask &= 0x008000;      break;
+            default:        $mask &= 0x0;
         }
 
-        parent::__construct($conditions);
+        $field = null;
+        for ($i = 0; $i < count(Util::$ssdMaskFields); $i++)
+            if ($mask & (1 << $i))
+                $field = Util::$ssdMaskFields[$i];
+
+        return $field ? DB::Aowow()->selectCell("SELECT ?# FROM ?_scalingstatvalues WHERE charLevel = ?", $field, $this->ssd[$this->Id]['maxLevel']) : 0;
     }
+
+    private function initScalingStats()
+    {
+        $this->ssd[$this->Id] = DB::Aowow()->selectRow("SELECT * FROM ?_scalingstatdistribution WHERE id = ?", $this->curTpl['ScalingStatDistribution']);
+
+        // stats and ratings
+        for ($i = 1; $i <= 10; $i++)
+        {
+            if ($this->ssd[$this->Id]['statMod'.$i] <= 0)
+            {
+                $this->templates[$this->Id]['stat_type'.$i]  = 0;
+                $this->templates[$this->Id]['stat_value'.$i] = 0;
+            }
+            else
+            {
+                $this->templates[$this->Id]['stat_type'.$i]  = $this->ssd[$this->Id]['statMod'.$i];
+                $this->templates[$this->Id]['stat_value'.$i] = intVal(($this->getSSDMod('stats') * $this->ssd[$this->Id]['modifier'.$i]) / 10000);
+            }
+        }
+
+        // armor: only replace if set
+        if ($ssvArmor = $this->getSSDMod('armor'))
+            $this->templates[$this->Id]['armor'] = $ssvArmor;
+
+        // if set dpsMod in ScalingStatValue use it for min (70% from average), max (130% from average) damage
+        if ($extraDPS = $this->getSSDMod('dps'))            // dmg_x2 not used for heirlooms
+        {
+            $average = $extraDPS * $this->curTpl['delay'] / 1000;
+            $this->templates[$this->Id]['dmg_min1'] = number_format(0.7 * $average);
+            $this->templates[$this->Id]['dmg_max1'] = number_format(1.3 * $average);
+        }
+
+        // apply Spell Power from ScalingStatValue if set
+        if ($spellBonus = $this->getSSDMod('spell'))
+        {
+            $this->templates[$this->Id]['stat_type10']  = ITEM_MOD_SPELL_POWER;
+            $this->templates[$this->Id]['stat_value10'] = $spellBonus;
+        }
+    }
+
+    private function initSubItems()
+    {
+        $randId = $this->curTpl['RandomProperty'] > 0 ? $this->curTpl['RandomProperty'] : $this->curTpl['RandomSuffix'];
+        if ($randomIds = DB::Aowow()->selectCol('SELECT ench FROM item_enchantment_template WHERE entry = ?d', $randId))
+        {
+            if ($this->curTpl['RandomSuffix'] > 0)
+                array_walk($randomIds, function($val, $key) use(&$randomIds) {
+                    $randomIds[$key] = -$val;
+                });
+
+            $this->subItems[$this->Id] = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM ?_itemRandomEnchant WHERE Id IN (?a)', $randomIds);
+
+            // subitems may share enchantmentIds
+            foreach ($this->subItems[$this->Id] as $sI)
+                for ($i = 1; $i < 6; $i++)
+                    if (!isset($this->rndEnchIds[$sI['enchantId'.$i]]) && $sI['enchantId'.$i])
+                        if ($enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $sI['enchantId'.$i]))
+                            $this->rndEnchIds[$enchant['Id']] = $enchant;
+        }
+    }
+
+    private function initJsonStats()
+    {
+        $json = array(
+            'id'          => $this->Id,                     // note to self: lowercase for js-Ids.. ALWAYS!!
+            'name'        => (ITEM_QUALITY_HEIRLOOM - $this->curTpl['Quality']).$this->names[$this->Id],
+            'icon'        => $this->curTpl['icon'],
+            'classs'      => $this->curTpl['class'],
+            'subclass'    => $this->curTpl['subclass'],
+         // 'subsubclass' => $this->curTpl['subsubclass'],
+            'slot'        => $this->curTpl['InventoryType'],
+            'slotbak'     => $this->curTpl['InventoryType'],
+            'level'       => $this->curTpl['ItemLevel'],
+            'reqlevel'    => $this->curTpl['RequiredLevel'],
+            'displayid'   => $this->curTpl['displayid'],
+            'commondrop'  => ($this->curTpl['RandomProperty'] > 0 || $this->curTpl['RandomSuffix'] > 0) ? 'true' : null, // string required :(
+            'holres'      => $this->curTpl['holy_res'],
+            'firres'      => $this->curTpl['fire_res'],
+            'natres'      => $this->curTpl['nature_res'],
+            'frores'      => $this->curTpl['frost_res'],
+            'shares'      => $this->curTpl['shadow_res'],
+            'arcres'      => $this->curTpl['arcane_res'],
+            'armorbonus'  => $this->curTpl['ArmorDamageModifier'],
+            'armor'       => $this->curTpl['armor'],
+            'dura'        => $this->curTpl['MaxDurability'],
+            'itemset'     => $this->curTpl['itemset'],
+            'socket1'     => $this->curTpl['socketColor_1'],
+            'socket2'     => $this->curTpl['socketColor_2'],
+            'socket3'     => $this->curTpl['socketColor_3'],
+            'nsockets'    => ($this->curTpl['socketColor_1'] > 0 ? 1 : 0) + ($this->curTpl['socketColor_2'] > 0 ? 1 : 0) + ($this->curTpl['socketColor_3'] > 0 ? 1 : 0),
+            'socketbonus' => $this->curTpl['socketBonus'],
+            'scadist'     => $this->curTpl['ScalingStatDistribution'],
+            'scaflags'    => $this->curTpl['ScalingStatValue']
+        );
+
+        if ($this->curTpl['class'] == ITEM_CLASS_WEAPON || $this->curTpl['class'] == ITEM_CLASS_AMMUNITION)
+        {
+            $json['dmgtype1'] = $this->curTpl['dmg_type1'];
+            $json['dmgmin1']  = $this->curTpl['dmg_min1'] + $this->curTpl['dmg_min2'];
+            $json['dmgmax1']  = $this->curTpl['dmg_max1'] + $this->curTpl['dmg_max2'];
+            $json['dps']      = !$this->curTpl['delay'] ? 0 : number_format(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $this->curTpl['delay'] / 1000), 1);
+            $json['speed']    = number_format($this->curTpl['delay'] / 1000, 2);
+
+            if (in_array($json['subclass'], [2, 3, 18, 19]))
+            {
+                $json['rgddmgmin'] = $json['dmgmin1'];
+                $json['rgddmgmax'] = $json['dmgmax1'];
+                $json['rgdspeed']  = $json['speed'];
+                $json['rgddps']    = $json['dps'];
+            }
+            else if ($json['classs'] != ITEM_CLASS_AMMUNITION)
+            {
+                $json['mledmgmin'] = $json['dmgmin1'];
+                $json['mledmgmax'] = $json['dmgmax1'];
+                $json['mlespeed']  = $json['speed'];
+                $json['mledps']    = $json['dps'];
+            }
+
+            if ($json['classs'] == ITEM_CLASS_WEAPON && in_array($json['subclass'], [5, 6, 10]) && $json['dps'] > 54.8)
+                $json['feratkpwr'] = max(0, round((($json['dmgmin1'] + $json['dmgmax1']) / (2 * $this->curTpl['delay'] / 1000) - 54.8) * 14, 0));
+        }
+
+        // clear zero-values afterwards
+        foreach ($json as $k => $v)
+            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'armor']) && $v === "0"))
+                unset($json[$k]);
+
+        $this->json[$json['id']] = $json;
+    }
+
+    public function addRewardsToJScript(&$ref) { }
 }
 
 ?>

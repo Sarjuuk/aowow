@@ -11,20 +11,18 @@ if (!defined('AOWOW_REVISION'))
 // require 'includes/class.community.php';                  // wo dont need those .. yet
 
 $id   = intVal($pageParam);
-$item = new Item($id);
+$item = new ItemList(array(['i.entry', $id]));
 
 $cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEM, $id, -1, User::$localeId]);
 
 if (isset($_GET['xml']))
-{
-    // output item info as xml
-    // why should i implement this..?
-}
-else if (isset($_GET['power']))
+    die('unsupported, as i do not see the point');
+
+if (isset($_GET['power']))
 {
     header('Content-type: application/x-javascript; charsetUTF-8');
 
-    Util::powerUseLocale($_GET['domain']);
+    Util::powerUseLocale(@$_GET['domain']);
 
     $enh        = [];
     $itemString = $id;
@@ -50,21 +48,20 @@ else if (isset($_GET['power']))
         $itemString .= 's';
     }
 
-    // : are not accepted in filenames
     $cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_ITEM, str_replace(':', ',', $itemString), -1, User::$localeId]);
 
     // output json for tooltips
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        if (!$item->template)
+        if ($item->error)
             die('$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.', {})');
 
-        $item->createTooltip($enh);
+        $item->renderTooltip($enh);
         $x .= '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($item->name)."',\n";
-        $x .= "\tquality: ".$item->template['Quality'].",\n";
-        $x .= "\ticon: '".Util::jsEscape($item->template['icon'])."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($item->tooltip)."'\n";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($item->names[$item->Id])."',\n";
+        $x .= "\tquality: ".$item->getField('Quality').",\n";
+        $x .= "\ticon: '".Util::jsEscape($item->getField('icon'))."',\n";
+        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($item->tooltip[$item->Id])."'\n";
         $x .= "});";
 
         $smarty->saveCache($cacheKeyTooltip, $x);

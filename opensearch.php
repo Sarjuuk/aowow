@@ -96,12 +96,12 @@ if ($_type & 0x18) {                                         // 3 | 4
     $iList = new ItemList($conditions);
 
     $items = [];
-    foreach ($iList->container as $id => $item)
+    while ($iList->iterate())
     {
-        $item->getJsonStats($pieceAssoc);
+        $iList->extendJsonStats($pieceAssoc);
 
         $stats = [];
-        foreach ($item->json as $k => $v)
+        foreach ($iList->json[$iList->Id] as $k => $v)
         {
             if (!$v && $k != 'classs' && $k != 'subclass')
                 continue;
@@ -109,10 +109,10 @@ if ($_type & 0x18) {                                         // 3 | 4
             $stats[] = is_numeric($v) || $v[0] == "{" ? '"'.$k.'":'.$v.'' : '"'.$k.'":"'.$v.'"';
         }
 
-        foreach ($item->itemMods as $k => $v)
+        foreach ($iList->itemMods[$iList->Id] as $k => $v)
             $stats[] = '"'.Util::$itemMods[$k].'":'.$v.'';
 
-        $items[$id] =  "\t{".implode(',', $stats)."}";
+        $items[$iList->Id] =  "\t{".implode(',', $stats)."}";
     }
     echo implode(",\n", $items)."\n],[\n";
 

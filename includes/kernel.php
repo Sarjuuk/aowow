@@ -20,7 +20,7 @@ require 'includes/class.database.php';
 
 // autoload any List-Classes
 spl_autoload_register(function ($class) {
-    if (!strpos($class, 'Mysql') && !strpos($class, 'Filter'))
+    if (strpos($class, 'List'))
         require 'includes/class.'.strtr($class, ['List' => '']).'.php';
 });
 
@@ -93,7 +93,7 @@ class Smarty_AoWoW extends Smarty
         if (!$cache)
             return false;
 
-        $cache = explode("\n", $cache, 2);
+        $cache = explode("\n", $cache);
 
         @list($time, $rev) = explode(' ', $cache[0]);
         $expireTime = $time + $this->config['page']['cacheTimer'];

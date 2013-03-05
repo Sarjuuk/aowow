@@ -19,7 +19,7 @@ define('TYPE_FACTION',                      8);
 define('TYPE_PET',                          9);
 define('TYPE_ACHIEVEMENT',                  10);
 define('TYPE_TITLE',                        11);
-define('TYPE_EVENT',                        12);
+define('TYPE_WORLDEVENT',                   12);
 define('TYPE_CLASS',                        13);
 define('TYPE_RACE',                         14);
 define('TYPE_SKILL',                        15);
@@ -33,8 +33,8 @@ define('CACHETYPE_SEARCH',                  3);
 define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);
 define('SEARCH_TYPE_JSON',                  0x40000000);
-define('SEARCH_MASK_OPEN',                  0x03FFFFFF);
-define('SEARCH_MASK_ALL',                   0x03FFFFFF);
+define('SEARCH_MASK_OPEN',                  0x017F807F);    // open search
+define('SEARCH_MASK_ALL',                   0x07FFFFFF);    // normal search
 
 // Databases
 define('DB_AOWOW',                          0);
@@ -93,6 +93,12 @@ define('LOCALE_FR',                         2);
 define('LOCALE_DE',                         3);
 define('LOCALE_ES',                         6);
 define('LOCALE_RU',                         8);
+
+// Additional info in item-listviews
+define('ITEMINFO_JSON',                     0x1);
+define('ITEMINFO_SUBITEMS',                 0x2);
+define('ITEMINFO_VENDOR',                   0x4);
+define('ITEMINFO_LOOT',                     0x8);
 
 /*
  * Game
@@ -185,6 +191,7 @@ define('SPELL_SCHOOL_NATURE',               3);
 define('SPELL_SCHOOL_FROST',                4);
 define('SPELL_SCHOOL_SHADOW',               5);
 define('SPELL_SCHOOL_ARCANE',               6);
+define('SPELL_ALL_SCHOOLS',                 0x7F);
 
 // CharacterSlot
 define('SLOT_HEAD',                         0);

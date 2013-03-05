@@ -3,15 +3,41 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-class Spell extends BaseType
+class SpellList extends BaseType
 {
-    public    $tooltip    = '';
-    public    $buff       = '';
+    public    $tooltips   = [];
+    public    $buffs      = [];
 
     private   $spellVars  = [];
     private   $refSpells  = [];
 
-    protected $setupQuery = 'SELECT * FROM ?_spell WHERE Id = ?d';
+    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_spell WHERE [filter] [cond] GROUP BY Id ORDER BY Id ASC';
+    protected $matchQuery = 'SELECT COUNT(1) FROM ?_spell WHERE [filter] [cond]';
+
+    public function __construct($conditions)
+    {
+        parent::__construct($conditions);
+
+        if ($this->error)
+            return;
+
+        // post processing
+        $itemIcons = [];
+
+        // if the spell creates an item use the itemIcon instead
+        while ($this->iterate())
+            if ($this->curTpl['effect1CreateItemId'])
+                $itemIcons[(int)$this->curTpl['effect1CreateItemId']] = $this->Id;
+
+        if ($itemIcons)
+        {
+            $itemList = new ItemList(array(['i.entry', array_keys($itemIcons)]));
+            while ($itemList->iterate())
+                $this->templates[$itemIcons[$itemList->Id]]['createItemString'] = $itemList->getField('icon');
+        }
+
+        $this->reset();                                     // restore 'iterator'
+    }
 
     // use if you JUST need the name
     public static function getName($id)
@@ -21,173 +47,177 @@ class Spell extends BaseType
     }
     // end static use
 
-    // required for item-sets-bonuses and socket-bonuses
+    // required for itemSet-bonuses and socket-bonuses
     public function getStatGain()
     {
         $stats = [];
-        for ($i = 1; $i <= 3; $i++)
+
+        while ($this->iterate())
         {
-            if (!in_array($this->template["effect".$i."AuraId"], [13, 22, 29, 34, 35, 83, 84, 85, 99, 124, 135, 143, 158, 161, 189, 230, 235, 240, 250]))
-                continue;
-
-            $mv = $this->template["effect".$i."MiscValue"];
-            $bp = $this->template["effect".$i."BasePoints"] + 1;
-
-            switch ($this->template["effect".$i."AuraId"])
+            for ($i = 1; $i <= 3; $i++)
             {
-                case 29:                                    // ModStat MiscVal:type
-                {
-                    if ($mv < 0)                            // all stats
-                    {
-                        for ($j = 0; $j < 5; $j++)
-                            @$stats[ITEM_MOD_AGILITY + $j] += $bp;
-                    }
-                    else                                    // one stat
-                        @$stats[ITEM_MOD_AGILITY + $mv] += $bp;
+                if (!in_array($this->curTpl["effect".$i."AuraId"], [13, 22, 29, 34, 35, 83, 84, 85, 99, 124, 135, 143, 158, 161, 189, 230, 235, 240, 250]))
+                    continue;
 
-                    break;
-                }
-                case 34:                                    // Increase Health
-                case 230:
-                case 250:
+                $mv = $this->curTpl["effect".$i."MiscValue"];
+                $bp = $this->curTpl["effect".$i."BasePoints"] + 1;
+
+                switch ($this->curTpl["effect".$i."AuraId"])
                 {
-                    @$stats[ITEM_MOD_HEALTH] += $bp;
-                    break;
-                }
-                case 13:                                    // damage splpwr + physical (dmg & any)
-                {
-                    if ($mv == 1)                           // + weapon damage
+                    case 29:                                    // ModStat MiscVal:type
                     {
-                        @$stats[ITEM_MOD_WEAPON_DMG] += $bp;
+                        if ($mv < 0)                            // all stats
+                        {
+                            for ($j = 0; $j < 5; $j++)
+                                @$stats[ITEM_MOD_AGILITY + $j] += $bp;
+                        }
+                        else                                    // one stat
+                            @$stats[ITEM_MOD_AGILITY + $mv] += $bp;
+
                         break;
                     }
+                    case 34:                                    // Increase Health
+                    case 230:
+                    case 250:
+                    {
+                        @$stats[ITEM_MOD_HEALTH] += $bp;
+                        break;
+                    }
+                    case 13:                                    // damage splpwr + physical (dmg & any)
+                    {
+                        if ($mv == 1)                           // + weapon damage
+                        {
+                            @$stats[ITEM_MOD_WEAPON_DMG] += $bp;
+                            break;
+                        }
 
-                    if ($mv == 0x7E)                        // full magic mask, also counts towards healing
+                        if ($mv == 0x7E)                        // full magic mask, also counts towards healing
+                        {
+                            @$stats[ITEM_MOD_SPELL_POWER] += $bp;
+                            @$stats[ITEM_MOD_SPELL_DAMAGE_DONE] += $bp;
+                        }
+                        else
+                        {
+                            if ($mv & (1 << 1))                 // HolySpellpower (deprecated; still used in randomproperties)
+                                @$stats[ITEM_MOD_HOLY_POWER] += $bp;
+
+                            if ($mv & (1 << 2))                 // FireSpellpower (deprecated; still used in randomproperties)
+                                @$stats[ITEM_MOD_FIRE_POWER] += $bp;
+
+                            if ($mv & (1 << 3))                 // NatureSpellpower (deprecated; still used in randomproperties)
+                                @$stats[ITEM_MOD_NATURE_POWER] += $bp;
+
+                            if ($mv & (1 << 4))                 // FrostSpellpower (deprecated; still used in randomproperties)
+                                @$stats[ITEM_MOD_FROST_POWER] += $bp;
+
+                            if ($mv & (1 << 5))                 // ShadowSpellpower (deprecated; still used in randomproperties)
+                                @$stats[ITEM_MOD_SHADOW_POWER] += $bp;
+
+                            if ($mv & (1 << 6))                 // ArcaneSpellpower (deprecated; still used in randomproperties)
+                                @$stats[ITEM_MOD_ARCANE_POWER] += $bp;
+                        }
+
+                        break;
+                    }
+                    case 135:                                   // healing splpwr (healing & any) .. not as a mask..
                     {
                         @$stats[ITEM_MOD_SPELL_POWER] += $bp;
-                        @$stats[ITEM_MOD_SPELL_DAMAGE_DONE] += $bp;
-                    }
-                    else
-                    {
-                        if ($mv & (1 << 1))                 // HolySpellpower (deprecated; still used in randomproperties)
-                            @$stats[ITEM_MOD_HOLY_POWER] += $bp;
+                        @$stats[ITEM_MOD_SPELL_HEALING_DONE] += $bp;
 
-                        if ($mv & (1 << 2))                 // FireSpellpower (deprecated; still used in randomproperties)
-                            @$stats[ITEM_MOD_FIRE_POWER] += $bp;
-
-                        if ($mv & (1 << 3))                 // NatureSpellpower (deprecated; still used in randomproperties)
-                            @$stats[ITEM_MOD_NATURE_POWER] += $bp;
-
-                        if ($mv & (1 << 4))                 // FrostSpellpower (deprecated; still used in randomproperties)
-                            @$stats[ITEM_MOD_FROST_POWER] += $bp;
-
-                        if ($mv & (1 << 5))                 // ShadowSpellpower (deprecated; still used in randomproperties)
-                            @$stats[ITEM_MOD_SHADOW_POWER] += $bp;
-
-                        if ($mv & (1 << 6))                 // ArcaneSpellpower (deprecated; still used in randomproperties)
-                            @$stats[ITEM_MOD_ARCANE_POWER] += $bp;
-                    }
-
-                    break;
-                }
-                case 135:                                   // healing splpwr (healing & any) .. not as a mask..
-                {
-                    @$stats[ITEM_MOD_SPELL_POWER] += $bp;
-                    @$stats[ITEM_MOD_SPELL_HEALING_DONE] += $bp;
-
-                    break;
-                }
-                case 35:                                    // ModPower - MiscVal:type see defined Powers only energy/mana in use
-                {
-                    if ($mv == -2)
-                        @$stats[ITEM_MOD_HEALTH] += $bp;
-                    if ($mv == 3)
-                        @$stats[ITEM_MOD_ENERGY] += $bp;
-                    else if ($mv == 0)
-                        @$stats[ITEM_MOD_MANA] += $bp;
-                    else if ($mv == 6)
-                        @$stats[ITEM_MOD_RUNIC_POWER] += $bp;
-
-                    break;
-                }
-                case 189:                                   // CombatRating MiscVal:ratingMask
-                    // special case: resilience -  consists of 3 ratings strung together. MOD_CRIT_TAKEN_MELEE|RANGED|SPELL (14,15,16)
-                    if (($mv & 0x1C000) == 0x1C000)
-                        @$stats[ITEM_MOD_RESILIENCE_RATING] += $bp;
-
-                    for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
-                    {
-                        if (!Util::$combatRatingToItemMod[$j])
-                            continue;
-
-                        if (($mv & (1 << $j)) == 0)
-                            continue;
-
-                        @$stats[Util::$combatRatingToItemMod[$j]] += $bp;
-                    }
-                    break;
-                case 143:                                   // Resistance MiscVal:school
-                case 83:
-                case 22:
-
-                    if ($mv == 1)                           // Armor only if explixitly specified
-                    {
-                        @$stats[ITEM_MOD_ARMOR] += $bp;
                         break;
                     }
-
-                    if ($mv == 2)                           // holy-resistance ONLY if explicitly specified (shouldn't even exist...)
+                    case 35:                                    // ModPower - MiscVal:type see defined Powers only energy/mana in use
                     {
-                        @$stats[ITEM_MOD_HOLY_RESISTANCE] += $bp;
+                        if ($mv == -2)
+                            @$stats[ITEM_MOD_HEALTH] += $bp;
+                        if ($mv == 3)
+                            @$stats[ITEM_MOD_ENERGY] += $bp;
+                        else if ($mv == 0)
+                            @$stats[ITEM_MOD_MANA] += $bp;
+                        else if ($mv == 6)
+                            @$stats[ITEM_MOD_RUNIC_POWER] += $bp;
+
                         break;
                     }
+                    case 189:                                   // CombatRating MiscVal:ratingMask
+                        // special case: resilience -  consists of 3 ratings strung together. MOD_CRIT_TAKEN_MELEE|RANGED|SPELL (14,15,16)
+                        if (($mv & 0x1C000) == 0x1C000)
+                            @$stats[ITEM_MOD_RESILIENCE_RATING] += $bp;
 
-                    for ($j = 0; $j < 7; $j++)
-                    {
-                        if (($mv & (1 << $j)) == 0)
-                            continue;
-
-                        switch ($j)
+                        for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
                         {
-                            case 2:
-                                @$stats[ITEM_MOD_FIRE_RESISTANCE] += $bp;
-                                break;
-                            case 3:
-                                @$stats[ITEM_MOD_NATURE_RESISTANCE] += $bp;
-                                break;
-                            case 4:
-                                @$stats[ITEM_MOD_FROST_RESISTANCE] += $bp;
-                                break;
-                            case 5:
-                                @$stats[ITEM_MOD_SHADOW_RESISTANCE] += $bp;
-                                break;
-                            case 6:
-                                @$stats[ITEM_MOD_ARCANE_RESISTANCE] += $bp;
-                                break;
+                            if (!Util::$combatRatingToItemMod[$j])
+                                continue;
+
+                            if (($mv & (1 << $j)) == 0)
+                                continue;
+
+                            @$stats[Util::$combatRatingToItemMod[$j]] += $bp;
                         }
-                    }
-                    break;
-                case 84:                                    // hp5
-                case 161:
-                    @$stats[ITEM_MOD_HEALTH_REGEN] += $bp;
-                    break;
-                case 85:                                    // mp5
-                    @$stats[ITEM_MOD_MANA_REGENERATION] += $bp;
-                    break;
-                case 99:                                    // atkpwr
-                    @$stats[ITEM_MOD_ATTACK_POWER] += $bp;
-                    break;                                  // ?carries over to rngatkpwr?
-                case 124:                                   // rngatkpwr
-                    @$stats[ITEM_MOD_RANGED_ATTACK_POWER] += $bp;
-                    break;
-                case 158:                                   // blockvalue
-                    @$stats[ITEM_MOD_BLOCK_VALUE] += $bp;
-                    break;
-                case 240:                                   // ModExpertise
-                    @$stats[ITEM_MOD_EXPERTISE_RATING] += $bp;
-                    break;
+                        break;
+                    case 143:                                   // Resistance MiscVal:school
+                    case 83:
+                    case 22:
+                        if ($mv == 1)                           // Armor only if explixitly specified
+                        {
+                            @$stats[ITEM_MOD_ARMOR] += $bp;
+                            break;
+                        }
+
+                        if ($mv == 2)                           // holy-resistance ONLY if explicitly specified (shouldn't even exist...)
+                        {
+                            @$stats[ITEM_MOD_HOLY_RESISTANCE] += $bp;
+                            break;
+                        }
+
+                        for ($j = 0; $j < 7; $j++)
+                        {
+                            if (($mv & (1 << $j)) == 0)
+                                continue;
+
+                            switch ($j)
+                            {
+                                case 2:
+                                    @$stats[ITEM_MOD_FIRE_RESISTANCE] += $bp;
+                                    break;
+                                case 3:
+                                    @$stats[ITEM_MOD_NATURE_RESISTANCE] += $bp;
+                                    break;
+                                case 4:
+                                    @$stats[ITEM_MOD_FROST_RESISTANCE] += $bp;
+                                    break;
+                                case 5:
+                                    @$stats[ITEM_MOD_SHADOW_RESISTANCE] += $bp;
+                                    break;
+                                case 6:
+                                    @$stats[ITEM_MOD_ARCANE_RESISTANCE] += $bp;
+                                    break;
+                            }
+                        }
+                        break;
+                    case 84:                                    // hp5
+                    case 161:
+                        @$stats[ITEM_MOD_HEALTH_REGEN] += $bp;
+                        break;
+                    case 85:                                    // mp5
+                        @$stats[ITEM_MOD_MANA_REGENERATION] += $bp;
+                        break;
+                    case 99:                                    // atkpwr
+                        @$stats[ITEM_MOD_ATTACK_POWER] += $bp;
+                        break;                                  // ?carries over to rngatkpwr?
+                    case 124:                                   // rngatkpwr
+                        @$stats[ITEM_MOD_RANGED_ATTACK_POWER] += $bp;
+                        break;
+                    case 158:                                   // blockvalue
+                        @$stats[ITEM_MOD_BLOCK_VALUE] += $bp;
+                        break;
+                    case 240:                                   // ModExpertise
+                        @$stats[ITEM_MOD_EXPERTISE_RATING] += $bp;
+                        break;
+                }
             }
         }
+
         return $stats;
     }
 
@@ -236,16 +266,16 @@ class Spell extends BaseType
 
         // cache at least some lookups.. should be moved to single spellList :/
         if ($lookup && !isset($this->refSpells[$lookup]))
-            $this->refSpells[$lookup] = new Spell($lookup);
+            $this->refSpells[$lookup] = new SpellList(array(['Id', $lookup]));
 
         switch ($var)
         {
             case 'a':                                       // EffectRadiusMin
             case 'A':                                       // EffectRadiusMax (ToDo)
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'RadiusMax'];
+                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'RadiusMax');
                 else
-                    $base = $this->template['effect'.$effIdx.'RadiusMax'];
+                    $base = $this->getField('effect'.$effIdx.'RadiusMax');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -254,9 +284,9 @@ class Spell extends BaseType
             case 'b':                                       // PointsPerComboPoint
             case 'B':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'PointsPerComboPoint'];
+                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'PointsPerComboPoint');
                 else
-                    $base = $this->template['effect'.$effIdx.'PointsPerComboPoint'];
+                    $base = $this->getField('effect'.$effIdx.'PointsPerComboPoint');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -267,7 +297,7 @@ class Spell extends BaseType
                 if ($lookup > 0 && $exprData[0])
                     $spell = DB::Aowow()->selectRow('SELECT effect'.$exprData[0].'BasePoints, effect'.$exprData[0].'AuraId, effect'.$exprData[0].'MiscValue FROM ?_spell WHERE id=? LIMIT 1', $lookup);
                 else
-                    $spell = $this->template;
+                    $spell = $this->curTpl;
 
                 $base = $spell['effect'.$exprData[0].'BasePoints'] + 1;
 
@@ -307,9 +337,9 @@ class Spell extends BaseType
             case 'd':                                       // SpellDuration
             case 'D':                                       // todo: min/max?
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['duration'];
+                    $base = $this->refSpells[$lookup]->getField('duration');
                 else
-                    $base = $this->template['duration'];
+                    $base = $this->getField('duration');
 
                 if ($base < 0)
                     return Lang::$spell['untilCanceled'];
@@ -321,9 +351,9 @@ class Spell extends BaseType
             case 'e':                                       // EffectValueMultiplier
             case 'E':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'ValueMultiplier'];
+                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'ValueMultiplier');
                 else
-                    $base = $this->template['effect'.$effIdx.'ValueMultiplier'];
+                    $base = $this->getField('effect'.$effIdx.'ValueMultiplier');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -332,9 +362,9 @@ class Spell extends BaseType
             case 'f':                                       // EffectDamageMultiplier
             case 'F':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'DamageMultiplier'];
+                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'DamageMultiplier');
                 else
-                    $base = $this->template['effect'.$effIdx.'DamageMultiplier'];
+                    $base = $this->getField('effect'.$effIdx.'DamageMultiplier');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -346,9 +376,9 @@ class Spell extends BaseType
             case 'h':                                       // ProcChance
             case 'H':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['procChance'];
+                    $base = $this->refSpells[$lookup]->getField('procChance');
                 else
-                    $base = $this->template['procChance'];
+                    $base = $this->getField('procChance');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -357,9 +387,9 @@ class Spell extends BaseType
             case 'i':                                       // MaxAffectedTargets
             case 'I':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['targets'];
+                    $base = $this->refSpells[$lookup]->getField('targets');
                 else
-                    $base = $this->template['targets'];
+                    $base = $this->getField('targets');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -372,18 +402,18 @@ class Spell extends BaseType
             case 'M':                                       // BasePoints (maxValue)
                 if ($lookup)
                 {
-                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'BasePoints'];
-                    $add  = $this->refSpells[$lookup]->template['effect'.$effIdx.'DieSides'];
-                    $mv   = $this->refSpells[$lookup]->template['effect'.$effIdx.'MiscValue'];
-                    $aura = $this->refSpells[$lookup]->template['effect'.$effIdx.'AuraId'];
+                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'BasePoints');
+                    $add  = $this->refSpells[$lookup]->getField('effect'.$effIdx.'DieSides');
+                    $mv   = $this->refSpells[$lookup]->getField('effect'.$effIdx.'MiscValue');
+                    $aura = $this->refSpells[$lookup]->getField('effect'.$effIdx.'AuraId');
 
                 }
                 else
                 {
-                    $base = $this->template['effect'.$effIdx.'BasePoints'];
-                    $add  = $this->template['effect'.$effIdx.'DieSides'];
-                    $mv   = $this->template['effect'.$effIdx.'MiscValue'];
-                    $aura = $this->template['effect'.$effIdx.'AuraId'];
+                    $base = $this->getField('effect'.$effIdx.'BasePoints');
+                    $add  = $this->getField('effect'.$effIdx.'DieSides');
+                    $mv   = $this->getField('effect'.$effIdx.'MiscValue');
+                    $aura = $this->getField('effect'.$effIdx.'AuraId');
                 }
 
                 if (ctype_lower($var))
@@ -419,9 +449,9 @@ class Spell extends BaseType
             case 'n':                                       // ProcCharges
             case 'N':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['procCharges'];
+                    $base = $this->refSpells[$lookup]->getField('procCharges');
                 else
-                    $base = $this->template['procCharges'];
+                    $base = $this->getField('procCharges');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -431,17 +461,17 @@ class Spell extends BaseType
             case 'O':
                 if ($lookup)
                 {
-                    $base     = $this->refSpells[$lookup]->template['effect'.$effIdx.'BasePoints'];
-                    $add      = $this->refSpells[$lookup]->template['effect'.$effIdx.'DieSides'];
-                    $periode  = $this->refSpells[$lookup]->template['effect'.$effIdx.'Periode'];
-                    $duration = $this->refSpells[$lookup]->template['duration'];
+                    $base     = $this->refSpells[$lookup]->getField('effect'.$effIdx.'BasePoints');
+                    $add      = $this->refSpells[$lookup]->getField('effect'.$effIdx.'DieSides');
+                    $periode  = $this->refSpells[$lookup]->getField('effect'.$effIdx.'Periode');
+                    $duration = $this->refSpells[$lookup]->getField('duration');
                 }
                 else
                 {
-                    $base     = $this->template['effect'.$effIdx.'BasePoints'];
-                    $add      = $this->template['effect'.$effIdx.'DieSides'];
-                    $periode  = $this->template['effect'.$effIdx.'Periode'];
-                    $duration = $this->template['duration'];
+                    $base     = $this->getField('effect'.$effIdx.'BasePoints');
+                    $add      = $this->getField('effect'.$effIdx.'DieSides');
+                    $periode  = $this->getField('effect'.$effIdx.'Periode');
+                    $duration = $this->getField('duration');
                 }
 
                 if (!$periode)
@@ -453,9 +483,9 @@ class Spell extends BaseType
             case 'q':                                       // EffectMiscValue
             case 'Q':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'MiscValue'];
+                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'MiscValue');
                 else
-                    $base = $this->template['effect'.$effIdx.'MiscValue'];
+                    $base = $this->getField('effect'.$effIdx.'MiscValue');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -464,9 +494,9 @@ class Spell extends BaseType
             case 'r':                                       // SpellRange
             case 'R':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['rangeMaxHostile'];
+                    $base = $this->refSpells[$lookup]->getField('rangeMaxHostile');
                 else
-                    $base = $this->template['rangeMaxHostile'];
+                    $base = $this->getField('rangeMaxHostile');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -476,17 +506,17 @@ class Spell extends BaseType
             case 'S':
                 if ($lookup)
                 {
-                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'BasePoints'];
-                    $add  = $this->refSpells[$lookup]->template['effect'.$effIdx.'DieSides'];
-                    $mv   = $this->refSpells[$lookup]->template['effect'.$effIdx.'MiscValue'];
-                    $aura = $this->refSpells[$lookup]->template['effect'.$effIdx.'AuraId'];
+                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'BasePoints');
+                    $add  = $this->refSpells[$lookup]->getField('effect'.$effIdx.'DieSides');
+                    $mv   = $this->refSpells[$lookup]->getField('effect'.$effIdx.'MiscValue');
+                    $aura = $this->refSpells[$lookup]->getField('effect'.$effIdx.'AuraId');
                 }
                 else
                 {
-                    $base = $this->template['effect'.$effIdx.'BasePoints'];
-                    $add  = $this->template['effect'.$effIdx.'DieSides'];
-                    $mv   = $this->template['effect'.$effIdx.'MiscValue'];
-                    $aura = $this->template['effect'.$effIdx.'AuraId'];
+                    $base = $this->getField('effect'.$effIdx.'BasePoints');
+                    $add  = $this->getField('effect'.$effIdx.'DieSides');
+                    $mv   = $this->getField('effect'.$effIdx.'MiscValue');
+                    $aura = $this->getField('effect'.$effIdx.'AuraId');
                 }
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
@@ -517,9 +547,9 @@ class Spell extends BaseType
             case 't':                                       // Periode
             case 'T':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'Periode'] / 1000;
+                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'Periode') / 1000;
                 else
-                    $base = $this->template['effect'.$effIdx.'Periode'] / 1000;
+                    $base = $this->getField('effect'.$effIdx.'Periode') / 1000;
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -528,9 +558,9 @@ class Spell extends BaseType
             case 'u':                                       // StackCount
             case 'U':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['stackAmount'];
+                    $base = $this->refSpells[$lookup]->getField('stackAmount');
                 else
-                    $base = $this->template['stackAmount'];
+                    $base = $this->getField('stackAmount');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -539,9 +569,9 @@ class Spell extends BaseType
             case 'v':                                   // MaxTargetLevel
             case 'V':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['MaxTargetLevel'];
+                    $base = $this->refSpells[$lookup]->getField('MaxTargetLevel');
                 else
-                    $base = $this->template['MaxTargetLevel'];
+                    $base = $this->getField('MaxTargetLevel');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -550,9 +580,9 @@ class Spell extends BaseType
             case 'x':                                   // ChainTargetCount
             case 'X':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->template['effect'.$effIdx.'ChainTarget'];
+                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'ChainTarget');
                 else
-                    $base = $this->template['effect'.$effIdx.'ChainTarget'];
+                    $base = $this->getField('effect'.$effIdx.'ChainTarget');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base.$op.$oparg;");
@@ -640,6 +670,10 @@ class Spell extends BaseType
     // although it seems to be pretty fast, even on those pesky test-spells with extra complex tooltips (Ron Test Spell X))
     public function parseText($type = 'description', $level = MAX_LEVEL)
     {
+        // oooo..kaaayy.. parsing text in 6 or 7 easy steps
+        // we don't use the internal iterator here. This func has to be called for the individual template.
+        // otherwise it will get a bit messy, when we iterate, while we iterate *yo dawg!*
+
     /* documentation .. sort of
         bracket use
             ${}.x - formulas; .x is optional; x:[0-9] .. max-precision of a floatpoint-result; default: 0
@@ -711,14 +745,14 @@ class Spell extends BaseType
 
 
     // step 0: get text
-        $data = Util::localizedString($this->template, $type);
+        $data = Util::localizedString($this->curTpl, $type);
         if (empty($data) || $data == "[]")                  // empty tooltip shouldn't be displayed anyway
             return null;
 
     // step 1: if the text is supplemented with text-variables, get and replace them
-        if (empty($this->spellVars[$this->Id]) && $this->template['spellDescriptionVariableId'] > 0)
+        if (empty($this->spellVars[$this->Id]) && $this->curTpl['spellDescriptionVariableId'] > 0)
         {
-            $spellVars = DB::Aowow()->SelectCell('SELECT vars FROM ?_spellVariables WHERE id = ?d', $this->template['spellDescriptionVariableId']);
+            $spellVars = DB::Aowow()->SelectCell('SELECT vars FROM ?_spellVariables WHERE id = ?d', $this->curTpl['spellDescriptionVariableId']);
             $spellVars = explode("\n", $spellVars);
             foreach ($spellVars as $sv)
                 if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $matches))
@@ -906,270 +940,282 @@ class Spell extends BaseType
         return $str;
     }
 
-    public function getBuff()
+    public function renderBuff($Id = 0)
     {
-        // doesn't have a buff
-        if (!Util::localizedString($this->template, 'buff'))
-            return '';
-
-        $x = '<table><tr>';
-
-        // spellName
-        $x .= '<td><b class="q">'.Util::localizedString($this->template, 'name').'</b></td>';
-
-        // dispelType (if applicable)
-        if ($dispel = Lang::$game['di'][$this->template['dispelType']])
-            $x .= '<th><b class="q">'.$dispel.'</b></th>';
-
-        $x .= '</tr></table>';
-
-        $x .= '<table><tr><td>';
-
-        // parse Buff-Text
-        $x .= $this->parseText('buff').'<br>';
-
-        // duration
-        if ($this->template['duration'])
-            $x .= '<span class="q">'.sprintf(Lang::$spell['remaining'], Util::formatTime($this->template['duration'])).'<span>';
-
-        $x .= '</td></tr></table>';
-
-        $this->buff = $x;
-
-        return $this->buff;
-    }
-
-    public function getTooltip()
-    {
-        // get reagents
-        $reagents = [];
-        for ($j = 1; $j <= 8; $j++)
+        while ($this->iterate())
         {
-            if($this->template['reagent'.$j] <= 0)
+            if ($Id && $this->Id != $Id)
                 continue;
 
-            $reagents[] = array(
-                'id' => $this->template['reagent'.$j],
-                'name' => Item::getName($this->template['reagent'.$j]),
-                'count' => $this->template['reagentCount'.$j]          // if < 0 : require, but don't use
-            );
-        }
-        $reagents = array_reverse($reagents);
+            // doesn't have a buff
+            if (!Util::localizedString($this->curTpl, 'buff'))
+                return '';
 
-        // get tools
-        $tools = [];
-        for ($i = 1; $i <= 2; $i++)
-        {
-            // Tools
-            if ($this->template['tool'.$i])
-                $tools[$i-1] = array('itemId' => $this->template['tool'.$i], 'name' => Item::getName($this->template['tool'.$i]));
+            $x = '<table><tr>';
 
-            // TotemCategory
-            if ($this->template['toolCategory'.$i])
-            {
-                $tc = DB::Aowow()->selectRow('SELECT * FROM aowow_totemcategory WHERE id = ?d', $this->template['toolCategory'.$i]);
-                $tools[$i+1] = array('categoryMask' => $tc['categoryMask'], 'name' => Util::localizedString($tc, 'name'));
-            }
-        }
-        $tools = array_reverse($tools);
+            // spellName
+            $x .= '<td><b class="q">'.Util::localizedString($this->curTpl, 'name').'</b></td>';
 
-        // get description
-        $desc = $this->parseText('description');
+            // dispelType (if applicable)
+            if ($dispel = Lang::$game['di'][$this->curTpl['dispelType']])
+                $x .= '<th><b class="q">'.$dispel.'</b></th>';
 
-        $reqWrapper  = $this->template['rangeMaxHostile'] && ($this->template['powerCost'] > 0 || $this->template['powerCostPercent'] > 0);
-        $reqWrapper2 = $reagents ||$tools || $desc;
+            $x .= '</tr></table>';
 
-        $x = '';
-        $x .= '<table><tr><td>';
+            $x .= '<table><tr><td>';
 
-        $rankText = Util::localizedString($this->template, 'rank');
+            // parse Buff-Text
+            $x .= $this->parseText('buff').'<br>';
 
-        if (!empty($rankText))
-            $x .= '<table width="100%"><tr><td>';
+            // duration
+            if ($this->curTpl['duration'] > 0)
+                $x .= '<span class="q">'.sprintf(Lang::$spell['remaining'], Util::formatTime($this->curTpl['duration'])).'<span>';
 
-        // name
-        $x .= '<b>'.Util::localizedString($this->template, 'name').'</b>';
+            $x .= '</td></tr></table>';
 
-        // rank
-        if (!empty($rankText))
-            $x .= '<br /></td><th><b class="q0">'.$rankText.'</b></th></tr></table>';
-
-
-        if ($reqWrapper)
-            $x .= '<table width="100%"><tr><td>';
-
-        // check for custom PowerDisplay
-        $pt = $this->template['powerDisplayString'] ? $this->template['powerDisplayString'] : $this->template['powerType'];
-
-        // power cost: pct over static
-        if ($this->template['powerCostPercent'] > 0)
-            $x .= $this->template['powerCostPercent']."% ".sprintf(Lang::$spell['pctCostOf'], strtolower(Lang::$spell['powerTypes'][$pt]));
-        else if ($this->template['powerCost'] > 0 || $this->template['powerPerSecond'] > 0 || $this->template['powerCostPerLevel'] > 0)
-            $x .= ($pt == 1 ? $this->template['powerCost'] / 10 : $this->template['powerCost']).' '.ucFirst(Lang::$spell['powerTypes'][$pt]);
-
-        // append periodic cost
-        if ($this->template['powerPerSecond'] > 0)
-            $x .= sprintf(Lang::$spell['costPerSec'], $this->template['powerPerSecond']);
-
-        // append level cost
-        if ($this->template['powerCostPerLevel'] > 0)
-            $x .= sprintf(Lang::$spell['costPerLevel'], $this->template['powerCostPerLevel']);
-
-        $x .= '<br />';
-
-        if ($reqWrapper)
-            $x .= '</td><th>';
-
-        // ranges
-        if ($this->template['rangeMaxHostile'])
-        {
-            // minRange exists; show as range
-            if ($this->template['rangeMinHostile'])
-                $x .= sprintf(Lang::$spell['range'], $this->template['rangeMinHostile'].' - '.$this->template['rangeMaxHostile']).'<br />';
-            // friend and hostile differ; do color
-            else if ($this->template['rangeMaxHostile'] != $this->template['rangeMaxFriend'])
-                $x .= sprintf(Lang::$spell['range'], '<span class="q10">'.$this->template['rangeMaxHostile'].'</span> - <span class="q2">'.$this->template['rangeMaxHostile']. '</span>').'<br />';
-            // hardcode: "melee range"
-            else if ($this->template['rangeMaxHostile'] == 5)
-                $x .= Lang::$spell['meleeRange'].'<br />';
-            // regular case
-            else
-                $x .= sprintf(Lang::$spell['range'], $this->template['rangeMaxHostile']).'<br />';
+            $this->buffs[$this->Id] = $x;
         }
 
-        if ($reqWrapper)
-            $x .= '</th></tr></table>';
-
-        $x .= '<table width="100%"><tr><td>';
-
-        // cast times
-        if ($this->template['interruptFlagsChannel'])
-            $x .= Lang::$spell['channeled'];
-        else if ($this->template['castTime'])
-            $x .= sprintf(Lang::$spell['castIn'], $this->template['castTime'] / 1000);
-        else if ($this->template['attributes0'] & 0x10)     // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only
-            $x .= Lang::$spell['instantPhys'];
-        else                                                // instant cast
-            $x .= Lang::$spell['instantMagic'];
-
-        $x .= '</td>';
-
-        // cooldown or categorycooldown
-        if ($this->template['recoveryTime'])
-            $x.= '<th>'.sprintf(Lang::$game['cooldown'], Util::formatTime($this->template['recoveryTime'], true)).'</th>';
-        else if ($this->template['recoveryCategory'])
-            $x.= '<th>'.sprintf(Lang::$game['cooldown'], Util::formatTime($this->template['recoveryCategory'], true)).'</th>';
-
-        $x .= '</tr>';
-
-        if ($this->template['stanceMask'])
-            $x.= '<tr><td colspan="2">'.Lang::$game['requires'].' '.Lang::getStances($this->template['stanceMask']).'</td></tr>';
-
-        $x .= '</table>';
-        $x .= '</td></tr></table>';
-
-        if ($reqWrapper2)
-            $x .= '<table>';
-
-        if ($tools)
-        {
-            $x .= '<tr><td>';
-            $x .= Lang::$spell['tools'].':<br/><div class="indent q1">';
-            while ($tool = array_pop($tools))
-            {
-                if (isset($tool['itemId']))
-                    $x .= '<a href="?item='.$tool['itemId'].'">'.$tool['name'].'</a>';
-                else if (isset($tool['totemCategory']))
-                    $x .= '<a href="?items&filter=cr=91;crs='.$tool['totemCategory'].';crv=0=">'.$tool['name'].'</a>';
-                else
-                    $x .= $tool['name'];
-
-                if (!empty($tools))
-                    $x .= ', ';
-                else
-                    $x .= '<br />';
-            }
-            $x .= '</div></td></tr>';
-        }
-
-        if ($reagents)
-        {
-            $x .= '<tr><td>';
-            $x .= Lang::$spell['reagents'].':<br/><div class="indent q1">';
-            while ($reagent = array_pop($reagents))
-            {
-                $x .= '<a href="?item='.$reagent['id'].'">'.$reagent['name'].'</a>';
-                if ($reagent['count'] > 1)
-                    $x .= ' ('.$reagent['count'].')';
-
-                if(!empty($reagents))
-                    $x .= ', ';
-                else
-                    $x .= '<br />';
-            }
-            $x .= '</div></td></tr>';
-        }
-
-        if($desc && $desc <> '_empty_')
-            $x .= '<tr><td><span class="q">'.$desc.'</span></td></tr>';
-
-        if ($reqWrapper2)
-            $x .= "</table>";
-
-        $this->tooltip = $x;
-
-        return $this->tooltip;
+        return $Id ? $this->buffs[$Id] : true;
     }
 
-    public function getTalentHead()
+    public function renderTooltip($Id = 0)
+    {
+        while ($this->iterate())
+        {
+            if ($Id && $this->Id != $Id)
+                continue;
+
+            // get reagents
+            $reagents = [];
+            for ($j = 1; $j <= 8; $j++)
+            {
+                if($this->curTpl['reagent'.$j] <= 0)
+                    continue;
+
+                $reagents[] = array(
+                    'id' => $this->curTpl['reagent'.$j],
+                    'name' => Util::getItemName($this->curTpl['reagent'.$j]),
+                    'count' => $this->curTpl['reagentCount'.$j]          // if < 0 : require, but don't use
+                );
+            }
+            $reagents = array_reverse($reagents);
+
+            // get tools
+            $tools = [];
+            for ($i = 1; $i <= 2; $i++)
+            {
+                // Tools
+                if ($this->curTpl['tool'.$i])
+                    $tools[$i-1] = array('itemId' => $this->curTpl['tool'.$i], 'name' => Util::getItemName($this->curTpl['tool'.$i]));
+
+                // TotemCategory
+                if ($this->curTpl['toolCategory'.$i])
+                {
+                    $tc = DB::Aowow()->selectRow('SELECT * FROM aowow_totemcategory WHERE id = ?d', $this->curTpl['toolCategory'.$i]);
+                    $tools[$i+1] = array('categoryMask' => $tc['categoryMask'], 'name' => Util::localizedString($tc, 'name'));
+                }
+            }
+            $tools = array_reverse($tools);
+
+            // get description
+            $desc = $this->parseText('description');
+
+            $reqWrapper  = $this->curTpl['rangeMaxHostile'] && ($this->curTpl['powerCost'] > 0 || $this->curTpl['powerCostPercent'] > 0);
+            $reqWrapper2 = $reagents ||$tools || $desc;
+
+            $x = '';
+            $x .= '<table><tr><td>';
+
+            $rankText = Util::localizedString($this->curTpl, 'rank');
+
+            if (!empty($rankText))
+                $x .= '<table width="100%"><tr><td>';
+
+            // name
+            $x .= '<b>'.$this->names[$this->Id].'</b>';
+
+            // rank
+            if (!empty($rankText))
+                $x .= '<br /></td><th><b class="q0">'.$rankText.'</b></th></tr></table>';
+
+
+            if ($reqWrapper)
+                $x .= '<table width="100%"><tr><td>';
+
+            // check for custom PowerDisplay
+            $pt = $this->curTpl['powerDisplayString'] ? $this->curTpl['powerDisplayString'] : $this->curTpl['powerType'];
+
+            // power cost: pct over static
+            if ($this->curTpl['powerCostPercent'] > 0)
+                $x .= $this->curTpl['powerCostPercent']."% ".sprintf(Lang::$spell['pctCostOf'], strtolower(Lang::$spell['powerTypes'][$pt]));
+            else if ($this->curTpl['powerCost'] > 0 || $this->curTpl['powerPerSecond'] > 0 || $this->curTpl['powerCostPerLevel'] > 0)
+                $x .= ($pt == 1 ? $this->curTpl['powerCost'] / 10 : $this->curTpl['powerCost']).' '.ucFirst(Lang::$spell['powerTypes'][$pt]);
+
+            // append periodic cost
+            if ($this->curTpl['powerPerSecond'] > 0)
+                $x .= sprintf(Lang::$spell['costPerSec'], $this->curTpl['powerPerSecond']);
+
+            // append level cost
+            if ($this->curTpl['powerCostPerLevel'] > 0)
+                $x .= sprintf(Lang::$spell['costPerLevel'], $this->curTpl['powerCostPerLevel']);
+
+            $x .= '<br />';
+
+            if ($reqWrapper)
+                $x .= '</td><th>';
+
+            // ranges
+            if ($this->curTpl['rangeMaxHostile'])
+            {
+                // minRange exists; show as range
+                if ($this->curTpl['rangeMinHostile'])
+                    $x .= sprintf(Lang::$spell['range'], $this->curTpl['rangeMinHostile'].' - '.$this->curTpl['rangeMaxHostile']).'<br />';
+                // friend and hostile differ; do color
+                else if ($this->curTpl['rangeMaxHostile'] != $this->curTpl['rangeMaxFriend'])
+                    $x .= sprintf(Lang::$spell['range'], '<span class="q10">'.$this->curTpl['rangeMaxHostile'].'</span> - <span class="q2">'.$this->curTpl['rangeMaxHostile']. '</span>').'<br />';
+                // hardcode: "melee range"
+                else if ($this->curTpl['rangeMaxHostile'] == 5)
+                    $x .= Lang::$spell['meleeRange'].'<br />';
+                // regular case
+                else
+                    $x .= sprintf(Lang::$spell['range'], $this->curTpl['rangeMaxHostile']).'<br />';
+            }
+
+            if ($reqWrapper)
+                $x .= '</th></tr></table>';
+
+            $x .= '<table width="100%"><tr><td>';
+
+            // cast times
+            if ($this->curTpl['interruptFlagsChannel'])
+                $x .= Lang::$spell['channeled'];
+            else if ($this->curTpl['castTime'])
+                $x .= sprintf(Lang::$spell['castIn'], $this->curTpl['castTime'] / 1000);
+            else if ($this->curTpl['attributes0'] & 0x10)       // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only
+                $x .= Lang::$spell['instantPhys'];
+            else                                                // instant cast
+                $x .= Lang::$spell['instantMagic'];
+
+            $x .= '</td>';
+
+            // cooldown or categorycooldown
+            if ($this->curTpl['recoveryTime'])
+                $x.= '<th>'.sprintf(Lang::$game['cooldown'], Util::formatTime($this->curTpl['recoveryTime'], true)).'</th>';
+            else if ($this->curTpl['recoveryCategory'])
+                $x.= '<th>'.sprintf(Lang::$game['cooldown'], Util::formatTime($this->curTpl['recoveryCategory'], true)).'</th>';
+
+            $x .= '</tr>';
+
+            if ($this->curTpl['stanceMask'])
+                $x.= '<tr><td colspan="2">'.Lang::$game['requires'].' '.Lang::getStances($this->curTpl['stanceMask']).'</td></tr>';
+
+            $x .= '</table>';
+            $x .= '</td></tr></table>';
+
+            if ($reqWrapper2)
+                $x .= '<table>';
+
+            if ($tools)
+            {
+                $x .= '<tr><td>';
+                $x .= Lang::$spell['tools'].':<br/><div class="indent q1">';
+                while ($tool = array_pop($tools))
+                {
+                    if (isset($tool['itemId']))
+                        $x .= '<a href="?item='.$tool['itemId'].'">'.$tool['name'].'</a>';
+                    else if (isset($tool['totemCategory']))
+                        $x .= '<a href="?items&filter=cr=91;crs='.$tool['totemCategory'].';crv=0=">'.$tool['name'].'</a>';
+                    else
+                        $x .= $tool['name'];
+
+                    if (!empty($tools))
+                        $x .= ', ';
+                    else
+                        $x .= '<br />';
+                }
+                $x .= '</div></td></tr>';
+            }
+
+            if ($reagents)
+            {
+                $x .= '<tr><td>';
+                $x .= Lang::$spell['reagents'].':<br/><div class="indent q1">';
+                while ($reagent = array_pop($reagents))
+                {
+                    $x .= '<a href="?item='.$reagent['id'].'">'.$reagent['name'].'</a>';
+                    if ($reagent['count'] > 1)
+                        $x .= ' ('.$reagent['count'].')';
+
+                    if(!empty($reagents))
+                        $x .= ', ';
+                    else
+                        $x .= '<br />';
+                }
+                $x .= '</div></td></tr>';
+            }
+
+            if($desc && $desc <> '_empty_')
+                $x .= '<tr><td><span class="q">'.$desc.'</span></td></tr>';
+
+            if ($reqWrapper2)
+                $x .= "</table>";
+
+            $this->tooltips[$this->Id] = $x;
+        }
+
+        return $Id ? $this->tooltips[$Id] : true;
+    }
+
+    public function getTalentHeadForCurrent()
     {
         // upper: cost :: range
-        // lower: time :: cool
+        // lower: time :: cooldown
         $x = '';
 
         // power cost: pct over static
         $cost = '';
 
-        if ($this->template['powerCostPercent'] > 0)
-            $cost .= $this->template['powerCostPercent']."% ".sprintf(Lang::$spell['pctCostOf'], strtolower(Lang::$spell['powerTypes'][$this->template['powerType']]));
-        else if ($this->template['powerCost'] > 0 || $this->template['powerPerSecond'] > 0 || $this->template['powerCostPerLevel'] > 0)
-            $cost .= ($this->template['powerType'] == 1 ? $this->template['powerCost'] / 10 : $this->template['powerCost']).' '.ucFirst(Lang::$spell['powerTypes'][$this->template['powerType']]);
+        if ($this->curTpl['powerCostPercent'] > 0)
+            $cost .= $this->curTpl['powerCostPercent']."% ".sprintf(Lang::$spell['pctCostOf'], strtolower(Lang::$spell['powerTypes'][$this->curTpl['powerType']]));
+        else if ($this->curTpl['powerCost'] > 0 || $this->curTpl['powerPerSecond'] > 0 || $this->curTpl['powerCostPerLevel'] > 0)
+            $cost .= ($this->curTpl['powerType'] == 1 ? $this->curTpl['powerCost'] / 10 : $this->curTpl['powerCost']).' '.ucFirst(Lang::$spell['powerTypes'][$this->curTpl['powerType']]);
 
         // append periodic cost
-        if ($this->template['powerPerSecond'] > 0)
-            $cost .= sprintf(Lang::$spell['costPerSec'], $this->template['powerPerSecond']);
+        if ($this->curTpl['powerPerSecond'] > 0)
+            $cost .= sprintf(Lang::$spell['costPerSec'], $this->curTpl['powerPerSecond']);
 
         // append level cost
-        if ($this->template['powerCostPerLevel'] > 0)
-            $cost .= sprintf(Lang::$spell['costPerLevel'], $this->template['powerCostPerLevel']);
+        if ($this->curTpl['powerCostPerLevel'] > 0)
+            $cost .= sprintf(Lang::$spell['costPerLevel'], $this->curTpl['powerCostPerLevel']);
 
         // ranges
         $range = '';
 
-        if ($this->template['rangeMaxHostile'])
+        if ($this->curTpl['rangeMaxHostile'])
         {
             // minRange exists; show as range
-            if ($this->template['rangeMinHostile'])
-                $range .= sprintf(Lang::$spell['range'], $this->template['rangeMinHostile'].' - '.$this->template['rangeMaxHostile']);
+            if ($this->curTpl['rangeMinHostile'])
+                $range .= sprintf(Lang::$spell['range'], $this->curTpl['rangeMinHostile'].' - '.$this->curTpl['rangeMaxHostile']);
             // friend and hostile differ; do color
-            else if ($this->template['rangeMaxHostile'] != $this->template['rangeMaxFriend'])
-                $range .= sprintf(Lang::$spell['range'], '<span class="q10">'.$this->template['rangeMaxHostile'].'</span> - <span class="q2">'.$this->template['rangeMaxHostile']. '</span>');
+            else if ($this->curTpl['rangeMaxHostile'] != $this->curTpl['rangeMaxFriend'])
+                $range .= sprintf(Lang::$spell['range'], '<span class="q10">'.$this->curTpl['rangeMaxHostile'].'</span> - <span class="q2">'.$this->curTpl['rangeMaxHostile']. '</span>');
             // hardcode: "melee range"
-            else if ($this->template['rangeMaxHostile'] == 5)
+            else if ($this->curTpl['rangeMaxHostile'] == 5)
                 $range .= Lang::$spell['meleeRange'];
             // regular case
             else
-                $range .= sprintf(Lang::$spell['range'], $this->template['rangeMaxHostile']);
+                $range .= sprintf(Lang::$spell['range'], $this->curTpl['rangeMaxHostile']);
         }
 
         // cast times
         $time = '';
 
-        if ($this->template['interruptFlagsChannel'])
+        if ($this->curTpl['interruptFlagsChannel'])
             $time .= Lang::$spell['channeled'];
-        else if ($this->template['castTime'])
-            $time .= sprintf(Lang::$spell['castIn'], $this->template['castTime'] / 1000);
-        else if ($this->template['attributes0'] & 0x10)     // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only
+        else if ($this->curTpl['castTime'])
+            $time .= sprintf(Lang::$spell['castIn'], $this->curTpl['castTime'] / 1000);
+        else if ($this->curTpl['attributes0'] & 0x10)       // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only
             $time .= Lang::$spell['instantPhys'];
         else                                                // instant cast
             $time .= Lang::$spell['instantMagic'];
@@ -1177,10 +1223,10 @@ class Spell extends BaseType
         // cooldown or categorycooldown
         $cool = '';
 
-        if ($this->template['recoveryTime'])
-            $cool.= sprintf(Lang::$game['cooldown'], Util::formatTime($this->template['recoveryTime'], true)).'</th>';
-        else if ($this->template['recoveryCategory'])
-            $cool.= sprintf(Lang::$game['cooldown'], Util::formatTime($this->template['recoveryCategory'], true)).'</th>';
+        if ($this->curTpl['recoveryTime'])
+            $cool.= sprintf(Lang::$game['cooldown'], Util::formatTime($this->curTpl['recoveryTime'], true)).'</th>';
+        else if ($this->curTpl['recoveryCategory'])
+            $cool.= sprintf(Lang::$game['cooldown'], Util::formatTime($this->curTpl['recoveryCategory'], true)).'</th>';
 
 
         // assemble parts
@@ -1209,48 +1255,39 @@ class Spell extends BaseType
 
     public function getListviewData()
     {
-        return array(
-            'id'       => $this->Id,
-            'name'     => Util::localizedString($this->template, 'name'),
-        );
-    }
+        // this is going to be .. ""fun""
 
-    public function addGlobalsToJScript(&$gSpells)
-    {
-        // if the spell creates an item use the itemIcon instead
-        if ($this->template['effect1CreateItemId'])
+        $data = [];
+
+        while ($this->iterate())
         {
-            $item = new Item($this->template['effect1CreateItemId']);
-            $iconString = $item->template['icon'];
-        }
-        else
-            $iconString = $this->template['iconString'];
-
-        $gSpells[$this->Id] = array(
-            'icon' => $iconString,
-            'name' => Util::localizedString($this->template, 'name'),
-        );
-    }
-}
-
-
-
-class SpellList extends BaseTypeList
-{
-    protected $setupQuery = 'SELECT *, Id AS ARRAY_KEY FROM ?_spell WHERE [filter] [cond] GROUP BY id';
-
-    public function __construct($conditions)
-    {
-        // may be called without filtering
-        if (class_exists('SpellFilter'))
-        {
-            $this->filter = new SpellFilter();
-            if (($fiData = $this->filter->init()) === false)
-                return;
+            $data[$this->Id] = array(
+                'name'  => $this->names[$this->Id],
+                'icon'  => $this->curTpl['iconString'],
+                'level' => $this->curTpl['baseLevel'],
+            );
         }
 
-        parent::__construct($conditions);
+        return $data;
     }
+
+    public function addGlobalsToJscript(&$refs)
+    {
+        if (!isset($refs['gSpells']))
+            $refs['gSpells'] = [];
+
+        while ($this->iterate())
+        {
+            $iconString = isset($this->curTpl['createItemString']) ? 'createItemString' : 'iconString';
+
+            $refs['gSpells'][$this->Id] = array(
+                'icon' => $this->curTpl[$iconString],
+                'name' => $this->names[$this->Id],
+            );
+        }
+    }
+
+    public function addRewardsToJScript(&$refs) { }
 }
 
 ?>
