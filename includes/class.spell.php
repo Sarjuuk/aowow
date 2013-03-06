@@ -278,7 +278,7 @@ class SpellList extends BaseType
                     $base = $this->getField('effect'.$effIdx.'RadiusMax');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return abs($base);
             case 'b':                                       // PointsPerComboPoint
@@ -289,7 +289,7 @@ class SpellList extends BaseType
                     $base = $this->getField('effect'.$effIdx.'PointsPerComboPoint');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return abs($base);
 /* where the heck is this var...?
@@ -302,10 +302,7 @@ class SpellList extends BaseType
                 $base = $spell['effect'.$exprData[0].'BasePoints'] + 1;
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                {
-                    $equation = $base.$op.$oparg;
-                    eval("\$base = $equation;");
-                }
+                    eval("\$base = $base $op $oparg;");
 
                 // Aura giving combat ratings (click-interactive)
                 $rType = 0;
@@ -345,7 +342,7 @@ class SpellList extends BaseType
                     return Lang::$spell['untilCanceled'];
 
                 if ($op && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return Util::formatTime($base, true);
             case 'e':                                       // EffectValueMultiplier
@@ -356,9 +353,9 @@ class SpellList extends BaseType
                     $base = $this->getField('effect'.$effIdx.'ValueMultiplier');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
-                return $base;
+                return abs($base);
             case 'f':                                       // EffectDamageMultiplier
             case 'F':
                 if ($lookup)
@@ -367,7 +364,7 @@ class SpellList extends BaseType
                     $base = $this->getField('effect'.$effIdx.'DamageMultiplier');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return abs($base);
             case 'g':                                       // boolean choice with casters gender as condition $gX:Y;
@@ -381,7 +378,7 @@ class SpellList extends BaseType
                     $base = $this->getField('procChance');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return abs($base);
             case 'i':                                       // MaxAffectedTargets
@@ -392,9 +389,9 @@ class SpellList extends BaseType
                     $base = $this->getField('targets');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
-                return $base;
+                return abs($base);
             case 'l':                                       // boolean choice with last value as condition $lX:Y;
             case 'L':
                 return '$l'.$switch[0].':'.$switch[1];      // resolve later by backtracking
@@ -422,7 +419,7 @@ class SpellList extends BaseType
                 $base += $add;
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 // Aura giving combat ratings
                 $rType = 0;
@@ -454,7 +451,7 @@ class SpellList extends BaseType
                     $base = $this->getField('procCharges');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return abs($base);
             case 'o':                                       // TotalAmount for periodic auras (with variance)
@@ -477,9 +474,16 @@ class SpellList extends BaseType
                 if (!$periode)
                     $periode = 3000;
 
-                $tick = $duration / $periode;
+                $tick  = $duration / $periode;
+                $min   = abs($base + 1) * tick;
+                $max   = abs($base + $add) * tick;
+                $equal = $min == $max;
 
-                return (abs($base + 1) * $tick) . ($add > 1 ? Lang::$game['valueDelim'] . (abs($base + $add) * $tick) : null);
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                    if ($equal)
+                        eval("\$min = $min $op $oparg;");
+
+                return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
             case 'q':                                       // EffectMiscValue
             case 'Q':
                 if ($lookup)
@@ -488,7 +492,7 @@ class SpellList extends BaseType
                     $base = $this->getField('effect'.$effIdx.'MiscValue');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return abs($base);
             case 'r':                                       // SpellRange
@@ -499,9 +503,9 @@ class SpellList extends BaseType
                     $base = $this->getField('rangeMaxHostile');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
-                return $base;
+                return abs($base);
             case 's':                                       // BasePoints (with variance)
             case 'S':
                 if ($lookup)
@@ -519,8 +523,13 @@ class SpellList extends BaseType
                     $aura = $this->getField('effect'.$effIdx.'AuraId');
                 }
 
+                $min   = abs($base + 1);
+                $max   = abs($base + $add);
+                $equal = $min == $max;
+
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    if ($equal)
+                        eval("\$min = $min $op $oparg;");
 
                 // Aura giving combat ratings
                 $rType = 0;
@@ -540,10 +549,10 @@ class SpellList extends BaseType
                 }
                 // Aura end
 
-                if ($rType && $add <= 1)
-                    return '<!--rtg'.$rType.'-->'.abs($base + 1)."&nbsp;<small>(".Util::setRatingLevel($level, $rType, abs($base + 1)).")</small>";
+                if ($rType && $equal)
+                    return '<!--rtg'.$rType.'-->'.$min."&nbsp;<small>(".Util::setRatingLevel($level, $rType, $min).")</small>";
                 else
-                    return abs($base + 1) . ($add > 1 ? Lang::$game['valueDelim'] . abs($base + $add) : null);
+                    return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
             case 't':                                       // Periode
             case 'T':
                 if ($lookup)
@@ -552,7 +561,7 @@ class SpellList extends BaseType
                     $base = $this->getField('effect'.$effIdx.'Periode') / 1000;
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return abs($base);
             case 'u':                                       // StackCount
@@ -563,7 +572,7 @@ class SpellList extends BaseType
                     $base = $this->getField('stackAmount');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return abs($base);
             case 'v':                                   // MaxTargetLevel
@@ -574,9 +583,9 @@ class SpellList extends BaseType
                     $base = $this->getField('MaxTargetLevel');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
-                return $base;
+                return abs($base);
             case 'x':                                   // ChainTargetCount
             case 'X':
                 if ($lookup)
@@ -585,7 +594,7 @@ class SpellList extends BaseType
                     $base = $this->getField('effect'.$effIdx.'ChainTarget');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base.$op.$oparg;");
+                    eval("\$base = $base $op $oparg;");
 
                 return abs($base);
             case 'z':                                   // HomeZone
