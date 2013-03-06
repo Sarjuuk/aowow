@@ -286,8 +286,8 @@ class ItemList extends BaseType
         else
             $x .= '<br />';
 
-        // Weapon Stats
-        if ($this->curTpl['delay'] > 0)
+        // Weapon/Ammunition Stats
+        if (in_array($this->curTpl['class'], [ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]))
         {
             $speed   = $this->curTpl['delay'] / 1000;
             $dmgmin1 = $this->curTpl['dmg_min1'] + $this->curTpl['dmg_min2'];
@@ -295,7 +295,7 @@ class ItemList extends BaseType
             $dps     = $speed ? ($dmgmin1 + $dmgmax1) / (2 * $speed) : 0;
 
             // regular weapon
-            if ($this->curTpl['class'] != ITEM_CLASS_AMMUNITION)
+            if ($this->curTpl['class'] == ITEM_CLASS_WEAPON)
             {
                 $x .= '<table width="100%"><tr>';
                 $x .= '<td><!--dmg-->'.sprintf($this->curTpl['dmg_type1'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmg_min1'].' - '.$this->curTpl['dmg_max1'], Lang::$game['sc'][$this->curTpl['dmg_type1']]).'</td>';
@@ -486,7 +486,7 @@ class ItemList extends BaseType
 
         // required spell
         if ($this->curTpl['requiredspell'])
-            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?spell='.$this->curTpl['requiredspell'].'">'.Spell::getName($this->curTpl['requiredspell']).'</a>';
+            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?spell='.$this->curTpl['requiredspell'].'">'.SpellList::getName($this->curTpl['requiredspell']).'</a>';
 
         // required reputation w/ faction
         if ($this->curTpl['RequiredReputationFaction'])
@@ -548,7 +548,6 @@ class ItemList extends BaseType
                     $x .= '<span class="q2">'.$bonus.'</span><br />';
 
         // Item Set
-        $tmpX    = '';
         $pieces  = [];
         $itemset = DB::Aowow()->selectRow('
             SELECT
@@ -572,23 +571,22 @@ class ItemList extends BaseType
                 $equivalents = ItemList::getEquivalentSetPieces($itemset['item'.$i]);
                 $pieces[]    = '<span><!--si'.implode(':', $equivalents).'--><a href="?item='.$itemset['item'.$i].'">'.ItemList::getName($itemset['item'.$i]).'</a></span>';
             }
-            $tmpX .= implode('<br />', $pieces);
 
-            $x .= '<br /><span class="q"><a href="?itemset='.$itemset['id'].'" class="q">'.Util::localizedString($itemset, 'name').'</a> (0/'.$num.')</span>';
+            $xSet = '<br /><span class="q"><a href="?itemset='.$itemset['id'].'" class="q">'.Util::localizedString($itemset, 'name').'</a> (0/'.$num.')</span>';
 
             if ($itemset['skillID'])                        // bonus requires skill to activate
             {
-                $name = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillID=?d', $itemset['skillID']);
-                $x   .= '<br />'.Lang::$game['requires'].' <a href="?skills='.$itemset['skillID'].'" class="q1">'.Util::localizedString($name, 'name').'</a>';
+                $name  = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillID=?d', $itemset['skillID']);
+                $xSet .= '<br />'.Lang::$game['requires'].' <a href="?skills='.$itemset['skillID'].'" class="q1">'.Util::localizedString($name, 'name').'</a>';
 
                 if ($itemset['skillLevel'])
-                    $x .= ' ('.$itemset['skillLevel'].')';
+                    $xSet .= ' ('.$itemset['skillLevel'].')';
 
-                $x .= '<br />';
+                $xSet .= '<br />';
             }
 
             // list pieces
-            $x .= '<div class="q0 indent">'.$tmpX.'</div><br />';
+            $xSet .= '<div class="q0 indent">'.implode('<br />', $pieces).'</div><br />';
 
             // get bonuses
             $setSpellsAndIdx = [];
@@ -611,7 +609,7 @@ class ItemList extends BaseType
             }
 
             // sort and list bonuses
-            $x .= '<span class="q0">';
+            $xSet .= '<span class="q0">';
             for ($i = 0; $i < count($itemset['spells']); $i++)
             {
                 for ($j = $i; $j < count($itemset['spells']); $j++)
@@ -623,11 +621,11 @@ class ItemList extends BaseType
                     $itemset['spells'][$i] = $itemset['spells'][$j];
                     $itemset['spells'][$j] = $tmp;
                 }
-                $x .= '<span>('.$itemset['spells'][$i]['bonus'].') '.Lang::$item['set'].': <a href="?spell='.$itemset['spells'][$i]['entry'].'">'.$itemset['spells'][$i]['tooltip'].'</a></span>';
+                $xSet .= '<span>('.$itemset['spells'][$i]['bonus'].') '.Lang::$item['set'].': <a href="?spell='.$itemset['spells'][$i]['entry'].'">'.$itemset['spells'][$i]['tooltip'].'</a></span>';
                 if ($i < count($itemset['spells']) - 1)
-                    $x .= '<br />';
+                    $xSet .= '<br />';
             }
-            $x .= '</span>';
+            $xSet .= '</span>';
         }
 
         // recipe handling (some stray Techniques have subclass == 0), place at bottom of tooltipp
@@ -657,6 +655,10 @@ class ItemList extends BaseType
 
         // misc (no idea, how to organize the <br /> better)
         $xMisc = [];
+
+        // itemset: pieces and boni
+        if (isset($xSet))
+            $xMisc[] = $xSet;
 
         // funny, yellow text at the bottom, omit if we have a recipe
         if ($this->curTpl['description'] && !isset($xCraft))
@@ -900,7 +902,7 @@ class ItemList extends BaseType
             // $js .= Util::setRatingLevel($level, $type, $value);
             // $js .= '</a>)</small>';
             if ($interactive)
-                $js = '&nbsp;<small>('.printf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</a>)</small>';
+                $js = '&nbsp;<small>('.sprintf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</a>)</small>';
             else
                 $js = "&nbsp;<small>(".Util::setRatingLevel($level, $type, $value).")</small>";
 

@@ -475,8 +475,8 @@ class SpellList extends BaseType
                     $periode = 3000;
 
                 $tick  = $duration / $periode;
-                $min   = abs($base + 1) * tick;
-                $max   = abs($base + $add) * tick;
+                $min   = abs($base + 1) * $tick;
+                $max   = abs($base + $add) * $tick;
                 $equal = $min == $max;
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
@@ -1004,7 +1004,7 @@ class SpellList extends BaseType
 
                 $reagents[] = array(
                     'id' => $this->curTpl['reagent'.$j],
-                    'name' => Util::getItemName($this->curTpl['reagent'.$j]),
+                    'name' => ItemList::getName($this->curTpl['reagent'.$j]),
                     'count' => $this->curTpl['reagentCount'.$j]          // if < 0 : require, but don't use
                 );
             }
@@ -1016,7 +1016,7 @@ class SpellList extends BaseType
             {
                 // Tools
                 if ($this->curTpl['tool'.$i])
-                    $tools[$i-1] = array('itemId' => $this->curTpl['tool'.$i], 'name' => Util::getItemName($this->curTpl['tool'.$i]));
+                    $tools[$i-1] = array('itemId' => $this->curTpl['tool'.$i], 'name' => ItemList::getName($this->curTpl['tool'.$i]));
 
                 // TotemCategory
                 if ($this->curTpl['toolCategory'.$i])
@@ -1169,6 +1169,16 @@ class SpellList extends BaseType
 
             if ($reqWrapper2)
                 $x .= "</table>";
+
+            // append created items (may need improvement)
+            for ($i = 1; $i <= 3; $i++)
+            {
+                if ($cId = $this->curTpl['effect'.$i.'CreateItemId'])
+                {
+                    $x .= '<br />'.(new ItemList(array(['i.entry', (int)$cId])))->renderTooltip();
+                    break;
+                }
+            }
 
             $this->tooltips[$this->id] = $x;
         }
