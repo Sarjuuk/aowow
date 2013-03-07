@@ -30,7 +30,7 @@ class ItemList extends BaseType
             $this->initJsonStats();
 
             // readdress itemset .. is wrong for virtual sets
-            if ($pieceToSet)
+            if ($pieceToSet && $pieceToSet[$this->id])
                 $this->json[$this->id]['itemset'] = $pieceToSet[$this->id];
         }
 
@@ -129,11 +129,11 @@ class ItemList extends BaseType
                 $data[$this->id]['nslots'] = $x;
 
 
-            if (!in_array($this->curTpl['AllowableRace'], [-1, 0]) && !$this->curTpl['AllowableRace'] & RACE_MASK_ALL == RACE_MASK_ALL &&
-                !$this->curTpl['AllowableRace'] & RACE_MASK_ALLIANCE == RACE_MASK_ALLIANCE && !$this->curTpl['AllowableRace'] & RACE_MASK_HORDE == RACE_MASK_HORDE)
+            if (!in_array($this->curTpl['AllowableRace'], [-1, 0]) && $this->curTpl['AllowableRace'] & RACE_MASK_ALL != RACE_MASK_ALL &&
+                $this->curTpl['AllowableRace'] & RACE_MASK_ALLIANCE != RACE_MASK_ALLIANCE && $this->curTpl['AllowableRace'] & RACE_MASK_HORDE != RACE_MASK_HORDE)
                 $data[$this->id]['reqrace'] = $this->curTpl['AllowableRace'];
 
-            if (!in_array($this->curTpl['AllowableClass'], [-1, 0]) && !$this->curTpl['AllowableClass'] & CLASS_MASK_ALL == CLASS_MASK_ALL)
+            if (!in_array($this->curTpl['AllowableClass'], [-1, 0]) && $this->curTpl['AllowableClass'] & CLASS_MASK_ALL != CLASS_MASK_ALL)
                 $data[$this->id]['reqclass'] = $this->curTpl['AllowableClass'];  // $data[$this->id]['classes'] ??
         }
 
