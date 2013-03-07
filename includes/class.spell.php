@@ -280,7 +280,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'b':                                       // PointsPerComboPoint
             case 'B':
                 if ($lookup)
@@ -291,7 +291,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
 /* where the heck is this var...?
             case 'c':                                       // BasePoints (raw)
                 if ($lookup > 0 && $exprData[0])
@@ -344,7 +344,7 @@ class SpellList extends BaseType
                 if ($op && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return Util::formatTime($base, true);
+                return Util::formatTime(abs($base), true);
             case 'e':                                       // EffectValueMultiplier
             case 'E':
                 if ($lookup)
@@ -355,7 +355,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'f':                                       // EffectDamageMultiplier
             case 'F':
                 if ($lookup)
@@ -366,7 +366,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'g':                                       // boolean choice with casters gender as condition $gX:Y;
             case 'G':
                 return '&gt;'.$switch[0].'/'.$switch[1].'&lt;';
@@ -380,7 +380,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'i':                                       // MaxAffectedTargets
             case 'I':
                 if ($lookup)
@@ -391,7 +391,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'l':                                       // boolean choice with last value as condition $lX:Y;
             case 'L':
                 return '$l'.$switch[0].':'.$switch[1];      // resolve later by backtracking
@@ -442,7 +442,7 @@ class SpellList extends BaseType
                 if ($rType)
                     return '<!--rtg'.$rType.'-->'.abs($base)."&nbsp;<small>(".Util::setRatingLevel($level, $rType, abs($base)).")</small>";
                 else
-                    return abs($base);
+                    return $base;
             case 'n':                                       // ProcCharges
             case 'N':
                 if ($lookup)
@@ -453,7 +453,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'o':                                       // TotalAmount for periodic auras (with variance)
             case 'O':
                 if ($lookup)
@@ -494,7 +494,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'r':                                       // SpellRange
             case 'R':
                 if ($lookup)
@@ -505,7 +505,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 's':                                       // BasePoints (with variance)
             case 'S':
                 if ($lookup)
@@ -563,7 +563,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'u':                                       // StackCount
             case 'U':
                 if ($lookup)
@@ -574,7 +574,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'v':                                   // MaxTargetLevel
             case 'V':
                 if ($lookup)
@@ -585,7 +585,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'x':                                   // ChainTargetCount
             case 'X':
                 if ($lookup)
@@ -596,7 +596,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return abs($base);
+                return $base;
             case 'z':                                   // HomeZone
                 return Lang::$spell['home'];
         }
@@ -662,17 +662,16 @@ class SpellList extends BaseType
                 $str .= '#';                                // mark as done, reset below
                 continue;
             }
-
             $pos += strlen($result[0]);
             $str .= $this->resolveVariableString($result, $level);
         }
         $str .= substr($formula, $pos);
-        $str = str_replace('#', '$', $str);                 // reset marks
+        $str  = str_replace('#', '$', $str);                // reset marks
 
         // step 3: try to evaluate result
         $evaled = $this->resolveEvaluation($str, $level);
 
-        return (int)$evaled ? round($evaled, $precision) : $evaled;
+        return (float)$evaled ? number_format($evaled, $precision) : $evaled;
     }
 
     // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
@@ -929,7 +928,9 @@ class SpellList extends BaseType
             }
 
             $pos += strlen($result[0]);
-            $str .= $this->resolveVariableString($result, $level);
+
+            $resolved = $this->resolveVariableString($result, $level);
+            $str .= intVal($resolved) ? abs($resolved) : resolved;
         }
         $str .= substr($data, $pos);
         $str = str_replace('#', '$', $str);                 // reset marks

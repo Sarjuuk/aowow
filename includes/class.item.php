@@ -30,7 +30,7 @@ class ItemList extends BaseType
             $this->initJsonStats();
 
             // readdress itemset .. is wrong for virtual sets
-            if ($pieceToSet && $pieceToSet[$this->id])
+            if ($pieceToSet && isset($pieceToSet[$this->id]))
                 $this->json[$this->id]['itemset'] = $pieceToSet[$this->id];
         }
 
@@ -1029,6 +1029,7 @@ class ItemList extends BaseType
 
         if ($this->curTpl['class'] == ITEM_CLASS_WEAPON || $this->curTpl['class'] == ITEM_CLASS_AMMUNITION)
         {
+
             $json['dmgtype1'] = $this->curTpl['dmg_type1'];
             $json['dmgmin1']  = $this->curTpl['dmg_min1'] + $this->curTpl['dmg_min2'];
             $json['dmgmax1']  = $this->curTpl['dmg_max1'] + $this->curTpl['dmg_max2'];

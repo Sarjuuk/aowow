@@ -38,15 +38,16 @@ Util::execTime(true);
         15: Listview - template: 'npc',         id: 'npcs',          name: LANG.tab_npcs,
         16: Listview - template: 'quest',       id: 'quests',        name: LANG.tab_quests,
         17: Listview - template: 'achievement', id: 'achievements',  name: LANG.tab_achievements,        visibleCols: ['category'],
-        18: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
-        19: Listview - template: 'object',      id: 'objects',       name: LANG.tab_objects,
-        20: Listview - template: 'faction',     id: 'factions',      name: LANG.tab_factions,
-        21: Listview - template: 'skill',       id: 'skills',        name: LANG.tab_skills,                                                         hiddenCols: ['reagents', 'skill'],
-        22: Listview - template: 'pet',         id: 'pets',          name: LANG.tab_pets,
-        23: Listview - template: 'spell',       id: 'npc-abilities', name: LANG.tab_npcabilities,        visibleCols: ['level'],                    hiddenCols: ['reagents', 'skill'],
-        24: Listview - template: 'spell',       id: 'spells',        name: LANG.tab_uncategorizedspells, visibleCols: ['level'],                    hiddenCols: ['reagents', 'skill'],
-        25: Listview - template: 'profile',     id: 'characters',    name: LANG.tab_characters,          visibleCols: ['race','classs','level','talents','gearscore','achievementpoints'],
-        26: Guilds..?
+        18: Listview - template: 'achievement', id: 'statistics',    name: LANG.tab_statistics,          visibleCols: ['category'],                 hiddenCols: ['side', 'points', 'rewards'],
+        19: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
+        20: Listview - template: 'object',      id: 'objects',       name: LANG.tab_objects,
+        21: Listview - template: 'faction',     id: 'factions',      name: LANG.tab_factions,
+        22: Listview - template: 'skill',       id: 'skills',        name: LANG.tab_skills,                                                         hiddenCols: ['reagents', 'skill'],
+        23: Listview - template: 'pet',         id: 'pets',          name: LANG.tab_pets,
+        24: Listview - template: 'spell',       id: 'npc-abilities', name: LANG.tab_npcabilities,        visibleCols: ['level'],                    hiddenCols: ['reagents', 'skill'],
+        25: Listview - template: 'spell',       id: 'spells',        name: LANG.tab_uncategorizedspells, visibleCols: ['level'],                    hiddenCols: ['reagents', 'skill'],
+        26: Listview - template: 'profile',     id: 'characters',    name: LANG.tab_characters,          visibleCols: ['race','classs','level','talents','gearscore','achievementpoints'],
+        27: Guilds..?
 */
 
 $search      = urlDecode(trim($pageParam));
@@ -55,6 +56,7 @@ $type        = @intVal($_GET['type']);
 $searchMask  = 0x0;
 $found       = [];
 $jsGlobals   = [];
+$maxResults  = 1000;                                        // todo: move to config
 
 if (isset($_GET['json']))
 {
@@ -207,7 +209,7 @@ if ($searchMask & 0x4)
 // 5 Currencies
 if ($searchMask & 0x10)
 {
-    $money = new CurrencyList(array(['name_loc'.User::$localeId, $query]));
+    $money = new CurrencyList(array($maxResults, ['name_loc'.User::$localeId, $query]));
 
     if ($data = $money->getListviewData())
     {
@@ -220,13 +222,16 @@ if ($searchMask & 0x10)
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
+
+        if ($money->matches > $maxResults)
+            $found['currency']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_currenciesfound', $money->matches, $maxResults);
     }
 }
 
 // 6 Itemsets
 if ($searchMask & 0x20)
 {
-    $sets = new ItemsetList(array(['name_loc'.User::$localeId, $query]));
+    $sets = new ItemsetList(array($maxResults, ['name_loc'.User::$localeId, $query]));
     $sets->addGlobalsToJscript($jsGlobals);
 
     if ($data = $sets->getListviewData())
@@ -241,6 +246,9 @@ if ($searchMask & 0x20)
             'params'   => ['tabs' => '$myTabs'],
             'pcsToSet' => $sets->pieceToSet
         );
+
+        if ($sets->matches > $maxResults)
+            $found['itemset']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsetsfound', $sets->matches, $maxResults);
     }
 }
 
@@ -250,9 +258,9 @@ if ($searchMask & 0x40)
     if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
         $conditions = [['i.entry', array_keys($found['itemset']['pcsToSet'])]];
     else if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEM)
-        $conditions = [['i.class', [2, 4]], [User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], 0];
+        $conditions = [['i.class', [2, 4]], [User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], $AoWoWconf['sqlLimit']];
     else
-        $conditions = [[User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], 0];
+        $conditions = [[User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], $maxResults];
 
     $items = new ItemList($conditions, @$found['itemset']['pcsToSet']);
     $items->addGlobalsToJscript($jsGlobals);
@@ -271,6 +279,9 @@ if ($searchMask & 0x40)
             'params'   => ['tabs' => '$myTabs'],
             'data'     => $data,
         );
+
+        if ($items->matches > $maxResults)
+            $found['item']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsfound', $items->matches, $maxResults);
     }
 }
 
@@ -304,7 +315,7 @@ if ($searchMask & 0x40)
 // 17 Achievements
 if ($searchMask & 0x10000)
 {
-    $acvs = new AchievementList(array(['name_loc'.User::$localeId, $query]));
+    $acvs = new AchievementList(array($maxResults, 'AND', ['flags', ~ACHIEVEMENT_FLAG_COUNTER, "&"], ['name_loc'.User::$localeId, $query]));
 
     if ($data = $acvs->getListviewData())
     {
@@ -317,38 +328,68 @@ if ($searchMask & 0x10000)
             'data'     => $data,
             'params'   => [
                 'tabs'        => '$myTabs',
-                'visibleCols' => '$[\'category\']'
+                'visibleCols' => "\$['category']"
             ]
         );
+
+        if ($acvs->matches > $maxResults)
+            $found['achievement']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_achievementsfound', $acvs->matches, $maxResults);
     }
 }
 
-// 18 Zones
-// if ($searchMask & 0x20000)
+// 18 Statistics
+if ($searchMask & 0x20000)
+{
+    $stats = new AchievementList(array($maxResults, 'AND', ['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], ['name_loc'.User::$localeId, $query]));
 
-// 19 Objects
+    if ($data = $stats->getListviewData())
+    {
+        $stats->addGlobalsToJScript($jsGlobals);
+        $stats->addRewardsToJScript($jsGlobals);
+
+        $found['statistic'] = array(
+            'type'     => TYPE_ACHIEVEMENT,
+            'data'     => $data,
+            'params'   => [
+                'tabs'        => '$myTabs',
+                'visibleCols' => "\$['category']",
+                'hiddenCols'  => "\$['side', 'points', 'rewards']",
+                'name'        => '$LANG.tab_statistics',
+                'id'          => 'statistics'
+            ]
+        );
+
+        if ($stats->matches > $maxResults)
+            $found['statistic']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_statisticsfound', $stats->matches, $maxResults);
+    }
+
+}
+// 19 Zones
 // if ($searchMask & 0x40000)
 
-// 20 Factions
+// 20 Objects
 // if ($searchMask & 0x80000)
 
-// 21 Skills
+// 21 Factions
 // if ($searchMask & 0x100000)
 
-// 22 Pets
+// 22 Skills
 // if ($searchMask & 0x200000)
 
-// 23 NPCAbilities
+// 23 Pets
 // if ($searchMask & 0x400000)
 
-// 24 Spells (Misc)
+// 24 NPCAbilities
 // if ($searchMask & 0x800000)
 
-// 25 Characters
+// 25 Spells (Misc)
 // if ($searchMask & 0x1000000)
 
-// 26 Guilds
+// 26 Characters
 // if ($searchMask & 0x2000000)
+
+// 27 Guilds
+// if ($searchMask & 0x4000000)
 
 /*
     !note! dear reader, if you ever try to generate a string, that is to be evaled by JS, NEVER EVER terminate with a \n
@@ -458,7 +499,8 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
 
     $vars = array(
         'title'     => $search.' - '.Lang::$search['search'],
-        'tab'       => 0                                    // tabId 0: Database for g_initHeader($tab)
+        'tab'       => 0,                                   // tabId 0: Database for g_initHeader($tab)
+        'reqJS'     => [array('path' => 'template/js/swfobject.js', 'conditional' => false)]
     );
 
     $smarty->updatePageVars($vars);

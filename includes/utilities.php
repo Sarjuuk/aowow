@@ -76,9 +76,6 @@ abstract class BaseType
                 else
                     continue;
 
-                if (isset($c[2]) && $c[2] != '!')
-                    $op = $c[2];
-
                 if (is_array($c[1]))
                 {
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
@@ -95,8 +92,9 @@ abstract class BaseType
                     $op  = (isset($c[2]) && $c[2] == '!') ? '<>' : '=';
                     $val = Util::sqlEscape($c[1]);
                 }
-                else
-                    continue;
+
+                if (isset($c[2]) && $c[2] != '!')
+                    $op = $c[2];
 
                 $sql[] = $field.' '.$op.' '.$val;
             }
@@ -422,7 +420,7 @@ class Util
     public static $changeLevelString        = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_staticTooltipLevelClick(this, null, 0)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><!--lvl-->%s</a>';
 
     public static $filterResultString       = 'sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
-
+    public static $narrowResultString       = 'sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
 
     public static $expansionString          = array(        // 3 & 4 unused .. obviously
         null,           'bc',           'wotlk',            'cata',                'mop'
@@ -1241,7 +1239,6 @@ class Util
 
         return $return;
     }
-
 
     // BaseType::_construct craaap!
     // todo: unify names

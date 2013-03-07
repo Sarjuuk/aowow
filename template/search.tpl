@@ -35,6 +35,7 @@
 {if isset($found.faction)}     {include file='bricks/faction_table.tpl'      data=$found.faction.data     params=$found.faction.params    } {/if}
 {if isset($found.pet)}         {include file='bricks/npc_table.tpl'          data=$found.pet.data         params=$found.pet.params        } {/if}
 {if isset($found.achievement)} {include file='bricks/achievement_table.tpl'  data=$found.achievement.data params=$found.achievement.params} {/if}
+{if isset($found.statistic)}   {include file='bricks/achievement_table.tpl'  data=$found.statistic.data   params=$found.statistic.params  } {/if}
 {if isset($found.event)}       {include file='bricks/event_table.tpl'        data=$found.event.data       params=$found.event.params      } {/if}
 {if isset($found.skill)}       {include file='bricks/skill_table.tpl'        data=$found.skill.data       params=$found.skill.params      } {/if}
 {if isset($found.currency)}    {include file='bricks/currency_table.tpl'     data=$found.currency.data    params=$found.currency.params   } {/if}

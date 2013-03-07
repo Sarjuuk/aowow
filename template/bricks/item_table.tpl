@@ -16,7 +16,7 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    name:'{$curr.quality}{$curr.name|escape:"quotes"}',
+                    name:'{$curr.name|escape:"quotes"}',
                     {if isset($curr.level)}
                         level:{$curr.level},
                     {/if}
@@ -56,14 +56,17 @@
                             {/if}
                             ],
                     {/if}
-                    {if $curr.classs == 1}
+                    {if isset($curr.displayid)}
+                        displayid:{$curr.displayid},
+                    {/if}
+                    {if isset($curr.nslots)}
                         nslots:{$curr.nslots},
                     {/if}
-                    {if $curr.classs == 2}
+                    {if isset($curr.dps)}
                         dps:{$curr.dps},
                         speed:{$curr.speed},
                     {/if}
-                    {if $curr.classs == 4}
+                    {if isset($curr.armor)}
                         armor:{$curr.armor},
                     {/if}
                     {if isset($curr.slot)}
