@@ -17,7 +17,7 @@ class ItemList extends BaseType
     protected $setupQuery = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] GROUP BY i.entry ORDER BY i.Quality DESC';
     protected $matchQuery = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond]';
 
-    public function __construct($conditions)
+    public function __construct($conditions, $pieceToSet = null)
     {
         parent::__construct($conditions);
 
@@ -28,6 +28,10 @@ class ItemList extends BaseType
                 $this->initScalingStats();
 
             $this->initJsonStats();
+
+            // readdress itemset .. is wrong for virtual sets
+            if ($pieceToSet)
+                $this->json[$this->id]['itemset'] = $pieceToSet[$this->id];
         }
 
         $this->reset();                                     // restore 'iterator'
@@ -90,30 +94,47 @@ class ItemList extends BaseType
             if ($addInfoMask & ITEMINFO_JSON)
                 $this->extendJsonStats();
 
-            $tmp = array_merge($this->json[$this->id], array(
-                'id'           => $this->id,
-                'name'         => $this->names[$this->id],
-                'quality'      => 7 - $this->curTpl['Quality'],
-                'reqskill'     => $this->curTpl['RequiredSkill'],
-                'reqskillrank' => $this->curTpl['RequiredSkillRank'],
-                'reqspell'     => $this->curTpl['requiredspell'],
-                'reqfaction'   => $this->curTpl['RequiredReputationFaction'],
-                'reqrep'       => $this->curTpl['RequiredReputationRank'],
-                'side'         => Util::sideByRaceMask($this->curTpl['AllowableRace']), // FlagsExtra zur Rate ziehen? 0:Beide; 1: Horde; 2:Allianz
-                'heroic'       => (string)($this->curTpl['Flags'] & 0x8),
-                'nslots'       => $this->curTpl['ContainerSlots'],
-                'buyprice'     => $this->curTpl['BuyPrice'],
-                'sellprice'    => $this->curTpl['SellPrice']
-            ));
+            $data[$this->id] = $this->json[$this->id];
+
+            if (isset($this->itemMods[$this->id]))          // due to ITEMINFO_JSON
+                foreach ($this->itemMods[$this->id] as $k => $v)
+                    $data[$this->id][Util::$itemMods[$k]] = $v;
+
+            if ($addInfoMask & ITEMINFO_VENDOR)
+            {
+                if ($x = $this->curTpl['BuyPrice'])
+                    $data[$this->id]['buyprice'] = $x;
+
+                if ($x = $this->curTpl['SellPrice'])
+                    $data[$this->id]['sellprice'] = $x;
+            }
 
             // complicated data
-            if (!in_array($this->curTpl['AllowableRace'], [-1, 0, RACE_MASK_ALL, RACE_MASK_ALLIANCE, RACE_MASK_HORDE]))
-                $tmp['reqrace'] = $this->curTpl['AllowableRace'];
+            if ($x = $this->curTpl['RequiredSkill'])
+                $data[$this->id]['reqskill'] = $x;
 
-            if (!in_array($this->curTpl['AllowableClass'], [-1, 0, CLASS_MASK_ALL]))
-                $tmp['reqclass'] = $this->curTpl['AllowableClass'];  // $tmp['classes'] ??
+            if ($x = $this->curTpl['RequiredSkillRank'])
+                $data[$this->id]['reqskillrank'] = $x;
 
-            $data[$this->id] = $tmp;
+            if ($x = $this->curTpl['requiredspell'])
+                $data[$this->id]['reqspell'] = $x;
+
+            if ($x = $this->curTpl['RequiredReputationFaction'])
+                $data[$this->id]['reqfaction'] = $x;
+
+            if ($x = $this->curTpl['RequiredReputationRank'])
+                $data[$this->id]['reqrep'] = $x;
+
+            if ($x = $this->curTpl['ContainerSlots'])
+                $data[$this->id]['nslots'] = $x;
+
+
+            if (!in_array($this->curTpl['AllowableRace'], [-1, 0]) && !$this->curTpl['AllowableRace'] & RACE_MASK_ALL == RACE_MASK_ALL &&
+                !$this->curTpl['AllowableRace'] & RACE_MASK_ALLIANCE == RACE_MASK_ALLIANCE && !$this->curTpl['AllowableRace'] & RACE_MASK_HORDE == RACE_MASK_HORDE)
+                $data[$this->id]['reqrace'] = $this->curTpl['AllowableRace'];
+
+            if (!in_array($this->curTpl['AllowableClass'], [-1, 0]) && !$this->curTpl['AllowableClass'] & CLASS_MASK_ALL == CLASS_MASK_ALL)
+                $data[$this->id]['reqclass'] = $this->curTpl['AllowableClass'];  // $data[$this->id]['classes'] ??
         }
 
         /* even more complicated crap
@@ -642,7 +663,7 @@ class ItemList extends BaseType
             $reagents = new ItemList(array(['i.entry', array_keys($reagentItems)]));
             $reqReag  = [];
 
-            $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->curTpl['spellid_2'].'">'.Util::localizedString($this->curTpl, 'description').'</a></span>';
+            $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->curTpl['spellid_2'].'">'.Util::localizedString($this->curTpl, 'description').'</a></span><br />';
 
             $xCraft = '<div><br />'.$craftItem->renderTooltip(null, $interactive).'</div><br />';
 
@@ -778,7 +799,7 @@ class ItemList extends BaseType
         return 0;
     }
 
-    public function extendJsonStats($pieceAssoc = NULL)
+    public function extendJsonStats()
     {
         // convert ItemMods
         for ($h = 1; $h <= 10; $h++)
@@ -808,24 +829,14 @@ class ItemList extends BaseType
             $eqpSplList = new SpellList(array(['id', $equipSpells]));
             $stats      = $eqpSplList->getStatGain();
             foreach ($stats as $mId => $qty)
-                @$this->itemMods[$this->id][$mId] += $qty;
+                if ($qty > 0)
+                    @$this->itemMods[$this->id][$mId] += $qty;
         }
 
         // fetch and add socketbonusstats
         if (@$this->json[$this->id]['socketbonus'] > 0)
-        {
-            $enh = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?;', $this->json[$this->id]['socketbonus']);
-            $this->json[$this->id]['socketbonusstat'] = [];
-            $socketbonusstat = Util::parseItemEnchantment($enh);
-            foreach ($socketbonusstat as $k => $v)
-                $this->json[$this->id]['socketbonusstat'][] = '"'.$k.'":'.$v;
-
-            $this->json[$this->id]['socketbonusstat'] = "{".implode(',', $this->json[$this->id]['socketbonusstat'])."}";
-        }
-
-        // readdress itemset .. is wrong for virtual sets
-        if ($pieceAssoc)
-            $this->json[$this->id]['itemset'] = $pieceAssoc[$this->id];
+            if ($enh = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?;', $this->json[$this->id]['socketbonus']))
+                $this->json[$this->id]['socketbonusstat'] = Util::parseItemEnchantment($enh);
 
         // gather random Enchantments
         // todo: !important! extremly high sql-load
@@ -866,23 +877,12 @@ class ItemList extends BaseType
                 );
             }
 
-            $this->json[$this->id]['subitems'] = json_encode($this->subItems[$this->id], JSON_FORCE_OBJECT);
+            $this->json[$this->id]['subitems'] = $this->subItems[$this->id];
         }
 
         foreach ($this->json[$this->id] as $k => $v)
-        {
-            if (!isset($v) || $v === "false")
-            {
+            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass']) && $v == "0"))
                 unset($this->json[$this->id][$k]);
-                continue;
-            }
-
-            if (!in_array($k, ['classs', 'subclass', 'armor']) && $v === "0")
-            {
-                unset($this->json[$this->id][$k]);
-                continue;
-            }
-        }
     }
 
     private function parseRating($type, $value, $interactive = false)
@@ -994,12 +994,14 @@ class ItemList extends BaseType
     private function initJsonStats()
     {
         $json = array(
-            'id'          => $this->id,                     // note to self: lowercase for js-Ids.. ALWAYS!!
+            'id'          => $this->id,
             'name'        => (ITEM_QUALITY_HEIRLOOM - $this->curTpl['Quality']).$this->names[$this->id],
             'icon'        => $this->curTpl['icon'],
             'classs'      => $this->curTpl['class'],
             'subclass'    => $this->curTpl['subclass'],
          // 'subsubclass' => $this->curTpl['subsubclass'],
+            'heroic'      => (string)($this->curTpl['Flags'] & 0x8),
+            'side'        => Util::sideByRaceMask($this->curTpl['AllowableRace']), // check for FlagsExtra? 0:both; 1: Horde; 2:Alliance
             'slot'        => $this->curTpl['InventoryType'],
             'slotbak'     => $this->curTpl['InventoryType'],
             'level'       => $this->curTpl['ItemLevel'],
@@ -1054,7 +1056,7 @@ class ItemList extends BaseType
 
         // clear zero-values afterwards
         foreach ($json as $k => $v)
-            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'armor']) && $v === "0"))
+            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass']) && $v == "0"))
                 unset($json[$k]);
 
         $this->json[$json['id']] = $json;

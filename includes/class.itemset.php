@@ -6,8 +6,7 @@ if (!defined('AOWOW_REVISION'))
 class ItemsetList extends BaseType
 {
     private   $classes    = [];                             // used to build g_classes
-    public    $pieces     = [];                             // used to build g_items and search
-    public    $pieceToSet = [];
+    public    $pieceToSet = [];                             // used to build g_items and search
 
     protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_itemset WHERE [filter] [cond] ORDER BY maxlevel ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_itemset WHERE [filter] [cond]';
@@ -35,7 +34,6 @@ class ItemsetList extends BaseType
             {
                 if ($piece = $this->curTpl['item'.$i])
                 {
-                    $this->pieces[] = $piece;
                     $this->templates[$this->id]['pieces'][] = $piece;
                     $this->pieceToSet[$piece] = $this->id;
                 }
@@ -43,9 +41,7 @@ class ItemsetList extends BaseType
         }
         $this->reset();
 
-        $this->classes    = array_unique($this->classes);
-        $this->pieces     = array_unique($this->pieces);
-        $this->pieceToSet = array_unique($this->pieceToSet);
+        $this->classes = array_unique($this->classes);
     }
 
     public function getListviewData()
@@ -78,8 +74,8 @@ class ItemsetList extends BaseType
         if ($this->classes)
             (new CharClassList(array(['id', $this->classes])))->addGlobalsToJscript($refs);
 
-        if ($this->pieces)
-            (new ItemList(array(['i.entry', $this->pieces])))->addGlobalsToJscript($refs);
+        if ($this->pieceToSet)
+            (new ItemList(array(['i.entry', array_keys($this->pieceToSet)])))->addGlobalsToJscript($refs);
     }
 
     public function addRewardsToJScript(&$ref) { }

@@ -30,7 +30,7 @@ if ($compareString)
             while (sizeof($params) < 7)
                 $params[] = 0;
 
-            $outString[] = "[".implode(',', $params)."]";
+            $outString[] = $params;
 
             // MATCH() AGAINST() for integers would be nice...
             $res = DB::Aowow()->SelectRow(
@@ -43,29 +43,23 @@ if ($compareString)
             if ($res)
                 $piecesAssoc[(int)$params[0]] = $res['id'];
         }
-        $outSet[] = "[".implode(',', $outString)."]";
+        $outSet[] = $outString;
     }
-    $pageData['summary'] = "[".implode(',', $outSet)."]";
+    $pageData['summary'] = json_encode($outSet, JSON_NUMERIC_CHECK);
 
     $iList = new ItemList(array(['i.entry', $items]));
-    while ($iList->iterate())
+    $data = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
+    foreach ($data as $id => $item)
     {
-        $iList->extendJsonStats();
-        $stats = [];
-
-        foreach ($iList->json[$iList->id] as $k => $v)
-            $stats[] = is_numeric($v) || $v[0] == "{" ? '"'.$k.'":'.$v.'' : '"'.$k.'":"'.$v.'"';
-
-        foreach ($iList->itemMods[$iList->id] as $k => $v)
-            if ($v)
-                $stats[] = '"'.Util::$itemMods[$k].'":'.$v;
+        while ($iList->id != $id)
+            $iList->iterate();
 
         $pageData['items'][] = [
-            $iList->id,
-            Util::jsEscape($iList->names[$iList->id]),
+            $id,
+            Util::jsEscape($iList->names[$id]),
             $iList->getField('Quality'),
             $iList->getField('icon'),
-            "{".implode(",", $stats)."}"
+            json_encode($item, JSON_NUMERIC_CHECK)
         ];
     }
 }

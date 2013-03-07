@@ -239,7 +239,7 @@ if ($searchMask & 0x20)
             'appendix' => ' (Item Set)',
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs'],
-            'pieces'   => $sets->pieces
+            'pcsToSet' => $sets->pieceToSet
         );
     }
 }
@@ -247,14 +247,17 @@ if ($searchMask & 0x20)
 // 7 Items
 if ($searchMask & 0x40)
 {
-    if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && $found['itemset']['pieces'])
-        $conditions = [['i.class', [2, 4]], ['i.entry', $found['itemset']['pieces']]];
+    if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
+        $conditions = [['i.entry', array_keys($found['itemset']['pcsToSet'])]];
+    else if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEM)
+        $conditions = [['i.class', [2, 4]], [User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], 0];
     else
         $conditions = [[User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], 0];
-    $items = new ItemList($conditions);
+
+    $items = new ItemList($conditions, @$found['itemset']['pcsToSet']);
     $items->addGlobalsToJscript($jsGlobals);
 
-    if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? ITEMINFO_SUBITEMS : 0))
+    if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
     {
         while ($items->iterate())
         {
@@ -347,12 +350,51 @@ if ($searchMask & 0x10000)
 // 26 Guilds
 // if ($searchMask & 0x2000000)
 
-
+/*
+    !note! dear reader, if you ever try to generate a string, that is to be evaled by JS, NEVER EVER terminate with a \n
+    $totalHoursWasted +=2;
+*/
 if ($searchMask & SEARCH_TYPE_JSON)
 {
+    $outItems = '';
+    $outSets  = '';
+
+    if (isset($found['item']))
+    {
+        $items = [];
+
+        foreach ($found['item']['data'] as $k => $v)
+        {
+            unset($v['param1']);
+            unset($v['param2']);
+
+            $items[] = json_encode($v, JSON_NUMERIC_CHECK);
+        }
+
+        $outItems = "\t".implode(",\n\t", $items)."\n";
+    }
+
+    if (isset($found['itemset']))
+    {
+        $sets = [];
+
+        foreach ($found['itemset']['data'] as $k => $v)
+        {
+            $v['name'] = $v['quality'].$v['name'];
+
+            unset($v['param1']);
+            unset($v['quality']);
+            if (!$v['heroic'])
+                unset($v['heroic']);
+
+            $sets[] = json_encode($v, JSON_NUMERIC_CHECK);
+        }
+
+        $outSets = "\t".implode(",\n\t", $sets)."\n";
+    }
+
     header("Content-type: text/javascript");
-    echo "// not yet supported \n";
-    exit ("[\"".Util::jsEscape($query)."\", [\n],[\n]]\n");
+    die ('["'.Util::jsEscape($query)."\", [\n".$outItems."],[\n".$outSets.']]');
 }
 else if ($searchMask & SEARCH_TYPE_OPEN)
 {
@@ -421,7 +463,7 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
 
     $smarty->updatePageVars($vars);
     $smarty->assign('lang', array_merge(Lang::$main, Lang::$search));
-	$smarty->assign('found', $found);
+    $smarty->assign('found', $found);
     $smarty->assign('data', $jsGlobals);
     $smarty->assign('search', $search);
     $smarty->assign('mysql', DB::Aowow()->getStatistics());
