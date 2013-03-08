@@ -930,7 +930,7 @@ class SpellList extends BaseType
             $pos += strlen($result[0]);
 
             $resolved = $this->resolveVariableString($result, $level);
-            $str .= intVal($resolved) ? abs($resolved) : resolved;
+            $str .= intVal($resolved) ? abs($resolved) : $resolved;
         }
         $str .= substr($data, $pos);
         $str = str_replace('#', '$', $str);                 // reset marks

@@ -19,7 +19,7 @@
 {/foreach}
     <script type="text/javascript">
         var g_serverTime = new Date('{$smarty.now|date_format:"%Y/%m/%d %H:%M:%S"}');
-        var g_staticUrl = "http://{php}echo $_SERVER['SERVER_NAME'];{/php}";
+        var g_staticUrl = "{$page.gStaticUrl}";
     </script>
     <script src="template/js/basic.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="power/aowowPower.js?lang={$user.language|substr:2}" type="text/javascript"></script>

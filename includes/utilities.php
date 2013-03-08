@@ -915,10 +915,10 @@ class Util
     );
 
     public static $bgImagePath              = array (
-        'tiny'   => 'style="background-image: url(/images/icons/tiny/%s.gif)"',
-        'small'  => 'style="background-image: url(/images/icons/small/%s.jpg)"',
-        'medium' => 'style="background-image: url(/images/icons/medium/%s.jpg)"',
-        'large'  => 'style="background-image: url(/images/icons/large/%s.jpg)"',
+        'tiny'   => 'style="background-image: url(images/icons/tiny/%s.gif)"',
+        'small'  => 'style="background-image: url(images/icons/small/%s.jpg)"',
+        'medium' => 'style="background-image: url(images/icons/medium/%s.jpg)"',
+        'large'  => 'style="background-image: url(images/icons/large/%s.jpg)"',
     );
 
     private static $execTime = 0.0;
