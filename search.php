@@ -492,11 +492,6 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
         // die();
     // }
 
-    // Announcements
-    $announcements = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = "search" OR page = "*")');
-    foreach ($announcements as $k => $v)
-        $announcements[$k]['text'] = Util::localizedString($v, 'text');
-
     $vars = array(
         'title'     => $search.' - '.Lang::$search['search'],
         'tab'       => 0,                                   // tabId 0: Database for g_initHeader($tab)
@@ -510,7 +505,6 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
     $smarty->assign('search', $search);
     $smarty->assign('mysql', DB::Aowow()->getStatistics());
     $smarty->assign('util', new Util);                      // just for debugging / optimizing
-    $smarty->assign('announcements', $announcements);
 
     $smarty->display('search.tpl');
 }

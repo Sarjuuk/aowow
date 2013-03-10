@@ -1,17 +1,21 @@
 {include file='header.tpl'}
 
-		<div id="main">
+    <div id="main">
+        <div id="main-precontents" class="main-precontents"></div>
+        <div id="main-contents" class="main-contents">
+{if !empty($announcements)}
+    {foreach from=$announcements item=item}
+        {include file='bricks/announcement.tpl' an=$item}
+    {/foreach}
+{/if}
 
-			<div id="main-precontents"></div>
-			<div id="main-contents" class="main-contents">
+            <div class="pad3"></div>
 
-                <div class="pad3"></div>
-
-                <div class="inputbox">
-                <h1>{$page.subject} #{$page.id}</h1>
-                <div id="inputbox-error">{$page.notFound}</div>
-                <!--  -->
-                </div>
+            <div class="inputbox">
+            <h1>{$page.subject} #{$page.id}</h1>
+            <div id="inputbox-error">{$page.notFound}</div>
+            <!--  -->
             </div>
         </div>
+    </div>
 {include file='footer.tpl'}

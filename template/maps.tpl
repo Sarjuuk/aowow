@@ -3,11 +3,11 @@
     <div id="main">
         <div id="main-precontents"></div>
         <div id="main-contents" class="main-contents">
-            {if !empty($announcements)}
-                {foreach from=$announcements item=item}
-                    {include file='bricks/announcement.tpl' an=$item}
-                {/foreach}
-            {/if}
+{if !empty($announcements)}
+    {foreach from=$announcements item=item}
+        {include file='bricks/announcement.tpl' an=$item}
+    {/foreach}
+{/if}
             <div class="text">
                 <div style="text-align: center">
                     <script type="text/javascript">g_initPath([1,1])</script>

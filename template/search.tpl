@@ -1,22 +1,22 @@
 {include file='header.tpl'}
 
-        <div id="main">
-            <div id="main-precontents"></div>
-            <div class="main-contents" id="main-contents">
-                {if !empty($announcements)}
-                    {foreach from=$announcements item=item}
-                        {include file='bricks/announcement.tpl' an=$item}
-                    {/foreach}
-                {/if}
-                <div class="text">
-                    <a href="http://www.wowhead.com/?{$query}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
-        {if !empty($found)}
-                    <h1>{$lang.foundResult} <i>{$search|escape:"html"}</i></h1>
-                </div>
-                <div id="tabs-generic"></div>
-                <div id="listview-generic" class="listview"></div>
-                <script type="text/javascript">
-                    var myTabs = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
+    <div id="main">
+        <div id="main-precontents"></div>
+        <div class="main-contents" id="main-contents">
+{if !empty($announcements)}
+    {foreach from=$announcements item=item}
+        {include file='bricks/announcement.tpl' an=$item}
+    {/foreach}
+{/if}
+            <div class="text">
+                <a href="http://www.wowhead.com/?{$query[0]}={$query[1]}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
+    {if !empty($found)}
+                <h1>{$lang.foundResult} <i>{$search|escape:"html"}</i></h1>
+            </div>
+            <div id="tabs-generic"></div>
+            <div id="listview-generic" class="listview"></div>
+            <script type="text/javascript">
+                var myTabs = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
 {if isset($found.class)}       {include file='bricks/class_table.tpl'        data=$found.class.data       params=$found.class.params      } {/if}
 {if isset($found.race)}        {include file='bricks/race_table.tpl'         data=$found.race.data        params=$found.race.params       } {/if}
 {if isset($found.title)}       {include file='bricks/title_table.tpl'        data=$found.title.data       params=$found.title.params      } {/if}
@@ -39,17 +39,17 @@
 {if isset($found.event)}       {include file='bricks/event_table.tpl'        data=$found.event.data       params=$found.event.params      } {/if}
 {if isset($found.skill)}       {include file='bricks/skill_table.tpl'        data=$found.skill.data       params=$found.skill.params      } {/if}
 {if isset($found.currency)}    {include file='bricks/currency_table.tpl'     data=$found.currency.data    params=$found.currency.params   } {/if}
-                    myTabs.flush();
-                </script>
-        {else}
-                <h1>{$lang.noResult} <i>{$search|escape:"html"}</i></h1>
+                myTabs.flush();
+            </script>
+    {else}
+            <h1>{$lang.noResult} <i>{$search|escape:"html"}</i></h1>
 
-                {$lang.tryAgain}
-        {/if}
-                <div class="clear"></div>
-
-            </div>
+            {$lang.tryAgain}
+    {/if}
+            <div class="clear"></div>
 
         </div>
+
+    </div>
     
 {include file='footer.tpl'}

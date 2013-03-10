@@ -377,10 +377,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
-$announcements = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = "achievement" OR page = "*")');
-foreach ($announcements as $k => $v)
-    $announcements[$k]['text'] = Util::localizedString($v, 'text');
-
 $vars = array(
     'title'     => implode(" - ", $pageData['title']),
     'path'      => "[".implode(", ", $pageData['path'])."]",// menuId 9: Achievement (g_initPath)
@@ -391,7 +387,6 @@ $vars = array(
 
 $smarty->updatePageVars($vars);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $id));         // comments, screenshots, videos
-$smarty->assign('announcements', $announcements);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
 $smarty->assign('data', $pageData);
 

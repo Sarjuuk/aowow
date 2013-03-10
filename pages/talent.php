@@ -6,13 +6,6 @@ if (!defined('AOWOW_REVISION'))
 
 $petCalc = $pageCall == 'petcalc';
 
-// Announcements
-$announcements = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = ?s OR page = "*")',
-    $petCalc ? 'petcalc' : 'talent'
-);
-foreach ($announcements as $k => $v)
-    $announcements[$k]['text'] = Util::localizedString($v, 'text');
-
 $page = array(
     'reqCSS' => array(
         array('path' => 'template/css/TalentCalc.css', 'condition' => false),
@@ -43,7 +36,6 @@ if ($petCalc)
 $smarty->updatePageVars($page);
 $smarty->assign('tcType', $petCalc ? 'pc' : 'tc');
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$talent));
-$smarty->assign('announcements', $announcements);
 $smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->display('talent.tpl');
 

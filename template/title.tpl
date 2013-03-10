@@ -21,7 +21,7 @@
                 <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: 11, typeId: {$data.page.id} {rdelim});">
                     <em><b><i>{$lang.link}</i></b><span>{$lang.link}</span></em>
                 </a>
-                <a href="http://old.wowhead.com/?{$query}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
+                <a href="http://old.wowhead.com/?{$query[0]}={$query[1]}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
                 <h1 class="h1-icon">{if isset($data.page.expansion)}<span class="{$data.page.expansion}-icon-right">{$data.page.name}</span>{else}{$data.page.name}{/if}</h1>
                 <h2 class="clear">{$lang.related}</h2>
             </div>

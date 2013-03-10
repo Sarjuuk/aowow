@@ -70,6 +70,21 @@ class Smarty_AoWoW extends Smarty
             $this->_tpl_vars['page'][$var] = $val;
     }
 
+    public function display($tpl)
+    {
+        // since it's the same for every page, except index..
+        if ($this->_tpl_vars['query'][0])
+        {
+            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = ?s OR page = "*")', $this->_tpl_vars['query'][0]);
+            foreach ($ann as $k => $v)
+                $ann[$k]['text'] = Util::localizedString($v, 'text');
+
+            $this->_tpl_vars['announcements'] = $ann;
+        }
+
+        parent::display($tpl);
+    }
+
     // creates the actual cache file
     public function saveCache($key, $data)
     {
@@ -157,10 +172,9 @@ User::setLocale();
 User::assignUserToTemplate($smarty, true);
 
 // parse page-parameters .. sanitize before use!
-$query = $_SERVER['QUERY_STRING'];
-$smarty->assign('query', $query);
-@list($str, $trash) = explode('&', $query, 2);
+@list($str, $trash) = explode('&', $_SERVER['QUERY_STRING'], 2);
 @list($pageCall, $pageParam) = explode('=', $str, 2);
+$smarty->assign('query', [$pageCall, $pageParam]);
 
 // init global vars for smarty
 $pageData = array(

@@ -102,16 +102,10 @@ $smarty->updatePageVars(array(
 ));
 
 
-// Announcements
-$announcements = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = "title" OR page = "*")');
-foreach ($announcements as $k => $v)
-    $announcements[$k]['text'] = Util::localizedString($v, 'text');
-
 $smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
 $smarty->assign('data', $pageData);
 $smarty->assign('mysql', DB::Aowow()->getStatistics());
-$smarty->assign('announcements', $announcements);
 $smarty->display('title.tpl');
 
 ?>
