@@ -77,34 +77,34 @@ function bindfunc() {
     }
 }
 
-Function.prototype.bind = function () {
+Function.prototype.bind = function() {
 	var
         __method = this,
         args     = $A(arguments),
         object   = args.shift();
 
-	return function () {
+	return function() {
 		return __method.apply(object, args.concat($A(arguments)));
 	}
 };
 
 if (!String.prototype.ltrim) {
-	String.prototype.ltrim = function () {
+	String.prototype.ltrim = function() {
 		return this.replace(/^\s*/, "")
 	}
 }
 if (!String.prototype.rtrim) {
-	String.prototype.rtrim = function () {
+	String.prototype.rtrim = function() {
 		return this.replace(/\s*$/, "")
 	}
 }
 if (!String.prototype.trim) {
-	String.prototype.trim = function () {
+	String.prototype.trim = function() {
 		return this.ltrim().rtrim()
 	}
 }
 if (!String.prototype.removeAllWhitespace) {
-	String.prototype.removeAllWhitespace = function () {
+	String.prototype.removeAllWhitespace = function() {
 		return this.replace("/s+/g", "")
 	}
 }
@@ -498,24 +498,24 @@ OS = {
 	linux:   navigator.appVersion.indexOf('Linux')     != -1
 };
 
-var DomContentLoaded = new function () {
+var DomContentLoaded = new function() {
 	var b = [];
 	var a = [];
-	this.now = function () {
-		array_apply(b, function (c) {
+	this.now = function() {
+		array_apply(b, function(c) {
 			c()
 		})
 	};
-	this.delayed = function () {
-		array_apply(a, function (c) {
+	this.delayed = function() {
+		array_apply(a, function(c) {
 			c()
 		});
 		DomContentLoaded = null
 	};
-	this.addEvent = function (c) {
+	this.addEvent = function(c) {
 		b.push(c)
 	};
-	this.addDelayedEvent = function (c) {
+	this.addDelayedEvent = function(c) {
 		a.push(c)
 	}
 };
@@ -751,7 +751,7 @@ function g_enableScroll(a) {
 		dE(window, "DOMMouseScroll", g_enableScroll.F)
 	}
 }
-g_enableScroll.F = function (a) {
+g_enableScroll.F = function(a) {
 	if (a.stopPropagation) {
 		a.stopPropagation()
 	}
@@ -806,9 +806,9 @@ function g_createRange(c, a) {
 }
 function g_sortIdArray(a, b, c) {
 	a.sort(c ?
-	function (e, d) {
+	function(e, d) {
 		return strcmp(b[e][c], b[d][c])
-	}: function (e, d) {
+	}: function(e, d) {
 		return strcmp(b[e], b[d])
 	})
 }
@@ -980,11 +980,11 @@ function g_initHeader(a) {
 	var b = d.previousSibling;
 	var c = d.parentNode;
 	ns(b);
-	b.onclick = function () {
+	b.onclick = function() {
 		this.parentNode.onsubmit()
 	};
 	if (Browser.ie) {
-		setTimeout(function () {
+		setTimeout(function() {
 			d.value = ""
 		},
 		1)
@@ -992,21 +992,21 @@ function g_initHeader(a) {
 	if (d.value == "") {
 		d.className = "search-database"
 	}
-	d.onmouseover = function () {
+	d.onmouseover = function() {
 		if (trim(this.value) != "") {
 			this.className = ""
 		}
 	};
-	d.onfocus = function () {
+	d.onfocus = function() {
 		this.className = ""
 	};
-	d.onblur = function () {
+	d.onblur = function() {
 		if (trim(this.value) == "") {
 			this.className = "search-database";
 			this.value = ""
 		}
 	};
-	c.onsubmit = function () {
+	c.onsubmit = function() {
 		var e = this.elements[0].value;
 		if (trim(e) == "") {
 			return false
@@ -1204,7 +1204,7 @@ function g_addTooltip(b, c, a) {
 	if (!a && c.indexOf("<table>") == -1) {
 		a = "q"
 	}
-	b.onmouseover = function (d) {
+	b.onmouseover = function(d) {
 		Tooltip.showAtCursor(d, c, 0, 0, a)
 	};
 	b.onmousemove = Tooltip.cursorUpdate;
@@ -1214,7 +1214,7 @@ function g_addStaticTooltip(b, c, a) {
 	if (!a && c.indexOf("<table>") == -1) {
 		a = "q"
 	}
-	b.onmouseover = function (d) {
+	b.onmouseover = function(d) {
 		Tooltip.show(b, c, 0, 0, a)
 	};
 	b.onmouseout = Tooltip.hide
@@ -1306,22 +1306,63 @@ function g_formatDate(c, j, a, d, k) {
 		return e
 	}
 }
-function g_formatDateSimple(g, c) {
-	function a(b) {
-		return (b < 10 ? "0" + b: b)
+
+function g_formatDateSimple(d, time) {
+	function __twoDigits(n) {
+		return (n < 10 ? '0' + n : n);
 	}
-	var i = "",
-	j = g.getDate(),
-	f = g.getMonth() + 1,
-	h = g.getFullYear();
-	i += sprintf(LANG.date_simple, a(j), a(f), h);
-	if (c == 1) {
-		var k = g.getHours() + 1,
-		e = g.getMinutes() + 1;
-		i += LANG.date_at + a(k) + ":" + a(e)
+
+	var
+        b     = "",
+        day   = d.getDate(),
+        month = d.getMonth() + 1,
+        year  = d.getFullYear();
+
+	if (year <= 1970) {
+		b += LANG.unknowndate_stc;
 	}
-	return i
+    else {
+        b += sprintf(LANG.date_simple, __twoDigits(day), __twoDigits(month), year);
+    }
+
+	if (time != null) {
+		b = g_formatTimeSimple(d, b);
+	}
+
+	return b;
 }
+
+function g_formatTimeSimple(d, txt, noPrefix) {
+	function __twoDigits(n) {
+		return (n < 10 ? '0' + n : n);
+	}
+
+	var
+        hours   = d.getHours(),
+	    minutes = d.getMinutes();
+
+	if (txt == null) {
+		txt = '';
+	}
+
+	txt += (noPrefix ? ' ' : LANG.date_at);
+
+	if (hours == 12) {
+		txt += LANG.noon;
+	}
+	else if (hours == 0) {
+		txt += LANG.midnight;
+	}
+	else if (hours > 12) {
+		txt += (hours - 12) + ':' + __twoDigits(minutes) + ' ' + LANG.pm;
+	}
+	else {
+		txt += hours + ':' + __twoDigits(minutes) + ' ' + LANG.am;
+	}
+
+	return txt;
+}
+
 function g_cleanCharacterName(e) {
 	var d = "";
 	for (var c = 0, a = e.length; c < a; ++c) {
@@ -1837,19 +1878,19 @@ function g_setTooltipItemLevel(a, g) {
 			speed: f || 0
 		};
 		g_setJsonItemLevel(e, g);
-		a = a.replace(/(<!--asc(\d+)-->)([^<]+)/, function (j, h, i) {
+		a = a.replace(/(<!--asc(\d+)-->)([^<]+)/, function(j, h, i) {
 			d = i;
 			if (g < 40 && (i == 3 || i == 4)) {--d
 			}
 			return h + g_itemset_types[d]
 		});
-		a = a.replace(/(<!--dmg-->)\d+(\D+)\d+/, function (j, h, i) {
+		a = a.replace(/(<!--dmg-->)\d+(\D+)\d+/, function(j, h, i) {
 			return h + e.dmgmin + i + e.dmgmax
 		});
-		a = a.replace(/(<!--dps-->\D*?)(\d+\.\d)/, function (i, h) {
+		a = a.replace(/(<!--dps-->\D*?)(\d+\.\d)/, function(i, h) {
 			return h + e.dps.toFixed(1)
 		});
-		a = a.replace(/<span class="c11"><!--fap-->(\D*?)(\d+)(\D*?)<\/span>(<br \/>)?/i, function (l, h, i, m, j) {
+		a = a.replace(/<span class="c11"><!--fap-->(\D*?)(\d+)(\D*?)<\/span>(<br \/>)?/i, function(l, h, i, m, j) {
 			var k;
 			i = Math.floor((e.dps - 54.8) * 14);
 			if (e.dps > 54.8 && i > 0) {
@@ -1862,10 +1903,10 @@ function g_setTooltipItemLevel(a, g) {
 			}
 			return '<span class="c11"' + k + "><!--fap-->" + h + i + m + "</span>" + j
 		});
-		a = a.replace(/(<!--amr-->)\d+/, function (i, h) {
+		a = a.replace(/(<!--amr-->)\d+/, function(i, h) {
 			return h + e.armor
 		});
-		a = a.replace(/<span><!--stat(\d+)-->[-+]\d+(\D*?)<\/span>(<!--e-->)?(<!--ps-->)?(<br ?\/?>)?/gi, function (l, i, h, o, p, j) {
+		a = a.replace(/<span><!--stat(\d+)-->[-+]\d+(\D*?)<\/span>(<!--e-->)?(<!--ps-->)?(<br ?\/?>)?/gi, function(l, i, h, o, p, j) {
 			var k, m = e.bonuses[i];
 			if (m) {
 				m = (m > 0 ? "+": "-") + m;
@@ -1878,7 +1919,7 @@ function g_setTooltipItemLevel(a, g) {
 			}
 			return "<span" + k + "><!--stat" + i + "-->" + m + h + "</span>" + (o || "") + (p || "") + j
 		});
-		a = a.replace(/<span class="q2">(.*?)<!--rtg(\d+)-->\d+(.*?)<\/span>(<br \/>)?/gi, function (h, k, m, p, l, i, q) {
+		a = a.replace(/<span class="q2">(.*?)<!--rtg(\d+)-->\d+(.*?)<\/span>(<br \/>)?/gi, function(h, k, m, p, l, i, q) {
 			var j, o = e.bonuses[m];
 			if (o) {
 				j = "";
@@ -1890,7 +1931,7 @@ function g_setTooltipItemLevel(a, g) {
 			return '<span class="q2"' + j + ">" + k + "<!--rtg" + m + "-->" + o + p + "</span>" + q
 		})
 	}
-	a = a.replace(/(<!--rtg%(\d+)-->)([\.0-9]+)/g, function (j, h, k, i) {
+	a = a.replace(/(<!--rtg%(\d+)-->)([\.0-9]+)/g, function(j, h, k, i) {
 		d = a.match(new RegExp("<!--rtg" + k + "-->(\\d+)"));
 		if (!d) {
 			return j
@@ -1915,10 +1956,10 @@ function g_enhanceTooltip(a, c) {
 		}
 	}
 	if (c) {
-		a = a.replace(/<span class="q2"><!--addamr(\d+)--><span>.*?<\/span><\/span>/i, function (d, e) {
+		a = a.replace(/<span class="q2"><!--addamr(\d+)--><span>.*?<\/span><\/span>/i, function(d, e) {
 			return '<span class="q2 tip" onmouseover="Tooltip.showAtCursor(event, sprintf(LANG.tooltip_armorbonus, ' + e + '), 0, 0, \'q\')" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">' + d + "</span>"
 		});
-		a = a.replace(/\(([^\)]*?<!--lvl-->[^\(]*?)\)/gi, function (e, d) {
+		a = a.replace(/\(([^\)]*?<!--lvl-->[^\(]*?)\)/gi, function(e, d) {
 			return '(<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="g_staticTooltipLevelClick(this)">' + d + "</a>)"
 		})
 	}
@@ -2008,7 +2049,7 @@ function g_getMoneyHtml2(f, c, b, a) {
 function g_numberFormat(f, b, l, h) {
 	var c = f,
 	a = b;
-	var e = function (r, q) {
+	var e = function(r, q) {
 		var i = Math.pow(10, q);
 		return (Math.round(r * i) / i).toString()
 	};
@@ -2242,7 +2283,7 @@ function g_isEmailValid(a) {
 }
 function g_onAfterTyping(a, d, c) {
 	var e;
-	var b = function () {
+	var b = function() {
 		if (e) {
 			clearTimeout(e);
 			e = null
@@ -2263,11 +2304,11 @@ function g_onClick(c, d) {
 		}
 		d(true)
 	}
-	c.oncontextmenu = function () {
+	c.oncontextmenu = function() {
 		a(1);
 		return false
 	};
-	c.onmouseup = function (f) {
+	c.onmouseup = function(f) {
 		f = $E(f);
 		if (f._button == 3 || f.shiftKey || f.ctrlKey) {
 			a(2)
@@ -2387,7 +2428,7 @@ function g_addPages(l, b) {
 		if (Browser.ie) {
 			ae(f, ct(" "))
 		}
-		f.onclick = function () {
+		f.onclick = function() {
 			var d = prompt(sprintf(LANG.prompt_gotopage, 1, b.nPages), b.page);
 			if (d != null) {
 				d |= 0;
@@ -2396,7 +2437,7 @@ function g_addPages(l, b) {
 				}
 			}
 		};
-		f.onmouseover = function (d) {
+		f.onmouseover = function(d) {
 			Tooltip.showAtCursor(d, LANG.tooltip_gotopage, 0, 0, "q")
 		};
 		f.onmousemove = Tooltip.cursorUpdate;
@@ -2455,7 +2496,7 @@ function ss_appendSticky() {
 	var _ = ge("infobox-sticky-ss");
 	var type = g_pageInfo.type;
 	var typeId = g_pageInfo.typeId;
-	var pos = in_array(lv_screenshots, 1, function (a) {
+	var pos = in_array(lv_screenshots, 1, function(a) {
 		return a.sticky;
 	});
 
@@ -2464,7 +2505,7 @@ function ss_appendSticky() {
 
 		var a = ce("a");
 		a.href = "#screenshots:id=" + screenshot.id;
-		a.onclick = function (a) {
+		a.onclick = function(a) {
 			ScreenshotViewer.show({
 				screenshots: lv_screenshots,
 				pos: pos
@@ -2489,7 +2530,7 @@ function ss_appendSticky() {
         ae(a, ct(th.innerText + " (" + lv_screenshots.length + ")"));
         a.href = "#screenshots"
         a.title = sprintf(LANG.infobox_showall, lv_screenshots.length);
-		a.onclick = function () {
+		a.onclick = function() {
 			tabsRelated.focus((lv_videos && lv_videos.length) || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)) ? -2 : -1);
 			return false;
 		};
@@ -2543,7 +2584,7 @@ function vi_appendSticky() {
 	var _ = ge("infobox-sticky-vi");
 	var type = g_pageInfo.type;
 	var typeId = g_pageInfo.typeId;
-	var pos = in_array(lv_videos, 1, function (a) {
+	var pos = in_array(lv_videos, 1, function(a) {
 		return a.sticky
 	});
 
@@ -2552,7 +2593,7 @@ function vi_appendSticky() {
 
 		var a = ce("a");
 		a.href = "#videos:id=" + video.id;
-		a.onclick = function (e) {
+		a.onclick = function(e) {
 			VideoViewer.show({
 				videos: lv_videos,
 				pos: pos
@@ -2571,7 +2612,7 @@ function vi_appendSticky() {
         ae(a, ct(th.innerText + " (" + lv_videos.length + ")"));
         a.href = "#videos"
         a.title = sprintf(LANG.infobox_showall, lv_videos.length);
-		a.onclick = function () {
+		a.onclick = function() {
 			tabsRelated.focus(-1);
 			return false;
 		};
@@ -2591,7 +2632,7 @@ function vi_appendSticky() {
 	}
 }
 var g_videos = [];
-var VideoViewer = new function () {
+var VideoViewer = new function() {
 	var
         videos,
         pos,
@@ -2965,7 +3006,7 @@ var VideoViewer = new function () {
 		render();
 	}
 
-	this.checkPound = function () {
+	this.checkPound = function() {
 		pageTitle = gE(document, 'title').innerHTML;
 		if (location.hash && location.hash.indexOf('#videos') == 0) {
 			if (!g_listviews['videos']) { // Standalone video viewer
@@ -2985,7 +3026,7 @@ var VideoViewer = new function () {
 		}
 	}
 
-	this.show = function (opt) {
+	this.show = function(opt) {
 		Lightbox.show('videoviewer', {
 			onShow: onShow,
 			onHide: onHide,
@@ -3010,7 +3051,7 @@ function su_addToSaved(c, d, a, e) {
 			fields: [{
 				id: "selecteditems",
 				type: "caption",
-				compute: function (h, g, f, i) {
+				compute: function(h, g, f, i) {
 					i.innerHTML = sprintf((g == 1 ? LANG.dialog_selecteditem: LANG.dialog_selecteditems), g)
 				}
 			},
@@ -3031,7 +3072,7 @@ function su_addToSaved(c, d, a, e) {
 	if (!suDialog) {
 		suDialog = new Dialog()
 	}
-	var b = function (h) {
+	var b = function(h) {
 		var g = gc("compare_groups"),
 		f = "?compare";
 		if (h.action > 1) {
@@ -3096,7 +3137,7 @@ function Ajax(b, c) {
 	}
 	a.send(this.params)
 }
-Ajax.onReadyStateChange = function () {
+Ajax.onReadyStateChange = function() {
 	if (this.request.readyState == 4) {
 		if (this.request.status == 0 || (this.request.status >= 200 && this.request.status < 300)) {
 			this.onSuccess != null && this.onSuccess(this.request, this)
@@ -3123,7 +3164,7 @@ var Menu = {
 	iframes: [],
 	divs: [],
 	selection: [],
-	show: function () {
+	show: function() {
 		try {
 			clearTimeout(Menu.timer);
 			if (Menu.currentLink) {
@@ -3136,7 +3177,7 @@ var Menu = {
 			}
 		} catch(a) {}
 	},
-	_show: function (b) {
+	_show: function(b) {
 		if (Menu.currentLink != b) {
 			var a = ac(b);
 			Menu._hide();
@@ -3151,7 +3192,7 @@ var Menu = {
 			Menu.clean(0)
 		}
 	},
-	showAtCursor: function (b, a, d) {
+	showAtCursor: function(b, a, d) {
 		clearTimeout(Menu.timer);
 		Menu._hide();
 		Menu.selection = [-1];
@@ -3168,7 +3209,7 @@ var Menu = {
 		}
 		Menu.showDepth(0, this.menu, a, d, 0, 0, 0, true)
 	},
-	hide: function () {
+	hide: function() {
 		try {
 			clearTimeout(Menu.timer);
 			if (Menu.currentLink) {
@@ -3178,7 +3219,7 @@ var Menu = {
 			}
 		} catch(a) {}
 	},
-	_hide: function () {
+	_hide: function() {
 		for (var b = 0, a = Menu.selection.length; b < a; ++b) {
 			Menu.divs[b].style.display = "none";
 			Menu.divs[b].style.visibility = "hidden";
@@ -3192,14 +3233,14 @@ var Menu = {
 		}
 		Menu.currentLink = null
 	},
-	sepOver: function () {
+	sepOver: function() {
 		var b = this.d;
 		var a = b.i;
 		Menu.truncate(a);
 		Menu.clean(a);
 		Menu.selection[a] = -1
 	},
-	elemOver: function () {
+	elemOver: function() {
 		var g = this.d;
 		var f = g.i;
 		var e = this.i;
@@ -3219,11 +3260,11 @@ var Menu = {
 			this.className = "open"
 		}
 	},
-	elemClick: function (a) {
+	elemClick: function(a) {
 		Menu._hide();
 		a()
 	},
-	getIframe: function (a) {
+	getIframe: function(a) {
 		var b;
 		if (Menu.iframes[a] == null) {
 			b = ce("iframe");
@@ -3236,7 +3277,7 @@ var Menu = {
 		}
 		return b
 	},
-	getDiv: function (a, b) {
+	getDiv: function(a, b) {
 		var c;
 		if (Menu.divs[a] == null) {
 			c = ce("div");
@@ -3250,7 +3291,7 @@ var Menu = {
 		c.menuArray = b;
 		return c
 	},
-	showDepth: function (N, c, D, C, O, G, A, z) {
+	showDepth: function(N, c, D, C, O, G, A, z) {
 		var X, U = Menu.getDiv(N, c);
 		while (U.firstChild) {
 			de(U.firstChild)
@@ -3467,14 +3508,14 @@ var Menu = {
 			U.style.display = ""
 		}
 	},
-	divOver: function () {
+	divOver: function() {
 		clearTimeout(Menu.timer)
 	},
-	divOut: function () {
+	divOut: function() {
 		clearTimeout(Menu.timer);
 		Menu.timer = setTimeout(Menu._hide, 333)
 	},
-	truncate: function (b) {
+	truncate: function(b) {
 		var c;
 		while (Menu.selection.length - 1 > b) {
 			c = Menu.selection.length - 1;
@@ -3486,7 +3527,7 @@ var Menu = {
 			Menu.selection.pop()
 		}
 	},
-	clean: function (b) {
+	clean: function(b) {
 		for (var c = b; c < Menu.selection.length; ++c) {
 			if (Menu.selection[c] != -1) {
 				var e = gE(Menu.divs[c], "a")[Menu.selection[c]];
@@ -3499,13 +3540,13 @@ var Menu = {
 			}
 		}
 	},
-	append: function (b, c) {
+	append: function(b, c) {
 		b[2] += c;
 		if (b[3] != null) {
 			Menu._append(b[3], c)
 		}
 	},
-	_append: function (b, d) {
+	_append: function(b, d) {
 		var e, g = 0;
 		for (var c = 0; c < b.length; ++c) {
 			var f = b[c][2].indexOf("&filter=");
@@ -3518,7 +3559,7 @@ var Menu = {
 			}
 		}
 	},
-	_splitFilter: function (b) {
+	_splitFilter: function(b) {
 		var g = b.substr(8).split(";"),
 		c = {};
 		for (var e = 0, a = g.length; e < a; ++e) {
@@ -3536,7 +3577,7 @@ var Menu = {
 		}
 		return c
 	},
-	_fixCollision: function (d, a) {
+	_fixCollision: function(d, a) {
 		var b = Menu._splitFilter(d),
 		c = Menu._splitFilter(a);
 		a = "";
@@ -3548,7 +3589,7 @@ var Menu = {
 		}
 		return a
 	},
-	fixUrls: function (g, c, e, b, f) {
+	fixUrls: function(g, c, e, b, f) {
 		if (!f) {
 			f = 0
 		}
@@ -3565,7 +3606,7 @@ var Menu = {
 			}
 		}
 	},
-	addButtons: function (h, g) {
+	addButtons: function(h, g) {
 		for (var e = 0, b = g.length; e < b; ++e) {
 			if (g[e][0] == null) {
 				continue
@@ -3593,7 +3634,7 @@ var Menu = {
 			ae(h, c)
 		}
 	},
-	explode: function (f) {
+	explode: function(f) {
 		var d = [],
 		e = null,
 		c;
@@ -3616,275 +3657,359 @@ var Menu = {
 		return d
 	}
 };
-function Tabs(a) {
-	cO(this, a);
+
+function Tabs(opt) {
+	cO(this, opt);
+
 	if (this.parent) {
-		this.parent = $(this.parent)
-	} else {
-		return
+		this.parent = $(this.parent);
 	}
-	this.oldMode = (Browser.geckoVersion > 20000000 && Browser.geckoVersion <= 20060414);
+    else {
+		return;
+    }
+
 	this.selectedTab = -1;
+
 	this.uls = [];
+
 	this.tabs = [];
 	this.nShows = 0;
 	if (this.poundable == null) {
-		this.poundable = 1
+		this.poundable = 1;
 	}
 	this.poundedTab = null;
+
 	if (this.onLoad == null) {
-		this.onLoad = Tabs.onLoad.bind(this)
+		this.onLoad = Tabs.onLoad.bind(this);
 	}
+
 	if (this.onShow == null) {
-		this.onShow = Tabs.onShow.bind(this)
+		this.onShow = Tabs.onShow.bind(this);
 	}
+
 	if (this.onHide) {
-		this.onHide = this.onHide.bind(this)
+		this.onHide = this.onHide.bind(this);
 	}
 }
+
 Tabs.prototype = {
-	add: function (a, d) {
-		var c, b = this.tabs.length;
-		c = {
-			caption: a,
-			index: b,
+	add: function(caption, opt) {
+		var
+            _,
+            index = this.tabs.length;
+
+        _ = {
+			caption: caption,
+			index: index,
 			owner: this
 		};
-		cO(c, d);
-		this.tabs.push(c);
-		return b
+		cO(_, opt);
+
+		this.tabs.push(_);
+
+		return index;
 	},
-	hide: function (a, b) {
-		if (this.tabs[a]) {
-			ee(this.parent);
-			this.tabs[a].hidden = !b;
+
+	hide: function(index, visible) {
+		if (this.tabs[index]) {
+			var selectedTab = this.selectedTab;
+
+			if (index == 0 && selectedTab == -1) {
+				this.poundedTab = this.selectedTab = selectedTab = 0;
+            }
+
+			if (index != this.poundedTab) {
+				this.selectedTab = -1;
+            }
+
+			this.tabs[index].hidden = !visible;
 			this.flush();
-			this.show((a == this.selectedTab ? this.poundedTab: this.selectedTab), 1)
+
+			if (!visible && index == selectedTab) {
+				this.selectedTab = selectedTab;
+				for (var i = 0, len = this.tabs.length; i < len; ++i) {
+					if (i != index && !this.tabs[i].hidden) {
+						return this.show(i, 1);
+                    }
+				}
+			}
 		}
 	},
-	focus: function (a) {
-		if (a < 0) {
-			a = this.tabs.length + a
+
+	unlock: function(index, locked) {
+		if (this.tabs[index]) {
+			this.tabs[index].locked = locked;
+            _ = gE(this.uls[0], 'a');
+
+    alert('whoops, forgot a ToDo!');
+/*  fix this jquery-nonsens
+            $('.icon-lock', _[index]).remove();
+
+            if (locked)
+                $('div, b', _[index]).prepend('<span class="icon-lock" />');
+*/
+			var _ = location.hash.substr(1).split(':')[0];
+			if (this.tabs[index].id == _) {
+				this.show(index, 1);
+            }
+		}
+	},
+
+	focus: function(index) {
+		if (index < 0) {
+			index = this.tabs.length + index;
 		}
 		this.forceScroll = 1;
-		gE(this.uls[this.oldMode ? 0 : 2], "a")[a].onclick({},
-		true);
-		this.forceScroll = null
+		gE(this.uls[0], 'a')[index].onclick({}, true);
+		this.forceScroll = null;
 	},
-	show: function (c, e) {
-		var b;
-		if (isNaN(c) || c < 0 || this.tabs[c].hidden) {
-			c = 0
-		} else {
-			if (c >= this.tabs.length) {
-				c = this.tabs.length - 1
-			}
+
+	show: function(index, forceClick) {
+		var _;
+
+		if (isNaN(index) || index < 0) {
+			index = 0;
 		}
-		if (e == null && c == this.selectedTab) {
-			return
+        else if (index >= this.tabs.length) {
+            index = this.tabs.length - 1;
 		}
+
+		if ((forceClick == null && index == this.selectedTab) || this.tabs[index].hidden) {
+			return;
+		}
+
+		if(this.tabs[index].locked) {
+			return this.onShow(this.tabs[index], this.tabs[this.selectedTab]);
+        }
+
 		if (this.selectedTab != -1) {
-			b = this.tabs[this.selectedTab];
-			if (this.onHide && !this.onHide(b)) {
-				return
+			_ = this.tabs[this.selectedTab];
+
+			if (this.onHide && !this.onHide(_)) {
+				return;
 			}
-			if (b.onHide && !b.onHide()) {
-				return
+
+			if (_.onHide && !_.onHide()) {
+				return;
 			}
-		}++this.nShows;
-		var a = this.oldMode ? 0 : 3;
-		for (var d = 0; d <= a; ++d) {
-			b = gE(this.uls[d], "a");
-			if (this.selectedTab != -1) {
-				b[this.selectedTab].className = ""
-			}
-			b[c].className = "selected"
 		}
-		b = this.tabs[c];
-		if (b.onLoad) {
-			b.onLoad();
-			b.onLoad = null
+
+        ++this.nShows;
+
+        _ = gE(this.uls[0], 'a');
+        if (this.selectedTab != -1) {
+            _[this.selectedTab].className = '';
+        }
+        _[index].className = 'selected';
+
+		_ = this.tabs[index];
+		if (_.onLoad) {
+			_.onLoad();
+			_.onLoad = null;
 		}
-		this.onShow(this.tabs[c], this.tabs[this.selectedTab]);
-		if (b.onShow) {
-			b.onShow(this.tabs[this.selectedTab])
+
+		this.onShow(this.tabs[index], this.tabs[this.selectedTab]);
+
+		if (_.onShow) {
+			_.onShow(this.tabs[this.selectedTab]);
 		}
-		this.selectedTab = c
+
+		this.selectedTab = index;
 	},
-	flush: function (q) {
-		if (this.oldMode) {
-			var m, u, e, t;
-			m = ce("ul");
-			m.className = "old-tabs";
-			for (var k = 0; k < this.tabs.length; ++k) {
-				var f = this.tabs[k];
-				u = ce("li");
-				e = ce("div");
-				t = ce("a");
-				if (f.hidden) {
-					u.style.display = "none"
-				}
-				if (this.poundable) {
-					t.href = "#" + f.id
-				} else {
-					t.href = "javascript:;"
-				}
-				ns(t);
-				t.onclick = Tabs.onClick.bind(f, t);
-				ae(t, ct(f.caption));
-				ae(u, e);
-				ae(u, t);
-				ae(m, u)
-			}
-			this.uls[0] = m;
-			ae(this.parent, m);
-			var v = ce("div");
-			v.style.cssFloat = v.style.styleFloat = "left";
-			ae(this.parent, v)
-		} else {
-			var v, g, t, r, p, c;
-			var o = ce("div");
-			o.className = "tabs-container";
-			p = ce("div");
-			p.style.visibility = "hidden";
-			this.uls[0] = ce("ul");
-			this.uls[0].className = "tabs";
-			ae(p, this.uls[0]);
-			ae(o, p);
-			p = ce("div");
-			p.className = "tabs-levels";
-			for (var k = 1; k <= 3; ++k) {
-				c = ce("div");
-				c.className = "tabs-level";
-				this.uls[k] = ce("ul");
-				this.uls[k].className = "tabs";
-				this.uls[k].style.top = ( - 30 * (3 - k)) + "px";
-				ae(c, this.uls[k]);
-				ae(p, c)
-			}
-			ae(o, p);
-			for (var k = 0; k < this.tabs.length; ++k) {
-				var f = this.tabs[k];
-				for (var h = 0; h <= 3; ++h) {
-					g = ce("li");
-					t = ce("a");
-					r = ce("b");
-					if (f.hidden) {
-						g.style.display = "none"
-					}
-					if (this.poundable) {
-						t.href = "#" + f.id
-					} else {
-						t.href = "javascript:;"
-					}
-					if (h > 0) {
-						ns(t);
-						t.onclick = Tabs.onClick.bind(f, t)
-					}
-					if (!Browser.ie6) {
-						p = ce("div");
-						if (f.icon) {
-							s = ce("span");
-							s.className = "icontiny";
-							s.style.backgroundImage = "url(images/icons/tiny/" + f.icon.toLowerCase() + ".gif)";
-							ae(p, s)
-						}
-						ae(p, ct(f.caption));
-						ae(t, p)
-					}
-					if (f.icon) {
-						s = ce("span");
-						s.className = "icontiny";
-						s.style.backgroundImage = "url(images/icons/tiny/" + f.icon.toLowerCase() + ".gif)";
-						ae(r, s)
-					}
-					ae(r, ct(f.caption));
-					ae(t, r);
-					ae(g, t);
-					ae(this.uls[h], g)
-				}
-			}
-			ae(this.parent, o)
-		}
-		if (this.onLoad) {
-			v = this.onLoad();
-			if (v != null) {
-				this.poundedTab = q = v
+
+	flush: function(defaultTab) {
+        var _, l, a, b, d, d2;
+
+        var container = ce('div');
+        container.className = 'tabs-container';
+
+        this.uls[0] = ce('ul');
+        this.uls[0].className = 'tabs';
+
+        d = ce('div');
+        d.className = 'tabs-levels';
+
+        ae(container, this.uls[0]);
+
+        for (var i = 0; i < this.tabs.length; ++i) {
+            var tab = this.tabs[i];
+
+            l = ce('li');
+            a = ce('a');
+            b = ce('b');
+
+            if (tab.hidden) {
+                l.style.display = 'none';
+            }
+
+            if (this.poundable) {
+                a.href = '#' + tab.id;
+            }
+            else {
+                a.href = 'javascript:;';
+            }
+
+            ns(a);
+            a.onclick = Tabs.onClick.bind(tab, a);
+
+            d = ce('div');
+
+            if(tab.locked)
+            {
+                s = ce('span');
+                s.className = 'icon-lock';
+                ae(d, s);
+            }
+            else if(tab.icon)
+            {
+                s = ce('span');
+                s.className = 'icontiny';
+                s.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + tab.icon.toLowerCase() + '.gif)';
+                ae(d, s);
+            }
+
+            if(tab.tooltip)
+            {
+                a.onmouseover = (function(tooltip, e) { Tooltip.showAtCursor(e, tooltip, 0, 0, 'q'); }).bind(a, tab.tooltip);
+                a.onmousemove = Tooltip.cursorUpdate;
+                a.onmouseout  = Tooltip.hide;
+            }
+
+            if(tab['class'])
+                d.className = tab['class'];
+
+            ae(d, ct(tab.caption));
+            ae(a, d);
+
+            if(tab.locked) {
+                s = ce('span');
+                s.className = 'icon-lock';
+                ae(b, s);
+            }
+            else if (tab.icon) {
+                s = ce('span');
+                s.className = 'icontiny';
+                s.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + tab.icon.toLowerCase() + '.gif)';
+                ae(b, s);
+            }
+            ae(b, ct(tab.caption));
+            ae(a, b);
+            ae(l, a);
+            ae(this.uls[0], l);
+        }
+
+        ee(this.parent);
+        ae(this.parent, container);
+
+        if (this.onLoad) {
+			_ = this.onLoad();
+			if (_ != null) {
+				this.poundedTab = defaultTab = _;
 			}
 		}
-		this.show(q)
+
+		this.show(defaultTab);
 	},
-	setTabName: function (d, c) {
-		var a = this.oldMode ? 0 : 3;
-		this.tabs[d].caption = c;
-		for (var e = 0; e <= a; ++e) {
-			var b = gE(this.uls[e], "a");
-			g_setTextNodes(b[d], c)
-		}
-	},
-	setTabPound: function (d, a) {
+
+	setTabName: function(index, name) {
+		this.tabs[index].caption = name;
+
+        var _ = gE(this.uls[0], 'a');
+        g_setTextNodes(_[index], name);
+    },
+
+	setTabPound: function(index, pound) {
 		if (!this.poundable) {
-			return
+			return;
 		}
-		var b = this.oldMode ? 0 : 3;
-		for (var e = 0; e <= b; ++e) {
-			var c = gE(this.uls[e], "a");
-			c[d].href = "#" + this.tabs[d].id + ":" + a
-		}
+
+        var _ = gE(this.uls[0], 'a');
+        _[index].href = '#' + this.tabs[index].id + (pound ? ':' + pound : '');
 	},
-	getSelectedTab: function () {
-		return this.selectedTab
+
+	setTabTooltip: function(index, text) {
+		this.tabs[index].tooltip = text;
+
+        var _ = gE(this.uls[0], 'a');
+        if(text == null) {
+            _[index].onmouseover = _[index].onmousemove = _[index].onmouseout = null;
+        }
+        else {
+            _[index].onmouseover = function(e) { Tooltip.showAtCursor(e, text, 0, 0, 'q2'); };
+            _[index].onmousemove = Tooltip.cursorUpdate;
+            _[index].onmouseout  = Tooltip.hide;
+        }
+	},
+
+	getSelectedTab: function() {
+		return this.selectedTab;
 	}
 };
-Tabs.onClick = function (b, g, f) {
-	if (f == null && this.index == this.owner.selectedTab) {
-		return
+
+Tabs.onClick = function(a, e, forceClick) {
+	if (forceClick == null && this.index == this.owner.selectedTab) {
+		return;
 	}
-	var d = rf2(g);
-	if (d == null) {
-		return
+
+	var res = rf2(e);
+	if (res == null) {
+		return;
 	}
-	this.owner.show(this.index, f);
-	if (this.owner.poundable) {
-		var c = b.href.indexOf("#");
-		c != -1 && location.replace(b.href.substr(c))
+
+	this.owner.show(this.index, forceClick);
+
+	if (this.owner.poundable && !this.locked) {
+		var _ = a.href.indexOf('#');
+		_ != -1 && location.replace(a.href.substr(_));
 	}
-	return d
+
+	return res;
 };
-Tabs.onLoad = function () {
+
+Tabs.onLoad = function() {
 	if (!this.poundable || !location.hash.length) {
-		return
+		return;
 	}
-	var a = location.hash.substr(1).split(":")[0];
-	if (a) {
-		return in_array(this.tabs, a, function (b) {
-			return b.id
-		})
+
+	var _ = location.hash.substr(1).split(':')[0];
+	if (_) {
+		return in_array(this.tabs, _, function(x) {
+            if(!x.locked) {
+                return x.id;
+            }
+		});
 	}
 };
-Tabs.onShow = function (d, e) {
-	var b;
-	if (e) {
-		ge("tab-" + e.id).style.display = "none"
+
+Tabs.onShow = function(newTab, oldTab) {
+	var _;
+
+	if(newTab.hidden || newTab.locked) {
+		return;
+    }
+
+	if (oldTab) {
+		ge('tab-' + oldTab.id).style.display = 'none';
 	}
-	b = ge("tab-" + d.id);
-	b.style.display = "";
-	if ((this.nShows == 1 && this.poundedTab != null && this.poundedTab >= 0) || this.forceScroll) {
-		var c, a;
+
+	_ = ge('tab-' + newTab.id);
+	_.style.display = '';
+
+	if (((this.nShows == 1 && this.poundedTab != null && this.poundedTab >= 0) || this.forceScroll) && !this.noScroll) {
+		var el, padd;
 		if (this.__st) {
-			c = this.__st;
-			a = 15
-		} else {
-			c = b;
-			a = this.parent.offsetHeight + 15
+			el = this.__st;
+			padd = 15;
 		}
-		if (Browser.ie) {
-			setTimeout(g_scrollTo.bind(this, c, a), 1)
-		} else {
-			g_scrollTo(c, a)
+        else {
+			el = _;
+			padd = this.parent.offsetHeight + 15;
 		}
+
+        setTimeout(g_scrollTo.bind(null, el, padd), 10);
 	}
 };
+
 var g_listviews = {};
 function Listview(a) {
 	cO(this, a);
@@ -4021,7 +4146,41 @@ function Listview(a) {
 		if (this.nItemsPerRow <= 1) {
 			this.nItemsPerRow = 1
 		}
-	} else {
+	}
+	else if (this.mode == Listview.MODE_CALENDAR) {
+		this.dates = [];
+		this.nItemsPerRow = 7; // Days per row
+		this.nItemsPerPage = 1; // Months per page
+		this.nDaysPerMonth = [];
+
+		if (this.template.startOnMonth != null)
+			this.startOnMonth = this.template.startOnMonth;
+		else
+			this.startOnMonth = new Date();
+		this.startOnMonth.setDate(1);
+		this.startOnMonth.setHours(0, 0, 0, 0);
+
+		if (this.nMonthsToDisplay == null) {
+			if(this.template.nMonthsToDisplay != null)
+				this.nMonthsToDisplay = this.template.nMonthsToDisplay;
+			else
+				this.nMonthsToDisplay = 1;
+		}
+
+		var y = this.startOnMonth.getFullYear(),
+			m = this.startOnMonth.getMonth();
+
+		for (var j = 0; j < this.nMonthsToDisplay; ++j) {
+			var date = new Date(y, m + j, 32);
+			this.nDaysPerMonth[j] = 32 - date.getDate();
+			for (var i = 1; i <= this.nDaysPerMonth[j]; ++i)
+				this.dates.push({ date: new Date(y, m + j, i) });
+		}
+
+		if (this.template.rowOffset != null)
+			this.rowOffset = this.template.rowOffset;
+	}
+    else {
 		this.nItemsPerRow = 1
 	}
 	this.columns = [];
@@ -4036,7 +4195,7 @@ function Listview(a) {
 			var m = null;
 			var b = this.extraCols[f];
 			if (b.after || b.before) {
-				var j = in_array(this.columns, (b.after ? b.after: b.before), function (d) {
+				var j = in_array(this.columns, (b.after ? b.after: b.before), function(d) {
 					return d.id
 				});
 				if (j != -1) {
@@ -4057,12 +4216,12 @@ function Listview(a) {
 	var p = [],
 	q = [];
 	if (this.visibleCols != null) {
-		array_walk(this.visibleCols, function (d) {
+		array_walk(this.visibleCols, function(d) {
 			p[d] = 1
 		})
 	}
 	if (this.hiddenCols != null) {
-		array_walk(this.hiddenCols, function (d) {
+		array_walk(this.hiddenCols, function(d) {
 			q[d] = 1
 		})
 	}
@@ -4086,7 +4245,7 @@ function Listview(a) {
 					g = 1;
 					h[f] = h[f].substring(1)
 				}
-				var j = in_array(this.columns, h[f], function (d) {
+				var j = in_array(this.columns, h[f], function(d) {
 					return d.id
 				});
 				if (j != -1) {
@@ -4132,12 +4291,14 @@ function Listview(a) {
 		this.initialize()
 	}
 }
-Listview.MODE_DEFAULT = 0;
+Listview.MODE_DEFAULT  = 0;
 Listview.MODE_CHECKBOX = 1;
-Listview.MODE_DIV = 2;
-Listview.MODE_TILED = 3;
+Listview.MODE_DIV      = 2;
+Listview.MODE_TILED    = 3;
+Listview.MODE_CALENDAR = 4;
+
 Listview.prototype = {
-	initialize: function () {
+	initialize: function() {
 		if (this.data.length) {
 			if (this.computeDataFunc != null) {
 				for (var d = 0, a = this.data.length; d < a; ++d) {
@@ -4176,15 +4337,20 @@ Listview.prototype = {
 				this.tbody.className = "clickable"
 			}
 			if (this.mode == Listview.MODE_TILED) {
-				this.table.className = "listview-mode-tiled";
-				var e = (100 / this.nItemsPerRow) + "%",
-				f = ce("colgroup"),
-				c;
+				if(!this.noStyle)
+					this.table.className = 'listview-mode-' + (this.mode == Listview.MODE_TILED ? 'tiled' : 'calendar');
+
+				var
+                    e = (100 / this.nItemsPerRow) + "%",
+                    f = ce("colgroup"),
+                    c;
+
 				for (var d = 0; d < this.nItemsPerRow; ++d) {
 					c = ce("col");
 					c.style.width = e;
 					ae(f, c)
 				}
+
 				ae(this.mainContainer, f)
 			} else {
 				this.table.className = "listview-mode-default";
@@ -4207,7 +4373,7 @@ Listview.prototype = {
 			this.onAfterCreate(b)
 		}
 	},
-	createHeader: function () {
+	createHeader: function() {
 		var h = ce("tr");
 		if (this.mode == Listview.MODE_CHECKBOX) {
 			var g = ce("th"),
@@ -4262,7 +4428,7 @@ Listview.prototype = {
 		}
 		ae(this.thead, h)
 	},
-	createBands: function () {
+	createBands: function() {
 		var j = ce("div"),
 		l = ce("div"),
 		m = ce("div"),
@@ -4312,7 +4478,7 @@ Listview.prototype = {
 			d.className = "listview-quicksearch";
 			ae(d, c);
 			i.href = "javascript:;";
-			i.onclick = function () {
+			i.onclick = function() {
 				var a = this.nextSibling;
 				a.value = "";
 				a.className = f;
@@ -4326,15 +4492,15 @@ Listview.prototype = {
 			h.className = f;
 			h.style.width = (this._truncated ? "19em": "15em");
 			g_onAfterTyping(h, o, this.searchDelay);
-			h.onmouseover = function () {
+			h.onmouseover = function() {
 				if (trim(this.value) != "") {
 					this.className = ""
 				}
 			};
-			h.onfocus = function () {
+			h.onfocus = function() {
 				this.className = ""
 			};
-			h.onblur = function () {
+			h.onblur = function() {
 				if (trim(this.value) == "") {
 					this.className = f;
 					this.value = ""
@@ -4342,7 +4508,7 @@ Listview.prototype = {
 			};
 			h.onkeypress = this.submitSearch.bind(this);
 			if (Browser.ie) {
-				setTimeout(function () {
+				setTimeout(function() {
 					h.value = ""
 				},
 				1)
@@ -4399,7 +4565,7 @@ Listview.prototype = {
 		}
 		ae(this.container, this.bandBot)
 	},
-	createNav: function (g) {
+	createNav: function(g) {
 		var c = ce("div"),
 		d = ce("a"),
 		b = ce("a"),
@@ -4423,14 +4589,22 @@ Listview.prototype = {
 		b.onclick = this.previousPage.bind(this);
 		a.onclick = this.nextPage.bind(this);
 		j.onclick = this.lastPage.bind(this);
-		ae(h, ct("a"));
-		ae(f, ct("a"));
-		ae(e, ct("a"));
-		ae(i, h);
-		ae(i, ct(LANG.hyphen));
-		ae(i, f);
-		ae(i, ct(LANG.lvpage_of));
-		ae(i, e);
+
+		if (this.mode == Listview.MODE_CALENDAR) {
+			ae(h, ct('a'));
+			ae(i, h);
+		}
+		else {
+            ae(h, ct("a"));
+            ae(f, ct("a"));
+            ae(e, ct("a"));
+            ae(i, h);
+            ae(i, ct(LANG.hyphen));
+            ae(i, f);
+            ae(i, ct(LANG.lvpage_of));
+            ae(i, e);
+        }
+
 		ae(c, d);
 		ae(c, b);
 		ae(c, i);
@@ -4447,7 +4621,7 @@ Listview.prototype = {
 		}
 		return c
 	},
-    createCbBar: function (a) {
+    createCbBar: function(a) {
 		var b = ce("div");
 		if (this.createCbControls) {
 			this.createCbControls(b, a)
@@ -4457,7 +4631,7 @@ Listview.prototype = {
 		}
 		return b
 	},
-	refreshRows: function () {
+	refreshRows: function() {
 		var a = (this.mode == Listview.MODE_DIV ? this.mainContainer: this.tbody);
 		ee(a);
 		if (this.nRowsVisible == 0) {
@@ -4535,7 +4709,45 @@ Listview.prototype = {
 					}
 					ae(this.tbody, l)
 				}
-			} else {
+			}
+            else if (this.mode == Listview.MODE_CALENDAR) {
+                var tr = ce('tr');
+
+                for(var i = 0; i < 7; ++i) {
+                    var th = ce('th');
+                    st(th, LANG.date_days[i]);
+                    ae(tr, th);
+                }
+
+                ae(this.tbody, tr);
+                tr = ce('tr');
+
+                for (var k = 0; k < this.dates[o].date.getDay(); ++k) {
+                    var foo = ce('td');
+                    foo.className = 'empty-cell';
+                    ae(tr, foo);
+                }
+
+                for (var j = o; j < b; ++j) {
+                    ae(tr, this.getEvent(j));
+
+                    if(++k == 7) {
+                        ae(this.tbody, tr);
+                        tr = ce('tr');
+                        k  = 0;
+                    }
+                }
+
+                if (k != 0) {
+                    for(; k < 7; ++k) {
+                        var foo = ce('td');
+                        foo.className = 'empty-cell';
+                        ae(tr, foo);
+                    }
+                    ae(this.tbody, tr);
+                }
+            }
+            else {
 				for (var e = 0; e < h; ++e) {
 					var f = o + e,
 					p = this.data[f];
@@ -4552,7 +4764,7 @@ Listview.prototype = {
 		this.mainContainer.style.display = "";
 		this.noData.style.display = "none"
 	},
-	showNoData: function () {
+	showNoData: function() {
 		var b = this.noData;
 		ee(b);
 		var a = -1;
@@ -4563,28 +4775,28 @@ Listview.prototype = {
 			ae(this.noData, ct(this.filtered ? LANG.lvnodata2: LANG.lvnodata))
 		}
 	},
-	getDiv: function (a) {
+	getDiv: function(a) {
 		var b = this.data[a];
 		if (b.__div == null || this.minPatchVersion != b.__minPatch) {
 			this.createDiv(b, a)
 		}
 		return b.__div
 	},
-	createDiv: function (b, a) {
+	createDiv: function(b, a) {
 		var c = ce("div");
 		b.__div = c;
 		if (this.minPatchVersion) {
 			b.__minPatch = this.minPatchVersion
 		} (this.template.compute.bind(this, b, c, a))()
 	},
-	getCell: function (a) {
+	getCell: function(a) {
 		var b = this.data[a];
 		if (b.__div == null) {
 			this.createCell(b, a)
 		}
 		return b.__td
 	},
-	createCell: function (b, a) {
+	createCell: function(b, a) {
 		var c = ce("td");
 		b.__td = c;
 		(this.template.compute.bind(this, b, c, a))();
@@ -4596,14 +4808,64 @@ Listview.prototype = {
 			c.onmouseout = Listview.itemOut
 		}
 	},
-	getRow: function (a) {
+
+	getEvent: function(i) {
+		var row = this.dates[i];
+
+		if (row.__td == null) {
+			this.createEvent(row, i);
+		}
+
+		return row.__td;
+	},
+
+	createEvent: function(row, i) {
+		row.events = array_filter(this.data, function(holiday) {
+			if (holiday.__hidden || holiday.__deleted) {
+				return false;
+			}
+
+			var dates = Listview.funcBox.getEventNextDates(holiday.startDate, holiday.endDate, holiday.rec || 0, row.date);
+			if (dates[0] && dates[1]) {
+				dates[0].setHours(0, 0, 0, 0);
+				dates[1].setHours(0, 0, 0, 0);
+				return dates[0] <= row.date && dates[1] >= row.date;
+			}
+
+			return false;
+		});
+
+		var td = ce('td');
+		row.__td = td;
+
+		if (row.date.getFullYear() == g_serverTime.getFullYear() && row.date.getMonth() == g_serverTime.getMonth() && row.date.getDate() == g_serverTime.getDate()) {
+			td.className = 'calendar-today';
+		}
+
+		var div = ce('div');
+		div.className = 'calendar-date';
+		st(div, row.date.getDate());
+		ae(td, div);
+
+		div = ce('div');
+		div.className = 'calendar-event';
+		ae(td, div);
+
+		(this.template.compute.bind(this, row, div, i))();
+
+		if (this.getItemLink) {
+			td.onclick = this.itemClick.bind(this, row);
+		}
+	},
+
+	getRow: function(a) {
 		var b = this.data[a];
 		if (b.__tr == null) {
 			this.createRow(b)
 		}
 		return b.__tr
 	},
-	setRow: function (a) {
+	setRow: function(a) {
 		if (this.data[a.pos]) {
 			this.data[a.pos] = a;
 			this.data[a.pos].__tr = a.__tr;
@@ -4611,7 +4873,7 @@ Listview.prototype = {
 			this.refreshRows()
 		}
 	},
-	createRow: function (j) {
+	createRow: function(j) {
 		var g = ce("tr");
 		j.__tr = g;
 		if (this.mode == Listview.MODE_CHECKBOX) {
@@ -4667,7 +4929,7 @@ Listview.prototype = {
 			g.onmouseout = Listview.itemOut
 		}
 	},
-	itemClick: function (d, c) {
+	itemClick: function(d, c) {
 		c = $E(c);
 		var a = 0,
 		b = c._target;
@@ -4679,7 +4941,7 @@ Listview.prototype = {
 		}
 		location.href = this.template.getItemLink(d)
 	},
-	submitSearch: function (c) {
+	submitSearch: function(c) {
 		c = $E(c);
 		if (!this.onSearchSubmit || c.keyCode != 13) {
 			return
@@ -4690,21 +4952,26 @@ Listview.prototype = {
 			} (this.onSearchSubmit.bind(this, this.data[b]))()
 		}
 	},
-	validatePage: function () {
-		var c = this.nItemsPerPage,
-		b = this.rowOffset,
-		a = this.nRowsVisible;
+	validatePage: function() {
+		var
+            c = this.nItemsPerPage,
+            b = this.rowOffset,
+            a = this.nRowsVisible;
+
 		if (b < 0) {
 			this.rowOffset = 0
-		} else {
+		}
+		else if(this.mode == Listview.MODE_CALENDAR)
+			this.rowOffset = Math.min(b, this.nDaysPerMonth.length - 1);
+        else {
 			this.rowOffset = this.getRowOffset(b + c > a ? a - 1 : b)
 		}
 	},
-	getRowOffset: function (b) {
+	getRowOffset: function(b) {
 		var a = this.nItemsPerPage;
 		return (a > 0 && b > 0 ? Math.floor(b / a) * a: 0)
 	},
-	resetRowVisibility: function () {
+	resetRowVisibility: function() {
 		for (var b = 0, a = this.data.length; b < a; ++b) {
 			this.data[b].__hidden = false
 		}
@@ -4712,7 +4979,7 @@ Listview.prototype = {
 		this.rowOffset = 0;
 		this.nRowsVisible = this.data.length
 	},
-	getColText: function (b, a) {
+	getColText: function(b, a) {
 		if (a.getVisibleText) {
 			return a.getVisibleText(b)
 		}
@@ -4727,7 +4994,7 @@ Listview.prototype = {
 		}
 		return ""
 	},
-	updateFilters: function (d) {
+	updateFilters: function(d) {
 		Tooltip.hide();
 		this.resetRowVisibility();
 		var z, r, c;
@@ -4757,42 +5024,42 @@ Listview.prototype = {
 			return
 		}
 		var C = {
-			1 : function (i, j) {
+			1 : function(i, j) {
 				return i > j
 			},
-			2 : function (i, j) {
+			2 : function(i, j) {
 				return i == j
 			},
-			3 : function (i, j) {
+			3 : function(i, j) {
 				return i < j
 			},
-			4 : function (i, j) {
+			4 : function(i, j) {
 				return i >= j
 			},
-			5 : function (i, j) {
+			5 : function(i, j) {
 				return i <= j
 			},
-			6 : function (i, k, j) {
+			6 : function(i, k, j) {
 				return k <= i && i <= j
 			}
 		};
 		var q = {
-			1 : function (j, i, k) {
+			1 : function(j, i, k) {
 				return i > k
 			},
-			2 : function (j, i, k) {
+			2 : function(j, i, k) {
 				return j <= k && k <= i
 			},
-			3 : function (j, i, k) {
+			3 : function(j, i, k) {
 				return j < k
 			},
-			4 : function (j, i, k) {
+			4 : function(j, i, k) {
 				return i >= k
 			},
-			5 : function (j, i, k) {
+			5 : function(j, i, k) {
 				return j <= k
 			},
-			6 : function (j, i, E, k) {
+			6 : function(j, i, E, k) {
 				return E <= i && j <= k
 			}
 		};
@@ -4882,7 +5149,7 @@ Listview.prototype = {
 			this.refreshRows()
 		}
 	},
-	changePage: function () {
+	changePage: function() {
 		this.validatePage();
 		this.refreshRows();
 		this.updateNav();
@@ -4893,28 +5160,28 @@ Listview.prototype = {
 			scrollTo(a.x, b[1])
 		}
 	},
-	firstPage: function () {
+	firstPage: function() {
 		this.rowOffset = 0;
 		this.changePage();
 		return false
 	},
-	previousPage: function () {
+	previousPage: function() {
 		this.rowOffset -= this.nItemsPerPage;
 		this.changePage();
 		return false
 	},
-	nextPage: function () {
+	nextPage: function() {
 		this.rowOffset += this.nItemsPerPage;
 		this.changePage();
 		return false
 	},
-	lastPage: function () {
+	lastPage: function() {
 		this.rowOffset = 99999999;
 		this.changePage();
 		return false
 	},
-	addSort: function (a, c) {
-		var b = in_array(a, Math.abs(c), function (d) {
+	addSort: function(a, c) {
+		var b = in_array(a, Math.abs(c), function(d) {
 			return Math.abs(d)
 		});
 		if (b != -1) {
@@ -4923,7 +5190,7 @@ Listview.prototype = {
 		}
 		a.splice(0, 0, c)
 	},
-	sortBy: function (a) {
+	sortBy: function(a) {
 		if (a <= 0 || a > this.columns.length) {
 			return
 		}
@@ -4941,20 +5208,20 @@ Listview.prototype = {
 		this.updateSortArrow();
 		this.updatePound()
 	},
-	applySort: function () {
+	applySort: function() {
 		if (this.sort.length == 0) {
 			return
 		}
 		Listview.sort = this.sort;
 		Listview.columns = this.columns;
 		if (this.indexCreated) {
-			this.data.sort(Listview.sortIndexedRows)
+			this.data.sort(Listview.sortIndexedRows.bind(this))
 		} else {
-			this.data.sort(Listview.sortRows)
+			this.data.sort(Listview.sortRows.bind(this))
 		}
 		this.updateSortIndex()
 	},
-	setSort: function (b, c, a) {
+	setSort: function(b, c, a) {
 		if (this.sort.toString() != b.toString()) {
 			this.sort = b;
 			this.applySort();
@@ -4966,7 +5233,7 @@ Listview.prototype = {
 			}
 		}
 	},
-	readPound: function () {
+	readPound: function() {
 		if (!this.poundable || !location.hash.length) {
 			return false
 		}
@@ -5002,8 +5269,8 @@ Listview.prototype = {
 			}
 		}
 	},
-	updateSortArrow: function () {
-		if (!this.sort.length || !this.thead || this.mode == Listview.MODE_TILED) {
+	updateSortArrow: function() {
+		if (!this.sort.length || !this.thead || this.mode == Listview.MODE_TILED || this.mode == Listview.MODE_CALENDAR) {
 			return
 		}
 		var a = in_array(this.visibility, Math.abs(this.sort[0]) - 1);
@@ -5020,19 +5287,19 @@ Listview.prototype = {
 		b.className = (this.sort[0] < 0 ? "sortdesc": "sortasc");
 		this.lsa = b
 	},
-	updateSortIndex: function () {
+	updateSortIndex: function() {
 		var b = this.data;
 		for (var c = 0, a = b.length; c < a; ++c) {
 			b[c].__si = c
 		}
 		this.indexCreated = true
 	},
-	updateTabName: function () {
+	updateTabName: function() {
 		if (this.tabs && this.tabIndex != null) {
 			this.tabs.setTabName(this.tabIndex, this.getTabName())
 		}
 	},
-	updatePound: function () {
+	updatePound: function() {
 		if (!this.poundable) {
 			return
 		}
@@ -5044,7 +5311,7 @@ Listview.prototype = {
 			location.replace("#" + a)
 		}
 	},
-	updateNav: function () {
+	updateNav: function() {
 		var e = [this.navTop, this.navBot],
 		j = this.nItemsPerPage,
 		h = this.rowOffset,
@@ -5052,7 +5319,9 @@ Listview.prototype = {
 		g = 0,
 		b = 0,
 		f = 0,
-		k = 0;
+		k = 0
+        date = new Date();
+
 		if (d > 0) {
 			if (! (this.hideNav & 1)) {
 				e[0].style.display = ""
@@ -5063,20 +5332,42 @@ Listview.prototype = {
 		} else {
 			e[0].style.display = e[1].style.display = "none"
 		}
-		if (j) {
-			if (h > 0) {
-				b = 1;
-				if (h >= j + j) {
-					g = 1
+
+		if (this.mode == Listview.MODE_CALENDAR) {
+			for (var i = 0; i < this.nDaysPerMonth.length; ++i) {
+				if (i == h)  { // Selected month
+					if (i > 0)
+						b = 1;
+					if (i > 1)
+						g = 1;
+					if (i < this.nDaysPerMonth.length - 1)
+						f = 1;
+					if (i < this.nDaysPerMonth.length - 2)
+						k = 1;
 				}
 			}
-			if (h + j < d) {
-				f = 1;
-				if (h + j + j < d) {
-					k = 1
-				}
-			}
+
+			date.setTime(this.startOnMonth.valueOf());
+			date.setMonth(date.getMonth() + h);
 		}
+		else
+		{
+            if (j) {
+                if (h > 0) {
+                    b = 1;
+                    if (h >= j + j) {
+                        g = 1
+                    }
+                }
+                if (h + j < d) {
+                    f = 1;
+                    if (h + j + j < d) {
+                        k = 1
+                    }
+                }
+            }
+		}
+
 		for (var c = 0; c < 2; ++c) {
 			var a = e[c].childNodes;
 			a[0].style.display = (g ? "": "none");
@@ -5084,12 +5375,17 @@ Listview.prototype = {
 			a[3].style.display = (f ? "": "none");
 			a[4].style.display = (k ? "": "none");
 			a = a[2].childNodes;
-			a[0].firstChild.nodeValue = h + 1;
-			a[2].firstChild.nodeValue = j ? Math.min(h + j, d) : d;
-			a[4].firstChild.nodeValue = d
+
+			if (this.mode == Listview.MODE_CALENDAR)
+				a[0].firstChild.nodeValue = LANG.date_months[date.getMonth()] + ' ' + date.getFullYear();
+			else {
+                a[0].firstChild.nodeValue = h + 1;
+                a[2].firstChild.nodeValue = j ? Math.min(h + j, d) : d;
+                a[4].firstChild.nodeValue = d;
+            }
 		}
 	},
-	getTabName: function () {
+	getTabName: function() {
 		var b = this.name,
 		d = this.data.length;
 		for (var c = 0, a = this.data.length; c < a; ++c) {
@@ -5101,7 +5397,7 @@ Listview.prototype = {
 		}
 		return b
 	},
-	getTabPound: function () {
+	getTabPound: function() {
 		var a = "";
 		a += this.rowOffset;
 		if (this.poundable != 2 && this.sort.length) {
@@ -5109,7 +5405,7 @@ Listview.prototype = {
 		}
 		return a
 	},
-	getCheckedRows: function () {
+	getCheckedRows: function() {
 		var d = [];
 		for (var c = 0, a = this.data.length; c < a; ++c) {
 			var b = this.data[c];
@@ -5119,7 +5415,7 @@ Listview.prototype = {
 		}
 		return d
 	},
-	deleteRows: function (c) {
+	deleteRows: function(c) {
 		if (!c || !c.length) {
 			return
 		}
@@ -5138,7 +5434,7 @@ Listview.prototype = {
 			this.updateNav()
 		}
 	},
-	setData: function (a) {
+	setData: function(a) {
 		this.data = a;
 		this.indexCreated = false;
 		this.resetRowVisibility();
@@ -5158,19 +5454,19 @@ Listview.prototype = {
 		this.updateNav();
 		this.refreshRows()
 	},
-	getClipDiv: function () {
+	getClipDiv: function() {
 		return this.clipDiv
 	},
-	getNoteTopDiv: function () {
+	getNoteTopDiv: function() {
 		return this.noteTop
 	},
-	focusSearch: function () {
+	focusSearch: function() {
 		this.quickSearchBox.focus()
 	},
-	clearSearch: function () {
+	clearSearch: function() {
 		this.quickSearchBox.value = ""
 	},
-	getList: function () {
+	getList: function() {
 		if (!this.debug) {
 			return
 		}
@@ -5183,12 +5479,14 @@ Listview.prototype = {
 		prompt("", b)
 	}
 };
-Listview.sortRows = function (e, d) {
+Listview.sortRows = function(e, d) {
 	var j = Listview.sort,
 	k = Listview.columns;
 	for (var h = 0, c = j.length; h < c; ++h) {
 		var g, f = k[Math.abs(j[h]) - 1];
-		if (f.sortFunc) {
+        if (!f)
+			f = this.template;
+        if (f.sortFunc) {
 			g = f.sortFunc(e, d, j[h])
 		} else {
 			g = strcmp(e[f.value], d[f.value])
@@ -5199,7 +5497,7 @@ Listview.sortRows = function (e, d) {
 	}
 	return 0
 },
-Listview.sortIndexedRows = function (d, c) {
+Listview.sortIndexedRows = function(d, c) {
 	var g = Listview.sort,
 	h = Listview.columns,
 	e = h[Math.abs(g[0]) - 1],
@@ -5214,7 +5512,7 @@ Listview.sortIndexedRows = function (d, c) {
 	}
 	return (d.__si - c.__si)
 },
-Listview.cbSelect = function (b) {
+Listview.cbSelect = function(b) {
 	for (var d = 0, a = this.data.length; d < a; ++d) {
 		var c = this.data[d];
 		var f = b;
@@ -5240,15 +5538,15 @@ Listview.cbSelect = function (b) {
 		c.__chk = f
 	}
 };
-Listview.cbClick = function (a) {
+Listview.cbClick = function(a) {
 	setTimeout(Listview.cbUpdate.bind(0, 0, this, this.parentNode.parentNode), 1);
 	sp(a)
 };
-Listview.cbCellClick = function (a) {
+Listview.cbCellClick = function(a) {
 	setTimeout(Listview.cbUpdate.bind(0, 1, this.firstChild, this.parentNode), 1);
 	sp(a)
 };
-Listview.cbIeFix = function () {
+Listview.cbIeFix = function() {
 	var d = gE(this.tbody, "tr");
 	for (var c = 0, a = d.length; c < a; ++c) {
 		var b = d[c].firstChild.firstChild;
@@ -5257,7 +5555,7 @@ Listview.cbIeFix = function () {
 		}
 	}
 };
-Listview.cbUpdate = function (c, a, b) {
+Listview.cbUpdate = function(c, a, b) {
 	if (c) {
 		a.checked = !a.checked
 	}
@@ -5268,13 +5566,13 @@ Listview.cbUpdate = function (c, a, b) {
 		}
 	}
 };
-Listview.itemOver = function () {
+Listview.itemOver = function() {
 	this.style.backgroundColor = (this.className == "checked" ? "#2C2C2C": "#202020")
 };
-Listview.itemOut = function () {
+Listview.itemOut = function() {
 	this.style.backgroundColor = (this.className == "checked" ? "#242424": "transparent")
 };
-Listview.headerClick = function (a, b, c) {
+Listview.headerClick = function(a, b, c) {
 	c = $E(c);
 	if (c._button == 3 || c.shiftKey || c.ctrlKey) {
 		Tooltip.hide();
@@ -5284,7 +5582,7 @@ Listview.headerClick = function (a, b, c) {
 	}
 	return false
 };
-Listview.headerFilter = function (c, f) {
+Listview.headerFilter = function(c, f) {
 	var j = "";
 	if (c.__filter) {
 		if (c.__filter.invert) {
@@ -5401,7 +5699,7 @@ Listview.headerFilter = function (c, f) {
 		}
 	}
 };
-Listview.headerOver = function (b, c, f) {
+Listview.headerOver = function(b, c, f) {
 	var d = "";
 	d += '<b class="q1">' + (c.tooltip ? c.tooltip: c.name) + "</b>";
 	if (c.__filter) {
@@ -5419,7 +5717,7 @@ Listview.extraCols = {
         name: 'ID',
         width: '5%',
         value: 'id',
-        compute: function (data, td) {
+        compute: function(data, td) {
             if (data.id) {
                 ae(td, ct(data.id));
             }
@@ -5458,13 +5756,13 @@ Listview.extraCols = {
     cost: {
         id: 'cost',
         name: LANG.cost,
-        getValue: function (row) {
+        getValue: function(row) {
             if (row.cost) {
                 return (row.cost[3] && row.cost[3][0] ? row.cost[3][0][1] : 0) || (row.cost[2] || row.cost[1] || row.cost[0])
     // 5.0      return (row.cost[2] && row.cost[2][0] ? row.cost[2][0][1] : 0) || (row.cost[1] && row.cost[1][0] ? row.cost[1][0][1] : 0) || row.cost[0];
             }
         },
-        compute: function (row, td) {
+        compute: function(row, td) {
             if (row.cost) {
                 var money = row.cost[0];
                 var side = null;
@@ -5489,7 +5787,7 @@ Listview.extraCols = {
 
             }
         },
-        sortFunc: function (a, b, col) {
+        sortFunc: function(a, b, col) {
             if (a.cost == null) {
                 return -1;
             }
@@ -5504,22 +5802,22 @@ Listview.extraCols = {
                 lend = 0;
 
             if (a.cost[2] != null) {
-                array_walk(a.cost[2], function (x, _, __, i) {
+                array_walk(a.cost[2], function(x, _, __, i) {
                     lena += Math.pow(10, i) + x[1];
                 });
             }
             if (b.cost[2] != null) {
-                array_walk(b.cost[2], function (x, _, __, i) {
+                array_walk(b.cost[2], function(x, _, __, i) {
                     lenb += Math.pow(10, i) + x[1];
                 });
             }
             if (a.cost[1] != null) {
-                array_walk(a.cost[1], function (x, _, __, i) {
+                array_walk(a.cost[1], function(x, _, __, i) {
                     lenc += Math.pow(10, i) + x[1];
                 });
             }
             if (b.cost[1] != null) {
-                array_walk(b.cost[1], function (x, _, __, i) {
+                array_walk(b.cost[1], function(x, _, __, i) {
                     lend += Math.pow(10, i) + x[1];
                 });
             }
@@ -5532,7 +5830,7 @@ Listview.extraCols = {
         id: 'count',
         name: LANG.count,
         value: 'count',
-        compute: function (row, td) {
+        compute: function(row, td) {
             if (!(this._totalCount > 0 || row.outof > 0)) {
                 return;
             }
@@ -5545,7 +5843,7 @@ Listview.extraCols = {
             }
             return row.count;
         },
-        getVisibleText: function (row) {
+        getVisibleText: function(row) {
             var buff = row.count;
             if (row.outof) {
                 buff += ' ' + row.outof;
@@ -5553,7 +5851,7 @@ Listview.extraCols = {
 
             return buff;
         },
-        sortFunc: function (a, b, col) {
+        sortFunc: function(a, b, col) {
             if (a.count == null) {
                 return -1;
             }
@@ -5569,7 +5867,7 @@ Listview.extraCols = {
         id: 'percent',
         name: '%',
         value: 'percent',
-        compute: function (row, td) {
+        compute: function(row, td) {
             if (row.count <= 0) {
                 return '??';
             }
@@ -5610,7 +5908,7 @@ Listview.extraCols = {
                 return value;
             }
         },
-        getVisibleText: function (row) {
+        getVisibleText: function(row) {
             if (row.count <= 0) {
                 return '??';
             }
@@ -5625,7 +5923,7 @@ Listview.extraCols = {
                 return parseFloat(row.percent.toFixed(2));
             }
         },
-        sortFunc: function (a, b, col) {
+        sortFunc: function(a, b, col) {
             if (a.count == null) {
                 return -1;
             }
@@ -5662,7 +5960,7 @@ Listview.extraCols = {
         name: LANG.stock,
         width: '10%',
         value: 'stock',
-        compute: function (row, td) {
+        compute: function(row, td) {
             if (row.stock > 0) {
                 return row.stock;
             }
@@ -5671,7 +5969,7 @@ Listview.extraCols = {
                 return String.fromCharCode(8734);
             }
         },
-        getVisibleText: function (row) {
+        getVisibleText: function(row) {
             if (row.stock > 0) {
                 return row.stock;
             }
@@ -5684,12 +5982,12 @@ Listview.extraCols = {
     currency: {
         id: 'currency',
         name: LANG.currency,
-        getValue: function (row) {
+        getValue: function(row) {
             if (row.currency) {
                 return (row.currency[0] ? row.currency[0][1] : 0);
             }
         },
-        compute: function (row, td) {
+        compute: function(row, td) {
             if (row.currency) {
                 var side = null;
                 if (row.side != null) {
@@ -5707,7 +6005,7 @@ Listview.extraCols = {
                 Listview.funcBox.appendMoney(td, null, side, null, row.currency);
             }
         },
-        sortFunc: function (a, b, col) {
+        sortFunc: function(a, b, col) {
             if (a.currency == null) {
                 return -1;
             }
@@ -5719,10 +6017,10 @@ Listview.extraCols = {
                 lena = 0,
                 lenb = 0;
 
-            array_walk(a.currency, function (x, _, __, i) {
+            array_walk(a.currency, function(x, _, __, i) {
                 lena += Math.pow(10, i) + x[1];
             });
-            array_walk(b.currency, function (x, _, __, i) {
+            array_walk(b.currency, function(x, _, __, i) {
                 lenb += Math.pow(10, i) + x[1];
             });
 
@@ -5735,7 +6033,7 @@ Listview.extraCols = {
         name: 'Mode',
         after: 'name',
         type: 'text',
-        compute: function (row, td) {
+        compute: function(row, td) {
             if (row.modes && row.modes.mode) {
                 if ((row.modes.mode & 120) == 120 || (row.modes.mode & 3) == 3) {
                     return LANG.pr_note_all;
@@ -5744,7 +6042,7 @@ Listview.extraCols = {
                 return Listview.extraCols.mode.getVisibleText(row);
             }
         },
-        getVisibleText: function (row) {
+        getVisibleText: function(row) {
             // TODO: Remove magic numbers.
             var modeNormal = !!(row.modes.mode & 26);
             var modeHeroic = !!(row.modes.mode & 97);
@@ -5782,7 +6080,7 @@ Listview.extraCols = {
 
             return LANG.pr_note_all;
         },
-        sortFunc: function (a, b, col) {
+        sortFunc: function(a, b, col) {
             if (a.modes && b.modes) {
                 return -strcmp(a.modes.mode, b.modes.mode);
             }
@@ -5793,7 +6091,7 @@ Listview.extraCols = {
         id: 'requires',
         name: LANG.requires,
         type: 'text',
-        compute: function (item, td) {
+        compute: function(item, td) {
             if (item.achievement && g_achievements[item.achievement]) {
                 nw(td);
                 td.className = 'small';
@@ -5809,12 +6107,12 @@ Listview.extraCols = {
                 ae(td, a);
             }
         },
-        getVisibleText: function (item) {
+        getVisibleText: function(item) {
             if (item.achievement && g_achievements[item.achievement]) {
                 return g_achievements[item.achievement].name;
             }
         },
-        sortFunc: function (a, b, col) {
+        sortFunc: function(a, b, col) {
             return strcmp(this.getVisibleText(a), this.getVisibleText(b));
         }
     },
@@ -5834,7 +6132,7 @@ Listview.extraCols = {
         align: 'left',
         span: 2,
         value: 'name',
-        compute: function (row, td, tr) {
+        compute: function(row, td, tr) {
             if (row.yield && g_items[row.yield]) {
                 var i = ce('td');
                 i.style.width = '1px';
@@ -5856,12 +6154,12 @@ Listview.extraCols = {
                 ae(td, wrapper);
             }
         },
-        getVisibleText: function (row) {
+        getVisibleText: function(row) {
             if (row.yield && g_items[row.yield]) {
                 return g_items[row.yield]['name_' + g_locale.name];
             }
         },
-        sortFunc: function (a, b, col) {
+        sortFunc: function(a, b, col) {
             if (!a.yield || !g_items[a.yield] || !b.yield || !g_items[b.yield]) {
                 return (a.yield && g_items[a.yield] ? 1 : (b.yield && g_items[b.yield] ? -1 : 0));
             }
@@ -5870,47 +6168,57 @@ Listview.extraCols = {
         }
     }
 };
+
 Listview.funcBox = {
-    assocBinFlags: function (f, arr) {
+    assocBinFlags: function(f, arr) {
         var res = [];
         for (var i in arr) {
             if (!isNaN(i) && (f & 1 << i - 1)) {
                 res.push(i);
             }
         }
-        res.sort(function (a, b) {
+        res.sort(function(a, b) {
             return strcmp(arr[a], arr[b]);
         });
 
         return res;
     },
-	createSimpleCol: function (c, d, a, b) {
+
+	createSimpleCol: function(i, n, w, v) {
 		return {
-			id: c,
-			name: (LANG[d] !== undefined ? LANG[d] : d),
-			width: a,
-			value: b
-		}
+			id:    i,
+			name:  (LANG[n] !== undefined ? LANG[n] : n),
+			width: w,
+			value: v
+		};
 	},
-	initLootTable: function (b) {
-		var a;
+
+	initLootTable: function(row) {
+		var divider;
+
 		if (this._totalCount != null) {
-			a = this._totalCount
-		} else {
-			a = b.outof
+			divider = this._totalCount;
 		}
-		if (a == 0) {
-			if (b.count != -1) {
-				b.percent = b.count
-			} else {
-				b.percent = 0
+        else {
+			divider = row.outof;
+		}
+
+		if (divider == 0) {
+			if (row.count != -1) {
+				row.percent = row.count;
 			}
-		} else {
-			b.percent = b.count / a * 100
+            else {
+				row.percent = 0;
+			}
 		}
-        (Listview.funcBox.initModeFilter.bind(this, b))()
+        else {
+			row.percent = row.count / divider * 100;
+		}
+
+        (Listview.funcBox.initModeFilter.bind(this, row))();
 	},
-    assocArrCmp: function (a, b, arr) {
+
+    assocArrCmp: function(a, b, arr) {
         if (a == null) {
             return -1;
         }
@@ -5935,37 +6243,42 @@ Listview.funcBox = {
 
         return 0
     },
-	location: function (f, g) {
-		if (f.location == null) {
-			return -1
+
+	location: function(row, td) {
+		if (row.location == null) {
+			return -1;
 		}
-		for (var d = 0, b = f.location.length; d < b; ++d) {
-			if (d > 0) {
-				ae(g, ct(LANG.comma))
+
+		for (var i = 0, len = row.location.length; i < len; ++i) {
+			if (i > 0) {
+				ae(td, ct(LANG.comma));
 			}
-			var e = f.location[d];
-			if (e == -1) {
-				ae(g, ct(LANG.ellipsis))
-			} else {
-				var c = ce("a");
-				c.className = "q1";
-				c.href = "?zone=" + e;
-				ae(c, ct(g_zones[e]));
-				ae(g, c)
+
+			var zoneId = row.location[i];
+			if (zoneId == -1) {
+				ae(td, ct(LANG.ellipsis));
+			}
+            else {
+				var a = ce('a');
+				a.className = 'q1';
+				a.href = '?zone=' + zoneId;
+				ae(a, ct(g_zones[zoneId]));
+				ae(td, a);
 			}
 		}
 	},
-    arrayText: function (arr, lookup) {
+
+    arrayText: function(arr, lookup) {
         if (arr == null) {
             return;
         }
         else if (!is_array(arr)) {
             return lookup[arr];
         }
-        var buff = "";
+        var buff = '';
         for (var i = 0, len = arr.length; i < len; ++i) {
             if (i > 0) {
-                buff += " ";
+                buff += ' ';
             }
             if (!lookup[arr[i]]) {
                 continue;
@@ -5974,7 +6287,8 @@ Listview.funcBox = {
         }
         return buff;
     },
-    createCenteredIcons: function (arr, td, text, type) {
+
+    createCenteredIcons: function(arr, td, text, type) {
         if (arr != null) {
             var
                 d = ce('div'),
@@ -6086,65 +6400,82 @@ Listview.funcBox = {
             return true;
         }
     },
-    createSocketedIcons: function (b, e, c, g, o) {
-		var m = 0,
-		k = ce("div"),
-		a = ce("div");
-		for (var f = 0, h = b.length; f < h; ++f) {
-			var l, j = c[f];
-				if (g_items && g_items[j]) {
-					l = g_items.createIcon(j, 0)
-				} else {
-				if (isset("g_gems") && g_gems && g_gems[j]) {
-					l = Icon.create(g_gems[j].icon, 0, null, "?item=" + j)
-                } else {
-                    l = Icon.create(null, 0, null, "javascript:;")
+
+    createSocketedIcons: function(sockets, td, gems, match, text) {
+		var
+            nMatch = 0,
+            d      = ce('div'),
+            d2     = ce('div');
+
+        for (var i = 0, len = sockets.length; i < len; ++i) {
+			var
+                icon,
+                gemId = gems[i];
+
+				if (g_items && g_items[gemId]) {
+					icon = g_items.createIcon(gemId, 0);
 				}
+                else if (isset('g_gems') && g_gems && g_gems[gemId]) {
+					icon = Icon.create(g_gems[gemId].icon, 0, null, '?item=' + gemId);
+                }
+                else {
+                    icon = Icon.create(null, 0, null, 'javascript:;');
+				}
+
+            icon.className += ' iconsmall-socket-' + g_file_gems[sockets[i]] + (!gems || !gemId ? '-empty': '');
+			icon.style.cssFloat = icon.style.styleFloat = 'left';
+
+			if (match && match[i]) {
+				icon.insertBefore(ce('var'), icon.childNodes[1]);
+                ++nMatch;
 			}
-			l.className += " iconsmall-socket-" + g_file_gems[b[f]] + (!c || !j ? "-empty": "");
-			l.style.cssFloat = l.style.styleFloat = "left";
-			if (g && g[f]) {
-				l.insertBefore(ce("var"), l.childNodes[1]); ++m
-			}
-			ae(k, l)
+
+			ae(d, icon);
 		}
-		k.style.margin = "0 auto";
-		k.style.textAlign = "left";
-		k.style.width = (26 * b.length) + "px";
-		a.className = "clear";
-		ae(e, k);
-		ae(e, a);
-		if (o && m == b.length) {
-			k = ce("div");
-			k.style.paddingTop = "4px";
-			ae(k, ct(o));
-			ae(e, k)
+
+		d.style.margin = '0 auto';
+		d.style.textAlign = 'left';
+
+		d.style.width = (26 * sockets.length) + 'px';
+		d2.className = 'clear';
+
+		ae(td, d);
+		ae(td, d2);
+
+		if (text && nMatch == sockets.length) {
+			d = ce('div');
+			d.style.paddingTop = '4px';
+			ae(d, ct(text));
+			ae(td, d);
 		}
 	},
-    getItemType: function (itemClass, itemSubclass, itemSubsubclass) {
+
+    getItemType: function(itemClass, itemSubclass, itemSubsubclass) {
         if (itemSubsubclass != null && g_item_subsubclasses[itemClass] != null && g_item_subsubclasses[itemClass][itemSubclass] != null) {
             return {
-                url: "?items=" + itemClass + "." + itemSubclass + "." + itemSubsubclass,
+                url: '?items=' + itemClass + '.' + itemSubclass + '.' + itemSubsubclass,
                 text: g_item_subsubclasses[itemClass][itemSubclass][itemSubsubclass]
             };
         }
         else if (itemSubclass != null &&g_item_subclasses[itemClass] != null) {
             return {
-                url: "?items=" + itemClass + "." + itemSubclass,
+                url: '?items=' + itemClass + '.' + itemSubclass,
                 text: g_item_subclasses[itemClass][itemSubclass]
             };
         }
         else {
             return {
-                url: "?items=" + itemClass,
+                url: '?items=' + itemClass,
                 text: g_item_classes[itemClass]
             };
         }
     },
-    getQuestCategory: function (category) {
+
+    getQuestCategory: function(category) {
         return g_quest_sorts[category];
     },
-	getQuestReputation: function (d, b) {
+
+	getQuestReputation: function(d, b) {
 		if (b.reprewards) {
 			for (var c = 0, a = b.reprewards.length; c < a; ++c) {
 				if (b.reprewards[c][0] == d) {
@@ -6153,50 +6484,59 @@ Listview.funcBox = {
 			}
 		}
 	},
-	getEventNextDates: function (e, a, j, f) {
-		if (typeof e != "string" || typeof a != "string") {
-			return [null, null]
+
+	getEventNextDates: function(startDate, endDate, recurrence, fromWhen) {
+		if (typeof startDate != 'string' || typeof endDate != 'string') {
+			return [null, null];
 		}
-		e = new Date(e.replace(/-/g, "/"));
-		a = new Date(a.replace(/-/g, "/"));
-		if (isNaN(e.getTime()) || isNaN(a.getTime())) {
-			return [null, null]
+
+		startDate = new Date(startDate.replace(/-/g, '/'));
+		endDate   = new Date(endDate.replace(/-/g, '/'));
+
+		if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+			return [null, null];
 		}
-		if (f == null) {
-			f = g_serverTime
+
+		if (fromWhen == null) {
+			fromWhen = g_serverTime;
 		}
-		var b = 0;
-		if (j == -1) {
-			var k = new Date(f.getFullYear(), f.getMonth(), 1, e.getHours(), e.getMinutes(), e.getSeconds());
-			for (var c = 0; c < 2; ++c) {
-				k.setDate(1);
-				k.setMonth(k.getMonth() + c);
-				var h = k.getDay();
-				var g = 1;
-				if (k.getYear() == 2009) {
-					g = 0
+
+		var offset = 0;
+		if (recurrence == -1) { // Once by month using day of the week of startDate
+			var nextEvent = new Date(fromWhen.getFullYear(), fromWhen.getMonth(), 1, startDate.getHours(), startDate.getMinutes(), startDate.getSeconds()); // counts as next until it ends
+			for (var i = 0; i < 2; ++i) {
+				nextEvent.setDate(1);
+				nextEvent.setMonth(nextEvent.getMonth() + i); // + 0 = try current month, else try next month
+				var day = nextEvent.getDay();
+				var tolerance = 1;
+				if (nextEvent.getYear() == 2009) {
+					tolerance = 0;
 				}
-				if (h > g) {
-					k.setDate(k.getDate() + (7 - h))
+				if (day > tolerance) {
+					nextEvent.setDate(nextEvent.getDate() + (7 - day)); // first sunday
 				}
-				var d = new Date(k);
-				d.setDate(d.getDate() + (7 - g));
-				if (f.getTime() < d.getTime()) {
-					break
+
+				var eventEnd = new Date(nextEvent);
+				eventEnd.setDate(eventEnd.getDate() + (7 - tolerance)); // 2010, length of 6. tolerance is 1 if it isnt 2009
+				if (fromWhen.getTime() < eventEnd.getTime()) {
+					break; // event hasnt ended yet, so this is still the current one
 				}
 			}
-			b = k.getTime() - e.getTime()
-		} else {
-			if (j > 0) {
-				j *= 1000;
-				b = Math.ceil((f.getTime() - a.getTime()) / j) * j
-			}
+
+			offset = nextEvent.getTime() - startDate.getTime();
 		}
-		e.setTime(e.getTime() + b);
-		a.setTime(a.getTime() + b);
-		return [e, a]
+        else if (recurrence > 0) {
+            recurrence *= 1000; // sec -> ms
+            offset = Math.ceil((fromWhen.getTime() - endDate.getTime()) / recurrence) * recurrence;
+        }
+
+		startDate.setTime(startDate.getTime() + offset);
+		endDate.setTime(endDate.getTime() + offset);
+
+		return [startDate, endDate];
 	},
-    getFactionCategory: function (category, category2) {
+
+    getFactionCategory: function(category, category2) {
         if (category) {
             return g_faction_categories[category];
         }
@@ -6204,21 +6544,23 @@ Listview.funcBox = {
             return g_faction_categories[category2];
         }
     },
-    createTextRange: function (min, max) {
+
+    createTextRange: function(min, max) {
         min |= 0;
         max |= 0;
         if (min > 1 || max > 1) {
             if (min != max && max > 0) {
-                return min + "-" + max;
+                return min + '-' + max;
             }
             else {
-                return min + "";
+                return min + '';
             }
         }
 
         return null;
     },
-	coReport: function (d, b, f) {
+
+	coReport: function(d, b, f) {
 		if (!g_user.id || !g_report_reasons[f]) {
 			return
 		}
@@ -6247,7 +6589,7 @@ Listview.funcBox = {
 			this.parentNode.replaceChild(c, this)
 		}
 	},
-	coReportClick: function (b, a, c) {
+	coReportClick: function(b, a, c) {
 		this.menu = [
             [2, g_report_reasons[2], Listview.funcBox.coReport.bind(this, a, b.id, 2)],
             [1, g_report_reasons[1], Listview.funcBox.coReport.bind(this, a, b.id, 1)],
@@ -6261,7 +6603,7 @@ Listview.funcBox = {
 			this.menu.push([5, g_report_reasons[5], Listview.funcBox.coReport.bind(this, 2, g_users[b.user].avatarmore, 5)])
 		} (Menu.showAtCursor.bind(this, c))()
 	},
-	coGetColor: function (c, a, d) {
+	coGetColor: function(c, a, d) {
 		switch (a) {
 		case -1 :
             var b = null;
@@ -6302,7 +6644,7 @@ Listview.funcBox = {
 		}
 		return ""
 	},
-	coToggleVis: function (b) {
+	coToggleVis: function(b) {
         var c = g_toggleDisplay(b.divBody);
 		this.firstChild.nodeValue = (c ? LANG.lvcomment_hide: LANG.lvcomment_show);
 		b.__div.className = trim(b.__div.className.replace("comment-collapsed", "")) + (c ? "": " comment-collapsed");
@@ -6322,7 +6664,7 @@ Listview.funcBox = {
 			g_toggleDisplay(b.divLastEdit)
 		}
 	},
-	coDisplayRating: function (d, c) {
+	coDisplayRating: function(d, c) {
 		if (typeof(d._ratingMode) == "undefined") {
 			d._ratingMode = 0
 		}
@@ -6345,7 +6687,7 @@ Listview.funcBox = {
 			} else {
 				new Ajax("?comment=rating&id=" + d.id, {
 					method: "get",
-					onSuccess: function (i, g) {
+					onSuccess: function(i, g) {
                         var f = JSON.parse(g.responseText);
 						if (f.success) {
 							Listview._ratings[i] = f;
@@ -6359,7 +6701,7 @@ Listview.funcBox = {
 			}
 		}
 	},
-	coToggleRating: function (b, a) {
+	coToggleRating: function(b, a) {
 		if (typeof(b._ratingMode) == "undefined") {
 			b._ratingMode = 0
 		}
@@ -6368,7 +6710,7 @@ Listview.funcBox = {
 		}
 		Listview.funcBox.coDisplayRating(b, a)
 	},
-	coRate: function (e, a) {
+	coRate: function(e, a) {
 		if (a == 0) {
 			var c = 5;
 			if (g_user.roles & U_GROUP_ADMIN) {
@@ -6406,7 +6748,7 @@ Listview.funcBox = {
 		de(b.nextSibling);
 		new Ajax("?comment=rate&id=" + e.id + "&rating=" + a, {
 			method: "get",
-			onSuccess: function (e) {
+			onSuccess: function(e) {
                 if (e.responseText == "0") {} else {
                     if (e.responseText == "1") {
                         b.innerHTML = LANG.tooltip_banned_rating;
@@ -6421,7 +6763,7 @@ Listview.funcBox = {
 			}
         });
 	},
-	coDelete: function (a) {
+	coDelete: function(a) {
 		if (a.purged) {
 			alert(LANG.message_cantdeletecomment)
 		} else {
@@ -6431,7 +6773,7 @@ Listview.funcBox = {
 			}
 		}
 	},
-	coDetach: function (a) {
+	coDetach: function(a) {
 		if (a.replyTo == 0) {
 			alert(LANG.message_cantdetachcomment)
 		} else {
@@ -6442,7 +6784,7 @@ Listview.funcBox = {
 			}
 		}
 	},
-	coEdit: function (g, e, c) {
+	coEdit: function(g, e, c) {
 		if (!c) {
 			g.divBody.style.display = "none";
 			g.divResponse.style.display = "none";
@@ -6483,7 +6825,7 @@ Listview.funcBox = {
         ae(g.divBody.parentNode, f)
 		a.focus()
 	},
-	coEditAppend: function (m, b, l, X, x) {
+	coEditAppend: function(m, b, l, X, x) {
 		var f = Listview.funcBox.coGetCharLimit(l);
 		if (l == 1 || l == 3 || l == 4) {
 			b.user = g_user.name;
@@ -6566,7 +6908,7 @@ Listview.funcBox = {
 			ae(y, ct(LANG.compose_livepreview));
 			ae(d, y);
 			y.href = "javascript:;";
-			y.onclick = function () {
+			y.onclick = function() {
 				c(1);
 				y.className = "disclosure-" + (g_toggleDisplay(v) ? "on": "off")
 			};
@@ -6577,7 +6919,7 @@ Listview.funcBox = {
 			ae(a, v);
 			ae(a, u);
 			g_onAfterTyping(g, c, 50);
-			aE(g, "focus", function () {
+			aE(g, "focus", function() {
 				c();
 				a.style.display = "";
 				if (l != 4) {
@@ -6586,7 +6928,7 @@ Listview.funcBox = {
 			})
 		} else {
 			if (l != 4) {
-				aE(g, "focus", function () {
+				aE(g, "focus", function() {
 					g.style.height = "22em"
 				})
 			}
@@ -6624,7 +6966,7 @@ Listview.funcBox = {
 		{
 			id: "url",
 			title: LANG.markup_url,
-			onclick: function () {
+			onclick: function() {
 				var i = prompt(LANG.prompt_linkurl, "http://");
 				if (i) {
 					g_insertTag(g, "[url=" + i + "]", "[/url]")
@@ -6648,7 +6990,7 @@ Listview.funcBox = {
 			title: LANG.markup_ul,
 			pre: "[ul]\n[li]",
 			post: "[/li]\n[/ul]",
-			rep: function (i) {
+			rep: function(i) {
 				return i.replace(/\n/g, "[/li]\n[li]")
 			}
 		},
@@ -6657,7 +6999,7 @@ Listview.funcBox = {
 			title: LANG.markup_ol,
 			pre: "[ol]\n[li]",
 			post: "[/li]\n[/ol]",
-			rep: function (i) {
+			rep: function(i) {
 				return i.replace(/\n/g, "[/li]\n[li]")
 			}
 		},
@@ -6699,7 +7041,7 @@ Listview.funcBox = {
 				}
 				var H = "tb-" + q.id;
 				var V = ce('button');
-				V.onclick = function (i, L) {
+				V.onclick = function(i, L) {
                     L.preventDefault();
                     (i.onclick != null ? i.onclick: g_insertTag.bind(0, g, i.pre, i.post, i.rep))()
                 };
@@ -6712,7 +7054,7 @@ Listview.funcBox = {
 			}
 			e.className += " formatting button sm";
 		}
-		var r = function (L, i) {
+		var r = function(L, i) {
 			var M = prompt(sprintf(LANG.markup_prompt, L), "");
 			if (M != null) {
 				g_insertTag(g, "[" + i + "=" + (parseInt(M) || 0) + "]", "")
@@ -6772,7 +7114,7 @@ Listview.funcBox = {
 		return g
 	},
 /*
-	coEditAppend: function (m, b, l) {
+	coEditAppend: function(m, b, l) {
 		var f = Listview.funcBox.coGetCharLimit(l);
 		if (l == 1 || l == 3 || l == 4) {
 			b.user = g_user.name;
@@ -6849,7 +7191,7 @@ Listview.funcBox = {
 			ae(y, ct(LANG.compose_livepreview));
 			ae(d, y);
 			y.href = "javascript:;";
-			y.onclick = function () {
+			y.onclick = function() {
 				c(1);
 				y.className = "disclosure-" + (g_toggleDisplay(v) ? "on": "off")
 			};
@@ -6860,7 +7202,7 @@ Listview.funcBox = {
 			ae(a, v);
 			ae(a, u);
 			g_onAfterTyping(g, c, 50);
-			aE(g, "focus", function () {
+			aE(g, "focus", function() {
 				c();
 				a.style.display = "";
 				if (l != 4) {
@@ -6869,7 +7211,7 @@ Listview.funcBox = {
 			})
 		} else {
 			if (l != 4) {
-				aE(g, "focus", function () {
+				aE(g, "focus", function() {
 					g.style.height = "22em"
 				})
 			}
@@ -6907,7 +7249,7 @@ Listview.funcBox = {
 		{
 			id: "url",
 			title: LANG.markup_url,
-			onclick: function () {
+			onclick: function() {
 				var i = prompt(LANG.prompt_linkurl, "http://");
 				if (i) {
 					g_insertTag(g, "[url=" + i + "]", "[/url]")
@@ -6931,7 +7273,7 @@ Listview.funcBox = {
 			title: LANG.markup_ul,
 			pre: "[ul]\n[li]",
 			post: "[/li]\n[/ul]",
-			rep: function (i) {
+			rep: function(i) {
 				return i.replace(/\n/g, "[/li]\n[li]")
 			}
 		},
@@ -6940,7 +7282,7 @@ Listview.funcBox = {
 			title: LANG.markup_ol,
 			pre: "[ol]\n[li]",
 			post: "[/li]\n[/ol]",
-			rep: function (i) {
+			rep: function(i) {
 				return i.replace(/\n/g, "[/li]\n[li]")
 			}
 		},
@@ -6981,7 +7323,7 @@ Listview.funcBox = {
 		return g
 	},
 */
-	coLivePreview: function (f, e, a, b) {
+	coLivePreview: function(f, e, a, b) {
         if (b != 1 && a.style.display == "none") {
 			return
 		}
@@ -7004,7 +7346,7 @@ Listview.funcBox = {
 			a.innerHTML = '<span class="q6">...</span>'
 		}
 	},
-	coEditButton: function (f, d, e, k) {
+	coEditButton: function(f, d, e, k) {
 		if (d) {
 			var a = gE(f.divEdit, "textarea");
             var g = a[0];
@@ -7066,7 +7408,7 @@ Listview.funcBox = {
 		de(f.divEdit);
 		f.divEdit = null
     },
-	coGetCharLimit: function (a) {
+	coGetCharLimit: function(a) {
 		if (a == 2) {
 			return 7500
 		}
@@ -7088,7 +7430,7 @@ Listview.funcBox = {
 			return 15000 * b
 		}
 	},
-	coUpdateCharLimit: function (a, b, c) {
+	coUpdateCharLimit: function(a, b, c) {
 		var d = a.value;
 		if (d.length > c) {
 			a.value = d.substring(0, c);
@@ -7100,10 +7442,10 @@ Listview.funcBox = {
 			}
 		}
 	},
-	coModeLink: function (e, b, f) {
+	coModeLink: function(e, b, f) {
         var j = Listview.funcBox.coGetCharLimit(b);
 		var c = Markup.MODE_COMMENT;
-		array_walk(gE(this.parentNode, "a"), function (k) {
+		array_walk(gE(this.parentNode, "a"), function(k) {
 			k.className = ""
 		});
 		this.className = "selected";
@@ -7146,14 +7488,14 @@ Listview.funcBox = {
 			break
 		}
 	},
-	coReply: function (b) {
+	coReply: function(b) {
 		document.forms.addcomment.elements.replyto.value = b.replyTo;
 		var a = ge("replybox-generic");
 		gE(a, "span")[0].innerHTML = b.user;
 		a.style.display = "";
 		co_addYourComment()
 	},
-	coValidate: function (a, c) {
+	coValidate: function(a, c) {
 		c |= 0;
 		if (c == 1 || c == -1) {
 			if (trim(a.value).length < 1) {
@@ -7174,34 +7516,34 @@ Listview.funcBox = {
 		}
 		return true
 	},
-	coCustomRatingOver: function (a) {
+	coCustomRatingOver: function(a) {
 		Tooltip.showAtCursor(a, LANG.tooltip_customrating, 0, 0, "q")
 	},
-	coPlusRatingOver: function (a) {
+	coPlusRatingOver: function(a) {
 		Tooltip.showAtCursor(a, LANG.tooltip_uprate, 0, 0, "q2")
 	},
-	coMinusRatingOver: function (a) {
+	coMinusRatingOver: function(a) {
 		Tooltip.showAtCursor(a, LANG.tooltip_downrate, 0, 0, "q10")
 	},
-	coSortDate: function (a) {
+	coSortDate: function(a) {
 		a.nextSibling.nextSibling.className = "";
 		a.className = "selected";
 		this.mainDiv.className += " listview-aci";
 		this.setSort([1], true, false)
 		sc("temp_comment_sort", 1)
 	},
-	coSortHighestRatedFirst: function (a) {
+	coSortHighestRatedFirst: function(a) {
 		a.previousSibling.previousSibling.className = "";
 		a.className = "selected";
 		this.mainDiv.className = this.mainDiv.className.replace("listview-aci", "");
 		this.setSort([ - 3, 2], true, false)
 		sc("temp_comment_sort", 2)
 	},
-	coFilterByPatchVersion: function (a) {
+	coFilterByPatchVersion: function(a) {
 		this.minPatchVersion = a.value;
 		this.refreshRows()
 	},
-	coUpdateLastEdit: function (f) {
+	coUpdateLastEdit: function(f) {
 		var b = f.divLastEdit;
 		if (!b) {
 			return
@@ -7229,7 +7571,7 @@ Listview.funcBox = {
 			b.style.display = "none"
 		}
 	},
-	coFormatDate: function (f, e, b, g, h) {
+	coFormatDate: function(f, e, b, g, h) {
 		var d;
 		if (e < 2592000) {
 			var a = sprintf(LANG.date_ago, g_formatTimeElapsed(e));
@@ -7246,7 +7588,7 @@ Listview.funcBox = {
 		d = ct(a);
 		ae(f, d)
 	},
-	coFormatFileSize: function (c) {
+	coFormatFileSize: function(c) {
 		var b = -1;
 		var a = "KMGTPEZY";
 		while (c >= 1024 && b < 7) {
@@ -7258,64 +7600,117 @@ Listview.funcBox = {
 			return c.toFixed(1) + " " + a[b] + "B"
 		}
 	},
-	ssCellOver: function () {
-		this.className = "screenshot-caption-over"
-	},
-	ssCellOut: function () {
-		this.className = "screenshot-caption"
-	},
-	ssCellClick: function (b, d) {
-		d = $E(d);
-		if (d.shiftKey || d.ctrlKey) {
-			return
-		}
-		var a = 0,
-		c = d._target;
-		while (c && a < 3) {
-			if (c.nodeName == "A") {
-				return
+
+	dateEventOver: function(date, event, e) {
+		var dates = Listview.funcBox.getEventNextDates(event.startDate, event.endDate, event.rec || 0, date),
+			buff  = '';
+
+		if (dates[0] && dates[1]) {
+			var
+                t1 = new Date(event.startDate.replace(/-/g, '/')),
+				t2 = new Date(event.endDate.replace(/-/g, '/')),
+				first,
+				last;
+
+			t1.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+			t2.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+
+			if (date.getFullYear() == dates[0].getFullYear() && date.getMonth() == dates[0].getMonth() && date.getDate() == dates[0].getDate()) {
+				first = true;
 			}
-			if (c.nodeName == "IMG") {
-				break
+
+			if (date.getFullYear() == dates[1].getFullYear() && date.getMonth() == dates[1].getMonth() && date.getDate() == dates[1].getDate()) {
+				last = true;
 			}
-			c = c.parentNode
+
+			if (first && last)
+				buff = g_formatTimeSimple(t1, LANG.lvscreenshot_from, 1) + ' ' + g_formatTimeSimple(t2, LANG.date_to, 1);
+			else if (first)
+				buff = g_formatTimeSimple(t1, LANG.tab_starts);
+			else if (last)
+				buff = g_formatTimeSimple(t2, LANG.tab_ends);
+			else
+				buff = LANG.allday;
+        }
+
+		Tooltip.showAtCursor(e, '<span class="q1">' + event.name + '</span><br />' + buff, 0, 0, 'q');
+	},
+
+	ssCellOver: function() {
+		this.className = 'screenshot-caption-over';
+	},
+
+	ssCellOut: function() {
+		this.className = 'screenshot-caption';
+	},
+
+	ssCellClick: function(i, e) {
+		e = $E(e);
+
+		if (e.shiftKey || e.ctrlKey) {
+			return;
 		}
+
+		var
+            j = 0,
+            el = e._target;
+
+        while (el && j < 3) {
+			if (el.nodeName == 'A') {
+				return;
+			}
+			if (el.nodeName == 'IMG') {
+				break;
+			}
+			el = el.parentNode;
+		}
+
 		ScreenshotViewer.show({
 			screenshots: this.data,
-			pos: b
-		})
+			pos: i
+		});
 	},
-	viCellClick: function (b, d) {
-		d = $E(d);
-		if (d.shiftKey || d.ctrlKey) {
-			return
+
+	viCellClick: function(i, e) {
+		e = $E(e);
+
+		if (e.shiftKey || e.ctrlKey) {
+			return;
 		}
-		var a = 0,
-		c = d._target;
-		while (c && a < 3) {
-			if (c.nodeName == "A") {
-				return
+
+		var
+            j = 0,
+            el = e._target;
+
+		while (el && j < 3) {
+			if (el.nodeName == 'A') {
+				return;
 			}
-			if (c.nodeName == "IMG") {
-				break
+			if (el.nodeName == 'IMG') {
+				break;
 			}
-			c = c.parentNode
+			el = el.parentNode;
 		}
+
 		VideoViewer.show({
 			videos: this.data,
-			pos: b
+			pos: i
 		})
 	},
-	moneyHonorOver: function (a) {
-		Tooltip.showAtCursor(a, LANG.tooltip_honorpoints, 0, 0, "q")
+
+	moneyHonorOver: function(e) {
+		Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_honorpoints + '</b>', 0, 0, 'q1');
 	},
-	moneyArenaOver: function (a) {
-		Tooltip.showAtCursor(a, LANG.tooltip_arenapoints, 0, 0, "q")
+
+	moneyArenaOver: function(e) {
+		Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_arenapoints + '</b>', 0, 0, 'q1');
 	},
-	moneyAchievementOver: function (a) {
-		Tooltip.showAtCursor(a, LANG.tooltip_achievementpoints, 0, 0, "q")
+
+	moneyAchievementOver: function(e) {
+		Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_achievementpoints + '</b>', 0, 0, 'q1');
 	},
-	appendMoney: function (g, a, f, m, j, c, l) {
+
+	appendMoney: function(g, a, f, m, j, c, l) {
 		var k, h = 0;
 		if (a >= 10000) {
 			h = 1;
@@ -7408,7 +7803,8 @@ Listview.funcBox = {
 			ae(g, k)
 		}
 	},
-    getUpperSource: function (source, sm) {
+
+    getUpperSource: function(source, sm) {
         switch (source) {
             case 2: // Drop
                 if (sm.bd) {
@@ -7426,7 +7822,8 @@ Listview.funcBox = {
 
         return g_sources[source];
     },
-    getLowerSource: function (source, sm, type) {
+
+    getLowerSource: function(source, sm, type) {
         switch (source) {
             case 3: // PvP
                 if (sm.p && g_sources_pvp[sm.p]) {
@@ -7440,7 +7837,7 @@ Listview.funcBox = {
             case 2: // Object
                 if (sm.z) {
                     var res = {
-                        url: "?zone=" + sm.z,
+                        url: '?zone=' + sm.z,
                         text: g_zones[sm.z]
                     };
 
@@ -7462,27 +7859,28 @@ Listview.funcBox = {
                 break;
             case 5: // Quest
                 return {
-                    url: "?quests=" + sm.c2 + "." + sm.c,
+                    url: '?quests=' + sm.c2 + '.' + sm.c,
                     text: Listview.funcBox.getQuestCategory(sm.c)
                 };
                 break;
             case 6: // Spell
                 if (sm.c && sm.s) {
                     return {
-                        url: "?spells=" + sm.c + "." + sm.s,
+                        url: '?spells=' + sm.c + '.' + sm.s,
                         text: g_spell_skills[sm.s]
                     };
                 }
                 else {
                     return {
-                        url: "?spells=0",
-                        text: "??"
+                        url: '?spells=0',
+                        text: '??'
                     };
                 }
                 break;
         }
     },
-    getExpansionText: function (line) {
+
+    getExpansionText: function(line) {
         var str = '';
 
         if (line.expansion == 1) {
@@ -7495,6 +7893,7 @@ Listview.funcBox = {
         return str;
     }
 };
+
 Listview.templates = {
     faction: {
         sort: [1],
@@ -7508,7 +7907,7 @@ Listview.templates = {
                 type: 'text',
                 align: 'left',
                 value: 'name',
-                compute: function (faction, td) {
+                compute: function(faction, td) {
                     var a = ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
                     a.href = this.template.getItemLink(faction);
@@ -7523,7 +7922,7 @@ Listview.templates = {
                         ae(td, a);
                     }
                 },
-                getVisibleText: function (faction) {
+                getVisibleText: function(faction) {
 					var buff = faction.name + Listview.funcBox.getExpansionText(faction);
 
                     return buff;
@@ -7533,7 +7932,7 @@ Listview.templates = {
                 id: 'side',
                 name: LANG.side,
                 type: 'text',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     if (item.side && item.side != 3) {
                         var sp = ce('span');
                         sp.className = (item.side == 1 ? 'alliance-icon' : 'horde-icon');
@@ -7542,12 +7941,12 @@ Listview.templates = {
                         ae(td, sp);
                     }
                 },
-                getVisibleText: function (item) {
+                getVisibleText: function(item) {
                     if (item.side) {
                         return g_sides[item.side];
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_sides[a.side], g_sides[b.side]);
                 }
             },
@@ -7555,7 +7954,7 @@ Listview.templates = {
                 id: 'standing',
                 name: LANG.reputation,
                 value: 'standing',
-                compute: function (faction, td) {
+                compute: function(faction, td) {
                     td.style.padding = 0;
                     ae(td, g_createReputationBar(faction.standing));
                 },
@@ -7566,7 +7965,7 @@ Listview.templates = {
                 name: LANG.category,
                 type: 'text',
                 width: '16%',
-                compute: function (faction, td) {
+                compute: function(faction, td) {
                     if (faction.category2 != null) {
                         td.className = 'small q1';
                         var
@@ -7581,20 +7980,21 @@ Listview.templates = {
                         ae(td, a);
                     }
                 },
-                getVisibleText: function (faction) {
+                getVisibleText: function(faction) {
                     return Listview.funcBox.getFactionCategory(faction.category, faction.category2);
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     var _ = Listview.funcBox.getFactionCategory;
                     return strcmp(_(a.category, a.category2), _(b.category, b.category2));
                 }
             }
         ],
 
-        getItemLink: function (faction) {
+        getItemLink: function(faction) {
             return '?faction=' + faction.id;
         }
     },
+
     item: {
         sort: [-2],
         searchable: 1,
@@ -7607,7 +8007,7 @@ Listview.templates = {
                 align: 'left',
                 span: 2,
                 value: 'name',
-                compute: function (item, td, tr) {
+                compute: function(item, td, tr) {
                     var i = ce('td');
                     i.style.width = '1px';
                     i.style.padding = '0';
@@ -7776,7 +8176,7 @@ Listview.templates = {
 
                     ae(td, wrapper);
                 },
-                getVisibleText: function (item) {
+                getVisibleText: function(item) {
                     var buff = item.name.substring(1);
 
                     if (item.heroic) {
@@ -7828,13 +8228,13 @@ Listview.templates = {
                 name: LANG.level,
                 value: 'level',
                 type: 'range',
-                getMinValue: function (item) {
+                getMinValue: function(item) {
                     return item.minlevel ? item.minlevel: item.level;
                 },
-                getMaxValue: function (item) {
+                getMaxValue: function(item) {
                     return item.maxlevel ? item.maxlevel: item.level;
                 },
-                compute: function (item, td) {
+                compute: function(item, td) {
                     if (item.minlevel && item.maxlevel) {
                         if (item.minlevel != item.maxlevel) {
                             return item.minlevel + LANG.hyphen + item.maxlevel;
@@ -7847,7 +8247,7 @@ Listview.templates = {
                         return item.level;
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     if (col > 0) {
                         return strcmp(a.minlevel, b.minlevel) || strcmp(a.maxlevel, b.maxlevel) || strcmp(a.level, b.level);
                     }
@@ -7861,7 +8261,7 @@ Listview.templates = {
                 name: LANG.req,
                 tooltip: LANG.tooltip_reqlevel,
                 value: 'reqlevel',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     if (item.reqlevel > 1) {
                         return item.reqlevel;
                     }
@@ -7871,7 +8271,7 @@ Listview.templates = {
                 id: 'side',
                 name: LANG.side,
                 type: 'text',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     if (item.side && item.side != 3) {
                         var sp = ce('span');
                         sp.className = (item.side == 1 ? 'alliance-icon': 'horde-icon');
@@ -7879,12 +8279,12 @@ Listview.templates = {
                         ae(td, sp);
                     }
                 },
-                getVisibleText: function (item) {
+                getVisibleText: function(item) {
                     if (item.side) {
                         return g_sides[item.side];
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_sides[a.side], g_sides[b.side]);
                 }
             },
@@ -7892,7 +8292,7 @@ Listview.templates = {
                 id: 'dps',
                 name: LANG.dps,
                 value: 'dps',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     return (item.dps || 0).toFixed(1);
                 },
                 hidden: true
@@ -7901,7 +8301,7 @@ Listview.templates = {
                 id: 'speed',
                 name: LANG.speed,
                 value: 'speed',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     return (item.speed || 0).toFixed(2);
                 },
                 hidden: true
@@ -7910,7 +8310,7 @@ Listview.templates = {
                 id: 'armor',
                 name: LANG.armor,
                 value: 'armor',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     if (item.armor > 0) {
                         return item.armor;
                     }
@@ -7921,15 +8321,15 @@ Listview.templates = {
                 id: 'slot',
                 name: LANG.slot,
                 type: 'text',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     nw(td);
 
                     return g_item_slots[item.slot];
                 },
-                getVisibleText: function (item) {
+                getVisibleText: function(item) {
                     return g_item_slots[item.slot];
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_item_slots[a.slot], g_item_slots[b.slot]);
                 }
             },
@@ -7950,15 +8350,15 @@ Listview.templates = {
                 name: LANG.glyphtype,
                 type: 'text',
                 value: 'glyph',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     if (item.glyph) {
                         return g_item_glyphs[item.glyph];
                     }
                 },
-                getVisibleText: function (item) {
+                getVisibleText: function(item) {
                     return g_item_glyphs[item.glyph];
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_item_glyphs[a.glyph], g_item_glyphs[b.glyph]);
                 },
                 hidden: true
@@ -7967,7 +8367,7 @@ Listview.templates = {
                 id: 'source',
                 name: LANG.source,
                 type: 'text',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     if (this.iconSize == 0) {
                         td.className = 'small';
                     }
@@ -8043,7 +8443,7 @@ Listview.templates = {
                         }
                     }
                 },
-                getVisibleText: function (item) {
+                getVisibleText: function(item) {
                     if (item.source != null) {
                         if (item.source.length == 1) {
                             var buff = '';
@@ -8080,7 +8480,7 @@ Listview.templates = {
                         }
                     }
                 },
-                sortFunc: function (a, b) {
+                sortFunc: function(a, b) {
                     var res = Listview.funcBox.assocArrCmp(a.source, b.source, g_sources);
                     if (res != 0) {
                         return res;
@@ -8097,7 +8497,7 @@ Listview.templates = {
                 id: 'type',
                 name: LANG.type,
                 type: 'text',
-                compute: function (item, td) {
+                compute: function(item, td) {
                     td.className = 'small q1';
                     nw(td);
                     var a = ce('a');
@@ -8108,21 +8508,21 @@ Listview.templates = {
                     ae(a, ct(it.text));
                     ae(td, a);
                 },
-                getVisibleText: function (item) {
+                getVisibleText: function(item) {
                     return Listview.funcBox.getItemType(item.classs, item.subclass, item.subsubclass).text;
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     var _ = Listview.funcBox.getItemType;
                     return strcmp(_(a.classs, a.subclass, a.subsubclass).text, _(b.classs, b.subclass, b.subsubclass).text);
                 }
             }
         ],
 
-        getItemLink: function (item) {
+        getItemLink: function(item) {
             return '?item=' + item.id;
         },
 
-        onBeforeCreate: function () {
+        onBeforeCreate: function() {
             var nComparable = false;
 
             for (var i = 0, len = this.data.length; i < len; ++i) {
@@ -8142,7 +8542,7 @@ Listview.templates = {
             }
         },
 
-        createCbControls: function (div, topBar) {
+        createCbControls: function(div, topBar) {
             if (!topBar && this._nComparable < 15) {
                 return;
             }
@@ -8152,7 +8552,7 @@ Listview.templates = {
                 iViewIn3d = ce('input'),
                 iEquip    = ce('input'),
                 iDeselect = ce('input'),
-                pinnedChr = g_user.characters ? array_filter(g_user.characters, function (row) {
+                pinnedChr = g_user.characters ? array_filter(g_user.characters, function(row) {
                     return row.pinned;
                 }) : false;
 
@@ -8186,14 +8586,14 @@ Listview.templates = {
             ae(div, iDeselect);
         },
 
-        compareItems: function () {
+        compareItems: function() {
             var rows = this.getCheckedRows();
             if (!rows.length) {
                 return;
             }
 
             var data = '';
-            array_walk(rows, function (x) {
+            array_walk(rows, function(x) {
                 if (x.slot == 0 || x.slot == 18) {
                     return;
                 }
@@ -8203,7 +8603,7 @@ Listview.templates = {
             su_addToSaved(rtrim(data, ';'), rows.length);
         },
 
-        viewIn3d: function () {
+        viewIn3d: function() {
             var rows = this.getCheckedRows();
             if (!rows.length) {
                 return;
@@ -8215,7 +8615,7 @@ Listview.templates = {
                 badData = false;
             var data = {};
             var model = null;
-            array_walk(rows, function (x) {
+            array_walk(rows, function(x) {
                 if (in_array(ModelViewer.validSlots, x.slotbak) >= 0 && x.displayid > 0) {
                     var slot = ModelViewer.slotMap[x.slotbak];
                     if (data[slot]) {
@@ -8266,14 +8666,14 @@ Listview.templates = {
             }
         },
 
-        equipItems: function (character) {
+        equipItems: function(character) {
             var rows = this.getCheckedRows();
             if (!rows.length) {
                 return;
             }
 
             var data = '';
-            array_walk(rows, function (x) {
+            array_walk(rows, function(x) {
                 if (x.slot == 0 || x.slot == 18) {
                     return;
                 }
@@ -8282,6 +8682,7 @@ Listview.templates = {
             location.href = g_getProfileUrl(character) + '&items=' + rtrim(data, ':');
         }
     },
+
 	itemset: {
 		sort: [1],
 		nItemsPerPage: 75,
@@ -8294,7 +8695,7 @@ Listview.templates = {
                 type: 'text',
                 align: 'left',
                 value: 'name',
-                compute: function (itemSet, td) {
+                compute: function(itemSet, td) {
                     var a = ce('a');
                     a.className = 'q' + (7 - parseInt(itemSet.name.charAt(0)));
                     a.style.fontFamily = 'Verdana, sans-serif';
@@ -8325,7 +8726,7 @@ Listview.templates = {
                         ae(td, d);
                     }
                 },
-                getVisibleText: function (itemSet) {
+                getVisibleText: function(itemSet) {
                     var buff = itemSet.name.substring(1);
                     if (itemSet.note) {
                         buff += ' ' + g_itemset_notes[itemSet.note];
@@ -8337,13 +8738,13 @@ Listview.templates = {
                 id: 'level',
                 name: LANG.level,
                 type: 'range',
-                getMinValue: function (itemSet) {
+                getMinValue: function(itemSet) {
                     return itemSet.minlevel;
                 },
-                getMaxValue: function (itemSet) {
+                getMaxValue: function(itemSet) {
                     return itemSet.maxlevel;
                 },
-                compute: function (itemSet, td) {
+                compute: function(itemSet, td) {
                     if (itemSet.minlevel > 0 && itemSet.maxlevel > 0) {
                         if (itemSet.minlevel != itemSet.maxlevel) {
                             return itemSet.minlevel + LANG.hyphen + itemSet.maxlevel;
@@ -8356,7 +8757,7 @@ Listview.templates = {
                         return - 1;
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     if (col > 0) {
                         return strcmp(a.minlevel, b.minlevel) || strcmp(a.maxlevel, b.maxlevel);
                     }
@@ -8368,14 +8769,14 @@ Listview.templates = {
             {
                 id: 'pieces',
                 name: LANG.pieces,
-                getValue: function (itemSet) {
+                getValue: function(itemSet) {
                     return itemSet.pieces.length;
                 },
-                compute: function (itemSet, td) {
+                compute: function(itemSet, td) {
                     td.style.padding = '0';
                     Listview.funcBox.createCenteredIcons(itemSet.pieces, td);
                 },
-                sortFunc: function (a, b) {
+                sortFunc: function(a, b) {
                     var lena = (a.pieces != null ? a.pieces.length: 0);
                     var lenb = (b.pieces != null ? b.pieces.length: 0);
                     return strcmp(lena, lenb);
@@ -8385,10 +8786,10 @@ Listview.templates = {
                 id: 'type',
                 name: LANG.type,
                 type: 'text',
-                compute: function (itemSet, td) {
+                compute: function(itemSet, td) {
                     return g_itemset_types[itemSet.type];
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_itemset_types[a.type], g_itemset_types[b.type]);
                 }
             },
@@ -8397,7 +8798,7 @@ Listview.templates = {
                 name: LANG.classes,
                 type: 'text',
                 width: '20%',
-                getVisibleText: function (itemSet) {
+                getVisibleText: function(itemSet) {
                     var str = '';
                     if (itemSet.reqclass) {
                         var classes = Listview.funcBox.assocBinFlags(itemSet.reqclass, g_chr_classes);
@@ -8411,7 +8812,7 @@ Listview.templates = {
                     }
                     return str;
                 },
-                compute: function (itemSet, td) {
+                compute: function(itemSet, td) {
                     if (itemSet.reqclass) {
                         var classes = Listview.funcBox.assocBinFlags(itemSet.reqclass, g_chr_classes);
 
@@ -8430,16 +8831,17 @@ Listview.templates = {
                         ae(td, d);
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(a.reqclass, g_chr_classes), Listview.funcBox.assocBinFlags(b.reqclass, g_chr_classes), g_chr_classes);
                 }
             }
         ],
 
-		getItemLink: function (itemSet) {
+		getItemLink: function(itemSet) {
 			return '?itemset=' + itemSet.id;
 		}
 	},
+
 	npc: {
 		sort: [1],
 		nItemsPerPage: 100,
@@ -8451,7 +8853,7 @@ Listview.templates = {
 			type: "text",
 			align: "left",
 			value: "name",
-			compute: function (c, f) {
+			compute: function(c, f) {
 				if (c.boss) {
 					f.className = "boss-icon-padded"
 				}
@@ -8467,7 +8869,7 @@ Listview.templates = {
 					ae(f, e)
 				}
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				var b = a.name;
 				if (a.tag) {
 					b += " <" + a.tag + ">"
@@ -8477,7 +8879,7 @@ Listview.templates = {
 				}
 				return b
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(c.boss, d.boss) || strcmp(d.name, c.name)
 			}
 		},
@@ -8486,13 +8888,13 @@ Listview.templates = {
 			name: LANG.level,
 			type: "range",
 			width: "10%",
-			getMinValue: function (a) {
+			getMinValue: function(a) {
 				return a.minlevel
 			},
-			getMaxValue: function (a) {
+			getMaxValue: function(a) {
 				return a.maxlevel
 			},
-			compute: function (a, c) {
+			compute: function(a, c) {
 				if (a.classification) {
 					var b = ce("div");
 					b.className = "small";
@@ -8511,7 +8913,7 @@ Listview.templates = {
 				}
 				return -1
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				var b = "";
 				if (a.classification) {
 					b += " " + g_npc_classifications[a.classification]
@@ -8526,7 +8928,7 @@ Listview.templates = {
 				}
 				return b
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				if (e > 0) {
 					return strcmp(d.minlevel, c.minlevel) || strcmp(d.maxlevel, c.maxlevel) || strcmp(d.classification, c.classification)
 				} else {
@@ -8538,13 +8940,13 @@ Listview.templates = {
 			id: "location",
 			name: LANG.location,
 			type: "text",
-			compute: function (a, b) {
+			compute: function(a, b) {
 				return Listview.funcBox.location(a, b)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				return Listview.funcBox.arrayText(a.location, g_zones)
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return Listview.funcBox.assocArrCmp(d.location, c.location, g_zones)
 			}
 		},
@@ -8555,7 +8957,7 @@ Listview.templates = {
 			width: "10%",
 			value: "react",
 			filtrable: 0,
-			compute: function (b, g) {
+			compute: function(b, g) {
 				if (b.react == null) {
 					return -1
 				}
@@ -8579,7 +8981,7 @@ Listview.templates = {
 			name: LANG.skin,
 			type: "text",
 			value: "skin",
-			compute: function (c, d) {
+			compute: function(c, d) {
 				if (c.skin) {
 					var b = ce("a");
 					b.className = "q1";
@@ -8595,17 +8997,17 @@ Listview.templates = {
 			name: LANG.petfamily,
 			type: "text",
 			width: "12%",
-			compute: function (c, d) {
+			compute: function(c, d) {
 				d.className = "q1";
 				var b = ce("a");
 				b.href = "?pet=" + c.family;
 				ae(b, ct(g_pet_families[c.family]));
 				ae(d, b)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				return g_pet_families[a.family]
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(g_pet_families[d.family], g_pet_families[c.family])
 			},
 			hidden: 1
@@ -8615,21 +9017,21 @@ Listview.templates = {
 			name: LANG.type,
 			type: "text",
 			width: "12%",
-			compute: function (c, d) {
+			compute: function(c, d) {
 				d.className = "small q1";
 				var b = ce("a");
 				b.href = "?npcs=" + c.type;
 				ae(b, ct(g_npc_types[c.type]));
 				ae(d, b)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				return g_npc_types[a.type]
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(g_npc_types[d.type], g_npc_types[c.type])
 			}
 		}],
-		getItemLink: function (a) {
+		getItemLink: function(a) {
 			return "?npc=" + a.id
 		}
 	},
@@ -8644,7 +9046,7 @@ Listview.templates = {
 			type: "text",
 			align: "left",
 			value: "name",
-			compute: function (c, d) {
+			compute: function(c, d) {
 				var b = ce("a");
 				b.style.fontFamily = "Verdana, sans-serif";
 				b.href = this.template.getItemLink(c);
@@ -8656,13 +9058,13 @@ Listview.templates = {
 			id: "location",
 			name: LANG.location,
 			type: "text",
-			compute: function (a, b) {
+			compute: function(a, b) {
 				return Listview.funcBox.location(a, b)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				return Listview.funcBox.arrayText(a.location, g_zones)
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return Listview.funcBox.assocArrCmp(d.location, c.location, g_zones)
 			}
 		},
@@ -8678,24 +9080,25 @@ Listview.templates = {
 			name: LANG.type,
 			type: "text",
 			width: "12%",
-			compute: function (c, d) {
+			compute: function(c, d) {
 				d.className = "small q1";
 				var b = ce("a");
 				b.href = "?objects=" + c.type;
 				ae(b, ct(g_object_types[c.type]));
 				ae(d, b)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				return g_object_types[a.type]
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(g_object_types[d.type], g_object_types[c.type])
 			}
 		}],
-		getItemLink: function (a) {
+		getItemLink: function(a) {
 			return "?object=" + a.id
 		}
 	},
+
 	quest: {
 		sort: [1,2],
 		nItemsPerPage: 100,
@@ -8708,7 +9111,7 @@ Listview.templates = {
                 type: 'text',
                 align: 'left',
                 value: 'name',
-                compute: function (quest, td) {
+                compute: function(quest, td) {
                     var wrapper = ce('div');
                     var a = ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
@@ -8802,7 +9205,7 @@ Listview.templates = {
                 id: 'level',
                 name: LANG.level,
                 value: 'level',
-                compute: function (quest, td) {
+                compute: function(quest, td) {
                     if (quest.type || quest.daily || quest.weekly) {
                         var d = ce('div');
                         d.className = 'small';
@@ -8833,7 +9236,7 @@ Listview.templates = {
 
                     return quest.level;
                 },
-                getVisibleText: function (quest) {
+                getVisibleText: function(quest) {
                     var buff = '';
 
                     if (quest.type) {
@@ -8853,7 +9256,7 @@ Listview.templates = {
 
                     return buff;
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(a.level, b.level) || strcmp(a.type, b.type);
                 }
             },
@@ -8867,7 +9270,7 @@ Listview.templates = {
                 id: 'side',
                 name: LANG.side,
                 type: 'text',
-                compute: function (quest, td) {
+                compute: function(quest, td) {
                     if (quest.side && quest.side != 3) {
                         var sp = ce('span');
                         sp.className = (quest.side == 1 ? 'alliance-icon': 'horde-icon');
@@ -8879,19 +9282,19 @@ Listview.templates = {
                         ae(td, ct('??'));
                     }
                 },
-                getVisibleText: function (quest) {
+                getVisibleText: function(quest) {
                     if (quest.side) {
                         return g_sides[quest.side];
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_sides[a.side], g_sides[b.side]);
                 }
             },
             {
                 id: 'rewards',
                 name: LANG.rewards,
-                compute: function (quest, td) {
+                compute: function(quest, td) {
                     var hasIcons = (quest.itemchoices != null || quest.itemrewards != null);
                     if (hasIcons) {
                         var
@@ -8919,7 +9322,7 @@ Listview.templates = {
                         ae(td, ce('br'));
                     }
                 },
-                getVisibleText: function (quest) {
+                getVisibleText: function(quest) {
                     var buff = '';
 
                     if (quest.itemchoices && quest.itemchoices.length) {
@@ -8935,7 +9338,7 @@ Listview.templates = {
 
                     return buff;
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     var lenA = (a.itemchoices != null ? a.itemchoices.length : 0) + (a.itemrewards != null ? a.itemrewards.length : 0);
                     var lenB = (b.itemchoices != null ? b.itemchoices.length : 0) + (b.itemrewards != null ? b.itemrewards.length : 0);
                     var titleA = (a.titlereward && g_titles[a.titlereward] ? g_titles[a.titlereward]['name_' + g_locale.name] : '');
@@ -8951,7 +9354,7 @@ Listview.templates = {
             {
                 id: 'money',
                 name: LANG.money,
-                compute: function (quest, td) {
+                compute: function(quest, td) {
                     if (quest.money > 0 || quest.currencyrewards != null) {
                         if (quest.money > 0) {
                             Listview.funcBox.appendMoney(td, quest.money);
@@ -8965,7 +9368,7 @@ Listview.templates = {
                         }
                     }
                 },
-                getVisibleText: function (quest) {
+                getVisibleText: function(quest) {
                     var buff = '';
                     for (var i = 0; quest.currencyrewards && i < quest.currencyrewards.length; ++i) {
                         if (g_gatheredcurrencies[quest.currencyrewards[i][0]]) {
@@ -8974,7 +9377,7 @@ Listview.templates = {
                     }
                     return buff;
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     var
                         lenA = 0,
                         lenB = 0;
@@ -9005,7 +9408,7 @@ Listview.templates = {
                 id: 'category',
                 name: LANG.category,
                 type: 'text',
-                compute: function (quest, td) {
+                compute: function(quest, td) {
                     if (quest.category != 0) {
                         td.className = 'small q1';
                         var a = ce('a');
@@ -9014,20 +9417,21 @@ Listview.templates = {
                         ae(td, a);
                     }
                 },
-                getVisibleText: function (quest) {
+                getVisibleText: function(quest) {
                     return Listview.funcBox.getQuestCategory(quest.category);
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     var _ = Listview.funcBox.getQuestCategory;
                     return strcmp(_(a.category), _(b.category));
                 }
             }
         ],
 
-		getItemLink: function (quest) {
+		getItemLink: function(quest) {
 			return '?quest=' + quest.id;
 		}
 	},
+
 	skill: {
 		sort: [1],
 		searchable: 1,
@@ -9039,7 +9443,7 @@ Listview.templates = {
 			align: "left",
 			value: "name",
 			span: 2,
-			compute: function (c, h, f) {
+			compute: function(c, h, f) {
 				var d = ce("td");
 				d.style.width = "1px";
 				d.style.padding = "0";
@@ -9062,7 +9466,7 @@ Listview.templates = {
 				}
 				ae(h, g)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				var b = a.name + Listview.funcBox.getExpansionText(a);
 				return b
 			}
@@ -9072,7 +9476,7 @@ Listview.templates = {
 			name: LANG.category,
 			type: "text",
 			width: "16%",
-			compute: function (c, d) {
+			compute: function(c, d) {
 				if (c.category != 0) {
 					d.className = "small q1";
 					var b = ce("a");
@@ -9081,14 +9485,14 @@ Listview.templates = {
 					ae(d, b)
 				}
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				return g_skill_categories[skill.category]
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(g_skill_categories[d.category], g_skill_categories[c.category])
 			}
 		}],
-		getItemLink: function (a) {
+		getItemLink: function(a) {
 			return "?skill=" + a.id
 		}
 	},
@@ -9103,7 +9507,7 @@ Listview.templates = {
 			align: "left",
 			span: 2,
 			value: "name",
-			compute: function (g, e, k) {
+			compute: function(g, e, k) {
 				var f = ce("td"),
 				p;
 				f.style.width = "44px";
@@ -9181,7 +9585,7 @@ Listview.templates = {
 				}
 				ae(e, b)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				var b = a.name;
 				if (a.rank) {
 					b += " " + a.rank
@@ -9207,7 +9611,7 @@ Listview.templates = {
 			name: LANG.tier,
 			width: "10%",
 			value: "level",
-			compute: function (b, d) {
+			compute: function(b, d) {
 				if (b.level > 0) {
 					var a = (!this._petTalents ? 10 : 20),
 					c = (!this._petTalents ? 5 : 12);
@@ -9221,7 +9625,7 @@ Listview.templates = {
 			name: LANG.level,
 			width: "10%",
 			value: "level",
-			compute: function (a, b) {
+			compute: function(a, b) {
 				if (a.level > 0) {
 					return a.level
 				}
@@ -9233,17 +9637,17 @@ Listview.templates = {
 			name: LANG.cost,
 			width: "10%",
 			hidden: true,
-			getValue: function (a) {
+			getValue: function(a) {
 				if (a.trainingcost) {
 					return a.trainingcost
 				}
 			},
-			compute: function (a, b) {
+			compute: function(a, b) {
 				if (a.trainingcost) {
 					Listview.funcBox.appendMoney(b, a.trainingcost)
 				}
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				if (d.trainingcost == null) {
 					return - 1
 				} else {
@@ -9267,7 +9671,7 @@ Listview.templates = {
 			type: "text",
 			hidden: true,
 			width: "20%",
-			getVisibleText: function (b) {
+			getVisibleText: function(b) {
 				var e = "";
 				if (b.reqclass) {
 					var d = Listview.funcBox.assocBinFlags(b.reqclass, g_chr_classes);
@@ -9280,7 +9684,7 @@ Listview.templates = {
 				}
 				return e
 			},
-			compute: function (b, h) {
+			compute: function(b, h) {
 				if (b.reqclass) {
 					var e = Listview.funcBox.assocBinFlags(b.reqclass, g_chr_classes);
 					var g = ce("div");
@@ -9294,7 +9698,7 @@ Listview.templates = {
 					ae(h, g)
 				}
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(d.reqclass, g_chr_classes), Listview.funcBox.assocBinFlags(c.reqclass, g_chr_classes), g_chr_classes)
 			}
 		},
@@ -9304,7 +9708,7 @@ Listview.templates = {
 			type: "text",
 			hidden: true,
 			width: "15%",
-			compute: function (a, e) {
+			compute: function(a, e) {
 				if (a.reqclass) {
 					var b = Listview.funcBox.assocBinFlags(a.reqclass, g_chr_classes);
 					var c = b[0];
@@ -9316,7 +9720,7 @@ Listview.templates = {
 					ae(e, d);
 				}
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(d.reqclass, g_chr_classes), Listview.funcBox.assocBinFlags(c.reqclass, g_chr_classes), g_chr_classes)
 			}
 		},
@@ -9326,7 +9730,7 @@ Listview.templates = {
 			type: "text",
 			hidden: true,
 			width: "10%",
-			compute: function (a, b) {
+			compute: function(a, b) {
 				if (a.glyphtype) {
 					return g_item_glyphs[a.glyphtype]
 				}
@@ -9338,7 +9742,7 @@ Listview.templates = {
 			type: "text",
 			width: "10%",
 			hidden: true,
-			compute: function (a, b) {
+			compute: function(a, b) {
 				var d = "";
 				var c = a.schools ? a.schools: a.school;
 				for (var e = 0; e < 32; ++e) {
@@ -9352,7 +9756,7 @@ Listview.templates = {
 				}
 				return d
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(this.compute(d), this.compute(c))
 			}
 		},
@@ -9362,13 +9766,13 @@ Listview.templates = {
 			type: "text",
 			width: "10%",
 			hidden: true,
-			compute: function (a, b) {
+			compute: function(a, b) {
 				if (g_spell_types[a.cat]) {
 					return g_spell_types[a.cat][a.type]
 				}
 				return a.type
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				var g = (g_spell_types[d.cat] ? g_spell_types[d.cat][d.type] : d.type),
 				f = (g_spell_types[c.cat] ? g_spell_types[c.cat][c.type] : d.type);
 				return strcmp(d.cat, c.cat) || strcmp(g, f)
@@ -9378,10 +9782,10 @@ Listview.templates = {
 			id: "reagents",
 			name: LANG.reagents,
 			width: "9%",
-			getValue: function (a) {
+			getValue: function(a) {
 				return (a.reagents ? a.reagents.length: 0)
 			},
-			compute: function (g, c) {
+			compute: function(g, c) {
 				var a = (g.reagents != null);
 				if (a) {
 					c.style.padding = "0";
@@ -9400,7 +9804,7 @@ Listview.templates = {
 					ae(c, k)
 				}
 			},
-			sortFunc: function (d, c) {
+			sortFunc: function(d, c) {
 				var f = (d.reagents != null ? d.reagents.length: 0);
 				var e = (c.reagents != null ? c.reagents.length: 0);
 				if (f > 0 && f == e) {
@@ -9417,7 +9821,7 @@ Listview.templates = {
 			width: "7%",
 			hidden: true,
 			value: "tp",
-			compute: function (a, b) {
+			compute: function(a, b) {
 				if (a.tp > 0) {
 					return a.tp
 				}
@@ -9429,7 +9833,7 @@ Listview.templates = {
 			type: "text",
 			width: "12%",
 			hidden: true,
-			compute: function (b, e) {
+			compute: function(b, e) {
 				if (b.source != null) {
 					var d = "";
 					for (var c = 0, a = b.source.length; c < a; ++c) {
@@ -9441,7 +9845,7 @@ Listview.templates = {
 					return d
 				}
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return Listview.funcBox.assocArrCmp(d.source, c.source, g_sources)
 			}
 		},
@@ -9450,10 +9854,10 @@ Listview.templates = {
 			name: LANG.skill,
 			type: "text",
 			width: "16%",
-			getValue: function (a) {
+			getValue: function(a) {
 				return a.learnedat
 			},
-			compute: function (h, f, l, r) {
+			compute: function(h, f, l, r) {
 				if (h.skill != null) {
 					this.skillsColumn = r;
 					var c = ce("div");
@@ -9551,14 +9955,14 @@ Listview.templates = {
 					}
 				}
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				var b = Listview.funcBox.arrayText(a.skill, g_spell_skills);
 				if (a.learnedat > 0) {
 					b += " " + (a.learnedat == 9999 ? "??": a.learnedat)
 				}
 				return b
 			},
-			sortFunc: function (e, c) {
+			sortFunc: function(e, c) {
 				if (e.chrclass && c.chrclass) {
 
 					var h = strcmp(g_chr_classes[(1 + Math.log(e.chrclass) / Math.LN2)], g_chr_classes[(1 + Math.log(c.chrclass) / Math.LN2)])
@@ -9597,7 +10001,7 @@ Listview.templates = {
 				return Listview.funcBox.assocArrCmp(e.skill, c.skill, g_spell_skills)
 			}
 		}],
-		getItemLink: function (a) {
+		getItemLink: function(a) {
 			return "?spell=" + a.id
 		}
 	},
@@ -9612,7 +10016,7 @@ Listview.templates = {
 			type: "text",
 			align: "left",
 			value: "name",
-			compute: function (c, e) {
+			compute: function(c, e) {
 				var b = ce("a");
 				b.style.fontFamily = "Verdana, sans-serif";
 				b.href = this.template.getItemLink(c);
@@ -9626,7 +10030,7 @@ Listview.templates = {
 					ae(e, b)
 				}
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				var b = a.name;
 				if (a.expansion == 1) {
 					b += " bc"
@@ -9646,13 +10050,13 @@ Listview.templates = {
 			name: LANG.level,
 			type: "range",
 			width: "10%",
-			getMinValue: function (a) {
+			getMinValue: function(a) {
 				return a.minlevel
 			},
-			getMaxValue: function (a) {
+			getMaxValue: function(a) {
 				return a.maxlevel
 			},
-			compute: function (a, b) {
+			compute: function(a, b) {
 				if (a.minlevel > 0 && a.maxlevel > 0) {
 					if (a.minlevel != a.maxlevel) {
 						return a.minlevel + LANG.hyphen + a.maxlevel
@@ -9661,7 +10065,7 @@ Listview.templates = {
 					}
 				}
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				if (e > 0) {
 					return strcmp(d.minlevel, c.minlevel) || strcmp(d.maxlevel, c.maxlevel)
 				} else {
@@ -9674,7 +10078,7 @@ Listview.templates = {
 			name: LANG.players,
 			type: "text",
 			hidden: true,
-			compute: function (a, d) {
+			compute: function(a, d) {
 				if (a.instance > 0) {
 					var b = ce("span");
 					if (a.nplayers == -2) {
@@ -9692,7 +10096,7 @@ Listview.templates = {
 					ae(d, b)
 				}
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				if (a.instance > 0) {
 					if (a.nplayers == -2) {
 						a.nplayers = "10/25"
@@ -9708,7 +10112,7 @@ Listview.templates = {
 					return b
 				}
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(d.nplayers, c.nplayers)
 			}
 		},
@@ -9717,7 +10121,7 @@ Listview.templates = {
 			name: LANG.territory,
 			type: "text",
 			width: "13%",
-			compute: function (a, c) {
+			compute: function(a, c) {
 				var b = ce("span");
 				switch (a.territory) {
 				case 0:
@@ -9733,10 +10137,10 @@ Listview.templates = {
 				ae(b, ct(g_zone_territories[a.territory]));
 				ae(c, b)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				return g_zone_territories[a.territory]
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(g_zone_territories[d.territory], g_zone_territories[c.territory])
 			}
 		},
@@ -9744,7 +10148,7 @@ Listview.templates = {
 			id: "instancetype",
 			name: LANG.instancetype,
 			type: "text",
-			compute: function (a, d) {
+			compute: function(a, d) {
 				if (a.instance > 0) {
 					var b = ce("span");
 					if ((a.instance >= 1 && a.instance <= 5) || a.instance == 7 || a.instance == 8) {
@@ -9764,7 +10168,7 @@ Listview.templates = {
 					ae(d, b)
 				}
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				if (a.instance > 0) {
 					var b = g_zone_instancetypes[a.instance];
 					if (a.nplayers && ((a.instance != 2 && a.instance != 5) || a.nplayers > 5)) {
@@ -9780,7 +10184,7 @@ Listview.templates = {
 					return b
 				}
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(g_zone_instancetypes[d.instance], g_zone_instancetypes[c.instance]) || strcmp(d.instance, c.instance) || strcmp(d.nplayers, c.nplayers)
 			}
 		},
@@ -9789,134 +10193,203 @@ Listview.templates = {
 			name: LANG.category,
 			type: "text",
 			width: "15%",
-			compute: function (c, d) {
+			compute: function(c, d) {
 				d.className = "small q1";
 				var b = ce("a");
 				b.href = "?zones=" + c.category;
 				ae(b, ct(g_zone_categories[c.category]));
 				ae(d, b)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				return g_zone_categories[a.category]
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(g_zone_categories[d.category], g_zone_categories[c.category])
 			}
 		}],
-		getItemLink: function (a) {
+		getItemLink: function(a) {
 			return "?zone=" + a.id
 		}
 	},
+
 	holiday: {
 		sort: [2, 1],
 		nItemsPerPage: -1,
 		searchable: 1,
 		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			span: 2,
-			compute: function (c, f, e) {
-				var d = ce("td");
-				d.style.width = "1px";
-				d.style.padding = "0";
-				d.style.borderRight = "none";
-				ae(d, g_holidays.createIcon(c.id, 0));
-				ae(e, d);
-				f.style.borderLeft = "none";
-				var b = ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(c);
-				ae(b, ct(c.name));
-				ae(f, b)
-			},
-			getVisibleText: function (a) {
-				return a.name
-			}
-		},
-		{
-			id: "date",
-			name: LANG.date,
-			type: "text",
-			width: "16%",
-			allText: true,
-			compute: function (b, e, g) {
-				if (b.startDate && b.endDate) {
-                    var h = Listview.funcBox.getEventNextDates(b.startDate, b.endDate, b.rec || 0);
-                    if (h[0] && h[1]) {
-                        var f = g_formatDateSimple(e[0]),
-						i = g_formatDateSimple(e[1]),
-						c = ce("span");
-                        if (b.today)
-                            c.style.color = "#00bb00";
-                        if (f != i) {
-                            st(c, f + LANG.hyphen + i)
-                        } else {
-                            st(c, f)
-                        }
-                        ae(e, c)
-						if (h[0] <= g_serverTime && h[1] >= g_serverTime) {
-							d.className = "checked";
-							c.className = "q2 tip";
-							g_addTooltip(c, LANG.tooltip_activeholiday, "q")
+
+		columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                span: 2,
+                compute: function(holiday, td, tr) {
+                    var i = ce('td');
+                    i.style.width = '1px';
+                    i.style.padding = '0';
+                    i.style.borderRight = 'none';
+
+                    ae(i, g_holidays.createIcon(holiday.id, 0));
+                    ae(tr, i);
+                    td.style.borderLeft = 'none';
+
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(holiday);
+                    ae(a, ct(holiday.name));
+                    ae(td, a);
+                },
+                getVisibleText: function(holiday) {
+                    return holiday.name;
+                }
+            },
+            {
+                id: 'date',
+                name: LANG.date,
+                type: 'text',
+                width: '16%',
+                allText: true,
+                compute: function(holiday, td, tr) {
+                    if (holiday.startDate && holiday.endDate) {
+                        var dates = Listview.funcBox.getEventNextDates(holiday.startDate, holiday.endDate, holiday.rec || 0);
+
+                        if (dates[0] && dates[1]) {
+                            var
+                                start = g_formatDateSimple(dates[0]),
+                                end = g_formatDateSimple(dates[1]),
+                                sp = ce('span');
+
+                            if (start != end) {
+                                st(sp, start + LANG.hyphen + end);
+                            }
+                            else {
+                                st(sp, start);
+                            }
+                            ae(td, sp);
+
+                            if (dates[0] <= g_serverTime && dates[1] >= g_serverTime) {
+                                tr.className = 'checked';
+                                sp.className = 'q2 tip';
+                                g_addTooltip(sp, LANG.tooltip_activeholiday, 'q');
+                            }
                         }
                     }
+                },
+                getVisibleText: function(holiday) {
+                    if (holiday.startDate && holiday.endDate) {
+                        var dates = Listview.funcBox.getEventNextDates(holiday.startDate, holiday.endDate, holiday.rec || 0);
+
+                        if (dates[0] && dates[1]) {
+                            var
+                                start = g_formatDateSimple(dates[0]),
+                                end = g_formatDateSimple(dates[1]);
+
+                            if (start != end) {
+                                return start + LANG.hyphen + end;
+                            }
+                            else {
+                                return start;
+                            }
+                        }
+                    }
+
+                    return'';
+                },
+                sortFunc: function(a, b, col) {
+                    if (a.startDate && b.startDate) {
+                        var datesA = Listview.funcBox.getEventNextDates(a.startDate, a.endDate, a.rec || 0);
+                        var datesB = Listview.funcBox.getEventNextDates(b.startDate, b.endDate, b.rec || 0);
+
+                        if (datesA[0] && datesB[0]) {
+                            return datesA[0] - datesB[0];
+                        }
+                    }
+					else if (a.startDate) {
+						return -1;
+					}
+					else if (b.startDate) {
+						return 1;
+					}
+
+					return 0;
                 }
-			},
-			getVisibleText: function (b) {
-				if (b.startDate && b.endDate) {
-					var c = Listview.funcBox.getEventNextDates(b.startDate, b.endDate, b.rec || 0);
-					if (c[0] && c[1]) {
-						var d = g_formatDateSimple(c[0]),
-						a = g_formatDateSimple(c[1]);
-						if (d != a) {
-							return d + LANG.hyphen + a
-						} else {
-							return d
-						}
-					}
-				}
-				return""
-			},
-			sortFunc: function (e, c, g) {
-				if (e.startDate && c.startDate) {
-					var d = Listview.funcBox.getEventNextDates(e.startDate, e.endDate, e.rec || 0);
-					var f = Listview.funcBox.getEventNextDates(c.startDate, c.endDate, c.rec || 0);
-					if (d[0] && f[0]) {
-						return d[0] - f[0]
-					}
-				} else {
-					return e.startDate ? -1 : c.startDate ? 1 : 0;
-				}
-			}
-		},
-		{
-			id: "category",
-			name: LANG.category,
-			type: "text",
-			width: "16%",
-			compute: function (d, e) {
-				e.className = "small q1";
-				var b = ce("a"), c = "?events=" + d.category;
-				b.href = c;
-				ae(b, ct(g_holiday_categories[d.category]));
-				ae(e, b)
-			},
-			getVisibleText: function (a) {
-				return g_holiday_categories[a.category]
-			},
-			sortFunc: function (d, c, e) {
-				return strcmp(g_holiday_categories[d.category], g_holiday_categories[c.category])
-			},
-			hidden: true
-		}],
-		getItemLink: function (a) {
-			return "?event=" + a.id
+            },
+            {
+                id: 'category',
+                name: LANG.category,
+                type: 'text',
+                width: '16%',
+                compute: function(holiday, td) {
+                    td.className = 'small q1';
+                    var
+                        a = ce('a'),
+                        href = '?events=' + holiday.category;
+
+                    a.href = href;
+                    ae(a, ct(g_holiday_categories[holiday.category]));
+                    ae(td, a);
+                },
+                getVisibleText: function(holiday) {
+                    return g_holiday_categories[holiday.category];
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(g_holiday_categories[a.category], g_holiday_categories[b.category]);
+                }
+            }
+        ],
+
+        getItemLink: function(holiday) {
+			return '?event=' + holiday.id;
 		}
 	},
+
+	holidaycal: {
+		sort: [1],
+		mode: 4, // Calendar
+		startOnMonth: new Date(g_serverTime.getFullYear(), 0, 1),
+		nMonthsToDisplay: 12,
+		rowOffset: g_serverTime.getMonth(),
+		poundable: 2, // Yes but w/o sort
+
+		columns: [],
+
+		compute: function(holiday, div, i) {
+			if (!holiday.events || !holiday.events.length) {
+				return;
+			}
+
+			for (var i = 0; i < holiday.events.length; ++i) {
+				var icon = g_holidays.createIcon(holiday.events[i].id, 1);
+				icon.onmouseover = Listview.funcBox.dateEventOver.bind(icon, holiday.date, holiday.events[i]);
+				icon.onmousemove = Tooltip.cursorUpdate;
+				icon.onmouseout  = Tooltip.hide;
+				icon.style.cssFloat = icon.style.styleFloat = 'left';
+				ae(div, icon);
+			}
+		},
+		sortFunc: function(a, b) {
+			if (a.startDate && b.startDate) {
+				var datesA = Listview.funcBox.getEventNextDates(a.startDate, a.endDate, a.rec || 0);
+				var datesB = Listview.funcBox.getEventNextDates(b.startDate, b.endDate, b.rec || 0);
+
+				for (var i = 0; i < 2; ++i) {
+					var
+                        dA = datesA[i],
+                        dB = datesB[i];
+
+					if (dA.getFullYear() == dB.getFullYear() && dA.getMonth() == dB.getMonth() && dA.getDate() == dB.getDate()) {
+						return dA - dB;
+					}
+				}
+			}
+
+			return strcmp(a.name, b.name);
+		}
+	},
+
 	comment: {
 		sort: [1],
 		mode: 2,
@@ -9931,7 +10404,7 @@ Listview.templates = {
 		{
 			value: "rating"
 		}],
-		compute: function (J, ac, ab) {
+		compute: function(J, ac, ab) {
 			var ag, I = new Date(J.date),
 			Y = (g_serverTime - I) / 1000,
 			h = (g_user.roles & U_GROUP_COMMENTS_MODERATOR) != 0,
@@ -9940,7 +10413,7 @@ Listview.templates = {
 			L = U && J.deleted == 0,
 			d = U && J.replyTo != J.id,
 			af = true,
-			W = J.purged == 0 && J.deleted == 0 && g_user.id && J.user.toLowerCase() != g_user.name.toLowerCase() && in_array(J.raters, g_user.id, function (i) {
+			W = J.purged == 0 && J.deleted == 0 && g_user.id && J.user.toLowerCase() != g_user.name.toLowerCase() && in_array(J.raters, g_user.id, function(i) {
 				return i[0]
 			}) == -1 && !g_user.ratingban,
 			p = J.rating >= 0 && (g_user.id == 0 || W || g_user.ratingban),
@@ -10191,7 +10664,7 @@ Listview.templates = {
 			}
 		},
 /* no idea what the new one does exactly.. so saved this old compute
-		compute: function (v, K) {
+		compute: function(v, K) {
 			var O, u = new Date(v.date),
 			I = (g_serverTime - u) / 1000,
 			d = (g_user.roles & 26) != 0,
@@ -10200,7 +10673,7 @@ Listview.templates = {
 			y = F && v.deleted == 0,
 			c = F && v.replyTo != v.id,
 			M = ((v.roles & 26) == 0),
-			G = v.purged == 0 && v.deleted == 0 && g_user.id && v.user.toLowerCase() != g_user.name.toLowerCase() && in_array(v.raters, g_user.id, function (P) {
+			G = v.purged == 0 && v.deleted == 0 && g_user.id && v.user.toLowerCase() != g_user.name.toLowerCase() && in_array(v.raters, g_user.id, function(P) {
 				return P[0]
 			}) == -1,
 			i = v.rating >= 0 && (g_user.id == 0 || G);
@@ -10373,7 +10846,7 @@ Listview.templates = {
 			}
 			ae(K, k)
 		}, */
-		createNote: function (b) {
+		createNote: function(b) {
 			var g = ce("small");
 			if (!g_user.commentban) {
 				var l = ce("a");
@@ -10428,7 +10901,7 @@ Listview.templates = {
 			for (var c in k) {
 				j.push(c)
 			}
-			j.sort(function (p, d) {
+			j.sort(function(p, d) {
 				return d - p
 			});
 			for (var c = 0; c < j.length; ++c) {
@@ -10442,7 +10915,7 @@ Listview.templates = {
 			ae(g, q);
 			ae(b, g);
 		},
-		onNoData: function (c) {
+		onNoData: function(c) {
 			var a = "<b>" + LANG.lvnodata_co1 + '</b><div class="pad2"></div>';
 			if (g_user.id > 0) {
 				var b = LANG.lvnodata_co2;
@@ -10457,16 +10930,16 @@ Listview.templates = {
 			c.style.padding = "1.5em 0";
 			c.innerHTML = a
 		},
-		onBeforeCreate: function () {
+		onBeforeCreate: function() {
 			if (location.hash && location.hash.match(/:id=([0-9]+)/) != null) {
-				var a = in_array(this.data, parseInt(RegExp.$1), function (b) {
+				var a = in_array(this.data, parseInt(RegExp.$1), function(b) {
 					return b.id
 				});
 				this.rowOffset = this.getRowOffset(a);
 				return this.data[a]
 			}
 		},
-		onAfterCreate: function (a) {
+		onAfterCreate: function(a) {
 			if (a != null) {
 				var b = a.__div;
 				this.tabs.__st = b;
@@ -10482,7 +10955,7 @@ Listview.templates = {
 			name: LANG.subject,
 			align: "left",
 			value: "subject",
-			compute: function (f, e) {
+			compute: function(f, e) {
 				var b = ce("a");
 				b.style.fontFamily = "Verdana, sans-serif";
 				b.href = this.template.getItemLink(f);
@@ -10502,7 +10975,7 @@ Listview.templates = {
 			align: "left",
 			width: "50%",
 			value: "preview",
-			compute: function (j, i, k) {
+			compute: function(j, i, k) {
 				var g = ce("div");
 				g.className = "crop";
 				if (j.rating >= 10) {
@@ -10551,7 +11024,7 @@ Listview.templates = {
 			id: "author",
 			name: LANG.author,
 			value: "user",
-			compute: function (d, c) {
+			compute: function(d, c) {
 				c.className = "q1";
 				var b = ce("a");
 				b.href = "?user=" + d.user;
@@ -10564,7 +11037,7 @@ Listview.templates = {
 			name: LANG.posted,
 			width: "16%",
 			value: "elapsed",
-			compute: function (e, d) {
+			compute: function(e, d) {
 				var a = new Date(e.date),
 				c = (g_serverTime - a) / 1000;
 				var b = ce("span");
@@ -10572,7 +11045,7 @@ Listview.templates = {
 				ae(d, b)
 			}
 		}],
-		getItemLink: function (a) {
+		getItemLink: function(a) {
 			return "?" + g_types[a.type] + "=" + a.typeId + (a.id != null ? "#comments:id=" + a.id: "")
 		}
 	},
@@ -10583,7 +11056,7 @@ Listview.templates = {
 		nItemsPerRow: 4,
 		poundable: 2,
 		columns: [],
-		compute: function (k, e, l) {
+		compute: function(k, e, l) {
 			var v, p = new Date(k.date),
 			f = (g_serverTime - p) / 1000;
 			e.className = "screenshot-cell";
@@ -10667,7 +11140,7 @@ Listview.templates = {
 			aE(e, "click", Listview.funcBox.ssCellClick.bind(this, l));
 			ae(e, q)
 		},
-		createNote: function (d) {
+		createNote: function(d) {
 			if (typeof g_pageInfo == "object" && g_pageInfo.type > 0) {
 				var c = ce("small");
 				var b = ce("a");
@@ -10682,7 +11155,7 @@ Listview.templates = {
 				ae(d, c)
 			}
 		},
-		onNoData: function (c) {
+		onNoData: function(c) {
 			if (typeof g_pageInfo == "object" && g_pageInfo.type > 0) {
 				var a = "<b>" + LANG.lvnodata_ss1 + '</b><div class="pad2"></div>';
 				if (g_user.id > 0) {
@@ -10701,18 +11174,18 @@ Listview.templates = {
 				return -1
 			}
 		},
-		onBeforeCreate: function () {
+		onBeforeCreate: function() {
 			if (location.hash && location.hash.match(/:id=([0-9]+)/) != null) {
-				var a = in_array(this.data, parseInt(RegExp.$1), function (b) {
+				var a = in_array(this.data, parseInt(RegExp.$1), function(b) {
 					return b.id
 				});
 				this.rowOffset = this.getRowOffset(a);
 				return a
 			}
 		},
-		onAfterCreate: function (a) {
+		onAfterCreate: function(a) {
 			if (a != null) {
-				setTimeout((function () {
+				setTimeout((function() {
 					ScreenshotViewer.show({
 						screenshots: this.data,
 						pos: a
@@ -10728,7 +11201,7 @@ Listview.templates = {
 		nItemsPerRow: 4,
 		poundable: 2,
 		columns: [],
-		compute: function (e, f, j) {
+		compute: function(e, f, j) {
 			var q, k = new Date(e.date),
 			r = (g_serverTime - k) / 1000;
 			f.className = "screenshot-cell";
@@ -10797,7 +11270,7 @@ Listview.templates = {
 			aE(f, "click", Listview.funcBox.viCellClick.bind(this, j));
 			ae(f, l)
 		},
-		createNote: function (d) {
+		createNote: function(d) {
 			if (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)) {
 				if (typeof g_pageInfo == "object" && g_pageInfo.type > 0) {
 					var c = ce("small");
@@ -10814,7 +11287,7 @@ Listview.templates = {
 				}
 			}
 		},
-		onNoData: function (c) {
+		onNoData: function(c) {
 			if (typeof g_pageInfo == "object" && g_pageInfo.type > 0) {
 				var a = "<b>" + LANG.lvnodata_vi1 + '</b><div class="pad2"></div>';
 				if (g_user.id > 0) {
@@ -10833,18 +11306,18 @@ Listview.templates = {
 				return - 1
 			}
 		},
-		onBeforeCreate: function () {
+		onBeforeCreate: function() {
 			if (location.hash && location.hash.match(/:id=([0-9]+)/) != null) {
-				var a = in_array(this.data, parseInt(RegExp.$1), function (b) {
+				var a = in_array(this.data, parseInt(RegExp.$1), function(b) {
 					return b.id
 				});
 				this.rowOffset = this.getRowOffset(a);
 				return a
 			}
 		},
-		onAfterCreate: function (a) {
+		onAfterCreate: function(a) {
 			if (a != null) {
-				setTimeout((function () {
+				setTimeout((function() {
 					VideoViewer.show({
 						videos: this.data,
 						pos: a,
@@ -10866,7 +11339,7 @@ Listview.templates = {
 			align: "left",
 			value: "name",
 			span: 2,
-			compute: function (b, k, g) {
+			compute: function(b, k, g) {
 				var e = ce("td");
 				e.style.width = "1px";
 				e.style.padding = "0";
@@ -10903,7 +11376,7 @@ Listview.templates = {
 				}
 				ae(k, j)
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				var b = a.name + Listview.funcBox.getExpansionText(a);
 				if (a.exotic) {
 					b += " " + LANG.lvpet_exotic
@@ -10915,13 +11388,13 @@ Listview.templates = {
 			id: "level",
 			name: LANG.level,
 			type: "range",
-			getMinValue: function (a) {
+			getMinValue: function(a) {
 				return a.minlevel
 			},
-			getMaxValue: function (a) {
+			getMaxValue: function(a) {
 				return a.maxlevel
 			},
-			compute: function (a, b) {
+			compute: function(a, b) {
 				if (a.minlevel > 0 && a.maxlevel > 0) {
 					if (a.minlevel != a.maxlevel) {
 						return a.minlevel + LANG.hyphen + a.maxlevel
@@ -10932,7 +11405,7 @@ Listview.templates = {
 					return - 1
 				}
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				if (e > 0) {
 					return strcmp(d.minlevel, c.minlevel) || strcmp(d.maxlevel, c.maxlevel)
 				} else {
@@ -10944,7 +11417,7 @@ Listview.templates = {
 			id: "abilities",
 			name: LANG.abilities,
 			type: "text",
-			getValue: function (b) {
+			getValue: function(b) {
 				if (!b.spells) {
 					return ""
 				}
@@ -10958,7 +11431,7 @@ Listview.templates = {
 					return d
 				}
 			},
-			compute: function (a, b) {
+			compute: function(a, b) {
 				if (!a.spells) {
 					return ""
 				}
@@ -10967,7 +11440,7 @@ Listview.templates = {
 					Listview.funcBox.createCenteredIcons(a.spells, b, "", 1)
 				}
 			},
-			sortFunc: function (d, c) {
+			sortFunc: function(d, c) {
 				if (!d.spells || !c.spells) {
 					return 0
 				}
@@ -10979,7 +11452,7 @@ Listview.templates = {
 			id: "diet",
 			name: LANG.diet,
 			type: "text",
-			compute: function (a, e) {
+			compute: function(a, e) {
 				if (e) {
 					e.className = "small"
 				}
@@ -10995,7 +11468,7 @@ Listview.templates = {
 				}
 				return c
 			},
-			sortFunc: function (d, c) {
+			sortFunc: function(d, c) {
 				return strcmp(c.foodCount, d.foodCount) || Listview.funcBox.assocArrCmp(d.diet, c.diet, g_pet_foods)
 			}
 		},
@@ -11003,7 +11476,7 @@ Listview.templates = {
 			id: "type",
 			name: LANG.type,
 			type: "text",
-			compute: function (b, d) {
+			compute: function(b, d) {
 				if (b.type != null) {
 					d.className = "small q1";
 					var c = ce("a");
@@ -11012,19 +11485,19 @@ Listview.templates = {
 					ae(d, c)
 				}
 			},
-			getVisibleText: function (a) {
+			getVisibleText: function(a) {
 				if (a.type != null) {
 					return g_pet_types[a.type]
 				}
 			},
-			sortFunc: function (d, c, e) {
+			sortFunc: function(d, c, e) {
 				return strcmp(g_pet_types[d.type], g_pet_types[c.type])
 			}
 		}],
-		getItemLink: function (a) {
+		getItemLink: function(a) {
 			return "?pet=" + a.id
 		},
-		getStatPct: function (b) {
+		getStatPct: function(b) {
 			var a = ce("span");
 			if (!isNaN(b) && b > 0) {
 				a.className = "q2";
@@ -11038,6 +11511,7 @@ Listview.templates = {
 			return a
 		}
 	},
+
 	achievement: {
 		sort: [1, 2],
 		nItemsPerPage: 100,
@@ -11051,7 +11525,7 @@ Listview.templates = {
                 align: 'left',
                 value: 'name',
                 span: 2,
-                compute: function (achievement, td, tr) {
+                compute: function(achievement, td, tr) {
                     var rel = null;
                     if (achievement.who && achievement.completed) {
                         rel = 'who=' + achievement.who + '&when=' + achievement.completed.getTime();
@@ -11084,7 +11558,7 @@ Listview.templates = {
                         ae(td, d);
                     }
                 },
-                getVisibleText: function (achievement) {
+                getVisibleText: function(achievement) {
                     var buff = achievement.name;
                     if (achievement.description) {
                         buff += ' ' + achievement.description;
@@ -11096,7 +11570,7 @@ Listview.templates = {
                 id: 'side',
                 name: LANG.side,
                 type: 'text',
-                compute: function (achievement, td) {
+                compute: function(achievement, td) {
                     if (achievement.side && achievement.side != 3) {
                         var sp = ce('span');
                         sp.className = (achievement.side == 1 ? 'alliance-icon': 'horde-icon');
@@ -11105,12 +11579,12 @@ Listview.templates = {
                         ae(td, sp);
                     }
                 },
-                getVisibleText: function (achievement) {
+                getVisibleText: function(achievement) {
                     if (achievement.side) {
                         return g_sides[achievement.side];
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_sides[a.side], g_sides[b.side]);
                 }
             },
@@ -11120,7 +11594,7 @@ Listview.templates = {
                 type: 'number',
                 width: '10%',
                 value: 'points',
-                compute: function (achievement, td) {
+                compute: function(achievement, td) {
                     if (achievement.points) {
                         Listview.funcBox.appendMoney(td, 0, null, 0, 0, 0, achievement.points);
                     }
@@ -11131,7 +11605,7 @@ Listview.templates = {
                 name: LANG.rewards,
                 type: 'text',
                 width: '20%',
-                compute: function (achievement, td) {
+                compute: function(achievement, td) {
                     if (achievement.rewards) {
                         var itemrewards = [];
                         var spellrewards = []; // not used in 3.3.5
@@ -11207,7 +11681,7 @@ Listview.templates = {
                         ae(td, span);
                     }
                 },
-                getVisibleText: function (achievement) {
+                getVisibleText: function(achievement) {
                     var buff = '';
                     if (achievement.rewards) {
                         for (var i = 0; i < achievement.rewards.length; i++) {
@@ -11228,7 +11702,7 @@ Listview.templates = {
 
                     return buff;
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     var text1 = this.getVisibleText(a);
                     var text2 = this.getVisibleText(b);
 
@@ -11247,7 +11721,7 @@ Listview.templates = {
                 name: LANG.category,
                 type: 'text',
                 width: '15%',
-                compute: function (achievement, td) {
+                compute: function(achievement, td) {
                     td.className = 'small';
                     path = '?achievements=';
                     if (achievement.category != -1 && achievement.parentcat != -1) {
@@ -11265,20 +11739,21 @@ Listview.templates = {
                     ae(a, ct(g_achievement_categories[achievement.category]));
                     ae(td, a);
                 },
-                getVisibleText: function (achievement) {
+                getVisibleText: function(achievement) {
                     return g_achievement_categories[achievement.category];
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_achievement_categories[a.category], g_achievement_categories[b.category]);
                 },
                 hidden: true
             }
         ],
 
-		getItemLink: function (achievement) {
+		getItemLink: function(achievement) {
 			return '?achievement=' + achievement.id;
 		}
 	},
+
 	title: {
 		sort: [1],
 		nItemsPerPage: -1,
@@ -11292,7 +11767,7 @@ Listview.templates = {
                 type: 'text',
                 align: 'left',
                 value: 'name',
-                compute: function (title, td, tr) {
+                compute: function(title, td, tr) {
                     var
                         sp = ce('a'),
                         n = ce('span'),
@@ -11331,14 +11806,14 @@ Listview.templates = {
                         ae(td, sp);
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     var
                         aName = trim(a.name.replace('%s', '').replace(/^[\s,]*(,|the |of the |of )/i, ''));
                         bName = trim(b.name.replace('%s', '').replace(/^[\s,]*(,|the |of the |of )/i, ''));
 
                     return strcmp(aName, bName);
                 },
-                getVisibleText: function (title) {
+                getVisibleText: function(title) {
 					var buff = title.name + Listview.funcBox.getExpansionText(title);
 
                     return buff;
@@ -11349,7 +11824,7 @@ Listview.templates = {
                 name: LANG.gender,
                 type: 'text',
                 value: 'gender',
-                compute: function (title, td) {
+                compute: function(title, td) {
                     if (title.gender && title.gender != 3) {
                         var gender = g_file_genders[title.gender - 1];
                         var sp = ce('span');
@@ -11359,12 +11834,12 @@ Listview.templates = {
                         ae(td, sp);
                     }
                 },
-                getVisibleText: function (title) {
+                getVisibleText: function(title) {
                     if (title.gender && title.gender != 3) {
                         return LANG[g_file_genders[title.gender - 1]];
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(a.gender, b.gender);
                 }
             },
@@ -11372,7 +11847,7 @@ Listview.templates = {
                 id: 'side',
                 name: LANG.side,
                 type: 'text',
-                compute: function (title, td) {
+                compute: function(title, td) {
                     if (title.side && title.side != 3) {
                         var sp = ce('span');
                         sp.className = (title.side == 1 ? 'alliance-icon': 'horde-icon');
@@ -11381,12 +11856,12 @@ Listview.templates = {
                         ae(td, sp);
                     }
                 },
-                getVisibleText: function (title) {
+                getVisibleText: function(title) {
                     if (title.side) {
                         return g_sides[title.side];
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_sides[a.side], g_sides[b.side]);
                 }
             },
@@ -11394,7 +11869,7 @@ Listview.templates = {
                 id: 'source',
                 name: LANG.source,
                 type: 'text',
-                compute: function (title, td) {
+                compute: function(title, td) {
                     if (title.source) {
                         nw(td);
                         td.className = 'small';
@@ -11402,7 +11877,7 @@ Listview.templates = {
                         var n = 0;
 
                         for (var s in title.source) {
-                            title.source[s].sort(function (a, b) {
+                            title.source[s].sort(function(a, b) {
                                 return b.s - a.s;
                             });
 
@@ -11447,7 +11922,7 @@ Listview.templates = {
                     }
                 },
                 /* old: doesn't support text sent by server
-                    getVisibleText: function (l) {
+                    getVisibleText: function(l) {
                         var h = {
                             achievements: g_achievements,
                             quests: g_quests
@@ -11477,8 +11952,8 @@ Listview.templates = {
 					var buff = '';
 
 					if (title.source) {
-						for(var s in title.source) {
-							for(var i = 0, len = title.source[s].length; i < len; ++i) {
+						for (var s in title.source) {
+							for (var i = 0, len = title.source[s].length; i < len; ++i) {
 								var sm = title.source[s][i];
 								if (typeof sm == 'string') {
 									buff += ' ' + sm;
@@ -11492,7 +11967,7 @@ Listview.templates = {
 
 					return buff;
 				},
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(this.getVisibleText(a), this.getVisibleText(b));
                 }
             },
@@ -11501,7 +11976,7 @@ Listview.templates = {
                 name: LANG.category,
                 type: 'text',
                 width: '15%',
-                compute: function (title, td) {
+                compute: function(title, td) {
                     nw(td);
                     td.className = 'small q1';
                     var a = ce('a');
@@ -11509,20 +11984,21 @@ Listview.templates = {
                     ae(a, ct(g_title_categories[title.category]));
                     ae(td, a);
                 },
-                getVisibleText: function (title) {
+                getVisibleText: function(title) {
                     return g_title_categories[title.category];
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_title_categories[a.category], g_title_categories[b.category]);
                 },
                 hidden: true
             }
         ],
 
-		getItemLink: function (title) {
+		getItemLink: function(title) {
             return '?title=' + title.id;
 		}
 	},
+
     profile: {
         sort: [],
         nItemsPerPage: 50,
@@ -11536,7 +12012,7 @@ Listview.templates = {
                 type: 'text',
                 align: 'left',
                 span: 2,
-                compute: function (profile, td, tr) {
+                compute: function(profile, td, tr) {
                     if (profile.level) {
                         var i = ce('td');
                         i.style.width = '1px';
@@ -11608,7 +12084,7 @@ Listview.templates = {
                     ae(wrapper, d);
                     ae(td, wrapper);
                 },
-                getVisibleText: function (profile) {
+                getVisibleText: function(profile) {
                     var buff = profile.name;
                     if (profile.guild && typeof(profile.guild) != 'number') {
                         buff += ' ' + profile.guild;
@@ -11620,7 +12096,7 @@ Listview.templates = {
                 id: 'faction',
                 name: LANG.faction,
                 type: 'text',
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     if (!profile.size && profile.members === undefined && !profile.level) {
                         return;
                     }
@@ -11643,10 +12119,10 @@ Listview.templates = {
                     ae(td, d);
                     ae(td, d2);
                 },
-                getVisibleText: function (profile) {
+                getVisibleText: function(profile) {
                     return g_sides[profile.faction + 1];
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(this.getVisibleText(a), this.getVisibleText(b));
                 }
             },
@@ -11672,7 +12148,7 @@ Listview.templates = {
                 id: 'race',
                 name: LANG.race,
                 type: 'text',
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     if (profile.race) {
                         var
                             d = ce('div'),
@@ -11693,10 +12169,10 @@ Listview.templates = {
                         ae(td, d2);
                     }
                 },
-                getVisibleText: function (profile) {
+                getVisibleText: function(profile) {
                     return g_file_genders[profile.gender] + ' ' + g_chr_races[profile.race];
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_chr_races[a.race], g_chr_races[b.race]);
                 },
                 hidden: 1
@@ -11705,7 +12181,7 @@ Listview.templates = {
                 id: 'classs',
                 name: LANG.classs,
                 type: 'text',
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     if (profile.classs) {
                         var
                             d  = ce('div'),
@@ -11730,12 +12206,12 @@ Listview.templates = {
                         return -1;
                     }
                 },
-                getVisibleText: function (profile) {
+                getVisibleText: function(profile) {
                     if (profile.classs) {
                         return g_chr_classes[profile.classs];
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(this.getVisibleText(a), this.getVisibleText(b));
                 },
                 hidden: 1
@@ -11750,7 +12226,7 @@ Listview.templates = {
                 id: 'talents',
                 name: LANG.talents,
                 type: 'text',
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     if (!profile.level) {
                         return;
                     }
@@ -11769,7 +12245,7 @@ Listview.templates = {
 
                     ae(td, a);
                 },
-                getVisibleText: function (profile) {
+                getVisibleText: function(profile) {
                     if (profile.talenttree1 || profile.talenttree2 || profile.talenttree3) {
                         if (profile.talentspec > 0) {
                             return g_chr_specs[profile.classs][profile.talentspec - 1];
@@ -11782,7 +12258,7 @@ Listview.templates = {
                         return g_chr_specs['-1'];
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(this.getVisibleText(a), this.getVisibleText(b));
                 },
                 hidden: 1
@@ -11792,7 +12268,7 @@ Listview.templates = {
                 name: LANG.gearscore,
                 tooltip: LANG.gearscore_real,
                 value: 'gearscore',
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     var level = (profile.level ? profile.level: (profile.members !== undefined ? 80 : 0));
 
                     if (isNaN(profile.gearscore) || !level) {
@@ -11810,7 +12286,7 @@ Listview.templates = {
                 name: LANG.points,
                 value: 'achievementpoints',
                 tooltip: LANG.tooltip_achievementpoints,
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     if (profile.achievementpoints) {
                         Listview.funcBox.appendMoney(td, 0, null, 0, 0, 0, profile.achievementpoints);
                     }
@@ -11826,7 +12302,7 @@ Listview.templates = {
             {
                 id: 'losses',
                 name: LANG.losses,
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     return profile.games - profile.wins;
                 },
                 hidden: 1
@@ -11835,7 +12311,7 @@ Listview.templates = {
                 id: 'guildrank',
                 name: LANG.guildrank,
                 value: 'guildrank',
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     if (profile.guildrank > 0) {
                         return sprintf(LANG.rankno, profile.guildrank);
                     }
@@ -11845,7 +12321,7 @@ Listview.templates = {
                         ae(td, b);
                     }
                 },
-                getVisibleText: function (profile) {
+                getVisibleText: function(profile) {
                     if (profile.guildrank > 0) {
                         return sprintf(LANG.rankno, profile.guildrank);
                     }
@@ -11853,7 +12329,7 @@ Listview.templates = {
                         return LANG.guildleader;
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp((a.guildrank >= 0 ? a.guildrank : 11), (b.guildrank >= 0 ? b.guildrank : 11));
                 },
                 hidden: 1
@@ -11862,14 +12338,14 @@ Listview.templates = {
                 id: 'rating',
                 name: LANG.rating,
                 value: 'rating',
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     if (profile.roster) {
                         return profile.arenateam[profile.roster].rating;
                     }
 
                     return profile.rating;
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     if (a.roster && b.roster) {
                         return strcmp(a.arenateam[a.roster].rating, b.arenateam[b.roster].rating);
                     }
@@ -11882,7 +12358,7 @@ Listview.templates = {
                 id: 'location',
                 name: LANG.location,
                 type: 'text',
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     var a;
 
                     if (profile.region) {
@@ -11915,7 +12391,7 @@ Listview.templates = {
                         ae(td, s);
                     }
                 },
-                getVisibleText: function (profile) {
+                getVisibleText: function(profile) {
                     var buff = '';
                     if (profile.region) {
                         buff += ' ' + profile.region;
@@ -11929,7 +12405,7 @@ Listview.templates = {
 
                     return trim(buff);
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     if (a.region != b.region) {
                         return strcmp(a.region, b.region);
                     }
@@ -11944,7 +12420,7 @@ Listview.templates = {
                 name: LANG.guild,
                 value: 'guild',
                 type: 'text',
-                compute: function (profile, td) {
+                compute: function(profile, td) {
                     if (!profile.region || !profile.subregion || !profile.realm || !profile.guild || typeof(profile.guild) == 'number') {
                         return;
                     }
@@ -11958,7 +12434,7 @@ Listview.templates = {
             }
         ],
 
-        getItemLink: function (profile) {
+        getItemLink: function(profile) {
             if (profile.size !== undefined) {
 				return '?arena-team=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name);
             }
@@ -11970,6 +12446,7 @@ Listview.templates = {
             }
         }
     },
+
 	model: {
 		sort: [],
 		mode: 3,
@@ -11977,7 +12454,7 @@ Listview.templates = {
 		nItemsPerRow: 4,
 		poundable: 2,
 		columns: [],
-		compute: function (e, k, f) {
+		compute: function(e, k, f) {
 			k.className = "screenshot-cell";
 			k.vAlign = "bottom";
 			var b = ce("a");
@@ -12009,7 +12486,7 @@ Listview.templates = {
 			ae(k, j);
 			aE(k, "click", this.template.modelShow.bind(this.template, e.npcId, e.displayId, true))
 		},
-		modelShow: function (d, b, f, g) {
+		modelShow: function(d, b, f, g) {
 			if (f) {
 				g = $E(g);
 				if (g.shiftKey || g.ctrlKey) {
@@ -12035,6 +12512,7 @@ Listview.templates = {
 			})
 		}
 	},
+
 	currency: {
 		sort: [1],
 		searchable: 1,
@@ -12047,7 +12525,7 @@ Listview.templates = {
                 align: 'left',
                 span: 2,
                 value: 'name',
-                compute: function (currency, td, tr) {
+                compute: function(currency, td, tr) {
                     var i = ce('td');
                     i.style.width = '1px';
                     i.style.padding = '0';
@@ -12074,7 +12552,7 @@ Listview.templates = {
                 name: LANG.category,
                 type: 'text',
                 width: '15%',
-                compute: function (currency, td) {
+                compute: function(currency, td) {
                     td.className = 'small';
 
                     var a = ce('a');
@@ -12083,19 +12561,20 @@ Listview.templates = {
                     ae(a, ct(g_currency_categories[currency.category]));
                     ae(td, a);
                 },
-                getVisibleText: function (currency) {
+                getVisibleText: function(currency) {
                     return g_currency_categories[currency.category];
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_currency_categories[a.category], g_currency_categories[b.category]);
                 }
             }
         ],
 
-		getItemLink: function (currency) {
+		getItemLink: function(currency) {
 			return '?currency=' + currency.id;
 		}
 	},
+
 	classs: {
 		sort: [1],
 		searchable: 1,
@@ -12108,7 +12587,7 @@ Listview.templates = {
                 align: 'left',
                 span: 2,
                 value: 'name',
-                compute: function (classs, td, tr) {
+                compute: function(classs, td, tr) {
                     var i = ce('td');
                     i.style.width = '1px';
                     i.style.padding = '0';
@@ -12157,7 +12636,7 @@ Listview.templates = {
                 id: 'races',
                 name: LANG.races,
                 type: 'text',
-                compute: function (classs, td) {
+                compute: function(classs, td) {
                     if (classs.races) {
                         var races = Listview.funcBox.assocBinFlags(classs.races, g_chr_races);
 
@@ -12173,21 +12652,22 @@ Listview.templates = {
                         }
                     }
                 },
-                getVisibleText: function (classs) {
+                getVisibleText: function(classs) {
                     if (classs.races) {
                         return Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(classs.races, g_chr_races), g_chr_races);
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(a.races, g_chr_races), Listview.funcBox.assocBinFlags(b.races, g_chr_races), g_chr_races);
                 }
             }
         ],
 
-		getItemLink: function (classs) {
+		getItemLink: function(classs) {
 			return '?class=' + classs.id;
 		}
 	},
+
 	race: {
 		sort: [1],
 		searchable: 1,
@@ -12200,7 +12680,7 @@ Listview.templates = {
                 align: 'left',
                 span: 2,
                 value: 'name',
-                compute: function (race, td, tr) {
+                compute: function(race, td, tr) {
                     var
                         d = ce('div'),
                         icon;
@@ -12249,7 +12729,7 @@ Listview.templates = {
                 id: 'side',
                 name: LANG.side,
                 type: 'text',
-                compute: function (race, td) {
+                compute: function(race, td) {
                     if (race.side && race.side != 3) {
                         var sp = ce('span');
                         sp.className = (race.side == 1 ? 'alliance-icon' : 'horde-icon');
@@ -12258,12 +12738,12 @@ Listview.templates = {
                         ae(td, sp);
                     }
                 },
-                getVisibleText: function (race) {
+                getVisibleText: function(race) {
                     if (race.side) {
                         return g_sides[race.side];
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return strcmp(g_sides[a.side], g_sides[b.side]);
                 }
             },
@@ -12271,7 +12751,7 @@ Listview.templates = {
                 id: 'classes',
                 name: LANG.classes,
                 type: 'text',
-                compute: function (race, td) {
+                compute: function(race, td) {
                     if (race.classes) {
                         var classes = Listview.funcBox.assocBinFlags(race.classes, g_chr_classes);
 
@@ -12291,22 +12771,23 @@ Listview.templates = {
                         ae(td, d);
                     }
                 },
-                getVisibleText: function (race) {
+                getVisibleText: function(race) {
                     if (race.classes) {
                         return Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(race.classes, g_chr_classes), g_chr_classes);
                     }
                 },
-                sortFunc: function (a, b, col) {
+                sortFunc: function(a, b, col) {
                     return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(a.classes, g_chr_classes), Listview.funcBox.assocBinFlags(b.classes, g_chr_classes), g_chr_classes);
                 }
             }
         ],
 
-		getItemLink: function (race) {
+		getItemLink: function(race) {
 			return '?race=' + race.id;
 		}
 	}
 };
+
 Menu.fixUrls(mn_items, "?items=");
 Menu.fixUrls(mn_itemSets, "?itemsets&filter=cl=", "#0-2+1");
 Menu.fixUrls(mn_npcs, "?npcs=");
@@ -12417,61 +12898,61 @@ var g_file_gems = {
 	12 : "green",
 	14 : "prismatic"
 };
-g_items.add = function (b, a) {
+g_items.add = function(b, a) {
 	if (g_items[b] != null) {
 		cO(g_items[b], a)
 	} else {
 		g_items[b] = a
 	}
 };
-g_items.getIcon = function (a) {
+g_items.getIcon = function(a) {
 	if (g_items[a] != null && g_items[a].icon) {
 		return g_items[a].icon
 	} else {
 		return "inv_misc_questionmark"
 	}
 };
-g_items.createIcon = function (d, b, a, c) {
+g_items.createIcon = function(d, b, a, c) {
 	return Icon.create(g_items.getIcon(d), b, null, "?item=" + d, a, c)
 };
-g_spells.add = function (b, a) {
+g_spells.add = function(b, a) {
 	if (g_spells[b] != null) {
 		cO(g_spells[b], a)
 	} else {
 		g_spells[b] = a
 	}
 };
-g_spells.getIcon = function (a) {
+g_spells.getIcon = function(a) {
 	if (g_spells[a] != null && g_spells[a].icon) {
 		return g_spells[a].icon
 	} else {
 		return "inv_misc_questionmark"
 	}
 };
-g_spells.createIcon = function (d, b, a, c) {
+g_spells.createIcon = function(d, b, a, c) {
 	return Icon.create(g_spells.getIcon(d), b, null, "?spell=" + d, a, c)
 };
-g_achievements.getIcon = function (a) {
+g_achievements.getIcon = function(a) {
 	if (g_achievements[a] != null && g_achievements[a].icon) {
 		return g_achievements[a].icon
 	} else {
 		return "inv_misc_questionmark"
 	}
 };
-g_achievements.createIcon = function (d, b, a, c) {
+g_achievements.createIcon = function(d, b, a, c) {
 	return Icon.create(g_achievements.getIcon(d), b, null, "?achievement=" + d, a, c)
 };
-g_classes.getIcon = function (a) {
+g_classes.getIcon = function(a) {
     if (g_file_classes[a]) {
         return "class_" + g_file_classes[a]
     } else {
         return "inv_misc_questionmark"
     }
 };
-g_classes.createIcon = function (d, b, a, c) {
+g_classes.createIcon = function(d, b, a, c) {
     return Icon.create(g_classes.getIcon(d), b, null, "?class=" + d, a, c)
 };
-g_races.getIcon = function (b, a) {
+g_races.getIcon = function(b, a) {
     if (a === undefined) {
         a = 0
     }
@@ -12481,20 +12962,20 @@ g_races.getIcon = function (b, a) {
         return "inv_misc_questionmark"
     }
 };
-g_races.createIcon = function (d, b, a, c) {
+g_races.createIcon = function(d, b, a, c) {
     return Icon.create(g_races.getIcon(d), b, null, "?race=" + d, a, c)
 };
-g_skills.getIcon = function (a) {
+g_skills.getIcon = function(a) {
     if (g_skills[a] != null && g_skills[a].icon) {
         return g_skills[a].icon
     } else {
         return "inv_misc_questionmark"
     }
 };
-g_skills.createIcon = function (d, b, a, c) {
+g_skills.createIcon = function(d, b, a, c) {
     return Icon.create(g_skills.getIcon(d), b, null, "?skill=" + d, a, c)
 };
-g_gatheredcurrencies.getIcon = function (b, a) {
+g_gatheredcurrencies.getIcon = function(b, a) {
     if (g_gatheredcurrencies[b] != null && g_gatheredcurrencies[b].icon) {
         if (is_array(g_gatheredcurrencies[b].icon) && !isNaN(a)) {
             return g_gatheredcurrencies[b].icon[a]
@@ -12504,17 +12985,17 @@ g_gatheredcurrencies.getIcon = function (b, a) {
         return "inv_misc_questionmark"
     }
 };
-g_gatheredcurrencies.createIcon = function (d, b, a, c) {
+g_gatheredcurrencies.createIcon = function(d, b, a, c) {
     return Icon.create(g_gatheredcurrencies.getIcon(d, (a > 0 ? 0 : 1)), b, null, null, Math.abs(a), c)
 };
-g_holidays.getIcon = function (a) {
+g_holidays.getIcon = function(a) {
     if (g_holidays[a] != null && g_holidays[a].icon) {
         return g_holidays[a].icon
     } else {
         return "inv_misc_questionmark"
     }
 };
-g_holidays.createIcon = function (d, b, a, c) {
+g_holidays.createIcon = function(d, b, a, c) {
     return Icon.create(g_holidays.getIcon(d), b, null, "?event=" + d, a, c)
 };
 
@@ -12544,7 +13025,7 @@ var Icon = {
     sizes2: [18, 36, 56],
     premiumOffsets: [[-56, -36], [-56, 0], [0, 0]],
 
-    create: function (name, size, UNUSED, url, num, qty, noBorder) {
+    create: function(name, size, UNUSED, url, num, qty, noBorder) {
         var
             icon  = ce('div'),
             image = ce('ins'),
@@ -12590,7 +13071,7 @@ var Icon = {
         return icon;
     },
 
-    createUser: function (avatar, avatarMore, size, url, isPremium, noBorder) {
+    createUser: function(avatar, avatarMore, size, url, isPremium, noBorder) {
         if (avatar == 2) {
             avatarMore = g_staticUrl + '/uploads/avatars/' + avatarMore + '.jpg';
         }
@@ -12608,7 +13089,7 @@ var Icon = {
         return icon;
     },
 
-    setTexture: function (icon, size, name) {
+    setTexture: function(icon, size, name) {
         if (!name) {
             return;
         }
@@ -12625,7 +13106,7 @@ var Icon = {
         Icon.moveTexture(icon, size, 0, 0);
     },
 
-    moveTexture: function (icon, size, x, y, exact) {
+    moveTexture: function(icon, size, x, y, exact) {
         var _ = icon.firstChild.style;
 
         if (x || y) {
@@ -12641,7 +13122,7 @@ var Icon = {
         }
     },
 
-    setNumQty: function (icon, num, qty) {
+    setNumQty: function(icon, num, qty) {
         var _ = gE(icon, 'span');
 
         for (var i = 0, len = _.length; i < len; ++i) {
@@ -12666,11 +13147,11 @@ var Icon = {
         }
     },
 
-    getLink: function (icon) {
+    getLink: function(icon) {
         return gE(icon, 'a')[0];
     },
 
-    showIconName: function (x) {
+    showIconName: function(x) {
         if (x.firstChild) {
             var _ = x.firstChild.style;
             if (_.backgroundImage.length && (_.backgroundImage.indexOf(g_staticUrl) >= 4 || g_staticUrl == '')) {
@@ -12856,7 +13337,7 @@ var Icon = {
 DomContentLoaded.addEvent(Icon.checkPound);
 
 var RedButton = {
-    create: function (text, enabled, func) {
+    create: function(text, enabled, func) {
         var
             a    = ce('a'),
             em   = ce('em'),
@@ -12879,12 +13360,12 @@ var RedButton = {
         return a;
     },
 
-    setText: function (button, text) {
+    setText: function(button, text) {
         st(button.firstChild.childNodes[0].firstChild, text); // em, b, i
         st(button.firstChild.childNodes[1], text); // em, span
     },
 
-    enable: function (button, enabled) {
+    enable: function(button, enabled) {
         if (enabled || enabled == null) {
             button.className = button.className.replace('button-red-disabled', '');
         }
@@ -12893,13 +13374,13 @@ var RedButton = {
         }
     },
 
-    setFunc: function (button, func) {
+    setFunc: function(button, func) {
         button.onclick = (func ? func: null);
     }
 };
 
 var Tooltip = {
-    create: function (htmlTooltip, secondary) {
+    create: function(htmlTooltip, secondary) {
         var
             d   = ce('div'),
             t   = ce('table'),
@@ -12948,11 +13429,11 @@ var Tooltip = {
         return d;
     },
 
-    getMultiPartHtml: function (upper, lower) {
+    getMultiPartHtml: function(upper, lower) {
         return '<table><tr><td>' + upper + '</td></tr></table><table><tr><td>' + lower + '</td></tr></table>';
     },
 
-    fix: function (tooltip, noShrink, visible) {
+    fix: function(tooltip, noShrink, visible) {
         var
         table     = gE(tooltip, 'table')[0],
         td        = gE(table, 'td')[0],
@@ -12984,11 +13465,11 @@ var Tooltip = {
         }
     },
 
-    fixSafe: function (p1, p2, p3) {
+    fixSafe: function(p1, p2, p3) {
         Tooltip.fix(p1, p2, p3);
     },
 
-    append: function (el, htmlTooltip) {
+    append: function(el, htmlTooltip) {
         var el = $(el);
         var tooltip = Tooltip.create(htmlTooltip);
         ae(el, tooltip);
@@ -12996,7 +13477,7 @@ var Tooltip = {
         Tooltip.fixSafe(tooltip, 1, 1);
     },
 
-    prepare: function () {
+    prepare: function() {
         if (Tooltip.tooltip) {
             return;
         }
@@ -13022,7 +13503,7 @@ var Tooltip = {
         Tooltip.tooltipTd2    = gE(_, 'td')[0];
     },
 
-    set: function (text, text2) {
+    set: function(text, text2) {
         var _ = Tooltip.tooltip;
 
         _.style.width = '550px';
@@ -13073,7 +13554,7 @@ var Tooltip = {
         [false, false]  // Bottom left
     ],
 
-    move: function (x, y, width, height, paddX, paddY) {
+    move: function(x, y, width, height, paddX, paddY) {
         if (!Tooltip.tooltipTable) {
             return;
         }
@@ -13112,7 +13593,7 @@ var Tooltip = {
         }
     },
 
-    moveTest: function (left, top, width, height, paddX, paddY, rightAligned, topAligned) {
+    moveTest: function(left, top, width, height, paddX, paddY, rightAligned, topAligned) {
         var
             bakLeft = left,
             bakTop  = top,
@@ -13178,7 +13659,7 @@ var Tooltip = {
         return g_createRect(left, top, tow, toh);
     },
 
-    show: function (_this, text, paddX, paddY, spanClass, text2) {
+    show: function(_this, text, paddX, paddY, spanClass, text2) {
         if (Tooltip.disabled) {
             return;
         }
@@ -13202,7 +13683,7 @@ var Tooltip = {
         Tooltip.move(coords.x, coords.y, _this.offsetWidth, _this.offsetHeight, paddX, paddY);
     },
 
-    showAtCursor: function (e, text, paddX, paddY, spanClass, text2) {
+    showAtCursor: function(e, text, paddX, paddY, spanClass, text2) {
         if (Tooltip.disabled) {
             return;
         }
@@ -13229,7 +13710,7 @@ var Tooltip = {
         Tooltip.move(pos.x, pos.y, 0, 0, paddX, paddY);
     },
 
-    showAtXY: function (text, x, y, paddX, paddY, text2) {
+    showAtXY: function(text, x, y, paddX, paddY, text2) {
         if (Tooltip.disabled) {
             return;
         }
@@ -13239,7 +13720,7 @@ var Tooltip = {
         Tooltip.move(x, y, 0, 0, paddX, paddY);
     },
 
-    cursorUpdate: function (e, x, y) { // Used along with showAtCursor
+    cursorUpdate: function(e, x, y) { // Used along with showAtCursor
         if (Tooltip.disabled || !Tooltip.tooltip) {
             return;
         }
@@ -13257,7 +13738,7 @@ var Tooltip = {
         Tooltip.move(pos.x, pos.y, 0, 0, x, y);
     },
 
-    hide: function () {
+    hide: function() {
         if (Tooltip.tooltip) {
             Tooltip.tooltip.style.display  = 'none';
             Tooltip.tooltip.visibility     = 'hidden';
@@ -13273,7 +13754,7 @@ var Tooltip = {
         }
     },
 
-    setIcon: function (icon) {
+    setIcon: function(icon) {
         Tooltip.prepare();
 
         if (icon) {
@@ -13289,7 +13770,7 @@ var Tooltip = {
     }
 };
 
-var LiveSearch = new function () {
+var LiveSearch = new function() {
     var
         currentTextbox,
         lastSearch = {},
@@ -13608,7 +14089,7 @@ var LiveSearch = new function () {
         }
     }
 
-    this.attach = function (textbox) {
+    this.attach = function(textbox) {
         if (textbox.getAttribute("autocomplete") == "off") {
             return;
         }
@@ -13619,19 +14100,19 @@ var LiveSearch = new function () {
         aE(textbox, "keydown", onKeyDown);
     };
 
-    this.reset = function (textbox) {
+    this.reset = function(textbox) {
         lastSearch[textbox.id] = null;
         textbox.value = "";
         hasData = 0;
         hide();
     };
 
-    this.hide = function () {
+    this.hide = function() {
         hide();
     }
 };
 
-var Lightbox = new function () {
+var Lightbox = new function() {
     var
         overlay,
         outer,
@@ -13700,7 +14181,7 @@ var Lightbox = new function () {
     }
 
     function hide() {
-        if(!prepared) {
+        if (!prepared) {
             return;
         }
 
@@ -13720,8 +14201,8 @@ var Lightbox = new function () {
         Lightbox.setSize(inner.offsetWidth, inner.offsetHeight, 1);
     }
 
-    this.setSize = function (w, h, auto) {
-        if(!Browser.ie) {
+    this.setSize = function(w, h, auto) {
+        if (!Browser.ie) {
             inner.style.visibility = 'hidden';
         }
 
@@ -13739,7 +14220,7 @@ var Lightbox = new function () {
         inner.style.visibility = 'visible';
     };
 
-    this.show = function (id, _funcs, opt) {
+    this.show = function(id, _funcs, opt) {
         funcs = _funcs || {};
 
         prepare();
@@ -13776,20 +14257,20 @@ var Lightbox = new function () {
         g_enableScroll(false);
     };
 
-    this.reveal = function () {
+    this.reveal = function() {
         reveal();
     };
 
-    this.hide = function () {
+    this.hide = function() {
         hide();
     };
 
-    this.isVisible = function () {
+    this.isVisible = function() {
         return (overlay && overlay.style.display != 'none');
     }
 };
 
-var ModelViewer = new function () {
+var ModelViewer = new function() {
 	this.validSlots = [1,3,4,5,6,7,8,9,10,13,14,15,16,17,19,20,21,22,23,25,26];
 	this.slotMap = {1: 1, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 13: 21, 14: 22, 15: 22, 16: 16, 17: 21, 19: 19, 20: 5, 21: 21, 22: 22, 23: 22, 25: 21, 26: 21};
     var
@@ -13850,7 +14331,7 @@ var ModelViewer = new function () {
     }
 
     function isRaceSexValid(race, sex) {
-        return (!isNaN(race) && race > 0 && in_array(races, race, function (x) {
+        return (!isNaN(race) && race > 0 && in_array(races, race, function(x) {
             return x.id;
         }) != -1 && !isNaN(sex) && sex >= 0 && sex <= 1);
     }
@@ -13968,7 +14449,7 @@ var ModelViewer = new function () {
                 sexSel.style.display = '';
             }
 
-            var foo = function (x) {
+            var foo = function(x) {
                 return x.id;
             };
             var raceIndex = in_array(races, race, foo);
@@ -14074,7 +14555,7 @@ var ModelViewer = new function () {
         }
 
         if (race != -1 && sex != -1) {
-            var foo = function (x) {
+            var foo = function(x) {
                 return x.id;
             };
 
@@ -14190,7 +14671,7 @@ var ModelViewer = new function () {
             modelDiv = ce('div');
             modelDiv.className = 'modelviewer-model';
 
-            var foo = function (a, b) {
+            var foo = function(a, b) {
                 return strcmp(a.name, b.name);
             };
 
@@ -14297,7 +14778,7 @@ var ModelViewer = new function () {
         oldHash = location.hash;
     }
 
-    this.checkPound = function () {
+    this.checkPound = function() {
         if (location.hash && location.hash.indexOf('#modelviewer') == 0) {
             var parts = location.hash.split(':');
             if (parts.length >= 3) {
@@ -14346,11 +14827,11 @@ var ModelViewer = new function () {
         }
     };
 
-    this.addExtraPound = function (func) {
+    this.addExtraPound = function(func) {
         readExtraPound = func;
     };
 
-    this.show = function (opt) {
+    this.show = function(opt) {
         optBak = opt;
 
         Lightbox.show('modelviewer', {
@@ -14363,7 +14844,7 @@ var ModelViewer = new function () {
 };
 
 var g_screenshots = {};
-var ScreenshotViewer = new function () {
+var ScreenshotViewer = new function() {
     var
         screenshots,
         pos,
@@ -14711,10 +15192,10 @@ var ScreenshotViewer = new function () {
             if (Browser.ie6) {
                 ns(aPrev);
                 ns(aNext);
-                aPrev.onmouseover = aNext.onmouseover = aCover.onmouseover = function () {
+                aPrev.onmouseover = aNext.onmouseover = aCover.onmouseover = function() {
                     this.firstChild.style.display = 'block';
                 };
-                aPrev.onmouseout = aNext.onmouseout = aCover.onmouseout = function () {
+                aPrev.onmouseout = aNext.onmouseout = aCover.onmouseout = function() {
                     this.firstChild.style.display = '';
                 };
 
@@ -14785,7 +15266,7 @@ var ScreenshotViewer = new function () {
             else {
                 container.className = '';
                 lightboxComponents = [];
-                while(container.firstChild) {
+                while (container.firstChild) {
                     lightboxComponents.push(container.firstChild);
                     de(container.firstChild);
                 }
@@ -14858,7 +15339,7 @@ var ScreenshotViewer = new function () {
         lightboxComponents = null;
     }
 
-    this.checkPound = function () {
+    this.checkPound = function() {
         if (location.hash && location.hash.indexOf('#screenshots') == 0) {
             if (!g_listviews['screenshots']) { // Standalone screenshot viewer
                 var parts = location.hash.split(':');
@@ -14878,7 +15359,7 @@ var ScreenshotViewer = new function () {
         }
     }
 
-    this.show = function (opt) {
+    this.show = function(opt) {
         Lightbox.show('screenshotviewer', {
             onShow: onShow,
             onHide: onHide,
@@ -14889,7 +15370,7 @@ var ScreenshotViewer = new function () {
     DomContentLoaded.addEvent(this.checkPound)
 };
 
-var Dialog = function () {
+var Dialog = function() {
 var
     _self = this,
     _template,
@@ -14903,12 +15384,12 @@ var
     _form = ce('form'),
     _elements = {};
 
-    _form.onsubmit = function () {
+    _form.onsubmit = function() {
         _processForm();
         return false
     };
 
-    this.show = function (template, opt) {
+    this.show = function(template, opt) {
         if (template) {
             _templateName = template;
             _template = Dialog.templates[_templateName];
@@ -14966,19 +15447,19 @@ var
         });
     };
 
-    this.getValue = function (id) {
+    this.getValue = function(id) {
         return _getValue(id);
     };
 
-    this.setValue = function (id, value) {
+    this.setValue = function(id, value) {
         _setValue(id, value);
     };
 
-    this.getSelectedValue = function (id) {
+    this.getSelectedValue = function(id) {
         return _getSelectedValue(id);
     };
 
-    this.getCheckedValue = function (id) {
+    this.getCheckedValue = function(id) {
         return _getCheckedValue(id);
     };
 
@@ -15062,7 +15543,7 @@ var
                 }
 
                 if (field.sort) {
-                    options.sort(function (a, b) {
+                    options.sort(function(a, b) {
                         return field.sort * strcmp(field.options[a], field.options[b]);
                     });
                 }
@@ -15192,7 +15673,7 @@ var
                             f.disabled = true;
                         }
                         if (field.submitOnDblClick) {
-                            l.ondblclick = f.ondblclick = function (e) {
+                            l.ondblclick = f.ondblclick = function(e) {
                                 _processForm();
                             };
                         }
@@ -15220,7 +15701,7 @@ var
                     }
 
                     if (field.submitOnEnter) {
-                        f.onkeypress = function (e) {
+                        f.onkeypress = function(e) {
                             e = $E(e);
                             if (e.keyCode == 13) {
                                 _processForm();
@@ -15443,7 +15924,7 @@ end custom */
 };
 Dialog.templates = {};
 
-var ContactTool = new function () {
+var ContactTool = new function() {
     this.general    = 0;
     this.comment    = 1;
     this.post       = 2;
@@ -15543,11 +16024,11 @@ var ContactTool = new function () {
 
     var oldHash = null;
 
-    this.displayError = function (field, message) {
+    this.displayError = function(field, message) {
         alert(message);
     };
 
-    this.onShow = function () {
+    this.onShow = function() {
         if (location.hash && location.hash != '#contact') {
             oldHash = location.hash;
         }
@@ -15556,7 +16037,7 @@ var ContactTool = new function () {
         }
     };
 
-    this.onHide = function () {
+    this.onHide = function() {
         if (oldHash && (oldHash.indexOf('screenshots:') == -1 || oldHash.indexOf('videos:') == -1)) {
             location.replace(oldHash);
         }
@@ -15565,7 +16046,7 @@ var ContactTool = new function () {
         }
     };
 
-    this.onSubmit = function (data, button, form) {
+    this.onSubmit = function(data, button, form) {
         if (data.submitting) {
             return false;
         }
@@ -15616,7 +16097,7 @@ var ContactTool = new function () {
         new Ajax(url, {
             method: 'POST',
             params: params.join('&'),
-            onSuccess: function (xhr, opt) {
+            onSuccess: function(xhr, opt) {
                 var resp = xhr.responseText;
                 if (resp == 0) {
                     if (g_user.name) {
@@ -15636,10 +16117,10 @@ var ContactTool = new function () {
                     }
                 }
             },
-            onFailure: function (xhr, opt) {
+            onFailure: function(xhr, opt) {
                 alert('Failure submitting contact request: ' + xhr.statusText);
             },
-            onComplete: function (xhr, opt) {
+            onComplete: function(xhr, opt) {
                 for (var i = 0; i < form.elements.length; ++i) {
                     form.elements[i].disabled = false;
                 }
@@ -15649,7 +16130,7 @@ var ContactTool = new function () {
         return false;
     };
 
-    this.show = function (opt) {
+    this.show = function(opt) {
         if (!opt) {
             opt = {};
         }
@@ -15679,7 +16160,7 @@ var ContactTool = new function () {
         })
     };
 
-    this.checkPound = function () {
+    this.checkPound = function() {
         if (location.hash && location.hash == '#contact') {
             ContactTool.show();
         }
@@ -15687,7 +16168,7 @@ var ContactTool = new function () {
 
     var dialog_contacttitle = LANG.ct_dialog_contactwowhead;
 
-    this.init = function () {
+    this.init = function() {
         _dialog = new Dialog();
 
         Dialog.templates.contactus = {
@@ -15702,7 +16183,7 @@ var ContactTool = new function () {
                     label: LANG.ct_dialog_reason,
                     required: 1,
                     options: [],
-                    compute: function (field, value, form, td) {
+                    compute: function(field, value, form, td) {
                         ee(field);
 
                         for (var i = 0; i < this.data.reasons.length; ++i) {
@@ -15729,7 +16210,7 @@ var ContactTool = new function () {
                             ae(field, o);
                         }
 
-                        field.onchange = function () {
+                        field.onchange = function() {
                             if (this.value == 1 || this.value == 2 || this.value == 3) {
                                 form.currenturl.parentNode.parentNode.style.display = '';
                                 form.relatedurl.parentNode.parentNode.style.display = '';
@@ -15742,7 +16223,7 @@ var ContactTool = new function () {
 
                         td.style.width = '98%';
                     },
-                    validate: function (newValue, data, form) {
+                    validate: function(newValue, data, form) {
                         var error = '';
                         if (!newValue || newValue.length == 0) {
                             error = LANG.ct_dialog_error_reason;
@@ -15770,7 +16251,7 @@ var ContactTool = new function () {
                     label: LANG.ct_dialog_relatedurl,
                     caption: LANG.ct_dialog_optional,
                     size: 40,
-                    validate: function (newValue, data, form) {
+                    validate: function(newValue, data, form) {
                         var error = '';
                         var urlRe = /^(http(s?)\:\/\/|\/)?([\w]+:\w+@)?([a-zA-Z]{1}([\w\-]+\.)+([\w]{2,5}))(:[\d]{1,5})?((\/?\w+\/)+|\/?)(\w+\.[\w]{3,4})?((\?\w+=\w+)?(&\w+=\w+)*)?/;
                         newValue = newValue.trim();
@@ -15795,13 +16276,13 @@ var ContactTool = new function () {
                     type: 'text',
                     label: LANG.ct_dialog_email,
                     caption: LANG.ct_dialog_email_caption,
-                    compute: function (field, value, form, td, tr) {
+                    compute: function(field, value, form, td, tr) {
                         if (g_user.email) {
                             this.data.email = g_user.email;
                             tr.style.display = 'none';
                         }
                         else {
-                            var func = function () {
+                            var func = function() {
                                 ge('contact-emailwarn').style.display = g_isEmailValid(ge(form.email).value) ? 'none' : '';
                                 Lightbox.reveal();
                             };
@@ -15810,7 +16291,7 @@ var ContactTool = new function () {
                             ge(field).onblur = func;
                         }
                     },
-                    validate: function (newValue, data, form) {
+                    validate: function(newValue, data, form) {
                         var error = '';
                         newValue = newValue.trim();
                         if (newValue.length >= 100) {
@@ -15836,7 +16317,7 @@ var ContactTool = new function () {
                     width: '98%',
                     required: 1,
                     size: [10, 30],
-                    validate: function (newValue, data, form) {
+                    validate: function(newValue, data, form) {
                         var error = '';
                         newValue = newValue.trim();
                         if (newValue.length == 0 || newValue.length > 10000) {
@@ -15855,7 +16336,7 @@ var ContactTool = new function () {
                 {
                     id: 'noemailwarning',
                     type: 'caption',
-                    compute: function (field, value, form, td) {
+                    compute: function(field, value, form, td) {
                         var td = ge(td);
                         td.innerHTML = '<span id="contact-emailwarn" class="q10"' + (g_user.email ? ' style="display: none"' : '') + '>' + LANG.ct_dialog_noemailwarning + '</span>';
                         td.style.whiteSpace = 'normal';
@@ -15864,9 +16345,9 @@ var ContactTool = new function () {
                 }
             ],
 
-            onInit: function (form) { },
+            onInit: function(form) { },
 
-            onShow: function (form) {
+            onShow: function(form) {
                 if (this.data.focus && form[this.data.focus]) {
                     setTimeout(g_setCaretPosition.bind(null, form[this.data.focus], form[this.data.focus].value.length), 100);
                 }
@@ -15898,7 +16379,7 @@ var ContactTool = new function () {
                     type: 'select',
                     label: LANG.ct_dialog_reason,
                     options: [],
-                    compute: function (field, value, form, td) {
+                    compute: function(field, value, form, td) {
                         switch (this.data.mode) {
                             case 1: // comment
                                 form.firstChild.innerHTML = sprintf(LANG.ct_dialog_reportcomment, '<a href="?user=' + this.data.comment.user + '">' + this.data.comment.user + '</a>');
@@ -15979,7 +16460,7 @@ var ContactTool = new function () {
 
                         td.style.width = '98%';
                     },
-                    validate: function (newValue, data, form) {
+                    validate: function(newValue, data, form) {
                         var error = '';
                         if (!newValue || newValue == -1 || newValue.length == 0) {
                             error = LANG.ct_dialog_error_reason;
@@ -16001,7 +16482,7 @@ var ContactTool = new function () {
                     width: '98%',
                     required: 1,
                     size: [10, 30],
-                    validate: function (newValue, data, form) {
+                    validate: function(newValue, data, form) {
                         var error = '';
                         newValue = newValue.trim();
                         if (newValue.length == 0 || newValue.length > 10000) {
@@ -16019,9 +16500,9 @@ var ContactTool = new function () {
                 }
             ],
 
-            onInit: function (form) {},
+            onInit: function(form) {},
 
-            onShow: function (form) {
+            onShow: function(form) {
                 /* Work-around for IE7 */
                 var reason = gE(form, 'select')[0];
                 var description = gE(form, 'textarea')[0];

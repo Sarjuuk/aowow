@@ -58,7 +58,8 @@ var mn_items = [
             [7,"Jambes","?items=4.1&filter=sl=7"],
             [3,"Épaules","?items=4.1&filter=sl=3"],
             [6,"Taille","?items=4.1&filter=sl=6"],
-            [9,"Poignets","?items=4.1&filter=sl=9"]        ]],
+            [9,"Poignets","?items=4.1&filter=sl=9"]
+        ]],
         [2,"Cuir",,[
             [5,"Torse","?items=4.2&filter=sl=5"],
             [8,"Pieds","?items=4.2&filter=sl=8"],
@@ -67,7 +68,8 @@ var mn_items = [
             [7,"Jambes","?items=4.2&filter=sl=7"],
             [3,"Épaules","?items=4.2&filter=sl=3"],
             [6,"Taille","?items=4.2&filter=sl=6"],
-            [9,"Poignets","?items=4.2&filter=sl=9"]        ]],
+            [9,"Poignets","?items=4.2&filter=sl=9"]
+        ]],
         [3,"Mailles",,[
             [5,"Torse","?items=4.3&filter=sl=5"],
             [8,"Pieds","?items=4.3&filter=sl=8"],
@@ -76,7 +78,8 @@ var mn_items = [
             [7,"Jambes","?items=4.3&filter=sl=7"],
             [3,"Épaules","?items=4.3&filter=sl=3"],
             [6,"Taille","?items=4.3&filter=sl=6"],
-            [9,"Poignets","?items=4.3&filter=sl=9"]        ]],
+            [9,"Poignets","?items=4.3&filter=sl=9"]
+        ]],
         [4,"Plaques",,[
             [5,"Torse","?items=4.4&filter=sl=5"],
             [8,"Pieds","?items=4.4&filter=sl=8"],
@@ -85,7 +88,8 @@ var mn_items = [
             [7,"Jambes","?items=4.4&filter=sl=7"],
             [3,"Épaules","?items=4.4&filter=sl=3"],
             [6,"Taille","?items=4.4&filter=sl=6"],
-            [9,"Poignets","?items=4.4&filter=sl=9"]        ]],
+            [9,"Poignets","?items=4.4&filter=sl=9"]
+        ]],
         [,"Joaillerie","?items=4&filter=ty=-3:-2:-4"],
         [-3,"Amulettes"],
         [-2,"Anneaux"],
@@ -103,7 +107,8 @@ var mn_items = [
         [-7,"Tabards"],
         [0,"Divers"]
     ]],
-	[1,"Conteneurs",,[        [0,"Sacs"],
+	[1,"Conteneurs",,[
+        [0,"Sacs"],
         [3,"Sacs d'enchanteur"],
         [4,"Sacs d'ingénieur"],
         [5,"Sacs de gemmes"],
@@ -113,7 +118,8 @@ var mn_items = [
         [6,"Sacs de mineur"],
         [1,"Sacs d'âmes"]
     ]],
-	[0,"Consommables",,[        [7,"Bandages"],
+	[0,"Consommables",,[
+        [7,"Bandages"],
         [0,"Consommables"],
         [2,"Élixirs",,[[1,"De bataille"],[2,"Du gardien"]]],
         [3,"Flacons"],
@@ -134,8 +140,10 @@ var mn_items = [
         [4,"Voleur",,[[1,"Majeur"],[2,"Mineur"]],{className:"c4",tinyIcon:"class_rogue"}],
         [7,"Chaman",,[[1,"Majeur"],[2,"Mineur"]],{className:"c7",tinyIcon:"class_shaman"}],
         [9,"Démoniste",,[[1,"Majeur"],[2,"Mineur"]],{className:"c9",tinyIcon:"class_warlock"}],
-        [1,"Guerrier",,[[1,"Majeur"],[2,"Mineur"]],{className:"c1",tinyIcon:"class_warrior"}]    ]],
-	[7,"Artisanat",,[        [14,"Enchantements d'armure"],
+        [1,"Guerrier",,[[1,"Majeur"],[2,"Mineur"]],{className:"c1",tinyIcon:"class_warrior"}]
+    ]],
+	[7,"Artisanat",,[
+        [14,"Enchantements d'armure"],
         [5,"Tissu"],
         [3,"Appareils"],
         [10,"Élémentaire"],
@@ -165,8 +173,11 @@ var mn_items = [
         [11,"Calligraphie",,,{tinyIcon:"inv_inscription_tradeskill01"}],
         [10,"Joaillerie",,,{tinyIcon:"inv_misc_gem_01"}],
         [1,"Travail du cuir",,,{tinyIcon:"inv_misc_armorkit_17"}],
-        [12,"Minage",,, {tinyIcon:'trade_mining'}],        [2,"Couture",,,{tinyIcon:"trade_tailoring"}]    ]],
-	[3,"Gemmes",,[        [,"Couleurs"],
+        [12,"Minage",,, {tinyIcon:'trade_mining'}],
+        [2,"Couture",,,{tinyIcon:"trade_tailoring"}]
+    ]],
+	[3,"Gemmes",,[
+        [,"Couleurs"],
         [6,"Méta",,,{className:"gem1"}],
         [0,"Rouge",,,{className:"gem2"}],
         [1,"Bleue",,,{className:"gem8"}],
@@ -178,7 +189,8 @@ var mn_items = [
         [,"Autre"],
         [7,"Simple"]
     ]],
-	[15,"Divers",,[        [-2,"Marques d'armure"],
+	[15,"Divers",,[
+        [-2,"Marques d'armure"],
         [3,"Évènement"],
         [0,"Camelote"],
         [1,"Composants"],
@@ -206,7 +218,39 @@ var mn_itemSets = [
 ];
 var mn_npcs = [
     [1,"Bêtes",,[
-        [24,"Chauve-souris",'?npcs=1&filter=fa=24'],        [ 4,"Ours",'?npcs=1&filter=fa=4'],        [26,"Oiseau de proie",'?npcs=1&filter=fa=26'],        [ 5,"Sanglier",'?npcs=1&filter=fa=5'],        [ 7,"Charognard",'?npcs=1&filter=fa=7'],        [ 2,"Félin",'?npcs=1&filter=fa=2'],        [38,"Chimère",'?npcs=1&filter=fa=38'],        [45,"Chien du Magma",'?npcs=1&filter=fa=45'],        [ 8,"Crabe",'?npcs=1&filter=fa=8'],        [ 6,"Crocilisque",'?npcs=1&filter=fa=6'],        [39,"Diablosaure",'?npcs=1&filter=fa=39'],        [30,"Faucon-dragon",'?npcs=1&filter=fa=30'],        [ 9,"Gorille",'?npcs=1&filter=fa=9'],        [25,"Hyène",'?npcs=1&filter=fa=25'],        [37,"Phalène",'?npcs=1&filter=fa=37'],        [34,"Raie du Néant",'?npcs=1&filter=fa=34'],        [11,"Raptor",'?npcs=1&filter=fa=11'],        [31,"Ravageur",'?npcs=1&filter=fa=31'],        [43,"Rhinocéros",'?npcs=1&filter=fa=43'],        [20,"Scorpide",'?npcs=1&filter=fa=20'],        [35,"Serpent",'?npcs=1&filter=fa=35'],        [41,"Silithide",'?npcs=1&filter=fa=41'],        [ 3,"Araignée",'?npcs=1&filter=fa=3'],        [46,"Esprit de bête",'?npcs=1&filter=fa=46'],        [33,"Sporoptère",'?npcs=1&filter=fa=33'],        [12,"Haut-trotteur",'?npcs=1&filter=fa=12'],        [21,"Tortue",'?npcs=1&filter=fa=21'],        [32,"Traqueur dim.",'?npcs=1&filter=fa=32'],        [44,"Guêpe",'?npcs=1&filter=fa=44'],        [27,"Serpent des vents",'?npcs=1&filter=fa=27'],        [ 1,"Loup",'?npcs=1&filter=fa=1'],        [42,"Ver",'?npcs=1&filter=fa=42']    ]],
+        [24,"Chauve-souris",'?npcs=1&filter=fa=24'],
+        [ 4,"Ours",'?npcs=1&filter=fa=4'],
+        [26,"Oiseau de proie",'?npcs=1&filter=fa=26'],
+        [ 5,"Sanglier",'?npcs=1&filter=fa=5'],
+        [ 7,"Charognard",'?npcs=1&filter=fa=7'],
+        [ 2,"Félin",'?npcs=1&filter=fa=2'],
+        [38,"Chimère",'?npcs=1&filter=fa=38'],
+        [45,"Chien du Magma",'?npcs=1&filter=fa=45'],
+        [ 8,"Crabe",'?npcs=1&filter=fa=8'],
+        [ 6,"Crocilisque",'?npcs=1&filter=fa=6'],
+        [39,"Diablosaure",'?npcs=1&filter=fa=39'],
+        [30,"Faucon-dragon",'?npcs=1&filter=fa=30'],
+        [ 9,"Gorille",'?npcs=1&filter=fa=9'],
+        [25,"Hyène",'?npcs=1&filter=fa=25'],
+        [37,"Phalène",'?npcs=1&filter=fa=37'],
+        [34,"Raie du Néant",'?npcs=1&filter=fa=34'],
+        [11,"Raptor",'?npcs=1&filter=fa=11'],
+        [31,"Ravageur",'?npcs=1&filter=fa=31'],
+        [43,"Rhinocéros",'?npcs=1&filter=fa=43'],
+        [20,"Scorpide",'?npcs=1&filter=fa=20'],
+        [35,"Serpent",'?npcs=1&filter=fa=35'],
+        [41,"Silithide",'?npcs=1&filter=fa=41'],
+        [ 3,"Araignée",'?npcs=1&filter=fa=3'],
+        [46,"Esprit de bête",'?npcs=1&filter=fa=46'],
+        [33,"Sporoptère",'?npcs=1&filter=fa=33'],
+        [12,"Haut-trotteur",'?npcs=1&filter=fa=12'],
+        [21,"Tortue",'?npcs=1&filter=fa=21'],
+        [32,"Traqueur dim.",'?npcs=1&filter=fa=32'],
+        [44,"Guêpe",'?npcs=1&filter=fa=44'],
+        [27,"Serpent des vents",'?npcs=1&filter=fa=27'],
+        [ 1,"Loup",'?npcs=1&filter=fa=1'],
+        [42,"Ver",'?npcs=1&filter=fa=42']
+    ]],
     [8,"Bestioles"],
     [3,"Démons"],
     [2,"Draconien"],
@@ -227,7 +271,8 @@ var mn_objects = [
 ];
 var mn_quests = [
 	[,"Continents"],
-	[0,"Royaumes de l'est",,[        [10,"Bois de la P\u00e9nombre"],
+	[0,"Royaumes de l'est",,[
+        [10,"Bois de la P\u00e9nombre"],
         [3430,"Bois des Chants \u00e9ternels"],
         [85,"Clairi\u00e8res de Tirisfal"],
         [267,"Contreforts de Hautebrande"],
@@ -261,7 +306,8 @@ var mn_quests = [
         [33,"Vall\u00e9e de Strangleronce"],
         [4080,"\u00cele de Quel'Danas"]
     ]],
-	[1,"Kalimdor",,[        [16,"Azshara"],
+	[1,"Kalimdor",,[
+        [16,"Azshara"],
         [618,"Berceau-de-l'Hiver"],
         [490,"Crat\u00e8re d'Un'Goro"],
         [1657,"Darnassus"],
@@ -287,7 +333,8 @@ var mn_quests = [
         [3524,"\u00cele de Brume-azur"],
         [3525,"\u00cele de Brume-sang"]
     ]],
-	[8,"Outreterre",,[        [3519,"For\u00eat de Terokkar"],
+	[8,"Outreterre",,[
+        [3519,"For\u00eat de Terokkar"],
         [3522,"Les Tranchantes"],
         [3521,"Mar\u00e9cage de Zangar"],
         [3518,"Nagrand"],
@@ -298,7 +345,8 @@ var mn_quests = [
         [4095,"Terrasse des Magist\u00e8res"],
         [3520,"Vall\u00e9e d'Ombrelune"]
     ]],
-	[10,"Norfendre",,[        [4742,"Accostage de Hrothgar"],
+	[10,"Norfendre",,[
+        [4742,"Accostage de Hrothgar"],
         [3711,"Bassin de Sholazar"],
         [4395,"Dalaran"],
         [65,"D\u00e9solation des dragons"],
@@ -312,7 +360,8 @@ var mn_quests = [
         [66,"Zul'Drak"]
     ]],
 	[,"Autre"],
-	[6,"Champs de bataille",,[        [3358,"Bassin d'Arathi"],
+	[6,"Champs de bataille",,[
+        [3358,"Bassin d'Arathi"],
         [-25,"Champs de bataille"],
         [3277,"Goulet des Chanteguerres"],
         [3820,"L'\u0152il du cyclone"],
@@ -320,7 +369,8 @@ var mn_quests = [
         [2597,"Vall\u00e9e d'Alterac"],
         [4710,"\u00cele des Conqu\u00e9rants"]
     ]],
-	[4,"Classes",,[        [-82,"Chaman"],
+	[4,"Classes",,[
+        [-82,"Chaman"],
         [-261,"Chasseur"],
         [-372,"Chevalier de la mort"],
         [-263,"Druide"],
@@ -331,7 +381,8 @@ var mn_quests = [
         [-262,"Pr\u00eatre"],
         [-162,"Voleur"]
     ]],
-	[2,"Donjons",,[        [4494,"Ahn'kahet\u00a0: l'Ancien royaume"],
+	[2,"Donjons",,[
+        [4494,"Ahn'kahet\u00a0: l'Ancien royaume"],
         [4277,"Azjol-N\u00e9rub"],
         [718,"Cavernes des lamentations"],
         [1196,"Cime d'Utgarde"],
@@ -386,7 +437,8 @@ var mn_quests = [
         [1337,"Uldaman"],
         [1176,"Zul'Farrak"]
     ]],
-	[5,"Métiers",,[        [-181,"Alchimiste"],
+	[5,"Métiers",,[
+        [-181,"Alchimiste"],
         [-371,"Calligraphie"],
         [-304,"Cuisinier"],
         [-121,"Forgeron"],
@@ -398,8 +450,10 @@ var mn_quests = [
         [-264,"Tailleur"],
         [-182,"Travailleur du cuir"]
     ]],
-	[3,"Raids",,[        [3428,"Ahn'Qiraj"],
-        [4603,"Caveau d'Archavon"],        [4812,"Citadelle de la Couronne de glace"],
+	[3,"Raids",,[
+        [3428,"Ahn'Qiraj"],
+        [4603,"Caveau d'Archavon"],
+        [4812,"Citadelle de la Couronne de glace"],
         [2717,"C\u0153ur du Magma"],
         [3845,"Donjon de la Temp\u00eate"],
         [3457,"Karazhan"],
@@ -410,7 +464,8 @@ var mn_quests = [
         [4987,"Le sanctum Rubis"],
         [3456,"Naxxramas"],
         [4075,"Plateau du Puits de soleil"],
-        [3923,"Repaire de Gruul"],        [2159,"Repaire d'Onyxia"],
+        [3923,"Repaire de Gruul"],
+        [2159,"Repaire d'Onyxia"],
         [2677,"Repaire de l'Aile noire"],
         [3429,"Ruines d'Ahn'Qiraj"],
         [3606,"Sommet d'Hyjal"],
@@ -419,7 +474,8 @@ var mn_quests = [
         [3805,"Zul'Aman"],
         [1977,"Zul'Gurub"]
     ]],
-	[9,"Évènements mondiaux",,[        [-370,"Fête des Brasseurs"],
+	[9,"Évènements mondiaux",,[
+        [-370,"Fête des Brasseurs"],
         [-1002,"Semaine des enfants"],
         [-364,"Foire de Sombrelune"],
         [-1007,"Jour des Morts"],
@@ -433,7 +489,8 @@ var mn_quests = [
         [-374,"Jardin des nobles"],
         [-1001,"Voile d'hiver"]
     ]],
-	[7,"Divers",,[        [-365,"Guerre d'Ahn'Qiraj"],
+	[7,"Divers",,[
+        [-365,"Guerre d'Ahn'Qiraj"],
         [-1010,"Chercheur de donjons"],
         [-1,"Épique"],
         [-344,"Légendaire"],
@@ -479,25 +536,40 @@ var mn_skills = [
 var mn_spells = [
 	[,"Personnage"],
 	[7,"Techniques",,[
-        [6,"Chevalier de la mort",,[[770,"Sang",,,{tinyIcon:"Spell_Deathknight_BloodPresence"}],[771,"Givre",,,{tinyIcon:"Spell_Deathknight_FrostPresence"}],[772,"Impie",,,{tinyIcon:"Spell_Deathknight_UnholyPresence"}],[776,"Runeforger"]],{className:"c6",tinyIcon:"class_deathknight"}],        [11,"Druide",,[[574,"Equilibre",,,{tinyIcon:"Spell_Nature_StarFall"}],[134,"Combat farouche",,,{tinyIcon:"Ability_Racial_BearForm"}],[573,"Restauration",,,{tinyIcon:"Spell_Nature_HealingTouch"}]],{className:"c11",tinyIcon:"class_druid"}],
-        [3,"Chasseur",,[[50,"Maîtrise des bêtes",,,{tinyIcon:"Ability_Hunter_BeastTaming"}],[163,"Précision",,,{tinyIcon:"Ability_Marksmanship"}],[51,"Survie",,,{tinyIcon:"Ability_Hunter_SwiftStrike"}]],{className:"c3",tinyIcon:"class_hunter"}],        [8,"Mage",,[[237,"Arcanes",,,{tinyIcon:"Spell_Holy_MagicalSentry"}],[8,"Feu",,,{tinyIcon:"Spell_Fire_FireBolt02"}],[6,"Givre",,,{tinyIcon:"Spell_Frost_FrostBolt02"}]],{className:"c8",tinyIcon:"class_mage"}],
-        [2,"Paladin",,[[594,"Sacré",,,{tinyIcon:"Spell_Holy_HolyBolt"}],[267,"Protection",,,{tinyIcon:"Spell_Holy_DevotionAura"}],[184,"Vindicte",,,{tinyIcon:"Spell_Holy_AuraOfLight"}]],{className:"c2",tinyIcon:"class_paladin"}],        [5,"Prêtre",,[[613,"Discipline",,,{tinyIcon:"Spell_Holy_WordFortitude"}],[56,"Sacré",,,{tinyIcon:"Spell_Holy_GuardianSpirit"}],[78,"Magie de l'ombre",,,{tinyIcon:"Spell_Shadow_ShadowWordPain"}]],{className:"c5",tinyIcon:"class_priest"}],
+        [6,"Chevalier de la mort",,[[770,"Sang",,,{tinyIcon:"Spell_Deathknight_BloodPresence"}],[771,"Givre",,,{tinyIcon:"Spell_Deathknight_FrostPresence"}],[772,"Impie",,,{tinyIcon:"Spell_Deathknight_UnholyPresence"}],[776,"Runeforger"]],{className:"c6",tinyIcon:"class_deathknight"}],
+        [11,"Druide",,[[574,"Equilibre",,,{tinyIcon:"Spell_Nature_StarFall"}],[134,"Combat farouche",,,{tinyIcon:"Ability_Racial_BearForm"}],[573,"Restauration",,,{tinyIcon:"Spell_Nature_HealingTouch"}]],{className:"c11",tinyIcon:"class_druid"}],
+        [3,"Chasseur",,[[50,"Maîtrise des bêtes",,,{tinyIcon:"Ability_Hunter_BeastTaming"}],[163,"Précision",,,{tinyIcon:"Ability_Marksmanship"}],[51,"Survie",,,{tinyIcon:"Ability_Hunter_SwiftStrike"}]],{className:"c3",tinyIcon:"class_hunter"}],
+        [8,"Mage",,[[237,"Arcanes",,,{tinyIcon:"Spell_Holy_MagicalSentry"}],[8,"Feu",,,{tinyIcon:"Spell_Fire_FireBolt02"}],[6,"Givre",,,{tinyIcon:"Spell_Frost_FrostBolt02"}]],{className:"c8",tinyIcon:"class_mage"}],
+        [2,"Paladin",,[[594,"Sacré",,,{tinyIcon:"Spell_Holy_HolyBolt"}],[267,"Protection",,,{tinyIcon:"Spell_Holy_DevotionAura"}],[184,"Vindicte",,,{tinyIcon:"Spell_Holy_AuraOfLight"}]],{className:"c2",tinyIcon:"class_paladin"}],
+        [5,"Prêtre",,[[613,"Discipline",,,{tinyIcon:"Spell_Holy_WordFortitude"}],[56,"Sacré",,,{tinyIcon:"Spell_Holy_GuardianSpirit"}],[78,"Magie de l'ombre",,,{tinyIcon:"Spell_Shadow_ShadowWordPain"}]],{className:"c5",tinyIcon:"class_priest"}],
         [4,"Voleur",,[[253,"Assassinat",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[38,"Combat",,,{tinyIcon:"Ability_BackStab"}],[633,"Crochetage",,,{tinyIcon:"spell_nature_moonkey"}],[39,"Finesse",,,{tinyIcon:"Ability_Stealth"}]],{className:"c4",tinyIcon:"class_rogue"}],
         [7,"Chaman",,[[375,"Combat élémentaire",,,{tinyIcon:"Spell_Nature_Lightning"}],[373,"Amélioration",,,{tinyIcon:"Spell_Nature_LightningShield"}],[374,"Restauration",,,{tinyIcon:"Spell_Nature_MagicImmunity"}]],{className:"c7",tinyIcon:"class_shaman"}],
         [9,"Démoniste",,[[355,"Affliction",,,{tinyIcon:"Spell_Shadow_DeathCoil"}],[354,"Démonologie",,,{tinyIcon:"Spell_Shadow_Metamorphosis"}],[593,"Destruction",,,{tinyIcon:"Spell_Shadow_RainOfFire"}]],{className:"c9",tinyIcon:"class_warlock"}],
-        [1,"Guerrier",,[[26,"Armes",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[256,"Fureur",,,{tinyIcon:"Ability_Warrior_InnerRage"}],[257,"Protection",,,{tinyIcon:"INV_Shield_06"}]],{className:"c1",tinyIcon:"class_warrior"}]    ]],
-	[-11,"Compétences",,[        [8,"Armure"],
+        [1,"Guerrier",,[[26,"Armes",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[256,"Fureur",,,{tinyIcon:"Ability_Warrior_InnerRage"}],[257,"Protection",,,{tinyIcon:"INV_Shield_06"}]],{className:"c1",tinyIcon:"class_warrior"}]
+    ]],
+	[-11,"Compétences",,[
+        [8,"Armure"],
         [10,"Langues"],
         [6,"Armes"]
     ]],
 	[-4,"Traits raciaux"],
 	[-2,"Talents",,[
         [6,"Chevalier de la mort",,[[770,"Sang",,,{tinyIcon:"Spell_Deathknight_BloodPresence"}],[771,"Givre",,,{tinyIcon:"Spell_Deathknight_FrostPresence"}],[772,"Impie",,,{tinyIcon:"Spell_Deathknight_UnholyPresence"}]],{className:"c6",tinyIcon:"class_deathknight"}],
-        [11,"Druide",,[[574,"Equilibre",,,{tinyIcon:"Spell_Nature_StarFall"}],[134,"Combat farouche",,,{tinyIcon:"Ability_Racial_BearForm"}],[573,"Restauration",,,{tinyIcon:"Spell_Nature_HealingTouch"}]],{className:"c11",tinyIcon:"class_druid"}],        [3,"Chasseur",,[[50,"Maîtrise des bêtes",,,{tinyIcon:"Ability_Hunter_BeastTaming"}],[163,"Précision",,,{tinyIcon:"Ability_Marksmanship"}],[51,"Survie",,,{tinyIcon:"Ability_Hunter_SwiftStrike"}]],{className:"c3",tinyIcon:"class_hunter"}],        [8,"Mage",,[[237,"Arcanes",,,{tinyIcon:"Spell_Holy_MagicalSentry"}],[8,"Feu",,,{tinyIcon:"Spell_Fire_FireBolt02"}],[6,"Givre",,,{tinyIcon:"Spell_Frost_FrostBolt02"}]],{className:"c8",tinyIcon:"class_mage"}],        [2,"Paladin",,[[594,"Sacré",,,{tinyIcon:"Spell_Holy_HolyBolt"}],[267,"Protection",,,{tinyIcon:"Spell_Holy_DevotionAura"}],[184,"Vindicte",,,{tinyIcon:"Spell_Holy_AuraOfLight"}]],{className:"c2",tinyIcon:"class_paladin"}],        [5,"Prêtre",,[[613,"Discipline",,,{tinyIcon:"Spell_Holy_WordFortitude"}],[56,"Sacré",,,{tinyIcon:"Spell_Holy_GuardianSpirit"}],[78,"Magie de l'ombre",,,{tinyIcon:"Spell_Shadow_ShadowWordPain"}]],{className:"c5",tinyIcon:"class_priest"}],        [4,"Voleur",,[[253,"Assassinat",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[38,"Combat",,,{tinyIcon:"Ability_BackStab"}],[633,"Crochetage",,,{tinyIcon:"spell_nature_moonkey"}],[39,"Finesse",,,{tinyIcon:"Ability_Stealth"}]],{className:"c4",tinyIcon:"class_rogue"}],        [7,"Chaman",,[[375,"Combat élémentaire",,,{tinyIcon:"Spell_Nature_Lightning"}],[373,"Amélioration",,,{tinyIcon:"Spell_Nature_LightningShield"}],[374,"Restauration",,,{tinyIcon:"Spell_Nature_MagicImmunity"}]],{className:"c7",tinyIcon:"class_shaman"}],        [9,"Démoniste",,[[355,"Affliction",,,{tinyIcon:"Spell_Shadow_DeathCoil"}],[354,"Démonologie",,,{tinyIcon:"Spell_Shadow_Metamorphosis"}],[593,"Destruction",,,{tinyIcon:"Spell_Shadow_RainOfFire"}]],{className:"c9",tinyIcon:"class_warlock"}],        [1,"Guerrier",,[[26,"Armes",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[256,"Fureur",,,{tinyIcon:"Ability_Warrior_InnerRage"}],[257,"Protection",,,{tinyIcon:"INV_Shield_06"}]],{className:"c1",tinyIcon:"class_warrior"}]    ]],
+        [11,"Druide",,[[574,"Equilibre",,,{tinyIcon:"Spell_Nature_StarFall"}],[134,"Combat farouche",,,{tinyIcon:"Ability_Racial_BearForm"}],[573,"Restauration",,,{tinyIcon:"Spell_Nature_HealingTouch"}]],{className:"c11",tinyIcon:"class_druid"}],
+        [3,"Chasseur",,[[50,"Maîtrise des bêtes",,,{tinyIcon:"Ability_Hunter_BeastTaming"}],[163,"Précision",,,{tinyIcon:"Ability_Marksmanship"}],[51,"Survie",,,{tinyIcon:"Ability_Hunter_SwiftStrike"}]],{className:"c3",tinyIcon:"class_hunter"}],
+        [8,"Mage",,[[237,"Arcanes",,,{tinyIcon:"Spell_Holy_MagicalSentry"}],[8,"Feu",,,{tinyIcon:"Spell_Fire_FireBolt02"}],[6,"Givre",,,{tinyIcon:"Spell_Frost_FrostBolt02"}]],{className:"c8",tinyIcon:"class_mage"}],
+        [2,"Paladin",,[[594,"Sacré",,,{tinyIcon:"Spell_Holy_HolyBolt"}],[267,"Protection",,,{tinyIcon:"Spell_Holy_DevotionAura"}],[184,"Vindicte",,,{tinyIcon:"Spell_Holy_AuraOfLight"}]],{className:"c2",tinyIcon:"class_paladin"}],
+        [5,"Prêtre",,[[613,"Discipline",,,{tinyIcon:"Spell_Holy_WordFortitude"}],[56,"Sacré",,,{tinyIcon:"Spell_Holy_GuardianSpirit"}],[78,"Magie de l'ombre",,,{tinyIcon:"Spell_Shadow_ShadowWordPain"}]],{className:"c5",tinyIcon:"class_priest"}],
+        [4,"Voleur",,[[253,"Assassinat",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[38,"Combat",,,{tinyIcon:"Ability_BackStab"}],[633,"Crochetage",,,{tinyIcon:"spell_nature_moonkey"}],[39,"Finesse",,,{tinyIcon:"Ability_Stealth"}]],{className:"c4",tinyIcon:"class_rogue"}],
+        [7,"Chaman",,[[375,"Combat élémentaire",,,{tinyIcon:"Spell_Nature_Lightning"}],[373,"Amélioration",,,{tinyIcon:"Spell_Nature_LightningShield"}],[374,"Restauration",,,{tinyIcon:"Spell_Nature_MagicImmunity"}]],{className:"c7",tinyIcon:"class_shaman"}],
+        [9,"Démoniste",,[[355,"Affliction",,,{tinyIcon:"Spell_Shadow_DeathCoil"}],[354,"Démonologie",,,{tinyIcon:"Spell_Shadow_Metamorphosis"}],[593,"Destruction",,,{tinyIcon:"Spell_Shadow_RainOfFire"}]],{className:"c9",tinyIcon:"class_warlock"}],
+        [1,"Guerrier",,[[26,"Armes",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[256,"Fureur",,,{tinyIcon:"Ability_Warrior_InnerRage"}],[257,"Protection",,,{tinyIcon:"INV_Shield_06"}]],{className:"c1",tinyIcon:"class_warrior"}]
+    ]],
 	[,"Familiers"],
 	[-6,"Compagnons"],
 	[-5,"Montures"],
-	[-3,"Habilité de familier",,[        [,"Chevalier de la mort"],
+	[-3,"Habilité de familier",,[
+        [,"Chevalier de la mort"],
         [782,"Goule",,,{tinyIcon:"Spell_Shadow_AnimateDead"}],
         [,"Chasseur"],
         [270,"Générique",,,{tinyIcon:"Ability_GhoulFrenzy"}],
@@ -538,11 +610,13 @@ var mn_spells = [
         [189,"Chasseur corrompu",,,{tinyIcon:"Spell_Shadow_SummonFelhunter"}],
         [188,"Diablotin",,,{tinyIcon:"Spell_Shadow_SummonImp"}],
         [205,"Succube",,,{tinyIcon:"Spell_Shadow_SummonSuccubus"}],
-        [204,"Marcheur du Vide",,,{tinyIcon:"Spell_Shadow_SummonVoidwalker"}]    ]],
+        [204,"Marcheur du Vide",,,{tinyIcon:"Spell_Shadow_SummonVoidwalker"}]
+    ]],
 	[-7,"Talents de familiers",,[
         [411,"Ruse",,,{tinyIcon:"Ability_Hunter_CombatExperience"}],
         [410,"Férocité",,,{tinyIcon:"Ability_Druid_Swipe"}],
-        [409,"Tenacité",,,{tinyIcon:"Ability_Hunter_Pet_Bear"}]    ]],
+        [409,"Tenacité",,,{tinyIcon:"Ability_Hunter_Pet_Bear"}]
+    ]],
 	[,"Métiers & compétences"],
 	[11,"Métiers",,[
         [171,"Alchimie",,,{tinyIcon:"trade_alchemy"}],
@@ -561,7 +635,8 @@ var mn_spells = [
         [185,"Cuisine",,,{tinyIcon:"inv_misc_food_15"}],
         [129,"Secourisme",,,{tinyIcon:"spell_holy_sealofsacrifice"}],
         [356,"Pêche",,,{tinyIcon:"trade_fishing"}],
-        [762,"Monte",,,{tinyIcon:"spell_nature_swiftness"}]    ]],
+        [762,"Monte",,,{tinyIcon:"spell_nature_swiftness"}]
+    ]],
 	[,"Autre"],
 	[-9,"Habilité de MJ"],
 	[-8,"Habilité de PNJ"],
@@ -594,7 +669,8 @@ var mn_achievements = [
 	[92,"G\u00e9n\u00e9ral"],
 	[96,"Qu\u00eates",,[[14861,"Classique"],[14862,"The Burning Crusade"],[14863,"Wrath of the Lich King"]]],
 	[97,"Exploration",,[[14777,"Royaumes de l'est"],[14778,"Kalimdor"],[14779,"Outreterre"],[14780,"Norfendre"]]],
-	[95,"Joueur contre Joueur",,[        [165,"Ar\u00e8ne"],
+	[95,"Joueur contre Joueur",,[
+        [165,"Ar\u00e8ne"],
         [14801,"Vall\u00e9e d'Alterac"],
         [14802,"Bassin d'Arathi"],
         [14803,"\u0152il du cyclone"],
@@ -619,7 +695,8 @@ var mn_achievements = [
     ]],
 	[169,"M\u00e9tiers",,[[170,"Cuisine"],[171,"P\u00eache"],[172,"Secourisme"]]],
 	[201,"R\u00e9putation",,[[14864,"Classique"],[14865,"The Burning Crusade"],[14866,"Wrath of the Lich King"]]],
-	[155,"\u00c9v\u00e8nements mondiaux",,[        [160,"F\u00eate lunaire"],
+	[155,"\u00c9v\u00e8nements mondiaux",,[
+        [160,"F\u00eate lunaire"],
         [187,"De l'amour dans l'air"],
         [159,"Jardin des nobles"],
         [163,"Semaine des enfants"],
@@ -630,7 +707,8 @@ var mn_achievements = [
         [156,"Voile d'hiver"],
         [14941,"Tournoi d'Argent"]
     ]],
-	[81,"Tours de force"],    [15,"Statistiques",,[
+	[81,"Tours de force"],
+    [15,"Statistiques",,[
         [130,"Personnage",,[[140,"Richesse"],[145,"Consommables"],[147,"R\u00e9putation"],[191,"\u00c9quipement"]]],
         [141,"Combat"],
         [128,"Victimes",,[[135,"Cr\u00e9atures"],[136,"Victoires honorables"],[137,"Coups fatals"]]],
@@ -643,8 +721,17 @@ var mn_achievements = [
         [21,"Joueur contre Joueur",,[[152,"Ar\u00e8nes cot\u00e9es"],[153,"Champs de bataille"],[154,"En ext\u00e9rieur"]]]
     ]]
 ];
-var mn_holidays = [	[1,"Vacances","?events=1"],	[2,"Récurrent","?events=2"],	[3,"Joueur ctr. Joueur","?events=3"]];var mn_currencies = [    [22,"Donjons & Raids","?currencies=22"],    [1,"Divers","?currencies=1"],
-    [2,"JcJ","?currencies=2"]];var mn_talentCalc = [
+var mn_holidays = [
+	[1,"Vacances","?events=1"],
+	[2,"Récurrent","?events=2"],
+	[3,"Joueur ctr. Joueur","?events=3"]
+];
+var mn_currencies = [
+    [22,"Donjons & Raids","?currencies=22"],
+    [1,"Divers","?currencies=1"],
+    [2,"JcJ","?currencies=2"]
+];
+var mn_talentCalc = [
 	[6,"Chevalier de la mort","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
 	[11,"Druide","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
 	[3,"Chasseur","?talent#c",,{className:"c3",tinyIcon:"class_hunter"}],
@@ -696,7 +783,8 @@ var mn_petCalc = [
 var mn_database = [
 	[9,"Hauts faits","?achievements",mn_achievements],
 	[12,"Classes","?classes",mn_classes],
-    [15,"Monnaies","?currencies", mn_currencies],	[7,"Factions","?factions",mn_factions],
+    [15,"Monnaies","?currencies", mn_currencies],
+	[7,"Factions","?factions",mn_factions],
 	[8,"Familiers de chasseur","?pets",mn_pets],
 	[2,"Ensembles d'objets","?itemsets",mn_itemSets],
 	[0,"Objets","?items",mn_items],
@@ -722,22 +810,33 @@ var mn_tools = [
     ]],
 	[1,"Cartes","?maps"],
 	[,"Autre"],
-	[6,"Guides","",[        [,"Évènements mondiaux"],
-        ["lunar-festival","Fête lunaire","?guide=lunar-festival"],        ["love-is-in-the-air","De l'amour dans l'air","?guide=love-is-in-the-air"],        ["noblegarden","Jardin des nobles","?guide=noblegarden"],        ["childrens-week","Semaine des enfants","?guide=childrens-week"],        ["midsummer-fire-festival","Fête du Feu du solstice d'été","?guide=midsummer-fire-festival"],        ["brewfest","Voile d'hiver","?guide=brewfest"],
-        ["hallows-end","Sanssaint","?guide=hallows-end"],        ["pilgrims-bounty","Bienfaits du pèlerin","?guide=pilgrims-bounty"],
+	[6,"Guides","",[
+        [,"Évènements mondiaux"],
+        ["lunar-festival","Fête lunaire","?guide=lunar-festival"],
+        ["love-is-in-the-air","De l'amour dans l'air","?guide=love-is-in-the-air"],
+        ["noblegarden","Jardin des nobles","?guide=noblegarden"],
+        ["childrens-week","Semaine des enfants","?guide=childrens-week"],
+        ["midsummer-fire-festival","Fête du Feu du solstice d'été","?guide=midsummer-fire-festival"],
+        ["brewfest","Voile d'hiver","?guide=brewfest"],
+        ["hallows-end","Sanssaint","?guide=hallows-end"],
+        ["pilgrims-bounty","Bienfaits du pèlerin","?guide=pilgrims-bounty"],
         ["winter-veil","Voile d'hiver","?guide=winter-veil"]
     ]],
-	[8,"Utilitaires",,[        [,"Base de données"],
+	[8,"Utilitaires",,[
+        [,"Base de données"],
         [4,"Page au hasard","?random"],
         [0,"Derniers ajouts","?latest-additions"],
-        [1,"Derniers articles","?latest-articles"],        [3,"Dernières captures d'écran","?latest-screenshots"],
+        [1,"Derniers articles","?latest-articles"],
+        [3,"Dernières captures d'écran","?latest-screenshots"],
         [11,"Derniers vidéos","?latest-videos"],
-        [2,"Derniers commentaires","?latest-comments"],        [5,"Commentaire sans note","?unrated-comments"]
+        [2,"Derniers commentaires","?latest-comments"],
+        [5,"Commentaire sans note","?unrated-comments"]
     ]]
 ];
 var mn_community = [
 	[3,"Forum","http://forums.battle.net",null,{tinyIcon:"template/images/forum.png"}],
-	[7,"Blog","http://worldpress.com",null,{tinyIcon:"template/images/blog.png"}],	[4,"Canal IRC","http://webchat.quakenet.org/",null,{tinyIcon:"template/images/bubble.gif"}],
+	[7,"Blog","http://worldpress.com",null,{tinyIcon:"template/images/blog.png"}],
+	[4,"Canal IRC","http://webchat.quakenet.org/",null,{tinyIcon:"template/images/bubble.gif"}],
 	[,"Social"],
 	[6,"Page Facebook","http://facebook.com",null,{icon:"template/images/facebook.gif"}],
 	[5,"Page Twitter","http://twitter.com",null,{icon:"template/images/twitter.gif"}]
@@ -1977,7 +2076,48 @@ var g_socket_names = {
 	14:"Châsse prismatique"
 };
 var LANG = {
-	and:" et ",comma:", ",ellipsis:"…",dash:" – ",hyphen:" - ",colon:" : ",qty:" ($1)",date:"Date",date_colon:"Date : ",date_on:"le ",date_ago:"il y a $1",date_at:" à ",date_simple:"$1-$2-$3",date_months:["janvier","février","mars","Avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"],abilities:"Techniques",armor:"Armure",author:"Auteur",battlegroup:"Groupe de bataille",category:"Catégorie",classes:"Classes",classs:"Classe",close:"Ferme",completed:"Complété",contactus:"Contactez-nous",cost:"Coût",count:"Compte",daily:"Journalière",weekly:"Chaque semaine",damage:"Dégâts",diet:"Alimentation",dps:"DPS",earned:"Accomplis",enchant:"Enchanter",faction:"Faction",gains:"Gains",gender:"Genre",gems:"Gemmes",gearscore:"Équipement",gearscore_real:"Score d'équipement",glyphtype:"Type de glyphe",guildlevel:"Niveau de Guilde",group:"Groupe",guild:"Guilde",guildleader:"Maitre de guilde",guildrank:"Rang de guilde",health:"Vie",heroiclevel:"Niveau héroïque",icon:"Icône",instancetype:"Type d'instance",lastpost:"Dernière réponse",level:"Niveau",location:"Lieu",losses:"Pertes",members:"Membres",name:"Nom",players:"Joueurs",race:"Race",races:"Races",rankno:"Rang $1",rating:"Score",react:"Réaction",realm:"Royaume",reagents:"Composants",region:"Région",rep:"Rép.",req:"Req. ",reputation:"Réputation",rewards:"Récompenses",petfamily:"Familier",pieces:"Morceaux",points:"Points",posted:"Écrit",premiumupgrade:"Amélioration Premium",preview:"Aperçu",privateprofile:"Privé",prize:"Prix",profiler:"Profiler",progress:"Progrès",publicprofile:"Publique",replies:"Réponses",report:"Rapporter",report_tooltip:"Cliquez pour plusieurs options de rapportage",school:"École",score:"Points",settings:"Réglages",side:"Côté",signout:"Déconnexion",sockets:"Châsses",source:"Source",skill:"Compétence",skin:"Texture",slot:"Emplacement",slots:"Emplacements",smartloot:"Butin intelligent",speed:"Vitesse",stack:"Pile",standing:"Niveau",stock:"Stock",statistic:"Statistique",subject:"Sujet",submit:"Soumettre",talents:"Talents",territory:"Territoire",tier:"Tier",topics:"Sujets",tp:"PE",type:"Type",user:"Utilisateur",views:"Vues",userpage:"Page d'usager",wins:"Gagne",when:"Quand",today:"aujourd'hui",yesterday:"hier",dayatnoon:"$1 à midi",dayatmidnight:"$1 à minuit",dayatam:"$1 à $3",dayatpm:"#1 à $3",male:"Homme",female:"Femme",source_zonedrop:"Butin de zone",source_quests:"Quêtes",source_vendors:"Marchands",infobox_noneyet:"Aucune &ndash; $1 la première !",infobox_submitone:"Envoyer",infobox_suggestone:"Suggérez en un",infobox_showall:"Afficher toutes ($1)",lvclass_hero:"Classe de héros",lvcomment_add:"Ajouter votre commentaire",lvcomment_sort:"Trier par : ",lvcomment_sortdate:"Date",lvcomment_sortrating:"Le plus haut noté",lvcomment_patchfilter:"Filtrer par mise-à-jour : ",lvcomment_by:"Par ",lvcomment_patch:" (Mise à jour $1)",lvcomment_show:"Afficher le commentaire",lvcomment_hide:"Cacher le commentaire",lvcomment_rating:"Note : ",lvcomment_lastedit:"Dernière modification par ",lvcomment_nedits:"modifié $1 fois",lvcomment_edit:"Édition",lvcomment_delete:"Supprimer",lvcomment_detach:"Détacher",lvcomment_reply:"Répondre",lvcomment_report:"Rapporter",lvcomment_reported:"Rapporté !",lvcomment_deleted:" (Supprimé)",lvcomment_purged:" (Effacé)",lvdrop_outof:"sur $1",lvitem_dd:" ($1$2)",lvitem_normal:"N",lvitem_heroic:"H",lvitem_raid10:"10",lvitem_raid25:"25",lvitem_heroicitem:"Héroïque",lvitem_vendorin:"Marchand dans ",lvitem_reqlevel:"Req. ",lvnpc_alliance:"A",lvnpc_horde:"H",premium_title:"Partisan Wowhead",lvquest_daily:"$1 journalière",lvquest_weekly:"$1 hebdomadaire",lvquest_pickone:"Choisir une : ",lvquest_alsoget:"Obtenez aussi : ",lvquest_xp:"$1 PX",lvquest_removed:"Supprimé",lvzone_xman:"$1-joueur",lvzone_xvx:"$1c$2",lvpet_exotic:"Exotique",lvpage_of:" de ",lvpage_first:" Première",lvpage_previous:" Préc.",lvpage_next:"Suiv. ",lvpage_last:"Dernière ",lvscreenshot_submit:"Envoyer une capture d'écran",lvscreenshot_from:"Par ",lvscreenshot_hires:"Voir",lvscreenshot_hires2:" une version plus détaillée ($1x$2)",lvvideo_suggest:"Suggérez un vidéo",lvvideo_from:"Par ",lvnodata:"Il n'y a aucune donnée à afficher.",lvnodata2:"Aucun résultat.",lvnodata_co1:"Aucun commentaire n'a été posté jusqu'à maintenant.",lvnodata_co2:"Soyez le premier à en <a>ajouter un</a> sur cette page !",lvnodata_co3:"Veuillez vous <a>connecter</a> pour ajouter votre commentaire, ou <a>enregistrez-vous</a> si vous n'avez pas encore de compte.",lvnodata_ss1:"Aucune capture d'écran n'a été envoyée jusqu'à maintenant.",lvnodata_ss2:"Soyez le premier à en <a>envoyer une</a> pour cette page !",lvnodata_ss3:"Veuillez vous <a>connecter</a> pour envoyer une capture, ou <a>enregistrez-vous</a> si vous n'avez pas encore de compte.",lvnodata_vi1:"Aucun vidéos n'a encore été soumis.",lvnodata_vi2:"Soyez le premier <a>suggérer un vidéo</a> pour cette page!",lvnodata_vi3:"Veuillez vous <a>connecter</a> pour suggérer un vidéo ou <a>enregistrez vous</a> si vous n'avez pas de compte.",
+	and:" et ",comma:", ",ellipsis:"…",dash:" – ",hyphen:" - ",colon:" : ",qty:" ($1)",
+
+	date:        "Date",
+	date_colon:  "Date : ",
+	date_on:     "le ",
+	date_ago:    "il y a $1",
+	date_at:     " à ",
+	date_to:     " à ",
+	date_simple: "$3-$2-$1",
+	unknowndate_stc: "Date inconnue",
+	date_months: ["janvier", "février", "mars", "Avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
+	date_days:   ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+
+    abilities:"Techniques",armor:"Armure",author:"Auteur",battlegroup:"Groupe de bataille",category:"Catégorie",classes:"Classes",classs:"Classe",close:"Ferme",completed:"Complété",contactus:"Contactez-nous",cost:"Coût",count:"Compte",daily:"Journalière",weekly:"Chaque semaine",damage:"Dégâts",diet:"Alimentation",dps:"DPS",earned:"Accomplis",enchant:"Enchanter",faction:"Faction",gains:"Gains",gender:"Genre",gems:"Gemmes",gearscore:"Équipement",gearscore_real:"Score d'équipement",glyphtype:"Type de glyphe",guildlevel:"Niveau de Guilde",group:"Groupe",guild:"Guilde",guildleader:"Maitre de guilde",guildrank:"Rang de guilde",health:"Vie",heroiclevel:"Niveau héroïque",icon:"Icône",instancetype:"Type d'instance",lastpost:"Dernière réponse",level:"Niveau",location:"Lieu",losses:"Pertes",members:"Membres",name:"Nom",players:"Joueurs",race:"Race",races:"Races",rankno:"Rang $1",rating:"Score",react:"Réaction",realm:"Royaume",reagents:"Composants",region:"Région",rep:"Rép.",req:"Req. ",reputation:"Réputation",rewards:"Récompenses",petfamily:"Familier",pieces:"Morceaux",points:"Points",posted:"Écrit",premiumupgrade:"Amélioration Premium",preview:"Aperçu",privateprofile:"Privé",prize:"Prix",profiler:"Profiler",progress:"Progrès",publicprofile:"Publique",replies:"Réponses",report:"Rapporter",report_tooltip:"Cliquez pour plusieurs options de rapportage",school:"École",score:"Points",settings:"Réglages",side:"Côté",signout:"Déconnexion",sockets:"Châsses",source:"Source",skill:"Compétence",skin:"Texture",slot:"Emplacement",slots:"Emplacements",smartloot:"Butin intelligent",speed:"Vitesse",stack:"Pile",standing:"Niveau",stock:"Stock",statistic:"Statistique",subject:"Sujet",submit:"Soumettre",talents:"Talents",territory:"Territoire",tier:"Tier",topics:"Sujets",tp:"PE",type:"Type",user:"Utilisateur",views:"Vues",userpage:"Page d'usager",wins:"Gagne",when:"Quand",
+
+	today: "aujourd'hui",
+	yesterday: "hier",
+	dayatnoon:"$1 à midi",
+	noon: "midi",
+	dayatmidnight:"$1 à minuit",
+	midnight: "minuit",
+	dayatam:"$1 à $3",
+	am: "AM",
+	dayatpm:"#1 à $3",
+	pm: "PM",
+
+	male:   "Homme",
+	female: "Femme",
+
+	source_bossdrop: "Butin de Boss",
+	source_zonedrop: "Butin de zone",
+	source_quests:   "Quêtes",
+	source_vendors:  "Marchands",
+
+	infobox_noneyet:    "Aucune &ndash; $1 la première !",
+	infobox_submitone:  "Envoyer",
+	infobox_suggestone: "Suggérez en un",
+	infobox_showall:    "Afficher toutes ($1)",
+
+	lvclass_hero: "Classe de héros",
+
+	lvcomment_add:"Ajouter votre commentaire",lvcomment_sort:"Trier par : ",lvcomment_sortdate:"Date",lvcomment_sortrating:"Le plus haut noté",lvcomment_patchfilter:"Filtrer par mise-à-jour : ",lvcomment_by:"Par ",lvcomment_patch:" (Mise à jour $1)",lvcomment_show:"Afficher le commentaire",lvcomment_hide:"Cacher le commentaire",lvcomment_rating:"Note : ",lvcomment_lastedit:"Dernière modification par ",lvcomment_nedits:"modifié $1 fois",lvcomment_edit:"Édition",lvcomment_delete:"Supprimer",lvcomment_detach:"Détacher",lvcomment_reply:"Répondre",lvcomment_report:"Rapporter",lvcomment_reported:"Rapporté !",lvcomment_deleted:" (Supprimé)",lvcomment_purged:" (Effacé)",lvdrop_outof:"sur $1",lvitem_dd:" ($1$2)",lvitem_normal:"N",lvitem_heroic:"H",lvitem_raid10:"10",lvitem_raid25:"25",lvitem_heroicitem:"Héroïque",lvitem_vendorin:"Marchand dans ",lvitem_reqlevel:"Req. ",lvnpc_alliance:"A",lvnpc_horde:"H",premium_title:"Partisan Wowhead",lvquest_daily:"$1 journalière",lvquest_weekly:"$1 hebdomadaire",lvquest_pickone:"Choisir une : ",lvquest_alsoget:"Obtenez aussi : ",lvquest_xp:"$1 PX",lvquest_removed:"Supprimé",lvzone_xman:"$1-joueur",lvzone_xvx:"$1c$2",lvpet_exotic:"Exotique",lvpage_of:" de ",lvpage_first:" Première",lvpage_previous:" Préc.",lvpage_next:"Suiv. ",lvpage_last:"Dernière ",lvscreenshot_submit:"Envoyer une capture d'écran",lvscreenshot_from:"Par ",lvscreenshot_hires:"Voir",lvscreenshot_hires2:" une version plus détaillée ($1x$2)",lvvideo_suggest:"Suggérez un vidéo",lvvideo_from:"Par ",lvnodata:"Il n'y a aucune donnée à afficher.",lvnodata2:"Aucun résultat.",lvnodata_co1:"Aucun commentaire n'a été posté jusqu'à maintenant.",lvnodata_co2:"Soyez le premier à en <a>ajouter un</a> sur cette page !",lvnodata_co3:"Veuillez vous <a>connecter</a> pour ajouter votre commentaire, ou <a>enregistrez-vous</a> si vous n'avez pas encore de compte.",lvnodata_ss1:"Aucune capture d'écran n'a été envoyée jusqu'à maintenant.",lvnodata_ss2:"Soyez le premier à en <a>envoyer une</a> pour cette page !",lvnodata_ss3:"Veuillez vous <a>connecter</a> pour envoyer une capture, ou <a>enregistrez-vous</a> si vous n'avez pas encore de compte.",lvnodata_vi1:"Aucun vidéos n'a encore été soumis.",lvnodata_vi2:"Soyez le premier <a>suggérer un vidéo</a> pour cette page!",lvnodata_vi3:"Veuillez vous <a>connecter</a> pour suggérer un vidéo ou <a>enregistrez vous</a> si vous n'avez pas de compte.",
 
 	lvnote_tryfiltering: "Essayez de filtrer vos résultats",
 	lvnote_trynarrowing: "Essayez de restreindre votre recherche",
@@ -2010,7 +2150,214 @@ var LANG = {
 	lvnote_arenateamsfound2:  "Total de $1 équipes d'aréna, $2 qui coïncides",
 	lvnote_currenciesfound:   "$1 monnaies trouvées ($2 affichées)",
 
-	lvnote_createafilter:'<small><a href="$1">Créer un filtre</a></small>',lvnote_filterresults:'<a href="$1">Filtrer ces résultats</a>',lvnote_questgivers:'Voir les <a href="?zone=$1">donneurs de quêtes</a> dans <b>$2</b> &nbsp;<b>|</b>&nbsp; Filtrer les <a href="?items&filter=cr=126;crs=$3;crv=0">récompenses</a>',lvnote_allpets:'Tous les familiers peuvent apprendre toutes les <a href="?spells=-3.270">compétences passives</a>',lvnote_zonequests:'Voir les <a href="?quests=$1.$2">quêtes</a> dans la catégorie <b>$3</b> &nbsp;<b>|</b>&nbsp; Filtrer les <a href="?items&filter=cr=126;crs=$4;crv=0">récompenses</a>',lvnote_crafteditems:'Filtrer les <a href="?items&filter=cr=86;crs=$1;crv=0">objets créés</a',lvnote_viewmoreslot:'Voir <a href="?items$1&filter=$2">plus de résultats</a> pour cet emplacement',lvnote_viewmorelevel:'Voir <a href="?items$1&filter=$2">plus de résultats</a> pour ce niveau d\'objet',lvnote_itemdisenchanting:"Cet objet a été désenchanté $1 fois.",lvnote_itemdropsinnormalonly:"Cet objet est obtenu en mode normal seulement.",lvnote_itemdropsinheroiconly:"Cet objet est obtenu en mode héroïque seulement.",lvnote_itemdropsinnormalheroic:"Cet objet est obtenu à la fois en mode normal et en mode héroïque.",lvnote_itemdropsinnormal10only:"Cet objet est obtenu en mode normal 10 seulement.",lvnote_itemdropsinnormal25only:"Cet objet est obtenu en mode normal 25 seulement.",lvnote_itemdropsinheroic10only:"Cet objet est obtenu en mode héroïque 10 seulement.",lvnote_itemdropsinheroic25only:"Cet objet est obtenu en mode héroïque 25 seulement.",lvnote_itemmilling:"Cette herbe a été pilée $1 fois.",lvnote_itemopening:"Cet objet a été ouvert $1 fois.",lvnote_itemprospecting:"Ce minerai a été prospecté $1 fois.",lvnote_npcdrops:"Ce PNJ a été dépouillé $1 fois.",lvnote_npcdropsnormal:"Ce PNJ a été dépouillé $1 fois en mode normal.",lvnote_npcdropsheroic:"Ce PNJ a été dépouillé $1 fois en mode héroïque.",lvnote_npcdropsnormalX:"Ce PNJ a été dépouillé $1 fois en mode normal $2.",lvnote_npcdropsheroicX:"Ce PNJ a été dépouillé $1 fois en mode héroïque $2.",lvnote_npcobject:'<a href="?object=$1">$2</a> ont été ouvert $3 fois.',lvnote_npcobjectnormal:'<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Normal.',lvnote_npcobjectheroic:'<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Héroïque.',lvnote_npcobjectnormalX:'<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Normal $4.',lvnote_npcobjectheroicX:'<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Héroïque $4.',lvnote_npcherbgathering:"Ce PNJ a été dépecé (Herboristerie) $1 fois.",lvnote_npcmining:"Ce PNJ a été dépecé (Minage) $1 fois.",lvnote_npcpickpocketing:"Ce PNJ a été volé à la tire $1 fois.",lvnote_npcskinning:"Ce PNJ a été dépecé $1 fois.",lvnote_objectherbgathering:"Cette herbe a été cueillie $1 fois.",lvnote_objectmining:"Ce filon de minerai a été miné $1 fois.",lvnote_objectopening:"Cette entité a été ouverte $1 fois.",lvnote_objectopeningnormal:"Cette entité a été ouverte $1 fois en mode normal.",lvnote_objectopeningheroic:"Cette entité a été ouverte $1 fois en mode héroïque.",lvnote_objectopeningnormalX:"Cette entité a été ouverte $1 fois en mode normal $2.",lvnote_objectopeningheroicX:"Cette entité a été ouverte $1 fois en mode héroïque $2.",lvnote_zonefishing:"Les eaux de cette zone ont été pêchées $1 fois.",lvnote_achieveevent:'Voyez la <a href="?event=$1">page d\'évènement</a> pour <b>$2</b>',lvnote_usercomments:"Cet utilisateur a écrit un total de $1 commentaires.",lvnote_userscreenshots:"Cet utilisateur a envoyé un total de $1 captures d'écran",lvnote_uservideos:"Cet usager a soumit un total de $1 vidéos.",lvnote_usertopics:"Cet utilisateur a écrit un total de $1 sujets.",lvnote_userreplies:"Cet utilisateur a écrit un total de $1 messages.",poll_optionnum:"Option #$1: ",poll_pollresults:"Résultat de sondage: ",poll_returntovoting:"Retour au vote",poll_question:"Question: ",poll_addoption:"Ajouter option",poll_allowmultiple:"Permettre aux usager de voter pour plusieurs options.",poll_vote:"Vote",poll_viewresults:"Voir les résultats",button_compare:"Comparer",button_delete:"Supprimer",button_deselect:"Désélectionner",button_exclude:"Exclure",button_include:"Inclut",button_lmwhtfy:"LMWHTFY",button_makepriv:"Rendre privé",button_makepub:"Rendre publique",button_new:"Nouvelle",button_quickexclude:"Manager les exclusions",button_remove:"Enlever",button_resync:"Resynchronisation",button_selectall:"Sélectionner tout",button_viewin3d:"Voir en 3D",dialog_cantdisplay:"Note: Certains items selectionnés ont été ignorés. Selectionnez les individuellement pour les afficher en 3D.",dialog_compare:"Comparaison d'objets",dialog_image:"Image",dialog_imagedetails:"Détails de l'image",dialog_imagename:"Nom : ",dialog_imageselector:"Sélection d'image",dialog_losechanges:"Vous êtes en train de regarder un personnage de l'Armurerie. Tous changements que vous effectueriez seront perdu à moins que vous n'enregistriez ce personnage en tant que profile personnalisé.",dialog_nosaveandview:"Voir sans sauvegarder",dialog_saveandview:"Sauvegarder et voir maintenant",dialog_saveforlater:"Sauvegarder pour plus tard",dialog_selecteditem:"<b>$1</b> objet a été sélectionné.",dialog_selecteditems:"<b>$1</b> objets ont été sélectionnés.",dialog_seeallusingicon:"Rechercher tous les $1, $2 ou $3 utilisant cet icon.",dialog_ok:"OK",dialog_cancel:"Annuler",dialog_original:"Originelle",message_ajaxnotsupported:"Veuillez utiliser un navigateur plus moderne (tel que Firefox) qui supporte les requêtes 'Ajax'.",message_cantdeletecomment:"Ce commentaire a été automatiquement effacé à cause d'une note négative. Il ne peut être supprimé.",message_cantdetachcomment:"Ce commentaire a déjà été détaché.",message_codenotentered:"Vous n'avez pas écrit le CAPTCHA.",message_commentdetached:"Ce commentaire a été détaché.",message_commenttooshort:"Votre message ne doit pas être vide.",message_descriptiontooshort:"Votre description doit faire au moins 10 caractères de long.\nVeuillez élaborer un peu.",message_emailnotvalid:"Cette adresse courriel est invalide.",message_entercurrpass:"Veuillez entrer votre mot de passe actuel.",message_enteremailorpass:"Vous devez entrer votre nouvelle adresse email ou mot de passe!",message_enteremail:"Veuillez entrer votre courriel.",message_enternewemail:"Veuillez entrer votre nouvelle adresse courriel.",message_enternewpass:"Veuillez entrer votre nouveau mot de passe.",message_enterpassword:"Veuillez entrer votre mot de passe.",message_enterusername:"Veuillez entrer votre nom d'utlisateur.",message_forumposttooshort:"Votre envoi est vide !",message_invalidfilter:"Filtre invalide.",message_invalidname:"Le nom de l'image est invalide. Doit être alphanumérique, 20 caractères maximum et doit commencer par une lettre.",message_newemaildifferent:"Votre nouvelle adresse courriel doit être différente de l'ancienne.",message_newpassdifferent:"Votre nouveau mot de passe doit être différent de l'ancien.",message_noscreenshot:"Veuillez sélectionner la capture d'écran à envoyer.",message_novideo:"Veuillez entrer des informations valide pour le vidéo.",message_nothingtoviewin3d:"Aucun objets qui ont été sélectionnés ne peuvent être vus en 3D.",message_passwordmin:"Votre mot de passe doit faire au moins 6 caractères de long.",message_passwordsdonotmatch:"Les mots de passe ne correspondent pas.",message_savebeforeexit:"Vous allez perdre tous les changements non sauvegarder que vous avez fait.",message_startedpost:"Vous avez commencé d'écrire un message.",message_sharetheurlbelow:"Partager l'URL ci-dessous:",message_usernamemin:"Votre nom d'utilisateur doit faire au moins 4 caractères de long.",message_usernamenotvalid:"Votre nom d'utilisateur doit contenir seulement des lettres et des chiffres.",confirm_addtosaved:"Ajouter à votre comparaison enregistrée ?",confirm_commenttoolong:"Votre commentaire dépasse la limite de $1 caractères et sera tronqué :\n\n$2\n\nVoulez-vous tout de même continuer ?",confirm_deletecomment:"Êtes-vous certain de vouloir supprimer ce commentaire ?",confirm_descriptiontoolong:"Votre description dépasse la limite de $1 caractères et sera tronquée :\n\n$2\n\nnVoulez-vous tout de même continuer ?",confirm_detachcomment:"Êtes-vous certain de vouloir détacher ce commentaire ?",confirm_forumposttoolong:"Votre message dépasse la limite de $1 caractères et sera tronqué :\n\n$2\n\nVoulez-vous tout de même continuer ?",confirm_report2:"Êtes-vous certain de vouloir rapporter ce message comme $1?",confirm_report3:"Êtes vous sure que vous voulez rapporter l'avatar de cet usager comme étant vulgaire/inapproprié?",confirm_report4:"Êtes vous sure que vous voulez rapporter cette image comme étant vulgaire/inappropriée?",confirm_report:"Êtes-vous certain de vouloir rapporter ce commentaire comme $1?",confirm_signaturetoolong:"Votre signature dépasse la limite de $1 caractères et sera tronquée :\n\n$2\n\nVoulez-vous tout de même continuer ?",confirm_signaturetoomanylines:"Votre signature dépasse la limite de $1 lignes et sera tronquée.\n\nVoulez-vous tout de même continuer ?",prompt_colfilter1:"Vous pouvez définir un filtre pour la colonne $1 :\n\n",prompt_colfilter2:'e.g. "épée"',prompt_colfilter3:'e.g. ">100", "32-34" ou "!<=10"',prompt_customrating:"Veuillez entrer une note entre -$1 et $2 :",prompt_details:"Veuillez entrer les détails ci-dessous :",prompt_gotopage:"Veuillez entrer le numéro de la page que vous désirez voir ($1 - $2) :",prompt_ingamelink:"Copiez-collez ce qui suit dans la fenêtre de discussion :",prompt_linkurl:"Veuillez entrer l'URL de votre lien :",prompt_ratinglevel:"Veuillez entrer le niveau à utiliser dans le calcul ($1 - $2) :",genericerror:"Une erreur est survenue; Actualisez la page et essayez à nouveau. Si l'erreur persiste, envoyez un email à feedback@wowhead.com",tooltip_achievementcomplete:"Haut-fait reçu par $1 le $2/$3/$4",tooltip_achievementnotfound:"Haut fait non trouvé :(",tooltip_achievementpoints:"Points de hauts faits",tooltip_allianceonly:"Alliance seulement",tooltip_arenapoints:"Points d'arène",tooltip_armorbonus:"A $1 points d'armure supplémentaires.",tooltip_avgmoneycontained:"Argent contenu en moyenne",tooltip_avgmoneydropped:"Argent dépouillé en moyenne",tooltip_banned_rating:"Vous avez été banni du score des commentaires.",tooltip_buyoutprice:"Prix de vente immédiate moyen (HV)",tooltip_captcha:"Cliquer pour en générer un autre",tooltip_changelevel2:"Glissez pour changer niveau",tooltip_changelevel:"Cliquez pour changer de niveau",tooltip_colfilter1:"Filtre: $1",tooltip_colfilter2:"Filtre inversé: $1",tooltip_combatrating:"$1&nbsp;au&nbsp;N$2",tooltip_consumedonuse:"Consommer lorsqu'utilisé",tooltip_customrating:"Note personnalisée",tooltip_dailyquest:"Vous pouvez compléter jusqu'à<br />25 quêtes journalières par jour.",tooltip_downrate:"Médiocre/redondant",tooltip_extendedachievementsearch:"Cocher cette option pour rechercher aussi<br />dans la description.",tooltip_extendednpcsearch:"Cocher cet option pour rechercher aussi dans le <br />&lt;tag&gt;",tooltip_extendedquestsearch:"Cocher cette option pour rechercher aussi<br />dans les objectifs et la description.",tooltip_extendedspellsearch:"Cocher cette option pour rechercher aussi<br />dans la description et le buff.",tooltip_flight:"Vol",tooltip_gotopage:"Cliquez pour voir une page en particulier",tooltip_ground:"Sol",tooltip_heroclass:"Les joueurs qui on un personnage au moins niveau 55<br /> sur leur compte peuvent créer<br />un nouveau personnage niveau 55 d'une classe de héros.",tooltip_heroicmodeavailable:"Mode héroïque disponible",tooltip_honorpoints:"Points d'honneur",tooltip_hordeonly:"Horde seulement",tooltip_autores:"Lorsque vous libérez votre esprit après être mort,<br />vous allez être ressusciter automatiquement sans avoir <br />à retourner à votre corps.",tooltip_itemnotfound:"Objet non trouvé :(",tooltip_loading:"Chargement...",tooltip_lmwhtfy:'<b class="q">LMWHTFY</b><br />Obtenez un lien LMWHTFY.com pour cette recherche.',tooltip_lvheader1:"Cliquer pour trier",tooltip_lvheader2:"Clic droit pour filtrer",tooltip_lvheader3:"Maj-clic pour filtrer",tooltip_noresponse:"Pas de réponse du serveur :(",tooltip_normal:"Standard",tooltip_notconsumedonuse:"Non consommé lorsqu'utilisé",tooltip_npcnotfound:"PNJ non trouvé :(",tooltip_objectnotfound:"Objet non trouvé :(",tooltip_partyloot:"Lorsque cet objet est trouvé, tous les<br />membres du groupe en obtiennent un.",tooltip_pending:"En attente",tooltip_questnotfound:"Quête non trouvée :(",tooltip_refundable:"Peut être retourné à un vendeur pour un remboursement<br />si c'est fait en dedans de deux heures après l'achat.",tooltip_repgain:"Gain de réputation",tooltip_reqenchanting:"Niveau d'enchantement requis",tooltip_reqinscription:"Niveau de calligraphie requis",tooltip_reqjewelcrafting:"Niveau de joaillerie requis",tooltip_reqlevel:"Niveau requis",tooltip_reqlockpicking:"Niveau de crochetage requis",tooltip_smartloot:"Seulement disponible aux joueurs qui ont<br />la profession et qui n'ont pas encore<br />la recette.",tooltip_deprecated:"Ne peut être utilisé ou équipé.",tooltip_noequipcooldown:"L'objet sera disponible immédiatement lorsqu'équipé,<br />sans le temps d'attente normal de 30 secondes.",tooltip_realduration:"La durée de cet objet est en temps réel, pas en temps joué.<br />Elle va diminuer même lorsque déconnecté.",tooltip_progressiveloot:"Cet objet avec un taux de drop<br />qui augmente avec la progression de la quête.",tooltip_cannotrollneed:"Vous ne pouvez pas faire un jet de Besoin.",tooltip_spellnotfound:"Sort non trouvé :(",tooltip_statweighting:'<b class="q1">Échelle de valeur de statistiques</b><br />\nTrouvez les meilleurs objets pour votre classe/spécialisation.',tooltip_sticky:"Persitante",tooltip_totaldatauploads:"Taille totale des envois",tooltip_totalratings:"Score total de tous ses commentaires",tooltip_trainingpoints:"Points d'entraînement",tooltip_uprate:"Intéressant/drôle",tooltip_zonelink:"Cliquer sur ce lien vous amènera<br />à la page de la zone correspondante.",tab_abilities:"Techniques",tab_achievements:"Hauts faits",tab_addyourcomment:"Ajouter votre commentaire",tab_article:"Article",tab_articles:"Articles",tab_bosses:"Boss",tab_canbeplacedin:"Peut se placer dans",tab_cancontain:"Peut contenir",tab_characters:"Personnages",tab_classes:"Classes",tab_comments:"Commentaires",tab_companions:"Compagnons",tab_containedin:"Contenu dans",tab_contains:"Contient",tab_crafteditems:"Objets fabriqués",tab_createdby:"Créé par",tab_criteriaof:"Critère de",tab_currencyfor:"Monnaie d'échange pour",tab_currencies:"Monnaies",tab_disenchantedfrom:"Désenchanté depuis",tab_disenchanting:"Désenchantement",tab_droppedby:"Dépouillé sur",tab_creates:"Crée",tab_drops:"Butin",tab_ends:"Termine",tab_factions:"Factions",tab_fishedin:"Pêché dans",tab_fishing:"Pêche",tab_gallery:"Galerie",tab_gatheredfrom:"Cueilli depuis",tab_gatheredfromnpc:"Cueilli depuis",tab_guildperks:"Avantages de Guilde",tab_armorspecializations:"Spécialisations d'armure",tab_herbalism:"Herboristerie",tab_heroicdrops:"Butin - héroïque",tab_heroicXdrops:"Butin - héroïque $1",tab_heroic:"Héroïque",tab_heroicX:"%1 héroïque",tab_holidays:"Évènements mondiaux",tab_info:"Info",tab_items:"Objets",tab_itemsets:"Ensembles d'objets",tab_languages:"Langues",tab_latestcomments:"Derniers commentaires",tab_latestreplies:"Dernières réponses",tab_latestscreenshots:"Dernières captures d'écran",tab_latestvideos:"Derniers vidéos",tab_latesttopics:"Derniers sujets",tab_members:"Membres",tab_milledfrom:"Pilé depuis",tab_milling:"Mouture",tab_minedfrom:"Miné depuis",tab_minedfromnpc:"Miné depuis",tab_mining:"Minage",tab_modifiedby:"Modifié par",tab_modifies:"Modifie",tab_mounts:"Montures",tab_normaldrops:"Butin - normal",tab_normalXdrops:"Butin - normal $1",tab_normal:"Standard",tab_normalX:"Normal $1",tab_npcs:"PNJs",tab_npcabilities:"Habiletés de PNJ",tab_objectiveof:"Objectif de",tab_objects:"Entités",tab_pets:"Familiers de chasseur",tab_pickpocketedfrom:"Volé à la tire depuis",tab_pickpocketing:"Vol à la tire",tab_proficiencies:"Compétences",tab_professions:"Métiers",tab_profiles:"Profils",tab_prospectedfrom:"Prospecté depuis",tab_prospecting:"Prospection",tab_providedfor:"Fourni pour",tab_questrewards:"Récompenses de quêtes",tab_quests:"Quêtes",tab_reagentfor:"Composant de",tab_races:"Races",tab_racialtraits:"Traits raciaux",tab_recipes:"Recettes",tab_recipeitems:"Objets recettes",tab_replies:"Réponses",tab_requiredby:"Requis par",tab_rewardfrom:"Récompense de",tab_samemodelas:"Même modèle que",tab_screenshots:"Captures d'écran",tab_statistics:"Statistiques",tab_videos:"Vidéos",tab_seealso:"Voir aussi",tab_sells:"Vend",tab_sharedcooldown:"Recharge partagée",tab_skills:"Compétences",tab_skinnedfrom:"Dépecé depuis",tab_skinning:"Dépeçage",tab_soldby:"Vendu par",tab_specialization:"Spécialisation",tab_spells:"Sorts",tab_starts:"Débute",tab_startsquest:"Débute une quête",tab_submitascreenshot:"Envoyer une capture d'écran",tab_suggestavideo:"Suggérez un vidéo",tab_summonedby:"Invoqué par",tab_talents:"Talents",tab_tameable:"Domptables",tab_taughtby:"Enseigné par",tab_teaches:"Enseigne",tab_titles:"Titres",tab_toolfor:"Outil pour",tab_topics:"Sujets",tab_trainers:"Entraineurs",tab_triggeredby:"Déclenché par",tab_uncategorizedspells:"Sorts non classés",tab_unlocks:"Déverouille",tab_usedby:"Utilisé par",tab_world:"Monde",tab_zones:"Zones",menu_browse:"Consulter",mapper_tipzoom:"Astuce : Cliquer pour agrandir la carte",mapper_tippin:"Astuce : Cliquer sur la carte pour ajouter/enlever des marqueurs",mapper_hidepins:"Cacher les marqueurs",mapper_showpins:"Montrer les marqueurs",mapper_floor:"Changer de niveau...",mapper_relevantlocs:"Emplacements pertinents",mapper_entiretyinzone:"L'entièreté de cette quête se déroule dans $$",mapper_happensin:"Une partie de cette quête se déroule dans $$.",mapper_objectives:{ox:"Cette quête a des objectifs dans $$.",sx:"Cette quête débute dans $$.",ex:"Cette quête finie dans $$.",sex:"Cette quête débute et finie dans $$.",osx:"Cette quête a des objectifs et débute dans $$.",oex:"Cette quête a des objectifs et fini dans $$.",osx_ey:"Cette quête a des objectifs et débute dans $$ fini dans $$.",oex_sy:"Cette quête a des objectifs et fini dans $$ et débute dans $$.",sx_ey:"Cette quête débute dans $$ et finie dans $$.",ox_sy:"Cette quête débute dans $$, a des objectifs dans $$.",ox_ey:"Cette quête a des objectifs dans $$ et fini dans $$.",ox_sey:"Cette quête débute et fini dans $$ et a des objectifs dans $$.",ox_sy_ez:"Cette quête débute dans $$, a des objectifs dans $$ et fini dans $$."},mapper_startsquest:"Débute la quête",mapper_endsquest:"Termine la quête",mapper_requiredquest:"Objectif de la quête",mapper_sourcestart:"Source du début de la quête: ",mapper_sourceend:"Source de la fin de la quête: ",mapper_sourcereq:"Source de l'objectif d'une quête: ",mapper_clicktoview:"Cliquez pour voir ce $1",showonmap:"Afficher sur la carte...",som_nothing:"Rien",som_questgivers:"Donneurs de quêtes",som_viewnpc:"Cliquez pour voir ce PNJ",som_viewobj:"Cliquez pour voir cette entité",som_view:"Cliquez pour voir...",som_startsquest:"Débute la quête suivante :",som_startsquestpl:"Débute les quêtes suivantes :",som_legend:"Légende: ",som_legend_alliance:"Alliance",som_legend_horde:"Horde",som_legend_neutral:"Neutre",som:{all:"Tous",alliance:"Alliance",horde:"Horde",quest:"Donneur de quêtes",alliancequests:"Donneur de quêtes",hordequests:"Donneur de quêtes",repair:"Réparateurs",rare:"PNJs rares",auctioneer:"Actionnaires",banker:"Banquiers",battlemaster:"Maitre de bataille",innkeeper:"Aubergiste",guildmaster:"Maitre de guilde",stablemaster:"Maitre d'écurie",flightmaster:"Maitres de vol",trainer:"Entraineurs",vendor:"Marchands",book:"Livres",herb:"Herbes",vein:"Filons de minerai",spirithealer:"Esprits soigneurs"},markup_b:"Gras",markup_i:"Italique",markup_u:"Souligné",markup_s:"Barré",markup_small:"Petits caractères",markup_url:"Lien",markup_quote:"Citation",markup_code:"Bout de code",markup_ul:"Liste à puces",markup_ol:"Liste numérotée",markup_li:"Élément de liste",markup_img:"Image",markup_said:"a dit : ",markup_toc:"Table des matières",ct_dialog_captcha:"Veuillez entrer le code ci-dessus : ",ct_dialog_contactwowhead:"Contactez Wowhead",ct_dialog_description:"Description",ct_dialog_desc_caption:"Soyez aussi spécifique que possible.",ct_dialog_email:"Courriel : ",ct_dialog_email_caption:"Seulement si vous voulez être contacté.",ct_dialog_optional:"Optionnel",ct_dialog_reason:"Raison: ",ct_dialog_relatedurl:"URL relié: ",ct_dialog_currenturl:"URL actuel:",ct_dialog_report:"Rapporter",ct_dialog_reportchar:"Signalez le personnage",ct_dialog_reportcomment:"Signalez le commentaire de $1",ct_dialog_reportpost:"Signalez le message de $1",ct_dialog_reportscreen:"Signalez la capture d'écran de $1",ct_dialog_reportvideo:"Rapportez le vidéo de $1",ct_dialog_reporttopic:"Signalez le sujet de $1",ct_dialog_thanks:"Votre message à été reçu. Merci de nous avoir contacté!",ct_dialog_thanks_user:"Votre message à été reçu, $1. Merci de nous avoir contacté!",ct_dialog_error_captcha:"Le CAPTCHA que vous avez écrit n'est pas valide. Veuillez réessayer.",ct_dialog_error_desc:"Veuillez fournir une description complète, mais pas trop longue.",ct_dialog_error_email:"Veuillez entrer une adresse e-mail valide.",ct_dialog_error_emaillen:"Veuillez entrer une adresse e-mail avec moins de 100 caractères.",ct_dialog_error_reason:"Veuillez choisir une raison pour nous contacter.",ct_dialog_error_relatedurl:"Veuillez fournir un URL avec moins de 250 caractères.",ct_dialog_error_invalidurl:"Veuillez entrer un URL valide.",cn_fieldrequired:"$1 est requis.",cn_fieldinvalid:"$1 doit être valide.",cn_confirm:"Vérifiez que vous avez entré les bonnes informations, ensuite cliquez sur OK.",cn_entrylogin:'Veuillez vous <a href="?account=signin">connecter</a> pour participer au concours ou <a href="?account=signup">inscrivez-vous</a> si vous n\'en avez pas.',cn_entryerror:"Une erreur est survenue. Veuillez réessayer.",cn_entrywhen:"Vous vous êtes inscrit au concours le <b>$1</b>.",cn_entrywhen2:"Vous tees déjà inscrit à ce concours.",cn_entrysuccess:"Vous venez de vous inscrire au concours. Bonne chance!",cn_entryended:"Ce concours est terminé.",cn_entryupcoming:"Ce concours n'a pas encore débuté. Restez à l'affut!",cn_entryregion:"Vous ne pouvez participer à ce concours dans votre région.",cn_mustbe18:"Vouz devez être agé de 18 ans ou plus pour participer au concours.",cn_winnerslist:"Liste des gagnants",cn_updated:"Actualisé",ct_resp_error1:"Le CAPTCHA que vous avez écrit n'est pas valide. Veuillez réessayer.",ct_resp_error2:"Veuillez fournir une description complète, mais pas trop longue.",ct_resp_error3:"Veuillez choisir une raison pour nous contacter.",ct_resp_error7:"Vous avez déjà rapporté ceci.",compose_mode:"Mode : ",compose_edit:"Édition",compose_preview:"Aperçu",compose_livepreview:"Aperçu rapide",compose_save:"Sauver",compose_cancel:"Annuler",compose_limit:"Jusqu'à $1 caractères",compose_limit2:"Jusqu'à $1 caractères et/ou $2 lignes",compose_remaining:"$1 caractères restants.",user_nodescription:"Cet utilisateur n'a pas encore composé une description publique.",user_nodescription2:"Vous n'en avez pas composée une encore.",user_composeone:"En composer une !",user_editdescription:"Édition",myaccount_passmatch:"Correspondent",myaccount_passdontmatch:"Ne correspondent pas",myaccount_purged:"Purgé",myaccount_purgefailed:"La purge a échouée :(",myaccount_purgesuccess:"Les données d'annonce ont été purgées correctement!",types:{1:["PNJ","PNJ","PNJs","PNJs"],
+	lvnote_createafilter:'<small><a href="$1">Créer un filtre</a></small>',lvnote_filterresults:'<a href="$1">Filtrer ces résultats</a>',lvnote_questgivers:'Voir les <a href="?zone=$1">donneurs de quêtes</a> dans <b>$2</b> &nbsp;<b>|</b>&nbsp; Filtrer les <a href="?items&filter=cr=126;crs=$3;crv=0">récompenses</a>',lvnote_allpets:'Tous les familiers peuvent apprendre toutes les <a href="?spells=-3.270">compétences passives</a>',lvnote_zonequests:'Voir les <a href="?quests=$1.$2">quêtes</a> dans la catégorie <b>$3</b> &nbsp;<b>|</b>&nbsp; Filtrer les <a href="?items&filter=cr=126;crs=$4;crv=0">récompenses</a>',lvnote_crafteditems:'Filtrer les <a href="?items&filter=cr=86;crs=$1;crv=0">objets créés</a',lvnote_viewmoreslot:'Voir <a href="?items$1&filter=$2">plus de résultats</a> pour cet emplacement',lvnote_viewmorelevel:'Voir <a href="?items$1&filter=$2">plus de résultats</a> pour ce niveau d\'objet',lvnote_itemdisenchanting:"Cet objet a été désenchanté $1 fois.",lvnote_itemdropsinnormalonly:"Cet objet est obtenu en mode normal seulement.",lvnote_itemdropsinheroiconly:"Cet objet est obtenu en mode héroïque seulement.",lvnote_itemdropsinnormalheroic:"Cet objet est obtenu à la fois en mode normal et en mode héroïque.",lvnote_itemdropsinnormal10only:"Cet objet est obtenu en mode normal 10 seulement.",lvnote_itemdropsinnormal25only:"Cet objet est obtenu en mode normal 25 seulement.",lvnote_itemdropsinheroic10only:"Cet objet est obtenu en mode héroïque 10 seulement.",lvnote_itemdropsinheroic25only:"Cet objet est obtenu en mode héroïque 25 seulement.",lvnote_itemmilling:"Cette herbe a été pilée $1 fois.",lvnote_itemopening:"Cet objet a été ouvert $1 fois.",lvnote_itemprospecting:"Ce minerai a été prospecté $1 fois.",lvnote_npcdrops:"Ce PNJ a été dépouillé $1 fois.",lvnote_npcdropsnormal:"Ce PNJ a été dépouillé $1 fois en mode normal.",lvnote_npcdropsheroic:"Ce PNJ a été dépouillé $1 fois en mode héroïque.",lvnote_npcdropsnormalX:"Ce PNJ a été dépouillé $1 fois en mode normal $2.",lvnote_npcdropsheroicX:"Ce PNJ a été dépouillé $1 fois en mode héroïque $2.",lvnote_npcobject:'<a href="?object=$1">$2</a> ont été ouvert $3 fois.',lvnote_npcobjectnormal:'<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Normal.',lvnote_npcobjectheroic:'<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Héroïque.',lvnote_npcobjectnormalX:'<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Normal $4.',lvnote_npcobjectheroicX:'<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Héroïque $4.',lvnote_npcherbgathering:"Ce PNJ a été dépecé (Herboristerie) $1 fois.",lvnote_npcmining:"Ce PNJ a été dépecé (Minage) $1 fois.",lvnote_npcpickpocketing:"Ce PNJ a été volé à la tire $1 fois.",lvnote_npcskinning:"Ce PNJ a été dépecé $1 fois.",lvnote_objectherbgathering:"Cette herbe a été cueillie $1 fois.",lvnote_objectmining:"Ce filon de minerai a été miné $1 fois.",lvnote_objectopening:"Cette entité a été ouverte $1 fois.",lvnote_objectopeningnormal:"Cette entité a été ouverte $1 fois en mode normal.",lvnote_objectopeningheroic:"Cette entité a été ouverte $1 fois en mode héroïque.",lvnote_objectopeningnormalX:"Cette entité a été ouverte $1 fois en mode normal $2.",lvnote_objectopeningheroicX:"Cette entité a été ouverte $1 fois en mode héroïque $2.",lvnote_zonefishing:"Les eaux de cette zone ont été pêchées $1 fois.",lvnote_achieveevent:'Voyez la <a href="?event=$1">page d\'évènement</a> pour <b>$2</b>',lvnote_usercomments:"Cet utilisateur a écrit un total de $1 commentaires.",lvnote_userscreenshots:"Cet utilisateur a envoyé un total de $1 captures d'écran",lvnote_uservideos:"Cet usager a soumit un total de $1 vidéos.",lvnote_usertopics:"Cet utilisateur a écrit un total de $1 sujets.",lvnote_userreplies:"Cet utilisateur a écrit un total de $1 messages.",poll_optionnum:"Option #$1: ",poll_pollresults:"Résultat de sondage: ",poll_returntovoting:"Retour au vote",poll_question:"Question: ",poll_addoption:"Ajouter option",poll_allowmultiple:"Permettre aux usager de voter pour plusieurs options.",poll_vote:"Vote",poll_viewresults:"Voir les résultats",button_compare:"Comparer",button_delete:"Supprimer",button_deselect:"Désélectionner",button_exclude:"Exclure",button_include:"Inclut",button_lmwhtfy:"LMWHTFY",button_makepriv:"Rendre privé",button_makepub:"Rendre publique",button_new:"Nouvelle",button_quickexclude:"Manager les exclusions",button_remove:"Enlever",button_resync:"Resynchronisation",button_selectall:"Sélectionner tout",button_viewin3d:"Voir en 3D",dialog_cantdisplay:"Note: Certains items selectionnés ont été ignorés. Selectionnez les individuellement pour les afficher en 3D.",dialog_compare:"Comparaison d'objets",dialog_image:"Image",dialog_imagedetails:"Détails de l'image",dialog_imagename:"Nom : ",dialog_imageselector:"Sélection d'image",dialog_losechanges:"Vous êtes en train de regarder un personnage de l'Armurerie. Tous changements que vous effectueriez seront perdu à moins que vous n'enregistriez ce personnage en tant que profile personnalisé.",dialog_nosaveandview:"Voir sans sauvegarder",dialog_saveandview:"Sauvegarder et voir maintenant",dialog_saveforlater:"Sauvegarder pour plus tard",dialog_selecteditem:"<b>$1</b> objet a été sélectionné.",dialog_selecteditems:"<b>$1</b> objets ont été sélectionnés.",dialog_seeallusingicon:"Rechercher tous les $1, $2 ou $3 utilisant cet icon.",dialog_ok:"OK",dialog_cancel:"Annuler",dialog_original:"Originelle",message_ajaxnotsupported:"Veuillez utiliser un navigateur plus moderne (tel que Firefox) qui supporte les requêtes 'Ajax'.",message_cantdeletecomment:"Ce commentaire a été automatiquement effacé à cause d'une note négative. Il ne peut être supprimé.",message_cantdetachcomment:"Ce commentaire a déjà été détaché.",message_codenotentered:"Vous n'avez pas écrit le CAPTCHA.",message_commentdetached:"Ce commentaire a été détaché.",message_commenttooshort:"Votre message ne doit pas être vide.",message_descriptiontooshort:"Votre description doit faire au moins 10 caractères de long.\nVeuillez élaborer un peu.",message_emailnotvalid:"Cette adresse courriel est invalide.",message_entercurrpass:"Veuillez entrer votre mot de passe actuel.",message_enteremailorpass:"Vous devez entrer votre nouvelle adresse email ou mot de passe!",message_enteremail:"Veuillez entrer votre courriel.",message_enternewemail:"Veuillez entrer votre nouvelle adresse courriel.",message_enternewpass:"Veuillez entrer votre nouveau mot de passe.",message_enterpassword:"Veuillez entrer votre mot de passe.",message_enterusername:"Veuillez entrer votre nom d'utlisateur.",message_forumposttooshort:"Votre envoi est vide !",message_invalidfilter:"Filtre invalide.",message_invalidname:"Le nom de l'image est invalide. Doit être alphanumérique, 20 caractères maximum et doit commencer par une lettre.",message_newemaildifferent:"Votre nouvelle adresse courriel doit être différente de l'ancienne.",message_newpassdifferent:"Votre nouveau mot de passe doit être différent de l'ancien.",message_noscreenshot:"Veuillez sélectionner la capture d'écran à envoyer.",message_novideo:"Veuillez entrer des informations valide pour le vidéo.",message_nothingtoviewin3d:"Aucun objets qui ont été sélectionnés ne peuvent être vus en 3D.",message_passwordmin:"Votre mot de passe doit faire au moins 6 caractères de long.",message_passwordsdonotmatch:"Les mots de passe ne correspondent pas.",message_savebeforeexit:"Vous allez perdre tous les changements non sauvegarder que vous avez fait.",message_startedpost:"Vous avez commencé d'écrire un message.",message_sharetheurlbelow:"Partager l'URL ci-dessous:",message_usernamemin:"Votre nom d'utilisateur doit faire au moins 4 caractères de long.",message_usernamenotvalid:"Votre nom d'utilisateur doit contenir seulement des lettres et des chiffres.",confirm_addtosaved:"Ajouter à votre comparaison enregistrée ?",confirm_commenttoolong:"Votre commentaire dépasse la limite de $1 caractères et sera tronqué :\n\n$2\n\nVoulez-vous tout de même continuer ?",confirm_deletecomment:"Êtes-vous certain de vouloir supprimer ce commentaire ?",confirm_descriptiontoolong:"Votre description dépasse la limite de $1 caractères et sera tronquée :\n\n$2\n\nnVoulez-vous tout de même continuer ?",confirm_detachcomment:"Êtes-vous certain de vouloir détacher ce commentaire ?",confirm_forumposttoolong:"Votre message dépasse la limite de $1 caractères et sera tronqué :\n\n$2\n\nVoulez-vous tout de même continuer ?",confirm_report2:"Êtes-vous certain de vouloir rapporter ce message comme $1?",confirm_report3:"Êtes vous sure que vous voulez rapporter l'avatar de cet usager comme étant vulgaire/inapproprié?",confirm_report4:"Êtes vous sure que vous voulez rapporter cette image comme étant vulgaire/inappropriée?",confirm_report:"Êtes-vous certain de vouloir rapporter ce commentaire comme $1?",confirm_signaturetoolong:"Votre signature dépasse la limite de $1 caractères et sera tronquée :\n\n$2\n\nVoulez-vous tout de même continuer ?",confirm_signaturetoomanylines:"Votre signature dépasse la limite de $1 lignes et sera tronquée.\n\nVoulez-vous tout de même continuer ?",prompt_colfilter1:"Vous pouvez définir un filtre pour la colonne $1 :\n\n",prompt_colfilter2:'e.g. "épée"',prompt_colfilter3:'e.g. ">100", "32-34" ou "!<=10"',prompt_customrating:"Veuillez entrer une note entre -$1 et $2 :",prompt_details:"Veuillez entrer les détails ci-dessous :",prompt_gotopage:"Veuillez entrer le numéro de la page que vous désirez voir ($1 - $2) :",prompt_ingamelink:"Copiez-collez ce qui suit dans la fenêtre de discussion :",prompt_linkurl:"Veuillez entrer l'URL de votre lien :",prompt_ratinglevel:"Veuillez entrer le niveau à utiliser dans le calcul ($1 - $2) :",genericerror:"Une erreur est survenue; Actualisez la page et essayez à nouveau. Si l'erreur persiste, envoyez un email à feedback@wowhead.com",
+
+	tooltip_activeholiday:             "L'évènement est présentement en cours",
+	tooltip_achievementcomplete:       "Haut-fait reçu par $1 le $2/$3/$4",
+	tooltip_achievementnotfound:       "Haut fait non trouvé :(",
+	tooltip_achievementpoints:         "Points de hauts faits",
+	tooltip_allianceonly:              "Alliance seulement",
+	tooltip_arenapoints:               "Points d'arène",
+	tooltip_armorbonus:                "A $1 points d'armure supplémentaires.",
+	tooltip_avgmoneycontained:         "Argent contenu en moyenne",
+	tooltip_avgmoneydropped:           "Argent dépouillé en moyenne",
+	tooltip_banned_rating:             "Vous avez été banni du score des commentaires.",
+	tooltip_too_many_votes:            "Vous avez voté trop souvent aujourd'hui! Revenez demain.",
+	tooltip_buyoutprice:               "Prix de vente immédiate moyen (HV)",
+	tooltip_changelevel2:              "Glissez pour changer niveau",
+	tooltip_changelevel:               "Cliquez pour changer de niveau",
+	tooltip_colfilter1:                "Filtre: $1",
+	tooltip_colfilter2:                "Filtre inversé: $1",
+	tooltip_combatrating:              "$1&nbsp;au&nbsp;N$2",
+	tooltip_completionavail:           "$1 que l'API de Blizzard n'indique pas<br /> comme étant complété par votre personnage.",
+	tooltip_completionunavail:         "$1 (ou équivalents) que l'API de Blizzard<br />indique comme complété par votre personnage.",
+	tooltip_consumedonuse:             "Consommé lorsqu'utilisé",
+	tooltip_customrating:              "Note personnalisée",
+	tooltip_dailyquest:                "Vous pouvez compléter jusqu'à<br />25 quêtes journalières par jour.",
+	tooltip_downrate:                  "Médiocre/redondant",
+	tooltip_equip:                     "Afficher cet objet sur votre personnage épingler.",
+	tooltip_exactprofilesearch:        "Cocher cette option pour une concordance de<br />personnage, guilde et nom d'équipe exacte.",
+	tooltip_extendedachievementsearch: "Cocher cette option pour rechercher aussi<br />dans la description.",
+	tooltip_extendednpcsearch:         "Cocher cet option pour rechercher aussi dans le <br />&lt;tag&gt;",
+	tooltip_extendedquestsearch:       "Cocher cette option pour rechercher aussi<br />dans les objectifs et la description.",
+	tooltip_extendedspellsearch:       "Cocher cette option pour rechercher aussi<br />dans la description et le buff.",
+	tooltip_flight:                    "Vol",
+	tooltip_gotopage:                  "Cliquez pour voir une page en particulier",
+	tooltip_ground:                    "Sol",
+	tooltip_heroclass:                 "Les joueurs qui ont un personnage au moins de niveau 55<br /> sur leur compte peuvent créer<br />un nouveau personnage niveau 55 d'une classe de héros.",
+	tooltip_heroicmodeavailable:       "Mode héroïque disponible",
+	tooltip_honorpoints:               "Points d'honneur",
+	tooltip_hordeonly:                 "Horde seulement",
+	tooltip_autores:                   "Lorsque vous libérez votre esprit après être mort,<br />vous allez être ressusciter automatiquement sans avoir <br />à retourner à votre corps.",
+	tooltip_itemnotfound:              "Objet non trouvé :(",
+	tooltip_loading:                   "Chargement...",
+	tooltip_lvheader1:                 "Cliquer pour trier",
+	tooltip_lvheader2:                 "Clic droit pour filtrer",
+	tooltip_lvheader3:                 "Maj-clic pour filtrer",
+	tooltip_noresponse:                "Pas de réponse du serveur :(",
+	tooltip_normal:                    "Standard",
+	tooltip_notconsumedonuse:          "Non consommé lorsqu'utilisé",
+	tooltip_npcnotfound:               "PNJ non trouvé :(",
+	tooltip_objectnotfound:            "Objet non trouvé :(",
+	tooltip_partyloot:                 "Lorsque cet objet est trouvé, tous les<br />membres du groupe en obtiennent un.",
+	tooltip_pending:                   "En attente",
+	tooltip_ppbheroic:                 "héroïque",
+	tooltip_ppbraid:                   "raid",
+	tooltip_questnotfound:             "Quête non trouvée :(",
+	tooltip_refundable:                "Peut être retourné à un vendeur pour un remboursement<br />si cela est fait endéans deux heures après l'achat.",
+	tooltip_repgain:                   "Gain de réputation",
+	tooltip_reqenchanting:             "Niveau d'enchantement requis",
+	tooltip_reqinscription:            "Niveau de calligraphie requis",
+	tooltip_reqjewelcrafting:          "Niveau de joaillerie requis",
+	tooltip_reqlevel:                  "Niveau requis",
+	tooltip_reqlockpicking:            "Niveau de crochetage requis",
+	tooltip_smartloot:                 "Seulement disponible aux joueurs qui ont<br />la profession et qui n'ont pas encore<br />la recette.",
+	tooltip_deprecated:                "Ne peut être utilisé ou équipé.",
+	tooltip_realduration:              "La durée de cet objet est en temps réel, pas en temps joué.<br />Elle va diminuer même lorsque déconnecté.",
+	tooltip_cannotrollneed:            "Vous ne pouvez pas faire un jet de Besoin.",
+	tooltip_spellnotfound:             "Sort non trouvé :(",
+	tooltip_statweighting:             '<b class="q1">Échelle de valeur de statistiques</b><br />\nTrouvez les meilleurs objets pour votre classe/spécialisation.',
+	tooltip_sticky:                    "Persitante",
+	tooltip_totaldatauploads:          "Taille totale des envois",
+	tooltip_totalratings:              "Score total de tous ses commentaires",
+	tooltip_trainingpoints:            "Points d'entraînement",
+	tooltip_uprate:                    "Intéressant/drôle",
+	tooltip_zonelink:                  "Cliquer sur ce lien vous amènera<br />à la page de la zone correspondante.",
+
+	tab_pettrainer:          "Entraîneur",
+	tab_feedback:            "Feedback",
+	tab_abilities:           "Techniques",
+	tab_achievements:        "Hauts faits",
+	tab_addyourcomment:      "Ajouter votre commentaire",
+	tab_giveyourfeedback:    "Donnez vos impressions",
+	tab_armorproficiencies:  "Armures utilisables",
+	tab_article:             "Article",
+	tab_articles:            "Articles",
+	tab_avatars:             "Avatars",
+	tab_bosses:              "Boss",
+	tab_calendar:            "Calendrier",
+	tab_canbeplacedin:       "Peut se placer dans",
+	tab_cancontain:          "Peut contenir",
+	tab_characters:          "Personnages",
+	tab_classes:             "Classes",
+	tab_comments:            "Commentaires",
+	tab_replies:             "Réponses",
+	tab_companions:          "Compagnons",
+	tab_containedin:         "Contenu dans",
+	tab_contains:            "Contient",
+	tab_controlledabilities: "Capacités contrôlées",
+	tab_crafteditems:        "Objets fabriqués",
+	tab_createdby:           "Créé par",
+	tab_criteriaof:          "Critère de",
+	tab_currencyfor:         "Monnaie d'échange pour",
+	tab_currencies:          "Monnaies",
+	tab_disenchantedfrom:    "Désenchanté depuis",
+	tab_disenchanting:       "Désenchantement",
+	tab_droppedby:           "Dépouillé sur",
+	tab_creates:             "Crée",
+	tab_drops:               "Butin",
+	tab_encounter:           "Rencontre",
+	tab_ends:                "Termine",
+	tab_factions:            "Factions",
+	tab_fishedin:            "Pêché dans",
+	tab_fishing:             "Pêche",
+	tab_gallery:             "Galerie",
+	tab_gatheredfrom:        "Cueilli depuis",
+	tab_gatheredfromnpc:     "Cueilli depuis",
+	tab_glyphs:              "Glyphes",
+	tab_armorspecializations:"Spécialisation d'armure",
+	tab_engineering:         "Ingénierie",
+	tab_englishcomments:     "Commentaire anglais.",
+	tab_herbalism:           "Herboristerie",
+	tab_heroicdrops:         "Butin - héroïque",
+	tab_heroicXdrops:        "Butin - héroïque $1",
+	tab_heroic:              "Héroïque",
+	tab_heroicX:             "$1 héroïque",
+	tab_holidays:            "Évènements mondiaux",
+	tab_info:                "Info",
+	tab_items:               "Objets",
+	tab_itemsets:            "Ensembles d'objets",
+	tab_languages:           "Langues",
+	tab_latestcomments:      "Derniers commentaires",
+	tab_latestreplies:       "Dernières réponses",
+	tab_latestscreenshots:   "Dernières captures d'écran",
+	tab_latestvideos:        "Derniers vidéos",
+	tab_latesttopics:        "Derniers sujets",
+	tab_members:             "Membres",
+	tab_milledfrom:          "Pilé depuis",
+	tab_milling:             "Mouture",
+	tab_minedfrom:           "Miné depuis",
+	tab_minedfromnpc:        "Miné depuis",
+	tab_mining:              "Minage",
+	tab_modifiedby:          "Modifié par",
+	tab_modifies:            "Modifie",
+	tab_mounts:              "Montures",
+	tab_normaldrops:         "Butin - normal",
+	tab_normalXdrops:        "Butin - normal $1",
+	tab_normal:              "Standard",
+	tab_normalX:             "Normal $1",
+	tab_noteworthy:          "Notable",
+	tab_npcs:                "PNJs",
+	tab_npcabilities:        "Habiletés de PNJ",
+	tab_objectiveof:         "Objectif de",
+	tab_objects:             "Entités",
+	tab_pets:                "Familiers de chasseur",
+	tab_pickpocketedfrom:    "Volé à la tire depuis",
+	tab_pickpocketing:       "Vol à la tire",
+	tab_proficiencies:       "Compétences",
+	tab_professions:         "Métiers",
+	tab_profiles:            "Profils",
+	tab_prospectedfrom:      "Prospecté depuis",
+	tab_prospecting:         "Prospection",
+	tab_providedfor:         "Fourni pour",
+	tab_questrewards:        "Récompenses de quêtes",
+	tab_quests:              "Quêtes",
+	tab_races:               "Races",
+	tab_racialtraits:        "Traits raciaux",
+	tab_reagentfor:          "Composant de",
+	tab_recipes:             "Recettes",
+	tab_recipeitems:         "Objets recettes",
+	tab_replies:             "Réponses",
+	tab_commentreplies:      "Réponses aux commentaires",
+	tab_requiredby:          "Requis par",
+	tab_rewardfrom:          "Récompense de",
+	tab_samemodelas:         "Même modèle que",
+	tab_salvagedfrom:        "Récupéré sur",
+	tab_screenshots:         "Captures d'écran",
+	tab_seealso:             "Voir aussi",
+	tab_sells:               "Vend",
+	tab_sharedcooldown:      "Recharge partagée",
+	tab_signatureimages:     "Arrière-plans de signature",
+	tab_signatures:          "Signatures",
+	tab_skills:              "Compétences",
+	tab_skinnedfrom:         "Dépecé depuis",
+	tab_skinning:            "Dépeçage",
+	tab_soldby:              "Vendu par",
+	tab_spells:              "Sorts",
+	tab_starts:              "Débute",
+	tab_startsquest:         "Débute une quête",
+	tab_submitascreenshot:   "Envoyer une capture d'écran",
+	tab_suggestavideo:       "Suggérez un vidéo",
+	tab_summonedby:          "Invoqué par",
+	tab_statistics:          "Statistiques",
+	tab_talents:             "Talents",
+	tab_tameable:            "Domptables",
+	tab_taughtby:            "Enseigné par",
+	tab_teaches:             "Enseigne",
+	tab_titles:              "Titres",
+	tab_toolfor:             "Outil pour",
+	tab_topics:              "Sujets",
+	tab_trainers:            "Entraineurs",
+	tab_triggeredby:         "Déclenché par",
+	tab_uncategorizedspells: "Sorts non classés",
+	tab_unlocks:             "Déverouille",
+	tab_usedby:              "Utilisé par",
+	tab_videos:              "Vidéos",
+	tab_weaponskills:        "Compétences d'armes",
+	tab_world:               "Monde",
+	tab_zones:               "Zones",
+
+	menu_browse:"Consulter",mapper_tipzoom:"Astuce : Cliquer pour agrandir la carte",mapper_tippin:"Astuce : Cliquer sur la carte pour ajouter/enlever des marqueurs",mapper_hidepins:"Cacher les marqueurs",mapper_showpins:"Montrer les marqueurs",mapper_floor:"Changer de niveau...",mapper_relevantlocs:"Emplacements pertinents",mapper_entiretyinzone:"L'entièreté de cette quête se déroule dans $$",mapper_happensin:"Une partie de cette quête se déroule dans $$.",mapper_objectives:{ox:"Cette quête a des objectifs dans $$.",sx:"Cette quête débute dans $$.",ex:"Cette quête finie dans $$.",sex:"Cette quête débute et finie dans $$.",osx:"Cette quête a des objectifs et débute dans $$.",oex:"Cette quête a des objectifs et fini dans $$.",osx_ey:"Cette quête a des objectifs et débute dans $$ fini dans $$.",oex_sy:"Cette quête a des objectifs et fini dans $$ et débute dans $$.",sx_ey:"Cette quête débute dans $$ et finie dans $$.",ox_sy:"Cette quête débute dans $$, a des objectifs dans $$.",ox_ey:"Cette quête a des objectifs dans $$ et fini dans $$.",ox_sey:"Cette quête débute et fini dans $$ et a des objectifs dans $$.",ox_sy_ez:"Cette quête débute dans $$, a des objectifs dans $$ et fini dans $$."},mapper_startsquest:"Débute la quête",mapper_endsquest:"Termine la quête",mapper_requiredquest:"Objectif de la quête",mapper_sourcestart:"Source du début de la quête: ",mapper_sourceend:"Source de la fin de la quête: ",mapper_sourcereq:"Source de l'objectif d'une quête: ",mapper_clicktoview:"Cliquez pour voir ce $1",showonmap:"Afficher sur la carte...",som_nothing:"Rien",som_questgivers:"Donneurs de quêtes",som_viewnpc:"Cliquez pour voir ce PNJ",som_viewobj:"Cliquez pour voir cette entité",som_view:"Cliquez pour voir...",som_startsquest:"Débute la quête suivante :",som_startsquestpl:"Débute les quêtes suivantes :",som_legend:"Légende: ",som_legend_alliance:"Alliance",som_legend_horde:"Horde",som_legend_neutral:"Neutre",som:{all:"Tous",alliance:"Alliance",horde:"Horde",quest:"Donneur de quêtes",alliancequests:"Donneur de quêtes",hordequests:"Donneur de quêtes",repair:"Réparateurs",rare:"PNJs rares",auctioneer:"Actionnaires",banker:"Banquiers",battlemaster:"Maitre de bataille",innkeeper:"Aubergiste",guildmaster:"Maitre de guilde",stablemaster:"Maitre d'écurie",flightmaster:"Maitres de vol",trainer:"Entraineurs",vendor:"Marchands",book:"Livres",herb:"Herbes",vein:"Filons de minerai",spirithealer:"Esprits soigneurs"},markup_b:"Gras",markup_i:"Italique",markup_u:"Souligné",markup_s:"Barré",markup_small:"Petits caractères",markup_url:"Lien",markup_quote:"Citation",markup_code:"Bout de code",markup_ul:"Liste à puces",markup_ol:"Liste numérotée",markup_li:"Élément de liste",markup_img:"Image",markup_said:"a dit : ",markup_toc:"Table des matières",ct_dialog_captcha:"Veuillez entrer le code ci-dessus : ",ct_dialog_contactwowhead:"Contactez Wowhead",ct_dialog_description:"Description",ct_dialog_desc_caption:"Soyez aussi spécifique que possible.",ct_dialog_email:"Courriel : ",ct_dialog_email_caption:"Seulement si vous voulez être contacté.",ct_dialog_optional:"Optionnel",ct_dialog_reason:"Raison: ",ct_dialog_relatedurl:"URL relié: ",ct_dialog_currenturl:"URL actuel:",ct_dialog_report:"Rapporter",ct_dialog_reportchar:"Signalez le personnage",ct_dialog_reportcomment:"Signalez le commentaire de $1",ct_dialog_reportpost:"Signalez le message de $1",ct_dialog_reportscreen:"Signalez la capture d'écran de $1",ct_dialog_reportvideo:"Rapportez le vidéo de $1",ct_dialog_reporttopic:"Signalez le sujet de $1",ct_dialog_thanks:"Votre message à été reçu. Merci de nous avoir contacté!",ct_dialog_thanks_user:"Votre message à été reçu, $1. Merci de nous avoir contacté!",ct_dialog_error_captcha:"Le CAPTCHA que vous avez écrit n'est pas valide. Veuillez réessayer.",ct_dialog_error_desc:"Veuillez fournir une description complète, mais pas trop longue.",ct_dialog_error_email:"Veuillez entrer une adresse e-mail valide.",ct_dialog_error_emaillen:"Veuillez entrer une adresse e-mail avec moins de 100 caractères.",ct_dialog_error_reason:"Veuillez choisir une raison pour nous contacter.",ct_dialog_error_relatedurl:"Veuillez fournir un URL avec moins de 250 caractères.",ct_dialog_error_invalidurl:"Veuillez entrer un URL valide.",cn_fieldrequired:"$1 est requis.",cn_fieldinvalid:"$1 doit être valide.",cn_confirm:"Vérifiez que vous avez entré les bonnes informations, ensuite cliquez sur OK.",cn_entrylogin:'Veuillez vous <a href="?account=signin">connecter</a> pour participer au concours ou <a href="?account=signup">inscrivez-vous</a> si vous n\'en avez pas.',cn_entryerror:"Une erreur est survenue. Veuillez réessayer.",cn_entrywhen:"Vous vous êtes inscrit au concours le <b>$1</b>.",cn_entrywhen2:"Vous tees déjà inscrit à ce concours.",cn_entrysuccess:"Vous venez de vous inscrire au concours. Bonne chance!",cn_entryended:"Ce concours est terminé.",cn_entryupcoming:"Ce concours n'a pas encore débuté. Restez à l'affut!",cn_entryregion:"Vous ne pouvez participer à ce concours dans votre région.",cn_mustbe18:"Vouz devez être agé de 18 ans ou plus pour participer au concours.",cn_winnerslist:"Liste des gagnants",cn_updated:"Actualisé",ct_resp_error1:"Le CAPTCHA que vous avez écrit n'est pas valide. Veuillez réessayer.",ct_resp_error2:"Veuillez fournir une description complète, mais pas trop longue.",ct_resp_error3:"Veuillez choisir une raison pour nous contacter.",ct_resp_error7:"Vous avez déjà rapporté ceci.",compose_mode:"Mode : ",compose_edit:"Édition",compose_preview:"Aperçu",compose_livepreview:"Aperçu rapide",compose_save:"Sauver",compose_cancel:"Annuler",compose_limit:"Jusqu'à $1 caractères",compose_limit2:"Jusqu'à $1 caractères et/ou $2 lignes",compose_remaining:"$1 caractères restants.",user_nodescription:"Cet utilisateur n'a pas encore composé une description publique.",user_nodescription2:"Vous n'en avez pas composée une encore.",user_composeone:"En composer une !",user_editdescription:"Édition",myaccount_passmatch:"Correspondent",myaccount_passdontmatch:"Ne correspondent pas",myaccount_purged:"Purgé",myaccount_purgefailed:"La purge a échouée :(",myaccount_purgesuccess:"Les données d'annonce ont été purgées correctement!",types:{1:["PNJ","PNJ","PNJs","PNJs"],
 	2:["Entité","entité","Entités","entités"],
 	3:["Objet","objet","Objets","objets"],
 	4:["Ensemble d'objets","ensemble d'objets","Ensembles d'objets","ensembles d'objets"],
