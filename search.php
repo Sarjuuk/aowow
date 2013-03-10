@@ -9,7 +9,7 @@ Util::execTime(true);
     if &json
         => search by compare or profiler
     else if &opensearch
-        => suche aus der suchbox oben rechts, bzw Startseite
+        => suggestions when typing into searchboxes
         array:[
             str,        // search
             str[10],    // found
@@ -189,21 +189,39 @@ if ($searchMask & 0x4)
 }
 
 // 4 World Events:
-// if ($searchMask & 0x8)
+if ($searchMask & 0x8)
 {
-    // /*  custom data :(
-    // */
+    /*  custom data :(
+        icons: data/interface/calendar/calendar_[a-z]start.blp
+    */
 
-    // $wEvents = new WorldEventList(array(['name_loc'.User::$localeId, $query]));
+    // limited by my own system.. >.<
+    // cant construct a query like: name = X OR (desc = X AND holidayId = 0)
+    $wEvents1 = new WorldEventList(array(['h.name_loc'.User::$localeId, $query]));
+    $wEvents2 = new WorldEventList(array(['e.description', $query], ['e.holidayId', 0], 'AND'));
 
-    // if (!empty($data))
-    // {
-        // $found[] = array(
-            // 'type'     => TYPE_WORLDEVENT,
-            // 'appendix' => ' (World Event)',
-            // 'data'     => $data
-        // );
-    // }
+    $data  = $wEvents1->getListviewData();
+    $data += $wEvents2->getListviewData();
+
+    if ($data)
+    {
+        $wEvents1->addGlobalsToJscript($jsGlobals);
+        $wEvents2->addGlobalsToJscript($jsGlobals);
+
+        foreach ($data as &$d)
+        {
+            $updated = WorldEventList::updateDates($d['startDate'], $d['endDate'], $d['rec']);
+            $d['startDate'] = date(Util::$dateFormatLong, $updated['start']);
+            $d['endDate']   = date(Util::$dateFormatLong, $updated['end']);
+        }
+
+        $found['event'] = array(
+            'type'     => TYPE_WORLDEVENT,
+            'appendix' => ' (World Event)',
+            'data'     => $data,
+            'params'   => ['tabs' => '$myTabs']
+        );
+    }
 }
 
 // 5 Currencies

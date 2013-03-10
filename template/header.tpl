@@ -34,6 +34,7 @@
             {if isset($data.gAchievements)} { include file='bricks/allachievements_table.tpl'   data=$data.gAchievements }{/if}
             {if isset($data.gClasses)}      { include file='bricks/allclasses_table.tpl'        data=$data.gClasses      }{/if}
             {if isset($data.gCurrencies)}   { include file='bricks/allcurrencies_table.tpl'     data=$data.gCurrencies   }{/if}
+            {if isset($data.gHolidays)}     { include file='bricks/allholidays_table.tpl'       data=$data.gHolidays     }{/if}
             {if isset($data.gItems)}        { include file='bricks/allitems_table.tpl'          data=$data.gItems        }{/if}
             {if isset($data.gRaces)}        { include file='bricks/allraces_table.tpl'          data=$data.gRaces        }{/if}
             {if isset($data.gSpells)}       { include file='bricks/allspells_table.tpl'         data=$data.gSpells       }{/if}

@@ -44,8 +44,8 @@ $lang = array(
         'minutesAbbr'   => "мин",
         'secondsAbbr'   => "сек.",
         'millisecsAbbr' => "[ms]",
-
         'name'          => "Название",
+
         'disabled'      => "[Disabled]",
         'disabledHint'  => "[Cannot be attained or completed]",
         'serverside'    => "[Serverside]",
@@ -115,6 +115,9 @@ $lang = array(
         'goForum'       => "Feedback <a href=\"?forums&board=1\">forum</a>",
     ),
     'account'  => [],
+    'event' => array(
+        'category'      => array("Разное", "Праздники", "Периодические", "PvP")
+    ),
     'achievement' => array(
         'achievements'  => "достижения",
         'criteria'      => "Критерий",

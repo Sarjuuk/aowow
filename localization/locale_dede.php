@@ -127,7 +127,7 @@ $lang = array(
         'eventShort'    => "Ereignis",
         'event'         => "Weltereigniss",
         'events'        => "Weltereignisse",
-        'cooldown'      => "%s Cooldown",
+        'cooldown'      => "%s Abklingzeit",
         'requires'      => "Benötigt",
         'reqLevel'      => "Benötigt Stufe %s",
         'reqLevelHlm'   => "Benötigt Stufe %s",
@@ -206,13 +206,16 @@ $lang = array(
         'myAccount'     => "Mein Account",
         'editAccount'   => "Benutze die folgenden Formulare um deine Account-Informationen zu aktualisieren",
         'publicDesc'    => "Öffentliche Beschreibung",
-        'viewPublicDesc' => "Die Beschreibung in deinem <a href=\"?user=%s\">öffetnlichen Profil</a> ansehen",
+        'viewPubDesc'   => "Die Beschreibung in deinem <a href=\"?user=%s\">öffentlichen Profil</a> ansehen",
 
 
         // Please_enter_your_confirm_password = Bitte das Passwort bestätigen
         // Please_enter_your_username = Gib bitte deinen Benutzernamen ein
         // Please_enter_your_password = Gib bitte dein Kennwort ein
         // Remember_me_on_this_computer = Auf diesem Computer merken
+    ),
+    'event' => array(
+        'category'      => array("Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler")
     ),
     'achievement' => array(
         'achievements'  => "Erfolge",

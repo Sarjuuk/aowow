@@ -115,6 +115,9 @@ $lang = array(
         'goForum'       => "Feedback <a href=\"?forums&board=1\">forum</a>",
     ),
     'account'  => [],
+    'event' => array(
+        'category'      => array("Non classés", "Vacances", "Récurrent", "Joueur ctr. Joueur")
+    ),
     'achievement' => array(
         'achievements'  => "hauts faits",
         'criteria'      => "Critères",

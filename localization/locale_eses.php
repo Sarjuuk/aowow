@@ -68,7 +68,6 @@ $lang = array(
         'eventShort'    => "Evento",
         'event'         => "Suceso mundial ",
         'events'        => "Eventos del mundo",
-        'cooldown'      => "%s cooldown",
         'cooldown'      => "%s de reutilización",
         'requires'      => "Requiere",
         'reqLevel'      => "Necesitas ser de nivel %s",
@@ -109,8 +108,31 @@ $lang = array(
         'resetForm'     => "Reiniciar formulario",
         'refineSearch'  => "Sugerencia: Refina tu búsqueda llendo a una <a href=\"javascript:;\" id=\"fi_subcat\">subcategoría</a>.",
     ),
-    'error'  => [],
+    'error' => array(
+        'errNotFound'   => "Page not found",
+        'errPage'       => "What? How did you... nevermind that!\n<br>\n<br>\nIt appears that the page you have requested cannot be found. At least, not in this dimension.\n<br>\n<br>\nPerhaps a few tweaks to the <span class=\"q4\">[WH-799 Major Confabulation Engine]</span> may result in the page suddenly making an appearance!\n<div class=\"pad\"></div>\n<div class=\"pad\"></div>\nOr, you can try \n<a href=\"http://www.wowhead.com/?aboutus#contact\">contacting us</a>\n- the stability of the WH-799 is debatable, and we wouldn't want another accident...",
+        'goStart'       => "Return to the <a href=\"index.php\">homepage</a>",
+        'goForum'       => "Feedback <a href=\"?forums&board=1\">forum</a>",
+    ),
     'account'  => [],
+    'event' => array(
+        'category'      => array("Sin categoría", "Vacacionales", "Periódicos", "Jugador contra Jugador")
+    ),
+    'achievement' => array(
+        'achievements'  => "logros",
+        'criteria'      => "Requisitos",
+        'achievement'   => "logro",
+        'points'        => "Puntos",
+        'series'        => "Serie",
+        'outOf'         => "de",
+        'criteriaType'  => "Criterium Type-Id:",
+        'itemReward'    => "Recibirás:",
+        'titleReward'   => "Deberías obtener el título \"<a href=\"?title=%d\">%s</a>\"",
+        'slain'         => "matado",
+    ),
+    'compare' => array(
+        'compare'       => "Herramienta de comparación de objetos",
+    ),
     'talent'  => array(
         'talentCalc'    => "Calculadora de talentos",
         'petCalc'       => "Calculadora de mascotas",
@@ -133,21 +155,6 @@ $lang = array(
         'Miscellaneous' => "Miscelánea",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Mapa cósmico",
-    ),
-    'achievement' => array(
-        'achievements'  => "logros",
-        'criteria'      => "Requisitos",
-        'achievement'   => "logro",
-        'points'        => "Puntos",
-        'series'        => "Serie",
-        'outOf'         => "de",
-        'criteriaType'  => "Criterium Type-Id:",
-        'itemReward'    => "Recibirás:",
-        'titleReward'   => "Deberías obtener el título \"<a href=\"?title=%d\">%s</a>\"",
-        'slain'         => "matado",
-    ),
-    'compare' => array(
-        'compare'       => "Herramienta de comparación de objetos",
     ),
     'zone' => array(
         'zone'          => "Zone",

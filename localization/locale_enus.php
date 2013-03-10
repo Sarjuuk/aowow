@@ -208,13 +208,16 @@ $lang = array(
         'myAccount'     => "My Account",
         'editAccount'   => "Simply use the forms below to update your account information",
         'publicDesc'    => "Public Description",
-        'viewPublicDesc' => "View your Public Description in your <a href=\"?user=%s\">Profile  Page</a>",
+        'viewPubDesc'   => "View your Public Description in your <a href=\"?user=%s\">Profile  Page</a>",
 
 
         // Please_enter_your_username = Enter your username (account)
         // Please_enter_your_password = Enter your password
         // Sign_in_to_your_Game_Account = Enter your game account:
         // Please_enter_your_confirm_password = Please enter your confirm password
+    ),
+    'event' => array(
+        'category'      => array("Uncategorized", "Holidays", "Recurring", "Player vs. Player")
     ),
     'achievement' => array(
         'achievements'  => "achievements",

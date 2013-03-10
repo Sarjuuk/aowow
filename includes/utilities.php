@@ -162,6 +162,22 @@ abstract class BaseType
         return $this->curTpl[$field];
     }
 
+    public function filterGetJs()
+    {
+        if ($this->filter && isset($this->filter->fiData['c']['cr']))
+            return "fi_setCriteria([".@implode(',',$this->filter->fiData['c']['cr'])."], [".@implode(',',$this->filter->fiData['c']['crs'])."], ['".@implode('\', \'',$this->filter->fiData['c']['crv'])."']);";
+        else
+            return null;
+    }
+
+    public function filterGetForm()
+    {
+        if ($this->filter)
+            return $this->filter->form;
+        else
+            return [];
+    }
+
     // should return data required to display a listview of any kind
     // this is a rudimentary example, that will not suffice for most Types
     abstract public function getListviewData();
@@ -188,12 +204,13 @@ class Lang
     public static $account;
     public static $achievement;
     public static $compare;
+    public static $event;
     public static $item;
     public static $maps;
     public static $spell;
     public static $talent;
-    public static $zone;
     public static $title;
+    public static $zone;
 
     public static function load($loc)
     {
@@ -416,6 +433,9 @@ class Util
         null,                           null,                           'tertBudged',                   'clothCloakArmor',
         'clothChestArmor',              'leatherChestArmor',            'mailChestArmor',               'plateChestArmor'
     );
+
+    public static $dateFormatShort          = "Y/m/d";
+    public static $dateFormatLong           = "Y/m/d H:i:s";
 
     public static $changeLevelString        = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_staticTooltipLevelClick(this, null, 0)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><!--lvl-->%s</a>';
 
