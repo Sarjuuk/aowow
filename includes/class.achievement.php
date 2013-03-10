@@ -189,18 +189,18 @@ class AchievementList extends BaseType
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
                     if (!$crtName)
-                        $crtName = Spell::getName($crt['value1']);
+                        $crtName = SpellList::getName($crt['value1']);
                     break;
                 case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
                     if (!$crtName)
-                        $crtName = Util::getItemName($crt['value1']);
+                        $crtName = ItemList::getName($crt['value1']);
                     break;
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
                     if (!$crtName)
-                        $crtName = Faction::getName($crt['value1']);
+                        $crtName = FactionList::getName($crt['value1']);
                     $crtName .= ' ('.Lang::getReputationLevelForPoints($crt['value2']).')';
                     break;
             }

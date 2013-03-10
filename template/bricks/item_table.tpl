@@ -16,7 +16,7 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    name:'{$curr.name|escape:"quotes"}',
+                    name:'{$curr.quality}{$curr.name|escape:"quotes"}',
                     {if isset($curr.level)}
                         level:{$curr.level},
                     {/if}

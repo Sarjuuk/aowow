@@ -4,7 +4,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class Faction
+class FactionList extends BaseType
 {
     public static function getName($id)
     {
@@ -33,7 +33,12 @@ class Faction
             -1: hostile
         */
     }
-    
+
+    public function getListviewData() { }
+    public function addGlobalsToJScript(&$refs) { }
+    public function addRewardsToJScript(&$refs) { }
+    public function renderTooltip() { }
+
 }
 
 ?>

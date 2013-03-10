@@ -995,7 +995,8 @@ class ItemList extends BaseType
     {
         $json = array(
             'id'          => $this->id,
-            'name'        => (ITEM_QUALITY_HEIRLOOM - $this->curTpl['Quality']).$this->names[$this->id],
+            'name'        => $this->names[$this->id],
+            'quality'     => ITEM_QUALITY_HEIRLOOM - $this->curTpl['Quality'],
             'icon'        => $this->curTpl['icon'],
             'classs'      => $this->curTpl['class'],
             'subclass'    => $this->curTpl['subclass'],
@@ -1065,5 +1066,55 @@ class ItemList extends BaseType
 
     public function addRewardsToJScript(&$ref) { }
 }
+
+
+/*
+teaches
+    $teaches = array();
+    for($j=1;$j<=4;$j++)
+        if($Row['spellid_'.$j]==483)
+            $teaches[] = spellinfo($Row['spellid_'.($j+1)]);
+    if($teaches)
+    {
+        $item['teaches'] = $teaches;
+        unset($teaches);
+        unset($spellrow);
+    }
+
+unlocks
+    $locks_row = $DB->selectCol('
+        SELECT lockID
+        FROM ?_lock
+        WHERE
+            (type1=1 AND lockproperties1=?d) OR
+            (type2=1 AND lockproperties2=?d) OR
+            (type3=1 AND lockproperties3=?d) OR
+            (type4=1 AND lockproperties4=?d) OR
+            (type5=1 AND lockproperties5=?d)
+        ',
+        $item['entry'], $item['entry'], $item['entry'], $item['entry'], $item['entry']
+    );
+    if($locks_row)
+    {
+        // ??????? ??????? ? ????? ????? ?????:
+        $item['unlocks'] = $DB->select('
+            SELECT ?#
+            FROM gameobject_template
+            WHERE
+                (
+                    ((type IN (?a)) AND (data0 IN (?a)))
+                OR
+                    ((type IN (?a)) AND (data0 IN (?a)))
+                )
+            ',
+            $object_cols[0],
+            array(GAMEOBJECT_TYPE_QUESTGIVER, GAMEOBJECT_TYPE_CHEST, GAMEOBJECT_TYPE_TRAP, GAMEOBJECT_TYPE_GOOBER, GAMEOBJECT_TYPE_CAMERA, GAMEOBJECT_TYPE_FLAGSTAND, GAMEOBJECT_TYPE_FLAGDROP),
+            $locks_row,
+            array(GAMEOBJECT_TYPE_DOOR, GAMEOBJECT_TYPE_BUTTON),
+            $locks_row
+        );
+        if(!$item['unlocks'])
+            unset($item['unlocks']);
+*/
 
 ?>
