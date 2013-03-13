@@ -393,6 +393,127 @@ class Lang
     }
 }
 
+class SmartyAoWoW extends Smarty
+{
+    private $config = [];
+
+    public function __construct($config)
+    {
+        $cwd = str_replace("\\", "/", getcwd());
+
+        $this->Smarty();
+        $this->config           = $config;
+        $this->template_dir     = $cwd.'/template/';
+        $this->compile_dir      = $cwd.'/cache/template/';
+        $this->config_dir       = $cwd.'/configs/';
+        $this->cache_dir        = $cwd.'/cache/';
+        $this->debugging        = $config['debug'];
+        $this->left_delimiter   = '{';
+        $this->right_delimiter  = '}';
+        $this->caching          = false;                    // Total Cache, this site does not work
+        $this->assign('app_name', $config['page']['name']);
+        $this->assign('AOWOW_REVISION', AOWOW_REVISION);
+        $this->_tpl_vars['page'] = array(
+            'reqJS'      => [],                             // <[string]> path to required JSFile
+            'reqCSS'     => [],                             // <[string,string]> path to required CSSFile, IE condition
+            'title'      => null,                           // [string] page title
+            'tab'        => null,                           // [int] # of tab to highlight in the menu
+            'type'       => null,                           // [int] numCode for spell, npx, object, ect
+            'typeId'     => null,                           // [int] entry to display
+            'path'       => '[]',                           // [string] (js:array) path to preselect in the menu
+            'gStaticUrl' => substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1)
+        );
+    }
+
+    // using Smarty::assign would overwrite every pair and result in undefined indizes
+    public function updatePageVars($pageVars)
+    {
+        if (!is_array($pageVars))
+            return;
+
+        foreach ($pageVars as $var => $val)
+            $this->_tpl_vars['page'][$var] = $val;
+    }
+
+    public function display($tpl)
+    {
+        // since it's the same for every page, except index..
+        if (!$this->_tpl_vars['query'][0])
+            return;
+
+        // sanitize
+        if (preg_match('/[^a-z]/i', $this->_tpl_vars['query'][0]))
+            return;
+
+        $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = ?s OR page = "*")', $this->_tpl_vars['query'][0]);
+        foreach ($ann as $k => $v)
+            $ann[$k]['text'] = Util::localizedString($v, 'text');
+
+        $this->_tpl_vars['announcements'] = $ann;
+
+        parent::display($tpl);
+    }
+
+    public function notFound($subject)
+    {
+        $this->updatePageVars(array(
+            'subject'  => ucfirst($subject),
+            'id'       => intVal($this->_tpl_vars['query'][1]),
+            'notFound' => sprintf(Lang::$main['pageNotFound'], $subject),
+        ));
+
+        $this->assign('lang', Lang::$main);
+
+        $this->display('404.tpl');
+        exit();
+    }
+
+    public function error()
+    {
+        $this->assign('lang', array_merge(Lang::$main, Lang::$error));
+        $this->assign('mysql', DB::Aowow()->getStatistics());
+
+        $this->display('error.tpl');
+        exit();
+    }
+
+    // creates the cache file
+    public function saveCache($key, $data)
+    {
+        if ($this->debugging)
+            return;
+
+        $file = $this->cache_dir.'data/'.$key;
+
+        $cache_data = time()." ".AOWOW_REVISION."\n";
+        $cache_data .= serialize($data);
+
+        file_put_contents($file, $cache_data);
+    }
+
+    // loads and evaluates the cache file
+    public function loadCache($key, &$data)
+    {
+        if ($this->debugging)
+            return false;
+
+        $cache = @file_get_contents($this->cache_dir.'data/'.$key);
+        if (!$cache)
+            return false;
+
+        $cache = explode("\n", $cache);
+
+        @list($time, $rev) = explode(' ', $cache[0]);
+        $expireTime = $time + $this->config['page']['cacheTimer'];
+        if ($expireTime <= time() || $rev < AOWOW_REVISION)
+            return false;
+
+        $data = unserialize($cache[1]);
+
+        return true;
+    }
+}
+
 class Util
 {
     public static $resistanceFields         = array(
