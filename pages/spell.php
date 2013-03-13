@@ -594,19 +594,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $smarty->saveCache($cacheKeyPage, $pageData);
     }
     else
-    {
-        $smarty->updatePageVars(array(
-            'subject'   => ucfirst(Lang::$game['spell']),
-            'id'        => $id,
-            'notFound'  => sprintf(Lang::$main['pageNotFound'], Lang::$game['spell']),
-        ));
-
-        $smarty->assign('lang', Lang::$main);
-        $smarty->display('404.tpl');
-
-        exit();
-    }
-
+        $smarty->notFound(Lang::$game['spell']);
 }
 
 $smarty->updatePageVars(array(

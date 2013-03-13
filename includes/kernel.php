@@ -73,16 +73,43 @@ class Smarty_AoWoW extends Smarty
     public function display($tpl)
     {
         // since it's the same for every page, except index..
-        if ($this->_tpl_vars['query'][0])
-        {
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = ?s OR page = "*")', $this->_tpl_vars['query'][0]);
-            foreach ($ann as $k => $v)
-                $ann[$k]['text'] = Util::localizedString($v, 'text');
+        if (!$this->_tpl_vars['query'][0])
+            return;
 
-            $this->_tpl_vars['announcements'] = $ann;
-        }
+        // sanitize
+        if (preg_match('/[^a-z]/i', $this->_tpl_vars['query'][0]))
+            return;
+
+        $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = ?s OR page = "*")', $this->_tpl_vars['query'][0]);
+        foreach ($ann as $k => $v)
+            $ann[$k]['text'] = Util::localizedString($v, 'text');
+
+        $this->_tpl_vars['announcements'] = $ann;
 
         parent::display($tpl);
+    }
+
+    public function notFound($subject)
+    {
+        $this->updatePageVars(array(
+            'subject'  => ucfirst($subject),
+            'id'       => intVal($this->_tpl_vars['query'][1]),
+            'notFound' => sprintf(Lang::$main['pageNotFound'], $subject),
+        ));
+
+        $this->assign('lang', Lang::$main);
+
+        $this->display('404.tpl');
+        exit();
+    }
+
+    public function error()
+    {
+        $this->assign('lang', array_merge(Lang::$main, Lang::$error));
+        $this->assign('mysql', DB::Aowow()->getStatistics());
+
+        $this->display('error.tpl');
+        exit();
     }
 
     // creates the actual cache file

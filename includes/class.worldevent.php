@@ -73,7 +73,7 @@ class WorldEventList extends BaseType
             {
                 // template
                 $this->curTpl['name_loc0']  = $this->curTpl['description'];
-                $this->curTpl['iconString'] = 'INV_Misc_QuestionMark';
+                $this->curTpl['iconString'] = 'trade_engineering';
                 $replace[$this->id] = $this->curTpl;
 
                 // names

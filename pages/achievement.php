@@ -55,16 +55,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
 
     if ($acv->error)
-    {
-        $smarty->updatePageVars(array(
-            'subject'  => ucfirst(Lang::$achievement['achievement']),
-            'id'       => $id,
-            'notFound' => sprintf(Lang::$main['pageNotFound'], Lang::$achievement['achievement']),
-        ));
-        $smarty->assign('lang', Lang::$main);
-        $smarty->display('404.tpl');
-        exit();
-    }
+        $smarty->notFound(Lang::$achievement['achievement']);
 
     $pageData['path'] = [];
     $pageData['title'] = [ucfirst(Lang::$achievement['achievement'])];

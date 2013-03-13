@@ -27,7 +27,7 @@ enum(array( // UserPropsLimits
 */
 
 if (!in_array($pageParam, array('dashboard', '', 'signin', 'signup', 'signout', 'signin_do', 'signup_do', 'forgotpassword', 'forgotusername')))
-    require 'error.php';
+    $smarty->error();
 
 function signin()
 {

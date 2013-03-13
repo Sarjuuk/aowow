@@ -4,10 +4,14 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-$cat      = Util::extractURLParams($pageParam)[0];
-$path     = [0, 10];
-$cacheKey = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, -1, isset($cat) ? $cat : -1, User::$localeId]);
-$title    = [ucFirst(Lang::$game['titles'])];
+$cat       = Util::extractURLParams($pageParam)[0];
+$path      = [0, 10];
+$validCats = [0, 1, 2, 3, 4, 5, 6];
+$title     = [ucFirst(Lang::$game['titles'])];
+$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, -1, isset($cat) ? $cat : -1, User::$localeId]);
+
+if (!in_array($cat, $validCats))
+    $smarty->error();
 
 $path[] = $cat;                                             // should be only one parameter anyway
 
@@ -36,10 +40,11 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $smarty->saveCache($cacheKey, $pageData);
 }
 
+
 $page = array(
     'tab'   => 0,                                           // for g_initHeader($tab)
     'title' => implode(" - ", $title),
-    'path'  => "[".implode(", ", $path)."]",
+    'path'  => "[".implode(", ", $path)."]"
 );
 
 $smarty->updatePageVars($page);

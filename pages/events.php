@@ -3,27 +3,41 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-@list($cat)   = Util::extractURLParams($pageParam);
-$condition    = [];
-$path         = [0, 11];
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_WORLDEVENT, -1, $cat, User::$localeId]);
 
-if ($cat)
-    $path[] = $cat;
+$cat       = Util::extractURLParams($pageParam)[0];
+$condition = [];
+$path      = [0, 11];
+$validCats = [0, 1, 2, 3];
+$title     = [Lang::$game['events']];
+$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_WORLDEVENT, -1, $cat, User::$localeId]);
 
-if (!$smarty->loadCache($cacheKeyPage, $pageData))
+if (!in_array($cat, $validCats))
+    $smarty->error();
+
+$path[] = $cat;
+
+if (isset($cat))
+    array_unshift($title, Lang::$event['category'][$cat]);
+
+if (!$smarty->loadCache($cacheKey, $pageData))
 {
-    switch ($cat)
+    if ($cat !== null)
     {
-        case 1:
-            $condition[] = ['h.scheduleType', -1];
-            break;
-        case 2:
-            $condition[] = ['h.scheduleType', [0, 1]];
-            break;
-        case 3:
-            $condition[] = ['h.scheduleType', 2];
-            break;
+        switch ($cat)
+        {
+            case 0:
+                $condition[] = ['e.holidayId', 0];
+                break;
+            case 1:
+                $condition[] = ['h.scheduleType', -1];
+                break;
+            case 2:
+                $condition[] = ['h.scheduleType', [0, 1]];
+                break;
+            case 3:
+                $condition[] = ['h.scheduleType', 2];
+                break;
+        }
     }
 
     $events = new WorldEventList($condition);
@@ -37,7 +51,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $events->addGlobalsToJScript($pageData);
 
-    $smarty->saveCache($cacheKeyPage, $pageData);
+    $smarty->saveCache($cacheKey, $pageData);
 }
 
 // recalculate dates with now(); can't be cached, obviously
@@ -48,12 +62,12 @@ foreach ($pageData['page'] as &$data)
     $data['endDate']   = date(Util::$dateFormatLong, $updated['end']);
 }
 
-$page = array(
-    'tab'       => 0,                                       // for g_initHeader($tab)
-    'title'     => ($cat ? Lang::$event['category'][$cat].' - ' : null) . Lang::$game['events'],
-    'path'      => json_encode($path, JSON_NUMERIC_CHECK),
-);
 
+$page = array(
+    'tab'   => 0,                                           // for g_initHeader($tab)
+    'title' => implode(" - ", $title),
+    'path'  => "[".implode(", ", $path)."]"
+);
 
 $smarty->updatePageVars($page);
 $smarty->assign('lang', Lang::$main);
