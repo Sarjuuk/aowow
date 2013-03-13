@@ -57,6 +57,10 @@ class WorldEventList extends BaseType
             else if ($sT == -1)
                 $this->curTpl['category'] = 1;
 
+            // preparse requisites
+            if ($this->curTpl['requires'])
+                $this->curTpl['requires'] = explode(' ', $this->curTpl['requires']);
+
             // change Ids if holiday is set
             if ($this->curTpl['holidayId'] > 0)
             {
@@ -101,6 +105,16 @@ class WorldEventList extends BaseType
 
     public static function updateDates($start, $end, $occurence, $final = 5000000000)    // in the far far FAR future..
     {
+        if (!$start)
+        {
+            return array(
+                'start'     => 0,
+                'end'       => 0,
+                'nextStart' => 0,
+                'nextEnd'   => 0
+            );
+        }
+
         // Convert everything to seconds
         $start     = intVal($start);
         $end       = intVal($end);

@@ -42,14 +42,21 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     $events = new WorldEventList($condition);
 
+    $events->addGlobalsToJScript($pageData);
+
+    $deps = [];
+    while ($events->iterate())
+        if ($d = $events->getField('requires'))
+            $deps[$events->id] = $d;
+
     $pageData = array(
         'page'   => $events->getListviewData(),
+        'deps'   => $deps,
         'params' => array(
             'tabs'   => '$myTabs'
         )
     );
 
-    $events->addGlobalsToJScript($pageData);
 
     $smarty->saveCache($cacheKey, $pageData);
 }
@@ -57,9 +64,16 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 // recalculate dates with now(); can't be cached, obviously
 foreach ($pageData['page'] as &$data)
 {
+    // is a followUp-event
+    if (!empty($pageData['deps'][$data['id']]))
+    {
+        $data['startDate'] = $data['endDate'] = false;
+        continue;
+    }
+
     $updated = WorldEventList::updateDates($data['startDate'], $data['endDate'], $data['rec']);
-    $data['startDate'] = date(Util::$dateFormatLong, $updated['start']);
-    $data['endDate']   = date(Util::$dateFormatLong, $updated['end']);
+    $data['startDate'] = $updated['start'] ? date(Util::$dateFormatLong, $updated['start']) : false;
+    $data['endDate']   = $updated['end'  ] ? date(Util::$dateFormatLong, $updated['end'])   : false;
 }
 
 
