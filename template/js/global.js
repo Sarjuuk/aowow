@@ -11722,12 +11722,13 @@ Listview.templates = {
                 type: 'text',
                 width: '15%',
                 compute: function(achievement, td) {
+                    statistic = achievement.type ? achievement.type + '.' : '';
                     td.className = 'small';
-                    path = '?achievements=';
+                    path = '?achievements=' + statistic;
                     if (achievement.category != -1 && achievement.parentcat != -1) {
                         var a2 = ce('a');
                         a2.className = 'q0';
-                        a2.href = '?achievements=' + achievement.parentcat;
+                        a2.href = '?achievements=' + statistic + achievement.parentcat;
                         ae(a2, ct(g_achievement_categories[achievement.parentcat]));
                         ae(td, a2);
                         ae(td, ce('br'));

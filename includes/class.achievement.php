@@ -93,6 +93,10 @@ class AchievementList extends BaseType
                 'parentCat'     => $this->curTpl['parentCat'],
             );
 
+            // going out on a limb here: type = 1 if in level 3 of statistics tree, so, IF (statistic AND parentCat NOT statistic (1)) i guess
+            if  ($this->curTpl['flags'] & ACHIEVEMENT_FLAG_COUNTER && $this->curTpl['parentCat'] != 1)
+                $data[$this->id]['type'] = 1;
+
             if (!empty($this->curTpl['rewards']))
             {
                 $rewards = [];
