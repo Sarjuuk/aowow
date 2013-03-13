@@ -193,6 +193,41 @@ abstract class BaseType
     abstract public function renderTooltip();
 }
 
+trait listviewHelper
+{
+    public function hasDiffCategories()
+    {
+        $this->reset();
+        $curCat = $this->getField('category');
+        if ($curCat === null)
+            return false;
+
+        while ($this->iterate())
+            if ($curCat != $this->getField('category'))
+                return true;
+
+        return false;
+    }
+
+    public function hasAnySource()
+    {
+        if (!isset($this->sources))
+            return false;
+
+        foreach ($this->sources as $src)
+        {
+            if (!is_array($src))
+                continue;
+
+            if (!empty($src))
+                return true;
+        }
+
+        return false;
+    }
+
+}
+
 class Lang
 {
     public static $main;

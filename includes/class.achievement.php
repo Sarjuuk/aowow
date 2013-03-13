@@ -5,6 +5,8 @@ if (!defined('AOWOW_REVISION'))
 
 class AchievementList extends BaseType
 {
+    use listviewHelper;
+
     public    $criteria   = [];
     public    $tooltip    = [];
 

@@ -27,6 +27,12 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         )
     );
 
+    if ($titles->hasDiffCategories())
+        $pageData['params']['visibleCols'] = "$['category']";
+
+    if (!$titles->hasAnySource())
+        $pageData['params']['hiddenCols'] = "$['source']";
+
     $smarty->saveCache($cacheKey, $pageData);
 }
 

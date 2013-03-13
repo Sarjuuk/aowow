@@ -5,7 +5,9 @@ if (!defined('AOWOW_REVISION'))
 
 class TitleList extends BaseType
 {
-    private   $sources    = [];
+    use listviewHelper;
+
+    public    $sources    = [];
 
     protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_titles WHERE [cond] ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_titles WHERE [cond]';
@@ -33,6 +35,7 @@ class TitleList extends BaseType
                 }
             }
         }
+        $this->reset();                                     // push first element back for instant use
     }
 
     public function getListviewData()
@@ -127,7 +130,7 @@ class TitleList extends BaseType
 
     public function getHtmlizedName($gender = GENDER_MALE)
     {
-        return str_replace('%s', '<span class="q0">&lt;'.Lang::$main['name'].'&gt;</span>', $this->name[$gender]);
+        return str_replace('%s', '<span class="q0">&lt;'.Lang::$main['name'].'&gt;</span>', $this->names[$this->id][$gender]);
     }
 
     public function addRewardsToJScript(&$ref) { }
