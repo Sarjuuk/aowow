@@ -1,4 +1,4 @@
-    <title>{if $page.title}{$page.title|escape:"html"} - {/if}{$app_name}</title>
+    <title>{if $page.title}{$page.title|escape:"html"} - {/if}{$appName}</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <link rel="SHORTCUT ICON" href="template/images/favicon.ico">

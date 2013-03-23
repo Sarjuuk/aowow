@@ -17,9 +17,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $smarty->notFound(Lang::$game['title']);
 
     $title->addGlobalsToJscript($pageData);
+    $title->reset();
 
     $infobox = [];
     $colon   = User::$localeId == LOCALE_FR ? ' : ' : ': '; // Je suis un prick! <_<
+
     if ($title->getField('side') == 1)
         $infobox[] = Lang::$main['side'].$colon.'[span class=alliance-icon]'.Lang::$game['alliance'].'[/span]';
     else if ($title->getField('side') == 2)
@@ -33,7 +35,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($e = $title->getField('eventId'))
         $infobox[] = Lang::$game['eventShort'].$colon.'[url=?event='.$e.']'.WorldEvent::getName($e).'[/url]';
 
-    $title->reset();
     $pageData = array(
         'page' => array(
             'name'      => $title->getHtmlizedName(),
@@ -43,40 +44,43 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'infobox' => '[li][ul]'.implode('[/ul][ul]', $infobox).'[/ul][/li]',
     );
 
-    foreach ($title->sources[$id] as $type => $entries)
+    if (!empty($title->sources[$id]))
     {
-        // todo: hidden-/visibleCols by actual use
-        switch ($type)
+        foreach ($title->sources[$id] as $type => $entries)
         {
-            case  4:
-                $quests = new QuestList(array(['id', $entries]));
-                $quests->addRewardsToJscript($pageData);
+            switch ($type)
+            {
+                case  4:
+                    $quests = new QuestList(array(['id', $entries]));
+                    $quests->addRewardsToJscript($pageData);
 
-                $pageData['page']['questReward'] = $quests->getListviewData();
-                $pageData['page']['questParams'] = array(
-                    'id'            => 'reward-from-quest',
-                    'name'          => '$LANG.tab_rewardfrom',
-                    'hiddenCols'    => "$['side']",
-                    'visibleCols'   => "$['category']"
-                );
-                break;
-            case 12:
-                $acvs = new AchievementList(array(['id', $entries]));
-                $acvs->addGlobalsToJscript($pageData);
-                $acvs->addRewardsToJscript($pageData);
+                    $pageData['page']['questReward'] = $quests->getListviewData();
+                    $pageData['page']['questParams'] = array(
+                        'id'            => 'reward-from-quest',
+                        'name'          => '$LANG.tab_rewardfrom',
+                        'hiddenCols'    => "$['side']",
+                        'visibleCols'   => "$['category']"
+                    );
+                    break;
+                case 12:
+                    $acvs = new AchievementList(array(['id', $entries]));
+                    $acvs->addGlobalsToJscript($pageData);
+                    $acvs->addRewardsToJscript($pageData);
 
-                $pageData['page']['acvReward'] = $acvs->getListviewData();
-                $pageData['page']['acvParams'] = array(
-                    'id'            => 'reward-from-achievement',
-                    'name'          => '$LANG.tab_rewardfrom',
-                    'visibleCols'   => "$['category']",
-                    'sort'          => "$['reqlevel', 'name']"
-                );
-                break;
-            // case 13:
-                // not displayed
+                    $pageData['page']['acvReward'] = $acvs->getListviewData();
+                    $pageData['page']['acvParams'] = array(
+                        'id'            => 'reward-from-achievement',
+                        'name'          => '$LANG.tab_rewardfrom',
+                        'visibleCols'   => "$['category']",
+                        'sort'          => "$['reqlevel', 'name']"
+                    );
+                    break;
+                // case 13:
+                    // not displayed
+            }
         }
     }
+
     $pageData['title'] = ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->names[$title->id][0]))));
     $pageData['path']  = '[0, 10, '.$title->getField('category').']';
 
@@ -94,7 +98,7 @@ $smarty->updatePageVars(array(
 
 $smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
-$smarty->assign('data', $pageData);
+$smarty->assign('lvData', $pageData);
 $smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->display('title.tpl');
 

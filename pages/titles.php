@@ -21,12 +21,11 @@ if (isset($cat))
 if (!$smarty->loadCache($cacheKey, $pageData))
 {
     $titles = new TitleList(isset($cat) ? array(['category', (int)$cat]) : []);
-    $listview = $titles->getListviewData();
 
     $pageData = array(
-        'page'   => $listview,
+        'file'   => 'title',
+        'data'   => $titles->getListviewData(),
         'params' => array(
-            'parent' => false,
             'tabs'   => false
         )
     );
@@ -49,8 +48,8 @@ $page = array(
 
 $smarty->updatePageVars($page);
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('data', $pageData);
+$smarty->assign('lvData', $pageData);
 $smarty->assign('mysql', DB::Aowow()->getStatistics());
-$smarty->display('titles.tpl');
+$smarty->display('generic-no-filter.tpl');
 
 ?>

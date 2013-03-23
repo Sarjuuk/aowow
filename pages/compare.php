@@ -83,7 +83,7 @@ $page = array(
 
 
 $smarty->updatePageVars($page);
-$smarty->assign('data', $pageData);
+$smarty->assign('lvData', $pageData);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$compare));
 $smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->display('compare.tpl');

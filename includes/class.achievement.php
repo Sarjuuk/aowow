@@ -88,7 +88,7 @@ class AchievementList extends BaseType
                 'name'          => Util::localizedString($this->curTpl, 'name'),
                 'description'   => Util::localizedString($this->curTpl, 'description'),
                 'points'        => $this->curTpl['points'],
-                'faction'       => $this->curTpl['faction'] + 1,
+                'faction'       => $this->curTpl['faction'],
                 'category'      => $this->curTpl['category'],
                 'parentCat'     => $this->curTpl['parentCat'],
             );

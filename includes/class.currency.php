@@ -35,8 +35,8 @@ class CurrencyList extends BaseType
         while ($this->iterate())
         {
             $refs['gCurrencies'][$this->id] = array(
-                'name_'.User::$localeString => Util::jsEscape($this->names[$this->id]),
-                'icon'                      => $this->curTpl['iconString']
+                'name' => $this->names[$this->id],
+                'icon' => $this->curTpl['iconString']
             );
         }
 

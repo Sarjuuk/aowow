@@ -9,5 +9,5 @@
     <script type="text/javascript">ss_appendSticky()</script>
     <script type="text/javascript">vi_appendSticky()</script>
     <script type="text/javascript">
-        Markup.printHtml("{$data.infobox}", "infobox-contents0", {ldelim}mode:Markup.MODE_QUICKFACTS{rdelim});
+        Markup.printHtml("{$lvData.infobox}", "infobox-contents0", {ldelim}mode:Markup.MODE_QUICKFACTS{rdelim});
     </script>

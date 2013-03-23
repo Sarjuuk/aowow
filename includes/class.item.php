@@ -96,6 +96,10 @@ class ItemList extends BaseType
 
             $data[$this->id] = $this->json[$this->id];
 
+            // json vs listview quirk
+            $data[$this->id]['name'] = $data[$this->id]['quality'].$data[$this->id]['name'];
+            unset($data[$this->id]['quality']);
+
             if (isset($this->itemMods[$this->id]))          // due to ITEMINFO_JSON
                 foreach ($this->itemMods[$this->id] as $k => $v)
                     $data[$this->id][Util::$itemMods[$k]] = $v;
@@ -499,7 +503,7 @@ class ItemList extends BaseType
         // required skill
         if ($this->curTpl['RequiredSkill'])
         {
-            $skillText = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillID = ?d', $this->curTpl['RequiredSkill']);
+            $skillText = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillId = ?d', $this->curTpl['RequiredSkill']);
             $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?skill='.$this->curTpl['RequiredSkill'].'">'.Util::localizedString($skillText, 'name').'</a>';
             if ($this->curTpl['RequiredSkillRank'])
                 $x .= ' ('.$this->curTpl['RequiredSkillRank'].')';
@@ -595,10 +599,10 @@ class ItemList extends BaseType
 
             $xSet = '<br /><span class="q"><a href="?itemset='.$itemset['id'].'" class="q">'.Util::localizedString($itemset, 'name').'</a> (0/'.$num.')</span>';
 
-            if ($itemset['skillID'])                        // bonus requires skill to activate
+            if ($itemset['skillId'])                        // bonus requires skill to activate
             {
-                $name  = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillID=?d', $itemset['skillID']);
-                $xSet .= '<br />'.Lang::$game['requires'].' <a href="?skills='.$itemset['skillID'].'" class="q1">'.Util::localizedString($name, 'name').'</a>';
+                $name  = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillId=?d', $itemset['skillId']);
+                $xSet .= '<br />'.Lang::$game['requires'].' <a href="?skills='.$itemset['skillId'].'" class="q1">'.Util::localizedString($name, 'name').'</a>';
 
                 if ($itemset['skillLevel'])
                     $xSet .= ' ('.$itemset['skillLevel'].')';
@@ -881,7 +885,7 @@ class ItemList extends BaseType
         }
 
         foreach ($this->json[$this->id] as $k => $v)
-            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass']) && $v == "0"))
+            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'quality']) && $v == "0"))
                 unset($this->json[$this->id][$k]);
     }
 
@@ -1058,7 +1062,7 @@ class ItemList extends BaseType
 
         // clear zero-values afterwards
         foreach ($json as $k => $v)
-            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass']) && $v == "0"))
+            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'quality']) && $v == "0"))
                 unset($json[$k]);
 
         $this->json[$json['id']] = $json;

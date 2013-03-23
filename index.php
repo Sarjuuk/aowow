@@ -60,7 +60,7 @@ switch ($pageCall)
         if (file_exists('pages/'.$pageCall.'.php'))
             require 'pages/'.$pageCall.'.php';
         else
-            require 'pages/error.php';
+            $smarty->error();
         break;
     case 'talent':                                          // tool: talent calculator
     case 'petcalc':                                         // tool: pet talent calculator
@@ -123,7 +123,7 @@ switch ($pageCall)
         if (isset($_GET['power']))
             die('$WowheadPower.register(0, '.User::$localeId.', {})');
         else                                                // in conjunction with a propper rewriteRule in .htaccess...
-            require 'pages/error.php';
+            $smarty->error();
         break;
 }
 

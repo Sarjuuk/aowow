@@ -40,7 +40,7 @@ class CharClassList extends BaseType
             $refs['gClasses'] = [];
 
         while ($this->iterate())
-            $refs['gClasses'][$this->id] = Util::jsEscape($this->names[$this->id]);
+            $refs['gClasses'][$this->id] = ['name' => $this->names[$this->id]];
     }
 
     public function addRewardsToJScript(&$ref) { }

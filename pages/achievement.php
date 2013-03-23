@@ -53,13 +53,11 @@ if (isset($_GET['power']))
 // regular page
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-
     if ($acv->error)
         $smarty->notFound(Lang::$achievement['achievement']);
 
     $pageData['path'] = [];
     $pageData['title'] = [ucfirst(Lang::$achievement['achievement'])];
-    $acv->renderTooltip();
 
     // create page title and path
     $curCat = $acv->getField('category');
@@ -75,8 +73,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     array_unshift($pageData['title'], $acv->names[$id]);
 
     $acv->addRewardsToJscript($pageData);
-    $pageData['page'] = $acv->getDetailedData();
-
+    $pageData['page'] = $acv->getDetailedData()[$id];
+    $acv->reset();
     // infobox content
     switch ($acv->getField('faction'))
     {
@@ -132,7 +130,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // create rewards
     $pageData['page']['titleReward'] = [];
     $pageData['page']['itemReward']  = [];
-    $acv->addRewardsToJscript($pageData);
+
     foreach ($pageData['page']['titleReward'] as $k => $v)
         $pageData['page']['titleReward'][$k] = sprintf(Lang::$achievement['titleReward'], $k, trim(str_replace('%s', '', $v['name'])));
 
@@ -368,6 +366,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
+
 $vars = array(
     'title'     => implode(" - ", $pageData['title']),
     'path'      => "[".implode(", ", $pageData['path'])."]",// menuId 9: Achievement (g_initPath)
@@ -379,12 +378,8 @@ $vars = array(
 $smarty->updatePageVars($vars);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
-$smarty->assign('data', $pageData);
-
-// Mysql query execution statistics
+$smarty->assign('lvData', $pageData);
 $smarty->assign('mysql', DB::Aowow()->getStatistics());
-
-// load the page
 $smarty->display('achievement.tpl');
 
 ?>

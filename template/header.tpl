@@ -31,13 +31,13 @@
         {strip}<script type="text/javascript">
             g_initHeader({$page.tab});
             LiveSearch.attach(ge('livesearch-generic'));
-            {if isset($data.gAchievements)} { include file='bricks/allachievements_table.tpl'   data=$data.gAchievements }{/if}
-            {if isset($data.gClasses)}      { include file='bricks/allclasses_table.tpl'        data=$data.gClasses      }{/if}
-            {if isset($data.gCurrencies)}   { include file='bricks/allcurrencies_table.tpl'     data=$data.gCurrencies   }{/if}
-            {if isset($data.gHolidays)}     { include file='bricks/allholidays_table.tpl'       data=$data.gHolidays     }{/if}
-            {if isset($data.gItems)}        { include file='bricks/allitems_table.tpl'          data=$data.gItems        }{/if}
-            {if isset($data.gRaces)}        { include file='bricks/allraces_table.tpl'          data=$data.gRaces        }{/if}
-            {if isset($data.gSpells)}       { include file='bricks/allspells_table.tpl'         data=$data.gSpells       }{/if}
-            {if isset($data.gTitles)}       { include file='bricks/alltitles_table.tpl'         data=$data.gTitles       }{/if}
+            {if isset($lvData.gAchievements)} { include file='bricks/globals/achievements.tpl'   data=$lvData.gAchievements }{/if}
+            {if isset($lvData.gClasses)}      { include file='bricks/globals/classes.tpl'        data=$lvData.gClasses      }{/if}
+            {if isset($lvData.gCurrencies)}   { include file='bricks/globals/currencies.tpl'     data=$lvData.gCurrencies   }{/if}
+            {if isset($lvData.gHolidays)}     { include file='bricks/globals/holidays.tpl'       data=$lvData.gHolidays     }{/if}
+            {if isset($lvData.gItems)}        { include file='bricks/globals/items.tpl'          data=$lvData.gItems        }{/if}
+            {if isset($lvData.gRaces)}        { include file='bricks/globals/races.tpl'          data=$lvData.gRaces        }{/if}
+            {if isset($lvData.gSpells)}       { include file='bricks/globals/spells.tpl'         data=$lvData.gSpells       }{/if}
+            {if isset($lvData.gTitles)}       { include file='bricks/globals/titles.tpl'         data=$lvData.gTitles       }{/if}
             {* TODO: Factions, Quests, NPCs, Objects, g_gatheredzones(?) *}
         </script>{/strip}

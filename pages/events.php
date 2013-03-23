@@ -42,27 +42,28 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     $events = new WorldEventList($condition);
 
-    $events->addGlobalsToJScript($pageData);
-
     $deps = [];
     while ($events->iterate())
         if ($d = $events->getField('requires'))
             $deps[$events->id] = $d;
 
     $pageData = array(
-        'page'   => $events->getListviewData(),
+        'file'     => 'event',
+        'data'   => $events->getListviewData(),
         'deps'   => $deps,
+        'calendar' => false,                                // todo: fix it Felix!
         'params' => array(
             'tabs'   => '$myTabs'
         )
     );
 
+    $events->addGlobalsToJScript($pageData);
 
     $smarty->saveCache($cacheKey, $pageData);
 }
 
 // recalculate dates with now(); can't be cached, obviously
-foreach ($pageData['page'] as &$data)
+foreach ($pageData['data'] as &$data)
 {
     // is a followUp-event
     if (!empty($pageData['deps'][$data['id']]))
@@ -86,7 +87,7 @@ $page = array(
 $smarty->updatePageVars($page);
 $smarty->assign('lang', Lang::$main);
 $smarty->assign('mysql', DB::Aowow()->getStatistics());
-$smarty->assign('data', $pageData);
-$smarty->display('events.tpl');
+$smarty->assign('lvData', $pageData);
+$smarty->display('generic-no-filter.tpl');
 
 ?>

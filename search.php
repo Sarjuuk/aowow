@@ -519,7 +519,7 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
     $smarty->updatePageVars($vars);
     $smarty->assign('lang', array_merge(Lang::$main, Lang::$search));
     $smarty->assign('found', $found);
-    $smarty->assign('data', $jsGlobals);
+    $smarty->assign('lvData', $jsGlobals);
     $smarty->assign('search', $search);
     $smarty->assign('mysql', DB::Aowow()->getStatistics());
     $smarty->assign('util', new Util);                      // just for debugging / optimizing

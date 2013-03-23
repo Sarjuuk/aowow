@@ -13,10 +13,10 @@
                 <div class="text">
                     <div id="compare-generic"></div>
                     <script type="text/javascript">//<![CDATA[
-{foreach name=cmpItems from=$data.items item=curr}
+{foreach name=cmpItems from=$lvData.items item=curr}
                         g_items.add({$curr[0]}, {ldelim}name_{$user.language}:'{$curr[1]}', quality:{$curr[2]}, icon:'{$curr[3]}', jsonequip:{$curr[4]}{rdelim});
 {/foreach}
-                        new Summary({ldelim}template:'compare',id:'compare',parent:'compare-generic',groups:{$data.summary}{rdelim});
+                        new Summary({ldelim}template:'compare',id:'compare',parent:'compare-generic',groups:{$lvData.summary}{rdelim});
                     //]]></script>
                 </div>
                 <div class="clear"></div>

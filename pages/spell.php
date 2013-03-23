@@ -608,7 +608,7 @@ $smarty->updatePageVars(array(
 // comments, screenshots, videos
 // $smarty->assign('community', CommunityContent::getAll(9, $id));
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$spell));
-$smarty->assign('data', $pageData);
+$smarty->assign('lvData', $pageData);
 $smarty->assign('spell', $spell);
 
 // Mysql query execution statistics
