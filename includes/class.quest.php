@@ -93,7 +93,7 @@ class QuestList extends BaseType
 
         while ($this->iterate())
         {
-            $set = array(
+            $data[$this->id] = array(
                 'category'  => $this->cat1,
                 'category2' => $this->cat2,
                 'id'        => $this->id,
@@ -114,13 +114,13 @@ class QuestList extends BaseType
                     $choices[] = [$this->curTpl['RewardChoiceItemId'.$i], $this->curTpl['RewardChoiceItemCount'.$i]];
 
             if ($rewards)
-                $set['itemrewards'] = $rewards;
+                $data[$this->id]['itemrewards'] = $rewards;
 
             if ($choices)
-                $set['itemchoices'] = $choices;
+                $data[$this->id]['itemchoices'] = $choices;
 
             if ($this->curTpl['RewardTitleId'])
-                $set['titlereward'] = $this->curTpl['RewardTitleId'];
+                $data[$this->id]['titlereward'] = $this->curTpl['RewardTitleId'];
 
             // todo reprewards .. accesses QuestFactionReward.dbc
         }

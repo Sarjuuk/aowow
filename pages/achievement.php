@@ -56,7 +56,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($acv->error)
         $smarty->notFound(Lang::$achievement['achievement']);
 
-    $pageData['path'] = [];
+    $pageData['path']  = [];
     $pageData['title'] = [ucfirst(Lang::$achievement['achievement'])];
 
     // create page title and path
@@ -75,17 +75,18 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $acv->addRewardsToJscript($pageData);
     $pageData['page'] = $acv->getDetailedData()[$id];
     $acv->reset();
+
     // infobox content
     switch ($acv->getField('faction'))
     {
         case 0:
-            $pageData['page']['infoBox'][] = Lang::$main['side'].': <span class="alliance-icon">'.Lang::$game['alliance'].'</span>';
+            $pageData['page']['infoBox'][] = Lang::$main['side'].': <span class="alliance-icon">'.Lang::$game['si'][SIDE_ALLIANCE].'</span>';
             break;
         case 1:
-            $pageData['page']['infoBox'][] = Lang::$main['side'].': <span class="horde-icon">'.Lang::$game['horde'].'</span>';
+            $pageData['page']['infoBox'][] = Lang::$main['side'].': <span class="horde-icon">'.Lang::$game['si'][SIDE_HORDE].'</span>';
             break;
         default:                                        // case 3
-            $pageData['page']['infoBox'][] = Lang::$main['side'].': '.Lang::$main['both'];
+            $pageData['page']['infoBox'][] = Lang::$main['side'].': '.Lang::$game['si'][SIDE_BOTH];
     }
 
     // todo: crosslink with charactersDB to check if realmFirsts are still available
@@ -98,7 +99,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         ['id', $id, '!']
     );
     $saList = new AchievementList($conditions);
-    $pageData['page']['saData'] = $saList->getListviewData();
+    $pageData['page']['saData']   = $saList->getListviewData();
     $pageData['page']['saParams'] = array(
         'id'          => 'see-also',
         'name'        => '$LANG.tab_seealso',
@@ -116,7 +117,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if (!empty($refs))
     {
         $coList = new AchievementList(array(['id', $refs]));
-        $pageData['page']['coData'] = $coList->getListviewData();
+        $pageData['page']['coData']   = $coList->getListviewData();
         $pageData['page']['coParams'] = array(
             'id'          => 'criteria-of',
             'name'        => '$LANG.tab_criteriaof',
@@ -149,7 +150,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     {
         // hide hidden criteria for regular users (really do..?)
         // if (($crt['complete_flags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::$perms > 0)
-        //     continue;
+            // continue;
 
         // alternative display option
         $displayMoney = $crt['complete_flags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER;
@@ -328,10 +329,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($acv->getField('series'))
     {
         $pageData['page']['series'] = array(
-                array(
-                    'id'     => $id,
-                    'name'   => $acv->names[$id],
-                    'parent' => $acv->getField('series') >> 16,
+            array(
+                'id'     => $id,
+                'name'   => $acv->names[$id],
+                'parent' => $acv->getField('series') >> 16,
             )
         );
         $tmp = $pageData['page']['series'][0];

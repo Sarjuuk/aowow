@@ -251,4 +251,157 @@ abstract class Filter
     abstract protected function createSQLForValues($vl);
 }
 
+
+class AchievementListFilter extends Filter
+{
+    protected function createSQLForCriterium($cr)
+    {
+        if ($r = $this->createSQLForCommunity($cr))
+            return $r;
+
+        switch ($cr[0])
+        {
+            case 2:                                         // gives a reward [y|n]
+                return 'reward_loc0 '.($this->int2Bool($cr[1]) ? '<>' : '=').' \'\'';
+            case 3:                                         // reward text [str]
+                return 'reward_loc'.User::$localeId.' LIKE \'%'.Util::sqlEscape($cr[2]).'%\'';
+         // case 4:                                         // location [int]
+             // return '';                                  // no plausible locations parsed yet
+            case 5:                                         // first in series [y|n]
+                return $this->int2Bool($cr[1]) ? '(series <> 0 AND (series & 0xFFFF0000) = 0)' : '(series & 0xFFFF0000) <> 0';
+            case 6:                                         // last in series [y|n]
+                return $this->int2Bool($cr[1]) ? '(series <> 0 AND (series & 0xFFFF) = 0)' : '(series & 0xFFFF) <> 0';
+            case 7:                                         // part of series [y|n]
+                return 'series '.($this->int2Bool($cr[1]) ? '<>' : '=').' 0';
+            case 9:                                         // Id [op] [int]
+                return 'id '.$this->int2Op($cr[1]).' '.intVal($cr[2]);
+            case 10:                                        // Icon [str]
+                return 'iconString LIKE \'%'.Util::sqlEscape($cr[2]).'%\'';
+         // case 11:                                        // Related Event [int]
+             // return '';                                  // >0:holidayId; -2323:any; -2324:none
+            case 18:                                        // flags (staff only)
+                if (User::isInGroup(U_GROUP_STAFF))
+                    return 'flags &'.(1 << max($cr[1] - 1, 0)) ;
+            default:
+                return '1';
+        }
+    }
+
+    protected function createSQLForValues($vl)
+    {
+        $parts = [];
+
+        // name ex: +description, +rewards
+        if (isset($vl['na']))
+        {
+            if (isset($vl['ex']) && $vl['ex'] == 'on')
+                $parts[] = '(name_loc'.User::$localeId.' LIKE "%'.Util::sqlEscape($vl['na']).'%" OR description_loc'.User::$localeId.' LIKE "%'.Util::sqlEscape($vl['na']).'%" OR reward_loc'.User::$localeId.' LIKE "%'.Util::sqlEscape($vl['na']).'%")';
+            else
+                $parts[] = 'name_loc'.User::$localeId.' LIKE "%'.Util::sqlEscape($vl['na']).'%"';
+        }
+
+        // points min
+        if (isset($vl['minpt']))
+            $parts[] = 'points >= '.intVal($vl['minpt']);
+
+        // points max
+        if (isset($vl['maxpt']))
+            $parts[] = 'points <= '.intVal($vl['maxpt']);
+
+        // faction (side)
+        if (isset($vl['si']))
+        {
+            if ($vl['si'] == 3)                             // both
+                $parts[] = 'faction = '.intVal($vl['si']);
+            else if ($vl['si'] > 0)                         // faction, inclusive both
+                $parts[] = '(faction = 3 OR faction = '.intVal($vl['si']).')';
+            else if ($vl['si'] < 0)                         // faction, exclusive both
+                $parts[] = 'faction = '.intVal(-$vl['si']);
+
+        }
+
+        return $parts;
+    }
+}
+
+
+// missing filter: "Available to Players"
+class ItemsetListFilter extends Filter
+{
+    protected function createSQLForCriterium($cr)
+    {
+        if ($r = $this->createSQLForCommunity($cr))
+            return $r;
+
+        switch ($cr[0])
+        {
+            case 2:                                         // Id
+                return 'id '.$this->int2Op($cr[1]).' '.intVal($cr[2]);
+            case 3:                                         // pieces [int]
+                return '(IF(item1 > 0, 1, 0) + IF(item2 > 0, 1, 0) + IF(item3 > 0, 1, 0) + IF(item4 > 0, 1, 0) + IF(item5 > 0, 1, 0) +
+                         IF(item6 > 0, 1, 0) + IF(item7 > 0, 1, 0) + IF(item8 > 0, 1, 0) + IF(item9 > 0, 1, 0) + IF(item10 > 0, 1, 0)) ' .$this->int2Op($cr[1]).' '.intVal($cr[2]);
+            case 4:                                         // bonustext [str]
+                return 'bonusText_loc'.User::$localeId.' LIKE \'%'.Util::sqlEscape($cr[2]).'%\'';
+            case 5:                                         // heroic [y|n]
+                return 'heroic = '.($cr[1] == 1 ? '1' : '0');
+            case 6:                                         // related event [int]
+                $hId = intVal($cr[1]);                      // >0:holidayId; -2323:any; -2324:none
+                if ($hId == -2323)
+                    return 'holidayId <> 0';
+
+                if ($hId == -2324)
+                    $hId = 0;
+
+                return 'holidayId = '.$hId;
+         // case 12:                                        // available to players [y|n]
+             // return '';                                  // ugh .. scan loot, quest and vendor templates and write to ?_itemset
+            default:
+                return '1';
+        }
+    }
+
+    protected function createSQLForValues($vl)
+    {
+        $parts = [];
+
+        //string (extended)
+        if (isset($vl['na']))
+            $parts[] = 'name_loc'.User::$localeId.' LIKE "%'.Util::sqlEscape($vl['na']).'%"';
+
+        // quality [list]
+        if (isset($vl['qu']))
+            $parts[] = 'quality IN ('.implode(', ', (array)$vl['qu']).')';
+
+        // type
+        if (isset($vl['ty']))
+            $parts[] = 'type IN ('.implode(', ', (array)$vl['ty']).')';
+
+        // itemLevel min
+        if (isset($vl['minle']))
+            $parts[] = 'minLevel >= '.intVal($vl['minle']);
+
+        // itemLevel max
+        if (isset($vl['maxle']))
+            $parts[] = 'maxLevel <= '.intVal($vl['maxle']);
+
+        // reqLevel min
+        if (isset($vl['minrl']))
+            $parts[] = 'i.reqLevel <= '.intVal($vl['minle']);
+
+        // reqLevel max
+        if (isset($vl['maxrl']))
+            $parts[] = 'i.reqLevel <= '.intVal($vl['maxle']);
+
+        // class
+        if (isset($vl['cl']))
+            $parts[] = 'classMask & '.$this->list2Mask($vl['cl'] - 1);
+
+        // tag
+        if (isset($vl['ta']))
+            $parts[] = 'contentGroup = '.$vl['ta'];
+
+        return $parts;
+    }
+}
+
 ?>

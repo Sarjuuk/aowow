@@ -58,7 +58,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     $pageData['page']['questParams'] = array(
                         'id'            => 'reward-from-quest',
                         'name'          => '$LANG.tab_rewardfrom',
-                        'hiddenCols'    => "$['side']",
+                        'hiddenCols'    => "$['experience', 'money']",
                         'visibleCols'   => "$['category']"
                     );
                     break;

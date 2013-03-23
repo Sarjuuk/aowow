@@ -13,9 +13,9 @@ class AchievementList extends BaseType
     protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_achievement WHERE [filter] [cond]';
 
-    public function __construct($conditions)
+    public function __construct($conditions, $applyFilter = false)
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $applyFilter);
 
         // post processing
         while ($this->iterate())

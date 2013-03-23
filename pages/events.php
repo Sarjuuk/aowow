@@ -49,10 +49,10 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     $pageData = array(
         'file'     => 'event',
-        'data'   => $events->getListviewData(),
-        'deps'   => $deps,
+        'data'     => $events->getListviewData(),
+        'deps'     => $deps,
         'calendar' => false,                                // todo: fix it Felix!
-        'params' => array(
+        'params'   => array(
             'tabs'   => '$myTabs'
         )
     );
