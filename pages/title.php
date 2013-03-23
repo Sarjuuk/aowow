@@ -22,12 +22,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $infobox = [];
     $colon   = User::$localeId == LOCALE_FR ? ' : ' : ': '; // Je suis un prick! <_<
 
-    if ($title->getField('side') == 1)
-        $infobox[] = Lang::$main['side'].$colon.'[span class=alliance-icon]'.Lang::$game['alliance'].'[/span]';
-    else if ($title->getField('side') == 2)
-        $infobox[] = Lang::$main['side'].$colon.'[span class=horde-icon]'.Lang::$game['horde'].'[/span]';
+    if ($title->getField('side') == SIDE_ALLIANCE)
+        $infobox[] = Lang::$main['side'].$colon.'[span class=alliance-icon]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
+    else if ($title->getField('side') == SIDE_HORDE)
+        $infobox[] = Lang::$main['side'].$colon.'[span class=horde-icon]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
     else
-        $infobox[] = Lang::$main['side'].$colon.Lang::$main['both'];
+        $infobox[] = Lang::$main['side'].$colon.Lang::$game['si'][SIDE_BOTH];
 
     if ($g = $title->getField('gender'))
         $infobox[] = Lang::$main['gender'].$colon.'[span class='.($g == 2 ? 'female' : 'male').'-icon]'.Lang::$main['sex'][$g].'[/span]';

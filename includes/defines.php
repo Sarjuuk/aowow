@@ -106,6 +106,11 @@ define('ITEMINFO_LOOT',                     0x8);
 
 define('MAX_LEVEL',                         80);
 
+// Sides
+define('SIDE_ALLIANCE',                     1);
+define('SIDE_HORDE',                        2);
+define('SIDE_BOTH',                         3);
+
 // ClassMask
 define('CLASS_WARRIOR',                     0x1);
 define('CLASS_PALADIN',                     0x2);

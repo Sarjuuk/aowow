@@ -18,7 +18,6 @@ $lang = array(
         'profiles'      => "Your Characters",
         'links'         => "Links",
         'pageNotFound'  => "This %s doesn't exist.",
-        'both'          => "Both",
         'gender'        => "Gender",
         'sex'           => [null, 'Male', 'Female'],
         'quickFacts'    => "Quick Facts",
@@ -49,63 +48,20 @@ $lang = array(
         // pwd_err = Enter your password
         // signin_msg = Enter your game account
         // c_pwd = Repeat password
-        // create_filter = Create a filter
-        // loading = Loading ...
-        // soldby = Sold by
-        // droppedby = Dropped by
-        // containedinobject = Contained in
-        // containedinitem = Contained in item
-        // contain = Contains
-        // objectiveof = Objective of
-        // rewardof = Reward of
         // facts = Facts
-        // pickpocketingloot = Pickpocketing
-        // prospectedfrom = Prospect from
-        // canbeplacedin = Can be placed in
-        // minedfromobject = Mined from
-        // gatheredfromobject = Gathered from
-        // items = Items
-        // objects = Objects
-        // quests = Quests
-        // npcs = NPCs
-        // drop = Drop
-        // starts = Starts
-        // ends = Ends
-        // skinning = Skinning
-        // pickpocketing = Pickpocketing
-        // sells = Sells
-        // reputationwith = Reputation with
-        // experience = experience
-        // uponcompletionofthisquestyouwillgain = Upon completion of quests, get
-        // reagentfor = Reagent for
-        // skinnedfrom = Skinned from
-        // disenchanting = Disenchanting
         // This_Object_cant_be_found = Object map not available, Object may be spawned via a script
-        // itemsets = Item Sets
-        // Spells = Spells
-        // Items = Items
-        // Quests = Quests
-        // Factions = Factions
-        // Item_Sets = Item sets
-        // NPCs = NPCs
-        // Objects = Objects
-        // Compare = Item Comparison Tool
-        // My_account = My account
-        // Comments = Comments
-        // Latest_Comments = Latest comments
-        // day = days
-        // hr = hr
-        // min = min
-        // sec = sec
-        // Respawn = Respawn
-        // Class = Class
-        // class = class
-        // race = race
-        // Race = Race
-        // Races = Races
-        // name = name
-        // Name = Name
-        // slain = slain
+
+        // filter
+        'extSearch'     => "Extended search",
+        'addFilter'     => "Add another Filter",
+        'match'         => "Match",
+        'allFilter'     => "All filters",
+        'oneFilter'     => "At least one",
+        'applyFilter'   => "Apply filter",
+        'resetForm'     => "Reset Form",
+        'refineSearch'  => "Tip: Refine your search by browsing a <a href=\"javascript:;\" id=\"fi_subcat\">subcategory</a>.",
+
+        // infobox
         'name'          => "Name",
         'disabled'      => "Disabled",
         'disabledHint'  => "Cannot be attained or completed",
@@ -119,10 +75,10 @@ $lang = array(
         'tryAgain'      => "Please try some different keywords or check your spelling.",
     ),
     'game' => array(
-        'alliance'      => "Alliance",
-        'horde'         => "Horde",
         'class'         => "class",
         'classes'       => "Classes",
+        'currency'      => "currency",
+        'currencies'    => "Currencies",
         'races'         => "Races",
         'title'         => "title",
         'titles'        => "Titles",
@@ -130,15 +86,18 @@ $lang = array(
         'event'         => "World Event",
         'events'        => "World Events",
         'cooldown'      => "%s cooldown",
+        'itemset'       => "item Set",
+        'itemsets'      => "Item Sets",
         'requires'      => "Requires",
         'reqLevel'      => "Requires Level %s",
         'reqLevelHlm'   => "Requires Level %s",
         'valueDelim'    => " to ",
+        'si'            => array(-2 => "Horde only", -1 => "Alliance only", null, "Alliance", "Horde", "Both"),
         'resistances'   => array(null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'),
         'di'            => array(null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"),
         'sc'            => array("Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"),
-        'cl'            => array("UNK_CL0", "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", 'UNK_CL10', "Druid"),
-        'ra'            => array(-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", 'UNK_RA9', "Blood Elf", "Draenei"),
+        'cl'            => array(null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"),
+        'ra'            => array(-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"),
         'rep'           => array("Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"),
         'st'            => array(
             null,               "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",
@@ -156,18 +115,6 @@ $lang = array(
             "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
             "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
         ),
-    ),
-    'filter' => array(
-        'extSearch'     => "Extended search",
-        'onlyAlliance'  => "Alliance only",
-        'onlyHorde'     => "Horde only",
-        'addFilter'     => "Add another Filter",
-        'match'         => "Match",
-        'allFilter'     => "All filters",
-        'oneFilter'     => "At least one",
-        'applyFilter'   => "Apply filter",
-        'resetForm'     => "Reset Form",
-        'refineSearch'  => "Tip: Refine your search by browsing a <a href=\"javascript:;\" id=\"fi_subcat\">subcategory</a>.",
     ),
     'error' => array(
         'errNotFound'   => "Page not found",
@@ -266,6 +213,27 @@ $lang = array(
             'General',      'Player vs. Player',    'Reputation',       'Dungeons & Raids',     'Quests',       'Professions',      'World Events'
         )
     ),
+    'currency' => array(
+        'cat'           => array(
+            1 => "Miscellaneous", 2 => "Player vs. Player", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon and Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Unused"
+        )
+    ),
+    'itemset' => array(
+        'notes'         => array(
+            null,                                   "Dungeon Set 1",                        "Dungeon Set 2",                        "Tier 1 Raid Set",
+            "Tier 2 Raid Set",                      "Tier 3 Raid Set",                      "Level 60 PvP Rare Set",                "Level 60 PvP Rare Set (Old)",
+            "Level 60 PvP Epic Set",                "Ruins of Ahn'Qiraj Set",               "Temple of Ahn'Qiraj Set",              "Zul'Gurub Set",
+            "Tier 4 Raid Set",                      "Tier 5 Raid Set",                      "Dungeon Set 3",                        "Arathi Basin Set",
+            "Level 70 PvP Rare Set",                "Arena Season 1 Set",                   "Tier 6 Raid Set",                      "Arena Season 2 Set",
+            "Arena Season 3 Set",                   "Level 70 PvP Rare Set 2",              "Arena Season 4 Set",                   "Tier 7 Raid Set",
+            "Arena Season 5 Set",                   "Tier 8 Raid Set",                      "Arena Season 6 Set",                   "Tier 9 Raid Set",
+            "Arena Season 7 Set",                   "Tier 10 Raid Set",                     "Arena Season 8 Set"
+        ),
+        'types'         => array(
+            null,               "Cloth",                "Leather",              "Mail",                     "Plate",                    "Dagger",                   "Ring",
+            "Fist Weapon",      "One-Handed Axe",       "One-Handed Mace",      "One-Handed Sword",         "Trinket",                  "Amulet"
+        )
+    ),
     'spell' => array(
         'remaining'     => "%s remaining",
         'untilCanceled' => "until canceled",
@@ -318,6 +286,10 @@ $lang = array(
         'socketBonus'   => "Socket Bonus",
         'socket'        => array(
             "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",            -1 => "Prismatic Socket"
+        ),
+        'quality'       => array (
+            "Poor",                 "Common",           "Uncommon",             "Rare",
+            "Epic",                 "Legendary",        "Artifact",             "Heirloom"
         ),
         'trigger'       => array (
             "Use: ",                "Equip: ",          "Chance on hit: ",      null,                           null,

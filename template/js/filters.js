@@ -3,1216 +3,1902 @@ var fi_weights = null;
 var fi_weightsFactor;
 var fi_nExtraCols;
 var fi_gemScores;
-var fi_upgradeId;
+
 var fi_filters = {
-	items: [
-		{id: 1, name: "sepgeneral"},
-		{id: 131, name: "addedinwotlk", type: "yn"},
-		{id: 110, name: "addedinbc", type: "yn"},
-		{id: 82, name: "addedinp24", type: "yn"},
-		{id: 2, name: "bindonpickup", type: "yn"},
-		{id: 3, name: "bindonequip", type: "yn"},
-		{id: 4, name: "bindonuse", type: "yn"},
-		{id: 133, name: "bindtoaccount", type: "yn"},
-		{id: 146, name: "heroicitem", type: "yn"},
-		{id: 107, name: "effecttext", type: "str"},
-		{id: 81, name: "fitsgemslot", type: "gem"},
-		{id: 132, name: "glyphtype", type: "glyphtype"},
-		{id: 80, name: "hassockets", type: "gem"},
-		{id: 100, name: "nsockets", type: "num"},
-		{id: 124, name: "randomenchants", type: "str"},
-		{id: 125, name: "reqarenartng", type: "num"},
-		{id: 111, name: "reqskillrank", type: "num"},
-		{id: 99, name: "requiresprof", type: "profession"},
-		{id: 66, name: "requiresprofspec", type: "profession"},
-		{id: 17, name: "requiresrepwith", type: "faction-any+none"},
-		{id: 15, name: "unique", type: "yn"},
-		{id: 83, name: "uniqueequipped", type: "yn"},
-		{id: 152, name: "classspecific", type: "classs"},
-		{id: 153, name: "racespecific", type: "race"},
-		{id: 19, name: "sepbasestats"},
-		{id: 21, name: "agi", type: "num"},
-		{id: 23, name: "int", type: "num"},
-		{id: 22, name: "sta", type: "num"},
-		{id: 24, name: "spi", type: "num"},
-		{id: 20, name: "str", type: "num"},
-		{id: 115, name: "health", type: "num"},
-		{id: 116, name: "mana", type: "num"},
-		{id: 60, name: "healthrgn", type: "num"},
-		{id: 61, name: "manargn", type: "num"},
-		{id: 120, name: "sepdefensivestats"},
-		{id: 41, name: "armor", type: "num"},
-		{id: 44, name: "blockrtng", type: "num"},
-		{id: 43, name: "block", type: "num"},
-		{id: 42, name: "defrtng", type: "num"},
-		{id: 45, name: "dodgertng", type: "num"},
-		{id: 46, name: "parryrtng", type: "num"},
-		{id: 79, name: "resirtng", type: "num"},
-		{id: 31, name: "sepoffensivestats"},
-		{id: 77, name: "atkpwr", type: "num"},
-		{id: 97, name: "feratkpwr", type: "num", indent: 1},
-		{id: 114, name: "armorpenrtng", type: "num"},
-		{id: 96, name: "critstrkrtng", type: "num"},
-		{id: 117, name: "exprtng", type: "num"},
-		{id: 103, name: "hastertng", type: "num"},
-		{id: 119, name: "hitrtng", type: "num"},
-		{id: 94, name: "splpen", type: "num"},
-		{id: 123, name: "splpwr", type: "num"},
-		{id: 52, name: "arcsplpwr", type: "num", indent: 1},
-		{id: 53, name: "firsplpwr", type: "num", indent: 1},
-		{id: 54, name: "frosplpwr", type: "num", indent: 1},
-		{id: 55, name: "holsplpwr", type: "num", indent: 1},
-		{id: 56, name: "natsplpwr", type: "num", indent: 1},
-		{id: 57, name: "shasplpwr", type: "num", indent: 1},
-		{id: 122, name: "sepweaponstats"},
-		{id: 32, name: "dps", type: "num"},
-		{id: 35, name: "damagetype", type: "resistance"},
-		{id: 33, name: "dmgmin1", type: "num"},
-		{id: 34, name: "dmgmax1", type: "num"},
-		{id: 36, name: "speed", type: "num"},
-		{id: 134, name: "mledps", type: "num"},
-		{id: 135, name: "mledmgmin", type: "num"},
-		{id: 136, name: "mledmgmax", type: "num"},
-		{id: 137, name: "mlespeed", type: "num"},
-		{id: 138, name: "rgddps", type: "num"},
-		{id: 139, name: "rgddmgmin", type: "num"},
-		{id: 140, name: "rgddmgmax", type: "num"},
-		{id: 141, name: "rgdspeed", type: "num"},
-		{id: 121, name: "sepresistances"},
-		{id: 25, name: "arcres", type: "num"},
-		{id: 26, name: "firres", type: "num"},
-		{id: 28, name: "frores", type: "num"},
-		{id: 30, name: "holres", type: "num"},
-		{id: 27, name: "natres", type: "num"},
-		{id: 29, name: "shares", type: "num"},
-		{id: 67, name: "sepsource"},
-		{id: 86, name: "craftedprof", type: "profession"},
-		{id: 16, name: "dropsin", type: "zone"},
-		{id: 105, name: "dropsinnormal", type: "heroicdungeon-any"},
-		{id: 106, name: "dropsinheroic", type: "heroicdungeon-any"},
-		{id: 147, name: "dropsinnormal10", type: "multimoderaid-any"},
-		{id: 148, name: "dropsinnormal25", type: "multimoderaid-any"},
-		{id: 149, name: "dropsinheroic10", type: "heroicraid-any"},
-		{id: 150, name: "dropsinheroic25", type: "heroicraid-any"},
-		{id: 68, name: "otdisenchanting", type: "yn"},
-		{id: 69, name: "otfishing", type: "yn"},
-		{id: 70, name: "otherbgathering", type: "yn"},
-		{id: 71, name: "otitemopening", type: "yn"},
-		{id: 72, name: "otlooting", type: "yn"},
-		{id: 143, name: "otmilling", type: "yn"},
-		{id: 73, name: "otmining", type: "yn"},
-		{id: 74, name: "otobjectopening", type: "yn"},
-		{id: 75, name: "otpickpocketing", type: "yn"},
-		{id: 88, name: "otprospecting", type: "yn"},
-		{id: 93, name: "otpvp", type: "pvp"},
-		{id: 76, name: "otskinning", type: "yn"},
-		{id: 118, name: "purchasablewith", type: "currency-any"},
-		{id: 144, name: "purchasablewithhonor", type: "yn"},
-		{id: 145, name: "purchasablewitharena", type: "yn"},
-		{id: 18, name: "rewardedbyfactionquest", type: "side"},
-		{id: 126, name: "rewardedbyquestin", type: "zone-any"},
-		{id: 92, name: "soldbyvendor", type: "yn"},
-		{id: 129, name: "soldbynpc", type: "str-small"},
-		{id: 128, name: "sepsource", type: "itemsource"},
-		{id: 47, name: "sepindividualstats"},
-		{id: 37, name: "mleatkpwr", type: "num"},
-		{id: 84, name: "mlecritstrkrtng", type: "num"},
-		{id: 78, name: "mlehastertng", type: "num"},
-		{id: 95, name: "mlehitrtng", type: "num"},
-		{id: 38, name: "rgdatkpwr", type: "num"},
-		{id: 40, name: "rgdcritstrkrtng", type: "num"},
-		{id: 101, name: "rgdhastertng", type: "num"},
-		{id: 39, name: "rgdhitrtng", type: "num"},
-		{id: 49, name: "splcritstrkrtng", type: "num"},
-		{id: 102, name: "splhastertng", type: "num"},
-		{id: 48, name: "splhitrtng", type: "num"},
-		{id: 51, name: "spldmg", type: "num"},
-		{id: 50, name: "splheal", type: "num"},
-		{id: 58, name: "sepmisc"},
-		{id: 109, name: "armorbonus", type: "num"},
-		{id: 90, name: "avgbuyout", type: "num"},
-		{id: 65, name: "avgmoney", type: "num"},
-		{id: 63, name: "buyprice", type: "num"},
-		{id: 9, name: "conjureditem", type: "yn"},
-		{id: 62, name: "cooldown", type: "num"},
-		{id: 8, name: "disenchantable", type: "yn"},
-		{id: 59, name: "dura", type: "num"},
-		{id: 104, name: "flavortext", type: "str"},
-		{id: 7, name: "hasflavortext", type: "yn"},
-		{id: 142, name: "icon", type: "str"},
-		{id: 10, name: "locked", type: "yn"},
-		{id: 127, name: "notavailable", type: "yn"},
-		{id: 85, name: "objectivequest", type: "side"},
-		{id: 11, name: "openable", type: "yn"},
-		{id: 12, name: "partofset", type: "yn"},
-		{id: 98, name: "partyloot", type: "yn"},
-		{id: 89, name: "prospectable", type: "yn"},
-		{id: 5, name: "questitem", type: "yn"},
-		{id: 13, name: "randomlyenchanted", type: "yn"},
-		{id: 14, name: "readable", type: "yn"},
-		{id: 87, name: "reagentforability", type: "profession"},
-		{id: 64, name: "sellprice", type: "num"},
-		{id: 6, name: "startsquest", type: "side"},
-		{id: 91, name: "tool", type: "totemcategory"},
-		{id: 151, name: "id", type: "num", before: "name"},
-		{id: 112, name: "sepcommunity"},
-		{id: 130, name: "hascomments", type: "yn"},
-		{id: 113, name: "hasscreenshots", type: "yn"}
-	],
-	npcs: [
-		{id: 4, name: "sepgeneral"},
-		{id: 36, name: "addedinwotlk", type: "yn"},
-		{id: 26, name: "addedinbc", type: "yn"},
-		{id: 13, name: "addedinp24", type: "yn"},
-		{id: 5, name: "canrepair", type: "yn"},
-		{id: 3, name: "faction", type: "faction"},
-		{id: 6, name: "foundin", type: "zone"},
-		{id: 1, name: "health", type: "num"},
-		{id: 2, name: "mana", type: "num"},
-		{id: 32, name: "instanceboss", type: "yn"},
-		{id: 7, name: "startsquest", type: "side"},
-		{id: 8, name: "endsquest", type: "side"},
-		{id: 34, name: "usemodel", type: "str-small"},
-		{id: 35, name: "useskin", type: "str"},
-		{id: 37, name: "id", type: "num"},
-		{id: 14, name: "seploot"},
-		{id: 12, name: "averagemoneydropped", type: "num"},
-		{id: 15, name: "gatherable", type: "yn"},
-		{id: 9, name: "lootable", type: "yn"},
-		{id: 16, name: "minable", type: "yn"},
-		{id: 11, name: "pickpocketable", type: "yn"},
-		{id: 10, name: "skinnable", type: "yn"},
-		{id: 17, name: "sepgossipoptions"},
-		{id: 18, name: "auctioneer", type: "yn"},
-		{id: 19, name: "banker", type: "yn"},
-		{id: 20, name: "battlemaster", type: "yn"},
-		{id: 21, name: "flightmaster", type: "yn"},
-		{id: 22, name: "guildmaster", type: "yn"},
-		{id: 23, name: "innkeeper", type: "yn"},
-		{id: 24, name: "talentunlearner", type: "yn"},
-		{id: 25, name: "tabardvendor", type: "yn"},
-		{id: 27, name: "stablemaster", type: "yn"},
-		{id: 28, name: "trainer", type: "yn"},
-		{id: 29, name: "vendor", type: "yn"},
-		{id: 30, name: "sepcommunity"},
-		{id: 33, name: "hascomments", type: "yn"},
-		{id: 31, name: "hasscreenshots", type: "yn"}
-	],
-	objects: [
-		{id: 8, name: "sepgeneral"},
-		{id: 14, name: "addedinwotlk", type: "yn"},
-		{id: 12, name: "addedinbc", type: "yn"},
-		{id: 6, name: "addedinp24", type: "yn"},
-		{id: 1, name: "foundin", type: "zone"},
-		{id: 7, name: "requiredskilllevel", type: "num"},
-		{id: 2, name: "startsquest", type: "side"},
-		{id: 3, name: "endsquest", type: "side"},
-		{id: 15, name: "id", type: "num"},
-		{id: 9, name: "seploot"},
-		{id: 5, name: "averagemoneycontained", type: "num"},
-		{id: 4, name: "openable", type: "yn"},
-		{id: 10, name: "sepcommunity"},
-		{id: 13, name: "hascomments", type: "yn"},
-		{id: 11, name: "hasscreenshots", type: "yn"}
-	],
-	quests: [
-		{id: 12, name: "sepgeneral"},
-		{id: 26, name: "addedinwotlk", type: "yn"},
-		{id: 20, name: "addedinbc", type: "yn"},
-		{id: 8, name: "addedinp24", type: "yn"},
-		{id: 27, name: "daily", type: "yn"},
-		{id: 28, name: "weekly", type: "yn"},
-		{id: 29, name: "repeatable", type: "yn"},
-		{id: 9, name: "objectiveearnrepwith", type: "faction-any+none"},
-		{id: 5, name: "sharable", type: "yn"},
-		{id: 19, name: "startsfrom", type: "queststart"},
-		{id: 21, name: "endsat", type: "questend"},
-		{id: 11, name: "suggestedplayers", type: "num"},
-		{id: 6, name: "timer", type: "num"},
-		{id: 30, name: "id", type: "num"},
-		{id: 13, name: "sepgainsrewards"},
-		{id: 2, name: "experiencegained", type: "num"},
-		{id: 23, name: "itemchoices", type: "num"},
-		{id: 22, name: "itemrewards", type: "num"},
-		{id: 3, name: "moneyrewarded", type: "num"},
-		{id: 4, name: "spellrewarded", type: "yn"},
-		{id: 1, name: "increasesrepwith", type: "faction"},
-		{id: 10, name: "decreasesrepwith", type: "faction"},
-		{id: 14, name: "sepseries"},
-		{id: 7, name: "firstquestseries", type: "yn"},
-		{id: 15, name: "lastquestseries", type: "yn"},
-		{id: 16, name: "partseries", type: "yn"},
-		{id: 17, name: "sepcommunity"},
-		{id: 25, name: "hascomments", type: "yn"},
-		{id: 18, name: "hasscreenshots", type: "yn"},
-		{id: 24, name: "lacksstartend", type: "yn"}
-	],
-	spells: [
-		{id: 6, name: "sepgeneral"},
-		{id: 2, name: "prcntbasemanarequired", type: "num"},
-		{id: 19, name: "scaling", type: "yn"},
-		{id: 10, name: "firstrank", type: "yn"},
-		{id: 12, name: "lastrank", type: "yn"},
-		{id: 13, name: "rankno", type: "num"},
-		{id: 1, name: "manaenergyragecost", type: "num"},
-		{id: 3, name: "requiresnearbyobject", type: "yn"},
-		{id: 5, name: "requiresprofspec", type: "yn"},
-		{id: 9, name: "source", type: "spellsource"},
-		{id: 4, name: "trainingcost", type: "num"},
-		{id: 14, name: "id", type: "num"},
-		{id: 15, name: "icon", type: "str"},
-		{id: 7, name: "sepcommunity"},
-		{id: 11, name: "hascomments", type: "yn"},
-		{id: 8, name: "hasscreenshots", type: "yn"}
-	],
-	achievements: [
-		{id: 1, name: "sepgeneral"},
-		{id: 2, name: "givesreward", type: "yn"},
-		{id: 3, name: "rewardtext", type: "str"},
-		{id: 4, name: "location", type: "zone"},
-		{id: 9, name: "id", type: "num"},
-		{id: 8, name: "sepseries"},
-		{id: 5, name: "firstseries", type: "yn"},
-		{id: 6, name: "lastseries", type: "yn"},
-		{id: 7, name: "partseries", type: "yn"}
-	],
-	profiles: [
-		{id: 1, name: "sepgeneral"},
-		{id: 2, name: "gearscore", type: "num"},
-		{id: 3, name: "achievementpoints", type: "num"},
-		{id: 21, name: "wearingitem", type: "str-small"},
-		{id: 23, name: "completedachievement", type: "str-small"},
-		{id: 24, name: "sepprofession"},
-		{id: 25, name: "alchemy", type: "str-small"},
-		{id: 26, name: "blacksmithing", type: "str-small"},
-		{id: 27, name: "enchanting", type: "str-small"},
-		{id: 28, name: "engineering", type: "str-small"},
-		{id: 29, name: "herbalism", type: "str-small"},
-		{id: 30, name: "inscription", type: "str-small"},
-		{id: 31, name: "jewelcrafting", type: "str-small"},
-		{id: 32, name: "leatherworking", type: "str-small"},
-		{id: 33, name: "mining", type: "str-small"},
-		{id: 34, name: "skinning", type: "str-small"},
-		{id: 35, name: "tailoring", type: "str-small"},
-		{id: 4, name: "septalent"},
-		{id: 5, name: "talenttree1", type: "num"},
-		{id: 6, name: "talenttree2", type: "num"},
-		{id: 7, name: "talenttree3", type: "num"},
-		{id: 8, name: "sepguild"},
-		{id: 36, name: "hasguild", type: "yn"},
-		{id: 9, name: "guildname", type: "str"},
-		{id: 10, name: "guildrank", type: "num"},
-		{id: 11, name: "separenateam"},
-		{id: 12, name: "teamname2v2", type: "str"},
-		{id: 13, name: "teamrtng2v2", type: "num"},
-		{id: 14, name: "teamcontrib2v2", type: "num"},
-		{id: 15, name: "teamname3v3", type: "str"},
-		{id: 16, name: "teamrtng3v3", type: "num"},
-		{id: 17, name: "teamcontrib3v3", type: "num"},
-		{id: 18, name: "teamname5v5", type: "str"},
-		{id: 19, name: "teamrtng5v5", type: "num"},
-		{id: 20, name: "teamcontrib5v5", type: "num"}
-	]
+
+    items: [
+        { id: 1,   name: 'sepgeneral' },
+        { id: 2,   name: 'bindonpickup',        type: 'yn' },
+        { id: 3,   name: 'bindonequip',         type: 'yn' },
+        { id: 4,   name: 'bindonuse',           type: 'yn' },
+        { id: 133, name: 'bindtoaccount',       type: 'yn' },
+        { id: 146, name: 'heroicitem',          type: 'yn' },
+        { id: 107, name: 'effecttext',          type: 'str' },
+        { id: 81,  name: 'fitsgemslot',         type: 'gem' },
+        { id: 132, name: 'glyphtype',           type: 'glyphtype' },
+        { id: 80,  name: 'hassockets',          type: 'gem' },
+        { id: 151, name: 'id',                  type: 'num', before: 'name', noweights: 1 },
+        { id: 100, name: 'nsockets',            type: 'num', noweights: 1 },
+        { id: 124, name: 'randomenchants',      type: 'str' },
+        { id: 125, name: 'reqarenartng',        type: 'num', noweights: 1 },
+        { id: 111, name: 'reqskillrank',        type: 'num', noweights: 1 },
+        { id: 99,  name: 'requiresprof',        type: 'profession' },
+        { id: 66,  name: 'requiresprofspec',    type: 'profession' },
+        { id: 17,  name: 'requiresrepwith',     type: 'faction-any+none' },
+        { id: 169, name: 'requiresevent',       type: 'event-any+none' },
+        { id: 160, name: 'relatedevent',        type: 'event-any+none' },
+        { id: 168, name: 'teachesspell',        type: 'yn' },
+        { id: 15,  name: 'unique',              type: 'yn' },
+        { id: 83,  name: 'uniqueequipped',      type: 'yn' },
+        { id: 152, name: 'classspecific',       type: 'classs' },
+        { id: 153, name: 'racespecific',        type: 'race' },
+
+        { id: 19,  name: 'sepbasestats' },
+        { id: 21,  name: 'agi',                 type: 'num' },
+        { id: 23,  name: 'int',                 type: 'num' },
+        { id: 22,  name: 'sta',                 type: 'num' },
+        { id: 24,  name: 'spi',                 type: 'num' },
+        { id: 20,  name: 'str',                 type: 'num' },
+        { id: 115, name: 'health',              type: 'num' },
+        { id: 116, name: 'mana',                type: 'num' },
+        { id: 60,  name: 'healthrgn',           type: 'num' },
+        { id: 61,  name: 'manargn',             type: 'num' },
+
+        { id: 120, name: 'sepdefensivestats' },
+        { id: 41,  name: 'armor',               type: 'num' },
+        { id: 44,  name: 'blockrtng',           type: 'num' },
+        { id: 43,  name: 'block',               type: 'num' },
+        { id: 42,  name: 'defrtng',             type: 'num' },
+        { id: 45,  name: 'dodgertng',           type: 'num' },
+        { id: 46,  name: 'parryrtng',           type: 'num' },
+        { id: 79,  name: 'resirtng',            type: 'num' },
+
+        { id: 31,  name: 'sepoffensivestats' },
+        { id: 77,  name: 'atkpwr',              type: 'num' },
+        { id: 97,  name: 'feratkpwr',           type: 'num', indent: 1 },
+        { id: 114, name: 'armorpenrtng',        type: 'num' },
+        { id: 96,  name: 'critstrkrtng',        type: 'num' },
+        { id: 117, name: 'exprtng',             type: 'num' },
+        { id: 103, name: 'hastertng',           type: 'num' },
+        { id: 119, name: 'hitrtng',             type: 'num' },
+        { id: 94,  name: 'splpen',              type: 'num' },
+        { id: 123, name: 'splpwr',              type: 'num' },
+        { id: 52,  name: 'arcsplpwr',           type: 'num', indent: 1 },
+        { id: 53,  name: 'firsplpwr',           type: 'num', indent: 1 },
+        { id: 54,  name: 'frosplpwr',           type: 'num', indent: 1 },
+        { id: 55,  name: 'holsplpwr',           type: 'num', indent: 1 },
+        { id: 56,  name: 'natsplpwr',           type: 'num', indent: 1 },
+        { id: 57,  name: 'shasplpwr',           type: 'num', indent: 1 },
+
+        { id: 122, name: 'sepweaponstats' },
+        { id: 32,  name: 'dps',                 type: 'num' },
+        { id: 35,  name: 'damagetype',          type: 'resistance' },
+        { id: 33,  name: 'dmgmin1',             type: 'num' },
+        { id: 34,  name: 'dmgmax1',             type: 'num' },
+        { id: 36,  name: 'speed',               type: 'num' },
+        { id: 134, name: 'mledps',              type: 'num' },
+        { id: 135, name: 'mledmgmin',           type: 'num' },
+        { id: 136, name: 'mledmgmax',           type: 'num' },
+        { id: 137, name: 'mlespeed',            type: 'num' },
+        { id: 138, name: 'rgddps',              type: 'num' },
+        { id: 139, name: 'rgddmgmin',           type: 'num' },
+        { id: 140, name: 'rgddmgmax',           type: 'num' },
+        { id: 141, name: 'rgdspeed',            type: 'num' },
+
+        { id: 121, name: 'sepresistances' },
+        { id: 25,  name: 'arcres',              type: 'num' },
+        { id: 26,  name: 'firres',              type: 'num' },
+        { id: 28,  name: 'frores',              ype: 'num' },
+        { id: 30,  name: 'holres',              type: 'num' },
+        { id: 27,  name: 'natres',              type: 'num' },
+        { id: 29,  name: 'shares',              type: 'num' },
+
+        { id: 67,  name: 'sepsource' },
+        { id: 86,  name: 'craftedprof',             type: 'profession' },
+        { id: 16,  name: 'dropsin',                 type: 'zone' },
+        { id: 105, name: 'dropsinnormal',           type: 'heroicdungeon-any' },
+        { id: 106, name: 'dropsinheroic',           type: 'heroicdungeon-any' },
+        { id: 147, name: 'dropsinnormal10',         type: 'multimoderaid-any' },
+        { id: 148, name: 'dropsinnormal25',         type: 'multimoderaid-any' },
+        { id: 149, name: 'dropsinheroic10',         type: 'heroicraid-any' },
+        { id: 150, name: 'dropsinheroic25',         type: 'heroicraid-any' },
+        { id: 68,  name: 'otdisenchanting',         type: 'yn' },
+        { id: 69,  name: 'otfishing',               type: 'yn' },
+        { id: 70,  name: 'otherbgathering',         type: 'yn' },
+        { id: 71,  name: 'otitemopening',           type: 'yn' },
+        { id: 72,  name: 'otlooting',               type: 'yn' },
+        { id: 143, name: 'otmilling',               type: 'yn' },
+        { id: 73,  name: 'otmining',                type: 'yn' },
+        { id: 74,  name: 'otobjectopening',         type: 'yn' },
+        { id: 75,  name: 'otpickpocketing',         type: 'yn' },
+        { id: 88,  name: 'otprospecting',           type: 'yn' },
+        { id: 93,  name: 'otpvp',                   type: 'pvp' },
+        { id: 171, name: 'otredemption',            type: 'yn' },
+        { id: 76,  name: 'otskinning',              type: 'yn' },
+        { id: 158, name: 'purchasablewithcurrency', type: 'currency-any' },
+        { id: 118, name: 'purchasablewithitem',     type: 'itemcurrency-any' },
+        { id: 144, name: 'purchasablewithhonor',    type: 'yn' },
+        { id: 145, name: 'purchasablewitharena',    type: 'yn' },
+        { id: 18,  name: 'rewardedbyfactionquest',  type: 'side' },
+        { id: 126, name: 'rewardedbyquestin',       type: 'zone-any' },
+        { id: 172, name: 'rewardedbyachievement',   type: 'yn' },
+        { id: 92,  name: 'soldbyvendor',            type: 'yn' },
+        { id: 129, name: 'soldbynpc',               type: 'str-small' },
+        { id: 128, name: 'sepsource',               type: 'itemsource' },
+
+        { id: 47,  name: 'sepindividualstats' },
+        { id: 37,  name: 'mleatkpwr',           type: 'num' },
+        { id: 84,  name: 'mlecritstrkrtng',     type: 'num' },
+        { id: 78,  name: 'mlehastertng',        type: 'num' },
+        { id: 95,  name: 'mlehitrtng',          type: 'num' },
+        { id: 38,  name: 'rgdatkpwr',           type: 'num' },
+        { id: 40,  name: 'rgdcritstrkrtng',     type: 'num' },
+        { id: 101, name: 'rgdhastertng',        type: 'num' },
+        { id: 39,  name: 'rgdhitrtng',          type: 'num' },
+        { id: 49,  name: 'splcritstrkrtng',     type: 'num' },
+        { id: 102, name: 'splhastertng',        type: 'num' },
+        { id: 48,  name: 'splhitrtng',          type: 'num' },
+        { id: 51,  name: 'spldmg',              type: 'num' },
+        { id: 50,  name: 'splheal',             type: 'num' },
+
+        { id: 58,  name: 'sepmisc' },
+        { id: 109, name: 'armorbonus',              type: 'num' },
+        { id: 161, name: 'availabletoplayers',      type: 'yn' },
+        { id: 90,  name: 'avgbuyout',               type: 'num', noweights: 1 },
+        { id: 65,  name: 'avgmoney',                type: 'num', noweights: 1 },
+        { id: 9,   name: 'conjureditem',            type: 'yn' },
+        { id: 62,  name: 'cooldown',                type: 'num', noweights: 1 },
+        { id: 162, name: 'deprecated',              type: 'yn' },
+        { id: 8,   name: 'disenchantable',          type: 'yn' },
+        { id: 163, name: 'disenchantsinto',         type: 'disenchanting' },
+        { id: 59,  name: 'dura',                    type: 'num', noweights: 1 },
+        { id: 104, name: 'flavortext',              type: 'str' },
+        { id: 7,   name: 'hasflavortext',           type: 'yn' },
+        { id: 142, name: 'icon',                    type: 'str' },
+        { id: 10,  name: 'locked',                  type: 'yn' },
+        { id: 159, name: 'millable',                type: 'yn' },
+        { id: 127, name: 'notavailable',            type: 'yn' },
+        { id: 85,  name: 'objectivequest',          type: 'side' },
+        { id: 11,  name: 'openable',                type: 'yn' },
+        { id: 12,  name: 'partofset',               type: 'yn' },
+        { id: 98,  name: 'partyloot',               type: 'yn' },
+        { id: 89,  name: 'prospectable',            type: 'yn' },
+        { id: 5,   name: 'questitem',               type: 'yn' },
+        { id: 13,  name: 'randomlyenchanted',       type: 'yn' },
+        { id: 14,  name: 'readable',                type: 'yn' },
+        { id: 87,  name: 'reagentforability',       type: 'profession' },
+        { id: 63,  name: 'buyprice',                type: 'num', noweights: 1 },
+        { id: 154, name: 'refundable',              type: 'yn' },
+        { id: 165, name: 'repaircost',              type: 'num' },
+        { id: 64,  name: 'sellprice',               type: 'num', noweights: 1 },
+        { id: 157, name: 'smartloot',               type: 'yn' },
+        { id: 6,   name: 'startsquest',             type: 'side' },
+        { id: 91,  name: 'tool',                    type: 'totemcategory' },
+        { id: 155, name: 'usableinarenas',          type: 'yn' },
+        { id: 156, name: 'usablewhenshapeshifted',  type: 'yn' },
+
+        { id: 112, name: 'sepcommunity' },
+        { id: 130, name: 'hascomments',         type: 'yn' },
+        { id: 113, name: 'hasscreenshots',      type: 'yn' },
+        { id: 167, name: 'hasvideos',           type: 'yn' },
+
+        { id: 1,   name: 'sepstaffonly',                   staffonly: true },
+        { id: 176, name: 'flags',               type: 'flags', staffonly: true },
+        { id: 177, name: 'flags2',              type: 'flags', staffonly: true }
+    ],
+
+    itemsets: [
+        { id: 9999,name: 'sepgeneral' },
+        { id: 12,  name: 'availabletoplayers',  type: 'yn' },
+        { id: 3,   name: 'pieces',              type: 'num' },
+        { id: 4,   name: 'bonustext',           type: 'str' },
+        { id: 5,   name: 'heroic',              type: 'yn' },
+        { id: 6,   name: 'relatedevent',        type: 'event-any+none' },
+        { id: 2,   name: 'id',                  type: 'num' },
+
+        { id: 9999,name: 'sepcommunity' },
+        { id:  8,  name: 'hascomments',         type: 'yn' },
+        { id:  9,  name: 'hasscreenshots',      type: 'yn' },
+        { id: 10,  name: 'hasvideos',           type: 'yn' }
+    ],
+
+    npcs: [
+        { id: 4,   name: 'sepgeneral' },
+        { id: 5,   name: 'canrepair',           type: 'yn' },
+        { id: 3,   name: 'faction',             type: 'faction' },
+        { id: 6,   name: 'foundin',             type: 'zone' },
+        { id: 1,   name: 'health',              type: 'num' },
+        { id: 2,   name: 'mana',                type: 'num' },
+        { id: 32,  name: 'instanceboss',        type: 'yn' },
+        { id: 38,  name: 'relatedevent',        type: 'event-any+none' },
+        { id: 7,   name: 'startsquest',         type: 'side' },
+        { id: 8,   name: 'endsquest',           type: 'side' },
+        { id: 34,  name: 'usemodel',            type: 'str-small' },
+        { id: 35,  name: 'useskin',             type: 'str' },
+        { id: 37,  name: 'id',                  type: 'num' },
+
+        { id: 14,  name: 'seploot' },
+        { id: 12,  name: 'averagemoneydropped', type: 'num' },
+        { id: 43,  name: 'decreasesrepwith',    type: 'faction' },
+        { id: 42,  name: 'increasesrepwith',    type: 'faction' },
+        { id: 15,  name: 'gatherable',          type: 'yn' },
+        { id: 44,  name: 'salvageable',         type: 'yn' },
+        { id: 9,   name: 'lootable',            type: 'yn' },
+        { id: 16,  name: 'minable',             type: 'yn' },
+        { id: 11,  name: 'pickpocketable',      type: 'yn' },
+        { id: 10,  name: 'skinnable',           type: 'yn' },
+
+        { id: 17,  name: 'sepgossipoptions' },
+        { id: 18,  name: 'auctioneer',          type: 'yn' },
+        { id: 19,  name: 'banker',              type: 'yn' },
+        { id: 20,  name: 'battlemaster',        type: 'yn' },
+        { id: 21,  name: 'flightmaster',        type: 'yn' },
+        { id: 22,  name: 'guildmaster',         type: 'yn' },
+        { id: 23,  name: 'innkeeper',           type: 'yn' },
+        { id: 24,  name: 'talentunlearner',     type: 'yn' },
+        { id: 25,  name: 'tabardvendor',        type: 'yn' },
+        { id: 27,  name: 'stablemaster',        type: 'yn' },
+        { id: 28,  name: 'trainer',             type: 'yn' },
+        { id: 29,  name: 'vendor',              type: 'yn' },
+
+        { id: 30,  name: 'sepcommunity' },
+        { id: 33,  name: 'hascomments',         type: 'yn' },
+        { id: 31,  name: 'hasscreenshots',      type: 'yn' },
+        { id: 40,  name: 'hasvideos',           type: 'yn' },
+
+        { id: 1,   name: 'sepstaffonly',                    staffonly: true },
+        { id: 41,  name: 'haslocation',         type: 'yn', staffonly: true }
+    ],
+
+    objects: [
+        { id: 8,   name: 'sepgeneral' },
+        { id: 1,   name: 'foundin',             type: 'zone' },
+        { id: 15,  name: 'id',                  type: 'num' },
+        { id: 16,  name: 'relatedevent',        type: 'event-any+none' },
+        { id: 7,   name: 'requiredskilllevel',  type: 'num' },
+        { id: 2,   name: 'startsquest',         type: 'side' },
+        { id: 3,   name: 'endsquest',           type: 'side' },
+
+        { id: 9,   name: 'seploot' },
+        { id: 5,   name: 'averagemoneycontained',   type: 'num' },
+        { id: 4,   name: 'openable',                type: 'yn' },
+
+        { id: 10,  name: 'sepcommunity' },
+        { id: 13,  name: 'hascomments',         type: 'yn' },
+        { id: 11,  name: 'hasscreenshots',      type: 'yn' },
+        { id: 18,  name: 'hasvideos',           type: 'yn' }
+    ],
+
+    quests: [
+        { id: 12,  name: 'sepgeneral' },
+        { id: 34,  name: 'availabletoplayers',      type: 'yn' },
+        { id: 37,  name: 'classspecific',           type: 'classs' },
+        { id: 38,  name: 'racespecific',            type: 'race' },
+        { id: 27,  name: 'daily',                   type: 'yn' },
+        { id: 28,  name: 'weekly',                  type: 'yn' },
+        { id: 29,  name: 'repeatable',              type: 'yn' },
+        { id: 30,  name: 'id',                      type: 'num' },
+        { id: 44,  name: 'countsforloremaster_stc', type: 'yn' },
+        { id: 9,   name: 'objectiveearnrepwith',    type: 'faction-any+none' },
+        { id: 33,  name: 'relatedevent',            type: 'event-any+none' },
+        { id: 5,   name: 'sharable',                type: 'yn' },
+        { id: 19,  name: 'startsfrom',              type: 'queststart' },
+        { id: 21,  name: 'endsat',                  type: 'questend' },
+        { id: 11,  name: 'suggestedplayers',        type: 'num' },
+        { id: 6,   name: 'timer',                   type: 'num' },
+
+        { id: 1,   name: 'sepstaffonly',                        staffonly: true },
+        { id: 42,  name: 'flags',               type: 'flags',  staffonly: true },
+
+        { id: 13,  name: 'sepgainsrewards' },
+        { id: 2,   name: 'experiencegained',    type: 'num' },
+        { id: 43,  name: 'currencyrewarded',    type: 'currency' },
+        { id: 45,  name: 'titlerewarded',       type: 'yn' },
+        { id: 23,  name: 'itemchoices',         type: 'num' },
+        { id: 22,  name: 'itemrewards',         type: 'num' },
+        { id: 3,   name: 'moneyrewarded',       type: 'num' },
+        { id: 4,   name: 'spellrewarded',       type: 'yn' },
+        { id: 1,   name: 'increasesrepwith',    type: 'faction' },
+        { id: 10,  name: 'decreasesrepwith',    type: 'faction' },
+
+        { id: 14,  name: 'sepseries' },
+        { id: 7,   name: 'firstquestseries',    type: 'yn' },
+        { id: 15,  name: 'lastquestseries',     type: 'yn' },
+        { id: 16,  name: 'partseries',          type: 'yn' },
+
+        { id: 17,  name: 'sepcommunity' },
+        { id: 25,  name: 'hascomments',         type: 'yn' },
+        { id: 18,  name: 'hasscreenshots',      type: 'yn' },
+        { id: 36,  name: 'hasvideos',           type: 'yn' },
+
+        { id: 1,   name: 'sepmisc' },
+        { id: 24,  name: 'lacksstartend',       type: 'yn'}
+    ],
+
+    spells: [
+        { id: 6,   name: 'sepgeneral' },
+        { id: 1,   name: 'manaenergyragecost',      type: 'num' },
+        { id: 2,   name: 'prcntbasemanarequired',   type: 'num' },
+        { id: 14,  name: 'id',                      type: 'num' },
+        { id: 15,  name: 'icon',                    type: 'str' },
+        { id: 10,  name: 'firstrank',               type: 'yn' },
+        { id: 20,  name: 'hasreagents',             type: 'yn' },
+        { id: 12,  name: 'lastrank',                type: 'yn' },
+        { id: 13,  name: 'rankno',                  type: 'num' },
+        { id: 22,  name: 'proficiencytype',         type: 'proficiencytype' },
+        { id: 19,  name: 'scaling',                 type: 'yn' },
+        { id: 25,  name: 'rewardsskillups',         type: 'yn' },
+        { id: 3,   name: 'requiresnearbyobject',    type: 'yn' },
+        { id: 5,   name: 'requiresprofspec',        type: 'yn' },
+        { id: 9,   name: 'source',                  type: 'spellsource' },
+        { id: 4,   name: 'trainingcost',            type: 'num' },
+
+        { id: 7,   name: 'sepcommunity' },
+        { id: 11,  name: 'hascomments',         type: 'yn' },
+        { id: 8,   name: 'hasscreenshots',      type: 'yn' },
+        { id: 17,  name: 'hasvideos',           type: 'yn' }
+    ],
+
+    achievements: [
+        { id: 1,   name: 'sepgeneral' },
+        { id: 2,   name: 'givesreward',         type: 'yn' },
+        { id: 3,   name: 'rewardtext',          type: 'str' },
+        { id: 4,   name: 'location',            type: 'zone' },
+        { id: 10,  name: 'icon',                type: 'str' },
+        { id: 9,   name: 'id',                  type: 'num' },
+        { id: 11,  name: 'relatedevent',        type: 'event-any+none' },
+
+        { id: 8,   name: 'sepseries' },
+        { id: 5,   name: 'firstseries',         type: 'yn' },
+        { id: 6,   name: 'lastseries',          type: 'yn' },
+        { id: 7,   name: 'partseries',          type: 'yn' },
+
+        { id: 9999,name: 'sepcommunity' },
+        { id: 14,  name: 'hascomments',         type: 'yn' },
+        { id: 15,  name: 'hasscreenshots',      type: 'yn' },
+        { id: 16,  name: 'hasvideos',           type: 'yn' },
+
+        { id: 9999,name: 'sepstaffonly',                        staffonly: true },
+        { id: 18,  name: 'flags',               type: 'flags',  staffonly: true }
+    ],
+
+    profiles: [
+        { id: 1,   name: 'sepgeneral' },
+        { id: 2,   name: 'gearscore',               type: 'num' },
+        { id: 3,   name: 'achievementpoints',       type: 'num' },
+        { id: 21,  name: 'wearingitem',             type: 'str-small' },
+        { id: 23,  name: 'completedachievement',    type: 'str-small' },
+
+        { id: 24,  name: 'sepprofession' },
+        { id: 25,  name: 'alchemy',             type: 'str-small' },
+        { id: 26,  name: 'blacksmithing',       type: 'str-small' },
+        { id: 27,  name: 'enchanting',          type: 'str-small' },
+        { id: 28,  name: 'engineering',         type: 'str-small' },
+        { id: 29,  name: 'herbalism',           type: 'str-small' },
+        { id: 30,  name: 'inscription',         type: 'str-small' },
+        { id: 31,  name: 'jewelcrafting',       type: 'str-small' },
+        { id: 32,  name: 'leatherworking',      type: 'str-small' },
+        { id: 33,  name: 'mining',              type: 'str-small' },
+        { id: 34,  name: 'skinning',            type: 'str-small' },
+        { id: 35,  name: 'tailoring',           type: 'str-small' },
+
+        { id: 4,   name: 'septalent' },
+        { id: 5,   name: 'talenttree1',         type: 'num' },
+        { id: 6,   name: 'talenttree2',         type: 'num' },
+        { id: 7,   name: 'talenttree3',         type: 'num' },
+
+        { id: 8,   name: 'sepguild' },
+        { id: 36,  name: 'hasguild',            type: 'yn' },
+        { id: 9,   name: 'guildname',           type: 'str' },
+        { id: 10,  name: 'guildrank',           type: 'num' },
+
+        { id: 11,  name: 'separenateam' },
+        { id: 12,  name: 'teamname2v2',         type: 'str' },
+        { id: 13,  name: 'teamrtng2v2',         type: 'num' },
+        { id: 14,  name: 'teamcontrib2v2',      type: 'num' },
+        { id: 15,  name: 'teamname3v3',         type: 'str' },
+        { id: 16,  name: 'teamrtng3v3',         type: 'num' },
+        { id: 17,  name: 'teamcontrib3v3',      type: 'num' },
+        { id: 18,  name: 'teamname5v5',         type: 'str' },
+        { id: 19,  name: 'teamrtng5v5',         type: 'num' },
+        { id: 20,  name: 'teamcontrib5v5',      type: 'num' }
+    ]
+
 };
+
 function fi_toggle() {
-	var c = ge("fi");
-	var b = g_toggleDisplay(c),
-	e;
-	var d = ge("fi_toggle");
-	if (b) {
+    var c = ge('fi');
+    var b = g_toggleDisplay(c);
+    var d = ge('fi_toggle');
+
+    if (b) {
+        // Set focus on first textbox
         d.firstChild.nodeValue = LANG.fihide;
-		c = (c.parentNode.tagName == "FORM" ? c.parentNode: gE(c, "form")[0]);
-		c = c.elements.na ? c.elements.na: c.elements.ti;
-		c.focus();
-		c.select()
-	}
+        c = (c.parentNode.tagName == 'FORM' ? c.parentNode: gE(c, 'form')[0]);
+        c = c.elements.na ? c.elements.na: c.elements.ti;
+        c.focus();
+        c.select();
+    }
     else {
-        d.firstChild.nodeValue = LANG.fishow
-	}
-	d.className = "disclosure-" + (b ? "on": "off");
-	return false
+        d.firstChild.nodeValue = LANG.fishow;
+    }
+    d.className = 'disclosure-' + (b ? 'on': 'off');
+
+    return false;
 }
-function fi_submit(d) {
-	var c = 0;
-	var a = d.elements;
-	for (var b = 0; b < a.length; ++b) {switch (a[b].nodeName) {
-        case "INPUT":
-			switch (a[b].type) {
-                case "text":
-                    if (trim(a[b].value).length > 0) {
-                        ++c
-                    }
+
+function fi_submit(_this) {
+    var sum = 0;
+
+    var _ = _this.elements;
+    for (var i = 0; i < _.length; ++i) {
+        switch (_[i].nodeName) {
+            case 'INPUT':
+                switch (_[i].type) {
+                    case 'text':
+                        if (trim(_[i].value).length > 0) {
+                            ++sum;
+                        }
+                        break;
+                    case 'checkbox':
+                        if ((_[i].value == 'ja' || _[i].name == 'gb') && _[i].checked) {
+                            ++sum;
+                        }
+                    case 'radio':
+                        if(_[i].name != 'ma' && _[i].checked && _[i].value)
+                            ++sum;
+
                     break;
-                case "checkbox":
-                    if ((a[b].value == "ja" || a[b].name == "gb") && a[b].checked) {
-                        ++c
-                    }
-                    break
-			}
-			break;
-		case "SELECT":
-			if (a[b].name != "cr[]" && a[b].name != "gm" && a[b].selectedIndex != -1 && a[b].options[a[b].selectedIndex].value) {
-                ++c
-			}
-			break
-		}
-	}
-	if (c == 0) {
+                }
+                break;
+
+            case 'SELECT':
+                if (_[i].name != 'cr[]' && _[i].name != 'gm' && _[i].selectedIndex != -1 && _[i].options[_[i].selectedIndex].value) {
+                    ++sum;
+                }
+
+                break;
+        }
+    }
+
+    var g = g_getGets();
+    if (sum == 0 && !g.filter) {
         alert(LANG.message_fillsomecriteria);
-		return false
-	}
-	return true
+        return false;
+    }
+
+    return true;
 }
+
 function fi_initWeightedListview() {
-	this._scoreMode = 0;
-	if (this.sort[0] == -this.columns.length) {
-        this.applySort()
-	}
-	if (this._minScore) {setTimeout(Listview.headerFilter.bind(this, this.columns[this.columns.length - 1], ">=" + this._minScore), 1);
-		this._maxScore = this._minScore
-	}
+    this._scoreMode = (this._upgradeIds ? 2 : 0); // Normalized or percent for upgrades
+
+    if (this.sort[0] == -this.columns.length) {
+        this.applySort();
+    }
+
+    if (this._upgradeIds && this._minScore) {
+        //todo: what did this do..? setTimeout(Listview.headerFilter.bind(this, this.columns[this.columns.length - 1], '>=' + this._minScore), 1);
+        this._maxScore = this._minScore; // Makes percentages relative to upgraded item
+    }
 }
-function fi_reset(c) {
-	fi_resetCriterion(ge("fi_criteria"));
-	fi_resetCriterion(ge("fi_weight"));
-	var a = ge("sdkgnsdkn436");
-	if (a) {
-        a.parentNode.style.display = "none";
-		while (a.firstChild) {
-            de(a.firstChild)
-		}
-		ae(a, ce("option"))
-	}
-	a = c.elements;
-	for (var b = 0; b < a.length; ++b) {
-        switch (a[b].nodeName) {
-            case "INPUT":
-                if (a[b].type == "text") {
-                    a[b].value = ""
+
+function fi_filterUpgradeListview(item, i) {
+    var nResults = 25;
+
+    if(!this._upgradeIds) {
+        return i < nResults;
+    }
+
+    if(this._upgradeRow == null) {
+        this._upgradeRow = nResults - 1;
+    }
+
+    if(in_array(this._upgradeIds, item.id) != -1) {
+        if(i < nResults) {
+            this._upgradeRow++;
+        }
+
+        return true;
+    }
+
+    return i < this._upgradeRow;
+}
+
+function fi_addUpgradeIndicator() {
+    if(this._upgradeIds) {
+        var upgradeUrl = fi_filterParamToJson(g_parseQueryString(location.href.replace(/^.*?filter=/, 'filter=')).filter).upg;
+        for(var i = 0; i < this.data.length; ++i) {
+            var
+                item = this.data[i],
+                newUpgrade = upgradeUrl.replace(item.id, '').replace(/(^:*|:*$)/g, '').replace('::', ':');
+
+            if(in_array(this._upgradeIds, item.id) != -1) {
+                this.createIndicator(sprintf(LANG.lvnote_upgradesfor, item.id, (7 - parseInt(item.name.charAt(0))), item.name.substr(1)), location.href.replace(';upg=' + upgradeUrl, (newUpgrade ? ';upg=' + newUpgrade : '')));
+            }
+        }
+    }
+}
+
+function fi_reset(_this) {
+    fi_resetCriterion(ge('fi_criteria'));
+    fi_resetCriterion(ge('fi_weight'));
+
+    var _ = ge('sdkgnsdkn436');
+    if (_) {
+        _.parentNode.style.display = 'none';
+        while (_.firstChild) {
+            de(_.firstChild);
+        }
+
+        ae(_, ce('option'));
+    }
+
+    _ = _this.elements;
+    for (var i = 0; i < _.length; ++i) {
+        switch (_[i].nodeName) {
+            case 'INPUT':
+                if (_[i].type == 'text') {
+                    _[i].value = '';
+                }
+                else if (_[i].type == 'checkbox') {
+                    _[i].checked = false;
+                }
+                else if (_[i].type == 'radio' && _[i].value.length == 0) {
+                    _[i].checked = true;
+                }
+            break;
+
+            case 'SELECT':
+            _[i].selectedIndex = _[i].multiple ? -1 : 0;
+            if (_[i].i) {
+                _[i].i = _[i].selectedIndex;
+            }
+            break;
+        }
+    }
+
+    return false;
+}
+
+function fi_resetCriterion(_this) {
+    if (_this != null) {
+        var d;
+        while (_this.childNodes.length > 1) {
+            d = _this.childNodes[1];
+
+            while (d.childNodes.length > 1) {
+                d.removeChild(d.childNodes[1]);
+            }
+
+            _this.removeChild(d);
+        }
+
+        d = _this.childNodes[0];
+
+        while (d.childNodes.length > 1) {
+            d.removeChild(d.childNodes[1]);
+        }
+
+        d.firstChild.i = null;
+        d.firstChild.selectedIndex = 0;
+
+        if (_this.nextSibling.firstChild) {
+            _this.nextSibling.firstChild.style.display = _this.style.display;
+        }
+    }
+}
+
+function fi_addCriterion(_this, cr) {
+    var _ = ge(_this.id.replace('add', ''));
+
+    if (_.childNodes.length >= 19 || (_this.id.indexOf('criteria') > 0 && _.childNodes.length >= 4)) {
+        _this.style.display = 'none';
+    }
+
+    var a = _.childNodes[0].lastChild;
+    if (a.nodeName != 'A') {
+        fi_appendRemoveLink(_.childNodes[0]);
+    }
+    else {
+        a.firstChild.nodeValue = LANG.firemove;
+        a.onmouseup = fi_removeCriterion;
+    }
+
+    var
+        d = ce('div'),
+        c = _.childNodes[0].childNodes[0].cloneNode(true);
+
+    c.onchange = c.onkeyup = fi_criterionChange.bind(0, c);
+    c.i = null;
+
+    if (cr != null) {
+        var opts = c.getElementsByTagName('option');
+        for (var i = 0; i < opts.length; ++i) {
+            if (opts[i].value == cr) {
+                opts[i].selected = true;
+                break;
+            }
+        }
+    }
+    else {
+        c.firstChild.selected = true;
+    }
+
+    d.appendChild(c);
+    fi_appendRemoveLink(d);
+    _.appendChild(d);
+
+    return c;
+}
+
+function fi_removeCriterion() {
+    var
+        _,
+        d = this.parentNode,
+        c = d.parentNode,
+        n = (d.firstChild.name == 'wt[]');
+
+    c.removeChild(d);
+
+    if (c.childNodes.length == 1) {
+        _ = c.firstChild;
+        if (_.firstChild.selectedIndex > 0) {
+            var a = _.lastChild;
+            a.firstChild.nodeValue = LANG.ficlear;
+            a.onmouseup = fi_clearCriterion;
+        }
+        else {
+            _.removeChild(_.lastChild);
+            _.removeChild(_.lastChild);
+        }
+    }
+
+    if (c.nextSibling.firstChild) {
+        c.nextSibling.firstChild.style.display = '';
+    }
+
+    if (n) {
+        _ = ge('sdkgnsdkn436');
+        _.selectedIndex = 0;
+        _.i = 0;
+        fi_presetMatch();
+    }
+}
+
+function fi_clearCriterion() {
+    var d = this.parentNode;
+    d.firstChild.selectedIndex = 0;
+    fi_criterionChange(d.firstChild);
+}
+
+function fi_appendRemoveLink(d) {
+    d.appendChild(ct(String.fromCharCode(160, 160)));
+    var a = ce('a');
+    a.href = 'javascript:;';
+    a.appendChild(ct(LANG.firemove));
+    a.onmouseup = fi_removeCriterion;
+    a.onmousedown = a.onclick = rf;
+    d.appendChild(a);
+}
+
+function fi_appendClearLink(d) {
+    d.appendChild(ct(String.fromCharCode(160, 160)));
+    var a = ce('a');
+    a.href = 'javascript:;';
+    a.appendChild(ct(LANG.ficlear));
+    a.onmouseup = fi_clearCriterion;
+    a.onmousedown = a.onclick = rf;
+    d.appendChild(a);
+}
+
+function fi_Lookup(value, type) {
+    var c;
+
+    if (type == null) {
+        type = fi_type;
+    }
+
+    if (fi_Lookup.cache == null) {
+        fi_Lookup.cache = {};
+    }
+
+    if (fi_Lookup.cache[type] == null) {
+        c = {};
+
+        for (var i = 0, len = fi_filters[type].length; i < len; ++i) {
+            if(!(g_user.roles & U_GROUP_EMPLOYEE) && fi_filters[type][i].staffonly)
+                continue;
+
+            var f = fi_filters[type][i];
+
+            c[f.id]   = f;
+            c[f.name] = f;
+        }
+
+        fi_Lookup.cache[type] = c;
+    }
+    else {
+        c = fi_Lookup.cache[type];
+    }
+
+    if (value && typeof value == 'string') {
+        var firstChar = value.charCodeAt(0);
+        if (firstChar >= '0'.charCodeAt(0) && firstChar <= '9'.charCodeAt(0)) {
+            value = parseInt(value);
+        }
+    }
+
+    return c[value];
+}
+
+function fi_criterionChange(_this, crs, crv) {
+    var _;
+
+    if (_this.selectedIndex != _this.i) {
+        var
+            o = _this.options[_this.selectedIndex],
+            d = _this.parentNode;
+
+        if (d.childNodes.length > 1) {
+            if (_this.selectedIndex > 0 && _this.i > 0) {
+                var a = fi_Lookup(o.value);
+                var b = fi_Lookup(_this.options[_this.i].value);
+
+                if (a.type == b.type) {
+                    return;
+                }
+            }
+
+            while (d.childNodes.length > 1) {
+                d.removeChild(d.childNodes[1]);
+            }
+        }
+
+        if (_this.selectedIndex > 0) {
+            var p = fi_Lookup(o.value);
+            var parts = p.type.split('-');
+            var criteriaName = parts[0];
+            var criteriaParams = parts[1] || '';
+
+            if (LANG.fidropdowns[criteriaName] != null) {
+                if (_this.name == 'cr[]') {
+                    var _c = LANG.fidropdowns[criteriaName];
+                    _ = ce('select');
+                    _.name = 'crs[]';
+
+                    var group = _;
+
+                    if (criteriaParams.indexOf('any') != -1) {
+                        var o2 = ce('option');
+                        o2.value = '-2323';
+                        o2.appendChild(ct(LANG.fiany));
+                        ae(group, o2);
+                        if (crs != null && crs == '-2323') {
+                            o2.selected = true;
+                        }
+                    }
+
+                    for (var i = 0; i < _c.length; ++i) {
+                        if (_c[i][0] !== null) {
+                            var o2 = ce('option');
+                            o2.value = _c[i][0];
+                            o2.appendChild(ct(_c[i][1]));
+                            ae(group, o2);
+                            if (crs != null && crs == _c[i][0]) {
+                                o2.selected = true;
+                            }
+                        }
+                        else {
+                            var group = ce('optgroup');
+                            group.label = _c[i][1];
+                            ae(_, group);
+                        }
+                    }
+
+                    if (criteriaParams.indexOf('none') != -1) {
+                        var o2 = ce('option');
+                        o2.value = '-2324';
+                        o2.appendChild(ct(LANG.finone));
+                        ae(group, o2);
+                        if (crs != null && crs == '-2324') {
+                            o2.selected = true;
+                        }
+                    }
+
+                    d.appendChild(ct(' '));
+                    d.appendChild(_);
+                }
+
+                var n = (criteriaName == 'num');
+
+                if (n) {
+                    d.appendChild(ct(' '));
+                }
+
+                _ = ce('input');
+                _.type = 'text';
+
+                if (crv != null) {
+                    _.value = crv.toString();
                 }
                 else {
-                    if (a[b].type == "checkbox") {
-                        a[b].checked = false
+                    _.value = '0';
+                }
+
+                if (_this.name == 'cr[]') {
+                    _.name = 'crv[]';
+                }
+                else {
+                    _.name = 'wtv[]';
+                    _.onchange = fi_changeWeight.bind(0, _);
+                }
+
+                if (n) {
+                    _.maxLength = 7;
+                    _.style.textAlign = 'center';
+                    _.style.width = '4.5em';
+                }
+                else {
+                    _.type = 'hidden';
+                }
+
+                _.setAttribute('autocomplete', 'off');
+
+                d.appendChild(_);
+                if (_this.name == 'wt[]') {
+                    fi_sortWeight(_);
+                }
+            }
+            else if (criteriaName == 'str') {
+                _ = ce('input');
+                _.name = 'crs[]';
+                _.type = 'hidden';
+                _.value = '0';
+                d.appendChild(_);
+
+                _ = ce('input');
+                _.type = 'text';
+                if (criteriaParams.indexOf('small') != -1) {
+                    _.maxLength = 7;
+                    _.style.textAlign = 'center';
+                    _.style.width = '4.5em';
+                }
+                else {
+                    _.maxLength = 50;
+                    _.style.width = '9em';
+                }
+                _.name = 'crv[]';
+
+                if (crv != null) {
+                    _.value = crv;
+                }
+
+                d.appendChild(ct(' '));
+                d.appendChild(_);
+            }
+        }
+
+        if (d.parentNode.childNodes.length == 1) {
+            if (_this.selectedIndex > 0) {
+                fi_appendClearLink(d);
+            }
+        }
+        else if (d.parentNode.childNodes.length > 1) {
+            fi_appendRemoveLink(d);
+        }
+
+        _this.i = _this.selectedIndex;
+    }
+}
+
+function fi_setCriteria(cr, crs, crv) {
+    var _ = ge('fi_criteria');
+
+    var
+        i,
+        c = _.childNodes[0].childNodes[0];
+
+    _ = c.getElementsByTagName('option');
+    for (i = 0; i < _.length; ++i) {
+        if (_[i].value == cr[0]) {
+            _[i].selected = true;
+            break;
+        }
+    }
+    fi_criterionChange(c, crs[0], crv[0]);
+
+    var a = ge('fi_addcriteria');
+    for (i = 1; i < cr.length && i < 5; ++i) {
+        fi_criterionChange(fi_addCriterion(a, cr[i]), crs[i], crv[i]);
+    }
+}
+
+function fi_setWeights(weights, nt, ids, stealth) {
+    if (ids) {
+        var
+            wt = weights[0],
+            wtv = weights[1],
+            weights = {};
+
+        for (var i = 0; i < wt.length; ++i) {
+            var a = fi_Lookup(wt[i]);
+            if (a && a.type == 'num' && !a.noweights && LANG.traits[a.name]) {
+                weights[a.name] = wtv[i];
+            }
+        }
+    }
+
+    var _ = ge('fi_weight');
+
+    if (fi_weights == null) {
+        fi_weights = {};
+        cO(fi_weights, weights);
+    }
+
+    var
+        a = ge('fi_addweight'),
+        c = _.childNodes[0].childNodes[0];
+
+    var i = 0;
+    for (var w in weights) {
+        if (!LANG.traits[w]) {
+            continue;
+        }
+
+        if (i++>0) {
+            c = fi_addCriterion(a, w);
+        }
+
+        var opts = c.getElementsByTagName('option');
+
+        for (var j = 0; j < opts.length; ++j) {
+            if (opts[j].value && w == fi_Lookup(opts[j].value).name) {
+                opts[j].selected = true;
+                break;
+            }
+        }
+
+        fi_criterionChange(c, 0, weights[w]);
+    }
+
+    fi_weightsFactor = fi_convertWeights(weights, true);
+
+    ge('fi_weight_toggle').className = 'disclosure-on';
+    ge('fi_weight').parentNode.style.display = '';
+
+    if (!nt) {
+        if (!fi_presetMatch(weights, stealth)) {
+            fi_presetDetails();
+        }
+    }
+}
+
+function fi_changeWeight(_this) {
+    var _ = ge('sdkgnsdkn436');
+    _.selectedIndex = 0;
+    _.i = 0;
+    fi_sortWeight(_this);
+    fi_presetMatch();
+}
+
+function fi_sortWeight(_this) {
+    var
+        i,
+        _ = ge('fi_weight'),
+        v = Number(_this.value);
+
+    _this = _this.parentNode;
+
+    n = 0;
+    for (i = 0; i < _.childNodes.length; ++i) {
+        var m = _.childNodes[i];
+        if (m.childNodes.length == 5) {
+            n++;
+            if (m.childNodes[2].nodeName == "INPUT" && v > Number(m.childNodes[2].value)) {
+                _.insertBefore(_this, m);
+                return;
+            }
+        }
+    }
+    _.insertBefore(_this, _.childNodes[n]);
+}
+
+function fi_convertWeights(weights, getf) {
+    var
+        f = 0,
+        m = 0;
+
+    for (var w in weights) {
+        if (!LANG.traits[w]) {
+            continue;
+        }
+        f += Math.abs(weights[w]);
+        if (Number(weights[w]) > m) {
+            m = Number(weights[w]);
+        }
+    }
+
+    if (getf) {
+        return f;
+    }
+
+    var result = {};
+    for (var w in weights) {
+        result[w] = (LANG.traits[w] ? Math.round(1000 * weights[w] / f) / 1000 : weights[w]);
+    }
+
+    return result;
+}
+
+function fi_convertScore(score, mode, maxScore) {
+    if (mode == 1) { // Raw
+        return parseInt(score * fi_weightsFactor);
+    }
+    else if (mode == 2) { // Percent
+        return ((score / maxScore) * 100).toFixed(1) + '%';
+    }
+    else { // Normalized
+            return score.toFixed(2);
+    }
+}
+
+function fi_updateScores() {
+    if (++this._scoreMode > 2) {
+        this._scoreMode = 0;
+    }
+
+    for (var i = 0; i < this.data.length; ++i) {
+        if (this.data[i].__tr) {
+            var cell = this.data[i].__tr.lastChild;
+            cell.firstChild.firstChild.nodeValue = fi_convertScore(this.data[i].score, this._scoreMode, this._maxScore);
+        }
+    }
+}
+
+function fi_presetClass(_this, stealth) {
+    if (_this.selectedIndex != _this.i) {
+        var
+            i,
+            _group,
+            c = _this.options[_this.selectedIndex],
+            d = _this.parentNode,
+            langref = LANG.presets;
+
+        fi_resetCriterion(_);
+
+        var _ = ge('sdkgnsdkn436');
+        _.parentNode.style.display = 'none';
+
+// todo: replace this
+        if (!stealth && (_this.form.ub.selectedIndex == 0 || _this.form.ub.selectedIndex == _this.i)) {
+            _this.form.ub.selectedIndex = _this.selectedIndex;
+        }
+/* with this
+        var oldValue = 1000;
+        if (_this.i) {
+            oldValue = $($('#fi_presets select option')[_this.i]).attr('value');
+        }
+
+        if(!stealth && (_this.form.ub.selectedIndex == 0 || _this.form.ub.value == oldValue)) {
+            $('select[name=ub] option[value=' + _this.value + ']').attr('selected', 'selected');
+        }
+*/
+
+        while (_.firstChild) {
+            de(_.firstChild);
+        }
+        ae(_, ce('option'));
+
+        if (_this.selectedIndex > 0) {
+            for (_group in c._presets) {
+                var weights = c._presets[_group];
+
+                if(langref[_group] != null) {
+                    var group = ce('optgroup');
+                    group.label = langref[_group];
+                }
+                else
+                    group = _;
+
+                for (var p in weights) {
+                    var o = ce('option');
+                    o.value = p;
+                    o._weights = weights[p];
+                    ae(o, ct(weights[p].name ? weights[p].name : langref[p]));
+                    ae(group, o);
+                }
+
+                if (langref[_group] != null && group && group.childNodes.length > 0) {
+                    ae(_, group);
+                }
+            }
+
+            if (_.childNodes.length > 1) {
+                _.parentNode.style.display = '';
+            }
+        }
+
+        fi_presetChange(_);
+        _this.i = _this.selectedIndex;
+    }
+}
+
+function fi_presetChange(_this) {
+    if (_this.selectedIndex != _this.i) {
+        fi_resetCriterion(ge('fi_weight'));
+
+        var o = _this.options[_this.selectedIndex];
+        if (_this.selectedIndex > 0) {
+            // Default gem color
+            if (_this.form.elements.gm.selectedIndex == 0) {
+                _this.form.elements.gm.selectedIndex = 2; // Rare
+            }
+
+            fi_resetCriterion(ge('fi_weight'));
+            fi_setWeights(o._weights, 1, 0);
+        }
+
+        _this.i = _this.selectedIndex;
+
+        if (g_user.id > 0) {
+            var a = ge('fi_remscale');
+            a.style.display = (o._weights && o._weights.name ? '' : 'none');
+        }
+    }
+}
+
+function fi_presetDetails() {
+    var
+        _     = ge('fi_weight'),
+        _this = ge('fi_detail'),
+        n     = ge('fi_addweight');
+
+    var a = g_toggleDisplay(_);
+
+    n.style.display = 'none';
+    if (a) {
+        _this.firstChild.nodeValue = LANG.fihidedetails;
+        if (_.childNodes.length < 19) {
+            n.style.display = '';
+        }
+    }
+    else {
+        _this.firstChild.nodeValue = LANG.fishowdetails;
+    }
+
+    return false;
+}
+
+function fi_presetMatch(weights, stealth) {
+    if (!weights) {
+        weights = {};
+        var _ = ge('fi_weight');
+
+        for (var i = 0; i < _.childNodes.length; ++i) {
+            if (_.childNodes[i].childNodes.length == 5) {
+                if (_.childNodes[i].childNodes[0].nodeName == "SELECT" && _.childNodes[i].childNodes[2].nodeName == "INPUT") {
+                    var node = _.childNodes[i].childNodes[0].options[_.childNodes[i].childNodes[0].selectedIndex];
+
+                    if (node.value) {
+                        weights[fi_Lookup(node.value)] = Number(_.childNodes[i].childNodes[2].value);
                     }
-                    else {
-                        if (a[b].type == "radio" && a[b].value.length == 0) {
-                            a[b].checked = true
+                }
+            }
+        }
+    }
+
+    var _ = ge('fi_presets');
+    var s = _.getElementsByTagName('select');
+    if (s.length != 2) {
+        return false;
+    }
+
+    var n = fi_convertWeights(weights);
+    for (var l in wt_presets) {
+        for (var k in wt_presets[l]) {
+            for (var v in wt_presets[l][k]) {
+                p = fi_convertWeights(wt_presets[l][k][v]);
+
+                var match = true;
+                for (var w in p) {
+                    if (!LANG.traits[w]) {
+                        continue;
+                    }
+                    if (!n[w] || p[w] != n[w]) {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match) {
+                    for (var i = 0; i < s[0].options.length; ++i) {
+                        if (l == s[0].options[i].value) {
+                            s[0].options[i].selected = true;
+                            fi_presetClass(s[0], stealth);
+                            break;
+                        }
+                    }
+
+                    for (var j = 0; j < s[1].options.length; ++j) {
+                        if (v == s[1].options[j].value) {
+                            s[1].options[j].selected = true;
+                            fi_presetChange(s[1]);
+                            break;
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+
+function fi_presetSave() {
+    if (!g_user.id) {
+        return;
+    }
+
+    // todo: find out what the jquery stuff is supposed to do and use standards instead
+    alert('NYI, sorry!');
+    return;
+
+    var
+        o     = $('#sdkgnsdkn436 option:selected').get(0),
+        name  = '',
+        id    = ((o._weights ? o._weights.id : 0) | 0),
+        scale = { id: id, name: name },
+        _     = ge('fi_weight'),
+        n     = 0;
+
+    for(i = 0; i < _.childNodes.length; ++i) {
+        var
+            w = fi_Lookup($('[name=wt[]]', _.childNodes[i]).val()),
+            v = $('[name=wtv[]]', _.childNodes[i]).val();
+
+        if(w && v != 0) {
+            scale[w.name] = v;
+            ++n;
+        }
+    }
+
+    if(n < 1 || (!(o._weights && o._weights.id) && g_user.weightscales && g_user.weightscales.length >= 5)) {
+        return alert(LANG.message_weightscalesaveerror);
+    }
+
+    if(name = prompt(LANG.prompt_nameweightscale, $(o).text())) {
+        var data = { save: 1,   name: urlencode(name), scale: '' };
+
+        if(id) {
+            data.id = id;
+        }
+
+        scale.name = name;
+        n = 0;
+
+        for(var w in scale) {
+            if(!LANG.traits[w]) {
+                continue;
+            }
+            if(n++ > 0) {
+                data.scale += ',';
+            }
+            data.scale += w + ':' + scale[w];
+        }
+
+        $.post('?account=weightscales', data, function(response) {
+            if(response > 0) {
+                if(g_user.weightscales == null) {
+                    g_user.weightscales = [];
+                }
+
+                if(scale.id) {
+                    g_user.weightscales = array_filter(g_user.weightscales, function(x) { return x.id != scale.id });
+                }
+
+                scale.id = response;
+                g_user.weightscales.push(scale);
+
+                var
+                    s = $('#fi_presets select').get(0),
+                    c = $('option[value=-1]', s).get(0);
+
+                if(!c) {
+                    c = ce('option');
+                    c.value = -1;
+                    ae(c, ct(LANG.ficustom));
+                    aef(s, c);
+                    aef(s, $('option', s).get(1));
+                }
+
+                c._presets = { custom: {} };
+                for(var i = 0, len = g_user.weightscales.length; i < len; ++i) {
+                    c._presets.custom[g_user.weightscales[i].id] = g_user.weightscales[i];
+                }
+
+                c.selected = true;
+                c.parentNode.onchange();
+
+                var o = $('#sdkgnsdkn436 option[value=' + scale.id + ']').get(0);
+                if(o) {
+                    o.text = scale.name;
+                    o.selected = true;
+                    o.parentNode.onchange();
+                }
+
+                alert(LANG.message_saveok);
+            }
+            else {
+                alert(LANG.message_weightscalesaveerror);
+            }
+        });
+    }
+}
+
+function fi_presetDelete() {
+    if(!g_user.id) {
+        return;
+    }
+
+    // todo: find out what the jquery stuff is supposed to do and use standards instead
+    alert('NYI, sorry!');
+    return;
+
+    // sarjuuk: .get(0) - returns first element matched by X
+    var s = $('#fi_presets select').get(0),
+        c = $('option:selected', s).get(0);
+
+    if(c.value == -1) {
+        var o = $('#sdkgnsdkn436 option:selected').get(0);
+        if(o.value && confirm(LANG.confirm_deleteweightscale)) {
+            // sarjuuk send an ajax-POST to X with Y as param
+            $.post('?account=weightscales', { 'delete': 1, id: o.value });
+
+            g_user.weightscales = array_filter(g_user.weightscales, function(x) {
+                return x.id != o.value;
+            });
+
+            if(g_user.weightscales.length) {
+                c._presets = { custom: {} };
+                for(var i = 0, len = g_user.weightscales.length; i < len; ++i) {
+                    c._presets.custom[g_user.weightscales[i].id] = g_user.weightscales[i];
+                }
+            }
+            else {
+                de(c);
+            }
+
+            de(o);
+
+            // sarjuuk: change() - manually triggers an onChange event on X
+            $('#fi_presets select').change();
+        }
+    }
+}
+
+function fi_scoreSockets(item) {
+    if (fi_gemScores != null) {
+        var match = 0,  best = 0,   sock = 0;
+        var mGems = [], bGems = [];
+        var mUniq = [], bUniq = [];
+        var mSock = {}, bSock = {};
+        var noMatch = false;
+
+        for (var i = 1; i <= 3; ++i) {
+            var
+                n = item['socket' + i],
+                s = (n == 1 ? 1 : 0);
+
+            if (n) {
+                if (fi_gemScores[n]) {
+                    for (var j = 0; j < fi_gemScores[n].length; ++j) {
+                        var t = fi_gemScores[n][j];
+                        if (t.socketLevel <= item.level && (t.uniqEquip == 0 || in_array(mUniq, t.id) < 0)) {
+                            match += t.score;
+                            mGems.push(t.id);
+
+                            mSock[i - 1] = 1;
+
+                            if (t.uniqEquip == 1) {
+                                mUniq.push(t.id);
+                            }
+
+                            break;
                         }
                     }
                 }
-			break;
-		case "SELECT":
-			a[b].selectedIndex = a[b].multiple ? -1 : 0;
-			if (a[b].i) {
-                a[b].i = a[b].selectedIndex
-			}
-			break
-		}
-	}
-	return false
-}
-function fi_resetCriterion(b) {
-	if (b != null) {var a;
-		while (b.childNodes.length > 1) {
-            a = b.childNodes[1];
-			while (a.childNodes.length > 1) {
-                a.removeChild(a.childNodes[1])
-			}
-			b.removeChild(a)
-		}
-		a = b.childNodes[0];
-		while (a.childNodes.length > 1) {
-            a.removeChild(a.childNodes[1])
-		}
-		a.firstChild.i = null;
-		a.firstChild.selectedIndex = 0;
-		if (b.nextSibling.firstChild) {
-            b.nextSibling.firstChild.style.display = b.style.display
-		}
-	}
-}
-function fi_addCriterion(l, h) {
-	var e = ge(l.id.replace("add", ""));
-	if (e.childNodes.length >= 19 || (l.id.indexOf("criteria") > 0 && e.childNodes.length >= 4)) {
-        l.style.display = "none"
-	}
-	var b = e.childNodes[0].lastChild;
-	if (b.nodeName != "A") {
-        fi_appendRemoveLink(e.childNodes[0])
-	} else {
-        b.firstChild.nodeValue = LANG.firemove;
-		b.onmouseup = fi_removeCriterion
-	}
-	var j = ce("div"),
-	k = e.childNodes[0].childNodes[0].cloneNode(true);
-	k.onchange = k.onkeyup = fi_criterionChange.bind(0, k);
-	k.i = null;
-	if (h != null) {
-        var g = k.getElementsByTagName("option");
-		for (var f = 0; f < g.length; ++f) {
-            if (g[f].value == h) {
-                g[f].selected = true;
-				break
-			}
-		}
-	} else {
-        k.firstChild.selected = true
-	}
-	j.appendChild(k);
-	fi_appendRemoveLink(j);
-	e.appendChild(j);
-	return k
-}
-function fi_removeCriterion() {
-	var e, f = this.parentNode,
-	h = f.parentNode,
-	g = (f.firstChild.name == "wt[]");
-	h.removeChild(f);
-	if (h.childNodes.length == 1) {
-        e = h.firstChild;
-		if (e.firstChild.selectedIndex > 0) {
-            var b = e.lastChild;
-			b.firstChild.nodeValue = LANG.ficlear;
-			b.onmouseup = fi_clearCriterion
-		}
-        else {
-            e.removeChild(e.lastChild);
-			e.removeChild(e.lastChild)
-		}
-	}
-	if (h.nextSibling.firstChild) {
-        h.nextSibling.firstChild.style.display = ""
-	}
-	if (g) {
-        e = ge("sdkgnsdkn436");
-		e.selectedIndex = 0;
-		e.i = 0;
-		fi_presetMatch()
-	}
-}
-function fi_clearCriterion() {
-	var a = this.parentNode;
-	a.firstChild.selectedIndex = 0;
-	fi_criterionChange(a.firstChild)
-}
-function fi_appendRemoveLink(c) {
-	c.appendChild(ct(String.fromCharCode(160, 160)));
-	var b = ce("a");
-	b.href = "javascript:;";
-	b.appendChild(ct(LANG.firemove));
-	b.onmouseup = fi_removeCriterion;
-	b.onmousedown = b.onclick = rf;
-	c.appendChild(b)
-}
-function fi_appendClearLink(c) {
-	c.appendChild(ct(String.fromCharCode(160, 160)));
-	var b = ce("a");
-	b.href = "javascript:;";
-	b.appendChild(ct(LANG.ficlear));
-	b.onmouseup = fi_clearCriterion;
-	b.onmousedown = b.onclick = rf;
-	c.appendChild(b)
-}
-function fi_Lookup(h, d) {
-	var j;
-	if (d == null) {
-        d = fi_type
-	}
-	if (fi_Lookup.cache == null) {
-        fi_Lookup.cache = {}
-	}
-	if (fi_Lookup.cache[d] == null) {j = {};
-		for (var b = 0, a = fi_filters[d].length; b < a; ++b) {
-            var g = fi_filters[d][b];
-			j[g.id] = g;
-			j[g.name] = g
-		}
-		fi_Lookup.cache[d] = j
-	}
-    else {
-        j = fi_Lookup.cache[d]
-	}
-	if (h && typeof h == "string") {
-        var e = h.charCodeAt(0);
-		if (e >= "0".charCodeAt(0) && e <= "9".charCodeAt(0)) {
-            h = parseInt(h)
-		}
-	}
-	return j[h]
-}
-function fi_criterionChange(l, w, s) {
-	var x;
-	if (l.selectedIndex != l.i) {
-        var e = l.options[l.selectedIndex],
-		q = l.parentNode;
-		if (q.childNodes.length > 1) {
-            if (l.selectedIndex > 0 && l.i > 0) {
-                var u = fi_Lookup(e.value);
-				var r = fi_Lookup(l.options[l.i].value);
-				if (u.type == r.type) {
-                    return
-				}
-			}
-			while (q.childNodes.length > 1) {
-                q.removeChild(q.childNodes[1])
-			}
-		}
-		if (l.selectedIndex > 0) {
-            var c = fi_Lookup(e.value);
-			var j = c.type.split("-");
-			var t = j[0];
-			var h = j[1] || "";
-			if (LANG.fidropdowns[t] != null) {
-                if (l.name == "cr[]") {
-                    var m = LANG.fidropdowns[t];
-					x = ce("select");
-					x.name = "crs[]";
-					var v = x;
-					if (h.indexOf("any") != -1) {
-                        var g = ce("option");
-						g.value = "-2323";
-						g.appendChild(ct(LANG.fiany));
-						ae(v, g);
-						if (w != null && w == "-2323") {
-                            g.selected = true
-						}
-					}
-					for (var k = 0; k < m.length; ++k) {
-                        if (m[k][0]) {
-                            var g = ce("option");
-							g.value = m[k][0];
-							g.appendChild(ct(m[k][1]));
-							ae(v, g);
-							if (w != null && w == m[k][0]) {
-                                g.selected = true
-							}
-						}
-                        else {
-                            var v = ce("optgroup");
-							v.label = m[k][1];
-							ae(x, v)
-						}
-					}
-					if (h.indexOf("none") != -1) {
-                        var g = ce("option");
-						g.value = "-2324";
-						g.appendChild(ct(LANG.finone));
-						ae(v, g);
-						if (w != null && w == "-2324") {
-                            g.selected = true
-						}
-					}
-					q.appendChild(ct(" "));
-					q.appendChild(x)
-				}
-				var f = (t == "num");
-				if (f) {
-                    q.appendChild(ct(" "))
-				}
-				x = ce("input");
-				x.type = "text";
-				if (s != null) {
-                    x.value = s.toString()
-				}
                 else {
-                    x.value = "0"
-				}
-				if (l.name == "cr[]") {
-                    x.name = "crv[]"
-				}
-                else {
-                    x.name = "wtv[]";
-					x.onchange = fi_changeWeight.bind(0, x)
-				}
-				if (f) {
-                    x.maxLength = 7;
-					x.style.textAlign = "center";
-					x.style.width = "4.5em"
-				}
-                else {
-                    x.type = "hidden"
-				}
-				x.setAttribute("autocomplete", "off");
-				q.appendChild(x);
-				if (l.name == "wt[]") {
-                    fi_sortWeight(x)
-				}
-			}
-            else {
-                if (t == "str") {
-                    x = ce("input");
-					x.name = "crs[]";
-					x.type = "hidden";
-					x.value = "0";
-					q.appendChild(x);
-					x = ce("input");
-					x.type = "text";
-					if (h.indexOf("small") != -1) {
-                        x.maxLength = 7;
-						x.style.textAlign = "center";
-						x.style.width = "4.5em"
-					}
-                    else {
-                        x.maxLength = 50;
-						x.style.width = "9em"
-					}
-					x.name = "crv[]";
-					if (s != null) {
-                        x.value = s
-					}
-					q.appendChild(ct(" "));
-					q.appendChild(x)
-				}
-			}
-		}
-		if (q.parentNode.childNodes.length == 1) {
-            if (l.selectedIndex > 0) {
-                fi_appendClearLink(q)
-			}
-		}
-        else {
-            if (q.parentNode.childNodes.length > 1) {
-                fi_appendRemoveLink(q)
-			}
-		}
-		l.i = l.selectedIndex
-	}
-}
-function fi_setCriteria(g, d, j) {
-	var e = ge("fi_criteria");
-	var f, h = e.childNodes[0].childNodes[0];
-	e = h.getElementsByTagName("option");
-	for (f = 0; f < e.length; ++f) {
-        if (e[f].value == g[0]) {
-            e[f].selected = true;
-			break
-		}
-	}
-	fi_criterionChange(h, d[0], j[0]);
-	var b = ge("fi_addcriteria");
-	for (f = 1; f < g.length && f < 5; ++f) {
-        fi_criterionChange(fi_addCriterion(b, g[f]), d[f], j[f])
-	}
-}
-function fi_setWeights(q, m, d, e) {
-	if (d) {var k = q[0],
-		g = q[1],
-		q = {};
-		for (var h = 0; h < k.length; ++h) {
-            var o = fi_Lookup(k[h]);
-			if (o.type == "num" && LANG.traits[o.name]) {
-                q[o.name] = g[h]
-			}
-		}
-	}
-	var s = ge("fi_weight");
-	if (fi_weights == null) {fi_weights = {};
-		cO(fi_weights, q)
-	}
-	var o = ge("fi_addweight"),
-	l = s.childNodes[0].childNodes[0];
-	var h = 0;
-	for (var r in q) {
-        if (!LANG.traits[r]) {
-            continue
-		}
-		if (h++>0) {
-            l = fi_addCriterion(o, r)
-		}
-		var b = l.getElementsByTagName("option");
-		for (var f = 0; f < b.length; ++f) {
-            if (b[f].value && r == fi_Lookup(b[f].value).name) {
-                b[f].selected = true;
-				break
-			}
-		}
-		fi_criterionChange(l, 0, q[r])
-	}
-	fi_weightsFactor = fi_convertWeights(q, true);
-	ge("fi_weight_toggle").className = "disclosure-on";
-	ge("fi_weight").parentNode.style.display = "";
-	if (!m) {
-        if (!fi_presetMatch(q, e)) {
-            fi_presetDetails()
-		}
-	}
-}
-function fi_changeWeight(b) {
-	var a = ge("sdkgnsdkn436");
-	a.selectedIndex = 0;
-	a.i = 0;
-	fi_sortWeight(b);
-	fi_presetMatch()
-}
-function fi_sortWeight(e) {
-	var d, c = ge("fi_weight"),
-	b = Number(e.value);
-	e = e.parentNode;
-	n = 0;
-	for (d = 0; d < c.childNodes.length; ++d) {var a = c.childNodes[d];
-		if (a.childNodes.length == 5) {	n++;
-			if (a.childNodes[2].nodeName == "INPUT" && b > Number(a.childNodes[2].value)) {
-                c.insertBefore(e, a);
-				return
-			}
-		}
-	}
-	c.insertBefore(e, c.childNodes[n])
-}
-function fi_convertWeights(c, g) {
-	var e = 0,
-	a = 0;
-	for (var b in c) {
-        if (!LANG.traits[b]) {
-            continue
-		}
-		e += Math.abs(c[b]);
-		if (Number(c[b]) > a) {
-            a = Number(c[b])
-		}
-	}
-	if (g) {
-        return e
-	}
-	var d = {};
-	for (var b in c) {
-        d[b] = (LANG.traits[b] ? Math.round(1000 * c[b] / e) / 1000 : c[b])
-	}
-	return d
-}
-function fi_convertScore(b, a, c) {
-	if (a == 1) {
-        return parseInt(b * fi_weightsFactor)
-	}
-    else {
-        if (a == 2) {
-            return ((b / c) * 100).toFixed(1) + "%"
-		}
-        else {
-            return b.toFixed(2)
-		}
-	}
-}
-function fi_updateScores() {
-	if (++this._scoreMode > 2) {
-        this._scoreMode = 0
-	}
-	for (var b = 0; b < this.data.length; ++b) {
-        if (this.data[b].__tr) {
-            var a = this.data[b].__tr.lastChild;
-			a.firstChild.firstChild.nodeValue = fi_convertScore(this.data[b].score, this._scoreMode, this._maxScore)
-		}
-	}
-}
-function fi_presetClass(g, b) {
-	if (g.selectedIndex != g.i) {
-        var f, j, k = g.options[g.selectedIndex],
-		h = g.parentNode,
-		l = LANG.presets;
-		fi_resetCriterion(r);
-		var r = ge("sdkgnsdkn436");
-		r.parentNode.style.display = "none";
-		if (!b && (g.form.ub.selectedIndex == 0 || g.form.ub.selectedIndex == g.i)) {
-            g.form.ub.selectedIndex = g.selectedIndex
-		}
-		while (r.firstChild) {
-            de(r.firstChild)
-		}
-		ae(r, ce("option"));
-		if (g.selectedIndex > 0) {
-            for (j in k._presets) {
-                var m = k._presets[j];
-				var q = ce("optgroup");
-				q.label = l[j];
-				for (var a in m) {
-                    var e = ce("option");
-					e.value = a;
-					e._weights = m[a];
-					ae(e, ct(l[a]));
-					ae(q, e)
-				}
-				if (q && q.childNodes.length > 0) {
-                    ae(r, q)
-				}
-			}
-			if (r.childNodes.length > 1) {
-                r.parentNode.style.display = ""
-			}
-		}
-		fi_presetChange(r);
-		g.i = g.selectedIndex
-	}
-}
-function fi_presetChange(b) {
-	if (b.selectedIndex != b.i) {fi_resetCriterion(ge("fi_weight"));
-		var a = b.options[b.selectedIndex];
-		if (b.selectedIndex > 0) {
-            if (b.form.elements.gm.selectedIndex == 0) {
-                b.form.elements.gm.selectedIndex = 2
-			}
-			fi_resetCriterion(ge("fi_weight"));
-			fi_setWeights(a._weights, 1, 0)
-		}
-		b.i = b.selectedIndex
-	}
-}
-function fi_presetDetails() {
-	var c = ge("fi_weight"),
-	e = ge("fi_detail"),
-	d = ge("fi_addweight");
-	var b = g_toggleDisplay(c);
-	d.style.display = "none";
-	if (b) {
-        e.firstChild.nodeValue = LANG.fihidedetails;
-		if (c.childNodes.length < 19) {
-            d.style.display = ""
-		}
-	}
-    else {
-        e.firstChild.nodeValue = LANG.fishowdetails
-	}
-	return false
-}
-function fi_presetMatch(m, a) {
-	if (!m) {m = {};
-		var r = ge("fi_weight");
-		for (var f = 0; f < r.childNodes.length; ++f) {
-            if (r.childNodes[f].childNodes.length == 5) {
-                if (r.childNodes[f].childNodes[0].nodeName == "SELECT" && r.childNodes[f].childNodes[2].nodeName == "INPUT") {
-                    var d = r.childNodes[f].childNodes[0].options[r.childNodes[f].childNodes[0].selectedIndex];
-					if (d.value) {
-                        m[fi_Lookup(d.value)] = Number(r.childNodes[f].childNodes[2].value)
-					}
-				}
-			}
-		}
-	}
-	var r = ge("fi_presets");
-	var t = r.getElementsByTagName("select");
-	if (t.length != 2) {
-        return false
-	}
-	var b = fi_convertWeights(m);
-	for (var l in wt_presets) {
-        for (var k in wt_presets[l]) {
-            for (var q in wt_presets[l][k]) {
-                p = fi_convertWeights(wt_presets[l][k][q]);
-				var h = true;
-				for (var o in p) {
-                    if (!LANG.traits[o]) {
-                        continue
-					}
-					if (!b[o] || p[o] != b[o]) {
-                        h = false;
-						break
-					}
-				}
-				if (h) {
-                    for (var e = 0; e < t[0].options.length; ++e) {
-                        if (l == t[0].options[e].value) {
-                            t[0].options[e].selected = true;
-							fi_presetClass(t[0], a);
-							break
-						}
-					}
-					for (e = 0; e < t[1].options.length; ++e) {
-                        if (q == t[1].options[e].value) {
-                            t[1].options[e].selected = true;
-							fi_presetChange(t[1]);
-							break
-						}
-					}
-					return true
-				}
-			}
-		}
-	}
-	return false
-}
-function fi_scoreSockets(r) {
-	if (fi_gemScores != null) {
-        var g = 0,
-		d = 0,
-		a = 0;
-		var b = [],
-		v = [];
-		var k = [],
-		h = [];
-		var o = {},
-		m = {};
-		var l = false;
-		for (var f = 1; f <= 3; ++f) {
-            var c = r["socket" + f],
-			u = (c == 1 ? 1 : 0);
-			if (c && fi_gemScores[c]) {
-                for (var e = 0; e < fi_gemScores[c].length; ++e) {
-                    var q = fi_gemScores[c][e];
-					if (q.uniqEquip == 0 || in_array(k, q.id) < 0) {
-                        g += q.score;
-						b.push(q.id);
-						o[f - 1] = 1;
-						if (q.uniqEquip == 1) {
-                            k.push(q.id)
-						}
-						break
-					}
-				}
-				for (var e = 0; e < fi_gemScores[u].length; ++e) {
-                    var q = fi_gemScores[u][e];
-					if (q.uniqEquip == 0 || in_array(h, q.id) < 0) {
-                        d += q.score;
-						v.push(q.id);
-						m[f - 1] = (q.colors & c);
-						if (q.uniqEquip == 1) {
-                            h.push(q.id)
-						}
-						break
-					}
-				}
-			}
-            else {
-                if (c) {
-                    l = true
-				}
-			}
-		}
-		if (r.socketbonusstat && fi_weights && fi_weightsFactor != 0) {
-            for (var f in fi_weights) {
-                if (r.socketbonusstat[f]) {
-                    a += r.socketbonusstat[f] * fi_weights[f] / fi_weightsFactor
-				}
-			}
-		}
-		r.scoreBest = d;
-		r.scoreMatch = g + a;
-		r.scoreSocket = a;
-		if (r.scoreMatch >= r.scoreBest && !l) {
-            r.matchSockets = o;
-			r.gemGain = r.scoreMatch;
-			r.gems = b
-		}
-        else {
-            r.matchSockets = m;
-			r.gemGain = r.scoreBest;
-			r.gems = v
-		}
-		r.score += r.gemGain
-	}
-	if (r.score > this._maxScore || !this._maxScore) {
-        this._maxScore = r.score
-	}
-	if (fi_upgradeId && r.id == fi_upgradeId) {
-        this._minScore = r.score
-	}
-}
-function fi_dropdownSync(a) {
-	if (a.selectedIndex >= 0) {
-        a.className = a.options[a.selectedIndex].className
-	}
-}
-function fi_init(b) {
-	fi_type = b;
-	var a = ge("fi_subcat");
-	if (g_initPath.lastIt && g_initPath.lastIt[3]) {
-        if (a) {
-            a.menu = g_initPath.lastIt[3];
-			a.menuappend = "&filter";
-			a.onmouseover = Menu.show;
-			a.onmouseout = Menu.hide
-		}
-	}
-	else if (a) {
-        de(a.parentNode);
-	}
+                    noMatch = true;
+                }
 
-	fi_initCriterion(ge("fi_criteria"), "cr[]", b);
-	if (b == "items") {
-        var d = ge("fi_presets");
-		if (d) {
-            fi_initPresets(ge("fi_presets"));
-			fi_initCriterion(ge("fi_weight"), "wt[]", b)
-		}
-	}
-	var c = ge("ma-0");
-	if (c.getAttribute("checked")) {
-        c.checked = true
-	}
-}
-function fi_initCriterion(h, a, j) {
-	var b = h.firstChild;
-	var m = ce("select");
-	m.name = a;
-	m.onchange = m.onkeyup = fi_criterionChange.bind(0, m);
-	ae(m, ce("option"));
-	var l = null;
-	var k = LANG["fi" + j];
-	for (var f = 0, g = fi_filters[j].length; f < g; ++f) {
-        var c = fi_filters[j][f];
-		if (!c.type) {
-            if (l && l.childNodes.length > 0) {
-                ae(m, l)
-			}
-			l = ce("optgroup");
-			l.label = (LANG.traits[c.name] ? LANG.traits[c.name] : k[c.name])
-		}
+                if (fi_gemScores[s]) {
+                    for (var j = 0; j < fi_gemScores[s].length; ++j) {
+                        var t = fi_gemScores[s][j];
+                        if (t.socketLevel <= item.level && (t.uniqEquip == 0 || in_array(bUniq, t.id) < 0)) {
+                            best += t.score;
+                            bGems.push(t.id);
+
+                            bSock[i - 1] = (t.colors & n);
+
+                            if (t.uniqEquip == 1) {
+                                bUniq.push(t.id);
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (item.socketbonusstat && fi_weights && fi_weightsFactor != 0) {
+            for (var i in fi_weights) {
+                if (item.socketbonusstat[i]) {
+                    sock += item.socketbonusstat[i] * fi_weights[i] / fi_weightsFactor;
+                }
+            }
+        }
+
+        item.scoreBest = best;
+        item.scoreMatch = match + sock;
+        item.scoreSocket = sock;
+
+        if (item.scoreMatch >= item.scoreBest && !noMatch) {
+            item.matchSockets = mSock;
+            item.gemGain = item.scoreMatch;
+            item.gems = mGems;
+        }
         else {
-            if (a != "wt[]" || c.type == "num") {
-                var d = ce("option");
-				d.value = c.id;
-				var e = LANG.traits[c.name] ? LANG.traits[c.name][0] : k[c.name];
-				if (c.indent) {
-                    e = "- " + e
-				}
-				ae(d, ct(e));
-				ae(l, d)
-			}
-		}
-	}
-	if (l && l.childNodes.length > 0) {
-        ae(m, l)
-	}
-	ae(b, m)
+            item.matchSockets = bSock;
+            item.gemGain = item.scoreBest;
+            item.gems = bGems;
+        }
+
+        item.score += item.gemGain;
+    }
+
+    if (item.score > this._maxScore || !this._maxScore) {
+        this._maxScore = item.score;
+    }
+
+    if(this._upgradeIds && in_array(this._upgradeIds, item.id) != -1) {
+        this._minScore = item.score;
+        item.upgraded = 1;
+    }
 }
-function fi_initPresets(g) {
-	var d, m = ce("select");
-	m.onchange = m.onkeyup = fi_presetClass.bind(0, m, 0);
-	ae(m, ce("option"));
-	var l = [];
-	for (var h in wt_presets) {
-        l.push(h)
-	}
-	l.sort(function (i, c) {
-        return strcmp(g_chr_classes[i], g_chr_classes[c])
-	});
-	for (var e = 0, f = l.length; e < f; ++e) {
-        var h = l[e],
-		b = ce("option");
-		b.value = h;
-		b._presets = wt_presets[h];
-		ae(b, ct(g_chr_classes[h]));
-		ae(m, b)
-	}
-	ae(g, m);
-	var k = ce("span");
-	k.style.display = "none";
-	var m = ce("select");
-	m.id = "sdkgnsdkn436";
-	m.onchange = m.onkeyup = fi_presetChange.bind(0, m);
-	ae(m, ce("option"));
-	ae(k, ct(" "));
-	ae(k, m);
-	ae(g, k);
-	ae(g, ct(String.fromCharCode(160, 160)));
-	var j = ce("a");
-	j.href = "javascript:;";
-	j.id = "fi_detail";
-	j.appendChild(ct(LANG.fishowdetails));
-	j.onclick = fi_presetDetails;
-	j.onmousedown = rf;
-	ae(g, j)
+
+function fi_dropdownSync(_this) {
+    if (_this.selectedIndex >= 0) {
+        _this.className = _this.options[_this.selectedIndex].className;
+    }
 }
-function fi_getExtraCols(f, e, l) {
-	if (!f.length) {
-        return
-	}
-	var g = [],
-	j = LANG.fiitems;
-	var c = (fi_weightsFactor ? (e ? 8 : 9) : 10) - (l ? 1 : 0);
-	for (var d = 0; d < f.length && d < c; ++d) {
-        var k = fi_Lookup(f[d]);
-		if (k && k.name && k.type == "num") {
-            var h = {
-                id: k.name,
-				value: k.name,
-				name: (LANG.traits[k.name] ? LANG.traits[k.name][2] : j[k.name]),
-				tooltip: (LANG.traits[k.name] ? LANG.traits[k.name][0] : j[k.name]),
-				before: (k.before ? k.before: "source")
-			};
-			if (k.name.indexOf("dps") != -1 || k.name.indexOf("speed") != -1) {
-                h.compute = function (a, b) {
-                    return (a[k.name] || 0).toFixed(2)
-				}
-			}
-			g.push(h)
-		}
-	}
-	if (fi_weightsFactor) {
-        if (e) {
-            g.push({
-                id: "gems",
-				name: LANG.gems,
-				getValue: function (a) {
-                    return a.gems.length
-				},
-				compute: function (q, r) {
-                    if (!q.nsockets || !q.gems) {
-                        return
-					}
-					var b = [];
-					for (var m = 0; m < q.nsockets; m++) {
-                        b.push(q["socket" + (m + 1)])
-					}
-					var a = "",
-					m = 0;
-					for (var o in q.socketbonusstat) {
-                        if (LANG.traits[o]) {
-                            if (m++>0) {
-                                a += ", "
-							}
-							a += "+" + q.socketbonusstat[o] + " " + LANG.traits[o][2]
-						}
-					}
-					Listview.funcBox.createSocketedIcons(b, r, q.gems, q.matchSockets, a)
-				},
-				sortFunc: function (m, i, o) {
-                    return strcmp((m.gems ? m.gems.length: 0), (i.gems ? i.gems.length: 0))
-				}
-			})
-		}
-		g.push({
-            id: "score",
-			name: LANG.score,
-			width: "7%",
-			value: "score",
-			compute: function (i, m) {
-                var b = ce("a");
-				b.href = "javascript:;";
-				b.onclick = fi_updateScores.bind(this);
-				b.className = (i.gemGain > 0 ? "q2": "q1");
-				ae(b, ct(fi_convertScore(i.score, this._scoreMode, this._maxScore)));
-				ae(m, b)
-			}
-		})
-	}
-	if (l) {
-        g.push(Listview.extraCols.cost)
-	}
-	fi_nExtraCols = g.length;
-	return g
+
+function fi_init(type) {
+    fi_type = type;
+
+    var s = ge('fi_subcat');
+    if (g_initPath.lastIt && g_initPath.lastIt[3]) {
+        if (s) {
+            s.menu = g_initPath.lastIt[3];
+            s.menuappend = '&filter';
+            s.onmouseover = Menu.show;
+            s.onmouseout = Menu.hide;
+        }
+    }
+    else if (s) {
+        de(s.parentNode);
+    }
+
+    fi_initCriterion(ge('fi_criteria'), 'cr[]', type);
+    if (type == 'items') {
+        var foo = ge('fi_presets');
+        if (foo) {
+            fi_initPresets(ge('fi_presets'));
+            fi_initCriterion(ge('fi_weight'), 'wt[]', type);
+        }
+    }
+
+    var ma = ge('ma-0');
+    if (ma.getAttribute('checked')) {
+        ma.checked = true;
+    }
 }
-function fi_GetReputationCols(factions) {
-	var res = [];
-	for (var i = 0, len = factions.length; i < len; ++i) {
+
+function fi_initCriterion(_this, sname, type) {
+    var div = _this.firstChild;
+
+    var s = ce('select');
+    s.name = sname;
+    s.onchange = s.onkeyup = fi_criterionChange.bind(0, s);
+    ae(s, ce('option'));
+
+    var group = null;
+    var langref = LANG['fi' + type];
+
+    for (var i = 0, len = fi_filters[type].length; i < len; ++i) {
+        if (!(g_user.roles & U_GROUP_EMPLOYEE) && fi_filters[type][i].staffonly) {
+            continue;
+        }
+
+        var p = fi_filters[type][i];
+
+        if (!p.type) {
+            if (group && group.childNodes.length > 0) {
+                ae(s, group);
+            }
+            group = ce('optgroup');
+            group.label = (LANG.traits[p.name] ? LANG.traits[p.name] : langref[p.name]);
+        }
+        else if (sname != 'wt[]' || (p.type == 'num' && !p.noweights)) {
+            var o = ce('option');
+            o.value = p.id;
+
+            var txt = LANG.traits[p.name] ? LANG.traits[p.name][0] : langref[p.name];
+            if (p.indent) {
+                txt = '- ' + txt;
+            }
+
+            ae(o, ct(txt));
+            ae(group, o);
+        }
+    }
+    if (group && group.childNodes.length > 0) {
+        ae(s, group);
+    }
+
+    ae(div, s);
+}
+
+function fi_initPresets(_this) {
+    var
+        _class,
+        s = ce('select');
+
+    s.onchange = s.onkeyup = fi_presetClass.bind(0, s, 0);
+
+    ae(s, ce('option'));
+
+    if (g_user.weightscales != null && g_user.weightscales.length) {
+        var o = ce('option');
+        o.value = -1;
+        o._presets = { custom: {} };
+        ae(o, ct(LANG.ficustom));
+        ae(s, o);
+
+        for (var i = 0, len = g_user.weightscales.length; i < len; ++i) {
+            o._presets.custom[g_user.weightscales[i].id] = g_user.weightscales[i];
+        }
+    }
+
+    var temp = [];
+    for (var c in wt_presets) {
+        temp.push(c);
+    }
+
+    temp.sort(function (a, b) {
+        return strcmp(g_chr_classes[a], g_chr_classes[b]);
+    });
+
+    for (var i = 0, len = temp.length; i < len; ++i) {
+        var
+            c = temp[i],
+            o = ce('option');
+
+        o.value = c;
+        o._presets = wt_presets[c];
+        ae(o, ct(g_chr_classes[c]));
+        ae(s, o);
+    }
+
+    ae(_this, s);
+
+    var _ = ce('span');
+    _.style.display = 'none';
+
+    var s = ce('select');
+    s.id = 'sdkgnsdkn436';
+    s.onchange = s.onkeyup = fi_presetChange.bind(0, s);
+    ae(s, ce('option'));
+
+    ae(_, ct(' '));
+    ae(_, s);
+    ae(_this, _);
+    ae(_this, ct(String.fromCharCode(160, 160)));
+
+    var a = ce('a');
+    a.href = 'javascript:;';
+    a.id = 'fi_detail';
+    a.appendChild(ct(LANG.fishowdetails));
+    a.onclick = fi_presetDetails;
+    a.onmousedown = rf;
+    ae(_this, a);
+
+    if(g_user.id > 0) {
+        ae(_this, ct(String.fromCharCode(160, 160)));
+
+        a = ce('a');
+        a.href = 'javascript:;';
+        a.className = 'save-icon';
+        a.appendChild(ct(LANG.fisavescale));
+        a.onclick = fi_presetSave;
+        a.onmousedown = rf;
+        ae(_this, a);
+
+        ae(_this, ct(String.fromCharCode(160, 160)));
+
+        a = ce('a');
+        a.href = 'javascript:;';
+        a.id = 'fi_remscale';
+        a.className = 'clear-icon';
+        a.style.display = 'none';
+        a.appendChild(ct(LANG.fideletescale));
+        a.onclick = fi_presetDelete;
+        a.onmousedown = rf;
+        ae(_this, a);
+    }
+
+    var helpLink = ge('statweight-help');
+    if (helpLink) {
+        g_addTooltip(helpLink, LANG.tooltip_statweighting, 'q');
+    }
+}
+
+function fi_getExtraCols(wt, gm, pu) {
+    if (!wt.length) {
+        return;
+    }
+
+    var
+        res = [],
+        langref = LANG.fiitems;
+
+    var nColsMax = 10;
+    if (fi_weightsFactor) {
+        nColsMax--;
+    }
+    if (gm) {
+        nColsMax--;
+    }
+    if (pu) {
+        nColsMax--;
+    }
+
+    for (var i = 0; i < wt.length && i < nColsMax; ++i) {
+        var a = fi_Lookup(wt[i]);
+        if (a && a.name && a.type == 'num') {
+            var b = {
+                id:      a.name,
+                value:   a.name,
+                name:    (LANG.traits[a.name] ? LANG.traits[a.name][2] : langref[a.name]),
+                tooltip: (LANG.traits[a.name] ? LANG.traits[a.name][0] : langref[a.name]),
+                before:  (a.before ? a.before: 'source')
+            };
+
+            // Fix display of decimal columns
+            if (a.name.indexOf('dps') != -1 || a.name.indexOf('speed') != -1) {
+                b.compute = function (item, td) {
+                    return (item[a.name] || 0).toFixed(2);
+                }
+            }
+
+            res.push(b);
+        }
+    }
+
+    if (fi_weightsFactor) {
+        if (gm) {
+            res.push({
+                id: 'gems',
+                name: LANG.gems,
+                getValue: function (item) {
+                    return item.gems.length;
+                },
+                compute: function (item, td) {
+                    if (!item.nsockets || !item.gems) {
+                        return;
+                    }
+
+                    var sockets = [];
+                    for (var i = 0; i < item.nsockets; i++) {
+                        sockets.push(item['socket' + (i + 1)]);
+                    }
+
+                    var
+                        bonusText = '',
+                        i = 0;
+
+                    for (var s in item.socketbonusstat) {
+                        if (LANG.traits[s]) {
+                            if (i++ > 0) {
+                                bonusText += ', ';
+                            }
+                            bonusText += '+' + item.socketbonusstat[s] + ' ' + LANG.traits[s][2];
+                        }
+                    }
+
+                    Listview.funcBox.createSocketedIcons(sockets, td, item.gems, item.matchSockets, bonusText);
+                },
+                sortFunc: function (a, b, col) {
+                    return strcmp((a.gems ? a.gems.length: 0), (b.gems ? b.gems.length: 0));
+                }
+            });
+        }
+
+        res.push({
+            id: 'score',
+            name: LANG.score,
+            width: '7%',
+            value: 'score',
+            compute: function (item, td) {
+                var a = ce('a');
+                a.href = 'javascript:;';
+                a.onclick = fi_updateScores.bind(this);
+                a.className = (item.gemGain > 0 ? 'q2': 'q1');
+
+                ae(a, ct(fi_convertScore(item.score, this._scoreMode, this._maxScore)));
+
+                ae(td, a);
+            }
+        });
+    }
+
+    if (pu) {
+        res.push(Listview.extraCols.cost);
+    }
+
+    fi_nExtraCols = res.length;
+
+    return res;
+}
+
+function fi_getReputationCols(factions) {
+    var res = [];
+
+    for (var i = 0, len = factions.length; i < len; ++i) {
         var name = factions[i][1];
-		if (name.length > 15) {
-            var words = factions[i][1].split(" ");
-			for (var j = 0, len2 = words.length; j < len2; ++j) {
+
+        if (name.length > 15) {
+            var words = factions[i][1].split(' ');
+            for (var j = 0, len2 = words.length; j < len2; ++j) {
                 if (words[j].length > 3) {
-                    name = (words[j].length > 15 ? words[j].substring(0, 12) + "...": words[j]);
-                    break
-				}
-			}
-		}
-		var col = {	id: "faction-" + factions[i][0],
-			name: name,
-			tooltip: factions[i][1],
-			type: "num",
-			before: "category"
-		};
-		eval("col.getValue = function(quest) { return Listview.funcBox.getQuestReputation(" + factions[i][0] + ", quest) }");
-		eval("col.compute = function(quest, td) { return Listview.funcBox.getQuestReputation(" + factions[i][0] + ", quest) }");
-		eval("col.sortFunc = function(a, b, col) { var _ = Listview.funcBox.getQuestReputation; return strcmp(_(" + factions[i][0] + ", a), _(" + factions[i][0] + ", b)) }");
-		res.push(col)
-	}
-	return res
+                    name = (words[j].length > 15 ? words[j].substring(0, 12) + '...': words[j]);
+                    break;
+                }
+            }
+        }
+
+        var col = {
+            id:      'faction-' + factions[i][0],
+            name:    name,
+            tooltip: factions[i][1],
+            type:    'num',
+            before:  'category'
+        };
+
+        eval("col.getValue = function(quest) { return Listview.funcBox.getQuestReputation(" + factions[i][0] + ", quest) }");
+        eval("col.compute = function(quest, td) { return Listview.funcBox.getQuestReputation(" + factions[i][0] + ", quest) }");
+        eval("col.sortFunc = function(a, b, col) { var _ = Listview.funcBox.getQuestReputation; return strcmp(_(" + factions[i][0] + ", a), _(" + factions[i][0] + ", b)) }");
+
+        res.push(col);
+    }
+
+    return res;
+}
+
+function fi_setFilterParams(newParam, menuUrl) {
+    return fi_mergeFilterParams(null, newParam, menuUrl);
+}
+
+// This is used when propagating the active filter throughout the menu/breadcrumb.
+// If the item already had filter params, they will be combined.
+function fi_mergeFilterParams(oldParam, newParam, menuUrl) {
+    var oldJson = fi_filterParamToJson(oldParam);
+    var newJson = fi_filterParamToJson(newParam);
+
+    if(menuUrl && menuUrl.match('filter=')) { // Don't propegate child menu criteria
+        menuJson = fi_filterParamToJson(g_parseQueryString(menuUrl.replace(/^.*?filter=/, 'filter=')).filter);
+        newJson  = fi_removeMenuCriteria(newJson, menuJson);
+    }
+
+    // original code for reference
+    // var jsonParam = $.extend(newJson, oldJson);
+
+    for (i in oldJson) { // Existing filter params have priority over new ones
+        newJson[i] = oldJson[i];
+    }
+
+    return fi_filterJsonToParam(newJson);
+}
+
+function fi_removeMenuCriteria(json, menu) {
+    if(menu.cr && json.cr && json.crs && json.crv) {
+        var
+            parts   = menu.cr.split(':'),
+            filters = {
+                cr:  json.cr.split(':'),
+                crs: json.crs.split(':'),
+                crv: json.crv.split(':')
+            };
+
+/* original code for reference
+        $.each(parts, function(idx, part)
+        {
+            var pos = $.inArray(part, filters.cr);
+            if(pos != -1) {
+                filters.cr.splice(pos, 1);
+                filters.crs.splice(pos, 1);
+                filters.crv.splice(pos, 1);
+            }
+        });
+*/
+
+        array_walk(parts, function(part) {
+            var pos = in_array(filters.cr, part);
+            if (pos != -1) {
+                filters.cr.splice(pos, 1);
+                filters.crs.splice(pos, 1);
+                filters.crv.splice(pos, 1);
+            }
+        });
+
+        json.cr  = filters.cr.join(':');
+        json.crs = filters.crs.join(':');
+        json.crv = filters.crv.join(':');
+    }
+    else if (menu.fa && json.fa) {
+        delete json.fa;
+    }
+
+    return json;
+}
+
+function fi_filterParamToJson(filters) {
+    var result = {};
+
+    if(filters) {
+        var parts = filters.split(';');
+
+/* original code for reference
+        $.each(parts, function(idx, part)
+        {
+            g_splitQueryParam(part, result);
+        });
+*/
+        array_walk(parts, function(part){
+            g_splitQueryParam(part, result);
+        });
+    }
+
+    return result;
+}
+
+function fi_filterJsonToParam(json) {
+    var result = '';
+
+    var i = 0;
+
+/* original code for reference
+    $.each(json, function(name, value)
+    {
+        if(value !== '') {
+            if(i++ > 0) {
+                result += ';';
+            }
+            result += name + '=' + value;
+        }
+    });
+*/
+    array_walk(json, function(value, _, __, name) {
+        if(value !== '') {
+            if(i++ > 0) {
+                result += ';';
+            }
+            result += name + '=' + value;
+        }
+    });
+
+    return result;
 }

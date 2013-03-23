@@ -4461,6 +4461,24 @@ Listview.prototype = {
 			ae(m, b);
 			ae(m, ct(")"))
 		}
+
+        if (this._errors) {
+            var
+                sp = ce('small'),
+                b  = ce('b');
+
+            b.className = 'q10 report-icon';
+            if (m.innerHTML) {
+                b.style.marginLeft = '10px';
+            }
+
+            g_addTooltip(sp, LANG.lvnote_witherrors, 'q')
+
+            st(b, LANG.error);
+            ae(sp, b);
+            ae(m, sp);
+        }
+
 		if (!m.firstChild && this.mode != Listview.MODE_CHECKBOX) {
 			ae(m, ct(String.fromCharCode(160)))
 		}

@@ -232,7 +232,7 @@ if ($searchMask & 0x10)
     if ($data = $money->getListviewData())
     {
         while ($money->iterate())
-            $data[$money->id]['param1'] = strToLower($money->getField('iconString'));
+            $data[$money->id]['param1'] = '"'.strToLower($money->getField('iconString')).'"';
 
         $found['currency'] = array(
             'type'     => TYPE_CURRENCY,
@@ -249,7 +249,7 @@ if ($searchMask & 0x10)
 // 6 Itemsets
 if ($searchMask & 0x20)
 {
-    $sets = new ItemsetList(array($maxResults, ['name_loc'.User::$localeId, $query]));
+    $sets = new ItemsetList(array($maxResults, ['item1', 0, '!'], ['name_loc'.User::$localeId, $query]));   // remove empty sets from search
     $sets->addGlobalsToJscript($jsGlobals);
 
     if ($data = $sets->getListviewData())
@@ -274,19 +274,21 @@ if ($searchMask & 0x20)
 if ($searchMask & 0x40)
 {
     if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
-        $conditions = [['i.entry', array_keys($found['itemset']['pcsToSet'])]];
+        $conditions = [['i.entry', array_keys($found['itemset']['pcsToSet'])], 0];
     else if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEM)
         $conditions = [['i.class', [2, 4]], [User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], $AoWoWconf['sqlLimit']];
     else
         $conditions = [[User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], $maxResults];
 
     $items = new ItemList($conditions, @$found['itemset']['pcsToSet']);
+
     $items->addGlobalsToJscript($jsGlobals);
 
     if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
     {
         while ($items->iterate())
         {
+            $data[$items->id]['name']   = substr($data[$items->id]['name'], 1);
             $data[$items->id]['param1'] = '"'.$items->getField('icon').'"';
             $data[$items->id]['param2'] = $items->getField('Quality');
         }

@@ -503,7 +503,7 @@ class ItemList extends BaseType
         // required skill
         if ($this->curTpl['RequiredSkill'])
         {
-            $skillText = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillId = ?d', $this->curTpl['RequiredSkill']);
+            $skillText = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillID = ?d', $this->curTpl['RequiredSkill']);
             $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?skill='.$this->curTpl['RequiredSkill'].'">'.Util::localizedString($skillText, 'name').'</a>';
             if ($this->curTpl['RequiredSkillRank'])
                 $x .= ' ('.$this->curTpl['RequiredSkillRank'].')';
@@ -832,8 +832,9 @@ class ItemList extends BaseType
         {
             $eqpSplList = new SpellList(array(['id', $equipSpells]));
             $stats      = $eqpSplList->getStatGain();
-            foreach ($stats as $mId => $qty)
-                if ($qty > 0)
+
+            foreach ($stats as $stat)
+                foreach ($stat as $mId => $qty)
                     @$this->itemMods[$this->id][$mId] += $qty;
         }
 

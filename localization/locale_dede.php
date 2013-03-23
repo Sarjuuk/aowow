@@ -18,7 +18,6 @@ $lang = array(
         'profiles'      => "Deine Charaktere",
         'links'         => "Links",
         'pageNotFound'  => "Diese|Dieser|Dieses %s existiert nicht.",        // todo: dämliche Fälle...
-        'both'          => "Beide",
         'gender'        => "Geschlecht",
         'sex'           => [null, 'Mann', 'Frau'],
         'quickFacts'    => "Kurzübersicht",
@@ -50,61 +49,20 @@ $lang = array(
         // pwd_err = Gib bitte dein Passwort ein
         // signin_msg = Gib bitte deinen Accountnamen ein
         // c_pwd = Passwort wiederholen
-        // create_filter = Filter erstellen
-        // loading = Lädt ...
-        // soldby = Verkauft von
-        // droppedby = Gedroppt von
-        // containedinobject = Enthalten in
-        // containedinitem = Enthalten in Item
-        // contain = Enthält
-        // objectiveof = Ziel von
-        // rewardof = Belohnung von
         // facts = Übersicht
-        // pickpocketingloot = Gestohlen von
-        // prospectedfrom = Sondiert aus
-        // canbeplacedin = Kann abgelegt werden in
-        // minedfromobject = Abgebaut aus
-        // gatheredfromobject = Gesammelt von
-        // items = Gegenstände
-        // objects = Objekte
-        // quests = Quests
-        // npcs = NPCs
-        // drop = Drop
-        // starts = Startet
-        // ends = Beendet
-        // skinning = Kürschnerei
-        // pickpocketing = Taschendiebstahl
-        // sells = Verkauft
-        // reputationwith = Ruf mit der Fraktion
-        // experience = Erfahrung
-        // uponcompletionofthisquestyouwillgain = Bei Abschluss dieser Quest erhaltet Ihr
-        // reagentfor = Reagenz für
-        // skinnedfrom = Gekürschnert von
-        // disenchanting = Entzaubern
         // This_Object_cant_be_found = Der Standort dieses Objekts ist nicht bekannt.
-        // itemsets = Sets
-        // Spells = Zauber
-        // Items = Gegenstände
-        // Quests = Quests
-        // Factions = Fraktionen
-        // Item_Sets = Sets
-        // Compare = Gegenstandsvergleichswerkzeug
-        // NPCs = NPCs
-        // Objects = Objekte
-        // My_account = Mein Account
-        // Comments = Kommentare
-        // Latest_Comments = Neuste Kommentare
-        // day = Tag.
-        // hr = Std.
-        // min = Min.
-        // sec = Sek.
-        // Respawn = Respawn
-        // Class = Klasse
-        // class = Klasse
-        // race = Volk
-        // Race = Volk
-        // Races = Völker
 
+        // filter
+        'extSearch'     => "Erweiterte Suche",
+        'addFilter'     => "Weiteren Filter hinzufügen",
+        'match'         => "Verwendete Filter",
+        'allFilter'     => "Alle Filters",
+        'oneFilter'     => "Mindestens einer",
+        'applyFilter'   => "Filter anwenden",
+        'resetForm'     => "Formular zurücksetzen",
+        'refineSearch'  => "Tipp: Präzisiere deine Suche mit Durchsuchen einer <a href=\"javascript:;\" id=\"fi_subcat\">Unterkategorie</a>.",
+
+        // infobox
         'disabled'      => "Deaktiviert",
         'disabledHint'  => "Kann nicht erhalten oder abgeschlossen werden.",
         'serverside'    => "Serverseitig",
@@ -117,10 +75,10 @@ $lang = array(
         'tryAgain'      => "Bitte versucht es mit anderen Suchbegriffen oder überprüft deren Schreibweise.",
     ),
     'game' => array(
-        'alliance'      => "Allianz",
-        'horde'         => "Horde",
         'class'         => "Klasse",
         'classes'       => "Klassen",
+        'currency'      => "Währung",
+        'currencies'    => "Währungen",
         'races'         => "Völker",
         'title'         => "Titel",
         'titles'        => "Titel",
@@ -128,15 +86,18 @@ $lang = array(
         'event'         => "Weltereigniss",
         'events'        => "Weltereignisse",
         'cooldown'      => "%s Abklingzeit",
+        'itemset'       => "Ausrüstungsset",
+        'itemsets'      => "Ausrüstungssets",
         'requires'      => "Benötigt",
         'reqLevel'      => "Benötigt Stufe %s",
         'reqLevelHlm'   => "Benötigt Stufe %s",
         'valueDelim'    => " - ",                           // " bis "
+        'si'            => array(-2 => "Nur für Horde", -1 => "Nur für Allianz", null, "Allianz", "Horde", "Beide"),
         'resistances'   => array(null, 'Heiligwiderstand', 'Feuerwiderstand', 'Naturwiderstand', 'Frostwiderstand', 'Schattenwiderstand', 'Arkanwiderstand'),
         'sc'            => array("Körperlich", "Heilig", "Feuer", "Natur", "Frost", "Schatten", "Arkan"),
         'di'            => array(null, "Magie", "Fluch", "Krankheit", "Gift", "Verstohlenheit", "Unsichtbarkeit", null, null, "Wut"),
-        'cl'            => array("UNK_CL0", "Krieger", "Paladin", "Jäger", "Schurke", "Priester", "Todesritter", "Schamane", "Magier", "Hexenmeister", 'UNK_CL10', "Druide"),
-        'ra'            => array(-2 => "Horde", -1 => "Allianz", "Beide", "Mensch", "Orc", "Zwerg", "Nachtelf", "Untoter", "Taure", "Gnom", "Troll", 'UNK_RA9', "Blutelf", "Draenei"),
+        'cl'            => array(null, "Krieger", "Paladin", "Jäger", "Schurke", "Priester", "Todesritter", "Schamane", "Magier", "Hexenmeister", null, "Druide"),
+        'ra'            => array(-2 => "Horde", -1 => "Allianz", "Beide", "Mensch", "Orc", "Zwerg", "Nachtelf", "Untoter", "Taure", "Gnom", "Troll", null, "Blutelf", "Draenei"),
         'rep'           => array("Hasserfüllt", "Feindselig", "Unfreundlich", "Neutral", "Freundlich", "Wohlwollend", "Respektvoll", "Ehrfürchtig"),
         'st'            => array(
             null,               "Katzengestalt",                "Baum des Lebens",              "Reisegestalt",                 "Wassergestalt",
@@ -154,18 +115,6 @@ $lang = array(
             "Ritter der Allianz / Klinge der Horde",    "Feldkomandant / Feldherr",             "Rittmeister / Sturmreiter",
             "Marschall / Kriegsherr",                   "Feldmarschall / Kriegsfürst",          "Großmarschall / Oberster Kriegsfürst"
         ),
-    ),
-    'filter' => array(
-        'extSearch'     => "Erweiterte Suche",
-        'onlyAlliance'  => "Nur für Allianz",
-        'onlyHorde'     => "Nur für Horde",
-        'addFilter'     => "Weiteren Filter hinzufügen",
-        'match'         => "Verwendete Filter",
-        'allFilter'     => "Alle Filters",
-        'oneFilter'     => "Mindestens einer",
-        'applyFilter'   => "Filter anwenden",
-        'resetForm'     => "Formular zurücksetzen",
-        'refineSearch'  => "Tipp: Präzisiere deine Suche mit Durchsuchen einer <a href=\"javascript:;\" id=\"fi_subcat\">Unterkategorie</a>.",
     ),
     'error' => array(
         'errNotFound'   => "Seite nicht gefunden",
@@ -264,6 +213,27 @@ $lang = array(
             'Allgemein',      'Spieler gegen Spieler',    'Ruf',       'Dungeon & Schlachtzug',     'Quests',       'Berufe',      'Weltereignisse'
         )
     ),
+    'currency' => array(
+        'cat'           => array(
+            1 => "Verschiedenes", 2 => "Spieler gegen Spieler", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon und Schlachtzug", 23 => "Burning Crusade", 41 => "Test", 3 => "Unbenutzt"
+        )
+    ),
+    'itemset' => array(
+        'notes'         => array(
+            null,                                   "Dungeon-Set 1",                            "Dungeon-Set 2",                            "Tier 1 Raid-Set",
+            "Tier 2 Raid-Set",                      "Tier 3 Raid-Set",                          "Level 60 PvP-Set (Rar)",                   "Level 60 PvP-Set (Rar,  alt)",
+            "Level 60 PvP-Set (Episch)",            "Set der Ruinen von Ahn'Qiraj",             "Set des Tempels von Ahn'Qiraj",            "Set von Zul'Gurub",
+            "Tier 4 Raid-Set",                      "Tier 5 Raid-Set",                          "Dungeon-Set 3",                            "Set des Arathibeckens",
+            "Level 70 PvP-Set (Rar)",               "Arena-Set Saison 1",                       "Tier 6 Raid-Set",                          "Arena-Set Saison 2",
+            "Arena-Set Saison 3",                   "Level 70 PvP-Set 2 (Rar)",                 "Arena-Set Saison 4",                       "Tier 7 Raid-Set",
+            "Arena-Set Saison 5",                   "Tier 8 Raid-Set",                          "Arena-Set Saison 6",                       "Tier 9 Raid-Set",
+            "Arena-Set Saison 7",                   "Tier 10 Raid-Set",                     "Arena-Set Saison 8"
+        ),
+        'types'         => array(
+            null,               "Stoff",                "Leder",                "Schwere R\u00fcstung",     "Platte",                   "Dolch",                "Ring",
+            "Faustwaffe",       "Einhandaxt",           "Einhandstreitkolben",  "Einhandschwert",           "Schmuck",                  "Amulett"
+        )
+    ),
     'spell' => array(
         'remaining'     => "Noch %s",
         'untilCanceled' => "bis Abbruch",
@@ -316,6 +286,10 @@ $lang = array(
         'socketBonus'   => "Sockelbonus",
         'socket'        => array (
             "Metasockel",           "Roter Sockel",     "Gelber Sockel",        "Blauer Sockel",          -1 => "Prismatischer Sockel"
+        ),
+        'quality'       => array (
+            "Schlecht",             "Verbreitet",       "Selten",               "Rar",
+            "Episch",               "Legendär",             "Artefakt",         "Erbstücke",
         ),
         'trigger'       => array (
             "Benutzen: ",           "Anlegen: ",        "Chance bei Treffer: ", null,                           null,

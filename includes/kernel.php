@@ -20,7 +20,7 @@ require 'includes/class.database.php';
 
 // autoload any List-Classes
 spl_autoload_register(function ($class) {
-    if (strpos($class, 'List'))
+    if (strpos($class, 'List') && !strpos($class, 'Filter'))
         require 'includes/class.'.strtr($class, ['List' => '']).'.php';
 });
 

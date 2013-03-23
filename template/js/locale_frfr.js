@@ -1125,52 +1125,55 @@ var g_item_subsubclasses = {
         }
     }
 };
+
 var g_itemset_types = {
-	1:"Tissu",
-	2:"Cuir",
-	3:"Mailles",
-	4:"Plaques",
-	5:"Dague",
-	6:"Anneau",
-	7:"Arme de pugilat",
-	8:"Hache à une main",
-	9:"Masse à une main",
-	10:"Épée à une main",
-	11:"Bijou",
-	12:"Amulette"
+	1:  "Tissu",
+	2:  "Cuir",
+	3:  "Mailles",
+	4:  "Plaques",
+	5:  "Dague",
+	6:  "Anneau",
+	7:  "Arme de pugilat",
+	8:  "Hache à une main",
+	9:  "Masse à une main",
+	10: "Épée à une main",
+	11: "Bijou",
+	12: "Amulette"
 };
+
 var g_itemset_notes = {
-	1:"Ensemble de donjon 1",
-	2:"Ensemble de donjon 2",
-	14:"Ensemble de donjon 3",
-	3:"Ensemble de raid palier 1",
-	4:"Ensemble de raid palier 2",
-	5:"Ensemble de raid palier 3",
-	12:"Ensemble de raid palier 4",
-	13:"Ensemble de raid palier 5",
-	18:"Ensemble de raid palier 6",
-	23:"Ensemble de raid palier 7",
-	25:"Ensemble de raid palier 8",
-	27:"Ensemble de raid palier 9",
-	29:"Ensemble de raid palier 10",
-	6:"Ensemble JcJ niveau 60 supérieur",
-	7:"Ensemble JcJ niveau 60 supérieur (désuet)",
-	8:"Ensemble JcJ niveau 60 épique",
-	16:"Ensemble JcJ niveau 70 supérieur",
-	21:"Ensemble JcJ niveau 70 supérieur 2",
-	17:"Ensemble d'arène saison 1",
-	19:"Ensemble d'arène saison 2",
-	20:"Ensemble d'arène saison 3",
-	22:"Ensemble d'arène saison 4",
-	24:"Ensemble d'arène saison 5",
-	26:"Ensemble d'arène saison 6",
-	28:"Ensemble d'arène saison 7",
-	30:"Set d'Arena de la Saison 8",
-	15:"Ensemble du bassin d'Arathi",
-	9:"Ensemble des ruines d'Ahn'Qiraj",
-	10:"Ensemble d'Ahn'Qiraj",
-	11:"Ensemble de Zul'Gurub"
+	1:  "Ensemble de donjon 1",
+	2:  "Ensemble de donjon 2",
+	14: "Ensemble de donjon 3",
+	3:  "Ensemble de raid palier 1",
+	4:  "Ensemble de raid palier 2",
+	5:  "Ensemble de raid palier 3",
+	12: "Ensemble de raid palier 4",
+	13: "Ensemble de raid palier 5",
+	18: "Ensemble de raid palier 6",
+	23: "Ensemble de raid palier 7",
+	25: "Ensemble de raid palier 8",
+	27: "Ensemble de raid palier 9",
+	29: "Ensemble de raid palier 10",
+	6:  "Ensemble JcJ niveau 60 supérieur",
+	7:  "Ensemble JcJ niveau 60 supérieur (désuet)",
+	8:  "Ensemble JcJ niveau 60 épique",
+	16: "Ensemble JcJ niveau 70 supérieur",
+	21: "Ensemble JcJ niveau 70 supérieur 2",
+	17: "Ensemble d'arène saison 1",
+	19: "Ensemble d'arène saison 2",
+	20: "Ensemble d'arène saison 3",
+	22: "Ensemble d'arène saison 4",
+	24: "Ensemble d'arène saison 5",
+	26: "Ensemble d'arène saison 6",
+	28: "Ensemble d'arène saison 7",
+	30: "Set d'Arena de la Saison 8",
+	15: "Ensemble du bassin d'Arathi",
+	9:  "Ensemble des ruines d'Ahn'Qiraj",
+	10: "Ensemble d'Ahn'Qiraj",
+	11: "Ensemble de Zul'Gurub"
 };
+
 var g_npc_classifications = {
 	0:"Standard",
 	1:"Élite",
@@ -2076,7 +2079,14 @@ var g_socket_names = {
 	14:"Châsse prismatique"
 };
 var LANG = {
-	and:" et ",comma:", ",ellipsis:"…",dash:" – ",hyphen:" - ",colon:" : ",qty:" ($1)",
+	and:      " et ",
+	comma:    ", ",
+	ellipsis: "…",
+	dash:     " – ",
+	hyphen:   " - ",
+	colon:    " : ",
+	qty:      " ($1)",
+	error:    "Erreur",
 
 	date:        "Date",
 	date_colon:  "Date : ",
@@ -2119,9 +2129,10 @@ var LANG = {
 
 	lvcomment_add:"Ajouter votre commentaire",lvcomment_sort:"Trier par : ",lvcomment_sortdate:"Date",lvcomment_sortrating:"Le plus haut noté",lvcomment_patchfilter:"Filtrer par mise-à-jour : ",lvcomment_by:"Par ",lvcomment_patch:" (Mise à jour $1)",lvcomment_show:"Afficher le commentaire",lvcomment_hide:"Cacher le commentaire",lvcomment_rating:"Note : ",lvcomment_lastedit:"Dernière modification par ",lvcomment_nedits:"modifié $1 fois",lvcomment_edit:"Édition",lvcomment_delete:"Supprimer",lvcomment_detach:"Détacher",lvcomment_reply:"Répondre",lvcomment_report:"Rapporter",lvcomment_reported:"Rapporté !",lvcomment_deleted:" (Supprimé)",lvcomment_purged:" (Effacé)",lvdrop_outof:"sur $1",lvitem_dd:" ($1$2)",lvitem_normal:"N",lvitem_heroic:"H",lvitem_raid10:"10",lvitem_raid25:"25",lvitem_heroicitem:"Héroïque",lvitem_vendorin:"Marchand dans ",lvitem_reqlevel:"Req. ",lvnpc_alliance:"A",lvnpc_horde:"H",premium_title:"Partisan Wowhead",lvquest_daily:"$1 journalière",lvquest_weekly:"$1 hebdomadaire",lvquest_pickone:"Choisir une : ",lvquest_alsoget:"Obtenez aussi : ",lvquest_xp:"$1 PX",lvquest_removed:"Supprimé",lvzone_xman:"$1-joueur",lvzone_xvx:"$1c$2",lvpet_exotic:"Exotique",lvpage_of:" de ",lvpage_first:" Première",lvpage_previous:" Préc.",lvpage_next:"Suiv. ",lvpage_last:"Dernière ",lvscreenshot_submit:"Envoyer une capture d'écran",lvscreenshot_from:"Par ",lvscreenshot_hires:"Voir",lvscreenshot_hires2:" une version plus détaillée ($1x$2)",lvvideo_suggest:"Suggérez un vidéo",lvvideo_from:"Par ",lvnodata:"Il n'y a aucune donnée à afficher.",lvnodata2:"Aucun résultat.",lvnodata_co1:"Aucun commentaire n'a été posté jusqu'à maintenant.",lvnodata_co2:"Soyez le premier à en <a>ajouter un</a> sur cette page !",lvnodata_co3:"Veuillez vous <a>connecter</a> pour ajouter votre commentaire, ou <a>enregistrez-vous</a> si vous n'avez pas encore de compte.",lvnodata_ss1:"Aucune capture d'écran n'a été envoyée jusqu'à maintenant.",lvnodata_ss2:"Soyez le premier à en <a>envoyer une</a> pour cette page !",lvnodata_ss3:"Veuillez vous <a>connecter</a> pour envoyer une capture, ou <a>enregistrez-vous</a> si vous n'avez pas encore de compte.",lvnodata_vi1:"Aucun vidéos n'a encore été soumis.",lvnodata_vi2:"Soyez le premier <a>suggérer un vidéo</a> pour cette page!",lvnodata_vi3:"Veuillez vous <a>connecter</a> pour suggérer un vidéo ou <a>enregistrez vous</a> si vous n'avez pas de compte.",
 
-	lvnote_tryfiltering: "Essayez de filtrer vos résultats",
+	lvnote_tryfiltering: "Essayez de <a>filtrer</a> vos résultats",
 	lvnote_trynarrowing: "Essayez de restreindre votre recherche",
 	lvnote_upgradesfor:  'En train de trouver des améliorations pour <a href="?item=$1" class="q$2"><b>$3</b></a>.',
+	lvnote_witherrors:   "Certains filtres dans votre recherche étaient invalides et on été ignorés.",
 
 	lvnote_itemsfound:        "$1 objets trouvés ($2 affichés)",
 	lvnote_itemsetsfound:     "$1 ensembles d'objets trouvés ($2 affichés)",
@@ -2357,22 +2368,50 @@ var LANG = {
 	tab_world:               "Monde",
 	tab_zones:               "Zones",
 
-	menu_browse:"Consulter",mapper_tipzoom:"Astuce : Cliquer pour agrandir la carte",mapper_tippin:"Astuce : Cliquer sur la carte pour ajouter/enlever des marqueurs",mapper_hidepins:"Cacher les marqueurs",mapper_showpins:"Montrer les marqueurs",mapper_floor:"Changer de niveau...",mapper_relevantlocs:"Emplacements pertinents",mapper_entiretyinzone:"L'entièreté de cette quête se déroule dans $$",mapper_happensin:"Une partie de cette quête se déroule dans $$.",mapper_objectives:{ox:"Cette quête a des objectifs dans $$.",sx:"Cette quête débute dans $$.",ex:"Cette quête finie dans $$.",sex:"Cette quête débute et finie dans $$.",osx:"Cette quête a des objectifs et débute dans $$.",oex:"Cette quête a des objectifs et fini dans $$.",osx_ey:"Cette quête a des objectifs et débute dans $$ fini dans $$.",oex_sy:"Cette quête a des objectifs et fini dans $$ et débute dans $$.",sx_ey:"Cette quête débute dans $$ et finie dans $$.",ox_sy:"Cette quête débute dans $$, a des objectifs dans $$.",ox_ey:"Cette quête a des objectifs dans $$ et fini dans $$.",ox_sey:"Cette quête débute et fini dans $$ et a des objectifs dans $$.",ox_sy_ez:"Cette quête débute dans $$, a des objectifs dans $$ et fini dans $$."},mapper_startsquest:"Débute la quête",mapper_endsquest:"Termine la quête",mapper_requiredquest:"Objectif de la quête",mapper_sourcestart:"Source du début de la quête: ",mapper_sourceend:"Source de la fin de la quête: ",mapper_sourcereq:"Source de l'objectif d'une quête: ",mapper_clicktoview:"Cliquez pour voir ce $1",showonmap:"Afficher sur la carte...",som_nothing:"Rien",som_questgivers:"Donneurs de quêtes",som_viewnpc:"Cliquez pour voir ce PNJ",som_viewobj:"Cliquez pour voir cette entité",som_view:"Cliquez pour voir...",som_startsquest:"Débute la quête suivante :",som_startsquestpl:"Débute les quêtes suivantes :",som_legend:"Légende: ",som_legend_alliance:"Alliance",som_legend_horde:"Horde",som_legend_neutral:"Neutre",som:{all:"Tous",alliance:"Alliance",horde:"Horde",quest:"Donneur de quêtes",alliancequests:"Donneur de quêtes",hordequests:"Donneur de quêtes",repair:"Réparateurs",rare:"PNJs rares",auctioneer:"Actionnaires",banker:"Banquiers",battlemaster:"Maitre de bataille",innkeeper:"Aubergiste",guildmaster:"Maitre de guilde",stablemaster:"Maitre d'écurie",flightmaster:"Maitres de vol",trainer:"Entraineurs",vendor:"Marchands",book:"Livres",herb:"Herbes",vein:"Filons de minerai",spirithealer:"Esprits soigneurs"},markup_b:"Gras",markup_i:"Italique",markup_u:"Souligné",markup_s:"Barré",markup_small:"Petits caractères",markup_url:"Lien",markup_quote:"Citation",markup_code:"Bout de code",markup_ul:"Liste à puces",markup_ol:"Liste numérotée",markup_li:"Élément de liste",markup_img:"Image",markup_said:"a dit : ",markup_toc:"Table des matières",ct_dialog_captcha:"Veuillez entrer le code ci-dessus : ",ct_dialog_contactwowhead:"Contactez Wowhead",ct_dialog_description:"Description",ct_dialog_desc_caption:"Soyez aussi spécifique que possible.",ct_dialog_email:"Courriel : ",ct_dialog_email_caption:"Seulement si vous voulez être contacté.",ct_dialog_optional:"Optionnel",ct_dialog_reason:"Raison: ",ct_dialog_relatedurl:"URL relié: ",ct_dialog_currenturl:"URL actuel:",ct_dialog_report:"Rapporter",ct_dialog_reportchar:"Signalez le personnage",ct_dialog_reportcomment:"Signalez le commentaire de $1",ct_dialog_reportpost:"Signalez le message de $1",ct_dialog_reportscreen:"Signalez la capture d'écran de $1",ct_dialog_reportvideo:"Rapportez le vidéo de $1",ct_dialog_reporttopic:"Signalez le sujet de $1",ct_dialog_thanks:"Votre message à été reçu. Merci de nous avoir contacté!",ct_dialog_thanks_user:"Votre message à été reçu, $1. Merci de nous avoir contacté!",ct_dialog_error_captcha:"Le CAPTCHA que vous avez écrit n'est pas valide. Veuillez réessayer.",ct_dialog_error_desc:"Veuillez fournir une description complète, mais pas trop longue.",ct_dialog_error_email:"Veuillez entrer une adresse e-mail valide.",ct_dialog_error_emaillen:"Veuillez entrer une adresse e-mail avec moins de 100 caractères.",ct_dialog_error_reason:"Veuillez choisir une raison pour nous contacter.",ct_dialog_error_relatedurl:"Veuillez fournir un URL avec moins de 250 caractères.",ct_dialog_error_invalidurl:"Veuillez entrer un URL valide.",cn_fieldrequired:"$1 est requis.",cn_fieldinvalid:"$1 doit être valide.",cn_confirm:"Vérifiez que vous avez entré les bonnes informations, ensuite cliquez sur OK.",cn_entrylogin:'Veuillez vous <a href="?account=signin">connecter</a> pour participer au concours ou <a href="?account=signup">inscrivez-vous</a> si vous n\'en avez pas.',cn_entryerror:"Une erreur est survenue. Veuillez réessayer.",cn_entrywhen:"Vous vous êtes inscrit au concours le <b>$1</b>.",cn_entrywhen2:"Vous tees déjà inscrit à ce concours.",cn_entrysuccess:"Vous venez de vous inscrire au concours. Bonne chance!",cn_entryended:"Ce concours est terminé.",cn_entryupcoming:"Ce concours n'a pas encore débuté. Restez à l'affut!",cn_entryregion:"Vous ne pouvez participer à ce concours dans votre région.",cn_mustbe18:"Vouz devez être agé de 18 ans ou plus pour participer au concours.",cn_winnerslist:"Liste des gagnants",cn_updated:"Actualisé",ct_resp_error1:"Le CAPTCHA que vous avez écrit n'est pas valide. Veuillez réessayer.",ct_resp_error2:"Veuillez fournir une description complète, mais pas trop longue.",ct_resp_error3:"Veuillez choisir une raison pour nous contacter.",ct_resp_error7:"Vous avez déjà rapporté ceci.",compose_mode:"Mode : ",compose_edit:"Édition",compose_preview:"Aperçu",compose_livepreview:"Aperçu rapide",compose_save:"Sauver",compose_cancel:"Annuler",compose_limit:"Jusqu'à $1 caractères",compose_limit2:"Jusqu'à $1 caractères et/ou $2 lignes",compose_remaining:"$1 caractères restants.",user_nodescription:"Cet utilisateur n'a pas encore composé une description publique.",user_nodescription2:"Vous n'en avez pas composée une encore.",user_composeone:"En composer une !",user_editdescription:"Édition",myaccount_passmatch:"Correspondent",myaccount_passdontmatch:"Ne correspondent pas",myaccount_purged:"Purgé",myaccount_purgefailed:"La purge a échouée :(",myaccount_purgesuccess:"Les données d'annonce ont été purgées correctement!",types:{1:["PNJ","PNJ","PNJs","PNJs"],
-	2:["Entité","entité","Entités","entités"],
-	3:["Objet","objet","Objets","objets"],
-	4:["Ensemble d'objets","ensemble d'objets","Ensembles d'objets","ensembles d'objets"],
-	5:["Quête","quête","Quêtes","quêtes"],
-	6:["Sort","sort","Sorts","sorts"],
-	7:["Zone","zone","Zones","zones"],
-	8:["Faction","faction","Factions","factions"],
-	9:["Familier","familier","Familiers","familiers"],
-	10:["Haut fait","haut fait","Hauts faits","hauts faits"],
-	11:["Titre","titre","Titres","titres"],
-	12:["Événement mondial","évènement mondial","Évènements mondiaux","évènements mondiaux"],
-	13:["Classe","classe","Classes","classes"],
-	14:["Race","race","Races","races"],
-	15:["Compétence","compétence","Compétences","compétences"],
-	16:["Statistique","statistique","Statistiques","statistiques"]},timeunitssg:["année","mois","semaine","jour","heure","minute","seconde"],timeunitspl:["années","mois","semaines","jours","heures","minutes","secondes"],timeunitsab:["an","mo","sem","jour","h","min","s"],presets:{pve:"JcE",pvp:"JcJ",afflic:"Affliction",arcane:"Arcanes",arms:"Armes (DPS)",assas:"Assassinat",balance:"Equilibre (DPS)",beast:"Maîtrise des bêtes",blooddps:"Sang (DPS)",bloodtank:"Sang (Tank)",combat:"Combat",demo:"Démonologie",destro:"Destruction",disc:"Discipline (Soins)",elem:"Combat élémentaire (DPS)",enhance:"Amélioration (DPS)",feraldps:"Combat farouche (DPS)",feraltank:"Combat farouche (Tank)",fire:"Feu",frost:"Givre",frostdps:"Givre (DPS)",frosttank:"Givre (Tank)",fury:"Fureur (DPS)",generic:"Générique",holy:"Sacré (Soins)",marks:"Précision",prot:"Protection (Tank)",resto:"Restauration (Soins)",retrib:"Vindicte (DPS)",shadow:"Magie de l'ombre (DPS)",subtle:"Finesse",surv:"Survie",unholydps:"Impie (DPS)"},traits:{agi:["Agilité","Agi","Agi"],arcres:["Résistance aux Arcanes","Rés. arcanes","RArc"],arcsplpwr:["Puissance des sorts des arcanes","Puiss. arcanes","PArc"],armor:["Armure","Armure","Armure"],armorbonus:["Armure supplémentaire","Armure suppl.","ArmSup"],armorpenrtng:["Score de pénétration d'armure","Pén. d'armure","Pén"],atkpwr:["Puissance d'attaque","PA","PA"],avgbuyout:["Prix d'achat immédiat moyen","Achat immédiat","HV"],avgmoney:["Argent contenu en moyenne","Argent","Argent"],block:["Valeur de blocage","Valeur de Blocage","VaBlc"],blockrtng:["Score de blocage","Bloc","Bloc"],buyprice:["Prix d'achat","Achat","Achat"],cooldown:["Temps de recharge (secondes)","Recharge","Rech"],critstrkrtng:["Score de coup critique","Crit","Crit"],defrtng:["Score de défense","Défense","Déf"],dmg:["Dégâts d'arme","Dégâts","Dégâts"],dmgmax1:["Dégâts maximaux","Dégâts max","Max"],dmgmin1:["Dégâts minimaux","Dégâts min","Min"],dodgertng:["Score d'esquive","Esqui","Esqui"],dps:["Dégâts par seconde","DPS","DPS"],dura:["Durabilité","Durabilité","Dura"],exprtng:["Score d'expertise","Expertise","Exp"],feratkpwr:["Puissance d'attaque en combat farouche","PA farouche","PAF"],firres:["Résistance au Feu","Rés. feu","RFeu"],firsplpwr:["Puissance des sorts de feu","Puiss. feu","PFeu"],frores:["Résistance au Givre","Rés. givre","RGiv"],frosplpwr:["Puissance des sorts de givre","Puiss. givre","PGiv"],hastertng:["Score de hâte","Hâte","Hâte"],health:["Vie","Vie","Vie"],healthrgn:["Régénération de vie","VP5","VP5"],hitrtng:["Score de toucher","Touch","Touch"],holres:["Résistance au Sacré","Rés. sacré","RSac"],holsplpwr:["Puissance des sorts sacrés","Puiss. sacrés","PSac"],"int":["Intelligence","Int","Int"],level:["Niveau","Niveau","Niv"],mana:["Mana","Mana","Mana"],manargn:["Régénération de mana","MP5","MP5"],masteryrtng:["Score de Maitrise","Maitrise","Maitrise"],mleatkpwr:["Puissance d'attaque en mêlée","PA en mêlée","PA"],mlecritstrkrtng:["Score de coup critique en mêlée","Crit en mêlée","Crit"],mledmgmax:["Dégâts maximaux en mêlée","Dégâts max mêlée","Max"],mledmgmin:["Dégâts minimaux en mêlée","Dégâts min mêlée","Min"],mledps:["DPS mêlée","DPS mêlée","DPS"],mlehastertng:["Score de hâte en mêlée","Hâte en mêlée","Hâte"],mlehitrtng:["Score de toucher en mêlée","Toucher en mêlée","Touch"],mlespeed:["Vitesse mêlée","Vitesse de corps à corps","Vitesse"],natres:["Résistance à la Nature","Rés. nature","RNat"],natsplpwr:["Puissance des sorts de la nature","Puiss. nature","PNat"],nsockets:["Nombre de châsses","Châsses","Châsse"],parryrtng:["Score de parade","Parade","Parade"],reqarenartng:["Requiert une cote d'arène personnelle et en équipe","Score requis","Score"],reqlevel:["Niveau requis","Niveau requis","Niveau"],reqskillrank:["Niveau de compétence requis","Compétence requise","Compétence"],resirtng:["Score de résilience","Résilience","Résil"],rgdatkpwr:["Puissance d'attaque à distance","PA à distance","PAD"],rgdcritstrkrtng:["Score de coup critique à distance","Crit à distance","Crit"],rgddmgmax:["Dégâts maximaux à distance","Dégâts max distance","Max"],rgddmgmin:["Dégâts minimaux à distance","Dégâts min distance","Min"],rgddps:["DPS à distance","DPS à distance","DPS"],rgdhastertng:["Score de hâte à distance","Hâte à distance","Hâte"],rgdhitrtng:["Score de toucher à distance","Toucher à distance","Touch"],rgdspeed:["Vitesse distance","Vitesse d'attaque à distance","Vitesse"],sellprice:["Prix de vente","Vente","Vente"],sepbasestats:"Caractéristiques",sepdefensivestats:"Caractéristiques défensives",sepgeneral:"Général",sepindividualstats:"Caractéristiques individuelles",sepmisc:"Divers",sepoffensivestats:"Caractéristiques offensives",sepresistances:"Résistances",sepweaponstats:"Caractéristiques d'armes",shares:["Résistance à l'Ombre","Rés. ombre","ROmb"],shasplpwr:["Puissance des sorts de l'ombre","Puiss. ombre","POmb"],speed:["Vitesse","Vitesse","Vitesse"],spi:["Esprit","Esp","Esp"],splcritstrkrtng:["Score de coup critique des sorts","Crit des sorts","Crit"],spldmg:["Dégâts infligés par les sorts","Dégâts sorts","Dégâts"],splheal:["Soins prodigués par les sorts","Soins","Soins"],splpwr:["Puiss. sorts","Puissance des sorts","PS"],splhastertng:["Score de hâte des sorts","Hâte des sorts","Hâte"],splhitrtng:["Score de toucher des sorts","Toucher des sorts","Touch"],splpen:["Pénétration des sorts","Pén. des sorts","Pén"],sta:["Endurance","End","End"],str:["Force","For","For"]},fishow:"Créer un filtre",fihide:"Masquer les options de filtrage",fiany:"N'importe quelle",finone:"Aucun",firemove:"enlever",ficlear:"effacer",fishowdetails:"montrer les détails",fihidedetails:"cacher les détails",message_fillsomecriteria:"Vous devez utiliser au moins un critère.",tooltip_jconlygems:"Si coché, les gemmes pour joailler, <br />\nvont aussi être utilisé pour déterminer les meilleurs<br />\ngemmes possible pour le score pondéré d'un objet.",fidropdowns:{yn:[[1,"Oui"],
+	menu_browse:"Consulter",mapper_tipzoom:"Astuce : Cliquer pour agrandir la carte",mapper_tippin:"Astuce : Cliquer sur la carte pour ajouter/enlever des marqueurs",mapper_hidepins:"Cacher les marqueurs",mapper_showpins:"Montrer les marqueurs",mapper_floor:"Changer de niveau...",mapper_relevantlocs:"Emplacements pertinents",mapper_entiretyinzone:"L'entièreté de cette quête se déroule dans $$",mapper_happensin:"Une partie de cette quête se déroule dans $$.",mapper_objectives:{ox:"Cette quête a des objectifs dans $$.",sx:"Cette quête débute dans $$.",ex:"Cette quête finie dans $$.",sex:"Cette quête débute et finie dans $$.",osx:"Cette quête a des objectifs et débute dans $$.",oex:"Cette quête a des objectifs et fini dans $$.",osx_ey:"Cette quête a des objectifs et débute dans $$ fini dans $$.",oex_sy:"Cette quête a des objectifs et fini dans $$ et débute dans $$.",sx_ey:"Cette quête débute dans $$ et finie dans $$.",ox_sy:"Cette quête débute dans $$, a des objectifs dans $$.",ox_ey:"Cette quête a des objectifs dans $$ et fini dans $$.",ox_sey:"Cette quête débute et fini dans $$ et a des objectifs dans $$.",ox_sy_ez:"Cette quête débute dans $$, a des objectifs dans $$ et fini dans $$."},mapper_startsquest:"Débute la quête",mapper_endsquest:"Termine la quête",mapper_requiredquest:"Objectif de la quête",mapper_sourcestart:"Source du début de la quête: ",mapper_sourceend:"Source de la fin de la quête: ",mapper_sourcereq:"Source de l'objectif d'une quête: ",mapper_clicktoview:"Cliquez pour voir ce $1",showonmap:"Afficher sur la carte...",som_nothing:"Rien",som_questgivers:"Donneurs de quêtes",som_viewnpc:"Cliquez pour voir ce PNJ",som_viewobj:"Cliquez pour voir cette entité",som_view:"Cliquez pour voir...",som_startsquest:"Débute la quête suivante :",som_startsquestpl:"Débute les quêtes suivantes :",som_legend:"Légende: ",som_legend_alliance:"Alliance",som_legend_horde:"Horde",som_legend_neutral:"Neutre",som:{all:"Tous",alliance:"Alliance",horde:"Horde",quest:"Donneur de quêtes",alliancequests:"Donneur de quêtes",hordequests:"Donneur de quêtes",repair:"Réparateurs",rare:"PNJs rares",auctioneer:"Actionnaires",banker:"Banquiers",battlemaster:"Maitre de bataille",innkeeper:"Aubergiste",guildmaster:"Maitre de guilde",stablemaster:"Maitre d'écurie",flightmaster:"Maitres de vol",trainer:"Entraineurs",vendor:"Marchands",book:"Livres",herb:"Herbes",vein:"Filons de minerai",spirithealer:"Esprits soigneurs"},markup_b:"Gras",markup_i:"Italique",markup_u:"Souligné",markup_s:"Barré",markup_small:"Petits caractères",markup_url:"Lien",markup_quote:"Citation",markup_code:"Bout de code",markup_ul:"Liste à puces",markup_ol:"Liste numérotée",markup_li:"Élément de liste",markup_img:"Image",markup_said:"a dit : ",markup_toc:"Table des matières",ct_dialog_captcha:"Veuillez entrer le code ci-dessus : ",ct_dialog_contactwowhead:"Contactez Wowhead",ct_dialog_description:"Description",ct_dialog_desc_caption:"Soyez aussi spécifique que possible.",ct_dialog_email:"Courriel : ",ct_dialog_email_caption:"Seulement si vous voulez être contacté.",ct_dialog_optional:"Optionnel",ct_dialog_reason:"Raison: ",ct_dialog_relatedurl:"URL relié: ",ct_dialog_currenturl:"URL actuel:",ct_dialog_report:"Rapporter",ct_dialog_reportchar:"Signalez le personnage",ct_dialog_reportcomment:"Signalez le commentaire de $1",ct_dialog_reportpost:"Signalez le message de $1",ct_dialog_reportscreen:"Signalez la capture d'écran de $1",ct_dialog_reportvideo:"Rapportez le vidéo de $1",ct_dialog_reporttopic:"Signalez le sujet de $1",ct_dialog_thanks:"Votre message à été reçu. Merci de nous avoir contacté!",ct_dialog_thanks_user:"Votre message à été reçu, $1. Merci de nous avoir contacté!",ct_dialog_error_captcha:"Le CAPTCHA que vous avez écrit n'est pas valide. Veuillez réessayer.",ct_dialog_error_desc:"Veuillez fournir une description complète, mais pas trop longue.",ct_dialog_error_email:"Veuillez entrer une adresse e-mail valide.",ct_dialog_error_emaillen:"Veuillez entrer une adresse e-mail avec moins de 100 caractères.",ct_dialog_error_reason:"Veuillez choisir une raison pour nous contacter.",ct_dialog_error_relatedurl:"Veuillez fournir un URL avec moins de 250 caractères.",ct_dialog_error_invalidurl:"Veuillez entrer un URL valide.",cn_fieldrequired:"$1 est requis.",cn_fieldinvalid:"$1 doit être valide.",cn_confirm:"Vérifiez que vous avez entré les bonnes informations, ensuite cliquez sur OK.",cn_entrylogin:'Veuillez vous <a href="?account=signin">connecter</a> pour participer au concours ou <a href="?account=signup">inscrivez-vous</a> si vous n\'en avez pas.',cn_entryerror:"Une erreur est survenue. Veuillez réessayer.",cn_entrywhen:"Vous vous êtes inscrit au concours le <b>$1</b>.",cn_entrywhen2:"Vous tees déjà inscrit à ce concours.",cn_entrysuccess:"Vous venez de vous inscrire au concours. Bonne chance!",cn_entryended:"Ce concours est terminé.",cn_entryupcoming:"Ce concours n'a pas encore débuté. Restez à l'affut!",cn_entryregion:"Vous ne pouvez participer à ce concours dans votre région.",cn_mustbe18:"Vouz devez être agé de 18 ans ou plus pour participer au concours.",cn_winnerslist:"Liste des gagnants",cn_updated:"Actualisé",ct_resp_error1:"Le CAPTCHA que vous avez écrit n'est pas valide. Veuillez réessayer.",ct_resp_error2:"Veuillez fournir une description complète, mais pas trop longue.",ct_resp_error3:"Veuillez choisir une raison pour nous contacter.",ct_resp_error7:"Vous avez déjà rapporté ceci.",compose_mode:"Mode : ",compose_edit:"Édition",compose_preview:"Aperçu",compose_livepreview:"Aperçu rapide",compose_save:"Sauver",compose_cancel:"Annuler",compose_limit:"Jusqu'à $1 caractères",compose_limit2:"Jusqu'à $1 caractères et/ou $2 lignes",compose_remaining:"$1 caractères restants.",user_nodescription:"Cet utilisateur n'a pas encore composé une description publique.",user_nodescription2:"Vous n'en avez pas composée une encore.",user_composeone:"En composer une !",user_editdescription:"Édition",myaccount_passmatch:"Correspondent",myaccount_passdontmatch:"Ne correspondent pas",myaccount_purged:"Purgé",myaccount_purgefailed:"La purge a échouée :(",myaccount_purgesuccess:"Les données d'annonce ont été purgées correctement!",
+
+    types: {
+         1: ["PNJ",	                "PNJ" ,                 "PNJs",                 "PNJs"],
+         2: ["Entité",              "entité",               "Entités",              "entités"],
+         3: ["Objet",               "objet",                "Objets",               "objets"],
+         4: ["Ensemble d'objets",   "ensemble d'objets",    "Ensembles d'objets",   "ensembles d'objets"],
+         5: ["Quête",               "quête",                "Quêtes",               "quêtes"],
+         6: ["Sort",                "sort",                 "Sorts",                "sorts"],
+         7: ["Zone",                "zone",                 "Zones",                "zones"],
+         8: ["Faction",             "faction",              "Factions",             "factions"],
+         9: ["Familier",            "familier",             "Familiers",            "familiers"],
+        10: ["Haut fait",           "haut fait",            "Hauts faits",          "hauts faits"],
+        11: ["Titre",               "titre",                "Titres",               "titres"],
+        12: ["Événement mondial",   "évènement mondial",    "Évènements mondiaux",  "évènements mondiaux"],
+        13: ["Classe",              "classe",               "Classes",              "classes"],
+        14: ["Race",                "race",                 "Races",                "races"],
+        15: ["Compétence",          "compétence",           "Compétences",          "compétences"],
+        16: ["Statistique",         "statistique",          "Statistiques",         "statistiques"],
+        17: ["Monnaies",            "monnaie",               "Monnaies",            "monnaies"]
+    },
+
+    timeunitssg:["année","mois","semaine","jour","heure","minute","seconde"],timeunitspl:["années","mois","semaines","jours","heures","minutes","secondes"],timeunitsab:["an","mo","sem","jour","h","min","s"],presets:{pve:"JcE",pvp:"JcJ",afflic:"Affliction",arcane:"Arcanes",arms:"Armes (DPS)",assas:"Assassinat",balance:"Equilibre (DPS)",beast:"Maîtrise des bêtes",blooddps:"Sang (DPS)",bloodtank:"Sang (Tank)",combat:"Combat",demo:"Démonologie",destro:"Destruction",disc:"Discipline (Soins)",elem:"Combat élémentaire (DPS)",enhance:"Amélioration (DPS)",feraldps:"Combat farouche (DPS)",feraltank:"Combat farouche (Tank)",fire:"Feu",frost:"Givre",frostdps:"Givre (DPS)",frosttank:"Givre (Tank)",fury:"Fureur (DPS)",generic:"Générique",holy:"Sacré (Soins)",marks:"Précision",prot:"Protection (Tank)",resto:"Restauration (Soins)",retrib:"Vindicte (DPS)",shadow:"Magie de l'ombre (DPS)",subtle:"Finesse",surv:"Survie",unholydps:"Impie (DPS)"},traits:{agi:["Agilité","Agi","Agi"],arcres:["Résistance aux Arcanes","Rés. arcanes","RArc"],arcsplpwr:["Puissance des sorts des arcanes","Puiss. arcanes","PArc"],armor:["Armure","Armure","Armure"],armorbonus:["Armure supplémentaire","Armure suppl.","ArmSup"],armorpenrtng:["Score de pénétration d'armure","Pén. d'armure","Pén"],atkpwr:["Puissance d'attaque","PA","PA"],avgbuyout:["Prix d'achat immédiat moyen","Achat immédiat","HV"],avgmoney:["Argent contenu en moyenne","Argent","Argent"],block:["Valeur de blocage","Valeur de Blocage","VaBlc"],blockrtng:["Score de blocage","Bloc","Bloc"],buyprice:["Prix d'achat","Achat","Achat"],cooldown:["Temps de recharge (secondes)","Recharge","Rech"],critstrkrtng:["Score de coup critique","Crit","Crit"],defrtng:["Score de défense","Défense","Déf"],dmg:["Dégâts d'arme","Dégâts","Dégâts"],dmgmax1:["Dégâts maximaux","Dégâts max","Max"],dmgmin1:["Dégâts minimaux","Dégâts min","Min"],dodgertng:["Score d'esquive","Esqui","Esqui"],dps:["Dégâts par seconde","DPS","DPS"],dura:["Durabilité","Durabilité","Dura"],exprtng:["Score d'expertise","Expertise","Exp"],feratkpwr:["Puissance d'attaque en combat farouche","PA farouche","PAF"],firres:["Résistance au Feu","Rés. feu","RFeu"],firsplpwr:["Puissance des sorts de feu","Puiss. feu","PFeu"],frores:["Résistance au Givre","Rés. givre","RGiv"],frosplpwr:["Puissance des sorts de givre","Puiss. givre","PGiv"],hastertng:["Score de hâte","Hâte","Hâte"],health:["Vie","Vie","Vie"],healthrgn:["Régénération de vie","VP5","VP5"],hitrtng:["Score de toucher","Touch","Touch"],holres:["Résistance au Sacré","Rés. sacré","RSac"],holsplpwr:["Puissance des sorts sacrés","Puiss. sacrés","PSac"],"int":["Intelligence","Int","Int"],level:["Niveau","Niveau","Niv"],mana:["Mana","Mana","Mana"],manargn:["Régénération de mana","MP5","MP5"],masteryrtng:["Score de Maitrise","Maitrise","Maitrise"],mleatkpwr:["Puissance d'attaque en mêlée","PA en mêlée","PA"],mlecritstrkrtng:["Score de coup critique en mêlée","Crit en mêlée","Crit"],mledmgmax:["Dégâts maximaux en mêlée","Dégâts max mêlée","Max"],mledmgmin:["Dégâts minimaux en mêlée","Dégâts min mêlée","Min"],mledps:["DPS mêlée","DPS mêlée","DPS"],mlehastertng:["Score de hâte en mêlée","Hâte en mêlée","Hâte"],mlehitrtng:["Score de toucher en mêlée","Toucher en mêlée","Touch"],mlespeed:["Vitesse mêlée","Vitesse de corps à corps","Vitesse"],natres:["Résistance à la Nature","Rés. nature","RNat"],natsplpwr:["Puissance des sorts de la nature","Puiss. nature","PNat"],nsockets:["Nombre de châsses","Châsses","Châsse"],parryrtng:["Score de parade","Parade","Parade"],reqarenartng:["Requiert une cote d'arène personnelle et en équipe","Score requis","Score"],reqlevel:["Niveau requis","Niveau requis","Niveau"],reqskillrank:["Niveau de compétence requis","Compétence requise","Compétence"],resirtng:["Score de résilience","Résilience","Résil"],rgdatkpwr:["Puissance d'attaque à distance","PA à distance","PAD"],rgdcritstrkrtng:["Score de coup critique à distance","Crit à distance","Crit"],rgddmgmax:["Dégâts maximaux à distance","Dégâts max distance","Max"],rgddmgmin:["Dégâts minimaux à distance","Dégâts min distance","Min"],rgddps:["DPS à distance","DPS à distance","DPS"],rgdhastertng:["Score de hâte à distance","Hâte à distance","Hâte"],rgdhitrtng:["Score de toucher à distance","Toucher à distance","Touch"],rgdspeed:["Vitesse distance","Vitesse d'attaque à distance","Vitesse"],sellprice:["Prix de vente","Vente","Vente"],sepbasestats:"Caractéristiques",sepdefensivestats:"Caractéristiques défensives",sepgeneral:"Général",sepindividualstats:"Caractéristiques individuelles",sepmisc:"Divers",sepoffensivestats:"Caractéristiques offensives",sepresistances:"Résistances",sepweaponstats:"Caractéristiques d'armes",shares:["Résistance à l'Ombre","Rés. ombre","ROmb"],shasplpwr:["Puissance des sorts de l'ombre","Puiss. ombre","POmb"],speed:["Vitesse","Vitesse","Vitesse"],spi:["Esprit","Esp","Esp"],splcritstrkrtng:["Score de coup critique des sorts","Crit des sorts","Crit"],spldmg:["Dégâts infligés par les sorts","Dégâts sorts","Dégâts"],splheal:["Soins prodigués par les sorts","Soins","Soins"],splpwr:["Puiss. sorts","Puissance des sorts","PS"],splhastertng:["Score de hâte des sorts","Hâte des sorts","Hâte"],splhitrtng:["Score de toucher des sorts","Toucher des sorts","Touch"],splpen:["Pénétration des sorts","Pén. des sorts","Pén"],sta:["Endurance","End","End"],str:["Force","For","For"]},
+
+    fishow: "Créer un filtre",
+    fihide: "Masquer les options de filtrage",
+
+    fiany:  "N'importe quelle",
+    finone: "Aucun",
+
+    firemove: "enlever",
+    ficlear:  "effacer",
+    ficustom: "Personnalisé",
+
+    fishowdetails: "Afficher les détails",
+    fihidedetails: "Cacher les détails",
+    fisavescale:   "Sauver",
+    fideletescale: "Supprimer",
+
+    message_fillsomecriteria: "Vous devez utiliser au moins un critère.",
+
+    tooltip_jconlygems: "Si coché, les gemmes pour joailler, <br />\nvont aussi être utilisé pour déterminer les meilleurs<br />\ngemmes possible pour le score pondéré d'un objet.",fidropdowns:{yn:[[1,"Oui"],
+    tooltip_genericrating: "<span class=\"q2\">Equipé: Augmente votre $1 de <!--rtg$2-->$3&nbsp;<small>(<!--rtg%$2-->0&nbsp;@&nbsp;L<!--lvl-->0)</small>.</span><br />",
+
 	[2,"Non"]],num:[[1,">"],
 	[2,">="],
 	[3,"="],

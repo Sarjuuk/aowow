@@ -35,20 +35,20 @@ abstract class BaseType
     *   results in
     *       WHERE id = 45 OR name NOT LIKE %test% LIMIT 5;
     */
-    public function __construct($conditions = [])
+    public function __construct($conditions = [], $applyFilter = false)
     {
         global    $AoWoWconf;                                   // yes i hate myself..
 
         $sql       = [];
         $linking   = ' AND ';
         $limit     = ' LIMIT '.$AoWoWconf['sqlLimit'];
-        $className = strtr(get_class($this), ['List' => '']);
+        $className = get_class($this);
 
         if (!$this->setupQuery || !$this->matchQuery)
             return;
 
         // may be called without filtering
-        if (class_exists($className.'Filter'))
+        if ($applyFilter && class_exists($className.'Filter'))
         {
             $fiName = $className.'Filter';
             $this->filter = new $fiName();
@@ -78,20 +78,29 @@ abstract class BaseType
 
                 if (is_array($c[1]))
                 {
+                    $val = implode(',', Util::sqlEscape($c[1]));
+                    if (!$val)
+                        continue;
+
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
-                    $val = '('.implode(',', Util::sqlEscape($c[1])).')';
+                    $val = '('.$val.')';
                 }
                 else if (is_string($c[1]))
                 {
-                    $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
-                    $val = '"%'.Util::sqlEscape($c[1]).'%"';
+                    $val = Util::sqlEscape($c[1]);
+                    if (!$val)
+                        continue;
 
+                    $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
+                    $val = '"%'.$val.'%"';
                 }
                 else if (is_int($c[1]))
                 {
                     $op  = (isset($c[2]) && $c[2] == '!') ? '<>' : '=';
                     $val = Util::sqlEscape($c[1]);
                 }
+                else                                        // null for example
+                    continue;
 
                 if (isset($c[2]) && $c[2] != '!')
                     $op = $c[2];
@@ -104,16 +113,15 @@ abstract class BaseType
                 $limit   = $c > 0      ? ' LIMIT '.$c : '';
             else
                 continue;                                   // ignore other possibilities
-
         }
 
         // todo: add strings propperly without them being escaped by simpleDB..?
-        $this->setupQuery  = str_replace('[filter]', $this->filter && $this->filter->buildFilterQuery() ? $this->filter->query.' AND ' : NULL, $this->setupQuery);
-        $this->setupQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                      $this->setupQuery);
+        $this->setupQuery  = str_replace('[filter]', $this->filter && $this->filter->buildQuery() ? $this->filter->getQuery().' AND ' : NULL, $this->setupQuery);
+        $this->setupQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                     $this->setupQuery);
         $this->setupQuery .= $limit;
 
-        $this->matchQuery  = str_replace('[filter]', $this->filter && $this->filter->buildFilterQuery() ? $this->filter->query.' AND ' : NULL, $this->matchQuery);
-        $this->matchQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                      $this->matchQuery);
+        $this->matchQuery  = str_replace('[filter]', $this->filter && $this->filter->buildQuery() ? $this->filter->getQuery().' AND ' : NULL, $this->matchQuery);
+        $this->matchQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                     $this->matchQuery);
 
         $rows = DB::Aowow()->Select($this->setupQuery);
         if (!$rows)
@@ -162,10 +170,10 @@ abstract class BaseType
         return $this->curTpl[$field];
     }
 
-    public function filterGetJs()
+    public function filterGetSetCriteria()
     {
-        if ($this->filter && isset($this->filter->fiData['c']['cr']))
-            return "fi_setCriteria([".@implode(',',$this->filter->fiData['c']['cr'])."], [".@implode(',',$this->filter->fiData['c']['crs'])."], ['".@implode('\', \'',$this->filter->fiData['c']['crv'])."']);";
+        if ($this->filter)
+            return $this->filter->getSetCriteria();
         else
             return null;
     }
@@ -173,9 +181,17 @@ abstract class BaseType
     public function filterGetForm()
     {
         if ($this->filter)
-            return $this->filter->form;
+            return $this->filter->getForm();
         else
             return [];
+    }
+
+    public function filterGetError()
+    {
+        if ($this->filter)
+            return $this->filter->error;
+        else
+            return false;
     }
 
     // should return data required to display a listview of any kind
@@ -233,14 +249,15 @@ class Lang
     public static $main;
     public static $search;
     public static $game;
-    public static $filter;
     public static $error;
 
     public static $account;
     public static $achievement;
     public static $compare;
+    public static $currency;
     public static $event;
     public static $item;
+    public static $itemset;
     public static $maps;
     public static $spell;
     public static $talent;
@@ -411,7 +428,7 @@ class SmartyAoWoW extends Smarty
         $this->left_delimiter   = '{';
         $this->right_delimiter  = '}';
         $this->caching          = false;                    // Total Cache, this site does not work
-        $this->assign('app_name', $config['page']['name']);
+        $this->assign('appName', $config['page']['name']);
         $this->assign('AOWOW_REVISION', AOWOW_REVISION);
         $this->_tpl_vars['page'] = array(
             'reqJS'      => [],                             // <[string]> path to required JSFile
@@ -438,18 +455,14 @@ class SmartyAoWoW extends Smarty
     public function display($tpl)
     {
         // since it's the same for every page, except index..
-        if (!$this->_tpl_vars['query'][0])
-            return;
+        if ($this->_tpl_vars['query'][0] && !preg_match('/[^a-z]/i', $this->_tpl_vars['query'][0]))
+        {
+            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = ?s OR page = "*")', $this->_tpl_vars['query'][0]);
+            foreach ($ann as $k => $v)
+                $ann[$k]['text'] = Util::localizedString($v, 'text');
 
-        // sanitize
-        if (preg_match('/[^a-z]/i', $this->_tpl_vars['query'][0]))
-            return;
-
-        $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = ?s OR page = "*")', $this->_tpl_vars['query'][0]);
-        foreach ($ann as $k => $v)
-            $ann[$k]['text'] = Util::localizedString($v, 'text');
-
-        $this->_tpl_vars['announcements'] = $ann;
+            $this->_tpl_vars['announcements'] = $ann;
+        }
 
         parent::display($tpl);
     }
@@ -597,6 +610,7 @@ class Util
 
     public static $filterResultString       = 'sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
     public static $narrowResultString       = 'sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
+    public static $setCriteriaString        = "fi_setCriteria(%s, %s, %s);\n";
 
     public static $expansionString          = array(        // 3 & 4 unused .. obviously
         null,           'bc',           'wotlk',            'cata',                'mop'
@@ -1232,18 +1246,14 @@ class Util
         return 0;
     }
 
-    private static function db_conform_array_callback(&$item, $key)
+    public static function sqlEscape($data)
     {
-        $item = Util::sqlEscape($item);
-    }
+        if (!is_array($data))
+            return mysql_real_escape_string(trim($data));
 
-    public static function sqlEscape($string)
-    {
-        if (!is_array($string))
-            return mysql_real_escape_string(trim($string));
+        array_walk($data, function(&$item, $key) { $item = Util::sqlEscape($item); });
 
-        array_walk($string, 'Util::db_conform_array_callback');
-        return $string;
+        return $data;
     }
 
     public static function jsEscape($string)
@@ -1260,15 +1270,25 @@ class Util
 
     public static function localizedString($data, $field)
     {
+        $sqlLocales = ['EN', 2 => 'FR', 3 => 'DE', 6 => 'ES', 8 => 'RU'];
+
         // default back to enUS if localization unavailable
 
         // default case: selected locale available
         if (!empty($data[$field.'_loc'.User::$localeId]))
             return $data[$field.'_loc'.User::$localeId];
 
+        // dbc-case
+        else if (!empty($data[$field.$sqlLocales[User::$localeId]]))
+            return $data[$field.$sqlLocales[User::$localeId]];
+
         // locale not enUS; aowow-type localization available; add brackets
         else if (User::$localeId != LOCALE_EN && isset($data[$field.'_loc0']) && !empty($data[$field.'_loc0']))
             return  '['.$data[$field.'_loc0'].']';
+
+        // dbc-case
+        else if (User::$localeId != LOCALE_EN && isset($data[$field.$sqlLocales[0]]) && !empty($data[$field.$sqlLocales[0]]))
+            return  '['.$data[$field.$sqlLocales[0]].']';
 
         // locale not enUS; TC localization; add brackets
         else if (User::$localeId != LOCALE_EN && isset($data[$field]) && !empty($data[$field]))
@@ -1367,11 +1387,12 @@ class Util
                     break;
                 case 3:
                 case 7:
-                    $spl  = new SpellList(array(['id', (int)$enchant['object'.$h]]));
-                    $gain = $spl->getStatGain();
+                    $spl   = new SpellList(array(['id', (int)$enchant['object'.$h]]));
+                    $gains = $spl->getStatGain();
 
-                    foreach ($gain as $k => $v)             // array_merge screws up somehow...
-                        @$jsonStats[$k] += $v;
+                    foreach ($gains as $gain)
+                        foreach ($gain as $k => $v)         // array_merge screws up somehow...
+                            @$jsonStats[$k] += $v;
                     break;
                 case 4:
                     switch ($enchant['object'.$h])

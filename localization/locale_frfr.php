@@ -18,7 +18,6 @@ $lang = array(
         'profiles'      => "Vos personnages",      // translate.google :x
         'links'         => "Liens",
         'pageNotFound'  => "Ce %s n'existe pas.",
-        'both'          => "Les deux",
         'gender'        => "Genre",
         'sex'           => [null, 'Homme', 'Femme'],
         'quickFacts'    => "En bref",
@@ -46,6 +45,17 @@ $lang = array(
         'millisecsAbbr' => "[ms]",
         'name'          => "Nom",
 
+        // filter
+        'extSearch'     => "Recherche avancée",
+        'addFilter'     => "Ajouter un autre filtre",
+        'match'         => "Critère",
+        'allFilter'     => "Tous les filtres",
+        'oneFilter'     => "Au moins un",
+        'applyFilter'   => "Appliquer le filtre",
+        'resetForm'     => "Rétablir",
+        'refineSearch'  => "Astuce : Affinez votre recherche en utilisant une <a href=\"javascript:;\" id=\"fi_subcat\">sous-catégorie</a>.",
+
+        // infobox
         'disabled'      => "[Disabled]",
         'disabledHint'  => "[Cannot be attained or completed]",
         'serverside'    => "[Serverside]",
@@ -58,10 +68,10 @@ $lang = array(
         'tryAgain'      => "Veuillez essayer d'autres mots ou vérifiez l'orthographe des termes de recherche.",
     ),
     'game' => array (
-        'alliance'      => "Alliance",
-        'horde'         => "Horde",
         'class'         => "classe",
         'classes'       => "Classes",
+        'currency'      => "monnaies",
+        'currencies'    => "Monnaies",
         'races'         => "Races",
         'title'         => "titre",
         'titles'        => "Titres",
@@ -69,15 +79,18 @@ $lang = array(
         'event'         => "Évènement mondial",
         'events'        => "Évènements mondiaux",
         'cooldown'      => "%s de recharge",
+        'itemset'       => "ensemble d'objets",
+        'itemsets'      => "Ensembles d'objets",
         'requires'      => "Requiert",
         'reqLevel'      => "Niveau %s requis",
         'reqLevelHlm'   => "Requiert Niveau %s",
         'valueDelim'    => " - ",
+        'si'            => array(-2 => "Horde seulement", -1 => "Alliance seulement", null, "Alliance", "Horde", "Les deux"),
         'resistances'   => array(null, 'Résistance au Sacré', 'Résistance au Feu', 'Résistance à la Nature', 'Résistance au Givre', 'Résistance à l\'Ombre', 'Résistance aux Arcanes'),
         'di'            => array(null, "Magie", "Malédiction", "Maladie", "Poison", "Camouflage", "Invisibilité", null, null, "Enrager"),
         'sc'            => array("Physique", "Sacré", "Feu", "Nature", "Givre", "Ombre", "Arcane"),
-        'cl'            => array("UNK_CL0", "Guerrier", "Paladin", "Chasseur", "Voleur", "Prêtre", "DeathChevalier de la mort", "Chaman", "Mage", "Démoniste", 'UNK_CL10', "Druide"),
-        'ra'            => array(-2 => "Horde", -1 => "Alliance", "Les deux", "Humain", "Orc", "Nain", "Elfe de la nuit", "Mort-vivant", "Tauren", "Gnome", "Troll", 'UNK_RA9', "Elfe de sang", "Draeneï"),
+        'cl'            => array(null, "Guerrier", "Paladin", "Chasseur", "Voleur", "Prêtre", "DeathChevalier de la mort", "Chaman", "Mage", "Démoniste", null, "Druide"),
+        'ra'            => array(-2 => "Horde", -1 => "Alliance", "Les deux", "Humain", "Orc", "Nain", "Elfe de la nuit", "Mort-vivant", "Tauren", "Gnome", "Troll", null, "Elfe de sang", "Draeneï"),
         'rep'           => array("Détesté", "Hostile", "Inamical", "Neutre", "Amical", "Honoré", "Révéré", "Exalté"),
         'st'            => array(
             null,               "Forme de félin",               "Arbre de vie",                 "Forme de voyage",              "Aquatic Form",
@@ -95,18 +108,6 @@ $lang = array(
             "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
             "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
         ),
-    ),
-    'filter' => array(
-        'extSearch'     => "Recherche avancée",
-        'onlyAlliance'  => "Alliance seulement",
-        'onlyHorde'     => "Horde seulement",
-        'addFilter'     => "Ajouter un autre filtre",
-        'match'         => "Critère",
-        'allFilter'     => "Tous les filtres",
-        'oneFilter'     => "Au moins un",
-        'applyFilter'   => "Appliquer le filtre",
-        'resetForm'     => "Rétablir",
-        'refineSearch'  => "Astuce : Affinez votre recherche en utilisant une <a href=\"javascript:;\" id=\"fi_subcat\">sous-catégorie</a>.",
     ),
     'error' => array(
         'errNotFound'   => "Page not found",
@@ -165,6 +166,27 @@ $lang = array(
             'Général',      'Joueur ctr. Joueur',    'Réputation',       'Donjons & raids',     'Quêtes',       'Métiers',      'Évènements mondiaux'
         )
     ),
+    'currency' => array(
+        'cat'           => array(
+            1 => "Divers", 2 => "JcJ", 4 => "Classique", 21 => "Wrath of the Lich King", 22 => "Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Inutilisées"
+        )
+    ),
+    'itemset' => array(
+        'notes'         => array(
+            null,                                   "Ensemble de donjon 1",                 "Ensemble de donjon 2",                         "Ensemble de raid palier 1",
+            "Ensemble de raid palier 2",            "Ensemble de raid palier 3",            "Ensemble JcJ niveau 60 supérieur",             "Ensemble JcJ niveau 60 supérieur (désuet)",
+            "Ensemble JcJ niveau 60 épique",        "Ensemble des ruines d'Ahn'Qiraj",      "Ensemble d'Ahn'Qiraj",                         "Ensemble de Zul'Gurub",
+            "Ensemble de raid palier 4",            "Ensemble de raid palier 5",            "Ensemble de donjon 3",                         "Ensemble du bassin d'Arathi",
+            "Ensemble JcJ niveau 70 supérieur",     "Ensemble d'arène saison 1",            "Ensemble de raid palier 6",                    "Ensemble d'arène saison 2",
+            "Ensemble d'arène saison 3",            "Ensemble JcJ niveau 70 supérieur 2",   "Ensemble d'arène saison 4",                    "Ensemble de raid palier 7",
+            "Ensemble d'arène saison 5",            "Ensemble de raid palier 8",            "Ensemble d'arène saison 6",                    "Ensemble de raid palier 9",
+            "Ensemble d'arène saison 7",            "Ensemble de raid palier 10",           "Set d'Arena de la Saison 8"
+        ),
+        'types'         => array(
+            null,               "Tissu",                "Cuir",                 "Mailles",                  "Plaques",                  "Dague",                    "Anneau",
+            "Arme de pugilat",  "Hache à une main",     "Masse à une main",     "Épée à une main",          "Bijou",                    "Amulette"
+        )
+    ),
     'spell' => array(
         'remaining'     => "%s restantes",
         'untilCanceled' => "jusqu’à annulation",
@@ -217,6 +239,10 @@ $lang = array(
         'socketBonus'   => "Bonus de châsse",
         'socket'        => array(
             "Méta-châsse",          "Châsse rouge",     "Châsse jaune",         "Châsse bleue",           -1 => "Châsse prismatique"
+        ),
+        'quality'       => array (
+            "Médiocre",             "Classique",        "Bonne",                "Rare",
+            "Épique",               "Légendaire",       "Artefact",             "Héritage"
         ),
         'trigger'       => array (
             "Utilise: ",            "Équipé : ",        "Chances quand vous touchez : ", null,                  null,

@@ -18,7 +18,6 @@ $lang = array(
         'profiles'      => "Tus personajes",    // translate.google :x
         'links'         => "Enlaces",
         'pageNotFound'  => "Este %s no existe.",
-        'both'          => "Ambos",
         'gender'        => "Género",
         'sex'           => [null, 'Hombre', 'Mujer'],
         'quickFacts'    => "Notas rápidas",
@@ -46,6 +45,17 @@ $lang = array(
         'millisecsAbbr' => "[ms]",
         'name'          => "Nombre",
 
+        // filter
+        'extSearch'     => "Extender búsqueda",
+        'addFilter'     => "Añadir otro filtro",
+        'match'         => "Aplicar",
+        'allFilter'     => "Todos los filtros",
+        'oneFilter'     => "Por lo menos uno",
+        'applyFilter'   => "Aplicar filtro",
+        'resetForm'     => "Reiniciar formulario",
+        'refineSearch'  => "Sugerencia: Refina tu búsqueda llendo a una <a href=\"javascript:;\" id=\"fi_subcat\">subcategoría</a>.",
+
+        // infobox
         'disabled'      => "[Disabled]",
         'disabledHint'  => "[Cannot be attained or completed]",
         'serverside'    => "[Serverside]",
@@ -58,10 +68,10 @@ $lang = array(
         'tryAgain'      => "Por favor, introduzca otras palabras claves o verifique el término ingresado.",
     ),
     'game' => array(
-        'alliance'      => "Alianza",
-        'horde'         => "Horda",
         'class'         => "clase",
         'classes'       => "Clases",
+        'currency'      => "monedas",
+        'currencies'    => "Monedas",
         'races'         => "Razas",
         'title'         => "título",
         'titles'        => "Títulos",
@@ -69,15 +79,18 @@ $lang = array(
         'event'         => "Suceso mundial ",
         'events'        => "Eventos del mundo",
         'cooldown'      => "%s de reutilización",
+        'itemset'       => "conjunto de objetos",
+        'itemsets'      => "Conjuntos de objetos",
         'requires'      => "Requiere",
         'reqLevel'      => "Necesitas ser de nivel %s",
         'reqLevelHlm'   => "Necesitas ser de nivel %s",
         'valueDelim'    => " - ",
+        'si'            => array(-2 => "Horda solamente", -1 => "Alianza solamente", null, "Alianza", "Horda", "Ambos"),
         'resistances'   => array(null, 'Resistencia a lo Sagrado', 'v', 'Resistencia a la Naturaleza', 'Resistencia a la Escarcha', 'Resistencia a las Sombras', 'Resistencia a lo Arcano'),
         'sc'       => array("Física", "Sagrado", "Fuego", "Naturaleza", "Escarcha", "Sombras", "Arcano"),
         'di'            => array(null, "Magia", "Maldición", "Enfermedad", "Veneno", "Sigilo", "Invisibilidad", null, null, "Enfurecer"),
-        'cl'            => array("UNK_CL0", "Guerrero", "Paladín", "Cazador", "Pícaro", "Sacerdote", "Caballero de la Muerte", "Chamán", "Mago", "Brujo", 'UNK_CL10', "Druida"),
-        'ra'            => array(-2 => "Horda", -1 => "Alianza", "Ambos", "Humano", "Orco", "Enano", "Elfo de la noche", "No-muerto", "Tauren", "Gnomo", "Trol  ", 'UNK_RA9', "Blood Elf", "Elfo de sangre"),
+        'cl'            => array(null, "Guerrero", "Paladín", "Cazador", "Pícaro", "Sacerdote", "Caballero de la Muerte", "Chamán", "Mago", "Brujo", null, "Druida"),
+        'ra'            => array(-2 => "Horda", -1 => "Alianza", "Ambos", "Humano", "Orco", "Enano", "Elfo de la noche", "No-muerto", "Tauren", "Gnomo", "Trol  ", null, "Blood Elf", "Elfo de sangre"),
         'rep'           => array("Odiado", "Hostil", "Adverso", "Neutral", "Amistoso", "Honorable", "Reverenciado", "Exaltado"),
         'st'            => array(
             null,               "Forma felina",                 "Árbol de vida",                "Forma de viaje",               "Forma acuática",
@@ -95,18 +108,6 @@ $lang = array(
             "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
             "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
         ),
-    ),
-    'filter' => array(
-        'extSearch'     => "Extender búsqueda",
-        'onlyAlliance'  => "Alianza solamente",
-        'onlyHorde'     => "Horda solamente",
-        'addFilter'     => "Añadir otro filtro",
-        'match'         => "Aplicar",
-        'allFilter'     => "Todos los filtros",
-        'oneFilter'     => "Por lo menos uno",
-        'applyFilter'   => "Aplicar filtro",
-        'resetForm'     => "Reiniciar formulario",
-        'refineSearch'  => "Sugerencia: Refina tu búsqueda llendo a una <a href=\"javascript:;\" id=\"fi_subcat\">subcategoría</a>.",
     ),
     'error' => array(
         'errNotFound'   => "Page not found",
@@ -165,6 +166,27 @@ $lang = array(
             'General',      'Jugador contra Jugador',    'Reputación',       'Mazmorras y bandas',     'Misiones',       'Profesiones',      'Eventos del mundo'
         )
     ),
+    'currency' => array(
+        'cat'           => array(
+            1 => "Miscelánea", 2 => "Jugador contra Jugador", 4 => "Clásico", 21 => "Wrath of the Lich King", 22 => "Mazmorra y banda", 23 => "Burning Crusade", 41 => "Prueba", 3 => "No las uso"
+        )
+    ),
+    'itemset' => array(
+        'notes'         => array(
+            null,                                   "Set de mazmorra 1",                    "Set de mazmorra 2",                        "Set de banda tier 1",
+            "Set de banda tier 2",                  "Set de banda tier 3",                  "Set JcJ nivel 60 superior",                "Set JcJ nivel 60 superior (obsoleto)",
+            "Set JcJ nivel 60 épico",               "Set de las Ruinas de Ahn'Qiraj",       "Set del Templo de Ahn'Qiraj",              "Set de Zul'Gurub",
+            "Set de banda tier 4",                  "Set de banda tier 5",                  "Set de mazmorra 3",                        "Set de la Cuenca de Arathi",
+            "Set JcJ nivel 70 superior",            "Set de la Temporada de Arenas 1",      "Set de banda tier 6",                      "Set de la Temporada de Arenas 2",
+            "Set de la Temporada de Arenas 3",      "Set JcJ nivel 70 superior 2",          "Set de la Temporada de Arenas 4",          "Set de banda tier 7",
+            "Set de la Temporada de Arenas 5",      "Set de banda tier 8",                  "Set de la Temporada de Arenas 6",          "Set de banda tier 9",
+            "Set de la Temporada de Arenas 7",      "Set de banda tier 10",                 "Set de la Temporada de Arenas 8"
+        ),
+        'types'         => array(
+            null,               "Tela",                 "Cuero",                "Malla",                    "Placas",                   "Daga",                     "Anillo",
+            "Arma de puño",     "Hacha de uno mano",    "Maza de uno mano",     "Espada de uno mano",       "Abalorio",                 "Amuleto"
+        )
+    ),
     'spell' => array(
         'remaining'     => "%s restantes",
         'untilCanceled' => "hasta que se cancela",
@@ -217,6 +239,10 @@ $lang = array(
         'socketBonus'   => "Bono de ranura",
         'socket'        => array(
             "Ranura meta",          "Ranura roja",      "Ranura amarilla",          "Ranura azul",            -1 => "Ranura prismática  "
+        ),
+        'quality'       => array (
+            "Pobre",                "Común",            "Poco Común",           "Raro",
+            "Épica",                "Legendaria",       "Artefacto",            "Reliquia"
         ),
         'trigger'       => array (
             "Uso: ",                "Equipar: ",        "Probabilidad al acertar: ", null,                      null,

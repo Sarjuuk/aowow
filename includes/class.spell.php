@@ -14,9 +14,9 @@ class SpellList extends BaseType
     protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE [filter] [cond] GROUP BY Id ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_spell WHERE [filter] [cond]';
 
-    public function __construct($conditions)
+    public function __construct($conditions, $applyFilter = false)
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $applyFilter);
 
         if ($this->error)
             return;
@@ -50,10 +50,12 @@ class SpellList extends BaseType
     // required for itemSet-bonuses and socket-bonuses
     public function getStatGain()
     {
-        $stats = [];
+        $data = [];
 
         while ($this->iterate())
         {
+            $stats = [];
+
             for ($i = 1; $i <= 3; $i++)
             {
                 if (!in_array($this->curTpl["effect".$i."AuraId"], [13, 22, 29, 34, 35, 83, 84, 85, 99, 124, 135, 143, 158, 161, 189, 230, 235, 240, 250]))
@@ -216,9 +218,11 @@ class SpellList extends BaseType
                         break;
                 }
             }
+
+            $data[$this->id] = $stats;
         }
 
-        return $stats;
+        return $data;
     }
 
     // description-, buff-parsing component
@@ -247,7 +251,7 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
-    private function resolveVariableString($variable, $level)
+    private function resolveVariableString($variable, $level, $interactive)
     {
         $signs  = ['+', '-', '/', '*', '%', '^'];
 
@@ -323,7 +327,7 @@ class SpellList extends BaseType
                 }
                 // Aura end
 
-                if ($rType)
+                if ($rType && $interactive)
                     $str .= '<!--rtg'.$rType.'-->'.$base."&nbsp;<small>(".Util::setRatingLevel($level, $rType, $base).")</small>";
                 else
                     $str .= $base;
@@ -439,7 +443,7 @@ class SpellList extends BaseType
                 }
                 // Aura end
 
-                if ($rType)
+                if ($rType && $interactive)
                     return '<!--rtg'.$rType.'-->'.abs($base)."&nbsp;<small>(".Util::setRatingLevel($level, $rType, abs($base)).")</small>";
                 else
                     return $base;
@@ -549,7 +553,7 @@ class SpellList extends BaseType
                 }
                 // Aura end
 
-                if ($rType && $equal)
+                if ($rType && $equal && $interactive)
                     return '<!--rtg'.$rType.'-->'.$min."&nbsp;<small>(".Util::setRatingLevel($level, $rType, $min).")</small>";
                 else
                     return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
@@ -603,7 +607,7 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
-    private function resolveFormulaString($formula, $precision = 0, $level)
+    private function resolveFormulaString($formula, $precision = 0, $level, $interactive)
     {
         // step 1: formula unpacking redux
         while (($formStartPos = strpos($formula, '${')) !== false)
@@ -639,7 +643,7 @@ class SpellList extends BaseType
                 ++$formCurPos;                              // for some odd reason the precision decimal survives if wo dont increment further..
             }
 
-            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $level);
+            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $level, $interactive);
 
             $formula = substr_replace($formula, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
@@ -663,7 +667,7 @@ class SpellList extends BaseType
                 continue;
             }
             $pos += strlen($result[0]);
-            $str .= $this->resolveVariableString($result, $level);
+            $str .= $this->resolveVariableString($result, $level, $interactive);
         }
         $str .= substr($formula, $pos);
         $str  = str_replace('#', '$', $str);                // reset marks
@@ -676,7 +680,7 @@ class SpellList extends BaseType
 
     // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
     // although it seems to be pretty fast, even on those pesky test-spells with extra complex tooltips (Ron Test Spell X))
-    public function parseText($type = 'description', $level = MAX_LEVEL)
+    public function parseText($type = 'description', $level = MAX_LEVEL, $interactive = false)
     {
         // oooo..kaaayy.. parsing text in 6 or 7 easy steps
         // we don't use the internal iterator here. This func has to be called for the individual template.
@@ -902,7 +906,7 @@ class SpellList extends BaseType
                     ++$formCurPos;                          // for some odd reason the precision decimal survives if wo dont increment further..
                 }
 
-            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $level);
+            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $level, $interactive);
 
             $data = substr_replace($data, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
@@ -929,7 +933,7 @@ class SpellList extends BaseType
 
             $pos += strlen($result[0]);
 
-            $resolved = $this->resolveVariableString($result, $level);
+            $resolved = $this->resolveVariableString($result, $level, $interactive);
             $str .= intVal($resolved) ? abs($resolved) : $resolved;
         }
         $str .= substr($data, $pos);

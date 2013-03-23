@@ -48,7 +48,7 @@ if ($compareString)
     $pageData['summary'] = json_encode($outSet, JSON_NUMERIC_CHECK);
 
     $iList = new ItemList(array(['i.entry', $items]));
-    $data = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
+    $data  = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
     foreach ($data as $id => $item)
     {
         while ($iList->id != $id)
