@@ -113,6 +113,12 @@ switch ($pageCall)
             require 'setup/tools/dataset-assembler/'.$pageParam.'.php';
             break;
         }
+    case 'sql':
+        if (User::isInGroup(U_GROUP_EMPLOYEE))
+        {
+            require 'setup/tools/sql/_'.$pageParam.'.php';
+            break;
+        }
     case 'setup':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
