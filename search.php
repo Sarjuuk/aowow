@@ -47,7 +47,9 @@ Util::execTime(true);
         24: Listview - template: 'spell',       id: 'npc-abilities', name: LANG.tab_npcabilities,        visibleCols: ['level'],                    hiddenCols: ['reagents', 'skill'],
         25: Listview - template: 'spell',       id: 'spells',        name: LANG.tab_uncategorizedspells, visibleCols: ['level'],                    hiddenCols: ['reagents', 'skill'],
         26: Listview - template: 'profile',     id: 'characters',    name: LANG.tab_characters,          visibleCols: ['race','classs','level','talents','gearscore','achievementpoints'],
-        27: Guilds..?
+        27: Profiles..?
+        28: Guilds..?
+        29: Arena Teams..?
 */
 
 $search      = urlDecode(trim($pageParam));
@@ -175,9 +177,8 @@ if ($searchMask & 0x4)
     );
 
     $titles = new TitleList($conditions);
-    $data   = $titles->getListviewData();
 
-    if (!empty($data))
+    if ($data = $titles->getListviewData())
     {
         $found['title'] = array(
             'type'     => TYPE_TITLE,
@@ -250,10 +251,11 @@ if ($searchMask & 0x10)
 if ($searchMask & 0x20)
 {
     $sets = new ItemsetList(array($maxResults, ['item1', 0, '!'], ['name_loc'.User::$localeId, $query]));   // remove empty sets from search
-    $sets->addGlobalsToJscript($jsGlobals);
 
     if ($data = $sets->getListviewData())
     {
+        $sets->addGlobalsToJscript($jsGlobals);
+
         while ($sets->iterate())
             $data[$sets->id]['param1'] = $sets->getField('quality');
 
@@ -282,10 +284,10 @@ if ($searchMask & 0x40)
 
     $items = new ItemList($conditions, @$found['itemset']['pcsToSet']);
 
-    $items->addGlobalsToJscript($jsGlobals);
-
     if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
     {
+        $items->addGlobalsToJscript($jsGlobals);
+
         while ($items->iterate())
         {
             $data[$items->id]['param1'] = '"'.$items->getField('icon').'"';
@@ -344,6 +346,9 @@ if ($searchMask & 0x10000)
         $acvs->addGlobalsToJScript($jsGlobals);
         $acvs->addRewardsToJScript($jsGlobals);
 
+        while ($acvs->iterate())
+            $data[$acvs->id]['param1'] = '"'.strToLower($acvs->getField('iconString')).'"';
+
         $found['achievement'] = array(
             'type'     => TYPE_ACHIEVEMENT,
             'appendix' => ' (Achievement)',
@@ -384,8 +389,8 @@ if ($searchMask & 0x20000)
         if ($stats->matches > $maxResults)
             $found['statistic']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_statisticsfound', $stats->matches, $maxResults);
     }
-
 }
+
 // 19 Zones
 // if ($searchMask & 0x40000)
 
@@ -399,7 +404,26 @@ if ($searchMask & 0x20000)
 // if ($searchMask & 0x200000)
 
 // 23 Pets
-// if ($searchMask & 0x400000)
+if ($searchMask & 0x400000)
+{
+    $pets = new PetList(array($maxResults, ['name_loc'.User::$localeId, $query]));
+    if ($data = $pets->getListviewData())
+    {
+        $pets->addGlobalsToJScript($jsGlobals);
+
+        while ($pets->iterate())
+            $data[$pets->id]['param1'] = '"'.$pets->getField('iconString').'"';
+
+        $found['pet'] = array(
+            'type'     => TYPE_PET,
+            'appendix' => ' (Pet)',
+            'data'     => $data,
+            'params'   => [
+                'tabs' => '$myTabs',
+            ]
+        );
+    }
+}
 
 // 24 NPCAbilities
 // if ($searchMask & 0x800000)
@@ -480,7 +504,7 @@ else if ($searchMask & SEARCH_TYPE_OPEN)
 
         for ($i = 0; $i < $max; $i++)
         {
-            $data = array_pop($set['data']);
+            $data = array_shift($set['data']);
             if (!$data)
                 break;
 

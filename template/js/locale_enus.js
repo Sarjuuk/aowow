@@ -835,7 +835,7 @@ var mn_database = [
     [2,"Item Sets","?itemsets",mn_itemSets],
     [4,"NPCs","?npcs",mn_npcs],
     [5,"Objects","?objects",mn_objects],
-    [8,"Pets","?pets",mn_pets],
+    [8,"Hunter Pets","?pets",mn_pets],
     [14,"Professions & Skills","?skills",mn_skills],
     [3,"Quests","?quests",mn_quests],
     [13,"Races","?races",mn_races],

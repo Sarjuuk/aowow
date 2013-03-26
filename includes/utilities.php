@@ -258,6 +258,7 @@ class Lang
     public static $event;
     public static $item;
     public static $itemset;
+    public static $pet;
     public static $maps;
     public static $spell;
     public static $talent;

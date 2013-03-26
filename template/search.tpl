@@ -33,7 +33,7 @@
 {if isset($found.unkSpell)}    {include file='bricks/listviews/spell.tpl'        data=$found.unkSpell.data    params=$found.unkSpell.params   } {/if}
 {if isset($found.zone)}        {include file='bricks/listviews/zone.tpl'         data=$found.zone.data        params=$found.zone.params       } {/if}
 {if isset($found.faction)}     {include file='bricks/listviews/faction.tpl'      data=$found.faction.data     params=$found.faction.params    } {/if}
-{if isset($found.pet)}         {include file='bricks/listviews/npc.tpl'          data=$found.pet.data         params=$found.pet.params        } {/if}
+{if isset($found.pet)}         {include file='bricks/listviews/pet.tpl'          data=$found.pet.data         params=$found.pet.params        } {/if}
 {if isset($found.achievement)} {include file='bricks/listviews/achievement.tpl'  data=$found.achievement.data params=$found.achievement.params} {/if}
 {if isset($found.statistic)}   {include file='bricks/listviews/achievement.tpl'  data=$found.statistic.data   params=$found.statistic.params  } {/if}
 {if isset($found.event)}       {include file='bricks/listviews/event.tpl'        data=$found.event.data       params=$found.event.params      } {/if}

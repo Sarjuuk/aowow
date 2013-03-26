@@ -81,6 +81,8 @@ $lang = array(
         'cooldown'      => "%s de recharge",
         'itemset'       => "ensemble d'objets",
         'itemsets'      => "Ensembles d'objets",
+        'pet'           => "Familier",
+        'pets'          => "Familiers de chasseur",
         'requires'      => "Requiert",
         'reqLevel'      => "Niveau %s requis",
         'reqLevelHlm'   => "Requiert Niveau %s",
@@ -169,6 +171,11 @@ $lang = array(
     'currency' => array(
         'cat'           => array(
             1 => "Divers", 2 => "JcJ", 4 => "Classique", 21 => "Wrath of the Lich King", 22 => "Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Inutilisées"
+        )
+    ),
+    'pet'      => array(
+        'cat'           => array(
+            'Férocité', 'Tenacité', 'Ruse'
         )
     ),
     'itemset' => array(

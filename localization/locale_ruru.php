@@ -81,6 +81,8 @@ $lang = array(
         'cooldown'      => "Восстановление: %s",
         'itemset'       => "комплект",
         'itemsets'      => "Комплекты",
+        'pet'           => "Питомец",
+        'pets'          => "Питомцы охотников",
         'requires'      => "Требует:",
         'reqLevel'      => "Требуется уровень: %s",
         'reqLevelHlm'   => "Требуется уровень: %s",
@@ -169,6 +171,11 @@ $lang = array(
     'currency' => array(
         'cat'           => array(
             1 => "Разное", 2 => "PvP", 4 => "World of Warcraft", 21 => "Wrath of the Lich King", 22 => "Подземелья и рейды", 23 => "Burning Crusade", 41 => "Test", 3 => "Неактивно"
+        )
+    ),
+    'pet'      => array(
+        'cat'           => array(
+            'Свирепость', 'Упорство', 'Хитрость'
         )
     ),
     'itemset' => array(

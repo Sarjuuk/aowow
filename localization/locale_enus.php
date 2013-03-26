@@ -88,6 +88,8 @@ $lang = array(
         'cooldown'      => "%s cooldown",
         'itemset'       => "item Set",
         'itemsets'      => "Item Sets",
+        'pet'           => "Pet",
+        'pets'          => "Hunter Pets",
         'requires'      => "Requires",
         'reqLevel'      => "Requires Level %s",
         'reqLevelHlm'   => "Requires Level %s",
@@ -216,6 +218,11 @@ $lang = array(
     'currency' => array(
         'cat'           => array(
             1 => "Miscellaneous", 2 => "Player vs. Player", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon and Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Unused"
+        )
+    ),
+    'pet'      => array(
+        'cat'           => array(
+            'Ferocity', 'Tenacity', 'Cunning'
         )
     ),
     'itemset' => array(

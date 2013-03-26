@@ -81,6 +81,8 @@ $lang = array(
         'cooldown'      => "%s de reutilización",
         'itemset'       => "conjunto de objetos",
         'itemsets'      => "Conjuntos de objetos",
+        'pet'           => "Mascota",
+        'pets'          => "Mascotas de cazador",
         'requires'      => "Requiere",
         'reqLevel'      => "Necesitas ser de nivel %s",
         'reqLevelHlm'   => "Necesitas ser de nivel %s",
@@ -169,6 +171,11 @@ $lang = array(
     'currency' => array(
         'cat'           => array(
             1 => "Miscelánea", 2 => "Jugador contra Jugador", 4 => "Clásico", 21 => "Wrath of the Lich King", 22 => "Mazmorra y banda", 23 => "Burning Crusade", 41 => "Prueba", 3 => "No las uso"
+        )
+    ),
+    'pet'      => array(
+        'cat'           => array(
+            'Ferocidad', 'Tenacidad', 'Astucia'
         )
     ),
     'itemset' => array(

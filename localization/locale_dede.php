@@ -88,6 +88,8 @@ $lang = array(
         'cooldown'      => "%s Abklingzeit",
         'itemset'       => "Ausrüstungsset",
         'itemsets'      => "Ausrüstungssets",
+        'pet'           => "Begleiter",
+        'pets'          => "Begleiter",
         'requires'      => "Benötigt",
         'reqLevel'      => "Benötigt Stufe %s",
         'reqLevelHlm'   => "Benötigt Stufe %s",
@@ -216,6 +218,11 @@ $lang = array(
     'currency' => array(
         'cat'           => array(
             1 => "Verschiedenes", 2 => "Spieler gegen Spieler", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon und Schlachtzug", 23 => "Burning Crusade", 41 => "Test", 3 => "Unbenutzt"
+        )
+    ),
+    'pet'      => array(
+        'cat'           => array(
+            'Wildheit', 'Hartnäckigkeit', 'Gerissenheit'
         )
     ),
     'itemset' => array(
