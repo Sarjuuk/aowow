@@ -2409,9 +2409,10 @@ var LANG = {
 
     message_fillsomecriteria: "Vous devez utiliser au moins un critère.",
 
-    tooltip_jconlygems: "Si coché, les gemmes pour joailler, <br />\nvont aussi être utilisé pour déterminer les meilleurs<br />\ngemmes possible pour le score pondéré d'un objet.",fidropdowns:{yn:[[1,"Oui"],
+    tooltip_jconlygems: "Si coché, les gemmes pour joailler, <br />\nvont aussi être utilisé pour déterminer les meilleurs<br />\ngemmes possible pour le score pondéré d'un objet.",
     tooltip_genericrating: "<span class=\"q2\">Equipé: Augmente votre $1 de <!--rtg$2-->$3&nbsp;<small>(<!--rtg%$2-->0&nbsp;@&nbsp;L<!--lvl-->0)</small>.</span><br />",
 
+	fidropdowns:{yn:[[1,"Oui"],
 	[2,"Non"]],num:[[1,">"],
 	[2,">="],
 	[3,"="],

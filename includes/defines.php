@@ -33,7 +33,7 @@ define('CACHETYPE_SEARCH',                  3);
 define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);
 define('SEARCH_TYPE_JSON',                  0x40000000);
-define('SEARCH_MASK_OPEN',                  0x001D807F);    // open search
+define('SEARCH_MASK_OPEN',                  0x003DC0FF);    // open search
 define('SEARCH_MASK_ALL',                   0x07FFFFFF);    // normal search
 
 // Databases

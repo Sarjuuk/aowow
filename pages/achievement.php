@@ -162,13 +162,16 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'type' => $crt['type'],
         );
 
+        $obj = (int)$crt['value1'];
+        $qty = (int)$crt['value2'];
+
         switch ($crt['type'])
         {
             // link to npc
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
             case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
                 $tmp['link'] = array(
-                    'href' => '?npc='.$crt['value1'],
+                    'href' => '?npc='.$obj,
                     'text' => $crtName,
                 );
                 $tmp['extra_text'] = Lang::$achievement['slain'];
@@ -179,7 +182,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
             case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
-                if ($zoneId = DB::Aowow()->selectCell('SELECT areatableID FROM ?_zones WHERE mapID = ? LIMIT 1', $crt['value1']))
+                if ($zoneId = DB::Aowow()->selectCell('SELECT areatableID FROM ?_zones WHERE mapID = ? LIMIT 1', $obj))
                     $tmp['link'] = array(
                         'href' => '?zone='.$zoneId,
                         'text' => $crtName,
@@ -191,7 +194,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
             case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
                 $tmp['link'] = array(
-                    'href' => '?zone='.$crt['value1'],
+                    'href' => '?zone='.$obj,
                     'text' => $crtName,
                 );
                 break;
@@ -201,21 +204,21 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
             case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
                 $tmp['link'] = array(
-                    'href' => '?skill='.$crt['value1'],
+                    'href' => '?skill='.$obj,
                     'text' => $crtName,
                 );
                 break;
             // link to class
             case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
                 $tmp['link'] = array(
-                    'href' => '?class='.$crt['value1'],
+                    'href' => '?class='.$obj,
                     'text' => $crtName,
                 );
                 break;
             // link to race
             case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
                 $tmp['link'] = array(
-                    'href' => '?race='.$crt['value1'],
+                    'href' => '?race='.$obj,
                     'text' => $crtName,
                 );
                 break;
@@ -226,23 +229,23 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             // link to achivement (/w icon)
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
                 $tmp['link'] = array(
-                    'href' => '?achievement='.$crt['value1'],
+                    'href' => '?achievement='.$obj,
                     'text' => $crtName,
                 );
                 $tmp['icon'] = $iconId;
                 $pageData['page']['icons'][] = array(
                     'itr'  => $iconId++,
                     'type' => 'g_achievements',
-                    'id'   => $crt['value1'],
+                    'id'   => $obj,
                 );
-                if ($crtAcv = new AchievementList(array(['id', $crt['value1']])))
+                if ($crtAcv = new AchievementList(array(['id', $obj])))
                     $crtAcv->addGlobalsToJscript($pageData);
                 break;
             // link to quest
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-                $crtName = Quest::getName($crt['value1']);
+                $crtName = Quest::getName($obj);
                 $tmp['link'] = array(
-                    'href' => '?quest='.$crt['value1'],
+                    'href' => '?quest='.$obj,
                     'text' => $crtName ? $crtName : $crtName,
                 );
                 break;
@@ -252,18 +255,18 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                $crtSpl = new SpellList(array(['id', $crt['value1']]));
+                $crtSpl = new SpellList(array(['id', $obj]));
                 $crtSpl->addGlobalsToJscript($pageData);
                 $text = $crtName ? $crtName : $crtSpl->names[$crtSpl->id];
                 $tmp['link'] = array(
-                    'href' => '?spell='.$crt['value1'],
+                    'href' => '?spell='.$obj,
                     'text' => $text
                 );
                 $tmp['icon'] = $iconId;
                 $pageData['page']['icons'][] = array(
                     'itr'  => $iconId++,
                     'type' => 'g_spells',
-                    'id'   => $crt['value1'],
+                    'id'   => $obj,
                 );
                 break;
             // link to item (/w icon)
@@ -271,44 +274,44 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
-                $crtItm = new ItemList(array(['id', $crt['value1']]));
+                $crtItm = new ItemList(array(['id', $obj]));
                 $crtItm->addGlobalsToJscript($pageData);
                 $text = $crtName ? $crtName : $crtItm->names[$crtItm->id];
                 $tmp['link'] = array(
-                    'href'    => '?item='.$crt['value1'],
+                    'href'    => '?item='.$obj,
                     'text'    => $text,
                     'quality' => $crtItm->getField('Quality'),
-                    'count'   => $crt['value2'],
+                    'count'   => $qty,
                 );
                 $tmp['icon'] = $iconId;
                 $pageData['page']['icons'][] = array(
                     'itr'   => $iconId++,
                     'type'  => 'g_items',
-                    'id'    => $crt['value1'],
-                    'count' => $crt['value2'],
+                    'id'    => $obj,
+                    'count' => $qty,
                 );
                 break;
             // link to faction (/w target reputation)
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
-                $crtName = Faction::getName($crt['value1']);
+                $crtName = Faction::getName($obj);
                 $tmp['link'] = array(
-                    'href' => '?faction='.$crt['value1'],
+                    'href' => '?faction='.$obj,
                     'text' => $crtName ? $crtName : $crtName,
                 );
-                $tmp['extra_text'] = ' ('.Lang::getReputationLevelForPoints($crt['value2']).')';
+                $tmp['extra_text'] = ' ('.Lang::getReputationLevelForPoints($qty).')';
                 break;
             // link to GObject
             case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
             case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
                 $tmp['link'] = array(
-                    'href' => '?object='.$crt['value1'],
+                    'href' => '?object='.$obj,
                     'text' => $crtName,
                 );
                 break;
             default:
                 $tmp['standard'] = true;
                 // Add a gold coin icon
-                $tmp['extra_text'] = $displayMoney ? Util::formatMoney($crt['value2']) : $crtName;
+                $tmp['extra_text'] = $displayMoney ? Util::formatMoney($qty) : $crtName;
                 break;
         }
         // If the right column

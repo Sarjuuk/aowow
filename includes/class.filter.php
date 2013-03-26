@@ -4,7 +4,7 @@ if(!defined('AOWOW_REVISION'))
 
 abstract class Filter
 {
-    private static $pattern   = "/[^\p{L}0-9\s\-\'\?\*]/ui";// delete any char not in unicode, number, hyphen, single quote or common wildcard
+    private static $pattern   = "/[^\p{L}0-9\s_\-\'\?\*]/ui";// delete any char not in unicode, number, hyphen, single quote or common wildcard
     private static $wildcards = ['*' => '%', '?' => '_'];
     private static $criteria  = ['cr', 'crs', 'crv'];       // [cr]iterium, [cr].[s]ign, [cr].[v]alue
 

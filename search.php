@@ -288,9 +288,11 @@ if ($searchMask & 0x40)
     {
         while ($items->iterate())
         {
-            $data[$items->id]['name']   = substr($data[$items->id]['name'], 1);
             $data[$items->id]['param1'] = '"'.$items->getField('icon').'"';
             $data[$items->id]['param2'] = $items->getField('Quality');
+
+            if ($searchMask & SEARCH_TYPE_OPEN)
+                $data[$items->id]['name'] = substr($data[$items->id]['name'], 1);
         }
 
         $found['item'] = array(

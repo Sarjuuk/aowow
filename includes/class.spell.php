@@ -934,7 +934,7 @@ class SpellList extends BaseType
             $pos += strlen($result[0]);
 
             $resolved = $this->resolveVariableString($result, $level, $interactive);
-            $str .= intVal($resolved) ? abs($resolved) : $resolved;
+            $str .= is_numeric($resolved) ? abs($resolved) : $resolved;
         }
         $str .= substr($data, $pos);
         $str = str_replace('#', '$', $str);                 // reset marks
@@ -1073,8 +1073,6 @@ class SpellList extends BaseType
             // append level cost
             if ($this->curTpl['powerCostPerLevel'] > 0)
                 $x .= sprintf(Lang::$spell['costPerLevel'], $this->curTpl['powerCostPerLevel']);
-
-            $x .= '<br />';
 
             if ($reqWrapper)
                 $x .= '</td><th>';
