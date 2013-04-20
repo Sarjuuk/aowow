@@ -36,22 +36,7 @@ $validCats  = array(
     )
 );
 
-$valid = false;
-switch (count($cats))
-{
-    case 0:
-        $valid = true;
-    case 1:
-        $valid = !$cats[0] || isset($validCats[$cats[0]]);
-        break;
-    case 2:
-        $valid = $cats[0] == 1 ? isset($validCats[$cats[0]][$cats[1]]) : isset($validCats[$cats[0]]) && in_array($cats[1], $validCats[$cats[0]]);
-        break;
-    case 3:
-        $valid = $cats[0] == 1 ? isset($validCats[$cats[0]][$cats[1]]) && in_array($cats[2], $validCats[$cats[0]][$cats[1]]) : false;
-        break;
-}
-if (!$valid)
+if (!Util::isValidPage($validCats, $cats))
     $smarty->error();
 
 if (!$smarty->loadCache($cacheKey, $pageData))

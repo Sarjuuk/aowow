@@ -1497,6 +1497,26 @@ class Util
         return $return;
     }
 
+    public static function isValidPage($struct, $keys)
+    {
+        switch (count($keys))
+        {
+            case 0:
+                return true;
+            case 1:
+                return !$keys[0] || isset($struct[$keys[0]]);
+            case 2:
+                if (!isset($struct[$keys[0]]))
+                    return false;
+
+                return in_array($keys[1], $struct[$keys[0]]) || isset($struct[$keys[0]][$keys[1]]);
+            case 3:
+                return isset($struct[$keys[0]][$keys[1]]) && in_array($keys[2], $struct[$keys[0]][$keys[1]]);
+        }
+
+        return false;
+    }
+
     // BaseType::_construct craaap!
     // todo: unify names
     public static function getNameFieldName($tpl)
