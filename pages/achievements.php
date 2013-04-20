@@ -99,7 +99,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $pageData['params'] = ['tabs' => false];
 
     // if we are have different cats display field
-    if ($acvList->hasDiffCategories())
+    if ($acvList->hasDiffFields(['category']))
         $pageData['params']['visibleCols'] = "$['category']";
 
     // create note if search limit was exceeded

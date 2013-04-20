@@ -30,7 +30,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         )
     );
 
-    if ($titles->hasDiffCategories())
+    if ($titles->hasDiffFields(['category']))
         $pageData['params']['visibleCols'] = "$['category']";
 
     if (!$titles->hasAnySource())

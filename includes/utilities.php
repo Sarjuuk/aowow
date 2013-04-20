@@ -18,22 +18,35 @@ abstract class BaseType
     protected $matchQuery = '';
 
     /*
-    *   condition as array [field, value, operator]
-    *       field:    must match fieldname; 1: select everything
-    *       value:    str   - operator defaults to: LIKE %<val>%
-    *                 int   - operator defaults to: = <val>
-    *                 array - operator defaults to: IN (<val>)
-    *       operator: modifies/overrides default
-    *                 ! - negated default value (NOT LIKE; <>; NOT IN)
+    *   condition as array [expression, value, operator]
+    *       expression:    str   - must match fieldname;
+    *                      int   - impl. 1: select everything
+    *                      array - another condition array
+    *       value:         str   - operator defaults to: LIKE %<val>%
+    *                      int   - operator defaults to: = <val>
+    *                      array - operator defaults to: IN (<val>)
+    *       operator:      modifies/overrides default
+    *                      ! - negated default value (NOT LIKE; <>; NOT IN)
     *   condition as str
     *       defines linking (AND || OR)
     *   condition as int
     *       defines LIMIT
     *
     *   example:
-    *       array(['id', 45], ['name', 'test', '!'], 'OR', 5)
+    *       array(
+    *           ['id', 45],
+    *           ['name', 'test', '!'],
+    *           [
+    *               'AND',
+    *               ['flags', 0xFF, '&'],
+    *               ['flags2', 0xF, '&'],
+    *           ]
+    *           [['mask', 0x3, '&'], 0]
+    *           'OR',
+    *           5
+    *       )
     *   results in
-    *       WHERE id = 45 OR name NOT LIKE %test% LIMIT 5;
+    *       WHERE ((`id` = 45) OR (`name` NOT LIKE "%test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) LIMIT 5
     */
     public function __construct($conditions = [], $applyFilter = false)
     {
@@ -56,31 +69,43 @@ abstract class BaseType
                 return;
         }
 
-        foreach ($conditions as $c)
+        $resolveCondition = function ($c, $supLink) use (&$resolveCondition)
         {
-            $field = '';
-            $op    = '';
-            $val   = '';
+            $subLink = '';
 
-            if (is_array($c))
+            foreach ($c as $foo)
+            {
+                if ($foo === 'AND')
+                    $subLink = ' AND ';
+                else if ($foo === 'OR')                     // nessi-bug: if (0 == 'OR') was true once... w/e
+                    $subLink = ' OR ';
+            }
+
+            // need to manually set link for subgroups to be recognized as condition set
+            if ($subLink)
+            {
+                $sql = [];
+
+                foreach ($c as $foo)
+                    if (is_array($foo))
+                        $sql[] = $resolveCondition($foo, $supLink);
+
+                return '('.implode($subLink, $sql).')';
+            }
+            else
             {
                 if ($c[0] == '1')
-                {
-                    $sql[] = '1';
-                    continue;
-                }
+                    return '1';
+                else if (is_array($c[0]))
+                    $field = $resolveCondition($c[0], $supLink);
                 else if ($c[0])
-                {
                     $field = '`'.implode('`.`', explode('.', Util::sqlEscape($c[0]))).'`';
-                }
-                else
-                    continue;
 
                 if (is_array($c[1]))
                 {
                     $val = implode(',', Util::sqlEscape($c[1]));
-                    if (!$val)
-                        continue;
+                    if ($val === '')
+                        return null;
 
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
                     $val = '('.$val.')';
@@ -88,8 +113,8 @@ abstract class BaseType
                 else if (is_string($c[1]))
                 {
                     $val = Util::sqlEscape($c[1]);
-                    if (!$val)
-                        continue;
+                    if ($val === '')
+                        return null;
 
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
                     $val = '"%'.$val.'%"';
@@ -100,20 +125,38 @@ abstract class BaseType
                     $val = Util::sqlEscape($c[1]);
                 }
                 else                                        // null for example
-                    continue;
+                    return null;
 
                 if (isset($c[2]) && $c[2] != '!')
                     $op = $c[2];
 
-                $sql[] = $field.' '.$op.' '.$val;
+                if (isset($field) && isset($op) && isset($val))
+                    return '('.$field.' '.$op.' '.$val.')';
+                else
+                    return null;
             }
-            else if (is_string($c))
-                $linking = $c == 'AND' ? ' AND ' : ' OR ';
-            else if (is_int($c))
-                $limit   = $c > 0      ? ' LIMIT '.$c : '';
-            else
-                continue;                                   // ignore other possibilities
+        };
+
+        foreach ($conditions as $i => $c)
+        {
+            switch(getType($c))
+            {
+                case 'array':
+                    break;
+                case 'string':
+                case 'integer':
+                case 'double':
+                    if (is_string($c))
+                        $linking = $c == 'AND' ? ' AND ' : ' OR ';
+                    else
+                        $limit = $c > 0 ? ' LIMIT '.$c : '';
+                default:
+                    unset($conditions[$i]);
+            }
         }
+        foreach ($conditions as $c)
+            if ($x = $resolveCondition($c, $linking))
+                $sql[] = $x;
 
         // todo: add strings propperly without them being escaped by simpleDB..?
         $this->setupQuery  = str_replace('[filter]', $this->filter && $this->filter->buildQuery() ? $this->filter->getQuery().' AND ' : NULL, $this->setupQuery);
@@ -211,18 +254,34 @@ abstract class BaseType
 
 trait listviewHelper
 {
-    public function hasDiffCategories()
+    public function hasDiffFields($fields)
     {
+        if (!is_array($fields))
+            return 0x0;
+
+        $base   = [];
+        $result = 0x0;
+
         $this->reset();
-        $curCat = $this->getField('category');
-        if ($curCat === null)
-            return false;
+        foreach ($fields as $k => $str)
+            $base[$str] = $this->getField($str);
 
         while ($this->iterate())
-            if ($curCat != $this->getField('category'))
-                return true;
+        {
+            foreach ($fields as $k => $str)
+            {
+                if ($base[$str] != $this->getField($str))
+                {
+                    $result |= 1 << $k;
+                    unset($fields[$k]);
+                }
+            }
 
-        return false;
+            if (empty($fields))                             // all fields diff .. return early
+                return $result;
+        }
+
+        return $result;
     }
 
     public function hasAnySource()
@@ -304,7 +363,7 @@ class Lang
 
     public static function getStances($stanceMask)
     {
-        $stanceMask &= 0x1F84F213E;                         // clamp to available stances/forms..
+        $stanceMask &= 0xFC27909F;                          // clamp to available stances/forms..
 
         $tmp = [];
         $i   = 1;

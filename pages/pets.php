@@ -31,7 +31,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         )
     );
 
-    if (!$pets->hasDiffCategories())
+    if (($mask = $pets->hasDiffFields(['type'])) == 0x0)
         $pageData['params']['hiddenCols'] = "$['type']";
 
     $pets->reset();
