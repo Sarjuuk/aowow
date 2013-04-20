@@ -113,7 +113,7 @@ if (!defined('AOWOW_REVISION'))
                 // costy and locale-independant -> cache
                 if (!isset($jsonBonus[$set['spell'.$i]]))
                 {
-                    $bSpell = new SpellList(array(['id', $set['spell'.$i]]));
+                    $bSpell = new SpellList(array(['s.id', $set['spell'.$i]]));
                     $jsonBonus[$set['spell'.$i]] = $bSpell->getStatGain();
                 }
 

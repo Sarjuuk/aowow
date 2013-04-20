@@ -243,7 +243,10 @@ if ($searchMask & 0x10)
         );
 
         if ($money->matches > $maxResults)
+        {
             $found['currency']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_currenciesfound', $money->matches, $maxResults);
+            $found['currency']['params']['_truncated'] = 1;
+        }
     }
 }
 
@@ -268,7 +271,10 @@ if ($searchMask & 0x20)
         );
 
         if ($sets->matches > $maxResults)
+        {
             $found['itemset']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsetsfound', $sets->matches, $maxResults);
+            $found['itemset']['params']['_truncated'] = 1;
+        }
     }
 }
 
@@ -305,7 +311,10 @@ if ($searchMask & 0x40)
         );
 
         if ($items->matches > $maxResults)
+        {
             $found['item']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsfound', $items->matches, $maxResults);
+            $found['item']['params']['_truncated'] = 1;
+        }
     }
 }
 
@@ -360,7 +369,10 @@ if ($searchMask & 0x10000)
         );
 
         if ($acvs->matches > $maxResults)
+        {
             $found['achievement']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_achievementsfound', $acvs->matches, $maxResults);
+            $found['achievement']['params']['_truncated'] = 1;
+        }
     }
 }
 
@@ -387,7 +399,10 @@ if ($searchMask & 0x20000)
         );
 
         if ($stats->matches > $maxResults)
+        {
             $found['statistic']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_statisticsfound', $stats->matches, $maxResults);
+            $found['statistic']['params']['_truncated'] = 1;
+        }
     }
 }
 

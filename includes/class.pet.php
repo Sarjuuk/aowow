@@ -7,7 +7,7 @@ class PetList extends BaseType
 {
     use ListviewHelper;
 
-    protected $setupQuery = 'SELECT *, type as category, id AS ARRAY_KEY FROM ?_pet WHERE [cond] ORDER BY Id ASC';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_pet WHERE [cond] ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_pet WHERE [cond]';
 
     public function getListviewData()
@@ -53,7 +53,7 @@ class PetList extends BaseType
                     $gathered[] = (int)$this->curTpl['spellId'.$i];
 
         if ($gathered)
-            (new SpellList(array(['id', $gathered])))->addGlobalsToJscript($refs);
+            (new SpellList(array(['s.id', $gathered])))->addGlobalsToJscript($refs);
     }
 
     public function addRewardsToJScript(&$ref) { }

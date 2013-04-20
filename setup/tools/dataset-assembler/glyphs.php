@@ -132,7 +132,7 @@ if (!defined('AOWOW_REVISION'))
         if ($pop['glyphEffect'])
             $glyphSpells[] = $pop['glyphEffect'];
 
-    $glyphSpells = new SpellList(array(['id', $glyphSpells]));
+    $glyphSpells = new SpellList(array(['s.id', $glyphSpells]));
 
     foreach ($locales as $lId)
     {

@@ -206,17 +206,18 @@ abstract class Filter
         }
     }
 
-    protected function list2Mask($list)
+    protected function list2Mask($list, $noOffset = false)
     {
         $mask = 0x0;
+        $o    = $noOffset ? 0 : 1;                          // schoolMask requires this..?
 
         if (is_array($list))
         {
             foreach ($list as $itm)
-                $mask += (1 << intVal($itm));
+                $mask += (1 << (intVal($itm) - $o));
         }
         else
-            $mask = (1 << intVal($list));
+            $mask = (1 << (intVal($list) - $o));
 
         return $mask;
     }
@@ -233,6 +234,9 @@ abstract class Filter
         header('Location: http://'.$_SERVER['SERVER_NAME'].str_replace('index.php', '', $_SERVER['PHP_SELF']).'?'.$_SERVER['QUERY_STRING'].'='.$get);
     }
 
+
+    // TODO: wrong wrong wrong!!
+    // 1) filter-Ids are different for each type; 2) (NOT) IN - subqueries will eat the mysql-server alive!
     protected function createSQLForCommunity($cr)
     {
         switch ($cr[0])

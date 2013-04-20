@@ -1311,7 +1311,9 @@ class Util
         if (!is_array($data))
             return mysql_real_escape_string(trim($data));
 
-        array_walk($data, function(&$item, $key) { $item = Util::sqlEscape($item); });
+        array_walk($data, function(&$item, $key) {
+            $item = Util::sqlEscape($item);
+        });
 
         return $data;
     }
@@ -1368,8 +1370,7 @@ class Util
         $arr = explode('.', $str);
 
         foreach ($arr as $i => $a)
-            if (!is_numeric($a))
-                $arr[$i] = null;
+            $arr[$i] = is_numeric($a) ? (int)$a : null;
 
         return $arr;
     }
@@ -1443,11 +1444,11 @@ class Util
             switch ($enchant['type'.$h])
             {
                 case 2:
-                    @$jsonStats[2] += $enchant['amount'.$h];
+                    @$jsonStats[ITEM_MOD_WEAPON_DMG] += $enchant['amount'.$h];
                     break;
                 case 3:
                 case 7:
-                    $spl   = new SpellList(array(['id', (int)$enchant['object'.$h]]));
+                    $spl   = new SpellList(array(['s.id', (int)$enchant['object'.$h]]));
                     $gains = $spl->getStatGain();
 
                     foreach ($gains as $gain)
@@ -1458,25 +1459,25 @@ class Util
                     switch ($enchant['object'.$h])
                     {
                         case 0:                             // Physical
-                            @$jsonStats[50] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_ARMOR] += $enchant['amount'.$h];
                             break;
                         case 1:                             // Holy
-                            @$jsonStats[53] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_HOLY_RESISTANCE] += $enchant['amount'.$h];
                             break;
                         case 2:                             // Fire
-                            @$jsonStats[51] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_FIRE_RESISTANCE] += $enchant['amount'.$h];
                             break;
                         case 3:                             // Nature
-                            @$jsonStats[55] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_NATURE_RESISTANCE] += $enchant['amount'.$h];
                             break;
                         case 4:                             // Frost
-                            @$jsonStats[52] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_FROST_RESISTANCE] += $enchant['amount'.$h];
                             break;
                         case 5:                             // Shadow
-                            @$jsonStats[54] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_SHADOW_RESISTANCE] += $enchant['amount'.$h];
                             break;
                         case 6:                             // Arcane
-                            @$jsonStats[56] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_ARCANE_RESISTANCE] += $enchant['amount'.$h];
                             break;
                     }
                     break;

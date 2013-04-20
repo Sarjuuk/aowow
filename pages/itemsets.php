@@ -31,7 +31,10 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     // create note if search limit was exceeded
     if ($itemsets->matches > $AoWoWconf['sqlLimit'])
+    {
         $pageData['params']['note'] = '$'.sprintf(Util::$filterResultString, 'LANG.lvnote_itemsetsfound', $itemsets->matches, $AoWoWconf['sqlLimit']);
+        $pageData['params']['_truncated'] = 1;
+    }
 
     if ($itemsets->filterGetError())
         $pageData['params']['_errors'] = '$1';

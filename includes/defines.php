@@ -33,7 +33,7 @@ define('CACHETYPE_SEARCH',                  3);
 define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);
 define('SEARCH_TYPE_JSON',                  0x40000000);
-define('SEARCH_MASK_OPEN',                  0x007DC0FF);    // open search
+define('SEARCH_MASK_OPEN',                  0x007DC1FF);    // open search
 define('SEARCH_MASK_ALL',                   0x07FFFFFF);    // normal search
 
 // Databases
@@ -112,27 +112,27 @@ define('SIDE_HORDE',                        2);
 define('SIDE_BOTH',                         3);
 
 // ClassMask
-define('CLASS_WARRIOR',                     0x1);
-define('CLASS_PALADIN',                     0x2);
-define('CLASS_HUNTER',                      0x4);
-define('CLASS_ROGUE',                       0x8);
-define('CLASS_PRIEST',                      0x10);
-define('CLASS_DEATHKNIGHT',                 0x20);
-define('CLASS_SHAMAN',                      0x40);
-define('CLASS_MAGE',                        0x80);
+define('CLASS_WARRIOR',                     0x001);
+define('CLASS_PALADIN',                     0x002);
+define('CLASS_HUNTER',                      0x004);
+define('CLASS_ROGUE',                       0x008);
+define('CLASS_PRIEST',                      0x010);
+define('CLASS_DEATHKNIGHT',                 0x020);
+define('CLASS_SHAMAN',                      0x040);
+define('CLASS_MAGE',                        0x080);
 define('CLASS_WARLOCK',                     0x100);
 define('CLASS_DRUID',                       0x400);
 define('CLASS_MASK_ALL',                    0x5FF);
 
 // RaceMask
-define('RACE_HUMAN',                        0x1);
-define('RACE_ORC',                          0x2);
-define('RACE_DWARF',                        0x4);
-define('RACE_NIGHTELF',                     0x8);
-define('RACE_UNDEAD',                       0x10);
-define('RACE_TAUREN',                       0x20);
-define('RACE_GNOME',                        0x40);
-define('RACE_TROLL',                        0x80);
+define('RACE_HUMAN',                        0x001);
+define('RACE_ORC',                          0x002);
+define('RACE_DWARF',                        0x004);
+define('RACE_NIGHTELF',                     0x008);
+define('RACE_UNDEAD',                       0x010);
+define('RACE_TAUREN',                       0x020);
+define('RACE_GNOME',                        0x040);
+define('RACE_TROLL',                        0x080);
 define('RACE_BLOODELF',                     0x200);
 define('RACE_DRAENEI',                      0x400);
 define('RACE_MASK_ALLIANCE',                0x44D);

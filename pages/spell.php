@@ -21,35 +21,37 @@ if (isset($_GET['power']))
 
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        $spell = new SpellList(array(['id', $id]));
+        $spell = new SpellList(array(['s.id', $id]));
 
         if ($spell->error)
             die('$WowheadPower.registerSpell('.$id.', '.User::$localeId.', {});');
 
-        $x = '$WowheadPower.registerSpell('.$id.', '.User::$localeId.", {\n";
+        $x  = '$WowheadPower.registerSpell('.$id.', '.User::$localeId.", {\n";
+        $pt = [];
         if ($n = $spell->names[$id])
-            $x .= "\tname_".User::$localeString.": '".Util::jsEscape($n)."',\n";
+            $pt[] = "\tname_".User::$localeString.": '".Util::jsEscape($n)."'";
         if ($i = $spell->getField('iconString'))
-            $x .= "\ticon: '".Util::jsEscape($i)."',\n";
+            $pt[] = "\ticon: '".Util::jsEscape($i)."'";
         if ($t = $spell->renderTooltip($id))
-            $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($t)."'";
+            $pt[] = "\ttooltip_".User::$localeString.": '".Util::jsEscape($t)."'";
         if ($b = $spell->renderBuff($id))
-            $x .= ",\n\tbuff_".User::$localeString.": '".Util::jsEscape($b)."'\n";
-        $x .= '});';
+            $pt[] = "\tbuff_".User::$localeString.": '".Util::jsEscape($b)."'";
+        $x .= implode(",\n", $pt)."\n});";
 
         $smarty->saveCache($cacheKeyTooltip, $x);
     }
+
     die($x);
 }
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $spell = new SpellList(array(['id', $id]));
+    $spell = new SpellList(array(['s.id', $id]));
 
 // v there be dragons v
 
     // Spelldata
-    if ($spellObj = new SpellList(array(['id', $id])))
+    if ($spellObj = new SpellList(array(['s.id', $id])))
     {
         $row = $spellObj->template; // equivalent to 5 layers of panzertape
 

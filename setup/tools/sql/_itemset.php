@@ -274,7 +274,7 @@ for ($i = 1; $i < 9; $i++)
     if ($set['spellId'.$i] > 0)
         $spells[] = (int)$set['spellId'.$i];
 
-$bonusSpells = new SpellList(array(['id', $spells]));
+$bonusSpells = new SpellList(array(['s.id', $spells]));
 
 $mods = $bonusSpells->getStatGain();
 

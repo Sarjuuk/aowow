@@ -5,14 +5,16 @@ if (!defined('AOWOW_REVISION'))
 
 class SpellList extends BaseType
 {
-    public    $tooltips   = [];
-    public    $buffs      = [];
+    public    $tooltips    = [];
+    public    $buffs       = [];
 
-    private   $spellVars  = [];
-    private   $refSpells  = [];
+    private   $spellVars   = [];
+    private   $refSpells   = [];
+    private   $interactive = false;
+    private   $charLevel   = MAX_LEVEL;
 
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE [filter] [cond] GROUP BY Id ORDER BY Id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_spell WHERE [filter] [cond]';
+    protected $setupQuery  = 'SELECT *, id AS ARRAY_KEY FROM ?_spell s WHERE [filter] [cond] GROUP BY Id ORDER BY Id ASC';
+    protected $matchQuery  = 'SELECT COUNT(1) FROM ?_spell s WHERE [filter] [cond]';
 
     public function __construct($conditions, $applyFilter = false)
     {
@@ -226,11 +228,11 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
-    private function resolveEvaluation($formula, $level)
+    private function resolveEvaluation($formula)
     {
         // todo: define unresolvable texts like AP, MHW, ect
 
-        $pl    = $PL    = $level;
+        $pl    = $PL    = $this->charLevel;
         $PlayerName     = Lang::$main['name'];
         $cond  = $COND  = function($a, $b, $c) { return $a ? $b : $c; };
         $eq    = $EQ    = function($a, $b)     { return $a == $b;     };
@@ -251,7 +253,7 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
-    private function resolveVariableString($variable, $level, $interactive)
+    private function resolveVariableString($variable)
     {
         $signs  = ['+', '-', '/', '*', '%', '^'];
 
@@ -270,7 +272,7 @@ class SpellList extends BaseType
 
         // cache at least some lookups.. should be moved to single spellList :/
         if ($lookup && !isset($this->refSpells[$lookup]))
-            $this->refSpells[$lookup] = new SpellList(array(['id', $lookup]));
+            $this->refSpells[$lookup] = new SpellList(array(['s.id', $lookup]));
 
         switch ($var)
         {
@@ -296,45 +298,6 @@ class SpellList extends BaseType
                     eval("\$base = $base $op $oparg;");
 
                 return $base;
-/* where the heck is this var...?
-            case 'c':                                       // BasePoints (raw)
-                if ($lookup > 0 && $exprData[0])
-                    $spell = DB::Aowow()->selectRow('SELECT effect'.$exprData[0].'BasePoints, effect'.$exprData[0].'AuraId, effect'.$exprData[0].'MiscValue FROM ?_spell WHERE id=? LIMIT 1', $lookup);
-                else
-                    $spell = $this->curTpl;
-
-                $base = $spell['effect'.$exprData[0].'BasePoints'] + 1;
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
-
-                // Aura giving combat ratings (click-interactive)
-                $rType = 0;
-                if ($spell['effect'.$exprData[0].'AuraId'] == 189)
-                {
-                    $mv = $spell['effect'.$exprData[0].'MiscValue'];
-                    for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
-                    {
-                        if (!Util::$combatRatingToItemMod[$j])
-                            continue;
-
-                        if (($mv & (1 << $j)) == 0)
-                            continue;
-
-                        $rType = Util::$combatRatingToItemMod[$j];
-                        break;
-                    }
-                }
-                // Aura end
-
-                if ($rType && $interactive)
-                    $str .= '<!--rtg'.$rType.'-->'.$base."&nbsp;<small>(".Util::setRatingLevel($level, $rType, $base).")</small>";
-                else
-                    $str .= $base;
-
-                $lastvalue = $base;
-                break;
-*/
             case 'd':                                       // SpellDuration
             case 'D':                                       // todo: min/max?
                 if ($lookup)
@@ -348,7 +311,7 @@ class SpellList extends BaseType
                 if ($op && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return Util::formatTime(abs($base), true);
+                return explode(' ', Util::formatTime(abs($base), true));
             case 'e':                                       // EffectValueMultiplier
             case 'E':
                 if ($lookup)
@@ -373,7 +336,7 @@ class SpellList extends BaseType
                 return $base;
             case 'g':                                       // boolean choice with casters gender as condition $gX:Y;
             case 'G':
-                return '&gt;'.$switch[0].'/'.$switch[1].'&lt;';
+                return '&lt;'.$switch[0].'/'.$switch[1].'&gt;';
             case 'h':                                       // ProcChance
             case 'H':
                 if ($lookup)
@@ -443,8 +406,8 @@ class SpellList extends BaseType
                 }
                 // Aura end
 
-                if ($rType && $interactive)
-                    return '<!--rtg'.$rType.'-->'.abs($base)."&nbsp;<small>(".Util::setRatingLevel($level, $rType, abs($base)).")</small>";
+                if ($rType && $this->interactive)
+                    return '<!--rtg'.$rType.'-->'.abs($base)."&nbsp;<small>(".Util::setRatingLevel($this->charLevel, $rType, abs($base)).")</small>";
                 else
                     return $base;
             case 'n':                                       // ProcCharges
@@ -553,8 +516,8 @@ class SpellList extends BaseType
                 }
                 // Aura end
 
-                if ($rType && $equal && $interactive)
-                    return '<!--rtg'.$rType.'-->'.$min."&nbsp;<small>(".Util::setRatingLevel($level, $rType, $min).")</small>";
+                if ($rType && $equal && $this->interactive)
+                    return '<!--rtg'.$rType.'-->'.$min."&nbsp;<small>(".Util::setRatingLevel($this->charLevel, $rType, $min).")</small>";
                 else
                     return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
             case 't':                                       // Periode
@@ -607,7 +570,7 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
-    private function resolveFormulaString($formula, $precision = 0, $level, $interactive)
+    private function resolveFormulaString($formula, $precision = 0)
     {
         // step 1: formula unpacking redux
         while (($formStartPos = strpos($formula, '${')) !== false)
@@ -643,14 +606,15 @@ class SpellList extends BaseType
                 ++$formCurPos;                              // for some odd reason the precision decimal survives if wo dont increment further..
             }
 
-            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $level, $interactive);
+            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision)
 
             $formula = substr_replace($formula, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
 
         // step 2: resolve variables
-        $pos = 0;                                           // continue strpos-search from this offset
-        $str = '';
+        $pos    = 0;                                           // continue strpos-search from this offset
+        $str    = '';
+        $suffix = '';
         while (($npos = strpos($formula, '$', $pos)) !== false)
         {
             if ($npos != $pos)
@@ -667,15 +631,24 @@ class SpellList extends BaseType
                 continue;
             }
             $pos += strlen($result[0]);
-            $str .= $this->resolveVariableString($result, $level, $interactive);
+
+            $var = $this->resolveVariableString($result);
+            if (is_array($var))
+            {
+                $str   .= $var[0];
+                $suffix = $var[1];
+            }
+            else
+                $str .= $var;
         }
         $str .= substr($formula, $pos);
         $str  = str_replace('#', '$', $str);                // reset marks
 
         // step 3: try to evaluate result
-        $evaled = $this->resolveEvaluation($str, $level);
+        $evaled = $this->resolveEvaluation($str);
 
-        return (float)$evaled ? number_format($evaled, $precision) : $evaled;
+        $return = is_numeric($evaled) ? number_format($evaled, $precision) : $evaled;
+        return $return.' '.$suffix;
     }
 
     // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
@@ -755,6 +728,8 @@ class SpellList extends BaseType
             $gt(a, b)      - a > b
     */
 
+    $this->interactive = $interactive;
+    $this->charLevel   = $level;
 
     // step 0: get text
         $data = Util::localizedString($this->curTpl, $type);
@@ -898,15 +873,15 @@ class SpellList extends BaseType
                 $formCurPos++;
             }
 
-            // check for precision-modifiers .. yes, the precrements fullfill a role!
-            if ($formCurPos + 2 < strlen($data) && $data[++$formCurPos] == '.')
-                if ($prec = $data[++$formCurPos])
-                {
-                    $formPrecision = (int)$prec;
-                    ++$formCurPos;                          // for some odd reason the precision decimal survives if wo dont increment further..
-                }
+            $formCurPos++;
 
-            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $level, $interactive);
+            // check for precision-modifiers
+            if ($formCurPos + 1 < strlen($data) && $data[$formCurPos] == '.' && is_numeric($data[$formCurPos + 1]))
+            {
+                $formPrecision = $data[$formCurPos + 1];
+                $formCurPos += 2;
+            }
+            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision);
 
             $data = substr_replace($data, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
@@ -933,16 +908,19 @@ class SpellList extends BaseType
 
             $pos += strlen($result[0]);
 
-            $resolved = $this->resolveVariableString($result, $level, $interactive);
+            $var = $this->resolveVariableString($result);
+            $resolved = is_array($var) ? $var[0] : $var;
             $str .= is_numeric($resolved) ? abs($resolved) : $resolved;
+            if (is_array($var))
+                $str .= ' '.$var[1];
         }
         $str .= substr($data, $pos);
         $str = str_replace('#', '$', $str);                 // reset marks
 
     // step 5: variable-depentant variable-text
         // special case $lONE:ELSE;
-        while (preg_match('/([\d\.]+) \$l([\w\s]*):([\w\s]*);/i', $str, $m))
-            $str = str_replace($m[1].' $l'.$m[2].':'.$m[3].';', $m[1].' '.($m[1] == 1 ? $m[2] : $m[3]), $str);
+        while (preg_match('/([\d\.]+)([^\d]*)\$l([\w\s]*):([\w\s]*);/i', $str, $m))
+            $str = str_replace($m[1].$m[2].'$l'.$m[3].':'.$m[4].';', $m[1].$m[2].($m[1] == 1 ? $m[3] : $m[4]), $str);
 
     // step 6: HTMLize
         // colors
@@ -1035,7 +1013,7 @@ class SpellList extends BaseType
             // get description
             $desc = $this->parseText('description');
 
-            $reqWrapper  = $this->curTpl['rangeMaxHostile'] && ($this->curTpl['powerCost'] > 0 || $this->curTpl['powerCostPercent'] > 0);
+            $reqWrapper  = $this->curTpl['rangeMaxHostile'] && ($this->curTpl['powerCost'] > 0 || $this->curTpl['powerCostPercent'] > 0 || ($this->curTpl['powerCostRunes'] & 0x333));
             $reqWrapper2 = $reagents ||$tools || $desc;
 
             $x = '';
@@ -1052,7 +1030,8 @@ class SpellList extends BaseType
             // rank
             if (!empty($rankText))
                 $x .= '<br /></td><th><b class="q0">'.$rankText.'</b></th></tr></table>';
-
+            else
+                $x .= '<br>';
 
             if ($reqWrapper)
                 $x .= '<table width="100%"><tr><td>';
@@ -1064,7 +1043,19 @@ class SpellList extends BaseType
             if ($this->curTpl['powerCostPercent'] > 0)
                 $x .= $this->curTpl['powerCostPercent']."% ".sprintf(Lang::$spell['pctCostOf'], strtolower(Lang::$spell['powerTypes'][$pt]));
             else if ($this->curTpl['powerCost'] > 0 || $this->curTpl['powerPerSecond'] > 0 || $this->curTpl['powerCostPerLevel'] > 0)
-                $x .= ($pt == 1 ? $this->curTpl['powerCost'] / 10 : $this->curTpl['powerCost']).' '.ucFirst(Lang::$spell['powerTypes'][$pt]);
+                $x .= ($pt == 1 || $pt == 6 ? $this->curTpl['powerCost'] / 10 : $this->curTpl['powerCost']).' '.ucFirst(Lang::$spell['powerTypes'][$pt]);
+            else if ($rCost = ($this->curTpl['powerCostRunes'] & 0x333))
+            {   // Blood 2|1 - Unholy 2|1 - Frost 2|1
+                $runes = [];
+                if ($_ = (($rCost & 0x300) >> 8))
+                    $runes[] = $_." ".Lang::$spell['powerRunes'][2];
+                if ($_ = (($rCost & 0x030) >> 4))
+                    $runes[] = $_." ".Lang::$spell['powerRunes'][1];
+                if ($_ = ($rCost & 0x003))
+                    $runes[] = $_." ".Lang::$spell['powerRunes'][0];
+
+                $x .= implode(', ', $runes);
+            }
 
             // append periodic cost
             if ($this->curTpl['powerPerSecond'] > 0)
@@ -1102,7 +1093,7 @@ class SpellList extends BaseType
             // cast times
             if ($this->curTpl['interruptFlagsChannel'])
                 $x .= Lang::$spell['channeled'];
-            else if ($this->curTpl['castTime'])
+            else if ($this->curTpl['castTime'] > 0)
                 $x .= sprintf(Lang::$spell['castIn'], $this->curTpl['castTime'] / 1000);
             else if ($this->curTpl['attributes0'] & 0x10)       // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only
                 $x .= Lang::$spell['instantPhys'];
@@ -1119,7 +1110,8 @@ class SpellList extends BaseType
 
             $x .= '</tr>';
 
-            if ($this->curTpl['stanceMask'])
+            // SPELL_ATTR2_NOT_NEED_SHAPESHIFT
+            if ($this->curTpl['stanceMask'] && ($this->curTpl['attributes2'] & 0x80000) == 0)
                 $x.= '<tr><td colspan="2">'.Lang::$game['requires'].' '.Lang::getStances($this->curTpl['stanceMask']).'</td></tr>';
 
             $x .= '</table>';

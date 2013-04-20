@@ -348,7 +348,7 @@ Mapper.prototype = {
 		}
 
 		var type = g_locale.name;
-		
+
 		if(isset('g_ptr') && g_ptr)
 			type = 'ptr';
 		else if(isset('g_beta') && g_beta)
@@ -422,7 +422,7 @@ Mapper.prototype = {
 	setZones: function(div, zones)
 	{
 		// div = $('#'+div);
-		div = ge('#'+div);
+        div = ge(div);
 		if(!div || !zones || zones.length == 0 || !this.objectives)
 			return;
 
@@ -971,12 +971,22 @@ Mapper.prototype = {
 		if(this.sToggle)
 			this.sToggle.style.display = (this.toggle && this.nCoords ? '' : 'none');
 
-		//if(!noScroll)
-		//	g_scrollTo(this.parent, 3);
+		if(!noScroll)
+			g_scrollTo(this.parent, 3);
 
-        // qhat the heck did this do..?
+        // replacement start
 		// $('.line', this.floorPins[level]).hide();
 		// $('.line.' + Mapper.sizes[this.zoom][2], this.floorPins[level]).show();
+        if (this.floorPins[level]) {
+            var lines = this.floorPins[level].getElementsByClassName('line');
+            for (i in lines)
+                lines[i].display = 'none';
+
+            lines = this.floorPins[level].getElementsByClassName('line ' + Mapper.sizes[this.zoom][2]);
+            for (i in lines)
+                lines[i].display = 'block';
+        }
+        // end of replacement
 
 		this.onMapUpdate && this.onMapUpdate(this);
 	},

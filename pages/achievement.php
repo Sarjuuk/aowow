@@ -255,7 +255,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                $crtSpl = new SpellList(array(['id', $obj]));
+                $crtSpl = new SpellList(array(['s.id', $obj]));
                 $crtSpl->addGlobalsToJscript($pageData);
                 $text = $crtName ? $crtName : $crtSpl->names[$crtSpl->id];
                 $tmp['link'] = array(

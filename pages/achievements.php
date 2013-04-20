@@ -46,13 +46,13 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $acvList   = new AchievementList($condition ? [['category', $condition]] : [], true);
     if (!$acvList->matches)
     {
-        $curCats = $catList = [$condition];
+        $curCats = $catList = [$condition ? $condition : 0];
         while ($curCats)
         {
             $curCats = DB::Aowow()->SelectCol('SELECT Id FROM ?_achievementCategory WHERE parentCategory IN (?a)', $curCats);
             $catList = array_merge($catList, $curCats);
         }
-        $acvList   = new AchievementList($catList ? [['category', $catList]] : [], true);
+        $acvList = new AchievementList($catList ? [['category', $catList]] : [], true);
     }
 
     // recreate form selection
@@ -89,7 +89,10 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     // create note if search limit was exceeded
     if ($acvList->matches > $AoWoWconf['sqlLimit'])
+    {
         $pageData['params']['note'] = '$'.sprintf(Util::$filterResultString, 'LANG.lvnote_achievementsfound', $acvList->matches, $AoWoWconf['sqlLimit']);
+        $pageData['params']['_truncated'] = 1;
+    }
 
     if ($acvList->filterGetError())
         $pageData['params']['_errors'] = '$1';

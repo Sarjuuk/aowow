@@ -558,7 +558,7 @@ class ItemList extends BaseType
 
         if ($itemSpellsAndTrigger)
         {
-            $itemSpells = new SpellList(array(['id', array_keys($itemSpellsAndTrigger)]));
+            $itemSpells = new SpellList(array(['s.id', array_keys($itemSpellsAndTrigger)]));
             while ($itemSpells->iterate())
                 if ($parsed = $itemSpells->parseText('description', $this->curTpl['RequiredLevel']))
                     $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id]].$parsed;
@@ -622,7 +622,7 @@ class ItemList extends BaseType
             // todo: get from static prop?
             if ($setSpellsAndIdx)
             {
-                $boni = new SpellList(array(['id', array_keys($setSpellsAndIdx)]));
+                $boni = new SpellList(array(['s.id', array_keys($setSpellsAndIdx)]));
                 while ($boni->iterate())
                 {
                     $itemset['spells'][] = array(
@@ -656,7 +656,7 @@ class ItemList extends BaseType
         // recipe handling (some stray Techniques have subclass == 0), place at bottom of tooltipp
         if ($this->curTpl['class'] == ITEM_CLASS_RECIPE && ($this->curTpl['subclass'] || $this->curTpl['BagFamily'] == 16))
         {
-            $craftSpell   = new SpellList(array(['id', (int)$this->curTpl['spellid_2']]));
+            $craftSpell   = new SpellList(array(['s.id', (int)$this->curTpl['spellid_2']]));
             $craftItem    = new ItemList(array(['i.entry', (int)$craftSpell->curTpl["effect1CreateItemId"]]));
             $reagentItems = [];
 
@@ -830,7 +830,7 @@ class ItemList extends BaseType
 
         if ($equipSpells)
         {
-            $eqpSplList = new SpellList(array(['id', $equipSpells]));
+            $eqpSplList = new SpellList(array(['s.id', $equipSpells]));
             $stats      = $eqpSplList->getStatGain();
 
             foreach ($stats as $stat)
@@ -1008,7 +1008,7 @@ class ItemList extends BaseType
          // 'subsubclass' => $this->curTpl['subsubclass'],
             'heroic'      => (string)($this->curTpl['Flags'] & 0x8),
             'side'        => Util::sideByRaceMask($this->curTpl['AllowableRace']), // check for FlagsExtra? 0:both; 1: Horde; 2:Alliance
-            'slot'        => $this->curTpl['InventoryType'],
+            'slot'        => $this->curTpl['InventoryType'] == 26 ? 15 : $this->curTpl['InventoryType'] == 20 ? 5 : $this->curTpl['InventoryType'],
             'slotbak'     => $this->curTpl['InventoryType'],
             'level'       => $this->curTpl['ItemLevel'],
             'reqlevel'    => $this->curTpl['RequiredLevel'],

@@ -161,7 +161,7 @@ class QuestList extends BaseType
             (new ItemList(array(['i.entry', $items])))->addGlobalsToJscript($refs);
 
         if ($spells)
-            (new SpellList(array(['id', $spells])))->addGlobalsToJscript($refs);
+            (new SpellList(array(['s.id', $spells])))->addGlobalsToJscript($refs);
 
         if ($titles)
             (new TitleList(array(['id', $titles])))->addGlobalsToJscript($refs);

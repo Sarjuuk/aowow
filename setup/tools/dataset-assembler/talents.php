@@ -114,7 +114,7 @@ if (!defined('AOWOW_REVISION'))
 
                 for ($k = 0; $k <= ($m - 1); $k++)
                 {
-                    $tSpell = new SpellList(array(['id', $talents[$j]['rank'.($k + 1)]]));
+                    $tSpell = new SpellList(array(['s.id', $talents[$j]['rank'.($k + 1)]]));
                     $d[] = $tSpell->parseText();
                     $s[] = $talents[$j]['rank'.($k + 1)];
 

@@ -448,6 +448,11 @@ function eO(b) {
 		delete b[a]
 	}
 }
+function dO(s) {
+    function f(){};
+    f.prototype = s;
+    return new f;
+}
 function cO(c, a) {
 	for (var b in a) {
 		if (a[b] !== null && typeof a[b] == "object" && a[b].length) {
