@@ -28,7 +28,7 @@ if (isset($_GET['power']))
 
         $x  = '$WowheadPower.registerSpell('.$id.', '.User::$localeId.", {\n";
         $pt = [];
-        if ($n = $spell->names[$id])
+        if ($n = $spell->getField('name', true))
             $pt[] = "\tname_".User::$localeString.": '".Util::jsEscape($n)."'";
         if ($i = $spell->getField('iconString'))
             $pt[] = "\ticon: '".Util::jsEscape($i)."'";

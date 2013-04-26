@@ -666,7 +666,7 @@ function g_addCss(b) {
 	} else {
 		ae(c, ct(b))
 	}
-	var a = document.getElementsByTagName("head")[0];
+	var a = gE(document, "head")[0];
 	ae(a, c)
 }
 function g_setTextNodes(c, b) {
@@ -2341,6 +2341,39 @@ function g_createOrRegex(c) {
 	return new RegExp("(" + d + ")", "gi")
 }
 
+DomContentLoaded.addEvent(function () {
+    array_apply(gE(document, 'dfn'), function(x){
+        var text = x.title;
+        x.title = '';
+        x.className += ' tip';
+        g_addTooltip(x, text, 'q');
+    });
+/* old implementation below; new is above
+    $("dfn").each(function() {
+        var text = $(this).attr('title');
+        // '<span class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, LANG.tooltip_jconlygems, 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'
+        $(this).attr('title', '').addClass('tip').mouseover(function(event) {
+            $WH.Tooltip.showAtCursor(event, text, 0, 0, 'q');
+        }).mousemove(function(event) {
+            $WH.Tooltip.cursorUpdate(event)
+        }).mouseout(function() {
+            $WH.Tooltip.hide()}
+        );
+    });
+*/
+// oohkay, if i understand this right, this code binds an onCopy eventHandler to every child node of class="text"-nodes with the attribute unselectable="on"
+// causing the text to disappear for 1ms, causing the empty node to be copied ...  w/e, i'm not going to use this nonsense
+/*
+    $('.text').bind('copy', function() {
+        $('*[unselectable]', this).each(function(i, v) {
+            var txt = $(v).text();
+            $(v).text('');
+            setTimeout(function() { $(v).text(txt) }, 1);
+        });
+    });
+*/
+});
+
 function g_GetExpansionClassName(expansion) {
 	switch (expansion) {
 		case 0:
@@ -3155,7 +3188,7 @@ Ajax.onReadyStateChange = function() {
 	}
 };
 function g_ajaxIshRequest(b) {
-	var c = document.getElementsByTagName("head")[0],
+	var c = gE(document, "head")[0],
 	a = g_getGets();
 	if (a.refresh != null) {
 		b += "&refresh"

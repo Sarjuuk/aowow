@@ -5,14 +5,13 @@ if (!defined('AOWOW_REVISION'))
 
 abstract class BaseType
 {
-    public    $names      = [];
-    public    $Id         = 0;
-    public    $matches    = 0;                              // total matches unaffected by sqlLimit in config
+    public    $id         = 0;
     public    $error      = true;
 
     protected $templates  = [];
     protected $curTpl     = [];                             // lets iterate!
     protected $filter     = null;
+    protected $matches    = null;                           // total matches unaffected by sqlLimit in config
 
     protected $setupQuery = '';
     protected $matchQuery = '';
@@ -170,13 +169,8 @@ abstract class BaseType
         if (!$rows)
             return;
 
-        $this->matches = DB::Aowow()->SelectCell($this->matchQuery);
-
         foreach ($rows as $k => $tpl)
-        {
-            $this->names[$k]     = Util::localizedString($tpl, Util::getNameFieldName($tpl));
             $this->templates[$k] = $tpl;
-        }
 
         $this->reset();
 
@@ -205,12 +199,23 @@ abstract class BaseType
     }
 
     // read-access to templates
-    public function getField($field)
+    public function getField($field, $localized = false)
     {
-        if (!$this->curTpl || !isset($this->curTpl[$field]))
-            return null;
+        if (!$this->curTpl || (!$localized && !isset($this->curTpl[$field])))
+            return '';
 
-        return $this->curTpl[$field];
+        if (!$localized)
+            return $this->curTpl[$field];
+        else
+            return Util::localizedString($this->curTpl, $field);
+    }
+
+    public function getMatches()
+    {
+        if ($this->matches === null)
+            $this->matches = DB::Aowow()->SelectCell($this->matchQuery);
+
+        return $this->matches;
     }
 
     public function filterGetSetCriteria()
@@ -386,14 +391,14 @@ class Lang
         $schoolMask &= SPELL_ALL_SCHOOLS;                   // clamp to available schools..
 
         $tmp = [];
-        $i   = 1;
+        $i   = 0;
 
         while ($schoolMask)
         {
-            if ($schoolMask & (1 << ($i - 1)))
+            if ($schoolMask & (1 << $i))
             {
                 $tmp[] = self::$game['sc'][$i];
-                $schoolMask &= ~(1 << ($i - 1));
+                $schoolMask &= ~(1 << $i);
             }
             $i++;
         }
@@ -551,21 +556,24 @@ class SmartyAoWoW extends Smarty
     }
 
     // creates the cache file
-    public function saveCache($key, $data)
+    public function saveCache($key, $data, $filter = null)
     {
         if ($this->debugging)
             return;
 
         $file = $this->cache_dir.'data/'.$key;
 
-        $cache_data = time()." ".AOWOW_REVISION."\n";
-        $cache_data .= serialize($data);
+        $cacheData = time()." ".AOWOW_REVISION."\n";
+        $cacheData .= serialize($data);
 
-        file_put_contents($file, $cache_data);
+        if ($filter)
+            $cacheData .= "\n".serialize($filter);
+
+        file_put_contents($file, $cacheData);
     }
 
     // loads and evaluates the cache file
-    public function loadCache($key, &$data)
+    public function loadCache($key, &$data, &$filter = null)
     {
         if ($this->debugging)
             return false;
@@ -582,6 +590,8 @@ class SmartyAoWoW extends Smarty
             return false;
 
         $data = unserialize($cache[1]);
+        if (isset($cache[2]))
+            $filter = unserialize($cache[2]);
 
         return true;
     }
@@ -676,6 +686,104 @@ class Util
         null,           'bc',           'wotlk',            'cata',                'mop'
     );
 
+    // todo: translate and move to Lang
+    public static $spellModOp               = array(
+        0  => 'DAMAGE',
+        1  => 'DURATION',
+        2  => 'THREAT',
+        3  => 'EFFECT1',
+        4  => 'CHARGES',
+        5  => 'RANGE',
+        6  => 'RADIUS',
+        7  => 'CRITICAL_CHANCE',
+        8  => 'ALL_EFFECTS',
+        9  => 'NOT_LOSE_CASTING_TIME',
+        10 => 'CASTING_TIME',
+        11 => 'COOLDOWN',
+        12 => 'EFFECT2',
+        13 => 'IGNORE_ARMOR',
+        14 => 'COST',
+        15 => 'CRIT_DAMAGE_BONUS',
+        16 => 'RESIST_MISS_CHANCE',
+        17 => 'JUMP_TARGETS',
+        18 => 'CHANCE_OF_SUCCESS',
+        19 => 'ACTIVATION_TIME',
+        20 => 'DAMAGE_MULTIPLIER',
+        21 => 'GLOBAL_COOLDOWN',
+        22 => 'DOT',
+        23 => 'EFFECT3',
+        24 => 'BONUS_MULTIPLIER',
+        25 => '25_UNUSED',
+        26 => 'PROC_PER_MINUTE',
+        27 => 'VALUE_MULTIPLIER',
+        28 => 'RESIST_DISPEL_CHANCE',
+        29 => 'CRIT_DAMAGE_BONUS_2',                //one not used spell
+        30 => 'SPELL_COST_REFUND_ON_FAIL'
+    );
+
+    public static $combatRating             = array(
+        0  => 'WEAPON_SKILL',
+        1  => 'DEFENSE_SKILL',
+        2  => 'DODGE',
+        3  => 'PARRY',
+        4  => 'BLOCK',
+        5  => 'HIT_MELEE',
+        6  => 'HIT_RANGED',
+        7  => 'HIT_SPELL',
+        8  => 'CRIT_MELEE',
+        9  => 'CRIT_RANGED',
+        10 => 'CRIT_SPELL',
+        11 => 'HIT_TAKEN_MELEE',
+        12 => 'HIT_TAKEN_RANGED',
+        13 => 'HIT_TAKEN_SPELL',
+        14 => 'CRIT_TAKEN_MELEE',
+        15 => 'CRIT_TAKEN_RANGED',
+        16 => 'CRIT_TAKEN_SPELL',
+        17 => 'HASTE_MELEE',
+        18 => 'HASTE_RANGED',
+        19 => 'HASTE_SPELL',
+        20 => 'WEAPON_SKILL_MAINHAND',
+        21 => 'WEAPON_SKILL_OFFHAND',
+        22 => 'WEAPON_SKILL_RANGED',
+        23 => 'EXPERTISE',
+        24 => 'ARMOR_PENETRATION'
+    );
+
+    public static $lockType                 = array(
+        1  => 'PICKLOCK',
+        2  => 'HERBALISM',
+        3  => 'MINING',
+        4  => 'DISARM_TRAP',
+        5  => 'OPEN',
+        6  => 'TREASURE',
+        7  => 'CALCIFIED_ELVEN_GEMS',
+        8  => 'CLOSE',
+        9  => 'ARM_TRAP',
+        10 => 'QUICK_OPEN',
+        11 => 'QUICK_CLOSE',
+        12 => 'OPEN_TINKERING',
+        13 => 'OPEN_KNEELING',
+        14 => 'OPEN_ATTACKING',
+        15 => 'GAHZRIDIAN',
+        16 => 'BLASTING',
+        17 => 'SLOW_OPEN',
+        18 => 'SLOW_CLOSE',
+        19 => 'FISHING',
+        20 => 'INSCRIPTION',
+        21 => 'OPEN_FROM_VEHICLE'
+    );
+
+    public static $stealthType              = array(
+        0 => 'GENERAL',
+        1 => 'TRAP'
+    );
+
+    public static $invisibilityType         = array(
+        0 => 'GENERAL',
+        3 => 'TRAP',
+        6 => 'DRUNK'
+    );
+
     public static $spellEffectStrings       = array(
         0 => 'None',
         1 => 'Instakill',
@@ -702,13 +810,13 @@ class Util
         22 => 'Parry',
         23 => 'Block',
         24 => 'Create Item',
-        25 => 'Weapon',
+        25 => 'Can Use Weapon',
         26 => 'Defense',
         27 => 'Persistent Area Aura',
         28 => 'Summon',
         29 => 'Leap',
         30 => 'Energize',
-        31 => 'Weapon Percent Damage',
+        31 => 'Weapon Damage Percent',
         32 => 'Trigger Missile',
         33 => 'Open Lock',
         34 => 'Summon Change Item',
@@ -735,7 +843,7 @@ class Util
         55 => 'Tame Creature',
         56 => 'Summon Pet',
         57 => 'Learn Pet Spell',
-        58 => 'Weapon Damage',
+        58 => 'Weapon Damage Flat',
         59 => 'Create Random Item',
         60 => 'Proficiency',
         61 => 'Send Event',
@@ -790,7 +898,7 @@ class Util
         110 => 'Destroy All Totems',
         111 => 'Durability Damage',
         112 => 'Summon Demon',
-        113 => 'Resurrect New',
+        113 => 'Resurrect Flat',
         114 => 'Attack Me',
         115 => 'Durability Damage Percent',
         116 => 'Skin Player Corpse',
@@ -798,7 +906,7 @@ class Util
         118 => 'Skill',
         119 => 'Apply Area Aura Pet',
         120 => 'Teleport Graveyard',
-        121 => 'Normalized Weapon Dmg',
+        121 => 'Weapon Damage Normalized',
         122 => 'Unknown Effect',
         123 => 'Send Taxi',
         124 => 'Pull Towards',
@@ -865,8 +973,8 @@ class Util
         17 => 'Mod Stealth Detection',
         18 => 'Mod Invisibility',
         19 => 'Mod Invisibility Detection',
-        20 => 'Obsolete Mod Health',
-        21 => 'Obsolete Mod Power',
+        20 => 'Mod Health Percent',
+        21 => 'Mod Power Percent',
         22 => 'Mod Resistance',
         23 => 'Periodic Trigger Spell',
         24 => 'Periodic Energize',
@@ -880,10 +988,10 @@ class Util
         32 => 'Mod Increase Mounted Speed',
         33 => 'Mod Decrease Speed',
         34 => 'Mod Increase Health',
-        35 => 'Mod Increase Energy',
+        35 => 'Mod Increase Power',
         36 => 'Shapeshift',
-        37 => 'Effect Immunity',
-        38 => 'State Immunity',
+        37 => 'Spell Effect Immunity',
+        38 => 'Spell Aura Immunity',
         39 => 'School Immunity',
         40 => 'Damage Immunity',
         41 => 'Dispel Immunity',
@@ -897,7 +1005,7 @@ class Util
         49 => 'Mod Dodge Percent',
         50 => 'Mod Critical Healing Amount',
         51 => 'Mod Block Percent',
-        52 => 'Mod Weapon Crit Percent',
+        52 => 'Mod Physical Crit Percent',
         53 => 'Periodic Leech',
         54 => 'Mod Hit Chance',
         55 => 'Mod Spell Hit Chance',
@@ -963,7 +1071,7 @@ class Util
         115 => 'Mod Healing',
         116 => 'Mod Regeneration During Combat',
         117 => 'Mod Mechanic Resistance',
-        118 => 'Mod Healing Percent',
+        118 => 'Mod Healing Taken Percent',
         119 => 'Share Pet Tracking',
         120 => 'Untrackable',
         121 => 'Empathy',
@@ -1038,7 +1146,7 @@ class Util
         190 => 'Mod Faction Reputation Gain',
         191 => 'Use Normal Movement Speed',
         192 => 'Mod Melee Ranged Haste',
-        193 => 'Melee Slow',
+        193 => 'Mod Haste',
         194 => 'Mod Target Absorb School',
         195 => 'Mod Target Ability Absorb School',
         196 => 'Mod Cooldown',
@@ -1059,10 +1167,10 @@ class Util
         211 => 'Mod Flight Speed (not stacking)',
         212 => 'Mod Ranged Attack Power Of Stat Percent',
         213 => 'Mod Rage from Damage Dealt',
-        214 => 'Unknown Aura',
+        214 => 'Tamed Pet Passive',
         215 => 'Arena Preparation',
         216 => 'Haste Spells',
-        217 => 'Unknown Aura',
+        217 => 'Killing Spree',
         218 => 'Haste Ranged',
         219 => 'Mod Mana Regeneration from Stat',
         220 => 'Mod Rating from Stat',
@@ -1075,11 +1183,11 @@ class Util
         227 => 'Periodic Trigger Spell With Value',
         228 => 'Detect Stealth',
         229 => 'Mod AoE Damage Avoidance',
-        230 => 'Unknown Aura',
+        230 => 'Mod Increase Health',
         231 => 'Proc Trigger Spell With Value',
-        232 => 'Mechanic Duration Mod',
-        233 => 'Unknown Aura',
-        234 => 'Mechanic Duration Mod (not stacking)',
+        232 => 'Mod Mechanic Duration',
+        233 => 'Mod Display Model',
+        234 => 'Mod Mechanic Duration (not stacking)',
         235 => 'Mod Dispel Resist',
         236 => 'Control Vehicle',
         237 => 'Mod Spell Damage Of Attack Power',
@@ -1103,7 +1211,7 @@ class Util
         255 => 'Mod Mechanic Damage Taken Percent',
         256 => 'No Reagent Use',
         257 => 'Mod Target Resist By Spell Class',
-        258 => 'Unknown Aura',
+        258 => 'Mod Spell Visual',
         259 => 'Mod HoT Percent',
         260 => 'Screen Effect',
         261 => 'Phase',
@@ -1116,12 +1224,12 @@ class Util
         268 => 'Mod Attack Power Of Stat Percent',
         269 => 'Mod Ignore Target Resist',
         270 => 'Mod Ability Ignore Target Resist',
-        271 => 'Mod Damage from Caster',
+        271 => 'Mod Damage Percent Taken Form Caster',
         272 => 'Ignore Melee Reset',
         273 => 'X Ray',
         274 => 'Ability Consume No Ammo',
         275 => 'Mod Ignore Shapeshift',
-        276 => 'Unknown Aura',
+        276 => 'Mod Damage Percent Mechanic',
         277 => 'Mod Max Affected Targets',
         278 => 'Mod Disarm Ranged',
         279 => 'Initialize Images',
@@ -1153,7 +1261,7 @@ class Util
         305 => 'Mod Minimum Speed',
         306 => 'Unknown Aura',
         307 => 'Heal Absorb Test',
-        308 => 'Unknown Aura',
+        308 => 'Hunter Trap',
         309 => 'Unknown Aura',
         310 => 'Mod Creature AoE Damage Avoidance',
         311 => 'Unknown Aura',
@@ -1225,7 +1333,7 @@ class Util
 
     public static function parseTime($sec)
     {
-        $time = [];
+        $time = ['d' => 0, 'h' => 0, 'm' => 0, 's' => 0, 'ms' => 0];
 
         if ($sec >= 3600 * 24)
         {
@@ -1264,19 +1372,34 @@ class Util
 
         if ($short)
         {
-            if (isset($s['d']))
+            if ($s['d'])
                 return round($s['d'])." ".Lang::$main['daysAbbr'];
-            if (isset($s['h']))
+            if ($s['h'])
                 return round($s['h'])." ".Lang::$main['hoursAbbr'];
-            if (isset($s['m']))
+            if ($s['m'])
                 return round($s['m'])." ".Lang::$main['minutesAbbr'];
-            if (isset($s['s']))
-                return round($s['s'] + @$s['ms'] / 1000, 2)." ".Lang::$main['secondsAbbr'];
-            if (isset($s['ms']))
+            if ($s['s'])
+                return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::$main['secondsAbbr'];
+            if ($s['ms'])
                 return $s['ms']." ".Lang::$main['millisecsAbbr'];
+
+            return '0 '.Lang::$main['secondsAbbr'];
         }
         else
         {
+            if ($s['d'])
+                return round($s['d'] + $s['h'] / 24, 2)." ".Lang::$main['days'];
+            if ($s['h'])
+                return round($s['h'] + $s['m'] / 60, 2)." ".Lang::$main['hours'];
+            if ($s['m'])
+                return round($s['m'] + $s['s'] / 60, 2)." ".Lang::$main['minutes'];
+            if ($s['s'])
+                return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::$main['seconds'];
+            if ($s['ms'])
+                return $s['ms']." ".Lang::$main['millisecs'];
+
+            return '0 '.Lang::$main['seconds'];
+/*  kept for reference
             if (isset($s['d']))
                 $fmt[] = $s['d']." ".Lang::$main['days'];
             if (isset($s['h']))
@@ -1287,9 +1410,10 @@ class Util
                 $fmt[] = $s['s']." ".Lang::$main['seconds'];
             if (isset($s['ms']))
                 $fmt[] = $s['ms']." ".Lang::$main['millisecs'];
-        }
 
-        return implode(' ', $fmt);
+        // return implode(' ', $fmt);
+*/
+        }
     }
 
     public static function sideByRaceMask($race)
@@ -1304,6 +1428,26 @@ class Util
             return 1;
 
         return 0;
+    }
+
+    public static function asHex($val)
+    {
+        $_ = decHex($val);
+        while (fMod(strLen($_), 4))                         // in 4-blocks
+            $_ = '0'.$_;
+
+        return '0x'.strToUpper($_);
+    }
+
+    public static function asBin($val)
+    {
+        $_ = decBin($val);
+        while (fMod(strLen($_), 4))                         // in 4-blocks
+        {
+            $_ = '0'.$_;
+        }
+
+        return 'b'.strToUpper($_);
     }
 
     public static function sqlEscape($data)
@@ -1519,20 +1663,6 @@ class Util
     }
 
     // BaseType::_construct craaap!
-    // todo: unify names
-    public static function getNameFieldName($tpl)
-    {
-        if (isset($tpl['name']) || isset($tpl['name_loc0']))
-            return 'name';
-        else if (isset($tpl['title']) || isset($tpl['title_loc0']))
-            return 'title';
-        else if (isset($tpl['male']) || isset($tpl['male_loc']))
-            return 'male';
-        else
-            return null;
-    }
-
-    // BaseType::iterate craaaaaaaaap!!!
     // todo: unify indizes
     public static function getIdFieldName($tpl)
     {

@@ -53,7 +53,7 @@ class ItemsetList extends BaseType
             $data[$this->id] = array(
                 'id'       => $this->id,
                 'idbak'    => $this->curTpl['refSetId'],
-                'name'     => $this->names[$this->id],
+                'name'     => $this->getField('name', true),
                 'quality'  => 7 - $this->curTpl['quality'],
                 'minlevel' => $this->curTpl['minLevel'],
                 'maxlevel' => $this->curTpl['maxLevel'],

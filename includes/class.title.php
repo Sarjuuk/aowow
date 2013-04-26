@@ -19,11 +19,6 @@ class TitleList extends BaseType
         // post processing
         while ($this->iterate())
         {
-            // overwrite names with gender-speciffics
-            $this->names[$this->id][GENDER_MALE] = Util::localizedString($this->curTpl, 'male');
-            if ($this->curTpl['female_loc0'] || $this->curTpl['female_loc'.User::$localeId])
-                $this->names[$this->id][GENDER_FEMALE] = Util::localizedString($this->curTpl, 'female');
-
             // preparse sources
             if (!empty($this->curTpl['source']))
             {
@@ -47,7 +42,7 @@ class TitleList extends BaseType
         {
             $data[$this->id] = array(
                 'id'        => $this->id,
-                'name'      => $this->names[$this->id][GENDER_MALE],
+                'name'      => $this->getField('male', true),
                 'side'      => $this->curTpl['side'],
                 'gender'    => $this->curTpl['gender'],
                 'expansion' => $this->curTpl['expansion'],
@@ -58,8 +53,8 @@ class TitleList extends BaseType
                 $data[$this->id]['source'] = $this->curTpl['source'];
         }
 
-        if (isset($this->name[GENDER_FEMALE]))
-            $data['namefemale'] = $this->name[GENDER_FEMALE];
+        if ($_ = $this->getField('female', true))
+            $data['namefemale'] = $_;
 
         return $data;
     }
@@ -71,10 +66,10 @@ class TitleList extends BaseType
 
         while ($this->iterate())
         {
-            $refs['gTitles'][$this->id]['name'] = Util::jsEscape($this->names[$this->id][GENDER_MALE]);
+            $refs['gTitles'][$this->id]['name'] = Util::jsEscape($this->getField('male', true));
 
-            if (isset($this->names[$this->id][GENDER_FEMALE]))
-                $refs['gTitles'][$this->id]['namefemale'] = Util::jsEscape($this->names[$this->id][GENDER_FEMALE]);
+            if ($_ = $this->getField('female', true))
+                $refs['gTitles'][$this->id]['namefemale'] = $_;
         }
     }
 
@@ -130,7 +125,8 @@ class TitleList extends BaseType
 
     public function getHtmlizedName($gender = GENDER_MALE)
     {
-        return str_replace('%s', '<span class="q0">&lt;'.Lang::$main['name'].'&gt;</span>', $this->names[$this->id][$gender]);
+        $field = $gender == GENDER_FEMALE ? 'female' : 'male';
+        return str_replace('%s', '<span class="q0">&lt;'.Lang::$main['name'].'&gt;</span>', $this->getField($field, true));
     }
 
     public function addRewardsToJScript(&$ref) { }

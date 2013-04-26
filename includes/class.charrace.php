@@ -16,7 +16,7 @@ class CharRaceList extends BaseType
         {
             $data[$this->id] = array(
                 'id'      => $this->id,
-                'name'    => $this->names[$this->id],
+                'name'    => $this->getField('name', true),
                 'classes' => $this->curTpl['classMask'],
                 'faction' => $this->curTpl['factionId'],
                 'leader'  => $this->curTpl['leader'],
@@ -36,7 +36,7 @@ class CharRaceList extends BaseType
         if (!isset($refs['gRaces']))
             $refs['gRaces'] = [];
 
-        $refs['gRaces'][$this->id] = Util::jsEscape($this->names[$this->id]);
+        $refs['gRaces'][$this->id] = Util::jsEscape($this->getField('name', true));
     }
 
     public function addRewardsToJScript(&$ref) { }

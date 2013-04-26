@@ -17,7 +17,7 @@ class CurrencyList extends BaseType
             $data[$this->id] = array(
                 'id'        => $this->id,
                 'category'  => $this->curTpl['category'],
-                'name'      => $this->names[$this->id],
+                'name'      => $this->getField('name', true),
                 'icon'      => $this->curTpl['iconString']
             );
         }
@@ -35,7 +35,7 @@ class CurrencyList extends BaseType
         while ($this->iterate())
         {
             $refs['gCurrencies'][$this->id] = array(
-                'name' => $this->names[$this->id],
+                'name' => $this->getField('name', true),
                 'icon' => $this->curTpl['iconString']
             );
         }

@@ -40,7 +40,7 @@ if (isset($_GET['power']))
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
         $x = '$WowheadPower.registerAchievement('.$id.', '.User::$localeId.",{\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($acv->names[$id])."',\n";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($acv->getField('name', true))."',\n";
         $x .= "\ticon: '".$acv->getField('iconString')."',\n";
         $x .= "\ttooltip_".User::$localeString.': \''.$acv->renderTooltip()."'\n";
         $x .= "});";
@@ -70,7 +70,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $pageData['path'] = array_reverse(array_merge($pageData['path'], [9, 0]));
 
-    array_unshift($pageData['title'], $acv->names[$id]);
+    array_unshift($pageData['title'], $acv->getField('name', true));
 
     $acv->addRewardsToJscript($pageData);
     $pageData['page'] = $acv->getDetailedData()[$id];
@@ -95,7 +95,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // listview: "see also"
     $conditions = array(
-        ['name_loc'.User::$localeId, $acv->names[$id]],
+        ['name_loc'.User::$localeId, $acv->getField('name', true)],
         ['id', $id, '!']
     );
     $saList = new AchievementList($conditions);
@@ -257,7 +257,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
                 $crtSpl = new SpellList(array(['s.id', $obj]));
                 $crtSpl->addGlobalsToJscript($pageData);
-                $text = $crtName ? $crtName : $crtSpl->names[$crtSpl->id];
+                $text = $crtName ? $crtName : $crtSpl->getField('name', true);
                 $tmp['link'] = array(
                     'href' => '?spell='.$obj,
                     'text' => $text
@@ -276,7 +276,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
                 $crtItm = new ItemList(array(['id', $obj]));
                 $crtItm->addGlobalsToJscript($pageData);
-                $text = $crtName ? $crtName : $crtItm->names[$crtItm->id];
+                $text = $crtName ? $crtName : $crtItm->getField('name', true);
                 $tmp['link'] = array(
                     'href'    => '?item='.$obj,
                     'text'    => $text,
@@ -334,7 +334,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $pageData['page']['series'] = array(
             array(
                 'id'     => $id,
-                'name'   => $acv->names[$id],
+                'name'   => $acv->getField('name', true),
                 'parent' => $acv->getField('series') >> 16,
             )
         );

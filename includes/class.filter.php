@@ -30,10 +30,8 @@ abstract class Filter
 
                     $sub = [];
                     foreach ($v as $sk => $sv)
-                    {
-                        $sv = str_replace("'", "\'", stripslashes($sv));
                         $sub[$sk] = is_numeric($sv) ? (int)$sv : urlencode($sv);
-                    }
+
                     if (!empty($sub) && in_array($k, Filter::$criteria))
                         $this->fiData['c'][$k] = $sub;
                     else if (!empty($sub))
@@ -41,8 +39,6 @@ abstract class Filter
                 }
                 else                                        // stings and integer
                 {
-                    $v = str_replace("'", "\'", stripslashes($v));
-
                     if (in_array($k, Filter::$criteria))
                         $this->fiData['c'][$k] = is_numeric($v) ? (int)$v : urlencode($v);
                     else

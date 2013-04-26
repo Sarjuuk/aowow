@@ -25,7 +25,7 @@ class PetList extends BaseType
                 'id'        => $this->id,
                 'maxlevel'  => $this->curTpl['maxLevel'],
                 'minlevel'  => $this->curTpl['minLevel'],
-                'name'      => $this->names[$this->id],
+                'name'      => $this->getField('name', true),
                 'type'      => $this->curTpl['type'],
                 'exotic'    => $this->curTpl['exotic'],
                 'spells'    => []

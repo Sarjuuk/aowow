@@ -91,7 +91,7 @@ switch ($pageCall)
         break;
     case 'data':                                            // tool: dataset-loader
     case 'search':                                          // tool: searches
-        include $pageCall.'.php';
+        require $pageCall.'.php';
         break;
     /* other */
     case '':                                                // no parameter given -> MainPage

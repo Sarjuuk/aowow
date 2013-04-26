@@ -167,7 +167,7 @@ class ItemList extends BaseType
         while ($this->iterate())
         {
             $refs['gItems'][$this->id] = array(
-                'name'    => $this->names[$this->id],
+                'name'    => $this->getField('name', true),
                 'quality' => $this->curTpl['Quality'],
                 'icon'    => $this->curTpl['icon'],
             );
@@ -187,7 +187,7 @@ class ItemList extends BaseType
         if ($this->error)
             return;
 
-        $name = $this->names[$this->id];
+        $name = $this->getField('name', true);
 
         if (!empty($this->tooltip[$this->id]))
             return $this->tooltip[$this->id];
@@ -1000,7 +1000,7 @@ class ItemList extends BaseType
     {
         $json = array(
             'id'          => $this->id,
-            'name'        => $this->names[$this->id],
+            'name'        => $this->getField('name', true),
             'quality'     => ITEM_QUALITY_HEIRLOOM - $this->curTpl['Quality'],
             'icon'        => $this->curTpl['icon'],
             'classs'      => $this->curTpl['class'],

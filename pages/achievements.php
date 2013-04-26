@@ -44,7 +44,8 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     // include child categories if current category is empty
     $condition = !$cats[0] ? null : (int)end($cats);
     $acvList   = new AchievementList($condition ? [['category', $condition]] : [], true);
-    if (!$acvList->matches)
+
+    if (!$acvList->getMatches())
     {
         $curCats = $catList = [$condition ? $condition : 0];
         while ($curCats)
@@ -88,9 +89,9 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         $pageData['params']['visibleCols'] = "$['category']";
 
     // create note if search limit was exceeded
-    if ($acvList->matches > $AoWoWconf['sqlLimit'])
+    if ($acvList->getMatches() > $AoWoWconf['sqlLimit'])
     {
-        $pageData['params']['note'] = '$'.sprintf(Util::$filterResultString, 'LANG.lvnote_achievementsfound', $acvList->matches, $AoWoWconf['sqlLimit']);
+        $pageData['params']['note'] = '$'.sprintf(Util::$filterResultString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), $AoWoWconf['sqlLimit']);
         $pageData['params']['_truncated'] = 1;
     }
 

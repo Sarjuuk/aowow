@@ -64,24 +64,18 @@ class WorldEventList extends BaseType
             // change Ids if holiday is set
             if ($this->curTpl['holidayId'] > 0)
             {
-                // template
-                $this->curTpl['id'] = $this->curTpl['holidayId'];
+                $this->curTpl['id']   = $this->curTpl['holidayId'];
+                $this->curTpl['name'] = $this->getField('name', true);
+                $replace[$this->id]   = $this->curTpl;
                 unset($this->curTpl['description']);
-                $replace[$this->id] = $this->curTpl;
-
-                // names
-                unset($this->names[$this->id]);
-                $this->names[$this->curTpl['id']] = Util::localizedString($this->curTpl, 'name');
             }
             else                                            // set a name if holiday is missing
             {
                 // template
                 $this->curTpl['name_loc0']  = $this->curTpl['description'];
                 $this->curTpl['iconString'] = 'trade_engineering';
-                $replace[$this->id] = $this->curTpl;
-
-                // names
-                $this->names[$this->id]     = '(SERVERSIDE) '.$this->curTpl['description'];
+                $this->curTpl['name']       = '(SERVERSIDE) '.$this->getField('description', true);
+                $replace[$this->id]         = $this->curTpl;
             }
         }
 
@@ -154,7 +148,7 @@ class WorldEventList extends BaseType
             $data[$this->id] = array(
                 'category'  => $this->curTpl['category'],
                 'id'        => $this->id,
-                'name'      => $this->names[$this->id],
+                'name'      => $this->getField('name', true),
                 'rec'       => $this->curTpl['occurence'],
                 'startDate' => $this->curTpl['startTime'],
                 'endDate'   => $this->curTpl['startTime'] + $this->curTpl['length']
@@ -178,7 +172,7 @@ class WorldEventList extends BaseType
         while ($this->iterate())
         {
             $refs['gHolidays'][$this->id] = array(
-                'name' => $this->names[$this->id],
+                'name' => $this->getField('name', true),
                 'icon' => $this->curTpl['iconString']
             );
         }

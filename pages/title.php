@@ -81,7 +81,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    $pageData['title'] = ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->names[$title->id][0]))));
+    $pageData['title'] = ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->getField('male', true)))));
     $pageData['path']  = '[0, 10, '.$title->getField('category').']';
 
     $smarty->saveCache($cacheKeyPage, $pageData);

@@ -636,7 +636,7 @@ class SpellList extends BaseType
             if (is_array($var))
             {
                 $str   .= $var[0];
-                $suffix = $var[1];
+                $suffix = ' '.$var[1];
             }
             else
                 $str .= $var;
@@ -648,7 +648,7 @@ class SpellList extends BaseType
         $evaled = $this->resolveEvaluation($str);
 
         $return = is_numeric($evaled) ? number_format($evaled, $precision) : $evaled;
-        return $return.' '.$suffix;
+        return $return.$suffix;
     }
 
     // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
@@ -919,8 +919,9 @@ class SpellList extends BaseType
 
     // step 5: variable-depentant variable-text
         // special case $lONE:ELSE;
-        while (preg_match('/([\d\.]+)([^\d]*)\$l([\w\s]*):([\w\s]*);/i', $str, $m))
-            $str = str_replace($m[1].$m[2].'$l'.$m[3].':'.$m[4].';', $m[1].$m[2].($m[1] == 1 ? $m[3] : $m[4]), $str);
+        // todo: russian uses THREE (wtf?! oO) cases ($l[singular]:[plural1]:[plural2]) .. explode() chooses always the first plural option :/
+        while (preg_match('/([\d\.]+)([^\d]*)(\$l:*)([^:]*):([^;]*);/i', $str, $m))
+            $str = str_ireplace($m[1].$m[2].$m[3].$m[4].':'.$m[5].';', $m[1].$m[2].($m[1] == 1 ? $m[4] : explode(':', $m[5])[0]), $str);
 
     // step 6: HTMLize
         // colors
@@ -1025,7 +1026,7 @@ class SpellList extends BaseType
                 $x .= '<table width="100%"><tr><td>';
 
             // name
-            $x .= '<b>'.$this->names[$this->id].'</b>';
+            $x .= '<b>'.$this->getField('name', true).'</b>';
 
             // rank
             if (!empty($rankText))
@@ -1276,7 +1277,7 @@ class SpellList extends BaseType
         while ($this->iterate())
         {
             $data[$this->id] = array(
-                'name'  => $this->names[$this->id],
+                'name'  => $this->getField('name', true),
                 'icon'  => $this->curTpl['iconString'],
                 'level' => $this->curTpl['baseLevel'],
             );
@@ -1296,7 +1297,7 @@ class SpellList extends BaseType
 
             $refs['gSpells'][$this->id] = array(
                 'icon' => $this->curTpl[$iconString],
-                'name' => $this->names[$this->id],
+                'name' => $this->getField('name', true),
             );
         }
     }

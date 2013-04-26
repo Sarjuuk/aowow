@@ -76,7 +76,7 @@ class QuestList extends BaseType
         while ($this->iterate())
         {
             $data[$this->id] = array(
-                "n"  => Util::localizedString($this->curTpl, 'Title'),
+                "n"  => $this->getField('Title', true),
                 "t"  => TYPE_QUEST,
                 "ti" => $this->id,
                 "c"  => $this->cat1,
@@ -99,7 +99,7 @@ class QuestList extends BaseType
                 'id'        => $this->id,
                 'level'     => $this->curTpl['Level'],
                 'reqlevel'  => $this->curTpl['MinLevel'],
-                'name'      => Util::localizedString($this->curTpl, 'Title'),
+                'name'      => $this->getField('Title', true),
                 'side'      => Util::sideByRaceMask($this->curTpl['RequiredRaces'])
             );
 

@@ -16,7 +16,7 @@ class CharClassList extends BaseType
         {
             $data[$this->id] = array(
                 'id'     => $this->id,
-                'name'   => $this->names[$this->id],
+                'name'   => $this->getField('name', true),
                 'races'  => $this->curTpl['raceMask'],
                 'roles'  => $this->curTpl['roles'],
                 'weapon' => $this->curTpl['weaponTypeMask'],
@@ -40,7 +40,7 @@ class CharClassList extends BaseType
             $refs['gClasses'] = [];
 
         while ($this->iterate())
-            $refs['gClasses'][$this->id] = ['name' => $this->names[$this->id]];
+            $refs['gClasses'][$this->id] = ['name' => $this->getField('name', true)];
     }
 
     public function addRewardsToJScript(&$ref) { }

@@ -56,7 +56,7 @@ if ($compareString)
 
         $pageData['items'][] = [
             $id,
-            Util::jsEscape($iList->names[$id]),
+            Util::jsEscape($iList->getField('name', true)),
             $iList->getField('Quality'),
             $iList->getField('icon'),
             json_encode($item, JSON_NUMERIC_CHECK)

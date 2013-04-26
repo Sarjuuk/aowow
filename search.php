@@ -58,7 +58,7 @@ $type        = @intVal($_GET['type']);
 $searchMask  = 0x0;
 $found       = [];
 $jsGlobals   = [];
-$maxResults  = 1000;                                        // todo: move to config
+$maxResults  = 500;                                         // todo: move to config
 
 if (isset($_GET['json']))
 {
@@ -68,7 +68,10 @@ if (isset($_GET['json']))
         $searchMask |= SEARCH_TYPE_JSON | 0x40;
 }
 else if (isset($_GET['opensearch']))
+{
+    $maxResults = 10;
     $searchMask |= SEARCH_TYPE_OPEN | SEARCH_MASK_OPEN;
+}
 else
     $searchMask |= SEARCH_TYPE_REGULAR | SEARCH_MASK_ALL;
 
@@ -112,7 +115,7 @@ if ($searchMask & 0x1)
         weapon:    build manually - ItemSubClassMask
         roles:     build manually - 1:heal; 2:mleDPS; 4:rngDPS; 8:tank
     */
-    $classes = new CharClassList(array(['name_loc'.User::$localeId, $query]));
+    $classes = new CharClassList(array(['name_loc'.User::$localeId, $query]], $maxResults));
 
     if ($data = $classes->getListviewData())
     {
@@ -122,6 +125,7 @@ if ($searchMask & 0x1)
         $found['class'] = array(
             'type'     => TYPE_CLASS,
             'appendix' => ' (Class)',
+            'matches'  => $classes->getMatches(),
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
@@ -137,7 +141,7 @@ if ($searchMask & 0x2)
         zone:       starting zone...
     */
 
-    $races = new CharRaceList(array(['name_loc'.User::$localeId, $query]));
+    $races = new CharRaceList(array(['name_loc'.User::$localeId, $query], $maxResults));
 
     if ($data = $races->getListviewData())
     {
@@ -147,6 +151,7 @@ if ($searchMask & 0x2)
         $found['race'] = array(
             'type'     => TYPE_RACE,
             'appendix' => ' (Race)',
+            'matches'  => $races->getMatches(),
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
@@ -173,7 +178,8 @@ if ($searchMask & 0x4)
     $conditions = array(
         'OR',
         ['male_loc'.User::$localeId, $query],
-        ['female_loc'.User::$localeId, $query]
+        ['female_loc'.User::$localeId, $query],
+        $maxResults
     );
 
     $titles = new TitleList($conditions);
@@ -183,6 +189,7 @@ if ($searchMask & 0x4)
         $found['title'] = array(
             'type'     => TYPE_TITLE,
             'appendix' => ' (Title)',
+            'matches'  => $titles->getMatches(),
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
@@ -196,18 +203,18 @@ if ($searchMask & 0x8)
         icons: data/interface/calendar/calendar_[a-z]start.blp
     */
 
-    // limited by my own system.. >.<
-    // cant construct a query like: name = X OR (desc = X AND holidayId = 0)
-    $wEvents1 = new WorldEventList(array(['h.name_loc'.User::$localeId, $query]));
-    $wEvents2 = new WorldEventList(array(['e.description', $query], ['e.holidayId', 0], 'AND'));
+    $conditions = array(
+        'OR',
+        ['h.name_loc'.User::$localeId, $query],
+        ['AND', ['e.description', $query], ['e.holidayId', 0]],
+        $maxResults
+    );
 
-    $data  = $wEvents1->getListviewData();
-    $data += $wEvents2->getListviewData();
+    $wEvents = new WorldEventList($conditions);
 
-    if ($data)
+    if ($data  = $wEvents->getListviewData())
     {
-        $wEvents1->addGlobalsToJscript($jsGlobals);
-        $wEvents2->addGlobalsToJscript($jsGlobals);
+        $wEvents->addGlobalsToJscript($jsGlobals);
 
         foreach ($data as &$d)
         {
@@ -219,6 +226,7 @@ if ($searchMask & 0x8)
         $found['event'] = array(
             'type'     => TYPE_WORLDEVENT,
             'appendix' => ' (World Event)',
+            'matches'  => $money->getMatches(),
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
@@ -238,13 +246,14 @@ if ($searchMask & 0x10)
         $found['currency'] = array(
             'type'     => TYPE_CURRENCY,
             'appendix' => ' (Currency)',
+            'matches'  => $money->getMatches(),
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
 
-        if ($money->matches > $maxResults)
+        if ($money->getMatches() > $maxResults)
         {
-            $found['currency']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_currenciesfound', $money->matches, $maxResults);
+            $found['currency']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_currenciesfound', $money->getMatches(), $maxResults);
             $found['currency']['params']['_truncated'] = 1;
         }
     }
@@ -253,7 +262,13 @@ if ($searchMask & 0x10)
 // 6 Itemsets
 if ($searchMask & 0x20)
 {
-    $sets = new ItemsetList(array($maxResults, ['item1', 0, '!'], ['name_loc'.User::$localeId, $query]));   // remove empty sets from search
+    $conditions = array(
+        ['item1', 0, '!'],                                  // remove empty sets from search
+        ['name_loc'.User::$localeId, $query],
+        $maxResults
+    );
+
+    $sets = new ItemsetList($conditions);
 
     if ($data = $sets->getListviewData())
     {
@@ -265,14 +280,15 @@ if ($searchMask & 0x20)
         $found['itemset'] = array(
             'type'     => TYPE_ITEMSET,
             'appendix' => ' (Item Set)',
+            'matches'  => $sets->getMatches(),
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs'],
             'pcsToSet' => $sets->pieceToSet
         );
 
-        if ($sets->matches > $maxResults)
+        if ($sets->getMatches() > $maxResults)
         {
-            $found['itemset']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsetsfound', $sets->matches, $maxResults);
+            $found['itemset']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsetsfound', $sets->getMatches(), $maxResults);
             $found['itemset']['params']['_truncated'] = 1;
         }
     }
@@ -306,13 +322,14 @@ if ($searchMask & 0x40)
         $found['item'] = array(
             'type'     => TYPE_ITEM,
             'appendix' => ' (Item)',
+            'matches'  => $items->getMatches(),
             'params'   => ['tabs' => '$myTabs'],
             'data'     => $data,
         );
 
-        if ($items->matches > $maxResults)
+        if ($items->getMatches() > $maxResults)
         {
-            $found['item']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsfound', $items->matches, $maxResults);
+            $found['item']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsfound', $items->getMatches(), $maxResults);
             $found['item']['params']['_truncated'] = 1;
         }
     }
@@ -348,7 +365,13 @@ if ($searchMask & 0x40)
 // 17 Achievements
 if ($searchMask & 0x10000)
 {
-    $acvs = new AchievementList(array($maxResults, 'AND', ['flags', ~ACHIEVEMENT_FLAG_COUNTER, "&"], ['name_loc'.User::$localeId, $query]));
+    $conditions = array(
+        [['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], 0],
+        ['name_loc'.User::$localeId, $query],
+        $maxResults
+    );
+
+    $acvs = new AchievementList($conditions);
 
     if ($data = $acvs->getListviewData())
     {
@@ -361,6 +384,7 @@ if ($searchMask & 0x10000)
         $found['achievement'] = array(
             'type'     => TYPE_ACHIEVEMENT,
             'appendix' => ' (Achievement)',
+            'matches'  => $acvs->getMatches(),
             'data'     => $data,
             'params'   => [
                 'tabs'        => '$myTabs',
@@ -368,9 +392,9 @@ if ($searchMask & 0x10000)
             ]
         );
 
-        if ($acvs->matches > $maxResults)
+        if ($acvs->getMatches() > $maxResults)
         {
-            $found['achievement']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_achievementsfound', $acvs->matches, $maxResults);
+            $found['achievement']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_achievementsfound', $acvs->getMatches(), $maxResults);
             $found['achievement']['params']['_truncated'] = 1;
         }
     }
@@ -379,7 +403,13 @@ if ($searchMask & 0x10000)
 // 18 Statistics
 if ($searchMask & 0x20000)
 {
-    $stats = new AchievementList(array($maxResults, 'AND', ['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], ['name_loc'.User::$localeId, $query]));
+    $conditions = array(
+        ['flags', ACHIEVEMENT_FLAG_COUNTER, '&'],
+        ['name_loc'.User::$localeId, $query],
+        $maxResults
+    );
+
+    $stats = new AchievementList($conditions);
 
     if ($data = $stats->getListviewData())
     {
@@ -388,6 +418,7 @@ if ($searchMask & 0x20000)
 
         $found['statistic'] = array(
             'type'     => TYPE_ACHIEVEMENT,
+            'matches'  => $stats->getMatches(),
             'data'     => $data,
             'params'   => [
                 'tabs'        => '$myTabs',
@@ -398,9 +429,9 @@ if ($searchMask & 0x20000)
             ]
         );
 
-        if ($stats->matches > $maxResults)
+        if ($stats->getMatches() > $maxResults)
         {
-            $found['statistic']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_statisticsfound', $stats->matches, $maxResults);
+            $found['statistic']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_statisticsfound', $stats->getMatches(), $maxResults);
             $found['statistic']['params']['_truncated'] = 1;
         }
     }
@@ -432,6 +463,7 @@ if ($searchMask & 0x400000)
         $found['pet'] = array(
             'type'     => TYPE_PET,
             'appendix' => ' (Pet)',
+            'matches'  => $pets->getMatches(),
             'data'     => $data,
             'params'   => [
                 'tabs' => '$myTabs',
@@ -507,14 +539,14 @@ else if ($searchMask & SEARCH_TYPE_OPEN)
     $info       = [];
 
     foreach ($found as $tmp)
-        $foundTotal += count($tmp['data']);
+        $foundTotal += $tmp['matches'];
 
     if (!$foundTotal)
         exit('["'.Util::jsEscape($query).'", []]');
 
     foreach ($found as $id => $set)
     {
-        $max = max(1, round($maxResults * count($set['data']) / $foundTotal));
+        $max = max(1, (int)($maxResults * $set['matches'] / $foundTotal));
         $maxResults -= $max;
 
         for ($i = 0; $i < $max; $i++)
@@ -534,6 +566,9 @@ else if ($searchMask & SEARCH_TYPE_OPEN)
 
             $info[]  = '['.implode(', ', $extra).']';
         }
+
+        if ($maxResults <= 0)
+            break;
     }
 
     header("Content-type: text/javascript");
