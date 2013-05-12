@@ -1,10 +1,11 @@
 <?php
+
 if(!defined('AOWOW_REVISION'))
     die("illegal access");
 
 abstract class Filter
 {
-    private static $pattern   = "/[^\p{L}0-9\s_\-\'\?\*]/ui";// delete any char not in unicode, number, hyphen, single quote or common wildcard
+    private static $pattern   = "/[^\p{L}0-9\s_\-\'\?\*]/ui";// delete any char not in unicode, number, space, underscore, hyphen, single quote or common wildcard
     private static $wildcards = ['*' => '%', '?' => '_'];
     private static $criteria  = ['cr', 'crs', 'crv'];       // [cr]iterium, [cr].[s]ign, [cr].[v]alue
 
@@ -230,7 +231,6 @@ abstract class Filter
         header('Location: http://'.$_SERVER['SERVER_NAME'].str_replace('index.php', '', $_SERVER['PHP_SELF']).'?'.$_SERVER['QUERY_STRING'].'='.$get);
     }
 
-
     // TODO: wrong wrong wrong!!
     // 1) filter-Ids are different for each type; 2) (NOT) IN - subqueries will eat the mysql-server alive!
     protected function createSQLForCommunity($cr)
@@ -325,6 +325,129 @@ class AchievementListFilter extends Filter
 }
 
 
+class SpellListFilter extends Filter
+{
+    // sources in filter and general use different indizes
+    private static $fiSource  = array(
+        1  => -2,                                           // Any
+        2  => -1,                                           // None
+        3  =>  1,                                           // Crafted
+        4  =>  2,                                           // Drop
+        6  =>  4,                                           // Quest
+        7  =>  5,                                           // Vendor
+        8  =>  6,                                           // Trainer
+        9  =>  7,                                           // Discovery
+        10 =>  9                                            // Talent
+    );
+
+    protected function createSQLForCriterium($cr)
+    {
+        if ($r = $this->createSQLForCommunity($cr))
+            return $r;
+
+        switch ($cr[0])
+        {
+            case 1:                                         // costAbs [op] [int]
+                return 's.powerCost '.$this->int2Op($cr[1]).' IF(s.powerType IN (1, 6),  10 * '.intVal($cr[2]).', '.intVal($cr[2]).')';
+            case 2:                                         // costPct [op] [int]
+                return 's.powerCostPercent '.$this->int2Op($cr[1]).' '.intVal($cr[2]);
+            case 3:                                         // requires FocusGO [y|n]
+                return $this->int2Bool($cr[1]) ? 's.spellFocusObject > 0' : 's.spellfocus = 0';
+            case 4:                                         // trainingcost [op] [int]
+                return 's.trainingcost '.$this->int2Op($cr[1]).' '.intVal($cr[2]);
+            case 5:                                         // Profession Specialitation [y|n]
+                return 's.reqSpellId '.($this->int2Bool($cr[1]) ? ' > ' : ' = ').' 0';
+            case 9:                                         // Source [int]
+                if ($foo = self::$fiSource[$cr[1]])
+                {
+                    if ($foo > 0)                           // specific
+                        return 's.source LIKE "%'.$foo.':%"';
+                    else if ($foo == -2)                    // any
+                        return 's.source <> ""';
+                    else if ($foo == -1)                    // none
+                        return 's.source = ""';
+                }
+
+                return '1';
+            case 10:                                        // First Rank [y|n]
+                return $this->int2Bool($cr[1]) ? 's.cuFlags & '.SPELL_CU_FIRST_RANK : '(s.cuFlags & '.SPELL_CU_FIRST_RANK.') = 0' ;
+            case 12:                                        // Last Rank [y|n]
+                return $this->int2Bool($cr[1]) ? 's.cuFlags & '.SPELL_CU_LAST_RANK : '(s.cuFlags & '.SPELL_CU_LAST_RANK.') = 0' ;
+            case 13:                                        // Rank# [op] [int]
+                return 's.rankId '.$this->int2Op($cr[1]).' '.intVal($cr[2]);
+            case 14:                                        // spellId [op] [int]
+                return 's.id '.$this->int2Op($cr[1]).' '.intVal($cr[2]);
+            case 15:                                        // iconString [string]
+                return 's.iconString LIKE "%'.Util::sqlEscape($cr[2]).'%"';
+            case 19:                                        // scales /W level [y|n] 0x80000 = SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION
+                return $this->int2Bool($cr[1]) ? 's.attributes0 & 0x80000' : '(s.attributes0 & 0x80000) = 0';
+            case 20:                                        // has Reagents [y|n]
+                return $this->int2Bool($cr[1]) ? 's.reagent1 > 0 OR s.reagent2 > 0 OR s.reagent3 > 0 OR s.reagent4 > 0 OR s.reagent5 > 0 OR s.reagent6 > 0 OR s.reagent7 > 0 OR s.reagent8 > 0' : 's.reagents1 = 0 AND s.reagents2 = 0 AND s.reagents3 = 0 AND s.reagents4 = 0 AND s.reagents5 = 0 AND s.reagents6 = 0 AND s.reagents7 = 0 AND s.reagents8 = 0';
+            case 25:                                        // rewards skill points [y|n]
+                return $this->int2Bool($cr[1]) ? 's.skillLevelYellow > 1' : 's.skillLevelYellow <= 1';
+            default:
+                return '1';
+        }
+    }
+
+    protected function createSQLForValues($vl)
+    {
+        $parts = [];
+
+        //string (extended)
+        if (isset($vl['na']))
+        {
+            if (isset($vl['ex']) && $vl['ex'] == 'on')
+                $parts[] = '(s.name_loc'.User::$localeId.' LIKE "%'.Util::sqlEscape($vl['na']).'%" OR buff_loc'.User::$localeId.' LIKE "%'.Util::sqlEscape($vl['na']).'%" OR description_loc'.User::$localeId.' LIKE "%'.Util::sqlEscape($vl['na']).'%")';
+            else
+                $parts[] = 's.name_loc'.User::$localeId.' LIKE "%'.Util::sqlEscape($vl['na']).'%"';
+        }
+
+        // spellLevel min
+        if (isset($vl['minle']))
+            $parts[] = 's.spellLevel >= '.intVal($vl['minle']);
+
+        // spellLevel max
+        if (isset($vl['maxle']))
+            $parts[] = 's.spellLevel <= '.intVal($vl['maxle']);
+
+        // skillLevel min
+        if (isset($vl['minrs']))
+            $parts[] = 's.learnedAt >= '.intVal($vl['minrs']);
+
+        // skillLevel max
+        if (isset($vl['maxrs']))
+            $parts[] = 's.learnedAt <= '.intVal($vl['maxrs']);
+
+        // race
+        if (isset($vl['ra']))
+            $parts[] = 's.reqRaceMask & '.$this->list2Mask($vl['ra']);
+
+        // class [list]
+        if (isset($vl['cl']))
+            $parts[] = 's.reqClassMask & '.$this->list2Mask($vl['cl']);
+
+        // school [list]
+        if (isset($vl['sc']))
+            $parts[] = 's.schoolMask & '.$this->list2Mask($vl['sc'], true);
+
+        // glyph type [list]                                wonky, admittedly, but consult SPELL_CU_* in defines and it makes sense
+        if (isset($vl['gl']))
+            $parts[] = 's.cuFlags & '.($this->list2Mask($vl['gl']) << 6);
+
+        // dispel type
+        if (isset($vl['dt']))
+            $parts[] = 's.dispelType = '.intVal($vl['dt']);
+
+        // mechanic
+        if (isset($vl['me']))
+            $parts[] = 's.mechanic = '.intVal($vl['me']).' OR s.effect1Mechanic = '.intVal($vl['me']).' OR s.effect2Mechanic = '.intVal($vl['me']).' OR s.effect3Mechanic = '.intVal($vl['me']);
+
+        return $parts;
+    }
+}
+
+
 // missing filter: "Available to Players"
 class ItemsetListFilter extends Filter
 {
@@ -394,7 +517,7 @@ class ItemsetListFilter extends Filter
 
         // class
         if (isset($vl['cl']))
-            $parts[] = 'classMask & '.$this->list2Mask($vl['cl'] - 1);
+            $parts[] = 'classMask & '.$this->list2Mask($vl['cl']);
 
         // tag
         if (isset($vl['ta']))

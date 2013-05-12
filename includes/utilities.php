@@ -328,6 +328,8 @@ class Lang
     public static $title;
     public static $zone;
 
+    public static $colon;
+
     public static function load($loc)
     {
         if (@(require 'localization/locale_'.$loc.'.php') !== 1)
@@ -416,7 +418,6 @@ class Lang
     public static function getMagicSchools($schoolMask)
     {
         $schoolMask &= SPELL_ALL_SCHOOLS;                   // clamp to available schools..
-
         $tmp = [];
         $i   = 0;
 
@@ -673,6 +674,27 @@ class Util
          8 =>  [ 3483,  3518,  3519,  3520,  3521,  3522,  3523,  3679, 3703],
          9 =>  [-1008, -1007, -1006, -1005, -1004, -1003, -1002, -1001, -375, -374, -370, -369, -366, -364, -284,  -41,  -22],
         10 =>  [   65,    66,    67,   210,   394,   495,  3537,  3711, 4024, 4197, 4395]
+    );
+
+    /*  why:
+        Because petSkills (and ranged weapon skills) are the only ones with more than two skillLines attached. Because Left Joining ?_spell with ?_skillLineAbility  causes more trouble than it has uses.
+        Because this is more or less the only reaonable way to fit all that information into one database field, so..
+        .. the indizes of this array are bits of skillLine2OrMask in ?_spell if skillLineId1 is negative
+    */
+    public static $skillLineMask            = array(        // idx => [familyId, skillLineId]
+        -1 => array(                                        // Pets (Hunter)
+            [ 1, 208],          [ 2, 209],          [ 3, 203],          [ 4, 210],          [ 5, 211],          [ 6, 212],          [ 7, 213],  // Wolf,       Cat,          Spider,       Bear,        Boar,      Crocolisk,    Carrion Bird
+            [ 8, 214],          [ 9, 215],          [11, 217],          [12, 218],          [20, 236],          [21, 251],          [24, 653],  // Crab,       Gorilla,      Raptor,       Tallstrider, Scorpid,   Turtle,       Bat
+            [25, 654],          [26, 655],          [27, 656],          [30, 763],          [31, 767],          [32, 766],          [33, 765],  // Hyena,      Bird of Prey, Wind Serpent, Dragonhawk,  Ravager,   Warp Stalker, Sporebat
+            [34, 764],          [35, 768],          [37, 775],          [38, 780],          [39, 781],          [41, 783],          [42, 784],  // Nether Ray, Serpent,      Moth,         Chimaera,    Devilsaur, Silithid,     Worm
+            [43, 786],          [44, 785],          [45, 787],          [46, 788]                                                               // Rhino,      Wasp,         Core Hound,   Spirit Beast
+        ),
+        -2 => array(                                        // Pets (Warlock)
+            [15, 189],          [16, 204],          [17, 205],          [19, 207],          [23, 188],          [29, 761]                       // Felhunter,  Voidwalker,   Succubus,     Doomguard,   Imp,       Felguard
+        ),
+        -3 => array(                                        // Ranged Weapons
+            [null, 45],         [null, 46],         [null, 226]                                                                                 // Bow,         Gun,         Crossbow
+        )
     );
 
     public static $sockets                  = array(        // jsStyle Strings

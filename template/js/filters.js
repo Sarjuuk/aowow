@@ -325,7 +325,6 @@ var fi_filters = {
         { id: 20,  name: 'hasreagents',             type: 'yn' },
         { id: 12,  name: 'lastrank',                type: 'yn' },
         { id: 13,  name: 'rankno',                  type: 'num' },
-        { id: 22,  name: 'proficiencytype',         type: 'proficiencytype' },
         { id: 19,  name: 'scaling',                 type: 'yn' },
         { id: 25,  name: 'rewardsskillups',         type: 'yn' },
         { id: 3,   name: 'requiresnearbyobject',    type: 'yn' },

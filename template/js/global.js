@@ -2346,6 +2346,11 @@ DomContentLoaded.addEvent(function () {
         var text = x.title;
         x.title = '';
         x.className += ' tip';
+
+        if (text.indexOf('LANG.') == 0) {                   // custom for less redundant texts
+          text = eval(text);
+        }
+
         g_addTooltip(x, text, 'q');
     });
 /* old implementation below; new is above
@@ -4500,22 +4505,22 @@ Listview.prototype = {
 			ae(m, ct(")"))
 		}
 
-        if (this._errors) {
-            var
-                sp = ce('small'),
-                b  = ce('b');
+		if (this._errors) {
+			var
+				sp = ce('small'),
+				b  = ce('b');
 
-            b.className = 'q10 report-icon';
-            if (m.innerHTML) {
-                b.style.marginLeft = '10px';
-            }
+			b.className = 'q10 report-icon';
+			if (m.innerHTML) {
+				b.style.marginLeft = '10px';
+			}
 
-            g_addTooltip(sp, LANG.lvnote_witherrors, 'q')
+			g_addTooltip(sp, LANG.lvnote_witherrors, 'q')
 
-            st(b, LANG.error);
-            ae(sp, b);
-            ae(m, sp);
-        }
+			st(b, LANG.error);
+			ae(sp, b);
+			ae(m, sp);
+		}
 
 		if (!m.firstChild && this.mode != Listview.MODE_CHECKBOX) {
 			ae(m, ct(String.fromCharCode(160)))
@@ -5035,21 +5040,32 @@ Listview.prototype = {
 		this.rowOffset = 0;
 		this.nRowsVisible = this.data.length
 	},
-	getColText: function(b, a) {
-		if (a.getVisibleText) {
-			return a.getVisibleText(b)
+
+	getColText: function(row, col) {
+		var text = '';
+		if (this.template.getVisibleText) {
+			text = trim(this.template.getVisibleText(row) + ' ');
 		}
-		if (a.getValue) {
-			return a.getValue(b)
+
+		if (col.getVisibleText) {
+			return text + col.getVisibleText(row)
 		}
-		if (a.value) {
-			return b[a.value]
+
+		if (col.getValue) {
+			return text + col.getValue(row)
 		}
-		if (a.compute) {
-			return a.compute(b)
+
+		if (col.value) {
+			return text + row[col.value]
 		}
+
+		if (col.compute) {
+			return text + col.compute(row, ce('td'), ce('tr'));
+		}
+
 		return ""
 	},
+
 	updateFilters: function(d) {
 		Tooltip.hide();
 		this.resetRowVisibility();
@@ -9208,7 +9224,7 @@ Listview.templates = {
                         if (quest.wflags & 1) {
                             var s = ce('span');
                             s.style.color = 'red';
-                            ae(s, ct(LANG.lvdisabled));
+                            ae(s, ct(LANG.lvquest_disabled));
                             // ae(s, ct(LANG.lvquest_removed));
                             ae(d, s);
                         }
@@ -9552,515 +9568,571 @@ Listview.templates = {
 			return "?skill=" + a.id
 		}
 	},
-	spell: {
-		sort: ["name", "skill", "level"],
-		searchable: 1,
-		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			span: 2,
-			value: "name",
-			compute: function(g, e, k) {
-				var f = ce("td"),
-				p;
-				f.style.width = "44px";
-				f.style.padding = "0";
-				f.style.borderRight = "none";
-				if (g.creates != null) {
-					p = g_items.createIcon(g.creates[0], 1, Listview.funcBox.createTextRange(g.creates[1], g.creates[2]))
-				} else {
-					p = g_spells.createIcon(g.id, 1)
-				}
-				p.style.cssFloat = p.style.styleFloat = "left";
-				ae(f, p);
-				ae(k, f);
-				e.style.borderLeft = "none";
-				var b = ce("div");
-				var o = ce("a");
-				var l = g.name.charAt(0);
-				if (l != "@") {
-					o.className = "q" + (7 - parseInt(l))
-				}
-				o.style.fontFamily = "Verdana, sans-serif";
-				o.href = this.template.getItemLink(g);
-				ae(o, ct(g.name.substring(1)));
-				ae(b, o);
-				if (g.rank) {
-					var j = ce("div");
-					j.className = "small2";
-					ae(j, ct(g.rank));
-					ae(b, j)
-				}
-				if (this.showRecipeClass && g.reqclass) {
-					var l = ce("div");
-					l.className = "small2";
-					var f = Listview.funcBox.assocBinFlags(j.reqclass, g_chr_classes);
-					for (var h = 0, k = f.length; h < k; ++h) {
-						if (h > 0) {
-							ae(l, ct(", "))
-						}
-						var o = ce("a");
-						o.href = "?class=" + f[h];
-						o.className = "c" + f[h];
-						st(o, g_chr_classes[f[h]]);
-						ae(l, o)
-					}
-					ae(b, l)
-				}
-				if (g.races) {
 
-					b.style.position = "relative";
-					var j = ce("div");
-					j.className = "small";
-					j.style.fontStyle = "italic";
-					j.style.position = "absolute";
-					j.style.right = j.style.bottom = "3px";
-					if ((g.races & 1791) == 1101) {
-						ae(j, ct(g_sides[1]))
-					} else {
-						if ((g.races & 1791) == 690) {
-							ae(j, ct(g_sides[2]))
-						} else {
-							var i = Listview.funcBox.assocBinFlags(g.races, g_chr_races);
-							j.className += " q1";
-							for (var h = 0, k = i.length; h < k; ++h) {
-								if (h > 0) {
-									ae(j, ct(LANG.comma))
-								}
-								var o = ce("a");
-								o.href = "?race=" + i[h];
-								st(o, g_chr_races[i[h]]);
-								ae(j, o)
-							}
-						}
-					}
-					ae(b, j)
-				}
-				ae(e, b)
-			},
-			getVisibleText: function(a) {
-				var b = a.name;
-				if (a.rank) {
-					b += " " + a.rank
-				}
-				if (a.races) {
+    spell: {
+        sort: ['name', 'skill', 'level'],
+        searchable: 1,
+        filtrable: 1,
 
-					var d = Listview.funcBox.assocBinFlags(b.reqclass, g_chr_classes);
-					for (var c = 0, a = d.length; c < a; ++c) {
-						if (c > 0) {
-							b += LANG.comma
-						}
-						b += g_chr_classes[d[c]]
-					}
-				}
-				if (b.races) {
-					b += " " + Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(b.reqrace, g_chr_races), g_chr_races)
-				}
-				return b
-			}
-		},
-		{
-			id: "tier",
-			name: LANG.tier,
-			width: "10%",
-			value: "level",
-			compute: function(b, d) {
-				if (b.level > 0) {
-					var a = (!this._petTalents ? 10 : 20),
-					c = (!this._petTalents ? 5 : 12);
-					return Math.floor((b.level - a) / c) + 1
-				}
-			},
-			hidden: true
-		},
-        {
-			id: "level",
-			name: LANG.level,
-			width: "10%",
-			value: "level",
-			compute: function(a, b) {
-				if (a.level > 0) {
-					return a.level
-				}
-			},
-			hidden: true
-		},
-		{
-			id: "trainingcost",
-			name: LANG.cost,
-			width: "10%",
-			hidden: true,
-			getValue: function(a) {
-				if (a.trainingcost) {
-					return a.trainingcost
-				}
-			},
-			compute: function(a, b) {
-				if (a.trainingcost) {
-					Listview.funcBox.appendMoney(b, a.trainingcost)
-				}
-			},
-			sortFunc: function(d, c, e) {
-				if (d.trainingcost == null) {
-					return - 1
-				} else {
-					if (c.trainingcost == null) {
-						return 1
-					}
-				}
-				if (d.trainingcost < c.trainingcost) {
-					return - 1
-				} else {
-					if (d.trainingcost > c.trainingcost) {
-						return 1
-					}
-				}
-				return 0
-			}
-		},
-		{
-			id: "classes",
-			name: LANG.classes,
-			type: "text",
-			hidden: true,
-			width: "20%",
-			getVisibleText: function(b) {
-				var e = "";
-				if (b.reqclass) {
-					var d = Listview.funcBox.assocBinFlags(b.reqclass, g_chr_classes);
-					for (var c = 0, a = d.length; c < a; ++c) {
-						if (c > 0) {
-							e += LANG.comma
-						}
-						e += g_chr_classes[d[c]]
-					}
-				}
-				return e
-			},
-			compute: function(b, h) {
-				if (b.reqclass) {
-					var e = Listview.funcBox.assocBinFlags(b.reqclass, g_chr_classes);
-					var g = ce("div");
-					g.style.width = (26 * e.length) + "px";
-					g.style.margin = "0 auto";
-					for (var c = 0, a = e.length; c < a; ++c) {
-						var f = Icon.create("class_" + g_file_classes[e[c]], 0, null, "?class=" + e[c]);
-						f.style.cssFloat = f.style.styleFloat = "left";
-						ae(g, f)
-					}
-					ae(h, g)
-				}
-			},
-			sortFunc: function(d, c, e) {
-				return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(d.reqclass, g_chr_classes), Listview.funcBox.assocBinFlags(c.reqclass, g_chr_classes), g_chr_classes)
-			}
-		},
-		{
-			id: "singleclass",
-			name: LANG.classs,
-			type: "text",
-			hidden: true,
-			width: "15%",
-			compute: function(a, e) {
-				if (a.reqclass) {
-					var b = Listview.funcBox.assocBinFlags(a.reqclass, g_chr_classes);
-					var c = b[0];
-					var d = ce("a");
-                    d.style.backgroundImage = 'url("' + g_staticUrl + "/images/wow/icons/tiny?class_" + g_file_classes[c] + '.gif")';
-                    d.className = "icontiny c" + c;
-                    d.href = "?class=" + c;
-                    ae(d, ct(g_chr_classes[c]));
-					ae(e, d);
-				}
-			},
-			sortFunc: function(d, c, e) {
-				return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(d.reqclass, g_chr_classes), Listview.funcBox.assocBinFlags(c.reqclass, g_chr_classes), g_chr_classes)
-			}
-		},
-		{
-			id: "glyphtype",
-			name: LANG.glyphtype,
-			type: "text",
-			hidden: true,
-			width: "10%",
-			compute: function(a, b) {
-				if (a.glyphtype) {
-					return g_item_glyphs[a.glyphtype]
-				}
-			}
-		},
-		{
-			id: "schools",
-			name: LANG.school,
-			type: "text",
-			width: "10%",
-			hidden: true,
-			compute: function(a, b) {
-				var d = "";
-				var c = a.schools ? a.schools: a.school;
-				for (var e = 0; e < 32; ++e) {
-					if (! (c & (1 << e))) {
-						continue
-					}
-					if (d != "") {
-						d += ", "
-					}
-					d += g_spell_resistances[e]
-				}
-				return d
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(this.compute(d), this.compute(c))
-			}
-		},
-		{
-			id: "type",
-			name: LANG.type,
-			type: "text",
-			width: "10%",
-			hidden: true,
-			compute: function(a, b) {
-				if (g_spell_types[a.cat]) {
-					return g_spell_types[a.cat][a.type]
-				}
-				return a.type
-			},
-			sortFunc: function(d, c, e) {
-				var g = (g_spell_types[d.cat] ? g_spell_types[d.cat][d.type] : d.type),
-				f = (g_spell_types[c.cat] ? g_spell_types[c.cat][c.type] : d.type);
-				return strcmp(d.cat, c.cat) || strcmp(g, f)
-			}
-		},
-		{
-			id: "reagents",
-			name: LANG.reagents,
-			width: "9%",
-			getValue: function(a) {
-				return (a.reagents ? a.reagents.length: 0)
-			},
-			compute: function(g, c) {
-				var a = (g.reagents != null);
-				if (a) {
-					c.style.padding = "0";
-					var k = ce("div");
-					var j = g.reagents;
-					k.style.width = (44 * j.length) + "px";
-					k.style.margin = "0 auto";
-					for (var e = 0, h = j.length; e < h; ++e) {
-						var b = j[e][0];
-						var f = j[e][1];
-						var l = g_items.createIcon(b, 1, f);
-						l.style.cssFloat = l.style.styleFloat = "left";
-						ae(k, l);
+        columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                span: 2,
+                value: 'name',
+                compute: function(spell, td, tr) {
+                    var
+                        i = ce('td'),
+                        _;
 
-					}
-					ae(c, k)
-				}
-			},
-			sortFunc: function(d, c) {
-				var f = (d.reagents != null ? d.reagents.length: 0);
-				var e = (c.reagents != null ? c.reagents.length: 0);
-				if (f > 0 && f == e) {
-					return strcmp(d.reagents.toString(), c.reagents.toString())
-				} else {
-					return strcmp(f, e)
-				}
-			}
-		},
-		{
-			id: "tp",
-			name: LANG.tp,
-			tooltip: LANG.tooltip_trainingpoints,
-			width: "7%",
-			hidden: true,
-			value: "tp",
-			compute: function(a, b) {
-				if (a.tp > 0) {
-					return a.tp
-				}
-			}
-		},
-		{
-			id: "source",
-			name: LANG.source,
-			type: "text",
-			width: "12%",
-			hidden: true,
-			compute: function(b, e) {
-				if (b.source != null) {
-					var d = "";
-					for (var c = 0, a = b.source.length; c < a; ++c) {
-						if (c > 0) {
-							d += LANG.comma
-						}
-						d += g_sources[b.source[c]]
-					}
-					return d
-				}
-			},
-			sortFunc: function(d, c, e) {
-				return Listview.funcBox.assocArrCmp(d.source, c.source, g_sources)
-			}
-		},
-		{
-			id: "skill",
-			name: LANG.skill,
-			type: "text",
-			width: "16%",
-			getValue: function(a) {
-				return a.learnedat
-			},
-			compute: function(h, f, l, r) {
-				if (h.skill != null) {
-					this.skillsColumn = r;
-					var c = ce("div");
-					c.className = "small";
-					if (h.cat == -7 && h.pettype != null) {
-						h.skill = [];
-						var q = {
-							0 : 410,
-							1 : 409,
-							2 : 411
-						};
-						for (var j = 0, k = h.pettype.length; j < k; ++j) {
-							h.skill.push(q[h.pettype[j]])
-						}
-					}
-					for (var g = 0, j = h.skill.length; g < j; ++g) {
-						if (g > 0) {
-							ae(c, ct(LANG.comma))
-						}
-						if (h.skill[g] == -1) {
-							ae(c, ct(LANG.ellipsis))
-						} else {
-							if (in_array([7, -2, -3, -5, -6, -7, 11, 9], h.cat) != -1) {
-								var o = ce("a");
-								o.className = "q1";
-								if (in_array([ - 5, -6, -7], h.cat) != -1) {
-									o.href = "?spells=" + h.cat
-								} else {
-									o.href = "?spells=" + h.cat + "." + (h.chrclass ? (1 + Math.log(h.chrclass) / Math.LN2) + ".": "") + h.skill[g]
-								}
-								var q = document.location.href.split("?")[1];
-								var e = q.substring(q.indexOf("=") + 1, (q.indexOf("#") != -1 ? q.indexOf("#") : q.length)).split(".");
+                    i.style.width = '44px';
+                    i.style.padding = '0';
+                    i.style.borderRight = 'none';
 
+                    if (spell.creates != null) {
+                        _ = g_items.createIcon(spell.creates[0], 1, Listview.funcBox.createTextRange(spell.creates[1], spell.creates[2]));
+                    }
+                    else {
+                        _ = g_spells.createIcon(spell.id, 1);
+                    }
 
-								if (h.chrclass && (h.cat == 7 || h.cat == -2)) {
-									if (g < 1 && ((1 + Math.log(h.chrclass) / Math.LN2) != e[1])) {
-										var b = ce("a");
-										b.className = "q0";
-										b.href = "?spells=" + h.cat + "." + (1 + Math.log(h.chrclass) / Math.LN2);
-										ae(b, ct(g_chr_classes[(1 + Math.log(h.chrclass) / Math.LN2)]));
-										ae(c, b);
-										ae(c, ce("br"))
-									}
-								}
-								ae(o, ct(g_spell_skills[h.skill[g]]));
-								ae(c, o)
-							} else {
-								ae(c, ct(g_spell_skills[h.skill[g]]))
-							}
-						}
-					}
-					if (h.learnedat > 0) {
-						ae(c, ct(" ("));
-						var d = ce("span");
-						if (h.learnedat == 9999) {
-							d.className = "q0";
-							ae(d, ct("??"))
-						} else {
-							if (h.learnedat > 0) {
-								ae(d, ct(h.learnedat));
-								d.style.fontWeight = "bold"
-							}
-						}
-						ae(c, d);
-						ae(c, ct(")"))
-					}
-					ae(f, c);
-					if (h.colors != null) {
-						this.template.columns[r].type = null;
-						var k = h.colors,
-						p = 0;
-						for (var g = 0; g < k.length; ++g) {
-							if (k[g] > 0) {++p;
-								break
-							}
-						}
-						if (p > 0) {
-							p = 0;
-							c = ce("div");
-							c.className = "small";
-							c.style.fontWeight = "bold";
-							for (var g = 0; g < k.length; ++g) {
-								if (k[g] > 0) {
-									if (p++>0) {
-										ae(c, ct(" "))
-									}
-									var m = ce("span");
-									m.className = "r" + (g + 1);
-									ae(m, ct(k[g]));
-									ae(c, m)
-								}
-							}
-							ae(f, c)
-						}
-					}
-				}
-			},
-			getVisibleText: function(a) {
-				var b = Listview.funcBox.arrayText(a.skill, g_spell_skills);
-				if (a.learnedat > 0) {
-					b += " " + (a.learnedat == 9999 ? "??": a.learnedat)
-				}
-				return b
-			},
-			sortFunc: function(e, c) {
-				if (e.chrclass && c.chrclass) {
+                    _.style.cssFloat = _.style.styleFloat = 'left';
+                    ae(i, _);
 
-					var h = strcmp(g_chr_classes[(1 + Math.log(e.chrclass) / Math.LN2)], g_chr_classes[(1 + Math.log(c.chrclass) / Math.LN2)])
-					if (h) {
-						return h
-					}
+                    ae(tr, i);
+                    td.style.borderLeft = 'none';
+
+                    var wrapper = ce('div');
+
+                    var a = ce('a');
+                    var c = spell.name.charAt(0);
+                    if (c != '@') {
+                        a.className = 'q' + (7 - parseInt(c));
+                    }
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(spell);
+
+                    ae(a, ct(spell.name.substring(1)));
+
+                    ae(wrapper, a);
+
+                    if (spell.rank) {
+                        var d = ce('div');
+                        d.className = 'small2';
+
+                        ae(d, ct(spell.rank));
+                        ae(wrapper, d);
+                    }
+
+                    if (this.showRecipeClass && spell.reqclass) {
+                        var d = ce('div');
+                        d.className = 'small2';
+
+                        var classes = Listview.funcBox.assocBinFlags(spell.reqclass, g_chr_classes);
+
+                        for (var i = 0, len = classes.length; i < len; ++i) {
+                            if (i > 0) {
+                                ae(d, ct(', '));
+                            }
+                            var a = ce('a');
+                            a.href = '?class=' + classes[i];
+                            a.className = 'c' + classes[i];
+                            st(a, g_chr_classes[classes[i]]);
+                            ae(d, a);
+                        }
+
+                        ae(wrapper, d);
+                    }
+
+                    if (spell.reqrace) {
+                        wrapper.style.position = 'relative';
+                        var d = ce('div');
+                        d.className = 'small';
+                        d.style.fontStyle = 'italic';
+                        d.style.position = 'absolute';
+                        d.style.right = d.style.bottom = '3px';
+                        if ((spell.reqrace & 1791) == 1101) {  // Alliance
+                            ae(d, ct(g_sides[1]));
+                        }
+                        else if ((spell.reqrace & 1791) == 690) { // Horde
+                            ae(d, ct(g_sides[2]));
+                        }
+                        else {
+                            var races = Listview.funcBox.assocBinFlags(spell.reqrace, g_chr_races);
+                            d.className += ' q1';
+
+                            for (var i = 0, len = races.length; i < len; ++i) {
+                                if (i > 0) {
+                                    ae(d, ct(LANG.comma)) ;
+                                }
+                                var a = ce('a');
+                                a.href = '?race=' + races[i];
+                                st(a, g_chr_races[races[i]]);
+                                ae(d, a);
+                            }
+                        }
+                        ae(wrapper, d);
+                    }
+                    ae(td, wrapper);
+                },
+                getVisibleText: function(spell) {
+                    var buff = spell.name;
+
+                    if (spell.rank) {
+                        buff += ' ' + spell.rank;
+                    }
+
+                    if (spell.reqclass) {
+                        var classes = Listview.funcBox.assocBinFlags(spell.reqclass, g_chr_classes);
+
+                        for (var i = 0, len = classes.length; i < len; ++i) {
+                            if (i > 0) {
+                                buff += LANG.comma;
+                            }
+                            buff += g_chr_classes[classes[i]];
+                        }
+                    }
+
+                    if (spell.reqrace) {
+                        buff += ' ' + Listview.funcBox.arrayText(Listview.funcBox.assocBinFlags(spell.reqrace, g_chr_races), g_chr_races);
+                    }
+
+                    return buff;
                 }
-				var d = [e.learnedat, c.learnedat];
-				for (var g = 0; g < 2; ++g) {
-					var h = (g == 0 ? e: c);
-					if (d[g] == 9999 && h.colors != null) {
-						var f = 0;
-						while (h.colors[f] == 0 && f < h.colors.length) {
-							f++
-						}
-						if (f < h.colors.length) {
-							d[g] = h.colors[f]
-						}
-					}
-				}
-				var j = strcmp(d[0], d[1]);
-				if (j != 0) {
-					return j
-				}
-				if (e.colors != null && c.colors != null) {
-					for (var f = 0; f < 4; ++f) {
-						j = strcmp(e.colors[f], c.colors[f]);
-						if (j != 0) {
-							return j
-						}
-					}
-				}
-				if (e.pettype != null & c.pettype != null) {
-					return Listview.funcBox.assocArrCmp(e.pettype, c.pettype, g_pet_types)
-				}
-				return Listview.funcBox.assocArrCmp(e.skill, c.skill, g_spell_skills)
-			}
-		}],
-		getItemLink: function(a) {
-			return "?spell=" + a.id
-		}
-	},
+            },
+            {
+                id: 'tier',
+                name: LANG.tier,
+                width: '10%',
+                value: 'level',
+                compute: function(spell, td) {
+                    if (spell.level > 0) {
+                        var
+                            baseLevel  = (!this._petTalents ? 10 : 20),
+                            tierPoints = (!this._petTalents ?  5 : 12);
+
+                        return Math.floor((spell.level - baseLevel) / tierPoints) + 1;  // + 3 ?
+                    }
+                    else {
+                        return 1;
+                    }
+                },
+                hidden: true
+            },
+            {
+                id: 'level',
+                name: LANG.level,
+                width: '10%',
+                value: 'level',
+                compute: function(spell, td) {
+                    if (spell.level > 0) {
+                        return spell.level;
+                    }
+                },
+                hidden: true
+            },
+            {
+                id: 'trainingcost',
+                name: LANG.cost,
+                width: '10%',
+                hidden: true,
+                getValue: function(row) {
+                    if (row.trainingcost) {
+                        return row.trainingcost;
+                    }
+                },
+                compute: function(row, td) {
+                    if (row.trainingcost) {
+                        Listview.funcBox.appendMoney(td, row.trainingcost);
+                    }
+                },
+                sortFunc: function(a, b, col) {
+                    if (a.trainingcost == null) {
+                        return -1;
+                    }
+                    else if (b.trainingcost == null) {
+                        return 1;
+                    }
+
+                    if (a.trainingcost < b.trainingcost) {
+                        return -1;
+                    }
+                    else if (a.trainingcost > b.trainingcost) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            },
+            {
+                id: 'classes',
+                name: LANG.classes,
+                type: 'text',
+                hidden: true,
+                width: '20%',
+                getVisibleText: function(spell) {
+                    var str = '';
+                    if (spell.reqclass) {
+                        var classes = Listview.funcBox.assocBinFlags(spell.reqclass, g_chr_classes);
+
+                        for (var i = 0, len = classes.length; i < len; ++i) {
+                            if (i > 0) {
+                                str += LANG.comma;
+                            }
+                            str += g_chr_classes[classes[i]];
+                        }
+                    }
+                    return str;
+                },
+                compute: function(spell, td) {
+                    if (spell.reqclass) {
+                        var classes = Listview.funcBox.assocBinFlags(spell.reqclass, g_chr_classes);
+
+                        var d = ce('div');
+                        d.style.width = (26 * classes.length) + 'px';
+                        d.style.margin = '0 auto';
+
+                        for (var i = 0, len = classes.length; i < len; ++i) {
+                            var icon = Icon.create('class_' + g_file_classes[classes[i]], 0, null, '?class=' + classes[i]);
+                            icon.style.cssFloat = icon.style.styleFloat = 'left';
+
+                            g_addTooltip(icon, g_chr_classes[classes[i]], 'c' + classes[i]);
+
+                            ae(d, icon);
+                        }
+
+                        ae(td, d);
+                    }
+                },
+                sortFunc: function(a, b, col) {
+                    return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(a.reqclass, g_chr_classes), Listview.funcBox.assocBinFlags(b.reqclass, g_chr_classes), g_chr_classes);
+                }
+            },
+            {
+                /* NOTE: To be used only if one single class is to be displayed */
+                id: 'singleclass',
+                name: LANG.classs,
+                type: 'text',
+                hidden: true,
+                width: '15%',
+                compute: function(spell, td) {
+                    if (spell.reqclass) {
+                        var classes = Listview.funcBox.assocBinFlags(spell.reqclass, g_chr_classes);
+                        var classId = classes[0];
+
+                        var text = ce('a');
+                        text.style.backgroundImage = 'url("' + g_staticUrl + '/images/icons/tiny/class_' + g_file_classes[classId] + '.gif")';
+                        text.className = 'icontiny tinyspecial c' + classId;
+                        text.href = '?class=' + classId;
+                        ae(text, ct(g_chr_classes[classId]));
+
+                        ae(td, text);
+                    }
+                },
+                sortFunc: function(a, b, col) {
+                    return Listview.funcBox.assocArrCmp(Listview.funcBox.assocBinFlags(a.reqclass, g_chr_classes), Listview.funcBox.assocBinFlags(b.reqclass, g_chr_classes), g_chr_classes);
+                }
+            },
+            {
+                id: 'glyphtype',
+                name: LANG.glyphtype,
+                type: 'text',
+                hidden: true,
+                width: '10%',
+                compute: function(spell, td) {
+                    if (spell.glyphtype) {
+                        return g_item_glyphs[spell.glyphtype];
+                    }
+                }
+            },
+            {
+                id: 'schools',
+                name: LANG.school,
+                type: 'text',
+                width: '10%',
+                hidden: true,
+                compute: function(spell, td) {
+                    var text = '';
+                    var schools = spell.schools ? spell.schools: spell.school;
+
+                    for (var i = 0; i < 32; ++i) {
+                        if (!(schools & (1 << i))) {
+                            continue;
+                        }
+
+                        if (text != '') {
+                            text += ', ';
+                        }
+
+                        text += g_spell_resistances[i];
+                    }
+
+                    return text;
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(this.compute(a), this.compute(b));
+                }
+            },
+            {
+                id: 'type',
+                name: LANG.type,
+                type: 'text',
+                width: '10%',
+                hidden: true,
+                compute: function(spell, td) {
+                    if (g_spell_types[spell.cat]) {
+                        return g_spell_types[spell.cat][spell.type];
+                    }
+                    return spell.type;
+                },
+                sortFunc: function(a, b, col) {
+                    var
+                        typeA = (g_spell_types[a.cat] ? g_spell_types[a.cat][a.type] : a.type),
+                        typeB = (g_spell_types[b.cat] ? g_spell_types[b.cat][b.type] : a.type);
+                    return strcmp(a.cat, b.cat) || strcmp(typeA, typeB);
+                }
+            },
+            {
+                id: 'reagents',
+                name: LANG.reagents,
+                width: '9%',
+                hidden: true,
+                getValue: function(spell) {
+                    return (spell.reagents ? spell.reagents.length: 0);
+                },
+                compute: function(spell, td) {
+                    var hasIcons = (spell.reagents != null);
+                    if (hasIcons) {
+                        td.style.padding = '0';
+
+                        var d = ce('div');
+                        var items = spell.reagents;
+
+                        d.style.width = (44 * items.length) + 'px';
+                        d.style.margin = '0 auto';
+
+                        for (var i = 0, len = items.length; i < len; ++i) {
+                            var id   = items[i][0];
+                            var num  = items[i][1];
+                            var icon = g_items.createIcon(id, 1, num);
+                            icon.style.cssFloat = icon.style.styleFloat = 'left';
+                            ae(d, icon);
+                        }
+
+                        ae(td, d);
+                    }
+                },
+                sortFunc: function(a, b) {
+                    var lena = (a.reagents != null ? a.reagents.length: 0);
+                    var lenb = (b.reagents != null ? b.reagents.length: 0);
+                    if (lena > 0 && lena == lenb) {
+                        return strcmp(a.reagents.toString(), b.reagents.toString());
+                    }
+                    else {
+                        return strcmp(lena, lenb);
+                    }
+                }
+            },
+            {
+                id: 'source',
+                name: LANG.source,
+                type: 'text',
+                width: '12%',
+                hidden: true,
+                compute: function(spell, td) {
+                    if (spell.source != null) {
+                        var buff = '';
+                        for (var i = 0, len = spell.source.length; i < len; ++i) {
+                            if (i > 0) {
+                                buff += LANG.comma;
+                            }
+                            buff += g_sources[spell.source[i]];
+                        }
+                        return buff;
+                    }
+                },
+                sortFunc: function(a, b, col) {
+                    return Listview.funcBox.assocArrCmp(a.source, b.source, g_sources);
+                }
+            },
+            {
+                id: 'skill',
+                name: LANG.skill,
+                type: 'text',
+                width: '16%',
+                getValue: function(spell) {
+                    return spell.learnedat;
+                },
+                compute: function(spell, td, tr, colNo) {
+                    if (spell.skill != null) {
+                        this.skillsColumn = colNo;
+                        var div = ce('div');
+                        div.className = 'small';
+
+                        if (spell.cat == -7 && spell.pettype != null) {
+                            spell.skill = [];
+                            var petTalents = {
+                                0: 410,
+                                1: 409,
+                                2: 411
+                            };
+                            for (var i = 0, len = spell.pettype.length; i < len; ++i) {
+                                spell.skill.push(petTalents[spell.pettype[i]]);
+                            }
+                        }
+
+                        for (var i = 0, len = spell.skill.length; i < len; ++i) {
+                            if (i > 0) {
+                                ae(div, ct(LANG.comma));
+                            }
+
+                            if (spell.skill[i] == -1) {
+                                ae(div, ct(LANG.ellipsis));
+                            }
+                            else {
+                                if (in_array([7, -2, -3, -5, -6, -7, 11, 9], spell.cat) != -1) {
+                                    var a = ce('a');
+                                    a.className = 'q1';
+                                    if (in_array([-5, -6], spell.cat) != -1) {
+                                        a.href = '?spells=' + spell.cat;
+                                    }
+                                    else {
+                                        a.href = '?spells=' + spell.cat + '.' + ((spell.reqclass && (spell.cat == 7 || spell.cat == -2)) ? (1 + Math.log(spell.reqclass) / Math.LN2) + '.' : '') + spell.skill[i];
+                                    }
+
+                                    var get = g_getGets();
+                                    var spellCat = (get.spells ? get.spells.split('.') : [false, false]);
+                                    if (spell.reqclass && (spell.cat == 7 || spell.cat == -2)) {
+                                        if (i < 1 && ((1 + Math.log(spell.reqclass) / Math.LN2) != spellCat[1])) {
+                                            var a2 = ce('a');
+                                            a2.className = 'q0';
+                                            a2.href = '?spells=' + spell.cat + '.' + (1 + Math.log(spell.reqclass) / Math.LN2);
+                                            ae(a2, ct(g_chr_classes[(1 + Math.log(spell.reqclass) / Math.LN2)]));
+                                            ae(div, a2);
+                                            ae(div, ce('br'));
+                                        }
+                                    }
+                                    ae(a, ct(spell.cat == -7 && spell.pettype != null ? g_pet_types[spell.pettype[i]] : g_spell_skills[spell.skill[i]]));
+                                    ae(div, a);
+                                }
+                                else {
+                                    ae(div, ct(g_spell_skills[spell.skill[i]]));
+                                }
+                            }
+                        }
+
+                        if (spell.learnedat > 0) {
+                            ae(div, ct(' ('));
+                            var spLearnedAt = ce('span');
+                            if (spell.learnedat == 9999) {
+                                spLearnedAt.className = 'q0';
+                                ae(spLearnedAt, ct('??'));
+                            }
+                            else if (spell.learnedat > 0) {
+                                ae(spLearnedAt, ct(spell.learnedat));
+                                spLearnedAt.style.fontWeight = 'bold';
+                            }
+                            ae(div, spLearnedAt);
+                            ae(div, ct(')'));
+                        }
+
+                        ae(td, div);
+
+                        if (spell.colors != null) {
+                            this.template.columns[colNo].type = null;
+
+                            var
+                                colors = spell.colors,
+                                nColors = 0;
+
+                            for (var i = 0; i < colors.length; ++i) {
+                                if (colors[i] > 0) {
+                                    ++nColors;
+                                    break;
+                                }
+                            }
+                            if (nColors > 0) {
+                                nColors = 0;
+                                div = ce('div');
+                                div.className = 'small';
+                                div.style.fontWeight = 'bold';
+                                for (var i = 0; i < colors.length; ++i) {
+                                    if (colors[i] > 0) {
+                                        if (nColors++ > 0) {
+                                            ae(div, ct(' '));
+                                        }
+                                        var spColor = ce('span');
+                                        spColor.className = 'r' + (i + 1);
+                                        ae(spColor, ct(colors[i]));
+                                        ae(div, spColor);
+                                    }
+                                }
+                                ae(td, div);
+                            }
+                        }
+                    }
+                },
+                getVisibleText: function(spell) {
+                    var buff = Listview.funcBox.arrayText(spell.skill, g_spell_skills);
+
+                    if (spell.learnedat > 0) {
+                        buff += ' ' + (spell.learnedat == 9999 ? '??' : spell.learnedat);
+                    }
+
+                    return buff;
+                },
+                sortFunc: function(a, b) {
+                /*  sarjuuk: behaves unpredictable if reqrace not set or 0
+                    if (a.reqclass && b.reqclass) {
+                        var reqClass = strcmp(g_chr_classes[(1 + Math.log(a.reqclass) / Math.LN2)], g_chr_classes[(1 + Math.log(b.reqclass) / Math.LN2)]);
+                        if (reqClass) {
+                            return reqClass;
+                        }
+                    }
+                */
+
+                    var skill = [a.learnedat, b.learnedat];
+                    for (var s = 0; s < 2; ++s) {
+                        var sp = (s == 0 ? a: b);
+                        if (skill[s] == 9999 && sp.colors != null) {
+                            var i = 0;
+                            while (sp.colors[i] == 0 && i < sp.colors.length) {
+                                i++;
+                            }
+                            if (i < sp.colors.length) {
+                                skill[s] = sp.colors[i];
+                            }
+                        }
+                    }
+                    var foo = strcmp(skill[0], skill[1]);
+                    if (foo != 0) {
+                        return foo;
+                    }
+
+                    if (a.colors != null && b.colors != null) {
+                        for (var i = 0; i < 4; ++i) {
+                            foo = strcmp(a.colors[i], b.colors[i]);
+                            if (foo != 0) {
+                                return foo;
+                            }
+                        }
+                    }
+
+                    if (a.pettype != null & b.pettype != null) {
+                        return Listview.funcBox.assocArrCmp(a.pettype, b.pettype, g_pet_types);
+                    }
+
+                    return Listview.funcBox.assocArrCmp(a.skill, b.skill, g_spell_skills);
+                }
+            }
+        ],
+
+        getItemLink: function(spell) {
+            return '?spell=' + spell.id;
+        }
+    },
+
 	zone: {
 		sort: [1],
 		nItemsPerPage: -1,
@@ -13243,7 +13315,7 @@ var Icon = {
             Dialog.templates.icondisplay = {
                 title: LANG.icon,
                 width: w,
-                buttons: [['arrow', LANG.dialog_original], ['cancel', LANG.close]],
+                buttons: [['arrow', LANG.original], ['cancel', LANG.close]],
                 fields:
                 [
                     {
@@ -13499,14 +13571,17 @@ var Tooltip = {
         if (c.length >= 2 && c[0].nodeName == 'TABLE' && c[1].nodeName == 'TABLE') {
             c[0].style.whiteSpace = 'nowrap';
 
-            var m;
-            if (c[1].offsetWidth > 300) {
-                m = Math.max(300, c[0].offsetWidth) + 20;
-            }
-            else {
-                m = Math.max(c[0].offsetWidth, c[1].offsetWidth) + 20;
+            var m = parseInt(tooltip.style.width);
+            if (!m) {
+                if (c[1].offsetWidth > 300) {
+                    m = Math.max(300, c[0].offsetWidth) + 20;
+                }
+                else {
+                    m = Math.max(c[0].offsetWidth, c[1].offsetWidth) + 20;
+                }
             }
 
+            m = Math.min(320, m);
             if (m > 20) {
                 tooltip.style.width = m + 'px';
                 c[0].style.width = c[1].style.width = '100%';
@@ -16231,7 +16306,7 @@ var ContactTool = new function() {
         Dialog.templates.contactus = {
             title: dialog_contacttitle,
             width: 550,
-            buttons: [['okay', LANG.dialog_ok], ['cancel', LANG.dialog_cancel]],
+            buttons: [['okay', LANG.ok], ['cancel', LANG.cancel]],
 
             fields: [
                 {
@@ -16429,7 +16504,7 @@ var ContactTool = new function() {
             title: LANG.ct_dialog_report,
             width: 550,
             // height: 360,
-            buttons: [['okay', LANG.dialog_ok], ['cancel', LANG.dialog_cancel]],
+            buttons: [['okay', LANG.ok], ['cancel', LANG.cancel]],
             fields: [
                 {
                     id: 'reason',

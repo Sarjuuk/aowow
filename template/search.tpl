@@ -27,8 +27,12 @@
 {if isset($found.quest)}       {include file='bricks/listviews/quest.tpl'        data=$found.quest.data       params=$found.quest.params      } {/if}
 {if isset($found.ability)}     {include file='bricks/listviews/spell.tpl'        data=$found.ability.data     params=$found.ability.params    } {/if}
 {if isset($found.talent)}      {include file='bricks/listviews/spell.tpl'        data=$found.talent.data      params=$found.talent.params     } {/if}
+{if isset($found.glyph)}       {include file='bricks/listviews/spell.tpl'        data=$found.glyph.data       params=$found.glyph.params      } {/if}
+{if isset($found.proficiency)} {include file='bricks/listviews/spell.tpl'        data=$found.proficiency.data params=$found.proficiency.params} {/if}
+{if isset($found.profession)}  {include file='bricks/listviews/spell.tpl'        data=$found.profession.data  params=$found.profession.params } {/if}
+{if isset($found.companion)}   {include file='bricks/listviews/spell.tpl'        data=$found.companion.data   params=$found.companion.params  } {/if}
+{if isset($found.mount)}       {include file='bricks/listviews/spell.tpl'        data=$found.mount.data       params=$found.mount.params      } {/if}
 {if isset($found.npcSpell)}    {include file='bricks/listviews/spell.tpl'        data=$found.npcSpell.data    params=$found.npcSpell.params   } {/if}
-{if isset($found.petSpell)}    {include file='bricks/listviews/spell.tpl'        data=$found.petSpell.data    params=$found.petSpell.params   } {/if}
 {if isset($found.spell)}       {include file='bricks/listviews/spell.tpl'        data=$found.spell.data       params=$found.spell.params      } {/if}
 {if isset($found.unkSpell)}    {include file='bricks/listviews/spell.tpl'        data=$found.unkSpell.data    params=$found.unkSpell.params   } {/if}
 {if isset($found.zone)}        {include file='bricks/listviews/zone.tpl'         data=$found.zone.data        params=$found.zone.params       } {/if}

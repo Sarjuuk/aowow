@@ -3,8 +3,6 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
-Util::execTime(true);
-
 /*
     if &json
         => search by compare or profiler
@@ -28,25 +26,25 @@ Util::execTime(true);
         5:  Listview - template: 'currency',    id: 'currencies',    name: LANG.tab_currencies,
         6:  Listview - template: 'itemset',     id: 'itemsets',      name: LANG.tab_itemsets,
         7:  Listview - template: 'item',        id: 'items',         name: LANG.tab_items,
-        8:  Listview - template: 'spell',       id: 'abilities',     name: LANG.tab_abilities,           visibleCols: ['level', 'schools'],
-        9:  Listview - template: 'spell',       id: 'talents',       name: LANG.tab_talents,             visibleCols: ['level', 'schools'],         hiddenCols: ['reagents'],
-        10: Listview - template: 'spell',       id: 'glyphs',        name: LANG.tab_glyphs,              visibleCols: ['singleclass', 'glyphtype'], hiddenCols: ['reagents', 'skill', 'level'],
-        11: Listview - template: 'spell',       id: 'proficiencies', name: LANG.tab_proficiencies,       visibleCols: ['classes'],                  hiddenCols: ['reagents', 'skill'],
-        12: Listview - template: 'spell',       id: 'professions',   name: LANG.tab_professions,         visibleCols: ['source'],
-        13: Listview - template: 'spell',       id: 'companions',    name: LANG.tab_companions,          visibleCols: ['reagents'],                 hiddenCols: ['level', 'skill'],
-        14: Listview - template: 'spell',       id: 'mounts',        name: LANG.tab_mounts,              visibleCols: ['reagents'],                 hiddenCols: ['level', 'skill'],
-        15: Listview - template: 'npc',         id: 'npcs',          name: LANG.tab_npcs,
-        16: Listview - template: 'quest',       id: 'quests',        name: LANG.tab_quests,
-        17: Listview - template: 'achievement', id: 'achievements',  name: LANG.tab_achievements,        visibleCols: ['category'],
-        18: Listview - template: 'achievement', id: 'statistics',    name: LANG.tab_statistics,          visibleCols: ['category'],                 hiddenCols: ['side', 'points', 'rewards'],
-        19: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
-        20: Listview - template: 'object',      id: 'objects',       name: LANG.tab_objects,
-        21: Listview - template: 'faction',     id: 'factions',      name: LANG.tab_factions,
-        22: Listview - template: 'skill',       id: 'skills',        name: LANG.tab_skills,                                                         hiddenCols: ['reagents', 'skill'],
+        8:  Listview - template: 'spell',       id: 'abilities',     name: LANG.tab_abilities,
+        9:  Listview - template: 'spell',       id: 'talents',       name: LANG.tab_talents,
+        10: Listview - template: 'spell',       id: 'glyphs',        name: LANG.tab_glyphs,
+        11: Listview - template: 'spell',       id: 'proficiencies', name: LANG.tab_proficiencies,
+        12: Listview - template: 'spell',       id: 'professions',   name: LANG.tab_professions,
+        13: Listview - template: 'spell',       id: 'companions',    name: LANG.tab_companions,
+        14: Listview - template: 'spell',       id: 'mounts',        name: LANG.tab_mounts,
+todo    15: Listview - template: 'npc',         id: 'npcs',          name: LANG.tab_npcs,
+todo    16: Listview - template: 'quest',       id: 'quests',        name: LANG.tab_quests,
+        17: Listview - template: 'achievement', id: 'achievements',  name: LANG.tab_achievements,
+        18: Listview - template: 'achievement', id: 'statistics',    name: LANG.tab_statistics,
+todo    19: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
+todo    20: Listview - template: 'object',      id: 'objects',       name: LANG.tab_objects,
+todo    21: Listview - template: 'faction',     id: 'factions',      name: LANG.tab_factions,
+todo    22: Listview - template: 'skill',       id: 'skills',        name: LANG.tab_skills,                                                         hiddenCols: ['reagents', 'skill'],
         23: Listview - template: 'pet',         id: 'pets',          name: LANG.tab_pets,
-        24: Listview - template: 'spell',       id: 'npc-abilities', name: LANG.tab_npcabilities,        visibleCols: ['level'],                    hiddenCols: ['reagents', 'skill'],
-        25: Listview - template: 'spell',       id: 'spells',        name: LANG.tab_uncategorizedspells, visibleCols: ['level'],                    hiddenCols: ['reagents', 'skill'],
-        26: Listview - template: 'profile',     id: 'characters',    name: LANG.tab_characters,          visibleCols: ['race','classs','level','talents','gearscore','achievementpoints'],
+        24: Listview - template: 'spell',       id: 'npc-abilities', name: LANG.tab_npcabilities,
+        25: Listview - template: 'spell',       id: 'spells',        name: LANG.tab_uncategorizedspells,
+todo    26: Listview - template: 'profile',     id: 'characters',    name: LANG.tab_characters,          visibleCols: ['race','classs','level','talents','gearscore','achievementpoints'],
         27: Profiles..?
         28: Guilds..?
         29: Arena Teams..?
@@ -115,7 +113,7 @@ if ($searchMask & 0x1)
         weapon:    build manually - ItemSubClassMask
         roles:     build manually - 1:heal; 2:mleDPS; 4:rngDPS; 8:tank
     */
-    $classes = new CharClassList(array(['name_loc'.User::$localeId, $query]], $maxResults));
+    $classes = new CharClassList(array(['name_loc'.User::$localeId, $query], $maxResults));
 
     if ($data = $classes->getListviewData())
     {
@@ -129,6 +127,12 @@ if ($searchMask & 0x1)
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
+
+        if ($classes->getMatches() > $maxResults)
+        {
+            // $found['class']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_', $classes->getMatches(), $maxResults);
+            $found['class']['params']['_truncated'] = 1;
+        }
     }
 }
 
@@ -155,6 +159,12 @@ if ($searchMask & 0x2)
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
+
+        if ($races->getMatches() > $maxResults)
+        {
+            // $found['race']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_', $races->getMatches(), $maxResults);
+            $found['race']['params']['_truncated'] = 1;
+        }
     }
 }
 
@@ -193,6 +203,12 @@ if ($searchMask & 0x4)
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
+
+        if ($titles->getMatches() > $maxResults)
+        {
+            // $found['title']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_', $titles->getMatches(), $maxResults);
+            $found['title']['params']['_truncated'] = 1;
+        }
     }
 }
 
@@ -226,10 +242,16 @@ if ($searchMask & 0x8)
         $found['event'] = array(
             'type'     => TYPE_WORLDEVENT,
             'appendix' => ' (World Event)',
-            'matches'  => $money->getMatches(),
+            'matches'  => $wEvents->getMatches(),
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
+
+        if ($wEvents->getMatches() > $maxResults)
+        {
+            // $found['event']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_', $wEvents->getMatches(), $maxResults);
+            $found['event']['params']['_truncated'] = 1;
+        }
     }
 }
 
@@ -335,26 +357,291 @@ if ($searchMask & 0x40)
     }
 }
 
-// 8 Abilities
-// if ($searchMask & 0x80)
+// 8 Abilities (Player + Pet)
+if ($searchMask & 0x80)
+{
+    $conditions = array(                                    // hmm, inclued classMounts..?
+        ['s.typeCat', [7, -2, -3]],
+        [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT | SPELL_CU_EXCLUDE_CATEGORY_SEARCH), '&'], 0],
+        [['s.attributes0', 0x80, '&'], 0],
+        ['s.name_loc'.User::$localeId, $query],
+        $maxResults
+    );
 
-// 9 Talents
-// if ($searchMask & 0x100)
+    $abilities = new SpellList($conditions);
+
+    if ($data = $abilities->getListviewData())
+    {
+        $abilities->addGlobalsToJscript($jsGlobals);
+
+        $vis = ['level', 'singleclass', 'schools'];
+
+        if ($abilities->hasDiffFields(['reagent1']))
+            $vis[] = 'reagents';
+
+        while ($abilities->iterate())
+        {
+            $data[$abilities->id]['param1'] = '"'.strToLower($abilities->getField('iconString')).'"';
+            $data[$abilities->id]['param2'] = '"'.$abilities->ranks[$abilities->id].'"';
+        }
+
+        $found['ability'] = array(
+            'type'     => TYPE_SPELL,
+            'appendix' => ' (Ability)',
+            'matches'  => $abilities->getMatches(),
+            'data'     => $data,
+            'params'   => [
+                'id'          => 'abilities',
+                'tabs'        => '$myTabs',
+                'name'        => '$LANG.tab_abilities',
+                'visibleCols' => '$'.json_encode($vis)
+            ]
+        );
+
+        if ($abilities->getMatches() > $maxResults)
+        {
+            $found['ability']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_abilitiesfound', $abilities->getMatches(), $maxResults);
+            $found['ability']['params']['_truncated'] = 1;
+        }
+    }
+}
+
+// 9 Talents (Player + Pet)
+if ($searchMask & 0x100)
+{
+    $conditions = array(
+        ['s.typeCat', [-7, -2]],
+        ['s.name_loc'.User::$localeId, $query],
+        $maxResults
+    );
+
+    $talents = new SpellList($conditions);
+
+    if ($data = $talents->getListviewData())
+    {
+        $talents->addGlobalsToJscript($jsGlobals);
+
+        while ($talents->iterate())
+        {
+            $data[$talents->id]['param1'] = '"'.strToLower($talents->getField('iconString')).'"';
+            $data[$talents->id]['param2'] = '"'.$talents->ranks[$talents->id].'"';
+        }
+
+        $found['talent'] = array(
+            'type'     => TYPE_SPELL,
+            'appendix' => ' (Talent)',
+            'matches'  => $talents->getMatches(),
+            'data'     => $data,
+            'params'   => [
+                'id'          => 'talents',
+                'tabs'        => '$myTabs',
+                'name'        => '$LANG.tab_talents',
+                'visibleCols' => "$['level', 'singleclass', 'schools']"
+            ]
+        );
+
+        if ($talents->getMatches() > $maxResults)
+        {
+            $found['talent']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_talentsfound', $talents->getMatches(), $maxResults);
+            $found['talent']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 10 Glyphs
-// if ($searchMask & 0x200)
+if ($searchMask & 0x200)
+{
+    $conditions = array(
+        ['s.typeCat', -13],
+        ['s.name_loc'.User::$localeId, $query],
+        $maxResults
+    );
+
+    $glyphs = new SpellList($conditions);
+
+    if ($data = $glyphs->getListviewData())
+    {
+        $glyphs->addGlobalsToJscript($jsGlobals);
+
+        while ($glyphs->iterate())
+            $data[$glyphs->id]['param1'] = '"'.strToLower($glyphs->getField('iconString')).'"';
+
+        $found['glyph'] = array(
+            'type'     => TYPE_SPELL,
+            'appendix' => ' (Glyph)',
+            'matches'  => $glyphs->getMatches(),
+            'data'     => $data,
+            'params'   => [
+                'id'          => 'glyphs',
+                'tabs'        => '$myTabs',
+                'name'        => '$LANG.tab_glyphs',
+                'visibleCols' => "$['singleclass', 'glyphtype']"
+            ]
+        );
+
+        if ($glyphs->getMatches() > $maxResults)
+        {
+            $found['glyph']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_glyphsfound', $glyphs->getMatches(), $maxResults);
+            $found['glyph']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 11 Proficiencies
-// if ($searchMask & 0x400)
+if ($searchMask & 0x400)
+{
+    $conditions = array(
+        ['s.typeCat', -11],
+        ['s.name_loc'.User::$localeId, $query],
+        $maxResults
+    );
 
-// 12 Professions
-// if ($searchMask & 0x800)
+    $prof = new SpellList($conditions);
+
+    if ($data = $prof->getListviewData())
+    {
+        $prof->addGlobalsToJscript($jsGlobals);
+
+        while ($prof->iterate())
+            $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
+
+        $found['proficiency'] = array(
+            'type'     => TYPE_SPELL,
+            'appendix' => ' (Proficiency)',
+            'matches'  => $prof->getMatches(),
+            'data'     => $data,
+            'params'   => [
+                'id'          => 'proficiencies',
+                'tabs'        => '$myTabs',
+                'name'        => '$LANG.tab_proficiencies',
+                'visibleCols' => "$['classes']"
+            ]
+        );
+
+        if ($prof->getMatches() > $maxResults)
+        {
+            $found['proficiency']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_spellsfound', $prof->getMatches(), $maxResults);
+            $found['proficiency']['params']['_truncated'] = 1;
+        }
+    }
+}
+
+// 12 Professions (Primary + Secondary)
+if ($searchMask & 0x800)
+{
+    $conditions = array(
+        ['s.typeCat', [9, 11]],
+        ['s.name_loc'.User::$localeId, $query],
+        $maxResults
+    );
+
+    $prof = new SpellList($conditions);
+
+    if ($data = $prof->getListviewData())
+    {
+        $prof->addGlobalsToJscript($jsGlobals);
+
+        while ($prof->iterate())
+            $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
+
+        $found['profession'] = array(
+            'type'     => TYPE_SPELL,
+            'appendix' => ' (Profession)',
+            'matches'  => $prof->getMatches(),
+            'data'     => $data,
+            'params'   => [
+                'id'          => 'professions',
+                'tabs'        => '$myTabs',
+                'name'        => '$LANG.tab_professions',
+                'visibleCols' => "$['source', 'reagents']"
+            ]
+        );
+
+        if ($prof->getMatches() > $maxResults)
+        {
+            $found['profession']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_professionfound', $prof->getMatches(), $maxResults);
+            $found['profession']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 13 Companions
-// if ($searchMask & 0x1000)
+if ($searchMask & 0x1000)
+{
+
+    $conditions = array(
+        ['s.typeCat', -6],
+        ['s.name_loc'.User::$localeId, $query],
+        $maxResults
+    );
+
+    $vPets = new SpellList($conditions);
+
+    if ($data = $vPets->getListviewData())
+    {
+        $vPets->addGlobalsToJscript($jsGlobals);
+
+        while ($vPets->iterate())
+            $data[$vPets->id]['param1'] = '"'.strToLower($vPets->getField('iconString')).'"';
+
+        $found['companion'] = array(
+            'type'     => TYPE_SPELL,
+            'appendix' => ' (Companion)',
+            'matches'  => $vPets->getMatches(),
+            'data'     => $data,
+            'params'   => [
+                'id'          => 'companions',
+                'tabs'        => '$myTabs',
+                'name'        => '$LANG.tab_companions',
+                'visibleCols' => "$['reagents']"
+            ]
+        );
+
+        if ($vPets->getMatches() > $maxResults)
+        {
+            $found['companion']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_companionsfound', $vPets->getMatches(), $maxResults);
+            $found['companion']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 14 Mounts
-// if ($searchMask & 0x2000)
+if ($searchMask & 0x2000)
+{
+    $conditions = array(
+        ['s.typeCat', -5],
+        ['s.name_loc'.User::$localeId, $query],
+        $maxResults
+    );
+
+    $mounts = new SpellList($conditions);
+
+    if ($data = $mounts->getListviewData())
+    {
+        $mounts->addGlobalsToJscript($jsGlobals);
+
+        while ($mounts->iterate())
+            $data[$mounts->id]['param1'] = '"'.strToLower($mounts->getField('iconString')).'"';
+
+        $found['mount'] = array(
+            'type'     => TYPE_SPELL,
+            'appendix' => ' (Mount)',
+            'matches'  => $mounts->getMatches(),
+            'data'     => $data,
+            'params'   => [
+                'id'   => 'mounts',
+                'tabs' => '$myTabs',
+                'name' => '$LANG.tab_mounts',
+            ]
+        );
+
+        if ($mounts->getMatches() > $maxResults)
+        {
+            $found['mount']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_mountsfound', $mounts->getMatches(), $maxResults);
+            $found['mount']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 15 NPCs
 // if ($searchMask & 0x4000)
@@ -453,6 +740,7 @@ if ($searchMask & 0x20000)
 if ($searchMask & 0x400000)
 {
     $pets = new PetList(array($maxResults, ['name_loc'.User::$localeId, $query]));
+
     if ($data = $pets->getListviewData())
     {
         $pets->addGlobalsToJScript($jsGlobals);
@@ -469,14 +757,106 @@ if ($searchMask & 0x400000)
                 'tabs' => '$myTabs',
             ]
         );
+
+        if ($pets->getMatches() > $maxResults)
+        {
+            $found['pet']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_petsfound', $pets->getMatches(), $maxResults);
+            $found['pet']['params']['_truncated'] = 1;
+        }
     }
 }
 
 // 24 NPCAbilities
-// if ($searchMask & 0x800000)
+if ($searchMask & 0x800000)
+{
+    $conditions = array(
+        ['s.name_loc'.User::$localeId, $query],
+        ['s.typeCat', -8],
+        $maxResults
+    );
 
-// 25 Spells (Misc)
-// if ($searchMask & 0x1000000)
+    $npcAbilities = new SpellList($conditions);
+
+    if ($data = $npcAbilities->getListviewData())
+    {
+        $npcAbilities->addGlobalsToJscript($jsGlobals);
+
+        while ($npcAbilities->iterate())
+            $data[$npcAbilities->id]['param1'] = '"'.strToLower($npcAbilities->getField('iconString')).'"';
+
+        $found['npcSpell'] = array(
+            'type'     => TYPE_SPELL,
+            'appendix' => ' (Spell)',
+            'matches'  => $npcAbilities->getMatches(),
+            'data'     => $data,
+            'params'   => [
+                'id'          => 'npc-abilities',
+                'tabs'        => '$myTabs',
+                'name'        => '$LANG.tab_npcabilities',
+                'visibleCols' => "$['level']",
+                'hiddenCols'  => "$['skill']"
+            ]
+        );
+
+        if ($npcAbilities->getMatches() > $maxResults)
+        {
+            $found['npcSpell']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_spellsfound', $npcAbilities->getMatches(), $maxResults);
+            $found['npcSpell']['params']['_truncated'] = 1;
+        }
+    }
+}
+
+// 25 Spells (Misc + GM)
+if ($searchMask & 0x1000000)
+{
+    $conditions = array(
+        ['s.name_loc'.User::$localeId, $query],
+        ['OR', ['s.typeCat', [0, -9]], ['s.cuFlags', SPELL_CU_EXCLUDE_CATEGORY_SEARCH, '&']],
+        $maxResults
+    );
+
+    $t = [];
+    Util::execTime();
+
+    $misc = new SpellList($conditions);
+
+    $t[] = Util::execTime();
+
+    if ($data = $misc->getListviewData())
+    {
+        $t[] = Util::execTime();
+
+        $misc->addGlobalsToJscript($jsGlobals);
+
+        $t[] = Util::execTime();
+
+        while ($misc->iterate())
+            $data[$misc->id]['param1'] = '"'.strToLower($misc->getField('iconString')).'"';
+
+        $t[] = Util::execTime();
+
+        $found['spell'] = array(
+            'type'     => TYPE_SPELL,
+            'appendix' => ' (Spell)',
+            'matches'  => $misc->getMatches(),
+            'data'     => $data,
+            'params'   => [
+                'tabs'        => '$myTabs',
+                'name'        => '$LANG.tab_uncategorizedspells',
+                'visibleCols' => "$['level']",
+                'hiddenCols'  => "$['skill']",
+            ]
+        );
+
+        $t[] = Util::execTime();
+
+        if ($misc->getMatches() > $maxResults)
+        {
+            $found['spell']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_spellsfound', $misc->getMatches(), $maxResults);
+            $found['spell']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 26 Characters
 // if ($searchMask & 0x2000000)
@@ -581,17 +961,21 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
     foreach ($found as $tmp)
         $foundTotal += count($tmp['data']);
 
-    // // only one match -> redirect to find
-    // if ($foundTotal == 1)
-    // {
-        // header("Location: ?".Util::$typeStrings[$found[0]['type']].'='.$found[0]['data'][0]['id']);
-        // die();
-    // }
+    // only one match -> redirect to find
+    if ($foundTotal == 1)
+    {
+        $_      = array_pop($found);
+        $type   = Util::$typeStrings[$_['type']];
+        $typeId = key(array_pop($_));
+
+        header("Location: ?".$type.'='.$typeId);
+        die();
+    }
 
     $vars = array(
-        'title'     => $search.' - '.Lang::$search['search'],
-        'tab'       => 0,                                   // tabId 0: Database for g_initHeader($tab)
-        'reqJS'     => [array('path' => 'template/js/swfobject.js', 'conditional' => false)]
+        'title' => $search.' - '.Lang::$search['search'],
+        'tab'   => 0,                                       // tabId 0: Database for g_initHeader($tab)
+        'reqJS' => [array('path' => 'template/js/swfobject.js', 'conditional' => false)]
     );
 
     $smarty->updatePageVars($vars);

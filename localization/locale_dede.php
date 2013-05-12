@@ -3,6 +3,11 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+/*
+    some translations have yet to be taken from or improved by the use of:
+    <path>\World of Warcraft\Data\deDE\patch-deDE-3.MPQ\Interface\FrameXML\GlobalStrings.lua
+    like: ITEM_MOD_*, POWER_TYPE_*, ITEM_BIND_*, PVP_RANK_*
+*/
 
 $lang = array(
     // page variables
@@ -43,7 +48,9 @@ $lang = array(
         'minutesAbbr'   => "Min.",
         'secondsAbbr'   => "Sek.",
         'millisecsAbbr' => "Ms",
-        'name'          => "Name",
+
+        'n_a'           => "n. v.",
+
         // err_title = Fehler in AoWoW
         // un_err = Gib bitte deinen Benutzernamen ein
         // pwd_err = Gib bitte dein Passwort ein
@@ -63,6 +70,7 @@ $lang = array(
         'refineSearch'  => "Tipp: Präzisiere deine Suche mit Durchsuchen einer <a href=\"javascript:;\" id=\"fi_subcat\">Unterkategorie</a>.",
 
         // infobox
+        'name'          => "Name",
         'disabled'      => "Deaktiviert",
         'disabledHint'  => "Kann nicht erhalten oder abgeschlossen werden.",
         'serverside'    => "Serverseitig",
@@ -79,6 +87,11 @@ $lang = array(
         'classes'       => "Klassen",
         'currency'      => "Währung",
         'currencies'    => "Währungen",
+        'difficulty'    => "Modus",
+        'dispelType'    => "Bannart",
+        'duration'      => "Dauer",
+        'glyphType'     => "Glyphenart",
+        'race'          => "Volk",
         'races'         => "Völker",
         'title'         => "Titel",
         'titles'        => "Titel",
@@ -88,27 +101,56 @@ $lang = array(
         'cooldown'      => "%s Abklingzeit",
         'itemset'       => "Ausrüstungsset",
         'itemsets'      => "Ausrüstungssets",
+        'mechanic'      => "Auswirkung",
+        'mechAbbr'      => "Ausw.",
         'pet'           => "Begleiter",
         'pets'          => "Begleiter",
-        'requires'      => "Benötigt",
+        'requires'      => "Benötigt %s",
+        'requires2'     => "Benötigt",
         'reqLevel'      => "Benötigt Stufe %s",
         'reqLevelHlm'   => "Benötigt Stufe %s",
+        'reqSkillLevel' => "Benötigte Fertigkeitsstufe",
+        'level'         => "Stufe",
+        'school'        => "Magieart",
+        'spell'         => "Zauber",
+        'spells'        => "Zauber",
         'valueDelim'    => " - ",                           // " bis "
+        'stats'         => array("Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"),
+        'languages'     => array(
+            1 => "Orcisch",     2 => "Darnassisch",     3 => "Taurisch",    6 => "Zwergisch",       7 => "Gemeinsprache",   8 => "Dämonisch",       9 => "Titanisch",       10 => "Thalassisch",
+            11 => "Drachisch",  12 => "Kalimagisch",    13 => "Gnomisch",   14 => "Trollisch",      33 => "Gossensprache",  35 => "Draeneiisch",    36 => "Zombie",         37 => "Gnomenbinär",        38 => "Goblinbinär"
+        ),
+        'gl'            => array(null, "Erhebliche", "Geringe"),
         'si'            => array(-2 => "Nur für Horde", -1 => "Nur für Allianz", null, "Allianz", "Horde", "Beide"),
         'resistances'   => array(null, 'Heiligwiderstand', 'Feuerwiderstand', 'Naturwiderstand', 'Frostwiderstand', 'Schattenwiderstand', 'Arkanwiderstand'),
         'sc'            => array("Körperlich", "Heilig", "Feuer", "Natur", "Frost", "Schatten", "Arkan"),
-        'di'            => array(null, "Magie", "Fluch", "Krankheit", "Gift", "Verstohlenheit", "Unsichtbarkeit", null, null, "Wut"),
+        'dt'            => array(null, "Magie", "Fluch", "Krankheit", "Gift", "Verstohlenheit", "Unsichtbarkeit", null, null, "Wut"),
         'cl'            => array(null, "Krieger", "Paladin", "Jäger", "Schurke", "Priester", "Todesritter", "Schamane", "Magier", "Hexenmeister", null, "Druide"),
         'ra'            => array(-2 => "Horde", -1 => "Allianz", "Beide", "Mensch", "Orc", "Zwerg", "Nachtelf", "Untoter", "Taure", "Gnom", "Troll", null, "Blutelf", "Draenei"),
         'rep'           => array("Hasserfüllt", "Feindselig", "Unfreundlich", "Neutral", "Freundlich", "Wohlwollend", "Respektvoll", "Ehrfürchtig"),
         'st'            => array(
-            null,               "Katzengestalt",                "Baum des Lebens",              "Reisegestalt",                 "Wassergestalt",
-            "Bärengestalt",     null,                           null,                           "Terrorbärengestalt",           null,
-            null,               null,                           null,                           "Schattentanz",                 null,
-            null,               "Geisterwolf",                  "Kampfhaltung",                 "Verteidigungshaltung",         "Berserkerhaltung",
-            null,               null,                           "Metamorphosis",                null,                           null,
-            null,               null,                           "Schnelle Fluggestalt",         "Schattengestalt",              "Fluggestalt",
-            "Verstohlenheit",   "Mondkingestalt",               "Geist der Erlösung"
+            null,                   "Katzengestalt",                "Baum des Lebens",              "Reisegestalt",                 "Wassergestalt",
+            "Bärengestalt",         null,                           null,                           "Terrorbärengestalt",           null,
+            null,                   null,                           null,                           "Schattentanz",                 null,
+            null,                   "Geisterwolf",                  "Kampfhaltung",                 "Verteidigungshaltung",         "Berserkerhaltung",
+            null,                   null,                           "Metamorphosis",                null,                           null,
+            null,                   null,                           "Schnelle Fluggestalt",         "Schattengestalt",              "Fluggestalt",
+            "Verstohlenheit",       "Mondkingestalt",               "Geist der Erlösung"
+        ),
+        'me'            => array(
+            null,               "Bezaubert",            "Desorientiert",            "Entwaffnet",               "Abgelenkt",            "Flüchtend",            "Ergriffen",            "Unbeweglich",
+            "Befriedet",        "Schweigend",           "Schlafend",                "Verlangsamt",              "Betäubt",              "Eingefroren",          "Handlungsunfähig",     "Blutend",
+            "Heilung",          "Verwandelt",           "Verbannt",                 "Abgeschirmt",              "Gefesselt",            "Reitend",              "Verführt",             "Vertrieben",
+            "Entsetzt",         "Unverwundbar",         "Unterbrochen",             "Benommen",                 "Entdeckung",           "Unverwundbar",         "Kopfnuss",             "Wütend"
+        ),
+        'ct'            => array(
+            null,                   "Wildtier",                     "Drachkin",                     "Dämon",                        "Elementar",
+            "Riese",                "Untoter",                      "Humanoid",                     "Tier",                         "Mechanisch",
+            "Nicht kategorisiert",  "Totem",                        "Haustier",                     "Gas Wolke"
+        ),
+        'professions'   => array(
+            171 => "Alchemie",          164 => "Schmiedekunst",             333 => "Verzauberkunst",        202 => "Ingenieurskunst",       773 => "Inschriftenkunde",      755 => "Juwelenschleifen",
+            165 => "Lederverarbeitung", 186 => "Bergbau",                   197 => "Schneiderei",           185 => "Kochkunst",             129 => "Erste Hilfe",           356 => "Angeln"
         ),
         'pvpRank'       => array(
             null,                                       "Gefreiter / Späher",                   "Fußknecht / Grunzer",
@@ -242,6 +284,26 @@ $lang = array(
         )
     ),
     'spell' => array(
+        '_spellDetails' => "Zauberdetails",
+        '_cost'         => "Kosten",
+        '_range'        => "Reichweite",
+        '_castTime'     => "Zauberzeit",
+        '_cooldown'     => "Abklingzeit",
+        '_distUnit'     => "Meter",
+        '_forms'        => "Gestalten",
+        '_aura'         => "Aura",
+        '_effect'       => "Effekt",
+        '_none'         => "Nichts",
+        '_gcd'          => "GCD",
+        '_globCD'       => "Globale Abklingzeit",
+        '_gcdCategory'  => "GCD-Kategorie",
+        '_value'        => "Wert",
+        '_radius'       => "Radius",
+        '_interval'     => "Interval",
+        '_inSlot'       => "im Platz",
+
+        'starter'       => "Basiszauber",
+        'trainingCost'  => "Trainingskosten",
         'remaining'     => "Noch %s",
         'untilCanceled' => "bis Abbruch",
         'castIn'        => "Wirken in %s Sek.",
@@ -250,16 +312,81 @@ $lang = array(
         'channeled'     => "Kanalisiert",
         'range'         => "%s Meter Reichweite",
         'meleeRange'    => "Nahkampfreichweite",
+        'unlimRange'    => "Unbegrenzte Reichweite",
         'reagents'      => "Reagenzien",
         'tools'         => "Extras",
         'home'          => "%lt;Gasthaus&gt;",
         'pctCostOf'     => "vom Grund%s",
         'costPerSec'    => ", plus %s pro Sekunde",
         'costPerLevel'  => ", plus %s pro Stufe",
+        'powerRunes'    => ["Frost", "Unheilig", "Blut", "Tod"],
         'powerTypes'    => array(
             -2 => "Gesundheit", -1 => null, "Mana",     "Wut",      "Fokus",    "Energie",      "Zufriedenheit",    "Runen",    "Runenmacht",
-            'AMMOSLOT' => "Munnition",      'STEAM' => "Dampfdruck",            'WRATH' => "Zorn",                  'PYRITE' => "Pyrit",
+            'AMMOSLOT' => "Munition",       'STEAM' => "Dampfdruck",            'WRATH' => "Zorn",                  'PYRITE' => "Pyrit",
             'HEAT' => "Hitze",              'OOZE' => "Schlamm",                'BLOOD_POWER' => "Blutmacht"
+        ),
+        'relItems'      => array (
+            'base'    => "<small>%s im Zusammenhang mit <b>%s</b> anzeigen</small>",
+            'link'    => " oder ",
+            'recipes' => "<a href=\"?items=9.%s\">Rezeptgegenstände</a>",
+            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s\">Hergestellte Gegenstände</a>"
+        ),
+        'cat'           => array(
+              7 => "Klassenfertigkeiten",
+            -13 => "Glyphen",
+            -11 => array("Sachverstand", 8 => "Rüstung", 6 => "Waffen", 10 => "Sprachen"),
+             -4 => "Völkerfertigkeiten",
+             -2 => "Talente",
+             -6 => "Haustiere",
+             -5 => "Reittiere",
+             -3 => array(
+                "Begleiterfertigkeiten",    782 => "Ghul",              270 => "Allgemein",             213 => "Aasvogel",                  210 => "Bär",                   763 => "Drachenfalke",          211 => "Eber",
+                767 => "Felshetzer",        653 => "Fledermaus",        788 => "Geisterbestie",         215 => "Gorilla",                   654 => "Hyäne",                 209 => "Katze",                 787 => "Kernhund",
+                214 => "Krebs",             212 => "Krokilisk",         775 => "Motte",                 764 => "Netherrochen",              217 => "Raptor",                655 => "Raubvogel",             786 => "Rhinozeros",
+                251 => "Schildkröte",       780 => "Schimäre",          768 => "Schlange",              783 => "Silithid",                  236 => "Skorpid",               766 => "Sphärenjäger",          203 => "Spinne",
+                765 => "Sporensegler",      781 => "Teufelssaurier",    218 => "Weitschreiter",         785 => "Wespe",                     656 => "Windnatter",            208 => "Wolf",                  784 => "Wurm",
+                204 => "Leerwandler",       205 => "Sukkubus",          189 => "Teufelsjäger",          761 => "Teufelswache",              188 => "Wichtel",
+            ),
+             -7 => array("Begleitertalente", 410 => "Gerissenheit", 411 => "Wildheit", 409 => "Hartnäckigkeit"),
+             11 => array(
+                "Berufe",
+                171 => "Alchemie",
+                164 => array("Schmiedekunst", 9788 => "Rüstungsschmied", 9787 => "Waffenschmied", 17041 => "Axtschmiedemeister", 17040 => "Hammerschmiedemeister", 17039 => "Schwertschmiedemeister"),
+                333 => "Verzauberkunst",
+                202 => array("Ingenieurskunst", 20219 => "Gnomeningenieurskunst", 20222 => "Gobliningenieurskunst"),
+                182 => "Kräuterkunde",
+                773 => "Inschriftenkunde",
+                755 => "Juwelenschleifen",
+                165 => array("Lederverarbeitung", 10656 => "Drachenschuppenlederverarbeitung", 10658 => "Elementarlederverarbeitung", 10660 => "Stammeslederverarbeitung"),
+                186 => "Bergbau",
+                393 => "Kürschnerei",
+                197 => array("Schneiderei", 26798 => "Mondstoffschneiderei", 26801 => "Schattenstoffschneiderei", 26797 => "Zauberfeuerschneiderei"),
+            ),
+              9 => array("Nebenberufe", 185 => "Kochkunst", 129 => "Erste Hilfe", 356 => "Angeln", 762 => "Reiten"),
+             -8 => "NPC-Fähigkeiten",
+             -9 => "GM-Fähigkeiten",
+              0 => "Nicht kategorisiert"
+        ),
+        'armorSubClass' => array(
+            "Sonstiges",            "Stoffrüstung",     "Lederrüstung",         "Schwere Rüstung",              "Plattenrüstung",
+            null,                   "Schilde",          "Buchbände",            "Götzen",                       "Totems",
+            "Siegel"
+        ),
+        'weaponSubClass' => array(
+            "Einhandäxte",          "Zweihandäxte",     "Bögen",                "Schusswaffen",                 "Einhandstreitkolben",
+            "Zweihandstreitkolben", "Stangenwaffen",    "Einhandschwerter",     "Zweihandschwerter",            null,
+            "Stäbe",                null,               null,                   "Faustwaffen",                  "Diverse",
+            "Dolche",               "Wurfwaffe",        null,                   "Armbrüste",                    "Zauberstäbe",
+            "Angelruten"
+        ),
+        'subClassMasks' => array(
+            0x02A5F3 => 'Nahkampfwaffe',                0x0060 => 'Schild',                         0x04000C => 'Distanzwaffe',                 0xA091 => 'Einhandnahkampfwaffe'
+        ),
+        'traitShort'    => array(
+            'atkpwr'    => "Angr",                      'rgdatkpwr' => "DAngr",                                 'splpwr'    => "ZMacht",
+            'arcsplpwr' => "ArkM",                      'firsplpwr' => "FeuM",                                  'frosplpwr' => "FroM",
+            'holsplpwr' => "HeiM",                      'natsplpwr' => "NatM",                                  'shasplpwr' => "SchM",
+            'splheal'   => "Heil"
         )
     ),
     'item' => array(
@@ -319,7 +446,7 @@ $lang = array(
             "Brust",                "Waffenhand",       "Schildhand",           "In der Schildhand geführt",    "Projektil",
             "Wurfwaffe",            "Distanzwaffe",     "Köcher",               "Relikt"
         ),
-        'armorSubclass' => array(
+        'armorSubClass' => array(
             "Sonstiges",            "Stoff",            "Leder",                "Schwere Rüstung",              "Platte",
             null,                   "Schild",           "Buchband",             "Götze",                        "Totem",
             "Sigel"
@@ -372,7 +499,7 @@ $lang = array(
             "Erhöht Waffenkundewertung um %d.",
             "Erhöht Angriffskraft um %d.",
             "Erhöht Distanzangriffskraft um %d.",
-            "Erhöht die Angriffskraft in Katzen-, Bären- oder Mondkingestalt um %d.",
+            "Erhöht die Angriffskraft in Katzen-, Bären-, Terrorbären- und Mondkingestalt um %d.",
             "Erhöht den von Zaubern und Effekten verursachten Schaden um bis zu %d.",
             "Erhöht die von Zaubern und Effekten verursachte Heilung um bis zu %d.",
             "Stellt alle 5 Sek. %d Mana wieder her.",
@@ -383,7 +510,8 @@ $lang = array(
             "Erhöht Blockwert um %d.",
             "Unbekannter Bonus #%d (%d)",
         )
-    )
+    ),
+    'colon'         => ': '
 );
 
 ?>

@@ -547,6 +547,18 @@ var mn_spells = [
         [9,"Brujo",,[[355,"Aflicción",,,{tinyIcon:"Spell_Shadow_DeathCoil"}],[354,"Demonología",,,{tinyIcon:"Spell_Shadow_Metamorphosis"}],[593,"Destrucción",,,{tinyIcon:"Spell_Shadow_RainOfFire"}]],{className:"c9",tinyIcon:"class_warlock"}],
         [1,"Guerrero",,[[26,"Armas",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[256,"Furia",,,{tinyIcon:"Ability_Warrior_InnerRage"}],[257,"Protección",,,{tinyIcon:"INV_Shield_06"}]],{className:"c1",tinyIcon:"class_warrior"}]
     ]],
+    [-13, "Glifos",, [
+        [6, "Caballero de la muerte",, [[1, "Sublime", '?spells=-13.6&filter=gl=1'],[2, "Menor", '?spells=-13.6&filter=gl=2']], {className:'c6', tinyIcon:'class_deathknight'}],
+        [11, "Druida",, [[1, "Sublime", '?spells=-13.11&filter=gl=1'],[2, "Menor", '?spells=-13.11&filter=gl=2']], {className:'c11', tinyIcon:'class_druid'}],
+        [3, "Cazador",, [[1, "Sublime", '?spells=-13.3&filter=gl=1'],[2, "Menor", '?spells=-13.3&filter=gl=2']], {className:'c3', tinyIcon:'class_hunter'}],
+        [8, "Mago",, [[1, "Sublime", '?spells=-13.8&filter=gl=1'],[2, "Menor", '?spells=-13.8&filter=gl=2']], {className:'c8', tinyIcon:'class_mage'}],
+        [2, "Paladín",, [[1, "Sublime", '?spells=-13.2&filter=gl=1'],[2, "Menor", '?spells=-13.2&filter=gl=2']], {className:'c2', tinyIcon:'class_paladin'}],
+        [5, "Sacerdote",, [[1, "Sublime", '?spells=-13.5&filter=gl=1'],[2, "Menor", '?spells=-13.5&filter=gl=2']], {className:'c5', tinyIcon:'class_priest'}],
+        [4, "Pícaro",, [[1, "Sublime", '?spells=-13.4&filter=gl=1'],[2, "Menor", '?spells=-13.4&filter=gl=2']], {className:'c4', tinyIcon:'class_rogue'}],
+        [7, "Chamán",, [[1, "Sublime", '?spells=-13.7&filter=gl=1'],[2, "Menor", '?spells=-13.7&filter=gl=2']], {className:'c7', tinyIcon:'class_shaman'}],
+        [9, "Brujo",, [[1, "Sublime", '?spells=-13.9&filter=gl=1'],[2, "Menor", '?spells=-13.9&filter=gl=2']], {className:'c9', tinyIcon:'class_warlock'}],
+        [1, "Guerrero",, [[1, "Sublime", '?spells=-13.1&filter=gl=1'],[2, "Menor", '?spells=-13.1&filter=gl=2']], {className:'c1', tinyIcon:'class_warrior'}]
+    ]],
     [-11,"Habilidades",,[
         [6,"Armas"],
         [8,"Armadura"],

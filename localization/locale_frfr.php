@@ -3,6 +3,11 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+/*
+    some translations have yet to be taken from or improved by the use of:
+    <path>\World of Warcraft\Data\frFR\patch-frFR-3.MPQ\Interface\FrameXML\GlobalStrings.lua
+    like: ITEM_MOD_*, POWER_TYPE_*, ITEM_BIND_*, PVP_RANK_*
+*/
 
 $lang = array(
     // page variables
@@ -43,7 +48,8 @@ $lang = array(
         'minutesAbbr'   => "min",
         'secondsAbbr'   => "s",
         'millisecsAbbr' => "[ms]",
-        'name'          => "Nom",
+
+        'n_a'           => "n/d",
 
         // filter
         'extSearch'     => "Recherche avancée",
@@ -56,6 +62,7 @@ $lang = array(
         'refineSearch'  => "Astuce : Affinez votre recherche en utilisant une <a href=\"javascript:;\" id=\"fi_subcat\">sous-catégorie</a>.",
 
         // infobox
+        'name'          => "Nom",
         'disabled'      => "[Disabled]",
         'disabledHint'  => "[Cannot be attained or completed]",
         'serverside'    => "[Serverside]",
@@ -72,6 +79,11 @@ $lang = array(
         'classes'       => "Classes",
         'currency'      => "monnaies",
         'currencies'    => "Monnaies",
+        'difficulty'    => "Difficulté",
+        'dispelType'    => "Type de dissipation",
+        'duration'      => "Durée",
+        'glyphType'     => "Type de glyphe",
+        'race'          => "race",
         'races'         => "Races",
         'title'         => "titre",
         'titles'        => "Titres",
@@ -81,15 +93,29 @@ $lang = array(
         'cooldown'      => "%s de recharge",
         'itemset'       => "ensemble d'objets",
         'itemsets'      => "Ensembles d'objets",
+        'mechanic'      => "Mécanique",
+        'mechAbbr'      => "Mécan.",
         'pet'           => "Familier",
         'pets'          => "Familiers de chasseur",
-        'requires'      => "Requiert",
+        'requires'      => "%s requis",
+        'requires2'     => "Requiert",
         'reqLevel'      => "Niveau %s requis",
         'reqLevelHlm'   => "Requiert Niveau %s",
+        'reqSkillLevel' => "Niveau de compétence requis",
+        'level'         => "Niveau",
+        'school'        => "École",
+        'spell'         => "sort",
+        'spells'        => "Sorts",
         'valueDelim'    => " - ",
+        'stats'         => array("Force", "Agilité", "Endurance", "Intelligence", "Esprit"),
+        'languages'     => array(
+            1 => "Orc",         2 => "Darnassien",      3 => "Taurahe",     6 => "Nain",            7 => "Commun",          8 => "Démoniaque",      9 => "Titan",           10 => "Thalassien",
+            11 => "Draconique", 12 => "Kalimag",        13 => "Gnome",      14 => "Troll",          33 => "Bas-parler",     35 => "Draeneï",        36 => "Zombie",         37 => "Binaire gnome",      38 => "Binaire gobelin"
+        ),
+        'gl'            => array(null, "Majeur", "Mineur"),
         'si'            => array(-2 => "Horde seulement", -1 => "Alliance seulement", null, "Alliance", "Horde", "Les deux"),
         'resistances'   => array(null, 'Résistance au Sacré', 'Résistance au Feu', 'Résistance à la Nature', 'Résistance au Givre', 'Résistance à l\'Ombre', 'Résistance aux Arcanes'),
-        'di'            => array(null, "Magie", "Malédiction", "Maladie", "Poison", "Camouflage", "Invisibilité", null, null, "Enrager"),
+        'dt'            => array(null, "Magie", "Malédiction", "Maladie", "Poison", "Camouflage", "Invisibilité", null, null, "Enrager"),
         'sc'            => array("Physique", "Sacré", "Feu", "Nature", "Givre", "Ombre", "Arcane"),
         'cl'            => array(null, "Guerrier", "Paladin", "Chasseur", "Voleur", "Prêtre", "DeathChevalier de la mort", "Chaman", "Mage", "Démoniste", null, "Druide"),
         'ra'            => array(-2 => "Horde", -1 => "Alliance", "Les deux", "Humain", "Orc", "Nain", "Elfe de la nuit", "Mort-vivant", "Tauren", "Gnome", "Troll", null, "Elfe de sang", "Draeneï"),
@@ -102,6 +128,21 @@ $lang = array(
             null,               null,                           "Métamorphe",                   null,                           null,
             null,               null,                           "Forme de vol rapide",          "Forme d'Ombre",                "Forme de vol",
             "Camouflage",       "Forme de sélénien",            "Esprit de rédemption"
+        ),
+        'me'            => array(
+            null,               "Charmé",               "Désorienté",           "Désarmé",              "Distrait",             "En fuite",                 "Maladroit",            "Immobilisé",
+            "Pacifié",          "Réduit au silence",    "Endormi",              "Pris au piège",        "Étourdi",              "Gelé",                     "Stupéfié",             "Sanguinolent",
+            "Soins",            "Métamorphosé",         "Banni",                "Protégé",              "Entravé",              "Monté",                    "Séduit",               "Repoussé",
+            "Horrifié",         "Invulnérable",         "Interrompu",           "Hébété",               "Découverte",           "Invulnérable",             "Assommé",              "Enragé"
+        ),
+        'ct'            => array(
+            null,               "Bête",                         "Draconien",                    "Démon",                        "Élémentaire",
+            "Géant",            "Mort-vivant",                  "Humanoïde",                    "Bestiole",                     "Mécanique",
+            "Non classés",      "Totem",                        "Familier pacifique",           "Nuage de gaz"
+        ),
+        'professions'   => array(
+            171 => "Alchimie",          164 => "Forge",                     333 => "Enchantement",          202 => "Ingénierie",            773 => "Calligraphie",          755 => "Joaillerie",
+            165 => "Travail du cuir",   186 => "Minage",                    197 => "Couture",               185 => "Cuisine",               129 => "Secourisme",            356 => "Pêche"
         ),
         'pvpRank'       => array(
             null,                                       "Private / Scout",                      "Corporal / Grunt",
@@ -129,7 +170,7 @@ $lang = array(
         'series'        => "Série",
         'outOf'         => "sur",
         'criteriaType'  => "Criterium Type-Id:",
-        'itemReward'    => "Vous recevrez:",
+        'itemReward'    => "Vous recevrez :",
         'titleReward'   => "Vous devriez recevoir le titre \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "tué",
     ),
@@ -195,6 +236,26 @@ $lang = array(
         )
     ),
     'spell' => array(
+        '_spellDetails' => "Détails sur le sort",
+        '_cost'         => "Coût",
+        '_range'        => "Portée",
+        '_castTime'     => "Incantation",
+        '_cooldown'     => "Recharge",
+        '_distUnit'     => "mètres",
+        '_forms'        => "Formes",
+        '_aura'         => "Aura",
+        '_effect'       => "Effet",
+        '_none'         => "Aucun",
+        '_gcd'          => "GCD",
+        '_globCD'       => "Temps d'attente universel",
+        '_gcdCategory'  => "Catégorie GCD",
+        '_value'        => "Valeur",
+        '_radius'       => "Rayon",
+        '_interval'     => "Intervalle",
+        '_inSlot'       => "dans l'emplacement",
+
+        'starter'       => "Sortilège initiaux",
+        'trainingCost'  => "Coût d'entraînement",
         'remaining'     => "%s restantes",
         'untilCanceled' => "jusqu’à annulation",
         'castIn'        => "%s s d'incantation",
@@ -203,16 +264,81 @@ $lang = array(
         'channeled'     => "Canalisée",
         'range'         => "m de portée",
         'meleeRange'    => "Allonge",
+        'unlimRange'    => "Portée illimitée",
         'reagents'      => "Composants",
         'tools'         => "Outils",
         'home'          => "%lt;Auberge&gt;",
         'pctCostOf'     => "de la %s de base",
         'costPerSec'    => ", plus %s par seconde",
         'costPerLevel'  => ", plus %s par niveau",
+        'powerRunes'    => ["Givre", "Impie", "Sang", "Mort"],
         'powerTypes'    => array(
             -2 => "vie",     -1 => null,    "mana",     "rage",     "focus",    "énergie",      "[Happiness]",      "[Rune]",   "puissance runique",
             'AMMOSLOT' => "[Ammo]",         'STEAM' => "[Steam Pressure]",      'WRATH' => "courroux",              'PYRITE' => "Pyrite",
             'HEAT' => "chaleur",            'OOZE' => "limon",                  'BLOOD_POWER' => "puissance de sang"
+        ),
+        'relItems'      => array (
+            'base'    => "<small>Montre %s reliés à <b>%s</b></small>",
+            'link'    => " ou ",
+            'recipes' => "les <a href=\"?items=9.%s\">recettes</a>",
+            'crafted' => "les <a href=\"?items&filter=cr=86;crs=%s\">objets fabriqués</a>"
+        ),
+        'cat'           => array(
+              7 => "Techniques",
+            -13 => "Glyphes",
+            -11 => array("Compétences", 8 => "Armure", 10 => "Langues", 6 => "Armes"),
+             -4 => "Traits raciaux",
+             -2 => "Talents",
+             -6 => "Compagnons",
+             -5 => "Montures",
+             -3 => array(
+                "Habilité de familier",     782 => "Goule",             270 => "Générique",             203 => "Araignée",                  213 => "Charognard",            653 => "Chauve-souris",         787 => "Chien du Magma",
+                780 => "Chimère",           214 => "Crabe",             212 => "Crocilisque",           781 => "Diablosaure",               788 => "Esprit de bête",        763 => "Faucon-dragon",         209 => "Félin",
+                215 => "Gorille",           785 => "Guêpe",             218 => "Haut-trotteur",         654 => "Hyène",                     208 => "Loup",                  655 => "Oiseau de proie",       210 => "Ours",
+                775 => "Phalène",           764 => "Raie du Néant",     217 => "Raptor",                767 => "Ravageur",                  786 => "Rhinocéros",            211 => "Sanglier",              236 => "Scorpide",
+                768 => "Serpent",           656 => "Serpent des vents", 783 => "Silithide",             765 => "Sporoptère",                251 => "Tortue",                766 => "Traqueur dim.",         784 => "Ver",
+                761 => "Gangregarde",       189 => "Chasseur corrompu", 188 => "Diablotin",             205 => "Succube",                   204 => "Marcheur du Vide"
+            ),
+             -7 => array("Talents de familiers", 411 => "Ruse", 410 => "Férocité", 409 => "Tenacité"),
+             11 => array(
+                "Métiers",
+                171 => "Alchimie",
+                164 => array("Forge", 9788 => "Fabricant d'armures", 9787 => "Fabricant d'armes", 17041 => "Maître fabricant de haches", 17040 => "Maître fabricant de marteaux", 17039 => "Maître fabricant d'épées"),
+                333 => "Enchantement",
+                202 => array("Ingénierie", 20219 => "Ingénieur gnome", 20222 => "Ingénieur goblin"),
+                182 => "Herboristerie",
+                773 => "Calligraphie",
+                755 => "Joaillerie",
+                165 => array("Travail du cuir", 10656 => "Travail du cuir d'écailles de dragon", 10658 => "Travail du cuir élémentaire", 10660 => "Travail du cuir tribal"),
+                186 => "Minage",
+                393 => "Dépeçage",
+                197 => array("Couture", 26798 => "Couture d'étoffe lunaire", 26801 => "Couture de tisse-ombre", 26797 => "Couture du feu-sorcier"),
+            ),
+              9 => array("Compétences secondaires", 185 => "Cuisine", 129 => "Secourisme", 356 => "Pêche", 762 => "Monte"),
+             -9 => "Habilité de MJ",
+             -8 => "Habilité de PNJ",
+              0 => "Non classés"
+        ),
+        'armorSubClass' => array(
+            "Divers",               "Armures en tissu", "Armures en cuir",      "Armures en mailles",           "Armures en plaques",
+            null,                   "Boucliers",        "Librams",              "Idoles",                       "Totems",
+            "Cachets"
+        ),
+        'weaponSubClass' => array(
+            "Haches à une main",    "Haches à deux mains", "Arcs",              "Armes à feu",                  "Masses à une main",
+            "Masses à deux mains",  "Armes d'hast",     "Epées à une main",     "Epées à deux mains",           null,
+            "Bâtons",               null,               null,                   "Armes de pugilat",             "Divers",
+            "Dagues",               "Armes de jet",     null,                   "Arbalètes",                    "Baguettes",
+            "Cannes à pêche"
+        ),
+        'subClassMasks'      => array(
+            0x02A5F3 => 'Arme de mêlée',                0x0060 => 'Bouclier',                       0x04000C => 'Arme à distance',              0xA091 => 'Arme de mêlée à une main'
+        ),
+        'traitShort'    => array(
+            'atkpwr'    => "PA",                        'rgdatkpwr' => "PAD",                                   'splpwr'    => "PS",
+            'arcsplpwr' => "PArc",                      'firsplpwr' => "PFeu",                                  'frosplpwr' => "PGiv",
+            'holsplpwr' => "PSac",                      'natsplpwr' => "PNat",                                  'shasplpwr' => "POmb",
+            'splheal'   => "Soins"
         )
     ),
     'item' => array(
@@ -272,7 +398,7 @@ $lang = array(
             "Torse",                "Main droite",      "Main gauche",          "Tenu en main gauche",          "Projectile",
             "Armes de jet",         "À distance",       "Carquois",             "Relique"
         ),
-        'armorSubclass' => array(
+        'armorSubClass' => array(
             "Divers",               "Armures en tissu", "Armures en cuir",      "Armures en mailles",           "Armures en plaques",
             null,                   "Bouclier",         "Libram",               "Idole",                        "Totem",
             "Cachet"
@@ -336,7 +462,8 @@ $lang = array(
             "Augmente la valeur de blocage de votre bouclier de %d.",
             "Stat Inutilisée #%d (%d)",
         )
-    )
+    ),
+    'colon'         => ' : '
 );
 
 ?>

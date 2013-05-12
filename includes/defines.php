@@ -156,6 +156,20 @@ define('SPELLFAMILY_POTION',                13);
 define('SPELLFAMILY_DEATHKNIGHT',           15);
 define('SPELLFAMILY_PET',                   17);
 
+// Spell Custom
+define('SPELL_CU_TALENT',                   0x0001);        // passive talent
+define('SPELL_CU_TALENTSPELL',              0x0002);        // ability taught by talent
+define('SPELL_CU_TRIGGERED',                0x0004);        // triggered by another spell
+define('SPELL_CU_PET_TALENT_TYPE0',         0x0008);        // Ferocity
+define('SPELL_CU_PET_TALENT_TYPE1',         0x0010);        // Tenacity
+define('SPELL_CU_PET_TALENT_TYPE2',         0x0020);        // Cunning
+define('SPELL_CU_GLYPH_MAJOR',              0x0040);
+define('SPELL_CU_GLYPH_MINOR',              0x0080);
+define('SPELL_CU_QUALITY_MASK',             0x0F00);        // set if spell creates an item: (7 - Quality) << 8
+define('SPELL_CU_EXCLUDE_CATEGORY_SEARCH',  0x1000);        // only display, when searching for spells in general (!cat || cat = 0)
+define('SPELL_CU_FIRST_RANK',               0x2000);        // used by filter
+define('SPELL_CU_LAST_RANK',                0x4000);
+
 // Gender
 define('GENDER_MALE',                       0);
 define('GENDER_FEMALE',                     1);

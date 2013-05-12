@@ -3,6 +3,11 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+/*
+    some translations have yet to be taken from or improved by the use of:
+    <path>\World of Warcraft\Data\esES\patch-esES-3.MPQ\Interface\FrameXML\GlobalStrings.lua
+    like: ITEM_MOD_*, POWER_TYPE_*, ITEM_BIND_*, PVP_RANK_*
+*/
 
 $lang = array(
     // page variables
@@ -43,7 +48,8 @@ $lang = array(
         'minutesAbbr'   => "min",
         'secondsAbbr'   => "seg",
         'millisecsAbbr' => "[ms]",
-        'name'          => "Nombre",
+
+        'n_a'           => "n/d",
 
         // filter
         'extSearch'     => "Extender búsqueda",
@@ -56,6 +62,7 @@ $lang = array(
         'refineSearch'  => "Sugerencia: Refina tu búsqueda llendo a una <a href=\"javascript:;\" id=\"fi_subcat\">subcategoría</a>.",
 
         // infobox
+        'name'          => "Nombre",
         'disabled'      => "[Disabled]",
         'disabledHint'  => "[Cannot be attained or completed]",
         'serverside'    => "[Serverside]",
@@ -72,6 +79,11 @@ $lang = array(
         'classes'       => "Clases",
         'currency'      => "monedas",
         'currencies'    => "Monedas",
+        'difficulty'    => "Dificultad",
+        'dispelType'    => "Tipo de disipación",
+        'duration'      => "Duración",
+        'glyphType'     => "Tipo de glifo",
+        'race'          => "raza",
         'races'         => "Razas",
         'title'         => "título",
         'titles'        => "Títulos",
@@ -81,16 +93,30 @@ $lang = array(
         'cooldown'      => "%s de reutilización",
         'itemset'       => "conjunto de objetos",
         'itemsets'      => "Conjuntos de objetos",
+        'mechanic'      => "Mecanica",
+        'mechAbbr'      => "Mec.",
         'pet'           => "Mascota",
         'pets'          => "Mascotas de cazador",
-        'requires'      => "Requiere",
+        'requires'      => "Requiere %s",
+        'requires2'     => "Requiere",
         'reqLevel'      => "Necesitas ser de nivel %s",
         'reqLevelHlm'   => "Necesitas ser de nivel %s",
+        'reqSkillLevel' => "Requiere nivel de habilidad",
+        'level'         => "Nivel",
+        'school'        => "Escuela",
+        'spell'         => "hechizo",
+        'spells'        => "Hechizos",
         'valueDelim'    => " - ",
+        'stats'         => array("Fuerza", "Agilidad", "Aguante", "Intelecto", "Espíritu"),
+        'languages'     => array(
+            1 => "Orco",        2 => "Darnassiano",     3 => "Taurahe",     6 => "Enánico",         7 => "Lengua común",    8 => "Demoníaco",       9 => "Titánico",        10 => "Thalassiano",
+            11 => "Dracónico",  12 => "Kalimag",        13 => "Gnomótico",  14 => "Trol",           33 => "Viscerálico",    35 => "Draenei",        36 => "Zombie",         37 => "Binario gnomo",      38 => "Binario goblin"
+        ),
+        'gl'            => array(null, "Sublime", "Menor"),
         'si'            => array(-2 => "Horda solamente", -1 => "Alianza solamente", null, "Alianza", "Horda", "Ambos"),
         'resistances'   => array(null, 'Resistencia a lo Sagrado', 'v', 'Resistencia a la Naturaleza', 'Resistencia a la Escarcha', 'Resistencia a las Sombras', 'Resistencia a lo Arcano'),
         'sc'       => array("Física", "Sagrado", "Fuego", "Naturaleza", "Escarcha", "Sombras", "Arcano"),
-        'di'            => array(null, "Magia", "Maldición", "Enfermedad", "Veneno", "Sigilo", "Invisibilidad", null, null, "Enfurecer"),
+        'dt'            => array(null, "Magia", "Maldición", "Enfermedad", "Veneno", "Sigilo", "Invisibilidad", null, null, "Enfurecer"),
         'cl'            => array(null, "Guerrero", "Paladín", "Cazador", "Pícaro", "Sacerdote", "Caballero de la Muerte", "Chamán", "Mago", "Brujo", null, "Druida"),
         'ra'            => array(-2 => "Horda", -1 => "Alianza", "Ambos", "Humano", "Orco", "Enano", "Elfo de la noche", "No-muerto", "Tauren", "Gnomo", "Trol  ", null, "Blood Elf", "Elfo de sangre"),
         'rep'           => array("Odiado", "Hostil", "Adverso", "Neutral", "Amistoso", "Honorable", "Reverenciado", "Exaltado"),
@@ -99,9 +125,24 @@ $lang = array(
             "Forma de oso",     null,                           null,                           "Forma de oso temible",         null,
             null,               null,                           null,                           "Danza de las Sombras",         null,
             null,               "Lobo fantasmal",               "Actitud de batalla",           "Actitud defensiva",            "Actitud rabiosa",
-            null,               null,                           "Metamorfosis",                  null,                           null,
-            null,               null,                           "Forma de vuelo presto",         "Forma de las Sombras",        "Forma de vuelo",
+            null,               null,                           "Metamorfosis",                 null,                           null,
+            null,               null,                           "Forma de vuelo presto",        "Forma de las Sombras",         "Forma de vuelo",
             "Sigilo",           "Forma de lechúcico lunar",     "Espíritu redentor"
+        ),
+        'me'            => array(
+            null,               "Embelesado",           "Desorientado",             "Desarmado",            "Distraído",            "Huyendo",              "Agarrado",             "Enraizado",
+            "Pacificado",       "Silenciado",           "Dormido",                  "Frenado",              "Aturdido",             "Congelado",            "Incapacitado",         "Sangrando",
+            "Sanacíon",         "Polimorfado",          "Desterrado",               "Protegido",            "Aprisionado",          "Montado",              "Seducido",             "Girado",
+            "Horrorizado",      "Invulnerable",         "Interrumpido",             "Atontado",             "Descubierto",          "Invulnerable",         "Aporreado",            "Iracundo"
+        ),
+        'ct'            => array(
+            null,               "Bestia",                       "Dragonante",                   "Demonio",                      "Elemental",
+            "Gigante",          "No-muerto",                    "Humanoide",                    "Alimaña",                      "Mecánico",
+            "Sin categoría",    "Tótem",                        "Mascota mansa",                "Nube de gas"
+        ),
+        'professions'   => array(
+            171 => "Alquimia",          164 => "Herrería",                  333 => "Encantamiento",         202 => "Ingeniería",            773 => "Inscripción",           755 => "Joyería",
+            165 => "Peletería",         186 => "Minería",                   197 => "Sastrería",             185 => "Cocina",                129 => "Primeros auxilios",     356 => "Pesca"
         ),
         'pvpRank'       => array(
             null,                                       "Private / Scout",                      "Corporal / Grunt",
@@ -195,6 +236,26 @@ $lang = array(
         )
     ),
     'spell' => array(
+        '_spellDetails' => "Detalles de hechizos",
+        '_cost'         => "Costo",
+        '_range'        => "Rango",
+        '_castTime'     => "Tiempo de lanzamiento",
+        '_cooldown'     => "Reutilización",
+        '_distUnit'     => "metros",
+        '_forms'        => "Formas",
+        '_aura'         => "Aura",
+        '_effect'       => "Efecto",
+        '_none'         => "Ninguno",
+        '_gcd'          => "GCD",
+        '_globCD'       => "Tiempo global de reutilización",
+        '_gcdCategory'  => "Categoría GCD",
+        '_value'        => "Valor",
+        '_radius'       => "Radio",
+        '_interval'     => "Intérvalo",
+        '_inSlot'       => "en la casilla",
+
+        'starter'       => "Hechizo inicial",
+        'trainingCost'  => "Costo de enseñanza",
         'remaining'     => "%s restantes",
         'untilCanceled' => "hasta que se cancela",
         'castIn'        => "Hechizo de %s seg",
@@ -203,16 +264,81 @@ $lang = array(
         'channeled'     => "Canalizado",
         'range'         => "Alcance de %s m",
         'meleeRange'    => "Alcance de ataques cuerpo a cuerpo",
+        'unlimRange'    => "Rango ilimitado",
         'reagents'      => "Componentes",
         'tools'         => "Herramientas",
         'home'          => "&lt;Posada&gt;",
         'pctCostOf'     => "del %s base",
         'costPerSec'    => ", mas %s por segundo",
         'costPerLevel'  => ", mas %s por nivel",
+        'powerRunes'    => ["Escarcha", "Profano", "Sangre", "Muerte"],
         'powerTypes'    => array(   // heat => spell 70174
             -2 => "Salud",   -1 => null,   "Maná",     "Ira",     "Enfoque",    "Energía",      "[Happiness]",      "Runa",    "Poder rúnico",
             'AMMOSLOT' => "[Ammo]",        'STEAM' => "[Steam Pressure]",       'WRATH' => "[Wrath]",               'PYRITE' => "[Pyrite]",
             'HEAT' => "[Heat]",            'OOZE' => "[Ooze]",                  'BLOOD_POWER' => "[Blood Power]" // spellname of 72370
+        ),
+        'relItems'      => array (
+            'base'    => "<small>Muestra %s relacionados con <b>%s</b></small>",
+            'link'    => " u ",
+            'recipes' => "<a href=\"?items=9.%s\">objetos de receta</a>",
+            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s\">objetos fabricados</a>"
+        ),
+        'cat'           => array(
+              7 => "Habilidades",
+            -13 => "Glifos",
+            -11 => array("Habilidades", 6 => "Armas", 8 => "Armadura", 10 => "Lenguas"),
+             -4 => "Habilidades de raza",
+             -2 => "Talentos",
+             -6 => "Compañeros",
+             -5 => "Monturas",
+             -3 => array(
+                "Habilidades de mascota",   782 => "Necrófago",         270 => "Genérico",              766 => "Acechador deformado",       203 => "Araña",                 655 => "Ave rapaz",             785 => "Avispa",
+                788 => "Bestia espíritu",   787 => "Can del Núcleo",    214 => "Cangrejo",              213 => "Carroñero",                 212 => "Crocolisco",            781 => "Demosaurio",            767 => "Devastador",
+                763 => "Dracohalcón",       236 => "Escórpido",         765 => "Esporiélago",           209 => "Felino",                    215 => "Gorila",                784 => "Gusano",                654 => "Hiena",
+                211 => "Jabalí",            208 => "Lobo",              653 => "Murciélago",            210 => "Oso",                       775 => "Palomilla",             780 => "Quimera",               217 => "Raptor",
+                764 => "Raya abisal",       786 => "Rinoceronte",       768 => "Serpiente",             656 => "Serpiente alada",           783 => "Silítido",              251 => "Tortuga",               218 => "Zancaalta",
+                761 => "Guardia vil",       189 => "Manáfago",          188 => "Diablillo",             205 => "Súcubo",                    204 => "Abisario"
+            ),
+             -7 => array("Talentos de mascotas", 411 => "Astucia", 410 => "Ferocidad", 409 => "Tenacidad"),
+             11 => array(
+                "Profesiones",
+                171 => "Alquimia",
+                164 => array("Herrería", 9788 => "Forjador de armaduras", 9787 => "Forjador de armas", 17041 => "Maestro forjador de hachas", 17040 => "Maestro forjador de mazas", 17039 => "Maestro forjador de espadas"),
+                333 => "Encantamiento",
+                202 => array("Ingeniería", 20219 => "Ingeniero gnómico", 20222 => "Ingeniero goblin"),
+                182 => "Herboristería",
+                773 => "Inscripción",
+                755 => "Joyería",
+                165 => array("Peletería", 10656 => "Peletería de escamas de dragón", 10658 => "Peletería de elemental", 10660 => "Peletería de tribal"),
+                186 => "Minería",
+                393 => "Desollar",
+                197 => array("Sastrería", 26798 => "Sastería de tela lunar primigenia", 26801 => "Sastrería de tejido de sombras", 26797 => "Sastería de fuego de hechizo"),
+            ),
+              9 => array("Habilidades secundarias", 185 => "Cocina", 129 => "Primeros auxilios", 356 => "Pesca", 762 => "Equitación"),
+             -8 => "Habilidades de PNJ",
+             -9 => "Habilidades de MJ",
+              0 => "Sin categoría"
+        ),
+        'armorSubClass' => array(
+            "Misceláneo",           "Armaduras de tela","Armaduras de cuero",   "Armaduras de malla",           "Armaduras de placas",
+            null,                   "Escudos",          "Tratados",             "Ídolos",                       "Tótems",
+            "Sigilos"
+        ),
+        'weaponSubClass' => array(
+            "Hachas de una mano",   "Hachas de dos manos","Arcos",              "Armas de fuego",               "Mazas de una mano",
+            "Mazas de dos manos",   "Armas de asta",    "Espadas de una mano",  "Espadas de dos manos",         null,
+            "Bastones",             null,               null,                   "Armas de puño",                "Misceláneo",
+            "Dagas",                "Arrojadizas",      null,                   "Ballestas",                    "Varitas",
+            "Cañas de pescar"
+        ),
+        'subClassMasks'      => array(
+            0x02A5F3 => 'Arma cuerpo a cuerpo',         0x0060 => 'Escudo',                         0x04000C => 'Arma de ataque a distancia',   0xA091 => 'Arma cuerpo a cuerpo 1M'
+        ),
+        'traitShort'    => array(
+            'atkpwr'    => "PA",                        'rgdatkpwr' => "PA",                                    'splpwr'    => "PH",
+            'arcsplpwr' => "PArc",                      'firsplpwr' => "PFue",                                  'frosplpwr' => "PEsc",
+            'holsplpwr' => "PSag",                      'natsplpwr' => "PNat",                                  'shasplpwr' => "PSom",
+            'splheal'   => "Sana"
         )
     ),
     'item' => array(
@@ -272,7 +398,7 @@ $lang = array(
             "Pecho",                "Mano derecha",     "Mano izquierda",           "Sostener con la mano izquierda", "Proyectiles",
             "Arrojadiza",           "A distancia",      "Carcaj",                   "Reliquia"
         ),
-        'armorSubclass' => array(
+        'armorSubClass' => array(
             "Misceláneo",           "Tela",             "Cuero",                    "Malla",                        "Placas",
             null,                   "Escudo",           "Tratado",                  "Ídolo",                        "Tótem",
             "Sigilo"
@@ -336,7 +462,8 @@ $lang = array(
             "Aumenta el valor de bloqueo de tu escudo %d p.",
             "Estadística no utilizada #%d (%d)",
         )
-    )
+    ),
+    'colon'         => ': '
 );
 
 ?>

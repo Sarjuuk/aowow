@@ -43,6 +43,9 @@ $lang = array(
         'minutesAbbr'   => "min",
         'secondsAbbr'   => "sec",
         'millisecsAbbr' => "ms",
+
+        'n_a'           => "n/a",
+
         // err_title = An error in AoWoW
         // un_err = Enter your username
         // pwd_err = Enter your password
@@ -79,6 +82,11 @@ $lang = array(
         'classes'       => "Classes",
         'currency'      => "currency",
         'currencies'    => "Currencies",
+        'difficulty'    => "Difficulty",
+        'dispelType'    => "Dispel type",
+        'duration'      => "Duration",
+        'glyphType'     => "Glyph type",
+        'race'          => "race",
         'races'         => "Races",
         'title'         => "title",
         'titles'        => "Titles",
@@ -88,15 +96,29 @@ $lang = array(
         'cooldown'      => "%s cooldown",
         'itemset'       => "item Set",
         'itemsets'      => "Item Sets",
+        'mechanic'      => "Mechanic",
+        'mechAbbr'      => "Mech.",
         'pet'           => "Pet",
         'pets'          => "Hunter Pets",
-        'requires'      => "Requires",
+        'requires'      => "Requires %s",
+        'requires2'     => "Requires",
         'reqLevel'      => "Requires Level %s",
         'reqLevelHlm'   => "Requires Level %s",
+        'reqSkillLevel' => "Required skill level",
+        'level'         => "Level",
+        'school'        => "School",
+        'spell'         => "spell",
+        'spells'        => "Spells",
         'valueDelim'    => " to ",
+        'stats'         => array("Strength", "Agility", "Stamina", "Intellect", "Spirit"),
+        'languages'     => array(
+            1 => "Orcish",      2 => "Darnassian",      3 => "Taurahe",     6 => "Dwarvish",        7 => "Common",          8 => "Demonic",         9 => "Titan",           10 => "Thalassian",
+            11 => "Draconic",   12 => "Kalimag",        13 => "Gnomish",    14 => "Troll",          33 => "Gutterspeak",    35 => "Draenei",        36 => "Zombie",         37 => "Gnomish Binary",     38 => "Goblin Binary"
+        ),
+        'gl'            => array(null, "Major", "Minor"),
         'si'            => array(-2 => "Horde only", -1 => "Alliance only", null, "Alliance", "Horde", "Both"),
         'resistances'   => array(null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'),
-        'di'            => array(null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"),
+        'dt'            => array(null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"),
         'sc'            => array("Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"),
         'cl'            => array(null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"),
         'ra'            => array(-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"),
@@ -109,6 +131,17 @@ $lang = array(
             null,               null,                           "Metamorphosis",                null,                           null,
             null,               null,                           "Swift Flight Form",            "Shadow Form",                  "Flight Form",
             "Stealth",          "Moonkin Form",                 "Spirit of Redemption"
+        ),
+        'me'            => array(
+            null,           "Charmed",              "Disoriented",              "Disarmed",                 "Distracted",               "Fleeing",              "Gripped",                  "Rooted",
+            "Pacified",     "Silenced",             "Asleep",                   "Ensnared",                 "Stunned",                  "Frozen",               "Incapacitated",            "Bleeding",
+            "Healing",      "Polymorphed",          "Banished",                 "Shielded",                 "Shackled",                 "Mounted",              "Seduced",                  "Turned",
+            "Horrified",    "Invulnerable",         "Interrupted",              "Dazed",                    "Discovery",                "Invulnerable",         "Sapped",                   "Enraged"
+        ),
+        'ct'            => array(
+            null,               "Beast",                        "Dragonkin",                    "Demon",                        "Elemental",
+            "Giant",            "Undead",                       "Humanoid",                     "Critter",                      "Mechanical",
+            "Uncategorized",    "Totem",                        "Non-combat Pet",               "Gas Cloud"
         ),
         'pvpRank'       => array(
             null,                                       "Private / Scout",                      "Corporal / Grunt",
@@ -242,6 +275,26 @@ $lang = array(
         )
     ),
     'spell' => array(
+        '_spellDetails' => "Spell Details",
+        '_cost'         => "Cost",
+        '_range'        => "Range",
+        '_castTime'     => "Cast Time",
+        '_cooldown'     => "Cooldown",
+        '_distUnit'     => "yards",
+        '_forms'        => "Forms",
+        '_aura'         => "Aura",
+        '_effect'       => "Effect",
+        '_none'         => "None",
+        '_gcd'          => "GCD",
+        '_globCD'       => "Global Cooldown",
+        '_gcdCategory'  => "GCD category",
+        '_value'        => "Value",
+        '_radius'       => "Radius",
+        '_interval'     => "Interval",
+        '_inSlot'       => "in slot",
+
+        'starter'       => "Starter spell",
+        'trainingCost'  => "Training cost",
         'remaining'     => "%s remaining",
         'untilCanceled' => "until canceled",
         'castIn'        => "%s sec cast",
@@ -250,16 +303,81 @@ $lang = array(
         'channeled'     => "Channeled",
         'range'         => "%s yd range",
         'meleeRange'    => "Melee Range",
+        'unlimRange'    => "Unlimited Range",
         'reagents'      => "Reagents",
         'tools'         => "Tools",
         'home'          => "&lt;Inn&gt;",
         'pctCostOf'     => "of base %s",
-        'costPerSec'    => ", plus %s per second",
+        'costPerSec'    => ", plus %s per sec",
         'costPerLevel'  => ", plus %s per level",
+        'powerRunes'    => ["Frost", "Unholy", "Blood", "Death"],
         'powerTypes'    => array(
             -2 => "Health",   -1 => null,   "Mana",     "Rage",     "Focus",    "Energy",       "Happiness",        "Rune",    "Runic Power",
             'AMMOSLOT' => "Ammo",           'STEAM' => "Steam Pressure",        'WRATH' => "Wrath",                 'PYRITE' => "Pyrite",
             'HEAT' => "Heat",               'OOZE' => "Ooze",                   'BLOOD_POWER' => "Blood Power"
+        ),
+        'relItems'      => array (
+            'base'    => "<small>Show %s related to <b>%s</b></small>",
+            'link'    => " or ",
+            'recipes' => "<a href=\"?items=9.%s\">recipe items</a>",
+            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s\">crafted items</a>"
+        ),
+        'cat'           => array(
+              7 => "Class Skills",      // classList
+            -13 => "Glyphs",            // classList
+            -11 => array("Proficiencies", 8 => "Armor", 6 => "Weapon", 10 => "Languages"),
+             -4 => "Racial Traits",
+             -2 => "Talents",           // classList
+             -6 => "Companions",
+             -5 => "Mounts",
+             -3 => array(
+                "Pet Skills",               782 => "Ghoul",             270 => "Generic",               653 => "Bat",                       210 => "Bear",                  655 => "Bird of Prey",          211 => "Boar",
+                213 => "Carrion Bird",      209 => "Cat",               780 => "Chimaera",              787 => "Core Hound",                214 => "Crab",                  212 => "Crocolisk",             781 => "Devilsaur",
+                763 => "Dragonhawk",        215 => "Gorilla",           654 => "Hyena",                 775 => "Moth",                      764 => "Nether Ray",            217 => "Raptor",                767 => "Ravager",
+                786 => "Rhino",             236 => "Scorpid",           768 => "Serpent",               783 => "Silithid",                  203 => "Spider",                788 => "Spirit Beast",          765 => "Sporebat",
+                218 => "Tallstrider",       251 => "Turtle",            766 => "Warp Stalker",          785 => "Wasp",                      656 => "Wind Serpent",          208 => "Wolf",                  784 => "Worm",
+                761 => "Felguard",          189 => "Felhunter",         188 => "Imp",                   205 => "Succubus",                  204 => "Voidwalker"
+            ),
+             -7 => array("Pet Talents", 410 => "Cunning", 411 => "Ferocity", 409 => "Tenacity"),
+             11 => array(
+                "Professions",
+                171 => "Alchemy",
+                164 => array("Blacksmithing", 9788 => "Armorsmithing", 9787 => "Weaponsmithing", 17041 => "Master Axesmithing", 17040 => "Master Hammersmithing", 17039 => "Master Swordsmithing"),
+                333 => "Enchanting",
+                202 => array("Engineering", 20219 => "Gnomish Engineering", 20222 => "Goblin Engineering"),
+                182 => "Herbalism",
+                773 => "Inscription",
+                755 => "Jewelcrafting",
+                165 => array("Leatherworking", 10656 => "Dragonscale Leatherworking", 10658 => "Elemental Leatherworking", 10660 => "Tribal Leatherworking"),
+                186 => "Mining",
+                393 => "Skinning",
+                197 => array("Tailoring", 26798 => "Mooncloth Tailoring", 26801 => "Shadoweave Tailoring", 26797 => "Spellfire Tailoring"),
+            ),
+              9 => array ("Secondary Skills", 185 => "Cooking", 129 => "First Aid", 356 => "Fishing", 762 => "Riding"),
+             -8 => "NPC Abilities",
+             -9 => "GM Abilities",
+              0 => "Uncategorized"
+        ),
+        'armorSubClass' => array(
+            "Miscellaneous",        "Cloth Armor",      "Leather Armor",        "Mail Armor",                   "Plate Armor",
+            null,                   "Shilds",           "Librams",              "Idols",                        "Totems",
+            "Sigils"
+        ),
+        'weaponSubClass' => array(
+            "One-Handed Axes",      "Two-Handed Axes",  "Bows",                 "Guns",                         "One-Handed Maces",
+            "Two-Handed Maces",     "Polearms",         "One-Handed Swords",    "Two-Handed Swords",            null,
+            "Staves",               null,               null,                   "Fist Weapons",                 "Miscellaneous",
+            "Daggers",              "Thrown",           null,                   "Crossbows",                    "Wands",
+            "Fishing Poles"
+        ),
+        'subClassMasks'      => array(
+            0x02A5F3 => 'Melee Weapon',                 0x0060 => 'Shield',                         0x04000C => 'Ranged Weapon',                0xA091 => 'One-Handed Melee Weapon'
+        ),
+        'traitShort'    => array(
+            'atkpwr'    => "AP",                        'rgdatkpwr' => "RAP",                                   'splpwr'    => "SP",
+            'arcsplpwr' => "ArcP",                      'firsplpwr' => "FireP",                                 'frosplpwr' => "FroP",
+            'holsplpwr' => "HolP",                      'natsplpwr' => "NatP",                                  'shasplpwr' => "ShaP",
+            'splheal'   => "Heal"
         )
     ),
     'item' => array(
@@ -279,7 +397,6 @@ $lang = array(
         'addsDps'       => "Adds",
         'fap'           => "Feral Attack Power",
         'durability'    => "Durability",
-        'duration'      => "Duration",
         'realTime'      => "real time",
         'conjured'      => "Conjured Item",
         'damagePhys'    => "%s Damage",
@@ -314,12 +431,12 @@ $lang = array(
         'inventoryType' => array(
             null,                   "Head",             "Neck",                 "Shoulder",                     "Shirt",
             "Chest",                "Waist",            "Legs",                 "Feet",                         "Wrist",
-            "Hands",                "Finger",           "Trinket",              "One-hand",                     "Off Hand",
-            "Ranged",               "Back",             "Two-hand",             "Bag",                          "Tabard",
+            "Hands",                "Finger",           "Trinket",              "One-Hand",                     "Off Hand",
+            "Ranged",               "Back",             "Two-Hand",             "Bag",                          "Tabard",
             "Chest",                "Main Hand",        "Off Hand",             "Held In Off-Hand",             "Projectile",
             "Thrown",               "Ranged",           "Quiver",               "Relic"
         ),
-        'armorSubclass' => array(
+        'armorSubClass' => array(
             "Miscellaneous",        "Cloth",            "Leather",              "Mail",                         "Plate",
             null,                   "Shild",            "Libram",               "Idol",                         "Totem",
             "Sigil"
@@ -383,7 +500,8 @@ $lang = array(
             "Increases the block value of your shield by %d.",
             "Unknown Bonus #%d (%d)",
         )
-    )
+    ),
+    'colon'         => ': '
 );
 
 ?>
