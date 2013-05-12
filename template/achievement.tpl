@@ -19,7 +19,7 @@
     <tr><td><div class="infobox-spacer"></div>
         <ul>
             {if $lvData.page.points}<li><div>{$lang.points}: <span class="moneyachievement tip" onmouseover="Listview.funcBox.moneyAchievementOver(event)" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">{$lvData.page.points}</span></div></li>{/if}
-            {foreach from=$lvData.page.infoBox item=info}
+            {foreach from=$lvData.infoBox item=info}
                 <li><div>{$info}</div></li>
             {/foreach}
             {*<li><div>Location: {$lvData.page.location}</div></li> todo: need to be parsed first *}
@@ -65,7 +65,7 @@
 
     <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); 
         Links.show({ldelim} type: 10, typeId: {$lvData.page.id}, linkColor: 'ffffff00', linkId: '{$lvData.page.id}:&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0', linkName: '{$lvData.page.name|escape:'javascript'}' {rdelim});">
-    <em><b><i>{$lang.link}</i></b><span>{$lang.link}</span></em></a>
+    <em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
     <a href="http://old.wowhead.com/?{$query[0]}={$query[1]}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
     <h1 class="h1-icon">{$lvData.page.name}</h1>
 

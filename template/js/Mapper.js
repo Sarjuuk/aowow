@@ -422,7 +422,7 @@ Mapper.prototype = {
 	setZones: function(div, zones)
 	{
 		// div = $('#'+div);
-        div = ge(div);
+		div = ge(div);
 		if(!div || !zones || zones.length == 0 || !this.objectives)
 			return;
 

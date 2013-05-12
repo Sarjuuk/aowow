@@ -39,12 +39,11 @@ $validCats  = array(
 if (!Util::isValidPage($validCats, $cats))
     $smarty->error();
 
-if (!$smarty->loadCache($cacheKey, $pageData))
+if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 {
     // include child categories if current category is empty
     $condition = !$cats[0] ? null : (int)end($cats);
     $acvList   = new AchievementList($condition ? [['category', $condition]] : [], true);
-
     if (!$acvList->getMatches())
     {
         $curCats = $catList = [$condition ? $condition : 0];
@@ -73,7 +72,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
             $path[] = $cat['id'];
             $title[] = Util::localizedString($cat, 'name');
         }
-        array_unshift($title, ucFirst(Lang::$achievement['achievements']));
+        array_unshift($title, Util::ucFirst(Lang::$achievement['achievements']));
     }
 
     // fill g_items, g_titles, g_achievements
@@ -98,9 +97,8 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     if ($acvList->filterGetError())
         $pageData['params']['_errors'] = '$1';
 
-    $smarty->saveCache($cacheKey, $pageData);
+    $smarty->saveCache($cacheKey, $pageData, $filter);
 }
-
 
 $page = array(
     'tab'       => 0,                                       // for g_initHeader($tab)

@@ -24,7 +24,7 @@ function TalentCalc() {
         _filteredGlyphs = false,
         _locked = false,
         _mode,
-        _nTrees,  // _nTrees (conflicts with some width-parameters)
+        _nTrees,
         _nTiers,
         _nGlyphs,
         _glyphSlots,

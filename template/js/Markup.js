@@ -9,10 +9,12 @@ var Markup = {
 		item: 1,
 		spell: 1,
 		achievement: 1,
+        money: 1,
 		npc: 1,
 		skill: 1,
 		pet: 1,
-        'class': 1
+        'class': 1,
+        race : 1
 	},
 	_prepare: function(D, C) {
 		Markup.tags = [];
@@ -100,7 +102,7 @@ var Markup = {
 			B += "|h3|minibox";
 			A += "|h3|minibox|toggler|div|map|pin";
 		case Markup.MODE_QUICKFACTS:
-			D = D.replace(/(.)?\[color\s*[\s+=:]\s*(aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|purple|red|silver|teal|white|yellow|c[0-9]{2}|q[0-8]?|#[a-f0-9]{6})\]/gi,
+			D = D.replace(/(.)?\[color\s*[\s+=:]\s*(aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|purple|red|silver|teal|white|yellow|c[0-9]{2}|r[1-4]?|q[0-8]?|#[a-f0-9]{6})\]/gi,
 			function(F, E, G) {
 				if (E == "\\") {
 					return F.substr(1)
@@ -113,7 +115,7 @@ var Markup = {
 					return (E || "") + "<t" + (Markup.nTags++) + ">"
 				}
 			});
-			D = D.replace(/(.)?\[(item|spell|achievement|class|npc|skill|pet)\s*[\s+=:]\s*(\d+?)\]/gi,
+			D = D.replace(/(.)?\[(item|spell|achievement|class|race|npc|skill|pet|money)\s*[\s+=:]\s*(\d+?)\]/gi,
 			function(F, E, I, H) {
 				if (E == "\\") {
 					return F.substr(1)
@@ -409,7 +411,7 @@ var Markup = {
 				G += '<div class="pad">' + Markup._htmlmize(B[D][1]) + "</div>";
 				break;
 			case "color":
-				G += "<span " + ((B[D][2].charAt(0) == "q" || B[D][2].charAt(0) == "c") ? 'class="': 'style="color: ') + B[D][2] + '">' + Markup._htmlmize(B[D][1]) + "</span>";
+				G += "<span " + ((B[D][2].charAt(0) == "q" || B[D][2].charAt(0) == "c" || B[D][2].charAt(0) == "r") ? 'class="': 'style="color: ') + B[D][2] + '">' + Markup._htmlmize(B[D][1]) + "</span>";
 				break;
 			case "toggler":
 				var F = B[D][2];
@@ -466,25 +468,42 @@ var Markup = {
 			case "achievement":
 				if (g_achievements[B[D][2]]) {
 					G += "<a href=\"?achievement=" + B[D][2] + "\" class=\"icontiny\">";
-					G += "<img src=\"images/icons/tiny/" + g_achievements[B[D][2]].icon + ".gif\" align=\"absmiddle\">";
+					G += "<img src=\"images/icons/tiny/" + g_achievements[B[D][2]].icon + ".gif\" align=\"absmiddle\"> ";
 					G += "<span>" + g_achievements[B[D][2]]["name_" + g_locale.name] + "</span></a>";
 				}
 				else
 					G += '<a href="?achievement=' + B[D][2] + '">(Achievement #' + B[D][2] + ")</a>";
 				break;
+			case "money":
+                if (_ = Math.floor(B[D][2] / 10000))
+                    G += '<span class="moneygold">' + _ + "</span> ";
+                if (_ = Math.floor((B[D][2] % 10000) / 100))
+                    G += '<span class="moneysilver">' + _ + "</span> ";
+                if (_ = Math.floor(B[D][2]) % 100)
+                    G += '<span class="moneycopper">' + _ + "</span>";
+				break;
 			case "class":
 				if (g_classes[B[D][2]]) {
 					G += "<a href=\"?class=" + B[D][2] + "\" class=\"icontiny c" + B[D][2] + "\">";
-					G += "<img src=\"images/icons/tiny/class_" + g_file_classes[B[D][2]] + ".gif\" align=\"absmiddle\">";
+					G += "<img src=\"images/icons/tiny/class_" + g_file_classes[B[D][2]] + ".gif\" align=\"absmiddle\"> ";
 					G += "<span>" + g_classes[B[D][2]]["name_" + g_locale.name] + "</span></a>";
 				}
 				else
 					G += '<a href="?class=' + B[D][2] + '">(Class #' + B[D][2] + ")</a>";
 				break;
-			case "npc":
+			case "race":
+				if (g_races[B[D][2]]) {
+					G += "<a href=\"?race=" + B[D][2] + "\" class=\"icontiny\">";
+					G += "<img src=\"images/icons/tiny/race_" + g_file_races[B[D][2]] + "_male.gif\" align=\"absmiddle\"> ";
+					G += "<span>" + g_races[B[D][2]]["name_" + g_locale.name] + "</span></a>";
+				}
+				else
+					G += '<a href="?race=' + B[D][2] + '">(Race #' + B[D][2] + ")</a>";
+				break;
+            case "npc":
 				if (g_npcs[B[D][2]]) {
 					G += "<a href=\"?npc=" + B[D][2] + "\" class=\"icontiny\">";
-					G += "<img src=\"images/icons/tiny/" + g_npcs[B[D][2]].icon + ".gif\" align=\"absmiddle\">";
+					G += "<img src=\"images/icons/tiny/" + g_npcs[B[D][2]].icon + ".gif\" align=\"absmiddle\"> ";
 					G += "<span>" + g_npcs[B[D][2]]["name_" + g_locale.name] + "</span></a>";
 				}
 				else
@@ -493,7 +512,7 @@ var Markup = {
 			case "skill":
 				if (g_skills[B[D][2]]) {
 					G += "<a href=\"?skill=" + B[D][2] + "\" class=\"icontiny\">";
-					G += "<img src=\"images/icons/tiny/" + g_skills[B[D][2]].icon + ".gif\" align=\"absmiddle\">";
+					G += "<img src=\"images/icons/tiny/" + g_skills[B[D][2]].icon + ".gif\" align=\"absmiddle\"> ";
 					G += "<span>" + g_skills[B[D][2]]["name_" + g_locale.name] + "</span></a>";
 				}
 				else
@@ -502,7 +521,7 @@ var Markup = {
 			case "pet":
 				if (g_pets[B[D][2]]) {
 					G += "<a href=\"?pet=" + B[D][2] + "\" class=\"icontiny\">";
-					G += "<img src=\"images/icons/tiny/" + g_pets[B[D][2]].icon + ".gif\" align=\"absmiddle\">";
+					G += "<img src=\"images/icons/tiny/" + g_pets[B[D][2]].icon + ".gif\" align=\"absmiddle\"> ";
 					G += "<span>" + g_pets[B[D][2]]["name_" + g_locale.name] + "</span></a>";
 				}
 				else
@@ -511,7 +530,7 @@ var Markup = {
 			case "item":
 				if (g_items[B[D][2]]) {
 					G += "<a href=\"?item=" + B[D][2] + "\" class=\"icontiny q" + B[D][2].quality + "\">";
-					G += "<img src=\"images/icons/tiny/" + g_items[B[D][2]].icon + ".gif\" align=\"absmiddle\">";
+					G += "<img src=\"images/icons/tiny/" + g_items[B[D][2]].icon + ".gif\" align=\"absmiddle\"> ";
 					G += "<span>" + g_items[B[D][2]]["name_" + g_locale.name] + "</span></a>";
 				}
 				else
@@ -520,7 +539,7 @@ var Markup = {
 			case "spell":
 				if (g_spells[B[D][2]]) {
 					G += "<a href=\"?spell=" + B[D][2] + "\" class=\"icontiny\">";
-					G += "<img src=\"images/icons/tiny/" + g_spells[B[D][2]].icon + ".gif\" align=\"absmiddle\">";
+					G += "<img src=\"images/icons/tiny/" + g_spells[B[D][2]].icon + ".gif\" align=\"absmiddle\"> ";
 					G += "<span>" + g_spells[B[D][2]]["name_" + g_locale.name] + "</span></a>";
 				}
 				else
@@ -580,7 +599,10 @@ var Markup = {
 			case "class":
 				E += "(Class #" + B[C][2] + ")";
 				break;
-			case "skill":
+			case "race":
+				E += "(Race #" + B[C][2] + ")";
+				break;
+            case "skill":
 				E += "(Skill #" + B[C][2] + ")";
 				break;
 			case "pet":

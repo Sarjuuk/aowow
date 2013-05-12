@@ -20,20 +20,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $title->reset();
 
     $infobox = [];
-    $colon   = User::$localeId == LOCALE_FR ? ' : ' : ': '; // Je suis un prick! <_<
 
     if ($title->getField('side') == SIDE_ALLIANCE)
-        $infobox[] = Lang::$main['side'].$colon.'[span class=alliance-icon]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
+        $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=alliance-icon]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
     else if ($title->getField('side') == SIDE_HORDE)
-        $infobox[] = Lang::$main['side'].$colon.'[span class=horde-icon]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
+        $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=horde-icon]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
     else
-        $infobox[] = Lang::$main['side'].$colon.Lang::$game['si'][SIDE_BOTH];
+        $infobox[] = Lang::$main['side'].Lang::$colon.Lang::$game['si'][SIDE_BOTH];
 
     if ($g = $title->getField('gender'))
-        $infobox[] = Lang::$main['gender'].$colon.'[span class='.($g == 2 ? 'female' : 'male').'-icon]'.Lang::$main['sex'][$g].'[/span]';
+        $infobox[] = Lang::$main['gender'].Lang::$colon.'[span class='.($g == 2 ? 'female' : 'male').'-icon]'.Lang::$main['sex'][$g].'[/span]';
 
     if ($e = $title->getField('eventId'))
-        $infobox[] = Lang::$game['eventShort'].$colon.'[url=?event='.$e.']'.WorldEvent::getName($e).'[/url]';
+        $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$e.']'.WorldEvent::getName($e).'[/url]';
 
     $pageData = array(
         'page' => array(
@@ -41,7 +40,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'id'        => $id,
             'expansion' => Util::$expansionString[$title->getField('expansion')]
         ),
-        'infobox' => '[li][ul]'.implode('[/ul][ul]', $infobox).'[/ul][/li]',
+        'infobox' => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
     );
 
     if (!empty($title->sources[$id]))
@@ -81,14 +80,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    $pageData['title'] = ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->getField('male', true)))));
+    $pageData['title'] = Util::ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->getField('male', true)))));
     $pageData['path']  = '[0, 10, '.$title->getField('category').']';
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
 $smarty->updatePageVars(array(
-    'title'     => $pageData['title']." - ".ucfirst(Lang::$game['title']),
+    'title'     => $pageData['title']." - ".Util::ucfirst(Lang::$game['title']),
     'path'      => $pageData['path'],
     'tab'       => 0,                                       // for g_initHeader($tab)
     'type'      => TYPE_TITLE,                              // 11:Titles

@@ -1,6 +1,8 @@
     <table class="infobox">
+{if !empty($lvData.infobox)}
         <tr><th id="infobox-quick-facts">{$lang.quickFacts}</th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-contents0"></div></td></tr>
+{/if}
         <tr><th id="infobox-screenshots">{$lang.screenshots}</th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-ss"></div></td></tr>
 {if $user.id > 0}
@@ -9,7 +11,11 @@
 {/if}
     </table>
     <script type="text/javascript">ss_appendSticky()</script>
-{if $user.id > 0}    <script type="text/javascript">vi_appendSticky()</script>{/if}
+{if $user.id > 0}
+    <script type="text/javascript">vi_appendSticky()</script>
+{/if}
+{if !empty($lvData.infobox)}
     <script type="text/javascript">
         Markup.printHtml("{$lvData.infobox}", "infobox-contents0", {ldelim}mode:Markup.MODE_QUICKFACTS{rdelim});
     </script>
+{/if}

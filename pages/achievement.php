@@ -57,7 +57,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $smarty->notFound(Lang::$achievement['achievement']);
 
     $pageData['path']  = [];
-    $pageData['title'] = [ucfirst(Lang::$achievement['achievement'])];
+    $pageData['title'] = [Util::ucfirst(Lang::$achievement['achievement'])];
 
     // create page title and path
     $curCat = $acv->getField('category');
@@ -80,18 +80,18 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     switch ($acv->getField('faction'))
     {
         case 0:
-            $pageData['page']['infoBox'][] = Lang::$main['side'].': <span class="alliance-icon">'.Lang::$game['si'][SIDE_ALLIANCE].'</span>';
+            $pageData['infoBox'][] = Lang::$main['side'].': <span class="alliance-icon">'.Lang::$game['si'][SIDE_ALLIANCE].'</span>';
             break;
         case 1:
-            $pageData['page']['infoBox'][] = Lang::$main['side'].': <span class="horde-icon">'.Lang::$game['si'][SIDE_HORDE].'</span>';
+            $pageData['infoBox'][] = Lang::$main['side'].': <span class="horde-icon">'.Lang::$game['si'][SIDE_HORDE].'</span>';
             break;
         default:                                        // case 3
-            $pageData['page']['infoBox'][] = Lang::$main['side'].': '.Lang::$game['si'][SIDE_BOTH];
+            $pageData['infoBox'][] = Lang::$main['side'].': '.Lang::$game['si'][SIDE_BOTH];
     }
 
     // todo: crosslink with charactersDB to check if realmFirsts are still available
 
-    $pageData['page']['infoBox'] = array_merge($pageData['page']['infoBox'], Lang::getInfoBoxForFlags($acv->getField('cuFlags')));
+    $pageData['infoBox'] = array_merge($pageData['infoBox'], Lang::getInfoBoxForFlags($acv->getField('cuFlags')));
 
     // listview: "see also"
     $conditions = array(
@@ -256,12 +256,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
                 $crtSpl = new SpellList(array(['s.id', $obj]));
-                $crtSpl->addGlobalsToJscript($pageData);
-                $text = $crtName ? $crtName : $crtSpl->getField('name', true);
+                $text = !empty($crtName) ? $crtName : $crtSpl->getField('name', true);
                 $tmp['link'] = array(
                     'href' => '?spell='.$obj,
                     'text' => $text
                 );
+                $crtSpl->addGlobalsToJscript($pageData);
                 $tmp['icon'] = $iconId;
                 $pageData['page']['icons'][] = array(
                     'itr'  => $iconId++,
@@ -275,7 +275,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
                 $crtItm = new ItemList(array(['id', $obj]));
-                $crtItm->addGlobalsToJscript($pageData);
                 $text = $crtName ? $crtName : $crtItm->getField('name', true);
                 $tmp['link'] = array(
                     'href'    => '?item='.$obj,
@@ -283,6 +282,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     'quality' => $crtItm->getField('Quality'),
                     'count'   => $qty,
                 );
+                $crtItm->addGlobalsToJscript($pageData);
                 $tmp['icon'] = $iconId;
                 $pageData['page']['icons'][] = array(
                     'itr'   => $iconId++,

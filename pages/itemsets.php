@@ -46,7 +46,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 $page = array(
     'tab'    => 0,                                          // for g_initHeader($tab)
     'subCat' => $pageParam ? '='.$pageParam : '',
-    'title'  => ucFirst(Lang::$game['itemsets']),
+    'title'  => Util::ucFirst(Lang::$game['itemsets']),
     'path'   => json_encode($path, JSON_NUMERIC_CHECK),
     'reqJS'  => array(
         array('path' => 'template/js/filters.js', 'conditional' => false),

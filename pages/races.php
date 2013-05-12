@@ -24,7 +24,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
 $page = array(
     'tab'   => 0,                                           // for g_initHeader($tab)
-    'title' => ucFirst(Lang::$game['races']),
+    'title' => Util::ucFirst(Lang::$game['races']),
     'path'  => "[0, 13]",
 );
 

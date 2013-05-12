@@ -965,7 +965,6 @@ a#toptabs-menu-language
 a.icontiny
 {
     text-decoration: none;
-    padding-left: 19px;
 }
 
 span.icontiny
@@ -983,6 +982,12 @@ span.icontiny
 {
     padding-right: 18px;
     background: right center no-repeat;
+}
+
+span.icontiny, a.tinyspecial
+{
+    padding-left:18px !important;
+    background:left center no-repeat;
 }
 
 .iconsmall, .iconmedium, .iconlarge
@@ -3114,7 +3119,7 @@ a:hover, a.open, .text b, .text ol li div, .text li div, .infobox li div, .minib
     background-image: url(../../images/icons/border_medium_gold.png);
 }
 
-.iconmedium-gold-selected del 
+.iconmedium-gold-selected del
 {
     background-image: url(../../images/icons/border_medium_gold_selected.png);
 }

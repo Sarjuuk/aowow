@@ -7,7 +7,7 @@ if (!defined('AOWOW_REVISION'))
 $cat       = Util::extractURLParams($pageParam)[0];
 $path      = [0, 8];
 $validCats = [0, 1, 2];
-$title     = [ucFirst(Lang::$game['pets'])];
+$title     = [Util::ucFirst(Lang::$game['pets'])];
 $cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_PET, -1, isset($cat) ? $cat : -1, User::$localeId]);
 
 if (!in_array($cat, $validCats))

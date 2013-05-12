@@ -36,7 +36,8 @@ class CharRaceList extends BaseType
         if (!isset($refs['gRaces']))
             $refs['gRaces'] = [];
 
-        $refs['gRaces'][$this->id] = Util::jsEscape($this->getField('name', true));
+        while ($this->iterate())
+            $refs['gRaces'][$this->id] = ['name' => $this->getField('name', true)];
     }
 
     public function addRewardsToJScript(&$ref) { }

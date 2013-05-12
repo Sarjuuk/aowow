@@ -12,7 +12,7 @@
 
             <script type="text/javascript">
                 g_initPath({$page.path}, {if empty($filter.query)} 0 {else} 1 {/if});
-                {if isset($filter.query)}Menu.append(mn_database[6], '&filter={$filter.query}'); // todo: menu order varies per locale{/if}
+                {if isset($filter.query)}Menu.append(mn_database[6], '&filter={$filter.query|escape:'quotes'}'); // todo: menu order varies per locale{/if}
             </script>
 
             <div id="fi" style="display:{if empty($filter.query)}none{else}block{/if};">

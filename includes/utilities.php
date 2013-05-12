@@ -99,7 +99,6 @@ abstract class BaseType
                     $field = $resolveCondition($c[0], $supLink);
                 else if ($c[0])
                     $field = '`'.implode('`.`', explode('.', Util::sqlEscape($c[0]))).'`';
-
                 if (is_array($c[1]))
                 {
                     $val = implode(',', Util::sqlEscape($c[1]));
@@ -366,6 +365,34 @@ class Lang
             return self::$game['rep'][REP_NEUTRAL];
     }
 
+    public static function getRequiredItems($class, $mask, $short = true)
+    {
+        // not checking weapon / armor here. It's highly unlikely that they overlap
+        if ($short)
+        {
+            if ($class == 15)                               // misc - Mounts
+                return '';
+
+            if ($class == 4 && $mask == 0x001E)             // all basic armor classes
+                return '';
+
+            foreach(Lang::$spell['subClassMasks'] as $m => $str)
+                if ($mask == $m)
+                    return $str;
+        }
+
+        if ($class == 15)                                   // yeah hardcoded.. sue me!
+            return Lang::$spell['cat'][-5];
+
+        $tmp = [];
+        $strs = Lang::$spell[$class == 4 ? 'armorSubClass' : 'weaponSubClass'];
+        foreach ($strs as $k => $str)
+            if ($mask & 1 << $k && $str)
+                $tmp[] = $str;
+
+        return implode(', ', $tmp);
+    }
+
     public static function getStances($stanceMask)
     {
         $stanceMask &= 0xFC27909F;                          // clamp to available stances/forms..
@@ -535,7 +562,7 @@ class SmartyAoWoW extends Smarty
     public function notFound($subject)
     {
         $this->updatePageVars(array(
-            'subject'  => ucfirst($subject),
+            'subject'  => Util::ucFirst($subject),
             'id'       => intVal($this->_tpl_vars['query'][1]),
             'notFound' => sprintf(Lang::$main['pageNotFound'], $subject),
         ));
@@ -682,8 +709,15 @@ class Util
     public static $narrowResultString       = 'sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
     public static $setCriteriaString        = "fi_setCriteria(%s, %s, %s);\n";
 
+    public static $dfnString                = '<dfn title="%s" class="w">%s</dfn>';
+
     public static $expansionString          = array(        // 3 & 4 unused .. obviously
         null,           'bc',           'wotlk',            'cata',                'mop'
+    );
+
+    public static $class2SpellFamily        = array(
+    //  null    Warrior Paladin Hunter  Rogue   Priest  DK      Shaman  Mage    Warlock null    Druid
+        null,   4,      10,     9,      8,      6,      15,     11,     3,      5,      null,   7
     );
 
     // todo: translate and move to Lang
@@ -940,7 +974,7 @@ class Util
         152 => 'Unknown Effect',
         153 => 'Create Tamed Pet',
         154 => 'Discover Taxi',
-        155 => 'Titan Grip',
+        155 => 'Dual Wield 2H Weapons',
         156 => 'Enchant Item Prismatic',
         157 => 'Create Item 2',
         158 => 'Milling',
@@ -1660,6 +1694,16 @@ class Util
         }
 
         return false;
+    }
+
+    // default ucFirst doesn't convert UTF-8 chars
+    public static function ucFirst($str)
+    {
+        $len   = mb_strlen($str, 'UTF-8') - 1;
+        $first = mb_substr($str, 0, 1, 'UTF-8');
+        $rest  = mb_substr($str, 1, $len, 'UTF-8');
+
+        return mb_strtoupper($first, 'UTF-8') . $rest;
     }
 
     // BaseType::_construct craaap!

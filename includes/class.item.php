@@ -14,7 +14,7 @@ class ItemList extends BaseType
 
     private   $ssd        = [];
 
-    protected $setupQuery = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] GROUP BY i.entry ORDER BY i.Quality DESC';
+    protected $setupQuery = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] ORDER BY i.Quality DESC';
     protected $matchQuery = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond]';
 
     public function __construct($conditions, $pieceToSet = null)
@@ -181,8 +181,9 @@ class ItemList extends BaseType
             gems: array (:-separated itemIds)
             rand: >0: randomPropId; <0: randomSuffixId
         interactive (set to place javascript/anchors to manipulate level and ratings or link to filters (static tooltips vs popup tooltip))
+        subT (tabled layout doesn't work if used as sub-tooltip in other item or spell tooltips; use line-break instead)
     */
-    public function renderTooltip($enhance = [], $interactive = false)
+    public function renderTooltip($enhance = [], $interactive = false, $subT = false)
     {
         if ($this->error)
             return;
@@ -218,10 +219,14 @@ class ItemList extends BaseType
         $x = '';
 
         // upper table: stats
-        $x .= '<table><tr><td>';
+        if (!$subT)
+            $x .= '<table><tr><td>';
 
         // name; quality
-        $x .= '<b class="q'.$this->curTpl['Quality'].'">'.$name.'</b>';
+        if ($subT)
+            $x .= '<span class="q'.$this->curTpl['Quality'].'"><a href="?item='.$this->id.'">'.$name.'</a></span>';
+        else
+            $x .= '<b class="q'.$this->curTpl['Quality'].'">'.$name.'</b>';
 
         // heroic tag
         if (($this->curTpl['Flags'] & ITEM_FLAG_HEROIC) && $this->curTpl['Quality'] == ITEM_QUALITY_EPIC)
@@ -259,18 +264,18 @@ class ItemList extends BaseType
         else if ($this->curTpl['ItemLimitCategory'])
         {
             $limit = DB::Aowow()->selectRow("SELECT * FROM ?_itemlimitcategory WHERE id = ?", $this->curTpl['ItemLimitCategory']);
-            $x .= '<br />'.($limit['isGem'] ? Lang::$item['uniqueEquipped'] : Lang::$item['unique']).': '.Util::localizedString($limit, 'name').' ('.$limit['count'].')';
+            $x .= '<br />'.($limit['isGem'] ? Lang::$item['uniqueEquipped'] : Lang::$item['unique']).Lang::$colon.Util::localizedString($limit, 'name').' ('.$limit['count'].')';
         }
 
         // max duration
         if ($this->curTpl['duration'] > 0)
-            $x .= "<br />".Lang::$item['duration'] . ' '. Util::formatTime($this->curTpl['duration'] * 1000) . ($this->curTpl['duration'] < 0 ? ' ('.Lang::$game['realTime'].')' : null);
+            $x .= "<br />".Lang::$game['duration'] . ' '. Util::formatTime($this->curTpl['duration'] * 1000) . ($this->curTpl['duration'] < 0 ? ' ('.Lang::$game['realTime'].')' : null);
 
         // required holiday
         if ($this->curTpl['HolidayId'])
         {
             $hDay = DB::Aowow()->selectRow("SELECT * FROM ?_holidays WHERE id = ?", $this->curTpl['HolidayId']);
-            $x .= '<br />'.Lang::$game['requires'].' <a href="'.$this->curTpl['HolidayId'].'">'.Util::localizedString($hDay, 'name').'</a>';
+            $x .= '<br />'.sprintf(Lang::$game['requires'], '<a href="'.$this->curTpl['HolidayId'].'">'.Util::localizedString($hDay, 'name').'</a>');
         }
 
         // maxcount
@@ -300,7 +305,7 @@ class ItemList extends BaseType
 
             // Subclass
             if ($this->curTpl['class'] == ITEM_CLASS_ARMOR && $this->curTpl['subclass'] > 0)
-                $x .= '<th><!--asc'.$this->curTpl['subclass'].'-->'.Lang::$item['armorSubclass'][$this->curTpl['subclass']].'</th>';
+                $x .= '<th><!--asc'.$this->curTpl['subclass'].'-->'.Lang::$item['armorSubClass'][$this->curTpl['subclass']].'</th>';
             else if ($this->curTpl['class'] == ITEM_CLASS_WEAPON)
                 $x .= '<th>'.Lang::$item['weaponSubClass'][$this->curTpl['subclass']].'</th>';
             else if ($this->curTpl['class'] == ITEM_CLASS_AMMUNITION)
@@ -469,7 +474,7 @@ class ItemList extends BaseType
         if ($this->curTpl['socketBonus'])
         {
             $sbonus = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $this->curTpl['socketBonus']);
-            $x .= '<span class="q'.($hasMatch ? '2' : '0').'">'.Lang::$item['socketBonus'].': '.Util::localizedString($sbonus, 'text').'</span><br />';
+            $x .= '<span class="q'.($hasMatch ? '2' : '0').'">'.Lang::$item['socketBonus'].Lang::$colon.Util::localizedString($sbonus, 'text').'</span><br />';
         }
 
         // durability
@@ -478,15 +483,15 @@ class ItemList extends BaseType
 
         // required classes
         if ($classes = Lang::getClassString($this->curTpl['AllowableClass']))
-            $x .= Lang::$game['classes'].': '.$classes.'<br />';
+            $x .= Lang::$game['classes'].Lang::$colon.$classes.'<br />';
 
         // required races
         if ($races = Lang::getRaceString($this->curTpl['AllowableRace']))
-            $x .= Lang::$game['races'].': '.$races['name'].'<br />';
+            $x .= Lang::$game['races'].Lang::$colon.$races['name'].'<br />';
 
         // required honorRank (not used anymore)
         if ($this->curTpl['requiredhonorrank'])
-            $x .= Lang::$game['requires'].': '.Lang::$game['pvpRank'][$this->curTpl['requiredhonorrank']].'<br />';
+            $x .= sprintf(Lang::$game['requires'], Lang::$game['pvpRank'][$this->curTpl['requiredhonorrank']]).'<br />';
 
         // required CityRank..?
         // what the f..
@@ -503,19 +508,20 @@ class ItemList extends BaseType
         // required skill
         if ($this->curTpl['RequiredSkill'])
         {
-            $skillText = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillID = ?d', $this->curTpl['RequiredSkill']);
-            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?skill='.$this->curTpl['RequiredSkill'].'">'.Util::localizedString($skillText, 'name').'</a>';
+            $_ = '<a class="q1" href="?skill='.$this->curTpl['RequiredSkill'].'">'.SkillList::getName($this->curTpl['RequiredSkill']).'</a>';
             if ($this->curTpl['RequiredSkillRank'])
-                $x .= ' ('.$this->curTpl['RequiredSkillRank'].')';
+                $_ .= ' ('.$this->curTpl['RequiredSkillRank'].')';
+
+            $x .= '<br />'.sprintf(Lang::$game['requires'], $_);
         }
 
         // required spell
         if ($this->curTpl['requiredspell'])
-            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href="?spell='.$this->curTpl['requiredspell'].'">'.SpellList::getName($this->curTpl['requiredspell']).'</a>';
+            $x .= '<br />'.Lang::$game['requires2'].' <a class="q1" href="?spell='.$this->curTpl['requiredspell'].'">'.SpellList::getName($this->curTpl['requiredspell']).'</a>';
 
         // required reputation w/ faction
         if ($this->curTpl['RequiredReputationFaction'])
-            $x .= '<br />'.Lang::$game['requires'].' <a class="q1" href=?faction="'.$this->curTpl['RequiredReputationFaction'].'">'.Faction::getName($this->curTpl['RequiredReputationFaction']).'</a> - '.Lang::$game['rep'][$this->curTpl['RequiredReputationRank']];
+            $x .= '<br />'.sprintf(Lang::$game['requires'], '<a class="q1" href=?faction="'.$this->curTpl['RequiredReputationFaction'].'">'.Faction::getName($this->curTpl['RequiredReputationFaction']).'</a> - '.Lang::$game['rep'][$this->curTpl['RequiredReputationRank']]);
 
         // locked
         if ($this->curTpl['lockid'])
@@ -534,13 +540,13 @@ class ItemList extends BaseType
             {
                 if ($lock['type'.$j] == 1)                  // opened by item
                 {
-                    $l = Lang::$game['requires'].' <a class="q1" href="?item='.$lock['lockproperties'.$j].'">'.Util::getItemName($lock['lockproperties'.$j]).'</a>';
+                    $l = sprintf(Lang::$game['requires'], '<a class="q1" href="?item='.$lock['lockproperties'.$j].'">'.Util::getItemName($lock['lockproperties'.$j]).'</a>');
                     break;
                 }
                 else if ($lock['type'.$j] == 2)             // opened by skill
                 {
                     $lockText = DB::Aowow()->selectRow('SELECT ?# FROM ?_locktype WHERE id = ?d', $lock['lockproperties'.$j]);
-                    $l = Lang::$game['requires'].' '.Util::localizedString($lockText, 'name').' ('.$lock['requiredskill'.$j].')';
+                    $l = sprintf(Lang::$game['requires'], Util::localizedString($lockText, 'name').' ('.$lock['requiredskill'.$j].')');
                     break;
                 }
             }
@@ -548,7 +554,10 @@ class ItemList extends BaseType
         }
 
         // upper table: done
-        $x .= '</td></tr></table>';
+        if (!$subT)
+            $x .= '</td></tr></table>';
+        else
+            $x .= '<br>';
 
         // spells on item
         $itemSpellsAndTrigger = [];
@@ -561,12 +570,13 @@ class ItemList extends BaseType
             $itemSpells = new SpellList(array(['s.id', array_keys($itemSpellsAndTrigger)]));
             while ($itemSpells->iterate())
                 if ($parsed = $itemSpells->parseText('description', $this->curTpl['RequiredLevel']))
-                    $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id]].$parsed;
+                    $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id]] . ($interactive ? '<a href="?spell='.$itemSpells->id.'">'.$parsed.'</a>' : $parsed);
         }
 
-
         // lower table (ratings, spells, ect)
-        $x .= '<table><tr><td>';
+        if (!$subT)
+            $x .= '<table><tr><td>';
+
         if (isset($green))
             foreach ($green as $j => $bonus)
                 if ($bonus)
@@ -602,7 +612,7 @@ class ItemList extends BaseType
             if ($itemset['skillId'])                        // bonus requires skill to activate
             {
                 $name  = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillId=?d', $itemset['skillId']);
-                $xSet .= '<br />'.Lang::$game['requires'].' <a href="?skills='.$itemset['skillId'].'" class="q1">'.Util::localizedString($name, 'name').'</a>';
+                $xSet .= '<br />'.sprintf(Lang::$game['requires'], '<a href="?skills='.$itemset['skillId'].'" class="q1">'.Util::localizedString($name, 'name').'</a>');
 
                 if ($itemset['skillLevel'])
                     $xSet .= ' ('.$itemset['skillLevel'].')';
@@ -672,9 +682,9 @@ class ItemList extends BaseType
             $xCraft = '<div><br />'.$craftItem->renderTooltip(null, $interactive).'</div><br />';
 
             while ($reagents->iterate())
-                $reqReag[] = '<a href="?item='.$reagents->id.'">'.$reagents->names[$reagents->id].'</a> ('.$reagentItems[$reagents->id].')';
+                $reqReag[] = '<a href="?item='.$reagents->id.'">'.$reagents->getField('name', true).'</a> ('.$reagentItems[$reagents->id].')';
 
-            $xCraft .= '<span class="q1">'.Lang::$game['requires']." ".implode(", ", $reqReag).'</span>';
+            $xCraft .= '<span class="q1">'.Lang::$game['requires2']." ".implode(", ", $reqReag).'</span>';
 
         }
 
@@ -698,7 +708,7 @@ class ItemList extends BaseType
             $xMisc[] = '<span class="q1">'.$this->curTpl['spellcharges_1'].' '.Lang::$item['charges'].'</span>';
 
         if ($this->curTpl['SellPrice'])
-            $xMisc[] = '<span class="q1">'.Lang::$item['sellPrice'].": ".Util::formatMoney($this->curTpl['SellPrice']).'</span>';
+            $xMisc[] = '<span class="q1">'.Lang::$item['sellPrice'].Lang::$colon.Util::formatMoney($this->curTpl['SellPrice']).'</span>';
 
         // list required reagents
         if (isset($xCraft))
@@ -707,7 +717,8 @@ class ItemList extends BaseType
         if ($xMisc)
             $x .= implode('<br />', $xMisc);
 
-        $x .= '</td></tr></table>';
+        if (!$subT)
+            $x .= '</td></tr></table>';
 
         // heirloom tooltip scaling
         if (isset($this->ssd[$this->id]))
@@ -747,7 +758,7 @@ class ItemList extends BaseType
             case INVTYPE_QUIVER:
             case INVTYPE_RELIC:
                 return 0;
-                // Select point coefficient
+            // Select point coefficient
             case INVTYPE_HEAD:
             case INVTYPE_BODY:
             case INVTYPE_CHEST:
@@ -796,7 +807,7 @@ class ItemList extends BaseType
                 return $rpp['epic'.$suffixFactor];
             case ITEM_QUALITY_LEGENDARY:
             case ITEM_QUALITY_ARTIFACT:
-                return 0;                                    // not have random properties
+                return 0;                                   // not have random properties
             default:
                 break;
         }

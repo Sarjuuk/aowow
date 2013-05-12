@@ -7,7 +7,7 @@ if (!defined('AOWOW_REVISION'))
 $cat       = Util::extractURLParams($pageParam)[0];
 $path      = [0, 15];
 $validCats = [1, 2, 3, 22];
-$title     = [ucFirst(Lang::$game['currencies'])];
+$title     = [Util::ucFirst(Lang::$game['currencies'])];
 $cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_CURRENCY, -1, isset($cat) ? $cat : -1, User::$localeId]);
 
 if ($cat !== null && !in_array($cat, $validCats))
