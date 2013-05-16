@@ -1400,7 +1400,7 @@ class SpellList extends BaseType
             if ($tools || $reagents || $reqItems || $desc)
                 $x .= "<br />";
 
-            $x .= $createItem;
+            $x .= '<br />'.$createItem;
         }
 
         if ($reqWrapper2)

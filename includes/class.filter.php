@@ -352,7 +352,7 @@ class SpellListFilter extends Filter
             case 2:                                         // costPct [op] [int]
                 return 's.powerCostPercent '.$this->int2Op($cr[1]).' '.intVal($cr[2]);
             case 3:                                         // requires FocusGO [y|n]
-                return $this->int2Bool($cr[1]) ? 's.spellFocusObject > 0' : 's.spellfocus = 0';
+                return $this->int2Bool($cr[1]) ? 's.spellFocusObject > 0' : 's.spellFocusObject = 0';
             case 4:                                         // trainingcost [op] [int]
                 return 's.trainingcost '.$this->int2Op($cr[1]).' '.intVal($cr[2]);
             case 5:                                         // Profession Specialitation [y|n]

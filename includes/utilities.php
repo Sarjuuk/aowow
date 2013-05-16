@@ -1621,18 +1621,18 @@ class Util
     }
 
     // EnchantmentTypes
-    // 0 => (dnd stuff; ignore)
-    // 1 => proc spell from ObjectX (amountX == procChance?; ignore)
-    // 2 => +AmountX damage
-    // 3 => Spells form ObjectX (amountX == procChance?)
-    // 4 => +AmountX resistance for ObjectX School
-    // 5 => +AmountX for Statistic by type of ObjectX
-    // 6 => Rockbiter AmountX as Damage (ignore)
-    // 7 => Engineering gadgets
-    // 8 => Extra Sockets AmountX as socketCount (ignore)
+    // 0 => TYPE_NONE               dnd stuff; (ignore)
+    // 1 => TYPE_COMBAT_SPELL       proc spell from ObjectX (amountX == procChance?; ignore)
+    // 2 => TYPE_DAMAGE             +AmountX damage
+    // 3 => TYPE_EQUIP_SPELL        Spells from ObjectX (amountX == procChance?)
+    // 4 => TYPE_RESISTANCE         +AmountX resistance for ObjectX School
+    // 5 => TYPE_STAT               +AmountX for Statistic by type of ObjectX
+    // 6 => TYPE_TOTEM              Rockbiter AmountX as Damage (ignore)
+    // 7 => TYPE_USE_SPELL          Engineering gadgets
+    // 8 => TYPE_PRISMATIC_SOCKET   Extra Sockets AmountX as socketCount (ignore)
     public static function parseItemEnchantment($enchant, $amountOverride = null)
     {
-        if (!$enchant || empty($enchant))
+        if (empty($enchant))
             return false;
 
         $jsonStats = [];
