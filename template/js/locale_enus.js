@@ -1963,33 +1963,39 @@ var g_zone_areas = {
     4723: ['Crusaders\' Coliseum','The Icy Depths'],
     4812: ['The Lower Citadel','The Rampart of Skulls','Deathbringer\'s Rise','The Frost Queen\'s Lair','The Upper Reaches','Royal Quarters','The Frozen Throne','Frostmourne']
 };
+
 var g_zone_categories = {
-    0:"Eastern Kingdoms",
-    1:"Kalimdor",
-    8:"Outland",
-    10:"Northrend",
-    2:"Dungeons",
-    3:"Raids",
-    6:"Battlegrounds",
-    9:"Arenas"
+    0:  "Eastern Kingdoms",
+    1:  "Kalimdor",
+    2:  "Dungeons",
+    3:  "Raids",
+    4:  "Unused",
+    6:  "Battlegrounds",
+    8:  "Outland",
+    9:  "Arenas",
+    10: "Northrend"
 };
+
 var g_zone_instancetypes = {
-    1:"Transit",
-    2:"Dungeon",
-    3:"Raid",
-    4:"Battleground",
-    5:"Dungeon",
-    6:"Arena",
-    7:"Raid",
-    8:"Raid"
+    1: "Transit",
+    2: "Dungeon",
+    3: "Raid",              // Classic
+    4: "Battleground",
+    5: "Dungeon",           // Heroic
+    6: "Arena",
+    7: "Raid",              // 10-25
+    8: "Raid"               // 10-25 Heroic
 };
+
 var g_zone_territories = {
-    0:"Alliance",
-    1:"Horde",
-    2:"Contested",
-    3:"Sanctuary",
-    4:"PvP"
+    0: "Alliance",
+    1: "Horde",
+    2: "Contested",
+    3: "Sanctuary",
+    4: "PvP",
+    5: "World PvP"
 };
+
 var g_faction_categories = {
 	"0":"Other",
 	"469":"Alliance",

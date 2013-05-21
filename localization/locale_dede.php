@@ -115,6 +115,9 @@ $lang = array(
         'spell'         => "Zauber",
         'spells'        => "Zauber",
         'valueDelim'    => " - ",                           // " bis "
+        'zone'          => "Zone",
+        'zones'         => "Gebiete",
+        'expansions'    => array("Classic", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"),
         'languages'     => array(
             1 => "Orcisch",     2 => "Darnassisch",     3 => "Taurisch",    6 => "Zwergisch",       7 => "Gemeinsprache",   8 => "Dämonisch",       9 => "Titanisch",       10 => "Thalassisch",
@@ -249,8 +252,12 @@ $lang = array(
         'CosmicMap'     => "Kosmische Karte",
     ),
     'zone' => array(
-        'zone'          => "Zone",
-        'zonePartOf'    => "Diese Zone ist Teil der Zone",
+        // 'zone'          => "Zone",
+        // 'zonePartOf'    => "Diese Zone ist Teil der Zone",
+        'cat'           => array(
+            "Östliche Königreiche",     "Kalimdor",                 "Dungeons",                 "Schlachtzüge",             "Unbenutzt",                null,
+            "Schlachtfelder",           null,                       "Scherbenwelt",             "Arenen",                   "Nordend"
+        )
     ),
     'title' => array(
         'cat'           => array(

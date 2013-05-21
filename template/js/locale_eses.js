@@ -1916,33 +1916,39 @@ var g_zone_areas = {
 	4723: ['El Coliseo Argenta','Las profundidades heladas'],
 	4812: ['La ciudadela inferior','La Muralla de las Calaveras','Ascenso del Libramorte','La guarida de la Reina de Escarcha','Los Confines superiores','Cuarteles Reales','El Trono Helado','Agonía de Escarcha']
 };
+
 var g_zone_categories = {
-	0:"Reinos del Este",
-	1:"Kalimdor",
-	8:"Terrallende",
-	10:"Rasganorte",
-	2:"Mazmorras",
-	3:"Bandas",
-	6:"Campos de batalla",
-	9:"Arenas"
+    0:  "Reinos del Este",
+    1:  "Kalimdor",
+    2:  "Mazmorras",
+    3:  "Bandas",
+    4:  "No las uso",
+    6:  "Campos de batalla",
+    8:  "Terrallende",
+    9:  "Arenas",
+    10: "Rasganorte"
 };
+
 var g_zone_instancetypes = {
-	1:"Tránsito",
-	2:"Mazmorra",
-	3:"Banda",
-	4:"Campo de batalla",
-	5:"Mazmorra",
-	6:"Arena",
-	7:"Banda",
-	8:"Banda"
+    1: "Tránsito",
+    2: "Mazmorra",
+    3: "Banda",             // Classic
+    4: "Campo de batalla",
+    5: "Mazmorra",          // Heroic
+    6: "Arena",
+    7: "Banda",             // 10-25
+    8: "Banda"              // 10-25 Heroic
 };
+
 var g_zone_territories = {
-	0:"Alianza",
-	1:"Horda",
-	2:"En disputa",
-	3:"Santuario",
-	4:"JcJ"
+    0: "Alianza",
+    1: "Horda",
+    2: "En disputa",
+    3: "Santuario",
+    4: "JcJ",
+    5: "JcJ abierto"
 };
+
 var g_faction_categories = {
     "0":"Otros",
     "469":"Alianza",

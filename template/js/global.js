@@ -2329,16 +2329,26 @@ function g_isLeftClick(a) {
 	a = $E(a);
 	return (a && a._button == 1)
 }
-function g_createOrRegex(c) {
-	var e = c.split(" "),
-	d = "";
-	for (var b = 0, a = e.length; b < a; ++b) {
-		if (b > 0) {
-			d += "|"
+
+function g_createOrRegex(search, negativeGroup) {
+	search = search.replace(/(\(|\)|\|\+|\*|\?|\$|\^)/g, '\\$1');
+	var
+        parts = search.split(' '),
+        strRegex= '';
+
+    for (var j = 0, len = parts.length; j < len; ++j) {
+		if (j > 0) {
+			strRegex += '|';
 		}
-		d += e[b]
+		strRegex += parts[j];
 	}
-	return new RegExp("(" + d + ")", "gi")
+
+	// The additional group is necessary so we dont replace %s
+	return new RegExp((negativeGroup != null ? '(' + negativeGroup + ')?' : '') + '(' + strRegex + ')', 'gi');
+}
+
+function g_getHash() {
+	return '#' + decodeURIComponent(location.href.split('#')[1] || '');
 }
 
 DomContentLoaded.addEvent(function () {
@@ -7175,9 +7185,9 @@ Listview.funcBox = {
             p.value = b.response;
             p.rows = 3;
 			p.style.height = "6em";
-			h.append(B);
-			h.append(w);
-			h.append(p)
+			ae(h, B);
+			ae(h, w);
+			ae(h, p)
 		}
 		ae(m, h);
 		ae(m, ce('div'));
@@ -10138,205 +10148,217 @@ Listview.templates = {
 		nItemsPerPage: -1,
 		searchable: 1,
 		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			compute: function(c, e) {
-				var b = ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(c);
-				ae(b, ct(c.name));
-				if (c.expansion) {
-					var d = ce("span");
-					d.className = (c.expansion == 1 ? "bc-icon": "wotlk-icon");
-					ae(d, b);
-					ae(e, d)
-				} else {
-					ae(e, b)
-				}
-			},
-			getVisibleText: function(a) {
-				var b = a.name;
-				if (a.expansion == 1) {
-					b += " bc"
-				} else {
-					if (a.expansion == 2) {
-						b += "wotlk wrath"
-					}
-                    if (a.instance == 5 || a.instance == 8) {
-                        b += " heroic"
+
+		columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                compute: function(zone, td) {
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(zone);
+                    ae(a, ct(zone.name));
+                    if (zone.expansion) {
+                        var sp = ce('span');
+                            sp.className = g_GetExpansionClassName(zone.expansion);
+                        ae(sp, a);
+                        ae(td, sp);
                     }
-				}
-				return b
-			}
-		},
-		{
-			id: "level",
-			name: LANG.level,
-			type: "range",
-			width: "10%",
-			getMinValue: function(a) {
-				return a.minlevel
-			},
-			getMaxValue: function(a) {
-				return a.maxlevel
-			},
-			compute: function(a, b) {
-				if (a.minlevel > 0 && a.maxlevel > 0) {
-					if (a.minlevel != a.maxlevel) {
-						return a.minlevel + LANG.hyphen + a.maxlevel
-					} else {
-						return a.minlevel
-					}
-				}
-			},
-			sortFunc: function(d, c, e) {
-				if (e > 0) {
-					return strcmp(d.minlevel, c.minlevel) || strcmp(d.maxlevel, c.maxlevel)
-				} else {
-					return strcmp(d.maxlevel, c.maxlevel) || strcmp(d.minlevel, c.minlevel)
-				}
-			}
-		},
-		{
-			id: "players",
-			name: LANG.players,
-			type: "text",
-			hidden: true,
-			compute: function(a, d) {
-				if (a.instance > 0) {
-					var b = ce("span");
-					if (a.nplayers == -2) {
-						a.nplayers = "10/25"
-					}
-					var c = "";
-					if (a.nplayers) {
-						if (a.instance == 4) {
-							c += sprintf(LANG.lvzone_xvx, a.nplayers, a.nplayers)
-						} else {
-							c += sprintf(LANG.lvzone_xman, a.nplayers)
-						}
-					}
-					ae(b, ct(c));
-					ae(d, b)
-				}
-			},
-			getVisibleText: function(a) {
-				if (a.instance > 0) {
-					if (a.nplayers == -2) {
-						a.nplayers = "10/25"
-					}
-					var b = "";
-					if (a.nplayers && ((a.instance != 2 && a.instance != 5) || a.nplayers > 5)) {
-						if (a.instance == 4) {
-							b += sprintf(LANG.lvzone_xvx, a.nplayers, a.nplayers)
-						} else {
-							b += sprintf(LANG.lvzone_xman, a.nplayers)
-						}
-					}
-					return b
-				}
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(d.nplayers, c.nplayers)
-			}
-		},
-		{
-			id: "territory",
-			name: LANG.territory,
-			type: "text",
-			width: "13%",
-			compute: function(a, c) {
-				var b = ce("span");
-				switch (a.territory) {
-				case 0:
-					b.className = "alliance-icon";
-					break;
-				case 1:
-					b.className = "horde-icon";
-					break;
-				case 4:
-					b.className = "ffapvp-icon";
-					break
-				}
-				ae(b, ct(g_zone_territories[a.territory]));
-				ae(c, b)
-			},
-			getVisibleText: function(a) {
-				return g_zone_territories[a.territory]
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(g_zone_territories[d.territory], g_zone_territories[c.territory])
-			}
-		},
-		{
-			id: "instancetype",
-			name: LANG.instancetype,
-			type: "text",
-			compute: function(a, d) {
-				if (a.instance > 0) {
-					var b = ce("span");
-					if ((a.instance >= 1 && a.instance <= 5) || a.instance == 7 || a.instance == 8) {
-						b.className = "instance-icon" + a.instance
-					}
-					if (a.nplayers == -2) {
-						a.nplayers = "10/25"
-					}
-					var c = g_zone_instancetypes[a.instance];
-					if (a.heroicLevel) {
-						var f = ce("span");
-						f.className = "heroic-icon";
-                        g_addTooltip(f, LANG.tooltip_heroicmodeavailable + LANG.qty.replace("$1", a.heroicLevel));
-						ae(e, f);
-					}
-					ae(b, ct(c));
-					ae(d, b)
-				}
-			},
-			getVisibleText: function(a) {
-				if (a.instance > 0) {
-					var b = g_zone_instancetypes[a.instance];
-					if (a.nplayers && ((a.instance != 2 && a.instance != 5) || a.nplayers > 5)) {
-						if (a.instance == 4) {
-							b += " " + sprintf(LANG.lvzone_xvx, a.nplayers, a.nplayers)
-						} else {
-							b += " " + sprintf(LANG.lvzone_xman, a.nplayers)
-						}
-					}
-					if (a.instance == 5 || a.instance == 8) {
-						b += " heroic"
-					}
-					return b
-				}
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(g_zone_instancetypes[d.instance], g_zone_instancetypes[c.instance]) || strcmp(d.instance, c.instance) || strcmp(d.nplayers, c.nplayers)
-			}
-		},
-		{
-			id: "category",
-			name: LANG.category,
-			type: "text",
-			width: "15%",
-			compute: function(c, d) {
-				d.className = "small q1";
-				var b = ce("a");
-				b.href = "?zones=" + c.category;
-				ae(b, ct(g_zone_categories[c.category]));
-				ae(d, b)
-			},
-			getVisibleText: function(a) {
-				return g_zone_categories[a.category]
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(g_zone_categories[d.category], g_zone_categories[c.category])
-			}
-		}],
-		getItemLink: function(a) {
-			return "?zone=" + a.id
+                    else {
+                        ae(td, a);
+                    }
+                },
+                getVisibleText: function(zone) {
+                    var buff = zone.name + Listview.funcBox.getExpansionText(zone);
+
+                    if (zone.instance == 5 || zone.instance == 8) {
+                        buff += ' heroic';
+                    }
+
+                    return buff;
+                }
+            },
+            {
+                id: 'level',
+                name: LANG.level,
+                type: 'range',
+                width: '10%',
+                getMinValue: function(zone) {
+                    return zone.minlevel;
+                },
+                getMaxValue: function(zone) {
+                    return zone.maxlevel;
+                },
+                compute: function(zone, td) {
+                    if (zone.minlevel > 0 && zone.maxlevel > 0) {
+                        if (zone.minlevel != zone.maxlevel) {
+                            return zone.minlevel + LANG.hyphen + zone.maxlevel;
+                        }
+                        else {
+                            return zone.minlevel;
+                        }
+                    }
+                },
+                sortFunc: function(a, b, col) {
+                    if (col > 0) {
+                        return strcmp(a.minlevel, b.minlevel) || strcmp(a.maxlevel, b.maxlevel);
+                    }
+                    else {
+                        return strcmp(a.maxlevel, b.maxlevel) || strcmp(a.minlevel, b.minlevel);
+                    }
+                }
+            },
+            {
+                id: 'players',
+                name: LANG.players,
+                type: 'text',
+                hidden: true,
+                compute: function(zone, td) {
+                    if (zone.instance > 0) {
+                        var sp = ce('span');
+
+                        if (zone.nplayers == -2) {
+                            zone.nplayers = '10/25';
+                        }
+
+                        var buff = '';
+                        if (zone.nplayers) {
+                            if (zone.instance == 4) {
+                                buff += sprintf(LANG.lvzone_xvx, zone.nplayers, zone.nplayers);
+                            }
+                            else {
+                                buff += sprintf(LANG.lvzone_xman, zone.nplayers);
+                            }
+                        }
+
+                        ae(sp, ct(buff));
+                        ae(td, sp);
+                    }
+                },
+                getVisibleText: function(zone) {
+                    if (zone.instance > 0) {
+                        if (zone.nplayers == -2) {
+                            zone.nplayers = '10/25';
+                        }
+
+                        var buff = '';
+                        if (zone.nplayers && ((zone.instance != 2 && zone.instance != 5) || zone.nplayers > 5)) {
+                            if (zone.instance == 4) {
+                                buff += sprintf(LANG.lvzone_xvx, zone.nplayers, zone.nplayers);
+                            }
+                            else {
+                                buff += sprintf(LANG.lvzone_xman, zone.nplayers);
+                            }
+                        }
+                        return buff;
+                    }
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(a.nplayers, b.nplayers);
+                }
+            },
+            {
+                id: 'territory',
+                name: LANG.territory,
+                type: 'text',
+                width: '13%',
+                compute: function(zone, td) {
+                    var sp = ce('span');
+                    switch (zone.territory) {
+                    case 0:
+                        sp.className = 'alliance-icon';
+                        break;
+                    case 1:
+                        sp.className = 'horde-icon';
+                        break;
+                    case 4:
+                        sp.className = 'ffapvp-icon';
+                        break;
+                    }
+
+                    ae(sp, ct(g_zone_territories[zone.territory]));
+                    ae(td, sp);
+                },
+                getVisibleText: function(zone) {
+                    return g_zone_territories[zone.territory];
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(g_zone_territories[a.territory], g_zone_territories[b.territory]);
+                }
+            },
+            {
+                id: 'instancetype',
+                name: LANG.instancetype,
+                type: 'text',
+                compute: function(zone, td) {
+                    if (zone.instance > 0) {
+                        var sp = ce('span');
+                        if ((zone.instance >= 1 && zone.instance <= 5) || zone.instance == 7 || zone.instance == 8) {
+                            sp.className = 'instance-icon' + zone.instance;
+                        }
+
+                        var buff = g_zone_instancetypes[zone.instance];
+
+                        if (zone.heroicLevel) {
+                            var skull = ce('span');
+                            skull.className = 'heroic-icon';
+                            g_addTooltip(skull, LANG.tooltip_heroicmodeavailable + LANG.qty.replace('$1', zone.heroicLevel));
+                            ae(td, skull);
+                        }
+
+                        ae(sp, ct(buff));
+                        ae(td, sp);
+                    }
+                },
+                getVisibleText: function(zone) {
+                    if (zone.instance > 0) {
+                        var buff = g_zone_instancetypes[zone.instance];
+
+                        if (zone.nplayers && ((zone.instance != 2 && zone.instance != 5) || zone.nplayers > 5)) {
+                            if (zone.instance == 4) {
+                                buff += ' ' + sprintf(LANG.lvzone_xvx, zone.nplayers, zone.nplayers);
+                            }
+                            else {
+                                buff += ' ' + sprintf(LANG.lvzone_xman, zone.nplayers);
+                            }
+                        }
+                        if (zone.instance == 5 || zone.instance == 8) {
+                            buff += ' heroic';
+                        }
+
+                        return buff;
+                    }
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(g_zone_instancetypes[a.instance], g_zone_instancetypes[b.instance]) || strcmp(a.instance, b.instance) || strcmp(a.nplayers, b.nplayers);
+                }
+            },
+            {
+                id: 'category',
+                name: LANG.category,
+                type: 'text',
+                width: '15%',
+                compute: function(zone, td) {
+                    td.className = 'small q1';
+                    var a = ce('a');
+                    a.href = '?zones=' + zone.category;
+                    ae(a, ct(g_zone_categories[zone.category]));
+                    ae(td, a);
+                },
+                getVisibleText: function(zone) {
+                    return g_zone_categories[zone.category];
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(g_zone_categories[a.category], g_zone_categories[b.category]);
+                }
+            }
+        ],
+
+		getItemLink: function(zone) {
+			return '?zone=' + zone.id;
 		}
 	},
 
@@ -16654,6 +16676,46 @@ var ContactTool = new function() {
 
     DomContentLoaded.addEvent(this.checkPound);
 };
+
+function Line(x1, y1, x2, y2, type) {
+	var left   = Math.min(x1, x2),
+		right  = Math.max(x1, x2),
+		top    = Math.min(y1, y2),
+		bottom = Math.max(y1, y2),
+
+		width  = (right - left),
+		height = (bottom - top),
+		length = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)),
+
+		radian   = Math.atan2(height, width),
+		sinTheta = Math.sin(radian),
+		cosTheta = Math.cos(radian);
+
+	var $line = ce('span');
+    $line.className = 'line';
+    $line.style.top    = top.toFixed(2) + 'px';
+	$line.style.left   = left.toFixed(2) + 'px';
+	$line.style.width  = width.toFixed(2) + 'px';
+	$line.style.height = height.toFixed(2) + 'px';
+
+    var v = ce('var');
+	v.style.width = length.toFixed(2) + 'px';
+    v.style.OTransform = 'rotate(' + radian + 'rad)';
+    v.style.MozTransform = 'rotate(' + radian + 'rad)';
+    v.style.webkitTransform = 'rotate(' + radian + 'rad)';
+    v.style.filter = "progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=" + cosTheta + ', M12=' + (-1 * sinTheta) + ', M21=' + sinTheta + ', M22=' + cosTheta + ')';
+    ae($line, v);
+
+	if (!(x1 == left && y1 == top) && !(x2 == left && y2 == top)) {
+		$line.className += ' flipped';
+	}
+
+	if (type != null) {
+		$line.className += ' line-' + type;
+	}
+
+	return $line;
+}
 
 var Links = new function() {
     var dialog  = null;

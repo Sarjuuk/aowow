@@ -1903,33 +1903,39 @@ var g_zone_areas = {
 	4723: ['L\'colisée d\'Argent','Les Profondeurs Glacées'],
 	4812: ['La Citadelle Inférieure','Le Rempart des Cranes','Ascension de Porte-mort','Le repaire de la reine du Givre','Les étages supérieurs','Quartiers Royaux','Le Trône Gelé','Deuillegivre']
 };
+
 var g_zone_categories = {
-	0:"Royaumes de l'est",
-	1:"Kalimdor",
-	8:"Outreterre",
-	10:"Norfendre",
-	2:"Donjons",
-	3:"Raids",
-	6:"Champs de bataille",
-	9:"Arènes"
+    0:  "Royaumes de l'est",
+    1:  "Kalimdor",
+    2:  "Donjons",
+    3:  "Raids",
+    4:  "Inutilisées",
+    6:  "Champs de bataille",
+    8:  "Outreterre",
+    9:  "Arènes",
+    10: "Norfendre"
 };
+
 var g_zone_instancetypes = {
-	1:"Transit",
-	2:"Donjon",
-	3:"Raid",
-	4:"Champ de bataille",
-	5:"Donjon",
-	6:"Arène",
-	7:"Raid",
-	8:"Raid"
+    1: "Transit",
+    2: "Donjon",
+    3: "Raid",              // Classic
+    4: "Champ de bataille",
+    5: "Donjon",            // Heroic
+    6: "Arène",
+    7: "Raid",              // 10-25
+    8: "Raid"               // 10-25 Heroic
 };
+
 var g_zone_territories = {
-	0:"Alliance",
-	1:"Horde",
-	2:"Contesté",
-	3:"Sanctuaire",
-	4:"JcJ"
+    0: "Alliance",
+    1: "Horde",
+    2: "Contesté",
+    3: "Sanctuaire",
+    4: "JcJ",
+    5: "JcJ Global"
 };
+
 var g_faction_categories = {
     "0":"Autre",
     "469":"Alliance",

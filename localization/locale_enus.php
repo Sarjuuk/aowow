@@ -110,6 +110,9 @@ $lang = array(
         'spell'         => "spell",
         'spells'        => "Spells",
         'valueDelim'    => " to ",
+        'zone'          => "zone",
+        'zones'         => "Zones",
+        'expansions'    => array("Classic", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Strength", "Agility", "Stamina", "Intellect", "Spirit"),
         'languages'     => array(
             1 => "Orcish",      2 => "Darnassian",      3 => "Taurahe",     6 => "Dwarvish",        7 => "Common",          8 => "Demonic",         9 => "Titan",           10 => "Thalassian",
@@ -240,8 +243,12 @@ $lang = array(
         'CosmicMap'     => "Cosmic Map",
     ),
     'zone' => array(
-        'zone'          => "Zone",
-        'zonePartOf'    => "This zone is part of",
+        // 'zone'          => "Zone",
+        // 'zonePartOf'    => "This zone is part of",
+        'cat'           => array(
+            "Eastern Kingdoms",         "Kalimdor",                 "Dungeons",                 "Raids",                    "Unused",                   null,
+            "Battlegrounds",            null,                       "Outland",                  "Arenas",                   "Northrend"
+        )
     ),
     'title' => array(
         'cat'           => array(

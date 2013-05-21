@@ -107,6 +107,9 @@ $lang = array(
         'spell'         => "sort",
         'spells'        => "Sorts",
         'valueDelim'    => " - ",
+        'zone'          => "zone",
+        'zones'         => "Zones",
+        'expansions'    => array("Classique", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Force", "Agilité", "Endurance", "Intelligence", "Esprit"),
         'languages'     => array(
             1 => "Orc",         2 => "Darnassien",      3 => "Taurahe",     6 => "Nain",            7 => "Commun",          8 => "Démoniaque",      9 => "Titan",           10 => "Thalassien",
@@ -201,8 +204,12 @@ $lang = array(
         'CosmicMap'     => "Carte cosmique",
     ),
     'zone' => array(
-        'zone'          => "Zone",
-        'zonePartOf'    => "Cette zone fait partie de la zone",
+        // 'zone'          => "Zone",
+        // 'zonePartOf'    => "Cette zone fait partie de la zone",
+        'cat'           => array(
+            "Royaumes de l'est",        "Kalimdor",                 "Donjons",                  "Raids",                    "Inutilisées",              null,
+            "Champs de bataille",       null,                       "Outreterre",               "Arènes",                   "Norfendre"
+        )
     ),
     'title' => array(
         'cat'           => array(

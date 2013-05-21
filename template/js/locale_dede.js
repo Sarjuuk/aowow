@@ -1916,33 +1916,39 @@ var g_zone_areas = {
 	4723: ['Kolosseum der Kreuzfahrer','Die eisigen Tiefen'],
 	4812: ['Die untere Zitadelle','Das Schädelbollwerk','Dom des Todbringers','Hort der Frostkönigin','Der obere Bereich','Königliche Quartiere','Der Frostthron','Frostgram']
 };
+
 var g_zone_categories = {
-	0:"Östliche Königreiche",
-	1:"Kalimdor",
-	8:"Scherbenwelt",
-	10:"Nordend",
-	2:"Dungeons",
-	3:"Schlachtzüge",
-	6:"Schlachtfelder",
-	9:"Arenen"
+	0:  "Östliche Königreiche",
+	1:  "Kalimdor",
+	2:  "Dungeons",
+	3:  "Schlachtzüge",
+	4:  "Unbenutzt",
+	6:  "Schlachtfelder",
+	8:  "Scherbenwelt",
+	9:  "Arenen",
+	10: "Nordend"
 };
+
 var g_zone_instancetypes = {
-	1:"Durchgang",
-	2:"Dungeon",
-	3:"Schlachtzug",
-	4:"Schlachtfeld",
-	5:"Dungeon",
-	6:"Arena",
-	7:"Schlachtzug",
-	8:"Schlachtzug"
+	1: "Durchgang",
+	2: "Dungeon",
+	3: "Schlachtzug",       // Classic
+	4: "Schlachtfeld",
+	5: "Dungeon",           // Heroic
+	6: "Arena",
+	7: "Schlachtzug",       // 10-25
+	8: "Schlachtzug"        // 10-25 Heroic
 };
+
 var g_zone_territories = {
-	0:"Allianz",
-	1:"Horde",
-	2:"Umkämpft",
-	3:"Sicheres Gebiet",
-	4:"PvP"
+	0: "Allianz",
+	1: "Horde",
+	2: "Umkämpft",
+	3: "Sicheres Gebiet",
+	4: "PvP",
+	5: "Welt-PvP"
 };
+
 var g_faction_categories = {
 	"0":"Anderes",
 	"469":"Allianz",

@@ -107,6 +107,9 @@ $lang = array(
         'spell'         => "hechizo",
         'spells'        => "Hechizos",
         'valueDelim'    => " - ",
+        'zone'          => "zona",
+        'zones'         => "Zonas",
+        'expansions'    => array("World of Warcraft", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Fuerza", "Agilidad", "Aguante", "Intelecto", "Espíritu"),
         'languages'     => array(
             1 => "Orco",        2 => "Darnassiano",     3 => "Taurahe",     6 => "Enánico",         7 => "Lengua común",    8 => "Demoníaco",       9 => "Titánico",        10 => "Thalassiano",
@@ -201,8 +204,12 @@ $lang = array(
         'CosmicMap'     => "Mapa cósmico",
     ),
     'zone' => array(
-        'zone'          => "Zone",
-        'zonePartOf'    => "Cette zone fait partie de la zone",
+        // 'zone'          => "Zone",
+        // 'zonePartOf'    => "Cette zone fait partie de la zone",
+        'cat'           => array(
+            "Reinos del Este",          "Kalimdor",                 "Mazmorras",                "Bandas",                   "No las uso",               null,
+            "Campos de batalla",        null,                       "Terrallende",              "Arenas",                   "Rasganorte"
+        )
     ),
     'title' => array(
         'cat'           => array(
