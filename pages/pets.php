@@ -26,7 +26,6 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         'file'   => 'pet',
         'data'   => $pets->getListviewData(),
         'params' => array(
-            'tabs'        => false,
             'visibleCols' => "$['abilities']"
         )
     );

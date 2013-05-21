@@ -51,7 +51,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         'file'     => 'event',
         'data'     => $events->getListviewData(),
         'deps'     => $deps,
-        'calendar' => false,                                // todo: fix it Felix!
+        'calendar' => false,                                // todo (med): fix it Felix!
         'params'   => array(
             'tabs'   => '$myTabs'
         )

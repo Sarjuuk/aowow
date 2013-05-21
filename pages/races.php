@@ -13,9 +13,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $pageData = array(
         'file'   => 'race',
         'data'   => $races->getListviewData(),
-        'params' => array(
-            'tabs'   => false
-        )
+        'params' => []
     );
 
     $smarty->saveCache($cacheKey, $pageData);

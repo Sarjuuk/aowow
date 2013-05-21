@@ -20,7 +20,6 @@ var _ = function(family)
         template:'pet',
         computeDataFunc: _,
         {if !isset($params.id)}id:'hunter-pets',{/if}
-        {if !isset($params.tabs)}tabs:'tabs-generic',{/if}
         {if !isset($params.name)}name:LANG.tab_pets,{/if}
         {if !isset($params.parent)}parent:'listview-generic',{/if}
         {foreach from=$params key=k item=v}

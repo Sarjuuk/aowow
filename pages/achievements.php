@@ -81,7 +81,6 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 
     // listview content
     $pageData['data']   = $acvList->getListviewData();
-    $pageData['params'] = ['tabs' => false];
 
     // if we are have different cats display field
     if ($acvList->hasDiffFields(['category']))

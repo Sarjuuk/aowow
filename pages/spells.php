@@ -380,7 +380,6 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     $spells = new SpellList($conditions, true);
 
     $pageData['data'] = $spells->getListviewData();
-    $pageData['params']['tabs'] = false;
 
     $spells->addGlobalsToJscript($pageData);
 

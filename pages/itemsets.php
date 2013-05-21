@@ -27,7 +27,6 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     // listview content
     $pageData['data']   = $itemsets->getListviewData();
-    $pageData['params'] = ['tabs' => false];
 
     // create note if search limit was exceeded
     if ($itemsets->getMatches() > $AoWoWconf['sqlLimit'])

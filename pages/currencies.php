@@ -26,9 +26,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $pageData = array(
         'file'   => 'currency',
         'data'   => $money->getListviewData(),
-        'params' => array(
-            'tabs'   => false
-        )
+        'params' => []
     );
 
     $money->addGlobalsToJscript($pageData);

@@ -25,9 +25,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $pageData = array(
         'file'   => 'title',
         'data'   => $titles->getListviewData(),
-        'params' => array(
-            'tabs'   => false
-        )
+        'params' => []
     );
 
     if ($titles->hasDiffFields(['category']))

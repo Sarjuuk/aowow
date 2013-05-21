@@ -2,7 +2,6 @@
     new Listview({ldelim}
         template:'race',
         {if !isset($params.id)}id:'races',{/if}
-        {if !isset($params.tabs)}tabs:'listview-generic',{/if}
         {if !isset($params.name)}name:LANG.tab_races,{/if}
         {if !isset($params.parent)}parent:'listview-generic',{/if}
         {foreach from=$params key=k item=v}
