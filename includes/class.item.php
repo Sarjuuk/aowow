@@ -235,7 +235,7 @@ class ItemList extends BaseType
         // requires map (todo: reparse ?_zones for non-conflicting data; generate Link to zone)
         if ($this->curTpl['Map'])
         {
-            $map = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE mapid=?d LIMIT 1', $this->curTpl['Map']);
+            $map = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE mapId=?d LIMIT 1', $this->curTpl['Map']);
             $x .= '<br />'.Util::localizedString($map, 'name');
         }
 

@@ -258,7 +258,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $foo['icon']['count'] = "'".($effBP + 1).'-'.$foo['icon']['count']."'";
         }
         // .. from spell
-        else if ($_ = $spell->getField('effect'.$i.'TriggerSpell'))
+        else if (($_ = $spell->getField('effect'.$i.'TriggerSpell')) && $_ > 0)
         {
             $trig = new SpellList(array(['s.id', (int)$_]));
 
@@ -438,14 +438,15 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 69:                            // School Absorb
                         case 72:                            // Mod Power Cost School Percent
                         case 74:                            // Reflect Spell School
-                        case 79:                            // Mod Damage Pct Done
+                        case 79:                            // Mod Damage Done Pct
                         case 81:                            // Split Damage Pct
-                        case 87:                            // Mod Dmg Taken Pct
+                        case 87:                            // Mod Damage Taken Pct
                         case 97:                            // Mana Shield
                         case 101:                           // Mod Resistance Pct
                         case 115:                           // Mod Healing Taken
-                        case 118:                           // Mod Healing Pct
+                        case 118:                           // Mod Healing Taken Pct
                         case 135:                           // Mod Healing Done
+                        case 136:                           // Mod Healing Done Pct
                         case 142:                           // Mod Base Resistance Pct
                         case 143:                           // Mod Resistance Exclusive
                         case 149:                           // Reduce Pushback

@@ -182,7 +182,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
             case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
-                if ($zoneId = DB::Aowow()->selectCell('SELECT areatableID FROM ?_zones WHERE mapID = ? LIMIT 1', $obj))
+                if ($zoneId = DB::Aowow()->selectCell('SELECT id FROM ?_zones WHERE mapId = ? LIMIT 1', $obj))
                     $tmp['link'] = array(
                         'href' => '?zone='.$zoneId,
                         'text' => $crtName,

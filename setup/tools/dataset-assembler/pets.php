@@ -68,7 +68,7 @@ if (!defined('AOWOW_REVISION'))
 
     $queryZones = '
         SELECT DISTINCT
-            z.areatableId AS location
+            z.id AS location
         FROM
             world.creature c
         JOIN
@@ -84,7 +84,7 @@ if (!defined('AOWOW_REVISION'))
 
     $queryInstanceZone = '
         SELECT DISTINCT
-            z.areatableId AS location
+            z.id AS location
         FROM
             world.creature c,
             ?_zones z

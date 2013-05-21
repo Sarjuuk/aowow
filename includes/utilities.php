@@ -528,7 +528,7 @@ class SmartyAoWoW extends Smarty
             'reqCSS'     => [],                             // <[string,string]> path to required CSSFile, IE condition
             'title'      => null,                           // [string] page title
             'tab'        => null,                           // [int] # of tab to highlight in the menu
-            'type'       => null,                           // [int] numCode for spell, npx, object, ect
+            'type'       => null,                           // [int] numCode for spell, npc, object, ect
             'typeId'     => null,                           // [int] entry to display
             'path'       => '[]',                           // [string] (js:array) path to preselect in the menu
             'gStaticUrl' => substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1)
