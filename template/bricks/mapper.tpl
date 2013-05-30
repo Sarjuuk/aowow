@@ -5,7 +5,7 @@
 </div>
 
 <script type="text/javascript">//<![CDATA[
-    var g_pageInfo = {ldelim}id:-2{rdelim};     {* what on gods green earth..?   *}
+    var g_pageInfo = {ldelim}id:{$map.zone}{rdelim};
     var myMapper = new Mapper({ldelim}{foreach from=$map key=k item=v}{$k}: {$v}, {/foreach}parent: 'mapper-generic'{rdelim});
     {if isset($som)}new ShowOnMap({$som});{/if}
 //]]></script>

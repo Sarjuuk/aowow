@@ -381,9 +381,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                             $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$spell['powerTypes'][$effMV], $effMV).')';
                             break;
                         case 29:                            // Mod Stat
-                        case 137:                           // Mod Stat %
+                        case 80:                            // Mod Stat %
+                        case 137:                           // Mod Total Stat %
                         case 175:                           // Mod Spell Healing Of Stat Percent
+                        case 212:                           // Mod Ranged Attack Power Of Stat Percent
                         case 219:                           // Mod Mana Regeneration from Stat
+                        case 268:                           // Mod Attack Power Of Stat Percent
                             $x = $effMV == -1 ? 0x1F : 1 << $effMV;
                             $bar = [];
                             for ($j = 0; $j < 5; $j++)
@@ -402,6 +405,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                             $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Util::$spellAuraStrings[$effMV], $effMV).')';
                             break;
                         case 41:                            // Dispel Immunity
+                        case 178:                           // Mod Debuff Resistance
                         case 245:                           // Mod Aura Duration By Dispel
                             $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$game['dt'][$effMV], $effMV).')';
                             break;
@@ -415,9 +419,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                             $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$game['languages'][$effMV], $effMV).')';
                             break;
                         case 77:                            // Mechanic Immunity
+                        case 117:                           // Mod Mechanic Resistance
                         case 232:                           // Mod Mechanic Duration
                         case 234:                           // Mod Mechanic Duration (no stack)
                         case 255:                           // Mod Mechanic Damage Taken Pct
+                        case 276:                           // Mod Mechanic Damage Done Percent
                             $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$game['me'][$effMV], $effMV).')';
                             break;
                         case 147:                           // mechanic Immunity Mask
@@ -436,15 +442,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 40:                            // Damage Immunity
                         case 57:                            // Mod Spell Crit Chance
                         case 69:                            // School Absorb
+                        case 71:                            // Mod Spell Crit Chance School
                         case 72:                            // Mod Power Cost School Percent
+                        case 73:                            // Mod Power Cost School Flat
                         case 74:                            // Reflect Spell School
                         case 79:                            // Mod Damage Done Pct
                         case 81:                            // Split Damage Pct
+                        case 83:                            // Mod Base Resistance
                         case 87:                            // Mod Damage Taken Pct
                         case 97:                            // Mana Shield
                         case 101:                           // Mod Resistance Pct
                         case 115:                           // Mod Healing Taken
                         case 118:                           // Mod Healing Taken Pct
+                        case 123:                           // Mod Target Resistance
                         case 135:                           // Mod Healing Done
                         case 136:                           // Mod Healing Done Pct
                         case 142:                           // Mod Base Resistance Pct
@@ -452,7 +462,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 149:                           // Reduce Pushback
                         case 163:                           // Mod Crit Damage Bonus
                         case 174:                           // Mod Spell Damage Of Stat Percent
+                        case 182:                           // Mod Resistance Of Stat Percent
                         case 186:                           // Mod Attacker Spell Hit Chance
+                        case 194:                           // Mod Target Absorb School
+                        case 195:                           // Mod Target Ability Absorb School
                         case 199:                           // Mod Increases Spell Percent to Hit
                         case 229:                           // Mod AoE Damage Avoidance
                         case 271:                           // Mod Damage Percent Taken Form Caster
@@ -473,6 +486,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                             $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, Util::$combatRating[log($effMV, 2)], Util::asHex($effMV)).')';
                             break;
                         case 168:                           // Mod Damage Done Versus
+                        case 59:                            // Mod Damage Done Versus Creature
                             $bar = [];
                             foreach (Lang::$game['ct'] as $j => $str)
                                 if ($effMV & (1 << $j - 1))
@@ -498,7 +512,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         }
                     }
 
-                    if (in_array($effAura, [174, 220]))
+                    if (in_array($effAura, [174, 220, 182]))
                         $foo['name'] .= ' ['.sprintf(Util::$dfnString, Lang::$game['stats'][$spell->getField('effect'.$i.'MiscValueB')], $spell->getField('effect'.$i.'MiscValueB')).']';
                     else if ($spell->getField('effect'.$i.'MiscValueB') > 0)
                         $foo['name'] .= ' ['.$spell->getField('effect'.$i.'MiscValueB').']';

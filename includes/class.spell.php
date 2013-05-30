@@ -401,10 +401,10 @@ class SpellList extends BaseType
         else if ($this->curTpl['castTime'] > 0)
             return $short ? sprintf(Lang::$spell['castIn'], $this->curTpl['castTime'] / 1000) : Util::formatTime($this->curTpl['castTime']);
         // show instant only for player/pet/npc abilities (todo: (low) unsure when really hidden (like talent-case))
-        else if ($noInstant && !in_array($this->curTpl['typeCat'], [7, -3, -8]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
+        else if ($noInstant && !in_array($this->curTpl['typeCat'], [7, -3, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
             return '';
         // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only
-        else if ($this->curTpl['schoolMask'] == 0x1 || $this->curTpl['attributes0'] & 0x10)
+        else if ($this->curTpl['damageClass'] == 0 || $this->curTpl['attributes0'] & 0x10)
             return Lang::$spell['instantPhys'];
         else                                                // instant cast
             return Lang::$spell['instantMagic'];
@@ -1421,7 +1421,7 @@ class SpellList extends BaseType
         $range = $this->createRangesForCurrent();
 
         // cast times
-        $time = $this->createCastTimeForCurrent(true);
+        $time = $this->createCastTimeForCurrent();
 
         // cooldown or categorycooldown
         $cool = $this->createCooldownForCurrent();

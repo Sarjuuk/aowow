@@ -517,7 +517,7 @@ ShowOnMap.prototype.checkMenu = function(path) {
 			str += label[i][1] + '</span>';
 		}
 	}
-	this._legendLabel.innerHtml = str;
+	this._legendLabel.innerHTML = str;
 };
 
 ShowOnMap.combinePins = function(pins, dailyOnly, hasPaths) {
@@ -696,7 +696,7 @@ ShowOnMap.buildTooltip = function(list, dailyOnly) {
 			}
 		}
 
-		str += '<b class="q' + (pinType == 2 ? ' icon-horde' : '') + (pinType == 3 ? ' icon-alliance' : '') + '">' + obj.name + '</b>';
+		str += '<b class="q' + (pinType == 2 ? ' horde-icon' : '') + (pinType == 3 ? ' alliance-icon' : '') + '">' + obj.name + '</b>';
 		if (coords.length > 0) {
 			str += ' (' + coords[0][0] + ', ' + coords[0][1] + ')<br />';
 		}

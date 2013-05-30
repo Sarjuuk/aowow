@@ -1,11 +1,11 @@
 body
 {
-    background-color: black;
+    background: black;
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
     font-size: 13px;
-    color: white;
+    color: #ccc;
     min-height: 650px;
     height: 90%;
 }
@@ -555,6 +555,26 @@ a#toptabs-menu-language
     border-radius: 2px;
     padding: 10px;
     min-height: 550px;
+}
+
+/**************/
+/* BREADCRUMB */
+/**************/
+
+.breadcrumb {
+    cursor: default;
+    font-size: 15px;
+    padding: 5px 0 5px 20px;
+    background: url(../images/favicon.gif) left center no-repeat;
+}
+
+span.breadcrumb-arrow  {
+    padding-right: 17px;
+    background: url(../images/arrow-right.gif) right center no-repeat;
+}
+
+span.breadcrumb-ellipsis {
+    padding-right: 16px; /* Makes it easier to mouseover */
 }
 
 #wrapper.nosidebar
@@ -2446,9 +2466,9 @@ div.live-search-icon div
 
 div.live-search-icon-boss
  {
-	background-image: url(../../images/icons/boss.gif);
-	background-position: 8px center;
-	background-repeat: no-repeat;
+    background-image: url(../../images/icons/boss.gif);
+    background-position: 8px center;
+    background-repeat: no-repeat;
 }
 
 div.live-search-icon-quest-alliance
@@ -3338,47 +3358,47 @@ div.modelviewer, div.screenshotviewer
 }
 
 div.announcement-pagetop div.announcement-inner {
-	margin-top: 10px;
+    margin-top: 10px;
 }
 
 div.announcement-pagetop div.announcement-inner, div.announcement-contenttop div.announcement-inner {
-	background-color: #141414;
-	border: 1px solid #101010;
+    background-color: #141414;
+    border: 1px solid #101010;
 
-	-webkit-border-radius: 6px;
-	-moz-border-radius: 6px;
-	border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
 }
 
 div.announcement-inner {
-	background-position: 0 center;
-	background-repeat: no-repeat;
-	margin-bottom: 10px;
-	padding: 8px;
-	position: relative;
+    background-position: 0 center;
+    background-repeat: no-repeat;
+    margin-bottom: 10px;
+    padding: 8px;
+    position: relative;
 }
 
 /* Close button */
 a.announcement-close {
-	display: block;
-	width: 16px;
-	height: 16px;
-	background: url(../images/delete.gif) center center no-repeat;
-	position: absolute;
-	right: 8px;
-	top: 8px;
+    display: block;
+    width: 16px;
+    height: 16px;
+    background: url(../images/delete.gif) center center no-repeat;
+    position: absolute;
+    right: 8px;
+    top: 8px;
 }
 
 /* .text overrides */
 div.announcement ul {
-	margin: 0.25em 0 !important;
+    margin: 0.25em 0 !important;
 }
 div.announcement h3 {
-	margin-top: 0 !important;
-	margin-bottom: 0.25em !important;
+    margin-top: 0 !important;
+    margin-bottom: 0.25em !important;
 }
 div.announcement li {
-	line-height: 1.75em !important;
+    line-height: 1.75em !important;
 }
 
 /* jQuery replacement */
