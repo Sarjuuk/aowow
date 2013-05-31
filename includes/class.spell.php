@@ -1484,7 +1484,7 @@ class SpellList extends BaseType
                 'school'       => $this->curTpl['schoolMask'],
                 'cat'          => $this->curTpl['typeCat'],
                 'trainingcost' => $this->curTpl['trainingCost'],
-                'skill'        => count($this->curTpl['skillLines']) > 6 ? array_merge(array_splice($this->curTpl['skillLines'], 0, 6), [-1]): $this->curTpl['skillLines'], // 6 is the max warlock pets .. only hunter pets will be shortened
+                'skill'        => count($this->curTpl['skillLines']) > 4 ? array_merge(array_splice($this->curTpl['skillLines'], 0, 4), [-1]): $this->curTpl['skillLines'], // display max 4 skillLines (fills max three lines in listview)
                 'reagents'     => [],
                 'source'       => []
             );
@@ -1629,31 +1629,24 @@ class SpellList extends BaseType
         if ($this->relItems)
             $this->relItems->addGlobalsToJscript($refs);
 
-        if ($mask = $this->curTpl['reqClassMask'])
-        {
-            $ids = [];
-            for ($i = 0; $i < 11; $i++)
-                if ($mask & (1 << $i))
-                    $ids[] = $i + 1;
-
-            (new CharClassList(array(['id', $ids])))->addGlobalsToJScript($refs);
-        }
-
-        if ($mask = $this->curTpl['reqRaceMask'])
-        {
-            $ids = [];
-            for ($i = 0; $i < 11; $i++)
-                if ($mask & (1 << $i))
-                    $ids[] = $i + 1;
-
-            (new CharRaceList(array(['id', $ids])))->addGlobalsToJScript($refs);
-        }
+        $classes = [];
+        $races   = [];
 
         if (!isset($refs['gSpells']))
             $refs['gSpells'] = [];
 
         while ($this->iterate())
         {
+            if ($mask = $this->curTpl['reqClassMask'])
+                for ($i = 0; $i < 11; $i++)
+                    if ($mask & (1 << $i))
+                        $classes[] = $i + 1;
+
+            if ($mask = $this->curTpl['reqRaceMask'])
+                for ($i = 0; $i < 11; $i++)
+                    if ($mask & (1 << $i))
+                        $races[] = $i + 1;
+
             $iconString = $this->curTpl['iconStringAlt'] ? 'iconStringAlt' : 'iconString';
 
             $refs['gSpells'][$this->id] = array(
@@ -1661,6 +1654,9 @@ class SpellList extends BaseType
                 'name' => $this->getField('name', true),
             );
         }
+
+        (new CharClassList(array(['id', $classes])))->addGlobalsToJScript($refs);
+        (new CharRaceList(array(['id', $races])))->addGlobalsToJScript($refs);
     }
 
     public function addRewardsToJScript(&$refs) { }
