@@ -815,25 +815,14 @@ if ($searchMask & 0x1000000)
         $maxResults
     );
 
-    $t = [];
-    Util::execTime();
-
     $misc = new SpellList($conditions);
-
-    $t[] = Util::execTime();
 
     if ($data = $misc->getListviewData())
     {
-        $t[] = Util::execTime();
-
         $misc->addGlobalsToJscript($jsGlobals);
-
-        $t[] = Util::execTime();
 
         while ($misc->iterate())
             $data[$misc->id]['param1'] = '"'.strToLower($misc->getField('iconString')).'"';
-
-        $t[] = Util::execTime();
 
         $found['spell'] = array(
             'type'     => TYPE_SPELL,
@@ -847,8 +836,6 @@ if ($searchMask & 0x1000000)
                 'hiddenCols'  => "$['skill']",
             ]
         );
-
-        $t[] = Util::execTime();
 
         if ($misc->getMatches() > $maxResults)
         {
@@ -984,7 +971,6 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
     $smarty->assign('lvData', $jsGlobals);
     $smarty->assign('search', $search);
     $smarty->assign('mysql', DB::Aowow()->getStatistics());
-    $smarty->assign('util', new Util);                      // just for debugging / optimizing
 
     $smarty->display('search.tpl');
 }
