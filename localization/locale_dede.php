@@ -141,19 +141,20 @@ $lang = array(
             "Verstohlenheit",       "Mondkingestalt",               "Geist der Erlösung"
         ),
         'me'            => array(
-            null,               "Bezaubert",            "Desorientiert",            "Entwaffnet",               "Abgelenkt",            "Flüchtend",            "Ergriffen",            "Unbeweglich",
-            "Befriedet",        "Schweigend",           "Schlafend",                "Verlangsamt",              "Betäubt",              "Eingefroren",          "Handlungsunfähig",     "Blutend",
-            "Heilung",          "Verwandelt",           "Verbannt",                 "Abgeschirmt",              "Gefesselt",            "Reitend",              "Verführt",             "Vertrieben",
-            "Entsetzt",         "Unverwundbar",         "Unterbrochen",             "Benommen",                 "Entdeckung",           "Unverwundbar",         "Kopfnuss",             "Wütend"
+            null,                       "Bezaubert",                "Desorientiert",            "Entwaffnet",               "Abgelenkt",                "Flüchtend",                "Ergriffen",                "Unbeweglich",
+            "Befriedet",                "Schweigend",               "Schlafend",                "Verlangsamt",              "Betäubt",                  "Eingefroren",              "Handlungsunfähig",         "Blutend",
+            "Heilung",                  "Verwandelt",               "Verbannt",                 "Abgeschirmt",              "Gefesselt",                "Reitend",                  "Verführt",                 "Vertrieben",
+            "Entsetzt",                 "Unverwundbar",             "Unterbrochen",             "Benommen",                 "Entdeckung",               "Unverwundbar",             "Kopfnuss",                 "Wütend"
         ),
         'ct'            => array(
-            null,                   "Wildtier",                     "Drachkin",                     "Dämon",                        "Elementar",
-            "Riese",                "Untoter",                      "Humanoid",                     "Tier",                         "Mechanisch",
-            "Nicht kategorisiert",  "Totem",                        "Haustier",                     "Gas Wolke"
+            "Nicht kategorisiert",      "Wildtier",                 "Drachkin",                 "Dämon",                    "Elementar",                "Riese",                    "Untoter",                  "Humanoid",
+            "Tier",                     "Mechanisch",               "Nicht spezifiziert",       "Totem",                    "Haustier",                 "Gas Wolke"
         ),
-        'professions'   => array(
-            171 => "Alchemie",          164 => "Schmiedekunst",             333 => "Verzauberkunst",        202 => "Ingenieurskunst",       773 => "Inschriftenkunde",      755 => "Juwelenschleifen",
-            165 => "Lederverarbeitung", 186 => "Bergbau",                   197 => "Schneiderei",           185 => "Kochkunst",             129 => "Erste Hilfe",           356 => "Angeln"
+        'fa'            => array(
+            1 => "Wolf",                2 => "Katze",               3 => "Spinne",              4 => "Bär",                 5 => "Eber",                6 => "Krokilisk",           7 => "Aasvogel",            8 => "Krebs",
+            9 => "Gorilla",             11 => "Raptor",             12 => "Weitschreiter",      20 => "Skorpid",            21 => "Schildkröte",        24 => "Fledermaus",         25 => "Hyäne",              26 => "Raubvogel",
+            27 => "Windnatter",         30 => "Drachenfalke",       31 => "Felshetzer",         32 => "Sphärenjäger",       33 => "Sporensegler",       34 => "Netherrochen",       35 => "Schlange",           37 => "Motte",
+            38 => "Schimäre",           39 => "Teufelssaurier",     41 => "Silithid",           42 => "Wurm",               43 => "Rhinozeros",         44 => "Wespe",              45 => "Kernhund",           46 => "Geisterbestie"
         ),
         'pvpRank'       => array(
             null,                                       "Gefreiter / Späher",                   "Fußknecht / Grunzer",
@@ -212,6 +213,9 @@ $lang = array(
     ),
     'event' => array(
         'category'      => array("Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler")
+    ),
+    'npc'   => array(
+        'rank'          => ['Normal', 'Elite', 'Rar Elite', 'Boss', 'Rar']
     ),
     'achievement' => array(
         'achievements'  => "Erfolge",

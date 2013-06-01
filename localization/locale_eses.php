@@ -133,19 +133,21 @@ $lang = array(
             "Sigilo",           "Forma de lechúcico lunar",     "Espíritu redentor"
         ),
         'me'            => array(
-            null,               "Embelesado",           "Desorientado",             "Desarmado",            "Distraído",            "Huyendo",              "Agarrado",             "Enraizado",
-            "Pacificado",       "Silenciado",           "Dormido",                  "Frenado",              "Aturdido",             "Congelado",            "Incapacitado",         "Sangrando",
-            "Sanacíon",         "Polimorfado",          "Desterrado",               "Protegido",            "Aprisionado",          "Montado",              "Seducido",             "Girado",
-            "Horrorizado",      "Invulnerable",         "Interrumpido",             "Atontado",             "Descubierto",          "Invulnerable",         "Aporreado",            "Iracundo"
+            null,                       "Embelesado",               "Desorientado",             "Desarmado",                "Distraído",                "Huyendo",                  "Agarrado",                 "Enraizado",
+            "Pacificado",               "Silenciado",               "Dormido",                  "Frenado",                  "Aturdido",                 "Congelado",                "Incapacitado",             "Sangrando",
+            "Sanacíon",                 "Polimorfado",              "Desterrado",               "Protegido",                "Aprisionado",              "Montado",                  "Seducido",                 "Girado",
+            "Horrorizado",              "Invulnerable",             "Interrumpido",             "Atontado",                 "Descubierto",              "Invulnerable",             "Aporreado",                "Iracundo"
         ),
         'ct'            => array(
-            null,               "Bestia",                       "Dragonante",                   "Demonio",                      "Elemental",
-            "Gigante",          "No-muerto",                    "Humanoide",                    "Alimaña",                      "Mecánico",
-            "Sin categoría",    "Tótem",                        "Mascota mansa",                "Nube de gas"
+            "Sin categoría",            "Bestia",                   "Dragonante",               "Demonio",                  "Elemental",                "Gigante",                  "No-muerto",                "Humanoide",
+            "Alimaña",                  "Mecánico",                 "Sin especificar",          "Tótem",                    "Mascota mansa",            "Nube de gas"
         ),
-        'professions'   => array(
-            171 => "Alquimia",          164 => "Herrería",                  333 => "Encantamiento",         202 => "Ingeniería",            773 => "Inscripción",           755 => "Joyería",
-            165 => "Peletería",         186 => "Minería",                   197 => "Sastrería",             185 => "Cocina",                129 => "Primeros auxilios",     356 => "Pesca"
+        'fa'            => array(
+
+            1 => "Lobo",                2 => "Felino",              3 => "Araña",               4 => "Oso",                 5 => "Jabalí",              6 => "Crocolisco",          7 => "Carroñero",           8 => "Cangrejo",
+            9 => "Gorila",              11 => "Raptor",             12 => "Zancaalta",          20 => "Escórpido",          21 => "Tortuga",            24 => "Murciélago",         25 => "Hiena",              26 => "Ave rapaz",
+            27 => "Serpiente alada",    30 => "Dracohalcón",        31 => "Devastador",         32 => "Acechador deformado",33 => "Esporiélago",        34 => "Raya abisal",        35 => "Serpiente",          37 => "Palomilla",
+            38 => "Quimera",            39 => "Demosaurio",         41 => "Silítido",           42 => "Gusano",             43 => "Rinoceronte",        44 => "Avispa",             45 => "Can del Núcleo",     46 => "Bestia espíritu"
         ),
         'pvpRank'       => array(
             null,                                       "Private / Scout",                      "Corporal / Grunt",
@@ -164,6 +166,9 @@ $lang = array(
     'account'  => [],
     'event' => array(
         'category'      => array("Sin categoría", "Vacacionales", "Periódicos", "Jugador contra Jugador")
+    ),
+    'npc'   => array(
+        'rank'          => ['Normal', 'Élite', 'Élite raro', 'Jefe', 'Raro']
     ),
     'achievement' => array(
         'achievements'  => "logros",

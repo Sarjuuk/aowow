@@ -133,19 +133,20 @@ $lang = array(
             "Camouflage",       "Forme de sélénien",            "Esprit de rédemption"
         ),
         'me'            => array(
-            null,               "Charmé",               "Désorienté",           "Désarmé",              "Distrait",             "En fuite",                 "Maladroit",            "Immobilisé",
-            "Pacifié",          "Réduit au silence",    "Endormi",              "Pris au piège",        "Étourdi",              "Gelé",                     "Stupéfié",             "Sanguinolent",
-            "Soins",            "Métamorphosé",         "Banni",                "Protégé",              "Entravé",              "Monté",                    "Séduit",               "Repoussé",
-            "Horrifié",         "Invulnérable",         "Interrompu",           "Hébété",               "Découverte",           "Invulnérable",             "Assommé",              "Enragé"
+            null,                       "Charmé",                   "Désorienté",               "Désarmé",                  "Distrait",                 "En fuite",                 "Maladroit",                "Immobilisé",
+            "Pacifié",                  "Réduit au silence",        "Endormi",                  "Pris au piège",            "Étourdi",                  "Gelé",                     "Stupéfié",                 "Sanguinolent",
+            "Soins",                    "Métamorphosé",             "Banni",                    "Protégé",                  "Entravé",                  "Monté",                    "Séduit",                   "Repoussé",
+            "Horrifié",                 "Invulnérable",             "Interrompu",               "Hébété",                   "Découverte",               "Invulnérable",             "Assommé",                  "Enragé"
         ),
         'ct'            => array(
-            null,               "Bête",                         "Draconien",                    "Démon",                        "Élémentaire",
-            "Géant",            "Mort-vivant",                  "Humanoïde",                    "Bestiole",                     "Mécanique",
-            "Non classés",      "Totem",                        "Familier pacifique",           "Nuage de gaz"
+            "Non classés",              "Bête",                     "Draconien",                "Démon",                    "Élémentaire",              "Géant",                    "Mort-vivant",              "Humanoïde",
+            "Bestiole",                 "Mécanique",                "Non spécifié",             "Totem",                    "Familier pacifique",       "Nuage de gaz"
         ),
-        'professions'   => array(
-            171 => "Alchimie",          164 => "Forge",                     333 => "Enchantement",          202 => "Ingénierie",            773 => "Calligraphie",          755 => "Joaillerie",
-            165 => "Travail du cuir",   186 => "Minage",                    197 => "Couture",               185 => "Cuisine",               129 => "Secourisme",            356 => "Pêche"
+        'fa'            => array(
+            1 => "Loup",                2 => "Félin",               3 => "Araignée",            4 => "Ours",                5 => "Sanglier",            6 => "Crocilisque",         7 => "Charognard",          8 => "Crabe",
+            9 => "Gorille",             11 => "Raptor",             12 => "Haut-trotteur",      20 => "Scorpide",           21 => "Tortue",             24 => "Chauve-souris",      25 => "Hyène",              26 => "Oiseau de proie",
+            27 => "Serpent des vents",  30 => "Faucon-dragon",      31 => "Ravageur",           32 => "Traqueur dim.",      33 => "Sporoptère",         34 => "Raie du Néant",      35 => "Serpent",            37 => "Phalène",
+            38 => "Chimère",            39 => "Diablosaure",        41 => "Silithide",          42 => "Ver",                43 => "Rhinocéros",         44 => "Guêpe",              45 => "Chien du Magma",     46 => "Esprit de bête"
         ),
         'pvpRank'       => array(
             null,                                       "Private / Scout",                      "Corporal / Grunt",
@@ -164,6 +165,9 @@ $lang = array(
     'account'  => [],
     'event' => array(
         'category'      => array("Non classés", "Vacances", "Récurrent", "Joueur ctr. Joueur")
+    ),
+    'npc'   => array(
+        'rank'          => ['Standard', 'Élite', 'Élite rare', 'Boss', 'Rare']
     ),
     'achievement' => array(
         'achievements'  => "hauts faits",
@@ -349,8 +353,8 @@ $lang = array(
         )
     ),
     'item' => array(
-        'armor'         => "Armure :",
-        'block'         => "Bloquer :",
+        'armor'         => "Armure",
+        'block'         => "Bloquer",
         'charges'       => "Charges",
         'expend'        => "expendable",
         'locked'        => "Verrouillé",

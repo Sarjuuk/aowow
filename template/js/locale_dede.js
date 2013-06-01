@@ -1204,16 +1204,20 @@ var g_npc_classifications = {
 };
 
 var g_npc_types = {
+     0: 'Nicht kategorisiert',
      1: 'Wildtier',
-     8: 'Tier',
+     2: 'Drachkin',
      3: 'Dämon',
      4: 'Elementar',
-     2: 'Drachkin',
      5: 'Riese',
-     7: 'Humanoid',
-     9: 'Mechanisch',
      6: 'Untot',
-    10: 'Nicht kategorisiert'
+     7: 'Humanoid',
+     8: 'Tier',
+     9: 'Mechanisch',
+    10: 'Nicht spezifiziert',
+    11: 'Totem',
+    12: 'Haustier',
+    13: 'Gaswolke'
 };
 
 var g_pet_families = {

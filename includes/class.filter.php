@@ -228,7 +228,7 @@ abstract class Filter
     // if called with POST-data, convert to GET request and call self
     private function redirect($get)
     {
-        header('Location: http://'.$_SERVER['SERVER_NAME'].str_replace('index.php', '', $_SERVER['PHP_SELF']).'?'.$_SERVER['QUERY_STRING'].'='.$get);
+        header('Location: '.STATIC_URL.'?'.$_SERVER['QUERY_STRING'].'='.$get);
     }
 
     // TODO: wrong wrong wrong!!

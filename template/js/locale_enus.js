@@ -1250,6 +1250,7 @@ var g_npc_classifications = {
 };
 
 var g_npc_types = {
+     0: 'Uncategorized',
      1: 'Beast',
      8: 'Critter',
      3: 'Demon',
@@ -1257,9 +1258,12 @@ var g_npc_types = {
      2: 'Dragonkin',
      5: 'Giant',
      7: 'Humanoid',
-     9: 'Mechanical',
      6: 'Undead',
-    10: 'Uncategorized'
+     9: 'Mechanical',
+    10: 'Not specified',
+    11: 'Totem',
+    12: 'Non-combat Pet',
+    13: 'Gas Cloud'
 };
 
 var g_pet_families = {

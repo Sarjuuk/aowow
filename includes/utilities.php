@@ -321,8 +321,9 @@ class Lang
     public static $event;
     public static $item;
     public static $itemset;
-    public static $pet;
     public static $maps;
+    public static $npc;
+    public static $pet;
     public static $spell;
     public static $talent;
     public static $title;
@@ -332,7 +333,7 @@ class Lang
 
     public static function load($loc)
     {
-        if (@(require 'localization/locale_'.$loc.'.php') !== 1)
+        if ((require 'localization/locale_'.$loc.'.php') !== 1)
             die('File for localization '.$loc.' not found.');
 
         foreach ($lang as $k => $v)
@@ -530,8 +531,7 @@ class SmartyAoWoW extends Smarty
             'tab'        => null,                           // [int] # of tab to highlight in the menu
             'type'       => null,                           // [int] numCode for spell, npc, object, ect
             'typeId'     => null,                           // [int] entry to display
-            'path'       => '[]',                           // [string] (js:array) path to preselect in the menu
-            'gStaticUrl' => substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1)
+            'path'       => '[]'                            // [string] (js:array) path to preselect in the menu
         );
     }
 
@@ -1329,10 +1329,10 @@ class Util
     );
 
     public static $bgImagePath              = array (
-        'tiny'   => 'style="background-image: url(images/icons/tiny/%s.gif)"',
-        'small'  => 'style="background-image: url(images/icons/small/%s.jpg)"',
-        'medium' => 'style="background-image: url(images/icons/medium/%s.jpg)"',
-        'large'  => 'style="background-image: url(images/icons/large/%s.jpg)"',
+        'tiny'   => 'style="background-image: url(%s/images/icons/tiny/%s.gif)"',
+        'small'  => 'style="background-image: url(%s/images/icons/small/%s.jpg)"',
+        'medium' => 'style="background-image: url(%s/images/icons/medium/%s.jpg)"',
+        'large'  => 'style="background-image: url(%s/images/icons/large/%s.jpg)"',
     );
 
     private static $execTime = 0.0;

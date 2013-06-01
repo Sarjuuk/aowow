@@ -1204,16 +1204,20 @@ var g_npc_classifications = {
 };
 
 var g_npc_types = {
+     0: 'Non classés',
      1: 'Bête',
-     8: 'Bestiole',
+     2: 'Draconien',
      3: 'Démon',
      4: 'Élémentaire',
-     2: 'Draconien',
      5: 'Géant',
-     7: 'Humanoïde',
-     9: 'Mécanique',
      6: 'Mort-vivant',
-    10: 'Non classés'
+     7: 'Humanoïde',
+     8: 'Bestiole',
+     9: 'Mécanique',
+    10: 'Non spécifié',
+    11: 'Totem',
+    12: 'Familier pacifique',
+    13: 'Nuage de gaz'
 };
 
 var g_pet_families = {

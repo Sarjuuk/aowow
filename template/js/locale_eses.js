@@ -1204,16 +1204,20 @@ var g_npc_classifications = {
 };
 
 var g_npc_types = {
+     0: 'Sin categoría',
      1: 'Bestia',
-     8: 'Alimaña',
+     2: 'Dragonante',
      3: 'Demonio',
      4: 'Elemental',
-     2: 'Dragonante',
      5: 'Gigante',
-     7: 'Humanoide',
-     9: 'Mecánico',
      6: 'No-muerto',
-    10: 'Sin categoría'
+     7: 'Humanoide',
+     8: 'Alimaña',
+     9: 'Mecánico',
+    10: 'Sin especificar',
+    11: 'Tótem',
+    12: 'Mascota mansa',
+    13: 'Nube de gas'
 };
 
 var g_pet_families = {

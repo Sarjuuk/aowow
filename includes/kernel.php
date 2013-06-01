@@ -12,6 +12,8 @@ require 'config/config.php';
 $e = !!$AoWoWconf['debug'] ? (E_ALL & ~(E_DEPRECATED|E_USER_DEPRECATED|E_STRICT)) : 0;
 error_reporting($e);
 
+define('STATIC_URL', substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));
+
 require 'includes/Smarty-2.6.26/libs/Smarty.class.php';     // Libraray: http://www.smarty.net/
 require 'includes/DbSimple/Generic.php';                    // Libraray: http://en.dklab.ru/lib/DbSimple
 require 'includes/utilities.php';

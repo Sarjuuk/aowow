@@ -446,7 +446,7 @@ class ItemList extends BaseType
             $pop       = array_pop($enhance['gems']);
             $col       = $pop ? 1 : 0;
             $hasMatch &= $pop ? (($gems[$pop]['colorMask'] & (1 << $colorId)) ? 1 : 0) : 0;
-            $icon      = $pop ? sprintf(Util::$bgImagePath['tiny'], strtolower($gems[$pop]['icon'])) : null;
+            $icon      = $pop ? sprintf(Util::$bgImagePath['tiny'], STATIC_URL, strtolower($gems[$pop]['icon'])) : null;
             $text      = $pop ? Util::localizedString($gems[$pop], 'text') : Lang::$item['socket'][$colorId];
 
             if ($interactive)
@@ -460,7 +460,7 @@ class ItemList extends BaseType
         {
             $pop  = array_pop($enhance['gems']);
             $col  = $pop ? 1 : 0;
-            $icon = $pop ? sprintf(Util::$bgImagePath['tiny'], strtolower($gems[$pop]['icon'])) : null;
+            $icon = $pop ? sprintf(Util::$bgImagePath['tiny'], STATIC_URL, strtolower($gems[$pop]['icon'])) : null;
             $text = $pop ? Util::localizedString($gems[$pop], 'text') : Lang::$item['socket'][-1];
 
             if ($interactive)
@@ -611,7 +611,7 @@ class ItemList extends BaseType
 
             if ($itemset['skillId'])                        // bonus requires skill to activate
             {
-                $name  = DB::Aowow()->selectRow('SELECT * FROM ?_skill WHERE skillId=?d', $itemset['skillId']);
+                $name  = DB::Aowow()->selectRow('SELECT * FROM ?_skillline WHERE Id=?d', $itemset['skillId']);
                 $xSet .= '<br />'.sprintf(Lang::$game['requires'], '<a href="?skills='.$itemset['skillId'].'" class="q1">'.Util::localizedString($name, 'name').'</a>');
 
                 if ($itemset['skillLevel'])
