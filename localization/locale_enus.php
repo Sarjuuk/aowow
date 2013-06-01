@@ -396,8 +396,8 @@ $lang = array(
         )
     ),
     'item' => array(
-        'armor'         => "Armor",
-        'block'         => "Block",
+        'armor'         => "%s Armor",
+        'block'         => "%s Block",
         'charges'       => "Charges",
         'expend'        => "expendable",
         'locked'        => "Locked",

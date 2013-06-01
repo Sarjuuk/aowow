@@ -353,8 +353,8 @@ $lang = array(
         )
     ),
     'item' => array(
-        'armor'         => "Броня",
-        'block'         => "Блок",
+        'armor'         => "Броня: %s",
+        'block'         => "Блок: %s",
         'charges'       => "зарядов",
         'expend'        => "expendable",
         'locked'        => "Заперт",

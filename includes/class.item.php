@@ -349,13 +349,13 @@ class ItemList extends BaseType
 
         // Armor
         if ($this->curTpl['class'] == ITEM_CLASS_ARMOR && $this->curTpl['ArmorDamageModifier'] > 0)
-            $x .= '<span class="q2"><!--addamr'.$this->curTpl['ArmorDamageModifier'].'--><span>'.($this->curTpl['armor'] + $this->curTpl['ArmorDamageModifier']).' '.Lang::$item['armor'].'</span></span><br />';
+            $x .= '<span class="q2"><!--addamr'.$this->curTpl['ArmorDamageModifier'].'--><span>'.sprintf(Lang::$item['armor'], $this->curTpl['armor'] + $this->curTpl['ArmorDamageModifier']).'</span></span><br />';
         else if ($this->curTpl['armor'])
-            $x .= '<span><!--amr-->'.$this->curTpl['armor'].' '.Lang::$item['armor'].'</span><br />';
+            $x .= '<span><!--amr-->'.sprintf(Lang::$item['armor'], $this->curTpl['armor']).'</span><br />';
 
         // Block
         if ($this->curTpl['block'])
-            $x .= '<span>'.$this->curTpl['block'].' '.Lang::$item['block'].'</span><br />';
+            $x .= '<span>'.sprintf(Lang::$item['block'], $this->curTpl['block']).'</span><br />';
 
         // Item is a gem (don't mix with sockets)
         if ($this->curTpl['GemProperties'])

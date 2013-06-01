@@ -354,8 +354,8 @@ $lang = array(
         )
     ),
     'item' => array(
-        'armor'         => "armadura",
-        'block'         => "bloqueo",
+        'armor'         => "%s armadura",
+        'block'         => "%s bloqueo",
         'charges'       => "cargas",
         'expend'        => "[expendable]",  // drop this shit
         'locked'        => "Cerrado",

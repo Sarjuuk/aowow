@@ -353,8 +353,8 @@ $lang = array(
         )
     ),
     'item' => array(
-        'armor'         => "Armure",
-        'block'         => "Bloquer",
+        'armor'         => "Armure : %s",
+        'block'         => "Bloquer : %s",
         'charges'       => "Charges",
         'expend'        => "expendable",
         'locked'        => "Verrouillé",
@@ -474,7 +474,7 @@ $lang = array(
             "Stat Inutilisée #%d (%d)",
         )
     ),
-    'colon'         => ' : '
+    'colon'         => ' : '
 );
 
 ?>
