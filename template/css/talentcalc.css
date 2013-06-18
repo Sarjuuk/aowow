@@ -1,403 +1,400 @@
 .talentcalc-sidebar-anchor {
-position:relative;
+    position:relative;
 }
 
 .talentcalc-sidebar {
-position:absolute;
-top:0;
-padding:10px;
-background-color:#141414;
+    position:absolute;
+    top:0;
+    padding:10px;
+    background-color:#141414;
 }
 
 .talentcalc-sidebar-inner {
-width:300px;
+    width:300px;
 }
 
 .talentcalc-sidebar-controls {
-padding-bottom:10px;
+    padding-bottom:10px;
 }
 
-a.talentcalc-button-help,.talentcalc-sidebar-controls a {
-display:block;
-padding:2px 0 2px 20px;
-margin-right:10px;
-background:no-repeat left center;
+a.talentcalc-button-help, .talentcalc-sidebar-controls a {
+    display:block;
+    padding:2px 0 2px 20px;
+    margin-right:10px;
+    background:no-repeat left center;
 }
 
 a.talentcalc-button-help {
-position:absolute;
-right:10px;
-top:10px;
-margin:0;
-background-image:url(../images/help.gif);
+    position:absolute;
+    right:10px;
+    top:10px;
+    margin:0;
+    background-image:url(../images/help.gif);
 }
 
 a.talentcalc-button-lock {
-float:left;
-background-image:url(../images/locked.gif);
+    float:left;
+    background-image:url(../images/locked.gif);
 }
 
 a.talentcalc-button-unlock {
-float:left;
-background-image:url(../images/unlocked.gif);
+    float:left;
+    background-image:url(../images/unlocked.gif);
 }
 
 a.talentcalc-button-reset {
-float:left;
-padding-left:19px;
-background-image:url(../images/delete.gif);
+    float:left;
+    padding-left:19px;
+    background-image:url(../images/delete.gif);
 }
 
 .talentcalc-sidebar-controls2 a {
-margin-right:10px;
-float:left;
-padding:2px 0;
-background:no-repeat left center;
+    margin-right:10px;
+    float:left;
+    padding:2px 0;
+    background:no-repeat left center;
 }
 
 a.talentcalc-button-export {
-padding-left:19px;
-background-image:url(../images/link.gif);
+    padding-left:19px;
+    background-image:url(../images/link.gif);
 }
 
 a.talentcalc-button-summary {
-padding-left:19px;
-background-image:url(../images/print.gif);
+    padding-left:19px;
+    background-image:url(../images/print.gif);
 }
 
 .talentcalc-sidebar h3 {
-font-size:14px;
-margin:1.5em 0 .5em;
-padding:0;
+    font-size:14px;
+    margin:1.5em 0 .5em;
+    padding:0;
 }
 
 .talentcalc-sidebar h3.first {
-margin-top:0;
+    margin-top:0;
 }
 
 .talentcalc-sidebar h3 a {
-font-size:11px;
-margin-left:6px;
+    font-size:11px;
+    margin-left:6px;
 }
 
-.talentcalc-sidebar-majorglyphs,.talentcalc-sidebar-minorglyphs {
-float:left;
-width:150px;
-font-size:11px;
+.talentcalc-sidebar-majorglyphs, .talentcalc-sidebar-minorglyphs {
+    float:left;
+    width:150px;
+    font-size:11px;
 }
 
 .talentcalc-sidebar .icontab td {
-width:103px;
+    width:103px;
 }
 
 .talentcalc-sidebar .icontab a {
-text-decoration:none;
+    text-decoration:none;
 }
 
 .talentcalc-upper {
-background-color:#141414;
-margin-bottom:5px;
+    background-color:#141414;
+    margin-bottom:5px;
+    padding:6px 8px;
+    font-size:14px;
 }
 
-.talentcalc-upper-inner {
-padding:6px 8px;
-font-size:14px;
+.talentcalc-upper span {
+    color:#DDD;
 }
 
-.talentcalc-upper-inner span {
-color:#DDD;
-}
-
-.talentcalc-upper-inner b {
-color:white;
+.talentcalc-upper b {
+    color:white;
 }
 
 .talentcalc-upper-class {
-float:left;
+    float:left;
 }
 
 .talentcalc-upper-class a {
-text-decoration:none;
+    text-decoration:none;
 }
 
 .talentcalc-upper-class a:hover {
-text-decoration:underline;
+    text-decoration:underline;
 }
 
 .talentcalc-upper-reqlevel {
-float:right;
+    float:right;
 }
 
 .talentcalc-upper-ptsleft {
-margin-left:60px;
-float:right;
+    margin-left:60px;
+    float:right;
 }
 
 .talentcalc-upper-ptsleft a {
-font-size:11px;
-font-weight:bold;
-margin-left:6px;
+    font-size:11px;
+    font-weight:bold;
+    margin-left:6px;
 }
 
 .talentcalc-main {
-background-color:black;
-border:1px solid #404040;
+    background-color:black;
+    border:1px solid #404040;
 }
 
 .talentcalc-default .talentcalc-main {
-width:614px;
-height:554px;
+    width:614px;
+    height:554px;
 }
 
 .talentcalc-pet .talentcalc-main {
-width:244px;
-height:364px;
-margin-left: 370px;
-/* background: url(../../../images/talent/pet-tree-glow.png); */
+    width:244px;
+    height:364px;
+    margin-left: 370px;
+    /* background: url(../../images/talent/pet-tree-glow.png); */
 }
 
 .talentcalc-main table {
-border-collapse:collapse;
-margin:2px;
+    border-collapse:collapse;
+    margin:2px;
 }
 
 .talentcalc-main table td {
-padding:0;
+    padding:0;
 }
 
 .talentcalc-default table td {
-width:50px;
-height:50px;
+    width:50px;
+    height:50px;
 }
 
 .talentcalc-pet table td {
-width:60px;
-height:60px;
+    width:60px;
+    height:60px;
 }
 
 .iconmedium div.icon-border {
-position:absolute;
-z-index:15;
-left:1px;
-top:1px;
-width:42px;
-height:42px;
-background:url(../../../images/talent/border.gif) no-repeat;
+    position:absolute;
+    z-index:15;
+    left:1px;
+    top:1px;
+    width:42px;
+    height:42px;
+    background:url(../../images/talent/border.gif) no-repeat;
 }
 
 .iconmedium div.icon-bubble {
-position:absolute;
-z-index:16;
-width:22px;
-height:23px;
-left:30px;
-top:29px;
-background:url(../../../images/talent/bubble2.png) no-repeat;
-visibility:hidden;
-padding:4px 0 0;
-font-family:Verdana,sans-serif;
-font-size:12px;
-text-align:center;
-cursor:default;
+    position:absolute;
+    z-index:16;
+    width:22px;
+    height:23px;
+    left:30px;
+    top:29px;
+    background:url(../../images/talent/bubble2.png) no-repeat;
+    visibility:hidden;
+    padding:4px 0 0;
+    font-family:Verdana,sans-serif;
+    font-size:12px;
+    text-align:center;
+    cursor:default;
 }
 
 .iconmedium a.bubbly {
-background-image:url(../../../images/talent/hilite_medium_talent.png);
+    background-image:url(../../images/talent/hilite_medium_talent.png);
 }
 
 .talentcalc-arrow-anchor {
-position:relative;
-z-index:30;
+    position:relative;
+    z-index:30;
 }
 
 .talentcalc-arrow {
-position:absolute;
-z-index:30;
+    position:absolute;
+    z-index:30;
 }
 
 .talentcalc-arrow table {
-width:100%;
-height:100%;
-border-collapse:collapse;
+    width:100%;
+    height:100%;
+    border-collapse:collapse;
 }
 
-.talentcalc-arrow table td,.talentcalc-arrow table th {
-font-size:1px;
-width:auto;
-height:auto;
+.talentcalc-arrow table td, .talentcalc-arrow table th {
+    font-size:1px;
+    width:auto;
+    height:auto;
 }
 
 .talentcalc-arrow-leftdown td {
-background-image:url(../../../images/talent/arrows/leftdown.png);
+    background-image:url(../../images/talent/arrows/leftdown.png);
 }
 
 .talentcalc-arrow-leftdown2 td {
-background-image:url(../../../images/talent/arrows/leftdown2.png);
+    background-image:url(../../images/talent/arrows/leftdown2.png);
 }
 
 .talentcalc-arrow-rightdown td {
-background-image:url(../../../images/talent/arrows/rightdown.png);
+    background-image:url(../../images/talent/arrows/rightdown.png);
 }
 
 .talentcalc-arrow-rightdown2 td {
-background-image:url(../../../images/talent/arrows/rightdown2.png);
+    background-image:url(../../images/talent/arrows/rightdown2.png);
 }
 
 .talentcalc-arrow-right td {
-background-image:url(../../../images/talent/arrows/right.png);
+    background-image:url(../../images/talent/arrows/right.png);
 }
 
 .talentcalc-arrow-right2 td {
-background-image:url(../../../images/talent/arrows/right2.png);
+    background-image:url(../../images/talent/arrows/right2.png);
 }
 
 .talentcalc-arrow-left td {
-background-image:url(../../../images/talent/arrows/left.png);
+    background-image:url(../../images/talent/arrows/left.png);
 }
 
 .talentcalc-arrow-left2 td {
-background-image:url(../../../images/talent/arrows/left2.png);
+    background-image:url(../../images/talent/arrows/left2.png);
 }
 
 .talentcalc-lower {
-position:relative;
-height:24px;
-margin-top:5px;
+    position:relative;
+    height:24px;
+    margin-top:5px;
 }
 
 .talentcalc-pet .talentcalc-lower {
-width:244px;
-margin-left:185px;
+    width:244px;
+    margin-left:185px;
 }
 
-.talentcalc-lower-tree1,.talentcalc-lower-tree2,.talentcalc-lower-tree3 {
-position:absolute;
-top:0;
+.talentcalc-lower-tree1, .talentcalc-lower-tree2, .talentcalc-lower-tree3 {
+    position:absolute;
+    top:0;
 }
 
-.talentcalc-default .talentcalc-lower-tree1,.talentcalc-default .talentcalc-lower-tree2,.talentcalc-default .talentcalc-lower-tree3 {
-width:204px;
+.talentcalc-default .talentcalc-lower-tree1, .talentcalc-default .talentcalc-lower-tree2, .talentcalc-default .talentcalc-lower-tree3 {
+    width:204px;
 }
 
-.talentcalc-pet .talentcalc-lower-tree1,.talentcalc-pet .talentcalc-lower-tree2,.talentcalc-pet .talentcalc-lower-tree3 {
-margin-left:185px;
-width:244px;
+.talentcalc-pet .talentcalc-lower-tree1, .talentcalc-pet .talentcalc-lower-tree2, .talentcalc-pet .talentcalc-lower-tree3 {
+    margin-left:185px;
+    width:244px;
 }
 
 .talentcalc-lower-tree1 {
-left:1px;
+    left:1px;
 }
 
 .talentcalc-lower-tree2 {
-left:206px;
+    left:206px;
 }
 
 .talentcalc-lower-tree3 {
-left:411px;
+    left:411px;
 }
 
 .talentcalc-lower p {
-background-color:#141414;
-height:24px;
-line-height:24px;
-overflow:hidden;
-padding:0;
-margin:0 auto;
-text-align:center;
+    background-color:#141414;
+    height:24px;
+    line-height:24px;
+    overflow:hidden;
+    padding:0;
+    margin:0 auto;
+    text-align:center;
 }
 
 .talentcalc-default .talentcalc-lower p {
-width:200px;
+    width:200px;
 }
 
 .talentcalc-pet .talentcalc-lower p {
-width:238px;
+    width:238px;
 }
 
 .talentcalc-lower b {
-font-size:13px;
-background:left center no-repeat;
-padding:4px 0 4px 28px;
+    font-size:13px;
+    background:left center no-repeat;
+    padding:4px 0 4px 28px;
 }
 
 .talentcalc-pet .talentcalc-lower b {
-padding-left:0;
+    padding-left:0;
 }
 
 .talentcalc-lower span {
-font-size:11px;
-color:#DDD;
+    font-size:11px;
+    color:#DDD;
 }
 
 .talentcalc-lower a {
-display:block;
-position:absolute;
-right:2px;
-top:2px;
-width:20px;
-height:20px;
-opacity:.3333;
-background:url(../images/delete.gif) no-repeat 2px 2px;
+    display:block;
+    position:absolute;
+    right:2px;
+    top:2px;
+    width:20px;
+    height:20px;
+    opacity:.3333;
+    background:url(../images/delete.gif) no-repeat 2px 2px;
 }
 
 .talentcalc-lower a:hover {
-opacity:1;
+    opacity:1;
 }
 
 .talentcalc-glyphpicker {
-font-size:13px;
-width:780px;
-height:554px;
-background-color:#303030;
-border:10px solid #303030;
-border-bottom:0;
+    font-size:13px;
+    width:780px;
+    height:554px;
+    background-color:#303030;
+    border:10px solid #303030;
+    border-bottom:0;
 }
 
 .talentcalc-glyphpicker .listview {
-border:0;
+    border:0;
 }
 
 .talentcalc-glyphpicker .listview-band-top {
-background-color:#303030;
-height:15px;
+    background-color:#303030;
+    height:15px;
 }
 
-.talentcalc,.talentcalc-main table td .iconmedium {
-margin:0 auto;
+.talentcalc, .talentcalc-main table td .iconmedium {
+    margin:0 auto;
 }
 
-.talentcalc-default,.talentcalc-pet {
-width:946px;
+.talentcalc-default, .talentcalc-pet {
+    width:946px;
 }
 
-.talentcalc-default .talentcalc-sidebar,.talentcalc-pet .talentcalc-sidebar {
-left:621px;
+.talentcalc-default .talentcalc-sidebar, .talentcalc-pet .talentcalc-sidebar {
+    left:621px;
 }
 
-.talentcalc-default .talentcalc-upper,.talentcalc-pet .talentcalc-upper,.talentcalc-default .talentcalc-lower {
-width:616px;
+.talentcalc-default .talentcalc-upper, .talentcalc-pet .talentcalc-upper, .talentcalc-default .talentcalc-lower {
+    width:600px;
 }
 
-.talentcalc-arrow-down td,.talentcalc-arrow-leftdown th,.talentcalc-arrow-rightdown th {
-background-image:url(../../../images/talent/arrows/down.png);
+.talentcalc-arrow-down td, .talentcalc-arrow-leftdown th, .talentcalc-arrow-rightdown th {
+    background-image:url(../../images/talent/arrows/down.png);
 }
 
-.talentcalc-arrow-down2 td,.talentcalc-arrow-leftdown2 th,.talentcalc-arrow-rightdown2 th {
-background-image:url(../../../images/talent/arrows/down2.png);
+.talentcalc-arrow-down2 td, .talentcalc-arrow-leftdown2 th, .talentcalc-arrow-rightdown2 th {
+    background-image:url(../../images/talent/arrows/down2.png);
 }
 
 .talentcalc-wrapper {
-	float: left;
-	width: 614px; /* fixes IE7 being dumb and moving down the glyph window */
+    float: left;
+    width: 614px; /* fixes IE7 being dumb and moving down the glyph window */
     position: relative;
 }
 
 .talentcalc-model {
-	background-color: #141414;
-	border: 1px solid #404040;
-	width: 368px;
-	height: 364px;
-	float: left;
+    background-color: #141414;
+    border: 1px solid #404040;
+    width: 368px;
+    height: 364px;
+    float: left;
     position: absolute;
     top: 33px;
 }

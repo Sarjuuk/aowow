@@ -40,5 +40,6 @@
             permissions:{$user.perms}
             {if isset($user.chars)}, characters: {$user.chars} {/if}
             {if isset($user.profiles)}, profiles: {$user.profiles}{/if}
+            {if isset($user.weights)}, weightscales: {$user.weights}{/if}
        {/strip} {rdelim};
     </script>

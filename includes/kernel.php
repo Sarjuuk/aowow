@@ -83,14 +83,4 @@ User::assignUserToTemplate($smarty, true);
 @list($pageCall, $pageParam) = explode('=', $str, 2);
 $smarty->assign('query', [$pageCall, $pageParam]);
 
-// init global vars for smarty
-$pageData = array(
-    'page'          => NULL,
-    'gAchievements' => NULL,
-    'gCurrencies'   => NULL,
-    'gItems'        => NULL,
-    'gSpells'       => NULL,
-    'gTitles'       => NULL,
-);
-
 ?>

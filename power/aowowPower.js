@@ -174,7 +174,7 @@ if (typeof $WowheadPower == "undefined") {
 
 			currentParams = params;
 
-			var p = function (m, k, v) {
+			var p = function (url, k, v) {
                 if (k == "buff" || k == "sock") {
                     params[k] = true;
                 }
@@ -238,7 +238,7 @@ if (typeof $WowheadPower == "undefined") {
 					if (parseInt(params.gems[i])) {
 						break;
 					}
-				};
+				}
                 ++i;
 
 				if (i == 0) {
@@ -335,7 +335,7 @@ if (typeof $WowheadPower == "undefined") {
 		}
 
 		function getTooltipField(locale) {
-			return (currentParams && currentParams.buff ? "buff_": "tooltip_") + LOCALES[locale];
+			return (currentParams && currentParams.buff ? "buff_" : "tooltip_") + LOCALES[locale];
 		}
 
 		function initElement(type, id, locale) {
@@ -371,14 +371,12 @@ if (typeof $WowheadPower == "undefined") {
 			if (arr[fullId].status[locale] == STATUS_OK || arr[fullId].status[locale] == STATUS_NOTFOUND) {
 				showTooltip(arr[fullId][getTooltipField(locale)], arr[fullId].icon);
 			}
+            else if (arr[fullId].status[locale] == STATUS_QUERYING) {
+                showTooltip(_LANG.loading);
+            }
             else {
-				if (arr[fullId].status[locale] == STATUS_QUERYING) {
-					showTooltip(_LANG.loading);
-				}
-                else {
-					request(type, id, locale, null, params);
-				}
-			}
+                request(type, id, locale, null, params);
+            }
 		}
 
 		function request(type, id, locale, stealth, params) {
@@ -406,13 +404,11 @@ if (typeof $WowheadPower == "undefined") {
 				if (typeof params[i] == "object") {
 					p += "&" + i + "=" + params[i].join(":");
 				}
+                else if (i == "sock") {
+                    p += "&sock";
+                }
                 else {
-					if (i == "sock") {
-						p += "&sock";
-					}
-                    else {
-						p += "&" + i + "=" + params[i];
-					}
+                    p += "&" + i + "=" + params[i];
 				}
 			}
 
@@ -438,7 +434,7 @@ if (typeof $WowheadPower == "undefined") {
 				if (currentParams != null) {
 					if (currentParams.pcs && currentParams.pcs.length) {
 						var n = 0;
-						for (var i = 0, al = currentParams.pcs.length; i < al; ++i) {
+						for (var i = 0, len = currentParams.pcs.length; i < len; ++i) {
 							var ak;
 							if (ak = html.match(new RegExp("<span><!--si([0-9]+:)*" + currentParams.pcs[i] + '(:[0-9]+)*--><a href="\\?item=(\\d+)">(.+?)</a></span>'))) {
 								html = html.replace(ak[0], '<span class="q8"><!--si' + currentParams.pcs[i] + '--><a href="?item=' + ak[3] + '">' + (($WH.isset("g_items") && g_items[currentParams.pcs[i]]) ? g_items[currentParams.pcs[i]]["name_" + LOCALES[currentLocale]] : ak[4]) + "</a></span>");

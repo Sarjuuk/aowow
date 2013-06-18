@@ -6,412 +6,189 @@
     font-size: 13px;
 }
 
-.wowhead-tooltip
-{
-	visibility: hidden;
-	z-index: 100000006;
-}
-
-.wowhead-tooltip a
-{
-	text-decoration: none;
-}
-
-.wowhead-tooltip a:hover
-{
-	text-decoration: underline;
-}
-
-.wowhead-tooltip table
-{
-	border-spacing: 0;
-	border-collapse: collapse;
-	margin: 0;
-	/* width: auto; */
-}
-
-.wowhead-tooltip table, .wowhead-tooltip td, .wowhead-tooltip th, .wowhead-tooltip tbody
-{
-	border: 0 !important;
-}
-
-.wowhead-tooltip td, .wowhead-tooltip th
-{
-	background: url(../images/tooltip.png);
-	font-family: Verdana, sans-serif;
-	font-size: 12px;
-	line-height: 17px;
-	color: white;
-}
-
-.wowhead-tooltip th
-{
-	height: auto;
-	padding: 3px;
-	vertical-align: top;
-}
-
-.wowhead-tooltip td
-{
-	padding: 8px 4px 1px 9px;
-	text-align: left;
-	vertical-align: top;
-}
-
-.wowhead-tooltip b
-{
-	font-size: 14px;
-	line-height: 19px;
-	font-weight: normal;
-}
-
-.wowhead-tooltip div.indent
-{
-	padding-left: .6em;
-}
-
-.wowhead-tooltip td th, .wowhead-tooltip td td
-{
-	background: none;
-}
-
-.wowhead-tooltip td th
-{
-	padding: 0 0 0 4em;
-	text-align: right;
-	font-weight: normal;
-}
-
-.wowhead-tooltip td td
-{
-	padding: 0;
-	text-align: left;
-}
-
-.wowhead-tooltip p
-{
-	position: absolute;
-	left: -44px;
-	top: -1px;
-	width: 44px;
-	height: 44px;
-	background: 4px 4px no-repeat;
-	margin: 0;
-	padding: 0;
-}
-
-.wowhead-tooltip p div
-{
-	width: 44px;
-	height: 44px;
-	background-image: url(../../images/icons/border_medium.png);
-}
-
-.wowhead-tooltip table.shrink b
-{
-	font-size: 12px;
-	line-height: 15px;
-}
-
-.wowhead-tooltip table.shrink td, .wowhead-tooltip table.shrink th
-{
-	font-size: 10px;
-	line-height: 14px;
-}
-
-.wowhead-tooltip-powered
-{
-	/* background: url(../../../images/powered.png) no-repeat; */
-	width: 53px;
-	height: 33px;
-	position: absolute;
-	right: -56px;
-	top: 2px;
-	display: none;
-}
-
-a.moneyitem, a.moneysocketmeta, a.moneysocketred, a.moneysocketyellow, a.moneysocketblue, a.moneysocketprismatic
-{
-	text-decoration: none !important;
-	border-bottom: 1px solid transparent;
-}
-
-a.moneyitem:hover, a.moneysocketmeta:hover, a.moneysocketred:hover, a.moneysocketyellow:hover, a.moneysocketblue:hover, a.moneysocketprismatic:hover
-{
-	border-bottom: 1px solid white;
-}
-
-.moneyitem, .moneygold, .moneysilver, .moneycopper, .moneyalliance, .moneyhorde, .moneyarena, .moneyachievement, .moneysocketmeta, .moneysocketred, .moneysocketyellow, .moneysocketblue, .moneysocketprismatic
-{
-	color: white;
-	background: no-repeat right center;
-}
-
-.moneyitem
-{
-	padding-right: 18px;
-}
-
-.moneygold
-{
-	padding-right: 15px;
-	background-image: url(../../images/icons/money_gold.gif);
-}
-
-.moneysilver
-{
-	padding-right: 15px;
-	background-image: url(../../images/icons/money_silver.gif);
-}
-
-.moneycopper
-{
-	padding-right: 15px;
-	background-image: url(../../images/icons/money_copper.gif);
-}
-
-.moneyalliance
-{
-	padding-right: 12px;
-	background-image: url(../../images/icons/alliance-icon.gif);
-}
-
-.moneyhorde
-{
-	padding-right: 17px;
-	background-image: url(../../images/icons/horde-icon.gif);
-}
-
-.moneyarena
-{
-	padding-right: 18px;
-	background-image: url(../../images/icons/money_arena.gif);
-}
-
-.moneyachievement
-{
-	padding-right: 13px;
-	background-image: url(../../images/icons/money_achievement.gif);
-}
-
-.moneysocketmeta
-{
-	padding-right: 18px;
-	background-image: url(../../images/sockets/socket_meta.gif);
-}
-
-.moneysocketred
-{
-	padding-right: 18px;
-	background-image: url(../../images/sockets/socket_red.gif);
-}
-
-.moneysocketyellow
-{
-	padding-right: 18px;
-	background-image: url(../../images/sockets/socket_yellow.gif);
-}
-
-.moneysocketblue
-{
-	padding-right: 18px;
-	background-image: url(../../images/sockets/socket_blue.gif);
-}
-
-.moneysocketprismatic
-{
-	padding-right: 18px;
-	background-image: url(../../images/sockets/socket_prismatic.gif);
-}
-
-.gem1{
-	color: #9D9D9D !important;
-}
-
-.gem2{
-	color: #e60c0b !important;
-}
-
-.gem4{
-	color: #ffff35 !important;
-}
-
-.gem6{
-	color: #f48905 !important;
-}
-
-.gem8{
-	color: #295df1 !important;
-}
-
-.gem10{
-	color: #b957fc !important;
-}
-
-.gem12{
-	color: #22c516 !important;
-}
-
-.gem14{
-	color: #FFF !important;
-}
-
-.q
-{
-	color: #ffd100 !important;
-}
-
-.q0, .q0 a
-{
-	color: #9d9d9d !important;
-}
-
-.q1, .q1 a
-{
-	color: #fff !important;
-}
-
-.q2, .q2 a
-{
-	color: #1eff00 !important;
-}
-
-.q3, .q3 a
-{
-	color: #0070dd !important;
-}
-
-.q4, .q4 a
-{
-	color: #a335ee !important;
-}
-
-.q5, .q5 a
-{
-	color: #ff8000 !important;
-}
-
-.q6, .q6 a
-{
-	color: #e5cc80 !important;
-}
-
-.q7, .q7 a
-{
-	color: #e5cc80 !important;
-}
-
-.q8, .q8 a
-{
-	color: #ffff98 !important;
-}
-
-.q9, .q9 a
-{
-	color: #71d5ff !important;
-}
-
-.q10, .q10 a
-{
-	color: #f00 !important;
-}
-
-.r1
-{
-	color: #FF8040 !important;
-}
-
-.r2
-{
-	color: #FF0 !important;
-}
-
-.r3
-{
-	color: #40BF40 !important;
-}
-
-.r4
-{
-	color: #808080 !important;
-}
-
-.c1, .c1 a
-{
-	color: #C69B6D !important;
-}
-
-.c2, .c2 a
-{
-	color: #F48CBA !important;
-}
-
-.c3, .c3 a
-{
-	color: #AAD372 !important;
-}
-
-.c4, .c4 a
-{
-	color: #FFF468 !important;
-}
-
-.c5, .c5 a
-{
-	color: #FFF !important;
-}
-
-.c6, .c6 a
-{
-	color: #C41E3B !important;
-}
-
-.c7, .c7 a
-{
-	color: #2359FF !important;
-}
-
-.c8, .c8 a
-{
-	color: #68CCEF !important;
-}
-
-.c9, .c9 a
-{
-	color: #9382C9 !important;
-}
-
-.c11, .c11 a
-{
-	color: #FF7C0A !important;
-}
-
-.socket-meta
-{
-	padding-left: 26px;
-	background: url(../../images/sockets/socket_meta.gif) no-repeat left center;
-}
-
-.socket-red
-{
-	padding-left: 26px;
-	background: url(../../images/sockets/socket_red.gif) no-repeat left center;
-}
-
-.socket-yellow
-{
-	padding-left: 26px;
-	background: url(../../images/sockets/socket_yellow.gif) no-repeat left center;
-}
-
-.socket-blue
-{
-	padding-left: 26px;
-	background: url(../../images/sockets/socket_blue.gif) no-repeat left center;
-}
-
-.socket-prismatic
-{
-	padding-left: 26px;
-	background: url(../../images/sockets/socket_prismatic.gif) no-repeat left center;
+.wowhead-tooltip         { visibility: hidden; z-index: 100000006; overflow: visible !important; }
+.wowhead-tooltip a       { text-decoration: none; }
+.wowhead-tooltip a:hover { text-decoration: underline; }
+
+.wowhead-tooltip table { border-spacing: 0; border-collapse: collapse; margin: 0; width: auto; } /*maybe remove width:auto*/
+.wowhead-tooltip table, .wowhead-tooltip td, .wowhead-tooltip th, .wowhead-tooltip tbody { border: 0 !important; }
+.wowhead-tooltip td table td table { width: 100% }
+.wowhead-tooltip td, .wowhead-tooltip th { background: url(../images/tooltip.png); font-family: Verdana, sans-serif; font-size: 12px; line-height: 17px; color: white; }
+
+.wowhead-tooltip th { height: auto; padding: 3px; vertical-align: top; }
+.wowhead-tooltip td { padding: 8px 4px 1px 9px; text-align: left; vertical-align: top; }
+.wowhead-tooltip b  { font-size: 14px; line-height: 19px; font-weight: normal; }
+
+.wowhead-tooltip div.indent { padding-left: .6em; }
+.wowhead-tooltip td th, .wowhead-tooltip td td { background: none; }
+.wowhead-tooltip td th { padding: 0 0 0 4em; text-align: right; font-weight: normal; }
+.wowhead-tooltip td td { padding: 0; text-align: left; }
+
+.wowhead-tooltip p     { position: absolute; left: -44px; top: -1px; width: 44px; height: 44px; background: 4px 4px no-repeat; margin: 0; padding: 0; }
+.wowhead-tooltip p div { width: 44px; height: 44px; background-image: url(../../images/icons/border_medium.png); }
+
+.wowhead-tooltip table.shrink b { font-size: 12px; line-height: 15px; }
+.wowhead-tooltip table.shrink td, .wowhead-tooltip table.shrink th { font-size: 10px; line-height: 14px; }
+
+.wowhead-tooltip .mapper { margin: 2px 0 3px 1px; border: none }
+
+.wowhead-tooltip ins { color: #5DF644; text-decoration: none; border-bottom: 1px dotted; }
+.wowhead-tooltip del { color: #FF8040; text-decoration: none; border-bottom: 1px dotted; }
+
+.wowhead-tooltip-powered {
+    /* background: url(../../../images/powered.png) no-repeat; */
+    width: 53px;
+    height: 33px;
+    position: absolute;
+    right: -56px;
+    top: 2px;
+    display: none;
+}
+
+.moneyitem, .moneygold, .moneysilver, .moneycopper, .moneyalliance, .moneyhorde, .moneyarena, .moneyachievement, .moneysocketmeta, .moneysocketred, .moneysocketyellow, .moneysocketblue, .moneysocketprismatic {
+    background: no-repeat right center;
+    color: white;
+}
+
+.moneyitem            { padding-right: 18px; }
+.moneygold            { padding-right: 15px; background-image: url(../../images/icons/money_gold.gif);         }
+.moneysilver          { padding-right: 15px; background-image: url(../../images/icons/money_silver.gif);       }
+.moneycopper          { padding-right: 15px; background-image: url(../../images/icons/money_copper.gif);       }
+.moneyalliance        { padding-right: 12px; background-image: url(../../images/icons/alliance-icon.gif);      }
+.moneyhorde           { padding-right: 17px; background-image: url(../../images/icons/horde-icon.gif);         }
+.moneyarena           { padding-right: 18px; background-image: url(../../images/icons/money_arena.gif);        }
+.moneyachievement     { padding-right: 13px; background-image: url(../../images/icons/money_achievement.gif);  }
+.moneysocketmeta      { padding-right: 18px; background-image: url(../../images/sockets/socket_meta.gif);      }
+.moneysocketred       { padding-right: 18px; background-image: url(../../images/sockets/socket_red.gif);       }
+.moneysocketyellow    { padding-right: 18px; background-image: url(../../images/sockets/socket_yellow.gif);    }
+.moneysocketblue      { padding-right: 18px; background-image: url(../../images/sockets/socket_blue.gif);      }
+.moneysocketprismatic { padding-right: 18px; background-image: url(../../images/sockets/socket_prismatic.gif); }
+
+a.moneyitem, a.moneysocketmeta, a.moneysocketred, a.moneysocketyellow, a.moneysocketblue, a.moneysocketprismatic,  a.moneyachievement{
+    text-decoration: none !important;
+    border-bottom: 1px solid transparent;
+    color: white !important;
+}
+
+a.moneyitem:hover, a.moneysocketmeta:hover, a.moneysocketred:hover, a.moneysocketyellow:hover, a.moneysocketblue:hover, a.moneysocketprismatic:hover, a.moneyachievement:hover  {
+    border-bottom: 1px solid white;
+}
+
+a span.moneyitem, a span.moneysocketmeta, a span.moneysocketred, a span.moneysocketyellow, a span.moneysocketblue, a span.moneysocketprismatic, a span.moneyachievement {
+    color: white;
+}
+
+.blizzard-blue { color: #00C0FF !important; }
+
+/***********************/
+/* ITEM QUALITY COLORS */
+/***********************/
+
+.q,   .q a,   .color-q,   .wowhead-tooltip .q a   { color: #ffd100 !important; } /* Default (yellow) */
+.q0,  .q0 a,  .color-q0,  .wowhead-tooltip .q0 a  { color: #9d9d9d !important; } /* Poor */
+.q1,  .q1 a,  .color-q1,  .wowhead-tooltip .q1 a  { color: #ffffff !important; } /* Common */
+.q2,  .q2 a,  .color-q2,  .wowhead-tooltip .q2 a  { color: #1eff00 !important; } /* Uncommon */
+.q3,  .q3 a,  .color-q3,  .wowhead-tooltip .q3 a  { color: #0070dd !important; } /* Rare */
+.q4,  .q4 a,  .color-q4,  .wowhead-tooltip .q4 a  { color: #a335ee !important; } /* Epic */
+.q5,  .q5 a,  .color-q5,  .wowhead-tooltip .q5 a  { color: #ff8000 !important; } /* Legendary */
+.q6,  .q6 a,  .color-q6,  .wowhead-tooltip .q6 a  { color: #e5cc80 !important; } /* Artifact */
+.q7,  .q7 a,  .color-q7,  .wowhead-tooltip .q7 a  { color: #e5cc80 !important; } /* Heirloom */
+.q8,  .q8 a,  .color-q8,  .wowhead-tooltip .q8 a  { color: #ffff98 !important; } /* Light yellow (item set bonuses) */
+.q9,  .q9 a,  .color-q9,  .wowhead-tooltip .q9 a  { color: #71d5ff !important; } /* Light blue (glyph type) */
+.q10, .q10 a, .color-q10, .wowhead-tooltip .q10 a { color: #ff4040 !important; } /* Red (requirement not met, error) */
+
+/*********************/
+/* DIFFICULTY COLORS */
+/*********************/
+
+.r1 { color: #FF8040 !important } /* Hard */
+.r2 { color: #FFFF00 !important } /* Medium */
+.r3 { color: #40BF40 !important } /* Easy */
+.r4 { color: #808080 !important } /* Trivial */
+
+/****************/
+/* CLASS COLORS */
+/****************/
+
+.c1,  .c1 a  { color: #C69B6D !important } /* Warrior */
+.c2,  .c2 a  { color: #F48CBA !important } /* Paladin */
+.c3,  .c3 a  { color: #AAD372 !important } /* Hunter */
+.c4,  .c4 a  { color: #FFF468 !important } /* Rogue */
+.c5,  .c5 a  { color: #FFFFFF !important } /* Priest */
+.c6,  .c6 a  { color: #C41E3B !important } /* Death Knight */
+.c7,  .c7 a  { color: #2359FF !important } /* Shaman */
+.c8,  .c8 a  { color: #68CCEF !important } /* Mage */
+.c9,  .c9 a  { color: #9382C9 !important } /* Warlock */
+.c11, .c11 a { color: #FF7C0A !important } /* Druid */
+
+/**************/
+/* GEM COLORS */
+/**************/
+
+.gem1  { color: #9D9D9D !important } /* Meta */
+.gem2  { color: #e60c0b !important } /* Red */
+.gem4  { color: #ffff35 !important } /* Yellow */
+.gem6  { color: #f48905 !important } /* Orange */
+.gem8  { color: #295df1 !important } /* Blue */
+.gem10 { color: #b957fc !important } /* Purple */
+.gem12 { color: #22c516 !important } /* Green */
+.gem14 { color: #FFFFFF !important } /* Prismatic */
+
+/****************/
+/* NPC MESSAGES */
+/****************/
+
+.s1 { color: #ff3f40 !important } /* Yell */
+.s2 { color: #fffb9f !important } /* Say */
+.s3 { color: #ffb2eb !important } /* Whisper */
+
+/*****************/
+/* SOCKETS ICONS */
+/*****************/
+
+.socket-meta      { padding-left: 26px; background: url(../../images/sockets/socket_meta.gif) no-repeat left center;      }
+.socket-red       { padding-left: 26px; background: url(../../images/sockets/socket_red.gif) no-repeat left center;       }
+.socket-yellow    { padding-left: 26px; background: url(../../images/sockets/socket_yellow.gif) no-repeat left center;    }
+.socket-blue      { padding-left: 26px; background: url(../../images/sockets/socket_blue.gif) no-repeat left center;      }
+.socket-prismatic { padding-left: 26px; background: url(../../images/sockets/socket_prismatic.gif) no-repeat left center; }
+
+/***********/
+/* WIDGETS */
+/***********/
+
+#wowhead-bluetip {
+    position: absolute;
+    z-index: 99999;
+    color: #fff;
+    font-size: 11px;
+    text-align: center;
+    padding: 6px 8px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.8);
+    text-align: left;
+    max-width: 300px;
+}
+
+.message-box {
+    position: absolute;
+    z-index: 1000;
+    cursor: pointer;
+    border: 2px solid #666;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding: 15px;
+    background:url(../images/blk.png) repeat;
+}
+
+.message-box .close {
+    text-indent: -9999px;
+    background:url(../images/close.png) no-repeat;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }

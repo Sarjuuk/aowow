@@ -1,62 +1,62 @@
 var Draggable = new function () {
-	var
+    var
         start = {},
         mouse = {},
         clickObj,
         dragObj;
 
     function onMouseDown(e) {
-		e = $E(e);
+        e = $E(e);
 
-		if (this._handle) {
-			var _ = e._target,
-			found = false,
-			i = 0;
+        if (this._handle) {
+            var _ = e._target,
+            found = false,
+            i = 0;
 
-			while (_ && i <= 3) {
-				if (_ == this._handle) {
-					found = true;
-					break;
-				}
+            while (_ && i <= 3) {
+                if (_ == this._handle) {
+                    found = true;
+                    break;
+                }
 
-				_ = _.parentNode;
+                _ = _.parentNode;
                 ++i;
-			}
+            }
 
-			if (!found) {
-				return false;
-			}
-		}
+            if (!found) {
+                return false;
+            }
+        }
 
-		clickObj = this;
+        clickObj = this;
 
-		start = g_getCursorPos(e);
+        start = g_getCursorPos(e);
 
-		aE(document, 'mousemove', onMouseMove);
-		aE(document, 'mouseup', onMouseUp);
+        aE(document, 'mousemove', onMouseMove);
+        aE(document, 'mouseup', onMouseUp);
 
-		if (clickObj.onClick) {
-			clickObj.onClick(e, clickObj);
-		}
+        if (clickObj.onClick) {
+            clickObj.onClick(e, clickObj);
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	function onMouseMove(e) {
-		e = $E(e);
+    function onMouseMove(e) {
+        e = $E(e);
 
-		var pos = g_getCursorPos(e);
+        var pos = g_getCursorPos(e);
 
-		if (clickObj) {
-			if (Math.abs(pos.x - start.x) > 5 || Math.abs(pos.y - start.y) > 5) {
-				onDragStart(e, clickObj);
-				clickObj = null;
-			}
-		}
+        if (clickObj) {
+            if (Math.abs(pos.x - start.x) > 5 || Math.abs(pos.y - start.y) > 5) {
+                onDragStart(e, clickObj);
+                clickObj = null;
+            }
+        }
 
         if (!dragObj || !dragObj._bounds) {
-			return false;
-		}
+            return false;
+        }
 
         var
             bounds = getBounds(dragObj),
@@ -64,166 +64,166 @@ var Draggable = new function () {
             dY     = pos.y - start.y;
 
         dX = Math.max(dragObj._bounds.x1 - mouse.x, Math.min(dragObj._bounds.x2 - mouse.x - (bounds.x2 - bounds.x1), dX));
-		dY = Math.max(dragObj._bounds.y1 - mouse.y, Math.min(dragObj._bounds.y2 - mouse.y - (bounds.y2 - bounds.y1), dY));
+        dY = Math.max(dragObj._bounds.y1 - mouse.y, Math.min(dragObj._bounds.y2 - mouse.y - (bounds.y2 - bounds.y1), dY));
 
-		setPosition(dX, dY);
+        setPosition(dX, dY);
 
-		return false;
-	}
+        return false;
+    }
 
-	function onMouseUp(e) {
-		e = $E(e);
+    function onMouseUp(e) {
+        e = $E(e);
 
-		clickObj = null;
+        clickObj = null;
 
-		if (dragObj) {
-			onDragEnd(e);
-		}
-	}
+        if (dragObj) {
+            onDragEnd(e);
+        }
+    }
 
-	function onDragStart(e, obj) {
-		if (dragObj) {
-			onDragEnd(e);
-		}
+    function onDragStart(e, obj) {
+        if (dragObj) {
+            onDragEnd(e);
+        }
 
-		var foo = ac(obj);
-		mouse.x = foo[0];
-		mouse.y = foo[1];
+        var foo = ac(obj);
+        mouse.x = foo[0];
+        mouse.y = foo[1];
 
-		if (obj._targets.length) {
-			dragObj = obj.cloneNode(true);
-			dragObj._orig = obj;
+        if (obj._targets.length) {
+            dragObj = obj.cloneNode(true);
+            dragObj._orig = obj;
 
-			ae(ge('layers'), dragObj);
-			// ae(document.body, dragObj); // 5.0.. why does it do that?
-			setPosition(-2323, -2323);
-		}
+            ae(ge('layers'), dragObj);
+            // ae(document.body, dragObj); // 5.0.. why does it do that?
+            setPosition(-2323, -2323);
+        }
         else {
-			dragObj = obj;
-		}
+            dragObj = obj;
+        }
 
-		Tooltip.disabled = true;
-		Tooltip.hide();
+        Tooltip.disabled = true;
+        Tooltip.hide();
 
-		if (obj.onDrag) {
-			obj.onDrag(e, dragObj, obj);
-		}
+        if (obj.onDrag) {
+            obj.onDrag(e, dragObj, obj);
+        }
 
-		dragObj._bounds = getBounds(obj._container);
-		dragObj.className += ' dragged';
-	}
+        dragObj._bounds = getBounds(obj._container);
+        dragObj.className += ' dragged';
+    }
 
-	function onDragEnd(e) {
-		var
+    function onDragEnd(e) {
+        var
             found = false,
             cursor = g_getCursorPos(e);
 
         if (dragObj._orig && dragObj._orig._targets.length) {
-			clearPosition();
+            clearPosition();
 
-			var pos = {
-				x1: dragObj._x,
-				x2: dragObj._x + parseInt(dragObj.offsetWidth),
-				y1: dragObj._y,
-				y2: dragObj._y + parseInt(dragObj.offsetHeight)
-			};
+            var pos = {
+                x1: dragObj._x,
+                x2: dragObj._x + parseInt(dragObj.offsetWidth),
+                y1: dragObj._y,
+                y2: dragObj._y + parseInt(dragObj.offsetHeight)
+            };
 
-			de(dragObj);
-			dragObj = dragObj._orig;
+            de(dragObj);
+            dragObj = dragObj._orig;
 
-			for (var i = 0, len = dragObj._targets.length; i < len; ++i) {
-				var targObj = dragObj._targets[i],
-				bounds = getBounds(targObj);
+            for (var i = 0, len = dragObj._targets.length; i < len; ++i) {
+                var targObj = dragObj._targets[i],
+                bounds = getBounds(targObj);
 
-				if (pos.x2 >= bounds.x1 && pos.x1 < bounds.x2 && pos.y2 >= bounds.y1 && pos.y1 < bounds.y2) {
-					found = true;
-					if (dragObj.onDrop) {
-						dragObj.onDrop(e, dragObj, targObj, (cursor.x >= bounds.x1 && cursor.x <= bounds.x2 && cursor.y >= bounds.y1 && cursor.y <= bounds.y2));
-					}
+                if (pos.x2 >= bounds.x1 && pos.x1 < bounds.x2 && pos.y2 >= bounds.y1 && pos.y1 < bounds.y2) {
+                    found = true;
+                    if (dragObj.onDrop) {
+                        dragObj.onDrop(e, dragObj, targObj, (cursor.x >= bounds.x1 && cursor.x <= bounds.x2 && cursor.y >= bounds.y1 && cursor.y <= bounds.y2));
+                    }
                     else {
-						ae(targObj, dragObj);
-					}
-				}
-			}
-		}
+                        ae(targObj, dragObj);
+                    }
+                }
+            }
+        }
 
-		if (!found && dragObj.onDrop) {
-			dragObj.onDrop(e, dragObj, null);
-		}
+        if (!found && dragObj.onDrop) {
+            dragObj.onDrop(e, dragObj, null);
+        }
 
-		dE(document, 'mousemove', onMouseMove);
-		dE(document, 'mouseup', onMouseUp);
+        dE(document, 'mousemove', onMouseMove);
+        dE(document, 'mouseup', onMouseUp);
 
-		Tooltip.disabled = false;
+        Tooltip.disabled = false;
 
-		dragObj.className = dragObj.className.replace(/dragged/, '');
-		dragObj = null;
-	}
+        dragObj.className = dragObj.className.replace(/dragged/, '');
+        dragObj = null;
+    }
 
-	function setPosition(dX, dY) {
-		dragObj.style.position = 'absolute';
-		dragObj.style.left = mouse.x + dX + 'px';
-		dragObj.style.top = mouse.y + dY + 'px';
+    function setPosition(dX, dY) {
+        dragObj.style.position = 'absolute';
+        dragObj.style.left = mouse.x + dX + 'px';
+        dragObj.style.top = mouse.y + dY + 'px';
 
-		dragObj._x = mouse.x + dX;
-		dragObj._y = mouse.y + dY;
-	}
+        dragObj._x = mouse.x + dX;
+        dragObj._y = mouse.y + dY;
+    }
 
-	function clearPosition() {
-		dragObj.style.left = '-2323px';
-		dragObj.style.top = '-2323px';
-	}
+    function clearPosition() {
+        dragObj.style.left = '-2323px';
+        dragObj.style.top = '-2323px';
+    }
 
-	function getBounds(obj) {
-		var pos = ac(obj);
+    function getBounds(obj) {
+        var pos = ac(obj);
 
-		return {
-			x1: pos[0],
-			x2: pos[0] + parseInt(obj.offsetWidth),
-			y1: pos[1],
-			y2: pos[1] + parseInt(obj.offsetHeight)
-		};
-	}
+        return {
+            x1: pos[0],
+            x2: pos[0] + parseInt(obj.offsetWidth),
+            y1: pos[1],
+            y2: pos[1] + parseInt(obj.offsetHeight)
+        };
+    }
 
-	this.init = function (obj, opt) {
-		obj.onmousedown = onMouseDown;
+    this.init = function (obj, opt) {
+        obj.onmousedown = onMouseDown;
 
-		var a = obj.getElementsByTagName('a');
-		for (var i = 0, len = a.length; i < len; ++i) {
-			ns(a[i]);
-		}
+        var a = obj.getElementsByTagName('a');
+        for (var i = 0, len = a.length; i < len; ++i) {
+            ns(a[i]);
+        }
 
-		if (!obj._targets) {
-			obj._targets = [];
-		}
+        if (!obj._targets) {
+            obj._targets = [];
+        }
 
-		if (!obj._container) {
-			obj._container = document.body;
-		}
+        if (!obj._container) {
+            obj._container = document.body;
+        }
 
-		if (opt != null) {
-			if (opt.targets) {
-				for (var i = 0, len = opt.targets.length; i < len; ++i) {
-					obj._targets.push(ge(opt.targets[i]));
-				}
-			}
+        if (opt != null) {
+            if (opt.targets) {
+                for (var i = 0, len = opt.targets.length; i < len; ++i) {
+                    obj._targets.push(ge(opt.targets[i]));
+                }
+            }
 
-			if (opt.container) {
-				obj._container = $(opt.container);
-			}
+            if (opt.container) {
+                obj._container = $(opt.container);
+            }
 
-			// Functions
-			if (opt.onClick) {
-				obj.onClick = opt.onClick;
-			}
+            // Functions
+            if (opt.onClick) {
+                obj.onClick = opt.onClick;
+            }
 
-			if (opt.onDrop) {
-				obj.onDrop = opt.onDrop;
-			}
+            if (opt.onDrop) {
+                obj.onDrop = opt.onDrop;
+            }
 
-			if (opt.onDrag) {
-				obj.onDrag = opt.onDrag;
-			}
-		}
-	}
+            if (opt.onDrag) {
+                obj.onDrag = opt.onDrag;
+            }
+        }
+    }
 };

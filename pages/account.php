@@ -26,7 +26,7 @@ enum(array( // UserPropsLimits
 ));
 */
 
-if (!in_array($pageParam, array('dashboard', '', 'signin', 'signup', 'signout', 'signin_do', 'signup_do', 'forgotpassword', 'forgotusername')))
+if (!in_array($pageParam, ['dashboard', '', 'signin', 'signup', 'signout', 'signin_do', 'signup_do', 'forgotpassword', 'forgotusername', 'weightscales']))
     $smarty->error();
 
 function signin()
@@ -43,7 +43,7 @@ function signin()
         $_SERVER['REMOTE_ADDR']
     );
 
-    if (!$ipBan)                                        // no entry exists; set count to 1 
+    if (!$ipBan)                                        // no entry exists; set count to 1
         DB::Auth()->query('INSERT INTO ?_account_bannedIPs VALUES (?s, 0, 1, FROM_UNIXTIME(?))',
             $_SERVER['REMOTE_ADDR'],
             time() + $GLOBALS['AoWoWconf']['loginFailTime']
@@ -262,17 +262,42 @@ $smarty->assign('lang', array_merge(Lang::$main, Lang::$account));
 
 if (User::$id)
 {
-    if ($pageParam == 'signout')
+    switch ($pageParam)
     {
-        User::destroy();
-        $next = explode('?', $_SERVER['HTTP_REFERER']);
-        $next = !empty($next[1]) ? '?'.$next[1] : '.';
-        header('Location: '.$next);
-    }
-    else
-    {
-        dashboard();
-        $smarty->display('dashboard.tpl');
+        case 'signout':
+            User::destroy();
+            $next = explode('?', $_SERVER['HTTP_REFERER']);
+            $next = !empty($next[1]) ? '?'.$next[1] : '.';
+            header('Location: '.$next);
+        case 'weightscales':
+            $post = Util::sqlEscape($_POST);
+
+            if (isset($post['save']))
+            {
+                if (!isset($post['id']))
+                {
+                    $res = DB::Aowow()->selectRow('SELECT max(id) as max, count(id) as num FROM ?_account_weightscales WHERE account = ?d', User::$id);
+                    if ($res['num'] < 5)                    // more or less hard-defined in LANG.message_weightscalesaveerror
+                        $post['id'] = ++$res['max'];
+                    else
+                        die('0');
+                }
+
+                if (DB::Aowow()->query('REPLACE INTO ?_account_weightscales VALUES (?d, ?d, ?s, ?s)', $post['id'], User::$id, $post['name'], $post['scale']))
+                    die((string)$post['id']);
+                else
+                    die('0');
+            }
+            else if (isset($post['delete']) && isset($post['id']))
+                DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', $post['id'], User::$id);
+            else
+                die('0');
+
+            break;
+        default;
+            dashboard();
+            $smarty->display('dashboard.tpl');
+            break;
     }
 }
 else

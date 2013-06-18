@@ -857,6 +857,15 @@ if ($searchMask & 0x1000000)
 */
 if ($searchMask & SEARCH_TYPE_JSON)
 {
+/*
+    todo (med):
+    &wt=21:134:20:170:77:117:119:96:103&wtv=100:96:41:41:39:32:32:31:29
+    additional url-parameter 'wt':ratingId/statId; 'wtv':applyPct (dafault 0)
+    search for items with these stats (name becomes optional)
+    how the fuck should i modify item_template_addon to accomodate this search behaviour... x_X
+    - is it possible to use space separated integers and not cause the search to take forever to execute
+    - one column per mod is probably the most efficient way to search but a pain to look at .. there are at least 150 after all
+*/
     $outItems = '';
     $outSets  = '';
 

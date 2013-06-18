@@ -166,8 +166,8 @@ class User
                 return AUTH_WRONGPASS;
 
             // "stay logged in" unchecked; kill session in time() + 5min
-            if (self::$timeout > 0 && self::$timeout < time())
-                return AUTH_TIMEDOUT;
+            // if (self::$timeout > 0 && self::$timeout < time())
+                // return AUTH_TIMEDOUT;
 
             if (self::$timeout > 0)
                 DB::Auth()->query('UPDATE ?_account SET timeout = ?d WHERE id = ?d',
@@ -275,13 +275,45 @@ class User
                 'avatar'    => self::$avatar,
                 'community' => self::$description,
                 'chars'     => self::getCharacters(),
-                'profiles'  => self::getProfiles(),
+                'profiles'  => self::getProfiles()
             );
+
+            if ($_ = self::getWeightScales())
+                $subSet['weights'] = json_encode($_, JSON_NUMERIC_CHECK);
 
             $smarty->assign('user', array_merge($set, $subSet));
         }
         else
             $smarty->assign('user', $set);
+    }
+
+    public static function getWeightScales()
+    {
+        $data = [];
+
+        $res = DB::Aowow()->select('SELECT * FROM ?_account_weightscales WHERE account = ?d', self::$id);
+        foreach ($res as $i)
+        {
+            $set = array (
+                'name' => $i['name'],
+                'id'   => $i['id']
+            );
+
+            $weights = explode(',', $i['weights']);
+            foreach ($weights as $weight)
+            {
+                $w = explode(':', $weight);
+
+                if ($w[1] === 'undefined')
+                    $w[1] = 0;
+
+                $set[$w[0]] = $w[1];
+            }
+
+            $data[] = $set;
+        }
+
+        return $data;
     }
 
     public static function getCharacters($asJSON = true)

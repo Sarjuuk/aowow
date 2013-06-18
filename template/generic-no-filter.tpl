@@ -10,7 +10,7 @@
         {include file='bricks/announcement.tpl' an=$item}
     {/foreach}
 {/if}
-{if isset($lvData.map)}
+{if !empty($lvData.map)}
     {include file='bricks/mapper.tpl' map=$lvData.map som=$lvData.som}
 {/if}
 
