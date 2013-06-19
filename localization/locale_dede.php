@@ -83,6 +83,8 @@ $lang = array(
         'tryAgain'      => "Bitte versucht es mit anderen Suchbegriffen oder überprüft deren Schreibweise.",
     ),
     'game' => array(
+        'achievement'   => "Erfolg",
+        'achievements'  => "Erfolge",
         'class'         => "Klasse",
         'classes'       => "Klassen",
         'currency'      => "Währung",
@@ -90,6 +92,8 @@ $lang = array(
         'difficulty'    => "Modus",
         'dispelType'    => "Bannart",
         'duration'      => "Dauer",
+        'gameObject'    => "Objekt",
+        'gameObjects'   => "Objekte",
         'glyphType'     => "Glyphenart",
         'race'          => "Volk",
         'races'         => "Völker",
@@ -218,9 +222,7 @@ $lang = array(
         'rank'          => ['Normal', 'Elite', 'Rar Elite', 'Boss', 'Rar']
     ),
     'achievement' => array(
-        'achievements'  => "Erfolge",
         'criteria'      => "Kriterien",
-        'achievement'   => "Erfolg",
         'points'        => "Punkte",
         'series'        => "Reihe",
         'outOf'         => "von",
@@ -262,6 +264,11 @@ $lang = array(
             "Östliche Königreiche",     "Kalimdor",                 "Dungeons",                 "Schlachtzüge",             "Unbenutzt",                null,
             "Schlachtfelder",           null,                       "Scherbenwelt",             "Arenen",                   "Nordend"
         )
+    ),
+    'quest' => array(
+        'level'         => 'Stufe %s',
+        'daily'         => 'Täglich',
+        'requirements'  => 'Anforderungen'
     ),
     'title' => array(
         'cat'           => array(

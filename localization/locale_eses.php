@@ -75,6 +75,8 @@ $lang = array(
         'tryAgain'      => "Por favor, introduzca otras palabras claves o verifique el término ingresado.",
     ),
     'game' => array(
+        'achievement'   => "logro",
+        'achievements'  => "Logros",
         'class'         => "clase",
         'classes'       => "Clases",
         'currency'      => "monedas",
@@ -82,6 +84,8 @@ $lang = array(
         'difficulty'    => "Dificultad",
         'dispelType'    => "Tipo de disipación",
         'duration'      => "Duración",
+        'gameObject'    => "entidad",
+        'gameObjects'   => "Entidades",
         'glyphType'     => "Tipo de glifo",
         'race'          => "raza",
         'races'         => "Razas",
@@ -171,9 +175,7 @@ $lang = array(
         'rank'          => ['Normal', 'Élite', 'Élite raro', 'Jefe', 'Raro']
     ),
     'achievement' => array(
-        'achievements'  => "logros",
         'criteria'      => "Requisitos",
-        'achievement'   => "logro",
         'points'        => "Puntos",
         'series'        => "Serie",
         'outOf'         => "de",
@@ -215,6 +217,11 @@ $lang = array(
             "Reinos del Este",          "Kalimdor",                 "Mazmorras",                "Bandas",                   "No las uso",               null,
             "Campos de batalla",        null,                       "Terrallende",              "Arenas",                   "Rasganorte"
         )
+    ),
+    'quest' => array(
+        'level'         => 'Nivel %s',
+        'daily'         => 'Diaria',
+        'requirements'  => 'Requisitos'
     ),
     'title' => array(
         'cat'           => array(

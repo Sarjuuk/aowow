@@ -75,6 +75,8 @@ $lang = array(
         'tryAgain'      => "Пожалуйста, попробуйте другие ключевые слова или проверьте правильность запроса.",
     ),
     'game' => array(
+        'achievement'   => "достижение",
+        'achievements'  => "Достижения",
         'class'         => "класс",
         'classes'       => "Классы",
         'currency'      => "валюта",
@@ -82,6 +84,8 @@ $lang = array(
         'difficulty'    => "Сложность",
         'dispelType'    => "Тип рассеивания",
         'duration'      => "Длительность",
+        'gameObject'    => "объект",
+        'gameObjects'   => "Объекты",
         'glyphType'     => "Тип символа",
         'race'          => "раса",
         'races'         => "Расы",
@@ -170,9 +174,7 @@ $lang = array(
         'rank'          => ['Обычный', 'Элитный', 'Редкий элитный', 'Босс', 'Редкий']
     ),
     'achievement' => array(
-        'achievements'  => "достижения",
         'criteria'      => "Критерий",
-        'achievement'   => "достижение",
         'points'        => "Очки",
         'series'        => "Серии",
         'outOf'         => "из",
@@ -214,6 +216,11 @@ $lang = array(
             "Восточные королевства",    "Калимдор",                 "Подземелья",               "Рейды",                    "Неактивно",                null,
             "Поля боя",                 null,                       "Запределье",               "Арены",                    "Нордскол"
         )
+    ),
+    'quest' => array(
+        'level'         => '%s-го уровня',
+        'daily'         => '',                              // empty on purpose .. wtf guys?!
+        'requirements'  => 'Требования'
     ),
     'title' => array(
         'cat'           => array(

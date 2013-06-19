@@ -70,7 +70,7 @@ class SpellList extends BaseType
                 foreach ($sources as $src)
                 {
                     $src = explode(':', $src);
-                    if ($src[0] != -3)                      // todo: sourcemore - implement after items
+                    if ($src[0] != -3)                      // todo (high): sourcemore - implement after items
                         $this->sources[$this->id][$src[0]][] = $src[1];
                 }
             }
@@ -124,7 +124,7 @@ class SpellList extends BaseType
 
             for ($i = 1; $i <= 3; $i++)
             {
-                if (!in_array($this->curTpl["effect".$i."AuraId"], [13, 22, 29, 34, 35, 83, 84, 85, 99, 124, 135, 143, 158, 161, 189, 230, 235, 240, 250]))
+                if (!in_array($this->curTpl["effect".$i."AuraId"], [8, 13, 22, 29, 34, 35, 83, 84, 85, 99, 124, 135, 143, 158, 161, 189, 230, 235, 240, 250]))
                     continue;
 
                 $mv = $this->curTpl["effect".$i."MiscValue"];
@@ -197,7 +197,6 @@ class SpellList extends BaseType
                     }
                     case 135:                               // healing splpwr (healing & any) .. not as a mask..
                     {
-                        @$stats[ITEM_MOD_SPELL_POWER] += $bp;
                         @$stats[ITEM_MOD_SPELL_HEALING_DONE] += $bp;
 
                         break;
@@ -271,7 +270,8 @@ class SpellList extends BaseType
                             }
                         }
                         break;
-                    case 84:                                // hp5
+                    case 8:                                 // hp5
+                    case 84:
                     case 161:
                         @$stats[ITEM_MOD_HEALTH_REGEN] += $bp;
                         break;
@@ -387,7 +387,7 @@ class SpellList extends BaseType
         if ($this->curTpl['powerPerSecond'] > 0)
             $str .= sprintf(Lang::$spell['costPerSec'], $this->curTpl['powerPerSecond']);
 
-        // append level cost    (todo: (low) work in as scaling cost)
+        // append level cost (todo (low): work in as scaling cost)
         if ($this->curTpl['powerCostPerLevel'] > 0)
             $str .= sprintf(Lang::$spell['costPerLevel'], $this->curTpl['powerCostPerLevel']);
 
@@ -400,11 +400,11 @@ class SpellList extends BaseType
             return Lang::$spell['channeled'];
         else if ($this->curTpl['castTime'] > 0)
             return $short ? sprintf(Lang::$spell['castIn'], $this->curTpl['castTime'] / 1000) : Util::formatTime($this->curTpl['castTime']);
-        // show instant only for player/pet/npc abilities (todo: (low) unsure when really hidden (like talent-case))
-        else if ($noInstant && !in_array($this->curTpl['typeCat'], [7, -3, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
+        // show instant only for player/pet/npc abilities (todo (low): unsure when really hidden (like talent-case))
+        else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
             return '';
-        // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only
-        else if ($this->curTpl['damageClass'] == 0 || $this->curTpl['attributes0'] & 0x10)
+        // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only (todo (low): rule is imperfect)
+        else if ($this->curTpl['damageClass'] != 1 || $this->curTpl['attributes0'] & 0x10)
             return Lang::$spell['instantPhys'];
         else                                                // instant cast
             return Lang::$spell['instantMagic'];
@@ -437,7 +437,7 @@ class SpellList extends BaseType
         $sps   = $SPS   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.shasplpwr[0]', Lang::$spell['traitShort']['shasplpwr']) : Lang::$spell['traitShort']['shasplpwr'];
         $bh    = $BH    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.splheal[0]',   Lang::$spell['traitShort']['splheal'])   : Lang::$spell['traitShort']['splheal'];
 
-        $HND   = $hnd   = $this->interactive ? sprintf(Util::$dfnString, '[Hands required by weapon]', 'HND') : 'HND';    // todo: localize this one
+        $HND   = $hnd   = $this->interactive ? sprintf(Util::$dfnString, '[Hands required by weapon]', 'HND') : 'HND';    // todo (med): localize this one
         $MWS   = $mws   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.mlespeed[0]',    'MWS') : 'MWS';
         $mw             = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.dmgmin1[0]',     'mw')  : 'mw';
         $MW             = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.dmgmax1[0]',     'MW')  : 'MW';
@@ -508,7 +508,7 @@ class SpellList extends BaseType
         switch ($var)
         {
             case 'a':                                       // EffectRadiusMin
-            case 'A':                                       // EffectRadiusMax (ToDo)
+            case 'A':                                       // EffectRadiusMax
                 if ($lookup)
                     $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'RadiusMax');
                 else
@@ -530,7 +530,7 @@ class SpellList extends BaseType
 
                 return $base;
             case 'd':                                       // SpellDuration
-            case 'D':                                       // todo: min/max?; /w unit?
+            case 'D':                                       // todo (med): min/max?; /w unit?
                 if ($lookup)
                     $base = $this->refSpells[$lookup]->getField('duration');
                 else
@@ -542,7 +542,6 @@ class SpellList extends BaseType
                 if ($op && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                // todo: determine WHEN the unit is needed >.<
                 return explode(' ', Util::formatTime(abs($base), true));
             case 'e':                                       // EffectValueMultiplier
             case 'E':
@@ -997,7 +996,7 @@ class SpellList extends BaseType
         }
 
     // step 2: resolving conditions
-        // aura- or spell-conditions cant be resolved for our purposes, so force them to false for now (todo: strg+f "know" in aowowPower.js ^.^)
+        // aura- or spell-conditions cant be resolved for our purposes, so force them to false for now (todo (low): strg+f "know" in aowowPower.js ^.^)
         // \1: full pattern match; \2: any sequence, that may include an aura/spell-ref; \3: any other sequence, between "?$" and "["
         while (preg_match('/\$\?(([\W\D]*[as]\d+)|([^\[]*))/i', $data, $matches))
         {
@@ -1017,7 +1016,7 @@ class SpellList extends BaseType
                 $condCurPos   = $condStartPos;
 
             }
-            else if (!empty($matches[2]))                   // aura/spell-condition .. use false; TODO (low priority) catch cases and port "know"-param for tooltips from 5.0
+            else if (!empty($matches[2]))                   // aura/spell-condition .. use false; TODO (low): catch cases and port "know"-param for tooltips from 5.0
             {                                               // tooltip_enus: Charge to an enemy, stunning it <!--sp58377:0--><!--sp58377-->for <!--sp103828:0-->1 sec<!--sp103828-->.; spells_enus: {"58377": [["", "and 2 additional nearby targets "]], "103828": [["1 sec", "3 sec"]]};
                 $condStartPos = strpos($data, $matches[2]) - 2;
                 $condCurPos   = $condStartPos;
@@ -1150,7 +1149,7 @@ class SpellList extends BaseType
 
     // step 5: variable-depentant variable-text
         // special case $lONE:ELSE;
-        // todo: russian uses THREE (wtf?! oO) cases ($l[singular]:[plural1]:[plural2]) .. explode() chooses always the first plural option :/
+        // todo (low): russian uses THREE (wtf?! oO) cases ($l[singular]:[plural1]:[plural2]) .. explode() chooses always the first plural option :/
         while (preg_match('/([\d\.]+)([^\d]*)(\$l:*)([^:]*):([^;]*);/i', $str, $m))
             $str = str_ireplace($m[1].$m[2].$m[3].$m[4].':'.$m[5].';', $m[1].$m[2].($m[1] == 1 ? $m[4] : explode(':', $m[5])[0]), $str);
 
@@ -1215,6 +1214,16 @@ class SpellList extends BaseType
 
         $this->interactive = $interactive;
 
+        // fetch needed texts
+        $name  = $this->getField('name', true);
+        $rank  = $this->getField('rank', true);
+        $desc  = $this->parseText('description', $level, $this->interactive);
+        $tools = $this->getToolsForCurrent();
+        $cool  = $this->createCooldownForCurrent();
+        $cast  = $this->createCastTimeForCurrent();
+        $cost  = $this->createPowerCostForCurrent();
+        $range = $this->createRangesForCurrent();
+
         // get reagents
         $reagents = [];
         for ($j = 1; $j <= 8; $j++)
@@ -1229,18 +1238,6 @@ class SpellList extends BaseType
             );
         }
         $reagents = array_reverse($reagents);
-
-        // get tools
-        $tools = $this->getToolsForCurrent();
-
-        // get description
-        $desc = $this->parseText('description', $level, $this->interactive);
-
-        // get cooldown
-        $cool = $this->createCooldownForCurrent();
-
-        // get cast time
-        $cast = $this->createCastTimeForCurrent();
 
         // get stances (check: SPELL_ATTR2_NOT_NEED_SHAPESHIFT)
         $stances = '';
@@ -1273,46 +1270,23 @@ class SpellList extends BaseType
             }
         }
 
-        $reqWrapper  = $this->curTpl['rangeMaxHostile'] && ($this->curTpl['powerCost'] > 0 || $this->curTpl['powerCostPercent'] > 0 || ($this->curTpl['powerCostRunes'] & 0x333));
-        $reqWrapper2 = $reagents || $tools || $desc || $reqItems || $createItem;
-
         $x = '';
         $x .= '<table><tr><td>';
 
-        $rankText = Util::localizedString($this->curTpl, 'rank');
+        // name & rank
+        if ($rank)
+            $x .= '<table width="100%"><tr><td><b>'.$name.'</b></td><th><b class="q0">'.$rank.'</b></th></tr></table>';
+        else
+            $x .= '<b>'.$name.'</b><br />';
 
-        if (!empty($rankText))
-            $x .= '<table width="100%"><tr><td>';
+        // powerCost & ranges
+        if ($range && $cost)
+            $x .= '<table width="100%"><tr><td>'.$cost.'</td><th>'.$range.'</th></tr></table>';
+        else if ($cost || $range)
+            $x .= $range.$cost.'<br />';
 
-        // name
-        $x .= '<b>'.$this->getField('name', true).'</b>';
-
-        // rank
-        if (!empty($rankText))
-            $x .= '</td><th><b class="q0">'.$rankText.'</b></th></tr></table>';
-
-        // power cost
-        $c = $this->createPowerCostForCurrent();
-
-        // ranges
-        $r = $this->createRangesForCurrent();
-
-        if ($reqWrapper)
-            $x .= '<table width="100%"><tr><td>'.$c.'</td><th>'.$r.'</th></tr></table>';
-        else if ($c || $r)
-        {
-            if (empty($rankText))
-                $x .= '<br />';
-
-            $x .= $r;
-
-            if ($c && $r)
-                $x .= '<br />';
-
-            $x .= $c;
-        }
-
-        if ($cool)                                          // tabled layout
+        // castTime & cooldown
+        if ($cast && $cool)                                 // tabled layout
         {
             $x .= '<table width="100%">';
             $x .= '<tr><td>'.$cast.'</td><th>'.$cool.'</th></tr>';
@@ -1321,91 +1295,68 @@ class SpellList extends BaseType
 
             $x .= '</table>';
         }
-        else if ($cast || $stances)                         // line-break layout
+        else if ($cast || $cool)                            // line-break layout
         {
-            if (!$reqWrapper && !$c && empty($rankText))
-                $x .= '<br />';
+            $x .= $cast.$cool;
 
-            $x .= $cast;
-
-            if ($cast && $stances)
-                $x .= '<br />';
-
-            $x .= $stances;
+            if ($stances)
+                $x .= '<br />'.$stances;
         }
 
         $x .= '</td></tr></table>';
 
-        if ($reqWrapper2)
-            $x .= '<table><tr><td>';
+        $xTmp = [];
 
         if ($tools)
         {
-            $x .= Lang::$spell['tools'].':<br/><div class="indent q1">';
+            $_ = Lang::$spell['tools'].':<br/><div class="indent q1">';
             while ($tool = array_pop($tools))
             {
                 if (isset($tool['itemId']))
-                    $x .= '<a href="?item='.$tool['itemId'].'">'.$tool['name'].'</a>';
+                    $_ .= '<a href="?item='.$tool['itemId'].'">'.$tool['name'].'</a>';
                 else if (isset($tool['id']))
-                    $x .= '<a href="?items&filter=cr=91;crs='.$tool['id'].';crv=0">'.$tool['name'].'</a>';
+                    $_ .= '<a href="?items&filter=cr=91;crs='.$tool['id'].';crv=0">'.$tool['name'].'</a>';
                 else
-                    $x .= $tool['name'];
+                    $_ .= $tool['name'];
 
                 if (!empty($tools))
-                    $x .= ', ';
+                    $_ .= ', ';
                 else
-                    $x .= '<br />';
+                    $_ .= '<br />';
             }
-            $x .= '</div>';
+
+            $xTmp[] = $_.'</div>';
         }
 
         if ($reagents)
         {
-            if ($tools)
-                $x .= "<br />";
-
-            $x .= Lang::$spell['reagents'].':<br/><div class="indent q1">';
+            $_ = Lang::$spell['reagents'].':<br/><div class="indent q1">';
             while ($reagent = array_pop($reagents))
             {
-                $x .= '<a href="?item='.$reagent['id'].'">'.$reagent['name'].'</a>';
+                $_ .= '<a href="?item='.$reagent['id'].'">'.$reagent['name'].'</a>';
                 if ($reagent['count'] > 1)
-                    $x .= ' ('.$reagent['count'].')';
+                    $_ .= ' ('.$reagent['count'].')';
 
                 if(!empty($reagents))
-                    $x .= ', ';
+                    $_ .= ', ';
                 else
-                    $x .= '<br />';
+                    $_ .= '<br />';
             }
-            $x .= '</div>';
+
+            $xTmp[] = $_.'</div>';
         }
 
         if ($reqItems)
-        {
-            if ($tools || $reagents)
-                $x .= "<br />";
-
-            $x .= Lang::$game['requires2'].' '.$reqItems;
-        }
+            $xTmp[] = Lang::$game['requires2'].' '.$reqItems;
 
         if ($desc)
-        {
-            if ($tools || $reagents || $reqItems)
-                $x .= "<br />";
-
-            $x .= '<span class="q">'.$desc.'</span>';
-        }
+            $xTmp[] = '<span class="q">'.$desc.'</span>';
 
         if ($createItem)
-        {
-            if ($tools || $reagents || $reqItems || $desc)
-                $x .= "<br />";
+            $xTmp[] = '<br />'.$createItem;
 
-            $x .= '<br />'.$createItem;
-        }
-
-        if ($reqWrapper2)
-            $x .= "</td></tr></table>";
-
+        if ($tools || $reagents || $reqItems || $desc || $createItem)
+            $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
 
         $this->tooltips[$this->id] = $x;
 
@@ -1421,7 +1372,7 @@ class SpellList extends BaseType
         $range = $this->createRangesForCurrent();
 
         // cast times
-        $time = $this->createCastTimeForCurrent();
+        $cast = $this->createCastTimeForCurrent();
 
         // cooldown or categorycooldown
         $cool = $this->createCooldownForCurrent();
@@ -1435,16 +1386,16 @@ class SpellList extends BaseType
         if ($cost && $range)
             $x .= '<table width="100%"><tr><td>'.$cost.'</td><th>'.$range.'</th></tr></table>';
         else
-            $x .= $cost . $range;
+            $x .= $cost.$range;
 
-        if (($cost xor $range) && ($time xor $cool))
+        if (($cost xor $range) && ($cast xor $cool))
             $x .= '<br />';
 
         // lower
-        if ($time && $cool)
-            $x .= '<table width="100%"><tr><td>'.$time.'</td><th>'.$cool.'</th></tr></table>';
+        if ($cast && $cool)
+            $x .= '<table width="100%"><tr><td>'.$cast.'</td><th>'.$cool.'</th></tr></table>';
         else
-            $x .= $time . $cool;
+            $x .= $cast.$cool;
 
         return $x;
     }

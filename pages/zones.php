@@ -13,6 +13,7 @@ $validCats = array(
     1 => true,
     2 => [0, 1, 2],
     3 => [0, 1, 2],
+    4 => true,
     6 => true,
     8 => true,
     9 => true,

@@ -4,20 +4,16 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// require 'includes/game.php';
-// require 'includes/allquests.php';
-// require 'includes/allnpcs.php';
-// require 'includes/allobjects.php';
-// require 'includes/class.community.php';                  // wo dont need those .. yet
-
-$id   = intVal($pageParam);
-$item = new ItemList(array(['i.entry', $id]));
-
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEM, $id, -1, User::$localeId]);
-
 if (isset($_GET['xml']))
     die('unsupported, as i do not see the point');
 
+require 'includes/class.community.php';
+
+$id   = intVal($pageParam);
+
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEM, $id, -1, User::$localeId]);
+
+// AowowPower-request
 if (isset($_GET['power']))
 {
     header('Content-type: application/x-javascript; charsetUTF-8');
@@ -53,6 +49,7 @@ if (isset($_GET['power']))
     // output json for tooltips
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
+        $item = new ItemList(array(['i.entry', $id]));
         if ($item->error)
             die('$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.', {})');
 
@@ -69,19 +66,25 @@ if (isset($_GET['power']))
     die($x);
 }
 
-// didn't die...
-// build regular page
-
-// v there be dragons v
-
-$cacheKey = generateCacheKey($id);
-
-if(!$smarty->loadCache($cacheKeyPage, $item))
+// regular page
+if (!$smarty->loadCache($cacheKeyPage, $item))
 {
+    $item = new ItemList(array(['i.entry', $id]));
+    if ($item->error)
+        $smarty->notFound(Lang::$game['item']);
+
+
+
+    // not yet implemented -> chicken out
+    $smarty->error();
+
+
+
     unset($item);
 
     // Информация о вещи...
     $item = iteminfo($id, 1);
+    $path = [0, 0, $item['classs'], $item['subclass'], $item['type']];
 
     // Поиск мобов с которых эта вещь лутится
     $drops_cr = drop('creature_loot_template', $item['entry']);
@@ -803,25 +806,28 @@ if(!$smarty->loadCache($cacheKeyPage, $item))
 
     $item['color'] = colorByQuality($item['quality']);
 
-    $smarty->saveCache($cacheKeyPage, $item);
+    $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
-$page = array(
-    'Book'   => $item['pagetext'] ? true : false,
-    'Title'  => $item['name'].' - '.$smarty->get_config_vars('Items'),
+// menuId 0: Item     g_initPath()
+//  tabId 0: Database g_initHeader()
+$smarty->updatePageVars(array(
+    'book'   => $pageData['page']['pagetext'] ? true : false,
+    'title'  => implode(" - ", $pageData['title']),
+    'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
     'tab'    => 0,
-    'type'   => 3,
-    'typeid' => $item['entry'],
-    'path'   => path(0, 0, $item['classs'], $item['subclass'], $item['type'])
-);
+    'type'   => TYPE_ITEM,
+    'typeid' => $id
+));
 
-$smarty->updatePageVars($page);
+$smarty->assign('community', CommunityContent::getAll(TYPE_ITEM, $id));         // comments, screenshots, videos
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$item, ['colon' => Lang::$colon]));
+$smarty->assign('lvData', $pageData);
 
-// Комментарии
-$smarty->assign('community', Community::getAll($page['type'], $page['typeid']));
-
-// Количество MySQL запросов
+// Mysql query execution statistics
 $smarty->assign('mysql', $DB->getStatistics());
-$smarty->assign('item', $item);
+
+// load the page
 $smarty->display('item.tpl');
+
 ?>

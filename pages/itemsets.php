@@ -15,6 +15,11 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 {
     $itemsets = new ItemsetList([], true);                  // class selection is via filter, nothing applies here
 
+    $pageData = array(
+        'data'   => $itemsets->getListviewData(),           // listview content
+        'params' => []
+    );
+
     $itemsets->addGlobalsToJscript($pageData);
 
     // recreate form selection
@@ -24,9 +29,6 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     if (isset($filter['cl']))
         $path[] = $filter['cl'];
-
-    // listview content
-    $pageData['data']   = $itemsets->getListviewData();
 
     // create note if search limit was exceeded
     if ($itemsets->getMatches() > $AoWoWconf['sqlLimit'])
@@ -49,7 +51,7 @@ $page = array(
     'path'   => json_encode($path, JSON_NUMERIC_CHECK),
     'reqJS'  => array(
         array('path' => 'template/js/filters.js', 'conditional' => false),
-        array('path' => '?data=weight-presets', 'conditional' => false),
+        array('path' => '?data=weight-presets',   'conditional' => false),
    )
 );
 

@@ -524,34 +524,9 @@ class ItemList extends BaseType
             $x .= '<br />'.sprintf(Lang::$game['requires'], '<a class="q1" href=?faction="'.$this->curTpl['RequiredReputationFaction'].'">'.Faction::getName($this->curTpl['RequiredReputationFaction']).'</a> - '.Lang::$game['rep'][$this->curTpl['RequiredReputationRank']]);
 
         // locked
-        if ($this->curTpl['lockid'])
-        {
-            $lock = DB::Aowow()->selectRow('
-                SELECT
-                    *
-                FROM
-                    ?_lock
-                WHERE
-                    lockID = ?d',
-                $this->curTpl['lockid']
-            );
-            // only use first useful entry
-            for ($j = 1; $j <= 5; $j++)
-            {
-                if ($lock['type'.$j] == 1)                  // opened by item
-                {
-                    $l = sprintf(Lang::$game['requires'], '<a class="q1" href="?item='.$lock['lockproperties'.$j].'">'.Util::getItemName($lock['lockproperties'.$j]).'</a>');
-                    break;
-                }
-                else if ($lock['type'.$j] == 2)             // opened by skill
-                {
-                    $lockText = DB::Aowow()->selectRow('SELECT ?# FROM ?_locktype WHERE id = ?d', $lock['lockproperties'.$j]);
-                    $l = sprintf(Lang::$game['requires'], Util::localizedString($lockText, 'name').' ('.$lock['requiredskill'.$j].')');
-                    break;
-                }
-            }
-            $x .= '<br /><span class="q0">'.Lang::$item['locked'].'<br />'.$l.'</span>';
-        }
+        if ($lId = $this->curTpl['lockid'])
+            if ($locks = Lang::getLocks($lId))
+                $x .= '<br /><span class="q0">'.Lang::$item['locked'].'<br />'.implode('<br />', $locks).'</span>';
 
         // upper table: done
         if (!$subT)
@@ -819,10 +794,15 @@ class ItemList extends BaseType
         // convert ItemMods
         for ($h = 1; $h <= 10; $h++)
         {
-            if (!$this->curTpl['stat_type'.$h])
+            $mod = $this->curTpl['stat_type'.$h];
+            $val = $this->curTpl['stat_value'.$h];
+            if (!$mod ||!$val)
                 continue;
 
-            @$this->itemMods[$this->id][$this->curTpl['stat_type'.$h]] += $this->curTpl['stat_value'.$h];
+            if ($mod == ITEM_MOD_ATTACK_POWER)
+                @$this->itemMods[$this->id][ITEM_MOD_RANGED_ATTACK_POWER] += $val;
+
+            @$this->itemMods[$this->id][$mod] += $val;
         }
 
         // convert Spells
@@ -855,7 +835,7 @@ class ItemList extends BaseType
                 $this->json[$this->id]['socketbonusstat'] = Util::parseItemEnchantment($enh);
 
         // gather random Enchantments
-        // todo: !important! extremly high sql-load
+        // todo (high): extremly high sql-load
         if (@$this->json[$this->id]['commondrop'] && isset($this->subItems[$this->id]))
         {
             foreach ($this->subItems[$this->id] as $k => $sI)

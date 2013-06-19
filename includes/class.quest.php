@@ -8,8 +8,8 @@ class QuestList extends BaseType
     public    $cat1       = 0;
     public    $cat2       = 0;
 
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM quest_template a LEFT JOIN locales_quest b ON a.Id = b.entry WHERE [filter] [cond] ORDER BY Id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM quest_template a LEFT JOIN locales_quest b ON a.Id = b.entry WHERE [filter] [cond]';
+    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt LEFT JOIN locales_quest lq ON qt.Id = lq.entry WHERE [filter] [cond] ORDER BY Id ASC';
+    protected $matchQuery = 'SELECT COUNT(1) FROM quest_template WHERE [filter] [cond]';
 
     // parent::__construct does the job
 
@@ -167,9 +167,100 @@ class QuestList extends BaseType
             (new TitleList(array(['id', $titles])))->addGlobalsToJscript($refs);
     }
 
+    private function parseText($type = 'Objectives')
+    {
+        $replace = array(
+            '$c' => '&lt;'.Util::ucFirst(Lang::$game['class']).'&gt;',
+            '$C' => '&lt;'.Util::ucFirst(Lang::$game['class']).'&gt;',
+            '$r' => '&lt;'.Util::ucFirst(Lang::$game['race']).'&gt;',
+            '$R' => '&lt;'.Util::ucFirst(Lang::$game['race']).'&gt;',
+            '$n' => '&lt;'.Util::ucFirst(Lang::$main['name']).'&gt;',
+            '$N' => '&lt;'.Util::ucFirst(Lang::$main['name']).'&gt;',
+            '$b' => '<br />',
+            '$B' => '<br />'
+        );
+
+        $text = $this->getField($type, true);
+        if (!$text)
+            return '';
+
+        $text = strtr($text, $replace);
+
+        // gender switch
+        $text = preg_replace('/$g([^:;]+):([^:;]+);/ui', '&lt;\1/\2&lt;', $text);
+
+        // nonesense, that the client apparently ignores
+        $text = preg_replace('/$t([^;]+);/ui', '', $text);
+
+        return Util::jsEscape($text);
+    }
+
     public function renderTooltip()
     {
-        // todo
+        if (!$this->curTpl)
+            return null;
+
+        if (isset($this->tooltips[$this->id]))
+            return $this->tooltips[$this->id];
+
+        $title = Util::jsEscape($this->getField('Title', true));
+        $level = $this->curTpl['Level'];
+        if ($level < 0)
+            $level = 0;
+
+        $x = '';
+        if ($level)
+        {
+            $level = sprintf(Lang::$quest['level'], $level);
+
+            if ($this->curTpl['Flags'] & 0x1000)                // daily
+                $level .= ' '.Lang::$quest['daily'];
+
+            $x .= '<table><tr><td><table width="100%"><tr><td><b class="q">'.$title.'</b></td><th><b class="q0">'.$level.'</b></th></tr></table></td></tr></table>';
+        }
+        else
+            $x .= '<table><tr><td><b class="q">'.$title.'</b></td></tr></table>';
+
+
+        $x .= '<table><tr><td><br />'.$this->parseText('Objectives').'<br /><br /><span class="q">'.Lang::$quest['requirements'].Lang::$colon.'</span>';
+
+
+        for ($i = 1; $i < 5; $i++)
+        {
+            $ot     = $this->getField('ObjectiveText'.$i, true);
+            $rng    = $this->curTpl['RequiredNpcOrGo'.$i];
+            $rngQty = $this->curTpl['RequiredNpcOrGoCount'.$i];
+
+            if ($rngQty < 1 && (!$rng || $ot))
+                continue;
+
+            if ($ot)
+                $name = $ot;
+            else
+                $name = $rng > 0 ? CreatureList::getName($rng) : GameObjectList::getName(-$rng);
+
+            $x .= '<br /> - '.Util::jsEscape($name).($rngQty > 1 ? ' x '.$rngQty : null);
+        }
+
+        for ($i = 1; $i < 7; $i++)
+        {
+            $ri    = $this->curTpl['RequiredItemId'.$i];
+            $riQty = $this->curTpl['RequiredItemCount'.$i];
+
+            if (!$ri || $riQty < 1)
+                continue;
+
+            $x .= '<br /> - '.Util::jsEscape(ItemList::getName($ri)).($riQty > 1 ? ' x '.$riQty : null);
+        }
+
+        if ($et = $this->getField('EndText', true))
+            $x .= '<br /> - '.$et;
+
+        $x .= '</td></tr></table>';
+
+        $this->tooltips[$this->id] = $x;
+
+        return $x;
     }
 
     public function addGlobalsToJScript(&$refs)

@@ -53,7 +53,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         'deps'     => $deps,
         'calendar' => false,                                // todo (med): fix it Felix!
         'params'   => array(
-            'tabs'   => '$myTabs'
+            // 'tabs'   => '$myTabs'
         )
     );
 

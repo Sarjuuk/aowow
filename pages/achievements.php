@@ -72,7 +72,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             $path[] = $cat['id'];
             $title[] = Util::localizedString($cat, 'name');
         }
-        array_unshift($title, Util::ucFirst(Lang::$achievement['achievements']));
+        array_unshift($title, Util::ucFirst(Lang::$game['achievements']));
     }
 
     // fill g_items, g_titles, g_achievements

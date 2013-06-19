@@ -78,6 +78,8 @@ $lang = array(
         'tryAgain'      => "Please try some different keywords or check your spelling.",
     ),
     'game' => array(
+        'achievement'   => "achievement",
+        'achievements'  => "Achievements",
         'class'         => "class",
         'classes'       => "Classes",
         'currency'      => "currency",
@@ -85,6 +87,8 @@ $lang = array(
         'difficulty'    => "Difficulty",
         'dispelType'    => "Dispel type",
         'duration'      => "Duration",
+        'gameObject'    => "objects",
+        'gameObjects'   => "Objects",
         'glyphType'     => "Glyph type",
         'race'          => "race",
         'races'         => "Races",
@@ -213,9 +217,7 @@ $lang = array(
         'category'      => array("Uncategorized", "Holidays", "Recurring", "Player vs. Player")
     ),
     'achievement' => array(
-        'achievements'  => "achievements",
         'criteria'      => "Criteria",
-        'achievement'   => "achievement",
         'points'        => "Points",
         'series'        => "Series",
         'outOf'         => "out of",
@@ -257,6 +259,11 @@ $lang = array(
             "Eastern Kingdoms",         "Kalimdor",                 "Dungeons",                 "Raids",                    "Unused",                   null,
             "Battlegrounds",            null,                       "Outland",                  "Arenas",                   "Northrend"
         )
+    ),
+    'quest' => array(
+        'level'         => 'Level %s',
+        'daily'         => 'Daily',
+        'requirements'  => 'Requirements'
     ),
     'title' => array(
         'cat'           => array(

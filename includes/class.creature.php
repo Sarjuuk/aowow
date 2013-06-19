@@ -6,6 +6,8 @@ if (!defined('AOWOW_REVISION'))
 
 class CreatureList extends BaseType
 {
+    use spawnHelper;
+
     public    $tooltips   = [];
 
     protected $setupQuery = 'SELECT *, ct.entry AS ARRAY_KEY, ct.entry AS id FROM creature_template ct LEFT JOIN locales_creature lc ON lc.entry = ct.entry LEFT JOIN creature_template_addon cta on cta.entry = ct.entry WHERE [filter] [cond]';

@@ -75,6 +75,8 @@ $lang = array(
         'tryAgain'      => "Veuillez essayer d'autres mots ou vérifiez l'orthographe des termes de recherche.",
     ),
     'game' => array (
+        'achievement'   => "haut fait",
+        'achievements'  => "Hauts faits",
         'class'         => "classe",
         'classes'       => "Classes",
         'currency'      => "monnaies",
@@ -82,6 +84,8 @@ $lang = array(
         'difficulty'    => "Difficulté",
         'dispelType'    => "Type de dissipation",
         'duration'      => "Durée",
+        'gameObject'    => "entité",
+        'gameObjects'   => "Entités",
         'glyphType'     => "Type de glyphe",
         'race'          => "race",
         'races'         => "Races",
@@ -170,9 +174,7 @@ $lang = array(
         'rank'          => ['Standard', 'Élite', 'Élite rare', 'Boss', 'Rare']
     ),
     'achievement' => array(
-        'achievements'  => "hauts faits",
         'criteria'      => "Critères",
-        'achievement'   => "haut fait",
         'points'        => "Points",
         'series'        => "Série",
         'outOf'         => "sur",
@@ -214,6 +216,11 @@ $lang = array(
             "Royaumes de l'est",        "Kalimdor",                 "Donjons",                  "Raids",                    "Inutilisées",              null,
             "Champs de bataille",       null,                       "Outreterre",               "Arènes",                   "Norfendre"
         )
+    ),
+    'quest' => array(
+        'level'         => 'Niveau %s',
+        'daily'         => 'Journalière',
+        'requirements'  => 'Conditions'
     ),
     'title' => array(
         'cat'           => array(

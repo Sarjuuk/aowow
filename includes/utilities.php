@@ -354,6 +354,43 @@ class Lang
         return $tmp;
     }
 
+    public static function getLocks($lockId, $interactive = false)
+    {
+        $locks = [];
+        $lock = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE id = ?d', $this->curTpl['lockid']);
+
+        for ($i = 1; $i <= 5; $i++)
+        {
+            $prop = $lock['lockproperties'.$i];
+            $rnk  = $lock['requiredskill'.$i];
+            $name = '';
+
+            if ($lock['type'.$i] == 1)                  // opened by item
+            {
+                $name = ItemList::getName($prop);
+                if (!$name)
+                    continue;
+
+                if ($interactive)
+                    $name = '<a class="q1" href="?item='.$prop.'">'.$name.'</a>';
+            }
+            else if ($lock['type'.$i] == 2)             // opened by skill
+            {
+                $txt = DB::Aowow()->selectRow('SELECT * FROM ?_locktype WHERE id = ?d', $prop);         // todo (low): convert to static text
+                $name = Util::localizedString($txts, 'name');
+                if (!$name)
+                    continue;
+
+                if ($rnk > 0)
+                    $name .= ' ('.$rnk.')';
+            }
+
+            $locks[] = sprintf(Lang::$game['requires'], $n);
+        }
+
+        return $locks;
+    }
+
     public static function getReputationLevelForPoints($pts)
     {
         if ($pts >= 41999)

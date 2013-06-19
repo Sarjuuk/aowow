@@ -4,13 +4,14 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/class.community.php';                     // not needed .. yet
+require 'includes/class.community.php';
 
-$id    = intVal($pageParam);
+$id = intVal($pageParam);
 
 $cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_SPELL, $id, -1, User::$localeId]);
 $cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_SPELL, $id, -1, User::$localeId]);
 
+// AowowPower-request
 if (isset($_GET['power']))
 {
     header('Content-type: application/x-javascript; charsetUTF-8');
@@ -20,7 +21,6 @@ if (isset($_GET['power']))
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
         $spell = new SpellList(array(['s.id', $id]));
-
         if ($spell->error)
             die('$WowheadPower.registerSpell('.$id.', '.User::$localeId.', {});');
 
@@ -42,6 +42,7 @@ if (isset($_GET['power']))
     die($x);
 }
 
+// regular page
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $spell = new SpellList(array(['s.id', $id]));
@@ -711,12 +712,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
+// menuId 1: Spell    g_initPath()
+//  tabId 0: Database g_initHeader()
 $smarty->updatePageVars(array(
-    'title'     => implode(" - ", $pageData['title']),
-    'path'      => "[".implode(", ", $pageData['path'])."]",
-    'tab'       => 0,                                       // for g_initHeader($tab)
-    'type'      => TYPE_SPELL,
-    'typeId'    => $id,
+    'title'  => implode(" - ", $pageData['title']),
+    'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
+    'tab'    => 0,
+    'type'   => TYPE_SPELL,
+    'typeId' => $id
 ));
 
 $smarty->assign('community', CommunityContent::getAll(TYPE_SPELL, $id));         // comments, screenshots, videos

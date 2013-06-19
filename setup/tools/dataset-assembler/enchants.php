@@ -132,9 +132,9 @@ if (!defined('AOWOW_REVISION'))
                 $ench['jsonequip']['reqlevel'] = $enchant['requiredLevel'];
 
             // check if the spell has an entry in skill_line_ability -> Source:Profession
-            if ($skill = DB::Aowow()->SelectCell('SELECT skillId FROM ?_skill_line_ability WHERE spellId = ?d', $enchantSpells->id))
+            if ($skill = DB::Aowow()->SelectCell('SELECT skillLineId FROM dbc.skillLineAbility WHERE spellId = ?d', $enchantSpells->id))
             {
-                $ench['name'][]   = Util::jsEscape($enchantSpells->getField('name', true)));
+                $ench['name'][]   = $enchantSpells->getField('name', true);
                 $ench['source'][] = $enchantSpells->id;
                 $ench['skill']    = $skill;
                 $ench['slots'][]  = $slot;
@@ -144,10 +144,10 @@ if (!defined('AOWOW_REVISION'))
             if (!isset($castItems[$enchantSpells->id]))
                 $castItems[$enchantSpells->id] = new ItemList([['spellid_1', $enchantSpells->id], ['name', 'Scroll of Enchant%', '!']]);    // do not reuse enchantment scrolls
 
-            $cI &= $castItems[$enchantSpells->id];          // this construct is a bit .. unwieldy
+            $cI = &$castItems[$enchantSpells->id];          // this construct is a bit .. unwieldy
             while ($cI->iterate())
             {
-                $ench['name'][]   = Util::jsEscape($cI->getField('name', true));
+                $ench['name'][]   = $cI->getField('name', true);
                 $ench['source'][] = -$cI->id;
                 $ench['icon']     = strTolower($cI->getField('icon'));
                 $ench['slots'][]  = $slot;
