@@ -183,7 +183,7 @@ abstract class BaseType
 
         $this->curTpl = current($this->templates);
         $field        = $this->curTpl ? Util::getIdFieldName($this->curTpl) : null;
-        $this->id     = $this->curTpl ? $this->curTpl[$field] : 0;
+        $this->id     = $this->curTpl ? (int)$this->curTpl[$field] : 0;
 
         while ($qty--)
             next($this->templates);
@@ -194,7 +194,7 @@ abstract class BaseType
     public function reset()
     {
         $this->curTpl = reset($this->templates);
-        $this->id     = $this->curTpl[Util::getIdFieldName($this->curTpl)];
+        $this->id     = (int)$this->curTpl[Util::getIdFieldName($this->curTpl)];
     }
 
     // read-access to templates
@@ -476,19 +476,19 @@ class Lang
         $i    = 1;
 
         if (!$raceMask)
-            return array('side' => 3, 'name' => self::$game['ra'][0]);
+            return array('side' => SIDE_BOTH,     'name' => self::$game['ra'][0]);
 
         if ($raceMask == RACE_MASK_HORDE)
-            return array('side' => 2, 'name' => self::$game['ra'][-2]);
+            return array('side' => SIDE_HORDE,    'name' => self::$game['ra'][-2]);
 
         if ($raceMask == RACE_MASK_ALLIANCE)
-            return array('side' => 1, 'name' => self::$game['ra'][-1]);
+            return array('side' => SIDE_ALLIANCE, 'name' => self::$game['ra'][-1]);
 
         if ($raceMask & RACE_MASK_HORDE)
-            $side |= 2;
+            $side |= SIDE_HORDE;
 
         if ($raceMask & RACE_MASK_ALLIANCE)
-            $side |= 1;
+            $side |= SIDE_ALLIANCE;
 
         while ($raceMask)
         {
@@ -550,9 +550,14 @@ class SmartyAoWoW extends Smarty
         // since it's the same for every page, except index..
         if ($this->_tpl_vars['query'][0] && !preg_match('/[^a-z]/i', $this->_tpl_vars['query'][0]))
         {
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE flags & 0x10 AND (page = ?s OR page = "*")', $this->_tpl_vars['query'][0]);
+            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ?s OR page = "*")', $this->_tpl_vars['query'][0]);
             foreach ($ann as $k => $v)
-                $ann[$k]['text'] = Util::localizedString($v, 'text');
+            {
+                if ($t = Util::localizedString($v, 'text'))
+                    $ann[$k]['text'] = Util::jsEscape($t);
+                else
+                    unset($ann[$k]);
+            }
 
             $this->_tpl_vars['announcements'] = $ann;
         }
@@ -1499,9 +1504,7 @@ class Util
     {
         $_ = decBin($val);
         while (fMod(strLen($_), 4))                         // in 4-blocks
-        {
             $_ = '0'.$_;
-        }
 
         return 'b'.strToUpper($_);
     }
@@ -1638,17 +1641,20 @@ class Util
         $jsonStats = [];
         for ($h = 1; $h <= 3; $h++)
         {
+            $obj = $enchant['object'.$h];
+            $val = $enchant['amount'.$h];
+
             if (isset($amountOverride))                     // itemSuffixes have dynamic amount
-                $enchant['amount'.$h] = $amountOverride;
+                $val = $amountOverride;
 
             switch ($enchant['type'.$h])
             {
                 case 2:
-                    @$jsonStats[ITEM_MOD_WEAPON_DMG] += $enchant['amount'.$h];
+                    @$jsonStats[ITEM_MOD_WEAPON_DMG] += $val;
                     break;
                 case 3:
                 case 7:
-                    $spl   = new SpellList(array(['s.id', (int)$enchant['object'.$h]]));
+                    $spl   = new SpellList(array(['s.id', (int)$obj]));
                     $gains = $spl->getStatGain();
 
                     foreach ($gains as $gain)
@@ -1656,33 +1662,36 @@ class Util
                             @$jsonStats[$k] += $v;
                     break;
                 case 4:
-                    switch ($enchant['object'.$h])
+                    switch ($obj)
                     {
                         case 0:                             // Physical
-                            @$jsonStats[ITEM_MOD_ARMOR] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_ARMOR] += $val;
                             break;
                         case 1:                             // Holy
-                            @$jsonStats[ITEM_MOD_HOLY_RESISTANCE] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_HOLY_RESISTANCE] += $val;
                             break;
                         case 2:                             // Fire
-                            @$jsonStats[ITEM_MOD_FIRE_RESISTANCE] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_FIRE_RESISTANCE] += $val;
                             break;
                         case 3:                             // Nature
-                            @$jsonStats[ITEM_MOD_NATURE_RESISTANCE] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_NATURE_RESISTANCE] += $val;
                             break;
                         case 4:                             // Frost
-                            @$jsonStats[ITEM_MOD_FROST_RESISTANCE] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_FROST_RESISTANCE] += $val;
                             break;
                         case 5:                             // Shadow
-                            @$jsonStats[ITEM_MOD_SHADOW_RESISTANCE] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_SHADOW_RESISTANCE] += $val;
                             break;
                         case 6:                             // Arcane
-                            @$jsonStats[ITEM_MOD_ARCANE_RESISTANCE] += $enchant['amount'.$h];
+                            @$jsonStats[ITEM_MOD_ARCANE_RESISTANCE] += $val;
                             break;
                     }
                     break;
                 case 5:
-                    @$jsonStats[$enchant['object'.$h]] += $enchant['amount'.$h];
+                    if ($obj == ITEM_MOD_ATTACK_POWER)
+                        @$jsonStats[ITEM_MOD_RANGED_ATTACK_POWER] += $val;
+
+                    @$jsonStats[$obj] += $val;
                     break;
             }
         }
