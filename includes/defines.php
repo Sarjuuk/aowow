@@ -80,12 +80,6 @@ define('U_GROUP_MODERATOR',                 (U_GROUP_ADMIN|U_GROUP_MOD|U_GROUP_B
 define('U_GROUP_COMMENTS_MODERATOR',        (U_GROUP_MODERATOR|U_GROUP_LOCALIZER));
 define('U_GROUP_PREMIUM_PERMISSIONS',       (U_GROUP_PREMIUM|U_GROUP_STAFF|U_GROUP_VIP));
 
-// Custom Flags for Types
-define('CUSTOM_HAS_COMMENT',                0x01);
-define('CUSTOM_HAS_SCREENSHOT',             0x02);
-define('CUSTOM_HAS_VIDEO',                  0x04);
-define('CUSTOM_DISABLED',                   0x08);
-define('CUSTOM_SERVERSIDE',                 0x10);
 
 // Locales
 define('LOCALE_EN',                         0);
@@ -100,9 +94,41 @@ define('ITEMINFO_SUBITEMS',                 0x2);
 define('ITEMINFO_VENDOR',                   0x4);
 define('ITEMINFO_LOOT',                     0x8);
 
+// Custom Flags for Types
+
 /*
  * Game
  */
+
+// Custom Flags (shared)
+define('CUSTOM_HAS_COMMENT',                0x01000000);
+define('CUSTOM_HAS_SCREENSHOT',             0x02000000);
+define('CUSTOM_HAS_VIDEO',                  0x04000000);
+define('CUSTOM_DISABLED',                   0x08000000);
+define('CUSTOM_SERVERSIDE',                 0x10000000);
+
+// Custom Flags (per type)
+define('SPELL_CU_TALENT',                   0x0001);        // passive talent
+define('SPELL_CU_TALENTSPELL',              0x0002);        // ability taught by talent
+define('SPELL_CU_TRIGGERED',                0x0004);        // triggered by another spell
+define('SPELL_CU_PET_TALENT_TYPE0',         0x0008);        // Ferocity
+define('SPELL_CU_PET_TALENT_TYPE1',         0x0010);        // Tenacity
+define('SPELL_CU_PET_TALENT_TYPE2',         0x0020);        // Cunning
+define('SPELL_CU_GLYPH_MAJOR',              0x0040);
+define('SPELL_CU_GLYPH_MINOR',              0x0080);
+define('SPELL_CU_QUALITY_MASK',             0x0F00);        // set if spell creates an item: (7 - Quality) << 8
+define('SPELL_CU_EXCLUDE_CATEGORY_SEARCH',  0x1000);        // only display, when searching for spells in general (!cat || cat = 0)
+define('SPELL_CU_FIRST_RANK',               0x2000);        // used by filter
+define('SPELL_CU_LAST_RANK',                0x4000);
+
+define('OBJECT_CU_DESTRUCTABLE',            0x01);
+define('OBJECT_CU_CHECK_LOS',               0x02);
+define('OBJECT_CU_INTERACT_MOUNTED',        0x04);
+define('OBJECT_CU_INTERACT_COMBAT',         0x08);
+define('OBJECT_CU_APPLY_GROUP_LOOT',        0x10);
+define('OBJECT_CU_STEALTHED',               0x20);
+define('OBJECT_CU_CASTER_GROUPED',          0x40);
+define('OBJECT_CU_NOT_PERSISTANT',          0x80);
 
 define('MAX_LEVEL',                         80);
 
@@ -155,20 +181,6 @@ define('SPELLFAMILY_UNK2',                  12);            // 2 spells (silence
 define('SPELLFAMILY_POTION',                13);
 define('SPELLFAMILY_DEATHKNIGHT',           15);
 define('SPELLFAMILY_PET',                   17);
-
-// Spell Custom
-define('SPELL_CU_TALENT',                   0x0001);        // passive talent
-define('SPELL_CU_TALENTSPELL',              0x0002);        // ability taught by talent
-define('SPELL_CU_TRIGGERED',                0x0004);        // triggered by another spell
-define('SPELL_CU_PET_TALENT_TYPE0',         0x0008);        // Ferocity
-define('SPELL_CU_PET_TALENT_TYPE1',         0x0010);        // Tenacity
-define('SPELL_CU_PET_TALENT_TYPE2',         0x0020);        // Cunning
-define('SPELL_CU_GLYPH_MAJOR',              0x0040);
-define('SPELL_CU_GLYPH_MINOR',              0x0080);
-define('SPELL_CU_QUALITY_MASK',             0x0F00);        // set if spell creates an item: (7 - Quality) << 8
-define('SPELL_CU_EXCLUDE_CATEGORY_SEARCH',  0x1000);        // only display, when searching for spells in general (!cat || cat = 0)
-define('SPELL_CU_FIRST_RANK',               0x2000);        // used by filter
-define('SPELL_CU_LAST_RANK',                0x4000);
 
 // Gender
 define('GENDER_MALE',                       0);
@@ -258,6 +270,49 @@ define('LANG_GOBLIN_BINARY',                38);
 define('TEAM_ALLIANCE',                     0);
 define('TEAM_HORDE',                        1);
 define('TEAM_NEUTRAL',                      2);
+
+// Lock-Properties (also categorizes GOs)
+define('LOCK_PROPERTY_FOOTLOCKER',          1);
+define('LOCK_PROPERTY_HERBALISM',           2);
+define('LOCK_PROPERTY_MINING',              3);
+
+// GameObject
+define('OBJECT_DOOR',                       0);
+define('OBJECT_BUTTON',                     1);
+define('OBJECT_QUESTGIVER',                 2);
+define('OBJECT_CHEST',                      3);
+define('OBJECT_BINDER',                     4);
+define('OBJECT_GENERIC',                    5);
+define('OBJECT_TRAP',                       6);
+define('OBJECT_CHAIR',                      7);
+define('OBJECT_SPELL_FOCUS',                8);
+define('OBJECT_TEXT',                       9);
+define('OBJECT_GOOBER',                     10);
+define('OBJECT_TRANSPORT',                  11);
+define('OBJECT_AREADAMAGE',                 12);
+define('OBJECT_CAMERA',                     13);
+define('OBJECT_MAP_OBJECT',                 14);
+define('OBJECT_MO_TRANSPORT',               15);
+define('OBJECT_DUEL_ARBITER',               16);
+define('OBJECT_FISHINGNODE',                17);
+define('OBJECT_RITUAL',                     18);
+define('OBJECT_MAILBOX',                    19);
+define('OBJECT_AUCTIONHOUSE',               20);
+define('OBJECT_GUARDPOST',                  21);
+define('OBJECT_SPELLCASTER',                22);
+define('OBJECT_MEETINGSTONE',               23);
+define('OBJECT_FLAGSTAND',                  24);
+define('OBJECT_FISHINGHOLE',                25);
+define('OBJECT_FLAGDROP',                   26);
+define('OBJECT_MINI_GAME',                  27);
+define('OBJECT_LOTTERY_KIOSK',              28);
+define('OBJECT_CAPTURE_POINT',              29);
+define('OBJECT_AURA_GENERATOR',             30);
+define('OBJECT_DUNGEON_DIFFICULTY',         31);
+define('OBJECT_BARBER_CHAIR',               32);
+define('OBJECT_DESTRUCTIBLE_BUILDING',      33);
+define('OBJECT_GUILD_BANK',                 34);
+define('OBJECT_TRAPDOOR',                   35);
 
 // InventoryType
 define('INVTYPE_NON_EQUIP',                 0);
