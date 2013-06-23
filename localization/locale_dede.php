@@ -12,6 +12,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+        'name'          => "Name",
         'link'          => "Link",
         'signIn'        => "Anmelden",
         'jsError'       => "Stelle bitte sicher, dass JavaScript aktiviert ist.",
@@ -21,7 +22,6 @@ $lang = array(
         'timeSQL'       => "Zeit für MySQL-Queries",
         'noJScript'     => "<b>Diese Seite macht ausgiebigen Gebrauch von JavaScript.</b><br />Bitte <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">aktiviert JavaScript</a> in Eurem Browser.",
         'profiles'      => "Deine Charaktere",
-        'links'         => "Links",
         'pageNotFound'  => "Diese|Dieser|Dieses %s existiert nicht.",        // todo: dämliche Fälle...
         'gender'        => "Geschlecht",
         'sex'           => [null, 'Mann', 'Frau'],
@@ -70,11 +70,16 @@ $lang = array(
         'refineSearch'  => "Tipp: Präzisiere deine Suche mit Durchsuchen einer <a href=\"javascript:;\" id=\"fi_subcat\">Unterkategorie</a>.",
 
         // infobox
-        'name'          => "Name",
+        'unavailable'   => "Nicht für Spieler verfügbar",
         'disabled'      => "Deaktiviert",
         'disabledHint'  => "Kann nicht erhalten oder abgeschlossen werden.",
         'serverside'    => "Serverseitig",
-        'serversideHint' => "Diese Informationen sind nicht im Client enthalten und wurden durch Sniffing zusammengetragen und/oder erraten.",
+        'serversideHint' => "Diese Informationen sind nicht im Client enthalten und wurden gesnifft und/oder erraten.",
+
+        // red buttons
+        'links'         => "Links",
+        'compare'       => "Vergleichen",
+        'view3D'        => "3D-Ansicht"
     ),
     'search' => array(
         'search'        => "Suche",
@@ -286,6 +291,15 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        '_desc'         => "<b>%s</b> ist das <b>%s</b>. Es enthält %s Teile.",
+        '_descTagless'  => "<b>%s</b> ist ein Ausrüstungsset, das %s Teile enthält.",
+        '_setBonuses'   => "Setboni",
+        '_conveyBonus'  => "Das Tragen mehrerer Gegenstände aus diesem Set gewährt Eurem Charakter Boni.",
+        '_pieces'       => "Teile",
+        '_unavailable'  => "Dieses Ausrüstungsset ist nicht für Spieler verfügbar.",
+        '_type'         => "Art",
+        '_tag'          => "Tag",
+
         'notes'         => array(
             null,                                   "Dungeon-Set 1",                            "Dungeon-Set 2",                            "Tier 1 Raid-Set",
             "Tier 2 Raid-Set",                      "Tier 3 Raid-Set",                          "Level 60 PvP-Set (Rar)",                   "Level 60 PvP-Set (Rar,  alt)",
@@ -297,7 +311,7 @@ $lang = array(
             "Arena-Set Saison 7",                   "Tier 10 Raid-Set",                     "Arena-Set Saison 8"
         ),
         'types'         => array(
-            null,               "Stoff",                "Leder",                "Schwere R\u00fcstung",     "Platte",                   "Dolch",                "Ring",
+            null,               "Stoff",                "Leder",                "Schwere Rüstung",          "Platte",                   "Dolch",                "Ring",
             "Faustwaffe",       "Einhandaxt",           "Einhandstreitkolben",  "Einhandschwert",           "Schmuck",                  "Amulett"
         )
     ),

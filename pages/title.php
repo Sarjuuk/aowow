@@ -32,7 +32,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $infobox[] = Lang::$main['gender'].Lang::$colon.'[span class='.($g == 2 ? 'female' : 'male').'-icon]'.Lang::$main['sex'][$g].'[/span]';
 
     if ($e = $title->getField('eventId'))
-        $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$e.']'.WorldEvent::getName($e).'[/url]';
+        $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$e.']'.WorldEventList::getName($e).'[/url]';
 
     $pageData = array(
         'page' => array(
@@ -58,7 +58,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         'id'            => 'reward-from-quest',
                         'name'          => '$LANG.tab_rewardfrom',
                         'hiddenCols'    => "$['experience', 'money']",
-                        'visibleCols'   => "$['category']"
+                        'visibleCols'   => "$['category']",
+                        'tabs'          => '$tabsRelated'
                     );
                     break;
                 case 12:
@@ -71,7 +72,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         'id'            => 'reward-from-achievement',
                         'name'          => '$LANG.tab_rewardfrom',
                         'visibleCols'   => "$['category']",
-                        'sort'          => "$['reqlevel', 'name']"
+                        'sort'          => "$['reqlevel', 'name']",
+                        'tabs'          => '$tabsRelated'
                     );
                     break;
                 // case 13:
@@ -87,11 +89,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 }
 
 $smarty->updatePageVars(array(
-    'title'     => $pageData['title']." - ".Util::ucfirst(Lang::$game['title']),
-    'path'      => $pageData['path'],
-    'tab'       => 0,                                       // for g_initHeader($tab)
-    'type'      => TYPE_TITLE,                              // 11:Titles
-    'typeId'    => $id
+    'title'  => $pageData['title']." - ".Util::ucfirst(Lang::$game['title']),
+    'path'   => $pageData['path'],
+    'tab'    => 0,                                          // for g_initHeader($tab)
+    'type'   => TYPE_TITLE,                                 // 11:Titles
+    'typeId' => $id
 ));
 
 

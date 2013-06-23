@@ -94,8 +94,6 @@ define('ITEMINFO_SUBITEMS',                 0x2);
 define('ITEMINFO_VENDOR',                   0x4);
 define('ITEMINFO_LOOT',                     0x8);
 
-// Custom Flags for Types
-
 /*
  * Game
  */
@@ -106,6 +104,7 @@ define('CUSTOM_HAS_SCREENSHOT',             0x02000000);
 define('CUSTOM_HAS_VIDEO',                  0x04000000);
 define('CUSTOM_DISABLED',                   0x08000000);
 define('CUSTOM_SERVERSIDE',                 0x10000000);
+define('CUSTOM_UNAVAILABLE',                0x20000000);
 
 // Custom Flags (per type)
 define('SPELL_CU_TALENT',                   0x0001);        // passive talent

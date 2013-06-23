@@ -5,6 +5,8 @@ if (!defined('AOWOW_REVISION'))
 
 class ItemsetList extends BaseType
 {
+    use ListviewHelper;
+
     private   $classes    = [];                             // used to build g_classes
     public    $pieceToSet = [];                             // used to build g_items and search
 
@@ -20,13 +22,12 @@ class ItemsetList extends BaseType
         {
             $this->templates[$this->id]['classes'] = [];
             $this->templates[$this->id]['pieces']  = [];
-
             for ($i = 1; $i < 12; $i++)
             {
-                if ($this->curTpl['classMask'] & (1 << $i))
+                if ($this->curTpl['classMask'] & (1 << ($i - 1)))
                 {
-                    $this->classes[] = $i + 1;
-                    $this->templates[$this->id]['classes'][] = $i + 1;
+                    $this->classes[] = $i;
+                    $this->templates[$this->id]['classes'][] = $i;
                 }
             }
 

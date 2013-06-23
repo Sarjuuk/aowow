@@ -1093,26 +1093,24 @@ Summary.prototype = {
 
             if (col.id == 'name') {
                 ae(th, this.selectLevel);
-                if (this.editable) {
 
-                    var s = ce('select');
-                    s.onchange = (function(s) {
-                        this.level = s.options[s.selectedIndex].value;
-                        this.refreshAll();
-                    }).bind(this, s);
+                var s = ce('select');
+                s.onchange = (function(s) {
+                    this.level = s.options[s.selectedIndex].value;
+                    this.refreshAll();
+                }).bind(this, s);
 
-                    for (var i = 80; i > 0; --i) {
-                        var o = ce('option');
-                        if (i == this.level) {
-                            o.selected = true;
-                        }
-                        st(o, i);
-                        ae(s, o);
+                for (var i = 80; i > 0; --i) {
+                    var o = ce('option');
+                    if (i == this.level) {
+                        o.selected = true;
                     }
-
-                    ae(this.selectLevel, ct(LANG.su_level + ' '));
-                    ae(this.selectLevel, s);
+                    st(o, i);
+                    ae(s, o);
                 }
+
+                ae(this.selectLevel, ct(LANG.su_level + ' '));
+                ae(this.selectLevel, s);
             }
 
             if (col.group) {

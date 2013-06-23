@@ -12,6 +12,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+        'name'          => "Название",
         'link'          => "Ссылка",
         'signIn'        => "Войти",
         'jsError'       => "Для работы этого сайта необходим JavaScript.",
@@ -21,7 +22,6 @@ $lang = array(
         'timeSQL'       => "Время выполнения MySQL запросов",
         'noJScript'     => "<b>Данный сайт активно использует технологию JavaScript.</b><br />Пожалуйста, <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">Включите JavaScript</a> в вашем браузере.",
         'profiles'      => "Ваши персонажи",    // translate.google :x
-        'links'         => "Ссылки",
         'pageNotFound'  => "Такое %s не существует.",
         'gender'        => "Пол",
         'sex'           => [null, 'Мужчина', 'Женщина'],
@@ -62,11 +62,16 @@ $lang = array(
         'refineSearch'  => "Совет: Уточните поиск, добавив <a href=\"javascript:;\" id=\"fi_subcat\">подкатегорию</a>.",
 
         // infobox
-        'name'          => "Название",
+        'unavailable'   => "Недоступно игрокам",
         'disabled'      => "[Disabled]",
         'disabledHint'  => "[Cannot be attained or completed]",
         'serverside'    => "[Serverside]",
         'serversideHint' => "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
+
+        // red buttons
+        'links'         => "Ссылки",
+        'compare'       => "Сравнить",
+        'view3D'        => "Посмотреть в 3D"
     ),
     'search' => array(
         'search'        => "Поиск",
@@ -238,6 +243,15 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        '_desc'         => "<b>%s</b> — <b>%s</b>. Он состоит из %s предметов.",
+        '_descTagless'  => "<b>%s</b> — набор из %s предметов.",
+        '_setBonuses'   => "Бонус за комплект",
+        '_conveyBonus'  => "Ношение большего числа предметов из этого комплекта предоставит бонусы для вашего персонажа.",
+        '_pieces'       => "частей",
+        '_unavailable'  => "Этот набор предметов не доступен игрокам.",
+        '_type'         => "Тип",
+        '_tag'          => "Тэг",
+
         'notes'         => array(
             null,                                       "Комплект подземелий 1",                "Комплект подземелий 2",                        "Рейдовый комплект Tier 1",
             "Рейдовый комплект Tier 2",                 "Рейдовый комплект Tier 3",             "PvP Комплект для 60 уровня",                   "PvP Комплект для 60 уровня (старая версия)",

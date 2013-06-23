@@ -3267,7 +3267,7 @@ function su_addToSaved(c, d, a, e) {
 			title: LANG.dialog_compare,
 			width: 400,
 			height: 138,
-			buttons: ["okay", "cancel"],
+            buttons: [['okay', LANG.ok], ['cancel', LANG.cancel]],
 			fields: [{
 				id: "selecteditems",
 				type: "caption",
@@ -14713,19 +14713,22 @@ var ModelViewer = new function() {
 
         if (!optBak.noPound) {
             var url = '#modelviewer';
-            switch (optBak.type) {
-                case 1: // npc
-                    url += ':1:' + optBak.displayId + ':' + (optBak.humanoid | 0);
-                    break;
-                case 2: // object
-                    url += ':2:' + optBak.displayId;
-                    break;
-                case 3: // item
-                    url += ':3:' + optBak.displayId + ':' + (optBak.slot | 0);
-                    break;
-                case 4: // item set
-                    url += ':4:' + equipList.join(';');
-                    break;
+			var foo = ge('view3D-button');
+			if (!foo) {
+                switch (optBak.type) {
+                    case 1: // npc
+                        url += ':1:' + optBak.displayId + ':' + (optBak.humanoid | 0);
+                        break;
+                    case 2: // object
+                        url += ':2:' + optBak.displayId;
+                        break;
+                    case 3: // item
+                        url += ':3:' + optBak.displayId + ':' + (optBak.slot | 0);
+                        break;
+                    case 4: // item set
+                        url += ':4:' + equipList.join(';');
+                        break;
+                }
             }
             if (race && sex) {
                 url += ':' + race + '+' + sex;
@@ -15141,7 +15144,7 @@ var ModelViewer = new function() {
                 readExtraPound(parts[1]);
             }
             else {
-                var foo = ge('dsgndslgn464d');
+                var foo = ge('view3D-button');
                 if (foo) {
                     foo.onclick();
                 }
@@ -16086,13 +16089,6 @@ var
             a.onclick = _processForm.bind(a, button[0]);
             a.className = 'dialog-' + button[0];
             ae(a, ct(button[1]));
-/* custom for lost buttons texture, no longer in use on 2.5.2012
-            a.onclick = _processForm.bind(a, button);
-            a.className = 'dialog-' + button;
-            var sp = ce('span');
-            sp.innerHTML = button;
-            ae(a, sp);
-end custom */
             ae(dest, a);
         }
 

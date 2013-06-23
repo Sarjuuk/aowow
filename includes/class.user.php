@@ -122,13 +122,18 @@ class User
         }
         else
         {
-            $loc = strtolower(substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2));
-            switch ($loc) {
-                case 'ru': $loc = 8; break;
-                case 'es': $loc = 6; break;
-                case 'de': $loc = 3; break;
-                case 'fr': $loc = 2; break;
-                default:   $loc = 0;
+            if (empty($_SERVER["HTTP_ACCEPT_LANGUAGE"]))
+                $loc = 0;
+            else
+            {
+                $loc = strtolower(substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2));
+                switch ($loc) {
+                    case 'ru': $loc = 8; break;
+                    case 'es': $loc = 6; break;
+                    case 'de': $loc = 3; break;
+                    case 'fr': $loc = 2; break;
+                    default:   $loc = 0;
+                }
             }
         }
 

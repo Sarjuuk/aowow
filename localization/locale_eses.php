@@ -12,6 +12,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+        'name'          => "Nombre",
         'link'          => "Enlace",
         'signIn'        => "Iniciar sesión",
         'jsError'       => "Por favor, asegúrese de que ha habilitado javascript.",
@@ -21,7 +22,6 @@ $lang = array(
         'timeSQL'       => "El tiempo para las consultas de MySQL",
         'noJScript'     => "<b>Este sitio hace uso intenso de JavaScript.</b><br />Por favor <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">habilita JavaScript</a> en tu navegador.",
         'profiles'      => "Tus personajes",    // translate.google :x
-        'links'         => "Enlaces",
         'pageNotFound'  => "Este %s no existe.",
         'gender'        => "Género",
         'sex'           => [null, 'Hombre', 'Mujer'],
@@ -62,11 +62,16 @@ $lang = array(
         'refineSearch'  => "Sugerencia: Refina tu búsqueda llendo a una <a href=\"javascript:;\" id=\"fi_subcat\">subcategoría</a>.",
 
         // infobox
-        'name'          => "Nombre",
+        'unavailable'   => "No está disponible a los jugadores",
         'disabled'      => "[Disabled]",
         'disabledHint'  => "[Cannot be attained or completed]",
         'serverside'    => "[Serverside]",
         'serversideHint' => "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
+
+        // red buttons
+        'links'         => "Enlaces",
+        'compare'       => "Comparar",
+        'view3D'        => "Ver en 3D"
     ),
     'search' => array(
         'search'        => "Búsqueda",
@@ -239,6 +244,15 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        '_desc'         => "<b>%s</b> es el <b>%s</b>. Contiene %s piezas.",
+        '_descTagless'  => "<b>%s</b> es un conjunto de objetos que tiene %s piezas.",
+        '_setBonuses'   => "Bonificación de conjunto",
+        '_conveyBonus'  => "Tener puestos mas objetos de este conjunto le aplicará una bonificación a tu personaje.",
+        '_pieces'       => "piezas",
+        '_unavailable'  => "Este conjunto de objetos no está disponible para jugadores.",
+        '_type'         => "Tipo",
+        '_tag'          => "Etiqueta",
+
         'notes'         => array(
             null,                                   "Set de mazmorra 1",                    "Set de mazmorra 2",                        "Set de banda tier 1",
             "Set de banda tier 2",                  "Set de banda tier 3",                  "Set JcJ nivel 60 superior",                "Set JcJ nivel 60 superior (obsoleto)",

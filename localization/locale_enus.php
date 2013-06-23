@@ -7,6 +7,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+        'name'          => "Name",
         'link'          => "Link",
         'signIn'        => "Sign in",
         'jsError'       => "Please make sure you have javascript enabled.",
@@ -16,7 +17,6 @@ $lang = array(
         'timeSQL'       => "Time of MySQL queries",
         'noJScript'     => "<b>This site makes extensive use of JavaScript.</b><br />Please <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">enable JavaScript</a> in your browser.",
         'profiles'      => "Your Characters",
-        'links'         => "Links",
         'pageNotFound'  => "This %s doesn't exist.",
         'gender'        => "Gender",
         'sex'           => [null, 'Male', 'Female'],
@@ -65,11 +65,16 @@ $lang = array(
         'refineSearch'  => "Tip: Refine your search by browsing a <a href=\"javascript:;\" id=\"fi_subcat\">subcategory</a>.",
 
         // infobox
-        'name'          => "Name",
+        'unavailable'   => "Not available to players",
         'disabled'      => "Disabled",
         'disabledHint'  => "Cannot be attained or completed",
         'serverside'    => "Serverside",
         'serversideHint' => "These informations are not in the Client and have been provided by sniffing and/or guessing.",
+
+        // red buttons
+        'links'         => "Links",
+        'compare'       => "Compare",
+        'view3D'        => "View in 3D"
     ),
     'search' => array(
         'search'        => "Search",
@@ -281,6 +286,15 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        '_desc'         => "<b>%s</b> is the <b>%s</b>. It contains %s pieces.",
+        '_descTagless'  => "<b>%s</b> is an item set that contains %s pieces.",
+        '_setBonuses'   => "Set Bonuses",
+        '_conveyBonus'  => "Wearing more pieces of this set will convey bonuses to your character.",
+        '_pieces'       => "pieces",
+        '_unavailable'  => "This item set is not available to players.",
+        '_type'         => "Type",
+        '_tag'          => "Tag",
+
         'notes'         => array(
             null,                                   "Dungeon Set 1",                        "Dungeon Set 2",                        "Tier 1 Raid Set",
             "Tier 2 Raid Set",                      "Tier 3 Raid Set",                      "Level 60 PvP Rare Set",                "Level 60 PvP Rare Set (Old)",

@@ -117,7 +117,7 @@ abstract class BaseType
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
                     $val = '"%'.$val.'%"';
                 }
-                else if (is_int($c[1]))
+                else if (is_numeric($c[1]))
                 {
                     $op  = (isset($c[2]) && $c[2] == '!') ? '<>' : '=';
                     $val = Util::sqlEscape($c[1]);
@@ -203,10 +203,11 @@ abstract class BaseType
         if (!$this->curTpl || (!$localized && !isset($this->curTpl[$field])))
             return '';
 
-        if (!$localized)
-            return $this->curTpl[$field];
-        else
+        if ($localized)
             return Util::localizedString($this->curTpl, $field);
+
+        $value = $this->curTpl[$field];
+        return is_numeric($value) ?  floatVal($value) : $value;
     }
 
     public function getMatches()
@@ -307,6 +308,7 @@ trait listviewHelper
 
 }
 
+
 class Lang
 {
     public static $main;
@@ -324,6 +326,7 @@ class Lang
     public static $maps;
     public static $npc;
     public static $pet;
+    public static $quest;
     public static $spell;
     public static $talent;
     public static $title;
@@ -365,7 +368,7 @@ class Lang
             $rnk  = $lock['requiredskill'.$i];
             $name = '';
 
-            if ($lock['type'.$i] == 1)                  // opened by item
+            if ($lock['type'.$i] == 1)                      // opened by item
             {
                 $name = ItemList::getName($prop);
                 if (!$name)
@@ -374,8 +377,11 @@ class Lang
                 if ($interactive)
                     $name = '<a class="q1" href="?item='.$prop.'">'.$name.'</a>';
             }
-            else if ($lock['type'.$i] == 2)             // opened by skill
+            else if ($lock['type'.$i] == 2)                 // opened by skill
             {
+                if (in_array($prop, [6, 7, 15, 19]))        // dnd stuff
+                    continue;
+
                 $txt = DB::Aowow()->selectRow('SELECT * FROM ?_locktype WHERE id = ?d', $prop);         // todo (low): convert to static text
                 $name = Util::localizedString($txts, 'name');
                 if (!$name)
@@ -385,7 +391,7 @@ class Lang
                     $name .= ' ('.$rnk.')';
             }
 
-            $locks[] = sprintf(Lang::$game['requires'], $n);
+            $locks[$lock['type'.$i] == 1 ? $i : -$i] = sprintf(Lang::$game['requires'], $name);
         }
 
         return $locks;
@@ -479,9 +485,6 @@ class Lang
         if ($classMask == CLASS_MASK_ALL)                   // available to all classes
             return false;
 
-        if (!$classMask)                                    // no restrictions left
-            return false;
-
         $tmp = [];
         $i   = 1;
 
@@ -503,9 +506,6 @@ class Lang
         $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
 
         if ($raceMask == RACE_MASK_ALL)                     // available to all races (we don't display 'both factions')
-            return false;
-
-        if (!$raceMask)                                     // no restrictions left (we don't display 'both factions')
             return false;
 
         $tmp  = [];

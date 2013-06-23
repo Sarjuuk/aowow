@@ -12,6 +12,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+        'name'          => "Nom",
         'link'          => "Lien",
         'signIn'        => "S'enregistrer",
         'jsError'       => "S'il vous plait, assurez vous d'avoir le javascript autorisé.",
@@ -21,7 +22,6 @@ $lang = array(
         'timeSQL'       => "Temps d'exécution des requêtes SQL",
         'noJScript'     => "<b>Ce site requiert JavaScript pour fonctionner.</b><br />Veuillez <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">activer JavaScript</a> dans votre navigateur.",
         'profiles'      => "Vos personnages",      // translate.google :x
-        'links'         => "Liens",
         'pageNotFound'  => "Ce %s n'existe pas.",
         'gender'        => "Genre",
         'sex'           => [null, 'Homme', 'Femme'],
@@ -62,11 +62,16 @@ $lang = array(
         'refineSearch'  => "Astuce : Affinez votre recherche en utilisant une <a href=\"javascript:;\" id=\"fi_subcat\">sous-catégorie</a>.",
 
         // infobox
-        'name'          => "Nom",
+        'unavailable'   => "Non disponible aux joueurs",
         'disabled'      => "[Disabled]",
         'disabledHint'  => "[Cannot be attained or completed]",
         'serverside'    => "[Serverside]",
         'serversideHint' => "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
+
+        // red buttons
+        'links'         => "Liens",
+        'compare'       => "Comparer",
+        'view3D'        => "Voir en 3D"
     ),
     'search' => array(
         'search'        => "Recherche",
@@ -238,6 +243,15 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        '_desc'         => "<b>%s</b> est le <b>%s</b>. Il contient %s pièces.",
+        '_descTagless'  => "<b>%s</b> est un ensemble d'objet qui contient %s pièces.",
+        '_setBonuses'   => "Bonus de l'ensemble",
+        '_conveyBonus'  => "Plus d'objets de cet ensemble sont équipés, plus votre personnage aura des bonus de caractéristiques.",
+        '_pieces'       => "pièces",
+        '_unavailable'  => "Cet objet n'est plus disponible aux joueurs.",
+        '_type'         => "Type",
+        '_tag'          => "Étiquette",
+
         'notes'         => array(
             null,                                   "Ensemble de donjon 1",                 "Ensemble de donjon 2",                         "Ensemble de raid palier 1",
             "Ensemble de raid palier 2",            "Ensemble de raid palier 3",            "Ensemble JcJ niveau 60 supérieur",             "Ensemble JcJ niveau 60 supérieur (désuet)",

@@ -1091,7 +1091,7 @@ Mapper.prototype = {
         var scroll = g_getScroll();
 
         this.mouseX = Math.floor((e.clientX + scroll.x - c[0] - 3) / Mapper.sizes[this.zoom][0] * 1000) / 10;
-        this.mouseY = Math.floor((e.clientY + scroll.y  - c[1] - 3) / Mapper.sizes[this.zoom][1] * 1000) / 10;
+        this.mouseY = Math.floor((e.clientY + scroll.y - c[1] - 3) / Mapper.sizes[this.zoom][1] * 1000) / 10;
 
         if(this.mouseX < 0) this.mouseX = 0;
         else if(this.mouseX > 100) this.mouseX = 100;

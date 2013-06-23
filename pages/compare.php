@@ -3,10 +3,8 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
-$pageData = array(
-    'items'   => null,
-    'summary' => '[]'
-);
+
+$pageData      = ['items' => null, 'summary' => '[]'];
 $compareString = '';
 
 // prefer $_GET over $_COOKIE
@@ -31,18 +29,8 @@ if ($compareString)
                 $params[] = 0;
 
             $outString[] = $params;
-
-            // MATCH() AGAINST() for integers would be nice...
-            $res = DB::Aowow()->SelectRow(
-                "SELECT id FROM ?_itemset WHERE
-                item1 = ? OR item2 = ? OR item3 = ? OR item4 = ? OR item5 = ? OR
-                item6 = ? OR item7 = ? OR item8 = ? OR item9 = ? OR item10 = ?",
-                (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0], (int)$params[0]
-            );
-
-            if ($res)
-                $piecesAssoc[(int)$params[0]] = $res['id'];
         }
+
         $outSet[] = $outString;
     }
     $pageData['summary'] = json_encode($outSet, JSON_NUMERIC_CHECK);
@@ -65,7 +53,7 @@ if ($compareString)
 }
 
 
-$page = array(
+$smarty->updatePageVars(array(
     'title'  => Lang::$compare['compare'],
     'tab'    => 1,
     'reqCSS' => array(
@@ -79,10 +67,7 @@ $page = array(
         array('path' => 'template/js/swfobject.js'),
         array('path' => '?data=weight-presets.gems.enchants.itemsets'),
     ),
-);
-
-
-$smarty->updatePageVars($page);
+));
 $smarty->assign('lvData', $pageData);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$compare));
 $smarty->assign('mysql', DB::Aowow()->getStatistics());
