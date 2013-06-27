@@ -309,6 +309,60 @@ trait listviewHelper
 }
 
 
+trait spawnHelper
+{
+    private static $spawnQuery = " SELECT a.guid AS ARRAY_KEY, map, position_x, position_y, spawnMask, phaseMask, spawntimesecs, eventEntry, pool_entry AS pool FROM ?# a LEFT JOIN ?# b ON a.guid = b.guid LEFT JOIN ?# c ON a.guid = c.guid WHERE id = ?d";
+
+    private function fetch()
+    {
+        if (!$this->id)
+            return false;
+
+        switch (get_class($this))
+        {
+            case 'CreatureList':
+                return DB::Aowow()->select(self::$spawnQuery, 'creature',   'game_event_creature',   'pool_creature',   $this->id);
+            case 'GameObjectList':
+                return DB::Aowow()->select(self::$spawnQuery, 'gameobject', 'game_event_gameobject', 'pool_gameobject', $this->id);
+            default:
+                return false;
+        }
+    }
+
+    public function getSpawns($short = false)
+    {
+        // short: true => only the most populated area and only coordinates
+        $data = [];
+
+        $raw = $this->fetch();
+        if (!$raw)
+            return [];
+
+        /*
+        long:
+            $data = array(
+                areaId => array(
+                    floorNo => array (
+                        posX      =>
+                        posY      =>
+                        respawn   =>
+                        phaseMask =>
+                        spawnMask =>
+                        eventId   =>
+                        poolId    =>
+                    )
+                )
+            )
+
+        short:      zoneId, [pos-sets]
+            $data = [6456, [[51,42.2],[51,43]]];
+        */
+
+        return $data;
+    }
+}
+
+
 class Lang
 {
     public static $main;
@@ -584,10 +638,55 @@ class SmartyAoWoW extends Smarty
 
     public function display($tpl)
     {
-        // since it's the same for every page, except index..
-        if ($this->_tpl_vars['query'][0] && !preg_match('/[^a-z]/i', $this->_tpl_vars['query'][0]))
+        $tv = &$this->_tpl_vars;
+        $_  = [];
+
+        if ($tv['page']['type'] && $tv['page']['typeId'])
         {
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ?s OR page = "*")', $this->_tpl_vars['query'][0]);
+            if ($article = DB::Aowow()->selectRow('SELECT id, article, quickInfo FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d', $tv['page']['type'], $tv['page']['typeId'], User::$localeId))
+            {
+                $globals = DB::Aowow()->select('SELECT type, typeId FROM ?_article_items WHERE id = ?d', $article['id']);
+
+                 $tv['article']  = $article['article'];
+                @$tv['infoBox'] .= $article['quickInfo'];
+
+                foreach ($globals as $glob)
+                {
+                    if (!isset($_[$glob['type']]))
+                        $_[$glob['type']] = [];
+
+                    $_[$glob['type']][] = $glob['typeId'];
+                }
+
+                foreach ($_ as $type => $ids)
+                {
+                    switch ($type)
+                    {
+                        case TYPE_NPC:         (new CreatureList(array(['ct.entry', $ids])))->addGlobalsToJscript($tv['lvData']);   break;
+                        case TYPE_OBJECT:      (new GameobjectList(array(['gt.entry', $ids])))->addGlobalsToJscript($tv['lvData']); break;
+                        case TYPE_ITEM:        (new ItemList(array(['it.entry', $ids])))->addGlobalsToJscript($tv['lvData']);       break;
+                        case TYPE_ITEMSET:     (new ItemsetList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);          break;
+                        case TYPE_QUEST:       (new QuestList(array(['qt.entry', $ids])))->addGlobalsToJscript($tv['lvData']);      break;
+                        case TYPE_SPELL:       (new SpellList(array(['s.id', $ids])))->addGlobalsToJscript($tv['lvData']);          break;
+                        case TYPE_ZONE:        (new ZoneList(array(['z.id', $ids])))->addGlobalsToJscript($tv['lvData']);           break;
+                        case TYPE_FACTION:     (new FactionList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);          break;
+                        case TYPE_PET:         (new PetList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);              break;
+                        case TYPE_ACHIEVEMENT: (new AchievementList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);      break;
+                        case TYPE_TITLE:       (new TitleList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);            break;
+                        case TYPE_WORLDEVENT:  (new WorldEventList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);       break;
+                        case TYPE_CLASS:       (new CharClassList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);        break;
+                        case TYPE_RACE:        (new CharRaceList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);         break;
+                        case TYPE_SKILL:       (new SkillList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);            break;
+                        case TYPE_CURRENCY:    (new CurrencyList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);         break;
+                    }
+                }
+            }
+        }
+
+        // since it's the same for every page, except index..
+        if ($tv['query'][0] && !preg_match('/[^a-z]/i', $tv['query'][0]))
+        {
+            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ?s OR page = "*")', $tv['query'][0]);
             foreach ($ann as $k => $v)
             {
                 if ($t = Util::localizedString($v, 'text'))

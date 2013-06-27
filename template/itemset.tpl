@@ -3,17 +3,18 @@
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
+
 {if !empty($announcements)}
     {foreach from=$announcements item=item}
         {include file='bricks/announcement.tpl' an=$item}
     {/foreach}
 {/if}
 
-            <script type="text/javascript">
+            <script type="text/javascript">//<![CDATA[
 {include file='bricks/community.tpl'}
                 var g_pageInfo = {ldelim}type: {$page.type}, typeId: {$page.typeId}, name: '{$lvData.page.name|escape:"quotes"}'{rdelim};
                 g_initPath({$page.path});
-            </script>
+            //]]></script>
 
 {include file='bricks/infobox.tpl'}
 
@@ -24,12 +25,7 @@
                 <a href="{if $lvData.page.id > 0}http://old.wowhead.com/?{$query[0]}={$query[1]}{else}javascript:;{/if}" class="button-red{if $lvData.page.id < 0} button-red-disabled{/if}"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
                 <h1>{$lvData.page.name}</h1>
 
-{if $lvData.article}
-                <div id="article-generic" class="left"></div>
-                <script type="text/javascript">//<![CDATA[
-                    Markup.printHtml("{$lvData.article}", "article-generic", {ldelim}mode:Markup.MODE_ARTICLE{rdelim});
-                //]]></script>
-{/if}
+{include file='bricks/article.tpl'}
 
 {$lvData.page.description}
 
@@ -45,11 +41,11 @@
 {/section}
                 </table>
 
-                <script type="text/javascript">
+                <script type="text/javascript">//<![CDATA[
 {section name=i loop=$lvData.pieces}
                     ge('iconlist-icon{$smarty.section.i.index + 1}').appendChild(g_items.createIcon({$lvData.pieces[i].id}, 0, 0));
 {/section}
-                </script>
+                //]]></script>
 
 {if $lvData.page.unavailable}
                 <div class="pad"></div><b style="color: red">{$lang._unavailable}</b>
@@ -74,19 +70,19 @@
                 <h2 class="clear">{$lang.related}</h2>
             </div>
 
-        <div id="tabs-generic"></div>
-        <div id="listview-generic" class="listview"></div>
-        <script type="text/javascript">//<![CDATA[
-            var tabsRelated = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
+            <div id="tabs-generic"></div>
+            <div id="listview-generic" class="listview"></div>
+            <script type="text/javascript">//<![CDATA[
+                var tabsRelated = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
 {if !empty($lvData.related)}            {include file='bricks/listviews/itemset.tpl' data=$lvData.related.data   params=$lvData.related.params} {/if}
-            new Listview({ldelim}template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: tabsRelated, parent: 'listview-generic', data: lv_comments{rdelim});
-            new Listview({ldelim}template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: tabsRelated, parent: 'listview-generic', data: lv_screenshots{rdelim});
-            if (lv_videos.length || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)))
-                new Listview({ldelim}template: 'video', id: 'videos', name: LANG.tab_videos, tabs: tabsRelated, parent: 'listview-generic', data: lv_videos{rdelim});
-            tabsRelated.flush();
-        //]]></script>
+                new Listview({ldelim}template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: tabsRelated, parent: 'listview-generic', data: lv_comments{rdelim});
+                new Listview({ldelim}template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: tabsRelated, parent: 'listview-generic', data: lv_screenshots{rdelim});
+                if (lv_videos.length || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)))
+                    new Listview({ldelim}template: 'video', id: 'videos', name: LANG.tab_videos, tabs: tabsRelated, parent: 'listview-generic', data: lv_videos{rdelim});
+                tabsRelated.flush();
+            //]]></script>
 
-        {include file='bricks/contribute.tpl'}
+{include file='bricks/contribute.tpl'}
 
         </div><!-- main-contents -->
     </div><!-- main -->

@@ -164,7 +164,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'title'   => $name,                                 // for header
         'path'    => $path,
         'infobox' => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
-        'article' => null,                                  // todo (med): hmm, move to $smarty..?
         'pieces'  => $pieces,
         'spells'  => $spells,
         'view3D'  => json_encode($eqList, JSON_NUMERIC_CHECK),
