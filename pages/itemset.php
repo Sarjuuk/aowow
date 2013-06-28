@@ -68,7 +68,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // type
     if ($ty)
-        $infobox[] = Lang::$itemset['_type'].lang::$colon.Lang::$itemset['types'][$ty];
+        $infobox[] = Lang::$game['type'].lang::$colon.Lang::$itemset['types'][$ty];
 
     // tag
     if ($ta)

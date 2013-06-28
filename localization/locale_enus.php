@@ -118,6 +118,7 @@ $lang = array(
         'school'        => "School",
         'spell'         => "spell",
         'spells'        => "Spells",
+        'type'          => "Type",
         'valueDelim'    => " to ",
         'zone'          => "zone",
         'zones'         => "Zones",
@@ -292,7 +293,6 @@ $lang = array(
         '_conveyBonus'  => "Wearing more pieces of this set will convey bonuses to your character.",
         '_pieces'       => "pieces",
         '_unavailable'  => "This item set is not available to players.",
-        '_type'         => "Type",
         '_tag'          => "Tag",
 
         'notes'         => array(

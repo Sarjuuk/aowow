@@ -14446,7 +14446,7 @@ var Lightbox = new function() {
         prepared,
         lastId;
 
-        function hookEvents() {
+    function hookEvents() {
         aE(overlay, 'click', hide);
         aE(document, 'keydown', onKeyDown);
         aE(window, 'resize', onResize);

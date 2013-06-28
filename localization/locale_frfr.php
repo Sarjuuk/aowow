@@ -115,6 +115,7 @@ $lang = array(
         'school'        => "École",
         'spell'         => "sort",
         'spells'        => "Sorts",
+        'type'          => "Type",
         'valueDelim'    => " - ",
         'zone'          => "zone",
         'zones'         => "Zones",
@@ -249,7 +250,6 @@ $lang = array(
         '_conveyBonus'  => "Plus d'objets de cet ensemble sont équipés, plus votre personnage aura des bonus de caractéristiques.",
         '_pieces'       => "pièces",
         '_unavailable'  => "Cet objet n'est plus disponible aux joueurs.",
-        '_type'         => "Type",
         '_tag'          => "Étiquette",
 
         'notes'         => array(

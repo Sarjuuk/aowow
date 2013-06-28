@@ -111,14 +111,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $pageData['page']['buff'] = $spell->renderBuff(MAX_LEVEL, true);
 
     // infobox
-    $parts = [];
+    $infobox = [];
 
     if (!in_array($cat, [-5, -6]))                          // not mount or vanity pet
     {
         if ($_ = $spell->getField('talentLevel'))           // level
-            $parts[] = '[li]'.(in_array($cat, [-2, 7, -13]) ? sprintf(Lang::$game['reqLevel'], $_) : Lang::$game['level'].Lang::$colon.$_).'[/li]';
+            $infobox[] = '[li]'.(in_array($cat, [-2, 7, -13]) ? sprintf(Lang::$game['reqLevel'], $_) : Lang::$game['level'].Lang::$colon.$_).'[/li]';
         else if ($_ = $spell->getField('spellLevel'))
-            $parts[] = '[li]'.(in_array($cat, [-2, 7, -13]) ? sprintf(Lang::$game['reqLevel'], $_) : Lang::$game['level'].Lang::$colon.$_).'[/li]';
+            $infobox[] = '[li]'.(in_array($cat, [-2, 7, -13]) ? sprintf(Lang::$game['reqLevel'], $_) : Lang::$game['level'].Lang::$colon.$_).'[/li]';
     }
 
     if ($mask = $spell->getField('reqRaceMask'))            // race
@@ -129,7 +129,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $bar[] = (!fMod(count($bar) + 1, 3) ? '\n' : null) . '[race='.($i + 1).']';
 
         $t = count($bar) == 1 ? Lang::$game['race'] : Lang::$game['races'];
-        $parts[] = '[li]'.Util::ucFirst($t).Lang::$colon.implode(', ', $bar).'[/li]';
+        $infobox[] = '[li]'.Util::ucFirst($t).Lang::$colon.implode(', ', $bar).'[/li]';
     }
 
     if ($mask = $spell->getField('reqClassMask'))           // class
@@ -140,13 +140,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $bar[] = (!fMod(count($bar) + 1, 3) ? '\n' : null) . '[class='.($i + 1).']';
 
         $t = count($bar) == 1 ? Lang::$game['class'] : Lang::$game['classes'];
-        $parts[] = '[li]'.Util::ucFirst($t).Lang::$colon.implode(', ', $bar).'[/li]';
+        $infobox[] = '[li]'.Util::ucFirst($t).Lang::$colon.implode(', ', $bar).'[/li]';
     }
 
     if ($_ = $spell->getField('spellFocusObject'))          // spellFocus
     {
         $bar = DB::Aowow()->selectRow('SELECT * FROM ?_spellFocusObject WHERE id = ?d', $_);
-        $parts[] = '[li]'.Lang::$game['requires2'].' '.Util::localizedString($bar, 'name').'[/li]';
+        $infobox[] = '[li]'.Lang::$game['requires2'].' '.Util::localizedString($bar, 'name').'[/li]';
     }
 
     if (in_array($cat, [9, 11]))                            // primary & secondary trades
@@ -156,11 +156,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if ($_ = $spell->getField('learnedAt'))
             $bar .= ' ('.$_.')';
 
-        $parts[] = '[li]'.sprintf(Lang::$game['requires'], $bar).'[/li]';
+        $infobox[] = '[li]'.sprintf(Lang::$game['requires'], $bar).'[/li]';
 
         // specialization
         if ($_ = $spell->getField('reqSpellId'))
-            $parts[] = '[li]'.Lang::$game['requires2'].' '.SpellList::getName($_).'[/li]';
+            $infobox[] = '[li]'.Lang::$game['requires2'].' '.SpellList::getName($_).'[/li]';
 
         // difficulty
         if ($_ = $spell->getColorsForCurrent())
@@ -170,19 +170,17 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 if ($_[$i])
                     $bar[] = '[color=r'.($i + 1).']'.$_[$i].'[/color]';
 
-            $parts[] = '[li]'.Lang::$game['difficulty'].Lang::$colon.implode(' ', $bar).'[/li]';
+            $infobox[] = '[li]'.Lang::$game['difficulty'].Lang::$colon.implode(' ', $bar).'[/li]';
         }
     }
 
     // flag starter spell
     if (isset($spell->sources[$spell->id]) && array_key_exists(10, $spell->sources[$spell->id]))
-        $parts[] = '[li]'.Lang::$spell['starter'].'[/li]';
+        $infobox[] = '[li]'.Lang::$spell['starter'].'[/li]';
 
     // training cost
     if ($cost = DB::Aowow()->selectCell('SELECT spellcost FROM npc_trainer WHERE spell = ?d', $spell->id))
-        $parts[] = '[li]'.Lang::$spell['trainingCost'].Lang::$colon.'[money='.$cost.'][/li]';
-
-    $pageData['infobox'] = $parts ? '[ul]'.implode('', $parts).'[/ul]' : null;
+        $infobox[] = '[li]'.Lang::$spell['trainingCost'].Lang::$colon.'[money='.$cost.'][/li]';
 
     // title
     $pageData['title'] = [$spell->getField('name', true), Util::ucFirst(Lang::$game['spell'])];
@@ -228,6 +226,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // Iterate through all effects:
     $pageData['page']['effect'] = [];
     $spell->reset();
+
+    $pageData['view3D'] = 0;
+
     for ($i = 1; $i < 4; $i++)
     {
         if ($spell->getField('effect'.$i.'Id') <= 0)
@@ -397,7 +398,15 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                             $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, implode(', ', $bar), $effMV).')';
                             break;
                         case 36:                            // Shapeshift
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$game['st'][$effMV], $effMV).')';
+                            $st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftForms WHERE id = ?d', $effMV);
+
+                            if ($st['creatureType'] > 0)
+                                $infobox[] = '[li]'.Lang::$game['type'].Lang::$colon.Lang::$game['ct'][$st['creatureType']].'[/li]';
+
+                            if (!$pageData['view3D'] && $st)
+                                $pageData['view3D'] = $st['model2'] ? $st['model'.rand(1,2)]: $st['model1'];
+
+                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, Util::localizedString($st, 'name'), $effMV).')';
                             break;
                         case 37:                            // Effect immunity
                             $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Util::$spellEffectStrings[$effMV], $effMV).')';
@@ -502,7 +511,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 78:                            // Mounted
                         case 56:                            // Transform
                         {
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' <a href="?npc='.$effMV.'">'.CreatureList::getName($effMV).'</a> ('.$effMV.')';
+                            $transform = new CreatureList(array(['ct.entry', $effMV]));
+
+                            if (!$pageData['view3D'] && $transform)
+                                $pageData['view3D'] = $transform->getRandomModelId();
+
+                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' <a href="?npc='.$effMV.'">'.$transform->getField('name', true).'</a> ('.$effMV.')';
                             break;
                         }
                         default:
@@ -530,6 +544,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if (in_array($effAura, [11, 12, 36, 77]) || in_array($effId, []))
             unset($foo['value']);
     }
+
+    $pageData['infobox'] = $infobox ? '[ul]'.implode('', $infobox).'[/ul]' : null;
 
     /*******
     * extra tabs
@@ -719,7 +735,10 @@ $smarty->updatePageVars(array(
     'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
     'tab'    => 0,
     'type'   => TYPE_SPELL,
-    'typeId' => $id
+    'typeId' => $id,
+    'reqJS'  => array (
+            array('path' => 'template/js/swfobject.js')
+    )
 ));
 
 $smarty->assign('community', CommunityContent::getAll(TYPE_SPELL, $id));         // comments, screenshots, videos

@@ -115,6 +115,7 @@ $lang = array(
         'school'        => "Escuela",
         'spell'         => "hechizo",
         'spells'        => "Hechizos",
+        'type'          => "Tipo",
         'valueDelim'    => " - ",
         'zone'          => "zona",
         'zones'         => "Zonas",
@@ -250,7 +251,6 @@ $lang = array(
         '_conveyBonus'  => "Tener puestos mas objetos de este conjunto le aplicará una bonificación a tu personaje.",
         '_pieces'       => "piezas",
         '_unavailable'  => "Este conjunto de objetos no está disponible para jugadores.",
-        '_type'         => "Tipo",
         '_tag'          => "Etiqueta",
 
         'notes'         => array(

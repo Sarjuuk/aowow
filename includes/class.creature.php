@@ -84,6 +84,17 @@ class CreatureList extends BaseType
         return $x;
     }
 
+    public function getRandomModelId()
+    {
+        $data = [];
+
+        for ($i = 1; $i < 5; $i++)
+            if ($_ = $this->curTpl['modelid'.$i])
+                $data[] = $_;
+
+        return !$data ? 0 : $data[array_rand($data)];
+    }
+
     public function getListviewData() { }
     public function addGlobalsToJScript(&$refs) { }
     public function addRewardsToJScript(&$refs) { }

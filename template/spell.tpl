@@ -22,9 +22,8 @@
             </table>
 
         <div class="text">
-            <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur();
-                Links.show({ldelim} type: 6, typeId: {$lvData.page.id}, linkColor: 'ff71d5ff', linkId: 'spell:{$lvData.page.id}', linkName: '{$lvData.page.name}' {rdelim});">
-            <em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
+            <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: 6, typeId: {$lvData.page.id}, linkColor: 'ff71d5ff', linkId: 'spell:{$lvData.page.id}', linkName: '{$lvData.page.name}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
+            <a href="javascript:;" id="view3D-button" class="button-red{if $lvData.view3D}" onclick="this.blur(); ModelViewer.show({ldelim} type: 1, displayId: {$lvData.view3D} {rdelim}){else} button-red-disabled{/if}"><em><b><i>View in 3D</i></b><span>View in 3D</span></em></a>
             <a href="http://old.wowhead.com/?{$query[0]}={$query[1]}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
             <h1>{$lvData.page.name}</h1>
 
