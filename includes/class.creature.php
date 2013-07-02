@@ -10,8 +10,8 @@ class CreatureList extends BaseType
 
     public    $tooltips   = [];
 
-    protected $setupQuery = 'SELECT *, ct.entry AS ARRAY_KEY, ct.entry AS id FROM creature_template ct LEFT JOIN locales_creature lc ON lc.entry = ct.entry LEFT JOIN creature_template_addon cta on cta.entry = ct.entry WHERE [filter] [cond]';
-    protected $matchQuery = 'SELECT COUNT(*) FROM creature_template ct WHERE [filter] [cond]';
+    protected $setupQuery = 'SELECT ct.*, ct.id AS ARRAY_KEY, ft.A, ft.H, ft.factionId FROM ?_creature ct LEFT JOIN ?_factiontemplate ft ON ft.id = ct.faction_A WHERE [filter] [cond]';
+    protected $matchQuery = 'SELECT COUNT(*) FROM ?_creature ct WHERE [filter] [cond]';
 
     public static function getName($id)
     {
@@ -23,13 +23,9 @@ class CreatureList extends BaseType
                 name_loc6,
                 name_loc8
             FROM
-                creature_template ct
-            LEFT JOIN
-                locales_creature lc
-            ON
-                lc.entry = ct.entry
+                ?_creature
             WHERE
-                ct.entry = ?d',
+                id = ?d',
             $id
         );
         return Util::localizedString($n, 'name');
@@ -95,8 +91,81 @@ class CreatureList extends BaseType
         return !$data ? 0 : $data[array_rand($data)];
     }
 
-    public function getListviewData() { }
-    public function addGlobalsToJScript(&$refs) { }
+    public function getListviewData($addInfoMask = 0x0)
+    {
+        /* looks like this data differs per occasion
+        *
+        * NPCINFO_TAMEABLE (0x1): include texture & react
+        * NPCINFO_MODEL (0x2):
+        */
+
+        $data = [];
+
+        while ($this->iterate())
+        {
+            if ($addInfoMask & NPCINFO_MODEL)
+            {
+                $texStr = strtolower($this->curTpl['textureString']);
+
+                if (isset($data[$texStr]))
+                {
+                    if ($data[$texStr]['minlevel'] > $this->curTpl['minlevel'])
+                        $data[$texStr]['minlevel'] = $this->curTpl['minlevel'];
+
+                    if ($data[$texStr]['maxlevel'] < $this->curTpl['maxlevel'])
+                        $data[$texStr]['maxlevel'] = $this->curTpl['maxlevel'];
+
+                    $data[$texStr]['count']++;
+                }
+                else
+                    $data[$texStr] = array(
+                        'family'    => $this->curTpl['family'],
+                        'minlevel'  => $this->curTpl['minlevel'],
+                        'maxlevel'  => $this->curTpl['maxlevel'],
+                        'modelId'   => $this->curTpl['modelId'],
+                        'displayId' => $this->curTpl['displayId1'],
+                        'skin'      => $texStr,
+                        'count'     => 1
+                    );
+            }
+            else
+            {
+                $data[$this->id] = array(
+                    'family'   => $this->curTpl['family'],
+                    'minlevel' => $this->curTpl['minlevel'],
+                    'maxlevel' => $this->curTpl['maxlevel'],
+                    'id'       => $this->id,
+                    'boss'     => $this->curTpl['type_flags'] & 0x4,
+                    'rank'     => $this->curTpl['rank'],
+                    'location' => json_encode($this->getSpawns(SPAWNINFO_ZONES), JSON_NUMERIC_CHECK),
+                    'name'     => $this->getField('name', true),
+                    'tag'      => $this->getField('subname', true),
+                    'type'     => $this->curTpl['type']
+                );
+
+                if ($addInfoMask & NPCINFO_TAMEABLE)
+                {
+                    // only first skin of first model ... we're omitting potentially 11 skins here .. but the lv accepts only one .. w/e
+                    $data[$this->id]['skin'] = $this->curTpl['textureString'];
+
+                    $data[$this->id]['react'] = '['.$this->curTpl['A'].', '.$this->curTpl['H'].']';
+                }
+            }
+        }
+
+        ksort($data);
+        return $data;
+    }
+
+    public function addGlobalsToJScript(&$refs)
+    {
+        if (!isset($refs['gCreatures']))
+            $refs['gCreatures'] = [];
+
+        while ($this->iterate())
+            $refs['gCreatures'][$this->id] = ['name' => $this->getField('name', true)];
+    }
+
     public function addRewardsToJScript(&$refs) { }
 
 }

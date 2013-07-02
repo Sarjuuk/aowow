@@ -87,7 +87,8 @@ abstract class BaseType
 
                 foreach ($c as $foo)
                     if (is_array($foo))
-                        $sql[] = $resolveCondition($foo, $supLink);
+                        if ($x = $resolveCondition($foo, $supLink))
+                            $sql[] = $x;
 
                 return '('.implode($subLink, $sql).')';
             }
@@ -99,6 +100,9 @@ abstract class BaseType
                     $field = $resolveCondition($c[0], $supLink);
                 else if ($c[0])
                     $field = '`'.implode('`.`', explode('.', Util::sqlEscape($c[0]))).'`';
+                else
+                    return null;
+
                 if (is_array($c[1]))
                 {
                     $val = implode(',', Util::sqlEscape($c[1]));
@@ -128,10 +132,7 @@ abstract class BaseType
                 if (isset($c[2]) && $c[2] != '!')
                     $op = $c[2];
 
-                if (isset($field) && isset($op) && isset($val))
-                    return '('.$field.' '.$op.' '.$val.')';
-                else
-                    return null;
+                return '('.$field.' '.$op.' '.$val.')';
             }
         };
 
@@ -152,6 +153,7 @@ abstract class BaseType
                     unset($conditions[$i]);
             }
         }
+
         foreach ($conditions as $c)
             if ($x = $resolveCondition($c, $linking))
                 $sql[] = $x;
@@ -308,7 +310,6 @@ trait listviewHelper
 
 }
 
-
 trait spawnHelper
 {
     private static $spawnQuery = " SELECT a.guid AS ARRAY_KEY, map, position_x, position_y, spawnMask, phaseMask, spawntimesecs, eventEntry, pool_entry AS pool FROM ?# a LEFT JOIN ?# b ON a.guid = b.guid LEFT JOIN ?# c ON a.guid = c.guid WHERE id = ?d";
@@ -329,17 +330,21 @@ trait spawnHelper
         }
     }
 
-    public function getSpawns($short = false)
+    /*
+        todo (med): implement this alpha-map-check-virtual-map-transform-wahey!
+        note: map in tooltips is activated by either '#map' as anchor (will automatic open mapviewer, when clicking link) in the href or as parameterless rel-parameter e.g. rel="map" in the anchor
+    */
+    public function getSpawns($spawnInfo)
     {
-        // short: true => only the most populated area and only coordinates
+        // SPAWNINFO_SHORT: true => only the most populated area and only coordinates
         $data = [];
 
-        $raw = $this->fetch();
-        if (!$raw)
-            return [];
+        // $raw = $this->fetch();
+        // if (!$raw)
+            // return [];
 
         /*
-        long:
+        SPAWNINFO_FULL:
             $data = array(
                 areaId => array(
                     floorNo => array (
@@ -354,8 +359,9 @@ trait spawnHelper
                 )
             )
 
-        short:      zoneId, [pos-sets]
-            $data = [6456, [[51,42.2],[51,43]]];
+        SPAWNINFO_SHORT: [zoneId, [[x1, y1], [x2, y2], ..]] // only the most populated zone
+
+        SPAWNINFO_ZONES: [zoneId1, zoneId2, ..]             // only zones
         */
 
         return $data;

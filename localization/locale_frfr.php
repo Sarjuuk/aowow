@@ -106,6 +106,7 @@ $lang = array(
         'mechAbbr'      => "Mécan.",
         'pet'           => "Familier",
         'pets'          => "Familiers de chasseur",
+        'petCalc'       => "Calculateur de familiers",
         'requires'      => "%s requis",
         'requires2'     => "Requiert",
         'reqLevel'      => "Niveau %s requis",
@@ -239,9 +240,8 @@ $lang = array(
         )
     ),
     'pet'      => array(
-        'cat'           => array(
-            'Férocité', 'Tenacité', 'Ruse'
-        )
+        'exotic'        => "Exotique"
+        "cat"           => ["Férocité", "Tenacité", "Ruse"]
     ),
     'itemset' => array(
         '_desc'         => "<b>%s</b> est le <b>%s</b>. Il contient %s pièces.",

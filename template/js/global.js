@@ -2250,109 +2250,6 @@ function g_numberFormat(f, b, l, h) {
 	}
 	return o
 }
-function g_getPatchVersionIndex(e) {
-	var d = g_getPatchVersion;
-	var b = 0,
-	c = d.T.length - 2,
-	a;
-	while (c > b) {
-		a = Math.floor((c + b) / 2);
-		if (e >= d.T[a] && e < d.T[a + 1]) {
-			return a
-		}
-		if (e >= d.T[a]) {
-			b = a + 1
-		} else {
-			c = a - 1
-		}
-	}
-	a = Math.ceil((c + b) / 2);
-	return a
-}
-function g_getPatchVersion(b) {
-	var a = g_getPatchVersionIndex(b);
-	return g_getPatchVersion.V[a]
-}
-g_getPatchVersion.V = [
-    "1.12.0",
-    "1.12.1",
-    "1.12.2",
-	"2.0.1",
-	"2.0.3",
-	"2.0.4",
-	"2.0.5",
-	"2.0.6",
-	"2.0.7",
-	"2.0.8",
-	"2.0.10",
-	"2.0.12",
-	"2.1.0",
-	"2.1.1",
-	"2.1.2",
-	"2.1.3",
-	"2.2.0",
-	"2.2.2",
-	"2.2.3",
-	"2.3.0",
-	"2.3.2",
-	"2.3.3",
-	"2.4.0",
-	"2.4.1",
-	"2.4.2",
-	"2.4.3",
-	"3.0.2",
-	"3.0.3",
-	"3.0.8",
-	"3.0.9",
-	"3.1.0",
-	"3.1.1",
-	"3.1.2",
-	"3.1.3",
-	"3.2.0",
-	"3.2.2",
-	"3.3.0",
-    "???"
-];
-g_getPatchVersion.T = [
-    1153540800000,
-	1159243200000,
-	1160712000000,
-	1165294800000,
-	1168318800000,
-	1168578000000,
-	1168750800000,
-	1169528400000,
-	1171342800000,
-	1171602000000,
-	1173157200000,
-	1175572800000,
-	1179806400000,
-	1181016000000,
-	1182225600000,
-	1184040000000,
-	1190692800000,
-	1191297600000,
-	1191902400000,
-	1194930000000,
-	1199768400000,
-	1200978000000,
-	1206417600000,
-	1207022400000,
-	1210651200000,
-	1216094400000,
-	1223956800000,
-	1225774800000,
-	1232427600000,
-	1234242000000,
-	1239681600000,
-	1240286400000,
-	1242705600000,
-	1243915200000,
-	1249358400000,
-	1253595600000,
-	1260266400000,
-	9999999999999
-];
 function g_expandSite() {
 	ge("wrapper").className = "nosidebar";
 	var a = ge("topbar-expand");
@@ -2446,10 +2343,6 @@ g_getIdFromTypeName.L = {
     currency: 17,
 	profile: 100
 };
-function g_getIngameLink(color, id, name) {
-	// prompt(LANG.prompt_ingamelink, '/script DEFAULT_CHAT_FRAME:AddMessage("\\124c' + a + "\\124H" + c + "\\124h[" + b + ']\\124h\\124r");')
-    return '/script DEFAULT_CHAT_FRAME:AddMessage("\\124c' + color + '\\124H' + id + '\\124h[' + name + ']\\124h\\124r");';
-}
 function g_isEmailValid(a) {
 	return a.match(/^([a-z0-9._-]+)(\+[a-z0-9._-]+)?(@[a-z0-9.-]+\.[a-z]{2,4})$/i) != null
 }
@@ -8164,7 +8057,7 @@ Listview.templates = {
                     ae(a, ct(faction.name));
                     if (faction.expansion) {
                         var sp = ce('span');
-						sp.className = g_GetExpansionClassName(faction.expansion);
+                        sp.className = g_GetExpansionClassName(faction.expansion);
                         ae(sp, a);
                         ae(td, sp);
                     }
@@ -8173,7 +8066,7 @@ Listview.templates = {
                     }
                 },
                 getVisibleText: function(faction) {
-					var buff = faction.name + Listview.funcBox.getExpansionText(faction);
+                    var buff = faction.name + Listview.funcBox.getExpansionText(faction);
 
                     return buff;
                 }
@@ -8933,12 +8826,12 @@ Listview.templates = {
         }
     },
 
-	itemset: {
-		sort: [1],
-		nItemsPerPage: 75,
-		searchable: 1,
-		filtrable: 1,
-		columns: [
+    itemset: {
+        sort: [1],
+        nItemsPerPage: 75,
+        searchable: 1,
+        filtrable: 1,
+        columns: [
             {
                 id: 'name',
                 name: LANG.name,
@@ -9087,274 +8980,302 @@ Listview.templates = {
             }
         ],
 
-		getItemLink: function(itemSet) {
-			return '?itemset=' + itemSet.id;
-		}
-	},
+        getItemLink: function(itemSet) {
+            return '?itemset=' + itemSet.id;
+        }
+    },
 
-	npc: {
-		sort: [1],
-		nItemsPerPage: 100,
-		searchable: 1,
-		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			compute: function(c, f) {
-				if (c.boss) {
-					f.className = "boss-icon-padded"
-				}
-				var b = ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(c);
-				ae(b, ct(c.name));
-				ae(f, b);
-				if (c.tag != null) {
-					var e = ce("div");
-					e.className = "small";
-					ae(e, ct("<" + c.tag + ">"));
-					ae(f, e)
-				}
-			},
-			getVisibleText: function(a) {
-				var b = a.name;
-				if (a.tag) {
-					b += " <" + a.tag + ">"
-				}
-				if (a.boss) {
-					b += " boss skull"
-				}
-				return b
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(c.boss, d.boss) || strcmp(d.name, c.name)
-			}
-		},
-		{
-			id: "level",
-			name: LANG.level,
-			type: "range",
-			width: "10%",
-			getMinValue: function(a) {
-				return a.minlevel
-			},
-			getMaxValue: function(a) {
-				return a.maxlevel
-			},
-			compute: function(a, c) {
-				if (a.classification) {
-					var b = ce("div");
-					b.className = "small";
-					ae(b, ct(g_npc_classifications[a.classification]));
-					ae(c, b)
-				}
-				if (a.classification == 3) {
-					return "??"
-				}
-				if (a.minlevel > 0 && a.maxlevel > 0) {
-					if (a.minlevel != a.maxlevel) {
-						return a.minlevel + LANG.hyphen + a.maxlevel
-					} else {
-						return a.minlevel
-					}
-				}
-				return -1
-			},
-			getVisibleText: function(a) {
-				var b = "";
-				if (a.classification) {
-					b += " " + g_npc_classifications[a.classification]
-				}
-				if (a.minlevel > 0 && a.maxlevel > 0) {
-					b += " ";
-					if (a.minlevel != a.maxlevel) {
-						b += a.minlevel + LANG.hyphen + a.maxlevel
-					} else {
-						b += a.minlevel
-					}
-				}
-				return b
-			},
-			sortFunc: function(d, c, e) {
-				if (e > 0) {
-					return strcmp(d.minlevel, c.minlevel) || strcmp(d.maxlevel, c.maxlevel) || strcmp(d.classification, c.classification)
-				} else {
-					return strcmp(d.maxlevel, c.maxlevel) || strcmp(d.minlevel, c.minlevel) || strcmp(d.classification, c.classification)
-				}
-			}
-		},
-		{
-			id: "location",
-			name: LANG.location,
-			type: "text",
-			compute: function(a, b) {
-				return Listview.funcBox.location(a, b)
-			},
-			getVisibleText: function(a) {
-				return Listview.funcBox.arrayText(a.location, g_zones)
-			},
-			sortFunc: function(d, c, e) {
-				return Listview.funcBox.assocArrCmp(d.location, c.location, g_zones)
-			}
-		},
-		{
-			id: "react",
-			name: LANG.react,
-			type: "text",
-			width: "10%",
-			value: "react",
-			filtrable: 0,
-			compute: function(b, g) {
-				if (b.react == null) {
-					return -1
-				}
-				var d = [LANG.lvnpc_alliance, LANG.lvnpc_horde];
-				var f = 0;
-				for (var a = 0; a < 2; ++a) {
-					if (b.react[a] != null) {
-						if (f++>0) {
-							ae(g, ct(" "))
-						}
-						var e = ce("span");
-						e.className = (b.react[a] < 0 ? "q10": (b.react[a] > 0 ? "q2": "q"));
-						ae(e, ct(d[a]));
-						ae(g, e)
-					}
-				}
-			}
-		},
-		{
-			id: "skin",
-			name: LANG.skin,
-			type: "text",
-			value: "skin",
-			compute: function(c, d) {
-				if (c.skin) {
-					var b = ce("a");
-					b.className = "q1";
-					b.href = "?npcs&filter=cr=35;crs=0;crv=" + c.skin;
-					ae(b, ct(c.skin));
-					ae(d, b)
-				}
-			},
-			hidden: 1
-		},
-		{
-			id: "petfamily",
-			name: LANG.petfamily,
-			type: "text",
-			width: "12%",
-			compute: function(c, d) {
-				d.className = "q1";
-				var b = ce("a");
-				b.href = "?pet=" + c.family;
-				ae(b, ct(g_pet_families[c.family]));
-				ae(d, b)
-			},
-			getVisibleText: function(a) {
-				return g_pet_families[a.family]
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(g_pet_families[d.family], g_pet_families[c.family])
-			},
-			hidden: 1
-		},
-		{
-			id: "type",
-			name: LANG.type,
-			type: "text",
-			width: "12%",
-			compute: function(c, d) {
-				d.className = "small q1";
-				var b = ce("a");
-				b.href = "?npcs=" + c.type;
-				ae(b, ct(g_npc_types[c.type]));
-				ae(d, b)
-			},
-			getVisibleText: function(a) {
-				return g_npc_types[a.type]
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(g_npc_types[d.type], g_npc_types[c.type])
-			}
-		}],
-		getItemLink: function(a) {
-			return "?npc=" + a.id
-		}
-	},
-	object: {
-		sort: [1],
-		nItemsPerPage: 100,
-		searchable: 1,
-		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			compute: function(c, d) {
-				var b = ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(c);
-				ae(b, ct(c.name));
-				ae(d, b)
-			}
-		},
-		{
-			id: "location",
-			name: LANG.location,
-			type: "text",
-			compute: function(a, b) {
-				return Listview.funcBox.location(a, b)
-			},
-			getVisibleText: function(a) {
-				return Listview.funcBox.arrayText(a.location, g_zones)
-			},
-			sortFunc: function(d, c, e) {
-				return Listview.funcBox.assocArrCmp(d.location, c.location, g_zones)
-			}
-		},
-		{
-			id: "skill",
-			name: LANG.skill,
-			width: "10%",
-			value: "skill",
-			hidden: true
-		},
-		{
-			id: "type",
-			name: LANG.type,
-			type: "text",
-			width: "12%",
-			compute: function(c, d) {
-				d.className = "small q1";
-				var b = ce("a");
-				b.href = "?objects=" + c.type;
-				ae(b, ct(g_object_types[c.type]));
-				ae(d, b)
-			},
-			getVisibleText: function(a) {
-				return g_object_types[a.type]
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(g_object_types[d.type], g_object_types[c.type])
-			}
-		}],
-		getItemLink: function(a) {
-			return "?object=" + a.id
-		}
-	},
+    npc: {
+        sort: [1],
+        nItemsPerPage: 100,
+        searchable: 1,
+        filtrable: 1,
 
-	quest: {
-		sort: [1,2],
-		nItemsPerPage: 100,
-		searchable: 1,
-		filtrable: 1,
-		columns: [
+        columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                compute: function(npc, td) {
+                    if (npc.boss) {
+                        td.className = 'boss-icon-padded';
+                    }
+
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(npc);
+                    ae(a, ct(npc.name));
+                    ae(td, a);
+
+                    if (npc.tag != null) {
+                        var d = ce('div');
+                        d.className = 'small';
+                        ae(d, ct('<' + npc.tag + '>'));
+                        ae(td, d);
+                    }
+                },
+                getVisibleText: function(npc) {
+                    var buff = npc.name;
+                    if (npc.tag) {
+                        buff += ' <' + npc.tag + '>';
+                    }
+                    if (npc.boss) {
+                        buff += ' boss skull';
+                    }
+                    return buff;
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(b.boss, a.boss) || strcmp(a.name, b.name);
+                }
+            },
+            {
+                id: 'level',
+                name: LANG.level,
+                type: 'range',
+                width: '10%',
+                getMinValue: function(npc) {
+                    return npc.minlevel;
+                },
+                getMaxValue: function(npc) {
+                    return npc.maxlevel;
+                },
+                compute: function(npc, td) {
+                    if (npc.classification) {
+                        var d = ce('div');
+                        d.className = 'small';
+                        ae(d, ct(g_npc_classifications[npc.classification]));
+                        ae(td, d);
+                    }
+
+                    if (npc.classification == 3 || npc.maxlevel == 9999) {
+                        return '??';
+                    }
+
+                    if (npc.minlevel > 0 && npc.maxlevel > 0) {
+                        if (npc.minlevel != npc.maxlevel) {
+                            return npc.minlevel + LANG.hyphen + npc.maxlevel;
+                        }
+                        else {
+                            return npc.minlevel;
+                        }
+                    }
+
+                    return -1;
+                },
+                getVisibleText: function(npc) {
+                    var buff = '';
+
+                    if (npc.classification) {
+                        buff += ' ' + g_npc_classifications[npc.classification];
+                    }
+
+                    if (npc.minlevel > 0 && npc.maxlevel > 0) {
+                        buff += ' ';
+                        if(npc.maxlevel == 9999) {
+                            buff += '??';
+                        }
+                        else if (npc.minlevel != npc.maxlevel) {
+                            buff += npc.minlevel + LANG.hyphen + npc.maxlevel;
+                        }
+                        else {
+                            buff += npc.minlevel;
+                        }
+                    }
+
+                    return buff;
+                },
+                sortFunc: function(a, b, col) {
+                    if (col > 0) {
+                        return strcmp(a.minlevel, b.minlevel) || strcmp(a.maxlevel, b.maxlevel) || strcmp(a.classification, b.classification);
+                    }
+                    else {
+                        return strcmp(a.maxlevel, b.maxlevel) || strcmp(a.minlevel, b.minlevel) || strcmp(a.classification, b.classification);
+                    }
+                }
+            },
+            {
+                id: 'location',
+                name: LANG.location,
+                type: 'text',
+                compute: function(npc, td) {
+                    return Listview.funcBox.location(npc, td);
+                },
+                getVisibleText: function(npc) {
+                    return Listview.funcBox.arrayText(npc.location, g_zones);
+                },
+                sortFunc: function(a, b, col) {
+                    return Listview.funcBox.assocArrCmp(a.location, b.location, g_zones);
+                }
+            },
+            {
+                id: 'react',
+                name: LANG.react,
+                type: 'text',
+                width: '10%',
+                value: 'react',
+                filtrable: 0,
+                compute: function(npc, td) {
+                    if (npc.react == null) {
+                        return -1;
+                    }
+
+                    var sides = [LANG.lvnpc_alliance, LANG.lvnpc_horde];
+                    var c = 0;
+                    for (var k = 0; k < 2; ++k) {
+                        if (npc.react[k] != null) {
+                            if (c++ > 0) {
+                                ae(td, ct(' '));
+                            }
+                            var sp = ce('span');
+
+                            sp.className = (npc.react[k] < 0 ? 'q10': (npc.react[k] > 0 ? 'q2': 'q'));
+
+                            ae(sp, ct(sides[k]));
+                            ae(td, sp);
+                        }
+                    }
+                }
+            },
+            {
+                id: 'skin',
+                name: LANG.skin,
+                type: 'text',
+                value: 'skin',
+                compute: function(npc, td) {
+                    if (npc.skin) {
+                        var a = ce('a');
+                        a.className = 'q1';
+                        a.href = '?npcs&filter=cr=35;crs=0;crv=' + npc.skin;
+                        ae(a, ct(npc.skin));
+                        ae(td, a);
+                    }
+                },
+                hidden: 1
+            },
+            {
+                id: 'petfamily',
+                name: LANG.petfamily,
+                type: 'text',
+                width: '12%',
+                compute: function(npc, td) {
+                    td.className = 'q1';
+
+                    var a = ce('a');
+                    a.href = '?pet=' + npc.family;
+                    ae(a, ct(g_pet_families[npc.family]));
+                    ae(td, a);
+                },
+                getVisibleText: function(npc) {
+                    return g_pet_families[npc.family];
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(g_pet_families[a.family], g_pet_families[b.family]);
+                },
+                hidden: 1
+            },
+            {
+                id: 'type',
+                name: LANG.type,
+                type: 'text',
+                width: '12%',
+                compute: function(npc, td) {
+                    td.className = 'small q1';
+
+                    var a = ce('a');
+                    a.href = '?npcs=' + npc.type;
+                    ae(a, ct(g_npc_types[npc.type]));
+                    ae(td, a);
+                },
+                getVisibleText: function(npc) {
+                    return g_npc_types[npc.type];
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(g_npc_types[a.type], g_npc_types[b.type]);
+                }
+            }
+        ],
+
+        getItemLink: function(npc) {
+            return '?npc=' + npc.id;
+        }
+    },
+
+    object: {
+        sort: [1],
+        nItemsPerPage: 100,
+        searchable: 1,
+        filtrable: 1,
+
+        columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                compute: function(object, td) {
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(object);
+                    ae(a, ct(object.name));
+                    ae(td, a);
+                }
+            },
+            {
+                id: 'location',
+                name: LANG.location,
+                type: 'text',
+                compute: function(object, td) {
+                    return Listview.funcBox.location(object, td);
+                },
+                getVisibleText: function(object) {
+                    return Listview.funcBox.arrayText(object.location, g_zones);
+                },
+                sortFunc: function(a, b, col) {
+                    return Listview.funcBox.assocArrCmp(a.location, b.location, g_zones);
+                }
+            },
+            {
+                id: 'skill',
+                name: LANG.skill,
+                width: '10%',
+                value: 'skill',
+                hidden: true
+            },
+            {
+                id: 'type',
+                name: LANG.type,
+                type: 'text',
+                width: '12%',
+                compute: function(object, td) {
+                    td.className = 'small q1';
+                    var a = ce('a');
+                    a.href = '?objects=' + object.type;
+                    ae(a, ct(g_object_types[object.type]));
+                    ae(td, a);
+                },
+                getVisibleText: function(object) {
+                    return g_object_types[object.type];
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(g_object_types[a.type], g_object_types[b.type]);
+                }
+            }
+        ],
+
+        getItemLink: function(object) {
+            return '?object=' + object.id;
+        }
+    },
+
+    quest: {
+        sort: [1,2],
+        nItemsPerPage: 100,
+        searchable: 1,
+        filtrable: 1,
+        columns: [
             {
                 id: 'name',
                 name: LANG.name,
@@ -9677,75 +9598,75 @@ Listview.templates = {
             }
         ],
 
-		getItemLink: function(quest) {
-			return '?quest=' + quest.id;
-		}
-	},
+        getItemLink: function(quest) {
+            return '?quest=' + quest.id;
+        }
+    },
 
-	skill: {
-		sort: [1],
-		searchable: 1,
-		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			span: 2,
-			compute: function(c, h, f) {
-				var d = ce("td");
-				d.style.width = "1px";
-				d.style.padding = "0";
-				d.style.borderRight = "none";
-				ae(d, Icon.create(c.icon, 0, null, this.getItemLink(c)));
-				ae(f, d);
-				h.style.borderLeft = "none";
-				var g = ce("div");
-				var b = ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.getItemLink(c);
-				ae(b, ct(c.name));
-				if (c.expansion) {
-					var e = ce("span");
-					e.className = g_GetExpansionClassName(c.expansion);
-					ae(e, b);
-					ae(g, e)
-				} else {
-					ae(g, b)
-				}
-				ae(h, g)
-			},
-			getVisibleText: function(a) {
-				var b = a.name + Listview.funcBox.getExpansionText(a);
-				return b
-			}
-		},
-		{
-			id: "category",
-			name: LANG.category,
-			type: "text",
-			width: "16%",
-			compute: function(c, d) {
-				if (c.category != 0) {
-					d.className = "small q1";
-					var b = ce("a");
-					b.href = "?skills=" + c.category;
-					ae(b, ct(g_skill_categories[c.category]));
-					ae(d, b)
-				}
-			},
-			getVisibleText: function(a) {
-				return g_skill_categories[skill.category]
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(g_skill_categories[d.category], g_skill_categories[c.category])
-			}
-		}],
-		getItemLink: function(a) {
-			return "?skill=" + a.id
-		}
-	},
+    skill: {
+        sort: [1],
+        searchable: 1,
+        filtrable: 1,
+        columns: [{
+            id: "name",
+            name: LANG.name,
+            type: "text",
+            align: "left",
+            value: "name",
+            span: 2,
+            compute: function(c, h, f) {
+                var d = ce("td");
+                d.style.width = "1px";
+                d.style.padding = "0";
+                d.style.borderRight = "none";
+                ae(d, Icon.create(c.icon, 0, null, this.getItemLink(c)));
+                ae(f, d);
+                h.style.borderLeft = "none";
+                var g = ce("div");
+                var b = ce("a");
+                b.style.fontFamily = "Verdana, sans-serif";
+                b.href = this.getItemLink(c);
+                ae(b, ct(c.name));
+                if (c.expansion) {
+                    var e = ce("span");
+                    e.className = g_GetExpansionClassName(c.expansion);
+                    ae(e, b);
+                    ae(g, e)
+                } else {
+                    ae(g, b)
+                }
+                ae(h, g)
+            },
+            getVisibleText: function(a) {
+                var b = a.name + Listview.funcBox.getExpansionText(a);
+                return b
+            }
+        },
+        {
+            id: "category",
+            name: LANG.category,
+            type: "text",
+            width: "16%",
+            compute: function(c, d) {
+                if (c.category != 0) {
+                    d.className = "small q1";
+                    var b = ce("a");
+                    b.href = "?skills=" + c.category;
+                    ae(b, ct(g_skill_categories[c.category]));
+                    ae(d, b)
+                }
+            },
+            getVisibleText: function(a) {
+                return g_skill_categories[skill.category]
+            },
+            sortFunc: function(d, c, e) {
+                return strcmp(g_skill_categories[d.category], g_skill_categories[c.category])
+            }
+        }],
+        getItemLink: function(a) {
+            return "?skill=" + a.id
+        }
+    },
 
     spell: {
         sort: ['name', 'skill', 'level'],
@@ -10113,6 +10034,19 @@ Listview.templates = {
                 }
             },
             {
+                id: 'tp',                                   // essentially unused, but if someone wants to backport classic
+                name: LANG.tp,
+                tooltip: LANG.tooltip_trainingpoints,
+                width: '7%',
+                hidden: true,
+                value: 'tp',
+                compute: function (spell, col) {
+                    if (spell.tp > 0) {
+                        return spell.tp;
+                    }
+                }
+            },
+            {
                 id: 'source',
                 name: LANG.source,
                 type: 'text',
@@ -10311,13 +10245,13 @@ Listview.templates = {
         }
     },
 
-	zone: {
-		sort: [1],
-		nItemsPerPage: -1,
-		searchable: 1,
-		filtrable: 1,
+    zone: {
+        sort: [1],
+        nItemsPerPage: -1,
+        searchable: 1,
+        filtrable: 1,
 
-		columns: [
+        columns: [
             {
                 id: 'name',
                 name: LANG.name,
@@ -10525,18 +10459,18 @@ Listview.templates = {
             }
         ],
 
-		getItemLink: function(zone) {
-			return '?zone=' + zone.id;
-		}
-	},
+        getItemLink: function(zone) {
+            return '?zone=' + zone.id;
+        }
+    },
 
-	holiday: {
-		sort: [2, 1],
-		nItemsPerPage: -1,
-		searchable: 1,
-		filtrable: 1,
+    holiday: {
+        sort: [2, 1],
+        nItemsPerPage: -1,
+        searchable: 1,
+        filtrable: 1,
 
-		columns: [
+        columns: [
             {
                 id: 'name',
                 name: LANG.name,
@@ -10625,14 +10559,14 @@ Listview.templates = {
                             return datesA[0] - datesB[0];
                         }
                     }
-					else if (a.startDate) {
-						return -1;
-					}
-					else if (b.startDate) {
-						return 1;
-					}
+                    else if (a.startDate) {
+                        return -1;
+                    }
+                    else if (b.startDate) {
+                        return 1;
+                    }
 
-					return 0;
+                    return 0;
                 }
             },
             {
@@ -10660,53 +10594,53 @@ Listview.templates = {
         ],
 
         getItemLink: function(holiday) {
-			return '?event=' + holiday.id;
-		}
-	},
+            return '?event=' + holiday.id;
+        }
+    },
 
-	holidaycal: {
-		sort: [1],
-		mode: 4, // Calendar
-		startOnMonth: new Date(g_serverTime.getFullYear(), 0, 1),
-		nMonthsToDisplay: 12,
-		rowOffset: g_serverTime.getMonth(),
-		poundable: 2, // Yes but w/o sort
+    holidaycal: {
+        sort: [1],
+        mode: 4, // Calendar
+        startOnMonth: new Date(g_serverTime.getFullYear(), 0, 1),
+        nMonthsToDisplay: 12,
+        rowOffset: g_serverTime.getMonth(),
+        poundable: 2, // Yes but w/o sort
 
-		columns: [],
+        columns: [],
 
-		compute: function(holiday, div, i) {
-			if (!holiday.events || !holiday.events.length) {
-				return;
-			}
+        compute: function(holiday, div, i) {
+            if (!holiday.events || !holiday.events.length) {
+                return;
+            }
 
-			for (var i = 0; i < holiday.events.length; ++i) {
-				var icon = g_holidays.createIcon(holiday.events[i].id, 1);
-				icon.onmouseover = Listview.funcBox.dateEventOver.bind(icon, holiday.date, holiday.events[i]);
-				icon.onmousemove = Tooltip.cursorUpdate;
-				icon.onmouseout  = Tooltip.hide;
-				icon.style.cssFloat = icon.style.styleFloat = 'left';
-				ae(div, icon);
-			}
-		},
-		sortFunc: function(a, b) {
-			if (a.startDate && b.startDate) {
-				var datesA = Listview.funcBox.getEventNextDates(a.startDate, a.endDate, a.rec || 0);
-				var datesB = Listview.funcBox.getEventNextDates(b.startDate, b.endDate, b.rec || 0);
+            for (var i = 0; i < holiday.events.length; ++i) {
+                var icon = g_holidays.createIcon(holiday.events[i].id, 1);
+                icon.onmouseover = Listview.funcBox.dateEventOver.bind(icon, holiday.date, holiday.events[i]);
+                icon.onmousemove = Tooltip.cursorUpdate;
+                icon.onmouseout  = Tooltip.hide;
+                icon.style.cssFloat = icon.style.styleFloat = 'left';
+                ae(div, icon);
+            }
+        },
+        sortFunc: function(a, b) {
+            if (a.startDate && b.startDate) {
+                var datesA = Listview.funcBox.getEventNextDates(a.startDate, a.endDate, a.rec || 0);
+                var datesB = Listview.funcBox.getEventNextDates(b.startDate, b.endDate, b.rec || 0);
 
-				for (var i = 0; i < 2; ++i) {
-					var
+                for (var i = 0; i < 2; ++i) {
+                    var
                         dA = datesA[i],
                         dB = datesB[i];
 
-					if (dA.getFullYear() == dB.getFullYear() && dA.getMonth() == dB.getMonth() && dA.getDate() == dB.getDate()) {
-						return dA - dB;
-					}
-				}
-			}
+                    if (dA.getFullYear() == dB.getFullYear() && dA.getMonth() == dB.getMonth() && dA.getDate() == dB.getDate()) {
+                        return dA - dB;
+                    }
+                }
+            }
 
-			return strcmp(a.name, b.name);
-		}
-	},
+            return strcmp(a.name, b.name);
+        }
+    },
 
 	comment: {
 		sort: [1],
@@ -11645,197 +11579,247 @@ Listview.templates = {
 			}
 		}
 	},
-	pet: {
-		sort: [1],
-		nItemsPerPage: -1,
-		searchable: 1,
-		filtrable: 1,
-		columns: [{
-			id: "name",
-			name: LANG.name,
-			type: "text",
-			align: "left",
-			value: "name",
-			span: 2,
-			compute: function(b, k, g) {
-				var e = ce("td");
-				e.style.width = "1px";
-				e.style.padding = "0";
-				e.style.borderRight = "none";
-				ae(e, Icon.create(b.icon, 0));
-				ae(g, e);
-				k.style.borderLeft = "none";
-				var j = ce("div");
-				var c = ce("a");
-				c.style.fontFamily = "Verdana, sans-serif";
-				c.href = this.template.getItemLink(b);
-				ae(c, ct(b.name));
-				if (b.expansion) {
-					var f = ce("span");
-					f.className = (b.expansion == 1 ? "bc-icon": "wotlk-icon");
-					ae(f, c);
-					ae(j, f)
-				} else {
-					ae(j, c)
-				}
-				if (b.exotic) {
-					j.style.position = "relative";
-					var h = ce("div");
-					h.className = "small q1";
-					h.style.fontStyle = "italic";
-					h.style.position = "absolute";
-					h.style.right = "3px";
-					h.style.bottom = "0px";
-					var c = ce("a");
-					c.href = "?spell=53270";
-					ae(c, ct(LANG.lvpet_exotic));
-					ae(h, c);
-					ae(j, h)
-				}
-				ae(k, j)
-			},
-			getVisibleText: function(a) {
-				var b = a.name + Listview.funcBox.getExpansionText(a);
-				if (a.exotic) {
-					b += " " + LANG.lvpet_exotic
-				}
-				return b
-			}
-		},
-		{
-			id: "level",
-			name: LANG.level,
-			type: "range",
-			getMinValue: function(a) {
-				return a.minlevel
-			},
-			getMaxValue: function(a) {
-				return a.maxlevel
-			},
-			compute: function(a, b) {
-				if (a.minlevel > 0 && a.maxlevel > 0) {
-					if (a.minlevel != a.maxlevel) {
-						return a.minlevel + LANG.hyphen + a.maxlevel
-					} else {
-						return a.minlevel
-					}
-				} else {
-					return - 1
-				}
-			},
-			sortFunc: function(d, c, e) {
-				if (e > 0) {
-					return strcmp(d.minlevel, c.minlevel) || strcmp(d.maxlevel, c.maxlevel)
-				} else {
-					return strcmp(d.maxlevel, c.maxlevel) || strcmp(d.minlevel, c.minlevel)
-				}
-			}
-		},
-		{
-			id: "abilities",
-			name: LANG.abilities,
-			type: "text",
-			getValue: function(b) {
-				if (!b.spells) {
-					return ""
-				}
-				if (b.spells.length > 0) {
-					var d = "";
-					for (var c = 0, a = b.spells.length; c < a; ++c) {
-						if (b.spells[c]) {
-							d += g_spells[b.spells[c]]["name_" + Locale.getName()]
-						}
-					}
-					return d
-				}
-			},
-			compute: function(a, b) {
-				if (!a.spells) {
-					return ""
-				}
-				if (a.spells.length > 0) {
-					b.style.padding = "0";
-					Listview.funcBox.createCenteredIcons(a.spells, b, "", 1)
-				}
-			},
-			sortFunc: function(d, c) {
-				if (!d.spells || !c.spells) {
-					return 0
-				}
-				return strcmp(d.spellCount, c.spellCount) || strcmp(d.spells, c.spells)
-			},
-			hidden: true
-		},
-		{
-			id: "diet",
-			name: LANG.diet,
-			type: "text",
-			compute: function(a, e) {
-				if (e) {
-					e.className = "small"
-				}
-				var b = 0,
-				c = "";
-				for (var d in g_pet_foods) {
-					if (a.diet & d) {
-						if (b++>0) {
-							c += LANG.comma
-						}
-						c += g_pet_foods[d]
-					}
-				}
-				return c
-			},
-			sortFunc: function(d, c) {
-				return strcmp(c.foodCount, d.foodCount) || Listview.funcBox.assocArrCmp(d.diet, c.diet, g_pet_foods)
-			}
-		},
-		{
-			id: "type",
-			name: LANG.type,
-			type: "text",
-			compute: function(b, d) {
-				if (b.type != null) {
-					d.className = "small q1";
-					var c = ce("a");
-					c.href = "?pets=" + b.type;
-					ae(c, ct(g_pet_types[b.type]));
-					ae(d, c)
-				}
-			},
-			getVisibleText: function(a) {
-				if (a.type != null) {
-					return g_pet_types[a.type]
-				}
-			},
-			sortFunc: function(d, c, e) {
-				return strcmp(g_pet_types[d.type], g_pet_types[c.type])
-			}
-		}],
-		getItemLink: function(a) {
-			return "?pet=" + a.id
-		},
-		getStatPct: function(b) {
-			var a = ce("span");
-			if (!isNaN(b) && b > 0) {
-				a.className = "q2";
-				ae(a, ct("+" + b + "%"))
-			} else {
-				if (!isNaN(b) && b < 0) {
-					a.className = "q10";
-					ae(a, ct(b + "%"))
-				}
-			}
-			return a
-		}
-	},
 
-	achievement: {
-		sort: [1, 2],
-		nItemsPerPage: 100,
-		searchable: 1,
-		filtrable: 1,
-		columns: [
+    pet: {
+        sort: [1],
+        nItemsPerPage: -1,
+        searchable: 1,
+        filtrable: 1,
+
+        columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                span: 2,
+                compute: function(pet, td, tr) {
+                    var i = ce('td');
+                    i.style.width = '1px';
+                    i.style.padding = '0';
+                    i.style.borderRight = 'none';
+
+                    ae(i, Icon.create(pet.icon, 0));
+                    ae(tr, i);
+                    td.style.borderLeft = 'none';
+
+                    var wrapper = ce('div');
+
+                    var a = ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(pet);
+                    ae(a, ct(pet.name));
+
+                    if (pet.expansion) {
+                        var sp = ce('span');
+                        sp.className = g_GetExpansionClassName(pet.expansion);
+                        ae(sp, a);
+                        ae(wrapper, sp);
+                    }
+                    else {
+                        ae(wrapper, a);
+                    }
+
+                    if (pet.exotic) {
+                        wrapper.style.position = 'relative';
+                        var d = ce('div');
+                        d.className = 'small q1';
+                        d.style.fontStyle = 'italic';
+                        d.style.position = 'absolute';
+                        d.style.right = '3px';
+                        d.style.bottom = '0px';
+                        var a = ce('a');
+                        a.href = '?spell=53270';
+                        ae(a, ct(LANG.lvpet_exotic));
+                        ae(d, a);
+                        ae(wrapper, d);
+                    }
+                    ae(td, wrapper);
+                },
+                getVisibleText: function(pet) {
+                    var buff = pet.name + Listview.funcBox.getExpansionText(pet);
+
+                    if (pet.exotic) {
+                        buff += ' ' + LANG.lvpet_exotic;
+                    }
+
+                    return buff;
+                }
+            },
+            {
+                id: 'level',
+                name: LANG.level,
+                type: 'range',
+                getMinValue: function(pet) {
+                    return pet.minlevel;
+                },
+                getMaxValue: function(pet) {
+                    return pet.maxlevel;
+                },
+                compute: function(pet, td) {
+                    if (pet.minlevel > 0 && pet.maxlevel > 0) {
+                        if (pet.minlevel != pet.maxlevel) {
+                            return pet.minlevel + LANG.hyphen + pet.maxlevel;
+                        }
+                        else {
+                            return pet.minlevel;
+                        }
+                    }
+                    else {
+                        return -1;
+                    }
+                },
+                sortFunc: function(a, b, col) {
+                    if (col > 0) {
+                        return strcmp(a.minlevel, b.minlevel) || strcmp(a.maxlevel, b.maxlevel);
+                    }
+                    else {
+                        return strcmp(a.maxlevel, b.maxlevel) || strcmp(a.minlevel, b.minlevel);
+                    }
+                }
+            },
+            {
+                id: 'damage',                                   // essentially unused, but if someone wants to backport classic
+                name: LANG.damage,
+                value: 'damage',
+                hidden: 1,
+                compute: function (pet, col) {
+                    ae(col, this.template.getStatPct(pet.damage))
+                }
+            },
+            {
+                id: 'armor',                                   // essentially unused, but if someone wants to backport classic
+                name: LANG.armor,
+                value: 'armor',
+                hidden: 1,
+                compute: function (pet, col) {
+                    ae(col, this.template.getStatPct(pet.armor))
+                }
+            },
+            {
+                id: 'health',                                   // essentially unused, but if someone wants to backport classic
+                name: LANG.health,
+                value: 'health',
+                hidden: 1,
+                compute: function (pet, col) {
+                    ae(col, this.template.getStatPct(pet.health))
+                }
+            },
+            {
+                id: 'abilities',
+                name: LANG.abilities,
+                type: 'text',
+                getValue: function(pet) {
+                    if (!pet.spells) {
+                        return '';
+                    }
+
+                    if (pet.spells.length > 0) {
+                        var spells = '';
+                        for (var i = 0, len = pet.spells.length; i < len; ++i) {
+                            if (pet.spells[i]) {
+                                spells += g_spells[pet.spells[i]]['name_' + g_locale.name];
+                            }
+                        }
+                        return spells;
+                    }
+                },
+                compute: function(pet, td) {
+                    if (!pet.spells) {
+                        return '';
+                    }
+
+                    if (pet.spells.length > 0) {
+                        td.style.padding = '0';
+                        Listview.funcBox.createCenteredIcons(pet.spells, td, '', 1);
+                    }
+                },
+                sortFunc: function(a, b) {
+                    if (!a.spells || !b.spells) {
+                        return 0;
+                    }
+
+                    return strcmp(a.spellCount, b.spellCount) || strcmp(a.spells, b.spells);
+                },
+                hidden: true
+            },
+            {
+                id: 'diet',
+                name: LANG.diet,
+                type: 'text',
+                compute: function(pet, td) {
+                    if (td) {
+                        td.className = 'small';
+                    }
+
+                    var
+                        i = 0,
+                        foods = '';
+
+                    for (var food in g_pet_foods) {
+                        if (pet.diet & food) {
+                            if (i++ > 0) {
+                                foods += LANG.comma;
+                            }
+                            foods += g_pet_foods[food];
+                        }
+                    }
+                    return foods;
+                },
+                sortFunc: function(a, b) {
+                    return strcmp(b.foodCount, a.foodCount) || Listview.funcBox.assocArrCmp(a.diet, b.diet, g_pet_foods);
+                }
+            },
+            {
+                id: 'type',
+                name: LANG.type,
+                type: 'text',
+                compute: function(pet, td) {
+                    if (pet.type != null) {
+                        td.className = 'small q1';
+                        var a = ce('a');
+                        a.href = '?pets=' + pet.type;
+                        ae(a, ct(g_pet_types[pet.type]));
+                        ae(td, a);
+                    }
+                },
+                getVisibleText: function(pet) {
+                    if (pet.type != null) {
+                        return g_pet_types[pet.type];
+                    }
+                },
+                sortFunc: function(a, b, col) {
+                    return strcmp(g_pet_types[a.type], g_pet_types[b.type]);
+                }
+            }
+        ],
+
+        getItemLink: function(pet) {
+            return '?pet=' + pet.id;
+        },
+
+        getStatPct: function(modifier) {
+            var _ = ce('span');
+            if (!isNaN(modifier) && modifier > 0) {
+                _.className = 'q2';
+                ae(_, ct('+' + modifier + '%'));
+            }
+            else if (!isNaN(modifier) && modifier < 0) {
+                _.className = 'q10';
+                ae(_, ct(modifier + '%'));
+            }
+
+            return _;
+        }
+    },
+
+    achievement: {
+        sort: [1, 2],
+        nItemsPerPage: 100,
+        searchable: 1,
+        filtrable: 1,
+        columns: [
             {
                 id: 'name',
                 name: LANG.name,
@@ -11882,6 +11866,28 @@ Listview.templates = {
                         buff += ' ' + achievement.description;
                     }
                     return buff;
+                }
+            },
+            {
+                id: 'location',
+                name: LANG.location,
+                type: 'text',
+                width: '15%',
+                hidden: 1,
+                compute: function (achievement, td) {
+                    if (achievement.zone) {
+                        var a = ce('a');
+                        a.className = 'q1';
+                        a.href = '?zones=' + achievement.zone;
+                        ae(a, ct(g_zones[achievement.zone]));
+                        ae(td, a);
+                    }
+                },
+                getVisibleText: function (achievement) {
+                    return Listview.funcBox.arrayText(achievement.zone, g_zones);
+                },
+                sortFunc: function (a, b, col) {
+                    return Listview.funcBox.assocArrCmp(a.zone, b.zone, g_zones);
                 }
             },
             {
@@ -12068,18 +12074,18 @@ Listview.templates = {
             }
         ],
 
-		getItemLink: function(achievement) {
-			return '?achievement=' + achievement.id;
-		}
-	},
+        getItemLink: function(achievement) {
+            return '?achievement=' + achievement.id;
+        }
+    },
 
-	title: {
-		sort: [1],
-		nItemsPerPage: -1,
-		searchable: 1,
-		filtrable: 1,
+    title: {
+        sort: [1],
+        nItemsPerPage: -1,
+        searchable: 1,
+        filtrable: 1,
 
-		columns: [
+        columns: [
             {
                 id: 'name',
                 name: LANG.name,
@@ -12096,12 +12102,12 @@ Listview.templates = {
 
                     // nw(td)
 
-					sp.href = this.template.getItemLink(title);
+                    sp.href = this.template.getItemLink(title);
 
-					if (title.who) {
-						ae(n, ct(title.who));
+                    if (title.who) {
+                        ae(n, ct(title.who));
                     }
-					else {
+                    else {
                         ae(n, ct('<' + LANG.name + '>'));
                         n.className = 'q0';
                     }
@@ -12133,7 +12139,7 @@ Listview.templates = {
                     return strcmp(aName, bName);
                 },
                 getVisibleText: function(title) {
-					var buff = title.name + Listview.funcBox.getExpansionText(title);
+                    var buff = title.name + Listview.funcBox.getExpansionText(title);
 
                     return buff;
                 }
@@ -12267,25 +12273,25 @@ Listview.templates = {
                         return m
                     },
                 */
-				getVisibleText: function(title) {
-					var buff = '';
+                getVisibleText: function(title) {
+                    var buff = '';
 
-					if (title.source) {
-						for (var s in title.source) {
-							for (var i = 0, len = title.source[s].length; i < len; ++i) {
-								var sm = title.source[s][i];
-								if (typeof sm == 'string') {
-									buff += ' ' + sm;
+                    if (title.source) {
+                        for (var s in title.source) {
+                            for (var i = 0, len = title.source[s].length; i < len; ++i) {
+                                var sm = title.source[s][i];
+                                if (typeof sm == 'string') {
+                                    buff += ' ' + sm;
                                 }
-								else if (sm.t){
-									buff += ' ' + sm.n;
+                                else if (sm.t){
+                                    buff += ' ' + sm.n;
                                 }
-							}
-						}
-					}
+                            }
+                        }
+                    }
 
-					return buff;
-				},
+                    return buff;
+                },
                 sortFunc: function(a, b, col) {
                     return strcmp(this.getVisibleText(a), this.getVisibleText(b));
                 }
@@ -12313,10 +12319,10 @@ Listview.templates = {
             }
         ],
 
-		getItemLink: function(title) {
+        getItemLink: function(title) {
             return '?title=' + title.id;
-		}
-	},
+        }
+    },
 
     profile: {
         sort: [],
@@ -12550,12 +12556,12 @@ Listview.templates = {
                         return;
                     }
 
-					var spent = [profile.talenttree1, profile.talenttree2, profile.talenttree3];
-					var specData = pr_getSpecFromTalents(profile.classs, spent);
+                    var spent = [profile.talenttree1, profile.talenttree2, profile.talenttree3];
+                    var specData = pr_getSpecFromTalents(profile.classs, spent);
                     var a = ce('a');
 
-					a.className = 'icontiny tinyspecial tip q1';
-					a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
+                    a.className = 'icontiny tinyspecial tip q1';
+                    a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
                     a.rel = 'np';
                     a.href = this.template.getItemLink(profile) + '#talents';
                     g_addTooltip(a, specData.name);
@@ -12755,88 +12761,101 @@ Listview.templates = {
 
         getItemLink: function(profile) {
             if (profile.size !== undefined) {
-				return '?arena-team=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name);
+                return '?arena-team=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name);
             }
             else if (profile.members !== undefined) {
                 return '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name);
             }
             else {
-				return g_getProfileUrl(profile);
+                return g_getProfileUrl(profile);
             }
         }
     },
 
-	model: {
-		sort: [],
-		mode: 3,
-		nItemsPerPage: 40,
-		nItemsPerRow: 4,
-		poundable: 2,
-		columns: [],
-		compute: function(e, k, f) {
-			k.className = "screenshot-cell";
-			k.vAlign = "bottom";
-			var b = ce("a");
-			b.href = "javascript:;";
-			b.onclick = this.template.modelShow.bind(this.template, e.npcId, e.displayId);
-			var c = ce("img");
-			c.src = "http://static.wowhead.com/modelviewer/thumbs/npc/" + e.displayId + ".png";
-			ae(b, c);
-			ae(k, b);
-			var j = ce("div");
-			j.className = "screenshot-cell-user";
-			b = ce("a");
-			b.href = "?npcs=1&filter=" + (e.family ? "fa=" + e.family + ";": "") + "minle=1;cr=35;crs=0;crv=" + e.skin;
-			ae(b, ct(e.skin));
-			ae(j, b);
-			ae(j, ct(" (" + e.count + ")"));
-			ae(k, j);
-			j = ce("div");
-			j.style.position = "relative";
-			j.style.height = "1em";
-			var h = ce("div");
-			h.className = "screenshot-caption";
-			var g = ce("small");
-			ae(g, ct(LANG.level + ": "));
-			ae(g, ct(e.minLevel + (e.minLevel == e.maxLevel ? "": LANG.hyphen + (e.maxLevel == 9999 ? "??": e.maxLevel))));
-			ae(g, ce("br"));
-			ae(h, g);
-			ae(j, h);
-			ae(k, j);
-			aE(k, "click", this.template.modelShow.bind(this.template, e.npcId, e.displayId, true))
-		},
-		modelShow: function(d, b, f, g) {
-			if (f) {
-				g = $E(g);
-				if (g.shiftKey || g.ctrlKey) {
-					return
-				}
-				var a = 0,
-				c = g._target;
-				while (c && a < 3) {
-					if (c.nodeName == "A") {
-						return
-					}
-					if (c.nodeName == "IMG") {
-						break
-					}
-					c = c.parentNode
-				}
-			}
-			ModelViewer.show({
-				type: 1,
-				typeId: d,
-				displayId: b,
-				noPound: 1
-			})
-		}
-	},
+    model: {
+        sort: [],
+        mode: 3, // Grid mode
+        nItemsPerPage: 40,
+        nItemsPerRow: 4,
+        poundable: 2, // Yes but w/o sort
 
-	currency: {
-		sort: [1],
-		searchable: 1,
-		filtrable: 1,
-		columns: [
+        columns: [],
+
+        compute: function(model, td, i) {
+            td.className = 'screenshot-cell';
+            td.vAlign = 'bottom';
+
+            var a = ce('a');
+            a.href = 'javascript:;';
+            // a.className = 'pet-zoom';   // reference only
+            a.onclick = this.template.modelShow.bind(this.template, model.npcId, model.displayId, false);
+
+            var img = ce('img');
+            img.src = g_staticUrl + '/modelviewer/thumbs/npc/' + model.displayId + '.png';
+            ae(a, img);
+
+            ae(td, a);
+
+            var d = ce('div');
+            d.className = 'screenshot-cell-user';
+
+            a = ce('a');
+            a.href = '?npcs=1&filter=' + (model.family ? 'fa=' + model.family + ';' : '') + 'minle=1;cr=35;crs=0;crv=' + model.skin;
+            ae(a, ct(model.skin));
+            ae(d, a);
+
+            ae(d, ct(' (' + model.count + ')'));
+            ae(td, d);
+
+            d = ce('div');
+            d.style.position = 'relative';
+            d.style.height = '1em';
+
+            var d2 = ce('div');
+            d2.className = 'screenshot-caption';
+
+            var s = ce('small');
+            ae(s, ct(LANG.level + ': '));
+            ae(s, ct((model.minLevel == 9999 ? '??' : model.minLevel) + (model.minLevel == model.maxLevel ? '' : LANG.hyphen + (model.maxLevel == 9999 ? '??' : model.maxLevel))));
+            ae(s, ce('br'));
+            ae(d2, s);
+            ae(d, d2);
+            ae(td, d);
+
+            aE(td, 'click', this.template.modelShow.bind(this.template, model.npcId, model.displayId, true));
+        },
+
+        modelShow: function(npcId, displayId, sp, e) {
+            if (sp) {
+                e = $E(e);
+
+                if (e.shiftKey || e.ctrlKey) {
+                    return;
+                }
+
+                var
+                    j = 0,
+                    el = e._target;
+                while (el && j < 3) {
+                    if (el.nodeName == 'A') {
+                        return;
+                    }
+                    if (el.nodeName == 'IMG') {
+                        break;
+                    }
+                    el = el.parentNode;
+                }
+            }
+
+            ModelViewer.show({type: 1, typeId: npcId, displayId: displayId, noPound: 1});
+        }
+    },
+
+    currency: {
+        sort: [1],
+        searchable: 1,
+        filtrable: 1,
+        columns: [
             {
                 id: 'name',
                 name: LANG.name,
@@ -12889,16 +12908,16 @@ Listview.templates = {
             }
         ],
 
-		getItemLink: function(currency) {
-			return '?currency=' + currency.id;
-		}
-	},
+        getItemLink: function(currency) {
+            return '?currency=' + currency.id;
+        }
+    },
 
-	classs: {
-		sort: [1],
-		searchable: 1,
-		filtrable: 1,
-		columns: [
+    classs: {
+        sort: [1],
+        searchable: 1,
+        filtrable: 1,
+        columns: [
             {
                 id: 'name',
                 name: LANG.name,
@@ -12982,16 +13001,16 @@ Listview.templates = {
             }
         ],
 
-		getItemLink: function(classs) {
-			return '?class=' + classs.id;
-		}
-	},
+        getItemLink: function(classs) {
+            return '?class=' + classs.id;
+        }
+    },
 
-	race: {
-		sort: [1],
-		searchable: 1,
-		filtrable: 1,
-		columns: [
+    race: {
+        sort: [1],
+        searchable: 1,
+        filtrable: 1,
+        columns: [
             {
                 id: 'name',
                 name: LANG.name,
@@ -13101,10 +13120,10 @@ Listview.templates = {
             }
         ],
 
-		getItemLink: function(race) {
-			return '?race=' + race.id;
-		}
-	}
+        getItemLink: function(race) {
+            return '?race=' + race.id;
+        }
+    }
 };
 
 Menu.fixUrls(mn_items, "?items=");
@@ -13133,189 +13152,13 @@ var g_user = {
 	name: "",
 	roles: 0
 };
-var g_npcs = {};
-var g_objects = {};
-var g_items = {};
-var g_itemsets = {};
-var g_quests = {};
-var g_spells = {};
-var g_titles = {}; //
-var g_gatheredzones = {};
-var g_factions = {};
-var g_pets = {};
-var g_achievements = {};
-var g_holidays = {};
-var g_classes = {};
-var g_races = {};
-var g_skills={}
-var g_gatheredcurrencies = {};
-var g_users = {};
-var g_types = {
-	1 : "npc",
-	2 : "object",
-	3 : "item",
-	4 : "itemset",
-	5 : "quest",
-	6 : "spell",
-	7 : "zone",
-	8 : "faction",
-	9 : "pet",
-	10 : "achievement",
-    11 : "title",
-    12 : "event",
-    13 : "class",
-    14 : "race",
-    15 : "skill",
-    17 : "currency"
-};
+
 var g_locales = {
-	0 : "enus",
-	2 : "frfr",
-	3 : "dede",
-	6 : "eses",
-	8 : "ruru"
-};
-var g_file_races = {
-	10 : "bloodelf",
-	11 : "draenei",
-	3 : "dwarf",
-	7 : "gnome",
-	1 : "human",
-	4 : "nightelf",
-	2 : "orc",
-	6 : "tauren",
-	8 : "troll",
-	5 : "scourge"
-};
-var g_file_classes = {
-	6 : "deathknight",
-	11 : "druid",
-	3 : "hunter",
-	8 : "mage",
-	2 : "paladin",
-	5 : "priest",
-	4 : "rogue",
-	7 : "shaman",
-	9 : "warlock",
-	1 : "warrior"
-};
-var g_file_genders = {
-	0 : "male",
-	1 : "female"
-};
-var g_file_factions = {
-	1 : "alliance",
-	2 : "horde"
-};
-var g_file_gems = {
-	1 : "meta",
-	2 : "red",
-	4 : "yellow",
-	6 : "orange",
-	8 : "blue",
-	10 : "purple",
-	12 : "green",
-	14 : "prismatic"
-};
-g_items.add = function(b, a) {
-	if (g_items[b] != null) {
-		cO(g_items[b], a)
-	} else {
-		g_items[b] = a
-	}
-};
-g_items.getIcon = function(a) {
-	if (g_items[a] != null && g_items[a].icon) {
-		return g_items[a].icon
-	} else {
-		return "inv_misc_questionmark"
-	}
-};
-g_items.createIcon = function(d, b, a, c) {
-	return Icon.create(g_items.getIcon(d), b, null, "?item=" + d, a, c)
-};
-g_spells.add = function(b, a) {
-	if (g_spells[b] != null) {
-		cO(g_spells[b], a)
-	} else {
-		g_spells[b] = a
-	}
-};
-g_spells.getIcon = function(a) {
-	if (g_spells[a] != null && g_spells[a].icon) {
-		return g_spells[a].icon
-	} else {
-		return "inv_misc_questionmark"
-	}
-};
-g_spells.createIcon = function(d, b, a, c) {
-	return Icon.create(g_spells.getIcon(d), b, null, "?spell=" + d, a, c)
-};
-g_achievements.getIcon = function(a) {
-	if (g_achievements[a] != null && g_achievements[a].icon) {
-		return g_achievements[a].icon
-	} else {
-		return "inv_misc_questionmark"
-	}
-};
-g_achievements.createIcon = function(d, b, a, c) {
-	return Icon.create(g_achievements.getIcon(d), b, null, "?achievement=" + d, a, c)
-};
-g_classes.getIcon = function(a) {
-    if (g_file_classes[a]) {
-        return "class_" + g_file_classes[a]
-    } else {
-        return "inv_misc_questionmark"
-    }
-};
-g_classes.createIcon = function(d, b, a, c) {
-    return Icon.create(g_classes.getIcon(d), b, null, "?class=" + d, a, c)
-};
-g_races.getIcon = function(b, a) {
-    if (a === undefined) {
-        a = 0
-    }
-    if (g_file_races[b] && g_file_genders[a]) {
-        return "race_" + g_file_races[b] + "_" + g_file_genders[a]
-    } else {
-        return "inv_misc_questionmark"
-    }
-};
-g_races.createIcon = function(d, b, a, c) {
-    return Icon.create(g_races.getIcon(d), b, null, "?race=" + d, a, c)
-};
-g_skills.getIcon = function(a) {
-    if (g_skills[a] != null && g_skills[a].icon) {
-        return g_skills[a].icon
-    } else {
-        return "inv_misc_questionmark"
-    }
-};
-g_skills.createIcon = function(d, b, a, c) {
-    return Icon.create(g_skills.getIcon(d), b, null, "?skill=" + d, a, c)
-};
-g_gatheredcurrencies.getIcon = function(b, a) {
-    if (g_gatheredcurrencies[b] != null && g_gatheredcurrencies[b].icon) {
-        if (is_array(g_gatheredcurrencies[b].icon) && !isNaN(a)) {
-            return g_gatheredcurrencies[b].icon[a]
-        }
-        return g_gatheredcurrencies[b].icon
-    } else {
-        return "inv_misc_questionmark"
-    }
-};
-g_gatheredcurrencies.createIcon = function(d, b, a, c) {
-    return Icon.create(g_gatheredcurrencies.getIcon(d, (a > 0 ? 0 : 1)), b, null, null, Math.abs(a), c)
-};
-g_holidays.getIcon = function(a) {
-    if (g_holidays[a] != null && g_holidays[a].icon) {
-        return g_holidays[a].icon
-    } else {
-        return "inv_misc_questionmark"
-    }
-};
-g_holidays.createIcon = function(d, b, a, c) {
-    return Icon.create(g_holidays.getIcon(d), b, null, "?event=" + d, a, c)
+	0: 'enus',
+	2: 'frfr',
+	3: 'dede',
+	6: 'eses',
+	8: 'ruru'
 };
 
 /*
@@ -14686,6 +14529,7 @@ var ModelViewer = new function() {
                     model: model,
                     modelType: modelType,
                     contentPath: 'http://static.wowhead.com/modelviewer/'
+                    // contentPath: g_staticUrl + '/modelviewer/'
                 };
 
                 var params = {
@@ -14702,7 +14546,9 @@ var ModelViewer = new function() {
                 if (modelType == 16 && equipList.length) {
                     flashVars.equipList = equipList.join(',');
                 }
-                swfobject.embedSWF('http://static.wowhead.com/modelviewer/ModelView.swf', 'dsjkgbdsg2346', '600', '400', '10.0.0', 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
+
+                // swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
+                swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', '10.0.0', 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
                 _w.style.display = '';
             }
         }
@@ -14789,20 +14635,24 @@ var ModelViewer = new function() {
         clear();
         render();
     }
-    function j(D) {
-        if (D == mode) {
+
+    function j(newMode) {
+        if (newMode == mode) {
             return;
         }
+
         g_setSelectedLink(this, 'modelviewer-mode');
+
         clear();
+
         if (mode == null) {
-            mode = D;
+            mode = newMode;
             setTimeout(render, 50);
         }
         else {
-            mode = D;
-            sc('modelviewer_mode', 7, D, '/', location.hostname);
-            // sc('modelviewer_mode', 7, D, '/', '.wowhead.com');
+            mode = newMode;
+            sc('modelviewer_mode', 7, newMode, '/', location.hostname);
+            // sc('modelviewer_mode', 7, newMode, '/', '.wowhead.com');
             render();
         }
     }
@@ -14944,7 +14794,7 @@ var ModelViewer = new function() {
             _o = ce('div');
             _z = ce('div');
             var flashDiv = ce('div');
-            flashDiv.id = 'dsjkgbdsg2346';
+            flashDiv.id = 'modelviewer-generic';
             ae(_w, flashDiv);
             screen.className = 'modelviewer-screen';
             _w.style.display = _o.style.display = _z.style.display = 'none';
@@ -17156,3 +17006,399 @@ Announcement.prototype = {
         ge(this.parent + '-markup').innerHTML = this.text;
     }
 };
+
+
+/*
+Global WoW data
+*/
+
+var g_file_races = {
+     1: 'human',
+     2: 'orc',
+     3: 'dwarf',
+     4: 'nightelf',
+     5: 'scourge',
+     6: 'tauren',
+     7: 'gnome',
+     8: 'troll',
+    10: 'bloodelf',
+    11: 'draenei'
+};
+
+var g_file_classes = {
+     1: 'warrior',
+     2: 'paladin',
+     3: 'hunter',
+     4: 'rogue',
+     5: 'priest',
+     6: 'deathknight',
+     7: 'shaman',
+     8: 'mage',
+     9: 'warlock',
+    11: 'druid'
+};
+
+var g_file_genders = {
+    0: 'male',
+    1: 'female'
+};
+
+var g_file_factions = {
+    1: 'alliance',
+    2: 'horde'
+};
+
+var g_file_gems = {
+     1: 'meta',
+     2: 'red',
+     4: 'yellow',
+     6: 'orange',
+     8: 'blue',
+    10: 'purple',
+    12: 'green',
+    14: 'prismatic'
+};
+
+/*
+Source:
+http://www.wowwiki.com/Patches
+http://www.wowwiki.com/Patches/1.x
+*/
+
+function g_getPatchVersionIndex(timestamp) {
+    var _ = g_getPatchVersion;
+    var l = 0, u = _.T.length - 2, m;
+
+    while (u > l) {
+        m = Math.floor((u + l) / 2);
+
+        if (timestamp >= _.T[m] && timestamp < _.T[m + 1]) {
+            return m;
+        }
+
+        if (timestamp >= _.T[m]) {
+            l = m + 1;
+        }
+        else {
+            u = m - 1;
+        }
+    }
+    m = Math.ceil((u + l) / 2);
+
+    return m;
+}
+
+function g_getPatchVersion(timestamp) {
+    var m = g_getPatchVersionIndex(timestamp);
+    return g_getPatchVersion.V[m];
+}
+g_getPatchVersion.V = [
+    '1.12.0',
+    '1.12.1',
+    '1.12.2',
+
+    '2.0.1',
+    '2.0.3',
+    '2.0.4',
+    '2.0.5',
+    '2.0.6',
+    '2.0.7',
+    '2.0.8',
+    '2.0.10',
+    '2.0.12',
+
+    '2.1.0',
+    '2.1.1',
+    '2.1.2',
+    '2.1.3',
+
+    '2.2.0',
+    '2.2.2',
+    '2.2.3',
+
+    '2.3.0',
+    '2.3.2',
+    '2.3.3',
+
+    '2.4.0',
+    '2.4.1',
+    '2.4.2',
+    '2.4.3',
+
+    '3.0.2',
+    '3.0.3',
+    '3.0.8',
+    '3.0.9',
+
+    '3.1.0',
+    '3.1.1',
+    '3.1.2',
+    '3.1.3',
+
+    '3.2.0',
+    '3.2.2',
+
+    '3.3.0',
+    '3.3.2',
+    '3.3.3',
+    '3.3.5',
+
+    '?????'
+];
+
+g_getPatchVersion.T = [
+    // 1.12: Drums of War
+    1153540800000, // 1.12.0    22 August 2006
+    1159243200000, // 1.12.1    26 September 2006
+    1160712000000, // 1.12.2    13 October 2006
+
+    // 2.0: Before the Storm (The Burning Crusade)
+    1165294800000, // 2.0.1     5 December 2006
+    1168318800000, // 2.0.3     9 January 2007
+    1168578000000, // 2.0.4     12 January 2007
+    1168750800000, // 2.0.5     14 January 2007
+    1169528400000, // 2.0.6     23 January 2007
+    1171342800000, // 2.0.7     13 February 2007
+    1171602000000, // 2.0.8     16 February 2007
+    1173157200000, // 2.0.10    6 March 2007
+    1175572800000, // 2.0.12    3 April 2007
+
+    // 2.1: The Black Temple
+    1179806400000, // 2.1.0     22 May 2007
+    1181016000000, // 2.1.1     5 June 2007
+    1182225600000, // 2.1.2     19 June 2007
+    1184040000000, // 2.1.3     10 July 2007
+
+    // 2.2: Voice Chat!
+    1190692800000, // 2.2.0     25 September 2007
+    1191297600000, // 2.2.2     2 October 2007
+    1191902400000, // 2.2.3     9 October 2007
+
+    // 2.3: The Gods of Zul'Aman
+    1194930000000, // 2.3.0     13 November 2007
+    1199768400000, // 2.3.2     08 January 2008
+    1200978000000, // 2.3.3     22 January 2008
+
+    // 2.4: Fury of the Sunwell
+    1206417600000, // 2.4.0     25 March 2008
+    1207022400000, // 2.4.1     1 April 2008
+    1210651200000, // 2.4.2     13 May 2008
+    1216094400000, // 2.4.3     15 July 2008
+
+    // 3.0: Echoes of Doom
+    1223956800000, // 3.0.2     October 14 2008
+    1225774800000, // 3.0.3     November 4 2008
+    1232427600000, // 3.0.8     January 20 2009
+    1234242000000, // 3.0.9     February 10 2009
+
+    // 3.1: Secrets of Ulduar
+    1239681600000, // 3.1.0     April 14 2009
+    1240286400000, // 3.1.1     April 21 2009
+    1242705600000, // 3.1.2     19 May 2009
+    1243915200000, // 3.1.3     2 June 2009
+
+    // 3.2: Call of the Crusader
+    1249358400000, // 3.2.0     4 August 2009
+    1253595600000, // 3.2.2     22 September 2009
+
+    // 3.3: Fall of the Lich King
+    1260266400000, // 3.3.0     8 December 2009
+    1265104800000, // 3.3.2     2 February 2010
+    1269320400000, // 3.3.3     23 March 2010
+    1277182800000, // 3.3.5     22 June 2010
+
+    9999999999999
+];
+
+/*
+Global stuff related to WoW database entries
+*/
+
+var
+    g_npcs               = {},
+    g_objects            = {},
+    g_items              = {},
+    g_itemsets           = {},
+    g_quests             = {},
+    g_spells             = {},
+    g_gatheredzones      = {},
+    g_factions           = {},
+    g_pets               = {},
+    g_achievements       = {},
+    g_titles             = {},
+    g_holidays           = {},
+    g_classes            = {},
+    g_races              = {},
+    g_skills             = {},
+    g_gatheredcurrencies = {},
+    g_users              = {};
+
+var g_types = {
+     1: 'npc',
+     2: 'object',
+     3: 'item',
+     4: 'itemset',
+     5: 'quest',
+     6: 'spell',
+     7: 'zone',
+     8: 'faction',
+     9: 'pet',
+    10: 'achievement',
+    11: 'title',
+    12: 'event',
+    13: 'class',
+    14: 'race',
+    15: 'skill',
+    17: 'currency'
+};
+
+// Items
+cO(g_items, {
+    add: function(id, json) {
+        if (g_items[id] != null) {
+            cO(g_items[id], json);
+        }
+        else {
+            g_items[id] = json;
+        }
+    },
+    getIcon: function(id) {
+        if (g_items[id] != null && g_items[id].icon) {
+            return g_items[id].icon;
+        }
+        else {
+            return 'inv_misc_questionmark';
+        }
+    },
+    createIcon: function(id, size, num, qty) {
+        return Icon.create(g_items.getIcon(id), size, null, '?item=' + id, num, qty);
+    }
+});
+
+// Spells
+cO(g_spells, {
+    add: function(id, json) {
+        if (g_spells[id] != null) {
+            cO(g_spells[id], json);
+        }
+        else {
+            g_spells[id] = json;
+        }
+    },
+    getIcon: function(id) {
+        if (g_spells[id] != null && g_spells[id].icon) {
+            return g_spells[id].icon;
+        }
+        else {
+            return 'inv_misc_questionmark';
+        }
+    },
+    createIcon: function(id, size, num, qty) {
+        return Icon.create(g_spells.getIcon(id), size, null, '?spell=' + id, num, qty);
+    }
+});
+
+// Achievements
+cO(g_achievements, {
+    getIcon: function(id) {
+        if (g_achievements[id] != null && g_achievements[id].icon) {
+            return g_achievements[id].icon;
+        }
+        else {
+            return 'inv_misc_questionmark';
+        }
+    },
+    createIcon: function(id, size, num, qty) {
+        return Icon.create(g_achievements.getIcon(id), size, null, '?achievement=' + id, num, qty);
+    }
+});
+
+// Classes
+cO(g_classes, {
+    getIcon: function(id) {
+        if (g_file_classes[id]) {
+            return 'class_' + g_file_classes[id];
+        }
+        else {
+            return 'inv_misc_questionmark';
+        }
+    },
+    createIcon: function(id, size, num, qty) {
+        return Icon.create(g_classes.getIcon(id), size, null, '?class=' + id, num, qty);
+    }
+});
+
+// Races
+cO(g_races, {
+    getIcon: function(id, gender) {
+        if (gender === undefined) {
+            gender = 0;
+        }
+        if (g_file_races[id] && g_file_genders[gender]) {
+            return 'race_' + g_file_races[id] + '_' + g_file_genders[gender];
+        }
+        else {
+            return 'inv_misc_questionmark';
+        }
+    },
+    createIcon: function(id, size, num, qty) {
+        return Icon.create(g_races.getIcon(id), size, null, '?race=' + id, num, qty);
+    }
+});
+
+// Skills
+cO(g_skills, {
+    getIcon: function(id) {
+        if (g_skills[id] != null && g_skills[id].icon) {
+            return g_skills[id].icon;
+        }
+        else {
+            return 'inv_misc_questionmark';
+        }
+    },
+    createIcon: function(id, size, num, qty) {
+        return Icon.create(g_skills.getIcon(id), size, null, '?skill=' + id, num, qty);
+    }
+});
+
+// Currencies
+cO(g_gatheredcurrencies, {
+    getIcon: function(id, side) {
+        if (g_gatheredcurrencies[id] != null && g_gatheredcurrencies[id].icon) {
+            if (is_array(g_gatheredcurrencies[id].icon) && !isNaN(side)) {
+                return g_gatheredcurrencies[id].icon[side];
+            }
+            return g_gatheredcurrencies[id].icon;
+        }
+        else
+            return 'inv_misc_questionmark';
+    },
+    createIcon: function(id, size, num, qty) {
+        return Icon.create(g_gatheredcurrencies.getIcon(id, (num > 0 ? 0 : 1)), size, null, null, Math.abs(num), qty);
+    }
+});
+
+// Holidays
+cO(g_holidays, {
+    getIcon: function(id) {
+        if (g_holidays[id] != null && g_holidays[id].icon) {
+            return g_holidays[id].icon;
+        }
+        else {
+            return 'inv_misc_questionmark';
+        }
+    },
+    createIcon: function(id, size, num, qty) {
+        return Icon.create(g_holidays.getIcon(id), size, null, '?event=' + id, num, qty);
+    }
+});
+
+function g_getIngameLink(color, id, name) {
+    // prompt(LANG.prompt_ingamelink, '/script DEFAULT_CHAT_FRAME:AddMessage("\\124c' + a + "\\124H" + c + "\\124h[" + b + ']\\124h\\124r");')
+    return '/script DEFAULT_CHAT_FRAME:AddMessage("\\124c' + color + '\\124H' + id + '\\124h[' + name + ']\\124h\\124r");';
+}
+
+/*
+ * Wowhead Site Achievements (WSA)
+ * which i intend to ignore
+*/

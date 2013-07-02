@@ -582,9 +582,9 @@ class SpellList extends BaseType
             case 'i':                                       // MaxAffectedTargets
             case 'I':
                 if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('targets');
+                    $base = $this->refSpells[$lookup]->getField('maxAffectedTargets');
                 else
-                    $base = $this->getField('targets');
+                    $base = $this->getField('maxAffectedTargets');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
@@ -1606,8 +1606,11 @@ class SpellList extends BaseType
             );
         }
 
-        (new CharClassList(array(['id', $classes])))->addGlobalsToJScript($refs);
-        (new CharRaceList(array(['id', $races])))->addGlobalsToJScript($refs);
+        if ($classes)
+            (new CharClassList(array(['id', $classes])))->addGlobalsToJScript($refs);
+
+        if ($races)
+            (new CharRaceList(array(['id', $races])))->addGlobalsToJScript($refs);
     }
 
     public function addRewardsToJScript(&$refs) { }

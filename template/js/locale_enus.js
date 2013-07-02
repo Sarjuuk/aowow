@@ -858,7 +858,7 @@ var mn_database = [
 ];
 var mn_tools = [
     [0,"Talent Calculator","?talent",mn_talentCalc],
-    [2,"Pet Calculator","?petcalc",mn_petCalc],
+    [2,"Hunter Pet Calculator","?petcalc",mn_petCalc],
     [3,"Item Comparison","?compare"],
     [5,"Profiler","?profiler",[
         [0,"Characters","?profiles"],

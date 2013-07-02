@@ -2736,13 +2736,13 @@ function TalentCalc() {
             allowfullscreen: true,
             menu: false,
             bgcolor: '#181818',
-            wmode: 'opaque'
+            wmode: 'direct'
         };
 
         var attributes = {};
 
         swfobject.embedSWF(
-            swfUrl + '/modelviewer/ModelView.swf',
+            swfUrl + '/modelviewer/ZAMviewerfp11.swf',
             _swfModel.id,
             '100%',
             '100%',

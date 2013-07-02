@@ -2058,7 +2058,8 @@ a.star-icon-right span
 
 .screenshot-cell img
 {
-    border: 3px solid #404040;
+    border: 2px solid #404040;
+    background-color: #080808;
     margin-bottom: 3px;
 }
 

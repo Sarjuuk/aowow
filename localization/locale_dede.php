@@ -114,6 +114,7 @@ $lang = array(
         'mechAbbr'      => "Ausw.",
         'pet'           => "Begleiter",
         'pets'          => "Begleiter",
+        'petCalc'       => "Begleiterrechner",
         'requires'      => "Benötigt %s",
         'requires2'     => "Benötigt",
         'reqLevel'      => "Benötigt Stufe %s",
@@ -286,9 +287,8 @@ $lang = array(
         )
     ),
     'pet'      => array(
-        'cat'           => array(
-            'Wildheit', 'Hartnäckigkeit', 'Gerissenheit'
-        )
+        'exotic'        => "Exotisch",
+        'cat'           => ["Wildheit", "Hartnäckigkeit", "Gerissenheit"]
     ),
     'itemset' => array(
         '_desc'         => "<b>%s</b> ist das <b>%s</b>. Es enthält %s Teile.",

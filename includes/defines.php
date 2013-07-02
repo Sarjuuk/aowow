@@ -80,7 +80,6 @@ define('U_GROUP_MODERATOR',                 (U_GROUP_ADMIN|U_GROUP_MOD|U_GROUP_B
 define('U_GROUP_COMMENTS_MODERATOR',        (U_GROUP_MODERATOR|U_GROUP_LOCALIZER));
 define('U_GROUP_PREMIUM_PERMISSIONS',       (U_GROUP_PREMIUM|U_GROUP_STAFF|U_GROUP_VIP));
 
-
 // Locales
 define('LOCALE_EN',                         0);
 define('LOCALE_FR',                         2);
@@ -88,11 +87,18 @@ define('LOCALE_DE',                         3);
 define('LOCALE_ES',                         6);
 define('LOCALE_RU',                         8);
 
-// Additional info in item-listviews
+// conditional information in listviews
 define('ITEMINFO_JSON',                     0x1);
 define('ITEMINFO_SUBITEMS',                 0x2);
 define('ITEMINFO_VENDOR',                   0x4);
 define('ITEMINFO_LOOT',                     0x8);
+
+define('NPCINFO_TAMEABLE',                  0x1);
+define('NPCINFO_MODEL',                     0x2);
+
+define('SPAWNINFO_ZONES',                   1);             // not a mask, mutually exclusive
+define('SPAWNINFO_SHORT',                   2);
+define('SPAWNINFO_FULL',                    3);
 
 /*
  * Game

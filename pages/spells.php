@@ -29,7 +29,7 @@ $validCats  = array(
     -4  => true,                                            // Racial Traits
     -5  => true,                                            // Mounts
     -6  => true,                                            // Companions
-    -7  => [409, 410, 411],                                 // PetTalents => TalenTtabId
+    -7  => [409, 410, 411],                                 // PetTalents => TalentTabId
     -8  => true,                                            // NPC Abilities
     -9  => true,                                            // GM Abilities
     -11 => [6, 8, 10],                                      // Proficiencies [Weapon, Armor, Language]

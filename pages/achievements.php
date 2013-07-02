@@ -75,12 +75,15 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         array_unshift($title, Util::ucFirst(Lang::$game['achievements']));
     }
 
+    // listview content
+    $pageData = array(
+        'data'   => $acvList->getListviewData(),
+        'params' => []
+    );
+
     // fill g_items, g_titles, g_achievements
     $acvList->addGlobalsToJscript($pageData);
     $acvList->addRewardsToJScript($pageData);
-
-    // listview content
-    $pageData['data']   = $acvList->getListviewData();
 
     // if we are have different cats display field
     if ($acvList->hasDiffFields(['category']))

@@ -39,5 +39,6 @@
             {if isset($lvData.gRaces)}        { include file='bricks/globals/races.tpl'          data=$lvData.gRaces        }{/if}
             {if isset($lvData.gSpells)}       { include file='bricks/globals/spells.tpl'         data=$lvData.gSpells       }{/if}
             {if isset($lvData.gTitles)}       { include file='bricks/globals/titles.tpl'         data=$lvData.gTitles       }{/if}
-            {* TODO: Factions, Quests, NPCs, Objects, g_gatheredzones(?) *}
+            {if isset($lvData.gCreatures)}    { include file='bricks/globals/creatures.tpl'      data=$lvData.gCreatures    }{/if}
+            {* TODO: Factions, Quests, Objects, g_gatheredzones(?) *}
         </script>{/strip}
