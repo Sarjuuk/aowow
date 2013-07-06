@@ -49,8 +49,11 @@ class SpellList extends BaseType
         {
             // required for globals
             for ($i = 1; $i <= 3; $i++)
-                if (in_array($this->curTpl['effect'.$i.'Id'], [24, 66]) || $this->curTpl['effect'.$i.'AuraId'] == 86)  // Create Item; Create Mana Gem; Channel Death Item
+            {
+                // 24: createItem; 34: changeItem; 59: randomItem; 86: Channel Death Item
+                if ($this->canCreateItem())
                     $foo[] = (int)$this->curTpl['effect'.$i.'CreateItemId'];
+            }
 
             for ($i = 1; $i <= 8; $i++)
                 if ($this->curTpl['reagent'.$i] > 0)
@@ -458,6 +461,16 @@ class SpellList extends BaseType
         }
     }
 
+    public function canCreateItem()
+    {
+        // 24: createItem; 34: changeItem; 59: randomItem; 66: Create Mana Gem; 86: Channel Death Item
+        for ($i = 1; $i < 4; $i++)
+            if (in_array($this->curTpl['effect'.$i.'Id'], [24, 34, 59, 66]) || $this->curTpl['effect'.$i.'AuraId'] == 86)
+                return true;
+
+        return false;
+    }
+
     // description-, buff-parsing component
     private function resolveEvaluation($formula)
     {
@@ -505,10 +518,11 @@ class SpellList extends BaseType
             if (!$evalable)
             {
                 // can't eval constructs because of strings present. replace constructs with strings
-                $cond  = $COND  = sprintf(Util::$dfnString, 'COND(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)<br /> <span class=\'q1\'>a</span> ? <span class=\'q1\'>b</span> : <span class=\'q1\'>c</span>', 'COND');
-                $eq    = $EQ    = sprintf(Util::$dfnString, 'EQ(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> == <span class=\'q1\'>b</span>', 'EQ');
-                $gt    = $GT    = sprintf(Util::$dfnString, 'GT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> > <span class=\'q1\'>b</span>', 'GT');
-                $floor = $FLOOR = sprintf(Util::$dfnString, 'FLOOR(<span class=\'q1\'>a</span>)', 'FLOOR');
+                $cond  = $COND  = !$this->interactive ? 'COND'  : sprintf(Util::$dfnString, 'COND(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)<br /> <span class=\'q1\'>a</span> ? <span class=\'q1\'>b</span> : <span class=\'q1\'>c</span>', 'COND');
+                $eq    = $EQ    = !$this->interactive ? 'EQ'    : sprintf(Util::$dfnString, 'EQ(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> == <span class=\'q1\'>b</span>', 'EQ');
+                $gt    = $GT    = !$this->interactive ? 'GT'    : sprintf(Util::$dfnString, 'GT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> > <span class=\'q1\'>b</span>', 'GT');
+                $floor = $FLOOR = !$this->interactive ? 'FLOOR' : sprintf(Util::$dfnString, 'FLOOR(<span class=\'q1\'>a</span>)', 'FLOOR');
+                $pl    = $PL    = !$this->interactive ? 'PL'    : sprintf(Util::$dfnString, 'LANG.level', 'PL');
 
                 // note the " !
                 return eval('return "'.$formula.'";');
@@ -679,7 +693,9 @@ class SpellList extends BaseType
                 // Aura end
 
                 if ($rType && $this->interactive)
-                    return '<!--rtg'.$rType.'-->'.abs($base)."&nbsp;<small>(".Util::setRatingLevel($this->charLevel, $rType, abs($base)).")</small>";
+                    return '<!--rtg'.$rType.'-->'.abs($base).'&nbsp;<small>('.sprintf(Util::$setRatingLevelString, $this->charLevel, $rType, abs($base), Util::setRatingLevel($this->charLevel, $rType, abs($base))).')</small>';
+                else if ($rType)
+                    return '<!--rtg'.$rType.'-->'.abs($base).'&nbsp;<small>('.Util::setRatingLevel($this->charLevel, $rType, abs($base)).')</small>';
                 else
                     return $base;
             case 'n':                                       // ProcCharges
@@ -781,7 +797,9 @@ class SpellList extends BaseType
                 // Aura end
 
                 if ($rType && $equal && $this->interactive)
-                    return '<!--rtg'.$rType.'-->'.$min."&nbsp;<small>(".Util::setRatingLevel($this->charLevel, $rType, $min).")</small>";
+                    return '<!--rtg'.$rType.'-->'.$min.'&nbsp;<small>('.sprintf(Util::$setRatingLevelString, $this->charLevel, $rType, $min, Util::setRatingLevel($this->charLevel, $rType, $min)).')</small>';
+                else if ($rType && $equal)
+                    return '<!--rtg'.$rType.'-->'.$min.'&nbsp;<small>('.Util::setRatingLevel($this->charLevel, $rType, $min).')</small>';
                 else
                     return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
             case 't':                                       // Periode

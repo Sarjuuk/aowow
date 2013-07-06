@@ -1678,114 +1678,146 @@ function g_setRatingLevel(f, e, b, c) {
 		}
 	}
 }
-function g_convertRatingToPercent(g, b, f, d) {
-	var e = g_convertRatingToPercent.RB;
-	if (g < 0) {
-		g = 1
-	} else {
-		if (g > 80) {
-			g = 80
-		}
-	}
-	if ((b == 14 || b == 12 || b == 15) && g < 34) {
-		g = 34
-	}
-	if ((b == 28 || b == 36) && (d == 2 || d == 6 || d == 7 || d == 11)) {
-		e[b] /= 1.3
-	}
-	if (f < 0) {
-		f = 0
-	}
-	var a;
-	if (e[b] == null) {
-		a = 0
-	} else {
-		var c;
-		if (g > 70) {
-			c = (82 / 52) * Math.pow((131 / 63), ((g - 70) / 10))
-		} else {
-			if (g > 60) {
-				c = (82 / (262 - 3 * g))
-			} else {
-				if (g > 10) {
-					c = ((g - 8) / 52)
-				} else {
-					c = 2 / 52
-				}
-			}
-		}
-		a = f / e[b] / c
-	}
-	return a
+
+function g_convertRatingToPercent(level, rating, value, classs) {
+    var ratingBases = g_convertRatingToPercent.RB;
+
+    if (level < 0) {
+        level = 1;
+    }
+    else {
+        if (level > 80) {
+            level = 80;
+        }
+    }
+
+    // Patch 2.4.3: Defense Skill, Dodge Rating, Parry Rating, Block Rating
+    if ((rating == 14 || rating == 12 || rating == 15) && level < 34) {
+        level = 34;
+    }
+
+    // Patch 3.1: Melee Haste for Death Knights, Druids, Paladins, and Shamans
+    if ((rating == 28 || rating == 36) && (classs == 2 || classs == 6 || classs == 7 || classs == 11)) {
+        ratingBases[rating] /= 1.3;
+    }
+
+    if (value < 0) {
+        value = 0
+    }
+
+    var percent;
+    if (!ratingBases || ratingBases[rating] == null) {
+        percent = 0
+    }
+    else {
+        var H;
+
+        if (level > 70) {
+            H = (82 / 52) * Math.pow((131 / 63), ((level - 70) / 10));
+        }
+        else if (level > 60) {
+            H = (82 / (262 - 3 * level));
+        }
+        else if (level > 10) {
+            H = ((level - 8) / 52);
+        }
+        else {
+            H = 2 / 52;
+        }
+
+        percent = value / ratingBases[rating] / H;
+    }
+
+    return percent;
 }
+
 g_convertRatingToPercent.RB = {
-	12 : 1.5,
-	13 : 12,
-	14 : 15,
-	15 : 5,
-	16 : 10,
-	17 : 10,
-	18 : 8,
-	19 : 14,
-	20 : 14,
-	21 : 14,
-	22 : 10,
-	23 : 10,
-	24 : 0,
-	25 : 0,
-	26 : 0,
-	27 : 0,
-	28 : 10,
-	29 : 10,
-	30 : 10,
-	31 : 10,
-	32 : 14,
-	33 : 0,
-	34 : 0,
-	35 : 25,
-	36 : 10,
-	37 : 2.5,
-	44 : 3.756097412109376
+    12: 1.5,
+    13: 12,
+    14: 15,
+    15: 5,
+    16: 10,
+    17: 10,
+    18: 8,
+    19: 14,
+    20: 14,
+    21: 14,
+    22: 10,
+    23: 10,
+    24: 0,
+    25: 0,
+    26: 0,
+    27: 0,
+    28: 10,
+    29: 10,
+    30: 10,
+    31: 10,
+    32: 14,
+    33: 0,
+    34: 0,
+    35: 25,
+    36: 10,
+    37: 2.5,
+    44: 3.756097412109376
 };
+
 var g_statToJson = {
-	1 : "health",
-	2 : "mana",
-	3 : "agi",
-	4 : "str",
-	5 : "int",
-	6 : "spi",
-	7 : "sta",
-	12 : "defrtng",
-	13 : "dodgertng",
-	14 : "parryrtng",
-	15 : "blockrtng",
-	16 : "mlehitrtng",
-	17 : "rgdhitrtng",
-	18 : "splhitrtng",
-	19 : "mlecritstrkrtng",
-	20 : "rgdcritstrkrtng",
-	21 : "splcritstrkrtng",
-	22 : "_mlehitrtng",
-	23 : "_rgdhitrtng",
-	24 : "_splhitrtng",
-	25 : "_mlecritstrkrtng",
-	26 : "_rgdcritstrkrtng",
-	27 : "_splcritstrkrtng",
-	28 : "mlehastertng",
-	29 : "rgdhastertng",
-	30 : "splhastertng",
-	31 : "hitrtng",
-	32 : "critstrkrtng",
-	33 : "_hitrtng",
-	34 : "_critstrkrtng",
-	35 : "resirtng",
-	36 : "hastertng",
-	37 : "exprtng",
-	38 : "atkpwr",
-	43 : "manargn",
-	44 : "armorpenrtng",
-	45 : "splpwr"
+    // Converts a numeric stat id into a json property
+     1: 'health',
+     2: 'mana',                                             // on idx 0 in 5.0
+     3: 'agi',
+     4: 'str',
+     5: 'int',
+     6: 'spi',
+     7: 'sta',
+     8: 'energy',
+     9: 'rage',
+    10: 'focus',
+    12: 'defrtng',
+    13: 'dodgertng',
+    14: 'parryrtng',
+    15: 'blockrtng',
+    16: 'mlehitrtng',
+    17: 'rgdhitrtng',
+    18: 'splhitrtng',
+    19: 'mlecritstrkrtng',
+    20: 'rgdcritstrkrtng',
+    21: 'splcritstrkrtng',
+    22: '_mlehitrtng',
+    23: '_rgdhitrtng',
+    24: '_splhitrtng',
+    25: '_mlecritstrkrtng',
+    26: '_rgdcritstrkrtng',
+    27: '_splcritstrkrtng',
+    28: 'mlehastertng',
+    29: 'rgdhastertng',
+    30: 'splhastertng',
+    31: 'hitrtng',
+    32: 'critstrkrtng',
+    33: '_hitrtng',
+    34: '_critstrkrtng',
+    35: 'resirtng',
+    36: 'hastertng',
+    37: 'exprtng',
+    38: 'atkpwr',
+    39: 'rgdatkpwr',
+    41: 'splheal',
+    42: 'spldmg',
+    43: 'manargn',
+    44: 'armorpenrtng',
+    45: 'splpwr',
+    46: 'healthrgn',
+    47: 'splpen',
+    49: 'mastrtng',
+    50: 'armor',
+    51: 'firres',
+    52: 'frores',
+    53: 'holres',
+    54: 'shares',
+    55: 'natres',
+    56: 'arcres'
 };
+
 function g_convertScalingFactor(c, b, g, d, j) {
 	var f = g_convertScalingFactor.SV;
 	var e = g_convertScalingFactor.SD;
@@ -2137,34 +2169,45 @@ function g_enhanceTooltip(a, c) {
 	}
 	return a
 }
-function g_staticTooltipLevelClick(g, f) {
-	while (g.className.indexOf("tooltip") == -1) {
-		g = g.parentNode
-	}
-	var c = g.innerHTML;
-	c = c.match(/<!--\?(\d+):(\d+):(\d+):(\d+)/);
-	if (!c) {
-		return
-	}
-	var e = parseInt(c[1]),
-	d = parseInt(c[2]),
-	b = parseInt(c[3]),
-	a = parseInt(c[4]);
-	if (!f) {
-		f = prompt(sprintf(LANG.prompt_ratinglevel, d, b), a)
-	}
-	f = parseInt(f);
-	if (isNaN(f)) {
-		return
-	}
-	if (f == a || f < d || f > b) {
-		return
-	}
-	c = g_setTooltipItemLevel(g_items[e]["tooltip_" + g_locale.name], f);
-	c = g_enhanceTooltip(c, true);
-	g.innerHTML = "<table><tr><td>" + c + '</td><th style="background-position: top right"></th></tr><tr><th style="background-position: bottom left"></th><th style="background-position: bottom right"></th></tr></table>';
-	Tooltip.fixSafe(g, 1, 1)
+
+function g_staticTooltipLevelClick(div, level) {
+    while (div.className.indexOf('tooltip') == -1) {
+        div = div.parentNode;
+    }
+
+    var _ = div.innerHTML;
+
+    // Retrieve tooltip's global information
+    _ = _.match(/<!--\?(\d+):(\d+):(\d+):(\d+)/);
+    if (!_) {
+        return; // Error
+    }
+
+    var
+        itemId = parseInt(_[1]),
+        minLevel = parseInt(_[2]),
+        maxLevel = parseInt(_[3]),
+        curLevel = parseInt(_[4]);
+    if (!level) { // Prompt for level
+        level = prompt(sprintf(LANG.prompt_ratinglevel, minLevel, maxLevel), curLevel);
+    }
+
+    level = parseInt(level);
+    if (isNaN(level)) {
+        return; // Invalid level
+    }
+
+    if (level == curLevel || level < minLevel || level > maxLevel) {
+        return; // Level out of bound or no tooltip changes required
+    }
+
+    _ = g_setTooltipItemLevel(g_items[e]['tooltip_' + g_locale.name], level);
+    _ = g_enhanceTooltip(_, true);
+
+    div.innerHTML = '<table><tr><td>' + _ + '</td><th style="background-position: top right"></th></tr><tr><th style="background-position: bottom left"></th><th style="background-position: bottom right"></th></tr></table>';
+    Tooltip.fixSafe(div, 1, 1);
 }
+
 function g_getMoneyHtml(c) {
 	var b = 0,
 	a = "";

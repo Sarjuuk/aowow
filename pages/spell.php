@@ -50,6 +50,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $smarty->notFound(Lang::$game['spell']);
 
     $cat = $spell->getField('typeCat');
+    $l   = [null, 'A', 'B', 'C'];
 
     $pageData['path'] = [0, 1, $cat];
 
@@ -244,7 +245,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         // Icons:
         // .. from item
-        if (in_array($effId, [24, 34, 59, 66]) || in_array($effAura, [86]))  // 24: createItem; 34: changeItem; 59: randomItem; 86: Channel Death Item
+        if ($spell->canCreateItem())
         {
             while ($spell->relItems->id != $spell->getField('effect'.$i.'CreateItemId'))
                 $spell->relItems->iterate();
@@ -281,7 +282,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if ($spell->getField('effect'.$i.'RadiusMax') > 0)
             $foo['radius'] = $spell->getField('effect'.$i.'RadiusMax');
 
-        if (($effBP + $effDS) && !$spell->getField('effect'.$i.'CreateItemId') && (!$spell->getField('effect'.$i.'TriggerSpell') || in_array($effAura, [225, 227])))
+        if (($effBP + $effDS) && !($spell->canCreateItem() && $spell->relItems && !$spell->relItems->error) && (!$spell->getField('effect'.$i.'TriggerSpell') || in_array($effAura, [225, 227])))
             $foo['value'] = ($effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
 
         if ($effRPPL != 0)
@@ -561,6 +562,175 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     * extra tabs
     *******/
 
+    // modifies $this
+    $sub = ['OR'];
+    $conditions = [
+        ['s.typeCat', [0, -9 /*, -8*/], '!'],               // uncategorized (0), GM (-9), NPC-Spell (-8); NPC includes totems, lightwell and others :/
+        ['s.spellFamilyId', $spell->getField('spellFamilyId')],
+        &$sub
+    ];
+
+    for ($i = 1; $i < 4; $i++)
+    {
+        // Flat Mods (107), Pct Mods (108), No Reagent Use .. include dummy..? (4)
+        if (!in_array($spell->getField('effect'.$i.'AuraId'), [107, 108, 256, 4]))
+            continue;
+
+        $m1 = $spell->getField('effect1SpellClassMask'.$l[$i]);
+        $m2 = $spell->getField('effect2SpellClassMask'.$l[$i]);
+        $m3 = $spell->getField('effect3SpellClassMask'.$l[$i]);
+
+        if (!$m1 && !$m2 && !$m3)
+            continue;
+
+        $sub[] = ['s.spellFamilyFlags1', $m1, '&'];
+        $sub[] = ['s.spellFamilyFlags2', $m2, '&'];
+        $sub[] = ['s.spellFamilyFlags3', $m3, '&'];
+    }
+
+    if (count($sub) > 1)
+    {
+        $modSpells = new SpellList($conditions);
+        if (!$modSpells->error)
+        {
+            $pageData['modifies'] = array(
+                'data'   => $modSpells->getListviewData(),
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'id'   => 'modifies',
+                    'name' => '$LANG.tab_modifies',
+                    'visibleCols' => "$['level']"
+                ]
+            );
+
+            $modSpells->addGlobalsToJScript($pageData);
+            if(!$modSpells->hasDiffFields(['skillLines']))
+                $pageData['modifies']['params']['hiddenCols'] = "$['skill']";
+        }
+    }
+
+    // modified by $this
+    $sub = ['OR'];
+    $conditions = [['s.spellFamilyId', $spell->getField('spellFamilyId')], &$sub];
+
+    for ($i = 1; $i < 4; $i++)
+    {
+        $m1 = $spell->getField('spellFamilyFlags1');
+        $m2 = $spell->getField('spellFamilyFlags2');
+        $m3 = $spell->getField('spellFamilyFlags3');
+
+        if (!$m1 && !$m2 && !$m3)
+            continue;
+
+        $sub[] = array(
+            'AND',
+            ['s.effect'.$i.'AuraId', [107, 108, 256 /*, 4*/]],
+            [
+                'OR',
+                ['s.effect1SpellClassMask'.$l[$i], $m1, '&'],
+                ['s.effect2SpellClassMask'.$l[$i], $m2, '&'],
+                ['s.effect3SpellClassMask'.$l[$i], $m3, '&']
+            ]
+        );
+    }
+
+    if (count($sub) > 1)
+    {
+        $modsSpell = new SpellList($conditions);
+        if (!$modsSpell->error)
+        {
+            $pageData['modifiedBy'] = array(
+                'data'   => $modsSpell->getListviewData(),
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'id'   => 'modified-by',
+                    'name' => '$LANG.tab_modifiedby',
+                    'visibleCols' => "$['level']"
+                ]
+            );
+
+            $modsSpell->addGlobalsToJScript($pageData);
+            if(!$modsSpell->hasDiffFields(['skillLines']))
+                $pageData['modifiedBy']['params']['hiddenCols'] = "$['skill']";
+        }
+    }
+
+    // see also
+    $conditions = array(
+        ['s.schoolMask', $spell->getField('schoolMask')],
+        ['s.effect1Id', $spell->getField('effect1Id')],
+        ['s.effect2Id', $spell->getField('effect2Id')],
+        ['s.effect3Id', $spell->getField('effect3Id')],
+        ['s.id', $spell->id, '!'],
+        ['s.name_loc'.User::$localeId, $spell->getField('name', true)]
+    );
+
+    $saSpells = new SpellList($conditions);
+    if (!$saSpells->error)
+    {
+        $pageData['seeAlso'] = array(
+            'data'   => $saSpells->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'see-also',
+                'name' => '$LANG.tab_seealso',
+                'visibleCols' => "$['level']"
+            ]
+        );
+
+        $saSpells->addGlobalsToJScript($pageData);
+        if(!$saSpells->hasDiffFields(['skillLines']))
+            $pageData['seeAlso']['params']['hiddenCols'] = "$['skill']";
+    }
+
+    // used by - itemset
+    $conditions = array(
+        'OR',
+        ['spell1', $spell->id], ['spell2', $spell->id], ['spell3', $spell->id], ['spell4', $spell->id],
+        ['spell5', $spell->id], ['spell6', $spell->id], ['spell7', $spell->id], ['spell8', $spell->id]
+    );
+
+    $ubSets = new ItemsetList($conditions);
+    if (!$ubSets->error)
+    {
+        $pageData['usedByItemset'] = array(
+            'data'   => $ubSets->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'used-by-itemset',
+                'name' => '$LANG.tab_usedby'
+            ]
+        );
+
+        $ubSets->addGlobalsToJScript($pageData);
+    }
+
+
+    // used by - item
+    $conditions = array(
+        'OR',
+        ['AND', ['spelltrigger_1', 6, '!'], ['spellid_1', $spell->id]],
+        ['AND', ['spelltrigger_2', 6, '!'], ['spellid_2', $spell->id]],
+        ['AND', ['spelltrigger_3', 6, '!'], ['spellid_3', $spell->id]],
+        ['AND', ['spelltrigger_4', 6, '!'], ['spellid_4', $spell->id]],
+        ['AND', ['spelltrigger_5', 6, '!'], ['spellid_5', $spell->id]]
+    );
+
+    $ubItems = new ItemList($conditions);
+    if (!$ubItems->error)
+    {
+        $pageData['usedByItem'] = array(
+            'data'   => $ubItems->getListviewData(0x0),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'used-by-item',
+                'name' => '$LANG.tab_usedby'
+            ]
+        );
+
+        $ubItems->addGlobalsToJScript($pageData);
+    }
+
     /* contains [Open Lock Item]
 
         effect.$i.Id = 59
@@ -627,51 +797,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     */
 
-
 /*
 
-    // Используется вещями:
-/*
-    $usedbyitem = DB::Aowow()->select('
-        SELECT ?#, c.entry
-        { , name_loc?d AS name_loc }
-        FROM ?_icons, item_template c
-        { LEFT JOIN (locales_item l) ON c.entry = l.entry AND ? }
-        WHERE
-            (spellid_1 = ?d OR (spellid_2 = ?d AND spelltrigger_2!=6) OR spellid_3 = ?d OR spellid_4 = ?d OR spellid_5 = ?d)
-            AND id=displayID
-        ',
-        $item_cols[2],
-        (User::$localeId>0)? User::$localeId: DBSIMPLE_SKIP,
-        (User::$localeId>0)? 1: DBSIMPLE_SKIP,
-        $spellArr['entry'], $spellArr['entry'], $spellArr['entry'], $spellArr['entry'], $spellArr['entry']
-    );
-    if($usedbyitem)
-    {
-        $spellArr['usedbyitem'] = [];
-        foreach($usedbyitem as $i => $row)
-            $spellArr['usedbyitem'][] = iteminfo2($row, 0);
-        unset($usedbyitem);
-    }
-*/
-    // Используется наборами вещей:
-    // $usedbyitemset = DB::Aowow()->select('
-        // SELECT *
-        // FROM ?_itemset
-        // WHERE spell1 = ?d OR spell2 = ?d OR spell3 = ?d OR spell4 = ?d OR spell5 = ?d OR spell6 = ?d OR spell7 = ?d OR spell8 = ?d
-        // ',
-        // $spellArr['entry'], $spellArr['entry'], $spellArr['entry'], $spellArr['entry'], $spellArr['entry'], $spellArr['entry'], $spellArr['entry'], $spellArr['entry']
-    // );
-    // if($usedbyitemset)
-    // {
-        // $spellArr['usedbyitemset'] = [];
-        // foreach($usedbyitemset as $i => $row)
-            // $spellArr['usedbyitemset'][] = itemsetinfo2($row);
-        // unset($usedbyitemset);
-    // }
-
-    // Спелл - награда за квест
-/*
     $questreward = DB::Aowow()->select('
         SELECT c.?#
         { , Title_loc?d AS Title_loc }

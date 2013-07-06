@@ -893,10 +893,6 @@ class ItemList extends BaseType
             return Lang::$item['trigger'][1] . str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::$item['statType'][$type]);
         else                                                // rating-Bonuses
         {
-            // old
-            // $js = '&nbsp;<small>(<a href="javascript:;" onmousedown="return false" onclick="g_setRatingLevel(this,'.$level.','.$type.','.$value.')">';
-            // $js .= Util::setRatingLevel($level, $type, $value);
-            // $js .= '</a>)</small>';
             if ($interactive)
                 $js = '&nbsp;<small>('.sprintf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</a>)</small>';
             else
