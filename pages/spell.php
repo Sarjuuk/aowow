@@ -30,9 +30,9 @@ if (isset($_GET['power']))
             $pt[] = "\tname_".User::$localeString.": '".Util::jsEscape($n)."'";
         if ($i = $spell->getField('iconString'))
             $pt[] = "\ticon: '".Util::jsEscape($i)."'";
-        if ($t = $spell->renderTooltip($id))
+        if ($t = $spell->renderTooltip())
             $pt[] = "\ttooltip_".User::$localeString.": '".Util::jsEscape($t)."'";
-        if ($b = $spell->renderBuff($id))
+        if ($b = $spell->renderBuff())
             $pt[] = "\tbuff_".User::$localeString.": '".Util::jsEscape($b)."'";
         $x .= implode(",\n", $pt)."\n});";
 
@@ -238,6 +238,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $effMV   = (int)$spell->getField('effect'.$i.'MiscValue');
         $effBP   = (int)$spell->getField('effect'.$i.'BasePoints');
         $effDS   = (int)$spell->getField('effect'.$i.'DieSides');
+        $effRPPL =      $spell->getField('effect'.$i.'RealPointsPerLevel');
         $effAura = (int)$spell->getField('effect'.$i.'AuraId');
         $foo     = &$pageData['page']['effect'][];
 
@@ -283,6 +284,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if (($effBP + $effDS) && !$spell->getField('effect'.$i.'CreateItemId') && (!$spell->getField('effect'.$i.'TriggerSpell') || in_array($effAura, [225, 227])))
             $foo['value'] = ($effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
 
+        if ($effRPPL != 0)
+            $foo['value'] = (isset($foo['value']) ? $foo['value'] : '0') . sprintf(Lang::$spell['costPerLevel'], $effRPPL);
+
         if($spell->getField('effect'.$i.'Periode') > 0)
             $foo['interval'] = $spell->getField('effect'.$i.'Periode') / 1000;
 
@@ -303,7 +307,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case 88:                                        // Summon Totem (slot 2)
             case 89:                                        // Summon Totem (slot 3)
             case 90:                                        // Summon Totem (slot 4)
-                $foo['name'] .= ': <a href="?npc='.$effMV.'">'.CreatureList::getName($effMV).'</a> ('.$effMV.')';
+                $summon = new CreatureList(array(['ct.id', $effMV]));
+
+                if (!$pageData['view3D'] && $summon)
+                    $pageData['view3D'] = $summon->getRandomModelId();
+
+                $foo['name'] .= ': <a href="?npc='.$effMV.'">'.$summon->getField('name', true).'</a> ('.$effMV.')';
                 break;
             case 33:                                        // open Lock
                 $foo['name'] .= ' ('.sprintf(Util::$dfnString, @Util::$lockType[$effMV], $effMV).')';
@@ -327,6 +336,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case 105:                                       // Summon Object (slot 2)
             case 106:                                       // Summon Object (slot 3)
             case 107:                                       // Summon Object (slot 4)
+                // todo (low): create modelviewer-data
                 $foo['name'] .= ': <a href="?object='.$effMV.'">'.GameObjectList::getName($effMV).'</a> ('.$effMV.')';
                 break;
             case 74:                                        // Apply Glyph
@@ -334,7 +344,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $foo['name'] .= ': <a href="?spell='.$_.'">'.SpellList::getName($_).'</a> ('.$effMV.')';
                 break;
             case 95:                                        // Skinning
-                // todo: sort this out - 0:skinning (corpse, beast), 1:hearb (GO), 2: ineral (GO), 3: engineer (corpse, mechanic)
+                // todo (low): sort this out - 0:skinning (corpse, beast), 1:hearb (GO), 2: mineral (GO), 3: engineer (corpse, mechanic)
                 $foo['name'] .= ' ('.sprintf(Util::$dfnString, 'NYI]', $effMV).')';
                 break;
             case 108:                                       // Dispel Mechanic
@@ -511,7 +521,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 78:                            // Mounted
                         case 56:                            // Transform
                         {
-                            $transform = new CreatureList(array(['ct.entry', $effMV]));
+                            $transform = new CreatureList(array(['ct.id', $effMV]));
 
                             if (!$pageData['view3D'] && $transform)
                                 $pageData['view3D'] = $transform->getRandomModelId();

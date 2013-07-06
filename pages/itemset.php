@@ -145,7 +145,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             if ($mask & (1 << $i))
             {
                 if ($mask == (1 << $i))                     // only bit set, add path
-                    $path[] = $i;
+                    $path[] = $i + 1;
 
                 break;                                      // break anyway (cant set multiple classes)
             }
@@ -189,7 +189,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($ta && count($path) == 3)
     {
         $rel[] = ['id', $id, '!'];
-        $rel[] = ['classMask', 1 << end($path), '&'];
+        $rel[] = ['classMask', 1 << (end($path) - 1), '&'];
         $rel[] = ['contentGroup', (int)$ta];
     }
     else if ($ev)

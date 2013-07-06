@@ -5,6 +5,66 @@ if (!defined('AOWOW_REVISION'))
 
 class PetSetup extends PetList
 {
+    private static $setup = array(
+        'CREATE TABLE `aowow_pet` (
+            `id`  int(11) NOT NULL ,
+            `category`  mediumint(8) NOT NULL ,
+            `minLevel`  smallint(6) NOT NULL ,
+            `maxLevel`  smallint(6) NOT NULL ,
+            `foodMask`  int(11) NOT NULL ,
+            `type`  tinyint(4) NOT NULL ,
+            `exotic`  tinyint(4) NOT NULL ,
+            `expansion`  tinyint(4) NOT NULL ,
+            `name_loc0`  varchar(64) NOT NULL ,
+            `name_loc2`  varchar(64) NOT NULL ,
+            `name_loc3`  varchar(64) NOT NULL ,
+            `name_loc6`  varchar(64) NOT NULL ,
+            `name_loc8`  varchar(64) NOT NULL ,
+            `iconString`  varchar(128) NOT NULL ,
+            `skillLineId`  mediumint(9) NOT NULL ,
+            `spellId1`  mediumint(9) NOT NULL ,
+            `spellId2`  mediumint(9) NOT NULL ,
+            `spellId3`  mediumint(9) NOT NULL ,
+            `spellId4`  mediumint(9) NOT NULL ,
+            `armor`  mediumint(9) NOT NULL ,
+            `damage`  mediumint(9) NOT NULL ,
+            `health`  mediumint(9) NOT NULL ,
+            PRIMARY KEY (`id`)
+        ) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci ENGINE=MyISAM',
+
+        'INSERT INTO aowow_pet SELECT
+            f.id,
+            categoryEnumId,
+            min(ct.minlevel),
+            max(ct.maxlevel),
+            itemPetFoodMask,
+            petTalentType,
+            IF(ct.type_flags & 0x10000, 1, 0),              -- exotic
+            0,                                              -- expansion (static data :/)
+            nameEN, nameFR, nameDE, nameES, nameRU,
+            SUBSTRING_INDEX(iconFile, '\\', -1),
+            skillLine1,
+            0, 0, 0, 0,                                     -- spells
+            0, 0, 0                                         -- mods (from "Tamed Pet Passive (DND)")
+        FROM
+            dbc.creatureFamily f
+        LEFT JOIN
+            ?_creature ct ON
+            f.id = ct.family
+        JOIN
+            world.creature c ON                             -- check if it is spawned (for min/max level)
+            ct.id = c.id
+        WHERE
+            pettalentType <> -1 AND
+            ct.type_flags & 0x1
+        GROUP BY
+            f.id;
+        ',
+
+        'UPDATE aowow_pet SET expansion = 1 WHERE id IN (30, 31, 32, 33, 34)',
+        'UPDATE aowow_pet SET expansion = 2 WHERE id IN (37, 38, 39, 41, 42, 43, 44, 45, 46)'
+    );
+
     private static $classicMods = array(                    // [Armor, Damage, Health] (see related "Tamed Pet Passive (DND)" spells per family. All values are set to +5% in wotlk)
          1 => [  5,   0,   0],                              // Wolf
          2 => [  0,  10,  -2],                              // Cat
@@ -31,22 +91,11 @@ class PetSetup extends PetList
         35 => [  0,   0,   0]                               // Serpent
     );
 
-    private static $addonInfo = array(                      // i could have sworn that was somewhere in dbc
-        30 => [1, 0],
-        31 => [1, 0],
-        32 => [1, 0],
-        33 => [1, 0],
-        34 => [1, 0],
-        37 => [2, 0],
-        38 => [2, 1],
-        39 => [2, 1],
-        41 => [2, 1],
-        42 => [2, 1],
-        43 => [2, 1],
-        44 => [2, 0],
-        45 => [2, 1],
-        46 => [2, 1]
-    ),
+    public function __construct($params)
+    {
+        foreach ($this->setup as $query)
+            DB::Aowow()->query($query);
+    }
 
     function setupPetSpells()
     {
@@ -71,14 +120,8 @@ class PetSetup extends PetList
 
     function setupClassicMods()
     {
-        foreach (self::$classicMods as $pet => $mods)
+        foreach ($this->classicMods as $pet => $mods)
             DB::Aowow()->query('UPDATE ?_pet SET armor = ?d, damage = ?d, health = ?d WHERE id = ?d', $mods[0], $mods[1], $mods[2], $pet);
-    }
-
-    function setupAddonInfo()
-    {
-        foreach (self::$addonInfo as $pet => $info)
-            DB::Aowow()->query('UPDATE ?_pet SET expansion = ?d, exotic = ?d WHERE id = ?d', $info[0], $info[1], $pet);
     }
 }
 

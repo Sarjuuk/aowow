@@ -82,10 +82,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // infobox content
     switch ($acv->getField('faction'))
     {
-        case 0:
+        case 1:
             $pageData['infoBox'][] = Lang::$main['side'].': <span class="alliance-icon">'.Lang::$game['si'][SIDE_ALLIANCE].'</span>';
             break;
-        case 1:
+        case 2:
             $pageData['infoBox'][] = Lang::$main['side'].': <span class="horde-icon">'.Lang::$game['si'][SIDE_HORDE].'</span>';
             break;
         default:                                        // case 3
@@ -106,7 +106,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $pageData['page']['saParams'] = array(
         'id'          => 'see-also',
         'name'        => '$LANG.tab_seealso',
-        'visibleCols' => "$['category']"
+        'visibleCols' => "$['category']",
+        'tabs'        => '$tabsRelated'
     );
 
     $saList->addRewardsToJscript($pageData);
@@ -124,7 +125,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $pageData['page']['coParams'] = array(
             'id'          => 'criteria-of',
             'name'        => '$LANG.tab_criteriaof',
-            'visibleCols' => "$['category']"
+            'visibleCols' => "$['category']",
+            'tabs'        => '$tabsRelated'
         );
 
         $coList->addRewardsToJscript($pageData);
@@ -135,8 +137,24 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $pageData['page']['titleReward'] = [];
     $pageData['page']['itemReward']  = [];
 
-    foreach ($pageData['page']['titleReward'] as $k => $v)
-        $pageData['page']['titleReward'][$k] = sprintf(Lang::$achievement['titleReward'], $k, trim(str_replace('%s', '', $v['name'])));
+    if ($foo = $acv->getField('rewards')[TYPE_ITEM])
+    {
+        $bar = new ItemList(array(['i.entry', $foo]));
+        while ($bar->iterate())
+        {
+            $pageData['page']['itemReward'][$bar->id] = array(
+                'name'    => $bar->getField('name', true),
+                'quality' => $bar->getField('Quality')
+            );
+        }
+    }
+
+    if ($foo = $acv->getField('rewards')[TYPE_TITLE])
+    {
+        $bar = new TitleList(array(['id', $foo]));
+        while ($bar->iterate())
+            $pageData['page']['titleReward'][] = sprintf(Lang::$achievement['titleReward'], $bar->id, trim(str_replace('%s', '', $bar->getField('male', true))));
+    }
 
     // *****
     // ACHIEVEMENT CRITERIA
@@ -296,7 +314,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 break;
             // link to faction (/w target reputation)
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
-                $crtName = Faction::getName($obj);
+                $crtName = FactionList::getName($obj);
                 $tmp['link'] = array(
                     'href' => '?faction='.$obj,
                     'text' => $crtName ? $crtName : $crtName,

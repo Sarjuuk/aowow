@@ -107,13 +107,27 @@ class TitleList extends BaseType
 
             // Quest-source
             if (isset($src[4]))
+            {
                 foreach ($src[4] as $s)
+                {
+                    if (isset($sources[4][$s]['s']))
+                        $this->faction2Side($sources[4][$s]['s']);
+
                     $tmp[4][] = $sources[4][$s];
+                }
+            }
 
             // Achievement-source
             if (isset($src[12]))
+            {
                 foreach ($src[12] as $s)
+                {
+                    if (isset($sources[12][$s]['s']))
+                        $this->faction2Side($sources[12][$s]['s']);
+
                     $tmp[12][] = $sources[12][$s];
+                }
+            }
 
             // other source (only one item possible, so no iteration needed)
             if (isset($src[13]))
@@ -131,6 +145,14 @@ class TitleList extends BaseType
 
     public function addRewardsToJScript(&$ref) { }
     public function renderTooltip() { }
+
+    private function faction2Side(&$faction)                // thats weird.. and hopefully unique to titles
+    {
+        if ($faction == 2)                                  // Horde
+            $faction = 0;
+        else if ($faction != 1)                             // Alliance
+            $faction = 3;                                   // Both
+    }
 }
 
 ?>

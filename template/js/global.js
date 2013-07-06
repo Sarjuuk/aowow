@@ -12246,33 +12246,6 @@ Listview.templates = {
                         }
                     }
                 },
-                /* old: doesn't support text sent by server
-                    getVisibleText: function(l) {
-                        var h = {
-                            achievements: g_achievements,
-                            quests: g_quests
-                        },
-                        m = "",
-                        d = 0;
-                        for (var f in h) {
-                            var g = h[f],
-                            a = l[f];
-                            if (!g || !a) {
-                                continue
-                            }
-                            for (var e = 0, c = a.length; e < c; ++e) {
-                                if (g[a[e]]) {
-                                    var b = (f == "achievements" ? "name": "name_" + g_locale.name);
-                                    if (d++>0) {
-                                        m += " "
-                                    }
-                                    m += g[a[e]][b]
-                                }
-                            }
-                        }
-                        return m
-                    },
-                */
                 getVisibleText: function(title) {
                     var buff = '';
 

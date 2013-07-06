@@ -50,6 +50,7 @@ if (!defined('AOWOW_REVISION'))
         {
             $talents = DB::Aowow()->select('
                     SELECT
+                        t.id AS tId,
                         t.*,
                         s.*
                     FROM
@@ -72,7 +73,7 @@ if (!defined('AOWOW_REVISION'))
             {
                 $petFamId           = log($tabs[$l]['pets'], 2);
                 $result[$l]['icon'] = $petFamIcons[$petFamId];
-                $petCategories      = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, categoryEnumId FROM ?_creatureFamily WHERE petTalentType = ?d', $petFamId);
+                $petCategories      = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, category FROM ?_pet WHERE type = ?d', $petFamId);
                 $result[$l]['f']    = array_keys($petCategories);
             }
 
@@ -82,11 +83,11 @@ if (!defined('AOWOW_REVISION'))
 
             for($j = 0; $j < count($talents); $j++)
             {
-                $tNums[$talents[$j]['id']] = $j;
+                $tNums[$talents[$j]['tId']] = $j;
 
                 $d    = [];
                 $s    = [];
-                $i    = $talents[$j]['id'];
+                $i    = $talents[$j]['tId'];
                 $n    = Util::localizedString($talents[$j], 'name');
                 $x    = $talents[$j]['col'];
                 $y    = $talents[$j]['row'];
@@ -114,7 +115,7 @@ if (!defined('AOWOW_REVISION'))
 
                 for ($k = 0; $k <= ($m - 1); $k++)
                 {
-                    $tSpell = new SpellList(array(['s.id', $talents[$j]['rank'.($k + 1)]]));
+                    $tSpell = new SpellList(array(['s.id', (int)$talents[$j]['rank'.($k + 1)]]));
                     $d[] = $tSpell->parseText();
                     $s[] = $talents[$j]['rank'.($k + 1)];
 
@@ -154,10 +155,10 @@ if (!defined('AOWOW_REVISION'))
                     $result[$l]['t'][$j]['iconname'] = $icon;
 
                 // If this talent is a reference, add it to the array of talent dependencies
-                if (isset($depLinks[$talents[$j]['id']]))
+                if (isset($depLinks[$talents[$j]['tId']]))
                 {
-                    $result[$l]['t'][$depLinks[$talents[$j]['id']]]['r'][0] = $j;
-                    unset($depLinks[$talents[$j]['id']]);
+                    $result[$l]['t'][$depLinks[$talents[$j]['tId']]]['r'][0] = $j;
+                    unset($depLinks[$talents[$j]['tId']]);
                 }
             }
 
@@ -203,7 +204,7 @@ if (!defined('AOWOW_REVISION'))
         // PetCalc
         if (empty($petIcons))
         {
-            $pets = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, iconString FROM ?_creatureFamily WHERE petTalentType <> -1');
+            $pets = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, iconString FROM ?_pet');
             $petIcons = json_encode($pets, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
         }
 

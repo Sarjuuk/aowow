@@ -240,7 +240,7 @@ $lang = array(
         )
     ),
     'pet'      => array(
-        'exotic'        => "Exotique"
+        'exotic'        => "Exotique",
         "cat"           => ["Férocité", "Tenacité", "Ruse"]
     ),
     'itemset' => array(

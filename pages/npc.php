@@ -20,7 +20,7 @@ if (isset($_GET['power']))
 
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        $npc = new CreatureList(array(['ct.entry', $id]));
+        $npc = new CreatureList(array(['ct.id', $id]));
         if ($npc->error)
             die('$WowheadPower.registerNpc(\''.$id.'\', '.User::$localeId.', {})');
 
@@ -41,7 +41,7 @@ if (isset($_GET['power']))
 // regular page
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $npc = new CreatureList(array(['ct.entry', $id]));
+    $npc = new CreatureList(array(['ct.id', $id]));
     if ($npc->error)
         $smarty->notFound(Lang::$game['npc']);
 

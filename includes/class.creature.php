@@ -17,7 +17,7 @@ class CreatureList extends BaseType
     {
         $n = DB::Aowow()->SelectRow('
             SELECT
-                name,
+                name_loc0,
                 name_loc2,
                 name_loc3,
                 name_loc6,
@@ -85,7 +85,7 @@ class CreatureList extends BaseType
         $data = [];
 
         for ($i = 1; $i < 5; $i++)
-            if ($_ = $this->curTpl['modelid'.$i])
+            if ($_ = $this->curTpl['displayId'.$i])
                 $data[] = $_;
 
         return !$data ? 0 : $data[array_rand($data)];

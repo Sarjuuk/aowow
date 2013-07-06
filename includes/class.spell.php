@@ -420,6 +420,44 @@ class SpellList extends BaseType
             return '';
     }
 
+    // formulae base from TC
+    private function calculateAmountForCurrent($effIdx, $altTpl = null)
+    {
+        $ref     = $altTpl ? $altTpl : $this;
+        $level   = $this->charLevel;
+        $rppl    = $ref->getField('effect'.$effIdx.'RealPointsPerLevel');
+        $base    = $ref->getField('effect'.$effIdx.'BasePoints');
+        $add     = $ref->getField('effect'.$effIdx.'DieSides');
+        $maxLvl  = $ref->getField('maxLevel');
+        $baseLvl = $ref->getField('baseLevel');
+
+        if ($this->curTpl['attributes1'] & 0x200)           // never a referenced spell, ALWAYS $this; SPELL_ATTR1_MELEE_COMBAT_SPELL: 0x200
+        {
+            if ($level > $maxLvl && $maxLvl > 0)
+                $level = $maxLvl;
+            else if ($level < $baseLvl)
+                $level = $baseLvl;
+
+            $level -= $ref->getField('spellLevel');
+            $base  += (int)($level * $rppl);
+        }
+
+        switch ($add)                                       // roll in a range <1;EffectDieSides> as of patch 3.3.3
+        {
+            case 0:
+            case 1:                                         // range 1..1
+                return [
+                    $base + $add,
+                    $base + $add
+                ];
+            default:
+                return [
+                    $base + 1,
+                    $base + $add
+                ];
+        }
+    }
+
     // description-, buff-parsing component
     private function resolveEvaluation($formula)
     {
@@ -478,6 +516,9 @@ class SpellList extends BaseType
             else
                 return eval('return '.$formula.';');
         }
+
+        // hm, minor eval-issue. eval doesnt understand two operators without a space between them (eg. spelll: 18126)
+        $formula = preg_replace('/(\+|-|\*|\/)(\+|-|\*|\/)/i', '\1 \2', $formula);
 
         // there should not be any letters without a leading $
         return eval('return '.$formula.';');
@@ -656,15 +697,13 @@ class SpellList extends BaseType
             case 'O':
                 if ($lookup)
                 {
-                    $base     = $this->refSpells[$lookup]->getField('effect'.$effIdx.'BasePoints');
-                    $add      = $this->refSpells[$lookup]->getField('effect'.$effIdx.'DieSides');
+                    list($min, $max) = $this->calculateAmountForCurrent($effIdx, $this->refSpells[$lookup]);
                     $periode  = $this->refSpells[$lookup]->getField('effect'.$effIdx.'Periode');
                     $duration = $this->refSpells[$lookup]->getField('duration');
                 }
                 else
                 {
-                    $base     = $this->getField('effect'.$effIdx.'BasePoints');
-                    $add      = $this->getField('effect'.$effIdx.'DieSides');
+                    list($min, $max) = $this->calculateAmountForCurrent($effIdx);
                     $periode  = $this->getField('effect'.$effIdx.'Periode');
                     $duration = $this->getField('duration');
                 }
@@ -672,12 +711,11 @@ class SpellList extends BaseType
                 if (!$periode)
                     $periode = 3000;
 
-                $tick  = $duration / $periode;
-                $min   = abs($base + 1) * $tick;
-                $max   = abs($base + $add) * $tick;
+                $min  *= $duration / $periode;
+                $max  *= $duration / $periode;
                 $equal = $min == $max;
 
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                if (in_array($op, $signs) && is_numeric($oparg))
                     if ($equal)
                         eval("\$min = $min $op $oparg;");
 
@@ -708,24 +746,19 @@ class SpellList extends BaseType
             case 'S':
                 if ($lookup)
                 {
-                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'BasePoints');
-                    $add  = $this->refSpells[$lookup]->getField('effect'.$effIdx.'DieSides');
+                    list($min, $max) = $this->calculateAmountForCurrent($effIdx, $this->refSpells[$lookup]);
                     $mv   = $this->refSpells[$lookup]->getField('effect'.$effIdx.'MiscValue');
                     $aura = $this->refSpells[$lookup]->getField('effect'.$effIdx.'AuraId');
                 }
                 else
                 {
-                    $base = $this->getField('effect'.$effIdx.'BasePoints');
-                    $add  = $this->getField('effect'.$effIdx.'DieSides');
+                    list($min, $max) = $this->calculateAmountForCurrent($effIdx);
                     $mv   = $this->getField('effect'.$effIdx.'MiscValue');
                     $aura = $this->getField('effect'.$effIdx.'AuraId');
                 }
-
-                $min   = abs($base + 1);
-                $max   = abs($base + $add);
                 $equal = $min == $max;
 
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
+                if (in_array($op, $signs) && is_numeric($oparg))
                     if ($equal)
                         eval("\$min = $min $op $oparg;");
 
@@ -878,7 +911,7 @@ class SpellList extends BaseType
         // step 3: try to evaluate result
         $evaled = $this->resolveEvaluation($str);
 
-        $return = is_numeric($evaled) ? number_format($evaled, $precision) : $evaled;
+        $return = is_numeric($evaled) ? number_format($evaled, $precision, '.', '') : $evaled;
         return $return.$suffix;
     }
 
