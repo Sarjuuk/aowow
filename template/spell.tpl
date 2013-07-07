@@ -69,8 +69,8 @@
 {/section}
                         </table>
                         <script type="text/javascript">
-{section name=i loop=$lvData.page.tools}{if isset($lvData.page.tools[i].entry)}
-                            ge('iconlist-icon{$iconlist2++}').appendChild(g_items.createIcon({$lvData.page.tools[i].entry}, 0, 1));
+{section name=i loop=$lvData.page.tools}{if isset($lvData.page.tools[i].itemId)}
+                            ge('iconlist-icon{$iconlist2++}').appendChild(g_items.createIcon({$lvData.page.tools[i].itemId}, 0, 1));
 {/if}{/section}
                         </script>
 {if $lvData.page.reagents}</div>{/if}{/if}
@@ -194,14 +194,14 @@
 {if isset($lvData.seeAlso)}       {include file='bricks/listviews/spell.tpl'       data=$lvData.seeAlso.data       params=$lvData.seeAlso.params      } {/if}
 {if isset($lvData.usedByItem)}    {include file='bricks/listviews/item.tpl'        data=$lvData.usedByItem.data    params=$lvData.usedByItem.params   } {/if}
 {if isset($lvData.usedByItemset)} {include file='bricks/listviews/itemset.tpl'     data=$lvData.usedByItemset.data params=$lvData.usedByItemset.params} {/if}
+{if isset($lvData.criteriaOf)}    {include file='bricks/listviews/achievement.tpl' data=$lvData.criteriaOf.data    params=$lvData.criteriaOf.params   } {/if}
+{if isset($lvData.contains)}      {include file='bricks/listviews/item.tpl'        data=$lvData.contains.data      params=$lvData.contains.params     } {/if}
 
 {if isset($lvData.taughtbynpc)}   {include file='bricks/listviews/creature.tpl'    data=$lvData.taughtbynpc.data   params=$lvData.taughtbynpc.params  } {/if}
 {if isset($lvData.taughtbyitem)}  {include file='bricks/listviews/item.tpl'        data=$lvData.taughtbyitem.data  params=$lvData.taughtbyitem.params } {/if}
 {if isset($lvData.taughtbyquest)} {include file='bricks/listviews/quest.tpl'       data=$lvData.taughtbyquest.data params=$lvData.taughtbyquest.params} {/if}
 {if isset($lvData.questreward)}   {include file='bricks/listviews/quest.tpl'       data=$lvData.questreward.data   params=$lvData.questreward.params  } {/if}
 {if isset($lvData.usedbynpc)}     {include file='bricks/listviews/creature.tpl'    data=$lvData.usedbynpc.data     params=$lvData.usedbynpc.params    } {/if}
-{if isset($lvData.contains)}      {include file='bricks/listviews/item.tpl'        data=$lvData.contains.data      params=$lvData.contains.params     } {/if}
-{if isset($lvData.criteria_of)}   {include file='bricks/listviews/achievement.tpl' data=$lvData.criteria_of.data   params=$lvData.criteria_of.params  } {/if}
                 new Listview({ldelim}template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: tabsRelated, parent: 'listview-generic', data: lv_comments{rdelim});
                 new Listview({ldelim}template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: tabsRelated, parent: 'listview-generic', data: lv_screenshots{rdelim});
                 if (lv_videos.length || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)))

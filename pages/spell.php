@@ -29,7 +29,7 @@ if (isset($_GET['power']))
         if ($n = $spell->getField('name', true))
             $pt[] = "\tname_".User::$localeString.": '".Util::jsEscape($n)."'";
         if ($i = $spell->getField('iconString'))
-            $pt[] = "\ticon: '".Util::jsEscape($i)."'";
+            $pt[] = "\ticon: '".urlencode($i)."'";
         if ($t = $spell->renderTooltip())
             $pt[] = "\ttooltip_".User::$localeString.": '".Util::jsEscape($t)."'";
         if ($b = $spell->renderBuff())
@@ -103,7 +103,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $pageData['path'][] = 410;                  // Cunning
     }
 
-    $spellArr = $pageData['page'] = $spell->getDetailPageData();
+    $pageData['page'] = $spell->getDetailPageData();
 
     // description
     $pageData['page']['info'] = $spell->renderTooltip(MAX_LEVEL, true);
@@ -193,7 +193,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     foreach ($pageData['page']['tools'] as $k => $tool)
     {
         if (isset($tool['itemId']))                         // Tool
-            $pageData['page']['tools'][$k]['url'] = '?item='.$tool;
+            $pageData['page']['tools'][$k]['url'] = '?item='.$tool['itemId'];
         else                                                // ToolCat
         {
                 $pageData['page']['tools'][$k]['quality'] = ITEM_QUALITY_HEIRLOOM - ITEM_QUALITY_NORMAL;
@@ -245,9 +245,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         // Icons:
         // .. from item
-        if ($spell->canCreateItem())
+        if ($spell->canCreateItem() && ($_ = $spell->getField('effect'.$i.'CreateItemId')) && $_ > 0)
         {
-            while ($spell->relItems->id != $spell->getField('effect'.$i.'CreateItemId'))
+            while ($spell->relItems->id != $_)
                 $spell->relItems->iterate();
 
             $foo['icon'] = array(
@@ -555,6 +555,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if (in_array($effAura, [11, 12, 36, 77]) || in_array($effId, []))
             unset($foo['value']);
     }
+    unset($foo);                                            // clear reference
 
     $pageData['infobox'] = $infobox ? '[ul]'.implode('', $infobox).'[/ul]' : null;
 
@@ -596,9 +597,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $pageData['modifies'] = array(
                 'data'   => $modSpells->getListviewData(),
                 'params' => [
-                    'tabs' => '$tabsRelated',
-                    'id'   => 'modifies',
-                    'name' => '$LANG.tab_modifies',
+                    'tabs'        => '$tabsRelated',
+                    'id'          => 'modifies',
+                    'name'        => '$LANG.tab_modifies',
                     'visibleCols' => "$['level']"
                 ]
             );
@@ -611,7 +612,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // modified by $this
     $sub = ['OR'];
-    $conditions = [['s.spellFamilyId', $spell->getField('spellFamilyId')], &$sub];
+    $conditions = [
+        ['s.spellFamilyId', $spell->getField('spellFamilyId')],
+        &$sub]
+    ;
 
     for ($i = 1; $i < 4; $i++)
     {
@@ -642,9 +646,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $pageData['modifiedBy'] = array(
                 'data'   => $modsSpell->getListviewData(),
                 'params' => [
-                    'tabs' => '$tabsRelated',
-                    'id'   => 'modified-by',
-                    'name' => '$LANG.tab_modifiedby',
+                    'tabs'        => '$tabsRelated',
+                    'id'          => 'modified-by',
+                    'name'        => '$LANG.tab_modifiedby',
                     'visibleCols' => "$['level']"
                 ]
             );
@@ -671,9 +675,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $pageData['seeAlso'] = array(
             'data'   => $saSpells->getListviewData(),
             'params' => [
-                'tabs' => '$tabsRelated',
-                'id'   => 'see-also',
-                'name' => '$LANG.tab_seealso',
+                'tabs'        => '$tabsRelated',
+                'id'          => 'see-also',
+                'name'        => '$LANG.tab_seealso',
                 'visibleCols' => "$['level']"
             ]
         );
@@ -720,7 +724,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if (!$ubItems->error)
     {
         $pageData['usedByItem'] = array(
-            'data'   => $ubItems->getListviewData(0x0),
+            'data'   => $ubItems->getListviewData(),
             'params' => [
                 'tabs' => '$tabsRelated',
                 'id'   => 'used-by-item',
@@ -731,20 +735,107 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $ubItems->addGlobalsToJScript($pageData);
     }
 
-    /* contains [Open Lock Item]
+    // criteria of
+    $_   = [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL];
+    if ($crs = DB::Aowow()->selectCol('SELECT refAchievement FROM ?_achievementCriteria WHERE type IN (?a) AND value1 = ?d', $_, $spell->id))
+    {
+        $coAchievemnts = new AchievementList(array(['id', $crs]));
+        if (!$coAchievemnts->error)
+        {
+            $pageData['criteriaOf'] = array(
+                'data'   => $coAchievemnts->getListviewData(),
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'id'   => 'criteria-of',
+                    'name' => '$LANG.tab_criteriaof'
+                ]
+            );
 
-        effect.$i.Id = 59
-        check spell_loot_template
-        ['contains']
-        reset icon..?
-    *
+            $coAchievemnts->addGlobalsToJScript($pageData);
+        }
+    }
 
-    /* related spells
-        at least 2 similar effects AND
-        names identical AND
-        ids not identical
-    */
-    $spellArr['seeAlso'] = [];
+    // "contains"
+    // spell_loot_template & skill_extra_item_template
+    $extraItem = DB::Aowow()->selectRow('SELECT * FROM skill_extra_item_template WHERE spellid = ?d', $spell->id);
+    $spellLoot = DB::Aowow()->select('SELECT *, item as ARRAY_KEY FROM spell_loot_template WHERE entry = ?d', $spell->id);
+    if ($extraItem || $spellLoot)
+    {
+        $ids = [];
+        $lv  = [];
+        $extraCols = ['Listview.extraCols.percent'];
+        foreach ($spellLoot as $row)
+            $ids[] = (int)$row['item'];
+
+        if ($ids)
+        {
+            // todo (high): generic loot-processing function
+            $slItems = new ItemList(array(['i.entry', $ids]));
+            $slItems->addGlobalsToJscript($pageData);
+            $lv += $slItems->getListviewData();
+
+            $equal = true;
+            foreach ($lv as $k => $v)
+            {
+                $chance = $spellLoot[$k]['ChanceOrQuestChance'];
+                if ($chance)
+                    $equal = false;
+
+                $lv[$k]['percent'] = $chance;
+                if ($spellLoot[$k]['maxcount'] > 1)
+                {
+                    $lv[$k]['maxcount'] = $spellLoot[$k]['maxcount'];
+                    $lv[$k]['mincount'] = $spellLoot[$k]['mincountOrRef'] > 0 ? $spellLoot[$k]['mincountOrRef'] : 1;
+                }
+            }
+
+            if ($equal)
+                foreach ($lv as &$_)
+                    $_['percent'] = number_format(100 / count($lv), 2);
+        }
+
+        if ($extraItem && $spell->canCreateItem())
+        {
+            $spell->relItems->reset();
+            $foo = $spell->relItems->getListviewData();
+
+            for ($i = 1; $i < 4; $i++)
+            {
+                if (($bar = $spell->getField('effect'.$i.'CreateItemId')) && isset($foo[$bar]))
+                {
+                    $reqSpec = new SpellList(array(['s.id', (int)$extraItem['requiredSpecialization']]));
+                    $lv[$bar] = $foo[$bar];
+                    $lv[$bar]['percent']   = $extraItem['additionalCreateChance'];
+                    $lv[$bar]['condition'] = json_encode(['type' => TYPE_SPELL, 'typeId' => $reqSpec->id, 'status' => 2], JSON_NUMERIC_CHECK);
+                    $reqSpec->addGlobalsToJscript($pageData);
+
+                    $extraCols[] = 'Listview.extraCols.condition';
+                    if ($max = $extraItem['additionalMaxNum'])
+                    {
+                        $lv[$bar]['mincount'] = 1;
+                        $lv[$bar]['maxcount'] = $max;
+                    }
+
+                    break;                                  // skill_extra_item_template can only contain 1 item
+                }
+            }
+        }
+
+        $pageData['contains'] = array(
+            'data'   => $lv,
+            'params' => [
+                'tabs'       => '$tabsRelated',
+                'name'       => '$LANG.tab_contains',
+                'id'         => 'contains',
+                'hiddenCols' => "$['side', 'slot', 'source', 'reqlevel']",
+                'extraCols'  => "$[".implode(', ', $extraCols)."]"
+            ]
+        );
+    }
+
+    // teaches
+    // spell_learn_spell
+    // skill_discovery_template
 
     /* source trainer
         first check source if not trainer :  break
@@ -827,40 +918,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         // unset($spellArr['taughtbyitem']);
     // if(!$spellArr['taughtbynpc'])
         // unset($spellArr['taughtbynpc']);
-
-    // achievement criteria
-    $rows = [];
-    // DB::Aowow()->select('
-            // SELECT a.id, a.faction, a.name_loc?d AS name, a.description_loc?d AS description, a.category, a.points, s.iconname, z.areatableID
-            // FROM ?_spellicons s, ?_achievementcriteria c, ?_achievement a
-            // LEFT JOIN (?_zones z) ON a.map != -1 AND a.map = z.mapID
-            // WHERE
-                // a.icon = s.id
-                // AND a.id = c.refAchievement
-                // AND c.type IN (?a)
-                // AND c.value1 = ?d
-            // GROUP BY a.id
-            // ORDER BY a.name_loc?d
-        // ',
-        // User::$localeId,
-        // User::$localeId,
-        // array(
-            // ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2,
-            // ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2,
-            // ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL
-        // ),
-        // $spellArr['entry'],
-        // User::$localeId
-    // );
-    if($rows)
-    {
-        $spellArr['criteria_of'] = [];
-        foreach($rows as $row)
-        {
-            allachievementsinfo2($spell->getField('id'));
-            $spellArr['criteria_of'][] = achievementinfo2($row);
-        }
-    }
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }

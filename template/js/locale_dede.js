@@ -2172,7 +2172,7 @@ var LANG = {
     amount:                 "Menge",
     abilities:              "Fähigkeiten",
     activity:               "Aktivität",
-    animation:               "Animation",
+    animation:              "Animation",
     armor:                  "Rüstung",
     text:                   "Text",
     author:                 "Autor",

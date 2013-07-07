@@ -2188,6 +2188,7 @@ function g_staticTooltipLevelClick(div, level) {
         minLevel = parseInt(_[2]),
         maxLevel = parseInt(_[3]),
         curLevel = parseInt(_[4]);
+
     if (!level) { // Prompt for level
         level = prompt(sprintf(LANG.prompt_ratinglevel, minLevel, maxLevel), curLevel);
     }
@@ -6352,7 +6353,129 @@ Listview.extraCols = {
             return -strcmp(g_items[a.yield].quality, g_items[b.yield].quality) ||
                     strcmp(g_items[a.yield]['name_' + g_locale.name], g_items[b.yield]['name_' + g_locale.name]);
         }
-    }
+    },
+
+    condition: {
+        /*
+            condition.status: [
+                0: missing
+                1: active
+                2: done / obtained
+            ]
+
+            LANG.completed
+            LANG.earned
+            LANG.progress
+
+            probably also events, zones, skill, faction, ..
+        */
+
+        id: 'condition',
+        name: LANG.requires,
+        compute: function(row, td) {
+            td.className = 'small';
+            td.style.lineHeight = '18px';
+
+            if (row.condition) {
+                switch(g_types[row.condition.type]) {
+                    case 'spell':
+                        return Listview.extraCols.condition.getSpellText(row.condition, td);
+                    case 'item':
+                        return Listview.extraCols.condition.getItemText(row.condition, td);
+                    case 'achievement':
+                        return Listview.extraCols.condition.getAchievementText(row.condition, td);
+                    case 'quest':
+                        return Listview.extraCols.condition.getQuestText(row.condition, td);
+                    default:
+                        return 'unhandled condition';
+                }
+            }
+        },
+        getSpellText: function(cond, td) {
+            if (!cond.typeId || !g_spells[cond.typeId]) {
+                return;
+            }
+
+            var item = g_spells[cond.typeId];
+            var span = ce('span');
+            span.className = cond.status ? 'q2' : 'q10';
+            ae(span, cond.status ? ct(LANG.pr_note_known) : ct(LANG.pr_note_missing));
+            ae(td, span);
+            ae(td, ce('br'));
+
+            var a = ce('a');
+            a.href = '?spell=' + cond.typeId;
+            a.className = 'icontiny tinyspecial';
+            a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
+            a.style.whiteSpace = 'nowrap';
+            ae(a, ct(item['name_' + g_locale.name]));
+            ae(td, a);
+        },
+        getItemText: function(cond, td) {
+            if (!cond.typeId || !g_items[cond.typeId]) {
+                return;
+            }
+
+            var item = g_items[cond.typeId];
+            var span = ce('span');
+            span.className = cond.status ? 'q2' : 'q10';
+            ae(span, cond.status ? ct(LANG.pr_note_earned) : ct(LANG.pr_note_missing));
+            ae(td, span);
+            ae(td, ce('br'));
+
+            var a = ce('a');
+            a.href = '?item=' + cond.typeId;
+            a.className = 'icontiny tinyspecial';
+            a.className += ' q' + item.quality;
+            a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
+            a.style.whiteSpace = 'nowrap';
+            ae(a, ct(item['name_' + g_locale.name]));
+            ae(td, a);
+        },
+        getAchievementText: function(cond, td) {
+            if (!cond.typeId || !g_achievements[cond.typeId]) {
+                return;
+            }
+
+            var item = g_achievements[cond.typeId];
+            var span = ce('span');
+            span.className = cond.status ? 'q2' : 'q10';
+            ae(span, cond.status ? ct(LANG.pr_note_earned) : ct(LANG.pr_note_incomplete));
+            ae(td, span);
+            ae(td, ce('br'));
+
+            var a = ce('a');
+            a.href = '?achievement=' + cond.typeId;
+            a.className = 'icontiny tinyspecial';
+            a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
+            a.style.whiteSpace = 'nowrap';
+            st(a, item['name_' + g_locale.name]);
+            ae(td, a);
+        },
+        getQuestText: function(cond, td) {
+            if (!cond.typeId || !g_quests[cond.typeId]) {
+                return;
+            }
+
+            var item = g_quests[cond.typeId];
+            var span = ce('span');
+            span.className = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
+            ae(span, cond.status == 1 ? ct(LANG.progress) : cond.status == 2 ? ct(LANG.pr_note_complete) : ct(LANG.pr_note_incomplete));
+            ae(td, span);
+            ae(td, ce('br'));
+
+            var a = ce('a');
+            a.href = '?quest=' + cond.typeId;
+            a.style.whiteSpace = 'nowrap';
+            st(a, item['name_' + g_locale.name]);
+            ae(td, a);
+        },
+        sortFunc: function(a, b, col) {
+            if (a.condition.status && b.condition.status) {
+                return strcmp(a.condition.status, b.condition.status);
+            }
+        }
+    },
 };
 
 Listview.funcBox = {

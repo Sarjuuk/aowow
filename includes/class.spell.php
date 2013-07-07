@@ -50,7 +50,6 @@ class SpellList extends BaseType
             // required for globals
             for ($i = 1; $i <= 3; $i++)
             {
-                // 24: createItem; 34: changeItem; 59: randomItem; 86: Channel Death Item
                 if ($this->canCreateItem())
                     $foo[] = (int)$this->curTpl['effect'.$i.'CreateItemId'];
             }
@@ -463,9 +462,9 @@ class SpellList extends BaseType
 
     public function canCreateItem()
     {
-        // 24: createItem; 34: changeItem; 59: randomItem; 66: Create Mana Gem; 86: Channel Death Item
+        // 24: createItem; 34: changeItem; 59: randomItem; 66: createManaGem; 157: createitem2; 86: channelDeathItem
         for ($i = 1; $i < 4; $i++)
-            if (in_array($this->curTpl['effect'.$i.'Id'], [24, 34, 59, 66]) || $this->curTpl['effect'.$i.'AuraId'] == 86)
+            if (in_array($this->curTpl['effect'.$i.'Id'], [24, 34, 59, 66, 157]) || $this->curTpl['effect'.$i.'AuraId'] == 86)
                 return true;
 
         return false;
@@ -1629,7 +1628,10 @@ class SpellList extends BaseType
     public function addGlobalsToJScript(&$refs)
     {
         if ($this->relItems)
+        {
+            $this->relItems->reset();
             $this->relItems->addGlobalsToJscript($refs);
+        }
 
         $classes = [];
         $races   = [];

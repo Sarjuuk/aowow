@@ -265,7 +265,15 @@ class QuestList extends BaseType
 
     public function addGlobalsToJScript(&$refs)
     {
-        // todo
+        if (!isset($refs['gQuests']))
+            $refs['gQuests'] = [];
+
+        while ($this->iterate())
+        {
+            $refs['gQuests'][$this->id] = array(
+                'name' => $this->getField('Title', true)
+            );
+        }
     }
 }
 

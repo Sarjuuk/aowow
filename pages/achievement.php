@@ -41,7 +41,7 @@ if (isset($_GET['power']))
 
         $x = '$WowheadPower.registerAchievement('.$id.', '.User::$localeId.",{\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($acv->getField('name', true))."',\n";
-        $x .= "\ticon: '".Util::jsEscape($acv->getField('iconString'))."',\n";
+        $x .= "\ticon: '".urlencode($acv->getField('iconString'))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".$acv->renderTooltip()."'\n";
         $x .= "});";
 

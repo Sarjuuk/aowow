@@ -209,7 +209,7 @@ abstract class BaseType
             return Util::localizedString($this->curTpl, $field);
 
         $value = $this->curTpl[$field];
-        return is_numeric($value) ?  floatVal($value) : $value;
+        return is_numeric($value) ? floatVal($value) : $value;
     }
 
     public function getMatches()

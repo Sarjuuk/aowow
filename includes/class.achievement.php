@@ -209,9 +209,9 @@ class AchievementList extends BaseType
             }
 
             if ($crt['complete_flags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER)
-                $criteria .= '- '.Util::jsEscape(htmlspecialchars($crtName)).' <span class="moneygold">'.number_format($crt['value2' ] / 10000).'</span><br />';
+                $criteria .= '- '.htmlspecialchars($crtName).' <span class="moneygold">'.number_format($crt['value2' ] / 10000).'</span><br />';
             else
-                $criteria .= '- '.Util::jsEscape(htmlspecialchars($crtName)).'<br />';
+                $criteria .= '- '.htmlspecialchars($crtName).'<br />';
 
             if (++$i == round(count($rows)/2))
                 $criteria .= '</small></td><th class="q0" style="white-space: nowrap; text-align: left"><small>';

@@ -31,6 +31,9 @@
                     {if isset($curr.percent)}
                         percent:{$curr.percent},
                     {/if}
+                    {if isset($curr.condition)}
+                        condition:{$curr.condition},
+                    {/if}
                     {if isset($curr.group) and isset($curr.groupcount)}
                         group:'({$curr.group}){if $curr.groupcount!=1} x{$curr.groupcount}{/if}',
                     {/if}

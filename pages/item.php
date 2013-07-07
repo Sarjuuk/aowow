@@ -57,7 +57,7 @@ if (isset($_GET['power']))
         $x .= '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($item->getField('name', true))."',\n";
         $x .= "\tquality: ".$item->getField('Quality').",\n";
-        $x .= "\ticon: '".Util::jsEscape($item->getField('icon'))."',\n";
+        $x .= "\ticon: '".urlencode($item->getField('icon'))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($item->tooltip[$id])."'\n";
         $x .= "});";
 
