@@ -261,7 +261,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 break;
             // link to quest
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-                $crtName = Quest::getName($obj);
+                $crtName = QuestList::getName($obj);
                 $tmp['link'] = array(
                     'href' => '?quest='.$obj,
                     'text' => $crtName ? $crtName : $crtName,

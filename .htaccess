@@ -17,13 +17,14 @@ AddDefaultCharset utf8
 	CharsetRecodeMultipartForms Off
 </IfModule>
 
-    php_value           default_charset                                 UTF-8
-
+    php_value       default_charset                             UTF-8
 
 RewriteEngine on
 
 # Mapper-Helper: If you cant provide maps for all locales, redirect the browser
-   RewriteRule         ^images/maps/(frfr|dede|eses|ruru)/(.*)$         images/maps/enus/$2 [NC]
+    RewriteRule     ^images/maps/(frfr|dede|eses|ruru)/(.*)$    images/maps/enus/$2 [NC]
 
 # accept flattened urls | NYI - need more work :x
-#  RewriteRule         ^([a-z0-9]+)=([^?&/=]*)(.*)$                     index.php?$1=$2&$3 [NC]
+    RewriteRule     ^([a-z0-9\-]+)$                             ?$1       [NC]      # /items                 => ?items
+    RewriteRule     ^([a-z0-9\-]+)=([^?&]*)$                    ?$1=$2    [NC]      # /items=4.1             => ?items=4.1
+    RewriteRule     ^([a-z0-9\-]+)=([^?&]*)[&?](.*)$            ?$1=$2&$3 [NC]      # /items=4.1?filter=sl=7 => ?items=4.1&filter=sl=7

@@ -23,9 +23,9 @@
             <tr><td><div class="infobox-spacer"></div>
                 <ul>
                     {if $lvData.page.points}<li><div>{$lang.points}: <span class="moneyachievement tip" onmouseover="Listview.funcBox.moneyAchievementOver(event)" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">{$lvData.page.points}</span></div></li>{/if}
-                    {foreach from=$lvData.infoBox item=info}
-                        <li><div>{$info}</div></li>
-                    {/foreach}
+{foreach from=$lvData.infoBox item=info}
+                    <li><div>{$info}</div></li>
+{/foreach}
                     {*<li><div>Location: {$lvData.page.location}</div></li> todo: need to be parsed first *}
                 </ul>
             </td></tr>
@@ -34,7 +34,7 @@
             <tr><th>{$lang.series}</th></tr>
             <tr><td><div class="infobox-spacer"></div>
                     <table class="series">
-                    {section name=i loop=$lvData.page.series}
+{section name=i loop=$lvData.page.series}
                         <tr>
                             <th>{$smarty.section.i.index+1}.</th>
                             <td>
@@ -45,7 +45,7 @@
                                 {/if}
                             </td>
                         </tr>
-                    {/section}
+{/section}
                     </table>
                 </td>
             </tr>
@@ -78,7 +78,7 @@
                 <div style="float: left; margin-right: 25px">
                 <table class="iconlist">
                 {strip}
-                {foreach from=$lvData.page.criteria item=cr name=criteria}
+{foreach from=$lvData.page.criteria item=cr name=criteria}
                     <tr>
                         <th{if isset($cr.icon)} align="right" id="iconlist-icon{$cr.icon}"{/if}>
                         {* for reference and standard entries *}
@@ -101,19 +101,16 @@
                         <div style="float: left">
                         <table class="iconlist">
                     {/if}
-                {/foreach}
+{/foreach}
                 {/strip}
                 </table>
                 </div>
 
-                {strip}
                 <script type="text/javascript">//<![CDATA[
-                {foreach from=$lvData.page.icons item=ic}
+{foreach from=$lvData.page.icons item=ic}
                     ge('iconlist-icon{$ic.itr}').appendChild({$ic.type}.createIcon({$ic.id}, 0, {if isset($ic.count) && $ic.count > 0}{$ic.count}{else}0{/if}));
-                {/foreach}
+{/foreach}
                 //]]></script>
-                {/strip}
-
 
                 <div style="clear: left"></div>
 
@@ -122,13 +119,13 @@
                     <h3>{$lang.rewards}</h3>
                     {$lang.itemReward}<table class="icontab">
                     <tr>
-                    {foreach from=$lvData.page.itemReward item=i name=item key=id}
+{foreach from=$lvData.page.itemReward item=i name=item key=id}
                         <th id="icontab-icon{$smarty.foreach.item.index}"></th><td><span class="q{$i.quality}"><a href="?item={$id}">{$i.name}</a></span></td>
-                    {/foreach}
+{/foreach}
                     <script type="text/javascript">//<![CDATA[
-                    {foreach from=$lvData.page.itemReward item=i name=item key=id}
+{foreach from=$lvData.page.itemReward item=i name=item key=id}
                         ge('icontab-icon{$smarty.foreach.item.index}').appendChild(g_items.createIcon({$id}, 1, 1));
-                    {/foreach}
+{/foreach}
                     //]]></script>
                     </tr>
                     </table>
@@ -138,9 +135,9 @@
                 {if $lvData.page.titleReward}
                     <h3>{$lang.gains}</h3>
                     <ul>
-                    {foreach from=$lvData.page.titleReward item=i}
+{foreach from=$lvData.page.titleReward item=i}
                         <li><div>{$i}</div></li>
-                    {/foreach}
+{/foreach}
                     </ul>
                 {/if}
 

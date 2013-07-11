@@ -836,7 +836,7 @@ class SmartyAoWoW extends Smarty
         $file = $this->cache_dir.'data/'.$key;
 
         $cacheData = time()." ".AOWOW_REVISION."\n";
-        $cacheData .= serialize($data);
+        $cacheData .= serialize(str_replace(["\n", "\t"], ['\n', '\t'], $data));
 
         if ($filter)
             $cacheData .= "\n".serialize($filter);
@@ -861,7 +861,7 @@ class SmartyAoWoW extends Smarty
         if ($expireTime <= time() || $rev < AOWOW_REVISION)
             return false;
 
-        $data = unserialize($cache[1]);
+        $data = str_replace(['\n', '\t'], ["\n", "\t"], unserialize($cache[1]));
         if (isset($cache[2]))
             $filter = unserialize($cache[2]);
 
