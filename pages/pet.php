@@ -18,7 +18,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($pet->error)
         $smarty->notFound(Lang::$game['pet']);
 
-    $pet->addGlobalsToJscript($pageData);
+    // $pet->addGlobalsToJscript($smarty);
     $pet->reset();
 
     $infobox = [];
@@ -83,7 +83,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $list[] = $i;
 
     $food = new ItemList(array(['i.subClass', [5, 8]], ['i.FoodType', $list]));
-    $food->addGlobalsToJscript($pageData);
+    $food->addGlobalsToJscript($smarty);
 
     $pageData['diet'] = array(
         'data'   => $food->getListviewData(),
@@ -126,7 +126,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
 
     $spells = new SpellList($conditions);
-    $spells->addGlobalsToJscript($pageData);
+    $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
     $pageData['abilities'] = array(
         'data'   => $spells->getListviewData(),
@@ -148,7 +148,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     $talents = new SpellList($conditions);
-    $talents->addGlobalsToJscript($pageData);
+    $talents->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
     $pageData['talents'] = array(
         'data'   => $talents->getListviewData(),
@@ -180,7 +180,6 @@ $smarty->updatePageVars(array(
 $smarty->assign('community', CommunityContent::getAll(TYPE_PET, $id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game));
 $smarty->assign('lvData', $pageData);
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->display('pet.tpl');
 
 ?>

@@ -87,7 +87,6 @@ if (strlen($query) < 3 || !($searchMask & SEARCH_MASK_ALL))
         // insufficient queries throw an error
         $smarty->assign('lang', array_merge(Lang::$main, Lang::$search));
         $smarty->assign('found', []);
-        $smarty->assign('mysql', DB::Aowow()->getStatistics());
         $smarty->assign('search', $query);
 
         $smarty->display('search.tpl');
@@ -124,6 +123,7 @@ if ($searchMask & 0x1)
             'type'     => TYPE_CLASS,
             'appendix' => ' (Class)',
             'matches'  => $classes->getMatches(),
+            'file'     => 'class',
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
@@ -156,6 +156,7 @@ if ($searchMask & 0x2)
             'type'     => TYPE_RACE,
             'appendix' => ' (Race)',
             'matches'  => $races->getMatches(),
+            'file'     => 'race',
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
@@ -200,6 +201,7 @@ if ($searchMask & 0x4)
             'type'     => TYPE_TITLE,
             'appendix' => ' (Title)',
             'matches'  => $titles->getMatches(),
+            'file'     => 'title',
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
@@ -230,7 +232,7 @@ if ($searchMask & 0x8)
 
     if ($data  = $wEvents->getListviewData())
     {
-        $wEvents->addGlobalsToJscript($jsGlobals);
+        $wEvents->addGlobalsToJscript($smarty);
 
         foreach ($data as &$d)
         {
@@ -243,6 +245,7 @@ if ($searchMask & 0x8)
             'type'     => TYPE_WORLDEVENT,
             'appendix' => ' (World Event)',
             'matches'  => $wEvents->getMatches(),
+            'file'     => 'event',
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
@@ -269,6 +272,7 @@ if ($searchMask & 0x10)
             'type'     => TYPE_CURRENCY,
             'appendix' => ' (Currency)',
             'matches'  => $money->getMatches(),
+            'file'     => 'currency',
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs']
         );
@@ -294,7 +298,7 @@ if ($searchMask & 0x20)
 
     if ($data = $sets->getListviewData())
     {
-        $sets->addGlobalsToJscript($jsGlobals);
+        $sets->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
         while ($sets->iterate())
             $data[$sets->id]['param1'] = $sets->getField('quality');
@@ -303,6 +307,7 @@ if ($searchMask & 0x20)
             'type'     => TYPE_ITEMSET,
             'appendix' => ' (Item Set)',
             'matches'  => $sets->getMatches(),
+            'file'     => 'itemset',
             'data'     => $data,
             'params'   => ['tabs' => '$myTabs'],
             'pcsToSet' => $sets->pieceToSet
@@ -330,7 +335,7 @@ if ($searchMask & 0x40)
 
     if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
     {
-        $items->addGlobalsToJscript($jsGlobals);
+        $items->addGlobalsToJscript($smarty);
 
         while ($items->iterate())
         {
@@ -345,8 +350,9 @@ if ($searchMask & 0x40)
             'type'     => TYPE_ITEM,
             'appendix' => ' (Item)',
             'matches'  => $items->getMatches(),
-            'params'   => ['tabs' => '$myTabs'],
+            'file'     => 'item',
             'data'     => $data,
+            'params'   => ['tabs' => '$myTabs']
         );
 
         if ($items->getMatches() > $maxResults)
@@ -372,11 +378,10 @@ if ($searchMask & 0x80)
 
     if ($data = $abilities->getListviewData())
     {
-        $abilities->addGlobalsToJscript($jsGlobals);
+        $abilities->addGlobalsToJscript($smarty);
 
         $vis = ['level', 'singleclass', 'schools'];
-
-        if ($abilities->hasDiffFields(['reagent1']))
+        if ($abilities->hasSetFields(['reagent1']))
             $vis[] = 'reagents';
 
         while ($abilities->iterate())
@@ -389,6 +394,7 @@ if ($searchMask & 0x80)
             'type'     => TYPE_SPELL,
             'appendix' => ' (Ability)',
             'matches'  => $abilities->getMatches(),
+            'file'     => 'spell',
             'data'     => $data,
             'params'   => [
                 'id'          => 'abilities',
@@ -419,7 +425,11 @@ if ($searchMask & 0x100)
 
     if ($data = $talents->getListviewData())
     {
-        $talents->addGlobalsToJscript($jsGlobals);
+        $talents->addGlobalsToJscript($smarty);
+
+        $vis = ['level', 'singleclass', 'schools'];
+        if ($abilities->hasSetFields(['reagent1']))
+            $vis[] = 'reagents';
 
         while ($talents->iterate())
         {
@@ -431,12 +441,13 @@ if ($searchMask & 0x100)
             'type'     => TYPE_SPELL,
             'appendix' => ' (Talent)',
             'matches'  => $talents->getMatches(),
+            'file'     => 'spell',
             'data'     => $data,
             'params'   => [
                 'id'          => 'talents',
                 'tabs'        => '$myTabs',
                 'name'        => '$LANG.tab_talents',
-                'visibleCols' => "$['level', 'singleclass', 'schools']"
+                'visibleCols' => '$'.json_encode($vis)
             ]
         );
 
@@ -461,7 +472,7 @@ if ($searchMask & 0x200)
 
     if ($data = $glyphs->getListviewData())
     {
-        $glyphs->addGlobalsToJscript($jsGlobals);
+        $glyphs->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
         while ($glyphs->iterate())
             $data[$glyphs->id]['param1'] = '"'.strToLower($glyphs->getField('iconString')).'"';
@@ -470,6 +481,7 @@ if ($searchMask & 0x200)
             'type'     => TYPE_SPELL,
             'appendix' => ' (Glyph)',
             'matches'  => $glyphs->getMatches(),
+            'file'     => 'spell',
             'data'     => $data,
             'params'   => [
                 'id'          => 'glyphs',
@@ -500,7 +512,7 @@ if ($searchMask & 0x400)
 
     if ($data = $prof->getListviewData())
     {
-        $prof->addGlobalsToJscript($jsGlobals);
+        $prof->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
         while ($prof->iterate())
             $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
@@ -509,6 +521,7 @@ if ($searchMask & 0x400)
             'type'     => TYPE_SPELL,
             'appendix' => ' (Proficiency)',
             'matches'  => $prof->getMatches(),
+            'file'     => 'spell',
             'data'     => $data,
             'params'   => [
                 'id'          => 'proficiencies',
@@ -539,7 +552,7 @@ if ($searchMask & 0x800)
 
     if ($data = $prof->getListviewData())
     {
-        $prof->addGlobalsToJscript($jsGlobals);
+        $prof->addGlobalsToJscript($smarty);
 
         while ($prof->iterate())
             $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
@@ -548,6 +561,7 @@ if ($searchMask & 0x800)
             'type'     => TYPE_SPELL,
             'appendix' => ' (Profession)',
             'matches'  => $prof->getMatches(),
+            'file'     => 'spell',
             'data'     => $data,
             'params'   => [
                 'id'          => 'professions',
@@ -579,7 +593,7 @@ if ($searchMask & 0x1000)
 
     if ($data = $vPets->getListviewData())
     {
-        $vPets->addGlobalsToJscript($jsGlobals);
+        $vPets->addGlobalsToJscript($smarty);
 
         while ($vPets->iterate())
             $data[$vPets->id]['param1'] = '"'.strToLower($vPets->getField('iconString')).'"';
@@ -588,6 +602,7 @@ if ($searchMask & 0x1000)
             'type'     => TYPE_SPELL,
             'appendix' => ' (Companion)',
             'matches'  => $vPets->getMatches(),
+            'file'     => 'spell',
             'data'     => $data,
             'params'   => [
                 'id'          => 'companions',
@@ -618,7 +633,7 @@ if ($searchMask & 0x2000)
 
     if ($data = $mounts->getListviewData())
     {
-        $mounts->addGlobalsToJscript($jsGlobals);
+        $mounts->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
         while ($mounts->iterate())
             $data[$mounts->id]['param1'] = '"'.strToLower($mounts->getField('iconString')).'"';
@@ -627,6 +642,7 @@ if ($searchMask & 0x2000)
             'type'     => TYPE_SPELL,
             'appendix' => ' (Mount)',
             'matches'  => $mounts->getMatches(),
+            'file'     => 'spell',
             'data'     => $data,
             'params'   => [
                 'id'   => 'mounts',
@@ -644,7 +660,42 @@ if ($searchMask & 0x2000)
 }
 
 // 15 NPCs
-// if ($searchMask & 0x4000)
+if ($searchMask & 0x4000)
+{
+    $conditions = array(
+        [
+            'OR',
+            ['name_loc'.User::$localeId, $query],
+            ['subname_loc'.User::$localeId, $query]
+        ],
+        // [['cuFlags', MASKE, '&'], 0],     // todo (med): exclude trigger creatures and difficulty entries
+        $maxResults
+    );
+
+    $npcs = new CreatureList($conditions);
+
+    if ($data = $npcs->getListviewData())
+    {
+        $found['npc'] = array(
+            'type'     => TYPE_NPC,
+            'appendix' => ' (NPC)',
+            'matches'  => $npcs->getMatches(),
+            'file'     => 'creature',
+            'data'     => $data,
+            'params'   => [
+                'id'   => 'npcs',
+                'tabs' => '$myTabs',
+                'name' => '$LANG.tab_npcs',
+            ]
+        );
+
+        if ($npcs->getMatches() > $maxResults)
+        {
+            $found['npc']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), $maxResults);
+            $found['npc']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 16 Quests
 // if ($searchMask & 0x8000)
@@ -662,8 +713,7 @@ if ($searchMask & 0x10000)
 
     if ($data = $acvs->getListviewData())
     {
-        $acvs->addGlobalsToJScript($jsGlobals);
-        $acvs->addRewardsToJScript($jsGlobals);
+        $acvs->addGlobalsToJScript($smarty);
 
         while ($acvs->iterate())
             $data[$acvs->id]['param1'] = '"'.strToLower($acvs->getField('iconString')).'"';
@@ -672,6 +722,7 @@ if ($searchMask & 0x10000)
             'type'     => TYPE_ACHIEVEMENT,
             'appendix' => ' (Achievement)',
             'matches'  => $acvs->getMatches(),
+            'file'     => 'achievement',
             'data'     => $data,
             'params'   => [
                 'tabs'        => '$myTabs',
@@ -700,12 +751,12 @@ if ($searchMask & 0x20000)
 
     if ($data = $stats->getListviewData())
     {
-        $stats->addGlobalsToJScript($jsGlobals);
-        $stats->addRewardsToJScript($jsGlobals);
+        $stats->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
 
         $found['statistic'] = array(
             'type'     => TYPE_ACHIEVEMENT,
             'matches'  => $stats->getMatches(),
+            'file'     => 'achievement',
             'data'     => $data,
             'params'   => [
                 'tabs'        => '$myTabs',
@@ -743,8 +794,6 @@ if ($searchMask & 0x400000)
 
     if ($data = $pets->getListviewData())
     {
-        $pets->addGlobalsToJScript($jsGlobals);
-
         while ($pets->iterate())
             $data[$pets->id]['param1'] = '"'.$pets->getField('iconString').'"';
 
@@ -752,6 +801,7 @@ if ($searchMask & 0x400000)
             'type'     => TYPE_PET,
             'appendix' => ' (Pet)',
             'matches'  => $pets->getMatches(),
+            'file'     => 'pet',
             'data'     => $data,
             'params'   => [
                 'tabs' => '$myTabs',
@@ -779,7 +829,7 @@ if ($searchMask & 0x800000)
 
     if ($data = $npcAbilities->getListviewData())
     {
-        $npcAbilities->addGlobalsToJscript($jsGlobals);
+        $npcAbilities->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
         while ($npcAbilities->iterate())
             $data[$npcAbilities->id]['param1'] = '"'.strToLower($npcAbilities->getField('iconString')).'"';
@@ -788,6 +838,7 @@ if ($searchMask & 0x800000)
             'type'     => TYPE_SPELL,
             'appendix' => ' (Spell)',
             'matches'  => $npcAbilities->getMatches(),
+            'file'     => 'spell',
             'data'     => $data,
             'params'   => [
                 'id'          => 'npc-abilities',
@@ -819,7 +870,7 @@ if ($searchMask & 0x1000000)
 
     if ($data = $misc->getListviewData())
     {
-        $misc->addGlobalsToJscript($jsGlobals);
+        $misc->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
         while ($misc->iterate())
             $data[$misc->id]['param1'] = '"'.strToLower($misc->getField('iconString')).'"';
@@ -828,6 +879,7 @@ if ($searchMask & 0x1000000)
             'type'     => TYPE_SPELL,
             'appendix' => ' (Spell)',
             'matches'  => $misc->getMatches(),
+            'file'     => 'spell',
             'data'     => $data,
             'params'   => [
                 'tabs'        => '$myTabs',
@@ -979,7 +1031,6 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
     $smarty->assign('found', $found);
     $smarty->assign('lvData', $jsGlobals);
     $smarty->assign('search', $search);
-    $smarty->assign('mysql', DB::Aowow()->getStatistics());
 
     $smarty->display('search.tpl');
 }

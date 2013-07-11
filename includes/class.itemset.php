@@ -7,11 +7,13 @@ class ItemsetList extends BaseType
 {
     use ListviewHelper;
 
-    private   $classes    = [];                             // used to build g_classes
-    public    $pieceToSet = [];                             // used to build g_items and search
+    public static $type       = TYPE_ITEMSET;
 
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_itemset WHERE [filter] [cond] ORDER BY maxlevel DESC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_itemset WHERE [filter] [cond]';
+    public        $pieceToSet = [];                             // used to build g_items and search
+    private       $classes    = [];                             // used to build g_classes
+
+    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_itemset WHERE [filter] [cond] ORDER BY maxlevel DESC';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_itemset WHERE [filter] [cond]';
 
     public function __construct($data, $applyFilter = false)
     {
@@ -71,16 +73,15 @@ class ItemsetList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$refs)
+    public function addGlobalsToJscript(&$template, $addMask = GLOBALINFO_ANY)
     {
-        if ($this->classes)
-            (new CharClassList(array(['id', $this->classes])))->addGlobalsToJscript($refs);
+        if ($this->classes && ($addMask & GLOBALINFO_RELATED))
+            $template->extendGlobalIds(TYPE_CLASS, $this->classes);
 
-        if ($this->pieceToSet)
-            (new ItemList(array(['i.entry', array_keys($this->pieceToSet)], 0)))->addGlobalsToJscript($refs);
+        if ($this->pieceToSet && ($addMask & GLOBALINFO_SELF))
+            $template->extendGlobalIds(TYPE_ITEM, array_keys($this->pieceToSet));
     }
 
-    public function addRewardsToJScript(&$ref) { }
     public function renderTooltip() { }
 }
 

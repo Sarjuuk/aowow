@@ -249,11 +249,7 @@ abstract class BaseType
     abstract public function getListviewData();
 
     // should return data to extend global js variables for a certain type (e.g. g_items)
-    abstract public function addGlobalsToJScript(&$ref);
-
-    // should return data to extend global js variables for the rewards provided by this type (e.g. g_titles)
-    // rewards will not always be required and only by Achievement and Quest .. but yeah.. maybe it should be merged with addGlobalsToJScript
-    abstract public function addRewardsToJScript(&$ref);
+    abstract public function addGlobalsToJScript(&$smarty, $addMask = GLOBALINFO_ANY);
 
     // NPC, GO, Item, Quest, Spell, Achievement, Profile would require this
     abstract public function renderTooltip();
@@ -261,6 +257,33 @@ abstract class BaseType
 
 trait listviewHelper
 {
+    public function hasSetFields($fields)
+    {
+        if (!is_array($fields))
+            return 0x0;
+
+        $result = 0x0;
+
+        $this->reset();
+
+        while ($this->iterate())
+        {
+            foreach ($fields as $k => $str)
+            {
+                if ($this->getField($str))
+                {
+                    $result |= 1 << $k;
+                    unset($fields[$k]);
+                }
+            }
+
+            if (empty($fields))                             // all set .. return early
+                return $result;
+        }
+
+        return $result;
+    }
+
     public function hasDiffFields($fields)
     {
         if (!is_array($fields))
@@ -603,33 +626,35 @@ class Lang
 
 class SmartyAoWoW extends Smarty
 {
-    private $config = [];
+    private $config    = [];
+    private $jsGlobals = [];
 
     public function __construct($config)
     {
         $cwd = str_replace("\\", "/", getcwd());
 
         $this->Smarty();
-        $this->config           = $config;
-        $this->template_dir     = $cwd.'/template/';
-        $this->compile_dir      = $cwd.'/cache/template/';
-        $this->config_dir       = $cwd.'/configs/';
-        $this->cache_dir        = $cwd.'/cache/';
-        $this->debugging        = $config['debug'];
-        $this->left_delimiter   = '{';
-        $this->right_delimiter  = '}';
-        $this->caching          = false;                    // Total Cache, this site does not work
         $this->assign('appName', $config['page']['name']);
         $this->assign('AOWOW_REVISION', AOWOW_REVISION);
-        $this->_tpl_vars['page'] = array(
-            'reqJS'      => [],                             // <[string]> path to required JSFile
-            'reqCSS'     => [],                             // <[string,string]> path to required CSSFile, IE condition
-            'title'      => null,                           // [string] page title
-            'tab'        => null,                           // [int] # of tab to highlight in the menu
-            'type'       => null,                           // [int] numCode for spell, npc, object, ect
-            'typeId'     => null,                           // [int] entry to display
-            'path'       => '[]'                            // [string] (js:array) path to preselect in the menu
+        $this->config                 = $config;
+        $this->template_dir           = $cwd.'/template/';
+        $this->compile_dir            = $cwd.'/cache/template/';
+        $this->config_dir             = $cwd.'/configs/';
+        $this->cache_dir              = $cwd.'/cache/';
+        $this->debugging              = $config['debug'];
+        $this->left_delimiter         = '{';
+        $this->right_delimiter        = '}';
+        $this->caching                = false;              // Total Cache, this site does not work
+        $this->_tpl_vars['page']      = array(
+            'reqJS'  => [],                                 // <[string]> path to required JSFile
+            'reqCSS' => [],                                 // <[string,string]> path to required CSSFile, IE condition
+            'title'  => null,                               // [string] page title
+            'tab'    => null,                               // [int] # of tab to highlight in the menu
+            'type'   => null,                               // [int] numCode for spell, npc, object, ect
+            'typeId' => null,                               // [int] entry to display
+            'path'   => '[]'                                // [string] (js:array) path to preselect in the menu
         );
+        $this->_tpl_vars['jsGlobals'] = [];
     }
 
     // using Smarty::assign would overwrite every pair and result in undefined indizes
@@ -658,33 +683,10 @@ class SmartyAoWoW extends Smarty
 
                 foreach ($globals as $glob)
                 {
-                    if (!isset($_[$glob['type']]))
-                        $_[$glob['type']] = [];
+                    if (!isset($this->jsGlobals[$glob['type']]))
+                        $this->jsGlobals[$glob['type']] = [];
 
-                    $_[$glob['type']][] = $glob['typeId'];
-                }
-
-                foreach ($_ as $type => $ids)
-                {
-                    switch ($type)
-                    {
-                        case TYPE_NPC:         (new CreatureList(array(['ct.entry', $ids])))->addGlobalsToJscript($tv['lvData']);   break;
-                        case TYPE_OBJECT:      (new GameobjectList(array(['gt.entry', $ids])))->addGlobalsToJscript($tv['lvData']); break;
-                        case TYPE_ITEM:        (new ItemList(array(['it.entry', $ids])))->addGlobalsToJscript($tv['lvData']);       break;
-                        case TYPE_ITEMSET:     (new ItemsetList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);          break;
-                        case TYPE_QUEST:       (new QuestList(array(['qt.entry', $ids])))->addGlobalsToJscript($tv['lvData']);      break;
-                        case TYPE_SPELL:       (new SpellList(array(['s.id', $ids])))->addGlobalsToJscript($tv['lvData']);          break;
-                        case TYPE_ZONE:        (new ZoneList(array(['z.id', $ids])))->addGlobalsToJscript($tv['lvData']);           break;
-                        case TYPE_FACTION:     (new FactionList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);          break;
-                        case TYPE_PET:         (new PetList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);              break;
-                        case TYPE_ACHIEVEMENT: (new AchievementList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);      break;
-                        case TYPE_TITLE:       (new TitleList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);            break;
-                        case TYPE_WORLDEVENT:  (new WorldEventList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);       break;
-                        case TYPE_CLASS:       (new CharClassList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);        break;
-                        case TYPE_RACE:        (new CharRaceList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);         break;
-                        case TYPE_SKILL:       (new SkillList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);            break;
-                        case TYPE_CURRENCY:    (new CurrencyList(array(['id', $ids])))->addGlobalsToJscript($tv['lvData']);         break;
-                    }
+                    $this->jsGlobals[$glob['type']][] = $glob['typeId'];
                 }
             }
         }
@@ -704,7 +706,101 @@ class SmartyAoWoW extends Smarty
             $this->_tpl_vars['announcements'] = $ann;
         }
 
+        $this->applyGlobals();
+
+        $this->_tpl_vars['mysql'] = DB::Aowow()->getStatistics();
+
         parent::display($tpl);
+    }
+
+    public function extendGlobalIds($type, $data)
+    {
+        if (!$type || !$data)
+            return false;
+
+        if (!isset($this->jsGlobals[$type]))
+            $this->jsGlobals[$type] = [];
+
+        if (is_array($data))
+            foreach ($data as $id)
+                $this->jsGlobals[$type][] = (int)$id;
+        else if (is_numeric($data))
+            $this->jsGlobals[$type][] = (int)$data;
+        else
+            return false;
+
+        return true;
+    }
+
+    public function extendGlobalData($type, $data)
+    {
+        $this->initJSGlobal($type);
+        $_ = &$this->_tpl_vars['jsGlobals'][$type][1];      // shorthand
+
+        foreach ($data as $id => $set)
+            if (!isset($_[$id]))
+                $_[$id] = $set;
+    }
+
+    private function initJSGlobal($type)
+    {
+        $jsg = &$this->_tpl_vars['jsGlobals'];              // shortcut
+
+        if (isset($jsg[$type]))
+            return;
+
+        switch ($type)
+        {                                                // [brickFile, [data]]
+            case TYPE_NPC:         $jsg[TYPE_NPC]         = ['creatures', []];    break;
+            case TYPE_OBJECT:      $jsg[TYPE_OBJECT]      = ['objects', []];      break;
+            case TYPE_ITEM:        $jsg[TYPE_ITEM]        = ['items', []];        break;
+            case TYPE_QUEST:       $jsg[TYPE_QUEST]       = ['quests', []];       break;
+            case TYPE_SPELL:       $jsg[TYPE_SPELL]       = ['spells', []];       break;
+            case TYPE_ZONE:        $jsg[TYPE_ZONE]        = ['zones', []];        break;
+            case TYPE_FACTION:     $jsg[TYPE_FACTION]     = ['factions', []];     break;
+            case TYPE_PET:         $jsg[TYPE_PET]         = ['pets', []];         break;
+            case TYPE_ACHIEVEMENT: $jsg[TYPE_ACHIEVEMENT] = ['achievements', []]; break;
+            case TYPE_TITLE:       $jsg[TYPE_TITLE]       = ['titles', []];       break;
+            case TYPE_WORLDEVENT:  $jsg[TYPE_WORLDEVENT]  = ['holidays', []];     break;
+            case TYPE_CLASS:       $jsg[TYPE_CLASS]       = ['classes', []];      break;
+            case TYPE_RACE:        $jsg[TYPE_RACE]        = ['races', []];        break;
+            case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['skills', []];       break;
+            case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['curencies', []];    break;
+        }
+    }
+
+    private function applyGlobals()
+    {
+        foreach ($this->jsGlobals as $type => $ids)
+        {
+            if (!$ids)
+                continue;
+
+            $this->initJSGlobal($type);
+
+            foreach ($ids as $k => $id)                     // filter already generated data, maybe we can save a lookup or two
+                if (isset($this->_tpl_vars['jsGlobals'][$type][$id]))
+                    unset($ids[$k]);
+
+            switch ($type)
+            {
+                case TYPE_NPC:         (new CreatureList(array(['ct.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);   break;
+                case TYPE_OBJECT:      (new GameobjectList(array(['gt.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF); break;
+                case TYPE_ITEM:        (new ItemList(array(['i.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);        break;
+                case TYPE_QUEST:       (new QuestList(array(['qt.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;
+                case TYPE_SPELL:       (new SpellList(array(['s.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);          break;
+                case TYPE_ZONE:        (new ZoneList(array(['z.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);           break;
+                case TYPE_FACTION:     (new FactionList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);          break;
+                case TYPE_PET:         (new PetList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);              break;
+                case TYPE_ACHIEVEMENT: (new AchievementList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;
+                case TYPE_TITLE:       (new TitleList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);            break;
+                case TYPE_WORLDEVENT:  (new WorldEventList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);       break;
+                case TYPE_CLASS:       (new CharClassList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);        break;
+                case TYPE_RACE:        (new CharRaceList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);         break;
+                case TYPE_SKILL:       (new SkillList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);            break;
+                case TYPE_CURRENCY:    (new CurrencyList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);         break;
+            }
+        }
     }
 
     public function notFound($subject)
@@ -716,6 +812,7 @@ class SmartyAoWoW extends Smarty
         ));
 
         $this->assign('lang', Lang::$main);
+        $this->assign('mysql', DB::Aowow()->getStatistics());
 
         $this->display('404.tpl');
         exit();

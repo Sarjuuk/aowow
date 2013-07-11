@@ -5,8 +5,10 @@ if (!defined('AOWOW_REVISION'))
 
 class CurrencyList extends BaseType
 {
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_currencies WHERE [cond] ORDER BY Id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_currencies WHERE [cond]';
+    public static $type       = TYPE_CURRENCY;
+
+    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_currencies WHERE [cond] ORDER BY Id ASC';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_currencies WHERE [cond]';
 
     public function getListviewData()
     {
@@ -25,25 +27,17 @@ class CurrencyList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$refs)
+    public function addGlobalsToJscript(&$template, $addMask = 0)
     {
-        if (!isset($refs['gCurrencies']))
-            $refs['gCurrencies'] = [];
-
-        $data = [];
-
         while ($this->iterate())
         {
-            $refs['gCurrencies'][$this->id] = array(
+            $template->extendGlobalData(self::$type, [$this->id => array(
                 'name' => $this->getField('name', true),
                 'icon' => $this->curTpl['iconString']
-            );
+            )]);
         }
-
-        return $data;
     }
 
-    public function addRewardsToJScript(&$ref) { }
     public function renderTooltip() { }
 }
 

@@ -87,7 +87,12 @@ define('LOCALE_DE',                         3);
 define('LOCALE_ES',                         6);
 define('LOCALE_RU',                         8);
 
-// conditional information in listviews
+// conditional information in template
+define('GLOBALINFO_SELF',                   0x1);           // id, name, icon
+define('GLOBALINFO_RELATED',                0x2);           // spells used by pet, classes/races required by spell, ect
+define('GLOBALINFO_REWARDS',                0x4);           // items rewarded by achievement/quest, ect
+define('GLOBALINFO_ANY',                    0xF);
+
 define('ITEMINFO_JSON',                     0x1);
 define('ITEMINFO_SUBITEMS',                 0x2);
 define('ITEMINFO_VENDOR',                   0x4);

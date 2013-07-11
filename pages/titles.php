@@ -47,7 +47,6 @@ $page = array(
 $smarty->updatePageVars($page);
 $smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->display('generic-no-filter.tpl');
 
 ?>

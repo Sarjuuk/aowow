@@ -82,8 +82,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     );
 
     // fill g_items, g_titles, g_achievements
-    $acvList->addGlobalsToJscript($pageData);
-    $acvList->addRewardsToJScript($pageData);
+    $acvList->addGlobalsToJscript($smarty);
 
     // if we are have different cats display field
     if ($acvList->hasDiffFields(['category']))
@@ -118,7 +117,6 @@ asort(Lang::$game['si']);
 $smarty->updatePageVars($page);
 $smarty->assign('filter', $filter);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->assign('lvData', $pageData);
 $smarty->display('achievements.tpl');
 

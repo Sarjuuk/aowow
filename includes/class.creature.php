@@ -8,10 +8,12 @@ class CreatureList extends BaseType
 {
     use spawnHelper;
 
-    public    $tooltips   = [];
+    public static $type       = TYPE_NPC;
 
-    protected $setupQuery = 'SELECT ct.*, ct.id AS ARRAY_KEY, ft.A, ft.H, ft.factionId FROM ?_creature ct LEFT JOIN ?_factiontemplate ft ON ft.id = ct.faction_A WHERE [filter] [cond]';
-    protected $matchQuery = 'SELECT COUNT(*) FROM ?_creature ct WHERE [filter] [cond]';
+    public        $tooltips   = [];
+
+    protected     $setupQuery = 'SELECT ct.*, ct.id AS ARRAY_KEY, ft.A, ft.H, ft.factionId FROM ?_creature ct LEFT JOIN ?_factiontemplate ft ON ft.id = ct.faction_A WHERE [filter] [cond]';
+    protected     $matchQuery = 'SELECT COUNT(*) FROM ?_creature ct WHERE [filter] [cond]';
 
     public static function getName($id)
     {
@@ -151,16 +153,12 @@ class CreatureList extends BaseType
                     'location' => json_encode($this->getSpawns(SPAWNINFO_ZONES), JSON_NUMERIC_CHECK),
                     'name'     => $this->getField('name', true),
                     'tag'      => $this->getField('subname', true),
-                    'type'     => $this->curTpl['type']
+                    'type'     => $this->curTpl['type'],
+                    'react'    => '['.$this->curTpl['A'].', '.$this->curTpl['H'].']'
                 );
 
-                if ($addInfoMask & NPCINFO_TAMEABLE)
-                {
-                    // only first skin of first model ... we're omitting potentially 11 skins here .. but the lv accepts only one .. w/e
+                if ($addInfoMask & NPCINFO_TAMEABLE)        // only first skin of first model ... we're omitting potentially 11 skins here .. but the lv accepts only one .. w/e
                     $data[$this->id]['skin'] = $this->curTpl['textureString'];
-
-                    $data[$this->id]['react'] = '['.$this->curTpl['A'].', '.$this->curTpl['H'].']';
-                }
             }
         }
 
@@ -168,13 +166,10 @@ class CreatureList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript(&$refs)
+    public function addGlobalsToJScript(&$template, $addMask = 0)
     {
-        if (!isset($refs['gCreatures']))
-            $refs['gCreatures'] = [];
-
         while ($this->iterate())
-            $refs['gCreatures'][$this->id] = ['name' => $this->getField('name', true)];
+            $template->extendGlobalData(TYPE_NPC, [$this->id => ['name' => $this->getField('name', true)]]);
     }
 
     public function addRewardsToJScript(&$refs) { }

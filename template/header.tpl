@@ -31,15 +31,7 @@
         {strip}<script type="text/javascript">
             g_initHeader({$page.tab});
             LiveSearch.attach(ge('livesearch-generic'));
-            {if isset($lvData.gAchievements)} { include file='bricks/globals/achievements.tpl'   data=$lvData.gAchievements }{/if}
-            {if isset($lvData.gClasses)}      { include file='bricks/globals/classes.tpl'        data=$lvData.gClasses      }{/if}
-            {if isset($lvData.gCurrencies)}   { include file='bricks/globals/currencies.tpl'     data=$lvData.gCurrencies   }{/if}
-            {if isset($lvData.gHolidays)}     { include file='bricks/globals/holidays.tpl'       data=$lvData.gHolidays     }{/if}
-            {if isset($lvData.gItems)}        { include file='bricks/globals/items.tpl'          data=$lvData.gItems        }{/if}
-            {if isset($lvData.gRaces)}        { include file='bricks/globals/races.tpl'          data=$lvData.gRaces        }{/if}
-            {if isset($lvData.gSpells)}       { include file='bricks/globals/spells.tpl'         data=$lvData.gSpells       }{/if}
-            {if isset($lvData.gTitles)}       { include file='bricks/globals/titles.tpl'         data=$lvData.gTitles       }{/if}
-            {if isset($lvData.gCreatures)}    { include file='bricks/globals/creatures.tpl'      data=$lvData.gCreatures    }{/if}
-            {if isset($lvData.gQuests)}       { include file='bricks/globals/quests.tpl'         data=$lvData.gQuests       }{/if}
-            {* TODO: Factions, Objects, g_gatheredzones(?) *}
+{foreach from=$jsGlobals item="glob"}
+    {include file="bricks/globals/`$glob[0]`.tpl" data=$glob[1]}
+{/foreach}
         </script>{/strip}

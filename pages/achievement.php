@@ -75,7 +75,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     array_unshift($pageData['title'], $acv->getField('name', true));
 
-    $acv->addRewardsToJscript($pageData);
+    $acv->addGlobalsToJscript($smarty, GLOBALINFO_REWARDS);
     $pageData['page'] = $acv->getDetailedData()[$id];
     $acv->reset();
 
@@ -110,8 +110,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'tabs'        => '$tabsRelated'
     );
 
-    $saList->addRewardsToJscript($pageData);
-    $saList->addGlobalsToJscript($pageData);
+    $saList->addGlobalsToJscript($smarty);
 
     // listview: "criteria of"
     $refs = DB::Aowow()->SelectCol('SELECT refAchievement FROM ?_achievementcriteria WHERE Type = ?d AND value1 = ?d',
@@ -129,8 +128,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'tabs'        => '$tabsRelated'
         );
 
-        $coList->addRewardsToJscript($pageData);
-        $coList->addGlobalsToJscript($pageData);
+        $coList->addGlobalsToJscript($smarty);
     }
 
     // create rewards
@@ -259,8 +257,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     'type' => 'g_achievements',
                     'id'   => $obj,
                 );
-                if ($crtAcv = new AchievementList(array(['id', $obj])))
-                    $crtAcv->addGlobalsToJscript($pageData);
+                $smarty->extendGlobalIds(TYPE_ACHIEVEMENT, $obj);
                 break;
             // link to quest
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
@@ -276,13 +273,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                $crtSpl = new SpellList(array(['s.id', $obj]));
-                $text = !empty($crtName) ? $crtName : $crtSpl->getField('name', true);
+                $text = !empty($crtName) ? $crtName : SpellList::getName($obj);
                 $tmp['link'] = array(
                     'href' => '?spell='.$obj,
                     'text' => $text
                 );
-                $crtSpl->addGlobalsToJscript($pageData);
+                $smarty->extendGlobalIds(TYPE_SPELL, $obj);
                 $tmp['icon'] = $iconId;
                 $pageData['page']['icons'][] = array(
                     'itr'  => $iconId++,
@@ -303,7 +299,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     'quality' => $crtItm->getField('Quality'),
                     'count'   => $qty,
                 );
-                $crtItm->addGlobalsToJscript($pageData);
+                $crtItm->addGlobalsToJscript($smarty);
                 $tmp['icon'] = $iconId;
                 $pageData['page']['icons'][] = array(
                     'itr'   => $iconId++,
@@ -404,9 +400,6 @@ $smarty->updatePageVars(array(
 $smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
 $smarty->assign('lvData', $pageData);
-
-// Mysql query execution statistics
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 
 // load the page
 $smarty->display('achievement.tpl');

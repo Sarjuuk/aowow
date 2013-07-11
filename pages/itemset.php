@@ -181,7 +181,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-    $iSet->addGlobalsToJscript($pageData);
+    $iSet->addGlobalsToJscript($smarty, GLOBALINFO_RELATED);
 
     // related sets (priority: 1: similar tag + class; 2: has event; 3: no tag + similar type, 4: similar type + profession)
     $rel = [];
@@ -230,7 +230,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             if (!$mask)
                 $pageData['related']['params']['hiddenCols'] = "$['classes']";
 
-            $relSets->addGlobalsToJscript($pageData);
+            $relSets->addGlobalsToJscript($smarty);
         }
     }
 
@@ -253,7 +253,6 @@ $smarty->updatePageVars(array(
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEMSET, $id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$itemset));
 $smarty->assign('lvData', $pageData);
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->display('itemset.tpl');
 
 ?>

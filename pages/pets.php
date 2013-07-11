@@ -34,7 +34,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         $pageData['params']['hiddenCols'] = "$['type']";
 
     $pets->reset();
-    $pets->addGlobalsToJscript($pageData);
+    $pets->addGlobalsToJscript($smarty, GLOBALINFO_RELATED);
 
     $smarty->saveCache($cacheKey, $pageData);
 }
@@ -49,7 +49,6 @@ $page = array(
 $smarty->updatePageVars($page);
 $smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->display('generic-no-filter.tpl');
 
 ?>

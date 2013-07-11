@@ -22,7 +22,6 @@ $page = array(
 
 $smarty->updatePageVars($page);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$maps));
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->display('maps.tpl');
 
 ?>

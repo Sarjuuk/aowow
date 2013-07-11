@@ -20,7 +20,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         'params' => []
     );
 
-    $itemsets->addGlobalsToJscript($pageData);
+    $itemsets->addGlobalsToJscript($smarty);
 
     // recreate form selection
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
@@ -62,7 +62,6 @@ asort(Lang::$game['cl']);
 $smarty->updatePageVars($page);
 $smarty->assign('filter', $filter);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$itemset, Lang::$item));
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->assign('lvData', $pageData);
 $smarty->display('itemsets.tpl');
 

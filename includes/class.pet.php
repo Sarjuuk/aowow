@@ -7,6 +7,8 @@ class PetList extends BaseType
 {
     use ListviewHelper;
 
+    public    static $type = TYPE_PET;
+
     protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_pet WHERE [cond] ORDER BY Id ASC';
     protected $matchQuery = 'SELECT COUNT(1) FROM ?_pet WHERE [cond]';
 
@@ -44,19 +46,20 @@ class PetList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$refs)
+    public function addGlobalsToJscript(&$template, $addMask = GLOBALINFO_ANY)
     {
-        $gathered = [];
         while ($this->iterate())
-            for ($i = 1; $i <= 4; $i++)
-                if ($this->curTpl['spellId'.$i] > 0)
-                    $gathered[] = (int)$this->curTpl['spellId'.$i];
+        {
+            if ($addMask & GLOBALINFO_RELATED)
+                for ($i = 1; $i <= 4; $i++)
+                    if ($this->curTpl['spellId'.$i] > 0)
+                        $template->extendGlobalIds(TYPE_SPELL, $this->curTpl['spellId'.$i]);
 
-        if ($gathered)
-            (new SpellList(array(['s.id', $gathered])))->addGlobalsToJscript($refs);
+            if ($addMask & GLOBALINFO_SELF)
+                $template->extendGlobalData(self::$type, [$this->id => ['icon' => $this->curTpl['iconString']]]);
+        }
     }
 
-    public function addRewardsToJScript(&$ref) { }
     public function renderTooltip() { }
 }
 

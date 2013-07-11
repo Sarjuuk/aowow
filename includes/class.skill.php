@@ -6,6 +6,8 @@ if (!defined('AOWOW_REVISION'))
 
 class SkillList extends BaseType
 {
+    public static $type = TYPE_SKILL;
+
     public static function getName($id)
     {
         $n = DB::Aowow()->SelectRow('
@@ -25,8 +27,7 @@ class SkillList extends BaseType
     }
 
     public function getListviewData() { }
-    public function addGlobalsToJScript(&$refs) { }
-    public function addRewardsToJScript(&$refs) { }
+    public function addGlobalsToJScript(&$template, $addMask = 0) { }
     public function renderTooltip() { }
 
 }

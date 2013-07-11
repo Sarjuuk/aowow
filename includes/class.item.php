@@ -5,17 +5,19 @@ if (!defined('AOWOW_REVISION'))
 
 class ItemList extends BaseType
 {
-    public    $tooltip    = '';
-    public    $json       = [];
-    public    $itemMods   = [];
+    public static $type       = TYPE_ITEM;
 
-    public    $rndEnchIds = [];
-    public    $subItems   = [];
+    public        $tooltip    = '';
+    public        $json       = [];
+    public        $itemMods   = [];
 
-    private   $ssd        = [];
+    public        $rndEnchIds = [];
+    public        $subItems   = [];
 
-    protected $setupQuery = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] ORDER BY i.Quality DESC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond]';
+    private       $ssd        = [];
+
+    protected     $setupQuery = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] ORDER BY i.Quality DESC';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond]';
 
     public function __construct($conditions, $pieceToSet = null)
     {
@@ -148,7 +150,7 @@ class ItemList extends BaseType
             {"source":[5],"sourcemore":[{"n":"Commander Oxheart","t":1,"ti":64606,"z":5842}],
 
             cost:[]     format unk 0:copper, 1:[items]? 2, 3, 4, 5
-            stack       [unk, unk]
+            stack       [min, max]  // when looting
             avail       unk
             rel         unk
             glyph       major | minor (as id)
@@ -159,18 +161,15 @@ class ItemList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$refs)
+    public function addGlobalsToJscript(&$template, $addMask = 0)
     {
-        if (!isset($refs['gItems']))
-            $refs['gItems'] = [];
-
         while ($this->iterate())
         {
-            $refs['gItems'][$this->id] = array(
+            $template->extendGlobalData(self::$type, [$this->id => array(
                 'name'    => $this->getField('name', true),
                 'quality' => $this->curTpl['Quality'],
-                'icon'    => $this->curTpl['icon'],
-            );
+                'icon'    => $this->curTpl['icon']
+            )]);
         }
     }
 

@@ -5,36 +5,10 @@ if (!defined('AOWOW_REVISION'))
 
 class WorldEventList extends BaseType
 {
-    private static $holidayIcons = [
-        141 => 'calendar_winterveilstart',
-        327 => 'calendar_lunarfestivalstart',
-        335 => 'calendar_loveintheairstart',
-        423 => 'calendar_loveintheairstart',
-        181 => 'calendar_noblegardenstart',
-        201 => 'calendar_childrensweekstart',
-        341 => 'calendar_midsummerstart',
-        62  => 'inv_misc_missilelarge_red',
-        321 => 'calendar_harvestfestivalstart',
-        398 => 'calendar_piratesdaystart',
-        372 => 'calendar_brewfeststart',
-        324 => 'calendar_hallowsendstart',
-        409 => 'calendar_dayofthedeadstart',
-        404 => 'calendar_harvestfestivalstart',
-        283 => 'inv_jewelry_necklace_21',
-        284 => 'inv_misc_rune_07',
-        400 => 'achievement_bg_winsoa',
-        420 => 'achievement_bg_winwsg',
-        285 => 'inv_jewelry_amulet_07',
-        353 => 'spell_nature_eyeofthestorm',
-        301 => 'calendar_fishingextravaganzastart',
-        424 => 'calendar_fishingextravaganzastart',
-        374 => 'calendar_darkmoonfaireelwynnstart',
-        375 => 'calendar_darkmoonfairemulgorestart',
-        376 => 'calendar_darkmoonfaireterokkarstart'
-    ];
+    public static  $type         = TYPE_WORLDEVENT;
 
-    protected $setupQuery = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id WHERE [cond] ORDER BY -e.id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id WHERE [cond]';
+    protected      $setupQuery   = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id WHERE [cond] ORDER BY -e.id ASC';
+    protected      $matchQuery   = 'SELECT COUNT(1) FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id WHERE [cond]';
 
     public function __construct($data)
     {
@@ -158,27 +132,17 @@ class WorldEventList extends BaseType
         return $data;
     }
 
-    public function setup()
+    public function addGlobalsToJScript(&$template, $addMask = 0)
     {
-        foreach (self::$holidayIcons as $id => $s)
-            DB::Aowow()->Query('UPDATE ?_holidays SET iconString = ?s WHERE id = ?', $s, $id);
-    }
-
-    public function addGlobalsToJScript(&$refs)
-    {
-        if (!isset($refs['gHolidays']))
-            $refs['gHolidays'] = [];
-
         while ($this->iterate())
         {
-            $refs['gHolidays'][$this->id] = array(
+            $template->extendGlobalData(self::$type, [$this->id => array(
                 'name' => $this->getField('name', true),
                 'icon' => $this->curTpl['iconString']
-            );
+            )]);
         }
     }
 
-    public function addRewardsToJScript(&$ref) { }
     public function renderTooltip() { }
 }
 

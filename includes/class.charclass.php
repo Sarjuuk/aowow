@@ -5,8 +5,10 @@ if (!defined('AOWOW_REVISION'))
 
 class CharClassList extends BaseType
 {
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_classes WHERE [cond] ORDER BY Id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_classes WHERE [cond]';
+    public static $type       = TYPE_CLASS;
+
+    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_classes WHERE [cond] ORDER BY Id ASC';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_classes WHERE [cond]';
 
     public function getListviewData()
     {
@@ -24,7 +26,7 @@ class CharClassList extends BaseType
                 'power'  => $this->curTpl['powerType'],
             );
 
-            if ($this->curTpl['expansion'] == 2)            // todo: grr, move to db
+            if ($this->curTpl['expansion'] == 2)            // todo (low): grr, move to db
                 $data[$this->id]['hero'] = 1;
 
             if ($this->curTpl['expansion'])
@@ -34,13 +36,10 @@ class CharClassList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$refs)
+    public function addGlobalsToJscript(&$template, $addMask = 0)
     {
-        if (!isset($refs['gClasses']))
-            $refs['gClasses'] = [];
-
         while ($this->iterate())
-            $refs['gClasses'][$this->id] = ['name' => $this->getField('name', true)];
+            $template->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
     }
 
     public function addRewardsToJScript(&$ref) { }

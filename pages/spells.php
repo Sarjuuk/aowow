@@ -381,7 +381,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 
     $pageData['data'] = $spells->getListviewData();
 
-    $spells->addGlobalsToJscript($pageData);
+    $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
     // create note if search limit was exceeded; overwriting 'note' is intentional
     if ($spells->getMatches() > $AoWoWconf['sqlLimit'])
@@ -393,7 +393,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     if ($spells->filterGetError())
         $pageData['params']['_errors'] = '$1';
 
-    $mask = $spells->hasDiffFields(['reagent1', 'skillLines', 'trainingCost']);
+    $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost']);
 
     if ($mask & 0x1)
         $visibleCols[] = 'reagents';
@@ -444,7 +444,6 @@ Lang::$game['race'] = Util::ucFirst(Lang::$game['race']);
 $smarty->updatePageVars($page);
 $smarty->assign('filter', $filter);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->assign('lvData', $pageData);
 $smarty->display('spells.tpl');
 

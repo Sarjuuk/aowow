@@ -6,6 +6,8 @@ if (!defined('AOWOW_REVISION'))
 
 class GameObjectList extends BaseType
 {
+    public static $type = TYPE_OBJECT;
+
     public static function getName($id)
     {
         $n = DB::Aowow()->SelectRow('
@@ -29,8 +31,7 @@ class GameObjectList extends BaseType
     }
 
     public function getListviewData() { }
-    public function addGlobalsToJScript(&$refs) { }
-    public function addRewardsToJScript(&$refs) { }
+    public function addGlobalsToJScript(&$template, $addMask = 0) { }
     public function renderTooltip() { }
 
 }

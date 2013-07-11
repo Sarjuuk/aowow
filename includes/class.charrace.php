@@ -5,8 +5,10 @@ if (!defined('AOWOW_REVISION'))
 
 class CharRaceList extends BaseType
 {
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_races WHERE [cond] ORDER BY Id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_races WHERE [cond]';
+    public static $type       = TYPE_RACE;
+
+    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_races WHERE [cond] ORDER BY Id ASC';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_races WHERE [cond]';
 
     public function getListviewData()
     {
@@ -31,13 +33,10 @@ class CharRaceList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$refs)
+    public function addGlobalsToJscript(&$template, $addMask = 0)
     {
-        if (!isset($refs['gRaces']))
-            $refs['gRaces'] = [];
-
         while ($this->iterate())
-            $refs['gRaces'][$this->id] = ['name' => $this->getField('name', true)];
+            $template->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
     }
 
     public function addRewardsToJScript(&$ref) { }

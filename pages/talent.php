@@ -35,7 +35,6 @@ if ($petCalc)
 $smarty->updatePageVars($page);
 $smarty->assign('tcType', $petCalc ? 'pc' : 'tc');
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$talent));
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->display('talent.tpl');
 
 ?>

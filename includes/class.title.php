@@ -7,10 +7,12 @@ class TitleList extends BaseType
 {
     use listviewHelper;
 
-    public    $sources    = [];
+    public static $type       = TYPE_TITLE;
 
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_titles WHERE [cond] ORDER BY Id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_titles WHERE [cond]';
+    public        $sources    = [];
+
+    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_titles WHERE [cond] ORDER BY Id ASC';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_titles WHERE [cond]';
 
     public function __construct($data)
     {
@@ -59,18 +61,19 @@ class TitleList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$refs)
+    public function addGlobalsToJscript(&$template, $addMask = 0)
     {
-        if (!isset($refs['gTitles']))
-            $refs['gTitles'] = [];
+        $data = [];
 
         while ($this->iterate())
         {
-            $refs['gTitles'][$this->id]['name'] = Util::jsEscape($this->getField('male', true));
+            $data[$this->id]['name'] = Util::jsEscape($this->getField('male', true));
 
             if ($_ = $this->getField('female', true))
-                $refs['gTitles'][$this->id]['namefemale'] = $_;
+                $data[$this->id]['namefemale'] = $_;
         }
+
+        $template->extendGlobalData(self::$type, $data);
     }
 
     private function createSource()
@@ -143,7 +146,6 @@ class TitleList extends BaseType
         return str_replace('%s', '<span class="q0">&lt;'.Lang::$main['name'].'&gt;</span>', $this->getField($field, true));
     }
 
-    public function addRewardsToJScript(&$ref) { }
     public function renderTooltip() { }
 
     private function faction2Side(&$faction)                // thats weird.. and hopefully unique to titles

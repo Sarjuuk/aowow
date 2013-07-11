@@ -7,11 +7,13 @@ class AchievementList extends BaseType
 {
     use listviewHelper;
 
-    public    $criteria   = [];
-    public    $tooltip    = [];
+    public static $type       = TYPE_ACHIEVEMENT;
 
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_achievement WHERE [filter] [cond]';
+    public        $criteria   = [];
+    public        $tooltip    = [];
+
+    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_achievement WHERE [filter] [cond]';
 
     public function __construct($conditions, $applyFilter = false)
     {
@@ -42,38 +44,24 @@ class AchievementList extends BaseType
         $this->reset();                                     // restore 'iterator'
     }
 
-    public function addRewardsToJScript(&$refs)
+    public function addGlobalsToJscript(&$template, $addMask = GLOBALINFO_ANY)
     {
-        $items  = [];
-        $titles = [];
-
         while ($this->iterate())
         {
-            foreach ($this->curTpl['rewards'][TYPE_ITEM] as $_)
-                $items[] = $_;
+            if ($addMask & GLOBALINFO_SELF)
+                $template->extendGlobalData(self::$type, [$this->id => array(
+                    'icon' => $this->curTpl['iconString'],
+                    'name' => Util::localizedString($this->curTpl, 'name')
+                )]);
 
-            foreach ($this->curTpl['rewards'][TYPE_TITLE] as $_)
-                $titles[] = $_;
-        }
+            if ($addMask & GLOBALINFO_REWARDS)
+            {
+                foreach ($this->curTpl['rewards'][TYPE_ITEM] as $_)
+                    $template->extendGlobalIds(TYPE_ITEM, $_);
 
-        if ($items)
-            (new ItemList(array(['i.entry', $items])))->addGlobalsToJscript($refs);
-
-        if ($titles)
-            (new TitleList(array(['id', $titles])))->addGlobalsToJscript($refs);
-    }
-
-    public function addGlobalsToJscript(&$refs)
-    {
-        if (!isset($refs['gAchievements']))
-            $refs['gAchievements'] = [];
-
-        while ($this->iterate())
-        {
-            $refs['gAchievements'][$this->id] = array(
-                'icon' => $this->curTpl['iconString'],
-                'name' => Util::localizedString($this->curTpl, 'name')
-            );
+                foreach ($this->curTpl['rewards'][TYPE_TITLE] as $_)
+                    $template->extendGlobalIds(TYPE_TITLE, $_);
+            }
         }
     }
 

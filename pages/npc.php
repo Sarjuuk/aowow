@@ -482,9 +482,6 @@ $smarty->assign('community', CommunityContent::getAll(TYPE_NPC, $id));         /
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$npc, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);
 
-// Mysql query execution statistics
-$smarty->assign('mysql', $DB->getStatistics());
-
 // load the page
 $smarty->display('npc.tpl');
 

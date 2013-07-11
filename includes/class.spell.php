@@ -13,6 +13,7 @@ class SpellList extends BaseType
     public        $relItems    = null;
     public        $sources     = [];
 
+    public static $type        = TYPE_SPELL;
     public static $skillLines  = array(
          6 => [43, 44, 45, 46, 54, 55, 95, 118, 136, 160, 162, 172, 173, 176, 226, 228, 229, 473],  // Weapons
          8 => [293, 413, 414, 415, 433],                                                            // Armor
@@ -1625,48 +1626,40 @@ class SpellList extends BaseType
         return $result;
     }
 
-    public function addGlobalsToJScript(&$refs)
+    public function addGlobalsToJScript(&$template, $addMask = GLOBALINFO_ANY)
     {
-        if ($this->relItems)
+        if ($this->relItems && ($addMask & GLOBALINFO_RELATED))
         {
             $this->relItems->reset();
-            $this->relItems->addGlobalsToJscript($refs);
+            $this->relItems->addGlobalsToJscript($template);
         }
-
-        $classes = [];
-        $races   = [];
-
-        if (!isset($refs['gSpells']))
-            $refs['gSpells'] = [];
 
         while ($this->iterate())
         {
-            if ($mask = $this->curTpl['reqClassMask'])
-                for ($i = 0; $i < 11; $i++)
-                    if ($mask & (1 << $i))
-                        $classes[] = $i + 1;
+            if ($addMask & GLOBALINFO_RELATED)
+            {
+                if ($mask = $this->curTpl['reqClassMask'])
+                    for ($i = 0; $i < 11; $i++)
+                        if ($mask & (1 << $i))
+                            $template->extendGlobalIds(TYPE_CLASS, $i + 1);
 
-            if ($mask = $this->curTpl['reqRaceMask'])
-                for ($i = 0; $i < 11; $i++)
-                    if ($mask & (1 << $i))
-                        $races[] = $i + 1;
+                if ($mask = $this->curTpl['reqRaceMask'])
+                    for ($i = 0; $i < 11; $i++)
+                        if ($mask & (1 << $i))
+                            $template->extendGlobalIds(TYPE_RACE, $i + 1);
+            }
 
-            $iconString = $this->curTpl['iconStringAlt'] ? 'iconStringAlt' : 'iconString';
+            if ($addMask & GLOBALINFO_SELF)
+            {
+                $iconString = $this->curTpl['iconStringAlt'] ? 'iconStringAlt' : 'iconString';
 
-            $refs['gSpells'][$this->id] = array(
-                'icon' => $this->curTpl[$iconString],
-                'name' => $this->getField('name', true),
-            );
+                $template->extendGlobalData(self::$type, [$this->id => array(
+                    'icon' => $this->curTpl[$iconString],
+                    'name' => $this->getField('name', true),
+                )]);
+            }
         }
-
-        if ($classes)
-            (new CharClassList(array(['id', $classes])))->addGlobalsToJScript($refs);
-
-        if ($races)
-            (new CharRaceList(array(['id', $races])))->addGlobalsToJScript($refs);
     }
-
-    public function addRewardsToJScript(&$refs) { }
 
 }
 

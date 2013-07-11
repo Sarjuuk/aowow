@@ -57,7 +57,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         )
     );
 
-    $events->addGlobalsToJScript($pageData);
+    $events->addGlobalsToJScript($smarty);
 
     $smarty->saveCache($cacheKey, $pageData);
 }
@@ -86,7 +86,6 @@ $page = array(
 
 $smarty->updatePageVars($page);
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 $smarty->assign('lvData', $pageData);
 $smarty->display('generic-no-filter.tpl');
 

@@ -27,7 +27,7 @@
                     {/if}
                     react:{$curr.react},
                     location:{$curr.location},
-                    {if $curr.skin}
+                    {if isset($curr.skin)}
                         skin: '{$curr.skin}',
                     {/if}
                     {if isset($curr.percent)}

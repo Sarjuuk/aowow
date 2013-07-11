@@ -187,7 +187,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $pageData['title'] = [$spell->getField('name', true), Util::ucFirst(Lang::$game['spell'])];
 
     // js-globals
-    $spell->addGlobalsToJScript($pageData);
+    $spell->addGlobalsToJScript($smarty, GLOBALINFO_RELATED);
 
     // prepare Tools
     foreach ($pageData['page']['tools'] as $k => $tool)
@@ -273,7 +273,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 'count' => 0
             );
 
-            $trig->addGlobalsToJScript($pageData);
+            $trig->addGlobalsToJScript($smarty);
         }
 
         // Effect Name
@@ -604,8 +604,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $modSpells->addGlobalsToJScript($pageData);
-            if(!$modSpells->hasDiffFields(['skillLines']))
+            $modSpells->addGlobalsToJScript($smarty);
+            if(!$modSpells->hasSetFields(['skillLines']))
                 $pageData['modifies']['params']['hiddenCols'] = "$['skill']";
         }
     }
@@ -653,8 +653,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $modsSpell->addGlobalsToJScript($pageData);
-            if(!$modsSpell->hasDiffFields(['skillLines']))
+            $modsSpell->addGlobalsToJScript($smarty);
+            if(!$modsSpell->hasSetFields(['skillLines']))
                 $pageData['modifiedBy']['params']['hiddenCols'] = "$['skill']";
         }
     }
@@ -682,8 +682,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $saSpells->addGlobalsToJScript($pageData);
-        if(!$saSpells->hasDiffFields(['skillLines']))
+        $saSpells->addGlobalsToJScript($smarty);
+        if(!$saSpells->hasSetFields(['skillLines']))
             $pageData['seeAlso']['params']['hiddenCols'] = "$['skill']";
     }
 
@@ -706,7 +706,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $ubSets->addGlobalsToJScript($pageData);
+        $ubSets->addGlobalsToJScript($smarty);
     }
 
 
@@ -732,11 +732,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $ubItems->addGlobalsToJScript($pageData);
+        $ubItems->addGlobalsToJScript($smarty);
     }
 
     // criteria of
-    $_   = [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL];
+    $_ = [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL];
     if ($crs = DB::Aowow()->selectCol('SELECT refAchievement FROM ?_achievementCriteria WHERE type IN (?a) AND value1 = ?d', $_, $spell->id))
     {
         $coAchievemnts = new AchievementList(array(['id', $crs]));
@@ -751,7 +751,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $coAchievemnts->addGlobalsToJScript($pageData);
+            $coAchievemnts->addGlobalsToJScript($smarty);
         }
     }
 
@@ -771,7 +771,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         {
             // todo (high): generic loot-processing function
             $slItems = new ItemList(array(['i.entry', $ids]));
-            $slItems->addGlobalsToJscript($pageData);
+            $slItems->addGlobalsToJscript($smarty);
             $lv += $slItems->getListviewData();
 
             $equal = true;
@@ -803,11 +803,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             {
                 if (($bar = $spell->getField('effect'.$i.'CreateItemId')) && isset($foo[$bar]))
                 {
-                    $reqSpec = new SpellList(array(['s.id', (int)$extraItem['requiredSpecialization']]));
                     $lv[$bar] = $foo[$bar];
                     $lv[$bar]['percent']   = $extraItem['additionalCreateChance'];
-                    $lv[$bar]['condition'] = json_encode(['type' => TYPE_SPELL, 'typeId' => $reqSpec->id, 'status' => 2], JSON_NUMERIC_CHECK);
-                    $reqSpec->addGlobalsToJscript($pageData);
+                    $lv[$bar]['condition'] = json_encode(['type' => TYPE_SPELL, 'typeId' => $extraItem['requiredSpecialization'], 'status' => 2], JSON_NUMERIC_CHECK);
+                    $smarty->extendGlobalIds(TYPE_SPELL, $extraItem['requiredSpecialization']);
 
                     $extraCols[] = 'Listview.extraCols.condition';
                     if ($max = $extraItem['additionalMaxNum'])
@@ -938,9 +937,6 @@ $smarty->updatePageVars(array(
 $smarty->assign('community', CommunityContent::getAll(TYPE_SPELL, $id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$spell, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);
-
-// Mysql query execution statistics
-$smarty->assign('mysql', DB::Aowow()->getStatistics());
 
 // load the page
 $smarty->display('spell.tpl');

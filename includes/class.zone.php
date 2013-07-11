@@ -11,8 +11,10 @@ if (!defined('AOWOW_REVISION'))
 
 class ZoneList extends BaseType
 {
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_zones z WHERE [cond] ORDER BY Id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_zones WHERE [cond]';
+    public static $type       = TYPE_ZONE;
+
+    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_zones z WHERE [cond] ORDER BY Id ASC';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_zones WHERE [cond]';
 
     // public function __construct($data)
     // {
@@ -148,16 +150,12 @@ visibleCols: ['heroiclevel', 'players']
         return $data;
     }
 
-    public function addGlobalsToJscript(&$refs)
+    public function addGlobalsToJscript(&$template, $addMask = 0)
     {
-        if (!isset($refs['gZones']))
-            $refs['gZones'] = [];
-
         while ($this->iterate())
-            $refs['gZones'][$this->id]['name'] = Util::jsEscape($this->getField('name', true));
+            $template->extendGlobalData(self::$type, [$this->id => ['name' => Util::jsEscape($this->getField('name', true))]]);
     }
 
-    public function addRewardsToJScript(&$ref) { }
     public function renderTooltip() { }
 }
 

@@ -5,11 +5,13 @@ if (!defined('AOWOW_REVISION'))
 
 class QuestList extends BaseType
 {
-    public    $cat1       = 0;
-    public    $cat2       = 0;
+    public static $type       = TYPE_QUEST;
 
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt LEFT JOIN locales_quest lq ON qt.Id = lq.entry WHERE [filter] [cond] ORDER BY Id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM quest_template WHERE [filter] [cond]';
+    public        $cat1       = 0;
+    public        $cat2       = 0;
+
+    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt LEFT JOIN locales_quest lq ON qt.Id = lq.entry WHERE [filter] [cond] ORDER BY Id ASC';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM quest_template WHERE [filter] [cond]';
 
     // parent::__construct does the job
 
@@ -128,45 +130,6 @@ class QuestList extends BaseType
         return $data;
     }
 
-    public function addRewardsToJscript(&$refs)
-    {
-        $items  = [];
-        $spells = [];
-        $titles = [];
-
-        while ($this->iterate())
-        {
-            // items
-            for ($i = 1; $i < 5; $i++)
-                if ($this->curTpl['RewardItemId'.$i] > 0)
-                    $items[] = $this->curTpl['RewardItemId'.$i];
-
-            for ($i = 1; $i < 7; $i++)
-                if ($this->curTpl['RewardChoiceItemId'.$i] > 0)
-                    $items[] = $this->curTpl['RewardChoiceItemId'.$i];
-
-            // spells
-            if ($this->curTpl['RewardSpell'] > 0)
-                $spells[] = $this->curTpl['RewardSpell'];
-
-            if ($this->curTpl['RewardSpellCast'] > 0)
-                $spells[] = $this->curTpl['RewardSpellCast'];
-
-            // titles
-            if ($this->curTpl['RewardTitleId'] > 0)
-                $titles[] = $this->curTpl['RewardTitleId'];
-        }
-
-        if ($items)
-            (new ItemList(array(['i.entry', $items])))->addGlobalsToJscript($refs);
-
-        if ($spells)
-            (new SpellList(array(['s.id', $spells])))->addGlobalsToJscript($refs);
-
-        if ($titles)
-            (new TitleList(array(['id', $titles])))->addGlobalsToJscript($refs);
-    }
-
     private function parseText($type = 'Objectives')
     {
         $replace = array(
@@ -263,16 +226,35 @@ class QuestList extends BaseType
         return $x;
     }
 
-    public function addGlobalsToJScript(&$refs)
+    public function addGlobalsToJScript(&$template, $addMask = GLOBALINFO_ANY)
     {
-        if (!isset($refs['gQuests']))
-            $refs['gQuests'] = [];
-
         while ($this->iterate())
         {
-            $refs['gQuests'][$this->id] = array(
-                'name' => $this->getField('Title', true)
-            );
+            if ($addMask & GLOBALINFO_REWARDS)
+            {
+                // items
+                for ($i = 1; $i < 5; $i++)
+                    if ($this->curTpl['RewardItemId'.$i] > 0)
+                        $template->extendGlobalIds(TYPE_ITEM, $this->curTpl['RewardItemId'.$i]);
+
+                for ($i = 1; $i < 7; $i++)
+                    if ($this->curTpl['RewardChoiceItemId'.$i] > 0)
+                        $template->extendGlobalIds(TYPE_ITEM, $this->curTpl['RewardChoiceItemId'.$i]);
+
+                // spells
+                if ($this->curTpl['RewardSpell'] > 0)
+                    $template->extendGlobalIds(TYPE_SPELL, $this->curTpl['RewardSpell']);
+
+                if ($this->curTpl['RewardSpellCast'] > 0)
+                    $template->extendGlobalIds(TYPE_SPELL, $this->curTpl['RewardSpellCast']);
+
+                // titles
+                if ($this->curTpl['RewardTitleId'] > 0)
+                    $template->extendGlobalIds(TYPE_TITLE, $this->curTpl['RewardTitleId']);
+            }
+
+            if ($addMask & GLOBALINFO_SELF)
+                $template->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('Title', true)]]);
         }
     }
 }
