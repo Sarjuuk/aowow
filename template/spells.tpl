@@ -1,8 +1,8 @@
 {include file='header.tpl'}
 
-    <div id="main">
-        <div id="main-precontents"></div>
-        <div id="main-contents" class="main-contents">
+    <div class="main" id="main">
+        <div class="main-precontents" id="main-precontents"></div>
+        <div class="main-contents" id="main-contents">
 
 {if !empty($announcements)}
     {foreach from=$announcements item=item}
@@ -12,14 +12,16 @@
 
             <script type="text/javascript">
                 g_initPath({$page.path}, {if empty($filter.query)} 0 {else} 1 {/if});
-                {if isset($filter.query)}Menu.append(mn_database[1], '&filter={$filter.query|escape:'quotes'}'); // todo: menu order varies per locale{/if}
+{if isset($filter.query)}
+                Menu.modifyUrl(Menu.findItem(mn_database, [1]), {ldelim} filter: '+={$filter.query|escape:'quotes'}' {rdelim}, {ldelim} onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [1])) {rdelim});
+{/if}
             </script>
 
             <div id="fi" style="display:{if empty($filter.query)}none{else}block{/if};">
                 <form action="?spells{$page.subCat}&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="rightpanel">
                         <div style="float: left">{$lang.school}:</div>
-                        <small><a href="javascript:;" onclick="document.forms['fi'].elements['sc[]'].selectedIndex = -1; return false" onmousedown="return false">clear</a></small>
+                        <small><a href="javascript:;" onclick="document.forms['fi'].elements['sc[]'].selectedIndex = -1; return false" onmousedown="return false">{$lang.clear}</a></small>
                         <div class="clear"></div>
                         <select name="sc[]" size="7" multiple="multiple" class="rightselect" style="width: 8em">
 {foreach from=$lang.sc key=i item=str}{if $str}
@@ -30,11 +32,11 @@
 {if $filter.classPanel}
                     <div class="rightpanel2">
                         <div style="float: left">{$lang.class|ucfirst}: </div>
-                        <small><a href="javascript:;" onclick="document.forms['fi'].elements['cl[]'].selectedIndex = -1; return false" onmousedown="return false">clear</a></small>
+                        <small><a href="javascript:;" onclick="document.forms['fi'].elements['cl[]'].selectedIndex = -1; return false" onmousedown="return false">{$lang.clear}</a></small>
                         <div class="clear"></div>
-                        <select name="cl[]" size="8" multiple="multiple" class="rightselect" style="width: 8em">
+                        <select name="cl[]" size="8" multiple="multiple" class="rightselect" style="width: 8em; background-color: #181818">
 {foreach from=$lang.cl key=i item=str}{if $str}
-                            <option value="{$i}"{if isset($filter.cl) && ($filter.cl == $i || @in_array($i, $filter.cl))} selected{/if}>{$str}</option>
+                            <option value="{$i}"{if isset($filter.cl) && ($filter.cl == $i || @in_array($i, $filter.cl))} selected{/if} class="c{$i}">{$str}</option>
 {/if}{/foreach}
                         </select>
                     </div>
@@ -42,7 +44,7 @@
 {if $filter.glyphPanel}
                     <div class="rightpanel2">
                         <div style="float: left">{$lang.glyphType|ucfirst}: </div>
-                        <small><a href="javascript:;" onclick="document.forms['fi'].elements['gl[]'].selectedIndex = -1; return false" onmousedown="return false">clear</a></small>
+                        <small><a href="javascript:;" onclick="document.forms['fi'].elements['gl[]'].selectedIndex = -1; return false" onmousedown="return false">{$lang.clear}</a></small>
                         <div class="clear"></div>
                         <select name="gl[]" size="2" multiple="multiple" class="rightselect" style="width: 8em">
 {foreach from=$lang.gl key=i item=str}{if $str}
@@ -112,7 +114,7 @@
                     <div class="clear"></div>
 
                     <div class="padded">
-                        <input type="submit" value="Apply filter" />
+                        <input type="submit" value="{$lang.applyFilter}" />
                         <input type="reset" value="{$lang.resetForm}" />
                         <div style="float: right">{$lang.refineSearch}</div>
                     </div>
@@ -127,9 +129,9 @@
             //]]></script>
 
             <div id="listview-generic" class="listview"></div>
-            <script type="text/javascript">
+            <script type="text/javascript">//<![CDATA[
                 {include file='bricks/listviews/spell.tpl' data=$lvData.data params=$lvData.params}
-            </script>
+            //]]></script>
 
             <div class="clear"></div>
         </div><!-- main-contents -->

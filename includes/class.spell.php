@@ -50,10 +50,8 @@ class SpellList extends BaseType
         {
             // required for globals
             for ($i = 1; $i <= 3; $i++)
-            {
                 if ($this->canCreateItem())
                     $foo[] = (int)$this->curTpl['effect'.$i.'CreateItemId'];
-            }
 
             for ($i = 1; $i <= 8; $i++)
                 if ($this->curTpl['reagent'.$i] > 0)
@@ -775,8 +773,11 @@ class SpellList extends BaseType
                 $equal = $min == $max;
 
                 if (in_array($op, $signs) && is_numeric($oparg))
-                    if ($equal)
-                        eval("\$min = $min $op $oparg;");
+                {
+                    eval("\$min = $min $op $oparg;");
+                    if (!$equal)
+                        eval("\$max = $max $op $oparg;");
+                }
 
                 // Aura giving combat ratings
                 $rType = 0;
