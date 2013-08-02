@@ -50,13 +50,13 @@ class User
     {
         self::$id = $userId;
 
-        $ipBan = DB::Auth()->SelectRow('SELECT count, unbanDate AS unbanDateIP FROM ?_account_bannedIPs WHERE ip = ?s AND type = 0',
+        $ipBan = DB::Aowow()->SelectRow('SELECT count, unbanDate AS unbanDateIP FROM ?_account_bannedIPs WHERE ip = ?s AND type = 0',
             $_SERVER['REMOTE_ADDR']
         );
         // explicit " > "; incremented first, checked after
         self::$bannedIP = $ipBan && $ipBan['count'] > $GLOBALS['AoWoWconf']['loginFailCount'] && $ipBan['unbanDateIP'] > time();
 
-        $query = !$userId ? null : DB::Auth()->SelectRow('
+        $query = !$userId ? null : DB::Aowow()->SelectRow('
                 SELECT
                     a.id, a.authId, a.user, a.passHash, a.displayName, a.email, a.lastIP, a.lastLogin, a.joindate, a.locale, a.avatar, a.description, a.userGroups, a.userPerms, a.timeout,
                     ab.bannedBy, ab.banReason, ab.isActive, ab.unbanDate
@@ -109,7 +109,7 @@ class User
             $loc = isset(Util::$localeStrings[$set]) ? $set : 0;
             if (self::$id)
             {
-                DB::Auth()->query('UPDATE ?_account SET locale = ? WHERE id = ?',
+                DB::Aowow()->query('UPDATE ?_account SET locale = ? WHERE id = ?',
                     $loc,
                     self::$id
                 );
@@ -175,7 +175,7 @@ class User
                 // return AUTH_TIMEDOUT;
 
             if (self::$timeout > 0)
-                DB::Auth()->query('UPDATE ?_account SET timeout = ?d WHERE id = ?d',
+                DB::Aowow()->query('UPDATE ?_account SET timeout = ?d WHERE id = ?d',
                     time() + $GLOBALS['AoWoWconf']['sessionTimeout'],
                     self::$id
                 );
@@ -247,7 +247,7 @@ class User
     {
         self::$passHash = self::hashCrypt($pass);
 
-        DB::Auth()->query('UPDATE ?_account SET passHash = ?s WHERE id = ?d',
+        DB::Aowow()->query('UPDATE ?_account SET passHash = ?s WHERE id = ?d',
             self::$passHash,
             self::$id
         );

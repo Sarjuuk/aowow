@@ -62,8 +62,9 @@ switch ($pageCall)
         else
             $smarty->error();
         break;
-    case 'talent':                                          // tool: talent calculator
     case 'petcalc':                                         // tool: pet talent calculator
+        $petCalc = true;
+    case 'talent':                                          // tool: talent calculator
         require 'pages/talent.php';
         break;
     /* called by script */

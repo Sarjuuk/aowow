@@ -387,6 +387,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
+
 // menuId 9: Achievement  g_initPath()
 //  tabId 0: Database     g_initHeader()
 $smarty->updatePageVars(array(
@@ -396,7 +397,6 @@ $smarty->updatePageVars(array(
     'type'   => TYPE_ACHIEVEMENT,
     'typeId' => $id
 ));
-
 $smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
 $smarty->assign('lvData', $pageData);

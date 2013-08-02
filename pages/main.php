@@ -19,6 +19,8 @@ foreach ($rows as $i => $row)
 
 $smarty->assign('news', isset($rows) ? $rows : NULL);
 $smarty->assign('lang', Lang::$main);
+
+// load the page
 $smarty->display('main.tpl');
 
 ?>

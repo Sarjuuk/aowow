@@ -43,7 +43,7 @@
 
                 <script type="text/javascript">//<![CDATA[
 {section name=i loop=$lvData.pieces}
-                    ge('iconlist-icon{$smarty.section.i.index + 1}').appendChild(g_items.createIcon({$lvData.pieces[i].id}, 0, 0));
+                    $WH.ge('iconlist-icon{$smarty.section.i.index + 1}').appendChild(g_items.createIcon({$lvData.pieces[i].id}, 0, 0));
 {/section}
                 //]]></script>
 
@@ -73,7 +73,7 @@
             <div id="tabs-generic"></div>
             <div id="listview-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
-                var tabsRelated = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
+                var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
 {if !empty($lvData.related)}            {include file='bricks/listviews/itemset.tpl' data=$lvData.related.data   params=$lvData.related.params} {/if}
                 new Listview({ldelim}template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: tabsRelated, parent: 'listview-generic', data: lv_comments{rdelim});
                 new Listview({ldelim}template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: tabsRelated, parent: 'listview-generic', data: lv_screenshots{rdelim});

@@ -12,7 +12,9 @@
 
             <script type="text/javascript">
                 g_initPath({$page.path}, {if empty($filter.query)} 0 {else} 1 {/if});
-                {if isset($filter.query)}Menu.append(mn_database[1], '&filter={$filter.query|escape:'quotes'}'); // todo: menu order varies per locale{/if}
+{if isset($filter.query)}
+                Menu.modifyUrl(Menu.findItem(mn_database, [9]), {ldelim} filter: '+={$filter.query|escape:'quotes'}' {rdelim}, {ldelim} onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [9])) {rdelim});
+{/if}
             </script>
 
             <div id="fi" style="display:{if empty($filter.query)}none{else}block{/if};">

@@ -53,23 +53,26 @@ if ($compareString)
 }
 
 
+// tabId 1: Tools g_initHeader()
 $smarty->updatePageVars(array(
     'title'  => Lang::$compare['compare'],
     'tab'    => 1,
     'reqCSS' => array(
-        array('path' => 'template/css/Summary.css', 'condition' => false),
-        array('path' => 'template/css/Summary_ie6.css', 'condition' => 'lte IE 6'),
+        ['path' => 'template/css/Summary.css'],
+        ['path' => 'template/css/Summary_ie6.css', 'ieCond' => 'lte IE 6'],
     ),
     'reqJS'  => array(
-        array('path' => 'template/js/Draggable.js'),
-        array('path' => 'template/js/filters.js'),
-        array('path' => 'template/js/Summary.js'),
-        array('path' => 'template/js/swfobject.js'),
-        array('path' => '?data=weight-presets.gems.enchants.itemsets'),
+        'template/js/Draggable.js',
+        'template/js/filters.js',
+        'template/js/Summary.js',
+        'template/js/swfobject.js',
+        '?data=weight-presets.gems.enchants.itemsets'
     ),
 ));
 $smarty->assign('lvData', $pageData);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$compare));
+
+// load the page
 $smarty->display('compare.tpl');
 
 ?>

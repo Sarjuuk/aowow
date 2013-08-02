@@ -232,7 +232,7 @@ var Markup = {
 			if (G.charAt(E) == "<" && G.charAt(E + 1) == "t") {
 				if (D.length) {
 					if (K == "ol" || K == "ul") {
-						if (trim(D).length) {
+						if ($WH.trim(D).length) {
 							I.push(["<text>", D])
 						}
 					} else {
@@ -298,7 +298,7 @@ var Markup = {
 		}
 		if (D.length) {
 			if (K == "ol" || K == "ul") {
-				if (trim(D).length) {
+				if ($WH.trim(D).length) {
 					I.push(["<text>", D])
 				}
 			} else {
@@ -378,7 +378,7 @@ var Markup = {
 			case "quote":
 				G += '<div class="quote">';
 				if (B[D][2]) {
-					var H = trim(B[D][2]);
+					var H = $WH.trim(B[D][2]);
 					if (H.length > 0) {
 						G += "<small><b>";
 						if (H.match(/[^a-z0-9]/i) == null && H.length >= 4 && H.length <= 16) {
@@ -416,7 +416,7 @@ var Markup = {
 			case "toggler":
 				var F = B[D][2];
 				if (F.id != null) {
-					G += '<a href="javascript:;" class="disclosure-' + (F.hidden ? "on": "off") + '" onmousedown="return false" onclick="this.className = \'disclosure-\' + (g_toggleDisplay(ge(\'ov4io23-' + F.id + "')) ? 'on' : 'off')\">" + Markup._htmlmize(B[D][1]) + "</a>"
+					G += '<a href="javascript:;" class="disclosure-' + (F.hidden ? "on": "off") + '" onmousedown="return false" onclick="this.className = \'disclosure-\' + (g_toggleDisplay($WH.ge(\'ov4io23-' + F.id + "')) ? 'on' : 'off')\">" + Markup._htmlmize(B[D][1]) + "</a>"
 				}
 				break;
 			case "div":
@@ -689,7 +689,7 @@ var Markup = {
 		} catch(A) {}
 	},
 	printHtml: function (c, d, b) {
-		d = ge(d);
+		d = $WH.ge(d);
 		var a = Markup.toHtml(c, b);
 		d.innerHTML = a;
 	}

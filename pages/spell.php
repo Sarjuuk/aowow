@@ -921,6 +921,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
+
 // menuId 1: Spell    g_initPath()
 //  tabId 0: Database g_initHeader()
 $smarty->updatePageVars(array(
@@ -929,11 +930,10 @@ $smarty->updatePageVars(array(
     'tab'    => 0,
     'type'   => TYPE_SPELL,
     'typeId' => $id,
-    'reqJS'  => array (
-            array('path' => 'template/js/swfobject.js')
+    'reqJS'  => array(
+        'template/js/swfobject.js'
     )
 ));
-
 $smarty->assign('community', CommunityContent::getAll(TYPE_SPELL, $id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$spell, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);

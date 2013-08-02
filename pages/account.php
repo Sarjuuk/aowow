@@ -39,27 +39,27 @@ function signin()
     $remember = $_POST['remember_me'] == 'yes';
 
     // handle login try limitation
-    $ipBan = DB::Auth()->selectRow('SELECT ip, count, UNIX_TIMESTAMP(unbanDate) as unbanDate FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?s',
+    $ipBan = DB::Aowow()->selectRow('SELECT ip, count, UNIX_TIMESTAMP(unbanDate) as unbanDate FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?s',
         $_SERVER['REMOTE_ADDR']
     );
 
     if (!$ipBan)                                        // no entry exists; set count to 1
-        DB::Auth()->query('INSERT INTO ?_account_bannedIPs VALUES (?s, 0, 1, FROM_UNIXTIME(?))',
+        DB::Aowow()->query('INSERT INTO ?_account_bannedIPs VALUES (?s, 0, 1, FROM_UNIXTIME(?))',
             $_SERVER['REMOTE_ADDR'],
             time() + $GLOBALS['AoWoWconf']['loginFailTime']
         );
     else if ($ipBan['unbanDate'] < time())              // ip has accumulated counts but time expired; reset count to 1
-        DB::Auth()->query('INSERT IGNORE INTO ?_account_bannedIPs VALUES (?s, 0, 1, ?)',
+        DB::Aowow()->query('INSERT IGNORE INTO ?_account_bannedIPs VALUES (?s, 0, 1, ?)',
             $_SERVER['REMOTE_ADDR'],
             time() + $GLOBALS['AoWoWconf']['loginFailTime']
         );
     else                                                // entry already exists; increment count
-        DB::Auth()->query('UPDATE ?_account_bannedIPs SET count = count + 1, unbanDate = FROM_UNIXTIME(?) WHERE ip = ?s',
+        DB::Aowow()->query('UPDATE ?_account_bannedIPs SET count = count + 1, unbanDate = FROM_UNIXTIME(?) WHERE ip = ?s',
             time() + $GLOBALS['AoWoWconf']['loginFailTime'],
             $_SERVER['REMOTE_ADDR']
         );
 
-    $id = DB::Auth()->SelectCell('SELECT id FROM ?_account WHERE user = ?',
+    $id = DB::Aowow()->SelectCell('SELECT id FROM ?_account WHERE user = ?',
         Util::sqlEscape($username)
     );
 
@@ -71,10 +71,10 @@ function signin()
     switch (User::Auth($password))
     {
         case AUTH_OK:
-            DB::Auth()->query('DELETE FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?s',
+            DB::Aowow()->query('DELETE FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?s',
                 $_SERVER['REMOTE_ADDR']
             );
-            DB::Auth()->query('UPDATE ?_account SET lastLogin = FROM_UNIXTIME(?), timeout = FROM_UNIXTIME(?) WHERE id = ?',
+            DB::Aowow()->query('UPDATE ?_account SET lastLogin = FROM_UNIXTIME(?), timeout = FROM_UNIXTIME(?) WHERE id = ?',
                 time(),
                 $remember ?  0 : time() + $GLOBALS['AoWoWconf']['sessionTimeout'],
                 $id
@@ -247,16 +247,15 @@ function recoverUser()
 {
 }
 
-$page = array(
+$smarty->updatePageVars(array(
     'reqCSS' => array(
-        array('path' => 'template/css/Profiler.css', 'condition' => false),
+        ['path' => 'template/css/Profiler.css'],
     ),
-    'reqJS' => array(
-        array('path' => 'template/js/user.js'),
-        array('path' => 'template/js/profile.js'),
+    'reqJS'  => array(
+        'template/js/user.js',
+        'template/js/profile.js',
     ),
-);
-$smarty->updatePageVars($page);
+));
 
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$account));
 

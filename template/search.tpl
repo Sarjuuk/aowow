@@ -16,7 +16,7 @@
             <div id="tabs-generic"></div>
             <div id="listview-generic" class="listview"></div>
             <script type="text/javascript">
-                var myTabs = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
+                var myTabs = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
 {foreach from=$found item="f"}
     {include file="bricks/listviews/`$f.file`.tpl" data=$f.data params=$f.params}
 {/foreach}

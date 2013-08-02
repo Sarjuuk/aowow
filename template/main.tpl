@@ -18,16 +18,16 @@
     <div id="home">
         <span id="menu_buttons-generic" class="menu-buttons"></span>
         <script type="text/javascript">
-            Menu.addButtons(ge('menu_buttons-generic'), mn_path);
+            Menu.addButtons($WH.ge('menu_buttons-generic'), mn_path);
         </script>
 
         <div class="pad"></div>
 
-        <form method="get" action="." onsubmit="if(trim(this.elements[0].value) == '') return false">
+        <form method="get" action="." onsubmit="if($WH.trim(this.elements[0].value) == '') return false">
             <input type="text" name="search" size="38" id="livesearch-generic" /><input type="submit" value="{$lang.searchButton}" />
         </form>
 
-        <script type="text/javascript">var _ = ge('livesearch-generic'); LiveSearch.attach(_); _.focus();</script>
+        <script type="text/javascript">var _ = $WH.ge('livesearch-generic'); LiveSearch.attach(_); _.focus();</script>
 
 {if isset($news)}
         <div class="news">

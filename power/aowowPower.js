@@ -63,12 +63,12 @@ if (typeof $WowheadPower == "undefined") {
                 achievementcomplete: "Achievement earned by $1 on $2/$3/$4"
             },
             LOOKUPS = {
-                1 : [npcs, "npc", "NPC"],
-                2 : [objects, "object", "Object"],
-                3 : [items, "item", "Item"],
-                5 : [quests, "quest", "Quest"],
-                6 : [spells, "spell", "Spell"],
-                10 : [achievements, "achievement", "Achievement"],
+                  1 : [npcs, "npc", "NPC"],
+                  2 : [objects, "object", "Object"],
+                  3 : [items, "item", "Item"],
+                  5 : [quests, "quest", "Quest"],
+                  6 : [spells, "spell", "Spell"],
+                 10 : [achievements, "achievement", "Achievement"],
                 100 : [profiles, "profile", "Profile"]
             },
             LOCALES = {
@@ -76,8 +76,7 @@ if (typeof $WowheadPower == "undefined") {
                 2 : "frfr",
                 3 : "dede",
                 6 : "eses",
-                8 : "ruru",
-                25 : "ptr"
+                8 : "ruru"
             },
             REDIRECTS = {
                 wotlk: "www",
@@ -455,7 +454,7 @@ if (typeof $WowheadPower == "undefined") {
 
 					// custom start
 					if ($WH.gc('compare_level') && window.location.href.match(/\?compare/i)) {
-						html = $WH.g_setTooltipItemLevel(html, gc('compare_level'));
+						html = $WH.g_setTooltipItemLevel(html, $WH.gc('compare_level'));
 					}
 					// custom end
 

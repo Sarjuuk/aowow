@@ -25,7 +25,7 @@
                 <div id="h1-icon-generic" class="h1-icon"></div>
 
                 <script type="text/javascript">//<![CDATA[
-                    ge('h1-icon-generic').appendChild(Icon.create('{$lvData.page.icon}', 1));
+                    $WH.ge('h1-icon-generic').appendChild(Icon.create('{$lvData.page.icon}', 1));
                 //]]></script>
 
                 <h1 class="h1-icon">{if isset($lvData.page.expansion)}<span class="{$lvData.page.expansion}-icon-right">{$lvData.page.name}</span>{else}{$lvData.page.name}{/if}</h1>
@@ -38,7 +38,7 @@
             <div id="tabs-generic"></div>
             <div id="listview-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
-                var tabsRelated = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
+                var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
 {if isset($lvData.gallery)}   {include file='bricks/listviews/model.tpl'    data=$lvData.gallery.data   params=$lvData.gallery.params  } {/if}
 {if isset($lvData.tameable)}  {include file='bricks/listviews/creature.tpl' data=$lvData.tameable.data  params=$lvData.tameable.params } {/if}
 {if isset($lvData.abilities)} {include file='bricks/listviews/spell.tpl'    data=$lvData.abilities.data params=$lvData.abilities.params} {/if}

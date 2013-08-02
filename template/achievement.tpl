@@ -64,7 +64,7 @@
                 <div id="h1-icon-generic" class="h1-icon"></div>
 
                 <script type="text/javascript">//<![CDATA[
-                    ge('h1-icon-generic').appendChild(Icon.create('{$lvData.page.iconname|escape:"javascript"}', 1));
+                    $WH.ge('h1-icon-generic').appendChild(Icon.create('{$lvData.page.iconname|escape:"javascript"}', 1));
                 //]]></script>
 
                 <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: 10, typeId: {$lvData.page.id}, linkColor: 'ffffff00', linkId: '{$lvData.page.id}:&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0', linkName: '{$lvData.page.name|escape:'javascript'}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
@@ -108,7 +108,7 @@
 
                 <script type="text/javascript">//<![CDATA[
 {foreach from=$lvData.page.icons item=ic}
-                    ge('iconlist-icon{$ic.itr}').appendChild({$ic.type}.createIcon({$ic.id}, 0, {if isset($ic.count) && $ic.count > 0}{$ic.count}{else}0{/if}));
+                    $WH.ge('iconlist-icon{$ic.itr}').appendChild({$ic.type}.createIcon({$ic.id}, 0, {if isset($ic.count) && $ic.count > 0}{$ic.count}{else}0{/if}));
 {/foreach}
                 //]]></script>
 
@@ -124,7 +124,7 @@
 {/foreach}
                     <script type="text/javascript">//<![CDATA[
 {foreach from=$lvData.page.itemReward item=i name=item key=id}
-                        ge('icontab-icon{$smarty.foreach.item.index}').appendChild(g_items.createIcon({$id}, 1, 1));
+                        $WH.ge('icontab-icon{$smarty.foreach.item.index}').appendChild(g_items.createIcon({$id}, 1, 1));
 {/foreach}
                     //]]></script>
                     </tr>
@@ -148,7 +148,7 @@
             <div id="tabs-generic"></div>
             <div id="listview-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
-                var tabsRelated = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
+                var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
 {if $lvData.page.saData}          {include   file='bricks/listviews/achievement.tpl' data=$lvData.page.saData  params=$lvData.page.saParams}{/if}
 {if isset($lvData.page.coData)}   {include   file='bricks/listviews/achievement.tpl' data=$lvData.page.coData  params=$lvData.page.coParams}{/if}
                 new Listview({ldelim}template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: tabsRelated, parent: 'listview-generic', data: lv_comments{rdelim});

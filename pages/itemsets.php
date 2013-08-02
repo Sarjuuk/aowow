@@ -44,25 +44,27 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 }
 
 
-$page = array(
-    'tab'    => 0,                                          // for g_initHeader($tab)
-    'subCat' => $pageParam ? '='.$pageParam : '',
-    'title'  => Util::ucFirst(Lang::$game['itemsets']),
-    'path'   => json_encode($path, JSON_NUMERIC_CHECK),
-    'reqJS'  => array(
-        array('path' => 'template/js/filters.js', 'conditional' => false),
-        array('path' => '?data=weight-presets',   'conditional' => false),
-   )
-);
-
 // sort for dropdown-menus
 asort(Lang::$itemset['notes'], SORT_NATURAL);
 asort(Lang::$game['cl']);
 
-$smarty->updatePageVars($page);
+// menuId 2: Itemset  g_initPath()
+//  tabId 0: Database g_initHeader()
+$smarty->updatePageVars(array(
+    'title'  => Util::ucFirst(Lang::$game['itemsets']),
+    'path'   => json_encode($path, JSON_NUMERIC_CHECK),
+    'tab'    => 0,
+    'subCat' => $pageParam ? '='.$pageParam : '',
+    'reqJS'  => array(
+        'template/js/filters.js',
+        '?data=weight-presets'
+    )
+));
 $smarty->assign('filter', $filter);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$itemset, Lang::$item));
 $smarty->assign('lvData', $pageData);
+
+// load the page
 $smarty->display('itemsets.tpl');
 
 ?>

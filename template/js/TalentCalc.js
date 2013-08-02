@@ -107,7 +107,7 @@ function TalentCalc() {
             }
         }
 
-        blizz = rtrim(blizz, '0');
+        blizz = $WH.rtrim(blizz, '0');
 
         return blizz;
     };
@@ -244,7 +244,7 @@ function TalentCalc() {
                 blizz += c[tree].t[i].k;
             }
 
-            blizz = rtrim(blizz, '0');
+            blizz = $WH.rtrim(blizz, '0');
 
             wh += _convertBlizzToWh(blizz);
 
@@ -267,7 +267,7 @@ function TalentCalc() {
             res = _encoding.charAt(_getOldIdFromClassId(_currentClass) * 3);
         }
 
-        res += rtrim(wh, _newTree);
+        res += $WH.rtrim(wh, _newTree);
 
         return res;
     };
@@ -306,7 +306,7 @@ function TalentCalc() {
             }
         }
 
-        res = rtrim(res, _newTree);
+        res = $WH.rtrim(res, _newTree);
 
         return res;
     };
@@ -316,7 +316,7 @@ function TalentCalc() {
             return;
         }
 
-        container = $(container);
+        container = $WH.ge(container);
         if (!container) {
             return;
         }
@@ -368,9 +368,9 @@ function TalentCalc() {
         }
 
         _pointsToSpend = _basePoints + _bonusPoints;
-        _divWrapper = ce('div');
+        _divWrapper = $WH.ce('div');
         _divWrapper.className = 'talentcalc-wrapper';
-        ae(_container, _divWrapper);
+        $WH.ae(_container, _divWrapper);
 
         _createSidebar();
         _createUpper();
@@ -594,10 +594,10 @@ function TalentCalc() {
             buffer += '<h2>';
 
             if (_mode == MODE_PET) {
-                buffer += sprintf(LANG.tc_printh, _getRequiredLevel(), g_pet_families[c.n]);
+                buffer += $WH.sprintf(LANG.tc_printh, _getRequiredLevel(), g_pet_families[c.n]);
             }
             else {
-                buffer += sprintf(LANG.tc_printh, _getRequiredLevel(), g_chr_classes[c.n]) + ' (' + c[0].k + '/' + c[1].k + '/' + c[2].k + ')';
+                buffer += $WH.sprintf(LANG.tc_printh, _getRequiredLevel(), g_chr_classes[c.n]) + ' (' + c[0].k + '/' + c[1].k + '/' + c[2].k + ')';
             }
 
             buffer += '</h2>';
@@ -614,7 +614,7 @@ function TalentCalc() {
                             buffer += '<br /><br />';
                         }
 
-                        buffer += '<b>' + c[i].t[j].n + '</b>' + LANG.hyphen + sprintf(LANG.tc_rank, c[i].t[j].k, c[i].t[j].m) + '<br />';
+                        buffer += '<b>' + c[i].t[j].n + '</b>' + LANG.hyphen + $WH.sprintf(LANG.tc_rank, c[i].t[j].k, c[i].t[j].m) + '<br />';
                         buffer += _getTalentDescription(c[i].t[j]);
                         ++k;
                     }
@@ -764,7 +764,7 @@ function TalentCalc() {
 
     function _createArrow(arrowType, width, height) {
         var
-            d = ce('div'),
+            d = $WH.ce('div'),
             t,
             _;
 
@@ -844,7 +844,7 @@ function TalentCalc() {
         d.style.width = width + 'px';
         d.style.height = height + 'px';
 
-        ae(d, t);
+        $WH.ae(d, t);
         return d;
     }
 
@@ -854,39 +854,39 @@ function TalentCalc() {
             __,
             ___;
 
-        _divLower = ce('div');
+        _divLower = $WH.ce('div');
         _divLower.className = 'talentcalc-lower';
         _divLower.style.display = 'none';
 
         for (var tree = 0; tree < _nTrees; ++tree) {
-            _ = _lblTreePoints[tree] = ce('div');
+            _ = _lblTreePoints[tree] = $WH.ce('div');
             _.className = 'talentcalc-lower-tree' + (tree + 1);
 
-            __ = ce('p');
+            __ = $WH.ce('p');
             __.className = 'rcorners';
-            ae(__, ce('b'));
-            ae(__, ce('span'));
-            ___ = ce('a');
+            $WH.ae(__, $WH.ce('b'));
+            $WH.ae(__, $WH.ce('span'));
+            ___ = $WH.ce('a');
             ___.href = 'javascript:;';
             ___.onclick = _self.reset.bind(null, tree);
             g_addTooltip(___, LANG.tc_resettree);
-            ae(__, ___);
-            ae(_, __);
-            ae(_divLower, _);
+            $WH.ae(__, ___);
+            $WH.ae(_, __);
+            $WH.ae(_divLower, _);
         }
 
-        ae(_divWrapper, _divLower);
+        $WH.ae(_divWrapper, _divLower);
     }
 
     function _createMain() {
-        _divMain = ce("div");
+        _divMain = $WH.ce("div");
         _divMain.className = "talentcalc-main";
 
-        var clear = ce("div");
+        var clear = $WH.ce("div");
         clear.className = "clear";
-        ae(_divMain, clear);
+        $WH.ae(_divMain, clear);
 
-        ae(_divWrapper, _divMain);
+        $WH.ae(_divWrapper, _divMain);
     }
 
     function _createModel() {
@@ -894,20 +894,20 @@ function TalentCalc() {
             return;
         }
 
-        _divModel = ce('div');
+        _divModel = $WH.ce('div');
         _divModel.className = 'talentcalc-model';
 
         _divModel.style.display = "none";
 
-        _swfModel = ce('div');
+        _swfModel = $WH.ce('div');
         _swfModel.id = 'shg09yrhlnk';
-        ae(_divModel, _swfModel);
+        $WH.ae(_divModel, _swfModel);
 
-        var clear = ce('div');
+        var clear = $WH.ce('div');
         clear.className = 'clear';
-        ae(_divModel, clear);
+        $WH.ae(_divModel, clear);
 
-        ae(_divWrapper, _divModel);
+        $WH.ae(_divWrapper, _divModel);
     }
 
     function _createPetTalents(classId) {
@@ -919,7 +919,7 @@ function TalentCalc() {
         for (var i = 0, len = g_pet_talents.length; i < len; ++i) {
             var talents = g_pet_talents[i];
 
-            if (in_array(talents.f, classId) >= 0) {
+            if ($WH.in_array(talents.f, classId) >= 0) {
                 data[0].n    = talents.n;
                 data[0].t    = [];
                 data[0].i    = i;
@@ -929,9 +929,9 @@ function TalentCalc() {
                     talent = talents.t[j];
 
                     _ = data[0].t[j] = {};
-                    cO(_, talent);
+                    $WH.cO(_, talent);
 
-                    if (talent.f && in_array(talent.f, classId) == -1)
+                    if (talent.f && $WH.in_array(talent.f, classId) == -1)
                         _.hidden = true;
                 }
                 break;
@@ -947,119 +947,119 @@ function TalentCalc() {
             __,
             ___;
 
-        _divSidebar = ce('div');
+        _divSidebar = $WH.ce('div');
         _divSidebar.className = 'talentcalc-sidebar rcorners';
 
-        sidebarDivInner = ce('div');
+        sidebarDivInner = $WH.ce('div');
         sidebarDivInner.className = 'talentcalc-sidebar-inner';
 
-        _ = ce('a');
+        _ = $WH.ce('a');
         _.className = 'talentcalc-button-help';
         _.href = (_mode == MODE_PET ? 'http://petopia.brashendeavors.net/html/patch30/patch30faq_talents.php' : '?help=talent-calculator');
         _.target = '_blank';
-        ae(_, ct(LANG.tc_help));
-        ae(sidebarDivInner, _);
+        $WH.ae(_, $WH.ct(LANG.tc_help));
+        $WH.ae(sidebarDivInner, _);
 
-        _controlsDiv = ce('div');
+        _controlsDiv = $WH.ce('div');
         _controlsDiv.className = 'talentcalc-sidebar-controls';
         _controlsDiv.style.display = 'none';
 
-        _ = ce('a');
+        _ = $WH.ce('a');
         _.className = 'talentcalc-button-reset';
         _.href = 'javascript:;';
         _.onclick = _self.resetAll;
-        ae(_, ct(LANG.tc_resetall));
-        ae(_controlsDiv, _);
+        $WH.ae(_, $WH.ct(LANG.tc_resetall));
+        $WH.ae(_controlsDiv, _);
 
-        _ = _lnkLock = ce('a');
+        _ = _lnkLock = $WH.ce('a');
         _.className = 'talentcalc-button-lock';
         _.href = 'javascript:;';
         _.onclick = _toggleLock;
-        ae(_, ct(LANG.tc_lock));
-        ae(_controlsDiv, _);
+        $WH.ae(_, $WH.ct(LANG.tc_lock));
+        $WH.ae(_controlsDiv, _);
 
-        _ = ce('div');
+        _ = $WH.ce('div');
         _.className = 'clear';
-        ae(_controlsDiv, _);
+        $WH.ae(_controlsDiv, _);
 
-        ae(sidebarDivInner, _controlsDiv);
+        $WH.ae(sidebarDivInner, _controlsDiv);
 
-        _ = ce('div');
+        _ = $WH.ce('div');
         _.className = 'talentcalc-sidebar-controls2';
 
-        __ = ce('a');
+        __ = $WH.ce('a');
         __.className = 'talentcalc-button-import';
         __.href = 'javascript:;';
         __.onclick = (_opt.profiler ? _self.promptWhBuild : _self.promptBlizzBuild);
-        ae(__, ct(LANG.tc_import));
-        ae(_, __);
+        $WH.ae(__, $WH.ct(LANG.tc_import));
+        $WH.ae(_, __);
 
-        __ = _lnkSummary = ce('a');
+        __ = _lnkSummary = $WH.ce('a');
         __.className = 'talentcalc-button-summary';
         __.style.display = 'none';
         __.href = 'javascript:;';
         __.onclick = _self.showSummary.bind(null, 1);
-        ae(__, ct(LANG.tc_summary));
-        ae(_, __);
+        $WH.ae(__, $WH.ct(LANG.tc_summary));
+        $WH.ae(_, __);
 
-        __ = _lnkRestore = ce('a');
+        __ = _lnkRestore = $WH.ce('a');
         __.className = 'talentcalc-button-restore';
         __.style.display = 'none';
         __.href = 'javascript:;';
         __.onclick = _restore;
-        ae(__, ct(LANG.tc_restore));
-        ae(_, __);
+        $WH.ae(__, $WH.ct(LANG.tc_restore));
+        $WH.ae(_, __);
 
-        __ = _lnkExport = ce('a');
+        __ = _lnkExport = $WH.ce('a');
         __.className = 'talentcalc-button-export';
         __.style.display = 'none';
         __.href = 'javascript:;';
         __.target = '_blank';
-        ae(__, ct(LANG.tc_link));
-        ae(_, __);
+        $WH.ae(__, $WH.ct(LANG.tc_link));
+        $WH.ae(_, __);
 
-        __ = ce('div');
+        __ = $WH.ce('div');
         __.className = 'clear';
-        ae(_, __);
+        $WH.ae(_, __);
 
-        ae(sidebarDivInner, _);
+        $WH.ae(sidebarDivInner, _);
 
-        _ = ce('div');
-        ae(sidebarDivInner, _);
+        _ = $WH.ce('div');
+        $WH.ae(sidebarDivInner, _);
 
         if (_mode == MODE_DEFAULT) {
-            _glyphDiv = ce('div');
+            _glyphDiv = $WH.ce('div');
             _glyphDiv.style.display = 'none';
 
-            _ = ce('h3');
-            ae(_, ct(LANG.tc_glyphs));
-            ae(_glyphDiv, _);
+            _ = $WH.ce('h3');
+            $WH.ae(_, $WH.ct(LANG.tc_glyphs));
+            $WH.ae(_glyphDiv, _);
 
-            __ = ce('a');
+            __ = $WH.ce('a');
             __.href = 'javascript:;';
             __.onclick = _self.resetGlyphs;
                g_addTooltip(__, LANG.tc_resetglyphs);
-            ae(__, ct('[x]'));
-            ae(_, __);
-            _ = ce('div');
+            $WH.ae(__, $WH.ct('[x]'));
+            $WH.ae(_, __);
+            _ = $WH.ce('div');
             _.className = 'talentcalc-sidebar-majorglyphs q9';
-            __ = ce('b');
-            ae(__, ct(g_item_glyphs[1]));
-            ae(_, __);
-            ae(_glyphDiv, _);
-            _ = ce('div');
+            __ = $WH.ce('b');
+            $WH.ae(__, $WH.ct(g_item_glyphs[1]));
+            $WH.ae(_, __);
+            $WH.ae(_glyphDiv, _);
+            _ = $WH.ce('div');
             _.className = 'talentcalc-sidebar-minorglyphs q9';
-            __ = ce('b');
-            ae(__, ct(g_item_glyphs[2]));
-            ae(_, __);
-            ae(_glyphDiv, _);
-            _ = ce('div');
+            __ = $WH.ce('b');
+            $WH.ae(__, $WH.ct(g_item_glyphs[2]));
+            $WH.ae(_, __);
+            $WH.ae(_glyphDiv, _);
+            _ = $WH.ce('div');
             _.className = 'clear';
-            ae(_glyphDiv, _);
+            $WH.ae(_glyphDiv, _);
 
             var
-                table = ce('table'),
-                tbody = ce('tbody'),
+                table = $WH.ce('table'),
+                tbody = $WH.ce('tbody'),
                 tr,
                 th,
                 td,
@@ -1070,27 +1070,27 @@ function TalentCalc() {
             table.className = 'icontab';
 
             for (var y = 0; y < 3; ++y) {
-                tr = ce('tr');
+                tr = $WH.ce('tr');
                 for (var z = 0; z < 2; ++z) {
                     var slot = (z * 3) + y;
-                    th = ce('th');
+                    th = $WH.ce('th');
                     icon = Icon.create('inventoryslot_empty', 1, null, 'javascript:;');
                     link = Icon.getLink(icon);
 
                     _glyphIcons[slot] = icon;
-                    ae(th, icon);
-                    ae(tr, th);
-                    td = ce('td');
+                    $WH.ae(th, icon);
+                    $WH.ae(tr, th);
+                    td = $WH.ce('td');
 
-                    a = ce('a');
+                    a = $WH.ce('a');
                     _glyphLinks[slot] = a;
-                    ae(td, a);
-                    ae(tr, td);
+                    $WH.ae(td, a);
+                    $WH.ae(tr, td);
 
                     a.target = link.target = '_blank';
                     a.rel = link.rel = 'np';
-                    a.onmousedown = link.onmousedown = rf;
-                    a.onclick = link.onclick = rf;
+                    a.onmousedown = link.onmousedown = $WH.rf;
+                    a.onclick = link.onclick = $WH.rf;
 
                     g_onClick(a, _glyphClick.bind(a, slot));
                     a.onmouseover = _showGlyphTooltip.bind(null, a, slot);
@@ -1101,50 +1101,50 @@ function TalentCalc() {
                     link.onmouseover = _showGlyphTooltip.bind(null, link, slot);
                     link.onmouseout = Tooltip.hide;
 
-                    td.oncontextmenu = rf;
+                    td.oncontextmenu = $WH.rf;
                 }
-                ae(tbody, tr);
+                $WH.ae(tbody, tr);
             }
-            ae(table, tbody);
-            ae(_glyphDiv, table);
-            ae(sidebarDivInner, _glyphDiv);
+            $WH.ae(table, tbody);
+            $WH.ae(_glyphDiv, table);
+            $WH.ae(sidebarDivInner, _glyphDiv);
         }
 
-        ae(_divSidebar, sidebarDivInner);
+        $WH.ae(_divSidebar, sidebarDivInner);
 
-        _ = ce('div');
+        _ = $WH.ce('div');
         _.className = 'talentcalc-sidebar-anchor';
-        ae(_, _divSidebar);
+        $WH.ae(_, _divSidebar);
 
-        ae(_container, _);
+        $WH.ae(_container, _);
     }
 
     function _createTable(nCols, nRows, arrowMaker) {
         var
-            t = ce('table'),
-            tb = ce('tbody'),
+            t = $WH.ce('table'),
+            tb = $WH.ce('tbody'),
             tr,
             _;
 
         for (var y = 0; y < nRows; ++y) {
-            tr = ce('tr');
+            tr = $WH.ce('tr');
 
             for (var x = 0; x < nCols; ++x) {
                 if (arrowMaker && y > 0) {
-                    _ = ce('th');
+                    _ = $WH.ce('th');
                     _.colSpan = 2;
-                    ae(tr, _);
+                    $WH.ae(tr, _);
                     break;
                 }
                 else {
-                    var td = ce('td');
+                    var td = $WH.ce('td');
                     td.className = 'talentcalc-main-cell';
-                    ae(tr, td);
+                    $WH.ae(tr, td);
                 }
             }
-            ae(tb, tr);
+            $WH.ae(tb, tr);
         }
-        ae(t, tb);
+        $WH.ae(t, tb);
 
         return t;
     }
@@ -1156,16 +1156,16 @@ function TalentCalc() {
 
         c.k = 0;
 
-        c.div = ce('div');
+        c.div = $WH.ce('div');
         c.div.style.display = 'none';
-        aef(_divMain, c.div);
+        $WH.aef(_divMain, c.div);
 
         for (var tree = 0; tree < _nTrees; ++tree) {
             c[tree].k = 0;
 
             var
-                d  = ce('div'),
-                d2 = ce('div');
+                d  = $WH.ce('div'),
+                d2 = $WH.ce('div');
 
             d.style.backgroundRepeat = 'no-repeat';
             d.style.cssFloat = d.style.styleFloat = 'left';
@@ -1176,13 +1176,13 @@ function TalentCalc() {
             d2.style.overflow = 'hidden';
             d2.style.width = (_mode == MODE_DEFAULT ? '204px' : '244px');
 
-            ae(d2, _createTable(4, _nTiers));
+            $WH.ae(d2, _createTable(4, _nTiers));
 
-            ae(d, d2);
-            ae(c.div, d);
+            $WH.ae(d, d2);
+            $WH.ae(c.div, d);
 
             var
-                tds = gE(d, 'td'),
+                tds = $WH.gE(d, 'td'),
                 iconBg,
                 afterUrl = '?' + _versionBuild;
 
@@ -1206,23 +1206,23 @@ function TalentCalc() {
 
                 link.rel = 'np';
                 link.target = '_blank';
-                link.onmousedown = rf;
-                link.onclick = rf;
+                link.onmousedown = $WH.rf;
+                link.onclick = $WH.rf;
                 g_onClick(link, _iconClick.bind(link, talent));
                 link.onmouseover = _showTooltip.bind(null, link, talent);
                 link.onmouseout = Tooltip.hide;
 
                 var
-                    border = ce('div'),
-                    bubble = ce('div');
+                    border = $WH.ce('div'),
+                    bubble = $WH.ce('div');
 
-                ae(bubble, ct('0'));
+                $WH.ae(bubble, $WH.ct('0'));
 
                 border.className = 'icon-border';
                 bubble.className = 'icon-bubble';
 
-                ae(icon, border);
-                ae(icon, bubble);
+                $WH.ae(icon, border);
+                $WH.ae(icon, bubble);
 
                 talent.k = 0;
                 talent.i = i;
@@ -1235,7 +1235,7 @@ function TalentCalc() {
                 talent.bubble = bubble;
 
                 if (!talent.hidden) {
-                    ae(targetTd, icon);
+                    $WH.ae(targetTd, icon);
                 }
 
                 if (talent.r) {
@@ -1330,9 +1330,9 @@ function TalentCalc() {
                     arrow.style.left = l + 'px';
                     arrow.style.top = t + 'px';
 
-                    var div = ce('div');
+                    var div = $WH.ce('div');
                     div.className = 'talentcalc-arrow-anchor';
-                    ae(div, arrow);
+                    $WH.ae(div, arrow);
 
                     if (!talent.hidden) {
                         targetTd.insertBefore(div, targetTd.firstChild);
@@ -1349,45 +1349,45 @@ function TalentCalc() {
             _,
             __;
 
-        _divUpper = ce('div');
+        _divUpper = $WH.ce('div');
         _divUpper.className = 'talentcalc-upper rcorners';
         _divUpper.style.display = 'none';
 
-        _ = ce('span');
+        _ = $WH.ce('span');
         _.className = 'talentcalc-upper-class';
-        _lblClass = a = ce('a');
+        _lblClass = a = $WH.ce('a');
         a.target = '_blank';
         a.style.fontWeight = 'bold';
-        ae(_, a);
-        ae(_, ct(' '));
-        _lblSpec = ce('b');
-        ae(_, _lblSpec);
-        ae(_divUpper, _);
+        $WH.ae(_, a);
+        $WH.ae(_, $WH.ct(' '));
+        _lblSpec = $WH.ce('b');
+        $WH.ae(_, _lblSpec);
+        $WH.ae(_divUpper, _);
 
-        _ = ce('span');
+        _ = $WH.ce('span');
         _.className = 'talentcalc-upper-ptsleft';
-        ae(_, ct(LANG.tc_ptsleft));
-        _lblPtsLeft = ce('b');
-        ae(_, _lblPtsLeft);
-        ae(_divUpper, _);
+        $WH.ae(_, $WH.ct(LANG.tc_ptsleft));
+        _lblPtsLeft = $WH.ce('b');
+        $WH.ae(_, _lblPtsLeft);
+        $WH.ae(_divUpper, _);
 
         if (_mode == MODE_PET) {
-            __ = _lnkBonusPoints = ce('a');
+            __ = _lnkBonusPoints = $WH.ce('a');
             __.href = 'javascript:;';
             __.onclick = _bonusPointsOnClick.bind(null, __);
             __.onmouseover = _bonusPointsOnMouseOver.bind(null, __);
             __.onmousemove = Tooltip.cursorUpdate;
             __.onmouseout = Tooltip.hide;
-            ae(_, __);
+            $WH.ae(_, __);
         }
 
-        _ = ce('span');
+        _ = $WH.ce('span');
         _.className = 'talentcalc-upper-reqlevel';
-        ae(_, ct(LANG.tc_reqlevel));
-        _lblReqLevel = ce('b');
-        ae(_, _lblReqLevel);
+        $WH.ae(_, $WH.ct(LANG.tc_reqlevel));
+        _lblReqLevel = $WH.ce('b');
+        $WH.ae(_, _lblReqLevel);
 
-        __ = _lnkMaxLevel = ce('a');
+        __ = _lnkMaxLevel = $WH.ce('a');
         __.className = 'q1';
         __.href = 'javascript:;';
         __.onclick = _setLevelCapOnClick.bind(null, __);
@@ -1396,18 +1396,18 @@ function TalentCalc() {
         __.onmouseout  = Tooltip.hide;
 
         if (!_opt.profiler) {
-            ae(_, ct(' ('));
-            ae(_, __);
-            ae(_, ct(')'));
+            $WH.ae(_, $WH.ct(' ('));
+            $WH.ae(_, __);
+            $WH.ae(_, $WH.ct(')'));
         }
 
-        ae(_divUpper, _);
+        $WH.ae(_divUpper, _);
 
-        _ = ce('div');
+        _ = $WH.ce('div');
         _.className = 'clear';
-        ae(_divUpper, _);
+        $WH.ae(_divUpper, _);
 
-        ae(_divWrapper, _divUpper);
+        $WH.ae(_divWrapper, _divUpper);
     }
 
     function _convertBlizzToWh(blizz) {
@@ -1519,7 +1519,7 @@ function TalentCalc() {
     }
 
     function _isGlyphLocked(slot) {
-        var notFound = (in_array(_glyphSlots[_getGlyphTypeFromSlot(slot)], slot) == -1);
+        var notFound = ($WH.in_array(_glyphSlots[_getGlyphTypeFromSlot(slot)], slot) == -1);
         return (notFound || _getGlyphSlotLevel(slot) > _maxLevel);
     }
 
@@ -1598,9 +1598,9 @@ function TalentCalc() {
 
             var
                 dataz = [],
-                div   = ce("div"),
-                anch  = ce("a"),
-                clear = ce("div");
+                div   = $WH.ce("div"),
+                anch  = $WH.ce("a"),
+                clear = $WH.ce("div");
 
             dataz.push({ none: 1 });
 
@@ -1609,16 +1609,16 @@ function TalentCalc() {
             }
 
             div.className = "listview";
-            ae(dest, div);
+            $WH.ae(dest, div);
 
             anch.className = "screenshotviewer-close";
             anch.href = "javascript:;";
             anch.onclick = Lightbox.hide;
-            ae(anch, ce("span"));
-            ae(dest, anch);
+            $WH.ae(anch, $WH.ce("span"));
+            $WH.ae(dest, anch);
 
             clear.className = "clear";
-            ae(dest, clear);
+            $WH.ae(dest, clear);
 
             lv = new Listview({
                 template: "glyph",
@@ -1629,8 +1629,8 @@ function TalentCalc() {
                 createNote: _createGlyphPickerNote
             });
 
-            if (Browser.firefox) {
-                aE(lv.getClipDiv(), "DOMMouseScroll", g_pickerWheel);
+            if ($WH.Browser.firefox) {
+                $WH.aE(lv.getClipDiv(), "DOMMouseScroll", g_pickerWheel);
             }
             else {
                 lv.getClipDiv().onmousewheel = g_pickerWheel;
@@ -1778,26 +1778,26 @@ function TalentCalc() {
         _info.pointsSpent   = (_mode == MODE_PET ? c[0].k: [c[0].k, c[1].k, c[2].k]);
         _info.bonusPoints   = _bonusPoints;
 
-        st(_lblSpec,     '(' + (_mode == MODE_PET ? c.k: _info.pointsSpent.join('/')) + ')');
-        st(_lblReqLevel, _info.requiredLevel ? _info.requiredLevel: '-');
-        st(_lnkMaxLevel, _maxLevel);
-        st(_lblPtsLeft,  _info.pointsLeft);
+        $WH.st(_lblSpec,     '(' + (_mode == MODE_PET ? c.k: _info.pointsSpent.join('/')) + ')');
+        $WH.st(_lblReqLevel, _info.requiredLevel ? _info.requiredLevel: '-');
+        $WH.st(_lnkMaxLevel, _maxLevel);
+        $WH.st(_lblPtsLeft,  _info.pointsLeft);
 
         if (_locked) {
-            st(_lnkLock, LANG.tc_unlock);
+            $WH.st(_lnkLock, LANG.tc_unlock);
             _lnkLock.className = 'talentcalc-button-unlock';
         }
         else {
-            st(_lnkLock, LANG.tc_lock);
+            $WH.st(_lnkLock, LANG.tc_lock);
             _lnkLock.className = 'talentcalc-button-lock';
         }
 
         if (_mode == MODE_PET) {
             if (_bonusPoints) {
-                st(_lnkBonusPoints, '[-]');
+                $WH.st(_lnkBonusPoints, '[-]');
                 _lnkBonusPoints.className = 'q10';
             } else {
-                st(_lnkBonusPoints, '[+]');
+                $WH.st(_lnkBonusPoints, '[+]');
                 _lnkBonusPoints.className = 'q2';
             }
         }
@@ -1808,7 +1808,7 @@ function TalentCalc() {
 
         for (var tree = 0; tree < _nTrees; ++tree) {
             var span = _lblTreePoints[tree].firstChild.childNodes[1];
-            st(span, ' (' + c[tree].k + ')');
+            $WH.st(span, ' (' + c[tree].k + ')');
         }
 
         if (_onChangeCallback) {
@@ -1817,7 +1817,7 @@ function TalentCalc() {
     }
 
     function _onClassChange() {
-        st(_lblClass, _referenceArray[_currentClass]);
+        $WH.st(_lblClass, _referenceArray[_currentClass]);
         if (_mode == MODE_PET) {
             _lblClass.href = '?pet=' + _currentClass;
             _updateModel(_currentClass);
@@ -1852,7 +1852,7 @@ function TalentCalc() {
             if (_mode == MODE_DEFAULT) {
                 span.style.backgroundImage = 'url(images/talent/classes/trees/' + g_file_classes[_currentClass] + '_' + (tree + 1) + '.gif)';
             }
-            st(span, c[tree].n);
+            $WH.st(span, c[tree].n);
         }
 
         _afterCapDecrease();
@@ -2243,7 +2243,7 @@ function TalentCalc() {
                     c.div.style.display = "";
                 }
                 else {
-                    g_ajaxIshRequest("?data=talents&class=" + classId + "&" + _versionBuild);
+                    $WH.g_ajaxIshRequest("?data=talents&class=" + classId + "&" + _versionBuild);
                 }
             }
 
@@ -2457,7 +2457,7 @@ function TalentCalc() {
         else {
             upper += '<b class="q0">' + LANG.tc_locked + '</b>';
             upper += '<br /><span class="q9">' + LANG[slot <= 2 ? "tc_majgly": "tc_mingly"] + '</span>';
-            lower += '<span class="q10">' + sprintf(LANG.tc_lockgly, _getGlyphSlotLevel(slot)) + '</span>';
+            lower += '<span class="q10">' + $WH.sprintf(LANG.tc_lockgly, _getGlyphSlotLevel(slot)) + '</span>';
         }
 
         if (glyph && _this.parentNode.className.indexOf("icon") != 0) {
@@ -2479,18 +2479,18 @@ function TalentCalc() {
             buffer += '<span style="float: right" class="q0">' + talent.z + '</span>';
         }
 
-        buffer += talent.n + '</b><br />' + sprintf(LANG.tc_rank, talent.k, talent.m) + '<br />';
+        buffer += talent.n + '</b><br />' + $WH.sprintf(LANG.tc_rank, talent.k, talent.m) + '<br />';
 
         if (talent.r) {
             if (c[talent.tree].t[talent.r[0]].k < talent.r[1]) {
                 buffer += '<span class="q10">';
-                buffer += sprintf(LANG[talent.r[1] == 1 ? 'tc_prereq' : 'tc_prereqpl'], talent.r[1], c[talent.tree].t[talent.r[0]].n);
+                buffer += $WH.sprintf(LANG[talent.r[1] == 1 ? 'tc_prereq' : 'tc_prereqpl'], talent.r[1], c[talent.tree].t[talent.r[0]].n);
                 buffer += '</span><br />';
             }
         }
 
         if (c[talent.tree].k < talent.y * _pointsPerTier) {
-            buffer += '<span class="q10">' + sprintf(LANG.tc_tier, (talent.y * _pointsPerTier), c[talent.tree].n) + '</span><br />';
+            buffer += '<span class="q10">' + $WH.sprintf(LANG.tc_tier, (talent.y * _pointsPerTier), c[talent.tree].n) + '</span><br />';
         }
 
         if (talent.t && talent.t.length >= 1) {
@@ -2584,7 +2584,7 @@ function TalentCalc() {
             Icon.setTexture(icon, 1, glyph.icon);
             a.href = link.href = '?item=' + glyph.id;
 
-            st(a, _simplifyGlyphName(glyph.name));
+            $WH.st(a, _simplifyGlyphName(glyph.name));
             a.className = 'q1';
 
             return true;
@@ -2593,7 +2593,7 @@ function TalentCalc() {
             Icon.setTexture(icon, 1, 'inventoryslot_empty');
             a.href = link.href = 'javascript:;';
 
-            st(a, (!locked ? LANG.tc_empty : LANG.tc_locked));
+            $WH.st(a, (!locked ? LANG.tc_empty : LANG.tc_locked));
             a.className = 'q0';
 
             return false;
@@ -2727,7 +2727,7 @@ function TalentCalc() {
             model: g_pets[c.npcId].displayId,
             modelType: 8,
             contentPath: swfUrl + '/modelviewer/',
-            blur: (OS.mac ? '0' : '1')
+            blur: ($WH.OS.mac ? '0' : '1')
         };
 
         var params = {
@@ -2797,7 +2797,7 @@ Listview.templates.glyph = {
                     return;
                 }
 
-                var i = ce('td');
+                var i = $WH.ce('td');
                 i.style.width = '1px';
                 i.style.padding = '0';
                 i.style.borderRight = 'none';
@@ -2805,20 +2805,20 @@ Listview.templates.glyph = {
                 var
                     icon = Icon.create(glyph.icon, 0, null, '?item=' + glyph.id),
                     link = Icon.getLink(icon);
-                ae(i, icon);
-                ae(tr, i);
+                $WH.ae(i, icon);
+                $WH.ae(tr, i);
                 td.style.borderLeft = 'none';
 
-                link.onclick = rf;
+                link.onclick = $WH.rf;
 
-                var a = ce('a');
+                var a = $WH.ce('a');
                 a.style.fontFamily = 'Verdana, sans-serif';
                 a.href = '?item=' + glyph.id;
 
-                ae(a, ct($WowheadTalentCalculator.simplifyGlyphName(glyph.name)));
+                $WH.ae(a, $WH.ct($WowheadTalentCalculator.simplifyGlyphName(glyph.name)));
 
                 td.style.whiteSpace = 'nowrap';
-                ae(td, a);
+                $WH.ae(td, a);
 
                 tr.onclick = function(e) {
                     if (e.which != 2 || e.target != a) {
@@ -2832,7 +2832,7 @@ Listview.templates.glyph = {
                     return -1;
                 }
 
-                return strcmp(a.name, b.name);
+                return $WH.strcmp(a.name, b.name);
             }
         },
         {
@@ -2845,11 +2845,11 @@ Listview.templates.glyph = {
                     return;
                 }
 
-                var d = ce('div');
+                var d = $WH.ce('div');
                 d.className = 'small crop';
                 td.title = glyph.description;
-                ae(d, ct(glyph.description));
-                ae(td, d);
+                $WH.ae(d, $WH.ct(glyph.description));
+                $WH.ae(td, d);
             }
         },
         {
@@ -2880,7 +2880,7 @@ Listview.templates.glyph = {
             },
             compute: function (glyph, td, tr) {
                 if (glyph.none) {
-                    ee(tr);
+                    $WH.ee(tr);
 
                     tr.onclick = $WowheadTalentCalculator.addGlyph.bind(null, 0);
                     td.colSpan          = 5;
@@ -2894,12 +2894,12 @@ Listview.templates.glyph = {
                     td.className = 'small q1';
                     td.style.whiteSpace = 'nowrap';
 
-                    var a = ce('a');
+                    var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
                     a.href = '?skill=' + glyph.skill;
 
-                    ae(a, ct(g_spell_skills[glyph.skill]));
-                    ae(td, a);
+                    $WH.ae(a, $WH.ct(g_spell_skills[glyph.skill]));
+                    $WH.ae(td, a);
                 }
             }
         }

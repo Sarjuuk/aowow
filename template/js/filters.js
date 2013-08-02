@@ -406,14 +406,14 @@ var fi_filters = {
 };
 
 function fi_toggle() {
-    var c = ge('fi');
+    var c = $WH.ge('fi');
     var b = g_toggleDisplay(c);
-    var d = ge('fi_toggle');
+    var d = $WH.ge('fi_toggle');
 
     if (b) {
         // Set focus on first textbox
         d.firstChild.nodeValue = LANG.fihide;
-        c = (c.parentNode.tagName == 'FORM' ? c.parentNode: gE(c, 'form')[0]);
+        c = (c.parentNode.tagName == 'FORM' ? c.parentNode: $WH.gE(c, 'form')[0]);
         c = c.elements.na ? c.elements.na: c.elements.ti;
         c.focus();
         c.select();
@@ -435,7 +435,7 @@ function fi_submit(_this) {
             case 'INPUT':
                 switch (_[i].type) {
                     case 'text':
-                        if (trim(_[i].value).length > 0) {
+                        if ($WH.trim(_[i].value).length > 0) {
                             ++sum;
                         }
                         break;
@@ -460,7 +460,7 @@ function fi_submit(_this) {
         }
     }
 
-    var g = g_getGets();
+    var g = $WH.g_getGets();
     if (sum == 0 && !g.filter) {
         alert(LANG.message_fillsomecriteria);
         return false;
@@ -477,7 +477,7 @@ function fi_initWeightedListview() {
     }
 
     if (this._upgradeIds && this._minScore) {
-        //todo: what did this do..? setTimeout(Listview.headerFilter.bind(this, this.columns[this.columns.length - 1], '>=' + this._minScore), 1);
+        setTimeout(Listview.headerFilter.bind(this, this.columns[this.columns.length - 1], '>=' + this._minScore), 1);
         this._maxScore = this._minScore; // Makes percentages relative to upgraded item
     }
 }
@@ -493,7 +493,7 @@ function fi_filterUpgradeListview(item, i) {
         this._upgradeRow = nResults - 1;
     }
 
-    if(in_array(this._upgradeIds, item.id) != -1) {
+    if($WH.in_array(this._upgradeIds, item.id) != -1) {
         if(i < nResults) {
             this._upgradeRow++;
         }
@@ -506,31 +506,31 @@ function fi_filterUpgradeListview(item, i) {
 
 function fi_addUpgradeIndicator() {
     if(this._upgradeIds) {
-        var upgradeUrl = fi_filterParamToJson(g_parseQueryString(location.href.replace(/^.*?filter=/, 'filter=')).filter).upg;
+        var upgradeUrl = fi_filterParamToJson($WH.g_parseQueryString(location.href.replace(/^.*?filter=/, 'filter=')).filter).upg;
         for(var i = 0; i < this.data.length; ++i) {
             var
                 item = this.data[i],
                 newUpgrade = upgradeUrl.replace(item.id, '').replace(/(^:*|:*$)/g, '').replace('::', ':');
 
-            if(in_array(this._upgradeIds, item.id) != -1) {
-                this.createIndicator(sprintf(LANG.lvnote_upgradesfor, item.id, (7 - parseInt(item.name.charAt(0))), item.name.substr(1)), location.href.replace(';upg=' + upgradeUrl, (newUpgrade ? ';upg=' + newUpgrade : '')));
+            if($WH.in_array(this._upgradeIds, item.id) != -1) {
+                this.createIndicator($WH.sprintf(LANG.lvnote_upgradesfor, item.id, (7 - parseInt(item.name.charAt(0))), item.name.substr(1)), location.href.replace(';upg=' + upgradeUrl, (newUpgrade ? ';upg=' + newUpgrade : '')));
             }
         }
     }
 }
 
 function fi_reset(_this) {
-    fi_resetCriterion(ge('fi_criteria'));
-    fi_resetCriterion(ge('fi_weight'));
+    fi_resetCriterion($WH.ge('fi_criteria'));
+    fi_resetCriterion($WH.ge('fi_weight'));
 
-    var _ = ge('sdkgnsdkn436');
+    var _ = $WH.ge('sdkgnsdkn436');
     if (_) {
         _.parentNode.style.display = 'none';
         while (_.firstChild) {
-            de(_.firstChild);
+            $WH.de(_.firstChild);
         }
 
-        ae(_, ce('option'));
+        $WH.ae(_, $WH.ce('option'));
     }
 
     _ = _this.elements;
@@ -589,7 +589,7 @@ function fi_resetCriterion(_this) {
 }
 
 function fi_addCriterion(_this, cr) {
-    var _ = ge(_this.id.replace('add', ''));
+    var _ = $WH.ge(_this.id.replace('add', ''));
 
     if (_.childNodes.length >= 19 || (_this.id.indexOf('criteria') > 0 && _.childNodes.length >= 4)) {
         _this.style.display = 'none';
@@ -605,7 +605,7 @@ function fi_addCriterion(_this, cr) {
     }
 
     var
-        d = ce('div'),
+        d = $WH.ce('div'),
         c = _.childNodes[0].childNodes[0].cloneNode(true);
 
     c.onchange = c.onkeyup = fi_criterionChange.bind(0, c);
@@ -658,7 +658,7 @@ function fi_removeCriterion() {
     }
 
     if (n) {
-        _ = ge('sdkgnsdkn436');
+        _ = $WH.ge('sdkgnsdkn436');
         _.selectedIndex = 0;
         _.i = 0;
         fi_presetMatch();
@@ -672,22 +672,22 @@ function fi_clearCriterion() {
 }
 
 function fi_appendRemoveLink(d) {
-    d.appendChild(ct(String.fromCharCode(160, 160)));
-    var a = ce('a');
+    d.appendChild($WH.ct(String.fromCharCode(160, 160)));
+    var a = $WH.ce('a');
     a.href = 'javascript:;';
-    a.appendChild(ct(LANG.firemove));
+    a.appendChild($WH.ct(LANG.firemove));
     a.onmouseup = fi_removeCriterion;
-    a.onmousedown = a.onclick = rf;
+    a.onmousedown = a.onclick = $WH.rf;
     d.appendChild(a);
 }
 
 function fi_appendClearLink(d) {
-    d.appendChild(ct(String.fromCharCode(160, 160)));
-    var a = ce('a');
+    d.appendChild($WH.ct(String.fromCharCode(160, 160)));
+    var a = $WH.ce('a');
     a.href = 'javascript:;';
-    a.appendChild(ct(LANG.ficlear));
+    a.appendChild($WH.ct(LANG.ficlear));
     a.onmouseup = fi_clearCriterion;
-    a.onmousedown = a.onclick = rf;
+    a.onmousedown = a.onclick = $WH.rf;
     d.appendChild(a);
 }
 
@@ -763,16 +763,16 @@ function fi_criterionChange(_this, crs, crv) {
             if (LANG.fidropdowns[criteriaName] != null) {
                 if (_this.name == 'cr[]') {
                     var _c = LANG.fidropdowns[criteriaName];
-                    _ = ce('select');
+                    _ = $WH.ce('select');
                     _.name = 'crs[]';
 
                     var group = _;
 
                     if (criteriaParams.indexOf('any') != -1) {
-                        var o2 = ce('option');
+                        var o2 = $WH.ce('option');
                         o2.value = '-2323';
-                        o2.appendChild(ct(LANG.fiany));
-                        ae(group, o2);
+                        o2.appendChild($WH.ct(LANG.fiany));
+                        $WH.ae(group, o2);
                         if (crs != null && crs == '-2323') {
                             o2.selected = true;
                         }
@@ -780,42 +780,42 @@ function fi_criterionChange(_this, crs, crv) {
 
                     for (var i = 0; i < _c.length; ++i) {
                         if (_c[i][0] !== null) {
-                            var o2 = ce('option');
+                            var o2 = $WH.ce('option');
                             o2.value = _c[i][0];
-                            o2.appendChild(ct(_c[i][1]));
-                            ae(group, o2);
+                            o2.appendChild($WH.ct(_c[i][1]));
+                            $WH.ae(group, o2);
                             if (crs != null && crs == _c[i][0]) {
                                 o2.selected = true;
                             }
                         }
                         else {
-                            var group = ce('optgroup');
+                            var group = $WH.ce('optgroup');
                             group.label = _c[i][1];
-                            ae(_, group);
+                            $WH.ae(_, group);
                         }
                     }
 
                     if (criteriaParams.indexOf('none') != -1) {
-                        var o2 = ce('option');
+                        var o2 = $WH.ce('option');
                         o2.value = '-2324';
-                        o2.appendChild(ct(LANG.finone));
-                        ae(group, o2);
+                        o2.appendChild($WH.ct(LANG.finone));
+                        $WH.ae(group, o2);
                         if (crs != null && crs == '-2324') {
                             o2.selected = true;
                         }
                     }
 
-                    d.appendChild(ct(' '));
+                    d.appendChild($WH.ct(' '));
                     d.appendChild(_);
                 }
 
                 var n = (criteriaName == 'num');
 
                 if (n) {
-                    d.appendChild(ct(' '));
+                    d.appendChild($WH.ct(' '));
                 }
 
-                _ = ce('input');
+                _ = $WH.ce('input');
                 _.type = 'text';
 
                 if (crv != null) {
@@ -850,13 +850,13 @@ function fi_criterionChange(_this, crs, crv) {
                 }
             }
             else if (criteriaName == 'str') {
-                _ = ce('input');
+                _ = $WH.ce('input');
                 _.name = 'crs[]';
                 _.type = 'hidden';
                 _.value = '0';
                 d.appendChild(_);
 
-                _ = ce('input');
+                _ = $WH.ce('input');
                 _.type = 'text';
                 if (criteriaParams.indexOf('small') != -1) {
                     _.maxLength = 7;
@@ -873,7 +873,7 @@ function fi_criterionChange(_this, crs, crv) {
                     _.value = crv;
                 }
 
-                d.appendChild(ct(' '));
+                d.appendChild($WH.ct(' '));
                 d.appendChild(_);
             }
         }
@@ -892,7 +892,7 @@ function fi_criterionChange(_this, crs, crv) {
 }
 
 function fi_setCriteria(cr, crs, crv) {
-    var _ = ge('fi_criteria');
+    var _ = $WH.ge('fi_criteria');
 
     var
         i,
@@ -907,7 +907,7 @@ function fi_setCriteria(cr, crs, crv) {
     }
     fi_criterionChange(c, crs[0], crv[0]);
 
-    var a = ge('fi_addcriteria');
+    var a = $WH.ge('fi_addcriteria');
     for (i = 1; i < cr.length && i < 5; ++i) {
         fi_criterionChange(fi_addCriterion(a, cr[i]), crs[i], crv[i]);
     }
@@ -928,15 +928,15 @@ function fi_setWeights(weights, nt, ids, stealth) {
         }
     }
 
-    var _ = ge('fi_weight');
+    var _ = $WH.ge('fi_weight');
 
     if (fi_weights == null) {
         fi_weights = {};
-        cO(fi_weights, weights);
+        $WH.cO(fi_weights, weights);
     }
 
     var
-        a = ge('fi_addweight'),
+        a = $WH.ge('fi_addweight'),
         c = _.childNodes[0].childNodes[0];
 
     var i = 0;
@@ -963,8 +963,8 @@ function fi_setWeights(weights, nt, ids, stealth) {
 
     fi_weightsFactor = fi_convertWeights(weights, true);
 
-    ge('fi_weight_toggle').className = 'disclosure-on';
-    ge('fi_weight').parentNode.style.display = '';
+    $WH.ge('fi_weight_toggle').className = 'disclosure-on';
+    $WH.ge('fi_weight').parentNode.style.display = '';
 
     if (!nt) {
         if (!fi_presetMatch(weights, stealth)) {
@@ -974,7 +974,7 @@ function fi_setWeights(weights, nt, ids, stealth) {
 }
 
 function fi_changeWeight(_this) {
-    var _ = ge('sdkgnsdkn436');
+    var _ = $WH.ge('sdkgnsdkn436');
     _.selectedIndex = 0;
     _.i = 0;
     fi_sortWeight(_this);
@@ -984,7 +984,7 @@ function fi_changeWeight(_this) {
 function fi_sortWeight(_this) {
     var
         i,
-        _ = ge('fi_weight'),
+        _ = $WH.ge('fi_weight'),
         v = Number(_this.value);
 
     _this = _this.parentNode;
@@ -1066,14 +1066,9 @@ function fi_presetClass(_this, stealth) {
 
         fi_resetCriterion(_);
 
-        var _ = ge('sdkgnsdkn436');
+        var _ = $WH.ge('sdkgnsdkn436');
         _.parentNode.style.display = 'none';
 
-// todo: replace this
-        if (!stealth && (_this.form.ub.selectedIndex == 0 || _this.form.ub.selectedIndex == _this.i)) {
-            _this.form.ub.selectedIndex = _this.selectedIndex;
-        }
-/* with this
         var oldValue = 1000;
         if (_this.i) {
             oldValue = $($('#fi_presets select option')[_this.i]).attr('value');
@@ -1082,34 +1077,33 @@ function fi_presetClass(_this, stealth) {
         if(!stealth && (_this.form.ub.selectedIndex == 0 || _this.form.ub.value == oldValue)) {
             $('select[name=ub] option[value=' + _this.value + ']').attr('selected', 'selected');
         }
-*/
 
         while (_.firstChild) {
-            de(_.firstChild);
+            $WH.de(_.firstChild);
         }
-        ae(_, ce('option'));
+        $WH.ae(_, $WH.ce('option'));
 
         if (_this.selectedIndex > 0) {
             for (_group in c._presets) {
                 var weights = c._presets[_group];
 
                 if(langref[_group] != null) {
-                    var group = ce('optgroup');
+                    var group = $WH.ce('optgroup');
                     group.label = langref[_group];
                 }
                 else
                     group = _;
 
                 for (var p in weights) {
-                    var o = ce('option');
+                    var o = $WH.ce('option');
                     o.value = p;
                     o._weights = weights[p];
-                    ae(o, ct(weights[p].name ? weights[p].name : langref[p]));
-                    ae(group, o);
+                    $WH.ae(o, $WH.ct(weights[p].name ? weights[p].name : langref[p]));
+                    $WH.ae(group, o);
                 }
 
                 if (langref[_group] != null && group && group.childNodes.length > 0) {
-                    ae(_, group);
+                    $WH.ae(_, group);
                 }
             }
 
@@ -1125,7 +1119,7 @@ function fi_presetClass(_this, stealth) {
 
 function fi_presetChange(_this) {
     if (_this.selectedIndex != _this.i) {
-        fi_resetCriterion(ge('fi_weight'));
+        fi_resetCriterion($WH.ge('fi_weight'));
 
         var o = _this.options[_this.selectedIndex];
         if (_this.selectedIndex > 0) {
@@ -1134,14 +1128,14 @@ function fi_presetChange(_this) {
                 _this.form.elements.gm.selectedIndex = 2; // Rare
             }
 
-            fi_resetCriterion(ge('fi_weight'));
+            fi_resetCriterion($WH.ge('fi_weight'));
             fi_setWeights(o._weights, 1, 0);
         }
 
         _this.i = _this.selectedIndex;
 
         if (g_user.id > 0) {
-            var a = ge('fi_remscale');
+            var a = $WH.ge('fi_remscale');
             a.style.display = (o._weights && o._weights.name ? '' : 'none');
         }
     }
@@ -1149,9 +1143,9 @@ function fi_presetChange(_this) {
 
 function fi_presetDetails() {
     var
-        _     = ge('fi_weight'),
-        _this = ge('fi_detail'),
-        n     = ge('fi_addweight');
+        _     = $WH.ge('fi_weight'),
+        _this = $WH.ge('fi_detail'),
+        n     = $WH.ge('fi_addweight');
 
     var a = g_toggleDisplay(_);
 
@@ -1172,7 +1166,7 @@ function fi_presetDetails() {
 function fi_presetMatch(weights, stealth) {
     if (!weights) {
         weights = {};
-        var _ = ge('fi_weight');
+        var _ = $WH.ge('fi_weight');
 
         for (var i = 0; i < _.childNodes.length; ++i) {
             if (_.childNodes[i].childNodes.length == 5) {
@@ -1187,7 +1181,7 @@ function fi_presetMatch(weights, stealth) {
         }
     }
 
-    var _ = ge('fi_presets');
+    var _ = $WH.ge('fi_presets');
     var s = _.getElementsByTagName('select');
     if (s.length != 2) {
         return false;
@@ -1241,61 +1235,59 @@ function fi_presetSave() {
         return;
     }
 
-    // todo: find out what the jquery stuff is supposed to do and use standards instead
-    alert('NYI, sorry!');
-    return;
-
     var
         o     = $('#sdkgnsdkn436 option:selected').get(0),
         name  = '',
         id    = ((o._weights ? o._weights.id : 0) | 0),
         scale = { id: id, name: name },
-        _     = ge('fi_weight'),
+        _     = $WH.ge('fi_weight'),
         n     = 0;
 
-    for(i = 0; i < _.childNodes.length; ++i) {
+    for (i = 0; i < _.childNodes.length; ++i) {
         var
             w = fi_Lookup($('[name=wt[]]', _.childNodes[i]).val()),
             v = $('[name=wtv[]]', _.childNodes[i]).val();
 
-        if(w && v != 0) {
+        if (w && v != 0) {
             scale[w.name] = v;
             ++n;
         }
     }
 
-    if(n < 1 || (!(o._weights && o._weights.id) && g_user.weightscales && g_user.weightscales.length >= 5)) {
+    if (n < 1 || (!(o._weights && o._weights.id) && g_user.weightscales && g_user.weightscales.length >= 5)) {
         return alert(LANG.message_weightscalesaveerror);
     }
 
-    if(name = prompt(LANG.prompt_nameweightscale, $(o).text())) {
-        var data = { save: 1,   name: urlencode(name), scale: '' };
+    if (name = prompt(LANG.prompt_nameweightscale, $(o).text())) {
+        var data = { save: 1,   name: $WH.urlencode(name), scale: '' };
 
-        if(id) {
+        if (id) {
             data.id = id;
         }
 
         scale.name = name;
         n = 0;
 
-        for(var w in scale) {
-            if(!LANG.traits[w]) {
+        for (var w in scale) {
+            if (!LANG.traits[w]) {
                 continue;
             }
-            if(n++ > 0) {
+            if (n++ > 0) {
                 data.scale += ',';
             }
             data.scale += w + ':' + scale[w];
         }
 
         $.post('?account=weightscales', data, function(response) {
-            if(response > 0) {
-                if(g_user.weightscales == null) {
+            if (response > 0) {
+                if (g_user.weightscales == null) {
                     g_user.weightscales = [];
                 }
 
-                if(scale.id) {
-                    g_user.weightscales = array_filter(g_user.weightscales, function(x) { return x.id != scale.id });
+                if (scale.id) {
+                    g_user.weightscales = $WH.array_filter(g_user.weightscales, function(x) {
+                        return x.id != scale.id
+                    });
                 }
 
                 scale.id = response;
@@ -1305,16 +1297,16 @@ function fi_presetSave() {
                     s = $('#fi_presets select').get(0),
                     c = $('option[value=-1]', s).get(0);
 
-                if(!c) {
-                    c = ce('option');
+                if (!c) {
+                    c = $WH.ce('option');
                     c.value = -1;
-                    ae(c, ct(LANG.ficustom));
-                    aef(s, c);
-                    aef(s, $('option', s).get(1));
+                    $WH.ae(c, $WH.ct(LANG.ficustom));
+                    $WH.aef(s, c);
+                    $WH.aef(s, $('option', s).get(1));
                 }
 
                 c._presets = { custom: {} };
-                for(var i = 0, len = g_user.weightscales.length; i < len; ++i) {
+                for (var i = 0, len = g_user.weightscales.length; i < len; ++i) {
                     c._presets.custom[g_user.weightscales[i].id] = g_user.weightscales[i];
                 }
 
@@ -1322,7 +1314,7 @@ function fi_presetSave() {
                 c.parentNode.onchange();
 
                 var o = $('#sdkgnsdkn436 option[value=' + scale.id + ']').get(0);
-                if(o) {
+                if (o) {
                     o.text = scale.name;
                     o.selected = true;
                     o.parentNode.onchange();
@@ -1342,37 +1334,31 @@ function fi_presetDelete() {
         return;
     }
 
-    // todo: find out what the jquery stuff is supposed to do and use standards instead
-    alert('NYI, sorry!');
-    return;
-
-    // sarjuuk: .get(0) - returns first element matched by X
-    var s = $('#fi_presets select').get(0),
+    var
+        s = $('#fi_presets select').get(0),
         c = $('option:selected', s).get(0);
 
     if(c.value == -1) {
         var o = $('#sdkgnsdkn436 option:selected').get(0);
-        if(o.value && confirm(LANG.confirm_deleteweightscale)) {
-            // sarjuuk send an ajax-POST to X with Y as param
+        if (o.value && confirm(LANG.confirm_deleteweightscale)) {
             $.post('?account=weightscales', { 'delete': 1, id: o.value });
 
-            g_user.weightscales = array_filter(g_user.weightscales, function(x) {
+            g_user.weightscales = $WH.array_filter(g_user.weightscales, function(x) {
                 return x.id != o.value;
             });
 
-            if(g_user.weightscales.length) {
+            if (g_user.weightscales.length) {
                 c._presets = { custom: {} };
-                for(var i = 0, len = g_user.weightscales.length; i < len; ++i) {
+                for (var i = 0, len = g_user.weightscales.length; i < len; ++i) {
                     c._presets.custom[g_user.weightscales[i].id] = g_user.weightscales[i];
                 }
             }
             else {
-                de(c);
+                $WH.de(c);
             }
 
-            de(o);
+            $WH.de(o);
 
-            // sarjuuk: change() - manually triggers an onChange event on X
             $('#fi_presets select').change();
         }
     }
@@ -1395,7 +1381,7 @@ function fi_scoreSockets(item) {
                 if (fi_gemScores[n]) {
                     for (var j = 0; j < fi_gemScores[n].length; ++j) {
                         var t = fi_gemScores[n][j];
-                        if (t.socketLevel <= item.level && (t.uniqEquip == 0 || in_array(mUniq, t.id) < 0)) {
+                        if (t.socketLevel <= item.level && (t.uniqEquip == 0 || $WH.in_array(mUniq, t.id) < 0)) {
                             match += t.score;
                             mGems.push(t.id);
 
@@ -1416,7 +1402,7 @@ function fi_scoreSockets(item) {
                 if (fi_gemScores[s]) {
                     for (var j = 0; j < fi_gemScores[s].length; ++j) {
                         var t = fi_gemScores[s][j];
-                        if (t.socketLevel <= item.level && (t.uniqEquip == 0 || in_array(bUniq, t.id) < 0)) {
+                        if (t.socketLevel <= item.level && (t.uniqEquip == 0 || $WH.in_array(bUniq, t.id) < 0)) {
                             best += t.score;
                             bGems.push(t.id);
 
@@ -1463,7 +1449,7 @@ function fi_scoreSockets(item) {
         this._maxScore = item.score;
     }
 
-    if(this._upgradeIds && in_array(this._upgradeIds, item.id) != -1) {
+    if(this._upgradeIds && $WH.in_array(this._upgradeIds, item.id) != -1) {
         this._minScore = item.score;
         item.upgraded = 1;
     }
@@ -1478,29 +1464,26 @@ function fi_dropdownSync(_this) {
 function fi_init(type) {
     fi_type = type;
 
-    var s = ge('fi_subcat');
+    var s = $WH.ge('fi_subcat');
     if (g_initPath.lastIt && g_initPath.lastIt[3]) {
         if (s) {
-            s.menu = g_initPath.lastIt[3];
-            s.menuappend = '&filter';
-            s.onmouseover = Menu.show;
-            s.onmouseout = Menu.hide;
+            Menu.add(s, g_initPath.lastIt[3]);
         }
     }
     else if (s) {
-        de(s.parentNode);
+        $WH.de(s.parentNode);
     }
 
-    fi_initCriterion(ge('fi_criteria'), 'cr[]', type);
+    fi_initCriterion($WH.ge('fi_criteria'), 'cr[]', type);
     if (type == 'items') {
-        var foo = ge('fi_presets');
+        var foo = $WH.ge('fi_presets');
         if (foo) {
-            fi_initPresets(ge('fi_presets'));
-            fi_initCriterion(ge('fi_weight'), 'wt[]', type);
+            fi_initPresets($WH.ge('fi_presets'));
+            fi_initCriterion($WH.ge('fi_weight'), 'wt[]', type);
         }
     }
 
-    var ma = ge('ma-0');
+    var ma = $WH.ge('ma-0');
     if (ma.getAttribute('checked')) {
         ma.checked = true;
     }
@@ -1509,10 +1492,10 @@ function fi_init(type) {
 function fi_initCriterion(_this, sname, type) {
     var div = _this.firstChild;
 
-    var s = ce('select');
+    var s = $WH.ce('select');
     s.name = sname;
     s.onchange = s.onkeyup = fi_criterionChange.bind(0, s);
-    ae(s, ce('option'));
+    $WH.ae(s, $WH.ce('option'));
 
     var group = null;
     var langref = LANG['fi' + type];
@@ -1526,13 +1509,13 @@ function fi_initCriterion(_this, sname, type) {
 
         if (!p.type) {
             if (group && group.childNodes.length > 0) {
-                ae(s, group);
+                $WH.ae(s, group);
             }
-            group = ce('optgroup');
+            group = $WH.ce('optgroup');
             group.label = (LANG.traits[p.name] ? LANG.traits[p.name] : langref[p.name]);
         }
         else if (sname != 'wt[]' || (p.type == 'num' && !p.noweights)) {
-            var o = ce('option');
+            var o = $WH.ce('option');
             o.value = p.id;
 
             var txt = LANG.traits[p.name] ? LANG.traits[p.name][0] : langref[p.name];
@@ -1540,32 +1523,32 @@ function fi_initCriterion(_this, sname, type) {
                 txt = '- ' + txt;
             }
 
-            ae(o, ct(txt));
-            ae(group, o);
+            $WH.ae(o, $WH.ct(txt));
+            $WH.ae(group, o);
         }
     }
     if (group && group.childNodes.length > 0) {
-        ae(s, group);
+        $WH.ae(s, group);
     }
 
-    ae(div, s);
+    $WH.ae(div, s);
 }
 
 function fi_initPresets(_this) {
     var
         _class,
-        s = ce('select');
+        s = $WH.ce('select');
 
     s.onchange = s.onkeyup = fi_presetClass.bind(0, s, 0);
 
-    ae(s, ce('option'));
+    $WH.ae(s, $WH.ce('option'));
 
     if (g_user.weightscales != null && g_user.weightscales.length) {
-        var o = ce('option');
+        var o = $WH.ce('option');
         o.value = -1;
         o._presets = { custom: {} };
-        ae(o, ct(LANG.ficustom));
-        ae(s, o);
+        $WH.ae(o, $WH.ct(LANG.ficustom));
+        $WH.ae(s, o);
 
         for (var i = 0, len = g_user.weightscales.length; i < len; ++i) {
             o._presets.custom[g_user.weightscales[i].id] = g_user.weightscales[i];
@@ -1578,68 +1561,68 @@ function fi_initPresets(_this) {
     }
 
     temp.sort(function (a, b) {
-        return strcmp(g_chr_classes[a], g_chr_classes[b]);
+        return $WH.strcmp(g_chr_classes[a], g_chr_classes[b]);
     });
 
     for (var i = 0, len = temp.length; i < len; ++i) {
         var
             c = temp[i],
-            o = ce('option');
+            o = $WH.ce('option');
 
         o.value = c;
         o._presets = wt_presets[c];
-        ae(o, ct(g_chr_classes[c]));
-        ae(s, o);
+        $WH.ae(o, $WH.ct(g_chr_classes[c]));
+        $WH.ae(s, o);
     }
 
-    ae(_this, s);
+    $WH.ae(_this, s);
 
-    var _ = ce('span');
+    var _ = $WH.ce('span');
     _.style.display = 'none';
 
-    var s = ce('select');
+    var s = $WH.ce('select');
     s.id = 'sdkgnsdkn436';
     s.onchange = s.onkeyup = fi_presetChange.bind(0, s);
-    ae(s, ce('option'));
+    $WH.ae(s, $WH.ce('option'));
 
-    ae(_, ct(' '));
-    ae(_, s);
-    ae(_this, _);
-    ae(_this, ct(String.fromCharCode(160, 160)));
+    $WH.ae(_, $WH.ct(' '));
+    $WH.ae(_, s);
+    $WH.ae(_this, _);
+    $WH.ae(_this, $WH.ct(String.fromCharCode(160, 160)));
 
-    var a = ce('a');
+    var a = $WH.ce('a');
     a.href = 'javascript:;';
     a.id = 'fi_detail';
-    a.appendChild(ct(LANG.fishowdetails));
+    a.appendChild($WH.ct(LANG.fishowdetails));
     a.onclick = fi_presetDetails;
-    a.onmousedown = rf;
-    ae(_this, a);
+    a.onmousedown = $WH.rf;
+    $WH.ae(_this, a);
 
     if(g_user.id > 0) {
-        ae(_this, ct(String.fromCharCode(160, 160)));
+        $WH.ae(_this, $WH.ct(String.fromCharCode(160, 160)));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.className = 'save-icon';
-        a.appendChild(ct(LANG.fisavescale));
+        a.appendChild($WH.ct(LANG.fisavescale));
         a.onclick = fi_presetSave;
-        a.onmousedown = rf;
-        ae(_this, a);
+        a.onmousedown = $WH.rf;
+        $WH.ae(_this, a);
 
-        ae(_this, ct(String.fromCharCode(160, 160)));
+        $WH.ae(_this, $WH.ct(String.fromCharCode(160, 160)));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.id = 'fi_remscale';
         a.className = 'clear-icon';
         a.style.display = 'none';
-        a.appendChild(ct(LANG.fideletescale));
+        a.appendChild($WH.ct(LANG.fideletescale));
         a.onclick = fi_presetDelete;
-        a.onmousedown = rf;
-        ae(_this, a);
+        a.onmousedown = $WH.rf;
+        $WH.ae(_this, a);
     }
 
-    var helpLink = ge('statweight-help');
+    var helpLink = $WH.ge('statweight-help');
     if (helpLink) {
         g_addTooltip(helpLink, LANG.tooltip_statweighting, 'q');
     }
@@ -1721,7 +1704,7 @@ function fi_getExtraCols(wt, gm, pu) {
                     Listview.funcBox.createSocketedIcons(sockets, td, item.gems, item.matchSockets, bonusText);
                 },
                 sortFunc: function (a, b, col) {
-                    return strcmp((a.gems ? a.gems.length: 0), (b.gems ? b.gems.length: 0));
+                    return $WH.strcmp((a.gems ? a.gems.length: 0), (b.gems ? b.gems.length: 0));
                 }
             });
         }
@@ -1732,14 +1715,14 @@ function fi_getExtraCols(wt, gm, pu) {
             width: '7%',
             value: 'score',
             compute: function (item, td) {
-                var a = ce('a');
+                var a = $WH.ce('a');
                 a.href = 'javascript:;';
                 a.onclick = fi_updateScores.bind(this);
                 a.className = (item.gemGain > 0 ? 'q2': 'q1');
 
-                ae(a, ct(fi_convertScore(item.score, this._scoreMode, this._maxScore)));
+                $WH.ae(a, $WH.ct(fi_convertScore(item.score, this._scoreMode, this._maxScore)));
 
-                ae(td, a);
+                $WH.ae(td, a);
             }
         });
     }
@@ -1779,7 +1762,7 @@ function fi_getReputationCols(factions) {
 
         eval("col.getValue = function(quest) { return Listview.funcBox.getQuestReputation(" + factions[i][0] + ", quest) }");
         eval("col.compute = function(quest, td) { return Listview.funcBox.getQuestReputation(" + factions[i][0] + ", quest) }");
-        eval("col.sortFunc = function(a, b, col) { var _ = Listview.funcBox.getQuestReputation; return strcmp(_(" + factions[i][0] + ", a), _(" + factions[i][0] + ", b)) }");
+        eval("col.sortFunc = function(a, b, col) { var _ = Listview.funcBox.getQuestReputation; return $WH.strcmp(_(" + factions[i][0] + ", a), _(" + factions[i][0] + ", b)) }");
 
         res.push(col);
     }
@@ -1798,18 +1781,13 @@ function fi_mergeFilterParams(oldParam, newParam, menuUrl) {
     var newJson = fi_filterParamToJson(newParam);
 
     if(menuUrl && menuUrl.match('filter=')) { // Don't propegate child menu criteria
-        menuJson = fi_filterParamToJson(g_parseQueryString(menuUrl.replace(/^.*?filter=/, 'filter=')).filter);
+        menuJson = fi_filterParamToJson($WH.g_parseQueryString(menuUrl.replace(/^.*?filter=/, 'filter=')).filter);
         newJson  = fi_removeMenuCriteria(newJson, menuJson);
     }
 
-    // original code for reference
-    // var jsonParam = $.extend(newJson, oldJson);
+    var combinedJson = $.extend(newJson, oldJson); // Existing filter params have priority over new ones
 
-    for (i in oldJson) { // Existing filter params have priority over new ones
-        newJson[i] = oldJson[i];
-    }
-
-    return fi_filterJsonToParam(newJson);
+    return fi_filterJsonToParam(combinedJson);
 }
 
 function fi_removeMenuCriteria(json, menu) {
@@ -1822,20 +1800,8 @@ function fi_removeMenuCriteria(json, menu) {
                 crv: json.crv.split(':')
             };
 
-/* original code for reference
-        $.each(parts, function(idx, part)
-        {
-            var pos = $.inArray(part, filters.cr);
-            if(pos != -1) {
-                filters.cr.splice(pos, 1);
-                filters.crs.splice(pos, 1);
-                filters.crv.splice(pos, 1);
-            }
-        });
-*/
-
-        array_walk(parts, function(part) {
-            var pos = in_array(filters.cr, part);
+        $WH.array_walk(parts, function(part) {
+            var pos = $WH.in_array(filters.cr, part);
             if (pos != -1) {
                 filters.cr.splice(pos, 1);
                 filters.crs.splice(pos, 1);
@@ -1860,14 +1826,8 @@ function fi_filterParamToJson(filters) {
     if(filters) {
         var parts = filters.split(';');
 
-/* original code for reference
-        $.each(parts, function(idx, part)
-        {
-            g_splitQueryParam(part, result);
-        });
-*/
-        array_walk(parts, function(part){
-            g_splitQueryParam(part, result);
+        $WH.array_walk(parts, function(part){
+            $WH.g_splitQueryParam(part, result);
         });
     }
 
@@ -1879,20 +1839,9 @@ function fi_filterJsonToParam(json) {
 
     var i = 0;
 
-/* original code for reference
-    $.each(json, function(name, value)
-    {
-        if(value !== '') {
-            if(i++ > 0) {
-                result += ';';
-            }
-            result += name + '=' + value;
-        }
-    });
-*/
-    array_walk(json, function(value, _, __, name) {
-        if(value !== '') {
-            if(i++ > 0) {
+    $WH.array_walk(json, function(value, _, __, name) {
+        if (value !== '') {
+            if (i++ > 0) {
                 result += ';';
             }
             result += name + '=' + value;

@@ -6,9 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/class.community.php';
 
-$id      = intVal($pageParam);
-$petCalc = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
-
+$id = intVal($pageParam);
 
 $cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_PET, $id, -1, User::$localeId]);
 
@@ -34,7 +32,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'title' => $pet->getField('name', true),
         'path'  => '[0, 8, '.$pet->getField('type').']',
         'page' => array(
-            'petCalc'   => $petCalc[(int)($id / 10)] . $petCalc[(2 * ($id % 10) + ($pet->getField('exotic') ? 1 : 0))],
+            'petCalc'   => Util::$tcEncoding[(int)($id / 10)] . Util::$tcEncoding[(2 * ($id % 10) + ($pet->getField('exotic') ? 1 : 0))],
             'name'      => $pet->getField('name', true),
             'id'        => $id,
             'icon'      => $pet->getField('iconString'),
@@ -165,21 +163,24 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
+
+// menuId 8: Pets     g_initPath()
+//  tabid 0: Database g_initHeader()
 $smarty->updatePageVars(array(
     'title'  => $pageData['title']." - ".Util::ucfirst(Lang::$game['pet']),
     'path'   => $pageData['path'],
-    'tab'    => 0,                                          // for g_initHeader($tab)
-    'type'   => TYPE_PET,                                   // 9:Pets
+    'tab'    => 0,
+    'type'   => TYPE_PET,
     'typeId' => $id,
     'reqJS'  => array(
-        array('path' => 'template/js/swfobject.js')
+        'template/js/swfobject.js'
     )
 ));
-
-
 $smarty->assign('community', CommunityContent::getAll(TYPE_PET, $id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game));
 $smarty->assign('lvData', $pageData);
+
+// load the page
 $smarty->display('pet.tpl');
 
 ?>

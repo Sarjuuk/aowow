@@ -101,23 +101,26 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     $smarty->saveCache($cacheKey, $pageData, $filter);
 }
 
-$page = array(
-    'tab'       => 0,                                       // for g_initHeader($tab)
-    'subCat'    => $pageParam ? '='.$pageParam : '',
-    'title'     => implode(" - ", $title),
-    'path'      => "[".implode(", ", $path)."]",
-    'reqJS'     => array(
-                       array('path' => 'template/js/filters.js', 'conditional' => false),
-                   ),
-);
 
 // sort for dropdown-menus
 asort(Lang::$game['si']);
 
-$smarty->updatePageVars($page);
+// menuId 9: Achievement g_initPath()
+//  tabId 0: Database    g_initHeader()
+$smarty->updatePageVars(array(
+    'title'  => implode(" - ", $title),
+    'path'   => "[".implode(", ", $path)."]",
+    'tab'    => 0,
+    'subCat' => $pageParam ? '='.$pageParam : '',
+    'reqJS'  => array(
+        'template/js/filters.js'
+    )
+));
 $smarty->assign('filter', $filter);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
 $smarty->assign('lvData', $pageData);
+
+// load the page
 $smarty->display('achievements.tpl');
 
 ?>

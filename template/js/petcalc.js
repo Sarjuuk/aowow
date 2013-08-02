@@ -12,15 +12,15 @@ function pc_init() {
 
     g_initPath([1, 2]);
 
-    ge('pc-classes').className = 'choose';
+    $WH.ge('pc-classes').className = 'choose';
 
     var
         families = g_sortJsonArray(g_pet_families, g_pet_families),
-        div = ce('div');
+        div = $WH.ce('div');
 
     div.className = 'pc-classes-inner-family';
 
-    _ = ge('pc-classes-inner');
+    _ = $WH.ge('pc-classes-inner');
     for (var i = 0, len = families.length; i < len; ++i) {
         var
             classId = families[i],
@@ -29,7 +29,7 @@ function pc_init() {
 
         pc_classIcons[classId] = icon;
 
-        if (Browser.ie6) {
+        if ($WH.Browser.ie6) {
             link.onfocus = tb;
         }
 
@@ -37,17 +37,17 @@ function pc_init() {
         link.onmouseover = pc_classOver.bind(link, classId);
         link.onmouseout  = Tooltip.hide;
 
-        ae(div, icon);
+        $WH.ae(div, icon);
     }
-    ae(_, div);
+    $WH.ae(_, div);
 
-    clear = ce('div');
+    clear = $WH.ce('div');
     clear.className = 'clear';
-    ae(div, clear);
+    $WH.ae(div, clear);
 
-    clear = ce('div');
+    clear = $WH.ce('div');
     clear.className = 'clear';
-    ae(_, clear);
+    $WH.ae(_, clear);
 
     pc_object = new TalentCalc();
     pc_object.initialize('pc-itself', {
@@ -55,7 +55,7 @@ function pc_init() {
         mode: TalentCalc.MODE_PET
     });
 
-    ge('pc-itself').className += ' choose';
+    $WH.ge('pc-itself').className += ' choose';
 
     pc_readPound();
     setInterval(pc_readPound, 1000);
@@ -78,11 +78,11 @@ function pc_onChange(tc, info, data) {
 
     if (info.classId != pc_classId) { // Class change
         if (!pc_loaded) {
-            _ = ge('pc-itself');
+            _ = $WH.ge('pc-itself');
             _.className = _.className.replace('choose', '');
 
-            _ = ge('pc-classes');
-            de(gE(_, 'p')[0]); // Removes 'Choose a pet family:'
+            _ = $WH.ge('pc-classes');
+            $WH.de($WH.gE(_, 'p')[0]); // Removes 'Choose a pet family:'
             _.className = '';
 
             pc_loaded = true;

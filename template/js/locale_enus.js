@@ -1570,12 +1570,16 @@ var g_quest_sorts = {
 var g_quest_types = {
      0: 'Normal',
      1: 'Group',
-    81: 'Dungeon',
-    62: 'Raid',
+    21: 'Life',
     41: 'PvP',
+    62: 'Raid',
+    81: 'Dungeon',
     82: 'World Event',
+    83: 'Legendary',
     84: 'Escort',
-    85: 'Heroic'
+    85: 'Heroic',
+    88: 'Raid (10)',
+    89: 'Raid (25)'
 };
 
 var g_sides = {
@@ -1613,6 +1617,21 @@ var g_spell_resistances = {
     4: 'Frost',
     5: 'Shadow',
     6: 'Arcane'
+};
+
+var g_spell_categories = {
+    '-13': 'Glyphs',
+    '-11': 'Proficiencies',
+     '-8': 'NPC Abilities',
+     '-7': 'Pet Talents',
+     '-6': 'Companions',
+     '-5': 'Mounts',
+     '-4': 'Racial Traits',
+     '-3': 'Pet Skills',
+     '-2': 'Talents',
+        7: 'Class Skills',
+        9: 'Secondary Skills',
+       11: 'Professions'
 };
 
 var g_spell_types = {
@@ -3744,6 +3763,8 @@ var LANG = {
 	menu_charlookup:      "Lookup by name...",
 	menu_newprofile:      "New Custom Profile",
 	menu_chooseclassspec: "Choose Your Class/Spec",
+
+    pr_selectregion: "Select a region",
 
 	pr_menu_equip:      "Equip...",
 	pr_menu_replace:    "Replace...",

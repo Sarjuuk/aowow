@@ -599,6 +599,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
+
 // menuId 3: Quest    g_initPath()
 //  tabId 0: Database g_initHeader()
 $smarty->updatePageVars(array(

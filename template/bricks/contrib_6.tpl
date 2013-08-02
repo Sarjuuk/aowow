@@ -16,7 +16,7 @@
                     <div class="pad"></div>
                 </div>
                 <div id="funcbox-generic"></div>
-                <script type="text/javascript">Listview.funcBox.coEditAppend(ge('funcbox-generic'), {ldelim}body: ''{rdelim}, 1)</script>
+                <script type="text/javascript">Listview.funcBox.coEditAppend($WH.ge('funcbox-generic'), {ldelim}body: ''{rdelim}, 1)</script>
                 <div class="pad"></div>
                 <input type="submit" value="Submit"></input>
                 <input type="hidden" name="replyto" value=""></input>

@@ -1020,13 +1020,15 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
         die();
     }
 
-    $vars = array(
-        'title' => $search.' - '.Lang::$search['search'],
-        'tab'   => 0,                                       // tabId 0: Database for g_initHeader($tab)
-        'reqJS' => [array('path' => 'template/js/swfobject.js', 'conditional' => false)]
-    );
 
-    $smarty->updatePageVars($vars);
+    // tabId 0: Database g_initHeader()
+    $smarty->updatePageVars(array(
+        'title' => $search.' - '.Lang::$search['search'],
+        'tab'   => 0,
+        'reqJS' => array(
+            'template/js/swfobject.js'
+        )
+    ));
     $smarty->assign('lang', array_merge(Lang::$main, Lang::$search));
     $smarty->assign('found', $found);
     $smarty->assign('lvData', $jsGlobals);

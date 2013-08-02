@@ -473,22 +473,6 @@ a#toptabs-menu-language
     font-size: 13px;
 }
 
-.menu-buttons a
-{
-    text-decoration: none;
-    color: white;
-    padding: 3px 8px;
-    border: 1px solid #383838;
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-.menu-buttons a.open
-{
-    background-color: #484848;
-    border: 1px solid #282828;
-}
-
 #morelink
 {
     padding: 3px 0 3px 8px;
@@ -731,102 +715,150 @@ span.breadcrumb-ellipsis {
     margin: 0 0 5px;
 }
 
-.menu
-{
-    position: absolute;
-    z-index: 100000002;
+
+/********/
+/* MENU */
+/********/
+
+.menu {
+	position: absolute;
+	z-index: 100000002;
 }
 
-.menu table td
-{
-    padding: 0;
-    vertical-align: top;
+.menu .menu-outer {
+	float: left;
+	border: 1px solid #181818;
+
+	-webkit-box-shadow: 1px 1px 5px black;
+	-moz-box-shadow: 1px 1px 5px black;
+	box-shadow: 1px 1px 5px black;
 }
 
-.menu p
-{
-    margin: 0;
-    padding: 0;
-    position: relative;
+.menu .menu-inner {
+	border: 2px solid #484848;
+	border-top: 1px solid #484848;
 }
 
-.menu div
-{
-    border: 1px solid #202020;
+.menu a {
+	display: block;
+	padding: 4px 4px 4px 24px;
+	text-decoration: none;
+	border-top: 1px solid #484848;
+	border-bottom: 1px solid #101010;
+	white-space: nowrap;
+	font-size: 13px;
 }
 
-.menu div div
-{
-    border: 2px solid #484848;
-    border-top: 1px solid #484848;
-    white-space: nowrap;
-    font-size: 13px;
+.menu a span {
+	display: block;
+	padding-right: 20px;
 }
 
-.menu span
-{
-    display: block;
-    padding: 0 18px 0 0;
+.menu a span.hassubmenu {
+	background: url(../images/Menu/arrow-right.gif) right center no-repeat;
 }
 
-.menu span span
-{
-    padding: 0 0 0 18px;
+.menu a, .menu a span { /* Setting the background color on both the <a> and the <span> so the hover effect works in IE7 */
+	background-color: #282828;
 }
 
-.menu span.separator
-{
-    padding: 4px 9px;
-    background: #141414;
-    border-top: 1px solid #484848;
-    font-weight: bold;
-    cursor: default;
+.menu a.open, .menu a:hover, .menu a.open span, .menu a:hover span {
+	background-color: #383838;
 }
 
-.menu a
-{
-    display: block;
-    padding: 4px;
-    text-decoration: none;
-    background-color: #282828;
-    border-top: 1px solid #484848;
-    border-bottom: 1px solid #101010;
+.menu a.open, .menu a:hover {
+	border-bottom: 1px solid #202020;
 }
 
-.menu a.open, .menu a:hover
-{
-    border-bottom: 1px solid #202020;
-    background-color: #383838;
+.menu a.separator {
+	color: white;
+	font-weight: bold;
+	padding: 4px 8px;
+	background-color: #181818;
 }
 
-.menu a.input:hover
-{
-    background-color: #282828;
-    border-bottom: 1px solid #101010;
-    cursor: default;
+.menu a.separator:hover {
+	text-decoration: underline;
+	background-color: #181818;
+	border-bottom: 1px solid #101010;
 }
 
-.menucheck
-{
-    background: url(../images/menu_check.gif) left center no-repeat;
+.menu a.unlinked {
+	text-decoration: none !important;
+	cursor: default;
 }
 
-.menusub
-{
-    background: url(../images/menu_arrow.gif) right center no-repeat;
+.menu a.checked {
+	background-image: url(../images/Menu/check.gif);
+	background-position: 9px center;
+	background-repeat: no-repeat;
 }
 
+.menu a.icon, .menu a.tinyicon {
+	background-position: 4px center;
+	background-repeat: no-repeat;
+	padding-left: 24px;
+}
+
+.menu a.socket-meta, .menu a.socket-red, .menu a.socket-yellow, .menu a.socket-blue, .menu a.socket-prismatic, .menu a.socket-hydraulic, .menu a.socket-cogwheel {
+	background-position: 5px center;
+}
+
+.menu a.icon-star-right span
+{
+	padding-right: 21px;
+	background: url(../images/icons/star.png) no-repeat right center;
+}
+
+/****************/
+/* MENU BUTTONS */
+/****************/
+
+.menu-buttons {
+	padding: 4px 0 0 5px;
+}
+
+    span.menu-buttons a {
+	text-decoration: none;
+	color: white;
+	padding: 4px 11px;
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+span.menu-buttons a:hover {
+	text-decoration: underline;
+}
+
+span.menu-buttons a.open {
+	background-color: #484848;
+	padding: 3px 10px;
+	border: 1px solid #282828;
+}
+
+span.menu-buttons a.unlinked {
+	text-decoration: none !important;
+	cursor: default;
+}
+
+span.menu-buttons span.hassubmenu {
+	padding-right: 13px;
+	background: url(../images/Menu/arrow-down.gif) right center no-repeat;
+}
+
+/* start note: remove with breadcrumbs */
 .menuarrow
 {
     padding-right: 16px;
-    background: url(../images/menu_arrow.gif) right center no-repeat;
+    background: url(../images/Menu/arrow-right.gif) right center no-repeat;
 }
 
 .menuarrowd
 {
     padding-right: 11px;
-    background: url(../images/menu_arrowd.gif) right center no-repeat;
+    background: url(../images/Menu/arrow-down.gif) right center no-repeat;
 }
+/* end note */
 
 .tabs li
 {

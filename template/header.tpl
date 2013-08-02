@@ -30,7 +30,7 @@
         <div id="topbar"><span id="topbar-generic" class="menu-buttons"></span><div class="clear"></div></div>
         {strip}<script type="text/javascript">
             g_initHeader({$page.tab});
-            LiveSearch.attach(ge('livesearch-generic'));
+            LiveSearch.attach($WH.ge('livesearch-generic'));
 {foreach from=$jsGlobals item="glob"}
     {include file="bricks/globals/`$glob[0]`.tpl" data=$glob[1]}
 {/foreach}

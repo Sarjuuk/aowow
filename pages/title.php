@@ -83,18 +83,21 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
+
+// menuId 10: Title    g_initPath()
+//  tabId  0: Database g_initHeader()
 $smarty->updatePageVars(array(
     'title'  => $pageData['title']." - ".Util::ucfirst(Lang::$game['title']),
     'path'   => $pageData['path'],
-    'tab'    => 0,                                          // for g_initHeader($tab)
-    'type'   => TYPE_TITLE,                                 // 11:Titles
+    'tab'    => 0,
+    'type'   => TYPE_TITLE,
     'typeId' => $id
 ));
-
-
 $smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
 $smarty->assign('lvData', $pageData);
+
+// load the page
 $smarty->display('title.tpl');
 
 ?>

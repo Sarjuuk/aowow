@@ -395,13 +395,15 @@ trait spawnHelper
 class Lang
 {
     public static $main;
-    public static $search;
+    public static $account;
     public static $game;
     public static $error;
 
-    public static $account;
-    public static $achievement;
+    public static $search;
     public static $compare;
+    public static $talent;
+
+    public static $achievement;
     public static $currency;
     public static $event;
     public static $item;
@@ -411,7 +413,6 @@ class Lang
     public static $pet;
     public static $quest;
     public static $spell;
-    public static $talent;
     public static $title;
     public static $zone;
 
@@ -765,7 +766,7 @@ class SmartyAoWoW extends Smarty
             case TYPE_CLASS:       $jsg[TYPE_CLASS]       = ['classes', []];      break;
             case TYPE_RACE:        $jsg[TYPE_RACE]        = ['races', []];        break;
             case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['skills', []];       break;
-            case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['curencies', []];    break;
+            case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['currencies', []];   break;
         }
     }
 
@@ -970,10 +971,10 @@ class Util
     public static $dateFormatLong           = "Y/m/d H:i:s";
 
     public static $changeLevelString        = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_staticTooltipLevelClick(this, null, 0)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><!--lvl-->%s</a>';
-    public static $setRatingLevelString     = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="g_setRatingLevel(this, %s, %s, %s)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</a>';
+    public static $setRatingLevelString     = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_setRatingLevel(this, %s, %s, %s)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</a>';
 
-    public static $filterResultString       = 'sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
-    public static $narrowResultString       = 'sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
+    public static $filterResultString       = '$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
+    public static $narrowResultString       = '$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
     public static $setCriteriaString        = "fi_setCriteria(%s, %s, %s);\n";
 
     public static $dfnString                = '<dfn title="%s" class="w">%s</dfn>';
@@ -1579,6 +1580,8 @@ class Util
         'medium' => 'style="background-image: url(%s/images/icons/medium/%s.jpg)"',
         'large'  => 'style="background-image: url(%s/images/icons/large/%s.jpg)"',
     );
+
+    public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
 
     private static $execTime = 0.0;
 

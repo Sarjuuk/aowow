@@ -31,7 +31,7 @@
             <div id="tabs-generic"></div>
             <div id="listview-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
-                var tabsRelated = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
+                var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
 {if isset($lvData.page.acvReward)}   {include file='bricks/listviews/achievement.tpl' data=$lvData.page.acvReward   params=$lvData.page.acvParams  } {/if}
 {if isset($lvData.page.questReward)} {include file='bricks/listviews/quest.tpl'       data=$lvData.page.questReward params=$lvData.page.questParams} {/if}
                 new Listview({ldelim}template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: tabsRelated, parent: 'listview-generic', data: lv_comments{rdelim});

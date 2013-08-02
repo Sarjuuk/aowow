@@ -6,7 +6,7 @@ var Draggable = new function () {
         dragObj;
 
     function onMouseDown(e) {
-        e = $E(e);
+        e = $WH.$E(e);
 
         if (this._handle) {
             var _ = e._target,
@@ -30,10 +30,10 @@ var Draggable = new function () {
 
         clickObj = this;
 
-        start = g_getCursorPos(e);
+        start = $WH.g_getCursorPos(e);
 
-        aE(document, 'mousemove', onMouseMove);
-        aE(document, 'mouseup', onMouseUp);
+        $WH.aE(document, 'mousemove', onMouseMove);
+        $WH.aE(document, 'mouseup', onMouseUp);
 
         if (clickObj.onClick) {
             clickObj.onClick(e, clickObj);
@@ -43,9 +43,9 @@ var Draggable = new function () {
     }
 
     function onMouseMove(e) {
-        e = $E(e);
+        e = $WH.$E(e);
 
-        var pos = g_getCursorPos(e);
+        var pos = $WH.g_getCursorPos(e);
 
         if (clickObj) {
             if (Math.abs(pos.x - start.x) > 5 || Math.abs(pos.y - start.y) > 5) {
@@ -72,7 +72,7 @@ var Draggable = new function () {
     }
 
     function onMouseUp(e) {
-        e = $E(e);
+        e = $WH.$E(e);
 
         clickObj = null;
 
@@ -86,7 +86,7 @@ var Draggable = new function () {
             onDragEnd(e);
         }
 
-        var foo = ac(obj);
+        var foo = $WH.ac(obj);
         mouse.x = foo[0];
         mouse.y = foo[1];
 
@@ -94,8 +94,8 @@ var Draggable = new function () {
             dragObj = obj.cloneNode(true);
             dragObj._orig = obj;
 
-            ae(ge('layers'), dragObj);
-            // ae(document.body, dragObj); // 5.0.. why does it do that?
+            $WH.ae($WH.ge('layers'), dragObj);
+            // $WH.ae(document.body, dragObj); // 5.0.. why does it do that?
             setPosition(-2323, -2323);
         }
         else {
@@ -116,7 +116,7 @@ var Draggable = new function () {
     function onDragEnd(e) {
         var
             found = false,
-            cursor = g_getCursorPos(e);
+            cursor = $WH.g_getCursorPos(e);
 
         if (dragObj._orig && dragObj._orig._targets.length) {
             clearPosition();
@@ -128,7 +128,7 @@ var Draggable = new function () {
                 y2: dragObj._y + parseInt(dragObj.offsetHeight)
             };
 
-            de(dragObj);
+            $WH.de(dragObj);
             dragObj = dragObj._orig;
 
             for (var i = 0, len = dragObj._targets.length; i < len; ++i) {
@@ -141,7 +141,7 @@ var Draggable = new function () {
                         dragObj.onDrop(e, dragObj, targObj, (cursor.x >= bounds.x1 && cursor.x <= bounds.x2 && cursor.y >= bounds.y1 && cursor.y <= bounds.y2));
                     }
                     else {
-                        ae(targObj, dragObj);
+                        $WH.ae(targObj, dragObj);
                     }
                 }
             }
@@ -151,8 +151,8 @@ var Draggable = new function () {
             dragObj.onDrop(e, dragObj, null);
         }
 
-        dE(document, 'mousemove', onMouseMove);
-        dE(document, 'mouseup', onMouseUp);
+        $WH.dE(document, 'mousemove', onMouseMove);
+        $WH.dE(document, 'mouseup', onMouseUp);
 
         Tooltip.disabled = false;
 
@@ -175,7 +175,7 @@ var Draggable = new function () {
     }
 
     function getBounds(obj) {
-        var pos = ac(obj);
+        var pos = $WH.ac(obj);
 
         return {
             x1: pos[0],
@@ -190,7 +190,7 @@ var Draggable = new function () {
 
         var a = obj.getElementsByTagName('a');
         for (var i = 0, len = a.length; i < len; ++i) {
-            ns(a[i]);
+            $WH.ns(a[i]);
         }
 
         if (!obj._targets) {
@@ -204,12 +204,12 @@ var Draggable = new function () {
         if (opt != null) {
             if (opt.targets) {
                 for (var i = 0, len = opt.targets.length; i < len; ++i) {
-                    obj._targets.push(ge(opt.targets[i]));
+                    obj._targets.push($WH.ge(opt.targets[i]));
                 }
             }
 
             if (opt.container) {
-                obj._container = $(opt.container);
+                obj._container = $WH.ge(opt.container);
             }
 
             // Functions

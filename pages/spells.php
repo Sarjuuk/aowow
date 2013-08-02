@@ -424,15 +424,6 @@ if (isset($filter['gl']) && !is_array($filter['gl']))
     $path[] = $filter['gl'];
 }
 
-$page = array(
-    'tab'       => 0,                                       // for g_initHeader($tab)
-    'subCat'    => $pageParam !== null ? '='.$pageParam : '',
-    'title'     => implode(" - ", $title),
-    'path'      => "[".implode(", ", $path)."]",
-    'reqJS'     => array(
-                       array('path' => 'template/js/filters.js', 'conditional' => false),
-                   ),
-);
 
 // sort for dropdown-menus
 asort(Lang::$game['ra']);
@@ -441,10 +432,22 @@ asort(Lang::$game['sc']);
 asort(Lang::$game['me']);
 Lang::$game['race'] = Util::ucFirst(Lang::$game['race']);
 
-$smarty->updatePageVars($page);
+// menuId 1: Spell    g_initPath()
+//  tabId 0: Database g_initHeader()
+$smarty->updatePageVars(array(
+    'title'  => implode(" - ", $title),
+    'path'   => "[".implode(", ", $path)."]",
+    'tab'    => 0,
+    'subCat' => $pageParam !== null ? '='.$pageParam : '',
+    'reqJS'  => array(
+        'template/js/filters.js'
+    )
+));
 $smarty->assign('filter', $filter);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
 $smarty->assign('lvData', $pageData);
+
+// load the page
 $smarty->display('spells.tpl');
 
 ?>

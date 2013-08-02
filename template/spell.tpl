@@ -34,8 +34,8 @@
                 <div style="clear: left"></div>
 
                 <script type="text/javascript">
-                    ge('headicon-generic').appendChild(Icon.create('{$lvData.page.icon}', 2, 0, 0, {$lvData.page.stack}));
-                    Tooltip.fix(ge('tooltip{$lvData.page.id}-generic'), 1, 1);
+                    $WH.ge('headicon-generic').appendChild(Icon.create('{$lvData.page.icon}', 2, 0, 0, {$lvData.page.stack}));
+                    Tooltip.fix($WH.ge('tooltip{$lvData.page.id}-generic'), 1, 1);
                 </script>
 
                 {if !empty($lvData.page.buff)}
@@ -44,7 +44,7 @@
                     <table><tr><td>{$lvData.page.buff}</td><th style="background-position: top right"></th></tr><tr><th style="background-position: bottom left"></th><th style="background-position: bottom right"></th></tr></table>
                 </div>
                 <script type="text/javascript">
-                    Tooltip.fixSafe(ge('btt{$lvData.page.id}'), 1, 1)
+                    Tooltip.fixSafe($WH.ge('btt{$lvData.page.id}'), 1, 1)
                 </script>
                 {/if}
 
@@ -57,7 +57,7 @@
                         </table>
                         <script type="text/javascript">
 {section name=i loop=$lvData.page.reagents}
-                            ge('iconlist-icon{$iconlist2++}').appendChild(g_items.createIcon({$lvData.page.reagents[i].entry}, 0, {$lvData.page.reagents[i].count}));
+                            $WH.ge('iconlist-icon{$iconlist2++}').appendChild(g_items.createIcon({$lvData.page.reagents[i].entry}, 0, {$lvData.page.reagents[i].count}));
 {/section}
                         </script>
 {if $lvData.page.tools}</div>{/if}{/if}
@@ -70,7 +70,7 @@
                         </table>
                         <script type="text/javascript">
 {section name=i loop=$lvData.page.tools}{if isset($lvData.page.tools[i].itemId)}
-                            ge('iconlist-icon{$iconlist2++}').appendChild(g_items.createIcon({$lvData.page.tools[i].itemId}, 0, 1));
+                            $WH.ge('iconlist-icon{$iconlist2++}').appendChild(g_items.createIcon({$lvData.page.tools[i].itemId}, 0, 1));
 {/if}{/section}
                         </script>
 {if $lvData.page.reagents}</div>{/if}{/if}
@@ -173,7 +173,7 @@
                                 </tr>
                             </table>
                             <script type="text/javascript">
-                                ge('icontab-icon{$smarty.section.i.index}').appendChild({if isset($lvData.page.effect[i].icon.quality)}g_items{else}g_spells{/if}.createIcon({$lvData.page.effect[i].icon.id}, 1, {$lvData.page.effect[i].icon.count}));
+                                $WH.ge('icontab-icon{$smarty.section.i.index}').appendChild({if isset($lvData.page.effect[i].icon.quality)}g_items{else}g_spells{/if}.createIcon({$lvData.page.effect[i].icon.id}, 1, {$lvData.page.effect[i].icon.count}));
                             </script>
 {/if}
                         </td>
@@ -188,7 +188,7 @@
             <div id="tabs-generic"></div>
             <div id="listview-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
-                var tabsRelated = new Tabs({ldelim}parent: ge('tabs-generic'){rdelim});
+                var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
 {if isset($lvData.modifiedBy)}    {include file='bricks/listviews/spell.tpl'       data=$lvData.modifiedBy.data    params=$lvData.modifiedBy.params   } {/if}
 {if isset($lvData.modifies)}      {include file='bricks/listviews/spell.tpl'       data=$lvData.modifies.data      params=$lvData.modifies.params     } {/if}
 {if isset($lvData.seeAlso)}       {include file='bricks/listviews/spell.tpl'       data=$lvData.seeAlso.data       params=$lvData.seeAlso.params      } {/if}

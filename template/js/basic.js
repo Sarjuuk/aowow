@@ -1,422 +1,615 @@
-if (typeof $WH == "undefined") {
-	$WH = window
+if (typeof $WH == "undefined") { // Local
+    var $WH = {};
 }
-$WH.$ = function (c) {
-	if (arguments.length > 1) {
-		var b = [];
-		var a;
-		for (var d = 0, a = arguments.length; d < a; ++d) {
-			b.push($WH.$(arguments[d]))
-		}
-		return b
-	}
-	if (typeof c == "string") {
-		c = $WH.ge(c)
-	}
-	return c
-};
 
 $WH.$E = function (e) {
-	if (!e) {
-		if (typeof event != 'undefined') {
-			e = event;
-		}
-		else {
-			return null;
-		}
-	}
+    if (!e) {
+        if (typeof event != 'undefined') {
+            e = event;
+        }
+        else {
+            return null;
+        }
+    }
 
-	// Netscape standard (1 = Left, 2 = Middle, 3 = Right)
-	if (e.which) {
-		e._button = e.which;
-	}
-	else {
-		e._button = e.button;
-		// IE8 doesnt have a button set, so add 1 to at least register as a left click
-		if ($WH.Browser.ie6789 && e._button) { // 5.0
-		// if ($WH.Browser.ie) { // 3.x
-			if (e._button & 4) {
-				e._button = 2; // Middle
-			}
-			else if (e._button & 2) {
-				e._button = 3; // Right
-			}
-		}
-		else {
-			e._button = e.button + 1;
-		}
-	}
+    // Netscape standard (1 = Left, 2 = Middle, 3 = Right)
+    if (e.which) {
+        e._button = e.which;
+    }
+    else {
+        e._button = e.button;
+        // IE8 doesnt have a button set, so add 1 to at least register as a left click
+        if ($WH.Browser.ie6789 && e._button) { // 5.0
+        // if ($WH.Browser.ie) { // 3.x
+            if (e._button & 4) {
+                e._button = 2; // Middle
+            }
+            else if (e._button & 2) {
+                e._button = 3; // Right
+            }
+        }
+        else {
+            e._button = e.button + 1;
+        }
+    }
 
-	e._target = e.target ? e.target : e.srcElement;
+    e._target = e.target ? e.target : e.srcElement;
 
-	e._wheelDelta = e.wheelDelta ? e.wheelDelta : -e.detail;
+    e._wheelDelta = e.wheelDelta ? e.wheelDelta : -e.detail;
 
-	return e;
+    return e;
 };
 
 $WH.$A = function (a) {
-	var r = [];
-	for (var i = 0, len = c.length; i < len; ++i) {
-		r.push(a[i]);
-	}
+    var r = [];
+    for (var i = 0, len = c.length; i < len; ++i) {
+        r.push(a[i]);
+    }
 
-	return r;
+    return r;
 };
 
-$WH.bindfunc = function(){
-	args = $A(arguments);
+if (!Function.prototype.bind) {
+    Function.prototype.bind = function () {
+        var
+            __method = this,
+            args     = $WH.$A(arguments),
+            object   = args.shift();
+
+        return function () {
+            return __method.apply(object, args.concat($WH.$A(arguments)));
+        };
+    }
+}
+
+$WH.bindfunc = function() {
+    args = $WH.$A(arguments);
 	var __method = args.shift();
 	var object = args.shift();
 
 	return function() {
-		return __method.apply(object, args.concat($A(arguments)));
-	}
+		return __method.apply(object, args.concat($WH.$A(arguments)));
+	};
 };
 
-if (!Function.prototype.bind) {
-	Function.prototype.bind = function () {
-		var
-			__method = this,
-			args	 = $WH.$A(arguments),
-			object   = args.shift();
-
-		return function () {
-			return __method.apply(object, args.concat($A(arguments)));
-		};
-	}
-}
 if (!String.prototype.ltrim) {
-	String.prototype.ltrim = function () {
-		return this.replace(/^\s*/, "")
-	}
+	String.prototype.ltrim = function () { return this.replace(/^\s*/, ""); }
 }
 if (!String.prototype.rtrim) {
-	String.prototype.rtrim = function () {
-		return this.replace(/\s*$/, "")
-	}
+	String.prototype.rtrim = function () { return this.replace(/\s*$/, ""); }
 }
 if (!String.prototype.trim) {
-	String.prototype.trim = function () {
-		return this.ltrim().rtrim()
-	}
+	String.prototype.trim = function () { return this.ltrim().rtrim(); }
 }
 if (!String.prototype.removeAllWhitespace) {
-	String.prototype.removeAllWhitespace = function () {
-		return this.replace("/s+/g", "")
-	}
+	String.prototype.removeAllWhitespace = function () { return this.replace("/s+/g", ""); }
 }
-$WH.strcmp = function (d, c) {
-	if (d == c) {
-		return 0
-	}
-	if (d == null) {
-		return -1
-	}
-	if (c == null) {
-		return 1
-	}
-	var f = parseFloat(d),
-	e = parseFloat(c);
-	if (!isNaN(f) && !isNaN(e) && f != e) {
-		return f < e ? -1 : 1
-	}
-	return d < c ? -1 : 1
-};
-$WH.trim = function (a) {
-	return a.replace(/(^\s*|\s*$)/g, "")
-};
-$WH.rtrim = function (c, d) {
-	var b = c.length;
-	while (--b > 0 && c.charAt(b) == d) {}
-	c = c.substring(0, b + 1);
-	if (c == d) {
-		c = ""
-	}
-	return c
-};
-$WH.sprintf = function (b) {
-	var a;
-	for (a = 1, len = arguments.length; a < len; ++a) {
-		b = b.replace("$" + a, arguments[a])
-	}
-	return b
-};
-$WH.sprintfa = function (b) {
-	var a;
-	for (a = 1, len = arguments.length; a < len; ++a) {
-		b = b.replace(new RegExp("\\$" + a, "g"), arguments[a])
-	}
-	return b
-};
-$WH.sprintfo = function (c) {
-	if (typeof c == "object" && c.length) {
-		var a = c;
-		c = a[0];
-		var b;
-		for (b = 1; b < a.length; ++b) {
-			c = c.replace("$" + b, a[b])
-		}
-		return c
-	}
-};
-$WH.str_replace = function (e, d, c) {
-	while (e.indexOf(d) != -1) {
-		e = e.replace(d, c)
-	}
-	return e
-};
-$WH.urlencode = function (a) {
-	a = encodeURIComponent(a);
-	a = str_replace(a, "+", "+");
-	return a
-};
-$WH.urlencode2 = function (a) {
-	a = encodeURIComponent(a);
-	a = str_replace(a, " ", "+");
-	return a
-};
-$WH.number_format = function (a) {
-	x = ("" + parseFloat(a)).split(".");
-	a = x[0];
-	x = x.length > 1 ? "." + x[1] : "";
-	if (a.length <= 3) {
-		return a + x
-	}
-	return $WH.number_format(a.substr(0, a.length - 3)) + "," + a.substr(a.length - 3) + x
-};
-$WH.is_array = function (b) {
-	return !! (b && b.constructor == Array)
-};
-$WH.in_array = function (c, g, h, e) {
-	if (c == null) {
-		return -1
-	}
-	if (h) {
-		return $WH.in_arrayf(c, g, h, e)
-	}
-	for (var d = e || 0, b = c.length; d < b; ++d) {
-		if (c[d] == g) {
-			return d
-		}
-	}
-	return -1
-};
-$WH.in_arrayf = function (c, g, h, e) {
-	for (var d = e || 0, b = c.length; d < b; ++d) {
-		if (h(c[d]) == g) {
-			return d
-		}
-	}
-	return -1
-};
-$WH.rs = function () {
-	var e = $WH.rs.random;
-	var b = "";
-	for (var a = 0; a < 16; a++) {
-		var d = Math.floor(Math.random() * e.length);
-		if (a == 0 && d < 11) {
-			d += 10
-		}
-		b += e.substring(d, d + 1)
-	}
-	return b
-};
-$WH.rs.random = "0123456789abcdefghiklmnopqrstuvwxyz";
-$WH.isset = function (a) {
-	return typeof window[a] != "undefined"
-};
-$WH.array_walk = function (d, h, c) {
-	var g;
-	for (var e = 0, b = d.length; e < b; ++e) {
-		g = h(d[e], c, d, e);
-		if (g != null) {
-			d[e] = g
-		}
-	}
-};
-$WH.array_apply = function (d, h, c) {
-	var g;
-	for (var e = 0, b = d.length; e < b; ++e) {
-		h(d[e], c, d, e)
-	}
-};
-$WH.ge = function (a) {
-	return document.getElementById(a)
-};
-$WH.gE = function (a, b) {
-	return a.getElementsByTagName(b)
-};
-$WH.ce = function (d, b, e) {
-	var a = document.createElement(d);
-	if (b) {
-		$WH.cOr(a, b)
-	}
-	if (e) {
-		$WH.ae(a, e)
-	}
-	return a
-};
-$WH.de = function (a) {
-	a.parentNode.removeChild(a)
-};
-$WH.ae = function (a, b) {
-	if ($WH.is_array(b)) {
-		$WH.array_apply(b, a.appendChild.bind(a));
-		return b
-	} else {
-		return a.appendChild(b)
-	}
-};
-$WH.aef = function (a, b) {
-	return a.insertBefore(b, a.firstChild)
-};
-$WH.ee = function (a, b) {
-	if (!b) {
-		b = 0
-	}
-	while (a.childNodes[b]) {
-		a.removeChild(a.childNodes[b])
-	}
-};
-$WH.ct = function (a) {
-	return document.createTextNode(a)
-};
-$WH.st = function (a, b) {
-	if (a.firstChild && a.firstChild.nodeType == 3) {
-		a.firstChild.nodeValue = b
-	} else {
-		$WH.aef(a, ct(b))
-	}
-};
-$WH.nw = function (a) {
-	a.style.whiteSpace = "nowrap"
-};
-$WH.rf = function () {
-	return false
-};
-$WH.rf2 = function (a) {
-	a = $WH.$E(a);
-	if (a.ctrlKey || a.shiftKey || a.altKey || a.metaKey) {
-		return
-	}
-	return false
-};
-$WH.tb = function () {
-	this.blur()
-};
-$WH.aE = function (b, c, a) {
-	if ($WH.Browser.ie) {
-		b.attachEvent("on" + c, a)
-	} else {
-		b.addEventListener(c, a, false)
-	}
-};
-$WH.dE = function (b, c, a) {
-	if ($WH.Browser.ie) {
-		b.detachEvent("on" + c, a)
-	} else {
-		b.removeEventListener(c, a, false)
-	}
-};
-$WH.sp = function (a) {
-	if (!a) {
-		a = event
-	}
-	if ($WH.Browser.ie) {
-		a.cancelBubble = true
-	} else {
-		a.stopPropagation()
-	}
-};
-$WH.sc = function (h, i, d, f, g) {
-	var e = new Date();
-	var c = h + "=" + escape(d) + "; ";
-	e.setDate(e.getDate() + i);
-	c += "expires=" + e.toUTCString() + "; ";
-	if (f) {
-		c += "path=" + f + "; "
-	}
-	if (g) {
-		c += "domain=" + g + "; "
-	}
-	document.cookie = c;
-	$WH.gc.C[h] = d
-};
-$WH.dc = function (a) {
-	$WH.sc(a, -1);
-	$WH.gc.C[a] = null
-};
-$WH.gc = function (f) {
-	if ($WH.gc.I == null) {
-		var e = unescape(document.cookie).split("; ");
-		$WH.gc.C = {};
-		for (var c = 0, a = e.length; c < a; ++c) {
-			var g = e[c].indexOf("="),
-			b,
-			d;
-			if (g != -1) {
-				b = e[c].substr(0, g);
-				d = e[c].substr(g + 1)
-			} else {
-				b = e[c];
-				d = ""
-			}
-			$WH.gc.C[b] = d
-		}
-		$WH.gc.I = 1
-	}
-	if (!f) {
-		return $WH.gc.C
-	} else {
-		return $WH.gc.C[f]
-	}
-};
-$WH.ns = function (a) {
-	if ($WH.Browser.ie) {
-		a.onfocus = tb;
-		a.onmousedown = a.onselectstart = a.ondragstart = $WH.rf
-	}
-};
-$WH.eO = function (b) {
-	for (var a in b) {
-		delete b[a]
-	}
-};
-$WH.cO = function (c, a) {
-	for (var b in a) {
-		if (a[b] !== null && typeof a[b] == "object" && a[b].length) {
-			c[b] = a[b].slice(0)
-		} else {
-			c[b] = a[b]
-		}
-	}
-};
-$WH.cOr = function (c, a) {
-	for (var b in a) {
-		if (typeof a[b] == "object") {
-			if (a[b].length) {
-				c[b] = a[b].slice(0)
-			} else {
-				if (!c[b]) {
-					c[b] = {}
-				}
-				$WH.cOr(c[b], a[b])
-			}
-		} else {
-			c[b] = a[b]
-		}
-	}
+
+$WH.strcmp = function(a, b) {
+    if (a == b) {
+        return 0;
+    }
+
+    if (a == null) {
+        return -1;
+    }
+
+    if (b == null) {
+        return 1;
+    }
+
+    // Natural sorting for strings starting with a number
+    var
+        _a = parseFloat(a),
+        _b = parseFloat(b);
+    if (!isNaN(_a) && !isNaN(_b) && _a != _b) {
+        return _a < _b ? -1 : 1;
+    }
+
+    // String comparison done with a native JS function that supports accents and non-latin characters
+    if (typeof a == 'string' && typeof b == 'string') {
+        return a.localeCompare(b);
+    }
+
+    // Other
+    return a < b ? -1 : 1;
+}
+
+$WH.trim = function(str) {
+    return str.replace(/(^\s*|\s*$)/g, '');
+}
+
+$WH.rtrim = function(z, y) {
+    var a = z.length;
+
+    while (--a > 0 && z.charAt(a) == y) { }
+
+    z = z.substring(0, a + 1);
+
+    if (z == y) {
+        z = '';
+    }
+
+    return z;
+}
+
+$WH.sprintf = function(z) {
+    var i;
+    for (i = 1, len = arguments.length; i < len; ++i) {
+        z = z.replace('$' + i, arguments[i]);
+    }
+
+    return z;
+}
+
+// This version supports multiple occurences of the same token.
+$WH.sprintfa = function(z) {
+    var i;
+    for (i = 1, len = arguments.length; i < len; ++i) {
+        z = z.replace(new RegExp('\\$' + i, 'g'), arguments[i]);
+    }
+
+    return z;
+}
+
+// This version works with an array object as the paremeter.
+$WH.sprintfo = function(z) {
+    if (typeof z == 'object' && z.length) {
+        var args = z;
+        z = args[0];
+
+        var i;
+        for (i = 1; i < args.length; ++i) {
+            z = z.replace('$' + i, args[i]);
+        }
+
+        return z;
+    }
+}
+
+$WH.str_replace = function(z, a, b) {
+    while (z.indexOf(a) != -1) {
+        z = z.replace(a, b);
+    }
+
+    return z;
+}
+
+// Encode URL for internal use (e.g. Ajax)
+$WH.urlencode = function(z) {
+    z = encodeURIComponent(z);
+    z = $WH.str_replace(z, '+', '%2B');
+    return z;
+}
+
+// Encode URL for visible use (e.g. href)
+$WH.urlencode2 = function(z) {
+    z = encodeURIComponent(z);
+    z = $WH.str_replace(z, '%20', '+');
+    z = $WH.str_replace(z, '%3D', '=');
+
+    return z;
+}
+
+// Group digits (e.g. 1234 --> 1,234)
+$WH.number_format = function(z) {
+    x = ('' + parseFloat(z)).split('.');
+    z = x[0];
+    x = x.length > 1 ? "." + x[1] : '';
+
+    if (z.length <= 3) {
+        return z + x;
+    }
+
+    return $WH.number_format(z.substr(0, z.length - 3)) + ',' + z.substr(z.length - 3) + x;
+}
+
+$WH.is_array = function (arr) {
+	return !!(arr && arr.constructor == Array);
 };
 
+$WH.in_array = function(arr, val, func, idx) {
+    if (arr == null) {
+        return -1;
+    }
+
+    if (func) {
+        return $WH.in_arrayf(arr, val, func, idx);
+    }
+
+    for (var i = idx || 0, len = arr.length; i < len; ++i) {
+        if (arr[i] == val) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+$WH.in_arrayf = function (arr, val, func, idx) {
+    for (var i = idx || 0, len = arr.length; i < len; ++i) {
+        if (func(arr[i]) == val) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+$WH.rs = function () {
+	var c = $WH.rs.random;
+	var r = '';
+	for (var i = 0; i < 16; i++) {
+		var n = Math.floor(Math.random() * c.length);
+		if (i == 0 && n < 11) {
+			n += 10;
+		}
+		r += c.substring(n, n + 1);
+	}
+
+	return r;
+};
+$WH.rs.random = "0123456789abcdefghiklmnopqrstuvwxyz";
+
+$WH.isset = function (a) {
+	return typeof window[a] != "undefined";
+};
+
+if (!$WH.isset('console')) {
+	console = { log: function() {} };
+}
+
+$WH.array_walk = function(a, f, ud) {
+    var res;
+    for (var i = 0, len = a.length; i < len; ++i) {
+        res = f(a[i], ud, a, i);
+        if (res != null) {
+            a[i] = res;
+        }
+    }
+}
+
+$WH.array_apply = function(a, f, ud) {
+    var res;
+    for (var i = 0, len = a.length; i < len; ++i) {
+        f(a[i], ud, a, i);
+    }
+}
+
+$WH.array_filter = function(a, f) {
+	var res = [];
+	for (var i = 0, len = a.length; i < len; ++i) {
+		if (f(a[i])) {
+			res.push(a[i]);
+		}
+	}
+
+	return res;
+}
+
+$WH.array_index = function(a, r, f, z) {
+	if (!$WH.is_array(a)) {
+        return false;
+	}
+
+	if (!a.__R || z) {
+		a.__R = {};
+		if (!f) {
+            f = function(x) { return x; };
+		}
+
+		for (var i = 0, len = a.length; i < len; ++i) {
+			a.__R[f(a[i])] = i;
+		}
+	}
+
+	return (r == null ? a.__R : !isNaN(a.__R[r]));
+}
+
+$WH.array_compare = function(a, b) {
+	if (a.length != b.length) {
+		return false;
+	}
+
+	var o = {};
+	for (var i = a.length; i >= 0; --i) {
+		o[a[i]] = true;
+	}
+
+	var match = true;
+	for (var i = b.length; i >= 0; --i) {
+		if (o[b[i]] === undefined) {
+			match = false;
+		}
+	}
+
+	return match;
+}
+
+$WH.array_unique = function(a) {
+	var out = [];
+	var tmp = {};
+
+	for (var i = a.length-1; i >= 0; --i) {
+		tmp[a[i]] = 1;
+	}
+
+    for (var i in tmp) {
+		out.push(i);
+    }
+
+	return out;
+}
+
+// Get element
+$WH.ge = function(z) {
+    if(typeof z != 'string') {
+        return z;
+    }
+
+    return document.getElementById(z);
+}
+
+// Get elements by tag name
+$WH.gE = function(z, y) {
+    return z.getElementsByTagName(y);
+}
+
+// Create element
+$WH.ce = function(z, p, c) {
+    var a = document.createElement(z);
+
+    if (p) {
+        $WH.cOr(a, p);
+    }
+
+    if (c) {
+        $WH.ae(a, c);
+    }
+
+    return a;
+}
+
+// Delete element
+$WH.de = function(z) {
+    if (!z || !z.parentNode) {
+        return;
+    }
+
+    z.parentNode.removeChild(z);
+}
+
+// Append element
+$WH.ae = function(z, y) {
+    if ($WH.is_array(y)) {
+        $WH.array_apply(y, z.appendChild.bind(z));
+
+        return y;
+    }
+    else {
+        return z.appendChild(y);
+    }
+}
+
+// Prepend element
+$WH.aef = function(z, y) {
+    return z.insertBefore(y, z.firstChild);
+}
+
+// Empty element
+$WH.ee = function(z, y) {
+    if (!y) {
+        y = 0;
+    }
+    while (z.childNodes[y]) {
+        z.removeChild(z.childNodes[y]);
+    }
+}
+
+// Create text element
+$WH.ct = function(z) {
+    return document.createTextNode(z);
+}
+
+// Set element's text
+$WH.st = function(z, y) {
+    if (z.firstChild && z.firstChild.nodeType == 3) {
+        z.firstChild.nodeValue = y;
+    }
+    else {
+        $WH.aef(z, $WH.ct(y));
+    }
+}
+
+// Add "white-space: nowrap" style to element
+$WH.nw = function(z) {
+    z.style.whiteSpace = "nowrap";
+}
+
+// Return false
+$WH.rf = function() {
+    return false;
+}
+
+// Return false only if no control key is pressed
+$WH.rf2 = function(e) {
+    e = $WH.$E(e);
+
+    if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+        return;
+    }
+
+    return false;
+}
+
+// Remove focus from current element
+$WH.tb = function() {
+    this.blur();
+}
+
+// Attach event
+$WH.aE = function(z, y, x) {
+    if (z.addEventListener) {
+        z.addEventListener(y, x, false);
+    }
+    else if (z.attachEvent) {
+        z.attachEvent('on' + y, x);
+    }
+}
+
+// Detach event
+$WH.dE = function(z, y, x) {
+    if (z.removeEventListener) {
+        z.removeEventListener(y, x, false);
+    }
+    else if (z.detachEvent) {
+        z.detachEvent('on' + y, x);
+    }
+}
+
+// Stop propagation
+$WH.sp = function(z) {
+    if (!z) {
+        z = event;
+    }
+
+    if ($WH.Browser.ie6789) {
+        z.cancelBubble = true
+    }
+    else {
+        z.stopPropagation();
+    }
+}
+
+// Set cookie
+$WH.sc = function(z, y, x, w, v) {
+    var a = new Date();
+    var b = z + "=" + escape(x) + "; ";
+
+    a.setDate(a.getDate() + y);
+    b += "expires=" + a.toUTCString() + "; ";
+
+    if (w) {
+        b += "path=" + w + "; ";
+    }
+
+    if (v) {
+        b += "domain=" + v + "; ";
+    }
+
+    document.cookie = b;
+    $WH.gc(z);
+    $WH.gc.C[z] = x;
+}
+
+// Delete cookie
+$WH.dc = function(z) {
+    $WH.sc(z, -1);
+    $WH.gc.C[z] = null;
+}
+
+// Get all cookies (return value is cached)
+$WH.gc = function(z) {
+    if ($WH.gc.I == null) { // Initialize cookie table
+        var words = unescape(document.cookie).split("; ");
+
+        $WH.gc.C = {};
+        for (var i = 0, len = words.length; i < len; ++i) {
+            var
+                pos = words[i].indexOf("="),
+                name,
+                value;
+
+            if (pos != -1) {
+                name  = words[i].substr(0, pos);
+                value = words[i].substr(pos + 1);
+            }
+            else {
+                name  = words[i];
+                value = "";
+            }
+
+            $WH.gc.C[name] = value;
+        }
+
+        $WH.gc.I = 1;
+    }
+
+    if (!z) {
+        return $WH.gc.C;
+    }
+    else {
+        return $WH.gc.C[z];
+    }
+}
+
+// Prevent element from being selected/dragged (IE only)
+$WH.ns = function(a) {
+    if ($WH.Browser.ie6789) {
+        a.onfocus = tb;
+        a.onmousedown = a.onselectstart = a.ondragstart = $WH.rf;
+    }
+}
+
+// Empty object
+$WH.eO = function(z) {
+    for (var p in z) {
+        delete z[p];
+    }
+}
+
+// Duplicate object
+$WH.dO = function(s) {
+    function f(){};
+    f.prototype = s;
+    return new f;
+}
+
+// Copy object
+$WH.cO = function(d, s) {
+    for (var p in s) {
+        if (s[p] !== null && typeof s[p] == "object" && s[p].length) {
+            d[p] = s[p].slice(0);
+        }
+        else {
+            d[p] = s[p];
+        }
+    }
+
+    return d;
+}
+
+// Copy object (recursive)
+$WH.cOr = function (d, s) {
+    for (var p in s) {
+        if (typeof s[p] == 'object') {
+            if (s[p].length) {
+                d[p] = s[p].slice(0);
+            }
+            else {
+                if (!d[p]) {
+                    d[p] = {};
+                }
+
+                $WH.cOr(d[p], s[p]);
+            }
+        }
+        else {
+            d[p] = s[p];
+        }
+    }
+
+    return d;
+}
+
 $WH.Browser = {
-	ie:	  !!(window.attachEvent && !window.opera),
+	ie:	     !!(window.attachEvent && !window.opera),
 	opera:   !!window.opera,
 	safari:  navigator.userAgent.indexOf('Safari') != -1,
 	firefox: navigator.userAgent.indexOf('Firefox') != -1,
 	chrome:  navigator.userAgent.indexOf('Chrome') != -1
 };
 $WH.Browser.ie9   = $WH.Browser.ie && navigator.userAgent.indexOf('MSIE 9.0') != -1;
-$WH.Browser.ie8   = $WH.Browser.ie && navigator.userAgent.indexOf('MSIE 8.0') != -1&& !$WH.Browser.ie9;
+$WH.Browser.ie8   = $WH.Browser.ie && navigator.userAgent.indexOf('MSIE 8.0') != -1 && !$WH.Browser.ie9;
 $WH.Browser.ie7   = $WH.Browser.ie && navigator.userAgent.indexOf('MSIE 7.0') != -1 && !$WH.Browser.ie8;
 $WH.Browser.ie6   = $WH.Browser.ie && navigator.userAgent.indexOf('MSIE 6.0') != -1 && !$WH.Browser.ie7;
 
@@ -430,65 +623,72 @@ $WH.Browser.geckoVersion = parseInt(RegExp.$1) | 0;
 $WH.OS = {
 	windows: navigator.appVersion.indexOf('Windows')   != -1,
 	mac:	 navigator.appVersion.indexOf('Macintosh') != -1,
-	linux:   navigator.appVersion.indexOf('Linux')	 != -1
+	linux:   navigator.appVersion.indexOf('Linux')	   != -1
 };
+
+//****************************************************************************//
+//****************************************************************************//
+//****************************************************************************//
 
 $WH.g_getWindowSize = function () {
-	var a = 0,
-	b = 0;
-	if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
-		a = document.documentElement.clientWidth;
-		b = document.documentElement.clientHeight
-	} else {
-		if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
-			a = document.body.clientWidth;
-			b = document.body.clientHeight
-		} else {
-			if (typeof window.innerWidth == "number") {
-				a = window.innerWidth;
-				b = window.innerHeight
-			}
-		}
-	}
-	return {
-		w: a,
-		h: b
-	};
-};
+    var
+        width  = 0,
+        height = 0;
+
+    if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+        // IE 6+ in 'standards compliant mode'
+        width  = document.documentElement.clientWidth;
+        height = document.documentElement.clientHeight;
+    }
+    else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+        // IE 4 compatible
+        width  = document.body.clientWidth;
+        height = document.body.clientHeight;
+    }
+    else if (typeof window.innerWidth == 'number') { // Non-IE
+        width  = window.innerWidth;
+        height = window.innerHeight;
+    }
+
+    return {
+        w: width,
+        h: height
+    };
+}
 
 $WH.g_getScroll = function() {
-	var
-		x = 0,
-		y = 0;
+    var
+        x = 0,
+        y = 0;
 
-	if (typeof(window.pageYOffset) == "number") {
-		// Netscape compliant
-		x = window.pageXOffset;
-		y = window.pageYOffset
-	}
-	else if (document.body && (document.body.scrollLeft || document.body.scrollTop)) {
-		// DOM compliant
-		x = document.body.scrollLeft;
-		y = document.body.scrollTop
-	}
-	else if (document.documentElement && (document.documentElement.scrollLeft || document.documentElement.scrollTop)) {
-		// IE6 standards compliant mode
-		x = document.documentElement.scrollLeft;
-		y = document.documentElement.scrollTop
-	}
+    if (typeof(window.pageYOffset) == "number") {
+        // Netscape compliant
+        x = window.pageXOffset;
+        y = window.pageYOffset
+    }
+    else if (document.body && (document.body.scrollLeft || document.body.scrollTop)) {
+        // DOM compliant
+        x = document.body.scrollLeft;
+        y = document.body.scrollTop
+    }
+    else if (document.documentElement && (document.documentElement.scrollLeft || document.documentElement.scrollTop)) {
+        // IE6 standards compliant mode
+        x = document.documentElement.scrollLeft;
+        y = document.documentElement.scrollTop
+    }
 
-	return {
-		x: x,
-		y: y
-	};
+    return {
+        x: x,
+        y: y
+    };
 };
 
 $WH.g_getCursorPos = function(e) {
-	var
-		x,
-		y;
+    var
+        x,
+        y;
 
-	if (window.innerHeight) {
+    if (window.innerHeight) {
 
         // ok, something of a workaround here... MS9+ sends a MSEventObj istead of mouseEvent . whatever
         // but the properties for that are client[X|Y] DIAF!
@@ -501,200 +701,299 @@ $WH.g_getCursorPos = function(e) {
             x = e.pageX;
             y = e.pageY
         }
-	}
-	else {
-		var scroll = $WH.g_getScroll();
+    }
+    else {
+        var scroll = $WH.g_getScroll();
 
-		x = e.clientX + scroll.x;
-		y = e.clientY + scroll.y
-	}
+        x = e.clientX + scroll.x;
+        y = e.clientY + scroll.y
+    }
 
-	return {
-		x: x,
-		y: y
-	};
+    return {
+        x: x,
+        y: y
+    };
 };
 
-$WH.ac = function (c, d) {
-	var a = 0,
-	g = 0,
-	b;
-	while (c) {
-		a += c.offsetLeft;
-		g += c.offsetTop;
-		b = c.parentNode;
-		while (b && b != c.offsetParent && b.offsetParent) {
-			if (b.scrollLeft || b.scrollTop) {
-				a -= (b.scrollLeft | 0);
-				g -= (b.scrollTop | 0);
-				break
-			}
-			b = b.parentNode
-		}
-		c = c.offsetParent
-	}
-	if ($WH.isset("Lightbox") && Lightbox.isVisible()) {
-		d = true
-	}
-	if (d && !$WH.Browser.ie6) {
-		var f = $WH.g_getScroll();
-		a += f.x;
-		g += f.y
-	}
-	var e = [a, g];
-	e.x = a;
-	e.y = g;
-	return e
+$WH.ac = function (el, fixedPos) {
+    var
+        x = 0,
+        y = 0,
+        el2;
+
+    while (el) {
+        x += el.offsetLeft;
+        y += el.offsetTop;
+
+        el2 = el.parentNode;
+        while (el2 && el2 != el.offsetParent && el2.offsetParent) { // Considers scroll position for elements inside an 'overflow: auto' div.
+            if (el2.scrollLeft || el2.scrollTop) {
+                x -= (el2.scrollLeft | 0);
+                y -= (el2.scrollTop  | 0);
+                break;
+            }
+
+            el2 = el2.parentNode;
+        }
+
+        el = el.offsetParent;
+    }
+
+    if ($WH.isset('Lightbox') && Lightbox.isVisible()) { // Assumes that calls made while the Lightbox is visible are on 'position: fixed' elements.
+        fixedPos = true;
+    }
+
+    if (fixedPos) {
+        var scroll = $WH.g_getScroll();
+        x += scroll.x;
+        y += scroll.y
+    }
+
+    var result = [x, y];
+    result.x = x;
+    result.y = y;
+    return result;
+}
+
+$WH.g_scrollTo = function (n, p) {
+    var
+        _,
+        windowSize = $WH.g_getWindowSize(),
+        scroll = $WH.g_getScroll(),
+        bcw = windowSize.w,
+        bch = windowSize.h,
+        bsl = scroll.x,
+        bst = scroll.y;
+
+    n = $WH.ge(n);
+
+    // Padding
+    if (p == null) {
+        p = [];
+    }
+    else if (typeof p == 'number') {
+        p = [p];
+    }
+
+    _ = p.length;
+    if (_ == 0) {
+        p[0] = p[1] = p[2] = p[3] = 0;
+    }
+    else if (_ == 1) {
+        p[1] = p[2] = p[3] = p[0];
+    }
+    else if (_ == 2) {
+        p[2] = p[0];
+        p[3] = p[1];
+    }
+    else if (_ == 3) {
+        p[3] = p[1];
+    }
+
+    _ = $WH.ac(n);
+
+    var
+        nl = _[0] - p[3],
+        nt = _[1] - p[0],
+        nr = _[0] + n.offsetWidth + p[1],
+        nb = _[1] + n.offsetHeight + p[2];
+
+    if (nr - nl > bcw || nl < bsl) {
+        bsl = nl;
+    }
+    else if (nr - bcw > bsl) {
+        bsl = nr - bcw;
+    }
+
+    if (nb - nt > bch || nt < bst) {
+        bst = nt;
+    }
+    else if (nb - bch > bst) {
+        bst = nb - bch;
+    }
+
+    scrollTo(bsl, bst);
+}
+
+$WH.g_createReverseLookupJson = function (json) {
+    var result = {};
+
+    for (var key in json) {
+        result[json[key]] = key;
+    }
+    return result;
 };
-$WH.g_scrollTo = function (c, b) {
-	var l, k = $WH.g_getWindowSize(),
-	m = $WH.g_getScroll(),
-	i = k.w,
-	e = k.h,
-	g = m.x,
-	d = m.y;
-	c = $WH.$(c);
-	if (b == null) {
-		b = []
-	} else {
-		if (typeof b == "number") {
-			b = [b]
-		}
-	}
-	l = b.length;
-	if (l == 0) {
-		b[0] = b[1] = b[2] = b[3] = 0
-	} else {
-		if (l == 1) {
-			b[1] = b[2] = b[3] = b[0]
-		} else {
-			if (l == 2) {
-				b[2] = b[0];
-				b[3] = b[1]
-			} else {
-				if (l == 3) {
-					b[3] = b[1]
-				}
-			}
-		}
-	}
-	l = $WH.ac(c);
-	var a = l[0] - b[3],
-	h = l[1] - b[0],
-	j = l[0] + c.offsetWidth + b[1],
-	f = l[1] + c.offsetHeight + b[2];
-	if (j - a > i || a < g) {
-		g = a
-	} else {
-		if (j - i > g) {
-			g = j - i
-		}
-	}
-	if (f - h > e || h < d) {
-		d = h
-	} else {
-		if (f - e > d) {
-			d = f - e
-		}
-	}
-	scrollTo(g, d)
-};
-$WH.g_createReverseLookupJson = function (b) {
-	var c = {};
-	for (var a in b) {
-		c[b[a]] = a
-	}
-	return c
-};
-$WH.g_getLocaleFromDomain = function (a) {
-	var c = $WH.g_getLocaleFromDomain.L;
-	if (a) {
-		var b = a.indexOf(".");
-		if (b != -1) {
-			a = a.substring(0, b)
-		}
-	}
-	return (c[a] ? c[a] : 0)
-};
+
+$WH.g_getLocaleFromDomain = function(domain) {
+    var lookup = $WH.g_getLocaleFromDomain.L;
+
+    if (domain) {
+        var pos = domain.indexOf('.');
+        if (pos != -1) {
+            domain = domain.substring(0, pos);
+        }
+    }
+
+    return (lookup[domain] ? lookup[domain] : 0);
+}
 $WH.g_getLocaleFromDomain.L = {
-	fr: 2,
-	de: 3,
-	es: 6,
-	ru: 8
+    fr:  2,
+    de:  3,
+    es:  6,
+    ru:  8,
+    www: 0
 };
-$WH.g_getDomainFromLocale = function (a) {
-	var b;
-	if ($WH.g_getDomainFromLocale.L) {
-		b = $WH.g_getDomainFromLocale.L
-	} else {
-		b = $WH.g_getDomainFromLocale.L = $WH.g_createReverseLookupJson($WH.g_getLocaleFromDomain.L)
-	}
-	return (b[a] ? b[a] : "www")
-};
-$WH.g_getIdFromTypeName = function (a) {
-	var b = $WH.g_getIdFromTypeName.L;
-	return (b[a] ? b[a] : -1)
+
+$WH.g_getDomainFromLocale = function(locale) {
+    var lookup;
+
+    if ($WH.g_getDomainFromLocale.L) {
+        lookup = $WH.g_getDomainFromLocale.L;
+    }
+    else {
+        lookup = $WH.g_getDomainFromLocale.L = $WH.g_createReverseLookupJson($WH.g_getLocaleFromDomain.L);
+    }
+
+    return (lookup[locale] ? lookup[locale] : 'www');
+}
+
+$WH.g_getIdFromTypeName = function (typeName) {
+    var lookup = $WH.g_getIdFromTypeName.L;
+
+    return (lookup[typeName] ? lookup[typeName] : -1)
 };
 $WH.g_getIdFromTypeName.L = {
-	npc: 1,
-	object: 2,
-	item: 3,
-	itemset: 4,
-	quest: 5,
-	spell: 6,
-	zone: 7,
-	faction: 8,
-	pet: 9,
-	achievement: 10,
-	title: 11,
-	profile: 100
+    npc: 1,
+    object: 2,
+    item: 3,
+    itemset: 4,
+    quest: 5,
+    spell: 6,
+    zone: 7,
+    faction: 8,
+    pet: 9,
+    achievement: 10,
+    title: 11,
+    event: 12,
+    "class": 13,
+    race: 14,
+    skill: 15,
+    currency: 17,
+    profile: 100
+
 };
-$WH.g_ajaxIshRequest = function (b) {
-	var c = document.getElementsByTagName("head")[0],
-	a = $WH.g_getGets();
-	if (a.refresh != null) {
-		b += "&refresh"
-	}
-	$WH.ae(c, $WH.ce("script", {
-		type: "text/javascript",
-		src: b
-	}))
+
+$WH.g_ajaxIshRequest = function (url) {
+    var
+        head = document.getElementsByTagName("head")[0],
+        get = $WH.g_getGets();
+
+    if (get.refresh != null) {
+        if (get.refresh.length) {
+            url += ('&refresh=' + get.refresh);
+        }
+        else {
+            url += '&refresh';
+        }
+    }
+
+    if (get.locale != null) {
+        url += '&locale=' + get.locale;
+    }
+
+    $WH.ae(head, $WH.ce("script", {
+        type: "text/javascript",
+        src: url,
+        charset: 'utf8'
+    }));
 };
-$WH.g_getGets = function () {
-	if ($WH.g_getGets.C != null) {
-		return $WH.g_getGets.C
-	}
-	var e = {};
-	if (location.search) {
-		var f = decodeURIComponent(location.search.substr(1)).split("&");
-		for (var c = 0, a = f.length; c < a; ++c) {
-			var g = f[c].indexOf("="),
-			b,
-			d;
-			if (g != -1) {
-				b = f[c].substr(0, g);
-				d = f[c].substr(g + 1)
-			} else {
-				b = f[c];
-				d = ""
-			}
-			e[b] = d
-		}
-	}
-	$WH.g_getGets.C = e;
-	return e
+
+$WH.g_getGets = function() {
+    if ($WH.g_getGets.C != null) {
+        return $WH.g_getGets.C;
+    }
+
+    var queryString = $WH.g_getQueryString();
+    var gets = $WH.g_parseQueryString(queryString);
+
+    $WH.g_getGets.C = gets;
+    return gets;
 };
-$WH.g_createRect = function (d, c, a, b) {
-	return {
-		l: d,
-		t: c,
-		r: d + a,
-		b: c + b
-	}
+
+$WH.g_getQueryString = function() {
+    /* Supports all of the following formats:
+        /item=50178?locale=0
+        /item=50178&locale=0
+        /?item=50178&locale=0
+    */
+
+    var queryString = '';
+
+    if (location.pathname) {
+        queryString += location.pathname.substr(1);
+    }
+
+    if (location.search) {
+        if (location.pathname) {
+            queryString += '&';
+        }
+
+        queryString += location.search.substr(1);
+    }
+
+    return queryString;
 };
-$WH.g_intersectRect = function (d, c) {
-	return ! (d.l >= c.r || c.l >= d.r || d.t >= c.b || c.t >= d.b)
+
+$WH.g_parseQueryString = function(str) {
+    str = decodeURIComponent(str);
+    var words = str.split('&');
+    var params = {};
+
+    for (var i = 0, len = words.length; i < len; ++i) {
+        $WH.g_splitQueryParam(words[i], params);
+    }
+
+    return params;
 };
+
+$WH.g_splitQueryParam = function(word, params) {
+    var pos = word.indexOf('=');
+    var name;
+    var value;
+
+    if (pos != -1) {
+        name  = word.substr(0, pos);
+        value = word.substr(pos + 1);
+    }
+    else {
+        name = word;
+        value = '';
+    }
+
+    params[name] = value;
+};
+
+// TODO: Refactor to use Rectangle class instead
+$WH.g_createRect = function(left, top, width, height) {
+    return {
+        l: left,
+        t: top,
+        r: left + width,
+        b: top + height
+    };
+}
+
+$WH.g_intersectRect = function(a, b) {
+    return !(
+        a.l >= b.r || b.l >= a.r ||
+        a.t >= b.b || b.t >= a.b
+    );
+}
+
+//****************************************************************************//
+//****************************************************************************//
+//****************************************************************************//
+
 $WH.g_convertRatingToPercent = function (g, b, f, d) {
 	var e = $WH.g_convertRatingToPercent.RB;
 	if (g < 0) {
@@ -1152,7 +1451,7 @@ $WH.g_enhanceTooltip = function (a, e, d) {
 	}
 	if (e) {
 		a = a.replace(/<span class="q2"><!--addamr(\d+)--><span>.*?<\/span><\/span>/i, function (f, g) {
-			return '<span class="q2 tip" onmouseover="Tooltip.showAtCursor(event, sprintf(LANG.tooltip_armorbonus, ' + g + '), 0, 0, \'q\')" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">' + f + "</span>"
+			return '<span class="q2 tip" onmouseover="Tooltip.showAtCursor(event, $WH.sprintf(LANG.tooltip_armorbonus, ' + g + '), 0, 0, \'q\')" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">' + f + "</span>"
 		});
 		a = a.replace(/\(([^\)]*?<!--lvl-->[^\(]*?)\)/gi, function (g, f) {
 			return '(<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="g_staticTooltipLevelClick(this)">' + f + "</a>)"
@@ -1279,7 +1578,7 @@ $WH.Tooltip = {
 		$WH.Tooltip.tooltipTable = $WH.gE(b, "table")[0];
 		$WH.Tooltip.tooltipTd = $WH.gE(b, "td")[0];
 		if ($WH.Browser.ie6) {
-			b = ce("iframe");
+			b = $WH.ce("iframe");
 			b.src = "javascript:0;";
 			b.frameBorder = 0;
 			if (a) {
@@ -1495,7 +1794,7 @@ $WH.g_getProfileIcon = function(raceId, classId, gender, level, icon, size) {
 		 5: {6:1,8:1,5:1,4:1,9:1,1:1}                       // scourge
 	};
 
-	if( icon) {
+	if (icon) {
 		return isNaN(icon) ? icon : '?profile=avatar' + (size ? '&size=' + size : '') + '&id=' + icon + (size == 'tiny' ? '.gif' : '.jpg');
 	}
 

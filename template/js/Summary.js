@@ -2,18 +2,18 @@ var g_summaries = {};
 var fi_type = 'items';
 
 function Summary(opt) {
-    cO(this, opt);
+    $WH.cO(this, opt);
 
     if (this.id) {
         var divId = this.id;
         if (this.parent) {
-            var d = ce('div');
+            var d = $WH.ce('div');
             d.id = divId;
-            ae($(this.parent), d);
+            $WH.ae($WH.ge(this.parent), d);
             this.container = d;
         }
         else {
-            this.container = ge(divId);
+            this.container = $WH.ge(divId);
         }
     }
     else {
@@ -93,7 +93,7 @@ function Summary(opt) {
         }
     }
 
-    var GET = g_getGets();
+    var GET = $WH.g_getGets();
     /* sarjuuk: GET.compare => GET.items, when using flat urls */
 
     this.autoSave = 1;
@@ -105,7 +105,7 @@ function Summary(opt) {
         this.level = parseInt(GET.l);
     }
     else {
-        var l = gc('compare_level');
+        var l = $WH.gc('compare_level');
         if (l) {
             this.level = l;
         }
@@ -118,7 +118,7 @@ function Summary(opt) {
             this.readGroups(GET.compare);
         }
         else {
-            this.readGroups(gc('compare_groups'));
+            this.readGroups($WH.gc('compare_groups'));
         }
     }
 
@@ -130,7 +130,7 @@ function Summary(opt) {
                 this.readWeights(GET.weights);
             }
             else {
-                this.readWeights(gc('compare_weights'));
+                this.readWeights($WH.gc('compare_weights'));
             }
         }
     }
@@ -144,7 +144,7 @@ function Summary(opt) {
 
     if (this.template.clone != null) {
         this.clone = {};
-        cO(this.clone, this.template.columns[this.template.clone]);
+        $WH.cO(this.clone, this.template.columns[this.template.clone]);
         this.clone.i = this.template.clone;
     }
 
@@ -160,11 +160,11 @@ function Summary(opt) {
 
 Summary.prototype = {
     initialize: function() {
-        this.controls = ce('div');
+        this.controls = $WH.ce('div');
         this.controls.style.display = 'none';
         this.controls.className = 'summary-controls';
 
-        this.textNames = ce('div');
+        this.textNames = $WH.ce('div');
         this.textNames.style.display = 'none';
         this.textNames.className = 'summary-textnames';
 
@@ -183,34 +183,34 @@ Summary.prototype = {
             this.visibility.shift();
         }
 
-        this.noData = ce('div');
+        this.noData = $WH.ce('div');
         this.noData.className = 'listview-nodata text';
 
-        this.table = ce('table');
-        this.thead = ce('thead');
-        this.tbody = ce('tbody');
+        this.table = $WH.ce('table');
+        this.thead = $WH.ce('thead');
+        this.tbody = $WH.ce('tbody');
 
         this.table.id = 'su_table';
         this.table.className = 'grid';
 
         this.refreshHeader();
 
-        ae(this.table, this.thead);
-        ae(this.table, this.tbody);
+        $WH.ae(this.table, this.thead);
+        $WH.ae(this.table, this.tbody);
 
         this.refreshRows();
 
-        ae(this.container, this.controls);
-        ae(this.container, this.textNames);
-        ae(this.container, this.table);
+        $WH.ae(this.container, this.controls);
+        $WH.ae(this.container, this.textNames);
+        $WH.ae(this.container, this.table);
 
-        this.itemTip = ce('div');
+        this.itemTip = $WH.ce('div');
         this.itemTip.className = 'summary-tip';
         this.itemTip.style.display = 'none';
-        var span = ce('span');
+        var span = $WH.ce('span');
         span.innerHTML = LANG.su_itemtip;
-        ae(this.itemTip, span);
-        ae(this.container, this.itemTip);
+        $WH.ae(this.itemTip, span);
+        $WH.ae(this.container, this.itemTip);
 
         this.refreshLink();
 
@@ -380,7 +380,7 @@ Summary.prototype = {
                     this.newgroup++;
                 }
 
-                var _ = dO(this.clone);
+                var _ = $WH.dO(this.clone);
 
                 _.id    = 'group' + i;
                 _.group = this.groups[i];
@@ -426,11 +426,11 @@ Summary.prototype = {
             hiddenCols = [];
 
         if (this.visibleCols != null) {
-            array_walk(this.visibleCols, function(x) { visibleCols[x] = 1; });
+            $WH.array_walk(this.visibleCols, function(x) { visibleCols[x] = 1; });
         }
 
         if (this.hiddenCols != null) {
-            array_walk(this.hiddenCols, function(x) { hiddenCols[x] = 1; });
+            $WH.array_walk(this.hiddenCols, function(x) { hiddenCols[x] = 1; });
         }
 
         for (var i = 0, len = this.columns.length; i < len; ++i) {
@@ -472,7 +472,7 @@ Summary.prototype = {
     },
 
     updateWeights: function(weights) {
-        var _ = ge('su_weight');
+        var _ = $WH.ge('su_weight');
         var c = _.childNodes[0].childNodes[0];
         var i = 0;
 
@@ -499,8 +499,8 @@ Summary.prototype = {
     },
 
     addWeight: function(e) {
-        var _ = ge('su_weight');
-        var a = ge('su_addweight');
+        var _ = $WH.ge('su_weight');
+        var a = $WH.ge('su_addweight');
 
         if (_.childNodes.length >= 14) {
             a.style.display = 'none';
@@ -508,8 +508,8 @@ Summary.prototype = {
 
         a = _.childNodes[0].lastChild;
         if (a.nodeName != 'A') {
-            ae(_.childNodes[0], ct(String.fromCharCode(160, 160)));
-            ae(_.childNodes[0], this.createControl(LANG.firemove, '', '', this.deleteWeight.bind(this, _.childNodes[0].firstChild)));
+            $WH.ae(_.childNodes[0], $WH.ct(String.fromCharCode(160, 160)));
+            $WH.ae(_.childNodes[0], this.createControl(LANG.firemove, '', '', this.deleteWeight.bind(this, _.childNodes[0].firstChild)));
         }
         else {
             a.firstChild.nodeValue = LANG.firemove;
@@ -517,19 +517,19 @@ Summary.prototype = {
         }
 
         var
-            d = ce('div'),
+            d = $WH.ce('div'),
             c = _.childNodes[0].childNodes[0].cloneNode(true);
 
-        ae(_, d);
+        $WH.ae(_, d);
 
         c.onchange = c.onkeyup = this.refreshWeights.bind(this, c);
-        ae(d, c);
+        $WH.ae(d, c);
 
-        ae(d, ct(String.fromCharCode(160, 160)));
-        ae(d, this.createControl(LANG.firemove, '', '', this.deleteWeight.bind(this, c)));
+        $WH.ae(d, $WH.ct(String.fromCharCode(160, 160)));
+        $WH.ae(d, this.createControl(LANG.firemove, '', '', this.deleteWeight.bind(this, c)));
 
         if (e) {
-            sp($E(e));
+            $WH.sp($WH.$E(e));
         }
 
         return c;
@@ -540,7 +540,7 @@ Summary.prototype = {
             d = sel.parentNode,
             c = d.parentNode;
 
-        de(d);
+        $WH.de(d);
 
         if (c.childNodes.length == 1) {
             var _ = c.firstChild;
@@ -551,23 +551,23 @@ Summary.prototype = {
             }
             else {
                 while (_.childNodes.length > 1) {
-                    de(_.childNodes[1]);
+                    $WH.de(_.childNodes[1]);
                 }
             }
         }
 
-        var a = ge('su_addweight');
+        var a = $WH.ge('su_addweight');
         if (c.childNodes.length < 15) {
             a.style.display = '';
         }
 
         if (e) {
-            sp($E(e));
+            $WH.sp($WH.$E(e));
         }
     },
 
     showDetails: function(a) {
-        var foo = ge('su_weight');
+        var foo = $WH.ge('su_weight');
 
         g_toggleDisplay(foo);
 
@@ -582,7 +582,7 @@ Summary.prototype = {
         }
 
         var
-            opts = gE(ge('su_presets'), 'option'),
+            opts = $WH.gE($WH.ge('su_presets'), 'option'),
             o;
 
         for (i in opts) {
@@ -593,16 +593,16 @@ Summary.prototype = {
         }
 
         var
-            name = ge('su_scale').value,
+            name = $WH.ge('su_scale').value,
             id    = ((o._weights ? o._weights.id : 0) | 0),
             scale = { id: id, name: name },
-            _     = ge('su_weight'),
+            _     = $WH.ge('su_weight'),
             n     = 0;
 
         for (i = 0; i < _.childNodes.length; ++i) {
             var
-                w    = fi_Lookup(gE(_.childNodes[i], 'select')[0].value),
-                inps = gE(_.childNodes[i], 'input'),
+                w    = fi_Lookup($WH.gE(_.childNodes[i], 'select')[0].value),
+                inps = $WH.gE(_.childNodes[i], 'input'),
                 v;
 
             for (j in inps) {
@@ -622,7 +622,7 @@ Summary.prototype = {
             return alert(LANG.message_weightscalesaveerror);
         }
 
-        var data = [ 'save=1', 'name=' + urlencode(name) ];
+        var data = [ 'save=1', 'name=' + $WH.urlencode(name) ];
 
         if (id) {
             data.push('id=' + id);
@@ -657,7 +657,7 @@ Summary.prototype = {
                     }
 
                     if (scale.id) {
-                        g_user.weightscales = array_filter(g_user.weightscales, function(x) {
+                        g_user.weightscales = $WH.array_filter(g_user.weightscales, function(x) {
                             return x.id != scale.id;
                         });
                     }
@@ -666,8 +666,8 @@ Summary.prototype = {
                     g_user.weightscales.push(scale);
 
                     var
-                        s    = ge('su_classes'),
-                        opts = gE(s, 'option'),
+                        s    = $WH.ge('su_classes'),
+                        opts = $WH.gE(s, 'option'),
                         c;
 
                     for (i in opts) {
@@ -678,11 +678,11 @@ Summary.prototype = {
                     }
 
                     if (!c) {
-                        c = ce('option');
+                        c = $WH.ce('option');
                         c.value = -1;
-                        ae(c, ct(LANG.ficustom));
-                        aef(s, c);
-                        aef(s, gE(s, 'option')[1]);
+                        $WH.ae(c, $WH.ct(LANG.ficustom));
+                        $WH.aef(s, c);
+                        $WH.aef(s, $WH.gE(s, 'option')[1]);
                     }
 
                     c._presets = { custom: {} };
@@ -694,7 +694,7 @@ Summary.prototype = {
                     c.parentNode.onchange();
 
                     var
-                        opts = gE(ge('su_presets'), 'option'),
+                        opts = $WH.gE($WH.ge('su_presets'), 'option'),
                         o;
 
                     for (i in opts) {
@@ -725,8 +725,8 @@ Summary.prototype = {
         }
 
         var
-            s    = ge('su_classes'),
-            opts = gE(s, 'option'),
+            s    = $WH.ge('su_classes'),
+            opts = $WH.gE(s, 'option'),
             c;
 
         for (i in opts) {
@@ -738,7 +738,7 @@ Summary.prototype = {
 
         if (c.value == -1) {
             var
-                opts = gE(ge('su_presets'), 'option'),
+                opts = $WH.gE($WH.ge('su_presets'), 'option'),
                 o;
 
             for (i in opts) {
@@ -754,7 +754,7 @@ Summary.prototype = {
                     params: 'delete=1&id=' + o.value
                 });
 
-                g_user.weightscales = array_filter(g_user.weightscales, function(x) {
+                g_user.weightscales = $WH.array_filter(g_user.weightscales, function(x) {
                     return x.id != o.value;
                 });
 
@@ -765,14 +765,14 @@ Summary.prototype = {
                     }
                 }
                 else {
-                    de(c);
+                    $WH.de(c);
                 }
 
-                de(o);
+                $WH.de(o);
 
                 // $('#su_classes, #su_presets').change();
-                ge('su_classes').onchange();
-                ge('su_presets').onchange();
+                $WH.ge('su_classes').onchange();
+                $WH.ge('su_presets').onchange();
             }
         }
     },
@@ -796,7 +796,7 @@ Summary.prototype = {
                     y = f(y, t, e, s);
                 }
 
-                return (in_array(x, y) < 0 ? y : null);
+                return ($WH.in_array(x, y) < 0 ? y : null);
             },
             custom: function(x, y, n, e, f, t, s) {
                 if (f) {
@@ -809,7 +809,7 @@ Summary.prototype = {
         };
 
         var checkTrait = function(json, tj, trait, col, f, c, e, s) {
-            var _json = dO(json);
+            var _json = $WH.dO(json);
             if (_json.scadist && _json.scaflags) {
                 g_setJsonItemLevel(_json, level);
             }
@@ -966,19 +966,19 @@ Summary.prototype = {
             text:   function(x, y)    {
                 var a = [];
                 for (var i = 0, len = y.length; i < len; ++i) {
-                    if (in_array(x, y[i]) == -1) {
-                        var _ = ce('span');
+                    if ($WH.in_array(x, y[i]) == -1) {
+                        var _ = $WH.ce('span');
                         _.className = 'q2';
-                        ae(_, ct('+' + y[i]));
+                        $WH.ae(_, $WH.ct('+' + y[i]));
                         a.push(_);
                     }
                 }
                 for (var i = 0, len = x.length; i < len; ++i) {
-                    if (in_array(y, x[i]) == -1) {
-                        var _ = ce('span');
+                    if ($WH.in_array(y, x[i]) == -1) {
+                        var _ = $WH.ce('span');
 
                         _.className = 'q10';
-                        ae(_, ct('-' + x[i]));
+                        $WH.ae(_, $WH.ct('-' + x[i]));
                         a.push(_);
                     }
                 }
@@ -1026,15 +1026,15 @@ Summary.prototype = {
         if (this.autoSave) {
             this.saveComparison(0);
         }
-        else if (this.editable && !Browser.ie) {
+        else if (this.editable && !$WH.Browser.ie) {
             window.onbeforeunload = function(e) { return LANG.message_savebeforeexit };
         }
     },
 
     refreshHeader: function() {
         if (this.groups.length && this.thead.nodeName.toLowerCase() != 'thead') {
-            this.thead = ce('thead');
-            ae(this.table, this.thead);
+            this.thead = $WH.ce('thead');
+            $WH.ae(this.table, this.thead);
         }
 
         while (this.thead.firstChild) {
@@ -1045,15 +1045,15 @@ Summary.prototype = {
         this.dragIcons = [];
         this.dragTargets = [];
 
-        this.selectLevel = ce('div');
+        this.selectLevel = $WH.ce('div');
         this.selectLevel.style.display = 'none';
 
-        var tr = ce('tr');
+        var tr = $WH.ce('tr');
 
         if (!this.groups.length) {
-            var th = ce('th');
-            ae(tr, th);
-            ae(this.thead, tr);
+            var th = $WH.ce('th');
+            $WH.ae(tr, th);
+            $WH.ae(this.thead, tr);
             this.showNoData(th);
             return;
         }
@@ -1063,7 +1063,7 @@ Summary.prototype = {
             var reali = this.visibility[i];
             var col = this.columns[reali];
 
-            var th = ce('th');
+            var th = $WH.ce('th');
             if (col.id == 'total') {
                 th.style.verticalAlign = 'middle';
             }
@@ -1092,45 +1092,44 @@ Summary.prototype = {
             }
 
             if (col.id == 'name') {
-                ae(th, this.selectLevel);
+                $WH.ae(th, this.selectLevel);
 
-                var s = ce('select');
+                var s = $WH.ce('select');
                 s.onchange = (function(s) {
                     this.level = s.options[s.selectedIndex].value;
                     this.refreshAll();
                 }).bind(this, s);
 
                 for (var i = 80; i > 0; --i) {
-                    var o = ce('option');
+                    var o = $WH.ce('option');
                     if (i == this.level) {
                         o.selected = true;
                     }
-                    st(o, i);
-                    ae(s, o);
+                    $WH.st(o, i);
+                    $WH.ae(s, o);
                 }
 
-                ae(this.selectLevel, ct(LANG.su_level + ' '));
-                ae(this.selectLevel, s);
+                $WH.ae(this.selectLevel, $WH.ct(LANG.su_level + ' '));
+                $WH.ae(this.selectLevel, s);
             }
 
             if (col.group) {
                 this.dragTargets.push(th);
 
                 if (this.editable) {
-                    var _ = ce('div');
+                    var _ = $WH.ce('div');
                     _.className = 'summary-group';
 
-                    div = ce('div');
+                    div = $WH.ce('div');
                     div.className = 'summary-group-controls';
 
-                    var a = ce('a');
+                    var a = $WH.ce('a');
                     a.href = 'javascript:;';
                     a.className = 'summary-group-dropdown';
-                    ae(a, ce('span'));
+                    $WH.ae(a, $WH.ce('span'));
                     a.menu = [
-                        [0, LANG.su_export, '?compare=' + this.getGroupData(groupi)]
+                        [0, LANG.su_export, '?compare=' + this.getGroupData(groupi), null, {newWindow: true}]
                     ];
-                    a.menu[0].newWindow = 1;
 
                     if (this.viewableIn3d(col)) {
                         a.menu.push([0, LANG.su_viewin3d, this.viewIn3d.bind(this, col)]);
@@ -1144,14 +1143,14 @@ Summary.prototype = {
                         a.menu.push([0, LANG.pr_menu_clearenh, this.clearEnhancements.bind(this, col)]);
                     }
 
-                    a.onclick = Menu.showAtCursor;
-                    ae(div, a);
+                    Menu.add(a, a.menu, { showAtCursor: true });
+                    $WH.ae(div, a);
 
                     if (this.groups.length > 1) {
-                        a = ce('a');
+                        a = $WH.ce('a');
                         a.href = 'javascript:;';
                         a.className = 'summary-group-focus';
-                        var s = ce('span');
+                        var s = $WH.ce('span');
                         a.onclick = this.selectColumn.bind(this, col);
                         if (this.selected && this.__selected.id == col.id) {
                             a.onmouseover = function() {
@@ -1166,31 +1165,31 @@ Summary.prototype = {
                         }
                         a.onmousemove = Tooltip.cursorUpdate;
                         a.onmouseout = Tooltip.hide;
-                        ae(a, s);
-                        ae(div, a);
+                        $WH.ae(a, s);
+                        $WH.ae(div, a);
                     }
 
-                    a = ce('a');
+                    a = $WH.ce('a');
                     a.href = 'javascript:;';
                     a.className = 'summary-group-delete';
                     a.onclick = this.deleteColumn.bind(this, col);
-                    ae(a, ce('span'));
-                    ae(div, a);
+                    $WH.ae(a, $WH.ce('span'));
+                    $WH.ae(div, a);
 
                     if (this.draggable) {
-                        a = ce('a');
+                        a = $WH.ce('a');
                         a.href = 'javascript:;';
                         a.className = 'summary-group-drag';
-                        ae(a, ce('span'));
-                        ae(div, a);
+                        $WH.ae(a, $WH.ce('span'));
+                        $WH.ae(div, a);
 
                         _.__col = col;
                         _._handle = a;
                         this.dragHeaders.push(_);
                     }
 
-                    ae(_, div);
-                    ae(th, _);
+                    $WH.ae(_, div);
+                    $WH.ae(th, _);
 
                     if (this.draggable && this.groups.length > 1) {
                         // Spacer needed to fix the wrapping issues in the bar
@@ -1210,12 +1209,12 @@ Summary.prototype = {
                     iconWidth = 26;
                 }
 
-                var _ = ce('div');
+                var _ = $WH.ce('div');
                 _.style.margin = '0 auto';
                 _.style.clear = 'both';
 
                 var
-                    btm = ce('div'),
+                    btm = $WH.ce('div'),
                     div = _.cloneNode(true);
 
                 if (this.editable) {
@@ -1226,7 +1225,7 @@ Summary.prototype = {
                     if (j % iconPerRow == 0) {
                         div.style.width = (iconWidth * iconPerRow) + 'px';
                         div = _.cloneNode(true);
-                        ae(btm, div);
+                        $WH.ae(btm, div);
                     }
 
                     var icon = g_items.createIcon(col.group[j][0], iconSize);
@@ -1240,46 +1239,46 @@ Summary.prototype = {
 
                     this.dragIcons.push(icon);
 
-                    ae(div, icon);
+                    $WH.ae(div, icon);
                 }
 
                 if (col.group.length) {
                     div.style.width = (iconWidth * (len2 % iconPerRow == 0 ? iconPerRow : (len2 % iconPerRow))) + 'px';
                 }
-                ae(btm, div);
+                $WH.ae(btm, div);
 
                 if (this.editable) {
                     th.style.padding = '0';
 
-                    div = ce('div');
+                    div = $WH.ce('div');
                     div.className = 'clear';
-                    ae(btm, div);
+                    $WH.ae(btm, div);
 
-                    div = ce('div');
+                    div = $WH.ce('div');
                     div.className = 'clear';
-                    ae(th.firstChild, div);
+                    $WH.ae(th.firstChild, div);
 
-                    ae(th.firstChild, btm);
+                    $WH.ae(th.firstChild, btm);
                 }
                 else {
-                    ae(th, btm);
+                    $WH.ae(th, btm);
                 }
 
                 groupi++;
             }
             else if (col.name) {
-                var b = ce('b');
-                ae(b, ct(col.name));
-                ae(th, b);
+                var b = $WH.ce('b');
+                $WH.ae(b, $WH.ct(col.name));
+                $WH.ae(th, b);
             }
 
             if (this.editable && reali == this.newgroup) {
                 this.dragTargets.push(th);
             }
 
-            ae(tr, th);
+            $WH.ae(tr, th);
         }
-        ae(this.thead, tr);
+        $WH.ae(this.thead, tr);
 
         if (this.draggable) {
             this.updateDraggable();
@@ -1345,9 +1344,9 @@ Summary.prototype = {
         menu.push([0, LANG.pr_menu_remove, this.removeItem.bind(this, col.group, i)]);
 
         a.rel = this.getItemRel(item, col);
-        a.oncontextmenu = rf;
+        a.oncontextmenu = $WH.rf;
         a.onclick = this.onMouseClick.bind(0, a);
-        a.onmouseup = this.onMouseUp.bind(0, a);
+        a.onmouseup = this.onMouseUp;
         a.menu = menu;
     },
 
@@ -1358,7 +1357,7 @@ Summary.prototype = {
 
     refreshRows: function() {
         if (this.groups.length) {
-            ae(this.table, this.tbody);
+            $WH.ae(this.table, this.tbody);
         }
 
         while (this.tbody.firstChild) {
@@ -1391,24 +1390,24 @@ Summary.prototype = {
             if (this.traits[trait].id) {
                 this.traits[trait].i = ++i;
             }
-            ae(this.tbody, this.getRow(trait, i));
+            $WH.ae(this.tbody, this.getRow(trait, i));
         }
 
         if (!i) {
             if (!this.groups.length && this.tbody.parentNode) {
-                de(this.tbody);
+                $WH.de(this.tbody);
             }
-            var tr = ce('tr');
-            var td = ce('td');
-            var span = ce('span');
+            var tr = $WH.ce('tr');
+            var td = $WH.ce('td');
+            var span = $WH.ce('span');
             if (this.visibility && this.visibility.length) {
                 td.colSpan = this.visibility.length;
             }
             td.style.textAlign = 'center';
-            ae(span, ct('The items in this set don\'t have any comparable stats.'));
-            ae(td, span);
-            ae(tr, td);
-            ae(this.tbody, tr);
+            $WH.ae(span, $WH.ct('The items in this set don\'t have any comparable stats.'));
+            $WH.ae(td, span);
+            $WH.ae(tr, td);
+            $WH.ae(this.tbody, tr);
         }
     },
 
@@ -1436,7 +1435,7 @@ Summary.prototype = {
 
     refreshLink: function() {
         var
-            a = ge('su_link'),
+            a = $WH.ge('su_link'),
             _ = this.getGroupData(),
             c = this.getWeightData();
 
@@ -1457,47 +1456,47 @@ Summary.prototype = {
 
     refreshSort: function(lv) {
         if (!this.sortWeighted) {
-            var sm = ce('small');
+            var sm = $WH.ce('small');
             sm.style.display = 'none';
 
-            var sp = ce('span');
+            var sp = $WH.ce('span');
             sp.style.padding = '0 8px';
             sp.style.color = 'white';
-            ae(sp, ct('|'));
-            ae(sm, sp);
+            $WH.ae(sp, $WH.ct('|'));
+            $WH.ae(sm, sp);
 
-            ae(sm, ct(LANG.pr_note_sort + ' '));
+            $WH.ae(sm, $WH.ct(LANG.pr_note_sort + ' '));
 
-            var s = ce('select');
-            ae(sm, s);
+            var s = $WH.ce('select');
+            $WH.ae(sm, s);
 
             this.sortWeighted = sm;
         }
 
         var
-            s = gE(this.sortWeighted, 'select')[0],
-            o = ce('option');
+            s = $WH.gE(this.sortWeighted, 'select')[0],
+            o = $WH.ce('option');
 
-        ee(s);
-        ae(s, o);
+        $WH.ee(s);
+        $WH.ae(s, o);
 
         if (this.weights && this.weights.length) {
             for (var i = 0, len = this.weights.length; i < len; ++i) {
-                o = ce('option');
+                o = $WH.ce('option');
                 o.scale = this.weights[i];
                 o.selected = (o.scale == this.currentScale);
-                st(o, this.weights[i].name);
-                ae(s, o);
+                $WH.st(o, this.weights[i].name);
+                $WH.ae(s, o);
             }
         }
 
         this.sortWeighted.style.display = s.childNodes.length > 1 ? '' : 'none';
 
         if (lv) {
-            ae(ce('div'), this.sortWeighted); // Remove from current parent
-            gE(this.sortWeighted, 'span')[0].style.display = (gE(lv.getNoteTopDiv(), 'small').length ? '' : 'none');
+            $WH.ae($WH.ce('div'), this.sortWeighted); // Remove from current parent
+            $WH.gE(this.sortWeighted, 'span')[0].style.display = ($WH.gE(lv.getNoteTopDiv(), 'small').length ? '' : 'none');
 
-            ae(lv.getNoteTopDiv(), this.sortWeighted);
+            $WH.ae(lv.getNoteTopDiv(), this.sortWeighted);
             s.onchange = this.sortPickerWindow.bind(this, lv, 1);
             s.onchange();
         }
@@ -1506,19 +1505,19 @@ Summary.prototype = {
     refreshClasses: function(sel) {
         var
             c = sel.options[sel.selectedIndex],
-            _ = ge('su_presets');
+            _ = $WH.ge('su_presets');
 
         while (_.firstChild) {
-            de(_.firstChild);
+            $WH.de(_.firstChild);
         }
-        ae(_, ce('option'));
+        $WH.ae(_, $WH.ce('option'));
 
         if (sel.selectedIndex > 0) {
             for (var _group in c._presets) {
                 var weights = c._presets[_group];
 
                 if (LANG.presets[_group] != null) {
-                    var group = ce('optgroup');
+                    var group = $WH.ce('optgroup');
                     group.label = LANG.presets[_group];
                 }
                 else {
@@ -1526,15 +1525,15 @@ Summary.prototype = {
                 }
 
                 for (var p in weights) {
-                    var o = ce('option');
+                    var o = $WH.ce('option');
                     o.value = p;
                     o._weights = weights[p];
-                    ae(o, ct(weights[p].name ? weights[p].name :LANG.presets[p]));
-                    ae(group, o);
+                    $WH.ae(o, $WH.ct(weights[p].name ? weights[p].name :LANG.presets[p]));
+                    $WH.ae(group, o);
                 }
 
                 if (LANG.presets[_group] != null && group && group.childNodes.length > 0) {
-                    ae(_, group);
+                    $WH.ae(_, group);
                 }
             }
 
@@ -1552,24 +1551,24 @@ Summary.prototype = {
     refreshPresets: function(sel) {
         this.resetWeights();
 
-        var _ = ge('su_classes');
+        var _ = $WH.ge('su_classes');
 
         var o = sel.options[sel.selectedIndex];
         if (sel.selectedIndex > 0) {
             this.updateWeights(o._weights);
-            ge('su_scale').value = (_.options[_.selectedIndex].value != -1 ? _.options[_.selectedIndex].text + LANG.hyphen : '') + o.text;
+            $WH.ge('su_scale').value = (_.options[_.selectedIndex].value != -1 ? _.options[_.selectedIndex].text + LANG.hyphen : '') + o.text;
         }
 
         if (g_user.id > 0) {
-            var a = ge('su_remscale');
+            var a = $WH.ge('su_remscale');
             a.style.display = (o._weights && o._weights.name ? '' : 'none');
         }
     },
 
     resetWeights: function() {
-        var _ = ge('su_weight');
+        var _ = $WH.ge('su_weight');
 
-        ge('su_scale').value = '';
+        $WH.ge('su_scale').value = '';
 
         while (_.childNodes.length >= 2) {
             _.removeChild(_.childNodes[1]);
@@ -1581,7 +1580,7 @@ Summary.prototype = {
         }
         d.firstChild.selectedIndex = 0;
 
-        var a = ge('su_addweight');
+        var a = $WH.ge('su_addweight');
         if (_.childNodes.length < 15) {
             a.style.display = '';
         }
@@ -1591,12 +1590,12 @@ Summary.prototype = {
         var d = sel.parentNode;
 
         while (d.childNodes.length > 1) {
-            de(d.childNodes[1]);
+            $WH.de(d.childNodes[1]);
         }
 
         if (sel.selectedIndex > 0) {
-            ae(d, ct(' '));
-            var _ = ce('input');
+            $WH.ae(d, $WH.ct(' '));
+            var _ = $WH.ce('input');
             _.type = 'text';
             _.value = (value | 0);
             _.maxLength = 7;
@@ -1604,25 +1603,25 @@ Summary.prototype = {
             _.style.width = '4.5em';
             _.setAttribute('autocomplete', 'off');
             _.onchange = this.sortWeights.bind(this, _);
-            ae(d, _);
+            $WH.ae(d, _);
             this.sortWeights(_);
         }
 
         if (d.parentNode.childNodes.length == 1) {
             if (sel.selectedIndex > 0) {
-                ae(d, ct(String.fromCharCode(160, 160)));
-                ae(d, this.createControl(LANG.ficlear, '', '', this.resetWeights.bind(this)));
+                $WH.ae(d, $WH.ct(String.fromCharCode(160, 160)));
+                $WH.ae(d, this.createControl(LANG.ficlear, '', '', this.resetWeights.bind(this)));
             }
         }
         else if (d.parentNode.childNodes.length > 1) {
-            ae(d, ct(String.fromCharCode(160, 160)));
-            ae(d, this.createControl(LANG.firemove, '', '', this.deleteWeight.bind(this, sel)));
+            $WH.ae(d, $WH.ct(String.fromCharCode(160, 160)));
+            $WH.ae(d, this.createControl(LANG.firemove, '', '', this.deleteWeight.bind(this, sel)));
         }
     },
 
     sortWeights: function(input) {
         var
-            _ = ge('su_weight'),
+            _ = $WH.ge('su_weight'),
             v = Number(input.value),
             c = input.parentNode;
 
@@ -1644,7 +1643,7 @@ Summary.prototype = {
             _.insertBefore(c, _.childNodes[n]);
         }
         else {
-            ae(_, c);
+            $WH.ae(_, c);
         }
     },
 
@@ -1652,11 +1651,11 @@ Summary.prototype = {
         window.onbeforeunload = null;
 
         // g_setWowheadCookie('compare_groups', this.getGroupData(), true);
-        sc('compare_groups', 20, this.getGroupData(), '/', location.hostname);
-        // g_setWowheadCookie('compare_weights', rtrim(this.getWeightData(1).join(';'), ';'), true);
-        sc('compare_weights', 20, rtrim(this.getWeightData(1).join(';'), ';'), '/', location.hostname);
+        $WH.sc('compare_groups', 20, this.getGroupData(), '/', location.hostname);
+        // g_setWowheadCookie('compare_weights', $WH.rtrim(this.getWeightData(1).join(';'), ';'), true);
+        $WH.sc('compare_weights', 20, $WH.rtrim(this.getWeightData(1).join(';'), ';'), '/', location.hostname);
         // g_setWowheadCookie('compare_level', this.level, true);
-        sc('compare_level', 20, this.level, '/', location.hostname);
+        $WH.sc('compare_level', 20, this.level, '/', location.hostname);
 
         if (refresh) {
             document.location.href = '?compare'
@@ -1716,7 +1715,7 @@ Summary.prototype = {
                 wtv += ';';
                 n   += ';';
             }
-            n += (plain ? this.weights[i].name : urlencode(this.weights[i].name));
+            n += (plain ? this.weights[i].name : $WH.urlencode(this.weights[i].name));
 
             var j = 0;
             for (var w in this.weights[i]) {
@@ -1744,22 +1743,22 @@ Summary.prototype = {
     showNoData: function(container) {
         var div = this.textNames;
         while (div.firstChild) {
-            de(div.firstChild);
+            $WH.de(div.firstChild);
         }
         div.style.display = 'none';
 
         div = this.noData;
         while (div.firstChild) {
-            de(div.firstChild);
+            $WH.de(div.firstChild);
         }
-        ae(container, div);
+        $WH.ae(container, div);
 
         var result = -1;
         if (this.template.onNoData) {
             result = (this.template.onNoData.bind(this, div))();
         }
         if (result == -1) {
-            ae(div, ct(LANG.su_additems || LANG.lvnodata));
+            $WH.ae(div, $WH.ct(LANG.su_additems || LANG.lvnodata));
         }
     },
 
@@ -1769,10 +1768,10 @@ Summary.prototype = {
         div.style.paddingTop = '10px';
 
         while (div.firstChild) {
-            de(div.firstChild);
+            $WH.de(div.firstChild);
         }
 
-        ae(div, ct(LANG.su_comparing));
+        $WH.ae(div, $WH.ct(LANG.su_comparing));
 
         var n = 0;
         for (var i = 0, len = this.visibility.length; i < len; ++i) {
@@ -1784,27 +1783,27 @@ Summary.prototype = {
             }
 
             if (n++ > 0) {
-                ae(div, ct(LANG.su_comparewith));
+                $WH.ae(div, $WH.ct(LANG.su_comparewith));
             }
 
             if (col.group.length == 1) {
                 var item = g_items[col.group[0][0]].jsonequip;
 
-                var a = ce('a');
+                var a = $WH.ce('a');
                 a.className = 'q' + (7 - parseInt(item.name.charAt(0)));
                 a.href = '?item=' + item.id;
                 a.rel = this.getItemRel(col.group[0], col);
-                ae(a, ct('[' + this.getItemName(col.group[0]) + ']'));
-                ae(div, a);
+                $WH.ae(a, $WH.ct('[' + this.getItemName(col.group[0]) + ']'));
+                $WH.ae(div, a);
             }
             else {
-                var sp = ce('span');
+                var sp = $WH.ce('span');
                 sp.onmouseover = Summary.groupOver.bind(a, col.group);
                 sp.onmousemove = Tooltip.cursorUpdate;
                 sp.onmouseout = Tooltip.hide;
                 sp.className = 'tip';
-                ae(sp, ct('[' + col.group.length + ' ' + LANG.types[3][3] + ']'));
-                ae(div, sp);
+                $WH.ae(sp, $WH.ct('[' + col.group.length + ' ' + LANG.types[3][3] + ']'));
+                $WH.ae(div, sp);
             }
         }
     },
@@ -1822,76 +1821,76 @@ Summary.prototype = {
         div.style.display = '';
 
         while (div.firstChild) {
-            de(div.firstChild);
+            $WH.de(div.firstChild);
         }
 
-        var div2 = ce('div');
+        var div2 = $WH.ce('div');
         div2.className = 'summary-controls-right';
-        ae(div, div2);
+        $WH.ae(div, div2);
 
         a = this.createControl(LANG.su_help, null, 'help-icon', null, '?help=item-comparison');
         a.target = '_blank';
-        ae(div2, a);
+        $WH.ae(div2, a);
 
         if (this.searchable) {
             a = this.createControl(LANG.su_addset, 'su_addset', 'additem-icon', this.openItemPicker.bind(this, 4));
-            ae(div2, a);
+            $WH.ae(div2, a);
 
             a = this.createControl(LANG.su_additem, 'su_additem', 'additem-icon', this.openItemPicker.bind(this, 3));
-            ae(div2, a);
+            $WH.ae(div2, a);
         }
 
         if (this.groups.length) {
             if (this.weightable) {
                 a = this.createControl(LANG.su_addscale, 'su_addscale', 'additem-icon', this.toggleOptions.bind(this, 'su_weights', 'su_addscale'));
-                ae(div2, a);
+                $WH.ae(div2, a);
             }
         }
 
-        aE(document, 'click', this.toggleOptions.bind(this, null, null));
+        $WH.aE(document, 'click', this.toggleOptions.bind(this, null, null));
 
-        var _ = ce('div');
+        var _ = $WH.ce('div');
         _.className = 'clear';
-        ae(div2, _);
+        $WH.ae(div2, _);
 
         if (this.weightable) {
             var
-                d2 = ce('div'),
-                d = ce('div');
+                d2 = $WH.ce('div'),
+                d = $WH.ce('div');
 
             d2.style.display = 'none';
             d2.id = 'su_weights';
             d.className = 'summary-weights-inner';
-            ae(d2, d);
-            ae(div2, d2);
+            $WH.ae(d2, d);
+            $WH.ae(div2, d2);
 
             var
-                t = ce('table'),
-                tbody = ce('tbody'),
-                tr = ce('tr'),
-                td = ce('td');
+                t = $WH.ce('table'),
+                tbody = $WH.ce('tbody'),
+                tr = $WH.ce('tr'),
+                td = $WH.ce('td');
 
-            ae(t, tbody);
-            ae(tbody, tr);
-            ae(tr, td);
+            $WH.ae(t, tbody);
+            $WH.ae(tbody, tr);
+            $WH.ae(tr, td);
 
-            ae(td, ct(LANG.su_preset));
+            $WH.ae(td, $WH.ct(LANG.su_preset));
 
-            td = ce('td');
-            ae(tr, td);
+            td = $WH.ce('td');
+            $WH.ae(tr, td);
 
-            var s = ce('select');
+            var s = $WH.ce('select');
             s.id = 'su_classes';
             s.onchange = s.onkeyup = this.refreshClasses.bind(this, s);
-            ae(s, ce('option'));
-            ae(td, s);
+            $WH.ae(s, $WH.ce('option'));
+            $WH.ae(td, s);
 
             if (g_user.weightscales != null && g_user.weightscales.length) {
-                var o = ce('option');
+                var o = $WH.ce('option');
                 o.value = -1;
                 o._presets = { custom: {} };
-                ae(o, ct(LANG.ficustom));
-                ae(s, o);
+                $WH.ae(o, $WH.ct(LANG.ficustom));
+                $WH.ae(s, o);
 
                 for (var i = 0, len = g_user.weightscales.length; i < len; ++i) {
                     o._presets.custom[g_user.weightscales[i].id] = g_user.weightscales[i];
@@ -1903,89 +1902,89 @@ Summary.prototype = {
                 temp.push(c);
             }
             temp.sort(function(a, b) {
-                return strcmp(g_chr_classes[a], g_chr_classes[b]);
+                return $WH.strcmp(g_chr_classes[a], g_chr_classes[b]);
             });
 
             for (var i = 0, len = temp.length; i < len; ++i) {
                 var
                     c = temp[i],
-                    o = ce('option');
+                    o = $WH.ce('option');
 
                 o.value = c;
                 o._presets = wt_presets[c];
-                ae(o, ct(g_chr_classes[c]));
-                ae(s, o);
+                $WH.ae(o, $WH.ct(g_chr_classes[c]));
+                $WH.ae(s, o);
             }
 
-            _ = ce('span');
+            _ = $WH.ce('span');
             _.style.display = 'none';
-            ae(_, ct(' '));
-            ae(td, _);
+            $WH.ae(_, $WH.ct(' '));
+            $WH.ae(td, _);
 
-            s = ce('select');
+            s = $WH.ce('select');
             s.id = 'su_presets';
             s.onchange = s.onkeyup = this.refreshPresets.bind(this, s);
-            ae(s, ce('option'));
-            ae(_, s);
+            $WH.ae(s, $WH.ce('option'));
+            $WH.ae(_, s);
 
-            ae(td, ct(' '));
-            a = ce('a');
+            $WH.ae(td, $WH.ct(' '));
+            a = $WH.ce('a');
             a.href = 'javascript:;';
-            ae(a, ct(LANG.fishowdetails));
+            $WH.ae(a, $WH.ct(LANG.fishowdetails));
             a.onclick = this.showDetails.bind(this, a);
-            ae(td, a);
+            $WH.ae(td, a);
 
             if (g_user.id > 0) {
-                ae(td, ct(' '));
-                a = ce('a');
+                $WH.ae(td, $WH.ct(' '));
+                a = $WH.ce('a');
                 a.href = 'javascript:;';
                 a.className = 'save-icon';
-                a.appendChild(ct(LANG.fisavescale));
+                a.appendChild($WH.ct(LANG.fisavescale));
                 a.onclick = this.saveScale;
-                a.onmousedown = rf;
-                ae(td, a);
+                a.onmousedown = $WH.rf;
+                $WH.ae(td, a);
 
-                ae(td, ct(' '));
-                a = ce('a');
+                $WH.ae(td, $WH.ct(' '));
+                a = $WH.ce('a');
                 a.href = 'javascript:;';
                 a.id = 'su_remscale';
                 a.className = 'clear-icon';
                 a.style.display = 'none';
-                a.appendChild(ct(LANG.fideletescale));
+                a.appendChild($WH.ct(LANG.fideletescale));
                 a.onclick = this.deleteScale;
-                a.onmousedown = rf;
-                ae(td, a);
+                a.onmousedown = $WH.rf;
+                $WH.ae(td, a);
             }
 
-            tr = ce('tr');
-            td = ce('td');
-            ae(tbody, tr);
-            ae(tr, td);
+            tr = $WH.ce('tr');
+            td = $WH.ce('td');
+            $WH.ae(tbody, tr);
+            $WH.ae(tr, td);
 
-            ae(td, ct(LANG.su_name));
+            $WH.ae(td, $WH.ct(LANG.su_name));
 
-            td = ce('td');
-            ae(tr, td);
+            td = $WH.ce('td');
+            $WH.ae(tr, td);
 
-            var i = ce('input');
+            var i = $WH.ce('input');
             i.type = 'text';
             i.id = 'su_scale';
-            ae(td, i);
-            ae(td, ct(' '));
+            $WH.ae(td, i);
+            $WH.ae(td, $WH.ct(' '));
 
-            ae(d, t);
+            $WH.ae(d, t);
 
-            var w = ce('div');
+            var w = $WH.ce('div');
             w.style.display = 'none';
             w.id = 'su_weight';
-            ae(d, w);
-            _ = ce('div');
-            ae(w, _);
+            $WH.ae(d, w);
+            _ = $WH.ce('div');
+            $WH.ae(w, _);
 
-            s = ce('select');
+            s = $WH.ce('select');
             s.onchange = s.onkeyup = this.refreshWeights.bind(this, s);
-            ae(s, ce('option'));
-            ae(_, s);
+            $WH.ae(s, $WH.ce('option'));
+            $WH.ae(_, s);
 
             _ = false;
 
@@ -1994,76 +1993,76 @@ Summary.prototype = {
 
                 if (p.type == 'sep') {
                     if (_ && _.childNodes.length > 0) {
-                        ae(s, _);
+                        $WH.ae(s, _);
                     }
-                    _ = ce('optgroup');
+                    _ = $WH.ce('optgroup');
                     _.label = (LANG.traits[p.id] ? LANG.traits[p.id] : p.name);
                 }
                 else if (p.type != 'custom') {
-                    var o = ce('option');
+                    var o = $WH.ce('option');
                     o.value = p.id;
-                    ae(o, ct((p.indent ? '- ' : '') + (LANG.traits[p.id] ? LANG.traits[p.id][0] : p.name)));
-                    ae(_, o);
+                    $WH.ae(o, $WH.ct((p.indent ? '- ' : '') + (LANG.traits[p.id] ? LANG.traits[p.id][0] : p.name)));
+                    $WH.ae(_, o);
                 }
             }
             if (_ && _.childNodes.length > 0) {
-                ae(s, _);
+                $WH.ae(s, _);
             }
 
-            _ = ce('div');
+            _ = $WH.ce('div');
             _.style.display = 'none';
             a = this.createControl(LANG.su_addweight, 'su_addweight', '', this.addWeight.bind(this));
-            ae(_, a);
-            ae(d, _);
+            $WH.ae(_, a);
+            $WH.ae(d, _);
 
-            _ = ce('div');
+            _ = $WH.ce('div');
             _.className = 'summary-weights-buttons';
 
-            a = ce('a');
+            a = $WH.ce('a');
             a.className = 'help-icon';
             a.href = '?help=stat-weighting';
             a.target = '_blank';
             a.style.border = 'none';
             a.style.cssFloat = a.style.styleFloat = 'right';
-            ae(a, ct(LANG.su_help));
-            ae(_, a);
+            $WH.ae(a, $WH.ct(LANG.su_help));
+            $WH.ae(_, a);
 
-            i = ce('input');
+            i = $WH.ce('input');
             i.type = 'button';
             i.value = LANG.su_applyweight;
             i.onclick = Summary.addWeightScale.bind(this);
-            ae(_, i);
+            $WH.ae(_, i);
 
-            ae(_, ct(' '));
+            $WH.ae(_, $WH.ct(' '));
 
-            i = ce('input');
+            i = $WH.ce('input');
             i.type = 'button';
             i.value = LANG.su_resetweight;
             i.onclick = Summary.resetScale.bind(this);
-            ae(_, i);
+            $WH.ae(_, i);
 
-            ae(d, _);
+            $WH.ae(d, _);
         }
 
         if (this.autoSave) {
             a = this.createControl(LANG.su_autosaving, null, 'autosave-icon selected');
         }
         else {
-            if (gc('compare_groups')) {
+            if ($WH.gc('compare_groups')) {
                 a = this.createControl(LANG.su_viewsaved, 'su_viewsaved', 'save-icon', this.viewSavedComparison.bind(this, 1));
-                ae(div, a);
+                $WH.ae(div, a);
             }
 
             a = this.createControl(LANG.su_savecompare, 'su_save', 'save-icon', this.saveComparison.bind(this, 1));
         }
-        ae(div, a);
+        $WH.ae(div, a);
 
         if (this.groups.length) {
             a = this.createControl(LANG.su_linkcompare, 'su_link', 'link-icon');
-            ae(div, a);
+            $WH.ae(div, a);
 
             a = this.createControl(LANG.su_clear, null, 'clear-icon', this.resetAll.bind(this));
-            ae(div, a);
+            $WH.ae(div, a);
         }
     },
 
@@ -2074,7 +2073,7 @@ Summary.prototype = {
     },
 
     createRow: function(row) {
-        var tr = ce('tr');
+        var tr = $WH.ce('tr');
         row.__tr = tr;
 
         for (var i = 0, len = this.visibility.length; i < len; ++i) {
@@ -2082,7 +2081,7 @@ Summary.prototype = {
             var col = this.columns[reali];
 
             var
-                td = ce('td'),
+                td = $WH.ce('td'),
                 _ = td;
 
             if (col.align != null) {
@@ -2104,7 +2103,7 @@ Summary.prototype = {
                 _.colSpan = len;
                 _.style.borderBottomWidth = '2px';
                 _.style.padding = '0';
-                ae(tr, td);
+                $WH.ae(tr, td);
                 break;
             }
 
@@ -2139,13 +2138,13 @@ Summary.prototype = {
                     if (result.join) {
                         for (var j = 0, len2 = result.length; j < len2; ++j) {
                             if (j > 0) {
-                                ae(_, ct(', '));
+                                $WH.ae(_, $WH.ct(', '));
                             }
                             if (result[j].appendChild) {
-                                ae(_, result[j]);
+                                $WH.ae(_, result[j]);
                             }
                             else {
-                                ae(_, ct(result[j]));
+                                $WH.ae(_, $WH.ct(result[j]));
                             }
                         }
                         result = null;
@@ -2159,7 +2158,7 @@ Summary.prototype = {
                         }
 
                         if (!row.rating) {
-                            result = (result < 0 ? '-' : '') + number_format(Math.abs(result));
+                            result = (result < 0 ? '-' : '') + $WH.number_format(Math.abs(result));
                         }
                         else {
                             this.selectLevel.style.display = '';
@@ -2177,63 +2176,63 @@ Summary.prototype = {
             if (result != null) {
                 if (row.rating && !isNaN(result)) {
                     var percent = (result < 0 ? -1 : 1) * g_convertRatingToPercent(this.level, row.rating, Math.abs(result));
-                    percent = number_format((Math.round(percent * 100) / 100));
+                    percent = $WH.number_format((Math.round(percent * 100) / 100));
 
                     if (row.rating != 12 && row.rating != 37) { // Neither Defense, nor Expertise
                         percent += '%';
                     }
 
-                    var a = ce('a');
+                    var a = $WH.ce('a');
 
                     a.className = (_.className ? _.className : 'q1');
                     a.style.borderBottom = '1px dotted #808080';
                     a.onmouseover = (function(rating, percent, level, text) {
-                        Tooltip.show(this, rating + ' ' + text + ' (' + sprintf(LANG.tooltip_combatrating, percent, level) + ')<br /><span class="q2">' + LANG.su_toggle + '</span>', 0, 0, 'q');
+                        Tooltip.show(this, rating + ' ' + text + ' (' + $WH.sprintf(LANG.tooltip_combatrating, percent, level) + ')<br /><span class="q2">' + LANG.su_toggle + '</span>', 0, 0, 'q');
                     }).bind(a, result, percent, this.level, LANG.traits[row.id][0]);
                     a.onmousemove = Tooltip.cursorUpdate;
                     a.onmouseout = Tooltip.hide;
                     a.onclick = this.toggleRatings.bind(this);
 
-                    ae(a, ct(sign + (this.ratingMode ? percent : result)));
+                    $WH.ae(a, $WH.ct(sign + (this.ratingMode ? percent : result)));
 
-                    aef(_, a);
+                    $WH.aef(_, a);
                 }
                 else {
-                    aef(_, ct(sign + result));
+                    $WH.aef(_, $WH.ct(sign + result));
                 }
             }
 
             if (!row.hidden) {
-                ae(tr, td);
+                $WH.ae(tr, td);
             }
         }
     },
 
     toggleOptions: function(popupId, link, e) {
-        e = $E(e);
+        e = $WH.$E(e);
 
         if (e && e._button >= 2) {
             return false;
         }
 
         var
-            popups = [ge('su_weights')],
-            links  = [ge('su_addscale')],
+            popups = [$WH.ge('su_weights')],
+            links  = [$WH.ge('su_addscale')],
             popup  = null;
 
-        if (Browser.ie && e && !popupId && in_array(links, e._target) != -1) {
+        if ($WH.Browser.ie && e && !popupId && $WH.in_array(links, e._target) != -1) {
             return;
         }
 
         if (link) {
-            link = ge(link);
+            link = $WH.ge(link);
         }
         if (popupId && link) { // Params provided -> a link was clicked
             if (link.className.indexOf('selected') != -1) { // Already selected
                 link = null;
             }
             else {
-                popup = ge(popupId);
+                popup = $WH.ge(popupId);
             }
         }
         else if (e) {
@@ -2244,7 +2243,7 @@ Summary.prototype = {
             }
 
             while (p.parentNode) {
-                if (in_array(popups, p) != -1) {
+                if ($WH.in_array(popups, p) != -1) {
                     return false;
                 }
 
@@ -2272,7 +2271,7 @@ Summary.prototype = {
         }
 
         if (e && popupId && link) {
-            sp(e);
+            $WH.sp(e);
         }
     },
 
@@ -2290,7 +2289,7 @@ Summary.prototype = {
     },
 
     createControl: function(text, id, _class, onclick, href) {
-        var a = ce('a');
+        var a = $WH.ce('a');
 
         if (href) {
             a.href = href;
@@ -2312,7 +2311,7 @@ Summary.prototype = {
             a.onclick = onclick;
         }
 
-        ae(a, ct(text));
+        $WH.ae(a, $WH.ct(text));
 
         return a;
     },
@@ -2332,7 +2331,7 @@ Summary.prototype = {
     deleteColumn: function(col, e) {
         Tooltip.hide();
 
-        e = $E(e);
+        e = $WH.$E(e);
 
         if (!e.shiftKey) {
             this.groups.splice(col.i, 1);
@@ -2353,13 +2352,13 @@ Summary.prototype = {
 
     createWeightScale: function() {
         var
-            _ = ge('su_weight'),
-            s = ge('su_scale'),
+            _ = $WH.ge('su_weight'),
+            s = $WH.ge('su_scale'),
             scale = {},
             found = false;
 
         scale.name = s.value;
-        scale.name = trim(scale.name);
+        scale.name = $WH.trim(scale.name);
         scale.name = scale.name.replace(/'/g, '');
 
         for (var i = 0, len = _.childNodes.length; i < len; ++i) {
@@ -2385,7 +2384,7 @@ Summary.prototype = {
         this.weights.splice(i, 1);
 
         if (!this.weights.length) {
-            var a = ge('enchants-default-sort');
+            var a = $WH.ge('enchants-default-sort');
             if (a) {
                 a.onclick();
             }
@@ -2429,19 +2428,9 @@ Summary.prototype = {
             return;
         }
 
-    /* original
-        if ($('option:selected', this.sortWeighted)[0])
+        if ($('option:selected', this.sortWeighted)[0]) {
             this.currentScale = $('option:selected', this.sortWeighted)[0].scale;
-    * replacement */
-
-        var opts = gE(this.sortWeighted, 'option');
-        for (i in opts) {
-            if (opts[i].selected) {
-                this.currentScale = opts[i].scale;
-                break;
-            }
         }
-    /* replace end */
 
         lv.setSort([1], true, false);
         lv.setData(this.calcScores(lv.data, this.currentScale));
@@ -2463,26 +2452,26 @@ Summary.prototype = {
 
     createItemPickerNote: function(div) {
         var
-            sm = ce('small'),
-            sp = ce('span'),
+            sm = $WH.ce('small'),
+            sp = $WH.ce('span'),
             a;
 
         this.currentSearch = '';
         this.searchTimer = 0;
 
-        ae(sm, ct(LANG.su_note_name));
+        $WH.ae(sm, $WH.ct(LANG.su_note_name));
 
-        this.searchName = ce('input');
+        this.searchName = $WH.ce('input');
         this.searchName.type = 'text';
 
-        aE(this.searchName, 'keyup', this.onSearchKeyUp.bind(this, 333));
-        aE(this.searchName, 'keydown', this.onSearchKeyDown.bind(this));
+        $WH.aE(this.searchName, 'keyup', this.onSearchKeyUp.bind(this, 333));
+        $WH.aE(this.searchName, 'keydown', this.onSearchKeyDown.bind(this));
 
-        ae(sm, this.searchName);
-        this.searchMsg = sp;
+        $WH.ae(sm, this.searchName);
+        this.searchMsg = $WH.sp;
         this.searchMsg.style.fontWeight = 'bold';
-        ae(sm, this.searchMsg);
-        ae(div, sm);
+        $WH.ae(sm, this.searchMsg);
+        $WH.ae(div, sm);
     },
 
     getSetBonuses: function(group) {
@@ -2550,22 +2539,22 @@ Summary.prototype = {
             dest.className = 'summary-picker listview';
 
             var
-                d     = ce('div'),
-                a     = ce('a'),
-                clear = ce('div');
+                d     = $WH.ce('div'),
+                a     = $WH.ce('a'),
+                clear = $WH.ce('div');
 
             d.className = 'listview';
-            ae(dest, d);
+            $WH.ae(dest, d);
 
-            a = ce('a');
+            a = $WH.ce('a');
             a.className = 'screenshotviewer-close';
             a.href = 'javascript:;';
             a.onclick = Lightbox.hide;
-            ae(a, ce('span'));
-            ae(dest, a);
+            $WH.ae(a, $WH.ce('span'));
+            $WH.ae(dest, a);
 
             clear.className = 'clear';
-            ae(dest, clear);
+            $WH.ae(dest, clear);
 
             lv = new Listview({
                 template: 'compare',
@@ -2576,8 +2565,8 @@ Summary.prototype = {
                 createNote: this.createItemPickerNote.bind(this)
             });
 
-            if (Browser.firefox) {
-                aE(lv.getClipDiv(), 'DOMMouseScroll', g_pickerWheel);
+            if ($WH.Browser.firefox) {
+                $WH.aE(lv.getClipDiv(), 'DOMMouseScroll', g_pickerWheel);
             }
             else {
                 lv.getClipDiv().onmousewheel = g_pickerWheel;
@@ -2628,22 +2617,22 @@ Summary.prototype = {
             dest.className = 'summary-picker listview';
 
             var
-                d     = ce('div'),
-                a     = ce('a'),
-                clear = ce('div');
+                d     = $WH.ce('div'),
+                a     = $WH.ce('a'),
+                clear = $WH.ce('div');
 
                 d.className = 'listview';
-            ae(dest, d);
+            $WH.ae(dest, d);
 
-            a = ce('a');
+            a = $WH.ce('a');
             a.className = 'screenshotviewer-close';
             a.href = 'javascript:;';
             a.onclick = Lightbox.hide;
-            ae(a, ce('span'));
-            ae(dest, a);
+            $WH.ae(a, $WH.ce('span'));
+            $WH.ae(dest, a);
 
             clear.className = 'clear';
-            ae(dest, clear);
+            $WH.ae(dest, clear);
 
             lv = new Listview({
                 template: 'subitempicker',
@@ -2652,8 +2641,8 @@ Summary.prototype = {
                 data: dataz
             });
 
-            if (Browser.firefox) {
-                aE(lv.getClipDiv(), 'DOMMouseScroll', g_pickerWheel);
+            if ($WH.Browser.firefox) {
+                $WH.aE(lv.getClipDiv(), 'DOMMouseScroll', g_pickerWheel);
             }
             else {
                 lv.getClipDiv().onmousewheel = g_pickerWheel;
@@ -2682,36 +2671,36 @@ Summary.prototype = {
 
     createEnchantPickerNote: function(div) {
         var
-            sm = ce('small'),
+            sm = $WH.ce('small'),
             a;
 
-        ae(sm, ct(LANG.pr_note_source));
+        $WH.ae(sm, $WH.ct(LANG.pr_note_source));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = this.filterEnchants.bind(this, a, 0, null);
-        ae(a, ct(LANG.pr_note_all));
+        $WH.ae(a, $WH.ct(LANG.pr_note_all));
 
         g_setSelectedLink(a, 'enchants0');
 
-        ae(sm, a);
-        ae(sm, ct(LANG.comma));
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = this.filterEnchants.bind(this, a, 0, 1);
-        ae(a, ct(LANG.pr_note_items));
+        $WH.ae(a, $WH.ct(LANG.pr_note_items));
 
-        ae(sm, a);
-        ae(sm, ct(LANG.comma));
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = this.filterEnchants.bind(this, a, 0, 2);
-        ae(a, ct(LANG.pr_note_profs));
+        $WH.ae(a, $WH.ct(LANG.pr_note_profs));
 
-        ae(sm, a);
-        ae(div, sm);
+        $WH.ae(sm, a);
+        $WH.ae(div, sm);
     },
 
     canBeEnchanted: function(slot, subclass) {
@@ -2770,23 +2759,23 @@ Summary.prototype = {
 
             var
                 dataz = [],
-                d = ce('div'),
-                a = ce('a'),
-                clear = ce('div');
+                d = $WH.ce('div'),
+                a = $WH.ce('a'),
+                clear = $WH.ce('div');
 
             dataz.push({ none: 1, __alwaysvisible: 1, _summary: this });
 
             for (var enchantId in g_enchants) {
                 var enchant = { id: enchantId, _summary: this };
 
-                cO(enchant, g_enchants[enchantId]);
+                $WH.cO(enchant, g_enchants[enchantId]);
 
                 if (typeof enchant.name == 'string') {
                     dataz.push(enchant);
                 }
                 else {
                     for (var i = 0, len = g_enchants[enchantId].name.length; i < len; ++i) {
-                        var row = dO(enchant);
+                        var row = $WH.dO(enchant);
 
                         row.name   = enchant.name[i];
                         row.source = enchant.source[i];
@@ -2798,17 +2787,17 @@ Summary.prototype = {
             }
 
             d.className = 'listview';
-            ae(dest, d);
+            $WH.ae(dest, d);
 
-            a = ce('a');
+            a = $WH.ce('a');
             a.className = 'screenshotviewer-close';
             a.href = 'javascript:;';
             a.onclick = Lightbox.hide;
-            ae(a, ce('span'));
-            ae(dest, a);
+            $WH.ae(a, $WH.ce('span'));
+            $WH.ae(dest, a);
 
             clear.className = 'clear';
-            ae(dest, clear);
+            $WH.ae(dest, clear);
 
             lv = new Listview({
                 template: 'enchantpicker',
@@ -2819,8 +2808,8 @@ Summary.prototype = {
                 customFilter: this.isValidEnchant.bind(this)
             });
 
-            if (Browser.firefox) {
-                aE(lv.getClipDiv(), 'DOMMouseScroll', g_pickerWheel);
+            if ($WH.Browser.firefox) {
+                $WH.aE(lv.getClipDiv(), 'DOMMouseScroll', g_pickerWheel);
             }
             else {
                 lv.getClipDiv().onmousewheel = g_pickerWheel;
@@ -2854,65 +2843,65 @@ Summary.prototype = {
 
     createGemPickerNote: function(div) {
         var
-            sm = ce('small'),
+            sm = $WH.ce('small'),
             a;
 
-        ae(sm, ct(LANG.pr_note_source));
+        $WH.ae(sm, $WH.ct(LANG.pr_note_source));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = this.filterGems.bind(this, a, 0, null);
-        ae(a, ct(LANG.pr_note_all));
+        $WH.ae(a, $WH.ct(LANG.pr_note_all));
 
-        ae(sm, a);
-        ae(sm, ct(LANG.comma));
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = this.filterGems.bind(this, a, 0, 1);
-        ae(a, ct(LANG.pr_note_bc));
+        $WH.ae(a, $WH.ct(LANG.pr_note_bc));
 
-        ae(sm, a);
-        ae(sm, ct(LANG.comma));
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = this.filterGems.bind(this, a, 0, 2);
-        ae(a, ct(LANG.pr_note_wotlk));
+        $WH.ae(a, $WH.ct(LANG.pr_note_wotlk));
         this.gemSource = 2;
         g_setSelectedLink(a, 'gems0');
 
-        ae(sm, a);
-        ae(div, sm);
+        $WH.ae(sm, a);
+        $WH.ae(div, sm);
 
-        sm = ce('small');
+        sm = $WH.ce('small');
 
-        var sp = ce('span');
+        var sp = $WH.ce('span');
         sp.style.padding = '0 8px';
         sp.style.color = 'white';
-        ae(sp, ct('|'));
-        ae(sm, sp);
+        $WH.ae(sp, $WH.ct('|'));
+        $WH.ae(sm, sp);
 
-        ae(sm, ct(LANG.pr_note_color));
+        $WH.ae(sm, $WH.ct(LANG.pr_note_color));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = this.filterGems.bind(this, a, 1, null);
-        ae(a, ct(LANG.pr_note_all));
+        $WH.ae(a, $WH.ct(LANG.pr_note_all));
 
-        ae(sm, a);
-        ae(sm, ct(LANG.comma));
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
 
-        a = ce('a');
+        a = $WH.ce('a');
         a.href = 'javascript:;';
         a.onclick = this.filterGems.bind(this, a, 1, 1);
-        ae(a, ct(LANG.pr_note_match));
+        $WH.ae(a, $WH.ct(LANG.pr_note_match));
 
         this.gemColor = 1;
         g_setSelectedLink(a, 'gems1');
 
-        ae(sm, a);
-        ae(div, sm);
+        $WH.ae(sm, a);
+        $WH.ae(div, sm);
     },
 
     matchGemSocket: function(gemColor, socketColor) {
@@ -3008,32 +2997,32 @@ Summary.prototype = {
 
                 var
                 dataz = [],
-                d     = ce('div'),
-                a     = ce('a'),
-                clear = ce('div');
+                d     = $WH.ce('div'),
+                a     = $WH.ce('a'),
+                clear = $WH.ce('div');
 
             dataz.push({ none: 1, __alwaysvisible: 1, _summary: this });
 
             for (var gemId in g_gems) {
                 var gem = { id: gemId, _summary: this };
 
-                cO(gem, g_gems[gemId]);
+                $WH.cO(gem, g_gems[gemId]);
 
                 dataz.push(gem);
             }
 
             d.className = 'listview';
-            ae(dest, d);
+            $WH.ae(dest, d);
 
-            a = ce('a');
+            a = $WH.ce('a');
             a.className = 'screenshotviewer-close';
             a.href = 'javascript:;';
             a.onclick = Lightbox.hide;
-            ae(a, ce('span'));
-            ae(dest, a);
+            $WH.ae(a, $WH.ce('span'));
+            $WH.ae(dest, a);
 
             clear.className = 'clear';
-            ae(dest, clear);
+            $WH.ae(dest, clear);
 
             lv = new Listview({
                 template: 'gempicker',
@@ -3044,8 +3033,8 @@ Summary.prototype = {
                 customFilter: this.isValidGem.bind(this)
             });
 
-            if (Browser.firefox) {
-                aE(lv.getClipDiv(), 'DOMMouseScroll', g_pickerWheel);
+            if ($WH.Browser.firefox) {
+                $WH.aE(lv.getClipDiv(), 'DOMMouseScroll', g_pickerWheel);
             }
             else {
                 lv.getClipDiv().onmousewheel = g_pickerWheel;
@@ -3060,8 +3049,8 @@ Summary.prototype = {
 
         var
             div = lv.getNoteTopDiv(),
-            sms = gE(div, 'small'),
-            as = gE(div, 'a');
+            sms = $WH.gE(div, 'small'),
+            as = $WH.gE(div, 'a');
 
         if (this.currentItem.color == 1 || this.currentItem.color == 14) { // Meta, Prismatic
             sms[1].style.display = 'none'; // Hide 'Color' filter
@@ -3078,21 +3067,18 @@ Summary.prototype = {
     },
 
     onMouseClick: function(a, e) {
-        e = $E(e);
+        e = $WH.$E(e);
 
         if (e._button == 3 || e.shiftKey || e.ctrlKey) {
             return false;
         }
     },
 
-    onMouseUp: function(a, e) {
-        e = $E(e);
-        if (e._button == 3 || e.shiftKey || e.ctrlKey) { // Right click
-            var f = Menu.getDiv(0, a.menu);
-
-            var pos = g_getCursorPos(e);
-            setTimeout(Menu.showAtCursor.bind(a, null, pos.x, pos.y), 1); // Timeout needed for the context menu to be disabled
-            // setTimeout(Menu.showAtXY.bind(null, this.menu, pos.x, pos.y), 1); // 5.x
+    onMouseUp: function(event) {
+        event = $WH.$E(event);
+        if (event._button == 3 || event.shiftKey || event.ctrlKey) { // Right click
+            var pos = $WH.g_getCursorPos(event);
+            setTimeout(Menu.showAtXY.bind(null, this.menu, pos.x, pos.y), 1); // Timeout needed for the context menu to be disabled
 
             Tooltip.hide();
         }
@@ -3101,7 +3087,7 @@ Summary.prototype = {
     },
 
     onSearchKeyUp: function(delay) {
-        var search = trim(this.searchName.value.replace(/\s+/g, ' '));
+        var search = $WH.trim(this.searchName.value.replace(/\s+/g, ' '));
 
         if (search == this.currentSearch && isNaN(delay)) {
             return;
@@ -3112,7 +3098,7 @@ Summary.prototype = {
     },
 
     onSearchKeyDown: function(e) {
-        e = $E(e);
+        e = $WH.$E(e);
 
         switch (e.keyCode) {
         case 13: // Enter
@@ -3143,7 +3129,7 @@ Summary.prototype = {
         }
 
         if (search) {
-            st(this.searchMsg, sprintf(LANG['su_searching' + this.searchType], search));
+            $WH.st(this.searchMsg, $WH.sprintf(LANG['su_searching' + this.searchType], search));
         }
         this.searchMsg.className = '';
 
@@ -3163,12 +3149,12 @@ Summary.prototype = {
         this.searchMsg.className = '';
 
         if (!search && !this.currentScale) {
-            st(this.searchMsg, LANG['su_specifyitem' + this.searchType]);
+            $WH.st(this.searchMsg, LANG['su_specifyitem' + this.searchType]);
             return;
         }
-        st(this.searchMsg, sprintf(LANG['su_searching' + this.searchType], search));
+        $WH.st(this.searchMsg, $WH.sprintf(LANG['su_searching' + this.searchType], search));
 
-        new Ajax('?search=' + urlencode(search) + '&json&type=' + type + pr_getScaleFilter(this.currentScale, 1), {
+        new Ajax('?search=' + $WH.urlencode(search) + '&json&type=' + type + pr_getScaleFilter(this.currentScale, 1), {
             method: 'POST',
             search: search,
             onSuccess: function(xhr, opt) {
@@ -3188,7 +3174,7 @@ Summary.prototype = {
                         row.level     = a[1][i].level;
                         row.classs    = a[1][i].classs;
                         row.subclass  = a[1][i].subclass;
-                        row.jsonequip = dO(a[1][i]);
+                        row.jsonequip = $WH.dO(a[1][i]);
 
                         row._type = 3;
                         row._summary = _this;
@@ -3234,10 +3220,10 @@ Summary.prototype = {
                         }
                     }
                     lv.searchable = true;
-                    ee(_this.searchMsg)
+                    $WH.ee(_this.searchMsg)
                 }
                 else {
-                    st(_this.searchMsg, sprintf(LANG.su_noresults, opt.search));
+                    $WH.st(_this.searchMsg, $WH.sprintf(LANG.su_noresults, opt.search));
                     _this.searchMsg.className = 'q10';
                 }
 
@@ -3500,7 +3486,7 @@ Summary.moveGroup = function(e, obj, targ, cursor) {
         group = [],
         pos;
 
-    cO(group, this.groups[obj.__col.i]);
+    $WH.cO(group, this.groups[obj.__col.i]);
 
     if (!targ) {
         if (confirm(LANG.message_deletegroup)) {
@@ -3544,10 +3530,10 @@ Summary.moveGroupItem = function(e, obj, targ) {
     }
 
     var item = [];
-    cO(item, obj.__col.group[obj.i]);
+    $WH.cO(item, obj.__col.group[obj.i]);
 
     if (!targ || (targ.__col.group && !targ.__col.group.length)) {
-        if (confirm(sprintf(LANG.message_deleteitem, g_items[obj.__col.group[obj.i][0]].jsonequip.name.substring(1)))) {
+        if (confirm($WH.sprintf(LANG.message_deleteitem, g_items[obj.__col.group[obj.i][0]].jsonequip.name.substring(1)))) {
             obj.__col.group.splice(obj.i, 1);
             this.refreshAll();
         }
@@ -3648,7 +3634,7 @@ Summary.addWeightScale = function(scale) {
 };
 
 Summary.resetScale = function() {
-    var _ = ge('su_classes');
+    var _ = $WH.ge('su_classes');
 
     _.selectedIndex = 0;
     _.onchange();
@@ -3788,9 +3774,9 @@ Summary.funcBox = {
             return;
         }
 
-        var div = ce('div');
+        var div = $WH.ce('div');
         div.style.paddingBottom = '3px';
-        ae(td, div);
+        $WH.ae(td, div);
 
         var
             i = 0,
@@ -3800,16 +3786,16 @@ Summary.funcBox = {
             if (sockets[color] != null && sockets[color] != 0) {
                 if (j > 0) {
                     if (j % 2 == 0) {
-                        var div = ce('div');
+                        var div = $WH.ce('div');
                         div.style.paddingBottom = '3px';
-                        ae(td, div);
+                        $WH.ae(td, div);
                     }
                     else {
-                        ae(div, ct(String.fromCharCode(160, 160)));
+                        $WH.ae(div, $WH.ct(String.fromCharCode(160, 160)));
                     }
                 }
 
-                var a = ce('a');
+                var a = $WH.ce('a');
                 a.href = '?items=3&filter=' + (color == 14 ? 'gb=1;cr=81:81:81;crs=2:3:4;crv=0:0:0;ma=1' : 'cr=81;crs=' + (i + 1) + ';crv=0');
                 a.className = 'moneysocket' + gem_colors[color];
 
@@ -3830,7 +3816,7 @@ Summary.funcBox = {
                 if (selected) {
                     a.className += ' ' + (sockets[color] > 0 ? 'q2' : 'q10');
                     if (sockets[color] > 0) {
-                        ae(a, ct('+'));
+                        $WH.ae(a, $WH.ct('+'));
                     }
                 }
                 else if (minSockets && maxSockets && minSockets[color] != maxSockets[color] && sockets[color] == maxSockets[color]) {
@@ -3838,8 +3824,8 @@ Summary.funcBox = {
                     a.className += ' q2';
                 }
 
-                ae(a, ct(sockets[color]));
-                ae(div, a);
+                $WH.ae(a, $WH.ct(sockets[color]));
+                $WH.ae(div, a);
 
                 ++j;
             }
@@ -3872,15 +3858,15 @@ Summary.templates = {
 
                     var res = (LANG.traits[trait.id] ? LANG.traits[trait.id][0] : trait.name);
                     if (trait.id == 'gains') {
-                        var sp = ce('span');
+                        var sp = $WH.ce('span');
                         sp.className = 'tip';
                         sp.onmouseover = function() {
                             Tooltip.show(this, LANG.tooltip_gains, 0, 0, 'q');
                         };
                         sp.onmousemove = Tooltip.cursorUpdate;
                         sp.onmouseout = Tooltip.hide;
-                        ae(sp, ct(res));
-                        ae(td, sp);
+                        $WH.ae(sp, $WH.ct(res));
+                        $WH.ae(td, sp);
                     }
                     else {
                         return res;
@@ -3956,7 +3942,7 @@ Summary.templates = {
 
                         if (score != null) {
                             if (!weight.name) {
-                                weight.name = sprintf(LANG.su_customscale, ++n);
+                                weight.name = $WH.sprintf(LANG.su_customscale, ++n);
                             }
 
                             switch (this.scoreMode) {
@@ -3968,18 +3954,18 @@ Summary.templates = {
                                 break;
                             }
 
-                            var a = ce('a');
+                            var a = $WH.ce('a');
                             a.className = 'summary-score-remove';
                             a.href = 'javascript:;';
                             a.onclick = this.deleteWeightScale.bind(this, i);
-                            ae(a, ct('x'));
-                            ae(td, a);
+                            $WH.ae(a, $WH.ct('x'));
+                            $WH.ae(td, a);
 
-                            var d = ce('div');
+                            var d = $WH.ce('div');
                             d.className = 'summary-score-row' + (i % 2);
-                            ae(td, d);
+                            $WH.ae(td, d);
 
-                            var a = ce('a');
+                            var a = $WH.ce('a');
                             a.className = (_ ? (score > 0 ? 'q2' : 'q10') : 'q1');
                             a.style.borderBottom = '1px dotted #808080';
                             a.href = 'javascript:;';
@@ -3987,8 +3973,8 @@ Summary.templates = {
                             a.onmouseover = Summary.weightOver.bind(a, weight);
                             a.onmousemove = Tooltip.cursorUpdate;
                             a.onmouseout = Tooltip.hide;
-                            ae(a, ct(score));
-                            ae(d, a);
+                            $WH.ae(a, $WH.ct(score));
+                            $WH.ae(d, a);
                         }
                     }
                 }
@@ -4170,25 +4156,25 @@ Summary.templates = {
                     for (var trait in this.minValue) {
                         if (col.total[trait] > this.minValue[trait]) {
                             if (i++ > 0) {
-                                ae(td, ce('br'));
+                                $WH.ae(td, $WH.ce('br'));
                             }
 
                             var value = (Math.round(1000 * (col.total[trait] - this.minValue[trait])) / 1000);
 
-                            ae(td, ct(value + ' ' + LANG.traits[trait][1]));
+                            $WH.ae(td, $WH.ct(value + ' ' + LANG.traits[trait][1]));
 
                             if (this.ratings[trait] != null) {
                                 var percent = g_convertRatingToPercent(this.level, this.ratings[trait], value);
 
-                                percent = number_format((Math.round(percent * 100) / 100));
+                                percent = $WH.number_format((Math.round(percent * 100) / 100));
 
                                 if (this.ratings[trait] != 12 && this.ratings[trait] != 37) { // Neither Defense, nor Expertise
                                     percent += '%';
                                 }
 
-                                var s = ce('small');
-                                ae(s, ct(' (' + percent + ')'));
-                                ae(td, s);
+                                var s = $WH.ce('small');
+                                $WH.ae(s, $WH.ct(' (' + percent + ')'));
+                                $WH.ae(td, s);
                             }
                         }
                     }
@@ -4360,7 +4346,7 @@ Listview.templates.compare = {
                     return;
                 }
 
-                var a = ce('a');
+                var a = $WH.ce('a');
                 a.className = 'q' + item.quality;
                 a.style.fontFamily = 'Verdana, sans-serif';
 
@@ -4368,7 +4354,7 @@ Listview.templates.compare = {
                     case 3:
                         this.template.columns[0].span = 2;
 
-                        var i = ce('td');
+                        var i = $WH.ce('td');
                         i.style.width = '1px';
                         i.style.padding = '0';
                         i.style.borderRight = 'none';
@@ -4377,11 +4363,11 @@ Listview.templates.compare = {
                             icon = Icon.create(item.icon, 0, null, '?item=' + item.id),
                             link = Icon.getLink(icon);
 
-                        ae(i, icon);
-                        ae(tr, i);
+                        $WH.ae(i, icon);
+                        $WH.ae(tr, i);
                         td.style.borderLeft = 'none';
 
-                        link.onclick = rf;
+                        link.onclick = $WH.rf;
 
                         a.href = '?item=' + item.id;
                         break;
@@ -4390,13 +4376,13 @@ Listview.templates.compare = {
                         break;
                 }
 
-                ae(a, ct(item.name));
+                $WH.ae(a, $WH.ct(item.name));
 
-                nw(td);
-                ae(td, a);
+                $WH.nw(td);
+                $WH.ae(td, a);
 
                 tr.onclick = function(e) {
-                    e = $E(e);
+                    e = $WH.$E(e);
                     if (e._button != 2 || e._target != a) {
                         e.preventDefault();
                         (Summary.addGroupItem.bind(item._summary, item._type, item))();
@@ -4412,9 +4398,9 @@ Listview.templates.compare = {
                 }
 
                 return (
-                    -strcmp(a.level | a.minlevel, b.level | b.minlevel) ||
-                    -strcmp(a.quality, b.quality) ||
-                    strcmp(a.name, b.name)
+                    -$WH.strcmp(a.level | a.minlevel, b.level | b.minlevel) ||
+                    -$WH.strcmp(a.quality, b.quality) ||
+                    $WH.strcmp(a.name, b.name)
                 );
             }
         },
@@ -4461,8 +4447,8 @@ Listview.templates.compare = {
                 }
 
                 return (
-                    -strcmp(a.score, b.score) ||
-                    strcmp(a.name, b.name)
+                    -$WH.strcmp(a.score, b.score) ||
+                    $WH.strcmp(a.name, b.name)
                 );
             }
         },
@@ -4488,21 +4474,21 @@ Listview.templates.compare = {
             type: 'text',
             compute: function(item, td, tr) {
                 td.className = 'small q1';
-                nw(td);
-                var a = ce('a');
+                $WH.nw(td);
+                var a = $WH.ce('a');
 
                 switch (item._type) {
                     case 3:
                         var it = Listview.funcBox.getItemType(item.classs, item.subclass, item.subsubclass);
                         a.href = it.url;
-                        ae(a, ct(it.text));
+                        $WH.ae(a, $WH.ct(it.text));
                         break;
                     case 4:
-                        ae(a, ct(g_itemset_types[item.type]));
+                        $WH.ae(a, $WH.ct(g_itemset_types[item.type]));
                         break;
                 }
 
-                ae(td, a);
+                $WH.ae(td, a);
             },
             getVisibleText: function(item) {
                 return Listview.funcBox.getItemType(item.classs, item.subclass, item.subsubclass).text;
@@ -4515,11 +4501,11 @@ Listview.templates.compare = {
 				if (item.score != null) {
 					var
                         n = parseFloat(item.score),
-						s = ce('div');
+						s = $WH.ce('div');
 
 					s.className = 'small q' + (n ? (n > 0 ? 2 : 10) : 0);
-					st(s, (n ? (n > 0 ? '+' : '-') + item.score : 0));
-					ae(td, s);
+					$WH.st(s, (n ? (n > 0 ? '+' : '-') + item.score : 0));
+					$WH.ae(td, s);
 				}
                 else {
                     td.style.display = 'none';
@@ -4571,7 +4557,7 @@ Listview.templates.subitempicker = {
                     url = '?item=' + subitem.item,
                     item = g_items[subitem.item];
 
-                var i = ce('td');
+                var i = $WH.ce('td');
                 i.style.width = '1px';
                 i.style.padding = '0';
                 i.style.borderRight = 'none';
@@ -4580,14 +4566,14 @@ Listview.templates.subitempicker = {
                     icon = Icon.create(item.icon, 0, null, url),
                     link = Icon.getLink(icon);
 
-                ae(i, icon);
-                ae(tr, i);
+                $WH.ae(i, icon);
+                $WH.ae(tr, i);
                 td.style.borderLeft = 'none';
 
-                link.onclick = rf;
+                link.onclick = $WH.rf;
                 link.rel = 'rand=' + subitem.id;
 
-                var a = ce('a');
+                var a = $WH.ce('a');
 
                 if (subitem.quality != -1) {
                     a.className = 'q' + item.quality;
@@ -4597,13 +4583,13 @@ Listview.templates.subitempicker = {
                 a.href = url;
                 a.rel = 'rand=' + subitem.id;
 
-                ae(a, ct(item['name_' + g_locale.name] + ' ' + subitem.name));
+                $WH.ae(a, $WH.ct(item['name_' + g_locale.name] + ' ' + subitem.name));
 
-                nw(td);
-                ae(td, a);
+                $WH.nw(td);
+                $WH.ae(td, a);
 
                 tr.onclick = function(e) {
-                    e = $E(e);
+                    e = $WH.$E(e);
                     if (e._button != 2 || e._target != a) {
                         e.preventDefault();
                         (Summary.addItemSubitem.bind(subitem._summary, subitem.id))();
@@ -4621,11 +4607,11 @@ Listview.templates.subitempicker = {
                     return;
                 }
 
-                var d = ce('div');
+                var d = $WH.ce('div');
                 d.className = 'small crop';
                 td.title = subitem.enchantment;
-                ae(d, ct(subitem.enchantment));
-                ae(td, d);
+                $WH.ae(d, $WH.ct(subitem.enchantment));
+                $WH.ae(td, d);
             },
             sortFunc: function(a, b, col) {
                 if (a.none) {
@@ -4636,8 +4622,8 @@ Listview.templates.subitempicker = {
                 }
 
                 return (
-                    -strcmp(a.score, b.score) ||
-                    strcmp(a.name, b.name)
+                    -$WH.strcmp(a.score, b.score) ||
+                    $WH.strcmp(a.name, b.name)
                 );
             }
         },
@@ -4652,11 +4638,11 @@ Listview.templates.subitempicker = {
                 if (subitem.score != null) {
                     var
                         n = parseFloat(subitem.score),
-                        s = ce('div');
+                        s = $WH.ce('div');
 
                     s.className = 'small q' + (n ? (n > 0 ? 2 : 10) : 0);
-                    st(s, (n ? (n > 0 ? '+' : '-') + subitem.score : 0));
-                    ae(td, s);
+                    $WH.st(s, (n ? (n > 0 ? '+' : '-') + subitem.score : 0));
+                    $WH.ae(td, s);
                 }
             }
         }
@@ -4704,7 +4690,7 @@ Listview.templates.enchantpicker = {
 
                 var url = (enchant.source > 0 ? '?spell=' : '?item=') + Math.abs(enchant.source);
 
-                var i = ce('td');
+                var i = $WH.ce('td');
                 i.style.width = '1px';
                 i.style.padding = '0';
                 i.style.borderRight = 'none';
@@ -4713,13 +4699,13 @@ Listview.templates.enchantpicker = {
                     icon = Icon.create(enchant.icon, 0, null, url),
                     link = Icon.getLink(icon);
 
-                ae(i, icon);
-                ae(tr, i);
+                $WH.ae(i, icon);
+                $WH.ae(tr, i);
                 td.style.borderLeft = 'none';
 
-                link.onclick = rf;
+                link.onclick = $WH.rf;
 
-                var a = ce('a');
+                var a = $WH.ce('a');
 
                 if (enchant.quality != -1) {
                     a.className = 'q' + enchant.quality;
@@ -4728,13 +4714,13 @@ Listview.templates.enchantpicker = {
                 a.style.fontFamily = 'Verdana, sans-serif';
                 a.href = url;
 
-                ae(a, ct(enchant.name));
+                $WH.ae(a, $WH.ct(enchant.name));
 
-                nw(td);
-                ae(td, a);
+                $WH.nw(td);
+                $WH.ae(td, a);
 
                 tr.onclick = function(e) {
-                    e = $E(e);
+                    e = $WH.$E(e);
                     if (e._button != 2 || e._target != a) {
                         e.preventDefault();
                         (Summary.addItemEnchant.bind(enchant._summary, enchant.id))();
@@ -4750,9 +4736,9 @@ Listview.templates.enchantpicker = {
                 }
 
                 return (
-                    -strcmp(a.quality, b.quality) ||
-                    strcmp(a.type, b.type) ||
-                    strcmp(a.name, b.name)
+                    -$WH.strcmp(a.quality, b.quality) ||
+                    $WH.strcmp(a.type, b.type) ||
+                    $WH.strcmp(a.name, b.name)
                 );
             }
         },
@@ -4766,11 +4752,11 @@ Listview.templates.enchantpicker = {
                     return;
                 }
 
-                var d = ce('div');
+                var d = $WH.ce('div');
                 d.className = 'small crop';
                 td.title = enchant.enchantment;
-                ae(d, ct(enchant.enchantment));
-                ae(td, d);
+                $WH.ae(d, $WH.ct(enchant.enchantment));
+                $WH.ae(td, d);
             },
             sortFunc: function(a, b, col) {
                 if (a.none) {
@@ -4781,8 +4767,8 @@ Listview.templates.enchantpicker = {
                 }
 
                 return (
-                    -strcmp(a.score, b.score) ||
-                    strcmp(a.name, b.name)
+                    -$WH.strcmp(a.score, b.score) ||
+                    $WH.strcmp(a.name, b.name)
                 );
             }
         },
@@ -4795,7 +4781,7 @@ Listview.templates.enchantpicker = {
                 }
 
                 td.className = 'small q0';
-                nw(td);
+                $WH.nw(td);
 
                 if (enchant.skill > 0) {
                     return g_spell_skills[enchant.skill];
@@ -4822,7 +4808,7 @@ Listview.templates.enchantpicker = {
             align: 'center',
             compute: function(enchant, td, tr) {
                 if (enchant.none) {
-                    ee(tr);
+                    $WH.ee(tr);
 
                     tr.onclick = Summary.addItemEnchant.bind(enchant._summary, 0);
                     td.colSpan          = 5;
@@ -4834,11 +4820,11 @@ Listview.templates.enchantpicker = {
                 if (enchant.score != null) {
                     var
                         n = parseFloat(enchant.score),
-                        s = ce('div');
+                        s = $WH.ce('div');
 
                     s.className = 'small q' + (n ? (n > 0 ? 2 : 10) : 0);
-                    st(s, (n ? (n > 0 ? '+' : '-') + enchant.score : 0));
-                    ae(td, s);
+                    $WH.st(s, (n ? (n > 0 ? '+' : '-') + enchant.score : 0));
+                    $WH.ae(td, s);
                 }
             }
         }
@@ -4884,7 +4870,7 @@ Listview.templates.gempicker = {
                     return;
                 }
 
-                var i = ce('td');
+                var i = $WH.ce('td');
                 i.style.width = '1px';
                 i.style.padding = '0';
                 i.style.borderRight = 'none';
@@ -4893,24 +4879,24 @@ Listview.templates.gempicker = {
                     icon = Icon.create(gem.icon, 0, null, '?item=' + gem.id),
                     link = Icon.getLink(icon);
 
-                ae(i, icon);
-                ae(tr, i);
+                $WH.ae(i, icon);
+                $WH.ae(tr, i);
                 td.style.borderLeft = 'none';
 
-                link.onclick = rf;
+                link.onclick = $WH.rf;
 
-                var a = ce('a');
+                var a = $WH.ce('a');
                 a.className = 'q' + gem.quality;
                 a.style.fontFamily = 'Verdana, sans-serif';
                 a.href = '?item=' + gem.id;
 
-                ae(a, ct(gem.name));
+                $WH.ae(a, $WH.ct(gem.name));
 
-                nw(td);
-                ae(td, a);
+                $WH.nw(td);
+                $WH.ae(td, a);
 
                 tr.onclick = function(e) {
-                    e = $E(e);
+                    e = $WH.$E(e);
                     if (e._button != 2 || e._target != a) {
                         e.preventDefault();
                         (Summary.addItemGem.bind(gem._summary, gem.id))();
@@ -4926,10 +4912,10 @@ Listview.templates.gempicker = {
                 }
 
                 return (
-                    -strcmp(a.quality, b.quality) ||
-                    strcmp(a.colors, b.colors) ||
-                    strcmp(a.icon, b.icon) ||
-                    strcmp(a.name, b.name)
+                    -$WH.strcmp(a.quality, b.quality) ||
+                    $WH.strcmp(a.colors, b.colors) ||
+                    $WH.strcmp(a.icon, b.icon) ||
+                    $WH.strcmp(a.name, b.name)
                 );
             }
         },
@@ -4943,11 +4929,11 @@ Listview.templates.gempicker = {
                     return;
                 }
 
-                var d = ce('div');
+                var d = $WH.ce('div');
                 d.className = 'small crop';
                 td.title = gem.enchantment;
-                ae(d, ct(gem.enchantment));
-                ae(td, d);
+                $WH.ae(d, $WH.ct(gem.enchantment));
+                $WH.ae(td, d);
             },
             sortFunc: function(a, b, col) {
                 if (a.none) {
@@ -4958,8 +4944,8 @@ Listview.templates.gempicker = {
                 }
 
                 return (
-                    -strcmp(a.score, b.score) ||
-                    strcmp(a.name, b.name)
+                    -$WH.strcmp(a.score, b.score) ||
+                    $WH.strcmp(a.name, b.name)
                 );
             }
         },
@@ -4971,7 +4957,7 @@ Listview.templates.gempicker = {
                 }
 
                 td.className = 'small gem' + gem.colors;
-                nw(td);
+                $WH.nw(td);
 
                 return g_gem_colors[gem.colors];
             },
@@ -4988,7 +4974,7 @@ Listview.templates.gempicker = {
             align: 'center',
             compute: function(gem, td, tr) {
                 if (gem.none) {
-                    ee(tr);
+                    $WH.ee(tr);
 
                     tr.onclick = Summary.addItemGem.bind(gem._summary, 0);
                     td.colSpan          = 5;
@@ -5001,11 +4987,11 @@ Listview.templates.gempicker = {
                 if (gem.score != null) {
                     var
                         n = parseFloat(gem.score),
-                        s = ce('div');
+                        s = $WH.ce('div');
 
                     s.className = 'small q' + (n ? (n > 0 ? 2 : 10) : 0);
-                    st(s, (n ? (n > 0 ? '+' : '-') + gem.score : 0));
-                    ae(td, s);
+                    $WH.st(s, (n ? (n > 0 ? '+' : '-') + gem.score : 0));
+                    $WH.ae(td, s);
                 }
             }
         }
@@ -5027,7 +5013,7 @@ function pr_getScaleFilter(scale, noFilter) {
     }
 
     temp.sort(function(a, b) {
-        return -strcmp(a[1], b[1]);
+        return -$WH.strcmp(a[1], b[1]);
     });
 
     var wt = [], wtv = [];

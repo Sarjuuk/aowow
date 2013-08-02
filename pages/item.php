@@ -809,6 +809,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
+
 // menuId 0: Item     g_initPath()
 //  tabId 0: Database g_initHeader()
 $smarty->updatePageVars(array(
@@ -819,7 +820,6 @@ $smarty->updatePageVars(array(
     'type'   => TYPE_ITEM,
     'typeid' => $id
 ));
-
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEM, $id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$item, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);

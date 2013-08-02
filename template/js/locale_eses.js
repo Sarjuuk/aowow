@@ -1525,12 +1525,16 @@ var g_quest_sorts = {
 var g_quest_types = {
      0: 'Normal',
      1: 'Grupo',
-    81: 'Mazmorra',
-    62: 'Banda',
+    21: 'Vida',
     41: 'JcJ',
+    62: 'Banda',
+    81: 'Mazmorra',
     82: 'Suceso mundial',
+    83: 'Legendaria',
     84: 'Acompañante',
-    85: 'Heroico'
+    85: 'Heroico',
+    88: 'Banda (10)',
+    89: 'Banda (25)'
 };
 
 var g_sides = {
@@ -1568,6 +1572,21 @@ var g_spell_resistances = {
     4: 'Escarcha',
     5: 'Sombras',
     6: 'Arcano'
+};
+
+var g_spell_categories = {
+    '-13': 'Glifos',
+    '-11': 'Proficiencies',
+     '-8': 'Habilidades de PNJ',
+     '-7': 'Talentos de mascotas',
+     '-6': 'Compañeros',
+     '-5': 'Monturas',
+     '-4': 'Habilidades de raza',
+     '-3': 'Habilidades de mascota',
+     '-2': 'Talentos',
+        7: 'Habilidades',
+        9: 'Habilidades secundarias',
+       11: 'Habilidades'
 };
 
 var g_spell_types = {

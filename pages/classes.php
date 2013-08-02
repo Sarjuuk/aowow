@@ -20,15 +20,17 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 }
 
 
-$page = array(
-    'tab'   => 0,                                           // for g_initHeader($tab)
+// menuId 12: Class    g_initPath()
+//  tabId  0: Database g_initHeader()
+$smarty->updatePageVars(array(
     'title' => Util::ucFirst(Lang::$game['classes']),
     'path'  => "[0, 12]",
-);
-
-$smarty->updatePageVars($page);
+    'tab'   => 0
+));
 $smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);
+
+// load the page
 $smarty->display('generic-no-filter.tpl');
 
 ?>

@@ -122,23 +122,26 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $smarty->saveCache($cacheKey, $pageData);
 }
 
-$page = array(
-    'tab'    => 0,                                           // for g_initHeader($tab)
+
+// menuId 6: Zone     g_initPath()
+//  tabId 0: Database g_initHeader()
+$smarty->updatePageVars(array(
     'title'  => implode(' - ', $title),
     'path'   => json_encode($path, JSON_NUMERIC_CHECK),
-    'reqJS'  => array(
-        array('path' => 'template/js/Mapper.js',    'conditional' => false),
-        array('path' => 'template/js/ShowOnMap.js', 'conditional' => false),
-    ),
+    'tab'    => 0,
     'reqCSS' => array(
-        array('path' => 'template/css/Mapper.css',     'condition' => false),
-        array('path' => 'template/css/Mapper_ie6.css', 'condition' => 'lte IE 6'),
+        ['path' => 'template/css/Mapper.css'],
+        ['path' => 'template/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
     ),
-);
-
-$smarty->updatePageVars($page);
+    'reqJS'  => array(
+        'template/js/Mapper.js',
+        'template/js/ShowOnMap.js'
+    )
+));
 $smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);
+
+// load the page
 $smarty->display('generic-no-filter.tpl');
 
 ?>

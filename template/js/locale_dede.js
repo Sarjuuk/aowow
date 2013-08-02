@@ -1525,12 +1525,16 @@ var g_quest_sorts = {
 var g_quest_types = {
      0: 'Normal',
      1: 'Gruppe',
-    81: 'Dungeon',
-    62: 'Schlachtzug',
+    21: 'Leben',
     41: 'PvP',
+    62: 'Schlachtzug',
+    81: 'Dungeon',
     82: 'Weltereignis',
+    83: 'Legendär',
     84: 'Eskorte',
-    85: 'Heroisch'
+    85: 'Heroisch',
+    88: 'Schlachtzug (10)',
+    89: 'Schlachtzug (25)'
 };
 
 var g_sides = {
@@ -1568,6 +1572,21 @@ var g_spell_resistances = {
     4: 'Frost',
     5: 'Schatten',
     6: 'Arkan'
+};
+
+var g_spell_categories = {
+    '-13': 'Glyphen',
+    '-11': 'Sachverstand',
+     '-8': 'NPC-Fähigkeiten',
+     '-7': 'Begleitertalente',
+     '-6': 'Haustiere',
+     '-5': 'Reittiere',
+     '-4': 'Völkerfertigkeiten',
+     '-3': 'Begleiterfertigkeiten',
+     '-2': 'Talente',
+        7: 'Klassenfertigkeiten',
+        9: 'Nebenberufe',
+       11: 'Berufe'
 };
 
 var g_spell_types = {
@@ -3699,6 +3718,8 @@ var LANG = {
 	menu_charlookup:      "Nach Namen suchen...",
 	menu_newprofile:      "Neues individuelles Profil",
 	menu_chooseclassspec: "Wählt Eure Klasse/Spezialisierung",
+
+    pr_selectregion: "Wählt eine Region",
 
 	pr_menu_equip:      "Anlegen...",
 	pr_menu_replace:    "Ersetzen...",

@@ -1512,12 +1512,16 @@ var g_quest_sorts = {
 var g_quest_types = {
      0: 'Standard',
      1: 'Groupe',
-    81: 'Donjon',
-    62: 'Raid',
+    21: 'Vie',
     41: 'JcJ',
+    62: 'Raid',
+    81: 'Donjon',
     82: 'Événement mondial',
+    83: 'Légendaire',
     84: 'Escorte',
-    85: 'Héroïque'
+    85: 'Héroïque',
+    88: 'Raid (10)',
+    89: 'Raid (25)'
 };
 
 var g_sides = {
@@ -1555,6 +1559,21 @@ var g_spell_resistances = {
     4: 'Givre',
     5: 'Ombre',
     6: 'Arcane'
+};
+
+var g_spell_categories = {
+    '-13': 'Glyphes',
+    '-11': 'Compétences',
+     '-8': 'Habilité de PNJ',
+     '-7': 'Talents de familiers',
+     '-6': 'Compagnons',
+     '-5': 'Montures',
+     '-4': 'Traits raciaux',
+     '-3': 'Habilité de familier',
+     '-2': 'Talents',
+        7: 'Techniques',
+        9: 'Compétences secondaires',
+       11: 'Métiers'
 };
 
 var g_spell_types = {

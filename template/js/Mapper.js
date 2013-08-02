@@ -1,8 +1,8 @@
 function Mapper(opt, noScroll) {
-    cO(this, opt);
+    $WH.cO(this, opt);
 
     if(this.parent && !this.parent.nodeName) {
-        this.parent = ge(this.parent);
+        this.parent = $WH.ge(this.parent);
     }
     else if(!this.parent) {
         return;
@@ -44,21 +44,21 @@ function Mapper(opt, noScroll) {
     this.tempHeight = null;
 
     this.parent.className = 'mapper';
-    this.parent.appendChild(this.span = ce('span'));
+    this.parent.appendChild(this.span = $WH.ce('span'));
 
     _ = this.span.style;
     _.display  = 'block';
     _.position = 'relative';
 
-    ns(this.span);
+    $WH.ns(this.span);
 
-    this.overlaySpan = _ = ce('div');
+    this.overlaySpan = _ = $WH.ce('div');
     _.style.display = 'block';
     _.style.width = '100%';
     _.style.height = '100%';
     this.span.appendChild(_);
 
-    this.buttonDiv = _ = ce('div');
+    this.buttonDiv = _ = $WH.ce('div');
     _.style.position = 'absolute';
     _.style.top = _.style.right = '3px';
 
@@ -73,7 +73,7 @@ function Mapper(opt, noScroll) {
         _.style.position = 'absolute';
         _.style.bottom = _.style.right = '0';
 
-        ns(_);
+        $WH.ns(_);
         this.parent.appendChild(_);
     }
     else {
@@ -83,7 +83,7 @@ function Mapper(opt, noScroll) {
 
         _.style.display = 'none';
 
-        ns(_);
+        $WH.ns(_);
         this.buttonDiv.appendChild(_);
     }
 
@@ -96,7 +96,7 @@ function Mapper(opt, noScroll) {
         _.style.position = 'absolute';
         _.style.bottom = _.style.right = '0';
 
-        ns(_);
+        $WH.ns(_);
         this.span.appendChild(_);
     }
 
@@ -127,9 +127,9 @@ function Mapper(opt, noScroll) {
         _.style.position = 'absolute';
         _.style.bottom = _.style.left = '0';
 
-        _.onmouseup = sp;
+        _.onmouseup = $WH.sp;
 
-        ns(_);
+        $WH.ns(_);
         this.span.appendChild(_);
     }
 
@@ -206,11 +206,11 @@ Mapper.prototype = {
         this.nCoords = 0;
         for(var i in this.floorPins)
             if(this.floorPins[i].parentNode)
-                de(this.floorPins[i]);
+                $WH.de(this.floorPins[i]);
         this.floorPins = {};
         if(this.floorButton)
         {
-            de(this.floorButton);
+            $WH.de(this.floorButton);
             this.floorButton = null;
         }
 
@@ -220,9 +220,9 @@ Mapper.prototype = {
         else
             level = this.level;
         var mapperData = false;
-        if(isset('g_mapperData'))
+        if($WH.isset('g_mapperData'))
             mapperData = g_mapperData;
-        else if(isset('g_mapper_data'))
+        else if($WH.isset('g_mapper_data'))
             mapperData = g_mapper_data;
         if(mapperData && mapperData[this.zone] && !opt.coords)
         {
@@ -244,7 +244,7 @@ Mapper.prototype = {
             }
             this.level = level;
             if(this.floorPins[this.level])
-                ae(this.span, this.floorPins[this.level]);
+                $WH.ae(this.span, this.floorPins[this.level]);
         }
         else if(opt.coords != null)
         {
@@ -262,7 +262,7 @@ Mapper.prototype = {
                 this.level = lowestLevel;
 
             if(this.floorPins[this.level])
-                ae(this.span, this.floorPins[this.level]);
+                $WH.ae(this.span, this.floorPins[this.level]);
         }
         //    this.setCoords(opt.coords);
         else if(opt.link != null)
@@ -294,11 +294,11 @@ Mapper.prototype = {
         this.pins = [];
         this.nCoords = 0;
         if(this.floorPins[this.level])
-            de(this.floorPins[this.level]);
+            $WH.de(this.floorPins[this.level]);
         this.floorPins = {};
         if(this.floorButton)
         {
-            de(this.floorButton);
+            $WH.de(this.floorButton);
             this.floorButton = null;
         }
 
@@ -314,7 +314,7 @@ Mapper.prototype = {
         if(!Mapper.multiLevelZones[this.zone])
             return;
 
-        this.menu = [];
+        var menu = [];
         var _ = Mapper.multiLevelZones[this.zone];
         var src = g_zone_areas;
 
@@ -329,11 +329,10 @@ Mapper.prototype = {
             if(i == this.level || (this.level === undefined && i == 0))
                 menuItem.checked = true;
 
-            this.menu.push(menuItem);
+            menu.push(menuItem);
         }
 
-        // Menu.showAtCursor(menu, event);
-        (Menu.showAtCursor.bind(this, event))()
+        Menu.showAtCursor(menu, event);
     },
 
     setMap: function(map, level, forceUpdate)
@@ -341,19 +340,19 @@ Mapper.prototype = {
         if(level != this.level)
         {
             if(this.floorPins[this.level])
-                de(this.floorPins[this.level]);
+                $WH.de(this.floorPins[this.level]);
             if(this.floorPins[level])
-                ae(this.span, this.floorPins[level]);
+                $WH.ae(this.span, this.floorPins[level]);
             this.level = level;
         }
 
         var type = g_locale.name;
 
-        if(isset('g_ptr') && g_ptr)
+        if($WH.isset('g_ptr') && g_ptr)
             type = 'ptr';
-        else if(isset('g_beta') && g_beta)
+        else if($WH.isset('g_beta') && g_beta)
             type = 'beta';
-        else if(isset('g_old') && g_old)
+        else if($WH.isset('g_old') && g_old)
             type = 'old';
 
         this.span.style.background = 'url(' + g_staticUrl + '/images/maps/' + type + '/' + Mapper.sizes[this.zoom][2] + '/' + map + '.jpg)';
@@ -421,8 +420,7 @@ Mapper.prototype = {
 
     setZones: function(div, zones)
     {
-        // div = $('#'+div);
-        div = ge(div);
+        div = $WH.ge(div);
         if(!div || !zones || zones.length == 0 || !this.objectives)
             return;
 
@@ -431,13 +429,13 @@ Mapper.prototype = {
             var maxIdx = [false, -1];
             for(var i = 0; i < zoneList.length; ++i)
             {
-                if(i > 0) ae(span, (i == zoneList.length-1 ? LANG.and : LANG.comma));
+                if(i > 0) $WH.ae(span, (i == zoneList.length-1 ? LANG.and : LANG.comma));
                 var entry = null;
                 if(self.objectives[zoneList[i][0]].mappable > 0)
                 {
-                    entry = ce('a');
+                    entry = $WH.ce('a');
                     entry.href = 'javascript:;';
-                    ae(entry, ct(self.objectives[zoneList[i][0]].zone));
+                    $WH.ae(entry, $WH.ct(self.objectives[zoneList[i][0]].zone));
                     entry.onClick = function(link, zone) {
                         self.update({ zone: zone });
                         g_setSelectedLink(link, 'mapper');
@@ -446,9 +444,9 @@ Mapper.prototype = {
                 }
                 else
                 {
-                    entry = ce('a');
+                    entry = $WH.ce('a');
                     entry.href = '?zone=' + zoneList[i][0];
-                    ae(entry, ct(self.objectives[zoneList[i][0]].zone));
+                    $WH.ae(entry, $WH.ct(self.objectives[zoneList[i][0]].zone));
                     g_addTooltip(entry, LANG.tooltip_zonelink);
                 }
 
@@ -474,7 +472,7 @@ Mapper.prototype = {
                         entry.style += ' padding-left', '16px';
                     }
                 }
-                ae(container, entry);
+                $WH.ae(container, entry);
 
                 if(zoneList[i][1] > maxIdx[1])
                     maxIdx = [entry, zoneList[i][1]];
@@ -525,26 +523,26 @@ Mapper.prototype = {
             }
         }
 
-        var h3 = ce('h3');
-        ae(h3, ct(LANG.mapper_relevantlocs));
-        ae(div, h3);
+        var h3 = $WH.ce('h3');
+        $WH.ae(h3, $WH.ct(LANG.mapper_relevantlocs));
+        $WH.ae(div, h3);
         if(zones.length == 1 && this.missing == 0)
         {
-            var span = ce('span');
+            var span = $WH.ce('span');
             span.innerHTML = LANG.mapper_entiretyinzone.replace('$$', '<b>' + this.objectives[zones[0][0]].zone + '</b>.');
-            ae(div, span);
+            $WH.ae(div, span);
             this.update({ zone: zones[0][0] });
         }
         else if(this.missing > 0)
         {
-            var span = ce('span');
+            var span = $WH.ce('span');
             var primaryLink = false, secondaryLink = false, tertiaryLink = false;
-            types.objective = array_unique(types.objective);
-            types.start = array_unique(types.start);
-            types.end = array_unique(types.end);
-            var startEnd = types.start.length > 0 && array_compare(types.start, types.end);
-            var startObj = types.start.length > 0 && array_compare(types.start, types.objective);
-            var endObj = types.end.length > 0 && array_compare(types.end, types.objective);
+            types.objective = $WH.array_unique(types.objective);
+            types.start = $WH.array_unique(types.start);
+            types.end = $WH.array_unique(types.end);
+            var startEnd = types.start.length > 0 && $WH.array_compare(types.start, types.end);
+            var startObj = types.start.length > 0 && $WH.array_compare(types.start, types.objective);
+            var endObj = types.end.length > 0 && $WH.array_compare(types.end, types.objective);
 
             var objZones = getZoneList(zones, typesByZone, 'objective');
             var startZones = getZoneList(zones, typesByZone, 'start');
@@ -553,125 +551,125 @@ Mapper.prototype = {
             if(startEnd && startObj) // everything in the same zones
             {
                 var parts = LANG.mapper_happensin.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
             }
             else if(startEnd && types.objective.length == 0) // starts and ends in x
             {
                 var parts = LANG.mapper_objectives.sex.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
             }
             else if(startEnd) // objectives in x, starts and ends in y
             {
                 var parts = LANG.mapper_objectives.ox_sey.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
-                ae(span, parts[2]);
+                $WH.ae(span, parts[2]);
             }
             else if(startObj && types.end.length == 0) // objectives and starts in x
             {
                 var parts = LANG.mapper_objectives.osx.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
             }
             else if(startObj) // objectives and starts in x, ends in y
             {
                 var parts = LANG.mapper_objectives.osx_ey.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, objZones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
                 secondaryLink = zoneLinks(this, span, endZones, typesByZone);
-                ae(span, parts[2]);
+                $WH.ae(span, parts[2]);
             }
             else if(endObj && types.start.length == 0) // objectives and ends in x
             {
                 var parts = LANG.mapper_objectives.oex.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
             }
             else if(endObj) // objectives and ends in x, starts in y
             {
                 var parts = LANG.mapper_objectives.oex_sy.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
             }
             else if(types.start.length > 0 && types.end.length > 0 && types.objective.length > 0) // objectives in x, starts in y, ends in z
             {
                 var parts = LANG.mapper_objectives.ox_sy_ez.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
                 tertiaryLink = zoneLinks(this, span, endZones, typesByZone);
-                ae(span, parts[3]);
+                $WH.ae(span, parts[3]);
             }
             else if(types.start.length > 0 && types.end.length > 0) // starts in x, ends in y
             {
                 var parts = LANG.mapper_objectives.sx_ey.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
                 secondaryLink = zoneLinks(this, span, endZones, typesByZone);
-                ae(span, parts[2]);
+                $WH.ae(span, parts[2]);
             }
             else if(types.start.length > 0 && types.objective.length > 0) // objectives in x, starts in y
             {
                 var parts = LANG.mapper_objectives.ox_sy.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
-                ae(span, parts[2]);
+                $WH.ae(span, parts[2]);
             }
             else if(types.end.length > 0 && types.objective.length > 0) // objectives in x, ends in y
             {
                 var parts = LANG.mapper_objectives.ox_ey.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, objZones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
                 secondaryLink = zoneLinks(this, span, endZones, typesByZone);
-                ae(span, parts[2]);
+                $WH.ae(span, parts[2]);
             }
             else if(types.start.length > 0) // starts in x
             {
                 var parts = LANG.mapper_objectives.sx.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
             }
             else if(types.end.length > 0) // ends in x
             {
                 var parts = LANG.mapper_objectives.ex.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
             }
             else if(types.objective.length > 0) // objectives in x
             {
                 var parts = LANG.mapper_objectives.ox.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
             }
             else // wat?
             {
                 var parts = LANG.mapper_happensin.split('$$');
-                ae(span, ct(parts[0]));
+                $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                ae(span, parts[1]);
+                $WH.ae(span, parts[1]);
             }
-            ae(div, span);
+            $WH.ae(div, span);
 
             if(primaryLink && primaryLink.isLink)
                 primaryLink.click();
@@ -683,11 +681,11 @@ Mapper.prototype = {
         else
         {
             var parts = LANG.mapper_happensin.split('$$');
-            var span = ce('span');
-            ae(span, ct(parts[0]));
+            var span = $WH.ce('span');
+            $WH.ae(span, $WH.ct(parts[0]));
             var primaryLink = zoneLinks(this, span, zones, typesByZone);
-            ae(span, parts[1]);
-            ae(div, span);
+            $WH.ae(span, parts[1]);
+            $WH.ae(div, span);
 
             if(primaryLink && primaryLink.isLink)
                 primaryLink.click();
@@ -848,23 +846,23 @@ Mapper.prototype = {
             if(opt && opt.menu)
             {
                 _.a.menu = opt.menu;
-                //Menu.add(_.a, _.a.menu, { showAtCursor: true });
-                _.a.onclick = function() {
-                    (Menu.show.bind(this))();
-                    Tooltip.hide();
-                    this.onmouseout = function() {
-                        Menu.hide();
-                        this.onmouseout = Tooltip.hide();
-                    }.bind(this);
-                    sp();
-                    return false;
-                }.bind(_.a);
+                Menu.add(_.a, _.a.menu, { showAtCursor: true });
+                // _.a.onclick = function() {
+                    // (Menu.show.bind(this))();
+                    // Tooltip.hide();
+                    // this.onmouseout = function() {
+                        // Menu.hide();
+                        // this.onmouseout = Tooltip.hide();
+                    // }.bind(this);
+                    // $WH.sp();
+                    // return false;
+                // }.bind(_.a);
             }
 
             if(opt && opt.type)
                 _.className += ' pin-' + opt.type;
 
-            _.a.tt = str_replace(_.a.tt, '$', _.x.toFixed(1) + ', ' + _.y.toFixed(1));
+            _.a.tt = $WH.str_replace(_.a.tt, '$', _.x.toFixed(1) + ', ' + _.y.toFixed(1));
 
             if(opt && opt.lines)
             {
@@ -878,7 +876,7 @@ Mapper.prototype = {
                         var size = Mapper.sizes[s];
                         _ = Line(coord[0] * size[0] / 100, coord[1] * size[1] / 100, opt.lines[p][0] * size[0] / 100, opt.lines[p][1] * size[1] / 100, opt.type);
                         _.className += ' ' + size[2];
-                        ae(this.floorPins[level], _);
+                        $WH.ae(this.floorPins[level], _);
                     }
                 }
             }
@@ -961,7 +959,7 @@ Mapper.prototype = {
 
                 _.style['float'] = 'right';
 
-                ns(_);
+                $WH.ns(_);
                 this.buttonDiv.appendChild(_);
             }
             else if(this.floorButton)
@@ -972,7 +970,7 @@ Mapper.prototype = {
             this.sToggle.style.display = (this.toggle && this.nCoords ? '' : 'none');
 
         if(!noScroll)
-            g_scrollTo(this.parent, 3);
+            $WH.g_scrollTo(this.parent, 3);
 
         // replacement start
         // $('.line', this.floorPins[level]).hide();
@@ -1004,8 +1002,8 @@ Mapper.prototype = {
         _.free = false;
         _.className = 'pin';
 
-        _.a.onmousedown = rf;
-        _.a.onmouseup = rf;
+        _.a.onmousedown = $WH.rf;
+        _.a.onmouseup = $WH.rf;
         _.a.href = 'javascript:;';
         _.a.style.cursor = 'default';
         _.floor = floor;
@@ -1019,32 +1017,32 @@ Mapper.prototype = {
             if(this.pins[i].free)
                 return this.cleanPin(i, floor);
 
-        var _ = ce('div'), a = ce('a');
+        var _ = $WH.ce('div'), a = $WH.ce('a');
         _.className = 'pin';
         _.appendChild(a);
         _.a = a;
         _.floor = floor;
         a.onmouseover = this.pinOver;
         a.onmouseout = Tooltip.hide;
-        a.onclick = sp;
+        a.onclick = $WH.sp;
 
         this.pins.push(_);
         this.cleanPin(this.pins.length - 1, floor);
 
         if(!this.floorPins[floor])
         {
-            this.floorPins[floor] = ce('div');
+            this.floorPins[floor] = $WH.ce('div');
             this.floorPins[floor].style.display = this.show ? '' : 'none';
             if(floor == this.level)
-                ae(this.span, this.floorPins[floor]);
+                $WH.ae(this.span, this.floorPins[floor]);
         }
-        ae(this.floorPins[floor], _);
+        $WH.ae(this.floorPins[floor], _);
         return _;
     },
 
     addPin: function(e)
     {
-        e = $E(e);
+        e = $WH.$E(e);
         if(e._button >= 2) return;
 
         this.getMousePos(e);
@@ -1066,11 +1064,11 @@ Mapper.prototype = {
 
     delPin: function(pin, e)
     {
-        e = $E(e);
+        e = $WH.$E(e);
 
         pin.style.display = 'none';
         pin.free = true;
-        sp(e);
+        $WH.sp(e);
 
         this.onPinUpdate && this.onPinUpdate(this);
 
@@ -1084,11 +1082,11 @@ Mapper.prototype = {
 
     getMousePos: function(e)
     {
-        e = $E(e);
+        e = $WH.$E(e);
 
-        var c = ac(this.parent);
+        var c = $WH.ac(this.parent);
 
-        var scroll = g_getScroll();
+        var scroll = $WH.g_getScroll();
 
         this.mouseX = Math.floor((e.clientX + scroll.x - c[0] - 3) / Mapper.sizes[this.zoom][0] * 1000) / 10;
         this.mouseY = Math.floor((e.clientY + scroll.y - c[1] - 3) / Mapper.sizes[this.zoom][1] * 1000) / 10;

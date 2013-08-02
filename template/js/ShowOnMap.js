@@ -38,10 +38,10 @@ ShowOnMap.prototype.construct = function() {
         return;
     }
 
-    var d = ge('som-generic');
+    var d = $WH.ge('som-generic');
 
     var cmpFunc = function(a, b) {
-        return strcmp(a[1], b[1]);
+        return $WH.strcmp(a[1], b[1]);
     };
 
     var allianceMenu = [];
@@ -108,7 +108,7 @@ ShowOnMap.prototype.construct = function() {
                 if (nCoords > 0) {
                     var url = (g_types[group[p][0].type] && group[p][0].id ? '?' + g_types[group[p][0].type] + '=' + group[p][0].id : '');
                     legend[submenu.length+1] = [p, url];
-                    entry.push(p + sprintf(LANG.qty, nPins));
+                    entry.push(p + $WH.sprintf(LANG.qty, nPins));
                     entry.push(this.showStuff.bind(this, coords, [i, i2], legend));
                     submenu.push(entry);
                     for (var l in coords) {
@@ -281,29 +281,29 @@ ShowOnMap.prototype.construct = function() {
             }
 
             if (nCoords > 0) {
-                var entry = [idx, LANG.som[idx] + sprintf(LANG.qty, nPins), this.showStuff.bind(this, coords, [idx], legend)];
+                var entry = [idx, LANG.som[idx] + $WH.sprintf(LANG.qty, nPins), this.showStuff.bind(this, coords, [idx], legend)];
                 this._menu.push(entry);
             }
             if (nHordeCoords > 0) {
-                var entry = [idx, LANG.som[idx] + sprintf(LANG.qty, nHordeCoords), this.showStuff.bind(this, hordeCoords, ['horde', idx], hordeLegend), null];
+                var entry = [idx, LANG.som[idx] + $WH.sprintf(LANG.qty, nHordeCoords), this.showStuff.bind(this, hordeCoords, ['horde', idx], hordeLegend), null];
                 if (idx == 'quest') {
                     entry.push({ tinyIcon: 'quest_start' });
 
                     if (nHordeDailyCoords > 0) {
                         hordeMenu.push(entry);
-                        entry = ['daily', LANG.som.daily + sprintf(LANG.qty, nHordeDailyCoords), this.showStuff.bind(this, hordeDailyCoords, ['horde', 'daily'], hordeLegend), null, { tinyIcon: 'quest_start_daily' }];
+                        entry = ['daily', LANG.som.daily + $WH.sprintf(LANG.qty, nHordeDailyCoords), this.showStuff.bind(this, hordeDailyCoords, ['horde', 'daily'], hordeLegend), null, { tinyIcon: 'quest_start_daily' }];
                     }
                 }
                 hordeMenu.push(entry);
             }
             if (nAllianceCoords > 0) {
-                var entry = [idx, LANG.som[idx] + sprintf(LANG.qty, nAllianceCoords), this.showStuff.bind(this, allianceCoords, ['alliance', idx], allianceLegend), null];
+                var entry = [idx, LANG.som[idx] + $WH.sprintf(LANG.qty, nAllianceCoords), this.showStuff.bind(this, allianceCoords, ['alliance', idx], allianceLegend), null];
                 if (idx == 'quest') {
                     entry.push({ tinyIcon: 'quest_start' });
 
                     if (nAllianceDailyCoords > 0) {
                         allianceMenu.push(entry);
-                        entry = ['daily', LANG.som.daily + sprintf(LANG.qty, nAllianceDailyCoords), this.showStuff.bind(this, allianceDailyCoords, ['alliance', 'daily'], allianceLegend), null, { tinyIcon: 'quest_start_daily' }];
+                        entry = ['daily', LANG.som.daily + $WH.sprintf(LANG.qty, nAllianceDailyCoords), this.showStuff.bind(this, allianceDailyCoords, ['alliance', 'daily'], allianceLegend), null, { tinyIcon: 'quest_start_daily' }];
                     }
                 }
                 allianceMenu.push(entry);
@@ -328,49 +328,37 @@ ShowOnMap.prototype.construct = function() {
 
     var redButton = RedButton.create(LANG.showonmap, true);
     redButton.className += ' mapper-som-button';
-    // Menu.add(redButton, this._menu, { showAtCursor: true });
-    redButton.menu = this._menu;
-    redButton.onclick = function() {
-        (Menu.show.bind(this))();
-        Tooltip.hide();
-        this.onmouseout = function() {
-            Menu.hide();
-            this.onmouseout = Tooltip.hide();
-        }.bind(this);
-        sp();
-        return false;
-    }.bind(redButton);
-    // replace end
-    ae(d, redButton);
+    Menu.add(redButton, this._menu, { showAtCursor: true });
+    $WH.ae(d, redButton);
 
     var clear;
     if (!this._legend) {
-        this._legend = ce('div');
+        this._legend = $WH.ce('div');
         this._legend.className = 'mapper-legend';
         this._legend.style.display = 'none';
 
-        var d2 = ce('div');
+        var d2 = $WH.ce('div');
         d2.className = 'mapper-legend-container';
 
-        this._legendLabel = ce('b')
-        ae(this._legendLabel, ct(LANG.som_legend));
-        ae(d2, this._legendLabel);
+        this._legendLabel = $WH.ce('b')
+        $WH.ae(this._legendLabel, $WH.ct(LANG.som_legend));
+        $WH.ae(d2, this._legendLabel);
 
-        this._legendContents = ce('div');
+        this._legendContents = $WH.ce('div');
         this._legendContents.style.cssFloat = 'right';
-        ae(d2, this._legendContents);
+        $WH.ae(d2, this._legendContents);
 
-        var clear = ce('div');
+        var clear = $WH.ce('div');
         clear.style.clear = 'right';
-        ae(d2, clear);
+        $WH.ae(d2, clear);
 
-        ae(this._legend, d2);
+        $WH.ae(this._legend, d2);
     }
-    ae(d, this._legend);
+    $WH.ae(d, this._legend);
 
-    var clear = ce('div');
+    var clear = $WH.ce('div');
     clear.style.clear = 'left';
-    ae(d, clear);
+    $WH.ae(d, clear);
 
     var components = [];
     var hash = g_getHash();
@@ -414,31 +402,31 @@ ShowOnMap.prototype.construct = function() {
 };
 
 ShowOnMap.prototype.setLegend = function(info) {
-    ee(this._legendContents);
+    $WH.ee(this._legendContents);
 
-    var div = ce('div');
+    var div = $WH.ce('div');
     var count = 0;
     for (var i in info) {
-        var sp = ce('span');
+        var sp = $WH.ce('span');
         sp.className = 'mapper-pin mapper-pin-' + i + ' mapper-legend-pin';
 
         if (info[i][1]) {
-            var a = ce('a');
+            var a = $WH.ce('a');
             a.href = info[i][1];
-            ae(a, ct(info[i][0]));
-            ae(sp, a);
+            $WH.ae(a, $WH.ct(info[i][0]));
+            $WH.ae(sp, a);
         }
         else {
             sp.innerText = info[i][0];
         }
 
-        ae(div, sp);
+        $WH.ae(div, sp);
         if ((++count) % 4 == 0) {
-            ae(div, ce('br'));
+            $WH.ae(div, $WH.ce('br'));
         }
     }
 
-    ae(this._legendContents, div);
+    $WH.ae(this._legendContents, div);
 };
 
 ShowOnMap.prototype.showStuff = function(coords, path, legendInfo) {
@@ -495,17 +483,9 @@ ShowOnMap.prototype.checkMenu = function(path) {
     var singlePinOptions = { 'rare': true, 'herb': true, 'vein': true };
     for (var i = 0; i < label.length; ++i) {
         if (i > 0 && singlePinOptions[label[0][0]]) {
-        /* unsure, kept for reference, replacement below
             var span = $('span', this._legendContents);
             span.removeClass('mapper-legend-pin');
             span.append($('<b/>', { text: ' ' + label[i][1].substr(label[i][1].lastIndexOf('(')) }));
-        */
-            var span = gE(this._legendContents[0], 'span')[0];
-            span.className.replace(/\mapper-legend-pin\b/,'');
-            var b = ce('b');
-            b.innerText = ' ' + label[i][1].substr(label[i][1].lastIndexOf('('));
-            ae(span, b);
-        // replace end
         }
         else {
             if (i == maxLabel) {
@@ -569,7 +549,7 @@ ShowOnMap.combinePins = function(pins, dailyOnly, hasPaths) {
             // Don't combine pins that have paths
             coord = getCoord([pin.id, 0], true);
             x = coord[0]; y = coord[1];
-            var newPin = dO(pin);
+            var newPin = $WH.dO(pin);
             newPin.coord = pin.coords[0];
 
             combined[x][y].push(newPin);
@@ -597,7 +577,7 @@ ShowOnMap.combinePins = function(pins, dailyOnly, hasPaths) {
             for (var c = 0; c < pin.coords.length; ++c) {
                 coord = getCoord(pin.coords[c]);
                 x = coord[0]; y = coord[1];
-                var newPin = dO(pin);
+                var newPin = $WH.dO(pin);
                 newPin.coord = pin.coords[c];
 
                 if (combined[x][y].length > 3) {
@@ -809,7 +789,7 @@ ShowOnMap.buildTooltip = function(list, dailyOnly) {
 };
 
 
-// !sarjuuk: tempfix!
+// // !sarjuuk: tempfix!
 Markup._fixUrl = function(url) {
     if(!url) {
         return '';

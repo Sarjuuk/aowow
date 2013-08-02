@@ -40,15 +40,17 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 }
 
 
-$page = array(
-    'tab'   => 0,                                           // for g_initHeader($tab)
+// menuId 8: Pets     g_initPath()
+//  tabid 0: Database g_initHeader()
+$smarty->updatePageVars(array(
     'title' => implode(" - ", $title),
-    'path'  => "[".implode(", ", $path)."]"
-);
-
-$smarty->updatePageVars($page);
+    'path'  => "[".implode(", ", $path)."]",
+    'tab'   => 0
+));
 $smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);
+
+// load the page
 $smarty->display('generic-no-filter.tpl');
 
 ?>

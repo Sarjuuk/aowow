@@ -467,7 +467,8 @@ $rows_qe = $DB->select('
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
-// menuId 4: Npc      g_initPath()
+
+// menuId 4: NPC      g_initPath()
 //  tabId 0: Database g_initHeader()
 $smarty->updatePageVars(array(
     'mapper' => true,
@@ -477,7 +478,6 @@ $smarty->updatePageVars(array(
     'type'   => TYPE_NPC,
     'typeId' => $id
 ));
-
 $smarty->assign('community', CommunityContent::getAll(TYPE_NPC, $id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$npc, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);

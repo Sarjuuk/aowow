@@ -237,22 +237,25 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
+
+// menuId 2: Itemset  g_initPath()
+//  tabId 0: Database g_initHeader()
 $smarty->updatePageVars(array(
 	'title'  => $pageData['title']." - ".Util::ucfirst(Lang::$game['itemset']),
 	'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-	'tab'    => 0,                                          // for g_initHeader($tab)
-	'type'   => TYPE_ITEMSET,                               // 4:Itemset
+	'tab'    => 0,
+	'type'   => TYPE_ITEMSET,
 	'typeId' => $id,
     'reqJS'  => array(
-        array('path' => 'template/js/Summary.js',   'conditional' => false),
-        array('path' => 'template/js/swfobject.js', 'conditional' => false)
+        'template/js/Summary.js',
+        'template/js/swfobject.js'
     )
 ));
-
-
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEMSET, $id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$itemset));
 $smarty->assign('lvData', $pageData);
+
+// load the page
 $smarty->display('itemset.tpl');
 
 ?>

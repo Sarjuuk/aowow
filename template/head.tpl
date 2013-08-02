@@ -11,23 +11,22 @@
 {foreach from=$page.reqCSS item=css}
 {if isset($css.string)}
     <style type="text/css">{$css.string}</style>
-
-    {else}
-    {if $css.condition}<!--[if {$css.condition}]>{/if}<link rel="stylesheet" type="text/css" href="{$css.path}?{$AOWOW_REVISION}" />{if $css.condition}<![endif]-->{/if}
-
+{else}
+    {if isset($css.ieCond)}<!--[if {$css.ieCond}]>{/if}<link rel="stylesheet" type="text/css" href="{$css.path}?{$AOWOW_REVISION}" />{if isset($css.ieCond)}<![endif]-->{/if}
 {/if}
 {/foreach}
     <script type="text/javascript">
         var g_serverTime = new Date('{$smarty.now|date_format:"%Y/%m/%d %H:%M:%S"}');
         var g_staticUrl = "{$smarty.const.STATIC_URL}";
     </script>
+    <script src="template/js/jquery-1.4.2.min.js" type="text/javascript"></script>
     <script src="template/js/basic.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="power/aowowPower.js?lang={$user.language|substr:2}" type="text/javascript"></script>
     <script src="template/js/locale_{$user.language}.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="template/js/global.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="template/js/Markup.js?{$AOWOW_REVISION}" type="text/javascript"></script>
 {foreach from=$page.reqJS item=file}
-    <script src="{$file.path}{*?$AOWOW_REVISION*}" type="text/javascript"></script>
+    <script src="{$file}{*?$AOWOW_REVISION*}" type="text/javascript"></script>
 {/foreach}
     <script type="text/javascript">
         var g_locale = {ldelim} id:{$user.locale}, name:'{$user.language}' {rdelim};

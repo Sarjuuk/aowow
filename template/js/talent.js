@@ -13,11 +13,11 @@ function tc_init() {
 
     g_initPath([1, 0]);
 
-    ge('tc-classes').className = 'choose';
+    $WH.ge('tc-classes').className = 'choose';
 
     var classes = g_sortJsonArray(g_chr_classes, g_chr_classes);
 
-    _ = ge('tc-classes-inner');
+    _ = $WH.ge('tc-classes-inner');
     for (var i = 0, len = classes.length; i < len; ++i) {
         var
             classId = classes[i],
@@ -26,7 +26,7 @@ function tc_init() {
 
         tc_classIcons[classId] = icon;
 
-        if (Browser.ie6) {
+        if ($WH.Browser.ie6) {
             link.onfocus = tb;
         }
 
@@ -34,11 +34,11 @@ function tc_init() {
         link.onmouseover = tc_classOver.bind(link, classId);
         link.onmouseout  = Tooltip.hide;
 
-        ae(_, icon);
+        $WH.ae(_, icon);
     }
-    clear = ce('div');
+    clear = $WH.ce('div');
     clear.className = 'clear';
-    ae(_, clear);
+    $WH.ae(_, clear);
 
     tc_object = new TalentCalc();
     tc_object.initialize('tc-itself', {
@@ -46,7 +46,7 @@ function tc_init() {
         mode: TalentCalc.MODE_DEFAULT
     });
 
-    ge('tc-itself').className += ' choose';
+    $WH.ge('tc-itself').className += ' choose';
 
     tc_readPound();
     setInterval(tc_readPound, 1000);
@@ -69,11 +69,11 @@ function tc_onChange(tc, info, data) {
 
     if (info.classId != tc_classId) { // Class change
         if (!tc_loaded) {
-            _ = ge('tc-itself');
+            _ = $WH.ge('tc-itself');
             _.className = _.className.replace('choose', '');
 
-            _ = ge('tc-classes');
-            de(gE(_, 'p')[0]); // Removes 'Choose a class:'
+            _ = $WH.ge('tc-classes');
+            $WH.de($WH.gE(_, 'p')[0]); // Removes 'Choose a class:'
             _.className = '';
 
             tc_loaded = true;
