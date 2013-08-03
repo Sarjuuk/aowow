@@ -17,18 +17,17 @@ foreach ($datasets as $data)
     {
         // locale independant
         case 'zones':
-            if (file_exists('datasets/zones'))
-                echo file_get_contents('datasets/zones');
-            else
-                echo "/* could not fetch multi-level areas */\n\Mapper.multiLevelZones = {};";
+        case 'weight-presets':
+        case 'realms':
+            if (file_exists('datasets/'.$data))
+                echo file_get_contents('datasets/'.$data);
+            else if ($AoWoWconf['debug'])
+                echo "/* could not fetch static data: ".$data." */";
             echo "\n\n";
             break;
-        case 'weight-presets':
-            if (file_exists('datasets/weight-presets'))
-                echo file_get_contents('datasets/weight-presets');
-            else
-                echo "/* could not fetch weight-presets */\n\var wt_presets = {};";
-            echo "\n\n";
+        case 'user':
+            // todo (high): structure probably lost; probably sent basic char stats
+            // g_user = { id: 0, name: '', roles: 0, permissions: 0, ads: true, cookies: {} };
             break;
         // localized
         case 'talents':
@@ -46,8 +45,8 @@ foreach ($datasets as $data)
                 echo file_get_contents('datasets/enus/'.$data.$params);
             else if (file_exists('datasets/'.$data.$params))
                 echo file_get_contents('datasets/'.$data.$params);
-            else
-                echo "/* could not fetch ".$data.$params." for locale ".User::$localeString." */";
+            else if ($AoWoWconf['debug'])
+                echo "/* could not fetch static data: ".$data.$params." for locale: ".User::$localeString." */";
             echo "\n\n";
             break;
         default:
