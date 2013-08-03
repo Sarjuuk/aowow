@@ -400,6 +400,7 @@ class Lang
     public static $error;
 
     public static $search;
+    public static $profiler;
     public static $compare;
     public static $talent;
 
@@ -1722,16 +1723,19 @@ class Util
 
     public static function sideByRaceMask($race)
     {
-        if (!$race || $race == RACE_MASK_ALL)               // Any
+        // Any
+        if (!$race || ($race & RACE_MASK_ALL) == RACE_MASK_ALL)
             return 3;
 
-        if ($race & RACE_MASK_HORDE)                        // Horde
+        // Horde
+        if ($race & RACE_MASK_HORDE && !($race & RACE_MASK_ALLIANCE))
             return 2;
 
-        if ($race & RACE_MASK_ALLIANCE)                     // Alliance
+        // Alliance
+        if ($race & RACE_MASK_ALLIANCE && !($race & RACE_MASK_HORDE))
             return 1;
 
-        return 0;
+        return 3;
     }
 
     public static function asHex($val)

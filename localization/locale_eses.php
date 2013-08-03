@@ -60,6 +60,8 @@ $lang = array(
         'applyFilter'   => "Aplicar filtro",
         'resetForm'     => "Reiniciar formulario",
         'refineSearch'  => "Sugerencia: Refina tu búsqueda llendo a una <a href=\"javascript:;\" id=\"fi_subcat\">subcategoría</a>.",
+        'clear'         => "borrar",
+        'exactMatch'    => "Coincidencia exacta",
 
         // infobox
         'unavailable'   => "No está disponible a los jugadores",
@@ -107,6 +109,8 @@ $lang = array(
         'pet'           => "Mascota",
         'pets'          => "Mascotas de cazador",
         'petCalc'       => "Calculadora de mascotas",
+        'profile'       => "",
+        'profiles'      => "Perfiles",
         'requires'      => "Requiere %s",
         'requires2'     => "Requiere",
         'reqLevel'      => "Necesitas ser de nivel %s",
@@ -116,7 +120,6 @@ $lang = array(
         'school'        => "Escuela",
         'spell'         => "hechizo",
         'spells'        => "Hechizos",
-        'type'          => "Tipo",
         'valueDelim'    => " - ",
         'zone'          => "zona",
         'zones'         => "Zonas",
@@ -252,6 +255,7 @@ $lang = array(
         '_pieces'       => "piezas",
         '_unavailable'  => "Este conjunto de objetos no está disponible para jugadores.",
         '_tag'          => "Etiqueta",
+        '_type'         => "Tipo",
 
         'notes'         => array(
             null,                                   "Set de mazmorra 1",                    "Set de mazmorra 2",                        "Set de banda tier 1",

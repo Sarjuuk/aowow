@@ -68,6 +68,8 @@ $lang = array(
         'applyFilter'   => "Filter anwenden",
         'resetForm'     => "Formular zurücksetzen",
         'refineSearch'  => "Tipp: Präzisiere deine Suche mit Durchsuchen einer <a href=\"javascript:;\" id=\"fi_subcat\">Unterkategorie</a>.",
+        'clear'         => "leeren",
+        'exactMatch'    => "Exakt passend",
 
         // infobox
         'unavailable'   => "Nicht für Spieler verfügbar",
@@ -116,6 +118,8 @@ $lang = array(
         'pets'          => "Begleiter",
         'petCalc'       => "Begleiterrechner",
         'requires'      => "Benötigt %s",
+        'profile'       => "",
+        'profiles'      => "Profile",
         'requires2'     => "Benötigt",
         'reqLevel'      => "Benötigt Stufe %s",
         'reqLevelHlm'   => "Benötigt Stufe %s",
@@ -297,8 +301,8 @@ $lang = array(
         '_conveyBonus'  => "Das Tragen mehrerer Gegenstände aus diesem Set gewährt Eurem Charakter Boni.",
         '_pieces'       => "Teile",
         '_unavailable'  => "Dieses Ausrüstungsset ist nicht für Spieler verfügbar.",
-        '_type'         => "Art",
         '_tag'          => "Tag",
+        '_type'         => "Art",
 
         'notes'         => array(
             null,                                   "Dungeon-Set 1",                            "Dungeon-Set 2",                            "Tier 1 Raid-Set",

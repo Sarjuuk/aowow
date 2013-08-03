@@ -34,7 +34,7 @@ if (!defined('AOWOW_REVISION'))
         13: Listview - template: 'spell',       id: 'companions',    name: LANG.tab_companions,
         14: Listview - template: 'spell',       id: 'mounts',        name: LANG.tab_mounts,
 todo    15: Listview - template: 'npc',         id: 'npcs',          name: LANG.tab_npcs,
-todo    16: Listview - template: 'quest',       id: 'quests',        name: LANG.tab_quests,
+        16: Listview - template: 'quest',       id: 'quests',        name: LANG.tab_quests,
         17: Listview - template: 'achievement', id: 'achievements',  name: LANG.tab_achievements,
         18: Listview - template: 'achievement', id: 'statistics',    name: LANG.tab_statistics,
 todo    19: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
@@ -698,7 +698,36 @@ if ($searchMask & 0x4000)
 }
 
 // 16 Quests
-// if ($searchMask & 0x8000)
+if ($searchMask & 0x8000)
+{
+    $conditions = array(
+//        [['cuFlags', MASK, '&'], 0],                                      // todo (med): identify disabled quests
+        [User::$localeId ? 'Title_loc'.User::$localeId : 'Title', $query],  // todo (high): unify name-fields
+        $maxResults
+    );
+
+    $quests = new QuestList($conditions);
+
+    if ($data = $quests->getListviewData())
+    {
+        $quests->addGlobalsToJScript($smarty);
+
+        $found['quest'] = array(
+            'type'     => TYPE_QUEST,
+            'appendix' => ' (Quest)',
+            'matches'  => $quests->getMatches(),
+            'file'     => 'quest',
+            'data'     => $data,
+            'params'   => ['tabs' => '$myTabs']
+        );
+    }
+
+    if ($quests->getMatches() > $maxResults)
+    {
+        $found['quest']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_questsfound', $quests->getMatches(), $maxResults);
+        $found['quest']['params']['_truncated'] = 1;
+    }
+}
 
 // 17 Achievements
 if ($searchMask & 0x10000)
@@ -726,7 +755,7 @@ if ($searchMask & 0x10000)
             'data'     => $data,
             'params'   => [
                 'tabs'        => '$myTabs',
-                'visibleCols' => "\$['category']"
+                'visibleCols' => "$['category']"
             ]
         );
 
@@ -760,8 +789,8 @@ if ($searchMask & 0x20000)
             'data'     => $data,
             'params'   => [
                 'tabs'        => '$myTabs',
-                'visibleCols' => "\$['category']",
-                'hiddenCols'  => "\$['side', 'points', 'rewards']",
+                'visibleCols' => "$['category']",
+                'hiddenCols'  => "$['side', 'points', 'rewards']",
                 'name'        => '$LANG.tab_statistics',
                 'id'          => 'statistics'
             ]
@@ -803,9 +832,7 @@ if ($searchMask & 0x400000)
             'matches'  => $pets->getMatches(),
             'file'     => 'pet',
             'data'     => $data,
-            'params'   => [
-                'tabs' => '$myTabs',
-            ]
+            'params'   => ['tabs' => '$myTabs']
         );
 
         if ($pets->getMatches() > $maxResults)
@@ -960,7 +987,7 @@ if ($searchMask & SEARCH_TYPE_JSON)
 }
 else if ($searchMask & SEARCH_TYPE_OPEN)
 {
-    // this one is funny: we want 10 results, ideally equally destributed over each type
+    // this one is funny: we want 10 results, ideally equally distributed over each type
     $foundTotal = 0;
     $maxResults = 10;
     $names      = [];

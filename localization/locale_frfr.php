@@ -60,6 +60,8 @@ $lang = array(
         'applyFilter'   => "Appliquer le filtre",
         'resetForm'     => "Rétablir",
         'refineSearch'  => "Astuce : Affinez votre recherche en utilisant une <a href=\"javascript:;\" id=\"fi_subcat\">sous-catégorie</a>.",
+        'clear'         => "effacer",
+        'exactMatch'    => "Concordance exacte",
 
         // infobox
         'unavailable'   => "Non disponible aux joueurs",
@@ -107,6 +109,8 @@ $lang = array(
         'pet'           => "Familier",
         'pets'          => "Familiers de chasseur",
         'petCalc'       => "Calculateur de familiers",
+        'profile'       => "",
+        'profiles'      => "Profils",
         'requires'      => "%s requis",
         'requires2'     => "Requiert",
         'reqLevel'      => "Niveau %s requis",
@@ -116,7 +120,6 @@ $lang = array(
         'school'        => "École",
         'spell'         => "sort",
         'spells'        => "Sorts",
-        'type'          => "Type",
         'valueDelim'    => " - ",
         'zone'          => "zone",
         'zones'         => "Zones",
@@ -251,6 +254,7 @@ $lang = array(
         '_pieces'       => "pièces",
         '_unavailable'  => "Cet objet n'est plus disponible aux joueurs.",
         '_tag'          => "Étiquette",
+        '_type'         => "Type",
 
         'notes'         => array(
             null,                                   "Ensemble de donjon 1",                 "Ensemble de donjon 2",                         "Ensemble de raid palier 1",

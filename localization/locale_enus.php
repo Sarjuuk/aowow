@@ -16,7 +16,7 @@ $lang = array(
         'numSQL'        => "Number of MySQL queries",
         'timeSQL'       => "Time of MySQL queries",
         'noJScript'     => "<b>This site makes extensive use of JavaScript.</b><br />Please <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">enable JavaScript</a> in your browser.",
-        'profiles'      => "Your Characters",
+        'profiles'      => "My Profiles",
         'pageNotFound'  => "This %s doesn't exist.",
         'gender'        => "Gender",
         'sex'           => [null, 'Male', 'Female'],
@@ -63,6 +63,8 @@ $lang = array(
         'applyFilter'   => "Apply filter",
         'resetForm'     => "Reset Form",
         'refineSearch'  => "Tip: Refine your search by browsing a <a href=\"javascript:;\" id=\"fi_subcat\">subcategory</a>.",
+        'clear'         => "clear",
+        'exactMatch'    => "Exact match",
 
         // infobox
         'unavailable'   => "Not available to players",
@@ -110,6 +112,8 @@ $lang = array(
         'pet'           => "Pet",
         'pets'          => "Hunter Pets",
         'petCalc'       => "Hunter Pet Calculator",
+        'profile'       => "profile",
+        'profiles'      => "Profiles",
         'requires'      => "Requires %s",
         'requires2'     => "Requires",
         'reqLevel'      => "Requires Level %s",
@@ -119,7 +123,6 @@ $lang = array(
         'school'        => "School",
         'spell'         => "spell",
         'spells'        => "Spells",
-        'type'          => "Type",
         'valueDelim'    => " to ",
         'zone'          => "zone",
         'zones'         => "Zones",
@@ -294,6 +297,7 @@ $lang = array(
         '_pieces'       => "pieces",
         '_unavailable'  => "This item set is not available to players.",
         '_tag'          => "Tag",
+        '_type'         => "Type",
 
         'notes'         => array(
             null,                                   "Dungeon Set 1",                        "Dungeon Set 2",                        "Tier 1 Raid Set",

@@ -11,7 +11,7 @@ class QuestList extends BaseType
     public        $cat2       = 0;
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt LEFT JOIN locales_quest lq ON qt.Id = lq.entry WHERE [filter] [cond] ORDER BY Id ASC';
-    protected     $matchQuery = 'SELECT COUNT(1) FROM quest_template WHERE [filter] [cond]';
+    protected     $matchQuery = 'SELECT COUNT(1) FROM quest_template qt LEFT JOIN locales_quest lq ON qt.Id = lq.entry WHERE [filter] [cond]';
 
     // parent::__construct does the job
 
@@ -61,11 +61,13 @@ class QuestList extends BaseType
         return Util::localizedString($n, 'title');
     }
 
-    public static function RewardXP($QuestLevel, $XPId)
+    public static function getXPReward($questLevel, $xpId)
     {
-        if ($xp = DB::Aowow()->SelectCell('SELECT Field?d FROM ?_questxp WHERE Id = ?d', $XPId, $QuestLevel)) {
+        if (!is_numeric($xpId) || $xpId < 0 || $xpId > 8)
+            return 0;
+
+        if ($xp = DB::Aowow()->selectCell('SELECT Field?d FROM ?_questxp WHERE Id = ?d', $xpId, $questLevel))
             return $xp;
-        }
         else
             return 0;
     }
@@ -102,7 +104,9 @@ class QuestList extends BaseType
                 'level'     => $this->curTpl['Level'],
                 'reqlevel'  => $this->curTpl['MinLevel'],
                 'name'      => $this->getField('Title', true),
-                'side'      => Util::sideByRaceMask($this->curTpl['RequiredRaces'])
+                'side'      => Util::sideByRaceMask($this->curTpl['RequiredRaces']),
+                'wflags'    => 0x0,
+                'xp'        => self::getXPReward($this->curTpl['Level'], $this->curTpl['RewardXPId'])
             );
 
             $rewards = [];
@@ -121,8 +125,37 @@ class QuestList extends BaseType
             if ($choices)
                 $data[$this->id]['itemchoices'] = $choices;
 
-            if ($this->curTpl['RewardTitleId'])
-                $data[$this->id]['titlereward'] = $this->curTpl['RewardTitleId'];
+            if ($_ = $this->curTpl['RewardTitleId'])
+                $data[$this->id]['titlereward'] = $_;
+
+            if ($_ = $this->curTpl['Type'])
+                $data[$this->id]['type'] = $_;
+
+            if ($_ = $this->curTpl['RequiredClasses'])
+                $data[$this->id]['reqclass'] = $_;
+
+            if ($_ = $this->curTpl['RequiredRaces'])
+                $data[$this->id]['reqrace'] = $_;
+
+            if ($_ = $this->curTpl['RewardOrRequiredMoney'])
+                if ($_ > 0)
+                    $data[$this->id]['money'] = $_;
+
+            if ($this->curTpl['Flags'] & 0x1000)
+                $data[$this->id]['daily'] = true;
+
+            if ($this->curTpl['Flags'] & 0x8000)
+                $data[$this->id]['weekly'] = true;
+
+            // flags & 64: Hostile - there are quests, that flag the player for pvp when taken .. where is that set..?
+            if ($this->curTpl['Flags'] & 0x4000)            // Unavailable (todo (med): get disables)
+            {
+                $data[$this->id]['historical'] = true;      // post 5.0
+                $data[$this->id]['wflags']    |= 0x1;       // pre 5.0
+            }
+
+            if ($this->curTpl['Flags'] & 0x80000)           // Auto Accept
+                $data[$this->id]['wflags'] |= 0x20;
 
             // todo reprewards .. accesses QuestFactionReward.dbc
         }

@@ -5,6 +5,8 @@ if (!defined('AOWOW_REVISION'))
 
 class ItemList extends BaseType
 {
+    use ListviewHelper;
+
     public static $type       = TYPE_ITEM;
 
     public        $tooltip    = '';
@@ -34,6 +36,15 @@ class ItemList extends BaseType
             // readdress itemset .. is wrong for virtual sets
             if ($pieceToSet && isset($pieceToSet[$this->id]))
                 $this->json[$this->id]['itemset'] = $pieceToSet[$this->id];
+
+            // unify those pesky masks
+            $_ = $this->curTpl['AllowableClass'];
+            if ($_ < 0 || ($_ & CLASS_MASK_ALL) == CLASS_MASK_ALL)
+                $this->templates[$this->id]['AllowableClass'] = 0;
+
+            $_ = $this->curTpl['AllowableRace'];
+            if ($_ < 0 || ($_ & RACE_MASK_ALL) == RACE_MASK_ALL)
+                $this->templates[$this->id]['AllowableRace'] = 0;
         }
 
         $this->reset();                                     // restore 'iterator'
@@ -134,13 +145,15 @@ class ItemList extends BaseType
             if ($x = $this->curTpl['ContainerSlots'])
                 $data[$this->id]['nslots'] = $x;
 
+            $_ = $this->curTpl['AllowableRace'];
+            if ($_ && $_ & RACE_MASK_ALLIANCE != RACE_MASK_ALLIANCE && $_ & RACE_MASK_HORDE != RACE_MASK_HORDE)
+                $data[$this->id]['reqrace'] = $_;
 
-            if (!in_array($this->curTpl['AllowableRace'], [-1, 0]) && $this->curTpl['AllowableRace'] & RACE_MASK_ALL != RACE_MASK_ALL &&
-                $this->curTpl['AllowableRace'] & RACE_MASK_ALLIANCE != RACE_MASK_ALLIANCE && $this->curTpl['AllowableRace'] & RACE_MASK_HORDE != RACE_MASK_HORDE)
-                $data[$this->id]['reqrace'] = $this->curTpl['AllowableRace'];
+            if ($_ = $this->curTpl['AllowableClass'])
+                $data[$this->id]['reqclass'] = $_;  // $data[$this->id]['classes'] ??
 
-            if (!in_array($this->curTpl['AllowableClass'], [-1, 0]) && $this->curTpl['AllowableClass'] & CLASS_MASK_ALL != CLASS_MASK_ALL)
-                $data[$this->id]['reqclass'] = $this->curTpl['AllowableClass'];  // $data[$this->id]['classes'] ??
+            if ($this->curTpl['Flags'] & ITEM_FLAG_HEROIC)
+                $data[$this->id]['heroic'] = true;
         }
 
         /* even more complicated crap
@@ -486,7 +499,8 @@ class ItemList extends BaseType
 
         // required races
         if ($races = Lang::getRaceString($this->curTpl['AllowableRace']))
-            $x .= Lang::$game['races'].Lang::$colon.$races['name'].'<br />';
+            if ($races['side'] != SIDE_BOTH)
+                $x .= Lang::$game['races'].Lang::$colon.$races['name'].'<br />';
 
         // required honorRank (not used anymore)
         if ($this->curTpl['requiredhonorrank'])
@@ -876,7 +890,7 @@ class ItemList extends BaseType
         }
 
         foreach ($this->json[$this->id] as $k => $v)
-            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'quality']) && $v == "0"))
+            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'quality', 'side']) && $v == "0"))
                 unset($this->json[$this->id][$k]);
     }
 
@@ -1049,7 +1063,7 @@ class ItemList extends BaseType
 
         // clear zero-values afterwards
         foreach ($json as $k => $v)
-            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'quality']) && $v == "0"))
+            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'quality', 'side']) && $v == "0"))
                 unset($json[$k]);
 
         $this->json[$json['id']] = $json;

@@ -17,8 +17,14 @@
                     id:'{$curr.id}',
                     name:'{$curr.name|escape:"quotes"}',
                     level:'{$curr.level}',
-                    {if ($curr.reqlevel)}
+                    {if isset($curr.reqlevel)}
                         reqlevel:{$curr.reqlevel},
+                    {/if}
+                    {if isset($curr.reqclass)}
+                        reqclass:{$curr.reqclass},
+                    {/if}
+                    {if isset($curr.reqrace)}
+                        reqrace:{$curr.reqrace},
                     {/if}
                     side:'{$curr.side}'
                     {if isset($curr.itemrewards)}
@@ -37,7 +43,7 @@
                             {/section}
                         ]
                     {/if}
-                    {if isset($curr.xp)}
+                    {if $curr.xp}
                         ,xp:{$curr.xp}
                     {/if}
                     {if isset($curr.titlereward)}
@@ -55,11 +61,14 @@
                     {if isset($curr.type)}
                         ,type:{$curr.type}
                     {/if}
-                    {if isset($curr.Daily)}
+                    {if isset($curr.daily)}
                         ,daily:1
                     {/if}
-                    {if isset($curr.flags)}
-                        ,wflags:$curr.flags          {* wflags: &1: disabled/historical; &32: AutoAccept; &64: Hostile(?) *}
+                    {if isset($curr.weekly)}
+                        ,weekly:1
+                    {/if}
+                    {if $curr.wflags}
+                        ,wflags:{$curr.wflags}          {* wflags: &1: disabled/historical; &32: AutoAccept; &64: Hostile(?) *}
                     {/if}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}

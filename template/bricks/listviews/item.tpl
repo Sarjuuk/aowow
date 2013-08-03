@@ -21,10 +21,20 @@
                     {if isset($curr.reqlevel)}
                         reqlevel:{$curr.reqlevel},
                     {/if}
-                        classs:{$curr.classs},
-                        subclass:{$curr.subclass},
+                    classs:{$curr.classs},
+                    subclass:{$curr.subclass},
+                    side:{$curr.side},
+                    {if isset($curr.reqclass)}
+                        reqclass:{$curr.reqclass},
+                    {/if}
+                    {if isset($curr.reqrace)}
+                        reqrace:{$curr.reqrace},
+                    {/if}
+                    {if isset($curr.heroic)}
+                        heroic:1,
+                    {/if}
                     {if isset($curr.maxcount)}
-                        {if $curr.maxcount>1}
+                        {if $curr.maxcount > 1}
                             stack:[{$curr.mincount},{$curr.maxcount}],
                         {/if}
                     {/if}
