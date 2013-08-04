@@ -18,6 +18,7 @@ foreach ($datasets as $data)
         // locale independant
         case 'zones':
         case 'weight-presets':
+        case 'item-scaling':
         case 'realms':
             if (file_exists('datasets/'.$data))
                 echo file_get_contents('datasets/'.$data);

@@ -2523,7 +2523,7 @@ function TalentCalc() {
 
         buffer += '</td></tr></table>';
 
-        Tooltip.show(_this, g_setTooltipItemLevel(buffer, _getRequiredLevel()));
+        Tooltip.show(_this, $WH.g_setTooltipLevel(buffer, _getRequiredLevel()));
     }
 
     function _simplifyGlyphName(name) {

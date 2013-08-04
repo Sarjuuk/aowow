@@ -770,9 +770,7 @@ Summary.prototype = {
 
                 $WH.de(o);
 
-                // $('#su_classes, #su_presets').change();
-                $WH.ge('su_classes').onchange();
-                $WH.ge('su_presets').onchange();
+                $('#su_classes, #su_presets').change();
             }
         }
     },
@@ -811,7 +809,7 @@ Summary.prototype = {
         var checkTrait = function(json, tj, trait, col, f, c, e, s) {
             var _json = $WH.dO(json);
             if (_json.scadist && _json.scaflags) {
-                g_setJsonItemLevel(_json, level);
+                $WH.g_setJsonItemLevel(_json, level);
             }
 
             var
@@ -2175,7 +2173,7 @@ Summary.prototype = {
 
             if (result != null) {
                 if (row.rating && !isNaN(result)) {
-                    var percent = (result < 0 ? -1 : 1) * g_convertRatingToPercent(this.level, row.rating, Math.abs(result));
+                    var percent = (result < 0 ? -1 : 1) * $WH.g_convertRatingToPercent(this.level, row.rating, Math.abs(result));
                     percent = $WH.number_format((Math.round(percent * 100) / 100));
 
                     if (row.rating != 12 && row.rating != 37) { // Neither Defense, nor Expertise
@@ -2468,7 +2466,7 @@ Summary.prototype = {
         $WH.aE(this.searchName, 'keydown', this.onSearchKeyDown.bind(this));
 
         $WH.ae(sm, this.searchName);
-        this.searchMsg = $WH.sp;
+        this.searchMsg = sp;
         this.searchMsg.style.fontWeight = 'bold';
         $WH.ae(sm, this.searchMsg);
         $WH.ae(div, sm);
@@ -4164,7 +4162,7 @@ Summary.templates = {
                             $WH.ae(td, $WH.ct(value + ' ' + LANG.traits[trait][1]));
 
                             if (this.ratings[trait] != null) {
-                                var percent = g_convertRatingToPercent(this.level, this.ratings[trait], value);
+                                var percent = $WH.g_convertRatingToPercent(this.level, this.ratings[trait], value);
 
                                 percent = $WH.number_format((Math.round(percent * 100) / 100));
 
