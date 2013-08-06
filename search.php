@@ -58,6 +58,9 @@ $found       = [];
 $jsGlobals   = [];
 $maxResults  = 500;                                         // todo: move to config
 
+$_wt         = isset($_GET['wt'])  ? explode(':', $_GET['wt'])  : null;
+$_wtv        = isset($_GET['wtv']) ? explode(':', $_GET['wtv']) : null;
+
 if (isset($_GET['json']))
 {
     if ($type == TYPE_ITEMSET)
@@ -97,7 +100,7 @@ if (strlen($query) < 3 || !($searchMask & SEARCH_MASK_ALL))
         header("Content-type: text/javascript");
         exit('["'.Util::jsEscape($query).'", []]');
     }
-    else /* if ($searchMask & SEARCH_TYPE_JSON) */
+    else if (!$_wt || !$_wtv)                               // implicitly: SEARCH_TYPE_JSON
     {
         header("Content-type: text/javascript");
         exit ("[\"".Util::jsEscape($query)."\", [\n],[\n]]\n");
@@ -324,14 +327,22 @@ if ($searchMask & 0x20)
 // 7 Items
 if ($searchMask & 0x40)
 {
+    $miscData = $conditions = [];
+
     if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
+    {
         $conditions = [['i.entry', array_keys($found['itemset']['pcsToSet'])], 0];
+        $miscData   = ['pcsToSet' => @$found['itemset']['pcsToSet']];
+    }
     else if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEM)
+    {
         $conditions = [['i.class', [2, 4]], [User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], $AoWoWconf['sqlLimit']];
+        $miscData   = ['wt' => $_wt, 'wtv' => $_wtv];
+    }
     else
         $conditions = [[User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], $maxResults];
 
-    $items = new ItemList($conditions, @$found['itemset']['pcsToSet']);
+    $items = new ItemList($conditions, $miscData);
 
     if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
     {
@@ -936,15 +947,6 @@ if ($searchMask & 0x1000000)
 */
 if ($searchMask & SEARCH_TYPE_JSON)
 {
-/*
-    todo (med):
-    &wt=21:134:20:170:77:117:119:96:103&wtv=100:96:41:41:39:32:32:31:29
-    additional url-parameter 'wt':ratingId/statId; 'wtv':applyPct (dafault 0)
-    search for items with these stats (name becomes optional)
-    how the fuck should i modify item_template_addon to accomodate this search behaviour... x_X
-    - is it possible to use space separated integers and not cause the search to take forever to execute
-    - one column per mod is probably the most efficient way to search but a pain to look at .. there are at least 150 after all
-*/
     $outItems = '';
     $outSets  = '';
 

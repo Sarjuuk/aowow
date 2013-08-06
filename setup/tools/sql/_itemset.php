@@ -289,7 +289,7 @@ foreach ($locales as $loc)
     $name[$loc] = '"'.Util::sqlEscape(Util::localizedString($set, 'name')).'"';
 
     while ($bonusSpells->iterate())
-        @$descText[$loc] .= $bonusSpells->parseText()."\n";
+        @$descText[$loc] .= $bonusSpells->parseText()[0]."\n";
 
     $descText[$loc] = '"'.Util::sqlEscape($descText[$loc]).'"';
 }

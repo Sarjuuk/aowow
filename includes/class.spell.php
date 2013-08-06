@@ -431,8 +431,9 @@ class SpellList extends BaseType
         $add     = $ref->getField('effect'.$effIdx.'DieSides');
         $maxLvl  = $ref->getField('maxLevel');
         $baseLvl = $ref->getField('baseLevel');
+        $scaling = $this->curTpl['attributes1'] & 0x200;    // never a referenced spell, ALWAYS $this; SPELL_ATTR1_MELEE_COMBAT_SPELL: 0x200
 
-        if ($this->curTpl['attributes1'] & 0x200)           // never a referenced spell, ALWAYS $this; SPELL_ATTR1_MELEE_COMBAT_SPELL: 0x200
+        if ($scaling)
         {
             if ($level > $maxLvl && $maxLvl > 0)
                 $level = $maxLvl;
@@ -443,20 +444,12 @@ class SpellList extends BaseType
             $base  += (int)($level * $rppl);
         }
 
-        switch ($add)                                       // roll in a range <1;EffectDieSides> as of patch 3.3.3
-        {
-            case 0:
-            case 1:                                         // range 1..1
-                return [
-                    $base + $add,
-                    $base + $add
-                ];
-            default:
-                return [
-                    $base + 1,
-                    $base + $add
-                ];
-        }
+        return [
+            $add ? $base + 1 : $base,
+            $base + $add,
+            $scaling ? '<!--ppl'.$baseLvl.':'.$maxLvl.':'.($base + max(1, $add)).':'.$rppl.'-->' : null,
+            $scaling ? '<!--ppl'.$baseLvl.':'.$maxLvl.':'.($base + $add).':'.$rppl.'-->' : null
+        ];
     }
 
     public function canCreateItem()
@@ -498,6 +491,7 @@ class SpellList extends BaseType
         $cond  = $COND  = function($a, $b, $c) { return $a ? $b : $c; };
         $eq    = $EQ    = function($a, $b)     { return $a == $b;     };
         $gt    = $GT    = function($a, $b)     { return $a > $b;      };
+        $gte   = $GTE   = function($a, $b)     { return $a <= $b;     };
         $floor = $FLOOR = function($a)         { return floor($a);    };
 
         if (preg_match_all('/\$[a-z]+\b/i', $formula, $vars))
@@ -506,11 +500,14 @@ class SpellList extends BaseType
 
             foreach ($vars[0] as $var)                      // oh lord, forgive me this sin .. but is_callable seems to bug out and function_exists doesn't find lambda-functions >.<
             {
-                if (@eval('return getType('.$var.');') != 'object')
-                {
-                    $evalable = false;
-                    break;
-                }
+                $eval = eval('return '.$var.';');
+                if (getType($eval) == 'object')
+                    continue;
+                else if (is_numeric($eval))
+                    continue;
+
+                $evalable = false;
+                break;
             }
 
             if (!$evalable)
@@ -519,6 +516,7 @@ class SpellList extends BaseType
                 $cond  = $COND  = !$this->interactive ? 'COND'  : sprintf(Util::$dfnString, 'COND(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)<br /> <span class=\'q1\'>a</span> ? <span class=\'q1\'>b</span> : <span class=\'q1\'>c</span>', 'COND');
                 $eq    = $EQ    = !$this->interactive ? 'EQ'    : sprintf(Util::$dfnString, 'EQ(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> == <span class=\'q1\'>b</span>', 'EQ');
                 $gt    = $GT    = !$this->interactive ? 'GT'    : sprintf(Util::$dfnString, 'GT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> > <span class=\'q1\'>b</span>', 'GT');
+                $gte   = $GTE   = !$this->interactive ? 'GTE'   : sprintf(Util::$dfnString, 'GTE(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> <= <span class=\'q1\'>b</span>', 'GT');
                 $floor = $FLOOR = !$this->interactive ? 'FLOOR' : sprintf(Util::$dfnString, 'FLOOR(<span class=\'q1\'>a</span>)', 'FLOOR');
                 $pl    = $PL    = !$this->interactive ? 'PL'    : sprintf(Util::$dfnString, 'LANG.level', 'PL');
 
@@ -711,13 +709,13 @@ class SpellList extends BaseType
             case 'O':
                 if ($lookup)
                 {
-                    list($min, $max) = $this->calculateAmountForCurrent($effIdx, $this->refSpells[$lookup]);
+                    list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx, $this->refSpells[$lookup]);
                     $periode  = $this->refSpells[$lookup]->getField('effect'.$effIdx.'Periode');
                     $duration = $this->refSpells[$lookup]->getField('duration');
                 }
                 else
                 {
-                    list($min, $max) = $this->calculateAmountForCurrent($effIdx);
+                    list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx);
                     $periode  = $this->getField('effect'.$effIdx.'Periode');
                     $duration = $this->getField('duration');
                 }
@@ -733,7 +731,10 @@ class SpellList extends BaseType
                     if ($equal)
                         eval("\$min = $min $op $oparg;");
 
-                return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
+                if ($this->interactive)
+                    return $modStrMin.$min . (!$equal ? Lang::$game['valueDelim'] . $modStrMax.$max : null);
+                else
+                    return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
             case 'q':                                       // EffectMiscValue
             case 'Q':
                 if ($lookup)
@@ -760,13 +761,13 @@ class SpellList extends BaseType
             case 'S':
                 if ($lookup)
                 {
-                    list($min, $max) = $this->calculateAmountForCurrent($effIdx, $this->refSpells[$lookup]);
+                    list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx, $this->refSpells[$lookup]);
                     $mv   = $this->refSpells[$lookup]->getField('effect'.$effIdx.'MiscValue');
                     $aura = $this->refSpells[$lookup]->getField('effect'.$effIdx.'AuraId');
                 }
                 else
                 {
-                    list($min, $max) = $this->calculateAmountForCurrent($effIdx);
+                    list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx);
                     $mv   = $this->getField('effect'.$effIdx.'MiscValue');
                     $aura = $this->getField('effect'.$effIdx.'AuraId');
                 }
@@ -801,6 +802,8 @@ class SpellList extends BaseType
                     return '<!--rtg'.$rType.'-->'.$min.'&nbsp;<small>('.sprintf(Util::$setRatingLevelString, $this->charLevel, $rType, $min, Util::setRatingLevel($this->charLevel, $rType, $min)).')</small>';
                 else if ($rType && $equal)
                     return '<!--rtg'.$rType.'-->'.$min.'&nbsp;<small>('.Util::setRatingLevel($this->charLevel, $rType, $min).')</small>';
+                else if ($this->interactive)
+                    return $modStrMin.$min . (!$equal ? Lang::$game['valueDelim'] . $modStrMax.$max : null);
                 else
                     return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
             case 't':                                       // Periode
@@ -1016,7 +1019,7 @@ class SpellList extends BaseType
     // step 0: get text
         $data = Util::localizedString($this->curTpl, $type);
         if (empty($data) || $data == "[]")                  // empty tooltip shouldn't be displayed anyway
-            return null;
+            return array();
 
     // step 1: if the text is supplemented with text-variables, get and replace them
         if (empty($this->spellVars[$this->id]) && $this->curTpl['spellDescriptionVariableId'] > 0)
@@ -1055,19 +1058,29 @@ class SpellList extends BaseType
             $condBrktCnt = 0;
             $targetPart  = 3;                               // we usually want the second pair of brackets
             $curPart     = 0;                               // parts: $? 0 [ 1 ] 2 [ 3 ] 4
+            $relSpells   = [];    // see spells_enus
 
             $condOutStr  = '';
 
             if (!empty($matches[3]))                        // we can do this! -> eval
             {
-                $cnd = eval('return ('.$matches[3].');');
-                if (is_numeric($cnd) && $cnd)               // only case, deviating from normal; positive result -> use [true]
+                $cnd = $this->resolveEvaluation($matches[3]);
+                if ((is_numeric($cnd) || is_bool($cnd)) && $cnd) // only case, deviating from normal; positive result -> use [true]
                     $targetPart = 1;
 
                 $condStartPos = strpos($data, $matches[3]) - 2;
                 $condCurPos   = $condStartPos;
 
             }
+/*
+_[100].tooltip_enus = '<table><tr><td><b>Charge</b><br />8 - 25 yd range<table width="100%"><tr><td>Instant</td><th>20 sec cooldown</th></tr></table>Requires Warrior<br />Requires level 3</td></tr></table><table><tr><td><span class="q">Charge to an enemy, stunning it <!--sp58377:0--><!--sp58377-->for <!--sp103828:0-->1 sec<!--sp103828-->. Generates 20 Rage.</span></td></tr></table>';
+_[100].buff_enus = '';
+_[100].spells_enus = {"58377": [["", "and 2 additional nearby targets "]], "103828": [["1 sec", "3 sec and reducing movement speed by 50% for 15 sec"]]};
+_[100].buffspells_enus = {};
+Turns the Shaman into a Ghost Wolf, increasing speed by $s2%$?s59289[ and regenerating $59289s1% of your maximum health every 5 sec][].
+Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
+*/
+
             else if (!empty($matches[2]))                   // aura/spell-condition .. use false; TODO (low): catch cases and port "know"-param for tooltips from 5.0
             {                                               // tooltip_enus: Charge to an enemy, stunning it <!--sp58377:0--><!--sp58377-->for <!--sp103828:0-->1 sec<!--sp103828-->.; spells_enus: {"58377": [["", "and 2 additional nearby targets "]], "103828": [["1 sec", "3 sec"]]};
                 $condStartPos = strpos($data, $matches[2]) - 2;
@@ -1212,20 +1225,20 @@ class SpellList extends BaseType
         // line endings
         $str = strtr($str, ["\r" => '', "\n" => '<br />']);
 
-        return $str;
+        return array($str, null/*$relSpells*/);
     }
 
     public function renderBuff($level = MAX_LEVEL, $interactive = false)
     {
         if (!$this->curTpl)
-            return null;
+            return array();
 
         if (isset($this->buffs[$this->id]))
             return $this->buffs[$this->id];
 
         // doesn't have a buff
         if (!Util::localizedString($this->curTpl, 'buff'))
-            return '';
+            return array();
 
         $this->interactive = $interactive;
 
@@ -1243,7 +1256,8 @@ class SpellList extends BaseType
         $x .= '<table><tr><td>';
 
         // parse Buff-Text
-        $x .= $this->parseText('buff', $level, $this->interactive).'<br>';
+        $btt = $this->parseText('buff', $level, $this->interactive);
+        $x .= $btt[0].'<br>';
 
         // duration
         if ($this->curTpl['duration'] > 0)
@@ -1251,15 +1265,15 @@ class SpellList extends BaseType
 
         $x .= '</td></tr></table>';
 
-        $this->buffs[$this->id] = $x;
+        $this->buffs[$this->id] = array($x, $btt[1]);
 
-        return $x;
+        return $this->buffs[$this->id];
     }
 
     public function renderTooltip($level = MAX_LEVEL, $interactive = false)
     {
         if (!$this->curTpl)
-            return null;
+            return array();
 
         if (isset($this->tooltips[$this->id]))
             return $this->tooltips[$this->id];
@@ -1402,7 +1416,7 @@ class SpellList extends BaseType
             $xTmp[] = Lang::$game['requires2'].' '.$reqItems;
 
         if ($desc)
-            $xTmp[] = '<span class="q">'.$desc.'</span>';
+            $xTmp[] = '<span class="q">'.$desc[0].'</span>';
 
         if ($createItem)
             $xTmp[] = '<br />'.$createItem;
@@ -1410,9 +1424,9 @@ class SpellList extends BaseType
         if ($tools || $reagents || $reqItems || $desc || $createItem)
             $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
 
-        $this->tooltips[$this->id] = $x;
+        $this->tooltips[$this->id] = array($x, $desc[1]);
 
-        return $x;
+        return $this->tooltips[$this->id];
     }
 
     public function getTalentHeadForCurrent()

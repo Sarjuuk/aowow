@@ -68,7 +68,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // type
     if ($ty)
-        $infobox[] = Lang::$itemset['_type'].lang::$colon.Lang::$itemset['types'][$ty];
+        $infobox[] = Lang::$game['type'].lang::$colon.Lang::$itemset['types'][$ty];
 
     // tag
     if ($ta)
@@ -134,7 +134,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         while ($setSpells->id != $s['id'])
             $setSpells->iterate();
 
-        $s['desc'] = $setSpells->parseText('description');
+        $s['desc'] = $setSpells->parseText('description')[0];
     }
 
     // path

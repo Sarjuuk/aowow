@@ -81,7 +81,7 @@ if (!defined('AOWOW_REVISION'))
 
             $glyphsOut[$pop['itemId']] = array(
                 'name'        => Util::localizedString($pop, 'name'),
-                'description' => $glyphSpells->parseText(),
+                'description' => $glyphSpells->parseText()[0],
                 'icon'        => $pop['icon'],
                 'type'        => $pop['type'],
                 'classs'      => $pop['classs'],

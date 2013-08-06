@@ -30,10 +30,16 @@ if (isset($_GET['power']))
             $pt[] = "\tname_".User::$localeString.": '".Util::jsEscape($n)."'";
         if ($i = $spell->getField('iconString'))
             $pt[] = "\ticon: '".urlencode($i)."'";
-        if ($t = $spell->renderTooltip())
-            $pt[] = "\ttooltip_".User::$localeString.": '".Util::jsEscape($t)."'";
-        if ($b = $spell->renderBuff())
-            $pt[] = "\tbuff_".User::$localeString.": '".Util::jsEscape($b)."'";
+        if ($tt = $spell->renderTooltip())
+        {
+            $pt[] = "\ttooltip_".User::$localeString.": '".Util::jsEscape($tt[0])."'";
+            $pt[] = "\tspells_".User::$localeString.": ".json_encode($tt[1], JSON_UNESCAPED_UNICODE);
+        }
+        if ($btt = $spell->renderBuff())
+        {
+            $pt[] = "\tbuff_".User::$localeString.": '".Util::jsEscape($btt[0])."'";
+            $pt[] = "\tbuffspells_".User::$localeString.": ".json_encode($btt[1], JSON_UNESCAPED_UNICODE);;
+        }
         $x .= implode(",\n", $pt)."\n});";
 
         $smarty->saveCache($cacheKeyTooltip, $x);
@@ -106,10 +112,16 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $pageData['page'] = $spell->getDetailPageData();
 
     // description
-    $pageData['page']['info'] = $spell->renderTooltip(MAX_LEVEL, true);
+    @list(
+        $pageData['page']['info'],
+        $pageData['page']['spells']
+    ) = $spell->renderTooltip(MAX_LEVEL, true);
 
     // buff
-    $pageData['page']['buff'] = $spell->renderBuff(MAX_LEVEL, true);
+    @list(
+        $pageData['page']['buff'],
+        $pageData['page']['buffspells']
+    ) = $spell->renderBuff(MAX_LEVEL, true);
 
     // infobox
     $infobox = [];

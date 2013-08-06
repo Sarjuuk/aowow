@@ -123,6 +123,7 @@ $lang = array(
         'school'        => "School",
         'spell'         => "spell",
         'spells'        => "Spells",
+        'type'          => "Type",
         'valueDelim'    => " to ",
         'zone'          => "zone",
         'zones'         => "Zones",
@@ -297,7 +298,6 @@ $lang = array(
         '_pieces'       => "pieces",
         '_unavailable'  => "This item set is not available to players.",
         '_tag'          => "Tag",
-        '_type'         => "Type",
 
         'notes'         => array(
             null,                                   "Dungeon Set 1",                        "Dungeon Set 2",                        "Tier 1 Raid Set",

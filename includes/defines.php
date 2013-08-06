@@ -437,6 +437,7 @@ define('ITEM_MOD_SPELL_POWER',              45);
 define('ITEM_MOD_HEALTH_REGEN',             46);
 define('ITEM_MOD_SPELL_PENETRATION',        47);
 define('ITEM_MOD_BLOCK_VALUE',              48);
+// ITEM_MOD_MASTERY_RATING, 49
 define('ITEM_MOD_ARMOR',                    50);            // resistances v
 define('ITEM_MOD_FIRE_RESISTANCE',          51);
 define('ITEM_MOD_FROST_RESISTANCE',         52);

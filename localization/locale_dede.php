@@ -128,6 +128,7 @@ $lang = array(
         'school'        => "Magieart",
         'spell'         => "Zauber",
         'spells'        => "Zauber",
+        'type'          => "Art",
         'valueDelim'    => " - ",                           // " bis "
         'zone'          => "Zone",
         'zones'         => "Gebiete",
@@ -302,7 +303,6 @@ $lang = array(
         '_pieces'       => "Teile",
         '_unavailable'  => "Dieses Ausrüstungsset ist nicht für Spieler verfügbar.",
         '_tag'          => "Tag",
-        '_type'         => "Art",
 
         'notes'         => array(
             null,                                   "Dungeon-Set 1",                            "Dungeon-Set 2",                            "Tier 1 Raid-Set",

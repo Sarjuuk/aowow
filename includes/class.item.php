@@ -7,22 +7,51 @@ class ItemList extends BaseType
 {
     use ListviewHelper;
 
-    public static $type       = TYPE_ITEM;
+    public static $type        = TYPE_ITEM;
 
-    public        $tooltip    = '';
-    public        $json       = [];
-    public        $itemMods   = [];
+    public        $tooltip     = '';
+    public        $json        = [];
+    public        $itemMods    = [];
 
-    public        $rndEnchIds = [];
-    public        $subItems   = [];
+    public        $rndEnchIds  = [];
+    public        $subItems    = [];
 
-    private       $ssd        = [];
+    private       $ssd         = [];
+    private       $weightQuery = 'SELECT i.*, iX.*, l.*, i.entry AS ARRAY_KEY, [weightsA] AS sum FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry JOIN ?_item_stats ais ON ais.id = i.entry WHERE [weightsB] AND [cond] ORDER BY sum DESC';
+    private       $weightMatch = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry JOIN ?_item_stats ais ON ais.id = i.entry WHERE [cond]';
 
-    protected     $setupQuery = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] ORDER BY i.Quality DESC';
-    protected     $matchQuery = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond]';
+    protected     $setupQuery  = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] ORDER BY i.Quality DESC';
+    protected     $matchQuery  = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond]';
 
-    public function __construct($conditions, $pieceToSet = null)
+    public function __construct($conditions, $miscData = null)
     {
+        // search by statweight
+        if ($miscData && isset($miscData['wt']) && isset($miscData['wtv']) && count($miscData['wt']) == count($miscData['wtv']))
+        {
+            $wtA = $wtB = [];
+
+            foreach ($miscData['wt'] as $k => $v)
+            {
+                if (@$str = Util::$itemFilter[$v])
+                {
+                    if ($str == 'rgdspeed')                 // dont need no duplicate column
+                        $str = 'speed';
+
+                    $wtA[] = '(`ais`.`'.$str.'` * '.intVal($miscData['wtv'][$k]).')';
+                    $wtB[] = '`ais`.`'.$str.'` <> 0';
+                }
+            }
+
+            $wtA = $wtA ? '('.implode(' + ', $wtA).')' : 1;
+            $wtB = $wtB ? '('.implode(' AND ', $wtB).')' : 1;
+
+            $this->setupQuery = $this->weightQuery;
+            $this->matchQuery = $this->weightMatch;
+
+            $this->setupQuery = strtr($this->setupQuery, ['[weightsA]' => $wtA, '[weightsB]' => $wtB]);
+            $this->matchQuery = strtr($this->matchQuery, ['[weightsA]' => $wtA, '[weightsB]' => $wtB]);
+        }
+
         parent::__construct($conditions);
 
         while ($this->iterate())
@@ -34,8 +63,8 @@ class ItemList extends BaseType
             $this->initJsonStats();
 
             // readdress itemset .. is wrong for virtual sets
-            if ($pieceToSet && isset($pieceToSet[$this->id]))
-                $this->json[$this->id]['itemset'] = $pieceToSet[$this->id];
+            if ($miscData && isset($miscData['pcsToSet']) && isset($miscData['pcsToSet'][$this->id]))
+                $this->json[$this->id]['itemset'] = $miscData['pcsToSet'][$this->id];
 
             // unify those pesky masks
             $_ = $this->curTpl['AllowableClass'];
@@ -557,7 +586,7 @@ class ItemList extends BaseType
         {
             $itemSpells = new SpellList(array(['s.id', array_keys($itemSpellsAndTrigger)]));
             while ($itemSpells->iterate())
-                if ($parsed = $itemSpells->parseText('description', $this->curTpl['RequiredLevel']))
+                if ($parsed = $itemSpells->parseText('description', $this->curTpl['RequiredLevel'])[0])
                     $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id]] . ($interactive ? '<a href="?spell='.$itemSpells->id.'">'.$parsed.'</a>' : $parsed);
         }
 
@@ -624,7 +653,7 @@ class ItemList extends BaseType
                 while ($boni->iterate())
                 {
                     $itemset['spells'][] = array(
-                        'tooltip' => $boni->parseText('description', $this->curTpl['RequiredLevel']),
+                        'tooltip' => $boni->parseText('description', $this->curTpl['RequiredLevel'])[0],
                         'entry'   => $itemset['spell'.$setSpellsAndIdx[$boni->id]],
                         'bonus'   => $itemset['bonus'.$setSpellsAndIdx[$boni->id]]
                     );
@@ -1060,6 +1089,9 @@ class ItemList extends BaseType
             if ($json['classs'] == ITEM_CLASS_WEAPON && in_array($json['subclass'], [5, 6, 10]) && $json['dps'] > 54.8)
                 $json['feratkpwr'] = max(0, round((($json['dmgmin1'] + $json['dmgmax1']) / (2 * $this->curTpl['delay'] / 1000) - 54.8) * 14, 0));
         }
+
+        if ($this->curTpl['ArmorDamageModifier'] > 0)
+            $json['armor'] += $this->curTpl['ArmorDamageModifier'];
 
         // clear zero-values afterwards
         foreach ($json as $k => $v)

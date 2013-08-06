@@ -120,6 +120,7 @@ $lang = array(
         'school'        => "École",
         'spell'         => "sort",
         'spells'        => "Sorts",
+        'type'          => "Type",
         'valueDelim'    => " - ",
         'zone'          => "zone",
         'zones'         => "Zones",
@@ -254,7 +255,6 @@ $lang = array(
         '_pieces'       => "pièces",
         '_unavailable'  => "Cet objet n'est plus disponible aux joueurs.",
         '_tag'          => "Étiquette",
-        '_type'         => "Type",
 
         'notes'         => array(
             null,                                   "Ensemble de donjon 1",                 "Ensemble de donjon 2",                         "Ensemble de raid palier 1",

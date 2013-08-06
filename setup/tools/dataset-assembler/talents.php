@@ -116,7 +116,7 @@ if (!defined('AOWOW_REVISION'))
                 for ($k = 0; $k <= ($m - 1); $k++)
                 {
                     $tSpell = new SpellList(array(['s.id', (int)$talents[$j]['rank'.($k + 1)]]));
-                    $d[] = $tSpell->parseText();
+                    $d[] = $tSpell->parseText()[0];
                     $s[] = $talents[$j]['rank'.($k + 1)];
 
                     if ($talents[$j]['isSpell'])
