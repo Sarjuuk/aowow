@@ -3582,7 +3582,7 @@ Listview.prototype = {
 		}
 	},
 	changePage: function() {
-		this.validatePa$WH.ge();
+		this.validatePage();
 		this.refreshRows();
 		this.updateNav();
 		this.updatePound();
@@ -3594,22 +3594,22 @@ Listview.prototype = {
 	},
 	firstPage: function() {
 		this.rowOffset = 0;
-		this.changePa$WH.ge();
+		this.changePage();
 		return false
 	},
 	previousPage: function() {
 		this.rowOffset -= this.nItemsPerPage;
-		this.changePa$WH.ge();
+		this.changePage();
 		return false
 	},
 	nextPage: function() {
 		this.rowOffset += this.nItemsPerPage;
-		this.changePa$WH.ge();
+		this.changePage();
 		return false
 	},
 	lastPage: function() {
 		this.rowOffset = 99999999;
-		this.changePa$WH.ge();
+		this.changePage();
 		return false
 	},
 	addSort: function(a, c) {
@@ -3680,7 +3680,7 @@ Listview.prototype = {
 		var a = parseInt(b);
 		if (!isNaN(a)) {
 			this.rowOffset = a;
-			this.validatePa$WH.ge();
+			this.validatePage();
 			if (this.poundable != 2) {
 				var d = [];
 				var f = b.match(/(\+|\-)[0-9]+/g);
@@ -3860,7 +3860,7 @@ Listview.prototype = {
 		}
 		this.updateTabName();
 		if (this.rowOffset >= this.nRowsVisible) {
-			this.previousPa$WH.ge()
+			this.previousPage()
 		} else {
 			this.refreshRows();
 			this.updateNav()
@@ -8018,64 +8018,75 @@ Listview.templates = {
         sort: [1],
         searchable: 1,
         filtrable: 1,
-        columns: [{
-            id: "name",
-            name: LANG.name,
-            type: "text",
-            align: "left",
-            value: "name",
-            span: 2,
-            compute: function(c, h, f) {
-                var d = $WH.ce("td");
-                d.style.width = "1px";
-                d.style.padding = "0";
-                d.style.borderRight = "none";
-                $WH.ae(d, Icon.create(c.icon, 0, null, this.getItemLink(c)));
-                $WH.ae(f, d);
-                h.style.borderLeft = "none";
-                var g = $WH.ce("div");
-                var b = $WH.ce("a");
-                b.style.fontFamily = "Verdana, sans-serif";
-                b.href = this.getItemLink(c);
-                $WH.ae(b, $WH.ct(c.name));
-                if (c.expansion) {
-                    var e = $WH.ce("span");
-                    e.className = g_GetExpansionClassName(c.expansion);
-                    $WH.ae(e, b);
-                    $WH.ae(g, e)
-                } else {
-                    $WH.ae(g, b)
-                }
-                $WH.ae(h, g)
-            },
-            getVisibleText: function(a) {
-                var b = a.name + Listview.funcBox.getExpansionText(a);
-                return b
-            }
-        },
-        {
-            id: "category",
-            name: LANG.category,
-            type: "text",
-            width: "16%",
-            compute: function(c, d) {
-                if (c.category != 0) {
-                    d.className = "small q1";
-                    var b = $WH.ce("a");
-                    b.href = "?skills=" + c.category;
-                    $WH.ae(b, $WH.ct(g_skill_categories[c.category]));
-                    $WH.ae(d, b)
+
+        columns: [
+            {
+                id: 'name',
+                name: LANG.name,
+                type: 'text',
+                align: 'left',
+                value: 'name',
+                span: 2,
+                compute: function(skill, td, tr) {
+                    var i = $WH.ce('td');
+                    i.style.width = '1px';
+                    i.style.padding = '0';
+                    i.style.borderRight = 'none';
+
+                    $WH.ae(i, Icon.create(skill.icon, 0, null, this.template.getItemLink(skill)));
+                    $WH.ae(tr, i);
+                    td.style.borderLeft = 'none';
+
+                    var wrapper = $WH.ce('div');
+
+                    var a = $WH.ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.template.getItemLink(skill);
+                    $WH.ae(a, $WH.ct(skill.name));
+
+                    if (skill.expansion) {
+                        var sp = $WH.ce('span');
+                        sp.className = g_GetExpansionClassName(skill.expansion);
+                        $WH.ae(sp, a);
+                        $WH.ae(wrapper, sp);
+                    }
+                    else {
+                        $WH.ae(wrapper, a);
+                    }
+
+                    $WH.ae(td, wrapper);
+                },
+                getVisibleText: function(skill) {
+                    var buff = skill.name + Listview.funcBox.getExpansionText(skill);
+
+                    return buff;
                 }
             },
-            getVisibleText: function(a) {
-                return g_skill_categories[skill.category]
-            },
-            sortFunc: function(d, c, e) {
-                return $WH.strcmp(g_skill_categories[d.category], g_skill_categories[c.category])
+            {
+                id: 'category',
+                name: LANG.category,
+                type: 'text',
+                width: '16%',
+                compute: function(skill, td) {
+                    if (skill.category != 0) {
+                        td.className = 'small q1';
+                        var a = $WH.ce('a');
+                        a.href = '?skills=' + skill.category;
+                        $WH.ae(a, $WH.ct(g_skill_categories[skill.category]));
+                        $WH.ae(td, a);
+                    }
+                },
+                getVisibleText: function(skill) {
+                    return g_skill_categories[skill.category];
+                },
+                sortFunc: function(a, b, col) {
+                    return $WH.strcmp(g_skill_categories[a.category], g_skill_categories[b.category]);
+                }
             }
-        }],
-        getItemLink: function(a) {
-            return "?skill=" + a.id
+        ],
+
+        getItemLink: function(skill) {
+            return '?skill=' + skill.id;
         }
     },
 
@@ -12480,8 +12491,6 @@ var Menu = new function()
 	}
 };
 
-
-
 Menu.fixUrls(mn_achievements, '?achievements=');
 Menu.fixUrls(mn_classes, '?class=');
 Menu.fixUrls(mn_currencies, '?currencies=');
@@ -12497,8 +12506,6 @@ Menu.fixUrls(mn_races, '?race=');
 Menu.fixUrls(mn_spells, '?spells=');
 Menu.fixUrls(mn_titles, '?titles=');
 Menu.fixUrls(mn_zones, '?zones=');
-
-
 
 $(document).ready(function() // Locale is only known later
 {

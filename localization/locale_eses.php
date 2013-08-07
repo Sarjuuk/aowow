@@ -118,6 +118,8 @@ $lang = array(
         'reqSkillLevel' => "Requiere nivel de habilidad",
         'level'         => "Nivel",
         'school'        => "Escuela",
+        'skill'         => "habilidad",
+        'skills'        => "Habilidades",
         'spell'         => "hechizo",
         'spells'        => "Hechizos",
         'type'          => "Tipo",
@@ -237,6 +239,12 @@ $lang = array(
     'title' => array(
         'cat'           => array(
             'General',      'Jugador contra Jugador',    'Reputación',       'Mazmorras y bandas',     'Misiones',       'Profesiones',      'Eventos del mundo'
+        )
+    ),
+    'skill' => array(
+        'cat'           => array(
+            -6 => 'Compañeros',         -5 => 'Monturas',           -4 => 'Habilidades de raza', 5 => 'Atributos',          6 => 'Habilidades con armas', 7 => 'Habilidades de clase', 8 => 'Armaduras disponibles',
+             9 => 'Habilidades secundarias', 10 => 'Idiomas',       11 => 'Profesiones'
         )
     ),
     'currency' => array(

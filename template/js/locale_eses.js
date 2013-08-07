@@ -530,8 +530,9 @@ var mn_skills = [
     [762,"Equitación","?skill=762",,{tinyIcon:"spell_nature_swiftness"}],
     [,"Otros"],
     [8,"Armaduras disponibles","?skills=8"],
-    [10,"Lenguas","?skills=10"],
-    [6,"Armas disponibles","?skills=6"]
+    [10,"Idiomas","?skills=10"],
+    [6,"Habilidades con armas","?skills=6"],
+    [7,"Habilidades de clase","?skills=6"]
 ];
 var mn_spells = [
     [,"Habilidades y Talentos"],
@@ -1754,10 +1755,12 @@ var g_skill_categories = {
     "-6": 'Compañeros',
     "-5": 'Monturas',
     "-4": 'Habilidades de raza',
-       6: 'Armas disponibles',
+       5: 'Atributos',
+       6: 'Habilidades con armas',
+       7: 'Habilidades de clase',
        8: 'Armaduras disponibles',
        9: 'Habilidades secundarias',
-      10: 'Lenguas',
+      10: 'Idiomas',
       11: 'Profesiones'
 };
 

@@ -531,7 +531,8 @@ var mn_skills = [
     [,"Sonstige"],
     [8,"Rüstngssachverstand","?skills=8"],
     [10,"Sprachen","?skills=10"],
-    [6,"Waffenfertigkeiten","?skills=6"]
+    [6,"Waffenfertigkeiten","?skills=6"],
+    [7,"Klassenfertigkeiten","?skills=7"]
 ];
 var mn_spells = [
     [,"Charakter"],
@@ -1754,7 +1755,9 @@ var g_skill_categories = {
     "-6": 'Haustiere',
     "-5": 'Reittiere',
     "-4": 'Völkerfertigkeiten',
+       5: 'Attribute',
        6: 'Waffenfertigkeiten',
+       6: 'Klassenfertigkeiten',
        8: 'Rüstungssachverstand',
        9: 'Nebenberufe',
       10: 'Sprachen',

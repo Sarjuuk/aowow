@@ -413,6 +413,7 @@ class Lang
     public static $npc;
     public static $pet;
     public static $quest;
+    public static $skill;
     public static $spell;
     public static $title;
     public static $zone;
@@ -781,7 +782,7 @@ class SmartyAoWoW extends Smarty
             $this->initJSGlobal($type);
 
             foreach ($ids as $k => $id)                     // filter already generated data, maybe we can save a lookup or two
-                if (isset($this->_tpl_vars['jsGlobals'][$type][$id]))
+                if (isset($this->_tpl_vars['jsGlobals'][$type][1][$id]))
                     unset($ids[$k]);
 
             switch ($type)

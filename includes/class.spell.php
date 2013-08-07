@@ -1225,7 +1225,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         // line endings
         $str = strtr($str, ["\r" => '', "\n" => '<br />']);
 
-        return array($str, null/*$relSpells*/);
+        return array($str, []/*$relSpells*/);
     }
 
     public function renderBuff($level = MAX_LEVEL, $interactive = false)
@@ -1424,7 +1424,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         if ($tools || $reagents || $reqItems || $desc || $createItem)
             $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
 
-        $this->tooltips[$this->id] = array($x, $desc[1]);
+        $this->tooltips[$this->id] = array($x, $desc ? $desc[1] : null);
 
         return $this->tooltips[$this->id];
     }

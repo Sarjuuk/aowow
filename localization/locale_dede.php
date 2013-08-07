@@ -126,6 +126,8 @@ $lang = array(
         'reqSkillLevel' => "Benötigte Fertigkeitsstufe",
         'level'         => "Stufe",
         'school'        => "Magieart",
+        'skill'         => "Fertigkeit",
+        'skills'        => "Fertigkeiten",
         'spell'         => "Zauber",
         'spells'        => "Zauber",
         'type'          => "Art",
@@ -284,6 +286,12 @@ $lang = array(
     'title' => array(
         'cat'           => array(
             'Allgemein',      'Spieler gegen Spieler',    'Ruf',       'Dungeon & Schlachtzug',     'Quests',       'Berufe',      'Weltereignisse'
+        )
+    ),
+    'skill' => array(
+        'cat'           => array(
+            -6 => 'Haustiere',          -5 => 'Reittiere',          -4 => 'Völkerfertigkeiten', 5 => 'Attribute',           6 => 'Waffenfertigkeiten',  7 => 'Klassenfertigkeiten', 8 => 'Rüstungssachverstand',
+             9 => 'Nebenberufe',        10 => 'Sprachen',           11 => 'Berufe'
         )
     ),
     'currency' => array(

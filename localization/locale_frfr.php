@@ -118,6 +118,8 @@ $lang = array(
         'reqSkillLevel' => "Niveau de compétence requis",
         'level'         => "Niveau",
         'school'        => "École",
+        'skill'         => "compétence",
+        'skills'        => "Compétences",
         'spell'         => "sort",
         'spells'        => "Sorts",
         'type'          => "Type",
@@ -236,6 +238,12 @@ $lang = array(
     'title' => array(
         'cat'           => array(
             'Général',      'Joueur ctr. Joueur',    'Réputation',       'Donjons & raids',     'Quêtes',       'Métiers',      'Évènements mondiaux'
+        )
+    ),
+    'skill' => array(
+        'cat'           => array(
+            -6 => 'Compagnons',         -5 => 'Montures',           -4 => 'Traits raciaux',     5 => 'Caractéristiques',    6 => "Compétences d'armes", 7 => 'Compétences de classe', 8 => 'Armures utilisables',
+             9 => 'Compétences secondaires', 10 => 'Langues',       11 => 'Métiers'
         )
     ),
     'currency' => array(

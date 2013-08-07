@@ -121,6 +121,8 @@ $lang = array(
         'reqSkillLevel' => "Required skill level",
         'level'         => "Level",
         'school'        => "School",
+        'skill'         => "skill",
+        'skills'        => "Skills",
         'spell'         => "spell",
         'spells'        => "Spells",
         'type'          => "Type",
@@ -279,6 +281,12 @@ $lang = array(
     'title' => array(
         'cat'           => array(
             'General',      'Player vs. Player',    'Reputation',       'Dungeons & Raids',     'Quests',       'Professions',      'World Events'
+        )
+    ),
+    'skill' => array(
+        'cat'           => array(
+            -6 => 'Companions',         -5 => 'Mounts',             -4 => 'Racial Traits',      5 => 'Attributes',          6 => 'Weapon Skills',       7 => 'Class Skills',        8 => 'Armor Proficiencies',
+             9 => 'Secondary Skills',   10 => 'Languages',          11 => 'Professions'
         )
     ),
     'currency' => array(

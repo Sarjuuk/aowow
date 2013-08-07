@@ -531,7 +531,8 @@ var mn_skills = [
     [,"Autre"],
     [8,"Armures utilisables","?skills=8"],
     [10,"Langues","?skills=10"],
-    [6,"Compétences d'armes","?skills=6"]
+    [6,"Compétences d'armes","?skills=6"],
+    [7,"Compétences de classe","?skills=7"]
 ];
 var mn_spells = [
     [,"Personnage"],
@@ -1741,7 +1742,9 @@ var g_skill_categories = {
     "-6": 'Compagnons',
     "-5": 'Montures',
     "-4": 'Traits raciaux',
+       5: 'Caractéristiques',
        6: 'Compétences d\'armes',
+       7: 'Compétences de classe',
        8: 'Armures utilisables',
        9: 'Compétences secondaires',
       10: 'Langues',

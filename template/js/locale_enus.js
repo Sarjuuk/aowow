@@ -531,7 +531,8 @@ var mn_skills = [
     [,"Other"],
     [8,"Armor Proficiencies","?skills=8"],
     [10,"Languages","?skills=10"],
-    [6,"Weapon Skills","?skills=6"]
+    [6,"Weapon Skills","?skills=6"],
+    [7,"Class Skills","?skills=7"]
 ];
 var mn_spells = [
     [,"Character"],
@@ -1799,7 +1800,9 @@ var g_skill_categories = {
     "-6": 'Companions',
     "-5": 'Mounts',
     "-4": 'Racial Traits',
+       5: 'Attributes',
        6: 'Weapon Skills',
+       7: 'Class Skills',
        8: 'Armor Proficiencies',
        9: 'Secondary Skills',
       10: 'Languages',
