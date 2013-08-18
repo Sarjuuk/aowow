@@ -13,45 +13,41 @@ class AchievementList extends BaseType
     public        $tooltip    = [];
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
-    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_achievement WHERE [filter] [cond]';
 
     public function __construct($conditions, $applyFilter = false)
     {
         parent::__construct($conditions, $applyFilter);
 
         // post processing
-        while ($this->iterate())
+        foreach ($this->iterate() as &$_curTpl)
         {
-            if (!$this->curTpl['iconString'])
-                $this->templates[$this->id]['iconString'] = 'INV_Misc_QuestionMark';
+            if (!$_curTpl['iconString'])
+                $_curTpl['iconString'] = 'INV_Misc_QuestionMark';
 
             //"rewards":[[11,137],[3,138]]   [type, typeId]
-            $rewards = [TYPE_ITEM => [], TYPE_TITLE => []];
-            if (!empty($this->curTpl['rewardIds']))
+            $_curTpl['rewards'] = [TYPE_ITEM => [], TYPE_TITLE => []];
+            if (!empty($_curTpl['rewardIds']))
             {
-                $rewIds  = explode(" ", $this->curTpl['rewardIds']);
+                $rewIds  = explode(" ", $_curTpl['rewardIds']);
                 foreach ($rewIds as $rewId)
                 {
                     if ($rewId > 0)
-                        $rewards[TYPE_ITEM][] = $rewId;
+                        $_curTpl['rewards'][TYPE_ITEM][]  = $rewId;
                     else if ($rewId < 0)
-                        $rewards[TYPE_TITLE][] = -$rewId;
+                        $_curTpl['rewards'][TYPE_TITLE][] = -$rewId;
                 }
             }
-            $this->templates[$this->id]['rewards'] = $rewards;
         }
-
-        $this->reset();                                     // restore 'iterator'
     }
 
     public function addGlobalsToJscript(&$template, $addMask = GLOBALINFO_ANY)
     {
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             if ($addMask & GLOBALINFO_SELF)
                 $template->extendGlobalData(self::$type, [$this->id => array(
                     'icon' => $this->curTpl['iconString'],
-                    'name' => Util::localizedString($this->curTpl, 'name')
+                    'name' => $this->getField('name', true)
                 )]);
 
             if ($addMask & GLOBALINFO_REWARDS)
@@ -69,16 +65,16 @@ class AchievementList extends BaseType
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'id'            => $this->id,
-                'name'          => Util::localizedString($this->curTpl, 'name'),
-                'description'   => Util::localizedString($this->curTpl, 'description'),
-                'points'        => $this->curTpl['points'],
-                'faction'       => $this->curTpl['faction'],
-                'category'      => $this->curTpl['category'],
-                'parentCat'     => $this->curTpl['parentCat'],
+                'id'          => $this->id,
+                'name'        => $this->getField('name', true),
+                'description' => $this->getField('description', true),
+                'points'      => $this->curTpl['points'],
+                'faction'     => $this->curTpl['faction'],
+                'category'    => $this->curTpl['category'],
+                'parentCat'   => $this->curTpl['parentCat'],
             );
 
             // going out on a limb here: type = 1 if in level 3 of statistics tree, so, IF (statistic AND parentCat NOT statistic (1)) i guess
@@ -93,7 +89,7 @@ class AchievementList extends BaseType
             if ($rewards)
                 $data[$this->id]['rewards'] = '['.implode(',', $rewards).']';
             else if (!empty($this->curTpl['reward']))
-                $data[$this->id]['reward'] = Util::localizedString($this->curTpl, 'reward');
+                $data[$this->id]['reward'] = $this->getField('reward', true);
         }
 
         return $data;
@@ -104,16 +100,16 @@ class AchievementList extends BaseType
     {
        $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'id'            => $this->id,
-                'name'          => Util::localizedString($this->curTpl, 'name'),
-                'description'   => Util::localizedString($this->curTpl, 'description'),
-                'points'        => $this->curTpl['points'],
-                'iconname'      => $this->curTpl['iconString'],
-                'count'         => $this->curTpl['reqCriteriaCount'],
-                'reward'        => empty($this->curTpl['reward_loc'.User::$localeId]) ? NULL : Util::localizedString($this->curTpl, 'reward')
+                'id'          => $this->id,
+                'name'        => $this->getField('name', true),
+                'description' => $this->getField('description', true),
+                'points'      => $this->curTpl['points'],
+                'iconname'    => $this->curTpl['iconString'],
+                'count'       => $this->curTpl['reqCriteriaCount'],
+                'reward'      => $this->getField('reward', true)
             );
         }
 
@@ -123,7 +119,7 @@ class AchievementList extends BaseType
     // only for current template
     public function getCriteria($idx = -1)
     {
-        if (empty($this->criteria))
+        foreach ($this->iterate() as $__)
         {
             $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievement` = ? ORDER BY `order` ASC', $this->id);
             if (!$result)
@@ -160,8 +156,8 @@ class AchievementList extends BaseType
         if ($tmp)
             $rows = array_merge($rows, $tmp);
 
-        $description = Util::localizedString($this->curTpl, 'description');
-        $name        = Util::localizedString($this->curTpl, 'name');
+        $description = $this->getField('description', true);
+        $name        = $this->getField('name', true);
         $criteria    = '';
 
         $i = 0;
@@ -232,10 +228,10 @@ class AchievementList extends BaseType
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                "n"  => Util::localizedString($this->curTpl, 'name'),
+                "n"  => $this->getField('name', true),
                 "s"  => $this->curTpl['faction'],
                 "t"  => TYPE_ACHIEVEMENT,
                 "ti" => $this->id

@@ -37,17 +37,18 @@ if ($compareString)
 
     $iList = new ItemList(array(['i.entry', $items]));
     $data  = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
-    foreach ($data as $id => $item)
+
+    foreach ($iList->iterate() as $itemId => $__)
     {
-        while ($iList->id != $id)
-            $iList->iterate();
+        if (empty($data[$itemId]))
+            continue;
 
         $pageData['items'][] = [
-            $id,
+            $itemId,
             Util::jsEscape($iList->getField('name', true)),
             $iList->getField('Quality'),
             $iList->getField('icon'),
-            json_encode($item, JSON_NUMERIC_CHECK)
+            json_encode($data[$itemId], JSON_NUMERIC_CHECK)
         ];
     }
 }

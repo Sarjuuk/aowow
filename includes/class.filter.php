@@ -509,11 +509,11 @@ class ItemsetListFilter extends Filter
 
         // reqLevel min
         if (isset($vl['minrl']))
-            $parts[] = 'i.reqLevel <= '.intVal($vl['minle']);
+            $parts[] = 'reqLevel <= '.intVal($vl['minrl']);
 
         // reqLevel max
         if (isset($vl['maxrl']))
-            $parts[] = 'i.reqLevel <= '.intVal($vl['maxle']);
+            $parts[] = 'reqLevel <= '.intVal($vl['maxrl']);
 
         // class
         if (isset($vl['cl']))

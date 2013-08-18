@@ -77,7 +77,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $acv->addGlobalsToJscript($smarty, GLOBALINFO_REWARDS);
     $pageData['page'] = $acv->getDetailedData()[$id];
-    $acv->reset();
 
     // infobox content
     switch ($acv->getField('faction'))
@@ -92,7 +91,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $pageData['infoBox'][] = Lang::$main['side'].': '.Lang::$game['si'][SIDE_BOTH];
     }
 
-    // todo: crosslink with charactersDB to check if realmFirsts are still available
+    // todo (low): crosslink with charactersDB to check if realmFirsts are still available
 
     $pageData['infoBox'] = array_merge($pageData['infoBox'], Lang::getInfoBoxForFlags($acv->getField('cuFlags')));
 
@@ -138,7 +137,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($foo = $acv->getField('rewards')[TYPE_ITEM])
     {
         $bar = new ItemList(array(['i.entry', $foo]));
-        while ($bar->iterate())
+        foreach ($bar->iterate() as $__)
         {
             $pageData['page']['itemReward'][$bar->id] = array(
                 'name'    => $bar->getField('name', true),
@@ -150,7 +149,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($foo = $acv->getField('rewards')[TYPE_TITLE])
     {
         $bar = new TitleList(array(['id', $foo]));
-        while ($bar->iterate())
+        foreach ($bar->iterate() as $__)
             $pageData['page']['titleReward'][] = sprintf(Lang::$achievement['titleReward'], $bar->id, trim(str_replace('%s', '', $bar->getField('male', true))));
     }
 

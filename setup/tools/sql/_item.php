@@ -29,7 +29,7 @@ class ItemSetup extends ItemList
 
     public function writeStatsTable()
     {
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $this->extendJsonStats();
             $updateFields = [];

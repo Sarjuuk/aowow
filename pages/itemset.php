@@ -17,8 +17,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($iSet->error)
         $smarty->notFound(Lang::$game['itemset']);
 
-    $iSet->reset();
-
     $ta   = $iSet->getField('contentGroup');
     $ty   = $iSet->getField('type');
     $ev   = $iSet->getField('holidayId');
@@ -78,26 +76,26 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $pieces  = [];
     $eqList  = [];
     $compare = [];
-    $iList = new ItemList(array(['i.entry', array_keys($iSet->pieceToSet)]));
-    $data  = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
-    foreach ($data as $iId => $item)
+    $iList   = new ItemList(array(['i.entry', array_keys($iSet->pieceToSet)]));
+    $data    = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
+    foreach ($iList->iterate() as $itemId => $__)
     {
-        while ($iList->id != $iId)
-            $iList->iterate();
+        if (empty($data[$itemId]))
+            continue;
 
         $slot = $iList->getField('InventoryType');
         $disp = $iList->getField('displayid');
         if ($slot && $disp)
             $eqList[] = [$slot, $disp];
 
-        $compare[] = $iId;
+        $compare[] = $itemId;
 
         $pieces[] = array(
-            'id'      => $iId,
+            'id'      => $itemId,
             'name'    => $iList->getField('name', true),
             'quality' => $iList->getField('Quality'),
             'icon'    => $iList->getField('icon'),
-            'json'    => json_encode($item, JSON_NUMERIC_CHECK)
+            'json'    => json_encode($data[$itemId], JSON_NUMERIC_CHECK)
         );
     }
 
@@ -129,12 +127,15 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     });
 
     $setSpells = new SpellList(array(['s.id', $foo]));
-    foreach ($spells as &$s)
+    foreach ($setSpells->iterate() as $spellId => $__)
     {
-        while ($setSpells->id != $s['id'])
-            $setSpells->iterate();
+        foreach ($spells as &$s)
+        {
+            if ($spellId != $s['id'])
+                continue;
 
-        $s['desc'] = $setSpells->parseText('description')[0];
+            $s['desc'] = $setSpells->parseText('description')[0];
+        }
     }
 
     // path

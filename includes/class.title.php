@@ -12,14 +12,13 @@ class TitleList extends BaseType
     public        $sources    = [];
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_titles WHERE [cond] ORDER BY Id ASC';
-    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_titles WHERE [cond]';
 
     public function __construct($data)
     {
         parent::__construct($data);
 
         // post processing
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             // preparse sources
             if (!empty($this->curTpl['source']))
@@ -32,7 +31,6 @@ class TitleList extends BaseType
                 }
             }
         }
-        $this->reset();                                     // push first element back for instant use
     }
 
     public function getListviewData()
@@ -40,7 +38,7 @@ class TitleList extends BaseType
         $data = [];
         $this->createSource();
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
                 'id'        => $this->id,
@@ -56,7 +54,7 @@ class TitleList extends BaseType
         }
 
         if ($_ = $this->getField('female', true))
-            $data['namefemale'] = $_;
+            $data[$this->id]['namefemale'] = $_;
 
         return $data;
     }
@@ -65,7 +63,7 @@ class TitleList extends BaseType
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id]['name'] = Util::jsEscape($this->getField('male', true));
 
@@ -84,7 +82,7 @@ class TitleList extends BaseType
             13 => []                                        // simple text
         );
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             if (empty($this->sources[$this->id]))
                 continue;

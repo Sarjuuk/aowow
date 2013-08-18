@@ -12,7 +12,9 @@
 
             <script type="text/javascript">
                 g_initPath({$page.path}, {if empty($filter.query)} 0 {else} 1 {/if});
-                {if isset($filter.query)}Menu.append(mn_database[6], '&filter={$filter.query|escape:'quotes'}'); // todo: menu order varies per locale{/if}
+{if isset($filter.query)}
+                Menu.modifyUrl(Menu.findItem(mn_database, [2]), {ldelim} filter: '+={$filter.query|escape:'quotes'}' {rdelim}, {ldelim} onAppendCollision: fi_mergeFilterParams {rdelim});
+{/if}
             </script>
 
             <div id="fi" style="display:{if empty($filter.query)}none{else}block{/if};">
@@ -47,7 +49,7 @@
                             <td class="padded" width="100%">
                                 <table><tr>
                                     <td>&nbsp;&nbsp;&nbsp;Required level: </td>
-                                    <td>&nbsp;<input type="text" name="minrl" maxlength="2" class="smalltextbox" /> - <input type="text" name="maxrl" maxlength="2" class="smalltextbox" /></td>
+                                    <td>&nbsp;<input type="text" name="minrl" maxlength="2" class="smalltextbox"{if isset($filter.minrl)} value="{$filter.minrl}"{/if} /> - <input type="text" name="maxrl" maxlength="2" class="smalltextbox"{if isset($filter.maxrl)} value="{$filter.maxrl}"{/if} /></td>
                                 </tr></table>
                             </td>
                         </tr><tr>

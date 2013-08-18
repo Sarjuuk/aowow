@@ -14,28 +14,6 @@ class ZoneList extends BaseType
     public static $type       = TYPE_ZONE;
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_zones z WHERE [cond] ORDER BY Id ASC';
-    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_zones WHERE [cond]';
-
-    // public function __construct($data)
-    // {
-        // parent::__construct($data);
-
-        // // post processing
-        // while ($this->iterate())
-        // {
-            // // preparse sources
-            // if (!empty($this->curTpl['source']))
-            // {
-                // $sources = explode(' ', $this->curTpl['source']);
-                // foreach ($sources as $src)
-                // {
-                    // $src = explode(':', $src);
-                    // $this->sources[$this->id][$src[0]][] = $src[1];
-                // }
-            // }
-        // }
-        // $this->reset();                                     // push first element back for instant use
-    // }
 
     public function getListviewData()
     {
@@ -117,7 +95,7 @@ visibleCols: ['heroiclevel', 'players']
     "minlevel":80,                                              // lfgDungeons.levelMax
     "name":"Abyssal Maw: Throne of the Tides",                  // areaTable.name_X
 */
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
                 'id'        => $this->id,
@@ -152,7 +130,7 @@ visibleCols: ['heroiclevel', 'players']
 
     public function addGlobalsToJscript(&$template, $addMask = 0)
     {
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
             $template->extendGlobalData(self::$type, [$this->id => ['name' => Util::jsEscape($this->getField('name', true))]]);
     }
 

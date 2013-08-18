@@ -119,7 +119,7 @@ if ($searchMask & 0x1)
 
     if ($data = $classes->getListviewData())
     {
-        while ($classes->iterate())
+        foreach ($classes->iterate() as $__)
             $data[$classes->id]['param1'] = '"class_'.strToLower($classes->getField('fileString')).'"';
 
         $found['class'] = array(
@@ -133,7 +133,7 @@ if ($searchMask & 0x1)
 
         if ($classes->getMatches() > $maxResults)
         {
-            // $found['class']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_', $classes->getMatches(), $maxResults);
+            // $found['class']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $classes->getMatches(), $maxResults);
             $found['class']['params']['_truncated'] = 1;
         }
     }
@@ -152,7 +152,7 @@ if ($searchMask & 0x2)
 
     if ($data = $races->getListviewData())
     {
-        while ($races->iterate())
+        foreach ($races->iterate() as $__)
             $data[$races->id]['param1'] = '"race_'.strToLower($races->getField('fileString')).'_male"';
 
         $found['race'] = array(
@@ -166,7 +166,7 @@ if ($searchMask & 0x2)
 
         if ($races->getMatches() > $maxResults)
         {
-            // $found['race']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_', $races->getMatches(), $maxResults);
+            // $found['race']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $races->getMatches(), $maxResults);
             $found['race']['params']['_truncated'] = 1;
         }
     }
@@ -211,7 +211,7 @@ if ($searchMask & 0x4)
 
         if ($titles->getMatches() > $maxResults)
         {
-            // $found['title']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_', $titles->getMatches(), $maxResults);
+            // $found['title']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $titles->getMatches(), $maxResults);
             $found['title']['params']['_truncated'] = 1;
         }
     }
@@ -255,7 +255,7 @@ if ($searchMask & 0x8)
 
         if ($wEvents->getMatches() > $maxResults)
         {
-            // $found['event']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_', $wEvents->getMatches(), $maxResults);
+            // $found['event']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $wEvents->getMatches(), $maxResults);
             $found['event']['params']['_truncated'] = 1;
         }
     }
@@ -268,7 +268,7 @@ if ($searchMask & 0x10)
 
     if ($data = $money->getListviewData())
     {
-        while ($money->iterate())
+        foreach ($money->iterate() as $__)
             $data[$money->id]['param1'] = '"'.strToLower($money->getField('iconString')).'"';
 
         $found['currency'] = array(
@@ -282,7 +282,7 @@ if ($searchMask & 0x10)
 
         if ($money->getMatches() > $maxResults)
         {
-            $found['currency']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_currenciesfound', $money->getMatches(), $maxResults);
+            $found['currency']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_currenciesfound', $money->getMatches(), $maxResults);
             $found['currency']['params']['_truncated'] = 1;
         }
     }
@@ -303,7 +303,7 @@ if ($searchMask & 0x20)
     {
         $sets->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
-        while ($sets->iterate())
+        foreach ($sets->iterate() as $__)
             $data[$sets->id]['param1'] = $sets->getField('quality');
 
         $found['itemset'] = array(
@@ -318,7 +318,7 @@ if ($searchMask & 0x20)
 
         if ($sets->getMatches() > $maxResults)
         {
-            $found['itemset']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsetsfound', $sets->getMatches(), $maxResults);
+            $found['itemset']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsetsfound', $sets->getMatches(), $maxResults);
             $found['itemset']['params']['_truncated'] = 1;
         }
     }
@@ -348,7 +348,7 @@ if ($searchMask & 0x40)
     {
         $items->addGlobalsToJscript($smarty);
 
-        while ($items->iterate())
+        foreach ($items->iterate() as $__)
         {
             $data[$items->id]['param1'] = '"'.$items->getField('icon').'"';
             $data[$items->id]['param2'] = $items->getField('Quality');
@@ -368,7 +368,7 @@ if ($searchMask & 0x40)
 
         if ($items->getMatches() > $maxResults)
         {
-            $found['item']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_itemsfound', $items->getMatches(), $maxResults);
+            $found['item']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsfound', $items->getMatches(), $maxResults);
             $found['item']['params']['_truncated'] = 1;
         }
     }
@@ -395,7 +395,7 @@ if ($searchMask & 0x80)
         if ($abilities->hasSetFields(['reagent1']))
             $vis[] = 'reagents';
 
-        while ($abilities->iterate())
+        foreach ($abilities->iterate() as $__)
         {
             $data[$abilities->id]['param1'] = '"'.strToLower($abilities->getField('iconString')).'"';
             $data[$abilities->id]['param2'] = '"'.$abilities->ranks[$abilities->id].'"';
@@ -417,7 +417,7 @@ if ($searchMask & 0x80)
 
         if ($abilities->getMatches() > $maxResults)
         {
-            $found['ability']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_abilitiesfound', $abilities->getMatches(), $maxResults);
+            $found['ability']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_abilitiesfound', $abilities->getMatches(), $maxResults);
             $found['ability']['params']['_truncated'] = 1;
         }
     }
@@ -442,7 +442,7 @@ if ($searchMask & 0x100)
         if ($abilities->hasSetFields(['reagent1']))
             $vis[] = 'reagents';
 
-        while ($talents->iterate())
+        foreach ($talents->iterate() as $__)
         {
             $data[$talents->id]['param1'] = '"'.strToLower($talents->getField('iconString')).'"';
             $data[$talents->id]['param2'] = '"'.$talents->ranks[$talents->id].'"';
@@ -464,7 +464,7 @@ if ($searchMask & 0x100)
 
         if ($talents->getMatches() > $maxResults)
         {
-            $found['talent']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_talentsfound', $talents->getMatches(), $maxResults);
+            $found['talent']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_talentsfound', $talents->getMatches(), $maxResults);
             $found['talent']['params']['_truncated'] = 1;
         }
     }
@@ -485,7 +485,7 @@ if ($searchMask & 0x200)
     {
         $glyphs->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
-        while ($glyphs->iterate())
+        foreach ($glyphs->iterate() as $__)
             $data[$glyphs->id]['param1'] = '"'.strToLower($glyphs->getField('iconString')).'"';
 
         $found['glyph'] = array(
@@ -504,7 +504,7 @@ if ($searchMask & 0x200)
 
         if ($glyphs->getMatches() > $maxResults)
         {
-            $found['glyph']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_glyphsfound', $glyphs->getMatches(), $maxResults);
+            $found['glyph']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_glyphsfound', $glyphs->getMatches(), $maxResults);
             $found['glyph']['params']['_truncated'] = 1;
         }
     }
@@ -525,7 +525,7 @@ if ($searchMask & 0x400)
     {
         $prof->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
-        while ($prof->iterate())
+        foreach ($prof->iterate() as $__)
             $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
 
         $found['proficiency'] = array(
@@ -544,7 +544,7 @@ if ($searchMask & 0x400)
 
         if ($prof->getMatches() > $maxResults)
         {
-            $found['proficiency']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_spellsfound', $prof->getMatches(), $maxResults);
+            $found['proficiency']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $prof->getMatches(), $maxResults);
             $found['proficiency']['params']['_truncated'] = 1;
         }
     }
@@ -565,7 +565,7 @@ if ($searchMask & 0x800)
     {
         $prof->addGlobalsToJscript($smarty);
 
-        while ($prof->iterate())
+        foreach ($prof->iterate() as $__)
             $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
 
         $found['profession'] = array(
@@ -584,7 +584,7 @@ if ($searchMask & 0x800)
 
         if ($prof->getMatches() > $maxResults)
         {
-            $found['profession']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_professionfound', $prof->getMatches(), $maxResults);
+            $found['profession']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_professionfound', $prof->getMatches(), $maxResults);
             $found['profession']['params']['_truncated'] = 1;
         }
     }
@@ -606,7 +606,7 @@ if ($searchMask & 0x1000)
     {
         $vPets->addGlobalsToJscript($smarty);
 
-        while ($vPets->iterate())
+        foreach ($vPets->iterate() as $__)
             $data[$vPets->id]['param1'] = '"'.strToLower($vPets->getField('iconString')).'"';
 
         $found['companion'] = array(
@@ -625,7 +625,7 @@ if ($searchMask & 0x1000)
 
         if ($vPets->getMatches() > $maxResults)
         {
-            $found['companion']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_companionsfound', $vPets->getMatches(), $maxResults);
+            $found['companion']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_companionsfound', $vPets->getMatches(), $maxResults);
             $found['companion']['params']['_truncated'] = 1;
         }
     }
@@ -646,7 +646,7 @@ if ($searchMask & 0x2000)
     {
         $mounts->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
-        while ($mounts->iterate())
+        foreach ($mounts->iterate() as $__)
             $data[$mounts->id]['param1'] = '"'.strToLower($mounts->getField('iconString')).'"';
 
         $found['mount'] = array(
@@ -664,7 +664,7 @@ if ($searchMask & 0x2000)
 
         if ($mounts->getMatches() > $maxResults)
         {
-            $found['mount']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_mountsfound', $mounts->getMatches(), $maxResults);
+            $found['mount']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_mountsfound', $mounts->getMatches(), $maxResults);
             $found['mount']['params']['_truncated'] = 1;
         }
     }
@@ -702,7 +702,7 @@ if ($searchMask & 0x4000)
 
         if ($npcs->getMatches() > $maxResults)
         {
-            $found['npc']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), $maxResults);
+            $found['npc']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), $maxResults);
             $found['npc']['params']['_truncated'] = 1;
         }
     }
@@ -735,7 +735,7 @@ if ($searchMask & 0x8000)
 
     if ($quests->getMatches() > $maxResults)
     {
-        $found['quest']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_questsfound', $quests->getMatches(), $maxResults);
+        $found['quest']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_questsfound', $quests->getMatches(), $maxResults);
         $found['quest']['params']['_truncated'] = 1;
     }
 }
@@ -755,7 +755,7 @@ if ($searchMask & 0x10000)
     {
         $acvs->addGlobalsToJScript($smarty);
 
-        while ($acvs->iterate())
+        foreach ($acvs->iterate() as $__)
             $data[$acvs->id]['param1'] = '"'.strToLower($acvs->getField('iconString')).'"';
 
         $found['achievement'] = array(
@@ -772,7 +772,7 @@ if ($searchMask & 0x10000)
 
         if ($acvs->getMatches() > $maxResults)
         {
-            $found['achievement']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_achievementsfound', $acvs->getMatches(), $maxResults);
+            $found['achievement']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_achievementsfound', $acvs->getMatches(), $maxResults);
             $found['achievement']['params']['_truncated'] = 1;
         }
     }
@@ -809,7 +809,7 @@ if ($searchMask & 0x20000)
 
         if ($stats->getMatches() > $maxResults)
         {
-            $found['statistic']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_statisticsfound', $stats->getMatches(), $maxResults);
+            $found['statistic']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_statisticsfound', $stats->getMatches(), $maxResults);
             $found['statistic']['params']['_truncated'] = 1;
         }
     }
@@ -834,7 +834,7 @@ if ($searchMask & 0x400000)
 
     if ($data = $pets->getListviewData())
     {
-        while ($pets->iterate())
+        foreach ($pets->iterate() as $__)
             $data[$pets->id]['param1'] = '"'.$pets->getField('iconString').'"';
 
         $found['pet'] = array(
@@ -848,7 +848,7 @@ if ($searchMask & 0x400000)
 
         if ($pets->getMatches() > $maxResults)
         {
-            $found['pet']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_petsfound', $pets->getMatches(), $maxResults);
+            $found['pet']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_petsfound', $pets->getMatches(), $maxResults);
             $found['pet']['params']['_truncated'] = 1;
         }
     }
@@ -869,7 +869,7 @@ if ($searchMask & 0x800000)
     {
         $npcAbilities->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
-        while ($npcAbilities->iterate())
+        foreach ($npcAbilities->iterate() as $__)
             $data[$npcAbilities->id]['param1'] = '"'.strToLower($npcAbilities->getField('iconString')).'"';
 
         $found['npcSpell'] = array(
@@ -889,7 +889,7 @@ if ($searchMask & 0x800000)
 
         if ($npcAbilities->getMatches() > $maxResults)
         {
-            $found['npcSpell']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_spellsfound', $npcAbilities->getMatches(), $maxResults);
+            $found['npcSpell']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $npcAbilities->getMatches(), $maxResults);
             $found['npcSpell']['params']['_truncated'] = 1;
         }
     }
@@ -910,7 +910,7 @@ if ($searchMask & 0x1000000)
     {
         $misc->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
-        while ($misc->iterate())
+        foreach ($misc->iterate() as $__)
             $data[$misc->id]['param1'] = '"'.strToLower($misc->getField('iconString')).'"';
 
         $found['spell'] = array(
@@ -929,7 +929,7 @@ if ($searchMask & 0x1000000)
 
         if ($misc->getMatches() > $maxResults)
         {
-            $found['spell']['params']['note'] = '$'.sprintf(Util::$narrowResultString, 'LANG.lvnote_spellsfound', $misc->getMatches(), $maxResults);
+            $found['spell']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $misc->getMatches(), $maxResults);
             $found['spell']['params']['_truncated'] = 1;
         }
     }

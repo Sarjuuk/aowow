@@ -14,7 +14,6 @@ abstract class BaseType
     protected $matches    = null;                           // total matches unaffected by sqlLimit in config
 
     protected $setupQuery = '';
-    protected $matchQuery = '';
 
     /*
     *   condition as array [expression, value, operator]
@@ -56,7 +55,7 @@ abstract class BaseType
         $limit     = ' LIMIT '.$AoWoWconf['sqlLimit'];
         $className = get_class($this);
 
-        if (!$this->setupQuery || !$this->matchQuery)
+        if (!$this->setupQuery)
             return;
 
         // may be called without filtering
@@ -155,48 +154,53 @@ abstract class BaseType
         }
 
         foreach ($conditions as $c)
-            if ($x = $resolveCondition($c, $linking))
-                $sql[] = $x;
+            if ($c)
+                if ($x = $resolveCondition($c, $linking))
+                    $sql[] = $x;
 
         // todo: add strings propperly without them being escaped by simpleDB..?
         $this->setupQuery  = str_replace('[filter]', $this->filter && $this->filter->buildQuery() ? $this->filter->getQuery().' AND ' : NULL, $this->setupQuery);
         $this->setupQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                     $this->setupQuery);
         $this->setupQuery .= $limit;
 
-        $this->matchQuery  = str_replace('[filter]', $this->filter && $this->filter->buildQuery() ? $this->filter->getQuery().' AND ' : NULL, $this->matchQuery);
-        $this->matchQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                     $this->matchQuery);
-
-        $rows = DB::Aowow()->Select($this->setupQuery);
+        $rows = DB::Aowow()->SelectPage($cnt, $this->setupQuery);
         if (!$rows)
             return;
+
+        $this->matches = $cnt;
 
         foreach ($rows as $k => $tpl)
             $this->templates[$k] = $tpl;
 
+        $this->curTpl = reset($this->templates);
+        $this->id     = key($this->templates);
+        $this->error  = false;
+    }
+
+    public function &iterate()
+    {
+        // reset on __construct
         $this->reset();
 
-        $this->error = false;
+        while (list($id, $tpl) = each($this->templates))
+        {
+            $this->id     = $id;
+            $this->curTpl = &$this->templates[$id];         // do not use $tpl as we want to be referenceable
+
+            yield $id => $this->curTpl;
+
+            unset($this->curTpl);                           // kill reference or it will 'bleed' into the next iteration
+        }
+
+        // reset on __destruct .. Generator, Y U NO HAVE __destruct ?!
+        $this->reset();
     }
 
-    public function iterate($qty = 1)
+    protected function reset()
     {
-        if (!$this->curTpl)                                 // exceeded end of line .. array .. in last iteration
-            reset($this->templates);
-
-        $this->curTpl = current($this->templates);
-        $field        = $this->curTpl ? Util::getIdFieldName($this->curTpl) : null;
-        $this->id     = $this->curTpl ? (int)$this->curTpl[$field] : 0;
-
-        while ($qty--)
-            next($this->templates);
-
-        return $this->id;
-    }
-
-    public function reset()
-    {
+        unset($this->curTpl);                               // kill reference or it will 'bleed' into the next iteration
         $this->curTpl = reset($this->templates);
-        $this->id     = (int)$this->curTpl[Util::getIdFieldName($this->curTpl)];
+        $this->id     = key($this->templates);
     }
 
     // read-access to templates
@@ -212,11 +216,13 @@ abstract class BaseType
         return is_numeric($value) ? floatVal($value) : $value;
     }
 
+    public function getFoundIDs()
+    {
+        return array_keys($this->templates);
+    }
+
     public function getMatches()
     {
-        if ($this->matches === null)
-            $this->matches = DB::Aowow()->SelectCell($this->matchQuery);
-
         return $this->matches;
     }
 
@@ -264,9 +270,7 @@ trait listviewHelper
 
         $result = 0x0;
 
-        $this->reset();
-
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             foreach ($fields as $k => $str)
             {
@@ -278,7 +282,10 @@ trait listviewHelper
             }
 
             if (empty($fields))                             // all set .. return early
+            {
+                $this->reset();                             // Generators have no __destruct, reset manually, when not doing a full iteration
                 return $result;
+            }
         }
 
         return $result;
@@ -292,11 +299,10 @@ trait listviewHelper
         $base   = [];
         $result = 0x0;
 
-        $this->reset();
         foreach ($fields as $k => $str)
             $base[$str] = $this->getField($str);
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             foreach ($fields as $k => $str)
             {
@@ -308,7 +314,10 @@ trait listviewHelper
             }
 
             if (empty($fields))                             // all fields diff .. return early
+            {
+                $this->reset();                             // Generators have no __destruct, reset manually, when not doing a full iteration
                 return $result;
+            }
         }
 
         return $result;
@@ -706,12 +715,12 @@ class SmartyAoWoW extends Smarty
                     unset($ann[$k]);
             }
 
-            $this->_tpl_vars['announcements'] = $ann;
+            $tv['announcements'] = $ann;
         }
 
         $this->applyGlobals();
 
-        $this->_tpl_vars['mysql'] = DB::Aowow()->getStatistics();
+        $tv['mysql'] = DB::Aowow()->getStatistics();
 
         parent::display($tpl);
     }
@@ -944,6 +953,38 @@ class Util
         )
     );
 
+    public static $trainerTemplates         = array(        // TYPE => Id => templateList
+        TYPE_CLASS => array(
+              1 => [-200001, -200002],                      // Warrior
+              2 => [-200003, -200004, -200020, -200021],    // Paladin
+              3 => [-200013, -200014],                      // Hunter
+              4 => [-200015, -200016],                      // Rogue
+              5 => [-200011, -200012],                      // Priest
+              6 => [-200019],                               // DK
+              7 => [-200017, -200018],                      // Shaman (HighlevelAlly Id missing..?)
+              8 => [-200007, -200008],                      // Mage
+              9 => [-200009, -200010],                      // Warlock
+             11 => [-200005, -200006]                       // Druid
+        ),
+        TYPE_SKILL => array(
+            171 => [-201001, -201002, -201003],             // Alchemy
+            164 => [-201004, -201005, -201006, -201007, -201008],// Blacksmithing
+            333 => [-201009, -201010, -201011],             // Enchanting
+            202 => [-201012, -201013, -201014, -201015, -201016, -201017], // Engineering
+            182 => [-201018, -201019, -201020],             // Herbalism
+            773 => [-201021, -201022, -201023],             // Inscription
+            755 => [-201024, -201025, -201026],             // Jewelcrafting
+            165 => [-201027, -201028, -201029, -201030, -201031, -201032], // Leatherworking
+            186 => [-201033, -201034, -201035],             // Mining
+            393 => [-201036, -201037, -201038],             // Skinning
+            197 => [-201039, -201040, -201041, -201042],    // Tailoring
+            356 => [-202001, -202002, -202003],             // Fishing
+            185 => [-202004, -202005, -202006],             // Cooking
+            129 => [-202007, -202008, -202009],             // First Aid
+            129 => [-202010, -202011, -202012]              // Riding
+        )
+    );
+
     public static $sockets                  = array(        // jsStyle Strings
         'meta',                         'red',                          'yellow',                       'blue'
     );
@@ -986,8 +1027,9 @@ class Util
     public static $changeLevelString        = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_staticTooltipLevelClick(this, null, 0)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><!--lvl-->%s</a>';
     public static $setRatingLevelString     = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_setRatingLevel(this, %s, %s, %s)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</a>';
 
-    public static $filterResultString       = '$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
-    public static $narrowResultString       = '$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
+    public static $filterResultString       = '$$WH.sprintf(LANG.lvnote_filterresults, \'%s\')';
+    public static $tryFilteringString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
+    public static $tryNarrowingString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
     public static $setCriteriaString        = "fi_setCriteria(%s, %s, %s);\n";
 
     public static $dfnString                = '<dfn title="%s" class="w">%s</dfn>';
@@ -1994,22 +2036,6 @@ class Util
         $rest  = mb_substr($str, 1, $len, 'UTF-8');
 
         return mb_strtoupper($first, 'UTF-8') . $rest;
-    }
-
-    // BaseType::_construct craaap!
-    // todo: unify indizes
-    public static function getIdFieldName($tpl)
-    {
-        if (isset($tpl['entry']))
-            return 'entry';
-        else if (isset($tpl['Id']))
-            return 'Id';
-        else if (isset($tpl['id']))
-            return 'id';
-        else if (isset($tpl['ID']))
-            return 'ID';
-        else
-            return null;
     }
 }
 

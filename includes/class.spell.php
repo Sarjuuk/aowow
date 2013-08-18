@@ -35,7 +35,6 @@ class SpellList extends BaseType
     private       $charLevel   = MAX_LEVEL;
 
     protected     $setupQuery  = 'SELECT *, id AS ARRAY_KEY FROM ?_spell s WHERE [filter] [cond]';
-    protected     $matchQuery  = 'SELECT COUNT(*) FROM ?_spell s WHERE [filter] [cond]';
 
     public function __construct($conditions, $applyFilter = false)
     {
@@ -46,28 +45,28 @@ class SpellList extends BaseType
 
         // post processing
         $foo = [];
-        while ($this->iterate())
+        foreach ($this->iterate() as &$_curTpl)
         {
             // required for globals
             for ($i = 1; $i <= 3; $i++)
                 if ($this->canCreateItem())
-                    $foo[] = (int)$this->curTpl['effect'.$i.'CreateItemId'];
+                    $foo[] = (int)$_curTpl['effect'.$i.'CreateItemId'];
 
             for ($i = 1; $i <= 8; $i++)
-                if ($this->curTpl['reagent'.$i] > 0)
-                    $foo[] = (int)$this->curTpl['reagent'.$i];
+                if ($_curTpl['reagent'.$i] > 0)
+                    $foo[] = (int)$_curTpl['reagent'.$i];
 
             for ($i = 1; $i <= 2; $i++)
-                if ($this->curTpl['tool'.$i] > 0)
-                    $foo[] = (int)$this->curTpl['tool'.$i];
+                if ($_curTpl['tool'.$i] > 0)
+                    $foo[] = (int)$_curTpl['tool'.$i];
 
             // ranks
-            $this->ranks[$this->id] = Util::localizedString($this->curTpl, 'rank');
+            $this->ranks[$this->id] = $this->getField('rank', true);
 
             // sources
-            if (!empty($this->curTpl['source']))
+            if (!empty($_curTpl['source']))
             {
-                $sources = explode(' ', $this->curTpl['source']);
+                $sources = explode(' ', $_curTpl['source']);
                 foreach ($sources as $src)
                 {
                     $src = explode(':', $src);
@@ -76,34 +75,39 @@ class SpellList extends BaseType
                 }
             }
 
+            // set full masks to 0
+            $_curTpl['reqClassMask'] &= CLASS_MASK_ALL;
+            if ($_curTpl['reqClassMask'] == CLASS_MASK_ALL)
+                $_curTpl['reqClassMask'] = 0;
+
+            $_curTpl['reqRaceMask'] &= RACE_MASK_ALL;
+            if ($_curTpl['reqRaceMask'] == RACE_MASK_ALL)
+                $_curTpl['reqRaceMask'] = 0;
+
             // unpack skillLines
-            $this->curTpl['skillLines'] = [];
-            if ($this->curTpl['skillLine1'] < 0)
+            $_curTpl['skillLines'] = [];
+            if ($_curTpl['skillLine1'] < 0)
             {
-                foreach (Util::$skillLineMask[$this->curTpl['skillLine1']] as $idx => $pair)
-                    if ($this->curTpl['skillLine2OrMask'] & (1 << $idx))
-                        $this->curTpl['skillLines'][] = $pair[1];
+                foreach (Util::$skillLineMask[$_curTpl['skillLine1']] as $idx => $pair)
+                    if ($_curTpl['skillLine2OrMask'] & (1 << $idx))
+                        $_curTpl['skillLines'][] = $pair[1];
             }
-            else if ($sec = $this->curTpl['skillLine2OrMask'])
+            else if ($sec = $_curTpl['skillLine2OrMask'])
             {
                 if ($this->id == 818)                       // and another hack .. basic Campfire (818) has deprecated skill Survival (142) as first skillLine
-                    $this->curTpl['skillLines'] = [$sec, $this->curTpl['skillLine1']];
+                    $_curTpl['skillLines'] = [$sec, $_curTpl['skillLine1']];
                 else
-                    $this->curTpl['skillLines'] = [$this->curTpl['skillLine1'], $sec];
+                    $_curTpl['skillLines'] = [$_curTpl['skillLine1'], $sec];
             }
-            else if ($prim = $this->curTpl['skillLine1'])
-                $this->curTpl['skillLines'] = [$prim];
+            else if ($prim = $_curTpl['skillLine1'])
+                $_curTpl['skillLines'] = [$prim];
 
-            unset($this->curTpl['skillLine1']);
-            unset($this->curTpl['skillLine2OrMask']);
-            $this->templates[$this->id] = $this->curTpl;
-
+            unset($_curTpl['skillLine1']);
+            unset($_curTpl['skillLine2OrMask']);
         }
 
         if ($foo)
             $this->relItems = new ItemList(array(['i.entry', array_unique($foo)], 0));
-
-        $this->reset();                                     // restore 'iterator'
     }
 
     // use if you JUST need the name
@@ -119,7 +123,7 @@ class SpellList extends BaseType
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $stats = [];
 
@@ -199,7 +203,6 @@ class SpellList extends BaseType
                     case 135:                               // healing splpwr (healing & any) .. not as a mask..
                     {
                         @$stats[ITEM_MOD_SPELL_HEALING_DONE] += $bp;
-
                         break;
                     }
                     case 35:                                // ModPower - MiscVal:type see defined Powers only energy/mana in use
@@ -310,16 +313,21 @@ class SpellList extends BaseType
         for ($i = 1; $i <= 2; $i++)
         {
             // Tools
-            if ($_ = $this->curTpl['tool'.$i])
+            if (!$this->curTpl['tool'.$i])
+                continue;
+
+            foreach ($this->relItems->iterate() as $relId => $__)
             {
-                while ($this->relItems->id != $_)
-                    $this->relItems->iterate();
+                if ($relId != $this->curTpl['tool'.$i])
+                    continue;
 
                 $tools[$i-1] = array(
-                    'itemId'  => $_,
+                    'itemId'  => $relId,
                     'name'    => $this->relItems->getField('name', true),
                     'quality' => $this->relItems->getField('quality')
                 );
+
+                break;
             }
 
             // TotemCategory
@@ -1017,9 +1025,9 @@ class SpellList extends BaseType
     $this->charLevel   = $level;
 
     // step 0: get text
-        $data = Util::localizedString($this->curTpl, $type);
+        $data = $this->getField($type, true);
         if (empty($data) || $data == "[]")                  // empty tooltip shouldn't be displayed anyway
-            return array();
+            return array("", []);
 
     // step 1: if the text is supplemented with text-variables, get and replace them
         if (empty($this->spellVars[$this->id]) && $this->curTpl['spellDescriptionVariableId'] > 0)
@@ -1237,7 +1245,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
             return $this->buffs[$this->id];
 
         // doesn't have a buff
-        if (!Util::localizedString($this->curTpl, 'buff'))
+        if (!$this->getField('buff', true))
             return array();
 
         $this->interactive = $interactive;
@@ -1245,7 +1253,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         $x = '<table><tr>';
 
         // spellName
-        $x .= '<td><b class="q">'.Util::localizedString($this->curTpl, 'name').'</b></td>';
+        $x .= '<td><b class="q">'.$this->getField('name', true).'</b></td>';
 
         // dispelType (if applicable)
         if ($dispel = Lang::$game['dt'][$this->curTpl['dispelType']])
@@ -1415,13 +1423,13 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         if ($reqItems)
             $xTmp[] = Lang::$game['requires2'].' '.$reqItems;
 
-        if ($desc)
+        if ($desc[0])
             $xTmp[] = '<span class="q">'.$desc[0].'</span>';
 
         if ($createItem)
-            $xTmp[] = '<br />'.$createItem;
+            $xTmp[] = $createItem;
 
-        if ($tools || $reagents || $reqItems || $desc || $createItem)
+        if ($xTmp)
             $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
 
         $this->tooltips[$this->id] = array($x, $desc ? $desc[1] : null);
@@ -1487,7 +1495,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
     public function getListviewData()
     {
         $data = [];
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $quality = ($this->curTpl['cuFlags'] & SPELL_CU_QUALITY_MASK) >> 8;
             $talent  = $this->curTpl['cuFlags'] & (SPELL_CU_TALENT | SPELL_CU_TALENTSPELL) && $this->curTpl['spellLevel'] <= 1;
@@ -1549,22 +1557,14 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
             if ($this->curTpl['typeCat'] == -13)
                 $data[$this->id]['glyphtype'] = $this->curTpl['cuFlags'] & SPELL_CU_GLYPH_MAJOR ? 1 : 2;
 
-            if ($r = Util::localizedString($this->curTpl, 'rank'))
+            if ($r = $this->getField('rank', true))
                 $data[$this->id]['rank'] = $r;
 
-            if (!empty($this->curTpl['reqClassMask']))
-            {
-                $mask = $this->curTpl['reqClassMask'] & CLASS_MASK_ALL;
-                if ($mask && $mask != CLASS_MASK_ALL)
-                    $data[$this->id]['reqclass'] = $mask;
-            }
+            if ($mask = $this->curTpl['reqClassMask'])
+                $data[$this->id]['reqclass'] = $mask;
 
-            if (!empty($this->curTpl['reqRaceMask']))
-            {
-                $mask = $this->curTpl['reqRaceMask'] & RACE_MASK_ALL;
-                if ($mask && $mask != RACE_MASK_ALL)
-                    $data[$this->id]['reqrace'] = $mask;
-            }
+            if ($mask = $this->curTpl['reqRaceMask'])
+                $data[$this->id]['reqrace'] = $mask;
         }
 
         return $data;
@@ -1644,12 +1644,9 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
     public function addGlobalsToJScript(&$template, $addMask = GLOBALINFO_ANY)
     {
         if ($this->relItems && ($addMask & GLOBALINFO_RELATED))
-        {
-            $this->relItems->reset();
             $this->relItems->addGlobalsToJscript($template);
-        }
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             if ($addMask & GLOBALINFO_RELATED)
             {
@@ -1675,7 +1672,6 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
             }
         }
     }
-
 }
 
 ?>

@@ -2409,7 +2409,7 @@ Tabs.onShow = function(newTab, oldTab) {
             padd = this.parent.offsetHeight + 15;
         }
 
-        setTimeout(g_scrollTo.bind(null, el, padd), 10);
+        setTimeout($WH.g_scrollTo.bind(null, el, padd), 10);
     }
 };
 
@@ -12496,7 +12496,7 @@ Menu.fixUrls(mn_classes, '?class=');
 Menu.fixUrls(mn_currencies, '?currencies=');
 Menu.fixUrls(mn_factions, '?factions=');
 Menu.fixUrls(mn_items, '?items=');
-Menu.fixUrls(mn_itemSets, '?itemsets?filter=cl=', { hash: '0-2+1' });
+Menu.fixUrls(mn_itemSets, '?itemsets&filter=cl=', { hash: '0-2+1' });
 Menu.fixUrls(mn_npcs, '?npcs=');
 Menu.fixUrls(mn_objects, '?objects=');
 Menu.fixUrls(mn_petCalc,  '?petcalc=');

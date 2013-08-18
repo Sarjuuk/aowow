@@ -43,7 +43,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $events = new WorldEventList($condition);
 
     $deps = [];
-    while ($events->iterate())
+    foreach ($events->iterate() as $__)
         if ($d = $events->getField('requires'))
             $deps[$events->id] = $d;
 

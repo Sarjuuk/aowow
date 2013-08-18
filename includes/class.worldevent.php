@@ -8,7 +8,6 @@ class WorldEventList extends BaseType
     public static  $type         = TYPE_WORLDEVENT;
 
     protected      $setupQuery   = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id WHERE [cond] ORDER BY -e.id ASC';
-    protected      $matchQuery   = 'SELECT COUNT(1) FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id WHERE [cond]';
 
     public function __construct($data)
     {
@@ -18,7 +17,7 @@ class WorldEventList extends BaseType
         $replace = [];
 
         // post processing
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             // emulate category
             $sT = $this->curTpl['scheduleType'];
@@ -58,7 +57,6 @@ class WorldEventList extends BaseType
             unset($this->templates[$old]);
             $this->templates[$data['id']] = $data;
         }
-        $this->reset();
     }
 
     public static function getName($id)
@@ -117,7 +115,7 @@ class WorldEventList extends BaseType
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
                 'category'  => $this->curTpl['category'],
@@ -134,7 +132,7 @@ class WorldEventList extends BaseType
 
     public function addGlobalsToJScript(&$template, $addMask = 0)
     {
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $template->extendGlobalData(self::$type, [$this->id => array(
                 'name' => $this->getField('name', true),

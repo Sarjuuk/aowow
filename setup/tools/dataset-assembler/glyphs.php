@@ -69,7 +69,7 @@ if (!defined('AOWOW_REVISION'))
         User::useLocale($lId);
 
         $glyphsOut = [];
-        while ($glyphSpells->iterate())
+        foreach ($glyphSpells->iterate() as $__)
         {
             $pop = $glyphList[$glyphSpells->id];
 

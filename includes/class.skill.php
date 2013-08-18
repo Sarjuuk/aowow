@@ -9,16 +9,15 @@ class SkillList extends BaseType
     public static $type = TYPE_SKILL;
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_skillLine sl WHERE [cond] ORDER BY id ASC';
-    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_skillLine sl WHERE [cond]';
 
     public function __construct($data)
     {
         parent::__construct($data);
 
         // post processing
-        while ($this->iterate())
+        foreach ($this->iterate() as &$_curTpl)
         {
-            $_ = &$this->curTpl['specializations'];         // shorthand
+            $_ = &$_curTpl['specializations'];              // shorthand
             if (!$_)
                 $_ = [0, 0, 0, 0, 0];
             else
@@ -27,11 +26,7 @@ class SkillList extends BaseType
                 while (count($_) < 5)
                     $_[] = 0;
             }
-
-            $this->templates[$this->id] = $this->curTpl;
         }
-
-        $this->reset();                                     // push first element back for instant use
     }
 
     public static function getName($id)
@@ -56,8 +51,9 @@ class SkillList extends BaseType
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
+
             $data[$this->id] = array(
                 'category'        => $this->curTpl['typeCat'],
                 'categorybak'     => $this->curTpl['categoryId'],
@@ -75,7 +71,7 @@ class SkillList extends BaseType
 
     public function addGlobalsToJScript(&$template, $addMask = 0)
     {
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $template->extendGlobalData(self::$type, [
                 $this->id => [

@@ -13,7 +13,6 @@ class CreatureList extends BaseType
     public        $tooltips   = [];
 
     protected     $setupQuery = 'SELECT ct.*, ct.id AS ARRAY_KEY, ft.A, ft.H, ft.factionId FROM ?_creature ct LEFT JOIN ?_factiontemplate ft ON ft.id = ct.faction_A WHERE [filter] [cond]';
-    protected     $matchQuery = 'SELECT COUNT(*) FROM ?_creature ct WHERE [filter] [cond]';
 
     public static function getName($id)
     {
@@ -114,7 +113,7 @@ class CreatureList extends BaseType
 
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             if ($addInfoMask & NPCINFO_MODEL)
             {
@@ -168,7 +167,7 @@ class CreatureList extends BaseType
 
     public function addGlobalsToJScript(&$template, $addMask = 0)
     {
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
             $template->extendGlobalData(TYPE_NPC, [$this->id => ['name' => $this->getField('name', true)]]);
     }
 

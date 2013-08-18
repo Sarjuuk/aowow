@@ -18,10 +18,8 @@ class ItemList extends BaseType
 
     private       $ssd         = [];
     private       $weightQuery = 'SELECT i.*, iX.*, l.*, i.entry AS ARRAY_KEY, [weightsA] AS sum FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry JOIN ?_item_stats ais ON ais.id = i.entry WHERE [weightsB] AND [cond] ORDER BY sum DESC';
-    private       $weightMatch = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry JOIN ?_item_stats ais ON ais.id = i.entry WHERE [cond]';
 
     protected     $setupQuery  = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] ORDER BY i.Quality DESC';
-    protected     $matchQuery  = 'SELECT COUNT(1) FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond]';
 
     public function __construct($conditions, $miscData = null)
     {
@@ -45,19 +43,15 @@ class ItemList extends BaseType
             $wtA = $wtA ? '('.implode(' + ', $wtA).')' : 1;
             $wtB = $wtB ? '('.implode(' AND ', $wtB).')' : 1;
 
-            $this->setupQuery = $this->weightQuery;
-            $this->matchQuery = $this->weightMatch;
-
-            $this->setupQuery = strtr($this->setupQuery, ['[weightsA]' => $wtA, '[weightsB]' => $wtB]);
-            $this->matchQuery = strtr($this->matchQuery, ['[weightsA]' => $wtA, '[weightsB]' => $wtB]);
+            $this->setupQuery = strtr($this->weightQuery, ['[weightsA]' => $wtA, '[weightsB]' => $wtB]);
         }
 
         parent::__construct($conditions);
 
-        while ($this->iterate())
+        foreach ($this->iterate() as &$_curTpl)
         {
             // item is scaling; overwrite other values
-            if ($this->curTpl['ScalingStatDistribution'] > 0 && $this->curTpl['ScalingStatValue'] > 0)
+            if ($_curTpl['ScalingStatDistribution'] > 0 && $_curTpl['ScalingStatValue'] > 0)
                 $this->initScalingStats();
 
             $this->initJsonStats();
@@ -67,16 +61,14 @@ class ItemList extends BaseType
                 $this->json[$this->id]['itemset'] = $miscData['pcsToSet'][$this->id];
 
             // unify those pesky masks
-            $_ = $this->curTpl['AllowableClass'];
+            $_ = &$_curTpl['AllowableClass'];
             if ($_ < 0 || ($_ & CLASS_MASK_ALL) == CLASS_MASK_ALL)
-                $this->templates[$this->id]['AllowableClass'] = 0;
+                $_ = 0;
 
-            $_ = $this->curTpl['AllowableRace'];
+            $_ = &$_curTpl['AllowableRace'];
             if ($_ < 0 || ($_ & RACE_MASK_ALL) == RACE_MASK_ALL)
-                $this->templates[$this->id]['AllowableRace'] = 0;
+                $_ = 0;
         }
-
-        $this->reset();                                     // restore 'iterator'
     }
 
     // use if you JUST need the name
@@ -126,7 +118,7 @@ class ItemList extends BaseType
         */
 
         $data = [];
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             // random item is random
             if ($this->curTpl['RandomProperty'] > 0 || $this->curTpl['RandomSuffix'] > 0)
@@ -205,7 +197,7 @@ class ItemList extends BaseType
 
     public function addGlobalsToJscript(&$template, $addMask = 0)
     {
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $template->extendGlobalData(self::$type, [$this->id => array(
                 'name'    => $this->getField('name', true),
@@ -585,7 +577,7 @@ class ItemList extends BaseType
         if ($itemSpellsAndTrigger)
         {
             $itemSpells = new SpellList(array(['s.id', array_keys($itemSpellsAndTrigger)]));
-            while ($itemSpells->iterate())
+            foreach ($itemSpells->iterate() as $__)
                 if ($parsed = $itemSpells->parseText('description', $this->curTpl['RequiredLevel'])[0])
                     $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id]] . ($interactive ? '<a href="?spell='.$itemSpells->id.'">'.$parsed.'</a>' : $parsed);
         }
@@ -650,7 +642,7 @@ class ItemList extends BaseType
             if ($setSpellsAndIdx)
             {
                 $boni = new SpellList(array(['s.id', array_keys($setSpellsAndIdx)]));
-                while ($boni->iterate())
+                foreach ($boni->iterate() as $__)
                 {
                     $itemset['spells'][] = array(
                         'tooltip' => $boni->parseText('description', $this->curTpl['RequiredLevel'])[0],
@@ -694,11 +686,11 @@ class ItemList extends BaseType
             $reagents = new ItemList(array(['i.entry', array_keys($reagentItems)]));
             $reqReag  = [];
 
-            $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->curTpl['spellid_2'].'">'.Util::localizedString($this->curTpl, 'description').'</a></span><br />';
+            $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->curTpl['spellid_2'].'">'.$this->getField('description', true).'</a></span><br />';
 
             $xCraft = '<div><br />'.$craftItem->renderTooltip(null, $interactive).'</div><br />';
 
-            while ($reagents->iterate())
+            foreach ($reagents->iterate() as $__)
                 $reqReag[] = '<a href="?item='.$reagents->id.'">'.$reagents->getField('name', true).'</a> ('.$reagentItems[$reagents->id].')';
 
             $xCraft .= '<span class="q1">'.Lang::$game['requires2']." ".implode(", ", $reqReag).'</span>';
@@ -714,7 +706,7 @@ class ItemList extends BaseType
 
         // funny, yellow text at the bottom, omit if we have a recipe
         if ($this->curTpl['description'] && !isset($xCraft))
-            $xMisc[] = '<span class="q">"'.Util::localizedString($this->curTpl, 'description').'"</span>';
+            $xMisc[] = '<span class="q">"'.$this->getField('description', true).'"</span>';
 
         // readable
         if ($this->curTpl['PageText'])

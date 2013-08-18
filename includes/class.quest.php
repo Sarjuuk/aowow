@@ -7,37 +7,27 @@ class QuestList extends BaseType
 {
     public static $type       = TYPE_QUEST;
 
-    public        $cat1       = 0;
-    public        $cat2       = 0;
-
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt LEFT JOIN locales_quest lq ON qt.Id = lq.entry WHERE [filter] [cond] ORDER BY Id ASC';
-    protected     $matchQuery = 'SELECT COUNT(1) FROM quest_template qt LEFT JOIN locales_quest lq ON qt.Id = lq.entry WHERE [filter] [cond]';
 
-    // parent::__construct does the job
-
-    public function iterate($qty = 1)
+    public function __construct($conditions)
     {
-        $r = parent::iterate($qty);
+        parent::__construct($conditions);
 
-        if (!$this->id)
+        // post processing
+        foreach ($this->iterate() as &$_curTpl)
         {
-            $this->cat1 = 0;
-            $this->cat2 = 0;
-        }
-        else
-        {
-            $this->cat1 = $this->curTpl['ZoneOrSort'];  // should probably be in a method...
+            $_curTpl['cat1'] = $_curTpl['ZoneOrSort'];      // should probably be in a method...
+            $_curTpl['cat2'] = 0;
+
             foreach (Util::$questClasses as $k => $arr)
             {
-                if (in_array($this->cat1, $arr))
+                if (in_array($_curTpl['cat1'], $arr))
                 {
-                    $this->cat2 = $k;
+                    $_curTpl['cat2'] = $k;
                     break;
                 }
             }
         }
-
-        return $r;
     }
 
     // static use START
@@ -77,14 +67,14 @@ class QuestList extends BaseType
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
                 "n"  => $this->getField('Title', true),
                 "t"  => TYPE_QUEST,
                 "ti" => $this->id,
-                "c"  => $this->cat1,
-                "c2" => $this->cat2
+                "c"  => $this->curTpl['cat1'],
+                "c2" => $this->curTpl['cat2']
             );
         }
 
@@ -95,11 +85,11 @@ class QuestList extends BaseType
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'category'  => $this->cat1,
-                'category2' => $this->cat2,
+                'category'  => $this->curTpl['cat1'],
+                'category2' => $this->curTpl['cat2'],
                 'id'        => $this->id,
                 'level'     => $this->curTpl['Level'],
                 'reqlevel'  => $this->curTpl['MinLevel'],
@@ -134,8 +124,9 @@ class QuestList extends BaseType
             if ($_ = $this->curTpl['RequiredClasses'])
                 $data[$this->id]['reqclass'] = $_;
 
-            if ($_ = $this->curTpl['RequiredRaces'])
-                $data[$this->id]['reqrace'] = $_;
+            if ($_ = ($this->curTpl['RequiredRaces'] & RACE_MASK_ALL))
+                if ((($_ & RACE_MASK_ALLIANCE) != RACE_MASK_ALLIANCE) && (($_ & RACE_MASK_HORDE) != RACE_MASK_HORDE))
+                    $data[$this->id]['reqrace'] = $_;
 
             if ($_ = $this->curTpl['RewardOrRequiredMoney'])
                 if ($_ > 0)
@@ -261,7 +252,7 @@ class QuestList extends BaseType
 
     public function addGlobalsToJScript(&$template, $addMask = GLOBALINFO_ANY)
     {
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             if ($addMask & GLOBALINFO_REWARDS)
             {

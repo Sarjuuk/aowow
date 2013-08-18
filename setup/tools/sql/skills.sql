@@ -56,7 +56,6 @@ UPDATE aowow_skillLine sl, dbc.spell s, dbc.skillLineAbility sla SET sl.spellIco
 UPDATE aowow_skillLine sl, dbc.spellIcon si SET sl.iconString = SUBSTRING_INDEX(si.string, '\\', -1) WHERE sl.spellIconId = si.id;
 UPDATE aowow_skillLine SET iconString = 'inv_misc_questionmark' WHERE spellIconId = 0;
 
-
 -- categorization
 UPDATE aowow_skillLine SET typeCat = -5 WHERE id = 777 OR (categoryId = 9 AND id NOT IN (356, 129, 185, 142, 155));
 UPDATE aowow_skillLine SET typeCat = -4 WHERE categoryId = 9 AND name_loc0 LIKE '%racial%';

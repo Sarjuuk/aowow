@@ -10,27 +10,26 @@ class PetList extends BaseType
     public    static $type = TYPE_PET;
 
     protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_pet WHERE [cond] ORDER BY Id ASC';
-    protected $matchQuery = 'SELECT COUNT(1) FROM ?_pet WHERE [cond]';
 
     public function getListviewData()
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'armor'     => $this->curTpl['armor'],
-                'damage'    => $this->curTpl['damage'],
-                'health'    => $this->curTpl['health'],
-                'diet'      => $this->curTpl['foodMask'],
-                'icon'      => $this->curTpl['iconString'],
-                'id'        => $this->id,
-                'maxlevel'  => $this->curTpl['maxLevel'],
-                'minlevel'  => $this->curTpl['minLevel'],
-                'name'      => $this->getField('name', true),
-                'type'      => $this->curTpl['type'],
-                'exotic'    => $this->curTpl['exotic'],
-                'spells'    => []
+                'armor'    => $this->curTpl['armor'],
+                'damage'   => $this->curTpl['damage'],
+                'health'   => $this->curTpl['health'],
+                'diet'     => $this->curTpl['foodMask'],
+                'icon'     => $this->curTpl['iconString'],
+                'id'       => $this->id,
+                'maxlevel' => $this->curTpl['maxLevel'],
+                'minlevel' => $this->curTpl['minLevel'],
+                'name'     => $this->getField('name', true),
+                'type'     => $this->curTpl['type'],
+                'exotic'   => $this->curTpl['exotic'],
+                'spells'   => []
             );
 
             if ($this->curTpl['expansion'] > 0)
@@ -48,7 +47,7 @@ class PetList extends BaseType
 
     public function addGlobalsToJscript(&$template, $addMask = GLOBALINFO_ANY)
     {
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             if ($addMask & GLOBALINFO_RELATED)
                 for ($i = 1; $i <= 4; $i++)

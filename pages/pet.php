@@ -16,9 +16,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($pet->error)
         $smarty->notFound(Lang::$game['pet']);
 
-    // $pet->addGlobalsToJscript($smarty);
-    $pet->reset();
-
     $infobox = [];
 
     // level range
@@ -61,7 +58,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'tabs'        => '$tabsRelated',
             'hiddenCols'  => "$['type']",
             'visibleCols' => "$['skin']",
-            'note'        => '$sprintf(LANG.lvnote_filterresults, \'?npcs=1&filter=fa=38\')',
+            'note'        => sprintf(Util::$filterResultString, '?npcs=1&filter=fa=38'),
             'id'          => 'tameable'
         ]
     );
@@ -122,7 +119,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         ]
     ];
 
-
     $spells = new SpellList($conditions);
     $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
@@ -137,7 +133,15 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
 
     // talents
-    $conditions = [['s.typeCat', -7]];
+    $conditions = array(
+        ['s.typeCat', -7],
+        [                                                   // last rank or unranked
+            'OR',
+            ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
+            ['s.rankId', 0]
+        ]
+    );
+
     switch($pet->getField('type'))
     {
         case 0: $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE0, '&']; break;

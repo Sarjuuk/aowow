@@ -13,37 +13,34 @@ class ItemsetList extends BaseType
     private       $classes    = [];                             // used to build g_classes
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_itemset WHERE [filter] [cond] ORDER BY maxlevel DESC';
-    protected     $matchQuery = 'SELECT COUNT(1) FROM ?_itemset WHERE [filter] [cond]';
 
     public function __construct($data, $applyFilter = false)
     {
         parent::__construct($data, $applyFilter);
 
         // post processing
-        while ($this->iterate())
+        foreach ($this->iterate() as &$_curTpl)
         {
-            $this->templates[$this->id]['classes'] = [];
-            $this->templates[$this->id]['pieces']  = [];
+            $_curTpl['classes'] = [];
+            $_curTpl['pieces']  = [];
             for ($i = 1; $i < 12; $i++)
             {
-                if ($this->curTpl['classMask'] & (1 << ($i - 1)))
+                if ($_curTpl['classMask'] & (1 << ($i - 1)))
                 {
                     $this->classes[] = $i;
-                    $this->templates[$this->id]['classes'][] = $i;
+                    $_curTpl['classes'][] = $i;
                 }
             }
 
             for ($i = 1; $i < 10; $i++)
             {
-                if ($piece = $this->curTpl['item'.$i])
+                if ($piece = $_curTpl['item'.$i])
                 {
-                    $this->templates[$this->id]['pieces'][] = $piece;
+                    $_curTpl['pieces'][] = $piece;
                     $this->pieceToSet[$piece] = $this->id;
                 }
             }
         }
-        $this->reset();
-
         $this->classes = array_unique($this->classes);
     }
 
@@ -51,7 +48,7 @@ class ItemsetList extends BaseType
     {
         $data = [];
 
-        while ($this->iterate())
+        foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
                 'id'       => $this->id,

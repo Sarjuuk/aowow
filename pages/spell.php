@@ -219,26 +219,27 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $_ = $pageData['page']['reagents'];
         $pageData['page']['reagents'] = [];
 
-        while (!empty($_))
+        foreach ($spell->relItems->iterate() as $itemId => $__)
         {
-            $spell->relItems->iterate();
-            if (!in_array($spell->relItems->id, array_keys($_)))
+            if (empty($_[$itemId]))
                 continue;
 
             $pageData['page']['reagents'][] = array(
                 'name'    => $spell->relItems->getField('name', true),
                 'quality' => $spell->relItems->getField('Quality'),
-                'entry'   => $spell->relItems->id,
-                'count'   => $_[$spell->relItems->id],
+                'entry'   => $itemId,
+                'count'   => $_[$itemId],
             );
 
-            unset($_[$spell->relItems->id]);
+            unset($_[$itemId]);
+
+            if (empty($_))
+                break;
         }
     }
 
     // Iterate through all effects:
     $pageData['page']['effect'] = [];
-    $spell->reset();
 
     $pageData['view3D'] = 0;
 
@@ -259,16 +260,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         // .. from item
         if ($spell->canCreateItem() && ($_ = $spell->getField('effect'.$i.'CreateItemId')) && $_ > 0)
         {
-            while ($spell->relItems->id != $_)
-                $spell->relItems->iterate();
+            foreach ($spell->relItems->iterate() as $itemId => $__)
+            {
+                if ($itemId != $_)
+                    continue;
 
-            $foo['icon'] = array(
-                'id'      => $spell->relItems->id,
-                'name'    => $spell->relItems->getField('name', true),
-                'quality' => $spell->relItems->getField('Quality'),
-                'count'   => $effDS + $effBP,
-                'icon'    => $spell->relItems->getField('icon')
-            );
+                $foo['icon'] = array(
+                    'id'      => $spell->relItems->id,
+                    'name'    => $spell->relItems->getField('name', true),
+                    'quality' => $spell->relItems->getField('Quality'),
+                    'count'   => $effDS + $effBP,
+                    'icon'    => $spell->relItems->getField('icon')
+                );
+            }
 
             if ($effDS > 1)
                 $foo['icon']['count'] = "'".($effBP + 1).'-'.$foo['icon']['count']."'";
@@ -332,6 +336,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 break;
             case 53:                                        // Enchant Item Perm
             case 54:                                        // Enchant Item Temp
+            case 156:                                       // Enchant Item Prismatic
                 $_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemEnchantment WHERE id = ?d', $effMV);
                 $foo['name'] .= ' <span class="q2">'.Util::localizedString($_, 'text').'</span> ('.$effMV.')';
                 break;
@@ -585,7 +590,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     for ($i = 1; $i < 4; $i++)
     {
-        // Flat Mods (107), Pct Mods (108), No Reagent Use .. include dummy..? (4)
+        // Flat Mods (107), Pct Mods (108), No Reagent Use (256) .. include dummy..? (4)
         if (!in_array($spell->getField('effect'.$i.'AuraId'), [107, 108, 256, 4]))
             continue;
 
@@ -626,8 +631,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $sub = ['OR'];
     $conditions = [
         ['s.spellFamilyId', $spell->getField('spellFamilyId')],
-        &$sub]
-    ;
+        &$sub
+    ];
 
     for ($i = 1; $i < 4; $i++)
     {
@@ -808,7 +813,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         if ($extraItem && $spell->canCreateItem())
         {
-            $spell->relItems->reset();
             $foo = $spell->relItems->getListviewData();
 
             for ($i = 1; $i < 4; $i++)
@@ -923,12 +927,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         unset($questreward);
     }
 */
-
-    // Проверяем на пустые массивы
-    // if(!$spellArr['taughtbyitem'])
-        // unset($spellArr['taughtbyitem']);
-    // if(!$spellArr['taughtbynpc'])
-        // unset($spellArr['taughtbynpc']);
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }

@@ -72,7 +72,7 @@ if (!defined('AOWOW_REVISION'))
 
         $enchantsOut = [];
 
-        while ($enchantSpells->iterate())
+        foreach ($enchantSpells->iterate() as $__)
         {
             $enchant = DB::Aowow()->SelectRow('SELECT * FROM ?_itemEnchantment WHERE Id = ?d', $enchantSpells->getField('effect1MiscValue'));
             if (!$enchant)                                  // 'shouldn't' happen
@@ -145,7 +145,7 @@ if (!defined('AOWOW_REVISION'))
                 $castItems[$enchantSpells->id] = new ItemList([['spellid_1', $enchantSpells->id], ['name', 'Scroll of Enchant%', '!']]);    // do not reuse enchantment scrolls
 
             $cI = &$castItems[$enchantSpells->id];          // this construct is a bit .. unwieldy
-            while ($cI->iterate())
+            foreach ($cI->iterate() as $__)
             {
                 $ench['name'][]   = $cI->getField('name', true);
                 $ench['source'][] = -$cI->id;

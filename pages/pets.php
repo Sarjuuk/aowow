@@ -33,7 +33,6 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     if (($mask = $pets->hasDiffFields(['type'])) == 0x0)
         $pageData['params']['hiddenCols'] = "$['type']";
 
-    $pets->reset();
     $pets->addGlobalsToJscript($smarty, GLOBALINFO_RELATED);
 
     $smarty->saveCache($cacheKey, $pageData);
