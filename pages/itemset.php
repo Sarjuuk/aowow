@@ -6,14 +6,14 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/class.community.php';
 
-$id   = intVal($pageParam);
+$_id  = intVal($pageParam);
 $path = [0, 2];
 
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEMSET, $id, -1, User::$localeId]);
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEMSET, $_id, -1, User::$localeId]);
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $iSet = new ItemsetList(array(['id', $id]));
+    $iSet = new ItemsetList(array(['id', $_id]));
     if ($iSet->error)
         $smarty->notFound(Lang::$game['itemset']);
 
@@ -165,6 +165,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'title'   => $name,                                 // for header
         'path'    => $path,
         'infobox' => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
+        'relTabs' => [],
         'pieces'  => $pieces,
         'spells'  => $spells,
         'view3D'  => json_encode($eqList, JSON_NUMERIC_CHECK),
@@ -175,7 +176,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         ),
         'page'    => array(
             'name'        => $name,                         // for page content
-            'id'          => $id,
+            'id'          => $_id,
             'bonusExt'    => $skill,
             'description' => $ta ? sprintf(Lang::$itemset['_desc'], $name, Lang::$itemset['notes'][$ta], $cnt) : sprintf(Lang::$itemset['_descTagless'], $name, $cnt),
             'unavailable' => $unav
@@ -189,25 +190,25 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     if ($ta && count($path) == 3)
     {
-        $rel[] = ['id', $id, '!'];
+        $rel[] = ['id', $_id, '!'];
         $rel[] = ['classMask', 1 << (end($path) - 1), '&'];
         $rel[] = ['contentGroup', (int)$ta];
     }
     else if ($ev)
     {
-        $rel[] = ['id', $id, '!'];
+        $rel[] = ['id', $_id, '!'];
         $rel[] = ['holidayId', 0, '!'];
     }
     else if ($sk)
     {
-        $rel[] = ['id', $id, '!'];
+        $rel[] = ['id', $_id, '!'];
         $rel[] = ['contentGroup', 0];
         $rel[] = ['skillId', 0, '!'];
         $rel[] = ['type', $ty];
     }
     else if (!$ta && $ty)
     {
-        $rel[] = ['id', $id, '!'];
+        $rel[] = ['id', $_id, '!'];
         $rel[] = ['contentGroup', 0];
         $rel[] = ['type', $ty];
         $rel[] = ['skillId', 0];
@@ -218,7 +219,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $relSets = new ItemsetList($rel);
         if (!$relSets->error)
         {
-            $pageData['related'] = array(
+            $pageData['relTabs'][] = array(
+                'file'   => 'itemset',
                 'data'   => $relSets->getListviewData(),
                 'params' => array(
                     'id'   => 'see-also',
@@ -246,13 +248,13 @@ $smarty->updatePageVars(array(
 	'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
 	'tab'    => 0,
 	'type'   => TYPE_ITEMSET,
-	'typeId' => $id,
+	'typeId' => $_id,
     'reqJS'  => array(
         'template/js/Summary.js',
         'template/js/swfobject.js'
     )
 ));
-$smarty->assign('community', CommunityContent::getAll(TYPE_ITEMSET, $id));  // comments, screenshots, videos
+$smarty->assign('community', CommunityContent::getAll(TYPE_ITEMSET, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$itemset));
 $smarty->assign('lvData', $pageData);
 

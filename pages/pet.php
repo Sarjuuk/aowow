@@ -6,13 +6,13 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/class.community.php';
 
-$id = intVal($pageParam);
+$_id = intVal($pageParam);
 
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_PET, $id, -1, User::$localeId]);
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_PET, $_id, -1, User::$localeId]);
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $pet = new PetList(array(['id', $id]));
+    $pet = new PetList(array(['id', $_id]));
     if ($pet->error)
         $smarty->notFound(Lang::$game['pet']);
 
@@ -26,23 +26,24 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $infobox[] = '[li][url=?spell=53270]'.Lang::$pet['exotic'].'[/url][/li]';
 
     $pageData = array(
-        'title' => $pet->getField('name', true),
-        'path'  => '[0, 8, '.$pet->getField('type').']',
-        'page' => array(
-            'petCalc'   => Util::$tcEncoding[(int)($id / 10)] . Util::$tcEncoding[(2 * ($id % 10) + ($pet->getField('exotic') ? 1 : 0))],
+        'title'   => $pet->getField('name', true),
+        'path'    => '[0, 8, '.$pet->getField('type').']',
+        'infobox' => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
+        'relTabs' => [],
+        'page'    => array(
+            'petCalc'   => Util::$tcEncoding[(int)($_id / 10)] . Util::$tcEncoding[(2 * ($_id % 10) + ($pet->getField('exotic') ? 1 : 0))],
             'name'      => $pet->getField('name', true),
-            'id'        => $id,
+            'id'        => $_id,
             'icon'      => $pet->getField('iconString'),
             'expansion' => Util::$expansionString[$pet->getField('expansion')]
         ),
-        'infobox' => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
     );
 
     // tameable & gallery
     $condition = array(
         ['ct.type', 1],                                     // Beast
         ['ct.type_flags', 0x1, '&'],                        // tameable
-        ['ct.family', $id],                                 // displayed petType
+        ['ct.family', $_id],                                // displayed petType
         [
             'OR',                                           // at least neutral to at least one faction
             ['ft.A', 1, '<'],
@@ -51,23 +52,25 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
     $tng = new CreatureList($condition);
 
-    $pageData['tameable'] = array(
+    $pageData['relTabs'][] = array(
+        'file'   => 'creature',
         'data'   => $tng->getListviewData(NPCINFO_TAMEABLE),
-        'params' => [
+        'params' => array(
             'name'        => '$LANG.tab_tameable',
             'tabs'        => '$tabsRelated',
             'hiddenCols'  => "$['type']",
             'visibleCols' => "$['skin']",
             'note'        => sprintf(Util::$filterResultString, '?npcs=1&filter=fa=38'),
             'id'          => 'tameable'
-        ]
+        )
     );
 
-    $pageData['gallery'] = array(
+    $pageData['relTabs'][] = array(
+        'file'   => 'model',
         'data'   => $tng->getListviewData(NPCINFO_MODEL),
-        'params' => [
-            'tabs'       => '$tabsRelated'
-        ]
+        'params' => array(
+            'tabs' => '$tabsRelated'
+        )
     );
 
     // diet
@@ -80,22 +83,23 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $food = new ItemList(array(['i.subClass', [5, 8]], ['i.FoodType', $list]));
     $food->addGlobalsToJscript($smarty);
 
-    $pageData['diet'] = array(
+    $pageData['relTabs'][] = array(
+        'file'   => 'item',
         'data'   => $food->getListviewData(),
-        'params' => [
+        'params' => array(
             'name'       => '$LANG.diet',
             'tabs'       => '$tabsRelated',
             'hiddenCols' => "$['source', 'slot', 'side']",
             'sort'       => "$['level']",
             'id'         => 'diet'
-        ]
+        )
     );
 
     // spells
     $mask = 0x0;
     foreach (Util::$skillLineMask[-1] as $idx => $pair)
     {
-        if ($pair[0] == $id)
+        if ($pair[0] == $_id)
         {
             $mask = 1 << $idx;
             break;
@@ -122,14 +126,15 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $spells = new SpellList($conditions);
     $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
-    $pageData['abilities'] = array(
+    $pageData['relTabs'][] = array(
+        'file'   => 'spell',
         'data'   => $spells->getListviewData(),
-        'params' => [
+        'params' => array(
             'name'        => '$LANG.tab_abilities',
             'tabs'        => '$tabsRelated',
             'visibleCols' => "$['schools', 'level']",
             'id'          => 'abilities'
-        ]
+        )
     );
 
     // talents
@@ -152,16 +157,17 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $talents = new SpellList($conditions);
     $talents->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
-    $pageData['talents'] = array(
+    $pageData['relTabs'][] = array(
+        'file'   => 'spell',
         'data'   => $talents->getListviewData(),
-        'params' => [
+        'params' => array(
             'tabs'        => '$tabsRelated',
             'visibleCols' => "$['tier', 'level']",
             'name'        => '$LANG.tab_talents',
             'id'          => 'talents',
             'sort'        => "$['tier', 'name']",
             '_petTalents' => 1
-        ]
+        )
     );
 
     $smarty->saveCache($cacheKeyPage, $pageData);
@@ -175,12 +181,12 @@ $smarty->updatePageVars(array(
     'path'   => $pageData['path'],
     'tab'    => 0,
     'type'   => TYPE_PET,
-    'typeId' => $id,
+    'typeId' => $_id,
     'reqJS'  => array(
         'template/js/swfobject.js'
     )
 ));
-$smarty->assign('community', CommunityContent::getAll(TYPE_PET, $id));  // comments, screenshots, videos
+$smarty->assign('community', CommunityContent::getAll(TYPE_PET, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game));
 $smarty->assign('lvData', $pageData);
 

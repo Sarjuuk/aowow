@@ -6,10 +6,10 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/class.community.php';
 
-$id = intVal($pageParam);
+$_id = intVal($pageParam);
 
-$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_NPC, $id, -1, User::$localeId]);
-$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_NPC, $id, -1, User::$localeId]);
+$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_NPC, $_id, -1, User::$localeId]);
+$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_NPC, $_id, -1, User::$localeId]);
 
 // AowowPower-request
 if (isset($_GET['power']))
@@ -20,13 +20,13 @@ if (isset($_GET['power']))
 
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        $npc = new CreatureList(array(['ct.id', $id]));
+        $npc = new CreatureList(array(['ct.id', $_id]));
         if ($npc->error)
-            die('$WowheadPower.registerNpc(\''.$id.'\', '.User::$localeId.', {})');
+            die('$WowheadPower.registerNpc(\''.$_id.'\', '.User::$localeId.', {})');
 
         $s = $npc->getSpawns(true);
 
-        $x = '$WowheadPower.registerNpc('.$id.', '.User::$localeId.", {\n";
+        $x = '$WowheadPower.registerNpc('.$_id.', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($npc->getField('name', true))."',\n";
         $x .= "\ttooltip_".User::$localeString.': \''.Util::jsEscape($npc->renderTooltip())."',\n";
         // $x .= "\tmap: ".($s ? '{zone: '.$s[0].', coords: {0:'.json_encode($s[1], JSON_NUMERIC_CHECK).'}' : '{}')."\n";
@@ -41,7 +41,7 @@ if (isset($_GET['power']))
 // regular page
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $npc = new CreatureList(array(['ct.id', $id]));
+    $npc = new CreatureList(array(['ct.id', $_id]));
     if ($npc->error)
         $smarty->notFound(Lang::$game['npc']);
 
@@ -50,7 +50,38 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // not yet implemented -> chicken out
     $smarty->error();
 
-
+/*
+            <table class="infobox">
+                <tr><th>{#Quick_Facts#}</th></tr>
+                <tr><td><div class="infobox-spacer"></div>
+                    <ul>
+                        <li><div>{#Level#}: {if $npc.minlevel<>$npc.maxlevel}{$npc.minlevel} - {/if}{$npc.maxlevel}</div></li>
+                        <li><div>{#Classification#}: {$npc.rank}</div></li>
+                        <li><div>{#React#}: <span class="q{if $npc.A==-1}10{elseif $npc.A==1}2{else}{/if}">A</span> <span class="q{if $npc.H==-1}10{elseif $npc.H==1}2{else}{/if}">H</span></div></li>
+                        <li><div>{#Faction#}: <a href="?faction={$npc.faction_num}">{$npc.faction}</a></div></li>
+                        <li><div>{#Health#}: {if $npc.minhealth<>$npc.maxhealth}{$npc.minhealth} - {/if}{$npc.maxhealth}</div></li>
+{if ($npc.minmana or $npc.maxmana)}
+                        <li><div>{#Mana#}: {if $npc.minmana<>$npc.maxmana}{$npc.minmana} - {/if}{$npc.maxmana}</div></li>
+{/if}
+{if ($npc.moneysilver>0) or ($npc.moneygold>0) or ($npc.moneycopper>0)}
+                        <li><div>{#Wealth#}:{if ($npc.moneygold>0)}
+ <span class="moneygold">{$npc.moneygold}</span>{/if}
+{if ($npc.moneysilver>0)}
+ <span class="moneysilver">{$npc.moneysilver}</span>{/if}
+{if ($npc.moneycopper>0)}
+ <span class="moneycopper">{$npc.moneycopper}</span>{/if}
+</div></li>
+{/if}
+{if $npc.mindmg > 0 and $npc.maxdmg > 0}
+                        <li><div>{#Damage#}: {$npc.mindmg} - {$npc.maxdmg}</div></li>
+{/if}
+{if $npc.armor > 0}
+                        <li><div>{#Armor#}: {$npc.armor}</div></li>
+{/if}
+                    </ul>
+                </td></tr>
+            </table>
+*/
 
     unset($npc);
 
@@ -88,7 +119,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $npc_cols[1],
         ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
         ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-        $id
+        $_id
     );
 
     if($row)
@@ -294,7 +325,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $item_cols[2],
             ($_SESSION['locale'])? $_SESSION['locale']: DBSIMPLE_SKIP,
             ($_SESSION['locale'])? 1: DBSIMPLE_SKIP,
-            $id
+            $_id
         );
         if($rows_s)
         {
@@ -350,7 +381,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     c.id=?
                  ',
                 $quest_cols[2],
-                $id
+                $_id
             );
         if($rows_qs)
         {
@@ -362,7 +393,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         unset ($rows_qs);
 
         // Начиниают event-only квесты...
-        $rows_qse = event_find(array('quest_creature_id' => $id));
+        $rows_qse = event_find(array('quest_creature_id' => $_id));
         if($rows_qse)
         {
             if (!isset($npc['starts']))
@@ -382,7 +413,7 @@ $rows_qe = $DB->select('
                 c.id=?
         ',
         $quest_cols[2],
-        $id
+        $_id
         );
         if($rows_qe)
         {
@@ -404,7 +435,7 @@ $rows_qe = $DB->select('
                 OR RequiredNpcOrGo4=?
             ',
             $quest_cols[2],
-            $id, $id, $id, $id
+            $_id, $_id, $_id, $_id
         );
         if($rows_qo)
         {
@@ -476,9 +507,9 @@ $smarty->updatePageVars(array(
     'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
     'tab'    => 0,
     'type'   => TYPE_NPC,
-    'typeId' => $id
+    'typeId' => $_id
 ));
-$smarty->assign('community', CommunityContent::getAll(TYPE_NPC, $id));         // comments, screenshots, videos
+$smarty->assign('community', CommunityContent::getAll(TYPE_NPC, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$npc, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);
 

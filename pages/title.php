@@ -6,13 +6,13 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/class.community.php';
 
-$id = intVal($pageParam);
+$_id = intVal($pageParam);
 
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, $id, -1, User::$localeId]);
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, $_id, -1, User::$localeId]);
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $title = new TitleList(array(['id', $id]));
+    $title = new TitleList(array(['id', $_id]));
     if ($title->error)
         $smarty->notFound(Lang::$game['title']);
 
@@ -31,17 +31,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$e.']'.WorldEventList::getName($e).'[/url]';
 
     $pageData = array(
-        'page' => array(
-            'name'      => $title->getHtmlizedName(),
-            'id'        => $id,
-            'expansion' => Util::$expansionString[$title->getField('expansion')]
-        ),
+        'title'   => Util::ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->getField('male', true))))),
+        'path'    => '[0, 10, '.$title->getField('category').']',
         'infobox' => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
+        'relTabs' => [],
+        'page'    => array(
+            'name'      => $title->getHtmlizedName(),
+            'expansion' => Util::$expansionString[$title->getField('expansion')]
+        )
     );
 
-    if (!empty($title->sources[$id]))
+    if (!empty($title->sources[$_id]))
     {
-        foreach ($title->sources[$id] as $type => $entries)
+        foreach ($title->sources[$_id] as $type => $entries)
         {
             switch ($type)
             {
@@ -49,26 +51,32 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     $quests = new QuestList(array(['id', $entries]));
                     $quests->addGlobalsToJscript($smarty, GLOBALINFO_REWARDS);
 
-                    $pageData['page']['questReward'] = $quests->getListviewData();
-                    $pageData['page']['questParams'] = array(
-                        'id'            => 'reward-from-quest',
-                        'name'          => '$LANG.tab_rewardfrom',
-                        'hiddenCols'    => "$['experience', 'money']",
-                        'visibleCols'   => "$['category']",
-                        'tabs'          => '$tabsRelated'
+                    $pageData['relTabs'][] = array(
+                        'file'   => 'quest',
+                        'data'   => $quests->getListviewData(),
+                        'params' => array(
+                            'id'          => 'reward-from-quest',
+                            'name'        => '$LANG.tab_rewardfrom',
+                            'hiddenCols'  => "$['experience', 'money']",
+                            'visibleCols' => "$['category']",
+                            'tabs'        => '$tabsRelated'
+                        )
                     );
                     break;
                 case 12:
                     $acvs = new AchievementList(array(['id', $entries]));
                     $acvs->addGlobalsToJscript($smarty);
 
-                    $pageData['page']['acvReward'] = $acvs->getListviewData();
-                    $pageData['page']['acvParams'] = array(
-                        'id'            => 'reward-from-achievement',
-                        'name'          => '$LANG.tab_rewardfrom',
-                        'visibleCols'   => "$['category']",
-                        'sort'          => "$['reqlevel', 'name']",
-                        'tabs'          => '$tabsRelated'
+                    $pageData['relTabs'][] = array(
+                        'file'   => 'achievement',
+                        'data'   => $acvs->getListviewData(),
+                        'params' => array(
+                            'id'          => 'reward-from-achievement',
+                            'name'        => '$LANG.tab_rewardfrom',
+                            'visibleCols' => "$['category']",
+                            'sort'        => "$['reqlevel', 'name']",
+                            'tabs'        => '$tabsRelated'
+                        )
                     );
                     break;
                 // case 13:
@@ -76,9 +84,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             }
         }
     }
-
-    $pageData['title'] = Util::ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->getField('male', true)))));
-    $pageData['path']  = '[0, 10, '.$title->getField('category').']';
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
@@ -91,9 +96,9 @@ $smarty->updatePageVars(array(
     'path'   => $pageData['path'],
     'tab'    => 0,
     'type'   => TYPE_TITLE,
-    'typeId' => $id
+    'typeId' => $_id
 ));
-$smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $id));  // comments, screenshots, videos
+$smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
 $smarty->assign('lvData', $pageData);
 

@@ -1,7 +1,8 @@
 {include file='header.tpl'}
 {assign var="iconlist1" value="1"}
 {assign var="iconlist2" value="1"}
-    <div id="main">
+
+    <div class="main" id="main">
         <div id="main-precontents" class="main-precontents"></div>
         <div id="main-contents" class="main-contents">
 
@@ -182,32 +183,9 @@
                 </table>
 
                 <h2>{$lang.related}</h2>
-
             </div>
 
-            <div id="tabs-generic"></div>
-            <div id="listview-generic" class="listview"></div>
-            <script type="text/javascript">//<![CDATA[
-                var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
-{if isset($lvData.modifiedBy)}    {include file='bricks/listviews/spell.tpl'       data=$lvData.modifiedBy.data    params=$lvData.modifiedBy.params   } {/if}
-{if isset($lvData.modifies)}      {include file='bricks/listviews/spell.tpl'       data=$lvData.modifies.data      params=$lvData.modifies.params     } {/if}
-{if isset($lvData.seeAlso)}       {include file='bricks/listviews/spell.tpl'       data=$lvData.seeAlso.data       params=$lvData.seeAlso.params      } {/if}
-{if isset($lvData.usedByItem)}    {include file='bricks/listviews/item.tpl'        data=$lvData.usedByItem.data    params=$lvData.usedByItem.params   } {/if}
-{if isset($lvData.usedByItemset)} {include file='bricks/listviews/itemset.tpl'     data=$lvData.usedByItemset.data params=$lvData.usedByItemset.params} {/if}
-{if isset($lvData.criteriaOf)}    {include file='bricks/listviews/achievement.tpl' data=$lvData.criteriaOf.data    params=$lvData.criteriaOf.params   } {/if}
-{if isset($lvData.contains)}      {include file='bricks/listviews/item.tpl'        data=$lvData.contains.data      params=$lvData.contains.params     } {/if}
-
-{if isset($lvData.taughtbynpc)}   {include file='bricks/listviews/creature.tpl'    data=$lvData.taughtbynpc.data   params=$lvData.taughtbynpc.params  } {/if}
-{if isset($lvData.taughtbyitem)}  {include file='bricks/listviews/item.tpl'        data=$lvData.taughtbyitem.data  params=$lvData.taughtbyitem.params } {/if}
-{if isset($lvData.taughtbyquest)} {include file='bricks/listviews/quest.tpl'       data=$lvData.taughtbyquest.data params=$lvData.taughtbyquest.params} {/if}
-{if isset($lvData.questreward)}   {include file='bricks/listviews/quest.tpl'       data=$lvData.questreward.data   params=$lvData.questreward.params  } {/if}
-{if isset($lvData.usedbynpc)}     {include file='bricks/listviews/creature.tpl'    data=$lvData.usedbynpc.data     params=$lvData.usedbynpc.params    } {/if}
-                new Listview({ldelim}template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: tabsRelated, parent: 'listview-generic', data: lv_comments{rdelim});
-                new Listview({ldelim}template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: tabsRelated, parent: 'listview-generic', data: lv_screenshots{rdelim});
-                if (lv_videos.length || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)))
-                    new Listview({ldelim}template: 'video', id: 'videos', name: LANG.tab_videos, tabs: tabsRelated, parent: 'listview-generic', data: lv_videos{rdelim});
-                tabsRelated.flush();
-            //]]></script>
+{include file='bricks/tabsRelated.tpl' tabs=$lvData.relTabs}
 
 {include file='bricks/contribute.tpl'}
 

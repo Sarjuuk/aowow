@@ -21,10 +21,10 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/class.community.php';
 
-$id  = intVal($pageParam);
+$_id = intVal($pageParam);
 
-$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_ACHIEVEMENT, $id, -1, User::$localeId]);
-$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_ACHIEVEMENT, $id, -1, User::$localeId]);
+$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_ACHIEVEMENT, $_id, -1, User::$localeId]);
+$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_ACHIEVEMENT, $_id, -1, User::$localeId]);
 
 // AowowPower-request
 if (isset($_GET['power']))
@@ -35,11 +35,11 @@ if (isset($_GET['power']))
 
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        $acv = new AchievementList(array(['id', $id]));
+        $acv = new AchievementList(array(['id', $_id]));
         if ($acv->error)
-            die('$WowheadPower.registerAchievement(\''.$id.'\', '.User::$localeId.', {})');
+            die('$WowheadPower.registerAchievement(\''.$_id.'\', '.User::$localeId.', {})');
 
-        $x = '$WowheadPower.registerAchievement('.$id.', '.User::$localeId.",{\n";
+        $x = '$WowheadPower.registerAchievement('.$_id.', '.User::$localeId.",{\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($acv->getField('name', true))."',\n";
         $x .= "\ticon: '".urlencode($acv->getField('iconString'))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".$acv->renderTooltip()."'\n";
@@ -53,60 +53,63 @@ if (isset($_GET['power']))
 // regular page
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $acv = new AchievementList(array(['id', $id]));
+    $acv = new AchievementList(array(['id', $_id]));
     if ($acv->error)
         $smarty->notFound(Lang::$game['achievement']);
-
-    $pageData['path']  = [0, 9];
-    $pageData['title'] = [Util::ucfirst(Lang::$game['achievement'])];
 
     // create page title and path
     $curCat  = $acv->getField('category');
     $tmpPath = [];
     do
     {
-        $tmpPath[] = $curCat;
+        array_unshift($tmpPath, $curCat);
         $curCat = DB::Aowow()->SelectCell('SELECT parentCategory FROM ?_achievementcategory WHERE id = ?d', $curCat);
     }
     while ($curCat > 0);
 
-    if (!empty($tmpPath))
-        $pageData['path'] = array_merge($pageData['path'], array_reverse($tmpPath));
-
-    array_unshift($pageData['title'], $acv->getField('name', true));
+    array_unshift($tmpPath, 0, 9);
 
     $acv->addGlobalsToJscript($smarty, GLOBALINFO_REWARDS);
-    $pageData['page'] = $acv->getDetailedData()[$id];
 
     // infobox content
+    $infobox = [];
     switch ($acv->getField('faction'))
     {
         case 1:
-            $pageData['infoBox'][] = Lang::$main['side'].': <span class="alliance-icon">'.Lang::$game['si'][SIDE_ALLIANCE].'</span>';
+            $infobox[] = Lang::$main['side'].': <span class="alliance-icon">'.Lang::$game['si'][SIDE_ALLIANCE].'</span>';
             break;
         case 2:
-            $pageData['infoBox'][] = Lang::$main['side'].': <span class="horde-icon">'.Lang::$game['si'][SIDE_HORDE].'</span>';
+            $infobox[] = Lang::$main['side'].': <span class="horde-icon">'.Lang::$game['si'][SIDE_HORDE].'</span>';
             break;
         default:                                        // case 3
-            $pageData['infoBox'][] = Lang::$main['side'].': '.Lang::$game['si'][SIDE_BOTH];
+            $infobox[] = Lang::$main['side'].': '.Lang::$game['si'][SIDE_BOTH];
     }
 
     // todo (low): crosslink with charactersDB to check if realmFirsts are still available
 
-    $pageData['infoBox'] = array_merge($pageData['infoBox'], Lang::getInfoBoxForFlags($acv->getField('cuFlags')));
+    $pageData = array(
+        'title'   => $acv->getField('name', true),
+        'path'    => $tmpPath,
+        'infobox' => array_merge($infobox, Lang::getInfoBoxForFlags($acv->getField('cuFlags'))),
+        'relTabs' => [],
+        'page'    => $acv->getDetailedData()[$_id]
+    );
 
     // listview: "see also"
     $conditions = array(
         ['name_loc'.User::$localeId, $acv->getField('name', true)],
-        ['id', $id, '!']
+        ['id', $_id, '!']
     );
     $saList = new AchievementList($conditions);
-    $pageData['page']['saData']   = $saList->getListviewData();
-    $pageData['page']['saParams'] = array(
-        'id'          => 'see-also',
-        'name'        => '$LANG.tab_seealso',
-        'visibleCols' => "$['category']",
-        'tabs'        => '$tabsRelated'
+    $pageData['relTabs'][] = array(
+        'file'   => 'achievement',
+        'data'   => $saList->getListviewData(),
+        'params' => array(
+            'id'          => 'see-also',
+            'name'        => '$LANG.tab_seealso',
+            'visibleCols' => "$['category']",
+            'tabs'        => '$tabsRelated'
+        )
     );
 
     $saList->addGlobalsToJscript($smarty);
@@ -114,17 +117,20 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // listview: "criteria of"
     $refs = DB::Aowow()->SelectCol('SELECT refAchievement FROM ?_achievementcriteria WHERE Type = ?d AND value1 = ?d',
         ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT,
-        $id
+        $_id
     );
     if (!empty($refs))
     {
         $coList = new AchievementList(array(['id', $refs]));
-        $pageData['page']['coData']   = $coList->getListviewData();
-        $pageData['page']['coParams'] = array(
-            'id'          => 'criteria-of',
-            'name'        => '$LANG.tab_criteriaof',
-            'visibleCols' => "$['category']",
-            'tabs'        => '$tabsRelated'
+        $pageData['relTabs'][] = array(
+            'file'   => 'achievement',
+            'data'   => $coList->getListviewData(),
+            'params' => array(
+                'id'          => 'criteria-of',
+                'name'        => '$LANG.tab_criteriaof',
+                'visibleCols' => "$['category']",
+                'tabs'        => '$tabsRelated'
+            )
         );
 
         $coList->addGlobalsToJscript($smarty);
@@ -349,7 +355,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     {
         $pageData['page']['series'] = array(
             array(
-                'id'     => $id,
+                'id'     => $_id,
                 'name'   => $acv->getField('name', true),
                 'parent' => $acv->getField('series') >> 16,
             )
@@ -390,13 +396,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 // menuId 9: Achievement  g_initPath()
 //  tabId 0: Database     g_initHeader()
 $smarty->updatePageVars(array(
-    'title'  => implode(" - ", $pageData['title']),
+    'title'  => $pageData['title'].' - '.Util::ucfirst(Lang::$game['achievement']),
     'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
     'tab'    => 0,
     'type'   => TYPE_ACHIEVEMENT,
-    'typeId' => $id
+    'typeId' => $_id
 ));
-$smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $id));         // comments, screenshots, videos
+$smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
 $smarty->assign('lvData', $pageData);
 

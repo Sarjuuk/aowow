@@ -9,9 +9,9 @@ if (isset($_GET['xml']))
 
 require 'includes/class.community.php';
 
-$id   = intVal($pageParam);
+$_id = intVal($pageParam);
 
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEM, $id, -1, User::$localeId]);
+$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEM, $_id, -1, User::$localeId]);
 
 // AowowPower-request
 if (isset($_GET['power']))
@@ -21,7 +21,7 @@ if (isset($_GET['power']))
     Util::powerUseLocale(@$_GET['domain']);
 
     $enh        = [];
-    $itemString = $id;
+    $itemString = $_id;
 
     if (isset($_GET['rand']))
     {
@@ -49,7 +49,7 @@ if (isset($_GET['power']))
     // output json for tooltips
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        $item = new ItemList(array(['i.entry', $id]));
+        $item = new ItemList(array(['i.entry', $_id]));
         if ($item->error)
             die('$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.', {})');
 
@@ -58,7 +58,7 @@ if (isset($_GET['power']))
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($item->getField('name', true))."',\n";
         $x .= "\tquality: ".$item->getField('Quality').",\n";
         $x .= "\ticon: '".urlencode($item->getField('icon'))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($item->tooltip[$id])."'\n";
+        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($item->tooltip[$_id])."'\n";
         $x .= "});";
 
         $smarty->saveCache($cacheKeyTooltip, $x);
@@ -69,7 +69,7 @@ if (isset($_GET['power']))
 // regular page
 if (!$smarty->loadCache($cacheKeyPage, $item))
 {
-    $item = new ItemList(array(['i.entry', $id]));
+    $item = new ItemList(array(['i.entry', $_id]));
     if ($item->error)
         $smarty->notFound(Lang::$game['item']);
 
@@ -78,12 +78,42 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     // not yet implemented -> chicken out
     $smarty->error();
 
-
+/*
+    <table class="infobox">
+        <tr><th>{#Quick_Facts#}</th></tr>
+        <tr><td>
+            <div class="infobox-spacer"></div>
+            <ul>
+                {* Уровень вещи *}
+                {if $item.level}<li><div>{#level#}: {$item.level}</div></li>{/if}
+                {* Стоимость вещи *}
+                {if $item.buygold or $item.buysilver or $item.buycopper}
+                    <li><div>
+                        {#Buy_for#}:
+                        {if $item.buygold}<span class="moneygold">{$item.buygold}</span>{/if}
+                        {if $item.buysilver}<span class="moneysilver">{$item.buysilver}</span>{/if}
+                        {if $item.buycopper}<span class="moneycopper">{$item.buycopper}</span>{/if}
+                    </div></li>
+                {/if}
+                {if $item.sellgold or $item.sellsilver or $item.sellcopper}
+                    <li><div>
+                        {#Sells_for#}:
+                        {if $item.sellgold}<span class="moneygold">{$item.sellgold}</span>{/if}
+                        {if $item.sellsilver}<span class="moneysilver">{$item.sellsilver}</span>{/if}
+                        {if $item.sellcopper}<span class="moneycopper">{$item.sellcopper}</span>{/if}
+                    </div></li>
+                {/if}
+                {if isset($item.disenchantskill)}<li><div>{#Disenchantable#} (<span class="tip" onmouseover="Tooltip.showAtCursor(event, LANG.tooltip_reqenchanting, 0, 0, 'q')" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">{$item.disenchantskill}</span>)</div></li>{/if}
+                {if isset($item.key)}<li><div>{#Can_be_placed_in_the_keyring#}</div></li>{/if}
+            </ul>
+        </td></tr>
+    </table>
+*/
 
     unset($item);
 
     // Информация о вещи...
-    $item = iteminfo($id, 1);
+    $item = iteminfo($_id, 1);
     $path = [0, 0, $item['classs'], $item['subclass'], $item['type']];
 
     // Поиск мобов с которых эта вещь лутится
@@ -725,24 +755,24 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         $item['currencyfor'] = [];
         foreach($rows_cf as $row)
         {
-            $id=$row['entry'];
-            $item['currencyfor'][$id] = [];
-            $item['currencyfor'][$id] = iteminfo2($row);
-            $item['currencyfor'][$id]['maxcount'] = $row['drop-maxcount'];
-            $item['currencyfor'][$id]['cost'] = [];
+            $_id=$row['entry'];
+            $item['currencyfor'][$_id] = [];
+            $item['currencyfor'][$_id] = iteminfo2($row);
+            $item['currencyfor'][$_id]['maxcount'] = $row['drop-maxcount'];
+            $item['currencyfor'][$_id]['cost'] = [];
             if($row['BuyPrice']>0)
-                $npc['sells'][$id]['cost']['money'] = $row['BuyPrice'];
+                $npc['sells'][$_id]['cost']['money'] = $row['BuyPrice'];
 
             if($row['reqhonorpoints']>0)
-                $item['currencyfor'][$id]['cost']['honor'] =/* ($row['A']==1?1:-1)* */$row['reqhonorpoints']; //FIXME_BUG
+                $item['currencyfor'][$_id]['cost']['honor'] =/* ($row['A']==1?1:-1)* */$row['reqhonorpoints']; //FIXME_BUG
             if($row['reqarenapoints']>0)
-                $item['currencyfor'][$id]['cost']['arena'] = $row['reqarenapoints'];
-            $item['currencyfor'][$id]['cost']['items'] = [];
+                $item['currencyfor'][$_id]['cost']['arena'] = $row['reqarenapoints'];
+            $item['currencyfor'][$_id]['cost']['items'] = [];
             for($j=1; $j<=5; $j++)
             if(($row['reqitem'.$j]>0) and ($row['reqitemcount'.$j]>0))
             {
                 allitemsinfo($row['reqitem'.$j], 0);
-                $item['currencyfor'][$id]['cost']['items'][] = array(
+                $item['currencyfor'][$_id]['cost']['items'][] = array(
                     'item' => $row['reqitem'.$j],
                     'count' => $row['reqitemcount'.$j]
                 );
@@ -818,9 +848,9 @@ $smarty->updatePageVars(array(
     'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
     'tab'    => 0,
     'type'   => TYPE_ITEM,
-    'typeid' => $id
+    'typeid' => $_id
 ));
-$smarty->assign('community', CommunityContent::getAll(TYPE_ITEM, $id));         // comments, screenshots, videos
+$smarty->assign('community', CommunityContent::getAll(TYPE_ITEM, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$item, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);
 

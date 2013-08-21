@@ -6,10 +6,10 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/class.community.php';
 
-$id = intVal($pageParam);
+$_id = intVal($pageParam);
 
-$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_QUEST, $id, -1, User::$localeId]);
-$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_QUEST, $id, -1, User::$localeId]);
+$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_QUEST, $_id, -1, User::$localeId]);
+$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_QUEST, $_id, -1, User::$localeId]);
 
 // AowowPower-request
 if (isset($_GET['power']))
@@ -20,11 +20,11 @@ if (isset($_GET['power']))
 
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        $quest = new QuestList(array(['qt.id', $id]));
+        $quest = new QuestList(array(['qt.id', $_id]));
         if ($quest->error)
-            die('$WowheadPower.registerQuest(\''.$id.'\', '.User::$localeId.', {})');
+            die('$WowheadPower.registerQuest(\''.$_id.'\', '.User::$localeId.', {})');
 
-        $x = '$WowheadPower.registerQuest('.$id.', '.User::$localeId.", {\n";
+        $x = '$WowheadPower.registerQuest('.$_id.', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($quest->getField('Title', true))."',\n";
         $x .= "\ttooltip_".User::$localeString.': \''.$quest->renderTooltip()."'\n";            // daily: 1 ... not used in wowheadPower => omitted here
         $x .= "});";
@@ -38,7 +38,7 @@ if (isset($_GET['power']))
 // regular page
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $quest = new QuestList(array(['qt.id', $id]));
+    $quest = new QuestList(array(['qt.id', $_id]));
     if ($quest->error)
         $smarty->notFound(Lang::$game['quest']);
 
@@ -52,7 +52,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 	unset($quest);
 
 	// Основная инфа
-	$quest = GetDBQuestInfo($id, 0xFFFFFF);
+	$quest = GetDBQuestInfo($_id, 0xFFFFFF);
     $path = [0, 3]; // TODO
 
 	/*              ЦЕПОЧКА КВЕСТОВ              */
@@ -607,10 +607,10 @@ $smarty->updatePageVars(array(
     'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
     'tab'    => 0,
     'type'   => TYPE_QUEST,
-    'typeId' => $id
+    'typeId' => $_id
 ));
 
-$smarty->assign('community', CommunityContent::getAll(TYPE_QUEST, $id));         // comments, screenshots, videos
+$smarty->assign('community', CommunityContent::getAll(TYPE_QUEST, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$quest, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);
 

@@ -23,7 +23,7 @@
             <tr><td><div class="infobox-spacer"></div>
                 <ul>
                     {if $lvData.page.points}<li><div>{$lang.points}: <span class="moneyachievement tip" onmouseover="Listview.funcBox.moneyAchievementOver(event)" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">{$lvData.page.points}</span></div></li>{/if}
-{foreach from=$lvData.infoBox item=info}
+{foreach from=$lvData.infobox item=info}
                     <li><div>{$info}</div></li>
 {/foreach}
                     {*<li><div>Location: {$lvData.page.location}</div></li> todo: need to be parsed first *}
@@ -142,21 +142,9 @@
                 {/if}
 
                 <h2>{$lang.related}</h2>
-
             </div>
 
-            <div id="tabs-generic"></div>
-            <div id="listview-generic" class="listview"></div>
-            <script type="text/javascript">//<![CDATA[
-                var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
-{if $lvData.page.saData}          {include   file='bricks/listviews/achievement.tpl' data=$lvData.page.saData  params=$lvData.page.saParams}{/if}
-{if isset($lvData.page.coData)}   {include   file='bricks/listviews/achievement.tpl' data=$lvData.page.coData  params=$lvData.page.coParams}{/if}
-                new Listview({ldelim}template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: tabsRelated, parent: 'listview-generic', data: lv_comments{rdelim});
-                new Listview({ldelim}template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: tabsRelated, parent: 'listview-generic', data: lv_screenshots{rdelim});
-                if (lv_videos.length || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)))
-                    new Listview({ldelim}template: 'video', id: 'videos', name: LANG.tab_videos, tabs: tabsRelated, parent: 'listview-generic', data: lv_videos{rdelim});
-                tabsRelated.flush();
-            //]]></script>
+{include file='bricks/tabsRelated.tpl' tabs=$lvData.relTabs}
 
 {include file='bricks/contribute.tpl'}
 
