@@ -675,25 +675,31 @@ class ItemList extends BaseType
         // recipe handling (some stray Techniques have subclass == 0), place at bottom of tooltipp
         if ($this->curTpl['class'] == ITEM_CLASS_RECIPE && ($this->curTpl['subclass'] || $this->curTpl['BagFamily'] == 16))
         {
-            $craftSpell   = new SpellList(array(['s.id', (int)$this->curTpl['spellid_2']]));
-            $craftItem    = new ItemList(array(['i.entry', (int)$craftSpell->curTpl["effect1CreateItemId"]]));
-            $reagentItems = [];
+            $spell      = $this->curTpl['spellid_1'] == 483 ? (int)$this->curTpl['spellid_2'] : (int)$this->curTpl['spellid_1'];
+            $craftSpell = new SpellList(array(['s.id', $spell]));
+            $craftItem  = new ItemList(array(['i.entry', (int)$craftSpell->curTpl['effect1CreateItemId']]));
 
+            if ($desc = $this->getField('description', true))
+                $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$spell.'">'.$desc.'</a></span><br />';
+
+            if ($itemTT = $craftItem->renderTooltip(null, $interactive))
+                $xCraft = '<div><br />'.$itemTT.'</div>';
+
+            $reagentItems = [];
             for ($i = 1; $i <= 8; $i++)
                 if ($rId = $craftSpell->getField('reagent'.$i))
                     $reagentItems[$rId] = $craftSpell->getField('reagentCount'.$i);
 
-            $reagents = new ItemList(array(['i.entry', array_keys($reagentItems)]));
-            $reqReag  = [];
+            if (isset($xCraft) && $reagentItems)
+            {
+                $reagents = new ItemList(array(['i.entry', array_keys($reagentItems)]));
+                $reqReag  = [];
 
-            $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->curTpl['spellid_2'].'">'.$this->getField('description', true).'</a></span><br />';
+                foreach ($reagents->iterate() as $__)
+                    $reqReag[] = '<a href="?item='.$reagents->id.'">'.$reagents->getField('name', true).'</a> ('.$reagentItems[$reagents->id].')';
 
-            $xCraft = '<div><br />'.$craftItem->renderTooltip(null, $interactive).'</div><br />';
-
-            foreach ($reagents->iterate() as $__)
-                $reqReag[] = '<a href="?item='.$reagents->id.'">'.$reagents->getField('name', true).'</a> ('.$reagentItems[$reagents->id].')';
-
-            $xCraft .= '<span class="q1">'.Lang::$game['requires2']." ".implode(", ", $reqReag).'</span>';
+                $xCraft .= '<br /><span class="q1">'.Lang::$game['requires2'].' '.implode(', ', $reqReag).'</span>';
+            }
 
         }
 

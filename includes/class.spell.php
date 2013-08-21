@@ -501,6 +501,8 @@ class SpellList extends BaseType
         $gt    = $GT    = function($a, $b)     { return $a > $b;      };
         $gte   = $GTE   = function($a, $b)     { return $a <= $b;     };
         $floor = $FLOOR = function($a)         { return floor($a);    };
+        $max   = $MAX   = function($a, $b)     { return max($a, $b);  };
+        $min   = $MIN   = function($a, $b)     { return min($a, $b);  };
 
         if (preg_match_all('/\$[a-z]+\b/i', $formula, $vars))
         {
@@ -526,6 +528,8 @@ class SpellList extends BaseType
                 $gt    = $GT    = !$this->interactive ? 'GT'    : sprintf(Util::$dfnString, 'GT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> > <span class=\'q1\'>b</span>', 'GT');
                 $gte   = $GTE   = !$this->interactive ? 'GTE'   : sprintf(Util::$dfnString, 'GTE(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> <= <span class=\'q1\'>b</span>', 'GT');
                 $floor = $FLOOR = !$this->interactive ? 'FLOOR' : sprintf(Util::$dfnString, 'FLOOR(<span class=\'q1\'>a</span>)', 'FLOOR');
+                $min   = $MIN   = !$this->interactive ? 'MIN'   : sprintf(Util::$dfnString, 'MIN(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MIN');
+                $max   = $MAX   = !$this->interactive ? 'MAX'   : sprintf(Util::$dfnString, 'MAX(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MAX');
                 $pl    = $PL    = !$this->interactive ? 'PL'    : sprintf(Util::$dfnString, 'LANG.level', 'PL');
 
                 // note the " !

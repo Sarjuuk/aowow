@@ -172,8 +172,7 @@ abstract class BaseType
         foreach ($rows as $k => $tpl)
             $this->templates[$k] = $tpl;
 
-        $this->curTpl = reset($this->templates);
-        $this->id     = key($this->templates);
+        $this->reset();                                     // push first element for instant use
         $this->error  = false;
     }
 
@@ -198,7 +197,7 @@ abstract class BaseType
 
     protected function reset()
     {
-        unset($this->curTpl);                               // kill reference or it will 'bleed' into the next iteration
+        unset($this->curTpl);                               // kill reference or strange stuff will happen
         $this->curTpl = reset($this->templates);
         $this->id     = key($this->templates);
     }
@@ -785,14 +784,14 @@ class SmartyAoWoW extends Smarty
     {
         foreach ($this->jsGlobals as $type => $ids)
         {
+            foreach ($ids as $k => $id)                     // filter already generated data, maybe we can save a lookup or two
+                if (isset($this->_tpl_vars['jsGlobals'][$type][1][$id]))
+                    unset($ids[$k]);
+
             if (!$ids)
                 continue;
 
             $this->initJSGlobal($type);
-
-            foreach ($ids as $k => $id)                     // filter already generated data, maybe we can save a lookup or two
-                if (isset($this->_tpl_vars['jsGlobals'][$type][1][$id]))
-                    unset($ids[$k]);
 
             switch ($type)
             {
