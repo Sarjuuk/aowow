@@ -4618,102 +4618,133 @@ Listview.extraCols = {
         id: 'condition',
         name: LANG.requires,
         compute: function(row, td) {
+            if (!row.condition || !row.condition.type || !row.condition.typeId) {
+                return '';
+            }
+
+            var cnd = Listview.extraCols.condition.getState(row.condition);
+            if (!cnd) {
+                return;
+            }
+
             td.className = 'small';
             td.style.lineHeight = '18px';
 
-            if (row.condition) {
-                switch(g_types[row.condition.type]) {
-                    case 'spell':
-                        return Listview.extraCols.condition.getSpellText(row.condition, td);
-                    case 'item':
-                        return Listview.extraCols.condition.getItemText(row.condition, td);
-                    case 'achievement':
-                        return Listview.extraCols.condition.getAchievementText(row.condition, td);
-                    case 'quest':
-                        return Listview.extraCols.condition.getQuestText(row.condition, td);
-                    default:
-                        return 'unhandled condition';
-                }
+            var span = $WH.ce('span');
+            span.className = cnd.color;
+            $WH.ae(span, cnd.state);
+            $WH.ae(td, span);
+            $WH.ae(td, $WH.ce('br'));
+
+            var a = $WH.ce('a');
+            a.href = cnd.url;
+            a.className = 'icontiny tinyspecial';
+            if (cnd.quality) {
+                a.className += ' q' + cnd.quality;
+            }
+            a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + cnd.icon + '.gif)';
+            a.style.whiteSpace = 'nowrap';
+            $WH.st(a, cnd.name);
+            $WH.ae(td, a);
+        },
+        getVisibleText: function(row) {
+            var buff = '';
+
+            if (!row.condition || !row.condition.type || !row.condition.typeId) {
+                return buff;
+            }
+
+            var cnd = Listview.extraCols.condition.getState(row.condition);
+            if (!cnd) {
+                return buff;
+            }
+
+            buff += cnd.name + ' ' + cnd.state;
+
+            return buff;
+        },
+        getState: function(cond) {
+            switch (g_types[cond.type]) {
+                case 'spell':
+                    return Listview.extraCols.condition.getSpellState(cond);
+                case 'item':
+                    return Listview.extraCols.condition.getItemtate(cond);
+                case 'achievement':
+                    return Listview.extraCols.condition.getAchievementState(cond);
+                case 'quest':
+                    return Listview.extraCols.condition.getQuestState(cond);
+                default:
+                    return {};
             }
         },
-        getSpellText: function(cond, td) {
+        getSpellState: function(cond) {
             if (!cond.typeId || !g_spells[cond.typeId]) {
                 return;
             }
 
-            var item = g_spells[cond.typeId];
-            var span = $WH.ce('span');
-            span.className = cond.status ? 'q2' : 'q10';
-            $WH.ae(span, cond.status ? $WH.ct(LANG.pr_note_known) : $WH.ct(LANG.pr_note_missing));
-            $WH.ae(td, span);
-            $WH.ae(td, $WH.ce('br'));
+            var
+                cnd  = {},
+                item = g_spells[cond.typeId];
 
-            var a = $WH.ce('a');
-            a.href = '?spell=' + cond.typeId;
-            a.className = 'icontiny tinyspecial';
-            a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
-            a.style.whiteSpace = 'nowrap';
-            $WH.ae(a, $WH.ct(item['name_' + g_locale.name]));
-            $WH.ae(td, a);
+            cnd.icon  = item.icon.toLowerCase();
+            cnd.state = cond.status ? $WH.ct(LANG.pr_note_known) : $WH.ct(LANG.pr_note_missing);
+            cnd.color = cond.status ? 'q2' : 'q10';
+            cnd.name  = item['name_' + g_locale.name];
+            cnd.url   = '?spell=' + cond.typeId;
+
+            return cnd;
         },
-        getItemText: function(cond, td) {
+        getItemState: function(cond) {
             if (!cond.typeId || !g_items[cond.typeId]) {
                 return;
             }
 
-            var item = g_items[cond.typeId];
-            var span = $WH.ce('span');
-            span.className = cond.status ? 'q2' : 'q10';
-            $WH.ae(span, cond.status ? $WH.ct(LANG.pr_note_earned) : $WH.ct(LANG.pr_note_missing));
-            $WH.ae(td, span);
-            $WH.ae(td, $WH.ce('br'));
+            var
+                cnd  = {},
+                item = g_items[cond.typeId];
 
-            var a = $WH.ce('a');
-            a.href = '?item=' + cond.typeId;
-            a.className = 'icontiny tinyspecial';
-            a.className += ' q' + item.quality;
-            a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
-            a.style.whiteSpace = 'nowrap';
-            $WH.ae(a, $WH.ct(item['name_' + g_locale.name]));
-            $WH.ae(td, a);
+            cnd.icon    = item.icon.toLowerCase();
+            cnd.state   = cond.status ? $WH.ct(LANG.pr_note_earned) : $WH.ct(LANG.pr_note_missing);
+            cnd.color   = cond.status ? 'q2' : 'q10';
+            cnd.name    = item['name_' + g_locale.name];
+            cnd.url     = '?item=' + cond.typeId;
+            cnd.quality = item.quality;
+
+            return cnd;
         },
-        getAchievementText: function(cond, td) {
+        getAchievementState: function(cond) {
             if (!cond.typeId || !g_achievements[cond.typeId]) {
                 return;
             }
 
-            var item = g_achievements[cond.typeId];
-            var span = $WH.ce('span');
-            span.className = cond.status ? 'q2' : 'q10';
-            $WH.ae(span, cond.status ? $WH.ct(LANG.pr_note_earned) : $WH.ct(LANG.pr_note_incomplete));
-            $WH.ae(td, span);
-            $WH.ae(td, $WH.ce('br'));
+            var
+                cnd  = {},
+                item = g_achievements[cond.typeId];
 
-            var a = $WH.ce('a');
-            a.href = '?achievement=' + cond.typeId;
-            a.className = 'icontiny tinyspecial';
-            a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
-            a.style.whiteSpace = 'nowrap';
-            $WH.st(a, item['name_' + g_locale.name]);
-            $WH.ae(td, a);
+            cnd.icon  = item.icon.toLowerCase();
+            cnd.state = cond.status ? $WH.ct(LANG.pr_note_earned) : $WH.ct(LANG.pr_note_incomplete);
+            cnd.color = cond.status ? 'q2' : 'q10';
+            cnd.name  = item['name_' + g_locale.name];
+            cnd.url   = '?achievement=' + cond.typeId;
+
+            return cnd;
         },
-        getQuestText: function(cond, td) {
+        getQuestState: function(cond) {
             if (!cond.typeId || !g_quests[cond.typeId]) {
                 return;
             }
 
-            var item = g_quests[cond.typeId];
-            var span = $WH.ce('span');
-            span.className = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
-            $WH.ae(span, cond.status == 1 ? $WH.ct(LANG.progress) : cond.status == 2 ? $WH.ct(LANG.pr_note_complete) : $WH.ct(LANG.pr_note_incomplete));
-            $WH.ae(td, span);
-            $WH.ae(td, $WH.ce('br'));
+            var
+                cnd  = {},
+                item = g_quests[cond.typeId];
 
-            var a = $WH.ce('a');
-            a.href = '?quest=' + cond.typeId;
-            a.style.whiteSpace = 'nowrap';
-            $WH.st(a, item['name_' + g_locale.name]);
-            $WH.ae(td, a);
+            cnd.icon  = item.icon.toLowerCase();
+            cnd.state = cond.status == 1 ? $WH.ct(LANG.progress) : cond.status == 2 ? $WH.ct(LANG.pr_note_complete) : $WH.ct(LANG.pr_note_incomplete);
+            cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
+            cnd.name  = item['name_' + g_locale.name];
+            cnd.url   = '?quest=' + cond.typeId;
+
+            return cnd;
         },
         sortFunc: function(a, b, col) {
             if (a.condition.status && b.condition.status) {
@@ -8729,6 +8760,289 @@ Listview.templates = {
                     }
 
                     return Listview.funcBox.assocArrCmp(a.skill, b.skill, g_spell_skills);
+                }
+            },
+    /* sarjuuk
+        todo: localize he next three cols
+    */
+            {
+                id: 'stackRules',
+                name: 'Behaviour',
+                type: 'text',
+                width: '20%',
+                hidden: true,
+                compute: function(spell, td) {
+                    if (!spell.stackRule) {
+                        return;
+                    }
+
+                    var
+                        buff  = '',
+                        buff2 = '';
+
+                    switch (spell.stackRule) {
+                        case 3:
+                            buff2 = '(strongest effect is applied)';
+                        case 0:
+                            buff  = 'coexist';              // without condition
+                            break;
+                        case 2:
+                            buff2 = '(from same caster)';
+                        case 1:
+                            buff  = 'exclusive';            // without condition
+                            break;
+                    }
+
+                    td.className = 'small';
+                    td.style.lineHeight = '18px';
+
+                    var span = $WH.ce('span');
+                    span.className = !spell.stackRule || spell.stackRule == 3 ? 'q2' : 'q10';
+                    $WH.ae(span, $WH.ct(buff));
+                    $WH.ae(td, span);
+
+                    if (buff2) {
+                        var sp2 = $WH.ce('span');
+                        sp2.style.whiteSpace = 'nowrap';
+                        sp2.className = 'q0';
+                        $WH.ae(td, $WH.ce('br'));
+                        $WH.st(sp2, buff2);
+                        $WH.ae(td, sp2);
+                    }
+                },
+                getVisibleText: function (spell) {
+                    if (!spell.stackRule) {
+                        return;
+                    }
+
+                    var buff = '';
+                    switch (spell.stackRule) {
+                        case 3:
+                            buff += '(strongest effect is applied)';
+                        case 0:
+                            buff += ' coexist';
+                            break;
+                        case 2:
+                            buff += '(from same caster)';
+                        case 1:
+                            buff += ' exclusive';
+                            break;
+                    }
+
+                    return buff;
+                },
+                sortFunc: function(a, b, col) {
+                    return $WH.strcmp(a.stackRule, b.stackRule);
+                }
+            },
+            {
+                id: 'linkedTrigger',
+                name: 'Triggers',
+                type: 'text',
+                width: '50%',
+                hidden: true,
+                compute: function(spell, td) {
+                    if (!spell.linked) {
+                        return;
+                    }
+
+                    var
+                        trigger = spell.linked[0],
+                        buff    = '';
+
+                    switch (spell.linked[2]) {
+                        case 0:
+                            buff = trigger > 0 ? 'When Spell is casted' : 'When Aura is removed';
+                            break;
+                        case 1:
+                            buff = 'When Spell hits the target(s)';
+                            break;
+                        case 2:
+                            buff = 'When Aura is applied and removed';
+                            break;
+                    }
+
+                    td.className = 'small';
+                    td.style.lineHeight = '18px';
+
+                    var a = $WH.ce('a');
+                    a.style.whiteSpace = 'nowrap';
+                    a.href = '?spell=' + Math.abs(trigger);
+                    if (g_pageInfo.typeId == Math.abs(trigger)) { // ponts to self
+                        a.className = 'q1';
+                        $WH.st(a, 'This');
+                    }
+                    else {
+                        var item = g_spells[Math.abs(trigger)];
+                        a.className = 'icontiny tinyspecial';
+                        a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item['icon'] + '.gif)';
+                        $WH.st(a, item['name_' + g_locale.name]);
+                    }
+                    $WH.ae(td, a);
+
+                    var span = $WH.ce('span');
+                    span.className = 'q0';
+                    $WH.st(span, buff);
+                    $WH.ae(td, $WH.ce('br'));
+                    $WH.ae(td, span);
+
+                },
+                getVisibleText: function (spell) {
+                    if (!spell.linked) {
+                        return;
+                    }
+
+                    var
+                        trigger = spell.linked[0],
+                        buff    = '';
+
+                    if (g_pageInfo.typeId == Math.abs(trigger)) {
+                        buff += 'This';
+                    }
+                    else {
+                        buff += g_spells[Math.abs(trigger)]['name_' + g_locale.name];
+                    }
+
+                    switch (spell.linked[2]) {
+                        case 0:
+                            buff += trigger > 0 ? ' When Spell is casted' : ' When Aura is removed';
+                            break;
+                        case 1:
+                            buff += ' When Spell hits the target(s)';
+                            break;
+                        case 2:
+                            buff += ' When Aura is applied and removed';
+                            break;
+                    }
+
+                    return buff;
+                },
+                sortFunc: function(a, b, col) {
+                    var
+                        trA = a.linked[0],
+                        trB = b.linked[0];
+
+                    if (trA > 0 && trB < 0) {
+                        return -1;
+                    }
+                    else if (trA < 0 && trB > 0) {
+                        return 1;
+                    }
+
+                    if (g_pageInfo.typeId == Math.abs(trA)) {
+                        return 1;
+                    }
+                    else if (g_pageInfo.typeId == Math.abs(trB)) {
+                        return -1;
+                    }
+                    else if (trA != trB) {
+                        return $WH.strcmp(g_spells[Math.abs(trA)]['name_' + g_locale.name],  g_spells[Math.abs(trB)]['name_' + g_locale.name]);
+                    }
+
+                    return 0;
+                }
+            },
+            {
+                id: 'linkedEffect',
+                name: 'Effects',
+                type: 'text',
+                width: '50%',
+                hidden: true,
+                compute: function(spell, td) {
+                    if (!spell.linked) {
+                        return;
+                    }
+
+                    var
+                        effect = spell.linked[1],
+                        buff   = '';
+
+                    switch (spell.linked[2]) {
+                        case 0:
+                        case 1:
+                            buff = effect > 0 ? 'Spell is triggered' : 'Spells Auras are removed';
+                            break;
+                        case 2:
+                            buff = effect > 0 ? 'Spells Auras are applied or removed' : 'Immunity against Spell is applied or cleared ';
+                            break;
+                    }
+
+                    td.className = 'small';
+                    td.style.lineHeight = '18px';
+
+                    var a = $WH.ce('a');
+                    a.style.whiteSpace = 'nowrap';
+                    a.href = '?spell=' + Math.abs(effect);
+                    if (g_pageInfo.typeId == Math.abs(effect)) { // ponts to self
+                        a.className = 'q1';
+                        $WH.st(a, 'This');
+                    }
+                    else {
+                        var item = g_spells[Math.abs(effect)];
+                        a.className = 'icontiny tinyspecial';
+                        a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + item['icon'] + '.gif)';
+                        $WH.st(a, item['name_' + g_locale.name]);
+                    }
+                    $WH.ae(td, a);
+
+                    var span = $WH.ce('span');
+                    span.className = 'q0';
+                    $WH.st(span, buff);
+                    $WH.ae(td, $WH.ce('br'));
+                    $WH.ae(td, span);
+
+                },
+                getVisibleText: function (spell) {
+                    if (!spell.linked) {
+                        return;
+                    }
+
+                    var
+                        effect = spell.linked[1],
+                        buff   = '';
+
+                    if (g_pageInfo.typeId == Math.abs(effect)) {
+                        buff += 'This';
+                    }
+                    else {
+                        buff += g_spells[Math.abs(effect)]['name_' + g_locale.name];
+                    }
+
+                    switch (spell.linked[2]) {
+                        case 0:
+                        case 1:
+                            buff += effect > 0 ? ' Spell is triggered' : ' Spells Auras are removed';
+                            break;
+                        case 2:
+                            buff += effect > 0 ? ' Spells Auras are applied or removed' : ' Immunity against Spell is applied or cleared ';
+                            break;
+                    }
+
+                    return buff;
+                },
+                sortFunc: function(a, b, col) {
+                    var
+                        effA = a.linked[1],
+                        effB = b.linked[1];
+
+                    if (effA > 0 && effB < 0) {
+                        return -1;
+                    }
+                    else if (effA < 0 && effB > 0) {
+                        return 1;
+                    }
+
+                    if (g_pageInfo.typeId == Math.abs(effA)) {
+                        return 1;
+                    }
+                    else if (g_pageInfo.typeId == Math.abs(effB)) {
+                        return -1;
+                    }
+                    else if (effA != effB) {
+                        return $WH.strcmp(g_spells[Math.abs(effA)]['name_' + g_locale.name],  g_spells[Math.abs(effB)]['name_' + g_locale.name]);
+                    }
+
+                    return 0;
                 }
             }
         ],

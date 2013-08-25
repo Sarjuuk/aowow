@@ -203,7 +203,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     ) = $spell->renderBuff(MAX_LEVEL, true);
 
     // js-globals
-    $spell->addGlobalsToJScript($smarty, GLOBALINFO_RELATED);
+    $spell->addGlobalsToJScript($smarty);
 
     // prepare Tools
     foreach ($pageData['page']['tools'] as $k => $tool)
@@ -583,7 +583,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     * extra tabs
     *******/
 
-    // modifies $this
+    // tab: modifies $this
     $sub = ['OR'];
     $conditions = [
         ['s.typeCat', [0, -9 /*, -8*/], '!'],               // uncategorized (0), GM (-9), NPC-Spell (-8); NPC includes totems, lightwell and others :/
@@ -619,6 +619,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $msH = "$['skill']";
 
             $pageData['relTabs'][] = array(
+                'file'   => 'spell',
                 'data'   => $modSpells->getListviewData(),
                 'params' => [
                     'tabs'        => '$tabsRelated',
@@ -629,11 +630,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $modSpells->addGlobalddoJScript($smarty);
+            $modSpells->addGlobalsToJScript($smarty);
         }
     }
 
-    // modified by $this
+    // tab: modified by $this
     $sub = ['OR'];
     $conditions = [
         ['s.spellFamilyId', $spell->getField('spellFamilyId')],
@@ -670,6 +671,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $mbH = "$['skill']";
 
             $pageData['relTabs'][] = array(
+                'file'   => 'spell',
                 'data'   => $modsSpell->getListviewData(),
                 'params' => [
                     'tabs'        => '$tabsRelated',
@@ -684,7 +686,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // see also
+    // tab: see also
     $conditions = array(
         ['s.schoolMask', $spell->getField('schoolMask')],
         ['s.effect1Id', $spell->getField('effect1Id')],
@@ -702,6 +704,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $saH = "$['skill']";
 
         $pageData['relTabs'][] = array(
+            'file'   => 'spell',
             'data'   => $saSpells->getListviewData(),
             'params' => [
                 'tabs'        => '$tabsRelated',
@@ -715,7 +718,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $saSpells->addGlobalsToJScript($smarty);
     }
 
-    // used by - itemset
+    // tab: used by - itemset
     $conditions = array(
         'OR',
         ['spell1', $spell->id], ['spell2', $spell->id], ['spell3', $spell->id], ['spell4', $spell->id],
@@ -726,6 +729,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if (!$ubSets->error)
     {
         $pageData['relTabs'][] = array(
+            'file'   => 'itemset',
             'data'   => $ubSets->getListviewData(),
             'params' => [
                 'tabs' => '$tabsRelated',
@@ -738,7 +742,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
 
-    // used by - item
+    // tab: used by - item
     $conditions = array(
         'OR',                   // 6: learn spell
         ['AND', ['spelltrigger_1', 6, '!'], ['spellid_1', $spell->id]],
@@ -752,6 +756,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if (!$ubItems->error)
     {
         $pageData['relTabs'][] = array(
+            'file'   => 'item',
             'data'   => $ubItems->getListviewData(),
             'params' => [
                 'tabs' => '$tabsRelated',
@@ -763,7 +768,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $ubItems->addGlobalsToJScript($smarty);
     }
 
-    // criteria of
+    // tab: criteria of
     $_ = [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL];
     if ($crs = DB::Aowow()->selectCol('SELECT refAchievement FROM ?_achievementCriteria WHERE type IN (?a) AND value1 = ?d', $_, $spell->id))
     {
@@ -783,7 +788,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // "contains"
+    // tab: contains
     // spell_loot_template & skill_extra_item_template
     $extraItem = DB::Aowow()->selectRow('SELECT * FROM skill_extra_item_template WHERE spellid = ?d', $spell->id);
     $spellLoot = DB::Aowow()->select('SELECT *, item as ARRAY_KEY FROM spell_loot_template WHERE entry = ?d', $spell->id);
@@ -860,7 +865,137 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
     }
 
-    // teaches
+    // tab: Exclusive with
+    $firstRank = DB::Aowow()->selectCell(                   // returns self or firstRank
+       'SELECT      IF(s1.rankId <> 1 AND s2.id, s2.id, s1.id)
+        FROM        ?_spell s1
+        LEFT JOIN   ?_spell s2
+            ON      s1.SpellFamilyId = s2.SpelLFamilyId AND
+                    s1.SpellFamilyFlags1 = s2.SpelLFamilyFlags1 AND
+                    s1.SpellFamilyFlags2 = s2.SpellFamilyFlags2 AND
+                    s1.SpellFamilyFlags3 = s2.SpellFamilyFlags3 AND
+                    s1.name_loc0 = s2.name_loc0 AND
+                    s2.RankId = 1
+        WHERE       s1.id = ?d',
+        $_id
+    );
+
+    if ($firstRank) {
+        $linkedSpells = DB::Aowow()->selectCol(             // dont look too closely ..... please..?
+           'SELECT      IF(sg2.spell_id < 0, sg2.id, sg2.spell_id) AS ARRAY_KEY, IF(sg2.spell_id < 0, sg2.spell_id, sr.stack_rule)
+            FROM        spell_group sg1
+            JOIN        spell_group sg2
+                ON      (sg1.id = sg2.id OR sg1.id = -sg2.spell_id) AND sg1.spell_id != sg2.spell_id
+            LEFT JOIN   spell_group_stack_rules sr
+                ON      sg1.id = sr.group_id
+            WHERE       sg1.spell_id = ?d',
+            $firstRank
+        );
+        if ($linkedSpells)
+        {
+            $extraSpells = [];
+            foreach ($linkedSpells as $k => $v)
+            {
+                if ($v > 0)
+                    continue;
+
+                $extraSpells += DB::Aowow()->selectCol(      // recursive case (recursive and regular ids are not mixed in a group)
+                   'SELECT      sg2.spell_id AS ARRAY_KEY, sr.stack_rule
+                    FROM        spell_group sg1
+                    JOIN        spell_group sg2
+                        ON      sg2.id = -sg1.spell_id AND sg2.spell_id != ?d
+                    LEFT JOIN   spell_group_stack_rules sr
+                        ON      sg1.id = sr.group_id
+                    WHERE       sg1.id = ?d',
+                    $firstRank,
+                    $k
+                );
+
+                unset($linkedSpells[$k]);
+            }
+
+            $groups  = $linkedSpells + $extraSpells;
+            $stacks = new SpellList(array(['s.id', array_keys($groups)]));
+
+            if (!$stacks->error)
+            {
+                $data = $stacks->getListviewData();
+                foreach ($data as $k => $d)
+                    $data[$k]['stackRule'] = $groups[$k];
+
+                if (!$stacks->hasSetFields(['skillLines']))
+                    $sH = "$['skill']";
+
+                $pageData['relTabs'][] = array(
+                    'file'   => 'spell',
+                    'data'   => $data,
+                    'params' => [
+                        'tabs'        => '$tabsRelated',
+                        'id'          => 'spell-group-stack',
+                        'name'        => 'Stack Group',     // todo (med): localize
+                        'visibleCols' => "$['stackRules']",
+                        'hiddenCols'  => isset($sH) ? $sH : null
+                    ]
+                );
+
+                $stacks->addGlobalsToJScript($smarty);
+            }
+        }
+    }
+
+    // tab: Linked with
+    $rows = DB::Aowow()->select('
+        SELECT  spell_trigger AS `trigger`,
+                spell_effect AS effect,
+                type,
+                IF(ABS(spell_effect) = ?d, ABS(spell_trigger), ABS(spell_effect)) AS related
+        FROM    spell_linked_spell
+        WHERE   ABS(spell_effect) = ?d OR ABS(spell_trigger) = ?d',
+        $_id, $_id, $_id
+    );
+
+    $related = [];
+    foreach ($rows as $row)
+        $related[] = $row['related'];
+
+    if ($related)
+        $linked = new SpellList(array(['s.id', $related]));
+
+    if (isset($linked) && !$linked->error)
+    {
+        $lv = $linked->getListviewData();
+        $data = [];
+
+        foreach ($rows as $r)
+        {
+            foreach ($lv as $dk => $d)
+            {
+                if ($r['related'] == $dk)
+                {
+                    $lv[$dk]['linked'] = json_encode([$r['trigger'], $r['effect'], $r['type']], JSON_NUMERIC_CHECK);
+                    $data[] = $lv[$dk];
+                    break;
+                }
+            }
+        }
+
+        $pageData['relTabs'][] = array(
+            'file'   => 'spell',
+            'data'   => $data,
+            'params' => [
+                'tabs'        => '$tabsRelated',
+                'id'          => 'spell-link',
+                'name'        => 'Linked with',             // todo (med): localize
+                'hiddenCols'  => "$['skill', 'name']",
+                'visibleCols' => "$['linkedTrigger', 'linkedEffect']"
+            ]
+        );
+
+        $linked->addGlobalsToJScript($smarty);
+    }
+
+
+    // tab: teaches
     // -> spell_learn_spell
     // -> skill_discovery_template
 
@@ -900,16 +1035,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $spellArr['usedbynpc'] = [];
 
-    /* used by item
-
-
-    */
-
-
-
     /* NEW
-        is in stack-rule with X
-        is linked with X
         scaling data
         conditions
         difficulty-versions

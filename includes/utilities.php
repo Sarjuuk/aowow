@@ -163,11 +163,9 @@ abstract class BaseType
         $this->setupQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                     $this->setupQuery);
         $this->setupQuery .= $limit;
 
-        $rows = DB::Aowow()->SelectPage($cnt, $this->setupQuery);
+        $rows = DB::Aowow()->SelectPage($this->matches, $this->setupQuery);
         if (!$rows)
             return;
-
-        $this->matches = $cnt;
 
         foreach ($rows as $k => $tpl)
             $this->templates[$k] = $tpl;

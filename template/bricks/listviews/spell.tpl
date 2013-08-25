@@ -77,6 +77,12 @@
                     {if isset($curr.percent)}
                         percent:{$curr.percent},
                     {/if}
+                    {if isset($curr.stackRule)}
+                        stackRule:{$curr.stackRule},
+                    {/if}
+                    {if isset($curr.linked)}
+                        linked:{$curr.linked},
+                    {/if}
                     id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
