@@ -33,14 +33,14 @@ if (!defined('AOWOW_REVISION'))
         12: Listview - template: 'spell',       id: 'professions',   name: LANG.tab_professions,
         13: Listview - template: 'spell',       id: 'companions',    name: LANG.tab_companions,
         14: Listview - template: 'spell',       id: 'mounts',        name: LANG.tab_mounts,
-todo    15: Listview - template: 'npc',         id: 'npcs',          name: LANG.tab_npcs,
+        15: Listview - template: 'npc',         id: 'npcs',          name: LANG.tab_npcs,
         16: Listview - template: 'quest',       id: 'quests',        name: LANG.tab_quests,
         17: Listview - template: 'achievement', id: 'achievements',  name: LANG.tab_achievements,
         18: Listview - template: 'achievement', id: 'statistics',    name: LANG.tab_statistics,
 todo    19: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
 todo    20: Listview - template: 'object',      id: 'objects',       name: LANG.tab_objects,
 todo    21: Listview - template: 'faction',     id: 'factions',      name: LANG.tab_factions,
-todo    22: Listview - template: 'skill',       id: 'skills',        name: LANG.tab_skills,                                                         hiddenCols: ['reagents', 'skill'],
+        22: Listview - template: 'skill',       id: 'skills',        name: LANG.tab_skills,
         23: Listview - template: 'pet',         id: 'pets',          name: LANG.tab_pets,
         24: Listview - template: 'spell',       id: 'npc-abilities', name: LANG.tab_npcabilities,
         25: Listview - template: 'spell',       id: 'spells',        name: LANG.tab_uncategorizedspells,
@@ -676,8 +676,7 @@ if ($searchMask & 0x4000)
     $conditions = array(
         [
             'OR',
-            ['name_loc'.User::$localeId, $query],
-            ['subname_loc'.User::$localeId, $query]
+            ['name_loc'.User::$localeId, $query]
         ],
         // [['cuFlags', MASKE, '&'], 0],     // todo (med): exclude trigger creatures and difficulty entries
         $maxResults
@@ -825,7 +824,31 @@ if ($searchMask & 0x20000)
 // if ($searchMask & 0x100000)
 
 // 22 Skills
-// if ($searchMask & 0x200000)
+if ($searchMask & 0x200000)
+{
+    $skills = new SkillList(array($maxResults, ['name_loc'.User::$localeId, $query]));
+
+    if ($data = $skills->getListviewData())
+    {
+        foreach ($skills->iterate() as $id => $__)
+            $data[$id]['param1'] = '"'.$skills->getField('iconString').'"';
+
+        $found['pet'] = array(
+            'type'     => TYPE_SKILL,
+            'appendix' => ' (Skill)',
+            'matches'  => $skills->getMatches(),
+            'file'     => 'skill',
+            'data'     => $data,
+            'params'   => ['tabs' => '$myTabs']
+        );
+
+        if ($skills->getMatches() > $maxResults)
+        {
+            $found['pet']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_skillsfound', $skills->getMatches(), $maxResults);
+            $found['pet']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 23 Pets
 if ($searchMask & 0x400000)
