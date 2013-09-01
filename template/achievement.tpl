@@ -16,13 +16,13 @@
                 g_initPath({$page.path});
             //]]></script>
 
-{* include file='bricks/infobox.tpl' *}
+{* include file='bricks/infobox.tpl' info=$lvData.infobox *}
 
             <table class="infobox">
             <tr><th>{$lang.quickFacts}</th></tr>
             <tr><td><div class="infobox-spacer"></div>
                 <ul>
-                    {if $lvData.page.points}<li><div>{$lang.points}: <span class="moneyachievement tip" onmouseover="Listview.funcBox.moneyAchievementOver(event)" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">{$lvData.page.points}</span></div></li>{/if}
+                    {if $lvData.page.points}<li><div>{$lang.points}: <span class="moneyachievement tip" onmouseover="Listview.funcBox.moneyAchievementOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">{$lvData.page.points}</span></div></li>{/if}
 {foreach from=$lvData.infobox item=info}
                     <li><div>{$info}</div></li>
 {/foreach}

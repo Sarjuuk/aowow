@@ -32,7 +32,7 @@ function tc_init() {
 
         link.onclick     = tc_classClick.bind(link, classId);
         link.onmouseover = tc_classOver.bind(link, classId);
-        link.onmouseout  = Tooltip.hide;
+        link.onmouseout  = $WH.Tooltip.hide;
 
         $WH.ae(_, icon);
     }
@@ -54,14 +54,14 @@ function tc_init() {
 
 function tc_classClick(classId) {
     if (tc_object.setClass(classId)) {
-        Tooltip.hide();
+        $WH.Tooltip.hide();
     }
 
     return false;
 }
 
 function tc_classOver(classId) {
-    Tooltip.show(this, '<b>' + g_chr_classes[classId] + '</b>', 0, 0, 'c' + classId);
+    $WH.Tooltip.show(this, '<b>' + g_chr_classes[classId] + '</b>', 0, 0, 'c' + classId);
 }
 
 function tc_onChange(tc, info, data) {

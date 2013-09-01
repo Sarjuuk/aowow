@@ -837,13 +837,19 @@ var mn_tools = [
     ]],
     [8,"Utilitaires",,[
         [,"Base de données"],
-        [4,"Page au hasard","?random"],
         [0,"Derniers ajouts","?latest-additions"],
         [1,"Derniers articles","?latest-articles"],
+        [2,"Derniers commentaires","?latest-comments"],
         [3,"Dernières captures d'écran","?latest-screenshots"],
         [11,"Derniers vidéos","?latest-videos"],
-        [2,"Derniers commentaires","?latest-comments"],
-        [5,"Commentaire sans note","?unrated-comments"]
+        [12,"Le plus de commentaires",,[
+            [1,"Hier","?most-comments"],
+            [7,"Derniers 7 jours","?most-comments=7"],
+            [30,"Derniers 30 jours","?most-comments=30"]
+        ]],
+        [5,"Commentaire sans note","?unrated-comments"],
+        [13,"Captures d'écrans manquantes","?missing-screenshots"],
+        [4,"Page au hasard","?random"]
     ]]
 ];
 var mn_community = [

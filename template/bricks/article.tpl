@@ -1,7 +1,13 @@
 {if !empty($article)}
     <div id="article-generic" class="left"></div>
     <script type="text/javascript">//<![CDATA[
-        Markup.printHtml("{$article}", "article-generic", {ldelim}mode:Markup.MODE_ARTICLE{rdelim});
+        Markup.printHtml("{$article.text}", "article-generic", {strip}{ldelim}
+            {foreach from=$article.params key=k item=v}
+                {$k}: {if $v[0] == '$'}{$v|substr:1}{else}'{$v}'{/if},
+            {/foreach}
+            allow: Markup.CLASS_ADMIN,
+            dbpage: true
+        {rdelim}{/strip});
     //]]></script>
 
     <div class="pad2"></div>

@@ -37,7 +37,7 @@ $lang = array(
         'rewards'       => "Récompenses",
         'gains'         => "Gains",
         'login'         => "[Login]",
-        'forum'         => "[Forum]",
+        'forum'         => "Forum",
         'days'          => "jours",
         'hours'         => "heures",
         'minutes'       => "minutes",
@@ -73,7 +73,18 @@ $lang = array(
         // red buttons
         'links'         => "Liens",
         'compare'       => "Comparer",
-        'view3D'        => "Voir en 3D"
+        'view3D'        => "Voir en 3D",
+
+        // misc Tools
+        'subscribe'     => "S'abonner",
+        'mostComments'  => ["Hier", "Derniers %d jours"],
+        'utilities'     => array(
+            "Derniers ajouts",                      "Derniers articles",                    "Derniers commentaires",                "Dernières captures d'écran",           null,
+            "Commentaire sans note",                11 => "Derniers vidéos",                12 => "Le plus de commentaires",        13 => "Captures d'écrans manquantes"
+        ),
+
+        // article & infobox
+        'englishOnly'   => "Cette page n'est disponible qu'en <b>anglais</b> pour le moment."
     ),
     'search' => array(
         'search'        => "Recherche",
@@ -126,6 +137,15 @@ $lang = array(
         'valueDelim'    => " - ",
         'zone'          => "zone",
         'zones'         => "Zones",
+
+        'heroClass'     => "Classe de héros",
+        'resource'      => "Ressource",
+        'resources'     => "Ressources",
+        'role'          => "Role",
+        'roles'         => "Roles",
+        'specs'         => "Specialisations",
+        '_roles'        => ['Soigneur', 'DPS mêlée', 'DPS à distance', 'Tank'],
+
         'expansions'    => array("Classique", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Force", "Agilité", "Endurance", "Intelligence", "Esprit"),
         'languages'     => array(
@@ -141,7 +161,7 @@ $lang = array(
         'ra'            => array(-2 => "Horde", -1 => "Alliance", "Les deux", "Humain", "Orc", "Nain", "Elfe de la nuit", "Mort-vivant", "Tauren", "Gnome", "Troll", null, "Elfe de sang", "Draeneï"),
         'rep'           => array("Détesté", "Hostile", "Inamical", "Neutre", "Amical", "Honoré", "Révéré", "Exalté"),
         'st'            => array(
-            null,               "Forme de félin",               "Arbre de vie",                 "Forme de voyage",              "Aquatic Form",
+            "Défaut",           "Forme de félin",               "Arbre de vie",                 "Forme de voyage",              "Aquatic Form",
             "Forme d'ours",     null,                           null,                           "Forme d'ours redoutable",      null,
             null,               null,                           null,                           "Danse de l'ombre",             null,
             null,               "Ghostwolf",                    "Posture de combat",            "Posture défensive",            "Posture berserker",

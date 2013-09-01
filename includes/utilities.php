@@ -55,7 +55,7 @@ abstract class BaseType
         $limit     = ' LIMIT '.$AoWoWconf['sqlLimit'];
         $className = get_class($this);
 
-        if (!$this->setupQuery)
+        if (!$this->setupQuery || $conditions === null)
             return;
 
         // may be called without filtering
@@ -211,6 +211,15 @@ abstract class BaseType
 
         $value = $this->curTpl[$field];
         return is_numeric($value) ? floatVal($value) : $value;
+    }
+
+    public function getRandomId()
+    {
+        $pattern = '/SELECT .* (-?[\w_]*\.?(id|entry)) AS ARRAY_KEY,?.* FROM (.*) WHERE .*/i';
+        $replace = 'SELECT $1 FROM $3 ORDER BY RAND() ASC LIMIT 1';
+        $query   = preg_replace($pattern, $replace, $this->setupQuery);
+
+        return DB::Aowow()->selectCell($query);
     }
 
     public function getFoundIDs()
@@ -441,10 +450,10 @@ class Lang
         $tmp = [];
 
         if ($flags & CUSTOM_DISABLED)
-            $tmp[] = '<span class="tip" onmouseover="Tooltip.showAtCursor(event, \''.self::$main['disabledHint'].'\', 0, 0, \'q\')" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">'.self::$main['disabled'].'</span>';
+            $tmp[] = '<span class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, \''.self::$main['disabledHint'].'\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'.self::$main['disabled'].'</span>';
 
         if ($flags & CUSTOM_SERVERSIDE)
-            $tmp[] = '<span class="tip" onmouseover="Tooltip.showAtCursor(event, \''.self::$main['serversideHint'].'\', 0, 0, \'q\')" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">'.self::$main['serverside'].'</span>';
+            $tmp[] = '<span class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, \''.self::$main['serversideHint'].'\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'.self::$main['serverside'].'</span>';
 
         return $tmp;
     }
@@ -679,28 +688,40 @@ class SmartyAoWoW extends Smarty
     public function display($tpl)
     {
         $tv = &$this->_tpl_vars;
-        $_  = [];
 
+        // fetch article & static infobox
         if ($tv['page']['type'] && $tv['page']['typeId'])
         {
-            if ($article = DB::Aowow()->selectRow('SELECT id, article, quickInfo FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d', $tv['page']['type'], $tv['page']['typeId'], User::$localeId))
+            $article = DB::Aowow()->selectRow(
+                'SELECT SQL_CALC_FOUND_ROWS article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL '.
+                'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = 0 AND FOUND_ROWS() = 0',
+                $tv['page']['type'], $tv['page']['typeId'], User::$localeId,
+                $tv['page']['type'], $tv['page']['typeId']
+            );
+
+            if ($article)
             {
-                $globals = DB::Aowow()->select('SELECT type, typeId FROM ?_article_items WHERE id = ?d', $article['id']);
+                $tv['article'] = ['text' => $article['article']];
+                if (empty($tv['infobox']) && !empty($article['quickInfo']))
+                    $tv['infobox'] = $article['quickInfo'];
 
-                 $tv['article']  = $article['article'];
-                @$tv['infoBox'] .= $article['quickInfo'];
+                if ($article['locale'] != User::$localeId)
+                    $tv['article']['params'] = ['prepend' => Util::jsEscape('<div class="notice-box" style="margin-right:245px;"><span class="bubble-icon">'.Lang::$main['englishOnly'].'</span></div>')];
 
-                foreach ($globals as $glob)
-                {
-                    if (!isset($this->jsGlobals[$glob['type']]))
-                        $this->jsGlobals[$glob['type']] = [];
+                foreach ($article as $text)
+                    if (preg_match_all('/\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|title|holiday|class|race|skill|currency)=(\d+)[^\]]*\]/i', $text, $matches, PREG_SET_ORDER))
+                        foreach ($matches as $match)
+                            if ($type = array_search($match[1], Util::$typeStrings))
+                            {
+                                if (!isset($this->jsGlobals[$type]))
+                                    $this->jsGlobals[$type] = [];
 
-                    $this->jsGlobals[$glob['type']][] = $glob['typeId'];
-                }
+                                $this->jsGlobals[$type][] = $match[2];
+                            }
             }
         }
 
-        // since it's the same for every page, except index..
+        // fetch announcements
         if ($tv['query'][0] && !preg_match('/[^a-z]/i', $tv['query'][0]))
         {
             $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ?s OR page = "*")', $tv['query'][0]);

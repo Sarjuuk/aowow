@@ -18,7 +18,7 @@
                 g_initPath({$page.path});
             </script>
 
-{include file='bricks/infobox.tpl'}
+{include file='bricks/infobox.tpl' info=$lvData.infobox}
 
             </table>
 
@@ -36,7 +36,7 @@
 
                 <script type="text/javascript">
                     $WH.ge('headicon-generic').appendChild(Icon.create('{$lvData.page.icon}', 2, 0, 0, {$lvData.page.stack}));
-                    Tooltip.fix($WH.ge('tooltip{$lvData.page.id}-generic'), 1, 1);
+                    $WH.Tooltip.fix($WH.ge('tooltip{$lvData.page.id}-generic'), 1, 1);
                 </script>
 
                 {if !empty($lvData.page.buff)}
@@ -45,7 +45,7 @@
                     <table><tr><td>{$lvData.page.buff}</td><th style="background-position: top right"></th></tr><tr><th style="background-position: bottom left"></th><th style="background-position: bottom right"></th></tr></table>
                 </div>
                 <script type="text/javascript">
-                    Tooltip.fixSafe($WH.ge('btt{$lvData.page.id}'), 1, 1)
+                    $WH.Tooltip.fixSafe($WH.ge('btt{$lvData.page.id}'), 1, 1)
                 </script>
                 {/if}
 

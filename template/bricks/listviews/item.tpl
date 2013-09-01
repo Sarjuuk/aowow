@@ -3,7 +3,7 @@
         template:'item',
         {if !isset($params.id)}id:'items',{/if}
         {if !isset($params.name)}name:LANG.tab_items,{/if}
-        {if !isset($params.parent)}parent:'listview-generic',{/if}
+        {if !isset($params.parent)}parent:'lv-generic',{/if}
         {foreach from=$params key=k item=v}
             {if $v[0] == '$'}
                 {$k}:{$v|substr:1},

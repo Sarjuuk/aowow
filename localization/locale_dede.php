@@ -81,7 +81,18 @@ $lang = array(
         // red buttons
         'links'         => "Links",
         'compare'       => "Vergleichen",
-        'view3D'        => "3D-Ansicht"
+        'view3D'        => "3D-Ansicht",
+
+        // miscTooles
+        'subscribe'     => "Abonnieren",
+        'mostComments'  => ["Gestern", "Vergangene %d Tage"],
+        'utilities'     => array(
+            "Neueste Ergänzungen",                  "Neueste Artikel",                      "Neueste Kommentare",                   "Neueste Screenshots",                  null,
+            "Nicht bewertete Kommentare",           11 => "Neueste Videos",                 12 => "Meiste Kommentare",              13 => "Fehlende Screenshots"
+        ),
+
+        // article & infobox
+        'englishOnly'   => "Diese Seite ist nur in <b>Englisch</b> verfügbar."
     ),
     'search' => array(
         'search'        => "Suche",
@@ -134,6 +145,15 @@ $lang = array(
         'valueDelim'    => " - ",                           // " bis "
         'zone'          => "Zone",
         'zones'         => "Gebiete",
+
+        'heroClass'     => "Heldenklasse",
+        'resource'      => "Ressource",
+        'resources'     => "Ressourcen",
+        'role'          => "Rolle",
+        'roles'         => "Rollen",
+        'specs'         => "Spezialisierungen",
+        '_roles'        => ['Heiler', 'Nahkampf-DPS', 'Distanz-DPS', 'Tank'],
+
         'expansions'    => array("Classic", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"),
         'languages'     => array(
@@ -149,7 +169,7 @@ $lang = array(
         'ra'            => array(-2 => "Horde", -1 => "Allianz", "Beide", "Mensch", "Orc", "Zwerg", "Nachtelf", "Untoter", "Taure", "Gnom", "Troll", null, "Blutelf", "Draenei"),
         'rep'           => array("Hasserfüllt", "Feindselig", "Unfreundlich", "Neutral", "Freundlich", "Wohlwollend", "Respektvoll", "Ehrfürchtig"),
         'st'            => array(
-            null,                   "Katzengestalt",                "Baum des Lebens",              "Reisegestalt",                 "Wassergestalt",
+            "Vorgabe",              "Katzengestalt",                "Baum des Lebens",              "Reisegestalt",                 "Wassergestalt",
             "Bärengestalt",         null,                           null,                           "Terrorbärengestalt",           null,
             null,                   null,                           null,                           "Schattentanz",                 null,
             null,                   "Geisterwolf",                  "Kampfhaltung",                 "Verteidigungshaltung",         "Berserkerhaltung",
@@ -313,14 +333,14 @@ $lang = array(
         '_tag'          => "Tag",
 
         'notes'         => array(
-            null,                                   "Dungeon-Set 1",                            "Dungeon-Set 2",                            "Tier 1 Raid-Set",
+            null,                                   "Dungeon-Set 1",                            "Dungeon-Set 2",                                "Tier 1 Raid-Set",
             "Tier 2 Raid-Set",                      "Tier 3 Raid-Set",                          "Level 60 PvP-Set (Rar)",                   "Level 60 PvP-Set (Rar,  alt)",
             "Level 60 PvP-Set (Episch)",            "Set der Ruinen von Ahn'Qiraj",             "Set des Tempels von Ahn'Qiraj",            "Set von Zul'Gurub",
             "Tier 4 Raid-Set",                      "Tier 5 Raid-Set",                          "Dungeon-Set 3",                            "Set des Arathibeckens",
             "Level 70 PvP-Set (Rar)",               "Arena-Set Saison 1",                       "Tier 6 Raid-Set",                          "Arena-Set Saison 2",
             "Arena-Set Saison 3",                   "Level 70 PvP-Set 2 (Rar)",                 "Arena-Set Saison 4",                       "Tier 7 Raid-Set",
             "Arena-Set Saison 5",                   "Tier 8 Raid-Set",                          "Arena-Set Saison 6",                       "Tier 9 Raid-Set",
-            "Arena-Set Saison 7",                   "Tier 10 Raid-Set",                     "Arena-Set Saison 8"
+            "Arena-Set Saison 7",                   "Tier 10 Raid-Set",                         "Arena-Set Saison 8"
         ),
         'types'         => array(
             null,               "Stoff",                "Leder",                "Schwere Rüstung",          "Platte",                   "Dolch",                "Ring",

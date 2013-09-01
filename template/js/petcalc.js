@@ -35,7 +35,7 @@ function pc_init() {
 
         link.onclick     = pc_classClick.bind(link, classId);
         link.onmouseover = pc_classOver.bind(link, classId);
-        link.onmouseout  = Tooltip.hide;
+        link.onmouseout  = $WH.Tooltip.hide;
 
         $WH.ae(div, icon);
     }
@@ -63,14 +63,14 @@ function pc_init() {
 
 function pc_classClick(classId) {
     if (pc_object.setClass(classId)) {
-        Tooltip.hide();
+        $WH.Tooltip.hide();
     }
 
     return false;
 }
 
 function pc_classOver(classId) {
-    Tooltip.show(this, '<b>' + g_pet_families[classId] + '</b>');
+    $WH.Tooltip.show(this, '<b>' + g_pet_families[classId] + '</b>');
 }
 
 function pc_onChange(tc, info, data) {

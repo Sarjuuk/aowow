@@ -26,9 +26,13 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $skills = new SkillList($conditions);
 
     $pageData = array(
-        'file'   => 'skill',
-        'data'   => $skills->getListviewData(),
-        'params' => []
+        'listviews' => array(
+            array(
+                'file'   => 'skill',
+                'data'   => $skills->getListviewData(),
+                'params' => []
+            )
+        )
     );
 
     $smarty->saveCache($cacheKey, $pageData);

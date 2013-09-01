@@ -21,9 +21,13 @@ if (isset($cat))
 
 if (!$smarty->loadCache($cacheKey, $pageData))
 {
+    $pageData = array(
+        'listviews' => []
+    );
+
     $money = new CurrencyList(isset($cat) ? array(['category', (int)$cat]) : []);
 
-    $pageData = array(
+    $pageData['listviews'][] = array(
         'file'   => 'currency',
         'data'   => $money->getListviewData(),
         'params' => []

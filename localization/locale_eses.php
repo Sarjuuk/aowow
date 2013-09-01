@@ -37,7 +37,7 @@ $lang = array(
         'rewards'       => "Recompensas",
         'gains'         => "Ganancias",
         'login'         => "[Login]",
-        'forum'         => "[Forum]",
+        'forum'         => "Foro",
         'days'          => "dias",
         'hours'         => "horas",
         'minutes'       => "minutos",
@@ -73,7 +73,18 @@ $lang = array(
         // red buttons
         'links'         => "Enlaces",
         'compare'       => "Comparar",
-        'view3D'        => "Ver en 3D"
+        'view3D'        => "Ver en 3D",
+
+        // misc Tools
+        'subscribe'     => "Suscribirme",
+        'mostComments'  => ["Ayer", "Pasados %d días"],
+        'utilities'     => array(
+            "Últimas adiciones",                    "Últimos artículos",                    "Últimos comentarios",                  "Últimas capturas de pantalla",         null,
+            "Comentarios sin valorar",              11 => "Últimos vídeos",                 12 => "Mayoría de comentarios",         13 => "Capturas de pantalla faltantes"
+        ),
+
+        // article & infobox
+        'englishOnly'   => "Esta página sólo está disponible en <b>inglés</b>."
     ),
     'search' => array(
         'search'        => "Búsqueda",
@@ -126,6 +137,15 @@ $lang = array(
         'valueDelim'    => " - ",
         'zone'          => "zona",
         'zones'         => "Zonas",
+
+        'heroClass'     => "Clase héroe",
+        'resource'      => "Recurso",
+        'resources'     => "Recursos",
+        'role'          => "Rol",
+        'roles'         => "Roles",
+        'specs'         => "Especializaciones",
+        '_roles'        => ['Sanador', 'DPS cuerpo', 'DPS a distancia', 'Tanque'],
+
         'expansions'    => array("World of Warcraft", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Fuerza", "Agilidad", "Aguante", "Intelecto", "Espíritu"),
         'languages'     => array(
@@ -141,7 +161,7 @@ $lang = array(
         'ra'            => array(-2 => "Horda", -1 => "Alianza", "Ambos", "Humano", "Orco", "Enano", "Elfo de la noche", "No-muerto", "Tauren", "Gnomo", "Trol  ", null, "Blood Elf", "Elfo de sangre"),
         'rep'           => array("Odiado", "Hostil", "Adverso", "Neutral", "Amistoso", "Honorable", "Reverenciado", "Exaltado"),
         'st'            => array(
-            null,               "Forma felina",                 "Árbol de vida",                "Forma de viaje",               "Forma acuática",
+            "Defecto",          "Forma felina",                 "Árbol de vida",                "Forma de viaje",               "Forma acuática",
             "Forma de oso",     null,                           null,                           "Forma de oso temible",         null,
             null,               null,                           null,                           "Danza de las Sombras",         null,
             null,               "Lobo fantasmal",               "Actitud de batalla",           "Actitud defensiva",            "Actitud rabiosa",

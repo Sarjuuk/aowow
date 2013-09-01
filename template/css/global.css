@@ -148,10 +148,10 @@ a.selected, a.selected:hover
 .text h1
 {
     color: white;
-    font-size: 20px;
+    font-size: 19px;
     font-weight: normal;
     border-bottom: 1px solid #505050;
-    padding: 0 0 5px;
+    padding: 1px 0 5px;
     margin: 0 0 13px;
     line-height: 1.1em;
 }
@@ -721,93 +721,93 @@ span.breadcrumb-ellipsis {
 /********/
 
 .menu {
-	position: absolute;
-	z-index: 100000002;
+    position: absolute;
+    z-index: 100000002;
 }
 
 .menu .menu-outer {
-	float: left;
-	border: 1px solid #181818;
+    float: left;
+    border: 1px solid #181818;
 
-	-webkit-box-shadow: 1px 1px 5px black;
-	-moz-box-shadow: 1px 1px 5px black;
-	box-shadow: 1px 1px 5px black;
+    -webkit-box-shadow: 1px 1px 5px black;
+    -moz-box-shadow: 1px 1px 5px black;
+    box-shadow: 1px 1px 5px black;
 }
 
 .menu .menu-inner {
-	border: 2px solid #484848;
-	border-top: 1px solid #484848;
+    border: 2px solid #484848;
+    border-top: 1px solid #484848;
 }
 
 .menu a {
-	display: block;
-	padding: 4px 4px 4px 24px;
-	text-decoration: none;
-	border-top: 1px solid #484848;
-	border-bottom: 1px solid #101010;
-	white-space: nowrap;
-	font-size: 13px;
+    display: block;
+    padding: 4px 4px 4px 24px;
+    text-decoration: none;
+    border-top: 1px solid #484848;
+    border-bottom: 1px solid #101010;
+    white-space: nowrap;
+    font-size: 13px;
 }
 
 .menu a span {
-	display: block;
-	padding-right: 20px;
+    display: block;
+    padding-right: 20px;
 }
 
 .menu a span.hassubmenu {
-	background: url(../images/Menu/arrow-right.gif) right center no-repeat;
+    background: url(../images/Menu/arrow-right.gif) right center no-repeat;
 }
 
 .menu a, .menu a span { /* Setting the background color on both the <a> and the <span> so the hover effect works in IE7 */
-	background-color: #282828;
+    background-color: #282828;
 }
 
 .menu a.open, .menu a:hover, .menu a.open span, .menu a:hover span {
-	background-color: #383838;
+    background-color: #383838;
 }
 
 .menu a.open, .menu a:hover {
-	border-bottom: 1px solid #202020;
+    border-bottom: 1px solid #202020;
 }
 
 .menu a.separator {
-	color: white;
-	font-weight: bold;
-	padding: 4px 8px;
-	background-color: #181818;
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    background-color: #181818;
 }
 
 .menu a.separator:hover {
-	text-decoration: underline;
-	background-color: #181818;
-	border-bottom: 1px solid #101010;
+    text-decoration: underline;
+    background-color: #181818;
+    border-bottom: 1px solid #101010;
 }
 
 .menu a.unlinked {
-	text-decoration: none !important;
-	cursor: default;
+    text-decoration: none !important;
+    cursor: default;
 }
 
 .menu a.checked {
-	background-image: url(../images/Menu/check.gif);
-	background-position: 9px center;
-	background-repeat: no-repeat;
+    background-image: url(../images/Menu/check.gif);
+    background-position: 9px center;
+    background-repeat: no-repeat;
 }
 
 .menu a.icon, .menu a.tinyicon {
-	background-position: 4px center;
-	background-repeat: no-repeat;
-	padding-left: 24px;
+    background-position: 4px center;
+    background-repeat: no-repeat;
+    padding-left: 24px;
 }
 
 .menu a.socket-meta, .menu a.socket-red, .menu a.socket-yellow, .menu a.socket-blue, .menu a.socket-prismatic, .menu a.socket-hydraulic, .menu a.socket-cogwheel {
-	background-position: 5px center;
+    background-position: 5px center;
 }
 
 .menu a.icon-star-right span
 {
-	padding-right: 21px;
-	background: url(../images/icons/star.png) no-repeat right center;
+    padding-right: 21px;
+    background: url(../images/icons/star.png) no-repeat right center;
 }
 
 /****************/
@@ -815,35 +815,35 @@ span.breadcrumb-ellipsis {
 /****************/
 
 .menu-buttons {
-	padding: 4px 0 0 5px;
+    padding: 4px 0 0 5px;
 }
 
     span.menu-buttons a {
-	text-decoration: none;
-	color: white;
-	padding: 4px 11px;
-	font-size: 13px;
-	white-space: nowrap;
+    text-decoration: none;
+    color: white;
+    padding: 4px 11px;
+    font-size: 13px;
+    white-space: nowrap;
 }
 
 span.menu-buttons a:hover {
-	text-decoration: underline;
+    text-decoration: underline;
 }
 
 span.menu-buttons a.open {
-	background-color: #484848;
-	padding: 3px 10px;
-	border: 1px solid #282828;
+    background-color: #484848;
+    padding: 3px 10px;
+    border: 1px solid #282828;
 }
 
 span.menu-buttons a.unlinked {
-	text-decoration: none !important;
-	cursor: default;
+    text-decoration: none !important;
+    cursor: default;
 }
 
 span.menu-buttons span.hassubmenu {
-	padding-right: 13px;
-	background: url(../images/Menu/arrow-down.gif) right center no-repeat;
+    padding-right: 13px;
+    background: url(../images/Menu/arrow-down.gif) right center no-repeat;
 }
 
 /* start note: remove with breadcrumbs */
@@ -1390,6 +1390,18 @@ a.star-icon-right span
     padding-left: 13px !important;
 }
 
+.bubble-icon
+{
+    background: url(../images/bubble.gif) left center no-repeat;
+    padding-left: 22px;
+}
+
+.bubble-icon-right
+{
+    background: url(../images/bubble.gif) right center no-repeat;
+    padding-right: 22px;
+}
+
 .instance-icon1, .instance-icon2, .instance-icon3, .instance-icon4, .instance-icon5, .instance-icon7
 {
     background: url(../../images/icons/instance-icons.gif) no-repeat;
@@ -1754,7 +1766,7 @@ a.star-icon-right span
 .listview-band-top, .listview-band-bottom
 {
     background-color: #404040;
-    color: #ccc;
+    color: #cccccc;
 }
 
 .listview-band-top
@@ -1764,13 +1776,14 @@ a.star-icon-right span
 
 .listview-band-bottom
 {
-    padding: 6px 6px 3px 3px;
+    padding: 6px 3px 3px 3px;
 }
 
-.listview-band-top input, .listview-band-bottom input, .listview-band-top select, .listview-band-bottom select
+.listview-band-top input, .listview-band-bottom input,
+.listview-band-top select, .listview-band-bottom select
 {
     font-size: 11px;
-    margin-right: .5em;
+    margin-right: 0.5em;
 }
 
 .listview-quicksearch
@@ -1795,7 +1808,7 @@ a.star-icon-right span
     display: block;
     width: 12px;
     height: 12px;
-    background: url(../images/search2.gif) no-repeat;
+    background: url(../images/Listview/quicksearch-cancel.gif) no-repeat;
 }
 
 .listview-quicksearch a:hover span
@@ -1811,7 +1824,7 @@ a.star-icon-right span
     top: 2px;
     width: 13px;
     height: 13px;
-    background: url(../images/search4.gif) no-repeat;
+    background: url(../images/Listview/quicksearch.gif) no-repeat;
 }
 
 .listview-quicksearch input
@@ -1828,12 +1841,15 @@ a.star-icon-right span
 
 .listview-withselected
 {
+    /* Top bar */
+    clear: left;
     padding-left: 33px;
-    background: url(../images/listview-withselected.gif) 11px 6px no-repeat;
+    background: url(../images/Listview/withselected.gif) 11px 6px no-repeat;
 }
 
 .listview-withselected2
 {
+    /* Bottom bar */
     padding-left: 33px;
     background: url(../images/listview-withselected.gif) 11px -35px no-repeat;
 }
@@ -1847,12 +1863,18 @@ a.star-icon-right span
 
 .listview-nav a, .listview-nav span
 {
-    margin-left: .5em;
+    margin-left: 0.5em;
 }
 
 .listview-note
 {
     line-height: 16px;
+}
+
+.listview table
+{
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .listview th
@@ -1861,6 +1883,11 @@ a.star-icon-right span
     font-weight: bold;
     padding: 0;
     border-bottom: 1px solid #202020;
+}
+
+.listview .iconlist th
+{
+    border: none;
 }
 
 .listview thead div
@@ -1875,7 +1902,7 @@ a.star-icon-right span
 .listview thead a
 {
     display: block;
-    padding: 4px 0;
+    padding: 5px 2px;
     text-decoration: none;
     color: white;
     background-color: #585858;
@@ -1886,22 +1913,54 @@ a.star-icon-right span
     padding: 0 4px;
 }
 
+.listview thead a span span
+{
+    padding: 0;
+}
+
 .listview th a:hover
 {
     background-color: #606060;
 }
 
-.listview-mode-default, .listview-mode-div, .listview-mode-tiled
+.listview th a.static
+{
+    cursor: default;
+}
+
+.listview th a.static:hover
+{
+    background-color: #585858;
+}
+
+.listview-mode-default, .listview-mode-div, .listview-mode-tiled, .listview-mode-calendar
 {
     background-color: #141414;
+}
+
+.listview-mode-default th
+{
+    white-space: nowrap;
 }
 
 .listview-mode-default td
 {
     padding: 4px;
-    color: #ddd;
+    color: #dddddd;
     text-align: center;
     border: 1px solid #404040;
+    font-size: 13px;
+}
+
+.listview-clip td
+{
+    border: none;
+    border-bottom: 1px solid #303030;
+}
+
+.listview-mode-default .small
+{
+    font-size: 11px;
 }
 
 .listview-mode-default .small2
@@ -1923,6 +1982,85 @@ a.star-icon-right span
     line-height: 1.2;
 }
 
+.listview-mode-default tbody a
+{
+    text-decoration: none;
+}
+
+.listview-mode-default tbody a:hover
+{
+    text-decoration: underline;
+}
+
+.listview-mode-default tbody.clickable tr
+{
+    cursor: pointer;
+}
+
+.listview-mode-default tbody tr:hover
+{
+    background-color: #202020;
+}
+
+.listview-mode-tiled td
+{
+    cursor: pointer;
+}
+
+.listview-mode-tiled td:hover
+{
+    background-color: #202020;
+}
+
+.listview-mode-tiled td.empty-cell
+{
+    cursor: default !important;
+}
+
+.listview-mode-tiled td.empty-cell:hover
+{
+    background: none !important;
+}
+
+.listview-mode-calendar th
+{
+    padding: 3px;
+    background-color: #404040;
+}
+
+.listview-mode-calendar td
+{
+    vertical-align: top;
+}
+
+.listview-mode-calendar .calendar-today
+{
+    background-color: #404040;
+    font-weight: bold;
+}
+
+.listview-mode-calendar .calendar-date
+{
+    background-color: #242424;
+    padding: 3px;
+}
+
+.listview-mode-calendar .calendar-event
+{
+    height: 88px;
+    padding: 3px;
+}
+
+.listview tr.mergerow
+{
+    background-color: #131d1a;
+}
+
+.listview tr.mergerow:hover
+{
+    background-color: #1a2924;
+}
+
 .listview tr.checked
 {
     background-color: #242424;
@@ -1931,6 +2069,32 @@ a.star-icon-right span
 .listview tr.checked:hover
 {
     background-color: #2C2C2C;
+}
+
+.listview tr.upgraded
+{
+    background-color: #242424;
+}
+
+.listview tr.upgraded:hover
+{
+    background-color: #2C2C2C;
+}
+
+.listview tr.upgraded td
+{
+    font-weight: bold;
+}
+
+.listview-cb
+{
+    text-align: center;
+    cursor: default;
+}
+
+.listview-cb input
+{
+    cursor: default;
 }
 
 .listview-nodata
@@ -1946,16 +2110,36 @@ a.star-icon-right span
     background-color: black;
 }
 
+.listview-indicators
+{
+    padding-left: 3px;
+}
+
 .sortasc
 {
-    background: url(../images/sort_asc.gif) no-repeat right center;
     padding-right: 15px !important;
+    background: url(../images/Listview/sort-asc.gif) no-repeat right center;
 }
 
 .sortdesc
 {
-    background: url(../images/sort_desc.gif) no-repeat right center;
     padding-right: 15px !important;
+    background: url(../images/Listview/sort-desc.gif) no-repeat right center;
+}
+
+td.checked
+{
+    background-color: #202020;
+}
+
+td.checked:hover
+{
+    background-color: #2C2C2C;
+}
+
+td.checked .listview-cb:hover
+{
+    background-color: #343434;
 }
 
 .comment
@@ -2972,7 +3156,12 @@ small, .listview-mode-default .small, .comment-edit-modes, .comment-edit-body
     font-size: 11px;
 }
 
-a:hover, a.open, .text b, .text ol li div, .text li div, .infobox li div, .minibox h3 a, .comment-body b, .comment-body h3
+a.open, .text ol li div, .text li div, .infobox li div, .minibox h3 a, .comment-body b, .comment-body h3
+{
+    color: #cccccc;
+}
+
+a:hover, .text b
 {
     color: white;
 }
@@ -3388,6 +3577,19 @@ div.modelviewer, div.screenshotviewer
     padding: 10px 10px 0;
     background-color: #303030;
     font-size: 13px;
+}
+
+.notice-box {
+    padding: 8px;
+    color: #dddddd;
+    margin-bottom: 10px;
+    text-align: center;
+    background: #141414;
+    border: 1px solid #101010;
+
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
 }
 
 div.announcement-pagetop div.announcement-inner {

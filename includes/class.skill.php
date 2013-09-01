@@ -10,9 +10,9 @@ class SkillList extends BaseType
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_skillLine sl WHERE [cond] ORDER BY id ASC';
 
-    public function __construct($data)
+    public function __construct($conditions = [])
     {
-        parent::__construct($data);
+        parent::__construct($conditions);
 
         // post processing
         foreach ($this->iterate() as &$_curTpl)

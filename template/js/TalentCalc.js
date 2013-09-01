@@ -748,7 +748,7 @@ function TalentCalc() {
 
     function _bonusPointsOnMouseOver(_this, e) {
         if (_mode == MODE_PET) {
-            Tooltip.showAtCursor(e, LANG[_bonusPoints ? "tc_rembon": "tc_addbon"], null, null, "q");
+            $WH.Tooltip.showAtCursor(e, LANG[_bonusPoints ? "tc_rembon": "tc_addbon"], null, null, "q");
         }
     }
 
@@ -759,7 +759,7 @@ function TalentCalc() {
     }
 
     function _setLevelCapOnMouseOver(_this, e) {
-        Tooltip.showAtCursor(e, LANG.tooltip_changelevel, null, null, 'q');
+        $WH.Tooltip.showAtCursor(e, LANG.tooltip_changelevel, null, null, 'q');
     }
 
     function _createArrow(arrowType, width, height) {
@@ -1094,12 +1094,12 @@ function TalentCalc() {
 
                     g_onClick(a, _glyphClick.bind(a, slot));
                     a.onmouseover = _showGlyphTooltip.bind(null, a, slot);
-                    a.onmousemove = Tooltip.cursorUpdate;
-                    a.onmouseout = Tooltip.hide;
+                    a.onmousemove = $WH.Tooltip.cursorUpdate;
+                    a.onmouseout = $WH.Tooltip.hide;
 
                     g_onClick(link, _glyphClick.bind(link, slot));
                     link.onmouseover = _showGlyphTooltip.bind(null, link, slot);
-                    link.onmouseout = Tooltip.hide;
+                    link.onmouseout = $WH.Tooltip.hide;
 
                     td.oncontextmenu = $WH.rf;
                 }
@@ -1210,7 +1210,7 @@ function TalentCalc() {
                 link.onclick = $WH.rf;
                 g_onClick(link, _iconClick.bind(link, talent));
                 link.onmouseover = _showTooltip.bind(null, link, talent);
-                link.onmouseout = Tooltip.hide;
+                link.onmouseout = $WH.Tooltip.hide;
 
                 var
                     border = $WH.ce('div'),
@@ -1376,8 +1376,8 @@ function TalentCalc() {
             __.href = 'javascript:;';
             __.onclick = _bonusPointsOnClick.bind(null, __);
             __.onmouseover = _bonusPointsOnMouseOver.bind(null, __);
-            __.onmousemove = Tooltip.cursorUpdate;
-            __.onmouseout = Tooltip.hide;
+            __.onmousemove = $WH.Tooltip.cursorUpdate;
+            __.onmouseout = $WH.Tooltip.hide;
             $WH.ae(_, __);
         }
 
@@ -1392,8 +1392,8 @@ function TalentCalc() {
         __.href = 'javascript:;';
         __.onclick = _setLevelCapOnClick.bind(null, __);
         __.onmouseover = _setLevelCapOnMouseOver.bind(null, __);
-        __.onmousemove = Tooltip.cursorUpdate;
-        __.onmouseout  = Tooltip.hide;
+        __.onmousemove = $WH.Tooltip.cursorUpdate;
+        __.onmouseout  = $WH.Tooltip.hide;
 
         if (!_opt.profiler) {
             $WH.ae(_, $WH.ct(' ('));
@@ -2461,13 +2461,13 @@ function TalentCalc() {
         }
 
         if (glyph && _this.parentNode.className.indexOf("icon") != 0) {
-            Tooltip.setIcon(glyph.icon);
+            $WH.Tooltip.setIcon(glyph.icon);
         }
         else {
-            Tooltip.setIcon(null);
+            $WH.Tooltip.setIcon(null);
         }
 
-        Tooltip.show(_this, "<table><tr><td>" + upper + "</td></tr></table><table><tr><td>" + lower + "</td></tr></table>")
+        $WH.Tooltip.show(_this, "<table><tr><td>" + upper + "</td></tr></table><table><tr><td>" + lower + "</td></tr></table>")
     }
 
     function _showTooltip(_this, talent) {
@@ -2523,7 +2523,7 @@ function TalentCalc() {
 
         buffer += '</td></tr></table>';
 
-        Tooltip.show(_this, $WH.g_setTooltipLevel(buffer, _getRequiredLevel()));
+        $WH.Tooltip.show(_this, $WH.g_setTooltipLevel(buffer, _getRequiredLevel()));
     }
 
     function _simplifyGlyphName(name) {

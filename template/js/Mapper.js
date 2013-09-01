@@ -849,10 +849,10 @@ Mapper.prototype = {
                 Menu.add(_.a, _.a.menu, { showAtCursor: true });
                 // _.a.onclick = function() {
                     // (Menu.show.bind(this))();
-                    // Tooltip.hide();
+                    // $WH.Tooltip.hide();
                     // this.onmouseout = function() {
                         // Menu.hide();
-                        // this.onmouseout = Tooltip.hide();
+                        // this.onmouseout = $WH.Tooltip.hide();
                     // }.bind(this);
                     // $WH.sp();
                     // return false;
@@ -1023,7 +1023,7 @@ Mapper.prototype = {
         _.a = a;
         _.floor = floor;
         a.onmouseover = this.pinOver;
-        a.onmouseout = Tooltip.hide;
+        a.onmouseout = $WH.Tooltip.hide;
         a.onclick = $WH.sp;
 
         this.pins.push(_);
@@ -1077,7 +1077,7 @@ Mapper.prototype = {
 
     pinOver: function()
     {
-        Tooltip.show(this, this.tt, 4, 0);
+        $WH.Tooltip.show(this, this.tt, 4, 0);
     },
 
     getMousePos: function(e)

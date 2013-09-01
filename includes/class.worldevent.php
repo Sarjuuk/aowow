@@ -9,9 +9,9 @@ class WorldEventList extends BaseType
 
     protected      $setupQuery   = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id WHERE [cond] ORDER BY -e.id ASC';
 
-    public function __construct($data)
+    public function __construct($conditions = [])
     {
-        parent::__construct($data);
+        parent::__construct($conditions);
 
         // unseting elements while we iterate over the array will cause the pointer to reset
         $replace = [];

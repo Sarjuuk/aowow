@@ -9,7 +9,7 @@ class QuestList extends BaseType
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt LEFT JOIN locales_quest lq ON qt.Id = lq.entry WHERE [filter] [cond] ORDER BY Id ASC';
 
-    public function __construct($conditions)
+    public function __construct($conditions = [])
     {
         parent::__construct($conditions);
 

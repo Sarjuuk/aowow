@@ -102,8 +102,8 @@ var Draggable = new function () {
             dragObj = obj;
         }
 
-        Tooltip.disabled = true;
-        Tooltip.hide();
+        $WH.Tooltip.disabled = true;
+        $WH.Tooltip.hide();
 
         if (obj.onDrag) {
             obj.onDrag(e, dragObj, obj);
@@ -154,7 +154,7 @@ var Draggable = new function () {
         $WH.dE(document, 'mousemove', onMouseMove);
         $WH.dE(document, 'mouseup', onMouseUp);
 
-        Tooltip.disabled = false;
+        $WH.Tooltip.disabled = false;
 
         dragObj.className = dragObj.className.replace(/dragged/, '');
         dragObj = null;

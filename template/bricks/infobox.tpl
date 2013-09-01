@@ -1,5 +1,5 @@
     <table class="infobox">
-{if !empty($lvData.infobox)}
+{if !empty($info)}
         <tr><th id="infobox-quick-facts">{$lang.quickFacts}</th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-contents0"></div></td></tr>
 {/if}
@@ -14,8 +14,8 @@
 {if $user.id > 0}
     <script type="text/javascript">vi_appendSticky()</script>
 {/if}
-{if !empty($lvData.infobox)}
+{if !empty($info)}
     <script type="text/javascript">
-        Markup.printHtml("{$lvData.infobox}", "infobox-contents0", {ldelim}mode:Markup.MODE_QUICKFACTS{rdelim});
+        Markup.printHtml("{$info}", "infobox-contents0", {ldelim} allow: Markup.CLASS_STAFF, dbpage: true {rdelim});
     </script>
 {/if}

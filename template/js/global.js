@@ -330,12 +330,6 @@ function g_urlize(str, allowLocales, profile) {
 	return str;
 }
 
-function g_getLocale(a) {
-	if (a && g_locale.id == 25) {
-		return 0
-	}
-	return g_locale.id
-}
 function g_createHeader(c) {
 	var k = $WH.ce("dl"),
 	p = (c == 5);
@@ -376,23 +370,23 @@ function g_createHeader(c) {
 		$WH.ae(k, f)
 	}
 	$WH.ae($WH.ge("toptabs-generic"), k);
-	var b = $WH.ge("topbar-generic");
-	if (c != null && c >= 0 && c < mn_path.length) {
-		c = parseInt(c);
+    var b = $WH.ge("topbar-generic");
+    if (c != null && c >= 0 && c < mn_path.length) {
+        c = parseInt(c);
         switch (c) {
             case 0: // Database
                 Menu.addButtons(b, [
-                    [0, LANG.menu_browse, null, mn_database],       // Browse
-                    [1, mn_tools[7][1], null, mn_tools[7][3]],      // Utilities
-                    [2, mn_tools[7][3][1][1], mn_tools[7][3][1][2]] // Random Page
-                ]);
+                    [0, LANG.menu_browse, null, mn_database],         // Browse
+                    Menu.findItem(mn_tools, [8]),                     // Utilities
+                    Menu.findItem(mn_tools, [8, 4])                   // Random Page
+                   ]);
                 break;
-            case 1:
+            case 1: // Tools
                 Menu.addButtons(b, [
                     [0, LANG.calculators, null, mn_tools.slice(0,4)], // Calculators
-                    [1, mn_tools[4][1], mn_tools[4][2]],              // Maps
-                    [2, mn_tools[7][1], null, mn_tools[7][3]],        // Utilities
-                    [3, mn_tools[6][1], null, mn_tools[6][3]]         // Guides
+                    Menu.findItem(mn_tools, [1]),                     // Maps
+                    Menu.findItem(mn_tools, [8]),                     // Utilities
+                    Menu.findItem(mn_tools, [6]),                     // Guides
                 ]);
                 break;
             case 2:
@@ -402,8 +396,9 @@ function g_createHeader(c) {
                 pr_initTopBarSearch();
                 break
         }
-	} else {
-		$WH.ae(b, $WH.ct(String.fromCharCode(160)))
+    } 
+    else {
+        $WH.ae(b, $WH.ct(String.fromCharCode(160)));
 	}
 }
 function g_updateHeader(a) {
@@ -637,162 +632,197 @@ function g_addTooltip(b, c, a) {
 		a = "q"
 	}
 	b.onmouseover = function(d) {
-		Tooltip.showAtCursor(d, c, 0, 0, a)
+		$WH.Tooltip.showAtCursor(d, c, 0, 0, a)
 	};
-	b.onmousemove = Tooltip.cursorUpdate;
-	b.onmouseout = Tooltip.hide
+	b.onmousemove = $WH.Tooltip.cursorUpdate;
+	b.onmouseout = $WH.Tooltip.hide
 }
 function g_addStaticTooltip(b, c, a) {
 	if (!a && c.indexOf("<table>") == -1) {
 		a = "q"
 	}
 	b.onmouseover = function(d) {
-		Tooltip.show(b, c, 0, 0, a)
+		$WH.Tooltip.show(b, c, 0, 0, a)
 	};
-	b.onmouseout = Tooltip.hide
+	b.onmouseout = $WH.Tooltip.hide
 }
-function g_formatTimeElapsed(e) {
-	function c(m, l, i) {
-		if (i && LANG.timeunitsab[l] == "") {
-			i = 0
-		}
-		if (i) {
-			return m + " " + LANG.timeunitsab[l]
-		} else {
-			return m + " " + (m == 1 ? LANG.timeunitssg[l] : LANG.timeunitspl[l])
-		}
-	}
-	var g = [31557600, 2629800, 604800, 86400, 3600, 60, 1];
-	var a = [1, 3, 3, -1, 5, -1, -1];
-	e = Math.max(e, 1);
-	for (var f = 3, h = g.length; f < h; ++f) {
-		if (e >= g[f]) {
-			var d = f;
-			var k = Math.floor(e / g[d]);
-			if (a[d] != -1) {
-				var b = a[d];
-				e %= g[d];
-				var j = Math.floor(e / g[b]);
-				if (j > 0) {
-					return c(k, d, 1) + " " + c(j, b, 1)
-				}
-			}
-			return c(k, d, 0)
-		}
-	}
-	return "(n/a)"
+
+function g_formatTimeElapsed(delay) {
+    function OMG(value, unit, abbrv) {
+        if (abbrv && LANG.timeunitsab[unit] == '') {
+            abbrv = 0;
+        }
+
+        if (abbrv) {
+            return value + ' ' + LANG.timeunitsab[unit];
+        }
+        else {
+            return value + ' ' + (value == 1 ? LANG.timeunitssg[unit] : LANG.timeunitspl[unit]);
+        }
+    }
+
+    var
+        range   = [31557600, 2629800, 604800, 86400, 3600, 60, 1],
+        subunit = [1, 3, 3, -1, 5, -1, -1];
+
+    delay = Math.max(delay, 1);
+
+    for (var i = 3, len = range.length; i < len; ++i) {
+        if (delay >= range[i]) {
+            var i1 = i;
+            var v1 = Math.floor(delay / range[i1]);
+
+            if (subunit[i1] != -1) {
+                var i2 = subunit[i1];
+                delay %= range[i1];
+
+                var v2 = Math.floor(delay / range[i2]);
+
+                if (v2 > 0) {
+                    return OMG(v1, i1, 1) + ' ' + OMG(v2, i2, 1);
+                }
+            }
+
+            return OMG(v1, i1, 0);
+        }
+    }
+
+    return '(n/a)';
 }
-function g_formatDate(c, j, a, d, k) {
-	var f = new Date();
-	var b = new Date();
-	b.setTime(f.getTime() - (1000 * j));
-	var e;
-	var g = new Date(b.getYear(), b.getMonth(), b.getDate());
-	var l = new Date(f.getYear(), f.getMonth(), f.getDate());
-	var i = (l.getTime() - g.getTime());
-	i /= 1000;
-	i /= 86400;
-	i = Math.round(i);
-	if (j >= 2592000) {
-		e = LANG.date_on + g_formatDateSimple(a, d)
-	} else {
-		if (i > 1) {
-			e = $WH.sprintf(LANG.ddaysago, i);
-			if (c) {
-				var h = new Date();
-				h.setTime(a.getTime() + (g_localTime - g_serverTime));
-				c.className += " tip";
-				c.title = h.toLocaleString()
-			}
-		} else {
-			if (j >= 43200) {
-				if (f.getDay() == b.getDay()) {
-					e = LANG.today
-				} else {
-					e = LANG.yesterday
-				}
-				e = g_formatTimeSimple(b, e);
-				if (c) {
-					var h = new Date();
-					h.setTime(a.getTime() + (g_localTime - g_serverTime));
-					c.className += " tip";
-					c.title = h.toLocaleString()
-				}
-			} else {
-				var e = $WH.sprintf(LANG.date_ago, g_formatTimeElapsed(j));
-				if (c) {
-					var h = new Date();
-					h.setTime(a.getTime() + (g_localTime - g_serverTime));
-					c.className += " tip";
-					c.title = h.toLocaleString()
-				}
-			}
-		}
-	}
-	if (k == 1) {
-		e = e.substr(0, 1).toUpperCase() + e.substr(1)
-	}
-	if (c) {
-		$WH.ae(c, $WH.ct(e))
-	} else {
-		return e
-	}
+
+function g_GetStaffColorFromRoles(roles) {
+    if (roles & U_GROUP_ADMIN) {
+        return 'comment-blue';
+    }
+    if (roles & U_GROUP_GREEN_TEXT) { // Mod, Bureau, Dev
+        return 'comment-green';
+    }
+    if (roles & U_GROUP_VIP) { // VIP
+        return 'comment-gold';
+    }
+
+    return '';
+}
+
+function g_formatDate(sp, elapsed, theDate, time, alone) {
+    var today = new Date();
+    var event_day = new Date();
+    event_day.setTime(today.getTime() - (1000 * elapsed));
+    var txt;
+    var event_day_midnight = new Date(event_day.getYear(), event_day.getMonth(), event_day.getDate());
+    var today_midnight = new Date(today.getYear(), today.getMonth(), today.getDate());
+    var delta = (today_midnight.getTime() - event_day_midnight.getTime());
+    delta /= 1000;
+    delta /= 86400;
+    delta = Math.round(delta);
+
+    if (elapsed >= 2592000) { /* More than a month ago */
+        txt = LANG.date_on + g_formatDateSimple(theDate, time);
+    }
+    else if (delta > 1) {
+        txt = $WH.sprintf(LANG.ddaysago, delta);
+
+        if (sp) {
+            var _ = new Date();
+            _.setTime(theDate.getTime() + (g_localTime - g_serverTime));
+            sp.className += ' tip';
+            sp.title = _.toLocaleString();
+        }
+    }
+    else if (elapsed >= 43200) {
+        if (today.getDay() == event_day.getDay()) {
+            txt = LANG.today;
+        }
+        else {
+            txt = LANG.yesterday;
+        }
+
+        txt = g_formatTimeSimple(event_day, txt);
+
+        if (sp) {
+            var _ = new Date();
+            _.setTime(theDate.getTime() + (g_localTime - g_serverTime));
+            sp.className += ' tip';
+            sp.title = _.toLocaleString();
+        }
+    }
+    else { /* Less than 12 hours ago */
+        var txt = $WH.sprintf(LANG.date_ago, g_formatTimeElapsed(elapsed));
+
+        if (sp) {
+            var _ = new Date();
+            _.setTime(theDate.getTime() + (g_localTime - g_serverTime));
+            sp.className += ' tip';
+            sp.title = _.toLocaleString();
+        }
+    }
+
+    if (alone == 1) {
+        txt = txt.substr(0, 1).toUpperCase() + txt.substr(1);
+    }
+
+    if (sp) {
+        $WH.ae(sp, $WH.ct(txt));
+    }
+    else {
+        return txt;
+    }
 }
 
 function g_formatDateSimple(d, time) {
-	function __twoDigits(n) {
-		return (n < 10 ? '0' + n : n);
-	}
+    function __twoDigits(n) {
+        return (n < 10 ? '0' + n : n);
+    }
 
-	var
+    var
         b     = "",
         day   = d.getDate(),
         month = d.getMonth() + 1,
         year  = d.getFullYear();
 
-	if (year <= 1970) {
-		b += LANG.unknowndate_stc;
-	}
+    if (year <= 1970) {
+        b += LANG.unknowndate_stc;
+    }
     else {
         b += $WH.sprintf(LANG.date_simple, __twoDigits(day), __twoDigits(month), year);
     }
 
-	if (time != null) {
-		b = g_formatTimeSimple(d, b);
-	}
+    if (time != null) {
+        b = g_formatTimeSimple(d, b);
+    }
 
-	return b;
+    return b;
 }
 
 function g_formatTimeSimple(d, txt, noPrefix) {
-	function __twoDigits(n) {
-		return (n < 10 ? '0' + n : n);
-	}
+    function __twoDigits(n) {
+        return (n < 10 ? '0' + n : n);
+    }
 
-	var
+    var
         hours   = d.getHours(),
-	    minutes = d.getMinutes();
+        minutes = d.getMinutes();
 
-	if (txt == null) {
-		txt = '';
-	}
+    if (txt == null) {
+        txt = '';
+    }
 
-	txt += (noPrefix ? ' ' : LANG.date_at);
+    txt += (noPrefix ? ' ' : LANG.date_at);
 
-	if (hours == 12) {
-		txt += LANG.noon;
-	}
-	else if (hours == 0) {
-		txt += LANG.midnight;
-	}
-	else if (hours > 12) {
-		txt += (hours - 12) + ':' + __twoDigits(minutes) + ' ' + LANG.pm;
-	}
-	else {
-		txt += hours + ':' + __twoDigits(minutes) + ' ' + LANG.am;
-	}
+    if (hours == 12) {
+        txt += LANG.noon;
+    }
+    else if (hours == 0) {
+        txt += LANG.midnight;
+    }
+    else if (hours > 12) {
+        txt += (hours - 12) + ':' + __twoDigits(minutes) + ' ' + LANG.pm;
+    }
+    else {
+        txt += hours + ':' + __twoDigits(minutes) + ' ' + LANG.am;
+    }
 
-	return txt;
+    return txt;
 }
 
 function g_cleanCharacterName(e) {
@@ -972,13 +1002,13 @@ function g_getMoneyHtml2(f, c, b, a) {
 		if (e.length > 0) {
 			e += " "
 		}
-		e += '<span class="money' + (c < 0 ? "horde": "alliance") + ' tip" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">' + g_numberFormat(Math.abs(c)) + "</span>"
+		e += '<span class="money' + (c < 0 ? "horde": "alliance") + ' tip" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + g_numberFormat(Math.abs(c)) + "</span>"
 	}
 	if (b !== undefined && b !== null && b > 0) {
 		if (e.length > 0) {
 			e += " "
 		}
-		e += '<span class="moneyarena tip" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">' + g_numberFormat(b) + "</span>"
+		e += '<span class="moneyarena tip" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + g_numberFormat(b) + "</span>"
 	}
 	if (a !== undefined && a !== null && a.length > 0) {
 		for (var d = 0; d < a.length; ++d) {
@@ -1396,10 +1426,10 @@ function g_addPages(l, b) {
 			}
 		};
 		f.onmouseover = function(d) {
-			Tooltip.showAtCursor(d, LANG.tooltip_gotopage, 0, 0, "q")
+			$WH.Tooltip.showAtCursor(d, LANG.tooltip_gotopage, 0, 0, "q")
 		};
-		f.onmousemove = Tooltip.cursorUpdate;
-		f.onmouseout = Tooltip.hide;
+		f.onmousemove = $WH.Tooltip.cursorUpdate;
+		f.onmouseout = $WH.Tooltip.hide;
 		$WH.ae(q, f)
 	}
 	if (c) {
@@ -1653,20 +1683,8 @@ var VideoViewer = new function() {
 		computeDimensions();
 
 		if (!resizing) {
-
 			if (video.videoType == 1) {
-				// imgDiv.innerHTML = Markup.toHtml('[youtube=' + video.videoId + ' width=' + imgWidth + ' height=' + imgHeight + ' autoplay=true]', {mode:Markup.MODE_ARTICLE});
-                /* yes container hack .. fuck off */
-                var m = 'http://www.youtube.com/collectionId/' + video.videoId + '&fs=1&rel=0&autoplay=1';
-                var l = imgWidth ? imgWidth : 640;
-                var n = imgHeight ? imgHeight : 385;
-                imgDiv.innerHTML = '<object width="' + l + '" height="' + n + '"><param name="movie" value="' + m + '">';
-                imgDiv.innerHTML += '<param name="allowfullscreen" value="true"></param>';
-                imgDiv.innerHTML += '<param name="allowscriptaccess" value="always"></param>';
-                imgDiv.innerHTML += '<param name="wmode" value="opaque"></param>';
-                imgDiv.innerHTML += '<embed width="' + l + '" height="' + n + '" src="' + m + '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="opaque"></embed>';
-                imgDiv.innerHTML += '</object>';
-                /* end of hack .. fuck off */
+				imgDiv.innerHTML = Markup.toHtml('[youtube=' + video.videoId + ' width=' + imgWidth + ' height=' + imgHeight + ' autoplay=true]', {mode:Markup.MODE_ARTICLE});
 			}
 
 			aOriginal.href = $WH.sprintf(vi_siteurls[video.videoType], video.videoId);
@@ -2271,9 +2289,9 @@ Tabs.prototype = {
             }
 
             if(tab.tooltip) {
-                a.onmouseover = (function(tooltip, e) { Tooltip.showAtCursor(e, tooltip, 0, 0, 'q'); }).bind(a, tab.tooltip);
-                a.onmousemove = Tooltip.cursorUpdate;
-                a.onmouseout  = Tooltip.hide;
+                a.onmouseover = (function(tooltip, e) { $WH.Tooltip.showAtCursor(e, tooltip, 0, 0, 'q'); }).bind(a, tab.tooltip);
+                a.onmousemove = $WH.Tooltip.cursorUpdate;
+                a.onmouseout  = $WH.Tooltip.hide;
             }
 
             if (tab['class']) {
@@ -2338,9 +2356,9 @@ Tabs.prototype = {
             _[index].onmouseover = _[index].onmousemove = _[index].onmouseout = null;
         }
         else {
-            _[index].onmouseover = function(e) { Tooltip.showAtCursor(e, text, 0, 0, 'q2'); };
-            _[index].onmousemove = Tooltip.cursorUpdate;
-            _[index].onmouseout  = Tooltip.hide;
+            _[index].onmouseover = function(e) { $WH.Tooltip.showAtCursor(e, text, 0, 0, 'q2'); };
+            _[index].onmousemove = $WH.Tooltip.cursorUpdate;
+            _[index].onmouseout  = $WH.Tooltip.hide;
         }
     },
 
@@ -2414,286 +2432,430 @@ Tabs.onShow = function(newTab, oldTab) {
 };
 
 var g_listviews = {};
-function Listview(a) {
-	$WH.cO(this, a);
-	if (this.id) {
-		var o = (this.tabs ? "tab-": "lv-") + this.id;
-		if (this.parent) {
-			var l = $WH.ce("div");
-			l.id = o;
-			$WH.ae($WH.ge(this.parent), l);
-			this.container = l
-		} else {
-			this.container = $WH.ge(o)
-		}
-	} else {
-		return
-	}
-	var c = $WH.g_getGets();
-	if ((c.debug != null || g_user.debug) && g_user.roles & 26) {
-		this.debug = true
-	}
-	if (this.template && Listview.templates[this.template]) {
-		this.template = Listview.templates[this.template]
-	} else {
-		return
-	}
-	g_listviews[this.id] = this;
-	if (this.data == null) {
-		this.data = []
-	}
-	if (this.poundable == null) {
-		if (this.template.poundable != null) {
-			this.poundable = this.template.poundable
-		} else {
-			this.poundable = true
-		}
-	}
-	if (this.searchable == null) {
-		if (this.template.searchable != null) {
-			this.searchable = this.template.searchable
-		} else {
-			this.searchable = false
-		}
-	}
-	if (this.filtrable == null) {
-		if (this.template.filtrable != null) {
-			this.filtrable = this.template.filtrable
-		} else {
-			this.filtrable = false
-		}
-	}
-	if (this.data.length == 1) {
-		this.filtrable = false;
-		this.searchable = false
-	}
-	if (this.searchable && this.searchDelay == null) {
-		if (this.template.searchDelay != null) {
-			this.searchDelay = this.template.searchDelay
-		} else {
-			this.searchDelay = 333
-		}
-	}
-	if (this.clickable == null) {
-		if (this.template.clickable != null) {
-			this.clickable = this.template.clickable
-		} else {
-			this.clickable = true
-		}
-	}
-	if (this.hideBands == null) {
-		this.hideBands = this.template.hideBands
-	}
-	if (this.hideNav == null) {
-		this.hideNav = this.template.hideNav
-	}
-	if (this.hideHeader == null) {
-		this.hideHeader = this.template.hideHeader
-	}
-	if (this.hideCount == null) {
-		this.hideCount = this.template.hideCount
-	}
-	if (this.computeDataFunc == null && this.template.computeDataFunc != null) {
-		this.computeDataFunc = this.template.computeDataFunc
-	}
-	if (this.createCbControls == null && this.template.createCbControls != null) {
-		this.createCbControls = this.template.createCbControls
-	}
-	if (this.template.onBeforeCreate != null) {
-		if (this.onBeforeCreate == null) {
-			this.onBeforeCreate = this.template.onBeforeCreate
-		} else {
-			this.onBeforeCreate = [this.template.onBeforeCreate, this.onBeforeCreate]
-		}
-	}
-	if (this.onAfterCreate == null && this.template.onAfterCreate != null) {
-		this.onAfterCreate = this.template.onAfterCreate
-	}
-	if (this.onNoData == null && this.template.onNoData != null) {
-		this.onNoData = this.template.onNoData
-	}
-	if (this.createNote == null && this.template.createNote != null) {
-		this.createNote = this.template.createNote
-	}
-	if (this.customFilter == null && this.template.customFilter != null) {
-		this.customFilter = this.template.customFilter
-	}
-	if (this.onSearchSubmit == null && this.template.onSearchSubmit != null) {
-		this.onSearchSubmit = this.template.onSearchSubmit
-	}
-	if (this.clip == null && this.template.clip != null) {
-		this.clip = this.template.clip
-	}
-	if (this.mode == null) {
-		this.mode = this.template.mode
-	}
-	if (this.nItemsPerPage == null) {
-		if (this.template.nItemsPerPage != null) {
-			this.nItemsPerPage = this.template.nItemsPerPage
-		} else {
-			this.nItemsPerPage = 50
-		}
-	}
-	this.nItemsPerPage |= 0;
-	if (this.nItemsPerPage <= 0) {
-		this.nItemsPerPage = 0
-	}
-	this.nFilters = 0;
-	this.resetRowVisibility();
-	if (this.mode == Listview.MODE_TILED) {
-		if (this.nItemsPerRow == null) {
-			var t = this.template.nItemsPerRow;
-			this.nItemsPerRow = (t != null ? t: 4)
-		}
-		this.nItemsPerRow |= 0;
-		if (this.nItemsPerRow <= 1) {
-			this.nItemsPerRow = 1
-		}
-	}
-	else if (this.mode == Listview.MODE_CALENDAR) {
-		this.dates = [];
-		this.nItemsPerRow = 7; // Days per row
-		this.nItemsPerPage = 1; // Months per page
-		this.nDaysPerMonth = [];
 
-		if (this.template.startOnMonth != null)
-			this.startOnMonth = this.template.startOnMonth;
-		else
-			this.startOnMonth = new Date();
-		this.startOnMonth.setDate(1);
-		this.startOnMonth.setHours(0, 0, 0, 0);
+function Listview(opt) {
+    $WH.cO(this, opt);
 
-		if (this.nMonthsToDisplay == null) {
-			if(this.template.nMonthsToDisplay != null)
-				this.nMonthsToDisplay = this.template.nMonthsToDisplay;
-			else
-				this.nMonthsToDisplay = 1;
-		}
-
-		var y = this.startOnMonth.getFullYear(),
-			m = this.startOnMonth.getMonth();
-
-		for (var j = 0; j < this.nMonthsToDisplay; ++j) {
-			var date = new Date(y, m + j, 32);
-			this.nDaysPerMonth[j] = 32 - date.getDate();
-			for (var i = 1; i <= this.nDaysPerMonth[j]; ++i)
-				this.dates.push({ date: new Date(y, m + j, i) });
-		}
-
-		if (this.template.rowOffset != null)
-			this.rowOffset = this.template.rowOffset;
-	}
+    if (this.id) {
+        var divId = (this.tabs ? 'tab-' : 'lv-') + this.id;
+        if (this.parent) {
+            var d = $WH.ce('div');
+            d.id = divId;
+            $WH.ae($WH.ge(this.parent), d);
+            this.container = d;
+        }
+        else {
+            this.container = $WH.ge(divId);
+        }
+    }
     else {
-		this.nItemsPerRow = 1
-	}
-	this.columns = [];
-	for (var f = 0, k = this.template.columns.length; f < k; ++f) {
-		var r = this.template.columns[f],
-		e = {};
-		$WH.cO(e, r);
-		this.columns.push(e)
-	}
-	if (this.extraCols != null) {
-		for (var f = 0, k = this.extraCols.length; f < k; ++f) {
-			var m = null;
-			var b = this.extraCols[f];
-			if (b.after || b.before) {
-				var j = $WH.in_array(this.columns, (b.after ? b.after: b.before), function(d) {
-					return d.id
-				});
-				if (j != -1) {
-					m = (b.after ? j + 1 : j - 1)
-				}
-			}
-			if (m == null) {
-				m = this.columns.length
-			}
-			if (b.id == "debug-id") {
-				this.columns.splice(0, 0, b)
-			} else {
-				this.columns.splice(m, 0, b)
-			}
-		}
-	}
-	this.visibility = [];
-	var p = [],
-	q = [];
-	if (this.visibleCols != null) {
-		$WH.array_walk(this.visibleCols, function(d) {
-			p[d] = 1
-		})
-	}
-	if (this.hiddenCols != null) {
-		$WH.array_walk(this.hiddenCols, function(d) {
-			q[d] = 1
-		})
-	}
-	for (var f = 0, k = this.columns.length; f < k; ++f) {
-		var b = this.columns[f];
-		if (p[b.id] != null || (!b.hidden && q[b.id] == null)) {
-			this.visibility.push(f)
-		}
-	}
-	if (this.sort == null && this.template.sort) {
-		this.sort = this.template.sort.slice(0)
-	}
-	if (this.sort != null) {
-		var h = this.sort;
-		this.sort = [];
-		for (var f = 0, k = h.length; f < k; ++f) {
-			var b = parseInt(h[f]);
-			if (isNaN(b)) {
-				var g = 0;
-				if (h[f].charAt(0) == "-") {
-					g = 1;
-					h[f] = h[f].substring(1)
-				}
-				var j = $WH.in_array(this.columns, h[f], function(d) {
-					return d.id
-				});
-				if (j != -1) {
-					if (g) {
-						this.sort.push( - (j + 1))
-					} else {
-						this.sort.push(j + 1)
-					}
-				}
-			} else {
-				this.sort.push(b)
-			}
-		}
-	} else {
-		this.sort = []
-	}
-	if ((this.debug || g_user.debug) && this.id != "topics" && this.id != "recipes") {
-		this.columns.splice(0, 0, {
-			id: "debug-id",
-			value: "id",
-			name: "ID",
-			width: "5%",
-			tooltip: "ID"
-		});
-		this.visibility.splice(0, 0, -1);
-		for (var f = 0, k = this.visibility.length; f < k; ++f) {
-			this.visibility[f] = this.visibility[f] + 1
-		}
-		for (var f = 0, k = this.sort.length; f < k; ++f) {
-			if (this.sort[f] < 0) {
-				this.sort[f] = this.sort[f] - 1
-			} else {
-				this.sort[f] = this.sort[f] + 1
-			}
-		}
-	}
-	if (this.tabs) {
-		this.tabIndex = this.tabs.add(this.getTabName(), {
-			id: this.id,
-			onLoad: this.initialize.bind(this)
-		})
-	} else {
-		this.initialize()
-	}
+        return;
+    }
+
+    var get = $WH.g_getGets();
+    if ((get.debug != null || g_user.debug) && g_user.roles & U_GROUP_MODERATOR) {
+        this.debug = true;
+    }
+
+    if (this.template && Listview.templates[this.template]) {
+        this.template = Listview.templates[this.template];
+    }
+    else {
+        return;
+    }
+
+    g_listviews[this.id] = this;
+
+    if (this.data == null) {
+        this.data = [];
+    }
+
+    if (this.poundable == null) {
+        if (this.template.poundable != null) {
+            this.poundable = this.template.poundable;
+        }
+        else {
+            this.poundable = true;
+        }
+    }
+
+    if (this.searchable == null) {
+        if (this.template.searchable != null) {
+            this.searchable = this.template.searchable;
+        }
+        else {
+            this.searchable = false;
+        }
+    }
+
+    if (this.filtrable == null) {
+        if (this.template.filtrable != null) {
+            this.filtrable = this.template.filtrable;
+        }
+        else {
+            this.filtrable = false;
+        }
+    }
+
+    if (this.sortable == null) {
+        if (this.template.sortable != null) {
+            this.sortable = this.template.sortable;
+        }
+        else {
+            this.sortable = true;
+        }
+    }
+
+    if (this.customPound == null) {
+        if (this.template.customPound != null) {
+            this.customPound = this.template.customPound;
+        }
+        else {
+            this.customPound = false;
+        }
+    }
+
+    if (this.data.length == 1) {
+        this.filtrable = false;
+        this.searchable = false;
+    }
+
+    if (this.searchable && this.searchDelay == null) {
+        if (this.template.searchDelay != null) {
+            this.searchDelay = this.template.searchDelay;
+        }
+        else {
+            this.searchDelay = 333;
+        }
+    }
+
+    if (this.clickable == null) {
+        if (this.template.clickable != null) {
+            this.clickable = this.template.clickable;
+        }
+        else {
+            this.clickable = true;
+        }
+    }
+
+    if (this.hideBands == null) {
+        this.hideBands = this.template.hideBands;
+    }
+
+    if (this.hideNav == null) {
+        this.hideNav = this.template.hideNav;
+    }
+
+    if (this.hideHeader == null) {
+        this.hideHeader = this.template.hideHeader;
+    }
+
+    if (this.hideCount == null) {
+        this.hideCount = this.template.hideCount;
+    }
+
+    if (this.computeDataFunc == null && this.template.computeDataFunc != null) {
+        this.computeDataFunc = this.template.computeDataFunc;
+    }
+
+    if (this.createCbControls == null && this.template.createCbControls != null) {
+        this.createCbControls = this.template.createCbControls;
+    }
+
+    if (this.template.onBeforeCreate != null) {
+        if (this.onBeforeCreate == null) {
+            this.onBeforeCreate = this.template.onBeforeCreate;
+        }
+        else {
+            this.onBeforeCreate = [this.template.onBeforeCreate, this.onBeforeCreate];
+        }
+    }
+
+    if (this.onAfterCreate == null && this.template.onAfterCreate != null) {
+        this.onAfterCreate = this.template.onAfterCreate;
+    }
+
+    if (this.onNoData == null && this.template.onNoData != null) {
+        this.onNoData = this.template.onNoData;
+    }
+
+    if (this.createNote == null && this.template.createNote != null) {
+        this.createNote = this.template.createNote;
+    }
+
+    if (this.customFilter == null && this.template.customFilter != null) {
+        this.customFilter = this.template.customFilter;
+    }
+
+    if (this.onSearchSubmit == null && this.template.onSearchSubmit != null) {
+        this.onSearchSubmit = this.template.onSearchSubmit;
+    }
+
+    if (this.getItemLink == null && this.template.getItemLink != null) {
+        this.getItemLink = this.template.getItemLink;
+    }
+
+    if (this.clip == null && this.template.clip != null) {
+        this.clip = this.template.clip;
+    }
+
+    if (this.clip || this.template.compute || this.id == 'topics' || this.id == 'recipes') {
+        this.debug = false; // Don't add columns to picker windows
+    }
+
+    if (this.mode == null) {
+        this.mode = this.template.mode;
+    }
+
+    if (this.template.noStyle != null) {
+        this.noStyle = this.template.noStyle;
+    }
+
+    if (this.nItemsPerPage == null) {
+        if (this.template.nItemsPerPage != null) {
+            this.nItemsPerPage = this.template.nItemsPerPage;
+        }
+        else {
+            this.nItemsPerPage = 50;
+        }
+    }
+    this.nItemsPerPage |= 0;
+    if (this.nItemsPerPage <= 0) {
+        this.nItemsPerPage = 0;
+    }
+
+    this.nFilters = 0;
+    this.resetRowVisibility();
+
+    if (this.mode == Listview.MODE_TILED) {
+        if (this.nItemsPerRow == null) {
+            var ipr = this.template.nItemsPerRow;
+            this.nItemsPerRow = (ipr != null ? ipr : 4);
+        }
+        this.nItemsPerRow |= 0;
+        if (this.nItemsPerRow <= 1) {
+            this.nItemsPerRow = 1;
+        }
+    }
+    else if (this.mode == Listview.MODE_CALENDAR) {
+        this.dates = [];
+        this.nItemsPerRow  = 7; // Days per row
+        this.nItemsPerPage = 1; // Months per page
+        this.nDaysPerMonth = [];
+
+        if (this.template.startOnMonth != null) {
+            this.startOnMonth = this.template.startOnMonth;
+        }
+        else {
+            this.startOnMonth = new Date();
+        }
+
+        this.startOnMonth.setDate(1);
+        this.startOnMonth.setHours(0, 0, 0, 0);
+
+        if (this.nMonthsToDisplay == null) {
+            if (this.template.nMonthsToDisplay != null) {
+                this.nMonthsToDisplay = this.template.nMonthsToDisplay;
+            }
+            else {
+                this.nMonthsToDisplay = 1;
+            }
+        }
+
+        var
+            y = this.startOnMonth.getFullYear(),
+            m = this.startOnMonth.getMonth();
+
+        for (var j = 0; j < this.nMonthsToDisplay; ++j) {
+            var date = new Date(y, m + j, 32);
+            this.nDaysPerMonth[j] = 32 - date.getDate();
+            for (var i = 1; i <= this.nDaysPerMonth[j]; ++i) {
+                this.dates.push({ date: new Date(y, m + j, i) });
+            }
+        }
+
+        if (this.template.rowOffset != null) {
+            this.rowOffset = this.template.rowOffset;
+        }
+    }
+    else {
+        this.nItemsPerRow = 1;
+    }
+
+    this.columns = [];
+    for (var i = 0, len = this.template.columns.length; i < len; ++i) {
+        var
+            ori = this.template.columns[i],
+            cpy = {};
+
+            $WH.cO(cpy, ori);
+
+        this.columns.push(cpy);
+    }
+
+    // ************************
+    // Extra Columns
+
+    if (this.extraCols != null) {
+        for (var i = 0, len = this.extraCols.length; i < len; ++i) {
+            var pos = null;
+            var col = this.extraCols[i];
+
+            if (col.after || col.before) {
+                var index = $WH.in_array(this.columns, (col.after ? col.after: col.before), function(x) {
+                    return x.id;
+                });
+
+                if (index != -1) {
+                    pos = (col.after ? index + 1 : index);
+                }
+            }
+
+            if (pos == null) {
+                pos = this.columns.length;
+            }
+
+            if (col.id == 'debug-id') {
+                this.columns.splice(0, 0, col);
+            }
+            else {
+                this.columns.splice(pos, 0, col);
+            }
+        }
+    }
+
+    // ************************
+    // Visibility
+
+    this.visibility = [];
+
+    var
+        visibleCols = [],
+        hiddenCols  = [];
+
+    if (this.visibleCols != null) {
+        $WH.array_walk(this.visibleCols, function(x) {
+            visibleCols[x] = 1;
+        });
+    }
+
+    if (this.hiddenCols != null) {
+        $WH.array_walk(this.hiddenCols, function(x) {
+            hiddenCols[x] = 1;
+        });
+    }
+
+    for (var i = 0, len = this.columns.length; i < len; ++i) {
+        var col = this.columns[i];
+        if (visibleCols[col.id] != null || (!col.hidden && hiddenCols[col.id] == null)) {
+            this.visibility.push(i);
+        }
+    }
+
+    // ************************
+    // Sort
+
+    if (this.sort == null && this.template.sort) {
+        this.sort = this.template.sort.slice(0);
+    }
+
+    if (this.sort != null) {
+        var sortParam = this.sort;
+        this.sort = [];
+        for (var i = 0, len = sortParam.length; i < len; ++i) {
+            var col = parseInt(sortParam[i]);
+            if (isNaN(col)) {
+                var desc = 0;
+                if (sortParam[i].charAt(0) == '-') {
+                    desc = 1;
+                    sortParam[i] = sortParam[i].substring(1);
+                }
+                var index = $WH.in_array(this.columns, sortParam[i], function(x) {
+                    return x.id;
+                });
+                if (index != -1) {
+                    if (desc) {
+                        this.sort.push( - (index + 1));
+                    }
+                    else {
+                        this.sort.push(index + 1);
+                    }
+                }
+            }
+            else {
+                this.sort.push(col);
+            }
+        }
+    }
+    else {
+        this.sort = [];
+    }
+
+    if (this.debug || g_user.debug) {
+        this.columns.splice(0, 0, {
+            id: 'debug-id',
+            compute: function(data, td) {
+                if (data.id) {
+                    $WH.ae(td, $WH.ct(data.id));
+                }
+            },
+            getVisibleText: function(data) {
+                if (data.id) {
+                    return data.id;
+                }
+                else {
+                    return '';
+                }
+            },
+            getValue: function(data) {
+                if (data.id) {
+                    return data.id;
+                }
+                else {
+                    return 0;
+                }
+            },
+            sortFunc: function(a, b, col) {
+                if (a.id == null) {
+                    return -1;
+                }
+                else if (b.id == null) {
+                    return 1;
+                }
+
+                return $WH.strcmp(a.id, b.id);
+            },
+            name: 'ID',
+            width: '5%',
+            tooltip: 'ID'
+        });
+        this.visibility.splice(0, 0, -1);
+
+        for (var i = 0, len = this.visibility.length; i < len; ++i) {
+            this.visibility[i] = this.visibility[i] + 1;
+        }
+
+        for (var i = 0, len = this.sort.length; i < len; ++i) {
+            if (this.sort[i] < 0) {
+                this.sort[i] = this.sort[i] - 1;
+            }
+            else {
+                this.sort[i] = this.sort[i] + 1;
+            }
+        }
+    }
+
+    if (this.tabs) {
+        this.tabIndex = this.tabs.add(this.getTabName(), {
+            id: this.id,
+            onLoad: this.initialize.bind(this)
+        });
+    }
+    else {
+        this.initialize();
+    }
 }
+
 Listview.MODE_DEFAULT  = 0;
 Listview.MODE_CHECKBOX = 1;
 Listview.MODE_DIV      = 2;
@@ -2701,1448 +2863,1898 @@ Listview.MODE_TILED    = 3;
 Listview.MODE_CALENDAR = 4;
 
 Listview.prototype = {
-	initialize: function() {
-		if (this.data.length) {
-			if (this.computeDataFunc != null) {
-				for (var d = 0, a = this.data.length; d < a; ++d) {
-					this.computeDataFunc(this.data[d])
-				}
-			}
-		}
-		if (this.tabs) {
-			this.pounded = (this.tabs.poundedTab == this.tabIndex);
-			if (this.pounded) {
-				this.readPound()
-			}
-		} else {
-			this.readPound()
-		}
-		this.applySort();
-		var b;
-		if (this.onBeforeCreate != null) {
-			if (typeof this.onBeforeCreate == "function") {
-				b = this.onBeforeCreate()
-			} else {
-				for (var d = 0; d < this.onBeforeCreate.length; ++d) { (this.onBeforeCreate[d].bind(this))()
-				}
-			}
-		}
-		this.noData = $WH.ce("div");
-		this.noData.className = "listview-nodata text";
-		if (this.mode == Listview.MODE_DIV) {
-			this.mainContainer = this.mainDiv = $WH.ce("div");
-			this.mainContainer.className = "listview-mode-div"
-		} else {
-			this.mainContainer = this.table = $WH.ce("table");
-			this.thead = $WH.ce("thead");
-			this.tbody = $WH.ce("tbody");
-			if (this.clickable) {
-				this.tbody.className = "clickable"
-			}
-			if (this.mode == Listview.MODE_TILED) {
-				if(!this.noStyle)
-					this.table.className = 'listview-mode-' + (this.mode == Listview.MODE_TILED ? 'tiled' : 'calendar');
-
-				var
-                    e = (100 / this.nItemsPerRow) + "%",
-                    f = $WH.ce("colgroup"),
-                    c;
-
-				for (var d = 0; d < this.nItemsPerRow; ++d) {
-					c = $WH.ce("col");
-					c.style.width = e;
-					$WH.ae(f, c)
-				}
-
-				$WH.ae(this.mainContainer, f)
-			} else {
-				this.table.className = "listview-mode-default";
-				this.createHeader();
-				this.updateSortArrow()
-			}
-			$WH.ae(this.table, this.thead);
-			$WH.ae(this.table, this.tbody);
-			if (this.mode == Listview.MODE_CHECKBOX && $WH.Browser.ie) {
-				setTimeout(Listview.cbIeFix.bind(this), 1)
-			}
-		}
-		this.createBands();
-		if (this.customFilter != null) {
-			this.updateFilters()
-		}
-		this.updateNav();
-		this.refreshRows();
-		if (this.onAfterCreate != null) {
-			this.onAfterCreate(b)
-		}
-	},
-	createHeader: function() {
-		var h = $WH.ce("tr");
-		if (this.mode == Listview.MODE_CHECKBOX) {
-			var g = $WH.ce("th"),
-			j = $WH.ce("div"),
-			c = $WH.ce("a");
-			g.style.width = "33px";
-			c.href = "javascript:;";
-			c.className = "listview-cb";
-			$WH.ns(c);
-			$WH.ae(c, $WH.ct(String.fromCharCode(160)));
-			$WH.ae(j, c);
-			$WH.ae(g, j);
-			$WH.ae(h, g)
-		}
-		for (var f = 0, b = this.visibility.length; f < b; ++f) {
-			var e = this.visibility[f],
-			d = this.columns[e],
-			g = $WH.ce("th");
-			j = $WH.ce("div"),
-			c = $WH.ce("a"),
-			outerSpan = $WH.ce("span"),
-			innerSpan = $WH.ce("span");
-			d.__th = g;
-			c.href = "javascript:;";
-			if (this.filtrable && (d.filtrable == null || d.filtrable)) {
-				c.onmouseup = Listview.headerClick.bind(this, d, e);
-				c.onclick = c.oncontextmenu = $WH.rf
-			} else {
-				c.onclick = this.sortBy.bind(this, e + 1)
-			}
-			c.onmouseover = Listview.headerOver.bind(this, c, d);
-			c.onmouseout = Tooltip.hide;
-			$WH.ns(c);
-			if (d.width != null) {
-				g.style.width = d.width
-			}
-			if (d.align != null) {
-				g.style.textAlign = d.align
-			}
-			if (d.span != null) {
-				g.colSpan = d.span
-			}
-			$WH.ae(innerSpan, $WH.ct(d.name));
-			$WH.ae(outerSpan, innerSpan);
-			$WH.ae(c, outerSpan);
-			$WH.ae(j, c);
-			$WH.ae(g, j);
-			$WH.ae(h, g)
-		}
-		if (this.hideHeader) {
-			this.thead.style.display = "none"
-		}
-		$WH.ae(this.thead, h)
-	},
-	createBands: function() {
-		var j = $WH.ce("div"),
-		l = $WH.ce("div"),
-		m = $WH.ce("div"),
-		k = $WH.ce("div");
-		this.bandTop = j;
-		this.bandBot = l;
-		this.noteTop = m;
-		this.noteBot = k;
-		j.className = "listview-band-top";
-		l.className = "listview-band-bottom";
-		this.navTop = this.createNav(true);
-		this.navBot = this.createNav(false);
-		m.className = k.className = "listview-note";
-		if (this.note) {
-			m.innerHTML = this.note;
-			var e = $WH.g_getGets();
-			if (this.note.indexOf("fi_toggle()") > -1 && !e.filter) {
-				fi_toggle()
-			}
-		} else {
-			if (this.createNote) {
-				this.createNote(m, k)
-			}
-		}
-		if (this.debug && this.id != "topics") {
-			$WH.ae(m, $WH.ct(" ("));
-			var b = $WH.ce("a");
-			b.onclick = this.getList.bind(this);
-			$WH.ae(b, $WH.ct("CSV"));
-			$WH.ae(m, b);
-			$WH.ae(m, $WH.ct(")"))
-		}
-
-		if (this._errors) {
-			var
-				sp = $WH.ce('small'),
-				b  = $WH.ce('b');
-
-			b.className = 'q10 report-icon';
-			if (m.innerHTML) {
-				b.style.marginLeft = '10px';
-			}
-
-			g_addTooltip(sp, LANG.lvnote_witherrors, 'q')
-
-			$WH.st(b, LANG.error);
-			$WH.ae(sp, b);
-			$WH.ae(m, sp);
-		}
-
-		if (!m.firstChild && this.mode != Listview.MODE_CHECKBOX) {
-			$WH.ae(m, $WH.ct(String.fromCharCode(160)))
-		}
-		if (this.mode != Listview.MODE_CHECKBOX) {
-			$WH.ae(k, $WH.ct(String.fromCharCode(160)))
-		}
-		$WH.ae(j, this.navTop);
-		if (this.searchable) {
-			var o = this.updateFilters.bind(this, true),
-			f = (this._truncated ? "search-within-results2": "search-within-results"),
-			d = $WH.ce("span"),
-			c = $WH.ce("em"),
-			i = $WH.ce("a"),
-			h = $WH.ce("input");
-			d.className = "listview-quicksearch";
-			$WH.ae(d, c);
-			i.href = "javascript:;";
-			i.onclick = function() {
-				var a = this.nextSibling;
-				a.value = "";
-				a.className = f;
-				o()
-			};
-			i.style.display = "none";
-			$WH.ae(i, $WH.ce("span"));
-			$WH.ae(d, i);
-			$WH.ns(i);
-			h.setAttribute("type", "text");
-			h.className = f;
-			h.style.width = (this._truncated ? "19em": "15em");
-			g_onAfterTyping(h, o, this.searchDelay);
-			h.onmouseover = function() {
-				if ($WH.trim(this.value) != "") {
-					this.className = ""
-				}
-			};
-			h.onfocus = function() {
-				this.className = ""
-			};
-			h.onblur = function() {
-				if ($WH.trim(this.value) == "") {
-					this.className = f;
-					this.value = ""
-				}
-			};
-			h.onkeypress = this.submitSearch.bind(this);
-			if ($WH.Browser.ie) {
-				setTimeout(function() {
-					h.value = ""
-				},
-				1)
-			}
-			$WH.ae(d, h);
-			this.quickSearchBox = h;
-			this.quickSearchGlass = c;
-			this.quickSearchClear = i;
-			$WH.ae(j, d)
-		}
-		$WH.ae(j, m);
-		$WH.ae(l, this.navBot);
-		$WH.ae(l, k);
-		if (this.mode == Listview.MODE_CHECKBOX) {
-			if (this.note) {
-				m.style.paddingBottom = "5px"
-			}
-			this.cbBarTop = this.createCbBar(true);
-			this.cbBarBot = this.createCbBar(false);
-			$WH.ae(j, this.cbBarTop);
-			$WH.ae(l, this.cbBarBot);
-			if (!this.noteTop.firstChild && !this.cbBarTop.firstChild) {
-				this.noteTop.innerHTML = "&nbsp;"
-			}
-			if (!this.noteBot.firstChild && !this.cbBarBot.firstChild) {
-				this.noteBot.innerHTML = "&nbsp;"
-			}
-			if (this.noteTop.firstChild && this.cbBarTop.firstChild) {
-				this.noteTop.style.paddingBottom = "6px"
-			}
-			if (this.noteBot.firstChild && this.cbBarBot.firstChild) {
-				this.noteBot.style.paddingBottom = "6px"
-			}
-		}
-		if (this.hideBands & 1) {
-			j.style.display = "none"
-		}
-		if (this.hideBands & 2) {
-			l.style.display = "none"
-		}
-		$WH.ae(this.container, this.bandTop);
-		if (this.clip) {
-			var g = $WH.ce("div");
-			g.className = "listview-clip";
-			g.style.width = this.clip.w + "px";
-			g.style.height = this.clip.h + "px";
-			this.clipDiv = g;
-			$WH.ae(g, this.mainContainer);
-			$WH.ae(g, this.noData);
-			$WH.ae(this.container, g)
-		} else {
-			$WH.ae(this.container, this.mainContainer);
-			$WH.ae(this.container, this.noData)
-		}
-		$WH.ae(this.container, this.bandBot)
-	},
-	createNav: function(g) {
-		var c = $WH.ce("div"),
-		d = $WH.ce("a"),
-		b = $WH.ce("a"),
-		a = $WH.ce("a"),
-		j = $WH.ce("a"),
-		i = $WH.ce("span"),
-		h = $WH.ce("b"),
-		f = $WH.ce("b"),
-		e = $WH.ce("b");
-		c.className = "listview-nav";
-		d.href = b.href = a.href = j.href = "javascript:;";
-		$WH.ae(d, $WH.ct(String.fromCharCode(171) + LANG.lvpage_first));
-		$WH.ae(b, $WH.ct(String.fromCharCode(8249) + LANG.lvpage_previous));
-		$WH.ae(a, $WH.ct(LANG.lvpage_next + String.fromCharCode(8250)));
-		$WH.ae(j, $WH.ct(LANG.lvpage_last + String.fromCharCode(187)));
-		$WH.ns(d);
-		$WH.ns(b);
-		$WH.ns(a);
-		$WH.ns(j);
-		d.onclick = this.firstPage.bind(this);
-		b.onclick = this.previousPage.bind(this);
-		a.onclick = this.nextPage.bind(this);
-		j.onclick = this.lastPage.bind(this);
-
-		if (this.mode == Listview.MODE_CALENDAR) {
-			$WH.ae(h, $WH.ct('a'));
-			$WH.ae(i, h);
-		}
-		else {
-            $WH.ae(h, $WH.ct("a"));
-            $WH.ae(f, $WH.ct("a"));
-            $WH.ae(e, $WH.ct("a"));
-            $WH.ae(i, h);
-            $WH.ae(i, $WH.ct(LANG.hyphen));
-            $WH.ae(i, f);
-            $WH.ae(i, $WH.ct(LANG.lvpage_of));
-            $WH.ae(i, e);
+    initialize: function() {
+        if (this.data.length) {
+            if (this.computeDataFunc != null) {
+                for (var i = 0, len = this.data.length; i < len; ++i) {
+                    this.computeDataFunc(this.data[i]);
+                }
+            }
         }
 
-		$WH.ae(c, d);
-		$WH.ae(c, b);
-		$WH.ae(c, i);
-		$WH.ae(c, a);
-		$WH.ae(c, j);
-		if (g) {
-			if (this.hideNav & 1) {
-				c.style.display = "none"
-			}
-		} else {
-			if (this.hideNav & 2) {
-				c.style.display = "none"
-			}
-		}
-		return c
-	},
-    createCbBar: function(a) {
-		var b = $WH.ce("div");
-		if (this.createCbControls) {
-			this.createCbControls(b, a)
-		}
-		if (b.firstChild) {
-			b.className = "listview-withselected" + (a ? "": "2")
-		}
-		return b
-	},
-	refreshRows: function() {
-		var a = (this.mode == Listview.MODE_DIV ? this.mainContainer: this.tbody);
-		$WH.ee(a);
-		if (this.nRowsVisible == 0) {
-			if (!this.filtered) {
-				this.bandTop.style.display = this.bandBot.style.display = "none";
-				this.mainContainer.style.display = "none"
-			}
-			this.noData.style.display = "";
-			this.showNoData();
-			return
-		}
-		var o, b, c;
-		if (! (this.hideBands & 1)) {
-			this.bandTop.style.display = ""
-		}
-		if (! (this.hideBands & 2)) {
-			this.bandBot.style.display = ""
-		}
-		if (this.nItemsPerPage > 0) {
-			o = this.rowOffset;
-			b = Math.min(o + this.nRowsVisible, o + this.nItemsPerPage);
-			if (this.filtered && this.rowOffset > 0) {
-				for (var f = 0, g = 0; f < this.data.length && g < this.rowOffset; ++f) {
-					var p = this.data[f];
-					if (p.__hidden || p.__deleted) {++o
-					} else {++g
-					}
-				}
-				b += (o - this.rowOffset)
-			}
-		} else {
-			o = 0;
-			b = this.nRowsVisible
-		}
-		var h = b - o;
-		if (this.mode == Listview.MODE_DIV) {
-			for (var e = 0; e < h; ++e) {
-				var f = o + e,
-				p = this.data[f];
-				if (!p) {
-					break
-				}
-				if (p.__hidden || p.__deleted) {++h;
-					continue
-				}
-				$WH.ae(this.mainDiv, this.getDiv(f))
-			}
-		} else {
-			if (this.mode == Listview.MODE_TILED) {
-				var d = 0,
-				l = $WH.ce("tr");
-				for (var e = 0; e < h; ++e) {
-					var f = o + e,
-					p = this.data[f];
-					if (!p) {
-						break
-					}
-					if (p.__hidden || p.__deleted) {++h;
-						continue
-					}
-					$WH.ae(l, this.getCell(f));
-					if (++d == this.nItemsPerRow) {
-						$WH.ae(this.tbody, l);
-						if (e + 1 < h) {
-							l = $WH.ce("tr")
-						}
-						d = 0
-					}
-				}
-				if (d != 0) {
-					for (; d < 4; ++d) {
-						var m = $WH.ce("td");
-						m.className = "empty-cell";
-						$WH.ae(l, m)
-					}
-					$WH.ae(this.tbody, l)
-				}
-			}
-            else if (this.mode == Listview.MODE_CALENDAR) {
-                var tr = $WH.ce('tr');
+        if (this.tabs) {
+            this.pounded = (this.tabs.poundedTab == this.tabIndex);
+            if (this.pounded) {
+                this.readPound();
+            }
+        }
+        else {
+            this.readPound();
+        }
 
-                for(var i = 0; i < 7; ++i) {
-                    var th = $WH.ce('th');
-                    $WH.st(th, LANG.date_days[i]);
-                    $WH.ae(tr, th);
+        this.applySort();
+
+        var obcResult;
+        if (this.onBeforeCreate != null) {
+            if (typeof this.onBeforeCreate == 'function') {
+                obcResult = this.onBeforeCreate();
+            }
+            else {
+                for (var i = 0; i < this.onBeforeCreate.length; ++i) {
+                    (this.onBeforeCreate[i].bind(this))();
+                }
+            }
+        }
+
+        this.noData = $WH.ce('div');
+        this.noData.className = 'listview-nodata text';
+
+        if (this.mode == Listview.MODE_DIV) {
+            this.mainContainer = this.mainDiv = $WH.ce('div');
+            if(!this.noStyle) {
+                this.mainContainer.className = 'listview-mode-div';
+            }
+        }
+        else {
+            this.mainContainer = this.table = $WH.ce('table');
+            this.thead = $WH.ce('thead');
+            this.tbody = $WH.ce('tbody');
+
+            if (this.clickable) {
+                this.tbody.className = 'clickable';
+            }
+
+            if (this.mode == Listview.MODE_TILED || this.mode == Listview.MODE_CALENDAR) {
+                if(!this.noStyle)
+                    this.table.className = 'listview-mode-' + (this.mode == Listview.MODE_TILED ? 'tiled' : 'calendar');
+
+                var
+                    width = (100 / this.nItemsPerRow) + '%',
+                    colGroup = $WH.ce('colgroup'),
+                    col;
+
+                for (var i = 0; i < this.nItemsPerRow; ++i) {
+                    col = $WH.ce('col');
+                    col.style.width = width;
+                    $WH.ae(colGroup, col);
                 }
 
-                $WH.ae(this.tbody, tr);
+                $WH.ae(this.mainContainer, colGroup);
+            }
+            else {
+                if (!this.noStyle) {
+                    this.table.className = 'listview-mode-default';
+                }
+
+                this.createHeader();
+                this.updateSortArrow();
+            }
+
+            $WH.ae(this.table, this.thead);
+            $WH.ae(this.table, this.tbody);
+        }
+
+        this.createBands();
+
+        if (this.customFilter != null) {
+            this.updateFilters();
+        }
+
+        this.updateNav();
+        this.refreshRows();
+
+        if (this.onAfterCreate != null) {
+            this.onAfterCreate(obcResult);
+        }
+    },
+
+    createHeader: function() {
+        var tr = $WH.ce('tr');
+
+        if (this.mode == Listview.MODE_CHECKBOX) {
+            var
+                th  = $WH.ce('th'),
+                div = $WH.ce('div'),
+                a   = $WH.ce('a');
+
+            th.style.width = '33px';
+
+            a.href = 'javascript:;';
+            a.className = 'listview-cb';
+            $WH.ns(a);
+            $WH.ae(a, $WH.ct(String.fromCharCode(160)));
+
+            $WH.ae(div, a);
+            $WH.ae(th, div);
+            $WH.ae(tr, th);
+        }
+
+        for (var i = 0, len = this.visibility.length; i < len; ++i) {
+            var
+                reali = this.visibility[i],
+                col = this.columns[reali],
+                th = $WH.ce('th');
+
+            div = $WH.ce('div'),
+            a = $WH.ce('a'),
+            outerSpan = $WH.ce('span'),
+            innerSpan = $WH.ce('span');
+
+            col.__th = th;
+
+            if (this.filtrable && (col.filtrable == null || col.filtrable)) {
+                a.onmouseup = Listview.headerClick.bind(this, col, reali);
+                a.onclick = a.oncontextmenu = $WH.rf;
+            }
+            else if (this.sortable) {
+                a.href = 'javascript:;';
+                a.onclick = this.sortBy.bind(this, reali + 1);
+            }
+
+            if (a.onclick) {
+                a.onmouseover = Listview.headerOver.bind(this, a, col);
+                a.onmouseout = $WH.Tooltip.hide;
+                $WH.ns(a);
+            }
+            else {
+                a.className = 'static';
+            }
+
+            if (col.width != null) {
+                th.style.width = col.width;
+            }
+
+            if (col.align != null) {
+                th.style.textAlign = col.align;
+            }
+
+            if (col.span != null) {
+                th.colSpan = col.span;
+            }
+
+            $WH.ae(innerSpan, $WH.ct(col.name));
+            $WH.ae(outerSpan, innerSpan);
+
+            $WH.ae(a, outerSpan);
+            $WH.ae(div, a);
+            $WH.ae(th, div);
+
+            $WH.ae(tr, th);
+        }
+
+        if (this.hideHeader) {
+            this.thead.style.display = 'none';
+        }
+
+        $WH.ae(this.thead, tr);
+    },
+
+    createBands: function() {
+        var
+            bandTop = $WH.ce('div'),
+            bandBot = $WH.ce('div'),
+            noteTop = $WH.ce('div'),
+            noteBot = $WH.ce('div');
+
+        this.bandTop = bandTop;
+        this.bandBot = bandBot;
+        this.noteTop = noteTop;
+        this.noteBot = noteBot;
+
+        bandTop.className = 'listview-band-top';
+        bandBot.className = 'listview-band-bottom';
+
+        this.navTop = this.createNav(true);
+        this.navBot = this.createNav(false);
+
+        noteTop.className = noteBot.className = 'listview-note';
+
+        if (this.note) {
+            noteTop.innerHTML = this.note;
+            var e = $WH.g_getGets();
+            if (this.note.indexOf('fi_toggle()') > -1 && !e.filter) {
+                fi_toggle();
+            }
+        }
+        else if (this.createNote) {
+            this.createNote(noteTop, noteBot);
+        }
+
+        if (this.debug) {
+            $WH.ae(noteTop, $WH.ct(" ("));
+            var ids = $WH.ce('a');
+            ids.onclick = this.getList.bind(this);
+            $WH.ae(ids, $WH.ct("CSV"));
+            $WH.ae(noteTop, ids);
+            $WH.ae(noteTop, $WH.ct(")"));
+        }
+
+        if (this._errors) {
+            var
+                sp = $WH.ce('small'),
+                b  = $WH.ce('b');
+
+            b.className = 'q10 report-icon';
+            if (noteTop.innerHTML) {
+                b.style.marginLeft = '10px';
+            }
+
+            g_addTooltip(sp, LANG.lvnote_witherrors, 'q');
+
+            $WH.st(b, LANG.error);
+            $WH.ae(sp, b);
+            $WH.ae(noteTop, sp);
+        }
+
+        if (!noteTop.firstChild && !(this.createCbControls || this.mode == Listview.MODE_CHECKBOX)) {
+            $WH.ae(noteTop, $WH.ct(String.fromCharCode(160)));
+        }
+        if (!(this.createCbControls || this.mode == Listview.MODE_CHECKBOX)) {
+            $WH.ae(noteBot, $WH.ct(String.fromCharCode(160)));
+        }
+
+        $WH.ae(bandTop, this.navTop);
+        if (this.searchable) {
+            var
+                FI_FUNC  = this.updateFilters.bind(this, true),
+                FI_CLASS = (this._truncated ? 'search-within-results2' : 'search-within-results'),
+                sp       = $WH.ce('span'),
+                em       = $WH.ce('em'),
+                a        = $WH.ce('a'),
+                input    = $WH.ce('input');
+
+            sp.className = 'listview-quicksearch';
+
+            if (this.tabClick) {
+                $(sp).click(this.tabClick);
+            }
+
+            $WH.ae(sp, em);
+
+            a.href = 'javascript:;';
+            a.onclick = function() {
+                var foo = this.nextSibling;
+                foo.value = '';
+                foo.className = FI_CLASS;
+                FI_FUNC();
+            };
+            a.style.display = 'none';
+            $WH.ae(a, $WH.ce('span'));
+            $WH.ae(sp, a);
+            $WH.ns(a);
+
+            input.setAttribute('type', 'text');
+            input.className = FI_CLASS;
+            input.style.width = (this._truncated ? '19em': '15em');
+            g_onAfterTyping(input, FI_FUNC, this.searchDelay);
+
+            input.onmouseover = function() {
+                if ($WH.trim(this.value) != '') {
+                    this.className = '';
+                }
+            };
+
+            input.onfocus = function() {
+                this.className = '';
+            };
+
+            input.onblur = function() {
+                if ($WH.trim(this.value) == '') {
+                    this.className = FI_CLASS;
+                    this.value = '';
+                }
+            };
+
+            input.onkeypress = this.submitSearch.bind(this);
+
+            $WH.ae(sp, input);
+
+            this.quickSearchBox = input;
+            this.quickSearchGlass = em;
+            this.quickSearchClear = a;
+
+            $WH.ae(bandTop, sp);
+        }
+        $WH.ae(bandTop, noteTop);
+
+        $WH.ae(bandBot, this.navBot);
+        $WH.ae(bandBot, noteBot);
+
+        if (this.createCbControls || this.mode == Listview.MODE_CHECKBOX) {
+            if (this.note) {
+                noteTop.style.paddingBottom = '5px';
+            }
+
+            this.cbBarTop = this.createCbBar(true);
+            this.cbBarBot = this.createCbBar(false);
+
+            $WH.ae(bandTop, this.cbBarTop);
+            $WH.ae(bandBot, this.cbBarBot);
+
+            if (!this.noteTop.firstChild && !this.cbBarTop.firstChild) {
+                this.noteTop.innerHTML = '&nbsp;';
+            }
+
+            if (!this.noteBot.firstChild && !this.cbBarBot.firstChild) {
+                this.noteBot.innerHTML = '&nbsp;';
+            }
+
+            if (this.noteTop.firstChild && this.cbBarTop.firstChild) {
+                this.noteTop.style.paddingBottom = '6px';
+            }
+
+            if (this.noteBot.firstChild && this.cbBarBot.firstChild) {
+                this.noteBot.style.paddingBottom = '6px';
+            }
+        }
+
+        if (this.hideBands & 1) {
+            bandTop.style.display = 'none';
+        }
+        if (this.hideBands & 2) {
+            bandBot.style.display = 'none';
+        }
+
+        $WH.ae(this.container, this.bandTop);
+        if (this.clip) {
+            var clipDiv = $WH.ce('div');
+            clipDiv.className = 'listview-clip';
+            clipDiv.style.width = this.clip.w + 'px';
+            clipDiv.style.height = this.clip.h + 'px';
+            this.clipDiv = clipDiv;
+
+            $WH.ae(clipDiv, this.mainContainer);
+            $WH.ae(clipDiv, this.noData);
+            $WH.ae(this.container, clipDiv);
+        }
+        else {
+            $WH.ae(this.container, this.mainContainer);
+            $WH.ae(this.container, this.noData);
+        }
+        $WH.ae(this.container, this.bandBot);
+    },
+
+    createNav: function(top) {
+        var
+            div = $WH.ce('div'),
+            a1 = $WH.ce('a'),
+            a2 = $WH.ce('a'),
+            a3 = $WH.ce('a'),
+            a4 = $WH.ce('a'),
+            span = $WH.ce('span'),
+            b1 = $WH.ce('b'),
+            b2 = $WH.ce('b'),
+            b3 = $WH.ce('b');
+
+        div.className = 'listview-nav';
+
+        a1.href = a2.href = a3.href = a4.href = 'javascript:;';
+
+        $WH.ae(a1, $WH.ct(String.fromCharCode(171) + LANG.lvpage_first));
+        $WH.ae(a2, $WH.ct(String.fromCharCode(8249) + LANG.lvpage_previous));
+        $WH.ae(a3, $WH.ct(LANG.lvpage_next + String.fromCharCode(8250)));
+        $WH.ae(a4, $WH.ct(LANG.lvpage_last + String.fromCharCode(187)));
+
+        $WH.ns(a1);
+        $WH.ns(a2);
+        $WH.ns(a3);
+        $WH.ns(a4);
+
+        a1.onclick = this.firstPage.bind(this);
+        a2.onclick = this.previousPage.bind(this);
+        a3.onclick = this.nextPage.bind(this);
+        a4.onclick = this.lastPage.bind(this);
+
+        if (this.mode == Listview.MODE_CALENDAR) {
+            $WH.ae(b1, $WH.ct('a'));
+            $WH.ae(span, b1);
+        }
+        else {
+            $WH.ae(b1, $WH.ct('a'));
+            $WH.ae(b2, $WH.ct('a'));
+            $WH.ae(b3, $WH.ct('a'));
+            $WH.ae(span, b1);
+            $WH.ae(span, $WH.ct(LANG.hyphen));
+            $WH.ae(span, b2);
+            $WH.ae(span, $WH.ct(LANG.lvpage_of));
+            $WH.ae(span, b3);
+        }
+
+        $WH.ae(div, a1);
+        $WH.ae(div, a2);
+        $WH.ae(div, span);
+        $WH.ae(div, a3);
+        $WH.ae(div, a4);
+
+        if (top) {
+            if (this.hideNav & 1) {
+                div.style.display = 'none';
+            }
+        }
+        else {
+            if (this.hideNav & 2) {
+                div.style.display = 'none';
+            }
+        }
+
+        if (this.tabClick) {
+            $('a', div).click(this.tabClick);
+        }
+
+        return div;
+    },
+
+    createCbBar: function(topBar) {
+        var    div = $WH.ce('div');
+
+        if (this.createCbControls) {
+            this.createCbControls(div, topBar);
+        }
+
+        if(div.firstChild) { // Not empty
+            div.className = 'listview-withselected' + (topBar ? '' : '2');
+        }
+
+        return div;
+    },
+
+    refreshRows: function() {
+        var target = (this.mode == Listview.MODE_DIV ? this.mainContainer: this.tbody);
+        $WH.ee(target);
+
+        if (this.nRowsVisible == 0) {
+            if (!this.filtered) {
+                this.bandTop.style.display = this.bandBot.style.display = 'none';
+
+                this.mainContainer.style.display = 'none';
+            }
+
+            this.noData.style.display = '';
+            this.showNoData();
+
+            return;
+        }
+
+        var
+            starti,
+            endi,
+            func;
+
+        if (! (this.hideBands & 1)) {
+            this.bandTop.style.display = '';
+        }
+        if (! (this.hideBands & 2)) {
+            this.bandBot.style.display = '';
+        }
+
+        if (this.nDaysPerMonth && this.nDaysPerMonth.length) {
+            starti = 0;
+            for(var i = 0; i < this.rowOffset; ++i) {
+                starti += this.nDaysPerMonth[i];
+            }
+            endi = starti + this.nDaysPerMonth[i];
+        }
+        else if (this.nItemsPerPage > 0) {
+            starti = this.rowOffset;
+            endi = Math.min(starti + this.nRowsVisible, starti + this.nItemsPerPage);
+
+            if (this.filtered && this.rowOffset > 0) { // Adjusts start and end position when listview is filtered
+                for (var i = 0, count = 0; i < this.data.length && count < this.rowOffset; ++i) {
+                    var row = this.data[i];
+
+                    if (row.__hidden || row.__deleted) {
+                        ++starti;
+                    }
+                    else {
+                        ++count;
+                    }
+                }
+                endi += (starti - this.rowOffset);
+            }
+        }
+        else {
+            starti = 0;
+            endi = this.nRowsVisible;
+        }
+
+        var nItemsToDisplay = endi - starti;
+
+        if (this.mode == Listview.MODE_DIV) {
+            for (var j = 0; j < nItemsToDisplay; ++j) {
+                var
+                    i = starti + j,
+                    row = this.data[i];
+
+                if (!row) {
+                    break;
+                }
+
+                if (row.__hidden || row.__deleted) {
+                    ++nItemsToDisplay;
+                    continue;
+                }
+
+                $WH.ae(this.mainDiv, this.getDiv(i));
+            }
+        }
+        else if (this.mode == Listview.MODE_TILED) {
+            var
+                k  = 0,
                 tr = $WH.ce('tr');
 
-                for (var k = 0; k < this.dates[o].date.getDay(); ++k) {
+            for (var j = 0; j < nItemsToDisplay; ++j) {
+                var
+                    i = starti + j,
+                row = this.data[i];
+
+                if (!row) {
+                    break;
+                }
+
+                if (row.__hidden || row.__deleted) {
+                    ++nItemsToDisplay;
+                    continue;
+                }
+
+                $WH.ae(tr, this.getCell(i));
+
+                if (++k == this.nItemsPerRow) {
+                    $WH.ae(this.tbody, tr);
+                    if (j + 1 < nItemsToDisplay) {
+                        tr = $WH.ce('tr');
+                    }
+                    k = 0;
+                }
+            }
+
+            if (k != 0) {
+                for (; k < 4; ++k) {
                     var foo = $WH.ce('td');
                     foo.className = 'empty-cell';
                     $WH.ae(tr, foo);
                 }
+                $WH.ae(this.tbody, tr);
+            }
+        }
+        else if (this.mode == Listview.MODE_CALENDAR) {
+            var tr = $WH.ce('tr');
 
-                for (var j = o; j < b; ++j) {
-                    $WH.ae(tr, this.getEvent(j));
+            for(var i = 0; i < 7; ++i) {
+                var th = $WH.ce('th');
+                $WH.st(th, LANG.date_days[i]);
+                $WH.ae(tr, th);
+            }
 
-                    if(++k == 7) {
-                        $WH.ae(this.tbody, tr);
-                        tr = $WH.ce('tr');
-                        k  = 0;
+            $WH.ae(this.tbody, tr);
+            tr = $WH.ce('tr');
+
+            for (var k = 0; k < this.dates[starti].date.getDay(); ++k) {
+                var foo = $WH.ce('td');
+                foo.className = 'empty-cell';
+                $WH.ae(tr, foo);
+            }
+
+            for (var j = starti; j < endi; ++j) {
+                $WH.ae(tr, this.getEvent(j));
+
+                if (++k == 7) {
+                    $WH.ae(this.tbody, tr);
+                    tr = $WH.ce('tr');
+                    k  = 0;
+                }
+            }
+
+            if (k != 0) {
+                for(; k < 7; ++k) {
+                    var foo = $WH.ce('td');
+                    foo.className = 'empty-cell';
+                    $WH.ae(tr, foo);
+                }
+                $WH.ae(this.tbody, tr);
+            }
+        }
+        else { // DEFAULT || CHECKBOX
+            for (var j = 0; j < nItemsToDisplay; ++j) {
+                var
+                i = starti + j,
+                row = this.data[i];
+
+                if (!row) {
+                    break;
+                }
+
+                if (row.__hidden || row.__deleted) {
+                    ++nItemsToDisplay;
+                    continue;
+                }
+
+                $WH.ae(this.tbody, this.getRow(i));
+            }
+        }
+
+        this.mainContainer.style.display = '';
+        this.noData.style.display = 'none';
+    },
+
+    showNoData: function() {
+        var div = this.noData;
+        $WH.ee(div);
+
+        var result = -1;
+        if (this.onNoData) {
+            result = (this.onNoData.bind(this, div))();
+        }
+
+        if (result == -1) {
+            $WH.ae(this.noData, $WH.ct(this.filtered ? LANG.lvnodata2: LANG.lvnodata));
+        }
+    },
+
+    getDiv: function(i) {
+        var row = this.data[i];
+
+        if (row.__div == null || this.minPatchVersion != row.__minPatch) {
+            this.createDiv(row, i);
+        }
+
+        return row.__div;
+    },
+
+    createDiv: function(row, i) {
+        var div = $WH.ce('div');
+        row.__div = div;
+        if (this.minPatchVersion) {
+            row.__minPatch = this.minPatchVersion;
+        }
+
+        (this.template.compute.bind(this, row, div, i))();
+    },
+
+    getCell: function(i) {
+        var row = this.data[i];
+
+        if (row.__td == null) {
+            this.createCell(row, i);
+        }
+
+        return row.__td;
+    },
+
+    createCell: function(row, i) {
+        var td = $WH.ce('td');
+        row.__td = td;
+
+        (this.template.compute.bind(this, row, td, i))();
+    },
+
+    getEvent: function(i) {
+        var row = this.dates[i];
+
+        if (row.__td == null) {
+            this.createEvent(row, i);
+        }
+
+        return row.__td;
+    },
+
+    createEvent: function(row, i) {
+        row.events = $WH.array_filter(this.data, function(holiday) {
+            if (holiday.__hidden || holiday.__deleted) {
+                return false;
+            }
+
+            var dates = Listview.funcBox.getEventNextDates(holiday.startDate, holiday.endDate, holiday.rec || 0, row.date);
+            if (dates[0] && dates[1]) {
+                dates[0].setHours(0, 0, 0, 0);
+                dates[1].setHours(0, 0, 0, 0);
+                return dates[0] <= row.date && dates[1] >= row.date;
+            }
+
+            return false;
+        });
+
+        var td = $WH.ce('td');
+        row.__td = td;
+
+        if (row.date.getFullYear() == g_serverTime.getFullYear() && row.date.getMonth() == g_serverTime.getMonth() && row.date.getDate() == g_serverTime.getDate()) {
+            td.className = 'calendar-today';
+        }
+
+        var div = $WH.ce('div');
+        div.className = 'calendar-date';
+        $WH.st(div, row.date.getDate());
+        $WH.ae(td, div);
+
+        div = $WH.ce('div');
+        div.className = 'calendar-event';
+        $WH.ae(td, div);
+
+        (this.template.compute.bind(this, row, div, i))();
+
+        if (this.getItemLink) {
+            td.onclick = this.itemClick.bind(this, row);
+        }
+    },
+
+    getRow: function(i) {
+        var row = this.data[i];
+
+        if (row.__tr == null) {
+            this.createRow(row);
+        }
+
+        return row.__tr;
+    },
+
+    setRow: function(newRow) {
+        if (this.data[newRow.pos]) {
+            this.data[newRow.pos] = newRow;
+            this.data[newRow.pos].__tr = newRow.__tr;
+            this.createRow(this.data[newRow.pos]);
+            this.refreshRows();
+        }
+    },
+
+    createRow: function(row) {
+        var tr = $WH.ce('tr');
+        row.__tr = tr;
+
+        if (this.mode == Listview.MODE_CHECKBOX) {
+            var td = $WH.ce('td');
+
+            if (!row.__nochk) {
+                td.className = 'listview-cb';
+                td.onclick = Listview.cbCellClick;
+
+                var cb = $WH.ce('input');
+                $WH.ns(cb);
+                cb.type = 'checkbox';
+                cb.onclick = Listview.cbClick;
+
+                if (row.__chk) {
+                    cb.checked = true;
+                }
+
+                row.__cb = cb;
+
+                $WH.ae(td, cb);
+            }
+
+            $WH.ae(tr, td);
+        }
+
+        for (var i = 0, len = this.visibility.length; i < len; ++i) {
+            var
+                reali = this.visibility[i],
+                col = this.columns[reali],
+                td = $WH.ce('td'),
+                result;
+
+            if (col.align != null) {
+                td.style.textAlign = col.align;
+            }
+
+            if (col.compute) {
+                result = (col.compute.bind(this, row, td, tr, reali))();
+            }
+            else {
+                if (row[col.value] != null) {
+                    result = row[col.value];
+                }
+                else {
+                    result = -1;
+                }
+            }
+
+            if (result != -1 && result != null) {
+                td.insertBefore($WH.ct(result), td.firstChild);
+            }
+
+            $WH.ae(tr, td);
+        }
+
+        if (this.mode == Listview.MODE_CHECKBOX && row.__chk) {
+            tr.className = 'checked';
+        }
+
+        if (row.frommerge == 1) {
+            tr.className += ' mergerow';
+        }
+
+        if (this.getItemLink) {
+            tr.onclick = this.itemClick.bind(this, row);
+        }
+    },
+
+    itemClick: function(row, e) {
+        e = $WH.$E(e);
+
+        var
+            i = 0,
+            el = e._target;
+
+        while (el && i < 3) {
+            if (el.nodeName == 'A') {
+                return;
+            }
+            el = el.parentNode;
+        }
+
+        location.href = this.getItemLink(row);
+    },
+
+    submitSearch: function(e) {
+        e = $WH.$E(e);
+
+        if (!this.onSearchSubmit || e.keyCode != 13) {
+            return;
+        }
+
+        for (var i = 0, len = this.data.length; i < len; ++i) {
+            if (this.data[i].__hidden) {
+                continue;
+            }
+
+            (this.onSearchSubmit.bind(this, this.data[i]))();
+        }
+    },
+
+    validatePage: function() {
+        var
+            rpp = this.nItemsPerPage,
+            ro  = this.rowOffset,
+            len = this.nRowsVisible;
+
+        if (ro < 0) {
+            this.rowOffset = 0;
+        }
+        else if (this.mode == Listview.MODE_CALENDAR) {
+            this.rowOffset = Math.min(ro, this.nDaysPerMonth.length - 1);
+        }
+        else {
+            this.rowOffset = this.getRowOffset(ro + rpp > len ? len - 1 : ro);
+        }
+    },
+
+    getRowOffset: function(rowNo) {
+        var rpp = this.nItemsPerPage;
+
+        return (rpp > 0 && rowNo > 0 ? Math.floor(rowNo / rpp) * rpp: 0);
+    },
+
+    resetRowVisibility: function() {
+        for (var i = 0, len = this.data.length; i < len; ++i) {
+            this.data[i].__hidden = false;
+        }
+
+        this.filtered = false;
+        this.rowOffset = 0;
+        this.nRowsVisible = this.data.length;
+    },
+
+    getColText: function(row, col) {
+        var text = '';
+        if (this.template.getVisibleText) {
+            text = $WH.trim(this.template.getVisibleText(row) + ' ');
+        }
+
+        if (col.getVisibleText) {
+            return text + col.getVisibleText(row)
+        }
+
+        if (col.getValue) {
+            return text + col.getValue(row)
+        }
+
+        if (col.value) {
+            return text + row[col.value]
+        }
+
+        if (col.compute) {
+            return text + col.compute(row, $WH.ce('td'), $WH.ce('tr'));
+        }
+
+        return ""
+    },
+
+    resetFilters: function() {
+        for (var j = 0, len2 = this.visibility.length; j < len2; ++j) {
+            var realj = this.visibility[j];
+            var col = this.columns[realj];
+
+            if (col.__filter) {
+                col.__th.firstChild.firstChild.className = '';
+                col.__filter = null;
+                --(this.nFilters);
+            }
+        }
+    },
+
+    updateFilters: function(refresh) {
+        $WH.Tooltip.hide();
+        this.resetRowVisibility();
+
+        var
+            searchText,
+            parts,
+            nParts;
+
+        if (this.searchable) {
+            this.quickSearchBox.parentNode.style.display = '';
+
+            searchText = $WH.trim(this.quickSearchBox.value);
+
+            if (searchText) {
+                this.quickSearchGlass.style.display = 'none';
+                this.quickSearchClear.style.display = '';
+
+                searchText = searchText.toLowerCase().replace(/\s+/g, ' ');
+
+                parts = searchText.split(' ');
+                nParts = parts.length;
+            }
+            else {
+                this.quickSearchGlass.style.display = '';
+                this.quickSearchClear.style.display = 'none';
+            }
+        }
+        else if (this.quickSearchBox) {
+            this.quickSearchBox.parentNode.style.display = 'none';
+        }
+
+        if (!searchText && this.nFilters == 0 && this.customFilter == null) {
+            if (refresh) {
+                this.updateNav();
+                this.refreshRows();
+            }
+
+            return;
+        }
+
+        // Numerical
+        var filterFuncs = {
+            1: function(x, y) {
+                return x > y;
+            },
+            2: function(x, y) {
+                return x == y;
+            },
+            3: function(x, y) {
+                return x < y;
+            },
+            4: function(x, y) {
+                return x >= y;
+            },
+            5: function(x, y) {
+                return x <= y;
+            },
+            6: function(x, y, z) {
+                return y <= x && x <= z;
+            }
+        };
+
+        // Range
+        var filterFuncs2 = {
+            1: function(min, max, y) {
+                return max > y;
+            },
+            2: function(min, max, y) {
+                return min <= y && y <= max;
+            },
+            3: function(min, max, y) {
+                return min < y;
+            },
+            4: function(min, max, y) {
+                return max >= y;
+            },
+            5: function(min, max, y) {
+                return min <= y;
+            },
+            6: function(min, max, y, z) {
+                return y <= max && min <= z;
+            }
+        };
+
+        var nRowsVisible = 0;
+
+        for (var i = 0, len = this.data.length; i < len; ++i) {
+            var
+                row = this.data[i],
+                nFilterMatches = 0,
+                nSearchMatches = 0,
+                matches = [];
+
+            row.__hidden = true;
+
+            if (this.customFilter && !this.customFilter(row, i)) {
+                continue;
+            }
+
+            for (var j = 0, len2 = this.visibility.length; j < len2; ++j) {
+                var realj = this.visibility[j];
+                var col = this.columns[realj];
+
+                if (col.__filter) {
+                    var
+                        filter = col.__filter,
+                        result = false;
+
+                    if (col.type != null && col.type == 'range') {
+                        var
+                            minValue = col.getMinValue(row),
+                            maxValue = col.getMaxValue(row);
+
+                        result = (filterFuncs2[filter.type])(minValue, maxValue, filter.value, filter.value2);
+                    }
+                    else if (col.type == null || col.type == 'num' || filter.type > 0) {
+                        var value = null;
+
+                        if (col.getValue) {
+                            value = col.getValue(row);
+                        }
+                        else if (col.value) {
+                            value = parseFloat(row[col.value]);
+                        }
+
+                        if (!value) {
+                            value = 0;
+                        }
+
+                        result = (filterFuncs[filter.type])(value, filter.value, filter.value2);
+                    }
+                    else {
+                        var text = this.getColText(row, col);
+
+                        if (text) {
+                            text = text.toString().toLowerCase();
+
+                            if (filter.invert) {
+                                result = text.match(filter.regex) != null;
+                            }
+                            else {
+                                var foo = 0;
+
+                                for (var k = 0, len3 = filter.words.length; k < len3; ++k) {
+                                    if (text.indexOf(filter.words[k]) != -1) {
+                                        ++foo;
+                                    }
+                                    else {
+                                        break;
+                                    }
+                                }
+
+                                result = (foo == filter.words.length);
+                            }
+                        }
+                    }
+
+                    if (filter.invert) {
+                        result = !result;
+                    }
+
+                    if (result) {
+                        ++nFilterMatches;
+                    }
+                    else {
+                        break;
                     }
                 }
 
-                if (k != 0) {
-                    for(; k < 7; ++k) {
-                        var foo = $WH.ce('td');
-                        foo.className = 'empty-cell';
-                        $WH.ae(tr, foo);
+                if (searchText) {
+                    var text = this.getColText(row, col);
+                    if (text) {
+                        text = text.toString().toLowerCase();
+
+                        for (var k = 0, len3 = parts.length; k < len3; ++k) {
+                            if (!matches[k]) {
+                                if (text.indexOf(parts[k]) != -1) {
+                                    matches[k] = 1;
+                                    ++nSearchMatches;
+                                }
+                            }
+                        }
                     }
-                    $WH.ae(this.tbody, tr);
+                }
+            }
+
+            if (row.__alwaysvisible ||
+               ((this.nFilters == 0 || nFilterMatches == this.nFilters) &&
+               (!searchText || nSearchMatches == nParts))) {
+                row.__hidden = false;
+                ++nRowsVisible;
+            }
+        }
+
+        this.filtered = (nRowsVisible < this.data.length);
+        this.nRowsVisible = nRowsVisible;
+
+        if (refresh) {
+            this.updateNav();
+            this.refreshRows();
+        }
+    },
+
+    changePage: function() {
+        this.validatePage();
+
+        this.refreshRows();
+        this.updateNav();
+        this.updatePound();
+
+        var
+            scroll = $WH.g_getScroll(),
+            c = $WH.ac(this.container);
+
+        if (scroll.y > c[1]) {
+            scrollTo(scroll.x, c[1]);
+        }
+    },
+
+    firstPage: function() {
+        this.rowOffset = 0;
+        this.changePage();
+
+        return false;
+    },
+
+    previousPage: function() {
+        this.rowOffset -= this.nItemsPerPage;
+        this.changePage();
+
+        return false;
+    },
+
+    nextPage: function() {
+        this.rowOffset += this.nItemsPerPage;
+        this.changePage();
+
+        return false;
+    },
+
+    lastPage: function() {
+        this.rowOffset = 99999999;
+        this.changePage();
+
+        return false;
+    },
+
+    addSort: function(arr, colNo) {
+        var i = $WH.in_array(arr, Math.abs(colNo), function(x) {
+            return Math.abs(x);
+        });
+
+        if (i != -1) {
+            colNo = arr[i];
+            arr.splice(i, 1);
+        }
+
+        arr.splice(0, 0, colNo);
+    },
+
+    sortBy: function(colNo) {
+        if (colNo <= 0 || colNo > this.columns.length) {
+            return;
+        }
+
+        if (Math.abs(this.sort[0]) == colNo) {
+            this.sort[0] = -this.sort[0];
+        }
+        else {
+            var defaultSort = -1;
+            if (this.columns[colNo-1].type == 'text') {
+                defaultSort = 1;
+            }
+
+            this.addSort(this.sort, defaultSort * colNo);
+        }
+
+        this.applySort();
+        this.refreshRows();
+        this.updateSortArrow();
+        this.updatePound();
+    },
+
+    applySort: function() {
+        if (this.sort.length == 0) {
+            return;
+        }
+
+        Listview.sort = this.sort;
+        Listview.columns = this.columns;
+
+        if (this.indexCreated) {
+            this.data.sort(Listview.sortIndexedRows.bind(this));
+        }
+        else {
+            this.data.sort(Listview.sortRows.bind(this));
+        }
+
+        this.updateSortIndex();
+    },
+
+    setSort: function(sort, refresh, updatePound) {
+        if (this.sort.toString() != sort.toString()) {
+            this.sort = sort;
+            this.applySort();
+
+            if (refresh) {
+                this.refreshRows();
+            }
+
+            if (updatePound) {
+                this.updatePound();
+            }
+        }
+    },
+
+    readPound: function() {
+        if (!this.poundable || !location.hash.length) {
+            return false;
+        }
+
+        var _ = location.hash.substr(1);
+        if (this.tabs) {
+            var n = _.lastIndexOf(':');
+
+            if (n == -1) {
+                return false;
+            }
+
+            _ = _.substr(n + 1);
+        }
+
+        var num = parseInt(_);
+        if (!isNaN(num)) {
+            this.rowOffset = num;
+            this.validatePage();
+
+            if (this.poundable != 2) {
+                var sort = [];
+                var matches= _.match(/(\+|\-)[0-9]+/g);
+                if (matches != null) {
+                    for (var i = matches.length - 1; i >= 0; --i) {
+                        var colNo = parseInt(matches[i]) | 0;
+                        var _ = Math.abs(colNo);
+                        if (_ <= 0 || _ > this.columns.length) {
+                            break;
+                        }
+                        this.addSort(sort, colNo);
+                    }
+
+                    this.setSort(sort, false, false);
+                }
+            }
+
+            if (this.tabs) {
+                this.tabs.setTabPound(this.tabIndex, this.getTabPound());
+            }
+        }
+    },
+
+    updateSortArrow: function() {
+        if (!this.sort.length || !this.thead || this.mode == Listview.MODE_TILED || this.mode == Listview.MODE_CALENDAR) {
+            return;
+        }
+
+        var i = $WH.in_array(this.visibility, Math.abs(this.sort[0]) - 1);
+
+        if (i == -1) {
+            return;
+        }
+
+        if (this.mode == Listview.MODE_CHECKBOX && i < this.thead.firstChild.childNodes.length - 1) {
+            i += 1;
+        }
+
+        var span = this.thead.firstChild.childNodes[i].firstChild.firstChild.firstChild;
+
+        if (this.lsa && this.lsa != span) { // lastSortArrow
+            this.lsa.className = '';
+        }
+
+        span.className = (this.sort[0] < 0 ? 'sortdesc': 'sortasc');
+        this.lsa = span;
+    },
+
+    updateSortIndex: function() {
+        var _ = this.data;
+
+        for (var i = 0, len = _.length; i < len; ++i) {
+            _[i].__si = i; // sortIndex
+        }
+
+        this.indexCreated = true;
+    },
+
+    updateTabName: function() {
+        if (this.tabs && this.tabIndex != null) {
+            this.tabs.setTabName(this.tabIndex, this.getTabName());
+        }
+    },
+
+    updatePound: function(useCurrentSort) {
+        if (!this.poundable) {
+            return;
+        }
+
+        var
+            _  = '',
+            id = '';
+
+        if (useCurrentSort) {
+            if (location.hash.length && this.tabs) {
+                var n = location.hash.lastIndexOf(':');
+                if (n != -1 && !isNaN(parseInt(location.hash.substr(n + 1)))) {
+                    _ = location.hash.substr(n + 1);
+                }
+            }
+        }
+        else {
+            _ = this.getTabPound();
+        }
+
+        if (this.customPound) {
+            id = this.customPound;
+        }
+        else if (this.tabs) {
+            id = this.id;
+        }
+
+        if (_ && this.tabs) {
+            this.tabs.setTabPound(this.tabIndex, _);
+        }
+
+        location.replace('#' + id + (id && _ ? ':' : '') + _);
+    },
+
+    updateNav: function() {
+        var
+            arr      = [this.navTop, this.navBot],
+            _        = this.nItemsPerPage,
+            __       = this.rowOffset,
+            ___      = this.nRowsVisible,
+            first    = 0,
+            previous = 0,
+            next     = 0,
+            last     = 0,
+            date     = new Date();
+
+        if (___ > 0) {
+            if (! (this.hideNav & 1)) {
+                arr[0].style.display = '';
+            }
+            if (! (this.hideNav & 2)) {
+                arr[1].style.display = '';
+            }
+        }
+        else {
+            arr[0].style.display = arr[1].style.display = 'none';
+        }
+
+        if (this.mode == Listview.MODE_CALENDAR) {
+            for (var i = 0; i < this.nDaysPerMonth.length; ++i) {
+                if (i == __)  { // Selected month
+                    if (i > 0)
+                        previous = 1;
+                    if (i > 1)
+                        first = 1;
+                    if (i < this.nDaysPerMonth.length - 1)
+                        next = 1;
+                    if (i < this.nDaysPerMonth.length - 2)
+                        last = 1;
+                }
+            }
+
+            date.setTime(this.startOnMonth.valueOf());
+            date.setMonth(date.getMonth() + __);
+        }
+        else {
+            if (_) {
+                if (__ > 0) {
+                    previous = 1;
+                    if (__ >= _ + _) {
+                        first = 1;
+                    }
+                }
+                if (__ + _ < ___) {
+                    next = 1;
+                    if (__ + _ + _ < ___) {
+                        last = 1;
+                    }
+                }
+            }
+        }
+
+        for (var i = 0; i < 2; ++i) {
+            var childs = arr[i].childNodes;
+
+            childs[0].style.display = (first ? '': 'none');
+            childs[1].style.display = (previous ? '': 'none');
+            childs[3].style.display = (next ? '': 'none');
+            childs[4].style.display = (last ? '': 'none');
+            childs = childs[2].childNodes;
+
+            if (this.mode == Listview.MODE_CALENDAR) {
+                childs[0].firstChild.nodeValue = LANG.date_months[date.getMonth()] + ' ' + date.getFullYear();
+            }
+            else {
+                childs[0].firstChild.nodeValue = __ + 1;
+                childs[2].firstChild.nodeValue = _ ? Math.min(__ + _, ___) : ___;
+                childs[4].firstChild.nodeValue = ___;
+            }
+        }
+    },
+
+    getTabName: function() {
+        var
+            name = this.name,
+            n = this.data.length;
+
+        for (var i = 0, len = this.data.length; i < len; ++i) {
+            if (this.data[i].__hidden || this.data[i].__deleted) {
+                --n;
+            }
+        }
+
+        if (n > 0 && !this.hideCount) {
+            name += $WH.sprintf(LANG.qty, n);
+        }
+
+        return name;
+    },
+
+    getTabPound: function() {
+        var buffer = '';
+
+        buffer += this.rowOffset;
+
+        if (this.poundable != 2 && this.sort.length) {
+            buffer += ('+' + this.sort.join('+')).replace(/\+\-/g, '-');
+        }
+
+        return buffer;
+    },
+
+    getCheckedRows: function() {
+        var checkedRows = [];
+
+        for (var i = 0, len = this.data.length; i < len; ++i) {
+            var _ = this.data[i];
+
+            if ((_.__cb && _.__cb.checked) || (!_.__cb && _.__chk)) {
+                checkedRows.push(_);
+            }
+        }
+
+        return checkedRows;
+    },
+
+    resetCheckedRows: function() {
+        for (var i = 0, len = this.data.length; i < len; ++i) {
+            var _ = this.data[i];
+
+            if (_.__cb) {
+                _.__cb.checked = false;
+            }
+            else if (_.__chk) {
+                _.__chk = null;
+            }
+
+            if (_.__tr) {
+                _.__tr.className = _.__tr.className.replace('checked', '');
+            }
+        }
+    },
+
+    deleteRows: function(rows) {
+        if (!rows || !rows.length) {
+            return;
+        }
+
+        for (var i = 0, len = rows.length; i < len; ++i) {
+            var row = rows[i];
+
+            if (!row.__hidden && !row.__hidden) {
+                this.nRowsVisible -= 1;
+            }
+
+            row.__deleted = true;
+        }
+
+        this.updateTabName();
+
+        if (this.rowOffset >= this.nRowsVisible) {
+            this.previousPage();
+        }
+        else {
+            this.refreshRows();
+            this.updateNav();
+        }
+    },
+
+    setData: function(data) {
+        this.data = data;
+        this.indexCreated = false;
+
+        this.resetCheckedRows();
+        this.resetRowVisibility();
+
+        if (this.tabs) {
+            this.pounded = (this.tabs.poundedTab == this.tabIndex);
+            if (this.pounded) {
+                this.readPound();
+            }
+        }
+        else {
+            this.readPound();
+        }
+
+        this.applySort();
+        this.updateSortArrow();
+
+        if (this.customFilter != null) {
+            this.updateFilters();
+        }
+
+        this.updateNav();
+        this.refreshRows();
+    },
+
+    getClipDiv: function() {
+        return this.clipDiv;
+    },
+
+    getNoteTopDiv: function() {
+        return this.noteTop;
+    },
+
+    focusSearch: function() {
+        this.quickSearchBox.focus();
+    },
+
+    clearSearch: function() {
+        this.quickSearchBox.value = '';
+    },
+
+    getList: function() {
+        if (!this.debug) {
+            return;
+        }
+        var str = '';
+        for (var i = 0; i < this.data.length; i++) {
+            if (!this.data[i].__hidden) {
+                str += this.data[i].id + ', ';
+            }
+        }
+
+        listviewIdList.show(str);
+    },
+
+    createIndicator: function(v, f, c) {
+        if (!this.noteIndicators) {
+            this.noteIndicators = $WH.ce('div');
+            this.noteIndicators.className = 'listview-indicators';
+            $(this.noteIndicators).insertBefore($(this.noteTop));
+        }
+
+        var t = this.tabClick;
+        $(this.noteIndicators).append(
+            $('<span class="indicator"></span>')
+            .html(v)
+            .append(!f ? '' :
+                $('<a class="indicator-x" style="outline: none">[x]</a>')
+                .attr('href', (typeof f == 'function' ? 'javascript:;' : f))
+                .click(function () { if (t) t(); if (typeof f == 'function') f(); })
+            )
+            .css('cursor', (typeof c == 'function' ? 'pointer' : null))
+            .click(function () { if (t) t(); if (typeof c == 'function') c(); })
+        );
+
+        $(this.noteTop).css('padding-top', '7px');
+    },
+
+    removeIndicators: function() {
+        if (this.noteIndicators) {
+            $(this.noteIndicators).remove();
+            this.noteIndicators = null;
+        }
+
+        $(this.noteTop).css('padding-top', '');
+    }
+};
+
+Listview.sortRows = function(a, b) {
+    var
+        sort = Listview.sort,
+        cols = Listview.columns;
+
+    for (var i = 0, len = sort.length; i < len; ++i) {
+        var
+            res,
+            _ = cols[Math.abs(sort[i]) - 1];
+
+        if (!_) {
+            _ = this.template;
+        }
+
+        if (_.sortFunc) {
+            res = _.sortFunc(a, b, sort[i]);
+        }
+        else {
+            res = $WH.strcmp(a[_.value], b[_.value]);
+        }
+
+        if (res != 0) {
+            return res * sort[i];
+        }
+    }
+
+    return 0;
+},
+
+Listview.sortIndexedRows = function(a, b) {
+    var
+        sort = Listview.sort,
+        cols = Listview.columns,
+        res;
+
+    for (var idx in sort) {
+        _ = cols[Math.abs(sort[idx]) - 1];
+
+        if(!_) {
+            _ = this.template;
+        }
+
+        if (_.sortFunc) {
+            res = _.sortFunc(a, b, sort[0]);
+        }
+        else {
+            res = $WH.strcmp(a[_.value], b[_.value]);
+        }
+
+        if (res != 0) {
+            return res * sort[idx];
+        }
+    }
+
+    return (a.__si - b.__si);
+},
+
+Listview.cbSelect = function(v) {
+    for (var i = 0, len = this.data.length; i < len; ++i) {
+        var _ = this.data[i];
+        var v2 = v;
+
+        if (_.__hidden) {
+            continue;
+        }
+
+        if (!_.__nochk && _.__cb) {
+            var
+                cb = _.__cb,
+                tr = cb.parentNode.parentNode;
+
+            if (v2 == null) {
+                v2 = !cb.checked;
+            }
+
+            if (cb.checked != v2) {
+                cb.checked = v2;
+                tr.className = (cb.checked ? tr.className + ' checked' : tr.className.replace('checked', ''));
+            }
+        }
+        else if (v2 == null) {
+            v2 = true;
+        }
+
+        _.__chk = v2;
+    }
+};
+
+Listview.cbClick = function(e) {
+    setTimeout(Listview.cbUpdate.bind(0, 0, this, this.parentNode.parentNode), 1);
+    $WH.sp(e);
+};
+
+Listview.cbCellClick = function(e) {
+    setTimeout(Listview.cbUpdate.bind(0, 1, this.firstChild, this.parentNode), 1);
+    $WH.sp(e);
+};
+
+Listview.cbUpdate = function(toggle, cb, tr) {
+    if (toggle) {
+        cb.checked = !cb.checked;
+    }
+
+    tr.className = (cb.checked ? tr.className + ' checked' : tr.className.replace('checked', ''));
+};
+
+Listview.headerClick = function(col, i, e) {
+    e = $WH.$E(e);
+
+    if (this.tabClick) {
+        this.tabClick();
+    }
+
+    if (e._button == 3 || e.shiftKey || e.ctrlKey) {
+        $WH.Tooltip.hide();
+        setTimeout(Listview.headerFilter.bind(this, col, null), 1);
+    }
+    else {
+        this.sortBy(i + 1);
+    }
+
+    return false;
+};
+
+Listview.headerFilter = function(col, res) {
+    var prefilled = '';
+    if (col.__filter) {
+        if (col.__filter.invert) {
+            prefilled += '!';
+        }
+
+        prefilled += col.__filter.text;
+    }
+
+    if (res == null) {
+        var res = prompt($WH.sprintf(LANG.prompt_colfilter1 + (col.type == 'text' ? LANG.prompt_colfilter2: LANG.prompt_colfilter3), col.name), prefilled);
+    }
+
+    if (res != null) {
+        var filter = {text: '', type: -1};
+
+        res = $WH.trim(res.replace(/\s+/g, ' '));
+
+        if (!res && this.onEmptyFilter) {
+            this.onEmptyFilter(col);
+        }
+        else if (res) {
+            if (res.charAt(0) == '!' || res.charAt(0) == '-') {
+                filter.invert = 1;
+                res = res.substr(1);
+            }
+
+            if (col.type == 'text') {
+                filter.type = 0;
+                filter.text = res;
+
+                if (filter.invert) {
+                    filter.regex = g_createOrRegex(res);
+                }
+                else {
+                    filter.words = res.toLowerCase().split(' ');
+                }
+            }
+            var
+                value,
+                value2;
+
+            if (res.match(/(>|=|<|>=|<=)\s*([0-9\.]+)/)) {
+                value = parseFloat(RegExp.$2);
+                if (!isNaN(value)) {
+                    switch (RegExp.$1) {
+                    case '>':
+                        filter.type = 1;
+                        break;
+                    case '=':
+                        filter.type = 2;
+                        break;
+                    case '<':
+                        filter.type = 3;
+                        break;
+                    case '>=':
+                        filter.type = 4;
+                        break;
+                    case '<=':
+                        filter.type = 5;
+                        break;
+                    }
+                    filter.value = value;
+                    filter.text = RegExp.$1 + ' ' + value;
+                }
+            }
+            else if (res.match(/([0-9\.]+)\s*\-\s*([0-9\.]+)/)) {
+                value = parseFloat(RegExp.$1);
+                value2 = parseFloat(RegExp.$2);
+                if (!isNaN(value) && !isNaN(value2)) {
+                    if (value > value2) {
+                        var foo = value;
+                        value = value2;
+                        value2 = foo;
+                    }
+
+                    if (value == value2) {
+                        filter.type = 2;
+                        filter.value = value;
+                        filter.text = '= ' + value;
+                    }
+                    else {
+                        filter.type = 6;
+                        filter.value = value;
+                        filter.value2 = value2;
+                        filter.text = value + ' - ' + value2;
+                    }
                 }
             }
             else {
-				for (var e = 0; e < h; ++e) {
-					var f = o + e,
-					p = this.data[f];
-					if (!p) {
-						break
-					}
-					if (p.__hidden || p.__deleted) {++h;
-						continue
-					}
-					$WH.ae(this.tbody, this.getRow(f))
-				}
-			}
-		}
-		this.mainContainer.style.display = "";
-		this.noData.style.display = "none"
-	},
-	showNoData: function() {
-		var b = this.noData;
-		$WH.ee(b);
-		var a = -1;
-		if (this.onNoData) {
-			a = (this.onNoData.bind(this, b))()
-		}
-		if (a == -1) {
-			$WH.ae(this.noData, $WH.ct(this.filtered ? LANG.lvnodata2: LANG.lvnodata))
-		}
-	},
-	getDiv: function(a) {
-		var b = this.data[a];
-		if (b.__div == null || this.minPatchVersion != b.__minPatch) {
-			this.createDiv(b, a)
-		}
-		return b.__div
-	},
-	createDiv: function(b, a) {
-		var c = $WH.ce("div");
-		b.__div = c;
-		if (this.minPatchVersion) {
-			b.__minPatch = this.minPatchVersion
-		} (this.template.compute.bind(this, b, c, a))()
-	},
-	getCell: function(a) {
-		var b = this.data[a];
-		if (b.__div == null) {
-			this.createCell(b, a)
-		}
-		return b.__td
-	},
-	createCell: function(b, a) {
-		var c = $WH.ce("td");
-		b.__td = c;
-		(this.template.compute.bind(this, b, c, a))();
-		if (this.template.getItemLink) {
-			c.onclick = this.itemClick.bind(this, b)
-		}
-		if ($WH.Browser.ie6) {
-			c.onmouseover = Listview.itemOver;
-			c.onmouseout = Listview.itemOut
-		}
-	},
-
-	getEvent: function(i) {
-		var row = this.dates[i];
-
-		if (row.__td == null) {
-			this.createEvent(row, i);
-		}
-
-		return row.__td;
-	},
-
-	createEvent: function(row, i) {
-		row.events = $WH.array_filter(this.data, function(holiday) {
-			if (holiday.__hidden || holiday.__deleted) {
-				return false;
-			}
-
-			var dates = Listview.funcBox.getEventNextDates(holiday.startDate, holiday.endDate, holiday.rec || 0, row.date);
-			if (dates[0] && dates[1]) {
-				dates[0].setHours(0, 0, 0, 0);
-				dates[1].setHours(0, 0, 0, 0);
-				return dates[0] <= row.date && dates[1] >= row.date;
-			}
-
-			return false;
-		});
-
-		var td = $WH.ce('td');
-		row.__td = td;
-
-		if (row.date.getFullYear() == g_serverTime.getFullYear() && row.date.getMonth() == g_serverTime.getMonth() && row.date.getDate() == g_serverTime.getDate()) {
-			td.className = 'calendar-today';
-		}
-
-		var div = $WH.ce('div');
-		div.className = 'calendar-date';
-		$WH.st(div, row.date.getDate());
-		$WH.ae(td, div);
-
-		div = $WH.ce('div');
-		div.className = 'calendar-event';
-		$WH.ae(td, div);
-
-		(this.template.compute.bind(this, row, div, i))();
-
-		if (this.getItemLink) {
-			td.onclick = this.itemClick.bind(this, row);
-		}
-	},
-
-	getRow: function(a) {
-		var b = this.data[a];
-		if (b.__tr == null) {
-			this.createRow(b)
-		}
-		return b.__tr
-	},
-	setRow: function(a) {
-		if (this.data[a.pos]) {
-			this.data[a.pos] = a;
-			this.data[a.pos].__tr = a.__tr;
-			this.createRow(this.data[a.pos]);
-			this.refreshRows()
-		}
-	},
-	createRow: function(j) {
-		var g = $WH.ce("tr");
-		j.__tr = g;
-		if (this.mode == Listview.MODE_CHECKBOX) {
-			var c = $WH.ce("td");
-			if (!j.__nochk) {
-				c.className = "listview-cb";
-				c.onclick = Listview.cbCellClick;
-				var b = $WH.ce("input");
-				$WH.ns(b);
-				b.type = "checkbox";
-				b.onclick = Listview.cbClick;
-				if (j.__chk) {
-					b.checked = true;
-					if ($WH.Browser.ie) {
-						b.defaultChecked = true
-					}
-				}
-				j.__cb = b;
-				$WH.ae(c, b)
-			}
-			$WH.ae(g, c)
-		}
-		for (var d = 0, e = this.visibility.length; d < e; ++d) {
-			var f = this.visibility[d],
-			a = this.columns[f],
-			c = $WH.ce("td"),
-			h;
-			if (a.align != null) {
-				c.style.textAlign = a.align
-			}
-			if (a.compute) {
-				h = (a.compute.bind(this, j, c, g, f))()
-			} else {
-				if (j[a.value] != null) {
-					h = j[a.value]
-				} else {
-					h = -1
-				}
-			}
-			if (h != -1 && h != null) {
-				c.insertBefore($WH.ct(h), c.firstChild)
-			}
-			$WH.ae(g, c)
-		}
-		if (this.mode == Listview.MODE_CHECKBOX && j.__chk) {
-			g.className = "checked"
-		}
-		if (this.template.getItemLink) {
-			g.onclick = this.itemClick.bind(this, j)
-		}
-		if ($WH.Browser.ie6) {
-			g.onmouseover = Listview.itemOver;
-			g.onmouseout = Listview.itemOut
-		}
-	},
-	itemClick: function(d, c) {
-		c = $WH.$E(c);
-		var a = 0,
-		b = c._target;
-		while (b && a < 3) {
-			if (b.nodeName == "A") {
-				return
-			}
-			b = b.parentNode
-		}
-		location.href = this.template.getItemLink(d)
-	},
-	submitSearch: function(c) {
-		c = $WH.$E(c);
-		if (!this.onSearchSubmit || c.keyCode != 13) {
-			return
-		}
-		for (var b = 0, a = this.data.length; b < a; ++b) {
-			if (this.data[b].__hidden) {
-				continue
-			} (this.onSearchSubmit.bind(this, this.data[b]))()
-		}
-	},
-	validatePage: function() {
-		var
-            c = this.nItemsPerPage,
-            b = this.rowOffset,
-            a = this.nRowsVisible;
-
-		if (b < 0) {
-			this.rowOffset = 0
-		}
-		else if(this.mode == Listview.MODE_CALENDAR)
-			this.rowOffset = Math.min(b, this.nDaysPerMonth.length - 1);
-        else {
-			this.rowOffset = this.getRowOffset(b + c > a ? a - 1 : b)
-		}
-	},
-	getRowOffset: function(b) {
-		var a = this.nItemsPerPage;
-		return (a > 0 && b > 0 ? Math.floor(b / a) * a: 0)
-	},
-	resetRowVisibility: function() {
-		for (var b = 0, a = this.data.length; b < a; ++b) {
-			this.data[b].__hidden = false
-		}
-		this.filtered = false;
-		this.rowOffset = 0;
-		this.nRowsVisible = this.data.length
-	},
-
-	getColText: function(row, col) {
-		var text = '';
-		if (this.template.getVisibleText) {
-			text = $WH.trim(this.template.getVisibleText(row) + ' ');
-		}
-
-		if (col.getVisibleText) {
-			return text + col.getVisibleText(row)
-		}
-
-		if (col.getValue) {
-			return text + col.getValue(row)
-		}
-
-		if (col.value) {
-			return text + row[col.value]
-		}
-
-		if (col.compute) {
-			return text + col.compute(row, $WH.ce('td'), $WH.ce('tr'));
-		}
-
-		return ""
-	},
-
-	updateFilters: function(d) {
-		Tooltip.hide();
-		this.resetRowVisibility();
-		var z, r, c;
-		if (this.searchable) {
-			this.quickSearchBox.parentNode.style.display = "";
-			z = $WH.trim(this.quickSearchBox.value);
-			if (z) {
-				this.quickSearchGlass.style.display = "none";
-				this.quickSearchClear.style.display = "";
-				z = z.toLowerCase().replace(/\s+/g, " ");
-				r = z.split(" ");
-				c = r.length
-			} else {
-				this.quickSearchGlass.style.display = "";
-				this.quickSearchClear.style.display = "none"
-			}
-		} else {
-			if (this.quickSearchBox) {
-				this.quickSearchBox.parentNode.style.display = "none"
-			}
-		}
-		if (!z && this.nFilters == 0 && this.customFilter == null) {
-			if (d) {
-				this.updateNav();
-				this.refreshRows()
-			}
-			return
-		}
-		var C = {
-			1 : function(i, j) {
-				return i > j
-			},
-			2 : function(i, j) {
-				return i == j
-			},
-			3 : function(i, j) {
-				return i < j
-			},
-			4 : function(i, j) {
-				return i >= j
-			},
-			5 : function(i, j) {
-				return i <= j
-			},
-			6 : function(i, k, j) {
-				return k <= i && i <= j
-			}
-		};
-		var q = {
-			1 : function(j, i, k) {
-				return i > k
-			},
-			2 : function(j, i, k) {
-				return j <= k && k <= i
-			},
-			3 : function(j, i, k) {
-				return j < k
-			},
-			4 : function(j, i, k) {
-				return i >= k
-			},
-			5 : function(j, i, k) {
-				return j <= k
-			},
-			6 : function(j, i, E, k) {
-				return E <= i && j <= k
-			}
-		};
-		var p = 0;
-		for (var w = 0, y = this.data.length; w < y; ++w) {
-			var g = this.data[w],
-			m = 0;
-			nSearchMatches = 0,
-			matches = [];
-			g.__hidden = true;
-			if (this.customFilter && !this.customFilter(g, w)) {
-				continue
-			}
-			for (var v = 0, h = this.visibility.length; v < h; ++v) {
-				var o = this.visibility[v];
-				var e = this.columns[o];
-				if (e.__filter) {
-					var a = e.__filter,
-					b = false;
-					if (e.type == null || e.type == "num" || a.type > 0) {
-						var t = null;
-						if (e.getValue) {
-							t = e.getValue(g)
-						} else {
-							if (e.value) {
-								t = parseFloat(g[e.value])
-							}
-						}
-						if (!t) {
-							t = 0
-						}
-						b = (C[a.type])(t, a.value, a.value2)
-					} else {
-						if (e.type == "range") {
-							var D = e.getMinValue(g),
-							B = e.getMaxValue(g);
-							b = (q[a.type])(D, B, a.value, a.value2)
-						} else {
-							var l = this.getColText(g, e);
-							if (l) {
-								l = l.toString().toLowerCase();
-								if (a.invert) {
-									b = l.match(a.regex) != null
-								} else {
-									var A = 0;
-									for (var u = 0, f = a.words.length; u < f; ++u) {
-										if (l.indexOf(a.words[u]) != -1) {++A
-										} else {
-											break
-										}
-									}
-									b = (A == a.words.length)
-								}
-							}
-						}
-					}
-					if (a.invert) {
-						b = !b
-					}
-					if (b) {++m
-					} else {
-						break
-					}
-				}
-				if (z) {
-					var l = this.getColText(g, e);
-					if (l) {
-						l = l.toString().toLowerCase();
-						for (var u = 0, f = r.length; u < f; ++u) {
-							if (!matches[u]) {
-								if (l.indexOf(r[u]) != -1) {
-									matches[u] = 1; ++nSearchMatches
-								}
-							}
-						}
-					}
-				}
-			}
-			if (g.__alwaysvisible || ((this.nFilters == 0 || m == this.nFilters) && (!z || nSearchMatches == c))) {
-				g.__hidden = false; ++p
-			}
-		}
-		this.filtered = (p < this.data.length);
-		this.nRowsVisible = p;
-		if (d) {
-			this.updateNav();
-			this.refreshRows()
-		}
-	},
-	changePage: function() {
-		this.validatePage();
-		this.refreshRows();
-		this.updateNav();
-		this.updatePound();
-		var a = $WH.g_getScroll(),
-		b = $WH.ac(this.container);
-		if (a.y > b[1]) {
-			scrollTo(a.x, b[1])
-		}
-	},
-	firstPage: function() {
-		this.rowOffset = 0;
-		this.changePage();
-		return false
-	},
-	previousPage: function() {
-		this.rowOffset -= this.nItemsPerPage;
-		this.changePage();
-		return false
-	},
-	nextPage: function() {
-		this.rowOffset += this.nItemsPerPage;
-		this.changePage();
-		return false
-	},
-	lastPage: function() {
-		this.rowOffset = 99999999;
-		this.changePage();
-		return false
-	},
-	addSort: function(a, c) {
-		var b = $WH.in_array(a, Math.abs(c), function(d) {
-			return Math.abs(d)
-		});
-		if (b != -1) {
-			c = a[b];
-			a.splice(b, 1)
-		}
-		a.splice(0, 0, c)
-	},
-	sortBy: function(a) {
-		if (a <= 0 || a > this.columns.length) {
-			return
-		}
-		if (Math.abs(this.sort[0]) == a) {
-			this.sort[0] = -this.sort[0]
-		} else {
-			var b = -1;
-			if (this.columns[a-1].type == "text") {
-				b = 1
-			}
-			this.addSort(this.sort, b * a)
-		}
-		this.applySort();
-		this.refreshRows();
-		this.updateSortArrow();
-		this.updatePound()
-	},
-	applySort: function() {
-		if (this.sort.length == 0) {
-			return
-		}
-		Listview.sort = this.sort;
-		Listview.columns = this.columns;
-		if (this.indexCreated) {
-			this.data.sort(Listview.sortIndexedRows.bind(this))
-		} else {
-			this.data.sort(Listview.sortRows.bind(this))
-		}
-		this.updateSortIndex()
-	},
-	setSort: function(b, c, a) {
-		if (this.sort.toString() != b.toString()) {
-			this.sort = b;
-			this.applySort();
-			if (c) {
-				this.refreshRows()
-			}
-			if (a) {
-				this.updatePound()
-			}
-		}
-	},
-	readPound: function() {
-		if (!this.poundable || !location.hash.length) {
-			return false
-		}
-		var b = location.hash.substr(1);
-		if (this.tabs) {
-			var g = b.indexOf(":");
-			if (g == -1) {
-				return false
-			}
-			b = b.substr(g + 1)
-		}
-		var a = parseInt(b);
-		if (!isNaN(a)) {
-			this.rowOffset = a;
-			this.validatePage();
-			if (this.poundable != 2) {
-				var d = [];
-				var f = b.match(/(\+|\-)[0-9]+/g);
-				if (f != null) {
-					for (var c = f.length - 1; c >= 0; --c) {
-						var e = parseInt(f[c]) | 0;
-						var b = Math.abs(e);
-						if (b <= 0 || b > this.columns.length) {
-							break
-						}
-						this.addSort(d, e)
-					}
-					this.setSort(d, false, false)
-				}
-			}
-			if (this.tabs) {
-				this.tabs.setTabPound(this.tabIndex, this.getTabPound())
-			}
-		}
-	},
-	updateSortArrow: function() {
-		if (!this.sort.length || !this.thead || this.mode == Listview.MODE_TILED || this.mode == Listview.MODE_CALENDAR) {
-			return
-		}
-		var a = $WH.in_array(this.visibility, Math.abs(this.sort[0]) - 1);
-		if (a == -1) {
-			return
-		}
-		if (this.mode == Listview.MODE_CHECKBOX) {
-			a += 1
-		}
-		var b = this.thead.firstChild.childNodes[a].firstChild.firstChild.firstChild;
-		if (this.lsa && this.lsa != b) {
-			this.lsa.className = ""
-		}
-		b.className = (this.sort[0] < 0 ? "sortdesc": "sortasc");
-		this.lsa = b
-	},
-	updateSortIndex: function() {
-		var b = this.data;
-		for (var c = 0, a = b.length; c < a; ++c) {
-			b[c].__si = c
-		}
-		this.indexCreated = true
-	},
-	updateTabName: function() {
-		if (this.tabs && this.tabIndex != null) {
-			this.tabs.setTabName(this.tabIndex, this.getTabName())
-		}
-	},
-	updatePound: function() {
-		if (!this.poundable) {
-			return
-		}
-		var a = this.getTabPound();
-		if (this.tabs) {
-			this.tabs.setTabPound(this.tabIndex, a);
-			location.replace("#" + this.id + ":" + a)
-		} else {
-			location.replace("#" + a)
-		}
-	},
-	updateNav: function() {
-		var e = [this.navTop, this.navBot],
-		j = this.nItemsPerPage,
-		h = this.rowOffset,
-		d = this.nRowsVisible,
-		g = 0,
-		b = 0,
-		f = 0,
-		k = 0
-        date = new Date();
-
-		if (d > 0) {
-			if (! (this.hideNav & 1)) {
-				e[0].style.display = ""
-			}
-			if (! (this.hideNav & 2)) {
-				e[1].style.display = ""
-			}
-		} else {
-			e[0].style.display = e[1].style.display = "none"
-		}
-
-		if (this.mode == Listview.MODE_CALENDAR) {
-			for (var i = 0; i < this.nDaysPerMonth.length; ++i) {
-				if (i == h)  { // Selected month
-					if (i > 0)
-						b = 1;
-					if (i > 1)
-						g = 1;
-					if (i < this.nDaysPerMonth.length - 1)
-						f = 1;
-					if (i < this.nDaysPerMonth.length - 2)
-						k = 1;
-				}
-			}
-
-			date.setTime(this.startOnMonth.valueOf());
-			date.setMonth(date.getMonth() + h);
-		}
-		else
-		{
-            if (j) {
-                if (h > 0) {
-                    b = 1;
-                    if (h >= j + j) {
-                        g = 1
-                    }
+                var parts = res.toLowerCase().split(' ');
+                if (!col.allText && parts.length == 1 && !isNaN(value = parseFloat(parts[0]))) {
+                    filter.type = 2;
+                    filter.value = value;
+                    filter.text = '= ' + value;
                 }
-                if (h + j < d) {
-                    f = 1;
-                    if (h + j + j < d) {
-                        k = 1
+                else if (col.type == 'text') {
+                    filter.type = 0;
+                    filter.text = res;
+
+                    if (filter.invert) {
+                        filter.regex = g_createOrRegex(res);
+                    }
+                    else {
+                        filter.words = parts;
                     }
                 }
             }
-		}
 
-		for (var c = 0; c < 2; ++c) {
-			var a = e[c].childNodes;
-			a[0].style.display = (g ? "": "none");
-			a[1].style.display = (b ? "": "none");
-			a[3].style.display = (f ? "": "none");
-			a[4].style.display = (k ? "": "none");
-			a = a[2].childNodes;
-
-			if (this.mode == Listview.MODE_CALENDAR)
-				a[0].firstChild.nodeValue = LANG.date_months[date.getMonth()] + ' ' + date.getFullYear();
-			else {
-                a[0].firstChild.nodeValue = h + 1;
-                a[2].firstChild.nodeValue = j ? Math.min(h + j, d) : d;
-                a[4].firstChild.nodeValue = d;
+            if (filter.type == -1) {
+                alert(LANG.message_invalidfilter);
+                return;
             }
-		}
-	},
-	getTabName: function() {
-		var b = this.name,
-		d = this.data.length;
-		for (var c = 0, a = this.data.length; c < a; ++c) {
-			if (this.data[c].__hidden || this.data[c].__deleted) {--d
-			}
-		}
-		if (d > 0 && !this.hideCount) {
-			b += $WH.sprintf(LANG.qty, d)
-		}
-		return b
-	},
-	getTabPound: function() {
-		var a = "";
-		a += this.rowOffset;
-		if (this.poundable != 2 && this.sort.length) {
-			a += ("+" + this.sort.join("+")).replace(/\+\-/g, "-")
-		}
-		return a
-	},
-	getCheckedRows: function() {
-		var d = [];
-		for (var c = 0, a = this.data.length; c < a; ++c) {
-			var b = this.data[c];
-			if ((b.__cb && b.__cb.checked) || (!b.__cb && b.__chk)) {
-				d.push(b)
-			}
-		}
-		return d
-	},
-	deleteRows: function(c) {
-		if (!c || !c.length) {
-			return
-		}
-		for (var b = 0, a = c.length; b < a; ++b) {
-			var d = c[b];
-			if (!d.__hidden && !d.__hidden) {
-				this.nRowsVisible -= 1
-			}
-			d.__deleted = true
-		}
-		this.updateTabName();
-		if (this.rowOffset >= this.nRowsVisible) {
-			this.previousPage()
-		} else {
-			this.refreshRows();
-			this.updateNav()
-		}
-	},
-	setData: function(a) {
-		this.data = a;
-		this.indexCreated = false;
-		this.resetRowVisibility();
-		if (this.tabs) {
-			this.pounded = (this.tabs.poundedTab == this.tabIndex);
-			if (this.pounded) {
-				this.readPound()
-			}
-		} else {
-			this.readPound()
-		}
-		this.applySort();
-		this.updateSortArrow();
-		if (this.customFilter != null) {
-			this.updateFilters()
-		}
-		this.updateNav();
-		this.refreshRows()
-	},
-	getClipDiv: function() {
-		return this.clipDiv
-	},
-	getNoteTopDiv: function() {
-		return this.noteTop
-	},
-	focusSearch: function() {
-		this.quickSearchBox.focus()
-	},
-	clearSearch: function() {
-		this.quickSearchBox.value = ""
-	},
-	getList: function() {
-		if (!this.debug) {
-			return
-		}
-		var b = "";
-		for (var a = 0; a < this.data.length; a++) {
-			if (!this.data[a].__hidden) {
-				b += this.data[a].id + ", "
-			}
-		}
-		prompt("", b)
-	}
+        }
+
+        if (!col.__filter || filter.text != col.__filter.text || filter.invert != col.__filter.invert) {
+            var a = col.__th.firstChild.firstChild;
+
+            if (res && filter.text) {
+                if (!col.__filter) {
+                    a.className = 'q5';
+                    ++(this.nFilters);
+                }
+
+                col.__filter = filter;
+            }
+            else {
+                if (col.__filter) {
+                    a.className = '';
+                    --(this.nFilters);
+                }
+
+                col.__filter = null;
+            }
+
+            this.updateFilters(1);
+        }
+    }
 };
-Listview.sortRows = function(e, d) {
-	var j = Listview.sort,
-	k = Listview.columns;
-	for (var h = 0, c = j.length; h < c; ++h) {
-		var g, f = k[Math.abs(j[h]) - 1];
-        if (!f)
-			f = this.template;
-        if (f.sortFunc) {
-			g = f.sortFunc(e, d, j[h])
-		} else {
-			g = $WH.strcmp(e[f.value], d[f.value])
-		}
-		if (g != 0) {
-			return g * j[h]
-		}
-	}
-	return 0
-},
-Listview.sortIndexedRows = function(d, c) {
-	var g = Listview.sort,
-	h = Listview.columns,
-	e = h[Math.abs(g[0]) - 1],
-	f;
-	if (e.sortFunc) {
-		f = e.sortFunc(d, c, g[0])
-	} else {
-		f = $WH.strcmp(d[e.value], c[e.value])
-	}
-	if (f != 0) {
-		return f * g[0]
-	}
-	return (d.__si - c.__si)
-},
-Listview.cbSelect = function(b) {
-	for (var d = 0, a = this.data.length; d < a; ++d) {
-		var c = this.data[d];
-		var f = b;
-		if (!c.__nochk && c.__tr) {
-			var e = c.__tr.firstChild.firstChild;
-			if (f == null) {
-				f = !e.checked
-			}
-			if (e.checked != f) {
-				e.checked = f;
-				c.__tr.className = (e.checked ? "checked": "");
-				if ($WH.Browser.ie) {
-					e.defaultChecked = f;
-					if ($WH.Browser.ie6) { (Listview.itemOut.bind(c.__tr))()
-					}
-				}
-			}
-		} else {
-			if (f == null) {
-				f = true
-			}
-		}
-		c.__chk = f
-	}
+
+Listview.headerOver = function(a, col, e) {
+    var buffer = '';
+
+    buffer += '<b class="q1">' + (col.tooltip ? col.tooltip: col.name) + '</b>';
+
+    if (col.__filter) {
+        buffer += '<br />' + $WH.sprintf((col.__filter.invert ? LANG.tooltip_colfilter2: LANG.tooltip_colfilter1), col.__filter.text);
+    }
+
+    buffer += '<br /><span class="q2">' + LANG.tooltip_lvheader1 + '</span>';
+    if (this.filtrable && (col.filtrable == null || col.filtrable)) {
+        buffer += '<br /><span class="q2">' + ($WH.Browser.opera ? LANG.tooltip_lvheader3: LANG.tooltip_lvheader2) + '</span>';
+    }
+
+    $WH.Tooltip.show(a, buffer, 0, 0, 'q');
 };
-Listview.cbClick = function(a) {
-	setTimeout(Listview.cbUpdate.bind(0, 0, this, this.parentNode.parentNode), 1);
-	$WH.sp(a)
-};
-Listview.cbCellClick = function(a) {
-	setTimeout(Listview.cbUpdate.bind(0, 1, this.firstChild, this.parentNode), 1);
-	$WH.sp(a)
-};
-Listview.cbIeFix = function() {
-	var d = $WH.gE(this.tbody, "tr");
-	for (var c = 0, a = d.length; c < a; ++c) {
-		var b = d[c].firstChild.firstChild;
-		if (b) {
-			b.checked = b.defaultChecked = false
-		}
-	}
-};
-Listview.cbUpdate = function(c, a, b) {
-	if (c) {
-		a.checked = !a.checked
-	}
-	b.className = (a.checked ? "checked": "");
-	if ($WH.Browser.ie) {
-		a.defaultChecked = a.checked;
-		if ($WH.Browser.ie6) { (Listview.itemOver.bind(b))()
-		}
-	}
-};
-Listview.itemOver = function() {
-	this.style.backgroundColor = (this.className == "checked" ? "#2C2C2C": "#202020")
-};
-Listview.itemOut = function() {
-	this.style.backgroundColor = (this.className == "checked" ? "#242424": "transparent")
-};
-Listview.headerClick = function(a, b, c) {
-	c = $WH.$E(c);
-	if (c._button == 3 || c.shiftKey || c.ctrlKey) {
-		Tooltip.hide();
-		setTimeout(Listview.headerFilter.bind(this, a, null), 1)
-	} else {
-		this.sortBy(b + 1)
-	}
-	return false
-};
-Listview.headerFilter = function(c, f) {
-	var j = "";
-	if (c.__filter) {
-		if (c.__filter.invert) {
-			j += "!"
-		}
-		j += c.__filter.text
-	}
-	if (f == null) {
-		var f = prompt($WH.sprintf(LANG.prompt_colfilter1 + (c.type == "text" ? LANG.prompt_colfilter2: LANG.prompt_colfilter3), c.name), j)
-	}
-	if (f != null) {
-		var e = {
-			text: "",
-			type: -1
-		};
-		f = $WH.trim(f.replace(/\s+/g, " "));
-		if (f) {
-			if (f.charAt(0) == "!" || f.charAt(0) == "-") {
-				e.invert = 1;
-				f = f.substr(1)
-			}
-			if (c.type == "text") {
-				e.type = 0;
-				e.text = f;
-				if (e.invert) {
-					e.regex = g_createOrRegex(f)
-				} else {
-					e.words = f.toLowerCase().split(" ")
-				}
-			}
-			var i, b;
-			if (f.match(/(>|=|<|>=|<=)\s*([0-9\.]+)/)) {
-				i = parseFloat(RegExp.$2);
-				if (!isNaN(i)) {
-					switch (RegExp.$1) {
-					case ">":
-						e.type = 1;
-						break;
-					case "=":
-						e.type = 2;
-						break;
-					case "<":
-						e.type = 3;
-						break;
-					case ">=":
-						e.type = 4;
-						break;
-					case "<=":
-						e.type = 5;
-						break
-					}
-					e.value = i;
-					e.text = RegExp.$1 + " " + i
-				}
-			} else {
-				if (f.match(/([0-9\.]+)\s*\-\s*([0-9\.]+)/)) {
-					i = parseFloat(RegExp.$1);
-					b = parseFloat(RegExp.$2);
-					if (!isNaN(i) && !isNaN(b)) {
-						if (i > b) {
-							var g = i;
-							i = b;
-							b = g
-						}
-						if (i == b) {
-							e.type = 2;
-							e.value = i;
-							e.text = "= " + i
-						} else {
-							e.type = 6;
-							e.value = i;
-							e.value2 = b;
-							e.text = i + " - " + b
-						}
-					}
-				} else {
-					var d = f.toLowerCase().split(" ");
-					if (d.length == 1 && !isNaN(i = parseFloat(d[0]))) {
-						e.type = 2;
-						e.value = i;
-						e.text = "= " + i
-					} else {
-						if (c.type == "text") {
-							e.type = 0;
-							e.text = f;
-							if (e.invert) {
-								e.regex = g_createOrRegex(f)
-							} else {
-								e.words = d
-							}
-						}
-					}
-				}
-			}
-			if (e.type == -1) {
-				alert(LANG.message_invalidfilter);
-				return
-			}
-		}
-		if (!c.__filter || e.text != c.__filter.text || e.invert != c.__filter.invert) {
-			var h = c.__th.firstChild.firstChild;
-			if (f && e.text) {
-				if (!c.__filter) {
-					h.className = "q5"; ++(this.nFilters)
-				}
-				c.__filter = e
-			} else {
-				if (c.__filter) {
-					h.className = ""; --(this.nFilters)
-				}
-				c.__filter = null
-			}
-			this.updateFilters(1)
-		}
-	}
-};
-Listview.headerOver = function(b, c, f) {
-	var d = "";
-	d += '<b class="q1">' + (c.tooltip ? c.tooltip: c.name) + "</b>";
-	if (c.__filter) {
-		d += "<br />" + $WH.sprintf((c.__filter.invert ? LANG.tooltip_colfilter2: LANG.tooltip_colfilter1), c.__filter.text)
-	}
-	d += '<br /><span class="q2">' + LANG.tooltip_lvheader1 + "</span>";
-	if (this.filtrable && (c.filtrable == null || c.filtrable)) {
-		d += '<br /><span class="q2">' + ($WH.Browser.opera ? LANG.tooltip_lvheader3: LANG.tooltip_lvheader2) + "</span>"
-	}
-	Tooltip.show(b, d, 0, 0, "q")
-};
+
 Listview.extraCols = {
     id: {
         id: 'id',
@@ -5060,11 +5672,11 @@ Listview.funcBox = {
         return g_quest_sorts[category];
     },
 
-	getQuestReputation: function(d, b) {
-		if (b.reprewards) {
-			for (var c = 0, a = b.reprewards.length; c < a; ++c) {
-				if (b.reprewards[c][0] == d) {
-					return b.reprewards[c][1]
+	getQuestReputation: function(faction, quest) {
+		if (quest.reprewards) {
+			for (var c = 0, a = quest.reprewards.length; c < a; ++c) {
+				if (quest.reprewards[c][0] == faction) {
+					return quest.reprewards[c][1];
 				}
 			}
 		}
@@ -5325,7 +5937,7 @@ Listview.funcBox = {
 		e.rating += a;
 		e.raters.push([g_user.id, a]);
 		var b = e.divHeader.firstChild;
-		Tooltip.hide();
+		$WH.Tooltip.hide();
 		b = b.childNodes[b.childNodes.length - 3];
         var f = $WH.ge("commentrating" + e.id);
         Listview.funcBox.coDisplayRating(e, f);
@@ -6102,13 +6714,13 @@ Listview.funcBox = {
 		return true
 	},
 	coCustomRatingOver: function(a) {
-		Tooltip.showAtCursor(a, LANG.tooltip_customrating, 0, 0, "q")
+		$WH.Tooltip.showAtCursor(a, LANG.tooltip_customrating, 0, 0, "q")
 	},
 	coPlusRatingOver: function(a) {
-		Tooltip.showAtCursor(a, LANG.tooltip_uprate, 0, 0, "q2")
+		$WH.Tooltip.showAtCursor(a, LANG.tooltip_uprate, 0, 0, "q2")
 	},
 	coMinusRatingOver: function(a) {
-		Tooltip.showAtCursor(a, LANG.tooltip_downrate, 0, 0, "q10")
+		$WH.Tooltip.showAtCursor(a, LANG.tooltip_downrate, 0, 0, "q10")
 	},
 	coSortDate: function(a) {
 		a.nextSibling.nextSibling.className = "";
@@ -6218,7 +6830,7 @@ Listview.funcBox = {
 				buff = LANG.allday;
         }
 
-		Tooltip.showAtCursor(e, '<span class="q1">' + event.name + '</span><br />' + buff, 0, 0, 'q');
+		$WH.Tooltip.showAtCursor(e, '<span class="q1">' + event.name + '</span><br />' + buff, 0, 0, 'q');
 	},
 
 	ssCellOver: function() {
@@ -6284,18 +6896,18 @@ Listview.funcBox = {
 	},
 
 	moneyHonorOver: function(e) {
-		Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_honorpoints + '</b>', 0, 0, 'q1');
+		$WH.Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_honorpoints + '</b>', 0, 0, 'q1');
 	},
 
 	moneyArenaOver: function(e) {
-		Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_arenapoints + '</b>', 0, 0, 'q1');
+		$WH.Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_arenapoints + '</b>', 0, 0, 'q1');
 	},
 
 	moneyAchievementOver: function(e) {
-		Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_achievementpoints + '</b>', 0, 0, 'q1');
+		$WH.Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_achievementpoints + '</b>', 0, 0, 'q1');
 	},
 
-	appendMoney: function(g, a, f, m, j, c, l) {
+	appendMoney: function(g, a, f, m, j, c, l) {        // todo: understand and adapt
 		var k, h = 0;
 		if (a >= 10000) {
 			h = 1;
@@ -6337,8 +6949,8 @@ Listview.funcBox = {
 			k = $WH.ce("span");
 			k.className = "money" + (m < 0 ? "horde": "alliance") + " tip";
 			k.onmouseover = Listview.funcBox.moneyHonorOver;
-			k.onmousemove = Tooltip.cursorUpdate;
-			k.onmouseout = Tooltip.hide;
+			k.onmousemove = $WH.Tooltip.cursorUpdate;
+			k.onmouseout = $WH.Tooltip.hide;
 			$WH.ae(k, $WH.ct($WH.number_format(Math.abs(m))));
 			$WH.ae(g, k)
 		}
@@ -6351,8 +6963,8 @@ Listview.funcBox = {
 			k = $WH.ce("span");
 			k.className = "moneyarena tip";
 			k.onmouseover = Listview.funcBox.moneyArenaOver;
-			k.onmousemove = Tooltip.cursorUpdate;
-			k.onmouseout = Tooltip.hide;
+			k.onmousemove = $WH.Tooltip.cursorUpdate;
+			k.onmouseout = $WH.Tooltip.hide;
 			$WH.ae(k, $WH.ct($WH.number_format(j)));
 			$WH.ae(g, k)
 		}
@@ -6382,8 +6994,8 @@ Listview.funcBox = {
 			k = $WH.ce("span");
 			k.className = "moneyachievement tip";
 			k.onmouseover = Listview.funcBox.moneyAchievementOver;
-			k.onmousemove = Tooltip.cursorUpdate;
-			k.onmouseout = Tooltip.hide;
+			k.onmousemove = $WH.Tooltip.cursorUpdate;
+			k.onmouseout = $WH.Tooltip.hide;
 			$WH.ae(k, $WH.ct($WH.number_format(l)));
 			$WH.ae(g, k)
 		}
@@ -6495,7 +7107,7 @@ Listview.templates = {
                 compute: function(faction, td) {
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(faction);
+                    a.href = this.getItemLink(faction);
                     $WH.ae(a, $WH.ct(faction.name));
                     if (faction.expansion) {
                         var sp = $WH.ce('span');
@@ -6618,7 +7230,7 @@ Listview.templates = {
                     var a = $WH.ce('a');
                     a.className = 'q' + (7 - parseInt(item.name.charAt(0)));
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(item);
+                    a.href = this.getItemLink(item);
 
                     if (item.rel) {
                         Icon.getLink(i.firstChild).rel = item.rel;
@@ -7284,7 +7896,7 @@ Listview.templates = {
                     var a = $WH.ce('a');
                     a.className = 'q' + (7 - parseInt(itemSet.name.charAt(0)));
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(itemSet);
+                    a.href = this.getItemLink(itemSet);
                     $WH.ae(a, $WH.ct(itemSet.name.substring(1)));
 
                     var div = $WH.ce('div');
@@ -7447,7 +8059,7 @@ Listview.templates = {
 
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(npc);
+                    a.href = this.getItemLink(npc);
                     $WH.ae(a, $WH.ct(npc.name));
                     $WH.ae(td, a);
 
@@ -7660,7 +8272,7 @@ Listview.templates = {
                 compute: function(object, td) {
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(object);
+                    a.href = this.getItemLink(object);
                     $WH.ae(a, $WH.ct(object.name));
                     $WH.ae(td, a);
                 }
@@ -7728,7 +8340,7 @@ Listview.templates = {
                     var wrapper = $WH.ce('div');
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(quest);
+                    a.href = this.getItemLink(quest);
                     $WH.ae(a, $WH.ct(quest.name));
                     $WH.ae(wrapper, a);
 
@@ -8064,7 +8676,7 @@ Listview.templates = {
                     i.style.padding = '0';
                     i.style.borderRight = 'none';
 
-                    $WH.ae(i, Icon.create(skill.icon, 0, null, this.template.getItemLink(skill)));
+                    $WH.ae(i, Icon.create(skill.icon, 0, null, this.getItemLink(skill)));
                     $WH.ae(tr, i);
                     td.style.borderLeft = 'none';
 
@@ -8072,7 +8684,7 @@ Listview.templates = {
 
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(skill);
+                    a.href = this.getItemLink(skill);
                     $WH.ae(a, $WH.ct(skill.name));
 
                     if (skill.expansion) {
@@ -8164,7 +8776,7 @@ Listview.templates = {
                         a.className = 'q' + (7 - parseInt(c));
                     }
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(spell);
+                    a.href = this.getItemLink(spell);
 
                     $WH.ae(a, $WH.ct(spell.name.substring(1)));
 
@@ -9068,7 +9680,7 @@ Listview.templates = {
                 compute: function(zone, td) {
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(zone);
+                    a.href = this.getItemLink(zone);
                     $WH.ae(a, $WH.ct(zone.name));
                     if (zone.expansion) {
                         var sp = $WH.ce('span');
@@ -9297,7 +9909,7 @@ Listview.templates = {
 
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(holiday);
+                    a.href = this.getItemLink(holiday);
                     $WH.ae(a, $WH.ct(holiday.name));
                     $WH.ae(td, a);
                 },
@@ -9423,8 +10035,8 @@ Listview.templates = {
             for (var i = 0; i < holiday.events.length; ++i) {
                 var icon = g_holidays.createIcon(holiday.events[i].id, 1);
                 icon.onmouseover = Listview.funcBox.dateEventOver.bind(icon, holiday.date, holiday.events[i]);
-                icon.onmousemove = Tooltip.cursorUpdate;
-                icon.onmouseout  = Tooltip.hide;
+                icon.onmousemove = $WH.Tooltip.cursorUpdate;
+                icon.onmouseout  = $WH.Tooltip.hide;
                 icon.style.cssFloat = icon.style.styleFloat = 'left';
                 $WH.ae(div, icon);
             }
@@ -9449,943 +10061,1023 @@ Listview.templates = {
         }
     },
 
-	comment: {
-		sort: [1],
-		mode: 2,
-		nItemsPerPage: 40,
-		poundable: 2,
-		columns: [{
-			value: "number"
-		},
-		{
-			value: "id"
-		},
-		{
-			value: "rating"
-		}],
-		compute: function(J, ac, ab) {
-			var ag, I = new Date(J.date),
-			Y = (g_serverTime - I) / 1000,
-			h = (g_user.roles & U_GROUP_COMMENTS_MODERATOR) != 0,
-			ad = J.rating < 0 || J.purged || J.deleted || (J.__minPatch && g_getPatchVersion.T[J.__minPatch] > I),
-			U = h || (J.user.toLowerCase() == g_user.name.toLowerCase() && !g_user.commentban),
-			L = U && J.deleted == 0,
-			d = U && J.replyTo != J.id,
-			af = true,
-			W = J.purged == 0 && J.deleted == 0 && g_user.id && J.user.toLowerCase() != g_user.name.toLowerCase() && $WH.in_array(J.raters, g_user.id, function(i) {
-				return i[0]
-			}) == -1 && !g_user.ratingban,
-			p = J.rating >= 0 && (g_user.id == 0 || W || g_user.ratingban),
-			G = g_users[J.user];
+    comment: {          // todo: reformat
+        sort: [1],
+        mode: 2,
+        nItemsPerPage: 40,
+        poundable: 2,
+        columns: [{
+            value: "number"
+        },
+        {
+            value: "id"
+        },
+        {
+            value: "rating"
+        }],
+        compute: function(J, ac, ab) {
+            var ag, I = new Date(J.date),
+            Y = (g_serverTime - I) / 1000,
+            h = (g_user.roles & U_GROUP_COMMENTS_MODERATOR) != 0,
+            ad = J.rating < 0 || J.purged || J.deleted || (J.__minPatch && g_getPatchVersion.T[J.__minPatch] > I),
+            U = h || (J.user.toLowerCase() == g_user.name.toLowerCase() && !g_user.commentban),
+            L = U && J.deleted == 0,
+            d = U && J.replyTo != J.id,
+            af = true,
+            W = J.purged == 0 && J.deleted == 0 && g_user.id && J.user.toLowerCase() != g_user.name.toLowerCase() && $WH.in_array(J.raters, g_user.id, function(i) {
+                return i[0]
+            }) == -1 && !g_user.ratingban,
+            p = J.rating >= 0 && (g_user.id == 0 || W || g_user.ratingban),
+            G = g_users[J.user];
             J.ratable = W;
-			var aa = ac;
-			var N = $WH.ce("div");
-			var z = $WH.ce("div");
-			var t = $WH.ce("em");
-			J.divHeader = N;
-			J.divBody = z;
-			J.divLinks = t;
-			aa.className = "comment-wrapper";
-			if (J.indent) {
-				aa.className += " comment-indent"
-			}
-			if (ad) {
-				aa.className += " comment-collapsed"
-			}
-			ac = $WH.ce("div");
-			ac.className = "comment comment" + (ab % 2);
-			$WH.ae(aa, ac);
-			N.className = "comment-header";
-			$WH.ae(ac, N);
-			var n = $WH.ce("em");
-			n.className = "comment-rating";
-			if (ad) {
-				var D = $WH.ce("a");
-				D.href = "javascript:;";
-				D.onclick = Listview.funcBox.coToggleVis.bind(D, J);
-				$WH.ae(D, $WH.ct(LANG.lvcomment_show));
-				$WH.ae(n, D);
-				$WH.ae(n, $WH.ct(" " + String.fromCharCode(160) + " "))
-			}
-			var A = $WH.ce("b");
-			var v = $WH.ce("a");
-			v.href = "javascript:;";
-			$WH.ae(v, $WH.ct(LANG.lvcomment_rating));
-			var E = $WH.ce("span");
-			E.id = "commentrating" + J.id;
-			Listview.funcBox.coDisplayRating(J, E);
-			v.onclick = Listview.funcBox.coToggleRating.bind(this, J, E);
-			$WH.ae(v, E);
-			$WH.ae(A, v);
-			$WH.ae(n, A);
-			$WH.ae(n, $WH.ct(" "));
-			var S = $WH.ce("span");
-			var q = $WH.ce("a"),
-			af = $WH.ce("a");
-			if (W) {
-				q.href = af.href = "javascript:;";
-				q.onclick = Listview.funcBox.coRate.bind(q, J, 1);
-				af.onclick = Listview.funcBox.coRate.bind(af, J, -1);
-				if (h) {
-					var R = $WH.ce("a");
-					R.href = "javascript:;";
-					R.onclick = Listview.funcBox.coRate.bind(R, J, 0);
-					R.onmouseover = Listview.funcBox.coCustomRatingOver;
-					R.onmousemove = Tooltip.cursorUpdate;
-					R.onmouseout = Tooltip.hide;
-					$WH.ae(R, $WH.ct("[~]"))
-					$WH.ae(S, R);
-					$WH.ae(S, $WH.ct(" "))
-				}
-			} else {
-				if (g_user.ratingban) {
-					q.href = af.href = "javascript:;"
-				} else {
-					q.href = af.href = "?account=signin"
-				}
-			}
-			$WH.ae(q, $WH.ct("[+]"))
-			if (!g_user.ratingban) {
-				q.onmouseover = Listview.funcBox.coPlusRatingOver;
-				af.onmouseover = Listview.funcBox.coMinusRatingOver;
-				q.onmousemove = af.onmousemove = Tooltip.cursorUpdate;
-				q.onmouseout = af.onmouseout = Tooltip.hide
-			} else {
-				g_addTooltip(q, LANG.tooltip_banned_rating, "q");
-				g_addTooltip(af, LANG.tooltip_banned_rating, "q")
-			}
-			$WH.ae(af, $WH.ct("[-]"))
-			$WH.ae(S, af);
-			$WH.ae(S, $WH.ct(" "));
-			$WH.ae(S, q);
-			$WH.ae(n, S);
-			if (!p) {
-				S.style.display = "none"
-			}
-			$WH.ae(N, n);
-			t.className = "comment-links";
-			var c = false;
-			if (U) {
-				var b = $WH.ce("span");
-				var Q = $WH.ce("a");
-				$WH.ae(Q, $WH.ct(LANG.lvcomment_edit));
-				Q.onclick = Listview.funcBox.coEdit.bind(this, J, 0, false);
-				$WH.ns(Q);
-				Q.href = "javascript:;";
-				$WH.ae(b, Q);
-				c = true;
-				$WH.ae(t, b)
-			}
-			if (L) {
-				var u = $WH.ce("span");
-				var F = $WH.ce("a");
-				$WH.ae(F, $WH.ct(LANG.lvcomment_delete));
-				F.onclick = Listview.funcBox.coDelete.bind(this, J);
-				$WH.ns(F);
-				F.href = "javascript:;";
-				if (c) {
+            var aa = ac;
+            var N = $WH.ce("div");
+            var z = $WH.ce("div");
+            var t = $WH.ce("em");
+            J.divHeader = N;
+            J.divBody = z;
+            J.divLinks = t;
+            aa.className = "comment-wrapper";
+            if (J.indent) {
+                aa.className += " comment-indent"
+            }
+            if (ad) {
+                aa.className += " comment-collapsed"
+            }
+            ac = $WH.ce("div");
+            ac.className = "comment comment" + (ab % 2);
+            $WH.ae(aa, ac);
+            N.className = "comment-header";
+            $WH.ae(ac, N);
+            var n = $WH.ce("em");
+            n.className = "comment-rating";
+            if (ad) {
+                var D = $WH.ce("a");
+                D.href = "javascript:;";
+                D.onclick = Listview.funcBox.coToggleVis.bind(D, J);
+                $WH.ae(D, $WH.ct(LANG.lvcomment_show));
+                $WH.ae(n, D);
+                $WH.ae(n, $WH.ct(" " + String.fromCharCode(160) + " "))
+            }
+            var A = $WH.ce("b");
+            var v = $WH.ce("a");
+            v.href = "javascript:;";
+            $WH.ae(v, $WH.ct(LANG.lvcomment_rating));
+            var E = $WH.ce("span");
+            E.id = "commentrating" + J.id;
+            Listview.funcBox.coDisplayRating(J, E);
+            v.onclick = Listview.funcBox.coToggleRating.bind(this, J, E);
+            $WH.ae(v, E);
+            $WH.ae(A, v);
+            $WH.ae(n, A);
+            $WH.ae(n, $WH.ct(" "));
+            var S = $WH.ce("span");
+            var q = $WH.ce("a"),
+            af = $WH.ce("a");
+            if (W) {
+                q.href = af.href = "javascript:;";
+                q.onclick = Listview.funcBox.coRate.bind(q, J, 1);
+                af.onclick = Listview.funcBox.coRate.bind(af, J, -1);
+                if (h) {
+                    var R = $WH.ce("a");
+                    R.href = "javascript:;";
+                    R.onclick = Listview.funcBox.coRate.bind(R, J, 0);
+                    R.onmouseover = Listview.funcBox.coCustomRatingOver;
+                    R.onmousemove = $WH.Tooltip.cursorUpdate;
+                    R.onmouseout = $WH.Tooltip.hide;
+                    $WH.ae(R, $WH.ct("[~]"))
+                    $WH.ae(S, R);
+                    $WH.ae(S, $WH.ct(" "))
+                }
+            } else {
+                if (g_user.ratingban) {
+                    q.href = af.href = "javascript:;"
+                } else {
+                    q.href = af.href = "?account=signin"
+                }
+            }
+            $WH.ae(q, $WH.ct("[+]"))
+            if (!g_user.ratingban) {
+                q.onmouseover = Listview.funcBox.coPlusRatingOver;
+                af.onmouseover = Listview.funcBox.coMinusRatingOver;
+                q.onmousemove = af.onmousemove = $WH.Tooltip.cursorUpdate;
+                q.onmouseout = af.onmouseout = $WH.Tooltip.hide
+            } else {
+                g_addTooltip(q, LANG.tooltip_banned_rating, "q");
+                g_addTooltip(af, LANG.tooltip_banned_rating, "q")
+            }
+            $WH.ae(af, $WH.ct("[-]"))
+            $WH.ae(S, af);
+            $WH.ae(S, $WH.ct(" "));
+            $WH.ae(S, q);
+            $WH.ae(n, S);
+            if (!p) {
+                S.style.display = "none"
+            }
+            $WH.ae(N, n);
+            t.className = "comment-links";
+            var c = false;
+            if (U) {
+                var b = $WH.ce("span");
+                var Q = $WH.ce("a");
+                $WH.ae(Q, $WH.ct(LANG.lvcomment_edit));
+                Q.onclick = Listview.funcBox.coEdit.bind(this, J, 0, false);
+                $WH.ns(Q);
+                Q.href = "javascript:;";
+                $WH.ae(b, Q);
+                c = true;
+                $WH.ae(t, b)
+            }
+            if (L) {
+                var u = $WH.ce("span");
+                var F = $WH.ce("a");
+                $WH.ae(F, $WH.ct(LANG.lvcomment_delete));
+                F.onclick = Listview.funcBox.coDelete.bind(this, J);
+                $WH.ns(F);
+                F.href = "javascript:;";
+                if (c) {
                     var e = $WH.ce("span");
                     e.style.color = "white";
                     $WH.ae(e, $WH.ct("|"));
-					$WH.ae(t, e)
-				}
-				$WH.ae(u, F);
-				$WH.ae(t, u)
-				c = true;
-			}
-			if (d) {
-				var P = $WH.ce("span");
-				var k = $WH.ce("a");
-				$WH.ae(k, $WH.ct(LANG.lvcomment_detach));
-				k.onclick = Listview.funcBox.coDetach.bind(this, J);
-				$WH.ns(k);
-				k.href = "javascript:;";
-				if (c) {
+                    $WH.ae(t, e)
+                }
+                $WH.ae(u, F);
+                $WH.ae(t, u)
+                c = true;
+            }
+            if (d) {
+                var P = $WH.ce("span");
+                var k = $WH.ce("a");
+                $WH.ae(k, $WH.ct(LANG.lvcomment_detach));
+                k.onclick = Listview.funcBox.coDetach.bind(this, J);
+                $WH.ns(k);
+                k.href = "javascript:;";
+                if (c) {
                     var e = $WH.ce("span");
                     e.style.color = "white";
                     $WH.ae(e, $WH.ct("|"));
-					$WH.ae(t, e)
-				}
-				$WH.ae(P, k);
-				$WH.ae(t, P)
-				c = true;
-			}
-			if (af) {
-				var K = $WH.ce("span");
-				var m = $WH.ce("a");
-				$WH.ae(m, $WH.ct(LANG.lvcomment_report));
-				m.onclick = ContactTool.show.bind(ContactTool, {
-					mode: 1,
-					comment: J
-				});
-				m.className = "report-icon";
-				m.href = "javascript:;";
-				g_addTooltip(m, LANG.report_tooltip, "q2");
-				if (c) {
+                    $WH.ae(t, e)
+                }
+                $WH.ae(P, k);
+                $WH.ae(t, P)
+                c = true;
+            }
+            if (af) {
+                var K = $WH.ce("span");
+                var m = $WH.ce("a");
+                $WH.ae(m, $WH.ct(LANG.lvcomment_report));
+                m.onclick = ContactTool.show.bind(ContactTool, {
+                    mode: 1,
+                    comment: J
+                });
+                m.className = "report-icon";
+                m.href = "javascript:;";
+                g_addTooltip(m, LANG.report_tooltip, "q2");
+                if (c) {
                     var e = $WH.ce("span");
                     e.style.color = "white";
                     $WH.ae(e, $WH.ct("|"));
-					$WH.ae(t, e)
-				}
-				$WH.ae(K, m);
-				$WH.ae(t, K)
-				c = true;
-			}
-			if (!g_user.commentban) {
-				var l = $WH.ce("span");
-				var o = $WH.ce("a");
-				$WH.ae(o, $WH.ct(LANG.lvcomment_reply));
-				if (g_user.id > 0) {
-					o.onclick = Listview.funcBox.coReply.bind(this, J);
-					o.href = "javascript:;"
-				} else {
-					o.href = "?account=signin"
-				}
-				if (c) {
+                    $WH.ae(t, e)
+                }
+                $WH.ae(K, m);
+                $WH.ae(t, K)
+                c = true;
+            }
+            if (!g_user.commentban) {
+                var l = $WH.ce("span");
+                var o = $WH.ce("a");
+                $WH.ae(o, $WH.ct(LANG.lvcomment_reply));
+                if (g_user.id > 0) {
+                    o.onclick = Listview.funcBox.coReply.bind(this, J);
+                    o.href = "javascript:;"
+                } else {
+                    o.href = "?account=signin"
+                }
+                if (c) {
                     var e = $WH.ce("span");
                     e.style.color = "white";
                     $WH.ae(e, $WH.ct("|"));
-					$WH.ae(t, e)
-				}
-				$WH.ae(l, o);
-				$WH.ae(t, l)
-				c = true;
-			}
-			if (ad) {
-				z.style.display = "none";
-				t.style.display = "none"
-			}
-			$WH.ae(N, t);
-			var C = $WH.ce("var");
-			$WH.ae(C, $WH.ct(LANG.lvcomment_by));
-			aUser = $WH.ce("a");
-			aUser.href = "?user=" + J.user;
-			$WH.ae(aUser, $WH.ct(J.user));
-			$WH.ae(C, aUser);
-			$WH.ae(C, $WH.ct(" "));
-			var a = $WH.ce("a");
-			a.className = "q0";
-			a.id = "comments:id=" + J.id;
-			a.href = "#" + a.id;
-			g_formatDate(a, Y, I);
-			$WH.ae(C, a);
-			$WH.ae(C, $WH.ct($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(I))));
-			if (G != null && G.avatar) {
-				var j = Icon.createUser(G.avatar, G.avatarmore, 0, null, ((G.roles & U_GROUP_PREMIUM) ? (G.border ? 2 : 1) : 0));
-				j.style.marginRight = "3px";
-				j.style.cssFloat = j.style.styleFloat = "left";
-				$WH.ae(N, j);
-				C.style.lineHeight = "26px"
-			}
-			$WH.ae(N, C);
-			z.className = "text comment-body" + Listview.funcBox.coGetColor(J);
-			if (J.indent) {
-				z.className += " comment-body-indent"
-			}
-			B = (this.id == "english-comments" ? "www": "");
-			z.innerHTML = Markup.toHtml(J.body, {
-				mode: Markup.MODE_COMMENT,
-				roles: J.roles,
-				locale: B
-			});
-			$WH.ae(ac, z);
-			var H = $WH.ce("div");
-			H.className = "text comment-body";
-			if (J.indent) {
-				H.className += " comment-body-indent"
-			}
-			if (J.response) {
-				H.innerHTML = Markup.toHtml("[div][/div][wowheadresponse=" + J.responseuser + " roles=" + J.responseroles + "]" + J.response + "[/wowheadresponse]", {
-					allow: Markup.CLASS_STAFF,
-					roles: J.responseroles,
-					uid: "resp-" + J.id
-				})
-			}
-			$WH.ae(ac, H);
-			J.divResponse = H;
-			if ((J.roles & U_GROUP_COMMENTS_MODERATOR) == 0 || g_user.roles & U_GROUP_COMMENTS_MODERATOR) {
-				var X = $WH.ce("div");
-				J.divLastEdit = X;
-				X.className = "comment-lastedit";
-				$WH.ae(X, $WH.ct(LANG.lvcomment_lastedit));
-				var w = $WH.ce("a");
-				$WH.ae(w, $WH.ct(" "));
-				$WH.ae(X, w);
-				$WH.ae(X, $WH.ct(" "));
-				var O = $WH.ce("span");
-				$WH.ae(X, O);
-				$WH.ae(X, $WH.ct(" "));
-				Listview.funcBox.coUpdateLastEdit(J);
-				if (ad) {
-					X.style.display = "none"
-				}
-				$WH.ae(ac, X)
-			}
-		},
+                    $WH.ae(t, e)
+                }
+                $WH.ae(l, o);
+                $WH.ae(t, l)
+                c = true;
+            }
+            if (ad) {
+                z.style.display = "none";
+                t.style.display = "none"
+            }
+            $WH.ae(N, t);
+            var C = $WH.ce("var");
+            $WH.ae(C, $WH.ct(LANG.lvcomment_by));
+            aUser = $WH.ce("a");
+            aUser.href = "?user=" + J.user;
+            $WH.ae(aUser, $WH.ct(J.user));
+            $WH.ae(C, aUser);
+            $WH.ae(C, $WH.ct(" "));
+            var a = $WH.ce("a");
+            a.className = "q0";
+            a.id = "comments:id=" + J.id;
+            a.href = "#" + a.id;
+            g_formatDate(a, Y, I);
+            $WH.ae(C, a);
+            $WH.ae(C, $WH.ct($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(I))));
+            if (G != null && G.avatar) {
+                var j = Icon.createUser(G.avatar, G.avatarmore, 0, null, ((G.roles & U_GROUP_PREMIUM) ? (G.border ? 2 : 1) : 0));
+                j.style.marginRight = "3px";
+                j.style.cssFloat = j.style.styleFloat = "left";
+                $WH.ae(N, j);
+                C.style.lineHeight = "26px"
+            }
+            $WH.ae(N, C);
+            z.className = "text comment-body" + Listview.funcBox.coGetColor(J);
+            if (J.indent) {
+                z.className += " comment-body-indent"
+            }
+            B = (this.id == "english-comments" ? "www": "");
+            z.innerHTML = Markup.toHtml(J.body, {
+                mode: Markup.MODE_COMMENT,
+                roles: J.roles,
+                locale: B
+            });
+            $WH.ae(ac, z);
+            var H = $WH.ce("div");
+            H.className = "text comment-body";
+            if (J.indent) {
+                H.className += " comment-body-indent"
+            }
+            if (J.response) {
+                H.innerHTML = Markup.toHtml("[div][/div][wowheadresponse=" + J.responseuser + " roles=" + J.responseroles + "]" + J.response + "[/wowheadresponse]", {
+                    allow: Markup.CLASS_STAFF,
+                    roles: J.responseroles,
+                    uid: "resp-" + J.id
+                })
+            }
+            $WH.ae(ac, H);
+            J.divResponse = H;
+            if ((J.roles & U_GROUP_COMMENTS_MODERATOR) == 0 || g_user.roles & U_GROUP_COMMENTS_MODERATOR) {
+                var X = $WH.ce("div");
+                J.divLastEdit = X;
+                X.className = "comment-lastedit";
+                $WH.ae(X, $WH.ct(LANG.lvcomment_lastedit));
+                var w = $WH.ce("a");
+                $WH.ae(w, $WH.ct(" "));
+                $WH.ae(X, w);
+                $WH.ae(X, $WH.ct(" "));
+                var O = $WH.ce("span");
+                $WH.ae(X, O);
+                $WH.ae(X, $WH.ct(" "));
+                Listview.funcBox.coUpdateLastEdit(J);
+                if (ad) {
+                    X.style.display = "none"
+                }
+                $WH.ae(ac, X)
+            }
+        },
 /* no idea what the new one does exactly.. so saved this old compute
-		compute: function(v, K) {
-			var O, u = new Date(v.date),
-			I = (g_serverTime - u) / 1000,
-			d = (g_user.roles & 26) != 0,
-			L = v.rating < 0 || v.purged || v.deleted || (v.__minPatch && g_getPatchVersion.T[v.__minPatch] > u),
-			F = d || v.user.toLowerCase() == g_user.name.toLowerCase(),
-			y = F && v.deleted == 0,
-			c = F && v.replyTo != v.id,
-			M = ((v.roles & 26) == 0),
-			G = v.purged == 0 && v.deleted == 0 && g_user.id && v.user.toLowerCase() != g_user.name.toLowerCase() && $WH.in_array(v.raters, g_user.id, function(P) {
-				return P[0]
-			}) == -1,
-			i = v.rating >= 0 && (g_user.id == 0 || G);
-			v.ratable = G;
-			K.className = "comment";
-			if (v.indent) {
-				K.className += " comment-indent"
-			}
-			var z = $WH.ce("div");
-			var m = $WH.ce("div");
-			var k = $WH.ce("div");
-			v.divHeader = z;
-			v.divBody = m;
-			v.divLinks = k;
-			z.className = (L ? "comment-header-bt": "comment-header");
-			var g = $WH.ce("div");
-			g.className = "comment-rating";
-			if (L) {
-				var q = $WH.ce("a");
-				q.href = "javascript:;";
-				q.onclick = Listview.funcBox.coToggleVis.bind(q, v);
-				$WH.ae(q, $WH.ct(LANG.lvcomment_show));
-				$WH.ae(g, q);
-				$WH.ae(g, $WH.ct(" " + String.fromCharCode(160) + " "))
-			}
-			var o = $WH.ce("b");
-			$WH.ae(o, $WH.ct(LANG.lvcomment_rating));
-			var r = $WH.ce("span");
-			$WH.ae(r, $WH.ct((v.rating > 0 ? "+": "") + v.rating));
-			$WH.ae(o, r);
-			$WH.ae(g, o);
-			$WH.ae(g, $WH.ct(" "));
-			var E = $WH.ce("span");
-			var j = $WH.ce("a"),
-			N = $WH.ce("a");
-			if (G) {
-				j.href = N.href = "javascript:;";
-				j.onclick = Listview.funcBox.coRate.bind(j, v, 1);
-				N.onclick = Listview.funcBox.coRate.bind(N, v, -1);
-				if (d) {
-					var D = $WH.ce("a");
-					D.href = "javascript:;";
-					D.onclick = Listview.funcBox.coRate.bind(D, v, 0);
-					D.onmouseover = Listview.funcBox.coCustomRatingOver;
-					D.onmousemove = Tooltip.cursorUpdate;
-					D.onmouseout = Tooltip.hide;
-					$WH.ae(D, $WH.ct("[~]"));
-					$WH.ae(E, D);
-					$WH.ae(E, $WH.ct(" "))
-				}
-			} else {
-				j.href = N.href = "?account=signin"
-			}
-			$WH.ae(j, $WH.ct("[+]"));
-			j.onmouseover = Listview.funcBox.coPlusRatingOver;
-			N.onmouseover = Listview.funcBox.coMinusRatingOver;
-			j.onmousemove = N.onmousemove = Tooltip.cursorUpdate;
-			j.onmouseout = N.onmouseout = Tooltip.hide;
-			$WH.ae(N, $WH.ct("[-]"));
-			$WH.ae(E, N);
-			$WH.ae(E, $WH.ct(" "));
-			$WH.ae(E, j);
-			$WH.ae(g, E);
-			if (!i) {
-				E.style.display = "none"
-			}
-			$WH.ae(z, g);
-			$WH.ae(z, $WH.ct(LANG.lvcomment_by));
-			var J = $WH.ce("a");
-			J.href = "?user=" + v.user;
-			$WH.ae(J, $WH.ct(v.user));
-			$WH.ae(z, J);
-			$WH.ae(z, $WH.ct(" "));
-			var a = $WH.ce("a");
-			a.className = "q0";
-			a.id = "comments:id=" + v.id;
-			a.href = "#" + a.id;
-			Listview.funcBox.coFormatDate(a, I, u);
-			a.style.cursor = "pointer";
-			$WH.ae(z, a);
-			$WH.ae(z, $WH.ct($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(u))));
-			$WH.ae(K, z);
-			m.className = "comment-body" + Listview.funcBox.coGetColor(v);
-			if (v.indent) {
-				m.className += " comment-body-indent"
-			}
-			m.innerHTML = Markup.toHtml(v.body, {
-				mode: Markup.MODE_COMMENT,
-				roles: v.roles
-			});
-			$WH.ae(K, m);
-			if ((v.roles & 26) == 0 || g_user.roles & 26) {
-				var H = $WH.ce("div");
-				v.divLastEdit = H;
-				H.className = "comment-lastedit";
-				$WH.ae(H, $WH.ct(LANG.lvcomment_lastedit));
-				var p = $WH.ce("a");
-				$WH.ae(p, $WH.ct(" "));
-				$WH.ae(H, p);
-				$WH.ae(H, $WH.ct(" "));
-				var C = $WH.ce("span");
-				$WH.ae(H, C);
-				$WH.ae(H, $WH.ct(" "));
-				Listview.funcBox.coUpdateLastEdit(v);
-				if (L) {
-					H.style.display = "none"
-				}
-				$WH.ae(K, H)
-			}
-			k.className = "comment-links";
-			if (F) {
-				var b = $WH.ce("span");
-				var B = $WH.ce("a");
-				$WH.ae(B, $WH.ct(LANG.lvcomment_edit));
-				B.onclick = Listview.funcBox.coEdit.bind(this, v, 0);
-				$WH.ns(B);
-				B.href = "javascript:;";
-				$WH.ae(b, B);
-				$WH.ae(b, $WH.ct("|"));
-				$WH.ae(k, b)
-			}
-			if (y) {
-				var l = $WH.ce("span");
-				var t = $WH.ce("a");
-				$WH.ae(t, $WH.ct(LANG.lvcomment_delete));
-				t.onclick = Listview.funcBox.coDelete.bind(this, v);
-				$WH.ns(t);
-				t.href = "javascript:;";
-				$WH.ae(l, t);
-				$WH.ae(l, $WH.ct("|"));
-				$WH.ae(k, l)
-			}
-			if (c) {
-				var A = $WH.ce("span");
-				var e = $WH.ce("a");
-				$WH.ae(e, $WH.ct(LANG.lvcomment_detach));
-				e.onclick = Listview.funcBox.coDetach.bind(this, v);
-				$WH.ns(e);
-				e.href = "javascript:;";
-				$WH.ae(A, e);
-				$WH.ae(A, $WH.ct("|"));
-				$WH.ae(k, A)
-			}
-			if (M) {
-				var w = $WH.ce("span");
-				var f = $WH.ce("a");
-				$WH.ae(f, $WH.ct(LANG.lvcomment_report));
-				if (g_user.id > 0) {
-					f.onclick = Listview.funcBox.coReportClick.bind(f, v, 0);
-					f.href = "javascript:;"
-				} else {
-					f.href = "?account=signin"
-				}
-				$WH.ae(w, f);
-				$WH.ae(w, $WH.ct("|"));
-				$WH.ae(k, w)
-			}
-			var h = $WH.ce("a");
-			$WH.ae(h, $WH.ct(LANG.lvcomment_reply));
-			if (g_user.id > 0) {
-				h.onclick = Listview.funcBox.coReply.bind(this, v);
-				h.href = "javascript:;"
-			} else {
-				h.href = "?account=signin"
-			}
-			$WH.ae(k, h);
-			if (L) {
-				m.style.display = "none";
-				k.style.display = "none"
-			}
-			$WH.ae(K, k)
-		}, */
-		createNote: function(b) {
-			var g = $WH.ce("small");
-			if (!g_user.commentban) {
-				var l = $WH.ce("a");
-				if (g_user.id > 0) {
-					l.href = "javascript:;";
-					l.onclick = co_addYourComment
-				} else {
-					l.href = "?account=signin"
-				}
-				$WH.ae(l, $WH.ct(LANG.lvcomment_add));
-				$WH.ae(g, l);
-				var e = $WH.ce("span");
-				e.style.padding = "0 5px";
-				e.style.color = "white";
-				$WH.ae(e, $WH.ct("|"));
-				$WH.ae(g, e);
-			}
-			$WH.ae(g, $WH.ct(LANG.lvcomment_sort));
-			var m = $WH.ce("a");
-			m.href = "javascript:;";
-			$WH.ae(m, $WH.ct(LANG.lvcomment_sortdate));
-			m.onclick = Listview.funcBox.coSortDate.bind(this, m);
-			$WH.ae(g, m);
-			$WH.ae(g, $WH.ct(LANG.comma));
-			var o = $WH.ce("a");
-			o.href = "javascript:;";
-			$WH.ae(o, $WH.ct(LANG.lvcomment_sortrating));
-			o.onclick = Listview.funcBox.coSortHighestRatedFirst.bind(this, o);
-			$WH.ae(g, o);
-			var h = $WH.gc("temp_comment_sort") || 1;
-			if (h == "2") {
-				o.onclick()
-			} else {
-				m.onclick()
-			}
-			var e = $WH.ce("span");
-			e.style.padding = "0 5px";
-			e.style.color = "white";
-			$WH.ae(e, $WH.ct("|"));
-			$WH.ae(g, e);
-			var q = $WH.ce("select");
-			var f = $WH.ce("option");
-			f.value = 0;
-			f.selected = "selected";
-			$WH.ae(q, f);
-			var k = {};
-			for (var i = 0; i < this.data.length; ++i) {
-				var h = new Date(this.data[i].date).getTime();
-				k[g_getPatchVersionIndex(h)] = true
-			}
-			var j = [];
-			for (var c in k) {
-				j.push(c)
-			}
-			j.sort(function(p, d) {
-				return d - p
-			});
-			for (var c = 0; c < j.length; ++c) {
-				var f = $WH.ce("option");
-				f.value = j[c];
-				$WH.ae(f, $WH.ct(g_getPatchVersion.V[j[c]]));
-				$WH.ae(q, f)
-			}
-			q.onchange = Listview.funcBox.coFilterByPatchVersion.bind(this, q);
-			$WH.ae(g, $WH.ct(LANG.lvcomment_patchfilter));
-			$WH.ae(g, q);
-			$WH.ae(b, g);
-		},
-		onNoData: function(c) {
-			var a = "<b>" + LANG.lvnodata_co1 + '</b><div class="pad2"></div>';
-			if (g_user.id > 0) {
-				var b = LANG.lvnodata_co2;
-				b = b.replace("<a>", '<a href="javascript:;" onclick="co_addYourComment()" onmousedown="return false">');
-				a += b
-			} else {
-				var b = LANG.lvnodata_co3;
+        compute: function(v, K) {
+            var O, u = new Date(v.date),
+            I = (g_serverTime - u) / 1000,
+            d = (g_user.roles & 26) != 0,
+            L = v.rating < 0 || v.purged || v.deleted || (v.__minPatch && g_getPatchVersion.T[v.__minPatch] > u),
+            F = d || v.user.toLowerCase() == g_user.name.toLowerCase(),
+            y = F && v.deleted == 0,
+            c = F && v.replyTo != v.id,
+            M = ((v.roles & 26) == 0),
+            G = v.purged == 0 && v.deleted == 0 && g_user.id && v.user.toLowerCase() != g_user.name.toLowerCase() && $WH.in_array(v.raters, g_user.id, function(P) {
+                return P[0]
+            }) == -1,
+            i = v.rating >= 0 && (g_user.id == 0 || G);
+            v.ratable = G;
+            K.className = "comment";
+            if (v.indent) {
+                K.className += " comment-indent"
+            }
+            var z = $WH.ce("div");
+            var m = $WH.ce("div");
+            var k = $WH.ce("div");
+            v.divHeader = z;
+            v.divBody = m;
+            v.divLinks = k;
+            z.className = (L ? "comment-header-bt": "comment-header");
+            var g = $WH.ce("div");
+            g.className = "comment-rating";
+            if (L) {
+                var q = $WH.ce("a");
+                q.href = "javascript:;";
+                q.onclick = Listview.funcBox.coToggleVis.bind(q, v);
+                $WH.ae(q, $WH.ct(LANG.lvcomment_show));
+                $WH.ae(g, q);
+                $WH.ae(g, $WH.ct(" " + String.fromCharCode(160) + " "))
+            }
+            var o = $WH.ce("b");
+            $WH.ae(o, $WH.ct(LANG.lvcomment_rating));
+            var r = $WH.ce("span");
+            $WH.ae(r, $WH.ct((v.rating > 0 ? "+": "") + v.rating));
+            $WH.ae(o, r);
+            $WH.ae(g, o);
+            $WH.ae(g, $WH.ct(" "));
+            var E = $WH.ce("span");
+            var j = $WH.ce("a"),
+            N = $WH.ce("a");
+            if (G) {
+                j.href = N.href = "javascript:;";
+                j.onclick = Listview.funcBox.coRate.bind(j, v, 1);
+                N.onclick = Listview.funcBox.coRate.bind(N, v, -1);
+                if (d) {
+                    var D = $WH.ce("a");
+                    D.href = "javascript:;";
+                    D.onclick = Listview.funcBox.coRate.bind(D, v, 0);
+                    D.onmouseover = Listview.funcBox.coCustomRatingOver;
+                    D.onmousemove = $WH.Tooltip.cursorUpdate;
+                    D.onmouseout = $WH.Tooltip.hide;
+                    $WH.ae(D, $WH.ct("[~]"));
+                    $WH.ae(E, D);
+                    $WH.ae(E, $WH.ct(" "))
+                }
+            } else {
+                j.href = N.href = "?account=signin"
+            }
+            $WH.ae(j, $WH.ct("[+]"));
+            j.onmouseover = Listview.funcBox.coPlusRatingOver;
+            N.onmouseover = Listview.funcBox.coMinusRatingOver;
+            j.onmousemove = N.onmousemove = $WH.Tooltip.cursorUpdate;
+            j.onmouseout = N.onmouseout = $WH.Tooltip.hide;
+            $WH.ae(N, $WH.ct("[-]"));
+            $WH.ae(E, N);
+            $WH.ae(E, $WH.ct(" "));
+            $WH.ae(E, j);
+            $WH.ae(g, E);
+            if (!i) {
+                E.style.display = "none"
+            }
+            $WH.ae(z, g);
+            $WH.ae(z, $WH.ct(LANG.lvcomment_by));
+            var J = $WH.ce("a");
+            J.href = "?user=" + v.user;
+            $WH.ae(J, $WH.ct(v.user));
+            $WH.ae(z, J);
+            $WH.ae(z, $WH.ct(" "));
+            var a = $WH.ce("a");
+            a.className = "q0";
+            a.id = "comments:id=" + v.id;
+            a.href = "#" + a.id;
+            Listview.funcBox.coFormatDate(a, I, u);
+            a.style.cursor = "pointer";
+            $WH.ae(z, a);
+            $WH.ae(z, $WH.ct($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(u))));
+            $WH.ae(K, z);
+            m.className = "comment-body" + Listview.funcBox.coGetColor(v);
+            if (v.indent) {
+                m.className += " comment-body-indent"
+            }
+            m.innerHTML = Markup.toHtml(v.body, {
+                mode: Markup.MODE_COMMENT,
+                roles: v.roles
+            });
+            $WH.ae(K, m);
+            if ((v.roles & 26) == 0 || g_user.roles & 26) {
+                var H = $WH.ce("div");
+                v.divLastEdit = H;
+                H.className = "comment-lastedit";
+                $WH.ae(H, $WH.ct(LANG.lvcomment_lastedit));
+                var p = $WH.ce("a");
+                $WH.ae(p, $WH.ct(" "));
+                $WH.ae(H, p);
+                $WH.ae(H, $WH.ct(" "));
+                var C = $WH.ce("span");
+                $WH.ae(H, C);
+                $WH.ae(H, $WH.ct(" "));
+                Listview.funcBox.coUpdateLastEdit(v);
+                if (L) {
+                    H.style.display = "none"
+                }
+                $WH.ae(K, H)
+            }
+            k.className = "comment-links";
+            if (F) {
+                var b = $WH.ce("span");
+                var B = $WH.ce("a");
+                $WH.ae(B, $WH.ct(LANG.lvcomment_edit));
+                B.onclick = Listview.funcBox.coEdit.bind(this, v, 0);
+                $WH.ns(B);
+                B.href = "javascript:;";
+                $WH.ae(b, B);
+                $WH.ae(b, $WH.ct("|"));
+                $WH.ae(k, b)
+            }
+            if (y) {
+                var l = $WH.ce("span");
+                var t = $WH.ce("a");
+                $WH.ae(t, $WH.ct(LANG.lvcomment_delete));
+                t.onclick = Listview.funcBox.coDelete.bind(this, v);
+                $WH.ns(t);
+                t.href = "javascript:;";
+                $WH.ae(l, t);
+                $WH.ae(l, $WH.ct("|"));
+                $WH.ae(k, l)
+            }
+            if (c) {
+                var A = $WH.ce("span");
+                var e = $WH.ce("a");
+                $WH.ae(e, $WH.ct(LANG.lvcomment_detach));
+                e.onclick = Listview.funcBox.coDetach.bind(this, v);
+                $WH.ns(e);
+                e.href = "javascript:;";
+                $WH.ae(A, e);
+                $WH.ae(A, $WH.ct("|"));
+                $WH.ae(k, A)
+            }
+            if (M) {
+                var w = $WH.ce("span");
+                var f = $WH.ce("a");
+                $WH.ae(f, $WH.ct(LANG.lvcomment_report));
+                if (g_user.id > 0) {
+                    f.onclick = Listview.funcBox.coReportClick.bind(f, v, 0);
+                    f.href = "javascript:;"
+                } else {
+                    f.href = "?account=signin"
+                }
+                $WH.ae(w, f);
+                $WH.ae(w, $WH.ct("|"));
+                $WH.ae(k, w)
+            }
+            var h = $WH.ce("a");
+            $WH.ae(h, $WH.ct(LANG.lvcomment_reply));
+            if (g_user.id > 0) {
+                h.onclick = Listview.funcBox.coReply.bind(this, v);
+                h.href = "javascript:;"
+            } else {
+                h.href = "?account=signin"
+            }
+            $WH.ae(k, h);
+            if (L) {
+                m.style.display = "none";
+                k.style.display = "none"
+            }
+            $WH.ae(K, k)
+        }, */
+        createNote: function(b) {
+            var g = $WH.ce("small");
+            if (!g_user.commentban) {
+                var l = $WH.ce("a");
+                if (g_user.id > 0) {
+                    l.href = "javascript:;";
+                    l.onclick = co_addYourComment
+                } else {
+                    l.href = "?account=signin"
+                }
+                $WH.ae(l, $WH.ct(LANG.lvcomment_add));
+                $WH.ae(g, l);
+                var e = $WH.ce("span");
+                e.style.padding = "0 5px";
+                e.style.color = "white";
+                $WH.ae(e, $WH.ct("|"));
+                $WH.ae(g, e);
+            }
+            $WH.ae(g, $WH.ct(LANG.lvcomment_sort));
+            var m = $WH.ce("a");
+            m.href = "javascript:;";
+            $WH.ae(m, $WH.ct(LANG.lvcomment_sortdate));
+            m.onclick = Listview.funcBox.coSortDate.bind(this, m);
+            $WH.ae(g, m);
+            $WH.ae(g, $WH.ct(LANG.comma));
+            var o = $WH.ce("a");
+            o.href = "javascript:;";
+            $WH.ae(o, $WH.ct(LANG.lvcomment_sortrating));
+            o.onclick = Listview.funcBox.coSortHighestRatedFirst.bind(this, o);
+            $WH.ae(g, o);
+            var h = $WH.gc("temp_comment_sort") || 1;
+            if (h == "2") {
+                o.onclick()
+            } else {
+                m.onclick()
+            }
+            var e = $WH.ce("span");
+            e.style.padding = "0 5px";
+            e.style.color = "white";
+            $WH.ae(e, $WH.ct("|"));
+            $WH.ae(g, e);
+            var q = $WH.ce("select");
+            var f = $WH.ce("option");
+            f.value = 0;
+            f.selected = "selected";
+            $WH.ae(q, f);
+            var k = {};
+            for (var i = 0; i < this.data.length; ++i) {
+                var h = new Date(this.data[i].date).getTime();
+                k[g_getPatchVersionIndex(h)] = true
+            }
+            var j = [];
+            for (var c in k) {
+                j.push(c)
+            }
+            j.sort(function(p, d) {
+                return d - p
+            });
+            for (var c = 0; c < j.length; ++c) {
+                var f = $WH.ce("option");
+                f.value = j[c];
+                $WH.ae(f, $WH.ct(g_getPatchVersion.V[j[c]]));
+                $WH.ae(q, f)
+            }
+            q.onchange = Listview.funcBox.coFilterByPatchVersion.bind(this, q);
+            $WH.ae(g, $WH.ct(LANG.lvcomment_patchfilter));
+            $WH.ae(g, q);
+            $WH.ae(b, g);
+        },
+        onNoData: function(c) {
+            var a = "<b>" + LANG.lvnodata_co1 + '</b><div class="pad2"></div>';
+            if (g_user.id > 0) {
+                var b = LANG.lvnodata_co2;
+                b = b.replace("<a>", '<a href="javascript:;" onclick="co_addYourComment()" onmousedown="return false">');
+                a += b
+            } else {
+                var b = LANG.lvnodata_co3;
                 b = b.replace("<a>", '<a href="?account=signin">');
                 b = b.replace("<a>", '<a href="?account=signup">');
-				a += b
-			}
-			c.style.padding = "1.5em 0";
-			c.innerHTML = a
-		},
-		onBeforeCreate: function() {
-			if (location.hash && location.hash.match(/:id=([0-9]+)/) != null) {
-				var a = $WH.in_array(this.data, parseInt(RegExp.$1), function(b) {
-					return b.id
-				});
-				this.rowOffset = this.getRowOffset(a);
-				return this.data[a]
-			}
-		},
-		onAfterCreate: function(a) {
-			if (a != null) {
-				var b = a.__div;
-				this.tabs.__st = b;
-                b.firstChild.style.border = "1px solid #505050"
-			}
-		}
-	},
-	commentpreview: {
-		sort: [4],
-		nItemsPerPage: 75,
-		columns: [{
-			id: "subject",
-			name: LANG.subject,
-			align: "left",
-			value: "subject",
-			compute: function(f, e) {
-				var b = $WH.ce("a");
-				b.style.fontFamily = "Verdana, sans-serif";
-				b.href = this.template.getItemLink(f);
-				$WH.ae(b, $WH.ct(f.subject));
-				$WH.ae(e, b);
-				if (LANG.types[f.type]) {
-                    var c = $WH.ce("div");
-                    c.className = "small";
-                    $WH.ae(c, $WH.ct(LANG.types[f.type][0]));
-                    $WH.ae(e, c)
-                }
-			}
-		},
-		{
-			id: "preview",
-			name: LANG.preview,
-			align: "left",
-			width: "50%",
-			value: "preview",
-			compute: function(j, i, k) {
-				var g = $WH.ce("div");
-				g.className = "crop";
-				if (j.rating >= 10) {
-					g.className += " comment-green"
-				}
-				$WH.ae(g, $WH.ct(Markup.removeTags(j.preview, {
-					mode: Markup.MODE_ARTICLE
-				})));
-				$WH.ae(i, g);
-				var e = j.rating != null;
-				var f = j.user != null;
-				if (e || f ||j.purged) {
-					g = $WH.ce("div");
-					g.className = "small3";
-					if (f) {
-						$WH.ae(g, $WH.ct(LANG.lvcomment_by));
-						var b = $WH.ce("a");
-						b.href = "?user=" + j.user;
-						$WH.ae(b, $WH.ct(j.user));
-						$WH.ae(g, b);
-						if (e) {
-							$WH.ae(g, $WH.ct(LANG.hyphen))
-						}
-					}
-					if (e) {
-						$WH.ae(g, $WH.ct(LANG.lvcomment_rating + (j.rating > 0 ? "+": "") + j.rating));
-						var c = $WH.ce("span"),
-						h = "";
-						c.className = "q10";
-						if (j.deleted) {
-							h = LANG.lvcomment_deleted
-						} else {
-							if (j.purged) {
-								h = LANG.lvcomment_purged
-							}
-						}
-						$WH.ae(c, $WH.ct(h));
-						$WH.ae(g, c)
-                        k.__status = c;
-					}
-					$WH.ae(i, g)
-				}
+                a += b
             }
-		},
-		{
-			id: "author",
-			name: LANG.author,
-			value: "user",
-			compute: function(d, c) {
-				c.className = "q1";
-				var b = $WH.ce("a");
-				b.href = "?user=" + d.user;
-				$WH.ae(b, $WH.ct(d.user));
-				$WH.ae(c, b)
-			}
-		},
-		{
-			id: "posted",
-			name: LANG.posted,
-			width: "16%",
-			value: "elapsed",
-			compute: function(e, d) {
-				var a = new Date(e.date),
-				c = (g_serverTime - a) / 1000;
-				var b = $WH.ce("span");
-				Listview.funcBox.coFormatDate(b, c, a, 0, 1);
-				$WH.ae(d, b)
-			}
-		}],
-		getItemLink: function(a) {
-			return "?" + g_types[a.type] + "=" + a.typeId + (a.id != null ? "#comments:id=" + a.id: "")
-		}
-	},
-	screenshot: {
-		sort: [],
-		mode: 3,
-		nItemsPerPage: 40,
-		nItemsPerRow: 4,
-		poundable: 2,
-		columns: [],
-		compute: function(k, e, l) {
-			var v, p = new Date(k.date),
-			f = (g_serverTime - p) / 1000;
-			e.className = "screenshot-cell";
-			e.vAlign = "bottom";
-			var r = $WH.ce("a");
-			r.href = "#screenshots:id=" + k.id;
-			r.onclick = $WH.rf2;
-			var w = $WH.ce("img"),
-			u = Math.min(150 / k.width, 150 / k.height);
-			// w.src = "http://static.wowhead.com/uploads/screenshots/thumb/" + k.id + ".jpg";
-			w.src = g_staticUrl + "/uploads/screenshots/thumb/" + k.id + ".jpg";
-			$WH.ae(r, w);
-			$WH.ae(e, r);
-			var q = $WH.ce("div");
-			q.className = "screenshot-cell-user";
-			var m = (k.user != null && k.user.length);
-			if (m) {
-				r = $WH.ce("a");
-				r.href = "?user=" + k.user;
-				$WH.ae(r, $WH.ct(k.user));
-				$WH.ae(q, $WH.ct(LANG.lvscreenshot_from));
-				$WH.ae(q, r);
-				$WH.ae(q, $WH.ct(" "))
-			}
-			var j = $WH.ce("span");
-			if (m) {
-				Listview.funcBox.coFormatDate(j, f, p)
-			} else {
-				Listview.funcBox.coFormatDate(j, f, p, 0, 1)
-			}
-			$WH.ae(q, j);
+            c.style.padding = "1.5em 0";
+            c.innerHTML = a
+        },
+        onBeforeCreate: function() {
+            if (location.hash && location.hash.match(/:id=([0-9]+)/) != null) {
+                var a = $WH.in_array(this.data, parseInt(RegExp.$1), function(b) {
+                    return b.id
+                });
+                this.rowOffset = this.getRowOffset(a);
+                return this.data[a]
+            }
+        },
+        onAfterCreate: function(a) {
+            if (a != null) {
+                var b = a.__div;
+                this.tabs.__st = b;
+                b.firstChild.style.border = "1px solid #505050"
+            }
+        }
+    },
 
-			$WH.ae(q, $WH.ct(" " + LANG.dash + " "));
-			var w = $WH.ce("a");
-			w.href = "javascript:;";
-			w.onclick = ContactTool.show.bind(ContactTool, {
-				mode: 3,
-				screenshot: k
-			});
-            w.className = "report-icon"
-			g_addTooltip(w, LANG.report_tooltip, "q2");
-			$WH.ae(w, $WH.ct(LANG.report));
-			$WH.ae(q, w);
+    commentpreview: {
+        sort: [4],
+        nItemsPerPage: 75,
 
-			$WH.ae(e, q);
-			q = $WH.ce("div");
-			q.style.position = "relative";
-			q.style.height = "1em";
-			if (g_getLocale(true) != 0 && k.caption) {
-				k.caption = ""
-			}
-			var h = (k.caption != null && k.caption.length);
-			var g = (k.subject != null && k.subject.length);
-			if (h || g) {
-				var t = $WH.ce("div");
-				t.className = "screenshot-caption";
-				if (g) {
-					var c = $WH.ce("small");
-					$WH.ae(c, $WH.ct(LANG.types[k.type][0] + LANG.colon));
-					var b = $WH.ce("a");
-					$WH.ae(b, $WH.ct(k.subject));
-					b.href = "?" + g_types[k.type] + "=" + k.typeId;
-					$WH.ae(c, b);
-					$WH.ae(t, c);
-					if (h && k.caption.length) {
-						$WH.ae(c, $WH.ct(" (...)"))
-					}
-					$WH.ae(c, $WH.ce("br"))
-				}
-				if (h) {
-					$WH.aE(e, "mouseover", Listview.funcBox.ssCellOver.bind(t));
-					$WH.aE(e, "mouseout", Listview.funcBox.ssCellOut.bind(t));
-					var o = $WH.ce("span");
-					o.innerHTML = Markup.toHtml(k.caption, {
-						mode: Markup.MODE_SIGNATURE
-					});
-					$WH.ae(t, o)
-				}
-				$WH.ae(q, t)
-			}
-			$WH.aE(e, "click", Listview.funcBox.ssCellClick.bind(this, l));
-			$WH.ae(e, q)
-		},
-		createNote: function(d) {
-			if (typeof g_pageInfo == "object" && g_pageInfo.type > 0) {
-				var c = $WH.ce("small");
-				var b = $WH.ce("a");
-				if (g_user.id > 0) {
-					b.href = "javascript:;";
-					b.onclick = ss_submitAScreenshot
-				} else {
-					b.href = "?account=signin"
-				}
-				$WH.ae(b, $WH.ct(LANG.lvscreenshot_submit));
-				$WH.ae(c, b);
-				$WH.ae(d, c)
-			}
-		},
-		onNoData: function(c) {
-			if (typeof g_pageInfo == "object" && g_pageInfo.type > 0) {
-				var a = "<b>" + LANG.lvnodata_ss1 + '</b><div class="pad2"></div>';
-				if (g_user.id > 0) {
-					var b = LANG.lvnodata_ss2;
-					b = b.replace("<a>", '<a href="javascript:;" onclick="ss_submitAScreenshot()" onmousedown="return false">');
-					a += b
-				} else {
-					var b = LANG.lvnodata_ss3;
-					b = b.replace("<a>", '<a href="?account=signin">');
-					b = b.replace("<a>", '<a href="?account=signup">');
-					a += b
-				}
-				c.style.padding = "1.5em 0";
-				c.innerHTML = a
-			} else {
-				return -1
-			}
-		},
-		onBeforeCreate: function() {
-			if (location.hash && location.hash.match(/:id=([0-9]+)/) != null) {
-				var a = $WH.in_array(this.data, parseInt(RegExp.$1), function(b) {
-					return b.id
-				});
-				this.rowOffset = this.getRowOffset(a);
-				return a
-			}
-		},
-		onAfterCreate: function(a) {
-			if (a != null) {
-				setTimeout((function() {
-					ScreenshotViewer.show({
-						screenshots: this.data,
-						pos: a
-					})
-				}).bind(this), 1)
-			}
-		}
-	},
-	video: {
-		sort: [],
-		mode: 3,
-		nItemsPerPage: 40,
-		nItemsPerRow: 4,
-		poundable: 2,
-		columns: [],
-		compute: function(e, f, j) {
-			var q, k = new Date(e.date),
-			r = (g_serverTime - k) / 1000;
-			f.className = "screenshot-cell";
-			f.vAlign = "bottom";
-			var p = $WH.ce("a");
-			p.href = "#videos:id=" + e.id;
-			p.onclick = $WH.rf2;
-			var h = $WH.ce("img");
-			h.src = $WH.sprintf(vi_thumbnails[e.videoType], e.videoId);
-			$WH.ae(p, h);
-			$WH.ae(f, p);
-			var l = $WH.ce("div");
-			l.className = "screenshot-cell-user";
-			var t = (e.user != null && e.user.length);
-			if (t) {
-				p = $WH.ce("a");
-				p.href = "?user=" + e.user;
-				$WH.ae(p, $WH.ct(e.user));
-				$WH.ae(l, $WH.ct(LANG.lvvideo_from));
-				$WH.ae(l, p);
-				$WH.ae(l, $WH.ct(" "))
-			}
-			var u = $WH.ce("span");
-			if (t) {
-				Listview.funcBox.coFormatDate(u, r, k)
-			} else {
-				Listview.funcBox.coFormatDate(u, r, k, 0, 1)
-			}
-			$WH.ae(l, u);
-			$WH.ae(f, l);
-			l = $WH.ce("div");
-			l.style.position = "relative";
-			l.style.height = "1em";
-			if (g_locale.id != 0 && e.caption) {
-				e.caption = ""
-			}
-			var c = (e.caption != null && e.caption.length);
-			var g = (e.subject != null && e.subject.length);
-			if (c || g) {
-				var b = $WH.ce("div");
-				b.className = "screenshot-caption";
-				if (g) {
-					var o = $WH.ce("small");
-					$WH.ae(o, $WH.ct(LANG.types[e.type][0] + LANG.colon));
-					var n = $WH.ce("a");
-					$WH.ae(n, $WH.ct(e.subject));
-					n.href = g_getCommentDomain(e.domain) + "/" + g_types[e.type] + "=" + e.typeId;
-					$WH.ae(o, n);
-					$WH.ae(b, o);
-					if (c && e.caption.length) {
-						$WH.ae(o, $WH.ct(" (...)"))
-					}
-					$WH.ae(o, $WH.ce("br"))
-				}
-				if (c) {
-					$WH.aE(f, "mouseover", Listview.funcBox.ssCellOver.bind(b));
-					$WH.aE(f, "mouseout", Listview.funcBox.ssCellOut.bind(b));
-					var m = $WH.ce("span");
-					m.innerHTML = Markup.toHtml(e.caption, {
-						mode: Markup.MODE_SIGNATURE
-					});
-					$WH.ae(b, m)
-				}
-				$WH.ae(l, b)
-			}
-			$WH.aE(f, "click", Listview.funcBox.viCellClick.bind(this, j));
-			$WH.ae(f, l)
-		},
-		createNote: function(d) {
-			if (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)) {
-				if (typeof g_pageInfo == "object" && g_pageInfo.type > 0) {
-					var c = $WH.ce("small");
-					var b = $WH.ce("a");
-					if (g_user.id > 0) {
-						b.href = "javascript:;";
-						b.onclick = vi_submitAVideo
-					} else {
-						b.href = "?account=signin"
-					}
-					$WH.ae(b, $WH.ct(LANG.lvvideo_suggest));
-					$WH.ae(c, b);
-					$WH.ae(d, c)
-				}
-			}
-		},
-		onNoData: function(c) {
-			if (typeof g_pageInfo == "object" && g_pageInfo.type > 0) {
-				var a = "<b>" + LANG.lvnodata_vi1 + '</b><div class="pad2"></div>';
-				if (g_user.id > 0) {
-					var b = LANG.lvnodata_vi2;
-					b = b.replace("<a>", '<a href="javascript:;" onclick="vi_submitAVideo()" onmousedown="return false">');
-					a += b
-				} else {
-					var b = LANG.lvnodata_vi3;
-					b = b.replace("<a>", '<a href="?account=signin">');
-					b = b.replace("<a>", '<a href="?account=signup">');
-					a += b
-				}
-				c.style.padding = "1.5em 0";
-				c.innerHTML = a
-			} else {
-				return - 1
-			}
-		},
-		onBeforeCreate: function() {
-			if (location.hash && location.hash.match(/:id=([0-9]+)/) != null) {
-				var a = $WH.in_array(this.data, parseInt(RegExp.$1), function(b) {
-					return b.id
-				});
-				this.rowOffset = this.getRowOffset(a);
-				return a
-			}
-		},
-		onAfterCreate: function(a) {
-			if (a != null) {
-				setTimeout((function() {
-					VideoViewer.show({
-						videos: this.data,
-						pos: a,
-						displayAd: true
-					})
-				}).bind(this), 1)
-			}
-		}
-	},
+        columns: [
+            {
+                id: 'subject',
+                name: LANG.subject,
+                align: 'left',
+                value: 'subject',
+                compute: function(comment, td) {
+                    var a = $WH.ce('a');
+                    a.style.fontFamily = 'Verdana, sans-serif';
+                    a.href = this.getItemLink(comment);
+                    $WH.ae(a, $WH.ct(comment.subject));
+                    $WH.ae(td, a);
+
+                    if (LANG.types[comment.type]) {
+                        var d = $WH.ce('div');
+                        d.className = 'small';
+                        $WH.ae(d, $WH.ct(LANG.types[comment.type][0]));
+                        $WH.ae(td, d);
+                    }
+                }
+            },
+            {
+                id: 'preview',
+                name: LANG.preview,
+                align: 'left',
+                width: '50%',
+                value: 'preview',
+                compute: function(comment, td, tr) {
+                    var d = $WH.ce('div');
+                    d.className = 'crop';
+                    if (comment.rating >= 10) {
+                        d.className += ' comment-green';
+                    }
+
+                    $WH.ae(d, $WH.ct(
+                        Markup.removeTags(comment.preview, {mode: Markup.MODE_ARTICLE})
+                    ));
+                    $WH.ae(td, d);
+
+                    if (comment.rating || comment.deleted) {
+                        d = $WH.ce('div');
+                        d.className = 'small3';
+
+                        if (comment.rating) {
+                            $WH.ae(d, $WH.ct(LANG.lvcomment_rating + (comment.rating > 0 ? '+': '') + comment.rating));
+                        }
+
+                        var
+                            s = $WH.ce('span'),
+                            foo = '';
+
+                        s.className = 'q10';
+                        if (comment.deleted) {
+                            foo = LANG.lvcomment_deleted;
+                        }
+
+                        $WH.ae(s, $WH.ct(foo));
+                        $WH.ae(d, s);
+
+                        tr.__status = s;
+
+                        $WH.ae(td, d);
+                    }
+                }
+            },
+            {
+                id: 'author',
+                name: LANG.author,
+                value: 'user',
+                compute: function(comment, td) {
+                    td.className = 'q1';
+
+                    var a = $WH.ce('a');
+                    a.href = '?user=' + comment.user;
+                    $WH.ae(a, $WH.ct(comment.user));
+                    $WH.ae(td, a);
+                }
+            },
+            {
+                id: 'posted',
+                name: LANG.posted,
+                width: '16%',
+                value: 'elapsed',
+                compute: function(comment, td) {
+                    var
+                        postedOn = new Date(comment.date),
+                        elapsed  = (g_serverTime - postedOn) / 1000;
+
+                        var s = $WH.ce('span');
+                    g_formatDate(s, elapsed, postedOn, 0, 1);
+                    $WH.ae(td, s);
+                }
+            }
+        ],
+
+        getItemLink: function(comment) {
+            return '?' + g_types[comment.type] + '=' + comment.typeId + (comment.id != null ? '#comments:id=' + comment.id: '')
+        }
+    },
+
+    screenshot: {
+        sort: [],
+        mode: 3, // Grid mode
+        nItemsPerPage: 40,
+        nItemsPerRow: 4,
+        poundable: 2, // Yes but w/o sort
+
+        columns: [],
+
+        compute: function(screenshot, td, i) {
+            var
+                _,
+                postedOn = new Date(screenshot.date),
+                elapsed  = (g_serverTime - postedOn) / 1000;
+
+            td.className = 'screenshot-cell';
+            td.vAlign = 'bottom';
+
+            var a = $WH.ce('a');
+            a.href = '#screenshots:id=' + screenshot.id;
+            a.onclick = $WH.rf2;
+
+            var
+                img = $WH.ce('img'),
+                scale = Math.min(150 / screenshot.width, 150 / screenshot.height);
+
+            img.src = g_staticUrl + '/uploads/screenshots/thumb/' + screenshot.id + '.jpg';
+            //img.width  = Math.round(scale * screenshot.width);
+            //img.height = Math.round(scale * screenshot.height);
+            $WH.ae(a, img);
+
+            $WH.ae(td, a);
+
+            var d = $WH.ce('div');
+            d.className = 'screenshot-cell-user';
+
+            var hasUser = (screenshot.user != null && screenshot.user.length);
+
+            if (hasUser) {
+                a = $WH.ce('a');
+                a.href = '?user=' + screenshot.user;
+                $WH.ae(a, $WH.ct(screenshot.user));
+                $WH.ae(d, $WH.ct(LANG.lvscreenshot_from));
+                $WH.ae(d, a);
+                $WH.ae(d, $WH.ct(' '));
+            }
+
+            var s = $WH.ce('span');
+            if (hasUser) {
+                g_formatDate(s, elapsed, postedOn);
+            }
+            else {
+                g_formatDate(s, elapsed, postedOn, 0, 1);
+            }
+            $WH.ae(d, s);
+
+            $WH.ae(d, $WH.ct(' ' + LANG.dash + ' '));
+            var a = $WH.ce('a');
+            a.href = 'javascript:;';
+            a.onclick = ContactTool.show.bind(ContactTool, {
+                mode: 3,
+                screenshot: screenshot
+            });
+
+            a.className = 'report-icon';
+
+            g_addTooltip(a, LANG.report_tooltip, 'q2');
+            $WH.ae(a, $WH.ct(LANG.report));
+            $WH.ae(d, a);
+
+            $WH.ae(td, d);
+
+            d = $WH.ce('div');
+            d.style.position = 'relative';
+            d.style.height = '1em';
+
+            var hasCaption = (screenshot.caption != null && screenshot.caption.length);
+            var hasSubject = (screenshot.subject != null && screenshot.subject.length);
+
+            if (hasCaption || hasSubject) {
+                var d2 = $WH.ce('div');
+                d2.className = 'screenshot-caption';
+
+                if (hasSubject) {
+                    var foo1 = $WH.ce('small');
+                    $WH.ae(foo1, $WH.ct(LANG.types[screenshot.type][0] + LANG.colon));
+                    var foo2 = $WH.ce('a');
+                    $WH.ae(foo2, $WH.ct(screenshot.subject));
+                    foo2.href = '?' + g_types[screenshot.type] + '=' + screenshot.typeId;
+                    $WH.ae(foo1, foo2);
+                    $WH.ae(d2, foo1);
+
+                    if (hasCaption && screenshot.caption.length) {
+                        $WH.ae(foo1, $WH.ct(' (...)'));
+                    }
+                    $WH.ae(foo1, $WH.ce('br'));
+                }
+
+                if (hasCaption) {
+                    $WH.aE(td, 'mouseover', Listview.funcBox.ssCellOver.bind(d2));
+                    $WH.aE(td, 'mouseout', Listview.funcBox.ssCellOut.bind(d2));
+
+                    var foo = $WH.ce('span');
+                    foo.innerHTML = Markup.toHtml(screenshot.caption, {
+                        mode: Markup.MODE_SIGNATURE
+                    });
+                    $WH.ae(d2, foo);
+                }
+
+                $WH.ae(d, d2);
+            }
+
+            $WH.aE(td, 'click', Listview.funcBox.ssCellClick.bind(this, i));
+
+            $WH.ae(td, d);
+        },
+
+        createNote: function(div) {
+            if (typeof g_pageInfo == 'object' && g_pageInfo.type > 0) {
+                var sm = $WH.ce('small');
+
+                var a = $WH.ce('a');
+                if (g_user.id > 0) {
+                    a.href = 'javascript:;';
+                    a.onclick = ss_submitAScreenshot;
+                }
+                else {
+                    a.href = '?account=signin';
+                }
+                $WH.ae(a, $WH.ct(LANG.lvscreenshot_submit));
+                $WH.ae(sm, a);
+
+                $WH.ae(div, sm);
+            }
+        },
+
+        onNoData: function(div) {
+            if (typeof g_pageInfo == 'object' && g_pageInfo.type > 0) {
+                var s = '<b>' + LANG.lvnodata_ss1 + '</b><div class="pad2"></div>';
+
+                if (g_user.id > 0) {
+                    var foo = LANG.lvnodata_ss2;
+                    foo = foo.replace('<a>', '<a href="javascript:;" onclick="ss_submitAScreenshot()" onmousedown="return false">');
+                    s += foo;
+                }
+                else {
+                    var foo = LANG.lvnodata_ss3;
+                    foo = foo.replace('<a>', '<a href="?account=signin">');
+                    foo = foo.replace('<a>', '<a href="?account=signup">');
+                    s += foo;
+                }
+
+                div.style.padding = '1.5em 0';
+                div.innerHTML = s;
+            }
+            else {
+                return -1;
+            }
+        },
+
+        onBeforeCreate: function() {
+            if (location.hash && location.hash.match(/:id=([0-9]+)/) != null) {
+                var rowNo = $WH.in_array(this.data, parseInt(RegExp.$1), function(x) {
+                    return x.id;
+                });
+                this.rowOffset = this.getRowOffset(rowNo);
+                return rowNo;
+            }
+        },
+
+        onAfterCreate: function(rowNo) {
+            if (rowNo != null) {
+                setTimeout((function() {
+                    ScreenshotViewer.show({
+                        screenshots: this.data,
+                        pos: rowNo
+                    })
+                }).bind(this), 1);
+            }
+        }
+    },
+
+    video: {
+        sort: [],
+        mode: 3, // Grid mode
+        nItemsPerPage: 40,
+        nItemsPerRow: 4,
+        poundable: 2, // Yes but w/o sort
+
+        columns: [],
+
+        compute: function(video, td, i) {
+            var
+                _,
+                postedOn = new Date(video.date),
+                elapsed = (g_serverTime - postedOn) / 1000;
+
+                td.className = 'screenshot-cell';
+            td.vAlign = 'bottom';
+
+            var a = $WH.ce('a');
+            a.href = '#videos:id=' + video.id;
+            a.onclick = $WH.rf2;
+
+            var img = $WH.ce('img');
+            img.src = $WH.sprintf(vi_thumbnails[video.videoType], video.videoId);
+            $WH.ae(a, img);
+
+            $WH.ae(td, a);
+
+            var d = $WH.ce('div');
+            d.className = 'screenshot-cell-user';
+
+            var hasUser = (video.user != null && video.user.length);
+
+            if (hasUser) {
+                a = $WH.ce('a');
+                a.href = '?user=' + video.user;
+                $WH.ae(a, $WH.ct(video.user));
+                $WH.ae(d, $WH.ct(LANG.lvvideo_from));
+                $WH.ae(d, a);
+                $WH.ae(d, $WH.ct(' '));
+            }
+
+            var s = $WH.ce('span');
+            if (hasUser) {
+                g_formatDate(s, elapsed, postedOn);
+            }
+            else {
+                g_formatDate(s, elapsed, postedOn, 0, 1);
+            }
+            $WH.ae(d, s);
+
+            $WH.ae(d, $WH.ct(' ' + LANG.dash + ' '));
+            var a = $WH.ce('a');
+            a.href = 'javascript:;';
+            a.onclick = ContactTool.show.bind(ContactTool, {mode: 5, video: video});
+            a.className = 'icon-report';
+            g_addTooltip(a, LANG.report_tooltip, 'q2');
+            $WH.ae(a, $WH.ct(LANG.report));
+            $WH.ae(d, a);
+
+            $WH.ae(td, d);
+
+            d = $WH.ce('div');
+            d.style.position = 'relative';
+            d.style.height = '1em';
+            var hasCaption = (video.caption != null && video.caption.length);
+            var hasSubject = (video.subject != null && video.subject.length);
+
+            if (hasCaption || hasSubject) {
+                var d2 = $WH.ce('div');
+                d2.className = 'screenshot-caption';
+
+                if (hasSubject) {
+                    var foo1 = $WH.ce('small');
+                    $WH.ae(foo1, $WH.ct(LANG.types[video.type][0] + LANG.colon));
+                    var foo2 = $WH.ce('a');
+                    $WH.ae(foo2, $WH.ct(video.subject));
+                    foo2.href = '?' + g_types[video.type] + '=' + video.typeId;
+                    $WH.ae(foo1, foo2);
+                    $WH.ae(d2, foo1);
+
+                    if (hasCaption && video.caption.length) {
+                        $WH.ae(foo1, $WH.ct(' (...)'));
+                    }
+                    $WH.ae(foo1, $WH.ce('br'));
+                }
+
+                if (hasCaption) {
+                    $WH.aE(td, 'mouseover', Listview.funcBox.ssCellOver.bind(d2));
+                    $WH.aE(td, 'mouseout', Listview.funcBox.ssCellOut.bind(d2));
+
+                    var foo = $WH.ce('span');
+                    foo.innerHTML = Markup.toHtml(video.caption, {
+                        mode: Markup.MODE_SIGNATURE
+                    });
+                    $WH.ae(d2, foo);
+                }
+
+                $WH.ae(d, d2);
+            }
+
+            $WH.aE(td, 'click', Listview.funcBox.viCellClick.bind(this, i));
+
+            $WH.ae(td, d);
+        },
+
+        createNote: function(div) {
+            if (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)) {
+                if (typeof g_pageInfo == 'object' && g_pageInfo.type > 0) {
+                    var sm = $WH.ce('small');
+
+                    var a = $WH.ce('a');
+                    if (g_user.id > 0) {
+                        a.href = 'javascript:;';
+                        a.onclick = vi_submitAVideo;
+                    }
+                    else {
+                        a.href = '?account=signin';
+                    }
+
+                    $WH.ae(a, $WH.ct(LANG.lvvideo_suggest));
+                    $WH.ae(sm, a);
+
+                    $WH.ae(div, sm);
+                }
+            }
+        },
+
+        onNoData: function(div) {
+            if (typeof g_pageInfo == 'object' && g_pageInfo.type > 0) {
+                var s = '<b>' + LANG.lvnodata_vi1 + '</b><div class="pad2"></div>';
+
+                if (g_user.id > 0) {
+                    var foo = LANG.lvnodata_vi2;
+                    foo = foo.replace('<a>', '<a href="javascript:;" onclick="vi_submitAVideo()" onmousedown="return false">');
+                    s += foo;
+                }
+                else {
+                    var foo = LANG.lvnodata_vi3;
+                    foo = foo.replace('<a>', '<a href="?account=signin">');
+                    foo = foo.replace('<a>', '<a href="?account=signup">');
+                    s += foo;
+                }
+
+                div.style.padding = '1.5em 0';
+                div.innerHTML = s;
+            }
+            else {
+                return -1;
+            }
+        },
+
+        onBeforeCreate: function() {
+            if (location.hash && location.hash.match(/:id=([0-9]+)/) != null) {
+                var rowNo = $WH.in_array(this.data, parseInt(RegExp.$1), function(x) {
+                    return x.id;
+                });
+                this.rowOffset = this.getRowOffset(rowNo);
+                return rowNo;
+            }
+        },
+
+        onAfterCreate: function(rowNo) {
+            if (rowNo != null) {
+                setTimeout((function() {
+                    VideoViewer.show({
+                        videos: this.data,
+                        pos: rowNo
+                    })
+                }).bind(this), 1);
+            }
+        }
+    },
 
     pet: {
         sort: [1],
@@ -10415,7 +11107,7 @@ Listview.templates = {
 
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(pet);
+                    a.href = this.getItemLink(pet);
                     $WH.ae(a, $WH.ct(pet.name));
 
                     if (pet.expansion) {
@@ -10647,7 +11339,7 @@ Listview.templates = {
 
                     $WH.ae(i, g_achievements.createIcon(achievement.id, 1));
 
-                    Icon.getLink(i.firstChild).href = this.template.getItemLink(achievement);
+                    Icon.getLink(i.firstChild).href = this.getItemLink(achievement);
                     Icon.getLink(i.firstChild).rel = rel;
 
                     $WH.ae(tr, i);
@@ -10655,7 +11347,7 @@ Listview.templates = {
 
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(achievement);
+                    a.href = this.getItemLink(achievement);
                     a.rel = rel;
                     $WH.ae(a, $WH.ct(achievement.name));
                     $WH.ae(td, a);
@@ -10909,7 +11601,7 @@ Listview.templates = {
 
                     // $WH.nw(td)
 
-                    sp.href = this.template.getItemLink(title);
+                    sp.href = this.getItemLink(title);
 
                     if (title.who) {
                         $WH.ae(n, $WH.ct(title.who));
@@ -11124,7 +11816,7 @@ Listview.templates = {
                         i.style.padding = '0';
                         i.style.borderRight = 'none';
 
-                        $WH.ae(i, Icon.create($WH.g_getProfileIcon(profile.race, profile.classs, profile.gender, profile.level, profile.icon ? profile.icon : profile.id, 'medium'), 1, null, this.template.getItemLink(profile)));
+                        $WH.ae(i, Icon.create($WH.g_getProfileIcon(profile.race, profile.classs, profile.gender, profile.level, profile.icon ? profile.icon : profile.id, 'medium'), 1, null, this.getItemLink(profile)));
                         $WH.ae(tr, i);
 
                         td.style.borderLeft = 'none';
@@ -11138,7 +11830,7 @@ Listview.templates = {
 
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(profile);
+                    a.href = this.getItemLink(profile);
                     if (profile.pinned) {
                         a.className = 'star-icon-right';
                     }
@@ -11343,7 +12035,7 @@ Listview.templates = {
                     a.className = 'icontiny tinyspecial tip q1';
                     a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
                     a.rel = 'np';
-                    a.href = this.template.getItemLink(profile) + '#talents';
+                    a.href = this.getItemLink(profile) + '#talents';
                     g_addTooltip(a, specData.name);
 
                     $WH.ae(a, $WH.ct(profile.talenttree1 + ' / ' + profile.talenttree2 + ' / ' + profile.talenttree3));
@@ -11631,7 +12323,7 @@ Listview.templates = {
                     i.style.padding = '0';
                     i.style.borderRight = 'none';
 
-                    $WH.ae(i, Icon.create(currency.icon, 0, null, this.template.getItemLink(currency)));
+                    $WH.ae(i, Icon.create(currency.icon, 0, null, this.getItemLink(currency)));
                     $WH.ae(tr, i);
                     td.style.borderLeft = 'none';
 
@@ -11639,7 +12331,7 @@ Listview.templates = {
 
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(currency);
+                    a.href = this.getItemLink(currency);
                     $WH.ae(a, $WH.ct(currency.name));
 
                     $WH.ae(wrapper, a);
@@ -11693,7 +12385,7 @@ Listview.templates = {
                     i.style.padding = '0';
                     i.style.borderRight = 'none';
 
-                    $WH.ae(i, Icon.create('class_' + g_file_classes[classs.id], 0, null, this.template.getItemLink(classs)));
+                    $WH.ae(i, Icon.create('class_' + g_file_classes[classs.id], 0, null, this.getItemLink(classs)));
                     $WH.ae(tr, i);
                     td.style.borderLeft = 'none';
 
@@ -11705,7 +12397,7 @@ Listview.templates = {
                     var a = $WH.ce('a');
                     a.className = 'c' + classs.id;
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(classs);
+                    a.href = this.getItemLink(classs);
                     $WH.ae(a, $WH.ct(classs.name));
 
                     if (classs.expansion) {
@@ -11789,11 +12481,11 @@ Listview.templates = {
                     d.style.textAlign = 'left';
                     d.style.width = '52px';
 
-                    icon = Icon.create('race_' + g_file_races[race.id] + '_' + g_file_genders[0], 0, null, this.template.getItemLink(race));
+                    icon = Icon.create('race_' + g_file_races[race.id] + '_' + g_file_genders[0], 0, null, this.getItemLink(race));
                     icon.style.cssFloat = icon.style.styleFloat = 'left';
                     $WH.ae(d, icon);
 
-                    icon = Icon.create('race_' + g_file_races[race.id] + '_' + g_file_genders[1], 0, null, this.template.getItemLink(race));
+                    icon = Icon.create('race_' + g_file_races[race.id] + '_' + g_file_genders[1], 0, null, this.getItemLink(race));
                     icon.style.cssFloat = icon.style.styleFloat = 'left';
                     $WH.ae(d, icon);
 
@@ -11810,7 +12502,7 @@ Listview.templates = {
 
                     var a = $WH.ce('a');
                     a.style.fontFamily = 'Verdana, sans-serif';
-                    a.href = this.template.getItemLink(race);
+                    a.href = this.getItemLink(race);
                     $WH.ae(a, $WH.ct(race.name));
 
                     if (race.expansion) {
@@ -13299,400 +13991,6 @@ var RedButton = {
     }
 };
 
-var Tooltip = {
-    create: function(htmlTooltip, secondary) {
-        var
-            d   = $WH.ce('div'),
-            t   = $WH.ce('table'),
-            tb  = $WH.ce('tbody'),
-            tr1 = $WH.ce('tr'),
-            tr2 = $WH.ce('tr'),
-            td  = $WH.ce('td'),
-            th1 = $WH.ce('th'),
-            th2 = $WH.ce('th'),
-            th3 = $WH.ce('th');
-
-        d.className = 'tooltip';
-
-        th1.style.backgroundPosition = 'top right';
-        th2.style.backgroundPosition = 'bottom left';
-        th3.style.backgroundPosition = 'bottom right';
-
-        if (htmlTooltip) {
-            td.innerHTML = htmlTooltip;
-        }
-
-        $WH.ae(tr1, td);
-        $WH.ae(tr1, th1);
-        $WH.ae(tb, tr1);
-        $WH.ae(tr2, th2);
-        $WH.ae(tr2, th3);
-        $WH.ae(tb, tr2);
-        $WH.ae(t, tb);
-
-        if (!secondary) {
-            Tooltip.icon = $WH.ce('p');
-            Tooltip.icon.style.visibility = 'hidden';
-            $WH.ae(Tooltip.icon, $WH.ce('div'));
-            $WH.ae(d, Tooltip.icon);
-        }
-
-        $WH.ae(d, t);
-
-        if (!secondary) {
-            var img = $WH.ce('div');
-            img.className = 'tooltip-powered';
-            $WH.ae(d, img);
-            Tooltip.logo = img;
-        }
-
-        return d;
-    },
-
-    getMultiPartHtml: function(upper, lower) {
-        return '<table><tr><td>' + upper + '</td></tr></table><table><tr><td>' + lower + '</td></tr></table>';
-    },
-
-    fix: function(tooltip, noShrink, visible) {
-        var
-        table     = $WH.gE(tooltip, 'table')[0],
-        td        = $WH.gE(table, 'td')[0],
-        c         = td.childNodes;
-
-        if (c.length >= 2 && c[0].nodeName == 'TABLE' && c[1].nodeName == 'TABLE') {
-            c[0].style.whiteSpace = 'nowrap';
-
-            var m = parseInt(tooltip.style.width);
-            if (!m) {
-                if (c[1].offsetWidth > 300) {
-                    m = Math.max(300, c[0].offsetWidth) + 20;
-                }
-                else {
-                    m = Math.max(c[0].offsetWidth, c[1].offsetWidth) + 20;
-                }
-            }
-
-            m = Math.min(320, m);
-            if (m > 20) {
-                tooltip.style.width = m + 'px';
-                c[0].style.width = c[1].style.width = '100%';
-
-                if (!noShrink && tooltip.offsetHeight > document.body.clientHeight) {
-                    table.className = 'shrink';
-                }
-            }
-        }
-
-        if (visible) {
-            tooltip.style.visibility = 'visible';
-        }
-    },
-
-    fixSafe: function(p1, p2, p3) {
-        Tooltip.fix(p1, p2, p3);
-    },
-
-    append: function(el, htmlTooltip) {
-        var el = $(el);
-        var tooltip = Tooltip.create(htmlTooltip);
-        $WH.ae(el, tooltip);
-
-        Tooltip.fixSafe(tooltip, 1, 1);
-    },
-
-    prepare: function() {
-        if (Tooltip.tooltip) {
-            return;
-        }
-
-        var _ = Tooltip.create();
-        _.style.position = 'absolute';
-        _.style.left = _.style.top = '-2323px';
-
-        $WH.ae(document.body, _);
-
-        Tooltip.tooltip = _;
-        Tooltip.tooltipTable = $WH.gE(_, 'table')[0];
-        Tooltip.tooltipTd = $WH.gE(_, 'td')[0];
-
-        var _ = Tooltip.create(null, true);
-        _.style.position = 'absolute';
-        _.style.left = _.style.top = '-2323px';
-
-        $WH.ae(document.body, _);
-
-        Tooltip.tooltip2      = _;
-        Tooltip.tooltipTable2 = $WH.gE(_, 'table')[0];
-        Tooltip.tooltipTd2    = $WH.gE(_, 'td')[0];
-    },
-
-    set: function(text, text2) {
-        var _ = Tooltip.tooltip;
-
-        _.style.width = '550px';
-        _.style.left = '-2323px';
-        _.style.top = '-2323px';
-
-        if (text.nodeName) {
-            $WH.ee(Tooltip.tooltipTd);
-            $WH.ae(Tooltip.tooltipTd, text);
-        }
-        else {
-            Tooltip.tooltipTd.innerHTML = text;
-        }
-
-        _.style.display = '';
-
-        Tooltip.fix(_, 0, 0);
-
-        if (text2) {
-            Tooltip.showSecondary = true;
-            var _ = Tooltip.tooltip2;
-
-            _.style.width = '550px';
-            _.style.left  = '-2323px';
-            _.style.top   = '-2323px';
-
-            if (text2.nodeName) {
-                $WH.ee(Tooltip.tooltipTd2);
-                $WH.ae(Tooltip.tooltipTd2, text2);
-            }
-            else {
-                Tooltip.tooltipTd2.innerHTML = text2;
-            }
-
-            _.style.display = '';
-
-            Tooltip.fix(_, 0, 0);
-        }
-        else {
-            Tooltip.showSecondary = false;
-        }
-    },
-
-    moveTests: [
-        [null, null],  // Top right
-        [null, false], // Bottom right
-        [false, null],  // Top left
-        [false, false]  // Bottom left
-    ],
-
-    move: function(x, y, width, height, paddX, paddY) {
-        if (!Tooltip.tooltipTable) {
-            return;
-        }
-
-        var
-            tooltip = Tooltip.tooltip,
-            tow = Tooltip.tooltipTable.offsetWidth,
-            toh = Tooltip.tooltipTable.offsetHeight,
-            tt2     = Tooltip.tooltip2,
-            tt2w    = Tooltip.showSecondary ? Tooltip.tooltipTable2.offsetWidth : 0,
-            tt2h    = Tooltip.showSecondary ? Tooltip.tooltipTable2.offsetHeight : 0,
-            _;
-
-        tooltip.style.width = tow + 'px';
-        tt2.style.width     = tt2w + 'px';
-
-        var
-            rect,
-            safe;
-
-        for (var i = 0, len = Tooltip.moveTests.length; i < len; ++i) {
-            _ = Tooltip.moveTests[i];
-
-            rect = Tooltip.moveTest(x, y, width, height, paddX, paddY, _[0], _[1]);
-            break;
-        }
-
-        tooltip.style.left       = rect.l + 'px';
-        tooltip.style.top        = rect.t + 'px';
-        tooltip.style.visibility = 'visible';
-
-        if (Tooltip.showSecondary) {
-            tt2.style.left       = rect.l + tow + 'px';
-            tt2.style.top        = rect.t + 'px';
-            tt2.style.visibility = 'visible';
-        }
-    },
-
-    moveTest: function(left, top, width, height, paddX, paddY, rightAligned, topAligned) {
-        var
-            bakLeft = left,
-            bakTop  = top,
-            tooltip = Tooltip.tooltip,
-            tow     = Tooltip.tooltipTable.offsetWidth,
-            toh     = Tooltip.tooltipTable.offsetHeight,
-            tt2     = Tooltip.tooltip2,
-            tt2w    = Tooltip.showSecondary ? Tooltip.tooltipTable2.offsetWidth : 0,
-            tt2h    = Tooltip.showSecondary ? Tooltip.tooltipTable2.offsetHeight : 0,
-            winSize = $WH.g_getWindowSize(),
-            scroll  = $WH.g_getScroll(),
-            bcw     = winSize.w,
-            bch     = winSize.h,
-            bsl     = scroll.x,
-            bst     = scroll.y,
-            minX    = bsl,
-            minY    = bst,
-            maxX    = bsl + bcw,
-            maxY    = bst + bch;
-
-            if (rightAligned == null) {
-            rightAligned = (left + width + tow + tt2w <= maxX);
-        }
-
-        if (topAligned == null) {
-            topAligned = (top - Math.max(toh, tt2h) >= minY);
-        }
-
-        if (rightAligned) {
-            left += width + paddX;
-        }
-        else {
-            left = Math.max(left - (tow + tt2w), minX) - paddX;
-        }
-
-        if (topAligned) {
-            top -= Math.max(toh, tt2h) + paddY;
-        }
-        else {
-            top += height + paddY;
-        }
-
-        if (left < minX) {
-            left = minX;
-        }
-        else if (left + tow + tt2w > maxX) {
-            left = maxX - (tow + tt2w);
-        }
-
-        if (top < minY) {
-            top = minY;
-        }
-        else if (top + Math.max(toh, tt2h) > maxY) {
-            top = Math.max(bst, maxY - Math.max(toh, tt2h));
-        }
-
-        if (Tooltip.iconVisible) {
-            if (bakLeft >= left - 48 && bakLeft <= left && bakTop >= top - 4 && bakTop <= top + 48) {
-                top -= 48 - (bakTop - top);
-            }
-        }
-
-        return $WH.g_createRect(left, top, tow, toh);
-    },
-
-    show: function(_this, text, paddX, paddY, spanClass, text2) {
-        if (Tooltip.disabled) {
-            return;
-        }
-
-        if (!paddX || paddX < 1) {
-            paddX = 1;
-        }
-
-        if (!paddY || paddY < 1) {
-            paddY = 1;
-        }
-
-        if (spanClass) {
-            text = '<span class="' + spanClass + '">' + text + '</span>';
-        }
-
-        var coords = $WH.ac(_this);
-
-        Tooltip.prepare();
-        Tooltip.set(text, text2);
-        Tooltip.move(coords.x, coords.y, _this.offsetWidth, _this.offsetHeight, paddX, paddY);
-    },
-
-    showAtCursor: function(e, text, paddX, paddY, spanClass, text2) {
-        if (Tooltip.disabled) {
-            return;
-        }
-
-        if (!paddX || paddX < 10) {
-            paddX = 10;
-        }
-        if (!paddY || paddY < 10) {
-            paddY = 10;
-        }
-
-        if (spanClass) {
-            text = '<span class="' + spanClass + '">' + text + '</span>';
-            if (text2) {
-                text2 = '<span class="' + spanClass + '">' + text2 + '</span>';
-            }
-        }
-
-        e = $WH.$E(e);
-        var pos = $WH.g_getCursorPos(e);
-
-        Tooltip.prepare();
-        Tooltip.set(text, text2);
-        Tooltip.move(pos.x, pos.y, 0, 0, paddX, paddY);
-    },
-
-    showAtXY: function(text, x, y, paddX, paddY, text2) {
-        if (Tooltip.disabled) {
-            return;
-        }
-
-        Tooltip.prepare();
-        Tooltip.set(text, text2);
-        Tooltip.move(x, y, 0, 0, paddX, paddY);
-    },
-
-    cursorUpdate: function(e, x, y) { // Used along with showAtCursor
-        if (Tooltip.disabled || !Tooltip.tooltip) {
-            return;
-        }
-
-        e = $WH.$E(e);
-
-        if (!x || x < 10) {
-            x = 10;
-        }
-        if (!y || y < 10) {
-            y = 10;
-        }
-
-        var pos = $WH.g_getCursorPos(e);
-        Tooltip.move(pos.x, pos.y, 0, 0, x, y);
-    },
-
-    hide: function() {
-        if (Tooltip.tooltip) {
-            Tooltip.tooltip.style.display  = 'none';
-            Tooltip.tooltip.visibility     = 'hidden';
-            Tooltip.tooltipTable.className = '';
-
-            Tooltip.setIcon(null);
-        }
-
-        if (Tooltip.tooltip2) {
-            Tooltip.tooltip2.style.display  = 'none';
-            Tooltip.tooltip2.visibility     = 'hidden';
-            Tooltip.tooltipTable2.className = '';
-        }
-    },
-
-    setIcon: function(icon) {
-        Tooltip.prepare();
-
-        if (icon) {
-            Tooltip.icon.style.backgroundImage = 'url(images/icons/medium/' + icon.toLowerCase() + '.jpg)';
-            Tooltip.icon.style.visibility      = 'visible';
-        }
-        else {
-            Tooltip.icon.style.backgroundImage = 'none';
-            Tooltip.icon.style.visibility      = 'hidden';
-        }
-
-        Tooltip.iconVisible = icon ? 1 : 0;
-    }
-};
-
 var LiveSearch = new function() {
     var
         currentTextbox,
@@ -14947,10 +15245,6 @@ var ScreenshotViewer = new function() {
             }
 
             divFrom.style.display = (hasFrom1 || hasFrom2 ? '': 'none');
-
-            if (g_getLocale(true) != 0 && screenshot.caption) {
-                screenshot.caption = '';
-            }
 
             var hasCaption = (screenshot.caption != null && screenshot.caption.length);
             var hasSubject = (screenshot.subject != null && screenshot.subject.length && screenshot.type && screenshot.typeId);

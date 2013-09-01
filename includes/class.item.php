@@ -21,7 +21,7 @@ class ItemList extends BaseType
 
     protected     $setupQuery  = 'SELECT *, i.entry AS ARRAY_KEY FROM item_template i LEFT JOIN ?_item_template_addon iX ON i.entry = iX.id LEFT JOIN locales_item l ON i.entry = l.entry WHERE [filter] [cond] ORDER BY i.Quality DESC';
 
-    public function __construct($conditions, $miscData = null)
+    public function __construct($conditions = [], $miscData = null)
     {
         // search by statweight
         if ($miscData && isset($miscData['wt']) && isset($miscData['wtv']) && count($miscData['wt']) == count($miscData['wtv']))
@@ -281,7 +281,7 @@ class ItemList extends BaseType
 
         // conjured
         if ($this->curTpl['Flags'] & ITEM_FLAG_CONJURED)
-            $x .= '<br />'.Lang::$game['conjured'];
+            $x .= '<br />'.Lang::$item['conjured'];
 
         // bonding
         if (($this->curTpl['Flags'] & ITEM_FLAG_ACCOUNTBOUND) && $this->curTpl['Quality'] == ITEM_QUALITY_HEIRLOOM)

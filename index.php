@@ -98,13 +98,14 @@ switch ($pageCall)
     case '':                                                // no parameter given -> MainPage
         require 'pages/main.php';
         break;
+    case 'latest-additions':
+    case 'latest-articles':
     case 'latest-comments':
     case 'latest-screenshots':
     case 'latest-videos':
-    case 'missing-comments':
-    case 'missing-screenshots':
-    case 'missing-videos':
     case 'unrated-comments':
+    case 'missing-screenshots':
+    case 'most-comments':
     case 'random':
         require 'pages/miscTools.php';
         break;

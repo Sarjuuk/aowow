@@ -1152,17 +1152,17 @@ Summary.prototype = {
                         a.onclick = this.selectColumn.bind(this, col);
                         if (this.selected && this.__selected.id == col.id) {
                             a.onmouseover = function() {
-                                Tooltip.show(this, LANG.tooltip_removefocus, 0, 0, 'q');
+                                $WH.Tooltip.show(this, LANG.tooltip_removefocus, 0, 0, 'q');
                             };
                             s.className = 'selected';
                         }
                         else {
                             a.onmouseover = function() {
-                                Tooltip.show(this, LANG.tooltip_setfocus, 0, 0, 'q');
+                                $WH.Tooltip.show(this, LANG.tooltip_setfocus, 0, 0, 'q');
                             };
                         }
-                        a.onmousemove = Tooltip.cursorUpdate;
-                        a.onmouseout = Tooltip.hide;
+                        a.onmousemove = $WH.Tooltip.cursorUpdate;
+                        a.onmouseout = $WH.Tooltip.hide;
                         $WH.ae(a, s);
                         $WH.ae(div, a);
                     }
@@ -1797,8 +1797,8 @@ Summary.prototype = {
             else {
                 var sp = $WH.ce('span');
                 sp.onmouseover = Summary.groupOver.bind(a, col.group);
-                sp.onmousemove = Tooltip.cursorUpdate;
-                sp.onmouseout = Tooltip.hide;
+                sp.onmousemove = $WH.Tooltip.cursorUpdate;
+                sp.onmouseout = $WH.Tooltip.hide;
                 sp.className = 'tip';
                 $WH.ae(sp, $WH.ct('[' + col.group.length + ' ' + LANG.types[3][3] + ']'));
                 $WH.ae(div, sp);
@@ -2185,10 +2185,10 @@ Summary.prototype = {
                     a.className = (_.className ? _.className : 'q1');
                     a.style.borderBottom = '1px dotted #808080';
                     a.onmouseover = (function(rating, percent, level, text) {
-                        Tooltip.show(this, rating + ' ' + text + ' (' + $WH.sprintf(LANG.tooltip_combatrating, percent, level) + ')<br /><span class="q2">' + LANG.su_toggle + '</span>', 0, 0, 'q');
+                        $WH.Tooltip.show(this, rating + ' ' + text + ' (' + $WH.sprintf(LANG.tooltip_combatrating, percent, level) + ')<br /><span class="q2">' + LANG.su_toggle + '</span>', 0, 0, 'q');
                     }).bind(a, result, percent, this.level, LANG.traits[row.id][0]);
-                    a.onmousemove = Tooltip.cursorUpdate;
-                    a.onmouseout = Tooltip.hide;
+                    a.onmousemove = $WH.Tooltip.cursorUpdate;
+                    a.onmouseout = $WH.Tooltip.hide;
                     a.onclick = this.toggleRatings.bind(this);
 
                     $WH.ae(a, $WH.ct(sign + (this.ratingMode ? percent : result)));
@@ -2320,14 +2320,14 @@ Summary.prototype = {
     },
 
     selectColumn: function(col) {
-        Tooltip.hide();
+        $WH.Tooltip.hide();
 
         this.selected = (this.__selected.id == col.id ? null : this.clone.i + col.i);
         this.refreshAll();
     },
 
     deleteColumn: function(col, e) {
-        Tooltip.hide();
+        $WH.Tooltip.hide();
 
         e = $WH.$E(e);
 
@@ -2377,7 +2377,7 @@ Summary.prototype = {
     },
 
     deleteWeightScale: function(i) {
-        Tooltip.hide();
+        $WH.Tooltip.hide();
 
         this.weights.splice(i, 1);
 
@@ -3078,7 +3078,7 @@ Summary.prototype = {
             var pos = $WH.g_getCursorPos(event);
             setTimeout(Menu.showAtXY.bind(null, this.menu, pos.x, pos.y), 1); // Timeout needed for the context menu to be disabled
 
-            Tooltip.hide();
+            $WH.Tooltip.hide();
         }
 
         return false;
@@ -3616,7 +3616,7 @@ Summary.groupOver = function(group, e) {
     }
 
     if (buff) {
-        Tooltip.showAtCursor(e, '<table style="white-space: nowrap">' + buff + '</table>');
+        $WH.Tooltip.showAtCursor(e, '<table style="white-space: nowrap">' + buff + '</table>');
     }
 };
 
@@ -3677,7 +3677,7 @@ Summary.weightOver = function(weight, e) {
         buff += '<table style="white-space: nowrap"><tr><td style="text-align: right">' + leftTd + '</td><td><div class="indent">' + rightTd + '</td></tr></table><span class="q2">' + LANG.su_toggle + '</span>';
     }
 
-    Tooltip.showAtCursor(e, buff);
+    $WH.Tooltip.showAtCursor(e, buff);
 };
 
 Summary.socketOver = function(gems, e) {
@@ -3696,7 +3696,7 @@ Summary.socketOver = function(gems, e) {
     }
 
     if (buff) {
-        Tooltip.showAtCursor(e, '<table style="white-space: nowrap">' + buff + '</table>');
+        $WH.Tooltip.showAtCursor(e, '<table style="white-space: nowrap">' + buff + '</table>');
     }
 };
 
@@ -3807,8 +3807,8 @@ Summary.funcBox = {
                     }
 
                     a.onmouseover = Summary.socketOver.bind(a, gems[color]);
-                    a.onmousemove = Tooltip.cursorUpdate;
-                    a.onmouseout = Tooltip.hide;
+                    a.onmousemove = $WH.Tooltip.cursorUpdate;
+                    a.onmouseout = $WH.Tooltip.hide;
                 }
 
                 if (selected) {
@@ -3859,10 +3859,10 @@ Summary.templates = {
                         var sp = $WH.ce('span');
                         sp.className = 'tip';
                         sp.onmouseover = function() {
-                            Tooltip.show(this, LANG.tooltip_gains, 0, 0, 'q');
+                            $WH.Tooltip.show(this, LANG.tooltip_gains, 0, 0, 'q');
                         };
-                        sp.onmousemove = Tooltip.cursorUpdate;
-                        sp.onmouseout = Tooltip.hide;
+                        sp.onmousemove = $WH.Tooltip.cursorUpdate;
+                        sp.onmouseout = $WH.Tooltip.hide;
                         $WH.ae(sp, $WH.ct(res));
                         $WH.ae(td, sp);
                     }
@@ -3969,8 +3969,8 @@ Summary.templates = {
                             a.href = 'javascript:;';
                             a.onclick = this.toggleWeights.bind(this);
                             a.onmouseover = Summary.weightOver.bind(a, weight);
-                            a.onmousemove = Tooltip.cursorUpdate;
-                            a.onmouseout = Tooltip.hide;
+                            a.onmousemove = $WH.Tooltip.cursorUpdate;
+                            a.onmouseout = $WH.Tooltip.hide;
                             $WH.ae(a, $WH.ct(score));
                             $WH.ae(d, a);
                         }

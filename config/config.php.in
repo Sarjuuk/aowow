@@ -47,8 +47,10 @@ $AoWoWconf['characters'][0] = array(
 // $AoWoWconf['characters'][1] = array();
 
 // -- Site Configuration --
-$AoWoWconf['page']['name']       = 'Aowow Database Viewer (ADV)';   // Title of the website
 $AoWoWconf['page']['cacheTimer'] = 60*60*24*7;                      // Time to keep cache in seconds (Default: 1 week)
+$AoWoWconf['page']['name']       = 'Aowow Database Viewer (ADV)';   // Title of the website
+$AoWoWconf['page']['shortName']  = 'Aowow';                         // used in Feeds
+$AoWoWconf['ttl']                = 60;                              // time to live for RSS
 $AoWowConf['cookieTimeout']      = 5*60*1000;                       // cookie times out in time() + X
 $AoWoWconf['register']           = true;                            // Allow account creating
 // $AoWoWconf['loginFailCount']  = 5;                               // how often invalid passwords are tollerated

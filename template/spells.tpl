@@ -60,7 +60,7 @@
                                 <table><tr>
                                     <td>&nbsp;<input type="text" name="na" size="30" {if isset($filter.na)}value="{$filter.na|escape:'html'}"{/if}/></td>
                                     <td>&nbsp; <input type="checkbox" name="ex" value="on" id="spell-ex" {if isset($filter.ex)}checked="checked"{/if}/></td>
-                                    <td><label for="spell-ex"><span class="tip" onmouseover="Tooltip.showAtCursor(event, LANG.tooltip_extendedspellsearch, 0, 0, 'q')" onmousemove="Tooltip.cursorUpdate(event)" onmouseout="Tooltip.hide()">{$lang.extSearch}</span></label></td>
+                                    <td><label for="spell-ex"><span class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, LANG.tooltip_extendedspellsearch, 0, 0, 'q')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">{$lang.extSearch}</span></label></td>
                                 </tr></table>
                             </td>
                         </tr>
@@ -128,7 +128,7 @@
                 {if isset($filter.setCr)}{$filter.setCr}{/if}
             //]]></script>
 
-            <div id="listview-generic" class="listview"></div>
+            <div id="lv-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
                 {include file='bricks/listviews/spell.tpl' data=$lvData.data params=$lvData.params}
             //]]></script>

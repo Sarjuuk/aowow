@@ -11,9 +11,13 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $races = new CharRaceList(array(['side', 0, '!']));     // only playable
 
     $pageData = array(
-        'file'   => 'race',
-        'data'   => $races->getListviewData(),
-        'params' => []
+        'listviews' => array(
+            array(
+                'file'   => 'race',
+                'data'   => $races->getListviewData(),
+                'params' => []
+            )
+        )
     );
 
     $smarty->saveCache($cacheKey, $pageData);

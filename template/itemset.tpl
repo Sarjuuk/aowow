@@ -16,7 +16,7 @@
                 g_initPath({$page.path});
             //]]></script>
 
-{include file='bricks/infobox.tpl'}
+{include file='bricks/infobox.tpl' info=$lvData.infobox}
 
             <div class="text">
                 <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: 4, typeId: {$lvData.page.id} {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>

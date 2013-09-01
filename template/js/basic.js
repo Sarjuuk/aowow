@@ -1604,298 +1604,412 @@ $WH.g_staticTooltipLevelClick = function (div, level, noSlider, buff) {
 //****************************************************************************//
 
 $WH.Tooltip = {
-	create: function (i) {
-		var g = $WH.ce("div"),
-		l = $WH.ce("table"),
-		b = $WH.ce("tbody"),
-		f = $WH.ce("tr"),
-		c = $WH.ce("tr"),
-		a = $WH.ce("td"),
-		k = $WH.ce("th"),
-		j = $WH.ce("th"),
-		h = $WH.ce("th");
-		g.className = "wowhead-tooltip";
-		k.style.backgroundPosition = "top right";
-		j.style.backgroundPosition = "bottom left";
-		h.style.backgroundPosition = "bottom right";
-		if (i) {
-			a.innerHTML = i
-		}
-		$WH.ae(f, a);
-		$WH.ae(f, k);
-		$WH.ae(b, f);
-		$WH.ae(c, j);
-		$WH.ae(c, h);
-		$WH.ae(b, c);
-		$WH.ae(l, b);
-		$WH.Tooltip.icon = $WH.ce("p");
-		$WH.Tooltip.icon.style.visibility = "hidden";
-		$WH.ae($WH.Tooltip.icon, $WH.ce("div"));
-		$WH.ae(g, $WH.Tooltip.icon);
-		$WH.ae(g, l);
-		var e = $WH.ce("div");
-		e.className = "wowhead-tooltip-powered";
-		$WH.ae(g, e);
-		$WH.Tooltip.logo = e;
-		return g
-	},
-	fix: function (d, b, f) {
-		var e = $WH.gE(d, "table")[0],
-		h = $WH.gE(e, "td")[0],
-		g = h.childNodes;
-		if (g.length >= 2 && g[0].nodeName == "TABLE" && g[1].nodeName == "TABLE") {
-			g[0].style.whiteSpace = "nowrap";
-			var a;
-			if (g[1].offsetWidth > 300) {
-				a = Math.max(300, g[0].offsetWidth) + 20
-			} else {
-				a = Math.max(g[0].offsetWidth, g[1].offsetWidth) + 20
-			}
-			if (a > 20) {
-				d.style.width = a + "px";
-				g[0].style.width = g[1].style.width = "100%";
-				if (!b && d.offsetHeight > document.body.clientHeight) {
-					e.className = "shrink"
+    create: function(htmlTooltip, secondary) {
+        var
+            d   = $WH.ce('div'),
+            t   = $WH.ce('table'),
+            tb  = $WH.ce('tbody'),
+            tr1 = $WH.ce('tr'),
+            tr2 = $WH.ce('tr'),
+            td  = $WH.ce('td'),
+            th1 = $WH.ce('th'),
+            th2 = $WH.ce('th'),
+            th3 = $WH.ce('th');
+
+        d.className = 'tooltip';
+        // d.className = 'wowhead-tooltip';
+
+        th1.style.backgroundPosition = 'top right';
+        th2.style.backgroundPosition = 'bottom left';
+        th3.style.backgroundPosition = 'bottom right';
+
+        if (htmlTooltip) {
+            td.innerHTML = htmlTooltip;
+        }
+
+        $WH.ae(tr1, td);
+        $WH.ae(tr1, th1);
+        $WH.ae(tb, tr1);
+        $WH.ae(tr2, th2);
+        $WH.ae(tr2, th3);
+        $WH.ae(tb, tr2);
+        $WH.ae(t, tb);
+
+        if (!secondary) {
+            $WH.Tooltip.icon = $WH.ce('p');
+            $WH.Tooltip.icon.style.visibility = 'hidden';
+            $WH.ae($WH.Tooltip.icon, $WH.ce('div'));
+            $WH.ae(d, $WH.Tooltip.icon);
+        }
+
+        $WH.ae(d, t);
+
+        if (!secondary) {
+            var img = $WH.ce('div');
+            img.className = 'tooltip-powered';
+            // img.className = 'wowheadtooltip-powered';
+            $WH.ae(d, img);
+            $WH.Tooltip.logo = img;
+        }
+
+        return d;
+    },
+
+    getMultiPartHtml: function(upper, lower) {
+        return '<table><tr><td>' + upper + '</td></tr></table><table><tr><td>' + lower + '</td></tr></table>';
+    },
+
+    fix: function(tooltip, noShrink, visible) {
+        var
+            table = $WH.gE(tooltip, 'table')[0],
+            td    = $WH.gE(table, 'td')[0],
+            c     = td.childNodes;
+
+		tooltip.className = $WH.trim(tooltip.className.replace('tooltip-slider', ''));
+
+        if (c.length >= 2 && c[0].nodeName == 'TABLE' && c[1].nodeName == 'TABLE') {
+            c[0].style.whiteSpace = 'nowrap';
+
+            var m = parseInt(tooltip.style.width);
+			if(!tooltip.slider || !m) {
+                if (c[1].offsetWidth > 300) {
+                    m = Math.max(300, c[0].offsetWidth) + 20;
+                }
+                else {
+                    m = Math.max(c[0].offsetWidth, c[1].offsetWidth) + 20;
+                }
+            }
+
+            m = Math.min(320, m);
+
+            if (m > 20) {
+                tooltip.style.width = m + 'px';
+                c[0].style.width = c[1].style.width = '100%';
+
+				if(tooltip.slider) {
+					Slider.setSize(tooltip.slider, m - 6);
+					tooltip.className += ' tooltip-slider';
 				}
-			}
-		}
-		if (f) {
-			d.style.visibility = "visible"
-		}
-	},
-	fixSafe: function (c, b, a) {
-		if ($WH.Browser.ie) {
-			setTimeout($WH.Tooltip.fix.bind(this, c, b, a), 1)
-		} else {
-			$WH.Tooltip.fix(c, b, a)
-		}
-	},
-	append: function (c, b) {
-		var c = $WH.$(c);
-		var a = $WH.Tooltip.create(b);
-		$WH.ae(c, a);
-		$WH.Tooltip.fixSafe(a, 1, 1)
-	},
-	prepare: function () {
-		if ($WH.Tooltip.tooltip) {
-			return
-		}
-		var b = $WH.Tooltip.create();
-		b.style.position = "absolute";
-		b.style.left = b.style.top = "-2323px";
-		var a = $WH.ge("layers");
-		if (!a) {
-			a = $WH.ce("div");
-			a.id = "layers";
-			$WH.aef(document.body, a)
-		}
-		$WH.ae(a, b);
-		$WH.Tooltip.tooltip = b;
-		$WH.Tooltip.tooltipTable = $WH.gE(b, "table")[0];
-		$WH.Tooltip.tooltipTd = $WH.gE(b, "td")[0];
-		if ($WH.Browser.ie6) {
-			b = $WH.ce("iframe");
-			b.src = "javascript:0;";
-			b.frameBorder = 0;
-			if (a) {
-				$WH.ae(a, b)
-			} else {
-				$WH.ae(document.body, b)
-			}
-			$WH.Tooltip.iframe = b
-		}
-	},
-	set: function (b) {
-		var a = $WH.Tooltip.tooltip;
-		a.style.width = "550px";
-		a.style.left = "-2323px";
-		a.style.top = "-2323px";
-		$WH.Tooltip.tooltipTd.innerHTML = b;
-		a.style.display = "";
-		$WH.Tooltip.fix(a, 0, 0)
-	},
-	moveTests: [[null, null], [null, false], [false, null], [false, false]],
-	move: function (m, l, d, o, c, a) {
-		if (!$WH.Tooltip.tooltipTable) {
-			return
-		}
-		var k = $WH.Tooltip.tooltip,
-		g = $WH.Tooltip.tooltipTable.offsetWidth,
-		b = $WH.Tooltip.tooltipTable.offsetHeight,
-		p;
-		k.style.width = g + "px";
-		var j, e;
-		for (var f = 0, h = $WH.Tooltip.moveTests.length; f < h; ++f) {
-			p = $WH.Tooltip.moveTests[f];
-			j = $WH.Tooltip.moveTest(m, l, d, o, c, a, p[0], p[1]);
-			if ($WH.isset("Ads") && !Ads.intersect(j)) {
-				e = true;
-				break
-			} else {
-				if (!$WH.isset("Ads")) {
-					break
-				}
-			}
-		}
-		if ($WH.isset("Ads") && !e) {
-			$WH.Tooltip.hiddenAd = Ads.intersect(j, true)
-		}
-		k.style.left = j.l + "px";
-		k.style.top = j.t + "px";
-		k.style.visibility = "visible";
-		if ($WH.Browser.ie6 && $WH.Tooltip.iframe) {
-			var p = $WH.Tooltip.iframe;
-			p.style.left = j.l + "px";
-			p.style.top = j.t + "px";
-			p.style.width = g + "px";
-			p.style.height = b + "px";
-			p.style.display = "";
-			p.style.visibility = "visible"
-		}
-	},
-	moveTest: function (e, l, o, y, c, a, m, b) {
-		var k = e,
-		w = l,
-		f = $WH.Tooltip.tooltip,
-		i = $WH.Tooltip.tooltipTable.offsetWidth,
-		q = $WH.Tooltip.tooltipTable.offsetHeight,
-		g = $WH.g_getWindowSize(),
-		j = $WH.g_getScroll(),
-		h = g.w,
-		p = g.h,
-		d = j.x,
-		v = j.y,
-		u = d,
-		t = v,
-		s = d + h,
-		r = v + p;
-		if (m == null) {
-			m = (e + o + i <= s)
-		}
-		if (b == null) {
-			b = (l - q >= t)
-		}
-		if (m) {
-			e += o + c
-		} else {
-			e = Math.max(e - i, u) - c
-		}
-		if (b) {
-			l -= q + a
-		} else {
-			l += y + a
-		}
-		if (e < u) {
-			e = u
-		} else {
-			if (e + i > s) {
-				e = s - i
-			}
-		}
-		if (l < t) {
-			l = t
-		} else {
-			if (l + q > r) {
-				l = Math.max(v, r - q)
-			}
-		}
-		if ($WH.Tooltip.iconVisible) {
-			if (k >= e - 48 && k <= e && w >= l - 4 && w <= l + 48) {
-				l -= 48 - (w - l)
-			}
-		}
-		return $WH.g_createRect(e, l, i, q)
-	},
-	show: function (f, e, d, b, c) {
-		if ($WH.Tooltip.disabled) {
-			return
-		}
-		if (!d || d < 1) {
-			d = 1
-		}
-		if (!b || b < 1) {
-			b = 1
-		}
-		if (c) {
-			e = '<span class="' + c + '">' + e + "</span>"
-		}
-		var a = $WH.ac(f);
-		$WH.Tooltip.prepare();
-		$WH.Tooltip.set(e);
-		$WH.Tooltip.move(a.x, a.y, f.offsetWidth, f.offsetHeight, d, b)
-	},
-	showAtCursor: function (d, f, c, a, b) {
-		if ($WH.Tooltip.disabled) {
-			return
-		}
-		if (!c || c < 10) {
-			c = 10
-		}
-		if (!a || a < 10) {
-			a = 10
-		}
-		if (b) {
-			f = '<span class="' + b + '">' + f + "</span>"
-		}
-		d = $WH.$E(d);
-		var g = $WH.g_getCursorPos(d);
-		$WH.Tooltip.prepare();
-		$WH.Tooltip.set(f);
-		$WH.Tooltip.move(g.x, g.y, 0, 0, c, a)
-	},
-	showAtXY: function (d, a, e, c, b) {
-		if ($WH.Tooltip.disabled) {
-			return
-		}
-		$WH.Tooltip.prepare();
-		$WH.Tooltip.set(d);
-		$WH.Tooltip.move(a, e, 0, 0, c, b)
-	},
-	cursorUpdate: function (b, a, d) {
-		if ($WH.Tooltip.disabled || !$WH.Tooltip.tooltip) {
-			return
-		}
-		b = $WH.$E(b);
-		if (!a || a < 10) {
-			a = 10
-		}
-		if (!d || d < 10) {
-			d = 10
-		}
-		var c = $WH.g_getCursorPos(b);
-		$WH.Tooltip.move(c.x, c.y, 0, 0, a, d)
-	},
-	hide: function () {
-		if ($WH.Tooltip.tooltip) {
-			$WH.Tooltip.tooltip.style.display = "none";
-			$WH.Tooltip.tooltip.visibility = "hidden";
-			$WH.Tooltip.tooltipTable.className = "";
-			if ($WH.Browser.ie6) {
-				$WH.Tooltip.iframe.style.display = "none"
-			}
-			$WH.Tooltip.setIcon(null);
-			if ($WH.isset("Ads") && $WH.Tooltip.hiddenAd) {
-				Ads.reveal(Tooltip.hiddenAd);
-				$WH.Tooltip.hiddenAd = false
-			}
-		}
-	},
-	setIcon: function (a) {
-		$WH.Tooltip.prepare();
-		if (a) {
-			$WH.Tooltip.icon.style.backgroundImage = "url(" + g_staticUrl + "/images/icons/medium/" + a.toLowerCase() + ".jpg)";
-			$WH.Tooltip.icon.style.visibility = "visible"
-		} else {
-			$WH.Tooltip.icon.style.backgroundImage = "none";
-			$WH.Tooltip.icon.style.visibility = "hidden"
-		}
-		$WH.Tooltip.iconVisible = a ? 1 : 0
-	}
+
+                if (!noShrink && tooltip.offsetHeight > document.body.clientHeight) {
+                    table.className = 'shrink';
+                }
+            }
+        }
+
+        if (visible) {
+            tooltip.style.visibility = 'visible';
+        }
+    },
+
+    fixSafe: function(p1, p2, p3) {
+        $WH.Tooltip.fix(p1, p2, p3);
+    },
+
+    append: function(el, htmlTooltip) {
+        var el = $WH.ge(el);
+        var tooltip = $WH.Tooltip.create(htmlTooltip);
+        $WH.ae(el, tooltip);
+
+        $WH.Tooltip.fixSafe(tooltip, 1, 1);
+    },
+
+    prepare: function() {
+        if ($WH.Tooltip.tooltip) {
+            return;
+        }
+
+        var _ = $WH.Tooltip.create();
+        _.style.position = 'absolute';
+        _.style.left = _.style.top = '-2323px';
+
+        $WH.ae(document.body, _);
+
+        $WH.Tooltip.tooltip      = _;
+        $WH.Tooltip.tooltipTable = $WH.gE(_, 'table')[0];
+        $WH.Tooltip.tooltipTd    = $WH.gE(_, 'td')[0];
+
+        var _ = $WH.Tooltip.create(null, true);
+        _.style.position = 'absolute';
+        _.style.left = _.style.top = '-2323px';
+
+        $WH.ae(document.body, _);
+
+        $WH.Tooltip.tooltip2      = _;
+        $WH.Tooltip.tooltipTable2 = $WH.gE(_, 'table')[0];
+        $WH.Tooltip.tooltipTd2    = $WH.gE(_, 'td')[0];
+    },
+
+    set: function(text, text2) {
+        var _ = $WH.Tooltip.tooltip;
+
+        _.style.width = '550px';
+        _.style.left  = '-2323px';
+        _.style.top   = '-2323px';
+
+        if (text.nodeName) {
+            $WH.ee($WH.Tooltip.tooltipTd);
+            $WH.ae($WH.Tooltip.tooltipTd, text);
+        }
+        else {
+            $WH.Tooltip.tooltipTd.innerHTML = text;
+        }
+
+        _.style.display = '';
+
+        $WH.Tooltip.fix(_, 0, 0);
+
+        if (text2) {
+            $WH.Tooltip.showSecondary = true;
+            var _ = $WH.Tooltip.tooltip2;
+
+            _.style.width = '550px';
+            _.style.left  = '-2323px';
+            _.style.top   = '-2323px';
+
+            if (text2.nodeName) {
+                $WH.ee($WH.Tooltip.tooltipTd2);
+                $WH.ae($WH.Tooltip.tooltipTd2, text2);
+            }
+            else {
+                $WH.Tooltip.tooltipTd2.innerHTML = text2;
+            }
+
+            _.style.display = '';
+
+            $WH.Tooltip.fix(_, 0, 0);
+        }
+        else {
+            $WH.Tooltip.showSecondary = false;
+        }
+    },
+
+    moveTests: [
+        [null, null],   // Top right
+        [null, false],  // Bottom right
+        [false, null],  // Top left
+        [false, false]  // Bottom left
+    ],
+
+    move: function(x, y, width, height, paddX, paddY) {
+        if (!$WH.Tooltip.tooltipTable) {
+            return;
+        }
+
+        var
+            tooltip = $WH.Tooltip.tooltip,
+            tow     = $WH.Tooltip.tooltipTable.offsetWidth,
+            toh     = $WH.Tooltip.tooltipTable.offsetHeight,
+            tt2     = $WH.Tooltip.tooltip2,
+            tt2w    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetWidth : 0,
+            tt2h    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetHeight : 0,
+            _;
+
+        tooltip.style.width = tow + 'px';
+        tt2.style.width     = tt2w + 'px';
+
+        var
+            rect,
+            safe;
+
+        for (var i = 0, len = $WH.Tooltip.moveTests.length; i < len; ++i) {
+            _ = $WH.Tooltip.moveTests[i];
+
+            rect = $WH.Tooltip.moveTest(x, y, width, height, paddX, paddY, _[0], _[1]);
+            break;
+        }
+
+        tooltip.style.left       = rect.l + 'px';
+        tooltip.style.top        = rect.t + 'px';
+        tooltip.style.visibility = 'visible';
+
+        if ($WH.Tooltip.showSecondary) {
+            tt2.style.left       = rect.l + tow + 'px';
+            tt2.style.top        = rect.t + 'px';
+            tt2.style.visibility = 'visible';
+        }
+    },
+
+    moveTest: function(left, top, width, height, paddX, paddY, rightAligned, topAligned) {
+        var
+            bakLeft = left,
+            bakTop  = top,
+            tooltip = $WH.Tooltip.tooltip,
+            tow     = $WH.Tooltip.tooltipTable.offsetWidth,
+            toh     = $WH.Tooltip.tooltipTable.offsetHeight,
+            tt2     = $WH.Tooltip.tooltip2,
+            tt2w    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetWidth : 0,
+            tt2h    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetHeight : 0,
+            winSize = $WH.g_getWindowSize(),
+            scroll  = $WH.g_getScroll(),
+            bcw     = winSize.w,
+            bch     = winSize.h,
+            bsl     = scroll.x,
+            bst     = scroll.y,
+            minX    = bsl,
+            minY    = bst,
+            maxX    = bsl + bcw,
+            maxY    = bst + bch;
+
+        if (rightAligned == null) {
+            rightAligned = (left + width + tow + tt2w <= maxX);
+        }
+
+        if (topAligned == null) {
+            topAligned = (top - Math.max(toh, tt2h) >= minY);
+        }
+
+        if (rightAligned) {
+            left += width + paddX;
+        }
+        else {
+            left = Math.max(left - (tow + tt2w), minX) - paddX;
+        }
+
+        if (topAligned) {
+            top -= Math.max(toh, tt2h) + paddY;
+        }
+        else {
+            top += height + paddY;
+        }
+
+        if (left < minX) {
+            left = minX;
+        }
+        else if (left + tow + tt2w > maxX) {
+            left = maxX - (tow + tt2w);
+        }
+
+        if (top < minY) {
+            top = minY;
+        }
+        else if (top + Math.max(toh, tt2h) > maxY) {
+            top = Math.max(bst, maxY - Math.max(toh, tt2h));
+        }
+
+        if ($WH.Tooltip.iconVisible) {
+            if (bakLeft >= left - 48 && bakLeft <= left && bakTop >= top - 4 && bakTop <= top + 48) {
+                top -= 48 - (bakTop - top);
+            }
+        }
+
+        return $WH.g_createRect(left, top, tow, toh);
+    },
+
+    show: function(_this, text, paddX, paddY, spanClass, text2) {
+        if ($WH.Tooltip.disabled) {
+            return;
+        }
+
+        if (!paddX || paddX < 1) {
+            paddX = 1;
+        }
+
+        if (!paddY || paddY < 1) {
+            paddY = 1;
+        }
+
+        if (spanClass) {
+            text = '<span class="' + spanClass + '">' + text + '</span>';
+        }
+
+        var coords = $WH.ac(_this);
+
+        $WH.Tooltip.prepare();
+        $WH.Tooltip.set(text, text2);
+        $WH.Tooltip.move(coords.x, coords.y, _this.offsetWidth, _this.offsetHeight, paddX, paddY);
+    },
+
+    showAtCursor: function(e, text, paddX, paddY, spanClass, text2) {
+        if ($WH.Tooltip.disabled) {
+            return;
+        }
+
+        if (!paddX || paddX < 10) {
+            paddX = 10;
+        }
+        if (!paddY || paddY < 10) {
+            paddY = 10;
+        }
+
+        if (spanClass) {
+            text = '<span class="' + spanClass + '">' + text + '</span>';
+            if (text2) {
+                text2 = '<span class="' + spanClass + '">' + text2 + '</span>';
+            }
+        }
+
+        e = $WH.$E(e);
+        var pos = $WH.g_getCursorPos(e);
+
+        $WH.Tooltip.prepare();
+        $WH.Tooltip.set(text, text2);
+        $WH.Tooltip.move(pos.x, pos.y, 0, 0, paddX, paddY);
+    },
+
+    showAtXY: function(text, x, y, paddX, paddY, text2) {
+        if ($WH.Tooltip.disabled) {
+            return;
+        }
+
+        $WH.Tooltip.prepare();
+        $WH.Tooltip.set(text, text2);
+        $WH.Tooltip.move(x, y, 0, 0, paddX, paddY);
+    },
+
+    cursorUpdate: function(e, x, y) { // Used along with showAtCursor
+        if ($WH.Tooltip.disabled || !$WH.Tooltip.tooltip) {
+            return;
+        }
+
+        e = $WH.$E(e);
+
+        if (!x || x < 10) {
+            x = 10;
+        }
+        if (!y || y < 10) {
+            y = 10;
+        }
+
+        var pos = $WH.g_getCursorPos(e);
+        $WH.Tooltip.move(pos.x, pos.y, 0, 0, x, y);
+    },
+
+    hide: function() {
+        if ($WH.Tooltip.tooltip) {
+            $WH.Tooltip.tooltip.style.display  = 'none';
+            $WH.Tooltip.tooltip.visibility     = 'hidden';
+            $WH.Tooltip.tooltipTable.className = '';
+
+            $WH.Tooltip.setIcon(null);
+        }
+
+        if ($WH.Tooltip.tooltip2) {
+            $WH.Tooltip.tooltip2.style.display  = 'none';
+            $WH.Tooltip.tooltip2.visibility     = 'hidden';
+            $WH.Tooltip.tooltipTable2.className = '';
+        }
+    },
+
+    setIcon: function(icon) {
+        $WH.Tooltip.prepare();
+
+        if (icon) {
+            $WH.Tooltip.icon.style.backgroundImage = 'url(images/icons/medium/' + icon.toLowerCase() + '.jpg)';
+            $WH.Tooltip.icon.style.visibility      = 'visible';
+        }
+        else {
+            $WH.Tooltip.icon.style.backgroundImage = 'none';
+            $WH.Tooltip.icon.style.visibility      = 'hidden';
+        }
+
+        $WH.Tooltip.iconVisible = icon ? 1 : 0;
+    }
 };
 
-if ($WH.isset("$WowheadPower")) {
-    $WowheadPower.init()
-};
+if ($WH.isset('$WowheadPower')) {
+	$WowheadPower.init();
+}
 
 $WH.g_getProfileIcon = function(raceId, classId, gender, level, icon, size) {
     var raceXclass = {

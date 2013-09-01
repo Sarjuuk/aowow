@@ -14,7 +14,7 @@ class AchievementList extends BaseType
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
 
-    public function __construct($conditions, $applyFilter = false)
+    public function __construct($conditions = [], $applyFilter = false)
     {
         parent::__construct($conditions, $applyFilter);
 

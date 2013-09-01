@@ -48,12 +48,22 @@ if (!$smarty->loadCache($cacheKey, $pageData))
             $deps[$events->id] = $d;
 
     $pageData = array(
-        'file'     => 'event',
-        'data'     => $events->getListviewData(),
-        'deps'     => $deps,
-        'calendar' => false,                                // todo (med): fix it Felix!
-        'params'   => array(
-            // 'tabs'   => '$myTabs'
+        'listviews' => [],
+        'deps'      => $deps
+    );
+
+    $pageData['listviews'][] = array(
+        'file'   => 'event',
+        'data'   => $events->getListviewData(),
+        'params' => ['tabs' => '$myTabs']
+    );
+
+    $pageData['listviews'][] = array(
+        'file'   => 'calendar',
+        'data'   => $events->getListviewData(),
+        'params' => array(
+            'tabs'      => '$myTabs',
+            'hideCount' => 1
         )
     );
 
@@ -63,18 +73,21 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 }
 
 // recalculate dates with now(); can't be cached, obviously
-foreach ($pageData['data'] as &$data)
+foreach ($pageData['listviews'] as &$views)
 {
-    // is a followUp-event
-    if (!empty($pageData['deps'][$data['id']]))
+    foreach ($views['data'] as &$data)
     {
-        $data['startDate'] = $data['endDate'] = false;
-        continue;
-    }
+        // is a followUp-event
+        if (!empty($pageData['deps'][$data['id']]))
+        {
+            $data['startDate'] = $data['endDate'] = false;
+            continue;
+        }
 
-    $updated = WorldEventList::updateDates($data['startDate'], $data['endDate'], $data['rec']);
-    $data['startDate'] = $updated['start'] ? date(Util::$dateFormatLong, $updated['start']) : false;
-    $data['endDate']   = $updated['end'  ] ? date(Util::$dateFormatLong, $updated['end'])   : false;
+        $updated = WorldEventList::updateDates($data['startDate'], $data['endDate'], $data['rec']);
+        $data['startDate'] = $updated['start'] ? date(Util::$dateFormatLong, $updated['start']) : false;
+        $data['endDate']   = $updated['end']   ? date(Util::$dateFormatLong, $updated['end'])   : false;
+    }
 }
 
 

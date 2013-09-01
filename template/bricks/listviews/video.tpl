@@ -1,8 +1,7 @@
 {strip}
     new Listview({ldelim}
-        template:'holidaycal',
-        {if !isset($params.id)}id:'calendar',{/if}
-        {if !isset($params.name)}name:LANG.tab_calendar,{/if}
+        template: 'video',
+        id: 'videos',
         {if !isset($params.parent)}parent:'lv-generic',{/if}
         {foreach from=$params key=k item=v}
             {if $v[0] == '$'}
@@ -11,20 +10,23 @@
                 {$k}:'{$v}',
             {/if}
         {/foreach}
-        data:[
+        data: [
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    {if $curr.rec}
-                        rec:{$curr.rec},
+                    id:{$vi.id},
+                    user:'{$vi.user}',
+                    date:'{$vi.date|date_format:"%Y/%m/%d %H:%M:%S"}',
+                    videoType:1, {* there is only youtube *}
+                    videoId:'{$vi.videoId}',
+                    type:{$page.type},
+                    typeId:{$page.typeId},
+                    {if isset($vi.sticky)}
+                        sticky:{$vi.sticky},
                     {/if}
-                    category:{$curr.category},
-                    id:{$curr.id},
-                    name:'{$curr.name|escape:"javascript"}',
-                    startDate:'{$curr.startDate}',
-                    endDate:'{$curr.endDate}'
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}
         ]
     {rdelim});
 {/strip}
+

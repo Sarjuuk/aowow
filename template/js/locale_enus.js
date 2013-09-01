@@ -881,15 +881,21 @@ var mn_tools = [
         ["pilgrims-bounty","Pilgrim's Bounty","?guide=pilgrims-bounty"],
         ["winter-veil","Feast of Winter Veil","?guide=winter-veil"]
     ]],
-    [8,"Utilities","",[
+    [8,"Utilities",,[
         [,"Database"],
-        [4,"Random Page","?random"],
         [0,"Latest Additions","?latest-additions"],
         [1,"Latest Articles","?latest-articles"],
-        [3,"Latest Screenshots","?latest-screenshots"],
-        [11,"Latest Vídeos","?latest-videos"],
         [2,"Latest Comments","?latest-comments"],
-        [5,"Unrated Comments","?unrated-comments"]
+        [3,"Latest Screenshots","?latest-screenshots"],
+        [11,"Latest Videos","?latest-videos"],
+        [12,"Most Comments",,[
+            [1,"Yesterday","?most-comments"],
+            [7,"Past 7 Days","?most-comments=7"],
+            [30,"Past 30 Days","?most-comments=30"]
+        ]],
+        [5,"Unrated Comments","?unrated-comments"],
+        [13,"Missing Screenshots","?missing-screenshots"],
+        [4,"Random Page","?random"]
     ]]
 ];
 var mn_community = [
@@ -3763,30 +3769,30 @@ var LANG = {
 
     pr_dialog_level: "Level:",
 
-	menu_charlookup:      "Lookup by name...",
-	menu_newprofile:      "New Custom Profile",
-	menu_chooseclassspec: "Choose Your Class/Spec",
+    menu_charlookup:      "Lookup by name...",
+    menu_newprofile:      "New Custom Profile",
+    menu_chooseclassspec: "Choose Your Class/Spec",
 
     pr_selectregion: "Select a region",
 
-	pr_menu_equip:      "Equip...",
-	pr_menu_replace:    "Replace...",
-	pr_menu_add:        "Add...",
-	pr_menu_unequip:    "Unequip",
-	pr_menu_remove:     "Remove",
-	pr_menu_addgem:     "Add Gem...",
-	pr_menu_repgem:     "Replace Gem...",
-	pr_menu_addenchant: "Add Enchant...",
-	pr_menu_repenchant: "Replace Enchant...",
-	pr_menu_addsubitem: "Add Random Property...",
-	pr_menu_repsubitem: "Replace Random Property...",
-	pr_menu_extrasock:  "Extra Socket",
-	pr_menu_display:    "Display on Character",
-	pr_menu_clearenh:   "Clear Enhancements",
-	pr_menu_links:      "Links",
-	pr_menu_compare:    "Compare",
-	pr_menu_upgrades:   "Find Upgrades",
-	pr_menu_whowears:   "Who Wears This?",
+    pr_menu_equip:      "Equip...",
+    pr_menu_replace:    "Replace...",
+    pr_menu_add:        "Add...",
+    pr_menu_unequip:    "Unequip",
+    pr_menu_remove:     "Remove",
+    pr_menu_addgem:     "Add Gem...",
+    pr_menu_repgem:     "Replace Gem...",
+    pr_menu_addenchant: "Add Enchant...",
+    pr_menu_repenchant: "Replace Enchant...",
+    pr_menu_addsubitem: "Add Random Property...",
+    pr_menu_repsubitem: "Replace Random Property...",
+    pr_menu_extrasock:  "Extra Socket",
+    pr_menu_display:    "Display on Character",
+    pr_menu_clearenh:   "Clear Enhancements",
+    pr_menu_links:      "Links",
+    pr_menu_compare:    "Compare",
+    pr_menu_upgrades:   "Find Upgrades",
+    pr_menu_whowears:   "Who Wears This?",
 
     pr_noneitem: "None",
     pr_nonegem: "None",

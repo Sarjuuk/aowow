@@ -837,13 +837,19 @@ var mn_tools = [
     ]],
     [8,"Hilfsmittel",,[
         [,"Datenbank"],
-        [4,"Zufällige Seite","?random"],
         [0,"Neueste Ergänzungen","?latest-additions"],
         [1,"Neueste Artikel","?latest-articles"],
+        [2,"Neueste Kommentare","?latest-comments"],
         [3,"Neueste Screenshots","?latest-screenshots"],
         [11,"Neueste Videos","?latest-videos"],
-        [2,"Neueste Kommentare","?latest-comments"],
+        [12,"Meiste Kommentare",,[
+            [1,"Gestern","?most-comments"],
+            [7,"Vergangene 7 Tage","?most-comments=7"],
+            [30,"Vergangene 30 Tage","?most-comments=30"]
+        ]],
         [5,"Nicht bewertete Kommentare","?unrated-comments"],
+        [13,"Fehlende Screenshots","?missing-screenshots"],
+        [4,"Zufällige Seite","?random"]
     ]]
 ];
 var mn_community = [
@@ -3718,30 +3724,30 @@ var LANG = {
 
     pr_dialog_level: "Stufe: ",
 
-	menu_charlookup:      "Nach Namen suchen...",
-	menu_newprofile:      "Neues individuelles Profil",
-	menu_chooseclassspec: "Wählt Eure Klasse/Spezialisierung",
+    menu_charlookup:      "Nach Namen suchen...",
+    menu_newprofile:      "Neues individuelles Profil",
+    menu_chooseclassspec: "Wählt Eure Klasse/Spezialisierung",
 
     pr_selectregion: "Wählt eine Region",
 
-	pr_menu_equip:      "Anlegen...",
-	pr_menu_replace:    "Ersetzen...",
-	pr_menu_add:        "Hinzufügen...",
-	pr_menu_unequip:    "Ablegen",
-	pr_menu_remove:     "Entfernen",
-	pr_menu_addgem:     "Edelstein hinzufügen...",
-	pr_menu_repgem:     "Edelstein ersetzen...",
-	pr_menu_addenchant: "Verzauberung hinzufügen...",
-	pr_menu_repenchant: "Verzauberung ersetzen...",
-	pr_menu_addsubitem: "Zufällige Eigenschaft hinzufügen",
-	pr_menu_repsubitem: "Zufällige Eigenschaft ersetzen",
-	pr_menu_extrasock:  "Zusätzlicher Sockel",
-	pr_menu_display:    "Vorschau",
-	pr_menu_clearenh:   "Verbesserungen entfernen",
-	pr_menu_links:      "Links",
-	pr_menu_compare:    "Vergleichen",
-	pr_menu_upgrades:   "Bessere Gegenstände finden",
-	pr_menu_whowears:   "Wer trägt dies?",
+    pr_menu_equip:      "Anlegen...",
+    pr_menu_replace:    "Ersetzen...",
+    pr_menu_add:        "Hinzufügen...",
+    pr_menu_unequip:    "Ablegen",
+    pr_menu_remove:     "Entfernen",
+    pr_menu_addgem:     "Edelstein hinzufügen...",
+    pr_menu_repgem:     "Edelstein ersetzen...",
+    pr_menu_addenchant: "Verzauberung hinzufügen...",
+    pr_menu_repenchant: "Verzauberung ersetzen...",
+    pr_menu_addsubitem: "Zufällige Eigenschaft hinzufügen",
+    pr_menu_repsubitem: "Zufällige Eigenschaft ersetzen",
+    pr_menu_extrasock:  "Zusätzlicher Sockel",
+    pr_menu_display:    "Vorschau",
+    pr_menu_clearenh:   "Verbesserungen entfernen",
+    pr_menu_links:      "Links",
+    pr_menu_compare:    "Vergleichen",
+    pr_menu_upgrades:   "Bessere Gegenstände finden",
+    pr_menu_whowears:   "Wer trägt dies?",
 
     pr_noneitem: "Nichts",
     pr_nonegem: "Nichts",

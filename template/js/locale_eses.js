@@ -837,13 +837,19 @@ var mn_tools = [
     ]],
     [8,"Utilidades",,[
         [,"Base de datos"],
-        [4,"Página aleatoria","?random"],
         [0,"Últimas adiciones","?latest-additions"],
         [1,"Últimos artículos","?latest-articles"],
+        [2,"Últimos comentarios","?latest-comments"],
         [3,"Últimas capturas de pantalla","?latest-screenshots"],
         [11,"Últimos vídeos","?latest-videos"],
-        [2,"Últimos comentarios","?latest-comments"],
-        [5,"Comentarios sin valorar","?unrated-comments"]
+        [12,"Mayoría de comentarios",,[
+            [1,"Ayer","?most-comments"],
+            [7,"Pasados 7 días","?most-comments=7"],
+            [30,"Pasados 30 días","?most-comments=30"]
+        ]],
+        [5,"Comentarios sin valorar","?unrated-comments"],
+        [13,"Capturas de pantalla faltantes","?missing-screenshots"],
+        [4,"Página aleatoria","?random"]
     ]]
 ];
 var mn_community = [

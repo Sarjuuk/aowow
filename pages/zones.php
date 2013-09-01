@@ -58,11 +58,15 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $zones = new ZoneList($conditions);
 
     $pageData = array(
-        'file'   => 'zone',
-        'data'   => $zones->getListviewData(),
-        'som'    => '',
-        'map'    => [],
-        'params' => []
+        'som'       => '',
+        'map'       => [],
+        'listviews' => array(
+            array(
+                'file'   => 'zone',
+                'data'   => $zones->getListviewData(),
+                'params' => []
+            )
+        )
     );
 
     if ($mapFile)

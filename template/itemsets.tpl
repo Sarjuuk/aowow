@@ -95,7 +95,7 @@
                 {if isset($filter.setCr)}{$filter.setCr}{/if}
             //]]></script>
 
-            <div id="listview-generic" class="listview"></div>
+            <div id="lv-generic" class="listview"></div>
             <script type="text/javascript">
                 {include file='bricks/listviews/itemset.tpl' data=$lvData.data params=$lvData.params}
             </script>

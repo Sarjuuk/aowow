@@ -23,6 +23,10 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $pets = new PetList(isset($cat) ? array(['type', (int)$cat]) : []);
 
     $pageData = array(
+        'listviews' => []
+    );
+
+    $lvPet = array(
         'file'   => 'pet',
         'data'   => $pets->getListviewData(),
         'params' => array(
@@ -31,7 +35,9 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     );
 
     if (($mask = $pets->hasDiffFields(['type'])) == 0x0)
-        $pageData['params']['hiddenCols'] = "$['type']";
+        $lvPet['params']['hiddenCols'] = "$['type']";
+
+    $pageData['listviews'][] = $lvPet;
 
     $pets->addGlobalsToJscript($smarty, GLOBALINFO_RELATED);
 

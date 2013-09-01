@@ -23,16 +23,22 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $titles = new TitleList(isset($cat) ? array(['category', (int)$cat]) : []);
 
     $pageData = array(
+        'listviews' => []
+    );
+
+    $lvTitles = array(
         'file'   => 'title',
         'data'   => $titles->getListviewData(),
         'params' => []
     );
 
     if ($titles->hasDiffFields(['category']))
-        $pageData['params']['visibleCols'] = "$['category']";
+        $lvTitles['params']['visibleCols'] = "$['category']";
 
     if (!$titles->hasAnySource())
-        $pageData['params']['hiddenCols'] = "$['source']";
+        $lvTitles['params']['hiddenCols'] = "$['source']";
+
+    $pageData['listviews'][] = $lvTitles;
 
     $smarty->saveCache($cacheKey, $pageData);
 }

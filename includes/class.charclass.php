@@ -9,6 +9,15 @@ class CharClassList extends BaseType
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_classes WHERE [cond] ORDER BY Id ASC';
 
+    public function __construct($conditions = [])
+    {
+        parent::__construct($conditions);
+
+        foreach ($this->iterate() as $k => &$_curTpl)
+            if ($k == 6)                                    // todo (low): grr, move to db
+                $_curTpl['hero'] = 1;
+    }
+
     public function getListviewData()
     {
         $data = [];
@@ -24,9 +33,6 @@ class CharClassList extends BaseType
                 'armor'  => $this->curTpl['armorTypeMask'],
                 'power'  => $this->curTpl['powerType'],
             );
-
-            if ($this->curTpl['expansion'] == 2)            // todo (low): grr, move to db
-                $data[$this->id]['hero'] = 1;
 
             if ($this->curTpl['expansion'])
                 $data[$this->id]['expansion'] = $this->curTpl['expansion'];

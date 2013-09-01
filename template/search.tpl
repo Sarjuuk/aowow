@@ -14,7 +14,7 @@
                 <h1>{$lang.foundResult} <i>{$search|escape:"html"}</i></h1>
             </div>
             <div id="tabs-generic"></div>
-            <div id="listview-generic" class="listview"></div>
+            <div id="lv-generic" class="listview"></div>
             <script type="text/javascript">
                 var myTabs = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
 {foreach from=$found item="f"}

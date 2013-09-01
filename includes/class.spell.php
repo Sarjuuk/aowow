@@ -36,7 +36,7 @@ class SpellList extends BaseType
 
     protected     $setupQuery  = 'SELECT *, id AS ARRAY_KEY FROM ?_spell s WHERE [filter] [cond]';
 
-    public function __construct($conditions, $applyFilter = false)
+    public function __construct($conditions = [], $applyFilter = false)
     {
         parent::__construct($conditions, $applyFilter);
 
@@ -1023,6 +1023,9 @@ class SpellList extends BaseType
             $eq(a, b)      - a == b
             $floor(a)      - floor()
             $gt(a, b)      - a > b
+            $gte(a, b)     - a >= b
+            $min(a, b)     - min()
+            $max(a, b)     - max()
     */
 
     $this->interactive = $interactive;

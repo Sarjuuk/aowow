@@ -14,9 +14,9 @@ class ItemsetList extends BaseType
 
     protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_itemset WHERE [filter] [cond] ORDER BY maxlevel DESC';
 
-    public function __construct($data, $applyFilter = false)
+    public function __construct($conditions = [], $applyFilter = false)
     {
-        parent::__construct($data, $applyFilter);
+        parent::__construct($conditions, $applyFilter);
 
         // post processing
         foreach ($this->iterate() as &$_curTpl)

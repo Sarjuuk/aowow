@@ -76,7 +76,18 @@ $lang = array(
         // red buttons
         'links'         => "Links",
         'compare'       => "Compare",
-        'view3D'        => "View in 3D"
+        'view3D'        => "View in 3D",
+
+        // misc Tools
+        'subscribe'     => "Subscribe",
+        'mostComments'  => ["Yesterday", "Past %d Days"],
+        'utilities'     => array(
+            "Latest Additions",                     "Latest Articles",                      "Latest Comments",                      "Latest Screenshots",                   null,
+            "Unrated Comments",                     11 => "Latest Videos",                  12 => "Most Comments",                  13 => "Missing Screenshots"
+        ),
+
+        // article & infobox
+        'englishOnly'   => "This page is only available in <b>English</b>."
     ),
     'search' => array(
         'search'        => "Search",
@@ -129,6 +140,15 @@ $lang = array(
         'valueDelim'    => " to ",
         'zone'          => "zone",
         'zones'         => "Zones",
+
+        'heroClass'     => "Hero class",
+        'resource'      => "Resource",
+        'resources'     => "Resources",
+        'role'          => "Role",
+        'roles'         => "Roles",
+        'specs'         => "Specs",
+        '_roles'        => ['Healer', 'Melee DPS', 'Ranged DPS', 'Tank'],
+
         'expansions'    => array("Classic", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Strength", "Agility", "Stamina", "Intellect", "Spirit"),
         'languages'     => array(
@@ -144,7 +164,7 @@ $lang = array(
         'ra'            => array(-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"),
         'rep'           => array("Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"),
         'st'            => array(
-            null,               "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",
+            "Default",          "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",
             "Bear From",        null,                           null,                           "Dire Bear Form",               null,
             null,               null,                           null,                           "Shadowdance",                  null,
             null,               "Ghostwolf",                    "Battle Stance",                "Defensive Stance",             "Berserker Stance",
