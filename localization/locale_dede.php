@@ -83,7 +83,7 @@ $lang = array(
         'compare'       => "Vergleichen",
         'view3D'        => "3D-Ansicht",
 
-        // miscTooles
+        // miscTools
         'subscribe'     => "Abonnieren",
         'mostComments'  => ["Gestern", "Vergangene %d Tage"],
         'utilities'     => array(
@@ -92,7 +92,14 @@ $lang = array(
         ),
 
         // article & infobox
-        'englishOnly'   => "Diese Seite ist nur in <b>Englisch</b> verfügbar."
+        'englishOnly'   => "Diese Seite ist nur in <b>Englisch</b> verfügbar.",
+
+        // calculators
+        'compareTool'   => "Gegenstandsvergleichswerkzeug",
+        'talentCalc'    => "Talentrechner",
+        'petCalc'       => "Begleiterrechner",
+        'chooseClass'   => "Wählt eine Klasse",
+        'chooseFamily'  => "Wählt eine Tierart"
     ),
     'search' => array(
         'search'        => "Suche",
@@ -120,6 +127,8 @@ $lang = array(
         'eventShort'    => "Ereignis",
         'event'         => "Weltereigniss",
         'events'        => "Weltereignisse",
+        'faction'       => "Fraktion",
+        'factions'      => "Fraktionen",
         'cooldown'      => "%s Abklingzeit",
         'itemset'       => "Ausrüstungsset",
         'itemsets'      => "Ausrüstungssets",
@@ -127,7 +136,6 @@ $lang = array(
         'mechAbbr'      => "Ausw.",
         'pet'           => "Begleiter",
         'pets'          => "Begleiter",
-        'petCalc'       => "Begleiterrechner",
         'requires'      => "Benötigt %s",
         'profile'       => "",
         'profiles'      => "Profile",
@@ -264,14 +272,9 @@ $lang = array(
         'titleReward'   => "Euch wird der Titel \"<a href=\"?title=%d\">%s</a>\" verliehen",
         'slain'         => "getötet",
     ),
-    'compare' => array(
-        'compare'       => "Gegenstandsvergleichswerkzeug",
-    ),
-    'talent' => array(
-        'talentCalc'    => "Talentrechner",
-        'petCalc'       => "Begleiterrechner",
-        'chooseClass'   => "Wählt eine Klasse",
-        'chooseFamily'  => "Wählt eine Tierart",
+    'class' => array(
+        'racialLeader'  => "Volksanführer",
+        'startZone'     => "Startgebiet",
     ),
     'maps' => array(
         'maps'          => "Karten",

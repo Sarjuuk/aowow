@@ -84,7 +84,14 @@ $lang = array(
         ),
 
         // article & infobox
-        'englishOnly'   => "Cette page n'est disponible qu'en <b>anglais</b> pour le moment."
+        'englishOnly'   => "Cette page n'est disponible qu'en <b>anglais</b> pour le moment.",
+
+        // calculators
+        'compareTool'   => "Outil de comparaison d'objets",
+        'talentCalc'    => "Calculateur de Talents",
+        'petCalc'       => "Calculateur de familiers",
+        'chooseClass'   => "Choisissez une classe",
+        'chooseFamily'  => "Choisissez un familier"
     ),
     'search' => array(
         'search'        => "Recherche",
@@ -112,6 +119,8 @@ $lang = array(
         'eventShort'    => "Évènement",
         'event'         => "Évènement mondial",
         'events'        => "Évènements mondiaux",
+        'faction'       => "faction",
+        'factions'      => "Factions",
         'cooldown'      => "%s de recharge",
         'itemset'       => "ensemble d'objets",
         'itemsets'      => "Ensembles d'objets",
@@ -119,7 +128,6 @@ $lang = array(
         'mechAbbr'      => "Mécan.",
         'pet'           => "Familier",
         'pets'          => "Familiers de chasseur",
-        'petCalc'       => "Calculateur de familiers",
         'profile'       => "",
         'profiles'      => "Profils",
         'requires'      => "%s requis",
@@ -216,14 +224,9 @@ $lang = array(
         'titleReward'   => "Vous devriez recevoir le titre \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "tué",
     ),
-    'compare' => array(
-        'compare'       => "Outil de comparaison d'objets",
-    ),
-    'talent' => array(
-        'talentCalc'    => "Calculateur de Talents",
-        'petCalc'       => "Calculateur de familiers",
-        'chooseClass'   => "Choisissez une classe",
-        'chooseFamily'  => "Choisissez un familier",
+    'class' => array(
+        'racialLeader'  => "Leader racial",
+        'startZone'     => "Zone initiales",
     ),
     'maps' => array(
         'maps'          => "Cartes",

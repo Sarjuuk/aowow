@@ -84,7 +84,14 @@ $lang = array(
         ),
 
         // article & infobox
-        'englishOnly'   => "Esta página sólo está disponible en <b>inglés</b>."
+        'englishOnly'   => "Esta página sólo está disponible en <b>inglés</b>.",
+
+        // calculators
+        'compareTool'   => "Herramienta de comparación de objetos",
+        'talentCalc'    => "Calculadora de talentos",
+        'petCalc'       => "Calculadora de mascotas",
+        'chooseClass'   => "Escoge una clase",
+        'chooseFamily'  => "Escoge una familia de mascota"
     ),
     'search' => array(
         'search'        => "Búsqueda",
@@ -112,6 +119,8 @@ $lang = array(
         'eventShort'    => "Evento",
         'event'         => "Suceso mundial ",
         'events'        => "Eventos del mundo",
+        'faction'       => "facción",
+        'factions'      => "Facciones",
         'cooldown'      => "%s de reutilización",
         'itemset'       => "conjunto de objetos",
         'itemsets'      => "Conjuntos de objetos",
@@ -119,7 +128,6 @@ $lang = array(
         'mechAbbr'      => "Mec.",
         'pet'           => "Mascota",
         'pets'          => "Mascotas de cazador",
-        'petCalc'       => "Calculadora de mascotas",
         'profile'       => "",
         'profiles'      => "Perfiles",
         'requires'      => "Requiere %s",
@@ -217,14 +225,9 @@ $lang = array(
         'titleReward'   => "Deberías obtener el título \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "matado",
     ),
-    'compare' => array(
-        'compare'       => "Herramienta de comparación de objetos",
-    ),
-    'talent'  => array(
-        'talentCalc'    => "Calculadora de talentos",
-        'petCalc'       => "Calculadora de mascotas",
-        'chooseClass'   => "Escoge una clase",
-        'chooseFamily'  => "Escoge una familia de mascota",
+    'class' => array(
+        'racialLeader'  => "Lider racial",
+        'startZone'     => "Zona de inicio",
     ),
     'maps' => array(
         'maps'          => "Mapas",

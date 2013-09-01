@@ -8,7 +8,7 @@ require 'includes/class.community.php';
 
 $_id         = intVal($pageParam);
 $_mask       = 1 << ($_id - 1);
-$path        = [0, 12, $_id];
+$_path       = [0, 12, $_id];
 $tcClassId   = [null, 8, 3, 1, 5, 4, 9, 6, 2, 7, null, 0]; // see TalentCalc.js
 $classSkills = array(
      1 => [ 26, 256, 257],
@@ -66,13 +66,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $pageData = array (
         'title'      => $cl->getField('name', true).' - '.Util::ucFirst(Lang::$game['class']),
-        'path'       => $path,
+        'path'       => $_path,
         'infobox'    => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
         'relTabs'    => [],
         'page'       => array(
             'name'       => $cl->getField('name', true),
             'talentCalc' => Util::$tcEncoding[$tcClassId[$_id] * 3],
-            'icon'       => 'class_'.strtolower($cl->getField('fileString'))
+            'icon'       => 'class_'.strtolower($cl->getField('fileString')),
+            'expansion'  => Util::$expansionString[$cl->getField('expansion')]
         )
     );
 
@@ -84,7 +85,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 */
     // Quests
     $conditions = array(
-        ['RequiredClasses', $_mask, '&']
+        ['RequiredClasses', $_mask, '&'],
+        [['RequiredClasses', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']
     );
 
     $quests = new QuestList($conditions);

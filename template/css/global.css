@@ -3156,12 +3156,12 @@ small, .listview-mode-default .small, .comment-edit-modes, .comment-edit-body
     font-size: 11px;
 }
 
-a.open, .text ol li div, .text li div, .infobox li div, .minibox h3 a, .comment-body b, .comment-body h3
+.text ol li div, .text li div, .minibox h3 a, .comment-body b, .comment-body h3
 {
     color: #cccccc;
 }
 
-a:hover, .text b
+a:hover, a.open, .infobox li div, .text b
 {
     color: white;
 }
@@ -3643,4 +3643,12 @@ div.announcement li {
     -o-transition: .5s ease;
     -ms-transition: .5s ease;
     transition: .5s ease;
+}
+
+.search-noresults {
+	background:url(../images/noresults.jpg) left no-repeat;
+	width:254px;
+	height:215px;
+	float:right;
+	margin-top:10px;
 }

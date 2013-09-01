@@ -396,7 +396,7 @@ function g_createHeader(c) {
                 pr_initTopBarSearch();
                 break
         }
-    } 
+    }
     else {
         $WH.ae(b, $WH.ct(String.fromCharCode(160)));
 	}
@@ -5572,7 +5572,9 @@ Listview.funcBox = {
                             bibi.style.whiteSpace = 'nowrap';
                             $WH.ae(bibi, $WH.ct(text));
                             $WH.ae(d, bibi);
-                            sp.style.paddingLeft = bibi.offsetWidth + 'px';
+                            if ($(bibi2).length > 0) {
+                                sp.style.paddingLeft = $(bibi2).width() + 'px';
+                            }
                         }
 
                         $WH.ae(d, sp);

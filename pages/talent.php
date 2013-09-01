@@ -9,7 +9,7 @@ if (!isset($petCalc))
 
 // tabId 1: Tools g_initHeader()
 $smarty->updatePageVars(array(
-    'title'  => $petCalc ? Lang::$talent['petCalc'] : Lang::$talent['talentCalc'],
+    'title'  => $petCalc ? Lang::$main['petCalc'] : Lang::$main['talentCalc'],
     'tab'    => 1,
     'reqCSS' => array(
         ['path' => 'template/css/TalentCalc.css'],
@@ -26,7 +26,7 @@ $smarty->updatePageVars(array(
     )
 ));
 $smarty->assign('tcType', $petCalc ? 'pc' : 'tc');
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$talent));
+$smarty->assign('lang', Lang::$main);
 
 // load the page
 $smarty->display('talent.tpl');

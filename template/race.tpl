@@ -19,14 +19,15 @@
 {include file='bricks/infobox.tpl' info=$lvData.infobox}
 
             <div class="text">
-                <div id="headicon-generic" class="h1-icon"></div>
+                <div id="race-icon-male" class="h1-icon"></div>
+                <div id="race-icon-female" class="h1-icon"></div>
                 <script type="text/javascript">
-                    $WH.ge('headicon-generic').appendChild(Icon.create('{$lvData.page.icon}', 1));
+                    $WH.ge('race-icon-male').appendChild(Icon.create('race_{$lvData.page.icon}_male', 1));
+                    $WH.ge('race-icon-female').appendChild(Icon.create('race_{$lvData.page.icon}_female', 1));
                 </script>
+
                 <a href="http://old.wowhead.com/?{$query[0]}={$query[1]}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
                 <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: {$page.type}, typeId: {$page.typeId} {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
-                <a href="?talent#{$lvData.page.talentCalc}" class="button-red"><em><b><i>{$lang.talentCalc}</i></b><span>{$lang.talentCalc}</span></em></a>
-                <a href="{if !empty($page.boardUrl)}{$page.boardUrl}{else}javascript:;{/if}" class="button-red{if empty($page.boardUrl)} button-red-disabled{/if}"><em><b><i>{$lang.forum}</i></b><span>{$lang.forum}</span></em></a>
                 <h1 class="h1-icon">{if $lvData.page.expansion}<span class="{$lvData.page.expansion}-icon-right">{$lvData.page.name}</span>{else}{$lvData.page.name}{/if}</h1>
 
 {include file='bricks/article.tpl'}

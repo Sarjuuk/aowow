@@ -2,9 +2,9 @@
     <div id="article-generic" class="left"></div>
     <script type="text/javascript">//<![CDATA[
         Markup.printHtml("{$article.text}", "article-generic", {strip}{ldelim}
-            {foreach from=$article.params key=k item=v}
+            {if !empty($article.params)}{foreach from=$article.params key=k item=v}
                 {$k}: {if $v[0] == '$'}{$v|substr:1}{else}'{$v}'{/if},
-            {/foreach}
+            {/foreach}{/if}
             allow: Markup.CLASS_ADMIN,
             dbpage: true
         {rdelim}{/strip});

@@ -87,7 +87,14 @@ $lang = array(
         ),
 
         // article & infobox
-        'englishOnly'   => "This page is only available in <b>English</b>."
+        'englishOnly'   => "This page is only available in <b>English</b>.",
+
+        // calculators
+        'compareTool'   => "Item Comparison Tool",
+        'talentCalc'    => "Talent Calculator",
+        'petCalc'       => "Hunter Pet Calculator",
+        'chooseClass'   => "Choose a class",
+        'chooseFamily'  => "Choose a pet family"
     ),
     'search' => array(
         'search'        => "Search",
@@ -115,6 +122,8 @@ $lang = array(
         'eventShort'    => "Event",
         'event'         => "World Event",
         'events'        => "World Events",
+        'faction'       => "faction",
+        'factions'      => "Factions",
         'cooldown'      => "%s cooldown",
         'itemset'       => "item Set",
         'itemsets'      => "Item Sets",
@@ -122,7 +131,6 @@ $lang = array(
         'mechAbbr'      => "Mech.",
         'pet'           => "Pet",
         'pets'          => "Hunter Pets",
-        'petCalc'       => "Hunter Pet Calculator",
         'profile'       => "profile",
         'profiles'      => "Profiles",
         'requires'      => "Requires %s",
@@ -259,14 +267,9 @@ $lang = array(
         'titleReward'   => "You shall be granted the title \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "slain",
     ),
-    'compare' => array(
-        'compare'       => "Item Comparison Tool",
-    ),
-    'talent' => array(
-        'talentCalc'    => "Talent Calculator",
-        'petCalc'       => "Hunter Pet Calculator",
-        'chooseClass'   => "Choose a class",
-        'chooseFamily'  => "Choose a pet family",
+    'class' => array(
+        'racialLeader'  => "Racial leader",
+        'startZone'     => "Starting zone",
     ),
     'maps' => array(
         'maps'          => "Maps",

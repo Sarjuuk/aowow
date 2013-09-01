@@ -352,6 +352,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 	$quest['coreqs'] = array();
 	for($i=0;$i<=4;++$i)
 	{
+        /*
+         * RequiredSpellCast dropped by TC 29.8.13
+         */
+
 		//echo $quest['ReqCreatureOrGOCount'.$i].'<br />';
 		if($quest['RequiredNpcOrGo'.$i] != 0 && $quest['RequiredNpcOrGoCount'.$i] != 0)
 		{

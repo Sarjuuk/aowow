@@ -24,6 +24,7 @@
             </script>
     {else}
             <h1>{$lang.noResult} <i>{$search|escape:"html"}</i></h1>
+            <div class="search-noresults"/></div>
 
             {$lang.tryAgain}
     {/if}

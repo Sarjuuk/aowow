@@ -416,10 +416,9 @@ class Lang
 
     public static $search;
     public static $profiler;
-    public static $compare;
-    public static $talent;
 
     public static $achievement;
+    public static $class;
     public static $currency;
     public static $event;
     public static $item;
@@ -814,7 +813,7 @@ class SmartyAoWoW extends Smarty
 
             switch ($type)
             {
-                case TYPE_NPC:         (new CreatureList(array(['ct.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);   break;
+                case TYPE_NPC:         (new CreatureList(array(['ct.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;
                 case TYPE_OBJECT:      (new GameobjectList(array(['gt.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF); break;
                 case TYPE_ITEM:        (new ItemList(array(['i.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);        break;
                 case TYPE_QUEST:       (new QuestList(array(['qt.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;

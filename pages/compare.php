@@ -56,7 +56,7 @@ if ($compareString)
 
 // tabId 1: Tools g_initHeader()
 $smarty->updatePageVars(array(
-    'title'  => Lang::$compare['compare'],
+    'title'  => Lang::$main['compareTool'],
     'tab'    => 1,
     'reqCSS' => array(
         ['path' => 'template/css/Summary.css'],
@@ -71,7 +71,7 @@ $smarty->updatePageVars(array(
     ),
 ));
 $smarty->assign('lvData', $pageData);
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$compare));
+$smarty->assign('lang', Lang::$main);
 
 // load the page
 $smarty->display('compare.tpl');

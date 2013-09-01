@@ -84,7 +84,14 @@ $lang = array(
         ),
 
         // article & infobox
-        'englishOnly'   => "Эта страница доступна только на <b>английском</b> языке."
+        'englishOnly'   => "Эта страница доступна только на <b>английском</b> языке.",
+
+        // calculators
+        'compareTool'   => "Инструмент сравнения предметов",
+        'talentCalc'    => "Расчёт талантов",
+        'petCalc'       => "Расчёт умений питомцев",
+        'chooseClass'   => "Выберите класс",
+        'chooseFamily'  => "Выберите семейство питомцев"
     ),
     'search' => array(
         'search'        => "Поиск",
@@ -112,6 +119,8 @@ $lang = array(
         'eventShort'    => "Игровое событие",
         'event'         => "Событие",
         'events'        => "Игровые события",
+        'faction'       => "фракция",
+        'factions'      => "Фракции",
         'cooldown'      => "Восстановление: %s",
         'itemset'       => "комплект",
         'itemsets'      => "Комплекты",
@@ -121,7 +130,6 @@ $lang = array(
         'pets'          => "Питомцы охотников",
         'profile'       => "",
         'profiles'      => "Профили",
-        'petCalc'       => "Расчёт умений питомцев",
         'requires'      => "Требует %s",
         'requires2'     => "Требуется:",
         'reqLevel'      => "Требуется уровень: %s",
@@ -216,14 +224,9 @@ $lang = array(
         'titleReward'   => "Наградное звание: \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "убито",
     ),
-    'compare' => array(
-        'compare'       => "Инструмент сравнения предметов",
-    ),
-    'talent' => array(
-        'talentCalc'    => "Расчёт талантов",
-        'petCalc'       => "Расчёт умений питомцев",
-        'chooseClass'   => "Выберите класс",
-        'chooseFamily'  => "Выберите семейство питомцев",
+    'class' => array(
+        'racialLeader'  => "Лидер расы",
+        'startZone'     => "Начальная локация",
     ),
     'maps' => array(
         'maps'          => "Карты",
