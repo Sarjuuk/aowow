@@ -13,16 +13,16 @@
  *
  * @author Dmitry Koterov, http://forum.dklab.ru/users/DmitryKoterov/
  * @author Konstantin Zhinko, http://forum.dklab.ru/users/KonstantinGinkoTit/
- * 
- * @version 2.x $Id: Mysql.php 163 2007-01-10 09:47:49Z dk $
+ *
+ * @version 2.x $Id: Mysql.php 247 2008-08-18 21:17:08Z dk $
  */
-require_once dirname(__FILE__) . '/Generic.php';
+require_once dirname(__FILE__).'/Database.php';
 
 
 /**
  * Database class for MySQL.
  */
-class DbSimple_Mysql extends DbSimple_Generic_Database
+class DbSimple_Mysql extends DbSimple_Database
 {
     var $link;
 
@@ -32,58 +32,54 @@ class DbSimple_Mysql extends DbSimple_Generic_Database
      */
     function DbSimple_Mysql($dsn)
     {
-        $p = DbSimple_Generic::parseDSN($dsn);
-        if (!is_callable('mysql_connect')) {
-            return $this->_setLastError("-1", "MySQL extension is not loaded", "mysql_connect");
-        }
-        $ok = $this->link = @mysql_connect(
-            $p['host'] . (empty($p['port'])? "" : ":".$p['port']),
-            $p['user'],
-            $p['pass'],
+        $connect = 'mysql_'.((isset($dsn['persist']) && $dsn['persist'])?'p':'').'connect';
+        if (!is_callable($connect))
+            return $this->_setLastError("-1", "MySQL extension is not loaded", $connect);
+        $ok = $this->link = @call_user_func($connect,
+            $dsn['host'] . (empty($dsn['port'])? "" : ":".$dsn['port']),
+            empty($dsn['user'])?'':$dsn['user'],
+            empty($dsn['pass'])?'':$dsn['pass'],
             true
         );
         $this->_resetLastError();
-        if (!$ok) return $this->_setDbError('mysql_connect()');
-        $ok = @mysql_select_db(preg_replace('{^/}s', '', $p['path']), $this->link);
-        if (!$ok) return $this->_setDbError('mysql_select_db()');
+        if (!$ok)
+            if (!$ok) return $this->_setDbError('mysql_connect("' . $str . '", "' . $p['user'] . '")');
+        $ok = @mysql_select_db(preg_replace('{^/}s', '', $dsn['path']), $this->link);
+        if (!$ok)
+            return $this->_setDbError('mysql_select_db()');
+        mysql_query('SET NAMES '.(isset($dsn['enc'])?$dsn['enc']:'UTF8'));
     }
 
 
-    function _performEscape($s, $isIdent=false)
+    protected function _performEscape($s, $isIdent=false)
     {
-        if (!$isIdent) {
+        if (!$isIdent)
             return "'" . mysql_real_escape_string($s, $this->link) . "'";
-        } else {
+        else
             return "`" . str_replace('`', '``', $s) . "`";
-        }
     }
 
 
-    function _performTransaction($parameters=null)
+    protected function _performNewBlob($blobid=null)
     {
-        return $this->query('BEGIN');
+        return new DbSimple_Mysql_Blob($this, $blobid);
     }
 
 
-    function& _performNewBlob($blobid=null)
-    {
-        $obj =& new DbSimple_Mysql_Blob($this, $blobid);
-        return $obj;
-    }
-
-
-    function _performGetBlobFieldNames($result)
+    protected function _performGetBlobFieldNames($result)
     {
         $blobFields = array();
-        for ($i=mysql_num_fields($result)-1; $i>=0; $i--) {
-            $type = mysql_field_type($result, $i); 
-            if (strpos($type, "BLOB") !== false) $blobFields[] = mysql_field_name($result, $i);
+        for ($i=mysql_num_fields($result)-1; $i>=0; $i--)
+        {
+            $type = mysql_field_type($result, $i);
+            if (stripos($type, "BLOB") !== false)
+                $blobFields[] = mysql_field_name($result, $i);
         }
         return $blobFields;
     }
 
 
-    function _performGetPlaceholderIgnoreRe()
+    protected function _performGetPlaceholderIgnoreRe()
     {
         return '
             "   (?> [^"\\\\]+|\\\\"|\\\\)*    "   |
@@ -94,132 +90,117 @@ class DbSimple_Mysql extends DbSimple_Generic_Database
     }
 
 
-    function _performCommit()
+    protected function _performTransaction($parameters=null)
+    {
+        return $this->query('BEGIN');
+    }
+
+
+    protected function _performCommit()
     {
         return $this->query('COMMIT');
     }
 
 
-    function _performRollback()
+    protected function _performRollback()
     {
         return $this->query('ROLLBACK');
     }
 
 
-    function _performTransformQuery(&$queryMain, $how)
+    protected function _performTransformQuery(&$queryMain, $how)
     {
         // If we also need to calculate total number of found rows...
-        switch ($how) {
+        switch ($how)
+        {
             // Prepare total calculation (if possible)
             case 'CALC_TOTAL':
                 $m = null;
-                if (preg_match('/^(\s* SELECT)(.*)/six', $queryMain[0], $m)) {
-                    if ($this->_calcFoundRowsAvailable()) {
-                        $queryMain[0] = $m[1] . ' SQL_CALC_FOUND_ROWS' . $m[2];
-                    }
-                }
+                if (preg_match('/^(\s* SELECT)(.*)/six', $queryMain[0], $m))
+                    $queryMain[0] = $m[1] . ' SQL_CALC_FOUND_ROWS' . $m[2];
                 return true;
-        
+
             // Perform total calculation.
             case 'GET_TOTAL':
                 // Built-in calculation available?
-                if ($this->_calcFoundRowsAvailable()) {
-                    $queryMain = array('SELECT FOUND_ROWS()');
-                }
-                // Else use manual calculation.
-                // TODO: GROUP BY ... -> COUNT(DISTINCT ...)
-                $re = '/^
-                    (?> -- [^\r\n]* | \s+)*
-                    (\s* SELECT \s+)                                      #1     
-                    (.*?)                                                 #2
-                    (\s+ FROM \s+ .*?)                                    #3
-                        ((?:\s+ ORDER \s+ BY \s+ .*?)?)                   #4
-                        ((?:\s+ LIMIT \s+ \S+ \s* (?:, \s* \S+ \s*)? )?)  #5
-                $/six';
-                $m = null;
-                if (preg_match($re, $queryMain[0], $m)) {
-                    $query[0] = $m[1] . $this->_fieldList2Count($m[2]) . " AS C" . $m[3];
-                    $skipTail = substr_count($m[4] . $m[5], '?'); 
-                    if ($skipTail) array_splice($query, -$skipTail);
-                }
+                $queryMain = array('SELECT FOUND_ROWS()');
                 return true;
         }
-        
+
         return false;
     }
 
 
-    function _performQuery($queryMain)
+    protected function _performQuery($queryMain)
     {
         $this->_lastQuery = $queryMain;
         $this->_expandPlaceholders($queryMain, false);
-        $result = @mysql_query($queryMain[0], $this->link);
-        if ($result === false) return $this->_setDbError($queryMain[0]);
+        $result = mysql_query($queryMain[0], $this->link);
+        if ($result === false)
+            return $this->_setDbError($queryMain[0]);
         if (!is_resource($result)) {
-            if (preg_match('/^\s* INSERT \s+/six', $queryMain[0])) {
+            if (preg_match('/^\s* INSERT \s+/six', $queryMain[0]))
+            {
                 // INSERT queries return generated ID.
-                return @mysql_insert_id($this->link);
+                return mysql_insert_id($this->link);
             }
             // Non-SELECT queries return number of affected rows, SELECT - resource.
-            return @mysql_affected_rows($this->link);
+            return mysql_affected_rows($this->link);
         }
         return $result;
     }
 
-    
-    function _performFetch($result)
+
+    protected function _performFetch($result)
     {
-        $row = @mysql_fetch_assoc($result);
+        $row = mysql_fetch_assoc($result);
         if (mysql_error()) return $this->_setDbError($this->_lastQuery);
-        if ($row === false) return null;        
+        if ($row === false) return null;
         return $row;
     }
-    
-    
-    function _setDbError($query)
+
+
+    protected function _setDbError($query)
     {
-        return $this->_setLastError(mysql_errno($this->link), mysql_error($this->link), $query);
-    }
-    
-    
-    function _calcFoundRowsAvailable()
-    {
-        $ok = version_compare(mysql_get_server_info($this->link), '4.0') >= 0;
-        return $ok;
+    	if ($this->link) {
+	        return $this->_setLastError(mysql_errno($this->link), mysql_error($this->link), $query);
+	    } else {
+	        return $this->_setLastError(mysql_errno(), mysql_error(), $query);
+	    }
     }
 }
 
 
-class DbSimple_Mysql_Blob extends DbSimple_Generic_Blob
+class DbSimple_Mysql_Blob implements DbSimple_Blob
 {
-    // MySQL does not support separate BLOB fetching. 
-    var $blobdata = null;
-    var $curSeek = 0;
+    // MySQL does not support separate BLOB fetching.
+    private $blobdata = null;
+    private $curSeek = 0;
 
-    function DbSimple_Mysql_Blob(&$database, $blobdata=null)
+    public function __construct(&$database, $blobdata=null)
     {
         $this->blobdata = $blobdata;
         $this->curSeek = 0;
     }
 
-    function read($len)
+    public function read($len)
     {
         $p = $this->curSeek;
         $this->curSeek = min($this->curSeek + $len, strlen($this->blobdata));
-        return substr($this->blobdata, $this->curSeek, $len);
+        return substr($this->blobdata, $p, $len);
     }
 
-    function write($data)
+    public function write($data)
     {
         $this->blobdata .= $data;
     }
 
-    function close()
+    public function close()
     {
         return $this->blobdata;
     }
 
-    function length()
+    public function length()
     {
         return strlen($this->blobdata);
     }

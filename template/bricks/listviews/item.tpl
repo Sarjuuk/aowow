@@ -14,22 +14,13 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id' && $name != 'name' && $name != 'heroic' && $name != 'mincount' && $name != 'maxcount' && $name != 'group' && $name != 'groupcount' && $name != 'cost'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
                     name:'{$curr.name|escape:"quotes"}',
-                    {if isset($curr.level)}
-                        level:{$curr.level},
-                    {/if}
-                    {if isset($curr.reqlevel)}
-                        reqlevel:{$curr.reqlevel},
-                    {/if}
-                    classs:{$curr.classs},
-                    subclass:{$curr.subclass},
-                    side:{$curr.side},
-                    {if isset($curr.reqclass)}
-                        reqclass:{$curr.reqclass},
-                    {/if}
-                    {if isset($curr.reqrace)}
-                        reqrace:{$curr.reqrace},
-                    {/if}
+
                     {if isset($curr.heroic)}
                         heroic:1,
                     {/if}
@@ -37,12 +28,6 @@
                         {if $curr.maxcount > 1}
                             stack:[{$curr.mincount},{$curr.maxcount}],
                         {/if}
-                    {/if}
-                    {if isset($curr.percent)}
-                        percent:{$curr.percent},
-                    {/if}
-                    {if isset($curr.condition)}
-                        condition:{$curr.condition},
                     {/if}
                     {if isset($curr.group) and isset($curr.groupcount)}
                         group:'({$curr.group}){if $curr.groupcount!=1} x{$curr.groupcount}{/if}',
@@ -66,23 +51,6 @@
                                 {/if}
                             {/if}
                             ],
-                    {/if}
-                    {if isset($curr.displayid)}
-                        displayid:{$curr.displayid},
-                    {/if}
-                    {if isset($curr.nslots)}
-                        nslots:{$curr.nslots},
-                    {/if}
-                    {if isset($curr.dps)}
-                        dps:{$curr.dps},
-                        speed:{$curr.speed},
-                    {/if}
-                    {if isset($curr.armor)}
-                        armor:{$curr.armor},
-                    {/if}
-                    {if isset($curr.slot)}
-                        slot:{$curr.slot},
-                        slotbak:{$curr.slotbak},
                     {/if}
                     id:{$curr.id}
                 {rdelim}

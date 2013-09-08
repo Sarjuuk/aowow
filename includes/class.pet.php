@@ -7,9 +7,9 @@ class PetList extends BaseType
 {
     use ListviewHelper;
 
-    public    static $type = TYPE_PET;
+    public static $type      = TYPE_PET;
 
-    protected $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_pet WHERE [cond] ORDER BY Id ASC';
+    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_pet p';
 
     public function getListviewData()
     {

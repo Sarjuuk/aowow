@@ -5,9 +5,13 @@ if (!defined('AOWOW_REVISION'))
 
 class QuestList extends BaseType
 {
-    public static $type       = TYPE_QUEST;
+    public static   $type      = TYPE_QUEST;
 
-    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt LEFT JOIN locales_quest lq ON qt.Id = lq.entry WHERE [filter] [cond] ORDER BY Id ASC';
+    protected       $queryBase = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt';
+    protected       $queryOpts = array(
+                        'qt' => [['lq']],
+                        'lq' => ['j' => ['locales_quest lq ON qt.id = lq.entry', true]]
+                    );
 
     public function __construct($conditions = [])
     {

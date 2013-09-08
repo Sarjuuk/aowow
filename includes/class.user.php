@@ -50,7 +50,7 @@ class User
     {
         self::$id = $userId;
 
-        $ipBan = DB::Aowow()->SelectRow('SELECT count, unbanDate AS unbanDateIP FROM ?_account_bannedIPs WHERE ip = ?s AND type = 0',
+        $ipBan = DB::Aowow()->SelectRow('SELECT count, unbanDate AS unbanDateIP FROM ?_account_bannedIPs WHERE ip = ? AND type = 0',
             $_SERVER['REMOTE_ADDR']
         );
         // explicit " > "; incremented first, checked after
@@ -247,7 +247,7 @@ class User
     {
         self::$passHash = self::hashCrypt($pass);
 
-        DB::Aowow()->query('UPDATE ?_account SET passHash = ?s WHERE id = ?d',
+        DB::Aowow()->query('UPDATE ?_account SET passHash = ? WHERE id = ?d',
             self::$passHash,
             self::$id
         );

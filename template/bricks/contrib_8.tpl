@@ -35,9 +35,9 @@
 
             <form action="?screenshot=add&{$page.type}.{$page.typeId}" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
 
-            File: <input type="file" name="screenshotfile" style="width: 35%"/><br />
+            File{$lang.colon}<input type="file" name="screenshotfile" style="width: 35%"/><br />
             <div class="pad2"></div>
-            Caption: <input type="text" name="screenshotcaption" maxlength="200" /> <small>Optional, up to 200 characters</small><br />
+            Caption{$lang.colon}<input type="text" name="screenshotcaption" maxlength="200" /> <small>Optional, up to 200 characters</small><br />
             <div class="pad2"></div>
             <input type="submit" value="Submit" />
 
@@ -54,9 +54,9 @@
             <div class="pad2"></div>
             <form action="?video=add&{$page.type}.{$page.typeId}" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
 
-            URL: <input type="text" name="videourl" style="width: 35%" /> <small>Поддерживается: только YouTube</small>
+            URL{$lang.colon}<input type="text" name="videourl" style="width: 35%" /> <small>Поддерживается: только YouTube</small>
             <div class="pad2"></div>
-            Title: <input type="text" name="videotitle" maxlength="200" /> <small>Optional, up to 200 characters</small><br />
+            Title{$lang.colon}<input type="text" name="videotitle" maxlength="200" /> <small>Optional, up to 200 characters</small><br />
             <div class="pad"></div>
             <input type="submit" value="Submit" />
 

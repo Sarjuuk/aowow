@@ -15,15 +15,21 @@ error_reporting($e);
 define('STATIC_URL', substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));
 
 require 'includes/Smarty-2.6.26/libs/Smarty.class.php';     // Libraray: http://www.smarty.net/
-require 'includes/DbSimple/Generic.php';                    // Libraray: http://en.dklab.ru/lib/DbSimple
+// require 'includes/Smarty-3.1.14/libs/Smarty.class.php';     // Libraray: http://www.smarty.net/
+require 'includes/DbSimple/Generic.php';                    // Libraray: http://en.dklab.ru/lib/DbSimple (mysqli: https://bitbucket.org/brainreaver/dbsimple/src)
 require 'includes/utilities.php';
 require 'includes/class.user.php';
 require 'includes/class.database.php';
 
-// autoload any List-Classes
+// autoload List-Classes and Associated Filters
 spl_autoload_register(function ($class) {
-    if (strpos($class, 'List') && !strpos($class, 'Filter'))
+    if (strpos($class, 'List') && !class_exists($class))
+    {
+        if (!class_exists('BaseType'))
+            require 'includes/class.basetype.php';
+
         require 'includes/class.'.strtr($class, ['List' => '']).'.php';
+    }
 });
 
 // debug: measure execution times
@@ -82,5 +88,6 @@ User::assignUserToTemplate($smarty, true);
 @list($str, $trash) = explode('&', $_SERVER['QUERY_STRING'], 2);
 @list($pageCall, $pageParam) = explode('=', $str, 2);
 $smarty->assign('query', [$pageCall, $pageParam]);
+$smarty->assign('wowhead', 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/'.$str);
 
 ?>

@@ -76,15 +76,15 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $pieces  = [];
     $eqList  = [];
     $compare = [];
-    $iList   = new ItemList(array(['i.entry', array_keys($iSet->pieceToSet)]));
+    $iList   = new ItemList(array(['i.id', array_keys($iSet->pieceToSet)]));
     $data    = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
     foreach ($iList->iterate() as $itemId => $__)
     {
         if (empty($data[$itemId]))
             continue;
 
-        $slot = $iList->getField('InventoryType');
-        $disp = $iList->getField('displayid');
+        $slot = $iList->getField('slot');
+        $disp = $iList->getField('displayId');
         if ($slot && $disp)
             $eqList[] = [$slot, $disp];
 
@@ -93,8 +93,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $pieces[] = array(
             'id'      => $itemId,
             'name'    => $iList->getField('name', true),
-            'quality' => $iList->getField('Quality'),
-            'icon'    => $iList->getField('icon'),
+            'quality' => $iList->getField('quality'),
+            'icon'    => $iList->getField('iconString'),
             'json'    => json_encode($data[$itemId], JSON_NUMERIC_CHECK)
         );
     }
@@ -255,7 +255,7 @@ $smarty->updatePageVars(array(
     )
 ));
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEMSET, $_id));  // comments, screenshots, videos
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$itemset));
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$itemset, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);
 
 // load the page

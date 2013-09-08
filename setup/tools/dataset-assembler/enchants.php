@@ -142,28 +142,28 @@ if (!defined('AOWOW_REVISION'))
 
             // check if this item can be cast via item -> Source:Item
             if (!isset($castItems[$enchantSpells->id]))
-                $castItems[$enchantSpells->id] = new ItemList([['spellid_1', $enchantSpells->id], ['name', 'Scroll of Enchant%', '!']]);    // do not reuse enchantment scrolls
+                $castItems[$enchantSpells->id] = new ItemList([['spellId1', $enchantSpells->id], ['name', 'Scroll of Enchant%', '!']]);    // do not reuse enchantment scrolls
 
             $cI = &$castItems[$enchantSpells->id];          // this construct is a bit .. unwieldy
             foreach ($cI->iterate() as $__)
             {
                 $ench['name'][]   = $cI->getField('name', true);
                 $ench['source'][] = -$cI->id;
-                $ench['icon']     = strTolower($cI->getField('icon'));
+                $ench['icon']     = strTolower($cI->getField('iconString'));
                 $ench['slots'][]  = $slot;
 
-                if ($cI->getField('Quality') > $ench['quality'])
-                    $ench['quality'] = $cI->getField('Quality');
+                if ($cI->getField('quality') > $ench['quality'])
+                    $ench['quality'] = $cI->getField('quality');
 
-                if ($cI->getField('AllowableClass') > 0)
+                if ($cI->getField('requiredClass') > 0)
                 {
-                    $ench['classes'] = $cI->getField('AllowableClass');
-                    $ench['jsonequip']['classes'] = $cI->getField('AllowableClass');
+                    $ench['classes'] = $cI->getField('requiredClass');
+                    $ench['jsonequip']['classes'] = $cI->getField('requiredClass');
                 }
 
                 if (!isset($ench['jsonequip']['reqlevel']))
-                    if ($cI->getField('RequiredLevel') > 0)
-                        $ench['jsonequip']['reqlevel'] = $cI->getField('RequiredLevel');
+                    if ($cI->getField('requiredLevel') > 0)
+                        $ench['jsonequip']['reqlevel'] = $cI->getField('requiredLevel');
             }
 
             // enchant spell not in use

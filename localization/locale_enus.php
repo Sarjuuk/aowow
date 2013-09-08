@@ -7,6 +7,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+'help'      => "Help",
         'name'          => "Name",
         'link'          => "Link",
         'signIn'        => "Sign in",
@@ -77,6 +78,7 @@ $lang = array(
         'links'         => "Links",
         'compare'       => "Compare",
         'view3D'        => "View in 3D",
+'findUpgrades' => "Find upgrades...",
 
         // misc Tools
         'subscribe'     => "Subscribe",
@@ -90,6 +92,15 @@ $lang = array(
         'englishOnly'   => "This page is only available in <b>English</b>.",
 
         // calculators
+'preset'    => "Preset",
+'addWeight' => "Add another weight",
+'createWS'  => "Create a weight scale",
+'jcGemsOnly' => "Include <span%s>JC-only</span> gems",
+'cappedHint' => 'Tip: <a href="javascript:;" onclick="fi_presetDetails();">Remove</a> weights for capped statistics such as Hit rating.',
+'groupBy'   => "Group By",
+'gb'        => array(
+    ['None', 'none'],         ['Slot', 'slot'],       ['Level', 'level'],     ['Source', 'source']
+),
         'compareTool'   => "Item Comparison Tool",
         'talentCalc'    => "Talent Calculator",
         'petCalc'       => "Hunter Pet Calculator",
@@ -125,6 +136,8 @@ $lang = array(
         'faction'       => "faction",
         'factions'      => "Factions",
         'cooldown'      => "%s cooldown",
+'item'      => "item",
+'items'     => "Items",
         'itemset'       => "item Set",
         'itemsets'      => "Item Sets",
         'mechanic'      => "Mechanic",
@@ -164,7 +177,7 @@ $lang = array(
             11 => "Draconic",   12 => "Kalimag",        13 => "Gnomish",    14 => "Troll",          33 => "Gutterspeak",    35 => "Draenei",        36 => "Zombie",         37 => "Gnomish Binary",     38 => "Goblin Binary"
         ),
         'gl'            => array(null, "Major", "Minor"),
-        'si'            => array(-2 => "Horde only", -1 => "Alliance only", null, "Alliance", "Horde", "Both"),
+        'si'            => array(1 => "Alliance", -1 => "Alliance only", 2 => "Horde", -2 => "Horde only", 3 => "Both"),
         'resistances'   => array(null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'),
         'dt'            => array(null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"),
         'sc'            => array("Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"),
@@ -431,17 +444,16 @@ $lang = array(
         ),
         'armorSubClass' => array(
             "Miscellaneous",        "Cloth Armor",      "Leather Armor",        "Mail Armor",                   "Plate Armor",
-            null,                   "Shilds",           "Librams",              "Idols",                        "Totems",
+            null,                   "Shields",          "Librams",              "Idols",                        "Totems",
             "Sigils"
         ),
         'weaponSubClass' => array(
-            "One-Handed Axes",      "Two-Handed Axes",  "Bows",                 "Guns",                         "One-Handed Maces",
-            "Two-Handed Maces",     "Polearms",         "One-Handed Swords",    "Two-Handed Swords",            null,
-            "Staves",               null,               null,                   "Fist Weapons",                 "Miscellaneous",
-            "Daggers",              "Thrown",           null,                   "Crossbows",                    "Wands",
-            "Fishing Poles"
+            15 => "Daggers",                        13 => "Fist Weapons",                    0 => "One-Handed Axes",                 4 => "One-Handed Maces",                7 => "One-Handed Swords",
+             6 => "Polearms",                       10 => "Staves",                          1 => "Two-Handed Axes",                 5 => "Two-Handed Maces",                8 => "Two-Handed Swords",
+             2 => "Bows",                           18 => "Crossbows",                       3 => "Guns",                           16 => "Thrown",                         19 => "Wands",
+            10 => "Fishing Poles",                  14 => "Miscellaneous"
         ),
-        'subClassMasks'      => array(
+        'subClassMasks' => array(
             0x02A5F3 => 'Melee Weapon',                 0x0060 => 'Shield',                         0x04000C => 'Ranged Weapon',                0xA091 => 'One-Handed Melee Weapon'
         ),
         'traitShort'    => array(
@@ -478,6 +490,11 @@ $lang = array(
         'randEnchant'   => "&lt;Random enchantment&gt",
         'readClick'     => "&lt;Right Click To Read&gt",
         'set'           => "Set",
+'_reqLevel' => "Required level",    
+'slot'      => "Slot",
+'_quality'  => "Quality",
+'usableBy'  => "Usable by",
+'gems'      => "Gems",
         'socketBonus'   => "Socket Bonus",
         'socket'        => array(
             "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",            -1 => "Prismatic Socket"
@@ -496,20 +513,20 @@ $lang = array(
         ),
         "bagFamily"     => array(
             "Bag",                  "Quiver",           "Ammo Pouch",           "Soul Bag",                     "Leatherworking Bag",
-            "Inscription Bag",      "Herb Bag",         "Enchanting Bag",       "Engineering Bag",              "Key",
+            "Inscription Bag",      "Herb Bag",         "Enchanting Bag",       "Engineering Bag",              null, /*Key*/
             "Gem Bag",              "Mining Bag"
         ),
         'inventoryType' => array(
             null,                   "Head",             "Neck",                 "Shoulder",                     "Shirt",
             "Chest",                "Waist",            "Legs",                 "Feet",                         "Wrist",
-            "Hands",                "Finger",           "Trinket",              "One-Hand",                     "Off Hand",
+            "Hands",                "Finger",           "Trinket",              "One-Hand",                     "Off Hand", /*Shield*/
             "Ranged",               "Back",             "Two-Hand",             "Bag",                          "Tabard",
-            "Chest",                "Main Hand",        "Off Hand",             "Held In Off-Hand",             "Projectile",
-            "Thrown",               "Ranged",           "Quiver",               "Relic"
+            null, /*Robe*/          "Main Hand",        "Off Hand",             "Held In Off-Hand",             "Projectile",
+            "Thrown",               null, /*Ranged2*/   "Quiver",               "Relic"
         ),
         'armorSubClass' => array(
             "Miscellaneous",        "Cloth",            "Leather",              "Mail",                         "Plate",
-            null,                   "Shild",            "Libram",               "Idol",                         "Totem",
+            null,                   "Shield",           "Libram",               "Idol",                         "Totem",
             "Sigil"
         ),
         'weaponSubClass' => array(
@@ -522,7 +539,51 @@ $lang = array(
         'projectileSubClass' => array(
             null,                   null,               "Arrow",                "Bullet",                        null
         ),
-        'statType'  => array(
+'elixirType'    => [null, "Battle", "Guardian"],
+'cat'           => array(
+             2 => "Weapons",                                // self::$spell['weaponSubClass']
+             4 => array("Armor", array(
+                 1 => "Cloth Armor",                 2 => "Leather Armor",           3 => "Mail Armor",              4 => "Plate Armor",             6 => "Shields",                 7 => "Librams",
+                 8 => "Idols",                       9 => "Totems",                 10 => "Sigils",                 -6 => "Cloaks",                 -5 => "Off-hand Frills",        -8 => "Shirts",
+                -7 => "Tabards",                    -3 => "Amulets",                -2 => "Rings",                  -4 => "Trinkets",                0 => "Miscellaneous (Armor)",
+            )),
+             1 => array("Containers", array(
+                 0 => "Bags",                        3 => "Enchanting Bags",         4 => "Engineering Bags",        5 => "Gem Bags",                2 => "Herb Bags",               8 => "Inscription Bags",
+                 7 => "Leatherworking Bags",         6 => "Mining Bags",             1 => "Soul Bags"
+            )),
+             0 => array("Consumables", array(
+                 7 => "Bandages",                    0 => "Consumables",             2 => "Elixirs",                 3 => "Flasks",                  5 => "Food & Drinks",           6 => "Item Enhancements (Permanent)",
+                -3 => "Item Enhancements (Temporary)", 1 => "Potions",               4 => "Scrolls",                 8 => "Other (Consumables)"
+            )),
+            16 => array("Glyphs", array(
+                 1 => "Warrior Glyphs",              2 => "Paladin Glyphs",          3 => "Hunter Glyphs",           4 => "Rogue Glyphs",            5 => "Priest Glyphs",           6 => "Death Knight Glyphs",
+                 7 => "Shaman Glyphs",               8 => "Mage Glyphs",             9 => "Warlock Glyphs",         11 => "Druid Glyphs"
+            )),
+             7 => array("Trade Goods", array(
+                14 => "Armor Enchantments",          5 => "Cloth",                   3 => "Devices",                10 => "Elemental",              12 => "Enchanting",              2 => "Explosives",
+                 9 => "Herbs",                       4 => "Jewelcrafting",           6 => "Leather",                13 => "Materials",               8 => "Meat",                    7 => "Metal & Stone",
+                 1 => "Parts",                      15 => "Weapon Enchantments",    11 => "Other (Trade Goods)"
+             )),
+             6 => ["Projectiles", [                  2 => "Arrows",                  3 => "Bullets"     ]],
+            11 => ["Quivers",     [                  2 => "Quivers",                 3 => "Ammo Pouches"]],
+             9 => array("Recipes", array(
+                 0 => "Books",                       6 => "Alchemy Recipes",         4 => "Blacksmithing Plans",     5 => "Cooking Recipes",         8 => "Enchanting Formulae",     3 => "Engineering Schematics",
+                 7 => "First Aid Books",             9 => "Fishing Books",          11 => "Inscription Techniques", 10 => "Jewelcrafting Designs",   1 => "Leatherworking Patterns",12 => "Mining Guides",
+                 2 => "Tailoring Patterns"
+            )),
+             3 => array("Gems", array(
+                 6 => "Meta Gems",                   0 => "Red Gems",                1 => "Blue Gems",              2 => "Yellow Gems",             3 => "Purple Gems",             4 => "Green Gems",
+                 5 => "Orange Gems",                 8 => "Prismatic Gems",          7 => "Simple Gems"
+            )),
+            15 => array("Miscellaneous", array(
+                -2 => "Armor Tokens",                3 => "Holiday",                 0 => "Junk",                    1 => "Reagents",                5 => "Mounts",                 -7 => "Flying Mounts",
+                 2 => "Small Pets",                  4 => "Other (Miscellaneous)"
+            )),
+            10 => "Currency",
+            12 => "Quest",
+            13 => "Keys",
+        ),
+        'statType'      => array(
             "Increases your Mana by %d.",
             "Increases your Health by %d.",
             null,
@@ -572,7 +633,7 @@ $lang = array(
             "Unknown Bonus #%d (%d)",
         )
     ),
-    'colon'         => ': '
+    'colon'             => ': '
 );
 
 ?>

@@ -26,7 +26,7 @@ $smarty->updatePageVars(array(
     )
 ));
 $smarty->assign('tcType', $petCalc ? 'pc' : 'tc');
-$smarty->assign('lang', Lang::$main);
+$smarty->assign('lang', array_merge(Lang::$main, ['colon' => Lang::$colon]));
 
 // load the page
 $smarty->display('talent.tpl');

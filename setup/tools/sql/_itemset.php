@@ -12,6 +12,13 @@ if (!defined('AOWOW_REVISION'))
     and i have no idea how to merge the prefixes/suffixes for wotlk-raidsets and arena-sets in gereral onto the name.. at least not for all locales and i'll be damned if i have to skip one
 */
 
+/*
+    ALTER TABLE `aowow_itemset` ADD COLUMN `npieces`  tinyint(3) NOT NULL AFTER `bonusParsed`;
+    UPDATE `aowow_itemset`SET npieces = (
+        IF(item1 > 0, 1, 0) + IF(item2 > 0, 1, 0) + IF(item3 > 0, 1, 0) + IF(item4 > 0, 1, 0) + IF(item5 > 0, 1, 0) +
+        IF(item6 > 0, 1, 0) + IF(item7 > 0, 1, 0) + IF(item8 > 0, 1, 0) + IF(item9 > 0, 1, 0) + IF(item10 > 0, 1, 0)
+    );
+*/
 
 // script terminates self unexpectedly.. i don't know why..; split calls via ajax
 if (!isset($_GET['setId']))
@@ -159,7 +166,7 @@ $tagsById = array(
     12 => [621,624,625,626,631,632,633,638,639,640,645,648,651,654,655,663,664],                    // "Tier 4 Raid Set"
     13 => [622,627,628,629,634,635,636,641,642,643,646,649,652,656,657,665,666],                    // "Tier 5 Raid Set",
     14 => [620,623,630,637,644,647,650,653,658,659,660,661,662],                                    // "Dungeon Set 3",
-    15 => [467,468,469,470,471,472,473483,484,485,486,487,488, 908],                                // "Arathi Basin Set",
+    15 => [467,468,469,470,471,472,473,483,484,485,486,487,488, 908],                               // "Arathi Basin Set",
     16 => [587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607,608,609,610,688,689,691,692,693,694,695,696],                            // "Level 70 PvP Rare Set",
     18 => [668,669,670,671,672,673,674,675,676,677,678,679,680,681,682,683,684],                    // "Tier 6 Raid Set",
     21 => [738,739,740,741,742,743,744,745,746,747,748,749,750,751,752],                            // "Level 70 PvP Rare Set 2",

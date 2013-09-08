@@ -7,12 +7,13 @@ class AchievementList extends BaseType
 {
     use listviewHelper;
 
-    public static $type       = TYPE_ACHIEVEMENT;
+    public static $type      = TYPE_ACHIEVEMENT;
 
-    public        $criteria   = [];
-    public        $tooltip    = [];
+    public        $criteria  = [];
+    public        $tooltip   = [];
 
-    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_achievement WHERE [filter] [cond] GROUP BY Id ORDER BY `orderInGroup` ASC';
+    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_achievement a';
+    protected     $queryOpts = ['a' => ['o' => 'orderInGroup ASC']];
 
     public function __construct($conditions = [], $applyFilter = false)
     {
@@ -90,27 +91,6 @@ class AchievementList extends BaseType
                 $data[$this->id]['rewards'] = '['.implode(',', $rewards).']';
             else if (!empty($this->curTpl['reward']))
                 $data[$this->id]['reward'] = $this->getField('reward', true);
-        }
-
-        return $data;
-    }
-
-    // hmm, really needed? .. probably .. needs rename? .. also probably
-    public function getDetailedData()
-    {
-       $data = [];
-
-        foreach ($this->iterate() as $__)
-        {
-            $data[$this->id] = array(
-                'id'          => $this->id,
-                'name'        => $this->getField('name', true),
-                'description' => $this->getField('description', true),
-                'points'      => $this->curTpl['points'],
-                'iconname'    => $this->curTpl['iconString'],
-                'count'       => $this->curTpl['reqCriteriaCount'],
-                'reward'      => $this->getField('reward', true)
-            );
         }
 
         return $data;
@@ -239,6 +219,111 @@ class AchievementList extends BaseType
         }
 
         return $data;
+    }
+}
+
+
+class AchievementListFilter extends Filter
+{
+    // cr => [type, field, misc, extraCol]
+    protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
+         2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true      ], // givesreward
+         3 => [FILTER_CR_STRING,    'reward',      true      ], // rewardtext
+         7 => [FILTER_CR_BOOLEAN,   'series',                ], // givesreward
+         9 => [FILTER_CR_NUMERIC,   'id',          null, true], // prcntbasemanarequired
+        10 => [FILTER_CR_STRING,    'iconString',            ], // icon
+        18 => [FILTER_CR_STAFFFLAG, 'flags',                 ], // lastrank
+    );
+
+    protected function createSQLForCriterium(&$cr)
+    {
+        if (in_array($cr[0], array_keys($this->genericFilter)))
+        {
+            if ($genCR = $this->genericCriterion($cr))
+                return $genCR;
+
+            unset($cr);
+            $this->error = true;
+            return [1];
+        }
+
+        switch ($cr[0])
+        {
+            case 4:                                         // location [enum]
+/* todo */      return [1];                                 // no plausible locations parsed yet
+            case 5:                                         // first in series [yn]
+                return $this->int2Bool($cr[1]) ? ['AND', ['series', 0, '!'], [['series', 0xFFFF0000, '&'], 0]] : [['series', 0xFFFF0000, '&'], 0, '!'];
+            case 6:                                         // last in series [yn]
+                return $this->int2Bool($cr[1]) ? ['AND', ['series', 0, '!'], [['series', 0xFFFF, '&'], 0]] : [['series', 0xFFFF, '&'], 0, '!'];
+            case 11:                                        // Related Event [enum]
+/* todo */      return [1];                                 // >0:holidayId; -2323:any; -2324:none .. not quite like the subcategories
+            case 14:                                        // hascomments [yn]
+/* todo */      return [1];
+            case 15:                                        // hasscreenshots [yn]
+/* todo */      return [1];
+            case 16:                                        // hasvideos [yn]
+/* todo */      return [1];
+        }
+
+        unset($cr);
+        $this->error = 1;
+        return [1];
+    }
+
+    protected function createSQLForValues()
+    {
+        $parts = [];
+        $_v    = &$this->fiData['v'];
+
+        // name ex: +description, +rewards
+        if (isset($_v['na']))
+        {
+            if (isset($_v['ex']) && $_v['ex'] == 'on')
+                $parts[] = ['OR', ['name_loc'.User::$localeId, $_v['na']], ['description_loc'.User::$localeId, $_v['na']], ['reward_loc'.User::$localeId, $_v['na']]];
+            else
+                $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+        }
+
+        // points min
+        if (isset($_v['minpt']))
+        {
+            if ($this->isSaneNumeric($_v['minpt']))
+                $parts[] = ['points', $_v['minpt'],  '>='];
+            else
+                unset($_v['minpt']);
+        }
+
+        // points max
+        if (isset($_v['maxpt']))
+        {
+            if ($this->isSaneNumeric($_v['maxpt']))
+                $parts[] = ['points', $_v['maxpt'],  '<='];
+            else
+                unset($_v['maxpt']);
+        }
+
+        // faction (side)
+        if (isset($_v['si']))
+        {
+            switch ($_v['si'])
+            {
+                case 3:                                     // both
+                    $parts[] = ['faction', 0];
+                    break;
+                case -1:                                    // faction, exclusive both
+                case -2:
+                    $parts[] = ['faction', -$_v['si']];
+                    break;
+                case 1:                                     // faction, inclusive both
+                case 2:
+                    $parts[] = ['OR', ['faction', 0], ['faction', $_v['si']]];
+                    break;
+                default:
+                    unset($_v['si']);
+            }
+        }
+
+        return $parts;
     }
 }
 

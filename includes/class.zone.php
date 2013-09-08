@@ -11,9 +11,9 @@ if (!defined('AOWOW_REVISION'))
 
 class ZoneList extends BaseType
 {
-    public static $type       = TYPE_ZONE;
+    public static $type      = TYPE_ZONE;
 
-    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_zones z WHERE [cond] ORDER BY Id ASC';
+    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_zones z';
 
     public function getListviewData()
     {

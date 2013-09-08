@@ -28,3 +28,5 @@ RewriteEngine on
     RewriteRule     ^([a-z0-9\-]+)$                             ?$1       [NC]      # /items                 => ?items
     RewriteRule     ^([a-z0-9\-]+)=([^?&]*)$                    ?$1=$2    [NC]      # /items=4.1             => ?items=4.1
     RewriteRule     ^([a-z0-9\-]+)=([^?&]*)[&?](.*)$            ?$1=$2&$3 [NC]      # /items=4.1?filter=sl=7 => ?items=4.1&filter=sl=7
+
+

@@ -230,7 +230,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
             $pageData['page']['reagents'][] = array(
                 'name'    => $spell->relItems->getField('name', true),
-                'quality' => $spell->relItems->getField('Quality'),
+                'quality' => $spell->relItems->getField('quality'),
                 'entry'   => $itemId,
                 'count'   => $_[$itemId],
             );
@@ -270,9 +270,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $foo['icon'] = array(
                     'id'      => $spell->relItems->id,
                     'name'    => $spell->relItems->getField('name', true),
-                    'quality' => $spell->relItems->getField('Quality'),
+                    'quality' => $spell->relItems->getField('quality'),
                     'count'   => $effDS + $effBP,
-                    'icon'    => $spell->relItems->getField('icon')
+                    'icon'    => $spell->relItems->getField('iconString')
                 );
             }
 
@@ -744,12 +744,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // tab: used by - item
     $conditions = array(
-        'OR',                   // 6: learn spell
-        ['AND', ['spelltrigger_1', 6, '!'], ['spellid_1', $spell->id]],
-        ['AND', ['spelltrigger_2', 6, '!'], ['spellid_2', $spell->id]],
-        ['AND', ['spelltrigger_3', 6, '!'], ['spellid_3', $spell->id]],
-        ['AND', ['spelltrigger_4', 6, '!'], ['spellid_4', $spell->id]],
-        ['AND', ['spelltrigger_5', 6, '!'], ['spellid_5', $spell->id]]
+        'OR',                  // 6: learn spell
+        ['AND', ['spellTrigger1', 6, '!'], ['spellId1', $spell->id]],
+        ['AND', ['spellTrigger2', 6, '!'], ['spellId2', $spell->id]],
+        ['AND', ['spellTrigger3', 6, '!'], ['spellId3', $spell->id]],
+        ['AND', ['spellTrigger4', 6, '!'], ['spellId4', $spell->id]],
+        ['AND', ['spellTrigger5', 6, '!'], ['spellId5', $spell->id]]
     );
 
     $ubItems = new ItemList($conditions);
@@ -803,7 +803,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if ($ids)
         {
             // todo (high): generic loot-processing function
-            $slItems = new ItemList(array(['i.entry', $ids]));
+            $slItems = new ItemList(array(['i.id', $ids]));
             $slItems->addGlobalsToJscript($smarty);
             $lv += $slItems->getListviewData();
 
@@ -837,7 +837,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 {
                     $lv[$bar] = $foo[$bar];
                     $lv[$bar]['percent']   = $extraItem['additionalCreateChance'];
-                    $lv[$bar]['condition'] = json_encode(['type' => TYPE_SPELL, 'typeId' => $extraItem['requiredSpecialization'], 'status' => 2], JSON_NUMERIC_CHECK);
+                    $lv[$bar]['condition'] = ['type' => TYPE_SPELL, 'typeId' => $extraItem['requiredSpecialization'], 'status' => 2];
                     $smarty->extendGlobalIds(TYPE_SPELL, $extraItem['requiredSpecialization']);
 
                     $extraCols[] = 'Listview.extraCols.condition';
@@ -1012,7 +1012,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     /* source item
         first check source if not item :  break
 
-        spellid_1 = id OR spellid_1 = "LEAR_SPELL_GENERIC" AND spellid_2 = id
+        spellId1 = id OR spellId1 = "LEAR_SPELL_GENERIC" AND spellId2 = id
         spelltrigger_1/2 = 6
 
     */

@@ -12,6 +12,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+        'help'          => "Справка",
         'name'          => "Название",
         'link'          => "Ссылка",
         'signIn'        => "Войти",
@@ -74,6 +75,7 @@ $lang = array(
         'links'         => "Ссылки",
         'compare'       => "Сравнить",
         'view3D'        => "Посмотреть в 3D",
+        'findUpgrades'  => "Найти лучше...",
 
         // misc Tools
         'subscribe'     => "Подписаться",
@@ -87,6 +89,15 @@ $lang = array(
         'englishOnly'   => "Эта страница доступна только на <b>английском</b> языке.",
 
         // calculators
+        'preset'        => "Готовая таблица",
+        'addWeight'     => "Добавить фильтр значимости",
+        'createWS'      => "Отсортировать по значимости",
+        'jcGemsOnly'    => "Использовать <span%s>ювелирские</span>",
+        'cappedHint'    => 'Подсказка: <a href="javascript:;" onclick="fi_presetDetails();">Удалите</a> характеристики с капом (например, меткость).',
+        'groupBy'       => "Группировать",
+        'gb'            => array(
+            ['Нет', 'none'],         ['Слот', 'slot'],       ['Уровень', 'level'],     ['Источник', 'source']
+        ),
         'compareTool'   => "Инструмент сравнения предметов",
         'talentCalc'    => "Расчёт талантов",
         'petCalc'       => "Расчёт умений питомцев",
@@ -122,6 +133,8 @@ $lang = array(
         'faction'       => "фракция",
         'factions'      => "Фракции",
         'cooldown'      => "Восстановление: %s",
+        'item'          => "предмет",
+        'items'         => "Предметы",
         'itemset'       => "комплект",
         'itemsets'      => "Комплекты",
         'mechanic'      => "Механика",
@@ -436,6 +449,11 @@ $lang = array(
         'randEnchant'   => "&lt;Случайное зачарование&gt",
         'readClick'     => "&lt;Щелкните правой кнопкой мыши, чтобы прочитать.&gt",
         'set'           => "Набор",
+        '_reqLevel'     => "Требуется уровень",
+        'slot'          => "Слот",
+        '_quality'      => "Качество",
+        'usableBy'      => "Используется (кем)",
+        'gems'          => "Самоцветы",
         'socketBonus'   => "При соответствии цвета",
         'socket'        => array(
             "Особое гнездо",        "Красное гнездо",   "Желтое гнездо",        "Синее гнездо",           -1 => "Бесцветное гнездо"
@@ -480,6 +498,9 @@ $lang = array(
         'projectileSubClass' => array(
             null,                   null,               "Стрелы",               "Пули",                         null
         ),
+        'elixirType'    => [null, "Бой", "Охранный"],
+'cat'           => array(
+),
         'statType'  => array(
             "Увеличение запаса маны на %d ед.",
             "Увеличение максимального запаса здоровья на %d ед.",

@@ -170,7 +170,7 @@ var mn_items = [
         [3,"Ingenieurskunst",,,{tinyIcon:"trade_engineering"}],
         [7,"Erste Hilfe",,,{tinyIcon:"spell_holy_sealofsacrifice"}],
         [9,"Angeln",,,{tinyIcon:"trade_fishing"}],
-        [11,"Inscription",,,{tinyIcon:'inv_inscription_tradeskill01'}],
+        [11,"Inschriftenkunde",,,{tinyIcon:'inv_inscription_tradeskill01'}],
         [10,"Juwelenschleifen",,,{tinyIcon:"inv_misc_gem_01"}],
         [1,"Lederverarbeitung",,,{tinyIcon:"inv_misc_armorkit_17"}],
         [12,"Bergbau",,,{tinyIcon:'trade_mining'}],

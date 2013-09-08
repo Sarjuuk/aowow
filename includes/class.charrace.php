@@ -5,9 +5,9 @@ if (!defined('AOWOW_REVISION'))
 
 class CharRaceList extends BaseType
 {
-    public static $type       = TYPE_RACE;
+    public static $type      = TYPE_RACE;
 
-    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_races WHERE [cond] ORDER BY Id ASC';
+    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_races r';
 
     public function getListviewData()
     {

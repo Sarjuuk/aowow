@@ -6,9 +6,9 @@ if (!defined('AOWOW_REVISION'))
 
 class SkillList extends BaseType
 {
-    public static $type = TYPE_SKILL;
+    public static $type      = TYPE_SKILL;
 
-    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_skillLine sl WHERE [cond] ORDER BY id ASC';
+    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_skillLine sl';
 
     public function __construct($conditions = [])
     {

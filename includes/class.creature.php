@@ -8,11 +8,15 @@ class CreatureList extends BaseType
 {
     use spawnHelper;
 
-    public static $type       = TYPE_NPC;
+    public static   $type      = TYPE_NPC;
 
-    public        $tooltips   = [];
+    public          $tooltips  = [];
 
-    protected     $setupQuery = 'SELECT ct.*, ct.id AS ARRAY_KEY, ft.A, ft.H, ft.factionId FROM ?_creature ct LEFT JOIN ?_factiontemplate ft ON ft.id = ct.faction_A WHERE [filter] [cond]';
+    protected       $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
+    protected       $queryOpts = array(
+                        'ct' => [['ft']],
+                        'ft' => ['j' => '?_factiontemplate ft ON ft.id = ct.faction_A', 's' => ', ft.A, ft.H, ft.factionId']
+                    );
 
     public static function getName($id)
     {

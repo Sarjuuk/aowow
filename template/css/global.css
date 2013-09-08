@@ -615,6 +615,72 @@ span.breadcrumb-ellipsis {
     right: 2px;
 }
 
+/*************/
+/* INDICATOR */
+/*************/
+
+.indicator {
+    float: left;
+    display: block;
+    background-color: #141414;
+    border: 1px solid #101010;
+    padding: 6px 10px;
+    margin: 0 5px 10px 0;
+    white-space: nowrap;
+
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.indicator-x {
+    font-size: 11px;
+    padding: 10px;
+    margin-right: -10px;
+}
+
+.listview-band-top .indicator { /* Makes it less contrasty */
+    background-color: #181818;
+    border-color: #141414;
+}
+
+.indicator-mode {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.indicator-mode a {
+    color: #CCCCCC;
+}
+
+.indicator-mode a span {
+    text-decoration: underline;
+    color: #FFD100;
+}
+
+.indicator-mode a.selected span {
+    text-decoration: none;
+}
+
+.indicator:hover .indicator-mode a span,
+.indicator-mode a.selected,
+.indicator-mode a.selected span {
+    color: white;
+}
+
+.indicator-mode b { /* Placeholder text */
+    display: block;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    font-weight: bold;
+}
+
+/************/
+/* INFO BOX */
+/************/
+
 .infobox
 {
     float: right;
@@ -643,6 +709,11 @@ span.breadcrumb-ellipsis {
     font-weight: bold;
 }
 
+.infobox th small
+{
+    font-weight: normal;
+}
+
 .infobox th a
 {
     text-decoration: none;
@@ -665,10 +736,22 @@ span.breadcrumb-ellipsis {
 .infobox ul
 {
     margin: 0;
-    padding-left: 13px;
+    padding: 0;
 }
 
-#infobox-sticky img
+.infobox li
+{
+    list-style:none;
+    background: url(../images/ui/redbullet.png) no-repeat left 10px;
+    padding-left:10px;
+}
+
+.infobox li div
+{
+    color: white;
+}
+
+#infobox-sticky-ss img, #infobox-sticky-vi img
 {
     margin-bottom: 4px;
 }
@@ -690,6 +773,11 @@ span.breadcrumb-ellipsis {
     font-weight: normal;
     text-align: right;
     vertical-align: top;
+}
+
+.series td
+{
+    padding: 0;
 }
 
 .minibox
@@ -1096,52 +1184,52 @@ span.icontiny, a.tinyspecial
 
 .iconsmall-socket-meta var
 {
-    background-image: url(../../images/sockets/small/anim_meta.gif);
+    background-image: url(../../images/sockets/small/anim-meta.gif);
 }
 
 .iconsmall-socket-yellow var
 {
-    background-image: url(../../images/sockets/small/anim_yellow.gif);
+    background-image: url(../../images/sockets/small/anim-yellow.gif);
 }
 
 .iconsmall-socket-red var
 {
-    background-image: url(../../images/sockets/small/anim_red.gif);
+    background-image: url(../../images/sockets/small/anim-red.gif);
 }
 
 .iconsmall-socket-blue var
 {
-    background-image: url(../../images/sockets/small/anim_blue.gif);
+    background-image: url(../../images/sockets/small/anim-blue.gif);
 }
 
 .iconsmall-socket-prismatic var
 {
-    background-image: url(../../images/sockets/small/anim_prismatic.gif);
+    background-image: url(../../images/sockets/small/anim-prismatic.gif);
 }
 
 .iconmedium-socket-meta var
 {
-    background-image: url(../../images/sockets/medium/anim_meta.gif);
+    background-image: url(../../images/sockets/medium/anim-meta.gif);
 }
 
 .iconmedium-socket-yellow var
 {
-    background-image: url(../../images/sockets/medium/anim_yellow.gif);
+    background-image: url(../../images/sockets/medium/anim-yellow.gif);
 }
 
 .iconmedium-socket-red var
 {
-    background-image: url(../../images/sockets/medium/anim_red.gif);
+    background-image: url(../../images/sockets/medium/anim-red.gif);
 }
 
 .iconmedium-socket-blue var
 {
-    background-image: url(../../images/sockets/medium/anim_blue.gif);
+    background-image: url(../../images/sockets/medium/anim-blue.gif);
 }
 
 .iconmedium-socket-prismatic var
 {
-    background-image: url(../../images/sockets/medium/anim_prismatic.gif);
+    background-image: url(../../images/sockets/medium/anim-prismatic.gif);
 }
 
 .iconsmall del, .iconmedium del, .iconlarge del
@@ -1851,7 +1939,7 @@ a.star-icon-right span
 {
     /* Bottom bar */
     padding-left: 33px;
-    background: url(../images/listview-withselected.gif) 11px -35px no-repeat;
+    background: url(../images/Listview/withselected.gif) 11px -35px no-repeat;
 }
 
 .listview-nav
@@ -3129,7 +3217,7 @@ div.h1-icon
     padding-bottom: 4px;
 }
 
-#tw5ekjm9wex1
+#statweight-disclosure
 {
     padding: 10px;
     border: 1px solid #363636;
@@ -3137,7 +3225,7 @@ div.h1-icon
     float: left;
 }
 
-#lnewwegnwe53 div
+#statweight-help div
 {
     position: absolute;
     right: -9px;
@@ -3182,7 +3270,7 @@ a:hover, a.open, .infobox li div, .text b
     color: #E5CC80;
 }
 
-.text ul li, .infobox li, .comment-body ul li
+.text ul li, .comment-body ul li
 {
     color: #c3030b;
     list-style-type: square;
@@ -3206,7 +3294,7 @@ a:hover, a.open, .infobox li div, .text b
     top: -2323px;
 }
 
-#header, #sidebar, .rcorners, #lnewwegnwe53
+#header, #sidebar, .rcorners, #statweight-help
 {
     position: relative;
 }
@@ -3646,9 +3734,9 @@ div.announcement li {
 }
 
 .search-noresults {
-	background:url(../images/noresults.jpg) left no-repeat;
-	width:254px;
-	height:215px;
-	float:right;
-	margin-top:10px;
+    background:url(../images/noresults.jpg) left no-repeat;
+    width:254px;
+    height:215px;
+    float:right;
+    margin-top:10px;
 }

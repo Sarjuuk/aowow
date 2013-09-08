@@ -4,14 +4,12 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/class.filter.php';
-
 $filter     = [];
 $path       = [0, 2];
 $filterHash = !empty($_GET['filter']) ? sha1(serialize($_GET['filter'])) : -1;
 $cacheKey   = implode('_', [CACHETYPE_PAGE, TYPE_ITEMSET, -1, $filterHash, User::$localeId]);
 
-if (!$smarty->loadCache($cacheKey, $pageData))
+if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 {
     $itemsets = new ItemsetList([], true);                  // class selection is via filter, nothing applies here
 
@@ -23,9 +21,12 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $itemsets->addGlobalsToJscript($smarty);
 
     // recreate form selection
+    $filter = array_merge($itemsets->filterGetForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['setCr'] = $itemsets->filterGetSetCriteria();
-    $filter = array_merge($itemsets->filterGetForm(), $filter);
+    $filter['fi']    =  $itemsets->filterGetForm();
+
+    if (!empty($filter['fi']['extraCols']))
+        $pageData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
     if (isset($filter['cl']))
         $path[] = $filter['cl'];
@@ -40,7 +41,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     if ($itemsets->filterGetError())
         $pageData['params']['_errors'] = '$1';
 
-    $smarty->saveCache($cacheKey, $pageData);
+    $smarty->saveCache($cacheKey, $pageData, $filter);
 }
 
 
@@ -61,7 +62,7 @@ $smarty->updatePageVars(array(
     )
 ));
 $smarty->assign('filter', $filter);
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$itemset, Lang::$item));
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$itemset, Lang::$item, ['colon' => lang::$colon]));
 $smarty->assign('lvData', $pageData);
 
 // load the page

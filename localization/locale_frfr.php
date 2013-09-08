@@ -12,6 +12,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+        'help'          => "Aide",
         'name'          => "Nom",
         'link'          => "Lien",
         'signIn'        => "S'enregistrer",
@@ -74,6 +75,7 @@ $lang = array(
         'links'         => "Liens",
         'compare'       => "Comparer",
         'view3D'        => "Voir en 3D",
+        'findUpgrades'  => "Trouver des améliorations...",
 
         // misc Tools
         'subscribe'     => "S'abonner",
@@ -87,6 +89,15 @@ $lang = array(
         'englishOnly'   => "Cette page n'est disponible qu'en <b>anglais</b> pour le moment.",
 
         // calculators
+        'preset'        => "Prédéterminée",
+        'addWeight'     => "Ajouter un autre facteur",
+        'createWS'      => "Créer une échelle de valeurs",
+        'jcGemsOnly'    => "Inclure les gemmes de <span%s>joaillier</span>",
+        'cappedHint'    => 'Conseil: <a href="javascript:;" onclick="fi_presetDetails();">Enlever</a> un facteur pour les statistiques au maximum tel que le score de touche.',
+        'groupBy'       => "Groupé par",
+        'gb'            => array(
+            ['Aucun', 'none'],         ['Emplacement', 'slot'],       ['Niveau', 'level'],     ['Source', 'source']
+        ),
         'compareTool'   => "Outil de comparaison d'objets",
         'talentCalc'    => "Calculateur de Talents",
         'petCalc'       => "Calculateur de familiers",
@@ -122,6 +133,8 @@ $lang = array(
         'faction'       => "faction",
         'factions'      => "Factions",
         'cooldown'      => "%s de recharge",
+        'item'          => "objet",
+        'items'         => "Objets",
         'itemset'       => "ensemble d'objets",
         'itemsets'      => "Ensembles d'objets",
         'mechanic'      => "Mécanique",
@@ -436,6 +449,11 @@ $lang = array(
         'randEnchant'   => "&lt;Enchantement aléatoire&gt",
         'readClick'     => "&lt;Clique Droit pour Lire&gt",
         'set'           => "Set",
+        '_reqLevel'     => "Niveau requis",
+        'slot'          => "Emplacement",
+        '_quality'      => "Qualité",
+        'usableBy'      => "Utilisable par",
+        'gems'          => "Gemmes",
         'socketBonus'   => "Bonus de châsse",
         'socket'        => array(
             "Méta-châsse",          "Châsse rouge",     "Châsse jaune",         "Châsse bleue",           -1 => "Châsse prismatique"
@@ -480,6 +498,9 @@ $lang = array(
         'projectileSubClass' => array(
             null,                   null,               "Flèche",               "Balle",                         null
         ),
+        'elixirType'    => [null, "De bataille", "De gardien"],
+'cat'           => array(
+),
         'statType'  => array(
             "Augmente vos points de mana de %d.",
             "Augmente vos points de vie de %d.",

@@ -60,7 +60,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     $pageData['listviews'][] = array(
         'file'   => 'calendar',
-        'data'   => $events->getListviewData(),
+        'data'   => array_filter($events->getListviewData(), function($x) {return $x['id'] > 0;}),
         'params' => array(
             'tabs'      => '$myTabs',
             'hideCount' => 1

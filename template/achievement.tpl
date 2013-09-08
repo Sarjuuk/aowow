@@ -22,7 +22,7 @@
             <tr><th>{$lang.quickFacts}</th></tr>
             <tr><td><div class="infobox-spacer"></div>
                 <ul>
-                    {if $lvData.page.points}<li><div>{$lang.points}: <span class="moneyachievement tip" onmouseover="Listview.funcBox.moneyAchievementOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">{$lvData.page.points}</span></div></li>{/if}
+                    {if $lvData.page.points}<li><div>{$lang.points}{$lang.colon}<span class="moneyachievement tip" onmouseover="Listview.funcBox.moneyAchievementOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">{$lvData.page.points}</span></div></li>{/if}
 {foreach from=$lvData.infobox item=info}
                     <li><div>{$info}</div></li>
 {/foreach}
@@ -38,7 +38,7 @@
                         <tr>
                             <th>{$smarty.section.i.index+1}.</th>
                             <td>
-                                {if ($lvData.page.series[i].id == $lvData.page.id)}
+                                {if ($lvData.page.series[i].id == $page.typeId)}
                                     <b>{$lvData.page.series[i].name}</b>
                                 {else}
                                     <div><a href="?achievement={$lvData.page.series[i].id}">{$lvData.page.series[i].name}</a></div>
@@ -67,13 +67,13 @@
                     $WH.ge('h1-icon-generic').appendChild(Icon.create('{$lvData.page.iconname|escape:"javascript"}', 1));
                 //]]></script>
 
-                <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: 10, typeId: {$lvData.page.id}, linkColor: 'ffffff00', linkId: '{$lvData.page.id}:&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0', linkName: '{$lvData.page.name|escape:'javascript'}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
-                <a href="http://old.wowhead.com/?{$query[0]}={$query[1]}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
+                <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: {$page.type}, typeId: {$page.typeId}, linkColor: 'ffffff00', linkId: '{$page.typeId}:&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0', linkName: '{$lvData.page.name|escape:'javascript'}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
+                <a href="{$wowhead}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
                 <h1 class="h1-icon">{$lvData.page.name}</h1>
 
                 {$lvData.page.description}
 
-                {if !empty($lvData.page.criteria)}<h3>{$lang.criteria}{if $lvData.page.count} &ndash; <small><b>{$lang.requires} {$lvData.page.count} {$lang.outOf} {$lvData.page.total_criteria}</b></small>{/if}</h3>{/if}
+                {if !empty($lvData.page.criteria)}<h3>{$lang.criteria}{if $lvData.page.count} &ndash; <small><b>{$lang.requires} {$lvData.page.count} {$lang.outOf} {$lvData.page.nCriteria}</b></small>{/if}</h3>{/if}
 
                 <div style="float: left; margin-right: 25px">
                 <table class="iconlist">
@@ -107,15 +107,14 @@
                 </div>
 
                 <script type="text/javascript">//<![CDATA[
-{foreach from=$lvData.page.icons item=ic}
+{foreach from=$lvData.page.icons key=k item=ic}
                     $WH.ge('iconlist-icon{$ic.itr}').appendChild({$ic.type}.createIcon({$ic.id}, 0, {if isset($ic.count) && $ic.count > 0}{$ic.count}{else}0{/if}));
 {/foreach}
                 //]]></script>
 
                 <div style="clear: left"></div>
 
-            {* for items *}
-                {if $lvData.page.itemReward}
+                {if $lvData.page.itemReward}                {* for items *}
                     <h3>{$lang.rewards}</h3>
                     {$lang.itemReward}<table class="icontab">
                     <tr>
@@ -131,8 +130,7 @@
                     </table>
                 {/if}
 
-            {* for titles *}
-                {if $lvData.page.titleReward}
+                {if $lvData.page.titleReward}               {* for titles *}
                     <h3>{$lang.gains}</h3>
                     <ul>
 {foreach from=$lvData.page.titleReward item=i}
@@ -140,6 +138,14 @@
 {/foreach}
                     </ul>
                 {/if}
+                
+                {if !$lvData.page.titleReward && !$lvData.page.itemReward && $lvData.page.reward}
+                    <h3>{$lang.rewards}</h3>
+                    <ul>
+                        <li><div>{$lvData.page.reward}</div></li>
+                    </ul>
+                {/if}
+                
 
                 <h2>{$lang.related}</h2>
             </div>

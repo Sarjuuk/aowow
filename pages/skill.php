@@ -60,7 +60,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         // 2 recipe Items [items] (Books)
         $conditions = array(
-            ['RequiredSkill', $_id],
+            ['requiredSkill', $_id],
             ['class', ITEM_CLASS_RECIPE],
             0
         );
@@ -92,7 +92,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         if ($created)
         {
-            $created = new ItemList(array(['i.entry', $created], 0));
+            $created = new ItemList(array(['i.id', $created], 0));
             if (!$created->error)
             {
                 $created->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
@@ -112,7 +112,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         // 4a required by [item]
         $conditions = array(
-            ['RequiredSkill', $_id],
+            ['requiredSkill', $_id],
             ['class', ITEM_CLASS_RECIPE, '!'],
             0
         );

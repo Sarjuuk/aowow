@@ -87,16 +87,24 @@ define('LOCALE_DE',                         3);
 define('LOCALE_ES',                         6);
 define('LOCALE_RU',                         8);
 
+define('FILTER_CR_BOOLEAN',                 1);
+define('FILTER_CR_FLAG',                    2);
+define('FILTER_CR_NUMERIC',                 3);
+define('FILTER_CR_STRING',                  4);
+define('FILTER_CR_ENUM',                    5);
+define('FILTER_CR_STAFFFLAG',               6);
+
 // conditional information in template
 define('GLOBALINFO_SELF',                   0x1);           // id, name, icon
 define('GLOBALINFO_RELATED',                0x2);           // spells used by pet, classes/races required by spell, ect
 define('GLOBALINFO_REWARDS',                0x4);           // items rewarded by achievement/quest, ect
 define('GLOBALINFO_ANY',                    0xF);
 
-define('ITEMINFO_JSON',                     0x1);
-define('ITEMINFO_SUBITEMS',                 0x2);
-define('ITEMINFO_VENDOR',                   0x4);
-define('ITEMINFO_LOOT',                     0x8);
+define('ITEMINFO_JSON',                     0x01);
+define('ITEMINFO_SUBITEMS',                 0x02);
+define('ITEMINFO_VENDOR',                   0x04);
+define('ITEMINFO_LOOT',                     0x08);
+define('ITEMINFO_GEM',                      0x10);
 
 define('NPCINFO_TAMEABLE',                  0x1);
 define('NPCINFO_MODEL',                     0x2);
@@ -324,7 +332,7 @@ define('OBJECT_DESTRUCTIBLE_BUILDING',      33);
 define('OBJECT_GUILD_BANK',                 34);
 define('OBJECT_TRAPDOOR',                   35);
 
-// InventoryType
+// InventoryType [slot]
 define('INVTYPE_NON_EQUIP',                 0);
 define('INVTYPE_HEAD',                      1);
 define('INVTYPE_NECK',                      2);
@@ -373,13 +381,27 @@ define('ITEM_QUALITY_ARTIFACT',             6);             // LIGHT YELLOW
 define('ITEM_QUALITY_HEIRLOOM',             7);             // GOLD
 
 // ItemClass
+define('ITEM_CLASS_CONSUMABLE',             0);
+define('ITEM_CLASS_CONTAINER',              1);
 define('ITEM_CLASS_WEAPON',                 2);
+define('ITEM_CLASS_GEM',                    3);
 define('ITEM_CLASS_ARMOR',                  4);
+define('ITEM_CLASS_REAGENT',                5);
 define('ITEM_CLASS_AMMUNITION',             6);
+define('ITEM_CLASS_TRADEGOOD',              7);
+// define('ITEM_CLASS_GENERIC',             8);
 define('ITEM_CLASS_RECIPE',                 9);
+// define('ITEM_CLASS_MONEY',               10);
+define('ITEM_CLASS_QUIVER',                 11);
+define('ITEM_CLASS_QUEST',                  12);
+define('ITEM_CLASS_KEY',                    13);
+// define('ITEM_CLASS_PERMANENT',           14);
+define('ITEM_CLASS_MISC',                   15);
+define('ITEM_CLASS_GLYPH',                  16);
 
 // ItemFlags
 define('ITEM_FLAG_CONJURED',                0x0000002);
+define('ITEM_FLAG_OPENABLE',                0x0000004);
 define('ITEM_FLAG_HEROIC',                  0x0000008);
 define('ITEM_FLAG_DEPRECATED',              0x0000010);
 define('ITEM_FLAG_PARTYLOOT',               0x0000800);

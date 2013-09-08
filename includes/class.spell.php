@@ -34,7 +34,7 @@ class SpellList extends BaseType
     private       $interactive = false;
     private       $charLevel   = MAX_LEVEL;
 
-    protected     $setupQuery  = 'SELECT *, id AS ARRAY_KEY FROM ?_spell s WHERE [filter] [cond]';
+    protected     $queryBase   = 'SELECT *, id AS ARRAY_KEY FROM ?_spell s';
 
     public function __construct($conditions = [], $applyFilter = false)
     {
@@ -107,7 +107,7 @@ class SpellList extends BaseType
         }
 
         if ($foo)
-            $this->relItems = new ItemList(array(['i.entry', array_unique($foo)], 0));
+            $this->relItems = new ItemList(array(['i.id', array_unique($foo)], 0));
     }
 
     // use if you JUST need the name
@@ -1345,7 +1345,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
                 if ($cId = $this->curTpl['effect'.$i.'CreateItemId'])
                 {
-                    $createItem = (new ItemList(array(['i.entry', (int)$cId])))->renderTooltip([], true, true);
+                    $createItem = (new ItemList(array(['i.id', (int)$cId])))->renderTooltip([], true, true);
                     break;
                 }
             }
@@ -1622,15 +1622,18 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
             if ($invType = $this->getField('equippedItemInventoryTypeMask'))
             {
-                // remove some duplicated strings if both are used
-                if (($invType & 0x100020) == 0x100020)             // Chest and Robe set
-                    $invType &= ~0x20;
+                // remap some duplicated strings            'Off Hand' and 'Shield' are never used simultaneously
+                if ($invType & (1 << INVTYPE_ROBE))         // Robe => Chest
+                {
+                    $invType &= ~(1 << INVTYPE_ROBE);
+                    $invType &=  (1 << INVTYPE_CHEST);
+                }
 
-                if (($invType & 0x404000) == 0x404000)             // Off-hand and Shield set
-                    $invType &= ~0x4000;
-
-                if (($invType & 0x4008000) == 0x4008000)           // Ranged and Ranged (right) set
-                    $invType &= ~0x8000;
+                if ($invType & (1 << INVTYPE_RANGEDRIGHT))  // Ranged2 => Ranged
+                {
+                    $invType &= ~(1 << INVTYPE_RANGEDRIGHT);
+                    $invType &=  (1 << INVTYPE_RANGED);
+                }
 
                 $_ = [];
                 $strs = Lang::$item['inventoryType'];
@@ -1678,6 +1681,202 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                 )]);
             }
         }
+    }
+}
+
+
+class SpellListFilter extends Filter
+{
+    // sources in filter and general use different indizes
+    private $enums = array(
+        9 => array(
+            1  => true,                                     // Any
+            2  => false,                                    // None
+            3  =>  1,                                       // Crafted
+            4  =>  2,                                       // Drop
+            6  =>  4,                                       // Quest
+            7  =>  5,                                       // Vendor
+            8  =>  6,                                       // Trainer
+            9  =>  7,                                       // Discovery
+            10 =>  9                                        // Talent
+        )
+    );
+
+    // cr => [type, field, misc, extraCol]
+    protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
+         2 => [FILTER_CR_NUMERIC, 'powerCostPercent',                         ],    // prcntbasemanarequired
+         3 => [FILTER_CR_BOOLEAN, 'spellFocusObject'                          ],    // requiresnearbyobject
+         4 => [FILTER_CR_NUMERIC, 'trainingcost'                              ],    // trainingcost
+         5 => [FILTER_CR_BOOLEAN, 'reqSpellId'                                ],    // requiresprofspec
+        10 => [FILTER_CR_FLAG,    'cuFlags',          SPELL_CU_FIRST_RANK     ],    // firstrank
+        12 => [FILTER_CR_FLAG,    'cuFlags',          SPELL_CU_LAST_RANK      ],    // lastrank
+        13 => [FILTER_CR_NUMERIC, 'rankId',                                   ],    // rankno
+        14 => [FILTER_CR_NUMERIC, 'id',               null,               true],    // id
+        15 => [FILTER_CR_STRING,  'iconString',                               ],    // icon
+        19 => [FILTER_CR_FLAG,    'attributes0',      0x80000                 ],    // scaling
+        25 => [FILTER_CR_BOOLEAN, 'skillLevelYellow'                          ]     // rewardsskillups
+    );
+
+    protected function createSQLForCriterium(&$cr)
+    {
+        if (in_array($cr[0], array_keys($this->genericFilter)))
+        {
+            if ($genCR = $this->genericCriterion($cr))
+                return $genCR;
+
+            unset($cr);
+            $this->error = true;
+            return [1];
+        }
+
+        switch ($cr[0])
+        {
+            case 1:                                         // costAbs [op] [int]
+                if (!$this->isSaneNumeric($cr[2]))
+                    break;
+
+                if (!$this->int2Op($cr[1]))
+                    break;
+
+                return ['OR', ['AND', ['powerType', [1, 6]], ['powerCost', (10 * $cr[2]), $cr[1]]], ['AND', ['powerType', [1, 6], '!'], ['powerCost', $cr[2], $cr[1]]]];
+            case 9:                                         // Source [enum]
+                $_ = @$this->enums[$cr[0]][$cr[1]];
+                if ($_ !== null)
+                {
+                    if (is_bool($_))
+                        return ['source', 0, ($_ ? '!' : null)];
+                    else if (is_int($_))
+                        return ['source', $_.':'];
+                }
+                break;
+            case 20:                                        // has Reagents [yn]
+                if ($this->int2Bool($cr[1]))
+                {
+                    if ($cr[1])
+                        return ['OR', ['reagent1', 0, '>'], ['reagent2', 0, '>'], ['reagent3', 0, '>'], ['reagent4', 0, '>'], ['reagent5', 0, '>'], ['reagent6', 0, '>'], ['reagent7', 0, '>'], ['reagent8', 0, '>']];
+                    else
+                        return ['AND', ['reagent1', 0], ['reagent2', 0], ['reagent3', 0], ['reagent4', 0], ['reagent5', 0], ['reagent6', 0], ['reagent7', 0], ['reagent8', 0]];
+                }
+            case 11:                                        // hascomments [yn]
+/* todo */      return [1];
+            case 8:                                         // hasscreenshots [yn]
+/* todo */      return [1];
+            case 17:                                        // hasvideos [yn]
+/* todo */      return [1];
+        }
+
+        unset($cr);
+        $this->error = 1;
+        return [1];
+    }
+
+    protected function createSQLForValues()
+    {
+        $parts = [];
+        $_v    = &$this->fiData['v'];
+
+        //string (extended)
+        if (isset($_v['na']))
+        {
+            if (isset($_v['ex']) && $_v['ex'] == 'on')
+                $parts[] = ['OR', ['name_loc'.User::$localeId, $_v['na']], ['buff_loc'.User::$localeId, $_v['na']], ['description_loc'.User::$localeId, $_v['na']]];
+            else
+                $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+        }
+
+        // spellLevel min
+        if (isset($_v['minle']))
+        {
+            if (is_int($_v['minle']) && $_v['minle'] > 0)
+                $parts[] = ['spellLevel', $_v['minle'], '>='];
+            else
+                unset($_v['minle']);
+        }
+
+        // spellLevel max
+        if (isset($_v['maxle']))
+        {
+            if (is_int($_v['maxle']) && $_v['maxle'] > 0)
+                $parts[] = ['spellLevel', $_v['maxle'], '<='];
+            else
+                unset($_v['maxle']);
+        }
+
+        // skillLevel min
+        if (isset($_v['minrs']))
+        {
+            if (is_int($_v['minrs']) && $_v['minrs'] > 0)
+                $parts[] = ['learnedAt', $_v['minrs'], '>='];
+            else
+                unset($_v['minrs']);
+        }
+
+        // skillLevel max
+        if (isset($_v['maxrs']))
+        {
+            if (is_int($_v['maxrs']) && $_v['maxrs'] > 0)
+                $parts[] = ['learnedAt', $_v['maxrs'], '<='];
+            else
+                unset($_v['maxrs']);
+        }
+
+        // race
+        if (isset($_v['ra']))
+        {
+            if (in_array($_v['ra'], [1, 2, 3, 4, 5, 6, 7, 8, 10, 11]))
+                $parts[] = ['AND', [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'], ['reqRaceMask', $this->list2Mask($_v['ra']), '&']];
+            else
+                unset($_v['ra']);
+        }
+
+        // class [list]
+        if (isset($_v['cl']))
+        {
+            $_ = (array)$_v['cl'];
+            if (!array_diff($_, [1, 2, 3, 4, 5, 6, 7, 8, 9, 11]))
+                $parts[] = ['reqClassMask', $this->list2Mask($_), '&'];
+            else
+                unset($_v['cl']);
+        }
+
+        // school [list]
+        if (isset($_v['sc']))
+        {
+            $_ = (array)$_v['sc'];
+            if (!array_diff($_, [0, 1, 2, 3, 4, 5, 6]))
+                $parts[] = ['schoolMask', $this->list2Mask($_, true), '&'];
+            else
+                unset($_v['sc']);
+        }
+
+        // glyph type [list]                                wonky, admittedly, but consult SPELL_CU_* in defines and it makes sense
+        if (isset($_v['gl']))
+        {
+            if (in_array($_v['gl'], [1, 2]))
+                $parts[] = ['cuFlags', ($this->list2Mask($_v['gl']) << 6), '&'];
+            else
+                unset($_v['gl']);
+        }
+
+        // dispel type
+        if (isset($_v['dt']))
+        {
+            if (in_array($_v['dt'], [1, 2, 3, 4, 5, 6, 9]))
+                $parts[] = ['dispelType', $_v['dt']];
+            else
+                unset($_v['dt']);
+        }
+
+        // mechanic
+        if (isset($_v['me']))
+        {
+            if ($_v['me'] > 0 && $_v['me'] < 32)
+                $parts[] = ['OR', ['mechanic', $_v['me']], ['effect1Mechanic', $_v['me']], ['effect2Mechanic', $_v['me']], ['effect3Mechanic', $_v['me']]];
+            else
+                unset($_v['me']);
+        }
+
+        return $parts;
     }
 }
 

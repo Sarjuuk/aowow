@@ -12,21 +12,19 @@
     {/foreach}
 {/if}
 
-            <script type="text/javascript">
+            <script type="text/javascript">//<![CDATA[
 {include file='bricks/community.tpl'}
                 var g_pageInfo = {ldelim}type: {$page.type}, typeId: {$page.typeId}, name: '{$lvData.page.name|escape:"javascript"}'{rdelim};
                 g_initPath({$page.path});
-            </script>
+            //]]></script>
 
 {include file='bricks/infobox.tpl' info=$lvData.infobox}
 
-            </table>
-
-        <div class="text">
-            <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: 6, typeId: {$lvData.page.id}, linkColor: 'ff71d5ff', linkId: 'spell:{$lvData.page.id}', linkName: '{$lvData.page.name}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
-            <a href="javascript:;" id="view3D-button" class="button-red{if $lvData.view3D}" onclick="this.blur(); ModelViewer.show({ldelim} type: 1, displayId: {$lvData.view3D} {rdelim}){else} button-red-disabled{/if}"><em><b><i>View in 3D</i></b><span>View in 3D</span></em></a>
-            <a href="http://old.wowhead.com/?{$query[0]}={$query[1]}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
-            <h1>{$lvData.page.name}</h1>
+            <div class="text">
+                <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} {$page.type}, typeId: {$page.typeId}, linkColor: 'ff71d5ff', linkId: 'spell:{$page.typeId}', linkName: '{$lvData.page.name}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
+                <a href="javascript:;" id="view3D-button" class="button-red{if $lvData.view3D}" onclick="this.blur(); ModelViewer.show({ldelim} type: 1, displayId: {$lvData.view3D} {rdelim}){else} button-red-disabled{/if}"><em><b><i>View in 3D</i></b><span>View in 3D</span></em></a>
+                <a href="{$wowhead}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
+                <h1>{$lvData.page.name}</h1>
 
                 <div id="headicon-generic" style="float: left"></div>
                 <div id="tooltip{$lvData.page.id}-generic" class="tooltip" style="float: left; padding-top: 1px">

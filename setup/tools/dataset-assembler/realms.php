@@ -82,7 +82,7 @@ if (!defined('AOWOW_REVISION'))
         ]]
     ];
 
-    $rows = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ?s AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0', $AoWoWconf['battlegroup']);
+    $rows = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ? AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0', $AoWoWconf['battlegroup']);
     $str  = 'var g_realms = '.json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE).';';
 
     $handle = fOpen('datasets\\realms', "w");

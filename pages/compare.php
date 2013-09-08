@@ -35,7 +35,7 @@ if ($compareString)
     }
     $pageData['summary'] = json_encode($outSet, JSON_NUMERIC_CHECK);
 
-    $iList = new ItemList(array(['i.entry', $items]));
+    $iList = new ItemList(array(['i.id', $items]));
     $data  = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
 
     foreach ($iList->iterate() as $itemId => $__)
@@ -46,8 +46,8 @@ if ($compareString)
         $pageData['items'][] = [
             $itemId,
             Util::jsEscape($iList->getField('name', true)),
-            $iList->getField('Quality'),
-            $iList->getField('icon'),
+            $iList->getField('quality'),
+            $iList->getField('iconString'),
             json_encode($data[$itemId], JSON_NUMERIC_CHECK)
         ];
     }

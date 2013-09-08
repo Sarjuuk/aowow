@@ -12,6 +12,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+        'help'          => "Hilfe",
         'name'          => "Name",
         'link'          => "Link",
         'signIn'        => "Anmelden",
@@ -82,6 +83,7 @@ $lang = array(
         'links'         => "Links",
         'compare'       => "Vergleichen",
         'view3D'        => "3D-Ansicht",
+        'findUpgrades'  => "Bessere Gegenstände finden...",
 
         // miscTools
         'subscribe'     => "Abonnieren",
@@ -95,6 +97,15 @@ $lang = array(
         'englishOnly'   => "Diese Seite ist nur in <b>Englisch</b> verfügbar.",
 
         // calculators
+        'preset'        => "Vorlage",
+        'addWeight'     => "Weitere Gewichtung hinzufügen",
+        'createWS'      => "Gewichtungsverteilung erstellen",
+        'jcGemsOnly'    => "<span%s>JS-exklusive</span> Edelsteine einschließen",
+        'cappedHint'    => 'Tipp: <a href="javascript:;" onclick="fi_presetDetails();">Entfernt</a> Gewichtungen für gedeckte Werte wie Trefferwertung.',
+        'groupBy'       => "Ordnen nach",
+        'gb'            => array(
+            ['Nichts', 'none'],         ['Platz', 'slot'],      ['Stufe', 'level'],         ['Quelle', 'source']
+        ),
         'compareTool'   => "Gegenstandsvergleichswerkzeug",
         'talentCalc'    => "Talentrechner",
         'petCalc'       => "Begleiterrechner",
@@ -130,6 +141,8 @@ $lang = array(
         'faction'       => "Fraktion",
         'factions'      => "Fraktionen",
         'cooldown'      => "%s Abklingzeit",
+        'item'          => "Gegenstand",
+        'items'         => "Gegenstände",
         'itemset'       => "Ausrüstungsset",
         'itemsets'      => "Ausrüstungssets",
         'mechanic'      => "Auswirkung",
@@ -484,6 +497,11 @@ $lang = array(
         'randEnchant'   => "&lt;Zufällige Verzauberung&gt",
         'readClick'     => "&lt;Zum Lesen rechtsklicken&gt",
         'set'           => "Set",
+        '_reqLevel'     => "Mindeststufe",
+        'slot'          => "Platz",
+        '_quality'      => "Qualität",
+        'usableBy'      => "Benutzbar von",
+        'gems'          => "Edelsteine",
         'socketBonus'   => "Sockelbonus",
         'socket'        => array (
             "Metasockel",           "Roter Sockel",     "Gelber Sockel",        "Blauer Sockel",          -1 => "Prismatischer Sockel"
@@ -528,6 +546,10 @@ $lang = array(
         'projectileSubClass' => array(
             null,                   null,               "Pfeil",                "Kugel",                         null
         ),
+        'elixirType'    => [null, "Kampf", "Wächter"],
+'cat'           => array(
+    // locale_dede.js zerparsen..
+),
         'statType'  => array(
             "Erhöht Euer Mana um %d.",
             "Erhöht Eure Gesundheit um %d.",

@@ -12,6 +12,9 @@ if (!file_exists('config/config.php'))
 // include all necessities, set up basics
 require 'includes/kernel.php';
 
+if ($AoWoWconf['maintenance'] && !User::isInGroup(U_GROUP_EMPLOYEE))
+    $smarty->brb();
+
 switch ($pageCall)
 {
     /* called by user */

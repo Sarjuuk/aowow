@@ -7,11 +7,11 @@ class TitleList extends BaseType
 {
     use listviewHelper;
 
-    public static $type       = TYPE_TITLE;
+    public static $type      = TYPE_TITLE;
 
-    public        $sources    = [];
+    public        $sources   = [];
 
-    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_titles WHERE [cond] ORDER BY Id ASC';
+    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_titles t';
 
     public function __construct($conditions = [])
     {

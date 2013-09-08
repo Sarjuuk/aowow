@@ -19,11 +19,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $infobox = [];
 
     // level range
-    $infobox[] = '[li]'.Lang::$game['level'].Lang::$colon.$pet->getField('minLevel').' - '.$pet->getField('maxLevel').'[/li]';
+    $infobox[] = Lang::$game['level'].Lang::$colon.$pet->getField('minLevel').' - '.$pet->getField('maxLevel');
 
     // exotic
     if ($pet->getField('exotic'))
-        $infobox[] = '[li][url=?spell=53270]'.Lang::$pet['exotic'].'[/url][/li]';
+        $infobox[] = '[url=?spell=53270]'.Lang::$pet['exotic'].'[/url]';
 
     $pageData = array(
         'title'   => $pet->getField('name', true),

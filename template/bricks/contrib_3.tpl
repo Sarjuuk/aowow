@@ -36,9 +36,9 @@
 
             <form action="?screenshot=add&{$page.type}.{$page.typeId}" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
 
-            Datei: <input type="file" name="screenshotfile" style="width: 35%"/><br />
+            Datei{$lang.colon}<input type="file" name="screenshotfile" style="width: 35%"/><br />
             <div class="pad2"></div>
-            Titel: <input type="text" name="screenshotcaption" maxlength="200" /> <small>Optional, bis zu 200 Zeichen</small><br />
+            Titel{$lang.colon}<input type="text" name="screenshotcaption" maxlength="200" /> <small>Optional, bis zu 200 Zeichen</small><br />
             <div class="pad2"></div>
             <input type="submit" value="Senden" />
 
@@ -56,9 +56,9 @@
             <div class="pad2"></div>
             <form action="?video=add&{$page.type}.{$page.typeId}" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
 
-            URL: <input type="text" name="videourl" style="width: 35%" /> <small>Unterstützt: nur YouTube</small>
+            URL{$lang.colon}<input type="text" name="videourl" style="width: 35%" /> <small>Unterstützt: nur YouTube</small>
             <div class="pad2"></div>
-            Titel: <input type="text" name="videotitle" maxlength="200" /> <small>Optional, bis zu 200 Zeichen</small><br />
+            Titel{$lang.colon}<input type="text" name="videotitle" maxlength="200" /> <small>Optional, bis zu 200 Zeichen</small><br />
             <div class="pad"></div>
             <input type="submit" value="Senden" />
 
@@ -115,7 +115,7 @@
             <div class="pad2"></div>
             <form action="/video=add&amp;13.7" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
 
-            URL: <input type="text" name="videourl" style="width: 35%" /> <small>Unterstützt: nur YouTube</small>
+            URL{$lang.colon}<input type="text" name="videourl" style="width: 35%" /> <small>Unterstützt: nur YouTube</small>
             <div class="pad"></div>
             <input type="submit" value="Senden" />
 

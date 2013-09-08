@@ -157,9 +157,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $items = isset($mountVendors[$_id]) ? DB::Aowow()->selectCol('SELECT item FROM npc_vendor WHERE entry IN (?a)', $mountVendors[$_id]) : 0;
 
     $conditions = array(
-        ['i.entry', $items],
-        ['i.class', 15],                                    // misc
-        ['i.subclass', 5],                                  // mounts
+        ['i.id', $items],
+        ['i.class', ITEM_CLASS_MISC],
+        ['i.subClass', 5],                                  // mounts
     );
 
     $mounts = new ItemList($conditions);

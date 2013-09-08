@@ -39,22 +39,22 @@ function signin()
     $remember = $_POST['remember_me'] == 'yes';
 
     // handle login try limitation
-    $ipBan = DB::Aowow()->selectRow('SELECT ip, count, UNIX_TIMESTAMP(unbanDate) as unbanDate FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?s',
+    $ipBan = DB::Aowow()->selectRow('SELECT ip, count, UNIX_TIMESTAMP(unbanDate) as unbanDate FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?',
         $_SERVER['REMOTE_ADDR']
     );
 
     if (!$ipBan)                                        // no entry exists; set count to 1
-        DB::Aowow()->query('INSERT INTO ?_account_bannedIPs VALUES (?s, 0, 1, FROM_UNIXTIME(?))',
+        DB::Aowow()->query('INSERT INTO ?_account_bannedIPs VALUES (?, 0, 1, FROM_UNIXTIME(?))',
             $_SERVER['REMOTE_ADDR'],
             time() + $GLOBALS['AoWoWconf']['loginFailTime']
         );
     else if ($ipBan['unbanDate'] < time())              // ip has accumulated counts but time expired; reset count to 1
-        DB::Aowow()->query('INSERT IGNORE INTO ?_account_bannedIPs VALUES (?s, 0, 1, ?)',
+        DB::Aowow()->query('INSERT IGNORE INTO ?_account_bannedIPs VALUES (?, 0, 1, ?)',
             $_SERVER['REMOTE_ADDR'],
             time() + $GLOBALS['AoWoWconf']['loginFailTime']
         );
     else                                                // entry already exists; increment count
-        DB::Aowow()->query('UPDATE ?_account_bannedIPs SET count = count + 1, unbanDate = FROM_UNIXTIME(?) WHERE ip = ?s',
+        DB::Aowow()->query('UPDATE ?_account_bannedIPs SET count = count + 1, unbanDate = FROM_UNIXTIME(?) WHERE ip = ?',
             time() + $GLOBALS['AoWoWconf']['loginFailTime'],
             $_SERVER['REMOTE_ADDR']
         );
@@ -71,7 +71,7 @@ function signin()
     switch (User::Auth($password))
     {
         case AUTH_OK:
-            DB::Aowow()->query('DELETE FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?s',
+            DB::Aowow()->query('DELETE FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?',
                 $_SERVER['REMOTE_ADDR']
             );
             DB::Aowow()->query('UPDATE ?_account SET lastLogin = FROM_UNIXTIME(?), timeout = FROM_UNIXTIME(?) WHERE id = ?',
@@ -97,11 +97,13 @@ function signin()
 
 function signup()
 {
+    global $AoWoWconf, $smarty;
+
 /*
         $username = Get(GET_STRING, 'username', 'POST');
         $password = Get(GET_STRING, 'password', 'POST');
-        $pwd2 = Get(GET_STRING, 'password2', 'POST');
-        $email = Get(GET_STRING, 'email', 'POST');
+        $pwd2     = Get(GET_STRING, 'password2', 'POST');
+        $email    = Get(GET_STRING, 'email', 'POST');
         $remember = Get(GET_BOOL, 'remember_me', 'POST');
 
         if($password != $pwd2)
@@ -203,8 +205,9 @@ function signup()
             return;
         }
 */
+
     // Account creation
-    if ($_REQUEST['account'] == 'signup' && isset($_POST['username']) && isset($_POST['password']) && isset($_POST['c_password']) && $AoWoWconf['register'] == true)
+    if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['c_password']) && $AoWoWconf['register'] == true)
     {
         // password mismatch
         if ($_POST['password'] != $_POST['c_password'])
@@ -212,7 +215,7 @@ function signup()
         else
         {
             // AccName already in use
-            if ($rDB->selectCell('SELECT Count(id) FROM aowow_account WHERE username=? LIMIT 1', $_POST['username']) >= 1)
+            if (DB::Aowow()->selectCell('SELECT 1 FROM aowow_account WHERE user = ? LIMIT 1', $_POST['username']))
                 $smarty->assign('signup_error', Lang::$account['nameInUse']);
             else
             {
@@ -257,7 +260,7 @@ $smarty->updatePageVars(array(
     ),
 ));
 
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$account));
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$account, ['colon' => Lang::$colon]));
 
 if (User::$id)
 {
@@ -269,7 +272,7 @@ if (User::$id)
             $next = !empty($next[1]) ? '?'.$next[1] : '.';
             header('Location: '.$next);
         case 'weightscales':
-            $post = Util::sqlEscape($_POST);
+            $post = Util::sqlEscape($_POST, true);
 
             if (isset($post['save']))
             {
@@ -282,7 +285,7 @@ if (User::$id)
                         die('0');
                 }
 
-                if (DB::Aowow()->query('REPLACE INTO ?_account_weightscales VALUES (?d, ?d, ?s, ?s)', $post['id'], User::$id, $post['name'], $post['scale']))
+                if (DB::Aowow()->query('REPLACE INTO ?_account_weightscales VALUES (?d, ?d, ?, ?)', intVal($post['id']), User::$id, $post['name'], $post['scale']))
                     die((string)$post['id']);
                 else
                     die('0');

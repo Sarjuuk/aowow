@@ -104,9 +104,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // Items
     $conditions = array(
-        ['allowableClass', 0, '>'],
-        ['allowableClass', $_mask, '&'],
-        [['allowableClass', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!'],
+        ['requiredClass', 0, '>'],
+        ['requiredClass', $_mask, '&'],
+        [['requiredClass', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!'],
         ['itemset', 0],                                     // hmm, do or dont..?
         0
     );
@@ -114,7 +114,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $items = new ItemList($conditions);
     $items->addGlobalsToJscript($smarty);
 
-    if (!$items->hasDiffFields(['AllowableRace']))
+    if (!$items->hasDiffFields(['requiredRace']))
         $hidden = "$['side']";
 
     $pageData['relTabs'][] = array(
@@ -334,7 +334,7 @@ $smarty->updatePageVars(array(
     )
 ));
 $smarty->assign('community', CommunityContent::getAll(TYPE_CLASS, $_id));       // comments, screenshots, videos
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$talent));
+$smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);
 
 // load the page

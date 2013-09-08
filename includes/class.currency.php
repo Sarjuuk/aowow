@@ -5,9 +5,9 @@ if (!defined('AOWOW_REVISION'))
 
 class CurrencyList extends BaseType
 {
-    public static $type       = TYPE_CURRENCY;
+    public static $type      = TYPE_CURRENCY;
 
-    protected     $setupQuery = 'SELECT *, id AS ARRAY_KEY FROM ?_currencies WHERE [cond] ORDER BY Id ASC';
+    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_currencies c';
 
     public function getListviewData()
     {

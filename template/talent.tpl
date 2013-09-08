@@ -10,7 +10,7 @@
 {/if}
             <div id="{$tcType}-classes">
                 <div id="{$tcType}-classes-outer">
-                    <div id="{$tcType}-classes-inner"><p>{if $tcType == 'tc'}{$lang.chooseClass}{else}{$lang.chooseFamily}{/if}:</p></div>
+                    <div id="{$tcType}-classes-inner"><p>{if $tcType == 'tc'}{$lang.chooseClass}{else}{$lang.chooseFamily}{/if}{$lang.colon}</p></div>
                 </div>
             </div>
             <div id="{$tcType}-itself"></div>

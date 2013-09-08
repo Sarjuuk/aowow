@@ -60,5 +60,6 @@ $AoWoWconf['limit']              = 300;                             // Limit of 
 $AoWoWconf['debug']              = true;                            // Disable cache, show smarty console panel, enable sql-errors
 $AoWoWconf['map_grouping']       = 0;                               // Map object grouping factor. Meters = 10^param. 0:disabled; 1|2|3:enabled (1:recommended)
 $AoWoWconf['battlegroup']        = 'Pure Pwnage';                   // pretend, we belong to a battlegroup to satisfy profiler-related Jscripts; region can be determined from realmlist.timezone
+$AoWoWconf['maintainance']       = false;                           // brb gnomes say hi
 
 ?>

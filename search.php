@@ -37,7 +37,7 @@ if (!defined('AOWOW_REVISION'))
         16: Listview - template: 'quest',       id: 'quests',        name: LANG.tab_quests,
         17: Listview - template: 'achievement', id: 'achievements',  name: LANG.tab_achievements,
         18: Listview - template: 'achievement', id: 'statistics',    name: LANG.tab_statistics,
-todo    19: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
+        19: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
 todo    20: Listview - template: 'object',      id: 'objects',       name: LANG.tab_objects,
 todo    21: Listview - template: 'faction',     id: 'factions',      name: LANG.tab_factions,
         22: Listview - template: 'skill',       id: 'skills',        name: LANG.tab_skills,
@@ -331,18 +331,18 @@ if ($searchMask & 0x40)
 
     if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
     {
-        $conditions = [['i.entry', array_keys($found['itemset']['pcsToSet'])], 0];
+        $conditions = [['i.id', array_keys($found['itemset']['pcsToSet'])], 0];
         $miscData   = ['pcsToSet' => @$found['itemset']['pcsToSet']];
     }
     else if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEM)
     {
-        $conditions = [['i.class', [2, 4]], [User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], $AoWoWconf['sqlLimit']];
+        $conditions = [['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], ['name_loc'.User::$localeId, $query], $AoWoWconf['sqlLimit']];
         $miscData   = ['wt' => $_wt, 'wtv' => $_wtv];
     }
     else
-        $conditions = [[User::$localeId ? 'name_loc'.User::$localeId : 'name', $query], $maxResults];
+        $conditions = [['name_loc'.User::$localeId, $query], $maxResults];
 
-    $items = new ItemList($conditions, $miscData);
+    $items = new ItemList($conditions, false, $miscData);
 
     if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
     {
@@ -350,8 +350,8 @@ if ($searchMask & 0x40)
 
         foreach ($items->iterate() as $__)
         {
-            $data[$items->id]['param1'] = '"'.$items->getField('icon').'"';
-            $data[$items->id]['param2'] = $items->getField('Quality');
+            $data[$items->id]['param1'] = '"'.$items->getField('iconString').'"';
+            $data[$items->id]['param2'] = $items->getField('quality');
 
             if ($searchMask & SEARCH_TYPE_OPEN)
                 $data[$items->id]['name'] = substr($data[$items->id]['name'], 1);
@@ -815,7 +815,37 @@ if ($searchMask & 0x20000)
 }
 
 // 19 Zones
-// if ($searchMask & 0x40000)
+if ($searchMask & 0x40000)
+{
+    $conditions = array(
+        ['name_loc'.User::$localeId, $query],
+        $maxResults
+    );
+
+    $zones = new ZoneList($conditions);
+
+    if ($data = $zones->getListviewData())
+    {
+        $zones->addGlobalsToJScript($smarty);
+
+        $found['zone'] = array(
+            'type'     => TYPE_ZONE,
+            'appendix' => ' (Zone)',
+            'matches'  => $zones->getMatches(),
+            'file'     => 'zone',
+            'data'     => $data,
+            'params'   => [
+                'tabs'        => '$myTabs',
+            ]
+        );
+
+        if ($zones->getMatches() > $maxResults)
+        {
+            $found['zone']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_zonesfound', $zones->getMatches(), $maxResults);
+            $found['zone']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 20 Objects
 // if ($searchMask & 0x80000)

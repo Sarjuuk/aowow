@@ -5,9 +5,10 @@ if (!defined('AOWOW_REVISION'))
 
 class WorldEventList extends BaseType
 {
-    public static  $type         = TYPE_WORLDEVENT;
+    public static $type      = TYPE_WORLDEVENT;
 
-    protected      $setupQuery   = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id WHERE [cond] ORDER BY -e.id ASC';
+    protected     $queryBase = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id';
+    protected     $queryOpts = ['e' => ['o' => '-e.id ASC']];
 
     public function __construct($conditions = [])
     {

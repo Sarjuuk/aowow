@@ -15,9 +15,9 @@ var wt_presets = {
     },
     3: {
         pve: {
-            beast: {__icon:'ability_hunter_bestialdiscipline',rgddps:213,hitrtng:100,agi:58,critstrkrtng:40,int:37,atkpwr:30,armorpenrtng:28,hastertng:21},
+            beast: {__icon:'ability_hunter_beasttaming',rgddps:213,hitrtng:100,agi:58,critstrkrtng:40,int:37,atkpwr:30,armorpenrtng:28,hastertng:21},
             marks: {__icon:'ability_hunter_focusedaim',rgddps:379,hitrtng:100,agi:74,critstrkrtng:57,armorpenrtng:40,int:39,atkpwr:32,hastertng:24},
-            surv: {__icon:'ability_hunter_camouflage',rgddps:181,hitrtng:100,agi:76,critstrkrtng:42,int:35,hastertng:31,atkpwr:29,armorpenrtng:26}
+            surv: {__icon:'inv_spear_02',rgddps:181,hitrtng:100,agi:76,critstrkrtng:42,int:35,hastertng:31,atkpwr:29,armorpenrtng:26}
         }
     },
     4: {

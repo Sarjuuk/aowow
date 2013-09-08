@@ -7207,6 +7207,10 @@ Listview.templates = {
                 span: 2,
                 value: 'name',
                 compute: function(item, td, tr) {
+                    if (item.upgraded) {
+                        tr.className = 'upgraded';
+                    }
+
                     var i = $WH.ce('td');
                     i.style.width = '1px';
                     i.style.padding = '0';
@@ -7727,7 +7731,7 @@ Listview.templates = {
             for (var i = 0, len = this.data.length; i < len; ++i) {
                 var item = this.data[i];
 
-                if ((item.slot > 0 && item.slot != 18) || ($WH.in_array(ModelViewer.validSlots, item.slotbak) >= 0 && item.displayid > 0) || item.modelviewer) { // Equippable, and not a bag, or has a model
+                if ((item.slot > 0 && item.slot != 18) || (item.classs == 3 && item.subclass != 7) || ($WH.in_array(ModelViewer.validSlots, item.slotbak) >= 0 && item.displayid > 0) || item.modelviewer) { // Equippable, and not a bag, or has a model
                     ++nComparable;
                 }
                 else {
@@ -7736,13 +7740,17 @@ Listview.templates = {
             }
 
             if (nComparable > 0) {
-                this.mode = 1;
+                this.mode = Listview.MODE_CHECKBOX;
                 this._nComparable = nComparable;
             }
         },
 
         createCbControls: function(div, topBar) {
             if (!topBar && this._nComparable < 15) {
+                return;
+            }
+            
+            if (this.mode != Listview.MODE_CHECKBOX) {
                 return;
             }
 
@@ -17447,8 +17455,8 @@ $WH.cO(g_holidays, {
 });
 
 function g_getIngameLink(color, id, name) {
-    // prompt(LANG.prompt_ingamelink, '/script DEFAULT_CHAT_FRAME:AddMessa$WH.ge("\\124c' + a + "\\124H" + c + "\\124h[" + b + ']\\124h\\124r");')
-    return '/script DEFAULT_CHAT_FRAME:AddMessa$WH.ge("\\124c' + color + '\\124H' + id + '\\124h[' + name + ']\\124h\\124r");';
+    // prompt(LANG.prompt_ingamelink, '/script DEFAULT_CHAT_FRAME:AddMessage("\\124c' + a + "\\124H" + c + "\\124h[" + b + ']\\124h\\124r");')
+    return '/script DEFAULT_CHAT_FRAME:AddMessage("\\124c' + color + '\\124H' + id + '\\124h[' + name + ']\\124h\\124r");';
 }
 
 /*

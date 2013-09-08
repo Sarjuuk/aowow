@@ -92,7 +92,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'path'    => $tmpPath,
         'infobox' => array_merge($infobox, Lang::getInfoBoxForFlags($acv->getField('cuFlags'))),
         'relTabs' => [],
-        'page'    => $acv->getDetailedData()[$_id]
+        'page'    => array(
+            'name'        => $acv->getField('name', true),
+            'description' => $acv->getField('description', true),
+            'points'      => $acv->getField('points'),
+            'iconname'    => $acv->getField('iconString'),
+            'count'       => $acv->getField('reqCriteriaCount'),
+            'reward'      => $acv->getField('reward', true),
+            'nCriteria'   => count($acv->getCriteria()),
+            'titleReward' => [],
+            'itemReward'  => [],
+            'criteria'    => [],
+            'icons'       => []
+        )
     );
 
     // listview: "see also"
@@ -137,17 +149,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     // create rewards
-    $pageData['page']['titleReward'] = [];
-    $pageData['page']['itemReward']  = [];
-
     if ($foo = $acv->getField('rewards')[TYPE_ITEM])
     {
-        $bar = new ItemList(array(['i.entry', $foo]));
+        $bar = new ItemList(array(['i.id', $foo]));
         foreach ($bar->iterate() as $__)
         {
             $pageData['page']['itemReward'][$bar->id] = array(
                 'name'    => $bar->getField('name', true),
-                'quality' => $bar->getField('Quality')
+                'quality' => $bar->getField('quality')
             );
         }
     }
@@ -163,14 +172,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // ACHIEVEMENT CRITERIA
     // *****
 
-    $pageData['page']['criteria'] = [];
-    $iconId = 1;
-    $tmp_arr = [];
-    $pageData['page']['icons'] = [];
-    $pageData['page']['total_criteria'] = count($acv->getCriteria());
+    $iconId   = 1;
+    $rightCol = [];
 
-    $i = 0;                                             // stupid uninitialized iterator.....
-    foreach ($acv->getCriteria() as $crt)
+    foreach ($acv->getCriteria() as $i => $crt)
     {
         // hide hidden criteria for regular users (really do..?)
         // if (($crt['complete_flags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::$perms > 0)
@@ -296,12 +301,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
-                $crtItm = new ItemList(array(['id', $obj]));
+                $crtItm = new ItemList(array(['i.id', $obj]));
                 $text = $crtName ? $crtName : $crtItm->getField('name', true);
                 $tmp['link'] = array(
                     'href'    => '?item='.$obj,
                     'text'    => $text,
-                    'quality' => $crtItm->getField('Quality'),
+                    'quality' => $crtItm->getField('quality'),
                     'count'   => $qty,
                 );
                 $crtItm->addGlobalsToJscript($smarty);
@@ -337,15 +342,15 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 break;
         }
         // If the right column
-        if ($i++ % 2)
-            $tmp_arr[] = $tmp;
-        else
+        if ($i % 2)
             $pageData['page']['criteria'][] = $tmp;
-
+        else
+            $rightCol[] = $tmp;
     }
+
     // If you found the second column - merge data from it to the end of the main body
-    if ($tmp_arr)
-        $pageData['page']['criteria'] = array_merge($pageData['page']['criteria'], $tmp_arr);
+    if ($rightCol)
+        $pageData['page']['criteria'] = array_merge($pageData['page']['criteria'], $rightCol);
 
     // *****
     // ACHIEVEMENT CHAIN
@@ -403,7 +408,7 @@ $smarty->updatePageVars(array(
     'typeId' => $_id
 ));
 $smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $_id));         // comments, screenshots, videos
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);
 
 // load the page

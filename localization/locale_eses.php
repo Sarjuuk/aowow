@@ -12,6 +12,7 @@ if (!defined('AOWOW_REVISION'))
 $lang = array(
     // page variables
     'main' => array(
+        'help'          => "Ayuda",
         'name'          => "Nombre",
         'link'          => "Enlace",
         'signIn'        => "Iniciar sesión",
@@ -74,6 +75,7 @@ $lang = array(
         'links'         => "Enlaces",
         'compare'       => "Comparar",
         'view3D'        => "Ver en 3D",
+        'findUpgrades'  => "Buscar mejoras...",
 
         // misc Tools
         'subscribe'     => "Suscribirme",
@@ -87,6 +89,15 @@ $lang = array(
         'englishOnly'   => "Esta página sólo está disponible en <b>inglés</b>.",
 
         // calculators
+        'preset'        => "Predet.",
+        'addWeight'     => "Añadir otro factor",
+        'createWS'      => "Crear escala de valores",
+        'jcGemsOnly'    => "Incluir solo <span%s>gemas de joyería</span>",
+        'cappedHint'    => 'Consejo: <a href="javascript:;" onclick="fi_presetDetails();">Elimina</a> escalas para atributos al máximo como el Índice de Golpe.',
+        'groupBy'       => "Agrupar por",
+        'gb'            => array(
+            ['Ninguno', 'none'],         ['Casilla', 'slot'],       ['Nivel', 'level'],     ['Fuente', 'source']
+        ),
         'compareTool'   => "Herramienta de comparación de objetos",
         'talentCalc'    => "Calculadora de talentos",
         'petCalc'       => "Calculadora de mascotas",
@@ -122,6 +133,8 @@ $lang = array(
         'faction'       => "facción",
         'factions'      => "Facciones",
         'cooldown'      => "%s de reutilización",
+        'item'          => "objeto",
+        'items'         => "Objetos",
         'itemset'       => "conjunto de objetos",
         'itemsets'      => "Conjuntos de objetos",
         'mechanic'      => "Mecanica",
@@ -437,6 +450,11 @@ $lang = array(
         'randEnchant'   => "&lt;Encantamiento aleatorio&gt",
         'readClick'     => "&lt;Click derecho para leer&gt",
         'set'           => "Conjunto",
+        '_reqLevel'     => "Nivel requerido",
+        'slot'          => "Casilla",
+        '_quality'      => "Calidad",
+        'usableBy'      => "Usable por",
+        'gems'          => "Gemas",
         'socketBonus'   => "Bono de ranura",
         'socket'        => array(
             "Ranura meta",          "Ranura roja",      "Ranura amarilla",          "Ranura azul",            -1 => "Ranura prismática  "
@@ -481,6 +499,9 @@ $lang = array(
         'projectileSubClass' => array(
             null,                   null,               "Flecha",                   "Bala",                         null
         ),
+        'elixirType'    => [null, "Batalla", "Guardián"],
+'cat'           => array(
+),
         'statType'  => array(
             "Aumenta tu maná %d p.",
             "Aumenta tu salud %d p.",

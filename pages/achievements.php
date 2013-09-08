@@ -4,8 +4,6 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/class.filter.php';
-
 $cats       = Util::extractURLParams($pageParam);
 $path       = [0, 9];
 $title      = [];
@@ -56,9 +54,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     }
 
     // recreate form selection
+    $filter = array_merge($acvList->filterGetForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['setCr'] = $acvList->filterGetSetCriteria();
-    $filter = array_merge($acvList->filterGetForm(), $filter);
+    $filter['fi']    =  $acvList->filterGetForm();
 
     // create page title and path
     if (is_array($cats))
@@ -87,6 +85,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     // if we are have different cats display field
     if ($acvList->hasDiffFields(['category']))
         $pageData['params']['visibleCols'] = "$['category']";
+
+    if (!empty($filter['fi']['extraCols']))
+        $pageData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
     // create note if search limit was exceeded
     if ($acvList->getMatches() > $AoWoWconf['sqlLimit'])
@@ -117,7 +118,7 @@ $smarty->updatePageVars(array(
     )
 ));
 $smarty->assign('filter', $filter);
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);
 
 // load the page

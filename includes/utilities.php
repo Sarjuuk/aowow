@@ -3,410 +3,6 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
-abstract class BaseType
-{
-    public    $id         = 0;
-    public    $error      = true;
-
-    protected $templates  = [];
-    protected $curTpl     = [];                             // lets iterate!
-    protected $filter     = null;
-    protected $matches    = null;                           // total matches unaffected by sqlLimit in config
-
-    protected $setupQuery = '';
-
-    /*
-    *   condition as array [expression, value, operator]
-    *       expression:    str   - must match fieldname;
-    *                      int   - impl. 1: select everything
-    *                      array - another condition array
-    *       value:         str   - operator defaults to: LIKE %<val>%
-    *                      int   - operator defaults to: = <val>
-    *                      array - operator defaults to: IN (<val>)
-    *       operator:      modifies/overrides default
-    *                      ! - negated default value (NOT LIKE; <>; NOT IN)
-    *   condition as str
-    *       defines linking (AND || OR)
-    *   condition as int
-    *       defines LIMIT
-    *
-    *   example:
-    *       array(
-    *           ['id', 45],
-    *           ['name', 'test', '!'],
-    *           [
-    *               'AND',
-    *               ['flags', 0xFF, '&'],
-    *               ['flags2', 0xF, '&'],
-    *           ]
-    *           [['mask', 0x3, '&'], 0]
-    *           'OR',
-    *           5
-    *       )
-    *   results in
-    *       WHERE ((`id` = 45) OR (`name` NOT LIKE "%test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) LIMIT 5
-    */
-    public function __construct($conditions = [], $applyFilter = false)
-    {
-        global    $AoWoWconf;                                   // yes i hate myself..
-
-        $sql       = [];
-        $linking   = ' AND ';
-        $limit     = ' LIMIT '.$AoWoWconf['sqlLimit'];
-        $className = get_class($this);
-
-        if (!$this->setupQuery || $conditions === null)
-            return;
-
-        // may be called without filtering
-        if ($applyFilter && class_exists($className.'Filter'))
-        {
-            $fiName = $className.'Filter';
-            $this->filter = new $fiName();
-            if ($this->filter->init() === false)
-                return;
-        }
-
-        $resolveCondition = function ($c, $supLink) use (&$resolveCondition)
-        {
-            $subLink = '';
-
-            foreach ($c as $foo)
-            {
-                if ($foo === 'AND')
-                    $subLink = ' AND ';
-                else if ($foo === 'OR')                     // nessi-bug: if (0 == 'OR') was true once... w/e
-                    $subLink = ' OR ';
-            }
-
-            // need to manually set link for subgroups to be recognized as condition set
-            if ($subLink)
-            {
-                $sql = [];
-
-                foreach ($c as $foo)
-                    if (is_array($foo))
-                        if ($x = $resolveCondition($foo, $supLink))
-                            $sql[] = $x;
-
-                return '('.implode($subLink, $sql).')';
-            }
-            else
-            {
-                if ($c[0] == '1')
-                    return '1';
-                else if (is_array($c[0]))
-                    $field = $resolveCondition($c[0], $supLink);
-                else if ($c[0])
-                    $field = '`'.implode('`.`', explode('.', Util::sqlEscape($c[0]))).'`';
-                else
-                    return null;
-
-                if (is_array($c[1]))
-                {
-                    $val = implode(',', Util::sqlEscape($c[1]));
-                    if ($val === '')
-                        return null;
-
-                    $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
-                    $val = '('.$val.')';
-                }
-                else if (is_string($c[1]))
-                {
-                    $val = Util::sqlEscape($c[1]);
-                    if ($val === '')
-                        return null;
-
-                    $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
-                    $val = '"%'.$val.'%"';
-                }
-                else if (is_numeric($c[1]))
-                {
-                    $op  = (isset($c[2]) && $c[2] == '!') ? '<>' : '=';
-                    $val = Util::sqlEscape($c[1]);
-                }
-                else                                        // null for example
-                    return null;
-
-                if (isset($c[2]) && $c[2] != '!')
-                    $op = $c[2];
-
-                return '('.$field.' '.$op.' '.$val.')';
-            }
-        };
-
-        foreach ($conditions as $i => $c)
-        {
-            switch(getType($c))
-            {
-                case 'array':
-                    break;
-                case 'string':
-                case 'integer':
-                case 'double':
-                    if (is_string($c))
-                        $linking = $c == 'AND' ? ' AND ' : ' OR ';
-                    else
-                        $limit = $c > 0 ? ' LIMIT '.$c : '';
-                default:
-                    unset($conditions[$i]);
-            }
-        }
-
-        foreach ($conditions as $c)
-            if ($c)
-                if ($x = $resolveCondition($c, $linking))
-                    $sql[] = $x;
-
-        // todo: add strings propperly without them being escaped by simpleDB..?
-        $this->setupQuery  = str_replace('[filter]', $this->filter && $this->filter->buildQuery() ? $this->filter->getQuery().' AND ' : NULL, $this->setupQuery);
-        $this->setupQuery  = str_replace('[cond]',   empty($sql) ? '1' : '('.implode($linking, $sql).')',                                     $this->setupQuery);
-        $this->setupQuery .= $limit;
-
-        $rows = DB::Aowow()->SelectPage($this->matches, $this->setupQuery);
-        if (!$rows)
-            return;
-
-        foreach ($rows as $k => $tpl)
-            $this->templates[$k] = $tpl;
-
-        $this->reset();                                     // push first element for instant use
-        $this->error  = false;
-    }
-
-    public function &iterate()
-    {
-        // reset on __construct
-        $this->reset();
-
-        while (list($id, $tpl) = each($this->templates))
-        {
-            $this->id     = $id;
-            $this->curTpl = &$this->templates[$id];         // do not use $tpl as we want to be referenceable
-
-            yield $id => $this->curTpl;
-
-            unset($this->curTpl);                           // kill reference or it will 'bleed' into the next iteration
-        }
-
-        // reset on __destruct .. Generator, Y U NO HAVE __destruct ?!
-        $this->reset();
-    }
-
-    protected function reset()
-    {
-        unset($this->curTpl);                               // kill reference or strange stuff will happen
-        $this->curTpl = reset($this->templates);
-        $this->id     = key($this->templates);
-    }
-
-    // read-access to templates
-    public function getField($field, $localized = false)
-    {
-        if (!$this->curTpl || (!$localized && !isset($this->curTpl[$field])))
-            return '';
-
-        if ($localized)
-            return Util::localizedString($this->curTpl, $field);
-
-        $value = $this->curTpl[$field];
-        return is_numeric($value) ? floatVal($value) : $value;
-    }
-
-    public function getRandomId()
-    {
-        $pattern = '/SELECT .* (-?[\w_]*\.?(id|entry)) AS ARRAY_KEY,?.* FROM (.*) WHERE .*/i';
-        $replace = 'SELECT $1 FROM $3 ORDER BY RAND() ASC LIMIT 1';
-        $query   = preg_replace($pattern, $replace, $this->setupQuery);
-
-        return DB::Aowow()->selectCell($query);
-    }
-
-    public function getFoundIDs()
-    {
-        return array_keys($this->templates);
-    }
-
-    public function getMatches()
-    {
-        return $this->matches;
-    }
-
-    public function filterGetSetCriteria()
-    {
-        if ($this->filter)
-            return $this->filter->getSetCriteria();
-        else
-            return null;
-    }
-
-    public function filterGetForm()
-    {
-        if ($this->filter)
-            return $this->filter->getForm();
-        else
-            return [];
-    }
-
-    public function filterGetError()
-    {
-        if ($this->filter)
-            return $this->filter->error;
-        else
-            return false;
-    }
-
-    // should return data required to display a listview of any kind
-    // this is a rudimentary example, that will not suffice for most Types
-    abstract public function getListviewData();
-
-    // should return data to extend global js variables for a certain type (e.g. g_items)
-    abstract public function addGlobalsToJScript(&$smarty, $addMask = GLOBALINFO_ANY);
-
-    // NPC, GO, Item, Quest, Spell, Achievement, Profile would require this
-    abstract public function renderTooltip();
-}
-
-trait listviewHelper
-{
-    public function hasSetFields($fields)
-    {
-        if (!is_array($fields))
-            return 0x0;
-
-        $result = 0x0;
-
-        foreach ($this->iterate() as $__)
-        {
-            foreach ($fields as $k => $str)
-            {
-                if ($this->getField($str))
-                {
-                    $result |= 1 << $k;
-                    unset($fields[$k]);
-                }
-            }
-
-            if (empty($fields))                             // all set .. return early
-            {
-                $this->reset();                             // Generators have no __destruct, reset manually, when not doing a full iteration
-                return $result;
-            }
-        }
-
-        return $result;
-    }
-
-    public function hasDiffFields($fields)
-    {
-        if (!is_array($fields))
-            return 0x0;
-
-        $base   = [];
-        $result = 0x0;
-
-        foreach ($fields as $k => $str)
-            $base[$str] = $this->getField($str);
-
-        foreach ($this->iterate() as $__)
-        {
-            foreach ($fields as $k => $str)
-            {
-                if ($base[$str] != $this->getField($str))
-                {
-                    $result |= 1 << $k;
-                    unset($fields[$k]);
-                }
-            }
-
-            if (empty($fields))                             // all fields diff .. return early
-            {
-                $this->reset();                             // Generators have no __destruct, reset manually, when not doing a full iteration
-                return $result;
-            }
-        }
-
-        return $result;
-    }
-
-    public function hasAnySource()
-    {
-        if (!isset($this->sources))
-            return false;
-
-        foreach ($this->sources as $src)
-        {
-            if (!is_array($src))
-                continue;
-
-            if (!empty($src))
-                return true;
-        }
-
-        return false;
-    }
-
-}
-
-trait spawnHelper
-{
-    private static $spawnQuery = " SELECT a.guid AS ARRAY_KEY, map, position_x, position_y, spawnMask, phaseMask, spawntimesecs, eventEntry, pool_entry AS pool FROM ?# a LEFT JOIN ?# b ON a.guid = b.guid LEFT JOIN ?# c ON a.guid = c.guid WHERE id = ?d";
-
-    private function fetch()
-    {
-        if (!$this->id)
-            return false;
-
-        switch (get_class($this))
-        {
-            case 'CreatureList':
-                return DB::Aowow()->select(self::$spawnQuery, 'creature',   'game_event_creature',   'pool_creature',   $this->id);
-            case 'GameObjectList':
-                return DB::Aowow()->select(self::$spawnQuery, 'gameobject', 'game_event_gameobject', 'pool_gameobject', $this->id);
-            default:
-                return false;
-        }
-    }
-
-    /*
-        todo (med): implement this alpha-map-check-virtual-map-transform-wahey!
-        note: map in tooltips is activated by either '#map' as anchor (will automatic open mapviewer, when clicking link) in the href or as parameterless rel-parameter e.g. rel="map" in the anchor
-    */
-    public function getSpawns($spawnInfo)
-    {
-        // SPAWNINFO_SHORT: true => only the most populated area and only coordinates
-        $data = [];
-
-        // $raw = $this->fetch();
-        // if (!$raw)
-            // return [];
-
-        /*
-        SPAWNINFO_FULL:
-            $data = array(
-                areaId => array(
-                    floorNo => array (
-                        posX      =>
-                        posY      =>
-                        respawn   =>
-                        phaseMask =>
-                        spawnMask =>
-                        eventId   =>
-                        poolId    =>
-                    )
-                )
-            )
-
-        SPAWNINFO_SHORT: [zoneId, [[x1, y1], [x2, y2], ..]] // only the most populated zone
-
-        SPAWNINFO_ZONES: [zoneId1, zoneId2, ..]             // only zones
-        */
-
-        return $data;
-    }
-}
-
-
 class Lang
 {
     public static $main;
@@ -436,11 +32,20 @@ class Lang
 
     public static function load($loc)
     {
-        if ((require 'localization/locale_'.$loc.'.php') !== 1)
-            die('File for localization '.$loc.' not found.');
+        if (!file_exists('localization/locale_'.$loc.'.php'))
+            die('File for localization '.strToUpper($loc).' not found.');
+        else
+            require 'localization/locale_'.$loc.'.php';
 
         foreach ($lang as $k => $v)
             self::$$k = $v;
+
+        // *cough* .. temp-hack
+        if (User::$localeId == LOCALE_EN)
+        {
+            self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
+            self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
+        }
     }
 
     // todo: expand
@@ -460,12 +65,14 @@ class Lang
     public static function getLocks($lockId, $interactive = false)
     {
         $locks = [];
-        $lock = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE id = ?d', $this->curTpl['lockid']);
+        $lock = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE id = ?d', $lockId);
+        if (!$lock)
+            return '';
 
         for ($i = 1; $i <= 5; $i++)
         {
-            $prop = $lock['lockproperties'.$i];
-            $rnk  = $lock['requiredskill'.$i];
+            $prop = $lock['properties'.$i];
+            $rnk  = $lock['reqSkill'.$i];
             $name = '';
 
             if ($lock['type'.$i] == 1)                      // opened by item
@@ -479,17 +86,19 @@ class Lang
             }
             else if ($lock['type'.$i] == 2)                 // opened by skill
             {
-                if (in_array($prop, [6, 7, 15, 19]))        // dnd stuff
+                if (!in_array($prop, [1, 2, 3, 4, 9, 16, 20])) // exclude unusual stuff
                     continue;
 
                 $txt = DB::Aowow()->selectRow('SELECT * FROM ?_locktype WHERE id = ?d', $prop);         // todo (low): convert to static text
-                $name = Util::localizedString($txts, 'name');
+                $name = Util::localizedString($txt, 'name');
                 if (!$name)
                     continue;
 
                 if ($rnk > 0)
                     $name .= ' ('.$rnk.')';
             }
+            else
+                continue;
 
             $locks[$lock['type'.$i] == 1 ? $i : -$i] = sprintf(Lang::$game['requires'], $name);
         }
@@ -648,9 +257,10 @@ class SmartyAoWoW extends Smarty
 
     public function __construct($config)
     {
+        parent::__construct();
+
         $cwd = str_replace("\\", "/", getcwd());
 
-        $this->Smarty();
         $this->assign('appName', $config['page']['name']);
         $this->assign('AOWOW_REVISION', AOWOW_REVISION);
         $this->config                 = $config;
@@ -723,7 +333,7 @@ class SmartyAoWoW extends Smarty
         // fetch announcements
         if ($tv['query'][0] && !preg_match('/[^a-z]/i', $tv['query'][0]))
         {
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ?s OR page = "*")', $tv['query'][0]);
+            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*")', $tv['query'][0]);
             foreach ($ann as $k => $v)
             {
                 if ($t = Util::localizedString($v, 'text'))
@@ -815,7 +425,7 @@ class SmartyAoWoW extends Smarty
             {
                 case TYPE_NPC:         (new CreatureList(array(['ct.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;
                 case TYPE_OBJECT:      (new GameobjectList(array(['gt.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF); break;
-                case TYPE_ITEM:        (new ItemList(array(['i.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);        break;
+                case TYPE_ITEM:        (new ItemList(array(['i.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);           break;
                 case TYPE_QUEST:       (new QuestList(array(['qt.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;
                 case TYPE_SPELL:       (new SpellList(array(['s.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);          break;
                 case TYPE_ZONE:        (new ZoneList(array(['z.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);           break;
@@ -853,6 +463,14 @@ class SmartyAoWoW extends Smarty
         $this->assign('mysql', DB::Aowow()->getStatistics());
 
         $this->display('error.tpl');
+        exit();
+    }
+
+    public function brb()
+    {
+        $this->assign('lang', array_merge(Lang::$main, Lang::$error));
+
+        $this->display('brb.tpl');
         exit();
     }
 
@@ -901,15 +519,19 @@ class SmartyAoWoW extends Smarty
 class Util
 {
     public static $resistanceFields         = array(
-        null,           'holy_res',     'fire_res',     'nature_res',   'frost_res',    'shadow_res',   'arcane_res'
+        null,           'resHoly',      'resFire',      'resNature',    'resFrost',     'resShadow',    'resArcane'
     );
 
-    private static $rarityColorStings       = array(        // zero-indexed
+    public static $rarityColorStings        = array(        // zero-indexed
         '9d9d9d',       'ffffff',       '1eff00',       '0070dd',       'a335ee',       'ff8000',       'e5cc80',       'e6cc80'
     );
 
     public static $localeStrings            = array(        // zero-indexed
         'enus',         null,           'frfr',         'dede',         null,           null,           'eses',         null,           'ruru'
+    );
+
+    public static $subDomains               = array(
+        'www',          null,           'fr',           'de',           null,           null,           'es',           null,           'ru'
     );
 
     public static $typeStrings              = array(        // zero-indexed
@@ -1675,14 +1297,6 @@ class Util
         return self::formatTime($tDiff * 1000, true);
     }
 
-    public static function colorByRarity($idx)
-    {
-        if (!isset(self::$rarityColorStings))
-            $idx = 1;
-
-        return self::$rarityColorStings($idx);
-    }
-
     public static function formatMoney($qty)
     {
         $money = '';
@@ -1827,13 +1441,16 @@ class Util
         return 'b'.strToUpper($_);
     }
 
-    public static function sqlEscape($data)
+    public static function sqlEscape($data, $relaxed = false)
     {
-        if (!is_array($data))
-            return mysql_real_escape_string(trim($data));
+        // relaxed: expecting strings for fulltext search
+        $pattern = $relaxed ? ['/[;`´"\/\\\]/ui', '--'] : ['/[^\p{L}0-9\s_\-\.]/ui', '--'];
 
-        array_walk($data, function(&$item, $key) {
-            $item = Util::sqlEscape($item);
+        if (!is_array($data))
+            return preg_replace($pattern, '', trim($data));
+
+        array_walk($data, function(&$item, $key) use (&$relaxed) {
+            $item = self::sqlEscape($item, $relaxed);
         });
 
         return $data;
@@ -2053,6 +1670,38 @@ class Util
         $rest  = mb_substr($str, 1, $len, 'UTF-8');
 
         return mb_strtoupper($first, 'UTF-8') . $rest;
+    }
+
+    public static function checkNumeric(&$data)
+    {
+        if ($data === null)
+            return false;
+        else if (!is_array($data))
+        {
+            $data = trim($data);
+
+            if (is_numeric($data))
+            {
+                $_int   = intVal($data);
+                $_float = floatVal($data);
+
+                $data = ($_int == $_float) ? $_int : $_float;
+                return true;
+            }
+            else if (preg_match('/^\d*,\d+$/', $data))
+            {
+                $data = floatVal(strtr($data, ',', '.'));
+                return true;
+            }
+
+            return false;
+        }
+
+        array_walk($data, function(&$item, $key) {
+            self::checkNumeric($item);
+        });
+
+        return false;                                       // always false for passed arrays
     }
 }
 

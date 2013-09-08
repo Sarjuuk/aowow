@@ -88,7 +88,7 @@ var fi_filters = {
         { id: 121, name: 'sepresistances' },
         { id: 25,  name: 'arcres',              type: 'num' },
         { id: 26,  name: 'firres',              type: 'num' },
-        { id: 28,  name: 'frores',              ype: 'num' },
+        { id: 28,  name: 'frores',              type: 'num' },
         { id: 30,  name: 'holres',              type: 'num' },
         { id: 27,  name: 'natres',              type: 'num' },
         { id: 29,  name: 'shares',              type: 'num' },
@@ -182,7 +182,7 @@ var fi_filters = {
         { id: 113, name: 'hasscreenshots',      type: 'yn' },
         { id: 167, name: 'hasvideos',           type: 'yn' },
 
-        { id: 1,   name: 'sepstaffonly',                   staffonly: true },
+        { id: 1,   name: 'sepstaffonly',                       staffonly: true },
         { id: 176, name: 'flags',               type: 'flags', staffonly: true },
         { id: 177, name: 'flags2',              type: 'flags', staffonly: true }
     ],
@@ -194,7 +194,7 @@ var fi_filters = {
         { id: 4,   name: 'bonustext',           type: 'str' },
         { id: 5,   name: 'heroic',              type: 'yn' },
         { id: 6,   name: 'relatedevent',        type: 'event-any+none' },
-        { id: 2,   name: 'id',                  type: 'num' },
+        { id: 2,   name: 'id',                  type: 'num', before: 'name' },
 
         { id: 9999,name: 'sepcommunity' },
         { id:  8,  name: 'hascomments',         type: 'yn' },
@@ -215,7 +215,7 @@ var fi_filters = {
         { id: 8,   name: 'endsquest',           type: 'side' },
         { id: 34,  name: 'usemodel',            type: 'str-small' },
         { id: 35,  name: 'useskin',             type: 'str' },
-        { id: 37,  name: 'id',                  type: 'num' },
+        { id: 37,  name: 'id',                  type: 'num', before: 'name' },
 
         { id: 14,  name: 'seploot' },
         { id: 12,  name: 'averagemoneydropped', type: 'num' },
@@ -253,7 +253,7 @@ var fi_filters = {
     objects: [
         { id: 8,   name: 'sepgeneral' },
         { id: 1,   name: 'foundin',             type: 'zone' },
-        { id: 15,  name: 'id',                  type: 'num' },
+        { id: 15,  name: 'id',                  type: 'num', before: 'name' },
         { id: 16,  name: 'relatedevent',        type: 'event-any+none' },
         { id: 7,   name: 'requiredskilllevel',  type: 'num' },
         { id: 2,   name: 'startsquest',         type: 'side' },
@@ -277,7 +277,7 @@ var fi_filters = {
         { id: 27,  name: 'daily',                   type: 'yn' },
         { id: 28,  name: 'weekly',                  type: 'yn' },
         { id: 29,  name: 'repeatable',              type: 'yn' },
-        { id: 30,  name: 'id',                      type: 'num' },
+        { id: 30,  name: 'id',                      type: 'num', before: 'name' },
         { id: 44,  name: 'countsforloremaster_stc', type: 'yn' },
         { id: 9,   name: 'objectiveearnrepwith',    type: 'faction-any+none' },
         { id: 33,  name: 'relatedevent',            type: 'event-any+none' },
@@ -319,7 +319,7 @@ var fi_filters = {
         { id: 6,   name: 'sepgeneral' },
         { id: 1,   name: 'manaenergyragecost',      type: 'num' },
         { id: 2,   name: 'prcntbasemanarequired',   type: 'num' },
-        { id: 14,  name: 'id',                      type: 'num' },
+        { id: 14,  name: 'id',                      type: 'num', before: 'name' },
         { id: 15,  name: 'icon',                    type: 'str' },
         { id: 10,  name: 'firstrank',               type: 'yn' },
         { id: 20,  name: 'hasreagents',             type: 'yn' },
@@ -344,7 +344,7 @@ var fi_filters = {
         { id: 3,   name: 'rewardtext',          type: 'str' },
         { id: 4,   name: 'location',            type: 'zone' },
         { id: 10,  name: 'icon',                type: 'str' },
-        { id: 9,   name: 'id',                  type: 'num' },
+        { id: 9,   name: 'id',                  type: 'num', before: 'name' },
         { id: 11,  name: 'relatedevent',        type: 'event-any+none' },
 
         { id: 8,   name: 'sepseries' },
@@ -413,7 +413,7 @@ function fi_toggle() {
     if (b) {
         // Set focus on first textbox
         d.firstChild.nodeValue = LANG.fihide;
-        c = (c.parentNode.tagName == 'FORM' ? c.parentNode: $WH.gE(c, 'form')[0]);
+        c = (c.parentNode.tagName == 'FORM' ? c.parentNode : $WH.gE(c, 'form')[0]);
         c = c.elements.na ? c.elements.na: c.elements.ti;
         c.focus();
         c.select();
@@ -477,7 +477,6 @@ function fi_initWeightedListview() {
     }
 
     if (this._upgradeIds && this._minScore) {
-        setTimeout(Listview.headerFilter.bind(this, this.columns[this.columns.length - 1], '>=' + this._minScore), 1);
         this._maxScore = this._minScore; // Makes percentages relative to upgraded item
     }
 }
@@ -1449,7 +1448,7 @@ function fi_scoreSockets(item) {
         this._maxScore = item.score;
     }
 
-    if(this._upgradeIds && $WH.in_array(this._upgradeIds, item.id) != -1) {
+    if (this._upgradeIds && $WH.in_array(this._upgradeIds, item.id) != -1) {
         this._minScore = item.score;
         item.upgraded = 1;
     }
@@ -1664,6 +1663,17 @@ function fi_getExtraCols(wt, gm, pu) {
                 b.compute = function (item, td) {
                     return (item[a.name] || 0).toFixed(2);
                 }
+            }
+
+            // Fix display of money columns
+            if (a.name.indexOf('money') != -1) {
+                b.compute = function (item, td) {
+                    td.innerHTML = g_getMoneyHtml(item[a.name] || 0);
+                }
+            }
+
+            if (a.name == 'id') {
+                b.width = '5%';
             }
 
             res.push(b);

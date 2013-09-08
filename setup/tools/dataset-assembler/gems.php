@@ -37,7 +37,7 @@ if (!defined('AOWOW_REVISION'))
         FROM
             item_template it,
             locales_item li,
-            ?_gemProperties gp,
+            dbc.gemProperties gp,
             ?_icons i,
             ?_itemEnchantment ie
         WHERE
@@ -45,7 +45,7 @@ if (!defined('AOWOW_REVISION'))
             li.entry = it.entry AND
             gp.Id = it.GemProperties AND
             i.Id = it.displayid AND
-            gp.itemEnchantmentId = ie.Id
+            gp.spellItemEnchantmentId = ie.Id
         ORDER BY
             it.entry DESC
         ;

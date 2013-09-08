@@ -4,8 +4,6 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/class.filter.php';
-
 $cats       = Util::extractURLParams($pageParam);
 $path       = [0, 1];
 $title      = [Lang::$game['spells']];                      // display max 2 cats, remove this base if nesecary
@@ -202,7 +200,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
                         break;
                 }
 
-                $pageData['params']['note'] = '$sprintf(LANG.lvnote_pettalents, "'.$url.'")';
+                $pageData['params']['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';
             }
 
             $pageData['params']['_petTalents'] = 1;         // not conviced, this is correct, but .. it works
@@ -409,9 +407,12 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $pageData['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
 
     // recreate form selection
+    $filter          = array_merge($spells->filterGetForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['setCr'] = $spells->filterGetSetCriteria();
-    $filter = array_merge($spells->filterGetForm(), $filter);
+    $filter['fi']    =  $spells->filterGetForm();
+
+    if (!empty($filter['fi']['extraCols']))
+        $pageData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
     $smarty->saveCache($cacheKey, $pageData, $filter);
 }
@@ -430,7 +431,6 @@ asort(Lang::$game['ra']);
 asort(Lang::$game['cl']);
 asort(Lang::$game['sc']);
 asort(Lang::$game['me']);
-Lang::$game['race'] = Util::ucFirst(Lang::$game['race']);
 
 // menuId 1: Spell    g_initPath()
 //  tabId 0: Database g_initHeader()
@@ -444,7 +444,7 @@ $smarty->updatePageVars(array(
     )
 ));
 $smarty->assign('filter', $filter);
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement));
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);
 
 // load the page
