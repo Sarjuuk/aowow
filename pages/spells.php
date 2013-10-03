@@ -379,7 +379,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 
     $pageData['data'] = $spells->getListviewData();
 
-    $spells->addGlobalsToJscript($smarty);
+    $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
     // create note if search limit was exceeded; overwriting 'note' is intentional
     if ($spells->getMatches() > $AoWoWconf['sqlLimit'])

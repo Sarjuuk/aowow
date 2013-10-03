@@ -4,7 +4,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/class.community.php';
+require 'includes/community.class.php';
 
 $_id = intVal($pageParam);
 
@@ -55,9 +55,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($spell->error)
         $smarty->notFound(Lang::$game['spell']);
 
+    $spell->addGlobalsToJScript($smarty, GLOBALINFO_ANY);
+
     $_cat = $spell->getField('typeCat');
     $path = [0, 1, $_cat];
-
     $l    = [null, 'A', 'B', 'C'];
 
     // reconstruct path / title
@@ -109,7 +110,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $path[] = 410;                              // Cunning
     }
 
-    // infobox
+
+    /***********/
+    /* Infobox */
+    /***********/
+
     $infobox = [];
 
     if (!in_array($_cat, [-5, -6]))                         // not mount or vanity pet
@@ -181,29 +186,87 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($cost = DB::Aowow()->selectCell('SELECT spellcost FROM npc_trainer WHERE spell = ?d', $spell->id))
         $infobox[] = '[li]'.Lang::$spell['trainingCost'].Lang::$colon.'[money='.$cost.'][/li]';
 
+
+    /****************/
+    /* Main Content */
+    /****************/
+
     $pageData = array(
         'title'   => $spell->getField('name', true),
         'path'    => json_encode($path, JSON_NUMERIC_CHECK),
         'infobox' => $infobox,
         'relTabs' => [],
         'view3D'  => 0,
-        'page'    => $spell->getDetailPageData()
+        'page'    => array(
+            'powerCost' => $spell->createPowerCostForCurrent(),
+            'castTime'  => $spell->createCastTimeForCurrent(false, false),
+            'tools'     => $spell->getToolsForCurrent(),
+            'reagents'  => $spell->getReagentsForCurrent(),
+            'name'      => $spell->getField('name', true),
+            'icon'      => $spell->getField('iconString'),
+            'stack'     => $spell->getField('stackAmount'),
+            'level'     => $spell->getField('spellLevel'),
+            'rangeName' => $spell->getField('rangeText', true),
+            'range'     => $spell->getField('rangeMaxHostile'),
+            'gcd'       => Util::formatTime($spell->getField('startRecoveryTime')),
+            'gcdCat'    => "[NYI]",
+            'school'    => sprintf(Util::$dfnString, Util::asHex($spell->getField('schoolMask')), Lang::getMagicSchools($spell->getField('schoolMask'))),
+            'dispel'    => Lang::$game['dt'][$spell->getField('dispelType')],
+            'mechanic'  => Lang::$game['me'][$spell->getField('mechanic')],
+        )
     );
 
-    // description
-    @list(
-        $pageData['page']['info'],
-        $pageData['page']['spells']
-    ) = $spell->renderTooltip(MAX_LEVEL, true);
+    if ($spell->getField('attributes2') & 0x80000)
+        $pageData['page']['stances'] = Lang::getStances($spell->getField('stanceMask'));
 
-    // buff
-    @list(
-        $pageData['page']['buff'],
-        $pageData['page']['buffspells']
-    ) = $spell->renderBuff(MAX_LEVEL, true);
+    if (($_ = $spell->getField('recoveryTime')) && $_ > 0)
+        $pageData['page']['cooldown'] = Util::formatTime($_);
 
-    // js-globals
-    $spell->addGlobalsToJScript($smarty);
+    if (($_ = $spell->getField('duration')) && $_ > 0)
+        $pageData['page']['duration'] = Util::formatTime($_);
+
+    // minRange exists..  prepend
+    if ($_ = $spell->getField('rangeMinHostile'))
+        $pageData['page']['range'] = $_.' - '.$pageData['page']['range'];
+
+    // parse itemClass & itemSubClassMask
+    $class    = $spell->getField('equippedItemClass');
+    $subClass = $spell->getField('equippedItemSubClassMask');
+    $invType  = $spell->getField('equippedItemInventoryTypeMask');
+
+    if ($class > 0 && $subClass > 0)
+    {
+        $title = ['Class: '.$class, 'SubClass: '.Util::asHex($subClass)];
+        $text  = Lang::getRequiredItems($class, $subClass, false);
+
+        if ($invType)
+        {
+            // remap some duplicated strings            'Off Hand' and 'Shield' are never used simultaneously
+            if ($invType & (1 << INVTYPE_ROBE))         // Robe => Chest
+            {
+                $invType &= ~(1 << INVTYPE_ROBE);
+                $invType &=  (1 << INVTYPE_CHEST);
+            }
+
+            if ($invType & (1 << INVTYPE_RANGEDRIGHT))  // Ranged2 => Ranged
+            {
+                $invType &= ~(1 << INVTYPE_RANGEDRIGHT);
+                $invType &=  (1 << INVTYPE_RANGED);
+            }
+
+            $_ = [];
+            $strs = Lang::$item['inventoryType'];
+            foreach ($strs as $k => $str)
+                if ($invType & 1 << $k && $str)
+                    $_[] = $str;
+
+            $title[] = Lang::$item['slot'].Lang::$colon.Util::asHex($invType);
+            $text   .= ' '.Lang::$spell['_inSlot'].': '.implode(', ', $_);
+        }
+
+        $pageData['page']['items'] = sprintf(Util::$dfnString, implode(' | ', $title), $text);
+    }
+
 
     // prepare Tools
     foreach ($pageData['page']['tools'] as $k => $tool)
@@ -232,7 +295,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 'name'    => $spell->relItems->getField('name', true),
                 'quality' => $spell->relItems->getField('quality'),
                 'entry'   => $itemId,
-                'count'   => $_[$itemId],
+                'count'   => $_[$itemId][1],
             );
 
             unset($_[$itemId]);
@@ -244,6 +307,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // Iterate through all effects:
     $pageData['page']['effect'] = [];
+
+    $triggerIdx = $spell->canTriggerSpell();
+    $itemIdx    = $spell->canCreateItem();
 
     for ($i = 1; $i < 4; $i++)
     {
@@ -260,8 +326,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         // Icons:
         // .. from item
-        if ($spell->canCreateItem() && ($_ = $spell->getField('effect'.$i.'CreateItemId')) && $_ > 0)
+        if (in_array($i, $itemIdx))
         {
+            $_ = $spell->getField('effect'.$i.'CreateItemId');
             foreach ($spell->relItems->iterate() as $itemId => $__)
             {
                 if ($itemId != $_)
@@ -280,8 +347,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $foo['icon']['count'] = "'".($effBP + 1).'-'.$foo['icon']['count']."'";
         }
         // .. from spell
-        else if (($_ = $spell->getField('effect'.$i.'TriggerSpell')) && $_ > 0)
+        else if (in_array($i, $triggerIdx))
         {
+            $_ = $spell->getField('effect'.$i.'TriggerSpell');
             $trig = new SpellList(array(['s.id', (int)$_]));
 
             $foo['icon'] = array(
@@ -291,7 +359,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 'count' => 0
             );
 
-            $trig->addGlobalsToJScript($smarty);
+            $trig->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
         }
 
         // Effect Name
@@ -300,14 +368,17 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if ($spell->getField('effect'.$i.'RadiusMax') > 0)
             $foo['radius'] = $spell->getField('effect'.$i.'RadiusMax');
 
-        if (($effBP + $effDS) && !($spell->canCreateItem() && $spell->relItems && !$spell->relItems->error) && (!$spell->getField('effect'.$i.'TriggerSpell') || in_array($effAura, [225, 227])))
+        if (($effBP + $effDS) && !($itemIdx && $spell->relItems && !$spell->relItems->error) && (!in_array($i, $triggerIdx) || in_array($effAura, [225, 227])))
             $foo['value'] = ($effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
 
         if ($effRPPL != 0)
             $foo['value'] = (isset($foo['value']) ? $foo['value'] : '0') . sprintf(Lang::$spell['costPerLevel'], $effRPPL);
 
-        if($spell->getField('effect'.$i.'Periode') > 0)
-            $foo['interval'] = $spell->getField('effect'.$i.'Periode') / 1000;
+        if ($spell->getField('effect'.$i.'Periode') > 0)
+            $foo['interval'] = Util::formatTime($spell->getField('effect'.$i.'Periode'));
+
+        if ($_ = $spell->getField('effect'.$i.'Mechanic'))
+            $foo['mechanic'] = Lang::$game['me'][$_];
 
         // parse masks and indizes
         switch ($effId)
@@ -523,7 +594,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                             break;
                         case 189:                           // Mod Rating
                         case 220:                           // Combat Rating From Stat
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, Util::$combatRating[log($effMV, 2)], Util::asHex($effMV)).')';
+                            $bar = [];
+                            foreach (Util::$combatRating as $k => $str)
+                                if ((1 << $k) & $effMV)
+                                    $bar[] = $str;
+
+                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, implode(', ', $bar), Util::asHex($effMV)).')';
                             break;
                         case 168:                           // Mod Damage Done Versus
                         case 59:                            // Mod Damage Done Versus Creature
@@ -579,9 +655,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     unset($foo);                                            // clear reference
 
-    /*******
-    * extra tabs
-    *******/
+
+    /**************/
+    /* Extra Tabs */
+    /**************/
 
     // tab: modifies $this
     $sub = ['OR'];
@@ -630,7 +707,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $modSpells->addGlobalsToJScript($smarty);
+            $modSpells->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
         }
     }
 
@@ -682,7 +759,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $modsSpell->addGlobalsToJScript($smarty);
+            $modsSpell->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
         }
     }
 
@@ -715,7 +792,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $saSpells->addGlobalsToJScript($smarty);
+        $saSpells->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
     }
 
     // tab: used by - itemset
@@ -738,7 +815,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $ubSets->addGlobalsToJScript($smarty);
+        $ubSets->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
     }
 
 
@@ -765,7 +842,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $ubItems->addGlobalsToJScript($smarty);
+        $ubItems->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
     }
 
     // tab: criteria of
@@ -776,6 +853,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if (!$coAchievemnts->error)
         {
             $pageData['relTabs'][] = array(
+                'file'   => 'achievement',
                 'data'   => $coAchievemnts->getListviewData(),
                 'params' => [
                     'tabs' => '$tabsRelated',
@@ -784,48 +862,27 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $coAchievemnts->addGlobalsToJScript($smarty);
+            $coAchievemnts->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
         }
     }
 
     // tab: contains
     // spell_loot_template & skill_extra_item_template
     $extraItem = DB::Aowow()->selectRow('SELECT * FROM skill_extra_item_template WHERE spellid = ?d', $spell->id);
-    $spellLoot = DB::Aowow()->select('SELECT *, item as ARRAY_KEY FROM spell_loot_template WHERE entry = ?d', $spell->id);
+    $spellLoot = Util::handleLoot(LOOT_SPELL, $spell->id, $smarty, User::isInGroup(U_GROUP_STAFF));
+
     if ($extraItem || $spellLoot)
     {
-        $ids = [];
-        $lv  = [];
         $extraCols = ['Listview.extraCols.percent'];
-        foreach ($spellLoot as $row)
-            $ids[] = (int)$row['item'];
 
-        if ($ids)
+        if ($spellLoot && User::isInGroup(U_GROUP_STAFF))
         {
-            // todo (high): generic loot-processing function
-            $slItems = new ItemList(array(['i.id', $ids]));
-            $slItems->addGlobalsToJscript($smarty);
-            $lv += $slItems->getListviewData();
-
-            $equal = true;
-            foreach ($lv as $k => $v)
-            {
-                $chance = $spellLoot[$k]['ChanceOrQuestChance'];
-                if ($chance)
-                    $equal = false;
-
-                $lv[$k]['percent'] = $chance;
-                if ($spellLoot[$k]['maxcount'] > 1)
-                {
-                    $lv[$k]['maxcount'] = $spellLoot[$k]['maxcount'];
-                    $lv[$k]['mincount'] = $spellLoot[$k]['mincountOrRef'] > 0 ? $spellLoot[$k]['mincountOrRef'] : 1;
-                }
-            }
-
-            if ($equal)
-                foreach ($lv as &$_)
-                    $_['percent'] = number_format(100 / count($lv), 2);
+            $extraCols[] = "Listview.funcBox.createSimpleCol('group', 'group', '10%', 'group')";
+            $extraCols[] = "Listview.funcBox.createSimpleCol('mode', LANG.compose_mode, '10%', 'mode')";
+            $extraCols[] = "Listview.funcBox.createSimpleCol('reference', LANG.finpcs.seploot + ' ' + LANG.button_link, '10%', 'reference')";
         }
+
+        $lv = $spellLoot;
 
         if ($extraItem && $spell->canCreateItem())
         {
@@ -870,7 +927,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
        'SELECT      IF(s1.rankId <> 1 AND s2.id, s2.id, s1.id)
         FROM        ?_spell s1
         LEFT JOIN   ?_spell s2
-            ON      s1.SpellFamilyId = s2.SpelLFamilyId AND
+            ON      s1.SpellFamilyId     = s2.SpelLFamilyId AND
                     s1.SpellFamilyFlags1 = s2.SpelLFamilyFlags1 AND
                     s1.SpellFamilyFlags2 = s2.SpellFamilyFlags2 AND
                     s1.SpellFamilyFlags3 = s2.SpellFamilyFlags3 AND
@@ -891,6 +948,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             WHERE       sg1.spell_id = ?d',
             $firstRank
         );
+
         if ($linkedSpells)
         {
             $extraSpells = [];
@@ -938,7 +996,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     ]
                 );
 
-                $stacks->addGlobalsToJScript($smarty);
+                $stacks->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
             }
         }
     }
@@ -991,7 +1049,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $linked->addGlobalsToJScript($smarty);
+        $linked->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
     }
 
 

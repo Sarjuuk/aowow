@@ -3866,7 +3866,6 @@ var LANG = {
     tc_summary:     "Zusammenfassung",
     tc_restore:     "Wiederherstellen",
     tc_export:      "Exportieren",
-    tc_link:        "Link",
     tc_print:       "Drucken",
 
     tc_glyphs:      "Glyphen",

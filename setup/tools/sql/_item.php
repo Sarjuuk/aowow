@@ -114,7 +114,8 @@ CREATE TABLE `aowow_item_stats` (
         DROP COLUMN `sheath`,
         DROP COLUMN `WDBVerified`,
         CHANGE COLUMN `entry` `id`  mediumint(8) UNSIGNED NOT NULL DEFAULT 0 FIRST ,
-        CHANGE COLUMN `subclass` `subClass`  tinyint(3) NOT NULL DEFAULT 0 AFTER `class`,
+        ADD COLUMN `classBak`  tinyint(3) NOT NULL AFTER `class`,
+        CHANGE COLUMN `subclass` `subClass`  tinyint(3) NOT NULL DEFAULT 0 AFTER `classBak`,
         ADD COLUMN `subClassBak`  tinyint(3) NOT NULL AFTER `subClass`,
         ADD COLUMN `subSubClass`  tinyint(3) NOT NULL AFTER `subClassBak`,
         CHANGE COLUMN `name` `name_loc0`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `subSubClass`,
@@ -127,10 +128,12 @@ CREATE TABLE `aowow_item_stats` (
         CHANGE COLUMN `Quality` `quality`  tinyint(3) UNSIGNED NOT NULL DEFAULT 0 AFTER `displayId`,
         CHANGE COLUMN `Flags` `flags`  bigint(20) NOT NULL DEFAULT 0 AFTER `quality`,
         CHANGE COLUMN `FlagsExtra` `flagsExtra`  int(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `flags`,
+        ADD COLUMN `cuFlags`  int(10) NOT NULL AFTER `flagsExtra`,
         CHANGE COLUMN `BuyCount` `buyCount`  tinyint(3) UNSIGNED NOT NULL DEFAULT 1 AFTER `flagsExtra`,
         CHANGE COLUMN `BuyPrice` `buyPrice`  bigint(20) NOT NULL DEFAULT 0 AFTER `buyCount`,
         CHANGE COLUMN `SellPrice` `sellPrice`  int(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `buyPrice`,
-        ADD COLUMN `slot`  tinyint(3) NOT NULL AFTER `sellPrice`,
+        ADD COLUMN `repairPrice`  int(10) UNSIGNED NOT NULL AFTER `sellPrice`,
+        ADD COLUMN `slot`  tinyint(3) NOT NULL AFTER `repairPrice`,
         CHANGE COLUMN `InventoryType` `slotBak`  tinyint(3) UNSIGNED NOT NULL DEFAULT 0 AFTER `slot`,
         CHANGE COLUMN `AllowableClass` `requiredClass`  int(11) NOT NULL DEFAULT '-1' AFTER `slotBak`,
         CHANGE COLUMN `AllowableRace` `requiredRace`  int(11) NOT NULL DEFAULT '-1' AFTER `requiredClass`,
@@ -230,8 +233,7 @@ CREATE TABLE `aowow_item_stats` (
         CHANGE COLUMN `PageMaterial` `pageMaterial`  tinyint(3) UNSIGNED NOT NULL DEFAULT 0 AFTER `languageId`,
         CHANGE COLUMN `startquest` `startQuest`  mediumint(8) UNSIGNED NOT NULL DEFAULT 0 AFTER `pageMaterial`,
         CHANGE COLUMN `lockid` `lockId`  mediumint(8) UNSIGNED NOT NULL DEFAULT 0 AFTER `startQuest`,
-        CHANGE COLUMN `RandomProperty` `randomProperty`  mediumint(8) NOT NULL DEFAULT 0 AFTER `lockId`,
-        CHANGE COLUMN `RandomSuffix` `randomSuffix`  mediumint(8) UNSIGNED NOT NULL DEFAULT 0 AFTER `randomProperty`,
+        CHANGE COLUMN `RandomProperty` `randomEnchant`  mediumint(8) NOT NULL DEFAULT 0 AFTER `lockId`;
         MODIFY COLUMN `itemset`  mediumint(8) UNSIGNED NOT NULL DEFAULT 0 AFTER `randomSuffix`,
         CHANGE COLUMN `MaxDurability` `durability`  smallint(5) UNSIGNED NOT NULL DEFAULT 0 AFTER `itemset`,
         CHANGE COLUMN `Map` `map`  smallint(6) NOT NULL DEFAULT 0 AFTER `area`,
@@ -254,6 +256,10 @@ CREATE TABLE `aowow_item_stats` (
         CHANGE COLUMN `FoodType` `foodType`  tinyint(3) UNSIGNED NOT NULL DEFAULT 0 AFTER `scriptName`,
         DROP PRIMARY KEY,
         ADD PRIMARY KEY (`id`);
+
+    -- random Attribs
+    UPDATE aowow_items SET randomEnchant = -RandomSuffix WHERE RandomSuffix <> 0;
+    ALTER TABLE `aowow_items` DROP COLUMN `RandomSuffix`,
 
     -- localization
     UPDATE aowow_items a, locales_item b SET
@@ -283,7 +289,7 @@ CREATE TABLE `aowow_item_stats` (
     UPDATE aowow_items SET slot =  5 WHERE slotbak = 20;
 
     -- custom sub-classes
-    UPDATE aowow_items SET subClassBak = subClass, slot = slotBak;
+    UPDATE aowow_items SET subClassBak = subClass, classBak = class, slot = slotBak;
     UPDATE aowow_items SET subclass = IF(
             slot = 4, -8, IF(                                  -- shirt
                 slot = 19, -7, IF(                             -- tabard
@@ -301,6 +307,42 @@ CREATE TABLE `aowow_item_stats` (
         )
     WHERE class = 4;
 
+    // move alchemist stones to trinkets (Armor)
+    UPDATE aowow_items SET class = 4, subClass = -4 WHERE classBak = 7 AND subClassBak = 11 AND slotBak = 12;
+
+    // mark keys as key (if not quest items)
+    UPDATE aowow_items SET class = 13, subClass = 0 WHERE classBak IN (0, 15) AND bagFamily & 0x100;
+
+    // set subSubClass for Glyphs (major/minor (requires spells to be set up))
+    UPDATE aowow_items i, dbc.spell s, dbc.glyphProperties gp SET i.subSubClass = IF(gp.typeFlags & 0x1, 2, 1) WHERE i.spellId1 = s.id AND s.effectMiscValue1 = gp.id AND i.classBak = 16;
+
+    // elixir-subClasses - spell_group.id = item.subSubClass (1:battle; 2:guardian)
+    // query takes ~1min
+    UPDATE aowow_items i, world.spell_group sg SET i.subSubClass = sg.id WHERE sg.spell_id = i.spellId1 AND i.classBak = 0 AND i.subClassBak = 2;
+
+
+    // filter misc(class:15) junk(subclass:0) to appropriate categories
+
+    // assign pets and mounts to category
+    UPDATE aowow_items i, dbc.spell s SET
+        subClass = IF(effectAuraId1 <> 78, 2, IF(effectAuraId2 = 207 OR effectAuraId3 = 207 OR (s.id <> 65917 AND effectAuraId2 = 4 AND effectId3 = 77), -7, 5))
+    WHERE
+        s.id = spellId2 AND class = 15 AND spellId1 IN (483, 55884);  -- misc items with learn-effect
+
+    // more corner cases (mounts that are not actualy learned)
+    UPDATE aowow_items i, dbc.spell s SET i.subClass = -7 WHERE
+        (effectId1 = 64 OR (effectAuraId1 = 78 AND effectAuraId2 = 4 AND effectId3 = 77) OR effectAuraId1 = 207 OR effectAuraId2 = 207 OR effectAuraId3 = 207)
+        AND s.id = i.spellId1 AND i.class = 15 AND i.subClass = 5;
+
+    UPDATE aowow_items i, dbc.spell s SET i.subClass = 5 WHERE s.effectAuraId1 = 78 AND s.id = i.spellId1 AND i.class = 15 AND i.subClass = 0;
+
+    UPDATE aowow_items i, dbc.spell s SET i.class = 0, i.subClass = 6 WHERE s.effectId1 = 53 AND s.id = i.spellId1 AND i.class = 15 AND i.subClassBak = 0;
+    UPDATE aowow_items i, dbc.spell s SET i.subClass = -3 WHERE s.effectId1 = 54 AND s.id = i.spellId1 AND i.class = 0 AND i.subClassBak = 8;
+
+    // one stray enchanting recipe .. with a strange icon
+    UPDATE aowow_items SET class = 9, subClass = 8 WHERE id = 33147;
+
+    UPDATE aowow_items SET subClass = -2 WHERE quality = 4 AND class = 15 AND subClassBak = 0 AND requiredClass AND (requiredClass & 0x5FF) <> 0x5FF;
 
 */
 
@@ -308,7 +350,7 @@ class ItemSetup extends ItemList
 {
     private $cols = [];
 
-    public function __construct($start, $end)               // i suggest steps of 5k at max (12 steps (0 - 60k)); otherwise eats your ram for breakfast
+    public function __construct($start, $end)               // i suggest steps of 3k at max (20 steps (0 - 60k)); otherwise eats your ram for breakfast
     {
         $this->cols = DB::Aowow()->selectCol('SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`="world" AND `TABLE_NAME`="aowow_item_stats"');
         set_time_limit(300);
@@ -316,11 +358,39 @@ class ItemSetup extends ItemList
         $conditions = array(
             ['i.id', $start, '>'],
             ['i.id', $end, '<='],
-            ['class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]],
+            ['class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR, ITEM_CLASS_CONSUMABLE]],
             0
         );
 
         parent::__construct($conditions);
+    }
+
+    public function calcRepairCost()
+    {
+        foreach ($this->iterate() as $id => $__)
+        {
+            $cls = $this->curTpl['class'];
+            $scb = $this->curTpl['subClassBak'];
+            $dur = $this->curTpl['durability'];
+            $qu  = $this->curTpl['quality'];
+
+            // has no durability
+            if (!in_array($cls, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) || $dur <= 0)
+                continue;
+
+            // is relic, misc or obsolete
+            if ($cls == ITEM_CLASS_ARMOR && !in_array($scb, [1, 2, 3, 4, 6]))
+                continue;
+
+            $cost = DB::Aowow()->selectCell('SELECT ?# FROM ?_durabilityCost WHERE itemLevel = ?',
+                'class'.$cls.'Sub'.$scb,
+                $this->curTpl['itemLevel']
+            );
+
+            $qMod = Util::$itemDurabilityQualityMod[(($qu + 1) * 2)];
+
+            DB::Aowow()->query('UPDATE ?_items SET repairPrice = ?d WHERE id = ?d', intVal($dur * $cost * $qMod), $id);
+        }
     }
 
     public function writeStatsTable()

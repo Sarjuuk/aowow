@@ -2410,6 +2410,147 @@ td.checked .listview-cb:hover
     font-weight: bold;
 }
 
+.slider-x, .slider-y {
+	position: relative;
+}
+
+.slider-x {
+	width: 100%;
+	height: 25px;
+}
+
+.slider-y {
+	width: 25px;
+	height: 100%;
+}
+
+.slider-x.has-labels {
+    height: 40px;
+}
+
+.slider-x .track, .slider-y .track {
+	position: absolute;
+	display: block;
+	width: 100%;
+	height: 100%;
+	z-index: 8;
+}
+
+.slider-x .track {
+    height: 25px;
+}
+
+.slider-y .track {
+    width: 25px;
+}
+
+.slider-x .handle, .slider-y .handle {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+.slider-x .handle {
+	background: url(../images/ui/misc/slider.gif) no-repeat top left;
+	cursor: e-resize;
+	height: 22px;
+	width: 9px;
+}
+
+.slider-y .handle {
+	background: url(../images/ui/misc/slider.gif) no-repeat top right;
+	cursor: n-resize;
+	height: 9px;
+	width: 22px;
+}
+
+.slider-x .handle:hover {
+	background-position: bottom left;
+}
+
+.slider-y .handle:hover {
+	background-position: bottom right;
+}
+
+.slider-x span, .slider-y span {
+	position: absolute;
+	background: #7e7e7e;
+	border: 1px solid #404040;
+	z-index: 5;
+}
+
+.slider-x span {
+	top: 9px;
+	left: 0;
+	width: 100%;
+	height: 2px;
+}
+
+.slider-y span {
+	top: 0;
+	left: 9px;
+	width: 2px;
+	height: 100%;
+}
+
+.slider-x .label {
+    font-size: 11px;
+    left: 0;
+    position: absolute;
+    top: 22px;
+}
+
+.slider-x .label.max {
+    left: auto;
+    right: 0;
+}
+
+.slider-y .label {
+    font-size: 11px;
+    left: 22px;
+    position: absolute;
+    top: 0;
+}
+
+.slider-y .label.max {
+    top: auto;
+    bottom: 0;
+}
+
+.slider-x input, .slider-y input {
+    background: none;
+    border: 1px solid transparent;
+    font-weight: bold;
+    color: #fff;
+    display: block;
+    font-size: 11px;
+    margin: 0 auto;
+    position: relative;
+    text-align: center;
+    top: 22px;
+    width: 50px;
+    z-index: 9;
+}
+
+.slider-y input {
+    margin: 0 0 0 21px;
+    position: relative;
+    text-align: left;
+    top: 45%;
+    width: 30px;
+}
+
+.slider-x input:hover, .slider-y input:hover, .slider-x input:focus, .slider-y input:focus {
+    background: #101010;
+    border-color: #303030;
+    outline: none;
+}
+
+.tooltip-slider table {
+	width: 100%;
+}
+
 .pet-model
 {
     position: relative;

@@ -21,31 +21,12 @@
 {include file='bricks/infobox.tpl' info=$lvData.infobox}
 
             <div class="text">
-                <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} {$page.type}, typeId: {$page.typeId}, linkColor: 'ff71d5ff', linkId: 'spell:{$page.typeId}', linkName: '{$lvData.page.name}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
+                <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: {$page.type}, typeId: {$page.typeId}, linkColor: 'ff71d5ff', linkId: 'spell:{$page.typeId}', linkName: '{$lvData.page.name}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
                 <a href="javascript:;" id="view3D-button" class="button-red{if $lvData.view3D}" onclick="this.blur(); ModelViewer.show({ldelim} type: 1, displayId: {$lvData.view3D} {rdelim}){else} button-red-disabled{/if}"><em><b><i>View in 3D</i></b><span>View in 3D</span></em></a>
                 <a href="{$wowhead}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
                 <h1>{$lvData.page.name}</h1>
 
-                <div id="headicon-generic" style="float: left"></div>
-                <div id="tooltip{$lvData.page.id}-generic" class="tooltip" style="float: left; padding-top: 1px">
-                    <table><tr><td>{$lvData.page.info}</td><th style="background-position: top right"></th></tr><tr><th style="background-position: bottom left"></th><th style="background-position: bottom right"></th></tr></table>
-                </div>
-                <div style="clear: left"></div>
-
-                <script type="text/javascript">
-                    $WH.ge('headicon-generic').appendChild(Icon.create('{$lvData.page.icon}', 2, 0, 0, {$lvData.page.stack}));
-                    $WH.Tooltip.fix($WH.ge('tooltip{$lvData.page.id}-generic'), 1, 1);
-                </script>
-
-                {if !empty($lvData.page.buff)}
-                <h3>{$lang._aura}</h3>
-                <div id="btt{$lvData.page.id}" class="tooltip">
-                    <table><tr><td>{$lvData.page.buff}</td><th style="background-position: top right"></th></tr><tr><th style="background-position: bottom left"></th><th style="background-position: bottom right"></th></tr></table>
-                </div>
-                <script type="text/javascript">
-                    $WH.Tooltip.fixSafe($WH.ge('btt{$lvData.page.id}'), 1, 1)
-                </script>
-                {/if}
+{include file='bricks/tooltip.tpl'}
 
 {if $lvData.page.reagents}{if $lvData.page.tools}<div style="float: left; margin-right: 75px">{/if}
                         <h3>{$lang.reagents}</h3>
@@ -95,7 +76,7 @@
                             </tr>
                             <tr>
                                 <th style="border-left: 0; border-top: 0">{$lang.duration}</th>
-                                <td width="100%" style="border-top: 0">{$lvData.page.duration}</td>
+                                <td width="100%" style="border-top: 0">{if !empty($lvData.page.duration)}{$lvData.page.duration}{else}<span class="q0">{$lang.n_a}</span>{/if}</td>
                             </tr>
                             <tr>
                                 <th style="border-left: 0">{$lang.school}</th>
@@ -103,11 +84,11 @@
                             </tr>
                             <tr>
                                 <th style="border-left: 0">{$lang.mechanic}</th>
-                                <td>{$lvData.page.mechanic}</td>
+                                <td width="100%" style="border-top: 0">{if $lvData.page.mechanic}{$lvData.page.mechanic}{else}<span class="q0">{$lang.n_a}</span>{/if}</td>
                             </tr>
                             <tr>
                                 <th style="border-left: 0">{$lang.dispelType}</th>
-                                <td>{$lvData.page.dispel}</td>
+                                <td width="100%" style="border-top: 0">{if $lvData.page.dispel}{$lvData.page.dispel}{else}<span class="q0">{$lang.n_a}</span>{/if}</td>
                             </tr>
                             <tr>
                                 <th style="border-bottom: 0; border-left: 0">{$lang._gcdCategory}</th>
@@ -130,19 +111,19 @@
                     </tr>
                     <tr>
                         <th>{$lang._cooldown}</th>
-                        <td>{$lvData.page.cooldown}</td>
+                        <td>{if !empty($lvData.page.cooldown)}{$lvData.page.cooldown}{else}<span class="q0">{$lang.n_a}</span>{/if}</td>
                     </tr>
                     <tr>
                         <th><dfn title="{$lang._globCD}">{$lang._gcd}</dfn></th>
                         <td>{$lvData.page.gcd}</td>
                     </tr>
-{if $lvData.page.stances}
+{if !empty($lvData.page.stances)}
                     <tr>
                         <th>{$lang._forms}</th>
                         <td colspan="3">{$lvData.page.stances}</td>
                     </tr>
 {/if}
-{if $lvData.page.items}
+{if !empty($lvData.page.items)}
                     <tr>
                         <th>{$lang.requires2}</th>
                         <td colspan="3">{$lvData.page.items}</td>
@@ -157,7 +138,8 @@
                             <small>
                             {if isset($lvData.page.effect[i].value)}<br>{$lang._value}{$lang.colon}{$lvData.page.effect[i].value}{/if}
                             {if isset($lvData.page.effect[i].radius)}<br>{$lang._radius}{$lang.colon}{$lvData.page.effect[i].radius} {$lang._distUnit}{/if}
-                            {if isset($lvData.page.effect[i].interval)}<br>{$lang._interval}{$lang.colon}{$lvData.page.effect[i].interval} {$lang.seconds}{/if}
+                            {if isset($lvData.page.effect[i].interval)}<br>{$lang._interval}{$lang.colon}{$lvData.page.effect[i].interval}{/if}
+                            {if isset($lvData.page.effect[i].mechanic)}<br>{$lang.mechanic}{$lang.colon}{$lvData.page.effect[i].mechanic}{/if}
                             </small>
 {if isset($lvData.page.effect[i].icon)}
                             <table class="icontab">

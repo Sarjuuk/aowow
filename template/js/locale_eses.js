@@ -4094,7 +4094,6 @@ var LANG = {
     tc_export:      "Exportar",
     tc_summary:     "Resúmen",
     tc_restore:     "Restaurar",
-    tc_link:        "Enlace",
     tc_print:       "Imprimir",
 
     tc_glyphs:      "Glifos",

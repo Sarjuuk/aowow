@@ -136,13 +136,16 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 
                 asort($slot[0]);
                 break;
-            case 3:
             case 16:
+                if (!isset($cats[2]))
+                    $visibleCols[] = 'glyph';
+            case 3:
                 if (!isset($cats[1]))
                     asort($catList[1]);
             case 1:
             case 7:
             case 9:
+                $hiddenCols[] = 'slot';
             case 15:
                 if (!isset($cats[1]))
                     $type = [$catList[1], null];
@@ -181,13 +184,19 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
     $filter['fi']    =  $items->filterGetForm();
 
+    $xCols = $items->filterGetForm('extraCols', true);
+
     // if slot-dropdown is available && Armor && $path points to Armor-Class
     if (count($path) == 4 && $cats[0] == 4 && isset($filter['sl']) && !is_array($filter['sl']))
         $path[] = $filter['sl'];
 
+    $infoMask = ITEMINFO_JSON;
+    if (array_intersect([63, 64], $xCols))                  // 63:buyPrice; 64:sellPrice
+        $infoMask |= ITEMINFO_VENDOR;
+
     $pageData = array(
         'page'   => [],
-        'data'   => $items->getListviewData(ITEMINFO_JSON),
+        'data'   => $items->getListviewData($infoMask),
         'title'  => $title,
         'path'   => $path,
         'params' => []
@@ -206,7 +215,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             if (!$upgItem->error)
             {
                 $upgItem->addGlobalsToJScript($smarty);
-                $pageData['data'][$filter['upg']] = $upgItem->getListviewData(ITEMINFO_JSON)[$filter['upg']];
+                $pageData['data'][$filter['upg']] = $upgItem->getListviewData($infoMask)[$filter['upg']];
             }
         }
 
@@ -217,7 +226,11 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     }
 
     if (!empty($filter['fi']['extraCols']))
-        $pageData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.(empty($filter['gm']) ? 0 : $filter['gm']).', 0)';
+    {
+        $gem  = empty($filter['gm']) ? 0 : $filter['gm'];
+        $cost = array_intersect([63], $xCols) ? 1 : 0;
+        $pageData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.$gem.', '.$cost.')';
+    }
 
     if (!empty($filter['fi']['setWeights']))
     {
@@ -259,9 +272,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $pageData['params']['sort']            = "$['-score', 'name']";
 
         if ($items->hasSetFields(['armor']))
-            $pageData['params']['visibleCols'] = "$['armor']";
+            $visibleCols[] = 'armor';
 
-        $pageData['params']['hiddenCols']      = "$['type', 'source']";
+        array_push($hiddenCols, 'type', 'source');
     }
 
     // create note if search limit was exceeded; overwriting 'note' is intentional
@@ -270,6 +283,12 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $pageData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), $AoWoWconf['sqlLimit']);
         $pageData['params']['_truncated'] = 1;
     }
+
+    if ($hiddenCols)
+        $pageData['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
+
+    if ($visibleCols)
+        $pageData['params']['visibleCols'] = '$'.json_encode($visibleCols);
 
     $smarty->saveCache($cacheKey, $pageData, $filter);
 }

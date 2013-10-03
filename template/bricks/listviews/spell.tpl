@@ -49,10 +49,10 @@
                     {/if}
                     {if !empty($curr.reagents)}
                         reagents:[
-                            {section name=j loop=$curr.reagents}
-                                [{$curr.reagents[j][0]},{$curr.reagents[j][1]}]
-                                {if $smarty.section.j.last}{else},{/if}
-                            {/section}
+                            {foreach name=j from=$curr.reagents item=r}
+                                [{$r[0]},{$r[1]}]
+                                {if $smarty.foreach.j.last}{else},{/if}
+                            {/foreach}
                         ],
                     {/if}
                     {if isset($curr.creates)}

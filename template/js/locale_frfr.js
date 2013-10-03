@@ -4083,7 +4083,6 @@ var LANG = {
     tc_export:      "Exporter",
     tc_summary:     "Résumé",
     tc_restore:     "Restaurer",
-    tc_link:        "Lien",
     tc_print:       "Imprimer",
 
     tc_glyphs:      "Glyphes",

@@ -15,42 +15,13 @@
             {foreach name=i from=$data item=curr}
                 {ldelim}
                     {foreach from=$curr  key='name' item=val}
-                        {if $name != 'id' && $name != 'name' && $name != 'heroic' && $name != 'mincount' && $name != 'maxcount' && $name != 'group' && $name != 'groupcount' && $name != 'cost'}
+                        {if $name != 'id' && $name != 'name' && $name != 'heroic'}
                             {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
                         {/if}
                     {/foreach}
                     name:'{$curr.name|escape:"quotes"}',
-
                     {if isset($curr.heroic)}
                         heroic:1,
-                    {/if}
-                    {if isset($curr.maxcount)}
-                        {if $curr.maxcount > 1}
-                            stack:[{$curr.mincount},{$curr.maxcount}],
-                        {/if}
-                    {/if}
-                    {if isset($curr.group) and isset($curr.groupcount)}
-                        group:'({$curr.group}){if $curr.groupcount!=1} x{$curr.groupcount}{/if}',
-                    {/if}
-                    {if isset($curr.cost.money) || isset($curr.cost.honor) ||isset($curr.cost.arena) || isset($curr.cost.items)}
-                        stock:-1,
-                        cost:[
-                            {if isset($curr.cost.money)}{$curr.cost.money}{/if}
-                            {if isset($curr.cost.honor) or isset($curr.cost.arena) or isset($curr.cost.items)}
-                                ,{if isset($curr.cost.honor)}{$curr.cost.honor}{/if}
-                                {if isset($curr.cost.arena) or isset($curr.cost.items)}
-                                    ,{if isset($curr.cost.arena)}{$curr.cost.arena}{/if}
-                                    {if isset($curr.cost.items)}
-                                        ,[
-                                        {foreach from=$curr.cost.items item=curitem name=c}
-                                            [{$curitem.item},{$curitem.count}]
-                                            {if $smarty.foreach.c.last}{else},{/if}
-                                        {/foreach}
-                                        ]
-                                    {/if}
-                                {/if}
-                            {/if}
-                            ],
                     {/if}
                     id:{$curr.id}
                 {rdelim}
@@ -89,7 +60,7 @@
             },
             count:363318,
             stack:[1,1], /* [min, max] */
-            pctstack:'{1: 50.0123,2: 49.9877}'  /* {dropCount: relChanceForThisStack} */
+            pctstack:'{1: 50.0123, 2: 49.9877}'  /* {dropCount: relChanceForThisStack} */
         }
     ]
 });

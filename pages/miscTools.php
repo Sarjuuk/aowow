@@ -4,7 +4,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// require 'includes/class.community.php';
+// require 'includes/community.class.php';
 
 $_path   = [1, 8];
 $subMenu = $h1Links = null;

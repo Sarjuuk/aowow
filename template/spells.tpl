@@ -55,7 +55,7 @@
 {/if}
                     <table>
                         <tr>
-                            <td>{$lang.name}{$lang.colon}</td>
+                            <td>{$lang.name|ucFirst}{$lang.colon}</td>
                             <td colspan="2">
                                 <table><tr>
                                     <td>&nbsp;<input type="text" name="na" size="30" {if isset($filter.na)}value="{$filter.na|escape:'html'}" {/if}/></td>

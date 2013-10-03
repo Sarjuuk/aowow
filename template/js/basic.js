@@ -68,7 +68,7 @@ $WH.bindfunc = function() {
     var object = args.shift();
 
     return function() {
-	    return __method.apply(object, args.concat($WH.$A(arguments)));
+        return __method.apply(object, args.concat($WH.$A(arguments)));
     };
 };
 
@@ -239,11 +239,11 @@ $WH.rs = function () {
     var c = $WH.rs.random;
     var r = '';
     for (var i = 0; i < 16; i++) {
-	    var n = Math.floor(Math.random() * c.length);
-	    if (i == 0 && n < 11) {
+        var n = Math.floor(Math.random() * c.length);
+        if (i == 0 && n < 11) {
             n += 10;
-	    }
-	    r += c.substring(n, n + 1);
+        }
+        r += c.substring(n, n + 1);
     }
 
     return r;
@@ -278,9 +278,9 @@ $WH.array_apply = function(a, f, ud) {
 $WH.array_filter = function(a, f) {
     var res = [];
     for (var i = 0, len = a.length; i < len; ++i) {
-	    if (f(a[i])) {
+        if (f(a[i])) {
             res.push(a[i]);
-	    }
+        }
     }
 
     return res;
@@ -292,14 +292,14 @@ $WH.array_index = function(a, r, f, z) {
     }
 
     if (!a.__R || z) {
-	    a.__R = {};
-	    if (!f) {
+        a.__R = {};
+        if (!f) {
             f = function(x) { return x; };
-	    }
+        }
 
-	    for (var i = 0, len = a.length; i < len; ++i) {
+        for (var i = 0, len = a.length; i < len; ++i) {
             a.__R[f(a[i])] = i;
-	    }
+        }
     }
 
     return (r == null ? a.__R : !isNaN(a.__R[r]));
@@ -307,19 +307,19 @@ $WH.array_index = function(a, r, f, z) {
 
 $WH.array_compare = function(a, b) {
     if (a.length != b.length) {
-	    return false;
+        return false;
     }
 
     var o = {};
     for (var i = a.length; i >= 0; --i) {
-	    o[a[i]] = true;
+        o[a[i]] = true;
     }
 
     var match = true;
     for (var i = b.length; i >= 0; --i) {
-	    if (o[b[i]] === undefined) {
+        if (o[b[i]] === undefined) {
             match = false;
-	    }
+        }
     }
 
     return match;
@@ -330,11 +330,11 @@ $WH.array_unique = function(a) {
     var tmp = {};
 
     for (var i = a.length-1; i >= 0; --i) {
-	    tmp[a[i]] = 1;
+        tmp[a[i]] = 1;
     }
 
     for (var i in tmp) {
-	    out.push(i);
+        out.push(i);
     }
 
     return out;
@@ -994,6 +994,24 @@ $WH.g_intersectRect = function(a, b) {
 //****************************************************************************//
 //****************************************************************************//
 
+// sarjuuk: this function should be obsolete by now :x
+$WH.g_setRatingLevel = function(sp, level, rating, value) {
+	var newLvl = prompt($WH.sprintf(LANG.prompt_ratinglevel, 1, 80), level);
+	if (newLvl != null) {
+		newLvl |= 0;
+		if (newLvl != level && newLvl >= 1 && newLvl <= 80) {
+			level = newLvl;
+			var a = $WH.g_convertRatingToPercent(level, rating, value);
+			a = (Math.round(a * 100) / 100);
+			if (rating != 12 && rating != 37) {
+				a += "%"
+			}
+			sp.innerHTML = $WH.sprintf(LANG.tooltip_combatrating, a, level);
+			sp.onclick = $WH.g_setRatingLevel.bind(0, sp, level, rating, value);
+		}
+	}
+}
+
 $WH.g_convertRatingToPercent = function(level, rating, value, classs) {
     var ratingBases = $WH.g_convertRatingToPercent.RB;
 
@@ -1136,36 +1154,36 @@ $WH.g_individualToGlobalStat = {
 };
 
 $WH.g_convertScalingFactor = function(level, factor, dist, stat, json) {
-	var scalingValues = $WH.g_convertScalingFactor.SV;
-	var scalingDistributions = $WH.g_convertScalingFactor.SD;
+    var scalingValues = $WH.g_convertScalingFactor.SV;
+    var scalingDistributions = $WH.g_convertScalingFactor.SD;
 
-	if(!scalingValues[level]) {
-		if (g_user.roles & U_GROUP_ADMIN) {
-			alert('There are no item scaling values for level ' + level);
+    if(!scalingValues[level]) {
+        if (g_user.roles & U_GROUP_ADMIN) {
+            alert('There are no item scaling values for level ' + level);
         }
 
-		return (json ? {} : 0);
-	}
-
-	var
-		result = {},
-		scaleValue = scalingValues[level],
-		scaleDistribution = scalingDistributions[dist];
-
-	if (!scaleDistribution || !(stat >= 0 && stat <= 9)) {
-		result.v = scaleValue[factor];
+        return (json ? {} : 0);
     }
-	else {
-		result.n = $WH.g_statToJson[scaleDistribution[stat]];
-		result.s = scaleDistribution[stat];
-		result.v = Math.floor(scaleValue[factor] * scaleDistribution[stat + 10] / 10000.0);
-	}
 
-	return (json ? result : result.v);
+    var
+        result = {},
+        scaleValue = scalingValues[level],
+        scaleDistribution = scalingDistributions[dist];
+
+    if (!scaleDistribution || !(stat >= 0 && stat <= 9)) {
+        result.v = scaleValue[factor];
+    }
+    else {
+        result.n = $WH.g_statToJson[scaleDistribution[stat]];
+        result.s = scaleDistribution[stat];
+        result.v = Math.floor(scaleValue[factor] * scaleDistribution[stat + 10] / 10000.0);
+    }
+
+    return (json ? result : result.v);
 }
 
 if (!$WH.wowheadRemote) {
-	$WH.g_ajaxIshRequest('?data=item-scaling');
+    $WH.g_ajaxIshRequest('?data=item-scaling');
 }
 
 $WH.g_getDataSource = function() {
@@ -1383,14 +1401,6 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
                 return '<span class="q2"' + style + '>' + prefix + '<!--rtg' + ratingId + '-->' + value + suffix + '</span>' + br;
             });
         }
-        else {
-                var json = {
-                    scadist: scaDist
-                };
-
-                $WH.g_setJsonSpellLevel(json, level);
-                // just check for known spells
-        }
     }
 
     // Points per level
@@ -1460,7 +1470,10 @@ $WH.g_setTooltipSpells = function(tooltip, spells, spellData, position) {
 }
 
 $WH.g_enhanceTooltip = function(tooltip, isStatic, useGets, showSlider, buff, knownSpells, chooseSpells) {
-    var _ = typeof tooltip, spellJson;
+    var
+        _ = typeof tooltip,
+        spellJson;
+
     if (_ == 'number') {
         var
             arr = $WH.g_getDataSource(),
@@ -1599,6 +1612,38 @@ $WH.g_staticTooltipLevelClick = function (div, level, noSlider, buff) {
     }
 }
 
+$WH.g_tooltipSliderMove = function(e, slider, position) {
+    $WH.g_staticTooltipLevelClick(this, position.value, 1);
+
+    if (this.bufftip) {
+        $WH.g_staticTooltipLevelClick(this.bufftip, position.value, 1, 1);
+    }
+
+    $WH.Tooltip.hide();
+}
+
+$WH.g_tooltipSpellsChange = function() {
+    if (!this.modified) {
+        return;
+    }
+
+    var
+        chooseSpells = this.modified[0],
+        spellJson    = this.modified[1],
+        knownSpells  = [];
+
+    $.each($('input:checked', chooseSpells), function(i, s) {
+        knownSpells.push(parseInt(s.id.replace('known-', '')));
+    });
+
+    this.modified[2] = knownSpells;
+    this.innerHTML = $WH.g_setTooltipSpells(this.innerHTML, knownSpells, spellJson);
+
+    if (this.bufftip) {
+        ($WH.g_tooltipSpellsChange.bind(this.bufftip))();
+    }
+}
+
 //****************************************************************************//
 //****************************************************************************//
 //****************************************************************************//
@@ -1665,13 +1710,13 @@ $WH.Tooltip = {
             td    = $WH.gE(table, 'td')[0],
             c     = td.childNodes;
 
-		tooltip.className = $WH.trim(tooltip.className.replace('tooltip-slider', ''));
+        tooltip.className = $WH.trim(tooltip.className.replace('tooltip-slider', ''));
 
         if (c.length >= 2 && c[0].nodeName == 'TABLE' && c[1].nodeName == 'TABLE') {
             c[0].style.whiteSpace = 'nowrap';
 
             var m = parseInt(tooltip.style.width);
-			if(!tooltip.slider || !m) {
+            if(!tooltip.slider || !m) {
                 if (c[1].offsetWidth > 300) {
                     m = Math.max(300, c[0].offsetWidth) + 20;
                 }
@@ -1686,10 +1731,10 @@ $WH.Tooltip = {
                 tooltip.style.width = m + 'px';
                 c[0].style.width = c[1].style.width = '100%';
 
-				if(tooltip.slider) {
-					Slider.setSize(tooltip.slider, m - 6);
-					tooltip.className += ' tooltip-slider';
-				}
+                if(tooltip.slider) {
+                    Slider.setSize(tooltip.slider, m - 6);
+                    tooltip.className += ' tooltip-slider';
+                }
 
                 if (!noShrink && tooltip.offsetHeight > document.body.clientHeight) {
                     table.className = 'shrink';
@@ -2008,30 +2053,30 @@ $WH.Tooltip = {
 };
 
 if ($WH.isset('$WowheadPower')) {
-	$WowheadPower.init();
+    $WowheadPower.init();
 }
 
 $WH.g_getProfileIcon = function(raceId, classId, gender, level, icon, size) {
     var raceXclass = {
-	    10: {6:1,  3:1, 8:1, 2:1, 5:1, 4:1, 9:1},           // bloodelf
-	    11: {6:1,  3:1, 8:1, 2:1, 5:1, 7:1, 1:1},           // draenei
-	     3: {6:1,  3:1, 2:1, 5:1, 4:1, 1:1     },           // dwarf
-	     7: {6:1,  8:1, 4:1, 9:1, 1:1          },           // gnome
-	     1: {6:1,  8:1, 2:1, 5:1, 4:1, 9:1, 1:1},           // human
-	     4: {6:1, 11:1, 3:1, 5:1, 4:1, 1:1     },           // nightelf
-	     2: {6:1,  3:1, 4:1, 7:1, 9:1, 1:1     },           // orc
-	     6: {6:1, 11:1, 3:1, 7:1, 1:1          },           // tauren
-	     8: {6:1,  3:1, 8:1, 5:1, 4:1, 7:1, 1:1},           // troll
-	     5: {6:1,  8:1, 5:1, 4:1, 9:1, 1:1     }            // scourge
+        10: {6:1,  3:1, 8:1, 2:1, 5:1, 4:1, 9:1},           // bloodelf
+        11: {6:1,  3:1, 8:1, 2:1, 5:1, 7:1, 1:1},           // draenei
+         3: {6:1,  3:1, 2:1, 5:1, 4:1, 1:1     },           // dwarf
+         7: {6:1,  8:1, 4:1, 9:1, 1:1          },           // gnome
+         1: {6:1,  8:1, 2:1, 5:1, 4:1, 9:1, 1:1},           // human
+         4: {6:1, 11:1, 3:1, 5:1, 4:1, 1:1     },           // nightelf
+         2: {6:1,  3:1, 4:1, 7:1, 9:1, 1:1     },           // orc
+         6: {6:1, 11:1, 3:1, 7:1, 1:1          },           // tauren
+         8: {6:1,  3:1, 8:1, 5:1, 4:1, 7:1, 1:1},           // troll
+         5: {6:1,  8:1, 5:1, 4:1, 9:1, 1:1     }            // scourge
     };
 
     if (icon) {
-	    return isNaN(icon) ? icon : '?profile=avatar' + (size ? '&size=' + size : '') + '&id=' + icon + (size == 'tiny' ? '.gif' : '.jpg');
+        return isNaN(icon) ? icon : '?profile=avatar' + (size ? '&size=' + size : '') + '&id=' + icon + (size == 'tiny' ? '.gif' : '.jpg');
     }
 
     if (!g_file_races[raceId] || !g_file_classes[classId] || !g_file_genders[gender] ||
        !raceXclass[raceId] || !raceXclass[raceId][classId] || (classId == 6 && level < 55)) {
-	    return 'inv_misc_questionmark';
+        return 'inv_misc_questionmark';
     }
 
     return 'chr_' + g_file_races[raceId] + '_' + g_file_genders[gender] + '_' + g_file_classes[classId] + '0' + (level > 59 ? (Math.floor((level - 60) / 10) + 2) : 1);

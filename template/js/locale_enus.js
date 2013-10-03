@@ -1037,7 +1037,7 @@ var g_item_slots = {
 };
 
 var g_item_classes = {
-     0: 'Consommable',
+     0: 'Consumable',
      1: 'Container',
      2: 'Weapon',
      3: 'Gem',
@@ -3911,7 +3911,6 @@ var LANG = {
     tc_export:      "Export",
     tc_summary:     "Summary",
     tc_restore:     "Restore",
-    tc_link:        "Link",
     tc_print:       "Print",
 
     tc_glyphs:      "Glyphs",

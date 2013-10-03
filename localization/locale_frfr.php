@@ -11,9 +11,14 @@ if (!defined('AOWOW_REVISION'))
 
 $lang = array(
     // page variables
+    'timeUnits' => array(
+        'sg'            => ["année",  "mois", "semaine",  "jour",  "heure",  "minute",  "seconde",  "milliseconde"],
+        'pl'            => ["années", "mois", "semaines", "jours", "heures", "minutes", "secondes", "millisecondes"],
+        'ab'            => ["an",     "mo",   "sem",      "jour",  "h",      "min",     "s",        "ms"]
+    ),
     'main' => array(
         'help'          => "Aide",
-        'name'          => "Nom",
+        'name'          => "nom",
         'link'          => "Lien",
         'signIn'        => "S'enregistrer",
         'jsError'       => "S'il vous plait, assurez vous d'avoir le javascript autorisé.",
@@ -39,17 +44,6 @@ $lang = array(
         'gains'         => "Gains",
         'login'         => "[Login]",
         'forum'         => "Forum",
-        'days'          => "jours",
-        'hours'         => "heures",
-        'minutes'       => "minutes",
-        'seconds'       => "secondes",
-        'millisecs'     => "[milliseconds]",
-        'daysAbbr'      => "jour",
-        'hoursAbbr'     => "h",
-        'minutesAbbr'   => "min",
-        'secondsAbbr'   => "s",
-        'millisecsAbbr' => "[ms]",
-
         'n_a'           => "n/d",
 
         // filter
@@ -449,6 +443,8 @@ $lang = array(
         'randEnchant'   => "&lt;Enchantement aléatoire&gt",
         'readClick'     => "&lt;Clique Droit pour Lire&gt",
         'set'           => "Set",
+        '_rndEnchants'  => "Enchantements aléatoires",
+        '_chance'       => "(%s%% de chance)",
         '_reqLevel'     => "Niveau requis",
         'slot'          => "Emplacement",
         '_quality'      => "Qualité",
@@ -468,7 +464,7 @@ $lang = array(
         ),
         'bonding'       => array (
             "Lié au compte",                            "Lié quand ramassé",                                    "Lié quand équipé",
-            "Lié quand utilisé",                        "[Soulbound]",                                          "Objet de quête"
+            "Lié quand utilisé",                        "Objet de quête",                                       "Objet de quête"
         ),
         "bagFamily"     => array(
             "Sac",                  "Carquois",         "Giberne",              "Sac d'âmes",                   "Sac de travailleur du cuir",

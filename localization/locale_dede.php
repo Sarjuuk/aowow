@@ -11,6 +11,11 @@ if (!defined('AOWOW_REVISION'))
 
 $lang = array(
     // page variables
+    'timeUnits' => array(
+        'sg'            => ["Jahr",  "Monat",  "Woche",  "Tag",   "Stunde",  "Minute",  "Sekunde",  "Millisekunde"],
+        'pl'            => ["Jahre", "Monate", "Wochen", "Tage",  "Stunden", "Minuten", "Sekunden", "Millisekunden"],
+        'ab'            => ["J.",    "M.",     "W.",     "Tag",   "Std.",    "Min.",    "Sek.",     "Ms."],
+    ),
     'main' => array(
         'help'          => "Hilfe",
         'name'          => "Name",
@@ -39,17 +44,6 @@ $lang = array(
         'gains'         => "Belohnungen",
         'login'         => "Login",
         'forum'         => "Forum",
-        'days'          => "Tage",
-        'hours'         => "Stunden",
-        'minutes'       => "Minuten",
-        'seconds'       => "Sekunden",
-        'millisecs'     => "Millisekunden",
-        'daysAbbr'      => "T",
-        'hoursAbbr'     => "Std.",
-        'minutesAbbr'   => "Min.",
-        'secondsAbbr'   => "Sek.",
-        'millisecsAbbr' => "Ms",
-
         'n_a'           => "n. v.",
 
         // err_title = Fehler in AoWoW
@@ -497,6 +491,8 @@ $lang = array(
         'randEnchant'   => "&lt;Zufällige Verzauberung&gt",
         'readClick'     => "&lt;Zum Lesen rechtsklicken&gt",
         'set'           => "Set",
+        '_rndEnchants'  => "Zufällige Verzauberungen",
+        '_chance'       => "(Chance von %s%%)",
         '_reqLevel'     => "Mindeststufe",
         'slot'          => "Platz",
         '_quality'      => "Qualität",
@@ -516,7 +512,7 @@ $lang = array(
         ),
         'bonding'       => array (
             "Accountgebunden",                          "Wird beim Aufheben gebunden",                          "Wird beim Anlegen gebunden",
-            "Wird bei Benutzung gebunden",              "Seelengebunden",                                       "Questgegenstand"
+            "Wird bei Benutzung gebunden",              "Questgegenstand",                                      "Questgegenstand"
         ),
         'bagFamily'     => array(
             "Tasche",               "Köcher",           "Munitionsbeutel",      "Seelentasche",                 "Lederertasche",

@@ -4,7 +4,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/class.community.php';
+require 'includes/community.class.php';
 
 $_id  = intVal($pageParam);
 $path = [0, 2];
@@ -76,7 +76,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $pieces  = [];
     $eqList  = [];
     $compare = [];
-    $iList   = new ItemList(array(['i.id', array_keys($iSet->pieceToSet)]));
+
+    if (!$iSet->pieceToSet)
+        $cnd = [0];
+    else
+        $cnd = ['i.id', array_keys($iSet->pieceToSet)];
+
+    $iList   = new ItemList(array($cnd));
     $data    = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);
     foreach ($iList->iterate() as $itemId => $__)
     {
@@ -183,7 +189,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-    $iSet->addGlobalsToJscript($smarty, GLOBALINFO_RELATED);
+    $iSet->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
     // related sets (priority: 1: similar tag + class; 2: has event; 3: no tag + similar type, 4: similar type + profession)
     $rel = [];

@@ -11,9 +11,14 @@ if (!defined('AOWOW_REVISION'))
 
 $lang = array(
     // page variables
+    'timeUnits' => array(
+        'sg'            => ["año",  "mes",   "semana",  "día",  "hora",  "minuto",  "segundo",  "milisegundo"],
+        'pl'            => ["años", "meses", "semanas", "dias", "horas", "minutos", "segundos", "milisegundos"],
+        'ab'            => ["año",  "mes",   "sem",     "",     "h",     "min",     "seg",      "ms"],
+    ),
     'main' => array(
         'help'          => "Ayuda",
-        'name'          => "Nombre",
+        'name'          => "nombre",
         'link'          => "Enlace",
         'signIn'        => "Iniciar sesión",
         'jsError'       => "Por favor, asegúrese de que ha habilitado javascript.",
@@ -39,17 +44,6 @@ $lang = array(
         'gains'         => "Ganancias",
         'login'         => "[Login]",
         'forum'         => "Foro",
-        'days'          => "dias",
-        'hours'         => "horas",
-        'minutes'       => "minutos",
-        'seconds'       => "segundos",
-        'millisecs'     => "[milliseconds]",
-        'daysAbbr'      => "",  // ???
-        'hoursAbbr'     => "h",
-        'minutesAbbr'   => "min",
-        'secondsAbbr'   => "seg",
-        'millisecsAbbr' => "[ms]",
-
         'n_a'           => "n/d",
 
         // filter
@@ -450,6 +444,8 @@ $lang = array(
         'randEnchant'   => "&lt;Encantamiento aleatorio&gt",
         'readClick'     => "&lt;Click derecho para leer&gt",
         'set'           => "Conjunto",
+        '_rndEnchants'  => "Encantamientos aleatorios",
+        '_chance'       => "(probabilidad %s%%)",
         '_reqLevel'     => "Nivel requerido",
         'slot'          => "Casilla",
         '_quality'      => "Calidad",
@@ -469,7 +465,7 @@ $lang = array(
         ),
         'bonding'       => array (
             "Se liga a la cuenta",                      "Se liga al recogerlo",                                 "Se liga al equiparlo",
-            "Se liga al usarlo",                        "[ligados al alma]", /* google :( */                    "Objeto de misión"
+            "Se liga al usarlo",                        "Objeto de misión",                                     "Objeto de misión"
         ),
         "bagFamily"     => array(
             "Bolsa",                "Carcaj",           "Bolsa de municiones",      "Bolsa de almas",             "Bolsa de peletería",

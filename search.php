@@ -51,7 +51,7 @@ todo    26: Listview - template: 'profile',     id: 'characters',    name: LANG.
 */
 
 $search      = urlDecode(trim($pageParam));
-$query       = Util::sqlEscape(str_replace('?', '_', str_replace('*', '%', ($search))));
+$query       = Util::sqlEscape(str_replace('?', '_', str_replace('*', '%', ($search))), true);
 $type        = @intVal($_GET['type']);
 $searchMask  = 0x0;
 $found       = [];
@@ -563,7 +563,7 @@ if ($searchMask & 0x800)
 
     if ($data = $prof->getListviewData())
     {
-        $prof->addGlobalsToJscript($smarty);
+        $prof->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
         foreach ($prof->iterate() as $__)
             $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
@@ -712,7 +712,7 @@ if ($searchMask & 0x8000)
 {
     $conditions = array(
 //        [['cuFlags', MASK, '&'], 0],                                      // todo (med): identify disabled quests
-        [User::$localeId ? 'Title_loc'.User::$localeId : 'Title', $query],  // todo (high): unify name-fields
+        [User::$localeId ? 'lq.Title_loc'.User::$localeId : 'Title', $query],  // todo (high): unify name-fields
         $maxResults
     );
 

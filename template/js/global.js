@@ -952,22 +952,6 @@ function g_createAchievementBar(b, d, a) {
 	};
 	return g_createProgressBar(c)
 }
-function g_setRatingLevel(f, e, b, c) {
-	var d = prompt($WH.sprintf(LANG.prompt_ratinglevel, 1, 80), e);
-	if (d != null) {
-		d |= 0;
-		if (d != e && d >= 1 && d <= 80) {
-			e = d;
-			var a = $WH.g_convertRatingToPercent(e, b, c);
-			a = (Math.round(a * 100) / 100);
-			if (b != 12 && b != 37) {
-				a += "%"
-			}
-			f.innerHTML = $WH.sprintf(LANG.tooltip_combatrating, a, e);
-			f.onclick = g_setRatingLevel.bind(0, f, e, b, c)
-		}
-	}
-}
 
 function g_getMoneyHtml(c) {
 	var b = 0,
@@ -2013,6 +1997,305 @@ var VideoViewer = new function() {
 
 	DomContentLoaded.addEvent(this.checkPound)
 };
+
+var Slider = new function() {
+    var
+        start,
+        handleObj,
+        timer;
+
+    function onMouseDown(e) {
+        e = $WH.$E(e);
+
+        handleObj = this;
+        start     = $WH.g_getCursorPos(e);
+
+        $WH.aE(document, 'mousemove', onMouseMove);
+        $WH.aE(document, 'mouseup', onMouseUp);
+
+        return false;
+    }
+
+    function onMouseMove(e) {
+        e = $WH.$E(e);
+
+        if (!start || !handleObj) {
+            return;
+        }
+
+        var
+            cursor  = $WH.g_getCursorPos(e),
+            delta   = cursor[handleObj._dir] - start[handleObj._dir],
+            outside = setPosition(handleObj, handleObj._pos + delta),
+            current = getCurrentPosition(handleObj);
+
+        if (current && handleObj.input) {
+            handleObj.input.value = current.value;
+        }
+
+        if (!outside) {
+            start = cursor;
+        }
+
+        if (handleObj.onMove) {
+            handleObj.onMove(e, handleObj, current);
+        }
+    }
+
+    function onMouseUp(e) {
+        e = $WH.$E(e);
+
+        if (handleObj.onMove) {
+            handleObj.onMove(e, handleObj, getCurrentPosition(handleObj));
+        }
+
+        handleObj = null;
+        start     = null;
+
+        $WH.dE(document, 'mousemove', onMouseMove);
+        $WH.dE(document, 'mouseup', onMouseUp);
+
+        return false;
+    }
+
+    function onClick(obj, e) {
+        e = $WH.$E(e);
+
+        handleObj = obj;
+        start     = $WH.g_getCursorPos(e);
+
+        var
+            offset = $WH.ac(handleObj.parentNode),
+            center = Math.floor(getHandleWidth(handleObj) / 2);
+
+        setPosition(handleObj, start[handleObj._dir] - offset[handleObj._dir] - center);
+
+        var current = getCurrentPosition(handleObj);
+
+        if (current && handleObj.input) {
+            handleObj.input.value = current.value;
+        }
+
+        if (handleObj.onMove) {
+            handleObj.onMove(e, handleObj, current);
+        }
+
+        $WH.aE(document, 'mousemove', onMouseMove);
+        $WH.aE(document, 'mouseup', onMouseUp);
+
+        return false;
+    }
+
+    function onKeyPress(obj, e) {
+        if (timer) {
+            clearTimeout(timer);
+        }
+
+        if (e.type == 'change' || e.type == 'keypress' && e.which == 13) {
+            onInput(obj, e);
+        }
+        else {
+            timer = setTimeout(onInput.bind(0, obj, e), 1000);
+        }
+    }
+
+    function onInput(obj, e) {
+        var
+            value   = obj.input.value,
+            current = getCurrentPosition(obj);
+
+        if (isNaN(value)) {
+            value = current.value;
+        }
+        if (value > obj._max) {
+            value = obj._max;
+        }
+        if (value < obj._min) {
+            value = obj._min;
+        }
+
+        Slider.setValue(obj, value);
+
+        if (obj.onMove) {
+            obj.onMove(e, obj, getCurrentPosition(obj));
+        }
+    }
+
+    function setPosition(obj, offset) {
+        var outside = false;
+
+        if (offset < 0) {
+            offset  = 0;
+            outside = true;
+        }
+        else if (offset > getMaxPosition(obj)) {
+            offset  = getMaxPosition(obj);
+            outside = true;
+        }
+
+        obj.style[(obj._dir == 'y' ? 'top' : 'left')] = offset + 'px';
+        obj._pos = offset;
+
+        return outside;
+    }
+
+    function getMaxPosition(obj) {
+        return getTrackerWidth(obj) - getHandleWidth(obj) + 2;
+    }
+
+    function getCurrentPosition(obj) {
+        var
+            percent = obj._pos / getMaxPosition(obj),
+            value   = Math.round((percent * (obj._max - obj._min)) + obj._min),
+            result  = [percent, value];
+
+        result.percent = percent;
+        result.value   = value;
+        return result;
+    }
+
+    function getTrackerWidth(obj) {
+        if (obj._tsz > 0) {
+            return obj._tsz;
+        }
+
+        if (obj._dir == 'y') {
+            return obj.parentNode.offsetHeight;
+        }
+
+        return obj.parentNode.offsetWidth;
+    }
+
+    function getHandleWidth(obj) {
+        if (obj._hsz > 0) {
+            return obj._hsz;
+        }
+
+        if (obj._dir == 'y') {
+            return obj.offsetHeight;
+        }
+
+        return obj.offsetWidth;
+    }
+
+    this.setPercent = function(obj, percent) {
+        setPosition(obj, parseInt(percent * getMaxPosition(obj)));
+    };
+
+    this.setValue = function(obj, value) {
+        if (value < obj._min) {
+            value = obj._min;
+        }
+        else if (value > obj._max) {
+            value = obj._max;
+        }
+
+        if (obj.input) {
+            obj.input.value = value;
+        }
+
+        this.setPercent(obj, (value - obj._min) / (obj._max - obj._min));
+    };
+
+    this.setSize = function(obj, length) {
+        var
+            current = getCurrentPosition(obj),
+            resized = getMaxPosition(obj);
+
+        obj.parentNode.style[(obj._dir == 'y' ? 'height' : 'width')] = length + 'px';
+
+        if (resized != getMaxPosition(obj)) {
+            this.setValue(obj, current.value);
+        }
+    };
+
+    this.init = function(container, opt) {
+        var obj = $WH.ce('a');
+        obj.href = 'javascript:;';
+        obj.onmousedown = onMouseDown;
+        obj.className = 'handle';
+
+        var track = $WH.ce('a');
+        track.href = 'javascript:;';
+        track.onmousedown = onClick.bind(0, obj);
+        track.className = 'track';
+
+        $WH.ae(container, $WH.ce('span'));
+        $WH.ae(container, track);
+        $WH.ae(container, obj);
+
+        obj._dir = 'x';
+        obj._min = 1;
+        obj._max = 100;
+        obj._pos = 0;
+        obj._tsz = 0;
+        obj._hsz = 0;
+
+        if (opt != null) {
+            // Orientation
+            if (opt.direction == 'y') {
+                obj._dir = 'y';
+            }
+
+            // Values
+            if (opt.minValue) {
+                obj._min = opt.minValue;
+            }
+            if (opt.maxValue) {
+                obj._max = opt.maxValue;
+            }
+
+            // Functions
+            if (opt.onMove) {
+                obj.onMove = opt.onMove;
+            }
+
+            if (opt.trackSize) {
+                obj._tsz = opt.trackSize;
+            }
+
+            if (opt.handleSize) {
+                obj._hsz = opt.handleSize;
+            }
+
+            // Labels
+            if (opt.showLabels !== false) {
+                var label = $WH.ce('div');
+
+                label.innerHTML = obj._min;
+                label.className = 'label min';
+                $WH.ae(container, label);
+
+                label = $WH.ce('div');
+                label.innerHTML = obj._max;
+                label.className = 'label max';
+                $WH.ae(container, label);
+
+                obj.input = $WH.ce('input');
+                $(obj.input).attr({ value: obj._max, type: 'text' }
+                ).bind('click', function () { this.select(); }
+                ).keypress(function (e) {
+                    var allowed = [];
+                    var usedKey = e.which;
+                    for (i = 48; i < 58; i++) {
+                        allowed.push(i);
+                    }
+                    if (!($WH.in_array(allowed, usedKey) >= 0) && usedKey != 13) {
+                        e.preventDefault();
+                    }
+                }).bind('keyup keydown change', onKeyPress.bind(0, obj));
+
+                obj.input.className = 'input';
+                $WH.ae(container, obj.input);
+            }
+        }
+
+        container.className = 'slider-' + obj._dir + (opt == null || opt.showLabels !== false ? ' has-labels' : '');
+
+        return obj;
+    }
+};
+
 var suDialog;
 function su_addToSaved(c, d, a, e) {
 	if (!c) {
@@ -4946,7 +5229,7 @@ Listview.extraCols = {
                 var sp = $WH.ce('span');
                 sp.className += ' tip';
                 $WH.ae(sp, $WH.ct(value));
-                $WH.ae(b, sp);
+                $WH.ae(td, sp);
             }
             else {
                 return value;
@@ -5367,53 +5650,400 @@ Listview.extraCols = {
 };
 
 Listview.funcBox = {
-    assocBinFlags: function(f, arr) {
-        var res = [];
-        for (var i in arr) {
-            if (!isNaN(i) && (f & 1 << i - 1)) {
-                res.push(i);
-            }
-        }
-        res.sort(function(a, b) {
-            return $WH.strcmp(arr[a], arr[b]);
-        });
-
-        return res;
+    createSimpleCol: function(i, n, w, v) {
+        return {
+            id:    i,
+            name:  (LANG[n] !== undefined ? LANG[n] : n),
+            width: w,
+            value: v
+        };
     },
 
-	createSimpleCol: function(i, n, w, v) {
-		return {
-			id:    i,
-			name:  (LANG[n] !== undefined ? LANG[n] : n),
-			width: w,
-			value: v
-		};
-	},
+    initLootTable: function(row) {
+        var divider;
 
-	initLootTable: function(row) {
-		var divider;
-
-		if (this._totalCount != null) {
-			divider = this._totalCount;
-		}
+        if (this._totalCount != null) {
+            divider = this._totalCount;
+        }
         else {
-			divider = row.outof;
-		}
+            divider = row.outof;
+        }
 
-		if (divider == 0) {
-			if (row.count != -1) {
-				row.percent = row.count;
-			}
+        if (divider == 0) {
+            if (row.count != -1) {
+                row.percent = row.count;
+            }
             else {
-				row.percent = 0;
-			}
-		}
+                row.percent = 0;
+            }
+        }
         else {
-			row.percent = row.count / divider * 100;
-		}
+            row.percent = row.count / divider * 100;
+        }
 
         (Listview.funcBox.initModeFilter.bind(this, row))();
-	},
+    },
+
+// // subtabs here //
+
+    initModeFilter: function(row)
+    {
+        if(this._lootModes == null)
+            this._lootModes = { 99: 0 };
+
+        if(this._distinctModes == null)
+            this._distinctModes = { 99: 0 };
+
+        if((!row.modes || row.modes.mode == 4) && row.classs != 12 && row.commondrop)
+        {
+            this._lootModes[99]++; // Trash
+            this._distinctModes[99]++;
+        }
+        else if(row.modes)
+        {
+            for(var i = -2; i <= 5; ++i)
+            {
+                if(this._lootModes[i] == null)
+                    this._lootModes[i] = 0;
+
+                if(row.modes.mode & 1 << parseInt(i) + 2)
+                    this._lootModes[i]++;
+            }
+
+            if(this._distinctModes[row.modes.mode] == null)
+                this._distinctModes[row.modes.mode] = 0;
+            this._distinctModes[row.modes.mode]++;
+        }
+    },
+
+    addModeIndicator: function()
+    {
+        var nModes = 0;
+        for(var i in this._distinctModes)
+        {
+            if(this._distinctModes[i])
+                nModes++;
+        }
+
+        if(nModes < 2)
+            return;
+
+        var    pm      = location.hash.match(/:mode=([^:]+)/),
+            order   = [0,-1,-2,1,3,2,4,5,99],
+            langref = {
+                "-2": LANG.tab_heroic,
+                "-1": LANG.tab_normal,
+                   0: LANG.tab_noteworthy,
+                   1: $WH.sprintf(LANG.tab_normalX, 10),
+                   2: $WH.sprintf(LANG.tab_normalX, 25),
+                   3: $WH.sprintf(LANG.tab_heroicX, 10),
+                   4: $WH.sprintf(LANG.tab_heroicX, 25),
+                   5: LANG.tab_raidfinder,
+                  99: '' // No indicator for trash
+            };
+
+        var f = function(mode, dm, updatePound)
+        {
+            g_setSelectedLink(this, 'lootmode');
+
+            lv.customPound  = lv.id + (dm != null ? ':mode=' + g_urlize(langref[dm].replace(' ', '')) : '');
+            lv.customFilter = function(item) { return Listview.funcBox.filterMode(item, lv._totalCount, mode) };
+
+            lv.updateFilters(1);
+            lv.applySort();
+            lv.refreshRows();
+            if(updatePound)
+                lv.updatePound(1);
+        };
+
+        var lv = this,
+            modes = [],
+            a;
+
+        a = $('<a><span>' + LANG.pr_note_all + '</span></a>');
+        a[0].f = f.bind(a[0], null, null, 1);
+        a.click(a[0].f);
+        var firstCallback = f.bind(a[0], null, null, 0);
+        firstCallback();
+
+        modes.push($('<span class="indicator-mode"></span>').append(a).append($('<b>' + LANG.pr_note_all + '</b>')));
+
+        for(var j = 0, len = order.length; j < len; ++j)
+        {
+            var i = order[j];
+            if(!this._lootModes[i])
+                continue;
+
+            a = $('<a><span>' + langref[i] + '</span> (' + this._lootModes[i] + ')</a>');
+            a[0].f = f.bind(a[0], 1 << i + 2, i, 1);
+            a.click(a[0].f);
+
+            if(i == 0)
+                firstCallback = f.bind(a[0], 1 << i + 2, i, 0);
+
+            if((i < -1 || i > 2) && i != 5)
+                a.addClass('icon-heroic');
+
+            modes.push($('<span class="indicator-mode"></span>').append(a).append($('<b' + (i < -1 || i > 2 ? ' class="icon-heroic"' : '') + '>' + langref[i] + ' (' + this._lootModes[i] + ')</b>'))); // jQuery is dumb
+
+            if(pm && pm[1] == g_urlize(langref[i].replace(' ', '')))
+                (a[0].f)();
+        }
+
+        var showNoteworthy = false;
+        for(var i = 0, len = modes.length; i < len; ++i)
+        {
+            a = $('a', modes[i]);
+            if(!$('span', a).html() && modes.length == 3)
+                showNoteworthy = true;
+            else
+                this.createIndicator(modes[i], null, a[0].f);
+        }
+
+        if(showNoteworthy)
+            firstCallback();
+
+        $(this.noteTop).append($('<div class="clear"></div>'));
+    },
+
+    filterMode: function(row, total, mode)
+    {
+        if(total != null && row.count != null)
+        {
+            if(row._count == null)
+                row._count = row.count;
+
+            var count = row._count;
+
+            if(mode != null && row.modes[mode])
+            {
+                count = row.modes[mode].count;
+                total = row.modes[mode].outof;
+            }
+
+            row.__tr    = null;
+            row.count   = count;
+            row.outof   = total;
+            if(total)
+                row.percent = count / total * 100;
+            else
+                row.percent = count;
+        }
+
+        return (mode != null ? ((!row.modes || row.modes.mode == 4) && row.classs != 12 && row.commondrop ? (mode == 32) : (row.modes && (row.modes.mode & mode))) : true);
+    },
+
+    initSubclassFilter: function(row)
+    {
+        var i = row.classs || 0;
+        if(this._itemClasses == null)
+            this._itemClasses = {};
+        if(this._itemClasses[i] == null)
+            this._itemClasses[i] = 0;
+        this._itemClasses[i]++;
+    },
+
+    addSubclassIndicator: function()
+    {
+        var it = location.hash.match(/:type=([^:]+)/),
+            order = [];
+
+        for(var i in g_item_classes)
+            order.push({ i: i, n: g_item_classes[i] });
+        order.sort(function(a, b) { return $WH.strcmp(a.n, b.n) });
+
+        var f = function(itemClass, updatePound)
+        {
+            g_setSelectedLink(this, 'itemclass');
+
+            lv.customPound  = lv.id + (itemClass != null ? ':type=' + itemClass : '');
+            lv.customFilter = function(item) { return itemClass == null || itemClass == item.classs };
+
+            lv.updateFilters(1);
+            lv.applySort();
+            lv.refreshRows();
+            if(updatePound)
+                lv.updatePound(1);
+        }
+
+        var lv = this,
+            classes = [],
+            a;
+
+        a = $('<a><span>' + LANG.pr_note_all + '</span></a>');
+        a[0].f = f.bind(a[0], null, 1);
+        a.click(a[0].f);
+        var firstCallback = f.bind(a[0], null, 0);
+        firstCallback();
+
+        classes.push($('<span class="indicator-mode"></span>').append(a).append($('<b>' + LANG.pr_note_all + '</b>')));
+
+        for(var j = 0, len = order.length; j < len; ++j)
+        {
+            var i = order[j].i;
+            if(!this._itemClasses[i])
+                continue;
+
+            a = $('<a><span>' + g_item_classes[i] + '</span> (' + this._itemClasses[i] + ')</a>');
+            a[0].f = f.bind(a[0], i, 1);
+            a.click(a[0].f);
+
+            classes.push($('<span class="indicator-mode"></span>').append(a).append($('<b>' + g_item_classes[i] + ' (' + this._itemClasses[i] + ')</b>')));
+
+            if(it && it[1] == g_urlize(i))
+                (a[0].f)();
+        }
+
+        if(classes.length > 2)
+        {
+            for(var i = 0, len = classes.length; i < len; ++i)
+                this.createIndicator(classes[i], null, $('a', classes[i])[0].f);
+
+            $(this.noteTop).css('padding-bottom', '12px');
+            $(this.noteIndicators).append($('<div class="clear"></div>')).insertAfter($(this.navTop));
+        }
+    },
+
+    initStatisticFilter: function(row)
+    {
+        if(this._achievTypes == null)
+            this._achievTypes = {};
+        if(this._achievTypes[row.type] == null)
+            this._achievTypes[row.type] = 0;
+        this._achievTypes[row.type]++;
+    },
+
+    addStatisticIndicator: function()
+    {
+        var it = location.hash.match(/:type=([^:]+)/),
+            order = [];
+
+        for(var i in g_achievement_types)
+            order.push({ i: i, n: g_achievement_types[i] });
+        order.sort(function(a, b) { return $WH.strcmp(a.n, b.n) });
+
+        var f = function(achievType, updatePound)
+        {
+            g_setSelectedLink(this, 'achievType');
+
+            lv.customPound  = lv.id + (achievType != null ? ':type=' + achievType : '');
+            lv.customFilter = function(achievement) { return achievType == null || achievType == achievement.type };
+
+            lv.updateFilters(1);
+            lv.applySort();
+            lv.refreshRows();
+            if(updatePound)
+                lv.updatePound(1);
+        };
+
+        var lv = this,
+            types = [],
+            a;
+
+        a = $('<a><span>' + LANG.pr_note_all + '</span></a>');
+        a[0].f = f.bind(a[0], null, 1);
+        a.click(a[0].f);
+        var firstCallback = f.bind(a[0], null, 0);
+        firstCallback();
+
+        types.push($('<span class="indicator-mode"></span>').append(a).append($('<b>' + LANG.pr_note_all + '</b>')));
+
+        for(var j = 0, len = order.length; j < len; ++j)
+        {
+            var i = order[j].i;
+            if(!this._achievTypes[i])
+                continue;
+
+            a = $('<a><span>' + g_achievement_types[i] + '</span> (' + this._achievTypes[i] + ')</a>');
+            a[0].f = f.bind(a[0], i, 1);
+            a.click(a[0].f);
+
+            types.push($('<span class="indicator-mode"></span>').append(a).append($('<b>' + g_achievement_types[i] + ' (' + this._achievTypes[i] + ')</b>')));
+
+            if(it && it[1] == i)
+                (a[0].f)();
+        }
+
+        if(types.length > 2)
+        {
+            for(var i = 0, len = types.length; i < len; ++i)
+                this.createIndicator(types[i], null, $('a', types[i])[0].f);
+
+            $(this.noteTop).append($('<div class="clear"></div>'));
+        }
+    },
+
+    initQuestFilter: function(row)
+    {
+        if(this._questTypes == null)
+            this._questTypes = {};
+
+        for(var i = 1; i <= 4; ++i)
+        {
+            if(this._questTypes[i] == null)
+                this._questTypes[i] = 0;
+
+            if(row._type && (row._type & 1 << i - 1))
+                this._questTypes[i]++;
+        }
+    },
+
+    addQuestIndicator: function()
+    {
+        var it = location.hash.match(/:type=([^:]+)/);
+
+        var f = function(questType, updatePound)
+        {
+            g_setSelectedLink(this, 'questType');
+
+            lv.customPound  = lv.id + (questType != null ? ':type=' + questType : '');
+            lv.customFilter = function(quest) { return questType == null || (quest._type & 1 << questType - 1) };
+
+            lv.updateFilters(1);
+            lv.applySort();
+            lv.refreshRows();
+            if(updatePound)
+                lv.updatePound(1);
+        };
+
+        var lv = this,
+            types = [],
+            a;
+
+        a = $('<a><span>' + LANG.pr_note_all + '</span></a>');
+        a[0].f = f.bind(a[0], null, 1);
+        a.click(a[0].f);
+        var firstCallback = f.bind(a[0], null, 0);
+        firstCallback();
+
+        types.push($('<span class="indicator-mode"></span>').append(a).append($('<b>' + LANG.pr_note_all + '</b>')));
+
+        for(var i = 1; i <= 4; ++i)
+        {
+            if(!this._questTypes[i])
+                continue;
+
+            a = $('<a><span>' + g_quest_indicators[i] + '</span> (' + this._questTypes[i] + ')</a>');
+            a[0].f = f.bind(a[0], i, 1);
+            a.click(a[0].f);
+
+            types.push($('<span class="indicator-mode"></span>').append(a).append($('<b>' + g_quest_indicators[i] + ' (' + this._questTypes[i] + ')</b>')));
+
+            if(it && it[1] == i)
+                (a[0].f)();
+        }
+
+        if(types.length > 2)
+        {
+            for(var i = 0, len = types.length; i < len; ++i)
+                this.createIndicator(types[i], null, $('a', types[i])[0].f);
+
+            $(this.noteTop).css('padding-bottom', '12px');
+            $(this.noteIndicators).append($('<div class="clear"></div>')).insertAfter($(this.navTop));
+        }
+    },
+
+// \\ subtabs here \\
 
     assocArrCmp: function(a, b, arr) {
         if (a == null) {
@@ -5441,29 +6071,43 @@ Listview.funcBox = {
         return 0
     },
 
-	location: function(row, td) {
-		if (row.location == null) {
-			return -1;
-		}
+    assocBinFlags: function(f, arr) {
+        var res = [];
+        for (var i in arr) {
+            if (!isNaN(i) && (f & 1 << i - 1)) {
+                res.push(i);
+            }
+        }
+        res.sort(function(a, b) {
+            return $WH.strcmp(arr[a], arr[b]);
+        });
 
-		for (var i = 0, len = row.location.length; i < len; ++i) {
-			if (i > 0) {
-				$WH.ae(td, $WH.ct(LANG.comma));
-			}
+        return res;
+    },
 
-			var zoneId = row.location[i];
-			if (zoneId == -1) {
-				$WH.ae(td, $WH.ct(LANG.ellipsis));
-			}
+    location: function(row, td) {
+        if (row.location == null) {
+            return -1;
+        }
+
+        for (var i = 0, len = row.location.length; i < len; ++i) {
+            if (i > 0) {
+                $WH.ae(td, $WH.ct(LANG.comma));
+            }
+
+            var zoneId = row.location[i];
+            if (zoneId == -1) {
+                $WH.ae(td, $WH.ct(LANG.ellipsis));
+            }
             else {
-				var a = $WH.ce('a');
-				a.className = 'q1';
-				a.href = '?zone=' + zoneId;
-				$WH.ae(a, $WH.ct(g_zones[zoneId]));
-				$WH.ae(td, a);
-			}
-		}
-	},
+                var a = $WH.ce('a');
+                a.className = 'q1';
+                a.href = '?zone=' + zoneId;
+                $WH.ae(a, $WH.ct(g_zones[zoneId]));
+                $WH.ae(td, a);
+            }
+        }
+    },
 
     arrayText: function(arr, lookup) {
         if (arr == null) {
@@ -5601,53 +6245,53 @@ Listview.funcBox = {
     },
 
     createSocketedIcons: function(sockets, td, gems, match, text) {
-		var
+        var
             nMatch = 0,
             d      = $WH.ce('div'),
             d2     = $WH.ce('div');
 
         for (var i = 0, len = sockets.length; i < len; ++i) {
-			var
+            var
                 icon,
                 gemId = gems[i];
 
-				if (g_items && g_items[gemId]) {
-					icon = g_items.createIcon(gemId, 0);
-				}
+                if (g_items && g_items[gemId]) {
+                    icon = g_items.createIcon(gemId, 0);
+                }
                 else if ($WH.isset('g_gems') && g_gems && g_gems[gemId]) {
-					icon = Icon.create(g_gems[gemId].icon, 0, null, '?item=' + gemId);
+                    icon = Icon.create(g_gems[gemId].icon, 0, null, '?item=' + gemId);
                 }
                 else {
                     icon = Icon.create(null, 0, null, 'javascript:;');
-				}
+                }
 
             icon.className += ' iconsmall-socket-' + g_file_gems[sockets[i]] + (!gems || !gemId ? '-empty': '');
-			icon.style.cssFloat = icon.style.styleFloat = 'left';
+            icon.style.cssFloat = icon.style.styleFloat = 'left';
 
-			if (match && match[i]) {
-				icon.insertBefore($WH.ce('var'), icon.childNodes[1]);
+            if (match && match[i]) {
+                icon.insertBefore($WH.ce('var'), icon.childNodes[1]);
                 ++nMatch;
-			}
+            }
 
-			$WH.ae(d, icon);
-		}
+            $WH.ae(d, icon);
+        }
 
-		d.style.margin = '0 auto';
-		d.style.textAlign = 'left';
+        d.style.margin = '0 auto';
+        d.style.textAlign = 'left';
 
-		d.style.width = (26 * sockets.length) + 'px';
-		d2.className = 'clear';
+        d.style.width = (26 * sockets.length) + 'px';
+        d2.className = 'clear';
 
-		$WH.ae(td, d);
-		$WH.ae(td, d2);
+        $WH.ae(td, d);
+        $WH.ae(td, d2);
 
-		if (text && nMatch == sockets.length) {
-			d = $WH.ce('div');
-			d.style.paddingTop = '4px';
-			$WH.ae(d, $WH.ct(text));
-			$WH.ae(td, d);
-		}
-	},
+        if (text && nMatch == sockets.length) {
+            d = $WH.ce('div');
+            d.style.paddingTop = '4px';
+            $WH.ae(d, $WH.ct(text));
+            $WH.ae(td, d);
+        }
+    },
 
     getItemType: function(itemClass, itemSubclass, itemSubsubclass) {
         if (itemSubsubclass != null && g_item_subsubclasses[itemClass] != null && g_item_subsubclasses[itemClass][itemSubclass] != null) {
@@ -5674,66 +6318,15 @@ Listview.funcBox = {
         return g_quest_sorts[category];
     },
 
-	getQuestReputation: function(faction, quest) {
-		if (quest.reprewards) {
-			for (var c = 0, a = quest.reprewards.length; c < a; ++c) {
-				if (quest.reprewards[c][0] == faction) {
-					return quest.reprewards[c][1];
-				}
-			}
-		}
-	},
-
-	getEventNextDates: function(startDate, endDate, recurrence, fromWhen) {
-		if (typeof startDate != 'string' || typeof endDate != 'string') {
-			return [null, null];
-		}
-
-		startDate = new Date(startDate.replace(/-/g, '/'));
-		endDate   = new Date(endDate.replace(/-/g, '/'));
-
-		if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-			return [null, null];
-		}
-
-		if (fromWhen == null) {
-			fromWhen = g_serverTime;
-		}
-
-		var offset = 0;
-		if (recurrence == -1) { // Once by month using day of the week of startDate
-			var nextEvent = new Date(fromWhen.getFullYear(), fromWhen.getMonth(), 1, startDate.getHours(), startDate.getMinutes(), startDate.getSeconds()); // counts as next until it ends
-			for (var i = 0; i < 2; ++i) {
-				nextEvent.setDate(1);
-				nextEvent.setMonth(nextEvent.getMonth() + i); // + 0 = try current month, else try next month
-				var day = nextEvent.getDay();
-				var tolerance = 1;
-				if (nextEvent.getYear() == 2009) {
-					tolerance = 0;
-				}
-				if (day > tolerance) {
-					nextEvent.setDate(nextEvent.getDate() + (7 - day)); // first sunday
-				}
-
-				var eventEnd = new Date(nextEvent);
-				eventEnd.setDate(eventEnd.getDate() + (7 - tolerance)); // 2010, length of 6. tolerance is 1 if it isnt 2009
-				if (fromWhen.getTime() < eventEnd.getTime()) {
-					break; // event hasnt ended yet, so this is still the current one
-				}
-			}
-
-			offset = nextEvent.getTime() - startDate.getTime();
-		}
-        else if (recurrence > 0) {
-            recurrence *= 1000; // sec -> ms
-            offset = Math.ceil((fromWhen.getTime() - endDate.getTime()) / recurrence) * recurrence;
+    getQuestReputation: function(faction, quest) {
+        if (quest.reprewards) {
+            for (var c = 0, a = quest.reprewards.length; c < a; ++c) {
+                if (quest.reprewards[c][0] == faction) {
+                    return quest.reprewards[c][1];
+                }
+            }
         }
-
-		startDate.setTime(startDate.getTime() + offset);
-		endDate.setTime(endDate.getTime() + offset);
-
-		return [startDate, endDate];
-	},
+    },
 
     getFactionCategory: function(category, category2) {
         if (category) {
@@ -5742,6 +6335,57 @@ Listview.funcBox = {
         else {
             return g_faction_categories[category2];
         }
+    },
+
+    getEventNextDates: function(startDate, endDate, recurrence, fromWhen) {
+        if (typeof startDate != 'string' || typeof endDate != 'string') {
+            return [null, null];
+        }
+
+        startDate = new Date(startDate.replace(/-/g, '/'));
+        endDate   = new Date(endDate.replace(/-/g, '/'));
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            return [null, null];
+        }
+
+        if (fromWhen == null) {
+            fromWhen = g_serverTime;
+        }
+
+        var offset = 0;
+        if (recurrence == -1) { // Once by month using day of the week of startDate
+            var nextEvent = new Date(fromWhen.getFullYear(), fromWhen.getMonth(), 1, startDate.getHours(), startDate.getMinutes(), startDate.getSeconds()); // counts as next until it ends
+            for (var i = 0; i < 2; ++i) {
+                nextEvent.setDate(1);
+                nextEvent.setMonth(nextEvent.getMonth() + i); // + 0 = try current month, else try next month
+                var day = nextEvent.getDay();
+                var tolerance = 1;
+                if (nextEvent.getYear() == 2009) {
+                    tolerance = 0;
+                }
+                if (day > tolerance) {
+                    nextEvent.setDate(nextEvent.getDate() + (7 - day)); // first sunday
+                }
+
+                var eventEnd = new Date(nextEvent);
+                eventEnd.setDate(eventEnd.getDate() + (7 - tolerance)); // 2010, length of 6. tolerance is 1 if it isnt 2009
+                if (fromWhen.getTime() < eventEnd.getTime()) {
+                    break; // event hasnt ended yet, so this is still the current one
+                }
+            }
+
+            offset = nextEvent.getTime() - startDate.getTime();
+        }
+        else if (recurrence > 0) {
+            recurrence *= 1000; // sec -> ms
+            offset = Math.ceil((fromWhen.getTime() - endDate.getTime()) / recurrence) * recurrence;
+        }
+
+        startDate.setTime(startDate.getTime() + offset);
+        endDate.setTime(endDate.getTime() + offset);
+
+        return [startDate, endDate];
     },
 
     createTextRange: function(min, max) {
@@ -5759,195 +6403,195 @@ Listview.funcBox = {
         return null;
     },
 
-	coReport: function(d, b, f) {
-		if (!g_user.id || !g_report_reasons[f]) {
-			return
-		}
-		var a = "";
-		if (f == 4 || f == 7) {
-			a = prompt(LANG.prompt_details, "")
-		} else {
-			if (d == 2) {
-				if (!confirm((f == 5 ? LANG.confirm_report3: LANG.confirm_report4))) {
-					return
-				}
-			} else {
-				if (!confirm($WH.sprintf((d == 0 ? LANG.confirm_report: LANG.confirm_report2), g_report_reasons[f]))) {
-					return
-				}
-			}
-		}
-		if (a != null) {
-			var e = "?report&type=" + d + "&typeid=" + b + "&reason=" + f;
-			if (a) {
-				e += "&reasonmore=" + $WH.urlencode(a)
-			}
-			new Ajax(e);
-			var c = $WH.ce("span");
-			$WH.ae(c, $WH.ct(LANG.lvcomment_reported));
-			this.parentNode.replaceChild(c, this)
-		}
-	},
-	coReportClick: function(b, a, c) {
-		this.menu = [
+    coReport: function(d, b, f) {
+        if (!g_user.id || !g_report_reasons[f]) {
+            return
+        }
+        var a = "";
+        if (f == 4 || f == 7) {
+            a = prompt(LANG.prompt_details, "")
+        } else {
+            if (d == 2) {
+                if (!confirm((f == 5 ? LANG.confirm_report3: LANG.confirm_report4))) {
+                    return
+                }
+            } else {
+                if (!confirm($WH.sprintf((d == 0 ? LANG.confirm_report: LANG.confirm_report2), g_report_reasons[f]))) {
+                    return
+                }
+            }
+        }
+        if (a != null) {
+            var e = "?report&type=" + d + "&typeid=" + b + "&reason=" + f;
+            if (a) {
+                e += "&reasonmore=" + $WH.urlencode(a)
+            }
+            new Ajax(e);
+            var c = $WH.ce("span");
+            $WH.ae(c, $WH.ct(LANG.lvcomment_reported));
+            this.parentNode.replaceChild(c, this)
+        }
+    },
+    coReportClick: function(b, a, c) {
+        this.menu = [
             [2, g_report_reasons[2], Listview.funcBox.coReport.bind(this, a, b.id, 2)],
             [1, g_report_reasons[1], Listview.funcBox.coReport.bind(this, a, b.id, 1)],
             [3, g_report_reasons[3], Listview.funcBox.coReport.bind(this, a, b.id, 3)],
             [4, g_report_reasons[4], Listview.funcBox.coReport.bind(this, a, b.id, 4)]
         ];
-		if (a == 1 && b.op && typeof g_pageInfo != "undefined" && !g_pageInfo.sticky) {
-			this.menu.splice(3, 0, [0, g_report_reasons[0], Listview.funcBox.coReport.bind(this, a, b.id, 0)])
-		}
-		if (a == 1 && g_users[b.user].avatar == 2) {
-			this.menu.push([5, g_report_reasons[5], Listview.funcBox.coReport.bind(this, 2, g_users[b.user].avatarmore, 5)])
-		} (Menu.showAtCursor.bind(this, c))()
-	},
-	coGetColor: function(c, a, d) {
-		switch (a) {
-		case -1 :
+        if (a == 1 && b.op && typeof g_pageInfo != "undefined" && !g_pageInfo.sticky) {
+            this.menu.splice(3, 0, [0, g_report_reasons[0], Listview.funcBox.coReport.bind(this, a, b.id, 0)])
+        }
+        if (a == 1 && g_users[b.user].avatar == 2) {
+            this.menu.push([5, g_report_reasons[5], Listview.funcBox.coReport.bind(this, 2, g_users[b.user].avatarmore, 5)])
+        } (Menu.showAtCursor.bind(this, c))()
+    },
+    coGetColor: function(c, a, d) {
+        switch (a) {
+        case -1 :
             var b = null;
             if (!d) {
 
                 b = c.divPost.childNodes[1].className.match(/comment-([a-z]+)/);
-			} else {
+            } else {
                 b = c.divBody[0].className.match(/comment-([a-z]+)/)
             }
             if (b != null) {
-				return " comment-" + b[1]
-			}
-			break;
-		case 3:
-		case 4:
-			if (c.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU)) {
-				return " comment-blue"
-			}
-			if (c.roles & U_GROUP_GREEN_TEXT) {
-				return " comment-green"
-			} else {
-				if (c.roles & U_GROUP_VIP) {
-					return " comment-gold"
-				}
-			}
-			break
-		}
-		if (c.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU)) {
-			return " comment-blue"
-		} else {
-			if (c.rating >= 10) {
-				return " comment-green"
-			} else {
-				if (c.rating < 0) {
-					return " comment-bt"
-				}
-			}
-		}
-		return ""
-	},
-	coToggleVis: function(b) {
+                return " comment-" + b[1]
+            }
+            break;
+        case 3:
+        case 4:
+            if (c.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU)) {
+                return " comment-blue"
+            }
+            if (c.roles & U_GROUP_GREEN_TEXT) {
+                return " comment-green"
+            } else {
+                if (c.roles & U_GROUP_VIP) {
+                    return " comment-gold"
+                }
+            }
+            break
+        }
+        if (c.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU)) {
+            return " comment-blue"
+        } else {
+            if (c.rating >= 10) {
+                return " comment-green"
+            } else {
+                if (c.rating < 0) {
+                    return " comment-bt"
+                }
+            }
+        }
+        return ""
+    },
+    coToggleVis: function(b) {
         var c = g_toggleDisplay(b.divBody);
-		this.firstChild.nodeValue = (c ? LANG.lvcomment_hide: LANG.lvcomment_show);
-		b.__div.className = $WH.trim(b.__div.className.replace("comment-collapsed", "")) + (c ? "": " comment-collapsed");
-		var a = b.divHeader.firstChild.lastChild;
-		if (b.ratable) {
-			a.style.display = ""
-		} else {
-			if (b.deleted || b.purged) {
-				a.style.fontWeight = "normal";
-				a.className = "q10";
-				a.innerHTML = (b.deleted ? LANG.lvcomment_deleted: LANG.lvcomment_purged);
-				a.style.display = ""
-			}
-		}
-		g_toggleDisplay(b.divLinks);
-		if (b.lastEdit != null) {
-			g_toggleDisplay(b.divLastEdit)
-		}
-	},
-	coDisplayRating: function(d, c) {
-		if (typeof(d._ratingMode) == "undefined") {
-			d._ratingMode = 0
-		}
-		if (typeof(Listview._ratings) == "undefined") {
-			Listview._ratings = {}
-		}
-		var a = c;
-		var e = d._ratingMode;
-		if (e == 0) {
-			if (d.rating < 0) {
-				a.innerHTML = d.rating
-			} else {
-				a.innerHTML = "+" + d.rating
-			}
-		}
-		if (e == 1) {
-			if (Listview._ratings[d.id] !== undefined) {
-				var b = Listview._ratings[d.id];
-				a.innerHTML = "+" + b.up + " / -" + b.down
-			} else {
-				new Ajax("?comment=rating&id=" + d.id, {
-					method: "get",
-					onSuccess: function(i, g) {
+        this.firstChild.nodeValue = (c ? LANG.lvcomment_hide: LANG.lvcomment_show);
+        b.__div.className = $WH.trim(b.__div.className.replace("comment-collapsed", "")) + (c ? "": " comment-collapsed");
+        var a = b.divHeader.firstChild.lastChild;
+        if (b.ratable) {
+            a.style.display = ""
+        } else {
+            if (b.deleted || b.purged) {
+                a.style.fontWeight = "normal";
+                a.className = "q10";
+                a.innerHTML = (b.deleted ? LANG.lvcomment_deleted: LANG.lvcomment_purged);
+                a.style.display = ""
+            }
+        }
+        g_toggleDisplay(b.divLinks);
+        if (b.lastEdit != null) {
+            g_toggleDisplay(b.divLastEdit)
+        }
+    },
+    coDisplayRating: function(d, c) {
+        if (typeof(d._ratingMode) == "undefined") {
+            d._ratingMode = 0
+        }
+        if (typeof(Listview._ratings) == "undefined") {
+            Listview._ratings = {}
+        }
+        var a = c;
+        var e = d._ratingMode;
+        if (e == 0) {
+            if (d.rating < 0) {
+                a.innerHTML = d.rating
+            } else {
+                a.innerHTML = "+" + d.rating
+            }
+        }
+        if (e == 1) {
+            if (Listview._ratings[d.id] !== undefined) {
+                var b = Listview._ratings[d.id];
+                a.innerHTML = "+" + b.up + " / -" + b.down
+            } else {
+                new Ajax("?comment=rating&id=" + d.id, {
+                    method: "get",
+                    onSuccess: function(i, g) {
                         var f = JSON.parse(g.responseText);
-						if (f.success) {
-							Listview._ratings[i] = f;
-							this.innerHTML = "+" + f.up + " / -" + f.down
-						} else {
-							this.innerHTML = "Error!"
-						}
-					}.bind(a, d.id)
-				});
-				a.innerHTML = '<img src="' + g_staticUrl + '/template/images/ajax.gif" />';
-			}
-		}
-	},
-	coToggleRating: function(b, a) {
-		if (typeof(b._ratingMode) == "undefined") {
-			b._ratingMode = 0
-		}
-		if (++b._ratingMode > 1) {
-			b._ratingMode = 0
-		}
-		Listview.funcBox.coDisplayRating(b, a)
-	},
-	coRate: function(e, a) {
-		if (a == 0) {
-			var c = 5;
-			if (g_user.roles & U_GROUP_ADMIN) {
-				c = 25
-			} else {
-				if (g_user.roles & U_GROUP_BUREAU) {
-					c = 15
-				}
-			}
-			var d = prompt($WH.sprintf(LANG.prompt_customrating, c, c), 0);
-			if (d == null) {
-				return
-			} else {
-				d |= 0;
-				if (d != 0 && Math.abs(d) <= c) {
-					a = d
-				}
-			}
-			if (a == 0) {
-				return
-			}
-		} else {
-			if (g_user.roles & U_GROUP_COMMENTS_MODERATOR) {
-				a *= 5
-			}
-		}
-		e.rating += a;
-		e.raters.push([g_user.id, a]);
-		var b = e.divHeader.firstChild;
-		$WH.Tooltip.hide();
-		b = b.childNodes[b.childNodes.length - 3];
+                        if (f.success) {
+                            Listview._ratings[i] = f;
+                            this.innerHTML = "+" + f.up + " / -" + f.down
+                        } else {
+                            this.innerHTML = "Error!"
+                        }
+                    }.bind(a, d.id)
+                });
+                a.innerHTML = '<img src="' + g_staticUrl + '/template/images/ajax.gif" />';
+            }
+        }
+    },
+    coToggleRating: function(b, a) {
+        if (typeof(b._ratingMode) == "undefined") {
+            b._ratingMode = 0
+        }
+        if (++b._ratingMode > 1) {
+            b._ratingMode = 0
+        }
+        Listview.funcBox.coDisplayRating(b, a)
+    },
+    coRate: function(e, a) {
+        if (a == 0) {
+            var c = 5;
+            if (g_user.roles & U_GROUP_ADMIN) {
+                c = 25
+            } else {
+                if (g_user.roles & U_GROUP_BUREAU) {
+                    c = 15
+                }
+            }
+            var d = prompt($WH.sprintf(LANG.prompt_customrating, c, c), 0);
+            if (d == null) {
+                return
+            } else {
+                d |= 0;
+                if (d != 0 && Math.abs(d) <= c) {
+                    a = d
+                }
+            }
+            if (a == 0) {
+                return
+            }
+        } else {
+            if (g_user.roles & U_GROUP_COMMENTS_MODERATOR) {
+                a *= 5
+            }
+        }
+        e.rating += a;
+        e.raters.push([g_user.id, a]);
+        var b = e.divHeader.firstChild;
+        $WH.Tooltip.hide();
+        b = b.childNodes[b.childNodes.length - 3];
         var f = $WH.ge("commentrating" + e.id);
         Listview.funcBox.coDisplayRating(e, f);
-		$WH.de(b.nextSibling);
-		$WH.de(b.nextSibling);
-		new Ajax("?comment=rate&id=" + e.id + "&rating=" + a, {
-			method: "get",
-			onSuccess: function(e) {
+        $WH.de(b.nextSibling);
+        $WH.de(b.nextSibling);
+        new Ajax("?comment=rate&id=" + e.id + "&rating=" + a, {
+            method: "get",
+            onSuccess: function(e) {
                 if (e.responseText == "0") {} else {
                     if (e.responseText == "1") {
                         b.innerHTML = LANG.tooltip_banned_rating;
@@ -5959,255 +6603,255 @@ Listview.funcBox = {
                         }
                     }
                 }
-			}
+            }
         });
-	},
-	coDelete: function(a) {
-		if (a.purged) {
-			alert(LANG.message_cantdeletecomment)
-		} else {
-			if (confirm(LANG.confirm_deletecomment)) {
-				new Ajax("?comment=delete&id=" + a.id);
-				this.deleteRows([a])
-			}
-		}
-	},
-	coDetach: function(a) {
-		if (a.replyTo == 0) {
-			alert(LANG.message_cantdetachcomment)
-		} else {
-			if (confirm(LANG.confirm_detachcomment)) {
-				new Ajax("?comment=detach&id=" + a.id);
-				a.replyTo = 0;
-				alert(LANG.message_commentdetached)
-			}
-		}
-	},
-	coEdit: function(g, e, c) {
-		if (!c) {
-			g.divBody.style.display = "none";
-			g.divResponse.style.display = "none";
-			g.divLinks.firstChild.style.display = "none"
-		} else {
-			g.divBody.hide();
-			g.divResponse.hide()
-		}
-		var f = $WH.ce("div");
-		f.className = "comment-edit";
-		g.divEdit = f;
-		if (e == -1) {
-			if (g_users[g.user] != null) {
-				g.roles = g_users[g.user].roles
-			}
-		}
-		var a = Listview.funcBox.coEditAppend(f, g, e, c);
-		var b = $WH.ce("div");
-		b.className = "comment-edit-buttons";
-		var d = $WH.ce("input");
-		d.type = "button";
-		d.value = LANG.compose_save;
-		d.onclick = Listview.funcBox.coEditButton.bind(d, g, true, e, c);
-		$WH.ae(b, d);
-		$WH.ae(b, $WH.ct(" "));
-		d = $WH.ce("input");
-		d.type = "button";
-		d.value = LANG.compose_cancel;
-		d.onclick = Listview.funcBox.coEditButton.bind(d, g, false, e, c);
-		$WH.ae(b, d);
-		$WH.ae(f, b);
-		var c = f;
-		if ($WH.Browser.ie6) {
-			c = $WH.ce("div");
-			c.style.width = "99%";
-			$WH.ae(c, f)
-		}
+    },
+    coDelete: function(a) {
+        if (a.purged) {
+            alert(LANG.message_cantdeletecomment)
+        } else {
+            if (confirm(LANG.confirm_deletecomment)) {
+                new Ajax("?comment=delete&id=" + a.id);
+                this.deleteRows([a])
+            }
+        }
+    },
+    coDetach: function(a) {
+        if (a.replyTo == 0) {
+            alert(LANG.message_cantdetachcomment)
+        } else {
+            if (confirm(LANG.confirm_detachcomment)) {
+                new Ajax("?comment=detach&id=" + a.id);
+                a.replyTo = 0;
+                alert(LANG.message_commentdetached)
+            }
+        }
+    },
+    coEdit: function(g, e, c) {
+        if (!c) {
+            g.divBody.style.display = "none";
+            g.divResponse.style.display = "none";
+            g.divLinks.firstChild.style.display = "none"
+        } else {
+            g.divBody.hide();
+            g.divResponse.hide()
+        }
+        var f = $WH.ce("div");
+        f.className = "comment-edit";
+        g.divEdit = f;
+        if (e == -1) {
+            if (g_users[g.user] != null) {
+                g.roles = g_users[g.user].roles
+            }
+        }
+        var a = Listview.funcBox.coEditAppend(f, g, e, c);
+        var b = $WH.ce("div");
+        b.className = "comment-edit-buttons";
+        var d = $WH.ce("input");
+        d.type = "button";
+        d.value = LANG.compose_save;
+        d.onclick = Listview.funcBox.coEditButton.bind(d, g, true, e, c);
+        $WH.ae(b, d);
+        $WH.ae(b, $WH.ct(" "));
+        d = $WH.ce("input");
+        d.type = "button";
+        d.value = LANG.compose_cancel;
+        d.onclick = Listview.funcBox.coEditButton.bind(d, g, false, e, c);
+        $WH.ae(b, d);
+        $WH.ae(f, b);
+        var c = f;
+        if ($WH.Browser.ie6) {
+            c = $WH.ce("div");
+            c.style.width = "99%";
+            $WH.ae(c, f)
+        }
         $WH.ae(g.divBody.parentNode, f)
-		a.focus()
-	},
-	coEditAppend: function(m, b, l, X, x) {
-		var f = Listview.funcBox.coGetCharLimit(l);
-		if (l == 1 || l == 3 || l == 4) {
-			b.user = g_user.name;
-			b.roles = g_user.roles;
-			b.rating = 1
-		} else {
-			if (l == 2) {
-				b.roles = g_user.roles;
-				b.rating = 1
-			}
-		}
-		if (x) {
-			b.roles &= ~U_GROUP_PENDING
-		}
-		if (l == -1 || l == 0) {
-			var j = $WH.ce("div");
-			j.className = "comment-edit-modes";
-			$WH.ae(j, $WH.ct(LANG.compose_mode));
-			var p = $WH.ce("a");
-			p.className = "selected";
-			p.onclick = Listview.funcBox.coModeLink.bind(p, 1, l, b);
-			p.href = "javascript:;";
-			$WH.ae(p, $WH.ct(LANG.compose_edit));
-			$WH.ae(j, p);
-			$WH.ae(j, $WH.ct("|"));
-			var w = $WH.ce("a");
-			w.onclick = Listview.funcBox.coModeLink.bind(w, 2, l, b);
-			w.href = "javascript:;";
-			$WH.ae(w, $WH.ct(LANG.compose_preview));
-			$WH.ae(j, w);
-			$WH.ae(m, j)
-		}
-		var a = $WH.ce("div");
-		a.style.display = "none";
-		a.className = "comment-body" + Listview.funcBox.coGetColor(b, l);
-		$WH.ae(m, a);
-		var h = $WH.ce("div");
-		h.className = "comment-edit-body";
-		var e = $WH.ce("div");
-		e.className = "toolbar";
+        a.focus()
+    },
+    coEditAppend: function(m, b, l, X, x) {
+        var f = Listview.funcBox.coGetCharLimit(l);
+        if (l == 1 || l == 3 || l == 4) {
+            b.user = g_user.name;
+            b.roles = g_user.roles;
+            b.rating = 1
+        } else {
+            if (l == 2) {
+                b.roles = g_user.roles;
+                b.rating = 1
+            }
+        }
+        if (x) {
+            b.roles &= ~U_GROUP_PENDING
+        }
+        if (l == -1 || l == 0) {
+            var j = $WH.ce("div");
+            j.className = "comment-edit-modes";
+            $WH.ae(j, $WH.ct(LANG.compose_mode));
+            var p = $WH.ce("a");
+            p.className = "selected";
+            p.onclick = Listview.funcBox.coModeLink.bind(p, 1, l, b);
+            p.href = "javascript:;";
+            $WH.ae(p, $WH.ct(LANG.compose_edit));
+            $WH.ae(j, p);
+            $WH.ae(j, $WH.ct("|"));
+            var w = $WH.ce("a");
+            w.onclick = Listview.funcBox.coModeLink.bind(w, 2, l, b);
+            w.href = "javascript:;";
+            $WH.ae(w, $WH.ct(LANG.compose_preview));
+            $WH.ae(j, w);
+            $WH.ae(m, j)
+        }
+        var a = $WH.ce("div");
+        a.style.display = "none";
+        a.className = "comment-body" + Listview.funcBox.coGetColor(b, l);
+        $WH.ae(m, a);
+        var h = $WH.ce("div");
+        h.className = "comment-edit-body";
+        var e = $WH.ce("div");
+        e.className = "toolbar";
         e.style.cssFloat = "left";
-		var i = $WH.ce("div");
-		i.className = "menu-buttons";
+        var i = $WH.ce("div");
+        i.className = "menu-buttons";
         i.style.cssFloat = "left";
-		var g = $WH.ce("textarea");
-		g.className = "comment-editbox";
-		g.rows = 10;
+        var g = $WH.ce("textarea");
+        g.className = "comment-editbox";
+        g.rows = 10;
         g.style.clear = "left";
-		g.value = b.body;
-		switch (l) {
-		case 1:
-			g.name = "commentbody";
-			break;
-		case 2:
-			g.name = "desc";
-			g.originalValue = b.body;
-			break;
-		case 3:
-			g.name = "body";
-			break;
-		case 4:
-			g.name = "sig";
-			g.originalValue = b.body;
-			g.rows = ($WH.Browser.firefox ? 2 : 3);
-			g.style.height = "auto";
-			break
-		}
-		if (l != -1 && l != 0) {
-			var d = $WH.ce("h3"),
-			y = $WH.ce("a"),
-			v = $WH.ce("div"),
-			u = $WH.ce("div");
-			var c = Listview.funcBox.coLivePreview.bind(g, b, l, v);
-			if (b.body) {
-				y.className = "disclosure-off";
-				v.style.display = "none"
-			} else {
-				y.className = "disclosure-on"
-			}
-			$WH.ae(y, $WH.ct(LANG.compose_livepreview));
-			$WH.ae(d, y);
-			y.href = "javascript:;";
-			y.onclick = function() {
-				c(1);
-				y.className = "disclosure-" + (g_toggleDisplay(v) ? "on": "off")
-			};
-			$WH.ns(y);
-			d.className = "first";
-			u.className = "pad";
-			$WH.ae(a, d);
-			$WH.ae(a, v);
-			$WH.ae(a, u);
-			g_onAfterTyping(g, c, 50);
-			$WH.aE(g, "focus", function() {
-				c();
-				a.style.display = "";
-				if (l != 4) {
-					g.style.height = "22em"
-				}
-			})
-		} else {
-			if (l != 4) {
-				$WH.aE(g, "focus", function() {
-					g.style.height = "22em"
-				})
-			}
-		}
-		var t = [{
-			id: "b",
-			title: LANG.markup_b,
-			pre: "[b]",
-			post: "[/b]"
-		},
-		{
-			id: "i",
-			title: LANG.markup_i,
-			pre: "[i]",
-			post: "[/i]"
-		},
-		{
-			id: "u",
-			title: LANG.markup_u,
-			pre: "[u]",
-			post: "[/u]"
-		},
-		{
-			id: "s",
-			title: LANG.markup_s,
-			pre: "[s]",
-			post: "[/s]"
-		},
-		{
-			id: "small",
-			title: LANG.markup_small,
-			pre: "[small]",
-			post: "[/small]"
-		},
-		{
-			id: "url",
-			title: LANG.markup_url,
-			onclick: function() {
-				var i = prompt(LANG.prompt_linkurl, "http://");
-				if (i) {
-					g_insertTag(g, "[url=" + i + "]", "[/url]")
-				}
-			}
-		},
-		{
-			id: "quote",
-			title: LANG.markup_quote,
-			pre: "[quote]",
-			post: "[/quote]"
-		},
-		{
-			id: "code",
-			title: LANG.markup_code,
-			pre: "[code]",
-			post: "[/code]"
-		},
-		{
-			id: "ul",
-			title: LANG.markup_ul,
-			pre: "[ul]\n[li]",
-			post: "[/li]\n[/ul]",
-			rep: function(i) {
-				return i.replace(/\n/g, "[/li]\n[li]")
-			}
-		},
-		{
-			id: "ol",
-			title: LANG.markup_ol,
-			pre: "[ol]\n[li]",
-			post: "[/li]\n[/ol]",
-			rep: function(i) {
-				return i.replace(/\n/g, "[/li]\n[li]")
-			}
-		},
-		{
-			id: "li",
-			title: LANG.markup_li,
-			pre: "[li]",
-			post: "[/li]"
-		}];
+        g.value = b.body;
+        switch (l) {
+        case 1:
+            g.name = "commentbody";
+            break;
+        case 2:
+            g.name = "desc";
+            g.originalValue = b.body;
+            break;
+        case 3:
+            g.name = "body";
+            break;
+        case 4:
+            g.name = "sig";
+            g.originalValue = b.body;
+            g.rows = ($WH.Browser.firefox ? 2 : 3);
+            g.style.height = "auto";
+            break
+        }
+        if (l != -1 && l != 0) {
+            var d = $WH.ce("h3"),
+            y = $WH.ce("a"),
+            v = $WH.ce("div"),
+            u = $WH.ce("div");
+            var c = Listview.funcBox.coLivePreview.bind(g, b, l, v);
+            if (b.body) {
+                y.className = "disclosure-off";
+                v.style.display = "none"
+            } else {
+                y.className = "disclosure-on"
+            }
+            $WH.ae(y, $WH.ct(LANG.compose_livepreview));
+            $WH.ae(d, y);
+            y.href = "javascript:;";
+            y.onclick = function() {
+                c(1);
+                y.className = "disclosure-" + (g_toggleDisplay(v) ? "on": "off")
+            };
+            $WH.ns(y);
+            d.className = "first";
+            u.className = "pad";
+            $WH.ae(a, d);
+            $WH.ae(a, v);
+            $WH.ae(a, u);
+            g_onAfterTyping(g, c, 50);
+            $WH.aE(g, "focus", function() {
+                c();
+                a.style.display = "";
+                if (l != 4) {
+                    g.style.height = "22em"
+                }
+            })
+        } else {
+            if (l != 4) {
+                $WH.aE(g, "focus", function() {
+                    g.style.height = "22em"
+                })
+            }
+        }
+        var t = [{
+            id: "b",
+            title: LANG.markup_b,
+            pre: "[b]",
+            post: "[/b]"
+        },
+        {
+            id: "i",
+            title: LANG.markup_i,
+            pre: "[i]",
+            post: "[/i]"
+        },
+        {
+            id: "u",
+            title: LANG.markup_u,
+            pre: "[u]",
+            post: "[/u]"
+        },
+        {
+            id: "s",
+            title: LANG.markup_s,
+            pre: "[s]",
+            post: "[/s]"
+        },
+        {
+            id: "small",
+            title: LANG.markup_small,
+            pre: "[small]",
+            post: "[/small]"
+        },
+        {
+            id: "url",
+            title: LANG.markup_url,
+            onclick: function() {
+                var i = prompt(LANG.prompt_linkurl, "http://");
+                if (i) {
+                    g_insertTag(g, "[url=" + i + "]", "[/url]")
+                }
+            }
+        },
+        {
+            id: "quote",
+            title: LANG.markup_quote,
+            pre: "[quote]",
+            post: "[/quote]"
+        },
+        {
+            id: "code",
+            title: LANG.markup_code,
+            pre: "[code]",
+            post: "[/code]"
+        },
+        {
+            id: "ul",
+            title: LANG.markup_ul,
+            pre: "[ul]\n[li]",
+            post: "[/li]\n[/ul]",
+            rep: function(i) {
+                return i.replace(/\n/g, "[/li]\n[li]")
+            }
+        },
+        {
+            id: "ol",
+            title: LANG.markup_ol,
+            pre: "[ol]\n[li]",
+            post: "[/li]\n[/ol]",
+            rep: function(i) {
+                return i.replace(/\n/g, "[/li]\n[li]")
+            }
+        },
+        {
+            id: "li",
+            title: LANG.markup_li,
+            pre: "[li]",
+            post: "[/li]"
+        }];
         if (!X) {
             for (var q = 0, r = t.length; q < r; ++q) {
                 var k = t[q];
@@ -6233,33 +6877,33 @@ Listview.funcBox = {
                 $WH.ae(e, o)
             }
         } else {
-			for (var B = 0, C = t.length; B < C; ++B) {
-				var q = t[B];
-				if ((g_user.rolls & U_GROUP_PENDING) && q.nopending) {
-					continue
-				}
-				var H = "tb-" + q.id;
-				var V = $WH.ce('button');
-				V.onclick = function(i, L) {
+            for (var B = 0, C = t.length; B < C; ++B) {
+                var q = t[B];
+                if ((g_user.rolls & U_GROUP_PENDING) && q.nopending) {
+                    continue
+                }
+                var H = "tb-" + q.id;
+                var V = $WH.ce('button');
+                V.onclick = function(i, L) {
                     L.preventDefault();
                     (i.onclick != null ? i.onclick: g_insertTag.bind(0, g, i.pre, i.post, i.rep))()
                 };
                 V.bind(null, q);
-				V.className = H;
-				V.title = q.title;
-				V[0].setAttribute("type", "button");
-				$WH.ae(V, $WH.ce('ins'));
-				$WH.ae(e, V);
-			}
-			e.className += " formatting button sm";
-		}
-		var r = function(L, i) {
-			var M = prompt($WH.sprintf(LANG.markup_prompt, L), "");
-			if (M != null) {
-				g_insertTag(g, "[" + i + "=" + (parseInt(M) || 0) + "]", "")
-			}
-		};
-		var A = [[0, LANG.markup_links, , [
+                V.className = H;
+                V.title = q.title;
+                V[0].setAttribute("type", "button");
+                $WH.ae(V, $WH.ce('ins'));
+                $WH.ae(e, V);
+            }
+            e.className += " formatting button sm";
+        }
+        var r = function(L, i) {
+            var M = prompt($WH.sprintf(LANG.markup_prompt, L), "");
+            if (M != null) {
+                g_insertTag(g, "[" + i + "=" + (parseInt(M) || 0) + "]", "")
+            }
+        };
+        var A = [[0, LANG.markup_links, , [
                 [9, LANG.types[10][0] + "...", r.bind(null, LANG.types[10][1], "achievement")],
                 [11, LANG.types[13][0] + "...", r.bind(null, LANG.types[13][1], "class")],
                 [7, LANG.types[8][0] + "...", r.bind(null, LANG.types[8][1], "faction")],
@@ -6278,730 +6922,762 @@ Listview.funcBox = {
         $WH.ae(di, e);
         $WH.ae(di, i);
         $WH.ae(h, di);
-  		$WH.ae(h, $WH.ce("div"));
-		$WH.ae(h, g);
-		$WH.ae(h, $WH.ce("br"));
-		Menu.addButtons(i, A);
-		if (l == 4) {
-			$WH.ae(h, $WH.ct($WH.sprintf(LANG.compose_limit2, f, 3)))
-		} else {
-			$WH.ae(h, $WH.ct($WH.sprintf(LANG.compose_limit, f)))
-		}
+          $WH.ae(h, $WH.ce("div"));
+        $WH.ae(h, g);
+        $WH.ae(h, $WH.ce("br"));
+        Menu.addButtons(i, A);
+        if (l == 4) {
+            $WH.ae(h, $WH.ct($WH.sprintf(LANG.compose_limit2, f, 3)))
+        } else {
+            $WH.ae(h, $WH.ct($WH.sprintf(LANG.compose_limit, f)))
+        }
         var A = $WH.ce('span');
         A.className = "comment-remaining";
         $WH.ae(A, $WH.ct($WH.sprintf(LANG.compose_remaining, l - b.body.length)));
         $WH.ae(h, A);
-		g.onkeyup = Listview.funcBox.coUpdateCharLimit.bind(0, g, A, f);
-		g.onkeydown = Listview.funcBox.coUpdateCharLimit.bind(0, g, A, f);
-		if ((l == -1 || l == 0) && g_user.roles & U_GROUP_MODERATOR) {
-			var B = $WH.ce("div");
+        g.onkeyup = Listview.funcBox.coUpdateCharLimit.bind(0, g, A, f);
+        g.onkeydown = Listview.funcBox.coUpdateCharLimit.bind(0, g, A, f);
+        if ((l == -1 || l == 0) && g_user.roles & U_GROUP_MODERATOR) {
+            var B = $WH.ce("div");
             B.classname = "pad";
-			var W = $WH.ce("div");
-			$WH.ae(W, $WH.ct((g_user.roles & U_GROUP_ADMIN ? "Admin": "Moderator") + " response"));
-			var p = $WH.ce("textarea");
+            var W = $WH.ce("div");
+            $WH.ae(W, $WH.ct((g_user.roles & U_GROUP_ADMIN ? "Admin": "Moderator") + " response"));
+            var p = $WH.ce("textarea");
             p.value = b.response;
             p.rows = 3;
-			p.style.height = "6em";
-			$WH.ae(h, B);
-			$WH.ae(h, w);
-			$WH.ae(h, p)
-		}
-		$WH.ae(m, h);
-		$WH.ae(m, $WH.ce('div'));
-		$WH.ae(m, a);
+            p.style.height = "6em";
+            $WH.ae(h, B);
+            $WH.ae(h, w);
+            $WH.ae(h, p)
+        }
+        $WH.ae(m, h);
+        $WH.ae(m, $WH.ce('div'));
+        $WH.ae(m, a);
 
-		return g
-	},
+        return g
+    },
 /*
-	coEditAppend: function(m, b, l) {
-		var f = Listview.funcBox.coGetCharLimit(l);
-		if (l == 1 || l == 3 || l == 4) {
-			b.user = g_user.name;
-			b.roles = g_user.roles;
-			b.rating = 1
-		} else {
-			if (l == 2) {
-				b.roles = g_user.roles;
-				b.rating = 1
-			}
-		}
-		if (l == -1 || l == 0) {
-			var j = $WH.ce("div");
-			j.className = "comment-edit-modes";
-			$WH.ae(j, $WH.ct(LANG.compose_mode));
-			var p = $WH.ce("a");
-			p.className = "selected";
-			p.onclick = Listview.funcBox.coModeLink.bind(p, 1, l, b);
-			p.href = "javascript:;";
-			$WH.ae(p, $WH.ct(LANG.compose_edit));
-			$WH.ae(j, p);
-			$WH.ae(j, $WH.ct("|"));
-			var w = $WH.ce("a");
-			w.onclick = Listview.funcBox.coModeLink.bind(w, 2, l, b);
-			w.href = "javascript:;";
-			$WH.ae(w, $WH.ct(LANG.compose_preview));
-			$WH.ae(j, w);
-			$WH.ae(m, j)
-		}
-		var a = $WH.ce("div");
-		a.style.display = "none";
-		a.className = "comment-body" + Listview.funcBox.coGetColor(b, l);
-		$WH.ae(m, a);
-		var h = $WH.ce("div");
-		h.className = "comment-edit-body";
-		var e = $WH.ce("div");
-		e.className = "toolbar";
-		var g = $WH.ce("textarea");
-		g.className = "comment-editbox";
-		g.rows = 10;
-		g.value = b.body;
-		switch (l) {
-		case 1:
-			g.name = "commentbody";
-			g.onfocus = g_revealCaptcha;
-			break;
-		case 2:
-			g.name = "desc";
-			g.originalValue = b.body;
-			break;
-		case 3:
-			g.name = "body";
-			g.onfocus = g_revealCaptcha;
-			break;
-		case 4:
-			g.name = "sig";
-			g.originalValue = b.body;
-			g.rows = ($WH.Browser(gecko ? 2 : 3);
-			g.style.height = "auto";
-			break
-		}
-		if (l != -1 && l != 0) {
-			var d = $WH.ce("h3"),
-			y = $WH.ce("a"),
-			v = $WH.ce("div"),
-			u = $WH.ce("div");
-			var c = Listview.funcBox.coLivePreview.bind(g, b, l, v);
-			if (b.body) {
-				y.className = "disclosure-off";
-				v.style.display = "none"
-			} else {
-				y.className = "disclosure-on"
-			}
-			$WH.ae(y, $WH.ct(LANG.compose_livepreview));
-			$WH.ae(d, y);
-			y.href = "javascript:;";
-			y.onclick = function() {
-				c(1);
-				y.className = "disclosure-" + (g_toggleDisplay(v) ? "on": "off")
-			};
-			$WH.ns(y);
-			d.className = "first";
-			u.className = "pad";
-			$WH.ae(a, d);
-			$WH.ae(a, v);
-			$WH.ae(a, u);
-			g_onAfterTyping(g, c, 50);
-			$WH.aE(g, "focus", function() {
-				c();
-				a.style.display = "";
-				if (l != 4) {
-					g.style.height = "22em"
-				}
-			})
-		} else {
-			if (l != 4) {
-				$WH.aE(g, "focus", function() {
-					g.style.height = "22em"
-				})
-			}
-		}
-		var t = [{
-			id: "b",
-			title: LANG.markup_b,
-			pre: "[b]",
-			post: "[/b]"
-		},
-		{
-			id: "i",
-			title: LANG.markup_i,
-			pre: "[i]",
-			post: "[/i]"
-		},
-		{
-			id: "u",
-			title: LANG.markup_u,
-			pre: "[u]",
-			post: "[/u]"
-		},
-		{
-			id: "s",
-			title: LANG.markup_s,
-			pre: "[s]",
-			post: "[/s]"
-		},
-		{
-			id: "small",
-			title: LANG.markup_small,
-			pre: "[small]",
-			post: "[/small]"
-		},
-		{
-			id: "url",
-			title: LANG.markup_url,
-			onclick: function() {
-				var i = prompt(LANG.prompt_linkurl, "http://");
-				if (i) {
-					g_insertTag(g, "[url=" + i + "]", "[/url]")
-				}
-			}
-		},
-		{
-			id: "quote",
-			title: LANG.markup_quote,
-			pre: "[quote]",
-			post: "[/quote]"
-		},
-		{
-			id: "code",
-			title: LANG.markup_code,
-			pre: "[code]",
-			post: "[/code]"
-		},
-		{
-			id: "ul",
-			title: LANG.markup_ul,
-			pre: "[ul]\n[li]",
-			post: "[/li]\n[/ul]",
-			rep: function(i) {
-				return i.replace(/\n/g, "[/li]\n[li]")
-			}
-		},
-		{
-			id: "ol",
-			title: LANG.markup_ol,
-			pre: "[ol]\n[li]",
-			post: "[/li]\n[/ol]",
-			rep: function(i) {
-				return i.replace(/\n/g, "[/li]\n[li]")
-			}
-		},
-		{
-			id: "li",
-			title: LANG.markup_li,
-			pre: "[li]",
-			post: "[/li]"
-		}];
-		for (var q = 0, r = t.length; q < r; ++q) {
-			var k = t[q];
-			if (l == 4 && k.id == "quote") {
-				break
-			}
-			var o = $WH.ce("button");
-			var z = $WH.ce("img");
-			o.setAttribute("type", "button");
-			o.title = k.title;
-			if (k.onclick != null) {
-				o.onclick = k.onclick
-			} else {
-				o.onclick = g_insertTag.bind(0, g, k.pre, k.post, k.rep)
-			}
-			z.src = "template/images/pixel.gif";
-			z.className = "toolbar-" + k.id;
-			$WH.ae(o, z);
-			$WH.ae(e, o)
-		}
-		$WH.ae(h, e);
-		$WH.ae(h, g);
-		$WH.ae(h, $WH.ce("br"));
-		if (l == 4) {
-			$WH.ae(h, $WH.ct($WH.sprintf(LANG.compose_limit2, f, 3)))
-		} else {
-			$WH.ae(h, $WH.ct($WH.sprintf(LANG.compose_limit, f)))
-		}
-		$WH.ae(m, h);
-		return g
-	},
+    coEditAppend: function(m, b, l) {
+        var f = Listview.funcBox.coGetCharLimit(l);
+        if (l == 1 || l == 3 || l == 4) {
+            b.user = g_user.name;
+            b.roles = g_user.roles;
+            b.rating = 1
+        } else {
+            if (l == 2) {
+                b.roles = g_user.roles;
+                b.rating = 1
+            }
+        }
+        if (l == -1 || l == 0) {
+            var j = $WH.ce("div");
+            j.className = "comment-edit-modes";
+            $WH.ae(j, $WH.ct(LANG.compose_mode));
+            var p = $WH.ce("a");
+            p.className = "selected";
+            p.onclick = Listview.funcBox.coModeLink.bind(p, 1, l, b);
+            p.href = "javascript:;";
+            $WH.ae(p, $WH.ct(LANG.compose_edit));
+            $WH.ae(j, p);
+            $WH.ae(j, $WH.ct("|"));
+            var w = $WH.ce("a");
+            w.onclick = Listview.funcBox.coModeLink.bind(w, 2, l, b);
+            w.href = "javascript:;";
+            $WH.ae(w, $WH.ct(LANG.compose_preview));
+            $WH.ae(j, w);
+            $WH.ae(m, j)
+        }
+        var a = $WH.ce("div");
+        a.style.display = "none";
+        a.className = "comment-body" + Listview.funcBox.coGetColor(b, l);
+        $WH.ae(m, a);
+        var h = $WH.ce("div");
+        h.className = "comment-edit-body";
+        var e = $WH.ce("div");
+        e.className = "toolbar";
+        var g = $WH.ce("textarea");
+        g.className = "comment-editbox";
+        g.rows = 10;
+        g.value = b.body;
+        switch (l) {
+        case 1:
+            g.name = "commentbody";
+            g.onfocus = g_revealCaptcha;
+            break;
+        case 2:
+            g.name = "desc";
+            g.originalValue = b.body;
+            break;
+        case 3:
+            g.name = "body";
+            g.onfocus = g_revealCaptcha;
+            break;
+        case 4:
+            g.name = "sig";
+            g.originalValue = b.body;
+            g.rows = ($WH.Browser(gecko ? 2 : 3);
+            g.style.height = "auto";
+            break
+        }
+        if (l != -1 && l != 0) {
+            var d = $WH.ce("h3"),
+            y = $WH.ce("a"),
+            v = $WH.ce("div"),
+            u = $WH.ce("div");
+            var c = Listview.funcBox.coLivePreview.bind(g, b, l, v);
+            if (b.body) {
+                y.className = "disclosure-off";
+                v.style.display = "none"
+            } else {
+                y.className = "disclosure-on"
+            }
+            $WH.ae(y, $WH.ct(LANG.compose_livepreview));
+            $WH.ae(d, y);
+            y.href = "javascript:;";
+            y.onclick = function() {
+                c(1);
+                y.className = "disclosure-" + (g_toggleDisplay(v) ? "on": "off")
+            };
+            $WH.ns(y);
+            d.className = "first";
+            u.className = "pad";
+            $WH.ae(a, d);
+            $WH.ae(a, v);
+            $WH.ae(a, u);
+            g_onAfterTyping(g, c, 50);
+            $WH.aE(g, "focus", function() {
+                c();
+                a.style.display = "";
+                if (l != 4) {
+                    g.style.height = "22em"
+                }
+            })
+        } else {
+            if (l != 4) {
+                $WH.aE(g, "focus", function() {
+                    g.style.height = "22em"
+                })
+            }
+        }
+        var t = [{
+            id: "b",
+            title: LANG.markup_b,
+            pre: "[b]",
+            post: "[/b]"
+        },
+        {
+            id: "i",
+            title: LANG.markup_i,
+            pre: "[i]",
+            post: "[/i]"
+        },
+        {
+            id: "u",
+            title: LANG.markup_u,
+            pre: "[u]",
+            post: "[/u]"
+        },
+        {
+            id: "s",
+            title: LANG.markup_s,
+            pre: "[s]",
+            post: "[/s]"
+        },
+        {
+            id: "small",
+            title: LANG.markup_small,
+            pre: "[small]",
+            post: "[/small]"
+        },
+        {
+            id: "url",
+            title: LANG.markup_url,
+            onclick: function() {
+                var i = prompt(LANG.prompt_linkurl, "http://");
+                if (i) {
+                    g_insertTag(g, "[url=" + i + "]", "[/url]")
+                }
+            }
+        },
+        {
+            id: "quote",
+            title: LANG.markup_quote,
+            pre: "[quote]",
+            post: "[/quote]"
+        },
+        {
+            id: "code",
+            title: LANG.markup_code,
+            pre: "[code]",
+            post: "[/code]"
+        },
+        {
+            id: "ul",
+            title: LANG.markup_ul,
+            pre: "[ul]\n[li]",
+            post: "[/li]\n[/ul]",
+            rep: function(i) {
+                return i.replace(/\n/g, "[/li]\n[li]")
+            }
+        },
+        {
+            id: "ol",
+            title: LANG.markup_ol,
+            pre: "[ol]\n[li]",
+            post: "[/li]\n[/ol]",
+            rep: function(i) {
+                return i.replace(/\n/g, "[/li]\n[li]")
+            }
+        },
+        {
+            id: "li",
+            title: LANG.markup_li,
+            pre: "[li]",
+            post: "[/li]"
+        }];
+        for (var q = 0, r = t.length; q < r; ++q) {
+            var k = t[q];
+            if (l == 4 && k.id == "quote") {
+                break
+            }
+            var o = $WH.ce("button");
+            var z = $WH.ce("img");
+            o.setAttribute("type", "button");
+            o.title = k.title;
+            if (k.onclick != null) {
+                o.onclick = k.onclick
+            } else {
+                o.onclick = g_insertTag.bind(0, g, k.pre, k.post, k.rep)
+            }
+            z.src = "template/images/pixel.gif";
+            z.className = "toolbar-" + k.id;
+            $WH.ae(o, z);
+            $WH.ae(e, o)
+        }
+        $WH.ae(h, e);
+        $WH.ae(h, g);
+        $WH.ae(h, $WH.ce("br"));
+        if (l == 4) {
+            $WH.ae(h, $WH.ct($WH.sprintf(LANG.compose_limit2, f, 3)))
+        } else {
+            $WH.ae(h, $WH.ct($WH.sprintf(LANG.compose_limit, f)))
+        }
+        $WH.ae(m, h);
+        return g
+    },
 */
-	coLivePreview: function(f, e, a, b) {
+    coLivePreview: function(f, e, a, b) {
         if (b != 1 && a.style.display == "none") {
-			return
-		}
-		var c = this,
-		i = Listview.funcBox.coGetCharLimit(e),
-		g = (c.value.length > i ? c.value.substring(0, i) : c.value);
-		if (e == 4) {
-			var h;
-			if ((h = g.indexOf("\n")) != -1 && (h = g.indexOf("\n", h + 1)) != -1 && (h = g.indexOf("\n", h + 1)) != -1) {
-				g = g.substring(0, h)
-			}
-		}
-		var d = Markup.toHtml(g, {
-			mode: Markup.MODE_COMMENT,
-			roles: f.roles
-		});
-		if (d) {
-			a.innerHTML = d
-		} else {
-			a.innerHTML = '<span class="q6">...</span>'
-		}
-	},
-	coEditButton: function(f, d, e, k) {
-		if (d) {
-			var a = $WH.gE(f.divEdit, "textarea");
+            return
+        }
+        var c = this,
+        i = Listview.funcBox.coGetCharLimit(e),
+        g = (c.value.length > i ? c.value.substring(0, i) : c.value);
+        if (e == 4) {
+            var h;
+            if ((h = g.indexOf("\n")) != -1 && (h = g.indexOf("\n", h + 1)) != -1 && (h = g.indexOf("\n", h + 1)) != -1) {
+                g = g.substring(0, h)
+            }
+        }
+        var d = Markup.toHtml(g, {
+            mode: Markup.MODE_COMMENT,
+            roles: f.roles
+        });
+        if (d) {
+            a.innerHTML = d
+        } else {
+            a.innerHTML = '<span class="q6">...</span>'
+        }
+    },
+    coEditButton: function(f, d, e, k) {
+        if (d) {
+            var a = $WH.gE(f.divEdit, "textarea");
             var g = a[0];
-			if (!Listview.funcBox.coValidate(a, e)) {
-				return
-			}
-			if (g.value != f.body || (a[1] && a[1].value != f.response)) {
-				var c = 0;
-				if (f.lastEdit != null) {
-					c = f.lastEdit[1]
-				}++c;
-				f.lastEdit = [g_serverTime, c, g_user.name];
-				Listview.funcBox.coUpdateLastEdit(f);
-				var b = Listview.funcBox.coGetCharLimit(e);
-				var i = Markup.toHtml((g.value.length > b ? g.value.substring(0, b) : g.value), {
-					mode: Markup.MODE_COMMENT,
-					roles: f.roles
-				});
-				var h = ((a[1] && a[1].value.length > 0) ? Markup.toHtml("[div][/div][wowheadresponse=" + g_user.name + " roles=" + g_user.roles + "]" + a[1].value + "[/wowheadresponse]", {
-					mode: Markup.MODE_COMMENT,
-					roles: g_user.roles
-				}) : "");
-				if (!k) {
-					f.divBody.innerHTML = i;
-					f.divResponse.innerHTML = h
-				} else {
-					f.divBody.html(i);
-					f.divResponse.html(h)
-				}
-				f.body = g.value;
-				if (g_user.roles & U_GROUP_MODERATOR && e[1]) {
-					f.response = e[1].value
-				}
-				var j = "body=" + $WH.urlencode(f.body);
-				if (f.response !== undefined) {
-					j += "&response=" + $WH.urlencode(f.response)
-				}
-				if (e == -1) {
-					new Ajax("?forums=editpost&id=" + f.id, {
-						method: "POST",
-						params: j
-					})
-				} else {
-					new Ajax("?comment=edit&id=" + f.id, {
-						method: "POST",
-						params: j
-					})
-				}
-			}
-		}
-		if (!k) {
+            if (!Listview.funcBox.coValidate(a, e)) {
+                return
+            }
+            if (g.value != f.body || (a[1] && a[1].value != f.response)) {
+                var c = 0;
+                if (f.lastEdit != null) {
+                    c = f.lastEdit[1]
+                }++c;
+                f.lastEdit = [g_serverTime, c, g_user.name];
+                Listview.funcBox.coUpdateLastEdit(f);
+                var b = Listview.funcBox.coGetCharLimit(e);
+                var i = Markup.toHtml((g.value.length > b ? g.value.substring(0, b) : g.value), {
+                    mode: Markup.MODE_COMMENT,
+                    roles: f.roles
+                });
+                var h = ((a[1] && a[1].value.length > 0) ? Markup.toHtml("[div][/div][wowheadresponse=" + g_user.name + " roles=" + g_user.roles + "]" + a[1].value + "[/wowheadresponse]", {
+                    mode: Markup.MODE_COMMENT,
+                    roles: g_user.roles
+                }) : "");
+                if (!k) {
+                    f.divBody.innerHTML = i;
+                    f.divResponse.innerHTML = h
+                } else {
+                    f.divBody.html(i);
+                    f.divResponse.html(h)
+                }
+                f.body = g.value;
+                if (g_user.roles & U_GROUP_MODERATOR && e[1]) {
+                    f.response = e[1].value
+                }
+                var j = "body=" + $WH.urlencode(f.body);
+                if (f.response !== undefined) {
+                    j += "&response=" + $WH.urlencode(f.response)
+                }
+                if (e == -1) {
+                    new Ajax("?forums=editpost&id=" + f.id, {
+                        method: "POST",
+                        params: j
+                    })
+                } else {
+                    new Ajax("?comment=edit&id=" + f.id, {
+                        method: "POST",
+                        params: j
+                    })
+                }
+            }
+        }
+        if (!k) {
             f.divBody.style.display = "";
             f.divResponse.style.display = "";
             f.divLinks.firstChild.style.display = "";
-		} else {
-			f.divBody.show();
-			f.divResponse.show()
-		}
-		$WH.de(f.divEdit);
-		f.divEdit = null
+        } else {
+            f.divBody.show();
+            f.divResponse.show()
+        }
+        $WH.de(f.divEdit);
+        f.divEdit = null
     },
-	coGetCharLimit: function(a) {
-		if (a == 2) {
-			return 7500
-		}
-		if (a == 4) {
-			return 250
-		}
-		if (g_user.roles & U_GROUP_STAFF) {
-			return 16000000
-		}
-		var b = 1;
-		if (g_user.premium) {
-			b = 3
-		}
-		switch (a) {
-		case 0:
-		case 1:
-			return 7500 * b;
-		case -1 : case 3:
-			return 15000 * b
-		}
-	},
-	coUpdateCharLimit: function(a, b, c) {
-		var d = a.value;
-		if (d.length > c) {
-			a.value = d.substring(0, c);
-		} else {
-			b.innerHTML = (" " + $WH.sprintf(LANG.compose_remaining, c - d.length))
+    coGetCharLimit: function(a) {
+        if (a == 2) {
+            return 7500
+        }
+        if (a == 4) {
+            return 250
+        }
+        if (g_user.roles & U_GROUP_STAFF) {
+            return 16000000
+        }
+        var b = 1;
+        if (g_user.premium) {
+            b = 3
+        }
+        switch (a) {
+        case 0:
+        case 1:
+            return 7500 * b;
+        case -1 : case 3:
+            return 15000 * b
+        }
+    },
+    coUpdateCharLimit: function(a, b, c) {
+        var d = a.value;
+        if (d.length > c) {
+            a.value = d.substring(0, c);
+        } else {
+            b.innerHTML = (" " + $WH.sprintf(LANG.compose_remaining, c - d.length))
             b.className.replace(/(?:^|\s)q10(?!\S)/g , '');
-			if (d.length == c) {
-				b.className += " q10";
-			}
-		}
-	},
-	coModeLink: function(e, b, f) {
+            if (d.length == c) {
+                b.className += " q10";
+            }
+        }
+    },
+    coModeLink: function(e, b, f) {
         var j = Listview.funcBox.coGetCharLimit(b);
-		var c = Markup.MODE_COMMENT;
-		$WH.array_walk($WH.gE(this.parentNode, "a"), function(k) {
-			k.className = ""
-		});
-		this.className = "selected";
-		var d = $WH.gE(this.parentNode.parentNode, "textarea"),
+        var c = Markup.MODE_COMMENT;
+        $WH.array_walk($WH.gE(this.parentNode, "a"), function(k) {
+            k.className = ""
+        });
+        this.className = "selected";
+        var d = $WH.gE(this.parentNode.parentNode, "textarea"),
         k = d[0],
-		i = k,
-		a = i.previousSibling;
-		if (b == 4) {
-			c = Markup.MODE_SIGNATURE
-		}
-		switch (e) {
-		case 1:
-			i.style.display = "";
-			a.style.display = "none";
-			a.previousSibling.style.display = "";
-			i.focus();
-			break;
-		case 2:
-			i.style.display = "none";
-			var g = (k.value.length > j ? k.value.substring(0, j) : k.value);
-			if (b == 4) {
-				var h;
-				if ((h = g.indexOf("\n")) != -1 && (h = g.indexOf("\n", h + 1)) != -1 && (h = g.indexOf("\n", h + 1)) != -1) {
-					g = g.substring(0, h)
-				}
-			}
-			var l = Markup.toHtml(g, {
-				mode: c,
-				roles: f.roles
-			});
-			if (d[1] && d[1].value.length > 0) {
-				l += Markup.toHtml("[div][/div][wowheadresponse=" + g_user.name + " roles=" + g_user.roles + "]" + f[1].value + "[/wowheadresponse]", {
-					mode: c,
-					roles: g_user.roles
-				})
-			}
-			a.innerHTML = l;
-			a.style.display = "";
-			a.previousSibling.style.display = "none";
-			break
-		}
-	},
-	coReply: function(b) {
-		document.forms.addcomment.elements.replyto.value = b.replyTo;
-		var a = $WH.ge("replybox-generic");
-		$WH.gE(a, "span")[0].innerHTML = b.user;
-		a.style.display = "";
-		co_addYourComment()
-	},
-	coValidate: function(a, c) {
-		c |= 0;
-		if (c == 1 || c == -1) {
-			if ($WH.trim(a.value).length < 1) {
-				alert(LANG.message_forumposttooshort);
-				return false
-			}
-		} else {
-			if ($WH.trim(a.value).length < 10) {
-				alert(LANG.message_commenttooshort);
-				return false
-			}
-		}
-		var b = Listview.funcBox.coGetCharLimit(c);
-		if (a.value.length > b) {
-			if (!confirm($WH.sprintf(c == 1 ? LANG.confirm_forumposttoolong: LANG.confirm_commenttoolong, b, a.value.substring(b - 30, b)))) {
-				return false
-			}
-		}
-		return true
-	},
-	coCustomRatingOver: function(a) {
-		$WH.Tooltip.showAtCursor(a, LANG.tooltip_customrating, 0, 0, "q")
-	},
-	coPlusRatingOver: function(a) {
-		$WH.Tooltip.showAtCursor(a, LANG.tooltip_uprate, 0, 0, "q2")
-	},
-	coMinusRatingOver: function(a) {
-		$WH.Tooltip.showAtCursor(a, LANG.tooltip_downrate, 0, 0, "q10")
-	},
-	coSortDate: function(a) {
-		a.nextSibling.nextSibling.className = "";
-		a.className = "selected";
-		this.mainDiv.className += " listview-aci";
-		this.setSort([1], true, false)
-		$WH.sc("temp_comment_sort", 1)
-	},
-	coSortHighestRatedFirst: function(a) {
-		a.previousSibling.previousSibling.className = "";
-		a.className = "selected";
-		this.mainDiv.className = this.mainDiv.className.replace("listview-aci", "");
-		this.setSort([ - 3, 2], true, false)
-		$WH.sc("temp_comment_sort", 2)
-	},
-	coFilterByPatchVersion: function(a) {
-		this.minPatchVersion = a.value;
-		this.refreshRows()
-	},
-	coUpdateLastEdit: function(f) {
-		var b = f.divLastEdit;
-		if (!b) {
-			return
-		}
-		if (f.lastEdit != null) {
-			var e = f.lastEdit;
-			b.childNodes[1].firstChild.nodeValue = e[2];
-			b.childNodes[1].href = "?user=" + e[2];
-			var c = new Date(e[0]);
-			var d = (g_serverTime - c) / 1000;
-			if (b.childNodes[3].firstChild) {
-				$WH.de(b.childNodes[3].firstChild)
-			}
-			Listview.funcBox.coFormatDate(b.childNodes[3], d, c);
-			var a = "";
-			if (f.rating != null) {
-				a += $WH.ct($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(c)))
-			}
-			if (e[1] > 1) {
-				a += LANG.dash + $WH.sprintf(LANG.lvcomment_nedits, e[1])
-			}
-			b.childNodes[4].nodeValue = a;
-			b.style.display = ""
-		} else {
-			b.style.display = "none"
-		}
-	},
-	coFormatDate: function(f, e, b, g, h) {
-		var d;
-		if (e < 2592000) {
-			var a = $WH.sprintf(LANG.date_ago, g_formatTimeElapsed(e));
-			var c = new Date();
-			c.setTime(b.getTime() + (g_localTime - g_serverTime));
-			f.style.cursor = "help";
-			f.title = c.toLocaleString()
-		} else {
-			a = LANG.date_on + g_formatDateSimple(b, g)
-		}
-		if (h == 1) {
-			a = a.substr(0, 1).toUpperCase() + a.substr(1)
-		}
-		d = $WH.ct(a);
-		$WH.ae(f, d)
-	},
-	coFormatFileSize: function(c) {
-		var b = -1;
-		var a = "KMGTPEZY";
-		while (c >= 1024 && b < 7) {
-			c /= 1024; ++b
-		}
-		if (b < 0) {
-			return c + " byte" + (c > 1 ? "s": "")
-		} else {
-			return c.toFixed(1) + " " + a[b] + "B"
-		}
-	},
+        i = k,
+        a = i.previousSibling;
+        if (b == 4) {
+            c = Markup.MODE_SIGNATURE
+        }
+        switch (e) {
+        case 1:
+            i.style.display = "";
+            a.style.display = "none";
+            a.previousSibling.style.display = "";
+            i.focus();
+            break;
+        case 2:
+            i.style.display = "none";
+            var g = (k.value.length > j ? k.value.substring(0, j) : k.value);
+            if (b == 4) {
+                var h;
+                if ((h = g.indexOf("\n")) != -1 && (h = g.indexOf("\n", h + 1)) != -1 && (h = g.indexOf("\n", h + 1)) != -1) {
+                    g = g.substring(0, h)
+                }
+            }
+            var l = Markup.toHtml(g, {
+                mode: c,
+                roles: f.roles
+            });
+            if (d[1] && d[1].value.length > 0) {
+                l += Markup.toHtml("[div][/div][wowheadresponse=" + g_user.name + " roles=" + g_user.roles + "]" + f[1].value + "[/wowheadresponse]", {
+                    mode: c,
+                    roles: g_user.roles
+                })
+            }
+            a.innerHTML = l;
+            a.style.display = "";
+            a.previousSibling.style.display = "none";
+            break
+        }
+    },
+    coReply: function(b) {
+        document.forms.addcomment.elements.replyto.value = b.replyTo;
+        var a = $WH.ge("replybox-generic");
+        $WH.gE(a, "span")[0].innerHTML = b.user;
+        a.style.display = "";
+        co_addYourComment()
+    },
+    coValidate: function(a, c) {
+        c |= 0;
+        if (c == 1 || c == -1) {
+            if ($WH.trim(a.value).length < 1) {
+                alert(LANG.message_forumposttooshort);
+                return false
+            }
+        } else {
+            if ($WH.trim(a.value).length < 10) {
+                alert(LANG.message_commenttooshort);
+                return false
+            }
+        }
+        var b = Listview.funcBox.coGetCharLimit(c);
+        if (a.value.length > b) {
+            if (!confirm($WH.sprintf(c == 1 ? LANG.confirm_forumposttoolong: LANG.confirm_commenttoolong, b, a.value.substring(b - 30, b)))) {
+                return false
+            }
+        }
+        return true
+    },
+    coCustomRatingOver: function(a) {
+        $WH.Tooltip.showAtCursor(a, LANG.tooltip_customrating, 0, 0, "q")
+    },
+    coPlusRatingOver: function(a) {
+        $WH.Tooltip.showAtCursor(a, LANG.tooltip_uprate, 0, 0, "q2")
+    },
+    coMinusRatingOver: function(a) {
+        $WH.Tooltip.showAtCursor(a, LANG.tooltip_downrate, 0, 0, "q10")
+    },
+    coSortDate: function(a) {
+        a.nextSibling.nextSibling.className = "";
+        a.className = "selected";
+        this.mainDiv.className += " listview-aci";
+        this.setSort([1], true, false)
+        $WH.sc("temp_comment_sort", 1)
+    },
+    coSortHighestRatedFirst: function(a) {
+        a.previousSibling.previousSibling.className = "";
+        a.className = "selected";
+        this.mainDiv.className = this.mainDiv.className.replace("listview-aci", "");
+        this.setSort([ - 3, 2], true, false)
+        $WH.sc("temp_comment_sort", 2)
+    },
+    coFilterByPatchVersion: function(a) {
+        this.minPatchVersion = a.value;
+        this.refreshRows()
+    },
+    coUpdateLastEdit: function(f) {
+        var b = f.divLastEdit;
+        if (!b) {
+            return
+        }
+        if (f.lastEdit != null) {
+            var e = f.lastEdit;
+            b.childNodes[1].firstChild.nodeValue = e[2];
+            b.childNodes[1].href = "?user=" + e[2];
+            var c = new Date(e[0]);
+            var d = (g_serverTime - c) / 1000;
+            if (b.childNodes[3].firstChild) {
+                $WH.de(b.childNodes[3].firstChild)
+            }
+            Listview.funcBox.coFormatDate(b.childNodes[3], d, c);
+            var a = "";
+            if (f.rating != null) {
+                a += $WH.ct($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(c)))
+            }
+            if (e[1] > 1) {
+                a += LANG.dash + $WH.sprintf(LANG.lvcomment_nedits, e[1])
+            }
+            b.childNodes[4].nodeValue = a;
+            b.style.display = ""
+        } else {
+            b.style.display = "none"
+        }
+    },
+    coFormatDate: function(f, e, b, g, h) {
+        var d;
+        if (e < 2592000) {
+            var a = $WH.sprintf(LANG.date_ago, g_formatTimeElapsed(e));
+            var c = new Date();
+            c.setTime(b.getTime() + (g_localTime - g_serverTime));
+            f.style.cursor = "help";
+            f.title = c.toLocaleString()
+        } else {
+            a = LANG.date_on + g_formatDateSimple(b, g)
+        }
+        if (h == 1) {
+            a = a.substr(0, 1).toUpperCase() + a.substr(1)
+        }
+        d = $WH.ct(a);
+        $WH.ae(f, d)
+    },
+    coFormatFileSize: function(c) {
+        var b = -1;
+        var a = "KMGTPEZY";
+        while (c >= 1024 && b < 7) {
+            c /= 1024; ++b
+        }
+        if (b < 0) {
+            return c + " byte" + (c > 1 ? "s": "")
+        } else {
+            return c.toFixed(1) + " " + a[b] + "B"
+        }
+    },
 
-	dateEventOver: function(date, event, e) {
-		var dates = Listview.funcBox.getEventNextDates(event.startDate, event.endDate, event.rec || 0, date),
-			buff  = '';
+    dateEventOver: function(date, event, e) {
+        var dates = Listview.funcBox.getEventNextDates(event.startDate, event.endDate, event.rec || 0, date),
+            buff  = '';
 
-		if (dates[0] && dates[1]) {
-			var
+        if (dates[0] && dates[1]) {
+            var
                 t1 = new Date(event.startDate.replace(/-/g, '/')),
-				t2 = new Date(event.endDate.replace(/-/g, '/')),
-				first,
-				last;
+                t2 = new Date(event.endDate.replace(/-/g, '/')),
+                first,
+                last;
 
-			t1.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
-			t2.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+            t1.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+            t2.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
 
-			if (date.getFullYear() == dates[0].getFullYear() && date.getMonth() == dates[0].getMonth() && date.getDate() == dates[0].getDate()) {
-				first = true;
-			}
+            if (date.getFullYear() == dates[0].getFullYear() && date.getMonth() == dates[0].getMonth() && date.getDate() == dates[0].getDate()) {
+                first = true;
+            }
 
-			if (date.getFullYear() == dates[1].getFullYear() && date.getMonth() == dates[1].getMonth() && date.getDate() == dates[1].getDate()) {
-				last = true;
-			}
+            if (date.getFullYear() == dates[1].getFullYear() && date.getMonth() == dates[1].getMonth() && date.getDate() == dates[1].getDate()) {
+                last = true;
+            }
 
-			if (first && last)
-				buff = g_formatTimeSimple(t1, LANG.lvscreenshot_from, 1) + ' ' + g_formatTimeSimple(t2, LANG.date_to, 1);
-			else if (first)
-				buff = g_formatTimeSimple(t1, LANG.tab_starts);
-			else if (last)
-				buff = g_formatTimeSimple(t2, LANG.tab_ends);
-			else
-				buff = LANG.allday;
+            if (first && last)
+                buff = g_formatTimeSimple(t1, LANG.lvscreenshot_from, 1) + ' ' + g_formatTimeSimple(t2, LANG.date_to, 1);
+            else if (first)
+                buff = g_formatTimeSimple(t1, LANG.tab_starts);
+            else if (last)
+                buff = g_formatTimeSimple(t2, LANG.tab_ends);
+            else
+                buff = LANG.allday;
         }
 
-		$WH.Tooltip.showAtCursor(e, '<span class="q1">' + event.name + '</span><br />' + buff, 0, 0, 'q');
-	},
+        $WH.Tooltip.showAtCursor(e, '<span class="q1">' + event.name + '</span><br />' + buff, 0, 0, 'q');
+    },
 
-	ssCellOver: function() {
-		this.className = 'screenshot-caption-over';
-	},
+    ssCellOver: function() {
+        this.className = 'screenshot-caption-over';
+    },
 
-	ssCellOut: function() {
-		this.className = 'screenshot-caption';
-	},
+    ssCellOut: function() {
+        this.className = 'screenshot-caption';
+    },
 
-	ssCellClick: function(i, e) {
-		e = $WH.$E(e);
+    ssCellClick: function(i, e) {
+        e = $WH.$E(e);
 
-		if (e.shiftKey || e.ctrlKey) {
-			return;
-		}
+        if (e.shiftKey || e.ctrlKey) {
+            return;
+        }
 
-		var
+        var
             j = 0,
             el = e._target;
 
         while (el && j < 3) {
-			if (el.nodeName == 'A') {
-				return;
-			}
-			if (el.nodeName == 'IMG') {
-				break;
-			}
-			el = el.parentNode;
-		}
+            if (el.nodeName == 'A') {
+                return;
+            }
+            if (el.nodeName == 'IMG') {
+                break;
+            }
+            el = el.parentNode;
+        }
 
-		ScreenshotViewer.show({
-			screenshots: this.data,
-			pos: i
-		});
-	},
+        ScreenshotViewer.show({
+            screenshots: this.data,
+            pos: i
+        });
+    },
 
-	viCellClick: function(i, e) {
-		e = $WH.$E(e);
+    ssCreateCb: function(td, row) {
+        if (row.__nochk) {
+            return;
+        }
 
-		if (e.shiftKey || e.ctrlKey) {
-			return;
-		}
+        var div = $WH.ce('div');
+        div.className = 'listview-cb';
+        div.onclick   = Listview.cbCellClick;
 
-		var
+        var cb = $WH.ce('input');
+        cb.type = 'checkbox';
+        cb.onclick = Listview.cbClick;
+        $WH.ns(cb);
+
+        if (row.__chk) {
+            cb.checked = true;
+        }
+
+        row.__cb = cb;
+
+        $WH.ae(div, cb);
+        $WH.ae(td, div);
+    },
+
+    viCellClick: function(i, e) {
+        e = $WH.$E(e);
+
+        if (e.shiftKey || e.ctrlKey) {
+            return;
+        }
+
+        var
             j = 0,
             el = e._target;
 
-		while (el && j < 3) {
-			if (el.nodeName == 'A') {
-				return;
-			}
-			if (el.nodeName == 'IMG') {
-				break;
-			}
-			el = el.parentNode;
-		}
+        while (el && j < 3) {
+            if (el.nodeName == 'A') {
+                return;
+            }
+            if (el.nodeName == 'IMG') {
+                break;
+            }
+            el = el.parentNode;
+        }
 
-		VideoViewer.show({
-			videos: this.data,
-			pos: i
-		})
-	},
+        VideoViewer.show({
+            videos: this.data,
+            pos: i
+        })
+    },
 
-	moneyHonorOver: function(e) {
-		$WH.Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_honorpoints + '</b>', 0, 0, 'q1');
-	},
+    moneyHonorOver: function(e) {
+        $WH.Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_honorpoints + '</b>', 0, 0, 'q1');
+    },
 
-	moneyArenaOver: function(e) {
-		$WH.Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_arenapoints + '</b>', 0, 0, 'q1');
-	},
+    moneyArenaOver: function(e) {
+        $WH.Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_arenapoints + '</b>', 0, 0, 'q1');
+    },
 
-	moneyAchievementOver: function(e) {
-		$WH.Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_achievementpoints + '</b>', 0, 0, 'q1');
-	},
+    moneyAchievementOver: function(e) {
+        $WH.Tooltip.showAtCursor(e, '<b>' + LANG.tooltip_achievementpoints + '</b>', 0, 0, 'q1');
+    },
 
-	appendMoney: function(g, a, f, m, j, c, l) {        // todo: understand and adapt
-		var k, h = 0;
-		if (a >= 10000) {
-			h = 1;
-			k = $WH.ce("span");
-			k.className = "moneygold";
-			$WH.ae(k, $WH.ct(Math.floor(a / 10000)));
-			$WH.ae(g, k);
-			a %= 10000
-		}
-		if (a >= 100) {
-			if (h) {
-				$WH.ae(g, $WH.ct(" "))
-			} else {
-				h = 1
-			}
-			k = $WH.ce("span");
-			k.className = "moneysilver";
-			$WH.ae(k, $WH.ct(Math.floor(a / 100)));
-			$WH.ae(g, k);
-			a %= 100
-		}
-		if (a >= 1 || f != null) {
-			if (h) {
-				$WH.ae(g, $WH.ct(" "))
-			} else {
-				h = 1
-			}
-			k = $WH.ce("span");
-			k.className = "moneycopper";
-			$WH.ae(k, $WH.ct(a));
-			$WH.ae(g, k)
-		}
-		if (m != null && m != 0) {
-			if (h) {
-				$WH.ae(g, $WH.ct(" "))
-			} else {
-				h = 1
-			}
-			k = $WH.ce("span");
-			k.className = "money" + (m < 0 ? "horde": "alliance") + " tip";
-			k.onmouseover = Listview.funcBox.moneyHonorOver;
-			k.onmousemove = $WH.Tooltip.cursorUpdate;
-			k.onmouseout = $WH.Tooltip.hide;
-			$WH.ae(k, $WH.ct($WH.number_format(Math.abs(m))));
-			$WH.ae(g, k)
-		}
-		if (j >= 1) {
-			if (h) {
-				$WH.ae(g, $WH.ct(" "))
-			} else {
-				h = 1
-			}
-			k = $WH.ce("span");
-			k.className = "moneyarena tip";
-			k.onmouseover = Listview.funcBox.moneyArenaOver;
-			k.onmousemove = $WH.Tooltip.cursorUpdate;
-			k.onmouseout = $WH.Tooltip.hide;
-			$WH.ae(k, $WH.ct($WH.number_format(j)));
-			$WH.ae(g, k)
-		}
-		if (c != null) {
-			for (var b = 0; b < c.length; ++b) {
-				if (h) {
-					$WH.ae(g, $WH.ct(" "))
-				} else {
-					h = 1
-				}
-				var o = c[b][0];
-				var e = c[b][1];
-				k = $WH.ce("a");
-				k.href = "?item=" + o;
-				k.className = "moneyitem";
-				k.style.backgroundImage = "url(images/icons/tiny/" + g_items.getIcon(o).toLowerCase() + ".gif)";
-				$WH.ae(k, $WH.ct(e));
-				$WH.ae(g, k)
-			}
-		}
-		if (l != null) {
-			if (h) {
-				$WH.ae(g, $WH.ct(" "))
-			} else {
-				h = 1
-			}
-			k = $WH.ce("span");
-			k.className = "moneyachievement tip";
-			k.onmouseover = Listview.funcBox.moneyAchievementOver;
-			k.onmousemove = $WH.Tooltip.cursorUpdate;
-			k.onmouseout = $WH.Tooltip.hide;
-			$WH.ae(k, $WH.ct($WH.number_format(l)));
-			$WH.ae(g, k)
-		}
-	},
+    moneyCurrencyOver: function(currencyId, count, e) {
+        var buff = g_gatheredcurrencies[currencyId]['name_' + Locale.getName()];
+
+        // justice / valor points handling removed
+
+        $WH.Tooltip.showAtCursor(e, buff, 0, 0, 'q1');
+    },
+
+    appendMoney: function(g, a, f, m, j, c, l) {        // todo: understand and adapt
+        var k, h = 0;
+        if (a >= 10000) {
+            h = 1;
+            k = $WH.ce("span");
+            k.className = "moneygold";
+            $WH.ae(k, $WH.ct(Math.floor(a / 10000)));
+            $WH.ae(g, k);
+            a %= 10000
+        }
+        if (a >= 100) {
+            if (h) {
+                $WH.ae(g, $WH.ct(" "))
+            } else {
+                h = 1
+            }
+            k = $WH.ce("span");
+            k.className = "moneysilver";
+            $WH.ae(k, $WH.ct(Math.floor(a / 100)));
+            $WH.ae(g, k);
+            a %= 100
+        }
+        if (a >= 1 || f != null) {
+            if (h) {
+                $WH.ae(g, $WH.ct(" "))
+            } else {
+                h = 1
+            }
+            k = $WH.ce("span");
+            k.className = "moneycopper";
+            $WH.ae(k, $WH.ct(a));
+            $WH.ae(g, k)
+        }
+        if (m != null && m != 0) {
+            if (h) {
+                $WH.ae(g, $WH.ct(" "))
+            } else {
+                h = 1
+            }
+            k = $WH.ce("span");
+            k.className = "money" + (m < 0 ? "horde": "alliance") + " tip";
+            k.onmouseover = Listview.funcBox.moneyHonorOver;
+            k.onmousemove = $WH.Tooltip.cursorUpdate;
+            k.onmouseout = $WH.Tooltip.hide;
+            $WH.ae(k, $WH.ct($WH.number_format(Math.abs(m))));
+            $WH.ae(g, k)
+        }
+        if (j >= 1) {
+            if (h) {
+                $WH.ae(g, $WH.ct(" "))
+            } else {
+                h = 1
+            }
+            k = $WH.ce("span");
+            k.className = "moneyarena tip";
+            k.onmouseover = Listview.funcBox.moneyArenaOver;
+            k.onmousemove = $WH.Tooltip.cursorUpdate;
+            k.onmouseout = $WH.Tooltip.hide;
+            $WH.ae(k, $WH.ct($WH.number_format(j)));
+            $WH.ae(g, k)
+        }
+        if (c != null) {
+            for (var b = 0; b < c.length; ++b) {
+                if (h) {
+                    $WH.ae(g, $WH.ct(" "))
+                } else {
+                    h = 1
+                }
+                var o = c[b][0];
+                var e = c[b][1];
+                k = $WH.ce("a");
+                k.href = "?item=" + o;
+                k.className = "moneyitem";
+                k.style.backgroundImage = "url(images/icons/tiny/" + g_items.getIcon(o).toLowerCase() + ".gif)";
+                $WH.ae(k, $WH.ct(e));
+                $WH.ae(g, k)
+            }
+        }
+        if (l != null) {
+            if (h) {
+                $WH.ae(g, $WH.ct(" "))
+            } else {
+                h = 1
+            }
+            k = $WH.ce("span");
+            k.className = "moneyachievement tip";
+            k.onmouseover = Listview.funcBox.moneyAchievementOver;
+            k.onmousemove = $WH.Tooltip.cursorUpdate;
+            k.onmouseout = $WH.Tooltip.hide;
+            $WH.ae(k, $WH.ct($WH.number_format(l)));
+            $WH.ae(g, k)
+        }
+    },
 
     getUpperSource: function(source, sm) {
         switch (source) {
@@ -7701,6 +8377,10 @@ Listview.templates = {
                 name: LANG.type,
                 type: 'text',
                 compute: function(item, td) {
+                    if (item.classs == null) {
+                        return;
+                    }
+
                     td.className = 'small q1';
                     $WH.nw(td);
                     var a = $WH.ce('a');
@@ -7722,7 +8402,7 @@ Listview.templates = {
         ],
 
         getItemLink: function(item) {
-            return '?item=' + item.id;
+            return item.id > 0 ? '?item=' + item.id : 'javascript:;';
         },
 
         onBeforeCreate: function() {
@@ -7749,7 +8429,7 @@ Listview.templates = {
             if (!topBar && this._nComparable < 15) {
                 return;
             }
-            
+
             if (this.mode != Listview.MODE_CHECKBOX) {
                 return;
             }

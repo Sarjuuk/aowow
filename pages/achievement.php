@@ -19,7 +19,7 @@ if (!defined('AOWOW_REVISION'))
 *       }
 */
 
-require 'includes/class.community.php';
+require 'includes/community.class.php';
 
 $_id = intVal($pageParam);
 

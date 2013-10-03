@@ -87,6 +87,7 @@ define('LOCALE_DE',                         3);
 define('LOCALE_ES',                         6);
 define('LOCALE_RU',                         8);
 
+// generic filter handler
 define('FILTER_CR_BOOLEAN',                 1);
 define('FILTER_CR_FLAG',                    2);
 define('FILTER_CR_NUMERIC',                 3);
@@ -98,12 +99,13 @@ define('FILTER_CR_STAFFFLAG',               6);
 define('GLOBALINFO_SELF',                   0x1);           // id, name, icon
 define('GLOBALINFO_RELATED',                0x2);           // spells used by pet, classes/races required by spell, ect
 define('GLOBALINFO_REWARDS',                0x4);           // items rewarded by achievement/quest, ect
+define('GLOBALINFO_EXTRA',                  0x8);           // items / spells .. sends exra tooltip info to template for js-manipulation
 define('GLOBALINFO_ANY',                    0xF);
 
 define('ITEMINFO_JSON',                     0x01);
 define('ITEMINFO_SUBITEMS',                 0x02);
 define('ITEMINFO_VENDOR',                   0x04);
-define('ITEMINFO_LOOT',                     0x08);
+// define('ITEMINFO_LOOT',                     0x08);       // get these infos from dedicatd loot function [count, stack, pctstack, modes]
 define('ITEMINFO_GEM',                      0x10);
 
 define('NPCINFO_TAMEABLE',                  0x1);
@@ -149,6 +151,20 @@ define('OBJECT_CU_CASTER_GROUPED',          0x40);
 define('OBJECT_CU_NOT_PERSISTANT',          0x80);
 
 define('MAX_LEVEL',                         80);
+
+// Loot handles
+define('LOOT_FISHING',            'fishing_loot_template');
+define('LOOT_CREATURE',          'creature_loot_template');
+define('LOOT_GAMEOBJECT',      'gameobject_loot_template');
+define('LOOT_ITEM',                  'item_loot_template');
+define('LOOT_DISENCHANT',      'disenchant_loot_template');
+define('LOOT_PROSPECTING',    'prospecting_loot_template');
+define('LOOT_MILLING',            'milling_loot_template');
+define('LOOT_PICKPOCKET',   'pickpocketing_loot_template');
+define('LOOT_SKINNING',          'skinning_loot_template');
+define('LOOT_QUEST',           'quest_mail_loot_template');
+define('LOOT_SPELL',                'spell_loot_template');
+define('LOOT_REFERENCE',        'reference_loot_template');
 
 // Sides
 define('SIDE_ALLIANCE',                     1);
@@ -332,7 +348,7 @@ define('OBJECT_DESTRUCTIBLE_BUILDING',      33);
 define('OBJECT_GUILD_BANK',                 34);
 define('OBJECT_TRAPDOOR',                   35);
 
-// InventoryType [slot]
+// InventoryType
 define('INVTYPE_NON_EQUIP',                 0);
 define('INVTYPE_HEAD',                      1);
 define('INVTYPE_NECK',                      2);
@@ -391,7 +407,7 @@ define('ITEM_CLASS_AMMUNITION',             6);
 define('ITEM_CLASS_TRADEGOOD',              7);
 // define('ITEM_CLASS_GENERIC',             8);
 define('ITEM_CLASS_RECIPE',                 9);
-// define('ITEM_CLASS_MONEY',               10);
+define('ITEM_CLASS_MONEY',                  10);
 define('ITEM_CLASS_QUIVER',                 11);
 define('ITEM_CLASS_QUEST',                  12);
 define('ITEM_CLASS_KEY',                    13);
@@ -400,14 +416,21 @@ define('ITEM_CLASS_MISC',                   15);
 define('ITEM_CLASS_GLYPH',                  16);
 
 // ItemFlags
-define('ITEM_FLAG_CONJURED',                0x0000002);
-define('ITEM_FLAG_OPENABLE',                0x0000004);
-define('ITEM_FLAG_HEROIC',                  0x0000008);
-define('ITEM_FLAG_DEPRECATED',              0x0000010);
-define('ITEM_FLAG_PARTYLOOT',               0x0000800);
-define('ITEM_FLAG_REFUNDABLE',              0x0001000);
-define('ITEM_FLAG_UNIQUEEQUIPPED',          0x0080000);
-define('ITEM_FLAG_ACCOUNTBOUND',            0x8000000);
+define('ITEM_FLAG_CONJURED',                0x00000002);
+define('ITEM_FLAG_OPENABLE',                0x00000004);
+define('ITEM_FLAG_HEROIC',                  0x00000008);
+define('ITEM_FLAG_DEPRECATED',              0x00000010);
+define('ITEM_FLAG_INDESTRUCTIBLE',          0x00000020);
+define('ITEM_FLAG_NO_EQUIPCD',              0x00000080);
+define('ITEM_FLAG_PARTYLOOT',               0x00000800);
+define('ITEM_FLAG_REFUNDABLE',              0x00001000);
+define('ITEM_FLAG_PROSPECTABLE',            0x00040000);
+define('ITEM_FLAG_UNIQUEEQUIPPED',          0x00080000);
+define('ITEM_FLAG_USABLE_ARENA',            0x00200000);
+define('ITEM_FLAG_USABLE_SHAPED',           0x00800000);
+define('ITEM_FLAG_SMARTLOOT',               0x02000000);
+define('ITEM_FLAG_ACCOUNTBOUND',            0x08000000);
+define('ITEM_FLAG_MILLABLE',                0x20000000);
 
 // ItemMod  (differ slightly from client, see g_statToJson)
 define('ITEM_MOD_WEAPON_DMG',               0);             // < custom

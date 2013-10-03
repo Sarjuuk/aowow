@@ -6,9 +6,14 @@ if (!defined('AOWOW_REVISION'))
 
 $lang = array(
     // page variables
+    'timeUnits' => array(
+        'sg'            => ["year",  "month",  "week",  "day",  "hour",  "minute",  "second",  "millisecond"],
+        'pl'            => ["years", "months", "weeks", "days", "hours", "minutes", "seconds", "milliseconds"],
+        'ab'            => ["yr",    "mo",     "wk",    "day",  "hr",    "min",     "sec",     "ms"]
+    ),
     'main' => array(
 'help'      => "Help",
-        'name'          => "Name",
+        'name'          => "name",
         'link'          => "Link",
         'signIn'        => "Sign in",
         'jsError'       => "Please make sure you have javascript enabled.",
@@ -34,17 +39,6 @@ $lang = array(
         'gains'         => "Gains",
         'login'         => "Login",
         'forum'         => "Forum",
-        'days'          => "days",
-        'hours'         => "hours",
-        'minutes'       => "minutes",
-        'seconds'       => "seconds",
-        'millisecs'     => "milliseconds",
-        'daysAbbr'      => "d",
-        'hoursAbbr'     => "hr",
-        'minutesAbbr'   => "min",
-        'secondsAbbr'   => "sec",
-        'millisecsAbbr' => "ms",
-
         'n_a'           => "n/a",
 
         // err_title = An error in AoWoW
@@ -68,7 +62,7 @@ $lang = array(
         'exactMatch'    => "Exact match",
 
         // infobox
-        'unavailable'   => "Not available to players",
+        'unavailable'   => "Not available to players",      // alternative wording found: "No longer available to players" ... aw screw it <_<
         'disabled'      => "Disabled",
         'disabledHint'  => "Cannot be attained or completed",
         'serverside'    => "Serverside",
@@ -404,7 +398,7 @@ $lang = array(
             'base'    => "<small>Show %s related to <b>%s</b></small>",
             'link'    => " or ",
             'recipes' => "<a href=\"?items=9.%s\">recipe items</a>",
-            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s\">crafted items</a>"
+            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s;crv=0\">crafted items</a>"
         ),
         'cat'           => array(
               7 => "Class Skills",      // classList
@@ -451,7 +445,7 @@ $lang = array(
             15 => "Daggers",                        13 => "Fist Weapons",                    0 => "One-Handed Axes",                 4 => "One-Handed Maces",                7 => "One-Handed Swords",
              6 => "Polearms",                       10 => "Staves",                          1 => "Two-Handed Axes",                 5 => "Two-Handed Maces",                8 => "Two-Handed Swords",
              2 => "Bows",                           18 => "Crossbows",                       3 => "Guns",                           16 => "Thrown",                         19 => "Wands",
-            10 => "Fishing Poles",                  14 => "Miscellaneous"
+            20 => "Fishing Poles",                  14 => "Miscellaneous"
         ),
         'subClassMasks' => array(
             0x02A5F3 => 'Melee Weapon',                 0x0060 => 'Shield',                         0x04000C => 'Ranged Weapon',                0xA091 => 'One-Handed Melee Weapon'
@@ -489,11 +483,40 @@ $lang = array(
         'itemLevel'     => "Item Level",
         'randEnchant'   => "&lt;Random enchantment&gt",
         'readClick'     => "&lt;Right Click To Read&gt",
+'openClick'     => "&lt;Right Click To Open&gt",
         'set'           => "Set",
-'_reqLevel' => "Required level",    
+'partyLoot' => "Party loot",
+'smartLoot' => "Smart loot",
+'indestructible' => "Cannot be destroyed",
+'deprecated'    => "Deprecated",
+'useInShape' => "Usable when shapeshifted",
+'useInArena' => "Usable in arenas",
+'refundable' => "Refundable",
+'noNeedRoll' => "Cannot roll Need",
+'atKeyring' => "Can be placed in the keyring",
+'worth'     => "Worth",
+'consumable'    => "Consumable",
+'nonConsumable'    => "Non-consumable",
+'accountWide'   => "Account-wide",
+'millable'  => "Millable",
+'noEquipCD' => "No equip cooldown",
+'prospectable'  => "Prospectable",
+'disenchantable' => "Disenchantable",
+'cantDisenchant' => "Cannot be disenchanted",
+'repairCost' => "Repair cost",
+'tool'      => "Tool",
+'cost'      => "Cost",    
+'content'   => "Content",
+'_transfer' => 	'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(images/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="%s-icon">%s</span>.',
+'_unavailable' => "This item is not available to players.",
+'_rndEnchants'  => "Random Enchantments",
+'_chance'   => "(%s%% chance)",
+'_reqLevel' => "Required level",
 'slot'      => "Slot",
 '_quality'  => "Quality",
 'usableBy'  => "Usable by",
+'buyout'    => "Buyout price",
+'each'      => "each",
 'gems'      => "Gems",
         'socketBonus'   => "Socket Bonus",
         'socket'        => array(
@@ -509,7 +532,7 @@ $lang = array(
         ),
         'bonding'       => array (
             "Binds to account",                         "Binds when picked up",                                 "Binds when equipped",
-            "Binds when used",                          "Soulbound",                                            "Quest Item"
+            "Binds when used",                          "Quest Item",                                           "Quest Item"
         ),
         "bagFamily"     => array(
             "Bag",                  "Quiver",           "Ammo Pouch",           "Soul Bag",                     "Leatherworking Bag",

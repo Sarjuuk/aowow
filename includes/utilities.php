@@ -5,6 +5,7 @@ if (!defined('AOWOW_REVISION'))
 
 class Lang
 {
+    public static $timeUnits;
     public static $main;
     public static $account;
     public static $game;
@@ -54,10 +55,13 @@ class Lang
         $tmp = [];
 
         if ($flags & CUSTOM_DISABLED)
-            $tmp[] = '<span class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, \''.self::$main['disabledHint'].'\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'.self::$main['disabled'].'</span>';
+            $tmp[] = '[tooltip name=disabledHint]'.Util::jsEscape(self::$main['disabledHint']).'[/tooltip][span class=tip tooltip=disabledHint]'.Util::jsEscape(self::$main['disabled']).'[/span]';
 
         if ($flags & CUSTOM_SERVERSIDE)
-            $tmp[] = '<span class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, \''.self::$main['serversideHint'].'\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'.self::$main['serverside'].'</span>';
+            $tmp[] = '[tooltip name=serversideHint]'.Util::jsEscape(self::$main['serversideHint']).'[/tooltip][span class=tip tooltip=serversideHint]'.Util::jsEscape(self::$main['serverside']).'[/span]';
+
+        if ($flags & CUSTOM_UNAVAILABLE)
+            $tmp[] = self::$main['unavailable'];
 
         return $tmp;
     }
@@ -94,6 +98,21 @@ class Lang
                 if (!$name)
                     continue;
 
+                if ($interactive)
+                {
+                    $skill = 0;
+                    switch ($prop)
+                    {
+                        case  1: $skill = 633; break;   // Lockpicking
+                        case  2: $skill = 182; break;   // Herbing
+                        case  3: $skill = 186; break;   // Mining
+                        case 20: $skill = 773; break;   // Scribing
+                    }
+
+                    if ($skill)
+                        $name = '<a href="?skill='.$skill.'">'.$name.'</a>';
+                }
+
                 if ($rnk > 0)
                     $name .= ' ('.$rnk.')';
             }
@@ -125,10 +144,10 @@ class Lang
         // not checking weapon / armor here. It's highly unlikely that they overlap
         if ($short)
         {
-            if ($class == 15)                               // misc - Mounts
+            if ($class == ITEM_CLASS_MISC)                  // misc - Mounts
                 return '';
 
-            if ($class == 4 && $mask == 0x001E)             // all basic armor classes
+            if ($class == ITEM_CLASS_ARMOR && $mask == 0x1E) // all basic armor classes
                 return '';
 
             foreach(Lang::$spell['subClassMasks'] as $m => $str)
@@ -136,11 +155,11 @@ class Lang
                     return $str;
         }
 
-        if ($class == 15)                                   // yeah hardcoded.. sue me!
+        if ($class == ITEM_CLASS_MISC)                      // yeah hardcoded.. sue me!
             return Lang::$spell['cat'][-5];
 
-        $tmp = [];
-        $strs = Lang::$spell[$class == 4 ? 'armorSubClass' : 'weaponSubClass'];
+        $tmp  = [];
+        $strs = Lang::$spell[$class == ITEM_CLASS_ARMOR ? 'armorSubClass' : 'weaponSubClass'];
         foreach ($strs as $k => $str)
             if ($mask & 1 << $k && $str)
                 $tmp[] = $str;
@@ -371,14 +390,18 @@ class SmartyAoWoW extends Smarty
         return true;
     }
 
-    public function extendGlobalData($type, $data)
+    public function extendGlobalData($type, $data, $extra = null)
     {
         $this->initJSGlobal($type);
-        $_ = &$this->_tpl_vars['jsGlobals'][$type][1];      // shorthand
+        $_ = &$this->_tpl_vars['jsGlobals'][$type];         // shorthand
 
-        foreach ($data as $id => $set)
-            if (!isset($_[$id]))
-                $_[$id] = $set;
+        if (is_array($data) && $data)
+            foreach ($data as $id => $set)
+                if (!isset($_[1][$id]))
+                    $_[1][$id] = $set;
+
+        if (is_array($extra) && $extra)
+            $_[2] = $extra;
     }
 
     private function initJSGlobal($type)
@@ -389,22 +412,22 @@ class SmartyAoWoW extends Smarty
             return;
 
         switch ($type)
-        {                                                // [brickFile, [data]]
-            case TYPE_NPC:         $jsg[TYPE_NPC]         = ['creatures', []];    break;
-            case TYPE_OBJECT:      $jsg[TYPE_OBJECT]      = ['objects', []];      break;
-            case TYPE_ITEM:        $jsg[TYPE_ITEM]        = ['items', []];        break;
-            case TYPE_QUEST:       $jsg[TYPE_QUEST]       = ['quests', []];       break;
-            case TYPE_SPELL:       $jsg[TYPE_SPELL]       = ['spells', []];       break;
-            case TYPE_ZONE:        $jsg[TYPE_ZONE]        = ['zones', []];        break;
-            case TYPE_FACTION:     $jsg[TYPE_FACTION]     = ['factions', []];     break;
-            case TYPE_PET:         $jsg[TYPE_PET]         = ['pets', []];         break;
-            case TYPE_ACHIEVEMENT: $jsg[TYPE_ACHIEVEMENT] = ['achievements', []]; break;
-            case TYPE_TITLE:       $jsg[TYPE_TITLE]       = ['titles', []];       break;
-            case TYPE_WORLDEVENT:  $jsg[TYPE_WORLDEVENT]  = ['holidays', []];     break;
-            case TYPE_CLASS:       $jsg[TYPE_CLASS]       = ['classes', []];      break;
-            case TYPE_RACE:        $jsg[TYPE_RACE]        = ['races', []];        break;
-            case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['skills', []];       break;
-            case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['currencies', []];   break;
+        {                                                // [brickFile,  [data], [extra]]
+            case TYPE_NPC:         $jsg[TYPE_NPC]         = ['creatures',    [], []]; break;
+            case TYPE_OBJECT:      $jsg[TYPE_OBJECT]      = ['objects',      [], []]; break;
+            case TYPE_ITEM:        $jsg[TYPE_ITEM]        = ['items',        [], []]; break;
+            case TYPE_QUEST:       $jsg[TYPE_QUEST]       = ['quests',       [], []]; break;
+            case TYPE_SPELL:       $jsg[TYPE_SPELL]       = ['spells',       [], []]; break;
+            case TYPE_ZONE:        $jsg[TYPE_ZONE]        = ['zones',        [], []]; break;
+            case TYPE_FACTION:     $jsg[TYPE_FACTION]     = ['factions',     [], []]; break;
+            case TYPE_PET:         $jsg[TYPE_PET]         = ['pets',         [], []]; break;
+            case TYPE_ACHIEVEMENT: $jsg[TYPE_ACHIEVEMENT] = ['achievements', [], []]; break;
+            case TYPE_TITLE:       $jsg[TYPE_TITLE]       = ['titles',       [], []]; break;
+            case TYPE_WORLDEVENT:  $jsg[TYPE_WORLDEVENT]  = ['holidays',     [], []]; break;
+            case TYPE_CLASS:       $jsg[TYPE_CLASS]       = ['classes',      [], []]; break;
+            case TYPE_RACE:        $jsg[TYPE_RACE]        = ['races',        [], []]; break;
+            case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['skills',       [], []]; break;
+            case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['currencies',   [], []]; break;
         }
     }
 
@@ -418,8 +441,8 @@ class SmartyAoWoW extends Smarty
 
             if (!$ids)
                 continue;
-
             $this->initJSGlobal($type);
+            $ids = array_unique($ids, SORT_NUMERIC);
 
             switch ($type)
             {
@@ -447,7 +470,7 @@ class SmartyAoWoW extends Smarty
         $this->updatePageVars(array(
             'subject'  => Util::ucFirst($subject),
             'id'       => intVal($this->_tpl_vars['query'][1]),
-            'notFound' => sprintf(Lang::$main['pageNotFound'], $subject),
+            'notFound' => sprintf(Lang::$main['pageNotFound'], $subject)
         ));
 
         $this->assign('lang', Lang::$main);
@@ -664,6 +687,7 @@ class Util
     public static $dateFormatLong           = "Y/m/d H:i:s";
 
     public static $changeLevelString        = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_staticTooltipLevelClick(this, null, 0)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><!--lvl-->%s</a>';
+
     public static $setRatingLevelString     = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_setRatingLevel(this, %s, %s, %s)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</a>';
 
     public static $filterResultString       = '$$WH.sprintf(LANG.lvnote_filterresults, \'%s\')';
@@ -680,6 +704,11 @@ class Util
     public static $class2SpellFamily        = array(
     //  null    Warrior Paladin Hunter  Rogue   Priest  DK      Shaman  Mage    Warlock null    Druid
         null,   4,      10,     9,      8,      6,      15,     11,     3,      5,      null,   7
+    );
+
+    // from DurabilityQuality.dbc
+    public static $itemDurabilityQualityMod = array(
+        null,   1.0,    0.6,    1.0,    0.8,    1.0,    1.0,    1.2,    1.25,   1.44,   2.5,    1.728,  3.0,    0.0,    0.0,    1.2,    1.25
     );
 
     // todo: translate and move to Lang
@@ -997,7 +1026,7 @@ class Util
         45 => 'Track Resources',
         46 => 'Mod Parry Skill',
         47 => 'Mod Parry Percent',
-        48 => 'Mod Dodge Skill',
+        48 => 'Unknown Aura',
         49 => 'Mod Dodge Percent',
         50 => 'Mod Critical Healing Amount',
         51 => 'Mod Block Percent',
@@ -1297,6 +1326,16 @@ class Util
         return self::formatTime($tDiff * 1000, true);
     }
 
+    public static function getBuyoutForItem($itemId)
+    {
+        if (!$itemId)
+            return 0;
+
+        // try, when having filled char-DB at hand
+        // return DB::Characters()->selectCell('SELECT SUM(a.buyoutprice) / SUM(ii.count) FROM auctionhouse a JOIN item_instance ii ON ii.guid = a.itemguid WHERE ii.itemEntry = ?d', $itemId);
+        return 0;
+    }
+
     public static function formatMoney($qty)
     {
         $money = '';
@@ -1362,48 +1401,56 @@ class Util
 
         if ($short)
         {
-            if ($s['d'])
-                return round($s['d'])." ".Lang::$main['daysAbbr'];
-            if ($s['h'])
-                return round($s['h'])." ".Lang::$main['hoursAbbr'];
-            if ($s['m'])
-                return round($s['m'])." ".Lang::$main['minutesAbbr'];
-            if ($s['s'])
-                return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::$main['secondsAbbr'];
+            if ($_ = round($s['d']))
+                return $_." ".Lang::$timeUnits['ab'][3];
+            if ($_ = round($s['h']))
+                return $_." ".Lang::$timeUnits['ab'][4];
+            if ($_ = round($s['m']))
+                return $_." ".Lang::$timeUnits['ab'][5];
+            if ($_ = round($s['s'] + $s['ms'] / 1000, 2))
+                return $_." ".Lang::$timeUnits['ab'][6];
             if ($s['ms'])
-                return $s['ms']." ".Lang::$main['millisecsAbbr'];
+                return $s['ms']." ".Lang::$timeUnits['ab'][7];
 
-            return '0 '.Lang::$main['secondsAbbr'];
+            return '0 '.Lang::$timeUnits['ab'][6];
         }
         else
         {
             if ($s['d'])
-                return round($s['d'] + $s['h'] / 24, 2)." ".Lang::$main['days'];
+                return round($s['d'] + $s['h'] / 24, 2)." ".Lang::$timeUnits[$s['d'] == 1 && !$s['h'] ? 'sg' : 'pl'][3];
             if ($s['h'])
-                return round($s['h'] + $s['m'] / 60, 2)." ".Lang::$main['hours'];
+                return round($s['h'] + $s['m'] / 60, 2)." ".Lang::$timeUnits[$s['h'] == 1 && !$s['m'] ? 'sg' : 'pl'][4];
             if ($s['m'])
-                return round($s['m'] + $s['s'] / 60, 2)." ".Lang::$main['minutes'];
+                return round($s['m'] + $s['s'] / 60, 2)." ".Lang::$timeUnits[$s['m'] == 1 && !$s['s'] ? 'sg' : 'pl'][5];
             if ($s['s'])
-                return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::$main['seconds'];
+                return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::$timeUnits[$s['s'] == 1 && !$s['ms'] ? 'sg' : 'pl'][6];
             if ($s['ms'])
-                return $s['ms']." ".Lang::$main['millisecs'];
+                return $s['ms']." ".Lang::$timeUnits[$s['ms'] == 1 ? 'sg' : 'pl'][7];
 
-            return '0 '.Lang::$main['seconds'];
-/*  kept for reference
-            if (isset($s['d']))
-                $fmt[] = $s['d']." ".Lang::$main['days'];
-            if (isset($s['h']))
-                $fmt[] = $s['h']." ".Lang::$main['hours'];
-            if (isset($s['m']))
-                $fmt[] = $s['m']." ".Lang::$main['minutes'];
-            if (isset($s['s']))
-                $fmt[] = $s['s']." ".Lang::$main['seconds'];
-            if (isset($s['ms']))
-                $fmt[] = $s['ms']." ".Lang::$main['millisecs'];
-
-        // return implode(' ', $fmt);
-*/
+            return '0 '.Lang::$timeUnits['pl'][6];
         }
+    }
+
+    public static function itemModByRatingMask($mask)
+    {
+        if (($mask & 0x1C000) == 0x1C000)                   // special case resilience
+            return ITEM_MOD_RESILIENCE_RATING;
+
+        if (($mask & 0x00E0) == 0x00E0)                     // special case hit rating
+            return ITEM_MOD_HIT_RATING;
+
+        for ($j = 0; $j < count(self::$combatRatingToItemMod); $j++)
+        {
+            if (!self::$combatRatingToItemMod[$j])
+                continue;
+
+            if (!($mask & (1 << $j)))
+                continue;
+
+            return self::$combatRatingToItemMod[$j];
+        }
+
+        return 0;
     }
 
     public static function sideByRaceMask($race)
@@ -1421,6 +1468,52 @@ class Util
             return 1;
 
         return 3;
+    }
+
+    // pageText for Books (Item or GO) and questText
+    public static function parseHtmlText($text)
+    {
+        if (stristr($text, '<HTML>'))                       // text is basicly a html-document with weird linebreak-syntax
+        {
+            $pairs = array(
+                '<HTML>'    => '',
+                '</HTML>'   => '',
+                '<BODY>'    => '',
+                '</BODY>'   => '',
+                '<BR></BR>' => '<br />',
+                "\n"        => '',
+                "\r"        => ''
+            );
+
+            // html may contain images
+            $text = preg_replace('/"Interface\\\Pictures\\\([\w_\-]+)"/i', '"images/interface/Pictures/\1.jpg"', strtr($text, $pairs));
+        }
+        else
+            $text = strtr($text, ["\n" => '<br />', "\r" => '']);
+
+        // gender switch
+        // ok, directed gender-reference: ($g:male:female:ref) where 'ref' is the variable (see $pairs) forward in the text determining the gender
+        $text = preg_replace('/\$g\s*([^:;]+)\s*:\s*([^:;]+)\s*(:?[^:;]*);/ui', '&lt;\1/\2&gt;', $text);
+
+        // nonesense, that the client apparently ignores
+        $text = preg_replace('/\$t([^;]+);/ui', '', $text);
+
+        // and another modifier for something russian |3-6($r) .. jesus christ <_<
+        $text = preg_replace('/\|\d\-?\d?\((\$\w)\)/ui', '\1', $text);
+
+        $pairs = array(
+            '$c' => '&lt;'.Lang::$game['class'].'&gt;',
+            '$C' => '&lt;'.Lang::$game['class'].'&gt;',
+            '$r' => '&lt;'.Lang::$game['race'].'&gt;',
+            '$R' => '&lt;'.Lang::$game['race'].'&gt;',
+            '$n' => '&lt;'.Lang::$main['name'].'&gt;',
+            '$N' => '&lt;'.Lang::$main['name'].'&gt;',
+            '$b' => '<br />',
+            '$B' => '<br />',
+            '|n' => ''                                      // what .. the fuck .. another type of line terminator? (only in spanish though)
+        );
+
+        return strtr($text, $pairs);
     }
 
     public static function asHex($val)
@@ -1568,19 +1661,21 @@ class Util
     // 6 => TYPE_TOTEM              Rockbiter AmountX as Damage (ignore)
     // 7 => TYPE_USE_SPELL          Engineering gadgets
     // 8 => TYPE_PRISMATIC_SOCKET   Extra Sockets AmountX as socketCount (ignore)
-    public static function parseItemEnchantment($enchant, $amountOverride = null)
+    public static function parseItemEnchantment($eId, $raw = false, &$name = null)
     {
-        if (empty($enchant))
-            return false;
+        $enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $eId);
+        if (!$enchant)
+            return [];
 
+        $name = self::localizedString($enchant, 'text');
+
+
+        // parse stats
         $jsonStats = [];
         for ($h = 1; $h <= 3; $h++)
         {
-            $obj = $enchant['object'.$h];
-            $val = $enchant['amount'.$h];
-
-            if (isset($amountOverride))                     // itemSuffixes have dynamic amount
-                $val = $amountOverride;
+            $obj = (int)$enchant['object'.$h];
+            $val = (int)$enchant['amount'.$h];
 
             switch ($enchant['type'.$h])
             {
@@ -1589,7 +1684,10 @@ class Util
                     break;
                 case 3:
                 case 7:
-                    $spl   = new SpellList(array(['s.id', (int)$obj]));
+                    $spl   = new SpellList(array(['s.id', $obj]));
+                    if ($spl->error)
+                        break;
+
                     $gains = $spl->getStatGain();
 
                     foreach ($gains as $gain)
@@ -1623,13 +1721,13 @@ class Util
                     }
                     break;
                 case 5:
-                    if ($obj == ITEM_MOD_ATTACK_POWER)
-                        @$jsonStats[ITEM_MOD_RANGED_ATTACK_POWER] += $val;
-
                     @$jsonStats[$obj] += $val;
                     break;
             }
         }
+
+        if ($raw)
+            return $jsonStats;
 
         // check if we use these mods
         $return = [];
@@ -1654,7 +1752,10 @@ class Util
                 if (!isset($struct[$keys[0]]))
                     return false;
 
-                return in_array($keys[1], $struct[$keys[0]]) || isset($struct[$keys[0]][$keys[1]]);
+                if (count($struct[$keys[0]]) == count($struct[$keys[0]], COUNT_RECURSIVE))
+                    return in_array($keys[1], $struct[$keys[0]]);
+                else
+                    return isset($struct[$keys[0]][$keys[1]]);
             case 3:
                 return isset($struct[$keys[0]][$keys[1]]) && in_array($keys[2], $struct[$keys[0]][$keys[1]]);
         }
@@ -1670,6 +1771,11 @@ class Util
         $rest  = mb_substr($str, 1, $len, 'UTF-8');
 
         return mb_strtoupper($first, 'UTF-8') . $rest;
+    }
+
+    public static function ucWords($str)
+    {
+        return mb_convert_case($str, MB_CASE_TITLE, 'UTF-8');
     }
 
     public static function checkNumeric(&$data)
@@ -1702,6 +1808,249 @@ class Util
         });
 
         return false;                                       // always false for passed arrays
+    }
+
+    public function arraySumByKey(&$ref)
+    {
+        $nArgs = func_num_args();
+        if (!is_array($ref) || $nArgs < 2)
+            return;
+
+        for ($i = 1; $i < $nArgs; $i++)
+        {
+            $arr = func_get_arg($i);
+            if (!is_array($arr))
+                continue;
+
+            foreach ($arr as $k => $v)
+            {
+                if (!isset($ref[$k]))
+                    $ref[$k] = 0;
+
+                $ref[$k] += $v;
+            }
+        }
+    }
+
+    /*  from TC wiki
+        fishing_loot_template           no relation     entry is linked with ID of the fishing zone or area
+        creature_loot_template          entry           many <- many        creature_template       lootid
+        gameobject_loot_template        entry           many <- many        gameobject_template     data1           Only GO type 3 (CHEST) or 25 (FISHINGHOLE)
+        item_loot_template              entry           many <- one         item_template           entry
+        disenchant_loot_template        entry           many <- many        item_template           DisenchantID
+        prospecting_loot_template       entry           many <- one         item_template           entry
+        milling_loot_template           entry           many <- one         item_template           entry
+        pickpocketing_loot_template     entry           many <- many        creature_template       pickpocketloot
+        skinning_loot_template          entry           many <- many        creature_template       skinloot        Can also store minable/herbable items gathered from creatures
+        quest_mail_loot_template        entry                               quest_template          RewMailTemplateId
+        reference_loot_template         entry           many <- many        _loot_template          -mincountOrRef  In case of negative mincountOrRef
+    */
+    private static function getLootByItem($tableName, $itemId)
+    {
+        return;
+    }
+
+    private static function getLootByEntry($tableName, $lootId, $groupId = 0, $baseChance = 1.0)
+    {
+        $loot     = [];
+        $rawItems = [];
+
+        if (!$tableName || !$lootId)
+            return null;
+
+        $rows = DB::Aowow()->select('SELECT * FROM ?# WHERE entry = ?d {AND groupid = ?d}', $tableName, abs($lootId), $groupId ? $groupId : DBSIMPLE_SKIP);
+        if (!$rows)
+            return null;
+
+        $groupChances = [];
+        $nGroupEquals = [];
+        foreach ($rows as $entry)
+        {
+            $set = array(
+                'quest'         => $entry['ChanceOrQuestChance'] < 0,
+                'group'         => $entry['groupid'],
+                'reference'     => $lootId < 0 ? abs($lootId) : 0,
+                'realChanceMod' => $baseChance
+            );
+
+            if ($entry['lootmode'] > 1)
+            {
+                $buff = [];
+                for ($i = 0; $i < 8; $i++)
+                    if ($entry['lootmode'] & (1 << $i))
+                        $buff[] = $i;
+
+                $set['mode'] = implode(', ', $buff);
+            }
+            else
+                $set['mode'] = 0;
+
+            /*
+                modes:{"mode":8,"4":{"count":7173,"outof":17619},"8":{"count":7173,"outof":10684}}
+                ignore lootmodes from sharedDefines.h use different creatures/GOs from each template
+                modes.mode = b6543210
+                              ||||||'dungeon heroic
+                              |||||'dungeon normal
+                              ||||'<empty>
+                              |||'10man normal
+                              ||'25man normal
+                              |'10man heroic
+                              '25man heroic
+            */
+
+            if ($entry['mincountOrRef'] < 0)
+            {
+                list($data, $raw) = self::getLootByEntry(LOOT_REFERENCE, $entry['mincountOrRef'], $entry['groupid'], abs($entry['ChanceOrQuestChance'] / 100));
+
+                $loot     = array_merge($loot, $data);
+                $rawItems = array_merge($rawItems, $raw);
+
+                $set['content']    = $entry['mincountOrRef'];
+                $set['multiplier'] = $entry['maxcount'];
+            }
+            else
+            {
+                $rawItems[]     = $entry['item'];
+                $set['content'] = $entry['item'];
+                $set['min']     = $entry['mincountOrRef'];
+                $set['max']     = $entry['maxcount'];
+            }
+
+            if ($set['quest'] || !$set['group'])
+                $set['groupChance'] = abs($entry['ChanceOrQuestChance']);
+            else if ($entry['groupid'] && !$entry['ChanceOrQuestChance'])
+            {
+                @$nGroupEquals[$entry['groupid']]++;
+                $set['groupChance'] = &$groupChances[$entry['groupid']];
+            }
+            else if ($entry['groupid'] && $entry['ChanceOrQuestChance'])
+            {
+                @$groupChances[$entry['groupid']] += $entry['ChanceOrQuestChance'];
+                $set['groupChance'] = abs($entry['ChanceOrQuestChance']);
+            }
+            else
+                continue;                                   // shouldn't happen
+
+            $loot[] = $set;
+        }
+
+        foreach (array_keys($nGroupEquals) as $k)
+        {
+            $sum = $groupChances[$k];
+            if (!$sum)
+                $sum = 0;
+            elseif ($sum > 100)                             // group has > 100% dropchance .. hmm, display some kind of error..?
+                $sum = 100;
+
+            $cnt = empty($nGroupEquals[$k]) ? 1 : $nGroupEquals[$k];
+
+            $groupChances[$k] = (100 - $sum) / $cnt;        // is applied as backReference to items with 0-chance
+        }
+
+        return [$loot, array_unique($rawItems)];
+    }
+
+    //                                                      v this is bullshit, but as long as there is no integral template class..
+    public static function handleLoot($table, $entry, &$pageTemplate, $debug = false)
+    {
+        $lv    = [];
+        $loot  = null;
+
+        if (!$table || !$entry)
+            return null;
+
+        /*
+            todo (high): implement conditions on loot (and conditions in general)
+
+        also
+
+            // if (is_array($entry) && in_array($table, [LOOT_CREATURE, LOOT_GAMEOBJECT])
+                // iterate over the 4 available difficulties and assign modes
+        */
+
+        if ($entry > 0)
+            $struct = self::getLootByEntry($table, $entry);
+        else if ($entry < 0)
+            $struct = self::getLootByItem($table, -$entry);
+
+        if (!$struct)
+            return $lv;
+
+        $items = new ItemList(array(['i.id', $struct[1]]));
+        $items->addGlobalsToJscript($pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $foo = $items->getListviewData();
+
+        // assign listview LV rows to loot rows, not the other way round! The same item may be contained multiple times
+        foreach ($struct[0] as $loot)
+        {
+            $base = array(
+                'percent' => round($loot['groupChance'] * $loot['realChanceMod'], 3),
+                'group'   => $loot['group'],
+                'count'   => 1                              // satisfies the sort-script
+            );
+
+            if ($_ = $loot['mode'])
+                $base['mode'] = $_;
+
+            if ($_ = $loot['reference'])
+                $base['reference'] = $_;
+
+            $buff = [];                                     // equal distribution between min/max .. not blizzlike, but hey, TC-issue
+            if (isset($loot['max']) && isset($loot['min']) && ($loot['max'] > $loot['min']))
+                for ($i = $loot['min']; $i <= $loot['max']; $i++)
+                    $buff[] = $i.':'.(round(100 / (1 + $loot['max'] - $loot['min']), 3));
+
+            if ($buff)                                      // yes, it wants a string .. how weired is that..
+                $base['pctstack'] = '{'.implode(',',$buff).'}';
+
+            if ($loot['content'] > 0)                       // regular drop
+            {
+                if (!$debug)
+                {
+                    if (!isset($lv[$loot['content']]))
+                        $lv[$loot['content']] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
+                    else
+                        $lv[$loot['content']]['percent'] += $base['percent'];
+                }
+                else
+                    $lv[] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
+            }
+            else if ($debug)                                // create dummy for ref-drop
+            {
+                $data = array(
+                    'id'    => $loot['content'],
+                    'name'  => '@REFERENCE: '.abs($loot['content']),
+                    'icon'  => 'trade_engineering',
+                    'stack' => [$loot['multiplier'], $loot['multiplier']]
+                );
+                $lv[] = array_merge($base, $data);
+
+                $pageTemplate->extendGlobalData(TYPE_ITEM, [$loot['content'] => $data]);
+            }
+        }
+
+        // move excessive % to extra loot
+        if (!$debug)
+        {
+            foreach ($lv as &$_)
+            {
+                if ($_['percent'] <= 100)
+                    continue;
+
+                while ($_['percent'] > 200)
+                {
+                    $_['stack'][0]++;
+                    $_['stack'][1]++;
+                    $_['percent'] -= 100;
+                }
+
+                $_['stack'][1]++;
+                $_['percent'] = 100;
+            }
+        }
+
+
+        return $lv;
     }
 }
 

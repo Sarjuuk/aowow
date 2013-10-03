@@ -21,7 +21,7 @@
                 <form action="?achievements{$page.subCat}&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <table>
                         <tr>
-                            <td>{$lang.name}{$lang.colon}</td>
+                            <td>{$lang.name|ucFirst}{$lang.colon}</td>
                             <td colspan="3">
                                 <table><tr>
                                     <td>&nbsp;<input type="text" name="na" size="30" {if isset($filter.na)}value="{$filter.na}"{/if}/></td>

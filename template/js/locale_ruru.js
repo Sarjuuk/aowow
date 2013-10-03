@@ -4084,7 +4084,6 @@ var LANG = {
     tc_export:      "Экспортировать",
     tc_summary:     "Сводка",
     tc_restore:     "Восстановить",
-    tc_link:        "Ссылка",
     tc_print:       "Печать",
 
     tc_glyphs:      "Символы",

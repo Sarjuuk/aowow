@@ -160,28 +160,11 @@ class QuestList extends BaseType
 
     private function parseText($type = 'Objectives')
     {
-        $replace = array(
-            '$c' => '&lt;'.Util::ucFirst(Lang::$game['class']).'&gt;',
-            '$C' => '&lt;'.Util::ucFirst(Lang::$game['class']).'&gt;',
-            '$r' => '&lt;'.Util::ucFirst(Lang::$game['race']).'&gt;',
-            '$R' => '&lt;'.Util::ucFirst(Lang::$game['race']).'&gt;',
-            '$n' => '&lt;'.Util::ucFirst(Lang::$main['name']).'&gt;',
-            '$N' => '&lt;'.Util::ucFirst(Lang::$main['name']).'&gt;',
-            '$b' => '<br />',
-            '$B' => '<br />'
-        );
-
         $text = $this->getField($type, true);
         if (!$text)
             return '';
 
-        $text = strtr($text, $replace);
-
-        // gender switch
-        $text = preg_replace('/$g([^:;]+):([^:;]+);/ui', '&lt;\1/\2&lt;', $text);
-
-        // nonesense, that the client apparently ignores
-        $text = preg_replace('/$t([^;]+);/ui', '', $text);
+        $text = Util::parseHtmlText($text);
 
         return Util::jsEscape($text);
     }

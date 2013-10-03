@@ -1649,7 +1649,7 @@ function fi_getExtraCols(wt, gm, pu) {
 
     for (var i = 0; i < wt.length && i < nColsMax; ++i) {
         var a = fi_Lookup(wt[i]);
-        if (a && a.name && a.type == 'num') {
+        if (a && a.name && a.type == 'num' && a.name != 'buyprice') {
             var b = {
                 id:      a.name,
                 value:   a.name,
@@ -1659,14 +1659,14 @@ function fi_getExtraCols(wt, gm, pu) {
             };
 
             // Fix display of decimal columns
-            if (a.name.indexOf('dps') != -1 || a.name.indexOf('speed') != -1) {
+            if (/dps|speed/i.test(a.name)) {
                 b.compute = function (item, td) {
                     return (item[a.name] || 0).toFixed(2);
                 }
             }
 
             // Fix display of money columns
-            if (a.name.indexOf('money') != -1) {
+            if (/money|price|cost/i.test(a.name)) {
                 b.compute = function (item, td) {
                     td.innerHTML = g_getMoneyHtml(item[a.name] || 0);
                 }

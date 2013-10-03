@@ -48,8 +48,8 @@ class SpellList extends BaseType
         foreach ($this->iterate() as &$_curTpl)
         {
             // required for globals
-            for ($i = 1; $i <= 3; $i++)
-                if ($this->canCreateItem())
+            if ($idx = $this->canCreateItem())
+                foreach ($idx as $i)
                     $foo[] = (int)$_curTpl['effect'.$i.'CreateItemId'];
 
             for ($i = 1; $i <= 8; $i++)
@@ -129,13 +129,24 @@ class SpellList extends BaseType
 
             for ($i = 1; $i <= 3; $i++)
             {
-                if (!in_array($this->curTpl["effect".$i."AuraId"], [8, 13, 22, 29, 34, 35, 83, 84, 85, 99, 124, 135, 143, 158, 161, 189, 230, 235, 240, 250]))
+                $mv = $this->curTpl['effect'.$i.'MiscValue'];
+                $bp = $this->curTpl['effect'.$i.'BasePoints'] + 1;
+                $au = $this->curTpl['effect'.$i.'AuraId'];
+
+                // Enchant Item Permanent (53) / Temporary (54)
+                if (in_array($this->curTpl['effect'.$i.'Id'], [53, 54]))
+                {
+                    if ($mv)
+                        Util::arraySumByKey($stats, Util::parseItemEnchantment($mv, true));
+
+                    continue;
+                }
+
+                // Aura Effects
+                if (!in_array($au, [8, 13, 22, 29, 34, 35, 83, 84, 85, 99, 124, 135, 143, 158, 161, 189, 220, 230, 235, 240, 250]))
                     continue;
 
-                $mv = $this->curTpl["effect".$i."MiscValue"];
-                $bp = $this->curTpl["effect".$i."BasePoints"] + 1;
-
-                switch ($this->curTpl["effect".$i."AuraId"])
+                switch ($au)
                 {
                     case 29:                                // ModStat MiscVal:type
                     {
@@ -219,20 +230,9 @@ class SpellList extends BaseType
                         break;
                     }
                     case 189:                               // CombatRating MiscVal:ratingMask
-                        // special case: resilience -  consists of 3 ratings strung together. MOD_CRIT_TAKEN_MELEE|RANGED|SPELL (14,15,16)
-                        if (($mv & 0x1C000) == 0x1C000)
-                            @$stats[ITEM_MOD_RESILIENCE_RATING] += $bp;
-
-                        for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
-                        {
-                            if (!Util::$combatRatingToItemMod[$j])
-                                continue;
-
-                            if (($mv & (1 << $j)) == 0)
-                                continue;
-
-                            @$stats[Util::$combatRatingToItemMod[$j]] += $bp;
-                        }
+                    case 220:
+                        if ($mod = Util::itemModByRatingMask($mv))
+                            @$stats[$mod] += $bp;
                         break;
                     case 143:                               // Resistance MiscVal:school
                     case 83:
@@ -304,7 +304,18 @@ class SpellList extends BaseType
     }
 
     // halper
-    private function getToolsForCurrent()
+    public function getReagentsForCurrent()
+    {
+        $data = [];
+
+        for ($i = 1; $i <= 8; $i++)
+            if ($this->curTpl['reagent'.$i] > 0 && $this->curTpl['reagentCount'.$i])
+                $data[$this->curTpl['reagent'.$i]] = [$this->curTpl['reagent'.$i], $this->curTpl['reagentCount'.$i]];
+
+        return $data;
+    }
+
+    public function getToolsForCurrent()
     {
         if ($this->tools)
             return $this->tools;
@@ -321,7 +332,7 @@ class SpellList extends BaseType
                 if ($relId != $this->curTpl['tool'.$i])
                     continue;
 
-                $tools[$i-1] = array(
+                $tools[$i - 1] = array(
                     'itemId'  => $relId,
                     'name'    => $this->relItems->getField('name', true),
                     'quality' => $this->relItems->getField('quality')
@@ -334,8 +345,8 @@ class SpellList extends BaseType
             if ($_ = $this->curTpl['toolCategory'.$i])
             {
                 $tc = DB::Aowow()->selectRow('SELECT * FROM ?_totemcategory WHERE id = ?d', $_);
-                $tools[$i+1] = array(
-                    'id' => $_,
+                $tools[$i + 1] = array(
+                    'id'   => $_,
                     'name' => Util::localizedString($tc, 'name'));
             }
         }
@@ -367,7 +378,7 @@ class SpellList extends BaseType
             return sprintf(Lang::$spell['range'], $this->curTpl['rangeMaxHostile']);
     }
 
-    private function createPowerCostForCurrent()
+    public function createPowerCostForCurrent()
     {
         $str = '';
 
@@ -403,7 +414,7 @@ class SpellList extends BaseType
         return $str;
     }
 
-    private function createCastTimeForCurrent($short = true, $noInstant = true)
+    public function createCastTimeForCurrent($short = true, $noInstant = true)
     {
         if ($this->curTpl['interruptFlagsChannel'])
             return Lang::$spell['channeled'];
@@ -462,12 +473,28 @@ class SpellList extends BaseType
 
     public function canCreateItem()
     {
-        // 24: createItem; 34: changeItem; 59: randomItem; 66: createManaGem; 157: createitem2; 86: channelDeathItem
+        $idx = [];
+        // effect - 24: createItem; 34: changeItem; 59: randomItem; 66: createManaGem; 157: createItem2
+        // aura   - 86: channelDeathItem
         for ($i = 1; $i < 4; $i++)
-            if (in_array($this->curTpl['effect'.$i.'Id'], [24, 34, 59, 66, 157]) || $this->curTpl['effect'.$i.'AuraId'] == 86)
-                return true;
+            if (in_array($this->curTpl['effect'.$i.'Id'], [24, 34, 59, 66, 157]) || in_array($this->curTpl['effect'.$i.'AuraId'], [86]))
+                if ($this->curTpl['effect'.$i.'CreateItemId'] > 0)
+                    $idx[] = $i;
 
-        return false;
+        return $idx;
+    }
+
+    public function canTriggerSpell()
+    {
+        $idx = [];
+        // effect - 3: dummy; 32: trigger missile; 36: learn spell; 57: learn pet spell; 64/151: trigger spell (2); 101: feed pet; 133: unlearn specialization; 140/142: force cast (with value); 148/152/160: unk; 164: remove aura
+        // aura   - 4: dummy; 23/227: periodic trigger spell (with value); 42/231: proc trigger spell (with value); 48: unk; 109: add target trigger; 226: periodic dummy; 236: control vehicle; 284: linked
+        for ($i = 1; $i < 4; $i++)
+            if (in_array($this->curTpl['effect'.$i.'Id'], [3, 32, 36, 57, 64, 101, 133, 142, 148, 151, 152, 160, 164]) || in_array($this->curTpl['effect'.$i.'AuraId'], [4, 23, 42, 48, 109, 226, 227, 231, 236, 284]))
+                if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0)
+                    $idx[] = $i;
+
+        return $idx;
     }
 
     // description-, buff-parsing component
@@ -547,7 +574,7 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
-    private function resolveVariableString($variable)
+    private function resolveVariableString($variable, &$usesScalingRating)
     {
         $signs  = ['+', '-', '/', '*', '%', '^'];
 
@@ -684,20 +711,9 @@ class SpellList extends BaseType
 
                 // Aura giving combat ratings
                 $rType = 0;
-                if ($aura == 189)
-                {
-                    for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
-                    {
-                        if (!Util::$combatRatingToItemMod[$j])
-                            continue;
-
-                        if (($mv & (1 << $j)) == 0)
-                            continue;
-
-                        $rType = Util::$combatRatingToItemMod[$j];
-                        break;
-                    }
-                }
+                if (in_array($aura, [189, 220]))
+                    if ($rType = Util::itemModByRatingMask($mv))
+                        $usesScalingRating = true;
                 // Aura end
 
                 if ($rType && $this->interactive)
@@ -794,20 +810,9 @@ class SpellList extends BaseType
 
                 // Aura giving combat ratings
                 $rType = 0;
-                if ($aura == 189)
-                {
-                    for ($j = 0; $j < count(Util::$combatRatingToItemMod); $j++)
-                    {
-                        if (!Util::$combatRatingToItemMod[$j])
-                            continue;
-
-                        if (($mv & (1 << $j)) == 0)
-                            continue;
-
-                        $rType = Util::$combatRatingToItemMod[$j];
-                        break;
-                    }
-                }
+                if (in_array($aura, [189, 220]))
+                    if ($rType = Util::itemModByRatingMask($mv))
+                        $usesScalingRating = true;
                 // Aura end
 
                 if ($rType && $equal && $this->interactive)
@@ -868,7 +873,7 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
-    private function resolveFormulaString($formula, $precision = 0)
+    private function resolveFormulaString($formula, $precision = 0, &$scaling)
     {
         // step 1: formula unpacking redux
         while (($formStartPos = strpos($formula, '${')) !== false)
@@ -904,7 +909,7 @@ class SpellList extends BaseType
                 ++$formCurPos;                              // for some odd reason the precision decimal survives if wo dont increment further..
             }
 
-            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision);
+            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
 
             $formula = substr_replace($formula, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
@@ -930,7 +935,7 @@ class SpellList extends BaseType
             }
             $pos += strlen($result[0]);
 
-            $var = $this->resolveVariableString($result);
+            $var = $this->resolveVariableString($result, $scaling);
             if (is_array($var))
             {
                 $str   .= $var[0];
@@ -951,7 +956,7 @@ class SpellList extends BaseType
 
     // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
     // although it seems to be pretty fast, even on those pesky test-spells with extra complex tooltips (Ron Test Spell X))
-    public function parseText($type = 'description', $level = MAX_LEVEL, $interactive = false)
+    public function parseText($type = 'description', $level = MAX_LEVEL, $interactive = false, &$scaling = false)
     {
         // oooo..kaaayy.. parsing text in 6 or 7 easy steps
         // we don't use the internal iterator here. This func has to be called for the individual template.
@@ -1028,8 +1033,8 @@ class SpellList extends BaseType
             $max(a, b)     - max()
     */
 
-    $this->interactive = $interactive;
-    $this->charLevel   = $level;
+        $this->interactive = $interactive;
+        $this->charLevel   = $level;
 
     // step 0: get text
         $data = $this->getField($type, true);
@@ -1096,8 +1101,8 @@ Turns the Shaman into a Ghost Wolf, increasing speed by $s2%$?s59289[ and regene
 Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 */
 
-            else if (!empty($matches[2]))                   // aura/spell-condition .. use false; TODO (low): catch cases and port "know"-param for tooltips from 5.0
-            {                                               // tooltip_enus: Charge to an enemy, stunning it <!--sp58377:0--><!--sp58377-->for <!--sp103828:0-->1 sec<!--sp103828-->.; spells_enus: {"58377": [["", "and 2 additional nearby targets "]], "103828": [["1 sec", "3 sec"]]};
+            else if (!empty($matches[2]))
+            {
                 $condStartPos = strpos($data, $matches[2]) - 2;
                 $condCurPos   = $condStartPos;
             }
@@ -1191,7 +1196,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                 $formPrecision = $data[$formCurPos + 1];
                 $formCurPos += 2;
             }
-            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision);
+            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
 
             $data = substr_replace($data, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
@@ -1218,7 +1223,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
             $pos += strlen($result[0]);
 
-            $var = $this->resolveVariableString($result);
+            $var = $this->resolveVariableString($result, $scaling);
             $resolved = is_array($var) ? $var[0] : $var;
             $str .= is_numeric($resolved) ? abs($resolved) : $resolved;
             if (is_array($var))
@@ -1227,7 +1232,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         $str .= substr($data, $pos);
         $str = str_replace('#', '$', $str);                 // reset marker
 
-    // step 5: variable-depentant variable-text
+    // step 5: variable-dependant variable-text
         // special case $lONE:ELSE;
         // todo (low): russian uses THREE (wtf?! oO) cases ($l[singular]:[plural1]:[plural2]) .. explode() chooses always the first plural option :/
         while (preg_match('/([\d\.]+)([^\d]*)(\$l:*)([^:]*):([^;]*);/i', $str, $m))
@@ -1271,7 +1276,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         $x .= '<table><tr><td>';
 
         // parse Buff-Text
-        $btt = $this->parseText('buff', $level, $this->interactive);
+        $btt = $this->parseText('buff', $level, $this->interactive, $scaling);
         $x .= $btt[0].'<br>';
 
         // duration
@@ -1279,6 +1284,9 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
             $x .= '<span class="q">'.sprintf(Lang::$spell['remaining'], Util::formatTime($this->curTpl['duration'])).'<span>';
 
         $x .= '</td></tr></table>';
+
+        // scaling information - spellId:min:max:curr
+        $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
 
         $this->buffs[$this->id] = array($x, $btt[1]);
 
@@ -1298,7 +1306,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         // fetch needed texts
         $name  = $this->getField('name', true);
         $rank  = $this->getField('rank', true);
-        $desc  = $this->parseText('description', $level, $this->interactive);
+        $desc  = $this->parseText('description', $level, $this->interactive, $scaling);
         $tools = $this->getToolsForCurrent();
         $cool  = $this->createCooldownForCurrent();
         $cast  = $this->createCastTimeForCurrent();
@@ -1306,18 +1314,10 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         $range = $this->createRangesForCurrent();
 
         // get reagents
-        $reagents = [];
-        for ($j = 1; $j <= 8; $j++)
-        {
-            if($this->curTpl['reagent'.$j] <= 0)
-                continue;
+        $reagents = $this->getReagentsForCurrent();
+        foreach ($reagents as &$r)
+            $r[2] = ItemList::getName($r[0]);
 
-            $reagents[] = array(
-                'id' => $this->curTpl['reagent'.$j],
-                'name' => ItemList::getName($this->curTpl['reagent'.$j]),
-                'count' => $this->curTpl['reagentCount'.$j]          // if < 0 : require, but don't use
-            );
-        }
         $reagents = array_reverse($reagents);
 
         // get stances (check: SPELL_ATTR2_NOT_NEED_SHAPESHIFT)
@@ -1414,9 +1414,9 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
             $_ = Lang::$spell['reagents'].':<br/><div class="indent q1">';
             while ($reagent = array_pop($reagents))
             {
-                $_ .= '<a href="?item='.$reagent['id'].'">'.$reagent['name'].'</a>';
-                if ($reagent['count'] > 1)
-                    $_ .= ' ('.$reagent['count'].')';
+                $_ .= '<a href="?item='.$reagent[0].'">'.$reagent[2].'</a>';
+                if ($reagent[1] > 1)
+                    $_ .= ' ('.$reagent[1].')';
 
                 if(!empty($reagents))
                     $_ .= ', ';
@@ -1438,6 +1438,9 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
         if ($xTmp)
             $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
+
+        // scaling information - spellId:min:max:curr
+        $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
 
         $this->tooltips[$this->id] = array($x, $desc ? $desc[1] : null);
 
@@ -1517,7 +1520,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                 'cat'          => $this->curTpl['typeCat'],
                 'trainingcost' => $this->curTpl['trainingCost'],
                 'skill'        => count($this->curTpl['skillLines']) > 4 ? array_merge(array_splice($this->curTpl['skillLines'], 0, 4), [-1]): $this->curTpl['skillLines'], // display max 4 skillLines (fills max three lines in listview)
-                'reagents'     => [],
+                'reagents'     => $this->getReagentsForCurrent(),
                 'source'       => []
             );
 
@@ -1555,11 +1558,6 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                 $data[$this->id]['colors'] = $this->getColorsForCurrent();
             }
 
-            // reagents
-            for ($i = 1; $i <= 8; $i++)
-                if ($this->curTpl['reagent'.$i] > 0 && $this->curTpl['reagentCount'.$i] > 0)
-                    $data[$this->id]['reagents'][] = [$this->curTpl['reagent'.$i], $this->curTpl['reagentCount'.$i]];
-
             // glyph
             if ($this->curTpl['typeCat'] == -13)
                 $data[$this->id]['glyphtype'] = $this->curTpl['cuFlags'] & SPELL_CU_GLYPH_MAJOR ? 1 : 2;
@@ -1577,86 +1575,12 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         return $data;
     }
 
-    public function getDetailPageData()
-    {
-        $result = array(
-            'id'        => $this->id,
-            'name'      => $this->getField('name', true),
-            'icon'      => $this->curTpl['iconString'],
-            'stack'     => $this->curTpl['stackAmount'],
-            'powerCost' => $this->createPowerCostForCurrent(),
-            'level'     => $this->curTpl['spellLevel'],
-            'rangeName' => $this->getField('rangeText', true),
-            'range'     => $this->curTpl['rangeMaxHostile'],
-            'castTime'  => $this->createCastTimeForCurrent(false, false),
-            'cooldown'  => $this->curTpl['recoveryTime'] > 0 ? Util::formatTime($this->curTpl['recoveryTime']) : '<span class="q0">'.Lang::$main['n_a'].'</span>',
-            'gcd'       => Util::formatTime($this->curTpl['startRecoveryTime']),
-            'gcdCat'    => "[NYI]",
-            'duration'  => $this->curTpl['duration'] > 0 ? Util::formatTime($this->curTpl['duration']) : '<span class="q0">'.Lang::$main['n_a'].'</span>',
-            'school'    => sprintf(Util::$dfnString, Util::asHex($this->getField('schoolMask')), Lang::getMagicSchools($this->getField('schoolMask'))),
-            'dispel'    => isset(Lang::$game['dt'][$this->curTpl['dispelType']]) ? Lang::$game['dt'][$this->curTpl['dispelType']] : '<span class="q0">'.Lang::$main['n_a'].'</span>',
-            'mechanic'  => isset(Lang::$game['me'][$this->curTpl['mechanic']]) ? Lang::$game['me'][$this->curTpl['mechanic']] : '<span class="q0">'.Lang::$main['n_a'].'</span>',
-            'stances'   => $this->curTpl['attributes2'] & 0x80000 ? '' : Lang::getStances($this->curTpl['stanceMask']),
-            'tools'     => $this->getToolsForCurrent(),
-            'reagents'  => [],
-            'items'     => []
-        );
-
-        // minRange exists..  prepend
-        if ($_ = $this->curTpl['rangeMinHostile'])
-            $result['range'] = $_.' - '.$result['range'];
-
-        // fill reagents
-        for ($i = 1; $i < 9; $i++)
-            if ($this->curTpl['reagent'.$i] > 0 && $this->curTpl['reagentCount'.$i] > 0)
-                $result['reagents'][$this->curTpl['reagent'.$i]] = $this->curTpl['reagentCount'.$i];
-
-        // parse itemClass & itemSubClassMask
-        $class    = $this->getField('equippedItemClass');
-        $subClass = $this->getField('equippedItemSubClassMask');
-
-        if ($class > 0 && $subClass > 0)
-        {
-            $title = ['CLASS: '.$class, 'SUBCLASS: '.Util::asHex($subClass)];
-            $text  = Lang::getRequiredItems($class, $subClass, false);
-
-            if ($invType = $this->getField('equippedItemInventoryTypeMask'))
-            {
-                // remap some duplicated strings            'Off Hand' and 'Shield' are never used simultaneously
-                if ($invType & (1 << INVTYPE_ROBE))         // Robe => Chest
-                {
-                    $invType &= ~(1 << INVTYPE_ROBE);
-                    $invType &=  (1 << INVTYPE_CHEST);
-                }
-
-                if ($invType & (1 << INVTYPE_RANGEDRIGHT))  // Ranged2 => Ranged
-                {
-                    $invType &= ~(1 << INVTYPE_RANGEDRIGHT);
-                    $invType &=  (1 << INVTYPE_RANGED);
-                }
-
-                $_ = [];
-                $strs = Lang::$item['inventoryType'];
-                foreach ($strs as $k => $str)
-                    if ($invType & 1 << $k && $str)
-                        $_[] = $str;
-
-                $title[] = 'INVENTORYTYPE: '.Util::asHex($invType);
-                $text   .= ' '.Lang::$spell['_inSlot'].': '.implode(', ', $_);
-            }
-
-            $result['items'] = sprintf(Util::$dfnString, implode(' - ', $title), $text);
-        }
-
-        return $result;
-    }
-
-    public function addGlobalsToJScript(&$template, $addMask = GLOBALINFO_ANY)
+    public function addGlobalsToJScript(&$template, $addMask = GLOBALINFO_SELF)
     {
         if ($this->relItems && ($addMask & GLOBALINFO_RELATED))
             $this->relItems->addGlobalsToJscript($template);
 
-        foreach ($this->iterate() as $__)
+        foreach ($this->iterate() as $id => $__)
         {
             if ($addMask & GLOBALINFO_RELATED)
             {
@@ -1671,15 +1595,42 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                             $template->extendGlobalIds(TYPE_RACE, $i + 1);
             }
 
+            $data  = null;
+            $extra = null;
             if ($addMask & GLOBALINFO_SELF)
             {
                 $iconString = $this->curTpl['iconStringAlt'] ? 'iconStringAlt' : 'iconString';
 
-                $template->extendGlobalData(self::$type, [$this->id => array(
-                    'icon' => $this->curTpl[$iconString],
-                    'name' => $this->getField('name', true),
-                )]);
+                $data = array(
+                    $id => array(
+                        'icon' => $this->curTpl[$iconString],
+                        'name' => $this->getField('name', true),
+                    )
+                );
             }
+
+            if ($addMask & GLOBALINFO_EXTRA)
+            {
+/*
+spells / buffspells = {
+    "58377": [["", "and 2 additional nearby targets "]],
+    "103828": [["stunning", "rooting"], ["1 sec", "4 sec and reducing movement speed by 50% for 15 sec"]]
+};
+*/
+                $buff = $this->renderBuff(MAX_LEVEL, true);
+                $tTip = $this->renderTooltip(MAX_LEVEL, true);
+
+                $extra = array(
+                    'id'         => $id,
+                    'tooltip'    => Util::jsEscape($tTip[0]),
+                    'buff'       => @Util::jsEscape($buff[0]),
+                    'spells'     => $tTip[1],
+                    'buffspells' => @$buff[1]
+                );
+            }
+
+            if ($data || $extra)
+                $template->extendGlobalData(self::$type, $data, $extra);
         }
     }
 }
@@ -1784,7 +1735,7 @@ class SpellListFilter extends Filter
                 $parts[] = ['name_loc'.User::$localeId, $_v['na']];
         }
 
-        // spellLevel min
+        // spellLevel min                                   todo (low): talentSpells (typeCat -2) commonly have spellLevel 1 (and talentLevel >1) -> query is inaccurate
         if (isset($_v['minle']))
         {
             if (is_int($_v['minle']) && $_v['minle'] > 0)

@@ -3,13 +3,23 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+/*
+    ! DONT FORGET !
+
+        REMOVE TEMP-HACK FROM Lang::load
+
+        fix locale files in gereral >.<
+
+    ! DONT FORGET !
+*/
+
 class ItemList extends BaseType
 {
     use ListviewHelper;
 
     public static $type       = TYPE_ITEM;
 
-    public        $tooltip    = '';
+    public        $tooltip    = [];
     public        $json       = [];
     public        $itemMods   = [];
 
@@ -21,8 +31,8 @@ class ItemList extends BaseType
     protected     $queryBase  = 'SELECT i.*, i.id AS ARRAY_KEY FROM ?_items i';
     protected     $queryOpts  = array(
                       'is'  => [         's' => ', 1 as score', 'j' => '?_item_stats AS `is` ON `is`.`id` = `i`.`id`', 'h' => 'score > 0',                                                                     'o' => 'score DESC'],
-                      'iet' => [['ire'], 'j' => 'item_enchantment_template AS `iet` ON IF (`ire`.`id` > 0, `iet`.`entry` = `i`.`randomProperty`, `iet`.`entry` = `i`.`randomSuffix`)'],
-                      'ire' => [['iet'], 'j' => '?_itemrandomenchant AS `ire` ON ABS(ire.id) = iet.ench'],
+                      // 'iet' => [['ire'], 'j' => 'item_enchantment_template AS `iet` ON IF (`ire`.`id` > 0, `iet`.`entry` = `i`.`randomProperty`, `iet`.`entry` = `i`.`randomSuffix`)'],
+                      // 'ire' => [['iet'], 'j' => '?_itemrandomenchant AS `ire` ON ABS(ire.id) = iet.ench'],
                       'i'   => [         'o' => 'i.quality DESC, i.itemLevel DESC']
                   );
 
@@ -72,36 +82,10 @@ class ItemList extends BaseType
         return Util::localizedString($n, 'name');
     }
 
-    public static function getEquivalentSetPieces($id)
+    public function getExtendedCost()
     {
-        return DB::Aowow()->selectCol('
-            SELECT
-                a.id
-            FROM
-                ?_items a,
-                ?_items b
-            WHERE
-                b.id = ?d AND
-                a.slotBak = b.slotBak AND
-                a.itemset = b.itemset',
-            $id
-        );
-    }
-    // end static use
-
-    public function getDetailPageData()
-    {
-        $data = array(
-            'color'     => Util::$rarityColorStings[$this->getField('quality')],
-            'icon'      => $this->getField('iconString'),
-            'name'      => $this->getField('name', true),
-            'displayId' => $this->getField('displayId'),
-            'slot'      => $this->getField('slot'),
-            'stack'     => $this->getField('stackable'),
-            'class'     => $this->getField('class'),
-        );
-
-        return $data;
+        // placeholder
+        return [];
     }
 
     public function getListviewData($addInfoMask = 0x0)
@@ -110,18 +94,16 @@ class ItemList extends BaseType
         * ITEMINFO_JSON     (0x01): itemMods (including spells) and subitems parsed
         * ITEMINFO_SUBITEMS (0x02): searched by comparison
         * ITEMINFO_VENDOR   (0x04): costs-obj, when displayed as vendor
-        * ITEMINFO_LOOT     (0x08): count, stack, pctstack, modes when displaying loot
         * ITEMINFO_GEM      (0x10): gem infos and score
         */
+
+        // random item is random
+        if ($addInfoMask & ITEMINFO_SUBITEMS)
+            $this->initSubItems();
 
         $data = [];
         foreach ($this->iterate() as $__)
         {
-            // random item is random
-            if ($this->curTpl['randomProperty'] > 0 || $this->curTpl['randomSuffix'] > 0)
-                if ($addInfoMask & ITEMINFO_SUBITEMS)
-                    $this->initSubItems();
-
             if ($addInfoMask & ITEMINFO_JSON)
                 $this->extendJsonStats();
 
@@ -137,8 +119,11 @@ class ItemList extends BaseType
                 foreach ($this->itemMods[$this->id] as $k => $v)
                     $data[$this->id][Util::$itemMods[$k]] = $v;
 
-                if ($_ = intVal(($this->curTpl['minMoneyLoot'] + $this->curTpl['maxMoneyLoot']) /2))
+                if ($_ = intVal(($this->curTpl['minMoneyLoot'] + $this->curTpl['maxMoneyLoot']) / 2))
                     $data[$this->id]['avgmoney'] = $_;
+
+                if ($_ = $this->curTpl['repairPrice'])
+                    $data[$this->id]['repaircost'] = $_;
             }
 
             if ($addInfoMask & (ITEMINFO_JSON |ITEMINFO_GEM))
@@ -153,14 +138,23 @@ class ItemList extends BaseType
 
             if ($addInfoMask & ITEMINFO_VENDOR)
             {
+                $data[$this->id]['cost'] = [];              // [money, honor (>0:ally; <0:horde), arena, [items?]]
+
                 if ($x = $this->curTpl['buyPrice'])
+                {
                     $data[$this->id]['buyprice'] = $x;
+                    $data[$this->id]['cost'][0]  = $x;
+                }
 
                 if ($x = $this->curTpl['sellPrice'])
                     $data[$this->id]['sellprice'] = $x;
+
+                // todo (med): use extended cost table to fill arena points ect
             }
 
-            // complicated data
+            if ($this->curTpl['class'] == ITEM_CLASS_GLYPH)
+                $data[$this->id]['glyph'] = $this->curTpl['subSubClass'];
+
             if ($x = $this->curTpl['requiredSkill'])
                 $data[$this->id]['reqskill'] = $x;
 
@@ -197,26 +191,45 @@ class ItemList extends BaseType
             {"source":[5],"sourcemore":[{"n":"Commander Oxheart","t":1,"ti":64606,"z":5842}],
 
             cost:[]     format unk 0:copper, 1:[items]? 2, 3, 4, 5
-            stack       [min, max]  // when looting
             avail       unk
             rel         unk
-            glyph       major | minor (as id)
-            modelviewer
+            modelviewer {type:X, displayid:Y, slot:z} .. not sure, when to set
+            }
 
         */
 
         return $data;
     }
 
-    public function addGlobalsToJscript(&$template, $addMask = 0)
+    public function addGlobalsToJscript(&$template, $addMask = GLOBALINFO_SELF)
     {
-        foreach ($this->iterate() as $__)
+        foreach ($this->iterate() as $id => $__)
         {
-            $template->extendGlobalData(self::$type, [$this->id => array(
-                'name'    => $this->getField('name', true),
-                'quality' => $this->curTpl['quality'],
-                'icon'    => $this->curTpl['iconString']
-            )]);
+            $extra = null;
+            $data  = null;
+
+            if ($addMask & GLOBALINFO_SELF)
+            {
+                $data = array(
+                    $id => array(
+                        'name'    => $this->getField('name', true),
+                        'quality' => $this->curTpl['quality'],
+                        'icon'    => $this->curTpl['iconString']
+                    )
+                );
+            }
+
+            if ($addMask & GLOBALINFO_EXTRA)
+            {
+                $extra = array(
+                    'id'      => $id,
+                    'tooltip' => Util::jsEscape($this->renderTooltip(null, true)),
+                    'spells'  => ''
+                );
+            }
+
+            if ($data || $extra)
+                $template->extendGlobalData(self::$type, $data, $extra);
         }
     }
 
@@ -227,9 +240,9 @@ class ItemList extends BaseType
             gems: array (:-separated itemIds)
             rand: >0: randomPropId; <0: randomSuffixId
         interactive (set to place javascript/anchors to manipulate level and ratings or link to filters (static tooltips vs popup tooltip))
-        subT (tabled layout doesn't work if used as sub-tooltip in other item or spell tooltips; use line-break instead)
+        subOf (tabled layout doesn't work if used as sub-tooltip in other item or spell tooltips; use line-break instead)
     */
-    public function renderTooltip($enhance = [], $interactive = false, $subT = false)
+    public function renderTooltip($enhance = [], $interactive = false, $subOf = 0)
     {
         if ($this->error)
             return;
@@ -237,18 +250,19 @@ class ItemList extends BaseType
         if (!empty($this->tooltip[$this->id]))
             return $this->tooltip[$this->id];
 
-        $_name     = $this->getField('name', true);
-        $_reqLvl   = $this->curTpl['requiredLevel'];
-        $_quality  = $this->curTpl['quality'];
-        $_flags    = $this->curTpl['flags'];
-        $_class    = $this->curTpl['class'];
-        $_subClass = $this->curTpl['subClass'];
+        $_name         = $this->getField('name', true);
+        $_reqLvl       = $this->curTpl['requiredLevel'];
+        $_quality      = $this->curTpl['quality'];
+        $_flags        = $this->curTpl['flags'];
+        $_class        = $this->curTpl['class'];
+        $_subClass     = $this->curTpl['subClass'];
+        $causesScaling = false;
 
         if (!empty($enhance['rand']))
         {
-            $rndEnch = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE Id = ?d', $enhance['rand']);
-            $_name   .= ' '.Util::localizedString($rndEnch, 'name');
-            $randEnchant['stats'] = '';
+            $rndEnch     = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE Id = ?d', $enhance['rand']);
+            $_name      .= ' '.Util::localizedString($rndEnch, 'name');
+            $randEnchant = '';
 
             for ($i = 1; $i < 6; $i++)
             {
@@ -258,11 +272,11 @@ class ItemList extends BaseType
                 $enchant = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $rndEnch['enchantId'.$i]);
                 if ($rndEnch['allocationPct'.$i] > 0)
                 {
-                    $amount = intVal($rndEnch['allocationPct'.$i] * $this->generateEnchSuffixFactor() / 10000);
-                    $randEnchant['stats'] .= '<span>'.str_replace('$i', $amount, Util::localizedString($enchant, 'text')).'</span><br />';
+                    $amount = intVal($rndEnch['allocationPct'.$i] * $this->generateEnchSuffixFactor());
+                    $randEnchant .= '<span>'.str_replace('$i', $amount, Util::localizedString($enchant, 'text')).'</span><br />';
                 }
                 else
-                    $randEnchant['stats'] .= '<span>'.Util::localizedString($enchant, 'text').'</span><br />';
+                    $randEnchant .= '<span>'.Util::localizedString($enchant, 'text').'</span><br />';
             }
         }
 
@@ -270,11 +284,11 @@ class ItemList extends BaseType
         $x = '';
 
         // upper table: stats
-        if (!$subT)
+        if (!$subOf)
             $x .= '<table><tr><td>';
 
         // name; quality
-        if ($subT)
+        if ($subOf)
             $x .= '<span class="q'.$_quality.'"><a href="?item='.$this->id.'">'.$_name.'</a></span>';
         else
             $x .= '<b class="q'.$_quality.'">'.$_name.'</b>';
@@ -284,10 +298,10 @@ class ItemList extends BaseType
             $x .= '<br /><span class="q2">'.Lang::$item['heroic'].'</span>';
 
         // requires map (todo: reparse ?_zones for non-conflicting data; generate Link to zone)
-        if ($this->curTpl['map'])
+        if ($_ = $this->curTpl['map'])
         {
-            $map = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE mapId=?d LIMIT 1', $this->curTpl['map']);
-            $x .= '<br />'.Util::localizedString($map, 'name');
+            $map = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE mapId=?d LIMIT 1', $_);
+            $x .= '<br /><a href="?map='.$_.'" class="q1">'.Util::localizedString($map, 'name').'</a>';
         }
 
         // requires area
@@ -302,14 +316,19 @@ class ItemList extends BaseType
             $x .= '<br />'.Lang::$item['conjured'];
 
         // bonding
-        if (($_flags & ITEM_FLAG_ACCOUNTBOUND) && $_quality == ITEM_QUALITY_HEIRLOOM)
+        if (($_flags & ITEM_FLAG_ACCOUNTBOUND))
             $x .= '<br /><!--bo-->'.Lang::$item['bonding'][0];
         else if ($this->curTpl['bonding'])
             $x .= '<br /><!--bo-->'.Lang::$item['bonding'][$this->curTpl['bonding']];
 
         // unique || unique-equipped || unique-limited
-        if ($this->curTpl['maxCount'] == 1)
+        if ($this->curTpl['maxCount'] > 0)
+        {
             $x .= '<br />'.Lang::$item['unique'];
+
+            if ($this->curTpl['maxCount'] > 1)
+                $x .= ' ('.$this->curTpl['maxCount'].')';
+        }
         else if ($_flags & ITEM_FLAG_UNIQUEEQUIPPED)
             $x .= '<br />'.Lang::$item['uniqueEquipped'];
         else if ($this->curTpl['itemLimitCategory'])
@@ -326,12 +345,8 @@ class ItemList extends BaseType
         if ($hId = $this->curTpl['holidayId'])
         {
             $hDay = DB::Aowow()->selectRow("SELECT * FROM ?_holidays WHERE id = ?", $hId);
-            $x .= '<br />'.sprintf(Lang::$game['requires'], '<a href="'.$hId.'">'.Util::localizedString($hDay, 'name').'</a>');
+            $x .= '<br />'.sprintf(Lang::$game['requires'], '<a href="'.$hId.'" class="q1">'.Util::localizedString($hDay, 'name').'</a>');
         }
-
-        // maxCount
-        if ($this->curTpl['maxCount'] > 1)
-            $x .= ' ('.$this->curTpl['maxCount'].')';
 
         // item begins a quest
         if ($this->curTpl['startQuest'])
@@ -365,45 +380,54 @@ class ItemList extends BaseType
 
             $x .= '</tr></table>';
         }
+        else if ($_ = $this->curTpl['slot'])                // yes, slot can occur on random items and is than also displayed <_<
+            $x .= '<br />'.Lang::$item['inventoryType'][$this->curTpl['slot']].'<br />';
         else
             $x .= '<br />';
 
-        // Weapon/Ammunition Stats
-        if (in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]))
-        {
-            $speed   = $this->curTpl['delay'] / 1000;
-            $dmgmin1 = $this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'];
-            $dmgmax1 = $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2'];
-            $dps     = $speed ? ($dmgmin1 + $dmgmax1) / (2 * $speed) : 0;
+        // Weapon/Ammunition Stats                          (not limited to weapons (see item:1700))
+        $speed   = $this->curTpl['delay'] / 1000;
+        $dmgmin1 = $this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'];
+        $dmgmax1 = $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2'];
+        $dps     = $speed ? ($dmgmin1 + $dmgmax1) / (2 * $speed) : 0;
 
-            // regular weapon
+        if ($_class == ITEM_CLASS_AMMUNITION && $dmgmin1 && $dmgmax1)
+            $x .= Lang::$item['addsDps'].' '.number_format(($dmgmin1 + $dmgmax1) / 2, 1).' '.Lang::$item['dps2'].'<br />';
+        else if ($dps)
+        {
             if ($_class == ITEM_CLASS_WEAPON)
             {
                 $x .= '<table width="100%"><tr>';
                 $x .= '<td><!--dmg-->'.sprintf($this->curTpl['dmgType1'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmgMin1'].' - '.$this->curTpl['dmgMax1'], Lang::$game['sc'][$this->curTpl['dmgType1']]).'</td>';
                 $x .= '<th>'.Lang::$item['speed'].' <!--spd-->'.number_format($speed, 2).'</th>';
                 $x .= '</tr></table>';
+            }
+            else
+                $x .= '<!--dmg-->'.sprintf($this->curTpl['dmgType1'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmgMin1'].' - '.$this->curTpl['dmgMax1'], Lang::$game['sc'][$this->curTpl['dmgType1']]).'<br />';
 
-                // secondary damage is set
-                if ($this->curTpl['dmgMin2'])
-                    $x .= '+'.sprintf($this->curTpl['dmgType2'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmgMin2'].' - '.$this->curTpl['dmgMax2'], Lang::$game['sc'][$this->curTpl['dmgType2']]).'<br />';
+            // secondary damage is set
+            if ($this->curTpl['dmgMin2'])
+                $x .= '+'.sprintf($this->curTpl['dmgType2'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmgMin2'].' - '.$this->curTpl['dmgMax2'], Lang::$game['sc'][$this->curTpl['dmgType2']]).'<br />';
 
+            if ($_class == ITEM_CLASS_WEAPON)
                 $x .= '<!--dps-->('.number_format($dps, 1).' '.Lang::$item['dps'].')<br />';
 
-                // display FeralAttackPower if set
-                if (in_array($_subClass, [5, 6, 10]) && $dps > 54.8)
-                    $x .= '<span class="c11"><!--fap-->('.round(($dps - 54.8) * 14, 0).' '.Lang::$item['fap'].')</span><br />';
-            }
-            // ammunition
-            else
-                $x .= Lang::$item['addsDps'].' '.number_format(($dmgmin1 + $dmgmax1) / 2, 1).' '.Lang::$item['dps2'].'<br />';
+            // display FeralAttackPower if set
+            if ($fap = $this->getFeralAP())
+                $x .= '<span class="c11"><!--fap-->('.$fap.' '.Lang::$item['fap'].')</span><br />';
         }
 
         // Armor
-        if ($_class == ITEM_CLASS_ARMOR && ($this->curTpl['armor'] + $this->curTpl['armorDamageModifier']) > 0)
-            $x .= '<span class="q2"><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.sprintf(Lang::$item['armor'], $this->curTpl['armor'] + $this->curTpl['armorDamageModifier']).'</span></span><br />';
-        else if ($this->curTpl['armor'])
-            $x .= '<span><!--amr-->'.sprintf(Lang::$item['armor'], $this->curTpl['armor']).'</span><br />';
+        if ($_class == ITEM_CLASS_ARMOR && $this->curTpl['armorDamageModifier'] > 0)
+        {
+            $spanI = 'class="q2"';
+            if ($interactive)
+                $spanI = 'class="q2 tip" onmouseover="$WH.Tooltip.showAtCursor(event, $WH.sprintf(LANG.tooltip_armorbonus, '.$this->curTpl['armorDamageModifier'].'), 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"';
+
+            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.sprintf(Lang::$item['armor'], intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])).'</span></span><br />';
+        }
+        else if (($this->curTpl['armor'] + $this->curTpl['armorDamageModifier']) > 0)
+            $x .= '<span><!--amr-->'.sprintf(Lang::$item['armor'], intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])).'</span><br />';
 
         // Block
         if ($this->curTpl['block'])
@@ -417,10 +441,10 @@ class ItemList extends BaseType
         }
 
         // Random Enchantment - if random enchantment is set, prepend stats from it
-        if (($this->curTpl['randomProperty'] || $this->curTpl['randomSuffix']) && !isset($enhance['rand']))
+        if ($this->curTpl['randomEnchant'] && !isset($enhance['rand']))
             $x .= '<span class="q2">'.Lang::$item['randEnchant'].'</span><br />';
         else if (isset($enhance['rand']))
-            $x .= $randEnchant['stats'];
+            $x .= $randEnchant;
 
         // itemMods (display stats and save ratings for later use)
         for ($j = 1; $j <= 10; $j++)
@@ -435,7 +459,7 @@ class ItemList extends BaseType
             if ($type >= ITEM_MOD_AGILITY && $type <= ITEM_MOD_STAMINA)
                 $x .= '<span><!--stat'.$type.'-->'.($qty > 0 ? '+' : '-').abs($qty).' '.Lang::$item['statType'][$type].'</span><br />';
             else                                            // rating with % for reqLevel
-                $green[] = $this->parseRating($type, $qty, $interactive);
+                $green[] = $this->parseRating($type, $qty, $interactive, $causesScaling);
         }
 
         // magic resistances
@@ -469,7 +493,6 @@ class ItemList extends BaseType
                     i.id IN (?a)',
                 $enhance['gems']
             );
-            echo "ho";
         }
         else
             $enhance['gems'] = [];
@@ -499,7 +522,7 @@ class ItemList extends BaseType
             $text      = $pop ? Util::localizedString($gems[$pop], 'text') : Lang::$item['socket'][$colorId];
 
             if ($interactive)
-                $x .= '<a href="?items=3&amp;filter=cr=81;crs='.(1 << $colorId).';crv=0" class="socket-'.Util::$sockets[$colorId].' q'.$col.'" '.$icon.'>'.$text.'</a><br />';
+                $x .= '<a href="?items=3&amp;filter=cr=81;crs='.($colorId + 1).';crv=0" class="socket-'.Util::$sockets[$colorId].' q'.$col.'" '.$icon.'>'.$text.'</a><br />';
             else
                 $x .= '<span class="socket-'.Util::$sockets[$colorId].' q'.$col.'" '.$icon.'>'.$text.'</span><br />';
         }
@@ -573,13 +596,14 @@ class ItemList extends BaseType
         if ($reqFac = $this->curTpl['requiredFaction'])
             $x .= '<br />'.sprintf(Lang::$game['requires'], '<a class="q1" href=?faction="'.$reqFac.'">'.FactionList::getName($reqFac).'</a> - '.Lang::$game['rep'][$this->curTpl['requiredFactionRank']]);
 
-        // locked
-        if ($lId = $this->curTpl['lockId'])
-            if ($locks = Lang::getLocks($lId))
-                $x .= '<br /><span class="q0">'.Lang::$item['locked'].'<br />'.implode('<br />', $locks).'</span>';
+        // locked or openable
+        if ($locks = Lang::getLocks($this->curTpl['lockId'], true))
+            $x .= '<br /><span class="q0">'.Lang::$item['locked'].'<br />'.implode('<br />', $locks).'</span>';
+        else if ($this->curTpl['flags'] & ITEM_FLAG_OPENABLE)
+            $x .= '<br /><span class="q2">'.Lang::$item['openClick'].'</span>';
 
         // upper table: done
-        if (!$subT)
+        if (!$subOf)
             $x .= '</td></tr></table>';
         else
             $x .= '<br>';
@@ -596,7 +620,7 @@ class ItemList extends BaseType
                     if ($cd < $this->curTpl['spellCategoryCooldown'.$j])
                         $cd = $this->curTpl['spellCategoryCooldown'.$j];
 
-                    $cd = $cd < 5000 ? null : ' ('.sprintf(Lang::$game['cooldown'], Util::formatTime($cd, true)).')';
+                    $cd = $cd < 5000 ? null : ' ('.sprintf(Lang::$game['cooldown'], Util::formatTime($cd)).')';
 
                     $itemSpellsAndTrigger[$this->curTpl['spellId'.$j]] = [$this->curTpl['spellTrigger'.$j], $cd];
                 }
@@ -608,13 +632,29 @@ class ItemList extends BaseType
 
                 $itemSpells = new SpellList(array(['s.id', array_keys($itemSpellsAndTrigger)]));
                 foreach ($itemSpells->iterate() as $__)
-                    if ($parsed = $itemSpells->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL)[0])
-                        $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id][0]] . ($interactive ? '<a href="?spell='.$itemSpells->id.'">'.$parsed.'</a>' : $parsed) . $itemSpellsAndTrigger[$itemSpells->id][1];
+                    if ($parsed = $itemSpells->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0])
+                    {
+                        if ($interactive)
+                        {
+                            $link   = '<a href="?spell='.$itemSpells->id.'">%s</a>';
+                            $parsed = preg_replace_callback('/^(.*)(&nbsp;<small>.*<\/small>)(.*)$/i', function($m) use($link) {
+                                    $m[1] = sprintf($link, $m[1]);
+                                    $m[3] = sprintf($link, $m[3]);
+                                    return $m[1].$m[2].$m[3];
+                                }, $parsed, -1, $nMatches
+                            );
+
+                            if (!$nMatches)
+                                $parsed = sprintF($link, $parsed);
+                        }
+
+                        $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id][0]] . $parsed . $itemSpellsAndTrigger[$itemSpells->id][1];
+                    }
             }
         }
 
         // lower table (ratings, spells, ect)
-        if (!$subT)
+        if (!$subOf)
             $x .= '<table><tr><td>';
 
         if (isset($green))
@@ -624,38 +664,30 @@ class ItemList extends BaseType
 
         // Item Set
         $pieces  = [];
-        $itemset = DB::Aowow()->selectRow('
-            SELECT
-                *
-            FROM
-                ?_itemset
-            WHERE
-                (item1=?d or item2=?d or item3=?d or item4=?d or item5=?d or item6=?d or item7=?d or item8=?d or item9=?d or item10=?d)',
-            $this->id, $this->id, $this->id, $this->id, $this->id, $this->id, $this->id, $this->id, $this->id, $this->id
-        );
+        $condition = ['OR', ['item1', $this->id], ['item2', $this->id], ['item3', $this->id], ['item4', $this->id], ['item5', $this->id], ['item6', $this->id], ['item7', $this->id], ['item8', $this->id], ['item9', $this->id], ['item10', $this->id]];
+        $itemset = new ItemsetList($condition);
 
-        if ($itemset)
+        if (!$itemset->error)
         {
-            $num = 0;                                       // piece counter
-            for ($i = 1; $i <= 10; $i++)
+            $pieces = DB::Aowow()->select('
+                SELECT b.id AS ARRAY_KEY, b.name_loc0, b.name_loc2, b.name_loc3, b.name_loc6, b.name_loc8, GROUP_CONCAT(a.id SEPARATOR \':\') AS equiv
+                FROM   aowow_items a, aowow_items b
+                WHERE  a.slotBak = b.slotBak AND a.itemset = b.itemset AND b.id IN (?a)
+                GROUP BY b.id;',
+                array_keys($itemset->pieceToSet)
+            );
+
+            foreach ($pieces as $k => &$p)
+                $p = '<span><!--si'.$p['equiv'].'--><a href="?item='.$k.'">'.Util::localizedString($p, 'name').'</a></span>';
+
+            $xSet = '<br /><span class="q"><a href="?itemset='.$itemset->id.'" class="q">'.$itemset->getField('name', true).'</a> (0/'.count($pieces).')</span>';
+
+            if ($skId = $itemset->getField('skillId'))      // bonus requires skill to activate
             {
-                if ($itemset['item'.$i] <= 0)
-                    continue;
+                $xSet .= '<br />'.sprintf(Lang::$game['requires'], '<a href="?skills='.$skId.'" class="q1">'.SkillList::getName($skId).'</a>');
 
-                $num++;
-                $equivalents = ItemList::getEquivalentSetPieces($itemset['item'.$i]);
-                $pieces[]    = '<span><!--si'.implode(':', $equivalents).'--><a href="?item='.$itemset['item'.$i].'">'.ItemList::getName($itemset['item'.$i]).'</a></span>';
-            }
-
-            $xSet = '<br /><span class="q"><a href="?itemset='.$itemset['id'].'" class="q">'.Util::localizedString($itemset, 'name').'</a> (0/'.$num.')</span>';
-
-            if ($itemset['skillId'])                        // bonus requires skill to activate
-            {
-                $name  = DB::Aowow()->selectRow('SELECT * FROM ?_skillline WHERE Id=?d', $itemset['skillId']);
-                $xSet .= '<br />'.sprintf(Lang::$game['requires'], '<a href="?skills='.$itemset['skillId'].'" class="q1">'.Util::localizedString($name, 'name').'</a>');
-
-                if ($itemset['skillLevel'])
-                    $xSet .= ' ('.$itemset['skillLevel'].')';
+                if ($_ = $itemset->getField('skillLevel'))
+                    $xSet .= ' ('.$_.')';
 
                 $xSet .= '<br />';
             }
@@ -666,38 +698,38 @@ class ItemList extends BaseType
             // get bonuses
             $setSpellsAndIdx = [];
             for ($j = 1; $j <= 8; $j++)
-                if ($itemset['spell'.$j] > 0)
-                    $setSpellsAndIdx[$itemset['spell'.$j]] = $j;
+                if ($_ = $itemset->getField('spell'.$j))
+                    $setSpellsAndIdx[$_] = $j;
 
-            // todo: get from static prop?
+            $setSpells = [];
             if ($setSpellsAndIdx)
             {
                 $boni = new SpellList(array(['s.id', array_keys($setSpellsAndIdx)]));
                 foreach ($boni->iterate() as $__)
                 {
-                    $itemset['spells'][] = array(
-                        'tooltip' => $boni->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL)[0],
-                        'entry'   => $itemset['spell'.$setSpellsAndIdx[$boni->id]],
-                        'bonus'   => $itemset['bonus'.$setSpellsAndIdx[$boni->id]]
+                    $setSpells[] = array(
+                        'tooltip' => $boni->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0],
+                        'entry'   => $itemset->getField('spell'.$setSpellsAndIdx[$boni->id]),
+                        'bonus'   => $itemset->getField('bonus'.$setSpellsAndIdx[$boni->id])
                     );
                 }
             }
 
             // sort and list bonuses
             $xSet .= '<span class="q0">';
-            for ($i = 0; $i < count($itemset['spells']); $i++)
+            for ($i = 0; $i < count($setSpells); $i++)
             {
-                for ($j = $i; $j < count($itemset['spells']); $j++)
+                for ($j = $i; $j < count($setSpells); $j++)
                 {
-                    if($itemset['spells'][$j]['bonus'] >= $itemset['spells'][$i]['bonus'])
+                    if($setSpells[$j]['bonus'] >= $setSpells[$i]['bonus'])
                         continue;
 
-                    $tmp = $itemset['spells'][$i];
-                    $itemset['spells'][$i] = $itemset['spells'][$j];
-                    $itemset['spells'][$j] = $tmp;
+                    $tmp = $setSpells[$i];
+                    $setSpells[$i] = $setSpells[$j];
+                    $setSpells[$j] = $tmp;
                 }
-                $xSet .= '<span>('.$itemset['spells'][$i]['bonus'].') '.Lang::$item['set'].': <a href="?spell='.$itemset['spells'][$i]['entry'].'">'.$itemset['spells'][$i]['tooltip'].'</a></span>';
-                if ($i < count($itemset['spells']) - 1)
+                $xSet .= '<span>('.$setSpells[$i]['bonus'].') '.Lang::$item['set'].': <a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a></span>';
+                if ($i < count($setSpells) - 1)
                     $xSet .= '<br />';
             }
             $xSet .= '</span>';
@@ -709,11 +741,9 @@ class ItemList extends BaseType
             $craftSpell = new SpellList(array(['s.id', intVal($this->curTpl['spellId2'])]));
             if (!$craftSpell->error)
             {
+                $xCraft = '';
                 if ($desc = $this->getField('description', true))
-                {
-                    $xCraft = '';
-                    $x     .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->curTpl['spellId2'].'">'.$desc.'</a></span><br />';
-                }
+                    $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->curTpl['spellId2'].'">'.$desc.'</a></span><br />';
 
                 // recipe handling (some stray Techniques have subclass == 0), place at bottom of tooltipp
                 if ($_class == ITEM_CLASS_RECIPE || $this->curTpl['bagFamily'] == 16)
@@ -721,7 +751,7 @@ class ItemList extends BaseType
                     $craftItem  = new ItemList(array(['i.id', (int)$craftSpell->curTpl['effect1CreateItemId']]));
                     if (!$craftItem->error)
                     {
-                        if ($itemTT = $craftItem->renderTooltip(null, $interactive))
+                        if ($itemTT = $craftItem->renderTooltip(null, $interactive, $this->id))
                             $xCraft .= '<div><br />'.$itemTT.'</div>';
 
                         $reagentItems = [];
@@ -752,7 +782,7 @@ class ItemList extends BaseType
             $xMisc[] = $xSet;
 
         // funny, yellow text at the bottom, omit if we have a recipe
-        if ($this->curTpl['description_loc0'] && !isset($xCraft))
+        if ($this->curTpl['description_loc0'] && !$this->canTeachSpell())
             $xMisc[] = '<span class="q">"'.$this->getField('description', true).'"</span>';
 
         // readable
@@ -760,8 +790,8 @@ class ItemList extends BaseType
             $xMisc[] = '<span class="q2">'.Lang::$item['readClick'].'</span>';
 
         // charges (i guess checking first spell is enough (single charges not shown))
-        if ($this->curTpl['spellCharges1'] > 1)
-            $xMisc[] = '<span class="q1">'.$this->curTpl['spellCharges1'].' '.Lang::$item['charges'].'</span>';
+        if ($this->curTpl['spellCharges1'] > 1 || $this->curTpl['spellCharges1'] < -1)
+            $xMisc[] = '<span class="q1">'.abs($this->curTpl['spellCharges1']).' '.Lang::$item['charges'].'</span>';
 
         if ($sp = $this->curTpl['sellPrice'])
             $xMisc[] = '<span class="q1">'.Lang::$item['sellPrice'].Lang::$colon.Util::formatMoney($sp).'</span>';
@@ -773,24 +803,31 @@ class ItemList extends BaseType
         if ($xMisc)
             $x .= implode('<br />', $xMisc);
 
-        if (!$subT)
+        if (!$subOf)
             $x .= '</td></tr></table>';
 
-        // heirloom tooltip scaling
-        if (isset($this->ssd[$this->id]))
+        // tooltip scaling
+        if (!isset($xCraft))
         {
-            $link = array(
-                $this->id,                                  // itemId
-                1,                                          // scaleMinLevel
-                $this->ssd[$this->id]['maxLevel'],          // scaleMaxLevel
-                $this->ssd[$this->id]['maxLevel'],          // scaleCurLevel
-                $this->curTpl['scalingStatDistribution'],   // scaleDist
-                $this->curTpl['scalingStatValue'],          // scaleFlags
-            );
+            $link = [$subOf ? $subOf : $this->id, 1];       // itemid, scaleMinLevel
+            if (isset($this->ssd[$this->id]))               // is heirloom
+            {
+                array_push($link,
+                    $this->ssd[$this->id]['maxLevel'],      // scaleMaxLevel
+                    $this->ssd[$this->id]['maxLevel'],      // scaleCurLevel
+                    $this->curTpl['scalingStatDistribution'],  // scaleDist
+                    $this->curTpl['scalingStatValue']       // scaleFlags
+                );
+            }
+            else                                            // may still use level dependant ratings
+            {
+                array_push($link,
+                    $causesScaling ? MAX_LEVEL : 1,         // scaleMaxLevel
+                    $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL     // scaleCurLevel
+                );
+            }
             $x .= '<!--?'.implode(':', $link).'-->';
         }
-        else
-            $x .= '<!--?'.$this->id.':1:'.MAX_LEVEL.':'.MAX_LEVEL.'-->';
 
         $this->tooltip[$this->id] = $x;
 
@@ -856,11 +893,11 @@ class ItemList extends BaseType
         switch ($this->curTpl['quality'])
         {
             case ITEM_QUALITY_UNCOMMON:
-                return $rpp['uncommon'.$suffixFactor];
+                return $rpp['uncommon'.$suffixFactor] / 10000;
             case ITEM_QUALITY_RARE:
-                return $rpp['rare'.$suffixFactor];
+                return $rpp['rare'.$suffixFactor] / 10000;
             case ITEM_QUALITY_EPIC:
-                return $rpp['epic'.$suffixFactor];
+                return $rpp['epic'.$suffixFactor] / 10000;
             case ITEM_QUALITY_LEGENDARY:
             case ITEM_QUALITY_ARTIFACT:
                 return 0;                                   // not have random properties
@@ -881,9 +918,6 @@ class ItemList extends BaseType
             if (!$mod ||!$val)
                 continue;
 
-            if ($mod == ITEM_MOD_ATTACK_POWER)
-                @$this->itemMods[$this->id][ITEM_MOD_RANGED_ATTACK_POWER] += $val;
-
             @$this->itemMods[$this->id][$mod] += $val;
         }
 
@@ -891,11 +925,12 @@ class ItemList extends BaseType
         $equipSpells = [];
         for ($h = 1; $h <= 5; $h++)
         {
-            // only onEquip
-            if ($this->curTpl['spellTrigger'.$h] != 1)
+            if ($this->curTpl['spellId'.$h] <= 0)
                 continue;
 
-            if ($this->curTpl['spellId'.$h] <= 0)
+            // armor & weapons only onEquip && consumables only onUse
+            if (!(in_array($this->curTpl['class'],  [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $this->curTpl['spellTrigger'.$h] == 1) &&
+                !(         $this->curTpl['class'] == ITEM_CLASS_CONSUMABLE                 && $this->curTpl['spellTrigger'.$h] == 0))
                 continue;
 
             $equipSpells[] = $this->curTpl['spellId'.$h];
@@ -913,58 +948,15 @@ class ItemList extends BaseType
 
         // fetch and add socketbonusstats
         if (@$this->json[$this->id]['socketbonus'] > 0)
-            if ($enh = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?;', $this->json[$this->id]['socketbonus']))
-                $this->json[$this->id]['socketbonusstat'] = Util::parseItemEnchantment($enh);
+            $this->json[$this->id]['socketbonusstat'] = Util::parseItemEnchantment($this->json[$this->id]['socketbonus']);
 
         // Item is a gem (don't mix with sockets)
         if ($geId = $this->curTpl['gemEnchantmentId'])
         {
-            $gemStats = Util::parseItemEnchantment(DB::Aowow()->selectRow('SELECT * FROM ?_itemEnchantment WHERE id = ?d', $geId));
+            $gemStats = Util::parseItemEnchantment($geId);
 
             foreach ($gemStats as $mod => $qty)
                 @$this->json[$this->id][$mod] += $qty;
-        }
-
-        // gather random Enchantments
-        // todo (high): extremly high sql-load
-        if (@$this->json[$this->id]['commondrop'] && isset($this->subItems[$this->id]))
-        {
-            foreach ($this->subItems[$this->id] as $k => $sI)
-            {
-                $jsonEquip = [];
-                $jsonText  = [];
-
-                for ($i = 1; $i < 6; $i++)
-                {
-                    if ($sI['enchantId'.$i] <= 0)
-                        continue;
-
-                    if (!$this->rndEnchIds[$sI['enchantId'.$i]])
-                        continue;
-
-                    $eData = $this->rndEnchIds[$sI['enchantId'.$i]];
-
-                    if ($sI['allocationPct'.$i] > 0)        // RandomSuffix: scaling Enchantment; enchId < 0
-                    {
-                        $amount     = intVal($sI['allocationPct'.$i] * $this->generateEnchSuffixFactor() / 10000);
-                        $jsonEquip  = array_merge($jsonEquip, Util::parseItemEnchantment($eData, $amount));
-                        $jsonText[] = str_replace('$i', $amount, Util::localizedString($eData, 'text'));
-                    }
-                    else                                    // RandomProperty: static Enchantment; enchId > 0
-                    {
-                        $jsonText[] = Util::localizedString($eData, 'text');
-                        $jsonEquip  = array_merge($jsonEquip, Util::parseItemEnchantment($eData));
-                    }
-                }
-
-                $this->subItems[$this->id][$k] = array(
-                    'name'          => Util::localizedString($sI, 'name'),
-                    'enchantment'   => implode(', ', $jsonText),
-                    'jsonequip'     => $jsonEquip
-                );
-            }
-
-            $this->json[$this->id]['subitems'] = $this->subItems[$this->id];
         }
 
         foreach ($this->json[$this->id] as $k => $v)
@@ -1019,13 +1011,36 @@ class ItemList extends BaseType
         if (!in_array($this->curTpl['spellId1'], [483, 55884]))
             return false;
 
+        // needs learnable spell
         if (!$this->curTpl['spellId2'])
             return false;
 
         return true;
     }
 
-    private function parseRating($type, $value, $interactive = false)
+    private function getFeralAP()
+    {
+        // must be weapon
+        if ($this->curTpl['class'] != ITEM_CLASS_WEAPON)
+            return 0;
+
+        // must be 2H weapon (2H-Mace, Polearm, Staff, ..Fishing Pole)
+        if (!in_array($this->curTpl['subClass'], [5, 6, 10, 20]))
+            return 0;
+
+        // thats fucked up..
+        if (!$this->curTpl['delay'])
+            return 0;
+
+        // must have enough damage
+        $dps = ($this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'] + $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2']) / (2 * $this->curTpl['delay'] / 1000);
+        if ($dps < 54.8)
+            return 0;
+
+        return round(($dps - 54.8) * 14, 0);
+    }
+
+    private function parseRating($type, $value, $interactive = false, &$scaling = false)
     {
         // clamp level range
         $ssdLvl = isset($this->ssd[$this->id]) ? $this->ssd[$this->id]['maxLevel'] : 1;
@@ -1038,8 +1053,10 @@ class ItemList extends BaseType
             return Lang::$item['trigger'][1] . str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::$item['statType'][$type]);
         else                                                // rating-Bonuses
         {
+            $scaling = true;
+
             if ($interactive)
-                $js = '&nbsp;<small>('.sprintf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</a>)</small>';
+                $js = '&nbsp;<small>('.sprintf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</small>';
             else
                 $js = "&nbsp;<small>(".Util::setRatingLevel($level, $type, $value).")</small>";
 
@@ -1107,24 +1124,68 @@ class ItemList extends BaseType
         }
     }
 
-    private function initSubItems()
+    public function initSubItems()
     {
-        $randId = $this->curTpl['randomProperty'] > 0 ? $this->curTpl['randomProperty'] : $this->curTpl['randomSuffix'];
-        if ($randomIds = DB::Aowow()->selectCol('SELECT ench FROM item_enchantment_template WHERE entry = ?d', $randId))
+        if (!array_keys($this->templates))
+            return;
+
+        $ire = DB::Aowow()->select('
+            SELECT  i.id AS ARRAY_KEY_1, ire.id AS ARRAY_KEY_2, iet.chance, ire.*
+            FROM    aowow_items i
+            JOIN    item_enchantment_template iet ON iet.entry = ABS(i.randomEnchant)
+            JOIN    aowow_itemRandomEnchant ire ON IF(i.randomEnchant > 0, ire.id = iet.ench, ire.id = -iet.ench)
+            WHERE   i.id IN (?a)',
+            array_keys($this->templates)
+        );
+
+        foreach ($ire as $mstItem => $subItem)
         {
-            if ($this->curTpl['randomSuffix'] > 0)
-                array_walk($randomIds, function($val, $key) use(&$randomIds) {
-                    $randomIds[$key] = -$val;
-                });
+            foreach ($subItem as $subId => $data)
+            {
+                $jsonEquip = [];
+                $jsonText  = [];
 
-            $this->subItems[$this->id] = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM ?_itemRandomEnchant WHERE Id IN (?a)', $randomIds);
-
-            // subitems may share enchantmentIds
-            foreach ($this->subItems[$this->id] as $sI)
                 for ($i = 1; $i < 6; $i++)
-                    if (!isset($this->rndEnchIds[$sI['enchantId'.$i]]) && $sI['enchantId'.$i])
-                        if ($enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $sI['enchantId'.$i]))
-                            $this->rndEnchIds[$enchant['id']] = $enchant;
+                {
+                    $enchId = $data['enchantId'.$i];
+
+                    if ($enchId <= 0)
+                        continue;
+
+                    // subitems may share enchantmentIds
+                    if (!isset($this->rndEnchIds[$enchId]))
+                    {
+                        $stats = Util::parseItemEnchantment($enchId, false, $text);
+                        $this->rndEnchIds[$enchId] = array(
+                            'text'  => $text,
+                            'stats' => $stats
+                        );
+                    }
+
+                    if ($data['allocationPct'.$i] > 0)      // RandomSuffix: scaling Enchantment; enchId < 0
+                    {
+                        $qty   = intVal($data['allocationPct'.$i] * $this->generateEnchSuffixFactor());
+                        $stats = array_fill_keys(array_keys($this->rndEnchIds[$enchId]['stats']), $qty);
+
+                        $jsonText[] = str_replace('$i', $qty, $this->rndEnchIds[$enchId]['text']);
+                        Util::arraySumByKey($jsonEquip, $stats);
+                    }
+                    else                                    // RandomProperty: static Enchantment; enchId > 0
+                    {
+                        $jsonText[] = $this->rndEnchIds[$enchId]['text'];
+                        Util::arraySumByKey($jsonEquip, $this->rndEnchIds[$enchId]['stats']);
+                    }
+                }
+
+                $this->subItems[$mstItem][$subId] = array(
+                    'name'          => Util::localizedString($data, 'name'),
+                    'enchantment'   => implode(', ', $jsonText),
+                    'jsonequip'     => $jsonEquip,
+                    'chance'        => $data['chance']   // hmm, only needed for item detail page...
+                );
+            }
+
+            $this->json[$mstItem]['subitems'] = $this->subItems[$mstItem];
         }
     }
 
@@ -1139,13 +1200,13 @@ class ItemList extends BaseType
             'subclass'    => $this->curTpl['subClass'],
             'subsubclass' => $this->curTpl['subSubClass'],
             'heroic'      => (string)($this->curTpl['flags'] & 0x8),
-            'side'        => Util::sideByRaceMask($this->curTpl['requiredRace']), // check for FlagsExtra? 0:both; 1: Horde; 2:Alliance
+            'side'        => $this->curTpl['flagsExtra'] & 0x3 ? 3 - ($this->curTpl['flagsExtra'] & 0x3) : Util::sideByRaceMask($this->curTpl['requiredRace']),
             'slot'        => $this->curTpl['slot'],
             'slotbak'     => $this->curTpl['slotBak'],
             'level'       => $this->curTpl['itemLevel'],
             'reqlevel'    => $this->curTpl['requiredLevel'],
             'displayid'   => $this->curTpl['displayId'],
-            'commondrop'  => ($this->curTpl['randomProperty'] > 0 || $this->curTpl['randomSuffix'] > 0) ? 'true' : null, // string required :(
+            // 'commondrop'  => 'true' / null           // set if the item is a loot-filler-item .. checke common ref-templates..?
             'holres'      => $this->curTpl['resHoly'],
             'firres'      => $this->curTpl['resFire'],
             'natres'      => $this->curTpl['resNature'],
@@ -1171,8 +1232,8 @@ class ItemList extends BaseType
             $json['dmgtype1'] = $this->curTpl['dmgType1'];
             $json['dmgmin1']  = $this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'];
             $json['dmgmax1']  = $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2'];
-            $json['dps']      = !$this->curTpl['delay'] ? 0 : number_format(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $this->curTpl['delay'] / 1000), 1);
             $json['speed']    = number_format($this->curTpl['delay'] / 1000, 2);
+            $json['dps']      = !floatVal($json['speed']) ? 0 : number_format(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1);
 
             if (in_array($json['subclass'], [2, 3, 18, 19]))
             {
@@ -1189,8 +1250,8 @@ class ItemList extends BaseType
                 $json['mledps']    = $json['dps'];
             }
 
-            if ($json['classs'] == ITEM_CLASS_WEAPON && in_array($json['subclass'], [5, 6, 10]) && $json['dps'] > 54.8)
-                $json['feratkpwr'] = max(0, round((($json['dmgmin1'] + $json['dmgmax1']) / (2 * $this->curTpl['delay'] / 1000) - 54.8) * 14, 0));
+            if ($fap = $this->getFeralAP())
+                $json['feratkpwr'] = $fap;
         }
 
         if ($this->curTpl['armorDamageModifier'] > 0)
@@ -1234,6 +1295,23 @@ class ItemListFilter extends Filter
             14 => -1,
             15 => -1
         ),
+        87 => array(                                        // reagent for profession
+             1 => 171,
+             2 => 164,
+             3 => 185,
+             4 => 333,
+             5 => 202,
+             6 => 129,
+             7 => 755,
+             8 => 165,
+             9 => 186,
+            10 => 197,
+            11 => true,
+            12 => false,
+            13 => 356,
+            14 => 182,
+            15 => 773,
+        ),
         152 => array(                                       // class-specific
             null, 1, 2, 3, 4, 5, 6, 7, 8, 9, null, 11, true, false
         ),
@@ -1243,90 +1321,106 @@ class ItemListFilter extends Filter
     );
     // cr => [type, field, misc, extraCol]
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-        146 => [FILTER_CR_FLAG,    'flags',                  ITEM_FLAG_HEROIC             ], // heroic
-          9 => [FILTER_CR_FLAG,    'flags',                  ITEM_FLAG_CONJURED           ], // conjureditem
-         83 => [FILTER_CR_FLAG,    'flags',                  ITEM_FLAG_UNIQUEEQUIPPED     ], // uniqueequipped
-        151 => [FILTER_CR_NUMERIC, 'id',                     null,                    true], // id
-        100 => [FILTER_CR_NUMERIC, 'is.nsockets'                                          ], // nsockets
-        111 => [FILTER_CR_NUMERIC, 'requiredSkillRank',      null,                    true], // reqskillrank
-         99 => [FILTER_CR_ENUM,    'requiredSkill'                                        ], // requiresprof
-         66 => [FILTER_CR_ENUM,    'requiredSpell'                                        ], // requiresprofspec
-         17 => [FILTER_CR_ENUM,    'requiredFaction'                                      ], // requiresrepwith
-        169 => [FILTER_CR_ENUM,    'holidayId'                                            ], // requiresevent
-         21 => [FILTER_CR_NUMERIC, 'is.agi',                 null,                    true], // agi
-         23 => [FILTER_CR_NUMERIC, 'is.int',                 null,                    true], // int
-         22 => [FILTER_CR_NUMERIC, 'is.sta',                 null,                    true], // sta
-         24 => [FILTER_CR_NUMERIC, 'is.spi',                 null,                    true], // spi
-         20 => [FILTER_CR_NUMERIC, 'is.str',                 null,                    true], // str
-        115 => [FILTER_CR_NUMERIC, 'is.health',              null,                    true], // health
-        116 => [FILTER_CR_NUMERIC, 'is.mana',                null,                    true], // mana
-         60 => [FILTER_CR_NUMERIC, 'is.healthrgn',           null,                    true], // healthrgn
-         61 => [FILTER_CR_NUMERIC, 'is.manargn',             null,                    true], // manargn
-         41 => [FILTER_CR_NUMERIC, 'is.armor'   ,            null,                    true], // armor
-         44 => [FILTER_CR_NUMERIC, 'is.blockrtng',           null,                    true], // blockrtng
-         43 => [FILTER_CR_NUMERIC, 'is.block',               null,                    true], // block
-         42 => [FILTER_CR_NUMERIC, 'is.defrtng',             null,                    true], // defrtng
-         45 => [FILTER_CR_NUMERIC, 'is.dodgertng',           null,                    true], // dodgertng
-         46 => [FILTER_CR_NUMERIC, 'is.parryrtng',           null,                    true], // parryrtng
-         79 => [FILTER_CR_NUMERIC, 'is.resirtng',            null,                    true], // resirtng
-         77 => [FILTER_CR_NUMERIC, 'is.atkpwr',              null,                    true], // atkpwr
-         97 => [FILTER_CR_NUMERIC, 'is.feratkpwr',           null,                    true], // feratkpwr
-        114 => [FILTER_CR_NUMERIC, 'is.armorpenrtng',        null,                    true], // armorpenrtng
-         96 => [FILTER_CR_NUMERIC, 'is.critstrkrtng',        null,                    true], // critstrkrtng
-        117 => [FILTER_CR_NUMERIC, 'is.exprtng',             null,                    true], // exprtng
-        103 => [FILTER_CR_NUMERIC, 'is.hastertng',           null,                    true], // hastertng
-        119 => [FILTER_CR_NUMERIC, 'is.hitrtng',             null,                    true], // hitrtng
-         94 => [FILTER_CR_NUMERIC, 'is.splpen',              null,                    true], // splpen
-        123 => [FILTER_CR_NUMERIC, 'is.splpwr',              null,                    true], // splpwr
-         52 => [FILTER_CR_NUMERIC, 'is.arcsplpwr',           null,                    true], // arcsplpwr
-         53 => [FILTER_CR_NUMERIC, 'is.firsplpwr',           null,                    true], // firsplpwr
-         54 => [FILTER_CR_NUMERIC, 'is.frosplpwr',           null,                    true], // frosplpwr
-         55 => [FILTER_CR_NUMERIC, 'is.holsplpwr',           null,                    true], // holsplpwr
-         56 => [FILTER_CR_NUMERIC, 'is.natsplpwr',           null,                    true], // natsplpwr
-         57 => [FILTER_CR_NUMERIC, 'is.shasplpwr',           null,                    true], // shasplpwr
-         32 => [FILTER_CR_NUMERIC, 'is.dps',                 true,                    true], // dps
-         33 => [FILTER_CR_NUMERIC, 'is.dmgmin1',             null,                    true], // dmgmin1
-         34 => [FILTER_CR_NUMERIC, 'is.dmgmax1',             null,                    true], // dmgmax1
-         36 => [FILTER_CR_NUMERIC, 'is.speed',               true,                    true], // speed
-        134 => [FILTER_CR_NUMERIC, 'is.mledps',              true,                    true], // mledps
-        135 => [FILTER_CR_NUMERIC, 'is.mledmgmin',           null,                    true], // mledmgmin
-        136 => [FILTER_CR_NUMERIC, 'is.mledmgmax',           null,                    true], // mledmgmax
-        137 => [FILTER_CR_NUMERIC, 'is.mlespeed',            true,                    true], // mlespeed
-        138 => [FILTER_CR_NUMERIC, 'is.rgddps',              true,                    true], // rgddps
-        139 => [FILTER_CR_NUMERIC, 'is.rgddmgmin',           null,                    true], // rgddmgmin
-        140 => [FILTER_CR_NUMERIC, 'is.rgddmgmax',           null,                    true], // rgddmgmax
-        141 => [FILTER_CR_NUMERIC, 'is.rgdspeed',            true,                    true], // rgdspeed
-         25 => [FILTER_CR_NUMERIC, 'is.arcres',              null,                    true], // arcres
-         26 => [FILTER_CR_NUMERIC, 'is.firres',              null,                    true], // firres
-         28 => [FILTER_CR_NUMERIC, 'is.frores',              null,                    true], // frores
-         30 => [FILTER_CR_NUMERIC, 'is.holres',              null,                    true], // holres
-         27 => [FILTER_CR_NUMERIC, 'is.natres',              null,                    true], // natres
-         29 => [FILTER_CR_NUMERIC, 'is.shares',              null,                    true], // shares
-         37 => [FILTER_CR_NUMERIC, 'is.mleatkpwr',           null,                    true], // mleatkpwr
-         84 => [FILTER_CR_NUMERIC, 'is.mlecritstrkrtng',     null,                    true], // mlecritstrkrtng
-         78 => [FILTER_CR_NUMERIC, 'is.mlehastertng',        null,                    true], // mlehastertng
-         95 => [FILTER_CR_NUMERIC, 'is.mlehitrtng',          null,                    true], // mlehitrtng
-         38 => [FILTER_CR_NUMERIC, 'is.rgdatkpwr',           null,                    true], // rgdatkpwr
-         40 => [FILTER_CR_NUMERIC, 'is.rgdcritstrkrtng',     null,                    true], // rgdcritstrkrtng
-        101 => [FILTER_CR_NUMERIC, 'is.rgdhastertng',        null,                    true], // rgdhastertng
-         39 => [FILTER_CR_NUMERIC, 'is.rgdhitrtng',          null,                    true], // rgdhitrtng
-         49 => [FILTER_CR_NUMERIC, 'is.splcritstrkrtng',     null,                    true], // splcritstrkrtng
-        102 => [FILTER_CR_NUMERIC, 'is.splhastertng',        null,                    true], // splhastertng
-         48 => [FILTER_CR_NUMERIC, 'is.splhitrtng',          null,                    true], // splhitrtng
-         51 => [FILTER_CR_NUMERIC, 'is.spldmg',              null,                    true], // spldmg
-         50 => [FILTER_CR_NUMERIC, 'is.splheal',             null,                    true], // splheal
-          8 => [FILTER_CR_BOOLEAN, 'requiredDisenchantSkill'                              ], // disenchantable
-         59 => [FILTER_CR_NUMERIC, 'durability',             null,                    true], // dura
-        104 => [FILTER_CR_STRING,  'description',            true                         ], // flavortext
-          7 => [FILTER_CR_BOOLEAN, 'description_loc0',       true                         ], // hasflavortext
-        142 => [FILTER_CR_STRING,  'iconString',                                          ], // icon
-
-        176 => [FILTER_CR_STAFFFLAG, 'flags'                                               ], // flags
-        177 => [FILTER_CR_STAFFFLAG, 'flagsExtra'                                          ], // flags2
+          9 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_CONJURED           ], // conjureditem
+         11 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_OPENABLE           ], // openable
+         83 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_UNIQUEEQUIPPED     ], // uniqueequipped
+         89 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_PROSPECTABLE       ], // prospectable
+         98 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_PARTYLOOT          ], // partyloot
+        133 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_ACCOUNTBOUND       ], // accountbound
+        146 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_HEROIC             ], // heroic
+        154 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_REFUNDABLE         ], // refundable
+        155 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_ARENA       ], // usableinarenas
+        156 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_SHAPED      ], // usablewhenshapeshifted
+        157 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_SMARTLOOT          ], // smartloot
+        159 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_MILLABLE           ], // millable
+        162 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_DEPRECATED         ], // deprecated
+        127 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_UNAVAILABLE           ], // notavailable
+     // 161 => [FILTER_CR_FLAG,      'cuFlags',                ~CUSTOM_UNAVAILABLE          ], // availabletoplayers .. wait what?!
+        151 => [FILTER_CR_NUMERIC,   'id',                     null,                    true], // id
+        100 => [FILTER_CR_NUMERIC,   'is.nsockets'                                          ], // nsockets
+        111 => [FILTER_CR_NUMERIC,   'requiredSkillRank',      null,                    true], // reqskillrank
+         99 => [FILTER_CR_ENUM,      'requiredSkill'                                        ], // requiresprof
+         66 => [FILTER_CR_ENUM,      'requiredSpell'                                        ], // requiresprofspec
+         17 => [FILTER_CR_ENUM,      'requiredFaction'                                      ], // requiresrepwith
+        169 => [FILTER_CR_ENUM,      'holidayId'                                            ], // requiresevent
+         21 => [FILTER_CR_NUMERIC,   'is.agi',                 null,                    true], // agi
+         23 => [FILTER_CR_NUMERIC,   'is.int',                 null,                    true], // int
+         22 => [FILTER_CR_NUMERIC,   'is.sta',                 null,                    true], // sta
+         24 => [FILTER_CR_NUMERIC,   'is.spi',                 null,                    true], // spi
+         20 => [FILTER_CR_NUMERIC,   'is.str',                 null,                    true], // str
+        115 => [FILTER_CR_NUMERIC,   'is.health',              null,                    true], // health
+        116 => [FILTER_CR_NUMERIC,   'is.mana',                null,                    true], // mana
+         60 => [FILTER_CR_NUMERIC,   'is.healthrgn',           null,                    true], // healthrgn
+         61 => [FILTER_CR_NUMERIC,   'is.manargn',             null,                    true], // manargn
+         41 => [FILTER_CR_NUMERIC,   'is.armor'   ,            null,                    true], // armor
+         44 => [FILTER_CR_NUMERIC,   'is.blockrtng',           null,                    true], // blockrtng
+         43 => [FILTER_CR_NUMERIC,   'is.block',               null,                    true], // block
+         42 => [FILTER_CR_NUMERIC,   'is.defrtng',             null,                    true], // defrtng
+         45 => [FILTER_CR_NUMERIC,   'is.dodgertng',           null,                    true], // dodgertng
+         46 => [FILTER_CR_NUMERIC,   'is.parryrtng',           null,                    true], // parryrtng
+         79 => [FILTER_CR_NUMERIC,   'is.resirtng',            null,                    true], // resirtng
+         77 => [FILTER_CR_NUMERIC,   'is.atkpwr',              null,                    true], // atkpwr
+         97 => [FILTER_CR_NUMERIC,   'is.feratkpwr',           null,                    true], // feratkpwr
+        114 => [FILTER_CR_NUMERIC,   'is.armorpenrtng',        null,                    true], // armorpenrtng
+         96 => [FILTER_CR_NUMERIC,   'is.critstrkrtng',        null,                    true], // critstrkrtng
+        117 => [FILTER_CR_NUMERIC,   'is.exprtng',             null,                    true], // exprtng
+        103 => [FILTER_CR_NUMERIC,   'is.hastertng',           null,                    true], // hastertng
+        119 => [FILTER_CR_NUMERIC,   'is.hitrtng',             null,                    true], // hitrtng
+         94 => [FILTER_CR_NUMERIC,   'is.splpen',              null,                    true], // splpen
+        123 => [FILTER_CR_NUMERIC,   'is.splpwr',              null,                    true], // splpwr
+         52 => [FILTER_CR_NUMERIC,   'is.arcsplpwr',           null,                    true], // arcsplpwr
+         53 => [FILTER_CR_NUMERIC,   'is.firsplpwr',           null,                    true], // firsplpwr
+         54 => [FILTER_CR_NUMERIC,   'is.frosplpwr',           null,                    true], // frosplpwr
+         55 => [FILTER_CR_NUMERIC,   'is.holsplpwr',           null,                    true], // holsplpwr
+         56 => [FILTER_CR_NUMERIC,   'is.natsplpwr',           null,                    true], // natsplpwr
+         57 => [FILTER_CR_NUMERIC,   'is.shasplpwr',           null,                    true], // shasplpwr
+         32 => [FILTER_CR_NUMERIC,   'is.dps',                 true,                    true], // dps
+         33 => [FILTER_CR_NUMERIC,   'is.dmgmin1',             null,                    true], // dmgmin1
+         34 => [FILTER_CR_NUMERIC,   'is.dmgmax1',             null,                    true], // dmgmax1
+         36 => [FILTER_CR_NUMERIC,   'is.speed',               true,                    true], // speed
+        134 => [FILTER_CR_NUMERIC,   'is.mledps',              true,                    true], // mledps
+        135 => [FILTER_CR_NUMERIC,   'is.mledmgmin',           null,                    true], // mledmgmin
+        136 => [FILTER_CR_NUMERIC,   'is.mledmgmax',           null,                    true], // mledmgmax
+        137 => [FILTER_CR_NUMERIC,   'is.mlespeed',            true,                    true], // mlespeed
+        138 => [FILTER_CR_NUMERIC,   'is.rgddps',              true,                    true], // rgddps
+        139 => [FILTER_CR_NUMERIC,   'is.rgddmgmin',           null,                    true], // rgddmgmin
+        140 => [FILTER_CR_NUMERIC,   'is.rgddmgmax',           null,                    true], // rgddmgmax
+        141 => [FILTER_CR_NUMERIC,   'is.rgdspeed',            true,                    true], // rgdspeed
+         25 => [FILTER_CR_NUMERIC,   'is.arcres',              null,                    true], // arcres
+         26 => [FILTER_CR_NUMERIC,   'is.firres',              null,                    true], // firres
+         28 => [FILTER_CR_NUMERIC,   'is.frores',              null,                    true], // frores
+         30 => [FILTER_CR_NUMERIC,   'is.holres',              null,                    true], // holres
+         27 => [FILTER_CR_NUMERIC,   'is.natres',              null,                    true], // natres
+         29 => [FILTER_CR_NUMERIC,   'is.shares',              null,                    true], // shares
+         37 => [FILTER_CR_NUMERIC,   'is.mleatkpwr',           null,                    true], // mleatkpwr
+         84 => [FILTER_CR_NUMERIC,   'is.mlecritstrkrtng',     null,                    true], // mlecritstrkrtng
+         78 => [FILTER_CR_NUMERIC,   'is.mlehastertng',        null,                    true], // mlehastertng
+         95 => [FILTER_CR_NUMERIC,   'is.mlehitrtng',          null,                    true], // mlehitrtng
+         38 => [FILTER_CR_NUMERIC,   'is.rgdatkpwr',           null,                    true], // rgdatkpwr
+         40 => [FILTER_CR_NUMERIC,   'is.rgdcritstrkrtng',     null,                    true], // rgdcritstrkrtng
+        101 => [FILTER_CR_NUMERIC,   'is.rgdhastertng',        null,                    true], // rgdhastertng
+         39 => [FILTER_CR_NUMERIC,   'is.rgdhitrtng',          null,                    true], // rgdhitrtng
+         49 => [FILTER_CR_NUMERIC,   'is.splcritstrkrtng',     null,                    true], // splcritstrkrtng
+        102 => [FILTER_CR_NUMERIC,   'is.splhastertng',        null,                    true], // splhastertng
+         48 => [FILTER_CR_NUMERIC,   'is.splhitrtng',          null,                    true], // splhitrtng
+         51 => [FILTER_CR_NUMERIC,   'is.spldmg',              null,                    true], // spldmg
+         50 => [FILTER_CR_NUMERIC,   'is.splheal',             null,                    true], // splheal
+          8 => [FILTER_CR_BOOLEAN,   'requiredDisenchantSkill'                              ], // disenchantable
+         10 => [FILTER_CR_BOOLEAN,   'lockId'                                               ], // locked
+         59 => [FILTER_CR_NUMERIC,   'durability',             null,                    true], // dura
+        104 => [FILTER_CR_STRING,    'description',            true                         ], // flavortext
+          7 => [FILTER_CR_BOOLEAN,   'description_loc0',       true                         ], // hasflavortext
+        142 => [FILTER_CR_STRING,    'iconString',                                          ], // icon
+         12 => [FILTER_CR_BOOLEAN,   'itemset',                                             ], // partofset
+         13 => [FILTER_CR_BOOLEAN,   'randomEnchant',                                       ], // randomlyenchanted
+         14 => [FILTER_CR_BOOLEAN,   'pageTextId',                                          ], // readable
+         63 => [FILTER_CR_NUMERIC,   'buyPrice',               null,                    true], // buyprice
+         64 => [FILTER_CR_NUMERIC,   'sellPrice',              null,                    true], // sellprice
+        165 => [FILTER_CR_NUMERIC,   'repairPrice',            null,                    true], // repaircost
+         91 => [FILTER_CR_ENUM,      'totemCategory'                                        ], // tool
+        176 => [FILTER_CR_STAFFFLAG, 'flags'                                                ], // flags
+        177 => [FILTER_CR_STAFFFLAG, 'flagsExtra'                                           ], // flags2
     );
-
-
-    // $field = Util::$itemFilter[$cr[0]];
 
     public function __construct($parent)
     {
@@ -1370,9 +1464,13 @@ class ItemListFilter extends Filter
                 if ($this->int2Bool($cr[1]))
                     return ['bonding', 2, $cr[1] ? null : '!'];
                 break;
-            case 4:
-                if ($this->int2Bool($cr[1]))                // bindonuse [yn]
+            case 4:                                         // bindonuse [yn]
+                if ($this->int2Bool($cr[1]))
                     return ['bonding', 3, $cr[1] ? null : '!'];
+                break;
+            case 5:                                         // questitem [yn]
+                if ($this->int2Bool($cr[1]))
+                    return ['bonding', [4, 5], $cr[1] ? null : '!'];
                 break;
             case 168:                                       // teachesspell [yn]        483: learn recipe; 55884: learn mount/pet
                 if ($this->int2Bool($cr[1]))
@@ -1412,15 +1510,6 @@ class ItemListFilter extends Filter
                         return ['AND', ['gemEnchantmentId', 0, '!'], ['gemColorMask', $mask, '&']];
                 }
                 break;
-            case 133:                                       // acc bound [yn]
-                if ($this->int2Bool($cr[1]))
-                {
-                    if ($cr[1])
-                        return ['AND', ['flags', ITEM_FLAG_ACCOUNTBOUND, '&'], ['quality', 7]];
-                    else
-                        return ['OR', [['flags', ITEM_FLAG_ACCOUNTBOUND, '&'], 0], ['quality', 7, '!']];
-                }
-                break;
             case 107:                                       // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.User::$localeId, $cr[2]]
 /* todo */      return [1];
             case 132:                                       // glyphtype [enum]                 susubclass not yet set
@@ -1433,20 +1522,10 @@ class ItemListFilter extends Filter
                 break;
             case 124:                                       // randomenchants [str]
                 // joining this in one step results in hell ..  so .. two steps
-                $tmp = DB::Aowow()->selectCol('SELECT IF (ire.id > 0, iet.entry, -iet.entry) FROM item_enchantment_template iet JOIN ?_itemrandomenchant ire ON ABS(ire.id) = iet.ench WHERE ire.name_loc'.User::$localeId.' LIKE ?', '%'.$cr[2].'%');
-                $suffix = $prop = [];
-                foreach ($tmp as $t)
-                {
-                    if ($t > 0)
-                        $prop[] = intVal($t);
-                    else if ($t < 0)
-                        $suffix[] = -intVal($t);
-                }
+                $randIds = DB::Aowow()->selectCol('SELECT IF (ire.id > 0, iet.entry, -iet.entry) FROM item_enchantment_template iet JOIN ?_itemrandomenchant ire ON ABS(ire.id) = iet.ench WHERE ire.name_loc'.User::$localeId.' LIKE ?', '%'.$cr[2].'%');
 
-                if ($suffix && $prop)
-                    return ['OR', ['randomProperty', $prop], ['randomSuffix', $suffix]];
-                else if ($suffix || $prop)
-                    return $prop ? ['randomProperty', $prop] : ['randomSuffix', $suffix];
+                if ($randIds)
+                    return ['randomEnchant', $randIds];
                 else
                     return [0];                             // no results aren't really input errors
             case 125:                                       // reqarenartng [op] [int]      JOIN npc_vendor, game_event_npc_vendor, itemextendedcost.dbc
@@ -1477,17 +1556,17 @@ class ItemListFilter extends Filter
                         return ['AND', [['requiredRace', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'], ['requiredRace', 1 << ($_ - 1), '&']];
                 }
                 break;
-            case 35:                                       // damagetype [enum]
+            case 35:                                        // damagetype [enum]
                 if (!$this->isSaneNumeric($cr[1]) || $cr[1] > 6 || $cr[1] < 0)
                     break;
 
                 return ['OR', ['dmgType1', $cr[1]], ['dmgType2', $cr[1]]];
             case 109:                                       // armorbonus [op] [int]
-                if (!$this->isSaneNumeric($cr[2], false))
+                if (!$this->isSaneNumeric($cr[2], false) || !$this->int2Op($cr[1]))
                     break;
 
                 $this->formData['extraCols'][] = $cr[0];
-                return ['AND', ['armordamagemodifier', $cr[2], $this->int2Op($cr[1])], ['class', ITEM_CLASS_ARMOR]];
+                return ['AND', ['armordamagemodifier', $cr[2], $cr[1]], ['class', ITEM_CLASS_ARMOR]];
             case 86:                                        // craftedprof [profession]
 /* todo */      return [1];
             case 16:                                        // dropsin [zone]
@@ -1548,73 +1627,66 @@ class ItemListFilter extends Filter
 /* todo */      return [1];
             case 129:                                       // soldbynpc [str-small]
 /* todo */      return [1];
-            case 161:                                       // availabletoplayers [yn]
-/* todo */      return [1];
             case 90:                                        // avgbuyout [op] [int]
 /* todo */      return [1];
             case 65:                                        // avgmoney [op] [int]
-                if (!$this->isSaneNumeric($cr[2]) || $cr[1] < 0)
+                if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
                     break;
 
                 $this->formData['extraCols'][] = $cr[0];
-                return ['AND', ['flags', ITEM_FLAG_OPENABLE, '&'], ['((minMoneyLoot + maxMoneyLoot) / 2)', $cr[2], $this->int2Op($cr[1])]];
+                return ['AND', ['flags', ITEM_FLAG_OPENABLE, '&'], ['((minMoneyLoot + maxMoneyLoot) / 2)', $cr[2], $cr[1]]];
             case 62:                                        // cooldown [op] [int]                      fuck it .. too complex atm
-                if (!$this->isSaneNumeric($cr[2]) || $cr[1] < 0)
+                if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
                     break;
 
                 $this->formData['extraCols'][] = $cr[0];
-                /* 5x
-                if (id > 0 AND trigger = 0 AND
-                    (((cd > 0 OR (cat = 0 AND cd = 0)) AND cdMatch) OR
-                    ((cat > 0 OR (cat = 0 AND cd = 0)) AND catMatch))
-                )
-                */
-/* todo */      return [1];
-            case 162:                                       // deprecated [yn]
 /* todo */      return [1];
             case 163:                                       // disenchantsinto [disenchanting]
-                break;
-            case 10:                                        // locked [yn]
-                break;
-            case 159:                                       // millable [yn]
-                break;
-            case 127:                                       // notavailable [yn]
-                break;
+                if (!$this->isSaneNumeric($cr[1]))
+                    break;
+            // 35
+/* todo */      return [1];
             case 85:                                        // objectivequest [side]
-                break;
-            case 11:                                        // openable [yn]
-                break;
-            case 12:                                        // partofset [yn]
-                break;
-            case 98:                                        // partyloot [yn]
-                break;
-            case 89:                                        // prospectable [yn]
-                break;
-            case 5:                                         // questitem [yn]
-                break;
-            case 13:                                        // randomlyenchanted [yn]
-                break;
-            case 14:                                        // readable [yn]
-                break;
-            case 87:                                        // reagentforability [profession]
-                break;
-            case 63:                                        // buyprice [op] [int]
-                break;
-            case 154:                                       // refundable [yn]
-                break;
-            case 165:                                       // repaircost [op] [int]
-                break;
-            case 64:                                        // sellprice [op] [int]
-                break;
-            case 157:                                       // smartloot [yn]
+/* todo */      return [1];
+            case 87:                                        // reagentforability [enum]
+                $_ = @$this->enums[$cr[0]][$cr[1]];
+                if ($_ !== null)
+                {
+                    $ids    = [];
+                    $spells = DB::Aowow()->select(          // todo (med): hmm, selecting all using SpellList would exhaust 128MB of memory :x .. see, that we only select the fields that are really needed
+                        'SELECT reagent1, reagent2, reagent3, reagent4, reagent5, reagent6, reagent7, reagent8,
+                                reagentCount1, reagentCount2, reagentCount3, reagentCount4, reagentCount5, reagentCount6, reagentCount7, reagentCount8
+                        FROM    ?_spell
+                        WHERE   skillLine1 IN (?a)',
+                        is_bool($_) ? array_filter($this->enums[$cr[0]], "is_numeric") : $_
+                    );
+                    foreach ($spells as $spell)
+                        for ($i = 1; $i < 9; $i++)
+                            if ($spell['reagent'.$i] > 0 && $spell['reagentCount'.$i] > 0)
+                                $ids[] = $spell['reagent'.$i];
+
+                    if (empty($ids))
+                        return [0];
+                    else if ($_)
+                        return ['id', $ids];
+                    else
+                        return ['id', $ids, '!'];
+                }
                 break;
             case 6:                                         // startsquest [side]
-                break;
-            case 91:                                        // tool [totemcategory]
-                break;
-            case 155:                                       // usableinarenas [yn]
-                break;
-            case 156:                                       // usablewhenshapeshifted [yn]
+                switch ($cr[1])
+                {
+                    case 1:                                 // any
+                        return ['startQuest', 0, '>'];
+                    case 2:                                 // exclude horde only
+                        return ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], 2]];
+                    case 3:                                 // exclude alliance only
+                        return ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], 1]];
+                    case 4:                                 // both
+                        return ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], 0]];
+                    case 5:                                 // none
+                        return ['startQuest', 0];
+                }
                 break;
             case 130:                                       // hascomments [yn]
                 break;
@@ -1734,16 +1806,16 @@ class ItemListFilter extends Filter
                     $parts[] = $notEx;
                     break;
                 case  2:
-                    $parts[] = ['OR',  $notEx, ['requiredRace', RACE_MASK_HORDE, '&']];
+                    $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 1]],  ['OR', $notEx, ['requiredRace', RACE_MASK_HORDE, '&']]];
                     break;
                 case -2:
-                    $parts[] = ['AND', $ex,    ['requiredRace', RACE_MASK_HORDE, '&']];
+                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 1],       ['AND', $ex,   ['requiredRace', RACE_MASK_HORDE, '&']]];
                     break;
                 case  1:
-                    $parts[] = ['OR',  $notEx, ['requiredRace', RACE_MASK_ALLIANCE, '&']];
+                    $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 2]],  ['OR', $notEx, ['requiredRace', RACE_MASK_ALLIANCE, '&']]];
                     break;
                 case -1:
-                    $parts[] = ['AND',  $ex,   ['requiredRace', RACE_MASK_ALLIANCE, '&']];
+                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 2],       ['AND', $ex,   ['requiredRace', RACE_MASK_ALLIANCE, '&']]];
                     break;
                 default:
                     unset($_v['si']);

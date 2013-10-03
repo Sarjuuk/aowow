@@ -521,7 +521,6 @@ trait spawnHelper
     }
 }
 
-
 /*
     roight!
         just noticed, that the filters on pages originally pointed to ?filter=<pageName>
@@ -771,10 +770,10 @@ abstract class Filter
     {
         if ($this->int2Bool($op))
         {
-            if ($isString)
-                return [$field, '', $op ? '!' : null];
-            else
-                return [$field, 0, $op ? '>' : '<='];
+            $value    = $isString ? '' : 0;
+            $operator = $op ? '!' : null;
+
+            return [$field, $value, $operator];
         }
 
         return null;
