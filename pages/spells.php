@@ -103,6 +103,14 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     $visibleCols = [];
     $hiddenCols  = [];
 
+    $pageData = array(
+        'page'   => [],
+        'data'   => [],
+        'title'  => '',
+        'path'   => '',
+        'params' => []
+    );
+
     switch($cats[0])
     {
         case -2:                                            // Character Talents

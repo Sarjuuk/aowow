@@ -3,6 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+
 class WorldEventList extends BaseType
 {
     public static $type      = TYPE_WORLDEVENT;

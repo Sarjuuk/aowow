@@ -1018,10 +1018,8 @@ $WH.g_convertRatingToPercent = function(level, rating, value, classs) {
     if (level < 0) {
         level = 1;
     }
-    else {
-        if (level > 80) {
-            level = 80;
-        }
+    else if (level > 80) {
+        level = 80;
     }
 
     // Patch 2.4.3: Defense Skill, Dodge Rating, Parry Rating, Block Rating

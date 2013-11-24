@@ -15,7 +15,6 @@ require 'includes/kernel.php';
 if ($AoWoWconf['maintenance'] && !User::isInGroup(U_GROUP_EMPLOYEE))
     $smarty->brb();
 
-
 switch ($pageCall)
 {
     /* called by user */

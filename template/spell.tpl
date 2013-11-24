@@ -117,6 +117,12 @@
                         <th><dfn title="{$lang._globCD}">{$lang._gcd}</dfn></th>
                         <td>{$lvData.page.gcd}</td>
                     </tr>
+{if !empty($lvData.page.scaling)}
+                    <tr>
+                        <th>{$lang._scaling}</th>
+                        <td colspan="3">{$lvData.page.scaling}</td>
+                    </tr>
+{/if}
 {if !empty($lvData.page.stances)}
                     <tr>
                         <th>{$lang._forms}</th>
@@ -140,6 +146,7 @@
                             {if isset($lvData.page.effect[i].radius)}<br>{$lang._radius}{$lang.colon}{$lvData.page.effect[i].radius} {$lang._distUnit}{/if}
                             {if isset($lvData.page.effect[i].interval)}<br>{$lang._interval}{$lang.colon}{$lvData.page.effect[i].interval}{/if}
                             {if isset($lvData.page.effect[i].mechanic)}<br>{$lang.mechanic}{$lang.colon}{$lvData.page.effect[i].mechanic}{/if}
+                            {if isset($lvData.page.effect[i].procData)}<br>{if $lvData.page.effect[i].procData[0] < 0}{$lang.ppm|sprintf:$lvData.page.effect[i].procData[0]*-1}{else}{$lang.procChance}{$lang.colon}{$lvData.page.effect[i].procData[0]}%{/if}{if $lvData.page.effect[i].procData[1]} ({$lang.cooldown|sprintf:$lvData.page.effect[i].procData[1]}){/if}{/if}
                             </small>
 {if isset($lvData.page.effect[i].icon)}
                             <table class="icontab">
@@ -148,7 +155,7 @@
 {if isset($lvData.page.effect[i].icon.quality)}
                                     <td><span class="q{$lvData.page.effect[i].icon.quality}"><a href="?item={$lvData.page.effect[i].icon.id}">{$lvData.page.effect[i].icon.name}</a></span></td>
 {else}
-                                    <td><a href="?spell={$lvData.page.effect[i].icon.id}">{$lvData.page.effect[i].icon.name}</a></td>
+                                    <td>{if !$lvData.page.effect[i].icon.name|strpos:"#"}<a href="?spell={$lvData.page.effect[i].icon.id}">{/if}{$lvData.page.effect[i].icon.name}{if !$lvData.page.effect[i].icon.name|strpos:"#"}</a>{/if}</td>
 {/if}
                                     <th></th><td></td>
                                 </tr>

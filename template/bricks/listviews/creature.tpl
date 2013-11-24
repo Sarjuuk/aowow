@@ -33,6 +33,9 @@
                     {if isset($curr.percent)}
                         percent:{$curr.percent},
                     {/if}
+                    {if isset($curr.count)}
+                        count:{$curr.count},
+                    {/if}
                     {if isset($curr.cost)}
                         stock:{$curr.stock},
                         {if isset($curr.stack)}

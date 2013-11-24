@@ -157,7 +157,7 @@ var fi_filters = {
         { id: 142, name: 'icon',                    type: 'str' },
         { id: 10,  name: 'locked',                  type: 'yn' },
         { id: 159, name: 'millable',                type: 'yn' },
-        { id: 127, name: 'notavailable',            type: 'yn' },
+     // { id: 127, name: 'notavailable',            type: 'yn' },       redundant with 161
         { id: 85,  name: 'objectivequest',          type: 'side' },
         { id: 11,  name: 'openable',                type: 'yn' },
         { id: 12,  name: 'partofset',               type: 'yn' },

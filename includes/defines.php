@@ -162,7 +162,7 @@ define('LOOT_PROSPECTING',    'prospecting_loot_template');
 define('LOOT_MILLING',            'milling_loot_template');
 define('LOOT_PICKPOCKET',   'pickpocketing_loot_template');
 define('LOOT_SKINNING',          'skinning_loot_template');
-define('LOOT_QUEST',           'quest_mail_loot_template');
+define('LOOT_QUEST',                 'mail_loot_template'); // changed to quest_mail_loot_template..?
 define('LOOT_SPELL',                'spell_loot_template');
 define('LOOT_REFERENCE',        'reference_loot_template');
 
@@ -309,6 +309,11 @@ define('TEAM_NEUTRAL',                      2);
 define('LOCK_PROPERTY_FOOTLOCKER',          1);
 define('LOCK_PROPERTY_HERBALISM',           2);
 define('LOCK_PROPERTY_MINING',              3);
+
+// Creature
+define('NPC_TYPEFLAG_HERBLOOT',             0x0100);
+define('NPC_TYPEFLAG_MININGLOOT',           0x0200);
+define('NPC_TYPEFLAG_ENGINEERLOOT',         0x8000);
 
 // GameObject
 define('OBJECT_DOOR',                       0);

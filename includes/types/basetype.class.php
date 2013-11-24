@@ -227,37 +227,32 @@ abstract class BaseType
         // append joins
         if ($j = array_column($this->queryOpts, 'j'))
             foreach ($j as $_)
-                $this->queryBase .= is_array($_) ? (empty($_[1]) ? ' JOIN ' : ' LEFT JOIN ') . $_[0] : ' JOIN ' . $_;
+                $this->queryBase .= is_array($_) ? (empty($_[1]) ? ' JOIN ' : ' LEFT JOIN ').$_[0] : ' JOIN '.$_;
 
         // append conditions
         if ($where)
-            $this->queryBase .= ' WHERE (' . implode($linking, $where).')';
+            $this->queryBase .= ' WHERE ('.implode($linking, $where).')';
 
         // append grouping
         if ($g = array_column($this->queryOpts, 'g'))
-            $this->queryBase .= ' GROUP BY ' . implode(', ', $g);
+            $this->queryBase .= ' GROUP BY '.implode(', ', $g);
 
         // append post filtering
         if ($h = array_column($this->queryOpts, 'h'))
-            $this->queryBase .= ' HAVING ' . implode(' AND ', $h);
+            $this->queryBase .= ' HAVING '.implode(' AND ', $h);
 
         // append ordering
         if ($o = array_column($this->queryOpts, 'o'))
-            $this->queryBase .= ' ORDER BY ' . implode(', ', $o);
+            $this->queryBase .= ' ORDER BY '.implode(', ', $o);
 
         // apply limit
         if ($limit)
             $this->queryBase .= ' LIMIT '.$limit;
 
-// Util::execTime(true);
-// var_dump($this->queryBase);
-// echo "<br><br>\n\n";
         // execure query (finally)
         $rows = DB::Aowow()->SelectPage($this->matches, $this->queryBase);
         if (!$rows)
             return;
-// var_dump(Util::execTime());
-// echo "<br><br><br>\n\n";
 
         // assign query results to template
         foreach ($rows as $k => $tpl)
@@ -789,7 +784,7 @@ abstract class Filter
 
     private function genericString($field, $value, $localized)
     {
-        $field .= $localized ? '_loc' . User::$localeId : null;
+        $field .= $localized ? '_loc'.User::$localeId : null;
 
         return [$field, (string)$value];
     }

@@ -70,6 +70,7 @@
 {if !empty($lvData.pageText)}
                 <div class="clear"></div>
                 <h3>{$lang.content}</h3>
+
                 <div id="book-generic"></div>
                 <script>//<![CDATA[
                     {strip}new Book({ldelim} parent: 'book-generic', pages: [

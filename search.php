@@ -389,7 +389,7 @@ if ($searchMask & 0x80)
 
     if ($data = $abilities->getListviewData())
     {
-        $abilities->addGlobalsToJscript($smarty);
+        $abilities->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
         $vis = ['level', 'singleclass', 'schools'];
         if ($abilities->hasSetFields(['reagent1']))
@@ -1096,7 +1096,7 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
     {
         $_      = array_pop($found);
         $type   = Util::$typeStrings[$_['type']];
-        $typeId = key(array_pop($_));
+        $typeId = key($_['data']);
 
         header("Location: ?".$type.'='.$typeId);
         die();

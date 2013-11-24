@@ -3,6 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+
 class QuestList extends BaseType
 {
     public static   $type      = TYPE_QUEST;

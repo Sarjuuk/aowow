@@ -991,9 +991,9 @@ var g_item_slots = {
 };
 
 var g_item_classes = {
-     0: 'Consommable',
+     0: 'Verbrauchbar',
      1: 'Behälter',
-     2: 'Arme',
+     2: 'Waffe',
      3: 'Edelstein',
      4: 'Rüstung',
      5: 'Reagenz',

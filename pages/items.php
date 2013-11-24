@@ -4,13 +4,6 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-/*
-item upgrade search: !
-    <a href="javascript:;" class="button-red" onclick="this.blur(); pr_showClassPresetMenu(this, 45498, 2, 17, event);">
-        <em><b><i>Find upgrades...</i></b><span>Find upgrades...</span></em>
-    </a>
-*/
-
 $cats       = Util::extractURLParams($pageParam);
 $path       = [0, 0];
 $title      = [Lang::$game['items']];
@@ -86,11 +79,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     if ($cats[0] !== null)
         $path = array_merge($path, $cats);
 
-    /*
-        display available submenu and slot, if applicable
-        todo: 'type' gets ignored if cats[1] is set
-        [$strArr, $keyMask]
-    */
+    // display available submenu and slot, if applicable
     $type = $slot = [[], null];
     if ($cats[0] === null)
     {
@@ -99,7 +88,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     }
     else
     {
-        if (isset($cats[1]))
+        if (isset($cats[2]))
+            $catList = Lang::$item['cat'][$cats[0]][1][$cats[1]][1][$cats[2]];
+        else if (isset($cats[1]))
             $catList = Lang::$item['cat'][$cats[0]][1][$cats[1]];
         else
             $catList = Lang::$item['cat'][$cats[0]];
@@ -120,7 +111,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
                 break;
             case 2:
                 if (!isset($cats[1]))
-                    $type = [Lang::$item['cat'][2][1], null];
+                    $type = [Lang::$spell['weaponSubClass'], null];
 
                 $slot = [Lang::$item['inventoryType'], 0x262A000];
                 asort($slot[0]);
@@ -139,10 +130,12 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             case 16:
                 if (!isset($cats[2]))
                     $visibleCols[] = 'glyph';
+            case 1:
+                if ($cats[0] == 1)
+                    $visibleCols[] = 'slots';
             case 3:
                 if (!isset($cats[1]))
                     asort($catList[1]);
-            case 1:
             case 7:
             case 9:
                 $hiddenCols[] = 'slot';
@@ -162,13 +155,23 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         if ($str && (!$slot[1] || ($slot[1] & (1 << $k))))
             $filter['slot'][$k] = $str;
 
-    if (isset($filter['slot'][INVTYPE_SHIELD]))     // "Off Hand" => "Shield"
+    if (isset($filter['slot'][INVTYPE_SHIELD]))             // "Off Hand" => "Shield"
         $filter['slot'][INVTYPE_SHIELD] = Lang::$item['armorSubClass'][6];
 
 
     /*
         set conditions
     */
+
+    /*
+     * todo (low): this is a long term issue.
+     * Filter is used as a subSystem to each TypeList
+     * but here we would need to preemptive check for $filter['gb']
+     *  .. bummer ..  this is to be removed when the issue is _really_ solved
+    */
+    if (preg_match('/gb\=(1|2|3)/i', $_SERVER['QUERY_STRING'], $match))
+        $filter['gb'] = $match[1];
+
     $conditions[] = ['i.class', $cats[0]];
     if (isset($cats[1]))
         $conditions[] = ['i.subClass', $cats[1]];
@@ -207,11 +210,13 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 
     if (!empty($filter['upg']))
     {
-        // uogarde-item got deleted by filter
+        // upgrade-item got deleted by filter
         if (empty($pageData['data'][$filter['upg']]))
         {
             $w = $items->filterGetForm('setWeights', true);
             $upgItem = new ItemList(array(['id', $filter['upg']]), false, ['wt' => $w[0], 'wtv' => $w[1]]);
+
+            // still it may not be found if you apply really weired filters (e.g. search for a melee item with caster-weights) .. not my fault :[
             if (!$upgItem->error)
             {
                 $upgItem->addGlobalsToJScript($smarty);
@@ -224,7 +229,45 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 
         $pageData['params']['_upgradeIds']  = "$[".$filter['upg']."]";
     }
+/*
+    by level: max 10 itemlevel steps (Level X) +1x Other|Autre|Anderes|Otros|Другое levels
+    by slot: all slots available
+    by source: .. well .. no
 
+	template: 'item',
+	id: 'one-hand',
+	name: 'One-Hand',
+	tabs: tabsGroups,
+	parent: 'lkljbjkb574',
+	hideCount: 1,
+	note: $WH.sprintf(LANG.lvnote_viewmoreslot, '=2', 'sl=13;ub=10;cr=161;crs=1;crv=0;gm=3;rf=1;wt=23:123:24:103:96:170;wtv=100:85:75:60:50:40;upg=104585'),
+	customFilter: fi_filterUpgradeListview,
+	_upgradeIds: [104585],
+	extraCols: fi_getExtraCols(fi_extraCols, 3, 1, 0),
+	sort: ['-score', 'name'],
+	computeDataFunc: fi_scoreSockets,
+	onBeforeCreate: fi_initWeightedListview,
+	onAfterCreate: fi_addUpgradeIndicator,
+	hiddenCols: ['type', 'source'],
+	data: []
+
+    template: 'item',
+	id: 'two-hand',
+	name: 'Two-Hand',
+	tabs: tabsGroups,
+	parent: 'lkljbjkb574',
+	hideCount: 1,
+	note: $WH.sprintf(LANG.lvnote_viewmoreslot, '=2', 'sl=17;ub=10;cr=161;crs=1;crv=0;gm=3;rf=1;wt=23:123:24:103:96:170;wtv=100:85:75:60:50:40;upg=104585'),
+	customFilter: fi_filterUpgradeListview,
+	_upgradeIds: [104585],
+	extraCols: fi_getExtraCols(fi_extraCols, 3, 1, 0),
+	sort: ['-score', 'name'],
+	computeDataFunc: fi_scoreSockets,
+	onBeforeCreate: fi_initWeightedListview,
+	onAfterCreate: fi_addUpgradeIndicator,
+	hiddenCols: ['type', 'source'],
+	data: []
+*/
     if (!empty($filter['fi']['extraCols']))
     {
         $gem  = empty($filter['gm']) ? 0 : $filter['gm'];
@@ -278,7 +321,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     }
 
     // create note if search limit was exceeded; overwriting 'note' is intentional
-    if ($items->getMatches() > $AoWoWconf['sqlLimit'])
+    if ($items->getMatches() > $AoWoWconf['sqlLimit'] && empty($filter['upg']))
     {
         $pageData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), $AoWoWconf['sqlLimit']);
         $pageData['params']['_truncated'] = 1;

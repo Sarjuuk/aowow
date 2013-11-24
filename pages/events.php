@@ -26,16 +26,16 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         switch ($cat)
         {
             case 0:
-                $condition[] = ['e.holidayId', 0];
+                $condition[] = ['holidayId', 0];
                 break;
             case 1:
-                $condition[] = ['h.scheduleType', -1];
+                $condition[] = ['scheduleType', -1];
                 break;
             case 2:
-                $condition[] = ['h.scheduleType', [0, 1]];
+                $condition[] = ['scheduleType', [0, 1]];
                 break;
             case 3:
-                $condition[] = ['h.scheduleType', 2];
+                $condition[] = ['scheduleType', 2];
                 break;
         }
     }

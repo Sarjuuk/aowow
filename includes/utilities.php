@@ -41,12 +41,9 @@ class Lang
         foreach ($lang as $k => $v)
             self::$$k = $v;
 
-        // *cough* .. temp-hack
-        if (User::$localeId == LOCALE_EN)
-        {
-            self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
-            self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
-        }
+        // *cough* .. reuse-hack
+        self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
+        self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
     }
 
     // todo: expand
@@ -141,16 +138,25 @@ class Lang
 
     public static function getRequiredItems($class, $mask, $short = true)
     {
+        if (!in_array($class, [ITEM_CLASS_MISC, ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON]))
+            return '';
+
         // not checking weapon / armor here. It's highly unlikely that they overlap
         if ($short)
         {
-            if ($class == ITEM_CLASS_MISC)                  // misc - Mounts
+            // misc - Mounts
+            if ($class == ITEM_CLASS_MISC)
                 return '';
 
-            if ($class == ITEM_CLASS_ARMOR && $mask == 0x1E) // all basic armor classes
+            // all basic armor classes
+            if ($class == ITEM_CLASS_ARMOR && ($mask & 0x1E) == 0x1E)
                 return '';
 
-            foreach(Lang::$spell['subClassMasks'] as $m => $str)
+            // all weapon classes
+            if ($class == ITEM_CLASS_WEAPON && ($mask & 0x1DE5FF) == 0x1DE5FF)
+                return '';
+
+            foreach (Lang::$spell['subClassMasks'] as $m => $str)
                 if ($mask == $m)
                     return $str;
         }
@@ -380,8 +386,10 @@ class SmartyAoWoW extends Smarty
             $this->jsGlobals[$type] = [];
 
         if (is_array($data))
+        {
             foreach ($data as $id)
                 $this->jsGlobals[$type][] = (int)$id;
+        }
         else if (is_numeric($data))
             $this->jsGlobals[$type][] = (int)$data;
         else
@@ -441,6 +449,7 @@ class SmartyAoWoW extends Smarty
 
             if (!$ids)
                 continue;
+
             $this->initJSGlobal($type);
             $ids = array_unique($ids, SORT_NUMERIC);
 
@@ -711,205 +720,123 @@ class Util
         null,   1.0,    0.6,    1.0,    0.8,    1.0,    1.0,    1.2,    1.25,   1.44,   2.5,    1.728,  3.0,    0.0,    0.0,    1.2,    1.25
     );
 
+    public static $lootTemplates = array(
+        LOOT_REFERENCE,     // internal
+        LOOT_ITEM,          // item
+        LOOT_DISENCHANT,    // item
+        LOOT_PROSPECTING,   // item
+        LOOT_MILLING,       // item
+        LOOT_CREATURE,      // npc
+        LOOT_PICKPOCKET,    // npc
+        LOOT_SKINNING,      // npc (see its flags for mining, herbing or actual skinning)
+        LOOT_FISHING,       // zone
+        LOOT_GAMEOBJECT,    // object
+        LOOT_QUEST,         // quest (mail rewards)
+        LOOT_SPELL          // spell
+    );
+
     // todo: translate and move to Lang
-    public static $spellModOp               = array(
-        0  => 'DAMAGE',
-        1  => 'DURATION',
-        2  => 'THREAT',
-        3  => 'EFFECT1',
-        4  => 'CHARGES',
-        5  => 'RANGE',
-        6  => 'RADIUS',
-        7  => 'CRITICAL_CHANCE',
-        8  => 'ALL_EFFECTS',
-        9  => 'NOT_LOSE_CASTING_TIME',
-        10 => 'CASTING_TIME',
-        11 => 'COOLDOWN',
-        12 => 'EFFECT2',
-        13 => 'IGNORE_ARMOR',
-        14 => 'COST',
-        15 => 'CRIT_DAMAGE_BONUS',
-        16 => 'RESIST_MISS_CHANCE',
-        17 => 'JUMP_TARGETS',
-        18 => 'CHANCE_OF_SUCCESS',
-        19 => 'ACTIVATION_TIME',
-        20 => 'DAMAGE_MULTIPLIER',
-        21 => 'GLOBAL_COOLDOWN',
-        22 => 'DOT',
-        23 => 'EFFECT3',
-        24 => 'BONUS_MULTIPLIER',
-        25 => '25_UNUSED',
-        26 => 'PROC_PER_MINUTE',
-        27 => 'VALUE_MULTIPLIER',
-        28 => 'RESIST_DISPEL_CHANCE',
-        29 => 'CRIT_DAMAGE_BONUS_2',                //one not used spell
-        30 => 'SPELL_COST_REFUND_ON_FAIL'
-    );
-
-    public static $combatRating             = array(
-        0  => 'WEAPON_SKILL',
-        1  => 'DEFENSE_SKILL',
-        2  => 'DODGE',
-        3  => 'PARRY',
-        4  => 'BLOCK',
-        5  => 'HIT_MELEE',
-        6  => 'HIT_RANGED',
-        7  => 'HIT_SPELL',
-        8  => 'CRIT_MELEE',
-        9  => 'CRIT_RANGED',
-        10 => 'CRIT_SPELL',
-        11 => 'HIT_TAKEN_MELEE',
-        12 => 'HIT_TAKEN_RANGED',
-        13 => 'HIT_TAKEN_SPELL',
-        14 => 'CRIT_TAKEN_MELEE',
-        15 => 'CRIT_TAKEN_RANGED',
-        16 => 'CRIT_TAKEN_SPELL',
-        17 => 'HASTE_MELEE',
-        18 => 'HASTE_RANGED',
-        19 => 'HASTE_SPELL',
-        20 => 'WEAPON_SKILL_MAINHAND',
-        21 => 'WEAPON_SKILL_OFFHAND',
-        22 => 'WEAPON_SKILL_RANGED',
-        23 => 'EXPERTISE',
-        24 => 'ARMOR_PENETRATION'
-    );
-
-    public static $lockType                 = array(
-        1  => 'PICKLOCK',
-        2  => 'HERBALISM',
-        3  => 'MINING',
-        4  => 'DISARM_TRAP',
-        5  => 'OPEN',
-        6  => 'TREASURE',
-        7  => 'CALCIFIED_ELVEN_GEMS',
-        8  => 'CLOSE',
-        9  => 'ARM_TRAP',
-        10 => 'QUICK_OPEN',
-        11 => 'QUICK_CLOSE',
-        12 => 'OPEN_TINKERING',
-        13 => 'OPEN_KNEELING',
-        14 => 'OPEN_ATTACKING',
-        15 => 'GAHZRIDIAN',
-        16 => 'BLASTING',
-        17 => 'SLOW_OPEN',
-        18 => 'SLOW_CLOSE',
-        19 => 'FISHING',
-        20 => 'INSCRIPTION',
-        21 => 'OPEN_FROM_VEHICLE'
-    );
-
-    public static $stealthType              = array(
-        0 => 'GENERAL',
-        1 => 'TRAP'
-    );
-
-    public static $invisibilityType         = array(
-        0 => 'GENERAL',
-        3 => 'TRAP',
-        6 => 'DRUNK'
-    );
-
     public static $spellEffectStrings       = array(
-        0 => 'None',
-        1 => 'Instakill',
-        2 => 'School Damage',
-        3 => 'Dummy',
-        4 => 'Portal Teleport',
-        5 => 'Teleport Units',
-        6 => 'Apply Aura',
-        7 => 'Environmental Damage',
-        8 => 'Power Drain',
-        9 => 'Health Leech',
-        10 => 'Heal',
-        11 => 'Bind',
-        12 => 'Portal',
-        13 => 'Ritual Base',
-        14 => 'Ritual Specialize',
-        15 => 'Ritual Activate Portal',
-        16 => 'Quest Complete',
-        17 => 'Weapon Damage NoSchool',
-        18 => 'Resurrect',
-        19 => 'Add Extra Attacks',
-        20 => 'Dodge',
-        21 => 'Evade',
-        22 => 'Parry',
-        23 => 'Block',
-        24 => 'Create Item',
-        25 => 'Can Use Weapon',
-        26 => 'Defense',
-        27 => 'Persistent Area Aura',
-        28 => 'Summon',
-        29 => 'Leap',
-        30 => 'Energize',
-        31 => 'Weapon Damage Percent',
-        32 => 'Trigger Missile',
-        33 => 'Open Lock',
-        34 => 'Summon Change Item',
-        35 => 'Apply Area Aura Party',
-        36 => 'Learn Spell',
-        37 => 'Spell Defense',
-        38 => 'Dispel',
-        39 => 'Language',
-        40 => 'Dual Wield',
-        41 => 'Jump',
-        42 => 'Jump Dest',
-        43 => 'Teleport Units Face Caster',
-        44 => 'Skill Step',
-        45 => 'Add Honor',
-        46 => 'Spawn',
-        47 => 'Trade Skill',
-        48 => 'Stealth',
-        49 => 'Detect',
-        50 => 'Trans Door',
-        51 => 'Force Critical Hit',
-        52 => 'Guarantee Hit',
-        53 => 'Enchant Item Permanent',
-        54 => 'Enchant Item Temporary',
-        55 => 'Tame Creature',
-        56 => 'Summon Pet',
-        57 => 'Learn Pet Spell',
-        58 => 'Weapon Damage Flat',
-        59 => 'Create Random Item',
-        60 => 'Proficiency',
-        61 => 'Send Event',
-        62 => 'Power Burn',
-        63 => 'Threat',
-        64 => 'Trigger Spell',
-        65 => 'Apply Area Aura Raid',
-        66 => 'Create Mana Gem',
-        67 => 'Heal Max Health',
-        68 => 'Interrupt Cast',
-        69 => 'Distract',
-        70 => 'Pull',
-        71 => 'Pickpocket',
-        72 => 'Add Farsight',
-        73 => 'Untrain Talents',
-        74 => 'Apply Glyph',
-        75 => 'Heal Mechanical',
-        76 => 'Summon Object Wild',
-        77 => 'Script Effect',
-        78 => 'Attack',
-        79 => 'Sanctuary',
-        80 => 'Add Combo Points',
-        81 => 'Create House',
-        82 => 'Bind Sight',
-        83 => 'Duel',
-        84 => 'Stuck',
-        85 => 'Summon Player',
-        86 => 'Activate Object',
-        87 => 'WMO Damage',
-        88 => 'WMO Repair',
-        89 => 'WMO Change',
-        90 => 'Kill Credit',
-        91 => 'Threat All',
-        92 => 'Enchant Held Item',
-        93 => 'Force Deselect',
-        94 => 'Self Resurrect',
-        95 => 'Skinning',
-        96 => 'Charge',
-        97 => 'Cast Button',
-        98 => 'Knock Back',
-        99 => 'Disenchant',
+          0 => 'None',
+          1 => 'Instakill',
+          2 => 'School Damage',
+          3 => 'Dummy',
+          4 => 'Portal Teleport',
+          5 => 'Teleport Units',
+          6 => 'Apply Aura',
+          7 => 'Environmental Damage',
+          8 => 'Power Drain',
+          9 => 'Health Leech',
+         10 => 'Heal',
+         11 => 'Bind',
+         12 => 'Portal',
+         13 => 'Ritual Base',
+         14 => 'Ritual Specialize',
+         15 => 'Ritual Activate Portal',
+         16 => 'Quest Complete',
+         17 => 'Weapon Damage NoSchool',
+         18 => 'Resurrect',
+         19 => 'Add Extra Attacks',
+         20 => 'Dodge',
+         21 => 'Evade',
+         22 => 'Parry',
+         23 => 'Block',
+         24 => 'Create Item',
+         25 => 'Can Use Weapon',
+         26 => 'Defense',
+         27 => 'Persistent Area Aura',
+         28 => 'Summon',
+         29 => 'Leap',
+         30 => 'Energize',
+         31 => 'Weapon Damage Percent',
+         32 => 'Trigger Missile',
+         33 => 'Open Lock',
+         34 => 'Summon Change Item',
+         35 => 'Apply Area Aura Party',
+         36 => 'Learn Spell',
+         37 => 'Spell Defense',
+         38 => 'Dispel',
+         39 => 'Language',
+         40 => 'Dual Wield',
+         41 => 'Jump',
+         42 => 'Jump Dest',
+         43 => 'Teleport Units Face Caster',
+         44 => 'Skill Step',
+         45 => 'Add Honor',
+         46 => 'Spawn',
+         47 => 'Trade Skill',
+         48 => 'Stealth',
+         49 => 'Detect',
+         50 => 'Trans Door',
+         51 => 'Force Critical Hit',
+         52 => 'Guarantee Hit',
+         53 => 'Enchant Item Permanent',
+         54 => 'Enchant Item Temporary',
+         55 => 'Tame Creature',
+         56 => 'Summon Pet',
+         57 => 'Learn Pet Spell',
+         58 => 'Weapon Damage Flat',
+         59 => 'Create Random Item',
+         60 => 'Proficiency',
+         61 => 'Send Event',
+         62 => 'Power Burn',
+         63 => 'Threat',
+         64 => 'Trigger Spell',
+         65 => 'Apply Area Aura Raid',
+         66 => 'Create Mana Gem',
+         67 => 'Heal Max Health',
+         68 => 'Interrupt Cast',
+         69 => 'Distract',
+         70 => 'Pull',
+         71 => 'Pickpocket',
+         72 => 'Add Farsight',
+         73 => 'Untrain Talents',
+         74 => 'Apply Glyph',
+         75 => 'Heal Mechanical',
+         76 => 'Summon Object Wild',
+         77 => 'Script Effect',
+         78 => 'Attack',
+         79 => 'Sanctuary',
+         80 => 'Add Combo Points',
+         81 => 'Create House',
+         82 => 'Bind Sight',
+         83 => 'Duel',
+         84 => 'Stuck',
+         85 => 'Summon Player',
+         86 => 'Activate Object',
+         87 => 'WMO Damage',
+         88 => 'WMO Repair',
+         89 => 'WMO Change',
+         90 => 'Kill Credit',
+         91 => 'Threat All',
+         92 => 'Enchant Held Item',
+         93 => 'Force Deselect',
+         94 => 'Self Resurrect',
+         95 => 'Skinning',
+         96 => 'Charge',
+         97 => 'Cast Button',
+         98 => 'Knock Back',
+         99 => 'Disenchant',
         100 => 'Inebriate',
         101 => 'Feed Pet',
         102 => 'Dismiss Pet',
@@ -1076,7 +1003,7 @@ class Util
         95 => 'Ghost',
         96 => 'Spell Magnet',
         97 => 'Mana Shield',
-        98 => 'Mod Skill Talent',
+        98 => 'Mod Skill Value',
         99 => 'Mod Attack Power',
         100 => 'Auras Visible',
         101 => 'Mod Resistance Percent',
@@ -1609,27 +1536,29 @@ class Util
     // for item and spells
     public static function setRatingLevel($level, $type, $val)
     {
-        if (in_array($type, array(ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING)) && $level < 34)
+        if (in_array($type, [ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING]) && $level < 34)
             $level = 34;
 
         if (!isset(Util::$gtCombatRatings[$type]))
             $result = 0;
-
-        else if ($level > 70)
-            $c = 82 / 52 * pow(131 / 63, ($level - 70) / 10);
-        else if ($level > 60)
-            $c = 82 / (262 - 3 * $level);
-        else if ($level > 10)
-            $c = ($level - 8) / 52;
         else
-            $c = 2 / 52;
+        {
+            if ($level > 70)
+                $c = 82 / 52 * pow(131 / 63, ($level - 70) / 10);
+            else if ($level > 60)
+                $c = 82 / (262 - 3 * $level);
+            else if ($level > 10)
+                $c = ($level - 8) / 52;
+            else
+                $c = 2 / 52;
 
-        $result = number_format($val / Util::$gtCombatRatings[$type] / $c, 2);
+            $result = number_format($val / Util::$gtCombatRatings[$type] / $c, 2);
+        }
 
         if (!in_array($type, array(ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_EXPERTISE_RATING)))
             $result .= '%';
 
-        return sprintf(Lang::$item['ratingString'], '<!--rtg%'.$type.'-->' . $result, '<!--lvl-->' . $level);
+        return sprintf(Lang::$item['ratingString'], '<!--rtg%'.$type.'-->'.$result, '<!--lvl-->'.$level);
     }
 
     public static function powerUseLocale($domain = 'www')
@@ -1770,7 +1699,7 @@ class Util
         $first = mb_substr($str, 0, 1, 'UTF-8');
         $rest  = mb_substr($str, 1, $len, 'UTF-8');
 
-        return mb_strtoupper($first, 'UTF-8') . $rest;
+        return mb_strtoupper($first, 'UTF-8').$rest;
     }
 
     public static function ucWords($str)
@@ -1845,11 +1774,6 @@ class Util
         quest_mail_loot_template        entry                               quest_template          RewMailTemplateId
         reference_loot_template         entry           many <- many        _loot_template          -mincountOrRef  In case of negative mincountOrRef
     */
-    private static function getLootByItem($tableName, $itemId)
-    {
-        return;
-    }
-
     private static function getLootByEntry($tableName, $lootId, $groupId = 0, $baseChance = 1.0)
     {
         $loot     = [];
@@ -1858,7 +1782,7 @@ class Util
         if (!$tableName || !$lootId)
             return null;
 
-        $rows = DB::Aowow()->select('SELECT * FROM ?# WHERE entry = ?d {AND groupid = ?d}', $tableName, abs($lootId), $groupId ? $groupId : DBSIMPLE_SKIP);
+        $rows = DB::Aowow()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, abs($lootId), $groupId ? $groupId : DBSIMPLE_SKIP);
         if (!$rows)
             return null;
 
@@ -1928,8 +1852,13 @@ class Util
                 @$groupChances[$entry['groupid']] += $entry['ChanceOrQuestChance'];
                 $set['groupChance'] = abs($entry['ChanceOrQuestChance']);
             }
-            else
-                continue;                                   // shouldn't happen
+            else                                            // shouldn't happened
+            {
+                if (User::isInGroup(U_GROUP_DEV))
+                    die(var_dump($entry));
+                else
+                    continue;
+            }
 
             $loot[] = $set;
         }
@@ -1939,7 +1868,7 @@ class Util
             $sum = $groupChances[$k];
             if (!$sum)
                 $sum = 0;
-            elseif ($sum > 100)                             // group has > 100% dropchance .. hmm, display some kind of error..?
+            else if ($sum > 100)                            // group has > 100% dropchance .. hmm, display some kind of error..?
                 $sum = 100;
 
             $cnt = empty($nGroupEquals[$k]) ? 1 : $nGroupEquals[$k];
@@ -1968,11 +1897,7 @@ class Util
                 // iterate over the 4 available difficulties and assign modes
         */
 
-        if ($entry > 0)
-            $struct = self::getLootByEntry($table, $entry);
-        else if ($entry < 0)
-            $struct = self::getLootByItem($table, -$entry);
-
+        $struct = self::getLootByEntry($table, $entry);
         if (!$struct)
             return $lv;
 
@@ -1995,13 +1920,13 @@ class Util
             if ($_ = $loot['reference'])
                 $base['reference'] = $_;
 
-            $buff = [];                                     // equal distribution between min/max .. not blizzlike, but hey, TC-issue
+            $stack = [];                                    // equal distribution between min/max .. not blizzlike, but hey, TC-issue
             if (isset($loot['max']) && isset($loot['min']) && ($loot['max'] > $loot['min']))
                 for ($i = $loot['min']; $i <= $loot['max']; $i++)
-                    $buff[] = $i.':'.(round(100 / (1 + $loot['max'] - $loot['min']), 3));
+                    $stack[$i] = round(100 / (1 + $loot['max'] - $loot['min']), 3);
 
-            if ($buff)                                      // yes, it wants a string .. how weired is that..
-                $base['pctstack'] = '{'.implode(',',$buff).'}';
+            if ($stack)                                     // yes, it wants a string .. how weired is that..
+                $base['pctstack'] = json_encode($stack, JSON_NUMERIC_CHECK);
 
             if ($loot['content'] > 0)                       // regular drop
             {
@@ -2049,8 +1974,141 @@ class Util
             }
         }
 
-
         return $lv;
+    }
+
+    public static function getLootSource($itemId)
+    {
+        if (!$itemId)
+            return [];
+
+        $final      = [];
+        $refResults = [];
+        $chanceMods = [];
+        $query      =   'SELECT
+                           -lt1.entry AS ARRAY_KEY,
+                            IF (lt1.mincountOrRef > 0, lt1.item, lt1.mincountOrRef) AS item,
+                            lt1.ChanceOrQuestChance AS chance,
+                            SUM(IF(lt2.ChanceOrQuestChance = 0, 1, 0)) AS nZeroItems,
+                            SUM(IF(lt2.ChanceOrQuestChance > 0, lt2.ChanceOrQuestChance, 0)) AS sumChance,
+                            IF(lt1.groupid > 0, 1, 0) AS isGrouped,
+                            IF (lt1.mincountOrRef > 0, lt1.mincountOrRef, 1) AS min,
+                            IF (lt1.mincountOrRef > 0, lt1.maxcount, 1) AS max,
+                            IF (lt1.mincountOrRef < 0, lt1.maxcount, 1) AS multiplier
+                        FROM
+                            ?# lt1
+                        LEFT JOIN
+                            ?# lt2 ON lt1.entry = lt2.entry AND lt1.groupid = lt2.groupid
+                        WHERE
+                            %s
+                        GROUP BY lt2.entry';
+
+        $calcChance = function ($refs, $parents = []) use (&$chanceMods)
+        {
+            $return = [];
+
+            foreach ($refs as $rId => $ref)
+            {
+                // errör: item/ref is in group 0 without a chance set
+                if (!$ref['chance'] && !$ref['isGrouped'])
+                    continue;                               // todo (low): create dubug output
+
+                // errör: item/ref is in group with >100% chance across all items contained
+                if ($ref['isGrouped'] && $ref['sumChance'] > 100)
+                    continue;                               // todo (low): create dubug output
+
+                $chance = ($ref['chance'] ? $ref['chance'] : (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
+
+                // apply inherited chanceMods
+                if (isset($chanceMods[$ref['item']]))
+                {
+                    $chance *= $chanceMods[$ref['item']][0];
+                    $chance  = 1 - pow(1 - $chance, $chanceMods[$ref['item']][1]);
+                }
+
+                // save chance for parent-ref
+                $chanceMods[$rId] = [$chance, $ref['multiplier']];
+
+                // refTemplate doesn't point to a new ref -> we are done
+                if (!in_array($rId, $parents))
+                {
+                    $data = array(
+                        'percent' => $chance,
+                        'stack'   => [$ref['multiplier'], $ref['multiplier']],
+                        'count'   => 1                          // ..and one for the sort script
+                    );
+
+                    $stack = [];                                // equal distribution between min/max .. not blizzlike, but hey, TC-issue
+                    if ($ref['max'] > $ref['min'])
+                        for ($i = $ref['min']; $i <= $ref['max']; $i++)
+                            $stack[$i] = round(100 / (1 + $ref['max'] - $ref['min']), 3);
+
+                    if ($stack)                                 // yes, it wants a string .. how weired is that..
+                        $data['pctstack'] = json_encode($stack, JSON_NUMERIC_CHECK);
+
+                    $return[$rId] = $data;
+                }
+            }
+
+            return $return;
+        };
+
+        $newRefs = DB::Aowow()->select(
+            sprintf($query, 'lt1.item = ?d AND lt1.mincountOrRef > 0'),
+            LOOT_REFERENCE, LOOT_REFERENCE,
+            $itemId
+        );
+
+        while ($newRefs)
+        {
+            $curRefs = $newRefs;
+            $newRefs = DB::Aowow()->select(
+                sprintf($query, 'lt1.mincountOrRef IN (?a)'),
+                LOOT_REFERENCE, LOOT_REFERENCE,
+                array_keys($curRefs)
+            );
+
+            $refResults += $calcChance($curRefs, array_column($newRefs, 'item'));
+        }
+
+        for ($i = 1; $i < count(self::$lootTemplates); $i++)
+        {
+            $res = DB::Aowow()->select(
+                sprintf($query, '{lt1.mincountOrRef IN (?a) OR }(lt1.mincountOrRef > 0 AND lt1.item = ?d)'),
+                self::$lootTemplates[$i], self::$lootTemplates[$i],
+                $refResults ? array_keys($refResults) : DBSIMPLE_SKIP,
+                $itemId
+            );
+
+            if ($_ = $calcChance($res))
+            {
+                // format for use in item.php
+                $sort = [];
+                foreach ($_ as $k => $v)
+                {
+                    unset($_[$k]);
+                    $v['percent'] = round($v['percent'] * 100, 3);
+                    $v['key'] = abs($k);                    // array_multisort issue: it does not preserve numeric keys, restore after sort
+                    $sort[$k] = $v['percent'];
+                    $_[abs($k)] = $v;
+                }
+
+                array_multisort($sort, SORT_DESC, $_);
+
+                foreach ($_ as $k => $v)
+                {
+                    $key = $v['key'];
+                    unset($_[$k]);
+                    unset($v['key']);
+
+                    $_[$key] = $v;
+                }
+
+                $final[self::$lootTemplates[$i]] = $_;
+            }
+        }
+
+        return $final;
     }
 }
 

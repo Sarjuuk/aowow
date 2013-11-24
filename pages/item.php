@@ -86,10 +86,10 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 
     $quickInfo = Lang::getInfoBoxForFlags($item->getField('cuFlags'));
 
-    if ($_slot)                                             // itemlevel
+    if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]) || $item->getField('gemEnchantmentId')) // itemlevel
         $quickInfo[] = Lang::$game['level'].Lang::$colon.$item->getField('itemLevel');
 
-    if ($_flags & ITEM_FLAG_ACCOUNTBOUND )                  // account-wide
+    if ($_flags & ITEM_FLAG_ACCOUNTBOUND)                   // account-wide
         $quickInfo[] = Lang::$item['accountWide'];
 
     if ($si = $item->json[$_id]['side'])                    // side
@@ -110,7 +110,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
             if ($item->getField('spellCharges'.$i) >= 0)
                 continue;
 
-            $tt = '[tooltip=tooltip_consumedonuse]'.Lang::$item['consumable'].'[/tooltip]';          // 2:Consommable    3:Verbrauchbar   6:Consumible   8:Расходуется
+            $tt = '[tooltip=tooltip_consumedonuse]'.Lang::$item['consumable'].'[/tooltip]';
             break;
         }
 
@@ -118,14 +118,15 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
             $quickInfo[] = isset($tt) ? $tt : '[tooltip=tooltip_notconsumedonuse]'.Lang::$item['nonConsumable'].'[/tooltip]';
     }
 
-    if ($hId = $item->getField('holidayId'))                                                        // 3:Werkzeug   6:Herramienta   8:Инструмент   2:Outil
+    if ($hId = $item->getField('holidayId'))
         if ($hName = DB::Aowow()->selectRow('SELECT * FROM ?_holidays WHERE id = ?d', $hId))
             $quickInfo[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$hId.']'.Util::localizedString($hName, 'name').'[/url]';
 
-    if ($tId = $item->getField('totemCategory'))                                                    // 3:Werkzeug   6:Herramienta   8:Инструмент   2:Outil
+    if ($tId = $item->getField('totemCategory'))
         if ($tName = DB::Aowow()->selectRow('SELECT * FROM ?_totemCategory WHERE id = ?d', $tId))
             $quickInfo[] = Lang::$item['tool'].Lang::$colon.'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
 
+    $each = $item->getField('stackable') > 1 ? '[color=q0] ('.Lang::$item['each'].')[/color]' : null;
     $cost = '';
     if ($_ = $item->getField('buyPrice'))
         $cost .= '[money='.$_.']';
@@ -135,20 +136,20 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
             $cost .= '[currency='.$c.' amount='.$qty.']';
 
     if ($cost)
-        $quickInfo[] = Lang::$item['cost'].Lang::$colon.$cost.'[color=q0] ('.Lang::$item['each'].')[/color]'; // 2:Coût   3:Preis   6:Coste    8:Цена
+        $quickInfo[] = Lang::$item['cost'].Lang::$colon.$cost.$each;
 
-    if ($_ = $item->getField('repairPrice'))                                                        // 3:Reparaturkosten    8:Цена починки  2:Cout de réparation    6:Coste de reparación
+    if ($_ = $item->getField('repairPrice'))
         $quickInfo[] = Lang::$item['repairCost'].Lang::$colon.'[money='.$_.']';
 
     if (in_array($item->getField('bonding'), [0, 2, 3]))    // avg auction buyout
         if ($_ = Util::getBuyoutForItem($_id))
-            $quickInfo[] = '[tooltip=tooltip_buyoutprice]'.Lang::$item['buyout.'].'[/tooltip]'.Lang::$colon.'[money='.$_.'][color=q0] ('.Lang::$item['each'].')[/color]';
+            $quickInfo[] = '[tooltip=tooltip_buyoutprice]'.Lang::$item['buyout.'].'[/tooltip]'.Lang::$colon.'[money='.$_.']'.$each;
 
-    if ($_flags & ITEM_FLAG_OPENABLE)                       // avg money contained                  // 2:Vaut   8:Деньги    6:Valor     3:Wert
+    if ($_flags & ITEM_FLAG_OPENABLE)                       // avg money contained
         if ($_ = intVal(($item->getField('minMoneyLoot') + $item->getField('maxMoneyLoot')) / 2))
             $quickInfo[] = Lang::$item['worth'].Lang::$colon.'[tooltip=tooltip_avgmoneycontained][money='.$_.'][/tooltip]';
 
-    if ($_slot)                                             // if it goes into a slot it may be disenchanted
+    if ($_slot && $_class != ITEM_CLASS_CONTAINER)          // if it goes into a slot it may be disenchanted
     {
         if ($item->getField('disenchantId'))
         {
@@ -156,47 +157,47 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
             if ($_ < 1)                                     // these are some items, that never went live .. extremely rough emulation here
                 $_ = intVal($item->getField('itemLevel') / 7.5) * 25;
 
-            $quickInfo[] = Lang::$item['disenchantable'].'&nbsp;([tooltip=tooltip_reqenchanting]'.$_.'[/tooltip])';        // 35002
+            $quickInfo[] = Lang::$item['disenchantable'].'&nbsp;([tooltip=tooltip_reqenchanting]'.$_.'[/tooltip])';
         }
         else
-            $quickInfo[] = Lang::$item['cantDisenchant'];   // 27978
+            $quickInfo[] = Lang::$item['cantDisenchant'];
     }
 
     if (($_flags & ITEM_FLAG_MILLABLE) && $item->getField('requiredSkill') == 773)
-        $quickInfo[] = Lang::$item['millable'].'&nbsp;([tooltip=tooltip_reqinscription]'.$item->getField('requiredSkillRank').'[/tooltip])';    // 8:Можно растолочь    2:Pilable   6:Se puede moler    3:Mahlbar
+        $quickInfo[] = Lang::$item['millable'].'&nbsp;([tooltip=tooltip_reqinscription]'.$item->getField('requiredSkillRank').'[/tooltip])';
 
     if (($_flags & ITEM_FLAG_PROSPECTABLE) && $item->getField('requiredSkill') == 755)
-        $quickInfo[] = Lang::$item['prospectable'].'&nbsp;([tooltip=tooltip_reqjewelcrafting]'.$item->getField('requiredSkillRank').'[/tooltip])';  // 3:Sondierbar 8:Просеиваемое  2:Prospectable  6:Prospectable
+        $quickInfo[] = Lang::$item['prospectable'].'&nbsp;([tooltip=tooltip_reqjewelcrafting]'.$item->getField('requiredSkillRank').'[/tooltip])';
 
     if ($_flags & ITEM_FLAG_DEPRECATED)
-        $quickInfo[] = '[tooltip=tooltip_deprecated]'.Lang::$item['deprecated'].'[/tooltip]';       // 3:Nicht benutzt   6:Depreciado      8:Устарело     2:Désuet
+        $quickInfo[] = '[tooltip=tooltip_deprecated]'.Lang::$item['deprecated'].'[/tooltip]';
 
     if ($_flags & ITEM_FLAG_NO_EQUIPCD)
-        $quickInfo[] = '[tooltip=tooltip_noequipcooldown]'.Lang::$item['noEquipCD'].'[/tooltip]';   // 3:Keine Anlegabklingzeit    6:No tiene tiempo de reutilización al equipar      8:Нет отката при надевании     2:Aucun temps de recharge lorsqu'équipé
+        $quickInfo[] = '[tooltip=tooltip_noequipcooldown]'.Lang::$item['noEquipCD'].'[/tooltip]';
 
     if ($_flags & ITEM_FLAG_PARTYLOOT)
-        $quickInfo[] = '[tooltip=tooltip_partyloot]'.Lang::$item['partyLoot'].'[/tooltip]';         // 3:Gruppenloot    6:Despojo de grupo      8:Добыча группы     2:Butin de groupe
+        $quickInfo[] = '[tooltip=tooltip_partyloot]'.Lang::$item['partyLoot'].'[/tooltip]';
 
     if ($_flags & ITEM_FLAG_REFUNDABLE)
-        $quickInfo[] = '[tooltip=tooltip_refundable]'.Lang::$item['refundable'].'[/tooltip]';       // 3:Rückzahlbar    6:Se puede devolver      8:Подлежит возврату     2:Remboursable
+        $quickInfo[] = '[tooltip=tooltip_refundable]'.Lang::$item['refundable'].'[/tooltip]';
 
     if ($_flags & ITEM_FLAG_SMARTLOOT)
-        $quickInfo[] = '[tooltip=tooltip_smartloot]'.Lang::$item['smartLoot'].'[/tooltip]';         // 3:Intelligente Beuteverteilung    6:Botín inteligente      8:Умное распределение добычи     2:Butin intelligent
+        $quickInfo[] = '[tooltip=tooltip_smartloot]'.Lang::$item['smartLoot'].'[/tooltip]';
 
     if ($_flags & ITEM_FLAG_INDESTRUCTIBLE)
-        $quickInfo[] = Lang::$item['indestructible'];                                               // 3:Kann nicht zerstört werden   6:No puede ser destruido      8:Невозможно выбросить     2:Ne peut être détruit
+        $quickInfo[] = Lang::$item['indestructible'];
 
     if ($_flags & ITEM_FLAG_USABLE_ARENA)
-        $quickInfo[] = Lang::$item['useInArena'];                                                   // 3: Benutzbar in Arenen   2:Utilisable en Aréna    6:Se puede usar en arenas      8:Используется на аренах
+        $quickInfo[] = Lang::$item['useInArena'];
 
     if ($_flags & ITEM_FLAG_USABLE_SHAPED)
-        $quickInfo[] = Lang::$item['useInShape'];                                                   // 2:Utilisable lorsque transformé  3:Benutzbar in Gestaltwandlung   6:Se puede usar con cambio de forma    8:Используется в формах
+        $quickInfo[] = Lang::$item['useInShape'];
 
     if ($item->getField('flagsExtra') & 0x0100)             // cant roll need
-        $quickInfo[] = '[tooltip=tooltip_cannotrollneed]'.Lang::$item['noNeedRoll'].'[/tooltip]';   // 3:Kann nicht für Bedarf werfen   6:No se puede hacer una tirada por Necesidad    2:Ne peut pas faire un jet de Besoin    8:Нельзя говорить "Мне это нужно"
+        $quickInfo[] = '[tooltip=tooltip_cannotrollneed]'.Lang::$item['noNeedRoll'].'[/tooltip]';
 
     if ($item->getField('bagFamily') & 0x0100)              // fits into keyring
-        $quickInfo[] = Lang::$item['atKeyring'];                                                    // 2:(Va dans le trousseau de clés) 8:(Может быть помещён в связку для ключей) 6:(Se puede poner en el llavero) 3:(Passt in den Schlüsselbund)
+        $quickInfo[] = Lang::$item['atKeyring'];
 
 
     /****************/
@@ -210,13 +211,13 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         'path'     => [0, 0],
         'title'    => [$item->getField('name', true), Util::ucFirst(Lang::$game['item'])],
         'pageText' => [],
-        'buttons'  => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]),
+        'buttons'  => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) || $item->getField('gemEnchantmentId'),
         'page'     => array(
             'color'     => Util::$rarityColorStings[$item->getField('quality')],
             'quality'   => $item->getField('quality'),
             'icon'      => $item->getField('iconString'),
             'name'      => $item->getField('name', true),
-            'displayId' => $item->getField('displayId'),
+            'displayId' => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $item->getField('displayId') ? $item->getField('displayId') : null,
             'slot'      => $_slot,
             'stack'     => $item->getField('stackable'),
             'class'     => $_class
@@ -266,6 +267,22 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     {
         uaSort($item->subItems[$_id], function($a, $b) { return strcmp($a['name'], $b['name']); });
         $pageData['page']['subItems'] = array_values($item->subItems[$_id]);
+
+        // merge identical stats and names for normal users (e.g. spellPower of a specific school became generel spellPower with 3.0)
+        if (!User::isInGroup(U_GROUP_STAFF))
+        {
+            for ($i = 1; $i < count($pageData['page']['subItems']); $i++)
+            {
+                $prev = &$pageData['page']['subItems'][$i-1];
+                $cur  = &$pageData['page']['subItems'][$i];
+                if ($prev['jsonequip'] == $cur['jsonequip'] && $prev['name'] == $cur['name'])
+                {
+                    $prev['chance'] += $cur['chance'];
+                    array_splice($pageData['page']['subItems'], $i , 1);
+                    $i = 1;
+                }
+            }
+        }
     }
 
     // factionchange-equivalent
@@ -291,69 +308,221 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     /* Extra Tabs */
     /**************/
 
-    // dropped by creature
+    $sourceTabs = array(
+    //   0 => refLoot
+         1 => ['item',     '$LANG.tab_containedin',      'contained-in-item', [], []],
+         2 => ['item',     '$LANG.tab_disenchantedfrom', 'disenchanted-from', [], []],
+         3 => ['item',     '$LANG.tab_prospectedfrom',   'prospected-from',   [], []],
+         4 => ['item',     '$LANG.tab_milledfrom',       'milled-from',       [], []],
+         5 => ['creature', '$LANG.tab_droppedby',        'dropped-by',        [], []],
+         6 => ['creature', '$LANG.tab_pickpocketedfrom', 'pickpocketed-from', [], []],
+         7 => ['creature', '$LANG.tab_skinnedfrom',      'skinned-from',      [], []],
+         8 => ['creature', '$LANG.tab_minedfromnpc',     'mined-from-npc',    [], []],
+         9 => ['creature', '$LANG.tab_salvagedfrom',     'salvaged-from',     [], []],
+        10 => ['creature', '$LANG.tab_gatheredfromnpc',  'gathered-from-npc', [], []],
+        11 => ['quest',    '$LANG.tab_rewardfrom',       'reward-from-quest', [], []],
+        12 => ['zone',     '$LANG.tab_fishedin',         'fished-in',         [], []],
+        13 => ['object',   '$LANG.tab_containedin',      'contained-in-go',   [], []],
+        14 => ['object',   '$LANG.tab_minedfrom',        'mined-from-go',     [], []],
+        15 => ['object',   '$LANG.tab_gatheredfrom',     'gathered-from-go',  [], []],
+        16 => ['spell',    '$LANG.tab_createdby',        'created-by',        [], []]
+    );
 
-    // GO-loot
-    // diff between gathered from / mined from / contained in
-    // foreach($rows as $row)
-    // {
-        // // Залежи руды
-        // if($row['lockproperties1'] == LOCK_PROPERTIES_MINING)
-            // $item['minedfromobject'][] = array_merge(objectinfo2($row), $drop);
-        // // Собирается с трав
-        // elseif($row['lockproperties1'] == LOCK_PROPERTIES_HERBALISM)
-            // $item['gatheredfromobject'][] = array_merge(objectinfo2($row), $drop);
-        // // Сундуки
-        // else
-            // $item['containedinobject'][] = array_merge(objectinfo2($row), $drop);
-    // }
+    $data    = [];
+    $xCols   = '';
+    $sources = Util::getLootSource($_id);
+    foreach ($sources as $lootTpl => $lootData)
+    {
+        // cap fetched entries to the sql-limit to guarantee, that the highest chance items get selected first
+        $ids = array_slice(array_keys($lootData), 0, $AoWoWconf['sqlLimit']);
+
+        switch ($lootTpl)
+        {
+            case LOOT_CREATURE:
+                $srcType = new CreatureList(array(['ct.lootId', $ids]));
+                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $srcData = $srcType->getListviewData();
+
+                foreach ($srcType->iterate() as $_)
+                    $data[5][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('lootId')]);
+
+                $sourceTabs[5][3][] = 'Listview.extraCols.percent';
+                break;
+            case LOOT_PICKPOCKET:
+                $srcType = new CreatureList(array(['ct.pickpocketLootId', $ids]));
+                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $srcData = $srcType->getListviewData();
+
+                foreach ($srcType->iterate() as $_)
+                    $data[6][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('pickpocketLootId')]);
+
+                $sourceTabs[6][3][] = 'Listview.extraCols.percent';
+                break;
+            case LOOT_SKINNING:
+                $srcType = new CreatureList(array(['ct.skinLootId', $ids]));
+                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $srcData = $srcType->getListviewData();
+
+                foreach ($srcType->iterate() as $curTpl)
+                {
+                    if ($curTpl['type_flags'] & NPC_TYPEFLAG_HERBLOOT)
+                    {
+                        $data[10][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
+                        $sourceTabs[10][3][] = 'Listview.extraCols.percent';
+                    }
+                    else if ($curTpl['type_flags'] & NPC_TYPEFLAG_ENGINEERLOOT)
+                    {
+                        $data[9][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
+                        $sourceTabs[9][3][] = 'Listview.extraCols.percent';
+                    }
+                    else if ($curTpl['type_flags'] & NPC_TYPEFLAG_MININGLOOT)
+                    {
+                        $data[8][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
+                        $sourceTabs[8][3][] = 'Listview.extraCols.percent';
+                    }
+                    else
+                    {
+                        $data[7][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
+                        $sourceTabs[7][3][] = 'Listview.extraCols.percent';
+                    }
+                }
+
+                break;
+            case LOOT_FISHING:
+                // subAreas are currently ignored
+                $srcType = new ZoneList(array(['id', $ids]));
+                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $srcData = $srcType->getListviewData();
+
+                foreach ($srcType->iterate() as $_)
+                    $data[12][] = array_merge($srcData[$srcType->id], $lootData[$srcType->id]);
+
+                $sourceTabs[12][3][] = 'Listview.extraCols.percent';
+                break;
+            case LOOT_GAMEOBJECT:
+                // GO-loot
+                // contained in GO (chest)
+                // mined-from (vine)
+                // gathered-from (herb)
+                // like skinning with lock-properties instead of type_flags
+                // foreach($rows as $row)
+                // {
+                    // // Залежи руды
+                    // if($row['lockproperties1'] == LOCK_PROPERTIES_MINING)
+                        // $item['minedfromobject'][] = array_merge(objectinfo2($row), $drop);
+                    // // Собирается с трав
+                    // elseif($row['lockproperties1'] == LOCK_PROPERTIES_HERBALISM)
+                        // $item['gatheredfromobject'][] = array_merge(objectinfo2($row), $drop);
+                    // // Сундуки
+                    // else
+                        // $item['containedinobject'][] = array_merge(objectinfo2($row), $drop);
+                // }
+                break;
+            case LOOT_PROSPECTING:
+                $sourceTab = 3;
+            case LOOT_MILLING:
+                if (!isset($sourceTab))
+                    $sourceTab = 4;
+            case LOOT_ITEM:
+                if (!isset($sourceTab))
+                    $sourceTab = 1;
+
+                $srcType = new ItemList(array(['i.id', $ids]));
+                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $srcData = $srcType->getListviewData();
+
+                foreach ($srcType->iterate() as $_)
+                    $data[$sourceTab][] = array_merge($srcData[$srcType->id], $lootData[$srcType->id]);
+
+                $sourceTabs[$sourceTab][3][] = 'Listview.extraCols.percent';
+                break;
+            case LOOT_DISENCHANT:
+                $srcType = new ItemList(array(['i.disenchantId', $ids]));
+                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $srcData = $srcType->getListviewData();
+
+                foreach ($srcType->iterate() as $_)
+                    $data[2][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('disenchantId')]);
+
+                $sourceTabs[2][3][] = 'Listview.extraCols.percent';
+                break;
+            case LOOT_QUEST:
+                // merge regular quest rewards into quest_mail_loot_template results
+                $conditions = array(
+                    'OR', ['qt.RewardMailTemplateId', $ids],
+                    ['RewardChoiceItemId1', $_id], ['RewardChoiceItemId2', $_id], ['RewardChoiceItemId3', $_id], ['RewardChoiceItemId4', $_id], ['RewardChoiceItemId5', $_id],
+                    ['RewardChoiceItemId6', $_id], ['RewardItemId1', $_id],       ['RewardItemId2', $_id],       ['RewardItemId3', $_id],       ['RewardItemId4', $_id],
+                );
+                $srcType = new QuestList($conditions);
+                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+                $data[11] = $srcType->getListviewData();    // dont merge chances; most are 100% anyway and regular reward loot has none
+
+                break;
+            case LOOT_SPELL:
+                // merge with: created by [spell]
+
+                break;
+        }
+    }
+
+    foreach ($sourceTabs as $k => $tab)
+    {
+        if (empty($data[$k]))
+            continue;
+
+        $pageData['relTabs'][] = array(
+            'file'   => $tab[0],
+            'data'   => $data[$k],
+            'params' => [
+                'tabs'       => '$tabsRelated',
+                'name'       => $tab[1],
+                'id'         => $tab[2],
+                'extraCols'  => $tab[3] ? '$['.implode(', ', array_unique($tab[3])).']' : null,
+                'hiddenCols' => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null
+            ]
+        );
+    }
+
+    /* this item contains.. */
+
+    $sourceFor = array(
+         [LOOT_ITEM,        $item->id,                       '$LANG.tab_contains',      'contains',      ['Listview.extraCols.percent'], []                          ],
+         [LOOT_PROSPECTING, $item->id,                       '$LANG.tab_prospecting',   'prospecting',   ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+         [LOOT_MILLING,     $item->id,                       '$LANG.tab_milling',       'milling',       ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+         [LOOT_DISENCHANT,  $item->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']]
+    );
+
+    foreach ($sourceFor as $sf)
+    {
+        $itemLoot = Util::handleLoot($sf[0], $sf[1], $smarty, User::isInGroup(U_GROUP_STAFF));
+        if ($itemLoot)
+        {
+            if (User::isInGroup(U_GROUP_STAFF))
+            {
+                $sf[4][] = "Listview.funcBox.createSimpleCol('group', 'Group', '10%', 'group')";
+                $sf[4][] = "Listview.funcBox.createSimpleCol('mode', 'Mode', '10%', 'mode')";
+                $sf[4][] = "Listview.funcBox.createSimpleCol('reference', 'Reference', '10%', 'reference')";
+            }
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'item',
+                'data'   => $itemLoot,
+                'params' => [
+                    'tabs'       => '$tabsRelated',
+                    'name'       => $sf[2],
+                    'id'         => $sf[3],
+                    'extraCols'  => $sf[4] ? "$[".implode(', ', $sf[4])."]" : null,
+                    'hiddenCols' => $sf[5] ? "$".json_encode($sf[5]) : null
+                ]
+            );
+        }
+    }
 
     // sold by [consult itemExtendedCost]
 
     // Objective of (quest)
 
     // provided for (quest)
-
-    // reward of (quest)
-
-    // reward of (quest) [from mail-loot]
-
-    // contained in (item) [item_loot]
-
-    // contains [item_loot]
-    $itemLoot = Util::handleLoot(LOOT_ITEM, $item->id, $smarty, User::isInGroup(U_GROUP_STAFF));
-    if ($itemLoot)
-    {
-        $extraCols = ['Listview.extraCols.percent'];
-
-        if (User::isInGroup(U_GROUP_STAFF))
-        {
-            $extraCols[] = "Listview.funcBox.createSimpleCol('group', 'group', '10%', 'group')";
-            $extraCols[] = "Listview.funcBox.createSimpleCol('mode', LANG.compose_mode, '10%', 'mode')";
-            $extraCols[] = "Listview.funcBox.createSimpleCol('reference', LANG.finpcs.seploot + ' ' + LANG.button_link, '10%', 'reference')";
-        }
-
-        $pageData['relTabs'][] = array(
-            'file'   => 'item',
-            'data'   => $itemLoot,
-            'params' => [
-                'tabs'       => '$tabsRelated',
-                'name'       => '$LANG.tab_contains',
-                'id'         => 'contains',
-                'hiddenCols' => "$['side', 'slot', 'source', 'reqlevel']",
-                'extraCols'  => "$[".implode(', ', $extraCols)."]",
-            ]
-        );
-    }
-
-    // pickpocketed from
-
-    // skinning_loot skinned from & salvaged from
-
-    // prospecting & prospected from
-    // milling & milled from
-
-    // disentchanting from & to
 
     // can be placed in
     // if($item['BagFamily'] == 256)
@@ -364,13 +533,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 
     // reagent for
 
-    // created by [spell]
-
-    // fished in
-
     // currency for
-
-    // [spell_loot_template] ehh...
 
     // criteria of
     // array(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM, ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM),

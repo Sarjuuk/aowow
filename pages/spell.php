@@ -110,6 +110,34 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $path[] = 410;                              // Cunning
     }
 
+    // has difficulty versions of itself
+    $difficulties = DB::Aowow()->selectRow(
+        'SELECT     normal10 AS "0",
+                    normal25 AS "1",
+                    heroic10 AS "2",
+                    heroic25 AS "3"
+         FROM       ?_spelldifficulty
+         WHERE      normal10 = ?d OR
+                    normal25 = ?d OR
+                    heroic10 = ?d OR
+                    heroic25 = ?d',
+        $_id, $_id, $_id, $_id
+    );
+
+   // returns self or firstRank
+   $firstRank = DB::Aowow()->selectCell(
+       'SELECT      IF(s1.rankId <> 1 AND s2.id, s2.id, s1.id)
+        FROM        ?_spell s1
+        LEFT JOIN   ?_spell s2
+            ON      s1.SpellFamilyId     = s2.SpelLFamilyId AND
+                    s1.SpellFamilyFlags1 = s2.SpelLFamilyFlags1 AND
+                    s1.SpellFamilyFlags2 = s2.SpellFamilyFlags2 AND
+                    s1.SpellFamilyFlags3 = s2.SpellFamilyFlags3 AND
+                    s1.name_loc0 = s2.name_loc0 AND
+                    s2.RankId = 1
+        WHERE       s1.id = ?d',
+        $_id
+    );
 
     /***********/
     /* Infobox */
@@ -130,7 +158,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $bar = [];
         for ($i = 0; $i < 11; $i++)
             if ($mask & (1 << $i))
-                $bar[] = (!fMod(count($bar) + 1, 3) ? '\n' : null) . '[race='.($i + 1).']';
+                $bar[] = (!fMod(count($bar) + 1, 3) ? '\n' : null).'[race='.($i + 1).']';
 
         $t = count($bar) == 1 ? Lang::$game['race'] : Lang::$game['races'];
         $infobox[] = '[li]'.Util::ucFirst($t).Lang::$colon.implode(', ', $bar).'[/li]';
@@ -141,7 +169,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $bar = [];
         for ($i = 0; $i < 11; $i++)
             if ($mask & (1 << $i))
-                $bar[] = (!fMod(count($bar) + 1, 3) ? '\n' : null) . '[class='.($i + 1).']';
+                $bar[] = (!fMod(count($bar) + 1, 3) ? '\n' : null).'[class='.($i + 1).']';
 
         $t = count($bar) == 1 ? Lang::$game['class'] : Lang::$game['classes'];
         $infobox[] = '[li]'.Util::ucFirst($t).Lang::$colon.implode(', ', $bar).'[/li]';
@@ -150,21 +178,38 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($_ = $spell->getField('spellFocusObject'))          // spellFocus
     {
         $bar = DB::Aowow()->selectRow('SELECT * FROM ?_spellFocusObject WHERE id = ?d', $_);
-        $infobox[] = '[li]'.Lang::$game['requires2'].' '.Util::localizedString($bar, 'name').'[/li]';
+        $focus = new GameObjectList(array(['type', 8], ['data0', $_], 1));
+        $infobox[] = '[li]'.Lang::$game['requires2'].' '.($focus->error ? Util::localizedString($bar, 'name') : '[url=?object='.$focus->id.']'.Util::localizedString($bar, 'name').'[/url]').'[/li]';
     }
 
     if (in_array($_cat, [9, 11]))                           // primary & secondary trades
     {
         // skill
-        $bar = SkillList::getName($spell->getField('skillLines')[0]);
-        if ($_ = $spell->getField('learnedAt'))
-            $bar .= ' ('.$_.')';
+        if ($_ = $spell->getField('skillLines')[0])
+        {
+            $rSkill = new SkillList(array(['id', $_]));
+            if (!$rSkill->error)
+            {
+                $rSkill->addGlobalsToJScript($smarty);
 
-        $infobox[] = '[li]'.sprintf(Lang::$game['requires'], $bar).'[/li]';
+                $bar = sprintf(Lang::$game['requires'], '[skill='.$rSkill->id.']');
+                if ($_ = $spell->getField('learnedAt'))
+                    $bar .= ' ('.$_.')';
+
+                $infobox[] = '[li]'.$bar.'[/li]';
+            }
+        }
 
         // specialization
         if ($_ = $spell->getField('reqSpellId'))
-            $infobox[] = '[li]'.Lang::$game['requires2'].' '.SpellList::getName($_).'[/li]';
+        {
+            $rSpell = new SpellList(array(['id', $_]));
+            if (!$rSpell->error)
+            {
+                $rSpell->addGlobalsToJScript($smarty);
+                $infobox[] = '[li]'.Lang::$game['requires2'].' [spell='.$rSpell->id.'][/li]';
+            }
+        }
 
         // difficulty
         if ($_ = $spell->getColorsForCurrent())
@@ -186,6 +231,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($cost = DB::Aowow()->selectCell('SELECT spellcost FROM npc_trainer WHERE spell = ?d', $spell->id))
         $infobox[] = '[li]'.Lang::$spell['trainingCost'].Lang::$colon.'[money='.$cost.'][/li]';
 
+    // used in mode
+    foreach ($difficulties as $n => $id)
+        if ($id == $_id)                                    // "Mode" seems to be multilingual acceptable
+            $infobox[] = '[li]Mode'.Lang::$colon.Lang::$game['modes'][$n].'[/li]';
+
 
     /****************/
     /* Main Content */
@@ -198,6 +248,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'relTabs' => [],
         'view3D'  => 0,
         'page'    => array(
+            'scaling'   => '',
             'powerCost' => $spell->createPowerCostForCurrent(),
             'castTime'  => $spell->createCastTimeForCurrent(false, false),
             'tools'     => $spell->getToolsForCurrent(),
@@ -210,7 +261,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'range'     => $spell->getField('rangeMaxHostile'),
             'gcd'       => Util::formatTime($spell->getField('startRecoveryTime')),
             'gcdCat'    => "[NYI]",
-            'school'    => sprintf(Util::$dfnString, Util::asHex($spell->getField('schoolMask')), Lang::getMagicSchools($spell->getField('schoolMask'))),
+            'school'    => User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Util::asHex($spell->getField('schoolMask')), Lang::getMagicSchools($spell->getField('schoolMask'))) : Lang::getMagicSchools($spell->getField('schoolMask')),
             'dispel'    => Lang::$game['dt'][$spell->getField('dispelType')],
             'mechanic'  => Lang::$game['me'][$spell->getField('mechanic')],
         )
@@ -261,12 +312,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     $_[] = $str;
 
             $title[] = Lang::$item['slot'].Lang::$colon.Util::asHex($invType);
-            $text   .= ' '.Lang::$spell['_inSlot'].': '.implode(', ', $_);
+            $text   .= ' '.Lang::$spell['_inSlot'].Lang::$colon.implode(', ', $_);
         }
 
-        $pageData['page']['items'] = sprintf(Util::$dfnString, implode(' | ', $title), $text);
+        $pageData['page']['items'] = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, implode(' | ', $title), $text) : $text;
     }
-
 
     // prepare Tools
     foreach ($pageData['page']['tools'] as $k => $tool)
@@ -304,6 +354,115 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 break;
         }
     }
+
+    // spell scaling
+    $scaling = array_merge(
+        array(
+            'directSP' => -1,
+            'dotSP'    => -1,
+            'directAP' =>  0,
+            'dotAP'    =>  0
+        ),
+        (array)DB::Aowow()->selectRow('SELECT direct_bonus AS directSP, dot_bonus AS dotSP, ap_bonus AS directAP, ap_dot_bonus AS dotAP FROM spell_bonus_data WHERE entry = ?d', $firstRank)
+    );
+
+    foreach ($scaling as $k => $v)
+    {
+        // only calculate for class/pet spells
+        if ($v != -1 || !in_array($spell->getField('typeCat'), [-2, -3, -7, 7]))
+            continue;
+
+        if (!$spell->isDamagingSpell() || $spell->isHealingSpell())
+        {
+            $scaling[$k] = 0;
+            continue;
+        }
+
+        // no known calculation for physical abilities
+        if ($k == 'directAP' || $k == 'dotAP')
+            continue;
+
+        // dont use spellPower to scale physical Abilities
+        if ($spell->getField('schoolMask') == 0x1 && ($k == 'directSP' || $k == 'dotSP'))
+            continue;
+
+        $isDOT = false;
+        $pMask = $spell->periodicEffectsMask();
+
+        if ($k == 'dotSP' || $k == 'dotAP')
+        {
+            if ($pMask)
+                $isDOT = true;
+            else
+                continue;
+        }
+        else                                                // if all used effects are periodic, dont calculate direct component
+        {
+            $bar = true;
+            for ($i = 1; $i < 4; $i++)
+            {
+                if (!$spell->getField('effect'.$i.'Id'))
+                    continue;
+
+                if ($pMask & 1 << ($i - 1))
+                    continue;
+
+                $bar = false;
+            }
+
+            if ($bar)
+                continue;
+        }
+
+        // Damage over Time spells bonus calculation
+        $dotFactor = 1.0;
+        if ($isDOT)
+        {
+            $dotDuration = $spell->getField('duration');
+            // 200% limit
+            if ($dotDuration > 0)
+            {
+                if ($dotDuration > 30000)
+                    $dotDuration = 30000;
+                if (!$spell->isChanneledSpell())
+                    $dotFactor = $dotDuration / 15000;
+            }
+        }
+
+        // Distribute Damage over multiple effects, reduce by AoE
+        $castingTime = $spell->getCastingTimeForBonus($isDOT);
+
+        // 50% for damage and healing spells for leech spells from damage bonus and 0% from healing
+        for ($j = 1; $j < 4; ++$j)
+        {
+            //  SPELL_EFFECT_HEALTH_LEECH            || SPELL_AURA_PERIODIC_LEECH
+            if ($spell->getField('effectId'.$j) == 9 || $spell->getField('effect'.$j.'AuraId') == 53)
+            {
+                $castingTime /= 2;
+                break;
+            }
+        }
+
+        if ($spell->isHealingSpell())
+            $castingTime *= 1.88;
+
+        if ($spell->getField('schoolMask') != 0x1)          // SPELL_SCHOOL_MASK_NORMAL
+            $scaling[$k] = ($castingTime / 3500.0) * $dotFactor;
+        else
+            $scaling[$k] = 0;                               // would be 1 ($dotFactor), but we dont want it to be displayed
+    }
+
+    foreach ($scaling as $k => $v)
+        if ($v > 0)
+            $pageData['page']['scaling'] .= sprintf(Lang::$spell['scaling'][$k], $v * 100).'<br>';
+
+    // proc data .. maybe use more information..?
+    $procData = DB::Aowow()->selectRow('SELECT IF(ppmRate > 0, -ppmRate, customChance) AS chance, cooldown FROM world.spell_proc_event WHERE entry = ?d', $_id);
+    if (empty($procData['chance']))
+        $procData['chance'] = $spell->getField('procChance');
+
+    if (!isset($procData['cooldown']))
+        $procData['cooldown'] = 0;
 
     // Iterate through all effects:
     $pageData['page']['effect'] = [];
@@ -350,12 +509,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         else if (in_array($i, $triggerIdx))
         {
             $_ = $spell->getField('effect'.$i.'TriggerSpell');
+            if (!$_)
+                $_ = $spell->getField('effect'.$i.'MiscValue');
+
             $trig = new SpellList(array(['s.id', (int)$_]));
 
             $foo['icon'] = array(
                 'id'    => $_,
-                'name'  => $trig->getField('name', true),
-                'icon'  => $trig->getField('iconString'),
+                'name'  => $trig->error ? Util::ucFirst(Lang::$game['spell']).' #'.$_ : $trig->getField('name', true),
                 'count' => 0
             );
 
@@ -363,7 +524,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
 
         // Effect Name
-        $foo['name'] = '('.$effId.') '.Util::$spellEffectStrings[$effId];
+        $foo['name'] = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, 'EffectId: '.$effId, Util::$spellEffectStrings[$effId]) : Util::$spellEffectStrings[$effId];
 
         if ($spell->getField('effect'.$i.'RadiusMax') > 0)
             $foo['radius'] = $spell->getField('effect'.$i.'RadiusMax');
@@ -372,7 +533,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $foo['value'] = ($effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
 
         if ($effRPPL != 0)
-            $foo['value'] = (isset($foo['value']) ? $foo['value'] : '0') . sprintf(Lang::$spell['costPerLevel'], $effRPPL);
+            $foo['value'] = (isset($foo['value']) ? $foo['value'] : '0').sprintf(Lang::$spell['costPerLevel'], $effRPPL);
 
         if ($spell->getField('effect'.$i.'Periode') > 0)
             $foo['interval'] = Util::formatTime($spell->getField('effect'.$i.'Periode'));
@@ -380,16 +541,32 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if ($_ = $spell->getField('effect'.$i.'Mechanic'))
             $foo['mechanic'] = Lang::$game['me'][$_];
 
+        if ($procData['chance'] && $procData['chance'] < 100)
+            if (in_array($i, $spell->canTriggerSpell()))
+                $foo['procData'] = array(
+                    $procData['chance'],
+                    $procData['cooldown'] ? Util::formatTime($procData['cooldown'] * 1000, true) : null
+                );
+
         // parse masks and indizes
         switch ($effId)
         {
             case 8:                                         // Power Drain
             case 30:                                        // Energize
             case 137:                                       // Energize Pct
-                $foo['name'] .= ' ('.sprintf(Util::$dfnString, @Lang::$spell['powerTypes'][$effMV], $effMV).')';
+                $_ = @Lang::$spell['powerTypes'][$effMV];
+                if ($_ && User::isInGroup(U_GROUP_STAFF))
+                    $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_);
+                else if (!$_)
+                    $_ = $effMV;
+
+                $foo['name'] .= ' ('.$_.')';
                 break;
             case 16:                                        // QuestComplete
-                $foo['name'] .= ': <a href="?quest='.$effMV.'">'.QuestList::getName($effMV).'</a> ('.$effMV.')';
+                if ($_ = QuestList::getName($effMV))
+                    $foo['name'] .= Lang::$colon.'(<a href="?quest='.$effMV.'">'.$_.'</a>)';
+                else
+                    $foo['name'] .= Lang::$colon.Util::ucFirst(Lang::$game['quest']).' #'.$effMV;;
                 break;
             case 28:                                        // Summon
             case 75:                                        // Summon Totem
@@ -397,28 +574,51 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case 88:                                        // Summon Totem (slot 2)
             case 89:                                        // Summon Totem (slot 3)
             case 90:                                        // Summon Totem (slot 4)
+                $_ = Lang::$game['npc'].' #'.$effMV;
                 $summon = new CreatureList(array(['ct.id', $effMV]));
-
-                if (!$pageData['view3D'] && $summon)
+                if (!$summon->error)
+                {
+                    $_ = '(<a href="?npc='.$effMV.'">'.$summon->getField('name', true).'</a>)';
                     $pageData['view3D'] = $summon->getRandomModelId();
+                }
 
-                $foo['name'] .= ': <a href="?npc='.$effMV.'">'.$summon->getField('name', true).'</a> ('.$effMV.')';
+                $foo['name'] .= Lang::$colon.$_;
                 break;
-            case 33:                                        // open Lock
-                $foo['name'] .= ' ('.sprintf(Util::$dfnString, @Util::$lockType[$effMV], $effMV).')';
+            case 33:                                        // Open Lock
+                $_ = @Lang::$spell['lockType'][$effMV];
+                if ($_ && User::isInGroup(U_GROUP_STAFF))
+                    $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_);
+                else if (!$_)
+                    $_ = $effMV;
+
+                $foo['name'] .= ' ('.$_.')';
                 break;
             case 53:                                        // Enchant Item Perm
             case 54:                                        // Enchant Item Temp
             case 156:                                       // Enchant Item Prismatic
-                $_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemEnchantment WHERE id = ?d', $effMV);
-                $foo['name'] .= ' <span class="q2">'.Util::localizedString($_, 'text').'</span> ('.$effMV.')';
+                if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemEnchantment WHERE id = ?d', $effMV))
+                    $foo['name'] .= ' <span class="q2">'.Util::localizedString($_, 'text').'</span> ('.$effMV.')';
+                else
+                    $foo['name'] .= ' #'.$effMV;
                 break;
             case 38:                                        // Dispel               [miscValue => Types]
             case 126:                                       // Steal Aura
-                $foo['name'] .= ' ('.sprintf(Util::$dfnString, @Lang::$game['dt'][$effMV], $effMV).')';
+                $_ = @Lang::$game['dt'][$effMV];
+                if ($_ && User::isInGroup(U_GROUP_STAFF))
+                    $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_);
+                else if (!$_)
+                    $_ = $effMV;
+
+                $foo['name'] .= ' ('.$_.')';
                 break;
             case 39:                                        // Learn Language
-                $foo['name'] .= ' ('.sprintf(Util::$dfnString, @Lang::$game['languages'][$effMV], $effMV).')';
+                $_ = @Lang::$game['languages'][$effMV];
+                if ($_ && User::isInGroup(U_GROUP_STAFF))
+                    $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_);
+                else if (!$_)
+                    $_ = $effMV;
+
+                $foo['name'] .= ' ('.$_.')';
                 break;
             case 50:                                        // Trans Door
             case 76:                                        // Summon Object (Wild)
@@ -427,61 +627,109 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case 105:                                       // Summon Object (slot 2)
             case 106:                                       // Summon Object (slot 3)
             case 107:                                       // Summon Object (slot 4)
-                // todo (low): create modelviewer-data
-                $foo['name'] .= ': <a href="?object='.$effMV.'">'.GameObjectList::getName($effMV).'</a> ('.$effMV.')';
+                // todo (low): create go/modelviewer-data
+                $_ = Util::ucFirst(Lang::$game['gameObject']).' #'.$effMV;
+                $n = GameObjectList::getName($effMV); // $summon = new GameObjectList(array(['go.id', $effMV]));
+                if ($n/*!$summon->error*/)
+                {
+                    $_ = '(<a href="?object='.$effMV.'">'.$n/*$summon->getField('name', true)*/.'</a>)';
+                    //$pageData['view3D'] = $summon->getRandomModelId();
+                }
+
+                $foo['name'] .= Lang::$colon.$_;
                 break;
             case 74:                                        // Apply Glyph
-                $_ = DB::Aowow()->selectCell('SELECT spellId FROM ?_glyphProperties WHERE id = ?d', $effMV);
-                $foo['name'] .= ': <a href="?spell='.$_.'">'.SpellList::getName($_).'</a> ('.$effMV.')';
+                if ($_ = DB::Aowow()->selectCell('SELECT spellId FROM ?_glyphProperties WHERE id = ?d', $effMV))
+                {
+                    if ($n = SpellList::getName($_))
+                        $foo['name'] .= Lang::$colon.'(<a href="?spell='.$_.'">'.$n.'</a>)';
+                    else
+                        $foo['name'] .= Lang::$colon.Util::ucFirst(Lang::$game['spell']).' #'.$_;;
+                }
+                else
+                    $foo['name'] .= ' #'.$effMV;;
                 break;
             case 95:                                        // Skinning
-                // todo (low): sort this out - 0:skinning (corpse, beast), 1:hearb (GO), 2: mineral (GO), 3: engineer (corpse, mechanic)
-                $foo['name'] .= ' ('.sprintf(Util::$dfnString, '[NYI]', $effMV).')';
+                switch ($effMV)
+                {
+                    case 0:  $_ = Lang::$game['ct'][1].', '.Lang::$game['ct'][2]; break;    // Beast, Dragonkin
+                    case 1:
+                    case 2:  $_ = Lang::$game['ct'][4]; break;                              // Elemental (nature based, earth based)
+                    case 3:  $_ = Lang::$game['ct'][9]; break;                              // Mechanic
+                    default; $_ = '';
+                }
+                if (User::isInGroup(U_GROUP_STAFF))
+                    $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_);
+                else
+                    $_ = $effMV;
+
+                $foo['name'] .= ' ('.$_.')';
                 break;
             case 108:                                       // Dispel Mechanic
-                $foo['name'] .= ' ('.sprintf(Util::$dfnString, @Lang::$game['me'][$effMV], $effMV).')';
+                $_ = @Lang::$game['me'][$effMV];
+                if ($_ && User::isInGroup(U_GROUP_STAFF))
+                    $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_);
+                else if (!$_)
+                    $_ = $effMV;
+
+                $foo['name'] .= ' ('.$_.')';
                 break;
             case 118:                                       // Require Skill
-                $foo['name'] .= ': <a href="?skill='.$effMV.'">'.SkillList::getName($effMV).'</a> ('.$effMV.')';
+                if ($_ = SkillList::getName($effMV))
+                    $foo['name'] .= Lang::$colon.'(<a href="?skill='.$effMV.'">'.$_.'</a>)';
+                else
+                    $foo['name'] .= Lang::$colon.Util::ucFirst(Lang::$game['skill']).' #'.$effMV;;
                 break;
             case 146:                                       // Activate Rune
-                $foo['name'] .= ' ('.sprintf(Util::$dfnString, Lang::$spell['powerRunes'][$effMV], $effMV).')';
+                $_ = @Lang::$spell['powerRunes'][$effMV];
+                if ($_ && User::isInGroup(U_GROUP_STAFF))
+                    $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_);
+                else if (!$_)
+                    $_ = $effMV;
+
+                $foo['name'] .= ' ('.$_.')';
                 break;
-            case 155:                                       // Dual Wield 2H-Weapons
-                $foo['name'] .= ': <a href="?spell='.$effMV.'">'.SpellList::getName($effMV).'</a> ('.$effMV.')';
-                break;
+            case 123:                                       // Send Taxi - effMV is taxiPathId. We only use paths for flightmasters for now, so spell-triggered paths are not in the table
             default:
             {
-                if ($effMV || $effId == 97)
+                if (($effMV || $effId == 97) && $effId != 155)
                     $foo['name'] .= ' ('.$effMV.')';
             }
             // Aura
-            case 6:                     // Simple
-            case 27:                    // AA Persistent
-            case 35:                    // AA Party
-            case 65:                    // AA Raid
-            case 119:                   // AA Pet
-            case 128:                   // AA Friend
-            case 129:                   // AA Enemy
-            case 143:                   // AA Owner
+            case 6:                                         // Simple
+            case 27:                                        // AA Persistent
+            case 35:                                        // AA Party
+            case 65:                                        // AA Raid
+            case 119:                                       // AA Pet
+            case 128:                                       // AA Friend
+            case 129:                                       // AA Enemy
+            case 143:                                       // AA Owner
             {
                 if ($effAura > 0 && isset(Util::$spellAuraStrings[$effAura]))
                 {
-                    $foo['name'] .= ' #'.$effAura;
+                    $foo['name'] .= User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, 'AuraId: '.$effAura, Lang::$colon.Util::$spellAuraStrings[$effAura]) : Lang::$colon.Util::$spellAuraStrings[$effAura];
+
+                    $bar = $effMV;
                     switch ($effAura)
                     {
                         case 17:                            // Mod Stealth Detection
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Util::$stealthType[$effMV], $effMV).')';
+                            if ($_ = @Lang::$spell['stealthType'][$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 19:                            // Mod Invisibility Detection
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Util::$invisibilityType[$effMV], $effMV).')';
+                            if ($_ = @Lang::$spell['invisibilityType'][$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 24:                            // Periodic Energize
                         case 21:                            // Obsolete Mod Power
                         case 35:                            // Mod Increase Power
                         case 85:                            // Mod Power Regeneration
                         case 110:                           // Mod Power Regeneration Pct
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$spell['powerTypes'][$effMV], $effMV).')';
+                            if ($_ = @Lang::$spell['powerTypes'][$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 29:                            // Mod Stat
                         case 80:                            // Mod Stat %
@@ -490,44 +738,59 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 212:                           // Mod Ranged Attack Power Of Stat Percent
                         case 219:                           // Mod Mana Regeneration from Stat
                         case 268:                           // Mod Attack Power Of Stat Percent
-                            $x = $effMV == -1 ? 0x1F : 1 << $effMV;
-                            $bar = [];
+                            $mask = $effMV == -1 ? 0x1F : 1 << $effMV;
+                            $_ = [];
                             for ($j = 0; $j < 5; $j++)
-                                if ($x & (1 << $j))
-                                    $bar[] = Lang::$game['stats'][$j];
+                                if ($mask & (1 << $j))
+                                    $_[] = Lang::$game['stats'][$j];
 
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, implode(', ', $bar), $effMV).')';
+                            if ($_ = implode(', ', $_));
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 36:                            // Shapeshift
-                            $st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftForms WHERE id = ?d', $effMV);
+                            if ($st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftForms WHERE id = ?d', $effMV))
+                            {
+                                $pageData['view3D'] = $st['model2'] ? $st['model'.rand(1, 2)]: $st['model1'];
 
-                            if ($st['creatureType'] > 0)
-                                $pageData['infobox'][] = '[li]'.Lang::$game['type'].Lang::$colon.Lang::$game['ct'][$st['creatureType']].'[/li]';
+                                if ($st['creatureType'] > 0)
+                                    $pageData['infobox'][] = '[li]'.Lang::$game['type'].Lang::$colon.Lang::$game['ct'][$st['creatureType']].'[/li]';
 
-                            if (!$pageData['view3D'] && $st)
-                                $pageData['view3D'] = $st['model2'] ? $st['model'.rand(1,2)]: $st['model1'];
-
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, Util::localizedString($st, 'name'), $effMV).')';
+                                if ($_ = Util::localizedString($st, 'name'))
+                                    $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+                            }
                             break;
                         case 37:                            // Effect immunity
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Util::$spellEffectStrings[$effMV], $effMV).')';
+                            if ($_ = @Util::$spellEffectStrings[$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 38:                            // Aura immunity
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Util::$spellAuraStrings[$effMV], $effMV).')';
+                            if ($_ = @Util::$spellAuraStrings[$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 41:                            // Dispel Immunity
                         case 178:                           // Mod Debuff Resistance
                         case 245:                           // Mod Aura Duration By Dispel
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$game['dt'][$effMV], $effMV).')';
+                            if ($_ = @Lang::$game['dt'][$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 44:                            // Track Creature
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$game['ct'][$effMV], $effMV).')';
+                            if ($_ = @Lang::$game['ct'][$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 45:                            // Track Resource
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Util::$lockType[$effMV], $effMV).')';
+                            if ($_ = @Lang::$spell['lockType'][$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 75:                            // Language
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$game['languages'][$effMV], $effMV).')';
+                            if ($_ = @Lang::$game['languages'][$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 77:                            // Mechanic Immunity
                         case 117:                           // Mod Mechanic Resistance
@@ -535,15 +798,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 234:                           // Mod Mechanic Duration (no stack)
                         case 255:                           // Mod Mechanic Damage Taken Pct
                         case 276:                           // Mod Mechanic Damage Done Percent
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, @Lang::$game['me'][$effMV], $effMV).')';
+                            if ($_ = @Lang::$game['me'][$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.Util::asHex($effMV), $_) : $_;
+
                             break;
-                        case 147:                           // mechanic Immunity Mask
-                            $bar = [];
+                        case 147:                           // Mechanic Immunity Mask
+                            $_ = [];
                             foreach (Lang::$game['me'] as $k => $str)
                                 if ($effMV & (1 << $k - 1))
-                                    $bar[] = $str;
+                                    $_[] = $str;
 
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, implode(', ', $bar), Util::asHex($effMV)).')';
+                            if ($_ = implode(', ', $_))
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.Util::asHex($effMV), $_) : $_;
+
                             break;
                         case 10:                            // Mod Threat
                         case 13:                            // Mod Damage Done
@@ -581,57 +848,68 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 229:                           // Mod AoE Damage Avoidance
                         case 271:                           // Mod Damage Percent Taken Form Caster
                         case 310:                           // Mod Creature AoE Damage Avoidance
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura];
-                            if ($effMV)
-                                 $foo['name'] .= ' ('.sprintf(Util::$dfnString, Lang::getMagicSchools($effMV), Util::asHex($effMV)).')';
+                            if ($_ = Lang::getMagicSchools($effMV))
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.Util::asHex($effMV), $_) : $_;
+
                             break;
+                        case 30:                            // Mod Skill
                         case 98:                            // Mod Skill Value
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' <a href="?skill='.$effMV.'">'.SkillList::getName($effMV).'</a> ('.$effMV.')';
+                            if ($_ = SkillList::getName($effMV))
+                                $bar = ' (<a href="?skill='.$effMV.'">'.SkillList::getName($effMV).'</a>)';
+                            else
+                                $bar = Lang::$colon.Util::ucFirst(Lang::$game['skill']).' #'.$effMV;;
+
                             break;
                         case 107:                           // Flat Modifier
                         case 108:                           // Pct Modifier
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, Util::$spellModOp[$effMV], $effMV).')';
+                            if ($_ = @Lang::$spell['spellModOp'][$effMV])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
+
                             break;
                         case 189:                           // Mod Rating
                         case 220:                           // Combat Rating From Stat
-                            $bar = [];
-                            foreach (Util::$combatRating as $k => $str)
+                            $_ = [];
+                            foreach (Lang::$spell['combatRating'] as $k => $str)
                                 if ((1 << $k) & $effMV)
-                                    $bar[] = $str;
+                                    $_[] = $str;
 
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, implode(', ', $bar), Util::asHex($effMV)).')';
+                            if ($_ = implode(', ', $_))
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.Util::asHex($effMV), $_) : $_;
+
                             break;
                         case 168:                           // Mod Damage Done Versus
                         case 59:                            // Mod Damage Done Versus Creature
-                            $bar = [];
-                            foreach (Lang::$game['ct'] as $j => $str)
-                                if ($effMV & (1 << $j - 1))
-                                    $bar[] = $str;
+                            $_ = [];
+                            foreach (Lang::$game['ct'] as $k => $str)
+                                if ($effMV & (1 << $k - 1))
+                                    $_[] = $str;
 
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, implode(', ', $bar), $effMV).')';
+                            if ($_ = implode(', ', $_))
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.Util::asHex($effMV), $_) : $_;
+
                             break;
                         case 249:                           // Convert Rune
                             $x = $spell->getField('effect'.$i.'MiscValueB');
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' ('.sprintf(Util::$dfnString, Lang::$spell['powerRunes'][$x], $x).')';
+                            if ($_ = @Lang::$spell['powerRunes'][$x])
+                                $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$x, $_) : $_;
+
                             break;
                         case 78:                            // Mounted
                         case 56:                            // Transform
                         {
                             $transform = new CreatureList(array(['ct.id', $effMV]));
-
-                            if (!$pageData['view3D'] && $transform)
+                            if (!$transform->error)
+                            {
                                 $pageData['view3D'] = $transform->getRandomModelId();
+                                $bar = ' (<a href="?npc='.$effMV.'">'.$transform->getField('name', true).'</a>)';
+                            }
+                            else
+                                $bar = Lang::$colon.Lang::$game['npc'].' #'.$effMV;;
 
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura].' <a href="?npc='.$effMV.'">'.$transform->getField('name', true).'</a> ('.$effMV.')';
                             break;
                         }
-                        default:
-                        {
-                            $foo['name'] .= Lang::$colon.Util::$spellAuraStrings[$effAura];
-                            if ($effMV > 0)
-                                $foo['name'] .= ' ('.$effMV.')';
-                        }
                     }
+                    $foo['name'] .= strstr($bar, 'href') || strstr($bar, '#') ? $bar : ($bar ? ' ('.$bar.')' : null);
 
                     if (in_array($effAura, [174, 220, 182]))
                         $foo['name'] .= ' ['.sprintf(Util::$dfnString, Lang::$game['stats'][$spell->getField('effect'.$i.'MiscValueB')], $spell->getField('effect'.$i.'MiscValueB')).']';
@@ -640,7 +918,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
                 }
                 else if ($effAura > 0)
-                    $foo['name'] .= ': Unknown Aura ('.$effAura.')';
+                    $foo['name'] .= Lang::$colon.'Unknown Aura ('.$effAura.')';
 
                 break;
             }
@@ -651,7 +929,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             unset($foo['value']);
     }
 
-    $pageData['infobox'] =  '[ul]'.implode('', $pageData['infobox']).'[/ul]';
+    $pageData['infobox'] = !empty($pageData['infobox']) ? '[ul]'.implode('', $pageData['infobox']).'[/ul]' : null;
 
     unset($foo);                                            // clear reference
 
@@ -671,7 +949,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     for ($i = 1; $i < 4; $i++)
     {
         // Flat Mods (107), Pct Mods (108), No Reagent Use (256) .. include dummy..? (4)
-        if (!in_array($spell->getField('effect'.$i.'AuraId'), [107, 108, 256, 4]))
+        if (!in_array($spell->getField('effect'.$i.'AuraId'), [107, 108, 256 /*, 4*/]))
             continue;
 
         $m1 = $spell->getField('effect1SpellClassMask'.$l[$i]);
@@ -689,6 +967,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if (count($sub) > 1)
     {
         $modSpells = new SpellList($conditions);
+
         if (!$modSpells->error)
         {
 
@@ -776,18 +1055,51 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $saSpells = new SpellList($conditions);
     if (!$saSpells->error)
     {
+        $data = $saSpells->getListviewData();
+        if ($difficulties)                                  // needs a way to distinguish between dungeon and raid :x
+        {
+            $saE = '$[Listview.extraCols.mode]';
+
+            foreach ($data as $id => $dat)
+            {
+                $data[$id]['modes'] = ['mode' => 0];
+
+                if ($difficulties[0] == $id)       // b0001000
+                {
+                    if (!$difficulties[2] && !$difficulties[3])
+                        $data[$id]['modes']['mode'] |= 0x2;
+                    else
+                        $data[$id]['modes']['mode'] |= 0x8;
+                }
+
+                if ($difficulties[1] == $id)       // b0010000
+                {
+                    if (!$difficulties[2] && !$difficulties[3])
+                        $data[$id]['modes']['mode'] |= 0x1;
+                    else
+                        $data[$id]['modes']['mode'] |= 0x10;
+                }
+
+                if ($difficulties[2] == $id)       // b0100000
+                    $data[$id]['modes']['mode'] |= 0x20;
+
+                if ($difficulties[3] == $id)       // b1000000
+                    $data[$id]['modes']['mode'] |= 0x40;
+            }
+        }
 
         if (!$saSpells->hasSetFields(['skillLines']))
             $saH = "$['skill']";
 
         $pageData['relTabs'][] = array(
             'file'   => 'spell',
-            'data'   => $saSpells->getListviewData(),
+            'data'   => $data,
             'params' => [
                 'tabs'        => '$tabsRelated',
                 'id'          => 'see-also',
                 'name'        => '$LANG.tab_seealso',
                 'visibleCols' => "$['level']",
+                'extraCols'   => isset($saE) ? $saE : null,
                 'hiddenCols'  => isset($saH) ? $saH : null
             ]
         );
@@ -817,7 +1129,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         $ubSets->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
     }
-
 
     // tab: used by - item
     $conditions = array(
@@ -877,9 +1188,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         if ($spellLoot && User::isInGroup(U_GROUP_STAFF))
         {
-            $extraCols[] = "Listview.funcBox.createSimpleCol('group', 'group', '10%', 'group')";
-            $extraCols[] = "Listview.funcBox.createSimpleCol('mode', LANG.compose_mode, '10%', 'mode')";
-            $extraCols[] = "Listview.funcBox.createSimpleCol('reference', LANG.finpcs.seploot + ' ' + LANG.button_link, '10%', 'reference')";
+            $extraCols[] = "Listview.funcBox.createSimpleCol('group', 'Group', '10%', 'group')";
+            $extraCols[] = "Listview.funcBox.createSimpleCol('mode', 'Mode', '10%', 'mode')";
+            $extraCols[] = "Listview.funcBox.createSimpleCol('reference', 'Reference', '10%', 'reference')";
         }
 
         $lv = $spellLoot;
@@ -922,21 +1233,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
     }
 
-    // tab: Exclusive with
-    $firstRank = DB::Aowow()->selectCell(                   // returns self or firstRank
-       'SELECT      IF(s1.rankId <> 1 AND s2.id, s2.id, s1.id)
-        FROM        ?_spell s1
-        LEFT JOIN   ?_spell s2
-            ON      s1.SpellFamilyId     = s2.SpelLFamilyId AND
-                    s1.SpellFamilyFlags1 = s2.SpelLFamilyFlags1 AND
-                    s1.SpellFamilyFlags2 = s2.SpellFamilyFlags2 AND
-                    s1.SpellFamilyFlags3 = s2.SpellFamilyFlags3 AND
-                    s1.name_loc0 = s2.name_loc0 AND
-                    s2.RankId = 1
-        WHERE       s1.id = ?d',
-        $_id
-    );
-
+    // tab: exclusive with
     if ($firstRank) {
         $linkedSpells = DB::Aowow()->selectCol(             // dont look too closely ..... please..?
            'SELECT      IF(sg2.spell_id < 0, sg2.id, sg2.spell_id) AS ARRAY_KEY, IF(sg2.spell_id < 0, sg2.spell_id, sr.stack_rule)
@@ -1001,7 +1298,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // tab: Linked with
+    // tab: linked with
     $rows = DB::Aowow()->select('
         SELECT  spell_trigger AS `trigger`,
                 spell_effect AS effect,
@@ -1030,7 +1327,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             {
                 if ($r['related'] == $dk)
                 {
-                    $lv[$dk]['linked'] = json_encode([$r['trigger'], $r['effect'], $r['type']], JSON_NUMERIC_CHECK);
+                    $lv[$dk]['linked'] = [$r['trigger'], $r['effect'], $r['type']];
                     $data[] = $lv[$dk];
                     break;
                 }
@@ -1053,78 +1350,200 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
 
-    // tab: teaches
-    // -> spell_learn_spell
-    // -> skill_discovery_template
+    // tab: triggered by
+    $eff = [3, 32, 64, 101, 133, 142, 148, 151, 152, 160, 164];
+    $aur = [4, 23, 42,  48, 109, 226, 227, 231, 236, 284];
+    $conditions = array(
+        'OR',
+        ['AND', ['OR', ['effect1Id', $eff], ['effect1AuraId', $aur]], ['effect1TriggerSpell', $spell->id]],
+        ['AND', ['OR', ['effect2Id', $eff], ['effect2AuraId', $aur]], ['effect2TriggerSpell', $spell->id]],
+        ['AND', ['OR', ['effect3Id', $eff], ['effect3AuraId', $aur]], ['effect3TriggerSpell', $spell->id]],
+    );
 
-    /* source trainer
-        first check source if not trainer :  break
+    $trigger = new SpellList($conditions);
+    if (!$trigger->error)
+    {
+        $pageData['relTabs'][] = array(
+            'file'   => 'spell',
+            'data'   => $trigger->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'triggered-by',
+                'name' => '$LANG.tab_triggeredby'
+            ]
+        );
 
-        consult npc_trainer for details
+        $trigger->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+    }
 
-        nyi: CreatureList
-        ['taughtbynpc']
-    */
-    $spellArr['taughtByNpc'] = [];
+    // tab: taught by npc (source:6 => trainer)
+    if (!empty($spell->sources[$_id]) && in_array(6, array_keys($spell->sources[$_id])))
+    {
+        $list = [];
+        if (count($spell->sources[$_id][6]) == 1 && $spell->sources[$_id][6][0] == 0) // multiple trainer
+        {
+            $tt = null;
+            if (in_array($_cat, [9, 11]))                   // Professions
+                $tt = @Util::$trainerTemplates[TYPE_SKILL][$spell->getField('skillLines')[0]];
+            else if ($_cat == 7 && $spell->getField('reqClassMask')) // Class Spells
+            {
+                $clId = log($spell->getField('reqClassMask'), 2) + 1 ;
+                if (intVal($clId) == $clId)                 // only one class was set, so float == int
+                    $tt = @Util::$trainerTemplates[TYPE_CLASS][$clId];
+            }
 
-    /* source item
-        first check source if not item :  break
+            if ($tt)
+                $list = DB::Aowow()->selectCol('SELECT DISTINCT entry FROM npc_trainer WHERE spell IN (?a) AND entry < 200000', $tt);
+            else
+            {
+                $mask = 0;
+                foreach (Util::$skillLineMask[-3] as $idx => $pair)
+                    if ($pair[1] == $_id)
+                        $mask |= 1 << $idx;
 
-        spellId1 = id OR spellId1 = "LEAR_SPELL_GENERIC" AND spellId2 = id
-        spelltrigger_1/2 = 6
+                $list = DB::Aowow()->selectCol('
+                    SELECT    IF(t1.entry > 200000, t2.entry, t1.entry)
+                    FROM      npc_trainer t1
+                    LEFT JOIN npc_trainer t2 ON t2.spell = -t1.entry
+                    WHERE     t1.spell = ?d',
+                    $_id
+                );
+            }
+        }
+        else
+            $list = [];
 
-    */
-    $spellArr['taughtbyitem'] = [];
+        if ($list)
+        {
+            $tbTrainer = new CreatureList(array(0, ['ct.id', $list], ['ct.spawns', 0, '>'], ['ct.npcflag', 0x10, '&']));
+            if (!$tbTrainer->error)
+            {
+                $tbTrainer->addGlobalsToJscript($smarty);
+                $pageData['relTabs'][] = array(
+                    'file'   => 'creature',
+                    'data'   => $tbTrainer->getListviewData(),
+                    'params' => array(
+                        'tabs' => '$tabsRelated',
+                        'id'   => 'taught-by-npc',
+                        'name' => '$LANG.tab_taughtby',
+                    )
+                );
+            }
+        }
+    }
 
-    // check for taught by spells (Effect 36)
+    // tab: taught by spell (36:self, 57:pet)
+    $conditions = array(
+        'OR',
+        ['AND', ['effect1Id', [36, 57]], ['effect1TriggerSpell', $spell->id]],
+        ['AND', ['effect2Id', [36, 57]], ['effect2TriggerSpell', $spell->id]],
+        ['AND', ['effect3Id', [36, 57]], ['effect3TriggerSpell', $spell->id]],
+    );
+
+    $tbSpell = new SpellList($conditions);
+    if (!$tbSpell->error)
+    {
+        $pageData['relTabs'][] = array(
+            'file'   => 'spell',
+            'data'   => $tbSpell->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'taught-by-spell',
+                'name' => '$LANG.tab_taughtby'
+            ]
+        );
+
+        $tbSpell->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+    }
+
+    // tab: taught by item (i'd like to precheck $spell->sources, but there is no source:item only complicated crap like "drop" and "vendor")
+    $conditions = array(
+        'OR',
+        ['AND', ['spellTrigger1', 6], ['spellId1', $spell->id]],
+        ['AND', ['spellTrigger2', 6], ['spellId2', $spell->id]],
+        ['AND', ['spellTrigger3', 6], ['spellId3', $spell->id]],
+        ['AND', ['spellTrigger4', 6], ['spellId4', $spell->id]],
+        ['AND', ['spellTrigger5', 6], ['spellId5', $spell->id]],
+    );
+
+
+    $tbItem = new ItemList($conditions);
+    if (!$tbItem->error)
+    {
+        $pageData['relTabs'][] = array(
+            'file'   => 'item',
+            'data'   => $tbItem->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'taught-by-item',
+                'name' => '$LANG.tab_taughtby'
+            ]
+        );
+
+        $tbItem->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+    }
+
     // find associated NPC, Item and merge results
     // taughtbypets (unused..?)
     // taughtbyquest
     // taughtbytrainers
     // taughtbyitem
 
-    /* used by npc
-        first check cat if not npc-spell :  break
-
-        stunt through the tables... >.<
-
-    */
-    $spellArr['taughtbyquest'] = [];
-
-    $spellArr['usedbynpc'] = [];
+    // tab: teaches
+    // -> spell_learn_spell
+    // -> skill_discovery_template
 
     /* NEW
-        scaling data
         conditions
-        difficulty-versions
-        spell_proc_data
-
     */
 
-/*
-
-    $questreward = DB::Aowow()->select('
-        SELECT c.?#
-        { , Title_loc?d AS Title_loc }
-        FROM quest_template c
-        { LEFT JOIN (locales_quest l) ON c.entry = l.entry AND ? }
-        WHERE
-            RewSpell = ?d
-            OR RewSpellCast = ?d
-        ',
-        $quest_cols[2],
-        (User::$localeId>0)? User::$localeId: DBSIMPLE_SKIP,
-        (User::$localeId>0)? 1: DBSIMPLE_SKIP,
-        $spellArr['entry'], $spellArr['entry']
+    // used by - creature
+    // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
+    $smart      = DB::Aowow()->selectCol('SELECT entryOrGUID FROM smart_scripts WHERE entryorguid > 0 AND source_type = 0 AND action_type IN (11, 75, 85, 86) AND action_param1 = ?d', $_id);
+    $conditions = array(
+        'OR',             ['id', $smart],
+        ['spell1', $_id], ['spell2', $_id], ['spell3', $_id], ['spell4', $_id],
+        ['spell5', $_id], ['spell6', $_id], ['spell7', $_id], ['spell8', $_id]
     );
-    if($questreward)
+
+    $ubCreature = new CreatureList($conditions);
+    if (!$ubCreature->error)
     {
-        $spellArr['questreward'] = [];
-        foreach($questreward as $i => $row)
-            $spellArr['questreward'][] = GetQuestInfo($row, 0xFFFFFF);
-        unset($questreward);
+        $pageData['relTabs'][] = array(
+            'file'   => 'creature',
+            'data'   => $ubCreature->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'used-by-npc',
+                'name' => '$LANG.tab_usedby'
+            ]
+        );
+
+        $ubCreature->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
     }
-*/
+
+    // tab: questreward
+    $query = 'SELECT qt.id FROM quest_template qt JOIN ?_spell s ON s.id = qt.SourceSpellId OR s.id = qt.RewardSpellCast OR (s.id = qt.RewardSpell AND qt.RewardSpellCast = 0)
+              WHERE (s.effect1Id IN (36, 57) AND effect1TriggerSpell = ?d) OR (s.effect2Id IN (36, 57) AND effect2TriggerSpell = ?d) OR (s.effect3Id IN (36, 57) AND effect3TriggerSpell = ?d)';
+
+    if ($ids = DB::Aowow()->selectCol($query, $_id, $_id, $_id))
+    {
+        $tbQuest = new QuestList(array(['id', $ids]));
+        if (!$tbQuest->error)
+        {
+            $pageData['relTabs'][] = array(
+                'file'   => 'quest',
+                'data'   => $tbQuest->getListviewData(),
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'id'   => 'reward-from-quest',
+                    'name' => '$LANG.tab_rewardfrom'
+                ]
+            );
+
+            $tbQuest->addGlobalsToJScript($smarty);
+        }
+    }
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
@@ -1139,7 +1558,7 @@ $smarty->updatePageVars(array(
     'type'   => TYPE_SPELL,
     'typeId' => $_id,
     'reqJS'  => array(
-        'template/js/swfobject.js'
+        $pageData['view3D'] ? 'template/js/swfobject.js' : null
     )
 ));
 $smarty->assign('community', CommunityContent::getAll(TYPE_SPELL, $_id));         // comments, screenshots, videos

@@ -3,6 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+
 class SpellList extends BaseType
 {
     use listviewHelper;
@@ -394,11 +395,11 @@ class SpellList extends BaseType
         {   // Blood 2|1 - Unholy 2|1 - Frost 2|1
             $runes = [];
             if ($_ = (($rCost & 0x300) >> 8))
-                $runes[] = $_." ".Lang::$spell['powerRunes'][2];
+                $runes[] = $_.' '.Lang::$spell['powerRunes'][2];
             if ($_ = (($rCost & 0x030) >> 4))
-                $runes[] = $_." ".Lang::$spell['powerRunes'][1];
-            if ($_ = ($rCost & 0x003))
-                $runes[] = $_." ".Lang::$spell['powerRunes'][0];
+                $runes[] = $_.' '.Lang::$spell['powerRunes'][1];
+            if ($_ =  ($rCost & 0x003))
+                $runes[] = $_.' '.Lang::$spell['powerRunes'][0];
 
             $str .= implode(', ', $runes);
         }
@@ -421,7 +422,7 @@ class SpellList extends BaseType
         else if ($this->curTpl['castTime'] > 0)
             return $short ? sprintf(Lang::$spell['castIn'], $this->curTpl['castTime'] / 1000) : Util::formatTime($this->curTpl['castTime']);
         // show instant only for player/pet/npc abilities (todo (low): unsure when really hidden (like talent-case))
-        else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
+        else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -6, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
             return '';
         // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only (todo (low): rule is imperfect)
         else if ($this->curTpl['damageClass'] != 1 || $this->curTpl['attributes0'] & 0x10)
@@ -487,14 +488,54 @@ class SpellList extends BaseType
     public function canTriggerSpell()
     {
         $idx = [];
-        // effect - 3: dummy; 32: trigger missile; 36: learn spell; 57: learn pet spell; 64/151: trigger spell (2); 101: feed pet; 133: unlearn specialization; 140/142: force cast (with value); 148/152/160: unk; 164: remove aura
+        // effect - 3: dummy; 32: trigger missile; 36: learn spell; 57: learn pet spell; 64/151: trigger spell (2); 101: feed pet; 133: unlearn specialization; 140/142: force cast (with value); 148/152/160: unk; 155: dualwield 2H; 164: remove aura
         // aura   - 4: dummy; 23/227: periodic trigger spell (with value); 42/231: proc trigger spell (with value); 48: unk; 109: add target trigger; 226: periodic dummy; 236: control vehicle; 284: linked
         for ($i = 1; $i < 4; $i++)
-            if (in_array($this->curTpl['effect'.$i.'Id'], [3, 32, 36, 57, 64, 101, 133, 142, 148, 151, 152, 160, 164]) || in_array($this->curTpl['effect'.$i.'AuraId'], [4, 23, 42, 48, 109, 226, 227, 231, 236, 284]))
-                if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0)
+            if (in_array($this->curTpl['effect'.$i.'Id'], [3, 32, 36, 57, 64, 101, 133, 142, 148, 151, 152, 155, 160, 164]) || in_array($this->curTpl['effect'.$i.'AuraId'], [4, 23, 42, 48, 109, 226, 227, 231, 236, 284]))
+                if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0 || $this->curTpl['effect'.$i.'MiscValue'] > 0)
                     $idx[] = $i;
 
         return $idx;
+    }
+
+    public function isChanneledSpell()
+    {
+        return $this->curTpl['attributes1'] & 0x44;
+    }
+
+    public function isHealingSpell()
+    {
+        $eff = [0, 3, 10, 67, 75, 136];                     // <no effect>, Dummy, Heal, Heal Max Health, Heal Mechanical, Heal Percent
+        $aur = [4, 8, 62, 69, 97, 226];                     // Dummy, Periodic Heal, Periodic Health Funnel, School Absorb, Mana Shield, Periodic Dummy
+
+        for ($i = 1; $i < 4; $i++)
+            if (!in_array($this->curTpl['effect'.$i.'Id'], $eff) && !in_array($this->curTpl['effect'.$i.'AuraId'], $aur))
+                return false;
+
+        return true;
+    }
+
+    public function isDamagingSpell()
+    {
+        $eff = [0, 2, 3, 9, 62];                            // <no effect>, Dummy, School Damage, Health Leech, Power Burn
+        $aur = [3, 4, 15, 53, 89, 162, 226];                // Periodic Damage, Dummy, Damage Shield, Periodic Health Leech, Periodic Damage Percent, Power Burn Mana, Periodic Dummy
+
+        for ($i = 1; $i < 4; $i++)
+            if (!in_array($this->curTpl['effect'.$i.'Id'], $eff) && !in_array($this->curTpl['effect'.$i.'AuraId'], $aur))
+                return false;
+
+        return true;
+    }
+
+    public function periodicEffectsMask()
+    {
+        $effMask = 0x0;
+
+        for ($i = 1; $i < 4; $i++)
+            if ($this->curTpl['effect'.$i.'Periode'] > 0)
+                $effMask |= 1 << ($i - 1);
+
+        return $effMask;
     }
 
     // description-, buff-parsing component
@@ -566,6 +607,10 @@ class SpellList extends BaseType
                 return eval('return '.$formula.';');
         }
 
+        // since this function may be called recursively, there are cases, where the already evaluated string is tried to be evaled again, throwing parse errors
+        if (strstr($formula, '</dfn>'))
+            return $formula;
+
         // hm, minor eval-issue. eval doesnt understand two operators without a space between them (eg. spelll: 18126)
         $formula = preg_replace('/(\+|-|\*|\/)(\+|-|\*|\/)/i', '\1 \2', $formula);
 
@@ -626,7 +671,7 @@ class SpellList extends BaseType
                 else
                     $base = $this->getField('duration');
 
-                if ($base < 0)
+                if ($base <= 0)
                     return Lang::$spell['untilCanceled'];
 
                 if ($op && is_numeric($oparg) && is_numeric($base))
@@ -1042,13 +1087,16 @@ class SpellList extends BaseType
             return array("", []);
 
     // step 1: if the text is supplemented with text-variables, get and replace them
-        if (empty($this->spellVars[$this->id]) && $this->curTpl['spellDescriptionVariableId'] > 0)
+        if ($this->curTpl['spellDescriptionVariableId'] > 0)
         {
-            $spellVars = DB::Aowow()->SelectCell('SELECT vars FROM ?_spellVariables WHERE id = ?d', $this->curTpl['spellDescriptionVariableId']);
-            $spellVars = explode("\n", $spellVars);
-            foreach ($spellVars as $sv)
-                if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $matches))
-                    $this->spellVars[$this->id][$matches[1]] = $matches[2];
+            if (empty($this->spellVars[$this->id]))
+            {
+                $spellVars = DB::Aowow()->SelectCell('SELECT vars FROM ?_spellVariables WHERE id = ?d', $this->curTpl['spellDescriptionVariableId']);
+                $spellVars = explode("\n", $spellVars);
+                foreach ($spellVars as $sv)
+                    if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $matches))
+                        $this->spellVars[$this->id][$matches[1]] = $matches[2];
+            }
 
             // replace self-references
             $reset = true;
@@ -1345,7 +1393,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
                 if ($cId = $this->curTpl['effect'.$i.'CreateItemId'])
                 {
-                    $createItem = (new ItemList(array(['i.id', (int)$cId])))->renderTooltip([], true, true);
+                    $createItem = (new ItemList(array(['i.id', (int)$cId])))->renderTooltip([], true, $this->id);
                     break;
                 }
             }
@@ -1520,13 +1568,13 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                 'cat'          => $this->curTpl['typeCat'],
                 'trainingcost' => $this->curTpl['trainingCost'],
                 'skill'        => count($this->curTpl['skillLines']) > 4 ? array_merge(array_splice($this->curTpl['skillLines'], 0, 4), [-1]): $this->curTpl['skillLines'], // display max 4 skillLines (fills max three lines in listview)
-                'reagents'     => $this->getReagentsForCurrent(),
+                'reagents'     => array_values($this->getReagentsForCurrent()),
                 'source'       => []
             );
 
             // Sources
             if (!empty($this->sources[$this->id]) && $s = $this->sources[$this->id])
-                $data[$this->id]['source'] = json_encode(array_keys($s), JSON_NUMERIC_CHECK);
+                $data[$this->id]['source'] = array_keys($s);
 
             // Proficiencies
             if ($this->curTpl['typeCat'] == -11)
@@ -1633,6 +1681,81 @@ spells / buffspells = {
                 $template->extendGlobalData(self::$type, $data, $extra);
         }
     }
+
+    // mostly similar to TC
+    public function getCastingTimeForBonus($asDOT = false)
+    {
+        $areaTargets = [7, 8, 15, 16, 20, 24, 30, 31, 33, 34, 37, 54, 56, 59, 104, 108];
+        $castingTime = $this->IsChanneledSpell() ? $this->curTpl['duration'] : $this->curTpl['castTime'];
+
+        if (!$castingTime)
+            return 3500;
+
+        if ($castingTime > 7000)
+            $castingTime = 7000;
+
+        if ($castingTime < 1500)
+            $castingTime = 1500;
+
+        if ($asDOT && !$this->isChanneledSpell())
+            $castingTime = 3500;
+
+        $overTime = 0;
+        $nEffects = 0;
+        $isDirect = false;
+        $isArea   = false;
+
+        for ($i = 1; $i <= 3; $i++)
+        {
+            if (in_array($this->curTpl['effect'.$i.'Id'], [2, 7, 8, 9, 62, 67]))
+                $isDirect = true;
+            else if (in_array($this->curTpl['effect'.$i.'AuraId'], [3, 8, 53]))
+                if ($_ = $this->curTpl['duration'])
+                    $overTime = $_;
+            else if ($this->curTpl['effect'.$i.'AuraId'])
+                $nEffects++;
+
+            if (in_array($this->curTpl['effect'.$i.'ImplicitTargetA'], $areaTargets) || in_array($this->curTpl['effect'.$i.'ImplicitTargetB'], $areaTargets))
+                $isArea = true;
+        }
+
+        // Combined Spells with Both Over Time and Direct Damage
+        if ($overTime > 0 && $castingTime > 0 && $isDirect)
+        {
+            // mainly for DoTs which are 3500 here otherwise
+            $originalCastTime = $this->curTpl['castTime'];
+            if ($this->curTpl['attributes0'] & 0x2)         // requires Ammo
+                $originalCastTime += 500;
+
+            if ($originalCastTime > 7000)
+                $originalCastTime = 7000;
+
+            if ($originalCastTime < 1500)
+                $originalCastTime = 1500;
+
+            // Portion to Over Time
+            $PtOT = ($overTime / 15000) / (($overTime / 15000) + (OriginalCastTime / 3500));
+
+            if ($asDOT)
+                $castingTime = $castingTime * $PtOT;
+            else if ($PtOT < 1)
+                $castingTime  = $castingTime * (1 - $PtOT);
+            else
+                $castingTime = 0;
+        }
+
+        // Area Effect Spells receive only half of bonus
+        if ($isArea)
+            $castingTime /= 2;
+
+        // -5% of total per any additional effect
+        $castingTime -= ($nEffects * 175);
+        if ($castingTime < 0)
+            $castingTime = 0;
+
+        return $castingTime;
+    }
+
 }
 
 

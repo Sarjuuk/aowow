@@ -3,15 +3,6 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-/*
-    ! DONT FORGET !
-
-        REMOVE TEMP-HACK FROM Lang::load
-
-        fix locale files in gereral >.<
-
-    ! DONT FORGET !
-*/
 
 class ItemList extends BaseType
 {
@@ -40,7 +31,7 @@ class ItemList extends BaseType
     {
         // search by statweight
         if ($miscData && isset($miscData['wt']) && isset($miscData['wtv']))
-            $conditions[] = $this->createConditionsForWeights($miscData, $this->queryOpts);
+            $conditions[] = $this->createConditionsForWeights($miscData);
 
         parent::__construct($conditions, $applyFilter);
 
@@ -85,7 +76,7 @@ class ItemList extends BaseType
     public function getExtendedCost()
     {
         // placeholder
-        return [];
+        return [];  // [id => qty]
     }
 
     public function getListviewData($addInfoMask = 0x0)
@@ -126,7 +117,7 @@ class ItemList extends BaseType
                     $data[$this->id]['repaircost'] = $_;
             }
 
-            if ($addInfoMask & (ITEMINFO_JSON |ITEMINFO_GEM))
+            if ($addInfoMask & (ITEMINFO_JSON | ITEMINFO_GEM))
                 if (isset($this->curTpl['score']))
                     $data[$this->id]['score'] = $this->curTpl['score'];
 
@@ -300,8 +291,8 @@ class ItemList extends BaseType
         // requires map (todo: reparse ?_zones for non-conflicting data; generate Link to zone)
         if ($_ = $this->curTpl['map'])
         {
-            $map = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE mapId=?d LIMIT 1', $_);
-            $x .= '<br /><a href="?map='.$_.'" class="q1">'.Util::localizedString($map, 'name').'</a>';
+            $map = DB::Aowow()->selectRow('SELECT * FROM ?_zones WHERE mapId = ?d LIMIT 1', $_);
+            $x .= '<br /><a href="?zone='.$_.'" class="q1">'.Util::localizedString($map, 'name').'</a>';
         }
 
         // requires area
@@ -316,7 +307,7 @@ class ItemList extends BaseType
             $x .= '<br />'.Lang::$item['conjured'];
 
         // bonding
-        if (($_flags & ITEM_FLAG_ACCOUNTBOUND))
+        if ($_flags & ITEM_FLAG_ACCOUNTBOUND)
             $x .= '<br /><!--bo-->'.Lang::$item['bonding'][0];
         else if ($this->curTpl['bonding'])
             $x .= '<br /><!--bo-->'.Lang::$item['bonding'][$this->curTpl['bonding']];
@@ -339,7 +330,7 @@ class ItemList extends BaseType
 
         // max duration
         if ($dur = $this->curTpl['duration'])
-            $x .= "<br />".Lang::$game['duration'] . ' '. Util::formatTime(abs($dur) * 1000) . ($dur < 0 ? ' ('.Lang::$game['realTime'].')' : null);
+            $x .= "<br />".Lang::$game['duration'].Lang::$colon.Util::formatTime(abs($dur) * 1000).($this->curTpl['flagsCustom'] & 0x1 ? ' ('.Lang::$item['realTime'].')' : null);
 
         // required holiday
         if ($hId = $this->curTpl['holidayId'])
@@ -353,7 +344,7 @@ class ItemList extends BaseType
             $x .= '<br /><a class="q1" href="?quest='.$this->curTpl['startQuest'].'">'.Lang::$item['startQuest'].'</a>';
 
         // containerType (slotCount)
-        if ($this->curTpl['slots'] > 1)
+        if ($this->curTpl['slots'] > 0)
         {
             $fam = log($this->curTpl['bagFamily'], 2) + 1;
             // word order differs <_<
@@ -380,7 +371,7 @@ class ItemList extends BaseType
 
             $x .= '</tr></table>';
         }
-        else if ($_ = $this->curTpl['slot'])                // yes, slot can occur on random items and is than also displayed <_<
+        else if (($_ = $this->curTpl['slot']) && $_class != ITEM_CLASS_CONTAINER) // yes, slot can occur on random items and is then also displayed <_< .. excluding Bags >_>
             $x .= '<br />'.Lang::$item['inventoryType'][$this->curTpl['slot']].'<br />';
         else
             $x .= '<br />';
@@ -571,12 +562,13 @@ class ItemList extends BaseType
 
         // required level
         if (($_flags & ITEM_FLAG_ACCOUNTBOUND) && $_quality == ITEM_QUALITY_HEIRLOOM)
-            $x .= sprintf(Lang::$game['reqLevelHlm'], ' 1'.Lang::$game['valueDelim'].MAX_LEVEL.' ('.($interactive ? printf(Util::$changeLevelString, MAX_LEVEL) : '<!--lvl-->'.MAX_LEVEL).')').'<br />';
+            $x .= sprintf(Lang::$game['reqLevelHlm'], ' 1'.Lang::$game['valueDelim'].MAX_LEVEL.' ('.($interactive ? sprintf(Util::$changeLevelString, MAX_LEVEL) : '<!--lvl-->'.MAX_LEVEL).')').'<br />';
         else if ($_reqLvl > 1)
             $x .= sprintf(Lang::$game['reqLevel'], $_reqLvl).'<br />';
 
         // item level
-        $x .= Lang::$item['itemLevel'].' '.$this->curTpl['itemLevel'];
+        if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON]))
+            $x .= Lang::$item['itemLevel'].' '.$this->curTpl['itemLevel'].'<br />';
 
         // required skill
         if ($reqSkill = $this->curTpl['requiredSkill'])
@@ -585,28 +577,26 @@ class ItemList extends BaseType
             if ($this->curTpl['requiredSkillRank'] > 0)
                 $_ .= ' ('.$this->curTpl['requiredSkillRank'].')';
 
-            $x .= '<br />'.sprintf(Lang::$game['requires'], $_);
+            $x .= sprintf(Lang::$game['requires'], $_).'<br />';
         }
 
         // required spell
         if ($reqSpell = $this->curTpl['requiredSpell'])
-            $x .= '<br />'.Lang::$game['requires2'].' <a class="q1" href="?spell='.$reqSpell.'">'.SpellList::getName($reqSpell).'</a>';
+            $x .= Lang::$game['requires2'].' <a class="q1" href="?spell='.$reqSpell.'">'.SpellList::getName($reqSpell).'</a><br />';
 
         // required reputation w/ faction
         if ($reqFac = $this->curTpl['requiredFaction'])
-            $x .= '<br />'.sprintf(Lang::$game['requires'], '<a class="q1" href=?faction="'.$reqFac.'">'.FactionList::getName($reqFac).'</a> - '.Lang::$game['rep'][$this->curTpl['requiredFactionRank']]);
+            $x .= sprintf(Lang::$game['requires'], '<a class="q1" href=?faction="'.$reqFac.'">'.FactionList::getName($reqFac).'</a> - '.Lang::$game['rep'][$this->curTpl['requiredFactionRank']]).'<br />';
 
         // locked or openable
         if ($locks = Lang::getLocks($this->curTpl['lockId'], true))
-            $x .= '<br /><span class="q0">'.Lang::$item['locked'].'<br />'.implode('<br />', $locks).'</span>';
+            $x .= '<span class="q0">'.Lang::$item['locked'].'<br />'.implode('<br />', $locks).'</span><br />';
         else if ($this->curTpl['flags'] & ITEM_FLAG_OPENABLE)
-            $x .= '<br /><span class="q2">'.Lang::$item['openClick'].'</span>';
+            $x .= '<span class="q2">'.Lang::$item['openClick'].'</span><br />';
 
         // upper table: done
         if (!$subOf)
             $x .= '</td></tr></table>';
-        else
-            $x .= '<br>';
 
         // spells on item
         if (!$this->canTeachSpell())
@@ -648,7 +638,7 @@ class ItemList extends BaseType
                                 $parsed = sprintF($link, $parsed);
                         }
 
-                        $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id][0]] . $parsed . $itemSpellsAndTrigger[$itemSpells->id][1];
+                        $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id][0]].$parsed.$itemSpellsAndTrigger[$itemSpells->id][1];
                     }
             }
         }
@@ -1050,7 +1040,7 @@ class ItemList extends BaseType
         if (!Lang::$item['statType'][$type])                // unknown rating
             return sprintf(Lang::$item['statType'][count(Lang::$item['statType']) - 1], $type, $value);
         else if (in_array($type, Util::$lvlIndepRating))    // level independant Bonus
-            return Lang::$item['trigger'][1] . str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::$item['statType'][$type]);
+            return Lang::$item['trigger'][1].str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::$item['statType'][$type]);
         else                                                // rating-Bonuses
         {
             $scaling = true;
@@ -1181,7 +1171,7 @@ class ItemList extends BaseType
                     'name'          => Util::localizedString($data, 'name'),
                     'enchantment'   => implode(', ', $jsonText),
                     'jsonequip'     => $jsonEquip,
-                    'chance'        => $data['chance']   // hmm, only needed for item detail page...
+                    'chance'        => $data['chance']      // hmm, only needed for item detail page...
                 );
             }
 
@@ -1199,14 +1189,14 @@ class ItemList extends BaseType
             'classs'      => $this->curTpl['class'],
             'subclass'    => $this->curTpl['subClass'],
             'subsubclass' => $this->curTpl['subSubClass'],
-            'heroic'      => (string)($this->curTpl['flags'] & 0x8),
+            'heroic'      => ($this->curTpl['flags'] & 0x8) >> 3,
             'side'        => $this->curTpl['flagsExtra'] & 0x3 ? 3 - ($this->curTpl['flagsExtra'] & 0x3) : Util::sideByRaceMask($this->curTpl['requiredRace']),
             'slot'        => $this->curTpl['slot'],
             'slotbak'     => $this->curTpl['slotBak'],
             'level'       => $this->curTpl['itemLevel'],
             'reqlevel'    => $this->curTpl['requiredLevel'],
             'displayid'   => $this->curTpl['displayId'],
-            // 'commondrop'  => 'true' / null           // set if the item is a loot-filler-item .. checke common ref-templates..?
+            // 'commondrop'  => 'true' / null           // set if the item is a loot-filler-item .. check common ref-templates..?
             'holres'      => $this->curTpl['resHoly'],
             'firres'      => $this->curTpl['resFire'],
             'natres'      => $this->curTpl['resNature'],
@@ -1334,8 +1324,6 @@ class ItemListFilter extends Filter
         157 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_SMARTLOOT          ], // smartloot
         159 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_MILLABLE           ], // millable
         162 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_DEPRECATED         ], // deprecated
-        127 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_UNAVAILABLE           ], // notavailable
-     // 161 => [FILTER_CR_FLAG,      'cuFlags',                ~CUSTOM_UNAVAILABLE          ], // availabletoplayers .. wait what?!
         151 => [FILTER_CR_NUMERIC,   'id',                     null,                    true], // id
         100 => [FILTER_CR_NUMERIC,   'is.nsockets'                                          ], // nsockets
         111 => [FILTER_CR_NUMERIC,   'requiredSkillRank',      null,                    true], // reqskillrank
@@ -1479,6 +1467,10 @@ class ItemListFilter extends Filter
             case 15:                                        // unique [yn]
                 if ($this->int2Bool($cr[1]))
                     return ['maxCount', 1, $cr[1] ? null : '!'];
+                break;
+            case 161:                                        // availabletoplayers [yn]
+                if ($this->int2Bool($cr[1]))
+                    return [['cuFlags', CUSTOM_UNAVAILABLE, '&'], 0, $cr[1] ? null : '!'];
                 break;
             case 80:                                        // has sockets [enum]
                 switch ($cr[1])
@@ -1728,10 +1720,20 @@ class ItemListFilter extends Filter
         if (isset($_v['upg']))
         {
             // valid item?
-            if (is_int($_v['upg']) && DB::Aowow()->selectCell('SELECT 1 FROM ?_items WHERE class IN (2, 3, 4) AND id = ?d', $_v['upg']))
-                $this->formData['form']['upg'] = $_v['upg'];
-            else
+            if (!is_int($_v['upg']))
                 unset($_v['upg']);
+            else
+            {
+                $_ = DB::Aowow()->selectCell('SELECT slot FROM ?_items WHERE class IN (2, 3, 4) AND id = ?d', $_v['upg']);
+                if ($_ === null)
+                    unset($_v['upg']);
+                else
+                {
+                    $this->formData['form']['upg'] = $_v['upg'];
+                    if ($_)
+                        $parts[] = ['slot', $_];
+                }
+            }
         }
 
         // group by [form only]

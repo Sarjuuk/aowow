@@ -3,6 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+
 class CurrencyList extends BaseType
 {
     public static $type      = TYPE_CURRENCY;

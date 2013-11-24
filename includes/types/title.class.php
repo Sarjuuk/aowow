@@ -3,6 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+
 class TitleList extends BaseType
 {
     use listviewHelper;

@@ -15,14 +15,11 @@
             {foreach name=i from=$data item=curr}
                 {ldelim}
                     {foreach from=$curr  key='name' item=val}
-                        {if $name != 'id' && $name != 'name' && $name != 'heroic'}
+                        {if $name != 'id' && $name != 'name'}
                             {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
                         {/if}
                     {/foreach}
                     name:'{$curr.name|escape:"quotes"}',
-                    {if isset($curr.heroic)}
-                        heroic:1,
-                    {/if}
                     id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}

@@ -17,24 +17,23 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($iSet->error)
         $smarty->notFound(Lang::$game['itemset']);
 
-    $ta   = $iSet->getField('contentGroup');
-    $ty   = $iSet->getField('type');
-    $ev   = $iSet->getField('holidayId');
-    $sk   = $iSet->getField('skillId');
-    $mask = $iSet->getField('classMask');
-    $rLvl = $iSet->getField('reqLevel');
-    $name = $iSet->getField('name', true);
-    $cnt  = count($iSet->getField('pieces'));
-    $unav = $iSet->getField('cuFlags') & CUSTOM_UNAVAILABLE;
+    $_ta  = $iSet->getField('contentGroup');
+    $_ty  = $iSet->getField('type');
+    $_ev  = $iSet->getField('holidayId');
+    $_sk  = $iSet->getField('skillId');
+    $_cl  = $iSet->getField('classMask');
+    $_lvl = $iSet->getField('reqLevel');
+    $_na  = $iSet->getField('name', true);
+    $_cnt = count($iSet->getField('pieces'));
 
     $infobox = [];
     // unavailable (todo (low): set data)
-    if ($unav)
+    if ($iSet->getField('cuFlags') & CUSTOM_UNAVAILABLE)
         $infobox[] = Lang::$main['unavailable'];
 
     // holiday
-    if ($ev)
-        $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$ev.']'.WorldEventList::getName($ev).'[/url]';
+    if ($_ev)
+        $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$_ev.']'.WorldEventList::getName($_ev).'[/url]';
 
     // itemLevel
     if ($min = $iSet->getField('minLevel'))
@@ -49,11 +48,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     // class
-    if ($mask)
+    if ($_cl)
     {
         $foo = [];
         for ($i = 0; $i < 11; $i++)
-            if ($mask & (1 << $i))
+            if ($_cl & (1 << $i))
                 $foo[] = (!fMod(count($foo) + 1, 3) ? '\n' : null) . '[class='.($i + 1).']';
 
         $t = count($foo) == 1 ? Lang::$game['class'] : Lang::$game['classes'];
@@ -61,16 +60,16 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     // required level
-    if ($rLvl)
-        $infobox[] = sprintf(Lang::$game['reqLevel'], $rLvl);
+    if ($_lvl)
+        $infobox[] = sprintf(Lang::$game['reqLevel'], $_lvl);
 
     // type
-    if ($ty)
-        $infobox[] = Lang::$game['type'].lang::$colon.Lang::$itemset['types'][$ty];
+    if ($_ty)
+        $infobox[] = Lang::$game['type'].lang::$colon.Lang::$itemset['types'][$_ty];
 
     // tag
-    if ($ta)
-        $infobox[] = Lang::$itemset['_tag'].Lang::$colon.'[url=?itemsets&filter=ta='.$ta.']'.Lang::$itemset['notes'][$ta].'[/url]';
+    if ($_ta)
+        $infobox[] = Lang::$itemset['_tag'].Lang::$colon.'[url=?itemsets&filter=ta='.$_ta.']'.Lang::$itemset['notes'][$_ta].'[/url]';
 
     // pieces + Summary
     $pieces  = [];
@@ -145,13 +144,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     // path
-    if ($mask)
+    if ($_cl)
     {
         for ($i = 0; $i < 11; $i++)
         {
-            if ($mask & (1 << $i))
+            if ($_cl & (1 << $i))
             {
-                if ($mask == (1 << $i))                     // only bit set, add path
+                if ($_cl == (1 << $i))                      // only bit set, add path
                     $path[] = $i + 1;
 
                 break;                                      // break anyway (cant set multiple classes)
@@ -160,15 +159,15 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     $skill = '';
-    if ($sk)
+    if ($_sk)
     {
         // todo (med): kill this Lang::monstrosity with Skills
-        $spellLink = sprintf('<a href="?spells=11.%s">%s</a> (%s)', $sk, Lang::$spell['cat'][11][$sk][0], $iSet->getField('skillLevel'));
+        $spellLink = sprintf('<a href="?spells=11.%s">%s</a> (%s)', $_sk, Lang::$spell['cat'][11][$_sk][0], $iSet->getField('skillLevel'));
         $skill = ' &ndash; <small><b>'.sprintf(Lang::$game['requires'], $spellLink).'</b></small>';
     }
 
     $pageData = array(
-        'title'   => $name,                                 // for header
+        'title'   => $_na,                                  // for header
         'path'    => $path,
         'infobox' => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
         'relTabs' => [],
@@ -176,47 +175,47 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'spells'  => $spells,
         'view3D'  => json_encode($eqList, JSON_NUMERIC_CHECK),
         'compare' => array(
-            'qty'   => $cnt,
+            'qty'   => $_cnt,
             'items' => $compare,
-            'level' => $rLvl
+            'level' => $_lvl
         ),
         'page'    => array(
-            'name'        => $name,                         // for page content
+            'name'        => $_na,                          // for page content
             'id'          => $_id,
             'bonusExt'    => $skill,
-            'description' => $ta ? sprintf(Lang::$itemset['_desc'], $name, Lang::$itemset['notes'][$ta], $cnt) : sprintf(Lang::$itemset['_descTagless'], $name, $cnt),
-            'unavailable' => $unav
+            'description' => $_ta ? sprintf(Lang::$itemset['_desc'], $_na, Lang::$itemset['notes'][$_ta], $_cnt) : sprintf(Lang::$itemset['_descTagless'], $_na, $_cnt),
+            'unavailable' => (bool)($iSet->getField('cuFlags') & CUSTOM_UNAVAILABLE)
         )
     );
 
-    $iSet->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+    $iSet->addGlobalsToJscript($smarty);
 
     // related sets (priority: 1: similar tag + class; 2: has event; 3: no tag + similar type, 4: similar type + profession)
     $rel = [];
 
-    if ($ta && count($path) == 3)
+    if ($_ta && count($path) == 3)
     {
         $rel[] = ['id', $_id, '!'];
         $rel[] = ['classMask', 1 << (end($path) - 1), '&'];
-        $rel[] = ['contentGroup', (int)$ta];
+        $rel[] = ['contentGroup', (int)$_ta];
     }
-    else if ($ev)
+    else if ($_ev)
     {
         $rel[] = ['id', $_id, '!'];
         $rel[] = ['holidayId', 0, '!'];
     }
-    else if ($sk)
+    else if ($_sk)
     {
         $rel[] = ['id', $_id, '!'];
         $rel[] = ['contentGroup', 0];
         $rel[] = ['skillId', 0, '!'];
-        $rel[] = ['type', $ty];
+        $rel[] = ['type', $_ty];
     }
-    else if (!$ta && $ty)
+    else if (!$_ta && $_ty)
     {
         $rel[] = ['id', $_id, '!'];
         $rel[] = ['contentGroup', 0];
-        $rel[] = ['type', $ty];
+        $rel[] = ['type', $_ty];
         $rel[] = ['skillId', 0];
     }
 

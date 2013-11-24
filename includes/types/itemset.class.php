@@ -3,6 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+
 class ItemsetList extends BaseType
 {
     use ListviewHelper;

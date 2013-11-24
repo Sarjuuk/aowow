@@ -12,7 +12,7 @@ $lang = array(
         'ab'            => ["yr",    "mo",     "wk",    "day",  "hr",    "min",     "sec",     "ms"]
     ),
     'main' => array(
-'help'      => "Help",
+        'help'          => "Help",
         'name'          => "name",
         'link'          => "Link",
         'signIn'        => "Sign in",
@@ -41,14 +41,6 @@ $lang = array(
         'forum'         => "Forum",
         'n_a'           => "n/a",
 
-        // err_title = An error in AoWoW
-        // un_err = Enter your username
-        // pwd_err = Enter your password
-        // signin_msg = Enter your game account
-        // c_pwd = Repeat password
-        // facts = Facts
-        // This_Object_cant_be_found = Object map not available, Object may be spawned via a script
-
         // filter
         'extSearch'     => "Extended search",
         'addFilter'     => "Add another Filter",
@@ -66,13 +58,13 @@ $lang = array(
         'disabled'      => "Disabled",
         'disabledHint'  => "Cannot be attained or completed",
         'serverside'    => "Serverside",
-        'serversideHint' => "These informations are not in the Client and have been provided by sniffing and/or guessing.",
+        'serversideHint'=> "These informations are not in the Client and have been provided by sniffing and/or guessing.",
 
         // red buttons
         'links'         => "Links",
         'compare'       => "Compare",
         'view3D'        => "View in 3D",
-'findUpgrades' => "Find upgrades...",
+        'findUpgrades'  => "Find upgrades...",
 
         // misc Tools
         'subscribe'     => "Subscribe",
@@ -86,15 +78,15 @@ $lang = array(
         'englishOnly'   => "This page is only available in <b>English</b>.",
 
         // calculators
-'preset'    => "Preset",
-'addWeight' => "Add another weight",
-'createWS'  => "Create a weight scale",
-'jcGemsOnly' => "Include <span%s>JC-only</span> gems",
-'cappedHint' => 'Tip: <a href="javascript:;" onclick="fi_presetDetails();">Remove</a> weights for capped statistics such as Hit rating.',
-'groupBy'   => "Group By",
-'gb'        => array(
-    ['None', 'none'],         ['Slot', 'slot'],       ['Level', 'level'],     ['Source', 'source']
-),
+        'preset'        => "Preset",
+        'addWeight'     => "Add another weight",
+        'createWS'      => "Create a weight scale",
+        'jcGemsOnly'    => "Include <span%s>JC-only</span> gems",
+        'cappedHint'    => 'Tip: <a href="javascript:;" onclick="fi_presetDetails();">Remove</a> weights for capped statistics such as Hit rating.',
+        'groupBy'       => "Group By",
+        'gb'            => array(
+            ['None', 'none'],         ['Slot', 'slot'],       ['Level', 'level'],     ['Source', 'source']
+        ),
         'compareTool'   => "Item Comparison Tool",
         'talentCalc'    => "Talent Calculator",
         'petCalc'       => "Hunter Pet Calculator",
@@ -117,7 +109,7 @@ $lang = array(
         'difficulty'    => "Difficulty",
         'dispelType'    => "Dispel type",
         'duration'      => "Duration",
-        'gameObject'    => "objects",
+        'gameObject'    => "object",
         'gameObjects'   => "Objects",
         'glyphType'     => "Glyph type",
         'race'          => "race",
@@ -130,12 +122,14 @@ $lang = array(
         'faction'       => "faction",
         'factions'      => "Factions",
         'cooldown'      => "%s cooldown",
-'item'      => "item",
-'items'     => "Items",
+        'item'          => "item",
+        'items'         => "Items",
         'itemset'       => "item Set",
         'itemsets'      => "Item Sets",
         'mechanic'      => "Mechanic",
         'mechAbbr'      => "Mech.",
+        'npc'           => "NPC",
+        'npcs'          => "NPCs",
         'pet'           => "Pet",
         'pets'          => "Hunter Pets",
         'profile'       => "profile",
@@ -164,6 +158,7 @@ $lang = array(
         'specs'         => "Specs",
         '_roles'        => ['Healer', 'Melee DPS', 'Ranged DPS', 'Tank'],
 
+        'modes'         => ['Normal / Normal 10', 'Heroic / Normal 25', 'Heroic 10', 'Heroic 25'],
         'expansions'    => array("Classic", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Strength", "Agility", "Stamina", "Intellect", "Spirit"),
         'languages'     => array(
@@ -251,12 +246,6 @@ $lang = array(
         'editAccount'   => "Simply use the forms below to update your account information",
         'publicDesc'    => "Public Description",
         'viewPubDesc'   => "View your Public Description in your <a href=\"?user=%s\">Profile  Page</a>",
-
-
-        // Please_enter_your_username = Enter your username (account)
-        // Please_enter_your_password = Enter your password
-        // Sign_in_to_your_Game_Account = Enter your game account:
-        // Please_enter_your_confirm_password = Please enter your confirm password
     ),
     'npc'   => array(
         'rank'          => ['Normal', 'Elite', 'Rare Elite', 'Boss', 'Rare']
@@ -371,6 +360,8 @@ $lang = array(
         '_interval'     => "Interval",
         '_inSlot'       => "in slot",
 
+        'ppm'           => "%s procs per minute",
+        'procChance'    => "Proc chance",
         'starter'       => "Starter spell",
         'trainingCost'  => "Training cost",
         'remaining'     => "%s remaining",
@@ -388,11 +379,16 @@ $lang = array(
         'pctCostOf'     => "of base %s",
         'costPerSec'    => ", plus %s per sec",
         'costPerLevel'  => ", plus %s per level",
+        '_scaling'      => "Scaling",
+        'scaling'       => array(
+            'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
+            'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
+        ),
         'powerRunes'    => ["Frost", "Unholy", "Blood", "Death"],
         'powerTypes'    => array(
             -2 => "Health",   -1 => null,   "Mana",     "Rage",     "Focus",    "Energy",       "Happiness",        "Rune",    "Runic Power",
-            'AMMOSLOT' => "Ammo",           'STEAM' => "Steam Pressure",        'WRATH' => "Wrath",                 'PYRITE' => "Pyrite",
-            'HEAT' => "Heat",               'OOZE' => "Ooze",                   'BLOOD_POWER' => "Blood Power"
+            'AMMOSLOT' => "Ammo",           'STEAM' => "Steam Pressure",        'WRATH'       => "Wrath",           'PYRITE' => "Pyrite",
+            'HEAT'     => "Heat",           'OOZE'  => "Ooze",                  'BLOOD_POWER' => "Blood Power"
         ),
         'relItems'      => array (
             'base'    => "<small>Show %s related to <b>%s</b></small>",
@@ -437,31 +433,53 @@ $lang = array(
               0 => "Uncategorized"
         ),
         'armorSubClass' => array(
-            "Miscellaneous",        "Cloth Armor",      "Leather Armor",        "Mail Armor",                   "Plate Armor",
-            null,                   "Shields",          "Librams",              "Idols",                        "Totems",
+            "Miscellaneous",                        "Cloth Armor",                          "Leather Armor",                        "Mail Armor",                           "Plate Armor",
+            null,                                   "Shields",                              "Librams",                              "Idols",                                "Totems",
             "Sigils"
         ),
-        'weaponSubClass' => array(
+        'weaponSubClass' => array(                          // ordered by content firts, then alphabeticaly
             15 => "Daggers",                        13 => "Fist Weapons",                    0 => "One-Handed Axes",                 4 => "One-Handed Maces",                7 => "One-Handed Swords",
              6 => "Polearms",                       10 => "Staves",                          1 => "Two-Handed Axes",                 5 => "Two-Handed Maces",                8 => "Two-Handed Swords",
              2 => "Bows",                           18 => "Crossbows",                       3 => "Guns",                           16 => "Thrown",                         19 => "Wands",
             20 => "Fishing Poles",                  14 => "Miscellaneous"
         ),
         'subClassMasks' => array(
-            0x02A5F3 => 'Melee Weapon',                 0x0060 => 'Shield',                         0x04000C => 'Ranged Weapon',                0xA091 => 'One-Handed Melee Weapon'
+            0x02A5F3 => 'Melee Weapon',             0x0060 => 'Shield',                     0x04000C => 'Ranged Weapon',            0xA091 => 'One-Handed Melee Weapon'
         ),
         'traitShort'    => array(
-            'atkpwr'    => "AP",                        'rgdatkpwr' => "RAP",                                   'splpwr'    => "SP",
-            'arcsplpwr' => "ArcP",                      'firsplpwr' => "FireP",                                 'frosplpwr' => "FroP",
-            'holsplpwr' => "HolP",                      'natsplpwr' => "NatP",                                  'shasplpwr' => "ShaP",
-            'splheal'   => "Heal"
-        )
+            'atkpwr'    => "AP",                    'rgdatkpwr' => "RAP",                   'splpwr'    => "SP",                    'arcsplpwr' => "ArcP",                  'firsplpwr' => "FireP",
+            'frosplpwr' => "FroP",                  'holsplpwr' => "HolP",                  'natsplpwr' => "NatP",                  'shasplpwr' => "ShaP",                  'splheal'   => "Heal"
+        ),
+        'spellModOp'    => array(
+            "Damage",                               "Duration",                             "Thread",                               "Effect 1",                             "Charges",
+            "Range",                                "Radius",                               "Critical Hit Chance",                  "All Effects",                          "Casting Time loss",
+            "Casting Time",                         "Cooldown",                             "Effect 2",                             "Ignore Armor",                         "Cost",
+            "Critical Damage Bonus",                "Chance to Fail",                       "Jump Targets",                         "Proc Chance",                          "Intervall",
+            "Multiplier (Damage)",                  "Global Cooldown",                      "Damage over Time",                     "Effect 3",                             "Multiplier (Bonus)",
+            null,                                   "Procs per Minute",                     "Multiplier (Value)",                   "Chance to Resist Dispel",              "Critical Damage Bonus2",
+            "Refund Cost on Fail"
+        ),
+        'combatRating'  => array(
+            "Weapon Skill",                         "Defense Skill",                        "Dodge",                                "Parry",                                "Block",
+            "Melee Hit Chance",                     "Ranged Hit Chance",                    "Spell Hit Chance",                     "Casting Melee Hit Chance",             "Casting Ranged Hit Chance",
+            "Casting Spell Hit Chance",             "Taken Melee Hit Chance",               "Taken Ranged Hit Chance",              "Taken Spell Hit Chance",               "Taken Critical Melee Hit Chance",
+            "Taken Critical Ranged Hit Chance",     "Taken Critical Spell Hit Chance",      "Melee Haste",                          "Ranged Haste",                         "Spell Haste",
+            "Mainhand Weapon Skill",                "Offhand Weapon Skill",                 "Ranged Weapon Skill",                  "Expertise",                            "Armor Penetration"
+        ),
+        'lockType'      => array(
+            null,                                   "Lockpicking",                          "Herbalism",                            "Mining",                               "Disarm Trap",
+            "Open",                                 "Treasure (DND)",                       "Calcified Elven Gems (DND)",           "Close",                                "Arm Trap",
+            "Quick Open",                           "Quick Close",                          "Open Tinkering",                       "Open Kneeling",                        "Open Attacking",
+            "Gahz'ridian (DND)",                    "Blasting",                             "PvP Open",                             "PvP Close",                            "Fishing (DND)",
+            "Inscription",                          "Open From Vehicle"
+        ),
+        'stealthType'   => ["General", "Trap"],
+        'invisibilityType' => ["General", 3 => "Trap", 6 => "Drunk"]
     ),
     'item' => array(
         'armor'         => "%s Armor",
         'block'         => "%s Block",
         'charges'       => "Charges",
-        'expend'        => "expendable",
         'locked'        => "Locked",
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Heroic",
@@ -483,41 +501,41 @@ $lang = array(
         'itemLevel'     => "Item Level",
         'randEnchant'   => "&lt;Random enchantment&gt",
         'readClick'     => "&lt;Right Click To Read&gt",
-'openClick'     => "&lt;Right Click To Open&gt",
+        'openClick'     => "&lt;Right Click To Open&gt",
         'set'           => "Set",
-'partyLoot' => "Party loot",
-'smartLoot' => "Smart loot",
-'indestructible' => "Cannot be destroyed",
-'deprecated'    => "Deprecated",
-'useInShape' => "Usable when shapeshifted",
-'useInArena' => "Usable in arenas",
-'refundable' => "Refundable",
-'noNeedRoll' => "Cannot roll Need",
-'atKeyring' => "Can be placed in the keyring",
-'worth'     => "Worth",
-'consumable'    => "Consumable",
-'nonConsumable'    => "Non-consumable",
-'accountWide'   => "Account-wide",
-'millable'  => "Millable",
-'noEquipCD' => "No equip cooldown",
-'prospectable'  => "Prospectable",
-'disenchantable' => "Disenchantable",
-'cantDisenchant' => "Cannot be disenchanted",
-'repairCost' => "Repair cost",
-'tool'      => "Tool",
-'cost'      => "Cost",    
-'content'   => "Content",
-'_transfer' => 	'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(images/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="%s-icon">%s</span>.',
-'_unavailable' => "This item is not available to players.",
-'_rndEnchants'  => "Random Enchantments",
-'_chance'   => "(%s%% chance)",
-'_reqLevel' => "Required level",
-'slot'      => "Slot",
-'_quality'  => "Quality",
-'usableBy'  => "Usable by",
-'buyout'    => "Buyout price",
-'each'      => "each",
-'gems'      => "Gems",
+        'partyLoot'     => "Party loot",
+        'smartLoot'     => "Smart loot",
+        'indestructible'=> "Cannot be destroyed",
+        'deprecated'    => "Deprecated",
+        'useInShape'    => "Usable when shapeshifted",
+        'useInArena'    => "Usable in arenas",
+        'refundable'    => "Refundable",
+        'noNeedRoll'    => "Cannot roll Need",
+        'atKeyring'     => "Can be placed in the keyring",
+        'worth'         => "Worth",
+        'consumable'    => "Consumable",
+        'nonConsumable' => "Non-consumable",
+        'accountWide'   => "Account-wide",
+        'millable'      => "Millable",
+        'noEquipCD'     => "No equip cooldown",
+        'prospectable'  => "Prospectable",
+        'disenchantable'=> "Disenchantable",
+        'cantDisenchant'=> "Cannot be disenchanted",
+        'repairCost'    => "Repair cost",
+        'tool'          => "Tool",
+        'cost'          => "Cost",
+        'content'       => "Content",
+        '_transfer'     => 'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(images/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="%s-icon">%s</span>.',
+        '_unavailable'  => "This item is not available to players.",
+        '_rndEnchants'  => "Random Enchantments",
+        '_chance'       => "(%s%% chance)",
+        '_reqLevel'     => "Required level",
+        'slot'          => "Slot",
+        '_quality'      => "Quality",
+        'usableBy'      => "Usable by",
+        'buyout'        => "Buyout price",
+        'each'          => "each",
+        'gems'          => "Gems",
         'socketBonus'   => "Socket Bonus",
         'socket'        => array(
             "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",            -1 => "Prismatic Socket"
@@ -552,7 +570,7 @@ $lang = array(
             null,                   "Shield",           "Libram",               "Idol",                         "Totem",
             "Sigil"
         ),
-        'weaponSubClass' => array(
+        'weaponSubClass'=> array(
             "Axe",                  "Axe",              "Bow",                  "Gun",                          "Mace",
             "Mace",                 "Polearm",          "Sword",                "Sword",                        null,
             "Staff",                null,               null,                   "Fist Weapon",                  "Miscellaneous",
@@ -562,8 +580,8 @@ $lang = array(
         'projectileSubClass' => array(
             null,                   null,               "Arrow",                "Bullet",                        null
         ),
-'elixirType'    => [null, "Battle", "Guardian"],
-'cat'           => array(
+        'elixirType'    => [null, "Battle", "Guardian"],
+        'cat'           => array(                           // ordered by content firts, then alphabeticaly
              2 => "Weapons",                                // self::$spell['weaponSubClass']
              4 => array("Armor", array(
                  1 => "Cloth Armor",                 2 => "Leather Armor",           3 => "Mail Armor",              4 => "Plate Armor",             6 => "Shields",                 7 => "Librams",
@@ -575,8 +593,9 @@ $lang = array(
                  7 => "Leatherworking Bags",         6 => "Mining Bags",             1 => "Soul Bags"
             )),
              0 => array("Consumables", array(
-                 7 => "Bandages",                    0 => "Consumables",             2 => "Elixirs",                 3 => "Flasks",                  5 => "Food & Drinks",           6 => "Item Enhancements (Permanent)",
-                -3 => "Item Enhancements (Temporary)", 1 => "Potions",               4 => "Scrolls",                 8 => "Other (Consumables)"
+                -3 => "Item Enhancements (Temporary)",                               6 => "Item Enhancements (Permanent)",                           2 => ["Elixirs", [1 => "Battle Elixirs", 2 => "Guardian Elixirs"]],
+                 1 => "Potions",                     4 => "Scrolls",                 7 => "Bandages",                0 => "Consumables",             3 => "Flasks",                  5 => "Food & Drinks",
+                 8 => "Other (Consumables)"
             )),
             16 => array("Glyphs", array(
                  1 => "Warrior Glyphs",              2 => "Paladin Glyphs",          3 => "Hunter Glyphs",           4 => "Rogue Glyphs",            5 => "Priest Glyphs",           6 => "Death Knight Glyphs",
@@ -595,7 +614,7 @@ $lang = array(
                  2 => "Tailoring Patterns"
             )),
              3 => array("Gems", array(
-                 6 => "Meta Gems",                   0 => "Red Gems",                1 => "Blue Gems",              2 => "Yellow Gems",             3 => "Purple Gems",             4 => "Green Gems",
+                 6 => "Meta Gems",                   0 => "Red Gems",                1 => "Blue Gems",               2 => "Yellow Gems",             3 => "Purple Gems",             4 => "Green Gems",
                  5 => "Orange Gems",                 8 => "Prismatic Gems",          7 => "Simple Gems"
             )),
             15 => array("Miscellaneous", array(

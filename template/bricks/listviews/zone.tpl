@@ -26,7 +26,8 @@
                     {if isset($curr.reqlevel)},reqlevel:{$curr.reqlevel}{/if}
                     {if isset($curr.lfgReqLevel)},lfgReqLevel:{$curr.lfgReqLevel}{/if}
                     {if isset($curr.heroicLevel)},heroicLevel:{$curr.heroicLevel}{/if}
-{*                    {if isset($curr.percent)},percent:{$curr.percent}{/if}   what was that originaly for..?     *}
+                    {if isset($curr.percent)},percent:{$curr.percent}{/if}
+                    {if isset($curr.count)},count:{$curr.count}{/if}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

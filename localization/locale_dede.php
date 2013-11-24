@@ -141,6 +141,8 @@ $lang = array(
         'itemsets'      => "Ausrüstungssets",
         'mechanic'      => "Auswirkung",
         'mechAbbr'      => "Ausw.",
+        'npc'           => "NPC",
+        'npcs'          => "NPCs",
         'pet'           => "Begleiter",
         'pets'          => "Begleiter",
         'requires'      => "Benötigt %s",
@@ -169,6 +171,7 @@ $lang = array(
         'specs'         => "Spezialisierungen",
         '_roles'        => ['Heiler', 'Nahkampf-DPS', 'Distanz-DPS', 'Tank'],
 
+        'modes'         => ['Normal / Normal 10', 'Heroisch / Normal 25', 'Heroisch 10', 'Heroisch 25'],
         'expansions'    => array("Classic", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"),
         'languages'     => array(
@@ -176,7 +179,7 @@ $lang = array(
             11 => "Drachisch",  12 => "Kalimagisch",    13 => "Gnomisch",   14 => "Trollisch",      33 => "Gossensprache",  35 => "Draeneiisch",    36 => "Zombie",         37 => "Gnomenbinär",        38 => "Goblinbinär"
         ),
         'gl'            => array(null, "Erhebliche", "Geringe"),
-        'si'            => array(-2 => "Nur für Horde", -1 => "Nur für Allianz", null, "Allianz", "Horde", "Beide"),
+        'si'            => array(1 => "Allianz", -1 => "Nur für Allianz", 2 => "Horde", -2 => "Nur für Horde", 3 => "Beide"),
         'resistances'   => array(null, 'Heiligwiderstand', 'Feuerwiderstand', 'Naturwiderstand', 'Frostwiderstand', 'Schattenwiderstand', 'Arkanwiderstand'),
         'sc'            => array("Körperlich", "Heilig", "Feuer", "Natur", "Frost", "Schatten", "Arkan"),
         'dt'            => array(null, "Magie", "Fluch", "Krankheit", "Gift", "Verstohlenheit", "Unsichtbarkeit", null, null, "Wut"),
@@ -256,18 +259,12 @@ $lang = array(
         'editAccount'   => "Benutze die folgenden Formulare um deine Account-Informationen zu aktualisieren",
         'publicDesc'    => "Öffentliche Beschreibung",
         'viewPubDesc'   => "Die Beschreibung in deinem <a href=\"?user=%s\">öffentlichen Profil</a> ansehen",
-
-
-        // Please_enter_your_confirm_password = Bitte das Passwort bestätigen
-        // Please_enter_your_username = Gib bitte deinen Benutzernamen ein
-        // Please_enter_your_password = Gib bitte dein Kennwort ein
-        // Remember_me_on_this_computer = Auf diesem Computer merken
-    ),
-    'event' => array(
-        'category'      => array("Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler")
     ),
     'npc'   => array(
         'rank'          => ['Normal', 'Elite', 'Rar Elite', 'Boss', 'Rar']
+    ),
+    'event' => array(
+        'category'      => array("Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler")
     ),
     'achievement' => array(
         'criteria'      => "Kriterien",
@@ -376,6 +373,8 @@ $lang = array(
         '_interval'     => "Interval",
         '_inSlot'       => "im Platz",
 
+        'ppm'           => "%s Auslösungen pro Minute",
+        'procChance'    => "Procchance",
         'starter'       => "Basiszauber",
         'trainingCost'  => "Trainingskosten",
         'remaining'     => "Noch %s",
@@ -393,11 +392,16 @@ $lang = array(
         'pctCostOf'     => "vom Grund%s",
         'costPerSec'    => ", plus %s pro Sekunde",
         'costPerLevel'  => ", plus %s pro Stufe",
+        '_scaling'      => "Skalierung",
+        'scaling'       => array(
+            'directSP' => "+%.2f%% der Zaubermacht zum direkten Effekt",         'directAP' => "+%.2f%% der Angriffskraft zum direkten Effekt",
+            'dotSP'    => "+%.2f%% der Zaubermacht pro Tick",                    'dotAP'    => "+%.2f%% der Angriffskraft pro Tick"
+        ),
         'powerRunes'    => ["Frost", "Unheilig", "Blut", "Tod"],
         'powerTypes'    => array(
             -2 => "Gesundheit", -1 => null, "Mana",     "Wut",      "Fokus",    "Energie",      "Zufriedenheit",    "Runen",    "Runenmacht",
-            'AMMOSLOT' => "Munition",       'STEAM' => "Dampfdruck",            'WRATH' => "Zorn",                  'PYRITE' => "Pyrit",
-            'HEAT' => "Hitze",              'OOZE' => "Schlamm",                'BLOOD_POWER' => "Blutmacht"
+            'AMMOSLOT' => "Munition",       'STEAM' => "Dampfdruck",            'WRATH'       => "Zorn",            'PYRITE' => "Pyrit",
+            'HEAT'     => "Hitze",          'OOZE'  => "Schlamm",               'BLOOD_POWER' => "Blutmacht"
         ),
         'relItems'      => array (
             'base'    => "<small>%s im Zusammenhang mit <b>%s</b> anzeigen</small>",
@@ -442,32 +446,53 @@ $lang = array(
               0 => "Nicht kategorisiert"
         ),
         'armorSubClass' => array(
-            "Sonstiges",            "Stoffrüstung",     "Lederrüstung",         "Schwere Rüstung",              "Plattenrüstung",
-            null,                   "Schilde",          "Buchbände",            "Götzen",                       "Totems",
+            "Sonstiges",                            "Stoffrüstung",                         "Lederrüstung",                         "Schwere Rüstung",                      "Plattenrüstung",
+            null,                                   "Schilde",                              "Buchbände",                            "Götzen",                               "Totems",
             "Siegel"
         ),
         'weaponSubClass' => array(
-            "Einhandäxte",          "Zweihandäxte",     "Bögen",                "Schusswaffen",                 "Einhandstreitkolben",
-            "Zweihandstreitkolben", "Stangenwaffen",    "Einhandschwerter",     "Zweihandschwerter",            null,
-            "Stäbe",                null,               null,                   "Faustwaffen",                  "Diverse",
-            "Dolche",               "Wurfwaffe",        null,                   "Armbrüste",                    "Zauberstäbe",
-            "Angelruten"
+            15 => "Dolche",                          0 => "Einhandäxte",                     7 => "Einhandschwerter",               4 => "Einhandstreitkolben",            13 => "Faustwaffen",
+             6 => "Stangenwaffen",                  10 => "Stäbe",                           1 => "Zweihandäxte",                   8 => "Zweihandschwerter",               5 => "Zweihandstreitkolben",
+            18 => "Armbrüste",                       2 => "Bögen",                           3 => "Schusswaffen",                  16 => "Wurfwaffen",                     19 => "Zauberstäbe",
+            20 => "Angelruten",                     14 => "Diverse"
         ),
         'subClassMasks' => array(
-            0x02A5F3 => 'Nahkampfwaffe',                0x0060 => 'Schild',                         0x04000C => 'Distanzwaffe',                 0xA091 => 'Einhandnahkampfwaffe'
+            0x02A5F3 => 'Nahkampfwaffe',            0x0060 => 'Schild',                     0x04000C => 'Distanzwaffe',             0xA091 => 'Einhandnahkampfwaffe'
         ),
         'traitShort'    => array(
-            'atkpwr'    => "Angr",                      'rgdatkpwr' => "DAngr",                                 'splpwr'    => "ZMacht",
-            'arcsplpwr' => "ArkM",                      'firsplpwr' => "FeuM",                                  'frosplpwr' => "FroM",
-            'holsplpwr' => "HeiM",                      'natsplpwr' => "NatM",                                  'shasplpwr' => "SchM",
-            'splheal'   => "Heil"
-        )
+            'atkpwr'    => "Angr",                  'rgdatkpwr' => "DAngr",                 'splpwr'    => "ZMacht",                'arcsplpwr' => "ArkM",                  'firsplpwr' => "FeuM",
+            'frosplpwr' => "FroM",                  'holsplpwr' => "HeiM",                  'natsplpwr' => "NatM",                  'shasplpwr' => "SchM",                  'splheal'   => "Heil"
+        ),
+        'spellModOp'    => array(
+            "Schaden",                              "Dauer",                                "Bedrohung",                            "Effekt 1",                             "Aufladungen",
+            "Reichweite",                           "Radius",                               "kritische Trefferchance",              "Alle Effekte",                         "Zauberzeitverlust",
+            "Zauberzeit",                           "Abklingzeit",                          "Effekt 2",                             "Ignoriere Rüstung",                    "Kosten",
+            "Kritischer Bonusschaden",              "Chance auf Fehlschlag",                "Sprung-Ziele",                         "Chance auf Auslösung",                 "Intervall",
+            "Multiplikator (Schaden)",              "Globale Abklingzeit",                  "Schaden über Zeit",                    "Effekt 3",                             "Multiplikator (Bonus)",
+            null,                                   "Auslösungen pro Minute",               "Multiplikator (Betrag)",               "Widerstand gegen Bannung",             "kritischer Bonusschaden2",
+            "Kostenrückerstattung bei Fehlschlag"
+        ),
+        'combatRating'  => array(
+            "Waffenfertigkeit",                     "Verteidigungsfertigkeit",              "Ausweichen",                           "Parrieren",                            "Blocken",
+            "Nahkampftrefferchance",                "Fernkampftrefferchance",               "Zaubertrefferchance",                  "kritische Nahkampftrefferchance",      "kritische Fernkampftrefferchance",
+            "kritische Zaubertrefferchance",        "erhaltene Nahkampftreffer",            "erhaltene Fernkampftreffer",           "erhaltene Zaubertreffer",              "erhaltene kritische Nahkampftreffer",
+            "erhaltene kritische Fernkampftreffer", "erhaltene kritische Zaubertreffer",    "Nahkampftempo",                        "Fernkampftempo",                       "Zaubertempo",
+            "Waffenfertigkeit Haupthand",           "Waffenfertigkeit Nebenhand",           "Waffenfertigkeit Fernkampf",           "Waffenkunde",                          "Rüstungsdurchschlag"
+        ),
+        'lockType'      => array(
+            null,                                   "Schlossknacken",                       "Kräuterkunde",                         "Bergbau",                              "Falle entschärfen",
+            "Öffnen",                               "Schatz (DND)",                         "Verkalkte Elfenedelsteine (DND)",      "Schließen",                            "Falle scharf machen",
+            "Schnell öffnen",                       "Schnell schließen",                    "Offenes Tüfteln",                      "Offenes Knien",                        "Offenes Angreifen",
+            "Gahz'ridian (DND)",                    "Schlagen",                             "PvP öffnen",                           "PvP schließen",                        "Angeln",
+            "Inschriftenkunde",                     "Vom Fahrzeug öffnen"
+        ),
+        'stealthType'   => ["Allgemein", "Falle"],
+        'invisibilityType' => ["Allgemein", 3 => "Falle", 6 => "Trunkenheit"]
     ),
     'item' => array(
         'armor'         => "%s Rüstung",
         'block'         => "%s Blocken",
         'charges'       => "Aufladungen",
-        'expend'        => "Verbrauchen",
         'locked'        => "Verschlossen",
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Heroisch",
@@ -480,7 +505,6 @@ $lang = array(
         'addsDps'       => "Adds",
         'fap'           => "Angriffskraft in Tiergestalt",
         'durability'    => "Haltbarkeit",
-        'duration'      => "Dauer",
         'realTime'      => "Realzeit",
         'conjured'      => "Herbeigezauberter Gegenstand",
         'damagePhys'    => "%s Schaden",
@@ -490,13 +514,40 @@ $lang = array(
         'itemLevel'     => "Gegenstandsstufe",
         'randEnchant'   => "&lt;Zufällige Verzauberung&gt",
         'readClick'     => "&lt;Zum Lesen rechtsklicken&gt",
+        'openClick'     => "&lt;Zum Öffnen rechtsklicken&gt",
         'set'           => "Set",
+        'partyLoot'     => "Gruppenloot",
+        'smartLoot'     => "Intelligente Beuteverteilung",
+        'indestructible'=> "Kann nicht zerstört werden",
+        'deprecated'    => "Nicht benutzt",
+        'useInShape'    => "Benutzbar in Gestaltwandlung",
+        'useInArena'    => "Benutzbar in Arenen",
+        'refundable'    => "Rückzahlbar",
+        'noNeedRoll'    => "Kann nicht für Bedarf werfen",
+        'atKeyring'     => "Passt in den Schlüsselbund",
+        'worth'         => "Wert",
+        'consumable'    => "Verbrauchbar",
+        'nonConsumable' => "Nicht verbrauchbar",
+        'accountWide'   => "Accountweit",
+        'millable'      => "Mahlbar",
+        'noEquipCD'     => "Keine Anlegabklingzeit",
+        'prospectable'  => "Sondierbar",
+        'disenchantable'=> "Kann entzaubert werden",
+        'cantDisenchant'=> "Kann nicht entzaubert werden",
+        'repairCost'    => "Reparaturkosten",
+        'tool'          => "Werkzeug",
+        'cost'          => "Preis",
+        'content'       => "Inhalt",
+        '_transfer'     => 'Dieser Gegenstand wird mit <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(images/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="%s-icon">%s</span> wechselt.',
+        '_unavailable'  => "Dieser Gegenstand ist nicht für Spieler verfügbar.",
         '_rndEnchants'  => "Zufällige Verzauberungen",
         '_chance'       => "(Chance von %s%%)",
         '_reqLevel'     => "Mindeststufe",
         'slot'          => "Platz",
         '_quality'      => "Qualität",
         'usableBy'      => "Benutzbar von",
+        'buyout'        => "Sofortkaufpreis",
+        'each'          => "Stück",
         'gems'          => "Edelsteine",
         'socketBonus'   => "Sockelbonus",
         'socket'        => array (
@@ -504,7 +555,7 @@ $lang = array(
         ),
         'quality'       => array (
             "Schlecht",             "Verbreitet",       "Selten",               "Rar",
-            "Episch",               "Legendär",             "Artefakt",         "Erbstücke",
+            "Episch",               "Legendär",         "Artefakt",             "Erbstücke",
         ),
         'trigger'       => array (
             "Benutzen: ",           "Anlegen: ",        "Chance bei Treffer: ", null,                           null,
@@ -516,16 +567,16 @@ $lang = array(
         ),
         'bagFamily'     => array(
             "Tasche",               "Köcher",           "Munitionsbeutel",      "Seelentasche",                 "Lederertasche",
-            "Schreibertasche",      "Kräutertasche",    "Verzauberertasche",    "Ingenieurstasche",             "Schlüssel",
+            "Schreibertasche",      "Kräutertasche",    "Verzauberertasche",    "Ingenieurstasche",             null, /*Schlüssel*/
             "Edelsteintasche",      "Bergbautasche"
         ),
         'inventoryType' => array(
             null,                   "Kopf",             "Hals",                 "Schulter",                     "Hemd",
             "Brust",                "Taille",           "Beine",                "Füße",                         "Handgelenke",
-            "Hände",                "Finger",           "Schmuck",              "Einhändig",                    "Schildhand",
+            "Hände",                "Finger",           "Schmuck",              "Einhändig",                    "Schildhand", /*Schild*/
             "Distanz",              "Rücken",           "Zweihändig",           "Tasche",                       "Wappenrock",
-            "Brust",                "Waffenhand",       "Schildhand",           "In der Schildhand geführt",    "Projektil",
-            "Wurfwaffe",            "Distanzwaffe",     "Köcher",               "Relikt"
+            null, /*Robe*/          "Waffenhand",       "Schildhand",           "In der Schildhand geführt",    "Projektil",
+            "Wurfwaffe",            null, /*Ranged2*/   "Köcher",               "Relikt"
         ),
         'armorSubClass' => array(
             "Sonstiges",            "Stoff",            "Leder",                "Schwere Rüstung",              "Platte",
@@ -543,10 +594,51 @@ $lang = array(
             null,                   null,               "Pfeil",                "Kugel",                         null
         ),
         'elixirType'    => [null, "Kampf", "Wächter"],
-'cat'           => array(
-    // locale_dede.js zerparsen..
-),
-        'statType'  => array(
+        'cat'           => array(
+             2 => "Waffen",                                 // self::$spell['weaponSubClass']
+             4 => array("Rüstung", array(
+                 1 => "Stoffrüstung",                2 => "Lederrüstung",            3 => "Schwere Rüstung",         4 => "Plattenrüstung",          6 => "Schilde",                 7 => "Buchbände",
+                 8 => "Götzen",                      9 => "Totems",                 10 => "Siegel",                 -6 => "Umhänge",                -5 => "Nebenhandgegenstände",   -8 => "Hemden",
+                -7 => "Wappenröcke",                -3 => "Amulette",               -2 => "Ringe",                  -4 => "Schmuckstücke",           0 => "Verschiedenes (Rüstung)",
+            )),
+             1 => array("Behälter", array(
+                 0 => "Taschen",                     3 => "Verzauberertaschen",      4 => "Ingenieurstaschen",       5 => "Edelsteintaschen",        2 => "Kräutertaschen",          8 => "Schreibertaschen",
+                 7 => "Lederertaschen",              6 => "Bergbautaschen",          1 => "Seelentaschen"
+            )),
+             0 => array("Verbrauchbar", array(
+                -3 => "Gegenstandsverzauberungen (Temporäre)",                       6 => "Gegenstandsverzauberungen (Dauerhafte)",                  2 => ["Elixire", [1 => "Kampfelixire", 2 => "Wächterelixire"]],
+                 1 => "Tränke",                      4 => "Schriftrollen",           7 => "Verbände",                0 => "Verbrauchbar",            3 => "Fläschchen",              5 => "Essen & Trinken",
+                 8 => "Andere (Verbrauchbar)"
+            )),
+            16 => array("Glyphen", array(
+                 1 => "Kriegerglyphen",              2 => "Paladinglyphen",          3 => "Jägerglyphen",            4 => "Schurkenglyphen",         5 => "Priesterglyphen",         6 => "Todesritterglyphen",
+                 7 => "Schamanenglyphen",            8 => "Magierglyphen",           9 => "Hexenmeisterglyphen",    11 => "Druidenglyphen"
+            )),
+             7 => array("Handwerkswaren", array(
+                14 => "Rüstungsverzauberungen",      5 => "Stoff",                   3 => "Geräte",                 10 => "Elementar",              12 => "Verzauberkunst",          2 => "Sprengstoff",
+                 9 => "Kräuter",                     4 => "Juwelenschleifen",        6 => "Leder",                  13 => "Materialien",             8 => "Fleisch",                 7 => "Metall & Stein",
+                 1 => "Teile",                      15 => "Waffenverzauberungen",   11 => "Andere (Handwerkswaren)"
+             )),
+             6 => ["Projektile", [                   2 => "Pfeile",                  3 => "Kugeln"          ]],
+            11 => ["Köcher",     [                   2 => "Köcher",                  3 => "Munitionsbeutel" ]],
+             9 => array("Rezepte", array(
+                 0 => "Bücher",                      6 => "Alchemierezepte",         4 => "Schmiedekunstpläne",      5 => "Kochrezepte",             8 => "Verzauberkunstformeln",   3 => "Ingenieurschemata",
+                 7 => "Erste Hilfe-Bücher",          9 => "Angelbücher",            11 => "Inschriftenkundetechniken",10 => "Juwelenschleifen-Vorlagen",1 => "Lederverarbeitungsmuster",12 => "Bergbauleitfäden",
+                 2 => "Schneidereimuster"
+            )),
+             3 => array("Edelsteine", array(
+                 6 => "Meta-Edelsteine",             0 => "Rote Edelsteine",         1 => "Blaue Edelsteine",        2 => "Gelbe Edelsteine",        3 => "Violette Edelsteine",     4 => "Grüne Edelsteine",
+                 5 => "Orange Edelsteine",           8 => "Prismatische Edelsteine", 7 => "Einfache Edelsteine"
+            )),
+            15 => array("Verschiedenes", array(
+                -2 => "Rüstungsmarken",              3 => "Feiertag",                0 => "Plunder",                 1 => "Reagenzien",              5 => "Reittiere",              -7 => "Flugtiere",
+                 2 => "Haustiere",                   4 => "Andere (Verschiedenes)"
+            )),
+            10 => "Währung",
+            12 => "Quest",
+            13 => "schlüssel",
+        ),
+        'statType'      => array(
             "Erhöht Euer Mana um %d.",
             "Erhöht Eure Gesundheit um %d.",
             null,
@@ -596,7 +688,7 @@ $lang = array(
             "Unbekannter Bonus #%d (%d)",
         )
     ),
-    'colon'         => ': '
+    'colon'             => ': '
 );
 
 ?>

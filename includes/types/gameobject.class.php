@@ -6,7 +6,13 @@ if (!defined('AOWOW_REVISION'))
 
 class GameObjectList extends BaseType
 {
-    public static $type = TYPE_OBJECT;
+    public static   $type      = TYPE_OBJECT;
+
+    protected       $queryBase = 'SELECT *, go.entry AS ARRAY_KEY FROM gameobject_template go';
+    protected       $queryOpts = array(
+                        'go' => [['lg']],
+                        'lg' => ['j' => ['locales_gameobject lq ON go.entry = lq.entry', true]]
+                    );
 
     public static function getName($id)
     {

@@ -43,7 +43,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if (!$recipes->error)
         {
             // 1 recipes [spells] (crafted)
-            $recipes->addGlobalsToJscript($smarty);
+            $recipes->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
             $pageData['relTabs'][] = array(
                 'file'   => 'spell',
@@ -85,7 +85,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         // 3 crafted items [items]
         $created = [];
         foreach ($recipes->iterate() as $__)
-            if ($idx = $this->canCreateItem())
+            if ($idx = $recipes->canCreateItem())
                 foreach ($idx as $i)
                     $created[] = $recipes->getField('effect'.$i.'CreateItemId');
 
