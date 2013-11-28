@@ -38,7 +38,7 @@ if (!defined('AOWOW_REVISION'))
         17: Listview - template: 'achievement', id: 'achievements',  name: LANG.tab_achievements,
         18: Listview - template: 'achievement', id: 'statistics',    name: LANG.tab_statistics,
         19: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
-todo    20: Listview - template: 'object',      id: 'objects',       name: LANG.tab_objects,
+        20: Listview - template: 'object',      id: 'objects',       name: LANG.tab_objects,
 todo    21: Listview - template: 'faction',     id: 'factions',      name: LANG.tab_factions,
         22: Listview - template: 'skill',       id: 'skills',        name: LANG.tab_skills,
         23: Listview - template: 'pet',         id: 'pets',          name: LANG.tab_pets,
@@ -835,7 +835,7 @@ if ($searchMask & 0x40000)
             'file'     => 'zone',
             'data'     => $data,
             'params'   => [
-                'tabs'        => '$myTabs',
+                'tabs' => '$myTabs'
             ]
         );
 
@@ -848,7 +848,37 @@ if ($searchMask & 0x40000)
 }
 
 // 20 Objects
-// if ($searchMask & 0x80000)
+if ($searchMask & 0x80000)
+{
+    $conditions = array(
+        ['name'.(User::$localeId ? '_loc'.User::$localeId : null), $query],
+        $maxResults
+    );
+
+    $objects = new GameObjectList($conditions);
+
+    if ($data = $objects->getListviewData())
+    {
+        $objects->addGlobalsToJScript($smarty);
+
+        $found['zone'] = array(
+            'type'     => TYPE_OBJECT,
+            'appendix' => ' (Object)',
+            'matches'  => $objects->getMatches(),
+            'file'     => 'object',
+            'data'     => $data,
+            'params'   => [
+                'tabs' => '$myTabs'
+            ]
+        );
+
+        if ($objects->getMatches() > $maxResults)
+        {
+            $found['zone']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_objectsfound', $objects->getMatches(), $maxResults);
+            $found['zone']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 21 Factions
 // if ($searchMask & 0x100000)
@@ -869,7 +899,9 @@ if ($searchMask & 0x200000)
             'matches'  => $skills->getMatches(),
             'file'     => 'skill',
             'data'     => $data,
-            'params'   => ['tabs' => '$myTabs']
+            'params'   => [
+                'tabs' => '$myTabs'
+            ]
         );
 
         if ($skills->getMatches() > $maxResults)

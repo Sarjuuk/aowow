@@ -75,10 +75,11 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 
     $item->addGlobalsToJscript($smarty, GLOBALINFO_EXTRA | GLOBALINFO_SELF);
 
-    $_flags    = $item->getField('flags');
-    $_slot     = $item->getField('slot');
-    $_subClass = $item->getField('subClass');
-    $_class    = $item->getField('class');
+    $_flags     = $item->getField('flags');
+    $_slot      = $item->getField('slot');
+    $_subClass  = $item->getField('subClass');
+    $_class     = $item->getField('class');
+    $_bagFamily = $item->getField('bagFamily');
 
     /***********/
     /* Infobox */
@@ -196,7 +197,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     if ($item->getField('flagsExtra') & 0x0100)             // cant roll need
         $quickInfo[] = '[tooltip=tooltip_cannotrollneed]'.Lang::$item['noNeedRoll'].'[/tooltip]';
 
-    if ($item->getField('bagFamily') & 0x0100)              // fits into keyring
+    if ($_bagFamily & 0x0100)                               // fits into keyring
         $quickInfo[] = Lang::$item['atKeyring'];
 
 
@@ -308,29 +309,32 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     /* Extra Tabs */
     /**************/
 
+    // tabs: this item is contained in..
     $sourceTabs = array(
     //   0 => refLoot
-         1 => ['item',     '$LANG.tab_containedin',      'contained-in-item', [], []],
-         2 => ['item',     '$LANG.tab_disenchantedfrom', 'disenchanted-from', [], []],
-         3 => ['item',     '$LANG.tab_prospectedfrom',   'prospected-from',   [], []],
-         4 => ['item',     '$LANG.tab_milledfrom',       'milled-from',       [], []],
-         5 => ['creature', '$LANG.tab_droppedby',        'dropped-by',        [], []],
-         6 => ['creature', '$LANG.tab_pickpocketedfrom', 'pickpocketed-from', [], []],
-         7 => ['creature', '$LANG.tab_skinnedfrom',      'skinned-from',      [], []],
-         8 => ['creature', '$LANG.tab_minedfromnpc',     'mined-from-npc',    [], []],
-         9 => ['creature', '$LANG.tab_salvagedfrom',     'salvaged-from',     [], []],
-        10 => ['creature', '$LANG.tab_gatheredfromnpc',  'gathered-from-npc', [], []],
-        11 => ['quest',    '$LANG.tab_rewardfrom',       'reward-from-quest', [], []],
-        12 => ['zone',     '$LANG.tab_fishedin',         'fished-in',         [], []],
-        13 => ['object',   '$LANG.tab_containedin',      'contained-in-go',   [], []],
-        14 => ['object',   '$LANG.tab_minedfrom',        'mined-from-go',     [], []],
-        15 => ['object',   '$LANG.tab_gatheredfrom',     'gathered-from-go',  [], []],
-        16 => ['spell',    '$LANG.tab_createdby',        'created-by',        [], []]
+         1 => ['item',     '$LANG.tab_containedin',      'contained-in-item', [], [], []],
+         2 => ['item',     '$LANG.tab_disenchantedfrom', 'disenchanted-from', [], [], []],
+         3 => ['item',     '$LANG.tab_prospectedfrom',   'prospected-from',   [], [], []],
+         4 => ['item',     '$LANG.tab_milledfrom',       'milled-from',       [], [], []],
+         5 => ['creature', '$LANG.tab_droppedby',        'dropped-by',        [], [], []],
+         6 => ['creature', '$LANG.tab_pickpocketedfrom', 'pickpocketed-from', [], [], []],
+         7 => ['creature', '$LANG.tab_skinnedfrom',      'skinned-from',      [], [], []],
+         8 => ['creature', '$LANG.tab_minedfromnpc',     'mined-from-npc',    [], [], []],
+         9 => ['creature', '$LANG.tab_salvagedfrom',     'salvaged-from',     [], [], []],
+        10 => ['creature', '$LANG.tab_gatheredfromnpc',  'gathered-from-npc', [], [], []],
+        11 => ['quest',    '$LANG.tab_rewardfrom',       'reward-from-quest', [], [], []],
+        12 => ['zone',     '$LANG.tab_fishedin',         'fished-in-zone',    [], [], []],
+        13 => ['object',   '$LANG.tab_containedin',      'contained-in-go',   [], [], []],
+        14 => ['object',   '$LANG.tab_minedfrom',        'mined-from-go',     [], [], []],
+        15 => ['object',   '$LANG.tab_gatheredfrom',     'gathered-from-go',  [], [], []],
+        16 => ['object',   '$LANG.tab_fishedin',         'fished-in-go',      [], [], []],
+        17 => ['spell',    '$LANG.tab_createdby',        'created-by',        [], [], []]
     );
 
-    $data    = [];
-    $xCols   = '';
-    $sources = Util::getLootSource($_id);
+    $data      = [];
+    $questLoot = [];
+    $spellLoot = [];
+    $sources   = Util::getLootSource($_id);
     foreach ($sources as $lootTpl => $lootData)
     {
         // cap fetched entries to the sql-limit to guarantee, that the highest chance items get selected first
@@ -365,26 +369,16 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 
                 foreach ($srcType->iterate() as $curTpl)
                 {
+                    $tabId = 7;                             // general case (skinning)
                     if ($curTpl['type_flags'] & NPC_TYPEFLAG_HERBLOOT)
-                    {
-                        $data[10][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
-                        $sourceTabs[10][3][] = 'Listview.extraCols.percent';
-                    }
+                        $tabId = 10;
                     else if ($curTpl['type_flags'] & NPC_TYPEFLAG_ENGINEERLOOT)
-                    {
-                        $data[9][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
-                        $sourceTabs[9][3][] = 'Listview.extraCols.percent';
-                    }
+                        $tabId = 9;
                     else if ($curTpl['type_flags'] & NPC_TYPEFLAG_MININGLOOT)
-                    {
-                        $data[8][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
-                        $sourceTabs[8][3][] = 'Listview.extraCols.percent';
-                    }
-                    else
-                    {
-                        $data[7][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
-                        $sourceTabs[7][3][] = 'Listview.extraCols.percent';
-                    }
+                        $tabId = 8;
+
+                    $data[$tabId][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
+                    $sourceTabs[$tabId][3][] = 'Listview.extraCols.percent';
                 }
 
                 break;
@@ -400,23 +394,23 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
                 $sourceTabs[12][3][] = 'Listview.extraCols.percent';
                 break;
             case LOOT_GAMEOBJECT:
-                // GO-loot
-                // contained in GO (chest)
-                // mined-from (vine)
-                // gathered-from (herb)
-                // like skinning with lock-properties instead of type_flags
-                // foreach($rows as $row)
-                // {
-                    // // Залежи руды
-                    // if($row['lockproperties1'] == LOCK_PROPERTIES_MINING)
-                        // $item['minedfromobject'][] = array_merge(objectinfo2($row), $drop);
-                    // // Собирается с трав
-                    // elseif($row['lockproperties1'] == LOCK_PROPERTIES_HERBALISM)
-                        // $item['gatheredfromobject'][] = array_merge(objectinfo2($row), $drop);
-                    // // Сундуки
-                    // else
-                        // $item['containedinobject'][] = array_merge(objectinfo2($row), $drop);
-                // }
+                $srcType = new GameObjectList(array(['type', [OBJECT_CHEST, OBJECT_FISHINGHOLE]], ['data1', $ids]));
+                $srcData = $srcType->getListviewData();
+
+                foreach ($srcType->iterate() as $curTpl)
+                {
+                    $tabId = 13;                            // general chest loot
+                    if ($curTpl['type'] == -4)              // vein
+                        $tabId = 14;
+                    else if ($curTpl['type'] == -3)         // herb
+                        $tabId = 15;
+                    else if ($curTpl['type'] == 25)         // fishing node
+                        $tabId = 16;
+
+                    $data[$tabId][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('lootId')]);
+                    $sourceTabs[$tabId][3][] = 'Listview.extraCols.percent';
+                    $sourceTabs[$tabId][5][] = 'skill';     // conflicts a bit with fishing nodes (no real requirement)
+                }
                 break;
             case LOOT_PROSPECTING:
                 $sourceTab = 3;
@@ -448,20 +442,52 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
                 break;
             case LOOT_QUEST:
                 // merge regular quest rewards into quest_mail_loot_template results
-                $conditions = array(
-                    'OR', ['qt.RewardMailTemplateId', $ids],
-                    ['RewardChoiceItemId1', $_id], ['RewardChoiceItemId2', $_id], ['RewardChoiceItemId3', $_id], ['RewardChoiceItemId4', $_id], ['RewardChoiceItemId5', $_id],
-                    ['RewardChoiceItemId6', $_id], ['RewardItemId1', $_id],       ['RewardItemId2', $_id],       ['RewardItemId3', $_id],       ['RewardItemId4', $_id],
-                );
-                $srcType = new QuestList($conditions);
-                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
-                $data[11] = $srcType->getListviewData();    // dont merge chances; most are 100% anyway and regular reward loot has none
-
+                $questLoot = $ids;
                 break;
             case LOOT_SPELL:
-                // merge with: created by [spell]
-
+                // merge with "created by [spell]"
+                $spellLoot = $ids;
                 break;
+        }
+    }
+
+    // merge quest rewards with quest_mail_loot
+    $conditions = array(
+        'OR',
+        ['RewardChoiceItemId1', $_id], ['RewardChoiceItemId2', $_id], ['RewardChoiceItemId3', $_id], ['RewardChoiceItemId4', $_id], ['RewardChoiceItemId5', $_id],
+        ['RewardChoiceItemId6', $_id], ['RewardItemId1', $_id],       ['RewardItemId2', $_id],       ['RewardItemId3', $_id],       ['RewardItemId4', $_id],
+    );
+
+    if ($questLoot)
+        $conditions[] = ['qt.RewardMailTemplateId', $questLoot];
+
+    $questLoot = new QuestList($conditions);
+    if (!$questLoot->error)
+    {
+        $questLoot->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+        $data[11] = $questLoot->getListviewData();
+    }
+
+    // merge spell_loot with "created by [spell]"
+    $conditions = ['OR', ['effect1CreateitemId', $_id], ['effect2CreateitemId', $_id], ['effect3CreateitemId', $_id]];
+    if ($spellLoot)
+        $conditions[] = ['id', $spellLoot];
+
+    $spellLoot = new SpellList($conditions);
+    if (!$spellLoot->error)
+    {
+        $spellLoot->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+        $spellData = $spellLoot->getListviewData();
+
+        if (!empty($sources[LOOT_SPELL]))
+            $sourceTabs[17][3][] = 'Listview.extraCols.percent';
+
+        foreach ($spellLoot->iterate() as $_)
+        {
+            if (!empty($sources[LOOT_SPELL][$spellLoot->id]))
+                $data[17][] = array_merge($spellData[$spellLoot->id], $sources[LOOT_SPELL][$spellLoot->id]);
+            else
+                $data[17][] = array_merge($spellData[$spellLoot->id], ['percent' => -1]);
         }
     }
 
@@ -474,48 +500,208 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
             'file'   => $tab[0],
             'data'   => $data[$k],
             'params' => [
-                'tabs'       => '$tabsRelated',
-                'name'       => $tab[1],
-                'id'         => $tab[2],
-                'extraCols'  => $tab[3] ? '$['.implode(', ', array_unique($tab[3])).']' : null,
-                'hiddenCols' => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null
+                'tabs'        => '$tabsRelated',
+                'name'        => $tab[1],
+                'id'          => $tab[2],
+                'extraCols'   => $tab[3] ? '$['.implode(', ', array_unique($tab[3])).']' : null,
+                'hiddenCols'  => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
+                'visibleCols' => $tab[5] ? '$'.json_encode($tab[5]) : null
             ]
         );
     }
 
-    /* this item contains.. */
-
+    // tabs: this item contains
     $sourceFor = array(
-         [LOOT_ITEM,        $item->id,                       '$LANG.tab_contains',      'contains',      ['Listview.extraCols.percent'], []                          ],
-         [LOOT_PROSPECTING, $item->id,                       '$LANG.tab_prospecting',   'prospecting',   ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
-         [LOOT_MILLING,     $item->id,                       '$LANG.tab_milling',       'milling',       ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
-         [LOOT_DISENCHANT,  $item->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']]
+         [LOOT_ITEM,        $item->id,                       '$LANG.tab_contains',      'contains',      ['Listview.extraCols.percent'], []                          , []],
+         [LOOT_PROSPECTING, $item->id,                       '$LANG.tab_prospecting',   'prospecting',   ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
+         [LOOT_MILLING,     $item->id,                       '$LANG.tab_milling',       'milling',       ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
+         [LOOT_DISENCHANT,  $item->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []]
     );
 
     foreach ($sourceFor as $sf)
     {
-        $itemLoot = Util::handleLoot($sf[0], $sf[1], $smarty, User::isInGroup(U_GROUP_STAFF));
+        $itemLoot = Util::handleLoot($sf[0], $sf[1], User::isInGroup(U_GROUP_STAFF), $sf[4]);
         if ($itemLoot)
         {
-            if (User::isInGroup(U_GROUP_STAFF))
-            {
-                $sf[4][] = "Listview.funcBox.createSimpleCol('group', 'Group', '10%', 'group')";
-                $sf[4][] = "Listview.funcBox.createSimpleCol('mode', 'Mode', '10%', 'mode')";
-                $sf[4][] = "Listview.funcBox.createSimpleCol('reference', 'Reference', '10%', 'reference')";
-            }
-
             $pageData['relTabs'][] = array(
                 'file'   => 'item',
                 'data'   => $itemLoot,
                 'params' => [
-                    'tabs'       => '$tabsRelated',
-                    'name'       => $sf[2],
-                    'id'         => $sf[3],
-                    'extraCols'  => $sf[4] ? "$[".implode(', ', $sf[4])."]" : null,
-                    'hiddenCols' => $sf[5] ? "$".json_encode($sf[5]) : null
+                    'tabs'        => '$tabsRelated',
+                    'name'        => $sf[2],
+                    'id'          => $sf[3],
+                    'extraCols'   => $sf[4] ? "$[".implode(', ', $sf[4])."]" : null,
+                    'hiddenCols'  => $sf[5] ? "$".json_encode($sf[5]) : null,
+                    'visibleCols' => $sf[6] ? '$'.json_encode($sf[6]) : null
                 ]
             );
         }
+    }
+
+    // tab: container can contain
+    if ($item->getField('slots') > 0)
+    {
+        $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<'], 0));
+        if (!$contains->error)
+        {
+            $contains->addGlobalsToJscript($smarty);
+
+            $hCols = ['side'];
+            if (!$contains->hasSetFields(['slot']))
+                $hCols[] = 'slot';
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'item',
+                'data'   => $contains->getListviewData(),
+                'params' => [
+                    'tabs'       => '$tabsRelated',
+                    'name'       => '$LANG.tab_cancontain',
+                    'id'         => 'can-contain',
+                    'hiddenCols' => '$'.json_encode($hCols)
+                ]
+            );
+        }
+    }
+    // tab: can be contained in (except keys)
+    else if ($_bagFamily != 0x0100)
+    {
+        $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>'], 0));
+        if (!$contains->error)
+        {
+            $contains->addGlobalsToJscript($smarty);
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'item',
+                'data'   => $contains->getListviewData(),
+                'params' => [
+                    'tabs'       => '$tabsRelated',
+                    'name'       => '$LANG.tab_canbeplacedin',
+                    'id'         => 'can-be-placed-in',
+                    'hiddenCols' => "$['side']"
+                ]
+            );
+        }
+    }
+
+    // tab: criteria of
+    $conditions = array(
+        ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM, ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM]],
+        ['ac.value1', $_id]
+    );
+
+    $criteriaOf = new AchievementList($conditions);
+    if (!$criteriaOf->error)
+    {
+            $criteriaOf->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+
+            $hCols = [];
+            if (!$criteriaOf->hasSetFields(['rewardIds']))
+                $hCols = ['rewards'];
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'achievement',
+                'data'   => $criteriaOf->getListviewData(),
+                'params' => [
+                    'tabs'        => '$tabsRelated',
+                    'name'        => '$LANG.tab_criteriaof',
+                    'id'          => 'criteria-of',
+                    'visibleCols' => "$['category']",
+                    'hiddenCols'  => '$'.json_encode($hCols)
+                ]
+            );
+    }
+
+    // tab: reagent for
+    $conditions = array(
+        'OR',
+        ['reagent1', $_id], ['reagent2', $_id], ['reagent3', $_id], ['reagent4', $_id],
+        ['reagent5', $_id], ['reagent6', $_id], ['reagent7', $_id], ['reagent8', $_id]
+    );
+
+    $reagent = new SpellList($conditions);
+    if (!$reagent->error)
+    {
+        $reagent->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+
+        $pageData['relTabs'][] = array(
+            'file'   => 'spell',
+            'data'   => $reagent->getListviewData(),
+            'params' => [
+                'tabs'        => '$tabsRelated',
+                'name'        => '$LANG.tab_reagentfor',
+                'id'          => 'reagent-for',
+                'visibleCols' => "$['reagents']"
+            ]
+        );
+    }
+
+    // tab: unlocks (object or item)
+    $lockIds = DB::Aowow()->selectCol(
+        'SELECT id FROM ?_lock WHERE
+        (type1 = 1 AND properties1 = ?d) OR
+        (type2 = 1 AND properties2 = ?d) OR
+        (type3 = 1 AND properties3 = ?d) OR
+        (type4 = 1 AND properties4 = ?d) OR
+        (type5 = 1 AND properties5 = ?d)',
+        $_id, $_id, $_id, $_id, $_id
+    );
+
+    if ($lockIds)
+    {
+        // objects
+        $conditions = array(
+            'OR',
+            ['AND', ['data0', $lockIds], ['type', [OBJECT_QUESTGIVER, OBJECT_CHEST, OBJECT_TRAP, OBJECT_GOOBER, OBJECT_CAMERA, OBJECT_FLAGSTAND, OBJECT_FLAGDROP]]],
+            ['AND', ['data1', $lockIds], ['type', [OBJECT_DOOR, OBJECT_BUTTON]]]
+        );
+
+        $lockedObj = new GameObjectList($conditions);
+        if (!$lockedObj->error)
+        {
+            $pageData['relTabs'][] = array(
+                'file'   => 'object',
+                'data'   => $lockedObj->getListviewData(),
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'name' => '$LANG.tab_unlocks',
+                    'id'   => 'unlocks-object'
+                ]
+            );
+        }
+
+        // items (generally unused. It's the spell on the item, that unlocks stuff)
+        $lockedItm = new ItemList(array(['lockId', $lockIds]));
+        if (!$lockedItm->error)
+        {
+            $lockedItm->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'item',
+                'data'   => $lockedItm->getListviewData(),
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'name' => '$LANG.tab_unlocks',
+                    'id'   => 'unlocks-item'
+                ]
+            );
+        }
+    }
+
+    // tab: see also
+    $saItems = new ItemList(array(['id', $_id, '!'], ['name_loc'.User::$localeId, $item->getField('name', true)]));
+    if (!$saItems->error)
+    {
+        $saItems->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+
+        $pageData['relTabs'][] = array(
+            'file'   => 'item',
+            'data'   => $saItems->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'name' => '$LANG.tab_seealso',
+                'id'   => 'see-also'
+            ]
+        );
     }
 
     // sold by [consult itemExtendedCost]
@@ -524,37 +710,13 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 
     // provided for (quest)
 
-    // can be placed in
-    // if($item['BagFamily'] == 256)
-    // {
-        // // Если это ключ
-        // $item['key'] = true;
-    // }
-
-    // reagent for
-
     // currency for
-
-    // criteria of
-    // array(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM, ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM),
 
     // teaches
 
     // Same model as
 
-    // unlocks
-        // $locks_row = $DB->selectCol('
-        // SELECT lockID
-        // FROM ?_lock
-        // WHERE
-            // (type1=1 AND lockproperties1=?d) OR
-            // (type2=1 AND lockproperties2=?d) OR
-            // (type3=1 AND lockproperties3=?d) OR
-            // (type4=1 AND lockproperties4=?d) OR
-            // (type5=1 AND lockproperties5=?d)
-        // ',
-        // $item['entry'], $item['entry'], $item['entry'], $item['entry'], $item['entry']
-    // );
+    // Shared cooldown
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }

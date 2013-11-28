@@ -10,7 +10,7 @@ $validCats = [1, 2, 3, 22];
 $title     = [Util::ucFirst(Lang::$game['currencies'])];
 $cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_CURRENCY, -1, isset($cat) ? $cat : -1, User::$localeId]);
 
-if ($cat !== null && !in_array($cat, $validCats))
+if (!Util::isValidPage($validCats, $cat))
     $smarty->error();
 
 if (isset($cat))

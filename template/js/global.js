@@ -5223,7 +5223,8 @@ Listview.extraCols = {
                 g_addTooltip(td, text);
             }
 
-            var value = parseFloat(row.percent.toFixed(row.percent >= 1.95 ? 0 : (row.percent >= 0.195 ? 1 : 2)));
+            // var value = parseFloat(row.percent.toFixed(row.percent >= 1.95 ? 0 : (row.percent >= 0.195 ? 1 : 2)));
+            var value = parseFloat(row.percent.toFixed(row.percent >= 1.95 ? 1 : 2)); // sarjuuk: doesn't look as nice but i prefer accuracy
 
             if (row.pctstack) {
                 var sp = $WH.ce('span');
@@ -5241,11 +5242,12 @@ Listview.extraCols = {
             }
 
             if (row.percent >= 1.95) {
-                return row.percent.toFixed(0);
+                // return row.percent.toFixed(0);
+                return row.percent.toFixed(1);
             }
-            else if (row.percent >= 0.195) {
-                return parseFloat(row.percent.toFixed(1));
-            }
+            // else if (row.percent >= 0.195) {
+                // return parseFloat(row.percent.toFixed(1));
+            // }
             else {
                 return parseFloat(row.percent.toFixed(2));
             }

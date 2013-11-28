@@ -22,13 +22,13 @@ if (isset($_GET['power']))
     {
         $npc = new CreatureList(array(['ct.id', $_id]));
         if ($npc->error)
-            die('$WowheadPower.registerNpc(\''.$_id.'\', '.User::$localeId.', {})');
+            die('$WowheadPower.registerNpc('.$_id.', '.User::$localeId.', {})');
 
         $s = $npc->getSpawns(true);
 
-        $x = '$WowheadPower.registerNpc('.$_id.', '.User::$localeId.", {\n";
+        $x  = '$WowheadPower.registerNpc('.$_id.', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($npc->getField('name', true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.': \''.Util::jsEscape($npc->renderTooltip())."',\n";
+        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($npc->renderTooltip())."',\n";
         // $x .= "\tmap: ".($s ? '{zone: '.$s[0].', coords: {0:'.json_encode($s[1], JSON_NUMERIC_CHECK).'}' : '{}')."\n";
         $x .= "});";
 

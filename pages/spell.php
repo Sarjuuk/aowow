@@ -1180,19 +1180,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // tab: contains
     // spell_loot_template & skill_extra_item_template
     $extraItem = DB::Aowow()->selectRow('SELECT * FROM skill_extra_item_template WHERE spellid = ?d', $spell->id);
-    $spellLoot = Util::handleLoot(LOOT_SPELL, $spell->id, $smarty, User::isInGroup(U_GROUP_STAFF));
+    $spellLoot = Util::handleLoot(LOOT_SPELL, $spell->id, User::isInGroup(U_GROUP_STAFF), $extraCols);
 
     if ($extraItem || $spellLoot)
     {
-        $extraCols = ['Listview.extraCols.percent'];
-
-        if ($spellLoot && User::isInGroup(U_GROUP_STAFF))
-        {
-            $extraCols[] = "Listview.funcBox.createSimpleCol('group', 'Group', '10%', 'group')";
-            $extraCols[] = "Listview.funcBox.createSimpleCol('mode', 'Mode', '10%', 'mode')";
-            $extraCols[] = "Listview.funcBox.createSimpleCol('reference', 'Reference', '10%', 'reference')";
-        }
-
+        $extraCols[] = 'Listview.extraCols.percent';
         $lv = $spellLoot;
 
         if ($extraItem && $spell->canCreateItem())

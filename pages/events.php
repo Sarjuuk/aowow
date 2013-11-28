@@ -11,7 +11,7 @@ $validCats = [0, 1, 2, 3];
 $title     = [Lang::$game['events']];
 $cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_WORLDEVENT, -1, $cat, User::$localeId]);
 
-if (!in_array($cat, $validCats))
+if (!Util::isValidPage($validCats, $cat))
     $smarty->error();
 
 $path[] = $cat;

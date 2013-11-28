@@ -122,7 +122,7 @@ class ItemsetListFilter extends Filter
         }
 
         unset($cr);
-        $this->error = 1;
+        $this->error = true;
         return [1];
     }
 

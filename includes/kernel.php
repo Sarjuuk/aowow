@@ -54,6 +54,9 @@ foreach ($AoWoWconf['characters'] as $realm => $charDBInfo)
 // create Template-Object
 $smarty = new SmartyAoWoW($AoWoWconf);
 
+// attach template to util (yes bandaid, shut up and code me a fix)
+Util::$pageTemplate = &$smarty;
+
 // Setup Session
 if (isset($_COOKIE[COOKIE_AUTH]))
 {

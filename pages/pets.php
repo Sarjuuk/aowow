@@ -10,7 +10,7 @@ $validCats = [0, 1, 2];
 $title     = [Util::ucFirst(Lang::$game['pets'])];
 $cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_PET, -1, isset($cat) ? $cat : -1, User::$localeId]);
 
-if (!in_array($cat, $validCats))
+if (!Util::isValidPage($validCats, $cat))
     $smarty->error();
 
 $path[] = $cat;                                             // should be only one parameter anyway

@@ -66,7 +66,7 @@ class Lang
     public static function getLocks($lockId, $interactive = false)
     {
         $locks = [];
-        $lock = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE id = ?d', $lockId);
+        $lock  = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE id = ?d', $lockId);
         if (!$lock)
             return '';
 
@@ -279,6 +279,7 @@ class SmartyAoWoW extends Smarty
 {
     private $config    = [];
     private $jsGlobals = [];
+    private $errors    = [];
 
     public function __construct($config)
     {
@@ -319,6 +320,12 @@ class SmartyAoWoW extends Smarty
             $this->_tpl_vars['page'][$var] = $val;
     }
 
+    // use, if you want to alert the staff to a problem with Trinity
+    public function internalError($str)
+    {
+        $this->errors[] = $str;
+    }
+
     public function display($tpl)
     {
         $tv = &$this->_tpl_vars;
@@ -355,19 +362,37 @@ class SmartyAoWoW extends Smarty
             }
         }
 
+        // display occured errors
+        if (User::isInGroup(U_GROUP_STAFF) && $this->errors)
+        {
+            if (!isset($tv['announcements']))
+                $tv['announcements'] = [];
+
+            $tv['announcements'][] = array(
+                'id'     => 0,
+                'mode'   => 1,
+                'status' => 1,
+                'name'   => 'internal error',
+                'style'  => 'padding-left: 45px; background-image: url(template/images/report.gif); background-size: 15px 15px; background-position: 10px center; border: dashed 2px #C03030;',
+                'text'   => '<span id="inputbox-error">- '.implode("<br>- ", $this->errors).'</span>',
+            );
+        }
+
         // fetch announcements
         if ($tv['query'][0] && !preg_match('/[^a-z]/i', $tv['query'][0]))
         {
+            if (!isset($tv['announcements']))
+                $tv['announcements'] = [];
+
             $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*")', $tv['query'][0]);
             foreach ($ann as $k => $v)
             {
                 if ($t = Util::localizedString($v, 'text'))
+                {
                     $ann[$k]['text'] = Util::jsEscape($t);
-                else
-                    unset($ann[$k]);
+                    $tv['announcements'][] = $ann[$k];
+                }
             }
-
-            $tv['announcements'] = $ann;
         }
 
         $this->applyGlobals();
@@ -1233,6 +1258,8 @@ class Util
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
 
+    public static $pageTemplate             = null;
+
     private static $execTime = 0.0;
 
     public static function execTime($set = false)
@@ -1676,7 +1703,7 @@ class Util
             case 0:
                 return true;
             case 1:
-                return !$keys[0] || isset($struct[$keys[0]]);
+                return (is_int($keys) && in_array($keys, $struct)) || (is_array($keys) && isset($struct[$keys[0]]));
             case 2:
                 if (!isset($struct[$keys[0]]))
                     return false;
@@ -1840,11 +1867,17 @@ class Util
                 $set['max']     = $entry['maxcount'];
             }
 
+            if (!isset($groupChances[$entry['groupid']]))
+            {
+                $groupChances[$entry['groupid']] = 0;
+                $nGroupEquals[$entry['groupid']] = 0;
+            }
+
             if ($set['quest'] || !$set['group'])
                 $set['groupChance'] = abs($entry['ChanceOrQuestChance']);
             else if ($entry['groupid'] && !$entry['ChanceOrQuestChance'])
             {
-                @$nGroupEquals[$entry['groupid']]++;
+                $nGroupEquals[$entry['groupid']]++;
                 $set['groupChance'] = &$groupChances[$entry['groupid']];
             }
             else if ($entry['groupid'] && $entry['ChanceOrQuestChance'])
@@ -1854,10 +1887,8 @@ class Util
             }
             else                                            // shouldn't happened
             {
-                if (User::isInGroup(U_GROUP_DEV))
-                    die(var_dump($entry));
-                else
-                    continue;
+                Util::$pageTemplate->internalError('Loot by LootId: unhandled case in calculating chance for item '.$entry['item'].'!');
+                continue;
             }
 
             $loot[] = $set;
@@ -1868,8 +1899,11 @@ class Util
             $sum = $groupChances[$k];
             if (!$sum)
                 $sum = 0;
-            else if ($sum > 100)                            // group has > 100% dropchance .. hmm, display some kind of error..?
+            else if ($sum > 100)
+            {
+                Util::$pageTemplate->internalError('Loot by LootId: entry '.$lootId.' / group '.$k.' has a total chance of '.$sum.'%. Some items cannot drop!');
                 $sum = 100;
+            }
 
             $cnt = empty($nGroupEquals[$k]) ? 1 : $nGroupEquals[$k];
 
@@ -1879,8 +1913,7 @@ class Util
         return [$loot, array_unique($rawItems)];
     }
 
-    //                                                      v this is bullshit, but as long as there is no integral template class..
-    public static function handleLoot($table, $entry, &$pageTemplate, $debug = false)
+    public static function handleLoot($table, $entry, $debug = false, &$debugCols = [])
     {
         $lv    = [];
         $loot  = null;
@@ -1902,7 +1935,7 @@ class Util
             return $lv;
 
         $items = new ItemList(array(['i.id', $struct[1]]));
-        $items->addGlobalsToJscript($pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $items->addGlobalsToJscript(Util::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
         $foo = $items->getListviewData();
 
         // assign listview LV rows to loot rows, not the other way round! The same item may be contained multiple times
@@ -1950,7 +1983,7 @@ class Util
                 );
                 $lv[] = array_merge($base, $data);
 
-                $pageTemplate->extendGlobalData(TYPE_ITEM, [$loot['content'] => $data]);
+                Util::$pageTemplate->extendGlobalData(TYPE_ITEM, [$loot['content'] => $data]);
             }
         }
 
@@ -1972,6 +2005,20 @@ class Util
                 $_['stack'][1]++;
                 $_['percent'] = 100;
             }
+        }
+        else
+        {
+            $fields = ['mode', 'reference'];
+            $set    = 0;
+            foreach ($lv as $foo)
+                foreach ($fields as $idx => $field)
+                    if (!empty($foo[$field]))
+                        $set |= 1 << $idx;
+
+            $debugCols[] = "Listview.funcBox.createSimpleCol('group', 'Group', '7%', 'group')";
+            foreach ($fields as $idx => $field)
+                if ($set & (1 << $idx))
+                    $debugCols[] = "Listview.funcBox.createSimpleCol('".$field."', '".Util::ucFirst($field)."', '7%', '".$field."')";
         }
 
         return $lv;
@@ -2009,13 +2056,15 @@ class Util
 
             foreach ($refs as $rId => $ref)
             {
-                // errör: item/ref is in group 0 without a chance set
+                // check for possible database inconsistencies
                 if (!$ref['chance'] && !$ref['isGrouped'])
-                    continue;                               // todo (low): create dubug output
+                    Util::$pageTemplate->internalError('Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
 
-                // errör: item/ref is in group with >100% chance across all items contained
                 if ($ref['isGrouped'] && $ref['sumChance'] > 100)
-                    continue;                               // todo (low): create dubug output
+                    Util::$pageTemplate->internalError('Loot by Item: group with Item/Ref '.$ref['item'].' has '.$ref['sumChance'].'% total chance! Some items cannot drop!');
+
+                if ($ref['isGrouped'] && $ref['sumChance'] == 100 && !$ref['chance'])
+                    Util::$pageTemplate->internalError('Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
 
                 $chance = ($ref['chance'] ? $ref['chance'] : (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
 

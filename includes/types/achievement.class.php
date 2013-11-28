@@ -13,8 +13,11 @@ class AchievementList extends BaseType
     public        $criteria  = [];
     public        $tooltip   = [];
 
-    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_achievement a';
-    protected     $queryOpts = ['a' => ['o' => 'orderInGroup ASC']];
+    protected     $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
+    protected     $queryOpts = array(
+                        'a'  => ['o' => 'orderInGroup ASC'],
+                        'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievement` = `a`.`id`', true], 'g' => '`a`.`id`']
+                  );
 
     public function __construct($conditions = [], $applyFilter = false)
     {
@@ -267,7 +270,7 @@ class AchievementListFilter extends Filter
         }
 
         unset($cr);
-        $this->error = 1;
+        $this->error = true;
         return [1];
     }
 
