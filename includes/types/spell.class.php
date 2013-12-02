@@ -22,11 +22,25 @@ class SpellList extends BaseType
         10 => [98, 109, 111, 113, 115, 137, 138, 139, 140, 141, 313, 315, 673, 759],                // Languages
         11 => [164, 165, 171, 182, 186, 197, 202, 333, 393, 755, 773]                               // prim. Professions
     );
-
     public static $spellTypes  = array(
          6 => 1,
          8 => 2,
         10 => 4
+    );
+
+    public static $effects     = array(
+        'heal'       => [ 0,  3,  10,  67,  75, 136                         ],  // <no effect>, Dummy, Heal, Heal Max Health, Heal Mechanical, Heal Percent
+        'damage'     => [ 0,  2,   3,   9,  62                              ],  // <no effect>, Dummy, School Damage, Health Leech, Power Burn
+        'itemCreate' => [24, 34,  59,  66, 157                              ],  // createItem, changeItem, randomItem, createManaGem, createItem2
+        'trigger'    => [ 3, 32,  64, 101, 142, 148, 151, 152, 155, 160, 164],  // dummy, trigger missile, trigger spell, feed pet, force cast, force cast with value, unk, trigger spell 2, unk, dualwield 2H, unk, remove aura
+        'teach'      => [36, 57, 133                                        ]   // learn spell, learn pet spell, unlearn specialization
+    );
+    public static $auras       = array(
+        'heal'       => [ 4,  8, 62, 69,  97, 226                           ],  // Dummy, Periodic Heal, Periodic Health Funnel, School Absorb, Mana Shield, Periodic Dummy
+        'damage'     => [ 3,  4, 15, 53,  89, 162, 226                      ],  // Periodic Damage, Dummy, Damage Shield, Periodic Health Leech, Periodic Damage Percent, Power Burn Mana, Periodic Dummy
+        'itemCreate' => [86                                                 ],  // Channel Death Item
+        'trigger'    => [ 4, 23, 42, 48, 109, 226, 227, 231, 236, 284       ],  // dummy; 23/227: periodic trigger spell (with value); 42/231: proc trigger spell (with value); 48: unk; 109: add target trigger; 226: periodic dummy; 236: control vehicle; 284: linked
+        'teach'      => [                                                   ]
     );
 
     private       $spellVars   = [];
@@ -475,10 +489,8 @@ class SpellList extends BaseType
     public function canCreateItem()
     {
         $idx = [];
-        // effect - 24: createItem; 34: changeItem; 59: randomItem; 66: createManaGem; 157: createItem2
-        // aura   - 86: channelDeathItem
         for ($i = 1; $i < 4; $i++)
-            if (in_array($this->curTpl['effect'.$i.'Id'], [24, 34, 59, 66, 157]) || in_array($this->curTpl['effect'.$i.'AuraId'], [86]))
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['itemCreate']) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['itemCreate']))
                 if ($this->curTpl['effect'.$i.'CreateItemId'] > 0)
                     $idx[] = $i;
 
@@ -488,11 +500,20 @@ class SpellList extends BaseType
     public function canTriggerSpell()
     {
         $idx = [];
-        // effect - 3: dummy; 32: trigger missile; 36: learn spell; 57: learn pet spell; 64/151: trigger spell (2); 101: feed pet; 133: unlearn specialization; 140/142: force cast (with value); 148/152/160: unk; 155: dualwield 2H; 164: remove aura
-        // aura   - 4: dummy; 23/227: periodic trigger spell (with value); 42/231: proc trigger spell (with value); 48: unk; 109: add target trigger; 226: periodic dummy; 236: control vehicle; 284: linked
         for ($i = 1; $i < 4; $i++)
-            if (in_array($this->curTpl['effect'.$i.'Id'], [3, 32, 36, 57, 64, 101, 133, 142, 148, 151, 152, 155, 160, 164]) || in_array($this->curTpl['effect'.$i.'AuraId'], [4, 23, 42, 48, 109, 226, 227, 231, 236, 284]))
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['trigger']) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['trigger']))
                 if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0 || $this->curTpl['effect'.$i.'MiscValue'] > 0)
+                    $idx[] = $i;
+
+        return $idx;
+    }
+
+    public function canTeachSpell()
+    {
+        $idx = [];
+        for ($i = 1; $i < 4; $i++)
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['teach']) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['teach']))
+                if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0)
                     $idx[] = $i;
 
         return $idx;
@@ -505,11 +526,8 @@ class SpellList extends BaseType
 
     public function isHealingSpell()
     {
-        $eff = [0, 3, 10, 67, 75, 136];                     // <no effect>, Dummy, Heal, Heal Max Health, Heal Mechanical, Heal Percent
-        $aur = [4, 8, 62, 69, 97, 226];                     // Dummy, Periodic Heal, Periodic Health Funnel, School Absorb, Mana Shield, Periodic Dummy
-
         for ($i = 1; $i < 4; $i++)
-            if (!in_array($this->curTpl['effect'.$i.'Id'], $eff) && !in_array($this->curTpl['effect'.$i.'AuraId'], $aur))
+            if (!in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['heal']) && !in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['heal']))
                 return false;
 
         return true;
@@ -517,11 +535,8 @@ class SpellList extends BaseType
 
     public function isDamagingSpell()
     {
-        $eff = [0, 2, 3, 9, 62];                            // <no effect>, Dummy, School Damage, Health Leech, Power Burn
-        $aur = [3, 4, 15, 53, 89, 162, 226];                // Periodic Damage, Dummy, Damage Shield, Periodic Health Leech, Periodic Damage Percent, Power Burn Mana, Periodic Dummy
-
         for ($i = 1; $i < 4; $i++)
-            if (!in_array($this->curTpl['effect'.$i.'Id'], $eff) && !in_array($this->curTpl['effect'.$i.'AuraId'], $aur))
+            if (!in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['damage']) && !in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['damage']))
                 return false;
 
         return true;
@@ -1583,15 +1598,12 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                         $data[$this->id]['type'] = $type;
 
             // creates item
-            for ($i = 1; $i <= 3; $i++)
+            foreach ($this->canCreateItem() as $idx)
             {
-                if ($this->curTpl['effect'.$i.'Id'] != 24)
-                    continue;
+                $max = $this->curTpl['effect'.$idx.'DieSides'] + $this->curTpl['effect'.$idx.'BasePoints'];
+                $min = $this->curTpl['effect'.$idx.'DieSides'] > 1 ? 1 : $max;
 
-                $max = $this->curTpl['effect'.$i.'DieSides'] + $this->curTpl['effect'.$i.'BasePoints'];
-                $min = $this->curTpl['effect'.$i.'DieSides'] > 1 ? 1 : $max;
-
-                $data[$this->id]['creates'] = [$this->curTpl['effect'.$i.'CreateItemId'], $min, $max];
+                $data[$this->id]['creates'] = [$this->curTpl['effect'.$idx.'CreateItemId'], $min, $max];
                 break;
             }
 

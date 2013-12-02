@@ -11,55 +11,56 @@ $AoWoWconf['aowow'] = array(
     'user'      => 'root',
     'pass'      => '',
     'db'        => 'aowow',
-    'prefix'    => '',
+    'prefix'    => ''
 );
 
 // -- World Database --
 // used to generate data-tables
 $AoWoWconf['world'] = array(
-    'host'      => '127.0.0.1';
-    'user'      => 'root';
-    'pass'      => '';
-    'db'        => 'world';
-    'prefix'    => '';
+    'host'      => '127.0.0.1',
+    'user'      => 'root',
+    'pass'      => '',
+    'db'        => 'world',
+    'prefix'    => ''
 );
 
 // -- Auth Database --
 // used to generate user-tables
 $AoWoWconf['auth'] = array(
-    'host'      => '127.0.0.1';
-    'user'      => 'root';
-    'pass'      => '';
-    'db'        => 'auth';
-    'prefix'    => '';
+    'host'      => '127.0.0.1',
+    'user'      => 'root',
+    'pass'      => '',
+    'db'        => 'auth',
+    'prefix'    => ''
 );
 
 // -- Characters Database --
 // used to display profiles
 $AoWoWconf['characters'][0] = array(
-    'host'      => '127.0.0.1';
-    'user'      => 'root';
-    'pass'      => '';
-    'db'        => 'characters';
-    'prefix'    => '';
+    'host'      => '127.0.0.1',
+    'user'      => 'root',
+    'pass'      => '',
+    'db'        => 'characters',
+    'prefix'    => ''
 );
 // add other realms if necessary
-// $AoWoWconf['characters'][1] = array();
+// $AoWoWconf['characters'][] = [];
 
 // -- Site Configuration --
-$AoWoWconf['page']['cacheTimer'] = 60*60*24*7;                      // Time to keep cache in seconds (Default: 1 week)
-$AoWoWconf['page']['name']       = 'Aowow Database Viewer (ADV)';   // Title of the website
-$AoWoWconf['page']['shortName']  = 'Aowow';                         // used in Feeds
-$AoWoWconf['ttl']                = 60;                              // time to live for RSS
-$AoWowConf['cookieTimeout']      = 5*60*1000;                       // cookie times out in time() + X
-$AoWoWconf['register']           = true;                            // Allow account creating
-// $AoWoWconf['loginFailCount']  = 5;                               // how often invalid passwords are tollerated
-// $AoWoWconf['loginFailTime']   = 15*60;                           // how long an account is closed after exceeding above limit
-// $AoWoWconf['contactEmail']    = "feedback@aowow.org";            // ah well...
-$AoWoWconf['limit']              = 300;                             // Limit of some SQL queries
-$AoWoWconf['debug']              = true;                            // Disable cache, show smarty console panel, enable sql-errors
-$AoWoWconf['map_grouping']       = 0;                               // Map object grouping factor. Meters = 10^param. 0:disabled; 1|2|3:enabled (1:recommended)
-$AoWoWconf['battlegroup']        = 'Pure Pwnage';                   // pretend, we belong to a battlegroup to satisfy profiler-related Jscripts; region can be determined from realmlist.timezone
-$AoWoWconf['maintainance']       = false;                           // brb gnomes say hi
+$AoWoWconf['page']['cacheTimer'] = 1 * WEEK;                                // Time to keep cache in seconds (Default: 1 week)
+$AoWoWconf['page']['name']       = 'Aowow Database Viewer (ADV)';           // Title of the website
+$AoWoWconf['page']['shortName']  = 'Aowow';                                 // used in Feeds
+$AoWoWconf['ttl']                = 60;                                      // time to live for RSS
+$AoWowConf['sessionTimeout']     = 1 * HOUR;                                // non-permanent session times out in time() + X
+$AoWoWconf['register']           = true;                                    // Allow account creating
+// $AoWoWconf['loginFailCount']  = 5;                                       // how often invalid passwords are tollerated
+// $AoWoWconf['loginFailTime']   = 15 * MINUTE;                             // how long an account is closed after exceeding above limit
+// $AoWoWconf['contactEmail']    = "feedback@aowow.org";                    // ah well...
+$AoWoWconf['boardUrl']           = "http://www.wowhead.com/forums?board=";  // a javascript thing..
+$AoWoWconf['sqlLimit']           = 300;                                     // Limit of some SQL queries
+$AoWoWconf['debug']              = true;                                    // Disable cache, show smarty console panel, enable sql-errors
+$AoWoWconf['map_grouping']       = 0;                                       // Map object grouping factor. Meters = 10^param. 0:disabled; 1|2|3:enabled (1:recommended)
+$AoWoWconf['battlegroup']        = 'Pure Pwnage';                           // pretend, we belong to a battlegroup to satisfy profiler-related Jscripts; region can be determined from realmlist.timezone
+$AoWoWconf['maintainance']       = false;                                   // brb gnomes say hi
 
 ?>

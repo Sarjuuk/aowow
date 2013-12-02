@@ -73,7 +73,7 @@ class Lang
         for ($i = 1; $i <= 5; $i++)
         {
             $prop = $lock['properties'.$i];
-            $rnk  = $lock['reqSkill'.$i];
+            $rank = $lock['reqSkill'.$i];
             $name = '';
 
             if ($lock['type'.$i] == 1)                      // opened by item
@@ -87,7 +87,8 @@ class Lang
             }
             else if ($lock['type'.$i] == 2)                 // opened by skill
             {
-                if (!in_array($prop, [1, 2, 3, 4, 9, 16, 20])) // exclude unusual stuff
+                // exclude unusual stuff
+                if (!in_array($prop, [1, 2, 3, 4, 9, 16, 20]))
                     continue;
 
                 $txt = DB::Aowow()->selectRow('SELECT * FROM ?_locktype WHERE id = ?d', $prop);         // todo (low): convert to static text
@@ -110,8 +111,8 @@ class Lang
                         $name = '<a href="?skill='.$skill.'">'.$name.'</a>';
                 }
 
-                if ($rnk > 0)
-                    $name .= ' ('.$rnk.')';
+                if ($rank > 0)
+                    $name .= ' ('.$rank.')';
             }
             else
                 continue;
@@ -167,7 +168,7 @@ class Lang
         $tmp  = [];
         $strs = Lang::$spell[$class == ITEM_CLASS_ARMOR ? 'armorSubClass' : 'weaponSubClass'];
         foreach ($strs as $k => $str)
-            if ($mask & 1 << $k && $str)
+            if ($mask & (1 << $k) && $str)
                 $tmp[] = $str;
 
         return implode(', ', $tmp);
@@ -602,10 +603,10 @@ class Util
         29,             30,             null,           null,           null,           37,             44
     );
 
-    public static $gtCombatRatings          = array(
+    public static $gtCombatRatings          = array(        // 44 => 4.69512176513672 / 1.1
         12 => 1.5,      13 => 12,       14 => 15,       15 => 5,        16 => 10,       17 => 10,       18 => 8,        19 => 14,       20 => 14,
         21 => 14,       22 => 10,       23 => 10,       24 => 0,        25 => 0,        26 => 0,        27 => 0,        28 => 10,       29 => 10,
-        30 => 10,       31 => 10,       32 => 14,       33 => 0,        34 => 0,        35 => 25,       36 => 10,       37 => 2.5,      44 => 3.756097412109376
+        30 => 10,       31 => 10,       32 => 14,       33 => 0,        34 => 0,        35 => 25,       36 => 10,       37 => 2.5,      44 => 4.2682925138
     );
 
     public static $lvlIndepRating           = array(        // rating doesn't scale with level
@@ -1703,7 +1704,7 @@ class Util
             case 0:
                 return true;
             case 1:
-                return (is_int($keys) && in_array($keys, $struct)) || (is_array($keys) && isset($struct[$keys[0]]));
+                return (is_int($keys) && in_array($keys, $struct)) || (is_array($keys) && (isset($struct[$keys[0]]) || $keys[0] === null && count($keys) == 1));
             case 2:
                 if (!isset($struct[$keys[0]]))
                     return false;

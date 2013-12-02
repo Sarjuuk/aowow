@@ -25,7 +25,7 @@ $WH.g_convertRatingToPercent.RB = {
     35: 25,
     36: 10,
     37: 2.5,
-    44: 3.756097412109376
+    44: 4.69512176513672 / 1.1
 };
 
 $WH.g_convertScalingFactor.SV = {

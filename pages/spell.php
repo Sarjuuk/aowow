@@ -467,8 +467,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // Iterate through all effects:
     $pageData['page']['effect'] = [];
 
-    $triggerIdx = $spell->canTriggerSpell();
-    $itemIdx    = $spell->canCreateItem();
+    $spellIdx = array_unique(array_merge($spell->canTriggerSpell(), $spell->canTeachSpell()));
+    $itemIdx  = $spell->canCreateItem();
 
     for ($i = 1; $i < 4; $i++)
     {
@@ -506,7 +506,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $foo['icon']['count'] = "'".($effBP + 1).'-'.$foo['icon']['count']."'";
         }
         // .. from spell
-        else if (in_array($i, $triggerIdx))
+        else if (in_array($i, $spellIdx))
         {
             $_ = $spell->getField('effect'.$i.'TriggerSpell');
             if (!$_)
@@ -529,7 +529,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if ($spell->getField('effect'.$i.'RadiusMax') > 0)
             $foo['radius'] = $spell->getField('effect'.$i.'RadiusMax');
 
-        if (($effBP + $effDS) && !($itemIdx && $spell->relItems && !$spell->relItems->error) && (!in_array($i, $triggerIdx) || in_array($effAura, [225, 227])))
+        if (($effBP + $effDS) && !($itemIdx && $spell->relItems && !$spell->relItems->error) && (!in_array($i, $spellIdx) || in_array($effAura, [225, 227])))
             $foo['value'] = ($effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
 
         if ($effRPPL != 0)
@@ -1156,25 +1156,26 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $ubItems->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
     }
 
-    // tab: criteria of
-    $_ = [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL];
-    if ($crs = DB::Aowow()->selectCol('SELECT refAchievement FROM ?_achievementCriteria WHERE type IN (?a) AND value1 = ?d', $_, $spell->id))
+    $conditions = array(
+        ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET,     ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2,     ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL,
+                     ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2,         ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL]
+        ],
+        ['ac.value1', $_id]
+    );
+    $coAchievemnts = new AchievementList($conditions);
+    if (!$coAchievemnts->error)
     {
-        $coAchievemnts = new AchievementList(array(['id', $crs]));
-        if (!$coAchievemnts->error)
-        {
-            $pageData['relTabs'][] = array(
-                'file'   => 'achievement',
-                'data'   => $coAchievemnts->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
-                    'id'   => 'criteria-of',
-                    'name' => '$LANG.tab_criteriaof'
-                ]
-            );
+        $pageData['relTabs'][] = array(
+            'file'   => 'achievement',
+            'data'   => $coAchievemnts->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'criteria-of',
+                'name' => '$LANG.tab_criteriaof'
+            ]
+        );
 
-            $coAchievemnts->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
-        }
+        $coAchievemnts->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
     }
 
     // tab: contains
@@ -1343,13 +1344,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
 
     // tab: triggered by
-    $eff = [3, 32, 64, 101, 133, 142, 148, 151, 152, 160, 164];
-    $aur = [4, 23, 42,  48, 109, 226, 227, 231, 236, 284];
     $conditions = array(
         'OR',
-        ['AND', ['OR', ['effect1Id', $eff], ['effect1AuraId', $aur]], ['effect1TriggerSpell', $spell->id]],
-        ['AND', ['OR', ['effect2Id', $eff], ['effect2AuraId', $aur]], ['effect2TriggerSpell', $spell->id]],
-        ['AND', ['OR', ['effect3Id', $eff], ['effect3AuraId', $aur]], ['effect3TriggerSpell', $spell->id]],
+        ['AND', ['OR', ['effect1Id', SpellList::$effects['trigger']], ['effect1AuraId', SpellList::$auras['trigger']]], ['effect1TriggerSpell', $spell->id]],
+        ['AND', ['OR', ['effect2Id', SpellList::$effects['trigger']], ['effect2AuraId', SpellList::$auras['trigger']]], ['effect2TriggerSpell', $spell->id]],
+        ['AND', ['OR', ['effect3Id', SpellList::$effects['trigger']], ['effect3AuraId', SpellList::$auras['trigger']]], ['effect3TriggerSpell', $spell->id]],
     );
 
     $trigger = new SpellList($conditions);
@@ -1367,127 +1366,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
         $trigger->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
     }
-
-    // tab: taught by npc (source:6 => trainer)
-    if (!empty($spell->sources[$_id]) && in_array(6, array_keys($spell->sources[$_id])))
-    {
-        $list = [];
-        if (count($spell->sources[$_id][6]) == 1 && $spell->sources[$_id][6][0] == 0) // multiple trainer
-        {
-            $tt = null;
-            if (in_array($_cat, [9, 11]))                   // Professions
-                $tt = @Util::$trainerTemplates[TYPE_SKILL][$spell->getField('skillLines')[0]];
-            else if ($_cat == 7 && $spell->getField('reqClassMask')) // Class Spells
-            {
-                $clId = log($spell->getField('reqClassMask'), 2) + 1 ;
-                if (intVal($clId) == $clId)                 // only one class was set, so float == int
-                    $tt = @Util::$trainerTemplates[TYPE_CLASS][$clId];
-            }
-
-            if ($tt)
-                $list = DB::Aowow()->selectCol('SELECT DISTINCT entry FROM npc_trainer WHERE spell IN (?a) AND entry < 200000', $tt);
-            else
-            {
-                $mask = 0;
-                foreach (Util::$skillLineMask[-3] as $idx => $pair)
-                    if ($pair[1] == $_id)
-                        $mask |= 1 << $idx;
-
-                $list = DB::Aowow()->selectCol('
-                    SELECT    IF(t1.entry > 200000, t2.entry, t1.entry)
-                    FROM      npc_trainer t1
-                    LEFT JOIN npc_trainer t2 ON t2.spell = -t1.entry
-                    WHERE     t1.spell = ?d',
-                    $_id
-                );
-            }
-        }
-        else
-            $list = [];
-
-        if ($list)
-        {
-            $tbTrainer = new CreatureList(array(0, ['ct.id', $list], ['ct.spawns', 0, '>'], ['ct.npcflag', 0x10, '&']));
-            if (!$tbTrainer->error)
-            {
-                $tbTrainer->addGlobalsToJscript($smarty);
-                $pageData['relTabs'][] = array(
-                    'file'   => 'creature',
-                    'data'   => $tbTrainer->getListviewData(),
-                    'params' => array(
-                        'tabs' => '$tabsRelated',
-                        'id'   => 'taught-by-npc',
-                        'name' => '$LANG.tab_taughtby',
-                    )
-                );
-            }
-        }
-    }
-
-    // tab: taught by spell (36:self, 57:pet)
-    $conditions = array(
-        'OR',
-        ['AND', ['effect1Id', [36, 57]], ['effect1TriggerSpell', $spell->id]],
-        ['AND', ['effect2Id', [36, 57]], ['effect2TriggerSpell', $spell->id]],
-        ['AND', ['effect3Id', [36, 57]], ['effect3TriggerSpell', $spell->id]],
-    );
-
-    $tbSpell = new SpellList($conditions);
-    if (!$tbSpell->error)
-    {
-        $pageData['relTabs'][] = array(
-            'file'   => 'spell',
-            'data'   => $tbSpell->getListviewData(),
-            'params' => [
-                'tabs' => '$tabsRelated',
-                'id'   => 'taught-by-spell',
-                'name' => '$LANG.tab_taughtby'
-            ]
-        );
-
-        $tbSpell->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
-    }
-
-    // tab: taught by item (i'd like to precheck $spell->sources, but there is no source:item only complicated crap like "drop" and "vendor")
-    $conditions = array(
-        'OR',
-        ['AND', ['spellTrigger1', 6], ['spellId1', $spell->id]],
-        ['AND', ['spellTrigger2', 6], ['spellId2', $spell->id]],
-        ['AND', ['spellTrigger3', 6], ['spellId3', $spell->id]],
-        ['AND', ['spellTrigger4', 6], ['spellId4', $spell->id]],
-        ['AND', ['spellTrigger5', 6], ['spellId5', $spell->id]],
-    );
-
-
-    $tbItem = new ItemList($conditions);
-    if (!$tbItem->error)
-    {
-        $pageData['relTabs'][] = array(
-            'file'   => 'item',
-            'data'   => $tbItem->getListviewData(),
-            'params' => [
-                'tabs' => '$tabsRelated',
-                'id'   => 'taught-by-item',
-                'name' => '$LANG.tab_taughtby'
-            ]
-        );
-
-        $tbItem->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
-    }
-
-    // find associated NPC, Item and merge results
-    // taughtbypets (unused..?)
-    // taughtbyquest
-    // taughtbytrainers
-    // taughtbyitem
-
-    // tab: teaches
-    // -> spell_learn_spell
-    // -> skill_discovery_template
-
-    /* NEW
-        conditions
-    */
 
     // used by - creature
     // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
@@ -1536,6 +1414,166 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $tbQuest->addGlobalsToJScript($smarty);
         }
     }
+
+    // tab: teaches
+    $_ = [];
+    foreach ($spell->canTeachSpell() as $idx)
+        $_[] = $spell->getField('effect'.$idx.'TriggerSpell');
+
+    $ids = array_merge(
+        DB::Aowow()->selectCol('SELECT spellId FROM spell_learn_spell WHERE entry = ?d', $_id),
+        DB::Aowow()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell = ?d', $_id),   // note: omits required spell and chance
+        $_
+    );
+
+    if ($ids)
+    {
+        $teaches = new SpellList(array(['id', $ids]));
+        if (!$teaches->error)
+        {
+            $teaches->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $vis = ['level', 'schools'];
+            $hid = [];
+            if (!$teaches->hasSetFields(['skillLines']))
+                $hid[] = 'skill';
+
+            foreach ($teaches->iterate() as $__)
+            {
+                if (!$teaches->canCreateItem())
+                    continue;
+
+                $vis[] = 'reagents';
+                break;
+            }
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'spell',
+                'data'   => $teaches->getListviewData(),
+                'params' => [
+                    'tabs'        => '$tabsRelated',
+                    'id'          => 'teaches-spell',
+                    'name'        => '$LANG.tab_teaches',
+                    'visibleCols' => '$'.json_encode($vis),
+                    'hiddenCols'  => $hid ? '$'.json_encode($hid) : null
+                ]
+            );
+        }
+    }
+
+    // tab: taught by npc (source:6 => trainer)
+    if (!empty($spell->sources[$_id]) && in_array(6, array_keys($spell->sources[$_id])))
+    {
+        $list = [];
+        if (count($spell->sources[$_id][6]) == 1 && $spell->sources[$_id][6][0] == 0)   // multiple trainer
+        {
+            $tt = null;
+            if (in_array($_cat, [9, 11]))                                               // Professions
+                $tt = @Util::$trainerTemplates[TYPE_SKILL][$spell->getField('skillLines')[0]];
+            else if ($_cat == 7 && $spell->getField('reqClassMask'))                    // Class Spells
+            {
+                $clId = log($spell->getField('reqClassMask'), 2) + 1 ;
+                if (intVal($clId) == $clId)                                             // only one class was set, so float == int
+                    $tt = @Util::$trainerTemplates[TYPE_CLASS][$clId];
+            }
+
+            if ($tt)
+                $list = DB::Aowow()->selectCol('SELECT DISTINCT entry FROM npc_trainer WHERE spell IN (?a) AND entry < 200000', $tt);
+            else
+            {
+                $mask = 0;
+                foreach (Util::$skillLineMask[-3] as $idx => $pair)
+                    if ($pair[1] == $_id)
+                        $mask |= 1 << $idx;
+
+                $list = DB::Aowow()->selectCol('
+                    SELECT    IF(t1.entry > 200000, t2.entry, t1.entry)
+                    FROM      npc_trainer t1
+                    LEFT JOIN npc_trainer t2 ON t2.spell = -t1.entry
+                    WHERE     t1.spell = ?d',
+                    $_id
+                );
+            }
+        }
+
+        if ($list)
+        {
+            $tbTrainer = new CreatureList(array(0, ['ct.id', $list], ['ct.spawns', 0, '>'], ['ct.npcflag', 0x10, '&']));
+            if (!$tbTrainer->error)
+            {
+                $tbTrainer->addGlobalsToJscript($smarty);
+                $pageData['relTabs'][] = array(
+                    'file'   => 'creature',
+                    'data'   => $tbTrainer->getListviewData(),
+                    'params' => array(
+                        'tabs' => '$tabsRelated',
+                        'id'   => 'taught-by-npc',
+                        'name' => '$LANG.tab_taughtby',
+                    )
+                );
+            }
+        }
+    }
+
+    // tab: taught by spell
+    $conditions = array(
+        'OR',
+        ['AND', ['effect1Id', SpellList::$effects['teach']], ['effect1TriggerSpell', $spell->id]],
+        ['AND', ['effect2Id', SpellList::$effects['teach']], ['effect2TriggerSpell', $spell->id]],
+        ['AND', ['effect3Id', SpellList::$effects['teach']], ['effect3TriggerSpell', $spell->id]],
+    );
+
+    $tbSpell = new SpellList($conditions);
+    if (!$tbSpell->error)
+    {
+        $pageData['relTabs'][] = array(
+            'file'   => 'spell',
+            'data'   => $tbSpell->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'taught-by-spell',
+                'name' => '$LANG.tab_taughtby'
+            ]
+        );
+
+        $tbSpell->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+    }
+
+    // tab: taught by item (i'd like to precheck $spell->sources, but there is no source:item only complicated crap like "drop" and "vendor")
+    $conditions = array(
+        'OR',
+        ['AND', ['spellTrigger1', 6], ['spellId1', $spell->id]],
+        ['AND', ['spellTrigger2', 6], ['spellId2', $spell->id]],
+        ['AND', ['spellTrigger3', 6], ['spellId3', $spell->id]],
+        ['AND', ['spellTrigger4', 6], ['spellId4', $spell->id]],
+        ['AND', ['spellTrigger5', 6], ['spellId5', $spell->id]],
+    );
+
+    $tbItem = new ItemList($conditions);
+    if (!$tbItem->error)
+    {
+        $pageData['relTabs'][] = array(
+            'file'   => 'item',
+            'data'   => $tbItem->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'taught-by-item',
+                'name' => '$LANG.tab_taughtby'
+            ]
+        );
+
+        $tbItem->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+    }
+
+    // find associated NPC, Item and merge results
+    // taughtbypets (unused..?)
+    // taughtbyquest (usually the spell casted as quest reward teaches something; exclude those seplls from taughtBySpell)
+    // taughtbytrainers
+    // taughtbyitem
+
+
+    /* NEW
+        conditions
+    */
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
