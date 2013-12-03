@@ -13,7 +13,7 @@ class GameObjectList extends BaseType
     protected       $queryBase = 'SELECT *, go.entry AS ARRAY_KEY FROM gameobject_template go';
     protected       $queryOpts = array(
                         'go' => [['lg']],
-                        'lg' => ['j' => ['locales_gameobject lq ON go.entry = lq.entry', true]],
+                        'lg' => ['j' => ['locales_gameobject lg ON go.entry = lg.entry', true]],
                         'l'  => ['j' => ['?_lock l ON l.id = IF(go.type = 3, data0, null)', true], 's' => ', l.type1, l.properties1, l.reqSkill1, l.type2, l.properties2, l.reqSkill2']
                     );
 

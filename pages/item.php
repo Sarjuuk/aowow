@@ -312,23 +312,23 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     // tabs: this item is contained in..
     $sourceTabs = array(
     //   0 => refLoot
-         1 => ['item',     '$LANG.tab_containedin',      'contained-in-item', [], [], []],
-         2 => ['item',     '$LANG.tab_disenchantedfrom', 'disenchanted-from', [], [], []],
-         3 => ['item',     '$LANG.tab_prospectedfrom',   'prospected-from',   [], [], []],
-         4 => ['item',     '$LANG.tab_milledfrom',       'milled-from',       [], [], []],
-         5 => ['creature', '$LANG.tab_droppedby',        'dropped-by',        [], [], []],
-         6 => ['creature', '$LANG.tab_pickpocketedfrom', 'pickpocketed-from', [], [], []],
-         7 => ['creature', '$LANG.tab_skinnedfrom',      'skinned-from',      [], [], []],
-         8 => ['creature', '$LANG.tab_minedfromnpc',     'mined-from-npc',    [], [], []],
-         9 => ['creature', '$LANG.tab_salvagedfrom',     'salvaged-from',     [], [], []],
-        10 => ['creature', '$LANG.tab_gatheredfromnpc',  'gathered-from-npc', [], [], []],
-        11 => ['quest',    '$LANG.tab_rewardfrom',       'reward-from-quest', [], [], []],
-        12 => ['zone',     '$LANG.tab_fishedin',         'fished-in-zone',    [], [], []],
-        13 => ['object',   '$LANG.tab_containedin',      'contained-in-go',   [], [], []],
-        14 => ['object',   '$LANG.tab_minedfrom',        'mined-from-go',     [], [], []],
-        15 => ['object',   '$LANG.tab_gatheredfrom',     'gathered-from-go',  [], [], []],
-        16 => ['object',   '$LANG.tab_fishedin',         'fished-in-go',      [], [], []],
-        17 => ['spell',    '$LANG.tab_createdby',        'created-by',        [], [], []]
+         1 => ['item',     '$LANG.tab_containedin',      'contained-in-item',    [], [], []],
+         2 => ['item',     '$LANG.tab_disenchantedfrom', 'disenchanted-from',    [], [], []],
+         3 => ['item',     '$LANG.tab_prospectedfrom',   'prospected-from',      [], [], []],
+         4 => ['item',     '$LANG.tab_milledfrom',       'milled-from',          [], [], []],
+         5 => ['creature', '$LANG.tab_droppedby',        'dropped-by',           [], [], []],
+         6 => ['creature', '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',    [], [], []],
+         7 => ['creature', '$LANG.tab_skinnedfrom',      'skinned-from',         [], [], []],
+         8 => ['creature', '$LANG.tab_minedfromnpc',     'mined-from-npc',       [], [], []],
+         9 => ['creature', '$LANG.tab_salvagedfrom',     'salvaged-from',        [], [], []],
+        10 => ['creature', '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',    [], [], []],
+        11 => ['quest',    '$LANG.tab_rewardfrom',       'reward-from-quest',    [], [], []],
+        12 => ['zone',     '$LANG.tab_fishedin',         'fished-in-zone',       [], [], []],
+        13 => ['object',   '$LANG.tab_containedin',      'contained-in-object',  [], [], []],
+        14 => ['object',   '$LANG.tab_minedfrom',        'mined-from-object',    [], [], []],
+        15 => ['object',   '$LANG.tab_gatheredfrom',     'gathered-from-object', [], [], []],
+        16 => ['object',   '$LANG.tab_fishedin',         'fished-in-object',     [], [], []],
+        17 => ['spell',    '$LANG.tab_createdby',        'created-by',           [], [], []]
     );
 
     $data      = [];
@@ -476,11 +476,14 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     $spellLoot = new SpellList($conditions);
     if (!$spellLoot->error)
     {
-        $spellLoot->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+        $spellLoot->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
         $spellData = $spellLoot->getListviewData();
 
         if (!empty($sources[LOOT_SPELL]))
             $sourceTabs[17][3][] = 'Listview.extraCols.percent';
+
+        if ($spellLoot->hasSetFields(['reagent1']))
+            $sourceTabs[17][5][] = 'reagents';
 
         foreach ($spellLoot->iterate() as $_)
         {
@@ -518,11 +521,23 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
          [LOOT_DISENCHANT,  $item->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []]
     );
 
+    $reqQuest = [];
     foreach ($sourceFor as $sf)
     {
-        $itemLoot = Util::handleLoot($sf[0], $sf[1], User::isInGroup(U_GROUP_STAFF), $sf[4]);
-        if ($itemLoot)
+        if ($itemLoot = Util::handleLoot($sf[0], $sf[1], User::isInGroup(U_GROUP_STAFF), $sf[4]))
         {
+            foreach ($itemLoot as $l => $lv)
+            {
+                if (!$lv['quest'])
+                    continue;
+
+                $sf[4][] = 'Listview.extraCols.condition';
+
+                $reqQuest[$lv['id']] = 0;
+
+                $itemLoot[$l]['condition'] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
+            }
+
             $pageData['relTabs'][] = array(
                 'file'   => 'item',
                 'data'   => $itemLoot,
@@ -530,11 +545,35 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
                     'tabs'        => '$tabsRelated',
                     'name'        => $sf[2],
                     'id'          => $sf[3],
-                    'extraCols'   => $sf[4] ? "$[".implode(', ', $sf[4])."]" : null,
+                    'extraCols'   => $sf[4] ? "$[".implode(', ', array_unique($sf[4]))."]" : null,
                     'hiddenCols'  => $sf[5] ? "$".json_encode($sf[5]) : null,
                     'visibleCols' => $sf[6] ? '$'.json_encode($sf[6]) : null
                 ]
             );
+        }
+    }
+
+    if ($reqIds = array_keys($reqQuest))                    // apply quest-conditions as back-reference
+    {
+        $conditions = array(
+            'OR',
+            ['requiredSourceItemId1', $reqIds], ['requiredSourceItemId2', $reqIds],
+            ['requiredSourceItemId3', $reqIds], ['requiredSourceItemId4', $reqIds],
+            ['requiredItemId1', $reqIds], ['requiredItemId2', $reqIds], ['requiredItemId3', $reqIds],
+            ['requiredItemId4', $reqIds], ['requiredItemId5', $reqIds], ['requiredItemId6', $reqIds]
+        );
+
+        $reqQuests = new QuestList($conditions);
+        $reqQuests->addGlobalsToJscript($smarty);
+
+        foreach ($reqQuests->iterate() as $qId => $__)
+        {
+            if (empty($reqQuests->requires[$qId][TYPE_ITEM]))
+                continue;
+
+            foreach ($reqIds as $rId)
+                if (in_array($rId, $reqQuests->requires[$qId][TYPE_ITEM]))
+                    $reqQuest[$rId] = $reqQuests->id;
         }
     }
 
@@ -562,6 +601,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
             );
         }
     }
+
     // tab: can be contained in (except keys)
     else if ($_bagFamily != 0x0100)
     {
@@ -704,17 +744,78 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         );
     }
 
+    // tab: starts (quest) [omited, because the questlink IS ALREADY in the item tooltip]
+
+    // tab: objective of (quest)
+    $conditions = array(
+        'OR',
+        ['requiredItemId1', $_id], ['requiredItemId2', $_id], ['requiredItemId3', $_id],
+        ['requiredItemId4', $_id], ['requiredItemId5', $_id], ['requiredItemId6', $_id]
+    );
+    $objective = new QuestList($conditions);
+    if (!$objective->error)
+    {
+        $objective->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+
+        $pageData['relTabs'][] = array(
+            'file'   => 'quest',
+            'data'   => $objective->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'name' => '$LANG.tab_objectiveof',
+                'id'   => 'objective-of-quest'
+            ]
+        );
+    }
+
+    // tab: provided for (quest)
+    $conditions = array(
+        'OR', ['sourceItemId', $_id],
+        ['requiredSourceItemId1', $_id], ['requiredSourceItemId2', $_id],
+        ['requiredSourceItemId3', $_id], ['requiredSourceItemId4', $_id]
+    );
+    $provided = new QuestList($conditions);
+    if (!$provided->error)
+    {
+        $provided->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+
+        $pageData['relTabs'][] = array(
+            'file'   => 'quest',
+            'data'   => $provided->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'name' => '$LANG.tab_providedfor',
+                'id'   => 'provided-for-quest'
+            ]
+        );
+    }
+
+    // tab: same model as
+    if ($model = $item->getField('model'))
+    {
+        $sameModel = new ItemList(array(['model', $model], ['id', $_id, '!']));
+        if (!$sameModel->error)
+        {
+            $sameModel->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'genericmodel',
+                'data'   => $sameModel->getListviewData(ITEMINFO_MODEL),
+                'params' => [
+                    'tabs'            => '$tabsRelated',
+                    'name'            => '$LANG.tab_samemodelas',
+                    'id'              => 'same-model-as',
+                    'genericlinktype' => 'item'
+                ]
+            );
+        }
+    }
+
     // sold by [consult itemExtendedCost]
-
-    // Objective of (quest)
-
-    // provided for (quest)
 
     // currency for
 
     // teaches
-
-    // Same model as
 
     // Shared cooldown
 

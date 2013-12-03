@@ -8,6 +8,9 @@ class QuestList extends BaseType
 {
     public static   $type      = TYPE_QUEST;
 
+    public          $requires  = [];
+    public          $rewards   = [];
+
     protected       $queryBase = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt';
     protected       $queryOpts = array(
                         'qt' => [['lq']],
@@ -19,8 +22,9 @@ class QuestList extends BaseType
         parent::__construct($conditions);
 
         // post processing
-        foreach ($this->iterate() as &$_curTpl)
+        foreach ($this->iterate() as $id => &$_curTpl)
         {
+
             $_curTpl['cat1'] = $_curTpl['ZoneOrSort'];      // should probably be in a method...
             $_curTpl['cat2'] = 0;
 
@@ -32,6 +36,28 @@ class QuestList extends BaseType
                     break;
                 }
             }
+
+            // todo (med): extend for reward case
+            $data = [];
+            for ($i = 1; $i < 7; $i++)
+            {
+                if ($_ = $_curTpl['RequiredItemId'.$i])
+                    $data[TYPE_ITEM][] = $_;
+
+                if ($i > 4)
+                    continue;
+
+                if ($_curTpl['RequiredNpcOrGo'.$i] > 0)
+                    $data[TYPE_NPC][] = $_curTpl['RequiredNpcOrGo'.$i];
+                else if ($_curTpl['RequiredNpcOrGo'.$i] < 0)
+                    $data[TYPE_OBJECT][] = -$_curTpl['RequiredNpcOrGo'.$i];
+
+                if ($_ = $_curTpl['RequiredSourceItemId'.$i])
+                    $data[TYPE_ITEM][] = $_;
+            }
+
+            if ($data)
+                $this->requires[$id] = $data;
         }
     }
 

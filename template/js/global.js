@@ -35,82 +35,82 @@ var U_GROUP_PREMIUM_PERMISSIONS = U_GROUP_PREMIUM | U_GROUP_STAFF     | U_GROUP_
 var g_users = {};
 
 function g_isUsernameValid(username) {
-	return (username.match(/[^a-z0-9]/i) == null && username.length >= 4 && username.length <= 16);
+    return (username.match(/[^a-z0-9]/i) == null && username.length >= 4 && username.length <= 16);
 }
 
 var User = new function() {
-	var self = this;
+    var self = this;
 
-	/**********/
-	/* PUBLIC */
-	/**********/
+    /**********/
+    /* PUBLIC */
+    /**********/
 
-	self.hasPermissions = function(roles) {
-		if (!roles) {
-			return true;
-		}
+    self.hasPermissions = function(roles) {
+        if (!roles) {
+            return true;
+        }
 
-		return !!(g_user.roles & roles);
-	}
+        return !!(g_user.roles & roles);
+    }
 
-	/**********/
-	/* PRIVATE */
-	/**********/
+    /**********/
+    /* PRIVATE */
+    /**********/
 
 };
 
 function Ajax(url, opt) {
-	if (!url) {
-		return;
-	}
+    if (!url) {
+        return;
+    }
 
-	var _;
+    var _;
 
-	try { _ = new XMLHttpRequest() }
+    try { _ = new XMLHttpRequest() }
     catch(e) {
-		try { _ = new ActiveXObject("Msxml2.XMLHTTP") }
+        try { _ = new ActiveXObject("Msxml2.XMLHTTP") }
         catch(e) {
-			try { _ = new ActiveXObject("Microsoft.XMLHTTP") }
+            try { _ = new ActiveXObject("Microsoft.XMLHTTP") }
             catch(e) {
-				if (window.createRequest) {
-					_ = window.createRequest();
-				}
+                if (window.createRequest) {
+                    _ = window.createRequest();
+                }
                 else {
-					alert(LANG.message_ajaxnotsupported);
-					return;
-				}
-			}
-		}
-	}
+                    alert(LANG.message_ajaxnotsupported);
+                    return;
+                }
+            }
+        }
+    }
 
-	this.request = _;
+    this.request = _;
 
-	$WH.cO(this, opt);
-	this.method = this.method || (this.params && 'POST') || 'GET';
+    $WH.cO(this, opt);
+    this.method = this.method || (this.params && 'POST') || 'GET';
 
-	_.open(this.method, url, this.async == null ? true: this.async);
-	_.onreadystatechange = Ajax.onReadyStateChange.bind(this);
+    _.open(this.method, url, this.async == null ? true: this.async);
+    _.onreadystatechange = Ajax.onReadyStateChange.bind(this);
 
-	if (this.method.toUpperCase() == 'POST') {
-		_.setRequestHeader('Content-Type', (this.contentType || 'application/x-www-form-urlencoded') + '; charset=' + (this.encoding || 'UTF-8'));
-	}
+    if (this.method.toUpperCase() == 'POST') {
+        _.setRequestHeader('Content-Type', (this.contentType || 'application/x-www-form-urlencoded') + '; charset=' + (this.encoding || 'UTF-8'));
+    }
 
-	_.send(this.params);
+    _.send(this.params);
 }
 
 Ajax.onReadyStateChange = function() {
-	if (this.request.readyState == 4) {
-		if (this.request.status == 0 || (this.request.status >= 200 && this.request.status < 300)) {
-			this.onSuccess != null && this.onSuccess(this.request, this);
-		}
+    if (this.request.readyState == 4) {
+        if (this.request.status == 0 || (this.request.status >= 200 && this.request.status < 300)) {
+            this.onSuccess != null && this.onSuccess(this.request, this);
+        }
         else {
-			this.onFailure != null && this.onFailure(this.request, this);
-		}
+            this.onFailure != null && this.onFailure(this.request, this);
+        }
 
-		if (this.onComplete != null) {
-			this.onComplete(this.request, this);
-		}
-	}
+        if (this.onComplete != null) {
+            this.onComplete(this.request, this);
+        }
+    }
 };
 
 var DomContentLoaded = new function() {
@@ -141,235 +141,235 @@ var DomContentLoaded = new function() {
 };
 
 function g_addCss(b) {
-	var c = $WH.ce("style");
-	c.type = "text/css";
-	if (c.styleSheet) {
-		c.styleSheet.cssText = b
-	} else {
-		$WH.ae(c, $WH.ct(b))
-	}
-	var a = $WH.gE(document, "head")[0];
-	$WH.ae(a, c)
+    var c = $WH.ce("style");
+    c.type = "text/css";
+    if (c.styleSheet) {
+        c.styleSheet.cssText = b
+    } else {
+        $WH.ae(c, $WH.ct(b))
+    }
+    var a = $WH.gE(document, "head")[0];
+    $WH.ae(a, c)
 }
 function g_setTextNodes(c, b) {
-	if (c.nodeType == 3) {
-		c.nodeValue = b
-	} else {
-		for (var a = 0; a < c.childNodes.length; ++a) {
-			g_setTextNodes(c.childNodes[a], b)
-		}
-	}
+    if (c.nodeType == 3) {
+        c.nodeValue = b
+    } else {
+        for (var a = 0; a < c.childNodes.length; ++a) {
+            g_setTextNodes(c.childNodes[a], b)
+        }
+    }
 }
 function g_setInnerHtml(d, c, a) {
-	if (d.nodeName.toLowerCase() == a) {
-		d.innerHTML = c
-	} else {
-		for (var b = 0; b < d.childNodes.length; ++b) {
-			g_setInnerHtml(d.childNodes[b], c, a)
-		}
-	}
+    if (d.nodeName.toLowerCase() == a) {
+        d.innerHTML = c
+    } else {
+        for (var b = 0; b < d.childNodes.length; ++b) {
+            g_setInnerHtml(d.childNodes[b], c, a)
+        }
+    }
 }
 function g_getTextContent(c) {
-	var a = "";
-	for (var b = 0; b < c.childNodes.length; ++b) {
-		if (c.childNodes[b].nodeValue) {
-			a += c.childNodes[b].nodeValue
-		} else {
-			if (c.childNodes[b].nodeName == "BR") {
-				if ($WH.Browser.ie67) {
-					a += "\r"
-				} else {
-					a += "\n"
-				}
-			}
-		}
-		a += g_getTextContent(c.childNodes[b])
-	}
-	return a
+    var a = "";
+    for (var b = 0; b < c.childNodes.length; ++b) {
+        if (c.childNodes[b].nodeValue) {
+            a += c.childNodes[b].nodeValue
+        } else {
+            if (c.childNodes[b].nodeName == "BR") {
+                if ($WH.Browser.ie67) {
+                    a += "\r"
+                } else {
+                    a += "\n"
+                }
+            }
+        }
+        a += g_getTextContent(c.childNodes[b])
+    }
+    return a
 }
 
 function g_pickerWheel(evt)
 {
-	evt = $WH.$E(evt);
+    evt = $WH.$E(evt);
 
-	if (evt._wheelDelta < 0)
-		this.scrollTop += 27;
-	else
-		this.scrollTop -= 27;
+    if (evt._wheelDelta < 0)
+        this.scrollTop += 27;
+    else
+        this.scrollTop -= 27;
 }
 
 function g_setSelectedLink(c, b) {
-	if (!g_setSelectedLink.groups) {
-		g_setSelectedLink.groups = {}
-	}
-	var a = g_setSelectedLink.groups;
-	if (a[b]) {
-		a[b].className = a[b].className.replace("selected", "")
-	}
-	c.className += " selected";
-	a[b] = c
+    if (!g_setSelectedLink.groups) {
+        g_setSelectedLink.groups = {}
+    }
+    var a = g_setSelectedLink.groups;
+    if (a[b]) {
+        a[b].className = a[b].className.replace("selected", "")
+    }
+    c.className += " selected";
+    a[b] = c
 }
 function g_setCheckedRow(c, b) {
-	if (!g_setCheckedRow.groups) {
-		g_setCheckedRow.groups = {}
-	}
-	var a = g_setCheckedRow.groups;
-	if (a[b]) {
-		a[b].className = a[b].className.replace("checked", "")
-	}
-	c.className += " checked";
-	a[b] = c
+    if (!g_setCheckedRow.groups) {
+        g_setCheckedRow.groups = {}
+    }
+    var a = g_setCheckedRow.groups;
+    if (a[b]) {
+        a[b].className = a[b].className.replace("checked", "")
+    }
+    c.className += " checked";
+    a[b] = c
 }
 function g_toggleDisplay(a) {
-	if (a.style.display == "none") {
-		a.style.display = "";
-		return true
-	} else {
-		a.style.display = "none";
-		return false
-	}
+    if (a.style.display == "none") {
+        a.style.display = "";
+        return true
+    } else {
+        a.style.display = "none";
+        return false
+    }
 }
 function g_enableScroll(a) {
-	if (!a) {
-		$WH.aE(document, "mousewheel", g_enableScroll.F);
-		$WH.aE(window, "DOMMouseScroll", g_enableScroll.F)
-	} else {
-		$WH.dE(document, "mousewheel", g_enableScroll.F);
-		$WH.dE(window, "DOMMouseScroll", g_enableScroll.F)
-	}
+    if (!a) {
+        $WH.aE(document, "mousewheel", g_enableScroll.F);
+        $WH.aE(window, "DOMMouseScroll", g_enableScroll.F)
+    } else {
+        $WH.dE(document, "mousewheel", g_enableScroll.F);
+        $WH.dE(window, "DOMMouseScroll", g_enableScroll.F)
+    }
 }
 g_enableScroll.F = function(a) {
-	if (a.stopPropagation) {
-		a.stopPropagation()
-	}
-	if (a.preventDefault) {
-		a.preventDefault()
-	}
-	a.returnValue = false;
-	a.cancelBubble = true;
-	return false
+    if (a.stopPropagation) {
+        a.stopPropagation()
+    }
+    if (a.preventDefault) {
+        a.preventDefault()
+    }
+    a.returnValue = false;
+    a.cancelBubble = true;
+    return false
 };
 function g_createRange(c, a) {
-	range = {};
-	for (var b = c; b <= a; ++b) {
-		range[b] = b
-	}
-	return range
+    range = {};
+    for (var b = c; b <= a; ++b) {
+        range[b] = b
+    }
+    return range
 }
 function g_sortIdArray(a, b, c) {
-	a.sort(c ?
-	function(e, d) {
-		return $WH.strcmp(b[e][c], b[d][c])
-	}: function(e, d) {
-		return $WH.strcmp(b[e], b[d])
-	})
+    a.sort(c ?
+    function(e, d) {
+        return $WH.strcmp(b[e][c], b[d][c])
+    }: function(e, d) {
+        return $WH.strcmp(b[e], b[d])
+    })
 }
 function g_sortJsonArray(e, d, f, a) {
-	var c = [];
-	for (var b in e) {
-		if (d[b] && (a == null || a(d[b]))) {
-			c.push(b)
-		}
-	}
-	if (f != null) {
-		c.sort(f)
-	} else {
-		g_sortIdArray(c, d)
-	}
-	return c
+    var c = [];
+    for (var b in e) {
+        if (d[b] && (a == null || a(d[b]))) {
+            c.push(b)
+        }
+    }
+    if (f != null) {
+        c.sort(f)
+    } else {
+        g_sortIdArray(c, d)
+    }
+    return c
 }
 
 function g_urlize(str, allowLocales, profile) {
-	var ta = $WH.ce('textarea');
-	ta.innerHTML = str.replace(/</g,"&lt;").replace(/>/g,"&gt;");
-	str = ta.value;
+    var ta = $WH.ce('textarea');
+    ta.innerHTML = str.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    str = ta.value;
 
-	str = $WH.str_replace(str, ' / ', '-');
-	str = $WH.str_replace(str, "'", '');
+    str = $WH.str_replace(str, ' / ', '-');
+    str = $WH.str_replace(str, "'", '');
 
-	if (profile) {
-		str = $WH.str_replace(str, '(', '');
-		str = $WH.str_replace(str, ')', '');
-		var accents = {
-			"ß": "ss",
-			"á": "a", "ä": "a", "à": "a", "â": "a",
-			"è": "e", "ê": "e", "é": "e", "ë": "e",
-			"í": "i", "î": "i", "ì": "i", "ï": "i",
-			"ñ": "n",
-			"ò": "o", "ó": "o", "ö": "o", "ô": "o",
-			"ú": "u", "ü": "u", "û": "u", "ù": "u",
-			"œ": "oe",
-			"Á": "A", "Ä": "A", "À": "A", "Â": "A",
-			"È": "E", "Ê": "E", "É": "E", "Ë": "E",
-			"Í": "I", "Î": "I", "Ì": "I", "Ï": "I",
-			"Ñ": "N",
-			"Ò": "O", "Ó": "O", "Ö": "O", "Ô": "O",
-			"Ú": "U", "Ü": "U", "Û": "U", "Ù": "U",
-			"œ": "Oe"
-		};
-		for (var character in accents) {
-			str = str.replace(new RegExp(character, "g"), accents[character]);
-		}
-	}
+    if (profile) {
+        str = $WH.str_replace(str, '(', '');
+        str = $WH.str_replace(str, ')', '');
+        var accents = {
+            "ß": "ss",
+            "á": "a", "ä": "a", "à": "a", "â": "a",
+            "è": "e", "ê": "e", "é": "e", "ë": "e",
+            "í": "i", "î": "i", "ì": "i", "ï": "i",
+            "ñ": "n",
+            "ò": "o", "ó": "o", "ö": "o", "ô": "o",
+            "ú": "u", "ü": "u", "û": "u", "ù": "u",
+            "œ": "oe",
+            "Á": "A", "Ä": "A", "À": "A", "Â": "A",
+            "È": "E", "Ê": "E", "É": "E", "Ë": "E",
+            "Í": "I", "Î": "I", "Ì": "I", "Ï": "I",
+            "Ñ": "N",
+            "Ò": "O", "Ó": "O", "Ö": "O", "Ô": "O",
+            "Ú": "U", "Ü": "U", "Û": "U", "Ù": "U",
+            "œ": "Oe"
+        };
+        for (var character in accents) {
+            str = str.replace(new RegExp(character, "g"), accents[character]);
+        }
+    }
 
-	str = $WH.trim(str);
-	if (allowLocales) {
-		str = $WH.str_replace(str, ' ', '-');
-	}
-	else {
-		str = str.replace(/[^a-z0-9]/ig, '-');
-	}
+    str = $WH.trim(str);
+    if (allowLocales) {
+        str = $WH.str_replace(str, ' ', '-');
+    }
+    else {
+        str = str.replace(/[^a-z0-9]/ig, '-');
+    }
 
-	str = $WH.str_replace(str, '--', '-');
-	str = $WH.str_replace(str, '--', '-');
-	str = $WH.rtrim(str, '-');
-	str = str.replace(/[A-Z]/g, function(x) {
+    str = $WH.str_replace(str, '--', '-');
+    str = $WH.str_replace(str, '--', '-');
+    str = $WH.rtrim(str, '-');
+    str = str.replace(/[A-Z]/g, function(x) {
         return x.toLowerCase();
     });
 
-	return str;
+    return str;
 }
 
 function g_createHeader(c) {
-	var k = $WH.ce("dl"),
-	p = (c == 5);
-	for (var j = 0, l = mn_path.length; j < l; ++j) {
-		var f = $WH.ce("dt");
-		var q = $WH.ce("a");
-		var m = $WH.ce("ins");
-		var g = $WH.ce("big");
-		var e = $WH.ce("span");
-		var o = mn_path[j][0];
-		var h = (o == c);
-		var d = (!h && mn_path[j][3]);
-		if (p && o == 5) {
-			d = true;
-			mn_path[j][3] = mn_profiles
-		}
-		if (d) {
+    var k = $WH.ce("dl"),
+    p = (c == 5);
+    for (var j = 0, l = mn_path.length; j < l; ++j) {
+        var f = $WH.ce("dt");
+        var q = $WH.ce("a");
+        var m = $WH.ce("ins");
+        var g = $WH.ce("big");
+        var e = $WH.ce("span");
+        var o = mn_path[j][0];
+        var h = (o == c);
+        var d = (!h && mn_path[j][3]);
+        if (p && o == 5) {
+            d = true;
+            mn_path[j][3] = mn_profiles
+        }
+        if (d) {
             Menu.add(q, mn_path[j][3]);
-		} else {
-			q.onmouseover = Menu._hide
-		}
-		if (mn_path[j][2]) {
-			q.href = mn_path[j][2]
-		} else {
-			q.href = "javascript:;";
-			$WH.ns(q);
-			q.style.cursor = "default"
-		}
-		if (h) {
-			q.className = "selected"
-		}
-		$WH.ae(g, $WH.ct(mn_path[j][1].charAt(0)));
-		$WH.ae(m, g);
-		$WH.ae(m, $WH.ct(mn_path[j][1].substr(1)));
-		$WH.ae(q, m);
-		$WH.ae(q, e);
-		$WH.ae(f, q);
-		$WH.ae(k, f)
-	}
-	$WH.ae($WH.ge("toptabs-generic"), k);
+        } else {
+            q.onmouseover = Menu._hide
+        }
+        if (mn_path[j][2]) {
+            q.href = mn_path[j][2]
+        } else {
+            q.href = "javascript:;";
+            $WH.ns(q);
+            q.style.cursor = "default"
+        }
+        if (h) {
+            q.className = "selected"
+        }
+        $WH.ae(g, $WH.ct(mn_path[j][1].charAt(0)));
+        $WH.ae(m, g);
+        $WH.ae(m, $WH.ct(mn_path[j][1].substr(1)));
+        $WH.ae(q, m);
+        $WH.ae(q, e);
+        $WH.ae(f, q);
+        $WH.ae(k, f)
+    }
+    $WH.ae($WH.ge("toptabs-generic"), k);
     var b = $WH.ge("topbar-generic");
     if (c != null && c >= 0 && c < mn_path.length) {
         c = parseInt(c);
@@ -399,252 +399,252 @@ function g_createHeader(c) {
     }
     else {
         $WH.ae(b, $WH.ct(String.fromCharCode(160)));
-	}
+    }
 }
 function g_updateHeader(a) {
-	$WH.ee($WH.ge("toptabs-generic"));
-	$WH.ee($WH.ge("topbar-generic"));
-	g_createHeader(a)
+    $WH.ee($WH.ge("toptabs-generic"));
+    $WH.ee($WH.ge("topbar-generic"));
+    g_createHeader(a)
 }
 function g_initHeader(a) {
-	g_createHeader(a);
-	var d = $WH.ge("livesearch-generic");
-	var b = d.previousSibling;
-	var c = d.parentNode;
-	$WH.ns(b);
-	b.onclick = function() {
-		this.parentNode.onsubmit()
-	};
-	if ($WH.Browser.ie) {
-		setTimeout(function() {
-			d.value = ""
-		},
-		1)
-	}
-	if (d.value == "") {
-		d.className = "search-database"
-	}
-	d.onmouseover = function() {
-		if ($WH.trim(this.value) != "") {
-			this.className = ""
-		}
-	};
-	d.onfocus = function() {
-		this.className = ""
-	};
-	d.onblur = function() {
-		if ($WH.trim(this.value) == "") {
-			this.className = "search-database";
-			this.value = ""
-		}
-	};
-	c.onsubmit = function() {
-		var e = this.elements[0].value;
-		if ($WH.trim(e) == "") {
-			return false
-		}
-		this.submit()
-	}
+    g_createHeader(a);
+    var d = $WH.ge("livesearch-generic");
+    var b = d.previousSibling;
+    var c = d.parentNode;
+    $WH.ns(b);
+    b.onclick = function() {
+        this.parentNode.onsubmit()
+    };
+    if ($WH.Browser.ie) {
+        setTimeout(function() {
+            d.value = ""
+        },
+        1)
+    }
+    if (d.value == "") {
+        d.className = "search-database"
+    }
+    d.onmouseover = function() {
+        if ($WH.trim(this.value) != "") {
+            this.className = ""
+        }
+    };
+    d.onfocus = function() {
+        this.className = ""
+    };
+    d.onblur = function() {
+        if ($WH.trim(this.value) == "") {
+            this.className = "search-database";
+            this.value = ""
+        }
+    };
+    c.onsubmit = function() {
+        var e = this.elements[0].value;
+        if ($WH.trim(e) == "") {
+            return false
+        }
+        this.submit()
+    }
 }
 function g_initHeaderMenus() {
-	var c = $WH.ge("toptabs-menu-user");
-	if (c) {
-		menu = [[0, LANG.userpage, "?user=" + g_user.name], [0, LANG.settings, "?account"], [0, LANG.signout, "?account=signout"]];
-		if (location.href.match(new RegExp("/?user=" + g_user.name + "$", "i"))) {
-			menu[0].checked = 1
-		} else {
-			if (location.href.indexOf("?account") != -1) {
-				menu[1].checked = 1
-			}
-		}
+    var c = $WH.ge("toptabs-menu-user");
+    if (c) {
+        menu = [[0, LANG.userpage, "?user=" + g_user.name], [0, LANG.settings, "?account"], [0, LANG.signout, "?account=signout"]];
+        if (location.href.match(new RegExp("/?user=" + g_user.name + "$", "i"))) {
+            menu[0].checked = 1
+        } else {
+            if (location.href.indexOf("?account") != -1) {
+                menu[1].checked = 1
+            }
+        }
         Menu.add(c, menu);
-		c.href = "?user=" + g_user.name
-	}
-	c = $WH.ge("toptabs-menu-profiles");
-	if (c) {
-		c.menu = [];
-		if (g_user.characters) {
-			c.menu.push([, LANG.tab_characters]);
-			for (var f = 0, b = g_user.characters.length; f < b; ++f) {
-				var h = g_user.characters[f],
-				e = [0, h.name + " (" + h.realmname + LANG.hyphen + h.region.toUpperCase() + ")", "?profile=" + h.region + "." + h.realm + "." + g_cleanCharacterName(h.name)];
-				e.smallIcon = h.icon ? h.icon: "chr_" + g_file_races[h.race] + "_" + g_file_genders[h.gender] + "_" + g_file_classes[h.classs] + "0" + (h.level > 59 ? (Math.floor((h.level - 60) / 10) + 2) : 1);
-				c.menu.push(e)
-			}
-		}
-		c.menu.push([, LANG.tab_profiles]);
-		if (g_user.profiles) {
-			for (var f = 0, b = g_user.profiles.length; f < b; ++f) {
-				var h = g_user.profiles[f],
-				e = [0, h.name, "?profile=" + h.id];
-				e.smallIcon = h.icon ? h.icon: "chr_" + g_file_races[h.race] + "_" + g_file_genders[h.gender] + "_" + g_file_classes[h.classs] + "0" + (h.level > 59 ? (Math.floor((h.level - 60) / 10) + 2) : 1);
-				c.menu.push(e)
-			}
-		}
-		var e = [0, "(" + LANG.button_new + ")", "?profile&new"];
-		e.smallIcon = "inv_misc_questionmark";
-		c.menu.push(e);
-		c.menu.rightAligned = 1;
+        c.href = "?user=" + g_user.name
+    }
+    c = $WH.ge("toptabs-menu-profiles");
+    if (c) {
+        c.menu = [];
+        if (g_user.characters) {
+            c.menu.push([, LANG.tab_characters]);
+            for (var f = 0, b = g_user.characters.length; f < b; ++f) {
+                var h = g_user.characters[f],
+                e = [0, h.name + " (" + h.realmname + LANG.hyphen + h.region.toUpperCase() + ")", "?profile=" + h.region + "." + h.realm + "." + g_cleanCharacterName(h.name)];
+                e.smallIcon = h.icon ? h.icon: "chr_" + g_file_races[h.race] + "_" + g_file_genders[h.gender] + "_" + g_file_classes[h.classs] + "0" + (h.level > 59 ? (Math.floor((h.level - 60) / 10) + 2) : 1);
+                c.menu.push(e)
+            }
+        }
+        c.menu.push([, LANG.tab_profiles]);
+        if (g_user.profiles) {
+            for (var f = 0, b = g_user.profiles.length; f < b; ++f) {
+                var h = g_user.profiles[f],
+                e = [0, h.name, "?profile=" + h.id];
+                e.smallIcon = h.icon ? h.icon: "chr_" + g_file_races[h.race] + "_" + g_file_genders[h.gender] + "_" + g_file_classes[h.classs] + "0" + (h.level > 59 ? (Math.floor((h.level - 60) / 10) + 2) : 1);
+                c.menu.push(e)
+            }
+        }
+        var e = [0, "(" + LANG.button_new + ")", "?profile&new"];
+        e.smallIcon = "inv_misc_questionmark";
+        c.menu.push(e);
+        c.menu.rightAligned = 1;
         Menu.add(c, c.menu);
         c.href = "?user=" + g_user.name + (g_user.profiles ? "#profiles": (g_user.characters ? "#characters": ""))
-	}
-	c = $WH.ge("toptabs-menu-language");
-	if (c) {
-		var g = "www",
-		d = location.href,
-		j = location.hostname.indexOf(".");
-		if (j != -1 && j <= 5) {
-			g = location.hostname.substr(0, j)
-		}
-		j = d.indexOf("#");
-		if (j != -1) {
-			d = d.substr(0, j)
-		}
-		//menu = [[0, "Deutsch", (g_locale.id != 3 ? d.replace(g, "de") : null)], [0, "English", (g_locale.id != 0 ? d.replace(g, "www") : null)], [0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? d.replace(g, "es") : null)], [0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? d.replace(g, "fr") : null)], [0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? d.replace(g, "ru") : null)]];
+    }
+    c = $WH.ge("toptabs-menu-language");
+    if (c) {
+        var g = "www",
+        d = location.href,
+        j = location.hostname.indexOf(".");
+        if (j != -1 && j <= 5) {
+            g = location.hostname.substr(0, j)
+        }
+        j = d.indexOf("#");
+        if (j != -1) {
+            d = d.substr(0, j)
+        }
+        //menu = [[0, "Deutsch", (g_locale.id != 3 ? d.replace(g, "de") : null)], [0, "English", (g_locale.id != 0 ? d.replace(g, "www") : null)], [0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? d.replace(g, "es") : null)], [0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? d.replace(g, "fr") : null)], [0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? d.replace(g, "ru") : null)]];
 
         var rel = d.match(/()\?((item|quest|spell|achievement|npc|object)=([0-9]+))/);
         rel = (rel && rel[2]) ? rel[2] : "";
 
-		menu = [
-			[0, "Deutsch", (g_locale.id != 3 ? "?locale=3" : null), , {rel: rel + " domain=de"}],
-			[0, "English", (g_locale.id != 0 ? "?locale=0" : null), , {rel: rel + " domain=en"}],
-			[0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? "?locale=6" : null), , {rel: rel + " domain=es"}],
-			[0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? "?locale=2" : null), , {rel: rel + " domain=fr"}],
-			[0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? "?locale=8" : null), , {rel: rel + " domain=ru"}]
+        menu = [
+            [0, "Deutsch", (g_locale.id != 3 ? "?locale=3" : null), , {rel: rel + " domain=de"}],
+            [0, "English", (g_locale.id != 0 ? "?locale=0" : null), , {rel: rel + " domain=en"}],
+            [0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? "?locale=6" : null), , {rel: rel + " domain=es"}],
+            [0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? "?locale=2" : null), , {rel: rel + " domain=fr"}],
+            [0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? "?locale=8" : null), , {rel: rel + " domain=ru"}]
         ];
-		menu.rightAligned = 1;
-		if (g_locale.id != 25) {
-			menu[{
-				0 : 1,
-				2 : 3,
-				3 : 0,
-				6 : 2,
-				8 : 4
-			} [g_locale.id]].checked = 1
-		}
+        menu.rightAligned = 1;
+        if (g_locale.id != 25) {
+            menu[{
+                0 : 1,
+                2 : 3,
+                3 : 0,
+                6 : 2,
+                8 : 4
+            } [g_locale.id]].checked = 1
+        }
         Menu.add(c, menu);
-	}
+    }
 }
 function g_initPath(q, f) {
-	var h = mn_path,
-	c = null,
-	k = null,
-	p = 0,
-	l = $WH.ge("main-precontents"),
-	o = $WH.ce("div");
-	$WH.ee(l);
-	if (g_initPath.lastIt) {
-		g_initPath.lastIt.checked = null
-	}
-	o.className = "path";
-	if (f != null) {
-		var m = $WH.ce("div");
-		m.className = "path-right";
-		var r = $WH.ce("a");
-		r.href = "javascript:;";
-		r.id = "fi_toggle";
-		$WH.ns(r);
-		r.onclick = fi_toggle;
-		if (f) {
-			r.className = "disclosure-on";
-			$WH.ae(r, $WH.ct(LANG.fihide))
-		} else {
-			r.className = "disclosure-off";
-			$WH.ae(r, $WH.ct(LANG.fishow))
-		}
-		$WH.ae(m, r);
-		$WH.ae(l, m)
-	}
-	for (var g = 0; g < q.length; ++g) {
-		var r, b, t = 0;
-		for (var e = 0; e < h.length; ++e) {
-			if (h[e][0] == q[g]) {
-				t = 1;
-				h = h[e];
-				h.checked = 1;
-				break
-			}
-		}
-		if (!t) {
-			p = 1;
-			break
-		}
-		r = $WH.ce("a");
-		b = $WH.ce("span");
-		if (h[2]) {
-			r.href = h[2]
-		} else {
-			r.href = "javascript:;";
-			$WH.ns(r);
-			r.style.textDecoration = "none";
-			r.style.color = "white";
-			r.style.cursor = "default"
-		}
-		if (g < q.length - 1 && h[3]) {
-			b.className = "menuarrow"
-		}
-		//$WH.ae(r, $WH.ct(h[4] == null ? h[1] : h[4]));
-		$WH.ae(r, $WH.ct(h[1]));
-		if (g == 0) {
-			Menu.add(r, mn_path);
-		} else {
-			Menu.add(r, c[3]);
-		}
-
-		$WH.ae(b, r);
-		$WH.ae(o, b);
-		k = b;
-		c = h;
-		h = h[3];
-		if (!h) {
-			p = 1;
-			break
-		}
-	}
-	if (p && k) {
-		k.className = ""
-	} else {
-		if (c && c[3]) {
-			k.className = "menuarrow";
-			r = $WH.ce("a");
-			b = $WH.ce("span");
-			r.href = "javascript:;";
-			$WH.ns(r);
-			r.style.textDecoration = "none";
-			r.style.paddingRight = "16px";
-			r.style.color = "white";
-			r.style.cursor = "default";
-			$WH.ae(r, $WH.ct("..."));
+    var h = mn_path,
+    c = null,
+    k = null,
+    p = 0,
+    l = $WH.ge("main-precontents"),
+    o = $WH.ce("div");
+    $WH.ee(l);
+    if (g_initPath.lastIt) {
+        g_initPath.lastIt.checked = null
+    }
+    o.className = "path";
+    if (f != null) {
+        var m = $WH.ce("div");
+        m.className = "path-right";
+        var r = $WH.ce("a");
+        r.href = "javascript:;";
+        r.id = "fi_toggle";
+        $WH.ns(r);
+        r.onclick = fi_toggle;
+        if (f) {
+            r.className = "disclosure-on";
+            $WH.ae(r, $WH.ct(LANG.fihide))
+        } else {
+            r.className = "disclosure-off";
+            $WH.ae(r, $WH.ct(LANG.fishow))
+        }
+        $WH.ae(m, r);
+        $WH.ae(l, m)
+    }
+    for (var g = 0; g < q.length; ++g) {
+        var r, b, t = 0;
+        for (var e = 0; e < h.length; ++e) {
+            if (h[e][0] == q[g]) {
+                t = 1;
+                h = h[e];
+                h.checked = 1;
+                break
+            }
+        }
+        if (!t) {
+            p = 1;
+            break
+        }
+        r = $WH.ce("a");
+        b = $WH.ce("span");
+        if (h[2]) {
+            r.href = h[2]
+        } else {
+            r.href = "javascript:;";
+            $WH.ns(r);
+            r.style.textDecoration = "none";
+            r.style.color = "white";
+            r.style.cursor = "default"
+        }
+        if (g < q.length - 1 && h[3]) {
+            b.className = "menuarrow"
+        }
+        //$WH.ae(r, $WH.ct(h[4] == null ? h[1] : h[4]));
+        $WH.ae(r, $WH.ct(h[1]));
+        if (g == 0) {
+            Menu.add(r, mn_path);
+        } else {
             Menu.add(r, c[3]);
-			$WH.ae(b, r);
-			$WH.ae(o, b)
-		}
-	}
+        }
+
+        $WH.ae(b, r);
+        $WH.ae(o, b);
+        k = b;
+        c = h;
+        h = h[3];
+        if (!h) {
+            p = 1;
+            break
+        }
+    }
+    if (p && k) {
+        k.className = ""
+    } else {
+        if (c && c[3]) {
+            k.className = "menuarrow";
+            r = $WH.ce("a");
+            b = $WH.ce("span");
+            r.href = "javascript:;";
+            $WH.ns(r);
+            r.style.textDecoration = "none";
+            r.style.paddingRight = "16px";
+            r.style.color = "white";
+            r.style.cursor = "default";
+            $WH.ae(r, $WH.ct("..."));
+            Menu.add(r, c[3]);
+            $WH.ae(b, r);
+            $WH.ae(o, b)
+        }
+    }
     // not really usefull
-	// var m = $WH.ce("div");
-	// m.className = "clear";
-	// $WH.ae(o, m);
-	$WH.ae(l, o);
-	g_initPath.lastIt = c
+    // var m = $WH.ce("div");
+    // m.className = "clear";
+    // $WH.ae(o, m);
+    $WH.ae(l, o);
+    g_initPath.lastIt = c
 }
 function g_addTooltip(b, c, a) {
-	if (!a && c.indexOf("<table>") == -1) {
-		a = "q"
-	}
-	b.onmouseover = function(d) {
-		$WH.Tooltip.showAtCursor(d, c, 0, 0, a)
-	};
-	b.onmousemove = $WH.Tooltip.cursorUpdate;
-	b.onmouseout = $WH.Tooltip.hide
+    if (!a && c.indexOf("<table>") == -1) {
+        a = "q"
+    }
+    b.onmouseover = function(d) {
+        $WH.Tooltip.showAtCursor(d, c, 0, 0, a)
+    };
+    b.onmousemove = $WH.Tooltip.cursorUpdate;
+    b.onmouseout = $WH.Tooltip.hide
 }
 function g_addStaticTooltip(b, c, a) {
-	if (!a && c.indexOf("<table>") == -1) {
-		a = "q"
-	}
-	b.onmouseover = function(d) {
-		$WH.Tooltip.show(b, c, 0, 0, a)
-	};
-	b.onmouseout = $WH.Tooltip.hide
+    if (!a && c.indexOf("<table>") == -1) {
+        a = "q"
+    }
+    b.onmouseover = function(d) {
+        $WH.Tooltip.show(b, c, 0, 0, a)
+    };
+    b.onmouseout = $WH.Tooltip.hide
 }
 
 function g_formatTimeElapsed(delay) {
@@ -826,460 +826,460 @@ function g_formatTimeSimple(d, txt, noPrefix) {
 }
 
 function g_cleanCharacterName(e) {
-	var d = "";
-	for (var c = 0, a = e.length; c < a; ++c) {
-		var b = e.charAt(c).toLowerCase();
-		if (b >= "a" && b <= "z") {
-			d += b
-		} else {
-			d += e.charAt(c)
-		}
-	}
-	return d
+    var d = "";
+    for (var c = 0, a = e.length; c < a; ++c) {
+        var b = e.charAt(c).toLowerCase();
+        if (b >= "a" && b <= "z") {
+            d += b
+        } else {
+            d += e.charAt(c)
+        }
+    }
+    return d
 }
 function g_createGlow(a, h) {
-	var e = $WH.ce("span");
-	for (var c = -1; c <= 1; ++c) {
-		for (var b = -1; b <= 1; ++b) {
-			var g = $WH.ce("div");
-			g.style.position = "absolute";
-			g.style.whiteSpace = "nowrap";
-			g.style.left = c + "px";
-			g.style.top = b + "px";
-			if (c == 0 && b == 0) {
-				g.style.zIndex = 4
-			} else {
-				g.style.color = "black";
-				g.style.zIndex = 2
-			}
-			g.innerHTML = a;
-			$WH.ae(e, g)
-		}
-	}
-	e.style.position = "relative";
-	e.className = "glow" + (h != null ? " " + h: "");
-	var f = $WH.ce("span");
-	f.style.visibility = "hidden";
-	$WH.ae(f, $WH.ct(a));
-	$WH.ae(e, f);
-	return e
+    var e = $WH.ce("span");
+    for (var c = -1; c <= 1; ++c) {
+        for (var b = -1; b <= 1; ++b) {
+            var g = $WH.ce("div");
+            g.style.position = "absolute";
+            g.style.whiteSpace = "nowrap";
+            g.style.left = c + "px";
+            g.style.top = b + "px";
+            if (c == 0 && b == 0) {
+                g.style.zIndex = 4
+            } else {
+                g.style.color = "black";
+                g.style.zIndex = 2
+            }
+            g.innerHTML = a;
+            $WH.ae(e, g)
+        }
+    }
+    e.style.position = "relative";
+    e.className = "glow" + (h != null ? " " + h: "");
+    var f = $WH.ce("span");
+    f.style.visibility = "hidden";
+    $WH.ae(f, $WH.ct(a));
+    $WH.ae(e, f);
+    return e
 }
 function g_createProgressBar(c) {
-	if (c == null) {
-		c = {}
-	}
-	if (!c.text) {
-		c.text = " "
-	}
-	if (c.color == null) {
-		c.color = "rep0"
-	}
-	if (c.width == null || c.width > 100) {
-		c.width = 100
-	}
-	var d, e;
-	if (c.hoverText) {
-		d = $WH.ce("a");
-		d.href = "javascript:;"
-	} else {
-		d = $WH.ce("span")
-	}
-	d.className = "progressbar";
-	if (c.text || c.hoverText) {
-		e = $WH.ce("div");
-		e.className = "progressbar-text";
-		if (c.text) {
-			var a = $WH.ce("del");
-			$WH.ae(a, $WH.ct(c.text));
-			$WH.ae(e, a)
-		}
-		if (c.hoverText) {
-			var b = $WH.ce("ins");
-			$WH.ae(b, $WH.ct(c.hoverText));
-			$WH.ae(e, b)
-		}
-		$WH.ae(d, e)
-	}
-	e = $WH.ce("div");
-	e.className = "progressbar-" + c.color;
-	e.style.width = c.width + "%";
-	$WH.ae(e, $WH.ct(String.fromCharCode(160)));
-	$WH.ae(d, e);
-	return d
+    if (c == null) {
+        c = {}
+    }
+    if (!c.text) {
+        c.text = " "
+    }
+    if (c.color == null) {
+        c.color = "rep0"
+    }
+    if (c.width == null || c.width > 100) {
+        c.width = 100
+    }
+    var d, e;
+    if (c.hoverText) {
+        d = $WH.ce("a");
+        d.href = "javascript:;"
+    } else {
+        d = $WH.ce("span")
+    }
+    d.className = "progressbar";
+    if (c.text || c.hoverText) {
+        e = $WH.ce("div");
+        e.className = "progressbar-text";
+        if (c.text) {
+            var a = $WH.ce("del");
+            $WH.ae(a, $WH.ct(c.text));
+            $WH.ae(e, a)
+        }
+        if (c.hoverText) {
+            var b = $WH.ce("ins");
+            $WH.ae(b, $WH.ct(c.hoverText));
+            $WH.ae(e, b)
+        }
+        $WH.ae(d, e)
+    }
+    e = $WH.ce("div");
+    e.className = "progressbar-" + c.color;
+    e.style.width = c.width + "%";
+    $WH.ae(e, $WH.ct(String.fromCharCode(160)));
+    $WH.ae(d, e);
+    return d
 }
 function g_createReputationBar(g) {
-	var f = g_createReputationBar.P;
-	if (!g) {
-		g = 0
-	}
-	g += 42000;
-	if (g < 0) {
-		g = 0
-	} else {
-		if (g > 84999) {
-			g = 84999
-		}
-	}
-	var e = g,
-	h, b = 0;
-	for (var d = 0, a = f.length; d < a; ++d) {
-		if (f[d] > e) {
-			break
-		}
-		if (d < a - 1) {
-			e -= f[d];
-			b = d + 1
-		}
-	}
-	h = f[b];
-	var c = {
-		text: g_reputation_standings[b],
-		hoverText: e + " / " + h,
-		color: "rep" + b,
-		width: parseInt(e / h * 100)
-	};
-	return g_createProgressBar(c)
+    var f = g_createReputationBar.P;
+    if (!g) {
+        g = 0
+    }
+    g += 42000;
+    if (g < 0) {
+        g = 0
+    } else {
+        if (g > 84999) {
+            g = 84999
+        }
+    }
+    var e = g,
+    h, b = 0;
+    for (var d = 0, a = f.length; d < a; ++d) {
+        if (f[d] > e) {
+            break
+        }
+        if (d < a - 1) {
+            e -= f[d];
+            b = d + 1
+        }
+    }
+    h = f[b];
+    var c = {
+        text: g_reputation_standings[b],
+        hoverText: e + " / " + h,
+        color: "rep" + b,
+        width: parseInt(e / h * 100)
+    };
+    return g_createProgressBar(c)
 }
 g_createReputationBar.P = [36000, 3000, 3000, 3000, 6000, 12000, 21000, 999];
 function g_createAchievementBar(b, d, a) {
-	if (!b) {
-		b = 0
-	}
-	var c = {
-		text: b + (d > 0 ? " / " + d: ""),
-		color: (a ? "rep7": "ach" + (d > 0 ? 0 : 1)),
-		width: (d > 0 ? parseInt(b / d * 100) : 100)
-	};
-	return g_createProgressBar(c)
+    if (!b) {
+        b = 0
+    }
+    var c = {
+        text: b + (d > 0 ? " / " + d: ""),
+        color: (a ? "rep7": "ach" + (d > 0 ? 0 : 1)),
+        width: (d > 0 ? parseInt(b / d * 100) : 100)
+    };
+    return g_createProgressBar(c)
 }
 
 function g_getMoneyHtml(c) {
-	var b = 0,
-	a = "";
-	if (c >= 10000) {
-		b = 1;
-		a += '<span class="moneygold">' + Math.floor(c / 10000) + "</span>";
-		c %= 10000
-	}
-	if (c >= 100) {
-		if (b) {
-			a += " "
-		} else {
-			b = 1
-		}
-		a += '<span class="moneysilver">' + Math.floor(c / 100) + "</span>";
-		c %= 100
-	}
-	if (c >= 1) {
-		if (b) {
-			a += " "
-		} else {
-			b = 1
-		}
-		a += '<span class="moneycopper">' + c + "</span>"
-	}
-	return a
+    var b = 0,
+    a = "";
+    if (c >= 10000) {
+        b = 1;
+        a += '<span class="moneygold">' + Math.floor(c / 10000) + "</span>";
+        c %= 10000
+    }
+    if (c >= 100) {
+        if (b) {
+            a += " "
+        } else {
+            b = 1
+        }
+        a += '<span class="moneysilver">' + Math.floor(c / 100) + "</span>";
+        c %= 100
+    }
+    if (c >= 1) {
+        if (b) {
+            a += " "
+        } else {
+            b = 1
+        }
+        a += '<span class="moneycopper">' + c + "</span>"
+    }
+    return a
 }
 function g_getMoneyHtml2(f, c, b, a) {
-	var e = g_getMoneyHtml(f);
-	if (c !== undefined && c !== null && c != 0) {
-		if (e.length > 0) {
-			e += " "
-		}
-		e += '<span class="money' + (c < 0 ? "horde": "alliance") + ' tip" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + g_numberFormat(Math.abs(c)) + "</span>"
-	}
-	if (b !== undefined && b !== null && b > 0) {
-		if (e.length > 0) {
-			e += " "
-		}
-		e += '<span class="moneyarena tip" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + g_numberFormat(b) + "</span>"
-	}
-	if (a !== undefined && a !== null && a.length > 0) {
-		for (var d = 0; d < a.length; ++d) {
-			if (e.length > 0) {
-				e += " "
-			}
-			var h = a[d][0];
-			var g = a[d][1];
-			e += '<a href="?item=' + h + '" class="moneyitem" style="background-image: url(images/icons/tiny/' + (g_items[h] && g_items[h]["icon"] ? g_items[h]["icon"] : "inv_misc_questionmark").toLowerCase() + '.gif)">' + g + "</a>"
-		}
-	}
-	return e
+    var e = g_getMoneyHtml(f);
+    if (c !== undefined && c !== null && c != 0) {
+        if (e.length > 0) {
+            e += " "
+        }
+        e += '<span class="money' + (c < 0 ? "horde": "alliance") + ' tip" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + g_numberFormat(Math.abs(c)) + "</span>"
+    }
+    if (b !== undefined && b !== null && b > 0) {
+        if (e.length > 0) {
+            e += " "
+        }
+        e += '<span class="moneyarena tip" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + g_numberFormat(b) + "</span>"
+    }
+    if (a !== undefined && a !== null && a.length > 0) {
+        for (var d = 0; d < a.length; ++d) {
+            if (e.length > 0) {
+                e += " "
+            }
+            var h = a[d][0];
+            var g = a[d][1];
+            e += '<a href="?item=' + h + '" class="moneyitem" style="background-image: url(images/icons/tiny/' + (g_items[h] && g_items[h]["icon"] ? g_items[h]["icon"] : "inv_misc_questionmark").toLowerCase() + '.gif)">' + g + "</a>"
+        }
+    }
+    return e
 }
 function g_numberFormat(f, b, l, h) {
-	var c = f,
-	a = b;
-	var e = function(r, q) {
-		var i = Math.pow(10, q);
-		return (Math.round(r * i) / i).toString()
-	};
-	c = !isFinite( + c) ? 0 : +c;
-	a = !isFinite( + a) ? 0 : Math.abs(a);
-	var p = (typeof h === "undefined") ? ",": h;
-	var d = (typeof l === "undefined") ? ".": l;
-	var o = (a > 0) ? e(c, a) : e(Math.round(c), a);
-	var m = e(Math.abs(c), a);
-	var k, g;
-	if (m >= 1000) {
-		k = m.split(/\D/);
-		g = k[0].length % 3 || 3;
-		k[0] = o.slice(0, g + (c < 0)) + k[0].slice(g).replace(/(\d{3})/g, p + "$1");
-		o = k.join(d)
-	} else {
-		o = o.replace(".", d)
-	}
-	var j = o.indexOf(d);
-	if (a >= 1 && j !== -1 && (o.length - j - 1) < a) {
-		o += new Array(a - (o.length - j - 1)).join(0) + "0"
-	} else {
-		if (a >= 1 && j === -1) {
-			o += d + new Array(a).join(0) + "0"
-		}
-	}
-	return o
+    var c = f,
+    a = b;
+    var e = function(r, q) {
+        var i = Math.pow(10, q);
+        return (Math.round(r * i) / i).toString()
+    };
+    c = !isFinite( + c) ? 0 : +c;
+    a = !isFinite( + a) ? 0 : Math.abs(a);
+    var p = (typeof h === "undefined") ? ",": h;
+    var d = (typeof l === "undefined") ? ".": l;
+    var o = (a > 0) ? e(c, a) : e(Math.round(c), a);
+    var m = e(Math.abs(c), a);
+    var k, g;
+    if (m >= 1000) {
+        k = m.split(/\D/);
+        g = k[0].length % 3 || 3;
+        k[0] = o.slice(0, g + (c < 0)) + k[0].slice(g).replace(/(\d{3})/g, p + "$1");
+        o = k.join(d)
+    } else {
+        o = o.replace(".", d)
+    }
+    var j = o.indexOf(d);
+    if (a >= 1 && j !== -1 && (o.length - j - 1) < a) {
+        o += new Array(a - (o.length - j - 1)).join(0) + "0"
+    } else {
+        if (a >= 1 && j === -1) {
+            o += d + new Array(a).join(0) + "0"
+        }
+    }
+    return o
 }
 function g_expandSite() {
-	$WH.ge("wrapper").className = "nosidebar";
-	var a = $WH.ge("topbar-expand");
-	if (a) {
-		$WH.de(a)
-	}
-	a = $WH.ge("sidebar");
-	if (a) {
-		$WH.de(a)
-	}
+    $WH.ge("wrapper").className = "nosidebar";
+    var a = $WH.ge("topbar-expand");
+    if (a) {
+        $WH.de(a)
+    }
+    a = $WH.ge("sidebar");
+    if (a) {
+        $WH.de(a)
+    }
 }
 function g_insertTag(d, a, i, j) {
-	var b = $(d);
-	b.focus();
-	if (b.selectionStart != null) {
-		var l = b.selectionStart,
-		h = b.selectionEnd,
-		k = b.scrollLeft,
-		c = b.scrollTop;
-		var g = b.value.substring(l, h);
-		if (typeof j == "function") {
-			g = j(g)
-		}
-		b.value = b.value.substr(0, l) + a + g + i + b.value.substr(h);
-		b.selectionStart = b.selectionEnd = h + a.length;
-		b.scrollLeft = k;
-		b.scrollTop = c
-	} else {
-		if (document.selection && document.selection.createRange) {
-			var f = document.selection.createRange();
-			if (f.parentElement() != b) {
-				return
-			}
-			var g = f.text;
-			if (typeof j == "function") {
-				g = j(g)
-			}
-			f.text = a + g + i
-		}
-	}
-	if (b.onkeyup) {
-		b.onkeyup()
-	}
+    var b = $(d);
+    b.focus();
+    if (b.selectionStart != null) {
+        var l = b.selectionStart,
+        h = b.selectionEnd,
+        k = b.scrollLeft,
+        c = b.scrollTop;
+        var g = b.value.substring(l, h);
+        if (typeof j == "function") {
+            g = j(g)
+        }
+        b.value = b.value.substr(0, l) + a + g + i + b.value.substr(h);
+        b.selectionStart = b.selectionEnd = h + a.length;
+        b.scrollLeft = k;
+        b.scrollTop = c
+    } else {
+        if (document.selection && document.selection.createRange) {
+            var f = document.selection.createRange();
+            if (f.parentElement() != b) {
+                return
+            }
+            var g = f.text;
+            if (typeof j == "function") {
+                g = j(g)
+            }
+            f.text = a + g + i
+        }
+    }
+    if (b.onkeyup) {
+        b.onkeyup()
+    }
 }
 
 function g_isDateValid(date) {
-	var match = /^(20[0-2]\d)-([01]\d)-([0-3]\d) ([0-2]\d):([0-5]\d):([0-5]\d)$/.exec(date);
-	return match;
+    var match = /^(20[0-2]\d)-([01]\d)-([0-3]\d) ([0-2]\d):([0-5]\d):([0-5]\d)$/.exec(date);
+    return match;
 }
 
 function g_isIpAddress(str) {
-	return /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/.test(str);
+    return /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/.test(str);
 }
 
 function g_isEmailValid(email) {
-	return email.match(/^([a-z0-9._-]+)(\+[a-z0-9._-]+)?(@[a-z0-9.-]+\.[a-z]{2,4})$/i) != null;
+    return email.match(/^([a-z0-9._-]+)(\+[a-z0-9._-]+)?(@[a-z0-9.-]+\.[a-z]{2,4})$/i) != null;
 }
 
 function g_getCurrentDomain() {
-	if (g_getCurrentDomain.CACHE) {
+    if (g_getCurrentDomain.CACHE) {
         return g_getCurrentDomain.CACHE;
-	}
+    }
 
-	var hostname = location.hostname;
+    var hostname = location.hostname;
 
-	if (!g_isIpAddress(hostname)) {
-		// Only keep the last 2 parts
-		var parts = hostname.split('.');
-		if(parts.length > 2) {
-			parts.splice(0, parts.length - 2);
-		}
-		hostname = parts.join('.');
-	}
+    if (!g_isIpAddress(hostname)) {
+        // Only keep the last 2 parts
+        var parts = hostname.split('.');
+        if(parts.length > 2) {
+            parts.splice(0, parts.length - 2);
+        }
+        hostname = parts.join('.');
+    }
 
-	g_getCurrentDomain.CACHE = hostname;
+    g_getCurrentDomain.CACHE = hostname;
 
-	return hostname;
+    return hostname;
 }
 
 function g_onAfterTyping(a, d, c) {
-	var e;
-	var b = function() {
-		if (e) {
-			clearTimeout(e);
-			e = null
-		}
-		e = setTimeout(d, c)
-	};
-	a.onkeyup = b
+    var e;
+    var b = function() {
+        if (e) {
+            clearTimeout(e);
+            e = null
+        }
+        e = setTimeout(d, c)
+    };
+    a.onkeyup = b
 }
 function g_onClick(c, d) {
-	var b = 0;
-	function a(e) {
-		if (b) {
-			if (b != e) {
-				return
-			}
-		} else {
-			b = e
-		}
-		d(true)
-	}
-	c.oncontextmenu = function() {
-		a(1);
-		return false
-	};
-	c.onmouseup = function(f) {
-		f = $WH.$E(f);
-		if (f._button == 3 || f.shiftKey || f.ctrlKey) {
-			a(2)
-		} else {
-			if (f._button == 1) {
-				d(false)
-			}
-		}
-		return false
-	}
+    var b = 0;
+    function a(e) {
+        if (b) {
+            if (b != e) {
+                return
+            }
+        } else {
+            b = e
+        }
+        d(true)
+    }
+    c.oncontextmenu = function() {
+        a(1);
+        return false
+    };
+    c.onmouseup = function(f) {
+        f = $WH.$E(f);
+        if (f._button == 3 || f.shiftKey || f.ctrlKey) {
+            a(2)
+        } else {
+            if (f._button == 1) {
+                d(false)
+            }
+        }
+        return false
+    }
 }
 function g_isLeftClick(a) {
-	a = $WH.$E(a);
-	return (a && a._button == 1)
+    a = $WH.$E(a);
+    return (a && a._button == 1)
 }
 
 function g_isExternalUrl(url) {
-	if(!url) {
+    if(!url) {
         return false;
-	}
+    }
 
-	if (url.indexOf('http') != 0 && url.indexOf('//') != 0) {
-		return false;
-	}
-	else if (url.indexOf(g_getCurrentDomain()) != -1) {
-		return false;
-	}
+    if (url.indexOf('http') != 0 && url.indexOf('//') != 0) {
+        return false;
+    }
+    else if (url.indexOf(g_getCurrentDomain()) != -1) {
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 function g_createOrRegex(search, negativeGroup) {
-	search = search.replace(/(\(|\)|\|\+|\*|\?|\$|\^)/g, '\\$1');
-	var
+    search = search.replace(/(\(|\)|\|\+|\*|\?|\$|\^)/g, '\\$1');
+    var
         parts = search.split(' '),
         strRegex= '';
 
     for (var j = 0, len = parts.length; j < len; ++j) {
-		if (j > 0) {
-			strRegex += '|';
-		}
-		strRegex += parts[j];
-	}
+        if (j > 0) {
+            strRegex += '|';
+        }
+        strRegex += parts[j];
+    }
 
-	// The additional group is necessary so we dont replace %s
-	return new RegExp((negativeGroup != null ? '(' + negativeGroup + ')?' : '') + '(' + strRegex + ')', 'gi');
+    // The additional group is necessary so we dont replace %s
+    return new RegExp((negativeGroup != null ? '(' + negativeGroup + ')?' : '') + '(' + strRegex + ')', 'gi');
 }
 
 function g_getHash() {
-	return '#' + decodeURIComponent(location.href.split('#')[1] || '');
+    return '#' + decodeURIComponent(location.href.split('#')[1] || '');
 }
 
 // Lets you add/remove/edit the query parameters in the passed URL
 function g_modifyUrl(url, params, opt) {
-	if (!opt) {
+    if (!opt) {
         opt = $.noop;
-	}
+    }
 
-  	// Preserve existing hash
-	var hash = '';
-	if (url.match(/(#.+)$/)) {
-		hash = RegExp.$1;
-		url = url.replace(hash, '');
-	}
+      // Preserve existing hash
+    var hash = '';
+    if (url.match(/(#.+)$/)) {
+        hash = RegExp.$1;
+        url = url.replace(hash, '');
+    }
 
-	$.each(params, function(paramName, newValue) {
-		var needle;
-		var paramPrefix;
-		var paramValue;
+    $.each(params, function(paramName, newValue) {
+        var needle;
+        var paramPrefix;
+        var paramValue;
 
-		var matches = url.match(new RegExp('(&|\\?)?' + paramName + '=?([^&]+)?'));
-		if (matches != null) {
-			needle      = matches[0];
-			paramPrefix = matches[1];
-			paramValue  = decodeURIComponent(matches[2]);
-		}
+        var matches = url.match(new RegExp('(&|\\?)?' + paramName + '=?([^&]+)?'));
+        if (matches != null) {
+            needle      = matches[0];
+            paramPrefix = matches[1];
+            paramValue  = decodeURIComponent(matches[2]);
+        }
 
-		// Remove
-		if (newValue == null) {
-			if (!needle) {
+        // Remove
+        if (newValue == null) {
+            if (!needle) {
                 return; // If param wasn't there, no need to remove anything
-			}
-			paramValue = null;
-		}
-		// Append
-		else if (newValue.substr(0, 2) == '+=') {
-			if (paramValue && opt.onAppendCollision) {
- 				paramValue = opt.onAppendCollision(paramValue, newValue.substr(2), opt.menuUrl);
-			}
-			else if (!paramValue && opt.onAppendEmpty) {
- 				paramValue = opt.onAppendEmpty(newValue.substr(2), opt.menuUrl);
-			}
-			else {
-				if (!paramValue) {
+            }
+            paramValue = null;
+        }
+        // Append
+        else if (newValue.substr(0, 2) == '+=') {
+            if (paramValue && opt.onAppendCollision) {
+                 paramValue = opt.onAppendCollision(paramValue, newValue.substr(2), opt.menuUrl);
+            }
+            else if (!paramValue && opt.onAppendEmpty) {
+                 paramValue = opt.onAppendEmpty(newValue.substr(2), opt.menuUrl);
+            }
+            else {
+                if (!paramValue) {
                     paramValue = '';
-				}
-				paramValue += $.trim(newValue.substr(2));
-			}
-		}
-		// Set
-		else {
-			paramValue = newValue;
-		}
+                }
+                paramValue += $.trim(newValue.substr(2));
+            }
+        }
+        // Set
+        else {
+            paramValue = newValue;
+        }
 
-		// Replace existing param
-		if (needle) {
-			var replacement = '';
-			if (paramPrefix) { // Preserve existing prefix
-				replacement += paramPrefix;
-			}
-			if (paramValue != null) {
-				replacement += paramName;
-				if (paramValue) {
-					replacement += '=' + $WH.urlencode2(paramValue);
-				}
-			}
+        // Replace existing param
+        if (needle) {
+            var replacement = '';
+            if (paramPrefix) { // Preserve existing prefix
+                replacement += paramPrefix;
+            }
+            if (paramValue != null) {
+                replacement += paramName;
+                if (paramValue) {
+                    replacement += '=' + $WH.urlencode2(paramValue);
+                }
+            }
 
-			url = url.replace(needle, replacement);
-		}
-		// Add new param
-		else if (paramValue || newValue == null || newValue.substr(0,2) != '+=') {
-			url += (url.indexOf('?') == -1 ? '?' : '&') + paramName;
-			if (paramValue) {
-				url += '=' + $WH.urlencode2(paramValue);
-			}
-		}
-	});
+            url = url.replace(needle, replacement);
+        }
+        // Add new param
+        else if (paramValue || newValue == null || newValue.substr(0,2) != '+=') {
+            url += (url.indexOf('?') == -1 ? '?' : '&') + paramName;
+            if (paramValue) {
+                url += '=' + $WH.urlencode2(paramValue);
+            }
+        }
+    });
 
-	// Polish
-	url = url.replace('?&', '?');
-	url = url.replace(/&&/g, '&');
-	url = url.replace(/\/\?/g, '/');
-	url = url.replace(/(&|\?)+$/, ''); // Remove trailing & and ? characters
+    // Polish
+    url = url.replace('?&', '?');
+    url = url.replace(/&&/g, '&');
+    url = url.replace(/\/\?/g, '/');
+    url = url.replace(/(&|\?)+$/, ''); // Remove trailing & and ? characters
 
-	return url + hash;
+    return url + hash;
 }
 
 DomContentLoaded.addEvent(function () {
@@ -1309,141 +1309,141 @@ DomContentLoaded.addEvent(function () {
 });
 
 function g_GetExpansionClassName(expansion) {
-	switch (expansion) {
-		case 0:
-			return null;
-		case 1:
-			return "bc-icon-right";
-		case 2:
-			return "wotlk-icon-right";
-	}
+    switch (expansion) {
+        case 0:
+            return null;
+        case 1:
+            return "bc-icon-right";
+        case 2:
+            return "wotlk-icon-right";
+    }
 
-	return null;
+    return null;
 }
 
 function g_addPages(l, b) {
-	function p(r, d) {
-		var i;
-		if (r == b.page) {
-			i = $WH.ce("span");
-			i.className = "selected"
-		} else {
-			i = $WH.ce("a");
-			i.href = (r > 1 ? b.url + b.sep + r + b.pound: b.url + b.pound)
-		}
-		$WH.ae(i, $WH.ct(d != null ? d: r));
-		return i
-	}
-	if (!b.pound) {
-		b.pound = ""
-	}
-	if (!b.sep) {
-		b.sep = "."
-	}
-	if (b.allOrNothing && b.nPages <= 1) {
-		return
-	}
-	var c = (b.align && b.align == "left");
-	var e = $WH.ce("div"),
-	k,
-	q = $WH.ce("var");
-	e.className = "pages";
-	if (c) {
-		e.className += " pages-left"
-	}
-	if (b.nPages > 1) {
-		k = $WH.ce("div");
-		k.className = "pages-numbers";
-		var o = Math.max(2, b.page - 3);
-		var h = Math.min(b.nPages - 1, b.page + 3);
-		var m = [];
-		if (b.page != b.nPages) {
-			m.push(p(b.page + 1, LANG.lvpage_next + String.fromCharCode(8250)))
-		}
-		m.push(p(b.nPages));
-		if (h < b.nPages - 1) {
-			var a = $WH.ce("span");
-			$WH.ae(a, $WH.ct("..."));
-			m.push(a)
-		}
-		for (var g = h; g >= o; --g) {
-			m.push(p(g))
-		}
-		if (o > 2) {
-			var a = $WH.ce("span");
-			$WH.ae(a, $WH.ct("..."));
-			m.push(a)
-		}
-		m.push(p(1));
-		if (b.page != 1) {
-			m.push(p(b.page - 1, String.fromCharCode(8249) + LANG.lvpage_previous))
-		}
-		if (c) {
-			m.reverse()
-		}
-		for (var g = 0, j = m.length; g < j; ++g) {
-			$WH.ae(k, m[g])
-		}
-		k.firstChild.style.marginRight = "0";
-		k.lastChild.style.marginLeft = "0"
-	}
-	var q = $WH.ce("var");
-	$WH.ae(q, $WH.ct($WH.sprintf(LANG[b.wording[b.nItems == 1 ? 0 : 1]], b.nItems)));
-	if (b.nPages > 1) {
-		var a = $WH.ce("span");
-		$WH.ae(a, $WH.ct(String.fromCharCode(8211)));
-		$WH.ae(q, a);
-		var f = $WH.ce("a");
-		f.className = "gotopage";
-		f.href = "javascript:;";
-		$WH.ns(f);
-		if ($WH.Browser.ie) {
-			$WH.ae(f, $WH.ct(" "))
-		}
-		f.onclick = function() {
-			var d = prompt($WH.sprintf(LANG.prompt_gotopage, 1, b.nPages), b.page);
-			if (d != null) {
-				d |= 0;
-				if (d != b.page && d >= 1 && d <= b.nPages) {
-					document.location.href = (d > 1 ? b.url + b.sep + d + b.pound: b.url + b.pound)
-				}
-			}
-		};
-		f.onmouseover = function(d) {
-			$WH.Tooltip.showAtCursor(d, LANG.tooltip_gotopage, 0, 0, "q")
-		};
-		f.onmousemove = $WH.Tooltip.cursorUpdate;
-		f.onmouseout = $WH.Tooltip.hide;
-		$WH.ae(q, f)
-	}
-	if (c) {
-		$WH.ae(e, q);
-		if (k) {
-			$WH.ae(e, k)
-		}
-	} else {
-		if (k) {
-			$WH.ae(e, k)
-		}
-		$WH.ae(e, q)
-	}
-	$WH.ae(l, e)
+    function p(r, d) {
+        var i;
+        if (r == b.page) {
+            i = $WH.ce("span");
+            i.className = "selected"
+        } else {
+            i = $WH.ce("a");
+            i.href = (r > 1 ? b.url + b.sep + r + b.pound: b.url + b.pound)
+        }
+        $WH.ae(i, $WH.ct(d != null ? d: r));
+        return i
+    }
+    if (!b.pound) {
+        b.pound = ""
+    }
+    if (!b.sep) {
+        b.sep = "."
+    }
+    if (b.allOrNothing && b.nPages <= 1) {
+        return
+    }
+    var c = (b.align && b.align == "left");
+    var e = $WH.ce("div"),
+    k,
+    q = $WH.ce("var");
+    e.className = "pages";
+    if (c) {
+        e.className += " pages-left"
+    }
+    if (b.nPages > 1) {
+        k = $WH.ce("div");
+        k.className = "pages-numbers";
+        var o = Math.max(2, b.page - 3);
+        var h = Math.min(b.nPages - 1, b.page + 3);
+        var m = [];
+        if (b.page != b.nPages) {
+            m.push(p(b.page + 1, LANG.lvpage_next + String.fromCharCode(8250)))
+        }
+        m.push(p(b.nPages));
+        if (h < b.nPages - 1) {
+            var a = $WH.ce("span");
+            $WH.ae(a, $WH.ct("..."));
+            m.push(a)
+        }
+        for (var g = h; g >= o; --g) {
+            m.push(p(g))
+        }
+        if (o > 2) {
+            var a = $WH.ce("span");
+            $WH.ae(a, $WH.ct("..."));
+            m.push(a)
+        }
+        m.push(p(1));
+        if (b.page != 1) {
+            m.push(p(b.page - 1, String.fromCharCode(8249) + LANG.lvpage_previous))
+        }
+        if (c) {
+            m.reverse()
+        }
+        for (var g = 0, j = m.length; g < j; ++g) {
+            $WH.ae(k, m[g])
+        }
+        k.firstChild.style.marginRight = "0";
+        k.lastChild.style.marginLeft = "0"
+    }
+    var q = $WH.ce("var");
+    $WH.ae(q, $WH.ct($WH.sprintf(LANG[b.wording[b.nItems == 1 ? 0 : 1]], b.nItems)));
+    if (b.nPages > 1) {
+        var a = $WH.ce("span");
+        $WH.ae(a, $WH.ct(String.fromCharCode(8211)));
+        $WH.ae(q, a);
+        var f = $WH.ce("a");
+        f.className = "gotopage";
+        f.href = "javascript:;";
+        $WH.ns(f);
+        if ($WH.Browser.ie) {
+            $WH.ae(f, $WH.ct(" "))
+        }
+        f.onclick = function() {
+            var d = prompt($WH.sprintf(LANG.prompt_gotopage, 1, b.nPages), b.page);
+            if (d != null) {
+                d |= 0;
+                if (d != b.page && d >= 1 && d <= b.nPages) {
+                    document.location.href = (d > 1 ? b.url + b.sep + d + b.pound: b.url + b.pound)
+                }
+            }
+        };
+        f.onmouseover = function(d) {
+            $WH.Tooltip.showAtCursor(d, LANG.tooltip_gotopage, 0, 0, "q")
+        };
+        f.onmousemove = $WH.Tooltip.cursorUpdate;
+        f.onmouseout = $WH.Tooltip.hide;
+        $WH.ae(q, f)
+    }
+    if (c) {
+        $WH.ae(e, q);
+        if (k) {
+            $WH.ae(e, k)
+        }
+    } else {
+        if (k) {
+            $WH.ae(e, k)
+        }
+        $WH.ae(e, q)
+    }
+    $WH.ae(l, e)
 }
 function g_disclose(a, b) {
-	b.className = "disclosure-" + (g_toggleDisplay(a) ? "on": "off");
-	return false
+    b.className = "disclosure-" + (g_toggleDisplay(a) ? "on": "off");
+    return false
 }
 function co_addYourComment() {
-	tabsContribute.focus(0);
-	var ta = $WH.gE(document.forms['addcomment'], "textarea")[0];
-	ta.focus()
+    tabsContribute.focus(0);
+    var ta = $WH.gE(document.forms['addcomment'], "textarea")[0];
+    ta.focus()
 }
 function co_cancelReply() {
-	$WH.ge("replybox-generic").style.display = "none";
-	document.forms.addcomment.elements.replyto.value = ""
+    $WH.ge("replybox-generic").style.display = "none";
+    document.forms.addcomment.elements.replyto.value = ""
 }
 function co_validateForm(f) {
-	var ta = $WH.gE(f, "textarea")[0];
+    var ta = $WH.gE(f, "textarea")[0];
 
     if (g_user.permissions & 1) {
         return true;
@@ -1451,146 +1451,146 @@ function co_validateForm(f) {
 
     if (Listview.funcBox.coValidate(ta)) {
         return true;
-	}
-	return false
+    }
+    return false
 }
 function ss_submitAScreenshot() {
-	tabsContribute.focus(1)
+    tabsContribute.focus(1)
 }
 function ss_validateForm(f) {
-	if (!f.elements.screenshotfile.value.length) {
-		alert(LANG.message_noscreenshot);
-		return false;
-	}
-	return true;
+    if (!f.elements.screenshotfile.value.length) {
+        alert(LANG.message_noscreenshot);
+        return false;
+    }
+    return true;
 }
 function ss_appendSticky() {
-	var _ = $WH.ge("infobox-sticky-ss");
-	var type = g_pageInfo.type;
-	var typeId = g_pageInfo.typeId;
-	var pos = $WH.in_array(lv_screenshots, 1, function(a) {
-		return a.sticky;
-	});
+    var _ = $WH.ge("infobox-sticky-ss");
+    var type = g_pageInfo.type;
+    var typeId = g_pageInfo.typeId;
+    var pos = $WH.in_array(lv_screenshots, 1, function(a) {
+        return a.sticky;
+    });
 
-	if (pos != -1) {
-		var screenshot = lv_screenshots[pos];
+    if (pos != -1) {
+        var screenshot = lv_screenshots[pos];
 
-		var a = $WH.ce("a");
-		a.href = "#screenshots:id=" + screenshot.id;
-		a.onclick = function(a) {
-			ScreenshotViewer.show({
-				screenshots: lv_screenshots,
-				pos: pos
-			});
-			return $WH.rf2(a);
-		};
+        var a = $WH.ce("a");
+        a.href = "#screenshots:id=" + screenshot.id;
+        a.onclick = function(a) {
+            ScreenshotViewer.show({
+                screenshots: lv_screenshots,
+                pos: pos
+            });
+            return $WH.rf2(a);
+        };
 
-		var size = (lv_videos && lv_videos.length ? [120, 90] : [150, 150]);
-		var
+        var size = (lv_videos && lv_videos.length ? [120, 90] : [150, 150]);
+        var
             img = $WH.ce("img"),
             scale = Math.min(size[0] / screenshot.width, size[1] / screenshot.height);
 
-		img.src    = g_staticUrl + "/uploads/screenshots/thumb/" + screenshot.id + ".jpg";
-		img.width  = Math.round(scale * screenshot.width);
-		img.height = Math.round(scale * screenshot.height);
-		img.className = "border";
-		$WH.ae(a, img);
-		$WH.ae(_, a);
+        img.src    = g_staticUrl + "/uploads/screenshots/thumb/" + screenshot.id + ".jpg";
+        img.width  = Math.round(scale * screenshot.width);
+        img.height = Math.round(scale * screenshot.height);
+        img.className = "border";
+        $WH.ae(a, img);
+        $WH.ae(_, a);
 
-		var th = $WH.ge('infobox-screenshots');
+        var th = $WH.ge('infobox-screenshots');
         var a = $WH.ce("a");
         $WH.ae(a, $WH.ct(th.innerText + " (" + lv_screenshots.length + ")"));
         a.href = "#screenshots"
         a.title = $WH.sprintf(LANG.infobox_showall, lv_screenshots.length);
-		a.onclick = function() {
-			tabsRelated.focus((lv_videos && lv_videos.length) || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)) ? -2 : -1);
-			return false;
-		};
+        a.onclick = function() {
+            tabsRelated.focus((lv_videos && lv_videos.length) || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)) ? -2 : -1);
+            return false;
+        };
         $WH.ee(th);
         $WH.ae(th, a);
-	}
+    }
     else {
-		var a;
-		if (g_user.id > 0) {
-			a = '<a href="javascript:;" onclick="ss_submitAScreenshot(); return false">';
-		}
+        var a;
+        if (g_user.id > 0) {
+            a = '<a href="javascript:;" onclick="ss_submitAScreenshot(); return false">';
+        }
         else {
-			a = '<a href="?account=signin">';
-		}
-		_.innerHTML = $WH.sprintf(LANG.infobox_noneyet, a + LANG.infobox_submitone + "</a>")
-	}
+            a = '<a href="?account=signin">';
+        }
+        _.innerHTML = $WH.sprintf(LANG.infobox_noneyet, a + LANG.infobox_submitone + "</a>")
+    }
 }
 var vi_thumbnails = {
-	1 : "http://i3.ytimg.com/vi/$1/default.jpg"
+    1 : "http://i3.ytimg.com/vi/$1/default.jpg"
 };
 var vi_siteurls = {
-	1 : "http://www.youtube.com/watch?v=$1"
+    1 : "http://www.youtube.com/watch?v=$1"
 };
 var vi_sitevalidation = {
-	1 : /^http:\/\/www\.youtube\.com\/watch\?v=([^& ]{11})/
+    1 : /^http:\/\/www\.youtube\.com\/watch\?v=([^& ]{11})/
 };
 function vi_submitAVideo() {
-	tabsContribute.focus(2)
+    tabsContribute.focus(2)
 }
 function vi_validateForm(f) {
-	if (!f.elements['videourl'].value.length) {
-		alert(LANG.message_novideo);
-		return false;
-	}
+    if (!f.elements['videourl'].value.length) {
+        alert(LANG.message_novideo);
+        return false;
+    }
 
-	var urlmatch = false;
-	for (var i in vi_sitevalidation) {
-		if (f.elements['videourl'].value.match(vi_sitevalidation[i])) {
-			urlmatch = true;
-			break
-		}
-	}
+    var urlmatch = false;
+    for (var i in vi_sitevalidation) {
+        if (f.elements['videourl'].value.match(vi_sitevalidation[i])) {
+            urlmatch = true;
+            break
+        }
+    }
 
-	if (!urlmatch) {
-		alert(LANG.message_novideo);
-		return false;
-	}
-	return true;
+    if (!urlmatch) {
+        alert(LANG.message_novideo);
+        return false;
+    }
+    return true;
 }
 function vi_appendSticky() {
-	var _ = $WH.ge("infobox-sticky-vi");
-	var type = g_pageInfo.type;
-	var typeId = g_pageInfo.typeId;
-	var pos = $WH.in_array(lv_videos, 1, function(a) {
-		return a.sticky
-	});
+    var _ = $WH.ge("infobox-sticky-vi");
+    var type = g_pageInfo.type;
+    var typeId = g_pageInfo.typeId;
+    var pos = $WH.in_array(lv_videos, 1, function(a) {
+        return a.sticky
+    });
 
-	if (pos != -1) {
-		var video = lv_videos[pos];
+    if (pos != -1) {
+        var video = lv_videos[pos];
 
-		var a = $WH.ce("a");
-		a.href = "#videos:id=" + video.id;
-		a.onclick = function(e) {
-			VideoViewer.show({
-				videos: lv_videos,
-				pos: pos
-			});
-			return $WH.rf2(e)
-		};
+        var a = $WH.ce("a");
+        a.href = "#videos:id=" + video.id;
+        a.onclick = function(e) {
+            VideoViewer.show({
+                videos: lv_videos,
+                pos: pos
+            });
+            return $WH.rf2(e)
+        };
 
-		var img = $WH.ce("img");
-		img.src = $WH.sprintf(vi_thumbnails[video.videoType], video.videoId);
-		img.className = "border";
-		$WH.ae(a, img);
-		$WH.ae(_, a);
+        var img = $WH.ce("img");
+        img.src = $WH.sprintf(vi_thumbnails[video.videoType], video.videoId);
+        img.className = "border";
+        $WH.ae(a, img);
+        $WH.ae(_, a);
 
-		var th = $WH.ge('infobox-videos');
+        var th = $WH.ge('infobox-videos');
         var a = $WH.ce("a");
         $WH.ae(a, $WH.ct(th.innerText + " (" + lv_videos.length + ")"));
         a.href = "#videos"
         a.title = $WH.sprintf(LANG.infobox_showall, lv_videos.length);
-		a.onclick = function() {
-			tabsRelated.focus(-1);
-			return false;
-		};
+        a.onclick = function() {
+            tabsRelated.focus(-1);
+            return false;
+        };
         $WH.ee(th);
         $WH.ae(th, a);
-	}
+    }
     else {
         var a;
         if (g_user.id > 0) {
@@ -1601,11 +1601,11 @@ function vi_appendSticky() {
         }
 
         _.innerHTML = $WH.sprintf(LANG.infobox_noneyet, a + LANG.infobox_suggestone + "</a>")
-	}
+    }
 }
 var g_videos = [];
 var VideoViewer = new function() {
-	var
+    var
         videos,
         pos,
         imgWidth,
@@ -1625,377 +1625,377 @@ var VideoViewer = new function() {
         divFrom,
         divCaption;
 
-	function computeDimensions() {
-		var video = videos[pos];
+    function computeDimensions() {
+        var video = videos[pos];
 
-		var
+        var
             captionExtraHeight = Math.max(divCaption.offsetHeight - 18, 0),
             availHeight = Math.max(50, Math.min(520, $WH.g_getWindowSize().h - 72 - captionExtraHeight)),
             scale = Math.min(1, availHeight / 520);
 
-		imgWidth = Math.round(scale * 880);
-		imgHeight = Math.round(scale * 520);
+        imgWidth = Math.round(scale * 880);
+        imgHeight = Math.round(scale * 520);
 
-		aPrev.style.height = aNext.style.height = aCover.style.height = (imgHeight - 95) + 'px';
-		Lightbox.setSize(Math.max(480, imgWidth) + 20, imgHeight + 52 + captionExtraHeight);
-	}
+        aPrev.style.height = aNext.style.height = aCover.style.height = (imgHeight - 95) + 'px';
+        Lightbox.setSize(Math.max(480, imgWidth) + 20, imgHeight + 52 + captionExtraHeight);
+    }
 
-	function getPound(pos) {
-		var
+    function getPound(pos) {
+        var
             video = videos[pos],
             buff = '#videos:';
 
         if (mode == 0) {
-			buff += 'id=' + video.id;
-		}
+            buff += 'id=' + video.id;
+        }
         else {
-			buff += collectionId + ':' + (pos + 1);
-		}
+            buff += collectionId + ':' + (pos + 1);
+        }
 
-		return buff;
-	}
+        return buff;
+    }
 
-	function render(resizing) {
-		if (resizing && (scale == 1) && $WH.g_getWindowSize().h > container.offsetHeight) {
-			return;
-		}
+    function render(resizing) {
+        if (resizing && (scale == 1) && $WH.g_getWindowSize().h > container.offsetHeight) {
+            return;
+        }
 
-		container.style.visibility = 'hidden';
+        container.style.visibility = 'hidden';
 
-		var video = videos[pos];
+        var video = videos[pos];
 
-		computeDimensions();
+        computeDimensions();
 
-		if (!resizing) {
-			if (video.videoType == 1) {
-				imgDiv.innerHTML = Markup.toHtml('[youtube=' + video.videoId + ' width=' + imgWidth + ' height=' + imgHeight + ' autoplay=true]', {mode:Markup.MODE_ARTICLE});
-			}
+        if (!resizing) {
+            if (video.videoType == 1) {
+                imgDiv.innerHTML = Markup.toHtml('[youtube=' + video.videoId + ' width=' + imgWidth + ' height=' + imgHeight + ' autoplay=true]', {mode:Markup.MODE_ARTICLE});
+            }
 
-			aOriginal.href = $WH.sprintf(vi_siteurls[video.videoType], video.videoId);
+            aOriginal.href = $WH.sprintf(vi_siteurls[video.videoType], video.videoId);
 
-			if (!video.user && typeof g_pageInfo == 'object') {
-				video.user = g_pageInfo.username;
-			}
+            if (!video.user && typeof g_pageInfo == 'object') {
+                video.user = g_pageInfo.username;
+            }
 
-			var
+            var
                 hasFrom1 = (video.date && video.user),
                 hasFrom2 = (videos.length > 1);
 
-			if (hasFrom1) {
-				var
+            if (hasFrom1) {
+                var
                     postedOn = new Date(video.date),
                     elapsed = (g_serverTime - postedOn) / 1000;
 
-				var a = divFrom.firstChild.childNodes[1];
-				a.href = '?user=' + video.user;
-				a.innerHTML = video.user;
+                var a = divFrom.firstChild.childNodes[1];
+                a.href = '?user=' + video.user;
+                a.innerHTML = video.user;
 
-				var s = divFrom.firstChild.childNodes[3];
-				$WH.ee(s);
-				Listview.funcBox.coFormatDate(s, elapsed, postedOn);
-				divFrom.firstChild.style.display = '';
-			}
+                var s = divFrom.firstChild.childNodes[3];
+                $WH.ee(s);
+                Listview.funcBox.coFormatDate(s, elapsed, postedOn);
+                divFrom.firstChild.style.display = '';
+            }
             else {
-				divFrom.firstChild.style.display = 'none';
-			}
+                divFrom.firstChild.style.display = 'none';
+            }
 
-			var s = divFrom.childNodes[1];
-			$WH.ee(s);
+            var s = divFrom.childNodes[1];
+            $WH.ee(s);
 
-			if (video.user)
-			{
-				if (hasFrom1) {
-					$WH.ae(s, $WH.ct(' ' + LANG.dash + ' '));
+            if (video.user)
+            {
+                if (hasFrom1) {
+                    $WH.ae(s, $WH.ct(' ' + LANG.dash + ' '));
                 }
-				var a = $WH.ce('a');
-				a.href = 'javascript:;';
-				a.onclick = ContactTool.show.bind(ContactTool, { mode: 5, video: video });
-				a.className = 'icon-report';
-				g_addTooltip(a, LANG.report_tooltip, 'q2');
-				$WH.ae(a, $WH.ct(LANG.report));
-				$WH.ae(s, a);
-			}
+                var a = $WH.ce('a');
+                a.href = 'javascript:;';
+                a.onclick = ContactTool.show.bind(ContactTool, { mode: 5, video: video });
+                a.className = 'icon-report';
+                g_addTooltip(a, LANG.report_tooltip, 'q2');
+                $WH.ae(a, $WH.ct(LANG.report));
+                $WH.ae(s, a);
+            }
 
-			s = divFrom.childNodes[2];
+            s = divFrom.childNodes[2];
 
-			if (hasFrom2) {
-				var buff = '';
-				if (video.user) {
-					buff = LANG.dash;
-				}
-				buff += (pos + 1) + LANG.lvpage_of + videos.length;
+            if (hasFrom2) {
+                var buff = '';
+                if (video.user) {
+                    buff = LANG.dash;
+                }
+                buff += (pos + 1) + LANG.lvpage_of + videos.length;
 
-				s.innerHTML = buff;
-				s.style.display = '';
-			}
+                s.innerHTML = buff;
+                s.style.display = '';
+            }
             else {
-				s.style.display = 'none';
-			}
+                s.style.display = 'none';
+            }
 
-			divFrom.style.display = (hasFrom1 || hasFrom2 ? '': 'none');
+            divFrom.style.display = (hasFrom1 || hasFrom2 ? '': 'none');
 
-			var hasCaption = (video.caption != null && video.caption.length);
-			var hasSubject = (video.subject != null && video.subject.length && video.type && video.typeId);
+            var hasCaption = (video.caption != null && video.caption.length);
+            var hasSubject = (video.subject != null && video.subject.length && video.type && video.typeId);
 
-			if (hasCaption || hasSubject) {
-				var html = '';
+            if (hasCaption || hasSubject) {
+                var html = '';
 
-				if (hasSubject) {
-					html += LANG.types[video.type][0] + LANG.colon;
-					html += '<a href="?' + g_types[video.type] + '=' + video.typeId + '">';
-					html += video.subject;
-					html += '</a>';
-				}
+                if (hasSubject) {
+                    html += LANG.types[video.type][0] + LANG.colon;
+                    html += '<a href="?' + g_types[video.type] + '=' + video.typeId + '">';
+                    html += video.subject;
+                    html += '</a>';
+                }
 
-				if (hasCaption) {
-					if (hasSubject) {
-						html += LANG.dash;
-					}
+                if (hasCaption) {
+                    if (hasSubject) {
+                        html += LANG.dash;
+                    }
 
-					html += (video.noMarkup ? video.caption: Markup.toHtml(video.caption, {
-						mode: Markup.MODE_SIGNATURE
-					}));
-				}
+                    html += (video.noMarkup ? video.caption: Markup.toHtml(video.caption, {
+                        mode: Markup.MODE_SIGNATURE
+                    }));
+                }
 
-				divCaption.innerHTML = html;
-				divCaption.style.display = '';
-			}
+                divCaption.innerHTML = html;
+                divCaption.style.display = '';
+            }
             else {
-				divCaption.style.display = 'none';
-			}
+                divCaption.style.display = 'none';
+            }
 
-			if (videos.length > 1) {
-				aPrev.href = getPound(peekPos(-1));
-				aNext.href = getPound(peekPos(1));
-				aPrev.style.display = aNext.style.display = '';
-				aCover.style.display = 'none';
-			}
+            if (videos.length > 1) {
+                aPrev.href = getPound(peekPos(-1));
+                aNext.href = getPound(peekPos(1));
+                aPrev.style.display = aNext.style.display = '';
+                aCover.style.display = 'none';
+            }
             else {
-				aPrev.style.display = aNext.style.display = 'none';
-				aCover.style.display = '';
-			}
+                aPrev.style.display = aNext.style.display = 'none';
+                aCover.style.display = '';
+            }
 
-			location.replace(getPound(pos));
-		}
+            location.replace(getPound(pos));
+        }
 
-		Lightbox.reveal();
+        Lightbox.reveal();
 
-		container.style.visibility = 'visible';
+        container.style.visibility = 'visible';
 
-		setTimeout(fixTitle, 1);
-	}
+        setTimeout(fixTitle, 1);
+    }
 
-	function peekPos(change) {
-		var foo = pos;
-		foo += change;
+    function peekPos(change) {
+        var foo = pos;
+        foo += change;
 
-		if (foo < 0) {
-			foo = videos.length - 1;
-		}
+        if (foo < 0) {
+            foo = videos.length - 1;
+        }
         else if (foo >= videos.length) {
             foo = 0;
-		}
+        }
 
-		return foo;
-	}
+        return foo;
+    }
 
-	function prevVideo() {
-		pos = peekPos(-1);
-		render();
+    function prevVideo() {
+        pos = peekPos(-1);
+        render();
 
-		return false;
-	}
+        return false;
+    }
 
-	function nextVideo() {
-		pos = peekPos(1);
-		render();
+    function nextVideo() {
+        pos = peekPos(1);
+        render();
 
-		return false;
-	}
+        return false;
+    }
 
-	function fixTitle() {
-		if (pageTitle) {
-			document.title = pageTitle;
-		}
-	}
+    function fixTitle() {
+        if (pageTitle) {
+            document.title = pageTitle;
+        }
+    }
 
-	function onKeyUp(e) {
-		e = $WH.$E(e);
+    function onKeyUp(e) {
+        e = $WH.$E(e);
 
-		switch (e.keyCode) {
-		case 37: // Left
-			prevVideo();
-			break;
-		case 39: // Right
-			nextVideo();
-			break;
-		}
-	}
+        switch (e.keyCode) {
+        case 37: // Left
+            prevVideo();
+            break;
+        case 39: // Right
+            nextVideo();
+            break;
+        }
+    }
 
-	function onResize() {
-		render(1);
-	}
+    function onResize() {
+        render(1);
+    }
 
-	function onHide() {
-		$WH.ee(imgDiv);
+    function onHide() {
+        $WH.ee(imgDiv);
 
-		if (videos.length > 1) {
-			$WH.dE(document, 'keyup', onKeyUp) ;
-		}
+        if (videos.length > 1) {
+            $WH.dE(document, 'keyup', onKeyUp) ;
+        }
 
-		if (oldHash && mode == 0) {
-			if (oldHash.indexOf(':id=') != -1) {
-				oldHash = '#videos';
-			}
-			location.replace(oldHash);
-		}
+        if (oldHash && mode == 0) {
+            if (oldHash.indexOf(':id=') != -1) {
+                oldHash = '#videos';
+            }
+            location.replace(oldHash);
+        }
         else {
-			location.replace('#.');
-		}
+            location.replace('#.');
+        }
 
-		fixTitle();
-	}
+        fixTitle();
+    }
 
-	function onShow(dest, first, opt) {
-		if (typeof opt.videos == 'string') {
-			videos = g_videos[opt.videos];
-			mode = 1;
-			collectionId = opt.videos;
-		}
+    function onShow(dest, first, opt) {
+        if (typeof opt.videos == 'string') {
+            videos = g_videos[opt.videos];
+            mode = 1;
+            collectionId = opt.videos;
+        }
         else {
-			videos = opt.videos;
-			mode = 0;
-			collectionId = null;
-		}
-		container = dest;
+            videos = opt.videos;
+            mode = 0;
+            collectionId = null;
+        }
+        container = dest;
 
-		pos = 0;
-		if (opt.pos && opt.pos >= 0 && opt.pos < videos.length) {
-			pos = opt.pos;
-		}
+        pos = 0;
+        if (opt.pos && opt.pos >= 0 && opt.pos < videos.length) {
+            pos = opt.pos;
+        }
 
-		if (first) {
-			dest.className = 'screenshotviewer';
-			screen = $WH.ce('div');
-			screen.className = 'screenshotviewer-screen';
+        if (first) {
+            dest.className = 'screenshotviewer';
+            screen = $WH.ce('div');
+            screen.className = 'screenshotviewer-screen';
 
-			aPrev = $WH.ce('a');
-			aNext = $WH.ce('a');
-			aPrev.className = 'screenshotviewer-prev';
-			aNext.className = 'screenshotviewer-next';
-			aPrev.href = 'javascript:;';
-			aNext.href = 'javascript:;';
+            aPrev = $WH.ce('a');
+            aNext = $WH.ce('a');
+            aPrev.className = 'screenshotviewer-prev';
+            aNext.className = 'screenshotviewer-next';
+            aPrev.href = 'javascript:;';
+            aNext.href = 'javascript:;';
 
-			var foo = $WH.ce('span');
-			var b = $WH.ce('b');
-			// $WH.ae(b, $WH.ct(LANG.previous));
-			$WH.ae(foo, b);
-			$WH.ae(aPrev, foo);
-			var foo = $WH.ce('span');
-			var b = $WH.ce('b');
-			// $WH.ae(b, $WH.ct(LANG.next));
-			$WH.ae(foo, b);
-			$WH.ae(aNext, foo);
+            var foo = $WH.ce('span');
+            var b = $WH.ce('b');
+            // $WH.ae(b, $WH.ct(LANG.previous));
+            $WH.ae(foo, b);
+            $WH.ae(aPrev, foo);
+            var foo = $WH.ce('span');
+            var b = $WH.ce('b');
+            // $WH.ae(b, $WH.ct(LANG.next));
+            $WH.ae(foo, b);
+            $WH.ae(aNext, foo);
 
-			aPrev.onclick = prevVideo;
-			aNext.onclick = nextVideo;
+            aPrev.onclick = prevVideo;
+            aNext.onclick = nextVideo;
 
-			aCover = $WH.ce('a');
-			aCover.className = 'screenshotviewer-cover';
-			aCover.href = 'javascript:;';
-			aCover.onclick = Lightbox.hide;
-			var foo = $WH.ce('span');
-			var b = $WH.ce('b');
-			$WH.ae(b, $WH.ct(LANG.close));
-			$WH.ae(foo, b);
-			$WH.ae(aCover, foo);
+            aCover = $WH.ce('a');
+            aCover.className = 'screenshotviewer-cover';
+            aCover.href = 'javascript:;';
+            aCover.onclick = Lightbox.hide;
+            var foo = $WH.ce('span');
+            var b = $WH.ce('b');
+            $WH.ae(b, $WH.ct(LANG.close));
+            $WH.ae(foo, b);
+            $WH.ae(aCover, foo);
 
-			$WH.ae(screen, aPrev);
-			$WH.ae(screen, aNext);
-			$WH.ae(screen, aCover);
+            $WH.ae(screen, aPrev);
+            $WH.ae(screen, aNext);
+            $WH.ae(screen, aCover);
 
-			imgDiv = $WH.ce('div');
-			$WH.ae(screen, imgDiv);
+            imgDiv = $WH.ce('div');
+            $WH.ae(screen, imgDiv);
 
-			$WH.ae(dest, screen);
+            $WH.ae(dest, screen);
 
-			var aClose = $WH.ce('a');
-			// aClose.className = 'dialog-x';
-			aClose.className = 'screenshotviewer-close';
-			aClose.href = 'javascript:;';
-			aClose.onclick = Lightbox.hide;
-			// $WH.ae(aClose, $WH.ct(LANG.close));
+            var aClose = $WH.ce('a');
+            // aClose.className = 'dialog-x';
+            aClose.className = 'screenshotviewer-close';
+            aClose.href = 'javascript:;';
+            aClose.onclick = Lightbox.hide;
+            // $WH.ae(aClose, $WH.ct(LANG.close));
             $WH.ae(aClose, $WH.ce('span'));
-			$WH.ae(dest, aClose);
+            $WH.ae(dest, aClose);
 
-			aOriginal = $WH.ce('a');
-			// aOriginal.className = 'dialog-arrow';
-			aOriginal.className = 'screenshotviewer-original';
-			aOriginal.href = 'javascript:;';
-			aOriginal.target = '_blank';
-			// $WH.ae(aOriginal, $WH.ct(LANG.original));
+            aOriginal = $WH.ce('a');
+            // aOriginal.className = 'dialog-arrow';
+            aOriginal.className = 'screenshotviewer-original';
+            aOriginal.href = 'javascript:;';
+            aOriginal.target = '_blank';
+            // $WH.ae(aOriginal, $WH.ct(LANG.original));
             $WH.ae(aOriginal, $WH.ce('span'));
-			$WH.ae(dest, aOriginal);
+            $WH.ae(dest, aOriginal);
 
-			divFrom = $WH.ce('div');
-			divFrom.className = 'screenshotviewer-from';
-			var sp = $WH.ce('span');
-			$WH.ae(sp, $WH.ct(LANG.lvscreenshot_from));
-			$WH.ae(sp, $WH.ce('a'));
-			$WH.ae(sp, $WH.ct(' '));
-			$WH.ae(sp, $WH.ce('span'));
-			$WH.ae(divFrom, sp);
-			$WH.ae(divFrom, $WH.ce('span'));
-			$WH.ae(divFrom, $WH.ce('span'));
-			$WH.ae(dest, divFrom);
+            divFrom = $WH.ce('div');
+            divFrom.className = 'screenshotviewer-from';
+            var sp = $WH.ce('span');
+            $WH.ae(sp, $WH.ct(LANG.lvscreenshot_from));
+            $WH.ae(sp, $WH.ce('a'));
+            $WH.ae(sp, $WH.ct(' '));
+            $WH.ae(sp, $WH.ce('span'));
+            $WH.ae(divFrom, sp);
+            $WH.ae(divFrom, $WH.ce('span'));
+            $WH.ae(divFrom, $WH.ce('span'));
+            $WH.ae(dest, divFrom);
 
-			divCaption = $WH.ce('div');
-			divCaption.className = 'screenshotviewer-caption';
-			$WH.ae(dest, divCaption);
+            divCaption = $WH.ce('div');
+            divCaption.className = 'screenshotviewer-caption';
+            $WH.ae(dest, divCaption);
 
-			var d = $WH.ce('div');
-			d.className = 'clear';
-			$WH.ae(dest, d);
-		}
+            var d = $WH.ce('div');
+            d.className = 'clear';
+            $WH.ae(dest, d);
+        }
 
-		oldHash = location.hash;
+        oldHash = location.hash;
 
-		if (videos.length > 1) {
-			$WH.aE(document, 'keyup', onKeyUp);
-		}
-		render();
-	}
+        if (videos.length > 1) {
+            $WH.aE(document, 'keyup', onKeyUp);
+        }
+        render();
+    }
 
-	this.checkPound = function() {
-		pageTitle = $WH.gE(document, 'title').innerHTML;
-		if (location.hash && location.hash.indexOf('#videos') == 0) {
-			if (!g_listviews['videos']) { // Standalone video viewer
-				var parts = location.hash.split(':');
-				if (parts.length == 3) {
-					var collection = g_videos[parts[1]],
-					p = parseInt(parts[2]);
+    this.checkPound = function() {
+        pageTitle = $WH.gE(document, 'title').innerHTML;
+        if (location.hash && location.hash.indexOf('#videos') == 0) {
+            if (!g_listviews['videos']) { // Standalone video viewer
+                var parts = location.hash.split(':');
+                if (parts.length == 3) {
+                    var collection = g_videos[parts[1]],
+                    p = parseInt(parts[2]);
 
-					if (collection && p >= 1 && p <= collection.length) {
-						VideoViewer.show({
-							videos: parts[1],
-							pos: p - 1
-						});
-					}
-				}
-			}
-		}
-	}
+                    if (collection && p >= 1 && p <= collection.length) {
+                        VideoViewer.show({
+                            videos: parts[1],
+                            pos: p - 1
+                        });
+                    }
+                }
+            }
+        }
+    }
 
-	this.show = function(opt) {
-		Lightbox.show('videoviewer', {
-			onShow: onShow,
-			onHide: onHide,
-			onResize: onResize
-		},opt);
-		return false;
-	}
+    this.show = function(opt) {
+        Lightbox.show('videoviewer', {
+            onShow: onShow,
+            onHide: onHide,
+            onResize: onResize
+        },opt);
+        return false;
+    }
 
-	DomContentLoaded.addEvent(this.checkPound)
+    DomContentLoaded.addEvent(this.checkPound)
 };
 
 var Slider = new function() {
@@ -2298,70 +2298,70 @@ var Slider = new function() {
 
 var suDialog;
 function su_addToSaved(c, d, a, e) {
-	if (!c) {
-		return
-	}
-	if (!Dialog.templates.docompare) {
-		Dialog.templates.docompare = {
-			title: LANG.dialog_compare,
-			width: 400,
-			height: 138,
+    if (!c) {
+        return
+    }
+    if (!Dialog.templates.docompare) {
+        Dialog.templates.docompare = {
+            title: LANG.dialog_compare,
+            width: 400,
+            height: 138,
             buttons: [['okay', LANG.ok], ['cancel', LANG.cancel]],
-			fields: [{
-				id: "selecteditems",
-				type: "caption",
-				compute: function(h, g, f, i) {
-					i.innerHTML = $WH.sprintf((g == 1 ? LANG.dialog_selecteditem: LANG.dialog_selecteditems), g)
-				}
-			},
-			{
-				id: "action",
-				type: "radio",
-				label: "",
-				value: 3,
-				submitOnDblClick: 1,
-				options: {
-					1 : LANG.dialog_nosaveandview,
-					2 : LANG.dialog_saveandview,
-					3 : LANG.dialog_saveforlater
-				}
-			}]
-		}
-	}
-	if (!suDialog) {
-		suDialog = new Dialog()
-	}
-	var b = function(h) {
-		var g = $WH.gc("compare_groups"),
-		f = "?compare";
-		if (h.action > 1) {
-			if (g) {
-				c = g + ";" + c
-			}
-			$WH.sc("compare_groups", 20, c, "/", location.hostname);
-			// $WH.sc("compare_groups", 20, c, "/", ".wowhead.com");
-			if (e) {
-				$WH.sc("compare_level", 20, e, "/", location.hostname)
-				// $WH.sc("compare_level", 20, e, "/", ".wowhead.com")
-			}
-		} else {
-			f += "=" + c + (e ? "&l=" + e: "")
-		}
-		if (h.action < 3) {
-			if (a) {
-				window.open(f)
-			} else {
-				location.href = f
-			}
-		}
-	};
-	suDialog.show("docompare", {
-		data: {
-			selecteditems: d,
-			action: 1
-		},
-		onSubmit: b
-	})
+            fields: [{
+                id: "selecteditems",
+                type: "caption",
+                compute: function(h, g, f, i) {
+                    i.innerHTML = $WH.sprintf((g == 1 ? LANG.dialog_selecteditem: LANG.dialog_selecteditems), g)
+                }
+            },
+            {
+                id: "action",
+                type: "radio",
+                label: "",
+                value: 3,
+                submitOnDblClick: 1,
+                options: {
+                    1 : LANG.dialog_nosaveandview,
+                    2 : LANG.dialog_saveandview,
+                    3 : LANG.dialog_saveforlater
+                }
+            }]
+        }
+    }
+    if (!suDialog) {
+        suDialog = new Dialog()
+    }
+    var b = function(h) {
+        var g = $WH.gc("compare_groups"),
+        f = "?compare";
+        if (h.action > 1) {
+            if (g) {
+                c = g + ";" + c
+            }
+            $WH.sc("compare_groups", 20, c, "/", location.hostname);
+            // $WH.sc("compare_groups", 20, c, "/", ".wowhead.com");
+            if (e) {
+                $WH.sc("compare_level", 20, e, "/", location.hostname)
+                // $WH.sc("compare_level", 20, e, "/", ".wowhead.com")
+            }
+        } else {
+            f += "=" + c + (e ? "&l=" + e: "")
+        }
+        if (h.action < 3) {
+            if (a) {
+                window.open(f)
+            } else {
+                location.href = f
+            }
+        }
+    };
+    suDialog.show("docompare", {
+        data: {
+            selecteditems: d,
+            action: 1
+        },
+        onSubmit: b
+    })
 }
 
 function Tabs(opt) {
@@ -5535,11 +5535,13 @@ Listview.extraCols = {
 
             var a = $WH.ce('a');
             a.href = cnd.url;
-            a.className = 'icontiny tinyspecial';
+            if (cnd.icon) {
+                a.className = 'icontiny tinyspecial';
+                a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + cnd.icon + '.gif)';
+            }
             if (cnd.quality) {
                 a.className += ' q' + cnd.quality;
             }
-            a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + cnd.icon + '.gif)';
             a.style.whiteSpace = 'nowrap';
             $WH.st(a, cnd.name);
             $WH.ae(td, a);
@@ -5565,7 +5567,7 @@ Listview.extraCols = {
                 case 'spell':
                     return Listview.extraCols.condition.getSpellState(cond);
                 case 'item':
-                    return Listview.extraCols.condition.getItemtate(cond);
+                    return Listview.extraCols.condition.getItemState(cond);
                 case 'achievement':
                     return Listview.extraCols.condition.getAchievementState(cond);
                 case 'quest':
@@ -5635,7 +5637,7 @@ Listview.extraCols = {
                 cnd  = {},
                 item = g_quests[cond.typeId];
 
-            cnd.icon  = item.icon.toLowerCase();
+            cnd.icon  = '';
             cnd.state = cond.status == 1 ? $WH.ct(LANG.progress) : cond.status == 2 ? $WH.ct(LANG.pr_note_complete) : $WH.ct(LANG.pr_note_incomplete);
             cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
             cnd.name  = item['name_' + g_locale.name];
@@ -12933,7 +12935,7 @@ Listview.templates = {
 
             var a = $WH.ce('a');
             a.href = 'javascript:;';
-            // a.className = 'pet-zoom';   // reference only
+            // a.className = 'pet-zoom';   // sarjuuk: keep as reference only
             a.onclick = this.template.modelShow.bind(this.template, model.npcId, model.displayId, false);
 
             var img = $WH.ce('img');
@@ -12994,6 +12996,140 @@ Listview.templates = {
             }
 
             ModelViewer.show({type: 1, typeId: npcId, displayId: displayId, noPound: 1});
+        }
+    },
+
+    genericmodel: {
+        sort: [],
+        mode: 3, // Grid mode
+        nItemsPerPage: 40,
+        nItemsPerRow: 4,
+        poundable: 2, // Yes but w/o sort
+
+        columns: [
+            {
+                value: "name",
+                sortFunc: function (a, b) {
+                    return Listview.templates.genericmodel.sortFunc(a, b);
+                }
+            }
+        ],
+
+        compute: function (model, td, i) {
+            td.className = 'screenshot-cell';
+            td.vAlign    = 'bottom';
+
+            var
+                displayId,
+                type,
+                linkType,
+                slot,
+                typeId;
+
+            if ('modelviewer' in model) {
+                displayId = model.modelviewer.displayid;
+                typeId    = model.modelviewer.typeid;
+                type      = model.modelviewer.type;
+                slot      = model.slot;
+            }
+            else if ('npcmodel' in model) {
+                displayId = model.npcmodel;
+                typeId    = model.id;
+                type      = 1;
+            }
+            else if ('displayid' in model) {
+                displayId = model.displayid;
+                typeId    = model.id;
+                type      = 3;
+                slot      = model.slotbak || model.slot;
+            }
+
+            switch (type) {
+            case 1:
+                linkType = 'npc';
+                break;
+            case 3:
+                linkType = 'item';
+                break;
+            default:
+                linkType = 'item';
+                break;
+            }
+
+            if (displayId) {
+                var a = $WH.ce('a');
+                a.href = 'javascript:;';
+                a.rel = this.genericlinktype + '=' + model.id;
+                a.onclick = this.template.modelShow.bind(this.template, type, typeId, displayId, slot, false);
+
+                var img = $WH.ce('img');
+                img.src = g_staticUrl + '/modelviewer/thumbs/' + linkType + '/' + displayId + '.png';
+                $WH.ae(a, img);
+
+                $WH.ae(td, a);
+            }
+
+            d = $WH.ce('div');
+            d.style.position = 'relative';
+            d.style.height = '1em';
+
+            var d2 = $WH.ce('div');
+            d2.className = 'screenshot-caption';
+
+            var a = $WH.ce('a');
+            a.className = 'q' + ((this.genericlinktype == 'item') ? g_items[model.id].quality : '');
+            a.style.fontFamily = 'Verdana,sans-serif';
+            a.href = g_staticUrl + '/' + this.genericlinktype + '=' + model.id;
+            $WH.ae(a, $WH.ct(model.name.substr(1)));
+            $WH.ae(d2, a);
+
+            $WH.ae(d, d2);
+            $WH.ae(td, d);
+
+            if (displayId) {
+                $WH.aE(td, 'click', this.template.modelShow.bind(this.template, type, typeId, displayId, slot, true));
+            }
+        },
+
+        modelShow: function (type, typeId, displayId, slot, sp, e) {
+            if (sp) {
+                e = $WH.$E(e);
+
+                if (e.shiftKey || e.ctrlKey) {
+                    return;
+                }
+
+                var
+                    j = 0,
+                    el = e._target;
+
+                while (el && j < 3) {
+                    if (el.nodeName == 'A') {
+                        return;
+                    }
+                    if (el.nodeName == 'IMG') {
+                        break;
+                    }
+                    el = el.parentNode;
+                }
+            }
+
+            var opt = {
+                type:      type,
+                typeId:    typeId,
+                displayId: displayId,
+                noPound:   1
+            };
+
+            if (typeof slot != "undefined") {
+                opt.slot = slot;
+            }
+
+            ModelViewer.show(opt);
+        },
+
+        sortFunc: function (a, b, col) {
+            return ($WH.strcmp(a.displayid, b.displayid) || $WH.strcmp(a.name, b.name) || -$WH.strcmp(a.level, b.level));
         }
     },
 
@@ -13284,909 +13420,909 @@ var MENU_IDX_OPT  = 4; // Options: JSON array with additional options
 
 var Menu = new function()
 {
-	var self = this;
-
-	/***********/
-	/* PUBLIC */
-	/**********/
-
-	self.add = function(node, menu, opt) // Add a menu to a DOM element
-	{
-		if(!opt) opt = $.noop;
-
-		var $node = $(node);
-
-		$node.data('menu', menu);
-
-		if(opt.showAtCursor)
-		{
-			$node.click(rootNodeClick);
-		}
-		else
-		{
-			$node
-			.mouseover(rootNodeOver)
-			.mouseout(rootNodeOut);
-		}
-	};
-
-	self.remove = function(node) // Remove menu from DOM element
-	{
-		$(node)
-		.data('menu', null)
-		.unbind('click',     rootNodeClick)
-		.unbind('mouseover', rootNodeOver)
-		.unbind('mouseout',  rootNodeOut);
-	};
-
-	self.show = function(menu, node)
-	{
-		var $node = $(node);
-
-		show(menu, $node);
-	}
-
-	self.showAtCursor = function(menu, event) // {event} must have been normalized by jQuery
-	{
-		showAtXY(menu, event.pageX, event.pageY);
-	}
-
-	self.showAtXY = function(menu, x, y)
-	{
-		showAtXY(menu, x, y);
-	}
-
-	self.hide = function()
-	{
-		rootNodeOut();
-	}
-
-	self.addButtons = function(dest, menu) // Create a set of menu buttons (as seen on the homepage or in the top bar)
-	{
-		var $dest = $(dest);
-		if(!$dest.length)
-			return;
-
-		var $buttons = $('<span class="menu-buttons"></span>');
-
-		$.each(menu, function(idx, menuItem)
-		{
-			if(isSeparator(menuItem)) return;
-
-			var $a = $('<a></a>')
-			var $span = $('<span></span>', {
-				text: menuItem[MENU_IDX_NAME]
-			}).appendTo($a);
-
-			self.linkifyItem(menuItem, $a);
-
-			if(hasSubmenu(menuItem))
-			{
-				$span.addClass('hassubmenu');
-				self.add($a, menuItem[MENU_IDX_SUB]);
-			}
-
-			$buttons.append($a);
-		});
-
-		$dest.append($buttons);
-	};
-
-	self.linkifyItem = function(menuItem, $a) // Also used by PageTemplate when generating the top tabs
-	{
-		var opt = self.getItemOpt(menuItem);
-
-		if(!menuItem[MENU_IDX_URL]) // Unlinked
-		{
-			$a.attr('href', 'javascript:;');
-			$a.addClass('unlinked');
-
-			return;
-		}
-
-		if(typeof menuItem[MENU_IDX_URL] == 'function') // Function
-		{
-			$a.attr('href', 'javascript:;');
-			$a.click(hide);
-			$a.click(menuItem[MENU_IDX_URL]);
-		}
-		else // URL
-		{
-			var url = self.getItemUrl(menuItem);
-			$a.attr('href', url);
-
-			if(opt.newWindow || g_isExternalUrl(url))
-				$a.attr('target', '_blank');
-
-			if(opt.rel)
-				$a.attr('rel', opt.rel);
-		}
-		if(typeof menuItem[MENU_IDX_OPT] == 'object' && menuItem[MENU_IDX_OPT].className)
-			$a.addClass(menuItem[MENU_IDX_OPT].className);
-	};
-
-	self.updateItem = function(menuItem) // Also used by PageTemplate when the breadcrumb changes
-	{
-		var $a = menuItem.$a;
-		if(!$a)
-			return;
-
-		var opt = self.getItemOpt(menuItem);
-
-		$a.removeClass('checked tinyicon icon');
-		$a.css('background-image', '');
-
-		if(menuItem.checked)
-		{
-			$a.addClass('checked');
-		}
-		else if(opt.tinyIcon)
-		{
-			$a.addClass('tinyicon');
-			$a.css('background-image', 'url(' + (opt.tinyIcon.indexOf('/') != -1 ? opt.tinyIcon : g_staticUrl + '/images/icons/tiny/' + opt.tinyIcon.toLowerCase() + '.gif') + ')');
-		}
-		else if(opt.icon)
-		{
-			$a.addClass('icon');
-			$a.css('background-image', 'url(' + opt.icon + ')');
-		}
-		else if(opt.socketColor && g_file_gems[opt.socketColor])
-		{
-			$a.addClass('socket-' + g_file_gems[opt.socketColor]);
-		}
-
-		var className = (opt['class'] || opt.className);
-		if(className)
-			$a.addClass(className);
-	};
-
-	// MENU UTILITY FUNCTIONS
-
-	self.hasMenu = function(node)
-	{
-		var $node = $(node);
-
-		return $node.data('menu') != null;
-	}
-
-	self.modifyUrl = function(menuItem, params, opt)
-	{
-		var json = { params: params, opt: opt };
-
-		traverseMenuItem(menuItem, function(x)
-		{
-			x.modifyUrl = json;
-		});
-
-		// uncomment with breadcrumbs PageTemplate.updateBreadcrumb();
-	};
-
-	self.fixUrls = function(menu, url, opt)
-	{
-		opt = opt || {};
-
-		opt.hash = (opt.hash ? '#' + opt.hash : '');
-
-		fixUrls(menu, url, opt, 0);
-	};
-
-	self.sort = function(menu) // Sort a specific menu
-	{
-		if(hasSeparators(menu))
-			sortSeparatedMenu(menu);
-		else
-			sortMenu(menu);
-	};
-
-	self.sortSubmenus = function(menu, paths) // Sort the submenus of {menu} specified by {paths}
-	{
-		$.each(paths, function(idx, path)
-		{
-			var submenu = self.findItem(menu, path);
-			if(submenu && submenu[MENU_IDX_SUB])
-				self.sort(submenu[MENU_IDX_SUB]);
-		});
-	};
-
-	self.implode = function(menu, opt) // Return a new menu where items preceded by a heading are merged into a single item w/ a submenu
-	{
-		if(!opt) opt = $.noop;
-
-		var result = [];
-		var groupedMenu;
-
-		if(opt.createHeadinglessGroup)
-		{
-			groupedMenu = [];
-			result.push([0, '', null, groupedMenu]);
-		}
-
-		$.each(menu, function(idx, menuItem)
-		{
-			if(isSeparator(menuItem))
-			{
-				groupedMenu = [];
-				result.push([0, menuItem[MENU_IDX_NAME], null, groupedMenu]);
-			}
-			else
-			{
-				if(groupedMenu)
-					groupedMenu.push(menuItem);
-				else
-					result.push(menuItem);
-			}
-		});
-
-		return result;
-	};
-
-	self.findItem = function(menu, path) // Return the menu item specified by {path} in {menu}
-	{
-		return self.getFullPath(menu, path).pop();
-	};
-
-	self.getFullPath = function(menu, path) // Return an array with all the menu items specified by {path} in {menu}
-	{
-		var result = [];
-
-		for(var i = 0; i < path.length; ++i)
-		{
-			var pos = findItemPosById(menu, path[i]);
-
-			if(pos != -1)
-			{
-				var menuItem = menu[pos];
-				menuItem.parentMenu = menu;
-				menu = menuItem[MENU_IDX_SUB];
-
-				result.push(menuItem);
-			}
-		}
-
-		return result;
-	};
-
-	self.getItemUrl = function(menuItem)
-	{
-		var url = menuItem[MENU_IDX_URL];
-		if(!url)
-			return null;
-
-		var opt = self.getItemOpt(menuItem);
-
-		if(menuItem.modifyUrl)
-			url = g_modifyUrl(url, menuItem.modifyUrl.params, menuItem.modifyUrl.opt);
-
-		return url;
-	};
-
-	self.getItemOpt = function(menuItem)
-	{
-		if(!menuItem[MENU_IDX_OPT])
-			menuItem[MENU_IDX_OPT] = {};
-
-		return menuItem[MENU_IDX_OPT];
-	};
-
-	self.removeItemById = function(menu, id)
-	{
-		var pos = findItemPosById(menu, id);
-		if(pos != -1)
-			menu.splice(pos, 1);
-	};
-
-	/***********/
-	/* PRIVATE */
-	/***********/
-
-	var DELAY_BEFORESHOW  = 25;
-	var DELAY_BEFOREHIDE  = 333;
-
-	var MAX_COLUMNS = 4;
-
-	// Should match the styles used in Menu.css
-	var SIZE_SHADOW_WIDTH    = 6;
-	var SIZE_SHADOW_HEIGHT   = 6;
-	var SIZE_BORDER_HEIGHT   = 3;
-	var SIZE_MENUITEM_HEIGHT = 26;
-
-	var inited = false;
-	var timer;
-	var $rootNode;
-	var visibleMenus = {};
-	var openLinks = {};
-	var divCache = {};
-	var menuItemsCache = {};
-	var nextUniqueId = 0;
-
-	function init()
-	{
-		if(inited) return;
-		inited = true;
-
-		// Run a test to get the height of a menu item (in case it's different in some browser/OS combos)
-		var $div = $('<div class="menu"><a href="#"><span>ohai</span></a></div>').css({left: '-1000px', top: '-1000px'}).appendTo(document.body);
-		var height = $div.children('a').outerHeight();
-		$div.remove();
-		if(height > 15) // Safety
-			SIZE_MENUITEM_HEIGHT = height;
-	}
-
-	function show(menu, $node)
-	{
-		if($rootNode)
-			$rootNode.removeClass('open');
-
-		$rootNode = $node;
-		$rootNode.addClass('open');
-
-		displayFirstMenu(menu);
-	}
-
-	function hide()
-	{
-		if($rootNode)
-		{
-			$rootNode.removeClass('open');
-			$rootNode = null;
-		}
-
-		hideMenus(0);
-	}
-
-	function showAtXY(menu, x, y)
-	{
-		clearTimeout(timer);
-
-		displayFirstMenu(menu, x, y);
-	}
-
-	function displayFirstMenu(menu, x, y)
-	{
-		closeLinks(0);
-		displayMenu(menu, 0, x, y);
-		hideMenus(1);
-	}
-
-	function displayMenu(menu, depth, x, y)
-	{
-		init();
-
-		beforeShowMenu(menu);
-
-		var $div       = createDiv(depth);
-		var $menuItems = createMenuItems(menu);
-		var $menu      = createMenu($menuItems, depth);
-
-		$div.append($menu);
-
-		var animated = !isMenuVisible(depth);
-		visibleMenus[depth] = $div;
-
-		var pos = getMenuPosition($div, depth, x, y);
-		$div.css({
-			left: pos.x + 'px',
-			top:  pos.y + 'px'
-		});
-
-		// Hide ads that intersect with the menu
-		// var menuRect = $WH.g_createRect(pos.x, pos.y, $div.width(), $div.height());
-		// Ads.intersect(menuRect, true);
-
-		revealDiv($div, animated);
-	}
-
-	function createDiv(depth)
-	{
-		if(divCache[depth])
-		{
-			var $div = divCache[depth];
-			$div.children().detach(); // Similar to $div.empty(), except custom data is preserved.
-			return $div;
-		}
-
-		var $div = $('<div class="menu"></div>')
-		.mouseover(menuDivOver)
-		.mouseleave(menuDivOut)
-		.delegate('a', 'mouseenter', { depth: depth }, menuItemOver)
-		.delegate('a', 'click', menuItemClick);
-
-		if($WH.isset('g_thottbot') && g_thottbot)
-			$div.hide();
-
-		$div.appendTo(document.body);
-
-		divCache[depth] = $div;
-		return $div;
-	}
-
-	function createMenuItems(menu)
-	{
-		var uid = getUniqueId(menu);
-
-		if(menuItemsCache[uid])
-			return menuItemsCache[uid];
-
-		var nextSeparator; // Used to make sure a separator is always followed by a visible item
-		var menuItems = [];
-
-		$.each(menu, function(idx, menuItem)
-		{
-			if(!isItemVisible(menuItem)) return;
-
-			$a = createMenuItem(menuItem);
-
-			if(isSeparator(menuItem))
-			{
-				nextSeparator = $a;
-				return;
-			}
-
-			if(nextSeparator)
-			{
-				menuItems.push(nextSeparator);
-				nextSeparator = null;
-			}
-
-			menuItems.push($a);
-		});
-
-		var $menuItems = $(menuItems);
-
-		menuItemsCache[menu] = $menuItems;
-		return $menuItems;
-	}
-
-	function createMenuItem(menuItem)
-	{
-		beforeCreateMenuItem(menuItem);
-
-		var $a = $('<a></a>');
-
-		menuItem.$a = $a;
-		$a.data('menuItem', menuItem);
-
-		self.linkifyItem(menuItem, $a);
-		self.updateItem(menuItem);
-
-		// Separator
-		if(isSeparator(menuItem))
-		{
-			$a.addClass('separator');
-			$a.text(menuItem[MENU_IDX_NAME]);
-
-			return $a;
-		}
-
-		var $span = $('<span></span>');
-		$span.text(menuItem[MENU_IDX_NAME]);
-		$span.appendTo($a);
-
-		// Submenu
-		if(hasSubmenu(menuItem))
-			$span.addClass('hassubmenu');
-
-		return $a;
-	}
-
-	function createMenu($menuItems, depth)
-	{
-		var $a = $rootNode;
-		var $w = $(window);
-		var nItems = $menuItems.length;
-		var availableHeight = $w.height() - (SIZE_BORDER_HEIGHT * 2) - SIZE_SHADOW_HEIGHT;
-		var nItemsThatCanFit = Math.floor(Math.max(0, availableHeight) / SIZE_MENUITEM_HEIGHT);
-
-		// 1 column
-		if(nItemsThatCanFit >= nItems)
-		{
-			var $outerDiv = $('<div class="menu-outer"></div>');
-			var $innerDiv = $('<div class="menu-inner"></div>');
-
-			$menuItems.appendTo($innerDiv);
-			$outerDiv.append($innerDiv);
-
-			return $outerDiv;
-		}
-
-		// Multiple columns
-		var nColumns = Math.min(MAX_COLUMNS, Math.ceil(nItems / nItemsThatCanFit));
-		var nItemsPerColumn = Math.ceil(nItems / nColumns);
-		var nItemsAdded = 0;
-		var nItemsRemaining = nItems;
-		var $holder = $('<div></div>');
-
-		while(nItemsRemaining > 0)
-		{
-			var $outerDiv = $('<div class="menu-outer"></div>');
-			var $innerDiv = $('<div class="menu-inner"></div>');
-
-			var nItemsToAdd = Math.min(nItemsRemaining, nItemsPerColumn);
-			var start = nItemsAdded;
-			var end   = start + nItemsToAdd;
-
-			$menuItems.slice(start, end).appendTo($innerDiv);
-			$outerDiv.append($innerDiv);
-			$holder.append($outerDiv);
-
-			nItemsAdded     += nItemsToAdd;
-			nItemsRemaining -= nItemsToAdd;
-		}
-
-		return $holder;
-	}
-
-	function getMenuPosition($div, depth, x, y)
-	{
-		if(depth == 0)
-			return getFirstMenuPosition($div, depth, x, y);
-
-		return getSubmenuPosition($div, depth);
-	}
-
-	function getFirstMenuPosition($div, depth, x, y)
-	{
-		var viewport   = g_getViewport();
-		var menuWidth  = $div.width();
-		var menuHeight = $div.height();
-		var menuWidthShadow  = menuWidth  + SIZE_SHADOW_WIDTH;
-		var menuHeightShadow = menuHeight + SIZE_SHADOW_HEIGHT;
-
-		var showingAtCursor = (x != null && y != null);
-		if(showingAtCursor)
-		{
-			if(y + menuHeightShadow > viewport.b) // Make sure menu doesn't overflow vertically
-				y = Math.max(viewport.t, viewport.b - menuHeightShadow);  // Place along the bottom edge if it does
-		}
-		else
-		{
-			var $a = $rootNode;
-			var offset = $a.offset();
-
-			// Place underneath the root node by default
-			x = offset.left
-			y = offset.top + $a.outerHeight();
-
-			// Show menu upwards if it's going to be outside the viewport otherwise (only if there's room)
-			if(y + menuHeightShadow > viewport.b && offset.top >= menuHeightShadow)
-				y = offset.top - menuHeightShadow;
-		}
-
-		if(x + menuWidthShadow > viewport.r) // Make sure menu doesn't overflow horizontally
-			x = Math.max(viewport.l, viewport.r - menuWidthShadow); // Place along the right edge if it does
-
-		return {x: x, y: y};
-	}
-
-	function getSubmenuPosition($div, depth)
-	{
-		var viewport   = g_getViewport();
-		var menuWidth  = $div.width();
-		var menuHeight = $div.height();
-		var menuWidthShadow  = menuWidth  + SIZE_SHADOW_WIDTH;
-		var menuHeightShadow = menuHeight + SIZE_SHADOW_HEIGHT;
-
-		var $a = openLinks[depth - 1];
-		var offset = $a.offset();
-		var openToTheLeft = false;
-
-		// Show to the right of the menu item
-		x = offset.left + $a.outerWidth() - 5;
-		y = offset.top - 2;
-
-		if(x + menuWidthShadow > viewport.r) // Make sure menu doesn't overflow horizontally
-			openToTheLeft = true;
-
-		if(openToTheLeft)
-			x = Math.max(viewport.l, offset.left - menuWidth);
-
-		if(y + menuHeightShadow > viewport.b) // Make sure menu doesn't overflow vertically
-			y = Math.max(viewport.t, viewport.b - menuHeightShadow);  // Place along the bottom edge if it does
-
-		return {x: x, y: y};
-	}
-
-	function revealDiv($div, animated)
-	{
-		if(animated)
-		{
-			$div.css({
-				opacity: '0'
-			})
-			.show()
-			.animate({
-				opacity: '1'
-			}, 'fast', null, doneRevealing);
-		}
-		else
-			$div.show();
-	}
-
-	function doneRevealing(a)
-	{
-		$(this).css('opacity', ''); // Remove opacity once animation is over to prevent a bug in IE8
-	}
-
-	function hideMenus(depth)
-	{
-		while(visibleMenus[depth])
-		{
-			visibleMenus[depth].stop().hide();
-			visibleMenus[depth] = null;
-
-			++depth;
-		}
-	}
-
-	function closeLinks(depth)
-	{
-		while(openLinks[depth])
-		{
-			openLinks[depth].removeClass('open');
-			openLinks[depth] = null;
-
-			++depth;
-		}
-	}
-
-	function isMenuVisible(depth)
-	{
-		return visibleMenus[depth || 0] != null;
-	}
-
-	// MENU UTILITY FUNCTIONS
-
-	function getItemId(menuItem)
-	{
-		return menuItem[MENU_IDX_ID];
-	}
-
-	function isSeparator(menuItem)
-	{
-		return menuItem[MENU_IDX_ID] == null; // Separators don't have an ID
-	}
-
-	function hasSeparators(menu)
-	{
-		return $WH.in_array(menu, true, isSeparator) != -1;
-	}
-
-	function hasSubmenu(menuItem)
-	{
-		return menuItem[MENU_IDX_SUB] != null;
-	}
-
-	function findItemPosById(menu, id)
-	{
-		return $WH.in_array(menu, id, getItemId);
-	}
-
-	function hasPermissions(menuItem)
-	{
-		var opt = self.getItemOpt(menuItem);
-
-		if(opt.requiredAccess && !User.hasPermissions(opt.requiredAccess))
-			return false;
-
-		return true;
-	}
-
-	function isItemVisible(menuItem)
-	{
-		if(!hasPermissions(menuItem))
-			return false;
-
-		if(hasSubmenu(menuItem))
-		{
-			if(!hasVisibleItems(menuItem[MENU_IDX_SUB]))
-				return false;
-		}
-
-		return true;
-	}
-
-	function hasVisibleItems(menu)
-	{
-		return $WH.in_array(menu, true, isSubitemVisible) != -1;
-	}
-
-	function isSubitemVisible(menuItem)
-	{
-		return !isSeparator(menuItem) && hasPermissions(menuItem);
-	}
-
-	function getUniqueId(menu)
-	{
-		if(menu.uniqueId == null)
-			menu.uniqueId = nextUniqueId++;
-
-		return menu.uniqueId;
-	}
-
-	function traverseMenu(menu, func)
-	{
-		$.each(menu, function(idx, menuItem)
-		{
-			traverseMenuItem(menuItem, func);
-		});
-	}
-
-	function traverseMenuItem(menuItem, func)
-	{
-		func(menuItem);
-		if(hasSubmenu(menuItem))
-			traverseMenu(menuItem[MENU_IDX_SUB], func);
-	}
-
-	function fixUrls(menu, url, opt, depth)
-	{
-		$.each(menu, function(idx, menuItem)
-		{
-			if(menuItem === undefined) return;
-			if(isSeparator(menuItem)) return;
-
-			if(menuItem[MENU_IDX_URL] == null) // Don't override if already set
-				menuItem[MENU_IDX_URL] = url + menuItem[MENU_IDX_ID] + opt.hash;
-
-			if(hasSubmenu(menuItem))
-			{
-				var accumulate = true;
-
-				if(opt.useSimpleIds)
-					accumulate = false;
-				else if(opt.useSimpleIdsAfter != null && depth >= opt.useSimpleIdsAfter)
-					accumulate = false;
-
-				var nextUrl = url;
-				if(accumulate)
-					nextUrl += menuItem[MENU_IDX_ID] + '.';
-				fixUrls(menuItem[MENU_IDX_SUB], nextUrl, opt, depth + 1);
-			}
-		});
-	}
-
-	function sortMenu(menu)
-	{
-		menu.sort(function(a, b)
-		{
-			return $WH.strcmp(a[MENU_IDX_NAME], b[MENU_IDX_NAME]);
-		});
-	}
-
-	function sortSeparatedMenu(menu)
-	{
-		// Sort each group separately so headings stay where they are.
-
-		var implodedMenu = self.implode(menu, { createHeadinglessGroup: true });
-
-		$.each(implodedMenu, function(idx, submenu)
-		{
-			sortMenu(submenu[MENU_IDX_SUB]);
-		});
-
-		explodeInto(menu, implodedMenu);
-	};
-
-	function explodeInto(menu, implodedMenu) // Reverse of implode
-	{
-		menu.splice(0, menu.length); // Clear menu
-
-		$.each(implodedMenu, function(idx, menuItem)
-		{
-			if(menuItem[MENU_IDX_NAME])
-				menu.push([, menuItem[MENU_IDX_NAME]]); // Heading
-
-			$.each(menuItem[MENU_IDX_SUB], function(idx, menuItem)
-			{
-				menu.push(menuItem);
-			});
-		});
-	}
-
-	// EVENTS
-
-	function beforeCreateMenuItem(menuItem)
-	{
-		var opt = self.getItemOpt(menuItem);
-
-		if(opt.checkedUrl && location.href.match(opt.checkedUrl))
-			menuItem.checked = true;
-	}
-
-	function beforeShowMenu(menu)
-	{
-		if(menu.onBeforeShow)
-			menu.onBeforeShow(menu);
-
-		$.each(menu, function(idx, menuItem)
-		{
-			var opt = self.getItemOpt(menuItem);
-
-			if(opt.onBeforeShow)
-				opt.onBeforeShow(menuItem);
-		});
-	}
-
-	function rootNodeOver(event)
-	{
-		clearTimeout(timer);
-
-		var $node = $(this);
-
-		if(!isMenuVisible())
-		{
-			// Use a small delay the 1st time to prevent undesired appearances
-			timer = setTimeout(show.bind(null, $node.data('menu'), $node), DELAY_BEFORESHOW);
-			return;
-		}
-
-		show($node.data('menu'), $node);
-	}
-
-	function rootNodeOut(event)
-	{
-		clearTimeout(timer);
-
-		if(isMenuVisible())
-			timer = setTimeout(hide, DELAY_BEFOREHIDE);
-	}
-
-	function rootNodeClick(event)
-	{
-		clearTimeout(timer);
-
-		self.showAtCursor($(this).data('menu'), event);
-	}
-
-	function menuDivOver(event)
-	{
-		clearTimeout(timer);
-	}
-
-	function menuDivOut(event)
-	{
-		clearTimeout(timer);
-		timer = setTimeout(hide, DELAY_BEFOREHIDE);
-	}
-
-	function menuItemOver(event)
-	{
-		clearTimeout(timer);
-
-		var $a = $(this);
-		var depth = event.data.depth;
-
-		closeLinks(depth);
-
-		var menuItem = $a.data('menuItem');
-
-		var deepestDepth = depth;
-		if(menuItem && hasSubmenu(menuItem))
-		{
-			$a.addClass('open');
-			openLinks[depth] = $a;
-
-			displayMenu(menuItem[MENU_IDX_SUB], depth + 1);
-
-			++deepestDepth;
-		}
-
-		hideMenus(deepestDepth + 1);
-	}
-
-	function menuItemClick(event)
-	{
-		var $a = $(this);
-		var menuItem = $a.data('menuItem');
-
-		if(!menuItem)
-			return;
-
-		var opt = self.getItemOpt(menuItem);
-
-		if(opt.onClick)
-			opt.onClick();
-	}
+    var self = this;
+
+    /***********/
+    /* PUBLIC */
+    /**********/
+
+    self.add = function(node, menu, opt) // Add a menu to a DOM element
+    {
+        if(!opt) opt = $.noop;
+
+        var $node = $(node);
+
+        $node.data('menu', menu);
+
+        if(opt.showAtCursor)
+        {
+            $node.click(rootNodeClick);
+        }
+        else
+        {
+            $node
+            .mouseover(rootNodeOver)
+            .mouseout(rootNodeOut);
+        }
+    };
+
+    self.remove = function(node) // Remove menu from DOM element
+    {
+        $(node)
+        .data('menu', null)
+        .unbind('click',     rootNodeClick)
+        .unbind('mouseover', rootNodeOver)
+        .unbind('mouseout',  rootNodeOut);
+    };
+
+    self.show = function(menu, node)
+    {
+        var $node = $(node);
+
+        show(menu, $node);
+    }
+
+    self.showAtCursor = function(menu, event) // {event} must have been normalized by jQuery
+    {
+        showAtXY(menu, event.pageX, event.pageY);
+    }
+
+    self.showAtXY = function(menu, x, y)
+    {
+        showAtXY(menu, x, y);
+    }
+
+    self.hide = function()
+    {
+        rootNodeOut();
+    }
+
+    self.addButtons = function(dest, menu) // Create a set of menu buttons (as seen on the homepage or in the top bar)
+    {
+        var $dest = $(dest);
+        if(!$dest.length)
+            return;
+
+        var $buttons = $('<span class="menu-buttons"></span>');
+
+        $.each(menu, function(idx, menuItem)
+        {
+            if(isSeparator(menuItem)) return;
+
+            var $a = $('<a></a>')
+            var $span = $('<span></span>', {
+                text: menuItem[MENU_IDX_NAME]
+            }).appendTo($a);
+
+            self.linkifyItem(menuItem, $a);
+
+            if(hasSubmenu(menuItem))
+            {
+                $span.addClass('hassubmenu');
+                self.add($a, menuItem[MENU_IDX_SUB]);
+            }
+
+            $buttons.append($a);
+        });
+
+        $dest.append($buttons);
+    };
+
+    self.linkifyItem = function(menuItem, $a) // Also used by PageTemplate when generating the top tabs
+    {
+        var opt = self.getItemOpt(menuItem);
+
+        if(!menuItem[MENU_IDX_URL]) // Unlinked
+        {
+            $a.attr('href', 'javascript:;');
+            $a.addClass('unlinked');
+
+            return;
+        }
+
+        if(typeof menuItem[MENU_IDX_URL] == 'function') // Function
+        {
+            $a.attr('href', 'javascript:;');
+            $a.click(hide);
+            $a.click(menuItem[MENU_IDX_URL]);
+        }
+        else // URL
+        {
+            var url = self.getItemUrl(menuItem);
+            $a.attr('href', url);
+
+            if(opt.newWindow || g_isExternalUrl(url))
+                $a.attr('target', '_blank');
+
+            if(opt.rel)
+                $a.attr('rel', opt.rel);
+        }
+        if(typeof menuItem[MENU_IDX_OPT] == 'object' && menuItem[MENU_IDX_OPT].className)
+            $a.addClass(menuItem[MENU_IDX_OPT].className);
+    };
+
+    self.updateItem = function(menuItem) // Also used by PageTemplate when the breadcrumb changes
+    {
+        var $a = menuItem.$a;
+        if(!$a)
+            return;
+
+        var opt = self.getItemOpt(menuItem);
+
+        $a.removeClass('checked tinyicon icon');
+        $a.css('background-image', '');
+
+        if(menuItem.checked)
+        {
+            $a.addClass('checked');
+        }
+        else if(opt.tinyIcon)
+        {
+            $a.addClass('tinyicon');
+            $a.css('background-image', 'url(' + (opt.tinyIcon.indexOf('/') != -1 ? opt.tinyIcon : g_staticUrl + '/images/icons/tiny/' + opt.tinyIcon.toLowerCase() + '.gif') + ')');
+        }
+        else if(opt.icon)
+        {
+            $a.addClass('icon');
+            $a.css('background-image', 'url(' + opt.icon + ')');
+        }
+        else if(opt.socketColor && g_file_gems[opt.socketColor])
+        {
+            $a.addClass('socket-' + g_file_gems[opt.socketColor]);
+        }
+
+        var className = (opt['class'] || opt.className);
+        if(className)
+            $a.addClass(className);
+    };
+
+    // MENU UTILITY FUNCTIONS
+
+    self.hasMenu = function(node)
+    {
+        var $node = $(node);
+
+        return $node.data('menu') != null;
+    }
+
+    self.modifyUrl = function(menuItem, params, opt)
+    {
+        var json = { params: params, opt: opt };
+
+        traverseMenuItem(menuItem, function(x)
+        {
+            x.modifyUrl = json;
+        });
+
+        // uncomment with breadcrumbs PageTemplate.updateBreadcrumb();
+    };
+
+    self.fixUrls = function(menu, url, opt)
+    {
+        opt = opt || {};
+
+        opt.hash = (opt.hash ? '#' + opt.hash : '');
+
+        fixUrls(menu, url, opt, 0);
+    };
+
+    self.sort = function(menu) // Sort a specific menu
+    {
+        if(hasSeparators(menu))
+            sortSeparatedMenu(menu);
+        else
+            sortMenu(menu);
+    };
+
+    self.sortSubmenus = function(menu, paths) // Sort the submenus of {menu} specified by {paths}
+    {
+        $.each(paths, function(idx, path)
+        {
+            var submenu = self.findItem(menu, path);
+            if(submenu && submenu[MENU_IDX_SUB])
+                self.sort(submenu[MENU_IDX_SUB]);
+        });
+    };
+
+    self.implode = function(menu, opt) // Return a new menu where items preceded by a heading are merged into a single item w/ a submenu
+    {
+        if(!opt) opt = $.noop;
+
+        var result = [];
+        var groupedMenu;
+
+        if(opt.createHeadinglessGroup)
+        {
+            groupedMenu = [];
+            result.push([0, '', null, groupedMenu]);
+        }
+
+        $.each(menu, function(idx, menuItem)
+        {
+            if(isSeparator(menuItem))
+            {
+                groupedMenu = [];
+                result.push([0, menuItem[MENU_IDX_NAME], null, groupedMenu]);
+            }
+            else
+            {
+                if(groupedMenu)
+                    groupedMenu.push(menuItem);
+                else
+                    result.push(menuItem);
+            }
+        });
+
+        return result;
+    };
+
+    self.findItem = function(menu, path) // Return the menu item specified by {path} in {menu}
+    {
+        return self.getFullPath(menu, path).pop();
+    };
+
+    self.getFullPath = function(menu, path) // Return an array with all the menu items specified by {path} in {menu}
+    {
+        var result = [];
+
+        for(var i = 0; i < path.length; ++i)
+        {
+            var pos = findItemPosById(menu, path[i]);
+
+            if(pos != -1)
+            {
+                var menuItem = menu[pos];
+                menuItem.parentMenu = menu;
+                menu = menuItem[MENU_IDX_SUB];
+
+                result.push(menuItem);
+            }
+        }
+
+        return result;
+    };
+
+    self.getItemUrl = function(menuItem)
+    {
+        var url = menuItem[MENU_IDX_URL];
+        if(!url)
+            return null;
+
+        var opt = self.getItemOpt(menuItem);
+
+        if(menuItem.modifyUrl)
+            url = g_modifyUrl(url, menuItem.modifyUrl.params, menuItem.modifyUrl.opt);
+
+        return url;
+    };
+
+    self.getItemOpt = function(menuItem)
+    {
+        if(!menuItem[MENU_IDX_OPT])
+            menuItem[MENU_IDX_OPT] = {};
+
+        return menuItem[MENU_IDX_OPT];
+    };
+
+    self.removeItemById = function(menu, id)
+    {
+        var pos = findItemPosById(menu, id);
+        if(pos != -1)
+            menu.splice(pos, 1);
+    };
+
+    /***********/
+    /* PRIVATE */
+    /***********/
+
+    var DELAY_BEFORESHOW  = 25;
+    var DELAY_BEFOREHIDE  = 333;
+
+    var MAX_COLUMNS = 4;
+
+    // Should match the styles used in Menu.css
+    var SIZE_SHADOW_WIDTH    = 6;
+    var SIZE_SHADOW_HEIGHT   = 6;
+    var SIZE_BORDER_HEIGHT   = 3;
+    var SIZE_MENUITEM_HEIGHT = 26;
+
+    var inited = false;
+    var timer;
+    var $rootNode;
+    var visibleMenus = {};
+    var openLinks = {};
+    var divCache = {};
+    var menuItemsCache = {};
+    var nextUniqueId = 0;
+
+    function init()
+    {
+        if(inited) return;
+        inited = true;
+
+        // Run a test to get the height of a menu item (in case it's different in some browser/OS combos)
+        var $div = $('<div class="menu"><a href="#"><span>ohai</span></a></div>').css({left: '-1000px', top: '-1000px'}).appendTo(document.body);
+        var height = $div.children('a').outerHeight();
+        $div.remove();
+        if(height > 15) // Safety
+            SIZE_MENUITEM_HEIGHT = height;
+    }
+
+    function show(menu, $node)
+    {
+        if($rootNode)
+            $rootNode.removeClass('open');
+
+        $rootNode = $node;
+        $rootNode.addClass('open');
+
+        displayFirstMenu(menu);
+    }
+
+    function hide()
+    {
+        if($rootNode)
+        {
+            $rootNode.removeClass('open');
+            $rootNode = null;
+        }
+
+        hideMenus(0);
+    }
+
+    function showAtXY(menu, x, y)
+    {
+        clearTimeout(timer);
+
+        displayFirstMenu(menu, x, y);
+    }
+
+    function displayFirstMenu(menu, x, y)
+    {
+        closeLinks(0);
+        displayMenu(menu, 0, x, y);
+        hideMenus(1);
+    }
+
+    function displayMenu(menu, depth, x, y)
+    {
+        init();
+
+        beforeShowMenu(menu);
+
+        var $div       = createDiv(depth);
+        var $menuItems = createMenuItems(menu);
+        var $menu      = createMenu($menuItems, depth);
+
+        $div.append($menu);
+
+        var animated = !isMenuVisible(depth);
+        visibleMenus[depth] = $div;
+
+        var pos = getMenuPosition($div, depth, x, y);
+        $div.css({
+            left: pos.x + 'px',
+            top:  pos.y + 'px'
+        });
+
+        // Hide ads that intersect with the menu
+        // var menuRect = $WH.g_createRect(pos.x, pos.y, $div.width(), $div.height());
+        // Ads.intersect(menuRect, true);
+
+        revealDiv($div, animated);
+    }
+
+    function createDiv(depth)
+    {
+        if(divCache[depth])
+        {
+            var $div = divCache[depth];
+            $div.children().detach(); // Similar to $div.empty(), except custom data is preserved.
+            return $div;
+        }
+
+        var $div = $('<div class="menu"></div>')
+        .mouseover(menuDivOver)
+        .mouseleave(menuDivOut)
+        .delegate('a', 'mouseenter', { depth: depth }, menuItemOver)
+        .delegate('a', 'click', menuItemClick);
+
+        if($WH.isset('g_thottbot') && g_thottbot)
+            $div.hide();
+
+        $div.appendTo(document.body);
+
+        divCache[depth] = $div;
+        return $div;
+    }
+
+    function createMenuItems(menu)
+    {
+        var uid = getUniqueId(menu);
+
+        if(menuItemsCache[uid])
+            return menuItemsCache[uid];
+
+        var nextSeparator; // Used to make sure a separator is always followed by a visible item
+        var menuItems = [];
+
+        $.each(menu, function(idx, menuItem)
+        {
+            if(!isItemVisible(menuItem)) return;
+
+            $a = createMenuItem(menuItem);
+
+            if(isSeparator(menuItem))
+            {
+                nextSeparator = $a;
+                return;
+            }
+
+            if(nextSeparator)
+            {
+                menuItems.push(nextSeparator);
+                nextSeparator = null;
+            }
+
+            menuItems.push($a);
+        });
+
+        var $menuItems = $(menuItems);
+
+        menuItemsCache[menu] = $menuItems;
+        return $menuItems;
+    }
+
+    function createMenuItem(menuItem)
+    {
+        beforeCreateMenuItem(menuItem);
+
+        var $a = $('<a></a>');
+
+        menuItem.$a = $a;
+        $a.data('menuItem', menuItem);
+
+        self.linkifyItem(menuItem, $a);
+        self.updateItem(menuItem);
+
+        // Separator
+        if(isSeparator(menuItem))
+        {
+            $a.addClass('separator');
+            $a.text(menuItem[MENU_IDX_NAME]);
+
+            return $a;
+        }
+
+        var $span = $('<span></span>');
+        $span.text(menuItem[MENU_IDX_NAME]);
+        $span.appendTo($a);
+
+        // Submenu
+        if(hasSubmenu(menuItem))
+            $span.addClass('hassubmenu');
+
+        return $a;
+    }
+
+    function createMenu($menuItems, depth)
+    {
+        var $a = $rootNode;
+        var $w = $(window);
+        var nItems = $menuItems.length;
+        var availableHeight = $w.height() - (SIZE_BORDER_HEIGHT * 2) - SIZE_SHADOW_HEIGHT;
+        var nItemsThatCanFit = Math.floor(Math.max(0, availableHeight) / SIZE_MENUITEM_HEIGHT);
+
+        // 1 column
+        if(nItemsThatCanFit >= nItems)
+        {
+            var $outerDiv = $('<div class="menu-outer"></div>');
+            var $innerDiv = $('<div class="menu-inner"></div>');
+
+            $menuItems.appendTo($innerDiv);
+            $outerDiv.append($innerDiv);
+
+            return $outerDiv;
+        }
+
+        // Multiple columns
+        var nColumns = Math.min(MAX_COLUMNS, Math.ceil(nItems / nItemsThatCanFit));
+        var nItemsPerColumn = Math.ceil(nItems / nColumns);
+        var nItemsAdded = 0;
+        var nItemsRemaining = nItems;
+        var $holder = $('<div></div>');
+
+        while(nItemsRemaining > 0)
+        {
+            var $outerDiv = $('<div class="menu-outer"></div>');
+            var $innerDiv = $('<div class="menu-inner"></div>');
+
+            var nItemsToAdd = Math.min(nItemsRemaining, nItemsPerColumn);
+            var start = nItemsAdded;
+            var end   = start + nItemsToAdd;
+
+            $menuItems.slice(start, end).appendTo($innerDiv);
+            $outerDiv.append($innerDiv);
+            $holder.append($outerDiv);
+
+            nItemsAdded     += nItemsToAdd;
+            nItemsRemaining -= nItemsToAdd;
+        }
+
+        return $holder;
+    }
+
+    function getMenuPosition($div, depth, x, y)
+    {
+        if(depth == 0)
+            return getFirstMenuPosition($div, depth, x, y);
+
+        return getSubmenuPosition($div, depth);
+    }
+
+    function getFirstMenuPosition($div, depth, x, y)
+    {
+        var viewport   = g_getViewport();
+        var menuWidth  = $div.width();
+        var menuHeight = $div.height();
+        var menuWidthShadow  = menuWidth  + SIZE_SHADOW_WIDTH;
+        var menuHeightShadow = menuHeight + SIZE_SHADOW_HEIGHT;
+
+        var showingAtCursor = (x != null && y != null);
+        if(showingAtCursor)
+        {
+            if(y + menuHeightShadow > viewport.b) // Make sure menu doesn't overflow vertically
+                y = Math.max(viewport.t, viewport.b - menuHeightShadow);  // Place along the bottom edge if it does
+        }
+        else
+        {
+            var $a = $rootNode;
+            var offset = $a.offset();
+
+            // Place underneath the root node by default
+            x = offset.left
+            y = offset.top + $a.outerHeight();
+
+            // Show menu upwards if it's going to be outside the viewport otherwise (only if there's room)
+            if(y + menuHeightShadow > viewport.b && offset.top >= menuHeightShadow)
+                y = offset.top - menuHeightShadow;
+        }
+
+        if(x + menuWidthShadow > viewport.r) // Make sure menu doesn't overflow horizontally
+            x = Math.max(viewport.l, viewport.r - menuWidthShadow); // Place along the right edge if it does
+
+        return {x: x, y: y};
+    }
+
+    function getSubmenuPosition($div, depth)
+    {
+        var viewport   = g_getViewport();
+        var menuWidth  = $div.width();
+        var menuHeight = $div.height();
+        var menuWidthShadow  = menuWidth  + SIZE_SHADOW_WIDTH;
+        var menuHeightShadow = menuHeight + SIZE_SHADOW_HEIGHT;
+
+        var $a = openLinks[depth - 1];
+        var offset = $a.offset();
+        var openToTheLeft = false;
+
+        // Show to the right of the menu item
+        x = offset.left + $a.outerWidth() - 5;
+        y = offset.top - 2;
+
+        if(x + menuWidthShadow > viewport.r) // Make sure menu doesn't overflow horizontally
+            openToTheLeft = true;
+
+        if(openToTheLeft)
+            x = Math.max(viewport.l, offset.left - menuWidth);
+
+        if(y + menuHeightShadow > viewport.b) // Make sure menu doesn't overflow vertically
+            y = Math.max(viewport.t, viewport.b - menuHeightShadow);  // Place along the bottom edge if it does
+
+        return {x: x, y: y};
+    }
+
+    function revealDiv($div, animated)
+    {
+        if(animated)
+        {
+            $div.css({
+                opacity: '0'
+            })
+            .show()
+            .animate({
+                opacity: '1'
+            }, 'fast', null, doneRevealing);
+        }
+        else
+            $div.show();
+    }
+
+    function doneRevealing(a)
+    {
+        $(this).css('opacity', ''); // Remove opacity once animation is over to prevent a bug in IE8
+    }
+
+    function hideMenus(depth)
+    {
+        while(visibleMenus[depth])
+        {
+            visibleMenus[depth].stop().hide();
+            visibleMenus[depth] = null;
+
+            ++depth;
+        }
+    }
+
+    function closeLinks(depth)
+    {
+        while(openLinks[depth])
+        {
+            openLinks[depth].removeClass('open');
+            openLinks[depth] = null;
+
+            ++depth;
+        }
+    }
+
+    function isMenuVisible(depth)
+    {
+        return visibleMenus[depth || 0] != null;
+    }
+
+    // MENU UTILITY FUNCTIONS
+
+    function getItemId(menuItem)
+    {
+        return menuItem[MENU_IDX_ID];
+    }
+
+    function isSeparator(menuItem)
+    {
+        return menuItem[MENU_IDX_ID] == null; // Separators don't have an ID
+    }
+
+    function hasSeparators(menu)
+    {
+        return $WH.in_array(menu, true, isSeparator) != -1;
+    }
+
+    function hasSubmenu(menuItem)
+    {
+        return menuItem[MENU_IDX_SUB] != null;
+    }
+
+    function findItemPosById(menu, id)
+    {
+        return $WH.in_array(menu, id, getItemId);
+    }
+
+    function hasPermissions(menuItem)
+    {
+        var opt = self.getItemOpt(menuItem);
+
+        if(opt.requiredAccess && !User.hasPermissions(opt.requiredAccess))
+            return false;
+
+        return true;
+    }
+
+    function isItemVisible(menuItem)
+    {
+        if(!hasPermissions(menuItem))
+            return false;
+
+        if(hasSubmenu(menuItem))
+        {
+            if(!hasVisibleItems(menuItem[MENU_IDX_SUB]))
+                return false;
+        }
+
+        return true;
+    }
+
+    function hasVisibleItems(menu)
+    {
+        return $WH.in_array(menu, true, isSubitemVisible) != -1;
+    }
+
+    function isSubitemVisible(menuItem)
+    {
+        return !isSeparator(menuItem) && hasPermissions(menuItem);
+    }
+
+    function getUniqueId(menu)
+    {
+        if(menu.uniqueId == null)
+            menu.uniqueId = nextUniqueId++;
+
+        return menu.uniqueId;
+    }
+
+    function traverseMenu(menu, func)
+    {
+        $.each(menu, function(idx, menuItem)
+        {
+            traverseMenuItem(menuItem, func);
+        });
+    }
+
+    function traverseMenuItem(menuItem, func)
+    {
+        func(menuItem);
+        if(hasSubmenu(menuItem))
+            traverseMenu(menuItem[MENU_IDX_SUB], func);
+    }
+
+    function fixUrls(menu, url, opt, depth)
+    {
+        $.each(menu, function(idx, menuItem)
+        {
+            if(menuItem === undefined) return;
+            if(isSeparator(menuItem)) return;
+
+            if(menuItem[MENU_IDX_URL] == null) // Don't override if already set
+                menuItem[MENU_IDX_URL] = url + menuItem[MENU_IDX_ID] + opt.hash;
+
+            if(hasSubmenu(menuItem))
+            {
+                var accumulate = true;
+
+                if(opt.useSimpleIds)
+                    accumulate = false;
+                else if(opt.useSimpleIdsAfter != null && depth >= opt.useSimpleIdsAfter)
+                    accumulate = false;
+
+                var nextUrl = url;
+                if(accumulate)
+                    nextUrl += menuItem[MENU_IDX_ID] + '.';
+                fixUrls(menuItem[MENU_IDX_SUB], nextUrl, opt, depth + 1);
+            }
+        });
+    }
+
+    function sortMenu(menu)
+    {
+        menu.sort(function(a, b)
+        {
+            return $WH.strcmp(a[MENU_IDX_NAME], b[MENU_IDX_NAME]);
+        });
+    }
+
+    function sortSeparatedMenu(menu)
+    {
+        // Sort each group separately so headings stay where they are.
+
+        var implodedMenu = self.implode(menu, { createHeadinglessGroup: true });
+
+        $.each(implodedMenu, function(idx, submenu)
+        {
+            sortMenu(submenu[MENU_IDX_SUB]);
+        });
+
+        explodeInto(menu, implodedMenu);
+    };
+
+    function explodeInto(menu, implodedMenu) // Reverse of implode
+    {
+        menu.splice(0, menu.length); // Clear menu
+
+        $.each(implodedMenu, function(idx, menuItem)
+        {
+            if(menuItem[MENU_IDX_NAME])
+                menu.push([, menuItem[MENU_IDX_NAME]]); // Heading
+
+            $.each(menuItem[MENU_IDX_SUB], function(idx, menuItem)
+            {
+                menu.push(menuItem);
+            });
+        });
+    }
+
+    // EVENTS
+
+    function beforeCreateMenuItem(menuItem)
+    {
+        var opt = self.getItemOpt(menuItem);
+
+        if(opt.checkedUrl && location.href.match(opt.checkedUrl))
+            menuItem.checked = true;
+    }
+
+    function beforeShowMenu(menu)
+    {
+        if(menu.onBeforeShow)
+            menu.onBeforeShow(menu);
+
+        $.each(menu, function(idx, menuItem)
+        {
+            var opt = self.getItemOpt(menuItem);
+
+            if(opt.onBeforeShow)
+                opt.onBeforeShow(menuItem);
+        });
+    }
+
+    function rootNodeOver(event)
+    {
+        clearTimeout(timer);
+
+        var $node = $(this);
+
+        if(!isMenuVisible())
+        {
+            // Use a small delay the 1st time to prevent undesired appearances
+            timer = setTimeout(show.bind(null, $node.data('menu'), $node), DELAY_BEFORESHOW);
+            return;
+        }
+
+        show($node.data('menu'), $node);
+    }
+
+    function rootNodeOut(event)
+    {
+        clearTimeout(timer);
+
+        if(isMenuVisible())
+            timer = setTimeout(hide, DELAY_BEFOREHIDE);
+    }
+
+    function rootNodeClick(event)
+    {
+        clearTimeout(timer);
+
+        self.showAtCursor($(this).data('menu'), event);
+    }
+
+    function menuDivOver(event)
+    {
+        clearTimeout(timer);
+    }
+
+    function menuDivOut(event)
+    {
+        clearTimeout(timer);
+        timer = setTimeout(hide, DELAY_BEFOREHIDE);
+    }
+
+    function menuItemOver(event)
+    {
+        clearTimeout(timer);
+
+        var $a = $(this);
+        var depth = event.data.depth;
+
+        closeLinks(depth);
+
+        var menuItem = $a.data('menuItem');
+
+        var deepestDepth = depth;
+        if(menuItem && hasSubmenu(menuItem))
+        {
+            $a.addClass('open');
+            openLinks[depth] = $a;
+
+            displayMenu(menuItem[MENU_IDX_SUB], depth + 1);
+
+            ++deepestDepth;
+        }
+
+        hideMenus(deepestDepth + 1);
+    }
+
+    function menuItemClick(event)
+    {
+        var $a = $(this);
+        var menuItem = $a.data('menuItem');
+
+        if(!menuItem)
+            return;
+
+        var opt = self.getItemOpt(menuItem);
+
+        if(opt.onClick)
+            opt.onClick();
+    }
 };
 
 Menu.fixUrls(mn_achievements, '?achievements=');
@@ -14207,60 +14343,60 @@ Menu.fixUrls(mn_zones, '?zones=');
 
 $(document).ready(function() // Locale is only known later
 {
-	// if(Locale.getId() == LOCALE_ENUS)
-		// return;
+    // if(Locale.getId() == LOCALE_ENUS)
+        // return;
 
-	Menu.sort(mn_classes);
-	Menu.sort(mn_database);
-	Menu.sortSubmenus(mn_items,
-	[
-		[4, 1], // Armor > Cloth
-		[4, 2], // Armor > Leather
-		[4, 3], // Armor > Mail
-		[4, 4], // Armor > Plate
-		[1],    // Containers
-		[0],    // Consumables
-		[16],   // Glyphs
-		[7],    // Trade Goods
-		[6],    // Projectiles
-		[9]     // Recipes
-	]);
-	Menu.sort(mn_itemSets);
-	Menu.sort(mn_npcs);
-	Menu.sort(mn_objects);
-	Menu.sort(mn_talentCalc);
-	Menu.sort(mn_petCalc);
-	Menu.sort(mn_pets);
-	Menu.sort(mn_races);
-	Menu.sort(mn_skills);
-	Menu.sortSubmenus(mn_spells,
-	[
-		[7],  // Abilities
-		[-2], // Talents
-		[-3], // Pet Abilities
-		[11], // Professions
-		[9]   // Secondary Skills
-	]);
+    Menu.sort(mn_classes);
+    Menu.sort(mn_database);
+    Menu.sortSubmenus(mn_items,
+    [
+        [4, 1], // Armor > Cloth
+        [4, 2], // Armor > Leather
+        [4, 3], // Armor > Mail
+        [4, 4], // Armor > Plate
+        [1],    // Containers
+        [0],    // Consumables
+        [16],   // Glyphs
+        [7],    // Trade Goods
+        [6],    // Projectiles
+        [9]     // Recipes
+    ]);
+    Menu.sort(mn_itemSets);
+    Menu.sort(mn_npcs);
+    Menu.sort(mn_objects);
+    Menu.sort(mn_talentCalc);
+    Menu.sort(mn_petCalc);
+    Menu.sort(mn_pets);
+    Menu.sort(mn_races);
+    Menu.sort(mn_skills);
+    Menu.sortSubmenus(mn_spells,
+    [
+        [7],  // Abilities
+        [-2], // Talents
+        [-3], // Pet Abilities
+        [11], // Professions
+        [9]   // Secondary Skills
+    ]);
 });
 
 var g_dev = false;
 var g_locale = {
-	id: 0,
-	name: "enus"
+    id: 0,
+    name: "enus"
 };
 var g_localTime = new Date();
 var g_user = {
-	id: 0,
-	name: "",
-	roles: 0
+    id: 0,
+    name: "",
+    roles: 0
 };
 
 var g_locales = {
-	0: 'enus',
-	2: 'frfr',
-	3: 'dede',
-	6: 'eses',
-	8: 'ruru'
+    0: 'enus',
+    2: 'frfr',
+    3: 'dede',
+    6: 'eses',
+    8: 'ruru'
 };
 
 /*
@@ -14268,20 +14404,20 @@ Global Profiler-related functions
 */
 
 function g_cleanCharacterName(name) {
-	return (name.match && name.match(/^[A-Z]/) ? name.charAt(0).toLowerCase() + name.substr(1) : name);
+    return (name.match && name.match(/^[A-Z]/) ? name.charAt(0).toLowerCase() + name.substr(1) : name);
 }
 
 function g_getProfileUrl(profile) {
-	if (profile.region) { // Armory character
-		return '?profile=' + profile.region + '.' + profile.realm + '.' + g_cleanCharacterName(profile.name);
-	}
-	else { // Custom profile
-		return '?profile=' + profile.id;
-	}
+    if (profile.region) { // Armory character
+        return '?profile=' + profile.region + '.' + profile.realm + '.' + g_cleanCharacterName(profile.name);
+    }
+    else { // Custom profile
+        return '?profile=' + profile.id;
+    }
 }
 
 function g_getProfileRealmUrl(profile) {
-	return '?profiles=' + profile.region + '.' + profile.realm;
+    return '?profiles=' + profile.region + '.' + profile.realm;
 }
 
 var Icon = {
@@ -14601,42 +14737,42 @@ var Icon = {
 DomContentLoaded.addEvent(Icon.checkPound);
 
 function Rectangle(left, top, width, height) {
-	this.l = left;
-	this.t = top;
-	this.r = left + width;
-	this.b = top + height;
+    this.l = left;
+    this.t = top;
+    this.r = left + width;
+    this.b = top + height;
 }
 
 function g_getViewport()
 {
-	var win = $(window);
+    var win = $(window);
 
-	return new Rectangle(win.scrollLeft(), win.scrollTop(), win.width(), win.height());
+    return new Rectangle(win.scrollLeft(), win.scrollTop(), win.width(), win.height());
 }
 
 Rectangle.prototype = {
 
-	intersectWith: function(rect) {
-		var result = !(
-			this.l >= rect.r || rect.l >= this.r ||
-			this.t >= rect.b || rect.t >= this.b
-		);
+    intersectWith: function(rect) {
+        var result = !(
+            this.l >= rect.r || rect.l >= this.r ||
+            this.t >= rect.b || rect.t >= this.b
+        );
 
-		return result;
-	},
+        return result;
+    },
 
-	contains: function(rect) {
-		var result = (
-			this.l <= rect.l && this.t <= rect.t &&
-			this.r >= rect.r &&	this.b >= rect.b
-		);
+    contains: function(rect) {
+        var result = (
+            this.l <= rect.l && this.t <= rect.t &&
+            this.r >= rect.r &&    this.b >= rect.b
+        );
 
-		return result;
-	},
+        return result;
+    },
 
-	containedIn: function(rect) {
-		return rect.contains(this);
-	}
+    containedIn: function(rect) {
+        return rect.contains(this);
+    }
 
 };
 
@@ -15184,8 +15320,8 @@ var Lightbox = new function() {
 };
 
 var ModelViewer = new function() {
-	this.validSlots = [1,3,4,5,6,7,8,9,10,13,14,15,16,17,19,20,21,22,23,25,26];
-	this.slotMap = {1: 1, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 13: 21, 14: 22, 15: 22, 16: 16, 17: 21, 19: 19, 20: 5, 21: 21, 22: 22, 23: 22, 25: 21, 26: 21};
+    this.validSlots = [1,3,4,5,6,7,8,9,10,13,14,15,16,17,19,20,21,22,23,25,26];
+    this.slotMap = {1: 1, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 13: 21, 14: 22, 15: 22, 16: 16, 17: 21, 19: 19, 20: 5, 21: 21, 22: 22, 23: 22, 25: 21, 26: 21};
     var
         model,
         modelType,
@@ -15307,8 +15443,8 @@ var ModelViewer = new function() {
 
         if (!optBak.noPound) {
             var url = '#modelviewer';
-			var foo = $WH.ge('view3D-button');
-			if (!foo) {
+            var foo = $WH.ge('view3D-button');
+            if (!foo) {
                 switch (optBak.type) {
                     case 1: // npc
                         url += ':1:' + optBak.displayId + ':' + (optBak.humanoid | 0);
@@ -17436,43 +17572,43 @@ var ContactTool = new function() {
 };
 
 function Line(x1, y1, x2, y2, type) {
-	var left   = Math.min(x1, x2),
-		right  = Math.max(x1, x2),
-		top    = Math.min(y1, y2),
-		bottom = Math.max(y1, y2),
+    var left   = Math.min(x1, x2),
+        right  = Math.max(x1, x2),
+        top    = Math.min(y1, y2),
+        bottom = Math.max(y1, y2),
 
-		width  = (right - left),
-		height = (bottom - top),
-		length = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)),
+        width  = (right - left),
+        height = (bottom - top),
+        length = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)),
 
-		radian   = Math.atan2(height, width),
-		sinTheta = Math.sin(radian),
-		cosTheta = Math.cos(radian);
+        radian   = Math.atan2(height, width),
+        sinTheta = Math.sin(radian),
+        cosTheta = Math.cos(radian);
 
-	var $line = $WH.ce('span');
+    var $line = $WH.ce('span');
     $line.className = 'line';
     $line.style.top    = top.toFixed(2) + 'px';
-	$line.style.left   = left.toFixed(2) + 'px';
-	$line.style.width  = width.toFixed(2) + 'px';
-	$line.style.height = height.toFixed(2) + 'px';
+    $line.style.left   = left.toFixed(2) + 'px';
+    $line.style.width  = width.toFixed(2) + 'px';
+    $line.style.height = height.toFixed(2) + 'px';
 
     var v = $WH.ce('var');
-	v.style.width = length.toFixed(2) + 'px';
+    v.style.width = length.toFixed(2) + 'px';
     v.style.OTransform = 'rotate(' + radian + 'rad)';
     v.style.MozTransform = 'rotate(' + radian + 'rad)';
     v.style.webkitTransform = 'rotate(' + radian + 'rad)';
     v.style.filter = "progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=" + cosTheta + ', M12=' + (-1 * sinTheta) + ', M21=' + sinTheta + ', M22=' + cosTheta + ')';
     $WH.ae($line, v);
 
-	if (!(x1 == left && y1 == top) && !(x2 == left && y2 == top)) {
-		$line.className += ' flipped';
-	}
+    if (!(x1 == left && y1 == top) && !(x2 == left && y2 == top)) {
+        $line.className += ' flipped';
+    }
 
-	if (type != null) {
-		$line.className += ' line-' + type;
-	}
+    if (type != null) {
+        $line.className += ' line-' + type;
+    }
 
-	return $line;
+    return $line;
 }
 
 var Links = new function() {

@@ -124,7 +124,8 @@ CREATE TABLE `aowow_item_stats` (
         ADD COLUMN `name_loc6`  varchar(255) NOT NULL AFTER `name_loc3`,
         ADD COLUMN `name_loc8`  varchar(255) NOT NULL AFTER `name_loc6`,
         CHANGE COLUMN `displayid` `displayId`  mediumint(8) UNSIGNED NOT NULL DEFAULT 0 AFTER `name_loc8`,
-        ADD COLUMN `iconString`  varchar(127) NOT NULL AFTER `displayid`,
+        ADD COLUMN `model`varchar(127) NOT NULL AFTER `displayId`,
+        ADD COLUMN `iconString`  varchar(127) NOT NULL AFTER `model`,
         CHANGE COLUMN `Quality` `quality`  tinyint(3) UNSIGNED NOT NULL DEFAULT 0 AFTER `displayId`,
         CHANGE COLUMN `Flags` `flags`  bigint(20) NOT NULL DEFAULT 0 AFTER `quality`,
         CHANGE COLUMN `FlagsExtra` `flagsExtra`  int(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `flags`,
@@ -281,7 +282,8 @@ CREATE TABLE `aowow_item_stats` (
 
     -- icon
     UPDATE aowow_items a, dbc.itemDisplayInfo b SET
-        a.iconString = b.inventoryIcon1
+        a.iconString = b.inventoryIcon1,
+        a.model      = (leftModelName = '', rightModelName, leftModelName)
     WHERE a.displayId = b.id;
 
     -- Robes => Chest and Ranged (right) => Ranged

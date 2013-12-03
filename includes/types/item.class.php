@@ -24,6 +24,7 @@ class ItemList extends BaseType
                       'is'  => [         's' => ', 1 as score', 'j' => '?_item_stats AS `is` ON `is`.`id` = `i`.`id`', 'h' => 'score > 0',                                                                     'o' => 'score DESC'],
                       // 'iet' => [['ire'], 'j' => 'item_enchantment_template AS `iet` ON IF (`ire`.`id` > 0, `iet`.`entry` = `i`.`randomProperty`, `iet`.`entry` = `i`.`randomSuffix`)'],
                       // 'ire' => [['iet'], 'j' => '?_itemrandomenchant AS `ire` ON ABS(ire.id) = iet.ench'],
+                      // 'idi' => ['s' => itemDisplayInfo]
                       'i'   => [         'o' => 'i.quality DESC, i.itemLevel DESC']
                   );
 
@@ -86,6 +87,7 @@ class ItemList extends BaseType
         * ITEMINFO_SUBITEMS (0x02): searched by comparison
         * ITEMINFO_VENDOR   (0x04): costs-obj, when displayed as vendor
         * ITEMINFO_GEM      (0x10): gem infos and score
+        * ITEMINFO_MODEL    (0x20): sameModelAs-Tab
         */
 
         // random item is random
@@ -173,6 +175,10 @@ class ItemList extends BaseType
 
             if ($this->curTpl['flags'] & ITEM_FLAG_HEROIC)
                 $data[$this->id]['heroic'] = true;
+
+            if ($addInfoMask & ITEMINFO_MODEL)
+                if ($_ = $this->getField('displayId'))
+                    $data[$this->id]['displayid'] = $_;
         }
 
         /* even more complicated crap

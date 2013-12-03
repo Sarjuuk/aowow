@@ -1851,8 +1851,8 @@ class Util
             */
 
             if ($entry['mincountOrRef'] < 0)
-            {
-                list($data, $raw) = self::getLootByEntry(LOOT_REFERENCE, $entry['mincountOrRef'], $entry['groupid'], abs($entry['ChanceOrQuestChance'] / 100));
+            {                                                                                     // todo (high): find out, why i used this in the first place. (don't do drugs, kids)
+                list($data, $raw) = self::getLootByEntry(LOOT_REFERENCE, $entry['mincountOrRef'], /*$entry['groupid'],*/ 0, abs($entry['ChanceOrQuestChance'] / 100));
 
                 $loot     = array_merge($loot, $data);
                 $rawItems = array_merge($rawItems, $raw);
@@ -1945,6 +1945,7 @@ class Util
             $base = array(
                 'percent' => round($loot['groupChance'] * $loot['realChanceMod'], 3),
                 'group'   => $loot['group'],
+                'quest'   => $loot['quest'],
                 'count'   => 1                              // satisfies the sort-script
             );
 
@@ -2067,7 +2068,7 @@ class Util
                 if ($ref['isGrouped'] && $ref['sumChance'] == 100 && !$ref['chance'])
                     Util::$pageTemplate->internalError('Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
 
-                $chance = ($ref['chance'] ? $ref['chance'] : (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
+                $chance = abs($ref['chance'] ? $ref['chance'] : (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
 
                 // apply inherited chanceMods
                 if (isset($chanceMods[$ref['item']]))

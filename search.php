@@ -851,7 +851,7 @@ if ($searchMask & 0x40000)
 if ($searchMask & 0x80000)
 {
     $conditions = array(
-        ['name'.(User::$localeId ? '_loc'.User::$localeId : null), $query],
+        [(User::$localeId ? 'lg.name_loc'.User::$localeId : 'name'), $query],
         $maxResults
     );
 
