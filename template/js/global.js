@@ -953,59 +953,116 @@ function g_createAchievementBar(b, d, a) {
     return g_createProgressBar(c)
 }
 
-function g_getMoneyHtml(c) {
-    var b = 0,
-    a = "";
-    if (c >= 10000) {
-        b = 1;
-        a += '<span class="moneygold">' + Math.floor(c / 10000) + "</span>";
-        c %= 10000
+function g_getMoneyHtml(money, side, costItems, costCurrency, achievementPoints) {
+    var
+        ns   = 0,
+        html = '';
+
+    if (side == 1 || side == 'alliance') {
+        side = 1;
     }
-    if (c >= 100) {
-        if (b) {
-            a += " "
-        } else {
-            b = 1
+    else if (side == 2 || side == 'horde') {
+        side = 2;
+    }
+    else {
+        side = 3;
+    }
+
+    if (money >= 10000) {
+        ns = 1;
+
+        var display = Math.floor(money / 10000);
+        html  += '<span class="moneygold">' + $WH.number_format(display) + '</span>';
+        money %= 10000;
+    }
+
+    if (money >= 100) {
+        if (ns) {
+            html += ' ';
         }
-        a += '<span class="moneysilver">' + Math.floor(c / 100) + "</span>";
-        c %= 100
-    }
-    if (c >= 1) {
-        if (b) {
-            a += " "
-        } else {
-            b = 1
+        else {
+            ns = 1;
         }
-        a += '<span class="moneycopper">' + c + "</span>"
+
+        var display = Math.floor(money / 100);
+        html  += '<span class="moneysilver">' + display + '</span>';
+        money %= 100;
     }
-    return a
-}
-function g_getMoneyHtml2(f, c, b, a) {
-    var e = g_getMoneyHtml(f);
-    if (c !== undefined && c !== null && c != 0) {
-        if (e.length > 0) {
-            e += " "
+
+    if (money >= 1) {
+        if (ns) {
+            html += ' ';
         }
-        e += '<span class="money' + (c < 0 ? "horde": "alliance") + ' tip" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + g_numberFormat(Math.abs(c)) + "</span>"
-    }
-    if (b !== undefined && b !== null && b > 0) {
-        if (e.length > 0) {
-            e += " "
+        else {
+            ns = 1;
         }
-        e += '<span class="moneyarena tip" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + g_numberFormat(b) + "</span>"
+
+        html += '<span class="moneycopper">' + money + '</span>';
     }
-    if (a !== undefined && a !== null && a.length > 0) {
-        for (var d = 0; d < a.length; ++d) {
-            if (e.length > 0) {
-                e += " "
+
+    if (costItems != null) {
+        for (var i = 0; i < costItems.length; ++i) {
+            if (ns) {
+                html += ' ';
             }
-            var h = a[d][0];
-            var g = a[d][1];
-            e += '<a href="?item=' + h + '" class="moneyitem" style="background-image: url(images/icons/tiny/' + (g_items[h] && g_items[h]["icon"] ? g_items[h]["icon"] : "inv_misc_questionmark").toLowerCase() + '.gif)">' + g + "</a>"
+            else {
+                ns = 1;
+            }
+
+            var itemId = costItems[i][0];
+            var count  = costItems[i][1];
+            var icon   = (g_items[itemId] && g_items[itemId].icon ? g_items[itemId].icon : 'inv_misc_questionmark');
+
+            html += '<a href="?item=' + itemId + '" class="moneyitem" style="background-image: url(' + g_staticUrl + '/images/icons/tiny/' + icon.toLowerCase() + '.gif)">' + count + '</a>';
         }
     }
-    return e
+
+    if (costCurrency != null) {
+        for (var i = 0; i < costCurrency.length; ++i) {
+            if (ns) {
+                html += ' ';
+            }
+            else {
+                ns = 1;
+            }
+
+            var currencyId = costCurrency[i][0];
+            var count      = costCurrency[i][1];
+            var icon       = (g_gatheredcurrencies[currencyId] && g_gatheredcurrencies[currencyId].icon ? g_gatheredcurrencies[currencyId].icon : ['inv_misc_questionmark', 'inv_misc_questionmark']);
+
+            if (side == 3 && icon[0] == icon[1]) {
+                side = 1;
+            }
+
+            // sarjuuk: custom start
+            if (currencyId == 103) {                        // arena
+                html += '<a href="?currency=' + currencyId + '" class="moneyarena tip" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + $WH.number_format(count) + '</a>';
+            }
+            else if (currencyId == 104) {                   // honor
+                html += '<a href="?currency=' + currencyId + '" class="money' + (side == 1 ? 'alliance' : 'horde') + ' tip" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + $WH.number_format(count) + '</a>';
+            }
+            else {                                          // tokens
+                html += '<a href="?currency=' + currencyId + '" class="icontinyr tip q1" onmouseover="Listview.funcBox.moneyCurrencyOver(' + currencyId + ', ' + count + ', event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()" style="background-image: url(' + g_staticUrl + '/images/icons/tiny/' + icon[0].toLowerCase() + '.gif)">' +  count + '</a>';
+            }
+            // sarjuuk: custom end
+            // html += '<a href="?currency=' + currencyId + '" class="icontinyr tip q1" onmouseover="Listview.funcBox.moneyCurrencyOver(' + currencyId + ', ' + count + ', event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()" style="background-image: url(' + g_staticUrl + '/images/icons/tiny/' + icon[(side == 3 ? 1 : side - 1)].toLowerCase() + '.gif)">' + (side == 3 ? '<span class="icontinyr" style="background-image: url(' + g_staticUrl + '/images/icons/tiny/' + icon[0].toLowerCase() + '.gif)">' : '') + count + (side == 3 ? '</span>' : '') + '</a>';
+        }
+    }
+
+    if (achievementPoints > 0) {
+        if (ns) {
+            html += ' ';
+        }
+        else {
+            ns = 1;
+        }
+
+        html += '<span class="moneyachievement tip" onmouseover="Listview.funcBox.moneyAchievementOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + $WH.number_format(achievementPoints) + '</span>';
+    }
+
+    return html;
 }
+
 function g_numberFormat(f, b, l, h) {
     var c = f,
     a = b;
@@ -5085,8 +5142,7 @@ Listview.extraCols = {
         name: LANG.cost,
         getValue: function(row) {
             if (row.cost) {
-                return (row.cost[3] && row.cost[3][0] ? row.cost[3][0][1] : 0) || (row.cost[2] || row.cost[1] || row.cost[0])
-    // 5.0      return (row.cost[2] && row.cost[2][0] ? row.cost[2][0][1] : 0) || (row.cost[1] && row.cost[1][0] ? row.cost[1][0][1] : 0) || row.cost[0];
+                return (row.cost[2] && row.cost[2][0] ? row.cost[2][0][1] : 0) || (row.cost[1] && row.cost[1][0] ? row.cost[1][0][1] : 0) || row.cost[0];
             }
         },
         compute: function(row, td) {
@@ -5109,9 +5165,7 @@ Listview.extraCols = {
                     }
                 }
 
-                Listview.funcBox.appendMoney(td, money, side, currency, items, row.cost[3]/*achievementPoints*/)
-    // 5.0      Listview.funcBox.appendMoney(td, money, side, items, currency, achievementPoints);
-
+                Listview.funcBox.appendMoney(td, money, side, items, currency, achievementPoints);
             }
         },
         sortFunc: function(a, b, col) {
@@ -5429,7 +5483,7 @@ Listview.extraCols = {
                 var a = $WH.ce('a');
                 a.href = '?achievement=' + item.achievement;
                 a.className = 'icontiny tinyspecial';
-                a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + g_achievements[item.achievement].icon.toLowerCase() + '.gif)';
+                a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + g_achievements[item.achievement].icon.toLowerCase() + '.gif)';
                 a.style.whiteSpace = 'nowrap';
 
                 $WH.st(a, g_achievements[item.achievement]['name_' + g_locale.name]);
@@ -5509,7 +5563,7 @@ Listview.extraCols = {
             LANG.earned
             LANG.progress
 
-            probably also events, zones, skill, faction, ..
+            probably also zones, skill, faction, ..
         */
 
         id: 'condition',
@@ -5572,6 +5626,8 @@ Listview.extraCols = {
                     return Listview.extraCols.condition.getAchievementState(cond);
                 case 'quest':
                     return Listview.extraCols.condition.getQuestState(cond);
+                case 'event':
+                    return Listview.extraCols.condition.getEventState(cond);
                 default:
                     return {};
             }
@@ -5642,6 +5698,23 @@ Listview.extraCols = {
             cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
             cnd.name  = item['name_' + g_locale.name];
             cnd.url   = '?quest=' + cond.typeId;
+
+            return cnd;
+        },
+        getEventState: function(cond) {
+            if (!cond.typeId || !g_holidays[cond.typeId]) {
+                return;
+            }
+
+            var
+                cnd  = {},
+                item = g_holidays[cond.typeId];
+
+            cnd.icon  = item.icon.toLowerCase();
+            cnd.state = cond.status ? $WH.ct('active') : $WH.ct('inactive');
+            cnd.color = cond.status ? 'q2' : 'q10';
+            cnd.name  = item['name_' + g_locale.name];
+            cnd.url   = '?event=' + cond.typeId;
 
             return cnd;
         },
@@ -7582,104 +7655,180 @@ Listview.funcBox = {
     },
 
     moneyCurrencyOver: function(currencyId, count, e) {
-        var buff = g_gatheredcurrencies[currencyId]['name_' + Locale.getName()];
+        var buff = g_gatheredcurrencies[currencyId]['name_' + g_locale.name /*g_loc.getName()*/];
 
         // justice / valor points handling removed
 
         $WH.Tooltip.showAtCursor(e, buff, 0, 0, 'q1');
     },
 
-    appendMoney: function(g, a, f, m, j, c, l) {        // todo: understand and adapt
-        var k, h = 0;
-        if (a >= 10000) {
-            h = 1;
-            k = $WH.ce("span");
-            k.className = "moneygold";
-            $WH.ae(k, $WH.ct(Math.floor(a / 10000)));
-            $WH.ae(g, k);
-            a %= 10000
+    appendMoney: function(d, money, side, costItems, costCurrency, achievementPoints) {
+        var
+            _,
+            __,
+            ns = 0;
+
+        if (side == 1 || side == 'alliance') {
+            side = 1;
         }
-        if (a >= 100) {
-            if (h) {
-                $WH.ae(g, $WH.ct(" "))
-            } else {
-                h = 1
+        else if (side == 2 || side == 'horde') {
+            side = 2;
+        }
+        else {
+            side = 3;
+        }
+
+        if (money >= 10000) {
+            ns = 1;
+
+            _ = $WH.ce('span');
+            _.className = 'moneygold';
+            $WH.ae(_, $WH.ct($WH.number_format(Math.floor(money / 10000))));
+            $WH.ae(d, _);
+            money %= 10000;
+        }
+
+        if (money >= 100) {
+            if (ns) {
+                $WH.ae(d, $WH.ct(' '));
             }
-            k = $WH.ce("span");
-            k.className = "moneysilver";
-            $WH.ae(k, $WH.ct(Math.floor(a / 100)));
-            $WH.ae(g, k);
-            a %= 100
-        }
-        if (a >= 1 || f != null) {
-            if (h) {
-                $WH.ae(g, $WH.ct(" "))
-            } else {
-                h = 1
+            else {
+                ns = 1;
             }
-            k = $WH.ce("span");
-            k.className = "moneycopper";
-            $WH.ae(k, $WH.ct(a));
-            $WH.ae(g, k)
+
+            _ = $WH.ce('span');
+            _.className = 'moneysilver';
+            $WH.ae(_, $WH.ct(Math.floor(money / 100)));
+            $WH.ae(d, _);
+            money %= 100;
         }
-        if (m != null && m != 0) {
-            if (h) {
-                $WH.ae(g, $WH.ct(" "))
-            } else {
-                h = 1
+
+        if (money >= 1) {
+            if (ns) {
+                $WH.ae(d, $WH.ct(' '));
             }
-            k = $WH.ce("span");
-            k.className = "money" + (m < 0 ? "horde": "alliance") + " tip";
-            k.onmouseover = Listview.funcBox.moneyHonorOver;
-            k.onmousemove = $WH.Tooltip.cursorUpdate;
-            k.onmouseout = $WH.Tooltip.hide;
-            $WH.ae(k, $WH.ct($WH.number_format(Math.abs(m))));
-            $WH.ae(g, k)
-        }
-        if (j >= 1) {
-            if (h) {
-                $WH.ae(g, $WH.ct(" "))
-            } else {
-                h = 1
+            else {
+                ns = 1;
             }
-            k = $WH.ce("span");
-            k.className = "moneyarena tip";
-            k.onmouseover = Listview.funcBox.moneyArenaOver;
-            k.onmousemove = $WH.Tooltip.cursorUpdate;
-            k.onmouseout = $WH.Tooltip.hide;
-            $WH.ae(k, $WH.ct($WH.number_format(j)));
-            $WH.ae(g, k)
+
+            _ = $WH.ce('span');
+            _.className = 'moneycopper';
+            $WH.ae(_, $WH.ct(money));
+            $WH.ae(d, _);
         }
-        if (c != null) {
-            for (var b = 0; b < c.length; ++b) {
-                if (h) {
-                    $WH.ae(g, $WH.ct(" "))
-                } else {
-                    h = 1
+
+        if (costItems != null) {
+            for (var i = 0; i < costItems.length; ++i) {
+                if (ns) {
+                    $WH.ae(d, $WH.ct(' '));
                 }
-                var o = c[b][0];
-                var e = c[b][1];
-                k = $WH.ce("a");
-                k.href = "?item=" + o;
-                k.className = "moneyitem";
-                k.style.backgroundImage = "url(images/icons/tiny/" + g_items.getIcon(o).toLowerCase() + ".gif)";
-                $WH.ae(k, $WH.ct(e));
-                $WH.ae(g, k)
+                else {
+                    ns = 1;
+                }
+
+                var itemId = costItems[i][0];
+                var count = costItems[i][1];
+                var icon = g_items.getIcon(itemId);
+
+                _ = $WH.ce('a');
+                _.href = '?item=' + itemId;
+                _.className = 'moneyitem';
+                _.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + icon.toLowerCase() + '.gif)';
+                $WH.ae(_, $WH.ct(count));
+                $WH.ae(d, _);
             }
         }
-        if (l != null) {
-            if (h) {
-                $WH.ae(g, $WH.ct(" "))
-            } else {
-                h = 1
+
+        if (costCurrency != null) {
+            for (var i = 0; i < costCurrency.length; ++i) {
+                if (ns) {
+                    $WH.ae(d, $WH.ct(' '));
+                }
+                else {
+                    ns = 1;
+                }
+
+                var currencyId = costCurrency[i][0];
+                var count = costCurrency[i][1];
+                var icon = ['inv_misc_questionmark', 'inv_misc_questionmark'];
+                if (g_gatheredcurrencies[currencyId]) {
+                    icon = g_gatheredcurrencies[currencyId].icon;
+                }
+
+//  sarjuuk: replacement
+                _ = $WH.ce('a');
+                _.href = '?currency=' + currencyId;
+                _.onmousemove = $WH.Tooltip.cursorUpdate;
+                _.onmouseout = $WH.Tooltip.hide;
+                if (currencyId == 103) {                    // arena
+                    _.className = 'moneyarena tip';
+                    _.onmouseover = Listview.funcBox.moneyArenaOver;
+                    $WH.ae(_, $WH.ct($WH.number_format(count)));
+                }
+                else if (currencyId == 104) {               // honor
+                    if (side == 3 && icon[0] == icon[1]) {
+                        side = 1;
+                    }
+                    _.className = 'money' + (side == 1 ? 'alliance' : 'horde') + ' tip';
+                    _.onmouseover = Listview.funcBox.moneyHonorOver;
+
+                    if (side == 3) {
+                        __ = $WH.ce('span');
+                        __.className = 'moneyalliance';
+                        $WH.ae(__, $WH.ct($WH.number_format(count)));
+                        $WH.ae(_, __);
+                    }
+                    else {
+                        $WH.ae(_, $WH.ct($WH.number_format(count)));
+                    }
+                }
+                else {                                      // tokens
+                    _.className = 'icontinyr tip q1';
+                    _.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + icon[0].toLowerCase() + '.gif)';
+                    _.onmouseover = Listview.funcBox.moneyCurrencyOver.bind(_, currencyId, count);
+                    $WH.ae(_, $WH.ct($WH.number_format(count)));
+                }
+/*  sarjuuk: original
+                if (side == 3 && icon[0] == icon[1]) {
+                    side = 1;
+                }
+
+                _ = $WH.ce('a');
+                _.href = '?currency=' + currencyId;
+                _.className = 'icontinyr tip q1';
+                _.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + icon[(side == 3 ? 1 : side - 1)].toLowerCase() + '.gif)';
+                _.onmouseover = Listview.funcBox.moneyCurrencyOver.bind(_, currencyId, count);
+                _.onmousemove = $WH.Tooltip.cursorUpdate;
+                _.onmouseout = $WH.Tooltip.hide;
+                $WH.ae(d, _);
+
+                if (side == 3) {
+                    __ = $WH.ce('span');
+                    __.className = 'icontinyr';
+                    __.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + icon[0].toLowerCase() + '.gif)';
+                    $WH.ae(_, __);
+                    _ = __;
+                }
+*/
+                $WH.ae(d, _);
             }
-            k = $WH.ce("span");
-            k.className = "moneyachievement tip";
-            k.onmouseover = Listview.funcBox.moneyAchievementOver;
-            k.onmousemove = $WH.Tooltip.cursorUpdate;
-            k.onmouseout = $WH.Tooltip.hide;
-            $WH.ae(k, $WH.ct($WH.number_format(l)));
-            $WH.ae(g, k)
+        }
+
+        if (achievementPoints > 0) {
+            if (ns) {
+                $WH.ae(d, $WH.ct(' '));
+            }
+            else {
+                ns = 1;
+            }
+
+            _ = $WH.ce('span');
+            _.className = 'moneyachievement tip';
+            _.onmouseover = Listview.funcBox.moneyAchievementOver;
+            _.onmousemove = $WH.Tooltip.cursorUpdate;
+            _.onmouseout = $WH.Tooltip.hide;
+            $WH.ae(_, $WH.ct($WH.number_format(achievementPoints)));
+            $WH.ae(d, _);
         }
     },
 
@@ -9283,7 +9432,7 @@ Listview.templates = {
                         }
 
                         if (quest.currencyrewards != null) {
-                            Listview.funcBox.appendMoney(td, null, null, quest.side, null, quest.currencyrewards);    // todo: update appendMoney ..!important!
+                            Listview.funcBox.appendMoney(td, null, quest.side, null, quest.currencyrewards);
                         }
                     }
                 },
@@ -12113,7 +12262,7 @@ Listview.templates = {
                 value: 'points',
                 compute: function(achievement, td) {
                     if (achievement.points) {
-                        Listview.funcBox.appendMoney(td, 0, null, 0, 0, 0, achievement.points);
+                        Listview.funcBox.appendMoney(td, 0, null, 0, 0, achievement.points);
                     }
                 }
             },
@@ -12761,7 +12910,7 @@ Listview.templates = {
                 tooltip: LANG.tooltip_achievementpoints,
                 compute: function(profile, td) {
                     if (profile.achievementpoints) {
-                        Listview.funcBox.appendMoney(td, 0, null, 0, 0, 0, profile.achievementpoints);
+                        Listview.funcBox.appendMoney(td, 0, null, 0, 0, profile.achievementpoints);
                     }
                 },
                 hidden: 1

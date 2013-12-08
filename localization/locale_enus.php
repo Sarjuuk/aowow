@@ -530,6 +530,7 @@ $lang = array(
         '_rndEnchants'  => "Random Enchantments",
         '_chance'       => "(%s%% chance)",
         '_reqLevel'     => "Required level",
+        'reqRating'     => "Requires personal and team arena rating of %d<br />in 3v3 or 5v5 brackets",
         'slot'          => "Slot",
         '_quality'      => "Quality",
         'usableBy'      => "Usable by",

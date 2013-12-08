@@ -151,14 +151,16 @@ class CreatureList extends BaseType
                     'minlevel' => $this->curTpl['minlevel'],
                     'maxlevel' => $this->curTpl['maxlevel'],
                     'id'       => $this->id,
-                    'boss'     => $this->curTpl['type_flags'] & 0x4,
-                    'rank'     => $this->curTpl['rank'],
-                    'location' => json_encode($this->getSpawns(SPAWNINFO_ZONES), JSON_NUMERIC_CHECK),
+                    'boss'     => $this->curTpl['type_flags'] & 0x4 ? 1 : 0,
+                    'rank'     => $this->curTpl['rank'],    // classification(?)
+                    'location' => $this->getSpawns(SPAWNINFO_ZONES),
                     'name'     => $this->getField('name', true),
-                    'tag'      => $this->getField('subname', true),
                     'type'     => $this->curTpl['type'],
                     'react'    => '['.$this->curTpl['A'].', '.$this->curTpl['H'].']'
                 );
+
+                if ($_ = $this->getField('subname', true))
+                    $data[$this->id]['tag'] = $_;
 
                 if ($addInfoMask & NPCINFO_TAMEABLE)        // only first skin of first model ... we're omitting potentially 11 skins here .. but the lv accepts only one .. w/e
                     $data[$this->id]['skin'] = $this->curTpl['textureString'];

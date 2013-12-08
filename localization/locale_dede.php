@@ -543,6 +543,7 @@ $lang = array(
         '_rndEnchants'  => "Zufällige Verzauberungen",
         '_chance'       => "(Chance von %s%%)",
         '_reqLevel'     => "Mindeststufe",
+        'reqRating'     => "Benötigt eine persönliche Arenawertung und Teamwertung von %d.",
         'slot'          => "Platz",
         '_quality'      => "Qualität",
         'usableBy'      => "Benutzbar von",

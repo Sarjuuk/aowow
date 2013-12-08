@@ -14,51 +14,11 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    name:'{$curr.name|escape:"quotes"}',
-                    {if $curr.tag}
-                        tag:'{$curr.tag|escape:"quotes"}',
-                    {/if}
-                    minlevel:{$curr.minlevel},
-                    maxlevel:{$curr.maxlevel},
-                    type:{$curr.type},
-                    classification:{$curr.rank},
-                    {if $curr.boss}
-                        boss: 1,
-                    {/if}
-                    react:{$curr.react},
-                    location:{$curr.location},
-                    {if isset($curr.skin)}
-                        skin: '{$curr.skin}',
-                    {/if}
-                    {if isset($curr.percent)}
-                        percent:{$curr.percent},
-                    {/if}
-                    {if isset($curr.count)}
-                        count:{$curr.count},
-                    {/if}
-                    {if isset($curr.cost)}
-                        stock:{$curr.stock},
-                        {if isset($curr.stack)}
-                            stack:{$curr.stack},
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
                         {/if}
-                        cost:[
-                            {if isset($curr.cost.money)}{$curr.cost.money}{/if}
-                            {if isset($curr.cost.honor) or isset($curr.cost.arena) or isset($curr.cost.items)}
-                                ,{if isset($curr.cost.honor)}{$curr.cost.honor}{/if}
-                                {if isset($curr.cost.arena) or isset($curr.cost.items)}
-                                    ,{if isset($curr.cost.arena)}{$curr.cost.arena}{/if}
-                                    {if isset($curr.cost.items)}
-                                        ,[
-                                        {foreach from=$curr.cost.items item=curitem name=c}
-                                            [{$curitem.item},{$curitem.count}]
-                                            {if $smarty.foreach.c.last}{else},{/if}
-                                        {/foreach}
-                                        ]
-                                    {/if}
-                                {/if}
-                            {/if}
-                        ],
-                    {/if}
+                    {/foreach}
                     id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}

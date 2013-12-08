@@ -501,6 +501,7 @@ $lang = array(
         '_rndEnchants'  => "Encantamientos aleatorios",
         '_chance'       => "(probabilidad %s%%)",
         '_reqLevel'     => "Nivel requerido",
+        'reqRating'     => "Requiere un índice de arena personal y de equipo de %d",
         'slot'          => "Casilla",
         '_quality'      => "Calidad",
         'usableBy'      => "Usable por",

@@ -375,9 +375,11 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 
             if ($cats[0] !== null)                          // !any Spell (php loose comparison: (null == 0) is true)
             {
-                $conditions[] = 'OR';
-                $conditions[] = ['s.typeCat', 0];
-                $conditions[] = ['s.cuFlags', SPELL_CU_EXCLUDE_CATEGORY_SEARCH, '&'];
+                $conditions[] = array(
+                    'OR',
+                    ['s.typeCat', 0],
+                    ['s.cuFlags', SPELL_CU_EXCLUDE_CATEGORY_SEARCH, '&']
+                );
 
                 break;
             }

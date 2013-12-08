@@ -1416,17 +1416,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     // tab: teaches
-    $_ = [];
-    foreach ($spell->canTeachSpell() as $idx)
-        $_[] = $spell->getField('effect'.$idx.'TriggerSpell');
-
-    $ids = array_merge(
-        DB::Aowow()->selectCol('SELECT spellId FROM spell_learn_spell WHERE entry = ?d', $_id),
-        DB::Aowow()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell = ?d', $_id),   // note: omits required spell and chance
-        $_
-    );
-
-    if ($ids)
+    if ($ids = Util::getTaughtSpells($spell))
     {
         $teaches = new SpellList(array(['id', $ids]));
         if (!$teaches->error)

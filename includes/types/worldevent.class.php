@@ -8,8 +8,8 @@ class WorldEventList extends BaseType
 {
     public static $type      = TYPE_WORLDEVENT;
 
-    protected     $queryBase = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e LEFT JOIN ?_holidays h ON e.holidayId = h.id';
-    protected     $queryOpts = ['e' => ['o' => '-e.id ASC']];
+    protected     $queryBase = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e';
+    protected     $queryOpts = ['e' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']];
 
     public function __construct($conditions = [])
     {
@@ -35,6 +35,8 @@ class WorldEventList extends BaseType
             // preparse requisites
             if ($this->curTpl['requires'])
                 $this->curTpl['requires'] = explode(' ', $this->curTpl['requires']);
+
+            $this->curTpl['eventBak'] = -$this->curTpl['id'];
 
             // change Ids if holiday is set
             if ($this->curTpl['holidayId'] > 0)

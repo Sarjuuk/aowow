@@ -77,9 +77,12 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 
     $_flags     = $item->getField('flags');
     $_slot      = $item->getField('slot');
-    $_subClass  = $item->getField('subClass');
     $_class     = $item->getField('class');
+    $_subClass  = $item->getField('subClass');
     $_bagFamily = $item->getField('bagFamily');
+    $_extCost   = [];
+    if ($_ = @$item->getExtendedCost($_reqRating)[$item->id])
+        $_extCost = $_;
 
     /***********/
     /* Infobox */
@@ -127,17 +130,37 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         if ($tName = DB::Aowow()->selectRow('SELECT * FROM ?_totemCategory WHERE id = ?d', $tId))
             $quickInfo[] = Lang::$item['tool'].Lang::$colon.'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
 
-    $each = $item->getField('stackable') > 1 ? '[color=q0] ('.Lang::$item['each'].')[/color]' : null;
-    $cost = '';
-    if ($_ = $item->getField('buyPrice'))
-        $cost .= '[money='.$_.']';
-
-    if ($_ = $item->getExtendedCost())
+    $each   = $item->getField('stackable') > 1 ? '[color=q0] ('.Lang::$item['each'].')[/color]' : null;
+    $tokens = $currency = [];
+    if ($_ = reset($_extCost))
+    {
         foreach ($_ as $c => $qty)
-            $cost .= '[currency='.$c.' amount='.$qty.']';
+        {
+            if (is_string($c))
+                continue;
 
-    if ($cost)
-        $quickInfo[] = Lang::$item['cost'].Lang::$colon.$cost.$each;
+            if ($c < 0)                                     // currency items (and honor or arena)
+                $currency[] = -$c.','.$qty;
+            else if ($c > 0)                                // plain items (item1,count1,item2,count2,...)
+                $tokens[$c] = $c.','.$qty;
+        }
+
+        $cost = isset($_[0]) ? '[money='.$_[0] : '[money';
+
+        if ($tokens)
+            $cost .= ' items='.implode(',', $tokens);
+
+        if ($currency)
+            $cost .= ' currency='.implode(',', $currency);
+
+        $cost .= ']';
+
+        if ($cost)
+            $quickInfo[] = Lang::$item['cost'].Lang::$colon.$cost.$each;
+
+        if ($_reqRating)
+            $quickInfo[] = sprintf(Lang::$item['reqRating'], $_reqRating);
+    }
 
     if ($_ = $item->getField('repairPrice'))
         $quickInfo[] = Lang::$item['repairCost'].Lang::$colon.'[money='.$_.']';
@@ -274,7 +297,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         {
             for ($i = 1; $i < count($pageData['page']['subItems']); $i++)
             {
-                $prev = &$pageData['page']['subItems'][$i-1];
+                $prev = &$pageData['page']['subItems'][$i - 1];
                 $cur  = &$pageData['page']['subItems'][$i];
                 if ($prev['jsonequip'] == $cur['jsonequip'] && $prev['name'] == $cur['name'])
                 {
@@ -290,21 +313,20 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     $pendant = DB::Aowow()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_items WHERE alliance_id = ?d OR horde_id = ?d', $_id, $_id, $_id);
     if ($pendant)
     {
-        $altItem = new ItemList(array(['id', abs($pendant)]));      // todo (med): include this item in tab: "see also"
+        $altItem = new ItemList(array(['id', abs($pendant)]));
         if (!$altItem->error)
         {
             $pageData['page']['transfer'] = array(
-                'id'        => $altItem->id,
-                'quality'   => $altItem->getField('quality'),
-                'icon'      => $altItem->getField('iconString'),
-                'name'      => $altItem->getField('name', true),
-                'facInt'    => $pendant > 0 ? 'alliance' : 'horde',
-                'facName'   => $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                'id'      => $altItem->id,
+                'quality' => $altItem->getField('quality'),
+                'icon'    => $altItem->getField('iconString'),
+                'name'    => $altItem->getField('name', true),
+                'facInt'  => $pendant > 0 ? 'alliance' : 'horde',
+                'facName' => $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
             );
         }
     }
 
-/*
     /**************/
     /* Extra Tabs */
     /**************/
@@ -728,7 +750,24 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     }
 
     // tab: see also
-    $saItems = new ItemList(array(['id', $_id, '!'], ['name_loc'.User::$localeId, $item->getField('name', true)]));
+    $conditions = array(
+        ['id', $_id, '!'],
+        [
+            'OR',
+            ['name_loc'.User::$localeId, $item->getField('name', true)],
+            [
+                'AND',
+                ['class',         $_class],
+                ['subClass',      $_subClass],
+                ['itemLevel',     $item->getField('itemLevel') - 15, '>'],
+                ['itemLevel',     $item->getField('itemLevel') + 15, '<'],
+                ['quality',       $item->getField('quality')],
+                ['requiredClass', $item->getField('requiredClass')]
+            ]
+        ]
+    );
+
+    $saItems = new ItemList($conditions);
     if (!$saItems->error)
     {
         $saItems->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
@@ -744,7 +783,25 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         );
     }
 
-    // tab: starts (quest) [omited, because the questlink IS ALREADY in the item tooltip]
+    // tab: starts (quest)
+    if ($qId = $item->getField('startQuest'))
+    {
+        $starts = new QuestList(array(['qt.id', $qId]));
+        if (!$starts->error)
+        {
+            $starts->addGlobalsToJscript($stmarty);
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'item',
+                'data'   => $starts->getListviewData(),
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'name' => '$LANG.tab_starts',
+                    'id'   => 'starts-quest'
+                ]
+            );
+        }
+    }
 
     // tab: objective of (quest)
     $conditions = array(
@@ -791,7 +848,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     }
 
     // tab: same model as
-    if ($model = $item->getField('model'))
+    if (($model = $item->getField('model')) && $_slot)
     {
         $sameModel = new ItemList(array(['model', $model], ['id', $_id, '!']));
         if (!$sameModel->error)
@@ -811,11 +868,164 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         }
     }
 
-    // sold by [consult itemExtendedCost]
+    // tab: sold by
+    if ($vendors = $_extCost)
+    {
+        $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
+        if (!$soldBy->error)
+        {
+            $soldBy->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $sbData = $soldBy->getListviewData();
 
-    // currency for
+            $extraCols = ['Listview.extraCols.stock', "Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
 
-    // teaches
+            $holidays = [];
+            foreach ($sbData as $k => &$row)
+            {
+                $currency = [];
+                $tokens   = [];
+                foreach ($vendors[$k] as $id => $qty)
+                {
+                    if (is_string($id))
+                        continue;
+
+                    if ($id > 0)
+                        $tokens[] = [$id, $qty];
+                    else if ($id < 0)
+                        $currency[] = [-$id, $qty];
+                }
+
+                if ($_ = $vendors[$k]['event'])
+                {
+                    if (count($extraCols) == 3)             // not already pushed
+                        $extraCols[] = 'Listview.extraCols.condition';
+
+                    $holidays[$_] = 0;                      // applied as back ref.
+
+                    $row['condition'] = array(
+                        'type'   => TYPE_WORLDEVENT,
+                        'typeId' => &$holidays[$_],
+                        'status' => 1
+                    );
+                }
+
+                $row['stock'] = $vendors[$k]['stock'];
+                $row['stack'] = $item->getField('buyCount');
+                $row['cost']  = array(
+                    $item->getField('buyPrice'),
+                    $currency ? $currency : null,
+                    $tokens   ? $tokens   : null
+                );
+            }
+
+            if ($holidays)
+            {
+                $hObj = new WorldEventList(array(['id', array_keys($holidays)]));
+                $hObj->addGlobalsToJscript($smarty);
+                foreach ($hObj->iterate() as $id => $tpl)
+                {
+                    if ($_ = $tpl['holidayId'])
+                        $holidays[$tpl['eventBak']] = $_;
+                    else
+                        $holidays[-$id] = $id;
+                }
+            }
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'creature',
+                'data'   => $sbData,
+                'params' => [
+                    'tabs'       => '$tabsRelated',
+                    'name'       => '$LANG.tab_soldby',
+                    'id'         => 'sold-by-npc',
+                    'extraCols'  => '$['.implode(', ', $extraCols).']',
+                    'hiddenCols' => "$['level', 'type']"
+                ]
+            );
+        }
+    }
+
+    // tab: currency for
+    // some minor trickery: get arenaPoints(43307) and honorPoints(43308) directly
+    if ($_id == 43307)
+        $w = 'iec.reqArenaPoints > 0';
+    else if ($_id == 43308)
+        $w = 'iec.reqHonorPoints > 0';
+    else
+        $w = 'iec.reqItemId1 = '.$_id.' OR iec.reqItemId2 = '.$_id.' OR iec.reqItemId3 = '.$_id.' OR iec.reqItemId4 = '.$_id.' OR iec.reqItemId5 = '.$_id;
+
+    $baughtBy = DB::Aowow()->selectCol('
+        SELECT item FROM npc_vendor nv JOIN ?_itemExtendedCost iec ON iec.id = nv.extendedCost WHERE '.$w.'
+        UNION
+        SELECT item FROM game_event_npc_vendor genv JOIN ?_itemExtendedCost iec ON iec.id = genv.extendedCost WHERE '.$w
+    );
+    if ($baughtBy)
+    {
+        $baughtBy = new ItemList(array(['id', $baughtBy]));
+        if (!$baughtBy->error)
+        {
+            $baughtBy->addGlobalsToJscript($smarty);
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'item',
+                'data'   => $baughtBy->getListviewData(ITEMINFO_VENDOR),
+                'params' => [
+                    'tabs'      => '$tabsRelated',
+                    'name'      => '$LANG.tab_currencyfor',
+                    'id'        => 'currency-for',
+                    'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]"
+                ]
+            );
+        }
+    }
+
+    // tab: teaches
+    $ids = $indirect = [];
+    for ($i = 1; $i < 6; $i++)
+    {
+        if ($item->getField('spellTrigger'.$i) == 6)
+            $ids[] = $item->getField('spellId'.$i);
+        else if ($item->getField('spellTrigger'.$i) == 0 && $item->getField('spellId'.$i) > 0)
+            $indirect[] = $item->getField('spellId'.$i);
+    }
+
+    // taught indirectly
+    if ($indirect)
+    {
+        $indirectSpells = new SpellList(array(['id', $indirect]));
+        foreach ($indirectSpells->iterate() as $__)
+            if ($_ = $indirectSpells->canTeachSpell())
+                foreach ($_ as $idx)
+                    $ids[] = $indirectSpells->getField('effect'.$idx.'TriggerSpell');
+
+        $ids = array_merge($ids, Util::getTaughtSpells($indirect));
+    }
+
+    if ($ids)
+    {
+        $taughtSpells = new SpellList(array(['id', $ids]));
+        if (!$taughtSpells->error)
+        {
+            $taughtSpells->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+
+            $visCols = ['level', 'schools'];
+            if ($taughtSpells->hasSetFields(['reagent1']))
+                $visCols[] = 'reagents';
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'spell',
+                'data'   => $taughtSpells->getListviewData(),
+                'params' => [
+                    'tabs'       => '$tabsRelated',
+                    'name'       => '$LANG.tab_teaches',
+                    'id'         => 'teaches',
+                    'visibleCols'  => '$'.json_encode($visCols),
+                ]
+            );
+        }
+    }
+
+    // taught by (req. workaround over the spell taught)
 
     // Shared cooldown
 

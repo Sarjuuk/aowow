@@ -1767,7 +1767,7 @@ class Util
         return false;                                       // always false for passed arrays
     }
 
-    public function arraySumByKey(&$ref)
+    public static function arraySumByKey(&$ref)
     {
         $nArgs = func_num_args();
         if (!is_array($ref) || $nArgs < 2)
@@ -1787,6 +1787,45 @@ class Util
                 $ref[$k] += $v;
             }
         }
+    }
+
+    public static function getTaughtSpells(&$spell)
+    {
+        $extraIds = [-1];                                    // init with -1 to prevent empty-array errors
+        $lookup   = [-1];
+        switch (gettype($spell))
+        {
+            case 'object':
+                if (get_class($spell) != 'SpellList')
+                    return [];
+
+                $lookup[] = $spell->id;
+                foreach ($spell->canTeachSpell() as $idx)
+                    $extraIds[] = $spell->getField('effect'.$idx.'TriggerSpell');
+
+                break;
+            case 'integer':
+                $lookup[] = $spell;
+                break;
+            case 'array':
+                $lookup = $spell;
+                break;
+            default:
+                return [];
+        }
+
+        $data = array_merge(
+            DB::Aowow()->selectCol('SELECT spellId FROM spell_learn_spell WHERE entry IN (?a)', $lookup),
+            DB::Aowow()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell IN (?a)', $lookup),   // note: omits required spell and chance
+            $extraIds
+        );
+
+        // return list of integers, not strings
+        array_walk($data, function (&$v, $k) {
+            $v = intVal($v);
+        });
+
+        return $data;
     }
 
     /*  from TC wiki
@@ -2085,12 +2124,12 @@ class Util
                 {
                     $data = array(
                         'percent' => $chance,
-                        'stack'   => [$ref['multiplier'], $ref['multiplier']],
+                        'stack'   => [$ref['min'], $ref['max']],
                         'count'   => 1                          // ..and one for the sort script
                     );
 
                     $stack = [];                                // equal distribution between min/max .. not blizzlike, but hey, TC-issue
-                    if ($ref['max'] > $ref['min'])
+                    if ($ref['max'] > 1)
                         for ($i = $ref['min']; $i <= $ref['max']; $i++)
                             $stack[$i] = round(100 / (1 + $ref['max'] - $ref['min']), 3);
 

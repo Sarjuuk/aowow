@@ -31,9 +31,16 @@ class CurrencyList extends BaseType
     {
         foreach ($this->iterate() as $__)
         {
+            if ($this->id == 104)                           // in case of honor commit sebbuku
+                $icon = ['alliance-icon', 'horde-icon'];
+            else if ($this->id == 103)                      // also arena-icon diffs from item-icon
+                $icon = ['money_arena', 'money_arena'];
+            else
+                $icon = [$this->curTpl['iconString'], $this->curTpl['iconString']];
+
             $template->extendGlobalData(self::$type, [$this->id => array(
                 'name' => $this->getField('name', true),
-                'icon' => $this->curTpl['iconString']
+                'icon' => $icon
             )]);
         }
     }

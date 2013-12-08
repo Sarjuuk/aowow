@@ -501,6 +501,7 @@ $lang = array(
         '_rndEnchants'  => "Enchantements aléatoires",
         '_chance'       => "(%s%% de chance)",
         '_reqLevel'     => "Niveau requis",
+        'reqRating'     => "Nécessite une cote d'arène personnelle et en équipe de %d<br />en arène de 3c3 ou 5c5.",
         'slot'          => "Emplacement",
         '_quality'      => "Qualité",
         'usableBy'      => "Utilisable par",

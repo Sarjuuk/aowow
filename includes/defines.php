@@ -105,7 +105,7 @@ define('GLOBALINFO_ANY',                    0xF);
 define('ITEMINFO_JSON',                     0x01);
 define('ITEMINFO_SUBITEMS',                 0x02);
 define('ITEMINFO_VENDOR',                   0x04);
-// define('ITEMINFO_LOOT',                     0x08);       // get these infos from dedicatd loot function [count, stack, pctstack, modes]
+// define('ITEMINFO_LOOT',                  0x08);          // get these infos from dedicatd loot function [count, stack, pctstack, modes]
 define('ITEMINFO_GEM',                      0x10);
 define('ITEMINFO_MODEL',                    0x20);
 
