@@ -16,6 +16,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($pet->error)
         $smarty->notFound(Lang::$game['pet']);
 
+    /***********/
+    /* Infobox */
+    /***********/
+
     $infobox = [];
 
     // level range
@@ -25,13 +29,21 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($pet->getField('exotic'))
         $infobox[] = '[url=?spell=53270]'.Lang::$pet['exotic'].'[/url]';
 
+    /****************/
+    /* Main Content */
+    /****************/
+
     $pageData = array(
         'title'   => $pet->getField('name', true),
         'path'    => '[0, 8, '.$pet->getField('type').']',
         'infobox' => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
         'relTabs' => [],
+        'buttons'  => array(
+            BUTTON_WOWHEAD => true,
+            BUTTON_LINKS   => true,
+            BUTTON_TALENT  => ['href' => '?petcalc#'.Util::$tcEncoding[(int)($_id / 10)] . Util::$tcEncoding[(2 * ($_id % 10) + ($pet->getField('exotic') ? 1 : 0))], 'pet' => true]
+        ),
         'page'    => array(
-            'petCalc'   => Util::$tcEncoding[(int)($_id / 10)] . Util::$tcEncoding[(2 * ($_id % 10) + ($pet->getField('exotic') ? 1 : 0))],
             'name'      => $pet->getField('name', true),
             'id'        => $_id,
             'icon'      => $pet->getField('iconString'),
@@ -39,7 +51,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         ),
     );
 
-    // tameable & gallery
+    /**************/
+    /* Extra Tabs */
+    /**************/
+
+    // tab: tameable & gallery
     $condition = array(
         ['ct.type', 1],                                     // Beast
         ['ct.type_flags', 0x1, '&'],                        // tameable
@@ -73,7 +89,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-    // diet
+    // tab: diet
     $list = [];
     $mask = $pet->getField('foodMask');
     for ($i = 1; $i < 7; $i++)
@@ -95,7 +111,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-    // spells
+    // tab: spells
     $mask = 0x0;
     foreach (Util::$skillLineMask[-1] as $idx => $pair)
     {
@@ -137,7 +153,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-    // talents
+    // tab: talents
     $conditions = array(
         ['s.typeCat', -7],
         [                                                   // last rank or unranked
@@ -186,6 +202,7 @@ $smarty->updatePageVars(array(
         'template/js/swfobject.js'
     )
 ));
+$smarty->assign('redButtons', $pageData['buttons']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_PET, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game));
 $smarty->assign('lvData', $pageData);

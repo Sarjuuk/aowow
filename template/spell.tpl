@@ -1,6 +1,4 @@
 {include file='header.tpl'}
-{assign var="iconlist1" value="1"}
-{assign var="iconlist2" value="1"}
 
     <div class="main" id="main">
         <div id="main-precontents" class="main-precontents"></div>
@@ -21,27 +19,19 @@
 {include file='bricks/infobox.tpl' info=$lvData.infobox}
 
             <div class="text">
-                <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: {$page.type}, typeId: {$page.typeId}, linkColor: 'ff71d5ff', linkId: 'spell:{$page.typeId}', linkName: '{$lvData.page.name}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
-                <a href="javascript:;" id="view3D-button" class="button-red{if $lvData.view3D}" onclick="this.blur(); ModelViewer.show({ldelim} type: 1, displayId: {$lvData.view3D} {rdelim}){else} button-red-disabled{/if}"><em><b><i>View in 3D</i></b><span>View in 3D</span></em></a>
-                <a href="{$wowhead}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
+{include file='bricks/redButtons.tpl'}
                 <h1>{$lvData.page.name}</h1>
 
 {include file='bricks/tooltip.tpl'}
 
-{if $lvData.page.reagents}{if $lvData.page.tools}<div style="float: left; margin-right: 75px">{/if}
-                        <h3>{$lang.reagents}</h3>
-                        <table class="iconlist">
-{section name=i loop=$lvData.page.reagents}
-                            <tr><th align="right" id="iconlist-icon{$iconlist1++}"></th><td><span class="q{$lvData.page.reagents[i].quality}"><a href="?item={$lvData.page.reagents[i].entry}">{$lvData.page.reagents[i].name}</a></span>{if $lvData.page.reagents[i].count > 1}&nbsp({$lvData.page.reagents[i].count}){/if}</td></tr>
-{/section}
-                        </table>
-                        <script type="text/javascript">
-{section name=i loop=$lvData.page.reagents}
-                            $WH.ge('iconlist-icon{$iconlist2++}').appendChild(g_items.createIcon({$lvData.page.reagents[i].entry}, 0, {$lvData.page.reagents[i].count}));
-{/section}
-                        </script>
-{if $lvData.page.tools}</div>{/if}{/if}
-{if $lvData.page.tools}{if $lvData.page.reagents}<div style="float: left">{/if}
+{if $lvData.page.reagents}
+    {if $lvData.page.tools}<div style="float: left; margin-right: 75px">{/if}
+{include file='bricks/reagentList.tpl' reagent=$lvData.page.reagents}
+    {if $lvData.page.tools}</div>{/if}
+{/if}
+
+{if $lvData.page.tools}
+    {if $lvData.page.reagents}<div style="float: left">{/if}
                         <h3>{$lang.tools}</h3>
                         <table class="iconlist">
 {section name=i loop=$lvData.page.tools}
@@ -53,7 +43,8 @@
                             $WH.ge('iconlist-icon{$iconlist2++}').appendChild(g_items.createIcon({$lvData.page.tools[i].itemId}, 0, 1));
 {/if}{/section}
                         </script>
-{if $lvData.page.reagents}</div>{/if}{/if}
+    {if $lvData.page.reagents}</div>{/if}{
+/if}
 
                 <div class="clear"></div>
 

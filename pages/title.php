@@ -16,6 +16,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($title->error)
         $smarty->notFound(Lang::$game['title']);
 
+    /***********/
+    /* Infobox */
+    /***********/
+
     $infobox = [];
     if ($title->getField('side') == SIDE_ALLIANCE)
         $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=alliance-icon]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
@@ -30,16 +34,28 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($e = $title->getField('eventId'))
         $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$e.']'.WorldEventList::getName($e).'[/url]';
 
+    /****************/
+    /* Main Content */
+    /****************/
+
     $pageData = array(
         'title'   => Util::ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->getField('male', true))))),
         'path'    => '[0, 10, '.$title->getField('category').']',
         'infobox' => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
         'relTabs' => [],
+        'buttons' => array(
+            BUTTON_WOWHEAD => true,
+            BUTTON_LINKS   => true
+        ),
         'page'    => array(
             'name'      => $title->getHtmlizedName(),
             'expansion' => Util::$expansionString[$title->getField('expansion')]
         )
     );
+
+    /**************/
+    /* Extra Tabs */
+    /**************/
 
     if (!empty($title->sources[$_id]))
     {
@@ -98,6 +114,7 @@ $smarty->updatePageVars(array(
     'type'   => TYPE_TITLE,
     'typeId' => $_id
 ));
+$smarty->assign('redButtons', $pageData['buttons']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
 $smarty->assign('lvData', $pageData);

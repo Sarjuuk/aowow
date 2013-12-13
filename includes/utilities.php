@@ -288,7 +288,7 @@ class SmartyAoWoW extends Smarty
 
         $cwd = str_replace("\\", "/", getcwd());
 
-        $this->assign('appName', $config['page']['name']);
+        $this->assign('appName', $config['name']);
         $this->assign('AOWOW_REVISION', AOWOW_REVISION);
         $this->config                 = $config;
         $this->template_dir           = $cwd.'/template/';
@@ -308,7 +308,8 @@ class SmartyAoWoW extends Smarty
             'typeId' => null,                               // [int] entry to display
             'path'   => '[]'                                // [string] (js:array) path to preselect in the menu
         );
-        $this->_tpl_vars['jsGlobals'] = [];
+        $this->_tpl_vars['jsGlobals']  = [];
+        $this->_tpl_vars['redButtons'] = [];
     }
 
     // using Smarty::assign would overwrite every pair and result in undefined indizes

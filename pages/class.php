@@ -31,6 +31,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($cl->error)
         $smarty->notFound(Lang::$game['class']);
 
+    /***********/
+    /* Infobox */
+    /***********/
+
     $infobox = [];
     // hero class
     if ($cl->getField('hero'))
@@ -64,45 +68,74 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $infobox[] = Lang::$game['specs'].Lang::$colon.'[ul][li]'.implode('[/li][li]', $specList).'[/li][/ul]';
 
+    /****************/
+    /* Main Content */
+    /****************/
+
     $pageData = array (
-        'title'      => $cl->getField('name', true).' - '.Util::ucFirst(Lang::$game['class']),
-        'path'       => $_path,
-        'infobox'    => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
-        'relTabs'    => [],
-        'page'       => array(
+        'title'   => $cl->getField('name', true).' - '.Util::ucFirst(Lang::$game['class']),
+        'path'    => $_path,
+        'infobox' => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
+        'relTabs' => [],
+        'buttons' => array(
+            BUTTON_LINKS   => ['color' => '', 'linkId' => ''],
+            BUTTON_WOWHEAD => true,
+            BUTTON_TALENT  => ['href' => '?talent#'.Util::$tcEncoding[$tcClassId[$_id] * 3], 'pet' => false],
+            BUTTON_FORUM   => false                         // doto (low): $GLOBALS['AoWoWconf']['boardUrl'] + X
+        ),
+        'page'    => array(
             'name'       => $cl->getField('name', true),
-            'talentCalc' => Util::$tcEncoding[$tcClassId[$_id] * 3],
             'icon'       => 'class_'.strtolower($cl->getField('fileString')),
             'expansion'  => Util::$expansionString[$cl->getField('expansion')]
         )
     );
 
-/*
-    note!
-        newer listviews support subTabs - i.e.:
-        Spells => Abilities, Talents, Glyphs, Proficiencies
-        Items  => grouping by subclass
-*/
-    // Quests
+    /**************/
+    /* Extra Tabs */
+    /**************/
+
+    // Tab: Spells (grouped)
+    //     '$LANG.tab_armorproficiencies',
+    //     '$LANG.tab_weaponskills',
+    //     '$LANG.tab_glyphs',
+    //     '$LANG.tab_abilities',
+    //     '$LANG.tab_talents',
     $conditions = array(
-        ['RequiredClasses', $_mask, '&'],
-        [['RequiredClasses', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']
+        ['s.typeCat', [-13, -11, -2, 7]],
+        [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_EXCLUDE_CATEGORY_SEARCH), '&'], 0],
+        [
+            'OR',
+            ['s.reqClassMask', $_mask, '&'],                // Glyphs, Proficiencies
+            ['s.skillLine1', $classSkills[$_id]],           // Abilities / Talents
+            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $classSkills[$_id]]]
+        ],
+        [                                                   // last rank or unranked
+            'OR',
+            ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
+            ['s.rankId', 0]
+        ]
     );
 
-    $quests = new QuestList($conditions);
-    $quests->addGlobalsToJscript($smarty);
+    $genSpells = new SpellList($conditions);
+    $genSpells->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
     $pageData['relTabs'][] = array(
-        'file'   => 'quest',
-        'data'   => $quests->getListviewData(),
+        'file'   => 'spell',
+        'data'   => $genSpells->getListviewData(),
         'params' => array(
-            'sort' => "$['reqlevel', 'name']",
-            'tabs' => '$tabsRelated'
+            'id'              => 'spells',
+            'name'            => '$LANG.tab_spells',
+            'visibleCols'     => "$['level', 'schools', 'type', 'classes']",
+            'hiddenCols'      => "$['reagents', 'skill']",
+            'sort'            => "$['-level', 'type', 'name']",
+            'tabs'            => '$tabsRelated',
+            'computeDataFunc' => '$Listview.funcBox.initSpellFilter',
+            'onAfterCreate'   => '$Listview.funcBox.addSpellIndicator'
         )
     );
 
 
-    // Items
+    // Tab: Items (grouped)
     $conditions = array(
         ['requiredClass', 0, '>'],
         ['requiredClass', $_mask, '&'],
@@ -133,9 +166,25 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
+    // Tab: Quests
+    $conditions = array(
+        ['RequiredClasses', $_mask, '&'],
+        [['RequiredClasses', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']
+    );
 
+    $quests = new QuestList($conditions);
+    $quests->addGlobalsToJscript($smarty);
 
-    // Itemsets
+    $pageData['relTabs'][] = array(
+        'file'   => 'quest',
+        'data'   => $quests->getListviewData(),
+        'params' => array(
+            'sort' => "$['reqlevel', 'name']",
+            'tabs' => '$tabsRelated'
+        )
+    );
+
+    // Tab: Itemsets
     $sets = new ItemsetList(array(['classMask', $_mask, '&']));
     $sets->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
@@ -150,8 +199,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-
-    // Trainer
+    // Tab: Trainer
     $conditions = array(
         ['npcflag', 0x30, '&'],                             // is trainer
         ['trainer_type', 0],                                // trains class spells
@@ -170,142 +218,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-
-    // Armor Proficiencies
-    $conditions = array(
-        ['s.typeCat', -11],
-        ['s.skillLine1', SpellList::$skillLines[8]],
-        ['s.reqClassMask', $_mask, '&']
-    );
-
-    $armorProf = new SpellList($conditions);
-    $armorProf->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
-
-    $pageData['relTabs'][] = array(
-        'file'   => 'spell',
-        'data'   => $armorProf->getListviewData(),
-        'params' => array(
-            'id'          => 'armor-proficiencies',
-            'name'        => '$LANG.tab_armorproficiencies',
-            'visibleCols' => "$['type', 'classes']",
-            'hiddenCols'  => "$['reagents', 'skill']",
-            'tabs'        => '$tabsRelated'
-        )
-    );
-
-
-    // Weapon Proficiencies
-    $conditions = array(
-        ['s.typeCat', -11],
-        ['OR', ['s.skillLine1', SpellList::$skillLines[6]], ['s.skillLine1', -3]],
-        ['s.reqClassMask', $_mask, '&']
-    );
-
-    $weaponProf = new SpellList($conditions);
-    $weaponProf->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
-
-    $pageData['relTabs'][] = array(
-        'file'   => 'spell',
-        'data'   => $weaponProf->getListviewData(),
-        'params' => array(
-            'id'          => 'weapon-skills',
-            'name'        => '$LANG.tab_weaponskills',
-            'visibleCols' => "$['type', 'classes']",
-            'hiddenCols'  => "$['reagents', 'skill']",
-            'tabs'        => '$tabsRelated'
-        )
-    );
-
-
-    // Glyphs
-    $conditions = array(
-        ['s.typeCat', -13],
-        ['s.reqClassMask', $_mask, '&']
-    );
-
-    $glyphs = new SpellList($conditions);
-    $glyphs->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
-
-    $pageData['relTabs'][] = array(
-        'file'   => 'spell',
-        'data'   => $glyphs->getListviewData(),
-        'params' => array(
-            'id'          => 'glyphs',
-            'name'        => '$LANG.tab_glyphs',
-            'visibleCols' => "$['type']",
-            'hiddenCols'  => "$['reagents']",
-            'tabs'        => '$tabsRelated'
-        )
-    );
-
-
-    // Abilities
-    $conditions = array(
-        ['s.typeCat', [7, -2]],
-        [['s.cuFlags', (SPELL_CU_TALENTSPELL | SPELL_CU_TALENT | SPELL_CU_TRIGGERED | SPELL_CU_EXCLUDE_CATEGORY_SEARCH), '&'], 0],
-        [                                                   // select class by skillLine
-            'OR',
-            ['s.skillLine1', $classSkills[$_id]],
-            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $classSkills[$_id]]]
-        ],
-        [                                                   // last rank or unranked
-            'OR',
-            ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
-            ['s.rankId', 0]
-        ]
-    );
-
-    $abilities = new SpellList($conditions);
-    $abilities->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
-
-    $pageData['relTabs'][] = array(
-        'file'   => 'spell',
-        'data'   => $abilities->getListviewData(),
-        'params' => array(
-            'id'          => 'abilities',
-            'name'        => '$LANG.tab_abilities',
-            'note'        => sprintf(Util::$filterResultString, '?spells=7.'.$_id),
-            'visibleCols' => "$['level', 'schools']",
-            'sort'        => "$['skill', 'name']",
-            'tabs'        => '$tabsRelated'
-        )
-    );
-
-
-    // Talents
-    $conditions = array(
-        ['s.typeCat', -2],
-        ['cuFlags', (SPELL_CU_TALENT | SPELL_CU_TALENTSPELL), '&'],
-        [                                                   // select class by skillLine
-            'OR',
-            ['s.skillLine1', $classSkills[$_id]],
-            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $classSkills[$_id]]]
-        ],
-        [                                                   // last rank or unranked
-            'OR',
-            ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
-            ['s.rankId', 0]
-        ]
-    );
-
-    $talents = new SpellList($conditions);
-    $talents->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
-
-    $pageData['relTabs'][] = array(
-        'file'   => 'spell',
-        'data'   => $talents->getListviewData(),
-        'params' => array(
-            'id'          => "talents",
-            'name'        => '$LANG.tab_talents',
-            'note'        => sprintf(Util::$filterResultString, '?spells=-2.'.$_id),
-            'visibleCols' => "$['level', 'schools', 'tier']",
-            'sort'        => "$['skill', 'tier']",
-            'tabs'        => '$tabsRelated'
-        )
-    );
-
-
-    // Races
+    // Tab: Races
     $races = new CharRaceList(array(['classMask', $_mask, '&']));
 
     $pageData['relTabs'][] = array(
@@ -328,11 +241,11 @@ $smarty->updatePageVars(array(
     'tab'      => 0,
     'type'     => TYPE_CLASS,
     'typeId'   => $_id,
-    // 'boardUrl' => '',                                    //$GLOBALS['AoWoWconf']['boardUrl'] + X,
     'reqJS'    => array(
         'template/js/swfobject.js'
     )
 ));
+$smarty->assign('redButtons', $pageData['buttons']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_CLASS, $_id));       // comments, screenshots, videos
 $smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);

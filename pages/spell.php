@@ -246,7 +246,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'path'    => json_encode($path, JSON_NUMERIC_CHECK),
         'infobox' => $infobox,
         'relTabs' => [],
-        'view3D'  => 0,
+        'buttons' => array(
+            BUTTON_LINKS   => ['color' => 'ff71d5ff', 'linkId' => Util::$typeStrings[TYPE_SPELL].':'.$_id],
+            BUTTON_VIEW3D  => false,
+            BUTTON_WOWHEAD => true
+        ),
         'page'    => array(
             'scaling'   => '',
             'powerCost' => $spell->createPowerCostForCurrent(),
@@ -579,7 +583,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 if (!$summon->error)
                 {
                     $_ = '(<a href="?npc='.$effMV.'">'.$summon->getField('name', true).'</a>)';
-                    $pageData['view3D'] = $summon->getRandomModelId();
+                    $pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon->getRandomModelId()];
                 }
 
                 $foo['name'] .= Lang::$colon.$_;
@@ -633,7 +637,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 if ($n/*!$summon->error*/)
                 {
                     $_ = '(<a href="?object='.$effMV.'">'.$n/*$summon->getField('name', true)*/.'</a>)';
-                    //$pageData['view3D'] = $summon->getRandomModelId();
+                    //$pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon->getRandomModelId()];
                 }
 
                 $foo['name'] .= Lang::$colon.$_;
@@ -751,7 +755,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 36:                            // Shapeshift
                             if ($st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftForms WHERE id = ?d', $effMV))
                             {
-                                $pageData['view3D'] = $st['model2'] ? $st['model'.rand(1, 2)]: $st['model1'];
+                                $pageData['buttons'][BUTTON_VIEW3D] = array(
+                                    'type'      => TYPE_NPC,
+                                    'displayId' => $st['model2'] ? $st['model'.rand(1, 2)]: $st['model1']
+                                );
 
                                 if ($st['creatureType'] > 0)
                                     $pageData['infobox'][] = '[li]'.Lang::$game['type'].Lang::$colon.Lang::$game['ct'][$st['creatureType']].'[/li]';
@@ -901,6 +908,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                             if (!$transform->error)
                             {
                                 $pageData['view3D'] = $transform->getRandomModelId();
+                                $pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $transform->getRandomModelId()]; 
                                 $bar = ' (<a href="?npc='.$effMV.'">'.$transform->getField('name', true).'</a>)';
                             }
                             else
@@ -1578,9 +1586,10 @@ $smarty->updatePageVars(array(
     'type'   => TYPE_SPELL,
     'typeId' => $_id,
     'reqJS'  => array(
-        $pageData['view3D'] ? 'template/js/swfobject.js' : null
+        $pageData['buttons'][BUTTON_VIEW3D] ? 'template/js/swfobject.js' : null
     )
 ));
+$smarty->assign('redButtons', $pageData['buttons']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_SPELL, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$spell, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);

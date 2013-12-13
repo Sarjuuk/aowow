@@ -1039,7 +1039,7 @@ function g_getMoneyHtml(money, side, costItems, costCurrency, achievementPoints)
                 html += '<a href="?currency=' + currencyId + '" class="moneyarena tip" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + $WH.number_format(count) + '</a>';
             }
             else if (currencyId == 104) {                   // honor
-                html += '<a href="?currency=' + currencyId + '" class="money' + (side == 1 ? 'alliance' : 'horde') + ' tip" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + $WH.number_format(count) + '</a>';
+                html += '<a href="?currency=' + currencyId + '" class="money' + (side == 1 ? 'alliance' : 'horde') + ' tip" onmouseover="Listview.funcBox.moneyHonorOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + (side == 3 ? '<span class="moneyalliance">' : '') + $WH.number_format(count) + (side == 3 ? '</span>' : '') + '</a>';
             }
             else {                                          // tokens
                 html += '<a href="?currency=' + currencyId + '" class="icontinyr tip q1" onmouseover="Listview.funcBox.moneyCurrencyOver(' + currencyId + ', ' + count + ', event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()" style="background-image: url(' + g_staticUrl + '/images/icons/tiny/' + icon[0].toLowerCase() + '.gif)">' +  count + '</a>';
@@ -5980,6 +5980,70 @@ Listview.funcBox = {
             $(this.noteIndicators).append($('<div class="clear"></div>')).insertAfter($(this.navTop));
         }
     },
+
+	initSpellFilter: function (row) {
+		if (this._spellTypes == null) {
+			this._spellTypes = {};
+		}
+
+		if (this._spellTypes[row.cat] == null) {
+			this._spellTypes[row.cat] = 0;
+		}
+
+		this._spellTypes[row.cat]++;
+	},
+
+	addSpellIndicator: function () {
+		var it = location.hash.match(/:type=([^:]+)/);
+
+		var f = function (spellCat, updatePound) {
+			g_setSelectedLink(this, "spellType");
+
+            lv.customPound = lv.id + (spellCat != null ? ":type=" + spellCat : "");
+			lv.customFilter = function (spell) {
+				return spellCat == null || spell.cat == spellCat;
+			};
+			lv.updateFilters(1);
+			lv.applySort();
+			lv.refreshRows();
+			if (updatePound) {
+				lv.updatePound(1)
+			}
+		};
+
+		var
+            lv = this,
+            categories = [],
+            a;
+
+		a = $("<a><span>" + LANG.pr_note_all + "</span></a>");
+		a[0].f = f.bind(a[0], null, 1);
+		a.click(a[0].f);
+		var firstCallback = f.bind(a[0], null, 0);
+		firstCallback();
+		categories.push($('<span class="indicator-mode"></span>').append(a).append($("<b>" + LANG.pr_note_all + "</b>")));
+		for (var i in g_spell_categories) {
+			if (!this._spellTypes[i]) {
+				continue;
+			}
+			a = $("<a><span>" + g_spell_categories[i] + "</span> (" + this._spellTypes[i] + ")</a>");
+			a[0].f = f.bind(a[0], i, 1);
+			a.click(a[0].f);
+
+			categories.push($('<span class="indicator-mode"></span>').append(a).append($("<b>" + g_spell_categories[i] + " (" + this._spellTypes[i] + ")</b>")));
+
+			if (it && it[1] == i) {
+                (a[0].f)();
+			}
+		}
+		if (categories.length > 2) {
+			for (var i = 0, len = categories.length; i < len; ++i) {
+				this.createIndicator(categories[i], null, $("a", categories[i])[0].f)
+			}
+			$(this.noteTop).css("padding-bottom", "12px");
+			$(this.noteIndicators).append($('<div class="clear"></div>')).insertAfter($(this.navTop))
+		}
+	},
 
     initStatisticFilter: function(row)
     {

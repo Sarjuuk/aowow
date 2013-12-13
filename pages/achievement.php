@@ -92,6 +92,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'path'    => $tmpPath,
         'infobox' => array_merge($infobox, Lang::getInfoBoxForFlags($acv->getField('cuFlags'))),
         'relTabs' => [],
+        'buttons' => array(
+            BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$_id.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0'],
+            BUTTON_WOWHEAD => true
+        ),
         'page'    => array(
             'name'        => $acv->getField('name', true),
             'description' => $acv->getField('description', true),
@@ -407,6 +411,7 @@ $smarty->updatePageVars(array(
     'type'   => TYPE_ACHIEVEMENT,
     'typeId' => $_id
 ));
+$smarty->assign('redButtons', $pageData['buttons']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);

@@ -90,9 +90,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $pageData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
     // create note if search limit was exceeded
-    if ($acvList->getMatches() > $AoWoWconf['sqlLimit'])
+    if ($acvList->getMatches() > SQL_LIMIT_DEFAULT)
     {
-        $pageData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), $AoWoWconf['sqlLimit']);
+        $pageData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), SQL_LIMIT_DEFAULT);
         $pageData['params']['_truncated'] = 1;
     }
 

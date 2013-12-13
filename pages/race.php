@@ -10,7 +10,7 @@ $_id   = intVal($pageParam);
 $_mask = 1 << ($_id - 1);
 $_path = [0, 13, $_id];
 
-$mountVendors = array(                                      // [starter, argent tournament]
+$mountVendors = array(                                      // race => [starter, argent tournament]
     null,
     [384,   33307],
     [3362,  33553],
@@ -34,7 +34,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $smarty->notFound(Lang::$game['race']);
 
     /***********/
-    /* INFOBOX */
+    /* Infobox */
     /***********/
 
     $infobox = [];                                          // unfortunately is all of this custom data :/
@@ -64,11 +64,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $infobox[] = Lang::$class['startZone'].Lang::$colon.'[zone='.$_.']';
     }
 
+    /****************/
+    /* Main Content */
+    /****************/
+
     $pageData = array (
         'title'      => $race->getField('name', true).' - '.Util::ucFirst(Lang::$game['race']),
         'path'       => $_path,
         'infobox'    => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
         'relTabs'    => [],
+        'buttons' => array(
+            BUTTON_WOWHEAD => true,
+            BUTTON_LINKS   => true
+        ),
         'page'       => array(
             'name'      => $race->getField('name', true),
             'icon'      => strtolower($race->getField('fileString')),
@@ -76,9 +84,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-    /********/
-    /* TABS */
-    /********/
+    /**************/
+    /* Extra Tabs */
+    /**************/
 
     // Classes
     $classes = new CharClassList(array(['racemask', $_mask, '&']));
@@ -91,7 +99,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'tabs' => '$tabsRelated'
         )
     );
-
 
     // Tongues
     $conditions = array(
@@ -133,7 +140,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-     // Quests
+    // Quests
     $conditions = array(
         ['RequiredRaces', $_mask, '&'],
         [['RequiredRaces', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'],
@@ -189,6 +196,7 @@ $smarty->updatePageVars(array(
     'type'   => TYPE_RACE,
     'typeId' => $_id
 ));
+$smarty->assign('redButtons', $pageData['buttons']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_RACE, $_id));       // comments, screenshots, videos
 $smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);

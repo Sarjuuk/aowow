@@ -50,11 +50,9 @@ abstract class BaseType
     */
     public function __construct($conditions = [], $applyFilter = false)
     {
-        global    $AoWoWconf;                                   // yes i hate myself..
-
         $where     = [];
         $linking   = ' AND ';
-        $limit     = $AoWoWconf['sqlLimit'];
+        $limit     = SQL_LIMIT_DEFAULT;
         $className = get_class($this);
 
         if (!$this->queryBase || $conditions === null)

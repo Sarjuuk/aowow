@@ -392,9 +392,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
     // create note if search limit was exceeded; overwriting 'note' is intentional
-    if ($spells->getMatches() > $AoWoWconf['sqlLimit'])
+    if ($spells->getMatches() > SQL_LIMIT_DEFAULT)
     {
-        $pageData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), $AoWoWconf['sqlLimit']);
+        $pageData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), SQL_LIMIT_DEFAULT);
         $pageData['params']['_truncated'] = 1;
     }
 

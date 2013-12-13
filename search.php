@@ -50,16 +50,16 @@ todo    26: Listview - template: 'profile',     id: 'characters',    name: LANG.
         29: Arena Teams..?
 */
 
-$search      = urlDecode(trim($pageParam));
-$query       = Util::sqlEscape(str_replace('?', '_', str_replace('*', '%', ($search))), true);
-$type        = @intVal($_GET['type']);
-$searchMask  = 0x0;
-$found       = [];
-$jsGlobals   = [];
-$maxResults  = 500;                                         // todo: move to config
+$search     = urlDecode(trim($pageParam));
+$query      = Util::sqlEscape(str_replace('?', '_', str_replace('*', '%', ($search))), true);
+$type       = @intVal($_GET['type']);
+$searchMask = 0x0;
+$found      = [];
+$jsGlobals  = [];
+$maxResults = SQL_LIMIT_SEARCH;
 
-$_wt         = isset($_GET['wt'])  ? explode(':', $_GET['wt'])  : null;
-$_wtv        = isset($_GET['wtv']) ? explode(':', $_GET['wtv']) : null;
+$_wt        = isset($_GET['wt'])  ? explode(':', $_GET['wt'])  : null;
+$_wtv       = isset($_GET['wtv']) ? explode(':', $_GET['wtv']) : null;
 
 if (isset($_GET['json']))
 {
@@ -331,12 +331,12 @@ if ($searchMask & 0x40)
 
     if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
     {
-        $conditions = [['i.id', array_keys($found['itemset']['pcsToSet'])], 0];
+        $conditions = [['i.id', array_keys($found['itemset']['pcsToSet'])], SQL_LIMIT_NONE];
         $miscData   = ['pcsToSet' => @$found['itemset']['pcsToSet']];
     }
     else if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEM)
     {
-        $conditions = [['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], ['name_loc'.User::$localeId, $query], $AoWoWconf['sqlLimit']];
+        $conditions = [['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], ['name_loc'.User::$localeId, $query], SQL_LIMIT_DEFAULT];
         $miscData   = ['wt' => $_wt, 'wtv' => $_wtv];
     }
     else

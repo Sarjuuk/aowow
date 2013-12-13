@@ -50,7 +50,7 @@ define('AUTH_BANNED',                       3);
 define('AUTH_IPBANNED',                     4);
 
 // Cookie Names
-define('COOKIE_AUTH',                       'aw_a');
+define('COOKIE_AUTH',                  'aw_a');
 
 // Times
 define('MINUTE',                            60);
@@ -86,6 +86,15 @@ define('LOCALE_FR',                         2);
 define('LOCALE_DE',                         3);
 define('LOCALE_ES',                         6);
 define('LOCALE_RU',                         8);
+
+// red buttons on the top of the page (ASC:: right -> left)
+define('BUTTON_WOWHEAD',                    0);
+define('BUTTON_UPGRADE',                    1);
+define('BUTTON_COMPARE',                    2);
+define('BUTTON_VIEW3D',                     3);
+define('BUTTON_LINKS',                      4);
+define('BUTTON_FORUM',                      5);
+define('BUTTON_TALENT',                     6);
 
 // generic filter handler
 define('FILTER_CR_BOOLEAN',                 1);

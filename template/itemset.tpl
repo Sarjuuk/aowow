@@ -19,10 +19,9 @@
 {include file='bricks/infobox.tpl' info=$lvData.infobox}
 
             <div class="text">
-                <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: {$page.type}, typeId: {$page.typeId} {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
-                <a href="javascript:;" id="view3D-button" class="button-red" onclick="this.blur(); ModelViewer.show({ldelim} type: {$page.type}, typeId: {$page.typeId}, equipList: {$lvData.view3D} {rdelim})"><em><b><i>{$lang.view3D}</i></b><span>{$lang.view3D}</span></em></a>
-                <a href="javascript:;" class="button-red" onclick="this.blur(); su_addToSaved('{':'|implode:$lvData.compare.items}', {$lvData.compare.qty})"><em><b><i>{$lang.compare}</i></b><span>{$lang.compare}</span></em></a>
-                <a href="{if $page.typeId > 0}{$wowhead}{else}javascript:;{/if}" class="button-red{if $lvData.page.id < 0} button-red-disabled{/if}"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
+
+{include file='bricks/redButtons.tpl'}
+
                 <h1>{$lvData.page.name}</h1>
 
 {include file='bricks/article.tpl'}

@@ -116,9 +116,9 @@ if (strstr($pageCall, 'latest') || $pageCall == 'most-comments')
 
         $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
             "<rss version=\"2.0\">\n\t<channel>\n".
-            "\t\t<title>".$AoWoWconf['page']['shortName'].' - '.Lang::$main['utilities'][$menu] . ($_title ? Lang::$colon . $_title : null)."</title>\n".
+            "\t\t<title>".$AoWoWconf['shortName'].' - '.Lang::$main['utilities'][$menu] . ($_title ? Lang::$colon . $_title : null)."</title>\n".
             "\t\t<link>".STATIC_URL.'?'.$pageCall . ($pageParam ? '='.$pageParam : null)."</link>\n".
-            "\t\t<description>".$AoWoWconf['page']['name']."</description>\n".
+            "\t\t<description>".$AoWoWconf['name']."</description>\n".
             "\t\t<language>".implode('-', str_split(User::$localeString, 2))."</language>\n".
             "\t\t<ttl>".$AoWoWconf['ttl']."</ttl>\n".
             // <lastBuildDate>Sat, 31 Aug 2013 15:33:16 -0500</lastBuildDate>

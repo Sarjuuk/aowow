@@ -80,9 +80,6 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     $_class     = $item->getField('class');
     $_subClass  = $item->getField('subClass');
     $_bagFamily = $item->getField('bagFamily');
-    $_extCost   = [];
-    if ($_ = @$item->getExtendedCost($_reqRating)[$item->id])
-        $_extCost = $_;
 
     /***********/
     /* Infobox */
@@ -130,33 +127,49 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         if ($tName = DB::Aowow()->selectRow('SELECT * FROM ?_totemCategory WHERE id = ?d', $tId))
             $quickInfo[] = Lang::$item['tool'].Lang::$colon.'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
 
-    $each   = $item->getField('stackable') > 1 ? '[color=q0] ('.Lang::$item['each'].')[/color]' : null;
-    $tokens = $currency = [];
-    if ($_ = reset($_extCost))
+    $each = $item->getField('stackable') > 1 ? '[color=q0] ('.Lang::$item['each'].')[/color]' : null;
+
+    if ($_ = @$item->getExtendedCost([], $_reqRating)[$item->id])
     {
-        foreach ($_ as $c => $qty)
+        $handled  = [];
+        $costList = [];
+        foreach ($_ as $npcId => $data)
         {
-            if (is_string($c))
+            if (in_array(md5(serialize($data)), $handled))  // display every cost-combination only once
                 continue;
 
-            if ($c < 0)                                     // currency items (and honor or arena)
-                $currency[] = -$c.','.$qty;
-            else if ($c > 0)                                // plain items (item1,count1,item2,count2,...)
-                $tokens[$c] = $c.','.$qty;
+            $handled[] = md5(serialize($data));
+
+            $tokens   = [];
+            $currency = [];
+            foreach ($data as $c => $qty)
+            {
+                if (is_string($c))
+                    continue;
+
+                if ($c < 0)                                 // currency items (and honor or arena)
+                    $currency[] = -$c.','.$qty;
+                else if ($c > 0)                            // plain items (item1,count1,item2,count2,...)
+                    $tokens[$c] = $c.','.$qty;
+            }
+
+            $cost = isset($_[0]) ? '[money='.$_[0] : '[money';
+
+            if ($tokens)
+                $cost .= ' items='.implode(',', $tokens);
+
+            if ($currency)
+                $cost .= ' currency='.implode(',', $currency);
+
+            $cost .= ']';
+
+            $costList[] = $cost;
         }
 
-        $cost = isset($_[0]) ? '[money='.$_[0] : '[money';
-
-        if ($tokens)
-            $cost .= ' items='.implode(',', $tokens);
-
-        if ($currency)
-            $cost .= ' currency='.implode(',', $currency);
-
-        $cost .= ']';
-
-        if ($cost)
-            $quickInfo[] = Lang::$item['cost'].Lang::$colon.$cost.$each;
+        if (count($costList) == 1)
+            $quickInfo[] = Lang::$item['cost'].Lang::$colon.$costList[0].$each;
+        else if (count($costList) > 1)
+            $quickInfo[] = Lang::$item['cost'].$each.Lang::$colon.'[ul][li]'.implode('[/li][li]', $costList).'[/li][/ul]';
 
         if ($_reqRating)
             $quickInfo[] = sprintf(Lang::$item['reqRating'], $_reqRating);
@@ -228,6 +241,9 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     /* Main Content */
     /****************/
 
+    $cmpUpg = in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) || $item->getField('gemEnchantmentId');
+    $view3D = in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $item->getField('displayId');
+
     $pageData = array(
         'infobox'  => $quickInfo ? '[ul][li]'.implode('[/li][li]', $quickInfo).'[/li][/ul]' : null,
         'relTabs'  => [],
@@ -235,16 +251,18 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         'path'     => [0, 0],
         'title'    => [$item->getField('name', true), Util::ucFirst(Lang::$game['item'])],
         'pageText' => [],
-        'buttons'  => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) || $item->getField('gemEnchantmentId'),
+        'buttons'  => array(
+            BUTTON_WOWHEAD => true,
+            BUTTON_LINKS   => ['color' => 'ff'.Util::$rarityColorStings[$item->getField('quality')], 'linkId' => 'item:'.$_id.':0:0:0:0:0:0:0:0'],
+            BUTTON_VIEW3D  => $view3D ? ['displayId' => $item->getField('displayId'), 'slot' => $_slot, 'type' => TYPE_ITEM, 'typeId' => $_id] : false,
+            BUTTON_COMPARE => $cmpUpg,                      // bool required
+            BUTTON_UPGRADE => $cmpUpg ? ['class' => $_class, 'slot' => $_slot] : false
+        ),
         'page'     => array(
-            'color'     => Util::$rarityColorStings[$item->getField('quality')],
             'quality'   => $item->getField('quality'),
             'icon'      => $item->getField('iconString'),
             'name'      => $item->getField('name', true),
-            'displayId' => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $item->getField('displayId') ? $item->getField('displayId') : null,
-            'slot'      => $_slot,
             'stack'     => $item->getField('stackable'),
-            'class'     => $_class
         )
     );
 
@@ -360,7 +378,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     foreach ($sources as $lootTpl => $lootData)
     {
         // cap fetched entries to the sql-limit to guarantee, that the highest chance items get selected first
-        $ids = array_slice(array_keys($lootData), 0, $AoWoWconf['sqlLimit']);
+        $ids = array_slice(array_keys($lootData), 0, SQL_LIMIT_DEFAULT);
 
         switch ($lootTpl)
         {
@@ -759,6 +777,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
                 'AND',
                 ['class',         $_class],
                 ['subClass',      $_subClass],
+                ['slot',          $_slot],
                 ['itemLevel',     $item->getField('itemLevel') - 15, '>'],
                 ['itemLevel',     $item->getField('itemLevel') + 15, '<'],
                 ['quality',       $item->getField('quality')],
@@ -789,10 +808,10 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         $starts = new QuestList(array(['qt.id', $qId]));
         if (!$starts->error)
         {
-            $starts->addGlobalsToJscript($stmarty);
+            $starts->addGlobalsToJscript($smarty);
 
             $pageData['relTabs'][] = array(
-                'file'   => 'item',
+                'file'   => 'quest',
                 'data'   => $starts->getListviewData(),
                 'params' => [
                     'tabs' => '$tabsRelated',
@@ -869,7 +888,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     }
 
     // tab: sold by
-    if ($vendors = $_extCost)
+    if ($vendors = @$item->getExtendedCost([], $_reqRating)[$item->id])
     {
         $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
         if (!$soldBy->error)
@@ -954,21 +973,24 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     else
         $w = 'iec.reqItemId1 = '.$_id.' OR iec.reqItemId2 = '.$_id.' OR iec.reqItemId3 = '.$_id.' OR iec.reqItemId4 = '.$_id.' OR iec.reqItemId5 = '.$_id;
 
-    $baughtBy = DB::Aowow()->selectCol('
+    $boughtBy = DB::Aowow()->selectCol('
         SELECT item FROM npc_vendor nv JOIN ?_itemExtendedCost iec ON iec.id = nv.extendedCost WHERE '.$w.'
         UNION
         SELECT item FROM game_event_npc_vendor genv JOIN ?_itemExtendedCost iec ON iec.id = genv.extendedCost WHERE '.$w
     );
-    if ($baughtBy)
+    if ($boughtBy)
     {
-        $baughtBy = new ItemList(array(['id', $baughtBy]));
-        if (!$baughtBy->error)
+        $boughtBy = new ItemList(array(['id', $boughtBy]));
+        if (!$boughtBy->error)
         {
-            $baughtBy->addGlobalsToJscript($smarty);
+            $boughtBy->addGlobalsToJscript($smarty);
+
+            $iCur   = new CurrencyList(array(['itemId', $_id]));
+            $filter = $iCur->error ? [TYPE_ITEM => $_id] : [TYPE_CURRENCY => $iCur->id];
 
             $pageData['relTabs'][] = array(
                 'file'   => 'item',
-                'data'   => $baughtBy->getListviewData(ITEMINFO_VENDOR),
+                'data'   => $boughtBy->getListviewData(ITEMINFO_VENDOR, $filter),
                 'params' => [
                     'tabs'      => '$tabsRelated',
                     'name'      => '$LANG.tab_currencyfor',
@@ -1051,6 +1073,7 @@ $smarty->updatePageVars(array(
         $pageData['pageText'] ? ['path' => 'template/css/Book.css'] : null,
     )
 ));
+$smarty->assign('redButtons', $pageData['buttons']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEM, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$item, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);

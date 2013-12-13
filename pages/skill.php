@@ -18,10 +18,18 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $_cat = $skill->getField('typeCat');
 
+    /****************/
+    /* Main Content */
+    /****************/
+
     $pageData = array(
         'title'   => $skill->getField('name', true),
         'path'    => [0, 14],
         'relTabs' => [],
+        'buttons' => array(
+            BUTTON_WOWHEAD => true,
+            BUTTON_LINKS   => true
+        ),
         'page'    => array(
             'name' => $skill->getField('name', true),
             'icon' => $skill->getField('iconString'),
@@ -30,6 +38,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
 
     $pageData['path'][] = (in_array($_cat, [9, 11]) || $_id == 762) ? $_id : $_cat;
+
+    /**************/
+    /* Extra Tabs */
+    /**************/
 
     if (in_array($_cat, [-5, 9, 11]))
     {
@@ -346,6 +358,7 @@ $smarty->updatePageVars(array(
     'type'   => TYPE_SKILL,
     'typeId' => $_id
 ));
+$smarty->assign('redButtons', $pageData['buttons']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_SKILL, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
 $smarty->assign('lvData', $pageData);

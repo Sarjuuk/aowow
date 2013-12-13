@@ -19,12 +19,9 @@
 {include file='bricks/infobox.tpl' info=$lvData.infobox}
 
             <div class="text">
-                <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} type: {$page.type}, typeId: {$page.typeId}, linkColor: 'ff{$lvData.page.color}', linkId: 'item:{$page.typeId}:0:0:0:0:0:0:0:0', linkName: '{$lvData.page.name|escape:"javascript"}' {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
-                <a href="javascript:;" id="view3D-button" class="button-red{if $lvData.page.displayId}" onclick="this.blur(); ModelViewer.show({ldelim} type: {$page.type}, typeId: {$page.typeId}, displayId: {$lvData.page.displayId}, slot: {$lvData.page.slot} {rdelim}){else} button-red-disabled{/if}"><em><b><i>{$lang.view3D}</i></b><span>{$lang.view3D}</span></em></a>
-                <a href="javascript:;" class="button-red{if $lvData.buttons}" onclick="this.blur(); su_addToSaved('{$page.typeId}', 1){else} button-red-disabled{/if}"><em><b><i>{$lang.compare}</i></b><span>{$lang.compare}</span></em></a>
-                <a href="javascript:;" class="button-red{if $lvData.buttons}" onclick="this.blur(); pr_showClassPresetMenu(this, {$page.typeId}, {$lvData.page.class}, {$lvData.page.slot}, event);{else} button-red-disabled{/if}"><em><b><i>{$lang.findUpgrades}</i></b><span>{$lang.findUpgrades}</span></em></a>
-                <a href="{$wowhead}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
-{* <div id="sdlkgnfdlkgndfg4"></div>  what the heck.. this div has neither data nor style or script associated with *}
+
+{include file='bricks/redButtons.tpl'}
+
                 <h1>{$lvData.page.name}</h1>
 
 {include file='bricks/tooltip.tpl'}

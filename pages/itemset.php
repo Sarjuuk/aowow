@@ -26,6 +26,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $_na  = $iSet->getField('name', true);
     $_cnt = count($iSet->getField('pieces'));
 
+    /***********/
+    /* Infobox */
+    /***********/
+
     $infobox = [];
     // unavailable (todo (low): set data)
     if ($iSet->getField('cuFlags') & CUSTOM_UNAVAILABLE)
@@ -70,6 +74,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // tag
     if ($_ta)
         $infobox[] = Lang::$itemset['_tag'].Lang::$colon.'[url=?itemsets&filter=ta='.$_ta.']'.Lang::$itemset['notes'][$_ta].'[/url]';
+
+    /****************/
+    /* Main Content */
+    /****************/
 
     // pieces + Summary
     $pieces  = [];
@@ -173,7 +181,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'relTabs' => [],
         'pieces'  => $pieces,
         'spells'  => $spells,
-        'view3D'  => json_encode($eqList, JSON_NUMERIC_CHECK),
+        'buttons' => array(
+            BUTTON_WOWHEAD => $_id > 0,                     // bool only
+            BUTTON_LINKS   => ['color' => '', 'linkId' => ''],
+            BUTTON_VIEW3D  => ['type' => TYPE_ITEMSET, 'typeId' => $_id, 'equipList' => $eqList],
+            BUTTON_COMPARE => ['eqList' => implode(':', $compare), 'qty' => $_cnt]
+        ),
         'compare' => array(
             'qty'   => $_cnt,
             'items' => $compare,
@@ -189,6 +202,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
 
     $iSet->addGlobalsToJscript($smarty);
+
+    /**************/
+    /* Extra Tabs */
+    /**************/
 
     // related sets (priority: 1: similar tag + class; 2: has event; 3: no tag + similar type, 4: similar type + profession)
     $rel = [];
@@ -259,6 +276,7 @@ $smarty->updatePageVars(array(
         'template/js/swfobject.js'
     )
 ));
+$smarty->assign('redButtons', $pageData['buttons']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEMSET, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$itemset, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData);

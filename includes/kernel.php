@@ -12,7 +12,11 @@ require 'config/config.php';
 $e = !!$AoWoWconf['debug'] ? (E_ALL & ~(E_DEPRECATED|E_USER_DEPRECATED|E_STRICT)) : 0;
 error_reporting($e);
 
-define('STATIC_URL', substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));
+define('STATIC_URL',        substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));
+
+define('SQL_LIMIT_NONE',    0);
+define('SQL_LIMIT_SEARCH',  $AoWoWconf['searchLimit']);
+define('SQL_LIMIT_DEFAULT', $AoWoWconf['defaultLimit']);
 
 require 'includes/libs/Smarty-2.6.26/libs/Smarty.class.php';// Libraray: http://www.smarty.net/
 // require 'includes/libs/Smarty-3.1.14/libs/Smarty.class.php';     // Libraray: http://www.smarty.net/
