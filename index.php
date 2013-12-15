@@ -14,6 +14,8 @@ require 'includes/kernel.php';
 
 if ($AoWoWconf['maintenance'] && !User::isInGroup(U_GROUP_EMPLOYEE))
     $smarty->brb();
+else if ($AoWoWconf['maintenance'] && User::isInGroup(U_GROUP_EMPLOYEE))
+    $smarty->internalNotice(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
 
 switch ($pageCall)
 {

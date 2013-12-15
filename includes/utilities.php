@@ -323,9 +323,9 @@ class SmartyAoWoW extends Smarty
     }
 
     // use, if you want to alert the staff to a problem with Trinity
-    public function internalError($str)
+    public function internalNotice($uGroupMask, $str)
     {
-        $this->errors[] = $str;
+        $this->notices[] = [$uGroupMask, $str];
     }
 
     public function display($tpl)
@@ -364,20 +364,28 @@ class SmartyAoWoW extends Smarty
             }
         }
 
-        // display occured errors
-        if (User::isInGroup(U_GROUP_STAFF) && $this->errors)
+        // display occured notices
+        if ($this->notices)
         {
-            if (!isset($tv['announcements']))
-                $tv['announcements'] = [];
+            $buff = [];
+            foreach ($this->notices as $data)
+                if (User::isInGroup($data[0]))
+                    $buff[] = $data[1];
 
-            $tv['announcements'][] = array(
-                'id'     => 0,
-                'mode'   => 1,
-                'status' => 1,
-                'name'   => 'internal error',
-                'style'  => 'padding-left: 45px; background-image: url(template/images/report.gif); background-size: 15px 15px; background-position: 10px center; border: dashed 2px #C03030;',
-                'text'   => '<span id="inputbox-error">- '.implode("<br>- ", $this->errors).'</span>',
-            );
+            if ($buff)
+            {
+                if (!isset($tv['announcements']))
+                    $tv['announcements'] = [];
+
+                $tv['announcements'][] = array(
+                    'id'     => 0,
+                    'mode'   => 1,
+                    'status' => 1,
+                    'name'   => 'internal error',
+                    'style'  => 'padding-left: 40px; background-image: url(template/images/report.gif); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
+                    'text'   => '<span id="inputbox-error">'.implode("<br>", $buff).'</span>',
+                );
+            }
         }
 
         // fetch announcements
@@ -1928,7 +1936,7 @@ class Util
             }
             else                                            // shouldn't happened
             {
-                Util::$pageTemplate->internalError('Loot by LootId: unhandled case in calculating chance for item '.$entry['item'].'!');
+                Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by LootId: unhandled case in calculating chance for item '.$entry['item'].'!');
                 continue;
             }
 
@@ -1942,7 +1950,7 @@ class Util
                 $sum = 0;
             else if ($sum > 100)
             {
-                Util::$pageTemplate->internalError('Loot by LootId: entry '.$lootId.' / group '.$k.' has a total chance of '.$sum.'%. Some items cannot drop!');
+                Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by LootId: entry '.$lootId.' / group '.$k.' has a total chance of '.$sum.'%. Some items cannot drop!');
                 $sum = 100;
             }
 
@@ -2100,13 +2108,13 @@ class Util
             {
                 // check for possible database inconsistencies
                 if (!$ref['chance'] && !$ref['isGrouped'])
-                    Util::$pageTemplate->internalError('Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
+                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] > 100)
-                    Util::$pageTemplate->internalError('Loot by Item: group with Item/Ref '.$ref['item'].' has '.$ref['sumChance'].'% total chance! Some items cannot drop!');
+                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.$ref['sumChance'].'% total chance! Some items cannot drop!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] == 100 && !$ref['chance'])
-                    Util::$pageTemplate->internalError('Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
+                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
 
                 $chance = abs($ref['chance'] ? $ref['chance'] : (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
 
