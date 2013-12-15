@@ -330,6 +330,8 @@ $lang = array(
         '_radius'       => "Radio",
         '_interval'     => "Intérvalo",
         '_inSlot'       => "en la casilla",
+        '_collapseAll'  => "Contraer todo",
+        '_expandAll'    => "Expandier todo",
 
         'ppm'           => "%s procs por minuto",
         'procChance'    => "Probabilidad de que accione",

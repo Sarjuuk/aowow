@@ -135,17 +135,15 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
         $costList = [];
         foreach ($_ as $npcId => $data)
         {
-            if (in_array(md5(serialize($data)), $handled))  // display every cost-combination only once
-                continue;
-
-            $handled[] = md5(serialize($data));
-
             $tokens   = [];
             $currency = [];
             foreach ($data as $c => $qty)
             {
                 if (is_string($c))
+                {
+                    unset($data[$c]);                       // unset miscData to prevent having two vendors /w the same cost being cached, because of different stock or rating-requirements
                     continue;
+                }
 
                 if ($c < 0)                                 // currency items (and honor or arena)
                     $currency[] = -$c.','.$qty;
@@ -153,7 +151,12 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
                     $tokens[$c] = $c.','.$qty;
             }
 
-            $cost = isset($_[0]) ? '[money='.$_[0] : '[money';
+            if (in_array(md5(serialize($data)), $handled))  // display every cost-combination only once
+                continue;
+
+            $handled[] = md5(serialize($data));
+
+            $cost = isset($data[0]) ? '[money='.$data[0] : '[money';
 
             if ($tokens)
                 $cost .= ' items='.implode(',', $tokens);

@@ -345,7 +345,7 @@ $lang = array(
         '_spellDetails' => "Spell Details",
         '_cost'         => "Cost",
         '_range'        => "Range",
-        '_castTime'     => "Cast Time",
+        '_castTime'     => "Cast time",
         '_cooldown'     => "Cooldown",
         '_distUnit'     => "yards",
         '_forms'        => "Forms",
@@ -359,6 +359,8 @@ $lang = array(
         '_radius'       => "Radius",
         '_interval'     => "Interval",
         '_inSlot'       => "in slot",
+        '_collapseAll'  => "Collapse All",
+        '_expandAll'    => "Expand All",
 
         'ppm'           => "%s procs per minute",
         'procChance'    => "Proc chance",

@@ -131,37 +131,40 @@ class ItemList extends BaseType
             }
 
             // convert items to currency if possible
-            $moneyItems = new CurrencyList(array(['itemId', $cItems]));
-            $moneyItems->addGlobalsToJscript(Util::$pageTemplate);
-
-            foreach ($itemz as $id => &$vendors)
+            if ($cItems)
             {
-                foreach ($vendors as &$costs)
-                {
-                    foreach ($costs as $k => $v)
-                    {
-                        if (in_array($k, $cItems))
-                        {
-                            $found = false;
-                            foreach ($moneyItems->iterate() as $__)
-                            {
-                                if ($moneyItems->getField('itemId') == $k)
-                                {
-                                    unset($costs[$k]);
-                                    $costs[-$moneyItems->id] = $v;
-                                    $found = true;
-                                    break;
-                                }
-                            }
+                $moneyItems = new CurrencyList(array(['itemId', $cItems]));
+                $moneyItems->addGlobalsToJscript(Util::$pageTemplate);
 
-                            if (!$found)
-                                Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $k);
+                foreach ($itemz as $id => &$vendors)
+                {
+                    foreach ($vendors as &$costs)
+                    {
+                        foreach ($costs as $k => $v)
+                        {
+                            if (in_array($k, $cItems))
+                            {
+                                $found = false;
+                                foreach ($moneyItems->iterate() as $__)
+                                {
+                                    if ($moneyItems->getField('itemId') == $k)
+                                    {
+                                        unset($costs[$k]);
+                                        $costs[-$moneyItems->id] = $v;
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!$found)
+                                    Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $k);
+                            }
                         }
                     }
                 }
-
-                $this->vendors[$id] = $vendors;
             }
+
+            $this->vendors = $itemz;
         }
 
         $result = $this->vendors;
@@ -178,7 +181,6 @@ class ItemList extends BaseType
             {
                 if ($npc && $npcId != $npc)
                 {
-
                     unset($data[$npcId]);
                     continue;
                 }
@@ -188,8 +190,6 @@ class ItemList extends BaseType
                     $valid = false;
                     foreach ($costs as $k => $qty)
                     {
-
-
                         if ((!$tok || $k == $tok) && (!$cur || $k == -$cur))
                         {
                             $valid = true;

@@ -1481,10 +1481,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                 if ($reagent[1] > 1)
                     $_ .= ' ('.$reagent[1].')';
 
-                if(!empty($reagents))
-                    $_ .= ', ';
-                else
-                    $_ .= '<br />';
+                $_ .= empty($reagents) ? '<br />' : ', ';
             }
 
             $xTmp[] = $_.'</div>';

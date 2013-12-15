@@ -330,6 +330,8 @@ $lang = array(
         '_radius'       => "Rayon",
         '_interval'     => "Intervalle",
         '_inSlot'       => "dans l'emplacement",
+        '_collapseAll'  => "Replier Tout",
+        '_expandAll'    => "Déplier Tout",
 
         'ppm'           => "%s déclenchements par minute",
         'procChance'    => "Chance",

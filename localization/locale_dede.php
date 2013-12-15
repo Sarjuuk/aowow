@@ -372,6 +372,8 @@ $lang = array(
         '_radius'       => "Radius",
         '_interval'     => "Interval",
         '_inSlot'       => "im Platz",
+        '_collapseAll'  => "Alle einklappen",
+        '_expandAll'    => "Alle ausklappen",
 
         'ppm'           => "%s Auslösungen pro Minute",
         'procChance'    => "Procchance",

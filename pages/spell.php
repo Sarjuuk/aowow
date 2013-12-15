@@ -241,6 +241,158 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     /* Main Content */
     /****************/
 
+    // chain reagents by method of accquisition
+    $reagentResult     = [];
+    $enhanced          = false;
+    $reagents          = $spell->getReagentsForCurrent();
+    $appendReagentItem = function(&$reagentResult, $_iId, $_qty, $_mult, $_level, $_path, $alreadyUsed) use (&$appendCreateSpell)
+    {
+        if (in_array($_iId, $alreadyUsed))
+            return false;
+
+        $item = DB::Aowow()->selectRow('
+            SELECT  name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, id, iconString, quality,
+            IF ( (spellId1 > 0 AND spellCharges1 < 0) OR
+                 (spellId2 > 0 AND spellCharges2 < 0) OR
+                 (spellId3 > 0 AND spellCharges3 < 0) OR
+                 (spellId4 > 0 AND spellCharges4 < 0) OR
+                 (spellId5 > 0 AND spellCharges5 < 0), 1, 0) AS consumed
+            FROM    ?_items
+            WHERE   id = ?d',
+            $_iId
+        );
+
+        if (!$item)
+            return false;
+
+        Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $item['id']);
+
+        $_level++;
+
+        if ($item['consumed'])
+            $_qty++;
+
+        $data = array(
+            'type'    => TYPE_ITEM,
+            'typeId'  => $item['id'],
+            'typeStr' => Util::$typeStrings[TYPE_ITEM],
+            'quality' => $item['quality'],
+            'name'    => Util::localizedString($item, 'name'),
+            'icon'    => $item['iconString'],
+            'qty'     => $_qty * $_mult,
+            'path'    => $_path.'.'.TYPE_ITEM.'-'.$item['id'],
+            'level'   => $_level
+        );
+
+        $idx = count($reagentResult);
+        $reagentResult[] = $data;
+        $alreadyUsed[]   = $item['id'];
+
+        if (!$appendCreateSpell($reagentResult, $item['id'], $data['qty'], $data['level'], $data['path'], $alreadyUsed))
+            $reagentResult[$idx]['final'] = true;
+
+        return true;
+    };
+    $appendCreateSpell = function(&$reagentResult, $_iId, $_qty, $_level, $_path, $alreadyUsed) use (&$appendReagentItem)
+    {
+        $_level++;
+        // when results are found executes in <10ms
+        // when no results are found executes in ~0.35sec
+        // dafuque?!
+        // ""solution"": index effect1Id and effect1CreateItemId and pray, that tradeSpells only use the first index  >.<
+        $spells = DB::Aowow()->select('
+            SELECT  reagent1,      reagent2,      reagent3,      reagent4,      reagent5,      reagent6,      reagent7,      reagent8,
+                    reagentCount1, reagentCount2, reagentCount3, reagentCount4, reagentCount5, reagentCount6, reagentCount7, reagentCount8,
+                    name_loc0,     name_loc2,     name_loc3,     name_loc6,     name_loc8,
+                    id AS ARRAY_KEY, iconString
+            FROM    ?_spell
+            WHERE   (effect1CreateItemId = ?d AND effect1Id = 24)',// OR
+                    // (effect2CreateItemId = ?d AND effect2Id = 24) OR
+                    // (effect3CreateItemId = ?d AND effect3Id = 24)',
+            $_iId//, $_iId, $_iId
+        );
+
+        if (!$spells)
+            return false;
+
+        $didAppendSomething = false;
+        foreach ($spells as $sId => $row)
+        {
+            if (in_array(-$sId, $alreadyUsed))
+                continue;
+
+            Util::$pageTemplate->extendGlobalIds(TYPE_SPELL, $sId);
+
+            $data = array(
+                'type'    => TYPE_SPELL,
+                'typeId'  => $sId,
+                'typeStr' => Util::$typeStrings[TYPE_SPELL],
+                'name'    => Util::localizedString($row, 'name'),
+                'icon'    => $row['iconString'],
+                'qty'     => $_qty,
+                'path'    => $_path.'.'.TYPE_SPELL.'-'.$sId,
+                'level'   => $_level,
+            );
+
+            $reagentResult[] = $data;
+            $_aU   = $alreadyUsed;
+            $_aU[] = -$sId;
+
+            $hasUnusedReagents = false;
+            for ($i = 1; $i < 9; $i++)
+            {
+                if ($row['reagent'.$i] <= 0 || $row['reagentCount'.$i] <= 0)
+                    continue;
+
+                if ($appendReagentItem($reagentResult, $row['reagent'.$i], $row['reagentCount'.$i], $data['qty'], $data['level'], $data['path'], $_aU))
+                {
+                    $hasUnusedReagents  = true;
+                    $didAppendSomething = true;
+                }
+            }
+
+            if (!$hasUnusedReagents)                        // no reagents were added, remove spell from result set
+                array_pop($reagentResult);
+        }
+
+        return $didAppendSomething;
+    };
+
+    if ($reagents)
+    {
+
+        foreach ($spell->relItems->iterate() as $iId => $__)
+        {
+            if (!in_array($iId, array_keys($reagents)))
+                continue;
+
+            $data = array(
+                'type'    => TYPE_ITEM,
+                'typeId'  => $iId,
+                'typeStr' => Util::$typeStrings[TYPE_ITEM],
+                'quality' => $spell->relItems->getField('quality'),
+                'name'    => $spell->relItems->getField('name', true),
+                'icon'    => $spell->relItems->getField('iconString'),
+                'qty'     => $reagents[$iId][1],
+                'path'    => TYPE_ITEM.'-'.$iId,            // id of the html-element
+                'level'   => 0                              // depths in array, used for indentation
+            );
+
+            $idx = count($reagentResult);
+            $reagentResult[] = $data;
+
+            // start with self and current original item in usedEntries (spell < 0; item > 0)
+            if ($appendCreateSpell($reagentResult, $iId, $data['qty'], 0, $data['path'], [-$_id, $iId]))
+                $enhanced = true;
+            else
+                $reagentResult[$idx]['final'] = true;
+        }
+    }
+
+    // increment all indizes (by prepending null and removing it again)
+    array_unshift($reagentResult, null);
+    unset($reagentResult[0]);
+
     $pageData = array(
         'title'   => $spell->getField('name', true),
         'path'    => json_encode($path, JSON_NUMERIC_CHECK),
@@ -256,7 +408,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'powerCost' => $spell->createPowerCostForCurrent(),
             'castTime'  => $spell->createCastTimeForCurrent(false, false),
             'tools'     => $spell->getToolsForCurrent(),
-            'reagents'  => $spell->getReagentsForCurrent(),
+            'reagents'  => [$enhanced, $reagentResult],
             'name'      => $spell->getField('name', true),
             'icon'      => $spell->getField('iconString'),
             'stack'     => $spell->getField('stackAmount'),
@@ -331,31 +483,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         {
                 $pageData['page']['tools'][$k]['quality'] = ITEM_QUALITY_HEIRLOOM - ITEM_QUALITY_NORMAL;
                 $pageData['page']['tools'][$k]['url']     = '?items&filter=cr=91;crs='.$tool['id'].';crv=0';
-        }
-    }
-
-    // prepare Reagents
-    if ($pageData['page']['reagents'])
-    {
-        $_ = $pageData['page']['reagents'];
-        $pageData['page']['reagents'] = [];
-
-        foreach ($spell->relItems->iterate() as $itemId => $__)
-        {
-            if (empty($_[$itemId]))
-                continue;
-
-            $pageData['page']['reagents'][] = array(
-                'name'    => $spell->relItems->getField('name', true),
-                'quality' => $spell->relItems->getField('quality'),
-                'entry'   => $itemId,
-                'count'   => $_[$itemId][1],
-            );
-
-            unset($_[$itemId]);
-
-            if (empty($_))
-                break;
         }
     }
 
@@ -908,7 +1035,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                             if (!$transform->error)
                             {
                                 $pageData['view3D'] = $transform->getRandomModelId();
-                                $pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $transform->getRandomModelId()]; 
+                                $pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $transform->getRandomModelId()];
                                 $bar = ' (<a href="?npc='.$effMV.'">'.$transform->getField('name', true).'</a>)';
                             }
                             else
@@ -940,7 +1067,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $pageData['infobox'] = !empty($pageData['infobox']) ? '[ul]'.implode('', $pageData['infobox']).'[/ul]' : null;
 
     unset($foo);                                            // clear reference
-
 
     /**************/
     /* Extra Tabs */

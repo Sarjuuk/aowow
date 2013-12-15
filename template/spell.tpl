@@ -26,7 +26,7 @@
 
 {if $lvData.page.reagents}
     {if $lvData.page.tools}<div style="float: left; margin-right: 75px">{/if}
-{include file='bricks/reagentList.tpl' reagent=$lvData.page.reagents}
+{include file='bricks/reagentList.tpl' reagents=$lvData.page.reagents[1] enhanced=$lvData.page.reagents[0]}
     {if $lvData.page.tools}</div>{/if}
 {/if}
 

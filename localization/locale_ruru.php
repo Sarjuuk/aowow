@@ -330,6 +330,8 @@ $lang = array(
         '_radius'       => "Радиус действия",
         '_interval'     => "Интервал",
         '_inSlot'       => "в слот",
+        '_collapseAll'  => "[Collapse All]",
+        '_expandAll'    => "[Expand All]",
 
         'ppm'           => "Срабатывает %s раз в минуту",
         'procChance'    => "Шанс срабатывания",
