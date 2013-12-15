@@ -223,9 +223,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // flag starter spell
-    if (isset($spell->sources[$spell->id]) && array_key_exists(10, $spell->sources[$spell->id]))
-        $infobox[] = '[li]'.Lang::$spell['starter'].'[/li]';
+    // accquisition..
+    if ($_ = @$spell->sources[$spell->id])
+    {
+        if (array_key_exists(10, $_))                       // ..starter spell
+            $infobox[] = '[li]'.Lang::$spell['starter'].'[/li]';
+        else if (array_key_exists(7, $_))                   // ..discovery
+            $infobox[] = '[li]'.Lang::$spell['discovered'].'[/li]';
+    }
 
     // training cost
     if ($cost = DB::Aowow()->selectCell('SELECT spellcost FROM npc_trainer WHERE spell = ?d', $spell->id))

@@ -22,11 +22,9 @@ class ItemList extends BaseType
 
     protected     $queryBase  = 'SELECT i.*, i.id AS ARRAY_KEY FROM ?_items i';
     protected     $queryOpts  = array(
-                      'is'  => [         's' => ', 1 as score', 'j' => '?_item_stats AS `is` ON `is`.`id` = `i`.`id`', 'h' => 'score > 0',                                                                     'o' => 'score DESC'],
-                      // 'iet' => [['ire'], 'j' => 'item_enchantment_template AS `iet` ON IF (`ire`.`id` > 0, `iet`.`entry` = `i`.`randomProperty`, `iet`.`entry` = `i`.`randomSuffix`)'],
-                      // 'ire' => [['iet'], 'j' => '?_itemrandomenchant AS `ire` ON ABS(ire.id) = iet.ench'],
-                      // 'idi' => ['s' => itemDisplayInfo]
-                      'i'   => [         'o' => 'i.quality DESC, i.itemLevel DESC']
+                      'is'  => ['s' => ', 1 as score', 'j' => '?_item_stats AS `is` ON `is`.`id` = `i`.`id`', 'h' => 'score > 0', 'o' => 'score DESC'],
+                      's'   => ['j' => ['?_spell AS `s` ON s.effect1CreateItemId = i.id', true], 'g' => 'i.id'],
+                      'i'   => ['o' => 'i.quality DESC, i.itemLevel DESC']
                   );
 
     public function __construct($conditions = [], $applyFilter = false, $miscData = null)
@@ -871,7 +869,7 @@ class ItemList extends BaseType
             {
                 for ($j = $i; $j < count($setSpells); $j++)
                 {
-                    if($setSpells[$j]['bonus'] >= $setSpells[$i]['bonus'])
+                    if ($setSpells[$j]['bonus'] >= $setSpells[$i]['bonus'])
                         continue;
 
                     $tmp = $setSpells[$i];
@@ -1425,7 +1423,7 @@ class ItemListFilter extends Filter
     // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
     private $ubFilter        = [];
     protected $enums         = array(
-        99 => array(                                        // profession
+        99 => array(                                        // profession | recycled for 86, 87
             null, 171, 164, 185, 333, 202, 129, 755, 165, 186, 197, true, false, 356, 182, 773
         ),
         66 => array(                                        // profession specialization
@@ -1444,23 +1442,6 @@ class ItemListFilter extends Filter
             13 => -1,
             14 => -1,
             15 => -1
-        ),
-        87 => array(                                        // reagent for profession
-             1 => 171,
-             2 => 164,
-             3 => 185,
-             4 => 333,
-             5 => 202,
-             6 => 129,
-             7 => 755,
-             8 => 165,
-             9 => 186,
-            10 => 197,
-            11 => true,
-            12 => false,
-            13 => 356,
-            14 => 182,
-            15 => 773,
         ),
         152 => array(                                       // class-specific
             null, 1, 2, 3, 4, 5, 6, 7, 8, 9, null, 11, true, false
@@ -1719,8 +1700,14 @@ class ItemListFilter extends Filter
 
                 $this->formData['extraCols'][] = $cr[0];
                 return ['AND', ['armordamagemodifier', $cr[2], $cr[1]], ['class', ITEM_CLASS_ARMOR]];
-            case 86:                                        // craftedprof [profession]
-/* todo */      return [1];
+            case 86:                                        // craftedprof [enum]
+                $_ = @$this->enums[99][$cr[1]];             // recycled enum
+                if (is_bool($_))
+                    return ['i.source', '1:', $_ ? null : '!'];
+                else if (is_int($_))
+                    return ['s.skillLine1', $_];
+
+                break;
             case 16:                                        // dropsin [zone]
 /* todo */      return [1];
             case 105:                                       // dropsinnormal [heroicdungeon-any]
@@ -1801,7 +1788,7 @@ class ItemListFilter extends Filter
             case 85:                                        // objectivequest [side]
 /* todo */      return [1];
             case 87:                                        // reagentforability [enum]
-                $_ = @$this->enums[$cr[0]][$cr[1]];
+                $_ = @$this->enums[99][$cr[1]];             // recycled enum
                 if ($_ !== null)
                 {
                     $ids    = [];

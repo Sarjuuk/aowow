@@ -362,6 +362,7 @@ $lang = array(
         '_collapseAll'  => "Collapse All",
         '_expandAll'    => "Expand All",
 
+        'discovered'    => "Learned via discovery",
         'ppm'           => "%s procs per minute",
         'procChance'    => "Proc chance",
         'starter'       => "Starter spell",

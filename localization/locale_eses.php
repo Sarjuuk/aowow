@@ -333,6 +333,7 @@ $lang = array(
         '_collapseAll'  => "Contraer todo",
         '_expandAll'    => "Expandier todo",
 
+        'discovered'    => "Aprendido via descubrimiento",
         'ppm'           => "%s procs por minuto",
         'procChance'    => "Probabilidad de que accione",
         'starter'       => "Hechizo inicial",
@@ -367,7 +368,7 @@ $lang = array(
             'base'    => "<small>Muestra %s relacionados con <b>%s</b></small>",
             'link'    => " u ",
             'recipes' => "<a href=\"?items=9.%s\">objetos de receta</a>",
-            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s\">objetos fabricados</a>"
+            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s;crv=0\">objetos fabricados</a>"
         ),
         'cat'           => array(
               7 => "Habilidades",

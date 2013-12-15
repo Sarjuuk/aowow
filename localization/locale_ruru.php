@@ -333,6 +333,7 @@ $lang = array(
         '_collapseAll'  => "[Collapse All]",
         '_expandAll'    => "[Expand All]",
 
+        'discovered'    => "Изучается путём освоения местности",
         'ppm'           => "Срабатывает %s раз в минуту",
         'procChance'    => "Шанс срабатывания",
         'starter'       => "Начальное заклинание",
@@ -367,7 +368,7 @@ $lang = array(
             'base'    => "<small>Показать %s, относящиеся к профессии <b>%s</b></small>",
             'link'    => " или ",
             'recipes' => "<a href=\"?items=9.%s\">рецепты</a>",
-            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s\">производимые предметы</a>"
+            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s;crv=0\">производимые предметы</a>"
         ),
         'cat'           => array(
               7 => "Способности",

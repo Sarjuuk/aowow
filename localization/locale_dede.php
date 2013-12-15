@@ -375,6 +375,7 @@ $lang = array(
         '_collapseAll'  => "Alle einklappen",
         '_expandAll'    => "Alle ausklappen",
 
+        'discovered'    => "Durch Geistesblitz erlernt",
         'ppm'           => "%s Auslösungen pro Minute",
         'procChance'    => "Procchance",
         'starter'       => "Basiszauber",
@@ -409,7 +410,7 @@ $lang = array(
             'base'    => "<small>%s im Zusammenhang mit <b>%s</b> anzeigen</small>",
             'link'    => " oder ",
             'recipes' => "<a href=\"?items=9.%s\">Rezeptgegenstände</a>",
-            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s\">Hergestellte Gegenstände</a>"
+            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s;crv=0\">Hergestellte Gegenstände</a>"
         ),
         'cat'           => array(
               7 => "Klassenfertigkeiten",
