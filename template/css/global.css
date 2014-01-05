@@ -1460,16 +1460,22 @@ a.star-icon-right span
     padding-left: 12px !important;
 }
 
-.alliance2-icon
+.alliance-icon-padded
 {
     background: url(../../images/icons/alliance-icon.gif) 4px center no-repeat;
-    padding-left: 18px !important;
+    padding-left: 20px !important;
 }
 
 .horde-icon
 {
     background: url(../../images/icons/horde-icon.gif) left center no-repeat;
     padding-left: 18px !important;
+}
+
+.horde-icon-padded
+{
+    background: url(../../images/icons/horde-icon.gif) 1px center no-repeat;
+    padding-left: 20px !important;
 }
 
 .ffapvp-icon

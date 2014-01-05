@@ -58,7 +58,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // tab: tameable & gallery
     $condition = array(
         ['ct.type', 1],                                     // Beast
-        ['ct.type_flags', 0x1, '&'],                        // tameable
+        ['ct.typeFlags', 0x1, '&'],                         // tameable
         ['ct.family', $_id],                                // displayed petType
         [
             'OR',                                           // at least neutral to at least one faction

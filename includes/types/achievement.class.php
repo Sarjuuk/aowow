@@ -16,7 +16,7 @@ class AchievementList extends BaseType
     protected     $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
     protected     $queryOpts = array(
                         'a'  => ['o' => 'orderInGroup ASC'],
-                        'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievement` = `a`.`id`', true], 'g' => '`a`.`id`']
+                        'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
                   );
 
     public function __construct($conditions = [], $applyFilter = false)
@@ -26,9 +26,6 @@ class AchievementList extends BaseType
         // post processing
         foreach ($this->iterate() as &$_curTpl)
         {
-            if (!$_curTpl['iconString'])
-                $_curTpl['iconString'] = 'INV_Misc_QuestionMark';
-
             //"rewards":[[11,137],[3,138]]   [type, typeId]
             $_curTpl['rewards'] = [TYPE_ITEM => [], TYPE_TITLE => []];
             if (!empty($_curTpl['rewardIds']))
@@ -89,10 +86,10 @@ class AchievementList extends BaseType
             $rewards = [];
             foreach ($this->curTpl['rewards'] as $type => $rIds)
                 foreach ($rIds as $rId)
-                    $rewards[] = '['.$type.','.$rId.']';
+                    $rewards[] = [$type, $rId];
 
             if ($rewards)
-                $data[$this->id]['rewards'] = '['.implode(',', $rewards).']';
+                $data[$this->id]['rewards'] = json_encode($rewards, JSON_NUMERIC_CHECK);
             else if (!empty($this->curTpl['reward']))
                 $data[$this->id]['reward'] = $this->getField('reward', true);
         }
@@ -101,29 +98,23 @@ class AchievementList extends BaseType
     }
 
     // only for current template
-    public function getCriteria($idx = -1)
+    public function getCriteria()
     {
-        foreach ($this->iterate() as $__)
-        {
-            $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievement` = ? ORDER BY `order` ASC', $this->id);
-            if (!$result)
-                return [];
-
-            if (is_array($result[0]))
-                $this->criteria[$this->id] = $result;
-            else
-                $this->criteria[$this->id][] = $result;
-        }
-
-        if ($idx < 0)
+        if (isset($this->criteria[$this->id]))
             return $this->criteria[$this->id];
-        else
-            return $this->criteria[$this->id][$idx];
+
+        $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievementId` = ?d ORDER BY `order` ASC', $this->id);
+        if (!$result)
+            return [];
+
+        $this->criteria[$this->id] = $result;
+
+        return $this->criteria[$this->id];
     }
 
     public function renderTooltip()
     {
-        if (!empty($this->tooltip[$this->id]))
+        if (isset($this->tooltip[$this->id]))
             return $this->tooltip[$this->id];
 
         $criteria = $this->getCriteria();
@@ -148,7 +139,7 @@ class AchievementList extends BaseType
         foreach ($rows as $crt)
         {
             // we could show them, but the tooltips are cluttered
-            if (($crt['complete_flags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::$perms <= 0)
+            if (($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::$perms <= 0)
                 continue;
 
             $crtName = Util::jsEscape(Util::localizedString($crt, 'name'));
@@ -176,7 +167,7 @@ class AchievementList extends BaseType
                     break;
             }
 
-            if ($crt['complete_flags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER)
+            if ($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER)
                 $criteria .= '- '.htmlspecialchars($crtName).' <span class="moneygold">'.number_format($crt['value2' ] / 10000).'</span><br />';
             else
                 $criteria .= '- '.htmlspecialchars($crtName).'<br />';

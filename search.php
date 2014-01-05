@@ -63,6 +63,9 @@ $_wtv       = isset($_GET['wtv']) ? explode(':', $_GET['wtv']) : null;
 
 if (isset($_GET['json']))
 {
+    if ($_ = intVal($search))                               // allow for search by Id
+        $query = $_;
+
     if ($type == TYPE_ITEMSET)
         $searchMask |= SEARCH_TYPE_JSON | 0x60;
     else if ($type == TYPE_ITEM)
@@ -76,10 +79,11 @@ else if (isset($_GET['opensearch']))
 else
     $searchMask |= SEARCH_TYPE_REGULAR | SEARCH_MASK_ALL;
 
+
 $cacheKey = implode('_', [CACHETYPE_SEARCH, $searchMask, sha1($query), User::$localeId]);
 
 // invalid conditions: not enough characters to search OR no types to search
-if (strlen($query) < 3 || !($searchMask & SEARCH_MASK_ALL))
+if ((strlen($query) < 3 || !($searchMask & SEARCH_MASK_ALL)) && !($searchMask & SEARCH_TYPE_JSON && intVal($search)))
 {
     if ($searchMask & SEARCH_TYPE_REGULAR)
     {
@@ -110,11 +114,6 @@ if (strlen($query) < 3 || !($searchMask & SEARCH_MASK_ALL))
 // 1 Classes:
 if ($searchMask & 0x1)
 {
-    /*  custom data :(
-        armor:     build manually - ItemSubClassMask (+Shield +Relics)
-        weapon:    build manually - ItemSubClassMask
-        roles:     build manually - 1:heal; 2:mleDPS; 4:rngDPS; 8:tank
-    */
     $classes = new CharClassList(array(['name_loc'.User::$localeId, $query], $maxResults));
 
     if ($data = $classes->getListviewData())
@@ -293,7 +292,7 @@ if ($searchMask & 0x20)
 {
     $conditions = array(
         ['item1', 0, '!'],                                  // remove empty sets from search
-        ['name_loc'.User::$localeId, $query],
+        is_int($query) ? ['id', $query] : ['name_loc'.User::$localeId, $query],
         $maxResults
     );
 
@@ -328,6 +327,7 @@ if ($searchMask & 0x20)
 if ($searchMask & 0x40)
 {
     $miscData = $conditions = [];
+    $cnd = is_int($query) ? ['id', $query] : ['name_loc'.User::$localeId, $query];
 
     if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
     {
@@ -336,11 +336,11 @@ if ($searchMask & 0x40)
     }
     else if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEM)
     {
-        $conditions = [['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], ['name_loc'.User::$localeId, $query], SQL_LIMIT_DEFAULT];
+        $conditions = [['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], $cnd, SQL_LIMIT_DEFAULT];
         $miscData   = ['wt' => $_wt, 'wtv' => $_wtv];
     }
     else
-        $conditions = [['name_loc'.User::$localeId, $query], $maxResults];
+        $conditions = [$cnd, $maxResults];
 
     $items = new ItemList($conditions, false, $miscData);
 

@@ -16,58 +16,15 @@
                 g_initPath({$page.path});
             //]]></script>
 
-{* include file='bricks/infobox.tpl' info=$lvData.infobox *}
-
-            <table class="infobox">
-            <tr><th>{$lang.quickFacts}</th></tr>
-            <tr><td><div class="infobox-spacer"></div>
-                <ul>
-                    {if $lvData.page.points}<li><div>{$lang.points}{$lang.colon}<span class="moneyachievement tip" onmouseover="Listview.funcBox.moneyAchievementOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">{$lvData.page.points}</span></div></li>{/if}
-{foreach from=$lvData.infobox item=info}
-                    <li><div>{$info}</div></li>
-{/foreach}
-                    {*<li><div>Location: {$lvData.page.location}</div></li> todo: need to be parsed first *}
-                </ul>
-            </td></tr>
-        {strip}{*************** CHAIN ​​OF ACHIEVEMENTS ***************}
-            {if isset($lvData.page.series)}
-            <tr><th>{$lang.series}</th></tr>
-            <tr><td><div class="infobox-spacer"></div>
-                    <table class="series">
-{section name=i loop=$lvData.page.series}
-                        <tr>
-                            <th>{$smarty.section.i.index+1}.</th>
-                            <td>
-                                {if ($lvData.page.series[i].id == $page.typeId)}
-                                    <b>{$lvData.page.series[i].name}</b>
-                                {else}
-                                    <div><a href="?achievement={$lvData.page.series[i].id}">{$lvData.page.series[i].name}</a></div>
-                                {/if}
-                            </td>
-                        </tr>
-{/section}
-                    </table>
-                </td>
-            </tr>
-            {/if}
-         {/strip}{*************** / CHAIN ​​OF ACHIEVEMENTS ***************}
-            <tr><th id="infobox-screenshots">{$lang.screenshots}</th></tr>
-            <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-ss"></div></td></tr>
-            <tr><th id="infobox-videos">{$lang.videos}</th></tr>
-            <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-vi"></div></td></tr>
-            </table>
-            <script type="text/javascript">ss_appendSticky()</script>
-            <script type="text/javascript">vi_appendSticky()</script>
+{include file='bricks/infobox.tpl' info=$lvData.infobox series=$lvData.series}
 
             <div class="text">
+{include file='bricks/redButtons.tpl'}
 
                 <div id="h1-icon-generic" class="h1-icon"></div>
-
                 <script type="text/javascript">//<![CDATA[
                     $WH.ge('h1-icon-generic').appendChild(Icon.create('{$lvData.page.iconname|escape:"javascript"}', 1));
                 //]]></script>
-
-{include file='bricks/redButtons.tpl'}
 
                 <h1 class="h1-icon">{$lvData.page.name}</h1>
 

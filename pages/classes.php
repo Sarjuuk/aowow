@@ -8,16 +8,16 @@ $cacheKey = implode('_', [CACHETYPE_PAGE, TYPE_CLASS, -1, -1, User::$localeId]);
 
 if (!$smarty->loadCache($cacheKey, $pageData))
 {
-    $pageData = array(
-        'listviews' => []
-    );
-
     $classes = new CharClassList();
 
-    $pageData['listviews'][] = array(
-        'file'   => 'class',
-        'data'   => $classes->getListviewData(),
-        'params' => []
+    $pageData = array(
+        'listviews' => array(
+            array(
+                'file'   => 'class',
+                'data'   => $classes->getListviewData(),
+                'params' => []
+            )
+        )
     );
 
     $smarty->saveCache($cacheKey, $pageData);

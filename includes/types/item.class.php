@@ -1303,9 +1303,9 @@ class ItemList extends BaseType
                     // subitems may share enchantmentIds
                     if (!isset($this->rndEnchIds[$enchId]))
                     {
-                        $stats = Util::parseItemEnchantment($enchId, false, $text);
+                        $stats = Util::parseItemEnchantment($enchId, false, $misc);
                         $this->rndEnchIds[$enchId] = array(
-                            'text'  => $text,
+                            'text'  => $misc['name'],
                             'stats' => $stats
                         );
                     }

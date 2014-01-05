@@ -6,23 +6,10 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/community.class.php';
 
-$_id         = intVal($pageParam);
-$_mask       = 1 << ($_id - 1);
-$_path       = [0, 12, $_id];
-$tcClassId   = [null, 8, 3, 1, 5, 4, 9, 6, 2, 7, null, 0]; // see TalentCalc.js
-$classSkills = array(
-     1 => [ 26, 256, 257],
-     2 => [594, 267, 184],
-     3 => [ 50, 163,  51],
-     4 => [253,  38,  39],
-     5 => [613,  56,  78],
-     6 => [770, 771, 772, 776],
-     7 => [375, 373, 374],
-     8 => [237,   8,   6],
-     9 => [355, 354, 593],
-    11 => [574, 134, 573]
-);
-
+$_id          = intVal($pageParam);
+$_mask        = 1 << ($_id - 1);
+$_path        = [0, 12, $_id];
+$tcClassId    = [null, 8, 3, 1, 5, 4, 9, 6, 2, 7, null, 0]; // see TalentCalc.js
 $cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_CLASS, $_id, -1, User::$localeId]);
 
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
@@ -57,16 +44,18 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if ($cl->getField('roles') & (1 << $i))
             $roles[] = (count($roles) == 2 ? '\n' : '').Lang::$game['_roles'][$i];
 
-    $infobox[] = (count($roles) > 1 ? Lang::$game['roles'] : Lang::$game['role']).Lang::$colon.implode(', ', $roles);
+    if ($roles)
+        $infobox[] = (count($roles) > 1 ? Lang::$game['roles'] : Lang::$game['role']).Lang::$colon.implode(', ', $roles);
 
     // specs
     $specList = [];
-    $skills = new SkillList(array(['id', $classSkills[$_id]]));
+    $skills = new SkillList(array(['id', $cl->getField('skills')]));
     $skills->addGlobalsToJscript($smarty);
     foreach ($skills->iterate() as $k => $__)
         $specList[$k] = '[icon name='.$skills->getField('iconString').'][url=?spells=7.'.$_id.'.'.$k.']'.$skills->getField('name', true).'[/url][/icon]';
 
-    $infobox[] = Lang::$game['specs'].Lang::$colon.'[ul][li]'.implode('[/li][li]', $specList).'[/li][/ul]';
+    if ($specList)
+        $infobox[] = Lang::$game['specs'].Lang::$colon.'[ul][li]'.implode('[/li][li]', $specList).'[/li][/ul]';
 
     /****************/
     /* Main Content */
@@ -106,8 +95,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         [
             'OR',
             ['s.reqClassMask', $_mask, '&'],                // Glyphs, Proficiencies
-            ['s.skillLine1', $classSkills[$_id]],           // Abilities / Talents
-            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $classSkills[$_id]]]
+            ['s.skillLine1', $cl->getField('skills')],      // Abilities / Talents
+            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $cl->getField('skills')]]
         ],
         [                                                   // last rank or unranked
             'OR',

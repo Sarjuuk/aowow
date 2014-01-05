@@ -15,7 +15,7 @@ class CreatureList extends BaseType
     protected       $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
     protected       $queryOpts = array(
                         'ct' => [['ft']],
-                        'ft' => ['j' => '?_factiontemplate ft ON ft.id = ct.faction_A', 's' => ', ft.A, ft.H, ft.factionId']
+                        'ft' => ['j' => '?_factiontemplate ft ON ft.id = ct.factionA', 's' => ', ft.A, ft.H, ft.factionId']
                     );
 
     public static function getName($id)
@@ -49,9 +49,9 @@ class CreatureList extends BaseType
         $row3  = [Lang::$game['level']];
         $fam   = $this->curTpl['family'];
         // todo (low): rework, when factions are implemented
-        $fac   = DB::Aowow()->selectRow('SELECT * FROM dbc.faction f JOIN dbc.factionTemplate ft ON f.id = ft.factionId WHERE ft.id = ?d AND NOT f.reputationFlags1 & 0x4 AND f.reputationIndex <> -1', $this->curTpl['faction_A']);
+        $fac   = DB::Aowow()->selectRow('SELECT * FROM dbc.faction f JOIN dbc.factionTemplate ft ON f.id = ft.factionId WHERE ft.id = ?d AND NOT f.reputationFlags1 & 0x4 AND f.reputationIndex <> -1', $this->curTpl['factionA']);
 
-        if (!($this->curTpl['type_flags'] & 0x4))
+        if (!($this->curTpl['typeFlags'] & 0x4))
         {
             $level = $this->curTpl['minlevel'];
             if ($level != $this->curTpl['maxlevel'])
@@ -151,7 +151,7 @@ class CreatureList extends BaseType
                     'minlevel' => $this->curTpl['minlevel'],
                     'maxlevel' => $this->curTpl['maxlevel'],
                     'id'       => $this->id,
-                    'boss'     => $this->curTpl['type_flags'] & 0x4 ? 1 : 0,
+                    'boss'     => $this->curTpl['typeFlags'] & 0x4 ? 1 : 0,
                     'rank'     => $this->curTpl['rank'],    // classification(?)
                     'location' => $this->getSpawns(SPAWNINFO_ZONES),
                     'name'     => $this->getField('name', true),

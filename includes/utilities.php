@@ -280,7 +280,7 @@ class SmartyAoWoW extends Smarty
 {
     private $config    = [];
     private $jsGlobals = [];
-    private $errors    = [];
+    private $notices   = [];
 
     public function __construct($config)
     {
@@ -1627,14 +1627,31 @@ class Util
     // 6 => TYPE_TOTEM              Rockbiter AmountX as Damage (ignore)
     // 7 => TYPE_USE_SPELL          Engineering gadgets
     // 8 => TYPE_PRISMATIC_SOCKET   Extra Sockets AmountX as socketCount (ignore)
-    public static function parseItemEnchantment($eId, $raw = false, &$name = null)
+    public static function parseItemEnchantment($eId, $raw = false, &$misc = null)
     {
         $enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $eId);
         if (!$enchant)
             return [];
 
-        $name = self::localizedString($enchant, 'text');
+        $misc = array(
+            'name' => self::localizedString($enchant, 'text'),
+            'text' => array(
+                'text_loc0' => $enchant['text_loc0'],
+                'text_loc2' => $enchant['text_loc2'],
+                'text_loc3' => $enchant['text_loc3'],
+                'text_loc6' => $enchant['text_loc6'],
+                'text_loc8' => $enchant['text_loc8']
+            )
+        );
 
+        if ($enchant['skillLine'] > 0)
+            $misc['reqskill'] = $enchant['skillLine'];
+
+        if ($enchant['skillLevel'] > 0)
+            $misc['reqskillrank'] = $enchant['skillLevel'];
+
+        if ($enchant['requiredLevel'] > 0)
+            $misc['reqlevel'] = $enchant['requiredLevel'];
 
         // parse stats
         $jsonStats = [];
@@ -1950,7 +1967,7 @@ class Util
                 $sum = 0;
             else if ($sum > 100)
             {
-                Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by LootId: entry '.$lootId.' / group '.$k.' has a total chance of '.$sum.'%. Some items cannot drop!');
+                Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by LootId: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
                 $sum = 100;
             }
 
@@ -2111,7 +2128,7 @@ class Util
                     Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] > 100)
-                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.$ref['sumChance'].'% total chance! Some items cannot drop!');
+                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] == 100 && !$ref['chance'])
                     Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');

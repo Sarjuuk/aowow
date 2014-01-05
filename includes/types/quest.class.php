@@ -11,10 +11,10 @@ class QuestList extends BaseType
     public          $requires  = [];
     public          $rewards   = [];
 
-    protected       $queryBase = 'SELECT *, id AS ARRAY_KEY FROM quest_template qt';
+    protected       $queryBase = 'SELECT *, qt.id AS ARRAY_KEY FROM quest_template qt';
     protected       $queryOpts = array(
                         'qt' => [['lq']],
-                        'lq' => ['j' => ['locales_quest lq ON qt.id = lq.entry', true]]
+                        'lq' => ['j' => ['locales_quest lq ON qt.id = lq.id', true]]
                     );
 
     public function __construct($conditions = [])

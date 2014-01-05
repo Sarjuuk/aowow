@@ -27,6 +27,9 @@ class TitleList extends BaseType
                 $sources = explode(' ', $this->curTpl['source']);
                 foreach ($sources as $src)
                 {
+                    if (!$src)                              // rogue whitespace slipped through
+                        continue;
+
                     $src = explode(':', $src);
                     $this->sources[$this->id][$src[0]][] = $src[1];
                 }

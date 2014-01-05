@@ -15,8 +15,7 @@ class CharClassList extends BaseType
         parent::__construct($conditions);
 
         foreach ($this->iterate() as $k => &$_curTpl)
-            if ($k == 6)                                    // todo (low): grr, move to db
-                $_curTpl['hero'] = 1;
+            $_curTpl['skills'] = explode(' ', $_curTpl['skills']);
     }
 
     public function getListviewData()
