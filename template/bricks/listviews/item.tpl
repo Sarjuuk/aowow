@@ -1,3 +1,24 @@
+{if !empty($tab.showRep)}
+var _ = [
+    {ldelim}
+        id: 'standing',
+        after: 'reqlevel',
+        name: LANG.standing,
+        width: '12%',
+        value: 'standing',
+        type: 'text',
+        getValue: function(item)
+        {ldelim}
+            return g_reputation_standings[item.standing];
+        {rdelim},
+        compute: function(item, td)
+        {ldelim}
+            return g_reputation_standings[item.standing];
+        {rdelim}
+    {rdelim}
+];
+{/if}
+
 {strip}
     new Listview({ldelim}
         template:'item',

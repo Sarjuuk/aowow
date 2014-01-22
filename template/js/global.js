@@ -825,132 +825,164 @@ function g_formatTimeSimple(d, txt, noPrefix) {
     return txt;
 }
 
-function g_cleanCharacterName(e) {
-    var d = "";
-    for (var c = 0, a = e.length; c < a; ++c) {
-        var b = e.charAt(c).toLowerCase();
-        if (b >= "a" && b <= "z") {
-            d += b
-        } else {
-            d += e.charAt(c)
-        }
-    }
-    return d
-}
-function g_createGlow(a, h) {
-    var e = $WH.ce("span");
-    for (var c = -1; c <= 1; ++c) {
-        for (var b = -1; b <= 1; ++b) {
-            var g = $WH.ce("div");
-            g.style.position = "absolute";
-            g.style.whiteSpace = "nowrap";
-            g.style.left = c + "px";
-            g.style.top = b + "px";
-            if (c == 0 && b == 0) {
-                g.style.zIndex = 4
-            } else {
-                g.style.color = "black";
-                g.style.zIndex = 2
+function g_createGlow(txt, cn) {
+    var s = $WH.ce('span');
+
+    for (var i = -1; i <= 1; ++i) {
+        for (var j = -1; j <= 1; ++j) {
+            var d = $WH.ce('div');
+            d.style.position = 'absolute';
+            d.style.whiteSpace = 'nowrap';
+            d.style.left = i + 'px';
+            d.style.top = j + 'px';
+
+            if (i == 0 && j == 0) {
+                d.style.zIndex = 4;
             }
-            g.innerHTML = a;
-            $WH.ae(e, g)
+            else {
+                d.style.color = 'black';
+                d.style.zIndex = 2;
+            }
+            //$WH.ae(d, $WH.ct(txt));
+            d.innerHTML = txt;
+            $WH.ae(s, d);
         }
     }
-    e.style.position = "relative";
-    e.className = "glow" + (h != null ? " " + h: "");
-    var f = $WH.ce("span");
-    f.style.visibility = "hidden";
-    $WH.ae(f, $WH.ct(a));
-    $WH.ae(e, f);
-    return e
+
+    s.style.position = 'relative';
+    s.className = 'glow' + (cn != null ? ' ' + cn : '');
+
+    var ph = $WH.ce('span');
+    ph.style.visibility = 'hidden';
+    $WH.ae(ph, $WH.ct(txt));
+    $WH.ae(s, ph);
+
+    return s;
 }
-function g_createProgressBar(c) {
-    if (c == null) {
-        c = {}
+
+function g_createProgressBar(opt) {
+    if (opt == null) {
+        opt = {};
     }
-    if (!c.text) {
-        c.text = " "
+
+    if (typeof opt.text == 'undefined') {
+        opt.text = ' ';
     }
-    if (c.color == null) {
-        c.color = "rep0"
+
+    if (opt.color == null) {
+        opt.color = 'rep0';
+
     }
-    if (c.width == null || c.width > 100) {
-        c.width = 100
+    if (opt.width == null || opt.width > 100) {
+        opt.width = 100;
     }
-    var d, e;
-    if (c.hoverText) {
-        d = $WH.ce("a");
-        d.href = "javascript:;"
-    } else {
-        d = $WH.ce("span")
+
+    var el, div;
+    if (opt.hoverText) {
+        el = $WH.ce('a');
+        el.href = 'javascript:;';
     }
-    d.className = "progressbar";
-    if (c.text || c.hoverText) {
-        e = $WH.ce("div");
-        e.className = "progressbar-text";
-        if (c.text) {
-            var a = $WH.ce("del");
-            $WH.ae(a, $WH.ct(c.text));
-            $WH.ae(e, a)
+    else {
+        el = $WH.ce('span');
+    }
+
+    el.className = 'progressbar';
+
+    if (opt.text || opt.hoverText) {
+        div = $WH.ce('div');
+        div.className = 'progressbar-text';
+
+        if (opt.text) {
+            var del = $WH.ce('del');
+            $WH.ae(del, $WH.ct(opt.text));
+            $WH.ae(div, del);
         }
-        if (c.hoverText) {
-            var b = $WH.ce("ins");
-            $WH.ae(b, $WH.ct(c.hoverText));
-            $WH.ae(e, b)
+
+        if (opt.hoverText) {
+            var ins = $WH.ce('ins');
+            $WH.ae(ins, $WH.ct(opt.hoverText));
+            $WH.ae(div, ins);
         }
-        $WH.ae(d, e)
+
+        $WH.ae(el, div);
     }
-    e = $WH.ce("div");
-    e.className = "progressbar-" + c.color;
-    e.style.width = c.width + "%";
-    $WH.ae(e, $WH.ct(String.fromCharCode(160)));
-    $WH.ae(d, e);
-    return d
+
+    div = $WH.ce('div');
+    div.className = 'progressbar-' + opt.color;
+    div.style.width = opt.width + '%';
+    if (opt.height) {
+        div.style.height = opt.height;
+    }
+
+    $WH.ae(div, $WH.ct(String.fromCharCode(160)));
+    $WH.ae(el, div);
+
+    if (opt.text) {
+        var div = $WH.ce('div');
+        div.className = 'progressbar-text progressbar-hidden';
+        $WH.ae(div, $WH.ct(opt.text));
+        $WH.ae(el, div);
+    }
+
+    return el;
 }
-function g_createReputationBar(g) {
-    var f = g_createReputationBar.P;
-    if (!g) {
-        g = 0
+
+function g_createReputationBar(totalRep) {
+    var P = g_createReputationBar.P;
+
+    if (!totalRep) {
+        totalRep = 0;
     }
-    g += 42000;
-    if (g < 0) {
-        g = 0
-    } else {
-        if (g > 84999) {
-            g = 84999
+
+    totalRep += 42000;
+    if (totalRep < 0) {
+        totalRep = 0;
+    }
+    else if (totalRep > 84999) {
+        totalRep = 84999;
+    }
+
+    var
+        currentRep = totalRep,
+        maxRep,
+        standing = 0;
+
+    for (var i = 0, len = P.length; i < len; ++i) {
+        if (P[i] > currentRep) {
+            break;
+        }
+
+        if (i < len - 1) {
+            currentRep -= P[i];
+            standing = i + 1;
         }
     }
-    var e = g,
-    h, b = 0;
-    for (var d = 0, a = f.length; d < a; ++d) {
-        if (f[d] > e) {
-            break
-        }
-        if (d < a - 1) {
-            e -= f[d];
-            b = d + 1
-        }
-    }
-    h = f[b];
-    var c = {
-        text: g_reputation_standings[b],
-        hoverText: e + " / " + h,
-        color: "rep" + b,
-        width: parseInt(e / h * 100)
+
+    maxRep = P[standing];
+
+    var opt = {
+        text:      g_reputation_standings[standing],
+        hoverText: currentRep + ' / ' + maxRep,
+        color:     'rep' + standing,
+        width:     parseInt(currentRep / maxRep * 100)
     };
-    return g_createProgressBar(c)
+
+    return g_createProgressBar(opt);
 }
 g_createReputationBar.P = [36000, 3000, 3000, 3000, 6000, 12000, 21000, 999];
-function g_createAchievementBar(b, d, a) {
-    if (!b) {
-        b = 0
+
+function g_createAchievementBar(points, outOf, overall, bonus) {
+    if (!points) {
+        points = 0;
     }
-    var c = {
-        text: b + (d > 0 ? " / " + d: ""),
-        color: (a ? "rep7": "ach" + (d > 0 ? 0 : 1)),
-        width: (d > 0 ? parseInt(b / d * 100) : 100)
+
+    var opt = {
+        text: points + (bonus > 0 ? '(+' + bonus + ')': '') + (outOf > 0 ? ' / ' + outOf: ''),
+        color: (overall ? 'rep7' : 'ach' + (outOf > 0 ? 0 : 1)),
+        width: (outOf > 0 ? parseInt(points / outOf * 100) : 100)
     };
-    return g_createProgressBar(c)
+
+    return g_createProgressBar(opt);
 }
 
 function g_getMoneyHtml(money, side, costItems, costCurrency, achievementPoints) {

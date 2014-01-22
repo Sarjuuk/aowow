@@ -112,7 +112,7 @@ class QuestList extends BaseType
         return $data;
     }
 
-    public function getListviewData()
+    public function getListviewData($extraFactionId = 0)    // i should formulate a propper parameter..
     {
         $data = [];
 
@@ -170,6 +170,7 @@ class QuestList extends BaseType
                 $data[$this->id]['weekly'] = true;
 
             // flags & 64: Hostile - there are quests, that flag the player for pvp when taken .. where is that set..?
+            // wflags: &1: disabled/historical; &32: AutoAccept; &64: Hostile(?)
             if ($this->curTpl['Flags'] & 0x4000)            // Unavailable (todo (med): get disables)
             {
                 $data[$this->id]['historical'] = true;      // post 5.0
@@ -179,7 +180,23 @@ class QuestList extends BaseType
             if ($this->curTpl['Flags'] & 0x80000)           // Auto Accept
                 $data[$this->id]['wflags'] |= 0x20;
 
-            // todo reprewards .. accesses QuestFactionReward.dbc
+            $data[$this->id]['reprewards'] = [];
+            for ($i = 1; $i < 6; $i++)
+            {
+                $foo = $this->curTpl['RewardFactionId'.$i];
+                $bar = $this->curTpl['RewardFactionValueIdOverride'.$i] / 100;
+
+                if (!$bar && ($_ = $this->curTpl['RewardFactionValueId'.$i]))
+                    $bar = Util::$questFactionReward[abs($_)] * ($_ < 0 ? -1 : 1);
+
+                if ($foo && $bar)
+                {
+                    $data[$this->id]['reprewards'][] = [$foo, $bar];
+
+                    if ($extraFactionId == $foo)
+                        $data[$this->id]['reputation'] = $bar;
+                }
+            }
         }
 
         return $data;

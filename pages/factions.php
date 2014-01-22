@@ -1,0 +1,80 @@
+<?php
+
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
+
+$cats      = Util::extractURLParams($pageParam);
+$path      = [0, 7];
+$title     = [Util::ucFirst(Lang::$game['factions'])];
+$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_FACTION, -1, implode('.', $cats), User::$localeId]);
+$validCats = array(
+    1118 => [469, 891, 67, 892, 169],
+    980  => [936],
+    1097 => [1037, 1052, 1117],
+    0    => true
+);
+
+if (!Util::isValidPage($validCats, $cats))
+    $smarty->error();
+
+if (!$smarty->loadCache($cacheKey, $pageData))
+{
+    $conditions = [];
+
+    if (User::isInGroup(U_GROUP_STAFF))
+        $conditions[] = ['reputationIndex', -1, '!'];       // unlisted factions
+
+    if (isset($cats[0]) && empty($cats[1]))
+    {
+        if (!$cats[0])
+            $conditions[] = ['f1.parentFactionId', [1118, 980, 1097, 469, 891, 67, 892, 169, 1037, 1052, 1117, 936], '!'];
+        else
+        {
+            $subs = DB::Aowow()->selectCol('SELECT id FROM ?_factions WHERE parentFactionId = ?d', $cats[0]);
+            $conditions[] = ['OR', ['f1.parentFactionId', $subs], ['f1.id', $subs]];
+        }
+
+        $path[]       = $cats[0];
+        // array_unshift($title, Lang::$factions['cat'][$cats[0]]);
+    }
+    else if (!empty($cats[1]))
+    {
+        $conditions[] = ['f1.parentFactionId', $cats[1]];
+        $path[]       = $cats[0];
+        $path[]       = $cats[1];
+        // array_unshift($title, Lang::$factions['cat'][$cats[1]]);
+    }
+
+    $factions = new FactionList($conditions);
+
+    $pageData = array(
+        'title'     => $title,
+        'path'      => $path,
+        'listviews' => array(
+            array(
+                'file'   => 'faction',
+                'data'   => $factions->getListviewData(),
+                'params' => []
+            )
+        )
+    );
+
+    $smarty->saveCache($cacheKey, $pageData);
+}
+
+
+// menuId 7: Faction  g_initPath()
+//  tabId 0: Database g_initHeader()
+$smarty->updatePageVars(array(
+    'title'  => implode(' - ', $title),
+    'path'   => json_encode($path, JSON_NUMERIC_CHECK),
+    'tab'    => 0
+));
+$smarty->assign('lang', Lang::$main);
+$smarty->assign('lvData', $pageData);
+
+// load the page
+$smarty->display('generic-no-filter.tpl');
+
+?>

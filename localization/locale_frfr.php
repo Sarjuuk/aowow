@@ -288,6 +288,12 @@ $lang = array(
         'exotic'        => "Exotique",
         'cat'           => ["Férocité", "Tenacité", "Ruse"]
     ),
+    'faction' => array(
+        'spillover'     => "[Reputation Spillover]",
+        'spilloverDesc' => "[Gaining Reputation with this faction also yields a proportional gain with the factions listed below.]",
+        'maxStanding'   => "Niveau maximum",
+        'quartermaster' => "Intendant"
+    ),
     'itemset' => array(
         '_desc'         => "<b>%s</b> est le <b>%s</b>. Il contient %s pièces.",
         '_descTagless'  => "<b>%s</b> est un ensemble d'objet qui contient %s pièces.",

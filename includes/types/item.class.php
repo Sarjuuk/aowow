@@ -316,7 +316,10 @@ class ItemList extends BaseType
                 $data[$this->id]['reqfaction'] = $x;
 
             if ($x = $this->curTpl['requiredFactionRank'])
-                $data[$this->id]['reqrep'] = $x;
+            {
+                $data[$this->id]['reqrep']   = $x;
+                $data[$this->id]['standing'] = $x;          // used in /faction item-listing
+            }
 
             if ($x = $this->curTpl['slots'])
                 $data[$this->id]['nslots'] = $x;
@@ -1236,6 +1239,9 @@ class ItemList extends BaseType
     private function initScalingStats()
     {
         $this->ssd[$this->id] = DB::Aowow()->selectRow("SELECT * FROM ?_scalingstatdistribution WHERE id = ?", $this->curTpl['scalingStatDistribution']);
+
+        if (!$this->ssd[$this->id])
+            return;
 
         // stats and ratings
         for ($i = 1; $i <= 10; $i++)

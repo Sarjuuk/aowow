@@ -71,7 +71,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
 
         // 2 recipe Items [items] (Books)
-        $conditions = array(
+        $skill2Filter = [null, 171, 164, 185, 333, 202, 129, 755, 165, 186, 197, null, null, 356, 182, 773];
+        $conditions   = array(
             ['requiredSkill', $_id],
             ['class', ITEM_CLASS_RECIPE],
             0
@@ -89,7 +90,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     'id'   => 'recipe-items',
                     'name' => '$LANG.tab_recipeitems',
                     'tabs' => '$tabsRelated',
-                    // 'note' => sprintf(Util::$filterResultString, "?items=9.subClass") // todo (med): after items
+                    'note' => !empty(array_flip($skill2Filter)[$_id]) ? sprintf(Util::$filterResultString, "?items=9.".array_flip($skill2Filter)[$_id]) : null
                 )
             );
         }
@@ -344,7 +345,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             );
         }
     }
-
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }

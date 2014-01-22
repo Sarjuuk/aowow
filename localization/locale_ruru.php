@@ -288,6 +288,12 @@ $lang = array(
         'exotic'        => "Экзотический",
         'cat'           => ["Свирепость", "Упорство", "Хитрость"]
     ),
+    'faction' => array(
+        'spillover'     => "[Reputation Spillover]",
+        'spilloverDesc' => "[Gaining Reputation with this faction also yields a proportional gain with the factions listed below.]",
+        'maxStanding'   => "Макс Уровень",
+        'quartermaster' => "Интендант"
+    ),
     'itemset' => array(
         '_desc'         => "<b>%s</b> — <b>%s</b>. Он состоит из %s предметов.",
         '_descTagless'  => "<b>%s</b> — набор из %s предметов.",

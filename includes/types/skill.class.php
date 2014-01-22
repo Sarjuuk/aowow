@@ -53,7 +53,6 @@ class SkillList extends BaseType
 
         foreach ($this->iterate() as $__)
         {
-
             $data[$this->id] = array(
                 'category'        => $this->curTpl['typeCat'],
                 'categorybak'     => $this->curTpl['categoryId'],

@@ -136,6 +136,7 @@ define('CUSTOM_HAS_VIDEO',                  0x04000000);
 define('CUSTOM_DISABLED',                   0x08000000);
 define('CUSTOM_SERVERSIDE',                 0x10000000);
 define('CUSTOM_UNAVAILABLE',                0x20000000);
+define('CUSTOM_EXCLUDE_FOR_LISTVIEW',       0x40000000);   // will not show up in search or on listPage (override for staff)
 
 // Custom Flags (per type)
 define('SPELL_CU_TALENT',                   0x0001);        // passive talent
@@ -147,7 +148,7 @@ define('SPELL_CU_PET_TALENT_TYPE2',         0x0020);        // Cunning
 define('SPELL_CU_GLYPH_MAJOR',              0x0040);
 define('SPELL_CU_GLYPH_MINOR',              0x0080);
 define('SPELL_CU_QUALITY_MASK',             0x0F00);        // set if spell creates an item: (7 - Quality) << 8
-define('SPELL_CU_EXCLUDE_CATEGORY_SEARCH',  0x1000);        // only display, when searching for spells in general (!cat || cat = 0)
+// define('SPELL_CU_EXCLUDE_CATEGORY_SEARCH',  0x1000);     // migrate to CUSTOM_EXCLUDE_FOR_LISTVIEW
 define('SPELL_CU_FIRST_RANK',               0x2000);        // used by filter
 define('SPELL_CU_LAST_RANK',                0x4000);
 

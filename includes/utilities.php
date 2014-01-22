@@ -18,6 +18,7 @@ class Lang
     public static $class;
     public static $currency;
     public static $event;
+    public static $faction;
     public static $item;
     public static $itemset;
     public static $maps;
@@ -344,7 +345,7 @@ class SmartyAoWoW extends Smarty
 
             if ($article)
             {
-                $tv['article'] = ['text' => $article['article']];
+                $tv['article'] = ['text' => Util::jsEscape($article['article'])];
                 if (empty($tv['infobox']) && !empty($article['quickInfo']))
                     $tv['infobox'] = $article['quickInfo'];
 
@@ -493,7 +494,7 @@ class SmartyAoWoW extends Smarty
                 case TYPE_NPC:         (new CreatureList(array(['ct.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;
                 case TYPE_OBJECT:      (new GameobjectList(array(['gt.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF); break;
                 case TYPE_ITEM:        (new ItemList(array(['i.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);           break;
-                case TYPE_QUEST:       (new QuestList(array(['qt.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;
+                case TYPE_QUEST:       (new QuestList(array(['qt.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);         break;
                 case TYPE_SPELL:       (new SpellList(array(['s.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);          break;
                 case TYPE_ZONE:        (new ZoneList(array(['z.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);           break;
                 case TYPE_FACTION:     (new FactionList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);          break;
@@ -638,6 +639,11 @@ class Util
         10 =>  [   65,    66,    67,   210,   394,   495,  3537,  3711, 4024, 4197, 4395]
     );
 
+    public static $questFactionReward       = array(        // from QuestFactionReward.dbc
+           0,   10,   25,   75,  150,  250,  350,  500, 1000,    5
+    );
+
+
     /*  why:
         Because petSkills (and ranged weapon skills) are the only ones with more than two skillLines attached. Because Left Joining ?_spell with ?_skillLineAbility  causes more trouble than it has uses.
         Because this is more or less the only reaonable way to fit all that information into one database field, so..
@@ -750,8 +756,7 @@ class Util
         null,   4,      10,     9,      8,      6,      15,     11,     3,      5,      null,   7
     );
 
-    // from DurabilityQuality.dbc
-    public static $itemDurabilityQualityMod = array(
+    public static $itemDurabilityQualityMod = array(        // from DurabilityQuality.dbc
         null,   1.0,    0.6,    1.0,    0.8,    1.0,    1.0,    1.2,    1.25,   1.44,   2.5,    1.728,  3.0,    0.0,    0.0,    1.2,    1.25
     );
 

@@ -39,7 +39,7 @@ if (!defined('AOWOW_REVISION'))
         18: Listview - template: 'achievement', id: 'statistics',    name: LANG.tab_statistics,
         19: Listview - template: 'zone',        id: 'zones',         name: LANG.tab_zones,
         20: Listview - template: 'object',      id: 'objects',       name: LANG.tab_objects,
-todo    21: Listview - template: 'faction',     id: 'factions',      name: LANG.tab_factions,
+        21: Listview - template: 'faction',     id: 'factions',      name: LANG.tab_factions,
         22: Listview - template: 'skill',       id: 'skills',        name: LANG.tab_skills,
         23: Listview - template: 'pet',         id: 'pets',          name: LANG.tab_pets,
         24: Listview - template: 'spell',       id: 'npc-abilities', name: LANG.tab_npcabilities,
@@ -379,7 +379,7 @@ if ($searchMask & 0x80)
 {
     $conditions = array(                                    // hmm, inclued classMounts..?
         ['s.typeCat', [7, -2, -3]],
-        [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT | SPELL_CU_EXCLUDE_CATEGORY_SEARCH), '&'], 0],
+        [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT | CUSTOM_EXCLUDE_FOR_LISTVIEW), '&'], 0],
         [['s.attributes0', 0x80, '&'], 0],
         ['s.name_loc'.User::$localeId, $query],
         $maxResults
@@ -861,7 +861,7 @@ if ($searchMask & 0x80000)
     {
         $objects->addGlobalsToJScript($smarty);
 
-        $found['zone'] = array(
+        $found['object'] = array(
             'type'     => TYPE_OBJECT,
             'appendix' => ' (Object)',
             'matches'  => $objects->getMatches(),
@@ -874,14 +874,43 @@ if ($searchMask & 0x80000)
 
         if ($objects->getMatches() > $maxResults)
         {
-            $found['zone']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_objectsfound', $objects->getMatches(), $maxResults);
-            $found['zone']['params']['_truncated'] = 1;
+            $found['object']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_objectsfound', $objects->getMatches(), $maxResults);
+            $found['object']['params']['_truncated'] = 1;
         }
     }
 }
 
 // 21 Factions
-// if ($searchMask & 0x100000)
+if ($searchMask & 0x100000)
+{
+    $conditions = array(
+        ['name_loc'.User::$localeId, $query],
+        [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
+        $maxResults
+    );
+
+    $factions = new FactionList($conditions);
+
+    if ($data = $factions->getListviewData())
+    {
+        $found['faction'] = array(
+            'type'     => TYPE_FACTION,
+            'appendix' => ' (Faction)',
+            'matches'  => $factions->getMatches(),
+            'file'     => 'faction',
+            'data'     => $data,
+            'params'   => [
+                'tabs' => '$myTabs'
+            ]
+        );
+
+        if ($factions->getMatches() > $maxResults)
+        {
+            $found['faction']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_factionsfound', $factions->getMatches(), $maxResults);
+            $found['faction']['params']['_truncated'] = 1;
+        }
+    }
+}
 
 // 22 Skills
 if ($searchMask & 0x200000)
@@ -985,7 +1014,7 @@ if ($searchMask & 0x1000000)
 {
     $conditions = array(
         ['s.name_loc'.User::$localeId, $query],
-        ['OR', ['s.typeCat', [0, -9]], ['s.cuFlags', SPELL_CU_EXCLUDE_CATEGORY_SEARCH, '&']],
+        ['OR', ['s.typeCat', [0, -9]], ['s.cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&']],
         $maxResults
     );
 

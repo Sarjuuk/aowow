@@ -1,21 +1,8 @@
-{if !empty($tab.showRep)}
-var _ = [
-    {ldelim}
-        id: 'reputation',
-        after: 'rewards',
-        name: LANG.rep,
-        tooltip: LANG.tooltip_repgain,
-        width: '8%',
-        value: 'reputation'
-    {rdelim}
-];
-{/if}
-
 {strip}
     new Listview({ldelim}
-        template:'quest',
-        {if !isset($params.id)}id:'quests',{/if}
-        {if !isset($params.name)}name:LANG.tab_quests,{/if}
+        template:'faction',
+        {if !isset($params.id)}id:'factions',{/if}
+        {if !isset($params.name)}name:LANG.tab_factions,{/if}
         {if !isset($params.parent)}parent:'lv-generic',{/if}
         {foreach from=$params key=k item=v}
             {if $v[0] == '$'}

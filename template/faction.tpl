@@ -16,20 +16,27 @@
                 g_initPath({$page.path});
             //]]></script>
 
-{include file='bricks/infobox.tpl'}
+{include file='bricks/infobox.tpl' info=$lvData.infobox}
 
             <div class="text">
-                <div id="h1-icon-generic" class="h1-icon"></div>
-
-                <script type="text/javascript">//<![CDATA[
-                    $WH.ge('h1-icon-generic').appendChild(Icon.create('{$lvData.page.icon|escape:"javascript"}', 1));
-                //]]></script>
 
 {include file='bricks/redButtons.tpl'}
 
                 <h1>{$lvData.page.name}</h1>
 
 {include file='bricks/article.tpl'}
+
+{if $lvData.spillover}
+    <div id="spillover" class="left"></div>
+    <script type="text/javascript">//<![CDATA[
+        Markup.printHtml("{$lvData.spillover}", "spillover", {strip}{ldelim}
+            allow: Markup.CLASS_ADMIN,
+            dbpage: true
+        {rdelim}{/strip});
+    //]]></script>
+
+    <div class="pad2"></div>
+{/if}
 
                 <h2 class="clear">{$lang.related}</h2>
             </div>

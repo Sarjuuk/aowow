@@ -507,7 +507,7 @@ var Markup = {
 				unnamed: { req: false, valid: /^hidden$/i },
 				'float': { req: false, valid: /^(left|right)$/i },
 				align: { req: false, valid: /^(left|right|center)$/i },
-				margin: { req: false, valid: /^\d+$/ },
+				margin: { req: false, valid: /^\d+(px|em|\%)$/ },
 				width: { req: false, valid: /^[0-9]+(px|em|\%)$/ }
 			},
 			allowedClass: MARKUP_CLASS_STAFF,
@@ -1739,7 +1739,7 @@ var Markup = {
 				if(g_quests[id] && g_quests[id][nameCol])
 				{
 					var quest = g_quests[id];
-					return '<a href="' + url + '?quest=' + id + '"' + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/icons/tiny/' + (quest.daily ? 'quest_start_daily' : 'quest_start') + '.gif"' : '') + Markup._addGlobalAttributes(attr) + ' align="absmiddle" /> <span class="tinyicontxt">' + Markup._safeHtml(quest[nameCol]) + '</span></a>';
+					return '<a href="' + url + '?quest=' + id + '"' + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/icons/' + (quest.daily ? 'quest_start_daily' : 'quest_start') + '.gif"' : '') + Markup._addGlobalAttributes(attr) + ' align="absmiddle" /> <span class="tinyicontxt">' + Markup._safeHtml(quest[nameCol]) + '</span></a>';
 				}
 				return '<a href="' + url + '?quest=' + id + '"' + Markup._addGlobalAttributes(attr) + '>(' + LANG.types[5][0] + ' #' + id + ')</a>';
 			},

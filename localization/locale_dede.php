@@ -330,6 +330,12 @@ $lang = array(
         'exotic'        => "Exotisch",
         'cat'           => ["Wildheit", "Hartnäckigkeit", "Gerissenheit"]
     ),
+    'faction' => array(
+        'spillover'     => "Reputationsüberlauf",
+        'spilloverDesc' => "Für diese Fraktion erhaltener Ruf wird zusätzlich mit den unten aufgeführten Fraktionen anteilig verrechnet.",
+        'maxStanding'   => "Max. Ruf",
+        'quartermaster' => "Rüstmeister"
+    ),
     'itemset' => array(
         '_desc'         => "<b>%s</b> ist das <b>%s</b>. Es enthält %s Teile.",
         '_descTagless'  => "<b>%s</b> ist ein Ausrüstungsset, das %s Teile enthält.",

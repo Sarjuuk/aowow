@@ -26,6 +26,8 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $skills = new SkillList($conditions);
 
     $pageData = array(
+        'title'     => $title,
+        'path'      => $path,
         'listviews' => array(
             array(
                 'file'   => 'skill',

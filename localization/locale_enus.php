@@ -317,6 +317,12 @@ $lang = array(
         'exotic'        => "Exotic",
         'cat'           => ["Ferocity", "Tenacity", "Cunning"]
     ),
+    'faction' => array(
+        'spillover'     => "Reputation Spillover",
+        'spilloverDesc' => "Gaining Reputation with this faction also yields a proportional gain with the factions listed below.",
+        'maxStanding'   => "Max. Standing",
+        'quartermaster' => "Quartermaster"
+    ),
     'itemset' => array(
         '_desc'         => "<b>%s</b> is the <b>%s</b>. It contains %s pieces.",
         '_descTagless'  => "<b>%s</b> is an item set that contains %s pieces.",
