@@ -282,12 +282,14 @@ class ItemList extends BaseType
                         else if ($k < 0)
                             $currency[] = [-$k, $qty];
                     }
+
                     $data[$this->id]['stock'] = $cost['stock'];
-                    $data[$this->id]['cost']  = array(
-                        $this->getField('buyPrice'),
-                        $currency ? $currency : null,
-                        $tokens   ? $tokens   : null
-                    );
+                    $data[$this->id]['cost']  = [$this->getField('buyPrice')];
+                    if ($currency || $tokens)               // fill idx:3 if required
+                        $data[$this->id]['cost'][] = $currency;
+
+                    if ($tokens)
+                        $data[$this->id]['cost'][] = $tokens;
                 }
 
                 if ($x = $this->curTpl['buyPrice'])

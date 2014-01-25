@@ -2096,24 +2096,43 @@ class Util
         return $lv;
     }
 
-    public static function getLootSource($itemId)
+    public static function getLootSource($itemId, $maxResults = SQL_LIMIT_DEFAULT)
     {
         if (!$itemId)
             return [];
 
-        $final      = [];
+        //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
+        $tabsFinal  = array(
+            ['item',     [], '$LANG.tab_containedin',      'contained-in-item',    [], [], []],
+            ['item',     [], '$LANG.tab_disenchantedfrom', 'disenchanted-from',    [], [], []],
+            ['item',     [], '$LANG.tab_prospectedfrom',   'prospected-from',      [], [], []],
+            ['item',     [], '$LANG.tab_milledfrom',       'milled-from',          [], [], []],
+            ['creature', [], '$LANG.tab_droppedby',        'dropped-by',           [], [], []],
+            ['creature', [], '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',    [], [], []],
+            ['creature', [], '$LANG.tab_skinnedfrom',      'skinned-from',         [], [], []],
+            ['creature', [], '$LANG.tab_minedfromnpc',     'mined-from-npc',       [], [], []],
+            ['creature', [], '$LANG.tab_salvagedfrom',     'salvaged-from',        [], [], []],
+            ['creature', [], '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',    [], [], []],
+            ['quest',    [], '$LANG.tab_rewardfrom',       'reward-from-quest',    [], [], []],
+            ['zone',     [], '$LANG.tab_fishedin',         'fished-in-zone',       [], [], []],
+            ['object',   [], '$LANG.tab_containedin',      'contained-in-object',  [], [], []],
+            ['object',   [], '$LANG.tab_minedfrom',        'mined-from-object',    [], [], []],
+            ['object',   [], '$LANG.tab_gatheredfrom',     'gathered-from-object', [], [], []],
+            ['object',   [], '$LANG.tab_fishedin',         'fished-in-object',     [], [], []],
+            ['spell',    [], '$LANG.tab_createdby',        'created-by',           [], [], []]
+        );
         $refResults = [];
         $chanceMods = [];
         $query      =   'SELECT
                            -lt1.entry AS ARRAY_KEY,
-                            IF (lt1.mincountOrRef > 0, lt1.item, lt1.mincountOrRef) AS item,
+                            IF(lt1.mincountOrRef > 0, lt1.item, lt1.mincountOrRef) AS item,
                             lt1.ChanceOrQuestChance AS chance,
                             SUM(IF(lt2.ChanceOrQuestChance = 0, 1, 0)) AS nZeroItems,
                             SUM(IF(lt2.ChanceOrQuestChance > 0, lt2.ChanceOrQuestChance, 0)) AS sumChance,
                             IF(lt1.groupid > 0, 1, 0) AS isGrouped,
-                            IF (lt1.mincountOrRef > 0, lt1.mincountOrRef, 1) AS min,
-                            IF (lt1.mincountOrRef > 0, lt1.maxcount, 1) AS max,
-                            IF (lt1.mincountOrRef < 0, lt1.maxcount, 1) AS multiplier
+                            IF(lt1.mincountOrRef > 0, lt1.mincountOrRef, 1) AS min,
+                            IF(lt1.mincountOrRef > 0, lt1.maxcount, 1) AS max,
+                            IF(lt1.mincountOrRef < 0, lt1.maxcount, 1) AS multiplier
                         FROM
                             ?# lt1
                         LEFT JOIN
@@ -2124,7 +2143,8 @@ class Util
 
         $calcChance = function ($refs, $parents = []) use (&$chanceMods)
         {
-            $return = [];
+            $retData = [];
+            $retKeys = [];
 
             foreach ($refs as $rId => $ref)
             {
@@ -2167,13 +2187,23 @@ class Util
                     if ($stack)                                 // yes, it wants a string .. how weired is that..
                         $data['pctstack'] = json_encode($stack, JSON_NUMERIC_CHECK);
 
-                    $return[$rId] = $data;
+                    // sort highest chances first
+                    $i = 0;
+                    for (; $i < count($retData); $i++)
+                        if ($retData[$i]['percent'] < $data['percent'])
+                            break;
+
+                    array_splice($retData, $i, 0, [$data]);
+                    array_splice($retKeys, $i, 0, [$rId]);
                 }
             }
 
-            return $return;
+            return array_combine($retKeys, $retData);
         };
 
+        /*
+            get references containing the item
+        */
         $newRefs = DB::Aowow()->select(
             sprintf($query, 'lt1.item = ?d AND lt1.mincountOrRef > 0'),
             LOOT_REFERENCE, LOOT_REFERENCE,
@@ -2192,44 +2222,143 @@ class Util
             $refResults += $calcChance($curRefs, array_column($newRefs, 'item'));
         }
 
+        /*
+            search the real loot-templates for the itemId and gathered refds
+        */
         for ($i = 1; $i < count(self::$lootTemplates); $i++)
         {
-            $res = DB::Aowow()->select(
+            $result = $calcChance(DB::Aowow()->select(
                 sprintf($query, '{lt1.mincountOrRef IN (?a) OR }(lt1.mincountOrRef > 0 AND lt1.item = ?d)'),
                 self::$lootTemplates[$i], self::$lootTemplates[$i],
                 $refResults ? array_keys($refResults) : DBSIMPLE_SKIP,
                 $itemId
-            );
+            ));
 
-            if ($_ = $calcChance($res))
+            // do not skip here if $result is empty. Additional loot for spells and quest is added separately
+
+            // format for actual use
+            foreach ($result as $k => $v)
             {
-                // format for use in item.php
-                $sort = [];
-                foreach ($_ as $k => $v)
-                {
-                    unset($_[$k]);
-                    $v['percent'] = round($v['percent'] * 100, 3);
-                    $v['key'] = abs($k);                    // array_multisort issue: it does not preserve numeric keys, restore after sort
-                    $sort[$k] = $v['percent'];
-                    $_[abs($k)] = $v;
-                }
+                unset($result[$k]);
+                $v['percent'] = round($v['percent'] * 100, 3);
+                $result[abs($k)] = $v;
+            }
 
-                array_multisort($sort, SORT_DESC, $_);
+            // cap fetched entries to the sql-limit to guarantee, that the highest chance items get selected first
+            // screws with GO-loot and skinnig-loot as these templates are shared for several tabs (fish, herb, ore) (herb, ore, leather)
+            $ids = array_slice(array_keys($result), 0, $maxResults);
 
-                foreach ($_ as $k => $v)
-                {
-                    $key = $v['key'];
-                    unset($_[$k]);
-                    unset($v['key']);
+            switch (self::$lootTemplates[$i])
+            {
+                case LOOT_CREATURE:     $field = 'lootId';              $tabId =  4;    break;
+                case LOOT_PICKPOCKET:   $field = 'pickpocketLootId';    $tabId =  5;    break;
+                case LOOT_SKINNING:     $field = 'skinLootId';          $tabId = -6;    break;      // assigned later
+                case LOOT_PROSPECTING:  $field = 'id';                  $tabId =  2;    break;
+                case LOOT_MILLING:      $field = 'id';                  $tabId =  3;    break;
+                case LOOT_ITEM:         $field = 'id';                  $tabId =  0;    break;
+                case LOOT_DISENCHANT:   $field = 'disenchantId';        $tabId =  1;    break;
+                case LOOT_FISHING:      $field = 'id';                  $tabId = 11;    break;      // subAreas are currently ignored
+                case LOOT_GAMEOBJECT:
+                    if (!$ids)
+                        break;
 
-                    $_[$key] = $v;
-                }
+                    $srcObj = new GameObjectList(array(['type', [OBJECT_CHEST, OBJECT_FISHINGHOLE]], ['data1', $ids]));
+                    if ($srcObj->error)
+                        break;
 
-                $final[self::$lootTemplates[$i]] = $_;
+                    $srcData = $srcObj->getListviewData();
+
+                    foreach ($srcObj->iterate() as $curTpl)
+                    {
+                        switch ($curTpl['type'])
+                        {
+                            case 25: $tabId = 15; break;    // fishing node
+                            case -3: $tabId = 14; break;    // herb
+                            case -4: $tabId = 13; break;    // vein
+                            default: $tabId = 12; break;    // general chest loot
+                        }
+
+                        $tabsFinal[$tabId][1][] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField('lootId')]);
+                        $tabsFinal[$tabId][4][] = 'Listview.extraCols.percent';
+                        if ($tabId != 15)
+                            $tabsFinal[$tabId][6][] = 'skill';
+                    }
+                    break;
+                case LOOT_QUEST:
+                    $conditions = array(['RewardChoiceItemId1', $itemId], ['RewardChoiceItemId2', $itemId], ['RewardChoiceItemId3', $itemId], ['RewardChoiceItemId4', $itemId], ['RewardChoiceItemId5', $itemId],
+                                        ['RewardChoiceItemId6', $itemId], ['RewardItemId1', $itemId],       ['RewardItemId2', $itemId],       ['RewardItemId3', $itemId],       ['RewardItemId4', $itemId],
+                                        'OR');
+                    if ($ids)
+                        $conditions[] = ['qt.RewardMailTemplateId', $ids];
+
+                    $srcObj = new QuestList($conditions);
+                    if (!$srcObj->error)
+                    {
+                        $srcObj->addGlobalsToJscript(self::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+                        $srcData = $srcObj->getListviewData();
+
+                        foreach ($srcObj->iterate() as $_)
+                            $tabsFinal[10][1][] = array_merge($srcData[$srcObj->id], empty($result[$srcObj->id]) ? ['percent' => -1] : $result[$srcObj->id]);
+                    }
+                    break;
+                case LOOT_SPELL:
+                    $conditions = ['OR', ['effect1CreateItemId', $itemId], ['effect2CreateItemId', $itemId], ['effect3CreateItemId', $itemId]];
+                    if ($ids)
+                        $conditions[] = ['id', $ids];
+
+                    $srcObj = new SpellList($conditions);
+                    if (!$srcObj->error)
+                    {
+                        $srcObj->addGlobalsToJscript(self::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                        $srcData = $srcObj->getListviewData();
+
+                        if (!empty($result))
+                            $tabsFinal[16][4][] = 'Listview.extraCols.percent';
+
+                        if ($srcObj->hasSetFields(['reagent1']))
+                            $tabsFinal[16][6][] = 'reagents';
+
+                        foreach ($srcObj->iterate() as $_)
+                            $tabsFinal[16][1][] = array_merge($srcData[$srcObj->id], empty($result[$srcObj->id]) ? ['percent' => -1] : $result[$srcObj->id]);
+                    }
+                    break;
+            }
+
+            if (!$ids)
+                continue;
+
+            switch ($tabsFinal[abs($tabId)][0])
+            {
+                case 'creature':                            // new CreatureList
+                case 'item':                                // new ItemList
+                case 'zone':                                // new ZoneList
+                    $oName  = ucFirst($tabsFinal[abs($tabId)][0]).'List';
+                    $srcObj = new $oName(array([$field, $ids]));
+                    if (!$srcObj->error)
+                    {
+                        $srcObj->addGlobalsToJscript(self::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                        $srcData = $srcObj->getListviewData();
+
+                        foreach ($srcObj->iterate() as $_)
+                        {
+                            if ($tabId < 0 && $curTpl['type_flags'] & NPC_TYPEFLAG_HERBLOOT)
+                                $tabId = 9;
+                            else if ($tabId < 0 && $curTpl['type_flags'] & NPC_TYPEFLAG_ENGINEERLOOT)
+                                $tabId = 8;
+                            else if ($tabId < 0 && $curTpl['type_flags'] & NPC_TYPEFLAG_MININGLOOT)
+                                $tabId = 7;
+                            else if ($tabId < 0)
+                                $tabId = abs($tabId);               // general case (skinning)
+
+                            $tabsFinal[$tabId][1][] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField($field)]);
+                            $tabsFinal[$tabId][4][] = 'Listview.extraCols.percent';
+                        }
+                    }
+                    break;
             }
         }
 
-        return $final;
+        return $tabsFinal;
     }
 }
 

@@ -353,210 +353,24 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     /**************/
 
     // tabs: this item is contained in..
-    $sourceTabs = array(
-    //   0 => refLoot
-         1 => ['item',     '$LANG.tab_containedin',      'contained-in-item',    [], [], []],
-         2 => ['item',     '$LANG.tab_disenchantedfrom', 'disenchanted-from',    [], [], []],
-         3 => ['item',     '$LANG.tab_prospectedfrom',   'prospected-from',      [], [], []],
-         4 => ['item',     '$LANG.tab_milledfrom',       'milled-from',          [], [], []],
-         5 => ['creature', '$LANG.tab_droppedby',        'dropped-by',           [], [], []],
-         6 => ['creature', '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',    [], [], []],
-         7 => ['creature', '$LANG.tab_skinnedfrom',      'skinned-from',         [], [], []],
-         8 => ['creature', '$LANG.tab_minedfromnpc',     'mined-from-npc',       [], [], []],
-         9 => ['creature', '$LANG.tab_salvagedfrom',     'salvaged-from',        [], [], []],
-        10 => ['creature', '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',    [], [], []],
-        11 => ['quest',    '$LANG.tab_rewardfrom',       'reward-from-quest',    [], [], []],
-        12 => ['zone',     '$LANG.tab_fishedin',         'fished-in-zone',       [], [], []],
-        13 => ['object',   '$LANG.tab_containedin',      'contained-in-object',  [], [], []],
-        14 => ['object',   '$LANG.tab_minedfrom',        'mined-from-object',    [], [], []],
-        15 => ['object',   '$LANG.tab_gatheredfrom',     'gathered-from-object', [], [], []],
-        16 => ['object',   '$LANG.tab_fishedin',         'fished-in-object',     [], [], []],
-        17 => ['spell',    '$LANG.tab_createdby',        'created-by',           [], [], []]
-    );
-
-    $data      = [];
-    $questLoot = [];
-    $spellLoot = [];
-    $sources   = Util::getLootSource($_id);
-    foreach ($sources as $lootTpl => $lootData)
+    $lootTabs = Util::getLootSource($_id);
+    foreach ($lootTabs as $tab)
     {
-        // cap fetched entries to the sql-limit to guarantee, that the highest chance items get selected first
-        $ids = array_slice(array_keys($lootData), 0, SQL_LIMIT_DEFAULT);
-
-        switch ($lootTpl)
-        {
-            case LOOT_CREATURE:
-                $srcType = new CreatureList(array(['ct.lootId', $ids]));
-                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
-                $srcData = $srcType->getListviewData();
-
-                foreach ($srcType->iterate() as $_)
-                    $data[5][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('lootId')]);
-
-                $sourceTabs[5][3][] = 'Listview.extraCols.percent';
-                break;
-            case LOOT_PICKPOCKET:
-                $srcType = new CreatureList(array(['ct.pickpocketLootId', $ids]));
-                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
-                $srcData = $srcType->getListviewData();
-
-                foreach ($srcType->iterate() as $_)
-                    $data[6][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('pickpocketLootId')]);
-
-                $sourceTabs[6][3][] = 'Listview.extraCols.percent';
-                break;
-            case LOOT_SKINNING:
-                $srcType = new CreatureList(array(['ct.skinLootId', $ids]));
-                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
-                $srcData = $srcType->getListviewData();
-
-                foreach ($srcType->iterate() as $curTpl)
-                {
-                    $tabId = 7;                             // general case (skinning)
-                    if ($curTpl['type_flags'] & NPC_TYPEFLAG_HERBLOOT)
-                        $tabId = 10;
-                    else if ($curTpl['type_flags'] & NPC_TYPEFLAG_ENGINEERLOOT)
-                        $tabId = 9;
-                    else if ($curTpl['type_flags'] & NPC_TYPEFLAG_MININGLOOT)
-                        $tabId = 8;
-
-                    $data[$tabId][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('skinLootId')]);
-                    $sourceTabs[$tabId][3][] = 'Listview.extraCols.percent';
-                }
-
-                break;
-            case LOOT_FISHING:
-                // subAreas are currently ignored
-                $srcType = new ZoneList(array(['id', $ids]));
-                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
-                $srcData = $srcType->getListviewData();
-
-                foreach ($srcType->iterate() as $_)
-                    $data[12][] = array_merge($srcData[$srcType->id], $lootData[$srcType->id]);
-
-                $sourceTabs[12][3][] = 'Listview.extraCols.percent';
-                break;
-            case LOOT_GAMEOBJECT:
-                $srcType = new GameObjectList(array(['type', [OBJECT_CHEST, OBJECT_FISHINGHOLE]], ['data1', $ids]));
-                $srcData = $srcType->getListviewData();
-
-                foreach ($srcType->iterate() as $curTpl)
-                {
-                    $tabId = 13;                            // general chest loot
-                    if ($curTpl['type'] == -4)              // vein
-                        $tabId = 14;
-                    else if ($curTpl['type'] == -3)         // herb
-                        $tabId = 15;
-                    else if ($curTpl['type'] == 25)         // fishing node
-                        $tabId = 16;
-
-                    $data[$tabId][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('lootId')]);
-                    $sourceTabs[$tabId][3][] = 'Listview.extraCols.percent';
-                    $sourceTabs[$tabId][5][] = 'skill';     // conflicts a bit with fishing nodes (no real requirement)
-                }
-                break;
-            case LOOT_PROSPECTING:
-                $sourceTab = 3;
-            case LOOT_MILLING:
-                if (!isset($sourceTab))
-                    $sourceTab = 4;
-            case LOOT_ITEM:
-                if (!isset($sourceTab))
-                    $sourceTab = 1;
-
-                $srcType = new ItemList(array(['i.id', $ids]));
-                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
-                $srcData = $srcType->getListviewData();
-
-                foreach ($srcType->iterate() as $_)
-                    $data[$sourceTab][] = array_merge($srcData[$srcType->id], $lootData[$srcType->id]);
-
-                $sourceTabs[$sourceTab][3][] = 'Listview.extraCols.percent';
-                break;
-            case LOOT_DISENCHANT:
-                $srcType = new ItemList(array(['i.disenchantId', $ids]));
-                $srcType->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
-                $srcData = $srcType->getListviewData();
-
-                foreach ($srcType->iterate() as $_)
-                    $data[2][] = array_merge($srcData[$srcType->id], $lootData[$srcType->getField('disenchantId')]);
-
-                $sourceTabs[2][3][] = 'Listview.extraCols.percent';
-                break;
-            case LOOT_QUEST:
-                // merge regular quest rewards into quest_mail_loot_template results
-                $questLoot = $ids;
-                break;
-            case LOOT_SPELL:
-                // merge with "created by [spell]"
-                $spellLoot = $ids;
-                break;
-        }
-    }
-
-    // merge quest rewards with quest_mail_loot
-    $conditions = array(
-        'OR',
-        ['RewardChoiceItemId1', $_id], ['RewardChoiceItemId2', $_id], ['RewardChoiceItemId3', $_id], ['RewardChoiceItemId4', $_id], ['RewardChoiceItemId5', $_id],
-        ['RewardChoiceItemId6', $_id], ['RewardItemId1', $_id],       ['RewardItemId2', $_id],       ['RewardItemId3', $_id],       ['RewardItemId4', $_id],
-    );
-
-    if ($questLoot)
-        $conditions[] = ['qt.RewardMailTemplateId', $questLoot];
-
-    $questLoot = new QuestList($conditions);
-    if (!$questLoot->error)
-    {
-        $questLoot->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
-        $data[11] = $questLoot->getListviewData();
-    }
-
-    // merge spell_loot with "created by [spell]"
-    $conditions = ['OR', ['effect1CreateitemId', $_id], ['effect2CreateitemId', $_id], ['effect3CreateitemId', $_id]];
-    if ($spellLoot)
-        $conditions[] = ['id', $spellLoot];
-
-    $spellLoot = new SpellList($conditions);
-    if (!$spellLoot->error)
-    {
-        $spellLoot->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
-        $spellData = $spellLoot->getListviewData();
-
-        if (!empty($sources[LOOT_SPELL]))
-            $sourceTabs[17][3][] = 'Listview.extraCols.percent';
-
-        if ($spellLoot->hasSetFields(['reagent1']))
-            $sourceTabs[17][5][] = 'reagents';
-
-        foreach ($spellLoot->iterate() as $_)
-        {
-            if (!empty($sources[LOOT_SPELL][$spellLoot->id]))
-                $data[17][] = array_merge($spellData[$spellLoot->id], $sources[LOOT_SPELL][$spellLoot->id]);
-            else
-                $data[17][] = array_merge($spellData[$spellLoot->id], ['percent' => -1]);
-        }
-    }
-
-    foreach ($sourceTabs as $k => $tab)
-    {
-        if (empty($data[$k]))
-            continue;
-
         $pageData['relTabs'][] = array(
             'file'   => $tab[0],
-            'data'   => $data[$k],
+            'data'   => $tab[1],
             'params' => [
                 'tabs'        => '$tabsRelated',
-                'name'        => $tab[1],
-                'id'          => $tab[2],
-                'extraCols'   => $tab[3] ? '$['.implode(', ', array_unique($tab[3])).']' : null,
-                'hiddenCols'  => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
-                'visibleCols' => $tab[5] ? '$'.json_encode($tab[5]) : null
+                'name'        => $tab[2],
+                'id'          => $tab[3],
+                'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
+                'hiddenCols'  => $tab[5] ? '$['.implode(', ', array_unique($tab[5])).']' : null,
+                'visibleCols' => $tab[6] ? '$'. json_encode(  array_unique($tab[6]))     : null
             ]
         );
     }
 
-    // tabs: this item contains
+    // tabs: this item contains..
     $sourceFor = array(
          [LOOT_ITEM,        $item->id,                       '$LANG.tab_contains',      'contains',      ['Listview.extraCols.percent'], []                          , []],
          [LOOT_PROSPECTING, $item->id,                       '$LANG.tab_prospecting',   'prospecting',   ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
@@ -933,11 +747,12 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 
                 $row['stock'] = $vendors[$k]['stock'];
                 $row['stack'] = $item->getField('buyCount');
-                $row['cost']  = array(
-                    $item->getField('buyPrice'),
-                    $currency ? $currency : null,
-                    $tokens   ? $tokens   : null
-                );
+                $row['cost']  = [$this->getField('buyPrice')];
+                if ($currency || $tokens)                   // fill idx:3 if required
+                    $row['cost'][] = $currency;
+
+                if ($tokens)
+                    $row['cost'][] = $tokens;
             }
 
             if ($holidays)
