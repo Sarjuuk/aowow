@@ -1,4 +1,4 @@
-#topbar-right input.search-database
+.topbar-search input.search-database
 {
     background: white url(../images/enus/searchdatabase.gif) .2em center no-repeat;
 }

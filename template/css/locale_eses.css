@@ -3,7 +3,7 @@
     width, left, background-position values may need adjustment!
 */
 
-#topbar-right input.search-database
+.topbar-search input.search-database
 {
     background: white url(../images/eses/searchdatabase.gif) .2em center no-repeat;
 }

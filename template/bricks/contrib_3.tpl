@@ -10,7 +10,7 @@
             <li><div>Stellt Eure Fragen bitte in unseren <a href="?forums">Foren</a>, wenn Ihr eine schnellere Antwort wünscht.</div></li>
             </ul>
             
-            <form name="addcomment" action="?comment=add&amp;type={$page.type}&amp;typeid={$page.typeId}" method="post" onsubmit="return co_validateForm(this)">
+            <form name="addcomment" action="?comment=add&amp;type={$type}&amp;typeid={$typeId}" method="post" onsubmit="return co_validateForm(this)">
                 <div id="replybox-generic" style="display: none">
                     Antwort zu einem Kommentar von <span></span>. &nbsp;<a href="javascript:;" onclick="co_cancelReply()">Abbrechen</a>
                     <div class="pad"></div>
@@ -34,7 +34,7 @@
             <li><div>Lest Euch unbedingt die <a href="?help=screenshots-tips-tricks" target="_blank">Tipps &amp; Tricks</a> durch, wenn nicht bereits geschehen.</div></li>
             </ul>
 
-            <form action="?screenshot=add&{$page.type}.{$page.typeId}" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
+            <form action="?screenshot=add&{$type}.{$typeId}" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
 
             Datei{$lang.colon}<input type="file" name="screenshotfile" style="width: 35%"/><br />
             <div class="pad2"></div>
@@ -54,7 +54,7 @@
             Gebt einfach die URL des Videos im folgenden Formular ein.
 
             <div class="pad2"></div>
-            <form action="?video=add&{$page.type}.{$page.typeId}" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
+            <form action="?video=add&{$type}.{$typeId}" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
 
             URL{$lang.colon}<input type="text" name="videourl" style="width: 35%" /> <small>Unterstützt: nur YouTube</small>
             <div class="pad2"></div>

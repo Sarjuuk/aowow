@@ -370,7 +370,7 @@ function g_createHeader(c) {
         $WH.ae(k, f)
     }
     $WH.ae($WH.ge("toptabs-generic"), k);
-    var b = $WH.ge("topbar-generic");
+    var b = $WH.ge("topbar-buttons");
     if (c != null && c >= 0 && c < mn_path.length) {
         c = parseInt(c);
         switch (c) {
@@ -403,7 +403,7 @@ function g_createHeader(c) {
 }
 function g_updateHeader(a) {
     $WH.ee($WH.ge("toptabs-generic"));
-    $WH.ee($WH.ge("topbar-generic"));
+    $WH.ee($WH.ge("topbar-buttons"));
     g_createHeader(a)
 }
 function g_initHeader(a) {
@@ -3324,6 +3324,7 @@ Listview.prototype = {
 
         this.updateNav();
         this.refreshRows();
+        this.updateBrowseSession();
 
         if (this.onAfterCreate != null) {
             this.onAfterCreate(obcResult);
@@ -4188,6 +4189,7 @@ Listview.prototype = {
             if (refresh) {
                 this.updateNav();
                 this.refreshRows();
+                this.updateBrowseSession();
             }
 
             return;
@@ -4353,6 +4355,7 @@ Listview.prototype = {
         if (refresh) {
             this.updateNav();
             this.refreshRows();
+            this.updateBrowseSession();
         }
     },
 
@@ -4362,6 +4365,7 @@ Listview.prototype = {
         this.refreshRows();
         this.updateNav();
         this.updatePound();
+        this.updateBrowseSession();
 
         var
             scroll = $WH.g_getScroll(),
@@ -4452,6 +4456,7 @@ Listview.prototype = {
         }
 
         this.updateSortIndex();
+        this.updateBrowseSession();
     },
 
     setSort: function(sort, refresh, updatePound) {
@@ -4511,6 +4516,70 @@ Listview.prototype = {
                 this.tabs.setTabPound(this.tabIndex, this.getTabPound());
             }
         }
+    },
+
+    updateBrowseSession: function () {
+        if ((!window.JSON) || (!$WH.localStorage.isSupported())) {
+            return;
+        }
+
+        // if ((typeof fi_filters == 'undefined') && (location.pathname != '/search')) {
+        if ((typeof fi_filters == 'undefined') && !(/\?search/.test(location.search))) {
+            return;
+        }
+
+        if (this.data.length < 3) {
+            return;
+        }
+
+        if (typeof this.getItemLink != 'function') {
+            return;
+        }
+
+        var max    = 5;
+        var path   = location.pathname + location.search;
+        var expire = (new Date(g_serverTime.getTime() - 1000 * 60 * 60 * 24 * 3)).getTime();
+        var lv     = $WH.localStorage.get('lvBrowse');
+
+        if (lv) {
+            lv = window.JSON.parse(lv);
+            for (var i = 0; i < lv.length; i++) {
+                if ((lv[i].path == path) || (lv[i].when < expire)) {
+                    lv.splice(i--, 1);
+                }
+            }
+
+            if (lv.length >= max) {
+                lv.splice(max - 1, lv.length - max - 1);
+            }
+        }
+        else {
+            lv = [];
+        }
+
+        var
+            urls = [],
+            url,
+            pattern = /^\?[-a-z]+=\d+/i;
+
+        for (var i = 0; i < this.data.length; i++) {
+            if (url = pattern.exec(this.getItemLink(this.data[i]))) {
+                urls.push(url[0]);
+            }
+        }
+
+        if (urls.length < 3) {
+            return;
+        }
+
+        lv.unshift({
+            path: path,
+            hash: location.hash,
+            when: g_serverTime.getTime(),
+            urls: urls
+        });
+
+        $WH.localStorage.set('lvBrowse', window.JSON.stringify(lv))
     },
 
     updateSortArrow: function() {
@@ -4751,6 +4820,7 @@ Listview.prototype = {
         else {
             this.refreshRows();
             this.updateNav();
+            this.updateBrowseSession();
         }
     },
 
@@ -4780,6 +4850,7 @@ Listview.prototype = {
 
         this.updateNav();
         this.refreshRows();
+        this.updateBrowseSession();
     },
 
     getClipDiv: function() {
@@ -6029,69 +6100,69 @@ Listview.funcBox = {
         }
     },
 
-	initSpellFilter: function (row) {
-		if (this._spellTypes == null) {
-			this._spellTypes = {};
-		}
+    initSpellFilter: function (row) {
+        if (this._spellTypes == null) {
+            this._spellTypes = {};
+        }
 
-		if (this._spellTypes[row.cat] == null) {
-			this._spellTypes[row.cat] = 0;
-		}
+        if (this._spellTypes[row.cat] == null) {
+            this._spellTypes[row.cat] = 0;
+        }
 
-		this._spellTypes[row.cat]++;
-	},
+        this._spellTypes[row.cat]++;
+    },
 
-	addSpellIndicator: function () {
-		var it = location.hash.match(/:type=([^:]+)/);
+    addSpellIndicator: function () {
+        var it = location.hash.match(/:type=([^:]+)/);
 
-		var f = function (spellCat, updatePound) {
-			g_setSelectedLink(this, "spellType");
+        var f = function (spellCat, updatePound) {
+            g_setSelectedLink(this, "spellType");
 
             lv.customPound = lv.id + (spellCat != null ? ":type=" + spellCat : "");
-			lv.customFilter = function (spell) {
-				return spellCat == null || spell.cat == spellCat;
-			};
-			lv.updateFilters(1);
-			lv.applySort();
-			lv.refreshRows();
-			if (updatePound) {
-				lv.updatePound(1)
-			}
-		};
+            lv.customFilter = function (spell) {
+                return spellCat == null || spell.cat == spellCat;
+            };
+            lv.updateFilters(1);
+            lv.applySort();
+            lv.refreshRows();
+            if (updatePound) {
+                lv.updatePound(1)
+            }
+        };
 
-		var
+        var
             lv = this,
             categories = [],
             a;
 
-		a = $("<a><span>" + LANG.pr_note_all + "</span></a>");
-		a[0].f = f.bind(a[0], null, 1);
-		a.click(a[0].f);
-		var firstCallback = f.bind(a[0], null, 0);
-		firstCallback();
-		categories.push($('<span class="indicator-mode"></span>').append(a).append($("<b>" + LANG.pr_note_all + "</b>")));
-		for (var i in g_spell_categories) {
-			if (!this._spellTypes[i]) {
-				continue;
-			}
-			a = $("<a><span>" + g_spell_categories[i] + "</span> (" + this._spellTypes[i] + ")</a>");
-			a[0].f = f.bind(a[0], i, 1);
-			a.click(a[0].f);
+        a = $("<a><span>" + LANG.pr_note_all + "</span></a>");
+        a[0].f = f.bind(a[0], null, 1);
+        a.click(a[0].f);
+        var firstCallback = f.bind(a[0], null, 0);
+        firstCallback();
+        categories.push($('<span class="indicator-mode"></span>').append(a).append($("<b>" + LANG.pr_note_all + "</b>")));
+        for (var i in g_spell_categories) {
+            if (!this._spellTypes[i]) {
+                continue;
+            }
+            a = $("<a><span>" + g_spell_categories[i] + "</span> (" + this._spellTypes[i] + ")</a>");
+            a[0].f = f.bind(a[0], i, 1);
+            a.click(a[0].f);
 
-			categories.push($('<span class="indicator-mode"></span>').append(a).append($("<b>" + g_spell_categories[i] + " (" + this._spellTypes[i] + ")</b>")));
+            categories.push($('<span class="indicator-mode"></span>').append(a).append($("<b>" + g_spell_categories[i] + " (" + this._spellTypes[i] + ")</b>")));
 
-			if (it && it[1] == i) {
+            if (it && it[1] == i) {
                 (a[0].f)();
-			}
-		}
-		if (categories.length > 2) {
-			for (var i = 0, len = categories.length; i < len; ++i) {
-				this.createIndicator(categories[i], null, $("a", categories[i])[0].f)
-			}
-			$(this.noteTop).css("padding-bottom", "12px");
-			$(this.noteIndicators).append($('<div class="clear"></div>')).insertAfter($(this.navTop))
-		}
-	},
+            }
+        }
+        if (categories.length > 2) {
+            for (var i = 0, len = categories.length; i < len; ++i) {
+                this.createIndicator(categories[i], null, $("a", categories[i])[0].f)
+            }
+            $(this.noteTop).css("padding-bottom", "12px");
+            $(this.noteIndicators).append($('<div class="clear"></div>')).insertAfter($(this.navTop))
+        }
+    },
 
     initStatisticFilter: function(row)
     {
@@ -18154,6 +18225,90 @@ Announcement.prototype = {
     }
 };
 
+$WH.aE(window, 'load', function () {
+    if (!(window.JSON && $WH.localStorage.isSupported())) {
+        return;
+    }
+
+    var lv = $WH.localStorage.get('lvBrowse');
+    if (!lv) {
+        return;
+    }
+
+    lv = window.JSON.parse(lv);
+    if (!lv) {
+        return;
+    }
+
+    var pattern = /^\?[-a-z]+=\d+/i;
+    // var path    = pattern.exec(location.pathname);
+    var path    = pattern.exec(location.search);
+    if (!path) {
+        return;
+    }
+
+    path = path[0];
+
+    var makeButton = function (text, url) {
+        var a = $WH.ce('a');
+        a.className = 'button-red' + (url ? ' button-red-disabled' : '');
+
+        var em = $WH.ce('em');
+        $WH.ae(a, em);
+
+        var b = $WH.ce('b');
+        $WH.ae(em, b);
+
+        var i = $WH.ce('i');
+        $WH.ae(b, i);
+        $WH.st(i, text);
+
+        var sp = $WH.ce('span');
+        $WH.ae(em, sp);
+        $WH.st(sp, text);
+
+        return a;
+    };
+
+    for (var i = 0; i < lv.length; i++) {
+        var urls = lv[i].urls;
+
+        for (var j = 0; j < urls.length; j++) {
+            if (urls[j] == path) {
+                var prevUrl = j > 0 ? urls[j - 1] : false;
+                var nextUrl = (j + 1) < urls.length ? urls[j + 1] : false;
+                var upUrl   = lv[i].path + lv[i].hash;
+                var el      = $WH.ge('topbar-browse');
+
+                if (!el) {
+                    return;
+                }
+
+                var button;
+
+                button = makeButton('>', !nextUrl);
+                if (nextUrl) {
+                    button.href = nextUrl;
+                }
+                $WH.ae(el, button);
+
+                button = makeButton(LANG.up, !upUrl);
+                if (upUrl) {
+                    button.href = upUrl;
+                }
+                $WH.ae(el, button);
+
+                button = makeButton('<', !prevUrl);
+                if (prevUrl) {
+                    button.href = prevUrl;
+                }
+                $WH.ae(el, button);
+
+                return;
+            }
+        }
+    }
+});
 
 /*
 Global WoW data

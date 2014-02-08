@@ -291,14 +291,9 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h1 a.icontiny span, h2 a.icontiny span, h3 a.icont
     border: 0;
 }
 
-#header-ad
-{
-    position: absolute;
-    right: 0;
-    width: 728px;
-    height: 90px;
-    padding-top: 10px;
-}
+/************/
+/* TOP TABS */
+/************/
 
 #toptabs
 {
@@ -409,39 +404,32 @@ a#toptabs-menu-language
     background: url(../images/language.gif) left center no-repeat;
 }
 
-#topbar-expand
+/***********/
+/* TOP BAR */
+/***********/
+
+.topbar
 {
-    float: right;
-    position: relative;
+    background: #383838;
+    border: 1px solid #484848;
+    height: 30px;
+    overflow: hidden;
+
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
 }
 
-#topbar-expand a
-{
-    position: absolute;
-    display: block;
-    right: -8px;
-    top: 38px;
-    background: url(../images/expandsite.gif) no-repeat;
-    width: 8px;
-    height: 38px;
-    outline: none;
-    z-index: 10;
-}
-
-#topbar-expand a:hover
-{
-    background-position: 0 -38px;
-}
-
-#topbar-right
+.topbar-search
 {
     right: 14px;
     top: 5px;
     float: right;
+    margin-left: 7px;
     position: relative;
 }
 
-#topbar-right input
+.topbar-search input
 {
     border: 1px solid #a7a6aa;
     height: 18px;
@@ -452,7 +440,7 @@ a#toptabs-menu-language
     color: black;
 }
 
-#topbar-right a
+.topbar-search a
 {
     position: absolute;
     top: 0;
@@ -464,19 +452,20 @@ a#toptabs-menu-language
     display: block;
 }
 
-#topbar-right a:hover
+.topbar-search a:hover
 {
     background-position: left bottom;
 }
 
-#topbar
-{
-    background: #383838;
-    border-top: 1px solid #484848;
-    border-left: 1px solid #484848;
-    border-right: 1px solid #484848;
-    padding: 7px 0 7px 3px;
-    font-size: 13px;
+.topbar-browse {
+    float: right;
+    padding-right: 15px;
+    padding-top: 5px;
+}
+
+.topbar-buttons {
+    line-height: 30px;
+    padding-left: 3px;
 }
 
 #morelink
@@ -912,7 +901,7 @@ span.breadcrumb-ellipsis {
     padding: 4px 0 0 5px;
 }
 
-    span.menu-buttons a {
+span.menu-buttons a {
     text-decoration: none;
     color: white;
     padding: 4px 11px;
@@ -2423,17 +2412,17 @@ td.checked .listview-cb:hover
 }
 
 .slider-x, .slider-y {
-	position: relative;
+    position: relative;
 }
 
 .slider-x {
-	width: 100%;
-	height: 25px;
+    width: 100%;
+    height: 25px;
 }
 
 .slider-y {
-	width: 25px;
-	height: 100%;
+    width: 25px;
+    height: 100%;
 }
 
 .slider-x.has-labels {
@@ -2441,11 +2430,11 @@ td.checked .listview-cb:hover
 }
 
 .slider-x .track, .slider-y .track {
-	position: absolute;
-	display: block;
-	width: 100%;
-	height: 100%;
-	z-index: 8;
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    z-index: 8;
 }
 
 .slider-x .track {
@@ -2457,53 +2446,53 @@ td.checked .listview-cb:hover
 }
 
 .slider-x .handle, .slider-y .handle {
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: 10;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
 }
 
 .slider-x .handle {
-	background: url(../images/ui/misc/slider.gif) no-repeat top left;
-	cursor: e-resize;
-	height: 22px;
-	width: 9px;
+    background: url(../images/ui/misc/slider.gif) no-repeat top left;
+    cursor: e-resize;
+    height: 22px;
+    width: 9px;
 }
 
 .slider-y .handle {
-	background: url(../images/ui/misc/slider.gif) no-repeat top right;
-	cursor: n-resize;
-	height: 9px;
-	width: 22px;
+    background: url(../images/ui/misc/slider.gif) no-repeat top right;
+    cursor: n-resize;
+    height: 9px;
+    width: 22px;
 }
 
 .slider-x .handle:hover {
-	background-position: bottom left;
+    background-position: bottom left;
 }
 
 .slider-y .handle:hover {
-	background-position: bottom right;
+    background-position: bottom right;
 }
 
 .slider-x span, .slider-y span {
-	position: absolute;
-	background: #7e7e7e;
-	border: 1px solid #404040;
-	z-index: 5;
+    position: absolute;
+    background: #7e7e7e;
+    border: 1px solid #404040;
+    z-index: 5;
 }
 
 .slider-x span {
-	top: 9px;
-	left: 0;
-	width: 100%;
-	height: 2px;
+    top: 9px;
+    left: 0;
+    width: 100%;
+    height: 2px;
 }
 
 .slider-y span {
-	top: 0;
-	left: 9px;
-	width: 2px;
-	height: 100%;
+    top: 0;
+    left: 9px;
+    width: 2px;
+    height: 100%;
 }
 
 .slider-x .label {
@@ -2560,7 +2549,7 @@ td.checked .listview-cb:hover
 }
 
 .tooltip-slider table {
-	width: 100%;
+    width: 100%;
 }
 
 .pet-model

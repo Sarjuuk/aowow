@@ -630,6 +630,57 @@ $WH.OS = {
 //****************************************************************************//
 //****************************************************************************//
 
+$WH.localStorage = new function () {
+    this.isSupported = function () {
+        var _;
+        try {
+            _ = "localStorage" in window && window.localStorage !== null;
+        }
+        catch(b) {
+            _ = false;
+        }
+
+        if (_) {
+            try {
+                localStorage.setItem("test", "123");
+                _ = localStorage.getItem("test") == "123";
+                localStorage.removeItem("test")
+            }
+            catch(b) {
+                _ = false
+            }
+        }
+
+        $WH.localStorage.isSupported = (function (c) { return c; }).bind(null, _);
+
+        return _;
+    };
+
+    this.set = function (idx, data) {
+        if (!$WH.localStorage.isSupported()) {
+            return;
+        }
+
+        localStorage.setItem(idx, data);
+    };
+
+    this.get = function (idx) {
+        if (!$WH.localStorage.isSupported()) {
+            return;
+        }
+
+        return localStorage.getItem(idx)
+    };
+
+    this.remove = function (idx) {
+        if (!$WH.localStorage.isSupported()) {
+            return;
+        }
+
+        localStorage.removeItem(idx);
+    }
+};
+
 $WH.g_getWindowSize = function () {
     var
         width  = 0,
@@ -996,20 +1047,20 @@ $WH.g_intersectRect = function(a, b) {
 
 // sarjuuk: this function should be obsolete by now :x
 $WH.g_setRatingLevel = function(sp, level, rating, value) {
-	var newLvl = prompt($WH.sprintf(LANG.prompt_ratinglevel, 1, 80), level);
-	if (newLvl != null) {
-		newLvl |= 0;
-		if (newLvl != level && newLvl >= 1 && newLvl <= 80) {
-			level = newLvl;
-			var a = $WH.g_convertRatingToPercent(level, rating, value);
-			a = (Math.round(a * 100) / 100);
-			if (rating != 12 && rating != 37) {
-				a += "%"
-			}
-			sp.innerHTML = $WH.sprintf(LANG.tooltip_combatrating, a, level);
-			sp.onclick = $WH.g_setRatingLevel.bind(0, sp, level, rating, value);
-		}
-	}
+    var newLvl = prompt($WH.sprintf(LANG.prompt_ratinglevel, 1, 80), level);
+    if (newLvl != null) {
+        newLvl |= 0;
+        if (newLvl != level && newLvl >= 1 && newLvl <= 80) {
+            level = newLvl;
+            var a = $WH.g_convertRatingToPercent(level, rating, value);
+            a = (Math.round(a * 100) / 100);
+            if (rating != 12 && rating != 37) {
+                a += "%"
+            }
+            sp.innerHTML = $WH.sprintf(LANG.tooltip_combatrating, a, level);
+            sp.onclick = $WH.g_setRatingLevel.bind(0, sp, level, rating, value);
+        }
+    }
 }
 
 $WH.g_convertRatingToPercent = function(level, rating, value, classs) {

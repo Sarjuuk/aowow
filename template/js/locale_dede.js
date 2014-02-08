@@ -267,10 +267,12 @@ var mn_npcs = [
 var mn_objects = [
     [9,"Bücher"],
     [3,"Behälter"],
-    [-5,"Schließkisten"],
+    [-5,"Truhen"],
+    [25,"Fischschwärme"],
     [-3,"Kräuter"],
     [-4,"Erzadern"],
-    [-2,"Quest"]
+    [-2,"Quest"],
+    [-6,"Werkzeuge"]
 ];
 var mn_quests = [
     [,"Kontinent"],
@@ -1283,12 +1285,15 @@ var g_pet_foods = {
 };
 
 var g_object_types = {
+       0: 'Anderes',
        9: 'Buch',
        3: 'Behälter',
-    "-5": 'Schließkiste',
-    "-3": 'Kräut',
+    "-5": 'Truhe',
+      25: 'Fischschwarm',
+    "-3": 'Kraut',
     "-4": 'Erzvorkommen',
-    "-2": 'Quest'
+    "-2": 'Quest',
+    "-6": 'Werkzeug'
 };
 
 var g_reputation_standings = {
@@ -2320,6 +2325,7 @@ var LANG = {
     tp:                     "TP",
     trending:               "Aktuell",
     type:                   "Art",
+    up:                     "Hoch",
     cooldown:               "Abklingzeit",
     duration:               "Dauer",
     user:                   "Benutzer",
@@ -3782,6 +3788,9 @@ var LANG = {
     pr_note_missing:       "Fehlend",
     pr_note_normal:        "Normal",
     pr_note_exotic:        "Exotisch",
+
+    su_note_stats:         "Werte",
+    su_note_other:         "Anderes",
 
     su_notice:       'Euer erstes Mal? Nur keine falsche Scheu! Schaut einfach auf unsere <a href="?help=item-comparison" target="_blank">Hilfeseite</a>!',
     su_itemtip:      "Tipp: Shift- oder rechtsklickt Gegenstände für mehr Optionen.",

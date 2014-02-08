@@ -2699,6 +2699,68 @@ Summary.prototype = {
 
         $WH.ae(sm, a);
         $WH.ae(div, sm);
+
+        sm = $WH.ce('small');
+        var sp = $WH.ce('span');
+        sp.style.padding = '0 8px';
+        sp.style.color = 'white';
+        $WH.ae(sp, $WH.ct('|'));
+        $WH.ae(sm, sp);
+        $WH.ae(sm, $WH.ct(LANG.su_note_stats + ': '));
+
+        a = $WH.ce('a');
+        a.href = 'javascript:;';
+        a.onclick = this.filterEnchants.bind(this, a, 1, null);
+        $WH.ae(a, $WH.ct(LANG.pr_note_all));
+
+        g_setSelectedLink(a, 'enchants1');
+
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma))
+
+        a = $WH.ce('a');
+        a.href = 'javascript:;';
+        a.onclick = this.filterEnchants.bind(this, a, 1, 'sta');
+        $WH.ae(a, $WH.ct(LANG.traits.sta[0]));
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
+
+        a = $WH.ce('a');
+        a.href = 'javascript:;';
+        a.onclick = this.filterEnchants.bind(this, a, 1, 'str')
+        $WH.ae(a, $WH.ct(LANG.traits.str[0]));
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
+
+        a = $WH.ce('a');
+        a.href = 'javascript:;';
+        a.onclick = this.filterEnchants.bind(this, a, 1, 'agi');
+        $WH.ae(a, $WH.ct(LANG.traits.agi[0]))
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
+
+        a = $WH.ce('a');
+        a.href = 'javascript:;';
+        a.onclick = this.filterEnchants.bind(this, a, 1, 'int');
+        $WH.ae(a, $WH.ct(LANG.traits['int'][0]));
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
+
+        a = $WH.ce('a');
+        a.href = 'javascript:;';
+        a.onclick = this.filterEnchants.bind(this, a, 1, 'spi');
+        $WH.ae(a, $WH.ct(LANG.traits['spi'][0]));
+        $WH.ae(sm, a);
+        $WH.ae(sm, $WH.ct(LANG.comma));
+
+        a = $WH.ce('a');
+        a.href = 'javascript:;';
+        a.onclick = this.filterEnchants.bind(this, a, 1, -1);
+        $WH.ae(a, $WH.ct(LANG.su_note_other));
+
+        this.enchantStat = null;
+        $WH.ae(sm, a);
+        $WH.ae(div, sm);
     },
 
     canBeEnchanted: function(slot, subclass) {
@@ -2725,6 +2787,22 @@ Summary.prototype = {
                 this.enchantSource == null ||
                 (this.enchantSource == 1 && enchant.source < 0) ||
                 (this.enchantSource == 2 && enchant.source > 0)
+            ) &&
+
+            // StatType
+            (
+                this.enchantStat == null ||
+                (
+                    this.enchantStat == -1 &&
+                    !enchant.jsonequip.hasOwnProperty('sta') &&
+                    !enchant.jsonequip.hasOwnProperty('str') &&
+                    !enchant.jsonequip.hasOwnProperty('agi') &&
+                    !enchant.jsonequip.hasOwnProperty('int') &&
+                    !enchant.jsonequip.hasOwnProperty('spi')
+                ) ||
+                (
+                    enchant.jsonequip.hasOwnProperty(this.enchantStat)
+                )
             )
         );
     },
@@ -2733,6 +2811,9 @@ Summary.prototype = {
         switch (wut) {
         case 0:
             this.enchantSource = value;
+            break;
+        case 1:
+            this.enchantStat = value;
             break;
         default:
             return;
@@ -4492,24 +4573,24 @@ Listview.templates.compare = {
                 return Listview.funcBox.getItemType(item.classs, item.subclass, item.subsubclass).text;
             }
         },
-		{
-			id: 'score',
-			align: 'center',
-			compute: function(item, td, tr) {
-				if (item.score != null) {
-					var
+        {
+            id: 'score',
+            align: 'center',
+            compute: function(item, td, tr) {
+                if (item.score != null) {
+                    var
                         n = parseFloat(item.score),
-						s = $WH.ce('div');
+                        s = $WH.ce('div');
 
-					s.className = 'small q' + (n ? (n > 0 ? 2 : 10) : 0);
-					$WH.st(s, (n ? (n > 0 ? '+' : '-') + item.score : 0));
-					$WH.ae(td, s);
-				}
+                    s.className = 'small q' + (n ? (n > 0 ? 2 : 10) : 0);
+                    $WH.st(s, (n ? (n > 0 ? '+' : '-') + item.score : 0));
+                    $WH.ae(td, s);
+                }
                 else {
                     td.style.display = 'none';
                 }
-			}
-		}
+            }
+        }
     ]
 };
 

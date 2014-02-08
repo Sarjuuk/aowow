@@ -26,8 +26,12 @@
                 <div class="clear"></div>
             </div>
         </div>
-        <div id="topbar-right"><div><form action="."><a href="javascript:;"></a><input name="search" size="35" value="" id="livesearch-generic" /></form></div></div>
-        <div id="topbar"><span id="topbar-generic" class="menu-buttons"></span><div class="clear"></div></div>
+        <div class="topbar" id="topbar">
+            <div class="topbar-search"><form action="."><a href="javascript:;"></a><input name="search" size="35" value="" id="livesearch-generic" /></form></div>
+            <div class="topbar-browse" id="topbar-browse"></div>
+            <div class="topbar-buttons" id="topbar-buttons"></div>
+        </div>
+
         {strip}<script type="text/javascript">
             g_initHeader({$tab});
             LiveSearch.attach($WH.ge('livesearch-generic'));

@@ -267,10 +267,12 @@ var mn_npcs = [
 var mn_objects = [
     [9,"Livres"],
     [3,"Conteneurs"],
-    [-5,"Cantines"],
+    [-5,"Coffres"],
+    [25,"Bancs de poissons"],
     [-3,"Herbes"],
     [-4,"Filons de minerai"],
-    [-2,"Quête"]
+    [-2,"Quête"],
+    [-6,"Outils"]
 ];
 var mn_quests = [
     [,"Continents"],
@@ -1283,12 +1285,15 @@ var g_pet_foods = {
 };
 
 var g_object_types = {
+       0: 'Autre',
        9: 'Livre',
        3: 'Conteneur',
-    "-5": 'Cantine',
+    "-5": 'Coffre',
+      25: 'Banc de poissons',
     "-3": 'Herbe',
     "-4": 'Filon de minerai',
-    "-2": 'Quête'
+    "-2": 'Quête',
+    "-6": 'Outil'
 };
 
 var g_reputation_standings = {
@@ -2308,6 +2313,7 @@ var LANG = {
     tp:                     "PE",
     trending:               "Tendance",
     type:                   "Type",
+    up:                     "Vers le haut",
     cooldown:               "Recharge",
     duration:               "Durée",
     user:                   "Utilisateur",
@@ -3998,7 +4004,10 @@ var LANG = {
     pr_note_normal:        "Standard",
     pr_note_exotic:        "Exotique",
 
-    pr_note_weighted:"Valorisé",    /* some relic text..? */
+    pr_note_weighted:      "Valorisé",    /* some relic text..? */
+
+    su_note_stats:         "Statistiques",
+    su_note_other:         "Autre",
 
     su_notice:       'Première visite? &ndash; Ne soyez pas intimidé! Vous n\'avez qu\'à lire notre <a href="?help=item-comparison" target="_blank">page d\'aide</a> !',
     su_itemtip:      "Conseil: Tenir Shift enfoncé ou clique-droit sur l'objet pour plus d'options.",

@@ -10,7 +10,7 @@
             <li><div>Deberías corregir tus comentarios antes de enviarlos.</div></li>
             </ul>
 
-            <form name="addcomment" action="?comment=add&amp;type={$page.type}&amp;typeid={$page.typeId}" method="post" onsubmit="return co_validateForm(this)">
+            <form name="addcomment" action="?comment=add&amp;type={$type}&amp;typeid={$typeId}" method="post" onsubmit="return co_validateForm(this)">
                 <div id="replybox-generic" style="display: none">
                     The answer to a comment from <span></span>. &nbsp;<a href="javascript:;" onclick="co_cancelReply()">Cancel</a>
                     <div class="pad"></div>
@@ -33,7 +33,7 @@
             <li><div>Asegurate de leer las <a href="?help=screenshots-tips-tricks" target="_blank">sugerencias y trucos</a> si no lo has hecho antes.</div></li>
             </ul>
 
-            <form action="?screenshot=add&{$page.type}.{$page.typeId}" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
+            <form action="?screenshot=add&{$type}.{$typeId}" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
 
             File{$lang.colon}<input type="file" name="screenshotfile" style="width: 35%"/><br />
             <div class="pad2"></div>
@@ -52,7 +52,7 @@
             Símplemente, escribe la URL del vídeo en el formulario.
 
             <div class="pad2"></div>
-            <form action="?video=add&{$page.type}.{$page.typeId}" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
+            <form action="?video=add&{$type}.{$typeId}" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
 
             URL{$lang.colon}<input type="text" name="videourl" style="width: 35%" /> <small>Soportado: Sólo YouTube</small>
             <div class="pad2"></div>

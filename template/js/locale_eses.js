@@ -267,10 +267,12 @@ var mn_npcs = [
 var mn_objects = [
     [9,"Libros"],
     [3,"Contenedores"],
-    [-5,"Armarios de pie"],
+    [-5,"Cofres"],
+    [25,"[Fishing Pools]"],
     [-3,"Hierbas"],
     [-4,"Venas de minerales"],
-    [-2,"Misión"]
+    [-2,"Misión"],
+    [-6,"Herramientas"]
 ];
 var mn_quests = [
     [,"Continentes"],
@@ -1283,12 +1285,15 @@ var g_pet_foods = {
 };
 
 var g_object_types = {
+       0: 'Otros',
        9: 'Libro',
        3: 'Contenedore',
-    "-5": 'Baúle',
+    "-5": 'Cofre',
+      25: '[Fishing Pool]',
     "-3": 'Hierba',
     "-4": 'Filóne de mineral',
-    "-2": 'Misión'
+    "-2": 'Misión',
+    "-6": 'Herramienta'
 };
 
 var g_reputation_standings = {
@@ -2321,6 +2326,7 @@ var LANG = {
     tp:                     "PI",
     trending:               "Tendencia",
     type:                   "Tipo",
+    up:                     "Arriba",
     cooldown:               "Reutilización",
     duration:               "Duración",
     user:                   "Usuario",
@@ -4009,7 +4015,10 @@ var LANG = {
     pr_note_normal:        "Normal",
     pr_note_exotic:        "Exótica",
 
-    pr_note_weighted:"Valorado",    /* some relic text..? */
+    pr_note_weighted:      "Valorado",    /* some relic text..? */
+
+    su_note_stats:         "Estadisticas",
+    su_note_other:         "Otros",
 
     su_notice:      '¿Tu primera vez? ¡No seas vergonzoso! !Mira nuestra <a href="?help=item-comparison" target="_blank">página de ayuda</a>!',
     su_itemtip:     "Consejo: Usa Shift o Click derecho en los objetos para ver más opciones.",

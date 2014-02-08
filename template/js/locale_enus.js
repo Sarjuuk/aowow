@@ -267,10 +267,12 @@ var mn_npcs = [
 var mn_objects = [
     [9,"Books"],
     [3,"Containers"],
-    [-5,"Footlockers"],
+    [-5,"Chests"],
+    [25,"Fishing Pools"],
     [-3,"Herbs"],
     [-4,"Mineral Veins"],
-    [-2,"Quest"]
+    [-2,"Quest"],
+    [-6,"Tools"]
 ];
 var mn_quests = [
     [,"Continents"],
@@ -1329,12 +1331,15 @@ var g_pet_foods = {
 };
 
 var g_object_types = {
+       0: 'Other',
        9: 'Book',
        3: 'Container',
-    "-5": 'Footlocker',
+    "-5": 'Chest',
+      25: 'Fishing Pool',
     "-3": 'Herb',
     "-4": 'Mineral Vein',
-    "-2": 'Quest'
+    "-2": 'Quest',
+    "-6": 'Tool'
 };
 
 var g_reputation_standings = {
@@ -2366,6 +2371,7 @@ var LANG = {
     tp:                     "TP",
     trending:               "Trending",
     type:                   "Type",
+    up:                     "Up",
     cooldown:               "Cooldown",
     duration:               "Duration",
     user:                   "User",
@@ -3827,6 +3833,9 @@ var LANG = {
     pr_note_missing:       "Missing",
     pr_note_normal:        "Normal",
     pr_note_exotic:        "Exotic",
+
+    su_note_stats:          "Stats",
+    su_note_other:          "Other",
 
     su_notice:       'First time? &ndash; Don\'t be shy! Just check out our <a href="?help=item-comparison" target="_blank">Help page</a>!',
     su_itemtip:      "Tip: Shift or right-click items for more options.",
