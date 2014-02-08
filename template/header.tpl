@@ -11,7 +11,7 @@
     <div id="header">
         <div id="header-logo">
             <a href="."></a>
-            <h1>{$page.title|escape:"html"}</h1>
+            <h1>{$title|escape:"html"}</h1>
         </div>
     </div>
     <div id="wrapper" class="nosidebar">
@@ -29,7 +29,7 @@
         <div id="topbar-right"><div><form action="."><a href="javascript:;"></a><input name="search" size="35" value="" id="livesearch-generic" /></form></div></div>
         <div id="topbar"><span id="topbar-generic" class="menu-buttons"></span><div class="clear"></div></div>
         {strip}<script type="text/javascript">
-            g_initHeader({$page.tab});
+            g_initHeader({$tab});
             LiveSearch.attach($WH.ge('livesearch-generic'));
 {foreach from=$jsGlobals item="glob"}
     {include file="bricks/globals/`$glob[0]`.tpl" data=$glob[1] extra=$glob[2]}

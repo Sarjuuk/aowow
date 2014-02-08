@@ -31,7 +31,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $race = new CharRaceList(array(['id', $_id]));          // should this be limited to playable races..?
     if ($race->error)
-        $smarty->notFound(Lang::$game['race']);
+        $smarty->notFound(Lang::$game['race'], $_id);
 
     /***********/
     /* Infobox */
@@ -68,20 +68,28 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     /* Main Content */
     /****************/
 
+    // menuId 13: Race     g_initPath()
+    //  tabId  0: Database g_initHeader()
     $pageData = array (
-        'title'      => $race->getField('name', true).' - '.Util::ucFirst(Lang::$game['race']),
-        'path'       => $_path,
-        'infobox'    => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
-        'relTabs'    => [],
-        'buttons' => array(
-            BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
-        ),
         'page'       => array(
-            'name'      => $race->getField('name', true),
-            'icon'      => strtolower($race->getField('fileString')),
-            'expansion' => Util::$expansionString[$race->getField('expansion')]
-        )
+            'name'       => $race->getField('name', true),
+            'expansion'  => Util::$expansionString[$race->getField('expansion')],
+            'title'      => $race->getField('name', true).' - '.Util::ucFirst(Lang::$game['race']),
+            'path'       => json_encode($_path, JSON_NUMERIC_CHECK),
+            'tab'        => 0,
+            'type'       => TYPE_RACE,
+            'typeId'     => $_id,
+            'infobox'    => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
+            'headIcons'  => array(
+                'race_'.strtolower($race->getField('fileString')).'_male',
+                'race_'.strtolower($race->getField('fileString')).'_female'
+            ),
+            'redButtons' => array(
+                BUTTON_WOWHEAD => true,
+                BUTTON_LINKS   => true
+            )
+        ),
+        'relTabs'    => []
     );
 
     /**************/
@@ -187,21 +195,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 }
 
 
-// menuId 13: Race     g_initPath()
-//  tabId  0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => $pageData['title'],
-    'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-    'tab'    => 0,
-    'type'   => TYPE_RACE,
-    'typeId' => $_id
-));
-$smarty->assign('redButtons', $pageData['buttons']);
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_RACE, $_id));       // comments, screenshots, videos
 $smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);
 
 // load the page
-$smarty->display('race.tpl');
+$smarty->display('detail-page-generic.tpl');
 
 ?>

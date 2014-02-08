@@ -190,6 +190,12 @@ a.selected, a.selected:hover
     color: #909090;
 }
 
+.text span.rep-difficulty {
+    font-weight: bold;
+    text-shadow: 0 0 6px gray;
+    filter: dropshadow(color=gray,offx=0,offy=0);
+}
+
 h1 a, h2 a, h3 a, h4 a, h5 a, h1 a.icontiny span, h2 a.icontiny span, h3 a.icontiny span, h4 a.icontiny span, h5 a.icontiny span
 {
     text-decoration:none !important;
@@ -3407,6 +3413,11 @@ a:hover, a.open, .infobox li div, .text b
     padding-left: 26px;
 }
 
+.text ol ul, .text ol ol, .text ul ol, .text ul ul {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
 .text ul.first, .text ol.first, .comment-body h3.first
 {
     margin-top: 0;
@@ -3419,7 +3430,7 @@ a:hover, a.open, .infobox li div, .text b
 
 .text ul li, .comment-body ul li
 {
-    color: #c3030b;
+    /* color: #c3030b; */
     list-style-type: square;
 }
 
@@ -3825,6 +3836,11 @@ div.modelviewer, div.screenshotviewer
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     border-radius: 6px;
+}
+
+.reputation-negative-amount span {
+    color: red;
+    font-weight: bold;
 }
 
 div.announcement-pagetop div.announcement-inner {

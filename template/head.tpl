@@ -1,4 +1,4 @@
-    <title>{if $page.title}{$page.title|escape:"html"} - {/if}{$appName}</title>
+    <title>{if $title}{$title|escape:"html"} - {/if}{$appName}</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <link rel="SHORTCUT ICON" href="template/images/favicon.ico">
@@ -8,7 +8,7 @@
     <!--[if IE]><link rel="stylesheet" type="text/css" href="template/css/global_ie.css?{$AOWOW_REVISION}" /><![endif]-->
     <!--[if lte IE 6]><link rel="stylesheet" type="text/css" href="template/css/global_ie6.css?{$AOWOW_REVISION}" /><![endif]-->
     <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="template/css/global_ie67.css?{$AOWOW_REVISION}" /><![endif]-->
-{foreach from=$page.reqCSS item=css}
+{foreach from=$reqCSS item=css}
 {if isset($css.string)}
     <style type="text/css">{$css.string}</style>
 {else}
@@ -25,7 +25,7 @@
     <script src="template/js/locale_{$user.language}.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="template/js/global.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="template/js/Markup.js?{$AOWOW_REVISION}" type="text/javascript"></script>
-{foreach from=$page.reqJS item=file}
+{foreach from=$reqJS item=file}
     <script src="{$file}{*?$AOWOW_REVISION*}" type="text/javascript"></script>
 {/foreach}
     <script type="text/javascript">

@@ -248,9 +248,32 @@ $lang = array(
         'viewPubDesc'   => "View your Public Description in your <a href=\"?user=%s\">Profile  Page</a>",
     ),
     'npc'   => array(
-        'rank'          => ['Normal', 'Elite', 'Rare Elite', 'Boss', 'Rare']
+        'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rare", 2 => "Rare Elite", 3 => "Boss"],
+        'classification'=> "Classification",
+        'petFamily'     => "Pet familiy",
+        'react'         => "React",
+        'worth'         => "Worth",
+        'unkPosition'   => "The location of this NPC is unknown.",
+        'difficultyPH'  => "This NPC is a placeholder for a different mode of",
+        'quotes'        => "Quotes",
+        'gainsDesc'     => "After killing this NPC you will gain",
+        'repWith'       => "reputation with",
+        'stopsAt'       => "stops at %s",
+        'textTypes'     => [null, "yells", "says", "whispers"],
+        'modes'         => array(
+            1 => ["Normal", "Heroic"],
+            2 => ["10-player Normal", "25-player Normal", "10-player Heroic", "25-player Heroic"]
+        ),
+        'cat'           => array(
+            "Uncategorized",            "Beasts",                   "Dragonkins",               "Demons",                   "Elementals",               "Giants",                   "Undead",                   "Humanoids",
+            "Critters",                 "Mechanicals",              "Not specified",            "Totems",                   "Non-combat Pets",          "Gas Clouds"
+        ),
     ),
     'event' => array(
+        'start'         => "Start",
+        'end'           => "End",
+        'interval'      => "Interval",
+        'inProgress'    => "Event is currently in progress",
         'category'      => array("Uncategorized", "Holidays", "Recurring", "Player vs. Player")
     ),
     'achievement' => array(
@@ -262,6 +285,7 @@ $lang = array(
         'itemReward'    => "You will receive:",
         'titleReward'   => "You shall be granted the title \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "slain",
+        'reqNumCrt'     => "Requires"
     ),
     'class' => array(
         'racialLeader'  => "Racial leader",
@@ -309,6 +333,7 @@ $lang = array(
         )
     ),
     'currency' => array(
+        'cap'           => "Total cap",
         'cat'           => array(
             1 => "Miscellaneous", 2 => "Player vs. Player", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon and Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Unused"
         )
@@ -331,7 +356,7 @@ $lang = array(
         '_pieces'       => "pieces",
         '_unavailable'  => "This item set is not available to players.",
         '_tag'          => "Tag",
-
+        'summary'       => "Summary",
         'notes'         => array(
             null,                                   "Dungeon Set 1",                        "Dungeon Set 2",                        "Tier 1 Raid Set",
             "Tier 2 Raid Set",                      "Tier 3 Raid Set",                      "Level 60 PvP Rare Set",                "Level 60 PvP Rare Set (Old)",
@@ -685,7 +710,9 @@ $lang = array(
             "Unknown Bonus #%d (%d)",
         )
     ),
-    'colon'             => ': '
+    'colon'             => ': ',
+    'dateFmtShort'      => "Y/m/d",
+    'dateFmtLong'       => "Y/m/d \a\\t H:i"
 );
 
 ?>

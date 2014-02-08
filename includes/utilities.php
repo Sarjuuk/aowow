@@ -3,280 +3,6 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
-class Lang
-{
-    public static $timeUnits;
-    public static $main;
-    public static $account;
-    public static $game;
-    public static $error;
-
-    public static $search;
-    public static $profiler;
-
-    public static $achievement;
-    public static $class;
-    public static $currency;
-    public static $event;
-    public static $faction;
-    public static $item;
-    public static $itemset;
-    public static $maps;
-    public static $npc;
-    public static $pet;
-    public static $quest;
-    public static $skill;
-    public static $spell;
-    public static $title;
-    public static $zone;
-
-    public static $colon;
-
-    public static function load($loc)
-    {
-        if (!file_exists('localization/locale_'.$loc.'.php'))
-            die('File for localization '.strToUpper($loc).' not found.');
-        else
-            require 'localization/locale_'.$loc.'.php';
-
-        foreach ($lang as $k => $v)
-            self::$$k = $v;
-
-        // *cough* .. reuse-hack
-        self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
-        self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
-    }
-
-    // todo: expand
-    public static function getInfoBoxForFlags($flags)
-    {
-        $tmp = [];
-
-        if ($flags & CUSTOM_DISABLED)
-            $tmp[] = '[tooltip name=disabledHint]'.Util::jsEscape(self::$main['disabledHint']).'[/tooltip][span class=tip tooltip=disabledHint]'.Util::jsEscape(self::$main['disabled']).'[/span]';
-
-        if ($flags & CUSTOM_SERVERSIDE)
-            $tmp[] = '[tooltip name=serversideHint]'.Util::jsEscape(self::$main['serversideHint']).'[/tooltip][span class=tip tooltip=serversideHint]'.Util::jsEscape(self::$main['serverside']).'[/span]';
-
-        if ($flags & CUSTOM_UNAVAILABLE)
-            $tmp[] = self::$main['unavailable'];
-
-        return $tmp;
-    }
-
-    public static function getLocks($lockId, $interactive = false)
-    {
-        $locks = [];
-        $lock  = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE id = ?d', $lockId);
-        if (!$lock)
-            return '';
-
-        for ($i = 1; $i <= 5; $i++)
-        {
-            $prop = $lock['properties'.$i];
-            $rank = $lock['reqSkill'.$i];
-            $name = '';
-
-            if ($lock['type'.$i] == 1)                      // opened by item
-            {
-                $name = ItemList::getName($prop);
-                if (!$name)
-                    continue;
-
-                if ($interactive)
-                    $name = '<a class="q1" href="?item='.$prop.'">'.$name.'</a>';
-            }
-            else if ($lock['type'.$i] == 2)                 // opened by skill
-            {
-                // exclude unusual stuff
-                if (!in_array($prop, [1, 2, 3, 4, 9, 16, 20]))
-                    continue;
-
-                $txt = DB::Aowow()->selectRow('SELECT * FROM ?_locktype WHERE id = ?d', $prop);         // todo (low): convert to static text
-                $name = Util::localizedString($txt, 'name');
-                if (!$name)
-                    continue;
-
-                if ($interactive)
-                {
-                    $skill = 0;
-                    switch ($prop)
-                    {
-                        case  1: $skill = 633; break;   // Lockpicking
-                        case  2: $skill = 182; break;   // Herbing
-                        case  3: $skill = 186; break;   // Mining
-                        case 20: $skill = 773; break;   // Scribing
-                    }
-
-                    if ($skill)
-                        $name = '<a href="?skill='.$skill.'">'.$name.'</a>';
-                }
-
-                if ($rank > 0)
-                    $name .= ' ('.$rank.')';
-            }
-            else
-                continue;
-
-            $locks[$lock['type'.$i] == 1 ? $i : -$i] = sprintf(Lang::$game['requires'], $name);
-        }
-
-        return $locks;
-    }
-
-    public static function getReputationLevelForPoints($pts)
-    {
-        if ($pts >= 41999)
-            return self::$game['rep'][REP_EXALTED];
-        else if ($pts >= 20999)
-            return self::$game['rep'][REP_REVERED];
-        else if ($pts >= 8999)
-            return self::$game['rep'][REP_HONORED];
-        else if ($pts >= 2999)
-            return self::$game['rep'][REP_FRIENDLY];
-        else /* if ($pts >= 1) */
-            return self::$game['rep'][REP_NEUTRAL];
-    }
-
-    public static function getRequiredItems($class, $mask, $short = true)
-    {
-        if (!in_array($class, [ITEM_CLASS_MISC, ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON]))
-            return '';
-
-        // not checking weapon / armor here. It's highly unlikely that they overlap
-        if ($short)
-        {
-            // misc - Mounts
-            if ($class == ITEM_CLASS_MISC)
-                return '';
-
-            // all basic armor classes
-            if ($class == ITEM_CLASS_ARMOR && ($mask & 0x1E) == 0x1E)
-                return '';
-
-            // all weapon classes
-            if ($class == ITEM_CLASS_WEAPON && ($mask & 0x1DE5FF) == 0x1DE5FF)
-                return '';
-
-            foreach (Lang::$spell['subClassMasks'] as $m => $str)
-                if ($mask == $m)
-                    return $str;
-        }
-
-        if ($class == ITEM_CLASS_MISC)                      // yeah hardcoded.. sue me!
-            return Lang::$spell['cat'][-5];
-
-        $tmp  = [];
-        $strs = Lang::$spell[$class == ITEM_CLASS_ARMOR ? 'armorSubClass' : 'weaponSubClass'];
-        foreach ($strs as $k => $str)
-            if ($mask & (1 << $k) && $str)
-                $tmp[] = $str;
-
-        return implode(', ', $tmp);
-    }
-
-    public static function getStances($stanceMask)
-    {
-        $stanceMask &= 0xFC27909F;                          // clamp to available stances/forms..
-
-        $tmp = [];
-        $i   = 1;
-
-        while ($stanceMask)
-        {
-            if ($stanceMask & (1 << ($i - 1)))
-            {
-                $tmp[] = self::$game['st'][$i];
-                $stanceMask &= ~(1 << ($i - 1));
-            }
-            $i++;
-        }
-
-        return implode(', ', $tmp);
-    }
-
-    public static function getMagicSchools($schoolMask)
-    {
-        $schoolMask &= SPELL_ALL_SCHOOLS;                   // clamp to available schools..
-        $tmp = [];
-        $i   = 0;
-
-        while ($schoolMask)
-        {
-            if ($schoolMask & (1 << $i))
-            {
-                $tmp[] = self::$game['sc'][$i];
-                $schoolMask &= ~(1 << $i);
-            }
-            $i++;
-        }
-
-        return implode(', ', $tmp);
-    }
-
-    public static function getClassString($classMask)
-    {
-        $classMask &= CLASS_MASK_ALL;                       // clamp to available classes..
-
-        if ($classMask == CLASS_MASK_ALL)                   // available to all classes
-            return false;
-
-        $tmp = [];
-        $i   = 1;
-
-        while ($classMask)
-        {
-            if ($classMask & (1 << ($i - 1)))
-            {
-                $tmp[] = '<a href="?class='.$i.'" class="c'.$i.'">'.self::$game['cl'][$i].'</a>';
-                $classMask &= ~(1 << ($i - 1));
-            }
-            $i++;
-        }
-
-        return implode(', ', $tmp);
-    }
-
-    public static function getRaceString($raceMask)
-    {
-        $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
-
-        if ($raceMask == RACE_MASK_ALL)                     // available to all races (we don't display 'both factions')
-            return false;
-
-        $tmp  = [];
-        $side = 0;
-        $i    = 1;
-
-        if (!$raceMask)
-            return array('side' => SIDE_BOTH,     'name' => self::$game['ra'][0]);
-
-        if ($raceMask == RACE_MASK_HORDE)
-            return array('side' => SIDE_HORDE,    'name' => self::$game['ra'][-2]);
-
-        if ($raceMask == RACE_MASK_ALLIANCE)
-            return array('side' => SIDE_ALLIANCE, 'name' => self::$game['ra'][-1]);
-
-        if ($raceMask & RACE_MASK_HORDE)
-            $side |= SIDE_HORDE;
-
-        if ($raceMask & RACE_MASK_ALLIANCE)
-            $side |= SIDE_ALLIANCE;
-
-        while ($raceMask)
-        {
-            if ($raceMask & (1 << ($i - 1)))
-            {
-                $tmp[] = '<a href="?race='.$i.'" class="q1">'.self::$game['ra'][$i].'</a>';
-                $raceMask &= ~(1 << ($i - 1));
-            }
-            $i++;
-        }
-
-        return array ('side' => $side, 'name' => implode(', ', $tmp));
-    }
-}
-
 class SmartyAoWoW extends Smarty
 {
     private $config    = [];
@@ -289,8 +15,6 @@ class SmartyAoWoW extends Smarty
 
         $cwd = str_replace("\\", "/", getcwd());
 
-        $this->assign('appName', $config['name']);
-        $this->assign('AOWOW_REVISION', AOWOW_REVISION);
         $this->config                 = $config;
         $this->template_dir           = $cwd.'/template/';
         $this->compile_dir            = $cwd.'/cache/template/';
@@ -300,17 +24,20 @@ class SmartyAoWoW extends Smarty
         $this->left_delimiter         = '{';
         $this->right_delimiter        = '}';
         $this->caching                = false;              // Total Cache, this site does not work
-        $this->_tpl_vars['page']      = array(
-            'reqJS'  => [],                                 // <[string]> path to required JSFile
-            'reqCSS' => [],                                 // <[string,string]> path to required CSSFile, IE condition
-            'title'  => null,                               // [string] page title
-            'tab'    => null,                               // [int] # of tab to highlight in the menu
-            'type'   => null,                               // [int] numCode for spell, npc, object, ect
-            'typeId' => null,                               // [int] entry to display
-            'path'   => '[]'                                // [string] (js:array) path to preselect in the menu
+        $this->_tpl_vars              = array(
+            'reqJS'      => [],                             // <[string]> path to required JSFile
+            'reqCSS'     => [],                             // <[string,string]> path to required CSSFile, IE condition
+            'title'      => null,                           // [string] page title
+            'tab'        => null,                           // [int] # of tab to highlight in the menu
+            'type'       => null,                           // [int] numCode for spell, npc, object, ect
+            'typeId'     => null,                           // [int] entry to display
+            'path'       => '[]',                           // [string] (js:array) path to preselect in the menu
+            'jsGlobals'  => [],
+            'redButtons' => [],
+            'headIcons'  => [],                             // icons in front of title
         );
-        $this->_tpl_vars['jsGlobals']  = [];
-        $this->_tpl_vars['redButtons'] = [];
+        $this->assign('appName', $config['name']);
+        $this->assign('AOWOW_REVISION', AOWOW_REVISION);
     }
 
     // using Smarty::assign would overwrite every pair and result in undefined indizes
@@ -320,7 +47,7 @@ class SmartyAoWoW extends Smarty
             return;
 
         foreach ($pageVars as $var => $val)
-            $this->_tpl_vars['page'][$var] = $val;
+            $this->_tpl_vars[$var] = $val;
     }
 
     // use, if you want to alert the staff to a problem with Trinity
@@ -334,13 +61,13 @@ class SmartyAoWoW extends Smarty
         $tv = &$this->_tpl_vars;
 
         // fetch article & static infobox
-        if ($tv['page']['type'] && $tv['page']['typeId'])
+        if ($tv['type'] && $tv['typeId'])
         {
             $article = DB::Aowow()->selectRow(
                 'SELECT SQL_CALC_FOUND_ROWS article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL '.
                 'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = 0 AND FOUND_ROWS() = 0',
-                $tv['page']['type'], $tv['page']['typeId'], User::$localeId,
-                $tv['page']['type'], $tv['page']['typeId']
+                $tv['type'], $tv['typeId'], User::$localeId,
+                $tv['type'], $tv['typeId']
             );
 
             if ($article)
@@ -390,12 +117,12 @@ class SmartyAoWoW extends Smarty
         }
 
         // fetch announcements
-        if ($tv['query'][0] && !preg_match('/[^a-z]/i', $tv['query'][0]))
+        if (preg_match('/^([a-z\-]+)=?.*$/i', $_SERVER['QUERY_STRING'], $match))
         {
             if (!isset($tv['announcements']))
                 $tv['announcements'] = [];
 
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*")', $tv['query'][0]);
+            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*")', $match[0]);
             foreach ($ann as $k => $v)
             {
                 if ($t = Util::localizedString($v, 'text'))
@@ -510,11 +237,11 @@ class SmartyAoWoW extends Smarty
         }
     }
 
-    public function notFound($subject)
+    public function notFound($subject, $entry)
     {
         $this->updatePageVars(array(
             'subject'  => Util::ucFirst($subject),
-            'id'       => intVal($this->_tpl_vars['query'][1]),
+            'id'       => $entry,
             'notFound' => sprintf(Lang::$main['pageNotFound'], $subject)
         ));
 
@@ -733,8 +460,7 @@ class Util
         'clothChestArmor',              'leatherChestArmor',            'mailChestArmor',               'plateChestArmor'
     );
 
-    public static $dateFormatShort          = "Y/m/d";
-    public static $dateFormatLong           = "Y/m/d H:i:s";
+    public static $dateFormatInternal       = "Y/m/d H:i:s";
 
     public static $changeLevelString        = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_staticTooltipLevelClick(this, null, 0)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><!--lvl-->%s</a>';
 
@@ -1370,6 +1096,12 @@ class Util
 
         if ($short)
         {
+            if ($_ = round($s['d'] / 365))
+                return $_." ".Lang::$timeUnits['ab'][0];
+            if ($_ = round($s['d'] / 30))
+                return $_." ".Lang::$timeUnits['ab'][1];
+            if ($_ = round($s['d'] / 7))
+                return $_." ".Lang::$timeUnits['ab'][2];
             if ($_ = round($s['d']))
                 return $_." ".Lang::$timeUnits['ab'][3];
             if ($_ = round($s['h']))
@@ -1385,6 +1117,12 @@ class Util
         }
         else
         {
+            if (!(($s['d'] + $s['h']) % 365))               // whole years
+                return round(($s['d'] + $s['h'] *24) / 365, 2)." ".Lang::$timeUnits[$s['d'] / 365 == 1 && !$s['h'] ? 'sg' : 'pl'][0];
+            if (!(($s['d'] + $s['h']) % 30))                // whole month
+                return round(($s['d'] + $s['h'] * 24) / 30, 2)." ".Lang::$timeUnits[$s['d'] / 30 == 1 && !$s['h'] ? 'sg' : 'pl'][1];
+            if (!(($s['d'] + $s['h']) % 7))                 // whole weeks
+                return round(($s['d'] + $s['h'] * 24) / 7, 2)." ".Lang::$timeUnits[$s['d'] / 7 == 1 && !$s['h'] ? 'sg' : 'pl'][2];
             if ($s['d'])
                 return round($s['d'] + $s['h'] / 24, 2)." ".Lang::$timeUnits[$s['d'] == 1 && !$s['h'] ? 'sg' : 'pl'][3];
             if ($s['h'])
@@ -1449,26 +1187,30 @@ class Util
                 '</HTML>'   => '',
                 '<BODY>'    => '',
                 '</BODY>'   => '',
-                '<BR></BR>' => '<br />',
-                "\n"        => '',
-                "\r"        => ''
+                '<BR></BR>' => '<br />'
             );
 
-            // html may contain images
+            // html may contain 'Pictures'
             $text = preg_replace('/"Interface\\\Pictures\\\([\w_\-]+)"/i', '"images/interface/Pictures/\1.jpg"', strtr($text, $pairs));
         }
-        else
-            $text = strtr($text, ["\n" => '<br />', "\r" => '']);
 
-        // gender switch
-        // ok, directed gender-reference: ($g:male:female:ref) where 'ref' is the variable (see $pairs) forward in the text determining the gender
-        $text = preg_replace('/\$g\s*([^:;]+)\s*:\s*([^:;]+)\s*(:?[^:;]*);/ui', '&lt;\1/\2&gt;', $text);
+        $from = array(
+            '/\|T([\w]+\\\)*([^\.]+)\.blp:\d+\|t/ui',       // images (force size to tiny)                      |T<fullPath>:<size>|t
+            '/\|c(\w{6})\w{2}([^\|]+)\|r/ui',               // color                                            |c<RRGGBBAA><text>|r
+            '/\$g\s*([^:;]+)\s*:\s*([^:;]+)\s*(:?[^:;]*);/ui',// directed gender-reference                      $g:<male>:<female>:<refVariable>
+            '/\$t([^;]+);/ui',                              // nonesense, that the client apparently ignores
+            '/\|\d\-?\d?\((\$\w)\)/ui'                      // and another modifier for something russian       |3-6($r)
+        );
 
-        // nonesense, that the client apparently ignores
-        $text = preg_replace('/\$t([^;]+);/ui', '', $text);
+        $to = array(
+            '<span class="icontiny" style="background-image: url('.STATIC_URL.'/images/icons/tiny/\2.gif)">',
+            '<span style="color: #\1">\2</span>',
+            '&lt;\1/\2&gt;',
+            '',
+            '\1'
+        );
 
-        // and another modifier for something russian |3-6($r) .. jesus christ <_<
-        $text = preg_replace('/\|\d\-?\d?\((\$\w)\)/ui', '\1', $text);
+        $text = preg_replace($from, $to, $text);
 
         $pairs = array(
             '$c' => '&lt;'.Lang::$game['class'].'&gt;',
@@ -1479,6 +1221,8 @@ class Util
             '$N' => '&lt;'.Lang::$main['name'].'&gt;',
             '$b' => '<br />',
             '$B' => '<br />',
+            "\n" => '<br />',
+            "\r" => '',
             '|n' => ''                                      // what .. the fuck .. another type of line terminator? (only in spanish though)
         );
 
@@ -1523,10 +1267,9 @@ class Util
         return strtr(trim($string), array(
             '\\' => '\\\\',
             "'"  => "\\'",
-            // '"'  => '\\"',
+            '"'  => '\\"',
             "\r" => '\\r',
-            "\n" => '\\n',
-            // '</' => '<\/',
+            "\n" => '\\n'
         ));
     }
 
@@ -1567,12 +1310,14 @@ class Util
 
     public static function extractURLParams($str)
     {
-        $arr = explode('.', $str);
+        $arr    = explode('.', $str);
+        $params = [];
 
-        foreach ($arr as $i => $a)
-            $arr[$i] = is_numeric($a) ? (int)$a : null;
+        foreach ($arr as $v)
+            if (is_numeric($v))
+                $params[] = (int)$v;
 
-        return $arr;
+        return $params;
     }
 
     // for item and spells
@@ -1732,19 +1477,20 @@ class Util
     {
         switch (count($keys))
         {
-            case 0:
+            case 0: // no params works always
                 return true;
-            case 1:
-                return (is_int($keys) && in_array($keys, $struct)) || (is_array($keys) && (isset($struct[$keys[0]]) || $keys[0] === null && count($keys) == 1));
-            case 2:
+            case 1: // null is avalid    || key in a n-dim-array     ||  value in a 1-dim-array
+                return $keys[0] === null || isset($struct[$keys[0]]) ||  in_array($keys[0], $struct);
+            case 2: // first param has to be a key. otherwise invalid
                 if (!isset($struct[$keys[0]]))
                     return false;
 
+                // check if the sub-array is n-imensional
                 if (count($struct[$keys[0]]) == count($struct[$keys[0]], COUNT_RECURSIVE))
-                    return in_array($keys[1], $struct[$keys[0]]);
+                    return in_array($keys[1], $struct[$keys[0]]); // second param is value in second level array
                 else
-                    return isset($struct[$keys[0]][$keys[1]]);
-            case 3:
+                    return isset($struct[$keys[0]][$keys[1]]);    // check if params is key of another array
+            case 3: // 3 params MUST point to a specific value
                 return isset($struct[$keys[0]][$keys[1]]) && in_array($keys[2], $struct[$keys[0]][$keys[1]]);
         }
 
@@ -1872,7 +1618,7 @@ class Util
         quest_mail_loot_template        entry                               quest_template          RewMailTemplateId
         reference_loot_template         entry           many <- many        _loot_template          -mincountOrRef  In case of negative mincountOrRef
     */
-    private static function getLootByEntry($tableName, $lootId, $groupId = 0, $baseChance = 1.0)
+    private static function getLootByEntry($tableName, $lootId, &$handledRefs, $groupId = 0, $baseChance = 1.0)
     {
         $loot     = [];
         $rawItems = [];
@@ -1895,17 +1641,17 @@ class Util
                 'realChanceMod' => $baseChance
             );
 
-            if ($entry['lootmode'] > 1)
-            {
+            // if ($entry['lootmode'] > 1)
+            // {
                 $buff = [];
                 for ($i = 0; $i < 8; $i++)
                     if ($entry['lootmode'] & (1 << $i))
-                        $buff[] = $i;
+                        $buff[] = $i + 1;
 
                 $set['mode'] = implode(', ', $buff);
-            }
-            else
-                $set['mode'] = 0;
+            // }
+            // else
+                // $set['mode'] = 0;
 
             /*
                 modes:{"mode":8,"4":{"count":7173,"outof":17619},"8":{"count":7173,"outof":10684}}
@@ -1921,11 +1667,17 @@ class Util
             */
 
             if ($entry['mincountOrRef'] < 0)
-            {                                                                                     // todo (high): find out, why i used this in the first place. (don't do drugs, kids)
-                list($data, $raw) = self::getLootByEntry(LOOT_REFERENCE, $entry['mincountOrRef'], /*$entry['groupid'],*/ 0, abs($entry['ChanceOrQuestChance'] / 100));
+            {
+                // bandaid.. remove when propperly handling lootmodes
+                if (!in_array($entry['mincountOrRef'], $handledRefs))
+                {                                                                                                   // todo (high): find out, why i used this in the first place. (don't do drugs, kids)
+                    list($data, $raw) = self::getLootByEntry(LOOT_REFERENCE, $entry['mincountOrRef'], $handledRefs, /*$entry['groupid'],*/ 0, abs($entry['ChanceOrQuestChance'] / 100));
 
-                $loot     = array_merge($loot, $data);
-                $rawItems = array_merge($rawItems, $raw);
+                    $handledRefs[] = $entry['mincountOrRef'];
+
+                    $loot     = array_merge($loot, $data);
+                    $rawItems = array_merge($rawItems, $raw);
+                }
 
                 $set['content']    = $entry['mincountOrRef'];
                 $set['multiplier'] = $entry['maxcount'];
@@ -1999,13 +1751,16 @@ class Util
 
             // if (is_array($entry) && in_array($table, [LOOT_CREATURE, LOOT_GAMEOBJECT])
                 // iterate over the 4 available difficulties and assign modes
-        */
 
-        $struct = self::getLootByEntry($table, $entry);
+
+            modes:{"mode":1,"1":{"count":4408,"outof":16013},"4":{"count":4408,"outof":22531}}
+        */
+        $handledRefs = [];
+        $struct = self::getLootByEntry($table, $entry, $handledRefs);
         if (!$struct)
             return $lv;
 
-        $items = new ItemList(array(['i.id', $struct[1]]));
+        $items = new ItemList(array(['i.id', $struct[1]], SQL_LIMIT_NONE));
         $items->addGlobalsToJscript(Util::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
         $foo = $items->getListviewData();
 
@@ -2042,7 +1797,7 @@ class Util
                     else
                         $lv[$loot['content']]['percent'] += $base['percent'];
                 }
-                else
+                else                                        // in case of limited trash loot, check if $foo[<itemId>] exists
                     $lv[] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
             }
             else if ($debug)                                // create dummy for ref-drop
@@ -2081,11 +1836,21 @@ class Util
         else
         {
             $fields = ['mode', 'reference'];
+            $base   = [];
             $set    = 0;
             foreach ($lv as $foo)
+            {
                 foreach ($fields as $idx => $field)
-                    if (!empty($foo[$field]))
+                {
+                    if (!isset($base[$idx]))
+                        $base[$idx] = @$foo[$field];
+                    else if ($base[$idx] != @$foo[$field])
                         $set |= 1 << $idx;
+                }
+
+                if ($set == (pow(2, count($fields)) - 1))
+                    break;
+            }
 
             $debugCols[] = "Listview.funcBox.createSimpleCol('group', 'Group', '7%', 'group')";
             foreach ($fields as $idx => $field)
@@ -2341,11 +2106,11 @@ class Util
 
                         foreach ($srcObj->iterate() as $_)
                         {
-                            if ($tabId < 0 && $curTpl['type_flags'] & NPC_TYPEFLAG_HERBLOOT)
+                            if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_HERBLOOT)
                                 $tabId = 9;
-                            else if ($tabId < 0 && $curTpl['type_flags'] & NPC_TYPEFLAG_ENGINEERLOOT)
+                            else if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_ENGINEERLOOT)
                                 $tabId = 8;
-                            else if ($tabId < 0 && $curTpl['type_flags'] & NPC_TYPEFLAG_MININGLOOT)
+                            else if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_MININGLOOT)
                                 $tabId = 7;
                             else if ($tabId < 0)
                                 $tabId = abs($tabId);               // general case (skinning)

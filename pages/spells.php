@@ -255,7 +255,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
                 array_unshift($title, Lang::$game['cl'][$cats[1]]);
 
             $conditions[] = ['s.typeCat', [7, -2]];
-            $conditions[] = [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT | SPELL_CU_EXCLUDE_CATEGORY_SEARCH), '&'], 0];
+            $conditions[] = [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT | CUSTOM_EXCLUDE_FOR_LISTVIEW), '&'], 0];
 
             // Runeforging listed multiple times, exclude from explicit skill-listing
             // if (isset($cats[1]) && $cats[1] == 6 && isset($cats[2]) && $cats[2] != 776)
@@ -378,7 +378,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
                 $conditions[] = array(
                     'OR',
                     ['s.typeCat', 0],
-                    ['s.cuFlags', SPELL_CU_EXCLUDE_CATEGORY_SEARCH, '&']
+                    ['s.cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&']
                 );
 
                 break;

@@ -52,6 +52,6 @@ $smarty->assign('lang', Lang::$main);
 $smarty->assign('lvData', $pageData);
 
 // load the page
-$smarty->display('generic-no-filter.tpl');
+$smarty->display('list-page-generic.tpl');
 
 ?>

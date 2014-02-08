@@ -43,7 +43,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $object = new GameObjectList(array(['entry', $_id]));
     if ($object->error)
-        $smarty->notFound(Lang::$game['gameObject']);
+        $smarty->notFound(Lang::$game['gameObject'], $_id);
 
 /*
     ListView for fishing holes

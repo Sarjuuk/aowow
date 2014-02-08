@@ -12,64 +12,66 @@
 
             <script type="text/javascript">//<![CDATA[
 {include file='bricks/community.tpl'}
-                var g_pageInfo = {ldelim}type: {$page.type}, typeId: {$page.typeId}, name: '{$lvData.page.name|escape:"quotes"}'{rdelim};
-                g_initPath({$page.path});
+                var g_pageInfo = {ldelim}type: {$type}, typeId: {$typeId}, name: '{$name|escape:"quotes"}'{rdelim};
+                g_initPath({$path});
             //]]></script>
 
-{include file='bricks/infobox.tpl' info=$lvData.infobox}
+{include file='bricks/infobox.tpl'}
 
             <div class="text">
+{include file='bricks/headIcons.tpl'}
 
 {include file='bricks/redButtons.tpl'}
 
-                <h1>{$lvData.page.name}</h1>
+                <h1{if isset($expansion)} class="h1-icon"><span class="{$expansion}-icon-right">{$name}</span>{else}>{$name}{/if}</h1>
 
 {include file='bricks/article.tpl'}
 
-{$lvData.page.description}
+{$description}
 
                 <script type="text/javascript">//<![CDATA[
-{section name=i loop=$lvData.pieces}
-                    g_items.add({$lvData.pieces[i].id}, {ldelim}name_{$user.language}:'{$lvData.pieces[i].name|escape:'javascript'}', quality:{$lvData.pieces[i].quality}, icon:'{$lvData.pieces[i].icon}', jsonequip:{$lvData.pieces[i].json}{rdelim});
+{section name=i loop=$pieces}
+                    g_items.add({$pieces[i].id}, {ldelim}name_{$user.language}:'{$pieces[i].name|escape:'javascript'}', quality:{$pieces[i].quality}, icon:'{$pieces[i].icon}', jsonequip:{$pieces[i].json}{rdelim});
 {/section}
                 //]]></script>
 
                 <table class="iconlist">
-{section name=i loop=$lvData.pieces}
-                    <tr><th align="right" id="iconlist-icon{$smarty.section.i.index + 1}"></th><td><span class="q{$lvData.pieces[i].quality}"><a href="?item={$lvData.pieces[i].id}">{$lvData.pieces[i].name}</a></span></td></tr>
+{section name=i loop=$pieces}
+                    <tr><th align="right" id="iconlist-icon{$smarty.section.i.index + 1}"></th><td><span class="q{$pieces[i].quality}"><a href="?item={$pieces[i].id}">{$pieces[i].name}</a></span></td></tr>
 {/section}
                 </table>
 
                 <script type="text/javascript">//<![CDATA[
-{section name=i loop=$lvData.pieces}
-                    $WH.ge('iconlist-icon{$smarty.section.i.index + 1}').appendChild(g_items.createIcon({$lvData.pieces[i].id}, 0, 0));
+{section name=i loop=$pieces}
+                    $WH.ge('iconlist-icon{$smarty.section.i.index + 1}').appendChild(g_items.createIcon({$pieces[i].id}, 0, 0));
 {/section}
                 //]]></script>
 
-{if $lvData.page.unavailable}
-                <div class="pad"></div><b style="color: red">{$lang._unavailable}</b>
+{if $unavailable}
+                <div class="pad"></div>
+                <b style="color: red">{$lang._unavailable}</b>
 {/if}
 
-                <h3>{$lang._setBonuses}{$lvData.page.bonusExt}</h3>
+                <h3>{$lang._setBonuses}{$bonusExt}</h3>
 
                 {$lang._conveyBonus}
                 <ul>
-{section name=i loop=$lvData.spells}
-                    <li><div>{$lvData.spells[i].bonus} {$lang._pieces}{$lang.colon}<a href="?spell={$lvData.spells[i].id}">{$lvData.spells[i].desc}</a></div></li>
+{section name=i loop=$spells}
+                    <li><div>{$spells[i].bonus} {$lang._pieces}{$lang.colon}<a href="?spell={$spells[i].id}">{$spells[i].desc}</a></div></li>
 {/section}
                 </ul>
 
-                <h2 class="clear">Summary</h2>
+                <h2 class="clear">{$lang.summary}</h2>
 
                 <div id="summary-generic"></div>
                 <script type="text/javascript">//<![CDATA[
-                    new Summary({ldelim} id: 'itemset', template: 'itemset', parent: 'summary-generic', groups: [[[{']],[['|implode:$lvData.compare.items}]]], level: {$lvData.compare.level}{rdelim});
+                    new Summary({ldelim} id: 'itemset', template: 'itemset', parent: 'summary-generic', groups: [[[{']],[['|implode:$compare.items}]]], level: {$compare.level}{rdelim});
                 //]]></script>
 
                 <h2 class="clear">{$lang.related}</h2>
             </div>
 
-{include file='bricks/tabsRelated.tpl' tabs=$lvData.relTabs}
+{include file='bricks/tabsRelated.tpl' tabs=$lvData}
 
 {include file='bricks/contribute.tpl'}
 

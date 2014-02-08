@@ -4,26 +4,34 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-$cat       = Util::extractURLParams($pageParam)[0];
+$cat       = Util::extractURLParams($pageParam);
 $path      = [0, 10];
 $validCats = [0, 1, 2, 3, 4, 5, 6];
 $title     = [Util::ucFirst(Lang::$game['titles'])];
-$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, -1, isset($cat) ? $cat : -1, User::$localeId]);
+$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, -1, $cat ? $cat[0] : -1, User::$localeId]);
 
-if (!in_array($cat, $validCats))
-    $smarty->error();
+if ($cat)
+{
+    if (!in_array($cat[0], $validCats))
+        $smarty->error();
 
-$path[] = $cat;                                             // should be only one parameter anyway
-
-if (isset($cat))
-    array_unshift($title, Lang::$title['cat'][$cat]);
+    $path[] = $cat[0];                                  // should be only one parameter anyway
+    array_unshift($title, Lang::$title['cat'][$cat[0]]);
+}
 
 if (!$smarty->loadCache($cacheKey, $pageData))
 {
-    $titles = new TitleList(isset($cat) ? array(['category', (int)$cat]) : []);
+    $titles = new TitleList($cat ? array(['category', (int)$cat[0]]) : []);
 
+    // menuId 10: Title    g_initPath()
+    //  tabId  0: Database g_initHeader()
     $pageData = array(
-        'listviews' => []
+        'page' => array(
+            'title' => implode(" - ", $title),
+            'path'  => json_encode($path, JSON_NUMERIC_CHECK),
+            'tab'   => 0
+        ),
+        'lv'   => []
     );
 
     $lvTitles = array(
@@ -38,23 +46,17 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     if (!$titles->hasAnySource())
         $lvTitles['params']['hiddenCols'] = "$['source']";
 
-    $pageData['listviews'][] = $lvTitles;
+    $pageData['lv'][] = $lvTitles;
 
     $smarty->saveCache($cacheKey, $pageData);
 }
 
 
-// menuId 10: Title    g_initPath()
-//  tabId  0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title' => implode(" - ", $title),
-    'path'  => "[".implode(", ", $path)."]",
-    'tab'   => 0
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['lv']);
 
 // load the page
-$smarty->display('generic-no-filter.tpl');
+$smarty->display('list-page-generic.tpl');
 
 ?>

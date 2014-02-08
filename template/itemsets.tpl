@@ -11,7 +11,7 @@
 {/if}
 
             <script type="text/javascript">
-                g_initPath({$page.path}, {if empty($filter.query)} 0 {else} 1 {/if});
+                g_initPath({$path}, {if empty($filter.query)} 0 {else} 1 {/if});
 {if !empty($filter.query)}
                 Menu.modifyUrl(Menu.findItem(mn_database, [2]), {ldelim} filter: '+={$filter.query|escape:'quotes'}' {rdelim}, {ldelim} onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [2])) {rdelim});
 {/if}
@@ -108,7 +108,7 @@
             //]]></script>
 
             <div class="clear"></div>
-        </div>
-    </div>
+        </div><!-- main-contents -->
+    </div><!-- main -->
 
 {include file='footer.tpl'}

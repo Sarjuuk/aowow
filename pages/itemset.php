@@ -15,7 +15,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $iSet = new ItemsetList(array(['id', $_id]));
     if ($iSet->error)
-        $smarty->notFound(Lang::$game['itemset']);
+        $smarty->notFound(Lang::$game['itemset'], $_id);
 
     $_ta  = $iSet->getField('contentGroup');
     $_ty  = $iSet->getField('type');
@@ -169,36 +169,43 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $skill = '';
     if ($_sk)
     {
-        // todo (med): kill this Lang::monstrosity with Skills
         $spellLink = sprintf('<a href="?spells=11.%s">%s</a> (%s)', $_sk, Lang::$spell['cat'][11][$_sk][0], $iSet->getField('skillLevel'));
         $skill = ' &ndash; <small><b>'.sprintf(Lang::$game['requires'], $spellLink).'</b></small>';
     }
 
+    // menuId 2: Itemset  g_initPath()
+    //  tabId 0: Database g_initHeader()
     $pageData = array(
-        'title'   => $_na,                                  // for header
-        'path'    => $path,
-        'infobox' => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
-        'relTabs' => [],
-        'pieces'  => $pieces,
-        'spells'  => $spells,
-        'buttons' => array(
-            BUTTON_WOWHEAD => $_id > 0,                     // bool only
-            BUTTON_LINKS   => ['color' => '', 'linkId' => ''],
-            BUTTON_VIEW3D  => ['type' => TYPE_ITEMSET, 'typeId' => $_id, 'equipList' => $eqList],
-            BUTTON_COMPARE => ['eqList' => implode(':', $compare), 'qty' => $_cnt]
-        ),
-        'compare' => array(
-            'qty'   => $_cnt,
-            'items' => $compare,
-            'level' => $_lvl
-        ),
         'page'    => array(
             'name'        => $_na,                          // for page content
-            'id'          => $_id,
             'bonusExt'    => $skill,
             'description' => $_ta ? sprintf(Lang::$itemset['_desc'], $_na, Lang::$itemset['notes'][$_ta], $_cnt) : sprintf(Lang::$itemset['_descTagless'], $_na, $_cnt),
-            'unavailable' => (bool)($iSet->getField('cuFlags') & CUSTOM_UNAVAILABLE)
-        )
+            'unavailable' => (bool)($iSet->getField('cuFlags') & CUSTOM_UNAVAILABLE),
+            'infobox'     => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
+            'title'       => $_na." - ".Util::ucfirst(Lang::$game['itemset']),
+            'path'        => json_encode($path, JSON_NUMERIC_CHECK),
+            'tab'         => 0,
+            'type'        => TYPE_ITEMSET,
+            'typeId'      => $_id,
+            'reqJS'       => array(
+                'template/js/Summary.js',
+                'template/js/swfobject.js'
+            ),
+            'pieces'      => $pieces,
+            'spells'      => $spells,
+            'redButtons'  => array(
+                BUTTON_WOWHEAD => $_id > 0,                 // bool only
+                BUTTON_LINKS   => ['color' => '', 'linkId' => ''],
+                BUTTON_VIEW3D  => ['type' => TYPE_ITEMSET, 'typeId' => $_id, 'equipList' => $eqList],
+                BUTTON_COMPARE => ['eqList' => implode(':', $compare), 'qty' => $_cnt]
+            ),
+            'compare'     => array(
+                'qty'   => $_cnt,
+                'items' => $compare,
+                'level' => $_lvl
+            ),
+        ),
+        'relTabs' => []
     );
 
     $iSet->addGlobalsToJscript($smarty);
@@ -263,23 +270,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 }
 
 
-// menuId 2: Itemset  g_initPath()
-//  tabId 0: Database g_initHeader()
-$smarty->updatePageVars(array(
-	'title'  => $pageData['title']." - ".Util::ucfirst(Lang::$game['itemset']),
-	'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-	'tab'    => 0,
-	'type'   => TYPE_ITEMSET,
-	'typeId' => $_id,
-    'reqJS'  => array(
-        'template/js/Summary.js',
-        'template/js/swfobject.js'
-    )
-));
-$smarty->assign('redButtons', $pageData['buttons']);
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEMSET, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$itemset, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
 $smarty->display('itemset.tpl');

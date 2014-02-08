@@ -9,7 +9,8 @@ if (isset($_GET['xml']))
 
 require 'includes/community.class.php';
 
-$_id = intVal($pageParam);
+$_id   = intVal($pageParam);
+$_path = [0, 0];
 
 $cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEM, $_id, -1, User::$localeId]);
 
@@ -247,64 +248,79 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     $cmpUpg = in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) || $item->getField('gemEnchantmentId');
     $view3D = in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $item->getField('displayId');
 
-    $pageData = array(
-        'infobox'  => $quickInfo ? '[ul][li]'.implode('[/li][li]', $quickInfo).'[/li][/ul]' : null,
-        'relTabs'  => [],
-        'tooltip'  => $item->renderTooltip([], true),
-        'path'     => [0, 0],
-        'title'    => [$item->getField('name', true), Util::ucFirst(Lang::$game['item'])],
-        'pageText' => [],
-        'buttons'  => array(
-            BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => ['color' => 'ff'.Util::$rarityColorStings[$item->getField('quality')], 'linkId' => 'item:'.$_id.':0:0:0:0:0:0:0:0'],
-            BUTTON_VIEW3D  => $view3D ? ['displayId' => $item->getField('displayId'), 'slot' => $_slot, 'type' => TYPE_ITEM, 'typeId' => $_id] : false,
-            BUTTON_COMPARE => $cmpUpg,                      // bool required
-            BUTTON_UPGRADE => $cmpUpg ? ['class' => $_class, 'slot' => $_slot] : false
-        ),
-        'page'     => array(
-            'quality'   => $item->getField('quality'),
-            'icon'      => $item->getField('iconString'),
-            'name'      => $item->getField('name', true),
-            'stack'     => $item->getField('stackable'),
-        )
-    );
-
     // path
     if (in_array($_class, [5, 8, 14]))
     {
-        $pageData['path'][] = 15;                           // misc.
+        $_path[] = 15;                                      // misc.
 
         if ($_class == 5)                                   // reagent
-            $pageData['path'][] = 1;
+            $_path[] = 1;
         else
-            $pageData['path'][] = 4;                        // other
+            $_path[] = 4;                                   // other
     }
     else
     {
-        $pageData['path'][] = $_class;
+        $_path[] = $_class;
 
         if (!in_array($_class, [ITEM_CLASS_MONEY, ITEM_CLASS_QUEST, ITEM_CLASS_KEY]))
-            $pageData['path'][] = $_subClass;
+            $_path[] = $_subClass;
 
         if ($_class == ITEM_CLASS_ARMOR && in_array($_subClass, [1, 2, 3, 4]))
         {
             if ($_ = $_slot);
-                $pageData['path'][] = $_;
+                $_path[] = $_;
         }
         else if (($_class == ITEM_CLASS_CONSUMABLE && $_subClass == 2) || $_class == ITEM_CLASS_GLYPH)
-            $pageData['path'][] = $item->getField('subSubClass');
+            $_path[] = $item->getField('subSubClass');
     }
 
     // pageText
+    $pageText = [];
     if ($next = $item->getField('pageTextId'))
     {
         while ($next)
         {
             $row = DB::Aowow()->selectRow('SELECT *, text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.entry = lpt.entry WHERE pt.entry = ?d', $next);
             $next = $row['next_page'];
-            $pageData['pageText'][] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
+            $pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
         }
     }
+
+    // menuId 0: Item     g_initPath()
+    //  tabId 0: Database g_initHeader()
+    $pageData = array(
+        'page'     => array(
+            'quality'    => $item->getField('quality'),
+            'headIcons'  => [$item->getField('iconString'), $item->getField('stackable')],
+            'name'       => $item->getField('name', true),
+            'infobox'    => $quickInfo ? '[ul][li]'.implode('[/li][li]', $quickInfo).'[/li][/ul]' : null,
+            'tooltip'    => $item->renderTooltip([], true),
+            'path'       => json_encode($_path, JSON_NUMERIC_CHECK),
+            'title'      => $item->getField('name', true).' - '.Util::ucFirst(Lang::$game['item']),
+            'pageText'   => $pageText,
+            'tab'        => 0,
+            'type'       => TYPE_ITEM,
+            'typeId'     => $_id,
+            'reqJS'      => array(
+                $pageText ? 'template/js/Book.js' : null,
+                'template/js/swfobject.js',
+                'template/js/profile.js',
+                'template/js/filters.js',
+                '?data=weight-presets'
+            ),
+            'reqCSS'     => array(
+                $pageText ? ['path' => 'template/css/Book.css'] : null,
+            ),
+            'redButtons' => array(
+                BUTTON_WOWHEAD => true,
+                BUTTON_LINKS   => ['color' => 'ff'.Util::$rarityColorStings[$item->getField('quality')], 'linkId' => 'item:'.$_id.':0:0:0:0:0:0:0:0'],
+                BUTTON_VIEW3D  => $view3D ? ['displayId' => $item->getField('displayId'), 'slot' => $_slot, 'type' => TYPE_ITEM, 'typeId' => $_id] : false,
+                BUTTON_COMPARE => $cmpUpg,                      // bool required
+                BUTTON_UPGRADE => $cmpUpg ? ['class' => $_class, 'slot' => $_slot] : false
+            ),
+        ),
+        'relTabs'  => []
+    );
 
     // subItems
     $item->initSubItems();
@@ -686,7 +702,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     // tab: same model as
     if (($model = $item->getField('model')) && $_slot)
     {
-        $sameModel = new ItemList(array(['model', $model], ['id', $_id, '!']));
+        $sameModel = new ItemList(array(['model', $model], ['id', $_id, '!'], ['slot', $_slot]));
         if (!$sameModel->error)
         {
             $sameModel->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
@@ -731,42 +747,38 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
                         $currency[] = [-$id, $qty];
                 }
 
-                if ($_ = $vendors[$k]['event'])
+                $row['stock'] = $vendors[$k]['maxcount'];
+                $row['cost']  = [$item->getField('buyPrice')];
+
+                if ($e = $vendors[$k]['eventId'])
                 {
-                    if (count($extraCols) == 3)             // not already pushed
+                    if (count($extraCols) == 3)
                         $extraCols[] = 'Listview.extraCols.condition';
 
-                    $holidays[$_] = 0;                      // applied as back ref.
-
+                    Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $e);
                     $row['condition'] = array(
                         'type'   => TYPE_WORLDEVENT,
-                        'typeId' => &$holidays[$_],
+                        'typeId' => -$e,
                         'status' => 1
                     );
                 }
 
-                $row['stock'] = $vendors[$k]['stock'];
-                $row['stack'] = $item->getField('buyCount');
-                $row['cost']  = [$this->getField('buyPrice')];
                 if ($currency || $tokens)                   // fill idx:3 if required
                     $row['cost'][] = $currency;
 
                 if ($tokens)
                     $row['cost'][] = $tokens;
+
+                if ($x = $item->getField('buyPrice'))
+                    $row['buyprice'] = $x;
+
+                if ($x = $item->getField('sellPrice'))
+                    $row['sellprice'] = $x;
+
+                if ($x = $item->getField('buyCount'))
+                    $row['stack'] = $x;
             }
 
-            if ($holidays)
-            {
-                $hObj = new WorldEventList(array(['id', array_keys($holidays)]));
-                $hObj->addGlobalsToJscript($smarty);
-                foreach ($hObj->iterate() as $id => $tpl)
-                {
-                    if ($_ = $tpl['holidayId'])
-                        $holidays[$tpl['eventBak']] = $_;
-                    else
-                        $holidays[-$id] = $id;
-                }
-            }
 
             $pageData['relTabs'][] = array(
                 'file'   => 'creature',
@@ -872,29 +884,11 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
-// menuId 0: Item     g_initPath()
-//  tabId 0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => implode(" - ", $pageData['title']),
-    'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-    'tab'    => 0,
-    'type'   => TYPE_ITEM,
-    'typeId' => $_id,
-    'reqJS'  => array(
-        $pageData['pageText'] ? 'template/js/Book.js' : null,
-        'template/js/swfobject.js',
-        'template/js/profile.js',
-        'template/js/filters.js',
-        '?data=weight-presets'
-    ),
-    'reqCSS' => array(
-        $pageData['pageText'] ? ['path' => 'template/css/Book.css'] : null,
-    )
-));
-$smarty->assign('redButtons', $pageData['buttons']);
+
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEM, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$item, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
 $smarty->display('item.tpl');

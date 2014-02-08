@@ -14,7 +14,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $skill = new SkillList(array(['id', $_id]));
     if ($skill->error)
-        $smarty->notFound(Lang::$game['skill']);
+        $smarty->notFound(Lang::$game['skill'], $_id);
 
     $_cat = $skill->getField('typeCat');
 
@@ -26,13 +26,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'title'   => $skill->getField('name', true),
         'path'    => [0, 14],
         'relTabs' => [],
+        'icons'   => [$skill->getField('iconString')],
         'buttons' => array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => true
         ),
         'page'    => array(
             'name' => $skill->getField('name', true),
-            'icon' => $skill->getField('iconString'),
             'id'   => $_id
         ),
     );
@@ -364,6 +364,6 @@ $smarty->assign('lang', array_merge(Lang::$main));
 $smarty->assign('lvData', $pageData);
 
 // load the page
-$smarty->display('skill.tpl');
+$smarty->display('detail-page-generic.tpl');
 
 ?>

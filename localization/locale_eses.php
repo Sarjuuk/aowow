@@ -219,9 +219,32 @@ $lang = array(
     ),
     'account'  => [],
     'npc'   => array(
-        'rank'          => ['Normal', 'Élite', 'Élite raro', 'Jefe', 'Raro']
+        'rank'          => [0 => "Normal", 1 => "Élite", 4 => "Raro", 2 => "Élite raro", 3 => "Jefe"],
+        'classification'=> "Clasificación",
+        'petFamily'     => "Familia de mascota",
+        'react'         => "Reacción",
+        'worth'         => "Valor",
+        'unkPosition'   => "No se conoce la ubicación de este PNJ.",
+        'difficultyPH'  => "[Este PNJ es un marcador de posición para un modo diferente de]",
+        'quotes'        => "Citas",
+        'gainsDesc'     => "Tras acabar con este PNJ ganarás",
+        'repWith'       => "reputación con",
+        'stopsAt'       => "se detiene en %s",
+        'textTypes'     => [null, "grita", "dice", "susurra"],
+        'modes'         => array(
+            1 => ["Normal", "Heroico"],
+            2 => ["10 jugadores Normal", "25 jugadores Normal", "10 jugadores Heroico", "25 jugadores Heroico"]
+        ),
+        'cat'           => array(
+            "Sin categoría",            "Bestia",                   "Dragonante",               "Demonio",                  "Elemental",                "Gigante",                  "No-muerto",                "Humanoide",
+            "Alimaña",                  "Mecánico",                 "Sin especificar",          "Tótem",                    "Mascota mansa",            "Nube de gas"
+        )
     ),
     'event' => array(
+        'start'         => "Empieza",
+        'end'           => "Termina",
+        'interval'      => "Intervalo",
+        'inProgress'    => "El evento está en progreso actualmente",
         'category'      => array("Sin categoría", "Vacacionales", "Periódicos", "Jugador contra Jugador")
     ),
     'achievement' => array(
@@ -233,6 +256,7 @@ $lang = array(
         'itemReward'    => "Recibirás:",
         'titleReward'   => "Deberías obtener el título \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "matado",
+        'reqNumCrt'     => "Requiere"
     ),
     'class' => array(
         'racialLeader'  => "Lider racial",
@@ -280,6 +304,7 @@ $lang = array(
         )
     ),
     'currency' => array(
+        'cap'           => "Límite total",
         'cat'           => array(
             1 => "Miscelánea", 2 => "Jugador contra Jugador", 4 => "Clásico", 21 => "Wrath of the Lich King", 22 => "Mazmorra y banda", 23 => "Burning Crusade", 41 => "Prueba", 3 => "No las uso"
         )
@@ -302,7 +327,7 @@ $lang = array(
         '_pieces'       => "piezas",
         '_unavailable'  => "Este conjunto de objetos no está disponible para jugadores.",
         '_tag'          => "Etiqueta",
-
+        'summary'       => "Resúmen",
         'notes'         => array(
             null,                                   "Set de mazmorra 1",                    "Set de mazmorra 2",                        "Set de banda tier 1",
             "Set de banda tier 2",                  "Set de banda tier 3",                  "Set JcJ nivel 60 superior",                "Set JcJ nivel 60 superior (obsoleto)",
@@ -656,7 +681,9 @@ $lang = array(
             "Estadística no utilizada #%d (%d)",
         )
     ),
-    'colon'         => ': '
+    'colon'             => ': ',
+    'dateFmtShort'      => "d/m/Y",
+    'dateFmtLong'       => "d/m/Y \a \l\a\s H:i"
 );
 
 ?>

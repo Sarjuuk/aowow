@@ -4,7 +4,25 @@ if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
 
-$pageData      = ['items' => null, 'summary' => '[]'];
+
+// tabId 1: Tools g_initHeader()
+$pageData      = array(
+    'items'   => null,
+    'summary' => '[]',
+    'title'   => Lang::$main['compareTool'],
+    'tab'     => 1,
+    'reqCSS'  => array(
+        ['path' => 'template/css/Summary.css'],
+        ['path' => 'template/css/Summary_ie6.css', 'ieCond' => 'lte IE 6'],
+    ),
+    'reqJS'   => array(
+        'template/js/Draggable.js',
+        'template/js/filters.js',
+        'template/js/Summary.js',
+        'template/js/swfobject.js',
+        '?data=weight-presets.gems.enchants.itemsets'
+    )
+);
 $compareString = '';
 
 // prefer $_GET over $_COOKIE
@@ -16,7 +34,7 @@ else if (!empty($_COOKIE['compare_groups']))
 if ($compareString)
 {
     $sets  = explode(";", $compareString);
-    $items = [];
+    $items = $outSet = [];
     foreach ($sets as $set)
     {
         $itemsting = explode(":", $set);
@@ -54,23 +72,7 @@ if ($compareString)
 }
 
 
-// tabId 1: Tools g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => Lang::$main['compareTool'],
-    'tab'    => 1,
-    'reqCSS' => array(
-        ['path' => 'template/css/Summary.css'],
-        ['path' => 'template/css/Summary_ie6.css', 'ieCond' => 'lte IE 6'],
-    ),
-    'reqJS'  => array(
-        'template/js/Draggable.js',
-        'template/js/filters.js',
-        'template/js/Summary.js',
-        'template/js/swfobject.js',
-        '?data=weight-presets.gems.enchants.itemsets'
-    ),
-));
-$smarty->assign('lvData', $pageData);
+$smarty->updatePageVars($pageData);
 $smarty->assign('lang', Lang::$main);
 
 // load the page

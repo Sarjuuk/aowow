@@ -22,7 +22,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 {
     $conditions = [];
 
-    if (User::isInGroup(U_GROUP_STAFF))
+    if (!User::isInGroup(U_GROUP_STAFF))
         $conditions[] = ['reputationIndex', -1, '!'];       // unlisted factions
 
     if (isset($cats[0]) && empty($cats[1]))
@@ -48,10 +48,15 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     $factions = new FactionList($conditions);
 
+    // menuId 7: Faction  g_initPath()
+    //  tabId 0: Database g_initHeader()
     $pageData = array(
-        'title'     => $title,
-        'path'      => $path,
-        'listviews' => array(
+        'page' => array(
+            'title'  => implode(' - ', $title),
+            'path'   => json_encode($path, JSON_NUMERIC_CHECK),
+            'tab'    => 0
+        ),
+        'lv' => array(
             array(
                 'file'   => 'faction',
                 'data'   => $factions->getListviewData(),
@@ -64,17 +69,11 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 }
 
 
-// menuId 7: Faction  g_initPath()
-//  tabId 0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => implode(' - ', $title),
-    'path'   => json_encode($path, JSON_NUMERIC_CHECK),
-    'tab'    => 0
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['lv']);
 
 // load the page
-$smarty->display('generic-no-filter.tpl');
+$smarty->display('list-page-generic.tpl');
 
 ?>

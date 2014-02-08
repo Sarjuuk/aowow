@@ -76,12 +76,12 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     $visibleCols = [];
     $hiddenCols  = [];
 
-    if ($cats[0] !== null)
+    if ($cats)
         $path = array_merge($path, $cats);
 
     // display available submenu and slot, if applicable
     $type = $slot = [[], null];
-    if ($cats[0] === null)
+    if (!$cats)
     {
         $slot = [Lang::$item['inventoryType'], null];
         asort($slot[0]);
@@ -172,7 +172,8 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     if (preg_match('/gb\=(1|2|3)/i', $_SERVER['QUERY_STRING'], $match))
         $filter['gb'] = $match[1];
 
-    $conditions[] = ['i.class', $cats[0]];
+    if (isset($cats[0]))
+        $conditions[] = ['i.class', $cats[0]];
     if (isset($cats[1]))
         $conditions[] = ['i.subClass', $cats[1]];
     if (isset($cats[2]))
@@ -197,21 +198,33 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     if (array_intersect([63, 64], $xCols))                  // 63:buyPrice; 64:sellPrice
         $infoMask |= ITEMINFO_VENDOR;
 
+    // menuId 0: Item     g_initPath()
+    //  tabId 0: Database g_initHeader()
     $pageData = array(
-        'page'   => [],
-        'data'   => $items->getListviewData($infoMask),
-        'title'  => $title,
-        'path'   => $path,
-        'params' => []
+        'page'   => array(
+            'title'  => implode(' - ', $title),
+            'path'   => json_encode($path, JSON_NUMERIC_CHECK),
+            'tab'    => 0,
+            'subCat' => $pageParam !== null ? '='.$pageParam : '',
+            'reqJS'  => array(
+                'template/js/filters.js',
+                'template/js/swfobject.js',
+                '?data=weight-presets'
+            )
+        ),
+        'lv' => array(
+            'data'   => $items->getListviewData($infoMask),
+            'params' => []
+        )
     );
 
     if ($items->filterGetError())
-        $pageData['params']['_errors'] = '$1';
+        $pageData['lv']['params']['_errors'] = '$1';
 
     if (!empty($filter['upg']))
     {
         // upgrade-item got deleted by filter
-        if (empty($pageData['data'][$filter['upg']]))
+        if (empty($pageData['lv']['data'][$filter['upg']]))
         {
             $w = $items->filterGetForm('setWeights', true);
             $upgItem = new ItemList(array(['id', $filter['upg']]), false, ['wt' => $w[0], 'wtv' => $w[1]]);
@@ -220,14 +233,14 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             if (!$upgItem->error)
             {
                 $upgItem->addGlobalsToJScript($smarty);
-                $pageData['data'][$filter['upg']] = $upgItem->getListviewData($infoMask)[$filter['upg']];
+                $pageData['lv']['data'][$filter['upg']] = $upgItem->getListviewData($infoMask)[$filter['upg']];
             }
         }
 
         if (!empty($filter['gb']))
-            $pageData['params']['customFilter'] = '$fi_filterUpgradeListview';
+            $pageData['lv']['params']['customFilter'] = '$fi_filterUpgradeListview';
 
-        $pageData['params']['_upgradeIds']  = "$[".$filter['upg']."]";
+        $pageData['lv']['params']['_upgradeIds']  = "$[".$filter['upg']."]";
     }
 /*
     by level: max 10 itemlevel steps (Level X) +1x Other|Autre|Anderes|Otros|Другое levels
@@ -272,14 +285,14 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     {
         $gem  = empty($filter['gm']) ? 0 : $filter['gm'];
         $cost = array_intersect([63], $xCols) ? 1 : 0;
-        $pageData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.$gem.', '.$cost.')';
+        $pageData['lv']['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.$gem.', '.$cost.')';
     }
 
     if (!empty($filter['fi']['setWeights']))
     {
         if (!empty($filter['gm']))
         {
-            $pageData['params']['computeDataFunc'] = '$fi_scoreSockets';
+            $pageData['lv']['params']['computeDataFunc'] = '$fi_scoreSockets';
 
             $w    = $items->filterGetForm('setWeights', true);
             $q    = intVal($filter['gm']);
@@ -310,9 +323,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             $pageData['page']['gemScores'] = json_encode($pageData['page']['gemScores'], JSON_NUMERIC_CHECK);
         }
 
-        $pageData['params']['onBeforeCreate']  = '$fi_initWeightedListview';
-        $pageData['params']['onAfterCreate']   = '$fi_addUpgradeIndicator';
-        $pageData['params']['sort']            = "$['-score', 'name']";
+        $pageData['lv']['params']['onBeforeCreate']  = '$fi_initWeightedListview';
+        $pageData['lv']['params']['onAfterCreate']   = '$fi_addUpgradeIndicator';
+        $pageData['lv']['params']['sort']            = "$['-score', 'name']";
 
         if ($items->hasSetFields(['armor']))
             $visibleCols[] = 'armor';
@@ -323,15 +336,15 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     // create note if search limit was exceeded; overwriting 'note' is intentional
     if ($items->getMatches() > SQL_LIMIT_DEFAULT && empty($filter['upg']))
     {
-        $pageData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), SQL_LIMIT_DEFAULT);
-        $pageData['params']['_truncated'] = 1;
+        $pageData['lv']['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), SQL_LIMIT_DEFAULT);
+        $pageData['lv']['params']['_truncated'] = 1;
     }
 
     if ($hiddenCols)
-        $pageData['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
+        $pageData['lv']['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
 
     if ($visibleCols)
-        $pageData['params']['visibleCols'] = '$'.json_encode($visibleCols);
+        $pageData['lv']['params']['visibleCols'] = '$'.json_encode($visibleCols);
 
     $smarty->saveCache($cacheKey, $pageData, $filter);
 }
@@ -341,22 +354,10 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 asort(Lang::$game['ra']);
 asort(Lang::$game['cl']);
 
-// menuId 0: Item     g_initPath()
-//  tabId 0: Database g_initHeader()
-$smarty->updatePageVars(array(
-	'title'  => implode(' - ', $pageData['title']),
-	'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-	'tab'    => 0,
-    'subCat' => $pageParam !== null ? '='.$pageParam : '',
-    'reqJS'  => array(
-        'template/js/filters.js',
-        'template/js/swfobject.js',
-        '?data=weight-presets'
-    )
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('filter', $filter);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$item, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['lv']);
 
 // load the page
 $smarty->display('items.tpl');

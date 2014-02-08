@@ -1,8 +1,8 @@
 {include file='header.tpl'}
 
     <div class="main" id="main">
-        <div id="main-precontents" class="main-precontents"></div>
-        <div id="main-contents" class="main-contents">
+        <div class="main-precontents" id="main-precontents"></div>
+        <div class="main-contents" id="main-contents">
 
 {if !empty($announcements)}
     {foreach from=$announcements item=item}
@@ -12,15 +12,18 @@
 
             <script type="text/javascript">//<![CDATA[
 {include file='bricks/community.tpl'}
-                var g_pageInfo = {ldelim}type: {$page.type}, typeId: {$page.typeId}, name: '{$lvData.page.name|escape:"javascript"}'{rdelim};
-                g_initPath({$page.path});
+                var g_pageInfo = {ldelim}type: {$type}, typeId: {$typeId}, name: '{$lvData.name|escape:"quotes"}'{rdelim};
+                g_initPath({$path});
             //]]></script>
 
-{include file='bricks/infobox.tpl' info=$lvData.infobox}
+{include file='bricks/infobox.tpl'}
 
             <div class="text">
+{include file='bricks/headIcons.tpl' icons=$lvData.icons}
+
 {include file='bricks/redButtons.tpl'}
-                <h1>{$lvData.page.name}</h1>
+
+                <h1{if isset($lvData.page.expansion)} class="h1-icon"><span class="{$lvData.page.expansion}-icon-right">{$lvData.page.name}</span>{else}>{$lvData.page.name}{/if}</h1>
 
 {include file='bricks/tooltip.tpl'}
 
@@ -49,6 +52,18 @@
                 <div class="clear"></div>
 
 {include file='bricks/article.tpl'}
+
+{*
+if !empty($lvData.page.transfer)}
+    <div class="pad"></div>
+        {$lang._transfer|sprintf:$lvData.page.transfer.id:´´:$lvData.page.transfer.icon:$lvData.page.transfer.name:$lvData.page.transfer.facInt:$lvData.page.transfer.facName}
+{/if}
+*}
+
+{if isset($lvData.page.unavailable)}
+                <div class="pad"></div>
+                <b style="color: red">{$lang._unavailable}</b>
+{/if}
 
                 <h3>{$lang._spellDetails}</h3>
 
@@ -160,7 +175,7 @@
 {/section}
                 </table>
 
-                <h2>{$lang.related}</h2>
+                <h2 class="clear">{$lang.related}</h2>
             </div>
 
 {include file='bricks/tabsRelated.tpl' tabs=$lvData.relTabs}

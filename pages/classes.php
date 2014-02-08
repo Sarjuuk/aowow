@@ -10,8 +10,15 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 {
     $classes = new CharClassList();
 
+    // menuId 12: Class    g_initPath()
+    //  tabId  0: Database g_initHeader()
     $pageData = array(
-        'listviews' => array(
+        'page' => array(
+            'title' => Util::ucFirst(Lang::$game['classes']),
+            'path'  => "[0, 12]",
+            'tab'   => 0
+        ),
+        'lv' => array(
             array(
                 'file'   => 'class',
                 'data'   => $classes->getListviewData(),
@@ -24,17 +31,11 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 }
 
 
-// menuId 12: Class    g_initPath()
-//  tabId  0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title' => Util::ucFirst(Lang::$game['classes']),
-    'path'  => "[0, 12]",
-    'tab'   => 0
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['lv']);
 
 // load the page
-$smarty->display('generic-no-filter.tpl');
+$smarty->display('list-page-generic.tpl');
 
 ?>

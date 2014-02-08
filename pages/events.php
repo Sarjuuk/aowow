@@ -4,61 +4,59 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-$cat       = Util::extractURLParams($pageParam)[0];
+$cat       = Util::extractURLParams($pageParam);
 $condition = [];
 $path      = [0, 11];
 $validCats = [0, 1, 2, 3];
 $title     = [Lang::$game['events']];
-$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_WORLDEVENT, -1, $cat, User::$localeId]);
+$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_WORLDEVENT, -1, $cat ? $cat[0] : -1, User::$localeId]);
 
 if (!Util::isValidPage($validCats, $cat))
     $smarty->error();
 
-$path[] = $cat;
-
-if (isset($cat))
-    array_unshift($title, Lang::$event['category'][$cat]);
-
 if (!$smarty->loadCache($cacheKey, $pageData))
 {
-    if ($cat !== null)
+    if ($cat)
     {
-        switch ($cat)
+        $path[] = $cat[0];
+        array_unshift($title, Lang::$event['category'][$cat[0]]);
+        switch ($cat[0])
         {
-            case 0:
-                $condition[] = ['holidayId', 0];
-                break;
-            case 1:
-                $condition[] = ['scheduleType', -1];
-                break;
-            case 2:
-                $condition[] = ['scheduleType', [0, 1]];
-                break;
-            case 3:
-                $condition[] = ['scheduleType', 2];
-                break;
+            case 0: $condition[] = ['e.holidayId', 0];          break;
+            case 1: $condition[] = ['h.scheduleType', -1];     break;
+            case 2: $condition[] = ['h.scheduleType', [0, 1]];  break;
+            case 3: $condition[] = ['h.scheduleType', 2];       break;
         }
     }
 
     $events = new WorldEventList($condition);
+    $events->addGlobalsToJScript($smarty);
 
     $deps = [];
     foreach ($events->iterate() as $__)
         if ($d = $events->getField('requires'))
             $deps[$events->id] = $d;
 
+
+    // menuId 11: Event    g_initPath()
+    //  tabId  0: Database g_initHeader()
     $pageData = array(
-        'listviews' => [],
-        'deps'      => $deps
+        'page' => array(
+            'tab'   => 0,
+            'title' => implode(" - ", $title),
+            'path'  => json_encode($path, JSON_NUMERIC_CHECK)
+        ),
+        'lv'   => [],
+        'deps' => $deps
     );
 
-    $pageData['listviews'][] = array(
+    $pageData['lv'][] = array(
         'file'   => 'event',
         'data'   => $events->getListviewData(),
         'params' => ['tabs' => '$myTabs']
     );
 
-    $pageData['listviews'][] = array(
+    $pageData['lv'][] = array(
         'file'   => 'calendar',
         'data'   => array_filter($events->getListviewData(), function($x) {return $x['id'] > 0;}),
         'params' => array(
@@ -67,13 +65,11 @@ if (!$smarty->loadCache($cacheKey, $pageData))
         )
     );
 
-    $events->addGlobalsToJScript($smarty);
-
     $smarty->saveCache($cacheKey, $pageData);
 }
 
 // recalculate dates with now(); can't be cached, obviously
-foreach ($pageData['listviews'] as &$views)
+foreach ($pageData['lv'] as &$views)
 {
     foreach ($views['data'] as &$data)
     {
@@ -81,27 +77,24 @@ foreach ($pageData['listviews'] as &$views)
         if (!empty($pageData['deps'][$data['id']]))
         {
             $data['startDate'] = $data['endDate'] = false;
+            unset($data['_date']);
             continue;
         }
 
-        $updated = WorldEventList::updateDates($data['startDate'], $data['endDate'], $data['rec']);
-        $data['startDate'] = $updated['start'] ? date(Util::$dateFormatLong, $updated['start']) : false;
-        $data['endDate']   = $updated['end']   ? date(Util::$dateFormatLong, $updated['end'])   : false;
+        $updated = WorldEventList::updateDates($data['_date']);
+        unset($data['_date']);
+        $data['startDate'] = $updated['start'] ? date(Util::$dateFormatInternal, $updated['start']) : false;
+        $data['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
+        $data['rec']       = $updated['rec'];
     }
 }
 
 
-// menuId 11: Event    g_initPath()
-//  tabId  0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title' => implode(" - ", $title),
-    'path'  => "[".implode(", ", $path)."]",
-    'tab'   => 0
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['lv']);
 
 // load the page
-$smarty->display('generic-no-filter.tpl');
+$smarty->display('list-page-generic.tpl');
 
 ?>

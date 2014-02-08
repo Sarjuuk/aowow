@@ -81,17 +81,20 @@ class ItemList extends BaseType
         {
             $ids = array_keys($this->templates);
             $itemz = DB::Aowow()->select('
-                SELECT   nv.item AS ARRAY_KEY1, nv.entry AS ARRAY_KEY2,               0 AS eventId,   nv.maxcount, iec.* FROM            npc_vendor   nv                                       LEFT JOIN ?_itemextendedcost iec ON   nv.extendedCost = iec.id WHERE   nv.item IN (?a)
+                SELECT   nv.item AS ARRAY_KEY1, nv.entry AS ARRAY_KEY2,               0 AS eventId,   nv.maxcount, iec.* FROM            npc_vendor   nv                                       LEFT JOIN ?_itemextendedcost iec ON   nv.extendedCost = iec.id                                                   WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
                 UNION
-                SELECT genv.item AS ARRAY_KEY1,     c.id AS ARRAY_KEY2, genv.eventEntry AS eventId, genv.maxcount, iec.* FROM game_event_npc_vendor genv JOIN creature c ON c.guid = genv.guid LEFT JOIN ?_itemextendedcost iec ON genv.extendedCost = iec.id WHERE genv.item IN (?a)',
+                SELECT genv.item AS ARRAY_KEY1,     c.id AS ARRAY_KEY2, genv.eventEntry AS eventId, genv.maxcount, iec.* FROM game_event_npc_vendor genv JOIN creature c ON c.guid = genv.guid LEFT JOIN ?_itemextendedcost iec ON genv.extendedCost = iec.id {JOIN creature c ON c.guid = genv.guid AND 1= ?d} WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
+                empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
                 $ids,
+                empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : 1,
+                empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
                 $ids
             );
 
             $cItems = [];
-            foreach ($itemz as &$vendors)
+            foreach ($itemz as $k => $vendors)
             {
-                foreach ($vendors as $k => $costs)
+                foreach ($vendors as $l => $costs)
                 {
                     $data = array(
                         'stock'  => $costs['maxcount'] ? $costs['maxcount'] : -1,
@@ -124,8 +127,10 @@ class ItemList extends BaseType
                         }
                     }
 
-                    $vendors[$k] = $data;
+                    $vendors[$l] = $data;
                 }
+
+                $itemz[$k] = $vendors;
             }
 
             // convert items to currency if possible
@@ -134,9 +139,9 @@ class ItemList extends BaseType
                 $moneyItems = new CurrencyList(array(['itemId', $cItems]));
                 $moneyItems->addGlobalsToJscript(Util::$pageTemplate);
 
-                foreach ($itemz as $id => &$vendors)
+                foreach ($itemz as $id => $vendors)
                 {
-                    foreach ($vendors as &$costs)
+                    foreach ($vendors as $l => $costs)
                     {
                         foreach ($costs as $k => $v)
                         {
@@ -158,7 +163,9 @@ class ItemList extends BaseType
                                     Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $k);
                             }
                         }
+                        $vendors[$l] = $costs;
                     }
+                    $itemz[$id] = $vendors;
                 }
             }
 
@@ -170,19 +177,12 @@ class ItemList extends BaseType
         // apply filter if given
         $tok = @$filter[TYPE_ITEM];
         $cur = @$filter[TYPE_CURRENCY];
-        $npc = @$filter[TYPE_NPC];                          // bought at specific vendor
 
         $reqRating = -1;
         foreach ($result as $itemId => $data)
         {
             foreach ($data as $npcId => $costs)
             {
-                if ($npc && $npcId != $npc)
-                {
-                    unset($data[$npcId]);
-                    continue;
-                }
-
                 if ($tok || $cur)                           // bought with specific token or currency
                 {
                     $valid = false;
@@ -269,7 +269,6 @@ class ItemList extends BaseType
                 $cost = @reset($this->getExtendedCost($miscData)[$this->id]);
                 if ($cost)
                 {
-
                     $currency = [];
                     $tokens   = [];
                     foreach ($cost as $k => $qty)
@@ -285,6 +284,17 @@ class ItemList extends BaseType
 
                     $data[$this->id]['stock'] = $cost['stock'];
                     $data[$this->id]['cost']  = [$this->getField('buyPrice')];
+
+                    if ($e = $cost['event'])
+                    {
+                        Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $e);
+                        $data[$this->id]['condition'] = array(
+                            'type'   => TYPE_WORLDEVENT,
+                            'typeId' => -$e,
+                            'status' => 1
+                        );
+                    }
+
                     if ($currency || $tokens)               // fill idx:3 if required
                         $data[$this->id]['cost'][] = $currency;
 
@@ -725,7 +735,7 @@ class ItemList extends BaseType
         else if ($_reqLvl > 1)
             $x .= sprintf(Lang::$game['reqLevel'], $_reqLvl).'<br />';
 
-        // required arena team raing / perosnal rating / todo (low): sort out what kind of rating
+        // required arena team rating / personal rating / todo (low): sort out what kind of rating
         if (@$this->getExtendedCost([], $reqRating)[$this->id] && $reqRating)
             $x .= sprintf(Lang::$item['reqRating'], $reqRating);
 

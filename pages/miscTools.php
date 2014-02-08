@@ -105,7 +105,7 @@ switch ($pageCall)
         $lv   = [];
         break;
     default:
-		$smarty->notFound();
+		$smarty->error();
 }
 
 if (strstr($pageCall, 'latest') || $pageCall == 'most-comments')

@@ -12,24 +12,25 @@
 
             <script type="text/javascript">//<![CDATA[
 {include file='bricks/community.tpl'}
-                var g_pageInfo = {ldelim}type: {$page.type}, typeId: {$page.typeId}, name: '{$lvData.page.name|escape:"quotes"}'{rdelim};
-                g_initPath({$page.path});
+                var g_pageInfo = {ldelim}type: {$type}, typeId: {$typeId}, name: '{$name|escape:"quotes"}'{rdelim};
+                g_initPath({$path});
             //]]></script>
 
-{include file='bricks/infobox.tpl' info=$lvData.infobox}
+{include file='bricks/infobox.tpl'}
 
             <div class="text">
+{include file='bricks/headIcons.tpl'}
 
 {include file='bricks/redButtons.tpl'}
 
-                <h1>{$lvData.page.name}</h1>
+                <h1{if isset($expansion)} class="h1-icon"><span class="{$expansion}-icon-right">{$name}</span>{else}>{$name}{/if}</h1>
 
 {include file='bricks/article.tpl'}
 
-{if $lvData.spillover}
-    <div id="spillover" class="left"></div>
+{if isset($extraText)}
+    <div id="text-generic" class="left"></div>
     <script type="text/javascript">//<![CDATA[
-        Markup.printHtml("{$lvData.spillover}", "spillover", {strip}{ldelim}
+        Markup.printHtml("{$extraText}", "text-generic", {strip}{ldelim}
             allow: Markup.CLASS_ADMIN,
             dbpage: true
         {rdelim}{/strip});
@@ -38,10 +39,15 @@
     <div class="pad2"></div>
 {/if}
 
+{if isset($unavailable)}
+                <div class="pad"></div>
+                <b style="color: red">{$lang._unavailable}</b>
+{/if}
+
                 <h2 class="clear">{$lang.related}</h2>
             </div>
 
-{include file='bricks/tabsRelated.tpl' tabs=$lvData.relTabs}
+{include file='bricks/tabsRelated.tpl' tabs=$lvData}
 
 {include file='bricks/contribute.tpl'}
 

@@ -16,7 +16,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $cl = new CharClassList(array(['id', $_id]));
     if ($cl->error)
-        $smarty->notFound(Lang::$game['class']);
+        $smarty->notFound(Lang::$game['class'], $_id);
 
     /***********/
     /* Infobox */
@@ -61,22 +61,28 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     /* Main Content */
     /****************/
 
+    // menuId 12: Class    g_initPath()
+    //  tabId  0: Database g_initHeader()
     $pageData = array (
-        'title'   => $cl->getField('name', true).' - '.Util::ucFirst(Lang::$game['class']),
-        'path'    => $_path,
-        'infobox' => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
-        'relTabs' => [],
-        'buttons' => array(
-            BUTTON_LINKS   => ['color' => '', 'linkId' => ''],
-            BUTTON_WOWHEAD => true,
-            BUTTON_TALENT  => ['href' => '?talent#'.Util::$tcEncoding[$tcClassId[$_id] * 3], 'pet' => false],
-            BUTTON_FORUM   => false                         // doto (low): $GLOBALS['AoWoWconf']['boardUrl'] + X
-        ),
         'page'    => array(
+            'title'      => $cl->getField('name', true).' - '.Util::ucFirst(Lang::$game['class']),
+            'path'       => json_encode($_path, JSON_NUMERIC_CHECK),
+            'tab'        => 0,
+            'type'       => TYPE_CLASS,
+            'typeId'     => $_id,
+            'reqJS'      => ['template/js/swfobject.js'],
             'name'       => $cl->getField('name', true),
-            'icon'       => 'class_'.strtolower($cl->getField('fileString')),
-            'expansion'  => Util::$expansionString[$cl->getField('expansion')]
-        )
+            'expansion'  => Util::$expansionString[$cl->getField('expansion')],
+            'infobox'    => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
+            'headIcons'  => ['class_'.strtolower($cl->getField('fileString'))],
+            'redButtons' => array(
+                BUTTON_LINKS   => ['color' => '', 'linkId' => ''],
+                BUTTON_WOWHEAD => true,
+                BUTTON_TALENT  => ['href' => '?talent#'.Util::$tcEncoding[$tcClassId[$_id] * 3], 'pet' => false],
+                BUTTON_FORUM   => false                         // doto (low): $GLOBALS['AoWoWconf']['boardUrl'] + X
+            )
+        ),
+        'relTabs' => [],
     );
 
     /**************/
@@ -91,7 +97,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     //     '$LANG.tab_talents',
     $conditions = array(
         ['s.typeCat', [-13, -11, -2, 7]],
-        [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_EXCLUDE_CATEGORY_SEARCH), '&'], 0],
+        [['s.cuFlags', (SPELL_CU_TRIGGERED | CUSTOM_EXCLUDE_FOR_LISTVIEW), '&'], 0],
         [
             'OR',
             ['s.reqClassMask', $_mask, '&'],                // Glyphs, Proficiencies
@@ -150,7 +156,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'hiddenCols'      => isset($hidden) ? $hidden : null,
             'computeDataFunc' => '$Listview.funcBox.initSubclassFilter',
             'onAfterCreate'   => '$Listview.funcBox.addSubclassIndicator',
-            'note'            => sprintf(Util::$filterResultString, '?items&filter=cr=152;crs=4;crv=0'),
+            'note'            => sprintf(Util::$filterResultString, '?items&filter=cr=152;crs='.$_id.';crv=0'),
             '_truncated'      => 1
         )
     );
@@ -191,8 +197,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // Tab: Trainer
     $conditions = array(
         ['npcflag', 0x30, '&'],                             // is trainer
-        ['trainer_type', 0],                                // trains class spells
-        ['trainer_class', $_id]
+        ['trainerType', 0],                                 // trains class spells
+        ['trainerClass', $_id]
     );
 
     $trainer = new CreatureList($conditions);
@@ -222,24 +228,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 }
 
 
-// menuId 12: Class    g_initPath()
-//  tabId  0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'    => $pageData['title'],
-    'path'     => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-    'tab'      => 0,
-    'type'     => TYPE_CLASS,
-    'typeId'   => $_id,
-    'reqJS'    => array(
-        'template/js/swfobject.js'
-    )
-));
-$smarty->assign('redButtons', $pageData['buttons']);
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_CLASS, $_id));       // comments, screenshots, videos
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
-$smarty->display('class.tpl');
+$smarty->display('detail-page-generic.tpl');
 
 ?>

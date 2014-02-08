@@ -259,7 +259,10 @@ var mn_npcs = [
     [7,"Humanoïdes"],
     [9,"Mécaniques"],
     [6,"Mort-vivant"],
-    [10,"Non classés"]
+    [10,"Non classés"],
+    [11,"Totem"],
+    [12,"Familier pacifique"],
+    [13,"Nuage de gaz"]
 ];
 var mn_objects = [
     [9,"Livres"],

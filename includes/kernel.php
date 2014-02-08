@@ -22,6 +22,7 @@ require 'includes/libs/Smarty-2.6.26/libs/Smarty.class.php';// Libraray: http://
 // require 'includes/libs/Smarty-3.1.14/libs/Smarty.class.php';     // Libraray: http://www.smarty.net/
 require 'includes/libs/DbSimple/Generic.php';               // Libraray: http://en.dklab.ru/lib/DbSimple (using mysqli variant: https://bitbucket.org/brainreaver/dbsimple/src)
 require 'includes/utilities.php';
+require 'localization/lang.class.php';
 require 'includes/user.class.php';
 require 'includes/database.class.php';
 
@@ -94,7 +95,6 @@ User::assignUserToTemplate($smarty, true);
 // parse page-parameters .. sanitize before use!
 @list($str, $trash) = explode('&', $_SERVER['QUERY_STRING'], 2);
 @list($pageCall, $pageParam) = explode('=', $str, 2);
-$smarty->assign('query', [$pageCall, $pageParam]);
 $smarty->assign('wowhead', 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/'.$str);
 
 ?>

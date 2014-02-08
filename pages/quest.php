@@ -40,7 +40,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $quest = new QuestList(array(['qt.id', $_id]));
     if ($quest->error)
-        $smarty->notFound(Lang::$game['quest']);
+        $smarty->notFound(Lang::$game['quest'], $_id);
 
 
 

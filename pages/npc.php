@@ -6,7 +6,10 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/community.class.php';
 
-$_id = intVal($pageParam);
+$_id       = intVal($pageParam);
+$_path     = [0, 4];
+$_altIds   = [];
+$_altNPCs  = null;
 
 $cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_NPC, $_id, -1, User::$localeId]);
 $cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_NPC, $_id, -1, User::$localeId]);
@@ -43,475 +46,549 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $npc = new CreatureList(array(['ct.id', $_id]));
     if ($npc->error)
-        $smarty->notFound(Lang::$game['npc']);
+        $smarty->notFound(Lang::$game['npc'], $_id);
 
+    // reconstruct path
+    $_path[] = $npc->getField('type');
 
+    $_typeFlags = $npc->getField('typeFlags');
+    $_name      = $npc->getField('name', true);
 
-    // not yet implemented -> chicken out
-    $smarty->error();
+    if ($_ = $npc->getField('family'))
+        $_path[] = $_;
+
+    $position = null;
+
+    // difficulty entrys of self
+    if ($npc->getField('cuFlags') & NPC_CU_DIFFICULTY_DUMMY)
+    {
+        // find and create link to regular creature
+        $regNPC = new CreatureList(array(['OR', ['difficultyEntry1', $_id], ['difficultyEntry2', $_id], ['difficultyEntry3', $_id]]));
+        $position = [$regNPC->id, $regNPC->getField('name', true)];
+    }
+    else
+    {
+        for ($i = 1; $i < 4; $i++)
+            if ($_ = $npc->getField('difficultyEntry'.$i))
+                $_altIds[$_] = $i;
+
+        if ($_altIds)
+            $_altNPCs = new CreatureList(array(['id', array_keys($_altIds)]));
+    }
+
+    // map mode
+    $mapType = 0;
+    $maps = DB::Aowow()->selectCol('SELECT DISTINCT map from creature WHERE id = ?d', $_id);
+    if (count($maps) == 1)                                   // should only exist in one instance
+    {
+        $map = new ZoneList(array(1, ['mapId', $maps[0]]));
+        // $mapType = $map->getField('areaType');
+    }
+
+    /***********/
+    /* Infobox */
+    /***********/
+
+    $infobox = [];
+
+    // Level
+    if ($npc->getField('rank') != NPC_RANK_BOSS)
+    {
+        $level  = $npc->getField('minLevel');
+        $maxLvl = $npc->getField('maxLevel');
+        if ($level < $maxLvl)
+            $level .= ' - '.$maxLvl;
+    }
+    else                                                    // Boss Level
+        $level = '??';
+
+    $infobox[] = Lang::$game['level'].Lang::$colon.$level;
+
+    // Classification
+    if ($_ = $npc->getField('rank'))                        //  != NPC_RANK_NORMAL
+    {
+        $str = $_typeFlags & 0x4 ? '[span class=boss-icon]'.Lang::$npc['rank'][$_].'[/span]' : Lang::$npc['rank'][$_];
+        $infobox[] = Lang::$npc['classification'].Lang::$colon.$str;
+    }
+
+    // Reaction
+    $_ = function ($r)
+    {
+        if ($r == 1)  return 2;
+        if ($r == -1) return 10;
+        return;
+    };
+    $infobox[] = Lang::$npc['react'].Lang::$colon.'[color=q'.$_($npc->getField('A')).']A[/color] [color=q'.$_($npc->getField('H')).']H[/color]';
+
+    // Faction
+    Util::$pageTemplate->extendGlobalIds(TYPE_FACTION, $npc->getField('factionId'));
+    $infobox[] = Util::ucFirst(Lang::$game['faction']).Lang::$colon.'[faction='.$npc->getField('factionId').']';
+
+    // Wealth
+    if ($_ = intVal(($npc->getField('minGold') + $npc->getField('maxGold')) / 2))
+        $infobox[] = Lang::$npc['worth'].Lang::$colon.'[tooltip=tooltip_avgmoneydropped][money='.$_.'][/tooltip]';
+
+    // AI
+    if (User::isInGroup(U_GROUP_STAFF))
+    {
+        if ($_ = $npc->getField('aiName'))
+            $infobox[] = 'AI'.Lang::$colon.$_;
+        else if ($_ = $npc->getField('scriptName'))
+            $infobox[] = 'Script'.Lang::$colon.$_;
+    }
+
+    $_nf = function ($num) { return number_format($num, 0, '', '.'); };
+
+    // Health
+    $health    = $npc->getField('healthMin');
+    $maxHealth = $npc->getField('healthMax');
+    $health    = $health < $maxHealth ? $_nf($health).' - '.$_nf($maxHealth) : $_nf($health);
+
+    $modes = [];
+    $tipp  = '[tooltip name=healthModes][table cellspacing=10][tr]%s[/tr][/table][/tooltip][span class=tip tooltip=healthModes]%s[/span]';
+    if ($mapType == 1 || $mapType == 2)                     // Dungeon or Raid
+    {
+        foreach ($_altIds as $mode => $id)
+        {
+            foreach ($_altNPCs->iterate() as $dId => $__)
+            {
+                if ($dId != $id)
+                    continue;
+
+                $hp    = $_altNPCs->getField('healthMin');
+                $hpMax = $_altNPCs->getField('healthMax');
+                $hp    = $hp < $hpMax ? $_nf($hp).' - '.$_nf($hpMax) : $_nf($hp);
+
+                $modes[] = '[tr][td]'.Lang::$npc['modes'][$mapType][$mode].'&nbsp;&nbsp;[/td][td]'.$hp.'[/td][/tr]';
+                break;
+            }
+        }
+
+        if ($modes)
+            $health = Lang::$spell['powerTypes'][-2].' ('.Lang::$npc['modes'][$mapType][0].')'.Lang::$colon.$health;
+    }
+
+    if ($modes)
+        $infobox[] = sprintf($tipp, implode('[/tr][tr]', $modes), $health);
+    else
+        $infobox[] = Lang::$spell['powerTypes'][-2].Lang::$colon.$health;
+
+    // Mana
+    $mana    = $npc->getField('manaMin');
+    $maxMana = $npc->getField('manaMax');
+    if ($maxMana)
+    {
+        $mana      = $mana < $maxMana ? $_nf($mana).' - '.$_nf($maxMana) : $_nf($mana);
+        $infobox[] = Lang::$spell['powerTypes'][0].Lang::$colon.$mana;
+    }
+
 
 /*
-            <table class="infobox">
-                <tr><th>{#Quick_Facts#}</th></tr>
-                <tr><td><div class="infobox-spacer"></div>
-                    <ul>
-                        <li><div>{#Level#}: {if $npc.minlevel<>$npc.maxlevel}{$npc.minlevel} - {/if}{$npc.maxlevel}</div></li>
-                        <li><div>{#Classification#}: {$npc.rank}</div></li>
-                        <li><div>{#React#}: <span class="q{if $npc.A==-1}10{elseif $npc.A==1}2{else}{/if}">A</span> <span class="q{if $npc.H==-1}10{elseif $npc.H==1}2{else}{/if}">H</span></div></li>
-                        <li><div>{#Faction#}: <a href="?faction={$npc.faction_num}">{$npc.faction}</a></div></li>
-                        <li><div>{#Health#}: {if $npc.minhealth<>$npc.maxhealth}{$npc.minhealth} - {/if}{$npc.maxhealth}</div></li>
-{if ($npc.minmana or $npc.maxmana)}
-                        <li><div>{#Mana#}: {if $npc.minmana<>$npc.maxmana}{$npc.minmana} - {/if}{$npc.maxmana}</div></li>
-{/if}
-{if ($npc.moneysilver>0) or ($npc.moneygold>0) or ($npc.moneycopper>0)}
-                        <li><div>{#Wealth#}:{if ($npc.moneygold>0)}
- <span class="moneygold">{$npc.moneygold}</span>{/if}
-{if ($npc.moneysilver>0)}
- <span class="moneysilver">{$npc.moneysilver}</span>{/if}
-{if ($npc.moneycopper>0)}
- <span class="moneycopper">{$npc.moneycopper}</span>{/if}
-</div></li>
-{/if}
-{if $npc.mindmg > 0 and $npc.maxdmg > 0}
-                        <li><div>{#Damage#}: {$npc.mindmg} - {$npc.maxdmg}</div></li>
-{/if}
-{if $npc.armor > 0}
-                        <li><div>{#Armor#}: {$npc.armor}</div></li>
-{/if}
-                    </ul>
-                </td></tr>
-            </table>
+        if damage
+            <li><div>{#Damage#}: {$npc.mindmg} - {$npc.maxdmg}</div></li>
+
+        if armor
+            <li><div>{#Armor#}: {$npc.armor}</div></li>
 */
 
-    unset($npc);
 
-    // Ищем NPC:
-    $npc = array();
-    $path = [0, 4, $npc['type']];
+    /****************/
+    /* Main Content */
+    /****************/
 
-    $row = $DB->selectRow('
-        SELECT
-            ?#, c.entry, c.name,
-            {
-                l.name_loc'.$_SESSION['locale'].' as `name_loc`,
-                l.subname_loc'.$_SESSION['locale'].' as `subname_loc`,
-                ?,
-            }
-            f.name_loc'.$_SESSION['locale'].' as `faction-name`, ft.factionID as `factionID`,
-            ((CASE exp WHEN 0 THEN mincls.basehp0 WHEN 1 THEN mincls.basehp1 WHEN 2 THEN mincls.basehp2 END)*Health_mod) AS minhealth,
-            ((CASE exp WHEN 0 THEN maxcls.basehp0 WHEN 1 THEN maxcls.basehp1 WHEN 2 THEN maxcls.basehp2 END)*Health_mod) AS maxhealth,
-            (mincls.basemana*Mana_mod) AS minmana,
-            (maxcls.basemana*Mana_mod) AS maxmana,
-            (maxcls.basearmor*Armor_mod) AS armor
-        FROM ?_factiontemplate ft, ?_factions f, creature_template c
-        LEFT JOIN creature_classlevelstats mincls ON mincls.level=minlevel AND mincls.class=unit_class
-        LEFT JOIN creature_classlevelstats maxcls ON maxcls.level=maxlevel AND maxcls.class=unit_class
+    // reputations (by mode)
+    $spilledParents = [];
+    $reputation     = [];
+    $_repFunc       = function ($entries, &$spillover)
+    {
+        $q = 'SELECT f.id, f.parentFactionId, cor.creature_id AS npc,
+                  IF(f.id = RewOnKillRepFaction1, RewOnKillRepValue1, RewOnKillRepValue2) AS qty,
+                  IF(f.id = RewOnKillRepFaction1, MaxStanding1, MaxStanding2)             AS maxRank,
+                  IF(f.id = RewOnKillRepFaction1, isTeamAward1, isTeamAward2)             AS spillover
+              FROM aowow_factions f JOIN creature_onkill_reputation cor ON f.Id = cor.RewOnKillRepFaction1 OR f.Id = cor.RewOnKillRepFaction2 WHERE cor.creature_id IN (?a)';
+
+        $result  = [];
+        $repData = DB::Aowow()->select($q, (array)$entries);
+
+        foreach ($repData as $_)
         {
-            LEFT JOIN (locales_creature l)
-            ON l.entry = c.entry AND ?
+            $set = array(
+                'id'   => $_['id'],
+                'qty'  => $_['qty'],
+                'name' => FactionList::getName($_['id']),   // << this sucks .. maybe format this whole table with markdown and add name via globals?
+                'npc'  => $_['npc'],
+                'cap'  => $_['maxRank'] && $_['maxRank'] < REP_EXALTED ? Lang::$game['rep'][$_['maxRank']] : null
+            );
+
+            if ($_['spillover'])
+            {
+                $spillover[$_['parentFactionId']] = [intVal($_['qty'] / 2), $_['maxRank']];
+                $set['spillover'] = $_['parentFactionId'];
+            }
+
+            $result[] = $set;
         }
-        WHERE
-            c.entry = ?
-            AND ft.factiontemplateID = c.faction_A
-            AND f.factionID = ft.factionID
-        LIMIT 1
-            ',
-        $npc_cols[1],
-        ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-        ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-        $_id
+
+        return $result;
+    };
+
+    // base NPC
+    if ($base = $_repFunc($_id, $spilledParents))
+        $reputation[] = [Lang::$npc['modes'][1][0], $base];
+
+    // difficulty dummys
+    if ($_altIds)
+    {
+        $alt = [];
+        $rep = $_repFunc(array_keys($_altIds), $spilledParents);
+
+        // order by difficulty
+        foreach ($rep as $r)
+            $alt[$_altIds[$r['npc']]][] = $r;
+
+        // apply by difficulty
+        foreach ($alt as $mode => $dat)
+            $reputation[] = [Lang::$npc['modes'][$mapType][$mode], $dat];
+    }
+
+    // get spillover factions and apply
+    if ($spilledParents)
+    {
+        $spilled = new FactionList(array(['parentFactionId', array_keys($spilledParents)]));
+
+        foreach($reputation as &$sets)
+        {
+            foreach ($sets[1] as &$row)
+            {
+                if (empty($row['spillover']))
+                    continue;
+
+                foreach ($spilled->iterate() as $spId => $__)
+                {
+                    // find parent
+                    if ($spilled->getField('parentFactionId') != $row['spillover'])
+                        continue;
+
+                    // don't readd parent
+                    if ($row['id'] == $spId)
+                        continue;
+
+                    $spMax = $spilledParents[$row['spillover']][1];
+
+                    $sets[1][] = array(
+                        'id'   => $spId,
+                        'qty'  => $spilledParents[$row['spillover']][0],
+                        'name' => $spilled->getField('name', true),
+                        'cap'  => $spMax && $spMax < REP_EXALTED ? Lang::$game['rep'][$spMax] : null
+                    );
+                }
+            }
+        }
+    }
+
+    // Quotes
+    $quotes = [];
+    if ($texts = DB::Aowow()->select('SELECT ct.*, ct.groupid AS ARRAY_KEY, ct.id as ARRAY_KEY2, lct.text_loc2, lct.text_loc3, lct.text_loc6, lct.text_loc8 FROM creature_text ct LEFT JOIN locales_creature_text lct ON ct.entry = lct.entry AND ct.groupid = lct.groupid AND ct.id = lct.id WHERE ct.entry = ?d', $_id))
+    {
+        $nQuotes = 0;
+        foreach ($texts as $text)
+        {
+            $group = [];
+            foreach ($text as $t)
+            {
+                // fixup .. either set %s for emotes or dont >.<
+                $text = Util::localizedString($t, 'text');
+                if (in_array($t['type'], [2, 3, 16, 41]) && strpos($text, '%s') === false)
+                    $text = '%s '.$text;
+
+                $line = array(
+                    'type' => 2,                               // [type: 0, 12] say: yellow-ish
+                    'lang'  => !empty($t['language']) ? Lang::$game['languages'][$t['language']] : null,
+                    'text'  => sprintf(Util::parseHtmlText(htmlentities($text)), $_name),
+                );
+
+                switch ($t['type'])
+                {
+                    case  1:                                    // yell:
+                    case 14: $line['type'] = 1; break;          // - dark red
+                    case  2:                                    // emote:
+                    case 16:                                    // "
+                    case  3:                                    // boss emote:
+                    case 41: $line['type'] = 4; break;          // - orange
+                    case  4:                                    // whisper:
+                    case 15:                                    // "
+                    case  5:                                    // boss whisper:
+                    case 42: $line['type'] = 3; break;          // - pink-ish
+                }
+
+                $nQuotes++;
+                $group[] = $line;
+            }
+            $quotes[] = $group;
+        }
+        $quotes = [$quotes, $nQuotes];
+    }
+
+
+    // get spawns and such
+
+
+    // menuId 4: NPC      g_initPath()
+    //  tabId 0: Database g_initHeader()
+    $pageData = array(
+        'page' => array(
+            'name'         => $_name,
+            'subname'      => $npc->getField('subname', true),
+            'infobox'      => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
+            'difficultyPH' => isset($difficultyPH) ? $difficultyPH : null,
+            // 'mapper' => true,
+            'position'     => $position,
+            'quotes'       => $quotes,
+            'reputation'   => $reputation,
+            'title'        => $_name.' - '.Util::ucFirst(Lang::$game['npc']),
+            'path'         => json_encode($_path, JSON_NUMERIC_CHECK),
+            'tab'          => 0,
+            'type'         => TYPE_NPC,
+            'typeId'       => $_id,
+            'reqJS'        => ['template/js/swfobject.js'],
+            'redButtons'   => array(
+                BUTTON_WOWHEAD => true,
+                BUTTON_LINKS   => true,
+                BUTTON_VIEW3D  => ['type' => TYPE_NPC, 'typeId' => $_id, 'displayId' => $npc->getRandomModelId()]
+            )
+        ),
+        'relTabs' => []
     );
 
-    if($row)
+    /**************/
+    /* Extra Tabs */
+    /**************/
+
+    // tab: SAI
+        // hmm, how should this loot like
+
+    // tab: abilities
+        // for spell in template and smartScripts if set
+
+    // tab: teaches
+        // pet spells, class spells, trade spells
+
+    // tab: sells
+    if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv  WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id = ?d', $_id, $_id))
     {
-        $npc = $row;
-        $npc['name'] = localizedName($row);
-        $npc['subname'] = localizedName($row, 'subname');
-        if($npc['rank'] == 3)
+        $soldItems = new ItemList(array(['id', $sells]));
+        if (!$soldItems->error)
         {
-            $npc['minlevel'] = '??';
-            $npc['maxlevel'] = '??';
-        }
-        $npc['mindmg'] = round(($row['mindmg'] + $row['attackpower']) * $row['dmg_multiplier']);
-        $npc['maxdmg'] = round(($row['maxdmg'] + $row['attackpower']) * $row['dmg_multiplier']);
+            $soldItems->addGlobalsToJscript(Util::$pageTemplate);
 
-        $toDiv = array('minhealth', 'maxmana', 'minmana', 'maxhealth', 'armor', 'mindmg', 'maxdmg');
-        // Разделяем на тысячи (ххххххххх => ххх,ххх,ххх)
-        foreach($toDiv as $e)
-            $npc[$e] = number_format($npc[$e]);
-
-        $npc['rank'] = $smarty->get_config_vars('rank'.$npc['rank']);
-        // faction_A = faction_H
-        $npc['faction_num'] = $row['factionID'];
-        $npc['faction'] = $row['faction-name'];
-        // Деньги
-        $money = ($row['mingold']+$row['maxgold']) / 2;
-        $npc = array_merge($npc, money2coins($money));
-        // Героик/нормал копия НПС
-        if($npc['difficulty_entry_1'])
-        {
-            // это нормал НПС, ищем героика
-            if($tmp = creatureinfo($npc['difficulty_entry_1']))
-            {
-                $npc['heroic'] = array(
-                    'type'    => 0,
-                    'entry'    => $tmp['entry'],
-                    'name'    => str_replace(LOCALE_HEROIC, '', $tmp['name'])
-                );
-
-                unset($tmp);
-            }
-        }
-        else
-        {
-            // А может быть героик НПС одним для нескольких нормалов?
-            // считаем что нет
-            $tmp = $DB->selectRow('
-                    SELECT c.entry, c.name
-                    {
-                        , l.name_loc?d as `name_loc`
-                    }
-                    FROM creature_template c
-                    {
-                        LEFT JOIN (locales_creature l)
-                        ON l.entry = c.entry AND ?
-                    }
-                    WHERE
-                        c.difficulty_entry_1 = ?d
-                    LIMIT 1
-                ',
-                ($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP,
-                ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-                $npc['entry']
+            $pageData['relTabs'][] = array(
+                'file'   => 'item',
+                'data'   => $soldItems->getListviewData(ITEMINFO_VENDOR, [TYPE_NPC => $_id]),
+                'params' => [
+                    'tabs'      => '$tabsRelated',
+                    'name'      => '$LANG.tab_sells',
+                    'id'        => 'currency-for',
+                    'extraCols' => "$[Listview.extraCols.condition, Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]"
+                ]
             );
-            if($tmp)
-            {
-                $npc['heroic'] = array(
-                    'type'    => 1,
-                    'entry'    => $tmp['entry'],
-                    'name'    => localizedName($tmp)
-                );
-                $npc['name'] = str_replace(' (1)', '', $npc['name']);
-                $normal_entry = $tmp['entry'];
-                unset($tmp);
-            }
         }
-        // Дроп
-        $lootid=$row['lootid'];
-        $skinid=$row['skinloot'];
-        $pickpocketid=$row['pickpocketloot'];
-        // Используемые спеллы
-        $npc['ablities'] = array();
-        $tmp = array();
-        for($j=0;$j<=4;++$j)
+    }
+
+    // tabs: this creature contains..
+    $skinTab = ['tab_skinning', 'skinned-from'];
+    if ($_typeFlags & NPC_TYPEFLAG_HERBLOOT)
+        $skinTab = ['tab_gatheredfromnpc', 'gathered-from-npc'];
+    else if ($_typeFlags & NPC_TYPEFLAG_MININGLOOT)
+        $skinTab = ['tab_minedfromnpc', 'mined-from-npc'];
+    else if ($_typeFlags & NPC_TYPEFLAG_ENGINEERLOOT)
+        $skinTab = ['tab_salvagedfrom', 'salvaged-from-npc'];
+
+/*
+		extraCols: [Listview.extraCols.count, Listview.extraCols.percent, Listview.extraCols.mode],
+		_totalCount: 22531,
+		computeDataFunc: Listview.funcBox.initLootTable,
+		onAfterCreate: Listview.funcBox.addModeIndicator,
+
+        modes:{"mode":1,"1":{"count":4408,"outof":16013},"4":{"count":4408,"outof":22531}}
+*/
+
+    $sourceFor = array(
+         [LOOT_CREATURE,    $npc->getField('lootId'),           '$LANG.tab_drops',         'drops',         ['Listview.extraCols.percent'], []                          , []],
+         [LOOT_PICKPOCKET,  $npc->getField('pickpocketLootId'), '$LANG.tab_pickpocketing', 'pickpocketing', ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
+         [LOOT_SKINNING,    $npc->getField('skinLootId'),       '$LANG.'.$skinTab[0],      $skinTab[1],     ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []]
+    );
+
+    // temp: manually add loot for difficulty-versions
+    $langref = array(
+        "-2" => '$LANG.tab_heroic',
+        "-1" => '$LANG.tab_normal',
+           1 => '$$WH.sprintf(LANG.tab_normalX, 10)',
+           2 => '$$WH.sprintf(LANG.tab_normalX, 25)',
+           3 => '$$WH.sprintf(LANG.tab_heroicX, 10)',
+           4 => '$$WH.sprintf(LANG.tab_heroicX, 25)'
+    );
+
+    if ($_altIds)
+    {
+        $sourceFor[0][2] = $langref[1];
+        foreach ($_altNPCs->iterate() as $id => $__)
         {
-            if($row['spell'.$j] && !in_array($row['spell'.$j], $tmp))
-            {
-                $tmp[] = $row['spell'.$j];
-                if($data = spellinfo($row['spell'.$j], 0))
-                {
-                    if($data['name'])
-                        $npc['abilities'][] = $data;
-                }
-            }
+            $mode = $_altIds[$id];
+            array_splice($sourceFor, 1, 0, [[LOOT_CREATURE, $_altNPCs->getField('lootId'), $langref[$mode + 1], 'drops-'.$mode, ['Listview.extraCols.percent'], [], []]]);
         }
-        for($j=1;$j<4;$j++)
+    }
+
+    $reqQuest = [];
+    foreach ($sourceFor as $sf)
+    {
+        if ($itemLoot = Util::handleLoot($sf[0], $sf[1], User::isInGroup(U_GROUP_STAFF), $sf[4]))
         {
-            $tmp2 = $DB->select('
-                SELECT action?d_param1
-                FROM creature_ai_scripts
-                WHERE
-                    creature_id=?d
-                    AND action?d_type=11
-                ',
-                $j,
-                $npc['entry'],
-                $j
+            foreach ($itemLoot as $l => $lv)
+            {
+                if (!$lv['quest'])
+                    continue;
+
+                $sf[4][] = 'Listview.extraCols.condition';
+
+                $reqQuest[$lv['id']] = 0;
+
+                $itemLoot[$l]['condition'] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
+            }
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'item',
+                'data'   => $itemLoot,
+                'params' => [
+                    'tabs'        => '$tabsRelated',
+                    'name'        => $sf[2],
+                    'id'          => $sf[3],
+                    'extraCols'   => $sf[4] ? "$[".implode(', ', array_unique($sf[4]))."]" : null,
+                    'hiddenCols'  => $sf[5] ? "$".json_encode($sf[5]) : null,
+                    'visibleCols' => $sf[6] ? '$'.json_encode($sf[6]) : null,
+                    'sort'        => "$['-percent', 'name']",
+                ]
             );
-            if($tmp2)
-                foreach($tmp2 as $i=>$tmp3)
-                    if(!in_array($tmp2[$i]['action'.$j.'_param1'], $tmp))
-                    {
-                        $tmp[] = $tmp2[$i]['action'.$j.'_param1'];
-                        if($data = spellinfo($tmp2[$i]['action'.$j.'_param1'], 0))
-                        {
-                            if($data['name'])
-                                $npc['abilities'][] = $data;
-                        }
-                    }
         }
-        if(!$npc['ablities'])
-            unset($npc['ablities']);
+    }
 
-        // Обучает:
-        // Если это пет со способностью:
-        /* // Временно закомментировано
-        $row = $DB->selectRow('
-            SELECT Spell1, Spell2, Spell3, Spell4
-            FROM petcreateinfo_spell
-            WHERE
-                entry=?d
-            ',
-            $npc['entry']
+    if ($reqIds = array_keys($reqQuest))                    // apply quest-conditions as back-reference
+    {
+        $conditions = array(
+            'OR',
+            ['requiredSourceItemId1', $reqIds], ['requiredSourceItemId2', $reqIds],
+            ['requiredSourceItemId3', $reqIds], ['requiredSourceItemId4', $reqIds],
+            ['requiredItemId1', $reqIds], ['requiredItemId2', $reqIds], ['requiredItemId3', $reqIds],
+            ['requiredItemId4', $reqIds], ['requiredItemId5', $reqIds], ['requiredItemId6', $reqIds]
         );
-        if($row)
+
+        $reqQuests = new QuestList($conditions);
+        $reqQuests->addGlobalsToJscript($smarty);
+
+        foreach ($reqQuests->iterate() as $qId => $__)
         {
-            $npc['teaches'] = array();
-            for($j=1;$j<=4;$j++)
-                if($row['Spell'.$j])
-                    for($k=1;$k<=3;$k++)
-                    {
-                        $spellrow = $DB->selectRow('
-                            SELECT ?#, spellID
-                            FROM ?_spell, ?_spellicons
-                            WHERE
-                                spellID=(SELECT effect'.$k.'triggerspell FROM ?_spell WHERE spellID=?d AND (effect'.$k.'id IN (36,57)))
-                                AND id=spellicon
-                            LIMIT 1
-                            ',
-                            $spell_cols[2],
-                            $row['Spell'.$j]
-                        );
-                        if($spellrow)
-                        {
-                            $num = count($npc['teaches']);
-                            $npc['teaches'][$num] = array();
-                            $npc['teaches'][$num] = spellinfo2($spellrow);
-                        }
-                    }
-        }
-        unset ($row);*/
+            if (empty($reqQuests->requires[$qId][TYPE_ITEM]))
+                continue;
 
-        // Если это просто тренер
-        $teachspells = $DB->select('
-            SELECT ?#, spellID
-            FROM npc_trainer, ?_spell, ?_spellicons
-            WHERE
-            (
-            -entry IN (SELECT spell FROM npc_trainer WHERE entry = ?)
-            OR (entry = ? AND npc_trainer.spell > 0)
-            )
-            AND spellID = npc_trainer.spell
-            AND id=spellicon
-            ',
-            $spell_cols[2],
-            $npc['entry'],
-            $npc['entry']
-        );
-        if($teachspells)
+            foreach ($reqIds as $rId)
+                if (in_array($rId, $reqQuests->requires[$qId][TYPE_ITEM]))
+                    $reqQuest[$rId] = $reqQuests->id;
+        }
+    }
+
+    // tab: starts quest (questrelation)
+    if ($starts = DB::Aowow()->selectCol('SELECT quest FROM creature_questrelation WHERE id = ?d', $_id))
+    {
+        $started = new QuestList(array(['id', $starts]));
+        if (!$started->error)
         {
-            if(!(IsSet($npc['teaches'])))
-                $npc['teaches'] = array();
-            foreach($teachspells as $teachspell)
-            {
-                        $num = count($npc['teaches']);
-                        $npc['teaches'][$num] = array();
-                        $npc['teaches'][$num] = spellinfo2($teachspell);
-            }
-        }
-        unset ($teachspells);
+            $started->addGlobalsToJScript(Util::$pageTemplate);
 
-        // Продает:
-        $rows_s = $DB->select('
-            SELECT ?#, i.entry, i.maxcount, n.`maxcount` as `drop-maxcount`, n.ExtendedCost
-                {, l.name_loc?d AS `name_loc`}
-            FROM npc_vendor n, ?_icons, item_template i
-                {LEFT JOIN (locales_item l) ON l.entry=i.entry AND ?d}
-            WHERE
-                n.entry=?
-                AND i.entry=n.item
-                AND id=i.displayid
-            ',
-            $item_cols[2],
-            ($_SESSION['locale'])? $_SESSION['locale']: DBSIMPLE_SKIP,
-            ($_SESSION['locale'])? 1: DBSIMPLE_SKIP,
-            $_id
-        );
-        if($rows_s)
-        {
-            $npc['sells'] = array();
-            foreach($rows_s as $numRow=>$row)
-            {
-                $npc['sells'][$numRow] = array();
-                $npc['sells'][$numRow] = iteminfo2($row);
-                $npc['sells'][$numRow]['maxcount'] = $row['drop-maxcount'];
-                $npc['sells'][$numRow]['cost'] = array();
-                if($row['ExtendedCost'])
-                {
-                    $extcost = $DB->selectRow('SELECT * FROM ?_item_extended_cost WHERE extendedcostID=?d LIMIT 1', abs($row['ExtendedCost']));
-                    if($extcost['reqhonorpoints']>0)
-                        $npc['sells'][$numRow]['cost']['honor'] = (($npc['A']==1)? 1: -1) * $extcost['reqhonorpoints'];
-                    if($extcost['reqarenapoints']>0)
-                        $npc['sells'][$numRow]['cost']['arena'] = $extcost['reqarenapoints'];
-                    $npc['sells'][$numRow]['cost']['items'] = array();
-                    for($j=1;$j<=5;$j++)
-                        if(($extcost['reqitem'.$j]>0) and ($extcost['reqitemcount'.$j]>0))
-                        {
-                            allitemsinfo($extcost['reqitem'.$j], 0);
-                            $npc['sells'][$numRow]['cost']['items'][] = array('item' => $extcost['reqitem'.$j], 'count' => $extcost['reqitemcount'.$j]);
-                        }
-                }
-                if($row['BuyPrice']>0)
-                    $npc['sells'][$numRow]['cost']['money'] = $row['BuyPrice'];
-            }
-            unset ($row);
-            unset ($numRow);
-            unset ($extcost);
-        }
-        unset ($rows_s);
-
-        // Дроп
-        if(!($npc['drop'] = loot('creature_loot_template', $lootid)))
-            unset ($npc['drop']);
-
-        // Кожа
-        if(!($npc['skinning'] = loot('skinning_loot_template', $skinid)))
-            unset ($npc['skinning']);
-
-        // Воруеццо
-        if(!($npc['pickpocketing'] = loot('pickpocketing_loot_template', $pickpocketid)))
-            unset ($npc['pickpocketing']);
-
-        // Начиниают квесты...
-        $rows_qs = $DB->select('
-                    SELECT q.?#
-                FROM quest_template q
-                LEFT JOIN creature_questrelation c on q.id = c.quest
-                WHERE
-                    c.id=?
-                 ',
-                $quest_cols[2],
-                $_id
+            $pageData['relTabs'][] = array(
+                'file'   => 'quest',
+                'data'   => $started->getListviewData(),
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'name' => '$LANG.tab_starts',
+                    'id'   => 'starts'
+                ]
             );
-        if($rows_qs)
-        {
-            $npc['starts'] = array();
-            foreach($rows_qs as $numRow=>$row) {
-                $npc['starts'][] = GetQuestInfo($row, 0xFFFFFF);
-            }
         }
-        unset ($rows_qs);
+    }
 
-        // Начиниают event-only квесты...
-        $rows_qse = event_find(array('quest_creature_id' => $_id));
-        if($rows_qse)
+    // tab: ends quest (involvedrelation)
+    if ($ends = DB::Aowow()->selectCol('SELECT quest FROM creature_involvedrelation WHERE id = ?d', $_id))
+    {
+        $ended = new QuestList(array(['id', $ends]));
+        if (!$ended->error)
         {
-            if (!isset($npc['starts']))
-                $npc['starts'] = array();
-            foreach($rows_qse as $event)
-                foreach($event['creatures_quests_id'] as $ids)
-                    $npc['starts'][] = GetDBQuestInfo($ids['quest'], 0xFFFFFF);
-        }
-        unset ($rows_qse);
+            $ended->addGlobalsToJScript(Util::$pageTemplate);
 
-        // Заканчивают квесты...
-$rows_qe = $DB->select('
-        SELECT q.?#
-        FROM quest_template q
-        LEFT JOIN creature_involvedrelation c on q.id = c.quest
-        WHERE
-                c.id=?
-        ',
-        $quest_cols[2],
-        $_id
+            $pageData['relTabs'][] = array(
+                'file'   => 'quest',
+                'data'   => $ended->getListviewData(),
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'name' => '$LANG.tab_ends',
+                    'id'   => 'ends'
+                ]
+            );
+        }
+    }
+
+    // tab: objective of quest
+    $conditions = array(
+        'OR',
+        ['AND', ['RequiredNpcOrGo1', $_id], ['RequiredNpcOrGoCount1', 0, '>']],
+        ['AND', ['RequiredNpcOrGo2', $_id], ['RequiredNpcOrGoCount2', 0, '>']],
+        ['AND', ['RequiredNpcOrGo3', $_id], ['RequiredNpcOrGoCount3', 0, '>']],
+        ['AND', ['RequiredNpcOrGo4', $_id], ['RequiredNpcOrGoCount4', 0, '>']],
+    );
+
+    $objectiveOf = new QuestList($conditions);
+    if (!$objectiveOf->error)
+    {
+        $objectiveOf->addGlobalsToJScript(Util::$pageTemplate);
+
+        $pageData['relTabs'][] = array(
+            'file'   => 'quest',
+            'data'   => $objectiveOf->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'name' => '$LANG.tab_objectiveof',
+                'id'   => 'objective-of'
+            ]
         );
-        if($rows_qe)
-        {
-            $npc['ends'] = array();
-            foreach($rows_qe as $numRow=>$row) {
-                $npc['ends'][] = GetQuestInfo($row, 0xFFFFFF);
-            }
-        }
-        unset ($rows_qe);
+    }
 
-        // Необходимы для квеста..
-        $rows_qo = $DB->select('
-            SELECT ?#
-            FROM quest_template
-            WHERE
-                RequiredNpcOrGo1=?
-                OR RequiredNpcOrGo2=?
-                OR RequiredNpcOrGo3=?
-                OR RequiredNpcOrGo4=?
-            ',
-            $quest_cols[2],
-            $_id, $_id, $_id, $_id
+    // tab: criteria of [ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE have no data set to check for]
+    $conditions = array(
+        ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE]],
+        ['ac.value1', $_id]
+    );
+
+    $crtOf = new AchievementList($conditions);
+    if (!$crtOf->error)
+    {
+        $crtOf->addGlobalsToJScript(Util::$pageTemplate);
+
+        $pageData['relTabs'][] = array(
+            'file'   => 'achievement',
+            'data'   => $crtOf->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'name' => '$LANG.tab_criteriaof',
+                'id'   => 'criteria-of'
+            ]
         );
-        if($rows_qo)
-        {
-            $npc['objectiveof'] = array();
-            foreach($rows_qo as $numRow=>$row)
-                $npc['objectiveof'][] = GetQuestInfo($row, 0xFFFFFF);
-        }
-        unset ($rows_qo);
-
-        // Цель критерии
-        $rows = $DB->select('
-                SELECT a.id, a.faction, a.name_loc?d AS name, a.description_loc?d AS description, a.category, a.points, s.iconname, z.areatableID
-                FROM ?_spellicons s, ?_achievementcriteria c, ?_achievement a
-                LEFT JOIN (?_zones z) ON a.map != -1 AND a.map = z.mapID
-                WHERE
-                    a.icon = s.id
-                    AND a.id = c.refAchievement
-                    AND c.type IN (?a)
-                    AND c.value1 = ?d
-                GROUP BY a.id
-                ORDER BY a.name_loc?d
-            ',
-            $_SESSION['locale'],
-            $_SESSION['locale'],
-            array(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE),
-            $npc['entry'],
-            $_SESSION['locale']
-        );
-        if($rows)
-        {
-            $npc['criteria_of'] = array();
-            foreach($rows as $row)
-            {
-                allachievementsinfo2($row['id']);
-                $npc['criteria_of'][] = achievementinfo2($row);
-            }
-        }
-
-        // Положения созданий божих (для героик НПС не задана карта, юзаем из нормала):
-        if($normal_entry)
-            // мы - героик НПС, определяем позицию по нормалу
-            $npc['position'] = position($normal_entry, 'creature', 2);
-        else
-            // мы - нормал НПС или НПС без сложности
-            $npc['position'] = position($npc['entry'], 'creature', 1);
-
-        // Исправить type, чтобы подсвечивались event-овые NPC
-        if ($npc['position'])
-            foreach ($npc['position'] as $z => $zone)
-                foreach ($zone['points'] as $p => $pos)
-                    if ($pos['type'] == 0 && ($events = event_find(array('creature_guid' => $pos['guid']))))
-                    {
-                        $names = array_select_key(event_name($events), 'name');
-                        $npc['position'][$z]['points'][$p]['type'] = 4;
-                        $npc['position'][$z]['points'][$p]['events'] = implode(", ", $names);
-                    }
-
     }
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
-
-// menuId 4: NPC      g_initPath()
-//  tabId 0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'mapper' => true,
-    'title'  => implode(" - ", $pageData['title']),
-    'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-    'tab'    => 0,
-    'type'   => TYPE_NPC,
-    'typeId' => $_id
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_NPC, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$npc, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
 $smarty->display('npc.tpl');

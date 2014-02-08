@@ -9,7 +9,10 @@ class WorldEventList extends BaseType
     public static $type      = TYPE_WORLDEVENT;
 
     protected     $queryBase = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e';
-    protected     $queryOpts = ['e' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']];
+    protected     $queryOpts = array(
+                                   'e' => ['j' => ['?_holidays h2 ON e.holidayId = h2.id', true], 'o' => '-e.id ASC'],
+                                   'h' => ['j' => ['?_holidays h ON e.holidayId = h.id']]
+                               );
 
     public function __construct($conditions = [])
     {
@@ -73,49 +76,44 @@ class WorldEventList extends BaseType
         return Util::localizedString($row, 'name');
     }
 
-    public static function updateDates($start, $end, $occurence, $final = 5000000000)    // in the far far FAR future..
+    public static function updateDates($date = null)
     {
-        if (!$start)
+        if (!$date || empty($date['firstDate']) || empty($date['length']))
         {
             return array(
-                'start'     => 0,
-                'end'       => 0,
-                'nextStart' => 0,
-                'nextEnd'   => 0
+                'start' => 0,
+                'end'   => 0,
+                'rec'   => 0
             );
         }
 
         // Convert everything to seconds
-        $start     = intVal($start);
-        $end       = intVal($end);
-        $occurence = intVal($occurence);
-        $final     = intVal($final);
+        $firstDate = intVal($date['firstDate']);
+        $lastDate  = !empty($date['lastDate']) ? intVal($date['lastDate']) : 5000000000;    // in the far far FAR future..;
+        $interval  = !empty($date['rec']) ? intVal($date['rec']) : -1;
+        $length    = intVal($date['length']);
 
-        $now       = time();
-        $year      = date("Y", $now);
+        $curStart  = $firstDate;
+        $curEnd    = $firstDate + $length;
+        $nextStart = $curStart  + $interval;
+        $nextEnd   = $curEnd    + $interval;
 
-        $curStart  = $start;
-        $curEnd    = $end;
-        $nextStart = $curStart + $occurence;
-        $nextEnd   = $curEnd + $occurence;
-
-        while ($nextEnd <= $final && date("Y", $nextEnd) <= $year && $curEnd <= $now)
+        while ($interval > 0 && $nextEnd <= $lastDate && $curEnd < time())
         {
             $curStart  = $nextStart;
             $curEnd    = $nextEnd;
-            $nextStart = $curStart + $occurence;
-            $nextEnd   = $curEnd + $occurence;
+            $nextStart = $curStart + $interval;
+            $nextEnd   = $curEnd   + $interval;
         }
 
         return array(
-            'start'     => $curStart,
-            'end'       => $curEnd,
-            'nextStart' => $nextStart,
-            'nextEnd'   => $nextEnd
+            'start' => $curStart,
+            'end'   => $curEnd,
+            'rec'   => $interval
         );
     }
 
-    public function getListviewData()
+    public function getListviewData($forNow = false)
     {
         $data = [];
 
@@ -125,10 +123,25 @@ class WorldEventList extends BaseType
                 'category'  => $this->curTpl['category'],
                 'id'        => $this->id,
                 'name'      => $this->getField('name', true),
-                'rec'       => $this->curTpl['occurence'],
-                'startDate' => $this->curTpl['startTime'],
-                'endDate'   => $this->curTpl['startTime'] + $this->curTpl['length']
+                '_date'     => array(
+                    'rec'       => $this->curTpl['occurence'],
+                    'length'    => $this->curTpl['length'],
+                    'firstDate' => $this->curTpl['startTime'],
+                    'lastDate'  => $this->curTpl['endTime']
+                )
             );
+        }
+
+        if ($forNow)
+        {
+            foreach ($data as &$d)
+            {
+               $u = self::updateDates($d['_date']);
+               unset($d['_date']);
+               $d['startDate'] = $u['start'];
+               $d['endDate']   = $u['end'];
+               $d['rec']       = $u['rec'];
+            }
         }
 
         return $data;

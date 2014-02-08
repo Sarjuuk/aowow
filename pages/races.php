@@ -10,8 +10,15 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 {
     $races = new CharRaceList(array(['side', 0, '!']));     // only playable
 
+    // menuId 13: Race     g_initPath()
+    //  tabId  0: Database g_initHeader()
     $pageData = array(
-        'listviews' => array(
+        'page' => array(
+            'title' => Util::ucFirst(Lang::$game['races']),
+            'path'  => "[0, 13]",
+            'tab'   => 0
+        ),
+        'lv' => array(
             array(
                 'file'   => 'race',
                 'data'   => $races->getListviewData(),
@@ -24,17 +31,11 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 }
 
 
-// menuId 13: Race     g_initPath()
-//  tabId  0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title' => Util::ucFirst(Lang::$game['races']),
-    'path'  => "[0, 13]",
-    'tab'   => 0
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['lv']);
 
 // load the page
-$smarty->display('generic-no-filter.tpl');
+$smarty->display('list-page-generic.tpl');
 
 ?>

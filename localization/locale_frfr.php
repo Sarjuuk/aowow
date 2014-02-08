@@ -219,9 +219,32 @@ $lang = array(
     ),
     'account'  => [],
     'npc'   => array(
-        'rank'          => ['Standard', 'Élite', 'Élite rare', 'Boss', 'Rare']
+        'rank'          => [0 => "Standard", 1 => "Élite", 4 => "Rare", 2 => "Élite rare", 3 =>"Boss"],
+        'classification'=> "Classification",
+        'petFamily'     => "Familier",
+        'react'         => "Réaction",
+        'worth'         => "Vaut",
+        'unkPosition'   => "L'emplacement de ce PNJ est inconnu.",
+        'difficultyPH'  => "[Ce PNJ est un espace réservé pour un autre mode de]",
+        'quotes'        => "Citations",
+        'gainsDesc'     => "Après avoir tué ce PNJ vous allez obtenir",
+        'repWith'       => "points de réputation avec",
+        'stopsAt'       => "arrête à %s",
+        'textTypes'     => [null, "crie", "dit", "chuchote"],
+        'modes'         => array(
+            1 => ["Normal", "Héroïque"],
+            2 => ["10-joueurs Normal", "25-joueurs Normal", "10-joueurs Héroïque", "25-joueurs Héroïque"]
+        ),
+        'cat'           => array(
+            "Non classés",              "Bêtes",                    "Draconien",                "Démons",                   "Élémentaires",             "Géants",                   "Mort-vivant",              "Humanoïdes",
+            "Bestioles",                "Mécaniques",               "Non spécifié",             "Totems",                   "Familier pacifique",       "Nuages de gaz"
+        )
     ),
     'event' => array(
+        'start'         => "Début",
+        'end'           => "Fin",
+        'interval'      => "Intervalle",
+        'inProgress'    => "L'évènement est présentement en cours",
         'category'      => array("Non classés", "Vacances", "Récurrent", "Joueur ctr. Joueur")
     ),
     'achievement' => array(
@@ -233,6 +256,7 @@ $lang = array(
         'itemReward'    => "Vous recevrez :",
         'titleReward'   => "Vous devriez recevoir le titre \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "tué",
+        'reqNumCrt'     => "Nécessite"
     ),
     'class' => array(
         'racialLeader'  => "Leader racial",
@@ -280,6 +304,7 @@ $lang = array(
         )
     ),
     'currency' => array(
+        'cap'           => "Maximum total",
         'cat'           => array(
             1 => "Divers", 2 => "JcJ", 4 => "Classique", 21 => "Wrath of the Lich King", 22 => "Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Inutilisées"
         )
@@ -302,7 +327,7 @@ $lang = array(
         '_pieces'       => "pièces",
         '_unavailable'  => "Cet objet n'est plus disponible aux joueurs.",
         '_tag'          => "Étiquette",
-
+        'summary'       => "Résumé",
         'notes'         => array(
             null,                                   "Ensemble de donjon 1",                 "Ensemble de donjon 2",                         "Ensemble de raid palier 1",
             "Ensemble de raid palier 2",            "Ensemble de raid palier 3",            "Ensemble JcJ niveau 60 supérieur",             "Ensemble JcJ niveau 60 supérieur (désuet)",
@@ -606,7 +631,7 @@ $lang = array(
             12 => "Quest",
             13 => "Keys",
         ),
-        'statType'  => array(
+        'statType'      => array(
             "Augmente vos points de mana de %d.",
             "Augmente vos points de vie de %d.",
             null,
@@ -656,7 +681,9 @@ $lang = array(
             "Stat Inutilisée #%d (%d)",
         )
     ),
-    'colon'         => ' : '
+    'colon'             => ' : ',
+    'dateFmtShort'      => "Y-m-d",
+    'dateFmtLong'       => "Y-m-d à H:i"
 );
 
 ?>

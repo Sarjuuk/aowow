@@ -6,7 +6,8 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/community.class.php';
 
-$_id = intVal($pageParam);
+$_id   = intVal($pageParam);
+$_path = [0, 1];
 
 $cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_SPELL, $_id, -1, User::$localeId]);
 $cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_SPELL, $_id, -1, User::$localeId]);
@@ -53,15 +54,15 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $spell = new SpellList(array(['s.id', $_id]));
     if ($spell->error)
-        $smarty->notFound(Lang::$game['spell']);
+        $smarty->notFound(Lang::$game['spell'], $_id);
 
     $spell->addGlobalsToJScript($smarty, GLOBALINFO_ANY);
 
     $_cat = $spell->getField('typeCat');
-    $path = [0, 1, $_cat];
     $l    = [null, 'A', 'B', 'C'];
+    $_path[] = $_cat;
 
-    // reconstruct path / title
+    // reconstruct path
     switch($_cat)
     {
         case  -2:
@@ -74,7 +75,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             {
                 if ($cl & (1 << ($i - 1)))
                 {
-                    $path[] = $i;
+                    $_path[] = $i;
                     break;
                 }
                 $i++;
@@ -82,32 +83,32 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
             if ($_cat == -13)
             {
-                $path[] = ($spell->getField('cuFlags') & (SPELL_CU_GLYPH_MAJOR | SPELL_CU_GLYPH_MINOR)) >> 6;
+                $_path[] = ($spell->getField('cuFlags') & (SPELL_CU_GLYPH_MAJOR | SPELL_CU_GLYPH_MINOR)) >> 6;
                 break;
             }
         case   9:
         case  -3:
         case  11:
-            $path[] = $spell->getField('skillLines')[0];
+            $_path[] = $spell->getField('skillLines')[0];
 
             if ($_cat == 11)
                 if ($_ = $spell->getField('reqSpellId'))
-                    $path[] = $_;
+                    $_path[] = $_;
 
             break;
         case -11:
             foreach (SpellList::$skillLines as $line => $skills)
                 if (in_array($spell->getField('skillLines')[0], $skills))
-                    $path[] = $line;
+                    $_path[] = $line;
             break;
         case  -7:                                           // only spells unique in skillLineAbility will always point to the right skillLine :/
             $_ = $spell->getField('cuFlags');
             if ($_ & SPELL_CU_PET_TALENT_TYPE0)
-                $path[] = 411;                              // Ferocity
+                $_path[] = 411;                              // Ferocity
             else if ($_ & SPELL_CU_PET_TALENT_TYPE1)
-                $path[] = 409;                              // Tenacity
+                $_path[] = 409;                              // Tenacity
             else if ($_ & SPELL_CU_PET_TALENT_TYPE2)
-                $path[] = 410;                              // Cunning
+                $_path[] = 410;                              // Cunning
     }
 
     // has difficulty versions of itself
@@ -400,7 +401,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $pageData = array(
         'title'   => $spell->getField('name', true),
-        'path'    => json_encode($path, JSON_NUMERIC_CHECK),
+        'path'    => json_encode($_path, JSON_NUMERIC_CHECK),
         'infobox' => $infobox,
         'relTabs' => [],
         'buttons' => array(
@@ -1073,6 +1074,25 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     unset($foo);                                            // clear reference
 
+    // factionchange-equivalent
+/* nyi
+    $pendant = DB::Aowow()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_items WHERE alliance_id = ?d OR horde_id = ?d', $_id, $_id, $_id);
+    if ($pendant)
+    {
+        $altiSpell = new SpellList(array(['id', abs($pendant)]));
+        if (!$altSpell->error)
+        {
+            $pageData['page']['transfer'] = array(
+                'id'      => $altItem->id,
+                'icon'    => $altItem->getField('iconString'),
+                'name'    => $altItem->getField('name', true),
+                'facInt'  => $pendant > 0 ? 'alliance' : 'horde',
+                'facName' => $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+            );
+        )
+    }
+*/
+
     /**************/
     /* Extra Tabs */
     /**************/
@@ -1195,7 +1215,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if (!$saSpells->error)
     {
         $data = $saSpells->getListviewData();
-        if ($difficulties)                                  // needs a way to distinguish between dungeon and raid :x
+        if ($difficulties)                                  // needs a way to distinguish between dungeon and raid :x; creature using this -> map -> areaType
         {
             $saE = '$[Listview.extraCols.mode]';
 

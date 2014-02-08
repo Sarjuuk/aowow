@@ -161,6 +161,9 @@ define('OBJECT_CU_STEALTHED',               0x20);
 define('OBJECT_CU_CASTER_GROUPED',          0x40);
 define('OBJECT_CU_NOT_PERSISTANT',          0x80);
 
+define('NPC_CU_INSTANCE_BOSS',              0x01);
+define('NPC_CU_DIFFICULTY_DUMMY',           0x02);
+
 define('MAX_LEVEL',                         80);
 
 // Loot handles
@@ -325,6 +328,25 @@ define('LOCK_PROPERTY_MINING',              3);
 define('NPC_TYPEFLAG_HERBLOOT',             0x0100);
 define('NPC_TYPEFLAG_MININGLOOT',           0x0200);
 define('NPC_TYPEFLAG_ENGINEERLOOT',         0x8000);
+define('NPC_TYPEFLAG_SPECIALLOOT',          0x8300);
+
+define('NPC_RANK_NORMAL',                   0);
+define('NPC_RANK_ELITE',                    1);
+define('NPC_RANK_RARE_ELITE',               2);
+define('NPC_RANK_BOSS',                     3);
+define('NPC_RANK_RARE',                     4);
+
+define('NPC_FLAG_TRAINER',                  0x00000010);
+define('NPC_FLAG_CLASS_TRAINER',            0x00000020);
+define('NPC_FLAG_VENDOR',                   0x00000080);
+define('NPC_FLAG_REPAIRER',                 0x00001000);
+define('NPC_FLAG_FLIGHT_MASTER',            0x00002000);
+define('NPC_FLAG_INNKEEPER',                0x00010000);
+define('NPC_FLAG_BANKER',                   0x00020000);
+define('NPC_FLAG_GUILD_MASTER',             0x00080000);
+define('NPC_FLAG_BATTLEMASTER',             0x00100000);
+define('NPC_FLAG_AUCTIONEER',               0x00200000);
+define('NPC_FLAG_STABLE_MASTER',            0x00400000);
 
 // GameObject
 define('OBJECT_DOOR',                       0);

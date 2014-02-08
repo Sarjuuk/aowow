@@ -5621,15 +5621,25 @@ Listview.extraCols = {
 
             var a = $WH.ce('a');
             a.href = cnd.url;
-            if (cnd.icon) {
-                a.className = 'icontiny tinyspecial';
-                a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + cnd.icon + '.gif)';
-            }
-            if (cnd.quality) {
-                a.className += ' q' + cnd.quality;
-            }
             a.style.whiteSpace = 'nowrap';
-            $WH.st(a, cnd.name);
+
+            if (g_pageInfo.typeId == row.condition.typeId) { // ponts to self
+                a.className = 'q1';
+                $WH.st(a, 'This');
+            }
+            else {
+                $WH.st(a, cnd.name);
+
+                if (cnd.icon) {
+                    a.className = 'icontiny tinyspecial';
+                    a.style.backgroundImage = 'url(' + g_staticUrl + '/images/icons/tiny/' + cnd.icon + '.gif)';
+                }
+
+                if (cnd.quality) {
+                    a.className += ' q' + cnd.quality;
+                }
+            }
+
             $WH.ae(td, a);
         },
         getVisibleText: function(row) {
@@ -5743,17 +5753,23 @@ Listview.extraCols = {
                 item = g_holidays[cond.typeId];
 
             cnd.icon  = item.icon.toLowerCase();
-            cnd.state = cond.status ? $WH.ct('active') : $WH.ct('inactive');
-            cnd.color = cond.status ? 'q2' : 'q10';
+            cnd.state = cond.status == 1 ? $WH.ct('active') : cond.status == 2 ? $WH.ct(LANG.pr_note_complete) : $WH.ct('inactive');
+            cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
             cnd.name  = item['name_' + g_locale.name];
             cnd.url   = '?event=' + cond.typeId;
 
             return cnd;
         },
         sortFunc: function(a, b, col) {
-            if (a.condition.status && b.condition.status) {
+            if (a.condition && b.condition) {
                 return $WH.strcmp(a.condition.status, b.condition.status);
             }
+            else if (a.condition)
+                return -1;
+            else if (b.condition)
+                return 1;
+            else
+                return 0;
         }
     },
 };
@@ -9000,6 +9016,12 @@ Listview.templates = {
                     a.style.fontFamily = 'Verdana, sans-serif';
                     a.href = this.getItemLink(npc);
                     $WH.ae(a, $WH.ct(npc.name));
+
+                    if (npc.hasQuests != null) {
+                        a.className += " icontiny tinyspecial";
+                        a.style.backgroundImage = "url(" + g_staticUrl + "/images/icons/quest_start.gif)";
+                    }
+
                     $WH.ae(td, a);
 
                     if (npc.tag != null) {
@@ -9020,7 +9042,7 @@ Listview.templates = {
                     return buff;
                 },
                 sortFunc: function(a, b, col) {
-                    return $WH.strcmp(b.boss, a.boss) || $WH.strcmp(a.name, b.name);
+                    return $WH.strcmp(b.boss, a.boss) || $WH.strcmp(a.name, b.name) || $WH.strcmp(a.hasQuests, b.hasQuests);
                 }
             },
             {

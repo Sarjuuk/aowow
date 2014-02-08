@@ -13,9 +13,16 @@ class CreatureList extends BaseType
     public          $tooltips  = [];
 
     protected       $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
-    protected       $queryOpts = array(
-                        'ct' => [['ft']],
-                        'ft' => ['j' => '?_factiontemplate ft ON ft.id = ct.factionA', 's' => ', ft.A, ft.H, ft.factionId']
+    public          $queryOpts = array(
+                        'ct'     => [['ft', 'clsMin', 'clsMax', 'qr']],
+                        'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.factionA', 's' => ', ft.*'],
+                        'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', CASE ct.exp WHEN 0 THEN clsMin.basehp0 * healthMod WHEN 1 THEN clsMin.basehp1 * healthMod ELSE clsMin.basehp2 * healthMod END AS healthMin, clsMin.baseMana * manaMod AS manaMin'],
+                        'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', CASE ct.exp WHEN 0 THEN clsMax.basehp0 * healthMod WHEN 1 THEN clsMax.basehp1 * healthMod ELSE clsMax.basehp2 * healthMod END AS healthMax, clsMax.baseMana * manaMod AS manaMax'],
+                        'qr'     => ['j' => ['creature_questrelation qr ON qr.id = ct.id', true], 's' => ', qr.quest', 'g' => 'ct.id'],          // start
+                        'ir'     => ['j' => ['creature_involvedrelation ir ON ir.id = ct.id', true]],                                            // end
+                        'qtqr'   => ['j' => 'quest_template qtqr ON qr.quest = qtqr.id'],
+                        'qtir'   => ['j' => 'quest_template qtir ON ir.quest = qtir.id'],
+                        'rep'    => ['j' => ['creature_onkill_reputation rep ON rep.creature_id = ct.id', true]]
                     );
 
     public static function getName($id)
@@ -48,15 +55,16 @@ class CreatureList extends BaseType
         $type  = $this->curTpl['type'];
         $row3  = [Lang::$game['level']];
         $fam   = $this->curTpl['family'];
-        // todo (low): rework, when factions are implemented
-        $fac   = DB::Aowow()->selectRow('SELECT * FROM dbc.faction f JOIN dbc.factionTemplate ft ON f.id = ft.factionId WHERE ft.id = ?d AND NOT f.reputationFlags1 & 0x4 AND f.reputationIndex <> -1', $this->curTpl['factionA']);
 
         if (!($this->curTpl['typeFlags'] & 0x4))
         {
-            $level = $this->curTpl['minlevel'];
-            if ($level != $this->curTpl['maxlevel'])
-                $level .= ' - '.$this->curTpl['maxlevel'];
+            $level = $this->curTpl['minLevel'];
+            if ($level != $this->curTpl['maxLevel'])
+                $level .= ' - '.$this->curTpl['maxLevel'];
         }
+        else
+            $level = '??';
+
         $row3[] = $level;
 
         if ($type)
@@ -75,8 +83,9 @@ class CreatureList extends BaseType
         if ($type == 1 && $fam)                             // 1: Beast
             $x .= '<tr><td>'.Lang::$game['fa'][$fam].'</td></tr>';
 
-        if ($fac)
-            $x .= '<tr><td>'.Util::localizedString($fac, 'name').'</td></tr>';
+        // todo (low): exclude not displayed factions
+        if ($f = FactionList::getName($this->getField('factionId')))
+            $x .= '<tr><td>'.$f.'</td></tr>';
 
         $x .= '</table>';
 
@@ -125,19 +134,19 @@ class CreatureList extends BaseType
 
                 if (isset($data[$texStr]))
                 {
-                    if ($data[$texStr]['minlevel'] > $this->curTpl['minlevel'])
-                        $data[$texStr]['minlevel'] = $this->curTpl['minlevel'];
+                    if ($data[$texStr]['minlevel'] > $this->curTpl['minLevel'])
+                        $data[$texStr]['minlevel'] = $this->curTpl['minLevel'];
 
-                    if ($data[$texStr]['maxlevel'] < $this->curTpl['maxlevel'])
-                        $data[$texStr]['maxlevel'] = $this->curTpl['maxlevel'];
+                    if ($data[$texStr]['maxlevel'] < $this->curTpl['maxLevel'])
+                        $data[$texStr]['maxlevel'] = $this->curTpl['maxLevel'];
 
                     $data[$texStr]['count']++;
                 }
                 else
                     $data[$texStr] = array(
                         'family'    => $this->curTpl['family'],
-                        'minlevel'  => $this->curTpl['minlevel'],
-                        'maxlevel'  => $this->curTpl['maxlevel'],
+                        'minlevel'  => $this->curTpl['minLevel'],
+                        'maxlevel'  => $this->curTpl['maxLevel'],
                         'modelId'   => $this->curTpl['modelId'],
                         'displayId' => $this->curTpl['displayId1'],
                         'skin'      => $texStr,
@@ -147,17 +156,20 @@ class CreatureList extends BaseType
             else
             {
                 $data[$this->id] = array(
-                    'family'   => $this->curTpl['family'],
-                    'minlevel' => $this->curTpl['minlevel'],
-                    'maxlevel' => $this->curTpl['maxlevel'],
-                    'id'       => $this->id,
-                    'boss'     => $this->curTpl['typeFlags'] & 0x4 ? 1 : 0,
-                    'rank'     => $this->curTpl['rank'],    // classification(?)
-                    'location' => $this->getSpawns(SPAWNINFO_ZONES),
-                    'name'     => $this->getField('name', true),
-                    'type'     => $this->curTpl['type'],
-                    'react'    => '['.$this->curTpl['A'].', '.$this->curTpl['H'].']'
+                    'family'         => $this->curTpl['family'],
+                    'minlevel'       => $this->curTpl['minLevel'],
+                    'maxlevel'       => $this->curTpl['maxLevel'],
+                    'id'             => $this->id,
+                    'boss'           => $this->curTpl['typeFlags'] & 0x4 ? 1 : 0,
+                    'classification' => $this->curTpl['rank'],
+                    'location'       => $this->getSpawns(SPAWNINFO_ZONES),
+                    'name'           => $this->getField('name', true),
+                    'type'           => $this->curTpl['type'],
+                    'react'          => [$this->curTpl['A'], $this->curTpl['H']],
                 );
+
+                if ($this->getField('quest'))
+                    $data[$this->id]['hasQuests'] = 1;
 
                 if ($_ = $this->getField('subname', true))
                     $data[$this->id]['tag'] = $_;
@@ -178,6 +190,289 @@ class CreatureList extends BaseType
     }
 
     public function addRewardsToJScript(&$refs) { }
+
+}
+
+
+class CreatureListFilter extends Filter
+{
+    protected $enums         = array(
+        3 => array( 469, 1037, 1106,  529, 1012,   87,   21,  910,  609,  942,  909,  530,   69,  577,  930, 1068, 1104,  729,  369,   92,   54,  946,   67, 1052,  749,
+                     47,  989, 1090, 1098,  978, 1011,   93, 1015, 1038,   76,  470,  349, 1031, 1077,  809,  911,  890,  970,  169,  730,   72,   70,  932, 1156,  933,
+                    510, 1126, 1067, 1073,  509,  941, 1105,  990,  934,  935, 1094, 1119, 1124, 1064,  967, 1091,   59,  947,   81,  576,  922,   68, 1050, 1085,  889,
+                    589,  270)
+    );
+
+    // cr => [type, field, misc, extraCol]
+    protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
+        5  => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_REPAIRER          ], // canrepair
+        9  => [FILTER_CR_BOOLEAN, 'lootId',                                      ], // lootable
+        11 => [FILTER_CR_BOOLEAN, 'pickpocketLootId',                            ], // pickpocketable
+        18 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_AUCTIONEER        ], // auctioneer
+        19 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_BANKER            ], // banker
+        20 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_BATTLEMASTER      ], // battlemaster
+        21 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_FLIGHT_MASTER     ], // flightmaster
+        22 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_GUILD_MASTER      ], // guildmaster
+        23 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_INNKEEPER         ], // innkeeper
+        24 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_CLASS_TRAINER     ], // talentunlearner
+        25 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_GUILD_MASTER      ], // tabardvendor
+        27 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_STABLE_MASTER     ], // stablemaster
+        28 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_TRAINER           ], // trainer
+        29 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_VENDOR            ], // vendor
+        19 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_BANKER            ], // banker
+        37 => [FILTER_CR_NUMERIC, 'id',               null,                  true], // id
+        35 => [FILTER_CR_STRING,  'textureString'                                ], // useskin
+        32 => [FILTER_CR_FLAG,    'cuFlags',          NPC_CU_INSTANCE_BOSS       ]  // instanceboss
+    );
+
+    protected function createSQLForCriterium(&$cr)
+    {
+        if (in_array($cr[0], array_keys($this->genericFilter)))
+        {
+            if ($genCR = $this->genericCriterion($cr))
+                return $genCR;
+
+            unset($cr);
+            $this->error = true;
+            return [1];
+        }
+
+        switch ($cr[0])
+        {
+            case 1:                                         // health [num]
+                if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
+                    break;
+
+                // remap OP for this special case
+                switch ($cr[1])
+                {
+                    case '=':                               // min > max is totally possible
+                        $this->parent->queryOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) <= '.$cr[2];
+                        $this->parent->queryOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) >= '.$cr[2];
+                        break;
+                    case '>':
+                        $this->parent->queryOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) > '.$cr[2];
+                        break;
+                    case '>=':
+                        $this->parent->queryOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) >= '.$cr[2];
+                        break;
+                    case '<':
+                        $this->parent->queryOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) < '.$cr[2];
+                        break;
+                    case '<=':
+                        $this->parent->queryOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) <= '.$cr[2];
+                        break;
+                }
+                return [1];                                 // always true, use post-filter
+            case 2:                                         // mana [num]
+                if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
+                    break;
+
+                // remap OP for this special case
+                switch ($cr[1])
+                {
+                    case '=':
+                        $this->parent->queryOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
+                        $this->parent->queryOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) => '.$cr[2];
+                        break;
+                    case '>':
+                        $this->parent->queryOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) > '.$cr[2];
+                        break;
+                    case '>=':
+                        $this->parent->queryOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) >= '.$cr[2];
+                        break;
+                    case '<':
+                        $this->parent->queryOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) < '.$cr[2];
+                        break;
+                    case '<=':
+                        $this->parent->queryOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
+                        break;
+                }
+                return [1];                                 // always true, use post-filter
+            case 7:                                         // startsquest [enum]
+                switch ($cr[1])
+                {
+                    case 1:                                 // any
+                        return ['ir.quest', 0, '!'];
+                    case 2:                                 // alliance
+                        return ['AND', ['ir.quest', 0, '!'], [['qtqr.RequiredRaces', RACE_MASK_HORDE, '&'], 0], ['qtqr.RequiredRaces', RACE_MASK_ALLIANCE, '&']];
+                    case 3:                                 // horde
+                        return ['AND', ['ir.quest', 0, '!'], [['qtqr.RequiredRaces', RACE_MASK_ALLIANCE, '&'], 0], ['qtqr.RequiredRaces', RACE_MASK_HORDE, '&']];
+                    case 4:                                 // both
+                        return ['AND', ['ir.quest', 0, '!'], ['OR', ['AND', ['qtqr.RequiredRaces', RACE_MASK_ALLIANCE, '&'], ['qtqr.RequiredRaces', RACE_MASK_HORDE, '&']], ['qtqr.RequiredRaces', 0]]];
+                    case 5:                                 // none
+                        return ['ir.quest', NULL];
+                }
+                break;
+            case 8:                                         // endsquest [enum]
+                switch ($cr[1])
+                {
+                    case 1:                                 // any
+                        return ['qr.quest', 0, '!'];
+                    case 2:                                 // alliance
+                        return ['AND', ['qr.quest', 0, '!'], [['qtqi.RequiredRaces', RACE_MASK_HORDE, '&'], 0], ['qtqi.RequiredRaces', RACE_MASK_ALLIANCE, '&']];
+                    case 3:                                 // horde
+                        return ['AND', ['qr.quest', 0, '!'], [['qtqi.RequiredRaces', RACE_MASK_ALLIANCE, '&'], 0], ['qtqi.RequiredRaces', RACE_MASK_HORDE, '&']];
+                    case 4:                                 // both
+                        return ['AND', ['qr.quest', 0, '!'], ['OR', ['AND', ['qtqi.RequiredRaces', RACE_MASK_ALLIANCE, '&'], ['qtqi.RequiredRaces', RACE_MASK_HORDE, '&']], ['qtqi.RequiredRaces', 0]]];
+                    case 5:                                 // none
+                        return ['qr.quest', NULL];
+                }
+                break;
+            case 3:                                         // faction [enum]
+                if (in_array($cr[1], $this->enums[$cr[0]]))
+                {
+                    $facTpls = [];
+                    $facs = new FactionList(array('OR', ['parentFactionId', $cr[1]], ['id', $cr[1]]));
+                    foreach ($facs->iterate() as $__)
+                        $facTpls = array_merge($facTpls, $facs->getField('templateIds'));
+
+                    if (!$facTpls)
+                        return [0];
+
+                    return ['OR', ['factionA', $facTpls], ['factionH', $facTpls]];
+                }
+                break;
+            case 42:                                        // increasesrepwith [enum]
+                if (in_array($cr[1], $this->enums[3]))      // reuse
+                    return ['OR', ['AND', ['rep.RewOnKillRepFaction1', $cr[1]], ['rep.RewOnKillRepValue1', 0, '>']], ['AND', ['rep.RewOnKillRepFaction2', $cr[1]], ['rep.RewOnKillRepValue2', 0, '>']]];
+
+                break;
+            case 43:                                        // decreasesrepwith [enum]
+                if (in_array($cr[1], $this->enums[3]))      // reuse
+                    return ['OR', ['AND', ['rep.RewOnKillRepFaction1', $cr[1]], ['rep.RewOnKillRepValue1', 0, '<']], ['AND', ['rep.RewOnKillRepFaction2', $cr[1]], ['rep.RewOnKillRepValue2', 0, '<']]];
+
+                break;
+            case 12:                                        // averagemoneydropped [op] [int]
+                if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
+                    break;
+
+                return ['AND', ['((minGold + maxGold) / 2)', $cr[2], $cr[1]]];
+            case 15:                                        // gatherable [yn]
+                if ($this->int2Bool($cr[1]))
+                {
+                    if ($cr[1])
+                        return ['AND', ['skinLootId', 0, '>'], ['typeFlags', NPC_TYPEFLAG_HERBLOOT, '&']];
+                    else
+                        return ['OR', ['skinLootId', 0], [['typeFlags', NPC_TYPEFLAG_HERBLOOT, '&'], 0]];
+                }
+                break;
+            case 44:                                        // salvageable [yn]
+                if ($this->int2Bool($cr[1]))
+                {
+                    if ($cr[1])
+                        return ['AND', ['skinLootId', 0, '>'], ['typeFlags', NPC_TYPEFLAG_ENGINEERLOOT, '&']];
+                    else
+                        return ['OR', ['skinLootId', 0], [['typeFlags', NPC_TYPEFLAG_ENGINEERLOOT, '&'], 0]];
+                }
+                break;
+            case 16:                                        // minable [yn]
+                if ($this->int2Bool($cr[1]))
+                {
+                    if ($cr[1])
+                        return ['AND', ['skinLootId', 0, '>'], ['typeFlags', NPC_TYPEFLAG_MININGLOOT, '&']];
+                    else
+                        return ['OR', ['skinLootId', 0], [['typeFlags', NPC_TYPEFLAG_MININGLOOT, '&'], 0]];
+                }
+                break;
+            case 10:                                        // skinnable [yn]
+                if ($this->int2Bool($cr[1]))
+                {
+                    if ($cr[1])
+                        return ['AND', ['skinLootId', 0, '>'], [['typeFlags', NPC_TYPEFLAG_SPECIALLOOT, '&'], 0]];
+                    else
+                        return ['OR', ['skinLootId', 0], [['typeFlags', NPC_TYPEFLAG_SPECIALLOOT, '&'], 0, '!']];
+                }
+                break;
+            case 6:                                         // foundin [enum]
+            case 38:                                        // relatedevent [enum]
+            case 34:                                        // usemodel [str]          // displayId -> id:creatureDisplayInfo.dbc/model -> id:cratureModelData.dbc/modelPath
+            case 33:                                        // hascomments [yn]
+            case 31:                                        // hasscreenshots [yn]
+            case 40:                                        // hasvideos [yn]
+            case 41:                                        // haslocation [yn] [staff]
+/* todo */      return [1];
+        }
+
+        unset($cr);
+        $this->error = true;
+        return [1];
+    }
+
+    protected function createSQLForValues()
+    {
+        $parts = [];
+        $_v    = &$this->fiData['v'];
+
+        // name [str]
+        if (isset($_v['na']))
+        {
+            if (isset($_v['ex']) && $_v['ex'] == 'on')
+                $parts[] = ['OR', ['name_loc'.User::$localeId, $_v['na']], ['subname_loc'.User::$localeId, $_v['na']]];
+            else
+                $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+        }
+
+        // pet family [list]
+        if (isset($_v['fa']))
+        {
+            $_ = (array)$_v['fa'];
+            if (!array_diff($_, [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 20, 21, 24, 25, 26, 27, 30, 31, 32, 33, 34, 35, 37, 38, 39, 41, 42, 43, 44, 45, 46]))
+                $parts[] = ['family', $_];
+            else
+                unset($_v['cl']);
+        }
+
+        // creatureLevel min [int]
+        if (isset($_v['minle']))
+        {
+            if (is_int($_v['minle']) && $_v['minle'] > 0)
+                $parts[] = ['minLevel', $_v['minle'], '>='];
+            else
+                unset($_v['minle']);
+        }
+
+        // creatureLevel max [int]
+        if (isset($_v['maxle']))
+        {
+            if (is_int($_v['maxle']) && $_v['maxle'] > 0)
+                $parts[] = ['maxLevel', $_v['maxle'], '<='];
+            else
+                unset($_v['maxle']);
+        }
+
+        // classification [list]
+        if (isset($_v['cl']))
+        {
+            $_ = (array)$_v['cl'];
+            if (!array_diff($_, [0, 1, 2, 3, 4]))
+                $parts[] = ['rank', $_];
+            else
+                unset($_v['cl']);
+        }
+
+        // react Alliance [int]
+        if (isset($_v['ra']))
+        {
+            $_ = (int)$_v['ra'];
+            if (in_array($_, [-1, 0, 1]))
+                $parts[] = ['ft.A', $_];
+            else
+                unset($_v['ra']);
+        }
+
+        // react Horde [int]
+        if (isset($_v['rh']))
+        {
+            $_ = (int)$_v['rh'];
+            if (in_array($_, [-1, 0, 1]))
+                $parts[] = ['ft.H', $_];
+            else
+                unset($_v['rh']);
+        }
+
+        return $parts;
+    }
 
 }
 

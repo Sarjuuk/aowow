@@ -75,7 +75,7 @@ class QuestList extends BaseType
                 quest_template q,
                 locales_quest l
             WHERE
-                q.id = l.entry AND
+                q.id = l.id AND
                 q.id = ?d',
             $id
         );

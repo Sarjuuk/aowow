@@ -11,14 +11,14 @@
 {/if}
 
             <script type="text/javascript">
-                g_initPath({$page.path}, {if empty($filter.query)}0{else}1{/if});
+                g_initPath({$path}, {if empty($filter.query)}0{else}1{/if});
 {if isset($filter.query)}
                 Menu.modifyUrl(Menu.findItem(mn_database, [0]), {ldelim} filter: '+={$filter.query|escape:'quotes'}' {rdelim}, {ldelim} onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [0])) {rdelim});
 {/if}
             </script>
 
-            <div id="fi" style="display: {if empty($filter.query)}none{else}block{/if}">
-                <form action="?items{$page.subCat}&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
+            <div id="fi" style="display: {if empty($filter.query)}none{else}block{/if};">
+                <form action="?items{$subCat}&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
 
                     <div class="rightpanel">
                         <div style="float: left">{$lang._quality}{$lang.colon}</div>
@@ -63,7 +63,7 @@
                             <td colspan="2">&nbsp;<input type="text" name="na" size="30" {if isset($filter.na)}value="{$filter.na|escape:'html'}" {/if}/></td>
                             <td></td>
                         </tr><tr>
-                            <td class="padded">Level{$lang.colon}</td>
+                            <td class="padded">{$lang.level}{$lang.colon}</td>
                             <td class="padded">&nbsp;<input type="text" name="minle" maxlength="3" class="smalltextbox2" {if isset($filter.minle)}value="{$filter.minle}" {/if}/> - <input type="text" name="maxle" maxlength="3" class="smalltextbox2" {if isset($filter.maxle)}value="{$filter.maxle}" {/if}/></td>
                             <td class="padded">
                                 <table>
@@ -176,7 +176,7 @@
 {/if}
             <div id="lv-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
-{if !empty($lvData.page.gemScores)}var fi_gemScores = {$lvData.page.gemScores};{/if}
+{if !empty($gemScores)}var fi_gemScores = {$gemScores};{/if}
 
 {if isset($lvData.data[0].params)}
                 var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});

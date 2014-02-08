@@ -20,11 +20,12 @@ abstract class BaseType
     /*
     *   condition as array [expression, value, operator]
     *       expression:    str   - must match fieldname;
-    *                      int   - impl. 1: select everything
+    *                      int   - 1: select everything; 0: select nothing
     *                      array - another condition array
     *       value:         str   - operator defaults to: LIKE %<val>%
     *                      int   - operator defaults to: = <val>
     *                      array - operator defaults to: IN (<val>)
+    *                      null  - operator defaults to: IS [NULL]
     *       operator:      modifies/overrides default
     *                      ! - negated default value (NOT LIKE; <>; NOT IN)
     *   condition as str
@@ -41,12 +42,13 @@ abstract class BaseType
     *               ['flags', 0xFF, '&'],
     *               ['flags2', 0xF, '&'],
     *           ]
-    *           [['mask', 0x3, '&'], 0]
+    *           [['mask', 0x3, '&'], 0],
+    *           ['joinedTbl.field', NULL]                   // NULL must be explicitly specified "['joinedTbl.field']" would be skipped as erronous definition (only really usefull when left-joining)
     *           'OR',
     *           5
     *       )
     *   results in
-    *       WHERE ((`id` = 45) OR (`name` NOT LIKE "%test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) LIMIT 5
+    *       WHERE ((`id` = 45) OR (`name` NOT LIKE "%test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) OR (`joinedTbl`.`field` IS NULL) LIMIT 5
     */
     public function __construct($conditions = [], $applyFilter = false)
     {
@@ -174,6 +176,11 @@ abstract class BaseType
 
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
                     $val = $val === '' ? '""' : '"%'.$val.'%"';
+                }
+                else if (count($c) > 1 && $c[1] === null)   // specifficly check for NULL
+                {
+                    $op  = (isset($c[2]) && $c[2] == '!') ? 'IS NOT' : 'IS';
+                    $val = 'NULL';
                 }
                 else                                        // null for example
                     return null;
@@ -578,7 +585,7 @@ abstract class Filter
             $tmp = [];
             foreach (array_merge($this->fiData['c'], $this->fiData['v']) as $k => $v)
             {
-                if ($v == '')
+                if ($v === '')
                     continue;
                 else if (is_array($v))
                     $tmp[$k] = $k."=".implode(':', $v);

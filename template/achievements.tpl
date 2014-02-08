@@ -11,14 +11,14 @@
 {/if}
 
             <script type="text/javascript">
-                g_initPath({$page.path}, {if empty($filter.query)}0{else}1{/if});
+                g_initPath({$path}, {if empty($filter.query)}0{else}1{/if});
 {if isset($filter.query)}
                 Menu.modifyUrl(Menu.findItem(mn_database, [9]), {ldelim} filter: '+={$filter.query|escape:'quotes'}' {rdelim}, {ldelim} onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [9])) {rdelim});
 {/if}
             </script>
 
             <div id="fi" style="display: {if empty($filter.query)}none{else}block{/if};">
-                <form action="?achievements{$page.subCat}&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
+                <form action="?achievements{$subCat}&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <table>
                         <tr>
                             <td>{$lang.name|ucFirst}{$lang.colon}</td>

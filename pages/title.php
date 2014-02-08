@@ -14,7 +14,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $title = new TitleList(array(['id', $_id]));
     if ($title->error)
-        $smarty->notFound(Lang::$game['title']);
+        $smarty->notFound(Lang::$game['title'], $_id);
 
     /***********/
     /* Infobox */
@@ -38,25 +38,31 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     /* Main Content */
     /****************/
 
+    // menuId 10: Title    g_initPath()
+    //  tabId  0: Database g_initHeader()
     $pageData = array(
-        'title'   => Util::ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->getField('male', true))))),
-        'path'    => '[0, 10, '.$title->getField('category').']',
-        'infobox' => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
-        'relTabs' => [],
-        'buttons' => array(
-            BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
-        ),
         'page'    => array(
-            'name'      => $title->getHtmlizedName(),
-            'expansion' => Util::$expansionString[$title->getField('expansion')]
-        )
+            'title'      => Util::ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->getField('male', true)))))." - ".Util::ucfirst(Lang::$game['title']),
+            'path'       => '[0, 10, '.$title->getField('category').']',
+            'tab'        => 0,
+            'type'       => TYPE_TITLE,
+            'typeId'     => $_id,
+            'name'       => $title->getHtmlizedName(),
+            'infobox'    => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
+            'expansion'  => Util::$expansionString[$title->getField('expansion')],
+            'redButtons' => array(
+                BUTTON_WOWHEAD => true,
+                BUTTON_LINKS   => true
+            ),
+        ),
+        'relTabs' => []
     );
 
     /**************/
     /* Extra Tabs */
     /**************/
 
+    // tab: sources
     if (!empty($title->sources[$_id]))
     {
         foreach ($title->sources[$_id] as $type => $entries)
@@ -101,25 +107,18 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
+    // tab: criteria of (to be added by TC)
+
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
 
-// menuId 10: Title    g_initPath()
-//  tabId  0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => $pageData['title']." - ".Util::ucfirst(Lang::$game['title']),
-    'path'   => $pageData['path'],
-    'tab'    => 0,
-    'type'   => TYPE_TITLE,
-    'typeId' => $_id
-));
-$smarty->assign('redButtons', $pageData['buttons']);
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
-$smarty->display('title.tpl');
+$smarty->display('detail-page-generic.tpl');
 
 ?>

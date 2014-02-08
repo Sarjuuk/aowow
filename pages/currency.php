@@ -6,7 +6,8 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/community.class.php';
 
-$_id = intVal($pageParam);
+$_id   = intVal($pageParam);
+$_path = [0, 15];
 
 $cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_CURRENCY, $_id, -1, User::$localeId]);
 
@@ -14,33 +15,46 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $currency = new CurrencyList(array(['id', $_id]));
     if ($currency->error)
-        $smarty->notFound(Lang::$game['skill']);
+        $smarty->notFound(Lang::$game['skill'], $_id);
 
     $_cat       = $currency->getField('category');
     $_itemId    = $currency->getField('itemId');
     $_isSpecial = $_id == 103 || $_id == 104;               // honor && arena points are not handled as items
+    $_path[]    = $_cat;
+
+    /***********/
+    /* Infobox */
+    /**********/
+
+    $infobox = '';
+    if ($_id == 103)                                        // Arena Points
+        $infobox = '[ul][li]'.Lang::$currency['cap'].Lang::$colon.'10\'000[/li][/ul]';
+    else if ($_id == 104)                                   // Honor
+        $infobox = '[ul][li]'.Lang::$currency['cap'].Lang::$colon.'75\'000[/li][/ul]';
 
     /****************/
     /* Main Content */
     /****************/
 
+    // menuId 14: Skill    g_initPath()
+    //  tabId  0: Database g_initHeader()
     $pageData = array(
-        'title'   => $currency->getField('name', true),
-        'path'    => [0, 15],
-        'relTabs' => [],
-        'buttons' => array(
-            BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
-        ),
         'page'    => array(
-            'name' => $currency->getField('name', true),
-            'icon' => $currency->getField('iconString'),
-            'id'   => $_id
+            'title'      => $currency->getField('name', true)." - ".Util::ucfirst(Lang::$game['skill']),
+            'path'       => json_encode($_path, JSON_NUMERIC_CHECK),
+            'tab'        => 0,
+            'type'       => TYPE_CURRENCY,
+            'typeId'     => $_id,
+            'infobox'    => $infobox,
+            'name'       => $currency->getField('name', true),
+            'headIcons'  => [$currency->getField('iconString')],
+            'redButtons' => array(
+                BUTTON_WOWHEAD => true,
+                BUTTON_LINKS   => true
+            )
         ),
+        'relTabs' => []
     );
-
-    if ($_cat)
-        $pageData['path'][] = $_cat;
 
     /**************/
     /* Extra Tabs */
@@ -148,7 +162,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // tab: created by (spell) [for items its handled in Util::getLootSource()]
     if ($_id == 104)
     {
-        $createdBy = new SpellList(array(['effect1Id', 45], ['effect2Id', 45], ['effect3Id', 45], 'OR']));
+        $createdBy = new SpellList(array(['effect1Id', 45], ['effect2Id', 45], ['effect3Id', 45], 'OR'));
         if (!$createdBy->error)
         {
             if ($createdBy->hasSetFields(['reagent1']))
@@ -203,21 +217,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
-// menuId 14: Skill    g_initPath()
-//  tabId  0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => $pageData['title']." - ".Util::ucfirst(Lang::$game['skill']),
-    'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-    'tab'    => 0,
-    'type'   => TYPE_CURRENCY,
-    'typeId' => $_id
-));
-$smarty->assign('redButtons', $pageData['buttons']);
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_CURRENCY, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
-$smarty->display('skill.tpl');
+$smarty->display('detail-page-generic.tpl');
 
 ?>

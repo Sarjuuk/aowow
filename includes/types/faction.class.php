@@ -25,12 +25,10 @@ class FactionList extends BaseType
         foreach ($this->iterate() as &$_curTpl)
         {
             // prepare factionTemplates
-            if ($_curTpl['templateIds'])
-                $_curTpl['templateIds'] = explode(' ', $_curTpl['templateIds']);
+            $_curTpl['templateIds'] = $_curTpl['templateIds'] ? explode(' ', $_curTpl['templateIds']) : [];
 
             // prepare quartermaster
-            if ($_curTpl['qmNpcIds'])
-                $_curTpl['qmNpcIds'] = explode(' ', $_curTpl['qmNpcIds']);
+            $_curTpl['qmNpcIds'] = $_curTpl['qmNpcIds'] ? explode(' ', $_curTpl['qmNpcIds']) : [];
         }
     }
 

@@ -145,9 +145,9 @@ $lang = array(
         'npcs'          => "NPCs",
         'pet'           => "Begleiter",
         'pets'          => "Begleiter",
-        'requires'      => "Benötigt %s",
         'profile'       => "",
         'profiles'      => "Profile",
+        'requires'      => "Benötigt %s",
         'requires2'     => "Benötigt",
         'reqLevel'      => "Benötigt Stufe %s",
         'reqLevelHlm'   => "Benötigt Stufe %s",
@@ -203,7 +203,7 @@ $lang = array(
         ),
         'ct'            => array(
             "Nicht kategorisiert",      "Wildtier",                 "Drachkin",                 "Dämon",                    "Elementar",                "Riese",                    "Untoter",                  "Humanoid",
-            "Tier",                     "Mechanisch",               "Nicht spezifiziert",       "Totem",                    "Haustier",                 "Gas Wolke"
+            "Tier",                     "Mechanisch",               "Nicht spezifiziert",       "Totem",                    "Haustier",                 "Gaswolke"
         ),
         'fa'            => array(
             1 => "Wolf",                2 => "Katze",               3 => "Spinne",              4 => "Bär",                 5 => "Eber",                6 => "Krokilisk",           7 => "Aasvogel",            8 => "Krebs",
@@ -261,9 +261,32 @@ $lang = array(
         'viewPubDesc'   => "Die Beschreibung in deinem <a href=\"?user=%s\">öffentlichen Profil</a> ansehen",
     ),
     'npc'   => array(
-        'rank'          => ['Normal', 'Elite', 'Rar Elite', 'Boss', 'Rar']
+        'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rar", 2 => "Rar Elite", 3 => "Boss"],
+        'classification'=> "Einstufung",
+        'petFamily'     => "Tierart",
+        'react'         => "Reaktion",
+        'worth'         => "Wert",
+        'unkPosition'   => "Der Aufenthaltsort dieses NPCs ist nicht bekannt.",
+        'difficultyPH'  => "Dieser NPC ist ein Platzhalter für einen anderen Modus von",
+        'quotes'        => "Zitate",
+        'gainsDesc'     => "Nach dem Töten dieses NPCs erhaltet Ihr",
+        'repWith'       => "Ruf mit der Fraktion",
+        'stopsAt'       => "Stoppt bei %s",
+        'textTypes'     => [null, "schreit", "sagt", "flüstert"],
+        'modes'         => array(
+            1 => ["Normal", "Heroisch"],
+            2 => ["10-Spieler Normal", "25-Spieler Normal", "10-Spieler Heroisch", "25-Spieler Heroisch"]
+        ),
+        'cat'           => array(
+            "Nicht kategorisiert",      "Wildtiere",                "Drachkin",                 "Dämonen",                  "Elementare",               "Riesen",                   "Untote",                   "Humanoide",
+            "Tiere",                    "Mechanisch",               "Nicht spezifiziert",       "Totems",                   "Haustiere",                "Gaswolken"
+        )
     ),
     'event' => array(
+        'start'         => "Anfang",
+        'end'           => "Ende",
+        'interval'      => "Intervall",
+        'inProgress'    => "Ereignis findet gerade statt",
         'category'      => array("Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler")
     ),
     'achievement' => array(
@@ -275,6 +298,7 @@ $lang = array(
         'itemReward'    => "Ihr bekommt:",
         'titleReward'   => "Euch wird der Titel \"<a href=\"?title=%d\">%s</a>\" verliehen",
         'slain'         => "getötet",
+        'reqNumCrt'     => "Benötigt"
     ),
     'class' => array(
         'racialLeader'  => "Volksanführer",
@@ -322,6 +346,7 @@ $lang = array(
         )
     ),
     'currency' => array(
+        'cap'           => "Obergrenze",
         'cat'           => array(
             1 => "Verschiedenes", 2 => "Spieler gegen Spieler", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon und Schlachtzug", 23 => "Burning Crusade", 41 => "Test", 3 => "Unbenutzt"
         )
@@ -344,7 +369,7 @@ $lang = array(
         '_pieces'       => "Teile",
         '_unavailable'  => "Dieses Ausrüstungsset ist nicht für Spieler verfügbar.",
         '_tag'          => "Tag",
-
+        'summary'       => "Zusammenfassung",
         'notes'         => array(
             null,                                   "Dungeon-Set 1",                            "Dungeon-Set 2",                                "Tier 1 Raid-Set",
             "Tier 2 Raid-Set",                      "Tier 3 Raid-Set",                          "Level 60 PvP-Set (Rar)",                   "Level 60 PvP-Set (Rar,  alt)",
@@ -698,7 +723,9 @@ $lang = array(
             "Unbekannter Bonus #%d (%d)",
         )
     ),
-    'colon'             => ': '
+    'colon'             => ': ',
+    'dateFmtShort'      => "d.m.Y",
+    'dateFmtLong'       => "d.m.Y \u\m H:i"
 );
 
 ?>

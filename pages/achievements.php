@@ -40,11 +40,11 @@ if (!Util::isValidPage($validCats, $cats))
 if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 {
     // include child categories if current category is empty
-    $condition = !$cats[0] ? null : (int)end($cats);
-    $acvList   = new AchievementList($condition ? [['category', $condition]] : [], true);
+    $condition = !empty($cats) ? [['category', (int)end($cats)]] : [];
+    $acvList   = new AchievementList($condition, true);
     if (!$acvList->getMatches())
     {
-        $curCats = $catList = [$condition ? $condition : 0];
+        $curCats = $catList = [!empty($cats) ? (int)end($cats) : 0];
         while ($curCats)
         {
             $curCats = DB::Aowow()->SelectCol('SELECT Id FROM ?_achievementCategory WHERE parentCategory IN (?a)', $curCats);
@@ -59,24 +59,32 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     $filter['fi']    =  $acvList->filterGetForm();
 
     // create page title and path
-    if (is_array($cats))
+    if ($cats)
     {
-        $catrows = DB::Aowow()->Select('SELECT * FROM ?_achievementcategory WHERE id IN (?a)',
-            $cats
-        );
-
+        $catrows = DB::Aowow()->Select('SELECT * FROM ?_achievementcategory WHERE id IN (?a)', $cats);
         foreach ($catrows as $cat)
         {
-            $path[] = $cat['id'];
+            $path[]  = $cat['id'];
             $title[] = Util::localizedString($cat, 'name');
         }
         array_unshift($title, Util::ucFirst(Lang::$game['achievements']));
     }
 
-    // listview content
+    // page content
+    // menuId 9: Achievement g_initPath()
+    //  tabId 0: Database    g_initHeader()
     $pageData = array(
-        'data'   => $acvList->getListviewData(),
-        'params' => []
+        'page' => array(
+            'title'  => implode(" - ", $title),
+            'path'   => json_encode($path, JSON_NUMERIC_CHECK),
+            'tab'    => 0,
+            'subCat' => $pageParam ? '='.$pageParam : '',
+            'reqJS'  => ['template/js/filters.js']
+        ),
+        'lv' => array(
+            'data'   => $acvList->getListviewData(),
+            'params' => []
+        )
     );
 
     // fill g_items, g_titles, g_achievements
@@ -84,20 +92,20 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 
     // if we are have different cats display field
     if ($acvList->hasDiffFields(['category']))
-        $pageData['params']['visibleCols'] = "$['category']";
+        $pageData['lv']['params']['visibleCols'] = "$['category']";
 
     if (!empty($filter['fi']['extraCols']))
-        $pageData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+        $pageData['lv']['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
     // create note if search limit was exceeded
     if ($acvList->getMatches() > SQL_LIMIT_DEFAULT)
     {
-        $pageData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), SQL_LIMIT_DEFAULT);
-        $pageData['params']['_truncated'] = 1;
+        $pageData['lv']['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), SQL_LIMIT_DEFAULT);
+        $pageData['lv']['params']['_truncated'] = 1;
     }
 
     if ($acvList->filterGetError())
-        $pageData['params']['_errors'] = '$1';
+        $pageData['lv']['params']['_errors'] = '$1';
 
     $smarty->saveCache($cacheKey, $pageData, $filter);
 }
@@ -106,20 +114,10 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 // sort for dropdown-menus
 asort(Lang::$game['si']);
 
-// menuId 9: Achievement g_initPath()
-//  tabId 0: Database    g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => implode(" - ", $title),
-    'path'   => "[".implode(", ", $path)."]",
-    'tab'    => 0,
-    'subCat' => $pageParam ? '='.$pageParam : '',
-    'reqJS'  => array(
-        'template/js/filters.js'
-    )
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('filter', $filter);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['lv']);
 
 // load the page
 $smarty->display('achievements.tpl');

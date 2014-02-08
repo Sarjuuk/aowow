@@ -238,9 +238,11 @@ if ($searchMask & 0x8)
 
         foreach ($data as &$d)
         {
-            $updated = WorldEventList::updateDates($d['startDate'], $d['endDate'], $d['rec']);
-            $d['startDate'] = date(Util::$dateFormatLong, $updated['start']);
-            $d['endDate']   = date(Util::$dateFormatLong, $updated['end']);
+            $updated = WorldEventList::updateDates($d);
+            unset($d['_date']);
+            $d['startDate'] = $updated['start'] ? date(Util::$dateFormatInternal, $updated['start']) : false;
+            $d['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
+            $d['rec']       = $updated['rec'];
         }
 
         $found['event'] = array(

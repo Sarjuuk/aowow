@@ -12,8 +12,8 @@
             <div class="pad3"></div>
 
             <div class="inputbox">
-            <h1>{$page.subject} #{$page.id}</h1>
-            <div id="inputbox-error">{$page.notFound}</div>
+            <h1>{$subject} #{$id}</h1>
+            <div id="inputbox-error">{$notFound}</div>
             <!--  -->
             </div>
         </div>

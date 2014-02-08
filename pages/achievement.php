@@ -55,19 +55,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $acv = new AchievementList(array(['id', $_id]));
     if ($acv->error)
-        $smarty->notFound(Lang::$game['achievement']);
+        $smarty->notFound(Lang::$game['achievement'], $_id);
 
     // create page title and path
     $curCat  = $acv->getField('category');
-    $tmpPath = [];
+    $path    = [];
     do
     {
-        array_unshift($tmpPath, $curCat);
+        array_unshift($path, $curCat);
         $curCat = DB::Aowow()->SelectCell('SELECT parentCategory FROM ?_achievementcategory WHERE id = ?d', $curCat);
     }
     while ($curCat > 0);
 
-    array_unshift($tmpPath, 0, 9);
+    array_unshift($path, 0, 9);
 
     $acv->addGlobalsToJscript($smarty, GLOBALINFO_REWARDS);
 
@@ -130,20 +130,24 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     /* Main Content */
     /****************/
 
+    // menuId 9: Achievement  g_initPath()
+    //  tabId 0: Database     g_initHeader()
     $pageData = array(
-        'title'   => $acv->getField('name', true),
-        'path'    => $tmpPath,
-        'infobox' => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
-        'series'  => $series,
-        'relTabs' => [],
-        'buttons' => array(
-            BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$_id.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0'],
-            BUTTON_WOWHEAD => true
-        ),
         'page'    => array(
+            'title'       => $acv->getField('name', true).' - '.Util::ucfirst(Lang::$game['achievement']),
+            'path'        => json_encode($path, JSON_NUMERIC_CHECK),
+            'tab'         => 0,
+            'type'        => TYPE_ACHIEVEMENT,
+            'typeId'      => $_id,
+            'headIcons'   => $acv->getField('iconString'),
+            'infobox'     => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
+            'series'      => $series,
+            'redButtons'  => array(
+                BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$_id.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0'],
+                BUTTON_WOWHEAD => true
+            ),
             'name'        => $acv->getField('name', true),
             'description' => $acv->getField('description', true),
-            'iconname'    => $acv->getField('iconString'),
             'count'       => $acv->getField('reqCriteriaCount'),
             'reward'      => $acv->getField('reward', true),
             'nCriteria'   => count($acv->getCriteria()),
@@ -151,7 +155,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'itemReward'  => [],
             'criteria'    => [],
             'icons'       => []
-        )
+        ),
+        'relTabs' => []
     );
 
     // create rewards
@@ -302,9 +307,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     'text' => $crtName,
                 );
                 break;
-            // link to title
+            // link to title - todo (low): crosslink
             case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
-            // todo: crosslink
+                $tmp['extra_text'] = Util::ucFirst(Lang::$game['title']).Lang::$colon.$crtName;
                 break;
             // link to achivement (/w icon)
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
@@ -322,10 +327,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 break;
             // link to quest
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-                $crtName = QuestList::getName($obj);
+                // $crtName = ;
                 $tmp['link'] = array(
                     'href' => '?quest='.$obj,
-                    'text' => $crtName ? $crtName : $crtName,
+                    'text' => $crtName ? $crtName : QuestList::getName($obj),
                 );
                 break;
             // link to spell (/w icon)
@@ -334,7 +339,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                $text = !empty($crtName) ? $crtName : SpellList::getName($obj);
+                $text = $crtName ? $crtName : SpellList::getName($obj);
                 $tmp['link'] = array(
                     'href' => '?spell='.$obj,
                     'text' => $text
@@ -371,10 +376,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 break;
             // link to faction (/w target reputation)
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
-                $crtName = FactionList::getName($obj);
                 $tmp['link'] = array(
                     'href' => '?faction='.$obj,
-                    'text' => $crtName ? $crtName : $crtName,
+                    'text' => $crtName ? $crtName : FactionList::getName($obj),
                 );
                 $tmp['extra_text'] = ' ('.Lang::getReputationLevelForPoints($qty).')';
                 break;
@@ -390,6 +394,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $tmp['standard'] = true;
                 // Add a gold coin icon
                 $tmp['extra_text'] = $displayMoney ? Util::formatMoney($qty) : $crtName;
+                var_dump($tmp);
                 break;
         }
         // If the right column
@@ -406,20 +411,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
-
-// menuId 9: Achievement  g_initPath()
-//  tabId 0: Database     g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => $pageData['title'].' - '.Util::ucfirst(Lang::$game['achievement']),
-    'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-    'tab'    => 0,
-    'type'   => TYPE_ACHIEVEMENT,
-    'typeId' => $_id
-));
-$smarty->assign('redButtons', $pageData['buttons']);
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
 $smarty->display('achievement.tpl');

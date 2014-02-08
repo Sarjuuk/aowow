@@ -246,7 +246,7 @@ var fi_filters = {
         { id: 31,  name: 'hasscreenshots',      type: 'yn' },
         { id: 40,  name: 'hasvideos',           type: 'yn' },
 
-        { id: 1,   name: 'sepstaffonly',                    staffonly: true },
+        { id: 999, name: 'sepstaffonly',                    staffonly: true },
         { id: 41,  name: 'haslocation',         type: 'yn', staffonly: true }
     ],
 
@@ -833,9 +833,9 @@ function fi_criterionChange(_this, crs, crv) {
                 }
 
                 if (n) {
-                    _.maxLength = 7;
+                    _.maxLength = 8;
                     _.style.textAlign = 'center';
-                    _.style.width = '4.5em';
+                    _.style.width = '5.0em';
                 }
                 else {
                     _.type = 'hidden';
@@ -858,9 +858,9 @@ function fi_criterionChange(_this, crs, crv) {
                 _ = $WH.ce('input');
                 _.type = 'text';
                 if (criteriaParams.indexOf('small') != -1) {
-                    _.maxLength = 7;
+                    _.maxLength = 8;
                     _.style.textAlign = 'center';
-                    _.style.width = '4.5em';
+                    _.style.width = '5.0em';
                 }
                 else {
                     _.maxLength = 50;
@@ -1659,9 +1659,15 @@ function fi_getExtraCols(wt, gm, pu) {
             };
 
             // Fix display of decimal columns
-            if (/dps|speed/i.test(a.name)) {
+            if (a.name == 'speed') {
                 b.compute = function (item, td) {
-                    return (item[a.name] || 0).toFixed(2);
+                    return (item.speed || 0).toFixed(2);
+                }
+            }
+
+            if (/dps/i.test(a.name)) {                      // mledps|rngdps|dps
+                b.compute = function (item, td) {
+                    return (item.dps || 0).toFixed(1);
                 }
             }
 

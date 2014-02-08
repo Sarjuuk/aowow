@@ -9,7 +9,7 @@
     {/foreach}
 {/if}
             <div class="text">
-                <a href="http://www.wowhead.com/?{$query[0]}={$query[1]}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
+                <a href="{$wowhead}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
     {if !empty($found)}
                 <h1>{$lang.foundResult} <i>{$search|escape:"html"}</i></h1>
             </div>

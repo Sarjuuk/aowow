@@ -168,22 +168,22 @@ class AchievementList extends BaseType
             }
 
             if ($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER)
-                $criteria .= '- '.htmlspecialchars($crtName).' <span class="moneygold">'.number_format($crt['value2' ] / 10000).'</span><br />';
+                $criteria .= '- '.Util::jsEscape($crtName).' <span class="moneygold">'.number_format($crt['value2' ] / 10000).'</span><br />';
             else
-                $criteria .= '- '.htmlspecialchars($crtName).'<br />';
+                $criteria .= '- '.Util::jsEscape($crtName).'<br />';
 
             if (++$i == round(count($rows)/2))
                 $criteria .= '</small></td><th class="q0" style="white-space: nowrap; text-align: left"><small>';
         }
 
         $x  = '<table><tr><td><b class="q">';
-        $x .= Util::jsEscape(htmlspecialchars($name));
+        $x .= Util::jsEscape($name);
         $x .= '</b></td></tr></table>';
         if ($description || $criteria)
             $x .= '<table><tr><td>';
 
         if ($description)
-            $x .= '<br />'.Util::jsEscape(htmlspecialchars($description)).'<br />';
+            $x .= '<br />'.Util::jsEscape($description).'<br />';
 
         if ($criteria)
         {

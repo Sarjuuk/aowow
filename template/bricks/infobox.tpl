@@ -1,5 +1,5 @@
     <table class="infobox">
-{if !empty($info)}
+{if !empty($infobox)}
         <tr><th id="infobox-quick-facts">{$lang.quickFacts}</th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-contents0"></div></td></tr>
 {/if}
@@ -14,7 +14,7 @@
                     <td><div>
         {foreach name=itemItr from=$itr item='i'}
             {if $i.side == 1}<span class="alliance-icon-padded">{elseif $i.side == 2}<span class="horde-icon-padded">{/if}
-                        {if ($i.typeId == $page.typeId)}
+                        {if ($i.typeId == $typeId)}
                             <b>{$i.name}</b>
                         {else}
                             <a href="?{$i.typeStr}={$i.typeId}">{$i.name}</a>
@@ -39,8 +39,8 @@
 {if $user.id > 0}
     <script type="text/javascript">vi_appendSticky()</script>
 {/if}
-{if !empty($info)}
+{if !empty($infobox)}
     <script type="text/javascript">
-        Markup.printHtml("{$info}", "infobox-contents0", {ldelim} allow: Markup.CLASS_STAFF, dbpage: true {rdelim});
+        Markup.printHtml("{$infobox}", "infobox-contents0", {ldelim} allow: Markup.CLASS_STAFF, dbpage: true {rdelim});
     </script>
 {/if}
