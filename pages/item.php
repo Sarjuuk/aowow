@@ -9,8 +9,9 @@ if (isset($_GET['xml']))
 
 require 'includes/community.class.php';
 
-$_id   = intVal($pageParam);
-$_path = [0, 0];
+$_id       = intVal($pageParam);
+$_path     = [0, 0];
+$_visSlots = [SLOT_HEAD, SLOT_SHOULDERS, SLOT_SHIRT, SLOT_CHEST, SLOT_WAIST, SLOT_LEGS, SLOT_FEET, SLOT_WRISTS, SLOT_HANDS, SLOT_BACK, SLOT_MAIN_HAND, SLOT_OFF_HAND, SLOT_RANGED, SLOT_TABARD];
 
 $cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEM, $_id, -1, User::$localeId]);
 
@@ -246,7 +247,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     /****************/
 
     $cmpUpg = in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) || $item->getField('gemEnchantmentId');
-    $view3D = in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $item->getField('displayId');
+    $view3D = in_array($_slot, $_visSlots) && $item->getField('displayId');
 
     // path
     if (in_array($_class, [5, 8, 14]))
@@ -562,13 +563,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     if ($lockIds)
     {
         // objects
-        $conditions = array(
-            'OR',
-            ['AND', ['data0', $lockIds], ['type', [OBJECT_QUESTGIVER, OBJECT_CHEST, OBJECT_TRAP, OBJECT_GOOBER, OBJECT_CAMERA, OBJECT_FLAGSTAND, OBJECT_FLAGDROP]]],
-            ['AND', ['data1', $lockIds], ['type', [OBJECT_DOOR, OBJECT_BUTTON]]]
-        );
-
-        $lockedObj = new GameObjectList($conditions);
+        $lockedObj = new GameObjectList(array(['lockId', $lockIds]));
         if (!$lockedObj->error)
         {
             $pageData['relTabs'][] = array(
@@ -700,6 +695,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     }
 
     // tab: same model as
+    // todo (low): should also work for creatures summoned by item
     if (($model = $item->getField('model')) && $_slot)
     {
         $sameModel = new ItemList(array(['model', $model], ['id', $_id, '!'], ['slot', $_slot]));

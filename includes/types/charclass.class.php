@@ -7,6 +7,7 @@ if (!defined('AOWOW_REVISION'))
 class CharClassList extends BaseType
 {
     public static $type      = TYPE_CLASS;
+    public static $brickFile = 'class';
 
     protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_classes c';
 

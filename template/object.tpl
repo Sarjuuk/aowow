@@ -1,36 +1,31 @@
 {include file='header.tpl'}
 
-    <div id="main">
+    <div class="main" id="main">
+        <div class="main-precontents" id="main-precontents"></div>
+        <div class="main-contents" id="main-contents">
 
-        <div id="main-precontents"></div>
-        <div id="main-contents" class="main-contents">
-
-            <script type="text/javascript">
-                {include file='bricks/community.tpl'}
-                var g_pageInfo = {ldelim}type: {$page.type}, typeId: {$page.typeId}, name: '{$object.name|escape:"quotes"}'{rdelim};
-                g_initPath({$page.path});
-            </script>
-
-{if isset($object.key) or isset($object.lockpicking) or isset($object.mining) or isset($object.herbalism)}
-            <table class="infobox">
-                <tr><th>{#Quick_Facts#}</th></tr>
-                <tr><td><div class="infobox-spacer"></div>
-                <ul>
-                    {if isset($object.key)}<li><div>{#Key#}{$lang.colon}<a class="q{$object.key.quality}" href="?item={$object.key.id}">[{$object.key.name}]</a></div></li>{/if}
-                    {if isset($object.lockpicking)}<li><div>{#Lockpickable#} (<span class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, '{#Required_lockpicking_skill#}', 0, 0, 'q')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">{$object.lockpicking}</span>)</div></li>{/if}
-                    {if isset($object.mining)}<li><div>{#Mining#} (<span class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, '{#Required_mining_skill#}', 0, 0, 'q')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">{$object.mining}</span>)</div></li>{/if}
-                    {if isset($object.herbalism)}<li><div>{#Herb#} (<span class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, '{#Required_herb_skill#}', 0, 0, 'q')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">{$object.herbalism}</span>)</div></li>{/if}
-                </ul>
-                </td></tr>
-            </table>
+{if !empty($announcements)}
+    {foreach from=$announcements item=item}
+        {include file='bricks/announcement.tpl' an=$item}
+    {/foreach}
 {/if}
 
+            <script type="text/javascript">//<![CDATA[
+                {include file='bricks/community.tpl'}
+                var g_pageInfo = {ldelim}type: {$type}, typeId: {$typeId}, name: '{$name|escape:"quotes"}'{rdelim};
+                g_initPath({$path});
+            //]]></script>
+
+{include file='bricks/infobox.tpl'}
+
             <div class="text">
+{include file='bricks/redButtons.tpl'}
 
-                <a href="{$wowhead}" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
-                <h1>{$object.name}</h1>
+                <h1>{$name}</h1>
 
-{if $object.position}
+{include file='bricks/article.tpl'}
+
+{if $positions}
                 <div>{#This_Object_can_be_found_in#}
 {strip}
                 <span id="locations">
@@ -75,33 +70,18 @@
                 <div class="clear"></div>
 
                 <script type="text/javascript">
-                    var myMapper = new Mapper({ldelim}parent: 'mapper-generic', zone: '{$object.position[0].atid}'{rdelim});
+                    var myMapper = new Mapper({ldelim}parent: 'mapper-generic', zone: '{$position[0].atid}'{rdelim});
                     $WH.gE($WH.ge('locations'), 'a')[0].onclick();
                 </script>
-
 {else}
-                {#This_Object_cant_be_found#}
+                {$lang.unkPosition}
 {/if}
-
-{if isset($object.pagetext)}
-    <h3>Content</h3>
-    <div id="book-generic"></div>
-    {strip}
-        <script>
-            new Book({ldelim} parent: 'book-generic', pages: [
-            {foreach from=$object.pagetext item=pagetext name=j}
-                '{$pagetext|escape:"javascript"}'
-                {if $smarty.foreach.j.last}{else},{/if}
-            {/foreach}
-            ]{rdelim})
-        </script>
-    {/strip}
-{/if}
+{include file='bricks/book.tpl'}
 
                 <h2 class="clear">{$lang.related}</h2>
             </div>
 
-{include file='bricks/tabsRelated.tpl' tabs=$lvData.relTabs}
+{include file='bricks/tabsRelated.tpl' tabs=$lvData}
 
 {include file='bricks/contribute.tpl'}
 

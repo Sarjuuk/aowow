@@ -198,7 +198,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 $smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_RACE, $_id));       // comments, screenshots, videos
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
 $smarty->display('detail-page-generic.tpl');

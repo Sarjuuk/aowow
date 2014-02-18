@@ -16,6 +16,7 @@ class Lang
     public static $currency;
     public static $event;
     public static $faction;
+    public static $gameObject;
     public static $item;
     public static $itemset;
     public static $maps;
@@ -68,7 +69,7 @@ class Lang
         $locks = [];
         $lock  = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE id = ?d', $lockId);
         if (!$lock)
-            return '';
+            return $locks;
 
         for ($i = 1; $i <= 5; $i++)
         {
@@ -91,8 +92,7 @@ class Lang
                 if (!in_array($prop, [1, 2, 3, 4, 9, 16, 20]))
                     continue;
 
-                $txt = DB::Aowow()->selectRow('SELECT * FROM ?_locktype WHERE id = ?d', $prop);         // todo (low): convert to static text
-                $name = Util::localizedString($txt, 'name');
+                $name = Lang::$spell['lockType'][$prop];
                 if (!$name)
                     continue;
 
@@ -117,7 +117,7 @@ class Lang
             else
                 continue;
 
-            $locks[$lock['type'.$i] == 1 ? $i : -$i] = sprintf(Lang::$game['requires'], $name);
+            $locks[$lock['type'.$i] == 1 ? $prop : -$prop] = sprintf(Lang::$game['requires'], $name);
         }
 
         return $locks;

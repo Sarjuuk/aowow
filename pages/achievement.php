@@ -394,7 +394,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $tmp['standard'] = true;
                 // Add a gold coin icon
                 $tmp['extra_text'] = $displayMoney ? Util::formatMoney($qty) : $crtName;
-                var_dump($tmp);
                 break;
         }
         // If the right column

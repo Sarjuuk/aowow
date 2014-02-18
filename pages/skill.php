@@ -6,7 +6,8 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/community.class.php';
 
-$_id = intVal($pageParam);
+$_id   = intVal($pageParam);
+$_path = [0, 14];
 
 $cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_SKILL, $_id, -1, User::$localeId]);
 
@@ -18,26 +19,30 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $_cat = $skill->getField('typeCat');
 
+    $_path[] = (in_array($_cat, [9, 11]) || $_id == 762) ? $_id : $_cat;
+
     /****************/
     /* Main Content */
     /****************/
 
+    // menuId 14: Skill    g_initPath()
+    //  tabId  0: Database g_initHeader()
     $pageData = array(
-        'title'   => $skill->getField('name', true),
-        'path'    => [0, 14],
-        'relTabs' => [],
-        'icons'   => [$skill->getField('iconString')],
-        'buttons' => array(
-            BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
-        ),
         'page'    => array(
-            'name' => $skill->getField('name', true),
-            'id'   => $_id
+            'title'      => $skill->getField('name', true)." - ".Util::ucfirst(Lang::$game['skill']),
+            'name'       => $skill->getField('name', true),
+            'path'       => json_encode($_path, JSON_NUMERIC_CHECK),
+            'tab'        => 0,
+            'type'       => TYPE_SKILL,
+            'typeId'     => $_id,
+            'headIcons'  => [$skill->getField('iconString')],
+            'redButtons' => array(
+                BUTTON_WOWHEAD => true,
+                BUTTON_LINKS   => true
+            )
         ),
+        'relTabs' => []
     );
-
-    $pageData['path'][] = (in_array($_cat, [9, 11]) || $_id == 762) ? $_id : $_cat;
 
     /**************/
     /* Extra Tabs */
@@ -45,6 +50,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     if (in_array($_cat, [-5, 9, 11]))
     {
+        // tab: recipes [spells] (crafted)
         $condition = array(
             ['OR', ['s.reagent1', 0, '>'], ['s.reagent2', 0, '>'], ['s.reagent3', 0, '>'], ['s.reagent4', 0, '>'], ['s.reagent5', 0, '>'], ['s.reagent6', 0, '>'], ['s.reagent7', 0, '>'], ['s.reagent8', 0, '>']],
             ['OR', ['s.skillLine1', $_id], ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $_id]]],
@@ -54,7 +60,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $recipes = new SpellList($condition);               // also relevant for 3
         if (!$recipes->error)
         {
-            // 1 recipes [spells] (crafted)
             $recipes->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
             $pageData['relTabs'][] = array(
@@ -70,8 +75,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             );
         }
 
-        // 2 recipe Items [items] (Books)
-        $skill2Filter = [null, 171, 164, 185, 333, 202, 129, 755, 165, 186, 197, null, null, 356, 182, 773];
+        // tab: recipe Items [items] (Books)
+        $filterRecipe = [null, 165, 197, 202, 164, 185, 171, 129, 333, 356, 755, 773, 186, 182];
         $conditions   = array(
             ['requiredSkill', $_id],
             ['class', ITEM_CLASS_RECIPE],
@@ -83,6 +88,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         {
             $recipeItems->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
+            if ($_ = array_search($_id, $filterRecipe))
+                $_ = sprintf(Util::$filterResultString, "?items=9.".$_);
+
             $pageData['relTabs'][] = array(
                 'file'   => 'item',
                 'data'   => $recipeItems->getListviewData(),
@@ -90,13 +98,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     'id'   => 'recipe-items',
                     'name' => '$LANG.tab_recipeitems',
                     'tabs' => '$tabsRelated',
-                    'note' => !empty(array_flip($skill2Filter)[$_id]) ? sprintf(Util::$filterResultString, "?items=9.".array_flip($skill2Filter)[$_id]) : null
+                    'note' => $_
                 )
             );
         }
 
-        // 3 crafted items [items]
-        $created = [];
+        // tab: crafted items [items]
+        $filterItem = [null, 171, 164, 185, 333, 202, 129, 755, 165, 186, 197, null, null, 356, 182, 773];
+        $created    = [];
         foreach ($recipes->iterate() as $__)
             if ($idx = $recipes->canCreateItem())
                 foreach ($idx as $i)
@@ -109,6 +118,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             {
                 $created->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
+                if ($_ = array_search($_id, $filterItem))
+                    $_ = sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=".$_.";crv=0");
+
                 $pageData['relTabs'][] = array(
                     'file'   => 'item',
                     'data'   => $created->getListviewData(),
@@ -116,13 +128,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         'id'   => 'crafted-items',
                         'name' => '$LANG.tab_crafteditems',
                         'tabs' => '$tabsRelated',
-                        // 'note' => sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=6;crv=0") // todo (med): after items; [craftedbyProfession (name)]
+                        'note' => $_
                     )
                 );
             }
         }
 
-        // 4a required by [item]
+        // tab: required by [item]
         $conditions = array(
             ['requiredSkill', $_id],
             ['class', ITEM_CLASS_RECIPE, '!'],
@@ -134,6 +146,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         {
             $reqBy->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
 
+            if ($_ = array_search($_id, $filterItem))
+                $_ = sprintf(Util::$filterResultString, "?items&filter=cr=99:168;crs=".$_.":2;crv=0:0");
+
             $pageData['relTabs'][] = array(
                 'file'   => 'item',
                 'data'   => $reqBy->getListviewData(),
@@ -141,12 +156,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     'id'   => 'required-by',
                     'name' => '$LANG.tab_requiredby',
                     'tabs' => '$tabsRelated',
-                    // 'note' => sprintf(Util::$filterResultString, "?items&filter=cr=99:168;crs=6:2;crv=0:0") // todo (med): after items; [requiresProfession (yes), teachesSpell (no)]
+                    'note' => $_
                 )
             );
         }
 
-        // 4b required by [itemset]
+        // tab: required by [itemset]
         $conditions = array(
             ['skillId', $_id],
             0
@@ -169,7 +184,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // 5 spells [spells] (exclude first tab)
+    // tab: spells [spells] (exclude first tab)
     $reqClass  = 0x0;
     $reqRace   = 0x0;
     $condition = array(
@@ -223,7 +238,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // 6 trainers [npcs]
+    // tab: trainers [npcs]
     if (in_array($_cat, [-5, 6, 7, 8, 9, 11]))
     {
         $list = [];
@@ -268,7 +283,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // 7 quests [quests]
+    // tab: quests [quests]
     if (in_array($_cat, [9, 11]))                           // only for professions
     {
         $sort = 0;
@@ -304,7 +319,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // 8 related classes (apply classes from 5)
+    // tab: related classes (apply classes from [itemset])
     $class = [];
     for ($i = 0; $i < 11; $i++)
         if ($reqClass & (1 << $i))
@@ -325,7 +340,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // 9 related races (apply races from 5)
+    // tab: related races (apply races from [itemset])
     $race = [];
     for ($i = 0; $i < 12; $i++)
         if ($reqRace & (1 << $i))
@@ -349,19 +364,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
-// menuId 14: Skill    g_initPath()
-//  tabId  0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => $pageData['title']." - ".Util::ucfirst(Lang::$game['skill']),
-    'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-    'tab'    => 0,
-    'type'   => TYPE_SKILL,
-    'typeId' => $_id
-));
-$smarty->assign('redButtons', $pageData['buttons']);
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_SKILL, $_id));  // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
 $smarty->display('detail-page-generic.tpl');

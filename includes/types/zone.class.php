@@ -12,6 +12,7 @@ if (!defined('AOWOW_REVISION'))
 class ZoneList extends BaseType
 {
     public static $type      = TYPE_ZONE;
+    public static $brickFile = 'zone';
 
     protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_zones z';
 

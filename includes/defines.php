@@ -176,7 +176,7 @@ define('LOOT_PROSPECTING',    'prospecting_loot_template');
 define('LOOT_MILLING',            'milling_loot_template');
 define('LOOT_PICKPOCKET',   'pickpocketing_loot_template');
 define('LOOT_SKINNING',          'skinning_loot_template');
-define('LOOT_QUEST',                 'mail_loot_template'); // changed to quest_mail_loot_template..?
+define('LOOT_MAIL',                  'mail_loot_template'); // used by achievements and quests
 define('LOOT_SPELL',                'spell_loot_template');
 define('LOOT_REFERENCE',        'reference_loot_template');
 

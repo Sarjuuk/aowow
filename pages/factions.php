@@ -28,22 +28,24 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     if (isset($cats[0]) && empty($cats[1]))
     {
         if (!$cats[0])
-            $conditions[] = ['f1.parentFactionId', [1118, 980, 1097, 469, 891, 67, 892, 169, 1037, 1052, 1117, 936], '!'];
+            $conditions[] = ['parentFactionId', [1118, 980, 1097, 469, 891, 67, 892, 169, 1037, 1052, 1117, 936], '!'];
         else
         {
             $subs = DB::Aowow()->selectCol('SELECT id FROM ?_factions WHERE parentFactionId = ?d', $cats[0]);
-            $conditions[] = ['OR', ['f1.parentFactionId', $subs], ['f1.id', $subs]];
+            $conditions[] = ['OR', ['parentFactionId', $subs], ['id', $subs]];
         }
 
         $path[]       = $cats[0];
-        // array_unshift($title, Lang::$factions['cat'][$cats[0]]);
+
+        $t = Lang::$faction['cat'][$cats[0]];
+        array_unshift($title, is_array($t) ? $t[0] : $t);
     }
     else if (!empty($cats[1]))
     {
-        $conditions[] = ['f1.parentFactionId', $cats[1]];
+        $conditions[] = ['parentFactionId', $cats[1]];
         $path[]       = $cats[0];
         $path[]       = $cats[1];
-        // array_unshift($title, Lang::$factions['cat'][$cats[1]]);
+        array_unshift($title, Lang::$faction['cat'][$cats[0]][$cats[1]]);
     }
 
     $factions = new FactionList($conditions);

@@ -7,6 +7,7 @@ if (!defined('AOWOW_REVISION'))
 class SkillList extends BaseType
 {
     public static $type      = TYPE_SKILL;
+    public static $brickFile = 'skill';
 
     protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_skillLine sl';
 

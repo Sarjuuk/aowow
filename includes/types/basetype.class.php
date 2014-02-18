@@ -311,8 +311,9 @@ abstract class BaseType
 
     public function getRandomId()
     {
-        $pattern = '/SELECT .* (-?[\w_]*\.?(id|entry)) AS ARRAY_KEY,?.* FROM (.*) WHERE .*/i';
-        $replace = 'SELECT $1 FROM $3 ORDER BY RAND() ASC LIMIT 1';
+        // its not optimal, so if anyone has an alternative idea..
+        $pattern = '/SELECT .* (-?`?[\w_]*\`?.?`?(id|entry)`?) AS ARRAY_KEY,?.* FROM (\?[\w_-]+) (`?\w*`?)/i';
+        $replace = 'SELECT $1 FROM $3 $4 WHERE (cuFlags & '.CUSTOM_EXCLUDE_FOR_LISTVIEW.') = 0 ORDER BY RAND() ASC LIMIT 1';
         $query   = preg_replace($pattern, $replace, $this->queryBase);
 
         return DB::Aowow()->selectCell($query);

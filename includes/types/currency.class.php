@@ -7,6 +7,7 @@ if (!defined('AOWOW_REVISION'))
 class CurrencyList extends BaseType
 {
     public static $type      = TYPE_CURRENCY;
+    public static $brickFile = 'currency';
 
     protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_currencies c';
 

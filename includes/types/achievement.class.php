@@ -9,6 +9,7 @@ class AchievementList extends BaseType
     use listviewHelper;
 
     public static $type      = TYPE_ACHIEVEMENT;
+    public static $brickFile = 'achievement';
 
     public        $criteria  = [];
     public        $tooltip   = [];
@@ -18,6 +19,10 @@ class AchievementList extends BaseType
                         'a'  => ['o' => 'orderInGroup ASC'],
                         'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
                   );
+
+    /*
+        todo: evaluate TC custom-data-tables: a*_criteria_data should be merged on installation, a*_reward linked with mail_loot_template and achievement
+    */
 
     public function __construct($conditions = [], $applyFilter = false)
     {

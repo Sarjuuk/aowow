@@ -26,6 +26,7 @@ $lang = array(
         'pageNotFound'  => "This %s doesn't exist.",
         'gender'        => "Gender",
         'sex'           => [null, 'Male', 'Female'],
+        'players'       => "Players",
         'quickFacts'    => "Quick Facts",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",
@@ -52,6 +53,7 @@ $lang = array(
         'refineSearch'  => "Tip: Refine your search by browsing a <a href=\"javascript:;\" id=\"fi_subcat\">subcategory</a>.",
         'clear'         => "clear",
         'exactMatch'    => "Exact match",
+        '_reqLevel'     => "Required level",
 
         // infobox
         'unavailable'   => "Not available to players",      // alternative wording found: "No longer available to players" ... aw screw it <_<
@@ -128,12 +130,15 @@ $lang = array(
         'itemsets'      => "Item Sets",
         'mechanic'      => "Mechanic",
         'mechAbbr'      => "Mech.",
+        'meetingStone'  => "Meeting Stone",
         'npc'           => "NPC",
         'npcs'          => "NPCs",
         'pet'           => "Pet",
         'pets'          => "Hunter Pets",
         'profile'       => "profile",
         'profiles'      => "Profiles",
+        'quest'         => "quest",
+        'quests'        => "Quests",
         'requires'      => "Requires %s",
         'requires2'     => "Requires",
         'reqLevel'      => "Requires Level %s",
@@ -247,7 +252,18 @@ $lang = array(
         'publicDesc'    => "Public Description",
         'viewPubDesc'   => "View your Public Description in your <a href=\"?user=%s\">Profile  Page</a>",
     ),
-    'npc'   => array(
+    'gameObject' => array(
+        'cat'           => [0 => "Other", 9 => "Books", 3 => "Containers", -5 => "Chests", 25 => "Fishing Pools", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],
+        'type'          => [              9 => "Book",  3 => "Container",  -5 => "Chest",  25 => "",              -3 => "Herb",  -4 => "Mineral Vein",  -2 => "Quest", -6 => ""],
+        'unkPosition'   => "The location of this object is unknown.",
+        'key'           => "Key",
+        'focus'         => "Spell Focus",
+        'focusDesc'     => "Spells requiring this Focus can be cast near this Object",
+        'trap'          => "Trap",
+        'triggeredBy'   => "Triggered by",
+        'capturePoint'  => "Capture Point"
+    ),
+    'npc' => array(
         'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rare", 2 => "Rare Elite", 3 => "Boss"],
         'classification'=> "Classification",
         'petFamily'     => "Pet familiy",
@@ -259,6 +275,7 @@ $lang = array(
         'gainsDesc'     => "After killing this NPC you will gain",
         'repWith'       => "reputation with",
         'stopsAt'       => "stops at %s",
+        'vehicle'       => "Vehicle",
         'textTypes'     => [null, "yells", "says", "whispers"],
         'modes'         => array(
             1 => ["Normal", "Heroic"],
@@ -317,9 +334,13 @@ $lang = array(
         )
     ),
     'quest' => array(
-        'level'         => 'Level %s',
+        'questLevel'    => 'Level %s',
         'daily'         => 'Daily',
-        'requirements'  => 'Requirements'
+        'requirements'  => 'Requirements',
+        'questInfo'     => array(
+             0 => 'Normal',              1 => 'Group',              21 => 'Life',               41 => 'PvP',                62 => 'Raid',               81 => 'Dungeon',            82 => 'World Event',
+            83 => 'Legendary',          84 => 'Escort',             85 => 'Heroic',             88 => 'Raid (10)',          89 => 'Raid (25)'
+        )
     ),
     'title' => array(
         'cat'           => array(
@@ -346,7 +367,13 @@ $lang = array(
         'spillover'     => "Reputation Spillover",
         'spilloverDesc' => "Gaining Reputation with this faction also yields a proportional gain with the factions listed below.",
         'maxStanding'   => "Max. Standing",
-        'quartermaster' => "Quartermaster"
+        'quartermaster' => "Quartermaster",
+        'cat'           => array(
+            1118 => ["Classic", 469 => "Alliance", 169 => "Steamwheedle Cartel", 67 => "Horde", 891 => "Alliance Forces", 892 => "Horde Forces"],
+            980  => ["The Burning Crusade", 936 => "Shattrath City"],
+            1097 => ["Wrath of the Lich King", 1052 => "Horde Expedition", 1117 => "Sholazar Basin", 1037 => "Alliance Vanguard"],
+            0    => "Other"
+        )
     ),
     'itemset' => array(
         '_desc'         => "<b>%s</b> is the <b>%s</b>. It contains %s pieces.",
@@ -563,7 +590,6 @@ $lang = array(
         '_unavailable'  => "This item is not available to players.",
         '_rndEnchants'  => "Random Enchantments",
         '_chance'       => "(%s%% chance)",
-        '_reqLevel'     => "Required level",
         'reqRating'     => "Requires personal and team arena rating of %d<br />in 3v3 or 5v5 brackets",
         'slot'          => "Slot",
         '_quality'      => "Quality",

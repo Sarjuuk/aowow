@@ -11,14 +11,14 @@
 {/if}
 
             <script type="text/javascript">
-                g_initPath({$page.path}, {if empty($filter.query)} 0 {else} 1 {/if});
+                g_initPath({$path}, {if empty($filter.query)} 0 {else} 1 {/if});
 {if !empty($filter.query)}
                 Menu.modifyUrl(Menu.findItem(mn_database, [1]), {ldelim} filter: '+={$filter.query|escape:'quotes'}' {rdelim}, {ldelim} onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [1])) {rdelim});
 {/if}
             </script>
 
             <div id="fi" style="display: {if empty($filter.query)}none{else}block{/if};">
-                <form action="?spells{$page.subCat}&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
+                <form action="?spells{$subCat}&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="rightpanel">
                         <div style="float: left">{$lang.school}{$lang.colon}</div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['sc[]'].selectedIndex = -1; return false" onmousedown="return false">{$lang.clear}</a></small>

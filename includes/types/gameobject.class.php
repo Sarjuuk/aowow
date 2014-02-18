@@ -9,12 +9,14 @@ class GameObjectList extends BaseType
     use listviewHelper, spawnHelper;
 
     public static   $type      = TYPE_OBJECT;
+    public static $brickFile   = 'object';
 
-    protected       $queryBase = 'SELECT *, go.entry AS ARRAY_KEY FROM gameobject_template go';
+    protected       $queryBase = 'SELECT *, o.id AS ARRAY_KEY FROM ?_objects o';
     protected       $queryOpts = array(
-                        'go' => [['lg', 'l']],
-                        'lg' => ['j' => ['locales_gameobject lg ON go.entry = lg.entry', true]],
-                        'l'  => ['j' => ['?_lock l ON l.id = IF(go.type = 3, data0, null)', true], 's' => ', l.type1, l.properties1, l.reqSkill1, l.type2, l.properties2, l.reqSkill2']
+                        'o'  => [['ft']],
+                        'ft' => ['j' => ['?_factiontemplate ft ON ft.id = o.faction', true], 's' => ', ft.*'],
+                        'qr' => ['j' => ['gameobject_questrelation qr ON qr.id = o.id', true]],     // started by GO
+                        'ir' => ['j' => ['gameobject_involvedrelation ir ON ir.id = o.id', true]],  // ends at GO
                     );
 
     public function __construct($conditions = [], $applyFilter = false)
@@ -25,52 +27,32 @@ class GameObjectList extends BaseType
             return;
 
         // post processing
-        // most of this will be obsolete, when gameobjects get their own table
         foreach ($this->iterate() as $_id => &$curTpl)
         {
+            // unpack miscInfo:
+            $curTpl['lootStack']    = [];
+            $curTpl['spells']       = [];
+            $curTpl['spellFocusId'] = 0;
+
+            if (in_array($curTpl['type'], [OBJECT_GOOBER, OBJECT_RITUAL, OBJECT_SPELLCASTER, OBJECT_FLAGSTAND, OBJECT_FLAGDROP, OBJECT_AURA_GENERATOR, OBJECT_TRAP]))
+                $curTpl['spells'] = array_combine(['onUse', 'onSuccess', 'aura', 'triggered'], [$curTpl['onUseSpell'], $curTpl['onSuccessSpell'], $curTpl['auraSpell'], $curTpl['triggeredSpell']]);
+
+            if (!$curTpl['miscInfo'])
+                continue;
+
             switch ($curTpl['type'])
             {
                 case OBJECT_CHEST:
-                    $curTpl['lootId']    = $curTpl['data1'];
-                    $curTpl['lootStack'] = [$curTpl['data4'], $curTpl['data5']];
-                    $curTpl['lockId']    = $curTpl['data0'];
-
-                    if (!isset($curTpl['properties1']))
-                        break;
-
-                    if ($curTpl['properties1'] == LOCK_PROPERTY_HERBALISM)
-                    {
-                        $curTpl['reqSkill'] = $curTpl['reqSkill1'];
-                        $curTpl['type'] = -3;
-                    }
-                    else if ($curTpl['properties1'] == LOCK_PROPERTY_MINING)
-                    {
-                        $curTpl['reqSkill'] = $curTpl['reqSkill1'];
-                        $curTpl['type'] = -4;
-                    }
-                    else if ($curTpl['properties1'] == LOCK_PROPERTY_FOOTLOCKER)
-                    {
-                        $curTpl['reqSkill'] = $curTpl['reqSkill1'];
-                        $curTpl['type'] = -5;
-                    }
-                    else if( $curTpl['properties2'] == LOCK_PROPERTY_FOOTLOCKER)
-                    {
-                        $curTpl['reqSkill'] = $curTpl['reqSkill2'];
-                        $curTpl['type'] = -5;
-                    }
-
-                    break;
                 case OBJECT_FISHINGHOLE:
-                    $curTpl['lootId']    = $curTpl['data1'];
-                    $curTpl['lootStack'] = [$curTpl['data2'], $curTpl['data3']];
+                    $curTpl['lootStack'] = explode(' ', $curTpl['miscInfo']);
                     break;
-                default:                                    // adding more, when i need them
-                    $curTpl['lockId'] = 0;
+                case OBJECT_CAPTURE_POINT:
+                    $curTpl['capture'] = explode(' ', $curTpl['miscInfo']);
+                    break;
+                case OBJECT_MEETINGSTONE:
+                    $curTpl['mStone'] = explode(' ', $curTpl['miscInfo']);
                     break;
             }
-
-            for ($i = 0; $i < 24; $i++)                     // kill indescriptive/unused fields
-                unset($curTpl['data'.$i]);
         }
     }
 
@@ -84,13 +66,9 @@ class GameObjectList extends BaseType
                 name_loc6,
                 name_loc8
             FROM
-                gameobject_template gt
-            LEFT JOIN
-                locales_gameobject lg
-            ON
-                lg.entry = gt.entry
+                ?_objects
             WHERE
-                gt.entry = ?d',
+                id = ?d',
             $id
         );
         return Util::localizedString($n, 'name');
@@ -104,7 +82,7 @@ class GameObjectList extends BaseType
             $data[$this->id] = array(
                 'id'   => $this->id,
                 'name' => $this->getField('name', true),
-                'type' => $this->curTpl['type']
+                'type' => $this->curTpl['typeCat']
             );
 
             if (!empty($this->curTpl['reqSkill']))
@@ -124,10 +102,13 @@ class GameObjectList extends BaseType
 
         $x  = '<table>';
         $x .= '<tr><td><b class="q">'.$this->getField('name', true).'</b></td></tr>';
-        $x .= '<tr><td>[TYPE '.$this->curTpl['type'].']</td></tr>';
-        if ($locks = Lang::getLocks($this->curTpl['lockId']))
-            foreach ($locks as $l)
-                $x .= '<tr><td>'.$l.'</td></tr>';
+        if ($_ = @Lang::$gameObject['type'][$this->curTpl['typeCat']])
+            $x .= '<tr><td>'.$_.'</td></tr>';
+
+        if (isset($this->curTpl['lockId']))
+            if ($locks = Lang::getLocks($this->curTpl['lockId']))
+                foreach ($locks as $l)
+                    $x .= '<tr><td>'.$l.'</td></tr>';
 
         $x .= '</table>';
 
@@ -136,7 +117,104 @@ class GameObjectList extends BaseType
         return $this->tooltips[$this->id];
     }
 
-    public function addGlobalsToJScript(&$template, $addMask = 0) { }
+    public function addGlobalsToJScript(&$template, $addMask = 0)
+    {
+        foreach ($this->iterate() as $id => $__)
+            $template->extendGlobalData(self::$type, [$id => ['name' => $this->getField('name', true)]]);
+    }
+}
+
+
+class GameObjectListFilter extends Filter
+{
+    protected $genericFilter = array(
+        15 => [FILTER_CR_NUMERIC,   'entry',    null],      // id
+         7 => [FILTER_CR_NUMERIC,   'reqSkill', null],      // requiredskilllevel
+    );
+
+/*
+        { id: 1,   name: 'foundin',             type: 'zone' },
+        { id: 16,  name: 'relatedevent',        type: 'event-any+none' },
+*/
+
+    protected function createSQLForCriterium(&$cr)
+    {
+        if (in_array($cr[0], array_keys($this->genericFilter)))
+        {
+            if ($genCR = $this->genericCriterion($cr))
+                return $genCR;
+
+            unset($cr);
+            $this->error = true;
+            return [1];
+        }
+
+        switch ($cr[0])
+        {
+            case  4:
+                if (!$this->int2Bool($cr[1]))
+                    break;
+
+                return $cr[1] ? ['OR', ['flags', 0x2, '&'], ['type', 3]] : ['AND', [['flags', 0x2, '&'], 0], ['type', 3, '!']];
+            case  5:                                        // averagemoneycontained [op] [int]         GOs don't contain money .. eval to 0 == true
+                if (!$this->isSaneNumeric($cr[2], false) || !$this->int2Op($cr[1]))
+                    break;
+
+                return eval('return ('.$cr[2].' '.$cr[1].' 0)') ? [1] : [0];
+            case 2:                                         // startsquest [side]
+                switch ($cr[1])
+                {
+                    case 1:                                 // any
+                        return ['qr.id', null, '!'];
+                    case 2:                                 // alliance only
+                        return ['AND', ['qr.id', null, '!'], ['ft.A', -1, '!'], ['ft.H', -1]];
+                    case 3:                                 // horde only
+                        return ['AND', ['qr.id', null, '!'], ['ft.A', -1], ['ft.H', -1, '!']];
+                    case 4:                                 // both
+                        return ['AND', ['qr.id', null, '!'], ['OR', ['faction', 0], ['AND', ['ft.A', -1, '!'], ['ft.H', -1, '!']]]];
+                    case 5:                                 // none
+                        return ['qr.id', null];
+                }
+                break;
+            case 3:                                         // endsquest [side]
+                switch ($cr[1])
+                {
+                    case 1:                                 // any
+                        return ['qi.id', null, '!'];
+                    case 2:                                 // alliance only
+                        return ['AND', ['qi.id', null, '!'], ['ft.A', -1, '!'], ['ft.H', -1]];
+                    case 3:                                 // horde only
+                        return ['AND', ['qi.id', null, '!'], ['ft.A', -1], ['ft.H', -1, '!']];
+                    case 4:                                 // both
+                        return ['AND', ['qi.id', null, '!'], ['OR', ['faction', 0], ['AND', ['ft.A', -1, '!'], ['ft.H', -1, '!']]]];
+                    case 5:                                 // none
+                        return ['qi.id', null];
+                }
+                break;
+            case 13:                                        // hascomments [yn]
+                break;
+            case 11:                                        // hasscreenshots [yn]
+                break;
+            case 18:                                        // hasvideos [yn]
+                break;
+        }
+
+        unset($cr);
+        $this->error = 1;
+        return [1];
+    }
+
+    protected function createSQLForValues()
+    {
+        $parts = [];
+        $_v    = $this->fiData['v'];
+
+        // name
+        if (isset($_v['na']))
+            $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+
+        return $parts;
+    }
 }
 
 ?>

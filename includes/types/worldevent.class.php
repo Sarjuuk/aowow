@@ -7,8 +7,9 @@ if (!defined('AOWOW_REVISION'))
 class WorldEventList extends BaseType
 {
     public static $type      = TYPE_WORLDEVENT;
+    public static $brickFile = 'event';
 
-    protected     $queryBase = 'SELECT *, -e.id AS ARRAY_KEY, -e.id as id FROM ?_events e';
+    protected     $queryBase = 'SELECT *, -e.id as id, -e.id AS ARRAY_KEY FROM ?_events e';
     protected     $queryOpts = array(
                                    'e' => ['j' => ['?_holidays h2 ON e.holidayId = h2.id', true], 'o' => '-e.id ASC'],
                                    'h' => ['j' => ['?_holidays h ON e.holidayId = h.id']]

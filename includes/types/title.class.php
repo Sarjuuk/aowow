@@ -9,6 +9,7 @@ class TitleList extends BaseType
     use listviewHelper;
 
     public static $type      = TYPE_TITLE;
+    public static $brickFile = 'title';
 
     public        $sources   = [];
 

@@ -31,6 +31,7 @@ $lang = array(
         'pageNotFound'  => "Diese|Dieser|Dieses %s existiert nicht.",        // todo: dämliche Fälle...
         'gender'        => "Geschlecht",
         'sex'           => [null, 'Mann', 'Frau'],
+        'players'       => "Spieler",
         'quickFacts'    => "Kurzübersicht",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",
@@ -65,6 +66,7 @@ $lang = array(
         'refineSearch'  => "Tipp: Präzisiere deine Suche mit Durchsuchen einer <a href=\"javascript:;\" id=\"fi_subcat\">Unterkategorie</a>.",
         'clear'         => "leeren",
         'exactMatch'    => "Exakt passend",
+        '_reqLevel'     => "Mindeststufe",
 
         // infobox
         'unavailable'   => "Nicht für Spieler verfügbar",
@@ -141,12 +143,15 @@ $lang = array(
         'itemsets'      => "Ausrüstungssets",
         'mechanic'      => "Auswirkung",
         'mechAbbr'      => "Ausw.",
+        'meetingStone'  => "Versammlungsstein",
         'npc'           => "NPC",
         'npcs'          => "NPCs",
         'pet'           => "Begleiter",
         'pets'          => "Begleiter",
         'profile'       => "",
         'profiles'      => "Profile",
+        'quest'         => "Quest",
+        'quests'        => "Quests",
         'requires'      => "Benötigt %s",
         'requires2'     => "Benötigt",
         'reqLevel'      => "Benötigt Stufe %s",
@@ -260,6 +265,17 @@ $lang = array(
         'publicDesc'    => "Öffentliche Beschreibung",
         'viewPubDesc'   => "Die Beschreibung in deinem <a href=\"?user=%s\">öffentlichen Profil</a> ansehen",
     ),
+    'gameObject' => array(
+        'cat'           => [0 => "Anderes", 9 => "Bücher", 3 => "Behälter", -5 => "Truhen", 25 => "Fischschwärme", -3 => "Kräuter", -4 => "Erzadern",     -2 => "Quest", -6 => "Werkzeuge"],
+        'type'          => [                9 => "Buch",   3 => "Behälter", -5 => "Truhe",  25 => "",              -3 => "Kraut",   -4 => "Erzvorkommen", -2 => "Quest", -6 => ""],
+        'unkPosition'   => "Der Standort dieses Objekts ist nicht bekannt.",
+        'key'           => "Schlüssel",
+        'focus'         => "Zauberfokus",
+        'focusDesc'     => "Zauber, die diesen Fokus benötigen, können an diesem Objekt gewirkt werden.",
+        'trap'          => "Falle",
+        'triggeredBy'   => "Ausgelöst durch",
+        'capturePoint'  => "Eroberungspunkt"
+    ),
     'npc'   => array(
         'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rar", 2 => "Rar Elite", 3 => "Boss"],
         'classification'=> "Einstufung",
@@ -272,6 +288,7 @@ $lang = array(
         'gainsDesc'     => "Nach dem Töten dieses NPCs erhaltet Ihr",
         'repWith'       => "Ruf mit der Fraktion",
         'stopsAt'       => "Stoppt bei %s",
+        'vehicle'       => "Fahrzeug",
         'textTypes'     => [null, "schreit", "sagt", "flüstert"],
         'modes'         => array(
             1 => ["Normal", "Heroisch"],
@@ -330,9 +347,13 @@ $lang = array(
         )
     ),
     'quest' => array(
-        'level'         => 'Stufe %s',
+        'questLevel'    => 'Stufe %s',
         'daily'         => 'Täglich',
-        'requirements'  => 'Anforderungen'
+        'requirements'  => 'Anforderungen',
+        'questInfo'     => array(
+              0 => 'Normal',             1 => 'Gruppe',             21 => 'Leben',              41 => 'PvP',                62 => 'Schlachtzug',        81 => 'Dungeon',            82 => 'Weltereignis',
+             83 => 'Legendär',          84 => 'Eskorte',            85 => 'Heroisch',           88 => 'Schlachtzug (10)',   89 => 'Schlachtzug (25)'
+        )
     ),
     'title' => array(
         'cat'           => array(
@@ -359,7 +380,13 @@ $lang = array(
         'spillover'     => "Reputationsüberlauf",
         'spilloverDesc' => "Für diese Fraktion erhaltener Ruf wird zusätzlich mit den unten aufgeführten Fraktionen anteilig verrechnet.",
         'maxStanding'   => "Max. Ruf",
-        'quartermaster' => "Rüstmeister"
+        'quartermaster' => "Rüstmeister",
+        'cat'           => array(
+            1118 => ["Classic", 469 => "Allianz", 169 => "Dampfdruckkartell", 67 => "Horde", 891 => "Streitkräfte der Allianz", 892 => "Streitkräfte der Horde"],
+            980  => ["The Burning Crusade", 936 => "Shattrath"],
+            1097 => ["Wrath of the Lich King", 1052 => "Expedition der Horde", 1117 => "Sholazarbecken", 1037 => "Vorposten der Allianz"],
+            0    => "Sonstige"
+        )
     ),
     'itemset' => array(
         '_desc'         => "<b>%s</b> ist das <b>%s</b>. Es enthält %s Teile.",
@@ -576,7 +603,6 @@ $lang = array(
         '_unavailable'  => "Dieser Gegenstand ist nicht für Spieler verfügbar.",
         '_rndEnchants'  => "Zufällige Verzauberungen",
         '_chance'       => "(Chance von %s%%)",
-        '_reqLevel'     => "Mindeststufe",
         'reqRating'     => "Benötigt eine persönliche Arenawertung und Teamwertung von %d.",
         'slot'          => "Platz",
         '_quality'      => "Qualität",

@@ -7,11 +7,12 @@ if (!defined('AOWOW_REVISION'))
 class FactionList extends BaseType
 {
     public static $type      = TYPE_FACTION;
+    public static $brickFile = 'faction';
 
-    protected     $queryBase = 'SELECT f1.*, f1.id AS ARRAY_KEY, f1.parentFactionId AS cat FROM ?_factions f1';
+    protected     $queryBase = 'SELECT f.*, f.parentFactionId AS cat, f.id AS ARRAY_KEY FROM ?_factions f';
     protected     $queryOpts = array(
-                      'f1' => [['f2']],
-                      'f2' => ['j' => ['?_factions f2 ON f1.parentFactionId = f2.id', true], 's' => ', IFNULL(f2.parentFactionId, 0) AS cat2']
+                      'f'  => [['f2']],
+                      'f2' => ['j' => ['?_factions f2 ON f.parentFactionId = f2.id', true], 's' => ', IFNULL(f2.parentFactionId, 0) AS cat2']
                   );
 
     public function __construct($conditions = [])

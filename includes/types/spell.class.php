@@ -15,12 +15,14 @@ class SpellList extends BaseType
     public        $sources     = [];
 
     public static $type        = TYPE_SPELL;
+    public static $brickFile   = 'spell';
+
     public static $skillLines  = array(
-         6 => [43, 44, 45, 46, 54, 55, 95, 118, 136, 160, 162, 172, 173, 176, 226, 228, 229, 473],  // Weapons
-         8 => [293, 413, 414, 415, 433],                                                            // Armor
-         9 => [129, 185, 356, 762],                                                                 // sec. Professions
-        10 => [98, 109, 111, 113, 115, 137, 138, 139, 140, 141, 313, 315, 673, 759],                // Languages
-        11 => [164, 165, 171, 182, 186, 197, 202, 333, 393, 755, 773]                               // prim. Professions
+         6 => [ 43,  44,  45,  46,  54,  55,  95, 118, 136, 160, 162, 172, 173, 176, 226, 228, 229, 473], // Weapons
+         8 => [293, 413, 414, 415, 433],                                                                  // Armor
+         9 => [129, 185, 356, 762],                                                                       // sec. Professions
+        10 => [ 98, 109, 111, 113, 115, 137, 138, 139, 140, 141, 313, 315, 673, 759],                     // Languages
+        11 => [164, 165, 171, 182, 186, 197, 202, 333, 393, 755, 773]                                     // prim. Professions
     );
     public static $spellTypes  = array(
          6 => 1,
@@ -1552,14 +1554,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         $org = $this->curTpl['learnedAt'];
 
         if ($ylw > 1)
-        {
-            return [
-                $org < $ylw ? $org : 0,
-                $org < $grn ? $ylw : 0,
-                $org < $gry ? $grn : 0,
-                $gry
-            ];
-        }
+            return [$org, $ylw, $grn, $gry];
     }
 
     public function getListviewData()

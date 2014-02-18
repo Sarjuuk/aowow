@@ -9,6 +9,7 @@ class ItemList extends BaseType
     use ListviewHelper;
 
     public static $type       = TYPE_ITEM;
+    public static $brickFile  = 'item';
 
     public        $tooltip    = [];
     public        $json       = [];
@@ -1435,7 +1436,6 @@ class ItemList extends BaseType
 }
 
 
-// missing each and everything
 class ItemListFilter extends Filter
 {
     // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses

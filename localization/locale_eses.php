@@ -31,6 +31,7 @@ $lang = array(
         'pageNotFound'  => "Este %s no existe.",
         'gender'        => "Género",
         'sex'           => [null, 'Hombre', 'Mujer'],
+        'players'       => "Jugadores",
         'quickFacts'    => "Notas rápidas",
         'screenshots'   => "Capturas de pantalla",
         'videos'        => "Videos",
@@ -57,6 +58,7 @@ $lang = array(
         'refineSearch'  => "Sugerencia: Refina tu búsqueda llendo a una <a href=\"javascript:;\" id=\"fi_subcat\">subcategoría</a>.",
         'clear'         => "borrar",
         'exactMatch'    => "Coincidencia exacta",
+        '_reqLevel'     => "Nivel requerido",
 
         // infobox
         'unavailable'   => "No está disponible a los jugadores",
@@ -133,12 +135,15 @@ $lang = array(
         'itemsets'      => "Conjuntos de objetos",
         'mechanic'      => "Mecanica",
         'mechAbbr'      => "Mec.",
+        'meetingStone'  => "Roca de encuentro",
         'npc'           => "PNJ",
         'npcs'          => "PNJs",
         'pet'           => "Mascota",
         'pets'          => "Mascotas de cazador",
         'profile'       => "",
         'profiles'      => "Perfiles",
+        'quest'         => "misión",
+        'quests'        => "Misiones",
         'requires'      => "Requiere %s",
         'requires2'     => "Requiere",
         'reqLevel'      => "Necesitas ser de nivel %s",
@@ -218,6 +223,17 @@ $lang = array(
         'goForum'       => "Feedback <a href=\"?forums&board=1\">forum</a>",
     ),
     'account'  => [],
+    'gameObject' => array(
+        'cat'           => [0 => "Otros", 9 => "Libros", 3 => "Contenedores", -5 => "Cofres", 25 => "[Fishing Pools]", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas"],
+        'type'          => [              9 => "Libro",  3 => "Contenedore",  -5 => "Cofre",  25 => "",                -3 => "Hierba",  -4 => "Filóne de mineral",  -2 => "Misión",   -6 => ""],
+        'unkPosition'   => "No se conoce la ubicación de esta entidad.",
+        'key'           => "Llave",
+        'focus'         => "[Spell Focus]",
+        'focusDesc'     => "[Spells requiring this Focus can be cast near this Object]",
+        'trap'          => "Trampa",
+        'triggeredBy'   => "Accionado por",
+        'capturePoint'  => "Punto de captura"
+    ),
     'npc'   => array(
         'rank'          => [0 => "Normal", 1 => "Élite", 4 => "Raro", 2 => "Élite raro", 3 => "Jefe"],
         'classification'=> "Clasificación",
@@ -230,6 +246,7 @@ $lang = array(
         'gainsDesc'     => "Tras acabar con este PNJ ganarás",
         'repWith'       => "reputación con",
         'stopsAt'       => "se detiene en %s",
+        'vehicle'       => "Vehículo",
         'textTypes'     => [null, "grita", "dice", "susurra"],
         'modes'         => array(
             1 => ["Normal", "Heroico"],
@@ -288,9 +305,13 @@ $lang = array(
         )
     ),
     'quest' => array(
-        'level'         => 'Nivel %s',
+        'questLevel'    => 'Nivel %s',
         'daily'         => 'Diaria',
-        'requirements'  => 'Requisitos'
+        'requirements'  => 'Requisitos',
+        'questInfo'     => array(
+             0 => 'Normal',              1 => 'Élite',              21 => 'Vida',               41 => 'JcJ',                62 => 'Banda',              81 => 'Mazmorra',           82 => 'Evento del mundo',
+            83 => 'Legendaria',         84 => 'Escolta',            85 => 'Heroica',            88 => 'Banda (10)',         89 => 'Banda (25)'
+        )
     ),
     'title' => array(
         'cat'           => array(
@@ -317,7 +338,13 @@ $lang = array(
         'spillover'     => "[Reputation Spillover]",
         'spilloverDesc' => "[Gaining Reputation with this faction also yields a proportional gain with the factions listed below.]",
         'maxStanding'   => "Posición máxima",
-        'quartermaster' => "Intendente"
+        'quartermaster' => "Intendente",
+        'cat'           => array(
+            1118 => ["Clásicas", 469 => "Alianza", 169 => "Cártel Bonvapor", 67 => "Horda", 891 => "Fuerzas de la Alianza", 892 => "Fuerzas de la Horda"],
+            980  => ["The Burning Crusade", 936 => "Ciudad de Shattrath"],
+            1097 => ["Wrath of the Lich King", 1052 => "Expedición de la Horda", 1117 => "Cuenca de Sholazar", 1037 => "Vanguardia de la Alianza"],
+            0    => "Otros"
+        )
     ),
     'itemset' => array(
         '_desc'         => "<b>%s</b> es el <b>%s</b>. Contiene %s piezas.",
@@ -534,7 +561,6 @@ $lang = array(
         '_unavailable'  => "Este objeto no está disponible para los jugadores.",
         '_rndEnchants'  => "Encantamientos aleatorios",
         '_chance'       => "(probabilidad %s%%)",
-        '_reqLevel'     => "Nivel requerido",
         'reqRating'     => "Requiere un índice de arena personal y de equipo de %d",
         'slot'          => "Casilla",
         '_quality'      => "Calidad",

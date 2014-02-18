@@ -98,7 +98,7 @@ class SmartyAoWoW extends Smarty
             $buff = [];
             foreach ($this->notices as $data)
                 if (User::isInGroup($data[0]))
-                    $buff[] = $data[1];
+                    $buff[] = Util::jsEscape($data[1]);
 
             if ($buff)
             {
@@ -182,24 +182,11 @@ class SmartyAoWoW extends Smarty
         if (isset($jsg[$type]))
             return;
 
-        switch ($type)
-        {                                                // [brickFile,  [data], [extra]]
-            case TYPE_NPC:         $jsg[TYPE_NPC]         = ['creatures',    [], []]; break;
-            case TYPE_OBJECT:      $jsg[TYPE_OBJECT]      = ['objects',      [], []]; break;
-            case TYPE_ITEM:        $jsg[TYPE_ITEM]        = ['items',        [], []]; break;
-            case TYPE_QUEST:       $jsg[TYPE_QUEST]       = ['quests',       [], []]; break;
-            case TYPE_SPELL:       $jsg[TYPE_SPELL]       = ['spells',       [], []]; break;
-            case TYPE_ZONE:        $jsg[TYPE_ZONE]        = ['zones',        [], []]; break;
-            case TYPE_FACTION:     $jsg[TYPE_FACTION]     = ['factions',     [], []]; break;
-            case TYPE_PET:         $jsg[TYPE_PET]         = ['pets',         [], []]; break;
-            case TYPE_ACHIEVEMENT: $jsg[TYPE_ACHIEVEMENT] = ['achievements', [], []]; break;
-            case TYPE_TITLE:       $jsg[TYPE_TITLE]       = ['titles',       [], []]; break;
-            case TYPE_WORLDEVENT:  $jsg[TYPE_WORLDEVENT]  = ['holidays',     [], []]; break;
-            case TYPE_CLASS:       $jsg[TYPE_CLASS]       = ['classes',      [], []]; break;
-            case TYPE_RACE:        $jsg[TYPE_RACE]        = ['races',        [], []]; break;
-            case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['skills',       [], []]; break;
-            case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['currencies',   [], []]; break;
-        }
+        $jsg[$type] = array(
+            (new ReflectionProperty(Util::$typeClasses[$type], 'brickFile'))->getValue(),   // brickfile
+            [],                                                                             // data
+            []                                                                              // extra
+        );
     }
 
     private function applyGlobals()
@@ -215,25 +202,9 @@ class SmartyAoWoW extends Smarty
 
             $this->initJSGlobal($type);
             $ids = array_unique($ids, SORT_NUMERIC);
+            $cnd = [['id', $ids], 0];
 
-            switch ($type)
-            {
-                case TYPE_NPC:         (new CreatureList(array(['ct.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;
-                case TYPE_OBJECT:      (new GameobjectList(array(['gt.entry', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF); break;
-                case TYPE_ITEM:        (new ItemList(array(['i.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);           break;
-                case TYPE_QUEST:       (new QuestList(array(['qt.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);         break;
-                case TYPE_SPELL:       (new SpellList(array(['s.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);          break;
-                case TYPE_ZONE:        (new ZoneList(array(['z.id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);           break;
-                case TYPE_FACTION:     (new FactionList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);          break;
-                case TYPE_PET:         (new PetList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);              break;
-                case TYPE_ACHIEVEMENT: (new AchievementList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);      break;
-                case TYPE_TITLE:       (new TitleList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);            break;
-                case TYPE_WORLDEVENT:  (new WorldEventList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);       break;
-                case TYPE_CLASS:       (new CharClassList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);        break;
-                case TYPE_RACE:        (new CharRaceList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);         break;
-                case TYPE_SKILL:       (new SkillList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);            break;
-                case TYPE_CURRENCY:    (new CurrencyList(array(['id', $ids], 0)))->addGlobalsToJscript($this, GLOBALINFO_SELF);         break;
-            }
+            (new Util::$typeClasses[$type]($cnd))->addGlobalsToJscript($this, GLOBALINFO_SELF);
         }
     }
 
@@ -299,7 +270,7 @@ class SmartyAoWoW extends Smarty
         $cache = explode("\n", $cache);
 
         @list($time, $rev) = explode(' ', $cache[0]);
-        $expireTime = $time + $this->config['page']['cacheTimer'];
+        $expireTime = $time + $this->config['cacheTimer'];
         if ($expireTime <= time() || $rev < AOWOW_REVISION)
             return false;
 
@@ -327,6 +298,12 @@ class Util
 
     public static $subDomains               = array(
         'www',          null,           'fr',           'de',           null,           null,           'es',           null,           'ru'
+    );
+
+    public static $typeClasses              = array(
+        null,               'CreatureList',     'GameObjectList',   'ItemList',         'ItemsetList',      'QuestList',        'SpellList',
+        'ZoneList',         'FactionList',      'PetList',          'AchievementList',  'TitleList',        'WorldEventList',   'CharClassList',
+        'CharRaceList',     'SkillList',        null,               'CurrencyList'
     );
 
     public static $typeStrings              = array(        // zero-indexed
@@ -497,7 +474,7 @@ class Util
         LOOT_SKINNING,      // npc (see its flags for mining, herbing or actual skinning)
         LOOT_FISHING,       // zone
         LOOT_GAMEOBJECT,    // object
-        LOOT_QUEST,         // quest (mail rewards)
+        LOOT_MAIL,          // quest || achievement
         LOOT_SPELL          // spell
     );
 
@@ -1117,11 +1094,13 @@ class Util
         }
         else
         {
-            if (!(($s['d'] + $s['h']) % 365))               // whole years
+            $_ = $s['d'] + $s['h'];
+
+            if ($_ && !($_ % 365))                          // whole years
                 return round(($s['d'] + $s['h'] *24) / 365, 2)." ".Lang::$timeUnits[$s['d'] / 365 == 1 && !$s['h'] ? 'sg' : 'pl'][0];
-            if (!(($s['d'] + $s['h']) % 30))                // whole month
+            if ($_ && !($_ % 30))                           // whole month
                 return round(($s['d'] + $s['h'] * 24) / 30, 2)." ".Lang::$timeUnits[$s['d'] / 30 == 1 && !$s['h'] ? 'sg' : 'pl'][1];
-            if (!(($s['d'] + $s['h']) % 7))                 // whole weeks
+            if ($_ && !($_ % 7))                            // whole weeks
                 return round(($s['d'] + $s['h'] * 24) / 7, 2)." ".Lang::$timeUnits[$s['d'] / 7 == 1 && !$s['h'] ? 'sg' : 'pl'][2];
             if ($s['d'])
                 return round($s['d'] + $s['h'] / 24, 2)." ".Lang::$timeUnits[$s['d'] == 1 && !$s['h'] ? 'sg' : 'pl'][3];
@@ -1193,6 +1172,8 @@ class Util
             // html may contain 'Pictures'
             $text = preg_replace('/"Interface\\\Pictures\\\([\w_\-]+)"/i', '"images/interface/Pictures/\1.jpg"', strtr($text, $pairs));
         }
+        else
+            $text = strtr($text, ["\n" => '<br />', "\r" => '']);
 
         $from = array(
             '/\|T([\w]+\\\)*([^\.]+)\.blp:\d+\|t/ui',       // images (force size to tiny)                      |T<fullPath>:<size>|t
@@ -1221,8 +1202,6 @@ class Util
             '$N' => '&lt;'.Lang::$main['name'].'&gt;',
             '$b' => '<br />',
             '$B' => '<br />',
-            "\n" => '<br />',
-            "\r" => '',
             '|n' => ''                                      // what .. the fuck .. another type of line terminator? (only in spanish though)
         );
 
@@ -1479,8 +1458,8 @@ class Util
         {
             case 0: // no params works always
                 return true;
-            case 1: // null is avalid    || key in a n-dim-array     ||  value in a 1-dim-array
-                return $keys[0] === null || isset($struct[$keys[0]]) ||  in_array($keys[0], $struct);
+            case 1: // null is avalid    || value in a 1-dim-array      ||  key in a n-dim-array
+                return $keys[0] === null || in_array($keys[0], $struct) || (isset($struct[$keys[0]]));
             case 2: // first param has to be a key. otherwise invalid
                 if (!isset($struct[$keys[0]]))
                     return false;
@@ -1868,23 +1847,24 @@ class Util
 
         //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
         $tabsFinal  = array(
-            ['item',     [], '$LANG.tab_containedin',      'contained-in-item',    [], [], []],
-            ['item',     [], '$LANG.tab_disenchantedfrom', 'disenchanted-from',    [], [], []],
-            ['item',     [], '$LANG.tab_prospectedfrom',   'prospected-from',      [], [], []],
-            ['item',     [], '$LANG.tab_milledfrom',       'milled-from',          [], [], []],
-            ['creature', [], '$LANG.tab_droppedby',        'dropped-by',           [], [], []],
-            ['creature', [], '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',    [], [], []],
-            ['creature', [], '$LANG.tab_skinnedfrom',      'skinned-from',         [], [], []],
-            ['creature', [], '$LANG.tab_minedfromnpc',     'mined-from-npc',       [], [], []],
-            ['creature', [], '$LANG.tab_salvagedfrom',     'salvaged-from',        [], [], []],
-            ['creature', [], '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',    [], [], []],
-            ['quest',    [], '$LANG.tab_rewardfrom',       'reward-from-quest',    [], [], []],
-            ['zone',     [], '$LANG.tab_fishedin',         'fished-in-zone',       [], [], []],
-            ['object',   [], '$LANG.tab_containedin',      'contained-in-object',  [], [], []],
-            ['object',   [], '$LANG.tab_minedfrom',        'mined-from-object',    [], [], []],
-            ['object',   [], '$LANG.tab_gatheredfrom',     'gathered-from-object', [], [], []],
-            ['object',   [], '$LANG.tab_fishedin',         'fished-in-object',     [], [], []],
-            ['spell',    [], '$LANG.tab_createdby',        'created-by',           [], [], []]
+            ['item',        [], '$LANG.tab_containedin',      'contained-in-item',      [], [], []],
+            ['item',        [], '$LANG.tab_disenchantedfrom', 'disenchanted-from',      [], [], []],
+            ['item',        [], '$LANG.tab_prospectedfrom',   'prospected-from',        [], [], []],
+            ['item',        [], '$LANG.tab_milledfrom',       'milled-from',            [], [], []],
+            ['creature',    [], '$LANG.tab_droppedby',        'dropped-by',             [], [], []],
+            ['creature',    [], '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',      [], [], []],
+            ['creature',    [], '$LANG.tab_skinnedfrom',      'skinned-from',           [], [], []],
+            ['creature',    [], '$LANG.tab_minedfromnpc',     'mined-from-npc',         [], [], []],
+            ['creature',    [], '$LANG.tab_salvagedfrom',     'salvaged-from',          [], [], []],
+            ['creature',    [], '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',      [], [], []],
+            ['quest',       [], '$LANG.tab_rewardfrom',       'reward-from-quest',      [], [], []],
+            ['zone',        [], '$LANG.tab_fishedin',         'fished-in-zone',         [], [], []],
+            ['object',      [], '$LANG.tab_containedin',      'contained-in-object',    [], [], []],
+            ['object',      [], '$LANG.tab_minedfrom',        'mined-from-object',      [], [], []],
+            ['object',      [], '$LANG.tab_gatheredfrom',     'gathered-from-object',   [], [], []],
+            ['object',      [], '$LANG.tab_fishedin',         'fished-in-object',       [], [], []],
+            ['spell',       [], '$LANG.tab_createdby',        'created-by',             [], [], []],
+            ['achievement', [], '$LANG.tab_rewardfrom',       'reward-from-achievemnt', [], [], []]
         );
         $refResults = [];
         $chanceMods = [];
@@ -2027,7 +2007,7 @@ class Util
                     if (!$ids)
                         break;
 
-                    $srcObj = new GameObjectList(array(['type', [OBJECT_CHEST, OBJECT_FISHINGHOLE]], ['data1', $ids]));
+                    $srcObj = new GameObjectList(array(['lootId', $ids]));
                     if ($srcObj->error)
                         break;
 
@@ -2049,7 +2029,7 @@ class Util
                             $tabsFinal[$tabId][6][] = 'skill';
                     }
                     break;
-                case LOOT_QUEST:
+                case LOOT_MAIL:
                     $conditions = array(['RewardChoiceItemId1', $itemId], ['RewardChoiceItemId2', $itemId], ['RewardChoiceItemId3', $itemId], ['RewardChoiceItemId4', $itemId], ['RewardChoiceItemId5', $itemId],
                                         ['RewardChoiceItemId6', $itemId], ['RewardItemId1', $itemId],       ['RewardItemId2', $itemId],       ['RewardItemId3', $itemId],       ['RewardItemId4', $itemId],
                                         'OR');
@@ -2065,6 +2045,13 @@ class Util
                         foreach ($srcObj->iterate() as $_)
                             $tabsFinal[10][1][] = array_merge($srcData[$srcObj->id], empty($result[$srcObj->id]) ? ['percent' => -1] : $result[$srcObj->id]);
                     }
+
+                    /*
+
+                        todo: search for achievements here
+                        $tabsFinal[17]
+                    */
+
                     break;
                 case LOOT_SPELL:
                     $conditions = ['OR', ['effect1CreateItemId', $itemId], ['effect2CreateItemId', $itemId], ['effect3CreateItemId', $itemId]];

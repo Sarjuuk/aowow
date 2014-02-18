@@ -78,361 +78,373 @@ $shortFilter = array(
 if (!Util::isValidPage($validCats, $cats))
     $smarty->error();
 
-$path = array_merge($path, $cats);
-
-if (isset($cats))
-{
-    if (isset($cats[1]))
-        array_pop($title);
-
-    $x = @Lang::$spell['cat'][$cats[0]];
-    if (is_array($x))
-    {
-        if (is_array($x[0]))
-            array_unshift($title, $x[0][0]);
-        else
-            array_unshift($title, $x[0]);
-    }
-    else if ($x !== null)
-        array_unshift($title, $x);
-}
-
 if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 {
     $conditions  = [];
     $visibleCols = [];
     $hiddenCols  = [];
-
-    $pageData = array(
-        'page'   => [],
+    $lv          = array(
+        'file'   => 'spell',
         'data'   => [],
-        'title'  => '',
-        'path'   => '',
         'params' => []
     );
 
-    switch($cats[0])
+    // reconstruct path & title
+    $path = array_merge($path, $cats);
+
+    if ($cats)
     {
-        case -2:                                            // Character Talents
-            $filter['classPanel'] = true;
+        if (isset($cats[1]))
+            array_pop($title);
 
-            array_push($visibleCols, 'singleclass', 'level', 'schools', 'tier');
+        $x = @Lang::$spell['cat'][$cats[0]];
+        if (is_array($x))
+        {
+            if (is_array($x[0]))
+                array_unshift($title, $x[0][0]);
+            else
+                array_unshift($title, $x[0]);
+        }
+        else if ($x !== null)
+            array_unshift($title, $x);
 
-            $conditions[] = ['s.typeCat', -2];
+        switch($cats[0])
+        {
+            case -2:                                            // Character Talents
+                $filter['classPanel'] = true;
 
-            if (isset($cats[1]))
-                array_unshift($title, Lang::$game['cl'][$cats[1]]);
+                array_push($visibleCols, 'singleclass', 'level', 'schools', 'tier');
 
-            if (isset($cats[1]) && empty($cats[2]))         // i will NOT redefine those class2skillId ... reusing
-                $conditions[] = ['s.skillLine1', $validCats[-2][$cats[1]]];
-            else if (isset($cats[1]))
-                $conditions[] = ['s.skillLine1', $cats[2]];
+                $conditions[] = ['s.typeCat', -2];
 
-            break;
-        case -3:                                            // Pet Spells
-            array_push($visibleCols, 'level', 'schools');
+                if (isset($cats[1]))
+                    array_unshift($title, Lang::$game['cl'][$cats[1]]);
 
-            $conditions[] = ['s.typeCat', -3];
+                if (isset($cats[1]) && empty($cats[2]))         // i will NOT redefine those class2skillId ... reusing
+                    $conditions[] = ['s.skillLine1', $validCats[-2][$cats[1]]];
+                else if (isset($cats[1]))
+                    $conditions[] = ['s.skillLine1', $cats[2]];
 
-            if (isset($cats[1]))
-            {
-                $xCond = null;
-                for ($i = -2; $i < 0; $i++)
+                break;
+            case -3:                                            // Pet Spells
+                array_push($visibleCols, 'level', 'schools');
+
+                $conditions[] = ['s.typeCat', -3];
+
+                if (isset($cats[1]))
                 {
-                    foreach (Util::$skillLineMask[$i] as $idx => $pair)
+                    $xCond = null;
+                    for ($i = -2; $i < 0; $i++)
                     {
-                        if ($pair[1] == $cats[1])
+                        foreach (Util::$skillLineMask[$i] as $idx => $pair)
                         {
-                            $xCond = ['AND', ['s.skillLine1', $i], ['s.skillLine2OrMask', 1 << $idx, '&']];
-                            break;
+                            if ($pair[1] == $cats[1])
+                            {
+                                $xCond = ['AND', ['s.skillLine1', $i], ['s.skillLine2OrMask', 1 << $idx, '&']];
+                                break;
+                            }
                         }
+                    }
+
+                    $conditions[] = [
+                        'OR',
+                        $xCond,
+                        ['s.skillLine1', $cats[1]],
+                        ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $cats[1]]]
+                    ];
+
+                    array_unshift($title, Lang::$spell['cat'][-3][$cats[1]]);
+                }
+                else
+                {
+                    $conditions[] = [
+                        'OR',
+                        ['s.skillLine1', [-1, -2]],
+                        ['s.skillLine1', $validCats[-3]],
+                        ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $validCats[-3]]]
+                    ];
+                }
+
+                break;
+            case -4:                                            // Racials
+                array_push($visibleCols, 'classes');
+
+                $conditions[] = ['s.typeCat', -4];
+
+                break;
+            case -8:                                            // NPC-Spells
+            case -9:                                            // GM Spells
+                array_push($visibleCols, 'level');
+            case -5:                                            // Mounts
+            case -6:                                            // Companions
+                $conditions[] = ['s.typeCat', $cats[0]];
+
+                break;
+            case -7:                                            // Pet Talents
+                array_push($visibleCols, 'level', 'tier');
+
+                $conditions[] = ['s.typeCat', -7];
+
+                if (isset($cats[1]))
+                {
+                    array_unshift($title, Lang::$spell['cat'][-7][$cats[1]]);
+
+                    switch($cats[1])                            // Spells can be used by multiple specs
+                    {
+                        case 409:                               // Tenacity
+                            $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE1, '&'];
+                            $url          = '?pets=1';
+                            break;
+                        case 410:                               // Cunning
+                            $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE2, '&'];
+                            $url          = '?pets=2';
+                           break;
+                        case 411:                               // Ferocity
+                            $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE0, '&'];
+                            $url          = '?pets=0';
+                            break;
+                    }
+
+                    $lv['params']['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';
+                }
+
+                $lv['params']['_petTalents'] = 1;               // not conviced, this is correct, but .. it works
+
+                break;
+            case -11:                                           // Proficiencies ... the subIds are actually SkillLineCategories
+                if (!isset($cats[1]) || $cats[1] != 10)
+                    array_push($visibleCols, 'classes');
+
+                    $conditions[] = ['s.typeCat', -11];
+
+                if (isset($cats[1]))
+                {
+                    if ($cats[1] == 6)                          // todo (med): we know Weapon(6) includes spell Shoot(3018), that has a mask; but really, ANY proficiency or petSkill should be in that mask so there is no need to differenciate
+                        $conditions[] = ['OR', ['s.skillLine1', SpellList::$skillLines[$cats[1]]], ['s.skillLine1', -3]];
+                    else
+                        $conditions[] = ['s.skillLine1', SpellList::$skillLines[$cats[1]]];
+
+                    array_unshift($title, Lang::$spell['cat'][-11][$cats[1]]);
+                }
+
+                break;
+            case -13:                                           // Glyphs
+                $filter['classPanel'] = true;
+                $filter['glyphPanel'] = true;
+
+                array_push($visibleCols, 'singleclass', 'glyphtype');
+
+                $conditions[] = ['s.typeCat', -13];
+
+                if (isset($cats[1]))
+                {
+                    array_unshift($title, Lang::$game['cl'][$cats[1]]);
+                    $conditions[] = ['s.reqClassMask', 1 << ($cats[1] - 1), '&'];
+                }
+
+                break;
+            case 7:                                             // Abilities
+                $filter['classPanel'] = true;
+
+                array_push($visibleCols, 'level', 'singleclass', 'schools');
+
+                if (isset($cats[1]))
+                    array_unshift($title, Lang::$game['cl'][$cats[1]]);
+
+                $conditions[] = ['s.typeCat', [7, -2]];
+                $conditions[] = [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT | CUSTOM_EXCLUDE_FOR_LISTVIEW), '&'], 0];
+
+                // Runeforging listed multiple times, exclude from explicit skill-listing
+                // if (isset($cats[1]) && $cats[1] == 6 && isset($cats[2]) && $cats[2] != 776)
+                    // $conditions[] = [['s.attributes0', 0x80, '&'], 0];
+                // else
+                    // $conditions[] = [
+                        // [['s.attributes0', 0x80, '&'], 0],      // ~SPELL_ATTR0_HIDDEN_CLIENTSIDE
+                        // ['s.attributes0', 0x20, '&'],           // SPELL_ATTR0_TRADESPELL (DK: Runeforging)
+                        // 'OR'
+                    // ];
+
+                if (isset($cats[2]))
+                {
+                    $conditions[] = [
+                        'OR',
+                        ['s.skillLine1', $cats[2]],
+                        ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $cats[2]]]
+                    ];
+
+                }
+                else if (isset($cats[1]))
+                {
+                    $conditions[] = [
+                        'OR',
+                        ['s.skillLine1', $validCats[7][$cats[1]]],
+                        ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $validCats[7][$cats[1]]]]
+                    ];
+
+                }
+
+                break;
+            case 9:                                             // Secondary Skills
+                array_push($visibleCols, 'source');
+
+                $conditions[] = ['s.typeCat', 9];
+
+                if (isset($cats[1]))
+                {
+                    array_unshift($title, Lang::$spell['cat'][9][$cats[1]]);
+
+                    $conditions[] = [
+                        'OR',
+                        ['s.skillLine1', $cats[1]],
+                        ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $cats[1]]]
+                    ];
+
+                    if ($sf = @$shortFilter[$cats[1]])
+                    {
+                        $txt = '';
+                        if ($sf[0] && $sf[1])
+                            $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]) . Lang::$spell['relItems']['link'] . sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
+                        else if ($sf[0])
+                            $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]);
+                        else if ($sf[1])
+                            $txt = sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
+
+                        $note = Lang::$spell['cat'][$cats[0]][$cats[1]];
+                        if (is_array($note))
+                            $note = $note[0];
+
+                        $lv['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
+                        $lv['params']['sort'] = "$['skill', 'name']";
                     }
                 }
 
-                $conditions[] = [
-                    'OR',
-                    $xCond,
-                    ['s.skillLine1', $cats[1]],
-                    ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $cats[1]]]
-                ];
+                break;
+            case 11:                                            // Professions
+                array_push($visibleCols, 'source');
 
-                array_unshift($title, Lang::$spell['cat'][-3][$cats[1]]);
-            }
-            else
-            {
-                $conditions[] = [
-                    'OR',
-                    ['s.skillLine1', [-1, -2]],
-                    ['s.skillLine1', $validCats[-3]],
-                    ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $validCats[-3]]]
-                ];
-            }
+                $conditions[] = ['s.typeCat', 11];
 
-            break;
-        case -4:                                            // Racials
-            array_push($visibleCols, 'classes');
-
-            $conditions[] = ['s.typeCat', -4];
-
-            break;
-        case -8:                                            // NPC-Spells
-        case -9:                                            // GM Spells
-            array_push($visibleCols, 'level');
-        case -5:                                            // Mounts
-        case -6:                                            // Companions
-            $conditions[] = ['s.typeCat', $cats[0]];
-
-            break;
-        case -7:                                            // Pet Talents
-            array_push($visibleCols, 'level', 'tier');
-
-            $conditions[] = ['s.typeCat', -7];
-
-            if (isset($cats[1]))
-            {
-                array_unshift($title, Lang::$spell['cat'][-7][$cats[1]]);
-
-                switch($cats[1])                            // Spells can be used by multiple specs
+                if (isset($cats[2]))
                 {
-                    case 409:                               // Tenacity
-                        $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE1, '&'];
-                        $url          = '?pets=1';
-                        break;
-                    case 410:                               // Cunning
-                        $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE2, '&'];
-                        $url          = '?pets=2';
-                       break;
-                    case 411:                               // Ferocity
-                        $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE0, '&'];
-                        $url          = '?pets=0';
-                        break;
+                    array_unshift($title, Lang::$spell['cat'][11][$cats[1]][$cats[2]]);
+
+                    if ($cats[2] == 9787)                       // general weaponsmithing
+                        $conditions[] = ['s.reqSpellId', [9787, 17039, 17040, 17041]];
+                    else
+                        $conditions[] = ['s.reqSpellId', $cats[2]];
+                }
+                else if (isset($cats[1]))
+                {
+                    $x = Lang::$spell['cat'][11][$cats[1]];
+                    if (is_array($x))
+                        array_unshift($title, $x[0]);
+                    else
+                        array_unshift($title, $x);
+                    $conditions[] = ['s.skillLine1', $cats[1]];
                 }
 
-                $pageData['params']['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';
-            }
-
-            $pageData['params']['_petTalents'] = 1;         // not conviced, this is correct, but .. it works
-
-            break;
-        case -11:                                           // Proficiencies ... the subIds are actually SkillLineCategories
-            if (!isset($cats[1]) || $cats[1] != 10)
-                array_push($visibleCols, 'classes');
-
-                $conditions[] = ['s.typeCat', -11];
-
-            if (isset($cats[1]))
-            {
-                if ($cats[1] == 6)                          // todo (med): we know Weapon(6) includes spell Shoot(3018), that has a mask; but really, ANY proficiency or petSkill should be in that mask so there is no need to differenciate
-                    $conditions[] = ['OR', ['s.skillLine1', SpellList::$skillLines[$cats[1]]], ['s.skillLine1', -3]];
-                else
-                    $conditions[] = ['s.skillLine1', SpellList::$skillLines[$cats[1]]];
-
-                array_unshift($title, Lang::$spell['cat'][-11][$cats[1]]);
-            }
-
-            break;
-        case -13:                                           // Glyphs
-            $filter['classPanel'] = true;
-            $filter['glyphPanel'] = true;
-
-            array_push($visibleCols, 'singleclass', 'glyphtype');
-
-            $conditions[] = ['s.typeCat', -13];
-
-            if (isset($cats[1]))
-            {
-                array_unshift($title, Lang::$game['cl'][$cats[1]]);
-                $conditions[] = ['s.reqClassMask', 1 << ($cats[1] - 1), '&'];
-            }
-
-            break;
-        case 7:                                             // Abilities
-            $filter['classPanel'] = true;
-
-            array_push($visibleCols, 'level', 'singleclass', 'schools');
-
-            if (isset($cats[1]))
-                array_unshift($title, Lang::$game['cl'][$cats[1]]);
-
-            $conditions[] = ['s.typeCat', [7, -2]];
-            $conditions[] = [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT | CUSTOM_EXCLUDE_FOR_LISTVIEW), '&'], 0];
-
-            // Runeforging listed multiple times, exclude from explicit skill-listing
-            // if (isset($cats[1]) && $cats[1] == 6 && isset($cats[2]) && $cats[2] != 776)
-                // $conditions[] = [['s.attributes0', 0x80, '&'], 0];
-            // else
-                // $conditions[] = [
-                    // [['s.attributes0', 0x80, '&'], 0],      // ~SPELL_ATTR0_HIDDEN_CLIENTSIDE
-                    // ['s.attributes0', 0x20, '&'],           // SPELL_ATTR0_TRADESPELL (DK: Runeforging)
-                    // 'OR'
-                // ];
-
-            if (isset($cats[2]))
-            {
-                $conditions[] = [
-                    'OR',
-                    ['s.skillLine1', $cats[2]],
-                    ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $cats[2]]]
-                ];
-
-            }
-            else if (isset($cats[1]))
-            {
-                $conditions[] = [
-                    'OR',
-                    ['s.skillLine1', $validCats[7][$cats[1]]],
-                    ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $validCats[7][$cats[1]]]]
-                ];
-
-            }
-
-            break;
-        case 9:                                             // Secondary Skills
-            array_push($visibleCols, 'source');
-
-            $conditions[] = ['s.typeCat', 9];
-
-            if (isset($cats[1]))
-            {
-                array_unshift($title, Lang::$spell['cat'][9][$cats[1]]);
-
-                $conditions[] = [
-                    'OR',
-                    ['s.skillLine1', $cats[1]],
-                    ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $cats[1]]]
-                ];
-
-                if ($sf = @$shortFilter[$cats[1]])
+                if (isset($cats[1]))
                 {
-                    $txt = '';
-                    if ($sf[0] && $sf[1])
-                        $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]) . Lang::$spell['relItems']['link'] . sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
-                    else if ($sf[0])
-                        $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]);
-                    else if ($sf[1])
-                        $txt = sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
+                    $conditions[] = ['s.skillLine1', $cats[1]];
 
-                    $note = Lang::$spell['cat'][$cats[0]][$cats[1]];
-                    if (is_array($note))
-                        $note = $note[0];
+                    if ($sf = @$shortFilter[$cats[1]])
+                    {
+                        $txt = '';
+                        if ($sf[0] && $sf[1])
+                            $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]) . Lang::$spell['relItems']['link'] . sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
+                        else if ($sf[0])
+                            $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]);
+                        else if ($sf[1])
+                            $txt = sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
 
-                    $pageData['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
-                    $pageData['params']['sort'] = "$['skill', 'name']";
+                        $note = Lang::$spell['cat'][$cats[0]][$cats[1]];
+                        if (is_array($note))
+                            $note = $note[0];
+
+                        $lv['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
+                        $lv['params']['sort'] = "$['skill', 'name']";
+                    }
                 }
-            }
-
-            break;
-        case 11:                                            // Professions
-            array_push($visibleCols, 'source');
-
-            $conditions[] = ['s.typeCat', 11];
-
-            if (isset($cats[2]))
-            {
-                array_unshift($title, Lang::$spell['cat'][11][$cats[1]][$cats[2]]);
-
-                if ($cats[2] == 9787)                       // general weaponsmithing
-                    $conditions[] = ['s.reqSpellId', [9787, 17039, 17040, 17041]];
-                else
-                    $conditions[] = ['s.reqSpellId', $cats[2]];
-            }
-            else if (isset($cats[1]))
-            {
-                $x = Lang::$spell['cat'][11][$cats[1]];
-                if (is_array($x))
-                    array_unshift($title, $x[0]);
-                else
-                    array_unshift($title, $x);
-                $conditions[] = ['s.skillLine1', $cats[1]];
-            }
-
-            if (isset($cats[1]))
-            {
-                $conditions[] = ['s.skillLine1', $cats[1]];
-
-                if ($sf = @$shortFilter[$cats[1]])
-                {
-                    $txt = '';
-                    if ($sf[0] && $sf[1])
-                        $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]) . Lang::$spell['relItems']['link'] . sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
-                    else if ($sf[0])
-                        $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]);
-                    else if ($sf[1])
-                        $txt = sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
-
-                    $note = Lang::$spell['cat'][$cats[0]][$cats[1]];
-                    if (is_array($note))
-                        $note = $note[0];
-
-                    $pageData['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
-                    $pageData['params']['sort'] = "$['skill', 'name']";
-                }
-            }
-
-            break;
-        case 0:                                             // misc. Spells
-            array_push($visibleCols, 'level');
-
-            if ($cats[0] !== null)                          // !any Spell (php loose comparison: (null == 0) is true)
-            {
-                $conditions[] = array(
-                    'OR',
-                    ['s.typeCat', 0],
-                    ['s.cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&']
-                );
 
                 break;
-            }
+            case 0:                                             // misc. Spells
+                array_push($visibleCols, 'level');
+
+                if ($cats[0] !== null)                          // !any Spell (php loose comparison: (null == 0) is true)
+                {
+                    $conditions[] = array(
+                        'OR',
+                        ['s.typeCat', 0],
+                        ['s.cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&']
+                    );
+
+                    break;
+                }
+        }
     }
 
     $spells = new SpellList($conditions, true);
 
-    $pageData['data'] = $spells->getListviewData();
-
     $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
-
-    // create note if search limit was exceeded; overwriting 'note' is intentional
-    if ($spells->getMatches() > SQL_LIMIT_DEFAULT)
-    {
-        $pageData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), SQL_LIMIT_DEFAULT);
-        $pageData['params']['_truncated'] = 1;
-    }
-
-    if ($spells->filterGetError())
-        $pageData['params']['_errors'] = '$1';
-
-    $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost']);
-
-    if ($mask & 0x1)
-        $visibleCols[] = 'reagents';
-    if (!($mask & 0x2) && $cats[0] != 9 && $cats[0] != 11)
-        $hiddenCols[] = 'skill';
-    if (($mask & 0x4) || $spells->getField('trainingCost'))
-        $visibleCols[] = 'trainingcost';
-
-    if ($visibleCols)
-        $pageData['params']['visibleCols'] = '$'.json_encode($visibleCols);
-
-    if ($hiddenCols)
-        $pageData['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
+    $lv['data'] = $spells->getListviewData();
 
     // recreate form selection
     $filter          = array_merge($spells->filterGetForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
     $filter['fi']    =  $spells->filterGetForm();
 
+    if (isset($filter['gl']) && !is_array($filter['gl']))
+    {
+        while (count($path) < 4)
+            $path[] = 0;
+
+        $path[] = $filter['gl'];
+    }
+
     if (!empty($filter['fi']['extraCols']))
-        $pageData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+        $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+
+    // create note if search limit was exceeded; overwriting 'note' is intentional
+    if ($spells->getMatches() > SQL_LIMIT_DEFAULT)
+    {
+        $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), SQL_LIMIT_DEFAULT);
+        $lv['params']['_truncated'] = 1;
+    }
+
+    if ($spells->filterGetError())
+        $lv['params']['_errors'] = '$1';
+
+    $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost']);
+
+    if ($mask & 0x1)
+        $visibleCols[] = 'reagents';
+    if (!($mask & 0x2) && $cats && $cats[0] != 9 && $cats[0] != 11)
+        $hiddenCols[] = 'skill';
+    if (($mask & 0x4) || $spells->getField('trainingCost'))
+        $visibleCols[] = 'trainingcost';
+
+    if ($visibleCols)
+        $lv['params']['visibleCols'] = '$'.json_encode($visibleCols);
+
+    if ($hiddenCols)
+        $lv['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
+
+    // menuId 1: Spell    g_initPath()
+    //  tabId 0: Database g_initHeader()
+    $pageData = array(
+        'page'   => array(
+            'title'  => implode(" - ", $title),
+            'path'   => json_encode($path, JSON_NUMERIC_CHECK),
+            'tab'    => 0,
+            'subCat' => $pageParam !== null ? '='.$pageParam : '',
+            'reqJS'  => array(
+                'template/js/filters.js'
+            )
+        ),
+        'lv'    => $lv
+    );
 
     $smarty->saveCache($cacheKey, $pageData, $filter);
-}
-
-if (isset($filter['gl']) && !is_array($filter['gl']))
-{
-    while (count($path) < 4)
-        $path[] = 0;
-
-    $path[] = $filter['gl'];
 }
 
 
@@ -442,20 +454,10 @@ asort(Lang::$game['cl']);
 asort(Lang::$game['sc']);
 asort(Lang::$game['me']);
 
-// menuId 1: Spell    g_initPath()
-//  tabId 0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => implode(" - ", $title),
-    'path'   => "[".implode(", ", $path)."]",
-    'tab'    => 0,
-    'subCat' => $pageParam !== null ? '='.$pageParam : '',
-    'reqJS'  => array(
-        'template/js/filters.js'
-    )
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('filter', $filter);
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['lv']);
 
 // load the page
 $smarty->display('spells.tpl');

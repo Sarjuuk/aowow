@@ -9,6 +9,7 @@ class ItemsetList extends BaseType
     use ListviewHelper;
 
     public static $type       = TYPE_ITEMSET;
+    public static $brickFile  = 'itemset';
 
     public        $pieceToSet = [];                             // used to build g_items and search
     private       $classes    = [];                             // used to build g_classes

@@ -9,6 +9,7 @@ class CreatureList extends BaseType
     use spawnHelper;
 
     public static   $type      = TYPE_NPC;
+    public static $brickFile   = 'creature';
 
     public          $tooltips  = [];
 

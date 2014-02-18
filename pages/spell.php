@@ -179,7 +179,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($_ = $spell->getField('spellFocusObject'))          // spellFocus
     {
         $bar = DB::Aowow()->selectRow('SELECT * FROM ?_spellFocusObject WHERE id = ?d', $_);
-        $focus = new GameObjectList(array(['type', 8], ['data0', $_], 1));
+        $focus = new GameObjectList(array(['spellFocusId', $_], 1));
         $infobox[] = '[li]'.Lang::$game['requires2'].' '.($focus->error ? Util::localizedString($bar, 'name') : '[url=?object='.$focus->id.']'.Util::localizedString($bar, 'name').'[/url]').'[/li]';
     }
 
@@ -399,25 +399,31 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     array_unshift($reagentResult, null);
     unset($reagentResult[0]);
 
+    // menuId 1: Spell    g_initPath()
+    //  tabId 0: Database g_initHeader()
     $pageData = array(
-        'title'   => $spell->getField('name', true),
-        'path'    => json_encode($_path, JSON_NUMERIC_CHECK),
-        'infobox' => $infobox,
-        'relTabs' => [],
-        'buttons' => array(
-            BUTTON_LINKS   => ['color' => 'ff71d5ff', 'linkId' => Util::$typeStrings[TYPE_SPELL].':'.$_id],
-            BUTTON_VIEW3D  => false,
-            BUTTON_WOWHEAD => true
-        ),
         'page'    => array(
+            'title'   => $spell->getField('name', true).' - '.Util::ucFirst(Lang::$game['spell']),
+            'path'    => json_encode($_path, JSON_NUMERIC_CHECK),
+            'tab'    => 0,
+            'type'   => TYPE_SPELL,
+            'typeId' => $_id,
+            'reqJS'  => array(
+                $pageData['buttons'][BUTTON_VIEW3D] ? 'template/js/swfobject.js' : null
+            ),
+            'redButtons' => array(
+                BUTTON_LINKS   => ['color' => 'ff71d5ff', 'linkId' => Util::$typeStrings[TYPE_SPELL].':'.$_id],
+                BUTTON_VIEW3D  => false,
+                BUTTON_WOWHEAD => true
+            ),
+            'infobox' => $infobox,
             'scaling'   => '',
             'powerCost' => $spell->createPowerCostForCurrent(),
             'castTime'  => $spell->createCastTimeForCurrent(false, false),
             'tools'     => $spell->getToolsForCurrent(),
             'reagents'  => [$enhanced, $reagentResult],
             'name'      => $spell->getField('name', true),
-            'icon'      => $spell->getField('iconString'),
-            'stack'     => $spell->getField('stackAmount'),
+            'headIcons' => [$spell->getField('iconString'), $spell->getField('stackAmount')],
             'level'     => $spell->getField('spellLevel'),
             'rangeName' => $spell->getField('rangeText', true),
             'range'     => $spell->getField('rangeMaxHostile'),
@@ -426,7 +432,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'school'    => User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Util::asHex($spell->getField('schoolMask')), Lang::getMagicSchools($spell->getField('schoolMask'))) : Lang::getMagicSchools($spell->getField('schoolMask')),
             'dispel'    => Lang::$game['dt'][$spell->getField('dispelType')],
             'mechanic'  => Lang::$game['me'][$spell->getField('mechanic')],
-        )
+        ),
+        'relTabs' => []
     );
 
     if ($spell->getField('attributes2') & 0x80000)
@@ -706,11 +713,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     $foo['name'] .= Lang::$colon.Util::ucFirst(Lang::$game['quest']).' #'.$effMV;;
                 break;
             case 28:                                        // Summon
-            case 75:                                        // Summon Totem
-            case 87:                                        // Summon Totem (slot 1)
-            case 88:                                        // Summon Totem (slot 2)
-            case 89:                                        // Summon Totem (slot 3)
-            case 90:                                        // Summon Totem (slot 4)
+            case 90:                                        // Kill Credit
                 $_ = Lang::$game['npc'].' #'.$effMV;
                 $summon = new CreatureList(array(['ct.id', $effMV]));
                 if (!$summon->error)
@@ -759,18 +762,17 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 break;
             case 50:                                        // Trans Door
             case 76:                                        // Summon Object (Wild)
-            case 86:                                        // Activate Object
+            // case 86:                                        // Activate Object
             case 104:                                       // Summon Object (slot 1)
             case 105:                                       // Summon Object (slot 2)
             case 106:                                       // Summon Object (slot 3)
             case 107:                                       // Summon Object (slot 4)
-                // todo (low): create go/modelviewer-data
                 $_ = Util::ucFirst(Lang::$game['gameObject']).' #'.$effMV;
-                $n = GameObjectList::getName($effMV); // $summon = new GameObjectList(array(['go.id', $effMV]));
-                if ($n/*!$summon->error*/)
+                $summon = new GameObjectList(array(['o.id', $effMV]));
+                if (!$summon->error)
                 {
-                    $_ = '(<a href="?object='.$effMV.'">'.$n/*$summon->getField('name', true)*/.'</a>)';
-                    //$pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon->getRandomModelId()];
+                    $_ = '(<a href="?object='.$effMV.'">'.$summon->getField('name', true).'</a>)';
+                    $pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_OBJECT, 'displayId' => $summon->getField('displayId')];
                 }
 
                 $foo['name'] .= Lang::$colon.$_;
@@ -894,7 +896,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                                 );
 
                                 if ($st['creatureType'] > 0)
-                                    $pageData['infobox'][] = '[li]'.Lang::$game['type'].Lang::$colon.Lang::$game['ct'][$st['creatureType']].'[/li]';
+                                    $pageData['page']['infobox'][] = '[li]'.Lang::$game['type'].Lang::$colon.Lang::$game['ct'][$st['creatureType']].'[/li]';
 
                                 if ($_ = Util::localizedString($st, 'name'))
                                     $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
@@ -1070,7 +1072,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             unset($foo['value']);
     }
 
-    $pageData['infobox'] = !empty($pageData['infobox']) ? '[ul]'.implode('', $pageData['infobox']).'[/ul]' : null;
+    $pageData['page']['infobox'] = !empty($pageData['page']['infobox']) ? '[ul]'.implode('', $pageData['page']['infobox']).'[/ul]' : null;
 
     unset($foo);                                            // clear reference
 
@@ -1315,6 +1317,30 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $ubItems->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
     }
 
+    // tab: used by - object
+    $conditions = array(
+        'OR',
+        ['onUseSpell', $spell->id], ['onSuccessSpell', $spell->id],
+        ['auraSpell',  $spell->id], ['triggeredSpell', $spell->id]
+    );
+
+    $ubObjects = new GameObjectList($conditions);
+    if (!$ubObjects->error)
+    {
+        $pageData['relTabs'][] = array(
+            'file'   => 'object',
+            'data'   => $ubObjects->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'used-by-object',
+                'name' => '$LANG.tab_usedby'
+            ]
+        );
+
+        $ubObjects->addGlobalsToJScript($smarty);
+    }
+
+    // tab: criteria of
     $conditions = array(
         ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET,     ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2,     ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL,
                      ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2,         ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL]
@@ -1728,22 +1754,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 }
 
 
-// menuId 1: Spell    g_initPath()
-//  tabId 0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => $pageData['title'].' - '.Util::ucFirst(Lang::$game['spell']),
-    'path'   => $pageData['path'],
-    'tab'    => 0,
-    'type'   => TYPE_SPELL,
-    'typeId' => $_id,
-    'reqJS'  => array(
-        $pageData['buttons'][BUTTON_VIEW3D] ? 'template/js/swfobject.js' : null
-    )
-));
-$smarty->assign('redButtons', $pageData['buttons']);
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_SPELL, $_id));         // comments, screenshots, videos
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$spell, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
 $smarty->display('spell.tpl');

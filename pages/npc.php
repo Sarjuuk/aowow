@@ -82,7 +82,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if (count($maps) == 1)                                   // should only exist in one instance
     {
         $map = new ZoneList(array(1, ['mapId', $maps[0]]));
-        // $mapType = $map->getField('areaType');
+        // $mapType = $map->getField('areaType');       //NYI
     }
 
     /***********/
@@ -128,13 +128,17 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($_ = intVal(($npc->getField('minGold') + $npc->getField('maxGold')) / 2))
         $infobox[] = Lang::$npc['worth'].Lang::$colon.'[tooltip=tooltip_avgmoneydropped][money='.$_.'][/tooltip]';
 
+    // is Vehicle
+    if ($npc->getField('vehicleId'))
+        $infobox[] = Lang::$npc['vehicle'];
+
     // AI
     if (User::isInGroup(U_GROUP_STAFF))
     {
-        if ($_ = $npc->getField('aiName'))
-            $infobox[] = 'AI'.Lang::$colon.$_;
-        else if ($_ = $npc->getField('scriptName'))
+        if ($_ = $npc->getField('scriptName'))
             $infobox[] = 'Script'.Lang::$colon.$_;
+        else if ($_ = $npc->getField('aiName'))
+            $infobox[] = 'AI'.Lang::$colon.$_;
     }
 
     $_nf = function ($num) { return number_format($num, 0, '', '.'); };
@@ -298,7 +302,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             {
                 // fixup .. either set %s for emotes or dont >.<
                 $text = Util::localizedString($t, 'text');
-                if (in_array($t['type'], [2, 3, 16, 41]) && strpos($text, '%s') === false)
+                if (in_array($t['type'], [2, 16]) && strpos($text, '%s') === false)
                     $text = '%s '.$text;
 
                 $line = array(
@@ -367,11 +371,150 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // tab: SAI
         // hmm, how should this loot like
 
-    // tab: abilities
-        // for spell in template and smartScripts if set
+    // tab: abilities / tab_controlledabilities (dep: VehicleId)
+    // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
+    $smartSpells = DB::Aowow()->selectCol('SELECT action_param1 FROM smart_scripts WHERE source_type = 0 AND action_type IN (11, 75, 85, 86) AND entryOrGUID = ?d', $_id);
+    $tplSpells   = [];
+    $conditions  = [['id', $smartSpells]];
+
+    for ($i = 1; $i < 9; $i++)
+        if ($_ = $npc->getField('spell'.$i))
+            $tplSpells[] = $_;
+
+    if ($tplSpells)
+    {
+        $conditions[] = ['id', $tplSpells];
+        $conditions[] = 'OR';
+    }
+
+    if ($tplSpells || $smartSpells)
+    {
+        $abilities = new SpellList($conditions);
+        if (!$abilities->error)
+        {
+            $abilities->addGlobalsToJScript(Util::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $normal    = $abilities->getListviewData();
+            $controled = [];
+
+            if ($npc->getField('vehicleId'))                    // not quite right. All seats should be checked for allowed-to-cast-flag-something
+            {
+                foreach ($normal as $id => $values)
+                {
+                    if (in_array($id, $smartSpells))
+                        continue;
+
+                    $controled[$id] = $values;
+                    unset($normal[$id]);
+                }
+            }
+
+            if ($normal)
+                $pageData['relTabs'][] = array(
+                    'file'   => 'spell',
+                    'data'   => $normal,
+                    'params' => [
+                        'tabs'        => '$tabsRelated',
+                        'name'        => '$LANG.tab_abilities',
+                        'id'          => 'abilities'
+                    ]
+                );
+
+            if ($controled)
+                $pageData['relTabs'][] = array(
+                    'file'   => 'spell',
+                    'data'   => $controled,
+                    'params' => [
+                        'tabs'        => '$tabsRelated',
+                        'name'        => '$LANG.tab_controlledabilities',
+                        'id'          => 'controlled-abilities'
+                    ]
+                );
+        }
+    }
+
+    // tab: summoned by
+    $conditions = array(
+        'OR',
+        ['AND', ['effect1Id', 28], ['effect1MiscValue', $_id]],
+        ['AND', ['effect2Id', 28], ['effect2MiscValue', $_id]],
+        ['AND', ['effect3Id', 28], ['effect3MiscValue', $_id]]
+    );
+
+    $summoned = new SpellList($conditions);
+    if (!$summoned->error)
+    {
+        $summoned->addGlobalsToJscript(Util::$pageTemplate);
+
+        $pageData['relTabs'][] = array(
+            'file'   => 'spell',
+            'data'   => $summoned->getListviewData(),
+            'params' => [
+                'tabs'      => '$tabsRelated',
+                'name'      => '$LANG.tab_summonedby',
+                'id'        => 'summoned-by'
+            ]
+        );
+    }
+
 
     // tab: teaches
-        // pet spells, class spells, trade spells
+    if ($npc->getField('npcflag') & NPC_FLAG_TRAINER)
+    {
+        $teachQuery = 'SELECT IFNULL(t2.spell, t1.spell) AS ARRAY_KEY,                      IFNULL(t2.spellcost, t1.spellcost) AS cost,  IFNULL(t2.reqskill, t1.reqskill) AS reqSkillId,
+                                               IFNULL(t2.reqskillvalue, t1.reqskillvalue) AS reqSkillValue,  IFNULL(t2.reqlevel, t1.reqlevel) AS reqLevel
+                                        FROM npc_trainer t1 LEFT JOIN npc_trainer t2 ON t2.entry = IF(t1.spell < 0, -t1.spell, null) WHERE t1.entry = ?d';
+
+        if ($tSpells = DB::Aowow()->select($teachQuery, $_id))
+        {
+            $teaches = new SpellList(array(['id', array_keys($tSpells)]));
+            if (!$teaches->error)
+            {
+                $teaches->addGlobalsToJscript(Util::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $data = $teaches->getListviewData();
+
+                $extra = [];
+                foreach ($tSpells as $sId => $train)
+                {
+                    if (empty($data[$sId]))
+                        continue;
+
+                    if ($_ = $train['reqSkillId'])
+                    {
+                        Util::$pageTemplate->extendGlobalIds(TYPE_SKILL, $_);
+                        if (!isset($extra[0]))
+                            $extra[0] = 'Listview.extraCols.condition';
+
+                        $data[$sId]['condition'] = ['type' => TYPE_SKILL, 'typeId' => $_, 'status' => 1, 'reqSkillLvl' => $train['reqSkillValue']];
+                    }
+
+                    if ($_ = $train['reqLevel'])
+                    {
+                        if (!isset($extra[1]))
+                            $extra[1] = "Listview.funcBox.createSimpleCol('reqLevel', LANG.tooltip_reqlevel, '7%', 'reqLevel')";
+
+                        $data[$sId]['reqLevel'] = $_;
+                    }
+
+                    if ($_ = $train['cost'])
+                        $data[$sId]['trainingcost'] = $_;
+                }
+
+                $pageData['relTabs'][] = array(
+                    'file'   => 'spell',
+                    'data'   => $data,
+                    'params' => [
+                        'tabs'        => '$tabsRelated',
+                        'name'        => '$LANG.tab_teaches',
+                        'id'          => 'teaches',
+                        'visibleCols' => "$['trainingcost']",
+                        'extraCols'   => $extra ? '$['.implode(', ', $extra).']' : null
+                    ]
+                );
+            }
+        }
+        else
+            Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'NPC '.$_id.' is flagged as trainer, but doesn\'t have any spells set');
+    }
 
     // tab: sells
     if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv  WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id = ?d', $_id, $_id))
@@ -495,44 +638,38 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // tab: starts quest (questrelation)
-    if ($starts = DB::Aowow()->selectCol('SELECT quest FROM creature_questrelation WHERE id = ?d', $_id))
+    // tab: starts quest
+    $starts = new QuestList(array(['npcStart.id', $_id]));
+    if (!$starts->error)
     {
-        $started = new QuestList(array(['id', $starts]));
-        if (!$started->error)
-        {
-            $started->addGlobalsToJScript(Util::$pageTemplate);
+        $starts->addGlobalsToJScript(Util::$pageTemplate);
 
-            $pageData['relTabs'][] = array(
-                'file'   => 'quest',
-                'data'   => $started->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
-                    'name' => '$LANG.tab_starts',
-                    'id'   => 'starts'
-                ]
-            );
-        }
+        $pageData['relTabs'][] = array(
+            'file'   => 'quest',
+            'data'   => $starts->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'name' => '$LANG.tab_starts',
+                'id'   => 'starts'
+            ]
+        );
     }
 
-    // tab: ends quest (involvedrelation)
-    if ($ends = DB::Aowow()->selectCol('SELECT quest FROM creature_involvedrelation WHERE id = ?d', $_id))
+    // tab: ends quest
+    $ends = new QuestList(array(['npcEnd.id', $_id]));
+    if (!$ends->error)
     {
-        $ended = new QuestList(array(['id', $ends]));
-        if (!$ended->error)
-        {
-            $ended->addGlobalsToJScript(Util::$pageTemplate);
+        $ends->addGlobalsToJScript(Util::$pageTemplate);
 
-            $pageData['relTabs'][] = array(
-                'file'   => 'quest',
-                'data'   => $ended->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
-                    'name' => '$LANG.tab_ends',
-                    'id'   => 'ends'
-                ]
-            );
-        }
+        $pageData['relTabs'][] = array(
+            'file'   => 'quest',
+            'data'   => $ends->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'name' => '$LANG.tab_ends',
+                'id'   => 'ends'
+            ]
+        );
     }
 
     // tab: objective of quest

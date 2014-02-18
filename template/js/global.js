@@ -5731,6 +5731,8 @@ Listview.extraCols = {
         },
         getState: function(cond) {
             switch (g_types[cond.type]) {
+                case 'skill':
+                    return Listview.extraCols.condition.getSkillState(cond);
                 case 'spell':
                     return Listview.extraCols.condition.getSpellState(cond);
                 case 'item':
@@ -5744,6 +5746,26 @@ Listview.extraCols = {
                 default:
                     return {};
             }
+        },
+        getSkillState: function(cond) {
+            if (!cond.typeId || !g_skills[cond.typeId]) {
+                return;
+            }
+
+            var
+                cnd  = {},
+                item = g_skills[cond.typeId];
+
+            cnd.icon  = item.icon.toLowerCase();
+            cnd.state = cond.status ? $WH.ct(LANG.pr_note_known) : $WH.ct(LANG.pr_note_missing);
+            cnd.color = cond.status ? 'q2' : 'q10';
+            cnd.name  = item['name_' + g_locale.name];
+            cnd.url   = '?skill=' + cond.typeId;
+
+            if (cond.reqSkillLvl)
+                cnd.name += ' (' + cond.reqSkillLvl + ')';
+
+            return cnd;
         },
         getSpellState: function(cond) {
             if (!cond.typeId || !g_spells[cond.typeId]) {

@@ -47,7 +47,7 @@ foreach ($datasets as $data)
             else if (file_exists('datasets/'.$data.$params))
                 echo file_get_contents('datasets/'.$data.$params);
             else if ($AoWoWconf['debug'])
-                echo "/* could not fetch static data: ".$data.$params." for locale: ".User::$localeString." */";
+                echo "alert('could not fetch static data: ".$data.$params." for locale: ".User::$localeString."');";
             echo "\n\n";
             break;
         default:
