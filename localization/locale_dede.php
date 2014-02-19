@@ -277,7 +277,6 @@ $lang = array(
         'capturePoint'  => "Eroberungspunkt"
     ),
     'npc'   => array(
-        'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rar", 2 => "Rar Elite", 3 => "Boss"],
         'classification'=> "Einstufung",
         'petFamily'     => "Tierart",
         'react'         => "Reaktion",
@@ -289,6 +288,11 @@ $lang = array(
         'repWith'       => "Ruf mit der Fraktion",
         'stopsAt'       => "Stoppt bei %s",
         'vehicle'       => "Fahrzeug",
+        'stats'         => "Werte",
+        'melee'         => "Nahkampf",
+        'ranged'        => "Fernkampf",
+        'armor'         => "Rüstung",
+        'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rar", 2 => "Rar Elite", 3 => "Boss"],
         'textTypes'     => [null, "schreit", "sagt", "flüstert"],
         'modes'         => array(
             1 => ["Normal", "Heroisch"],

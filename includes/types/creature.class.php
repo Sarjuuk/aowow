@@ -17,8 +17,8 @@ class CreatureList extends BaseType
     public          $queryOpts = array(
                         'ct'     => [['ft', 'clsMin', 'clsMax', 'qr']],
                         'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.factionA', 's' => ', ft.*'],
-                        'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', CASE ct.exp WHEN 0 THEN clsMin.basehp0 * healthMod WHEN 1 THEN clsMin.basehp1 * healthMod ELSE clsMin.basehp2 * healthMod END AS healthMin, clsMin.baseMana * manaMod AS manaMin'],
-                        'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', CASE ct.exp WHEN 0 THEN clsMax.basehp0 * healthMod WHEN 1 THEN clsMax.basehp1 * healthMod ELSE clsMax.basehp2 * healthMod END AS healthMax, clsMax.baseMana * manaMod AS manaMax'],
+                        'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', clsMin.attackpower AS mleAtkPwrMin, clsMin.rangedattackpower AS rngAtkPwrMin, clsMin.baseArmor * armorMod AS armorMin, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * dmgMultiplier AS dmgMin, (CASE ct.exp WHEN 0 THEN clsMin.basehp0 WHEN 1 THEN clsMin.basehp1 ELSE clsMin.basehp2 END) * healthMod AS healthMin, clsMin.baseMana * manaMod AS manaMin'],
+                        'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', clsMax.attackpower AS mleAtkPwrMax, clsMax.rangedattackpower AS rngAtkPwrMax, clsMax.baseArmor * armorMod AS armorMax, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * dmgMultiplier AS dmgMax, (CASE ct.exp WHEN 0 THEN clsMax.basehp0 WHEN 1 THEN clsMax.basehp1 ELSE clsMax.basehp2 END) * healthMod AS healthMax, clsMax.baseMana * manaMod AS manaMax'],
                         'qr'     => ['j' => ['creature_questrelation qr ON qr.id = ct.id', true], 's' => ', qr.quest', 'g' => 'ct.id'],          // start
                         'ir'     => ['j' => ['creature_involvedrelation ir ON ir.id = ct.id', true]],                                            // end
                         'qtqr'   => ['j' => 'quest_template qtqr ON qr.quest = qtqr.id'],
@@ -115,6 +115,37 @@ class CreatureList extends BaseType
             $data = $totems[$data[0]];
 
         return !$data ? 0 : $data[array_rand($data)];
+    }
+
+    public function getBaseStats($type)
+    {
+        // unsure of implementation: creature_classlevestats just got reworked
+
+        switch ($type)
+        {
+            case 'health':
+                $hMin = $this->getField('healthMin');
+                $hMax = $this->getField('healthMax');
+                return [$hMin, $hMax];
+            case 'power':
+                $mMin = $this->getField('manaMin');
+                $mMax = $this->getField('manaMax');
+                return [$mMin, $mMax];
+            case 'armor':
+                $aMin = $this->getField('armorMin');
+                $aMax = $this->getField('armorMax');
+                return [$aMin, $aMax];
+            case 'melee':
+                $mleMin =  $this->getField('dmgMin') + $this->getField('mleAtkPwrMin') / 7;
+                $mleMax = ($this->getField('dmgMax') + $this->getField('mleAtkPwrMax') / 7) * 1.5;
+                return [$mleMin, $mleMax];
+            case 'ranged':
+                $rngMin =  $this->getField('dmgMin') + $this->getField('rngAtkPwrMin') / 7;
+                $rngMax = ($this->getField('dmgMax') + $this->getField('rngAtkPwrMax') / 7) * 1.5;
+                return [$rngMin, $rngMax];
+            default:
+                return [0, 0];
+        }
     }
 
     public function getListviewData($addInfoMask = 0x0)

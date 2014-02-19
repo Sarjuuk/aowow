@@ -235,7 +235,6 @@ $lang = array(
         'capturePoint'  => "Punto de captura"
     ),
     'npc'   => array(
-        'rank'          => [0 => "Normal", 1 => "Élite", 4 => "Raro", 2 => "Élite raro", 3 => "Jefe"],
         'classification'=> "Clasificación",
         'petFamily'     => "Familia de mascota",
         'react'         => "Reacción",
@@ -247,6 +246,11 @@ $lang = array(
         'repWith'       => "reputación con",
         'stopsAt'       => "se detiene en %s",
         'vehicle'       => "Vehículo",
+        'stats'         => "Estadisticas",
+        'melee'         => "Cuerpo a cuerpo",
+        'ranged'        => "Ataque a distancia",
+        'armor'         => "Armadura",
+        'rank'          => [0 => "Normal", 1 => "Élite", 4 => "Raro", 2 => "Élite raro", 3 => "Jefe"],
         'textTypes'     => [null, "grita", "dice", "susurra"],
         'modes'         => array(
             1 => ["Normal", "Heroico"],

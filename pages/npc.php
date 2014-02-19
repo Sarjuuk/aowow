@@ -76,14 +76,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $_altNPCs = new CreatureList(array(['id', array_keys($_altIds)]));
     }
 
-    // map mode
     $mapType = 0;
-    $maps = DB::Aowow()->selectCol('SELECT DISTINCT map from creature WHERE id = ?d', $_id);
-    if (count($maps) == 1)                                   // should only exist in one instance
-    {
-        $map = new ZoneList(array(1, ['mapId', $maps[0]]));
+    if (count($_altIds) > 1)                                // temp until zones..
+        $mapType = 2;
+    else if (count($_altIds) == 1)
+        $mapType = 1;
+
+    // map mode
+    // $maps = DB::Aowow()->selectCol('SELECT DISTINCT map from creature WHERE id = ?d', $_id);
+    // if (count($maps) == 1)                                   // should only exist in one instance
+    // {
+        // $map = new ZoneList(array(1, ['mapId', $maps[0]]));
         // $mapType = $map->getField('areaType');       //NYI
-    }
+    // }
 
     /***********/
     /* Infobox */
@@ -141,59 +146,80 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $infobox[] = 'AI'.Lang::$colon.$_;
     }
 
-    $_nf = function ($num) { return number_format($num, 0, '', '.'); };
-
+    // > Stats
+    $_nf     = function ($num) { return number_format($num, 0, '', '.'); };
+    $stats   = [];
+    $modes   = [];                                          // get difficulty versions if set
+    $hint    = '[tooltip name=%3$s][table cellspacing=10][tr]%1s[/tr][/table][/tooltip][span class=tip tooltip=%3$s]%2s[/span]';
+    $modeRow = '[tr][td]%s&nbsp;&nbsp;[/td][td]%s[/td][/tr]';
     // Health
-    $health    = $npc->getField('healthMin');
-    $maxHealth = $npc->getField('healthMax');
-    $health    = $health < $maxHealth ? $_nf($health).' - '.$_nf($maxHealth) : $_nf($health);
+    $health = $npc->getBaseStats('health');
+    $stats['health'] = Util::ucFirst(Lang::$spell['powerTypes'][-2]).Lang::$colon.($health[0] < $health[1] ? $_nf($health[0]).' - '.$_nf($health[1]) : $_nf($health[0]));
 
-    $modes = [];
-    $tipp  = '[tooltip name=healthModes][table cellspacing=10][tr]%s[/tr][/table][/tooltip][span class=tip tooltip=healthModes]%s[/span]';
+    // Mana (may be 0)
+    $mana = $npc->getBaseStats('power');
+    $stats['mana'] = $mana[0] ? Lang::$spell['powerTypes'][0].Lang::$colon.($mana[0] < $mana[1] ? $_nf($mana[0]).' - '.$_nf($mana[1]) : $_nf($mana[0])) : null;
+
+    // Armor
+    $armor = $npc->getBaseStats('armor');
+    $stats['armor'] = Lang::$npc['armor'].Lang::$colon.($armor[0] < $armor[1] ? $_nf($armor[0]).' - '.$_nf($armor[1]) : $_nf($armor[0]));
+
+    // Melee Damage
+    $melee = $npc->getBaseStats('melee');
+    if ($_ = $npc->getField('dmgSchool'))                   // magic damage
+        $stats['melee'] = Lang::$npc['melee'].Lang::$colon.$_nf($melee[0]).' - '.$_nf($melee[1]).' ('.Lang::$game['sc'][$_].')';
+    else                                                    // phys. damage
+        $stats['melee'] = Lang::$npc['melee'].Lang::$colon.$_nf($melee[0]).' - '.$_nf($melee[1]);
+
+    // Ranged Damage
+    $ranged = $npc->getBaseStats('ranged');
+    $stats['ranged'] = Lang::$npc['ranged'].Lang::$colon.$_nf($ranged[0]).' - '.$_nf($ranged[1]);
+
     if ($mapType == 1 || $mapType == 2)                     // Dungeon or Raid
     {
-        foreach ($_altIds as $mode => $id)
+        foreach ($_altIds as $id => $mode)
         {
             foreach ($_altNPCs->iterate() as $dId => $__)
             {
                 if ($dId != $id)
                     continue;
 
-                $hp    = $_altNPCs->getField('healthMin');
-                $hpMax = $_altNPCs->getField('healthMax');
-                $hp    = $hp < $hpMax ? $_nf($hp).' - '.$_nf($hpMax) : $_nf($hp);
+                $m = Lang::$npc['modes'][$mapType][$mode];
 
-                $modes[] = '[tr][td]'.Lang::$npc['modes'][$mapType][$mode].'&nbsp;&nbsp;[/td][td]'.$hp.'[/td][/tr]';
-                break;
+                // Health
+                $health = $_altNPCs->getBaseStats('health');
+                $modes['health'][] = sprintf($modeRow, $m, $health[0] < $health[1] ? $_nf($health[0]).' - '.$_nf($health[1]) : $_nf($health[0]));
+
+                // Mana (may be 0)
+                $mana = $_altNPCs->getBaseStats('power');
+                $modes['mana'][] = $mana[0] ? sprintf($modeRow, $m, $mana[0] < $mana[1] ? $_nf($mana[0]).' - '.$_nf($mana[1]) : $_nf($mana[0])) : null;
+
+                // Armor
+                $armor = $_altNPCs->getBaseStats('armor');
+                $modes['armor'][] = sprintf($modeRow, $m, $armor[0] < $armor[1] ? $_nf($armor[0]).' - '.$_nf($armor[1]) : $_nf($armor[0]));
+
+                // Melee Damage
+                $melee = $_altNPCs->getBaseStats('melee');
+                if ($_ = $_altNPCs->getField('dmgSchool'))  // magic damage
+                    $modes['melee'][] = sprintf($modeRow, $m, $_nf($melee[0]).' - '.$_nf($melee[1]).' ('.Lang::$game['sc'][$_].')');
+                else                                        // phys. damage
+                    $modes['melee'][] = sprintf($modeRow, $m, $_nf($melee[0]).' - '.$_nf($melee[1]));
+
+                // Ranged Damage
+                $ranged = $_altNPCs->getBaseStats('ranged');
+                $modes['ranged'][] = sprintf($modeRow, $m, $_nf($ranged[0]).' - '.$_nf($ranged[1]));
             }
         }
-
-        if ($modes)
-            $health = Lang::$spell['powerTypes'][-2].' ('.Lang::$npc['modes'][$mapType][0].')'.Lang::$colon.$health;
     }
 
     if ($modes)
-        $infobox[] = sprintf($tipp, implode('[/tr][tr]', $modes), $health);
-    else
-        $infobox[] = Lang::$spell['powerTypes'][-2].Lang::$colon.$health;
+        foreach ($stats as $k => $v)
+            if ($v)
+                $stats[$k] = sprintf($hint, implode('[/tr][tr]', $modes[$k]), $v, $k);
 
-    // Mana
-    $mana    = $npc->getField('manaMin');
-    $maxMana = $npc->getField('manaMax');
-    if ($maxMana)
-    {
-        $mana      = $mana < $maxMana ? $_nf($mana).' - '.$_nf($maxMana) : $_nf($mana);
-        $infobox[] = Lang::$spell['powerTypes'][0].Lang::$colon.$mana;
-    }
-
-
-/*
-        if damage
-            <li><div>{#Damage#}: {$npc.mindmg} - {$npc.maxdmg}</div></li>
-
-        if armor
-            <li><div>{#Armor#}: {$npc.armor}</div></li>
-*/
+    // < Stats
+    if ($stats)
+        $infobox[] = Lang::$npc['stats'].($modes ? ' ('.Lang::$npc['modes'][$mapType][0].')' : null).Lang::$colon.'[ul][li]'.implode('[/li][li]', $stats).'[/li][/ul]';
 
 
     /****************/

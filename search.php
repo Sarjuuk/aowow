@@ -281,7 +281,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     if ($searchMask & 0x0000020)
     {
         // ['item1', 0, '!'],                               // remove empty sets from search, set in cuFlags
-        $cnd = array_merge($cndBase, is_int($query) ? ['id', $query] : ['name_loc'.User::$localeId, $query]);
+        $cnd = array_merge($cndBase, [is_int($query) ? ['id', $query] : ['name_loc'.User::$localeId, $query]]);
 
         $sets = new ItemsetList($cnd);
 
