@@ -713,8 +713,10 @@ Mapper.prototype = {
                 this.sZoom.style.display = 'none';
         }
 
+/*  sarjuuk: thats one feature i never understood. the inflatable map is superior to the popup in every way possible
         if(this.zoom)
             MapViewer.show({ mapper: this });
+*/
     },
 
     getShow: function() { return this.show; },

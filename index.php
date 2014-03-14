@@ -55,6 +55,8 @@ switch ($pageCall)
     case 'races':
     case 'skill':
     case 'skills':
+    // case 'sound':                                        // db: sounds for zone, creature, spell, ...
+    // case 'sounds':
     case 'spell':
     case 'spells':
     case 'title':
@@ -73,23 +75,26 @@ switch ($pageCall)
         require 'pages/talent.php';
         break;
     /* called by script */
-    case 'contactus':
-        if ($pageCall == 'contactus')
+    case 'cookie':                                          // lossless cookies and user settings
+        if (User::$id && $pageParam && !empty($_GET[$pageParam]))
         {
-            // 0:ok; 1:captchaInvalid; 2:tooLong; 3:noReasonGiven; 7:alreadyReported; other:prints String
-            die("not yet implemented:\n".print_r($_POST));
+            // don't panic .. again .... it get's escaped
+            if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $pageParam, urldecode($_GET[$pageParam])))
+                die('0');                                   // 0: success
+            else
+                die();
         }
+
+        break;
+    case 'contactus':
+        die("not yet implemented:\n".print_r($_POST));      // 0:ok; 1:captchaInvalid; 2:tooLong; 3:noReasonGiven; 7:alreadyReported; other:prints String
     case 'comment':
         if ($pageParam == 'rating')
-        {
-            // why is this called via index...?
             die('{"success":true,"error":"","up":7,"down":9}');
-        }
         else if ($pageParam == 'rate')
-        {
-           // 0:success, 1:ratingban, 3:rated too often
-            die('3');
-        }
+            die('3');                                       // 0:success, 1:ratingban, 3:rated too often
+
+        break;
     case 'locale':                                          // subdomain-workaround, change the language
         User::setLocale($pageParam);
         User::writeCookie();
@@ -117,13 +122,13 @@ switch ($pageCall)
     case 'build':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            require 'setup/tools/dataset-assembler/'.$pageParam.'.php';
+            require 'setup/tools/dataset/'.$pageParam.'.php';
             break;
         }
     case 'sql':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            require 'setup/tools/sql/_'.$pageParam.'.php';
+            require 'setup/tools/database/_'.$pageParam.'.php';
             break;
         }
     case 'setup':

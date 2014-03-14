@@ -16,6 +16,7 @@ $pageData      = array(
         ['path' => 'template/css/Summary_ie6.css', 'ieCond' => 'lte IE 6'],
     ),
     'reqJS'   => array(
+        'template/js/profile.js',
         'template/js/Draggable.js',
         'template/js/filters.js',
         'template/js/Summary.js',

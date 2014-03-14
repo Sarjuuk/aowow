@@ -1692,6 +1692,7 @@ function vi_appendSticky() {
         _.innerHTML = $WH.sprintf(LANG.infobox_noneyet, a + LANG.infobox_suggestone + "</a>")
     }
 }
+
 var g_videos = [];
 var VideoViewer = new function() {
     var
@@ -2087,6 +2088,553 @@ var VideoViewer = new function() {
     DomContentLoaded.addEvent(this.checkPound)
 };
 
+var Dialog = function() {
+var
+    _self = this,
+    _template,
+    _onSubmit = null,
+    _templateName,
+
+    _funcs = {},
+    _data,
+
+    _inited = false,
+    _form = $WH.ce('form'),
+    _elements = {};
+
+    _form.onsubmit = function() {
+        _processForm();
+        return false
+    };
+
+    this.show = function(template, opt) {
+        if (template) {
+            _templateName = template;
+            _template = Dialog.templates[_templateName];
+            _self.template = _template;
+        }
+        else {
+            return;
+        }
+
+        if (_template.onInit && !_inited) {
+            (_template.onInit.bind(_self, _form, opt))();
+        }
+
+        if (opt.onBeforeShow) {
+            _funcs.onBeforeShow = opt.onBeforeShow.bind(_self, _form);
+        }
+
+        if (_template.onBeforeShow) {
+            _template.onBeforeShow = _template.onBeforeShow.bind(_self, _form);
+        }
+
+        if (opt.onShow) {
+            _funcs.onShow = opt.onShow.bind(_self, _form);
+        }
+
+        if (_template.onShow) {
+            _template.onShow = _template.onShow.bind(_self, _form);
+        }
+
+        if (opt.onHide) {
+            _funcs.onHide = opt.onHide.bind(_self, _form);
+        }
+
+        if (_template.onHide) {
+            _template.onHide = _template.onHide.bind(_self, _form);
+        }
+
+        if (opt.onSubmit) {
+            _funcs.onSubmit = opt.onSubmit;
+        }
+
+        if (_template.onSubmit)
+            _onSubmit = _template.onSubmit.bind(_self, _form);
+
+        if (opt.data) {
+            _inited = false;
+            _data = {};
+            $WH.cO(_data, opt.data);
+        }
+        _self.data = _data;
+
+        Lightbox.show('dialog-' + _templateName, {
+            onShow: _onShow,
+            onHide: _onHide
+        });
+    };
+
+    this.getValue = function(id) {
+        return _getValue(id);
+    };
+
+    this.setValue = function(id, value) {
+        _setValue(id, value);
+    };
+
+    this.getSelectedValue = function(id) {
+        return _getSelectedValue(id);
+    };
+
+    this.getCheckedValue = function(id) {
+        return _getCheckedValue(id);
+    };
+
+    function _onShow(dest, first) {
+        if (first || !_inited) {
+            _initForm(dest);
+        }
+
+        if (_template.onBeforeShow) {
+            _template.onBeforeShow();
+        }
+
+        if (_funcs.onBeforeShow) {
+            _funcs.onBeforeShow();
+        }
+
+        Lightbox.setSize(_template.width, _template.height);
+        dest.className = 'dialog';
+
+        _updateForm();
+
+        if (_template.onShow) {
+            _template.onShow();
+        }
+
+        if (_funcs.onShow) {
+            _funcs.onShow();
+        }
+    }
+
+    function _initForm(dest) {
+        $WH.ee(dest);
+        $WH.ee(_form);
+
+        var container = $WH.ce('div');
+        container.className = 'text';
+        $WH.ae(dest, container);
+        $WH.ae(container, _form);
+        if (_template.title) {
+            var h = $WH.ce('h1');
+            $WH.ae(h, $WH.ct(_template.title));
+            $WH.ae(_form, h);
+        }
+
+        var
+            t         = $WH.ce('table'),
+            tb        = $WH.ce('tbody'),
+            mergeCell = false;
+
+        $WH.ae(t, tb);
+        $WH.ae(_form, t);
+
+        for (var i = 0, len = _template.fields.length; i < len; ++i) {
+            var
+                field = _template.fields[i],
+                element;
+
+            if (!mergeCell) {
+                tr = $WH.ce('tr');
+                th = $WH.ce('th');
+                td = $WH.ce('td');
+            }
+
+            field.__tr = tr;
+
+            if (_data[field.id] == null) {
+                _data[field.id] = (field.value ? field.value: '');
+            }
+
+            var options;
+            if (field.options) {
+                options = [];
+
+                if (field.optorder) {
+                    $WH.cO(options, field.optorder);
+                }
+                else {
+                    for (var j in field.options) {
+                        options.push(j);
+                    }
+                }
+
+                if (field.sort) {
+                    options.sort(function(a, b) {
+                        return field.sort * $WH.strcmp(field.options[a], field.options[b]);
+                    });
+                }
+            }
+
+            switch (field.type) {
+                case 'caption':
+                    th.colSpan = 2;
+                    th.style.textAlign = 'left';
+                    th.style.padding = 0;
+
+                    if (field.compute) {
+                        (field.compute.bind(_self, null, _data[field.id], _form, th, tr))();
+                    }
+                    else if (field.label) {
+                        $WH.ae(th, $WH.ct(field.label));
+                    }
+
+                    $WH.ae(tr, th);
+                    $WH.ae(tb, tr);
+
+                    continue;
+                    break;
+                case 'textarea':
+                    var f = element = $WH.ce('textarea');
+
+                    f.name = field.id;
+
+                    if (field.disabled) {
+                        f.disabled = true;
+                    }
+
+                    f.rows = field.size[0];
+                    f.cols = field.size[1];
+                    td.colSpan = 2;
+
+                    if (field.label) {
+                        th.colSpan = 2;
+                        th.style.textAlign = 'left';
+                        th.style.padding = 0;
+                        td.style.padding = 0;
+
+                        $WH.ae(th, $WH.ct(field.label));
+                        $WH.ae(tr, th);
+                        $WH.ae(tb, tr);
+
+                        tr = $WH.ce('tr');
+                    }
+                    $WH.ae(td, f);
+
+                    break;
+                case 'select':
+
+                    var f = element = $WH.ce('select');
+
+                    f.name = field.id;
+
+                    if (field.size) {
+                        f.size = field.size;
+                    }
+
+                    if (field.disabled) {
+                        f.disabled = true;
+                    }
+
+                    if (field.multiple) {
+                        f.multiple = true;
+                    }
+
+                    for (var j = 0, len2 = options.length; j < len2; ++j) {
+                        var o = $WH.ce('option');
+
+                        o.value = options[j];
+
+                        $WH.ae(o, $WH.ct(field.options[options[j]]));
+                        $WH.ae(f, o)
+                    }
+
+                    $WH.ae(td, f);
+
+                    break;
+                case 'dynamic':
+                    td.colSpan = 2;
+                    td.style.textAlign = 'left';
+                    td.style.padding = 0;
+
+                    if (field.compute)
+                        (field.compute.bind(_self, null, _data[field.id], _form, td, tr))();
+
+                    $WH.ae(tr, td);
+                    $WH.ae(tb, tr);
+
+                    element = td;
+
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    var k = 0;
+                    element = [];
+                    for (var j = 0, len2 = options.length; j < len2; ++j) {
+                        var
+                            s = $WH.ce('span'),
+                            f,
+                            l,
+                            uniqueId = 'sdfler46' + field.id + '-' + options[j];
+
+                        if (j > 0 && !field.noInputBr) {
+                            $WH.ae(td, $WH.ce('br'));
+                        }
+                        if ($WH.Browser.ie6 && field.type == 'radio') {
+                            l = $WH.ce("<label for='' + uniqueId + '' onselectstart='return false' />");
+                            f = $WH.ce("<input type='' + field.type + '' name='' + field.id + '' />");
+                        }
+                        else {
+                            l = $WH.ce('label');
+                            l.setAttribute('for', uniqueId);
+                            l.onmousedown = $WH.rf;
+
+                            f = $WH.ce('input');
+                            f.setAttribute('type', field.type);
+                            f.name = field.id;
+                        }
+                        f.value = options[j];
+                        f.id = uniqueId;
+
+                        if (field.disabled) {
+                            f.disabled = true;
+                        }
+                        if (field.submitOnDblClick) {
+                            l.ondblclick = f.ondblclick = function(e) {
+                                _processForm();
+                            };
+                        }
+
+                        if (field.compute) {
+                            (field.compute.bind(_self, f, _data[field.id], _form, td, tr))();
+                        }
+
+                        $WH.ae(l, f);
+                        $WH.ae(l, $WH.ct(field.options[options[j]]));
+                        $WH.ae(td, l);
+                        element.push(f);
+                    }
+                    break;
+                default: // Textbox
+                    var f = element = $WH.ce('input');
+                    f.name = field.id;
+
+                    if (field.size) {
+                        f.size = field.size;
+                    }
+
+                    if (field.disabled) {
+                        f.disabled = true ;
+                    }
+
+                    if (field.submitOnEnter) {
+                        f.onkeypress = function(e) {
+                            e = $WH.$E(e);
+                            if (e.keyCode == 13) {
+                                _processForm();
+                            }
+                        }
+                    }
+                    f.setAttribute('type', field.type);
+                    $WH.ae(td, f);
+                    break;
+            }
+
+            if (field.label) {
+                if (field.type == 'textarea') {
+                    if (field.labelAlign) {
+                        td.style.textAlign = field.labelAlign;
+                    }
+                    td.colSpan = 2;
+                }
+                else {
+                    if (field.labelAlign) {
+                        th.style.textAlign = field.labelAlign;
+                    }
+                    $WH.ae(th, $WH.ct(field.label));
+                    $WH.ae(tr, th);
+                }
+            }
+
+            if (field.type != 'checkbox' && field.type != 'radio') {
+                if (field.width) {
+                    f.style.width = field.width;
+                }
+
+                if (field.compute  && field.type != 'caption' && field.type != 'dynamic') {
+                    (field.compute.bind(_self, f, _data[field.id], _form, td, tr))();
+                }
+            }
+
+            if (field.caption) {
+                var s = $WH.ce('small');
+                if (field.type != 'textarea')
+                    s.style.paddingLeft = '2px';
+                s.className = 'q0'; // commented in 5.0?
+                $WH.ae(s, $WH.ct(field.caption));
+                $WH.ae(td, s);
+            }
+
+            $WH.ae(tr, td);
+            $WH.ae(tb, tr);
+
+            mergeCell = field.mergeCell;
+            _elements[field.id] = element;
+        }
+
+        for (var i = _template.buttons.length; i > 0; --i) {
+            var
+                button = _template.buttons[i - 1],
+                a      = $WH.ce('a');
+
+            a.href = 'javascript:;';
+            a.onclick = _processForm.bind(a, button[0]);
+            a.className = 'dialog-' + button[0];
+            $WH.ae(a, $WH.ct(button[1]));
+            $WH.ae(dest, a);
+        }
+
+        var _ = $WH.ce('div');
+        _.className = 'clear';
+        $WH.ae(dest, _);
+
+        _inited = true;
+    }
+
+    function _updateForm() {
+        for (var i = 0, len = _template.fields.length; i < len; ++i) {
+            var
+                field = _template.fields[i],
+                f     = _elements[field.id];
+
+            switch (field.type) {
+                case 'caption': // Do nothing
+                    break;
+                case 'select':
+                    for (var j = 0, len2 = f.options.length; j < len2; j++) {
+                        f.options[j].selected = (f.options[j].value == _data[field.id] || $WH.in_array(_data[field.id], f.options[j].value) != -1);
+                    }
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    for (var j = 0, len2 = f.length; j < len2; j++) {
+                        f[j].checked = (f[j].value == _data[field.id] || $WH.in_array(_data[field.id], f[j].value) != -1);
+                    }
+                    break;
+
+                default:
+                    f.value = _data[field.id];
+                    break;
+            }
+
+            if (field.update) {
+                (field.update.bind(_self, null, _data[field.id], _form, f))();
+            }
+        }
+    }
+
+    function _onHide() {
+        if (_template.onHide) {
+            _template.onHide();
+        }
+        if (_funcs.onHide) {
+            _funcs.onHide();
+        }
+    }
+
+    function _processForm(button) {
+        // if (button == 'x') { // Special case
+        if (button == 'cancel') { // Special case
+            return Lightbox.hide();
+        }
+
+        for (var i = 0, len = _template.fields.length; i < len; ++i) {
+            var
+                field = _template.fields[i],
+                newValue;
+
+            switch (field.type) {
+                case 'caption': // Do nothing
+                    continue;
+                case 'select':
+                    newValue = _getSelectedValue(field.id);
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    newValue = _getCheckedValue(field.id);
+                    break;
+                case 'dynamic':
+                    if (field.getValue) {
+                        newValue = field.getValue(field, _data, _form);
+                        break;
+                    }
+                default:
+                    newValue = _getValue(field.id);
+                    break;
+            }
+            if (field.validate) {
+                if (!field.validate(newValue, _data, _form)) {
+                    return;
+                }
+            }
+
+            if (newValue && typeof newValue == 'string') {
+                newValue = $WH.trim(newValue);
+            }
+            _data[field.id] = newValue;
+        }
+
+        _submitData(button);
+    }
+
+    function _submitData(button) {
+        var ret;
+
+        if (_onSubmit) {
+            ret = _onSubmit(_data, button, _form);
+        }
+
+        if (_funcs.onSubmit) {
+            ret = _funcs.onSubmit(_data, button, _form);
+        }
+
+        if (ret === undefined || ret)
+            Lightbox.hide();
+
+            return false;
+    }
+
+    function _getValue(id) {
+        return _elements[id].value;
+    }
+
+    function _setValue(id, value) {
+        _elements[id].value = value;
+    }
+
+    function _getSelectedValue(id) {
+        var
+            result = [],
+            f = _elements[id];
+
+            for (var i = 0, len = f.options.length; i < len; i++) {
+            if (f.options[i].selected) {
+                result.push(parseInt(f.options[i].value) == f.options[i].value ? parseInt(f.options[i].value) : f.options[i].value);
+            }
+        }
+        if (result.length == 1) {
+            result = result[0];
+        }
+        return result;
+    }
+
+    function _getCheckedValue(id) {
+        var
+            result = [],
+            f      = _elements[id];
+
+        for (var i = 0, len = f.length; i < len; i++) {
+            if (f[i].checked) {
+                result.push(parseInt(f[i].value) == f[i].value ? parseInt(f[i].value) : f[i].value);
+            }
+        }
+
+        return result;
+    }
+};
+Dialog.templates = {};
+
 var Slider = new function() {
     var
         start,
@@ -2385,73 +2933,84 @@ var Slider = new function() {
     }
 };
 
+/*
+Global functions related to the Summary class (item comparison, item set summary)
+*/
+
 var suDialog;
-function su_addToSaved(c, d, a, e) {
-    if (!c) {
-        return
+
+function su_addToSaved(items, nItems, newWindow, level) {
+    if (!items) {
+        return;
     }
-    if (!Dialog.templates.docompare) {
-        Dialog.templates.docompare = {
-            title: LANG.dialog_compare,
-            width: 400,
-            height: 138,
-            buttons: [['okay', LANG.ok], ['cancel', LANG.cancel]],
-            fields: [{
-                id: "selecteditems",
-                type: "caption",
-                compute: function(h, g, f, i) {
-                    i.innerHTML = $WH.sprintf((g == 1 ? LANG.dialog_selecteditem: LANG.dialog_selecteditems), g)
-                }
-            },
-            {
-                id: "action",
-                type: "radio",
-                label: "",
-                value: 3,
-                submitOnDblClick: 1,
-                options: {
-                    1 : LANG.dialog_nosaveandview,
-                    2 : LANG.dialog_saveandview,
-                    3 : LANG.dialog_saveforlater
-                }
-            }]
-        }
-    }
+
     if (!suDialog) {
-        suDialog = new Dialog()
+        suDialog = new Dialog();
     }
-    var b = function(h) {
-        var g = $WH.gc("compare_groups"),
-        f = "?compare";
-        if (h.action > 1) {
-            if (g) {
-                c = g + ";" + c
+
+    var doCompare = function(data) {
+        var saved = g_getWowheadCookie('compare_groups'),
+        url = '?compare';
+
+        if (data.action > 1) { // Save
+            if (saved) {
+                items = saved + ';' + items;
             }
-            $WH.sc("compare_groups", 20, c, "/", location.hostname);
-            // $WH.sc("compare_groups", 20, c, "/", ".wowhead.com");
-            if (e) {
-                $WH.sc("compare_level", 20, e, "/", location.hostname)
-                // $WH.sc("compare_level", 20, e, "/", ".wowhead.com")
+
+            g_setWowheadCookie('compare_groups', items, true);
+
+            if (level) {
+                g_setWowheadCookie('compare_level', level, true);
             }
-        } else {
-            f += "=" + c + (e ? "&l=" + e: "")
         }
-        if (h.action < 3) {
-            if (a) {
-                window.open(f)
-            } else {
-                location.href = f
+        else { // Don't save
+            url += '=' + items + (level ? '&l=' + level : '');
+        }
+
+        if (data.action < 3) { // View now
+            if (newWindow) {
+                window.open(url);
+            }
+            else {
+                location.href = url;
             }
         }
     };
-    suDialog.show("docompare", {
-        data: {
-            selecteditems: d,
-            action: 1
-        },
-        onSubmit: b
-    })
+
+    suDialog.show('docompare', {
+        data: { selecteditems: nItems, action: 1 },
+        onSubmit: doCompare
+    });
 }
+
+Dialog.templates.docompare = {
+
+    title: LANG.dialog_compare,
+    width: 400,
+    buttons: [['okay', LANG.ok], ['cancel', LANG.cancel]],
+
+    fields: [
+        {
+            id: 'selecteditems',
+            type: 'caption',
+            compute: function(field, value, form, td) {
+                td.innerHTML = $WH.sprintf((value == 1 ? LANG.dialog_selecteditem: LANG.dialog_selecteditems), value);
+            }
+        },
+        {
+            id: 'action',
+            type: 'radio',
+            label: '',
+            value: 3,
+            submitOnDblClick: 1,
+            options: {
+                1 : LANG.dialog_nosaveandview,
+                2 : LANG.dialog_saveandview,
+                3 : LANG.dialog_saveforlater
+            }
+        }
+    ]
+};
 
 function Tabs(opt) {
     $WH.cO(this, opt);
@@ -9101,8 +9660,10 @@ Listview.templates = {
                 align: 'left',
                 value: 'name',
                 compute: function(npc, td) {
+                    var wrapper = $WH.ce('div');
+
                     if (npc.boss) {
-                        td.className = 'boss-icon-padded';
+                        wrapper.className = 'boss-icon-padded';
                     }
 
                     var a = $WH.ce('a');
@@ -9115,14 +9676,31 @@ Listview.templates = {
                         a.style.backgroundImage = "url(" + g_staticUrl + "/images/icons/quest_start.gif)";
                     }
 
-                    $WH.ae(td, a);
+                    $WH.ae(wrapper, a);
 
                     if (npc.tag != null) {
                         var d = $WH.ce('div');
                         d.className = 'small';
                         $WH.ae(d, $WH.ct('<' + npc.tag + '>'));
-                        $WH.ae(td, d);
+                        $WH.ae(wrapper, d);
                     }
+
+                    if (npc.method != null) {
+                        td.style.position = 'relative';
+
+                        var d = $WH.ce('div');
+                        d.className = 'small';
+                        d.style.fontStyle = 'italic';
+                        d.style.position = 'absolute';
+                        d.style.right = '3px';
+                        d.style.bottom = '3px';
+                        d.style.textAlign = 'right';
+
+                        $WH.ae(d, $WH.ct(npc.method ? LANG.added : LANG.lvquest_removed));
+                        $WH.ae(wrapper, d);
+                    }
+
+                    $WH.ae(td, wrapper);
                 },
                 getVisibleText: function(npc) {
                     var buff = npc.name;
@@ -9324,11 +9902,36 @@ Listview.templates = {
                 align: 'left',
                 value: 'name',
                 compute: function(object, td) {
+                    var wrapper = $WH.ce('div');
                     var a = $WH.ce('a');
+
                     a.style.fontFamily = 'Verdana, sans-serif';
                     a.href = this.getItemLink(object);
                     $WH.ae(a, $WH.ct(object.name));
-                    $WH.ae(td, a);
+
+                    if (object.hasQuests != null) {
+                        a.className += " icontiny tinyspecial";
+                        a.style.backgroundImage = "url(" + g_staticUrl + "/images/icons/quest_start.gif)";
+                    }
+
+                    $WH.ae(wrapper, a);
+
+                    if (object.method != null) {
+                        td.style.position = 'relative';
+
+                        var d = $WH.ce('div');
+                        d.className = 'small';
+                        d.style.fontStyle = 'italic';
+                        d.style.position = 'absolute';
+                        d.style.right = '3px';
+                        d.style.bottom = '3px';
+                        d.style.textAlign = 'right';
+
+                        $WH.ae(d, $WH.ct(object.method ? LANG.added : LANG.lvquest_removed));
+                        $WH.ae(wrapper, d);
+                    }
+
+                    $WH.ae(td, wrapper);
                 }
             },
             {
@@ -15679,6 +16282,100 @@ var Lightbox = new function() {
     }
 };
 
+/*
+Locale class
+*/
+
+var LOCALE_ENUS = 0;
+var LOCALE_FRFR = 2;
+var LOCALE_DEDE = 3;
+var LOCALE_ESES = 6;
+var LOCALE_RURU = 7;
+var LOCALE_PTBR = 8;
+
+var Locale = {
+
+    current: {},
+
+    // All
+    locales: {
+        0: { // English
+            id: LOCALE_ENUS,
+            name: 'enus',
+            // domain: 'www.wowhead.com',
+            description: 'English'
+        },
+        2: { // French
+            id: LOCALE_FRFR,
+            name: 'frfr',
+            // domain: 'fr.wowhead.com',
+            description: 'Fran' + String.fromCharCode(231) + 'ais'
+        },
+        3: { // German
+            id: LOCALE_DEDE,
+            name: 'dede',
+            // domain: 'de.wowhead.com',
+            description: 'Deutsch'
+        },
+        6: { // Spanish
+            id: LOCALE_ESES,
+            name: 'eses',
+            // domain: 'es.wowhead.com',
+            description: 'Espa' + String.fromCharCode(241) + 'ol'
+        },
+        8: { // Russian
+            id: LOCALE_RURU,
+            name: 'ruru',
+            // domain: 'ru.wowhead.com',
+            description: String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081)
+        }
+    },
+
+    getAll: function() {
+        var result = [];
+
+        for(var id in Locale.locales) {
+            result.push(Locale.locales[id]);
+        }
+
+        return result;
+    },
+
+    getAllByName: function() {
+        var result = Locale.getAll();
+
+        result.sort(function(a, b) {
+            return $WH.strcmp(a.description, b.description);
+        });
+
+        return result;
+    },
+
+    getId: function() {
+        return Locale.current.id;
+    },
+
+    getName: function() {
+        var localeId = Locale.getId();
+
+        return Locale.locales[localeId].name;
+    },
+
+    get: function() {
+        var localeId = Locale.getId();
+
+        return Locale.locales[localeId];
+    },
+
+    set: function(localeId) {
+        $.extend(Locale.current, Locale.locales[localeId]);
+    }
+
+};
+
+// Locale.set(LOCALE_ENUS); // Default
+Locale.set(g_locale.id); // Default
+
 var ModelViewer = new function() {
     this.validSlots = [1,3,4,5,6,7,8,9,10,13,14,15,16,17,19,20,21,22,23,25,26];
     this.slotMap = {1: 1, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 13: 21, 14: 22, 15: 22, 16: 16, 17: 21, 19: 19, 20: 5, 21: 21, 22: 22, 23: 22, 25: 21, 26: 21};
@@ -15758,43 +16455,41 @@ var ModelViewer = new function() {
             _z.innerHTML = G;
             _z.style.display = '';
         }
+        else if (mode == 1) {
+            var G = '<applet id="3dviewer-java" code="org.jdesktop.applet.util.JNLPAppletLauncher" width="600" height="400" archive="http://static.wowhead.com/modelviewer/applet-launcher.jar,http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jar,http://download.java.net/media/gluegen/webstart/gluegen-rt.jar,http://download.java.net/media/java3d/webstart/release/vecmath/latest/vecmath.jar,http://static.wowhead.com/modelviewer/ModelView510.jar"><param name="jnlp_href" value="http://static.wowhead.com/modelviewer/ModelView.jnlp"><param name="codebase_lookup" value="false"><param name="cache_option" value="no"><param name="subapplet.classname" value="modelview.ModelViewerApplet"><param name="subapplet.displayname" value="Model Viewer Applet"><param name="progressbar" value="true"><param name="jnlpNumExtensions" value="1"><param name="jnlpExtension1" value="http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jnlp"><param name="contentPath" value="http://static.wowhead.com/modelviewer/"><param name="model" value="' + model + '"><param name="modelType" value="' + modelType + '">';
+            if (modelType == 16 && equipList.length) {
+                G += '<param name="equipList" value="' + equipList.join(',') + '">';
+            }
+            G += '<param name="bgColor" value="#181818"></applet>';
+            _o.innerHTML = G;
+            _o.style.display = '';
+        }
         else {
-            if (mode == 1) {
-                var G = '<applet id="3dviewer-java" code="org.jdesktop.applet.util.JNLPAppletLauncher" width="600" height="400" archive="http://static.wowhead.com/modelviewer/applet-launcher.jar,http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jar,http://download.java.net/media/gluegen/webstart/gluegen-rt.jar,http://download.java.net/media/java3d/webstart/release/vecmath/latest/vecmath.jar,http://static.wowhead.com/modelviewer/ModelView510.jar"><param name="jnlp_href" value="http://static.wowhead.com/modelviewer/ModelView.jnlp"><param name="codebase_lookup" value="false"><param name="cache_option" value="no"><param name="subapplet.classname" value="modelview.ModelViewerApplet"><param name="subapplet.displayname" value="Model Viewer Applet"><param name="progressbar" value="true"><param name="jnlpNumExtensions" value="1"><param name="jnlpExtension1" value="http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jnlp"><param name="contentPath" value="http://static.wowhead.com/modelviewer/"><param name="model" value="' + model + '"><param name="modelType" value="' + modelType + '">';
-                if (modelType == 16 && equipList.length) {
-                    G += '<param name="equipList" value="' + equipList.join(',') + '">';
-                }
-                G += '<param name="bgColor" value="#181818"></applet>';
-                _o.innerHTML = G;
-                _o.style.display = '';
+            var flashVars = {
+                model: model,
+                modelType: modelType,
+                contentPath: 'http://static.wowhead.com/modelviewer/'
+                // contentPath: g_staticUrl + '/modelviewer/'
+            };
+
+            var params = {
+                quality: 'high',
+                allowscriptaccess: 'always',
+                allowfullscreen: true,
+                menu: false,
+                bgcolor: '#181818',
+                wmode: 'direct'
+            };
+
+            var attributes = { };
+
+            if (modelType == 16 && equipList.length) {
+                flashVars.equipList = equipList.join(',');
             }
-            else {
-                var flashVars = {
-                    model: model,
-                    modelType: modelType,
-                    contentPath: 'http://static.wowhead.com/modelviewer/'
-                    // contentPath: g_staticUrl + '/modelviewer/'
-                };
 
-                var params = {
-                    quality: 'high',
-                    allowscriptaccess: 'always',
-                    allowfullscreen: true,
-                    menu: false,
-                    bgcolor: '#181818',
-                    wmode: 'direct'
-                };
-
-                var attributes = { };
-
-                if (modelType == 16 && equipList.length) {
-                    flashVars.equipList = equipList.join(',');
-                }
-
-                // swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
-                swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', '10.0.0', 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
-                _w.style.display = '';
-            }
+            // swfobject.embedSWF(http://static.wowhead.com/modelviewer/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", http://static.wowhead.com/modelviewer/modelviewer/expressInstall.swf', flashVars, params, attributes);
+            swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
+            _w.style.display = '';
         }
         var
             foo  = getRaceSex(),
@@ -15874,6 +16569,8 @@ var ModelViewer = new function() {
                 model = races[raceIndex].model + sexes[sexIndex].model;
                 modelType = 16;
             }
+
+            g_setWowheadCookie('temp_default_3dmodel', race + ',' + sex);
         }
 
         clear();
@@ -15947,8 +16644,26 @@ var ModelViewer = new function() {
         else {
             if (race == -1 && sex == -1) {
                 var
-                    cooRace = (g_user && g_user.settings ? g_user.settings.modelrace: 1),
-                    cooSex  = (g_user && g_user.settings ? g_user.settings.modelgender - 1 : 0);
+                    cooRace = 1,
+                    cooSex  = 0;
+
+                if (g_user && g_user.cookies['default_3dmodel']) {
+                    var sp = g_user.cookies['default_3dmodel'].split(',');
+                    if (sp.length == 2) {
+                        cooRace = sp[0];
+                        cooSex  = sp[1] - 1;
+                    }
+                }
+                else {
+                    var cookie = g_getWowheadCookie('temp_default_3dmodel');
+                    if (cookie) {
+                        var sp = cookie.split(',');
+                        if (sp.length == 2) {
+                            cooRace = sp[0];
+                            cooSex  = sp[1];
+                        }
+                    }
+                }
 
                 if (isRaceSexValid(cooRace, cooSex)) {
                     race = cooRace;
@@ -16785,552 +17500,38 @@ var ScreenshotViewer = new function() {
     DomContentLoaded.addEvent(this.checkPound)
 };
 
-var Dialog = function() {
-var
-    _self = this,
-    _template,
-    _onSubmit = null,
-    _templateName,
+// TODO: Create a "Cookies" object
 
-    _funcs = {},
-    _data,
+function g_cookiesEnabled() {
+    document.cookie = 'enabledTest';
+    return (document.cookie.indexOf("enabledTest") != -1) ? true : false;
+}
 
-    _inited = false,
-    _form = $WH.ce('form'),
-    _elements = {};
+function g_getWowheadCookie(name) {
+    if (g_user.id > 0) {
+        return g_user.cookies[name]; // no point checking if it exists, as undefined tests as false anyways
+    }
+    else {
+        return $WH.gc(name); // plus gc does the same thing..
+    }
+}
 
-    _form.onsubmit = function() {
-        _processForm();
-        return false
-    };
-
-    this.show = function(template, opt) {
-        if (template) {
-            _templateName = template;
-            _template = Dialog.templates[_templateName];
-            _self.template = _template;
-        }
-        else {
-            return;
-        }
-
-        if (_template.onInit && !_inited) {
-            (_template.onInit.bind(_self, _form, opt))();
-        }
-
-        if (opt.onBeforeShow) {
-            _funcs.onBeforeShow = opt.onBeforeShow.bind(_self, _form);
-        }
-
-        if (_template.onBeforeShow) {
-            _template.onBeforeShow = _template.onBeforeShow.bind(_self, _form);
-        }
-
-        if (opt.onShow) {
-            _funcs.onShow = opt.onShow.bind(_self, _form);
-        }
-
-        if (_template.onShow) {
-            _template.onShow = _template.onShow.bind(_self, _form);
-        }
-
-        if (opt.onHide) {
-            _funcs.onHide = opt.onHide.bind(_self, _form);
-        }
-
-        if (_template.onHide) {
-            _template.onHide = _template.onHide.bind(_self, _form);
-        }
-
-        if (opt.onSubmit) {
-            _funcs.onSubmit = opt.onSubmit;
-        }
-
-        if (_template.onSubmit)
-            _onSubmit = _template.onSubmit.bind(_self, _form);
-
-        if (opt.data) {
-            _inited = false;
-            _data = {};
-            $WH.cO(_data, opt.data);
-        }
-        _self.data = _data;
-
-        Lightbox.show('dialog-' + _templateName, {
-            onShow: _onShow,
-            onHide: _onHide
+function g_setWowheadCookie(name, data, browser) {
+    var temp = name.substr(0, 5) == 'temp_';
+    if (!browser && g_user.id > 0 && !temp) {
+        new Ajax('?cookie=' + name + '&' + name + '=' + $WH.urlencode(data), {
+            method: 'get',
+            onSuccess: function(xhr) {
+                if (xhr.responseText == 0) {
+                    g_user.cookies[name] = data;
+                }
+            }
         });
-    };
-
-    this.getValue = function(id) {
-        return _getValue(id);
-    };
-
-    this.setValue = function(id, value) {
-        _setValue(id, value);
-    };
-
-    this.getSelectedValue = function(id) {
-        return _getSelectedValue(id);
-    };
-
-    this.getCheckedValue = function(id) {
-        return _getCheckedValue(id);
-    };
-
-    function _onShow(dest, first) {
-        if (first || !_inited) {
-            _initForm(dest);
-        }
-
-        if (_template.onBeforeShow) {
-            _template.onBeforeShow();
-        }
-
-        if (_funcs.onBeforeShow) {
-            _funcs.onBeforeShow();
-        }
-
-        Lightbox.setSize(_template.width, _template.height);
-        dest.className = 'dialog';
-
-        _updateForm();
-
-        if (_template.onShow) {
-            _template.onShow();
-        }
-
-        if (_funcs.onShow) {
-            _funcs.onShow();
-        }
     }
-
-    function _initForm(dest) {
-        $WH.ee(dest);
-        $WH.ee(_form);
-
-        var container = $WH.ce('div');
-        container.className = 'text';
-        $WH.ae(dest, container);
-        $WH.ae(container, _form);
-        if (_template.title) {
-            var h = $WH.ce('h1');
-            $WH.ae(h, $WH.ct(_template.title));
-            $WH.ae(_form, h);
-        }
-
-        var
-            t         = $WH.ce('table'),
-            tb        = $WH.ce('tbody'),
-            mergeCell = false;
-
-        $WH.ae(t, tb);
-        $WH.ae(_form, t);
-
-        for (var i = 0, len = _template.fields.length; i < len; ++i) {
-            var
-                field = _template.fields[i],
-                element;
-
-            if (!mergeCell) {
-                tr = $WH.ce('tr');
-                th = $WH.ce('th');
-                td = $WH.ce('td');
-            }
-
-            field.__tr = tr;
-
-            if (_data[field.id] == null) {
-                _data[field.id] = (field.value ? field.value: '');
-            }
-
-            var options;
-            if (field.options) {
-                options = [];
-
-                if (field.optorder) {
-                    $WH.cO(options, field.optorder);
-                }
-                else {
-                    for (var j in field.options) {
-                        options.push(j);
-                    }
-                }
-
-                if (field.sort) {
-                    options.sort(function(a, b) {
-                        return field.sort * $WH.strcmp(field.options[a], field.options[b]);
-                    });
-                }
-            }
-
-            switch (field.type) {
-                case 'caption':
-                    th.colSpan = 2;
-                    th.style.textAlign = 'left';
-                    th.style.padding = 0;
-
-                    if (field.compute) {
-                        (field.compute.bind(_self, null, _data[field.id], _form, th, tr))();
-                    }
-                    else if (field.label) {
-                        $WH.ae(th, $WH.ct(field.label));
-                    }
-
-                    $WH.ae(tr, th);
-                    $WH.ae(tb, tr);
-
-                    continue;
-                    break;
-                case 'textarea':
-                    var f = element = $WH.ce('textarea');
-
-                    f.name = field.id;
-
-                    if (field.disabled) {
-                        f.disabled = true;
-                    }
-
-                    f.rows = field.size[0];
-                    f.cols = field.size[1];
-                    td.colSpan = 2;
-
-                    if (field.label) {
-                        th.colSpan = 2;
-                        th.style.textAlign = 'left';
-                        th.style.padding = 0;
-                        td.style.padding = 0;
-
-                        $WH.ae(th, $WH.ct(field.label));
-                        $WH.ae(tr, th);
-                        $WH.ae(tb, tr);
-
-                        tr = $WH.ce('tr');
-                    }
-                    $WH.ae(td, f);
-
-                    break;
-                case 'select':
-
-                    var f = element = $WH.ce('select');
-
-                    f.name = field.id;
-
-                    if (field.size) {
-                        f.size = field.size;
-                    }
-
-                    if (field.disabled) {
-                        f.disabled = true;
-                    }
-
-                    if (field.multiple) {
-                        f.multiple = true;
-                    }
-
-                    for (var j = 0, len2 = options.length; j < len2; ++j) {
-                        var o = $WH.ce('option');
-
-                        o.value = options[j];
-
-                        $WH.ae(o, $WH.ct(field.options[options[j]]));
-                        $WH.ae(f, o)
-                    }
-
-                    $WH.ae(td, f);
-
-                    break;
-                case 'dynamic':
-                    td.colSpan = 2;
-                    td.style.textAlign = 'left';
-                    td.style.padding = 0;
-
-                    if (field.compute)
-                        (field.compute.bind(_self, null, _data[field.id], _form, td, tr))();
-
-                    $WH.ae(tr, td);
-                    $WH.ae(tb, tr);
-
-                    element = td;
-
-                    break;
-                case 'checkbox':
-                case 'radio':
-                    var k = 0;
-                    element = [];
-                    for (var j = 0, len2 = options.length; j < len2; ++j) {
-                        var
-                            s = $WH.ce('span'),
-                            f,
-                            l,
-                            uniqueId = 'sdfler46' + field.id + '-' + options[j];
-
-                        if (j > 0 && !field.noInputBr) {
-                            $WH.ae(td, $WH.ce('br'));
-                        }
-                        if ($WH.Browser.ie6 && field.type == 'radio') {
-                            l = $WH.ce("<label for='' + uniqueId + '' onselectstart='return false' />");
-                            f = $WH.ce("<input type='' + field.type + '' name='' + field.id + '' />");
-                        }
-                        else {
-                            l = $WH.ce('label');
-                            l.setAttribute('for', uniqueId);
-                            l.onmousedown = $WH.rf;
-
-                            f = $WH.ce('input');
-                            f.setAttribute('type', field.type);
-                            f.name = field.id;
-                        }
-                        f.value = options[j];
-                        f.id = uniqueId;
-
-                        if (field.disabled) {
-                            f.disabled = true;
-                        }
-                        if (field.submitOnDblClick) {
-                            l.ondblclick = f.ondblclick = function(e) {
-                                _processForm();
-                            };
-                        }
-
-                        if (field.compute) {
-                            (field.compute.bind(_self, f, _data[field.id], _form, td, tr))();
-                        }
-
-                        $WH.ae(l, f);
-                        $WH.ae(l, $WH.ct(field.options[options[j]]));
-                        $WH.ae(td, l);
-                        element.push(f);
-                    }
-                    break;
-                default: // Textbox
-                    var f = element = $WH.ce('input');
-                    f.name = field.id;
-
-                    if (field.size) {
-                        f.size = field.size;
-                    }
-
-                    if (field.disabled) {
-                        f.disabled = true ;
-                    }
-
-                    if (field.submitOnEnter) {
-                        f.onkeypress = function(e) {
-                            e = $WH.$E(e);
-                            if (e.keyCode == 13) {
-                                _processForm();
-                            }
-                        }
-                    }
-                    f.setAttribute('type', field.type);
-                    $WH.ae(td, f);
-                    break;
-            }
-
-            if (field.label) {
-                if (field.type == 'textarea') {
-                    if (field.labelAlign) {
-                        td.style.textAlign = field.labelAlign;
-                    }
-                    td.colSpan = 2;
-                }
-                else {
-                    if (field.labelAlign) {
-                        th.style.textAlign = field.labelAlign;
-                    }
-                    $WH.ae(th, $WH.ct(field.label));
-                    $WH.ae(tr, th);
-                }
-            }
-
-            if (field.type != 'checkbox' && field.type != 'radio') {
-                if (field.width) {
-                    f.style.width = field.width;
-                }
-
-                if (field.compute  && field.type != 'caption' && field.type != 'dynamic') {
-                    (field.compute.bind(_self, f, _data[field.id], _form, td, tr))();
-                }
-            }
-
-            if (field.caption) {
-                var s = $WH.ce('small');
-                if (field.type != 'textarea')
-                    s.style.paddingLeft = '2px';
-                s.className = 'q0'; // commented in 5.0?
-                $WH.ae(s, $WH.ct(field.caption));
-                $WH.ae(td, s);
-            }
-
-            $WH.ae(tr, td);
-            $WH.ae(tb, tr);
-
-            mergeCell = field.mergeCell;
-            _elements[field.id] = element;
-        }
-
-        for (var i = _template.buttons.length; i > 0; --i) {
-            var
-                button = _template.buttons[i - 1],
-                a      = $WH.ce('a');
-
-            a.href = 'javascript:;';
-            a.onclick = _processForm.bind(a, button[0]);
-            a.className = 'dialog-' + button[0];
-            $WH.ae(a, $WH.ct(button[1]));
-            $WH.ae(dest, a);
-        }
-
-        var _ = $WH.ce('div');
-        _.className = 'clear';
-        $WH.ae(dest, _);
-
-        _inited = true;
+    else if (browser || g_user.id == 0) {
+        $WH.sc(name, 14, data, null, location.hostname);
     }
-
-    function _updateForm() {
-        for (var i = 0, len = _template.fields.length; i < len; ++i) {
-            var
-                field = _template.fields[i],
-                f     = _elements[field.id];
-
-            switch (field.type) {
-                case 'caption': // Do nothing
-                    break;
-                case 'select':
-                    for (var j = 0, len2 = f.options.length; j < len2; j++) {
-                        f.options[j].selected = (f.options[j].value == _data[field.id] || $WH.in_array(_data[field.id], f.options[j].value) != -1);
-                    }
-                    break;
-                case 'checkbox':
-                case 'radio':
-                    for (var j = 0, len2 = f.length; j < len2; j++) {
-                        f[j].checked = (f[j].value == _data[field.id] || $WH.in_array(_data[field.id], f[j].value) != -1);
-                    }
-                    break;
-
-                default:
-                    f.value = _data[field.id];
-                    break;
-            }
-
-            if (field.update) {
-                (field.update.bind(_self, null, _data[field.id], _form, f))();
-            }
-        }
-    }
-
-    function _onHide() {
-        if (_template.onHide) {
-            _template.onHide();
-        }
-        if (_funcs.onHide) {
-            _funcs.onHide();
-        }
-    }
-
-    function _processForm(button) {
-        // if (button == 'x') { // Special case
-        if (button == 'cancel') { // Special case
-            return Lightbox.hide();
-        }
-
-        for (var i = 0, len = _template.fields.length; i < len; ++i) {
-            var
-                field = _template.fields[i],
-                newValue;
-
-            switch (field.type) {
-                case 'caption': // Do nothing
-                    continue;
-                case 'select':
-                    newValue = _getSelectedValue(field.id);
-                    break;
-                case 'checkbox':
-                case 'radio':
-                    newValue = _getCheckedValue(field.id);
-                    break;
-                case 'dynamic':
-                    if (field.getValue) {
-                        newValue = field.getValue(field, _data, _form);
-                        break;
-                    }
-                default:
-                    newValue = _getValue(field.id);
-                    break;
-            }
-            if (field.validate) {
-                if (!field.validate(newValue, _data, _form)) {
-                    return;
-                }
-            }
-
-            if (newValue && typeof newValue == 'string') {
-                newValue = $WH.trim(newValue);
-            }
-            _data[field.id] = newValue;
-        }
-
-        _submitData(button);
-    }
-
-    function _submitData(button) {
-        var ret;
-
-        if (_onSubmit) {
-            ret = _onSubmit(_data, button, _form);
-        }
-
-        if (_funcs.onSubmit) {
-            ret = _funcs.onSubmit(_data, button, _form);
-        }
-
-        if (ret === undefined || ret)
-            Lightbox.hide();
-
-            return false;
-    }
-
-    function _getValue(id) {
-        return _elements[id].value;
-    }
-
-    function _setValue(id, value) {
-        _elements[id].value = value;
-    }
-
-    function _getSelectedValue(id) {
-        var
-            result = [],
-            f = _elements[id];
-
-            for (var i = 0, len = f.options.length; i < len; i++) {
-            if (f.options[i].selected) {
-                result.push(parseInt(f.options[i].value) == f.options[i].value ? parseInt(f.options[i].value) : f.options[i].value);
-            }
-        }
-        if (result.length == 1) {
-            result = result[0];
-        }
-        return result;
-    }
-
-    function _getCheckedValue(id) {
-        var
-            result = [],
-            f      = _elements[id];
-
-        for (var i = 0, len = f.length; i < len; i++) {
-            if (f[i].checked) {
-                result.push(parseInt(f[i].value) == f[i].value ? parseInt(f[i].value) : f[i].value);
-            }
-        }
-
-        return result;
-    }
-};
-Dialog.templates = {};
+}
 
 var ContactTool = new function() {
     this.general    = 0;
@@ -18107,7 +18308,7 @@ var Announcement = function(opt) {
         return;
     }
 
-    if (g_user.id == 0 && $WH.gc('announcement-' + this.id) == 'closed') {
+    if (g_user.id == 0 && (!g_cookiesEnabled() || g_getWowheadCookie('announcement-' + this.id) == 'closed')) {
         return;
     }
 
@@ -18230,8 +18431,8 @@ Announcement.prototype = {
     },
 
     markRead: function() {
-        // g_setWowheadCookie('announcement-' + this.id, 'closed');
-        $WH.sc('announcement-' + this.id, 20, 'closed', "/", location.hostname);
+        g_setWowheadCookie('announcement-' + this.id, 'closed');
+        // $WH.sc('announcement-' + this.id, 20, 'closed', "/", location.hostname);
         this.hide();
     },
 
@@ -18242,8 +18443,7 @@ Announcement.prototype = {
 
     setText: function(text) {
         this.text = text;
-        // Markup.printHtml(this.text, this.parent + '-markup');
-        $WH.ge(this.parent + '-markup').innerHTML = this.text;
+        Markup.printHtml(this.text, this.parent + '-markup');
     }
 };
 

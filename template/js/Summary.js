@@ -105,7 +105,7 @@ function Summary(opt) {
         this.level = parseInt(GET.l);
     }
     else {
-        var l = $WH.gc('compare_level');
+        var l = g_getWowheadCookie('compare_level');
         if (l) {
             this.level = l;
         }
@@ -118,7 +118,7 @@ function Summary(opt) {
             this.readGroups(GET.compare);
         }
         else {
-            this.readGroups($WH.gc('compare_groups'));
+            this.readGroups(g_getWowheadCookie('compare_groups'));
         }
     }
 
@@ -130,7 +130,7 @@ function Summary(opt) {
                 this.readWeights(GET.weights);
             }
             else {
-                this.readWeights($WH.gc('compare_weights'));
+                this.readWeights(g_getWowheadCookie('compare_weights'));
             }
         }
     }
@@ -1298,10 +1298,10 @@ Summary.prototype = {
 
         // Enchant
         if (this.canBeEnchanted(g_items[itemId].jsonequip.slotbak, g_items[itemId].jsonequip.subclass)) {
-            var _ = [0, (item[2] ? LANG.pr_menu_repenchant : LANG.pr_menu_addenchant), this.openEnchantPicker.bind(this, col, i)];
+            var _ = [0, (item[2] ? LANG.pr_menu_repenchant : LANG.pr_menu_addenchant), this.openEnchantPicker.bind(this, col, i), null, {}];
 
             if (item[2] && g_enchants[item[2]]) {
-                _.tinyIcon = g_enchants[item[2]].icon;
+                _[4].tinyIcon = g_enchants[item[2]].icon;
             }
 
             menu.push(_);
@@ -1313,13 +1313,13 @@ Summary.prototype = {
                 var
                     gemId = (item[k + 4] > 0 ? item[k + 4] : 0),
                     c     = (extraSocket && k == len3 - 1 ? 14 : g_items[itemId].jsonequip['socket' + (k + 1)]),
-                    _     = [0, (gemId ? LANG.pr_menu_repgem : LANG.pr_menu_addgem), this.openGemPicker.bind(this, col, i, 4 + k, c)];
+                    _     = [0, (gemId ? LANG.pr_menu_repgem : LANG.pr_menu_addgem), this.openGemPicker.bind(this, col, i, 4 + k, c), null, {}];
 
                 if (gemId) {
-                    _.tinyIcon = g_gems[gemId].icon;
+                    _[4].tinyIcon = g_gems[gemId].icon;
                 }
                 else {
-                    _.socketColor = c;
+                    _[4].socketColor = c;
                 }
 
                 menu.push(_);
@@ -1648,12 +1648,9 @@ Summary.prototype = {
     saveComparison: function(refresh) {
         window.onbeforeunload = null;
 
-        // g_setWowheadCookie('compare_groups', this.getGroupData(), true);
-        $WH.sc('compare_groups', 20, this.getGroupData(), '/', location.hostname);
-        // g_setWowheadCookie('compare_weights', $WH.rtrim(this.getWeightData(1).join(';'), ';'), true);
-        $WH.sc('compare_weights', 20, $WH.rtrim(this.getWeightData(1).join(';'), ';'), '/', location.hostname);
-        // g_setWowheadCookie('compare_level', this.level, true);
-        $WH.sc('compare_level', 20, this.level, '/', location.hostname);
+        g_setWowheadCookie('compare_groups', this.getGroupData(), true);
+        g_setWowheadCookie('compare_weights', $WH.rtrim(this.getWeightData(1).join(';'), ';'), true);
+        g_setWowheadCookie('compare_level', this.level, true);
 
         if (refresh) {
             document.location.href = '?compare'
@@ -2046,7 +2043,7 @@ Summary.prototype = {
             a = this.createControl(LANG.su_autosaving, null, 'autosave-icon selected');
         }
         else {
-            if ($WH.gc('compare_groups')) {
+            if (g_getWowheadCookie('compare_groups')) {
                 a = this.createControl(LANG.su_viewsaved, 'su_viewsaved', 'save-icon', this.viewSavedComparison.bind(this, 1));
                 $WH.ae(div, a);
             }
@@ -2464,11 +2461,12 @@ Summary.prototype = {
 
         $WH.aE(this.searchName, 'keyup', this.onSearchKeyUp.bind(this, 333));
         $WH.aE(this.searchName, 'keydown', this.onSearchKeyDown.bind(this));
-
         $WH.ae(sm, this.searchName);
+
         this.searchMsg = sp;
         this.searchMsg.style.fontWeight = 'bold';
         $WH.ae(sm, this.searchMsg);
+
         $WH.ae(div, sm);
     },
 
@@ -3217,7 +3215,7 @@ Summary.prototype = {
 
     searchItems: function(search, type) {
         var
-            lv = g_listviews.items,
+            lv    = g_listviews.items,
             _this = this,
             searchResults = [{ none: 1 }];
 
@@ -3236,7 +3234,7 @@ Summary.prototype = {
         new Ajax('?search=' + $WH.urlencode(search) + '&json&type=' + type + pr_getScaleFilter(this.currentScale, 1), {
             method: 'POST',
             search: search,
-            onSuccess: function(xhr, opt) {
+            onSuccess: function (xhr, opt) {
                 var text = xhr.responseText;
                 if (text.charAt(0) != '[' || text.charAt(text.length - 1) != ']') {
                     return;
@@ -3245,7 +3243,7 @@ Summary.prototype = {
                 var a = eval(text);
                 if (search == opt.search && a.length == 3 && a[1].length) {
                     for (var i = 0, len = a[1].length; i < len; ++i) {
-                        var row = {};
+                        var row       = {};
                         row.id        = a[1][i].id;
                         row.name      = row['name_' + g_locale.name] = a[1][i].name.substring(1);
                         row.quality   = 7 - a[1][i].name.charAt(0);
@@ -5076,35 +5074,3 @@ Listview.templates.gempicker = {
         }
     ]
 };
-
-/* sarjuuk: bandaid .. belongs to profile.js */
-function pr_getScaleFilter(scale, noFilter) {
-    var temp = [];
-
-    if (scale) {
-        for (var i = 0, len = fi_filters.items.length; i < len; ++i) {
-            var f = fi_filters.items[i];
-
-            if (LANG.traits[f.name] && scale[f.name]) {
-                temp.push([f.id, scale[f.name]]);
-            }
-        }
-    }
-
-    temp.sort(function(a, b) {
-        return -$WH.strcmp(a[1], b[1]);
-    });
-
-    var wt = [], wtv = [];
-    for (var i = 0, len = temp.length; i < len; ++i) {
-        wt.push(temp[i][0]);
-        wtv.push(temp[i][1]);
-    }
-
-    if (wt.length && wtv.length) {
-        return (noFilter ? '&' : ';gm=3;rf=1;') + 'wt=' + wt.join(':') + (noFilter ? '&' : ';') + 'wtv=' + wtv.join(':');
-    }
-
-    return '';
-}
-

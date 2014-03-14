@@ -1,7 +1,7 @@
 var wt_presets = {
     1: {
         pve: {
-            // arms: {__icon:'ability_warrior_savageblow'},
+            arms: {__icon:'ability_rogue_eviscerate'},
             fury: {__icon:'ability_warrior_innerrage',exprtng:100,str:82,critstrkrtng:66,agi:53,armorpenrtng:52,hitrtng:48,hastertng:36,atkpwr:31,armor:5},
             prot: {__icon:'ability_warrior_defensivestance',sta:100,dodgertng:90,defrtng:86,block:81,agi:67,parryrtng:67,blockrtng:48,str:48,exprtng:19,hitrtng:10,armorpenrtng:10,critstrkrtng:7,armor:6,hastertng:1,atkpwr:1}
         }
@@ -16,8 +16,8 @@ var wt_presets = {
     3: {
         pve: {
             beast: {__icon:'ability_hunter_beasttaming',rgddps:213,hitrtng:100,agi:58,critstrkrtng:40,int:37,atkpwr:30,armorpenrtng:28,hastertng:21},
-            marks: {__icon:'ability_hunter_focusedaim',rgddps:379,hitrtng:100,agi:74,critstrkrtng:57,armorpenrtng:40,int:39,atkpwr:32,hastertng:24},
-            surv: {__icon:'inv_spear_02',rgddps:181,hitrtng:100,agi:76,critstrkrtng:42,int:35,hastertng:31,atkpwr:29,armorpenrtng:26}
+            marks: {__icon:'ability_marksmanship',rgddps:379,hitrtng:100,agi:74,critstrkrtng:57,armorpenrtng:40,int:39,atkpwr:32,hastertng:24},
+            surv: {__icon:'ability_hunter_swiftstrike',rgddps:181,hitrtng:100,agi:76,critstrkrtng:42,int:35,hastertng:31,atkpwr:29,armorpenrtng:26}
         }
     },
     4: {
@@ -29,7 +29,7 @@ var wt_presets = {
     },
     5: {
         pve: {
-            disc: {__icon:'spell_holy_powerwordshield',splpwr:100,manargn:67,int:65,hastertng:59,critstrkrtng:48,spi:22},
+            disc: {__icon:'spell_holy_wordfortitude',splpwr:100,manargn:67,int:65,hastertng:59,critstrkrtng:48,spi:22},
             holy: {__icon:'spell_holy_guardianspirit',manargn:100,int:69,splpwr:60,spi:52,critstrkrtng:38,hastertng:31},
             shadow: {__icon:'spell_shadow_shadowwordpain',hitrtng:100,shasplpwr:76,splpwr:76,critstrkrtng:54,hastertng:50,spi:16,int:16}
         }
@@ -45,7 +45,7 @@ var wt_presets = {
     7: {
         pve: {
             elem: {__icon:'spell_nature_lightning',hitrtng:100,splpwr:60,hastertng:56,critstrkrtng:40,int:11},
-            enhance: {__icon:'spell_shaman_improvedstormstrike',mledps:135,hitrtng:100,exprtng:84,agi:55,int:55,critstrkrtng:55,hastertng:42,str:35,atkpwr:32,splpwr:29,armorpenrtng:26},
+            enhance: {__icon:'spell_nature_lightningshield',mledps:135,hitrtng:100,exprtng:84,agi:55,int:55,critstrkrtng:55,hastertng:42,str:35,atkpwr:32,splpwr:29,armorpenrtng:26},
             resto: {__icon:'spell_nature_magicimmunity',manargn:100,int:85,splpwr:77,critstrkrtng:62,hastertng:35}
         }
     },
@@ -66,9 +66,9 @@ var wt_presets = {
     11: {
         pve: {
             balance: {__icon:'spell_nature_starfall',hitrtng:100,splpwr:66,hastertng:54,critstrkrtng:43,spi:22,int:22},
-            feraldps: {__icon:'ability_druid_catform',agi:100,armorpenrtng:90,str:80,critstrkrtng:55,exprtng:50,hitrtng:50,feratkpwr:40,atkpwr:40,hastertng:35},
             feraltank: {__icon:'ability_racial_bearform',agi:100,sta:75,dodgertng:65,defrtng:60,exprtng:16,str:10,armor:10,hitrtng:8,hastertng:5,atkpwr:4,feratkpwr:4,critstrkrtng:3},
-            resto: {__icon:'spell_nature_healingtouch',splpwr:100,manargn:73,hastertng:57,int:51,spi:32,critstrkrtng:11}
+            resto: {__icon:'spell_nature_healingtouch',splpwr:100,manargn:73,hastertng:57,int:51,spi:32,critstrkrtng:11},
+            feraldps: {__icon:'ability_druid_catform',agi:100,armorpenrtng:90,str:80,critstrkrtng:55,exprtng:50,hitrtng:50,feratkpwr:40,atkpwr:40,hastertng:35}
         }
     }
 };

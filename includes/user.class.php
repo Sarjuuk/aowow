@@ -262,6 +262,7 @@ class User
             'name'     => self::$displayName ? self::$displayName : '',
             'perms'    => self::$perms ? self::$perms : 0,
             'roles'    => self::$groups ? self::$groups : 0,
+            'cookies'  => []
         );
 
         if (self::$id > 0)
@@ -280,7 +281,8 @@ class User
                 'avatar'    => self::$avatar,
                 'community' => self::$description,
                 'chars'     => self::getCharacters(),
-                'profiles'  => self::getProfiles()
+                'profiles'  => self::getProfiles(),
+                'cookies'   => self::getCookies(),
             );
 
             if ($_ = self::getWeightScales())
@@ -328,10 +330,10 @@ class User
             // todo: do after profiler
             // existing chars on realm(s)
             if ($asJSON)
-                $chars = '[{"name":"ExampleChar", "realmname":"Example Realm", "region":"eu", "realm":"exrealm", icon:"inv_axe_04", "race":4, "gender":0, "classs":11, "level":80}]';
+                $chars = '[{"name":"ExampleChar", "realmname":"Example Realm", "region":"eu", "realm":"exrealm", icon:"inv_axe_04", "race":4, "gender":0, "classs":11, "level":80, "pinned":1}]';
             else
                 $chars = array(
-                    array("name" => "ExampleChar", "realmname" => "Example Realm", "region" => "eu", "realm" => "exrealm", "icon" => "inv_axe_04", "race" => 4, "gender" => 0, "classs" => 11, "level" => 80)
+                    array("name" => "ExampleChar", "realmname" => "Example Realm", "region" => "eu", "realm" => "exrealm", "icon" => "inv_axe_04", "race" => 4, "gender" => 0, "classs" => 11, "level" => 80, "pinned" => 1)
                 );
 
             self::$characters = $chars;
@@ -356,6 +358,16 @@ class User
             self::$profiles = $profiles;
         }
         return self::$profiles;
+    }
+
+    public static function getCookies()
+    {
+        $data = [];
+
+        if (self::$id)
+            $data = DB::Aowow()->selectCol('SELECT name AS ARRAY_KEY, data FROM ?_account_cookies WHERE userId = ?d', self::$id);
+
+        return json_encode($data);
     }
 
     public static function writeCookie()

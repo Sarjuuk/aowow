@@ -1190,6 +1190,10 @@ function fi_presetMatch(weights, stealth) {
     for (var l in wt_presets) {
         for (var k in wt_presets[l]) {
             for (var v in wt_presets[l][k]) {
+                if (Object.keys(wt_presets[l][k][v]).length == 1) {
+                    continue;
+                }
+
                 p = fi_convertWeights(wt_presets[l][k][v]);
 
                 var match = true;

@@ -342,7 +342,7 @@ $WH.array_unique = function(a) {
 
 // Get element
 $WH.ge = function(z) {
-    if(typeof z != 'string') {
+    if (typeof z != 'string') {
         return z;
     }
 
@@ -545,7 +545,7 @@ $WH.gc = function(z) {
 // Prevent element from being selected/dragged (IE only)
 $WH.ns = function(a) {
     if ($WH.Browser.ie6789) {
-        a.onfocus = tb;
+        a.onfocus = $WH.tb;
         a.onmousedown = a.onselectstart = a.ondragstart = $WH.rf;
     }
 }
@@ -1206,7 +1206,7 @@ $WH.g_convertScalingFactor = function(level, factor, dist, stat, json) {
     var scalingValues = $WH.g_convertScalingFactor.SV;
     var scalingDistributions = $WH.g_convertScalingFactor.SD;
 
-    if(!scalingValues[level]) {
+    if (!scalingValues[level]) {
         if (g_user.roles & U_GROUP_ADMIN) {
             alert('There are no item scaling values for level ' + level);
         }
@@ -1765,7 +1765,7 @@ $WH.Tooltip = {
             c[0].style.whiteSpace = 'nowrap';
 
             var m = parseInt(tooltip.style.width);
-            if(!tooltip.slider || !m) {
+            if (!tooltip.slider || !m) {
                 if (c[1].offsetWidth > 300) {
                     m = Math.max(300, c[0].offsetWidth) + 20;
                 }
@@ -1780,7 +1780,7 @@ $WH.Tooltip = {
                 tooltip.style.width = m + 'px';
                 c[0].style.width = c[1].style.width = '100%';
 
-                if(tooltip.slider) {
+                if (tooltip.slider) {
                     Slider.setSize(tooltip.slider, m - 6);
                     tooltip.className += ' tooltip-slider';
                 }
