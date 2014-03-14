@@ -1884,6 +1884,15 @@ class ItemListFilter extends Filter
         // upgrade for [form only]
         if (isset($_v['upg']))
         {
+            /* notice!
+                profiler can send $_GET['upg'] as an array
+                this should results in in N listviews-sets (weapons generate more more than one listview per slot) for N items
+                <div id="jkbfksdbl4"></div>
+                <div id="lkljbjkb574" class="listview"></div>
+                var tabsGroups = new Tabs({parent: $WH.ge('jkbfksdbl4')});
+                {template: 'item', id: 'ranged', name: 'Ranged', tabs: tabsGroups, parent: 'lkljbjkb574', hideCount: 1, note: $WH.sprintf(LANG.lvnote_viewmoreslot, '', 'sl=15;maxrl=80;si=1;ub=1;cr=161;crs=1;crv=0;upg=45498'), customFilter: fi_filterUpgradeListview, _upgradeIds: [45498], extraCols: fi_getExtraCols(fi_extraCols, 0, 0, 0), onAfterCreate: fi_addUpgradeIndicator, data:[]}
+            */
+
             // valid item?
             if (!is_int($_v['upg']))
                 unset($_v['upg']);

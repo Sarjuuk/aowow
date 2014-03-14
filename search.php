@@ -37,13 +37,23 @@ $maxResults = SQL_LIMIT_SEARCH;
 
 $_wt        = isset($_GET['wt'])  ? explode(':', $_GET['wt'])  : null;
 $_wtv       = isset($_GET['wtv']) ? explode(':', $_GET['wtv']) : null;
+$_slots     = [];
 
 if (isset($_GET['json']))
 {
     if ($_ = intVal($search))                               // allow for search by Id
         $query = $_;
 
-    if ($type == TYPE_ITEMSET)
+    if (!empty($_GET['slots']))
+    {
+        $_slots = explode(':', $_GET['slots']);
+        array_walk($_slots, function(&$v, $k) {
+            $v = intVal($v);
+        });
+
+        $searchMask |= SEARCH_TYPE_JSON | 0x40;
+    }
+    else if ($type == TYPE_ITEMSET)
         $searchMask |= SEARCH_TYPE_JSON | 0x60;
     else if ($type == TYPE_ITEM)
         $searchMask |= SEARCH_TYPE_JSON | 0x40;
@@ -314,16 +324,20 @@ if (!$smarty->loadCache($cacheKey, $found))
     if ($searchMask & 0x0000040)
     {
         $miscData = [];
-        $cndAdd   = is_int($query) ? ['id', $query] : ['name_loc'.User::$localeId, $query];
+        $cndAdd   = empty($query) ? [] : (is_int($query) ? ['id', $query] : ['name_loc'.User::$localeId, $query]);
 
         if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
         {
             $cnd      = [['i.id', array_keys($found['itemset']['pcsToSet'])], SQL_LIMIT_NONE];
             $miscData = ['pcsToSet' => @$found['itemset']['pcsToSet']];
         }
-        else if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEM)
+        else if (($searchMask & SEARCH_TYPE_JSON) && ($type == TYPE_ITEM || $_slots))
         {
-            $cnd      = array_merge($cndBase, [['AND', ['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], $cndAdd]]);
+            $iCnd = ['AND', ['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], $cndAdd];
+            if ($_slots)
+                $iCnd[] = ['slot', $_slots];
+
+            $cnd      = array_merge($cndBase, [$iCnd]);
             $miscData = ['wt' => $_wt, 'wtv' => $_wtv];
         }
         else

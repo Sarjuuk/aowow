@@ -15,15 +15,36 @@ foreach ($datasets as $data)
 {
     switch ($data)
     {
+        // Profiler
+        case 'factions':
+        case 'quests':
+        case 'companions':
+        case 'recipes':
+        case 'mounts':
+            if (empty($_GET['callback']) || empty($_GET['t']))
+                break;
+
+            $token    = intVal($_GET['t']);
+            $callback = $_GET['callback'];
+            if (!$token || substr($callback, 0, 17) != '$WowheadProfiler.')
+                break;
+
+/*
+    get data via token:
+    > echo data in unknown format here
+    echo '$WowheadProfiler.loadOnDemand('.$data.', <catg?>);';
+*/
+            break;
         // locale independant
         case 'zones':
         case 'weight-presets':
         case 'item-scaling':
         case 'realms':
+        case 'statistics':
             if (file_exists('datasets/'.$data))
                 echo file_get_contents('datasets/'.$data);
             else if ($AoWoWconf['debug'])
-                echo "/* could not fetch static data: ".$data." */";
+                echo "alert('could not fetch static data: ".$data."');";
             echo "\n\n";
             break;
         case 'user':
@@ -50,6 +71,7 @@ foreach ($datasets as $data)
                 echo "alert('could not fetch static data: ".$data.$params." for locale: ".User::$localeString."');";
             echo "\n\n";
             break;
+        case 'quick-excludes':  // generated per character in profiler
         default:
             break;
     }

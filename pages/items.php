@@ -168,7 +168,11 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
      * Filter is used as a subSystem to each TypeList
      * but here we would need to preemptive check for $filter['gb']
      *  .. bummer ..  this is to be removed when the issue is _really_ solved
+     *
+     * ALSO upgradeItems .. Profiler can send them as lists, so multiple lv-tabs would occur
+     *
     */
+
     if (preg_match('/gb\=(1|2|3)/i', $_SERVER['QUERY_STRING'], $match))
         $filter['gb'] = $match[1];
 
@@ -226,14 +230,16 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         // upgrade-item got deleted by filter
         if (empty($pageData['lv']['data'][$filter['upg']]))
         {
-            $w = $items->filterGetForm('setWeights', true);
-            $upgItem = new ItemList(array(['id', $filter['upg']]), false, ['wt' => $w[0], 'wtv' => $w[1]]);
-
-            // still it may not be found if you apply really weired filters (e.g. search for a melee item with caster-weights) .. not my fault :[
-            if (!$upgItem->error)
+            if ($w = $items->filterGetForm('setWeights', true))
             {
-                $upgItem->addGlobalsToJScript($smarty);
-                $pageData['lv']['data'][$filter['upg']] = $upgItem->getListviewData($infoMask)[$filter['upg']];
+                $upgItem = new ItemList(array(['id', $filter['upg']]), false, ['wt' => $w[0], 'wtv' => $w[1]]);
+
+                // still it may not be found if you apply really weired filters (e.g. search for a melee item with caster-weights) .. not my fault :[
+                if (!$upgItem->error)
+                {
+                    $upgItem->addGlobalsToJScript($smarty);
+                    $pageData['lv']['data'][$filter['upg']] = $upgItem->getListviewData($infoMask)[$filter['upg']];
+                }
             }
         }
 

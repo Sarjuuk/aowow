@@ -20,7 +20,7 @@
                     side:{$curr.faction},
                     points:{$curr.points},
                     category:{$curr.category},
-                    parentcat:{$curr.parentCat}
+                    parentcat:{$curr.parentcat}
                     {if isset($curr.type)}, type:{$curr.type}{/if}
                     {if isset($curr.rewards)}, rewards:{$curr.rewards}{/if}
                     {if isset($curr.reward)}, reward:'{$curr.reward|escape:"javascript"}'{/if}

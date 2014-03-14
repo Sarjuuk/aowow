@@ -473,12 +473,6 @@ if (typeof $WowheadPower == "undefined") {
                         html = html.replace(new RegExp('<span class="c(' + currentParams.c + ')" style="display: none">(.+?)</span>', "g"), '<span class="c$1">$2</span><br />');
                     }
 
-                    // custom start
-                    if ($WH.gc('compare_level') && window.location.href.match(/\?compare/i)) {
-                        html = $WH.g_setTooltipLevel(html, $WH.gc('compare_level'), currentParams.buff);
-                    }
-                    // custom end
-
                     if (currentParams.know && currentParams.know.length) {
                         html = $WH.g_setTooltipSpells(html, currentParams.know, spellData);
                     }
@@ -486,6 +480,11 @@ if (typeof $WowheadPower == "undefined") {
                     if (currentParams.lvl) {
                         html = $WH.g_setTooltipLevel(html, currentParams.lvl, currentParams.buff);
                     }
+                    // custom start
+                    else if ($WH.gc('compare_level') && window.location.href.match(/\?compare/i)) {
+                        html = $WH.g_setTooltipLevel(html, $WH.gc('compare_level'), currentParams.buff);
+                    }
+                    // custom end
 
                     if (currentParams.who && currentParams.when) {
                         html = html.replace("<table><tr><td><br />", '<table><tr><td><br /><span class="q2">' + $WH.sprintf(_LANG.achievementcomplete, currentParams.who, currentParams.when.getMonth() + 1, currentParams.when.getDate(), currentParams.when.getFullYear()) + "</span><br /><br />");

@@ -1,0 +1,927 @@
+.profiler-home {
+    clear: both;
+    margin: 40px 0px 20px;
+    display: block;
+}
+
+.profiler-home > div {
+    float: left;
+    height: 67px;
+    margin-right: 10px;
+}
+
+.profiler-home > div.profiler-buttons {
+    height: 40px;
+    padding-top: 27px;
+}
+
+.profiler-home > div h2 {
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0px 0px 10px;
+    padding: 0px;
+}
+
+.profiler-home input[type="text"], .profiler-home a: link, .profiler-home a: visited {
+    font-family: Helvetica,Arial,sans-serif;
+}
+
+.profiler-home input[type="text"] {
+    background: url(../images/Profiler/text-input.2.png) no-repeat;
+    border: none;
+    color: #383838;
+    font-size: 12px;
+    height: 22px;
+    line-height: 22px;
+    margin: 0px;
+    padding: 0px 7px;
+    width: 105px;
+}
+
+.profiler-home input[type="text"]: focus {
+    outline: none;
+}
+
+.profiler-home input[type="text"].oops {
+    color: #ff0000;
+
+    -moz-box-shadow: 0 0 10px #ff0000;
+    -webkit-box-shadow: 0 0 10px #ff0000;
+    -o-box-shadow: 0 0 10px #ff0000;
+}
+
+.profiler-home input[type="radio"] {
+    display: none;
+}
+
+.profiler-autocomplete {
+    display: none;
+    width: 194px;
+    background: #484848;
+    border: 1px solid #202020;
+    padding: 0 2px 2px 2px;
+    position: absolute;
+    font-size: 12px;
+
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    -webkit-box-shadow: 0 1px 3px #111;
+    -o-box-shadow: 0 1px 3px #111;
+}
+
+.profiler-autocomplete span {
+    display: block;
+    background: #282828;
+    border-bottom: 1px solid #101010;
+    border-top: 1px solid #484848;
+    cursor: pointer;
+    height: 23px;
+    line-height: 23px;
+    text-indent: 6px;
+}
+
+.profiler-autocomplete span: hover, .profiler-autocomplete span.active {
+    background: #383838;
+    border-bottom: solid 1px #202020;
+}
+
+/*********************************************/
+
+.profiler-charlookup {
+    position: relative;
+    height: 22px;
+    width: 124px;
+    display: inline-block;
+}
+
+.profiler-charlookup input {
+    border: 1px solid #a7a6aa;
+    height: 18px;
+    width: 120px;
+    padding-left: 2px;
+    font-size: 13px;
+    font-family: Arial,sans-serif;
+    background: white;
+    color: black;
+}
+
+.profiler-charlookup-go {
+    position: absolute;
+    top: 0;
+    right: -12px;
+    z-index: 1;
+    width: 22px;
+    height: 22px;
+    background: url(../images/Profiler/lookup.gif) left top no-repeat;
+    display: block;
+}
+
+.profiler-charlookup-go: hover {
+    background-position: left bottom;
+}
+
+input.search-character {
+    background: white url(../images/enus/character.gif) 0.2em center no-repeat !important;
+}
+
+/*********************************************/
+
+.profiler-header {
+    height: 69px;
+    background: url(../images/Profiler/character-header-bg.gif) repeat-x left top;
+    border-bottom: 1px solid #505050;
+    position: relative;
+    margin-bottom: 13px;
+    padding-right: 8px;
+}
+
+.profiler-header .iconlarge, .profiler-header .iconlargepremium {
+    position: absolute;
+    left: 2px;
+    top: -1px;
+}
+
+.profiler-header a {
+    text-decoration: none;
+}
+
+.profiler-header a: hover {
+    text-decoration: underline;
+}
+
+.profiler-header-line1, .profiler-header-line2, .profiler-header-line3 {
+    position: absolute;
+    left: 74px;
+}
+
+.profiler-header-line1 {
+    top: 0;
+    font-size: 15px;
+    line-height: 1.1em;
+    color: #EEEEEE;
+}
+
+.profiler-header-line1 a {
+    color: #EEEEEE;
+}
+
+.profiler-header-line1 b {
+    font-size: 20px;
+    font-weight: normal;
+    color: white;
+}
+
+.profiler-header-line2 {
+    top: 25px;
+    color: #dddddd;
+}
+
+.profiler-header-line2 var {
+    font-size: 12px;
+    font-family: Verdana,sans-serif;
+    color: #CCCCCC;
+    font-style: normal;
+}
+
+.profiler-header-line2 a {
+    font-size: 14px;
+}
+
+.profiler-header-line3 {
+    top: 48px;
+    font-size: 11px;
+    color: #EEEEEE;
+}
+
+.profiler-header-line3 span {
+    display: block;
+    float: left;
+}
+
+.profiler-header-line3 span a {
+    color: white;
+}
+
+a.profiler-header-editlink {
+    float: left;
+    margin-left: 16px;
+    font-size: 11px;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/*********************************************/
+
+.profiler-message {
+    padding: 8px;
+    color: #dddddd;
+    margin-bottom: 10px;
+    text-align: center;
+    border: 1px solid #101010;
+    background: url(../images/ajax.gif) no-repeat 8px #141414;
+
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+}
+
+.profiler-message b {
+    color: white;
+}
+
+/*********************************************/
+
+.profiler-tablinks {
+    position: relative;
+    z-index: 1;
+}
+
+.profiler-tablinks a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.profiler-tablinks-armory {
+    z-index: 1;
+    float: right;
+    font-size: 13px;
+    background: url(../images/link.gif) no-repeat left center;
+    padding: 5px 5px 5px 19px;
+    margin-left: 6px;
+}
+
+.profiler-tablinks-help {
+    z-index: 1;
+    float: right;
+    font-size: 13px;
+    background: url(../images/help.gif) no-repeat left center;
+    padding: 5px 5px 5px 21px;
+    margin-left: 6px;
+}
+
+.profiler-tablinks-print {
+    z-index: 1;
+    float: right;
+    font-size: 13px;
+    background: url(../images/print.gif) no-repeat left center;
+    padding: 5px 5px 5px 21px;
+}
+
+/*********************************************/
+
+.profiler-tabs {
+    border-bottom: 1px solid #404040;
+    margin-bottom: 10px;
+}
+
+/*********************************************/
+
+.profiler-infobox-skill {
+    line-height: 1em;
+}
+
+.profiler-infobox-skill a {
+    text-decoration: none;
+}
+
+.profiler-infobox-raids {
+    line-height: 18px!important;
+    vertical-align: top;
+}
+
+.profiler-infobox-raids .progressbar {
+    height: 18px;
+    margin: 4px auto;
+}
+
+.profiler-infobox-raids .progressbar-text {
+    width: auto;
+    padding-left: 22px;
+    text-align: left;
+}
+
+.profiler-infobox-raids .progressbar-hidden {
+    padding-left: 8px;
+}
+
+.profiler-infobox-gear {
+    width: 20px;
+    line-height: 18px!important;
+    vertical-align: top;
+}
+
+.profiler-infobox-gear .completion {
+    display: block;
+    height: 20px;
+    width: 16px;
+    margin: 2px auto;
+    background: left center no-repeat;
+}
+
+.profiler-infobox-gear .progressbar {
+    width: 20px;
+    margin: 0 auto 1px;
+
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+
+.profiler-infobox-gear .progressbar div {
+    height: 100%;
+    border-top-width: 0;
+
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+
+.profiler-infobox-gear .progressbar-first, .profiler-infobox-gear .progressbar-first div {
+    -webkit-border-radius: 3px 3px 0 0;
+    -moz-border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;
+}
+
+.profiler-infobox-gear .progressbar-first div {
+    border-top-width: 1px;
+    margin-bottom: 2px;
+}
+
+.profiler-infobox-gear .progressbar-last, .profiler-infobox-gear .progressbar-last div {
+    -webkit-border-radius: 0 0 3px 3px;
+    -moz-border-radius: 0 0 3px 3px;
+    border-radius: 0 0 3px 3px;
+}
+
+.profiler-infobox-gear .progressbar-rep0 {
+    border: 1px solid #9c2319;
+    border-top: 1px solid #b82e21;
+}
+
+.profiler-infobox-gear .progressbar-rep1 {
+    border: 1px solid #b05421;
+    border-top: 1px solid #c9662b;
+}
+
+.profiler-infobox-gear .progressbar-rep2 {
+    border: 1px solid #bf8626;
+    border-top: 1px solid #d59b31;
+}
+
+.profiler-infobox-gear .progressbar-rep3 {
+    border: 1px solid #bb9b25;
+    border-top: 1px solid #d2b130;
+}
+
+.profiler-infobox-gear .progressbar-rep4 {
+    border: 1px solid #8d8b01;
+    border-top: 1px solid #a4a201;
+}
+
+.profiler-infobox-gear .progressbar-rep5 {
+    border: 1px solid #638701;
+    border-top: 1px solid #74a001;
+}
+
+.profiler-infobox-gear .progressbar-rep6 {
+    border: 1px solid #288b01;
+    border-top: 1px solid #30a601;
+}
+
+.profiler-infobox-gear .progressbar-rep7 {
+    border: 1px solid #068870;
+    border-top: 1px solid #0aa087;
+}
+
+.profiler-infobox-gear .progressbar-ach0 {
+    border: 1px solid #2082af;
+    border-top: 1px solid #0aa087;
+}
+
+.profiler-infobox-gear .progressbar-ach1 {
+    border: 1px solid #686868;
+    border-top: 1px solid #7a7a7a;
+}
+
+.profiler-infobox-gear .progressbar-green {
+    border: 1px solid #2b9401;
+    border-top: 1px solid #3aca01;
+}
+
+.profiler-infobox-gear .progressbar-yellow {
+    border: 1px solid #b1ae00;
+    border-top: 1px solid #e6e200;
+}
+
+.profiler-infobox-gear .progressbar-red {
+    border: 1px solid #b10c00;
+    border-top: 1px solid #e60f00;
+}
+
+/*********************************************/
+
+.profiler-model-outer {
+    position: relative;
+}
+
+.profiler-model {
+    position: absolute;
+    top: 6px;
+    left: 50px;
+    height: 345px;
+    width: 275px;
+    z-index: 10;
+}
+
+.profiler-search {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+}
+
+.profiler-search input {
+    width: 235px;
+}
+
+.profiler-inventory {
+    background-color: #141414;
+    border: 1px solid #101010;
+    width: 369px;
+    height: 408px;
+    position: relative;
+    margin-bottom: 10px;
+
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+}
+
+.profiler-inventory-inner {
+    padding: 3px;
+}
+
+.profiler-inventory-left, .profiler-inventory-right, .profiler-inventory-bottom {
+    position: absolute;
+}
+
+.profiler-inventory-left {
+    top: 3px;
+    left: 3px;
+}
+
+.profiler-inventory-right {
+    top: 3px;
+    right: 3px;
+}
+
+.profiler-inventory-bottom {
+    bottom: 3px;
+    left: 119px;
+}
+
+.profiler-inventory-bottom .iconmedium {
+    float: left;
+}
+
+.profiler-inventory-buttons {
+    position: absolute;
+    bottom: -25px;
+    right: 0;
+}
+
+.profiler-inventory-bars {
+    float: left;
+    width: 25%;
+}
+
+.profiler-inventory-resists {
+    float: right;
+}
+
+.profiler-inventory-stats {
+    border-collapse: collapse;
+    border: 0;
+    width: 100%;
+}
+
+.profiler-inventory-stats td {
+    padding: 0;
+    vertical-align: top;
+}
+
+.profiler-inventory-stats p {
+    margin: 0;
+    margin-right: 10px;
+    background-color: #141414;
+    border: 1px solid #101010;
+    padding: 0 10px 10px 10px;
+
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+}
+
+.profiler-inventory-stats small {
+    display: block;
+    font-size: 11px;
+    padding: 0 7px;
+}
+
+.profiler-inventory-stats h3 {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    margin: 0;
+    padding: 8px 0;
+}
+
+.profiler-inventory-stats a {
+    display: block;
+    color: white;
+    padding: 2px 3px;
+    text-decoration: none;
+}
+
+.profiler-inventory-stats a: hover {
+    background-color: #222222;
+}
+
+.profiler-inventory-stats a: hover em {
+    text-decoration: underline;
+}
+
+.profiler-inventory-stats a: hover span {
+    text-decoration: underline;
+}
+
+.profiler-inventory-stats em {
+    float: left;
+    display: block;
+    font-style: normal;
+    width: 70%;
+    color: #dddddd;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.profiler-inventory-stats var {
+    float: right;
+    display: block;
+    width: 30%;
+    font-style: normal;
+    text-align: right;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.progressbar-health {
+    border-top: 1px solid #3aca01;
+    border-bottom: 1px solid #2b9401;
+    background-color: #207001;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.progressbar-mana {
+    border-top: 1px solid #3472bf;
+    border-bottom: 1px solid #235a9d;
+    background-color: #174a89;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.progressbar-rage {
+    border-top: 1px solid #e60f00;
+    border-bottom: 1px solid #b10c00;
+    background-color: #930900;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.progressbar-energy {
+    border-top: 1px solid #e6e200;
+    border-bottom: 1px solid #b1ae00;
+    background-color: #939000;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.progressbar-runic {
+    border-top: 1px solid #30cfeb;
+    border-bottom: 1px solid #30aac0;
+    background-color: #3095a7;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+/*********************************************/
+
+.profiler-talents-specs {
+    width: 946px;
+    margin: 0 auto;
+    padding-bottom: 10px;
+}
+
+a.profiler-talents-button,a.profiler-pets-button {
+    float: left;
+    display: block;
+    padding: 3px 8px 3px 5px;
+    margin-right: 10px;
+    background-color: #404040;
+    border: 1px solid #202020;
+    text-decoration: none;
+    color: white;
+
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+}
+
+a.profiler-talents-button: hover, a.profiler-pets-button: hover {
+    background-color: #484848;
+    border-color: #181818;
+    text-decoration: underline;
+    color: white;
+}
+
+a.profiler-talents-button span, a.profiler-pets-button span {
+    display: block;
+    padding: 3px 0 3px 18px;
+    background: no-repeat left center;
+}
+
+a.profiler-talents-button small, a.profiler-pets-button small {
+    color: #CCCCCC;
+}
+
+a.profiler-talents-button: hover small, a.profiler-pets-button: hover small {
+    color: white;
+}
+
+.profiler-talents-specs a.selected, .profiler-pets-specs a.selected {
+    background-color: #505050;
+    text-decoration: none!important;
+}
+
+.profiler-talents-specs a.selected small, .profiler-pets-specs a.selected small {
+    color: white;
+}
+
+/*********************************************/
+
+a.profiler-pets-button {
+    height: 26px;
+}
+
+a.profiler-pets-button span {
+    padding: 5px 0 5px 28px;
+}
+
+.profiler-pets-model {
+    width: 360px;
+    height: 364px;
+    position: absolute;
+    background-color: #181818;
+    border: 1px solid #383838;
+    margin-top: 43px;
+}
+
+.talentcalc-pet .talentcalc-main, .talentcalc-pet .talentcalc-lower {
+    margin-left: 370px;
+}
+
+/*********************************************/
+
+.profiler-reputation h2 {
+    clear: none;
+}
+
+h2 .disclosure-on,h2 .disclosure-off {
+    font-weight: normal;
+}
+
+.profiler-reputation th, .profiler-reputation td {
+    padding: 2px 0 0 0;
+}
+
+.profiler-reputation th {
+    width: 250px;
+    text-align: left;
+    vertical-align: middle;
+    font-weight: normal;
+}
+
+.profiler-reputation td {
+    width: 200px;
+}
+
+/*********************************************/
+
+.profiler-achievements-source {
+    margin-bottom: 10px;
+}
+
+.profiler-achievements-summary {
+    width: 600px;
+    float: left;
+    background-color: #141414;
+    border: 1px solid #101010;
+    margin-bottom: 10px;
+
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+}
+
+.profiler-achievements-summary-points {
+    position: relative;
+}
+
+.profiler-achievements-summary-points span {
+    display: block;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+}
+
+.profiler-achievements-summary-inner {
+    padding: 6px;
+    font-size: 12px;
+}
+
+.profiler-achievements-summary a {
+    display: block;
+    color: white;
+}
+
+.profiler-achievements-summary a: hover {
+    background-color: #222222;
+}
+
+.profiler-achievements-summary a.selected {
+    background-color: #282828;
+}
+
+.profiler-achievements-summary a: hover em {
+    text-decoration: underline;
+}
+
+.profiler-achievements-summary a.selected: hover em {
+    text-decoration: none;
+}
+
+.profiler-achievements-summary var {
+    display: block;
+    padding: 5px;
+    font-style: normal;
+}
+
+.profiler-achievements-summary em {
+    font-style: normal;
+}
+
+a.profiler-achievements-total {
+    width: 188px;
+    margin-top: 6px;
+    margin-right: 11px;
+    float: left;
+}
+
+a.profiler-achievements-total-right {
+    width: 190px;
+    margin-top: 6px;
+    float: left;
+}
+
+/*********************************************/
+
+.profiler-picker {
+    font-size: 13px;
+    width: 780px;
+    height: 554px;
+    background-color: #303030;
+    border: 10px solid #303030;
+    border-bottom: 0;
+}
+
+.profiler-picker .listview {
+    border: 0;
+}
+
+.profiler-picker .listview-band-top {
+    background-color: #303030;
+}
+
+/*********************************************/
+
+.profiler-exclusion label {
+    width: 49%;
+    display: inline-block;
+    text-align: center;
+}
+
+.profiler-exclusion label b {
+    padding: 0 4px;
+}
+
+/*********************************************/
+
+.moneyschoolarc, .moneyschoolfir, .moneyschoolfro, .moneyschoolhol, .moneyschoolnat, .moneyschoolsha {
+    padding-left: 18px;
+    background: no-repeat left center;
+}
+
+.moneyschoolarc { background-image: url(../../images/icons/resist-arcane.gif); }
+.moneyschoolfir { background-image: url(../../images/icons/resist-fire.gif); }
+.moneyschoolfro { background-image: url(../../images/icons/resist-frost.gif); }
+.moneyschoolhol { background-image: url(../../images/icons/resist-holy.gif); }
+.moneyschoolnat { background-image: url(../../images/icons/resist-nature.gif); }
+.moneyschoolsha { background-image: url(../../images/icons/resist-shadow.gif); }
+
+
+/**************/
+/* OVERWRITES */
+/**************/
+
+.infobox {
+    border-color: #101010;
+}
+
+/********************/
+/* PROFILER BUTTONS */
+/********************/
+
+.profiler-button {
+    float: left;
+    margin-right: 5px;
+    cursor: pointer;
+    outline: 0;
+    white-space: nowrap;
+    line-height: 24px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 11px;
+    color: white;
+    text-shadow: #333 0px -1px 0px;
+    background: url(../images/Profiler/button-grey.png) left 0 no-repeat;
+}
+
+.profiler-button em {
+    display: block;
+    margin-left: 15px; /* Endcap */
+    padding-right: 15px; /* Endcap */
+    background: url(../images/Profiler/button-grey.png) right 0 no-repeat;
+}
+
+.profiler-button.selected {
+    cursor: default;
+    color: #aaaaaa;
+    text-shadow: none;
+}
+
+.profiler-button i, .profiler-button em {
+    font-style: normal;
+}
+
+.profiler-option-left, .profiler-option-right {
+    margin-right: 0;
+}
+
+.profiler-option-right em {
+    margin-left: 0;
+}
+
+.profiler-option-right i {
+    display: block;
+    padding-left: 15px; /* Endcap */
+    background: url(../images/Profiler/button-grey.png) -204px 0 no-repeat;
+}
+
+.profiler-button: hover       { background-position: left -48px;  }
+.profiler-button: hover em    { background-position: right -48px; }
+.profiler-button: active       { background-position: left -72px;  }
+.profiler-button: active em    { background-position: right -72px; }
+.profiler-button.selected    { background-position: left -24px;  }
+.profiler-button.selected em { background-position: right -24px; }
+
+.profiler-option-left em          { background-position: -120px 0; }
+.profiler-option-left: hover em    { background-position: -120px -48px; }
+.profiler-option-left: active em    { background-position: -120px -72px; }
+.profiler-option-left.selected em { background-position: -120px -24px; }
+
+.profiler-option-right i          { background-position: -204px 0; }
+.profiler-option-right: hover i    { background-position: -204px -48px; }
+.profiler-option-right: active i    { background-position: -204px -72px; }
+.profiler-option-right.selected i { background-position: -204px -24px; }

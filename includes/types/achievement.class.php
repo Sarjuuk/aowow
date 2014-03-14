@@ -68,7 +68,7 @@ class AchievementList extends BaseType
         }
     }
 
-    public function getListviewData()
+    public function getListviewData($addInfoMask = 0x0)
     {
         $data = [];
 
@@ -81,8 +81,11 @@ class AchievementList extends BaseType
                 'points'      => $this->curTpl['points'],
                 'faction'     => $this->curTpl['faction'],
                 'category'    => $this->curTpl['category'],
-                'parentCat'   => $this->curTpl['parentCat'],
+                'parentcat'   => $this->curTpl['parentCat'],
             );
+
+            if ($addInfoMask & ACHIEVEMENTINFO_PROFILE)
+                $data[$this->id]['icon'] = $this->curTpl['iconString'];
 
             // going out on a limb here: type = 1 if in level 3 of statistics tree, so, IF (statistic AND parentCat NOT statistic (1)) i guess
             if  ($this->curTpl['flags'] & ACHIEVEMENT_FLAG_COUNTER && $this->curTpl['parentCat'] != 1)

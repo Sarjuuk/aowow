@@ -1,8 +1,3 @@
-{*
-found this button(?) in item.tpl .. no script, data or style found for this id
-<div id="sdlkgnfdlkgndfg4"></div>
-*}
-
 {if isset($redButtons[$smarty.const.BUTTON_WOWHEAD])}
     {assign var='b' value=$redButtons[$smarty.const.BUTTON_WOWHEAD]}
     {if $b}
@@ -58,4 +53,7 @@ found this button(?) in item.tpl .. no script, data or style found for this id
     {else}
         <a href="javascript:;" class="button-red button-red-disabled"><em><b><i>{$lang.forum}</i></b><span>{$lang.forum}</span></em></a>
     {/if}
+{/if}
+{if isset($redButtons[$smarty.const.BUTTON_EQUIP])}
+    <div id="equip-pinned-button"></div> {* content is added by jScript *}
 {/if}

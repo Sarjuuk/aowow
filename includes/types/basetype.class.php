@@ -297,6 +297,14 @@ abstract class BaseType
     }
 
     // read-access to templates
+    public function getEntry($id)
+    {
+        if (isset($this->templates[$id]))
+            return $this->templates[$id];
+
+        return null;
+    }
+
     public function getField($field, $localized = false)
     {
         if (!$this->curTpl || (!$localized && !isset($this->curTpl[$field])))
@@ -306,7 +314,14 @@ abstract class BaseType
             return Util::localizedString($this->curTpl, $field);
 
         $value = $this->curTpl[$field];
-        return Util::checkNumeric($value) ? floatVal($value) : $value;
+        if (Util::checkNumeric($value))
+        {
+            $intVal   = intVal($value);
+            $floatVal = floatVal($value);
+            return $intVal == $floatVal ? $intVal : $floatVal;
+        }
+        else
+            return $value;
     }
 
     public function getRandomId()

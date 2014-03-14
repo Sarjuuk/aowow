@@ -261,7 +261,8 @@ $lang = array(
         'focusDesc'     => "Spells requiring this Focus can be cast near this Object",
         'trap'          => "Trap",
         'triggeredBy'   => "Triggered by",
-        'capturePoint'  => "Capture Point"
+        'capturePoint'  => "Capture Point",
+        'foundIn'       => "This object can be found in"
     ),
     'npc' => array(
         'classification'=> "Classification",
@@ -279,6 +280,7 @@ $lang = array(
         'melee'         => "Melee",
         'ranged'        => "Ranged",
         'armor'         => "Armor",
+        'foundIn'       => "This NPC can be found in",
         'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rare", 2 => "Rare Elite", 3 => "Boss"],
         'textTypes'     => [null, "yells", "says", "whispers"],
         'modes'         => array(
@@ -328,6 +330,7 @@ $lang = array(
         'Miscellaneous' => "Miscellaneous",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Cosmic Map",
+        'selectorLink'  => " and ",
     ),
     'zone' => array(
         // 'zone'          => "Zone",
@@ -526,8 +529,8 @@ $lang = array(
         ),
         'combatRating'  => array(
             "Weapon Skill",                         "Defense Skill",                        "Dodge",                                "Parry",                                "Block",
-            "Melee Hit Chance",                     "Ranged Hit Chance",                    "Spell Hit Chance",                     "Casting Melee Hit Chance",             "Casting Ranged Hit Chance",
-            "Casting Spell Hit Chance",             "Taken Melee Hit Chance",               "Taken Ranged Hit Chance",              "Taken Spell Hit Chance",               "Taken Critical Melee Hit Chance",
+            "Melee Hit Chance",                     "Ranged Hit Chance",                    "Spell Hit Chance",                     "Critical Melee Hit Chance",            "Critical Ranged Hit Chance",
+            "Critical Spell Hit Chance",            "Taken Melee Hit Chance",               "Taken Ranged Hit Chance",              "Taken Spell Hit Chance",               "Taken Critical Melee Hit Chance",
             "Taken Critical Ranged Hit Chance",     "Taken Critical Spell Hit Chance",      "Melee Haste",                          "Ranged Haste",                         "Spell Haste",
             "Mainhand Weapon Skill",                "Offhand Weapon Skill",                 "Ranged Weapon Skill",                  "Expertise",                            "Armor Penetration"
         ),

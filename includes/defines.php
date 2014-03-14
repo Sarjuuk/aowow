@@ -87,7 +87,7 @@ define('LOCALE_DE',                         3);
 define('LOCALE_ES',                         6);
 define('LOCALE_RU',                         8);
 
-// red buttons on the top of the page (ASC:: right -> left)
+// red buttons on the top of the page
 define('BUTTON_WOWHEAD',                    0);
 define('BUTTON_UPGRADE',                    1);
 define('BUTTON_COMPARE',                    2);
@@ -95,6 +95,7 @@ define('BUTTON_VIEW3D',                     3);
 define('BUTTON_LINKS',                      4);
 define('BUTTON_FORUM',                      5);
 define('BUTTON_TALENT',                     6);
+define('BUTTON_EQUIP',                      7);
 
 // generic filter handler
 define('FILTER_CR_BOOLEAN',                 1);
@@ -120,6 +121,8 @@ define('ITEMINFO_MODEL',                    0x20);
 
 define('NPCINFO_TAMEABLE',                  0x1);
 define('NPCINFO_MODEL',                     0x2);
+
+define('ACHIEVEMENTINFO_PROFILE',           0x1);
 
 define('SPAWNINFO_ZONES',                   1);             // not a mask, mutually exclusive
 define('SPAWNINFO_SHORT',                   2);
@@ -163,6 +166,14 @@ define('OBJECT_CU_NOT_PERSISTANT',          0x80);
 
 define('NPC_CU_INSTANCE_BOSS',              0x01);
 define('NPC_CU_DIFFICULTY_DUMMY',           0x02);
+define('NPC_CU_DUNGEON_ENCOUNTER',          0x04);
+
+// as seen in wFlags
+define('QUEST_CU_REPEATABLE',               0x01);
+define('QUEST_CU_DAILY',                    0x02);
+define('QUEST_CU_WEEKLY',                   0x04);
+define('QUEST_CU_SEASONAL',                 0x08);
+define('QUEST_CU_SKIP_LOG',                 0x10);          // no idea...
 
 define('MAX_LEVEL',                         80);
 
@@ -341,6 +352,8 @@ define('NPC_FLAG_CLASS_TRAINER',            0x00000020);
 define('NPC_FLAG_VENDOR',                   0x00000080);
 define('NPC_FLAG_REPAIRER',                 0x00001000);
 define('NPC_FLAG_FLIGHT_MASTER',            0x00002000);
+define('NPC_FLAG_SPIRIT_HEALER',            0x00004000);    // civil
+define('NPC_FLAG_SPIRIT_GUIDE',             0x00008000);    // battleground
 define('NPC_FLAG_INNKEEPER',                0x00010000);
 define('NPC_FLAG_BANKER',                   0x00020000);
 define('NPC_FLAG_GUILD_MASTER',             0x00080000);

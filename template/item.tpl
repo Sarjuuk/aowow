@@ -14,6 +14,9 @@
 {include file='bricks/community.tpl'}
                 var g_pageInfo = {ldelim}type: {$type}, typeId: {$typeId}, name: '{$name|escape:"quotes"}'{rdelim};
                 g_initPath({$path});
+{if $user.id && $redButtons[$smarty.const.BUTTON_EQUIP]}
+                DomContentLoaded.addEvent(function() {ldelim} pr_addEquipButton('equip-pinned-button', {$typeId}); {rdelim});
+{/if}
             //]]></script>
 
 {include file='bricks/infobox.tpl'}

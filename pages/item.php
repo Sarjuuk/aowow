@@ -11,7 +11,11 @@ require 'includes/community.class.php';
 
 $_id       = intVal($pageParam);
 $_path     = [0, 0];
-$_visSlots = [SLOT_HEAD, SLOT_SHOULDERS, SLOT_SHIRT, SLOT_CHEST, SLOT_WAIST, SLOT_LEGS, SLOT_FEET, SLOT_WRISTS, SLOT_HANDS, SLOT_BACK, SLOT_MAIN_HAND, SLOT_OFF_HAND, SLOT_RANGED, SLOT_TABARD];
+$_visSlots = array(
+    INVTYPE_HEAD,           INVTYPE_SHOULDERS,      INVTYPE_BODY,           INVTYPE_CHEST,          INVTYPE_WAIST,          INVTYPE_LEGS,           INVTYPE_FEET,           INVTYPE_WRISTS,
+    INVTYPE_HANDS,          INVTYPE_WEAPON,         INVTYPE_SHIELD,         INVTYPE_RANGED,         INVTYPE_CLOAK,          INVTYPE_2HWEAPON,       INVTYPE_TABARD,         INVTYPE_ROBE,
+    INVTYPE_WEAPONMAINHAND, INVTYPE_WEAPONOFFHAND,  INVTYPE_HOLDABLE,       INVTYPE_THROWN,         INVTYPE_RANGEDRIGHT
+);
 
 $cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_ITEM, $_id, -1, User::$localeId]);
 
@@ -73,7 +77,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 {
     $item = new ItemList(array(['i.id', $_id]));
     if ($item->error)
-        $smarty->notFound(Lang::$game['item']);
+        $smarty->notFound(Lang::$game['item'], $_id);
 
     $item->addGlobalsToJscript($smarty, GLOBALINFO_EXTRA | GLOBALINFO_SELF);
 
@@ -317,6 +321,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
                 BUTTON_LINKS   => ['color' => 'ff'.Util::$rarityColorStings[$item->getField('quality')], 'linkId' => 'item:'.$_id.':0:0:0:0:0:0:0:0'],
                 BUTTON_VIEW3D  => $view3D ? ['displayId' => $item->getField('displayId'), 'slot' => $_slot, 'type' => TYPE_ITEM, 'typeId' => $_id] : false,
                 BUTTON_COMPARE => $cmpUpg,                      // bool required
+                BUTTON_EQUIP   => $cmpUpg,
                 BUTTON_UPGRADE => $cmpUpg ? ['class' => $_class, 'slot' => $_slot] : false
             ),
         ),
@@ -348,19 +353,19 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
     }
 
     // factionchange-equivalent
-    $pendant = DB::Aowow()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_items WHERE alliance_id = ?d OR horde_id = ?d', $_id, $_id, $_id);
-    if ($pendant)
+    if ($pendant = DB::Aowow()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_items WHERE alliance_id = ?d OR horde_id = ?d', $_id, $_id, $_id))
     {
         $altItem = new ItemList(array(['id', abs($pendant)]));
         if (!$altItem->error)
         {
-            $pageData['page']['transfer'] = array(
-                'id'      => $altItem->id,
-                'quality' => $altItem->getField('quality'),
-                'icon'    => $altItem->getField('iconString'),
-                'name'    => $altItem->getField('name', true),
-                'facInt'  => $pendant > 0 ? 'alliance' : 'horde',
-                'facName' => $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+            $pageData['page']['transfer'] = sprintf(
+                Lang::$item['_transfer'],
+                $altItem->id,
+                $altItem->getField('quality'),
+                $altItem->getField('iconString'),
+                $altItem->getField('name', true),
+                $pendant > 0 ? 'alliance' : 'horde',
+                $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
             );
         }
     }
@@ -743,10 +748,10 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
                         $currency[] = [-$id, $qty];
                 }
 
-                $row['stock'] = $vendors[$k]['maxcount'];
+                $row['stock'] = $vendors[$k]['stock'];
                 $row['cost']  = [$item->getField('buyPrice')];
 
-                if ($e = $vendors[$k]['eventId'])
+                if ($e = $vendors[$k]['event'])
                 {
                     if (count($extraCols) == 3)
                         $extraCols[] = 'Listview.extraCols.condition';

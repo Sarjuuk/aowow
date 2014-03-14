@@ -146,9 +146,9 @@ class SpellList extends BaseType
 
             for ($i = 1; $i <= 3; $i++)
             {
-                $mv = $this->curTpl['effect'.$i.'MiscValue'];
-                $bp = $this->curTpl['effect'.$i.'BasePoints'] + 1;
-                $au = $this->curTpl['effect'.$i.'AuraId'];
+                $pts = $this->calculateAmountForCurrent($i)[1];
+                $mv  = $this->curTpl['effect'.$i.'MiscValue'];
+                $au  = $this->curTpl['effect'.$i.'AuraId'];
 
                 // Enchant Item Permanent (53) / Temporary (54)
                 if (in_array($this->curTpl['effect'.$i.'Id'], [53, 54]))
@@ -159,10 +159,6 @@ class SpellList extends BaseType
                     continue;
                 }
 
-                // Aura Effects
-                if (!in_array($au, [8, 13, 22, 29, 34, 35, 83, 84, 85, 99, 124, 135, 143, 158, 161, 189, 220, 230, 235, 240, 250]))
-                    continue;
-
                 switch ($au)
                 {
                     case 29:                                // ModStat MiscVal:type
@@ -170,10 +166,10 @@ class SpellList extends BaseType
                         if ($mv < 0)                        // all stats
                         {
                             for ($j = 0; $j < 5; $j++)
-                                @$stats[ITEM_MOD_AGILITY + $j] += $bp;
+                                @$stats[ITEM_MOD_AGILITY + $j] += $pts;
                         }
                         else                                // one stat
-                            @$stats[ITEM_MOD_AGILITY + $mv] += $bp;
+                            @$stats[ITEM_MOD_AGILITY + $mv] += $pts;
 
                         break;
                     }
@@ -181,7 +177,7 @@ class SpellList extends BaseType
                     case 230:
                     case 250:
                     {
-                        @$stats[ITEM_MOD_HEALTH] += $bp;
+                        @$stats[ITEM_MOD_HEALTH] += $pts;
                         break;
                     }
                     case 13:                                // damage splpwr + physical (dmg & any)
@@ -189,80 +185,80 @@ class SpellList extends BaseType
                         // + weapon damage
                         if ($mv == (1 << SPELL_SCHOOL_NORMAL))
                         {
-                            @$stats[ITEM_MOD_WEAPON_DMG] += $bp;
+                            @$stats[ITEM_MOD_WEAPON_DMG] += $pts;
                             break;
                         }
 
                         // full magic mask, also counts towards healing
                         if ($mv == 0x7E)
                         {
-                            @$stats[ITEM_MOD_SPELL_POWER] += $bp;
-                            @$stats[ITEM_MOD_SPELL_DAMAGE_DONE] += $bp;
+                            @$stats[ITEM_MOD_SPELL_POWER] += $pts;
+                            @$stats[ITEM_MOD_SPELL_DAMAGE_DONE] += $pts;
                         }
                         else
                         {
                             // HolySpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_HOLY))
-                                @$stats[ITEM_MOD_HOLY_POWER] += $bp;
+                                @$stats[ITEM_MOD_HOLY_POWER] += $pts;
 
                             // FireSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_FIRE))
-                                @$stats[ITEM_MOD_FIRE_POWER] += $bp;
+                                @$stats[ITEM_MOD_FIRE_POWER] += $pts;
 
                             // NatureSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_NATURE))
-                                @$stats[ITEM_MOD_NATURE_POWER] += $bp;
+                                @$stats[ITEM_MOD_NATURE_POWER] += $pts;
 
                             // FrostSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_FROST))
-                                @$stats[ITEM_MOD_FROST_POWER] += $bp;
+                                @$stats[ITEM_MOD_FROST_POWER] += $pts;
 
                             // ShadowSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_SHADOW))
-                                @$stats[ITEM_MOD_SHADOW_POWER] += $bp;
+                                @$stats[ITEM_MOD_SHADOW_POWER] += $pts;
 
                             // ArcaneSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_ARCANE))
-                                @$stats[ITEM_MOD_ARCANE_POWER] += $bp;
+                                @$stats[ITEM_MOD_ARCANE_POWER] += $pts;
                         }
 
                         break;
                     }
                     case 135:                               // healing splpwr (healing & any) .. not as a mask..
                     {
-                        @$stats[ITEM_MOD_SPELL_HEALING_DONE] += $bp;
+                        @$stats[ITEM_MOD_SPELL_HEALING_DONE] += $pts;
                         break;
                     }
                     case 35:                                // ModPower - MiscVal:type see defined Powers only energy/mana in use
                     {
                         if ($mv == POWER_HEALTH)
-                            @$stats[ITEM_MOD_HEALTH] += $bp;
+                            @$stats[ITEM_MOD_HEALTH] += $pts;
                         if ($mv == POWER_ENERGY)
-                            @$stats[ITEM_MOD_ENERGY] += $bp;
+                            @$stats[ITEM_MOD_ENERGY] += $pts;
                         else if ($mv == POWER_MANA)
-                            @$stats[ITEM_MOD_MANA] += $bp;
+                            @$stats[ITEM_MOD_MANA] += $pts;
                         else if ($mv == POWER_RUNIC_POWER)
-                            @$stats[ITEM_MOD_RUNIC_POWER] += $bp;
+                            @$stats[ITEM_MOD_RUNIC_POWER] += $pts;
 
                         break;
                     }
                     case 189:                               // CombatRating MiscVal:ratingMask
                     case 220:
                         if ($mod = Util::itemModByRatingMask($mv))
-                            @$stats[$mod] += $bp;
+                            @$stats[$mod] += $pts;
                         break;
                     case 143:                               // Resistance MiscVal:school
                     case 83:
                     case 22:
                         if ($mv == 1)                       // Armor only if explicitly specified
                         {
-                            @$stats[ITEM_MOD_ARMOR] += $bp;
+                            @$stats[ITEM_MOD_ARMOR] += $pts;
                             break;
                         }
 
                         if ($mv == 2)                       // holy-resistance ONLY if explicitly specified (shouldn't even exist...)
                         {
-                            @$stats[ITEM_MOD_HOLY_RESISTANCE] += $bp;
+                            @$stats[ITEM_MOD_HOLY_RESISTANCE] += $pts;
                             break;
                         }
 
@@ -274,19 +270,19 @@ class SpellList extends BaseType
                             switch ($j)
                             {
                                 case 2:
-                                    @$stats[ITEM_MOD_FIRE_RESISTANCE] += $bp;
+                                    @$stats[ITEM_MOD_FIRE_RESISTANCE] += $pts;
                                     break;
                                 case 3:
-                                    @$stats[ITEM_MOD_NATURE_RESISTANCE] += $bp;
+                                    @$stats[ITEM_MOD_NATURE_RESISTANCE] += $pts;
                                     break;
                                 case 4:
-                                    @$stats[ITEM_MOD_FROST_RESISTANCE] += $bp;
+                                    @$stats[ITEM_MOD_FROST_RESISTANCE] += $pts;
                                     break;
                                 case 5:
-                                    @$stats[ITEM_MOD_SHADOW_RESISTANCE] += $bp;
+                                    @$stats[ITEM_MOD_SHADOW_RESISTANCE] += $pts;
                                     break;
                                 case 6:
-                                    @$stats[ITEM_MOD_ARCANE_RESISTANCE] += $bp;
+                                    @$stats[ITEM_MOD_ARCANE_RESISTANCE] += $pts;
                                     break;
                             }
                         }
@@ -294,27 +290,63 @@ class SpellList extends BaseType
                     case 8:                                 // hp5
                     case 84:
                     case 161:
-                        @$stats[ITEM_MOD_HEALTH_REGEN] += $bp;
+                        @$stats[ITEM_MOD_HEALTH_REGEN] += $pts;
                         break;
                     case 85:                                // mp5
-                        @$stats[ITEM_MOD_MANA_REGENERATION] += $bp;
+                        @$stats[ITEM_MOD_MANA_REGENERATION] += $pts;
                         break;
                     case 99:                                // atkpwr
-                        @$stats[ITEM_MOD_ATTACK_POWER] += $bp;
+                        @$stats[ITEM_MOD_ATTACK_POWER] += $pts;
                         break;                              // ?carries over to rngatkpwr?
                     case 124:                               // rngatkpwr
-                        @$stats[ITEM_MOD_RANGED_ATTACK_POWER] += $bp;
+                        @$stats[ITEM_MOD_RANGED_ATTACK_POWER] += $pts;
                         break;
                     case 158:                               // blockvalue
-                        @$stats[ITEM_MOD_BLOCK_VALUE] += $bp;
+                        @$stats[ITEM_MOD_BLOCK_VALUE] += $pts;
                         break;
                     case 240:                               // ModExpertise
-                        @$stats[ITEM_MOD_EXPERTISE_RATING] += $bp;
+                        @$stats[ITEM_MOD_EXPERTISE_RATING] += $pts;
                         break;
                 }
             }
 
             $data[$this->id] = $stats;
+        }
+
+        return $data;
+    }
+
+    public function getProfilerMods()
+    {
+        $data = $this->getStatGain();                       // flat gains
+
+        foreach ($this->iterate() as $id => $__)
+        {
+            for ($i = 1; $i < 4; $i++)
+            {
+                $pts = $this->calculateAmountForCurrent($i)[1];
+                $mv  = $this->curTpl['effect'.$i.'MiscValue'];
+                $au  = $this->curTpl['effect'.$i.'AuraId'];
+
+                /*  ISSUE!
+                    mods formated like ['<statName>' => [<points>, 'percentOf', '<statName>']] are applied as multiplier and not
+                    as a flat value (that is equal to the percentage, like they should be). So the stats-tabe won't show the actual deficit
+                */
+
+                switch ($this->curTpl['effect'.$i.'AuraId'])
+                {
+                    case 101:
+                        $data[$id][] = ['armor' => [$pts / 100, 'percentOf', 'armor']];
+                        break;
+                    case 13:                                // damage done flat
+                        // per magic school, omit physical
+                        break;
+                    case 30:                                // mod skill
+                        // diff between character skills and trade skills
+                        break;
+                    case 36:                                // shapeshift
+                }
+            }
         }
 
         return $data;
@@ -773,14 +805,14 @@ class SpellList extends BaseType
 
                 // Aura giving combat ratings
                 $rType = 0;
-                if (in_array($aura, [189, 220]))
+                if ($aura == 189)
                     if ($rType = Util::itemModByRatingMask($mv))
                         $usesScalingRating = true;
                 // Aura end
 
-                if ($rType && $this->interactive)
+                if ($rType && $this->interactive && $aura == 189)
                     return '<!--rtg'.$rType.'-->'.abs($base).'&nbsp;<small>('.sprintf(Util::$setRatingLevelString, $this->charLevel, $rType, abs($base), Util::setRatingLevel($this->charLevel, $rType, abs($base))).')</small>';
-                else if ($rType)
+                else if ($rType && $aura == 189)
                     return '<!--rtg'.$rType.'-->'.abs($base).'&nbsp;<small>('.Util::setRatingLevel($this->charLevel, $rType, abs($base)).')</small>';
                 else
                     return $base;
@@ -872,16 +904,16 @@ class SpellList extends BaseType
 
                 // Aura giving combat ratings
                 $rType = 0;
-                if (in_array($aura, [189, 220]))
+                if ($aura == 189)
                     if ($rType = Util::itemModByRatingMask($mv))
                         $usesScalingRating = true;
                 // Aura end
 
-                if ($rType && $equal && $this->interactive)
+                if ($rType && $equal && $this->interactive && $aura == 189)
                     return '<!--rtg'.$rType.'-->'.$min.'&nbsp;<small>('.sprintf(Util::$setRatingLevelString, $this->charLevel, $rType, $min, Util::setRatingLevel($this->charLevel, $rType, $min)).')</small>';
-                else if ($rType && $equal)
+                else if ($rType && $equal && $aura == 189)
                     return '<!--rtg'.$rType.'-->'.$min.'&nbsp;<small>('.Util::setRatingLevel($this->charLevel, $rType, $min).')</small>';
-                else if ($this->interactive)
+                else if ($this->interactive && $aura == 189)
                     return $modStrMin.$min . (!$equal ? Lang::$game['valueDelim'] . $modStrMax.$max : null);
                 else
                     return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
@@ -1069,7 +1101,7 @@ class SpellList extends BaseType
             $g / $G     - Gender-Switch $Gmale:female;
             $h / $H     - ProcChance
             $i          - MaxAffectedTargets
-            $l          - LastValue-Switch; last value as condiition $Ltrue:false;
+            $l          - LastValue-Switch; last value as condition $Ltrue:false;
             $m / $M     - BasePoints; per EffectIdx; m/M +1/+effectDieSides
             $n          - ProcCharges
             $o          - TotalAmount (for periodic auras); per EffectIdx
@@ -1577,6 +1609,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                 'skill'        => count($this->curTpl['skillLines']) > 4 ? array_merge(array_splice($this->curTpl['skillLines'], 0, 4), [-1]): $this->curTpl['skillLines'], // display max 4 skillLines (fills max three lines in listview)
                 'reagents'     => array_values($this->getReagentsForCurrent()),
                 'source'       => []
+                // 'talentspec'   => $this->curTpl['skillLines'][0]      not used: g_chr_specs has the wrong structure for it; also setting .cat and .type does the same
             );
 
             // Sources

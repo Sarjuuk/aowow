@@ -1097,32 +1097,21 @@ span.menu-buttons span.hassubmenu {
     width: 47%;
 }
 
-a.icontiny
-{
-    text-decoration: none;
-}
+/****************/
+/* INLINE ICONS */
+/****************/
+
+.icontiny  { background: left center no-repeat; }
+.icontinyr { padding-right: 18px; background: right center no-repeat; }
+.icontinyl { padding-left: 18px; background: left center no-repeat; }
+a.icontiny { text-decoration: none; }
+/* a.icontiny span span { text-decoration:underline; } */
+span.icontiny, a.tinyspecial { padding-left:18px !important; background:left center no-repeat; }
 
 span.icontiny
 {
     background: 0% 50% no-repeat transparent;
     padding-left: 18px !important;
-}
-
-.icontiny
-{
-    background: left center no-repeat;
-}
-
-.icontinyr
-{
-    padding-right: 18px;
-    background: right center no-repeat;
-}
-
-span.icontiny, a.tinyspecial
-{
-    padding-left:18px !important;
-    background:left center no-repeat;
 }
 
 .iconsmall, .iconmedium, .iconlarge
@@ -1471,6 +1460,31 @@ a.star-icon-right span
 {
     background: url(../../images/icons/horde-icon.gif) 1px center no-repeat;
     padding-left: 20px !important;
+}
+
+.icon-instance1, .icon-instance2, .icon-instance3, .icon-instance4, .icon-instance5, .icon-instance7, .icon-instance8 {
+    padding-left: 19px;
+    background: url(../../images/icons/instance-icons.gif) no-repeat;
+}
+
+.icon-instance1 { /* Transit (white) */
+    background-position: left center;
+}
+
+.icon-instance2 { /* Dungeon (blue) */
+    background-position: -152px center;
+}
+
+.icon-instance3, .icon-instance7, .icon-instance8 { /* Raid (green) */
+    background-position: -357px center;
+}
+
+.icon-instance4 { /* Battleground (red) */
+    background-position: -564px center;
+}
+
+.icon-instance5 { /* Heroic dungeon (purple) */
+    background-position: -734px center;
 }
 
 .ffapvp-icon
@@ -2613,18 +2627,31 @@ a:hover.pet-zoom
     border-right: 1px solid #282828;
 }
 
+/****************/
+/* PROGRESS BAR */
+/****************/
+
 .progressbar
 {
     display: block;
-    border: 1px solid #404040;
-    background: black;
+	border: none;
+    background-color: black;
     font-size: 11px;
     font-weight: bold;
     line-height: 1.5em;
     color: white;
-    text-decoration: none;
+    text-decoration: none !important;
     position: relative;
-    margin: 1px 0 3px;
+	margin: 2px 1px 4px 1px;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.progressbar del
+{
+    text-decoration: none;
 }
 
 .progressbar ins
@@ -2638,14 +2665,14 @@ a.progressbar
     cursor: default;
 }
 
-a.progressbar:hover
-{
-    border: 1px solid #606060;
-}
-
 a.progressbar:hover ins
 {
     display: inline;
+}
+
+a.progressbar:hover del
+{
+    display: none;
 }
 
 .progressbar-text
@@ -2658,11 +2685,24 @@ a.progressbar:hover ins
     text-align: center;
 }
 
+.progressbar-hidden
+{
+	position: relative;
+	visibility: hidden;
+	height: 1px;
+	width: auto;
+	margin-top: -1px;
+}
+
 .progressbar-rep0
 {
     border-top: 1px solid #b82e21;
     border-bottom: 1px solid #9c2319;
     background-color: #861c10;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .progressbar-rep1
@@ -2670,6 +2710,10 @@ a.progressbar:hover ins
     border-top: 1px solid #c9662b;
     border-bottom: 1px solid #b05421;
     background-color: #994515;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .progressbar-rep2
@@ -2677,6 +2721,10 @@ a.progressbar:hover ins
     border-top: 1px solid #d59b31;
     border-bottom: 1px solid #bf8626;
     background-color: #aa7419;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .progressbar-rep3
@@ -2684,6 +2732,10 @@ a.progressbar:hover ins
     border-top: 1px solid #d2b130;
     border-bottom: 1px solid #bb9b25;
     background-color: #a68818;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .progressbar-rep4
@@ -2691,6 +2743,10 @@ a.progressbar:hover ins
     border-top: 1px solid #a4a201;
     border-bottom: 1px solid #8d8b01;
     background-color: #777601;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .progressbar-rep5
@@ -2698,6 +2754,10 @@ a.progressbar:hover ins
     border-top: 1px solid #74a001;
     border-bottom: 1px solid #638701;
     background-color: #527001;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .progressbar-rep6
@@ -2705,6 +2765,10 @@ a.progressbar:hover ins
     border-top: 1px solid #30a601;
     border-bottom: 1px solid #288b01;
     background-color: #217201;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .progressbar-rep7
@@ -2712,6 +2776,10 @@ a.progressbar:hover ins
     border-top: 1px solid #0aa087;
     border-bottom: 1px solid #068870;
     background-color: #007564;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .progressbar-ach0
@@ -2719,6 +2787,10 @@ a.progressbar:hover ins
     border-top: 1px solid #2b98c9;
     border-bottom: 1px solid #2082af;
     background-color: #157099;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .progressbar-ach1
@@ -2726,6 +2798,48 @@ a.progressbar:hover ins
     border-top: 1px solid #7a7a7a;
     border-bottom: 1px solid #686868;
     background-color: #575757;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.progressbar-green
+{
+	border-top: 1px solid #3aca01;
+	border-bottom: 1px solid #2b9401;
+	background-color: #207001;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.progressbar-yellow
+{
+	border-top: 1px solid #e6e200;
+	border-bottom: 1px solid #b1ae00;
+	background-color: #939000;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.progressbar-red
+{
+	border-top: 1px solid #e60f00;
+	border-bottom: 1px solid #b10c00;
+	background-color: #930900;
+
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.listview .progressbar
+{
+	margin: 3px;
 }
 
 .article-footer
@@ -3612,12 +3726,12 @@ a:hover, a.open, .infobox li div, .text b
     cursor: default;
 }
 
-.tooltip a, .listview-mode-default tbody a, .progressbar del
+.tooltip a, .listview-mode-default tbody a
 {
     text-decoration: none;
 }
 
-.listview-void, a.progressbar:hover del
+.listview-void
 {
     display: none;
 }
