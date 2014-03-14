@@ -38,15 +38,17 @@ class DbSimple_Mysqli extends DbSimple_Database
 			$this->link->options(MYSQLI_OPT_CONNECT_TIMEOUT,
 				isset($dsn['timeout']) && $dsn['timeout'] ? $dsn['timeout'] : 0);
 
-			$this->link->real_connect((isset($dsn['persist']) && $dsn['persist'])?'p:'.$dsn['host']:$dsn['host'],
+			if (@$this->link->real_connect((isset($dsn['persist']) && $dsn['persist'])?'p:'.$dsn['host']:$dsn['host'],
 				$dsn['user'], isset($dsn['pass'])?$dsn['pass']:'', $base,
 				empty($dsn['port'])?NULL:$dsn['port'], NULL,
-				(isset($dsn['compression']) && $dsn['compression'])
-					? MYSQLI_CLIENT_COMPRESS : NULL);
+				(isset($dsn['compression']) && $dsn['compression']) ? MYSQLI_CLIENT_COMPRESS : NULL))
+            {
+                $this->link->set_charset((isset($dsn['enc']) ? $dsn['enc'] : 'UTF8'));
 
-			$this->link->set_charset((isset($dsn['enc']) ? $dsn['enc'] : 'UTF8'));
-
-			$this->isMySQLnd = method_exists('mysqli_result', 'fetch_all');
+                $this->isMySQLnd = method_exists('mysqli_result', 'fetch_all');
+            }
+            else
+                return $this->_setDbError(null, 'mysqli_real_connect @ ' . $dsn['host']);
 		}
 		catch (mysqli_sql_exception $e)
 		{
