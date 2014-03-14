@@ -43,7 +43,7 @@ if (!defined('AOWOW_REVISION'))
             ct.family,
             ct.modelId1 as displayId,
             cdi.skin1 as skin,
-            cf.iconString as icon,
+            SUBSTRING_INDEX(cf.iconFile, "\\\\", -1) as icon,
             cf.petTalentType as type
         FROM
             world.creature_template ct
@@ -51,9 +51,9 @@ if (!defined('AOWOW_REVISION'))
             ?_factionTemplate ft ON
                 ft.Id = ct.faction_A    -- no beast has different faction set for Horde
         JOIN
-            ?_creatureFamily cf ON
+            dbc.creatureFamily cf ON
                 cf.Id = ct.family
-        JOIN
+        LEFT JOIN
             world.locales_creature lc ON
                 lc.entry = ct.entry
         JOIN
@@ -73,10 +73,10 @@ if (!defined('AOWOW_REVISION'))
             world.creature c
         JOIN
             ?_zones z ON
-                z.x_min < c.position_x AND
-                z.x_max > c.position_x AND
-                z.y_min < c.position_y AND
-                z.y_max > c.position_y AND
+                z.xMin < c.position_x AND
+                z.xMax > c.position_x AND
+                z.yMin < c.position_y AND
+                z.yMax > c.position_y AND
                 z.mapId = c.map
         WHERE
             c.id = ?d;

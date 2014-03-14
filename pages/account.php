@@ -219,12 +219,13 @@ function signup()
                 $smarty->assign('signup_error', Lang::$account['nameInUse']);
             else
             {
-                $success = $rDB->Query('INSERT INTO aowow_account (username, sha_pass_hash, email, joindate, last_ip, locale, online) VALUES (?, ?, ?, NOW(), ?, ?, 1)',
+                $success = DB::Auth()->query('INSERT INTO aowow_account (user, passHash, displayName, email, joindate, lastIP, locale) VALUES (?, ?, ?, ?, NOW(), ?, ?)',
                     $_POST['username'],
-                    User::$createUserSendPass($_POST['username'], $_POST['password']),
+                    sha1(strtoupper($_POST['username']).':'.strtoupper($_POST['password'])),
+                    Util::ucFirst($_POST['username']),
                     (isset($_POST['email']))? $_POST['email'] : '',
                     (isset($_SERVER["REMOTE_ADDR"]))? $_SERVER["REMOTE_ADDR"] : '',
-                    $_SESSION['locale']
+                    0
                 );
                 if ($success > 0)
                     // all fine, send to login

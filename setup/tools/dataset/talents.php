@@ -19,6 +19,7 @@ if (!defined('AOWOW_REVISION'))
     // r - array:int on what the talent depends on: "r:[u, v]", u - nth talent in tree, v - required rank of u
     // f - array:int [pets only] creatureFamilies, that use this spell
     // t - array:str if the talent teaches a spell, this is the upper tooltip-table containing castTime, cost, cooldown
+    // j - array of modifier-arrays per rank for the Profiler [nyi]
     // tabs
     // n - name of the tab
     // t - array of talent-objects
@@ -36,11 +37,11 @@ if (!defined('AOWOW_REVISION'))
             SELECT
                 *
             FROM
-                ?_talenttab
+                dbc.talenttab
             WHERE
-                classes = ?d
+                classMask = ?d
             ORDER BY
-                `order`, `pets`',
+                `tabNumber`, `creatureFamilyMask`',
             $mask
         );
 
@@ -54,14 +55,14 @@ if (!defined('AOWOW_REVISION'))
                         t.*,
                         s.*
                     FROM
-                        ?_talent t,
+                        dbc.talent t,
                         ?_spell s
                     WHERE
-                        t.`tab`= ?d AND
+                        t.`tabId`= ?d AND
                         s.`Id` = t.`rank1`
-                    ORDER by t.`row`, t.`col`
+                    ORDER by t.`row`, t.`column`
                 ',
-                $tabs[$l]['id']
+                $tabs[$l]['Id']
             );
 
             $result[$l] = array(
@@ -71,7 +72,7 @@ if (!defined('AOWOW_REVISION'))
 
             if (!$class)
             {
-                $petFamId           = log($tabs[$l]['pets'], 2);
+                $petFamId           = log($tabs[$l]['creatureFamilyMask'], 2);
                 $result[$l]['icon'] = $petFamIcons[$petFamId];
                 $petCategories      = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, category FROM ?_pet WHERE type = ?d', $petFamId);
                 $result[$l]['f']    = array_keys($petCategories);
@@ -89,7 +90,7 @@ if (!defined('AOWOW_REVISION'))
                 $s    = [];
                 $i    = $talents[$j]['tId'];
                 $n    = Util::localizedString($talents[$j], 'name');
-                $x    = $talents[$j]['col'];
+                $x    = $talents[$j]['column'];
                 $y    = $talents[$j]['row'];
                 $r    = null;
                 $t    = [];
@@ -107,9 +108,9 @@ if (!defined('AOWOW_REVISION'))
                 foreach ($petCategories as $k => $v)
                 {
                     // cant handle 64bit integer .. split
-                    if ($v >= 32 && ((1 << ($v - 32)) & $talents[$j]['petmask2']))
+                    if ($v >= 32 && ((1 << ($v - 32)) & $talents[$j]['petCategory2']))
                         $f[] = $k;
-                    else if ($v < 32 && ((1 << $v) & $talents[$j]['petmask']))
+                    else if ($v < 32 && ((1 << $v) & $talents[$j]['petCategory1']))
                         $f[] = $k;
                 }
 
@@ -119,17 +120,17 @@ if (!defined('AOWOW_REVISION'))
                     $d[] = $tSpell->parseText()[0];
                     $s[] = $talents[$j]['rank'.($k + 1)];
 
-                    if ($talents[$j]['isSpell'])
+                    if ($talents[$j]['talentSpell'])
                         $t[] = $tSpell->getTalentHeadForCurrent();
                 }
 
-                if ($talents[$j]['dependsOn'])
+                if ($talents[$j]['reqTalent'])
                 {
                     // we didn't encounter the required talent yet => create reference
-                    if (!isset($tNums[$talents[$j]['dependsOn']]))
-                        $depLinks[$talents[$j]['dependsOn']] = $j;
+                    if (!isset($tNums[$talents[$j]['reqTalent']]))
+                        $depLinks[$talents[$j]['reqTalent']] = $j;
 
-                    $r = [$tNums[$talents[$j]['dependsOn']], $talents[$j]['dependsOnRank'] + 1];
+                    $r = [$tNums[$talents[$j]['reqTalent']], $talents[$j]['reqRank'] + 1];
                 }
 
                 $result[$l]['t'][$j] = array(
@@ -190,6 +191,8 @@ if (!defined('AOWOW_REVISION'))
         // TalentCalc
         foreach ($classes as $cMask)
         {
+            set_time_limit(20);
+
             $cId    = log($cMask, 2) + 1;
             $file   = 'datasets\\'.User::$localeString.'\\talents-'.$cId;
             $toFile = '$WowheadTalentCalculator.registerClass('.$cId.', '.json_encode(buildTree($cId), JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK).')';

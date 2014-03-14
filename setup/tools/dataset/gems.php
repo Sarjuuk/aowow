@@ -26,26 +26,26 @@ if (!defined('AOWOW_REVISION'))
 
     $gemQuery = "
         SELECT
-            it.entry,
+            it.entry as itemId,
             it.name,
             li.*,
             IF (it.entry < 36000 OR it.ItemLevel < 70, 1 , 2) AS expansion,
             (it.Quality) AS quality,
-            i.iconname as icon,
+            i.inventoryicon1 as icon,
             ie.*,
             gp.colorMask as colors
         FROM
-            item_template it,
-            locales_item li,
-            dbc.gemProperties gp,
-            ?_icons i,
-            ?_itemEnchantment ie
+            item_template it
+        LEFT JOIN
+            locales_item li ON li.entry = it.entry
+        JOIN
+            dbc.gemProperties gp ON gp.Id = it.GemProperties
+        JOIN
+            ?_itemEnchantment ie ON gp.spellItemEnchantmentId = ie.Id
+        JOIN
+            dbc.itemdisplayinfo i ON i.Id = it.displayid
         WHERE
-            it.GemProperties <> 0 AND
-            li.entry = it.entry AND
-            gp.Id = it.GemProperties AND
-            i.Id = it.displayid AND
-            gp.spellItemEnchantmentId = ie.Id
+            it.GemProperties <> 0
         ORDER BY
             it.entry DESC
         ;
@@ -70,15 +70,15 @@ if (!defined('AOWOW_REVISION'))
         foreach ($gems as $pop)
         {
             // costy and locale-independant -> cache
-            if (!isset($jsonGems[$pop['entry']]))
-                $jsonGems[$pop['entry']] = Util::parseItemEnchantment($pop);
+            if (!isset($jsonGems[$pop['itemId']]))
+                $jsonGems[$pop['itemId']] = Util::parseItemEnchantment($pop);
 
-            $gemsOut[$pop['entry']] = array(
-                'name'        => Util::jsEscape(Util::localizedString($pop, 'name')),
+            $gemsOut[$pop['itemId']] = array(
+                'name'        => Util::localizedString($pop, 'name'),
                 'quality'     => $pop['quality'],
                 'icon'        => strToLower($pop['icon']),
-                'enchantment' => Util::jsEscape(Util::localizedString($pop, 'text')),
-                'jsonequip'   => $jsonGems[$pop['entry']],
+                'enchantment' => Util::localizedString($pop, 'text'),
+                'jsonequip'   => $jsonGems[$pop['itemId']],
                 'colors'      => $pop['colors'],
                 'expansion'   => $pop['expansion']
             );

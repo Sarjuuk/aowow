@@ -12,6 +12,14 @@ if (!file_exists('config/config.php'))
 // include all necessities, set up basics
 require 'includes/kernel.php';
 
+if (version_compare(PHP_VERSION, '5.4.0') <= 0)
+{
+    if (User::isInGroup(U_GROUP_EMPLOYEE))
+        $smarty->internalNotice(U_GROUP_EMPLOYEE, 'PHP Version 5.4.0 or higher required! Your version is '.PHP_VERSION."\nCore functions are unavailable!");
+    else
+        $smarty->brb();
+}
+
 if ($AoWoWconf['maintenance'] && !User::isInGroup(U_GROUP_EMPLOYEE))
     $smarty->brb();
 else if ($AoWoWconf['maintenance'] && User::isInGroup(U_GROUP_EMPLOYEE))

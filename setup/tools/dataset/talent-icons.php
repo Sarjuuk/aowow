@@ -15,16 +15,16 @@ if (!defined('AOWOW_REVISION'))
         FROM
             ?_spell s
         JOIN
-            ?_talent t On
+            dbc.talent t On
                 t.rank1 = s.Id
         JOIN
-            ?_talenttab tt ON
-                tt.Id = t.tab
+            dbc.talenttab tt ON
+                tt.Id = t.tabId
         WHERE
             tt.?# = ?d AND
-            tt.order = ?d
+            tt.tabNumber = ?d
         ORDER BY
-            t.row, t.col, t.petmask ASC ;
+            t.row, t.column, t.petCategory1 ASC ;
     ';
 
     $dims      = 36; //v-pets
@@ -43,7 +43,7 @@ if (!defined('AOWOW_REVISION'))
 
         for ($tree = 0; $tree < 3; $tree++)
         {
-            $what   = $k ? 'classes' : 'pets';
+            $what   = $k ? 'classMask' : 'creatureFamilyMask';
             $set    = $k ? 1 << ($k - 1) : 1 << $tree;
             $subset = $k ? $tree : 0;
             $path   = $k ? 'classes\\icons' : 'pets';

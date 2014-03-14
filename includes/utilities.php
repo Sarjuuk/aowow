@@ -97,7 +97,7 @@ class SmartyAoWoW extends Smarty
         {
             $buff = [];
             foreach ($this->notices as $data)
-                if (User::isInGroup($data[0]))
+                if (!$data[0] || User::isInGroup($data[0]))
                     $buff[] = Util::jsEscape($data[1]);
 
             if ($buff)
@@ -111,7 +111,7 @@ class SmartyAoWoW extends Smarty
                     'status' => 1,
                     'name'   => 'internal error',
                     'style'  => 'padding-left: 40px; background-image: url(template/images/report.gif); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
-                    'text'   => '<span id="inputbox-error">'.implode("<br>", $buff).'</span>',
+                    'text'   => '[span id=inputbox-error]'.implode("\n", $buff).'[/span]',
                 );
             }
         }
@@ -122,7 +122,8 @@ class SmartyAoWoW extends Smarty
             if (!isset($tv['announcements']))
                 $tv['announcements'] = [];
 
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*")', $match[0]);
+            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*")', $match[1]);
+
             foreach ($ann as $k => $v)
             {
                 if ($t = Util::localizedString($v, 'text'))
@@ -311,16 +312,20 @@ class Util
         'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency'
     );
 
-    public static $combatRatingToItemMod    = array(        // zero-indexed
+    public static $combatRatingToItemMod    = array(        // zero-indexed idx:CR; val:Mod
         null,           12,             13,             14,             15,             16,             17,             18,             19,
         20,             21,             null,           null,           null,           null,           null,           null,           28,
         29,             30,             null,           null,           null,           37,             44
     );
 
-    public static $gtCombatRatings          = array(        // 44 => 4.69512176513672 / 1.1
+    /* manual corrections
+        idx:35 => 25*1.15 => 28.75                              strange, this was not mentioned anywhere
+        idx:44 => 4,69512176513672/1.1 => 4,268292513760655     see: gtOCTclasscombatRatingScalar.dbc (also reflects changes to haste (+30% for sham, drui, ect))
+    */
+    public static $gtCombatRatings          = array(
         12 => 1.5,      13 => 12,       14 => 15,       15 => 5,        16 => 10,       17 => 10,       18 => 8,        19 => 14,       20 => 14,
         21 => 14,       22 => 10,       23 => 10,       24 => 0,        25 => 0,        26 => 0,        27 => 0,        28 => 10,       29 => 10,
-        30 => 10,       31 => 10,       32 => 14,       33 => 0,        34 => 0,        35 => 25,       36 => 10,       37 => 2.5,      44 => 4.2682925138
+        30 => 10,       31 => 10,       32 => 14,       33 => 0,        34 => 0,        35 => 28.75,    36 => 10,       37 => 2.5,      44 => 4.268292513760655
     );
 
     public static $lvlIndepRating           = array(        // rating doesn't scale with level
@@ -1356,9 +1361,14 @@ class Util
     // 6 => TYPE_TOTEM              Rockbiter AmountX as Damage (ignore)
     // 7 => TYPE_USE_SPELL          Engineering gadgets
     // 8 => TYPE_PRISMATIC_SOCKET   Extra Sockets AmountX as socketCount (ignore)
-    public static function parseItemEnchantment($eId, $raw = false, &$misc = null)
+    public static function parseItemEnchantment($ench, $raw = false, &$misc = null)
     {
-        $enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $eId);
+        $enchant = [];
+        if (is_numeric($ench))
+            $enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $ench);
+        else if (is_array($ench))
+            $enchant = $ench;
+
         if (!$enchant)
             return [];
 

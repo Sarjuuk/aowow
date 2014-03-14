@@ -75,7 +75,7 @@ if (!defined('AOWOW_REVISION'))
         foreach ($setList as $set)
         {
             $setOut = array(
-                'id'       => $set['itemsetID'],
+                'id'       => $set['id'],
                 'name'     => (7 - $set['quality']).Util::jsEscape(Util::localizedString($set, 'name')),
                 'pieces'   => [],
                 'heroic'   => DB::Aowow()->SelectCell('SELECT IF (Flags & 0x8, "true", "false") FROM item_template WHERE entry = ?d', $set['item1']),
@@ -98,7 +98,7 @@ if (!defined('AOWOW_REVISION'))
             if ($set['contentGroup'])
                 $setOut['note'] = $set['contentGroup'];
 
-            if ($set['itemsetID'] < 0)
+            if ($set['id'] < 0)
                 $setOut['idbak'] = $set['refSetId'];
 
             for ($i = 1; $i < 11; $i++)
@@ -114,7 +114,7 @@ if (!defined('AOWOW_REVISION'))
                 if (!isset($jsonBonus[$set['spell'.$i]]))
                 {
                     $bSpell = new SpellList(array(['s.id', $set['spell'.$i]]));
-                    $jsonBonus[$set['spell'.$i]] = $bSpell->getStatGain();
+                    $jsonBonus[$set['spell'.$i]] = $bSpell->getStatGain()[$set['spell'.$i]];
                 }
 
                 if (isset($setOut['setbonus'][$set['bonus'.$i]]))
