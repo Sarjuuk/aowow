@@ -13,7 +13,7 @@
                     <th>{$idx+1}.</th>
                     <td><div>
         {foreach name=itemItr from=$itr item='i'}
-            {if $i.side == 1}<span class="alliance-icon-padded">{elseif $i.side == 2}<span class="horde-icon-padded">{/if}
+            {if $i.side == 1}<span class="icon-alliance-padded">{elseif $i.side == 2}<span class="icon-horde-padded">{/if}
                         {if ($i.typeId == $typeId)}
                             <b>{$i.name}</b>
                         {else}

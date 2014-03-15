@@ -9,7 +9,7 @@
 {if isset($redButtons[$smarty.const.BUTTON_LINKS])}
     {assign var='b' value=$redButtons[$smarty.const.BUTTON_LINKS]}
     {if $b}
-        <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} {if isset($b.color)}linkColor: '{$b.color}', {/if}{if isset($b.linkId)}linkId: '{$b.linkId}', {/if}{if isset($b.name)}linkName: '{$name|escape:"javascript"}', {/if}type: {$type}, typeId: {$typeId} {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
+        <a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({ldelim} {if isset($b.color)}linkColor: '{$b.color}', {/if}{if isset($b.linkId)}linkId: '{$b.linkId}', {/if}{if isset($name)}linkName: '{$name|escape:"javascript"}', {/if}type: {$type}, typeId: {$typeId} {rdelim});"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
     {else}
         <a href="javascript:;" id="open-links-button" class="button-red button-red-disabled"><em><b><i>{$lang.links}</i></b><span>{$lang.links}</span></em></a>
     {/if}

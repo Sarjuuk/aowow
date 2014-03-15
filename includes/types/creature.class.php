@@ -16,7 +16,7 @@ class CreatureList extends BaseType
     protected       $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
     public          $queryOpts = array(
                         'ct'     => [['ft', 'clsMin', 'clsMax', 'qr']],
-                        'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.factionA', 's' => ', ft.*'],
+                        'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.factionA', 's' => ', ft.A, ft.H, ft.factionId'],
                         'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', clsMin.attackpower AS mleAtkPwrMin, clsMin.rangedattackpower AS rngAtkPwrMin, clsMin.baseArmor * armorMod AS armorMin, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * dmgMultiplier AS dmgMin, (CASE ct.exp WHEN 0 THEN clsMin.basehp0 WHEN 1 THEN clsMin.basehp1 ELSE clsMin.basehp2 END) * healthMod AS healthMin, clsMin.baseMana * manaMod AS manaMin'],
                         'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', clsMax.attackpower AS mleAtkPwrMax, clsMax.rangedattackpower AS rngAtkPwrMax, clsMax.baseArmor * armorMod AS armorMax, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * dmgMultiplier AS dmgMax, (CASE ct.exp WHEN 0 THEN clsMax.basehp0 WHEN 1 THEN clsMax.basehp1 ELSE clsMax.basehp2 END) * healthMod AS healthMax, clsMax.baseMana * manaMod AS manaMax'],
                         'qr'     => ['j' => ['creature_questrelation qr ON qr.id = ct.id', true], 's' => ', qr.quest', 'g' => 'ct.id'],          // start
@@ -192,7 +192,7 @@ class CreatureList extends BaseType
                     'minlevel'       => $this->curTpl['minLevel'],
                     'maxlevel'       => $this->curTpl['maxLevel'],
                     'id'             => $this->id,
-                    'boss'           => $this->curTpl['typeFlags'] & 0x4 ? 1 : 0,
+                    'boss'           => $this->curTpl['typeFlags'] & 0x4 && $this->curTpl['rank'] ? 1 : 0,
                     'classification' => $this->curTpl['rank'],
                     'location'       => $this->getSpawns(SPAWNINFO_ZONES),
                     'name'           => $this->getField('name', true),

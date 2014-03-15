@@ -101,7 +101,7 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 
     if ($si = $item->json[$_id]['side'])                    // side
         if ($si != 3)
-            $quickInfo[] = Lang::$main['side'].Lang::$colon.'[span class='.($si == 1 ? 'alliance' : 'horde').'-icon]'.Lang::$game['si'][$si].'[/span]';
+            $quickInfo[] = Lang::$main['side'].Lang::$colon.'[span class=icon-'.($si == 1 ? 'alliance' : 'horde').']'.Lang::$game['si'][$si].'[/span]';
 
     // consumable / not consumable
     if (!$_slot)
@@ -307,14 +307,14 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
             'type'       => TYPE_ITEM,
             'typeId'     => $_id,
             'reqJS'      => array(
-                $pageText ? 'template/js/Book.js' : null,
-                'template/js/swfobject.js',
-                'template/js/profile.js',
-                'template/js/filters.js',
+                $pageText ? 'static/js/Book.js' : null,
+                'static/js/swfobject.js',
+                'static/js/profile.js',
+                'static/js/filters.js',
                 '?data=weight-presets'
             ),
             'reqCSS'     => array(
-                $pageText ? ['path' => 'template/css/Book.css'] : null,
+                $pageText ? ['path' => 'static/css/Book.css'] : null,
             ),
             'redButtons' => array(
                 BUTTON_WOWHEAD => true,

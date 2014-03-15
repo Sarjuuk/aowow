@@ -143,7 +143,7 @@ if (strstr($pageCall, 'latest') || $pageCall == 'most-comments')
         die($xml);
     }
     else
-        $h1Links = '<small><a href="?'.$pageCall.($pageParam ? '='.$pageParam : null).'&rss" class="rss-icon">'.Lang::$main['subscribe'].'</a></small>';
+        $h1Links = '<small><a href="?'.$pageCall.($pageParam ? '='.$pageParam : null).'&rss" class="icon-rss">'.Lang::$main['subscribe'].'</a></small>';
 }
 
 array_push($_path, $menu);

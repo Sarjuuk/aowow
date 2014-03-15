@@ -31,7 +31,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             'tab'    => 0,
             'subCat' => $pageParam ? '='.$pageParam : '',
             'reqJS'  => array(
-                'template/js/filters.js',
+                'static/js/filters.js',
                 '?data=weight-presets'
             )
         ),

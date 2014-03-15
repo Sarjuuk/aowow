@@ -18,7 +18,7 @@
             <script type="text/javascript">
                 var myTabs = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
 {foreach from=$found item="f"}
-    {include file="bricks/listviews/`$f.file`.tpl" data=$f.data params=$f.params}
+    {include file="listviews/`$f.file`.tpl" data=$f.data params=$f.params}
 {/foreach}
                 myTabs.flush();
             </script>

@@ -10,7 +10,7 @@ if (typeof $WH == "undefined") {
 
         var match = document.scripts[i].src.match(/(.*)\/power\/aowowPower.js/i);
         if (match) {
-            var g_staticUrl = match[1];
+            var g_host = match[1];
             break;
         }
     }
@@ -100,7 +100,7 @@ if (typeof $WowheadPower == "undefined") {
             if (isRemote) {
                 var script = document.createElement("script");
                 // script.src = "http://static.wowhead.com/js/basic.js?4";
-                script.src = g_staticUrl + "/template/js/basic.js";
+                script.src = g_host + "/static/js/basic.js";
                 head.appendChild(script);
             }
             else {
@@ -122,7 +122,7 @@ if (typeof $WowheadPower == "undefined") {
                 $WH.ae(head, $WH.ce("link", {
                     type: "text/css",
                     // href: "http://static.wowhead.com/css/basic.css?4",
-                    href: g_staticUrl + "/template/css/basic.css",
+                    href: g_host + "/static/css/basic.css",
                     rel:  "stylesheet"
                 }));
 
@@ -130,7 +130,7 @@ if (typeof $WowheadPower == "undefined") {
                     $WH.ae(head, $WH.ce("link", {
                         type: "text/css",
                         // href: "http://static.wowhead.com/css/basic_ie67.css?4",
-                        href: g_staticUrl + "/template/css/global_ie67.css",
+                        href: g_host + "/static/css/global_ie67.css",
                         rel:  "stylesheet"
                     }));
 
@@ -138,7 +138,7 @@ if (typeof $WowheadPower == "undefined") {
                         $WH.ae(head, $WH.ce("link", {
                             type: "text/css",
                             // href: "http://static.wowhead.com/css/basic_ie6.css?4",
-                            href: g_staticUrl + "/template/css/global_ie6.css",
+                            href: g_host + "/static/css/global_ie6.css",
                             rel:  "stylesheet"
                         }));
                     }
@@ -431,7 +431,7 @@ if (typeof $WowheadPower == "undefined") {
             // url += "ajax.php?" + LOOKUPS[type][1] + "=" + id + "&power" + p;
             var
                 localeDomain = $WH.g_getDomainFromLocale(locale),
-                url = g_staticUrl + "/";
+                url = g_host + "/";
 
             $WH.g_ajaxIshRequest(url + "?" + LOOKUPS[type][1] + "=" + id + "&domain=" + localeDomain + "&power" + p);
             if (SCALES[type] && !SCALES[type][locale]) {

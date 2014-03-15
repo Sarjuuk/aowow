@@ -145,14 +145,14 @@ $smarty->updatePageVars(array(
     'path'  => "[1, 5, 0, 'us', 'pure-pwnage', 'trinity']",                                    // [1,5,'eu','cyclone-wirbelsturm','silvermoon']
     'tab'   => 1,
     'reqJS' => array(
-        'template/js/filters.js?978',
-        'template/js/profile_all.js?978',
-        'template/js/profile.js?978',
+        'static/js/filters.js?978',
+        'static/js/profile_all.js?978',
+        'static/js/profile.js?978',
         '?data=weight-presets.realms&978',
         // '?data=user&1280640186'
     ),
     'reqCSS' => array(
-        ['path' => 'template/css/profiler.css']
+        ['path' => 'static/css/profiler.css']
     )
 ));
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, ['colon' => Lang::$colon]));

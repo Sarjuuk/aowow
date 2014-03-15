@@ -12,16 +12,16 @@ require 'config/config.php';
 $e = !!$AoWoWconf['debug'] ? (E_ALL & ~(E_DEPRECATED|E_USER_DEPRECATED|E_STRICT)) : 0;
 error_reporting($e);
 
-define('STATIC_URL',        substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));
+define('STATIC_URL',           substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1).'/static'); // points js to images & scripts (change here if you want to use a separate subdomain)
+define('HOST_URL',             substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));           // points js to executable files
 
 define('SQL_LIMIT_NONE',       0);
 define('SQL_LIMIT_SEARCH',     $AoWoWconf['searchLimit']);
 define('SQL_LIMIT_QUCKSEARCH', $AoWoWconf['quickSearchLimit']);
 define('SQL_LIMIT_DEFAULT',    $AoWoWconf['defaultLimit']);
 
-require 'includes/libs/Smarty-2.6.26/libs/Smarty.class.php';// Libraray: http://www.smarty.net/
-// require 'includes/libs/Smarty-3.1.14/libs/Smarty.class.php';     // Libraray: http://www.smarty.net/
-require 'includes/libs/DbSimple/Generic.php';               // Libraray: http://en.dklab.ru/lib/DbSimple (using mysqli variant: https://bitbucket.org/brainreaver/dbsimple/src)
+require 'includes/libs/Smarty-2.6.26/libs/Smarty.class.php';    // Libraray: http://www.smarty.net/
+require 'includes/libs/DbSimple/Generic.php';                   // Libraray: http://en.dklab.ru/lib/DbSimple (using mysqli variant: https://bitbucket.org/brainreaver/dbsimple/src)
 require 'includes/utilities.php';
 require 'localization/lang.class.php';
 require 'includes/user.class.php';

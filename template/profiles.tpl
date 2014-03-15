@@ -104,7 +104,7 @@ PageTemplate.init();
 
             <div id="lv-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
-                {include file='bricks/listviews/profile.tpl' data=$lvData.data params=$lvData.params}
+                {include file='listviews/profile.tpl' data=$lvData.data params=$lvData.params}
             //]]></script>
 
             <div class="clear"></div>

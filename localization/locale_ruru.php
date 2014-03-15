@@ -561,7 +561,7 @@ $lang = array(
         'tool'          => "Инструмент",
         'cost'          => "Цена",
         'content'       => "Материал",
-        '_transfer'     => 'Этот предмет превратится в <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(images/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="%s-icon">%s</span>.',
+        '_transfer'     => 'Этот предмет превратится в <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(static/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         '_unavailable'  => "Этот предмет не доступен игрокам.",
         '_rndEnchants'  => "Случайные улучшения",
         '_chance'       => "(шанс %s%%)",

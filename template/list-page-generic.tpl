@@ -9,9 +9,8 @@
         {include file='bricks/announcement.tpl' an=$item}
     {/foreach}
 {/if}
-{if !empty($map)}
-    {include file='bricks/mapper.tpl' map=$map.data som=$map.som}
-{/if}
+
+    {include file='bricks/mapper.tpl'}
 
             <script type="text/javascript">//<![CDATA[
                 g_initPath({$path});
@@ -39,7 +38,7 @@
     {/if}
     {foreach from=$lvData item=lv}
         {if isset($lv.file)}
-                {include file="bricks/listviews/`$lv.file`.tpl" data=$lv.data params=$lv.params}
+                {include file="listviews/`$lv.file`.tpl" data=$lv.data params=$lv.params}
         {/if}
     {/foreach}
     {if count($lvData) > 1}

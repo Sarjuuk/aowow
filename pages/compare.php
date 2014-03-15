@@ -12,15 +12,15 @@ $pageData      = array(
     'title'   => Lang::$main['compareTool'],
     'tab'     => 1,
     'reqCSS'  => array(
-        ['path' => 'template/css/Summary.css'],
-        ['path' => 'template/css/Summary_ie6.css', 'ieCond' => 'lte IE 6'],
+        ['path' => 'static/css/Summary.css'],
+        ['path' => 'static/css/Summary_ie6.css', 'ieCond' => 'lte IE 6'],
     ),
     'reqJS'   => array(
-        'template/js/profile.js',
-        'template/js/Draggable.js',
-        'template/js/filters.js',
-        'template/js/Summary.js',
-        'template/js/swfobject.js',
+        'static/js/profile.js',
+        'static/js/Draggable.js',
+        'static/js/filters.js',
+        'static/js/Summary.js',
+        'static/js/swfobject.js',
         '?data=weight-presets.gems.enchants.itemsets'
     )
 );

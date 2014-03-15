@@ -4,7 +4,7 @@
                 var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
 {foreach from=$tabs item="tab"}
     {if !empty($tab.data)}
-        {include file="bricks/listviews/`$tab.file`.tpl" data=$tab.data params=$tab.params}
+        {include file="listviews/`$tab.file`.tpl" data=$tab.data params=$tab.params}
     {/if}
 {/foreach}
                 new Listview({ldelim}template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: tabsRelated, parent: 'lv-generic', data: lv_comments{rdelim});

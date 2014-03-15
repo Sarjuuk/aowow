@@ -4,7 +4,7 @@
 <div id="tabs-contribute-generic" style="width: 50%"></div>
 <div class="text" style="margin-right: 310px">
     <div class="tabbed-contents" style="clear: none">
-{include file="bricks\contrib_`$user.locale`.tpl"}
+{include file="bricks/contrib_`$user.locale`.tpl"}
     </div>
 </div>
 <script type="text/javascript">

@@ -1,0 +1,58 @@
+.book
+{
+	width:28em;
+	border:2px solid #404040;
+	-webkit-border-radius:2px;
+	-moz-border-radius:2px;
+	border-radius:2px;
+}
+
+.book .paging
+{
+	cursor:default;
+	text-align:center;
+	background-color:#404040;
+	padding:3px 4px 5px;
+}
+
+.book .previous
+{
+	float:left;
+	text-align:left;
+	width:33%;
+}
+
+.book .next
+{
+	float:right;
+	text-align:right;
+	width:33%;
+}
+
+.book .page
+{
+	background-color:#141414;
+	padding:4px;
+}
+
+.book p
+{
+	margin:0;
+	padding:0;
+}
+
+.book h1,.book h2
+{
+	border:0;
+	font-weight:bold;
+}
+
+.book h1
+{
+	font-size:16px;
+}
+
+.book h2
+{
+	font-size:14px;
+}

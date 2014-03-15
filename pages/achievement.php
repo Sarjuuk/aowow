@@ -88,10 +88,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     switch ($acv->getField('faction'))
     {
         case 1:
-            $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=alliance-icon]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
+            $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=icon-alliance]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
             break;
         case 2:
-            $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=horde-icon]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
+            $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=icon-horde]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
             break;
         default:                                        // case 3
             $infobox[] = Lang::$main['side'].Lang::$colon.Lang::$game['si'][SIDE_BOTH];

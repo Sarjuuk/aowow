@@ -409,7 +409,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'type'   => TYPE_SPELL,
             'typeId' => $_id,
             'reqJS'  => array(
-                $pageData['buttons'][BUTTON_VIEW3D] ? 'template/js/swfobject.js' : null
+                $pageData['buttons'][BUTTON_VIEW3D] ? 'static/js/swfobject.js' : null
             ),
             'redButtons' => array(
                 BUTTON_LINKS   => ['color' => 'ff71d5ff', 'linkId' => Util::$typeStrings[TYPE_SPELL].':'.$_id],
@@ -783,7 +783,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     if ($n = SpellList::getName($_))
                         $foo['name'] .= Lang::$colon.'(<a href="?spell='.$_.'">'.$n.'</a>)';
                     else
-                        $foo['name'] .= Lang::$colon.Util::ucFirst(Lang::$game['spell']).' #'.$_;;
+                        $foo['name'] .= Lang::$colon.Util::ucFirst(Lang::$game['spell']).' #'.$effMV;
                 }
                 else
                     $foo['name'] .= ' #'.$effMV;;

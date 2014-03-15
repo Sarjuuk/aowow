@@ -211,8 +211,8 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             'tab'    => 0,
             'subCat' => $pageParam !== null ? '='.$pageParam : '',
             'reqJS'  => array(
-                'template/js/filters.js',
-                'template/js/swfobject.js',
+                'static/js/filters.js',
+                'static/js/swfobject.js',
                 '?data=weight-presets'
             )
         ),

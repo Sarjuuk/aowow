@@ -52,7 +52,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'tab'        => 0,
             'type'       => TYPE_PET,
             'typeId'     => $_id,
-            'reqJS'      => ['template/js/swfobject.js']
+            'reqJS'      => ['static/js/swfobject.js']
         ),
         'relTabs'  => []
     );

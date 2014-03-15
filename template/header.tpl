@@ -36,6 +36,6 @@
             g_initHeader({$tab});
             LiveSearch.attach($WH.ge('livesearch-generic'));
 {foreach from=$jsGlobals item="glob"}
-    {include file="bricks/globals/`$glob[0]`.tpl" data=$glob[1] extra=$glob[2]}
+    {include file="globals/`$glob[0]`.tpl" data=$glob[1] extra=$glob[2]}
 {/foreach}
         </script>{/strip}

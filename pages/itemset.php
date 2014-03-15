@@ -188,8 +188,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'type'        => TYPE_ITEMSET,
             'typeId'      => $_id,
             'reqJS'       => array(
-                'template/js/Summary.js',
-                'template/js/swfobject.js'
+                'static/js/Summary.js',
+                'static/js/swfobject.js'
             ),
             'pieces'      => $pieces,
             'spells'      => $spells,

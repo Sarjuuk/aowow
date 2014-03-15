@@ -589,18 +589,18 @@ $pageData = array(
         'title'     => Util::ucFirst(Lang::$game['profile']), // actual name is set per jScript
         'tab'       => 1,
         'reqJS'     => array(
-            'template/js/filters.js',
-            'template/js/TalentCalc.js',
-            'template/js/swfobject.js',
-            'template/js/profile_all.js',
-            'template/js/profile.js',
-            'template/js/Profiler.js',
+            'static/js/filters.js',
+            'static/js/TalentCalc.js',
+            'static/js/swfobject.js',
+            'static/js/profile_all.js',
+            'static/js/profile.js',
+            'static/js/Profiler.js',
             '?data=enchants.gems.glyphs.itemsets.pets.pet-talents.quick-excludes.realms.statistics.weight-presets'  // quick-excludes?!
             // ?data=user&1270968639
         ),
         'reqCSS'    => array(
-            ['path' => 'template/css/TalentCalc.css'],
-            ['path' => 'template/css/Profiler.css']
+            ['path' => 'static/css/TalentCalc.css'],
+            ['path' => 'static/css/Profiler.css']
         )
     )
 );

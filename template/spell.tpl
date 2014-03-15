@@ -23,7 +23,7 @@
 
 {include file='bricks/redButtons.tpl'}
 
-                <h1{if isset($expansion)} class="h1-icon"><span class="{$expansion}-icon-right">{$name}</span>{else}>{$name}{/if}</h1>
+                <h1{if isset($expansion)} class="h1-icon">{$name}</h1>
 
 {include file='bricks/tooltip.tpl'}
 

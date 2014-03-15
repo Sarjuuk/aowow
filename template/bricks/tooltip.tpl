@@ -1,12 +1,12 @@
     <div id="ic{$typeId}" style="float: left"></div>
-    <div id="tt{$typeId}" class="tooltip" style="float: left; padding-top: 1px"></div>
+    <div id="tt{$typeId}" class="wowhead-tooltip" style="float: left; padding-top: 1px"></div>
     <div style="clear: left"></div>
     <div id="sl{$typeId}" style="margin-left: 70px; margin-top: 4px;"></div>
     <div id="ks{$typeId}" style="margin-left: 70px; margin-top: 4px;"></div>
 
 {if !empty($jsGlobals[6][2].buff)} {* not set with items *}
     <h3>{$lang._aura}</h3>
-    <div id="btt{$typeId}" class="tooltip"></div>
+    <div id="btt{$typeId}" class="wowhead-tooltip"></div>
 {/if}
 
 <script type="text/javascript">//<![CDATA[

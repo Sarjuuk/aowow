@@ -123,9 +123,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     }
 
                     $row['stock'] = $vendors[$k]['stock'];
-                    $row['stack'] = $item->getField('buyCount');
+                    $row['stack'] = $itemObj->getField('buyCount');
                     $row['cost']  = array(
-                        $item->getField('buyPrice'),
+                        $itemObj->getField('buyPrice'),
                         $currency ? $currency : null,
                         $tokens   ? $tokens   : null
                     );

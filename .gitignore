@@ -1,0 +1,32 @@
+# smarty cache
+/cache/*index.html
+/cache/*.php
+
+# generated files
+/static/js/profile_all.js
+/config/config.php
+
+# extracted images
+/static/images/wow/icons/large/*
+/static/images/wow/icons/medium/*
+/static/images/wow/icons/small/*
+/static/images/wow/icons/tiny/*
+!/static/images/wow/icons/tiny/quest_*
+/static/images/wow/hunterpettalents/icons*
+/static/images/wow/interface/*
+/static/images/wow/loadingscreens/*
+/static/images/wow/maps/*
+!/static/images/wow/maps/overlay*
+/static/images/wow/talents/icons/*
+
+# modelviewer (~7GB data)
+/static/modelviewer/models/*
+/static/modelviewer/thumbs/*
+/static/modelviewer/textures2/*
+
+# user uploads
+/static/uploads/avatars/*
+/static/uploads/screenshots/*
+/static/uploads/signatures/*
+/static/uploads/temp/*
+

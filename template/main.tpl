@@ -4,7 +4,7 @@
     <style type="text/css">
 {literal}
         .menu-buttons a { border-color: black }
-        .news { position: relative; text-align: left; width: 415px; height: 191px; margin: 30px auto 0 auto; background: url(template/images/{/literal}{$user.language}{literal}/mainpage-bg-news.jpg) no-repeat }
+        .news { position: relative; text-align: left; width: 415px; height: 191px; margin: 30px auto 0 auto; background: url(static/images/{/literal}{$user.language}{literal}/mainpage-bg-news.jpg) no-repeat }
         .news-list { padding: 26px 0 0 26px; margin: 0 }
         .news-list li { line-height: 2em }
         .news-img1 { position: absolute; left: 60px; top: 155px; width: 172px; height: 17px }

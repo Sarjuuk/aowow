@@ -438,7 +438,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             'tab'    => 0,
             'subCat' => $pageParam !== null ? '='.$pageParam : '',
             'reqJS'  => array(
-                'template/js/filters.js'
+                'static/js/filters.js'
             )
         ),
         'lv'    => $lv

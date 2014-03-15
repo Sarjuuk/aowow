@@ -51,7 +51,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // side if any
     if ($_ = $faction->getField('side'))
-        $infobox[] = Lang::$main['side'].Lang::$colon.'[span class='.($_ == 1 ? 'alliance' : 'horde').'-icon]'.Lang::$game['si'][$_].'[/span]';
+        $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=icon-'.($_ == 1 ? 'alliance' : 'horde').']'.Lang::$game['si'][$_].'[/span]';
 
     /****************/
     /* Main Content */

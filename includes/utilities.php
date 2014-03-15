@@ -77,7 +77,7 @@ class SmartyAoWoW extends Smarty
                     $tv['infobox'] = $article['quickInfo'];
 
                 if ($article['locale'] != User::$localeId)
-                    $tv['article']['params'] = ['prepend' => Util::jsEscape('<div class="notice-box" style="margin-right:245px;"><span class="bubble-icon">'.Lang::$main['englishOnly'].'</span></div>')];
+                    $tv['article']['params'] = ['prepend' => Util::jsEscape('<div class="notice-box" style="margin-right:245px;"><span class="icon-bubble">'.Lang::$main['englishOnly'].'</span></div>')];
 
                 foreach ($article as $text)
                     if (preg_match_all('/\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|title|holiday|class|race|skill|currency)=(\d+)[^\]]*\]/i', $text, $matches, PREG_SET_ORDER))
@@ -110,8 +110,8 @@ class SmartyAoWoW extends Smarty
                     'mode'   => 1,
                     'status' => 1,
                     'name'   => 'internal error',
-                    'style'  => 'padding-left: 40px; background-image: url(template/images/report.gif); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
-                    'text'   => '[span id=inputbox-error]'.implode("\n", $buff).'[/span]',
+                    'style'  => 'padding-left: 55px; background-image: url(static/images/announcements/warn-small.png); background-position: 10px center; border: dashed 2px #C03030;',
+                    'text'   => '[span id=inputbox-error]'.implode("[br]", $buff).'[/span]',
                 );
             }
         }
@@ -454,6 +454,8 @@ class Util
     public static $setCriteriaString        = "fi_setCriteria(%s, %s, %s);\n";
 
     public static $dfnString                = '<dfn title="%s" class="w">%s</dfn>';
+
+    public static $mapSelectorString        = '<a href="javascript:;" onclick="myMapper.update({zone: %d}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">%s</a>&nbsp;(%d)';
 
     public static $expansionString          = array(        // 3 & 4 unused .. obviously
         null,           'bc',           'wotlk',            'cata',                'mop'
@@ -973,10 +975,10 @@ class Util
     );
 
     public static $bgImagePath              = array (
-        'tiny'   => 'style="background-image: url(%s/images/icons/tiny/%s.gif)"',
-        'small'  => 'style="background-image: url(%s/images/icons/small/%s.jpg)"',
-        'medium' => 'style="background-image: url(%s/images/icons/medium/%s.jpg)"',
-        'large'  => 'style="background-image: url(%s/images/icons/large/%s.jpg)"',
+        'tiny'   => 'style="background-image: url(%s/images/wow/icons/tiny/%s.gif)"',
+        'small'  => 'style="background-image: url(%s/images/wow/icons/small/%s.jpg)"',
+        'medium' => 'style="background-image: url(%s/images/wow/icons/medium/%s.jpg)"',
+        'large'  => 'style="background-image: url(%s/images/wow/icons/large/%s.jpg)"',
     );
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
@@ -1175,7 +1177,7 @@ class Util
             );
 
             // html may contain 'Pictures'
-            $text = preg_replace('/"Interface\\\Pictures\\\([\w_\-]+)"/i', '"images/interface/Pictures/\1.jpg"', strtr($text, $pairs));
+            $text = preg_replace('/"Interface\\\Pictures\\\([\w_\-]+)"/i', '"images/wow/interface/Pictures/\1.jpg"', strtr($text, $pairs));
         }
         else
             $text = strtr($text, ["\n" => '<br />', "\r" => '']);
@@ -1189,7 +1191,7 @@ class Util
         );
 
         $to = array(
-            '<span class="icontiny" style="background-image: url('.STATIC_URL.'/images/icons/tiny/\2.gif)">',
+            '<span class="icontiny" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/\2.gif)">',
             '<span style="color: #\1">\2</span>',
             '&lt;\1/\2&gt;',
             '',

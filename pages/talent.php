@@ -12,17 +12,17 @@ $smarty->updatePageVars(array(
     'title'  => $petCalc ? Lang::$main['petCalc'] : Lang::$main['talentCalc'],
     'tab'    => 1,
     'reqCSS' => array(
-        ['path' => 'template/css/TalentCalc.css'],
-        ['path' => 'template/css/talent.css'],
-        ['path' => 'template/css/TalentCalc_ie6.css',  'ieCond' => 'lte IE 6'],
-        ['path' => 'template/css/TalentCalc_ie67.css', 'ieCond' => 'lte IE 7'],
-        $petCalc ? ['path' => 'template/css/petcalc.css'] : null
+        ['path' => 'static/css/TalentCalc.css'],
+        ['path' => 'static/css/talent.css'],
+        ['path' => 'static/css/TalentCalc_ie6.css',  'ieCond' => 'lte IE 6'],
+        ['path' => 'static/css/TalentCalc_ie67.css', 'ieCond' => 'lte IE 7'],
+        $petCalc ? ['path' => 'static/css/petcalc.css'] : null
     ),
     'reqJS'  => array(
-        'template/js/TalentCalc.js',
+        'static/js/TalentCalc.js',
         $petCalc ? '?data=pet-talents.pets'   : '?data=glyphs',
-        $petCalc ? 'template/js/petcalc.js'   : 'template/js/talent.js',
-        $petCalc ? 'template/js/swfobject.js' : null
+        $petCalc ? 'static/js/petcalc.js'   : 'static/js/talent.js',
+        $petCalc ? 'static/js/swfobject.js' : null
     )
 ));
 $smarty->assign('tcType', $petCalc ? 'pc' : 'tc');

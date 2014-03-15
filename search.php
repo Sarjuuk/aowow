@@ -1161,7 +1161,7 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
         'title' => $search.' - '.Lang::$search['search'],
         'tab'   => 0,
         'reqJS' => array(
-            'template/js/swfobject.js'
+            'static/js/swfobject.js'
         )
     ));
     $smarty->assign('lang', array_merge(Lang::$main, Lang::$search));

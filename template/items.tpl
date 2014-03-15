@@ -182,12 +182,12 @@
                 var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
     {foreach from=$tabs item="tab"}
         {if !empty($tab.data)}
-            {include file="bricks/listviews/item.tpl" data=$tab.data params=$tab.params}
+            {include file="listviews/item.tpl" data=$tab.data params=$tab.params}
         {/if}
     {/foreach}
                 tabsRelated.flush();
 {else}
-    {include file='bricks/listviews/item.tpl' data=$lvData.data params=$lvData.params}
+    {include file='listviews/item.tpl' data=$lvData.data params=$lvData.params}
 {/if}
             //]]></script>
 

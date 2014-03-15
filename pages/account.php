@@ -253,11 +253,11 @@ function recoverUser()
 
 $smarty->updatePageVars(array(
     'reqCSS' => array(
-        ['path' => 'template/css/Profiler.css'],
+        ['path' => 'static/css/Profiler.css'],
     ),
     'reqJS'  => array(
-        'template/js/user.js',
-        'template/js/profile.js',
+        'static/js/user.js',
+        'static/js/profile.js',
     ),
 ));
 
