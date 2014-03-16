@@ -524,6 +524,11 @@ function g_initHeaderMenus() {
         }
         Menu.add(c, menu);
     }
+
+    $('#toplinks-feedback').attr('href', 'javascript:;').click(function()
+    {
+        ContactTool.show();
+    });
 }
 function g_initPath(q, f) {
     var h = mn_path,

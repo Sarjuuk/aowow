@@ -262,7 +262,7 @@ class User
             'name'     => self::$displayName ? self::$displayName : '',
             'perms'    => self::$perms ? self::$perms : 0,
             'roles'    => self::$groups ? self::$groups : 0,
-            'cookies'  => []
+            'cookies'  => '[]'
         );
 
         if (self::$id > 0)

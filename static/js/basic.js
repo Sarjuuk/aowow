@@ -42,7 +42,7 @@ $WH.$E = function (e) {
 
 $WH.$A = function (a) {
     var r = [];
-    for (var i = 0, len = c.length; i < len; ++i) {
+    for (var i = 0, len = a.length; i < len; ++i) {
         r.push(a[i]);
     }
 
