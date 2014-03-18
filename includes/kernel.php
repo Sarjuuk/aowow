@@ -8,18 +8,6 @@ ini_set('serialize_precision', 4);
 
 require 'includes/defines.php';
 require 'config/config.php';
-
-$e = !!$AoWoWconf['debug'] ? (E_ALL & ~(E_DEPRECATED|E_USER_DEPRECATED|E_STRICT)) : 0;
-error_reporting($e);
-
-define('STATIC_URL',           substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1).'/static'); // points js to images & scripts (change here if you want to use a separate subdomain)
-define('HOST_URL',             substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));           // points js to executable files
-
-define('SQL_LIMIT_NONE',       0);
-define('SQL_LIMIT_SEARCH',     $AoWoWconf['searchLimit']);
-define('SQL_LIMIT_QUCKSEARCH', $AoWoWconf['quickSearchLimit']);
-define('SQL_LIMIT_DEFAULT',    $AoWoWconf['defaultLimit']);
-
 require 'includes/libs/Smarty-2.6.26/libs/Smarty.class.php';    // Libraray: http://www.smarty.net/
 require 'includes/libs/DbSimple/Generic.php';                   // Libraray: http://en.dklab.ru/lib/DbSimple (using mysqli variant: https://bitbucket.org/brainreaver/dbsimple/src)
 require 'includes/utilities.php';
@@ -38,8 +26,6 @@ spl_autoload_register(function ($class) {
     }
 });
 
-// debug: measure execution times
-Util::execTime(!!$AoWoWconf['debug']);
 
 // Setup DB-Wrapper
 if (!empty($AoWoWconf['aowow']['db']))
@@ -57,11 +43,30 @@ foreach ($AoWoWconf['characters'] as $realm => $charDBInfo)
     if (!empty($charDBInfo))
         DB::load(DB_CHARACTERS + $realm, $charDBInfo);
 
+
+// load config to constants
+$sets = DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, intValue as i, strValue as s FROM ?_config');
+foreach ($sets as $k => $v)
+    define('CFG_'.strtoupper($k), $v['i'] ? intVal($v['i']) : $v['s']);
+
+define('STATIC_URL', substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1).'/static'); // points js to images & scripts (change here if you want to use a separate subdomain)
+define('HOST_URL',   substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));           // points js to executable files
+
+$e = CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0;
+error_reporting($e);
+
+
+// debug: measure execution times
+Util::execTime(CFG_DEBUG);
+
+
 // create Template-Object
 $smarty = new SmartyAoWoW($AoWoWconf);
 
+
 // attach template to util (yes bandaid, shut up and code me a fix)
 Util::$pageTemplate = &$smarty;
+
 
 // Setup Session
 if (isset($_COOKIE[COOKIE_AUTH]))
@@ -90,8 +95,10 @@ else
 
 User::setLocale();
 
+
 // assign lang/locale, userdata, characters and custom profiles
 User::assignUserToTemplate($smarty, true);
+
 
 // parse page-parameters .. sanitize before use!
 @list($str, $trash) = explode('&', $_SERVER['QUERY_STRING'], 2);

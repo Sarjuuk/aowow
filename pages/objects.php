@@ -55,9 +55,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     );
 
     // create note if search limit was exceeded
-    if ($objects->getMatches() > SQL_LIMIT_DEFAULT)
+    if ($objects->getMatches() > CFG_SQL_LIMIT_DEFAULT)
     {
-        $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_objectsfound', $objects->getMatches(), SQL_LIMIT_DEFAULT);
+        $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_objectsfound', $objects->getMatches(), CFG_SQL_LIMIT_DEFAULT);
         $lv['params']['_truncated'] = 1;
     }
 

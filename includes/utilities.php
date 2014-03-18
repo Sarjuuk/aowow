@@ -5,22 +5,20 @@ if (!defined('AOWOW_REVISION'))
 
 class SmartyAoWoW extends Smarty
 {
-    private $config    = [];
     private $jsGlobals = [];
     private $notices   = [];
 
-    public function __construct($config)
+    public function __construct()
     {
         parent::__construct();
 
         $cwd = str_replace("\\", "/", getcwd());
 
-        $this->config                 = $config;
         $this->template_dir           = $cwd.'/template/';
         $this->compile_dir            = $cwd.'/cache/template/';
         $this->config_dir             = $cwd.'/configs/';
         $this->cache_dir              = $cwd.'/cache/';
-        $this->debugging              = $config['debug'];
+        $this->debugging              = CFG_DEBUG;
         $this->left_delimiter         = '{';
         $this->right_delimiter        = '}';
         $this->caching                = false;              // Total Cache, this site does not work
@@ -36,7 +34,7 @@ class SmartyAoWoW extends Smarty
             'redButtons' => [],
             'headIcons'  => [],                             // icons in front of title
         );
-        $this->assign('appName', $config['name']);
+        $this->assign('appName', CFG_NAME);
         $this->assign('AOWOW_REVISION', AOWOW_REVISION);
     }
 
@@ -271,7 +269,7 @@ class SmartyAoWoW extends Smarty
         $cache = explode("\n", $cache);
 
         @list($time, $rev) = explode(' ', $cache[0]);
-        $expireTime = $time + $this->config['cacheTimer'];
+        $expireTime = $time + CFG_CACHE_DECAY;
         if ($expireTime <= time() || $rev < AOWOW_REVISION)
             return false;
 
@@ -1751,7 +1749,7 @@ class Util
         if (!$struct)
             return $lv;
 
-        $items = new ItemList(array(['i.id', $struct[1]], SQL_LIMIT_NONE));
+        $items = new ItemList(array(['i.id', $struct[1]], CFG_SQL_LIMIT_NONE));
         $items->addGlobalsToJscript(Util::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
         $foo = $items->getListviewData();
 
@@ -1852,7 +1850,7 @@ class Util
         return $lv;
     }
 
-    public static function getLootSource($itemId, $maxResults = SQL_LIMIT_DEFAULT)
+    public static function getLootSource($itemId, $maxResults = CFG_SQL_LIMIT_DEFAULT)
     {
         if (!$itemId)
             return [];

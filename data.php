@@ -43,7 +43,7 @@ foreach ($datasets as $data)
         case 'statistics':
             if (file_exists('datasets/'.$data))
                 echo file_get_contents('datasets/'.$data);
-            else if ($AoWoWconf['debug'])
+            else if (CFG_DEBUG)
                 echo "alert('could not fetch static data: ".$data."');";
             echo "\n\n";
             break;
@@ -67,7 +67,7 @@ foreach ($datasets as $data)
                 echo file_get_contents('datasets/enus/'.$data.$params);
             else if (file_exists('datasets/'.$data.$params))
                 echo file_get_contents('datasets/'.$data.$params);
-            else if ($AoWoWconf['debug'])
+            else if (CFG_DEBUG)
                 echo "alert('could not fetch static data: ".$data.$params." for locale: ".User::$localeString."');";
             echo "\n\n";
             break;

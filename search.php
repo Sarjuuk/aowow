@@ -33,7 +33,7 @@ $type       = @intVal($_GET['type']);
 $searchMask = 0x0;
 $found      = [];
 $cndBase    = ['AND'];
-$maxResults = SQL_LIMIT_SEARCH;
+$maxResults = CFG_SQL_LIMIT_SEARCH;
 
 $_wt        = isset($_GET['wt'])  ? explode(':', $_GET['wt'])  : null;
 $_wtv       = isset($_GET['wtv']) ? explode(':', $_GET['wtv']) : null;
@@ -60,7 +60,7 @@ if (isset($_GET['json']))
 }
 else if (isset($_GET['opensearch']))
 {
-    $maxResults  = SQL_LIMIT_QUCKSEARCH;
+    $maxResults  = CFG_SQL_LIMIT_QUCKSEARCH;
     $searchMask |= SEARCH_TYPE_OPEN | SEARCH_MASK_OPEN;
 }
 else
@@ -328,7 +328,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
         {
-            $cnd      = [['i.id', array_keys($found['itemset']['pcsToSet'])], SQL_LIMIT_NONE];
+            $cnd      = [['i.id', array_keys($found['itemset']['pcsToSet'])], CFG_SQL_LIMIT_NONE];
             $miscData = ['pcsToSet' => @$found['itemset']['pcsToSet']];
         }
         else if (($searchMask & SEARCH_TYPE_JSON) && ($type == TYPE_ITEM || $_slots))

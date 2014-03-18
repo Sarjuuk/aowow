@@ -20,9 +20,9 @@ if (version_compare(PHP_VERSION, '5.4.0') <= 0)
         $smarty->brb();
 }
 
-if ($AoWoWconf['maintenance'] && !User::isInGroup(U_GROUP_EMPLOYEE))
+if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE))
     $smarty->brb();
-else if ($AoWoWconf['maintenance'] && User::isInGroup(U_GROUP_EMPLOYEE))
+else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
     $smarty->internalNotice(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
 
 switch ($pageCall)

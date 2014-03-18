@@ -11,12 +11,12 @@ class GameObjectList extends BaseType
     public static   $type      = TYPE_OBJECT;
     public static $brickFile   = 'object';
 
-    protected       $queryBase = 'SELECT *, o.id AS ARRAY_KEY FROM ?_objects o';
+    protected       $queryBase = 'SELECT o.*, o.id AS ARRAY_KEY FROM ?_objects o';
     protected       $queryOpts = array(
-                        'o'  => [['ft']],
-                        'ft' => ['j' => ['?_factiontemplate ft ON ft.id = o.faction', true], 's' => ', ft.*'],
-                        'qr' => ['j' => ['gameobject_questrelation qr ON qr.id = o.id', true]],     // started by GO
-                        'ir' => ['j' => ['gameobject_involvedrelation ir ON ir.id = o.id', true]],  // ends at GO
+                        'o'   => [['ft', 'qr']],
+                        'ft'  => ['j' => ['?_factiontemplate ft ON ft.id = o.faction', true], 's' => ', ft.factionId, ft.A, ft.H'],
+                        'qr'  => ['j' => ['gameobject_questrelation qr ON qr.id = o.id', true], 's' => ', qr.quest', 'g' => 'o.id'],     // started by GO
+                        'ir'  => ['j' => ['gameobject_involvedrelation ir ON ir.id = o.id', true]]                                       // ends at GO
                     );
 
     public function __construct($conditions = [], $applyFilter = false)
@@ -32,7 +32,6 @@ class GameObjectList extends BaseType
             // unpack miscInfo:
             $curTpl['lootStack']    = [];
             $curTpl['spells']       = [];
-            $curTpl['spellFocusId'] = 0;
 
             if (in_array($curTpl['type'], [OBJECT_GOOBER, OBJECT_RITUAL, OBJECT_SPELLCASTER, OBJECT_FLAGSTAND, OBJECT_FLAGDROP, OBJECT_AURA_GENERATOR, OBJECT_TRAP]))
                 $curTpl['spells'] = array_combine(['onUse', 'onSuccess', 'aura', 'triggered'], [$curTpl['onUseSpell'], $curTpl['onSuccessSpell'], $curTpl['auraSpell'], $curTpl['triggeredSpell']]);
@@ -87,6 +86,10 @@ class GameObjectList extends BaseType
 
             if (!empty($this->curTpl['reqSkill']))
                 $data[$this->id]['skill'] = $this->curTpl['reqSkill'];
+
+            if ($this->curTpl['quest'])
+                $data[$this->id]['hasQuests'] = 1;
+
         }
 
         return $data;

@@ -54,7 +54,7 @@ class User
             $_SERVER['REMOTE_ADDR']
         );
         // explicit " > "; incremented first, checked after
-        self::$bannedIP = $ipBan && $ipBan['count'] > $GLOBALS['AoWoWconf']['loginFailCount'] && $ipBan['unbanDateIP'] > time();
+        self::$bannedIP = $ipBan && $ipBan['count'] > CFG_FAILED_AUTH_COUNT && $ipBan['unbanDateIP'] > time();
 
         $query = !$userId ? null : DB::Aowow()->SelectRow('
                 SELECT
@@ -176,7 +176,7 @@ class User
 
             if (self::$timeout > 0)
                 DB::Aowow()->query('UPDATE ?_account SET timeout = ?d WHERE id = ?d',
-                    time() + $GLOBALS['AoWoWconf']['sessionTimeout'],
+                    time() + CFG_SESSION_TIMEOUT_DELAY,
                     self::$id
                 );
         }

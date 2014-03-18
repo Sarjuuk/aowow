@@ -340,9 +340,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     }
 
     // create note if search limit was exceeded; overwriting 'note' is intentional
-    if ($items->getMatches() > SQL_LIMIT_DEFAULT && empty($filter['upg']))
+    if ($items->getMatches() > CFG_SQL_LIMIT_DEFAULT && empty($filter['upg']))
     {
-        $pageData['lv']['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), SQL_LIMIT_DEFAULT);
+        $pageData['lv']['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), CFG_SQL_LIMIT_DEFAULT);
         $pageData['lv']['params']['_truncated'] = 1;
     }
 

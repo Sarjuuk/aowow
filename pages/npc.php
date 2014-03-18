@@ -77,24 +77,28 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     $mapType = 0;
-    if (count($_altIds) > 1)                                // temp until zones..
-        $mapType = 2;
-    else if (count($_altIds) == 1)
-        $mapType = 1;
-
-    // map mode
-    // $maps = DB::Aowow()->selectCol('SELECT DISTINCT map from creature WHERE id = ?d', $_id);
-    // if (count($maps) == 1)                                   // should only exist in one instance
-    // {
-        // $map = new ZoneList(array(1, ['mapId', $maps[0]]));
-        // $mapType = $map->getField('areaType');       //NYI
-    // }
+    $maps = DB::Aowow()->selectCol('SELECT DISTINCT map from creature WHERE id = ?d', $_id);
+    if (count($maps) == 1)                                   // should only exist in one instance
+    {
+        $map = new ZoneList(array(1, ['mapId', $maps[0]]));
+        $mapType = $map->getField('areaType');       //NYI
+    }
 
     /***********/
     /* Infobox */
     /***********/
 
     $infobox = [];
+
+    // Event
+    if ($_ = DB::Aowow()->selectRow('SELECT e.id, holidayId FROM ?_events e, game_event_creature gec, creature c WHERE e.id = ABS(gec.eventEntry) AND c.guid = gec.guid AND c.id = ?d', $_id))
+    {
+        if ($h = $_['holidayId'])
+        {
+            Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $_['id']);
+            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$colon.'[event='.$h.']';
+        }
+    }
 
     // Level
     if ($npc->getField('rank') != NPC_RANK_BOSS)
@@ -112,7 +116,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // Classification
     if ($_ = $npc->getField('rank'))                        //  != NPC_RANK_NORMAL
     {
-        $str = $_typeFlags & 0x4 ? '[span class=boss-icon]'.Lang::$npc['rank'][$_].'[/span]' : Lang::$npc['rank'][$_];
+        $str = $_typeFlags & 0x4 ? '[span class=icon-boss]'.Lang::$npc['rank'][$_].'[/span]' : Lang::$npc['rank'][$_];
         $infobox[] = Lang::$npc['classification'].Lang::$colon.$str;
     }
 
@@ -363,6 +367,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // get spawns and such
 
 
+    // consider phaseMasks
+
+    // consider pooled spawns
+
+
     // menuId 4: NPC      g_initPath()
     //  tabId 0: Database g_initHeader()
     $pageData = array(
@@ -380,7 +389,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'tab'          => 0,
             'type'         => TYPE_NPC,
             'typeId'       => $_id,
-            'reqJS'        => ['template/js/swfobject.js'],
+            'reqJS'        => ['static/js/swfobject.js'],
             'redButtons'   => array(
                 BUTTON_WOWHEAD => true,
                 BUTTON_LINKS   => true,

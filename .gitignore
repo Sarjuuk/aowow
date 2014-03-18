@@ -1,5 +1,5 @@
 # smarty cache
-/cache/*index.html
+/cache/*.tmp
 /cache/*.php
 
 # generated files

@@ -74,15 +74,15 @@ if (!defined('AOWOW_REVISION'))
         die('profile_all source file is missing; cannot create realm file');
 
     $menu = [
-        ["us","US & Oceanic", null,[
-            [urlize($AoWoWconf['battlegroup']),$AoWoWconf['battlegroup'],null,[]]
+        ["us", "US & Oceanic", null,[
+            [urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, []]
         ]],
-        ["eu","Europe", null,[
-            [urlize($AoWoWconf['battlegroup']),$AoWoWconf['battlegroup'],null,[]]
+        ["eu", "Europe", null,[
+            [urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, []]
         ]]
     ];
 
-    $rows = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ? AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0', $AoWoWconf['battlegroup']);
+    $rows = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ? AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0', CFG_BATTLEGROUP);
     $str  = 'var g_realms = '.json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE).';';
 
     $handle = fOpen('datasets\\realms', "w");

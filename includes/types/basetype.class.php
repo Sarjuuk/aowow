@@ -54,7 +54,7 @@ abstract class BaseType
     {
         $where     = [];
         $linking   = ' AND ';
-        $limit     = SQL_LIMIT_DEFAULT;
+        $limit     = CFG_SQL_LIMIT_DEFAULT;
         $className = get_class($this);
 
         if (!$this->queryBase || $conditions === null)

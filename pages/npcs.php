@@ -45,7 +45,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             'tab'         => 0,
             'subCat'      => $pageParam ? '='.$pageParam : '',
             'reqJS'       => array(
-                'template/js/filters.js'
+                'static/js/filters.js'
             )
         ),
         'lv' => []
@@ -60,9 +60,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
     // create note if search limit was exceeded
-    if ($npcs->getMatches() > SQL_LIMIT_DEFAULT)
+    if ($npcs->getMatches() > CFG_SQL_LIMIT_DEFAULT)
     {
-        $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), SQL_LIMIT_DEFAULT);
+        $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), CFG_SQL_LIMIT_DEFAULT);
         $lv['params']['_truncated'] = 1;
     }
 

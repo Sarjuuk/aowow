@@ -405,9 +405,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
     // create note if search limit was exceeded; overwriting 'note' is intentional
-    if ($spells->getMatches() > SQL_LIMIT_DEFAULT)
+    if ($spells->getMatches() > CFG_SQL_LIMIT_DEFAULT)
     {
-        $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), SQL_LIMIT_DEFAULT);
+        $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), CFG_SQL_LIMIT_DEFAULT);
         $lv['params']['_truncated'] = 1;
     }
 

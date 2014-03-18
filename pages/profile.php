@@ -366,7 +366,7 @@ function handleLoad()
     // by locale and faction
 
     // buffer title
-    $titlez = new TitleList(array(SQL_LIMIT_NONE, [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0])); // all available
+    $titlez = new TitleList(array(CFG_SQL_LIMIT_NONE, [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0])); // all available
     $dataz = $titlez->getListviewData();
 
     $buff .= "\r\n\r\nvar _ = g_titles;";
@@ -378,7 +378,7 @@ function handleLoad()
 
     // buffer achievements / statistics
     $cnd = array(
-        SQL_LIMIT_NONE,
+        CFG_SQL_LIMIT_NONE,
         [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0], // no unachievable
         [['flags', 1, '&'], 0],                             // no statistics
         // [faction matches our faction]

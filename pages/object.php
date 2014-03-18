@@ -63,6 +63,16 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $infobox = [];
 
+    // Event
+    if ($_ = DB::Aowow()->selectRow('SELECT e.id, holidayId FROM ?_events e, game_event_gameobject geg, gameobject g WHERE e.id = ABS(geg.eventEntry) AND g.guid = geg.guid AND g.id = ?d', $_id))
+    {
+        if ($h = $_['holidayId'])
+        {
+            Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $_['id']);
+            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$colon.'[event='.$h.']';
+        }
+    }
+
     // Reaction
     $_ = function ($r)
     {
@@ -217,6 +227,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 				}
 */
 
+
+    // consider phaseMasks
+
+    // consider pooled spawns
+
+
     // menuId 5: Object   g_initPath()
     //  tabId 0: Database g_initHeader()
     $pageData = array(
@@ -236,14 +252,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 BUTTON_VIEW3D  => ['displayId' => $object->getField('displayId'), 'type' => TYPE_OBJECT, 'typeId' => $_id]
             ),
             'reqCSS' => array(
-                $pageText ? ['path' => 'template/css/Book.css'] : null,
-                // ['path' => 'template/css/Mapper.css'],
-                // ['path' => 'template/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
+                $pageText ? ['path' => 'static/css/Book.css'] : null,
+                // ['path' => 'static/css/Mapper.css'],
+                // ['path' => 'static/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
             ),
             'reqJS'  => array(
-                $pageText ? 'template/js/Book.js' : null,
-                // 'template/js/Mapper.js',
-                'template/js/swfobject.js'
+                $pageText ? 'static/js/Book.js' : null,
+                // 'static/js/Mapper.js',
+                'static/js/swfobject.js'
             )
         ),
         'relTabs' => []

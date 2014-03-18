@@ -79,7 +79,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 BUTTON_LINKS   => ['color' => '', 'linkId' => ''],
                 BUTTON_WOWHEAD => true,
                 BUTTON_TALENT  => ['href' => '?talent#'.Util::$tcEncoding[$tcClassId[$_id] * 3], 'pet' => false],
-                BUTTON_FORUM   => false                         // doto (low): $GLOBALS['AoWoWconf']['boardUrl'] + X
+                BUTTON_FORUM   => false                         // doto (low): CFG_BOARD_URL + X
             )
         ),
         'relTabs' => [],

@@ -1065,7 +1065,7 @@ var Markup = {
 				if(g_items[id] && g_items[id][nameCol])
 				{
 					var item = g_items[id];
-					var str = '<a' + Markup._addGlobalAttributes(attr) + ' href="' + url + '?item=' + id + '" class="q' + item.quality + (!attr.icon ? ' icontiny"><img src="' + g_staticUrl + '/images/iwow/cons/tiny/' + item.icon.toLowerCase() + '.gif"' : '') + ' align="absmiddle" /> <span class="tinyicontxt">';
+					var str = '<a' + Markup._addGlobalAttributes(attr) + ' href="' + url + '?item=' + id + '" class="q' + item.quality + (!attr.icon ? ' icontiny"><img src="' + g_staticUrl + '/images/wow/icons/tiny/' + item.icon.toLowerCase() + '.gif"' : '') + ' align="absmiddle" /> <span class="tinyicontxt">';
 					str += Markup._safeHtml(item[nameCol]) + '</span></a>';
 					return str;
 				}
@@ -1739,7 +1739,7 @@ var Markup = {
 				if(g_quests[id] && g_quests[id][nameCol])
 				{
 					var quest = g_quests[id];
-					return '<a href="' + url + '?quest=' + id + '"' + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/wow/icons/' + (quest.daily ? 'quest_start_daily' : 'quest_start') + '.gif"' : '') + Markup._addGlobalAttributes(attr) + ' align="absmiddle" /> <span class="tinyicontxt">' + Markup._safeHtml(quest[nameCol]) + '</span></a>';
+					return '<a href="' + url + '?quest=' + id + '"' + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/wow/icons/tiny/' + (quest.daily ? 'quest_start_daily' : 'quest_start') + '.gif"' : '') + Markup._addGlobalAttributes(attr) + ' align="absmiddle" /> <span class="tinyicontxt">' + Markup._safeHtml(quest[nameCol]) + '</span></a>';
 				}
 				return '<a href="' + url + '?quest=' + id + '"' + Markup._addGlobalAttributes(attr) + '>(' + LANG.types[5][0] + ' #' + id + ')</a>';
 			},

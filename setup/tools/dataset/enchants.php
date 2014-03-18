@@ -55,7 +55,7 @@ if (!defined('AOWOW_REVISION'))
     // from g_item_slots: 13:"One-Hand", 26:"Ranged", 17:"Two-Hand",
     $slotPointer   = [13, 17, 26, 26, 13, 17, 17, 13, 17, null, 17, null, null, 13, null, 13, null, null, null, null, 17];
     $locales       = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
-    $enchantSpells = new SpellList([['effect1Id', 53], ['name_loc0', 'QA%', '!'], SQL_LIMIT_NONE]);     // enchantItemPermanent && !qualityAssurance
+    $enchantSpells = new SpellList([['effect1Id', 53], ['name_loc0', 'QA%', '!'], CFG_SQL_LIMIT_NONE]);     // enchantItemPermanent && !qualityAssurance
     $castItems     = [];
 
     // check directory-structure

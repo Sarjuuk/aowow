@@ -46,16 +46,16 @@ function signin()
     if (!$ipBan)                                        // no entry exists; set count to 1
         DB::Aowow()->query('INSERT INTO ?_account_bannedIPs VALUES (?, 0, 1, FROM_UNIXTIME(?))',
             $_SERVER['REMOTE_ADDR'],
-            time() + $GLOBALS['AoWoWconf']['loginFailTime']
+            time() + CFG_FAILED_AUTH_EXCLUSION
         );
     else if ($ipBan['unbanDate'] < time())              // ip has accumulated counts but time expired; reset count to 1
         DB::Aowow()->query('INSERT IGNORE INTO ?_account_bannedIPs VALUES (?, 0, 1, ?)',
             $_SERVER['REMOTE_ADDR'],
-            time() + $GLOBALS['AoWoWconf']['loginFailTime']
+            time() + CFG_FAILED_AUTH_EXCLUSION
         );
     else                                                // entry already exists; increment count
         DB::Aowow()->query('UPDATE ?_account_bannedIPs SET count = count + 1, unbanDate = FROM_UNIXTIME(?) WHERE ip = ?',
-            time() + $GLOBALS['AoWoWconf']['loginFailTime'],
+            time() + CFG_FAILED_AUTH_EXCLUSION,
             $_SERVER['REMOTE_ADDR']
         );
 
@@ -76,7 +76,7 @@ function signin()
             );
             DB::Aowow()->query('UPDATE ?_account SET lastLogin = FROM_UNIXTIME(?), timeout = FROM_UNIXTIME(?) WHERE id = ?',
                 time(),
-                $remember ?  0 : time() + $GLOBALS['AoWoWconf']['sessionTimeout'],
+                $remember ?  0 : time() + CFG_SESSION_TIMEOUT_DELAY,
                 $id
             );
             User::writeCookie();                    // overwrites the current user
@@ -89,7 +89,7 @@ function signin()
             return Lang::$account['wrongPass'];
         case AUTH_IPBANNED:
             User::destroy();
-            return sprintf(Lang::$account['loginsExceeded'], round($GLOBALS['AoWoWconf']['loginFailTime'] / 60));
+            return sprintf(Lang::$account['loginsExceeded'], round(CFG_FAILED_AUTH_EXCLUSION / 60));
         default:
             return;
     }
@@ -97,7 +97,7 @@ function signin()
 
 function signup()
 {
-    global $AoWoWconf, $smarty;
+    global $smarty;
 
 /*
         $username = Get(GET_STRING, 'username', 'POST');
@@ -207,7 +207,7 @@ function signup()
 */
 
     // Account creation
-    if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['c_password']) && $AoWoWconf['register'] == true)
+    if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['c_password']) && CFG_ALLOW_REGISTER)
     {
         // password mismatch
         if ($_POST['password'] != $_POST['c_password'])
@@ -322,7 +322,7 @@ else
             else
                 $smarty->assign('next', $_GET['next']);
 
-            $smarty->assign('register', $AoWoWconf['register']);
+            $smarty->assign('register', CFG_ALLOW_REGISTER);
             $smarty->display('signin.tpl');
             break;
         case 'signup_do':
