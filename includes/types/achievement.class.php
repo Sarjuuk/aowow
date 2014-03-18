@@ -150,7 +150,7 @@ class AchievementList extends BaseType
             if (($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::$perms <= 0)
                 continue;
 
-            $crtName = Util::jsEscape(Util::localizedString($crt, 'name'));
+            $crtName = Util::localizedString($crt, 'name');
             switch ($crt['type'])
             {
                 case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
