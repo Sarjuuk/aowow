@@ -28,7 +28,7 @@ $lang = array(
         'numSQL'        => "Anzahl an MySQL-Queries",
         'timeSQL'       => "Zeit für MySQL-Queries",
         'noJScript'     => "<b>Diese Seite macht ausgiebigen Gebrauch von JavaScript.</b><br />Bitte <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">aktiviert JavaScript</a> in Eurem Browser.",
-        'profiles'      => "Deine Charaktere",
+        'userProfiles'  => "Deine Charaktere",
         'pageNotFound'  => "Diese|Dieser|Dieses %s existiert nicht.",        // todo: dämliche Fälle...
         'gender'        => "Geschlecht",
         'sex'           => [null, 'Mann', 'Frau'],

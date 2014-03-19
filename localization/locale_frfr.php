@@ -28,7 +28,7 @@ $lang = array(
         'numSQL'        => "Nombre de requêtes SQL",
         'timeSQL'       => "Temps d'exécution des requêtes SQL",
         'noJScript'     => "<b>Ce site requiert JavaScript pour fonctionner.</b><br />Veuillez <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">activer JavaScript</a> dans votre navigateur.",
-        'profiles'      => "Vos personnages",      // translate.google :x
+        'userProfiles'  => "Vos personnages",      // translate.google :x
         'pageNotFound'  => "Ce %s n'existe pas.",
         'gender'        => "Genre",
         'sex'           => [null, 'Homme', 'Femme'],

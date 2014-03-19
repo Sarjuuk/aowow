@@ -23,7 +23,7 @@ $lang = array(
         'numSQL'        => "Number of MySQL queries",
         'timeSQL'       => "Time of MySQL queries",
         'noJScript'     => "<b>This site makes extensive use of JavaScript.</b><br />Please <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">enable JavaScript</a> in your browser.",
-        'profiles'      => "My Profiles",
+        'userProfiles'  => "My Profiles",
         'pageNotFound'  => "This %s doesn't exist.",
         'gender'        => "Gender",
         'sex'           => [null, 'Male', 'Female'],
