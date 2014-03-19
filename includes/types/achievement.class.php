@@ -24,9 +24,9 @@ class AchievementList extends BaseType
         todo: evaluate TC custom-data-tables: a*_criteria_data should be merged on installation, a*_reward linked with mail_loot_template and achievement
     */
 
-    public function __construct($conditions = [], $applyFilter = false)
+    public function __construct($conditions = [])
     {
-        parent::__construct($conditions, $applyFilter);
+        parent::__construct($conditions);
 
         // post processing
         foreach ($this->iterate() as &$_curTpl)

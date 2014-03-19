@@ -126,7 +126,7 @@
                                         <option value="3" {if isset($filter.gm) && $filter.gm == 3}selected{/if}>{$lang.quality[3]}</option>
                                         <option value="4" {if isset($filter.gm) && $filter.gm == 4}selected{/if}>{$lang.quality[4]}</option>
                                     </select>
-                                    &nbsp; <input type="checkbox" name="jc" value="1" id="jc" /><label for="jc">{$lang.jcGemsOnly|sprintf:' class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, LANG.tooltip_jconlygems, 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"'}</label>
+                                    &nbsp; <input type="checkbox" name="jc" value="1" id="jc" {if isset($filter.jc) && $filter.jc == 1}checked="checked"{/if}/><label for="jc">{$lang.jcGemsOnly|sprintf:' class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, LANG.tooltip_jconlygems, 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"'}</label>
                                 </td>
                             </tr>
                         </table>

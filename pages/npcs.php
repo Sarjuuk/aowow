@@ -25,12 +25,16 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         array_unshift($title, Lang::$npc['cat'][$cats[0]]);
     }
 
-    $npcs = new CreatureList($conditions, true);            // beast subtypes are selected via filter
+    $npcFilter = new CreatureListFilter();
+    if ($_ = $npcFilter->getConditions())
+        $conditions[] = $_;
+
+    $npcs = new CreatureList($conditions);                  // beast subtypes are selected via filter
 
     // recreate form selection
-    $filter = array_merge($npcs->filterGetForm('form'), $filter);
+    $filter = array_merge($npcFilter->getForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['fi']    =  $npcs->filterGetForm();
+    $filter['fi']    =  $npcFilter->getForm();
 
     if (isset($filter['fa']))
         $path[] = $filter['fa'];
@@ -66,7 +70,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $lv['params']['_truncated'] = 1;
     }
 
-    if ($npcs->filterGetError())
+    if ($npcFilter->error)
         $lv['params']['_errors'] = '$1';
 
     $pageData['lv'] = $lv;

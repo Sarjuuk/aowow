@@ -24,6 +24,11 @@ if ($cat)
 
 if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 {
+
+    $objectFilter = new GameObjectListFilter();
+    if ($_ = $objectFilter->getConditions())
+        $conditions[] = $_;
+
     $objects = new GameObjectList($conditions, true);
 
     // menuId 5: Object   g_initPath()
@@ -40,9 +45,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     );
 
     // recreate form selection
-    $filter = array_merge($objects->filterGetForm('form'), $filter);
+    $filter = array_merge($objectFilter->getForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['fi']    =  $objects->filterGetForm();
+    $filter['fi']    =  $objectFilter->getForm();
 
     $params = [];
     if ($objects->hasSetFields(['reqSkill']))
@@ -61,7 +66,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $lv['params']['_truncated'] = 1;
     }
 
-    if ($objects->filterGetError())
+    if ($objectFilter->error)
         $lv['params']['_errors'] = '$1';
 
     $pageData['lv'] = $lv;

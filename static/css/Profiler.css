@@ -219,6 +219,7 @@ a.profiler-header-editlink {
     text-align: center;
     border: 1px solid #101010;
     background: url(../images/icons/ajax.gif) no-repeat 8px #141414;
+    position: relative;
 
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;

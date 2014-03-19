@@ -39,9 +39,15 @@ if (!Util::isValidPage($validCats, $cats))
 
 if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 {
+    $acvFilter = new AchievementListFilter();
+
     // include child categories if current category is empty
     $condition = !empty($cats) ? [['category', (int)end($cats)]] : [];
-    $acvList   = new AchievementList($condition, true);
+
+    if ($_ = $acvFilter->getConditions())
+        $condition[] = $_;
+
+    $acvList   = new AchievementList($condition);
     if (!$acvList->getMatches())
     {
         $curCats = $catList = [!empty($cats) ? (int)end($cats) : 0];
@@ -50,13 +56,13 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             $curCats = DB::Aowow()->SelectCol('SELECT Id FROM ?_achievementCategory WHERE parentCategory IN (?a)', $curCats);
             $catList = array_merge($catList, $curCats);
         }
-        $acvList = new AchievementList($catList ? [['category', $catList]] : [], true);
+        $acvList = new AchievementList($catList ? [['category', $catList]] : []);
     }
 
     // recreate form selection
-    $filter = array_merge($acvList->filterGetForm('form'), $filter);
+    $filter = array_merge($acvFilter->getForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['fi']    =  $acvList->filterGetForm();
+    $filter['fi']    =  $acvFilter->getForm();
 
     // create page title and path
     if ($cats)
@@ -104,7 +110,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $pageData['lv']['params']['_truncated'] = 1;
     }
 
-    if ($acvList->filterGetError())
+    if ($acvFilter->error)
         $pageData['lv']['params']['_errors'] = '$1';
 
     $smarty->saveCache($cacheKey, $pageData, $filter);

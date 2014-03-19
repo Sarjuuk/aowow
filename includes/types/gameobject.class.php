@@ -19,9 +19,9 @@ class GameObjectList extends BaseType
                         'ir'  => ['j' => ['gameobject_involvedrelation ir ON ir.id = o.id', true]]                                       // ends at GO
                     );
 
-    public function __construct($conditions = [], $applyFilter = false)
+    public function __construct($conditions = [])
     {
-        parent::__construct($conditions, $applyFilter);
+        parent::__construct($conditions);
 
         if ($this->error)
             return;

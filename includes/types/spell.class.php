@@ -53,9 +53,9 @@ class SpellList extends BaseType
 
     protected     $queryBase   = 'SELECT *, id AS ARRAY_KEY FROM ?_spell s';
 
-    public function __construct($conditions = [], $applyFilter = false)
+    public function __construct($conditions = [])
     {
-        parent::__construct($conditions, $applyFilter);
+        parent::__construct($conditions);
 
         if ($this->error)
             return;

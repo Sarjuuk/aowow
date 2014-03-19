@@ -172,6 +172,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
      * ALSO upgradeItems .. Profiler can send them as lists, so multiple lv-tabs would occur
      *
     */
+    $itemFilter = new ItemListFilter();
 
     if (preg_match('/gb\=(1|2|3)/i', $_SERVER['QUERY_STRING'], $match))
         $filter['gb'] = $match[1];
@@ -183,16 +184,19 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     if (isset($cats[2]))
         $conditions[] = ['i.subSubClass', $cats[2]];
 
-    $items = new ItemList($conditions, true);
+    if ($_ = $itemFilter->getConditions())
+        $conditions[] = $_;
+
+    $items = new ItemList($conditions, ['extraOpts' => $itemFilter->extraOpts]);
 
     $items->addGlobalsToJscript($smarty);
 
     // recreate form selection
-    $filter = array_merge($items->filterGetForm('form'), $filter);
+    $filter = array_merge($itemFilter->getForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['fi']    =  $items->filterGetForm();
+    $filter['fi']    =  $itemFilter->getForm();
 
-    $xCols = $items->filterGetForm('extraCols', true);
+    $xCols = $itemFilter->getForm('extraCols', true);
 
     // if slot-dropdown is available && Armor && $path points to Armor-Class
     if (count($path) == 4 && $cats[0] == 4 && isset($filter['sl']) && !is_array($filter['sl']))
@@ -222,7 +226,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         )
     );
 
-    if ($items->filterGetError())
+    if ($itemFilter->error)
         $pageData['lv']['params']['_errors'] = '$1';
 
     if (!empty($filter['upg']))
@@ -230,7 +234,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         // upgrade-item got deleted by filter
         if (empty($pageData['lv']['data'][$filter['upg']]))
         {
-            if ($w = $items->filterGetForm('setWeights', true))
+            if ($w = $itemFilter->getForm('setWeights', true))
             {
                 $upgItem = new ItemList(array(['id', $filter['upg']]), false, ['wt' => $w[0], 'wtv' => $w[1]]);
 
@@ -300,14 +304,18 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         {
             $pageData['lv']['params']['computeDataFunc'] = '$fi_scoreSockets';
 
-            $w    = $items->filterGetForm('setWeights', true);
+            $w    = $itemFilter->getForm('setWeights', true);
             $q    = intVal($filter['gm']);
             $mask = 14;
             $cnd  = [10, ['class', ITEM_CLASS_GEM], ['gemColorMask', &$mask, '&'], ['quality', &$q]];
             if (!isset($filter['jc']))
                 $cnd[] = ['itemLimitCategory', 0];          // Jeweler's Gems
 
-            $anyColor = new ItemList($cnd, false, ['wt' => $w[0], 'wtv' => $w[1]]);
+            $wData = ['wt' => $w[0], 'wtv' => $w[1]];
+            If ($_ = $itemFilter->createConditionsForWeights($wData))
+                $cnd[] = $_;
+
+            $anyColor = new ItemList($cnd, ['extraOpts' => $itemFilter->extraOpts]);
             if (!$anyColor->error)
             {
                 $anyColor->addGlobalsToJScript($smarty);
@@ -317,8 +325,8 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             for ($i = 0; $i < 4; $i++)
             {
                 $mask = 1 << $i;
-                $q    = !$i ? 3 : intVal($filter['gm']);    // meta gems are always included..
-                $byColor = new ItemList($cnd, false, ['wt' => $w[0], 'wtv' => $w[1]]);
+                $q    = !$i ? 3 : intVal($filter['gm']);    // meta gems are always included.. ($q is backReferenced)
+                $byColor = new ItemList($cnd, ['extraOpts' => $itemFilter->extraOpts]);
                 if (!$byColor->error)
                 {
                     $byColor->addGlobalsToJScript($smarty);
@@ -329,9 +337,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             $pageData['page']['gemScores'] = json_encode($pageData['page']['gemScores'], JSON_NUMERIC_CHECK);
         }
 
-        $pageData['lv']['params']['onBeforeCreate']  = '$fi_initWeightedListview';
-        $pageData['lv']['params']['onAfterCreate']   = '$fi_addUpgradeIndicator';
-        $pageData['lv']['params']['sort']            = "$['-score', 'name']";
+        $pageData['lv']['params']['onBeforeCreate'] = '$fi_initWeightedListview';
+        $pageData['lv']['params']['onAfterCreate']  = '$fi_addUpgradeIndicator';
+        $pageData['lv']['params']['sort']           = "$['-score', 'name']";
 
         if ($items->hasSetFields(['armor']))
             $visibleCols[] = 'armor';

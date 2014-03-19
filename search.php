@@ -337,13 +337,20 @@ if (!$smarty->loadCache($cacheKey, $found))
             if ($_slots)
                 $iCnd[] = ['slot', $_slots];
 
-            $cnd      = array_merge($cndBase, [$iCnd]);
-            $miscData = ['wt' => $_wt, 'wtv' => $_wtv];
+            $cnd   = array_merge($cndBase, [$iCnd]);
+            $wData = ['wt' => $_wt, 'wtv' => $_wtv];
+
+            $itemFilter = new ItemListFilter();
+            if ($_ = $itemFilter->createConditionsForWeights($wData))
+            {
+                $miscData['extraOpts'] = $itemFilter->extraOpts;
+                $cnd = array_merge($cnd, [$_]);
+            }
         }
         else
             $cnd = array_merge($cndBase, [$cndAdd]);
 
-        $items = new ItemList($cnd, false, $miscData);
+        $items = new ItemList($cnd, $miscData);
 
         if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
         {

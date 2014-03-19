@@ -24,9 +24,9 @@ class QuestList extends BaseType
                         'itemStart' => ['j' => ['?_items itemStart ON itemStart.startQuest = qt.id', true], 'g' => 'qt.id']  // started by item .. grouping required, as the same quest may have multiple starter
                     );
 
-    public function __construct($conditions = [], $applyFilter = false)
+    public function __construct($conditions = [])
     {
-        parent::__construct($conditions, $applyFilter);
+        parent::__construct($conditions);
 
         // post processing
         foreach ($this->iterate() as $id => &$_curTpl)
@@ -48,7 +48,7 @@ class QuestList extends BaseType
             for ($i = 0; $i < 9; $i++)
                 unset($_curTpl['Field'.$i]);
 
-            // todo (med): extend for reward case
+            // store requirements
             $data = [];
             for ($i = 1; $i < 7; $i++)
             {
@@ -66,9 +66,34 @@ class QuestList extends BaseType
                 if ($_ = $_curTpl['RequiredSourceItemId'.$i])
                     $data[TYPE_ITEM][] = $_;
             }
-
             if ($data)
                 $this->requires[$id] = $data;
+
+            // store rewards
+            $data = [];
+
+            if ($_ = $_curTpl['RewardTitleId'])
+                $data[TYPE_TITLE][] = $_;
+
+            for ($i = 1; $i < 7; $i++)
+            {
+                if ($_ = $_curTpl['RewardChoiceItemId'.$i])
+                    $data[TYPE_ITEM][] = $_;
+
+                if ($i > 5)
+                    continue;
+
+                if ($_ = $_curTpl['RewardFactionId'.$i])
+                    $data[TYPE_FACTION][] = $_;
+
+                if ($i > 4)
+                    continue;
+
+                if ($_ = $_curTpl['RewardItemId'.$i])
+                    $data[TYPE_ITEM][] = $_;
+            }
+            if ($data)
+                $this->rewards[$id] = $data;
         }
     }
 

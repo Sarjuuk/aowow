@@ -383,15 +383,19 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         }
     }
 
-    $spells = new SpellList($conditions, true);
+    $spellFilter = new SpellListFilter();
+    if ($_ = $spellFilter->getConditions())
+        $conditions[] = $_;
+
+    $spells = new SpellList($conditions);
 
     $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
     $lv['data'] = $spells->getListviewData();
 
     // recreate form selection
-    $filter          = array_merge($spells->filterGetForm('form'), $filter);
+    $filter          = array_merge($spellFilter->getForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['fi']    =  $spells->filterGetForm();
+    $filter['fi']    =  $spellFilter->getForm();
 
     if (isset($filter['gl']) && !is_array($filter['gl']))
     {
@@ -411,7 +415,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $lv['params']['_truncated'] = 1;
     }
 
-    if ($spells->filterGetError())
+    if ($spellFilter->error)
         $lv['params']['_errors'] = '$1';
 
     $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost']);

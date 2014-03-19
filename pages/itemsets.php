@@ -11,13 +11,15 @@ $cacheKey   = implode('_', [CACHETYPE_PAGE, TYPE_ITEMSET, -1, $filterHash, User:
 
 if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 {
-    $itemsets = new ItemsetList([], true);                  // class selection is via filter, nothing applies here
+    $itemsetFilter = new ItemsetListFilter();
+
+    $itemsets = new ItemsetList([$itemsetFilter->getConditions()]);
     $itemsets->addGlobalsToJscript($smarty);
 
     // recreate form selection
-    $filter = array_merge($itemsets->filterGetForm('form'), $filter);
+    $filter = array_merge($itemsetFilter->getForm('form'), $filter);
     $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['fi']    =  $itemsets->filterGetForm();
+    $filter['fi']    =  $itemsetFilter->getForm();
 
     if (isset($filter['cl']))
         $path[] = $filter['cl'];
@@ -53,7 +55,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $lv['params']['_truncated'] = 1;
     }
 
-    if ($itemsets->filterGetError())
+    if ($itemsetFilter->error)
         $lv['params']['_errors'] = '$1';
 
     $pageData['lv'] = $lv;

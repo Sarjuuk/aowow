@@ -17,6 +17,8 @@ require 'includes/database.class.php';
 
 // autoload List-Classes and Associated Filters
 spl_autoload_register(function ($class) {
+    $class = str_replace('Filter', '', $class);
+
     if (strpos($class, 'List') && !class_exists($class))
     {
         if (!class_exists('BaseType'))

@@ -28,13 +28,13 @@ class ItemList extends BaseType
                       'i'   => ['o' => 'i.quality DESC, i.itemLevel DESC']
                   );
 
-    public function __construct($conditions = [], $applyFilter = false, $miscData = null)
+    public function __construct($conditions = [], $miscData = null)
     {
         // search by statweight
-        if ($miscData && isset($miscData['wt']) && isset($miscData['wtv']))
-            $conditions[] = $this->createConditionsForWeights($miscData);
+        if ($miscData && !empty($miscData['extraOpts']))
+            $this->extendQueryOpts($miscData['extraOpts']);
 
-        parent::__construct($conditions, $applyFilter);
+        parent::__construct($conditions);
 
         foreach ($this->iterate() as &$_curTpl)
         {
@@ -283,7 +283,8 @@ class ItemList extends BaseType
                             $currency[] = [-$k, $qty];
                     }
 
-                    $data[$this->id]['stock'] = $cost['stock'];
+                    $data[$this->id]['stock'] = $cost['stock']; // display as column in lv
+                    $data[$this->id]['avail'] = $cost['stock']; // display as number on icon
                     $data[$this->id]['cost']  = [$this->getField('buyPrice')];
 
                     if ($e = $cost['event'])
@@ -354,8 +355,6 @@ class ItemList extends BaseType
 
         /* even more complicated crap
             "source":[5],"sourcemore":[{"n":"Commander Oxheart","t":1,"ti":64606,"z":5842}],
-            avail       unk
-            rel         unk
             modelviewer {type:X, displayid:Y, slot:z} .. not sure, when to set
         */
 
@@ -1128,47 +1127,6 @@ class ItemList extends BaseType
                 unset($this->json[$this->id][$k]);
     }
 
-    public function createConditionsForWeights(&$data)
-    {
-        if (count($data['wt']) != count($data['wtv']))
-            return null;
-
-        $select = $cnd = [];
-        $wtSum  = 0;
-
-        foreach ($data['wt'] as $k => $v)
-        {
-            @$str = Util::$itemFilter[$v];
-            $qty  = intVal($data['wtv'][$k]);
-
-            if ($str && $qty)
-            {
-                if ($str == 'rgdspeed')                     // dont need no duplicate column
-                    $str = 'speed';
-
-                if ($str == 'mledps')                       // todo (med): unify rngdps and mledps to dps
-                    $str = 'dps';
-
-                $select[] = '(`is`.`'.$str.'` * '.$qty.')';
-                $cnd[]    = ['is.'.$str, 0, '>'];
-                $wtSum   += $qty;
-            }
-            else                                            // well look at that.. erronous indizes or zero-weights
-            {
-                unset($data['wt'][$k]);
-                unset($data['wtv'][$k]);
-            }
-        }
-
-        if (count($cnd) > 1)
-            array_unshift($cnd, 'OR');
-        else if (count($cnd) == 1)
-            $cnd = $cnd[0];
-
-        $this->queryOpts['is']['s'] = $select ? ', ('.implode(' + ', $select).') / '.$wtSum.' AS score' : null;
-        return $cnd;
-    }
-
     private function canTeachSpell()
     {
         // 483: learn recipe; 55884: learn mount/pet
@@ -1438,8 +1396,8 @@ class ItemList extends BaseType
 
 class ItemListFilter extends Filter
 {
-    // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
-    private $ubFilter        = [];
+    private   $ubFilter      = [];                          // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
+    public    $extraOpts     = null;                        // score for statWeights
     protected $enums         = array(
         99 => array(                                        // profession | recycled for 86, 87
             null, 171, 164, 185, 333, 202, 129, 755, 165, 186, 197, true, false, 356, 182, 773
@@ -1569,7 +1527,7 @@ class ItemListFilter extends Filter
         177 => [FILTER_CR_STAFFFLAG, 'flagsExtra'                                           ], // flags2
     );
 
-    public function __construct($parent)
+    public function __construct()
     {
         $classes = new CharClassList();
         foreach ($classes->iterate() as $cId => $_tpl)
@@ -1586,7 +1544,50 @@ class ItemListFilter extends Filter
                     $this->ubFilter[$cId][ITEM_CLASS_ARMOR][] = $i;
         }
 
-        parent::__construct($parent);
+        parent::__construct();
+    }
+
+    public function createConditionsForWeights(&$data)
+    {
+        if (count($data['wt']) != count($data['wtv']))
+            return null;
+
+        $select = $cnd = [];
+        $wtSum  = 0;
+
+        foreach ($data['wt'] as $k => $v)
+        {
+            @$str = Util::$itemFilter[$v];
+            $qty  = intVal($data['wtv'][$k]);
+
+            if ($str && $qty)
+            {
+                if ($str == 'rgdspeed')                     // dont need no duplicate column
+                    $str = 'speed';
+
+                if ($str == 'mledps')                       // todo (med): unify rngdps and mledps to dps
+                    $str = 'dps';
+
+                $select[] = '(`is`.`'.$str.'` * '.$qty.')';
+                $cnd[]    = ['is.'.$str, 0, '>'];
+                $wtSum   += $qty;
+            }
+            else                                            // well look at that.. erronous indizes or zero-weights
+            {
+                unset($data['wt'][$k]);
+                unset($data['wtv'][$k]);
+            }
+        }
+
+        if (count($cnd) > 1)
+            array_unshift($cnd, 'OR');
+        else if (count($cnd) == 1)
+            $cnd = $cnd[0];
+
+        if ($select)
+            $this->extraOpts['is']['s'] = ', ('.implode(' + ', $select).') / '.$wtSum.' AS score';
+
+        return $cnd;
     }
 
     protected function createSQLForCriterium(&$cr)
@@ -1873,7 +1874,7 @@ class ItemListFilter extends Filter
             $_v['wt']  = (array)$_v['wt'];
             $_v['wtv'] = (array)$_v['wtv'];
 
-            $parts[] = $this->parent->createConditionsForWeights($_v);
+            $parts[] = $this->createConditionsForWeights($_v);
 
             foreach ($_v['wt'] as $_)
                 $this->formData['extraCols'][] = $_;

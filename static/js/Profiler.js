@@ -1317,7 +1317,7 @@ function Profiler() {
             sp  = $WH.ce('span');
 
             $WH.ae(div, $WH.ct((_isArmoryProfile() ? LANG.pr_qf_resynced : LANG.pr_qf_updated)));
-            g_formatDate(sp, elapsed, _profile.lastupdated);
+            g_formatDate(sp, elapsed, new Date(_profile.lastupdated));
 
             if (elapsed > (60 * 60 * 24)) { // 1 Day
                 sp.style.color = 'red';

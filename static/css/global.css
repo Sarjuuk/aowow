@@ -1479,7 +1479,7 @@ Variations:
 
 .icon-delete
 {
-    padding-left: 19px;
+    padding-left: 19px !important;
     background: url(../images/icons/delete.gif) no-repeat left center;
 }
 
@@ -1595,7 +1595,7 @@ Variations:
 
 .icon-save
 {
-    padding-left: 21px;
+    padding-left: 21px !important;
     background: url(../images/icons/save.gif) no-repeat left center;
 }
 

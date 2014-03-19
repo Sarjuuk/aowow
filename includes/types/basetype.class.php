@@ -11,7 +11,6 @@ abstract class BaseType
 
     protected $templates = [];
     protected $curTpl    = [];                              // lets iterate!
-    protected $filter    = null;
     protected $matches   = null;                            // total matches unaffected by sqlLimit in config
 
     protected $queryBase = '';
@@ -50,7 +49,7 @@ abstract class BaseType
     *   results in
     *       WHERE ((`id` = 45) OR (`name` NOT LIKE "%test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) OR (`joinedTbl`.`field` IS NULL) LIMIT 5
     */
-    public function __construct($conditions = [], $applyFilter = false)
+    public function __construct($conditions = [])
     {
         $where     = [];
         $linking   = ' AND ';
@@ -60,22 +59,11 @@ abstract class BaseType
         if (!$this->queryBase || $conditions === null)
             return;
 
-        // may be called without filtering
-        if ($applyFilter && class_exists($className.'Filter'))
-        {
-            $fiName = $className.'Filter';
-            $this->filter = new $fiName($this);
-        }
-
         $prefixes = [];
         if (preg_match('/FROM \??[\w\_]+( AS)?\s?`?(\w+)`?$/i', $this->queryBase, $match))
             $prefixes['base'] = $match[2];
         else
             $prefixes['base'] = '';
-
-        // add conditions from filter
-        // to consider - conditions from filters are already escaped and contain sql-wildcards reescaping those sucks
-        $conditions[] = $this->filter ? $this->filter->getConditions() : null;
 
         $resolveCondition = function ($c, $supLink) use (&$resolveCondition, &$prefixes)
         {
@@ -344,47 +332,46 @@ abstract class BaseType
         return $this->matches;
     }
 
-    public function filterGetForm($key = null, $raw = false)
+    protected function extendQueryOpts($extra)              // needs to be called from __construct
     {
-        $form = [];
-
-        if (!$this->filter)
-            return $form;
-
-        foreach ($this->filter->getForm() as $name => $data)
+        foreach ($extra as $tbl => $sets)
         {
-            if (!$data || ($key && $name != $key))
+            if (!isset($this->queryOpts[$tbl]))             // allow adding only to known tables
                 continue;
 
-            switch ($name)
+            foreach ($sets as $module => $value)
             {
-                case 'setCriteria':
-                    $form[$name] = $raw ? $data : 'fi_setCriteria('.$data['cr'].', '.$data['crs'].', '.$data['crv'].');';
-                    break;
-                case 'extraCols':
-                    $form[$name] = $raw ? $data : 'fi_extraCols = '.json_encode(array_unique($data), JSON_NUMERIC_CHECK).';';
-                    break;
-                case 'setWeights':
-                    $form[$name] = $raw ? $data : 'fi_setWeights('.json_encode($data, JSON_NUMERIC_CHECK).', 0, 1, 1);';
-                    break;
-                case 'form':
-                    if ($key == $name)                      // only if explicitely specifies
-                        $form[$name] = $data;
-                    break;
-                default:
-                    break;
+                if (!$value)
+                    continue;
+
+                switch ($module)
+                {
+                    // additional (str)
+                    case 'g':                               // group by
+                    case 'h':                               // having
+                    case 'o':                               // order by
+                        if (!empty($this->queryOpts[$tbl][$module]))
+                            $this->queryOpts[$tbl][$module] .= $value;
+                        else
+                            $this->queryOpts[$tbl][$module] = $value;
+
+                        break;
+                    // additional (arr)
+                    case 'j':                               // join
+                        if (is_array($this->queryOpts[$tbl][$module]))
+                            $this->queryOpts[$tbl][$module][0][] = $value;
+                        else
+                            $this->queryOpts[$tbl][$module] = $value;
+
+                        break;
+                    // replacement
+                    case 'l':                               // limit
+                    case 's':                               // select
+                        $this->queryOpts[$tbl][$module] = $value;
+                        break;
+                }
             }
         }
-
-        return $key ? (empty($form[$key]) ? [] : $form[$key]) : $form;
-    }
-
-    public function filterGetError()
-    {
-        if ($this->filter)
-            return $this->filter->error;
-        else
-            return false;
     }
 
     // should return data required to display a listview of any kind
@@ -555,7 +542,6 @@ abstract class Filter
 
     private         $cndSet    = [];
 
-    protected       $parent    = null;                      // itemFilter requires this
     protected       $fiData    = ['c' => [], 'v' =>[]];
     protected       $formData =  array(                     // data to fill form fields
                         'form'        => [],                // base form - unsanitized
@@ -565,10 +551,8 @@ abstract class Filter
                     );
 
     // parse the provided request into a usable format; recall self with GET-params if nessecary
-    public function __construct($parent)
+    public function __construct()
     {
-        $this->parent = $parent;
-
         // prefer POST over GET, translate to url
         if (!empty($_POST))
         {
@@ -610,7 +594,7 @@ abstract class Filter
             }
 
             // do get request
-            header('Location: '.STATIC_URL.'?'.$_SERVER['QUERY_STRING'].'='.implode(';', $tmp));
+            header('Location: '.HOST_URL.'?'.$_SERVER['QUERY_STRING'].'='.implode(';', $tmp));
         }
         // sanitize input and build sql
         else if (!empty($_GET['filter']))
@@ -704,9 +688,39 @@ abstract class Filter
             array_unshift($this->cndSet, empty($this->fiData['v']['ma']) ? 'AND' : 'OR');
     }
 
-    public function getForm()
+    public function getForm($key = null, $raw = false)
     {
-        return $this->formData;
+        $form = [];
+
+        if (!$this->formData)
+            return $form;
+
+        foreach ($this->formData as $name => $data)
+        {
+            if (!$data || ($key && $name != $key))
+                continue;
+
+            switch ($name)
+            {
+                case 'setCriteria':
+                    $form[$name] = $raw ? $data : 'fi_setCriteria('.$data['cr'].', '.$data['crs'].', '.$data['crv'].');';
+                    break;
+                case 'extraCols':
+                    $form[$name] = $raw ? $data : 'fi_extraCols = '.json_encode(array_unique($data), JSON_NUMERIC_CHECK).';';
+                    break;
+                case 'setWeights':
+                    $form[$name] = $raw ? $data : 'fi_setWeights('.json_encode($data, JSON_NUMERIC_CHECK).', 0, 1, 1);';
+                    break;
+                case 'form':
+                    if ($key == $name)                      // only if explicitely specified
+                        $form[$name] = $data;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return $key ? (empty($form[$key]) ? [] : $form[$key]) : $form;
     }
 
     public function getConditions()
