@@ -158,38 +158,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     if (isset($filter['slot'][INVTYPE_SHIELD]))             // "Off Hand" => "Shield"
         $filter['slot'][INVTYPE_SHIELD] = Lang::$item['armorSubClass'][6];
 
-
-    /*
-        set conditions
-    */
-
-    /*
-     * todo (low): this is a long term issue.
-     * Filter is used as a subSystem to each TypeList
-     * but here we would need to preemptive check for $filter['gb']
-     *  .. bummer ..  this is to be removed when the issue is _really_ solved
-     *
-     * ALSO upgradeItems .. Profiler can send them as lists, so multiple lv-tabs would occur
-     *
-    */
     $itemFilter = new ItemListFilter();
-
-    if (preg_match('/gb\=(1|2|3)/i', $_SERVER['QUERY_STRING'], $match))
-        $filter['gb'] = $match[1];
-
-    if (isset($cats[0]))
-        $conditions[] = ['i.class', $cats[0]];
-    if (isset($cats[1]))
-        $conditions[] = ['i.subClass', $cats[1]];
-    if (isset($cats[2]))
-        $conditions[] = ['i.subSubClass', $cats[2]];
-
-    if ($_ = $itemFilter->getConditions())
-        $conditions[] = $_;
-
-    $items = new ItemList($conditions, ['extraOpts' => $itemFilter->extraOpts]);
-
-    $items->addGlobalsToJscript($smarty);
 
     // recreate form selection
     $filter = array_merge($itemFilter->getForm('form'), $filter);
@@ -206,6 +175,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     if (array_intersect([63, 64], $xCols))                  // 63:buyPrice; 64:sellPrice
         $infoMask |= ITEMINFO_VENDOR;
 
+
     // menuId 0: Item     g_initPath()
     //  tabId 0: Database g_initHeader()
     $pageData = array(
@@ -220,89 +190,46 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
                 '?data=weight-presets'
             )
         ),
-        'lv' => array(
-            'data'   => $items->getListviewData($infoMask),
-            'params' => []
+        'lv'     => array(
+            'tabs'      => [],
+            'isGrouped' => false
         )
     );
 
-    if ($itemFilter->error)
-        $pageData['lv']['params']['_errors'] = '$1';
 
-    if (!empty($filter['upg']))
-    {
-        // upgrade-item got deleted by filter
-        if (empty($pageData['lv']['data'][$filter['upg']]))
-        {
-            if ($w = $itemFilter->getForm('setWeights', true))
-            {
-                $upgItem = new ItemList(array(['id', $filter['upg']]), false, ['wt' => $w[0], 'wtv' => $w[1]]);
+    /*
+        set conditions
+    */
 
-                // still it may not be found if you apply really weired filters (e.g. search for a melee item with caster-weights) .. not my fault :[
-                if (!$upgItem->error)
-                {
-                    $upgItem->addGlobalsToJScript($smarty);
-                    $pageData['lv']['data'][$filter['upg']] = $upgItem->getListviewData($infoMask)[$filter['upg']];
-                }
-            }
-        }
+    if (isset($cats[0]))
+        $conditions[] = ['i.class', $cats[0]];
+    if (isset($cats[1]))
+        $conditions[] = ['i.subClass', $cats[1]];
+    if (isset($cats[2]))
+        $conditions[] = ['i.subSubClass', $cats[2]];
 
-        if (!empty($filter['gb']))
-            $pageData['lv']['params']['customFilter'] = '$fi_filterUpgradeListview';
+    if ($_ = $itemFilter->getConditions())
+        $conditions[] = $_;
 
-        $pageData['lv']['params']['_upgradeIds']  = "$[".$filter['upg']."]";
-    }
-/*
-    by level: max 10 itemlevel steps (Level X) +1x Other|Autre|Anderes|Otros|Другое levels
-    by slot: all slots available
-    by source: .. well .. no
 
-	template: 'item',
-	id: 'one-hand',
-	name: 'One-Hand',
-	tabs: tabsGroups,
-	parent: 'lkljbjkb574',
-	hideCount: 1,
-	note: $WH.sprintf(LANG.lvnote_viewmoreslot, '=2', 'sl=13;ub=10;cr=161;crs=1;crv=0;gm=3;rf=1;wt=23:123:24:103:96:170;wtv=100:85:75:60:50:40;upg=104585'),
-	customFilter: fi_filterUpgradeListview,
-	_upgradeIds: [104585],
-	extraCols: fi_getExtraCols(fi_extraCols, 3, 1, 0),
-	sort: ['-score', 'name'],
-	computeDataFunc: fi_scoreSockets,
-	onBeforeCreate: fi_initWeightedListview,
-	onAfterCreate: fi_addUpgradeIndicator,
-	hiddenCols: ['type', 'source'],
-	data: []
+    /*
+        shared parameter between all possible lv-tabs
+    */
 
-    template: 'item',
-	id: 'two-hand',
-	name: 'Two-Hand',
-	tabs: tabsGroups,
-	parent: 'lkljbjkb574',
-	hideCount: 1,
-	note: $WH.sprintf(LANG.lvnote_viewmoreslot, '=2', 'sl=17;ub=10;cr=161;crs=1;crv=0;gm=3;rf=1;wt=23:123:24:103:96:170;wtv=100:85:75:60:50:40;upg=104585'),
-	customFilter: fi_filterUpgradeListview,
-	_upgradeIds: [104585],
-	extraCols: fi_getExtraCols(fi_extraCols, 3, 1, 0),
-	sort: ['-score', 'name'],
-	computeDataFunc: fi_scoreSockets,
-	onBeforeCreate: fi_initWeightedListview,
-	onAfterCreate: fi_addUpgradeIndicator,
-	hiddenCols: ['type', 'source'],
-	data: []
-*/
+    $sharedLvParams = [];
+    $upgItemData    = [];
     if (!empty($filter['fi']['extraCols']))
     {
         $gem  = empty($filter['gm']) ? 0 : $filter['gm'];
         $cost = array_intersect([63], $xCols) ? 1 : 0;
-        $pageData['lv']['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.$gem.', '.$cost.')';
+        $sharedLvParams['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.$gem.', '.$cost.')';
     }
 
     if (!empty($filter['fi']['setWeights']))
     {
         if (!empty($filter['gm']))
         {
-            $pageData['lv']['params']['computeDataFunc'] = '$fi_scoreSockets';
+            $sharedLvParams['computeDataFunc'] = '$fi_scoreSockets';
 
             $w    = $itemFilter->getForm('setWeights', true);
             $q    = intVal($filter['gm']);
@@ -337,28 +264,201 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             $pageData['page']['gemScores'] = json_encode($pageData['page']['gemScores'], JSON_NUMERIC_CHECK);
         }
 
-        $pageData['lv']['params']['onBeforeCreate'] = '$fi_initWeightedListview';
-        $pageData['lv']['params']['onAfterCreate']  = '$fi_addUpgradeIndicator';
-        $pageData['lv']['params']['sort']           = "$['-score', 'name']";
-
-        if ($items->hasSetFields(['armor']))
-            $visibleCols[] = 'armor';
+        $sharedLvParams['onBeforeCreate'] = '$fi_initWeightedListview';
+        $sharedLvParams['onAfterCreate']  = '$fi_addUpgradeIndicator';
+        $sharedLvParams['sort']           = "$['-score', 'name']";
 
         array_push($hiddenCols, 'type', 'source');
     }
 
-    // create note if search limit was exceeded; overwriting 'note' is intentional
-    if ($items->getMatches() > CFG_SQL_LIMIT_DEFAULT && empty($filter['upg']))
+    if ($itemFilter->error)
+        $sharedLvParams['_errors'] = '$1';
+
+    if (!empty($filter['upg']))
     {
-        $pageData['lv']['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-        $pageData['lv']['params']['_truncated'] = 1;
+                                                            // v poke it to use item_stats
+        $upgItem = new ItemList(array(['id', $filter['upg']], ['is.id', null, '!']), ['extraOpts' => $itemFilter->extraOpts]);
+        if (!$upgItem->error)
+        {
+            $upgItem->addGlobalsToJScript($smarty);
+            $upgItemData = $upgItem->getListviewData($infoMask)[$filter['upg']];
+        }
+
+        // if (!empty($filter['gb']))
+        $sharedLvParams['customFilter'] = '$fi_filterUpgradeListview';
+
+        $sharedLvParams['_upgradeIds']  = "$[".$filter['upg']."]";
     }
 
-    if ($hiddenCols)
-        $pageData['lv']['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
+    /*
+     * todo (low): this is a long term issue.
+     * upgradeItems .. Profiler can send them as lists, so multiple lv-tabs would occur
+     *
+    */
 
-    if ($visibleCols)
-        $pageData['lv']['params']['visibleCols'] = '$'.json_encode($visibleCols);
+    /*
+        group by
+    */
+    $availableSlots = array(
+        ITEM_CLASS_ARMOR  => [INVTYPE_HEAD, INVTYPE_NECK, INVTYPE_SHOULDERS, INVTYPE_CHEST, INVTYPE_WAIST, INVTYPE_LEGS, INVTYPE_FEET, INVTYPE_WRISTS, INVTYPE_HANDS, INVTYPE_FINGER, INVTYPE_TRINKET, INVTYPE_SHIELD, INVTYPE_CLOAK],
+        ITEM_CLASS_WEAPON => [INVTYPE_WEAPON, INVTYPE_RANGED, INVTYPE_2HWEAPON, INVTYPE_WEAPONMAINHAND, INVTYPE_WEAPONOFFHAND, INVTYPE_THROWN, INVTYPE_HOLDABLE]
+    );
+    $sourcesGlobalToItem  = [1 => 3, 2 => 4, 3 => 5, 4 => 6, 5 => 7, 6 => 8];
+    $groups     = [];
+    $nameSource = [];
+    $field      = '';
+    switch (@$filter['gb'])
+    {
+        // slot: (try to limit the lookups by class grouping and intersecting with preselected slots)
+        // if intersect yields an empty array no lookups will occur
+        case 1:
+            if (isset($cats[0]) && $cats[0] == ITEM_CLASS_ARMOR)
+                $groups = isset($filter['sl']) ? array_intersect($availableSlots[ITEM_CLASS_ARMOR], (array)$filter['sl']) : $availableSlots[ITEM_CLASS_ARMOR];
+            else if (isset($cats[0]) && $cats[0] == ITEM_CLASS_WEAPON)
+                $groups = isset($filter['sl']) ? array_intersect($availableSlots[ITEM_CLASS_WEAPON], (array)$filter['sl']) : $availableSlots[ITEM_CLASS_WEAPON];
+            else
+            {
+                $groups = array_merge($availableSlots[ITEM_CLASS_ARMOR], $availableSlots[ITEM_CLASS_WEAPON]);
+                if (isset($filter['sl']))
+                    $groups = array_intersect($groups, (array)$filter['sl']);
+            }
+
+            if ($groups)
+            {
+                $nameSource = Lang::$item['inventoryType'];
+                $pageData['lv']['isGrouped'] = true;
+                $field = 'slot';
+            }
+
+            break;
+        // itemlevel: first, try to find 10 level steps within range (if given) as tabs
+        case 2:
+            $levelRef = new ItemList(array_merge($conditions, [10]), ['extraOpts' => ['i' => ['g' => 'itemlevel', 'o' => 'itemlevel DESC']]]);
+            foreach ($levelRef->iterate() as $_)
+            {
+                $l = $levelRef->getField('itemLevel');
+                $groups[] = $l;
+                $nameSource[$l] = Lang::$game['level'].' '.$l;
+            }
+
+            if ($groups)
+            {
+                $l = -end($groups);
+                $groups[] = $l;                             // push last value as negativ to signal misc group after this level
+                $nameSource[$l] = Lang::$item['tabOther'];
+                $pageData['lv']['isGrouped'] = true;
+                $field = 'itemlevel';
+            }
+
+            break;
+         // todo(med): source
+         // .. well .. no, not at the moment .. the databse doesn't event have a field for that
+         case 3:
+            $groups = array_filter(array_keys(Lang::$game['sources']));
+
+            if ($groups)
+            {
+                $nameSource = Lang::$game['sources'];
+                $pageData['lv']['isGrouped'] = true;
+                $field = 'source';
+            }
+
+            break;
+        // none
+        default:
+            $groups[0] = null;
+    }
+
+    foreach ($groups as $group)
+    {
+        $finalCnd = $field ? array_merge($conditions, [[$field, abs($group), $group > 0 ? null : '<'], 25]) : $conditions;
+
+        $items = new ItemList($finalCnd, ['extraOpts' => $itemFilter->extraOpts]);
+        $items->addGlobalsToJscript($smarty);
+
+        if ($items->error)
+            continue;
+
+        $data = $items->getListviewData($infoMask);
+
+        if ($upgItemData)
+            $data[$filter['upg']] = $upgItemData;
+
+        $tab = array(
+            'data'   => $data,
+            'params' => $sharedLvParams
+        );
+
+        if ($field)
+        {
+            $tab['params']['id']   = $group > 0 ? $field.'-'.$group : 'other';
+            $tab['params']['name'] = $nameSource[$group];
+            $tab['params']['tabs'] = '$tabsGroups';
+        }
+
+        if (!empty($filter['fi']['setWeights']))
+        {
+            if ($items->hasSetFields(['armor']))
+                $visibleCols[] = 'armor';
+        }
+
+        // create note if search limit was exceeded; overwriting 'note' is intentional
+        if ($items->getMatches() > CFG_SQL_LIMIT_DEFAULT && empty($filter['upg']) && !$field)
+        {
+            $tab['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $tab['params']['_truncated'] = 1;
+        }
+        else if ($field && $items->getMatches() > 25)
+        {
+            $tab['params']['_truncated'] = 1;
+
+            $addCr = [];
+            if ($field == 'slot')
+            {
+                $note = 'lvnote_viewmoreslot';
+                $override = ['sl' => $group, 'gb' => ''];
+            }
+            else if ($field == 'itemlevel')
+            {
+                $note = 'lvnote_viewmorelevel';
+                $override = ['minle' => $group, 'maxle' => $group, 'gb' => ''];
+            }
+            else if ($field == 'source')
+            {
+                if ($_ = @$sourcesGlobalToItem[$group])
+                {
+                    $note  = 'lvnote_viewmoresource';
+                    $addCr = ['cr' => 128, 'crs' => $_, 'crv' => 0];
+                }
+
+                $override = ['gb' => ''];
+            }
+
+            $cls = isset($cats[0]) ? '='.$cats[0] : '';
+            $filterUrl = $itemFilter->urlize($override, $addCr);
+
+            if ($note)
+                $tab['params']['note'] = '$$WH.sprintf(LANG.'.$note.', \''.$cls.'\', \''.$filterUrl.'\')';
+        }
+
+        if ($hiddenCols)
+            $tab['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
+
+        if ($visibleCols)
+            $tab['params']['visibleCols'] = '$'.json_encode($visibleCols);
+
+        if ($field)
+            $tab['params']['hideCount'] = '$1';
+
+        $pageData['lv']['tabs'][] = $tab;
+    }
+
+    // whoops, we have no data? create emergency content
+    if (!$pageData['lv']['tabs'])
+    {
+        $pageData['lv']['isGrouped'] = false;
+        $pageData['lv']['tabs'][] = ['data' => [], 'params' => []];
+    }
 
     $smarty->saveCache($cacheKey, $pageData, $filter);
 }

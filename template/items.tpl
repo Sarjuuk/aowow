@@ -171,23 +171,21 @@
 {/foreach}
             //]]></script>
 
-{if isset($lvData.data[0].params)}
+{if $lvData.isGrouped}
             <div id="tabs-generic"></div>
 {/if}
             <div id="lv-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
 {if !empty($gemScores)}var fi_gemScores = {$gemScores};{/if}
 
-{if isset($lvData.data[0].params)}
-                var tabsRelated = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
-    {foreach from=$tabs item="tab"}
-        {if !empty($tab.data)}
-            {include file="listviews/item.tpl" data=$tab.data params=$tab.params}
-        {/if}
+{if $lvData.isGrouped}
+                var tabsGroups = new Tabs({ldelim}parent: $WH.ge('tabs-generic'){rdelim});
+{/if}
+    {foreach from=$lvData.tabs item="tab"}
+        {include file="listviews/item.tpl" data=$tab.data params=$tab.params}
     {/foreach}
-                tabsRelated.flush();
-{else}
-    {include file='listviews/item.tpl' data=$lvData.data params=$lvData.params}
+{if $lvData.isGrouped}
+                tabsGroups.flush();
 {/if}
             //]]></script>
 

@@ -636,7 +636,7 @@ function Profiler() {
         _divAuras.id = 'aura-container';
         _divAuras.style.cssFloat = 'left';
         _divAuras.style.marginLeft = '390px';
-        _divAuras.style.width = '350px';
+        _divAuras.style.width = '325px';
         _divAuras.style.display = 'none';
 
         _ = $WH.ce('h3');

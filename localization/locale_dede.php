@@ -180,6 +180,10 @@ $lang = array(
         'modes'         => ['Normal / Normal 10', 'Heroisch / Normal 25', 'Heroisch 10', 'Heroisch 25'],
         'expansions'    => array("Classic", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"),
+        'sources'       => array(
+            null,                       "Hergestellt",              "Drop",                     "PvP",                      "Quest",                    "Händler",              "Lehrer",               "Entdeckung",
+            "Einlösung",                "Talent",                   "Startausrüstung",          "Ereignis",                 "Erfolg"
+        ),
         'languages'     => array(
             1 => "Orcisch",     2 => "Darnassisch",     3 => "Taurisch",    6 => "Zwergisch",       7 => "Gemeinsprache",   8 => "Dämonisch",       9 => "Titanisch",       10 => "Thalassisch",
             11 => "Drachisch",  12 => "Kalimagisch",    13 => "Gnomisch",   14 => "Trollisch",      33 => "Gossensprache",  35 => "Draeneiisch",    36 => "Zombie",         37 => "Gnomenbinär",        38 => "Goblinbinär"
@@ -614,6 +618,7 @@ $lang = array(
         'usableBy'      => "Benutzbar von",
         'buyout'        => "Sofortkaufpreis",
         'each'          => "Stück",
+        'tabOther'      => "Anderes",
         'gems'          => "Edelsteine",
         'socketBonus'   => "Sockelbonus",
         'socket'        => array (

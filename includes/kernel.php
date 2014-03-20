@@ -49,7 +49,7 @@ foreach ($AoWoWconf['characters'] as $realm => $charDBInfo)
 // load config to constants
 $sets = DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, intValue as i, strValue as s FROM ?_config');
 foreach ($sets as $k => $v)
-    define('CFG_'.strtoupper($k), $v['i'] ? intVal($v['i']) : $v['s']);
+    define('CFG_'.strtoupper($k), $v['s'] ? $v['s'] : intVal($v['i']));
 
 define('STATIC_URL', substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1).'/static'); // points js to images & scripts (change here if you want to use a separate subdomain)
 define('HOST_URL',   substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));           // points js to executable files

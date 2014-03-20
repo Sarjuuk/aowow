@@ -349,7 +349,6 @@ abstract class BaseType
                     // additional (str)
                     case 'g':                               // group by
                     case 'h':                               // having
-                    case 'o':                               // order by
                         if (!empty($this->queryOpts[$tbl][$module]))
                             $this->queryOpts[$tbl][$module] .= $value;
                         else
@@ -364,9 +363,10 @@ abstract class BaseType
                             $this->queryOpts[$tbl][$module] = $value;
 
                         break;
-                    // replacement
+                    // replacement (str)
                     case 'l':                               // limit
                     case 's':                               // select
+                    case 'o':                               // order by
                         $this->queryOpts[$tbl][$module] = $value;
                         break;
                 }
@@ -543,7 +543,7 @@ abstract class Filter
     private         $cndSet    = [];
 
     protected       $fiData    = ['c' => [], 'v' =>[]];
-    protected       $formData =  array(                     // data to fill form fields
+    protected       $formData  =  array(                    // data to fill form fields
                         'form'        => [],                // base form - unsanitized
                         'setCriteria' => [],                // dynamic criteria list - index checked
                         'setWeights'  => [],                // dynamic weights list  - index checked
@@ -581,20 +581,8 @@ abstract class Filter
                 }
             }
 
-            // create get-data
-            $tmp = [];
-            foreach (array_merge($this->fiData['c'], $this->fiData['v']) as $k => $v)
-            {
-                if ($v === '')
-                    continue;
-                else if (is_array($v))
-                    $tmp[$k] = $k."=".implode(':', $v);
-                else
-                    $tmp[$k] = $k."=".$v;
-            }
-
             // do get request
-            header('Location: '.HOST_URL.'?'.$_SERVER['QUERY_STRING'].'='.implode(';', $tmp));
+            header('Location: '.HOST_URL.'?'.$_SERVER['QUERY_STRING'].'='.$this->urlize());
         }
         // sanitize input and build sql
         else if (!empty($_GET['filter']))
@@ -672,6 +660,23 @@ abstract class Filter
 
             $this->evaluateFilter();
         }
+    }
+
+    public function urlize(array $override = [], array $addCr = [])
+    {
+        $_ = [];
+        foreach (array_merge($this->fiData['c'], $this->fiData['v'], $override) as $k => $v)
+        {
+            if (isset($addCr[$k]))
+                $v = $v ? array_merge((array)$v, (array)$addCr[$k]) : $addCr[$k];
+
+            if (is_array($v) && !empty($v))
+                $_[$k] = $k.'='.implode(':', $v);
+            else if ($v === '')
+                $_[$k] = $k.'='.$v;
+        }
+
+        return implode(';', $_);
     }
 
     // todo: kill data, that is unexpected or points to wrong indizes
