@@ -50,6 +50,7 @@ pre.code
     line-height: normal;
     font-family: 'Bitstream Vera Sans Mono','Lucida Console','Courier New', Monaco, Courier, monospace;
     overflow: auto;
+    white-space:pre-wrap;
 }
 
 div.quote
@@ -950,6 +951,13 @@ span.menu-buttons span.hassubmenu {
 }
 /* end note */
 
+.tabs, .text ul.tabs, ul.tabs
+{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
 .tabs li
 {
     float: left;
@@ -957,9 +965,20 @@ span.menu-buttons span.hassubmenu {
     height: 30px;
 }
 
+.tabs li a div, .tabs li a b
+{
+    color: #FFD100;
+}
+
+.tabs li a.selected div, .tabs li a:hover div, .tabs li a.selected b, .tabs li a:hover b
+{
+    color: white;
+}
+
 .tabs a
 {
     float: left;
+    font-size: 13px;
     position: relative;
     display: block;
     height: 29px;
@@ -967,6 +986,18 @@ span.menu-buttons span.hassubmenu {
     white-space: nowrap;
     background: #303030 url(../images/Tabs/corner-tr.gif) no-repeat top right;
     border-bottom: 1px solid #282828;
+}
+
+.tabs a:hover
+{
+    background-color: #383838;
+    border-bottom: 1px solid #303030;
+}
+
+.tabs a.selected, .tabs a.selected:hover
+{
+    background-color: #404040;
+    border-bottom: 1px solid #404040;
 }
 
 .tabs b
@@ -1012,13 +1043,15 @@ span.menu-buttons span.hassubmenu {
 .tabs-level ul
 {
     position: absolute;
-    left: 0;
+    left: 0 !important;
+    margin: 0px !important;
+    padding-left: 0px !important;
 }
 
 .tabbed-contents
 {
     border: 1px solid #404040;
-    border-top-width: 3px;
+    border-top-width: 2px;
     background-color: #141414;
     padding: 8px;
     clear: both;
@@ -3230,13 +3263,13 @@ a.captcha:hover
 
 div.captcha-center
 {
-	width: 318px;
-	margin: 0 auto;
+    width: 318px;
+    margin: 0 auto;
 }
 
 #recaptcha_instructions_image
 {
-	color: #cccccc;
+    color: #cccccc;
 }
 
 h1.h1-icon

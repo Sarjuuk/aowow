@@ -77,6 +77,15 @@ switch ($pageCall)
         else
             $smarty->error();
         break;
+    case 'whats-new':
+    case 'searchplugins':
+    case 'searchbox':
+    case 'tooltips':
+    case 'help':
+    case 'faq':
+    case 'aboutus':
+        require 'pages/more.php';
+        break;
     case 'petcalc':                                         // tool: pet talent calculator
         $petCalc = true;
     case 'talent':                                          // tool: talent calculator

@@ -912,7 +912,7 @@ var mn_community = [
     [5,"Twitter Page","http://twitter.com",null,{tinyIcon:"static/images/icons/twitter.gif"}]
 ];
 var mn_more = [
-    [,"All About Wowhead"],
+    [,"All About AoWoW"],
     [0,"About Us & Contact","?aboutus"],
     [3,"FAQ","?faq"],
     [13,"Help",,[
@@ -926,8 +926,9 @@ var mn_more = [
     ]],
     [7,"What's New","?whats-new"],
     [,"Goodies"],
-    [10,"Tooltips","?tooltips"],
-    [8,"Search Plugins (FF, IE7, ...)","?searchplugins"]
+	[16, "Search Box","?searchbox"],
+    [8,"Search Plugins (FF, IE7, ...)","?searchplugins"],
+    [10,"Tooltips","?tooltips"]
 ];
 var mn_path = [
     [0,"Database",,mn_database],

@@ -866,7 +866,7 @@ var mn_community = [
     [5,"Twitter","http://twitter.com",null,{icon:"static/images/icons/twitter.gif"}]
 ];
 var mn_more = [
-    [,"О Wowhead"],
+    [,"О AoWoW"],
     [0,"Контакты","?aboutus"],
     [3,"ЧаВо","?faq"],
     [13,"Справка",,[
@@ -881,6 +881,7 @@ var mn_more = [
     [7,"Новости","?whats-new"],
     [,"Для вашего сайта"],
     [8,"Дополнения для браузеров","?searchplugins"],
+	[16,"Окно поиска","?searchbox"],
     [10,"Всплывающие подсказки","?tooltips"]
 ];
 var mn_path = [

@@ -866,7 +866,7 @@ var mn_community = [
     [5,"Página de Twitter","http://twitter.com",null,{icon:"static/images/icons/twitter.gif"}]
 ];
 var mn_more = [
-    [,"Todo sobre Wowhead"],
+    [,"Todo sobre AoWoW"],
     [0,"Acerca de nosotros","?aboutus"],
     [3,"Preguntas frecuentes","?faq"],
     [13,"Ayuda",,[
@@ -880,8 +880,9 @@ var mn_more = [
     ]],
     [7,"Novedades","?whats-new"],
     [,"Extras para tu sitio"],
+	[16, "Caja de búsqueda", "?searchbox"],
     [8,"Extensiones de búsqueda","?searchplugins"],
-    [10,"Tooltips","?tooltips"],
+    [10,"Tooltips","?tooltips"]
 ];
 var mn_path = [
     [0,"Base de datos",,mn_database],

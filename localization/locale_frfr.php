@@ -17,7 +17,6 @@ $lang = array(
         'ab'            => ["an",     "mo",   "sem",      "jour",  "h",      "min",     "s",        "ms"]
     ),
     'main' => array(
-        'help'          => "Aide",
         'name'          => "nom",
         'link'          => "Lien",
         'signIn'        => "Se connecter / S'inscrire",
@@ -99,7 +98,14 @@ $lang = array(
         'talentCalc'    => "Calculateur de Talents",
         'petCalc'       => "Calculateur de familiers",
         'chooseClass'   => "Choisissez une classe",
-        'chooseFamily'  => "Choisissez un familier"
+        'chooseFamily'  => "Choisissez un familier",
+
+        // help
+        'help'          => "Aide",
+        'helpTopics'    => array(
+            "Le guide du commentaire",              "Visionneuse 3D",                       "Captures d'écran : Trucs et astuces",  "Échelles de valeurs",
+            "Calculateur de talents",               "Comparaison d'objets",                 "Profiler"
+        )
     ),
     'search' => array(
         'search'        => "Recherche",

@@ -1,0 +1,56 @@
+(function () {
+    function create(w, h) {
+        var
+            scripts = document.getElementsByTagName('SCRIPT'),
+            body;
+
+        /* sarjuuk: workaround to avoid hardcoding the url of the body */
+        if (scripts && scripts.length > 0) {
+            for (var i in scripts) {
+                if (!scripts[i].src) {
+                    continue;
+                }
+
+                var m = scripts[i].src.match(/(.*)\/widgets\/searchbox\.js$/);
+                if (!m) {
+                    continue;
+                }
+
+                body = m[1] + '/widgets/searchbox/searchbox.html';
+                break;
+            }
+        }
+        /* end */
+
+        var buff = '<iframe src="' + body + '" width="' + w + '" height="' + h + '" frameborder="0" class="aowow-searchbox"';
+        buff += "></iframe>";
+
+        document.write(buff);
+    }
+
+    function init() {
+        var formats = {
+            "160x200": { width: 160, height: 200 },
+            "160x120": { width: 160, height: 120 },
+            "120x200": { width: 120, height: 200 },
+            "120x120": { width: 120, height: 120 },
+            "150x120": { width: 150, height: 120 }
+        };
+
+        var dim;
+
+        if (typeof aowow_searchbox_format != "undefined") {
+            if (formats[aowow_searchbox_format]) {
+                dim = formats[aowow_searchbox_format];
+            }
+        }
+
+        if (!dim) {
+            dim = formats["160x200"];
+        }
+
+        create(dim.width, dim.height);
+    }
+
+    init();
+})();

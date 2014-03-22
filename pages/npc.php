@@ -32,7 +32,7 @@ if (isset($_GET['power']))
         $x  = '$WowheadPower.registerNpc('.$_id.', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($npc->getField('name', true))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($npc->renderTooltip())."',\n";
-        // $x .= "\tmap: ".($s ? '{zone: '.$s[0].', coords: {0:'.json_encode($s[1], JSON_NUMERIC_CHECK).'}' : '{}')."\n";
+        // $x .= "\tmap: ".($s ? '{zone: '.$s[0].', coords: {0:'.json_encode($s[1], JSON_NUMERIC_CHECK).'}}' : '{}')."\n";
         $x .= "});";
 
         $smarty->saveCache($cacheKeyTooltip, $x);

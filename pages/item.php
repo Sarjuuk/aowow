@@ -73,7 +73,7 @@ if (isset($_GET['power']))
 }
 
 // regular page
-if (!$smarty->loadCache($cacheKeyPage, $item))
+if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
     $item = new ItemList(array(['i.id', $_id]));
     if ($item->error)
@@ -884,7 +884,6 @@ if (!$smarty->loadCache($cacheKeyPage, $item))
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
-
 
 $smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEM, $_id));         // comments, screenshots, videos

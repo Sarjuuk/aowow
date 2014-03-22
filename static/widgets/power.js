@@ -1,16 +1,15 @@
 if (typeof $WH == "undefined") {
-    $WH = {
-        wowheadRemote: true
-    }
+    $WH = { wowheadRemote: true };
 
     /* custom */
     for (i in document.scripts) {
         if (!document.scripts[i].src)
             continue;
 
-        var match = document.scripts[i].src.match(/(.*)\/power\/aowowPower.js/i);
+        var match = document.scripts[i].src.match(/(https?:\/\/[^\/]+)((\/[\w\d-_%]+)*)\/widgets\/power\.js/i);
         if (match) {
-            var g_host = match[1];
+            var g_host      = match[1];
+            var g_staticUrl = match[1] + match[2];
             break;
         }
     }
@@ -20,21 +19,23 @@ if (typeof $WowheadPower == "undefined") {
     var $WowheadPower = new function () {
         var isRemote = $WH.wowheadRemote;
         var
-            opt = {
-                applyto: 3
-            },
+            opt  = { applyto: 3 },
             head = document.getElementsByTagName("head")[0],
+            whcss,
             currentType,
             currentId,
             currentLocale,
             currentDomain,
             currentParams,
             currentA,
+
             cursorX,
             cursorY,
+
             mode = 0,
-            t, y, ag, A, Z, ab = 1,
+
             eventAttached = false,
+
             npcs = {},
             objects = {},
             items = {},
@@ -42,69 +43,119 @@ if (typeof $WowheadPower == "undefined") {
             spells = {},
             achievements = {},
             profiles = {},
+
             showLogo = 1,
-            STATUS_NONE = 0,
+
+            STATUS_NONE     = 0,
             STATUS_QUERYING = 1,
-            STATUS_ERROR = 2,
+            STATUS_ERROR    = 2,
             STATUS_NOTFOUND = 3,
-            STATUS_OK = 4,
-            STATUS_SCALES = 5,
-            TYPE_NPC = 1,
-            TYPE_OBJECT = 2,
-            TYPE_ITEM = 3,
-            TYPE_QUEST = 5,
-            TYPE_SPELL = 6,
+            STATUS_OK       = 4,
+            STATUS_SCALES   = 5,
+
+            SCALES_NONE     = 0,
+            SCALES_LOADED   = 1,
+            SCALES_QUERYING = 2,
+
+            TYPE_NPC         = 1,
+            TYPE_OBJECT      = 2,
+            TYPE_ITEM        = 3,
+            TYPE_QUEST       = 5,
+            TYPE_SPELL       = 6,
             TYPE_ACHIEVEMENT = 10,
-            TYPE_PROFILE = 100,
+            TYPE_PROFILE     = 100,
+
             CURSOR_HSPACE = 15,
             CURSOR_VSPACE = 15,
+
             _LANG = {
                 loading: "Loading...",
                 noresponse: "No response from server :(",
                 achievementcomplete: "Achievement earned by $1 on $2/$3/$4"
             },
             LOOKUPS = {
-                  1 : [npcs, "npc", "NPC"],
-                  2 : [objects, "object", "Object"],
-                  3 : [items, "item", "Item"],
-                  5 : [quests, "quest", "Quest"],
-                  6 : [spells, "spell", "Spell"],
-                 10 : [achievements, "achievement", "Achievement"],
-                100 : [profiles, "profile", "Profile"]
+                  1: [npcs,         "npc",         "NPC"        ],
+                  2: [objects,      "object",      "Object"     ],
+                  3: [items,        "item",        "Item"       ],
+                  5: [quests,       "quest",       "Quest"      ],
+                  6: [spells,       "spell",       "Spell"      ],
+                 10: [achievements, "achievement", "Achievement"],
+                100: [profiles,     "profile",     "Profile"    ]
             },
             SCALES = {
-                3 : {
-                    url: "?data=item-scaling"
-                }
+                3: { url: "?data=item-scaling" }
             },
             LOCALES = {
-                0 : "enus",
-                2 : "frfr",
-                3 : "dede",
-                6 : "eses",
-                8 : "ruru"
+                0: "enus",
+                2: "frfr",
+                3: "dede",
+                6: "eses",
+                8: "ruru"
             },
             REDIRECTS = {
                 wotlk: "www",
-                ptr: "www"
+                ptr:   "www"
             };
 
         if (isRemote) {
-            var Locale = {
-                id: 0,
-                name: "enus"
-            };
+            var Locale = { id: 0, name: "enus" };
         }
 
         function init() {
             if (isRemote) {
                 var script = document.createElement("script");
-                // script.src = "http://static.wowhead.com/js/basic.js?4";
+                // script.src = (document.location.protocol != "https:" ? "http:": document.location.protocol) + "//wowjs.zamimg.com/js/basic.js?5";
                 script.src = g_host + "/static/js/basic.js";
                 head.appendChild(script);
             }
             else {
                 attachEvent();
+            }
+
+            for (var type in SCALES) {
+                for (var localeId in LOCALES) {
+                    SCALES[type][localeId] = SCALES_NONE
+                }
+            }
+        }
+
+        function initCSS() {
+            if (typeof aowow_tooltips == "undefined") {
+                return;
+            }
+
+            if (!("hide" in aowow_tooltips)) {
+                return;
+            }
+
+            if (typeof whcss != "undefined") {
+                return;
+            }
+
+            if (!document.styleSheets) {
+                return
+            }
+
+            var style = document.createElement("style");
+            style.type = "text/css";
+            head.appendChild(style);
+
+            if (!window.createPopup) {
+                head.appendChild(document.createTextNode(""));
+            }
+
+            whcss = document.styleSheets[document.styleSheets.length - 1];
+            for (var k in aowow_tooltips.hide) {
+                if (!aowow_tooltips.hide[k]) {
+                    continue;
+                }
+
+                if (whcss.insertRule) {
+                    whcss.insertRule(".wowhead-tooltip .whtt-" + k + "{display : none}", whcss.cssRules.length);
+                }
+                else if (whcss.addRule) {
+                    whcss.addRule(".wowhead-tooltip .whtt-" + k, "display : none", -1);
+                }
             }
         }
 
@@ -117,11 +168,19 @@ if (typeof $WowheadPower == "undefined") {
             $WH.aE(document, "mouseover", onMouseOver);
         }
 
+        function onDOMReady(func) {
+            if (typeof jQuery != "undefined") {
+                jQuery(func);
+                return
+            }
+            /in/.test(document.readyState) ? setTimeout(onDOMReady.bind(null, func), 9) : func();
+        }
+
         this.init = function () {
             if (isRemote) {
                 $WH.ae(head, $WH.ce("link", {
                     type: "text/css",
-                    // href: "http://static.wowhead.com/css/basic.css?4",
+                    // href: (document.location.protocol != "https:" ? "http:": document.location.protocol) + "//wowcss.zamimg.com/css/basic.css?5",
                     href: g_host + "/static/css/basic.css",
                     rel:  "stylesheet"
                 }));
@@ -145,6 +204,17 @@ if (typeof $WowheadPower == "undefined") {
                 }
             }
             attachEvent();
+
+            onDOMReady(function () {
+                if (typeof aowow_tooltips != "undefined") {
+                    for (var i = 0; i < document.links.length; i++) {
+                        var link = document.links[i];
+                        scanElement(link);
+                    }
+
+                    initCSS();
+                }
+            });
         };
 
         function updateCursorPos(e) {
@@ -156,10 +226,6 @@ if (typeof $WowheadPower == "undefined") {
         function scanElement(t, e) {
             if (t.nodeName != "A" && t.nodeName != "AREA") {
                 return -2323;
-            }
-
-            if (!t.href.length) {
-                return;
             }
 
             if (!t.href.length && !t.rel) {
@@ -195,14 +261,20 @@ if (typeof $WowheadPower == "undefined") {
                 else if (k == "when") {
                     params[k] = new Date(parseInt(v));
                 }
+                else if (k == "premium") {
+                    params[k] = true;
+                }
+                else if (k == "text") {
+                    params[k] = true;
+                }
             };
 
             if (opt.applyto & 1) {
                 i1 = 2;
                 i2 = 3;
-                if (t.href.indexOf("http://") == 0) {
+                if (t.href.indexOf("http://") == 0 || t.href.indexOf("https://") == 0) {
                     i0 = 1;
-                    // url = t.href.match(/^http:\/\/(.+?)?\.?wowhead\.com\/\?(item|quest|spell|achievement|npc|object)=([0-9]+)/);
+                    // url = t.href.match(/^https?:\/\/(.+?)?\.?wowhead\.com(?:\:\d+)?\/\??(item|quest|spell|achievement|npc|object)=([0-9]+)/);
                     url = t.href.match(/^http:\/\/(.*)\/\??(item|quest|spell|achievement|npc|object)=([0-9]+)/);
                     if (url == null) {
                         // url = t.href.match(/^http:\/\/(.+?)?\.?wowhead\.com\/\?(profile)=([^&#]+)/)
@@ -249,10 +321,8 @@ if (typeof $WowheadPower == "undefined") {
                 if (i == 0) {
                     delete params.gems;
                 }
-                else {
-                    if (i < params.gems.length) {
-                        params.gems = params.gems.slice(0, i);
-                    }
+                else if (i < params.gems.length) {
+                    params.gems = params.gems.slice(0, i);
                 }
             }
 
@@ -266,6 +336,7 @@ if (typeof $WowheadPower == "undefined") {
                     domain = params.domain;
                 }
                 else if (i0 && url[i0]) {
+                    // domain = url[i0];
                     domain = url[i0].split(".")[0];
                 }
 
@@ -296,7 +367,7 @@ if (typeof $WowheadPower == "undefined") {
                     return;
                 }
 
-                mode = ((t.parentNode.className.indexOf("icon") == 0 && t.parentNode.nodeName == "DIV") ? 1 : 0);
+                mode = t.parentNode.className.indexOf("icon") == 0 && t.parentNode.nodeName == "DIV" ? 1 : 0;
                 if (!t.onmouseout) {
                     if (mode == 0) {
                         t.onmousemove = onMouseMove;
@@ -312,11 +383,46 @@ if (typeof $WowheadPower == "undefined") {
                     type = $WH.g_getIdFromTypeName(url[i1]),
                     typeId = url[i2];
 
-                if (type == TYPE_PROFILE) {
-                    locale = 0;
+                display(type, typeId, locale, params);
+
+                if (e || typeof aowow_tooltips == "undefined") {
+                    return;
                 }
 
-                display(type, typeId, locale, params);
+                var data = LOOKUPS[type][0][getFullId(typeId, params)];
+
+                var timeout = function (t) {
+                    if (data.status[locale] != STATUS_OK && data.status[locale] != STATUS_NOTFOUND) {
+                        window.setTimeout(function () {
+                            timeout(t);
+                        }, 5);
+
+                        return;
+                    }
+
+                    if (aowow_tooltips.renamelinks) {
+                        eval("name = data.name_" + LOCALES[locale]);
+                        if (name) {
+                            t.innerHTML = '<span>' + name + '</span>';
+                        }
+                    }
+
+                    if (aowow_tooltips.iconizelinks && (type == TYPE_ITEM || type == TYPE_ACHIEVEMENT || type == TYPE_SPELL) && data.icon) {
+                        // t.children[0].style.marginLeft = "18px";
+                        t.className += " icontinyl";
+                        t.style.paddingLeft = "18px !important";
+                        t.style.verticalAlign = "center";
+                        // t.style.background = "url(" + (document.location.protocol != "https:" ? "http:": document.location.protocol) + "//wowimg.zamimg.com/images/wow/icons/tiny/" + data.icon.toLocaleLowerCase() + ".gif) left center no-repeat"
+                        t.style.background = "url(" + g_host + "/static/images/wow/icons/tiny/" + data.icon.toLocaleLowerCase() + ".gif) left center no-repeat"
+                    }
+
+                    if (aowow_tooltips.colorlinks) {
+                        if (type == TYPE_ITEM) {
+                            t.className += " q" + data.quality;
+                        }
+                    }
+                };
+                timeout(t);
             }
         }
 
@@ -325,7 +431,8 @@ if (typeof $WowheadPower == "undefined") {
             var t = e._target;
             var i = 0;
             while (t != null && i < 5 && scanElement(t, e) == -2323) {
-                t = t.parentNode; ++i
+                t = t.parentNode;
+                ++i;
             }
         }
 
@@ -342,7 +449,25 @@ if (typeof $WowheadPower == "undefined") {
         }
 
         function getTooltipField(locale, n) {
-            return (currentParams && currentParams.buff ? "buff" : "tooltip") + (n ? n : "") + "_" + LOCALES[locale];
+            var prefix = "tooltip";
+
+            if (currentParams && currentParams.buff) {
+                prefix = "buff";
+            }
+
+            if (currentParams && currentParams.text) {
+                prefix = "text";
+            }
+
+            if (currentParams && currentParams.premium) {
+                prefix = "tooltip_premium";
+            }
+
+            return prefix + (n ? n : "") + "_" + LOCALES[locale];
+        }
+
+        function getIconField() {
+            return (currentParams && currentParams.text) ? "text_icon" : "icon";
         }
 
         function getSpellsField(locale) {
@@ -361,7 +486,7 @@ if (typeof $WowheadPower == "undefined") {
             }
 
             if (arr[id].response == null) {
-                arr[id].response = {}
+                arr[id].response = {};
             }
 
             if (arr[id].status[locale] == null) {
@@ -384,7 +509,7 @@ if (typeof $WowheadPower == "undefined") {
 
             var arr = LOOKUPS[type][0];
             if (arr[fullId].status[locale] == STATUS_OK || arr[fullId].status[locale] == STATUS_NOTFOUND) {
-                showTooltip(arr[fullId][getTooltipField(locale)], arr[fullId].icon, arr[fullId].map, arr[fullId][getSpellsField(locale)], arr[fullId][getTooltipField(locale, 2)]);
+                showTooltip(arr[fullId][getTooltipField(locale)], arr[fullId][getIconField()], arr[fullId].map, arr[fullId][getSpellsField(locale)], arr[fullId][getTooltipField(locale, 2)]);
             }
             else if (arr[fullId].status[locale] == STATUS_QUERYING || arr[fullId].status[locale] == STATUS_SCALES) {
                 showTooltip(_LANG.loading);
@@ -412,15 +537,15 @@ if (typeof $WowheadPower == "undefined") {
 
             var p = "";
             for (var i in params) {
-                if (i != "rand" && i != "ench" && i != "gems" && i != "sock") {
+                if (i != "rand" && i != "ench" && i != "gems" && i != "sock" && i != "lvl") {
                     continue;
                 }
 
                 if (typeof params[i] == "object") {
                     p += "&" + i + "=" + params[i].join(":");
                 }
-                else if (i == "sock") {
-                    p += "&sock";
+                else if (params[i] === true) {
+                    p += "&" + i;
                 }
                 else {
                     p += "&" + i + "=" + params[i];
@@ -428,14 +553,16 @@ if (typeof $WowheadPower == "undefined") {
             }
 
             // var url = "http://" + $WH.g_getDomainFromLocale(locale) + ".wowhead.com"
-            // url += "ajax.php?" + LOOKUPS[type][1] + "=" + id + "&power" + p;
+            // var url = (document.location.protocol != "https:" ? "http:": document.location.protocol) + "//" + localeDomain + ".wowhead.com";
             var
                 localeDomain = $WH.g_getDomainFromLocale(locale),
                 url = g_host + "/";
 
+            // $WH.g_ajaxIshRequest(url + "?" + LOOKUPS[type][1] + "=" + id + "&power" + p);
             $WH.g_ajaxIshRequest(url + "?" + LOOKUPS[type][1] + "=" + id + "&domain=" + localeDomain + "&power" + p);
-            if (SCALES[type] && !SCALES[type][locale]) {
+            if (SCALES[type] && SCALES[type][locale] == SCALES_NONE) {
                 $WH.g_ajaxIshRequest(url + SCALES[type].url);
+                SCALES[type][locale] = SCALES_QUERYING;
             }
         }
 
@@ -444,6 +571,7 @@ if (typeof $WowheadPower == "undefined") {
                 html = currentA._fixTooltip(html, currentType, currentId, currentA);
             }
 
+            initCSS();
             var notFound = false;
             if (!html) {
                 html = LOOKUPS[currentType][2] + " not found :(";
@@ -455,9 +583,9 @@ if (typeof $WowheadPower == "undefined") {
                     if (currentParams.pcs && currentParams.pcs.length) {
                         var n = 0;
                         for (var i = 0, len = currentParams.pcs.length; i < len; ++i) {
-                            var ak;
-                            if (ak = html.match(new RegExp("<span><!--si([0-9]+:)*" + currentParams.pcs[i] + '(:[0-9]+)*--><a href="\\?item=(\\d+)">(.+?)</a></span>'))) {
-                                html = html.replace(ak[0], '<span class="q8"><!--si' + currentParams.pcs[i] + '--><a href="?item=' + ak[3] + '">' + (($WH.isset("g_items") && g_items[currentParams.pcs[i]]) ? g_items[currentParams.pcs[i]]["name_" + LOCALES[currentLocale]] : ak[4]) + "</a></span>");
+                            var m;
+                            if (m = html.match(new RegExp("<span><!--si([0-9]+:)*" + currentParams.pcs[i] + '(:[0-9]+)*--><a href="\\?item=(\\d+)">(.+?)</a></span>'))) {
+                                html = html.replace(m[0], '<span class="q8"><!--si' + currentParams.pcs[i] + '--><a href="?item=' + m[3] + '">' + (($WH.isset("g_items") && g_items[currentParams.pcs[i]]) ? g_items[currentParams.pcs[i]]["name_" + LOCALES[currentLocale]] : m[4]) + "</a></span>");
                                 ++n;
                             }
                         }
@@ -532,17 +660,17 @@ if (typeof $WowheadPower == "undefined") {
         }
 
         function getFullId(id, params) {
-            return id + (params.rand ? "r" + params.rand: "") + (params.ench ? "e" + params.ench: "") + (params.gems ? "g" + params.gems.join(",") : "") + (params.sock ? "s": "");
+            return id + (params.rand ? "r" + params.rand : "") + (params.ench ? "e" + params.ench : "") + (params.gems ? "g" + params.gems.join(",") : "") + (params.sock ? "s" : "");
         }
 
         this.loadScales = function (type, locale) {
             var arr = LOOKUPS[type][0];
             for (var i in LOCALES) {
                 if (locale == i || (!locale && !isNaN(i))) {
-                    SCALES[type][i] = 1;
+                    SCALES[type][i] = SCALES_LOADED;
                     for (var id in arr) {
                         if (arr[id].status[i] == STATUS_SCALES && arr[id].response[i]) {
-                            arr[id].response[i]()
+                            arr[id].response[i]();
                         }
                     }
                 }
@@ -553,10 +681,10 @@ if (typeof $WowheadPower == "undefined") {
             var arr = LOOKUPS[type][0];
             initElement(type, id, locale);
 
-            if (SCALES[type] && !SCALES[type][locale]) {
+            if (SCALES[type] && SCALES[type][locale] != SCALES_LOADED) {
                 arr[id].status[locale] = STATUS_SCALES;
                 arr[id].response[locale] = this.register.bind(this, type, id, locale, json);
-                return
+                return;
             }
 
             if (arr[id].timer) {
@@ -571,10 +699,10 @@ if (typeof $WowheadPower == "undefined") {
                         zoom: 3,
                         zoomable: false,
                         buttons: false
-                    })
+                    });
                 }
                 arr[id].map.update(json.map);
-                delete json.map
+                delete json.map;
             }
 
             $WH.cO(arr[id], json);
@@ -621,6 +749,10 @@ if (typeof $WowheadPower == "undefined") {
             this.register(TYPE_PROFILE, id, locale, json);
         };
 
+        this.displayTooltip = function (type, id, locale, params) {
+            display(type, id, locale, params);
+        };
+
         this.request = function (type, id, locale, params) {
             if (!params) {
                 params = {};
@@ -656,6 +788,35 @@ if (typeof $WowheadPower == "undefined") {
 
         this.getSpellStatus = function (id, locale) {
             this.getStatus(TYPE_SPELL, id, locale);
+        };
+
+        this.refreshLinks = function () {
+            if (typeof aowow_tooltips != "undefined") {
+                for (var i = 0; i < document.links.length; i++) {
+                    var link = document.links[i];
+                    var node = link.parentNode;
+                    var isTooltipChild = false;
+
+                    while (node != null) {
+                        if ((" " + node.className + " ").replace(/[\n\t]/g, " ").indexOf(" wowhead-tooltip ") > -1) {
+                            isTooltipChild = true;
+                            break;
+                        }
+                        node = node.parentNode
+                    }
+
+                    if (!isTooltipChild) {
+                        scanElement(link);
+                    }
+                }
+            }
+
+            this.hideTooltip();
+        };
+
+        this.setParent = function (newParent) {
+            $WH.Tooltip.reset();
+            $WH.Tooltip.prepare(newParent);
         };
 
         if (isRemote) {

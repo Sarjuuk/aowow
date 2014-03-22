@@ -416,6 +416,7 @@ class ItemList extends BaseType
         $_flags        = $this->curTpl['flags'];
         $_class        = $this->curTpl['class'];
         $_subClass     = $this->curTpl['subClass'];
+        $_slot         = $this->curTpl['slot'];
         $causesScaling = false;
 
         if (!empty($enhance['rand']))
@@ -439,6 +440,9 @@ class ItemList extends BaseType
                     $randEnchant .= '<span>'.Util::localizedString($enchant, 'text').'</span><br />';
             }
         }
+
+        if (isset($enhance['sock']) && !in_array($_slot, [INVTYPE_WRISTS, INVTYPE_WAIST, INVTYPE_HANDS]))
+            unset($enhance['sock']);
 
         // IMPORTAT: DO NOT REMOVE THE HTML-COMMENTS! THEY ARE REQUIRED TO UPDATE THE TOOLTIP CLIENTSIDE
         $x = '';
@@ -528,7 +532,7 @@ class ItemList extends BaseType
             $x .= '<table width="100%"><tr>';
 
             // Class
-            $x .= '<td>'.Lang::$item['inventoryType'][$this->curTpl['slot']].'</td>';
+            $x .= '<td>'.Lang::$item['inventoryType'][$_slot].'</td>';
 
             // Subclass
             if ($_class == ITEM_CLASS_ARMOR && $_subClass > 0)
@@ -540,8 +544,8 @@ class ItemList extends BaseType
 
             $x .= '</tr></table>';
         }
-        else if (($_ = $this->curTpl['slot']) && $_class != ITEM_CLASS_CONTAINER) // yes, slot can occur on random items and is then also displayed <_< .. excluding Bags >_>
-            $x .= '<br />'.Lang::$item['inventoryType'][$this->curTpl['slot']].'<br />';
+        else if ($_slot && $_class != ITEM_CLASS_CONTAINER) // yes, slot can occur on random items and is then also displayed <_< .. excluding Bags >_>
+            $x .= '<br />'.Lang::$item['inventoryType'][$_slot].'<br />';
         else
             $x .= '<br />';
 
@@ -930,7 +934,7 @@ class ItemList extends BaseType
                             foreach ($reagents->iterate() as $__)
                                 $reqReag[] = '<a href="?item='.$reagents->id.'">'.$reagents->getField('name', true).'</a> ('.$reagentItems[$reagents->id].')';
 
-                            $xCraft .= '<br /><span class="q1">'.Lang::$game['requires2'].' '.implode(', ', $reqReag).'</span>';
+                            $xCraft .= '<div class="q1 whtt-reagents"><br />'.Lang::$game['requires2'].' '.implode(', ', $reqReag).'</div>';
                         }
                     }
                 }
@@ -956,9 +960,6 @@ class ItemList extends BaseType
         if ($this->curTpl['spellCharges1'] > 1 || $this->curTpl['spellCharges1'] < -1)
             $xMisc[] = '<span class="q1">'.abs($this->curTpl['spellCharges1']).' '.Lang::$item['charges'].'</span>';
 
-        if ($sp = $this->curTpl['sellPrice'])
-            $xMisc[] = '<span class="q1">'.Lang::$item['sellPrice'].Lang::$colon.Util::formatMoney($sp).'</span>';
-
         // list required reagents
         if (isset($xCraft))
             $xMisc[] = $xCraft;
@@ -966,13 +967,16 @@ class ItemList extends BaseType
         if ($xMisc)
             $x .= implode('<br />', $xMisc);
 
+        if ($sp = $this->curTpl['sellPrice'])
+            $x .= '<div class="q1 whtt-sellprice">'.Lang::$item['sellPrice'].Lang::$colon.Util::formatMoney($sp).'</div>';
+
         if (!$subOf)
             $x .= '</td></tr></table>';
 
         // tooltip scaling
         if (!isset($xCraft))
         {
-            $link = [$subOf ? $subOf : $this->id, 1];       // itemid, scaleMinLevel
+            $link = [$subOf ? $subOf : $this->id, 1];       // itemId, scaleMinLevel
             if (isset($this->ssd[$this->id]))               // is heirloom
             {
                 array_push($link,
@@ -1885,26 +1889,17 @@ class ItemListFilter extends Filter
         // upgrade for [form only]
         if (isset($_v['upg']))
         {
-            /* notice!
-                profiler can send $_GET['upg'] as an array
-                this should results in in N listviews-sets (weapons generate more more than one listview per slot) for N items
-                <div id="jkbfksdbl4"></div>
-                <div id="lkljbjkb574" class="listview"></div>
-                var tabsGroups = new Tabs({parent: $WH.ge('jkbfksdbl4')});
-                {template: 'item', id: 'ranged', name: 'Ranged', tabs: tabsGroups, parent: 'lkljbjkb574', hideCount: 1, note: $WH.sprintf(LANG.lvnote_viewmoreslot, '', 'sl=15;maxrl=80;si=1;ub=1;cr=161;crs=1;crv=0;upg=45498'), customFilter: fi_filterUpgradeListview, _upgradeIds: [45498], extraCols: fi_getExtraCols(fi_extraCols, 0, 0, 0), onAfterCreate: fi_addUpgradeIndicator, data:[]}
-            */
-
             // valid item?
-            if (!is_int($_v['upg']))
+            if (!is_int($_v['upg']) && !is_array($_v['upg']))
                 unset($_v['upg']);
             else
             {
-                $_ = DB::Aowow()->selectCell('SELECT slot FROM ?_items WHERE class IN (2, 3, 4) AND id = ?d', $_v['upg']);
+                $_ = DB::Aowow()->selectCol('SELECT id as ARRAY_KEY, slot FROM ?_items WHERE class IN (2, 3, 4) AND id IN (?a)', (array)$_v['upg']);
                 if ($_ === null)
                     unset($_v['upg']);
                 else
                 {
-                    $this->formData['form']['upg'] = $_v['upg'];
+                    $this->formData['form']['upg'] = $_;
                     if ($_)
                         $parts[] = ['slot', $_];
                 }

@@ -950,7 +950,7 @@ var Markup = {
 				else if(attr.id)
 					str += ' src="' + g_staticUrl + '/uploads/screenshots/' + (attr.size ? attr.size : 'normal') + '/' + attr.id + '.jpg"';
 				else if(attr.icon)
-					str += ' src="' + g_staticUrl + '/images/icons/wow/' + (attr.size ? attr.size : 'large') + '/' + attr.icon + '.jpg"';
+					str += ' src="' + g_staticUrl + '/images/wow/icons/' + (attr.size ? attr.size : 'large') + '/' + attr.icon + '.jpg"';
 				else if(attr.blog)
 				{
 					if(g_blogimages[attr.blog])
@@ -1338,7 +1338,7 @@ var Markup = {
 			toHtml: function(attr)
 			{
 				var path = attr.path.split(',');
-				PageTemplate.set({activeTab: attr.tab, breadcrumb: path});
+				// sarjuuk: nyi :(      PageTemplate.set({activeTab: attr.tab, breadcrumb: path});
 			}
 		},
 		minibox:

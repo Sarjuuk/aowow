@@ -866,7 +866,7 @@ var mn_community = [
     [5,"Page Twitter","http://twitter.com",null,{icon:"static/images/icons/twitter.gif"}]
 ];
 var mn_more = [
-    [,"Tout sur Wowhead"],
+    [,"Tout sur AoWoW"],
     [0,"À propos / contact","?aboutus"],
     [3,"FAQ","?faq"],
     [13,"Aide",,[
@@ -880,6 +880,7 @@ var mn_more = [
     ]],
     [7,"Quoi de neuf?","?whats-new"],
     [,"Extras pour votre site"],
+	[16,"Boîte de recherche", "?searchbox"],
     [8,"Plug-ins de recherche","?searchplugins"],
     [10,"Tooltips","?tooltips"]
 ];

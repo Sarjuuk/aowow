@@ -672,7 +672,7 @@ abstract class Filter
 
             if (is_array($v) && !empty($v))
                 $_[$k] = $k.'='.implode(':', $v);
-            else if ($v === '')
+            else if ($v !== '')
                 $_[$k] = $k.'='.$v;
         }
 

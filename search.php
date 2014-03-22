@@ -60,7 +60,7 @@ if (isset($_GET['json']))
 }
 else if (isset($_GET['opensearch']))
 {
-    $maxResults  = CFG_SQL_LIMIT_QUCKSEARCH;
+    $maxResults  = CFG_SQL_LIMIT_QUICKSEARCH;
     $searchMask |= SEARCH_TYPE_OPEN | SEARCH_MASK_OPEN;
 }
 else
@@ -196,6 +196,9 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $titles->getListviewData())
         {
+            foreach ($titles->iterate() as $id => $__)
+                $data[$id]['param1'] = $titles->getField('side');
+
             $found['title'] = array(
                 'type'     => TYPE_TITLE,
                 'appendix' => ' (Title)',

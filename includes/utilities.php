@@ -59,7 +59,7 @@ class SmartyAoWoW extends Smarty
         $tv = &$this->_tpl_vars;
 
         // fetch article & static infobox
-        if ($tv['type'] && $tv['typeId'])
+        if (isset($tv['type']) && isset($tv['typeId']))
         {
             $article = DB::Aowow()->selectRow(
                 'SELECT SQL_CALC_FOUND_ROWS article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL '.
@@ -70,7 +70,13 @@ class SmartyAoWoW extends Smarty
 
             if ($article)
             {
-                $tv['article'] = ['text' => Util::jsEscape($article['article'])];
+                $replace = array(
+                    'script'     => 'scr"+"ipt',
+                    'HOST_URL'   => HOST_URL,
+                    'STATIC_URL' => STATIC_URL
+                );
+                $tv['article'] = ['text' => strtr(Util::jsEscape($article['article']), $replace)];
+
                 if (empty($tv['infobox']) && !empty($article['quickInfo']))
                     $tv['infobox'] = $article['quickInfo'];
 
@@ -247,7 +253,8 @@ class SmartyAoWoW extends Smarty
 
         $file = $this->cache_dir.'data/'.$key;
 
-        $cacheData = time()." ".AOWOW_REVISION."\n";
+        $cacheData  = time()." ".AOWOW_REVISION."\n";
+        $cacheData .= serialize($this->_tpl_vars)."\n";     // todo(med): this should not be nessecary, rework caching
         $cacheData .= serialize(str_replace(["\n", "\t"], ['\n', '\t'], $data));
 
         if ($filter)
@@ -273,9 +280,12 @@ class SmartyAoWoW extends Smarty
         if ($expireTime <= time() || $rev < AOWOW_REVISION)
             return false;
 
-        $data = str_replace(['\n', '\t'], ["\n", "\t"], unserialize($cache[1]));
-        if (isset($cache[2]))
-            $filter = unserialize($cache[2]);
+        $this->_tpl_vars = unserialize($cache[1]);
+
+        $data = str_replace(['\n', '\t'], ["\n", "\t"], unserialize($cache[2]));
+
+        if (isset($cache[3]))
+            $filter = unserialize($cache[3]);
 
         return true;
     }

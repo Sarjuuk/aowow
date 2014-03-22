@@ -17,7 +17,6 @@ $lang = array(
         'ab'            => ["año",  "mes",   "sem",     "",     "h",     "min",     "seg",      "ms"],
     ),
     'main' => array(
-        'help'          => "Ayuda",
         'name'          => "nombre",
         'link'          => "Enlace",
         'signIn'        => "Iniciar sesión / Registrarse",
@@ -99,7 +98,14 @@ $lang = array(
         'talentCalc'    => "Calculadora de talentos",
         'petCalc'       => "Calculadora de mascotas",
         'chooseClass'   => "Escoge una clase",
-        'chooseFamily'  => "Escoge una familia de mascota"
+        'chooseFamily'  => "Escoge una familia de mascota",
+
+        // help
+        'help'          => "Ayuda",
+        'helpTopics'    => array(
+            "Los comentarios y tú",                 "Visualizador de modelos",              "Capturas de pantalla: Sugerencias y trucos", "Medición de atributos",
+            "Calculadora de talentos",              "Comparación de objetos",               "Perfiles"
+        )
     ),
     'search' => array(
         'search'        => "Búsqueda",

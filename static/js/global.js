@@ -390,7 +390,7 @@ function g_createHeader(c) {
                 ]);
                 break;
             case 2:
-                Menu.addButtons(b, Menu.explode(mn_more));
+                Menu.addButtons(b, Menu.implode(mn_more));
                 break;
             case 5:
                 pr_initTopBarSearch();
@@ -17428,7 +17428,7 @@ var ScreenshotViewer = new function() {
                 container.style.visiblity = 'visible';
             }, 150);
 
-            loadingImage = new Ima$WH.ge();
+            loadingImage = new Image();
             loadingImage.onload = (function(screen, timer) {
                 clearTimeout(timer);
                 screen.width = this.width;

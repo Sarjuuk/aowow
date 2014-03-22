@@ -22,7 +22,7 @@
     </script>
     <script src="static/js/jquery-1.4.2.min.js" type="text/javascript"></script>
     <script src="static/js/basic.js?{$AOWOW_REVISION}" type="text/javascript"></script>
-    <script src="power/aowowPower.js?lang={$user.language|substr:2}" type="text/javascript"></script>
+    <script src="static/widgets/power.js?lang={$user.language|substr:2}" type="text/javascript"></script>
     <script src="static/js/locale_{$user.language}.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="static/js/global.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="static/js/Markup.js?{$AOWOW_REVISION}" type="text/javascript"></script>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+<ShortName>Aowow</ShortName>
+<Description>Aowowo Search Plugin</Description>
+<Url
+	type="text/html"
+	method="get"
+	template="http://aowow.dyndns.org/?search={searchTerms}" />
+
+<Url
+	type="application/x-suggestions+json"
+	method="get"
+	template="http://aowow.dyndns.org/?search={searchTerms}&amp;opensearch" />
+
+<Image height="16" width="16" type="image/vnd.microsoft.icon">http://aowow.dyndns.org/static/images/logos/favicon.ico</Image>
+<Image height="16" width="16" type="image/gif">http://aowow.dyndns.org/static/images/icons/favicon.gif</Image>
+
+</OpenSearchDescription>

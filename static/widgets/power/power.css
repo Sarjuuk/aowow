@@ -1,0 +1,161 @@
+.wowhead-tooltip {
+    position:absolute;
+    left:0;
+    top:0;
+    z-index:100000006;
+}
+
+.wowhead-tooltip table {
+    border-spacing:0;
+    border-collapse:collapse;
+    margin:0;
+}
+
+.wowhead-tooltip table, .wowhead-tooltip td, .wowhead-tooltip th, .wowhead-tooltip tbody {
+    border:0!important;
+}
+
+.wowhead-tooltip tr {
+    background:transparent!important;
+    border:0!important;
+}
+
+.wowhead-tooltip td, .wowhead-tooltip th {
+    background:transparent url(../../images/tooltip.png);
+    font-family:Verdana, sans-serif;
+    font-size:12px;
+    line-height:17px;
+    color:white;
+}
+
+.wowhead-tooltip th {
+    padding:3px;
+    border:0;
+    height:auto;
+    vertical-align:top;
+}
+
+.wowhead-tooltip td {
+    padding:8px 4px 1px 9px;
+    text-align:left;
+    vertical-align:top;
+}
+
+.wowhead-tooltip b {
+    font-size:14px;
+    line-height:19px;
+    font-weight:normal;
+}
+
+.wowhead-tooltip div.indent {
+    padding-left:.6em;
+}
+
+.wowhead-tooltip td th, .wowhead-tooltip td td {
+    background:none;
+}
+
+.wowhead-tooltip td th {
+    padding:0 0 0 4em;
+    text-align:right;
+    font-weight:normal;
+}
+
+.wowhead-tooltip td td {
+    padding:0;
+    text-align:left;
+}
+
+.wowhead-tooltip p {
+    position:absolute;
+    left:-44px;
+    top:-1px;
+    width:44px;
+    height:44px;
+    background:4px 4px no-repeat;
+    margin:0;
+    padding:0;
+}
+
+.wowhead-tooltip p div {
+    width:44px;
+    height:44px;
+    background-image:url(../../images/icon_border_medium.png);
+}
+
+.wowhead-tooltip a {
+    text-decoration:none!important;
+}
+
+.wowhead-tooltip-powered {
+    background:url(../../images/powered.png) no-repeat;
+    width:53px;
+    height:33px;
+    position:absolute;
+    right:-56px;
+    top:2px;
+}
+
+a.moneyitem, a.moneysocketmeta, a.moneysocketred, a.moneysocketyellow, a.moneysocketblue, a.moneysocketprismatic {
+    text-decoration:none!important;
+    border-bottom:1px solid transparent;
+}
+
+a.moneyitem:hover, a.moneysocketmeta:hover, a.moneysocketred:hover, a.moneysocketyellow:hover, a.moneysocketblue:hover, a.moneysocketprismatic:hover {
+    border-bottom:1px solid white;
+}
+
+.moneyitem, .moneygold, .moneysilver, .moneycopper, .moneyalliance, .moneyhorde, .moneyarena, .moneyachievement, .moneysocketmeta, .moneysocketred, .moneysocketyellow, .moneysocketblue, .moneysocketprismatic {
+    color:white;
+    background:no-repeat right center;
+}
+
+.moneyitem            { padding-right:18px; }
+.moneygold            { padding-right:15px; background-image:url(../../images/money-gold.gif); }
+.moneysilver          { padding-right:15px; background-image:url(../../images/money-silver.gif); }
+.moneycopper          { padding-right:15px; background-image:url(../../images/money-copper.gif); }
+.moneyalliance        { padding-right:12px; background-image:url(../../images/money-alliance.gif); }
+.moneyhorde           { padding-right:17px; background-image:url(../../images/money-horde.gif); }
+.moneyarena           { padding-right:18px; background-image:url(../../images/money-arena.gif); }
+.moneyachievement     { padding-right:13px; background-image:url(../../images/money-achievement.gif); }
+.moneysocketmeta      { padding-right:18px; background-image:url(../../images/socket-meta.gif); }
+.moneysocketred       { padding-right:18px; background-image:url(../../images/socket-red.gif); }
+.moneysocketyellow    { padding-right:18px; background-image:url(../../images/socket-yellow.gif); }
+.moneysocketblue      { padding-right:18px; background-image:url(../../images/socket-blue.gif); }
+.moneysocketprismatic { padding-right:18px; background-image:url(../../images/socket-prismatic.gif); }
+
+.socket-meta      { padding-left:26px; background:url(../../images/socket-meta.gif)      no-repeat left center; }
+.socket-red       { padding-left:26px; background:url(../../images/socket-red.gif)       no-repeat left center; }
+.socket-yellow    { padding-left:26px; background:url(../../images/socket-yellow.gif)    no-repeat left center; }
+.socket-blue      { padding-left:26px; background:url(../../images/socket-blue.gif)      no-repeat left center; }
+.socket-prismatic { padding-left:26px; background:url(../../images/socket-prismatic.gif) no-repeat left center; }
+
+ .q          { color:#ffd100!important; }
+
+ .q0,  .q0 a { color:#9d9d9d!important; }
+ .q1,  .q1 a { color:#ffffff!important; }
+ .q2,  .q2 a { color:#1eff00!important; }
+ .q3,  .q3 a { color:#0070dd!important; }
+ .q4,  .q4 a { color:#a335ee!important; }
+ .q5,  .q5 a { color:#ff8000!important; }
+ .q6,  .q6 a { color:#e5cc80!important; }
+ .q7,  .q7 a { color:#e5cc80!important; }
+ .q8,  .q8 a { color:#ffff98!important; }
+ .q9,  .q9 a { color:#71d5ff!important; }
+.q10, .q10 a { color:#ff0000!important; }
+
+.r1 { color:#FF8040!important; }
+.r2 { color:#FFFF00!important; }
+.r3 { color:#40BF40!important; }
+.r4 { color:#808080!important; }
+
+ .c1,  .c1 a { color:#C69B6D!important; }
+ .c2,  .c2 a { color:#F48CBA!important; }
+ .c3,  .c3 a { color:#AAD372!important; }
+ .c4,  .c4 a { color:#FFF468!important; }
+ .c5,  .c5 a { color:#FFFFFF!important; }
+ .c6,  .c6 a { color:#C41E3B!important; }
+ .c7,  .c7 a { color:#2359FF!important; }
+ .c8,  .c8 a { color:#68CCEF!important; }
+ .c9,  .c9 a { color:#9382C9!important; }
+.c11, .c11 a { color:#FF7C0A!important; }
