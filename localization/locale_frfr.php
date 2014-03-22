@@ -112,6 +112,7 @@ $lang = array(
         'foundResult'   => "Résultats de recherche pour",
         'noResult'      => "Aucun résultat pour malordawsne",
         'tryAgain'      => "Veuillez essayer d'autres mots ou vérifiez l'orthographe des termes de recherche.",
+        'ignoredTerms'  => "Les mots suivants ont été ignorés dans votre recherches : %s"
     ),
     'game' => array (
         'achievement'   => "haut fait",

@@ -382,8 +382,8 @@ class QuestListFilter extends Filter
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
         {
-            if ($genCR = $this->genericCriterion($cr))
-                return $genCR;
+            if ($genCr = $this->genericCriterion($cr))
+                return $genCr;
 
             unset($cr);
             $this->error = true;

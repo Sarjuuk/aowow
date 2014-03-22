@@ -112,6 +112,7 @@ $lang = array(
         'foundResult'   => "Resultados de busqueda para",
         'noResult'      => "Ningún resultado para",
         'tryAgain'      => "Por favor, introduzca otras palabras claves o verifique el término ingresado.",
+        'ignoredTerms'  => "Las siguientes palabras fueron ignoradas en tu búsqueda: %s"
     ),
     'game' => array(
         'achievement'   => "logro",

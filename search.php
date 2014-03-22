@@ -16,7 +16,7 @@ if (!defined('AOWOW_REVISION'))
             [],         // unused
             [],         // unused
             [],         // unused
-            str[10][4]  // type, typeId, param1 (4:quality, 3,6,9,10,17:icon, 5:faction), param2 (3:quality, 6:rank)
+            str[10][4]  // type, typeId, param1 (4:quality, 3,6,9,10,17:icon, 5,11:faction), param2 (3:quality, 6:rank)
         ]
     else
         => listviews
@@ -27,8 +27,6 @@ todo    26: Listview - template: 'profile',     id: 'characters',    name: LANG.
         29: Arena Teams..?
 */
 
-$search     = urlDecode(trim($pageParam));
-$query      = Util::sqlEscape(str_replace('?', '_', str_replace('*', '%', ($search))), true);
 $type       = @intVal($_GET['type']);
 $searchMask = 0x0;
 $found      = [];
@@ -38,6 +36,65 @@ $maxResults = CFG_SQL_LIMIT_SEARCH;
 $_wt        = isset($_GET['wt'])  ? explode(':', $_GET['wt'])  : null;
 $_wtv       = isset($_GET['wtv']) ? explode(':', $_GET['wtv']) : null;
 $_slots     = [];
+
+$search     = urlDecode(trim($pageParam));
+$query      = Util::sqlEscape(str_replace('?', '_', str_replace('*', '%', ($search))), true);
+$invalid    = [];
+$include    = [];
+$exclude    = [];
+
+$parts = explode(' ', $query);
+foreach ($parts as $p)
+{
+    if ($p[0] == '-')
+    {
+        if (strlen($p) < 4)
+            $invalid[] = $p;
+        else
+            $exclude[] = substr($p, 1);
+    }
+    else
+    {
+        if (strlen($p) < 3)
+            $invalid[] = $p;
+        else
+            $include[] = $p;
+    }
+}
+
+$createLookup = function(array $fields = []) use($include, $exclude)
+{
+    // default to name-field
+    if (!$fields)
+        $fields[] = 'name_loc'.User::$localeId;
+
+    $qry = [];
+    foreach ($fields as $n => $f)
+    {
+        $sub = [];
+        foreach ($include as $i)
+            $sub[] = [$f, $i];
+
+        foreach ($exclude as $x)
+            $sub[] = [$f, $x, '!'];
+
+        // single cnd?
+        if (count($sub) > 1)
+            array_unshift($sub, 'AND');
+        else
+            $sub = $sub[0];
+
+        $qry[] = $sub;
+    }
+
+    // single cnd?
+    if (count($qry) > 1)
+        array_unshift($qry, 'OR');
+    else
+        $qry = $qry[0];
+
+    return $qry;
+};
 
 if (isset($_GET['json']))
 {
@@ -75,7 +132,7 @@ if (!User::isInGroup(U_GROUP_STAFF))
 $cacheKey = implode('_', [CACHETYPE_SEARCH, $searchMask, sha1($query), User::$localeId]);
 
 // invalid conditions: not enough characters to search OR no types to search
-if ((strlen($query) < 3 || !($searchMask & SEARCH_MASK_ALL)) && !($searchMask & SEARCH_TYPE_JSON && intVal($search)))
+if ((!$include || !($searchMask & SEARCH_MASK_ALL)) && !($searchMask & SEARCH_TYPE_JSON && intVal($search)))
 {
     if ($searchMask & SEARCH_TYPE_REGULAR)
     {
@@ -86,7 +143,8 @@ if ((strlen($query) < 3 || !($searchMask & SEARCH_MASK_ALL)) && !($searchMask & 
         // insufficient queries throw an error
         $smarty->assign('lang', array_merge(Lang::$main, Lang::$search));
         $smarty->assign('found', []);
-        $smarty->assign('search', $query);
+        $smarty->assign('search', $search);
+        $smarty->assign('ignored', implode(', ', $invalid));
 
         $smarty->display('search.tpl');
         die();
@@ -108,8 +166,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 1 Classes:
     if ($searchMask & 0x00000001)
     {
-        $cnd = array_merge($cndBase, [['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $classes = new CharClassList($cnd);
 
         if ($data = $classes->getListviewData())
@@ -143,8 +200,7 @@ if (!$smarty->loadCache($cacheKey, $found))
             zone:       starting zone...
         */
 
-        $cnd = array_merge($cndBase, [['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $races = new CharRaceList($cnd);
 
         if ($data = $races->getListviewData())
@@ -180,18 +236,7 @@ if (!$smarty->loadCache($cacheKey, $found))
             source: {}      // g_sources .. holy cow.. that will cost some nerves
         */
 
-        $sources = array(
-            4  => [],                                       // Quest
-            12 => [],                                       // Achievement
-            13 => []                                        // DB-Text
-        );
-
-        $cnd = array_merge($cndBase, array(
-            'OR',
-            ['male_loc'.User::$localeId, $query],
-            ['female_loc'.User::$localeId, $query]
-        ));
-
+        $cnd = array_merge($cndBase, [$createLookup(['male_loc'.User::$localeId, 'female_loc'.User::$localeId])]);
         $titles = new TitleList($cnd);
 
         if ($data = $titles->getListviewData())
@@ -225,10 +270,13 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         $cnd = array_merge($cndBase, array(
             'OR',
-            ['h.name_loc'.User::$localeId, $query],
-            ['AND', ['e.description', $query], ['e.holidayId', 0]]
+            $createLookup(['h.name_loc'.User::$localeId]),
+            [
+                'AND',
+                $createLookup(['e.description']),
+                ['e.holidayId', 0]
+            ]
         ));
-
         $wEvents = new WorldEventList($cnd);
 
         if ($data  = $wEvents->getListviewData())
@@ -264,8 +312,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 5 Currencies
     if ($searchMask & 0x0000010)
     {
-        $cnd = array_merge($cndBase, [['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $money = new CurrencyList($cnd);
 
         if ($data = $money->getListviewData())
@@ -294,8 +341,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     if ($searchMask & 0x0000020)
     {
         // ['item1', 0, '!'],                               // remove empty sets from search, set in cuFlags
-        $cnd = array_merge($cndBase, [is_int($query) ? ['id', $query] : ['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [is_int($query) ? ['id', $query] : $createLookup()]);
         $sets = new ItemsetList($cnd);
 
         if ($data = $sets->getListviewData())
@@ -327,7 +373,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     if ($searchMask & 0x0000040)
     {
         $miscData = [];
-        $cndAdd   = empty($query) ? [] : (is_int($query) ? ['id', $query] : ['name_loc'.User::$localeId, $query]);
+        $cndAdd   = empty($query) ? [] : (is_int($query) ? ['id', $query] : $createLookup());
 
         if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
         {
@@ -336,7 +382,7 @@ if (!$smarty->loadCache($cacheKey, $found))
         }
         else if (($searchMask & SEARCH_TYPE_JSON) && ($type == TYPE_ITEM || $_slots))
         {
-            $iCnd = ['AND', ['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], $cndAdd];
+            $iCnd = [['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], $cndAdd];
             if ($_slots)
                 $iCnd[] = ['slot', $_slots];
 
@@ -389,13 +435,11 @@ if (!$smarty->loadCache($cacheKey, $found))
     if ($searchMask & 0x0000080)
     {
         $cnd = array_merge($cndBase, array(                 // hmm, inclued classMounts..?
-            'AND',
             ['s.typeCat', [7, -2, -3]],
             [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT), '&'], 0],
             [['s.attributes0', 0x80, '&'], 0],
-            ['s.name_loc'.User::$localeId, $query]
+            $createLookup()
         ));
-
         $abilities = new SpellList($cnd);
 
         if ($data = $abilities->getListviewData())
@@ -437,12 +481,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 9 Talents (Player + Pet)
     if ($searchMask & 0x0000100)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            ['s.typeCat', [-7, -2]],
-            ['s.name_loc'.User::$localeId, $query]
-        ));
-
+        $cnd = array_merge($cndBase, [['s.typeCat', [-7, -2]], $createLookup()]);
         $talents = new SpellList($cnd);
 
         if ($data = $talents->getListviewData())
@@ -484,12 +523,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 10 Glyphs
     if ($searchMask & 0x0000200)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            ['s.typeCat', -13],
-            ['s.name_loc'.User::$localeId, $query]
-        ));
-
+        $cnd = array_merge($cndBase, [['s.typeCat', -13], $createLookup()]);
         $glyphs = new SpellList($cnd);
 
         if ($data = $glyphs->getListviewData())
@@ -524,12 +558,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 11 Proficiencies
     if ($searchMask & 0x0000400)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            ['s.typeCat', -11],
-            ['s.name_loc'.User::$localeId, $query]
-        ));
-
+        $cnd = array_merge($cndBase, [['s.typeCat', -11], $createLookup()]);
         $prof = new SpellList($cnd);
 
         if ($data = $prof->getListviewData())
@@ -564,12 +593,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 12 Professions (Primary + Secondary)
     if ($searchMask & 0x0000800)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            ['s.typeCat', [9, 11]],
-            ['s.name_loc'.User::$localeId, $query]
-        ));
-
+        $cnd = array_merge($cndBase, [['s.typeCat', [9, 11]], $createLookup()]);
         $prof = new SpellList($cnd);
 
         if ($data = $prof->getListviewData())
@@ -604,12 +628,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 13 Companions
     if ($searchMask & 0x0001000)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            ['s.typeCat', -6],
-            ['s.name_loc'.User::$localeId, $query]
-        ));
-
+        $cnd = array_merge($cndBase, [['s.typeCat', -6], $createLookup()]);
         $vPets = new SpellList($cnd);
 
         if ($data = $vPets->getListviewData())
@@ -644,12 +663,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 14 Mounts
     if ($searchMask & 0x0002000)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            ['s.typeCat', -5],
-            ['s.name_loc'.User::$localeId, $query]
-        ));
-
+        $cnd = array_merge($cndBase, [['s.typeCat', -5], $createLookup()]);
         $mounts = new SpellList($cnd);
 
         if ($data = $mounts->getListviewData())
@@ -684,8 +698,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     if ($searchMask & 0x0004000)
     {
         // [['cuFlags', MASKE, '&'], 0],     // todo (med): exclude trigger creatures and difficulty entries
-        $cnd = array_merge($cndBase, [['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $npcs = new CreatureList($cnd);
 
         if ($data = $npcs->getListviewData())
@@ -720,7 +733,6 @@ if (!$smarty->loadCache($cacheKey, $found))
             [User::$localeId ? 'lq.Title_loc'.User::$localeId : 'Title', $query],
             $maxResults
         );
-
         $quests = new QuestList($cnd);
 
         if ($data = $quests->getListviewData())
@@ -747,12 +759,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 17 Achievements
     if ($searchMask & 0x0010000)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            [['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], 0],
-            ['name_loc'.User::$localeId, $query]
-        ));
-
+        $cnd = array_merge($cndBase, [[['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], 0], $createLookup()]);
         $acvs = new AchievementList($cnd);
 
         if ($data = $acvs->getListviewData())
@@ -785,12 +792,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 18 Statistics
     if ($searchMask & 0x0020000)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            ['flags', ACHIEVEMENT_FLAG_COUNTER, '&'],
-            ['name_loc'.User::$localeId, $query]
-        ));
-
+        $cnd = array_merge($cndBase, [['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], $createLookup()]);
         $stats = new AchievementList($cnd);
 
         if ($data = $stats->getListviewData())
@@ -822,8 +824,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 19 Zones
     if ($searchMask & 0x0040000)
     {
-        $cnd = array_merge($cndBase, [['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $zones = new ZoneList($cnd);
 
         if ($data = $zones->getListviewData())
@@ -852,8 +853,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 20 Objects
     if ($searchMask & 0x0080000)
     {
-        $cnd = array_merge($cndBase, [['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $objects = new GameObjectList($cnd);
 
         if ($data = $objects->getListviewData())
@@ -882,8 +882,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 21 Factions
     if ($searchMask & 0x0100000)
     {
-        $cnd = array_merge($cndBase, [['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $factions = new FactionList($cnd);
 
         if ($data = $factions->getListviewData())
@@ -910,8 +909,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 22 Skills
     if ($searchMask & 0x0200000)
     {
-        $cnd = array_merge($cndBase, [['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $skills = new SkillList($cnd);
 
         if ($data = $skills->getListviewData())
@@ -941,8 +939,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 23 Pets
     if ($searchMask & 0x0400000)
     {
-        $cnd = array_merge($cndBase, [['name_loc'.User::$localeId, $query]]);
-
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $pets = new PetList($cnd);
 
         if ($data = $pets->getListviewData())
@@ -970,12 +967,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 24 NPCAbilities
     if ($searchMask & 0x0800000)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            ['s.name_loc'.User::$localeId, $query],
-            ['s.typeCat', -8]
-        ));
-
+        $cnd = array_merge($cndBase, [['s.typeCat', -8], $createLookup()]);
         $npcAbilities = new SpellList($cnd);
 
         if ($data = $npcAbilities->getListviewData())
@@ -1011,12 +1003,7 @@ if (!$smarty->loadCache($cacheKey, $found))
     // 25 Spells (Misc + GM)
     if ($searchMask & 0x1000000)
     {
-        $cnd = array_merge($cndBase, array(
-            'AND',
-            ['s.name_loc'.User::$localeId, $query],
-            ['s.typeCat', [0, -9]]
-        ));
-
+        $cnd = array_merge($cndBase, [['s.typeCat', [0, -9]], $createLookup()]);
         $misc = new SpellList($cnd);
 
         if ($data = $misc->getListviewData())
@@ -1177,6 +1164,7 @@ else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
     $smarty->assign('lang', array_merge(Lang::$main, Lang::$search));
     $smarty->assign('found', $found);
     $smarty->assign('search', $search);
+    $smarty->assign('ignored', implode(', ', $invalid));
 
     $smarty->display('search.tpl');
 }

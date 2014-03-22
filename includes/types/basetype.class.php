@@ -747,6 +747,55 @@ abstract class Filter
         }
     }
 
+    protected function modularizeString(array $fields, $string = '')
+    {
+        if (!$string)
+            $string = $this->fiData['v']['na'];
+
+        $qry   = [];
+        $valid = false;
+        foreach ($fields as $n => $f)
+        {
+            $sub = [];
+            $parts = explode(' ', $string);
+
+            foreach ($parts as $p)
+            {
+                if ($p[0] == '-' && strlen($p) > 3)
+                    $sub[] = [$f, substr($p, 1), '!'];
+                else if ($p[0] != '-' && strlen($p) > 2)
+                {
+                    $valid = true;
+                    $sub[] = [$f, $p];
+                }
+            }
+
+            // single cnd?
+            if (!$sub)
+                continue;
+            else if (count($sub) > 1)
+                array_unshift($sub, 'AND');
+            else
+                $sub = $sub[0];
+
+            $qry[] = $sub;
+        }
+
+        if (!$valid)                                        // no +term with length >= 3 set
+        {
+            $this->error = 1;
+            return [];
+        }
+
+        // single cnd?
+        if (count($qry) > 1)
+            array_unshift($qry, 'OR');
+        else
+            $qry = $qry[0];
+
+        return $qry;
+    }
+
     protected function int2Op(&$op)
     {
         switch ($op)
@@ -824,9 +873,10 @@ abstract class Filter
 
     private function genericString($field, $value, $localized)
     {
-        $field .= $localized ? '_loc'.User::$localeId : null;
+        if (!$localized)
+            return [$field, (string)$value];
 
-        return [$field, (string)$value];
+        return $this->modularizeString([$field.'_loc'.User::$localeId], $value);
     }
 
     private function genericNumeric($field, &$value, $op, $castInt)

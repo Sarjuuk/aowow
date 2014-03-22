@@ -1832,8 +1832,8 @@ class SpellListFilter extends Filter
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
         {
-            if ($genCR = $this->genericCriterion($cr))
-                return $genCR;
+            if ($genCr = $this->genericCriterion($cr))
+                return $genCr;
 
             unset($cr);
             $this->error = true;
@@ -1889,10 +1889,14 @@ class SpellListFilter extends Filter
         //string (extended)
         if (isset($_v['na']))
         {
+            $_ = [];
             if (isset($_v['ex']) && $_v['ex'] == 'on')
-                $parts[] = ['OR', ['name_loc'.User::$localeId, $_v['na']], ['buff_loc'.User::$localeId, $_v['na']], ['description_loc'.User::$localeId, $_v['na']]];
+                $_ = $this->modularizeString(['name_loc'.User::$localeId, 'buff_loc'.User::$localeId, 'description_loc'.User::$localeId]);
             else
-                $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+                $_ = $this->modularizeString(['name_loc'.User::$localeId]);
+
+            if ($_)
+                $parts[] = $_;
         }
 
         // spellLevel min                                   todo (low): talentSpells (typeCat -2) commonly have spellLevel 1 (and talentLevel >1) -> query is inaccurate

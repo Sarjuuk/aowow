@@ -261,8 +261,8 @@ class CreatureListFilter extends Filter
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
         {
-            if ($genCR = $this->genericCriterion($cr))
-                return $genCR;
+            if ($genCr = $this->genericCriterion($cr))
+                return $genCr;
 
             unset($cr);
             $this->error = true;
@@ -439,10 +439,14 @@ class CreatureListFilter extends Filter
         // name [str]
         if (isset($_v['na']))
         {
+            $_ = [];
             if (isset($_v['ex']) && $_v['ex'] == 'on')
-                $parts[] = ['OR', ['name_loc'.User::$localeId, $_v['na']], ['subname_loc'.User::$localeId, $_v['na']]];
+                $_ = $this->modularizeString(['name_loc'.User::$localeId, 'subname_loc'.User::$localeId]);
             else
-                $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+                $_ = $this->modularizeString(['name_loc'.User::$localeId]);
+
+            if ($_)
+                $parts[] = $_;
         }
 
         // pet family [list]

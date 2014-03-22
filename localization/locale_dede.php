@@ -120,6 +120,7 @@ $lang = array(
         'foundResult'   => "Suchergebnisse für",
         'noResult'      => "Keine Ergebnisse für",
         'tryAgain'      => "Bitte versucht es mit anderen Suchbegriffen oder überprüft deren Schreibweise.",
+        'ignoredTerms'  => "Die folgenden Wörter wurden in Eurer Suche ignoriert: %s"
     ),
     'game' => array(
         'achievement'   => "Erfolg",

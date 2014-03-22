@@ -1553,7 +1553,7 @@ class ItemListFilter extends Filter
 
     public function createConditionsForWeights(&$data)
     {
-        if (count($data['wt']) != count($data['wtv']))
+        if (!$data['wt'] || !$data['wtv'] || count($data['wt']) != count($data['wtv']))
             return null;
 
         $select = $cnd = [];
@@ -1598,8 +1598,8 @@ class ItemListFilter extends Filter
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
         {
-            if ($genCR = $this->genericCriterion($cr))
-                return $genCR;
+            if ($genCr = $this->genericCriterion($cr))
+                return $genCr;
 
             unset($cr);
             $this->error = true;
@@ -1678,6 +1678,7 @@ class ItemListFilter extends Filter
                 break;
             case 124:                                       // randomenchants [str]
                 // joining this in one step results in hell ..  so .. two steps
+                // todo (low): in _theory_ Filter::modularizeString() should also be applied here
                 $randIds = DB::Aowow()->selectCol('SELECT IF (ire.id > 0, iet.entry, -iet.entry) FROM item_enchantment_template iet JOIN ?_itemrandomenchant ire ON ABS(ire.id) = iet.ench WHERE ire.name_loc'.User::$localeId.' LIKE ?', '%'.$cr[2].'%');
 
                 if ($randIds)
@@ -1918,7 +1919,8 @@ class ItemListFilter extends Filter
 
         // name
         if (isset($_v['na']))
-            $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+            if ($_ = $this->modularizeString(['name_loc'.User::$localeId]))
+                $parts[] = $_;
 
         // usable-by (not excluded by requiredClass && armor or weapons match mask from ?_classes)
         if (isset($_v['ub']))

@@ -107,6 +107,7 @@ $lang = array(
         'foundResult'   => "Search Results for",
         'noResult'      => "No Results for",
         'tryAgain'      => "Please try some different keywords or check your spelling.",
+        'ignoredTerms'  => "The following words were ignored in your search: %s"
     ),
     'game' => array(
         'achievement'   => "achievement",
