@@ -1076,6 +1076,8 @@ class ItemList extends BaseType
 
     public function extendJsonStats()
     {
+        $onUseStats = [];
+
         // convert ItemMods
         $this->itemMods[$this->id] = [];
         for ($h = 1; $h <= 10; $h++)
@@ -1106,11 +1108,15 @@ class ItemList extends BaseType
         if ($equipSpells)
         {
             $eqpSplList = new SpellList(array(['s.id', $equipSpells]));
-            $stats      = $eqpSplList->getStatGain();
-
-            foreach ($stats as $stat)
+            foreach ($eqpSplList->getStatGain() as $stat)
+            {
                 foreach ($stat as $mId => $qty)
+                {
                     @$this->itemMods[$this->id][$mId] += $qty;
+                    if ($this->curTpl['class'] == ITEM_CLASS_CONSUMABLE)
+                        @$onUseStats[$mId] += $qty;
+                }
+            }
         }
 
         // fetch and add socketbonusstats
@@ -1121,14 +1127,18 @@ class ItemList extends BaseType
         if ($geId = $this->curTpl['gemEnchantmentId'])
         {
             $gemStats = Util::parseItemEnchantment($geId);
-
             foreach ($gemStats as $mod => $qty)
+            {
                 @$this->json[$this->id][$mod] += $qty;
+                @$this->itemMods[$this->id][$mId] += $qty;
+            }
         }
 
         foreach ($this->json[$this->id] as $k => $v)
             if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'quality', 'side']) && $v == "0"))
                 unset($this->json[$this->id][$k]);
+
+        return $onUseStats;
     }
 
     private function canTeachSpell()

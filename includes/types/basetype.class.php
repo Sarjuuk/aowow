@@ -162,6 +162,14 @@ abstract class BaseType
                 {
                     $val = Util::sqlEscape($c[1], true);
 
+                    /*
+                        long term observation
+                        do both methods diff ?
+                    */
+                    $debug = DB::Aowow()->escape($c[1]);
+                    if ($debug != "'".$val."'")
+                        Util::$pageTemplate->internalNotice(U_GROUP_ADMIN, 'BaseType::__construct() - escape mechanism have different results: \''.$val.'\' => '.$debug);
+
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
                     $val = $val === '' ? '""' : '"%'.$val.'%"';
                 }

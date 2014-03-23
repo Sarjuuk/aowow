@@ -4,9 +4,6 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-if (isset($_GET['xml']))
-    die('unsupported, as i do not see the point');
-
 require 'includes/community.class.php';
 
 $_id       = intVal($pageParam);
@@ -71,6 +68,160 @@ if (isset($_GET['power']))
     }
     die($x);
 }
+
+
+// xml object
+if (isset($_GET['xml']))
+{
+    header('Content-type: text/xml; charsetUTF-8');
+
+    $cacheKeyXML = implode('_', [CACHETYPE_XML, TYPE_ITEM, $_id, -1, User::$localeId]);
+
+    if (!$smarty->loadCache($cacheKeyXML, $root))
+    {
+        $root = new SimpleXML('<aowow />');
+
+        if (!$_id)
+        {
+            $str = DB::Aowow()->escape(urlDecode($pageParam));
+            $str = substr($str, 1, -1);                     // escape adds '
+            $cnd = array(['name_loc'.User::$localeId, $str]);
+        }
+        else
+            $cnd = array(['i.id', $_id]);
+
+        $item = new ItemList($cnd);
+        if ($item->error)
+            $root->addChild('error', 'Item not found!');
+        else
+        {
+            // item root
+            $xml = $root->addChild('item');
+            $xml->addAttribute('id', $item->id);
+
+            // name
+            $xml->addChild('name')->addCData($item->getField('name', true));
+            // itemlevel
+            $xml->addChild('level', $item->getField('itemLevel'));
+            // quality
+            $xml->addChild('quality', Lang::$item['quality'][$item->getField('quality')])->addAttribute('id', $item->getField('quality'));
+            // class
+            $x = Lang::$item['cat'][$item->getField('class')];
+            $xml->addChild('class')->addCData(is_array($x) ? $x[0] : $x)->addAttribute('id', $item->getField('class'));
+            // subclass
+            $x = $item->getField('class') == 2 ? Lang::$spell['weaponSubClass'] : Lang::$item['cat'][$item->getField('class')][1];
+            $xml->addChild('subclass')->addCData(is_array($x) ? (is_array($x[$item->getField('subClass')]) ? $x[$item->getField('subClass')][0] : $x[$item->getField('subClass')]) : null)->addAttribute('id', $item->getField('subClass'));
+            // icon + displayId
+            $xml->addChild('icon', $item->getField('iconString'))->addAttribute('displayId', $item->getField('displayId'));
+            // inventorySlot
+            $xml->addChild('inventorySlot', Lang::$item['inventoryType'][$item->getField('slot')])->addAttribute('id', $item->getField('slot'));
+            // tooltip
+            $xml->addChild('htmlTooltip')->addCData($item->renderTooltip());
+
+            $onUse  = $item->extendJsonStats();
+
+            // json
+            $fields = ["classs", "displayid", "dps", "id", "level", "name", "reqlevel", "slot", "slotbak", "source", "sourcemore", "speed", "subclass"];
+            $json   = '';
+            foreach ($fields as $f)
+            {
+                if (($_ = @$item->json[$item->id][$f]) !== null)
+                {
+                    $_ = $f == 'name' ? (7 - $item->getField('quality')).$_ : $_;
+                    $json .= ',"'.$f.'":'.$_;
+                }
+            }
+            $xml->addChild('json')->addCData(substr($json, 1));
+
+            // jsonEquip missing: avgbuyout, cooldown
+            $json = '';
+            if ($_ = $item->getField('sellPrice'))          // sellprice
+                $json .= ',"sellprice":'.$_;
+
+            if ($_ = $item->getField('requiredLevel'))      // reqlevel
+                $json .= ',"reqlevel":'.$_;
+
+            if ($_ = $item->getField('requiredSkill'))      // reqskill
+                $json .= ',"reqskill":'.$_;
+
+            if ($_ = $item->getField('requiredSkillRank'))  // reqskillrank
+                $json .= ',"reqskillrank":'.$_;
+
+            foreach (Util::$itemMods as $idx => $str)
+                if ($_ = @$item->itemMods[$item->id][$idx])
+                    $json .= ',"'.$str.'":'.$_;
+
+            foreach ($_ = $item->json[$item->id] as $name => $qty)
+                if (in_array($name, Util::$itemFilter))
+                    $json .= ',"'.$name.'":'.$qty;
+
+            $xml->addChild('jsonEquip')->addCData(substr($json, 1));
+
+            // jsonUse
+            if ($onUse)
+            {
+                $j = '';
+                foreach ($onUse as $idx => $qty)
+                    $j .= ',"'.Util::$itemMods[$idx].'":'.$qty;
+
+                $xml->addChild('jsonUse')->addCdata(substr($j, 1));
+            }
+
+            // reagents
+            $cnd = array(
+                'OR',
+                ['AND', ['effect1CreateItemId', $item->id], ['OR', ['effect1Id', SpellList::$effects['itemCreate']], ['effect1AuraId', SpellList::$auras['itemCreate']]]],
+                ['AND', ['effect2CreateItemId', $item->id], ['OR', ['effect2Id', SpellList::$effects['itemCreate']], ['effect2AuraId', SpellList::$auras['itemCreate']]]],
+                ['AND', ['effect3CreateItemId', $item->id], ['OR', ['effect3Id', SpellList::$effects['itemCreate']], ['effect3AuraId', SpellList::$auras['itemCreate']]]],
+            );
+
+            $spellSource = new SpellList($cnd);
+            if (!$spellSource->error)
+            {
+                $cbNode = $xml->addChild('createdBy');
+
+                foreach ($spellSource->iterate() as $sId => $__)
+                {
+                    foreach ($spellSource->canCreateItem() as $idx)
+                    {
+                        if ($spellSource->getField('effect'.$idx.'CreateItemId') != $item->id)
+                            continue;
+
+                        $splNode = $cbNode->addChild('spell');
+                        $splNode->addAttribute('id', $sId);
+                        $splNode->addAttribute('name', $spellSource->getField('name', true));
+                        $splNode->addAttribute('icon', $item->getField('iconString'));
+                        $splNode->addAttribute('minCount', $spellSource->getField('effect'.$idx.'BasePoints') + 1);
+                        $splNode->addAttribute('maxCount', $spellSource->getField('effect'.$idx.'BasePoints') + $spellSource->getField('effect'.$idx.'DieSides'));
+
+                        foreach ($spellSource->getReagentsForCurrent() as $rId => $qty)
+                        {
+                            if ($reagent = $spellSource->relItems->getEntry($rId))
+                            {
+                                $rgtNode = $splNode->addChild('reagent');
+                                $rgtNode->addAttribute('id', $rId);
+                                $rgtNode->addAttribute('name', Util::localizedString($reagent, 'name'));
+                                $rgtNode->addAttribute('quality', $reagent['quality']);
+                                $rgtNode->addAttribute('icon', $reagent['iconString']);
+                                $rgtNode->addAttribute('count', $qty[1]);
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            // link
+            $xml->addChild('link', HOST_URL.'?item='.$item->id);
+        }
+
+        $smarty->saveCache($cacheKeyXML, $root);
+    }
+
+    die($root->asXML());
+}
+
 
 // regular page
 if (!$smarty->loadCache($cacheKeyPage, $pageData))

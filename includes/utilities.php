@@ -3,6 +3,18 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
+class SimpleXML extends SimpleXMLElement
+{
+    public function addCData($str)
+    {
+        $node = dom_import_simplexml($this);
+        $no   = $node->ownerDocument;
+        $node->appendChild($no->createCDATASection($str));
+
+        return $this;
+    }
+}
+
 class SmartyAoWoW extends Smarty
 {
     private $jsGlobals = [];
@@ -2111,7 +2123,7 @@ class Util
                         $srcObj->addGlobalsToJscript(self::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
                         $srcData = $srcObj->getListviewData();
 
-                        foreach ($srcObj->iterate() as $_)
+                        foreach ($srcObj->iterate() as $curTpl)
                         {
                             if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_HERBLOOT)
                                 $tabId = 9;
