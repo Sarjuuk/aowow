@@ -405,6 +405,93 @@ class SpellList extends BaseType
         return $this->tools;
     }
 
+    public function getModelInfo($targetId = 0)
+    {
+        $displays = [0 => []];
+        foreach ($this->iterate() as $id => $__)
+        {
+            if ($targetId && $targetId != $id)
+                continue;
+
+            for ($i = 1; $i < 4; $i++)
+            {
+                $effMV = $this->curTpl['effect'.$i.'MiscValue'];
+                if (!$effMV)
+                    continue;
+
+                // GO Model from MiscVal
+                if (in_array($this->curTpl['effect'.$i.'Id'], [50, 76, 104, 105, 106, 107]))
+                {
+                    $displays[TYPE_OBJECT][$id] = $effMV;
+                    break;
+                }
+                // NPC Model from MiscVal
+                else if (in_array($this->curTpl['effect'.$i.'Id'], [28, 90]) || in_array($this->curTpl['effect'.$i.'AuraId'], [56, 78]))
+                {
+                    $displays[TYPE_NPC][$id] = $effMV;
+                    break;
+                }
+                // Shapeshift
+                else if ($this->curTpl['effect'.$i.'AuraId'] == 36)
+                {
+                    $subForms = array(
+                        892  => [892,  29407, 29406, 29408, 29405],         // Cat - NE
+                        8571 => [8571, 29410, 29411, 29412],                // Cat - Tauren
+                        2281 => [2281, 29413, 29414, 29416, 29417],         // Bear - NE
+                        2289 => [2289, 29415, 29418, 29419, 29420, 29421]   // Bear - Tauren
+                    );
+
+                    if ($st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftForms WHERE id = ?d', $effMV))
+                    {
+                        foreach ([1, 2] as $i)
+                            if (isset($subForms[$st['model'.$i]]))
+                                $st['model'.$i] = $subForms[$st['model'.$i]][array_rand($subForms[$st['model'.$i]])];
+
+                        $displays[0][$id] = array(
+                            'npcId'        => 0,
+                            'displayId'    => [$st['model1'], $st['model2']],
+                            'creatureType' => $st['creatureType'],
+                            'displayName'  => Util::localizedString($st, 'name')
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+
+        $results = $displays[0];
+
+        if (!empty($displays[TYPE_NPC]))
+        {
+            $nModels = new CreatureList(array(['id', $displays[TYPE_NPC]]));
+            foreach ($nModels->iterate() as $nId => $__)
+            {
+                $srcId = array_search($nId, $displays[TYPE_NPC]);
+                $results[$srcId] = array(
+                    'typeId'      => $nId,
+                    'displayId'   => $nModels->getRandomModelId(),
+                    'displayName' => $nModels->getField('name', true)
+                );
+            }
+        }
+
+        if (!empty($displays[TYPE_OBJECT]))
+        {
+            $oModels = new GameObjectList(array(['id', $displays[TYPE_OBJECT]]));
+            foreach ($oModels->iterate() as $oId => $__)
+            {
+                $srcId = array_search($oId, $displays[TYPE_OBJECT]);
+                $results[$srcId] = array(
+                    'typeId'      => $oId,
+                    'displayId'   => $oModels->getField('displayId'),
+                    'displayName' => $oModels->getField('name', true)
+                );
+            }
+        }
+
+        return $targetId ? @$results[$targetId] : $results;
+    }
+
     private function createRangesForCurrent()
     {
         if (!$this->curTpl['rangeMaxHostile'])
@@ -1433,17 +1520,20 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
         // get created items (may need improvement)
         $createItem = '';
-        if ($this->curTpl['typeCat'] == 11)                 // only Professions
+        if (in_array($this->curTpl['typeCat'], [9, 11]))    // only Professions
         {
-            for ($i = 1; $i <= 3; $i++)
+            foreach ($this->canCreateItem() as $idx)
             {
-                if ($this->curTpl['effect'.$i.'Id'] == 53)  // Enchantment (has createItem Scroll of Enchantment)
+                if ($this->curTpl['effect'.$idx.'Id'] == 53)// Enchantment (has createItem Scroll of Enchantment)
                     continue;
 
-                if ($cId = $this->curTpl['effect'.$i.'CreateItemId'])
+                foreach ($this->relItems->iterate() as $cId => $__)
                 {
-                    $createItem = (new ItemList(array(['i.id', (int)$cId])))->renderTooltip([], true, $this->id);
-                    break;
+                    if ($cId != $this->curTpl['effect'.$idx.'CreateItemId'])
+                        continue;
+
+                    $createItem = $this->relItems->renderTooltip([], true, $this->id);
+                    break 2;
                 }
             }
         }
@@ -1589,9 +1679,13 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
             return [$org, $ylw, $grn, $gry];
     }
 
-    public function getListviewData()
+    public function getListviewData($addInfoMask = 0x0)
     {
         $data = [];
+
+        if ($addInfoMask & ITEMINFO_MODEL)
+            $modelInfo = $this->getModelInfo();
+
         foreach ($this->iterate() as $__)
         {
             $quality = ($this->curTpl['cuFlags'] & SPELL_CU_QUALITY_MASK) >> 8;
@@ -1655,6 +1749,17 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
             if ($mask = $this->curTpl['reqRaceMask'])
                 $data[$this->id]['reqrace'] = $mask;
+
+
+            if ($addInfoMask & ITEMINFO_MODEL)
+            {
+                if ($mi = @$modelInfo[$this->id])
+                {
+                    $data[$this->id]['npcId']       = $mi['typeId'];
+                    $data[$this->id]['displayId']   = $mi['displayId'];
+                    $data[$this->id]['displayName'] = $mi['displayName'];
+                }
+            }
         }
 
         return $data;

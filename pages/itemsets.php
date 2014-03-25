@@ -34,7 +34,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             'subCat' => $pageParam ? '='.$pageParam : '',
             'reqJS'  => array(
                 'static/js/filters.js',
-                '?data=weight-presets'
+                '?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
             )
         ),
         'lv' => []

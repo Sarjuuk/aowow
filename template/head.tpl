@@ -27,7 +27,7 @@
     <script src="static/js/global.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="static/js/Markup.js?{$AOWOW_REVISION}" type="text/javascript"></script>
 {foreach from=$reqJS item=file}
-    <script src="{$file}{*?$AOWOW_REVISION*}" type="text/javascript"></script>
+    <script src="{$file}{if $file[0] == '?'}&{else}?{/if}{$AOWOW_REVISION}" type="text/javascript"></script>
 {/foreach}
     <script type="text/javascript">
         var g_locale = {ldelim} id:{$user.locale}, name:'{$user.language}' {rdelim};

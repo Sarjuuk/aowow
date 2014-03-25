@@ -2243,7 +2243,7 @@ function TalentCalc() {
                     c.div.style.display = "";
                 }
                 else {
-                    $WH.g_ajaxIshRequest("?data=talents&class=" + classId + "&" + _versionBuild);
+                    $WH.g_ajaxIshRequest('?data=talents&class=' + classId + '&locale=' + g_locale.id + '&t=' + g_dataKey + '&' + _versionBuild);
                 }
             }
 

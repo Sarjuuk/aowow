@@ -408,9 +408,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'tab'    => 0,
             'type'   => TYPE_SPELL,
             'typeId' => $_id,
-            'reqJS'  => array(
-                $pageData['buttons'][BUTTON_VIEW3D] ? 'static/js/swfobject.js' : null
-            ),
+            'reqJS'  => ['static/js/swfobject.js'],
             'redButtons' => array(
                 BUTTON_LINKS   => ['color' => 'ff71d5ff', 'linkId' => Util::$typeStrings[TYPE_SPELL].':'.$_id],
                 BUTTON_VIEW3D  => false,
@@ -715,11 +713,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case 28:                                        // Summon
             case 90:                                        // Kill Credit
                 $_ = Lang::$game['npc'].' #'.$effMV;
-                $summon = new CreatureList(array(['ct.id', $effMV]));
-                if (!$summon->error)
+                if ($summon = $spell->getModelInfo($_id))
                 {
-                    $_ = '(<a href="?npc='.$effMV.'">'.$summon->getField('name', true).'</a>)';
-                    $pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon->getRandomModelId()];
+                    $_ = '(<a href="?npc='.$summon['typeId'].'">'.$summon['displayName'].'</a>)';
+                    $pageData['page']['redButtons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon['displayId']];
                 }
 
                 $foo['name'] .= Lang::$colon.$_;
@@ -768,12 +765,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             case 106:                                       // Summon Object (slot 3)
             case 107:                                       // Summon Object (slot 4)
                 $_ = Util::ucFirst(Lang::$game['gameObject']).' #'.$effMV;
-                $summon = new GameObjectList(array(['o.id', $effMV]));
-                if (!$summon->error)
+                if ($summon = $spell->getModelInfo($_id))
                 {
-                    $_ = '(<a href="?object='.$effMV.'">'.$summon->getField('name', true).'</a>)';
-                    $pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_OBJECT, 'displayId' => $summon->getField('displayId')];
+                    $_ = '(<a href="?object='.$summon['typeId'].'">'.$summon['displayName'].'</a>)';
+                    $pageData['page']['redButtons'][BUTTON_VIEW3D] = ['type' => TYPE_OBJECT, 'displayId' => $summon['displayId']];
                 }
+
 
                 $foo['name'] .= Lang::$colon.$_;
                 break;
@@ -888,17 +885,17 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
                             break;
                         case 36:                            // Shapeshift
-                            if ($st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftForms WHERE id = ?d', $effMV))
+                            if ($st = $spell->getModelInfo($_id))
                             {
-                                $pageData['buttons'][BUTTON_VIEW3D] = array(
+                                $pageData['page']['redButtons'][BUTTON_VIEW3D] = array(
                                     'type'      => TYPE_NPC,
-                                    'displayId' => $st['model2'] ? $st['model'.rand(1, 2)]: $st['model1']
+                                    'displayId' => $st['displayId'][1] ? $st['displayId'][rand(0, 1)] : $st['displayId'][0]
                                 );
 
                                 if ($st['creatureType'] > 0)
                                     $pageData['page']['infobox'][] = '[li]'.Lang::$game['type'].Lang::$colon.Lang::$game['ct'][$st['creatureType']].'[/li]';
 
-                                if ($_ = Util::localizedString($st, 'name'))
+                                if ($_ = $st['displayName'])
                                     $bar = User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_) : $_;
                             }
                             break;
@@ -1039,12 +1036,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         case 78:                            // Mounted
                         case 56:                            // Transform
                         {
-                            $transform = new CreatureList(array(['ct.id', $effMV]));
-                            if (!$transform->error)
+                            if ($transform = $spell->getModelInfo($_id))
                             {
-                                $pageData['view3D'] = $transform->getRandomModelId();
-                                $pageData['buttons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $transform->getRandomModelId()];
-                                $bar = ' (<a href="?npc='.$effMV.'">'.$transform->getField('name', true).'</a>)';
+                                $pageData['page']['redButtons'][BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $transform['displayId']];
+                                $bar = ' (<a href="?npc='.$transform['typeId'].'">'.$transform['displayName'].'</a>)';
                             }
                             else
                                 $bar = Lang::$colon.Lang::$game['npc'].' #'.$effMV;;

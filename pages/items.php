@@ -187,7 +187,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             'reqJS'  => array(
                 'static/js/filters.js',
                 'static/js/swfobject.js',
-                '?data=weight-presets'
+                '?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
             )
         ),
         'lv'     => array(

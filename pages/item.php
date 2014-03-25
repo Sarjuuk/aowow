@@ -462,7 +462,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 'static/js/swfobject.js',
                 'static/js/profile.js',
                 'static/js/filters.js',
-                '?data=weight-presets'
+                '?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
             ),
             'reqCSS'     => array(
                 $pageText ? ['path' => 'static/css/Book.css'] : null,

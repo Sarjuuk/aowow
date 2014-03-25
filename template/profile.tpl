@@ -12,7 +12,7 @@
 
             <script type="text/javascript">
                 g_initPath({$path});
-                var g_dataKey = {$dataKey};
+                var g_dataKey = '{$dataKey}';
                 var temp_path = {$path}; {*kill with pageTemplate*}
 {*
 PageTemplate.set({pageName: 'profile', activeTab: 1, breadcrumb: [1,5,0,'eu']});

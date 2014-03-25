@@ -21,7 +21,7 @@ $pageData      = array(
         'static/js/filters.js',
         'static/js/Summary.js',
         'static/js/swfobject.js',
-        '?data=weight-presets.gems.enchants.itemsets'
+        '?data=weight-presets.gems.enchants.itemsets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
     )
 );
 $compareString = '';

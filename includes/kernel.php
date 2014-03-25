@@ -58,6 +58,18 @@ $e = CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0;
 error_reporting($e);
 
 
+// php session (used for profiler: g_dataKey) (todo (high): merge to user-class at some point)
+session_start();
+if (empty($_SESSION['timeout']) || $_SESSION['timeout'] < time())
+{
+    $seed = "abcdefghijklmnopqrstuvwxyz0123456789";
+    $_SESSION['dataKey'] = '';                              // just some random numbers for identifictaion purpose
+    for ($i = 0; $i < 40; $i++)
+        $_SESSION['dataKey'] .= substr($seed, mt_rand(0, 35), 1);
+}
+$_SESSION['timeout'] = time() + CFG_SESSION_TIMEOUT_DELAY;
+
+
 // debug: measure execution times
 Util::execTime(CFG_DEBUG);
 

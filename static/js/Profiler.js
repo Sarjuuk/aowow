@@ -4614,7 +4614,8 @@ function ProfilerInventory(_parent) {
                 style: 'outline: none'
             };
 
-            swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
+            // swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
+            swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
 
             _mvInited = true;
         }
@@ -7388,6 +7389,9 @@ function ProfilerCompletion(_parent) {
         if (!_data || _loading) { // Filter load on demand
             return _timer[wut] = setTimeout(_self.filterData.bind(_self, wut, value), 750);
         }
+
+        if (!_divTotals)                                    // sarjuuk: prevent error on matching available data against empty known data
+            return;
 
         var _ = 0;
 

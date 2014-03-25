@@ -252,12 +252,12 @@ function handleLoad()
             [/*oneArrayPerPet*/],
         ),
         'skills'            => [333 => [150, 450]],                         // can contain anything, should be limited to prim/sec professions
-        'reputation'        => [],
+        'reputation'        => [70 => 42500],
         'achievements'      => [],
         'achievementpoints' => 9001,                                        // max you have
         'titles'            => [111 => 1, 144 => 1],
         'quests'            => [],
-        'spells'            => [],
+        'spells'            => [67527 => 1, 41252 => 1, 25659 => 1, 27984 => 1],
         // 'glyphs'            => [],                                       // not really used .. i guess..?
         'inventory'         => [],
         'playedtime'        => 1 * YEAR + 10 * MONTH + 21 * DAY,            // exact to the day
@@ -325,7 +325,7 @@ function handleLoad()
         if (empty($data[$iId]))
             continue;
 
-        $buff .= "\r\ng_items.add(".$iId.', {name_'.User::$localeString.':"'.Util::jsEscape($itemz->getField('name', true)).'", quality:'.$itemz->getField('quality').', icon:"'.$itemz->getField('iconString').'", jsonequip:'.json_encode($data[$iId], JSON_NUMERIC_CHECK).'})';
+        $buff .= "\ng_items.add(".$iId.', {name_'.User::$localeString.':"'.Util::jsEscape($itemz->getField('name', true)).'", quality:'.$itemz->getField('quality').', icon:"'.$itemz->getField('iconString').'", jsonequip:'.json_encode($data[$iId], JSON_NUMERIC_CHECK).'})';
     }
 
 /* CUSTOM AURAS */
@@ -334,7 +334,7 @@ function handleLoad()
     $dataz = $auraz->getListviewData();
     $modz  = $auraz->getProfilerMods();
 
-    $buff .= "\r\n";
+    $buff .= "\n";
     foreach ($dataz as $id => $data)
     {
         if (!empty($modz[$id]))
@@ -350,7 +350,7 @@ function handleLoad()
         }
 
         $json = preg_replace('/"\$([^$"]+)"/', '\1', json_encode($data, JSON_NUMERIC_CHECK));
-        $buff .= "\r\ng_spells.add(".$id.', '.$json.');';
+        $buff .= "\ng_spells.add(".$id.', '.$json.');';
     }
 
 /*  END CUSTOM  */
@@ -358,7 +358,7 @@ function handleLoad()
     $mountz = new SpellList(array(['typeCat', -5]));
     $dataz = $mountz->getListviewData();
     foreach ($dataz as $id => $data)
-        echo "\r\ng_spells.add(".$id.', '.json_encode($data, JSON_NUMERIC_CHECK).');';
+        echo "\ng_spells.add(".$id.', '.json_encode($data, JSON_NUMERIC_CHECK).');';
 
 
 
@@ -371,11 +371,11 @@ function handleLoad()
     $titlez = new TitleList(array(CFG_SQL_LIMIT_NONE, [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0])); // all available
     $dataz = $titlez->getListviewData();
 
-    $buff .= "\r\n\r\nvar _ = g_titles;";
+    $buff .= "\n\nvar _ = g_titles;";
     foreach ($dataz as $id => $data)
     {
         $s = !empty($data[$id]['source']) ? ', source: '.($data[$id]['source']) : null;
-        $buff .= "\r\n_[".$id."] = {name:'".Util::jsEscape($character['gender'] && !empty($data['namefemale']) ? $data['namefemale'] : $data['name'])."', gender:".$data['gender'].', category:'.$data['category'].$s.'};';
+        $buff .= "\n_[".$id."] = {name:'".Util::jsEscape($character['gender'] && !empty($data['namefemale']) ? $data['namefemale'] : $data['name'])."', gender:".$data['gender'].', category:'.$data['category'].$s.'};';
     }
 
     // buffer achievements / statistics
@@ -389,27 +389,26 @@ function handleLoad()
     $dataz = $achievez->getListviewData(ACHIEVEMENTINFO_PROFILE);
 
     $sumPoints = 0;
-    $buff .= "\r\n\r\nvar _ = g_achievements;";
+    $buff .= "\n\nvar _ = g_achievements;";
     foreach ($dataz as $id => $data)
     {
         $sumPoints += $data['points'];
-        $buff .= "\r\n_[".$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).';';
+        $buff .= "\n_[".$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).';';
     }
 
     // this list below is correct and expected. HOW THE HELL DOES THE SCRIPT GENERATE A TREE FROM THAT?! [ORDER BY parentId, posOrChildCount ASC]
-    $buff .= "\r\n\r\ng_achievement_catorder = [96, 97, 95, 168, 169, 201, 155, 81, 1, 130, 141, 128, 122, 133, 14807, 132, 134, 131, 21, 152, 153, 154, 165, 14801, 14802, 14803, 14804, 14881, 14901, 15003, 14861, 14862, 14863, 14777, 14778, 14779, 14780, 123, 124, 125, 126, 127, 135, 136, 137, 140, 145, 147, 191, 178, 173, 160, 187, 159, 163, 161, 162, 158, 14981, 156, 14941, 14808, 14805, 14806, 14921, 14922, 14923, 14961, 14962, 15001, 15002, 15041, 15042, 170, 171, 172, 14864, 14865, 14866, 14821, 14822, 14823, 14963, 15021, 15062]";
+    $buff .= "\n\ng_achievement_catorder = [92, 96, 97, 95, 168, 169, 201, 155, 81, 1, 130, 141, 128, 122, 133, 14807, 132, 134, 131, 21, 152, 153, 154, 165, 14801, 14802, 14803, 14804, 14881, 14901, 15003, 14861, 14862, 14863, 14777, 14778, 14779, 14780, 123, 124, 125, 126, 127, 135, 136, 137, 140, 145, 147, 191, 178, 173, 160, 187, 159, 163, 161, 162, 158, 14981, 156, 14941, 14808, 14805, 14806, 14921, 14922, 14923, 14961, 14962, 15001, 15002, 15041, 15042, 170, 171, 172, 14864, 14865, 14866, 14821, 14822, 14823, 14963, 15021, 15062]";
 
     // max achievable achievementpoints come separately .. as array.. with only one element .. seriously?
-    $buff .= "\r\n\r\ng_achievement_points = [".$sumPoints."];";
+    $buff .= "\n\ng_achievement_points = [".$sumPoints."];";
 
 /*** END STATIC ***/
 
-
     // excludes
-    $buff .= "\r\n\r\ng_excludes = {};";
+    $buff .= "\n\ng_excludes = {};";
 
     // add profile to buffer
-    $buff .= "\r\n\r\n\$WowheadProfiler.registerProfile(".json_encode($character, JSON_PRETTY_PRINT, JSON_NUMERIC_CHECK).");";
+    $buff .= "\n\n\$WowheadProfiler.registerProfile(".json_encode($character, JSON_PRETTY_PRINT, JSON_NUMERIC_CHECK).");";
 
     return $buff;
 }
@@ -471,7 +470,7 @@ function getModelForForm($form, $char)
             if ($char['race'] == 4) // RACE_NIGHTELF
             {
                 if ($char['hairColor'] >= 0 && $char['hairColor'] <= 2)
-                    return 29413;       // 29415
+                    return 29413;
                 else if ($char['hairColor'] == 3)
                     return 29417;
                 else if ($char['hairColor'] == 4)
@@ -513,7 +512,7 @@ function getModelForForm($form, $char)
             }
     }
 
-    // hey, still here? you're not a Tauren/Nelf as  bear or cat, are you?
+    // hey, still here? you're not a Tauren/Nelf as bear or cat, are you?
     return DB::Aowow()->selectCell('SELECT IF(?d == 1, IFNULL(displayIdA, displayIdH), IFNULL(displayIdH, displayIdA)) FROM ?_shapeshiftForm WHERE id = ?d AND XXX', Util::sideByRaceMask(1 << ($char['race'] - 1)), $form);
 }
 
@@ -586,7 +585,7 @@ switch ($pageParam)
 $pageData = array(
     'page' => array(
         'profileId' => $_profileId,
-        'dataKey'   => $_profileId,                         // should be some unique integer to manage ?data=-requests
+        'dataKey'   => $_SESSION['dataKey'],
         'path'      => json_encode($_path, JSON_NUMERIC_CHECK),
         'title'     => Util::ucFirst(Lang::$game['profile']), // actual name is set per jScript
         'tab'       => 1,
@@ -597,7 +596,7 @@ $pageData = array(
             'static/js/profile_all.js',
             'static/js/profile.js',
             'static/js/Profiler.js',
-            '?data=enchants.gems.glyphs.itemsets.pets.pet-talents.quick-excludes.realms.statistics.weight-presets'  // quick-excludes?!
+            '?data=enchants.gems.glyphs.itemsets.pets.pet-talents.quick-excludes.realms.statistics.weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']  // quick-excludes?!
             // ?data=user&1270968639
         ),
         'reqCSS'    => array(

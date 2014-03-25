@@ -20,7 +20,7 @@ $smarty->updatePageVars(array(
     ),
     'reqJS'  => array(
         'static/js/TalentCalc.js',
-        $petCalc ? '?data=pet-talents.pets'   : '?data=glyphs',
+       ($petCalc ? '?data=pet-talents.pets' : '?data=glyphs').'&locale='.User::$localeId.'&t='.$_SESSION['dataKey'],
         $petCalc ? 'static/js/petcalc.js'   : 'static/js/talent.js',
         $petCalc ? 'static/js/swfobject.js' : null
     )

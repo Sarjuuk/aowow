@@ -16,7 +16,7 @@ $smarty->updatePageVars(array(
     'reqJS'  => array(
         'static/js/maps.js',
         'static/js/Mapper.js',
-        '?data=zones'
+        '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
     )
 ));
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$maps));
