@@ -10,12 +10,20 @@
         .news-img1 { position: absolute; left: 60px; top: 155px; width: 172px; height: 17px }
         .news-img2 { position: absolute; left: 246px; top: 48px; width: 145px; height: 127px }
         .news-talent { position: absolute; left: 240px; top: 29px; width: 152px; height: 146px }
+        .announcement { margin: auto; max-width: 1200px; padding: 0px 15px 15px 15px }
 {/literal}
     </style>
 </head>
 <body>
     <div id="layers"></div>
     <div id="home">
+
+{if !empty($announcements)}
+    {foreach from=$announcements item=item}
+        {include file='bricks/announcement.tpl' an=$item}
+    {/foreach}
+{/if}
+
         <span id="menu_buttons-generic" class="menu-buttons"></span>
         <script type="text/javascript">
             Menu.addButtons($WH.ge('menu_buttons-generic'), mn_path);
