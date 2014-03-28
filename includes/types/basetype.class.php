@@ -21,7 +21,7 @@ abstract class BaseType
     *       expression:    str   - must match fieldname;
     *                      int   - 1: select everything; 0: select nothing
     *                      array - another condition array
-    *       value:         str   - operator defaults to: LIKE %<val>%
+    *       value:         str   - operator defaults to: LIKE <val>
     *                      int   - operator defaults to: = <val>
     *                      array - operator defaults to: IN (<val>)
     *                      null  - operator defaults to: IS [NULL]
@@ -35,7 +35,7 @@ abstract class BaseType
     *   example:
     *       array(
     *           ['id', 45],
-    *           ['name', 'test', '!'],
+    *           ['name', 'test%', '!'],
     *           [
     *               'AND',
     *               ['flags', 0xFF, '&'],
@@ -47,9 +47,9 @@ abstract class BaseType
     *           5
     *       )
     *   results in
-    *       WHERE ((`id` = 45) OR (`name` NOT LIKE "%test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) OR (`joinedTbl`.`field` IS NULL) LIMIT 5
+    *       WHERE ((`id` = 45) OR (`name` NOT LIKE "test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) OR (`joinedTbl`.`field` IS NULL) LIMIT 5
     */
-    public function __construct($conditions = [])
+    public function __construct($conditions = [], $miscData = null)
     {
         $where     = [];
         $linking   = ' AND ';
@@ -64,6 +64,9 @@ abstract class BaseType
             $prefixes['base'] = $match[2];
         else
             $prefixes['base'] = '';
+
+        if ($miscData && !empty($miscData['extraOpts']))
+            $this->extendQueryOpts($miscData['extraOpts']);
 
         $resolveCondition = function ($c, $supLink) use (&$resolveCondition, &$prefixes)
         {
@@ -107,17 +110,22 @@ abstract class BaseType
                         if (is_array($f))
                             $f = $f[0];
 
-                        if (is_numeric($f))
+                        // numeric allows for formulas e.g. (1 < 3)
+                        if (Util::checkNumeric($f))
                             return $f;
 
-                        $f = explode('.', Util::sqlEscape($f));
+                        // skip condition if fieldName contains illegal chars
+                        if (preg_match('/[^\d\w\.\_]/i', $f))
+                            return null;
+
+                        $f = explode('.', $f);
 
                         switch (count($f))
                         {
                             case 2:
                                 if (!in_array($f[0], $prefixes))
                                 {
-                                    // choose table to join or return null if prefix not existant
+                                    // choose table to join or return null if prefix does not exist
                                     if (!in_array($f[0], array_keys($this->queryOpts)))
                                         return null;
 
@@ -146,12 +154,12 @@ abstract class BaseType
 
                 if (is_array($c[1]))
                 {
-                    $val = implode(',', Util::sqlEscape($c[1], true));
-                    if ($val === '')
-                        return null;
+                    array_walk($c[1], function(&$item, $key) {
+                         $item = Util::checkNumeric($item) ? $item : DB::Aowow()->escape($item);
+                    });
 
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
-                    $val = '('.$val.')';
+                    $val = '('.implode(', ', $c[1]).')';
                 }
                 else if (Util::checkNumeric($c[1]))
                 {
@@ -160,18 +168,8 @@ abstract class BaseType
                 }
                 else if (is_string($c[1]))
                 {
-                    $val = Util::sqlEscape($c[1], true);
-
-                    /*
-                        long term observation
-                        do both methods diff ?
-                    */
-                    $debug = DB::Aowow()->escape($c[1]);
-                    if ($debug != "'".$val."'")
-                        Util::$pageTemplate->internalNotice(U_GROUP_ADMIN, 'BaseType::__construct() - escape mechanism have different results: \''.$val.'\' => '.$debug);
-
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
-                    $val = $val === '' ? '""' : '"%'.$val.'%"';
+                    $val = DB::Aowow()->escape($c[1]);
                 }
                 else if (count($c) > 1 && $c[1] === null)   // specifficly check for NULL
                 {
@@ -761,7 +759,6 @@ abstract class Filter
             $string = $this->fiData['v']['na'];
 
         $qry   = [];
-        $valid = false;
         foreach ($fields as $n => $f)
         {
             $sub = [];
@@ -770,12 +767,9 @@ abstract class Filter
             foreach ($parts as $p)
             {
                 if ($p[0] == '-' && strlen($p) > 3)
-                    $sub[] = [$f, substr($p, 1), '!'];
+                    $sub[] = [$f, '%'.substr($p, 1).'%', '!'];
                 else if ($p[0] != '-' && strlen($p) > 2)
-                {
-                    $valid = true;
-                    $sub[] = [$f, $p];
-                }
+                    $sub[] = [$f, '%'.$p.'%'];
             }
 
             // single cnd?
@@ -789,14 +783,10 @@ abstract class Filter
             $qry[] = $sub;
         }
 
-        if (!$valid)                                        // no +term with length >= 3 set
-        {
-            $this->error = 1;
-            return [];
-        }
-
         // single cnd?
-        if (count($qry) > 1)
+        if (!$qry)
+            $this->error = 1;
+        else if (count($qry) > 1)
             array_unshift($qry, 'OR');
         else
             $qry = $qry[0];
@@ -949,7 +939,6 @@ abstract class Filter
         return $result;
     }
 
-    // apply Util::sqlEscape() and intVal() in the implementation of these
     abstract protected function createSQLForCriterium(&$cr);
     abstract protected function createSQLForValues();
 }

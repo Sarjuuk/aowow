@@ -59,10 +59,7 @@ function signin()
             $_SERVER['REMOTE_ADDR']
         );
 
-    $id = DB::Aowow()->SelectCell('SELECT id FROM ?_account WHERE user = ?',
-        Util::sqlEscape($username)
-    );
-
+    $id = DB::Aowow()->SelectCell('SELECT id FROM ?_account WHERE user = ?', $username);
     if (!$id)
         return Lang::$account['userNotFound'];
 
@@ -273,8 +270,6 @@ if (User::$id)
             $next = !empty($next[1]) ? '?'.$next[1] : '.';
             header('Location: '.$next);
         case 'weightscales':
-            $post = Util::sqlEscape($_POST, true);
-
             if (isset($post['save']))
             {
                 if (!isset($post['id']))
@@ -292,7 +287,7 @@ if (User::$id)
                     die('0');
             }
             else if (isset($post['delete']) && isset($post['id']))
-                DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', $post['id'], User::$id);
+                DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', intVal($post['id']), User::$id);
             else
                 die('0');
 

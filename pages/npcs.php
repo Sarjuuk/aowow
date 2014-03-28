@@ -29,7 +29,8 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     if ($_ = $npcFilter->getConditions())
         $conditions[] = $_;
 
-    $npcs = new CreatureList($conditions);                  // beast subtypes are selected via filter
+    // beast subtypes are selected via filter
+    $npcs = new CreatureList($conditions, ['extraOpts' => $npcFilter->extraOpts]);
 
     // recreate form selection
     $filter = array_merge($npcFilter->getForm('form'), $filter);

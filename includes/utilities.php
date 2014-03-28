@@ -1253,21 +1253,6 @@ class Util
         return 'b'.strToUpper($_);
     }
 
-    public static function sqlEscape($data, $relaxed = false)
-    {
-        // relaxed: expecting strings for fulltext search
-        $pattern = $relaxed ? ['/[;`´"\/\\\]/ui', '--'] : ['/[^\p{L}0-9\s_\-\.]/ui', '--'];
-
-        if (!is_array($data))
-            return preg_replace($pattern, '', trim($data));
-
-        array_walk($data, function(&$item, $key) use (&$relaxed) {
-            $item = self::sqlEscape($item, $relaxed);
-        });
-
-        return $data;
-    }
-
     public static function jsEscape($string)
     {
         return strtr(trim($string), array(
@@ -2079,7 +2064,6 @@ class Util
                     }
 
                     /*
-
                         todo: search for achievements here
                         $tabsFinal[17]
                     */
@@ -2132,7 +2116,7 @@ class Util
                             else if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_MININGLOOT)
                                 $tabId = 7;
                             else if ($tabId < 0)
-                                $tabId = abs($tabId);               // general case (skinning)
+                                $tabId = abs($tabId);       // general case (skinning)
 
                             $tabsFinal[$tabId][1][] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField($field)]);
                             $tabsFinal[$tabId][4][] = 'Listview.extraCols.percent';

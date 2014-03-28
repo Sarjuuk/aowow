@@ -38,7 +38,7 @@ $_wtv       = isset($_GET['wtv']) ? explode(':', $_GET['wtv']) : null;
 $_slots     = [];
 
 $search     = urlDecode(trim($pageParam));
-$query      = Util::sqlEscape(str_replace('?', '_', str_replace('*', '%', ($search))), true);
+$query      = strtr($search, '?*', '_%');
 $invalid    = [];
 $include    = [];
 $exclude    = [];
@@ -73,10 +73,10 @@ $createLookup = function(array $fields = []) use($include, $exclude)
     {
         $sub = [];
         foreach ($include as $i)
-            $sub[] = [$f, $i];
+            $sub[] = [$f, '%'.$i.'%'];
 
         foreach ($exclude as $x)
-            $sub[] = [$f, $x, '!'];
+            $sub[] = [$f, '%'.$x.'%', '!'];
 
         // single cnd?
         if (count($sub) > 1)
@@ -152,12 +152,12 @@ if ((!$include || !($searchMask & SEARCH_MASK_ALL)) && !($searchMask & SEARCH_TY
     else if ($searchMask & SEARCH_TYPE_OPEN)
     {
         header("Content-type: text/javascript");
-        exit('["'.Util::jsEscape($query).'", []]');
+        exit('["'.Util::jsEscape($search).'", []]');
     }
     else if (!$_wt || !$_wtv)                               // implicitly: SEARCH_TYPE_JSON
     {
         header("Content-type: text/javascript");
-        exit ("[\"".Util::jsEscape($query)."\", [\n],[\n]]\n");
+        exit ("[\"".Util::jsEscape($search)."\", [\n],[\n]]\n");
     }
 }
 
@@ -1088,7 +1088,7 @@ if ($searchMask & SEARCH_TYPE_JSON)
     }
 
     header("Content-type: text/javascript");
-    die ('["'.Util::jsEscape($query)."\", [\n".$outItems."],[\n".$outSets.']]');
+    die ('["'.Util::jsEscape($search)."\", [\n".$outItems."],[\n".$outSets.']]');
 }
 else if ($searchMask & SEARCH_TYPE_OPEN)
 {
@@ -1102,7 +1102,7 @@ else if ($searchMask & SEARCH_TYPE_OPEN)
         $foundTotal += $tmp['matches'];
 
     if (!$foundTotal)
-        exit('["'.Util::jsEscape($query).'", []]');
+        exit('["'.Util::jsEscape($search).'", []]');
 
     foreach ($found as $id => $set)
     {

@@ -228,6 +228,7 @@ class CreatureList extends BaseType
 
 class CreatureListFilter extends Filter
 {
+    public    $extraOpts     = null;
     protected $enums         = array(
         3 => array( 469, 1037, 1106,  529, 1012,   87,   21,  910,  609,  942,  909,  530,   69,  577,  930, 1068, 1104,  729,  369,   92,   54,  946,   67, 1052,  749,
                      47,  989, 1090, 1098,  978, 1011,   93, 1015, 1038,   76,  470,  349, 1031, 1077,  809,  911,  890,  970,  169,  730,   72,   70,  932, 1156,  933,
@@ -279,20 +280,20 @@ class CreatureListFilter extends Filter
                 switch ($cr[1])
                 {
                     case '=':                               // min > max is totally possible
-                        $this->parent->queryOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) <= '.$cr[2];
-                        $this->parent->queryOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) >= '.$cr[2];
+                        $this->extraOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) <= '.$cr[2];
+                        $this->extraOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) >= '.$cr[2];
                         break;
                     case '>':
-                        $this->parent->queryOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) > '.$cr[2];
+                        $this->extraOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) > '.$cr[2];
                         break;
                     case '>=':
-                        $this->parent->queryOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) >= '.$cr[2];
+                        $this->extraOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) >= '.$cr[2];
                         break;
                     case '<':
-                        $this->parent->queryOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) < '.$cr[2];
+                        $this->extraOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) < '.$cr[2];
                         break;
                     case '<=':
-                        $this->parent->queryOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) <= '.$cr[2];
+                        $this->extraOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) <= '.$cr[2];
                         break;
                 }
                 return [1];                                 // always true, use post-filter
@@ -304,20 +305,20 @@ class CreatureListFilter extends Filter
                 switch ($cr[1])
                 {
                     case '=':
-                        $this->parent->queryOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
-                        $this->parent->queryOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) => '.$cr[2];
+                        $this->extraOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
+                        $this->extraOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) => '.$cr[2];
                         break;
                     case '>':
-                        $this->parent->queryOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) > '.$cr[2];
+                        $this->extraOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) > '.$cr[2];
                         break;
                     case '>=':
-                        $this->parent->queryOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) >= '.$cr[2];
+                        $this->extraOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) >= '.$cr[2];
                         break;
                     case '<':
-                        $this->parent->queryOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) < '.$cr[2];
+                        $this->extraOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) < '.$cr[2];
                         break;
                     case '<=':
-                        $this->parent->queryOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
+                        $this->extraOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
                         break;
                 }
                 return [1];                                 // always true, use post-filter

@@ -30,11 +30,7 @@ class ItemList extends BaseType
 
     public function __construct($conditions = [], $miscData = null)
     {
-        // search by statweight
-        if ($miscData && !empty($miscData['extraOpts']))
-            $this->extendQueryOpts($miscData['extraOpts']);
-
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         foreach ($this->iterate() as &$_curTpl)
         {
@@ -1831,7 +1827,7 @@ class ItemListFilter extends Filter
                                 reagentCount1, reagentCount2, reagentCount3, reagentCount4, reagentCount5, reagentCount6, reagentCount7, reagentCount8
                         FROM    ?_spell
                         WHERE   skillLine1 IN (?a)',
-                        is_bool($_) ? array_filter($this->enums[$cr[0]], "is_numeric") : $_
+                        is_bool($_) ? array_filter($this->enums[99], "is_numeric") : $_
                     );
                     foreach ($spells as $spell)
                         for ($i = 1; $i < 9; $i++)

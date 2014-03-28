@@ -80,15 +80,7 @@ if (isset($_GET['xml']))
     if (!$smarty->loadCache($cacheKeyXML, $root))
     {
         $root = new SimpleXML('<aowow />');
-
-        if (!$_id)
-        {
-            $str = DB::Aowow()->escape(urlDecode($pageParam));
-            $str = substr($str, 1, -1);                     // escape adds '
-            $cnd = array(['name_loc'.User::$localeId, $str]);
-        }
-        else
-            $cnd = array(['i.id', $_id]);
+        $cnd  = array($_id ? ['i.id', $_id] : ['name_loc'.User::$localeId, $pageParam]);
 
         $item = new ItemList($cnd);
         if ($item->error)
