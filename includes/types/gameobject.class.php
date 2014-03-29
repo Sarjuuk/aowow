@@ -13,15 +13,15 @@ class GameObjectList extends BaseType
 
     protected       $queryBase = 'SELECT o.*, o.id AS ARRAY_KEY FROM ?_objects o';
     protected       $queryOpts = array(
-                        'o'   => [['ft', 'qr']],
+                        'o'   => [['ft', 'qse']],
                         'ft'  => ['j' => ['?_factiontemplate ft ON ft.id = o.faction', true], 's' => ', ft.factionId, ft.A, ft.H'],
-                        'qr'  => ['j' => ['gameobject_questrelation qr ON qr.id = o.id', true], 's' => ', qr.quest', 'g' => 'o.id'],     // started by GO
-                        'ir'  => ['j' => ['gameobject_involvedrelation ir ON ir.id = o.id', true]]                                       // ends at GO
+                        'qse' => ['j' => ['?_quests_startend qse ON qse.type = 2 AND qse.typeId = o.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'o.id'],
+                        'qt'  => ['j' => '?_quests qt ON qse.questId = qt.id']
                     );
 
-    public function __construct($conditions = [])
+    public function __construct($conditions = [], $miscData = null)
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         if ($this->error)
             return;
@@ -29,7 +29,7 @@ class GameObjectList extends BaseType
         // post processing
         foreach ($this->iterate() as $_id => &$curTpl)
         {
-            // unpack miscInfo:
+            // unpack miscInfo
             $curTpl['lootStack']    = [];
             $curTpl['spells']       = [];
 
@@ -87,7 +87,7 @@ class GameObjectList extends BaseType
             if (!empty($this->curTpl['reqSkill']))
                 $data[$this->id]['skill'] = $this->curTpl['reqSkill'];
 
-            if ($this->curTpl['quest'])
+            if ($this->curTpl['startsQuests'])
                 $data[$this->id]['hasQuests'] = 1;
 
         }
@@ -120,18 +120,20 @@ class GameObjectList extends BaseType
         return $this->tooltips[$this->id];
     }
 
-    public function addGlobalsToJScript(&$template, $addMask = 0)
+    public function addGlobalsToJScript($addMask = 0)
     {
         foreach ($this->iterate() as $id => $__)
-            $template->extendGlobalData(self::$type, [$id => ['name' => $this->getField('name', true)]]);
+            Util::$pageTemplate->extendGlobalData(self::$type, [$id => ['name' => $this->getField('name', true)]]);
     }
 }
 
 
 class GameObjectListFilter extends Filter
 {
+    public    $extraOpts     = [];
+
     protected $genericFilter = array(
-        15 => [FILTER_CR_NUMERIC,   'entry',    null],      // id
+        15 => [FILTER_CR_NUMERIC,   'id',       null],      // id
          7 => [FILTER_CR_NUMERIC,   'reqSkill', null],      // requiredskilllevel
     );
 
@@ -168,30 +170,32 @@ class GameObjectListFilter extends Filter
                 switch ($cr[1])
                 {
                     case 1:                                 // any
-                        return ['qr.id', null, '!'];
+                        return ['AND', ['qse.method', 0x1, '&'], ['qse.questId', null, '!']];
                     case 2:                                 // alliance only
-                        return ['AND', ['qr.id', null, '!'], ['ft.A', -1, '!'], ['ft.H', -1]];
+                        return ['AND', ['qse.method', 0x1, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_HORDE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&']];
                     case 3:                                 // horde only
-                        return ['AND', ['qr.id', null, '!'], ['ft.A', -1], ['ft.H', -1, '!']];
+                        return ['AND', ['qse.method', 0x1, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']];
                     case 4:                                 // both
-                        return ['AND', ['qr.id', null, '!'], ['OR', ['faction', 0], ['AND', ['ft.A', -1, '!'], ['ft.H', -1, '!']]]];
+                        return ['AND', ['qse.method', 0x1, '&'], ['qse.questId', null, '!'], ['OR', ['AND', ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']], ['qt.reqRaceMask', 0]]];
                     case 5:                                 // none
-                        return ['qr.id', null];
+                        $this->extraOpts['o']['h'][] = 'startsQuests = 0';
+                        return [1];
                 }
                 break;
             case 3:                                         // endsquest [side]
                 switch ($cr[1])
                 {
                     case 1:                                 // any
-                        return ['qi.id', null, '!'];
+                        return ['AND', ['qse.method', 0x2, '&'], ['qse.questId', null, '!']];
                     case 2:                                 // alliance only
-                        return ['AND', ['qi.id', null, '!'], ['ft.A', -1, '!'], ['ft.H', -1]];
+                        return ['AND', ['qse.method', 0x2, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_HORDE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&']];
                     case 3:                                 // horde only
-                        return ['AND', ['qi.id', null, '!'], ['ft.A', -1], ['ft.H', -1, '!']];
+                        return ['AND', ['qse.method', 0x2, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']];
                     case 4:                                 // both
-                        return ['AND', ['qi.id', null, '!'], ['OR', ['faction', 0], ['AND', ['ft.A', -1, '!'], ['ft.H', -1, '!']]]];
-                    case 5:                                 // none
-                        return ['qi.id', null];
+                        return ['AND', ['qse.method', 0x2, '&'], ['qse.questId', null, '!'], ['OR', ['AND', ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']], ['qt.reqRaceMask', 0]]];
+                    case 5:                                 // none         todo: broken, if entry starts and ends quests...
+                        $this->extraOpts['o']['h'][] = 'endsQuests = 0';
+                        return [1];
                 }
                 break;
             case 13:                                        // hascomments [yn]
@@ -214,7 +218,8 @@ class GameObjectListFilter extends Filter
 
         // name
         if (isset($_v['na']))
-            $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+            if ($_ = $this->modularizeString(['name_loc'.User::$localeId]))
+                $parts[] = $_;
 
         return $parts;
     }

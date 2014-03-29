@@ -103,7 +103,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $list[] = $i;
 
     $food = new ItemList(array(['i.subClass', [5, 8]], ['i.FoodType', $list]));
-    $food->addGlobalsToJscript($smarty);
+    $food->addGlobalsToJscript();
 
     $pageData['relTabs'][] = array(
         'file'   => 'item',
@@ -146,7 +146,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     ];
 
     $spells = new SpellList($conditions);
-    $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+    $spells->addGlobalsToJScript(GLOBALINFO_SELF);
 
     $pageData['relTabs'][] = array(
         'file'   => 'spell',
@@ -177,7 +177,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     $talents = new SpellList($conditions);
-    $talents->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+    $talents->addGlobalsToJScript(GLOBALINFO_SELF);
 
     $pageData['relTabs'][] = array(
         'file'   => 'spell',

@@ -69,11 +69,11 @@ class SkillList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript(&$template, $addMask = 0)
+    public function addGlobalsToJScript($addMask = 0)
     {
         foreach ($this->iterate() as $__)
         {
-            $template->extendGlobalData(self::$type, [
+            Util::$pageTemplate->extendGlobalData(self::$type, [
                 $this->id => [
                     'name' => Util::jsEscape($this->getField('name', true)),
                     'icon' => Util::jsEscape($this->curTpl['iconString'])

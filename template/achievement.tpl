@@ -70,18 +70,7 @@
 
                 {if $itemReward}                {* for items *}
                     <h3>{$lang.rewards}</h3>
-                    {$lang.itemReward}<table class="icontab">
-                    <tr>
-{foreach from=$itemReward item=i name=item key=id}
-                        <th id="icontab-icon{$smarty.foreach.item.index}"></th><td><span class="q{$i.quality}"><a href="?item={$id}">{$i.name}</a></span></td>
-{/foreach}
-                    <script type="text/javascript">//<![CDATA[
-{foreach from=$itemReward item=i name=item key=id}
-                        $WH.ge('icontab-icon{$smarty.foreach.item.index}').appendChild(g_items.createIcon({$id}, 1, 1));
-{/foreach}
-                    //]]></script>
-                    </tr>
-                    </table>
+                    {include file='bricks/rewards.tpl' rewTitle=$lang.itemReward rewData=$itemReward offset=0}
                 {/if}
 
                 {if $titleReward}               {* for titles *}
@@ -92,14 +81,14 @@
 {/foreach}
                     </ul>
                 {/if}
-                
+
                 {if !$titleReward && !$itemReward && $reward}
                     <h3>{$lang.rewards}</h3>
                     <ul>
                         <li><div>{$reward}</div></li>
                     </ul>
                 {/if}
-                
+
                 <h2 class="clear">{$lang.related}</h2>
             </div>
 

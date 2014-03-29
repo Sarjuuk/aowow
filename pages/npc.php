@@ -410,24 +410,24 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
     $smartSpells = DB::Aowow()->selectCol('SELECT action_param1 FROM smart_scripts WHERE source_type = 0 AND action_type IN (11, 75, 85, 86) AND entryOrGUID = ?d', $_id);
     $tplSpells   = [];
-    $conditions  = [['id', $smartSpells]];
+    $conditions  = ['OR'];
 
     for ($i = 1; $i < 9; $i++)
         if ($_ = $npc->getField('spell'.$i))
             $tplSpells[] = $_;
 
     if ($tplSpells)
-    {
         $conditions[] = ['id', $tplSpells];
-        $conditions[] = 'OR';
-    }
+
+    if ($smartSpells)
+        $conditions[] = ['id', $smartSpells];
 
     if ($tplSpells || $smartSpells)
     {
         $abilities = new SpellList($conditions);
         if (!$abilities->error)
         {
-            $abilities->addGlobalsToJScript(Util::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $abilities->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
             $normal    = $abilities->getListviewData();
             $controled = [];
 
@@ -478,7 +478,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $summoned = new SpellList($conditions);
     if (!$summoned->error)
     {
-        $summoned->addGlobalsToJscript(Util::$pageTemplate);
+        $summoned->addGlobalsToJscript();
 
         $pageData['relTabs'][] = array(
             'file'   => 'spell',
@@ -504,7 +504,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $teaches = new SpellList(array(['id', array_keys($tSpells)]));
             if (!$teaches->error)
             {
-                $teaches->addGlobalsToJscript(Util::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $teaches->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
                 $data = $teaches->getListviewData();
 
                 $extra = [];
@@ -557,7 +557,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $soldItems = new ItemList(array(['id', $sells]));
         if (!$soldItems->error)
         {
-            $soldItems->addGlobalsToJscript(Util::$pageTemplate);
+            $soldItems->addGlobalsToJscript();
 
             $pageData['relTabs'][] = array(
                 'file'   => 'item',
@@ -653,14 +653,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     {
         $conditions = array(
             'OR',
-            ['requiredSourceItemId1', $reqIds], ['requiredSourceItemId2', $reqIds],
-            ['requiredSourceItemId3', $reqIds], ['requiredSourceItemId4', $reqIds],
-            ['requiredItemId1', $reqIds], ['requiredItemId2', $reqIds], ['requiredItemId3', $reqIds],
-            ['requiredItemId4', $reqIds], ['requiredItemId5', $reqIds], ['requiredItemId6', $reqIds]
+            ['reqSourceItemId1', $reqIds], ['reqSourceItemId2', $reqIds],
+            ['reqSourceItemId3', $reqIds], ['reqSourceItemId4', $reqIds],
+            ['reqItemId1', $reqIds], ['reqItemId2', $reqIds], ['reqItemId3', $reqIds],
+            ['reqItemId4', $reqIds], ['reqItemId5', $reqIds], ['reqItemId6', $reqIds]
         );
 
         $reqQuests = new QuestList($conditions);
-        $reqQuests->addGlobalsToJscript($smarty);
+        $reqQuests->addGlobalsToJscript();
 
         foreach ($reqQuests->iterate() as $qId => $__)
         {
@@ -674,52 +674,63 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     // tab: starts quest
-    $starts = new QuestList(array(['npcStart.id', $_id]));
-    if (!$starts->error)
-    {
-        $starts->addGlobalsToJScript(Util::$pageTemplate);
-
-        $pageData['relTabs'][] = array(
-            'file'   => 'quest',
-            'data'   => $starts->getListviewData(),
-            'params' => [
-                'tabs' => '$tabsRelated',
-                'name' => '$LANG.tab_starts',
-                'id'   => 'starts'
-            ]
-        );
-    }
-
     // tab: ends quest
-    $ends = new QuestList(array(['npcEnd.id', $_id]));
-    if (!$ends->error)
+    $startEnd = new QuestList(array(['qse.type', TYPE_NPC], ['qse.typeId', $_id]));
+    if (!$startEnd->error)
     {
-        $ends->addGlobalsToJScript(Util::$pageTemplate);
+        $startEnd->addGlobalsToJScript();
+        $lvData = $startEnd->getListviewData();
+        $_ = [[], []];
 
-        $pageData['relTabs'][] = array(
-            'file'   => 'quest',
-            'data'   => $ends->getListviewData(),
-            'params' => [
-                'tabs' => '$tabsRelated',
-                'name' => '$LANG.tab_ends',
-                'id'   => 'ends'
-            ]
-        );
+        foreach ($startEnd->iterate() as $id => $__)
+        {
+            $m = $startEnd->getField('method');
+            if ($m & 0x1)
+                $_[0][] = $lvData[$id];
+            if ($m & 0x2)
+                $_[1][] = $lvData[$id];
+        }
+
+        if ($_[0])
+        {
+            $pageData['relTabs'][] = array(
+                'file'   => 'quest',
+                'data'   => $_[0],
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'name' => '$LANG.tab_starts',
+                    'id'   => 'starts'
+                ]
+            );
+        }
+
+        if ($_[1])
+        {
+            $pageData['relTabs'][] = array(
+                'file'   => 'quest',
+                'data'   => $_[1],
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'name' => '$LANG.tab_ends',
+                    'id'   => 'ends'
+                ]
+            );
+        }
     }
 
     // tab: objective of quest
     $conditions = array(
         'OR',
-        ['AND', ['RequiredNpcOrGo1', $_id], ['RequiredNpcOrGoCount1', 0, '>']],
-        ['AND', ['RequiredNpcOrGo2', $_id], ['RequiredNpcOrGoCount2', 0, '>']],
-        ['AND', ['RequiredNpcOrGo3', $_id], ['RequiredNpcOrGoCount3', 0, '>']],
-        ['AND', ['RequiredNpcOrGo4', $_id], ['RequiredNpcOrGoCount4', 0, '>']],
+        ['AND', ['reqNpcOrGo1', $_id], ['reqNpcOrGoCount1', 0, '>']],
+        ['AND', ['reqNpcOrGo2', $_id], ['reqNpcOrGoCount2', 0, '>']],
+        ['AND', ['reqNpcOrGo3', $_id], ['reqNpcOrGoCount3', 0, '>']],
+        ['AND', ['reqNpcOrGo4', $_id], ['reqNpcOrGoCount4', 0, '>']],
     );
 
     $objectiveOf = new QuestList($conditions);
     if (!$objectiveOf->error)
     {
-        $objectiveOf->addGlobalsToJScript(Util::$pageTemplate);
+        $objectiveOf->addGlobalsToJScript();
 
         $pageData['relTabs'][] = array(
             'file'   => 'quest',
@@ -741,7 +752,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $crtOf = new AchievementList($conditions);
     if (!$crtOf->error)
     {
-        $crtOf->addGlobalsToJScript(Util::$pageTemplate);
+        $crtOf->addGlobalsToJScript();
 
         $pageData['relTabs'][] = array(
             'file'   => 'achievement',

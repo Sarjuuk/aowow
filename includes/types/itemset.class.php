@@ -73,13 +73,13 @@ class ItemsetList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$template, $addMask = GLOBALINFO_ANY)
+    public function addGlobalsToJScript($addMask = GLOBALINFO_ANY)
     {
         if ($this->classes && ($addMask & GLOBALINFO_RELATED))
-            $template->extendGlobalIds(TYPE_CLASS, $this->classes);
+            Util::$pageTemplate->extendGlobalIds(TYPE_CLASS, $this->classes);
 
         if ($this->pieceToSet && ($addMask & GLOBALINFO_SELF))
-            $template->extendGlobalIds(TYPE_ITEM, array_keys($this->pieceToSet));
+            Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, array_keys($this->pieceToSet));
     }
 
     public function renderTooltip() { }

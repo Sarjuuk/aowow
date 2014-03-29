@@ -5,9 +5,9 @@
     </head>
     <body>
         <div style="text-align:center; margin:auto; width:75%; padding-top:150px">
-            <div style="background-image:url(template/images/logo.png); width:261px; height:119px; margin:auto;"></div>
+            <div style="background-image:url(static/images/logos/logo.png); width:261px; height:119px; margin:auto;"></div>
             <h1>Maintenance</h1>
-            <div style="background-image:url(template/images/maintenance/brbgnomes.jpg); width:618px; height:282px; margin:auto;"></div>
+            <div style="background-image:url(static/images/maintenance/brbgnomes.jpg); width:618px; height:282px; margin:auto;"></div>
             <div style="padding-top:50px">We will be back soon..ish!</div>
         </div>
     <body>

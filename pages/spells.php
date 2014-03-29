@@ -389,7 +389,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
 
     $spells = new SpellList($conditions);
 
-    $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+    $spells->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
     $lv['data'] = $spells->getListviewData();
 
     // recreate form selection

@@ -362,6 +362,26 @@ define('NPC_FLAG_BATTLEMASTER',             0x00100000);
 define('NPC_FLAG_AUCTIONEER',               0x00200000);
 define('NPC_FLAG_STABLE_MASTER',            0x00400000);
 
+// quest
+define('QUEST_FLAG_STAY_ALIVE',             0x00001);
+define('QUEST_FLAG_PARTY_ACCEPT',           0x00002);
+define('QUEST_FLAG_EXPLORATION',            0x00004);
+define('QUEST_FLAG_SHARABLE',               0x00008);
+define('QUEST_FLAG_AUTO_REWARDED',          0x00400);
+define('QUEST_FLAG_DAILY',                  0x01000);
+define('QUEST_FLAG_REPEATABLE',             0x02000);
+define('QUEST_FLAG_UNAVAILABLE',            0x04000);
+define('QUEST_FLAG_WEEKLY',                 0x08000);
+define('QUEST_FLAG_AUTO_COMPLETE',          0x10000);
+define('QUEST_FLAG_AUTO_ACCEPT',            0x80000);
+
+define('QUEST_FLAG_SPECIAL_REPEATABLE',     0x01);
+define('QUEST_FLAG_SPECIAL_EXT_COMPLETE',   0x02);
+define('QUEST_FLAG_SPECIAL_AUTO_ACCEPT',    0x04);
+define('QUEST_FLAG_SPECIAL_DUNGEON_FINDER', 0x08);
+define('QUEST_FLAG_SPECIAL_MONTHLY',        0x10);
+define('QUEST_FLAG_SPECIAL_SPELLCAST',      0x20);          // not documented in wiki! :[
+
 // GameObject
 define('OBJECT_DOOR',                       0);
 define('OBJECT_BUTTON',                     1);

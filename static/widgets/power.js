@@ -352,7 +352,7 @@ if (typeof $WowheadPower == "undefined") {
                         if (!document.scripts[i].src)
                             continue;
 
-                        var dmn = document.scripts[i].src.match(/power\/aowowPower.js\?(lang|locale)=(en|fr|de|es|ru)/i);
+                        var dmn = document.scripts[i].src.match(/widgets\/power.js\?(lang|locale)=(en|fr|de|es|ru)/i);
                         if (dmn) {
                             domain = dmn[2];
                             locale = $WH.g_getLocaleFromDomain(dmn[2]);

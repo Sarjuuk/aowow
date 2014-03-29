@@ -56,7 +56,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($spell->error)
         $smarty->notFound(Lang::$game['spell'], $_id);
 
-    $spell->addGlobalsToJScript($smarty, GLOBALINFO_ANY);
+    $spell->addGlobalsToJScript(GLOBALINFO_ANY);
 
     $_cat = $spell->getField('typeCat');
     $l    = [null, 'A', 'B', 'C'];
@@ -154,26 +154,21 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $infobox[] = '[li]'.(in_array($_cat, [-2, 7, -13]) ? sprintf(Lang::$game['reqLevel'], $_) : Lang::$game['level'].Lang::$colon.$_).'[/li]';
     }
 
-    if ($mask = $spell->getField('reqRaceMask'))            // race
+    // races
+    if ($_ = Lang::getRaceString($spell->getField('reqRaceMask'), $__, false, $n))
     {
-        $bar = [];
-        for ($i = 0; $i < 11; $i++)
-            if ($mask & (1 << $i))
-                $bar[] = (!fMod(count($bar) + 1, 3) ? '\n' : null).'[race='.($i + 1).']';
-
-        $t = count($bar) == 1 ? Lang::$game['race'] : Lang::$game['races'];
-        $infobox[] = '[li]'.Util::ucFirst($t).Lang::$colon.implode(', ', $bar).'[/li]';
+        if ($_ != Lang::$game['ra'][0])                     // omit: "both"
+        {
+            $t = $n == 1 ? Lang::$game['race'] : Lang::$game['races'];
+            $infobox[] = '[li]'.Util::ucFirst($t).Lang::$colon.$_.'[/li]';
+        }
     }
 
-    if ($mask = $spell->getField('reqClassMask'))           // class
+    // classes
+    if ($_ = Lang::getClassString($spell->getField('reqClassMask'), false, $n))
     {
-        $bar = [];
-        for ($i = 0; $i < 11; $i++)
-            if ($mask & (1 << $i))
-                $bar[] = (!fMod(count($bar) + 1, 3) ? '\n' : null).'[class='.($i + 1).']';
-
-        $t = count($bar) == 1 ? Lang::$game['class'] : Lang::$game['classes'];
-        $infobox[] = '[li]'.Util::ucFirst($t).Lang::$colon.implode(', ', $bar).'[/li]';
+        $t = $n == 1 ? Lang::$game['class'] : Lang::$game['classes'];
+        $infobox[] = '[li]'.Util::ucFirst($t).Lang::$colon.$_.'[/li]';
     }
 
     if ($_ = $spell->getField('spellFocusObject'))          // spellFocus
@@ -191,7 +186,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $rSkill = new SkillList(array(['id', $_]));
             if (!$rSkill->error)
             {
-                $rSkill->addGlobalsToJScript($smarty);
+                $rSkill->addGlobalsToJScript();
 
                 $bar = sprintf(Lang::$game['requires'], '[skill='.$rSkill->id.']');
                 if ($_ = $spell->getField('learnedAt'))
@@ -207,7 +202,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $rSpell = new SpellList(array(['id', $_]));
             if (!$rSpell->error)
             {
-                $rSpell->addGlobalsToJScript($smarty);
+                $rSpell->addGlobalsToJScript();
                 $infobox[] = '[li]'.Lang::$game['requires2'].' [spell='.$rSpell->id.'][/li]';
             }
         }
@@ -662,7 +657,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 'count' => 0
             );
 
-            $trig->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $trig->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
         }
 
         // Effect Name
@@ -1142,7 +1137,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $modSpells->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $modSpells->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
         }
     }
 
@@ -1194,7 +1189,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $modsSpell->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $modsSpell->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
         }
     }
 
@@ -1260,7 +1255,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $saSpells->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $saSpells->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
     }
 
     // tab: used by - itemset
@@ -1283,7 +1278,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $ubSets->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $ubSets->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
     }
 
     // tab: used by - item
@@ -1309,7 +1304,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $ubItems->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+        $ubItems->addGlobalsToJScript(GLOBALINFO_SELF);
     }
 
     // tab: used by - object
@@ -1332,7 +1327,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $ubObjects->addGlobalsToJScript($smarty);
+        $ubObjects->addGlobalsToJScript();
     }
 
     // tab: criteria of
@@ -1355,7 +1350,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $coAchievemnts->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $coAchievemnts->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
     }
 
     // tab: contains
@@ -1466,7 +1461,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     ]
                 );
 
-                $stacks->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $stacks->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
             }
         }
     }
@@ -1519,7 +1514,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $linked->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $linked->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
     }
 
 
@@ -1544,17 +1539,18 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $trigger->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+        $trigger->addGlobalsToJScript(GLOBALINFO_SELF);
     }
 
     // used by - creature
     // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
-    $smart      = DB::Aowow()->selectCol('SELECT entryOrGUID FROM smart_scripts WHERE entryorguid > 0 AND source_type = 0 AND action_type IN (11, 75, 85, 86) AND action_param1 = ?d', $_id);
     $conditions = array(
-        'OR',             ['id', $smart],
+        'OR',
         ['spell1', $_id], ['spell2', $_id], ['spell3', $_id], ['spell4', $_id],
         ['spell5', $_id], ['spell6', $_id], ['spell7', $_id], ['spell8', $_id]
     );
+    if ($_ = DB::Aowow()->selectCol('SELECT entryOrGUID FROM smart_scripts WHERE entryorguid > 0 AND source_type = 0 AND action_type IN (11, 75, 85, 86) AND action_param1 = ?d', $_id))
+        $conditions[] = ['id', $_];
 
     $ubCreature = new CreatureList($conditions);
     if (!$ubCreature->error)
@@ -1569,12 +1565,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $ubCreature->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+        $ubCreature->addGlobalsToJScript(GLOBALINFO_SELF);
     }
 
     // tab: questreward
-    $query = 'SELECT qt.id FROM quest_template qt JOIN ?_spell s ON s.id = qt.SourceSpellId OR s.id = qt.RewardSpellCast OR (s.id = qt.RewardSpell AND qt.RewardSpellCast = 0)
-              WHERE (s.effect1Id IN (36, 57) AND effect1TriggerSpell = ?d) OR (s.effect2Id IN (36, 57) AND effect2TriggerSpell = ?d) OR (s.effect3Id IN (36, 57) AND effect3TriggerSpell = ?d)';
+    $query = 'SELECT q.id FROM ?_quests q JOIN ?_spell s ON s.id = sourceSpellId OR s.id = rewardSpellCast OR (s.id = rewardSpell AND rewardSpellCast = 0)
+              WHERE (effect1Id IN (36, 57) AND effect1TriggerSpell = ?d) OR (effect2Id IN (36, 57) AND effect2TriggerSpell = ?d) OR (effect3Id IN (36, 57) AND effect3TriggerSpell = ?d)';
 
     if ($ids = DB::Aowow()->selectCol($query, $_id, $_id, $_id))
     {
@@ -1591,7 +1587,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 ]
             );
 
-            $tbQuest->addGlobalsToJScript($smarty);
+            $tbQuest->addGlobalsToJScript();
         }
     }
 
@@ -1601,7 +1597,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $teaches = new SpellList(array(['id', $ids]));
         if (!$teaches->error)
         {
-            $teaches->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $teaches->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
             $vis = ['level', 'schools'];
             $hid = [];
             if (!$teaches->hasSetFields(['skillLines']))
@@ -1670,7 +1666,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $tbTrainer = new CreatureList(array(0, ['ct.id', $list], ['ct.spawns', 0, '>'], ['ct.npcflag', 0x10, '&']));
             if (!$tbTrainer->error)
             {
-                $tbTrainer->addGlobalsToJscript($smarty);
+                $tbTrainer->addGlobalsToJscript();
                 $pageData['relTabs'][] = array(
                     'file'   => 'creature',
                     'data'   => $tbTrainer->getListviewData(),
@@ -1705,7 +1701,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $tbSpell->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+        $tbSpell->addGlobalsToJScript(GLOBALINFO_SELF);
     }
 
     // tab: taught by item (i'd like to precheck $spell->sources, but there is no source:item only complicated crap like "drop" and "vendor")
@@ -1731,7 +1727,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             ]
         );
 
-        $tbItem->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+        $tbItem->addGlobalsToJScript(GLOBALINFO_SELF);
     }
 
     // find associated NPC, Item and merge results

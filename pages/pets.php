@@ -22,7 +22,7 @@ if ($cat)
 if (!$smarty->loadCache($cacheKey, $pageData))
 {
     $pets = new PetList($cat ? array(['type', (int)$cat[0]]) : []);
-    $pets->addGlobalsToJscript($smarty, GLOBALINFO_RELATED);
+    $pets->addGlobalsToJScript(GLOBALINFO_RELATED);
 
     $lvPet = array(
         'file'   => 'pet',

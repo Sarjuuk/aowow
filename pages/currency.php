@@ -47,7 +47,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'typeId'     => $_id,
             'infobox'    => $infobox,
             'name'       => $currency->getField('name', true),
-            'headIcons'  => [$currency->getField('iconString')],
+            'headIcons'  => $_id == 104 ? ['inv_bannerpvp_02', 'inv_bannerpvp_01'] : [$currency->getField('iconString')],
             'redButtons' => array(
                 BUTTON_WOWHEAD => true,
                 BUTTON_LINKS   => true
@@ -87,7 +87,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
             if (!$soldBy->error)
             {
-                $soldBy->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+                $soldBy->addGlobalsToJScript(GLOBALINFO_SELF);
                 $sbData = $soldBy->getListviewData();
 
                 $extraCols = ['Listview.extraCols.stock', "Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
@@ -134,7 +134,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 if ($holidays)
                 {
                     $hObj = new WorldEventList(array(['id', array_keys($holidays)]));
-                    $hObj->addGlobalsToJscript($smarty);
+                    $hObj->addGlobalsToJscript();
                     foreach ($hObj->iterate() as $id => $tpl)
                     {
                         if ($_ = $tpl['holidayId'])
@@ -183,11 +183,20 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // tab: currency for
     if ($_id == 103)
+    {
+        $n = '?items&filter=cr=145;crs=1;crv=0';
         $w = 'iec.reqArenaPoints > 0';
+    }
     else if ($_id == 104)
+    {
+        $n = '?items&filter=cr=144;crs=1;crv=0';
         $w = 'iec.reqHonorPoints > 0';
+    }
     else
+    {
+        $n = in_array($_id, [42, 61, 81, 241, 121, 122, 123, 125, 126, 161, 201, 101, 102, 221, 301, 341]) ? '?items&filter=cr=158;crs='.$currency->getField('itemId').';crv=0' : null;
         $w = 'iec.reqItemId1 = '.$_itemId.' OR iec.reqItemId2 = '.$_itemId.' OR iec.reqItemId3 = '.$_itemId.' OR iec.reqItemId4 = '.$_itemId.' OR iec.reqItemId5 = '.$_itemId;
+    }
 
     $boughtBy = DB::Aowow()->selectCol('
         SELECT item FROM npc_vendor nv JOIN ?_itemExtendedCost iec ON iec.id = nv.extendedCost WHERE '.$w.'
@@ -199,7 +208,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $boughtBy = new ItemList(array(['id', $boughtBy]));
         if (!$boughtBy->error)
         {
-            $boughtBy->addGlobalsToJscript($smarty);
+            $boughtBy->addGlobalsToJscript();
 
             $pageData['relTabs'][] = array(
                 'file'   => 'item',
@@ -208,7 +217,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     'tabs'      => '$tabsRelated',
                     'name'      => '$LANG.tab_currencyfor',
                     'id'        => 'currency-for',
-                    'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]"
+                    'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]",
+                    'note'      => $n ? '$$WH.sprintf(LANG.lvnote_filterresults, \''.$n.'\')' : null
                 ]
             );
         }

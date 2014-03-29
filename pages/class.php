@@ -50,7 +50,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // specs
     $specList = [];
     $skills = new SkillList(array(['id', $cl->getField('skills')]));
-    $skills->addGlobalsToJscript($smarty);
+    $skills->addGlobalsToJscript();
     foreach ($skills->iterate() as $k => $__)
         $specList[$k] = '[icon name='.$skills->getField('iconString').'][url=?spells=7.'.$_id.'.'.$k.']'.$skills->getField('name', true).'[/url][/icon]';
 
@@ -112,7 +112,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
 
     $genSpells = new SpellList($conditions);
-    $genSpells->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+    $genSpells->addGlobalsToJScript(GLOBALINFO_SELF);
 
     $pageData['relTabs'][] = array(
         'file'   => 'spell',
@@ -140,7 +140,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
 
     $items = new ItemList($conditions);
-    $items->addGlobalsToJscript($smarty);
+    $items->addGlobalsToJscript();
 
     if (!$items->hasDiffFields(['requiredRace']))
         $hidden = "$['side']";
@@ -163,12 +163,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // Tab: Quests
     $conditions = array(
-        ['RequiredClasses', $_mask, '&'],
-        [['RequiredClasses', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']
+        ['reqClassMask', $_mask, '&'],
+        [['reqClassMask', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']
     );
 
     $quests = new QuestList($conditions);
-    $quests->addGlobalsToJscript($smarty);
+    $quests->addGlobalsToJscript();
 
     $pageData['relTabs'][] = array(
         'file'   => 'quest',
@@ -181,7 +181,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // Tab: Itemsets
     $sets = new ItemsetList(array(['classMask', $_mask, '&']));
-    $sets->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+    $sets->addGlobalsToJScript(GLOBALINFO_SELF);
 
     $pageData['relTabs'][] = array(
         'file'   => 'itemset',

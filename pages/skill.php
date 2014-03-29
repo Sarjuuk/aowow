@@ -60,7 +60,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $recipes = new SpellList($condition);               // also relevant for 3
         if (!$recipes->error)
         {
-            $recipes->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $recipes->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
             $pageData['relTabs'][] = array(
                 'file'   => 'spell',
@@ -86,7 +86,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $recipeItems = new ItemList($conditions);
         if (!$recipeItems->error)
         {
-            $recipeItems->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $recipeItems->addGlobalsToJScript(GLOBALINFO_SELF);
 
             if ($_ = array_search($_id, $filterRecipe))
                 $_ = sprintf(Util::$filterResultString, "?items=9.".$_);
@@ -116,7 +116,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $created = new ItemList(array(['i.id', $created], 0));
             if (!$created->error)
             {
-                $created->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+                $created->addGlobalsToJScript(GLOBALINFO_SELF);
 
                 if ($_ = array_search($_id, $filterItem))
                     $_ = sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=".$_.";crv=0");
@@ -144,7 +144,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $reqBy = new ItemList($conditions);
         if (!$reqBy->error)
         {
-            $reqBy->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $reqBy->addGlobalsToJScript(GLOBALINFO_SELF);
 
             if ($_ = array_search($_id, $filterItem))
                 $_ = sprintf(Util::$filterResultString, "?items&filter=cr=99:168;crs=".$_.":2;crv=0:0");
@@ -170,7 +170,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $reqBy = new ItemsetList($conditions);
         if (!$reqBy->error)
         {
-            $reqBy->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $reqBy->addGlobalsToJScript(GLOBALINFO_SELF);
 
             $pageData['relTabs'][] = array(
                 'file'   => 'itemset',
@@ -210,7 +210,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $reqRace  |= $spells->getField('reqRaceMask');
         }
 
-        $spells->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+        $spells->addGlobalsToJScript(GLOBALINFO_SELF);
 
         $pageData['relTabs'][] = array(
             'file'   => 'spell',
@@ -268,7 +268,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
             if (!$trainer->error)
             {
-                $trainer->addGlobalsToJscript($smarty);
+                $trainer->addGlobalsToJscript();
 
                 $pageData['relTabs'][] = array(
                     'file'   => 'creature',
@@ -307,7 +307,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $quests = new QuestList(array(['zoneOrSort', -$sort], 0));
             if (!$quests->error)
             {
-                $quests->addGlobalsToJScript($smarty);
+                $quests->addGlobalsToJScript();
                 $pageData['relTabs'][] = array(
                     'file'   => 'quest',
                     'data'   => $quests->getListviewData(),

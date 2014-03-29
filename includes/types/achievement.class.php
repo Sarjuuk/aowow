@@ -24,9 +24,9 @@ class AchievementList extends BaseType
         todo: evaluate TC custom-data-tables: a*_criteria_data should be merged on installation, a*_reward linked with mail_loot_template and achievement
     */
 
-    public function __construct($conditions = [])
+    public function __construct($conditions = [], $miscData = null)
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         // post processing
         foreach ($this->iterate() as &$_curTpl)
@@ -47,12 +47,12 @@ class AchievementList extends BaseType
         }
     }
 
-    public function addGlobalsToJscript(&$template, $addMask = GLOBALINFO_ANY)
+    public function addGlobalsToJScript($addMask = GLOBALINFO_ANY)
     {
         foreach ($this->iterate() as $__)
         {
             if ($addMask & GLOBALINFO_SELF)
-                $template->extendGlobalData(self::$type, [$this->id => array(
+                Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => array(
                     'icon' => $this->curTpl['iconString'],
                     'name' => $this->getField('name', true)
                 )]);
@@ -60,10 +60,10 @@ class AchievementList extends BaseType
             if ($addMask & GLOBALINFO_REWARDS)
             {
                 foreach ($this->curTpl['rewards'][TYPE_ITEM] as $_)
-                    $template->extendGlobalIds(TYPE_ITEM, $_);
+                    Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $_);
 
                 foreach ($this->curTpl['rewards'][TYPE_TITLE] as $_)
-                    $template->extendGlobalIds(TYPE_TITLE, $_);
+                    Util::$pageTemplate->extendGlobalIds(TYPE_TITLE, $_);
             }
         }
     }

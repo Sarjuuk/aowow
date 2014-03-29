@@ -124,7 +124,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $trigger = new GameObjectList(array(['linkedTrap', $_id]));
     if (!$trigger->error)
     {
-        $trigger->addGlobalsToJScript(Util::$pageTemplate);
+        $trigger->addGlobalsToJScript();
         $infobox[] = Lang::$gameObject['triggeredBy'].Lang::$colon.'[object='.$trigger->id.']';
     }
 
@@ -281,7 +281,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $summons = new SpellList($conditions);
     if (!$summons->error)
     {
-        $summons->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $summons->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
         $pageData['relTabs'][] = array(
             'file'   => 'spell',
@@ -300,7 +300,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $relSpells = new SpellList(array(['id', $_]));
         if (!$relSpells->error)
         {
-            $relSpells->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $relSpells->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
             $data = $relSpells->getListviewData();
 
             foreach ($data as $relId => $d)
@@ -324,7 +324,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $acvs = new AchievementList(array(['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT]], ['ac.value1', $_id]));
     if (!$acvs->error)
     {
-        $acvs->addGlobalsToJScript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $acvs->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
         $pageData['relTabs'][] = array(
             'file'   => 'achievement',
@@ -337,38 +337,49 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
     }
 
-    // tab: starts
-    $started = new QuestList(array(['goStart.id', $_id]));
-    if (!$started->error)
+    // tab: starts quest
+    // tab: ends quest
+    $startEnd = new QuestList(array(['qse.type', TYPE_OBJECT], ['qse.typeId', $_id]));
+    if (!$startEnd->error)
     {
-        $started->addGlobalsToJScript(Util::$pageTemplate);
+        $startEnd->addGlobalsToJScript();
+        $lvData = $startEnd->getListviewData();
+        $_ = [[], []];
 
-        $pageData['relTabs'][] = array(
-            'file'   => 'quest',
-            'data'   => $started->getListviewData(),
-            'params' => [
-                'tabs' => '$tabsRelated',
-                'name' => '$LANG.tab_starts',
-                'id'   => 'starts'
-            ]
-        );
-    }
+        foreach ($startEnd->iterate() as $id => $__)
+        {
+            $m = $startEnd->getField('method');
+            if ($m & 0x1)
+                $_[0][] = $lvData[$id];
+            if ($m & 0x2)
+                $_[1][] = $lvData[$id];
+        }
 
-    // tab: ends
-    $ends = new QuestList(array(['goEnd.id', $_id]));
-    if (!$ends->error)
-    {
-        $ends->addGlobalsToJScript(Util::$pageTemplate);
+        if ($_[0])
+        {
+            $pageData['relTabs'][] = array(
+                'file'   => 'quest',
+                'data'   => $_[0],
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'name' => '$LANG.tab_starts',
+                    'id'   => 'starts'
+                ]
+            );
+        }
 
-        $pageData['relTabs'][] = array(
-            'file'   => 'quest',
-            'data'   => $ends->getListviewData(),
-            'params' => [
-                'tabs' => '$tabsRelated',
-                'name' => '$LANG.tab_ends',
-                'id'   => 'ends'
-            ]
-        );
+        if ($_[1])
+        {
+            $pageData['relTabs'][] = array(
+                'file'   => 'quest',
+                'data'   => $_[1],
+                'params' => [
+                    'tabs' => '$tabsRelated',
+                    'name' => '$LANG.tab_ends',
+                    'id'   => 'ends'
+                ]
+            );
+        }
     }
 
     // tab: related quests
@@ -377,7 +388,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $relQuest = new QuestList(array(['id', $_]));
         if (!$relQuest->error)
         {
-            $relQuest->addGlobalsToJScript(Util::$pageTemplate);
+            $relQuest->addGlobalsToJScript();
 
             $pageData['relTabs'][] = array(
                 'file'   => 'quest',
@@ -435,14 +446,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     {
         $conditions = array(
             'OR',
-            ['requiredSourceItemId1', $reqIds], ['requiredSourceItemId2', $reqIds],
-            ['requiredSourceItemId3', $reqIds], ['requiredSourceItemId4', $reqIds],
-            ['requiredItemId1', $reqIds], ['requiredItemId2', $reqIds], ['requiredItemId3', $reqIds],
-            ['requiredItemId4', $reqIds], ['requiredItemId5', $reqIds], ['requiredItemId6', $reqIds]
+            ['reqSourceItemId1', $reqIds], ['reqSourceItemId2', $reqIds],
+            ['reqSourceItemId3', $reqIds], ['reqSourceItemId4', $reqIds],
+            ['reqItemId1', $reqIds], ['reqItemId2', $reqIds], ['reqItemId3', $reqIds],
+            ['reqItemId4', $reqIds], ['reqItemId5', $reqIds], ['reqItemId6', $reqIds]
         );
 
         $reqQuests = new QuestList($conditions);
-        $reqQuests->addGlobalsToJscript($smarty);
+        $reqQuests->addGlobalsToJscript();
 
         foreach ($reqQuests->iterate() as $qId => $__)
         {
@@ -459,7 +470,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $sameModel = new GameObjectList(array(['displayId', $object->getField('displayId')], ['id', $_id, '!']));
     if (!$sameModel->error)
     {
-        $sameModel->addGlobalsToJScript(Util::$pageTemplate);
+        $sameModel->addGlobalsToJScript();
 
         $pageData['relTabs'][] = array(
             'file'   => 'object',

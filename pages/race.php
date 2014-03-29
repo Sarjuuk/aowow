@@ -98,7 +98,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // Classes
     $classes = new CharClassList(array(['racemask', $_mask, '&']));
-    $classes->addGlobalsToJscript($smarty);
+    $classes->addGlobalsToJscript();
 
     $pageData['relTabs'][] = array(
         'file'   => 'class',
@@ -115,7 +115,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
 
     $tongues = new SpellList($conditions);
-    $tongues->addGlobalsToJscript($smarty);
+    $tongues->addGlobalsToJscript();
 
     $pageData['relTabs'][] = array(
         'file'   => 'spell',
@@ -135,7 +135,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
 
     $racials = new SpellList($conditions);
-    $racials->addGlobalsToJscript($smarty);
+    $racials->addGlobalsToJscript();
 
     $pageData['relTabs'][] = array(
         'file'   => 'spell',
@@ -150,14 +150,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // Quests
     $conditions = array(
-        ['RequiredRaces', $_mask, '&'],
-        [['RequiredRaces', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'],
-        [['RequiredRaces', RACE_MASK_HORDE, '&'], RACE_MASK_HORDE, '!'],
-        [['RequiredRaces', RACE_MASK_ALLIANCE, '&'], RACE_MASK_ALLIANCE, '!']
+        ['reqRaceMask', $_mask, '&'],
+        [['reqRaceMask', RACE_MASK_HORDE, '&'], RACE_MASK_HORDE, '!'],
+        [['reqRaceMask', RACE_MASK_ALLIANCE, '&'], RACE_MASK_ALLIANCE, '!']
     );
 
     $quests = new QuestList($conditions);
-    $quests->addGlobalsToJscript($smarty);
+    $quests->addGlobalsToJscript();
 
     $pageData['relTabs'][] = array(
         'file'   => 'quest',
@@ -178,7 +177,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
 
     $mounts = new ItemList($conditions);
-    $mounts->addGlobalsToJscript($smarty);
+    $mounts->addGlobalsToJscript();
 
     $pageData['relTabs'][] = array(
         'file'   => 'item',

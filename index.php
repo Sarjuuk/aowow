@@ -104,7 +104,9 @@ switch ($pageCall)
 
         break;
     case 'contactus':
-        die("not yet implemented:\n".print_r($_POST));      // 0:ok; 1:captchaInvalid; 2:tooLong; 3:noReasonGiven; 7:alreadyReported; other:prints String
+        print_r($_POST);
+        print_r($_GET);
+        die("not yet implemented!");                        // 0:ok; 1:captchaInvalid; 2:tooLong; 3:noReasonGiven; 7:alreadyReported; other:prints String
     case 'comment':
         if ($pageParam == 'rating')
             die('{"success":true,"error":"","up":7,"down":9}');

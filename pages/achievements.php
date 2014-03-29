@@ -94,7 +94,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     );
 
     // fill g_items, g_titles, g_achievements
-    $acvList->addGlobalsToJscript($smarty);
+    $acvList->addGlobalsToJscript();
 
     // if we are have different cats display field
     if ($acvList->hasDiffFields(['category']))

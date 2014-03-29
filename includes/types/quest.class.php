@@ -11,27 +11,26 @@ class QuestList extends BaseType
 
     public          $requires  = [];
     public          $rewards   = [];
+    public          $choices   = [];
 
-    protected       $queryBase = 'SELECT *, qt.id AS ARRAY_KEY FROM quest_template qt';
+    protected       $queryBase = 'SELECT q.*, q.id AS ARRAY_KEY FROM ?_quests q';
     protected       $queryOpts = array(
-                        'qt'        => [['lq', 'xp']],
-                        'lq'        => ['j' => ['locales_quest lq ON qt.id = lq.id', true]],
-                        'xp'        => ['j' => ['?_questxp xp ON qt.level = xp.id', true], 's' => ', xp.*'],
-                        'goStart'   => ['j' => 'gameobject_questrelation goStart ON goStart.quest = qt.id'], // started by GO
-                        'goEnd'     => ['j' => 'gameobject_involvedrelation goEnd ON goEnd.quest = qt.id'],  // ends at GO
-                        'npcStart'  => ['j' => 'creature_questrelation npcStart ON npcStart.quest = qt.id'], // started by NPC
-                        'npcEnd'    => ['j' => 'creature_involvedrelation npcEnd ON npcEnd.quest = qt.id'],  // ends at NPC
-                        'itemStart' => ['j' => ['?_items itemStart ON itemStart.startQuest = qt.id', true], 'g' => 'qt.id']  // started by item .. grouping required, as the same quest may have multiple starter
+                        'q'   => [],
+                        'rsc' => ['j' => '?_spell rsc ON q.rewardSpellCast = rsc.id'],      // limit rewardSpellCasts
+                        'qse' => ['j' => '?_quests_startend qse ON q.id = qse.questId', 's' => ', qse.method'],    // groupConcat..?
                     );
 
-    public function __construct($conditions = [])
+    public function __construct($conditions = [], $miscData = null)
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
+
+        // i don't like this very much
+        $currencies = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, itemId FROM ?_currencies');
 
         // post processing
         foreach ($this->iterate() as $id => &$_curTpl)
         {
-            $_curTpl['cat1'] = $_curTpl['ZoneOrSort'];      // should probably be in a method...
+            $_curTpl['cat1'] = $_curTpl['zoneOrSort'];      // should probably be in a method...
             $_curTpl['cat2'] = 0;
 
             foreach (Util::$questClasses as $k => $arr)
@@ -43,81 +42,97 @@ class QuestList extends BaseType
                 }
             }
 
-            // set xp
-            $_curTpl['xp'] = $_curTpl['Field'.$_curTpl['RewardXPId']];
-            for ($i = 0; $i < 9; $i++)
-                unset($_curTpl['Field'.$i]);
-
             // store requirements
-            $data = [];
+            $requires = [];
             for ($i = 1; $i < 7; $i++)
             {
-                if ($_ = $_curTpl['RequiredItemId'.$i])
-                    $data[TYPE_ITEM][] = $_;
+                if ($_ = $_curTpl['reqItemId'.$i])
+                    $requires[TYPE_ITEM][] = $_;
 
                 if ($i > 4)
                     continue;
 
-                if ($_curTpl['RequiredNpcOrGo'.$i] > 0)
-                    $data[TYPE_NPC][] = $_curTpl['RequiredNpcOrGo'.$i];
-                else if ($_curTpl['RequiredNpcOrGo'.$i] < 0)
-                    $data[TYPE_OBJECT][] = -$_curTpl['RequiredNpcOrGo'.$i];
+                if ($_curTpl['reqNpcOrGo'.$i] > 0)
+                    $requires[TYPE_NPC][] = $_curTpl['reqNpcOrGo'.$i];
+                else if ($_curTpl['reqNpcOrGo'.$i] < 0)
+                    $requires[TYPE_OBJECT][] = -$_curTpl['reqNpcOrGo'.$i];
 
-                if ($_ = $_curTpl['RequiredSourceItemId'.$i])
-                    $data[TYPE_ITEM][] = $_;
+                if ($_ = $_curTpl['reqSourceItemId'.$i])
+                    $requires[TYPE_ITEM][] = $_;
             }
-            if ($data)
-                $this->requires[$id] = $data;
+            if ($requires)
+                $this->requires[$id] = $requires;
 
             // store rewards
-            $data = [];
+            $rewards = [];
+            $choices = [];
 
-            if ($_ = $_curTpl['RewardTitleId'])
-                $data[TYPE_TITLE][] = $_;
+            if ($_ = $_curTpl['rewardTitleId'])
+                $rewards[TYPE_TITLE][] = $_;
+
+            if ($_ = $_curTpl['rewardHonorPoints'])
+                $rewards[TYPE_CURRENCY][104] = $_;
+
+            if ($_ = $_curTpl['rewardArenaPoints'])
+                $rewards[TYPE_CURRENCY][103] = $_;
 
             for ($i = 1; $i < 7; $i++)
             {
-                if ($_ = $_curTpl['RewardChoiceItemId'.$i])
-                    $data[TYPE_ITEM][] = $_;
+                if ($_ = $_curTpl['rewardChoiceItemId'.$i])
+                    $choices[TYPE_ITEM][$_] = $_curTpl['rewardChoiceItemCount'.$i];
 
                 if ($i > 5)
                     continue;
 
-                if ($_ = $_curTpl['RewardFactionId'.$i])
-                    $data[TYPE_FACTION][] = $_;
+                if ($_ = $_curTpl['rewardFactionId'.$i])
+                    $rewards[TYPE_FACTION][$_] = $_curTpl['rewardFactionValue'.$i];
 
                 if ($i > 4)
                     continue;
 
-                if ($_ = $_curTpl['RewardItemId'.$i])
-                    $data[TYPE_ITEM][] = $_;
+                if ($_ = $_curTpl['rewardItemId'.$i])
+                {
+                    $qty = $_curTpl['rewardItemCount'.$i];
+                    if (in_array($_, $currencies))
+                        $rewards[TYPE_CURRENCY][array_search($_, $currencies)] = $qty;
+                    else
+                        $rewards[TYPE_ITEM][$_] = $qty;
+                }
             }
-            if ($data)
-                $this->rewards[$id] = $data;
+            if ($rewards)
+                $this->rewards[$id] = $rewards;
+
+            if ($choices)
+                $this->choices[$id] = $choices;
         }
     }
 
     // static use START
     public static function getName($id)
     {
-        $n = DB::Aowow()->SelectRow('
-            SELECT
-                title,
-                title_loc2,
-                title_loc3,
-                title_loc6,
-                title_loc8
-            FROM
-                quest_template q,
-                locales_quest l
-            WHERE
-                q.id = l.id AND
-                q.id = ?d',
-            $id
-        );
-        return Util::localizedString($n, 'title');
+        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_quests WHERE id = ?d', $id);
+        return Util::localizedString($n, 'name');
     }
     // static use END
+
+    public function isRepeatable()
+    {
+        return $this->curTpl['flags'] & QUEST_FLAG_REPEATABLE || $this->curTpl['specialFlags'] & QUEST_FLAG_SPECIAL_REPEATABLE;
+    }
+
+    public function isDaily($strict = false)
+    {
+        if ($strict)
+            return $this->curTpl['flags'] & QUEST_FLAG_DAILY;
+        else
+            return $this->curTpl['flags'] & (QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY) || $this->curTpl['specialFlags'] & QUEST_FLAG_SPECIAL_MONTHLY;
+    }
+
+    // using reqPlayerKills and rewardHonor as a crutch .. has TC this even implemented..?
+    public function isPvPEnabled()
+    {
+        return $this->curTpl['reqPlayerKills'] || $this->curTpl['rewardHonorPoints'] || $this->curTpl['rewardArenaPoints'];
+    }
 
     public function getSourceData()
     {
@@ -126,7 +141,7 @@ class QuestList extends BaseType
         foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                "n"  => $this->getField('Title', true),
+                "n"  => $this->getField('name', true),
                 "t"  => TYPE_QUEST,
                 "ti" => $this->id,
                 "c"  => $this->curTpl['cat1'],
@@ -147,73 +162,68 @@ class QuestList extends BaseType
                 'category'  => $this->curTpl['cat1'],
                 'category2' => $this->curTpl['cat2'],
                 'id'        => $this->id,
-                'level'     => $this->curTpl['Level'],
-                'reqlevel'  => $this->curTpl['MinLevel'],
-                'name'      => $this->getField('Title', true),
-                'side'      => Util::sideByRaceMask($this->curTpl['RequiredRaces']),
+                'level'     => $this->curTpl['level'],
+                'reqlevel'  => $this->curTpl['minLevel'],
+                'name'      => $this->getField('name', true),
+                'side'      => Util::sideByRaceMask($this->curTpl['reqRaceMask']),
                 'wflags'    => 0x0,
-                'xp'        => $this->curTpl['xp']
+                'xp'        => $this->curTpl['rewardXP']
             );
 
-            $rewards = [];
-            for ($i = 1; $i < 5; $i++)
-                if ($this->curTpl['RewardItemId'.$i])
-                    $rewards[] = [$this->curTpl['RewardItemId'.$i], $this->curTpl['RewardItemCount'.$i]];
+            if (!empty($this->rewards[$this->id][TYPE_CURRENCY]))
+                foreach ($this->rewards[$this->id][TYPE_CURRENCY] as $iId => $qty)
+                    $data[$this->id]['currencyrewards'][] = [$iId, $qty];
 
-            $choices = [];
-            for ($i = 1; $i < 7; $i++)
-                if ($this->curTpl['RewardChoiceItemId'.$i])
-                    $choices[] = [$this->curTpl['RewardChoiceItemId'.$i], $this->curTpl['RewardChoiceItemCount'.$i]];
+            if (!empty($this->rewards[$this->id][TYPE_ITEM]))
+                foreach ($this->rewards[$this->id][TYPE_ITEM] as $iId => $qty)
+                    $data[$this->id]['itemrewards'][] = [$iId, $qty];
 
-            if ($rewards)
-                $data[$this->id]['itemrewards'] = $rewards;
+            if (!empty($this->choices[$this->id][TYPE_ITEM]))
+                foreach ($this->choices[$this->id][TYPE_ITEM] as $iId => $qty)
+                    $data[$this->id]['itemchoices'][] = [$iId, $qty];
 
-            if ($choices)
-                $data[$this->id]['itemchoices'] = $choices;
-
-            if ($_ = $this->curTpl['RewardTitleId'])
+            if ($_ = $this->curTpl['rewardTitleId'])
                 $data[$this->id]['titlereward'] = $_;
 
-            if ($_ = $this->curTpl['Type'])
+            if ($_ = $this->curTpl['type'])
                 $data[$this->id]['type'] = $_;
 
-            if ($_ = $this->curTpl['RequiredClasses'])
+            if ($_ = $this->curTpl['reqClassMask'])
                 $data[$this->id]['reqclass'] = $_;
 
-            if ($_ = ($this->curTpl['RequiredRaces'] & RACE_MASK_ALL))
+            if ($_ = ($this->curTpl['reqRaceMask'] & RACE_MASK_ALL))
                 if ((($_ & RACE_MASK_ALLIANCE) != RACE_MASK_ALLIANCE) && (($_ & RACE_MASK_HORDE) != RACE_MASK_HORDE))
                     $data[$this->id]['reqrace'] = $_;
 
-            if ($_ = $this->curTpl['RewardOrRequiredMoney'])
+            if ($_ = $this->curTpl['rewardOrReqMoney'])
                 if ($_ > 0)
                     $data[$this->id]['money'] = $_;
 
-            if ($this->curTpl['Flags'] & 0x1000)
+            if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)
                 $data[$this->id]['daily'] = true;
 
-            if ($this->curTpl['Flags'] & 0x8000)
+            if ($this->curTpl['flags'] & QUEST_FLAG_WEEKLY)
                 $data[$this->id]['weekly'] = true;
 
-            // flags & 64: Hostile - there are quests, that flag the player for pvp when taken .. where is that set..?
             // wflags: &1: disabled/historical; &32: AutoAccept; &64: Hostile(?)
-            if ($this->curTpl['Flags'] & 0x4000)            // Unavailable (todo (med): get disables)
+            // todo (med): also get disables
+            if ($this->curTpl['flags'] & QUEST_FLAG_UNAVAILABLE)
             {
                 $data[$this->id]['historical'] = true;      // post 5.0
                 $data[$this->id]['wflags']    |= 0x1;       // pre 5.0
             }
 
-            if ($this->curTpl['Flags'] & 0x80000)           // Auto Accept
+            if ($this->curTpl['flags'] & QUEST_FLAG_AUTO_ACCEPT)
                 $data[$this->id]['wflags'] |= 0x20;
+
+            if ($this->isPvPEnabled())
+                $data[$this->id]['wflags'] |= 0x60;         // not sure why this flag also requires auto-accept to be set
 
             $data[$this->id]['reprewards'] = [];
             for ($i = 1; $i < 6; $i++)
             {
-                $foo = $this->curTpl['RewardFactionId'.$i];
-                $bar = $this->curTpl['RewardFactionValueIdOverride'.$i] / 100;
-
-                if (!$bar && ($_ = $this->curTpl['RewardFactionValueId'.$i]))
-                    $bar = Util::$questFactionReward[abs($_)] * ($_ < 0 ? -1 : 1);
-
+                $foo = $this->curTpl['rewardFactionId'.$i];
+                $bar = $this->curTpl['rewardFactionValue'.$i];
                 if ($foo && $bar)
                 {
                     $data[$this->id]['reprewards'][] = [$foo, $bar];
@@ -227,7 +237,7 @@ class QuestList extends BaseType
         return $data;
     }
 
-    private function parseText($type = 'Objectives')
+    public function parseText($type = 'objectives', $jsEscaped = true)
     {
         $text = $this->getField($type, true);
         if (!$text)
@@ -235,7 +245,10 @@ class QuestList extends BaseType
 
         $text = Util::parseHtmlText($text);
 
-        return Util::jsEscape($text);
+        if ($jsEscaped)
+            $text = Util::jsEscape($text);
+
+        return $text;
     }
 
     public function renderTooltip()
@@ -246,8 +259,8 @@ class QuestList extends BaseType
         if (isset($this->tooltips[$this->id]))
             return $this->tooltips[$this->id];
 
-        $title = Util::jsEscape($this->getField('Title', true));
-        $level = $this->curTpl['Level'];
+        $title = Util::jsEscape($this->getField('name', true));
+        $level = $this->curTpl['level'];
         if ($level < 0)
             $level = 0;
 
@@ -256,7 +269,7 @@ class QuestList extends BaseType
         {
             $level = sprintf(Lang::$quest['questLevel'], $level);
 
-            if ($this->curTpl['Flags'] & 0x1000)                // daily
+            if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)  // daily
                 $level .= ' '.Lang::$quest['daily'];
 
             $x .= '<table><tr><td><table width="100%"><tr><td><b class="q">'.$title.'</b></td><th><b class="q0">'.$level.'</b></th></tr></table></td></tr></table>';
@@ -265,14 +278,15 @@ class QuestList extends BaseType
             $x .= '<table><tr><td><b class="q">'.$title.'</b></td></tr></table>';
 
 
-        $x .= '<table><tr><td><br />'.$this->parseText('Objectives').'<br /><br /><span class="q">'.Lang::$quest['requirements'].Lang::$colon.'</span>';
+        $x .= '<table><tr><td><br />'.$this->parseText('objectives');
 
 
+        $xReq = '';
         for ($i = 1; $i < 5; $i++)
         {
-            $ot     = $this->getField('ObjectiveText'.$i, true);
-            $rng    = $this->curTpl['RequiredNpcOrGo'.$i];
-            $rngQty = $this->curTpl['RequiredNpcOrGoCount'.$i];
+            $ot     = $this->getField('objectiveText'.$i, true);
+            $rng    = $this->curTpl['reqNpcOrGo'.$i];
+            $rngQty = $this->curTpl['reqNpcOrGoCount'.$i];
 
             if ($rngQty < 1 && (!$rng || $ot))
                 continue;
@@ -282,22 +296,29 @@ class QuestList extends BaseType
             else
                 $name = $rng > 0 ? CreatureList::getName($rng) : GameObjectList::getName(-$rng);
 
-            $x .= '<br /> - '.Util::jsEscape($name).($rngQty > 1 ? ' x '.$rngQty : null);
+            $xReq .= '<br /> - '.Util::jsEscape($name).($rngQty > 1 ? ' x '.$rngQty : null);
         }
 
         for ($i = 1; $i < 7; $i++)
         {
-            $ri    = $this->curTpl['RequiredItemId'.$i];
-            $riQty = $this->curTpl['RequiredItemCount'.$i];
+            $ri    = $this->curTpl['reqItemId'.$i];
+            $riQty = $this->curTpl['reqItemCount'.$i];
 
             if (!$ri || $riQty < 1)
                 continue;
 
-            $x .= '<br /> - '.Util::jsEscape(ItemList::getName($ri)).($riQty > 1 ? ' x '.$riQty : null);
+            $xReq .= '<br /> - '.Util::jsEscape(ItemList::getName($ri)).($riQty > 1 ? ' x '.$riQty : null);
         }
 
-        if ($et = $this->getField('EndText', true))
-            $x .= '<br /> - '.$et;
+        if ($et = $this->getField('end', true))
+            $xReq .= '<br /> - '.Util::jsEscape($et);
+
+        if ($_ = $this->getField('rewardOrReqMoney'))
+            if ($_ < 0)
+                $xReq .= '<br /> - '.Lang::$quest['money'].Lang::$colon.Util::formatMoney(abs($_));
+
+        if ($xReq)
+            $x .= '<br /><br /><span class="q">'.Lang::$quest['requirements'].Lang::$colon.'</span>'.$xReq;
 
         $x .= '</td></tr></table>';
 
@@ -306,7 +327,7 @@ class QuestList extends BaseType
         return $x;
     }
 
-    public function addGlobalsToJScript(&$template, $addMask = GLOBALINFO_ANY)
+    public function addGlobalsToJScript($addMask = GLOBALINFO_ANY)
     {
         foreach ($this->iterate() as $__)
         {
@@ -314,27 +335,31 @@ class QuestList extends BaseType
             {
                 // items
                 for ($i = 1; $i < 5; $i++)
-                    if ($this->curTpl['RewardItemId'.$i] > 0)
-                        $template->extendGlobalIds(TYPE_ITEM, $this->curTpl['RewardItemId'.$i]);
+                    if ($this->curTpl['rewardItemId'.$i] > 0)
+                        Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $this->curTpl['rewardItemId'.$i]);
 
                 for ($i = 1; $i < 7; $i++)
-                    if ($this->curTpl['RewardChoiceItemId'.$i] > 0)
-                        $template->extendGlobalIds(TYPE_ITEM, $this->curTpl['RewardChoiceItemId'.$i]);
+                    if ($this->curTpl['rewardChoiceItemId'.$i] > 0)
+                        Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $this->curTpl['rewardChoiceItemId'.$i]);
 
                 // spells
-                if ($this->curTpl['RewardSpell'] > 0)
-                    $template->extendGlobalIds(TYPE_SPELL, $this->curTpl['RewardSpell']);
+                if ($this->curTpl['rewardSpell'] > 0)
+                    Util::$pageTemplate->extendGlobalIds(TYPE_SPELL, $this->curTpl['rewardSpell']);
 
-                if ($this->curTpl['RewardSpellCast'] > 0)
-                    $template->extendGlobalIds(TYPE_SPELL, $this->curTpl['RewardSpellCast']);
+                if ($this->curTpl['rewardSpellCast'] > 0)
+                    Util::$pageTemplate->extendGlobalIds(TYPE_SPELL, $this->curTpl['rewardSpellCast']);
 
                 // titles
-                if ($this->curTpl['RewardTitleId'] > 0)
-                    $template->extendGlobalIds(TYPE_TITLE, $this->curTpl['RewardTitleId']);
+                if ($this->curTpl['rewardTitleId'] > 0)
+                    Util::$pageTemplate->extendGlobalIds(TYPE_TITLE, $this->curTpl['rewardTitleId']);
+
+                // currencies
+                if ($_ = @$this->rewards[$this->id][TYPE_CURRENCY])
+                    Util::$pageTemplate->extendGlobalIds(TYPE_CURRENCY, array_keys($_));
             }
 
             if ($addMask & GLOBALINFO_SELF)
-                $template->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('Title', true)]]);
+                Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
         }
     }
 }
@@ -342,41 +367,25 @@ class QuestList extends BaseType
 
 class QuestListFilter extends Filter
 {
-    protected $enums         = array();
-    protected $genericFilter = array();
-
-/*
-        { id: 34,  name: 'availabletoplayers',      type: 'yn' },
-        { id: 37,  name: 'classspecific',           type: 'classs' },
-        { id: 38,  name: 'racespecific',            type: 'race' },
-        { id: 27,  name: 'daily',                   type: 'yn' },
-        { id: 28,  name: 'weekly',                  type: 'yn' },
-        { id: 29,  name: 'repeatable',              type: 'yn' },
-        { id: 30,  name: 'id',                      type: 'num', before: 'name' },
-        { id: 44,  name: 'countsforloremaster_stc', type: 'yn' },
-        { id: 9,   name: 'objectiveearnrepwith',    type: 'faction-any+none' },
-        { id: 33,  name: 'relatedevent',            type: 'event-any+none' },
-        { id: 5,   name: 'sharable',                type: 'yn' },
-        { id: 11,  name: 'suggestedplayers',        type: 'num' },
-        { id: 6,   name: 'timer',                   type: 'num' },
-        { id: 42,  name: 'flags',               type: 'flags',  staffonly: true },
-        { id: 2,   name: 'experiencegained',    type: 'num' },
-        { id: 43,  name: 'currencyrewarded',    type: 'currency' },
-        { id: 45,  name: 'titlerewarded',       type: 'yn' },
-        { id: 23,  name: 'itemchoices',         type: 'num' },
-        { id: 22,  name: 'itemrewards',         type: 'num' },
-        { id: 3,   name: 'moneyrewarded',       type: 'num' },
-        { id: 4,   name: 'spellrewarded',       type: 'yn' },
-        { id: 1,   name: 'increasesrepwith',    type: 'faction' },
-        { id: 10,  name: 'decreasesrepwith',    type: 'faction' },
-        { id: 7,   name: 'firstquestseries',    type: 'yn' },
-        { id: 15,  name: 'lastquestseries',     type: 'yn' },
-        { id: 16,  name: 'partseries',          type: 'yn' },
-        { id: 25,  name: 'hascomments',         type: 'yn' },
-        { id: 18,  name: 'hasscreenshots',      type: 'yn' },
-        { id: 36,  name: 'hasvideos',           type: 'yn' },
-
-*/
+    public    $extraOpts     = [];
+    protected $enums         = array(                       // massive enums could be put here, if you want to restrict inputs further to be valid IDs instead of just integers
+        37 => [null, 1, 2, 3, 4, 5, 6, 7, 8,    9, null, 11, true, false],
+        38 => [null, 1, 2, 3, 4, 5, 6, 7, 8, null,   10, 11, true, false],
+    );
+    protected $genericFilter = array(
+        27 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_DAILY                ], // daily
+        28 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_WEEKLY               ], // weekly
+        29 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_REPEATABLE           ], // repeatable
+        30 => [FILTER_CR_NUMERIC,   'id',               null,                       true], // id
+         5 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_SHARABLE             ], // sharable
+        11 => [FILTER_CR_NUMERIC,   'suggestedPlayers',                                 ], // suggestedplayers
+         6 => [FILTER_CR_NUMERIC,   'timeLimit',                                        ], // timer
+        42 => [FILTER_CR_STAFFFLAG, 'flags',                                            ], // flags
+        45 => [FILTER_CR_BOOLEAN,   'rewardTitleId',                                    ], // titlerewarded
+         2 => [FILTER_CR_NUMERIC,   'rewardXP',                                         ], // experiencegained
+         3 => [FILTER_CR_NUMERIC,   'rewardOrReqMoney',                                 ], // moneyrewarded
+        33 => [FILTER_CR_ENUM,      'holidayId',                                        ], // relatedevent
+    );
 
     protected function createSQLForCriterium(&$cr)
     {
@@ -392,39 +401,156 @@ class QuestListFilter extends Filter
 
         switch ($cr[0])
         {
+            case  1:                                        // increasesrepwith
+                if ($this->isSaneNumeric($cr[1]) && $cr[1] > 0)
+                {
+                    return [
+                        'OR',
+                        ['AND', ['rewardFactionId1', $cr[1]], ['rewardFactionValue1', 0, '>']],
+                        ['AND', ['rewardFactionId2', $cr[1]], ['rewardFactionValue2', 0, '>']],
+                        ['AND', ['rewardFactionId3', $cr[1]], ['rewardFactionValue3', 0, '>']],
+                        ['AND', ['rewardFactionId4', $cr[1]], ['rewardFactionValue4', 0, '>']],
+                        ['AND', ['rewardFactionId5', $cr[1]], ['rewardFactionValue5', 0, '>']]
+                    ];
+                }
+                break;
+            case 10:                                        // decreasesrepwith
+                if ($this->isSaneNumeric($cr[1]) && $cr[1] > 0)
+                {
+                    return [
+                        'OR',
+                        ['AND', ['rewardFactionId1', $cr[1]], ['rewardFactionValue1', 0, '<']],
+                        ['AND', ['rewardFactionId2', $cr[1]], ['rewardFactionValue2', 0, '<']],
+                        ['AND', ['rewardFactionId3', $cr[1]], ['rewardFactionValue3', 0, '<']],
+                        ['AND', ['rewardFactionId4', $cr[1]], ['rewardFactionValue4', 0, '<']],
+                        ['AND', ['rewardFactionId5', $cr[1]], ['rewardFactionValue5', 0, '<']]
+                    ];
+                }
+                break;
+            case 43:                                        // currencyrewarded
+                if ($this->isSaneNumeric($cr[1]) && $cr[1] > 0)
+                {
+                    return [
+                        'OR',
+                        ['rewardItemId1', $cr[1]], ['rewardItemId2', $cr[1]], ['rewardItemId3', $cr[1]], ['rewardItemId4', $cr[1]],
+                        ['rewardChoiceItemId1', $cr[1]], ['rewardChoiceItemId2', $cr[1]], ['rewardChoiceItemId3', $cr[1]], ['rewardChoiceItemId4', $cr[1]], ['rewardChoiceItemId5', $cr[1]], ['rewardChoiceItemId6', $cr[1]]
+                    ];
+                }
+                break;
+            case 34:                                        // availabletoplayers
+                if ($this->int2Bool($cr[1]))
+                {
+                    if ($cr[1])
+                        return ['AND', [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0], [['flags', QUEST_FLAG_UNAVAILABLE, '&'], 0]];
+                    else
+                        return ['OR', ['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], ['flags', QUEST_FLAG_UNAVAILABLE, '&']];
+                }
+                break;
+            case 23:                                        // itemchoices [op] [int]
+                if (!$this->isSaneNumeric($cr[2], false) || !$this->int2Op($cr[1]))
+                    break;
+
+                $this->extraOpts['q']['s'][] = ', (IF(rewardChoiceItemId1, 1, 0) + IF(rewardChoiceItemId2, 1, 0) + IF(rewardChoiceItemId3, 1, 0) + IF(rewardChoiceItemId4, 1, 0) + IF(rewardChoiceItemId5, 1, 0) + IF(rewardChoiceItemId6, 1, 0)) as numChoices';
+                $this->extraOpts['q']['h'][] = 'numChoices '.$cr[1].' '.$cr[2];
+                return [1];
+            case 22:                                        // itemrewards [op] [int]
+                if (!$this->isSaneNumeric($cr[2], false) || !$this->int2Op($cr[1]))
+                    break;
+
+                $this->extraOpts['q']['s'][] = ', (IF(rewardItemId1, 1, 0) + IF(rewardItemId2, 1, 0) + IF(rewardItemId3, 1, 0) + IF(rewardItemId4, 1, 0)) as numRewards';
+                $this->extraOpts['q']['h'][] = 'numRewards '.$cr[1].' '.$cr[2];
+                return [1];
+            case 44:                                        // countsforloremaster_stc [bool]
+                if ($this->int2Bool($cr[1]))
+                {
+                    if ($cr[1])
+                        return ['AND', ['zoneOrSort', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE , '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY , '&'], 0]];
+                    else
+                        return ['OR', ['zoneOrSort', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE , '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY , '&']];;
+                }
+
+                break;
+            case  4:                                        // spellrewarded [bool]
+                if ($this->int2Bool($cr[1]))
+                {
+                    if ($cr[1])
+                        return ['OR', ['sourceSpellId', 0, '>'], ['rewardSpell', 0, '>'], ['rsc.effect1Id', SpellList::$effects['teach']], ['rsc.effect2Id', SpellList::$effects['teach']], ['rsc.effect3Id', SpellList::$effects['teach']]];
+                    else
+                        return ['AND', ['sourceSpellId', 0], ['rewardSpell', 0], ['rewardSpellCast', 0]];
+                }
+                break;
+            case  9:                                        // objectiveearnrepwith [enum]
+                $_ = intVal($cr[1]);
+                if ($_ > 0)
+                    return ['OR', ['reqFactionId1', $_], ['reqFactionId2', $_]];
+                else if ($cr[1] == -2323)                   // any
+                    return ['OR', ['reqFactionId1', 0, '>'], ['reqFactionId2', 0, '>']];
+                else if ($cr[1] == -2324)                   // none
+                    return ['AND', ['reqFactionId1', 0], ['reqFactionId2', 0]];
+
+                break;
+            case 37:                                        // classspecific [enum]
+                $_ = @$this->enums[$cr[0]][$cr[1]];
+                if ($_ !== null)
+                {
+                    if ($_ === true)
+                        return ['AND', ['reqClassMask', 0, '!'], [['reqClassMask', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']];
+                    else if ($_ === false)
+                        return ['OR', ['reqClassMask', 0], [['reqClassMask', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL]];
+                    else if (is_int($_))
+                        return ['AND', ['reqClassMask', (1 << ($_ - 1)), '&'], [['reqClassMask', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']];
+                }
+                break;
+            case 38:                                        // racespecific [enum]
+                $_ = @$this->enums[$cr[0]][$cr[1]];
+                if ($_ !== null)
+                {
+                    if ($_ === true)
+                        return ['AND', ['reqRaceMask', 0, '!'], [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'], [['reqRaceMask', RACE_MASK_ALLIANCE, '&'], RACE_MASK_ALLIANCE, '!'], [['reqRaceMask', RACE_MASK_HORDE, '&'], RACE_MASK_HORDE, '!']];
+                    else if ($_ === false)
+                        return ['OR', ['reqRaceMask', 0], ['reqRaceMask', RACE_MASK_ALL], ['reqRaceMask', RACE_MASK_ALLIANCE], ['reqRaceMask', RACE_MASK_HORDE]];
+                    else if (is_int($_))
+                        return ['AND', ['reqRaceMask', (1 << ($_ - 1)), '&'], [['reqRaceMask', RACE_MASK_ALLIANCE, '&'], RACE_MASK_ALLIANCE, '!'], [['reqRaceMask', RACE_MASK_HORDE, '&'], RACE_MASK_HORDE, '!']];
+                }
+                break;
             case 19:                                        // startsfrom [enum]
                 switch ($cr[1])
                 {
                     case 1:                                 // npc
-                        return ['npcStart.id', null, '!'];
-                        break;
+                        return ['AND', ['qse.type', TYPE_NPC], ['qse.method', 0x1, '&']];
                     case 2:                                 // object
-                        return ['goStart.id', null, '!'];
-                        break;
+                        return ['AND', ['qse.type', TYPE_OBJECT], ['qse.method', 0x1, '&']];
                     case 3:                                 // item
-                        return ['itemStart.id', null, '!'];
+                        return ['AND', ['qse.type', TYPE_ITEM], ['qse.method', 0x1, '&']];
                 }
                 break;
             case 21:                                        // endsat [enum]
                 switch ($cr[1])
                 {
                     case 1:                                 // npc
-                        return ['npcEnd.id', null, '!'];
-                        break;
+                        return ['AND', ['qse.type', TYPE_NPC], ['qse.method', 0x2, '&']];
                     case 2:                                 // object
-                        return ['goEnd.id', null, '!'];
-                        break;
+                        return ['AND', ['qse.type', TYPE_OBJECT], ['qse.method', 0x2, '&']];
                 }
                 break;
-            // case 24:                                        // lacksstartend [bool] cost an impossible amount of resources
-                // if ($this->int2Bool($cr[1]))
-                // {
-                    // if ($cr[1])
-                        // return ['OR', ['AND', ['npcStart.id', null], ['goStart.id', null], ['itemStart.id', null]], ['AND', ['npcEnd.id', null], ['goEnd.id', null]]];
-                    // else
-                        // return ['AND', ['OR', ['npcStart.id', null, '!'], ['goStart.id', null, '!'], ['itemStart.id', null, '!']], ['OR', ['npcEnd.id', null, '!'], ['goEnd.id', null, '!']]];
-                // }
-                // break;
+            case 24:                                        // lacksstartend [bool]
+                $missing = DB::Aowow()->selectCol('SELECT questId, max(method) a, min(method) b FROM ?_quests_startend GROUP BY questId HAVING (a | b) <> 3');
+                if ($this->int2Bool($cr[1]))
+                {
+                    if ($cr[1])
+                        return ['id', $missing];
+                    else
+                        return ['id', $missing, '!'];
+                }
+                break;
+            case  7:                                        // firstquestseries
+            case 15:                                        // lastquestseries
+            case 16:                                        // partseries
+/* todo */      return [1];                                 // self-joining eats substential amounts of time: should restructure that and also incorporate reqQ and openQ cases from infobox
+            case 25:                                        // hascomments
+            case 18:                                        // hasscreenshots
+            case 36:                                        // hasvideos
+/* todo */      return [1];
             default:
                 break;
         }
@@ -442,14 +568,14 @@ class QuestListFilter extends Filter
         // name
         if (isset($_v['na']))
         {
-            $name        = User::$localeId ? 'title_loc'.User::$localeId      : 'title';
-            $objectives  = User::$localeId ? 'objectives_loc'.User::$localeId : 'objectives';
-            $description = User::$localeId ? 'details_loc'.User::$localeId    : 'details';
-
+            $_ = [];
             if (isset($_v['ex']) && $_v['ex'] == 'on')
-                $parts[] = ['OR', [$name, $_v['na']], [$objectives, $_v['na']], [$description, $_v['na']]];
+                $_ = $this->modularizeString(['name_loc'.User::$localeId, 'objectives_loc'.User::$localeId, 'details_loc'.User::$localeId]);
             else
-                $parts[] = [$name, $_v['na']];
+                $_ = $this->modularizeString(['name_loc'.User::$localeId]);
+
+            if ($_)
+                $parts[] = $_;
         }
 
         // level min
@@ -491,8 +617,8 @@ class QuestListFilter extends Filter
         // side
         if (isset($_v['si']))
         {
-            $ex    = [['requiredRaces', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'];
-            $notEx = ['OR', ['requiredRaces', 0], [['requiredRaces', RACE_MASK_ALL, '&'], RACE_MASK_ALL]];
+            $ex    = [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'];
+            $notEx = ['OR', ['reqRaceMask', 0], [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL]];
 
             switch ($_v['si'])
             {
@@ -500,20 +626,30 @@ class QuestListFilter extends Filter
                     $parts[] = $notEx;
                     break;
                 case  2:
-                    $parts[] = ['OR', $notEx, ['requiredRaces', RACE_MASK_HORDE, '&']];
+                    $parts[] = ['OR', $notEx, ['reqRaceMask', RACE_MASK_HORDE, '&']];
                     break;
                 case -2:
-                    $parts[] = ['AND', $ex,   ['requiredRaces', RACE_MASK_HORDE, '&']];
+                    $parts[] = ['AND', $ex,   ['reqRaceMask', RACE_MASK_HORDE, '&']];
                     break;
                 case  1:
-                    $parts[] = ['OR', $notEx, ['requiredRaces', RACE_MASK_ALLIANCE, '&']];
+                    $parts[] = ['OR', $notEx, ['reqRaceMask', RACE_MASK_ALLIANCE, '&']];
                     break;
                 case -1:
-                    $parts[] = ['AND', $ex,   ['requiredRaces', RACE_MASK_ALLIANCE, '&']];
+                    $parts[] = ['AND', $ex,   ['reqRaceMask', RACE_MASK_ALLIANCE, '&']];
                     break;
                 default:
                     unset($_v['si']);
             }
+        }
+
+        // type [list]
+        if (isset($_v['ty']))
+        {
+            $_ = (array)$_v['ty'];
+            if (!array_diff($_, [0, 1, 21, 41, 62, 81, 82, 83, 84, 85, 88, 89]))
+                $parts[] = ['type', $_];
+            else
+                unset($_v['ty']);
         }
 
         return $parts;

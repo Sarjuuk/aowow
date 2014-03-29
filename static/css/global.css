@@ -17,6 +17,12 @@ form
     display: inline;
 }
 
+p
+{
+    margin: 0px;
+    padding: 0px;
+}
+
 img, iframe
 {
     border: 0;
@@ -1113,6 +1119,17 @@ span.menu-buttons span.hassubmenu {
     margin-right: 4px;
 }
 
+.icontab
+{
+    border-collapse: collapse;
+    margin-top: 4px;
+}
+
+.icontab tr
+{
+    background: none !important;
+}
+
 .icontab th, .icontab td
 {
     border: 0 !important;
@@ -1129,6 +1146,28 @@ span.menu-buttons span.hassubmenu {
 .icontab th
 {
     padding: 0 3px 0 0;
+}
+
+.icontab-box
+{
+    margin-top: 0;
+    border-spacing: 0 6px;
+    border-collapse: separate;
+}
+
+.icontab-box th
+{
+    padding: 0 0 0 4px;
+}
+
+.icontab-box td
+{
+    background-color: #141414;
+    padding: 0 6px;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
 }
 
 .random-enchantments
@@ -3272,6 +3311,11 @@ div.captcha-center
     color: #cccccc;
 }
 
+#description.left, #article-generic.left
+{
+    clear:left;
+}
+
 h1.h1-icon
 {
     padding-top: 5px;
@@ -3603,13 +3647,13 @@ a:hover, a.open, .infobox li div, .text b
     border-bottom: 1px solid #404040;
 }
 
-.iconlist, .icontab
+.iconlist
 {
     border-collapse: collapse;
     margin-top: 4px;
 }
 
-.icontab tr, .listview-mode-tiled td.empty-cell:hover
+.listview-mode-tiled td.empty-cell:hover
 {
     background: none !important;
 }

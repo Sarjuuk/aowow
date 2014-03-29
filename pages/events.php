@@ -30,7 +30,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     }
 
     $events = new WorldEventList($condition);
-    $events->addGlobalsToJScript($smarty);
+    $events->addGlobalsToJScript();
 
     $deps = [];
     foreach ($events->iterate() as $__)

@@ -6,7 +6,6 @@ class Lang
     public static $main;
     public static $account;
     public static $game;
-    public static $error;
 
     public static $search;
     public static $profiler;
@@ -133,8 +132,14 @@ class Lang
             return self::$game['rep'][REP_HONORED];
         else if ($pts >= 2999)
             return self::$game['rep'][REP_FRIENDLY];
-        else /* if ($pts >= 1) */
+        else if ($pts >= 0)
             return self::$game['rep'][REP_NEUTRAL];
+        else if ($pts >= -3000)
+            return self::$game['rep'][REP_UNFRIENDLY];
+        else if ($pts >= -6000)
+            return self::$game['rep'][REP_HOSTILE];
+        else
+            return self::$game['rep'][REP_HATED];
     }
 
     public static function getRequiredItems($class, $mask, $short = true)
@@ -213,30 +218,36 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getClassString($classMask)
+    public static function getClassString($classMask, $asHTML = true, &$n = 0)
     {
         $classMask &= CLASS_MASK_ALL;                       // clamp to available classes..
 
         if ($classMask == CLASS_MASK_ALL)                   // available to all classes
             return false;
 
-        $tmp = [];
-        $i   = 1;
+        $tmp  = [];
+        $i    = 1;
+        $base = $asHTML ? '<a href="?class=%d" class="c%1$d">%2$s</a>' : '[class=%d]';
+        $br   = $asHTML ? '' : '\n';
 
         while ($classMask)
         {
             if ($classMask & (1 << ($i - 1)))
             {
-                $tmp[] = '<a href="?class='.$i.'" class="c'.$i.'">'.self::$game['cl'][$i].'</a>';
+                $tmp[] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['cl'][$i]);
                 $classMask &= ~(1 << ($i - 1));
+
+                if (!$asHTML)
+                    Util::$pageTemplate->extendGlobalIds(TYPE_CLASS, $i);
             }
             $i++;
         }
 
+        $n = count($tmp);
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString($raceMask)
+    public static function getRaceString($raceMask, &$side = 0, $asHTML = true, &$n = 0)
     {
         $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
 
@@ -244,17 +255,15 @@ class Lang
             return false;
 
         $tmp  = [];
-        $side = 0;
         $i    = 1;
+        $base = $asHTML ? '<a href="?race=%d" class="q1">%s</a>' : '[race=%d]';
+        $br   = $asHTML ? '' : '\n';
 
         if (!$raceMask)
-            return array('side' => SIDE_BOTH,     'name' => self::$game['ra'][0]);
-
-        if ($raceMask == RACE_MASK_HORDE)
-            return array('side' => SIDE_HORDE,    'name' => self::$game['ra'][-2]);
-
-        if ($raceMask == RACE_MASK_ALLIANCE)
-            return array('side' => SIDE_ALLIANCE, 'name' => self::$game['ra'][-1]);
+        {
+            $side |= SIDE_BOTH;
+            return self::$game['ra'][0];
+        }
 
         if ($raceMask & RACE_MASK_HORDE)
             $side |= SIDE_HORDE;
@@ -262,17 +271,27 @@ class Lang
         if ($raceMask & RACE_MASK_ALLIANCE)
             $side |= SIDE_ALLIANCE;
 
+        if ($raceMask == RACE_MASK_HORDE)
+            return self::$game['ra'][-2];
+
+        if ($raceMask == RACE_MASK_ALLIANCE)
+            return self::$game['ra'][-1];
+
         while ($raceMask)
         {
             if ($raceMask & (1 << ($i - 1)))
             {
-                $tmp[] = '<a href="?race='.$i.'" class="q1">'.self::$game['ra'][$i].'</a>';
+                $tmp[] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['ra'][$i]);
                 $raceMask &= ~(1 << ($i - 1));
+
+                if (!$asHTML)
+                    Util::$pageTemplate->extendGlobalIds(TYPE_RACE, $i);
             }
             $i++;
         }
 
-        return array ('side' => $side, 'name' => implode(', ', $tmp));
+        $n = count($tmp);
+        return implode(', ', $tmp);
     }
 }
 

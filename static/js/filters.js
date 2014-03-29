@@ -287,7 +287,7 @@ var fi_filters = {
         { id: 11,  name: 'suggestedplayers',        type: 'num' },
         { id: 6,   name: 'timer',                   type: 'num' },
 
-        { id: 1,   name: 'sepstaffonly',                        staffonly: true },
+        { id: 999, name: 'sepstaffonly',                        staffonly: true },
         { id: 42,  name: 'flags',               type: 'flags',  staffonly: true },
 
         { id: 13,  name: 'sepgainsrewards' },
@@ -311,7 +311,7 @@ var fi_filters = {
         { id: 18,  name: 'hasscreenshots',      type: 'yn' },
         { id: 36,  name: 'hasvideos',           type: 'yn' },
 
-        { id: 1,   name: 'sepmisc' },
+        { id: 9999,name: 'sepmisc' },
         { id: 24,  name: 'lacksstartend',       type: 'yn'}
     ],
 

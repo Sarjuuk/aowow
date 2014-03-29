@@ -28,18 +28,19 @@ class CurrencyList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$template, $addMask = 0)
+    public function addGlobalsToJScript($addMask = 0)
     {
         foreach ($this->iterate() as $__)
         {
+            // todo (low): find out, why i did this in the first place
             if ($this->id == 104)                           // in case of honor commit sebbuku
-                $icon = ['alliance', 'horde'];
+                $icon = ['inv_bannerpvp_02', 'inv_bannerpvp_01']; // ['alliance', 'horde'];
             else if ($this->id == 103)                      // also arena-icon diffs from item-icon
                 $icon = ['money_arena', 'money_arena'];
             else
                 $icon = [$this->curTpl['iconString'], $this->curTpl['iconString']];
 
-            $template->extendGlobalData(self::$type, [$this->id => array(
+            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => array(
                 'name' => $this->getField('name', true),
                 'icon' => $icon
             )]);

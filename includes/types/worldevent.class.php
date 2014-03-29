@@ -148,11 +148,11 @@ class WorldEventList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript(&$template, $addMask = 0)
+    public function addGlobalsToJScript($addMask = 0)
     {
         foreach ($this->iterate() as $__)
         {
-            $template->extendGlobalData(self::$type, [$this->id => array(
+            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => array(
                 'name' => $this->getField('name', true),
                 'icon' => $this->curTpl['iconString']
             )]);

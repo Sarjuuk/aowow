@@ -4,29 +4,9 @@
         <tr><td><div class="infobox-spacer"></div><div id="infobox-contents0"></div></td></tr>
 {/if}
 {if !empty($series)}
-        <tr><th id="infobox-series">{$lang.series}</th></tr>
-        <tr><td>
-            <div class="infobox-spacer"></div>
-            <table class="series">
-    {foreach from=$series key='idx' item='itr'}
-                <tr>
-                    <th>{$idx+1}.</th>
-                    <td><div>
-        {foreach name=itemItr from=$itr item='i'}
-            {if $i.side == 1}<span class="icon-alliance-padded">{elseif $i.side == 2}<span class="icon-horde-padded">{/if}
-                        {if ($i.typeId == $typeId)}
-                            <b>{$i.name}</b>
-                        {else}
-                            <a href="?{$i.typeStr}={$i.typeId}">{$i.name}</a>
-                        {/if}
-            {if $i.side != 3}</span>{/if}
-            {if $smarty.foreach.itemItr.last}{else}<br />{/if}
-        {/foreach}
-                    </div></td>
-                </tr>
+    {foreach from=$series item=s}
+        {include file="bricks/series.tpl" list=$s[0] listTitle=$s[1]}
     {/foreach}
-            </table>
-        </td></tr>
 {/if}
         <tr><th id="infobox-screenshots">{$lang.screenshots}</th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-ss"></div></td></tr>

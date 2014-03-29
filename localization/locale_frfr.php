@@ -30,7 +30,7 @@ $lang = array(
         'userProfiles'  => "Vos personnages",      // translate.google :x
         'pageNotFound'  => "Ce %s n'existe pas.",
         'gender'        => "Genre",
-        'sex'           => [null, 'Homme', 'Femme'],
+        'sex'           => [null, "Homme", "Femme"],
         'players'       => "Joueurs",
         'quickFacts'    => "En bref",
         'screenshots'   => "Captures d'écran",
@@ -65,7 +65,7 @@ $lang = array(
         'disabled'      => "[Disabled]",
         'disabledHint'  => "[Cannot be attained or completed]",
         'serverside'    => "[Serverside]",
-        'serversideHint' => "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
+        'serversideHint'=> "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
 
         // red buttons
         'links'         => "Liens",
@@ -74,6 +74,8 @@ $lang = array(
         'findUpgrades'  => "Trouver des améliorations...",
 
         // misc Tools
+        'errPageTitle'  => "Page non trouvée",
+        'nfPageTitle'   => "Erreur",
         'subscribe'     => "S'abonner",
         'mostComments'  => ["Hier", "Derniers %d jours"],
         'utilities'     => array(
@@ -92,7 +94,7 @@ $lang = array(
         'cappedHint'    => 'Conseil: <a href="javascript:;" onclick="fi_presetDetails();">Enlever</a> un facteur pour les statistiques au maximum tel que le score de touche.',
         'groupBy'       => "Groupé par",
         'gb'            => array(
-            ['Aucun', 'none'],         ['Emplacement', 'slot'],       ['Niveau', 'level'],     ['Source', 'source']
+            ["Aucun", "none"],         ["Emplacement", "slot"],       ["Niveau", "level"],     ["Source", "source"]
         ),
         'compareTool'   => "Outil de comparaison d'objets",
         'talentCalc'    => "Calculateur de Talents",
@@ -168,33 +170,35 @@ $lang = array(
         'zone'          => "zone",
         'zones'         => "Zones",
 
+        'honorPoints'   => "Points d'honneur",
+        'arenaPoints'   => "Points d'arène",
         'heroClass'     => "Classe de héros",
         'resource'      => "Ressource",
         'resources'     => "Ressources",
         'role'          => "Role",
         'roles'         => "Roles",
         'specs'         => "Specialisations",
-        '_roles'        => ['Soigneur', 'DPS mêlée', 'DPS à distance', 'Tank'],
+        '_roles'        => ["Soigneur", "DPS mêlée", "DPS à distance", "Tank"],
 
-        'modes'         => ['Standard / Normal 10', 'Héroïque / Normal 25', '10 héroïque', '25 héroïque'],
-        'expansions'    => array("Classique", "The Burning Crusade", "Wrath of the Lich King"),
-        'stats'         => array("Force", "Agilité", "Endurance", "Intelligence", "Esprit"),
+        'modes'         => ["Standard / Normal 10", "Héroïque / Normal 25", "10 héroïque", "25 héroïque"],
+        'expansions'    => ["Classique", "The Burning Crusade", "Wrath of the Lich King"],
+        'stats'         => ["Force", "Agilité", "Endurance", "Intelligence", "Esprit"],
         'sources'       => array(
             null,                       "Fabriqué",                 "Butin",                    "JcJ",                      "Quête",                    "Vendeur",              "Maître",               "Découverte",
             "Échange d'un code",        "Talent",                   "Débutant",                 "Événement",                "Haut fait"
         ),
         'languages'     => array(
-            1 => "Orc",         2 => "Darnassien",      3 => "Taurahe",     6 => "Nain",            7 => "Commun",          8 => "Démoniaque",      9 => "Titan",           10 => "Thalassien",
+             1 => "Orc",         2 => "Darnassien",      3 => "Taurahe",     6 => "Nain",            7 => "Commun",          8 => "Démoniaque",      9 => "Titan",          10 => "Thalassien",
             11 => "Draconique", 12 => "Kalimag",        13 => "Gnome",      14 => "Troll",          33 => "Bas-parler",     35 => "Draeneï",        36 => "Zombie",         37 => "Binaire gnome",      38 => "Binaire gobelin"
         ),
-        'gl'            => array(null, "Majeur", "Mineur"),
-        'si'            => array(1 => "Alliance", -1 => "Alliance seulement", 2 => "Horde", -2 => "Horde seulement", 3 => "Les deux"),
-        'resistances'   => array(null, 'Résistance au Sacré', 'Résistance au Feu', 'Résistance à la Nature', 'Résistance au Givre', 'Résistance à l\'Ombre', 'Résistance aux Arcanes'),
-        'dt'            => array(null, "Magie", "Malédiction", "Maladie", "Poison", "Camouflage", "Invisibilité", null, null, "Enrager"),
-        'sc'            => array("Physique", "Sacré", "Feu", "Nature", "Givre", "Ombre", "Arcane"),
-        'cl'            => array(null, "Guerrier", "Paladin", "Chasseur", "Voleur", "Prêtre", "DeathChevalier de la mort", "Chaman", "Mage", "Démoniste", null, "Druide"),
-        'ra'            => array(-2 => "Horde", -1 => "Alliance", "Les deux", "Humain", "Orc", "Nain", "Elfe de la nuit", "Mort-vivant", "Tauren", "Gnome", "Troll", null, "Elfe de sang", "Draeneï"),
-        'rep'           => array("Détesté", "Hostile", "Inamical", "Neutre", "Amical", "Honoré", "Révéré", "Exalté"),
+        'gl'            => [null, "Majeur", "Mineur"],
+        'si'            => [1 => "Alliance", -1 => "Alliance seulement", 2 => "Horde", -2 => "Horde seulement", 3 => "Les deux"],
+        'resistances'   => [null, 'Résistance au Sacré', 'Résistance au Feu', 'Résistance à la Nature', 'Résistance au Givre', 'Résistance à l\'Ombre', 'Résistance aux Arcanes'],
+        'dt'            => [null, "Magie", "Malédiction", "Maladie", "Poison", "Camouflage", "Invisibilité", null, null, "Enrager"],
+        'sc'            => ["Physique", "Sacré", "Feu", "Nature", "Givre", "Ombre", "Arcane"],
+        'cl'            => [null, "Guerrier", "Paladin", "Chasseur", "Voleur", "Prêtre", "DeathChevalier de la mort", "Chaman", "Mage", "Démoniste", null, "Druide"],
+        'ra'            => [-2 => "Horde", -1 => "Alliance", "Les deux", "Humain", "Orc", "Nain", "Elfe de la nuit", "Mort-vivant", "Tauren", "Gnome", "Troll", null, "Elfe de sang", "Draeneï"],
+        'rep'           => ["Détesté", "Hostile", "Inamical", "Neutre", "Amical", "Honoré", "Révéré", "Exalté"],
         'st'            => array(
             "Défaut",           "Forme de félin",               "Arbre de vie",                 "Forme de voyage",              "Aquatic Form",
             "Forme d'ours",     null,                           null,                           "Forme d'ours redoutable",      null,
@@ -215,8 +219,8 @@ $lang = array(
             "Bestiole",                 "Mécanique",                "Non spécifié",             "Totem",                    "Familier pacifique",       "Nuage de gaz"
         ),
         'fa'            => array(
-            1 => "Loup",                2 => "Félin",               3 => "Araignée",            4 => "Ours",                5 => "Sanglier",            6 => "Crocilisque",         7 => "Charognard",          8 => "Crabe",
-            9 => "Gorille",             11 => "Raptor",             12 => "Haut-trotteur",      20 => "Scorpide",           21 => "Tortue",             24 => "Chauve-souris",      25 => "Hyène",              26 => "Oiseau de proie",
+             1 => "Loup",                2 => "Félin",               3 => "Araignée",            4 => "Ours",                5 => "Sanglier",            6 => "Crocilisque",         7 => "Charognard",          8 => "Crabe",
+             9 => "Gorille",            11 => "Raptor",             12 => "Haut-trotteur",      20 => "Scorpide",           21 => "Tortue",             24 => "Chauve-souris",      25 => "Hyène",              26 => "Oiseau de proie",
             27 => "Serpent des vents",  30 => "Faucon-dragon",      31 => "Ravageur",           32 => "Traqueur dim.",      33 => "Sporoptère",         34 => "Raie du Néant",      35 => "Serpent",            37 => "Phalène",
             38 => "Chimère",            39 => "Diablosaure",        41 => "Silithide",          42 => "Ver",                43 => "Rhinocéros",         44 => "Guêpe",              45 => "Chien du Magma",     46 => "Esprit de bête"
         ),
@@ -227,12 +231,6 @@ $lang = array(
             "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
             "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
         ),
-    ),
-    'error' => array(
-        'errNotFound'   => "Page not found",
-        'errPage'       => "What? How did you... nevermind that!\n<br>\n<br>\nIt appears that the page you have requested cannot be found. At least, not in this dimension.\n<br>\n<br>\nPerhaps a few tweaks to the <span class=\"q4\">[WH-799 Major Confabulation Engine]</span> may result in the page suddenly making an appearance!\n<div class=\"pad\"></div>\n<div class=\"pad\"></div>\nOr, you can try \n<a href=\"http://www.wowhead.com/?aboutus#contact\">contacting us</a>\n- the stability of the WH-799 is debatable, and we wouldn't want another accident...",
-        'goStart'       => "Return to the <a href=\"index.php\">homepage</a>",
-        'goForum'       => "Feedback <a href=\"?forums&board=1\">forum</a>",
     ),
     'account'  => [],
     'gameObject' => array(
@@ -278,7 +276,7 @@ $lang = array(
         'end'           => "Fin",
         'interval'      => "Intervalle",
         'inProgress'    => "L'évènement est présentement en cours",
-        'category'      => array("Non classés", "Vacances", "Récurrent", "Joueur ctr. Joueur")
+        'category'      => ["Non classés", "Vacances", "Récurrent", "Joueur ctr. Joueur"]
     ),
     'achievement' => array(
         'criteria'      => "Critères",
@@ -286,7 +284,7 @@ $lang = array(
         'series'        => "Série",
         'outOf'         => "sur",
         'criteriaType'  => "Criterium Type-Id:",
-        'itemReward'    => "Vous recevrez :",
+        'itemReward'    => "Vous recevrez",
         'titleReward'   => "Vous devriez recevoir le titre \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "tué",
         'reqNumCrt'     => "Nécessite"
@@ -321,23 +319,75 @@ $lang = array(
         )
     ),
     'quest' => array(
-        'questLevel'    => 'Niveau %s',
-        'daily'         => 'Journalière',
-        'requirements'  => 'Conditions',
+        'questLevel'    => "Niveau %s",
+        'requirements'  => "Conditions",
+        'reqMoney'      => "Argent requis",
+        'money'         => "Argent",
+        'additionalReq' => "Conditions additionnelles requises pour obtenir cette quête",
+        'reqRepWith'    => 'Votre reputation avec <a href="?faction=%d">%s</a> doît être %s %s',
+        'reqRepMin'     => "d'au moins",
+        'reqRepMax'     => "moins que",
+        'progress'      => "Progrès",
+        'provided'      => "Fourni",
+        'providedItem'  => "Objet fourni",
+        'completion'    => "Achèvement",
+        'description'   => "Description",
+        'playerSlain'   => "Joueurs tués",
+        'profession'    => "Métier",
+        'timer'         => "Temps",
+        'loremaster'    => "Maitre des traditions",
+        'suggestedPl'   => "Joueurs suggérés",
+        'keepsPvpFlag'  => "Vous garde en mode JvJ",
+        'daily'         => "Journalière",
+        'weekly'        => "Chaque semaine",
+        'monthly'       => "Mensuel",
+        'sharable'      => "Partageable",
+        'notSharable'   => "Non partageable",
+        'repeatable'    => "Répétable",
+        'reqQ'          => "Requiert",
+        'reqQDesc'      => "Pour avoir cette quête, vous devez avoir completé ces quêtes",
+        'reqOneQ'       => "Requiert",
+        'reqOneQDesc'   => "Pour avoir accès à cette quête vous devez accomplir une des quêtes suivantes",
+        'opensQ'        => "Donne accès aux quêtes",
+        'opensQDesc'    => "Terminer cette quête est requis pour commencer ces quetês",
+        'closesQ'       => "Empêche l'accès aux quêtes",
+        'closesQDesc'   => "Terminer cette quête ferme l'accès aux quêtes",
+        'enablesQ'      => "Autorise",
+        'enablesQDesc'  => "Quand cette quête est active, vous pouvez obtenir cette quete",
+        'enabledByQ'    => "Autorisée par",
+        'enabledByQDesc'=> "Vous pouvez faire cette quête seulement quand cette quête est active",
+        'gainsDesc'     => "Lors de l'achèvement de cette quête vous gagnerez",
+        'theTitle'      => '"%s"',                          // empty on purpose!
+        'mailDelivery'  => "Vous recevrez cette lettre %s",
+        'mailIn'        => "après %s",
+        'unavailable'   => "Cette quête est marquée comme obsolète et ne peut être obtenue ou accomplie.",
+        'experience'    => "points d'expérience",
+        'expConvert'    => "(ou %s si completé au niveau %d)",
+        'expConvert2'   => "%s si completé au niveau %d",
+        'chooseItems'   => "Vous pourrez choisir une de ces récompenses",
+        'receiveItems'  => "Vous recevrez",
+        'receiveAlso'   => "Vous recevrez également",
+        'spellCast'     => "Vous allez être la cible du sort suivant",
+        'spellLearn'    => "Vous apprendrez",
+        'bonusTalents'  => "points de talent",
+        'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> affichés)',
         'questInfo'     => array(
-             0 => 'Standard',            1 => 'Groupe',             21 => 'Vie',                41 => 'JcJ',                62 => 'Raid',               81 => 'Donjon',             82 => 'Évènement mondial',
-            83 => 'Légendaire',         84 => 'Escorte',            85 => 'Héroïque',           88 => 'Raid (10)',          89 => 'Raid (25)'
+             0 => "Standard",            1 => "Groupe",             21 => "Vie",                41 => "JcJ",                62 => "Raid",               81 => "Donjon",             82 => "Évènement mondial",
+            83 => "Légendaire",         84 => "Escorte",            85 => "Héroïque",           88 => "Raid (10)",          89 => "Raid (25)"
+        ),
+        'cat'           => array(
+            // todo: after zones
         )
     ),
     'title' => array(
         'cat'           => array(
-            'Général',      'Joueur ctr. Joueur',    'Réputation',       'Donjons & raids',     'Quêtes',       'Métiers',      'Évènements mondiaux'
+            "Général",      "Joueur ctr. Joueur",    "Réputation",       "Donjons & raids",     "Quêtes",       "Métiers",      "Évènements mondiaux"
         )
     ),
     'skill' => array(
         'cat'           => array(
-            -6 => 'Compagnons',         -5 => 'Montures',           -4 => 'Traits raciaux',     5 => 'Caractéristiques',    6 => "Compétences d'armes", 7 => 'Compétences de classe', 8 => 'Armures utilisables',
-             9 => 'Compétences secondaires', 10 => 'Langues',       11 => 'Métiers'
+            -6 => "Compagnons",         -5 => "Montures",           -4 => "Traits raciaux",     5 => "Caractéristiques",    6 => "Compétences d'armes", 7 => "Compétences de classe", 8 => "Armures utilisables",
+             9 => "Compétences secondaires", 10 => "Langues",       11 => "Métiers"
         )
     ),
     'currency' => array(
@@ -447,7 +497,7 @@ $lang = array(
         'cat'           => array(
               7 => "Techniques",
             -13 => "Glyphes",
-            -11 => array("Compétences", 8 => "Armure", 10 => "Langues", 6 => "Armes"),
+            -11 => ["Compétences", 8 => "Armure", 10 => "Langues", 6 => "Armes"],
              -4 => "Traits raciaux",
              -2 => "Talents",
              -6 => "Compagnons",
@@ -460,22 +510,22 @@ $lang = array(
                 768 => "Serpent",           656 => "Serpent des vents", 783 => "Silithide",             765 => "Sporoptère",                251 => "Tortue",                766 => "Traqueur dim.",         784 => "Ver",
                 761 => "Gangregarde",       189 => "Chasseur corrompu", 188 => "Diablotin",             205 => "Succube",                   204 => "Marcheur du Vide"
             ),
-             -7 => array("Talents de familiers", 411 => "Ruse", 410 => "Férocité", 409 => "Tenacité"),
+             -7 => ["Talents de familiers", 411 => "Ruse", 410 => "Férocité", 409 => "Tenacité"],
              11 => array(
                 "Métiers",
                 171 => "Alchimie",
-                164 => array("Forge", 9788 => "Fabricant d'armures", 9787 => "Fabricant d'armes", 17041 => "Maître fabricant de haches", 17040 => "Maître fabricant de marteaux", 17039 => "Maître fabricant d'épées"),
+                164 => ["Forge", 9788 => "Fabricant d'armures", 9787 => "Fabricant d'armes", 17041 => "Maître fabricant de haches", 17040 => "Maître fabricant de marteaux", 17039 => "Maître fabricant d'épées"],
                 333 => "Enchantement",
-                202 => array("Ingénierie", 20219 => "Ingénieur gnome", 20222 => "Ingénieur goblin"),
+                202 => ["Ingénierie", 20219 => "Ingénieur gnome", 20222 => "Ingénieur goblin"],
                 182 => "Herboristerie",
                 773 => "Calligraphie",
                 755 => "Joaillerie",
-                165 => array("Travail du cuir", 10656 => "Travail du cuir d'écailles de dragon", 10658 => "Travail du cuir élémentaire", 10660 => "Travail du cuir tribal"),
+                165 => ["Travail du cuir", 10656 => "Travail du cuir d'écailles de dragon", 10658 => "Travail du cuir élémentaire", 10660 => "Travail du cuir tribal"],
                 186 => "Minage",
                 393 => "Dépeçage",
-                197 => array("Couture", 26798 => "Couture d'étoffe lunaire", 26801 => "Couture de tisse-ombre", 26797 => "Couture du feu-sorcier"),
+                197 => ["Couture", 26798 => "Couture d'étoffe lunaire", 26801 => "Couture de tisse-ombre", 26797 => "Couture du feu-sorcier"],
             ),
-              9 => array("Compétences secondaires", 185 => "Cuisine", 129 => "Secourisme", 356 => "Pêche", 762 => "Monte"),
+              9 => ["Compétences secondaires", 185 => "Cuisine", 129 => "Secourisme", 356 => "Pêche", 762 => "Monte"],
              -9 => "Habilité de MJ",
              -8 => "Habilité de PNJ",
               0 => "Non classés"
@@ -492,27 +542,27 @@ $lang = array(
             20 => "Cannes à pêche",                 14 => "Divers"
         ),
         'subClassMasks'      => array(
-            0x02A5F3 => 'Arme de mêlée',            0x0060 => 'Bouclier',                   0x04000C => 'Arme à distance',          0xA091 => 'Arme de mêlée à une main'
+            0x02A5F3 => "Arme de mêlée",            0x0060 => "Bouclier",                   0x04000C => "Arme à distance",          0xA091 => "Arme de mêlée à une main"
         ),
         'traitShort'    => array(
             'atkpwr'    => "PA",                    'rgdatkpwr' => "PAD",                   'splpwr'    => "PS",                    'arcsplpwr' => "PArc",                  'firsplpwr' => "PFeu",
             'frosplpwr' => "PGiv",                  'holsplpwr' => "PSac",                  'natsplpwr' => "PNat",                  'shasplpwr' => "POmb",                  'splheal'   => "Soins"
         ),
         'spellModOp'    => array(
-            'DAMAGE',                               'DURATION',                             'THREAT',                               'EFFECT1',                              'CHARGES',
-            'RANGE',                                'RADIUS',                               'CRITICAL_CHANCE',                      'ALL_EFFECTS',                          'NOT_LOSE_CASTING_TIME',
-            'CASTING_TIME',                         'COOLDOWN',                             'EFFECT2',                              'IGNORE_ARMOR',                         'COST',
-            'CRIT_DAMAGE_BONUS',                    'RESIST_MISS_CHANCE',                   'JUMP_TARGETS',                         'CHANCE_OF_SUCCESS',                    'ACTIVATION_TIME',
-            'DAMAGE_MULTIPLIER',                    'GLOBAL_COOLDOWN',                      'DOT',                                  'EFFECT3',                              'BONUS_MULTIPLIER',
-            null,                                   'PROC_PER_MINUTE',                      'VALUE_MULTIPLIER',                     'RESIST_DISPEL_CHANCE',                 'CRIT_DAMAGE_BONUS_2',
-            'SPELL_COST_REFUND_ON_FAIL'
+            "DAMAGE",                               "DURATION",                             "THREAT",                               "EFFECT1",                              "CHARGES",
+            "RANGE",                                "RADIUS",                               "CRITICAL_CHANCE",                      "ALL_EFFECTS",                          "NOT_LOSE_CASTING_TIME",
+            "CASTING_TIME",                         "COOLDOWN",                             "EFFECT2",                              "IGNORE_ARMOR",                         "COST",
+            "CRIT_DAMAGE_BONUS",                    "RESIST_MISS_CHANCE",                   "JUMP_TARGETS",                         "CHANCE_OF_SUCCESS",                    "ACTIVATION_TIME",
+            "DAMAGE_MULTIPLIER",                    "GLOBAL_COOLDOWN",                      "DOT",                                  "EFFECT3",                              "BONUS_MULTIPLIER",
+            null,                                   "PROC_PER_MINUTE",                      "VALUE_MULTIPLIER",                     "RESIST_DISPEL_CHANCE",                 "CRIT_DAMAGE_BONUS_2",
+            "SPELL_COST_REFUND_ON_FAIL"
         ),
         'combatRating'  => array(
-            'WEAPON_SKILL',                         'DEFENSE_SKILL',                        'DODGE',                                'PARRY',                                'BLOCK',
-            'HIT_MELEE',                            'HIT_RANGED',                           'HIT_SPELL',                            'CRIT_MELEE',                           'CRIT_RANGED',
-            'CRIT_SPELL',                           'HIT_TAKEN_MELEE',                      'HIT_TAKEN_RANGED',                     'HIT_TAKEN_SPELL',                      'CRIT_TAKEN_MELEE',
-            'CRIT_TAKEN_RANGED',                    'CRIT_TAKEN_SPELL',                     'HASTE_MELEE',                          'HASTE_RANGED',                         'HASTE_SPELL',
-            'WEAPON_SKILL_MAINHAND',                'WEAPON_SKILL_OFFHAND',                 'WEAPON_SKILL_RANGED',                  'EXPERTISE',                            'ARMOR_PENETRATION'
+            "WEAPON_SKILL",                         "DEFENSE_SKILL",                        "DODGE",                                "PARRY",                                "BLOCK",
+            "HIT_MELEE",                            "HIT_RANGED",                           "HIT_SPELL",                            "CRIT_MELEE",                           "CRIT_RANGED",
+            "CRIT_SPELL",                           "HIT_TAKEN_MELEE",                      "HIT_TAKEN_RANGED",                     "HIT_TAKEN_SPELL",                      "CRIT_TAKEN_MELEE",
+            "CRIT_TAKEN_RANGED",                    "CRIT_TAKEN_SPELL",                     "HASTE_MELEE",                          "HASTE_RANGED",                         "HASTE_SPELL",
+            "WEAPON_SKILL_MAINHAND",                "WEAPON_SKILL_OFFHAND",                 "WEAPON_SKILL_RANGED",                  "EXPERTISE",                            "ARMOR_PENETRATION"
         ),
         'lockType'      => array(
             null,                                   "Crochetage",                           "Herboristerie",                        "Minage",                               "Désarmement de piège",
@@ -521,8 +571,8 @@ $lang = array(
             "Gahz'ridienne (DND)",                  "Explosif",                             "Ouverture JcJ",                        "Fermeture JcJ",                        "Pêche",
             "Calligraphie",                         "Ouverture à partir d'un véhicule",
         ),
-        'stealthType'   => ['GENERAL', 'TRAP'],
-        'invisibilityType' => ['GENERAL', 3 => 'TRAP', 6 => 'DRUNK']
+        'stealthType'   => ["GENERAL", "TRAP"],
+        'invisibilityType' => ["GENERAL", 3 => "TRAP", 6 => "DRUNK"]
     ),
     'item' => array(
         'armor'         => "Armure : %s",
@@ -630,49 +680,49 @@ $lang = array(
             null,                   null,               "Flèche",               "Balle",                         null
         ),
         'elixirType'    => [null, "De bataille", "De gardien"],
-'cat'           => array(
-             2 => "Weapons",                                // self::$spell['weaponSubClass']
-             4 => array("Armor", array(
-                 1 => "Cloth Armor",                 2 => "Leather Armor",           3 => "Mail Armor",              4 => "Plate Armor",             6 => "Shields",                 7 => "Librams",
-                 8 => "Idols",                       9 => "Totems",                 10 => "Sigils",                 -6 => "Cloaks",                 -5 => "Off-hand Frills",        -8 => "Shirts",
-                -7 => "Tabards",                    -3 => "Amulets",                -2 => "Rings",                  -4 => "Trinkets",                0 => "Miscellaneous (Armor)",
+        'cat'           => array(
+             2 => "Armes",                                  // self::$spell['weaponSubClass']
+             4 => array("Armure", array(
+                 1 => "Armures en tissu",            2 => "Armures en cuir",         3 => "Armures en mailles",      4 => "Armures en plaques",      6 => "Boucliers",               7 => "Librams",
+                 8 => "Idoles",                      9 => "Totems",                 10 => "Cachets",                -6 => "Capes",                  -5 => "Accessoires pour main gauche", -8 => "Chemises",
+                -7 => "Tabards",                    -3 => "Amulettes",              -2 => "Anneaux",                -4 => "Bijoux",                  0 => "Divers (Armure)",
             )),
-             1 => array("Containers", array(
-                 0 => "Bags",                        3 => "Enchanting Bags",         4 => "Engineering Bags",        5 => "Gem Bags",                2 => "Herb Bags",               8 => "Inscription Bags",
-                 7 => "Leatherworking Bags",         6 => "Mining Bags",             1 => "Soul Bags"
+             1 => array("Conteneurs", array(
+                 0 => "Sacs",                        3 => "Sacs d'enchanteur",       4 => "Sacs d'ingénieur",        5 => "Sacs de gemmes",          2 => "Sacs d'herbes",           8 => "Sacs de calligraphie",
+                 7 => "Sacs de travailleur du cuir", 6 => "Sacs de mineur",          1 => "Sacs d'âmes"
             )),
-             0 => array("Consumables", array(
-                -3 => "Item Enhancements (Temporary)",                               6 => "Item Enhancements (Permanent)",                           2 => ["Elixirs", [1 => "Battle Elixirs", 2 => "Guardian Elixirs"]],
-                 1 => "Potions",                     4 => "Scrolls",                 7 => "Bandages",                0 => "Consumables",             3 => "Flasks",                  5 => "Food & Drinks",
-                 8 => "Other (Consumables)"
+             0 => array("Consommables", array(
+                -3 => "Améliorations d'objet temporaires",                           6 => "Améliorations d'objet permanentes",                       2 => ["Élixirs", [1 => "Élixirs de bataille", 2 => "Élixirs du gardien"]],
+                 1 => "Potions",                     4 => "Parchemins",              7 => "Bandages",                0 => "Consommables",            3 => "Flacons",                 5 => "Nourriture et boissons",
+                 8 => "Autre (Consommables)"
             )),
-            16 => array("Glyphs", array(
-                 1 => "Warrior Glyphs",              2 => "Paladin Glyphs",          3 => "Hunter Glyphs",           4 => "Rogue Glyphs",            5 => "Priest Glyphs",           6 => "Death Knight Glyphs",
-                 7 => "Shaman Glyphs",               8 => "Mage Glyphs",             9 => "Warlock Glyphs",         11 => "Druid Glyphs"
+            16 => array("Glyphes", array(
+                 7 => "Glyphes de chaman",           3 => "Glyphes de chasseur",     6 => "Glyphes de chevalier de la mort",                         9 => "Glyphes de démoniste",   11 => "Glyphes de druide",
+                 1 => "Glyphes de guerrier",         8 => "Glyphes de mage",         2 => "Glyphes de paladin",      5 => "Glyphes de prêtre",       4 => "Glyphes de voleur"
             )),
-             7 => array("Trade Goods", array(
-                14 => "Armor Enchantments",          5 => "Cloth",                   3 => "Devices",                10 => "Elemental",              12 => "Enchanting",              2 => "Explosives",
-                 9 => "Herbs",                       4 => "Jewelcrafting",           6 => "Leather",                13 => "Materials",               8 => "Meat",                    7 => "Metal & Stone",
-                 1 => "Parts",                      15 => "Weapon Enchantments",    11 => "Other (Trade Goods)"
+             7 => array("Artisanat", array(
+                14 => "Enchantements d'armure",      5 => "Tissu",                   3 => "Appareils",              10 => "Élémentaire",            12 => "Enchantement",            2 => "Explosifs",
+                 9 => "Herbes",                      4 => "Joaillerie",              6 => "Cuir",                   13 => "Matériaux",               8 => "Viande",                  7 => "Métal et pierre",
+                 1 => "Éléments",                   15 => "Enchantements d'arme",   11 => "Autre (Artisanat)"
              )),
-             6 => ["Projectiles", [                  2 => "Arrows",                  3 => "Bullets"     ]],
-            11 => ["Quivers",     [                  2 => "Quivers",                 3 => "Ammo Pouches"]],
-             9 => array("Recipes", array(
-                 0 => "Books",                       6 => "Alchemy Recipes",         4 => "Blacksmithing Plans",     5 => "Cooking Recipes",         8 => "Enchanting Formulae",     3 => "Engineering Schematics",
-                 7 => "First Aid Books",             9 => "Fishing Books",          11 => "Inscription Techniques", 10 => "Jewelcrafting Designs",   1 => "Leatherworking Patterns",12 => "Mining Guides",
-                 2 => "Tailoring Patterns"
+             6 => ["Projectiles", [                  2 => "Flèches",                 3 => "Balles"  ]],
+            11 => ["Carquois",    [                  2 => "Carquois",                3 => "Gibernes"]],
+             9 => array("Recettes", array(
+                 0 => "Livres",                      6 => "Recettes d'alchimie",     4 => "Plans de forge",          5 => "Recettes de cuisine",     8 => "Formules d'enchantement", 3 => "Schémas d'ingénierie",
+                 7 => "Livres de premiers soins",    9 => "Livres de pêche",        11 => "Techniques de calligraphie",10 => "Dessins de joaillerie",1 => "Patrons de travail du cuir",12 => "Guides de Minage",
+                 2 => "Patrons de couture"
             )),
-             3 => array("Gems", array(
-                 6 => "Meta Gems",                   0 => "Red Gems",                1 => "Blue Gems",              2 => "Yellow Gems",             3 => "Purple Gems",             4 => "Green Gems",
-                 5 => "Orange Gems",                 8 => "Prismatic Gems",          7 => "Simple Gems"
+             3 => array("Gemmes", array(
+                 6 => "Méta-gemmes",                 0 => "Gemmes rouges",           1 => "Gemmes bleues",           2 => "Gemmes jaunes",           3 => "Gemmes violettes",        4 => "Gemmes vertes",
+                 5 => "Gemmes oranges",              8 => "Gemmes prismatiques",     7 => "Gemmes simples"
             )),
-            15 => array("Miscellaneous", array(
-                -2 => "Armor Tokens",                3 => "Holiday",                 0 => "Junk",                    1 => "Reagents",                5 => "Mounts",                 -7 => "Flying Mounts",
-                 2 => "Small Pets",                  4 => "Other (Miscellaneous)"
+            15 => array("Divers", array(
+                -2 => "Marques d'armure",            3 => "Évènement",               0 => "Camelote",                1 => "Composants",              5 => "Montures",               -7 => "Montures volantes",
+                 2 => "Compagnons",                  4 => "Autre (Divers)"
             )),
-            10 => "Currency",
-            12 => "Quest",
-            13 => "Keys",
+            10 => "Monnaies",
+            12 => "Quête",
+            13 => "Clés",
         ),
         'statType'      => array(
             "Augmente vos points de mana de %d.",

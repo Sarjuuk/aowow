@@ -24,6 +24,7 @@ class SpellList extends BaseType
         10 => [ 98, 109, 111, 113, 115, 137, 138, 139, 140, 141, 313, 315, 673, 759],                     // Languages
         11 => [164, 165, 171, 182, 186, 197, 202, 333, 393, 755, 773]                                     // prim. Professions
     );
+
     public static $spellTypes  = array(
          6 => 1,
          8 => 2,
@@ -1765,10 +1766,10 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         return $data;
     }
 
-    public function addGlobalsToJScript(&$template, $addMask = GLOBALINFO_SELF)
+    public function addGlobalsToJScript($addMask = GLOBALINFO_SELF)
     {
         if ($this->relItems && ($addMask & GLOBALINFO_RELATED))
-            $this->relItems->addGlobalsToJscript($template);
+            $this->relItems->addGlobalsToJscript();
 
         foreach ($this->iterate() as $id => $__)
         {
@@ -1777,12 +1778,12 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                 if ($mask = $this->curTpl['reqClassMask'])
                     for ($i = 0; $i < 11; $i++)
                         if ($mask & (1 << $i))
-                            $template->extendGlobalIds(TYPE_CLASS, $i + 1);
+                            Util::$pageTemplate->extendGlobalIds(TYPE_CLASS, $i + 1);
 
                 if ($mask = $this->curTpl['reqRaceMask'])
                     for ($i = 0; $i < 11; $i++)
                         if ($mask & (1 << $i))
-                            $template->extendGlobalIds(TYPE_RACE, $i + 1);
+                            Util::$pageTemplate->extendGlobalIds(TYPE_RACE, $i + 1);
             }
 
             $data  = null;
@@ -1820,7 +1821,7 @@ spells / buffspells = {
             }
 
             if ($data || $extra)
-                $template->extendGlobalData(self::$type, $data, $extra);
+                Util::$pageTemplate->extendGlobalData(self::$type, $data, $extra);
         }
     }
 
@@ -1962,7 +1963,7 @@ class SpellListFilter extends Filter
                     if (is_bool($_))
                         return ['source', 0, ($_ ? '!' : null)];
                     else if (is_int($_))
-                        return ['source', $_.':'];
+                        return ['source', '%'.$_.':%'];
                 }
                 break;
             case 20:                                        // has Reagents [yn]

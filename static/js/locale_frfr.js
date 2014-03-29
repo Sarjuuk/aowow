@@ -347,7 +347,6 @@ var mn_quests = [
         [3523,"Raz-de-Néant"],
         [3703,"Shattrath"],
         [3679,"Skettis"],
-        [4095,"Terrasse des Magistères"],
         [3520,"Vallée d'Ombrelune"]
     ]],
     [10,"Norfendre",,[
@@ -483,14 +482,14 @@ var mn_quests = [
         [-370,"Fête des Brasseurs"],
         [-1002,"Semaine des enfants"],
         [-364,"Foire de Sombrelune"],
-        [-1007,"Jour des Morts"],
+        [-41,"Jour des Morts"],
         [-1003,"Sanssaint"],
         [-1005,"Fête des moissons"],
-        [-1004,"De l'amour dans l'air"],
+        [-376,"De l'amour dans l'air"],
         [-366,"Fête lunaire"],
         [-369,"Solstice d'été"],
         [-1006,"Nouvel an"],
-        [-1008,"Bienfaits du pèlerin"],
+        [-375,"Bienfaits du pèlerin"],
         [-374,"Jardin des nobles"],
         [-1001,"Voile d'hiver"]
     ]],
@@ -1324,14 +1323,15 @@ var g_quest_categories = {
 };
 
 var g_quest_sorts = {
+    "-1010": 'Chercheur de donjons',
     "-1001": 'Voile d\'hiver',
     "-1002": 'Semaine des enfants',
     "-1003": 'Sanssaint',
-    "-1004": 'De l\'amour dans l\'air',
+     "-376": 'De l\'amour dans l\'air',
     "-1005": 'Fête des moissons',
     "-1006": 'Nouvel an',
-    "-1007": 'Jour des Morts',
-    "-1008": 'Bienfaits du pèlerin',
+      "-41": 'Jour des Morts',
+     "-375": 'Bienfaits du pèlerin',
        3428: 'Ahn\'Qiraj',
        4494: 'Ahn\'kahet : l\'Ancien royaume',
      "-181": 'Alchimiste',

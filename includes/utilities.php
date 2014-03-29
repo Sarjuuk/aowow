@@ -93,7 +93,7 @@ class SmartyAoWoW extends Smarty
                     $tv['infobox'] = $article['quickInfo'];
 
                 if ($article['locale'] != User::$localeId)
-                    $tv['article']['params'] = ['prepend' => Util::jsEscape('<div class="notice-box" style="margin-right:245px;"><span class="icon-bubble">'.Lang::$main['englishOnly'].'</span></div>')];
+                    $tv['article']['params'] = ['prepend' => Util::jsEscape('<div class="notice-box"><span class="icon-bubble">'.Lang::$main['englishOnly'].'</span></div>')];
 
                 foreach ($article as $text)
                     if (preg_match_all('/\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|title|holiday|class|race|skill|currency)=(\d+)[^\]]*\]/i', $text, $matches, PREG_SET_ORDER))
@@ -221,38 +221,42 @@ class SmartyAoWoW extends Smarty
             $ids = array_unique($ids, SORT_NUMERIC);
             $cnd = [['id', $ids], 0];
 
-            (new Util::$typeClasses[$type]($cnd))->addGlobalsToJscript($this, GLOBALINFO_SELF);
+            (new Util::$typeClasses[$type]($cnd))->addGlobalsToJScript(GLOBALINFO_SELF);
         }
     }
 
     public function notFound($subject, $entry)
     {
-        $this->updatePageVars(array(
-            'subject'  => Util::ucFirst($subject),
-            'id'       => $entry,
-            'notFound' => sprintf(Lang::$main['pageNotFound'], $subject)
-        ));
+        $this->assign([
+            'typeStr'  => Util::ucFirst($subject),
+            'typeId'   => $entry,
+            'title'    => Lang::$main['nfPageTitle'],
+            'notFound' => sprintf(Lang::$main['pageNotFound'], $subject),
+            'lang'     => Lang::$main,
+            'mysql'    => DB::Aowow()->getStatistics()
+        ]);
 
-        $this->assign('lang', Lang::$main);
-        $this->assign('mysql', DB::Aowow()->getStatistics());
-
-        $this->display('404.tpl');
+        $this->display('text-page-generic.tpl');
         exit();
     }
 
     public function error()
     {
-        $this->assign('lang', array_merge(Lang::$main, Lang::$error));
-        $this->assign('mysql', DB::Aowow()->getStatistics());
+        $this->assign([
+            'type'   => -99,                                // get error-article
+            'typeId' => 0,
+            'title'  => Lang::$main['errPageTitle'],
+            'name'   => Lang::$main['errPageTitle'],
+            'lang'   => Lang::$main,
+            'mysql'  => DB::Aowow()->getStatistics()
+        ]);
 
-        $this->display('error.tpl');
+        $this->display('text-page-generic.tpl');
         exit();
     }
 
     public function brb()
     {
-        $this->assign('lang', array_merge(Lang::$main, Lang::$error));
-
         $this->display('brb.tpl');
         exit();
     }
@@ -353,25 +357,20 @@ class Util
         ITEM_MOD_HEALTH_REGEN,          ITEM_MOD_SPELL_PENETRATION,     ITEM_MOD_BLOCK_VALUE
     );
 
-    public static $questClasses             = array(        // taken from old aowow: 0,1,2,3,8,10 may point to pointless mini-areas
+    public static $questClasses             = array(        // taken from old aowow: 2 & 3 partially point to pointless mini-areas in front of dungeons
         -2 =>  [    0],
-         0 =>  [    1,     3,     4,     8,    10,    11,    12,    25,   28,   33,   36,   38,   40,   41,   44,   45,   46,   47,   51,   85,  130,  139,  267,  279, 1497, 1519, 1537, 2257, 3430, 3433, 3487, 4080],
+         0 =>  [    1,     3,     4,     8,    10,    11,    12,    25,   28,   33,   36,   38,   40,   41,   44,   45,   46,   47,   51,   85,  130,  139,  267,  279, 1497, 1519, 1537, 2257, 3430, 3433, 3487, 4080, 4298],
          1 =>  [   14,    15,    16,    17,   141,   148,   215,   331,  357,  361,  400,  405,  406,  440,  490,  493,  618, 1216, 1377, 1637, 1638, 1657, 3524, 3525, 3557],
-         2 =>  [  133,   206,   209,   491,   717,   718,   719,   722,  796,  978, 1196, 1337, 1417, 1581, 1583, 1584, 1941, 2017, 2057, 2100, 2366, 2367, 2437, 2557, 3477, 3562, 3713, 3714, 3715, 3716, 3717, 3789, 3790, 3791, 3792, 3845, 3846, 3847, 3849, 3905, 4095, 4100, 4120, 4196, 4228, 4264, 4272, 4375, 4415, 4494, 4723],
-         3 =>  [   19,  2159,  2562,  2677,  2717,  3428,  3429,  3456, 3606, 3805, 3836, 3840, 3842, 4273, 4500, 4722, 4812],
+/*todo*/ 2 =>  [  133,   206,   209,   491,   717,   718,   719,   722,  796,  978, 1196, 1337, 1417, 1581, 1583, 1584, 1941, 2017, 2057, 2100, 2366, 2367, 2437, 2557, 3477, 3562, 3713, 3714, 3715, 3716, 3717, 3789, 3790, 3791, 3792, 3845, 3846, 3847, 3849, 3905, 4095, 4100, 4120, 4196, 4228, 4264, 4272, 4375, 4415, 4494, 4723],
+/*todo*/ 3 =>  [ 1977,  2159,  2562,  2677,  2717,  3428,  3429,  3456, 3606, 3805, 3836, 3840, 3842, 4273, 4500, 4722, 4812],
          4 =>  [ -372,  -263,  -262,  -261,  -162,  -161,  -141,   -82,  -81,  -61],
          5 =>  [ -373,  -371,  -324,  -304,  -264,  -201,  -182,  -181, -121, -101,  -24],
          6 =>  [  -25,  2597,  3277,  3358,  3820,  4384,  4710],
-         7 =>  [ -368,  -367,  -365,  -344,  -241,    -1],
-         8 =>  [ 3483,  3518,  3519,  3520,  3521,  3522,  3523,  3679, 3703],
-         9 =>  [-1008, -1007, -1006, -1005, -1004, -1003, -1002, -1001, -375, -374, -370, -369, -366, -364, -284,  -41,  -22],
-        10 =>  [   65,    66,    67,   210,   394,   495,  3537,  3711, 4024, 4197, 4395]
+         7 =>  [-1010,  -368,  -367,  -365,  -344,  -241,    -1],
+         8 =>  [ 3483,  3518,  3519,  3520,  3521,  3522,  3523,  3679, 3703],                                      // Skettis is no parent
+         9 =>  [-1006, -1005, -1003, -1002, -1001,  -376,  -375,  -374, -370, -369, -366, -364, -284,  -41,  -22],  // 22: seasonal, 284: special => not in the actual menu
+        10 =>  [   65,    66,    67,   210,   394,   495,  3537,  3711, 4024, 4197, 4395, 4742]                     // Coldara is no parent
     );
-
-    public static $questFactionReward       = array(        // from QuestFactionReward.dbc
-           0,   10,   25,   75,  150,  250,  350,  500, 1000,    5
-    );
-
 
     /*  why:
         Because petSkills (and ranged weapon skills) are the only ones with more than two skillLines attached. Because Left Joining ?_spell with ?_skillLineAbility  causes more trouble than it has uses.
@@ -1207,7 +1206,8 @@ class Util
             '/\|c(\w{6})\w{2}([^\|]+)\|r/ui',               // color                                            |c<RRGGBBAA><text>|r
             '/\$g\s*([^:;]+)\s*:\s*([^:;]+)\s*(:?[^:;]*);/ui',// directed gender-reference                      $g:<male>:<female>:<refVariable>
             '/\$t([^;]+);/ui',                              // nonesense, that the client apparently ignores
-            '/\|\d\-?\d?\((\$\w)\)/ui'                      // and another modifier for something russian       |3-6($r)
+            '/\|\d\-?\d?\((\$\w)\)/ui',                     // and another modifier for something russian       |3-6($r)
+            '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui'                // emotes (workaround: at least one whitespace and never " oder = between brackets)
         );
 
         $to = array(
@@ -1215,7 +1215,8 @@ class Util
             '<span style="color: #\1">\2</span>',
             '&lt;\1/\2&gt;',
             '',
-            '\1'
+            '\1',
+            '&lt;\1&gt;'
         );
 
         $text = preg_replace($from, $to, $text);
@@ -1704,7 +1705,7 @@ class Util
                 @$groupChances[$entry['groupid']] += $entry['ChanceOrQuestChance'];
                 $set['groupChance'] = abs($entry['ChanceOrQuestChance']);
             }
-            else                                            // shouldn't happened
+            else                                            // shouldn't have happened
             {
                 Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by LootId: unhandled case in calculating chance for item '.$entry['item'].'!');
                 continue;
@@ -1757,7 +1758,7 @@ class Util
             return $lv;
 
         $items = new ItemList(array(['i.id', $struct[1]], CFG_SQL_LIMIT_NONE));
-        $items->addGlobalsToJscript(Util::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $items->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
         $foo = $items->getListviewData();
 
         // assign listview LV rows to loot rows, not the other way round! The same item may be contained multiple times
@@ -2047,16 +2048,16 @@ class Util
                     }
                     break;
                 case LOOT_MAIL:
-                    $conditions = array(['RewardChoiceItemId1', $itemId], ['RewardChoiceItemId2', $itemId], ['RewardChoiceItemId3', $itemId], ['RewardChoiceItemId4', $itemId], ['RewardChoiceItemId5', $itemId],
-                                        ['RewardChoiceItemId6', $itemId], ['RewardItemId1', $itemId],       ['RewardItemId2', $itemId],       ['RewardItemId3', $itemId],       ['RewardItemId4', $itemId],
+                    $conditions = array(['rewardChoiceItemId1', $itemId], ['rewardChoiceItemId2', $itemId], ['rewardChoiceItemId3', $itemId], ['rewardChoiceItemId4', $itemId], ['rewardChoiceItemId5', $itemId],
+                                        ['rewardChoiceItemId6', $itemId], ['rewardItemId1', $itemId],       ['rewardItemId2', $itemId],       ['rewardItemId3', $itemId],       ['rewardItemId4', $itemId],
                                         'OR');
                     if ($ids)
-                        $conditions[] = ['qt.RewardMailTemplateId', $ids];
+                        $conditions[] = ['rewardMailTemplateId', $ids];
 
                     $srcObj = new QuestList($conditions);
                     if (!$srcObj->error)
                     {
-                        $srcObj->addGlobalsToJscript(self::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+                        $srcObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
                         $srcData = $srcObj->getListviewData();
 
                         foreach ($srcObj->iterate() as $_)
@@ -2077,7 +2078,7 @@ class Util
                     $srcObj = new SpellList($conditions);
                     if (!$srcObj->error)
                     {
-                        $srcObj->addGlobalsToJscript(self::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                        $srcObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
                         $srcData = $srcObj->getListviewData();
 
                         if (!empty($result))
@@ -2104,7 +2105,7 @@ class Util
                     $srcObj = new $oName(array([$field, $ids]));
                     if (!$srcObj->error)
                     {
-                        $srcObj->addGlobalsToJscript(self::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                        $srcObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
                         $srcData = $srcObj->getListviewData();
 
                         foreach ($srcObj->iterate() as $curTpl)

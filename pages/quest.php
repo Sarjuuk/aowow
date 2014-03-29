@@ -6,7 +6,8 @@ if (!defined('AOWOW_REVISION'))
 
 require 'includes/community.class.php';
 
-$_id = intVal($pageParam);
+$_id   = intVal($pageParam);
+$_path = [0, 3];
 
 $cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_QUEST, $_id, -1, User::$localeId]);
 $cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_QUEST, $_id, -1, User::$localeId]);
@@ -20,14 +21,16 @@ if (isset($_GET['power']))
 
     if (!$smarty->loadCache($cacheKeyTooltip, $x))
     {
-        $quest = new QuestList(array(['qt.id', $_id]));
+        $quest = new QuestList(array(['id', $_id]));
         if ($quest->error)
             die('$WowheadPower.registerQuest(\''.$_id.'\', '.User::$localeId.', {})');
 
         $x = '$WowheadPower.registerQuest('.$_id.', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($quest->getField('Title', true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.': \''.$quest->renderTooltip()."'\n";            // daily: 1 ... not used in wowheadPower => omitted here
-        $x .= "});";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($quest->getField('name', true))."',\n";
+        $x .= "\ttooltip_".User::$localeString.': \''.$quest->renderTooltip()."'";
+        if ($quest->isDaily())
+            $x .= ",\n\tdaily: 1";
+        $x .= "\n});";
 
         $smarty->saveCache($cacheKeyTooltip, $x);
     }
@@ -38,585 +41,786 @@ if (isset($_GET['power']))
 // regular page
 if (!$smarty->loadCache($cacheKeyPage, $pageData))
 {
-    $quest = new QuestList(array(['qt.id', $_id]));
+    $quest = new QuestList(array(['id', $_id]));
     if ($quest->error)
         $smarty->notFound(Lang::$game['quest'], $_id);
 
+    // recreate path
+    $_path[] = $quest->getField('cat2');
+    if ($_ = $quest->getField('cat1'))
+        $_path[] = $_;
 
+    $_name         = $quest->getField('name', true);
+    $_level        = $quest->getField('level');
+    $_minLevel     = $quest->getField('minLevel');
+    $_maxLevel     = $quest->getField('maxLevel');
+    $_flags        = $quest->getField('flags');
+    $_specialFlags = $quest->getField('specialFlags');
+    $_questMoney   = $quest->getField('rewardOrReqMoney');
+    $_side         = Util::sideByRaceMask($quest->getField('reqRaceMask'));
 
-    // not yet implemented -> chicken out
-    $smarty->error();
+    /***********/
+    /* Infobox */
+    /***********/
 
+    $infobox = [];
 
+    // event (todo: assign eventData)
+    if ($_ = $quest->getField('holidayId'))
+    {
+        (new WorldEventList(array(['h.id', $_])))->addGlobalsToJscript();
+        $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[event='.$_.']';
+    }
 
-	unset($quest);
+    // level
+    if ($_ = $_level)
+        if ($_ > 0)
+            $infobox[] = Lang::$game['level'].Lang::$colon.$_;
 
-	// Основная инфа
-	$quest = GetDBQuestInfo($_id, 0xFFFFFF);
-    $path = [0, 3]; // TODO
+    // reqlevel
+    if ($_ = $_minLevel)
+    {
+        $lvl =  $_;
+        if ($_ = $_maxLevel)
+            $lvl .= ' - '.$_;
 
-	/*              ЦЕПОЧКА КВЕСТОВ              */
-	// Добавляем сам квест в цепочку
-	$quest['series'] = array(
-		array(
-			'Id' => $quest['Id'],
-			'Title' => $quest['Title'],
-			'NextQuestIdChain' => $quest['NextQuestIdChain']
-			)
-	);
-	// Квесты в цепочке до этого квеста
-	$tmp = $quest['series'][0];
-	while($tmp)
+        $infobox[] = sprintf(Lang::$game['reqLevel'], $lvl);
+    }
+
+    // loremaster (i dearly hope those flags cover every case...)
+    if ($quest->getField('zoneOrSort') > 0 && !$quest->isRepeatable())
+    {
+        $conditions = array(
+            ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE],
+            ['ac.value1', $quest->getField('zoneOrSort')],
+            ['a.faction', $_side, '&']
+        );
+        $loremaster = new AchievementList($conditions);
+        switch ($loremaster->getMatches())
+        {
+            case 0:
+                break;
+            case 1:
+                $loremaster->addGlobalsToJscript(GLOBALINFO_SELF);
+                $infobox[] = Lang::$quest['loremaster'].Lang::$colon.'[achievement='.$loremaster->id.']';
+                break;
+            default:
+                $loremaster->addGlobalsToJscript(GLOBALINFO_SELF);
+                $lm = Lang::$quest['loremaster'].Lang::$colon.'[ul]';
+                foreach($loremaster->iterate() as $id => $__)
+                    $lm .= '[li][achievement='.$id.'][/li]';
+
+                $infobox[] = $lm.'[/ul]';
+                break;
+        }
+    }
+
+    // type (maybe expand uppon?)
+    $_ = [];
+    if ($_flags & QUEST_FLAG_DAILY)
+        $_[] = Lang::$quest['daily'];
+    else if ($_flags & QUEST_FLAG_WEEKLY)
+        $_[] = Lang::$quest['weekly'];
+    else if ($_specialFlags & QUEST_FLAG_SPECIAL_MONTHLY)
+        $_[] = Lang::$quest['monthly'];
+
+    if ($t = $quest->getField('type'))
+        $_[] = Lang::$quest['questInfo'][$t];
+
+    if ($_)
+        $infobox[] = Lang::$game['type'].Lang::$colon.implode(' ', $_);
+
+    // side
+    $_ = Lang::$main['side'].lang::$colon;
+    switch ($_side)
+    {
+        case 3: $infobox[] = $_.Lang::$game['si'][3];                                           break;
+        case 2: $infobox[] = $_.'[span class=icon-horde]'.Lang::$game['si'][2].'[/span]';       break;
+        case 1: $infobox[] = $_.'[span class=icon-alliance]'.Lang::$game['si'][1].'[/span]';    break;
+    }
+
+    // races
+    if ($_ = Lang::getRaceString($quest->getField('reqRaceMask'), $__, false, $n))
+    {
+        if ($n)
+        {
+            $t = $n == 1 ? Lang::$game['race'] : Lang::$game['races'];
+            $infobox[] = Util::ucFirst($t).Lang::$colon.$_;
+        }
+    }
+
+    // classes
+    if ($_ = Lang::getClassString($quest->getField('reqClassMask'), false, $n))
+    {
+        $t = $n == 1 ? Lang::$game['class'] : Lang::$game['classes'];
+        $infobox[] = Util::ucFirst($t).Lang::$colon.$_;
+    }
+
+    // profession {profession: [skill=X] (123)}
+    if ($_ = $quest->getField('reqSkillId'))
+    {
+        Util::$pageTemplate->extendGlobalIds(TYPE_SKILL, $_);
+        $sk =  '[skill='.$_.']';
+        if ($_ = $quest->getField('reqSkillPoints'))
+            $sk .= ' ('.$_.')';
+
+        $infobox[] = Lang::$quest['profession'].Lang::$colon.$sk;
+    }
+
+    // timer
+    if ($_ = $quest->getField('timeLimit'))
+        $infobox[] = Lang::$quest['timer'].Lang::$colon.Util::formatTime($_ * 1000);
+
+    $startEnd = DB::Aowow()->select('SELECT * FROM ?_quests_startend WHERE questId = ?d', $_id);
+
+    // start
+    $start = '[icon name=quest_start'.($quest->isDaily() ? '_daily' : '').']'.lang::$event['start'].Lang::$colon.'[/icon]';
+    $s     = [];
+    foreach ($startEnd as $se)
+    {
+        if ($se['method'] & 0x1)
+        {
+            Util::$pageTemplate->extendGlobalIds($se['type'], $se['typeId']);
+            $s[] = ($s ? '[span=invisible]'.$start.'[/span] ' : $start.' ') .'['.Util::$typeStrings[$se['type']].'='.$se['typeId'].']';
+        }
+    }
+
+    if ($s)
+        $infobox[] = implode('[br]', $s);
+
+    // end
+    $end = '[icon name=quest_end'.($quest->isDaily() ? '_daily' : '').']'.lang::$event['end'].Lang::$colon.'[/icon]';
+    $e   = [];
+    foreach ($startEnd as $se)
+    {
+        if ($se['method'] & 0x2)
+        {
+            Util::$pageTemplate->extendGlobalIds($se['type'], $se['typeId']);
+            $e[] = ($e ? '[span=invisible]'.$end.'[/span] ' : $end.' ') . '['.Util::$typeStrings[$se['type']].'='.$se['typeId'].']';
+        }
+    }
+
+    if ($e)
+        $infobox[] = implode('[br]', $e);
+
+    // Repeatable
+    if ($_flags & QUEST_FLAG_REPEATABLE || $_specialFlags & QUEST_FLAG_SPECIAL_REPEATABLE)
+        $infobox[] = Lang::$quest['repeatable'];
+
+    // sharable | not sharable
+    $infobox[] = $_flags & QUEST_FLAG_SHARABLE ? Lang::$quest['sharable'] : Lang::$quest['notSharable'];
+
+    // Keeps you PvP flagged
+    if ($quest->isPvPEnabled())
+        $infobox[] = Lang::$quest['keepsPvpFlag'];
+
+    // difficulty (todo (low): formula unclear. seems to be [minLevel,] -4, -2, (level), +3, +(9 to 15))
+    if ($_level > 0)
+    {
+        $_ = [];
+        if ($_minLevel && $_minLevel < $_level - 4)
+            $_[] = '[color=q10]'.$_minLevel.'[/color]';     // red
+
+        if (!$_minLevel || $_minLevel < $_level - 2)        // orange
+            $_[] = '[color=r1]'.(!$_ && $_minLevel > $_level - 4 ? $_minLevel : $_level - 4).'[/color]';
+
+        $_[] = '[color=r2]'.(!$_ && $_minLevel > $_level - 2 ? $_minLevel : $_level - 2).'[/color]';        // yellow
+        $_[] = '[color=r3]'.($_level + 3).'[/color]';       // green
+        $_[] = '[color=r4]'.($_level + 3 + ceil(12 * $_level / MAX_LEVEL)).'[/color]';                      // grey   (is about +/-1 level off)
+
+        if ($_)
+            $infobox[] = Lang::$game['difficulty'].Lang::$colon.implode('[small] &nbsp;[/small]', $_);
+    }
+
+    /**********/
+    /* Series */
+    /**********/
+
+    $series = [];
+
+    // Quest Chain (are there cases where quests go in parallel?)
+    $chain = array(
+        array(
+            array(
+                'side'    => $_side,
+                'typeStr' => Util::$typeStrings[TYPE_QUEST],
+                'typeId'  => $_id,
+                'name'    => $_name,
+                '_next'   => $quest->getField('nextQuestIdChain')
+            )
+        )
+    );
+
+    $_ = $chain[0][0];
+	while ($_)
 	{
-		$tmp = $DB->selectRow('
-			SELECT q.Id, q.Title
-				{, l.Title_loc?d as Title_loc}
-			FROM quest_template q
-				{LEFT JOIN (locales_quest l) ON l.Id=q.Id AND ?d}
-			WHERE q.NextQuestIdChain=?d
-			LIMIT 1
-			',
-			($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP,
-			($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-			$quest['series'][0]['Id']
-		);
-		if($tmp)
-		{
-			$tmp['Title'] = localizedName($tmp, 'Title');
-			array_unshift($quest['series'], $tmp);
-		}
-	}
-	// Квесты в цепочке после этого квеста
-	$tmp = end($quest['series']);
-	while($tmp)
-	{
-		$tmp = $DB->selectRow('
-			SELECT q.Id, q.Title, q.NextQuestIdChain
-				{, l.Title_loc?d as Title_loc}
-			FROM quest_template q
-				{LEFT JOIN (locales_quest l) ON l.Id=q.Id AND ?}
-			WHERE q.Id=?d
-			LIMIT 1
-			',
-			($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP,
-			($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-			$quest['series'][count($quest['series'])-1]['NextQuestIdChain']
-		);
-		if($tmp)
-		{
-			$tmp['Title'] = localizedName($tmp, 'Title');
-			array_push($quest['series'], $tmp);
-		}
-	}
-	unset($tmp);
-	if(count($quest['series'])<=1)
-		unset($quest['series']);
-
-
-	/*              ДРУГИЕ КВЕСТЫ              */
-	// (после их нахождения проверяем их тайтлы на наличие локализации)
-
-
-	// Квесты, которые необходимо выполнить, что бы получить этот квест
-	if(!$quest['req'] = $DB->select('
-				SELECT q.Id, q.Title, q.NextQuestIdChain
-					{, l.Title_loc?d as Title_loc}
-				FROM quest_template q
-					{LEFT JOIN (locales_quest l) ON l.Id=q.Id AND ?}
-				WHERE
-					(q.NextQuestId=?d AND q.ExclusiveGroup<0)
-					OR (q.Id=?d AND q.NextQuestIdChain<>?d)
-				LIMIT 20',
-				($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP, ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-				$quest['Id'], $quest['PrevQuestId'], $quest['Id']
-				)
-		)
-			unset($quest['req']);
-		else
-			$questItems[] = 'req';
-
-	// Квесты, которые становятся доступными, только после того как выполнен этот квест (необязательно только он)
-	if(!$quest['open'] = $DB->select('
-				SELECT q.Id, q.Title
-					{, l.Title_loc?d as Title_loc}
-				FROM quest_template q
-					{LEFT JOIN (locales_quest l) ON l.Id=q.Id AND ?}
-				WHERE
-					(q.PrevQuestId=?d AND q.Id<>?d)
-					OR q.Id=?d
-				LIMIT 20',
-				($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP, ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-				$quest['Id'], $quest['NextQuestIdChain'], $quest['NextQuestId']
-				)
-		)
-			unset($quest['open']);
-		else
-			$questItems[] = 'open';
-
-	// Квесты, которые становятся недоступными после выполнения этого квеста
-	if($quest['ExclusiveGroup']>0)
-		if(!$quest['closes'] = $DB->select('
-				SELECT q.Id, q.Title
-					{, l.Title_loc?d as Title_loc}
-				FROM quest_template q
-					{LEFT JOIN (locales_quest l) ON l.Id=q.Id AND ?}
-				WHERE
-					q.ExclusiveGroup=?d AND q.Id<>?d
-				LIMIT 20
-				',
-				($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP, ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-				$quest['ExclusiveGroup'], $quest['Id']
-				)
-		)
-			unset($quest['closes']);
-		else
-			$questItems[] = 'closes';
-
-	// Требует выполнения одного из квестов, на выбор:
-	if(!$quest['reqone'] = $DB->select('
-				SELECT q.Id, q.Title
-					{, l.Title_loc?d as Title_loc}
-				FROM quest_template q
-					{LEFT JOIN (locales_quest l) ON l.Id=q.Id AND ?}
-				WHERE
-					q.ExclusiveGroup>0 AND q.NextQuestId=?d
-				LIMIT 20
-				',
-				($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP, ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-				$quest['Id']
-				)
-		)
-			unset($quest['reqone']);
-		else
-			$questItems[] = 'reqone';
-
-	// Квесты, которые доступны, только во время выполнения этого квеста
-	if(!$quest['enables'] = $DB->select('
-				SELECT q.Id, q.Title
-					{, l.Title_loc?d as Title_loc}
-				FROM quest_template q
-					{LEFT JOIN (locales_quest l) ON l.Id=q.Id AND ?}
-				WHERE q.PrevQuestId=?d
-				LIMIT 20
-				',
-				($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP, ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-				-$quest['Id']
-				)
-		)
-			unset($quest['enables']);
-		else
-			$questItems[] = 'enables';
-
-	// Квесты, во время выполнения которых доступен этот квест
-	if($quest['PrevQuestId']<0)
-		if(!$quest['enabledby'] = $DB->select('
-				SELECT q.Id, q.Title
-					{, l.Title_loc?d as Title_loc}
-				FROM quest_template q
-					{LEFT JOIN (locales_quest l) ON l.Id=q.Id AND ?}
-				WHERE q.Id=?d
-				LIMIT 20
-				',
-				($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP, ($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-				-$quest['PrevQuestId']
-				)
-		)
-			unset($quest['enabledby']);
-		else
-			$questItems[] = 'enabledby';
-
-	// Теперь локализуем все тайтлы квестов
-	if($questItems)
-		foreach($questItems as $item)
-			foreach($quest[$item] as $i => $x)
-				$quest[$item][$i]['Title'] = localizedName($quest[$item][$i], 'Title');
-
-
-
-	/*             НАГРАДЫ И ТРЕБОВАНИЯ             */
-
-	if($quest['RequiredSkillPoints']>0 && $quest['SkillOrClassMask']>0)
-	{
-		// Требуемый уровень скилла, что бы получить квест
-		/*
-		$skills = array(
-			-264 => 197,	// Tailoring
-			-182 => 165,	// Leatherworking
-			-24 => 182,		// Herbalism
-			-101 => 356,	// Fishing
-			-324 =>	129,	// First Aid
-			-201 => 202,	// Engineering
-			-304 => 185,	// Cooking
-			-121 => 164,	// Blacksmithing
-			-181 => 171		// Alchemy
-		);
-		*/
-
-		// TODO: skill localization
-		$quest['reqskill'] = array(
-			'name' => $DB->selectCell('SELECT name_loc'.$_SESSION['locale'].' FROM ?_skill WHERE skillID=?d LIMIT 1',$quest['SkillOrClassMask']),
-			'value' => $quest['RequiredSkillPoints']
-		);
-	}
-	elseif($quest['SkillOrClassMask']<0)
-	{
-		$s = array();
-		foreach($classes as $i => $class)
-			if (intval(-$quest['SkillOrClassMask'])==$i)
-				$s[] = $class;
-
-		if (!count($s) == 0)
-			// Требуемый класс, что бы получить квест
-			$quest['reqclass'] = implode(", ", $s);
-	}
-
-	// Требуемые отношения с фракциями, что бы начать квест
-	if($quest['RequiredMinRepFaction'])
-		$quest['RequiredMinRep'] = array(
-			'name' => $DB->selectCell('SELECT name_loc'.$_SESSION['locale'].' FROM ?_factions WHERE factionID=?d LIMIT 1', $quest['RequiredMinRepFaction']),
-			'entry' => $quest['RequiredMinRepFaction'],
-			'value' => reputations($quest['RequiredMinRepValue'])
-		);
-	if($quest['RequiredMaxRepFaction'])
-		$quest['RequiredMaxRep'] = array(
-			'name' => $DB->selectCell('SELECT name_loc'.$_SESSION['locale'].' FROM ?_factions WHERE factionID=?d LIMIT 1', $quest['RequiredMaxRepFaction']),
-			'entry' => $quest['RequiredMaxRepFaction'],
-			'value' => reputations($quest['RequiredMaxRepValue'])
-		);
-
-	// Спеллы не требуют локализации, их инфа берется из базы
-	// Хранить в базе все локализации - задачка на будующее
-
-	// Спелл, кастуемый на игрока в начале квеста
-	if($quest['SourceSpell'])
-	{
-		$tmp = $DB->selectRow('
-			SELECT ?#, s.spellname_loc'.$_SESSION['locale'].'
-			FROM ?_spell s, ?_spellicons si
-			WHERE
-				s.spellID=?d
-				AND si.id=s.spellicon
-			LIMIT 1',
-			$spell_cols[0],
-			$quest['SourceSpell']
-		);
-		if($tmp)
-		{
-			$quest['SourceSpell'] = array(
-				'name' => $tmp['spellname_loc'.$_SESSION['locale']],
-				'entry' => $tmp['spellID']);
-			allspellsinfo2($tmp);
-		}
-		unset($tmp);
-	}
-
-	// Итем, выдаваемый игроку в начале квеста
-	if($quest['SourceItemId'])
-	{
-		$quest['SourceItemId'] = iteminfo($quest['SourceItemId']);
-		$quest['SourceItemId']['SourceItemCount'] = $quest['SourceItemCount'];
-	}
-
-	// Дополнительная информация о квесте (флаги, повторяемость, скрипты)
-	$quest['flagsdetails'] = GetFlagsDetails($quest);
-	if (!$quest['flagsdetails'])
-		unset($quest['flagsdetails']);
-
-	// Спелл, кастуемый на игрока в награду за выполнение
-	if($quest['RewardSpellCast']>0 || $quest['RewardSpell']>0)
-	{
-		$tmp = $DB->SelectRow('
-			SELECT ?#, s.spellname_loc'.$_SESSION['locale'].'
-			FROM ?_spell s, ?_spellicons si
-			WHERE
-				s.spellID=?d
-				AND si.id=s.spellicon
-			LIMIT 1',
-			$spell_cols[0],
-			$quest['RewardSpell']>0?$quest['RewardSpell']:$quest['RewardSpellCast']
-		);
-		if($tmp)
-		{
-			$quest['spellreward'] = array(
-				'name' => $tmp['spellname_loc'.$_SESSION['locale']],
-				'entry' => $tmp['spellID'],
-				'realentry' => $quest['RewardSpellCast']>0 ? $quest['RewardSpellCast'] : $quest['RewardSpell']);
-			allspellsinfo2($tmp);
-		}
-		unset($tmp);
-	}
-
-	// Создания, необходимые для квеста
-	//$quest['creaturereqs'] = array();
-	//$quest['objectreqs'] = array();
-	$quest['coreqs'] = array();
-	for($i=0;$i<=4;++$i)
-	{
-        /*
-         * RequiredSpellCast dropped by TC 29.8.13
-         */
-
-		//echo $quest['ReqCreatureOrGOCount'.$i].'<br />';
-		if($quest['RequiredNpcOrGo'.$i] != 0 && $quest['RequiredNpcOrGoCount'.$i] != 0)
-		{
-			if($quest['RequiredNpcOrGo'.$i] > 0)
-			{
-				// Необходимо какое-либо взамодействие с созданием
-				$quest['coreqs'][$i] = array_merge(
-					creatureinfo($quest['RequiredNpcOrGo'.$i]),
-					array('req_type' => 'npc')
-				);
-			}
-			else
-			{
-				// необходимо какое-то взаимодействие с объектом
-				$quest['coreqs'][$i] = array_merge(
-					objectinfo(-$quest['RequiredNpcOrGo'.$i]),
-					array('req_type' => 'object')
-				);
-			}
-			// Количество
-			$quest['coreqs'][$i]['count'] = $quest['RequiredNpcOrGoCount'.$i];
-			// Спелл
-			if($quest['RequiredSpellCast'.$i])
-				$quest['coreqs'][$i]['spell'] = array(
-					'name' => $DB->selectCell('SELECT spellname_loc'.$_SESSION['locale'].' FROM ?_spell WHERE spellid=?d LIMIT 1', $quest['RequiredSpellCast'.$i]),
-					'entry' => $quest['RequiredSpellCast'.$i]
-				);
-		}
-	}
-	if(!$quest['coreqs'])
-		unset($quest['coreqs']);
-
-	// Вещи, необходимые для квеста
-	$quest['itemreqs'] = array();
-	for($i=0;$i<=4;++$i)
-	{
-		if($quest['RequiredItemId'.$i]!=0 && $quest['RequiredItemCount'.$i]!=0)
-			$quest['itemreqs'][] = array_merge(iteminfo($quest['RequiredItemId'.$i]), array('count' => $quest['RequiredItemCount'.$i]));
-	}
-	if(!$quest['itemreqs'])
-		unset($quest['itemreqs']);
-
-	// Фракции необходимые для квеста
-	if($quest['RepObjectiveFaction']>0)
-	{
-		$quest['factionreq'] = array(
-			'name' => $DB->selectCell('SELECT name_loc'.$_SESSION['locale'].' FROM ?_factions WHERE factionID=?d LIMIT 1', $quest['RepObjectiveFaction']),
-			'entry' => $quest['RepObjectiveFaction'],
-			'value' => reputations($quest['RepObjectiveValue'])
-		);
-	}
-
-	/* КВЕСТГИВЕРЫ И КВЕСТТЕЙКЕРЫ */
-
-	// КВЕСТГИВЕРЫ
-	// НПС
-	$rows = $DB->select('
-		SELECT c.entry, c.name, A, H
-			{, l.name_loc?d AS name_loc}
-		FROM creature_questrelation q, ?_factiontemplate, creature_template c
-			{LEFT JOIN (locales_creature l) ON l.entry=c.entry AND ?}
-		WHERE
-			q.quest=?d
-			AND c.entry=q.id
-			AND factiontemplateID=c.faction_A
-		',
-		($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP,
-		($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-		$quest['Id']
-	);
-	if($rows)
-	{
-		foreach($rows as $tmp)
-		{
-			$tmp['name'] = localizedName($tmp);
-			if($tmp['A'] == -1 && $tmp['H'] == 1)
-				$tmp['side'] = 'horde';
-			elseif($tmp['A'] == 1 && $tmp['H'] == -1)
-				$tmp['side'] = 'alliance';
-			$quest['start'][] = array_merge($tmp, array('type' => 'npc'));
-		}
-	}
-	unset($rows);
-
-	// НПС-ивентовые
-	$rows = event_find(array('quest_id' => $quest['Id']));
-	if ($rows)
-	{
-		foreach ($rows as $event)
-			foreach ($event['creatures_quests_id'] as $ids)
-				if ($ids['quest'] == $quest['Id'])
-				{
-					$tmp = creatureinfo($ids['creature']);
-					if($tmp['react'] == '-1,1')
-						$tmp['side'] = 'horde';
-					elseif($tmp['react'] == '1,-1')
-						$tmp['side'] = 'alliance';
-					$tmp['type'] = 'npc';
-					$tmp['event'] = $event['entry'];
-					$quest['start'][] = $tmp;
-				}
-	}
-	unset($rows);
-
-	// ГО
-	$rows = $DB->select('
-		SELECT g.entry, g.name
-			{, l.name_loc?d AS name_loc}
-		FROM gameobject_questrelation q, gameobject_template g
-			{LEFT JOIN (locales_gameobject l) ON l.entry = g.entry AND ?}
-		WHERE
-			q.quest=?d
-			AND g.entry=q.id
-		',
-		($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP,
-		($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-		$quest['Id']
-	);
-	if($rows)
-	{
-		foreach($rows as $tmp)
-		{
-			$tmp['name'] = localizedName($tmp);
-			$quest['start'][] = array_merge($tmp, array('type' => 'object'));
-		}
-	}
-	unset($rows);
-
-	// итем
-	$rows = $DB->select('
-		SELECT i.name, i.entry, i.quality, LOWER(a.iconname) AS iconname
-			{, l.name_loc?d AS name_loc}
-		FROM ?_icons a, item_template i
-			{LEFT JOIN (locales_item l) ON l.entry=i.entry AND ?}
-		WHERE
-			startquest = ?d
-			AND id = displayid
-		',
-		($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP,
-		($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-		$quest['Id']
-	);
-	if($rows)
-	{
-		foreach($rows as $tmp)
-		{
-			$tmp['name'] = localizedName($tmp);
-			$quest['start'][] = array_merge($tmp, array('type' => 'item'));
-		}
-	}
-	unset($rows);
-
-	// КВЕСТТЕЙКЕРЫ
-	// НПС
-	$rows = $DB->select('
-		SELECT c.entry, c.name, A, H
-			{, l.name_loc?d AS name_loc}
-		FROM creature_involvedrelation q, ?_factiontemplate, creature_template c
-			{LEFT JOIN (locales_creature l) ON l.entry=c.entry AND ?}
-		WHERE
-			q.quest=?d
-			AND c.entry=q.id
-			AND factiontemplateID=c.faction_A
-		',
-		($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP,
-		($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-		$quest['Id']
-	);
-	if($rows)
-	{
-		foreach($rows as $tmp)
-		{
-			$tmp['name'] = localizedName($tmp);
-			if($tmp['A'] == -1 && $tmp['H'] == 1)
-				$tmp['side'] = 'horde';
-			elseif($tmp['A'] == 1 && $tmp['H'] == -1)
-				$tmp['side'] = 'alliance';
-			$quest['end'][] = array_merge($tmp, array('type' => 'npc'));
-		}
-	}
-	unset($rows);
-
-	// ГО
-	$rows = $DB->select('
-		SELECT g.entry, g.name
-			{, l.name_loc?d AS name_loc}
-		FROM gameobject_involvedrelation q, gameobject_template g
-			{LEFT JOIN (locales_gameobject l) ON l.entry = g.entry AND ?}
-		WHERE
-			q.quest=?d
-			AND g.entry=q.id
-		',
-		($_SESSION['locale']>0)? $_SESSION['locale']: DBSIMPLE_SKIP,
-		($_SESSION['locale']>0)? 1: DBSIMPLE_SKIP,
-		$quest['Id']
-	);
-	if($rows)
-	{
-		foreach($rows as $tmp)
-		{
-			$tmp['name'] = localizedName($tmp);
-			$quest['end'][] = array_merge($tmp, array('type' => 'object'));
-		}
-	}
-	unset($rows);
-
-	// Цель критерии
-	$rows = $DB->select('
-			SELECT a.id, a.faction, a.name_loc?d AS name, a.description_loc?d AS description, a.category, a.points, s.iconname, z.areatableID
-			FROM ?_spellicons s, ?_achievementcriteria c, ?_achievement a
-			LEFT JOIN (?_zones z) ON a.map != -1 AND a.map = z.mapID
-			WHERE
-				a.icon = s.id
-				AND a.id = c.refAchievement
-				AND c.type IN (?a)
-				AND c.value1 = ?d
-			GROUP BY a.id
-			ORDER BY a.name_loc?d
-		',
-		$_SESSION['locale'],
-		$_SESSION['locale'],
-		array(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST),
-		$quest['Id'],
-		$_SESSION['locale']
-	);
-	if($rows)
-	{
-		$quest['criteria_of'] = array();
-		foreach($rows as $row)
-		{
-			allachievementsinfo2($row['id']);
-			$quest['criteria_of'][] = achievementinfo2($row);
+		if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, reqRaceMask FROM ?_quests WHERE nextQuestIdChain = ?d', $_['typeId']))
+        {
+            $n = Util::localizedString($_, 'name');
+            array_unshift($chain, array(
+                array(
+                    'side'    => Util::sideByRaceMask($_['reqRaceMask']),
+                    'typeStr' => Util::$typeStrings[TYPE_QUEST],
+                    'typeId'  => $_['typeId'],
+                    'name'    => strlen($n) > 40 ? substr($n, 0, 40).'…' : $n
+                )
+            ));
 		}
 	}
 
-	// Награды и благодарности, присылаемые почтой
-	if ($quest['RewardMailTemplateId'])
+	$_ = end($chain)[0];
+	while($_)
 	{
-		if(!($quest['mailrewards'] = loot('mail_loot_template', $quest['RewardMailTemplateId'])))
-			unset ($quest['mailrewards']);
+		if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, reqRaceMask, nextQuestIdChain AS _next FROM ?_quests WHERE id = ?d', $_['_next']))
+        {
+            $n = Util::localizedString($_, 'name');
+            array_push($chain, array(
+                array(
+                    'side'    => Util::sideByRaceMask($_['reqRaceMask']),
+                    'typeStr' => Util::$typeStrings[TYPE_QUEST],
+                    'typeId'  => $_['typeId'],
+                    'name'    => strlen($n) > 40 ? substr($n, 0, 40).'…' : $n,
+                    '_next'   => $_['_next'],
+                )
+            ));
+		}
 	}
-	if ($quest['RewardMailDelay'])
-		$quest['maildelay'] = sec_to_time($quest['RewardMailDelay']);
+
+    if (count($chain) > 1)
+        $series[] = [$chain, null];
+
+
+    // todo (low): sensibly merge te following lists into 'series'
+    $listGen = function($cnd)
+    {
+        $chain = [];
+        $list  = new QuestList($cnd);
+        if ($list->error)
+            return null;
+
+        foreach ($list->iterate() as $id => $__)
+        {
+            $n = $list->getField('name', true);
+            $chain[] = array(array(
+                'side'    => Util::sideByRaceMask($list->getField('reqRaceMask')),
+                'typeStr' => Util::$typeStrings[TYPE_QUEST],
+                'typeId'  => $id,
+                'name'    => strlen($n) > 40 ? substr($n, 0, 40).'…' : $n
+            ));
+        }
+
+        return $chain;
+    };
+
+    $extraLists = array(
+        array(                                              // Requires all of these quests (Quests that you must follow to get this quest)
+            'reqQ',
+            array(
+                'OR',
+                ['AND', ['nextQuestId', $_id], ['exclusiveGroup', 0, '<']],
+                ['AND', ['id', $quest->getField('prevQuestId')], ['nextQuestIdChain', $_id, '!']]
+            )
+        ),
+        array(                                              // Requires one of these quests (Requires one of the quests to choose from)
+            'reqOneQ',
+            [['exclusiveGroup', 0, '>'], ['nextQuestId', $_id]]
+        ),
+        array(                                              // Opens Quests (Quests that become available only after complete this quest (optionally only one))
+            'opensQ',
+            array(
+                'OR',
+                ['AND', ['prevQuestId', $_id], ['id', $quest->getField('nextQuestIdChain'), '!']],
+                ['id', $quest->getField('nextQuestId')]
+            )
+        ),
+        array(                                              // Closes Quests (Quests that become inaccessible after completing this quest)
+            'closesQ',
+            [['exclusiveGroup', 0, '!'], ['exclusiveGroup', $quest->getField('exclusiveGroup')], ['id', $_id, '!']]
+        ),
+        array(                                              // During the quest available these quests (Quests that are available only at run time this quest)
+            'enablesQ',
+            [['prevQuestId', -$_id]]
+        ),
+        array(                                              // Requires an active quest (Quests during the execution of which is available on the quest)
+            'enabledByQ',
+            [['id', -$quest->getField('prevQuestId')]]
+        )
+    );
+
+    foreach ($extraLists as $el)
+        if ($_ = $listGen($el[1]))
+            $series[] = [$_, sprintf(Util::$dfnString, Lang::$quest[$el[0].'Desc'], Lang::$quest[$el[0]])];
+
+
+    /*******************/
+    /* Objectives List */
+    /*******************/
+
+    $objectiveList = [];
+
+    $srcItemId = $quest->getField('sourceItemId');
+    if ($srcItemId)
+    {
+        $item = new itemList(array(['id', $srcItemId]));
+        if (!$item->error)
+        {
+            $item->addGlobalsToJscript();
+            $objectiveList[] = array(
+                'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                'id'        => $srcItemId,
+                'name'      => $item->getField('name', true),
+                'qty'       => $quest->getField('sourceItemCount'),
+                'quality'   => $item->getField('quality'),
+                'extraText' => '&nbsp;('.Lang::$quest['provided'].')'
+            );
+        }
+    }
+
+    if ($_ = $quest->getField('sourceSpellId'))
+    {
+        Util::$pageTemplate->extendGlobalIds(TYPE_SPELL, $_);
+        $objectiveList[] = array(
+            'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+            'id'        => $_,
+            'name'      => SpellList::getName($_),
+            'qty'       => 0,
+            'quality'   => '',
+            'extraText' => '&nbsp;('.Lang::$quest['provided'].')'
+        );
+    }
+
+	for ($i = 1; $i < 5; $i++)
+	{
+        $id     = $quest->getField('reqNpcOrGo'.$i);
+        $qty    = $quest->getField('reqNpcOrGoCount'.$i);
+        $altTxt = $quest->getField('objectiveText'.$i, true);
+		if (!$id || !$qty)
+            continue;
+
+		if ($id > 0)
+        {
+            $proxy = new CreatureList(['OR', ['killCredit1', (int)$id], ['killCredit2', (int)$id]]);
+            if (!$proxy->error)
+            {
+                // todo (low): now do it properly this time!
+                $proxyList  = '<a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$id.'\'), this)" class="disclosure-off">'.($altTxt ? $altTxt : CreatureList::getName($id)).'</a>'.($qty > 1 ? ' &nbsp;('.$qty.')' : null);
+                $proxyList .= "<div id=\"npcgroup-".$id."\" style=\"display: none\"><div style=\"float: left\">\n<table class=\"iconlist\">\n";
+                foreach ($proxy->iterate() as $pId => $__)
+                    $proxyList .= '    <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$proxy->getField('name', true)."</a></td></tr>\n";
+
+                // re-add self
+                $proxyList .= '    <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$id.'">'.CreatureList::getName($id)."</a></td></tr>\n";
+
+                $objectiveList[] = ['text' => $proxyList."</table>\n</div></div>"];
+            }
+            else
+            {
+                $objectiveList[] = array(
+                    'typeStr'   => Util::$typeStrings[TYPE_NPC],
+                    'id'        => $id,
+                    'name'      => $altTxt ? $altTxt : CreatureList::getName($id),
+                    'qty'       => $qty,
+                    'quality'   => '',
+                    'extraText' => (($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $altTxt) ? '' : ' '.Lang::$achievement['slain']
+                );
+            }
+        }
+        else
+        {
+			$objectiveList[] = array(
+                'typeStr'   => Util::$typeStrings[TYPE_OBJECT],
+                'id'        => -$id,
+                'name'      => $altTxt ? $altTxt : GameObjectList::getName(-$id),
+                'qty'       => $qty,
+                'quality'   => '',
+                'extraText' => ''
+            );
+        }
+    }
+
+	for ($i = 1; $i < 7; $i++)
+	{
+        $id  = $quest->getField('reqItemId'.$i);
+        $qty = $quest->getField('reqItemCount'.$i);
+		if (!$id || !$qty || $id == $srcItemId)
+            continue;
+
+        $item = new itemList(array(['id', $id]));
+        if (!$item->error)
+        {
+            $item->addGlobalsToJscript();
+            $objectiveList[] = array(
+                'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                'id'        => $id,
+                'name'      => $item->getField('name', true),
+                'qty'       => $qty,
+                'quality'   => $item->getField('quality'),
+                'extraText' => ''
+            );
+        }
+	}
+
+    for ($i = 1; $i < 3; $i++)
+    {
+        $id  = $quest->getField('reqFactionId'.$i);
+        $val = $quest->getField('reqFactionValue'.$i);
+        if (!$id)
+            continue;
+
+        $objectiveList[] = array(
+            'typeStr'   => Util::$typeStrings[TYPE_FACTION],
+            'id'        => $id,
+            'name'      => FactionList::getName($id),
+            'qty'       => '',
+            'quality'   => '',
+            'extraText' => '&nbsp;('.sprintf(Util::$dfnString, $val.' '.Lang::$achievement['points'], Lang::getReputationLevelForPoints($val)).')'
+        );
+    }
+
+    if ($_questMoney < 0)
+        $objectiveList[] = ['text' => Lang::$quest['reqMoney'].Lang::$colon.Util::formatMoney(abs($_questMoney))];
+
+    if ($_ = $quest->getField('reqPlayerKills'))
+        $objectiveList[] = ['text' => Lang::$quest['playerSlain'].'&nbsp;('.$_.')'];
+
+
+    /**********/
+    /* Mapper */
+    /**********/
+
+    /*
+        TODO (GODDAMNIT): jeez..
+    */
+
+    // $startend + reqNpcOrGo[1-4]
+    $map = [];
+
+    /***********/
+    /* Rewards */
+    /***********/
+
+    // rewards
+    $rewards = [];
+
+    $comp  = $quest->getField('rewardMoneyMaxLevel');
+    $money = '';
+    if ($_questMoney > 0)
+        $money .= Util::formatMoney($_questMoney);
+    if ($_questMoney > 0 && $comp > 0)
+        $money .= '&nbsp;' . sprintf(Lang::$quest['expConvert'], Util::formatMoney($_questMoney + $comp), MAX_LEVEL);
+    else if ($_questMoney <= 0 && $_questMoney + $comp > 0)
+        $money .= sprintf(Lang::$quest['expConvert2'], Util::formatMoney($_questMoney + $comp), MAX_LEVEL);
+
+    $rewards['money'] = $money;
+
+    if ($c = @$quest->choices[$_id][TYPE_ITEM])
+    {
+        $choiceItems = new ItemList(array(['id', array_keys($c)]));
+        if (!$choiceItems->error)
+        {
+            $choiceItems->addGlobalsToJscript();
+            foreach ($choiceItems->Iterate() as $id => $__)
+            {
+                $rewards['choice'][] = array(
+                    'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                    'id'        => $id,
+                    'name'      => $choiceItems->getField('name', true),
+                    'quality'   => $choiceItems->getField('quality'),
+                    'qty'       => $c[$id],
+                    'globalStr' => 'g_items'
+                );
+            }
+        }
+    }
+
+    $rewards['items'] = [];                                 // template requires initialization of this var
+    if ($r = @$quest->rewards[$_id])
+    {
+        if (!empty($r[TYPE_ITEM]))
+        {
+            $rewItems = new ItemList(array(['id', array_keys($r[TYPE_ITEM])]));
+            if (!$rewItems->error)
+            {
+                $rewItems->addGlobalsToJscript();
+                foreach ($rewItems->Iterate() as $id => $__)
+                {
+                    $rewards['items'][] = array(
+                        'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                        'id'        => $id,
+                        'name'      => $rewItems->getField('name', true),
+                        'quality'   => $rewItems->getField('quality'),
+                        'qty'       => $r[TYPE_ITEM][$id],
+                        'globalStr' => 'g_items'
+                    );
+                }
+            }
+        }
+
+        if (!empty($r[TYPE_CURRENCY]))
+        {
+            $rewCurr = new CurrencyList(array(['id', array_keys($r[TYPE_CURRENCY])]));
+            if (!$rewCurr->error)
+            {
+                $rewCurr->addGlobalsToJscript();
+                foreach ($rewCurr->Iterate() as $id => $__)
+                {
+                    $rewards['items'][] = array(
+                        'typeStr'   => Util::$typeStrings[TYPE_CURRENCY],
+                        'id'        => $id,
+                        'name'      => $rewCurr->getField('name', true),
+                        'quality'   => 1,
+                        'qty'       => $r[TYPE_CURRENCY][$id] * ($_side == 2 ? -1 : 1), // toggles the icon
+                        'globalStr' => 'g_gatheredcurrencies'
+                    );
+                }
+            }
+        }
+    }
+
+    $displ = $quest->getField('rewardSpell');
+    $cast  = $quest->getField('rewardSpellCast');
+    if (!$cast && $displ)
+    {
+        $cast  = $displ;
+        $displ = 0;
+    }
+
+    if ($cast || $displ)
+    {
+        $rewSpells = new SpellList(array(['id', [$displ, $cast]]));
+        $rewSpells->addGlobalsToJscript();
+
+        if (User::isInGroup(U_GROUP_STAFF))
+        {
+            $extra = null;
+            if ($_ = $rewSpells->getEntry($displ))
+                $extra = sprintf(Lang::$quest['spellDisplayed'], $displ, Util::localizedString($_, 'name'));
+
+            if ($_ = $rewSpells->getEntry($cast))
+            {
+                $rewards['spells']['extra']  = $extra;
+                $rewards['spells']['cast'][] = array(
+                    'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+                    'id'        => $cast,
+                    'name'      => Util::localizedString($_, 'name'),
+                    'globalStr' => 'g_spells'
+                );
+            }
+        }
+        else // check if we have a learn spell
+        {
+            $teach = [];
+            foreach ($rewSpells->iterate() as $id => $__)
+                if ($_ = $rewSpells->canTeachSpell())
+                    foreach ($_ as $idx)
+                        $teach[$rewSpells->getField('effect'.$idx.'TriggerSpell')] = $id;
+
+            if ($_ = $rewSpells->getEntry($displ))
+            {
+                $rewards['spells']['extra'] = null;
+                $rewards['spells'][$teach ? 'learn' : 'cast'][] = array(
+                    'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+                    'id'        => $displ,
+                    'name'      => Util::localizedString($_, 'name'),
+                    'globalStr' => 'g_spells'
+                );
+            }
+            else if (($_ = $rewSpells->getEntry($cast)) && !$teach)
+            {
+                $rewards['spells']['extra']  = null;
+                $rewards['spells']['cast'][] = array(
+                    'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+                    'id'        => $cast,
+                    'name'      => Util::localizedString($_, 'name'),
+                    'globalStr' => 'g_spells'
+                );
+            }
+            else
+            {
+                $taught = new SpellList(array(['id', array_keys($teach)]));
+                if (!$taught->error)
+                {
+                    $taught->addGlobalsToJscript();
+                    $rewards['spells']['extra']  = null;
+                    foreach ($taught->iterate() as $id => $__)
+                    {
+                        $rewards['spells']['learn'][] = array(
+                            'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+                            'id'        => $id,
+                            'name'      => $taught->getField('name', true),
+                            'globalStr' => 'g_spells'
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    // gains
+    $gains = [];
+
+    if ($_ = $quest->getField('rewardXP'))
+        $gains['xp'] = $_;
+
+    if ($_ = $quest->getField('rewardTalents'))
+        $gains['tp'] = $_;
+
+
+    for ($i = 1; $i < 6; $i++)
+    {
+        $fac = $quest->getField('rewardFactionId'.$i);
+        $qty = $quest->getField('rewardFactionValue'.$i);
+        if (!$fac || !$qty)
+            continue;
+
+        $gains['rep'][] = array(
+            'qty'  => $qty,
+            'id'   => $fac,
+            'name' => FactionList::getName($fac)
+        );
+    }
+
+    if ($_ = (new TitleList(array(['id', $quest->getField('rewardTitleId')])))->getHtmlizedName())
+        $gains['title'] = sprintf(Lang::$quest['theTitle'], $_);
+
+    // reward mail
+    $mail     = [];
+	$relTabs  = [];
+    if ($_ = $quest->getField('rewardMailTemplateId'))
+    {
+        $delay  = $quest->getField('rewardMailDelay');
+        $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailTemplate WHERE id = ?d', $_);
+
+        $mail = array(
+            'delay'   => $delay  ? sprintf(Lang::$quest['mailIn'], Util::formatTime($delay * 1000)) : null,
+            'text'    => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text'))      : null,
+            'subject' => Util::parseHtmlText(Util::localizedString($letter, 'subject'))
+        );
+
+        $extraCols = ['Listview.extraCols.percent'];
+        if ($loot = Util::handleLoot(LOOT_MAIL, $_, User::isInGroup(U_GROUP_STAFF), $extraCols))
+        {
+            $relTabs[] = array(
+                'file'   => 'item',
+                'data'   => $loot,
+                'params' => [
+                    'tabs'        => '$tabsRelated',
+                    'name'        => '[Mail Attachments]',
+                    'id'          => 'mail-attachments',
+                    'extraCols'   => "$[".implode(', ', array_unique($extraCols))."]",
+                    'hiddenCols'  => "$".json_encode(['side', 'slot', 'reqlevel'])
+                ]
+            );
+        }
+    }
+
+    /****************/
+    /* Main Content */
+    /****************/
+
+    // menuId 3: Quest    g_initPath()
+    //  tabId 0: Database g_initHeader()
+    $pageData = array(
+        'page'    => array(
+            'title'         => $_name.' - '.Util::ucFirst(Lang::$game['quest']),
+            'name'          => $_name,
+            'path'          => json_encode($_path, JSON_NUMERIC_CHECK),
+            'tab'           => 0,
+            'type'          => TYPE_QUEST,
+            'typeId'        => $_id,
+            'objectives'    => $quest->parseText('objectives', false),
+            'details'       => $quest->parseText('details', false),
+            'offerReward'   => $quest->parseText('offerReward', false),
+            'requestItems'  => $quest->parseText('requestItems', false),
+            'completed'     => $quest->parseText('completed', false),
+            'end'           => $quest->parseText('end', false),
+            'suggestedPl'   => $quest->getField('suggestedPlayers'),
+            'infobox'       => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',
+            'series'        => $series,
+            'objectiveList' => $objectiveList,
+            'rewards'       => $rewards,
+            'gains'         => $gains,
+            'mail'          => $mail,
+            // 'map'    => array(
+                // 'data' => ['zone' => $_id],
+                // 'som'  => json_encode($som, JSON_NUMERIC_CHECK)
+            // ),
+            'reqJS'         => array(
+                // $map ? 'static/js/Mapper.js' : null
+            ),
+            'reqCSS'        => array(
+                ['path' => 'static/css/Book.css'],
+                // $map ? ['path' => 'static/css/Mapper.css'] : null,
+                // $map ? ['path' => 'static/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6'] : null
+            ),
+            'redButtons'    => array(
+                BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => 'quest:'.$_id.':'.$_level.''],
+                BUTTON_WOWHEAD => true
+            )
+        ),
+        'relTabs' => $relTabs
+    );
+
+    if ($_flags & QUEST_FLAG_UNAVAILABLE || $quest->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW)
+        $pageData['page']['unavailable'] = true;
+
+    if ($_ = $quest->getField('reqMinRepFaction'))
+    {
+        $val = $quest->getField('reqMinRepValue');
+        $pageData['page']['reqMinRep'] = sprintf(Lang::$quest['reqRepWith'], $_, FactionList::getName($_), Lang::$quest['reqRepMin'], sprintf(Util::$dfnString, $val.' '.Lang::$achievement['points'], Lang::getReputationLevelForPoints($val)));
+    }
+
+    if ($_ = $quest->getField('reqMaxRepFaction'))
+    {
+        $val = $quest->getField('reqMaxRepValue');
+        $pageData['page']['reqMaxRep'] = sprintf(Lang::$quest['reqRepWith'], $_, FactionList::getName($_), Lang::$quest['reqRepMax'], sprintf(Util::$dfnString, $val.' '.Lang::$achievement['points'], Lang::getReputationLevelForPoints($val)));
+    }
+
+
+    /**************/
+    /* Extra Tabs */
+    /**************/
+
+    // tab: see also
+    $seeAlso = new QuestList(array(['name_loc'.User::$localeId, '%'.$_name.'%'], ['id', $_id, '!']));
+    if (!$seeAlso->error)
+    {
+        $seeAlso->addGlobalsToJScript();
+        $pageData['relTabs'][] = array(
+            'file'   => 'quest',
+            'data'   => $seeAlso->getListviewData(),
+            'params' => [
+                'tabs'       => '$tabsRelated',
+                'name'       => '$LANG.tab_seealso',
+                'id'         => 'see-also'
+            ]
+        );
+    }
+
+    // tab: criteria of
+    $criteriaOf = new AchievementList(array(['ac.type', ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST], ['ac.value1', $_id]));
+    if (!$criteriaOf->error)
+    {
+        $criteriaOf->addGlobalsToJScript();
+        $pageData['relTabs'][] = array(
+            'file'   => 'achievement',
+            'data'   => $criteriaOf->getListviewData(),
+            'params' => [
+                'tabs'       => '$tabsRelated',
+                'name'       => '$LANG.tab_criteriaof',
+                'id'         => 'criteria-of'
+            ]
+        );
+    }
 
     $smarty->saveCache($cacheKeyPage, $pageData);
 }
 
 
-// menuId 3: Quest    g_initPath()
-//  tabId 0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => implode(" - ", $pageData['title']),
-    'path'   => json_encode($pageData['path'], JSON_NUMERIC_CHECK),
-    'tab'    => 0,
-    'type'   => TYPE_QUEST,
-    'typeId' => $_id
-));
-
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_QUEST, $_id));         // comments, screenshots, videos
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$quest, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$item, Lang::$achievement, Lang::$npc, Lang::$quest, ['colon' => Lang::$colon]));
+$smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page
 $smarty->display('quest.tpl');

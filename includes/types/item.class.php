@@ -134,7 +134,7 @@ class ItemList extends BaseType
             if ($cItems)
             {
                 $moneyItems = new CurrencyList(array(['itemId', $cItems]));
-                $moneyItems->addGlobalsToJscript(Util::$pageTemplate);
+                $moneyItems->addGlobalsToJscript();
 
                 foreach ($itemz as $id => $vendors)
                 {
@@ -357,7 +357,7 @@ class ItemList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$template, $addMask = GLOBALINFO_SELF)
+    public function addGlobalsToJScript($addMask = GLOBALINFO_SELF)
     {
         foreach ($this->iterate() as $id => $__)
         {
@@ -385,7 +385,7 @@ class ItemList extends BaseType
             }
 
             if ($data || $extra)
-                $template->extendGlobalData(self::$type, $data, $extra);
+                Util::$pageTemplate->extendGlobalData(self::$type, $data, $extra);
         }
     }
 
@@ -719,8 +719,8 @@ class ItemList extends BaseType
 
         // required races
         if ($races = Lang::getRaceString($this->curTpl['requiredRace']))
-            if ($races['name'] != Lang::$game['ra'][0])     // not "both"
-                $x .= Lang::$game['races'].Lang::$colon.$races['name'].'<br />';
+            if ($races != Lang::$game['ra'][0])             // not "both", but display combinations like: troll, dwarf
+                $x .= Lang::$game['races'].Lang::$colon.$races.'<br />';
 
         // required honorRank (not used anymore)
         if ($rhr = $this->curTpl['requiredHonorRank'])
@@ -1595,7 +1595,7 @@ class ItemListFilter extends Filter
             $cnd = $cnd[0];
 
         if ($select)
-            $this->extraOpts['is']['s'] = ', ('.implode(' + ', $select).') / '.$wtSum.' AS score';
+            $this->extraOpts['is']['s'][] = ', ('.implode(' + ', $select).') / '.$wtSum.' AS score';
 
         return $cnd;
     }

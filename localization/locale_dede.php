@@ -26,11 +26,11 @@ $lang = array(
         'feedback'      => "Rückmeldung",
         'numSQL'        => "Anzahl an MySQL-Queries",
         'timeSQL'       => "Zeit für MySQL-Queries",
-        'noJScript'     => "<b>Diese Seite macht ausgiebigen Gebrauch von JavaScript.</b><br />Bitte <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">aktiviert JavaScript</a> in Eurem Browser.",
+        'noJScript'     => '<b>Diese Seite macht ausgiebigen Gebrauch von JavaScript.</b><br />Bitte <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">aktiviert JavaScript</a> in Eurem Browser.',
         'userProfiles'  => "Deine Charaktere",
         'pageNotFound'  => "Diese|Dieser|Dieses %s existiert nicht.",        // todo: dämliche Fälle...
         'gender'        => "Geschlecht",
-        'sex'           => [null, 'Mann', 'Frau'],
+        'sex'           => [null, "Mann", "Frau"],
         'players'       => "Spieler",
         'quickFacts'    => "Kurzübersicht",
         'screenshots'   => "Screenshots",
@@ -63,7 +63,7 @@ $lang = array(
         'oneFilter'     => "Mindestens einer",
         'applyFilter'   => "Filter anwenden",
         'resetForm'     => "Formular zurücksetzen",
-        'refineSearch'  => "Tipp: Präzisiere deine Suche mit Durchsuchen einer <a href=\"javascript:;\" id=\"fi_subcat\">Unterkategorie</a>.",
+        'refineSearch'  => 'Tipp: Präzisiere deine Suche mit Durchsuchen einer <a href="javascript:;" id="fi_subcat">Unterkategorie</a>.',
         'clear'         => "leeren",
         'exactMatch'    => "Exakt passend",
         '_reqLevel'     => "Mindeststufe",
@@ -73,7 +73,7 @@ $lang = array(
         'disabled'      => "Deaktiviert",
         'disabledHint'  => "Kann nicht erhalten oder abgeschlossen werden.",
         'serverside'    => "Serverseitig",
-        'serversideHint' => "Diese Informationen sind nicht im Client enthalten und wurden gesnifft und/oder erraten.",
+        'serversideHint'=> "Diese Informationen sind nicht im Client enthalten und wurden gesnifft und/oder erraten.",
 
         // red buttons
         'links'         => "Links",
@@ -82,6 +82,8 @@ $lang = array(
         'findUpgrades'  => "Bessere Gegenstände finden...",
 
         // miscTools
+        'errPageTitle'  => "Seite nicht gefunden",
+        'nfPageTitle'   => "Fehler",
         'subscribe'     => "Abonnieren",
         'mostComments'  => ["Gestern", "Vergangene %d Tage"],
         'utilities'     => array(
@@ -100,7 +102,7 @@ $lang = array(
         'cappedHint'    => 'Tipp: <a href="javascript:;" onclick="fi_presetDetails();">Entfernt</a> Gewichtungen für gedeckte Werte wie Trefferwertung.',
         'groupBy'       => "Ordnen nach",
         'gb'            => array(
-            ['Nichts', 'none'],         ['Platz', 'slot'],      ['Stufe', 'level'],         ['Quelle', 'source']
+            ["Nichts", "none"],         ["Platz", "slot"],      ["Stufe", "level"],         ["Quelle", "source"]
         ),
         'compareTool'   => "Gegenstandsvergleichswerkzeug",
         'talentCalc'    => "Talentrechner",
@@ -176,33 +178,35 @@ $lang = array(
         'zone'          => "Zone",
         'zones'         => "Gebiete",
 
+        'honorPoints'   => "Ehrenpunkte",
+        'arenaPoints'   => "Arenapunkte",
         'heroClass'     => "Heldenklasse",
         'resource'      => "Ressource",
         'resources'     => "Ressourcen",
         'role'          => "Rolle",
         'roles'         => "Rollen",
         'specs'         => "Spezialisierungen",
-        '_roles'        => ['Heiler', 'Nahkampf-DPS', 'Distanz-DPS', 'Tank'],
+        '_roles'        => ["Heiler", "Nahkampf-DPS", "Distanz-DPS", "Tank"],
 
-        'modes'         => ['Normal / Normal 10', 'Heroisch / Normal 25', 'Heroisch 10', 'Heroisch 25'],
-        'expansions'    => array("Classic", "The Burning Crusade", "Wrath of the Lich King"),
-        'stats'         => array("Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"),
+        'modes'         => ["Normal / Normal 10", "Heroisch / Normal 25", "Heroisch 10", "Heroisch 25"],
+        'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
+        'stats'         => ["Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"],
         'sources'       => array(
             null,                       "Hergestellt",              "Drop",                     "PvP",                      "Quest",                    "Händler",              "Lehrer",               "Entdeckung",
             "Einlösung",                "Talent",                   "Startausrüstung",          "Ereignis",                 "Erfolg"
         ),
         'languages'     => array(
-            1 => "Orcisch",     2 => "Darnassisch",     3 => "Taurisch",    6 => "Zwergisch",       7 => "Gemeinsprache",   8 => "Dämonisch",       9 => "Titanisch",       10 => "Thalassisch",
+             1 => "Orcisch",     2 => "Darnassisch",     3 => "Taurisch",    6 => "Zwergisch",       7 => "Gemeinsprache",   8 => "Dämonisch",       9 => "Titanisch",      10 => "Thalassisch",
             11 => "Drachisch",  12 => "Kalimagisch",    13 => "Gnomisch",   14 => "Trollisch",      33 => "Gossensprache",  35 => "Draeneiisch",    36 => "Zombie",         37 => "Gnomenbinär",        38 => "Goblinbinär"
         ),
-        'gl'            => array(null, "Erhebliche", "Geringe"),
-        'si'            => array(1 => "Allianz", -1 => "Nur für Allianz", 2 => "Horde", -2 => "Nur für Horde", 3 => "Beide"),
-        'resistances'   => array(null, 'Heiligwiderstand', 'Feuerwiderstand', 'Naturwiderstand', 'Frostwiderstand', 'Schattenwiderstand', 'Arkanwiderstand'),
-        'sc'            => array("Körperlich", "Heilig", "Feuer", "Natur", "Frost", "Schatten", "Arkan"),
-        'dt'            => array(null, "Magie", "Fluch", "Krankheit", "Gift", "Verstohlenheit", "Unsichtbarkeit", null, null, "Wut"),
-        'cl'            => array(null, "Krieger", "Paladin", "Jäger", "Schurke", "Priester", "Todesritter", "Schamane", "Magier", "Hexenmeister", null, "Druide"),
-        'ra'            => array(-2 => "Horde", -1 => "Allianz", "Beide", "Mensch", "Orc", "Zwerg", "Nachtelf", "Untoter", "Taure", "Gnom", "Troll", null, "Blutelf", "Draenei"),
-        'rep'           => array("Hasserfüllt", "Feindselig", "Unfreundlich", "Neutral", "Freundlich", "Wohlwollend", "Respektvoll", "Ehrfürchtig"),
+        'gl'            => [null, "Erhebliche", "Geringe"],
+        'si'            => [1 => "Allianz", -1 => "Nur für Allianz", 2 => "Horde", -2 => "Nur für Horde", 3 => "Beide"],
+        'resistances'   => [null, 'Heiligwiderstand', 'Feuerwiderstand', 'Naturwiderstand', 'Frostwiderstand', 'Schattenwiderstand', 'Arkanwiderstand'],
+        'sc'            => ["Körperlich", "Heilig", "Feuer", "Natur", "Frost", "Schatten", "Arkan"],
+        'dt'            => [null, "Magie", "Fluch", "Krankheit", "Gift", "Verstohlenheit", "Unsichtbarkeit", null, null, "Wut"],
+        'cl'            => [null, "Krieger", "Paladin", "Jäger", "Schurke", "Priester", "Todesritter", "Schamane", "Magier", "Hexenmeister", null, "Druide"],
+        'ra'            => [-2 => "Horde", -1 => "Allianz", "Beide", "Mensch", "Orc", "Zwerg", "Nachtelf", "Untoter", "Taure", "Gnom", "Troll", null, "Blutelf", "Draenei"],
+        'rep'           => ["Hasserfüllt", "Feindselig", "Unfreundlich", "Neutral", "Freundlich", "Wohlwollend", "Respektvoll", "Ehrfürchtig"],
         'st'            => array(
             "Vorgabe",              "Katzengestalt",                "Baum des Lebens",              "Reisegestalt",                 "Wassergestalt",
             "Bärengestalt",         null,                           null,                           "Terrorbärengestalt",           null,
@@ -223,8 +227,8 @@ $lang = array(
             "Tier",                     "Mechanisch",               "Nicht spezifiziert",       "Totem",                    "Haustier",                 "Gaswolke"
         ),
         'fa'            => array(
-            1 => "Wolf",                2 => "Katze",               3 => "Spinne",              4 => "Bär",                 5 => "Eber",                6 => "Krokilisk",           7 => "Aasvogel",            8 => "Krebs",
-            9 => "Gorilla",             11 => "Raptor",             12 => "Weitschreiter",      20 => "Skorpid",            21 => "Schildkröte",        24 => "Fledermaus",         25 => "Hyäne",              26 => "Raubvogel",
+             1 => "Wolf",                2 => "Katze",               3 => "Spinne",              4 => "Bär",                 5 => "Eber",                6 => "Krokilisk",           7 => "Aasvogel",            8 => "Krebs",
+             9 => "Gorilla",            11 => "Raptor",             12 => "Weitschreiter",      20 => "Skorpid",            21 => "Schildkröte",        24 => "Fledermaus",         25 => "Hyäne",              26 => "Raubvogel",
             27 => "Windnatter",         30 => "Drachenfalke",       31 => "Felshetzer",         32 => "Sphärenjäger",       33 => "Sporensegler",       34 => "Netherrochen",       35 => "Schlange",           37 => "Motte",
             38 => "Schimäre",           39 => "Teufelssaurier",     41 => "Silithid",           42 => "Wurm",               43 => "Rhinozeros",         44 => "Wespe",              45 => "Kernhund",           46 => "Geisterbestie"
         ),
@@ -235,12 +239,6 @@ $lang = array(
             "Ritter der Allianz / Klinge der Horde",    "Feldkomandant / Feldherr",             "Rittmeister / Sturmreiter",
             "Marschall / Kriegsherr",                   "Feldmarschall / Kriegsfürst",          "Großmarschall / Oberster Kriegsfürst"
         ),
-    ),
-    'error' => array(
-        'errNotFound'   => "Seite nicht gefunden",
-        'errPage'       => "Was? Wie hast du... vergesst es!\n<br>\n<br>\nAnscheinend konnte die von Euch angeforderte Seite nicht gefunden werden. Wenigstens nicht in dieser Dimension.\n<br>\n<br>\nVielleicht lassen einige Justierungen an der\n<span class=\"q4\">\n<ins>[WH-799 Großkonfabulierungsmaschine]</ins>\n</span>\ndie Seite plötzlich wieder auftauchen!\n<div class=\"pad\"></div>\n<div class=\"pad\"></div>\nOder, Ihr könnt es auch \n<a href=\"/?aboutus#contact\">uns melden</a>\n- die Stabilität des WH-799 ist umstritten, und wir möchten gern noch so ein Problem vermeiden...",
-        'goStart'       => "Zur <a href=\"index.php\">Titelseite</a> zurückkehren",
-        'goForum'       => "<a href=\"?forums&board=1\">Forum</a> für Rückmeldungen",
     ),
     'account' => array(
         'doSignIn'      => "Mit Eurem AoWoW-Konto anmelden",
@@ -253,7 +251,7 @@ $lang = array(
         'userNotFound'  => "Ein Konto mit diesem Namen existiert nicht",
         'userBanned'    => "Dieses Konto wurde geschlossen",
         'passMismatch'  => "Die eingegebenen Passwörter stimmen nicht überein",
-        'loginsExceeded' => "Die maximale Anzahl an Login-Versuchen von dieser IP wurde überschritten. Bitte versuchen Sie es in %s Minuten noch einmal.",
+        'loginsExceeded'=> "Die maximale Anzahl an Login-Versuchen von dieser IP wurde überschritten. Bitte versuchen Sie es in %s Minuten noch einmal.",
         'nameInUse'     => "Es existiert bereits ein Konto mit diesem Namen",
         'email'         => "E-Mail-Adresse",
         'unkError'      => "Unbekannter Fehler bei der Accounterstellung",
@@ -275,7 +273,7 @@ $lang = array(
         'myAccount'     => "Mein Account",
         'editAccount'   => "Benutze die folgenden Formulare um deine Account-Informationen zu aktualisieren",
         'publicDesc'    => "Öffentliche Beschreibung",
-        'viewPubDesc'   => "Die Beschreibung in deinem <a href=\"?user=%s\">öffentlichen Profil</a> ansehen",
+        'viewPubDesc'   => 'Die Beschreibung in deinem <a href="?user=%s">öffentlichen Profil</a> ansehen',
     ),
     'gameObject' => array(
         'cat'           => [0 => "Anderes", 9 => "Bücher", 3 => "Behälter", -5 => "Truhen", 25 => "Fischschwärme", -3 => "Kräuter", -4 => "Erzadern",     -2 => "Quest", -6 => "Werkzeuge"],
@@ -286,7 +284,8 @@ $lang = array(
         'focusDesc'     => "Zauber, die diesen Fokus benötigen, können an diesem Objekt gewirkt werden.",
         'trap'          => "Falle",
         'triggeredBy'   => "Ausgelöst durch",
-        'capturePoint'  => "Eroberungspunkt"
+        'capturePoint'  => "Eroberungspunkt",
+        'foundIn'       => "Dieses Objekt befindet sich in"
     ),
     'npc'   => array(
         'classification'=> "Einstufung",
@@ -304,6 +303,7 @@ $lang = array(
         'melee'         => "Nahkampf",
         'ranged'        => "Fernkampf",
         'armor'         => "Rüstung",
+        'foundIn'       => "Dieser NPC befindet sich in",
         'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rar", 2 => "Rar Elite", 3 => "Boss"],
         'textTypes'     => [null, "schreit", "sagt", "flüstert"],
         'modes'         => array(
@@ -320,7 +320,7 @@ $lang = array(
         'end'           => "Ende",
         'interval'      => "Intervall",
         'inProgress'    => "Ereignis findet gerade statt",
-        'category'      => array("Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler")
+        'category'      => ["Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler"]
     ),
     'achievement' => array(
         'criteria'      => "Kriterien",
@@ -328,8 +328,8 @@ $lang = array(
         'series'        => "Reihe",
         'outOf'         => "von",
         'criteriaType'  => "Criterium Typ-Id:",
-        'itemReward'    => "Ihr bekommt:",
-        'titleReward'   => "Euch wird der Titel \"<a href=\"?title=%d\">%s</a>\" verliehen",
+        'itemReward'    => "Ihr bekommt",
+        'titleReward'   => 'Euch wird der Titel "<a href="?title=%d">%s</a>" verliehen',
         'slain'         => "getötet",
         'reqNumCrt'     => "Benötigt"
     ),
@@ -353,6 +353,7 @@ $lang = array(
         'Miscellaneous' => "Diverse",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Kosmische Karte",
+        'selectorLink'  => " und ",
     ),
     'zone' => array(
         // 'zone'          => "Zone",
@@ -363,23 +364,75 @@ $lang = array(
         )
     ),
     'quest' => array(
-        'questLevel'    => 'Stufe %s',
+        'questLevel'    => "Stufe %s",
+        'requirements'  => "Anforderungen",
+        'reqMoney'      => "Benötigtes Geld",
+        'money'         => "Geld",
+        'additionalReq' => "Zusätzliche Anforderungen um das Quest zu erhalten",
+        'reqRepWith'    => 'Eure Reputation mit <a href="?faction=%d">%s</a> %s %s sein',
+        'reqRepMin'     => "muss mindestens",
+        'reqRepMax'     => "darf höchstens",
+        'progress'      => "Fortschritt",
+        'provided'      => "Bereitgestellt",
+        'providedItem'  => "Bereitgestellter Gegenstand",
+        'completion'    => "Abschluss",
+        'description'   => "Beschreibung",
+        'playerSlain'   => "Spieler getötet",
+        'profession'    => "Beruf",
+        'timer'         => "Zeitbegrenzung",
+        'loremaster'    => "Meister der Lehren",
+        'suggestedPl'   => "Empfohlene Spielerzahl",
+        'keepsPvpFlag'  => "Hält Euch im PvP",
         'daily'         => 'Täglich',
-        'requirements'  => 'Anforderungen',
+        'weekly'        => "Wöchentlich",
+        'monthly'       => "Monatlich",
+        'sharable'      => "Teilbar",
+        'notSharable'   => "Nicht teilbar",
+        'repeatable'    => "Wiederholbar",
+        'reqQ'          => "Benötigt",
+        'reqQDesc'      => "Um diese Quest zu erhalten, müsst ihr alle der nachfolgenden Quests abschließen",
+        'reqOneQ'       => "Benötigt eins von",
+        'reqOneQDesc'   => "Um diese Quest zu erhalten, müsst ihr eines der nachfolgenden Quests abschließen",
+        'opensQ'        => "Öffnet Quests",
+        'opensQDesc'    => "Es ist notwendig, diese Quest zu beenden, um die nachfolgenden Quests zu erhalten",
+        'closesQ'       => "Schließt Quests",
+        'closesQDesc'   => "Wenn ihr diese Quest beendet, sind die nachfolgenden Quests nicht mehr verfügbar",
+        'enablesQ'      => "Aktiviert",
+        'enablesQDesc'  => "Wenn diese Quest aktiv ist, sind die nachfolgenden Quests ebenfalls verfügbar",
+        'enabledByQ'    => "Aktiviert durch",
+        'enabledByQDesc'=> "Ihr könnt diese Quest nur annehmen, wenn eins der nachfolgenden Quests aktiv ist",
+        'gainsDesc'     => "Bei Abschluss dieser Quest erhaltet Ihr",
+        'theTitle'      => 'den Titel "%s"',
+        'mailDelivery'  => "Ihr werdet diesen Brief %serhalten",
+        'mailIn'        => "nach %s ",
+        'unavailable'   => "Diese Quest wurde als nicht genutzt markiert und kann weder erhalten noch vollendet werden.",
+        'experience'    => "Erfahrung",
+        'expConvert'    => "(oder %s, wenn auf Stufe %d vollendet)",
+        'expConvert2'   => "%s, wenn auf Stufe %d vollendet",
+        'chooseItems'   => "Auf Euch wartet eine dieser Belohnungen",
+        'receiveItems'  => "Ihr bekommt",
+        'receiveAlso'   => "Ihr bekommt außerdem",
+        'spellCast'     => "Der folgende Zauber wird auf Euch gewirkt",
+        'spellLearn'    => "Ihr erlernt",
+        'bonusTalents'  => "Talentpunkte",
+        'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> wird angezeigt)',
         'questInfo'     => array(
-              0 => 'Normal',             1 => 'Gruppe',             21 => 'Leben',              41 => 'PvP',                62 => 'Schlachtzug',        81 => 'Dungeon',            82 => 'Weltereignis',
-             83 => 'Legendär',          84 => 'Eskorte',            85 => 'Heroisch',           88 => 'Schlachtzug (10)',   89 => 'Schlachtzug (25)'
+              0 => "Normal",             1 => "Gruppe",             21 => "Leben",              41 => "PvP",                62 => "Schlachtzug",        81 => "Dungeon",            82 => "Weltereignis",
+             83 => "Legendär",          84 => "Eskorte",            85 => "Heroisch",           88 => "Schlachtzug (10)",   89 => "Schlachtzug (25)"
+        ),
+        'cat'           => array(
+            // todo: after zones
         )
     ),
     'title' => array(
         'cat'           => array(
-            'Allgemein',      'Spieler gegen Spieler',    'Ruf',       'Dungeon & Schlachtzug',     'Quests',       'Berufe',      'Weltereignisse'
+            "Allgemein",      "Spieler gegen Spieler",    "Ruf",       "Dungeon & Schlachtzug",     "Quests",       "Berufe",      "Weltereignisse"
         )
     ),
     'skill' => array(
         'cat'           => array(
-            -6 => 'Haustiere',          -5 => 'Reittiere',          -4 => 'Völkerfertigkeiten', 5 => 'Attribute',           6 => 'Waffenfertigkeiten',  7 => 'Klassenfertigkeiten', 8 => 'Rüstungssachverstand',
-             9 => 'Nebenberufe',        10 => 'Sprachen',           11 => 'Berufe'
+            -6 => "Haustiere",          -5 => "Reittiere",          -4 => "Völkerfertigkeiten", 5 => "Attribute",           6 => "Waffenfertigkeiten",  7 => "Klassenfertigkeiten", 8 => "Rüstungssachverstand",
+             9 => "Nebenberufe",        10 => "Sprachen",           11 => "Berufe"
         )
     ),
     'currency' => array(
@@ -480,16 +533,16 @@ $lang = array(
             'AMMOSLOT' => "Munition",       'STEAM' => "Dampfdruck",            'WRATH'       => "Zorn",            'PYRITE' => "Pyrit",
             'HEAT'     => "Hitze",          'OOZE'  => "Schlamm",               'BLOOD_POWER' => "Blutmacht"
         ),
-        'relItems'      => array (
+        'relItems'      => array(
             'base'    => "<small>%s im Zusammenhang mit <b>%s</b> anzeigen</small>",
             'link'    => " oder ",
-            'recipes' => "<a href=\"?items=9.%s\">Rezeptgegenstände</a>",
-            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s;crv=0\">Hergestellte Gegenstände</a>"
+            'recipes' => '<a href="?items=9.%s">Rezeptgegenstände</a>',
+            'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">Hergestellte Gegenstände</a>'
         ),
         'cat'           => array(
               7 => "Klassenfertigkeiten",
             -13 => "Glyphen",
-            -11 => array("Sachverstand", 8 => "Rüstung", 6 => "Waffen", 10 => "Sprachen"),
+            -11 => ["Sachverstand", 8 => "Rüstung", 6 => "Waffen", 10 => "Sprachen"],
              -4 => "Völkerfertigkeiten",
              -2 => "Talente",
              -6 => "Haustiere",
@@ -502,22 +555,22 @@ $lang = array(
                 765 => "Sporensegler",      781 => "Teufelssaurier",    218 => "Weitschreiter",         785 => "Wespe",                     656 => "Windnatter",            208 => "Wolf",                  784 => "Wurm",
                 204 => "Leerwandler",       205 => "Sukkubus",          189 => "Teufelsjäger",          761 => "Teufelswache",              188 => "Wichtel",
             ),
-             -7 => array("Begleitertalente", 410 => "Gerissenheit", 411 => "Wildheit", 409 => "Hartnäckigkeit"),
+             -7 => ["Begleitertalente", 410 => "Gerissenheit", 411 => "Wildheit", 409 => "Hartnäckigkeit"],
              11 => array(
                 "Berufe",
                 171 => "Alchemie",
-                164 => array("Schmiedekunst", 9788 => "Rüstungsschmied", 9787 => "Waffenschmied", 17041 => "Axtschmiedemeister", 17040 => "Hammerschmiedemeister", 17039 => "Schwertschmiedemeister"),
+                164 => ["Schmiedekunst", 9788 => "Rüstungsschmied", 9787 => "Waffenschmied", 17041 => "Axtschmiedemeister", 17040 => "Hammerschmiedemeister", 17039 => "Schwertschmiedemeister"],
                 333 => "Verzauberkunst",
-                202 => array("Ingenieurskunst", 20219 => "Gnomeningenieurskunst", 20222 => "Gobliningenieurskunst"),
+                202 => ["Ingenieurskunst", 20219 => "Gnomeningenieurskunst", 20222 => "Gobliningenieurskunst"],
                 182 => "Kräuterkunde",
                 773 => "Inschriftenkunde",
                 755 => "Juwelenschleifen",
-                165 => array("Lederverarbeitung", 10656 => "Drachenschuppenlederverarbeitung", 10658 => "Elementarlederverarbeitung", 10660 => "Stammeslederverarbeitung"),
+                165 => ["Lederverarbeitung", 10656 => "Drachenschuppenlederverarbeitung", 10658 => "Elementarlederverarbeitung", 10660 => "Stammeslederverarbeitung"],
                 186 => "Bergbau",
                 393 => "Kürschnerei",
-                197 => array("Schneiderei", 26798 => "Mondstoffschneiderei", 26801 => "Schattenstoffschneiderei", 26797 => "Zauberfeuerschneiderei"),
+                197 => ["Schneiderei", 26798 => "Mondstoffschneiderei", 26801 => "Schattenstoffschneiderei", 26797 => "Zauberfeuerschneiderei"],
             ),
-              9 => array("Nebenberufe", 185 => "Kochkunst", 129 => "Erste Hilfe", 356 => "Angeln", 762 => "Reiten"),
+              9 => ["Nebenberufe", 185 => "Kochkunst", 129 => "Erste Hilfe", 356 => "Angeln", 762 => "Reiten"],
              -8 => "NPC-Fähigkeiten",
              -9 => "GM-Fähigkeiten",
               0 => "Nicht kategorisiert"
@@ -534,7 +587,7 @@ $lang = array(
             20 => "Angelruten",                     14 => "Diverse"
         ),
         'subClassMasks' => array(
-            0x02A5F3 => 'Nahkampfwaffe',            0x0060 => 'Schild',                     0x04000C => 'Distanzwaffe',             0xA091 => 'Einhandnahkampfwaffe'
+            0x02A5F3 => "Nahkampfwaffe",            0x0060 => "Schild",                     0x04000C => "Distanzwaffe",             0xA091 => "Einhandnahkampfwaffe"
         ),
         'traitShort'    => array(
             'atkpwr'    => "Angr",                  'rgdatkpwr' => "DAngr",                 'splpwr'    => "ZMacht",                'arcsplpwr' => "ArkM",                  'firsplpwr' => "FeuM",

@@ -69,7 +69,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     array_unshift($path, 0, 9);
 
-    $acv->addGlobalsToJscript($smarty, GLOBALINFO_REWARDS);
+    $acv->addGlobalsToJScript(GLOBALINFO_REWARDS);
 
     /***********/
     /* Infobox */
@@ -141,7 +141,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'typeId'      => $_id,
             'headIcons'   => $acv->getField('iconString'),
             'infobox'     => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
-            'series'      => $series,
+            'series'      => $series ? [[$series, null]] : null,
             'redButtons'  => array(
                 BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$_id.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0'],
                 BUTTON_WOWHEAD => true
@@ -163,11 +163,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($foo = $acv->getField('rewards')[TYPE_ITEM])
     {
         $bar = new ItemList(array(['i.id', $foo]));
-        foreach ($bar->iterate() as $__)
+        foreach ($bar->iterate() as $id => $__)
         {
-            $pageData['page']['itemReward'][$bar->id] = array(
-                'name'    => $bar->getField('name', true),
-                'quality' => $bar->getField('quality')
+            $pageData['page']['itemReward'][] = array(
+                'name'      => $bar->getField('name', true),
+                'quality'   => $bar->getField('quality'),
+                'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                'id'        => $id,
+                'globalStr' => 'g_items'
             );
         }
     }
@@ -200,7 +203,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         )
     );
 
-    $saList->addGlobalsToJscript($smarty);
+    $saList->addGlobalsToJscript();
 
     // tab: criteria of
     $refs = DB::Aowow()->SelectCol('SELECT refAchievementId FROM ?_achievementcriteria WHERE Type = ?d AND value1 = ?d',
@@ -221,7 +224,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             )
         );
 
-        $coList->addGlobalsToJscript($smarty);
+        $coList->addGlobalsToJscript();
     }
 
     /*****************/
@@ -365,7 +368,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     'quality' => $crtItm->getField('quality'),
                     'count'   => $qty,
                 );
-                $crtItm->addGlobalsToJscript($smarty);
+                $crtItm->addGlobalsToJscript();
                 $tmp['icon'] = $iconId;
                 $pageData['page']['icons'][] = array(
                     'itr'   => $iconId++,

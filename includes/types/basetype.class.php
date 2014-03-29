@@ -340,6 +340,7 @@ abstract class BaseType
 
     protected function extendQueryOpts($extra)              // needs to be called from __construct
     {
+
         foreach ($extra as $tbl => $sets)
         {
             if (!isset($this->queryOpts[$tbl]))             // allow adding only to known tables
@@ -347,18 +348,25 @@ abstract class BaseType
 
             foreach ($sets as $module => $value)
             {
-                if (!$value)
+                if (!$value || !is_array($value))
                     continue;
 
                 switch ($module)
                 {
                     // additional (str)
                     case 'g':                               // group by
+                    case 's':                               // select
+                        if (!empty($this->queryOpts[$tbl][$module]))
+                            $this->queryOpts[$tbl][$module] .= implode(' ', $value);
+                        else
+                            $this->queryOpts[$tbl][$module] = implode(' ', $value);
+
+                        break;
                     case 'h':                               // having
                         if (!empty($this->queryOpts[$tbl][$module]))
-                            $this->queryOpts[$tbl][$module] .= $value;
+                            $this->queryOpts[$tbl][$module] .= implode(' AND ', $value);
                         else
-                            $this->queryOpts[$tbl][$module] = $value;
+                            $this->queryOpts[$tbl][$module] = implode(' AND ', $value);
 
                         break;
                     // additional (arr)
@@ -371,9 +379,8 @@ abstract class BaseType
                         break;
                     // replacement (str)
                     case 'l':                               // limit
-                    case 's':                               // select
                     case 'o':                               // order by
-                        $this->queryOpts[$tbl][$module] = $value;
+                        $this->queryOpts[$tbl][$module] = $value[0];
                         break;
                 }
             }
@@ -385,7 +392,7 @@ abstract class BaseType
     abstract public function getListviewData();
 
     // should return data to extend global js variables for a certain type (e.g. g_items)
-    abstract public function addGlobalsToJScript(&$smarty, $addMask = GLOBALINFO_ANY);
+    abstract public function addGlobalsToJScript($addMask = GLOBALINFO_ANY);
 
     // NPC, GO, Item, Quest, Spell, Achievement, Profile would require this
     abstract public function renderTooltip();
@@ -714,7 +721,7 @@ abstract class Filter
             switch ($name)
             {
                 case 'setCriteria':
-                    $form[$name] = $raw ? $data : 'fi_setCriteria('.$data['cr'].', '.$data['crs'].', '.$data['crv'].');';
+                    $form[$name] = $raw ? $data : 'fi_setCriteria('.(empty($data['cr']) ? '[]' : $data['cr']).', '.(empty($data['crs']) ? '[]' : $data['crs']).', '.(empty($data['crv']) ? '[]' : $data['crv']).');';
                     break;
                 case 'extraCols':
                     $form[$name] = $raw ? $data : 'fi_extraCols = '.json_encode(array_unique($data), JSON_NUMERIC_CHECK).';';
@@ -762,7 +769,7 @@ abstract class Filter
         foreach ($fields as $n => $f)
         {
             $sub = [];
-            $parts = explode(' ', $string);
+            $parts = array_filter(explode(' ', $string));
 
             foreach ($parts as $p)
             {

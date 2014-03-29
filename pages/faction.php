@@ -98,7 +98,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $conditions[] = ['parentFactionId', $_id];      // self as parent
 
     $spillover = new FactionList($conditions);
-    $spillover->addGlobalsToJscript(Util::$pageTemplate);
+    $spillover->addGlobalsToJscript();
     $buff = [];
 
     foreach ($spillover->iterate() as $spillId => $__)
@@ -145,7 +145,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $items = new ItemList(array(['requiredFaction', $_id]));
     if (!$items->error)
     {
-        $items->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+        $items->addGlobalsToJScript(GLOBALINFO_SELF);
 
         $pageData['relTabs'][] = array(
             'file'    => 'item',
@@ -175,7 +175,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $killCreatures = new CreatureList(array(['id', $cIds]));
             if (!$killCreatures->error)
             {
-                $killCreatures->addGlobalsToJscript($smarty);
+                $killCreatures->addGlobalsToJscript();
 
                 $pageData['relTabs'][] = array(
                     'file'    => 'creature',
@@ -199,7 +199,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $killCreatures = new CreatureList($conditions);
     if (!$killCreatures->error)
     {
-        $killCreatures->addGlobalsToJscript($smarty);
+        $killCreatures->addGlobalsToJscript();
 
         $pageData['relTabs'][] = array(
             'file'    => 'creature',
@@ -215,17 +215,17 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // tab: quests
     $conditions = array(
-        ['AND', ['RewardFactionId1', $_id], ['OR', ['RewardFactionValueId1', 0, '>'], ['RewardFactionValueIdOverride1', 0, '>']]],
-        ['AND', ['RewardFactionId2', $_id], ['OR', ['RewardFactionValueId2', 0, '>'], ['RewardFactionValueIdOverride2', 0, '>']]],
-        ['AND', ['RewardFactionId3', $_id], ['OR', ['RewardFactionValueId3', 0, '>'], ['RewardFactionValueIdOverride3', 0, '>']]],
-        ['AND', ['RewardFactionId4', $_id], ['OR', ['RewardFactionValueId4', 0, '>'], ['RewardFactionValueIdOverride4', 0, '>']]],
-        ['AND', ['RewardFactionId5', $_id], ['OR', ['RewardFactionValueId5', 0, '>'], ['RewardFactionValueIdOverride5', 0, '>']]],
+        ['AND', ['rewardFactionId1', $_id], ['OR', ['rewardFactionValueId1', 0, '>'], ['rewardFactionValueIdOverride1', 0, '>']]],
+        ['AND', ['rewardFactionId2', $_id], ['OR', ['rewardFactionValueId2', 0, '>'], ['rewardFactionValueIdOverride2', 0, '>']]],
+        ['AND', ['rewardFactionId3', $_id], ['OR', ['rewardFactionValueId3', 0, '>'], ['rewardFactionValueIdOverride3', 0, '>']]],
+        ['AND', ['rewardFactionId4', $_id], ['OR', ['rewardFactionValueId4', 0, '>'], ['rewardFactionValueIdOverride4', 0, '>']]],
+        ['AND', ['rewardFactionId5', $_id], ['OR', ['rewardFactionValueId5', 0, '>'], ['rewardFactionValueIdOverride5', 0, '>']]],
         'OR'
     );
     $quests = new QuestList($conditions);
     if (!$quests->error)
     {
-        $quests->addGlobalsToJscript($smarty, GLOBALINFO_ANY);
+        $quests->addGlobalsToJScript(GLOBALINFO_ANY);
 
         $pageData['relTabs'][] = array(
             'file'    => 'quest',
@@ -247,7 +247,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $acvs = new AchievementList($conditions);
     if (!$acvs->error)
     {
-        $acvs->addGlobalsToJscript($smarty, GLOBALINFO_ANY);
+        $acvs->addGlobalsToJScript(GLOBALINFO_ANY);
 
         $pageData['relTabs'][] = array(
             'file'   => 'achievement',

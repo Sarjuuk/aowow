@@ -22,7 +22,7 @@ AddDefaultCharset utf8
 RewriteEngine on
 
 # Mapper-Helper: If you cant provide maps for all locales, redirect the browser
-    RewriteRule     ^images/maps/(frfr|dede|eses|ruru)/(.*)$    images/maps/enus/$2 [NC]
+    RewriteRule     ^static/images/wow/maps/(frfr|dede|eses|ruru)/(.*)$    static/images/wow/maps/enus/$2 [NC]
 
 # accept flattened urls | NYI - need more work :x
     RewriteRule     ^([a-z0-9\-]+)$                             ?$1       [NC]      # /items                 => ?items

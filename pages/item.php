@@ -80,7 +80,7 @@ if (isset($_GET['xml']))
     if (!$smarty->loadCache($cacheKeyXML, $root))
     {
         $root = new SimpleXML('<aowow />');
-        $cnd  = array($_id ? ['i.id', $_id] : ['name_loc'.User::$localeId, $pageParam]);
+        $cnd  = array($_id ? ['i.id', $_id] : ['name_loc'.User::$localeId, urldecode($pageParam)]);
 
         $item = new ItemList($cnd);
         if ($item->error)
@@ -222,7 +222,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($item->error)
         $smarty->notFound(Lang::$game['item'], $_id);
 
-    $item->addGlobalsToJscript($smarty, GLOBALINFO_EXTRA | GLOBALINFO_SELF);
+    $item->addGlobalsToJScript(GLOBALINFO_EXTRA | GLOBALINFO_SELF);
 
     $_flags     = $item->getField('flags');
     $_slot      = $item->getField('slot');
@@ -579,14 +579,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     {
         $conditions = array(
             'OR',
-            ['requiredSourceItemId1', $reqIds], ['requiredSourceItemId2', $reqIds],
-            ['requiredSourceItemId3', $reqIds], ['requiredSourceItemId4', $reqIds],
-            ['requiredItemId1', $reqIds], ['requiredItemId2', $reqIds], ['requiredItemId3', $reqIds],
-            ['requiredItemId4', $reqIds], ['requiredItemId5', $reqIds], ['requiredItemId6', $reqIds]
+            ['reqSourceItemId1', $reqIds], ['reqSourceItemId2', $reqIds],
+            ['reqSourceItemId3', $reqIds], ['reqSourceItemId4', $reqIds],
+            ['reqItemId1', $reqIds], ['reqItemId2', $reqIds], ['reqItemId3', $reqIds],
+            ['reqItemId4', $reqIds], ['reqItemId5', $reqIds], ['reqItemId6', $reqIds]
         );
 
         $reqQuests = new QuestList($conditions);
-        $reqQuests->addGlobalsToJscript($smarty);
+        $reqQuests->addGlobalsToJscript();
 
         foreach ($reqQuests->iterate() as $qId => $__)
         {
@@ -605,7 +605,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<'], 0));
         if (!$contains->error)
         {
-            $contains->addGlobalsToJscript($smarty);
+            $contains->addGlobalsToJscript();
 
             $hCols = ['side'];
             if (!$contains->hasSetFields(['slot']))
@@ -630,7 +630,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>'], 0));
         if (!$contains->error)
         {
-            $contains->addGlobalsToJscript($smarty);
+            $contains->addGlobalsToJscript();
 
             $pageData['relTabs'][] = array(
                 'file'   => 'item',
@@ -654,7 +654,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $criteriaOf = new AchievementList($conditions);
     if (!$criteriaOf->error)
     {
-            $criteriaOf->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+            $criteriaOf->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
 
             $hCols = [];
             if (!$criteriaOf->hasSetFields(['rewardIds']))
@@ -683,7 +683,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $reagent = new SpellList($conditions);
     if (!$reagent->error)
     {
-        $reagent->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $reagent->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
         $pageData['relTabs'][] = array(
             'file'   => 'spell',
@@ -729,7 +729,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $lockedItm = new ItemList(array(['lockId', $lockIds]));
         if (!$lockedItm->error)
         {
-            $lockedItm->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $lockedItm->addGlobalsToJScript(GLOBALINFO_SELF);
 
             $pageData['relTabs'][] = array(
                 'file'   => 'item',
@@ -765,7 +765,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     $saItems = new ItemList($conditions);
     if (!$saItems->error)
     {
-        $saItems->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+        $saItems->addGlobalsToJScript(GLOBALINFO_SELF);
 
         $pageData['relTabs'][] = array(
             'file'   => 'item',
@@ -781,10 +781,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // tab: starts (quest)
     if ($qId = $item->getField('startQuest'))
     {
-        $starts = new QuestList(array(['qt.id', $qId]));
+        $starts = new QuestList(array(['id', $qId]));
         if (!$starts->error)
         {
-            $starts->addGlobalsToJscript($smarty);
+            $starts->addGlobalsToJscript();
 
             $pageData['relTabs'][] = array(
                 'file'   => 'quest',
@@ -801,13 +801,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // tab: objective of (quest)
     $conditions = array(
         'OR',
-        ['requiredItemId1', $_id], ['requiredItemId2', $_id], ['requiredItemId3', $_id],
-        ['requiredItemId4', $_id], ['requiredItemId5', $_id], ['requiredItemId6', $_id]
+        ['reqItemId1', $_id], ['reqItemId2', $_id], ['reqItemId3', $_id],
+        ['reqItemId4', $_id], ['reqItemId5', $_id], ['reqItemId6', $_id]
     );
     $objective = new QuestList($conditions);
     if (!$objective->error)
     {
-        $objective->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+        $objective->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
 
         $pageData['relTabs'][] = array(
             'file'   => 'quest',
@@ -823,13 +823,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // tab: provided for (quest)
     $conditions = array(
         'OR', ['sourceItemId', $_id],
-        ['requiredSourceItemId1', $_id], ['requiredSourceItemId2', $_id],
-        ['requiredSourceItemId3', $_id], ['requiredSourceItemId4', $_id]
+        ['reqSourceItemId1', $_id], ['reqSourceItemId2', $_id],
+        ['reqSourceItemId3', $_id], ['reqSourceItemId4', $_id]
     );
     $provided = new QuestList($conditions);
     if (!$provided->error)
     {
-        $provided->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+        $provided->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
 
         $pageData['relTabs'][] = array(
             'file'   => 'quest',
@@ -849,7 +849,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $sameModel = new ItemList(array(['model', $model], ['id', $_id, '!'], ['slot', $_slot]));
         if (!$sameModel->error)
         {
-            $sameModel->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $sameModel->addGlobalsToJScript(GLOBALINFO_SELF);
 
             $pageData['relTabs'][] = array(
                 'file'   => 'genericmodel',
@@ -870,7 +870,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
         if (!$soldBy->error)
         {
-            $soldBy->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $soldBy->addGlobalsToJScript(GLOBALINFO_SELF);
             $sbData = $soldBy->getListviewData();
 
             $extraCols = ['Listview.extraCols.stock', "Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
@@ -957,7 +957,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $boughtBy = new ItemList(array(['id', $boughtBy]));
         if (!$boughtBy->error)
         {
-            $boughtBy->addGlobalsToJscript($smarty);
+            $boughtBy->addGlobalsToJscript();
 
             $iCur   = new CurrencyList(array(['itemId', $_id]));
             $filter = $iCur->error ? [TYPE_ITEM => $_id] : [TYPE_CURRENCY => $iCur->id];
@@ -1002,7 +1002,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $taughtSpells = new SpellList(array(['id', $ids]));
         if (!$taughtSpells->error)
         {
-            $taughtSpells->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $taughtSpells->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
             $visCols = ['level', 'schools'];
             if ($taughtSpells->hasSetFields(['reagent1']))

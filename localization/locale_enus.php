@@ -21,11 +21,11 @@ $lang = array(
         'feedback'      => "Feedback",
         'numSQL'        => "Number of MySQL queries",
         'timeSQL'       => "Time of MySQL queries",
-        'noJScript'     => "<b>This site makes extensive use of JavaScript.</b><br />Please <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">enable JavaScript</a> in your browser.",
+        'noJScript'     => '<b>This site makes extensive use of JavaScript.</b><br />Please <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">enable JavaScript</a> in your browser.',
         'userProfiles'  => "My Profiles",
         'pageNotFound'  => "This %s doesn't exist.",
         'gender'        => "Gender",
-        'sex'           => [null, 'Male', 'Female'],
+        'sex'           => [null, "Male", "Female"],
         'players'       => "Players",
         'quickFacts'    => "Quick Facts",
         'screenshots'   => "Screenshots",
@@ -50,7 +50,7 @@ $lang = array(
         'oneFilter'     => "At least one",
         'applyFilter'   => "Apply filter",
         'resetForm'     => "Reset Form",
-        'refineSearch'  => "Tip: Refine your search by browsing a <a href=\"javascript:;\" id=\"fi_subcat\">subcategory</a>.",
+        'refineSearch'  => 'Tip: Refine your search by browsing a <a href="javascript:;" id="fi_subcat">subcategory</a>.',
         'clear'         => "clear",
         'exactMatch'    => "Exact match",
         '_reqLevel'     => "Required level",
@@ -69,6 +69,8 @@ $lang = array(
         'findUpgrades'  => "Find upgrades...",
 
         // misc Tools
+        'errPageTitle'  => "Page not found",
+        'nfPageTitle'   => "Error",
         'subscribe'     => "Subscribe",
         'mostComments'  => ["Yesterday", "Past %d Days"],
         'utilities'     => array(
@@ -87,7 +89,7 @@ $lang = array(
         'cappedHint'    => 'Tip: <a href="javascript:;" onclick="fi_presetDetails();">Remove</a> weights for capped statistics such as Hit rating.',
         'groupBy'       => "Group By",
         'gb'            => array(
-            ['None', 'none'],         ['Slot', 'slot'],       ['Level', 'level'],     ['Source', 'source']
+            ["None", "none"],         ["Slot", "slot"],       ["Level", "level"],     ["Source", "source"]
         ),
         'compareTool'   => "Item Comparison Tool",
         'talentCalc'    => "Talent Calculator",
@@ -163,17 +165,19 @@ $lang = array(
         'zone'          => "zone",
         'zones'         => "Zones",
 
+        'honorPoints'   => "Honor Points",                  // tooltip_honorpoints
+        'arenaPoints'   => "Arena Points",                  // tooltip_arenapoints
         'heroClass'     => "Hero class",
         'resource'      => "Resource",
         'resources'     => "Resources",
         'role'          => "Role",
         'roles'         => "Roles",
         'specs'         => "Specs",
-        '_roles'        => ['Healer', 'Melee DPS', 'Ranged DPS', 'Tank'],
+        '_roles'        => ["Healer", "Melee DPS", "Ranged DPS", "Tank"],
 
-        'modes'         => ['Normal / Normal 10', 'Heroic / Normal 25', 'Heroic 10', 'Heroic 25'],
-        'expansions'    => array("Classic", "The Burning Crusade", "Wrath of the Lich King"),
-        'stats'         => array("Strength", "Agility", "Stamina", "Intellect", "Spirit"),
+        'modes'         => ["Normal / Normal 10", "Heroic / Normal 25", "Heroic 10", "Heroic 25"],
+        'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
+        'stats'         => ["Strength", "Agility", "Stamina", "Intellect", "Spirit"],
         'sources'       => array(
             null,                       "Crafted",                  "Drop",                     "PvP",                      "Quest",                    "Vendor",                   "Trainer",                  "Discovery",
             "Redemption",               "Talent",                   "Starter",                  "Event",                    "Achievement"
@@ -182,14 +186,14 @@ $lang = array(
              1 => "Orcish",      2 => "Darnassian",      3 => "Taurahe",     6 => "Dwarvish",        7 => "Common",          8 => "Demonic",         9 => "Titan",          10 => "Thalassian",
             11 => "Draconic",   12 => "Kalimag",        13 => "Gnomish",    14 => "Troll",          33 => "Gutterspeak",    35 => "Draenei",        36 => "Zombie",         37 => "Gnomish Binary",     38 => "Goblin Binary"
         ),
-        'gl'            => array(null, "Major", "Minor"),
-        'si'            => array(1 => "Alliance", -1 => "Alliance only", 2 => "Horde", -2 => "Horde only", 3 => "Both"),
-        'resistances'   => array(null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'),
-        'dt'            => array(null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"),
-        'sc'            => array("Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"),
-        'cl'            => array(null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"),
-        'ra'            => array(-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"),
-        'rep'           => array("Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"),
+        'gl'            => [null, "Major", "Minor"],
+        'si'            => [1 => "Alliance", -1 => "Alliance only", 2 => "Horde", -2 => "Horde only", 3 => "Both"],
+        'resistances'   => [null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'],
+        'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"],
+        'sc'            => ["Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"],
+        'cl'            => [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"],
+        'ra'            => [-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"],
+        'rep'           => ["Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"],
         'st'            => array(
             "Default",          "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",
             "Bear From",        null,                           null,                           "Dire Bear Form",               null,
@@ -223,12 +227,6 @@ $lang = array(
             "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
         ),
     ),
-    'error' => array(
-        'errNotFound'   => "Page not found",
-        'errPage'       => "What? How did you... nevermind that!\n<br>\n<br>\nIt appears that the page you have requested cannot be found. At least, not in this dimension.\n<br>\n<br>\nPerhaps a few tweaks to the <span class=\"q4\">[WH-799 Major Confabulation Engine]</span> may result in the page suddenly making an appearance!\n<div class=\"pad\"></div>\n<div class=\"pad\"></div>\nOr, you can try \n<a href=\"http://www.wowhead.com/?aboutus#contact\">contacting us</a>\n- the stability of the WH-799 is debatable, and we wouldn't want another accident...",
-        'goStart'       => "Return to the <a href=\"index.php\">homepage</a>",
-        'goForum'       => "Feedback <a href=\"?forums&board=1\">forum</a>",
-    ),
     'account' => array(
         'doSignIn'      => "Log in to your AoWoW Account",
         'user'          => "Username",
@@ -240,7 +238,7 @@ $lang = array(
         'userNotFound'  => "Such user does not exists",
         'userBanned'    => "This Account was closed",
         'passMismatch'  => "Entered passwords does not match",
-        'loginsExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s minutes.",
+        'loginsExceeded'=> "The maximum number of logins from this IP has been exceeded. Please try again in %s minutes.",
         'nameInUse'     => "Such user already exists",
         'email'         => "Email address",
         'unkError'      => "Unknown error on account create",
@@ -262,7 +260,7 @@ $lang = array(
         'myAccount'     => "My Account",
         'editAccount'   => "Simply use the forms below to update your account information",
         'publicDesc'    => "Public Description",
-        'viewPubDesc'   => "View your Public Description in your <a href=\"?user=%s\">Profile  Page</a>",
+        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
     ),
     'gameObject' => array(
         'cat'           => [0 => "Other", 9 => "Books", 3 => "Containers", -5 => "Chests", 25 => "Fishing Pools", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],
@@ -309,7 +307,7 @@ $lang = array(
         'end'           => "End",
         'interval'      => "Interval",
         'inProgress'    => "Event is currently in progress",
-        'category'      => array("Uncategorized", "Holidays", "Recurring", "Player vs. Player")
+        'category'      => ["Uncategorized", "Holidays", "Recurring", "Player vs. Player"]
     ),
     'achievement' => array(
         'criteria'      => "Criteria",
@@ -317,8 +315,8 @@ $lang = array(
         'series'        => "Series",
         'outOf'         => "out of",
         'criteriaType'  => "Criterium Type-Id:",
-        'itemReward'    => "You will receive:",
-        'titleReward'   => "You shall be granted the title \"<a href=\"?title=%d\">%s</a>\"",
+        'itemReward'    => "You will receive",
+        'titleReward'   => 'You shall be granted the title "<a href="?title=%d">%s</a>"',
         'slain'         => "slain",
         'reqNumCrt'     => "Requires"
     ),
@@ -353,23 +351,75 @@ $lang = array(
         )
     ),
     'quest' => array(
-        'questLevel'    => 'Level %s',
-        'daily'         => 'Daily',
-        'requirements'  => 'Requirements',
+        'questLevel'    => "Level %s",
+        'requirements'  => "Requirements",
+        'reqMoney'      => "Required money",
+        'money'         => "Money",
+        'additionalReq' => "Additional requirements to obtain this quest",
+        'reqRepWith'    => 'Your reputation with <a href="?faction=%d">%s</a> must be %s %s',
+        'reqRepMin'     => "at least",
+        'reqRepMax'     => "lower than",
+        'progress'      => "Progress",
+        'provided'      => "Provided",
+        'providedItem'  => "Provided item",
+        'completion'    => "Completion",
+        'description'   => "Description",
+        'playerSlain'   => "Players slain",
+        'profession'    => "Profession",
+        'timer'         => "Timer",
+        'loremaster'    => "Loremaster",
+        'suggestedPl'   => "Suggested players",
+        'keepsPvpFlag'  => "Keeps you PvP flagged",
+        'daily'         => "Daily",
+        'weekly'        => "Weekly",
+        'monthly'       => "Monthly",
+        'sharable'      => "Sharable",
+        'notSharable'   => "Not sharable",
+        'repeatable'    => "Repeatable",
+        'reqQ'          => "Requires",
+        'reqQDesc'      => "To take this quest, you must complete all these quests",
+        'reqOneQ'       => "Requires one of",
+        'reqOneQDesc'   => "To take this quest, you must complete one of the following quests",
+        'opensQ'        => "Opens Quests",
+        'opensQDesc'    => "Completing this quest is requires to take this quests",
+        'closesQ'       => "Closes Quests",
+        'closesQDesc'   => "After completing this quest, you will not be able to take these quests",
+        'enablesQ'      => "Enables",
+        'enablesQDesc'  => "When this quest is active, these quests are also available",
+        'enabledByQ'    => "Enabled by",
+        'enabledByQDesc'=> "This quest is available only, when one of these quests are active",
+        'gainsDesc'     => "Upon completion of this quest you will gain",
+        'theTitle'      => 'the title "%s"',
+        'mailDelivery'  => "You will receive this letter %s",
+        'mailIn'        => "after %s",
+        'unavailable'   => "This quest was marked obsolete and cannot be obtained or completed.",
+        'experience'    => "experience",
+        'expConvert'    => "(or %s if completed at level %d)",
+        'expConvert2'   => "%s if completed at level %d",
+        'chooseItems'   => "You will be able to choose one of these rewards",
+        'receiveItems'  => "You will receive",
+        'receiveAlso'   => "You will also receive",
+        'spellCast'     => "The following spell will be cast on you",
+        'spellLearn'    => "You will learn",
+        'bonusTalents'  => "talent points",
+        'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
         'questInfo'     => array(
-             0 => 'Normal',              1 => 'Group',              21 => 'Life',               41 => 'PvP',                62 => 'Raid',               81 => 'Dungeon',            82 => 'World Event',
-            83 => 'Legendary',          84 => 'Escort',             85 => 'Heroic',             88 => 'Raid (10)',          89 => 'Raid (25)'
+             0 => "Normal",              1 => "Group",              21 => "Life",               41 => "PvP",                62 => "Raid",               81 => "Dungeon",            82 => "World Event",
+            83 => "Legendary",          84 => "Escort",             85 => "Heroic",             88 => "Raid (10)",          89 => "Raid (25)"
+        ),
+        'cat'           => array(
+            // todo: after zones
         )
     ),
     'title' => array(
         'cat'           => array(
-            'General',      'Player vs. Player',    'Reputation',       'Dungeons & Raids',     'Quests',       'Professions',      'World Events'
+            "General",      "Player vs. Player",    "Reputation",       "Dungeons & Raids",     "Quests",       "Professions",      "World Events"
         )
     ),
     'skill' => array(
         'cat'           => array(
-            -6 => 'Companions',         -5 => 'Mounts',             -4 => 'Racial Traits',      5 => 'Attributes',          6 => 'Weapon Skills',       7 => 'Class Skills',        8 => 'Armor Proficiencies',
-             9 => 'Secondary Skills',   10 => 'Languages',          11 => 'Professions'
+            -6 => "Companions",         -5 => "Mounts",             -4 => "Racial Traits",      5 => "Attributes",          6 => "Weapon Skills",       7 => "Class Skills",        8 => "Armor Proficiencies",
+             9 => "Secondary Skills",   10 => "Languages",          11 => "Professions"
         )
     ),
     'currency' => array(
@@ -473,8 +523,8 @@ $lang = array(
         'relItems'      => array (
             'base'    => "<small>Show %s related to <b>%s</b></small>",
             'link'    => " or ",
-            'recipes' => "<a href=\"?items=9.%s\">recipe items</a>",
-            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s;crv=0\">crafted items</a>"
+            'recipes' => '<a href="?items=9.%s">recipe items</a>',
+            'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">crafted items</a>'
         ),
         'cat'           => array(
               7 => "Class Skills",      // classList
@@ -492,22 +542,22 @@ $lang = array(
                 218 => "Tallstrider",       251 => "Turtle",            766 => "Warp Stalker",          785 => "Wasp",                      656 => "Wind Serpent",          208 => "Wolf",                  784 => "Worm",
                 761 => "Felguard",          189 => "Felhunter",         188 => "Imp",                   205 => "Succubus",                  204 => "Voidwalker"
             ),
-             -7 => array("Pet Talents", 410 => "Cunning", 411 => "Ferocity", 409 => "Tenacity"),
+             -7 => ["Pet Talents", 410 => "Cunning", 411 => "Ferocity", 409 => "Tenacity"],
              11 => array(
                 "Professions",
                 171 => "Alchemy",
-                164 => array("Blacksmithing", 9788 => "Armorsmithing", 9787 => "Weaponsmithing", 17041 => "Master Axesmithing", 17040 => "Master Hammersmithing", 17039 => "Master Swordsmithing"),
+                164 => ["Blacksmithing", 9788 => "Armorsmithing", 9787 => "Weaponsmithing", 17041 => "Master Axesmithing", 17040 => "Master Hammersmithing", 17039 => "Master Swordsmithing"],
                 333 => "Enchanting",
-                202 => array("Engineering", 20219 => "Gnomish Engineering", 20222 => "Goblin Engineering"),
+                202 => ["Engineering", 20219 => "Gnomish Engineering", 20222 => "Goblin Engineering"],
                 182 => "Herbalism",
                 773 => "Inscription",
                 755 => "Jewelcrafting",
-                165 => array("Leatherworking", 10656 => "Dragonscale Leatherworking", 10658 => "Elemental Leatherworking", 10660 => "Tribal Leatherworking"),
+                165 => ["Leatherworking", 10656 => "Dragonscale Leatherworking", 10658 => "Elemental Leatherworking", 10660 => "Tribal Leatherworking"],
                 186 => "Mining",
                 393 => "Skinning",
-                197 => array("Tailoring", 26798 => "Mooncloth Tailoring", 26801 => "Shadoweave Tailoring", 26797 => "Spellfire Tailoring"),
+                197 => ["Tailoring", 26798 => "Mooncloth Tailoring", 26801 => "Shadoweave Tailoring", 26797 => "Spellfire Tailoring"],
             ),
-              9 => array ("Secondary Skills", 185 => "Cooking", 129 => "First Aid", 356 => "Fishing", 762 => "Riding"),
+              9 => ["Secondary Skills", 185 => "Cooking", 129 => "First Aid", 356 => "Fishing", 762 => "Riding"],
              -8 => "NPC Abilities",
              -9 => "GM Abilities",
               0 => "Uncategorized"
@@ -524,7 +574,7 @@ $lang = array(
             20 => "Fishing Poles",                  14 => "Miscellaneous"
         ),
         'subClassMasks' => array(
-            0x02A5F3 => 'Melee Weapon',             0x0060 => 'Shield',                     0x04000C => 'Ranged Weapon',            0xA091 => 'One-Handed Melee Weapon'
+            0x02A5F3 => "Melee Weapon",             0x0060 => "Shield",                     0x04000C => "Ranged Weapon",            0xA091 => "One-Handed Melee Weapon"
         ),
         'traitShort'    => array(
             'atkpwr'    => "AP",                    'rgdatkpwr' => "RAP",                   'splpwr'    => "SP",                    'arcsplpwr' => "ArcP",                  'firsplpwr' => "FireP",
@@ -662,7 +712,7 @@ $lang = array(
             null,                   null,               "Arrow",                "Bullet",                        null
         ),
         'elixirType'    => [null, "Battle", "Guardian"],
-        'cat'           => array(                           // ordered by content firts, then alphabeticaly
+        'cat'           => array(                           // ordered by content first, then alphabeticaly
              2 => "Weapons",                                // self::$spell['weaponSubClass']
              4 => array("Armor", array(
                  1 => "Cloth Armor",                 2 => "Leather Armor",           3 => "Mail Armor",              4 => "Plate Armor",             6 => "Shields",                 7 => "Librams",

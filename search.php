@@ -281,7 +281,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data  = $wEvents->getListviewData())
         {
-            $wEvents->addGlobalsToJscript($smarty);
+            $wEvents->addGlobalsToJscript();
 
             foreach ($data as &$d)
             {
@@ -346,7 +346,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $sets->getListviewData())
         {
-            $sets->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $sets->addGlobalsToJScript(GLOBALINFO_SELF);
 
             foreach ($sets->iterate() as $__)
                 $data[$sets->id]['param1'] = $sets->getField('quality');
@@ -403,7 +403,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
         {
-            $items->addGlobalsToJscript($smarty);
+            $items->addGlobalsToJscript();
 
             foreach ($items->iterate() as $__)
             {
@@ -444,7 +444,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $abilities->getListviewData())
         {
-            $abilities->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $abilities->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
             $vis = ['level', 'singleclass', 'schools'];
             if ($abilities->hasSetFields(['reagent1']))
@@ -486,7 +486,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $talents->getListviewData())
         {
-            $talents->addGlobalsToJscript($smarty);
+            $talents->addGlobalsToJscript();
 
             $vis = ['level', 'singleclass', 'schools'];
             if ($abilities->hasSetFields(['reagent1']))
@@ -528,7 +528,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $glyphs->getListviewData())
         {
-            $glyphs->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $glyphs->addGlobalsToJScript(GLOBALINFO_SELF);
 
             foreach ($glyphs->iterate() as $__)
                 $data[$glyphs->id]['param1'] = '"'.strToLower($glyphs->getField('iconString')).'"';
@@ -563,7 +563,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $prof->getListviewData())
         {
-            $prof->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $prof->addGlobalsToJScript(GLOBALINFO_SELF);
 
             foreach ($prof->iterate() as $__)
                 $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
@@ -598,7 +598,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $prof->getListviewData())
         {
-            $prof->addGlobalsToJscript($smarty, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            $prof->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
             foreach ($prof->iterate() as $__)
                 $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
@@ -633,7 +633,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $vPets->getListviewData())
         {
-            $vPets->addGlobalsToJscript($smarty);
+            $vPets->addGlobalsToJscript();
 
             foreach ($vPets->iterate() as $__)
                 $data[$vPets->id]['param1'] = '"'.strToLower($vPets->getField('iconString')).'"';
@@ -668,7 +668,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $mounts->getListviewData())
         {
-            $mounts->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $mounts->addGlobalsToJScript(GLOBALINFO_SELF);
 
             foreach ($mounts->iterate() as $__)
                 $data[$mounts->id]['param1'] = '"'.strToLower($mounts->getField('iconString')).'"';
@@ -728,16 +728,12 @@ if (!$smarty->loadCache($cacheKey, $found))
     if ($searchMask & 0x0008000)
     {
         //        [['cuFlags', MASK, '&'], 0],                                      // todo (med): identify disabled quests
-        // use defined $conditions array when using own table
-        $cnd = array(
-            [User::$localeId ? 'lq.Title_loc'.User::$localeId : 'Title', $query],
-            $maxResults
-        );
+        $cnd = array_merge($cndBase, [$createLookup()]);
         $quests = new QuestList($cnd);
 
         if ($data = $quests->getListviewData())
         {
-            $quests->addGlobalsToJScript($smarty);
+            $quests->addGlobalsToJScript();
 
             $found['quest'] = array(
                 'type'     => TYPE_QUEST,
@@ -764,7 +760,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $acvs->getListviewData())
         {
-            $acvs->addGlobalsToJScript($smarty);
+            $acvs->addGlobalsToJScript();
 
             foreach ($acvs->iterate() as $__)
                 $data[$acvs->id]['param1'] = '"'.strToLower($acvs->getField('iconString')).'"';
@@ -797,7 +793,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $stats->getListviewData())
         {
-            $stats->addGlobalsToJScript($smarty, GLOBALINFO_SELF);
+            $stats->addGlobalsToJScript(GLOBALINFO_SELF);
 
             $found['statistic'] = array(
                 'type'     => TYPE_ACHIEVEMENT,
@@ -829,7 +825,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $zones->getListviewData())
         {
-            $zones->addGlobalsToJScript($smarty);
+            $zones->addGlobalsToJScript();
 
             $found['zone'] = array(
                 'type'     => TYPE_ZONE,
@@ -858,7 +854,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $objects->getListviewData())
         {
-            $objects->addGlobalsToJScript($smarty);
+            $objects->addGlobalsToJScript();
 
             $found['object'] = array(
                 'type'     => TYPE_OBJECT,
@@ -972,7 +968,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $npcAbilities->getListviewData())
         {
-            $npcAbilities->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $npcAbilities->addGlobalsToJScript(GLOBALINFO_SELF);
 
             foreach ($npcAbilities->iterate() as $__)
                 $data[$npcAbilities->id]['param1'] = '"'.strToLower($npcAbilities->getField('iconString')).'"';
@@ -1008,7 +1004,7 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         if ($data = $misc->getListviewData())
         {
-            $misc->addGlobalsToJscript($smarty, GLOBALINFO_SELF);
+            $misc->addGlobalsToJScript(GLOBALINFO_SELF);
 
             foreach ($misc->iterate() as $__)
                 $data[$misc->id]['param1'] = '"'.strToLower($misc->getField('iconString')).'"';

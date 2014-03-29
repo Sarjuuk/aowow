@@ -339,7 +339,6 @@ var mn_quests = [
         [331,"Vallefresno"]
     ]],
     [8,"Terrallende",,[
-        [4095,"Bancal del Magister"],
         [3519,"Bosque de Terokkar"],
         [3703,"Ciudad de Shattrath"],
         [3521,"Marisma de Zangar"],
@@ -484,14 +483,14 @@ var mn_quests = [
         [-370,"Fiesta de la cerveza"],
         [-1002,"Los Niños"],
         [-364,"Feria de la Luna Negra"],
-        [-1007,"Día de los Muertos"],
+        [-41,"Día de los Muertos"],
         [-1003,"Halloween"],
         [-1005,"Festival de la cosecha"],
-        [-1004,"Amor en el aire"],
+        [-376,"Amor en el aire"],
         [-366,"Festival Lunar"],
         [-369,"Solsticio"],
         [-1006,"Año nuevo"],
-        [-1008,"Generosidad"],
+        [-375,"Generosidad"],
         [-374,"Jardín Noble"],
         [-1001,"Festival de Invierno"]
     ]],
@@ -1324,14 +1323,14 @@ var g_quest_categories = {
 };
 
 var g_quest_sorts = {
+    "-1010": 'Buscador de Mazmorras',
     "-1001": 'Festival de Invierno',
     "-1002": 'Los Niños',
     "-1003": 'Halloween',
-    "-1004": 'Amor en el aire',
     "-1005": 'Festival de la cosecha',
     "-1006": 'Año nuevo',
-    "-1007": 'Día de los Muertos',
-    "-1008": 'Generosidad',
+    "-41": 'Día de los Muertos',
+    "-375": 'Generosidad',
        3428: 'Ahn\'Qiraj',
        4494: 'Ahn\'kahet: El Antiguo Reino',
      "-181": 'Alquimia',

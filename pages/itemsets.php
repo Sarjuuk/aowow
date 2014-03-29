@@ -14,7 +14,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     $itemsetFilter = new ItemsetListFilter();
 
     $itemsets = new ItemsetList([$itemsetFilter->getConditions()]);
-    $itemsets->addGlobalsToJscript($smarty);
+    $itemsets->addGlobalsToJscript();
 
     // recreate form selection
     $filter = array_merge($itemsetFilter->getForm('form'), $filter);

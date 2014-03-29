@@ -208,7 +208,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'relTabs' => []
     );
 
-    $iSet->addGlobalsToJscript($smarty);
+    $iSet->addGlobalsToJscript();
 
     /**************/
     /* Extra Tabs */
@@ -262,7 +262,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             if (!$mask)
                 $pageData['related']['params']['hiddenCols'] = "$['classes']";
 
-            $relSets->addGlobalsToJscript($smarty);
+            $relSets->addGlobalsToJscript();
         }
     }
 

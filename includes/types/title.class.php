@@ -64,7 +64,7 @@ class TitleList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$template, $addMask = 0)
+    public function addGlobalsToJScript($addMask = 0)
     {
         $data = [];
 
@@ -76,7 +76,7 @@ class TitleList extends BaseType
                 $data[$this->id]['namefemale'] = $_;
         }
 
-        $template->extendGlobalData(self::$type, $data);
+        Util::$pageTemplate->extendGlobalData(self::$type, $data);
     }
 
     private function createSource()

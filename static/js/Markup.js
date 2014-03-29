@@ -828,7 +828,7 @@ var Markup = {
 
 						var src = '';
 						if(attr.name)
-							src = g_staticUrl + '/images/icons/wow/tiny/' + attr.name.toLowerCase() + '.gif';
+							src = g_staticUrl + '/images/wow/icons/tiny/' + attr.name.toLowerCase() + '.gif';
 						else if(attr.preset)
 							src = Markup.tags.icon.presets[attr.preset];
 						else if(attr.url && Markup._isUrlSafe(attr.url))

@@ -74,15 +74,10 @@ switch ($pageCall)
 
         foreach (Util::$typeClasses as $classStr)
         {
-            // temp: as long as we use world.quest_template
-            if ($classStr == 'QuestList')
-                continue;
-
             $typeObj = new $classStr($cnd);
-
             if (!$typeObj->error)
             {
-                $typeObj->addGlobalsToJscript(Util::$pageTemplate, GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                $typeObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
 
                 $lv[] = array(
                     'file'   => (new ReflectionProperty($typeObj, 'brickFile'))->getValue(),

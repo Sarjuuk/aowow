@@ -26,11 +26,11 @@ $lang = array(
         'feedback'      => "Отзыв",
         'numSQL'        => "Количество MySQL запросов",
         'timeSQL'       => "Время выполнения MySQL запросов",
-        'noJScript'     => "<b>Данный сайт активно использует технологию JavaScript.</b><br />Пожалуйста, <a href=\"https://www.google.com/support/adsense/bin/answer.py?answer=12654\" target=\"_blank\">Включите JavaScript</a> в вашем браузере.",
+        'noJScript'     => '<b>Данный сайт активно использует технологию JavaScript.</b><br />Пожалуйста, <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">Включите JavaScript</a> в вашем браузере.',
         'userProfiles'  => "Ваши персонажи",    // translate.google :x
         'pageNotFound'  => "Такое %s не существует.",
         'gender'        => "Пол",
-        'sex'           => [null, 'Мужчина', 'Женщина'],
+        'sex'           => [null, "Мужчина", "Женщина"],
         'players'       => "Игрокам",
         'quickFacts'    => "Краткая информация",
         'screenshots'   => "Изображения",
@@ -55,7 +55,7 @@ $lang = array(
         'oneFilter'     => "Любое совпадение",
         'applyFilter'   => "Применить фильтр",
         'resetForm'     => "Очистить форму",
-        'refineSearch'  => "Совет: Уточните поиск, добавив <a href=\"javascript:;\" id=\"fi_subcat\">подкатегорию</a>.",
+        'refineSearch'  => 'Совет: Уточните поиск, добавив <a href="javascript:;" id="fi_subcat">подкатегорию</a>.',
         'clear'         => "Очистить",
         'exactMatch'    => "Полное совпадение",
         '_reqLevel'     => "Требуется уровень",
@@ -74,6 +74,8 @@ $lang = array(
         'findUpgrades'  => "Найти лучше...",
 
         // misc Tools
+        'errPageTitle'  => "Страница не найдена",
+        'nfPageTitle'   => "Ошибка",
         'subscribe'     => "Подписаться",
         'mostComments'  => ["Вчера", "Последние %d дней"],
         'utilities'     => array(
@@ -92,7 +94,7 @@ $lang = array(
         'cappedHint'    => 'Подсказка: <a href="javascript:;" onclick="fi_presetDetails();">Удалите</a> характеристики с капом (например, меткость).',
         'groupBy'       => "Группировать",
         'gb'            => array(
-            ['Нет', 'none'],         ['Слот', 'slot'],       ['Уровень', 'level'],     ['Источник', 'source']
+            ['Нет", "none'],         ['Слот", "slot'],       ['Уровень", "level'],     ['Источник", "source']
         ),
         'compareTool'   => "Инструмент сравнения предметов",
         'talentCalc'    => "Расчёт талантов",
@@ -168,15 +170,17 @@ $lang = array(
         'zone'          => "игровая зона",
         'zones'         => "Местности",
 
+        'honorPoints'   => "Очки Чести",
+        'arenaPoints'   => "Очки арены",
         'heroClass'     => "Героический класс",
         'resource'      => "Ресурс",
         'resources'     => "Ресурсы",
         'role'          => "Роль",
         'roles'         => "Роли",
         'specs'         => "Ветки талантов",
-        '_roles'        => ['Лекарь', 'Боец ближнего боя', 'Боец дальнего боя', 'Танк'],
+        '_roles'        => ["Лекарь", "Боец ближнего боя", "Боец дальнего боя", "Танк"],
 
-        'modes'         => ['Обычный / 10-норм.', 'Героический / 25-норм.', '10-героич', '25-героич'],
+        'modes'         => ['Обычный / 10-норм.", "Героический / 25-норм.", "10-героич", "25-героич'],
         'expansions'    => array("World of Warcraft", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("к силе", "к ловкости", "к выносливости", "к интеллекту", "к духу"),
         'sources'       => array(
@@ -189,8 +193,8 @@ $lang = array(
         ),
         'gl'            => array(null, "Большой", "Малый"),
         'si'            => array(1 => "Альянс", -1 => "Альянс только", 2 => "Орда", -2 => "Орда только", null, 3 => "Обе"),
-        'resistances'   => array(null, 'Сопротивление светлой магии', 'Сопротивление огню', 'Сопротивление силам природы', 'Сопротивление магии льда', 'Сопротивление темной магии', 'Сопротивление тайной магии'),
-        'dt'            => array(null, 'Магия', 'Проклятие', 'Болезнь', 'Яд', 'Незаметность', 'Невидимость', null, null, 'Исступление'),
+        'resistances'   => array(null, "Сопротивление светлой магии", "Сопротивление огню", "Сопротивление силам природы", "Сопротивление магии льда", "Сопротивление темной магии", "Сопротивление тайной магии"),
+        'dt'            => array(null, "Магия", "Проклятие", "Болезнь", "Яд", "Незаметность", "Невидимость", null, null, "Исступление"),
         'sc'            => array("Физический урон", "Свет", "Огонь", "природа", "Лед", "Тьма", "Тайная магия"),
         'cl'            => array(null, "Воин", "Паладин", "Охотник", "Разбойник", "Жрец", "Рыцарь смерти", "Шаман", "Маг", "Чернокнижник", null, "Друид"),
         'ra'            => array(-2 => "Орда", -1 => "Альянс", "Обе", "Человек", "Орк", "Дворф", "Ночной эльф", "Нежить", "Таурен", "Гном", "Тролль", null, "Эльф крови", "Дреней"),
@@ -227,12 +231,6 @@ $lang = array(
             "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
             "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
         ),
-    ),
-    'error' => array(
-        'errNotFound'   => "Page not found",
-        'errPage'       => "What? How did you... nevermind that!\n<br>\n<br>\nIt appears that the page you have requested cannot be found. At least, not in this dimension.\n<br>\n<br>\nPerhaps a few tweaks to the <span class=\"q4\">[WH-799 Major Confabulation Engine]</span> may result in the page suddenly making an appearance!\n<div class=\"pad\"></div>\n<div class=\"pad\"></div>\nOr, you can try \n<a href=\"http://www.wowhead.com/?aboutus#contact\">contacting us</a>\n- the stability of the WH-799 is debatable, and we wouldn't want another accident...",
-        'goStart'       => "Return to the <a href=\"index.php\">homepage</a>",
-        'goForum'       => "Feedback <a href=\"?forums&board=1\">forum</a>",
     ),
     'account'  => [],
     'gameObject' => array(
@@ -286,8 +284,8 @@ $lang = array(
         'series'        => "Серии",
         'outOf'         => "из",
         'criteriaType'  => "[Criterium Type-Id]:",
-        'itemReward'    => "Вы получите:",
-        'titleReward'   => "Наградное звание: \"<a href=\"?title=%d\">%s</a>\"",
+        'itemReward'    => "Вы получите",
+        'titleReward'   => 'Наградное звание: "<a href="?title=%d">%s</a>"',
         'slain'         => "убито",
         'reqNumCrt'     => "Требуется"
     ),
@@ -321,23 +319,75 @@ $lang = array(
         )
     ),
     'quest' => array(
-        'questLevel'    => '%s-го уровня',
-        'daily'         => 'Ежедневно',
-        'requirements'  => 'Требования',
+        'questLevel'    => "%s-го уровня",
+        'requirements'  => "Требования",
+        'reqMoney'      => "Требуется денег",
+        'money'         => "Деньги",
+        'additionalReq' => "Дополнительные условия для получения данного задания",
+        'reqRepWith'    => 'Ваша репутация с <a href="?faction=%d">%s</a> должна быть %s %s',
+        'reqRepMin'     => "не менее",
+        'reqRepMax'     => "меньше чем",
+        'progress'      => "Прогресс",
+        'provided'      => "Прилагается",
+        'providedItem'  => "Прилагается предмет",
+        'completion'    => "Завершение",
+        'description'   => "Описание",
+        'playerSlain'   => "Убито игроков",
+        'profession'    => "Профессия",
+        'timer'         => "Таймер",
+        'loremaster'    => "Хранитель мудрости",
+        'suggestedPl'   => "Рекомендуемое количество игроков",
+        'keepsPvpFlag'  => "Включает доступность PvP",
+        'daily'         => "Ежедневно",
+        'weekly'        => "Раз в неделю",
+        'monthly'       => "Ежемесячно",
+        'sharable'      => "Раздается",
+        'notSharable'   => "Не раздается",
+        'repeatable'    => "Повторяемый",
+        'reqQ'          => "Требует",
+        'reqQDesc'      => "Чтобы получить это задание, вы должны завершить все указанные задания",
+        'reqOneQ'       => "Требуется Один из",
+        'reqOneQDesc'   => "Чтобы получить это задание, необходимо выполнить одно из следующих заданий",
+        'opensQ'        => "Открывает доступ к заданиям",
+        'opensQDesc'    => "Выполнение этого задания требует, чтобы эти задания",
+        'closesQ'       => "Заканчивает задание",
+        'closesQDesc'   => "Завершив этот квест, вы не сможете выполнять эти квесты",
+        'enablesQ'      => "Позволяет",
+        'enablesQDesc'  => "Кода это задание активно, вы сможете выполнять эти задания",
+        'enabledByQ'    => "Включена по",
+        'enabledByQDesc'=> "Вы можете получить это задание, только когда эти задания доступны",
+        'gainsDesc'     => "По завершении этого задания, вы получите",
+        'theTitle'      => '"%s"',                          // empty on purpose!
+        'mailDelivery'  => "[Вы получите это письмо %s]",
+        'mailIn'        => "[через %s]",
+        'unavailable'   => "пометили это задание как устаревшее — его нельзя получить или выполнить.",
+        'experience'    => "опыта",
+        'expConvert'    => "(или %s на %d-м уровне)",
+        'expConvert2'   => "%s на %d-м уровне",
+        'chooseItems'   => "Вам дадут возможность выбрать одну из следующих наград",
+        'receiveItems'  => "Вы получите",
+        'receiveAlso'   => "Вы также получите",
+        'spellCast'     => "Следующее заклинание будет наложено на вас",
+        'spellLearn'    => "Вы изучите",
+        'bonusTalents'  => "очков талантов",
+        'spellDisplayed'=> ' (показано: <a href="?spell=%d">%s</a>)',
         'questInfo'     => array(
-             0 => 'Обычный',             1 => 'Группа',             21 => 'Жизнь',              41 => 'PvP',                62 => 'Рейд',               81 => 'Подземелье',         82 => 'Игровое событие',
-             83 => 'Легенда',           84 => 'Сопровождение',      85 => 'Героическое',        88 => 'Рейд (10)',          89 => 'Рейд (25)'
+              0 => "Обычный",            1 => "Группа",             21 => "Жизнь",              41 => "PvP",                62 => "Рейд",               81 => "Подземелье",         82 => "Игровое событие",
+             83 => "Легенда",           84 => "Сопровождение",      85 => "Героическое",        88 => "Рейд (10)",          89 => "Рейд (25)"
+        ),
+        'cat'           => array(
+            // todo: after zones
         )
     ),
     'title' => array(
         'cat'           => array(
-            'Общее',      'PvP',    'Репутация',       'Подземелья и рейды',     'Задания',       'Профессии',      'Игровые события'
+            'Общее",      "PvP",    "Репутация",       "Подземелья и рейды",     "Задания",       "Профессии",      "Игровые события'
         )
     ),
     'skill' => array(
         'cat'           => array(
-            -6 => 'Спутники',           -5 => 'Транспорт',          -4 => 'Классовые навыки',   5 => 'Характеристики',      6 => 'Оружейные навыки',    7 => 'Классовые навыки',    8 => 'Доспехи',
-             9 => 'Вторичные навыки',   10 => 'Языки',              11 => 'Профессии'
+            -6 => "Спутники",           -5 => "Транспорт",          -4 => "Классовые навыки",   5 => "Характеристики",      6 => "Оружейные навыки",    7 => "Классовые навыки",    8 => "Доспехи",
+             9 => "Вторичные навыки",   10 => "Языки",              11 => "Профессии"
         )
     ),
     'currency' => array(
@@ -441,8 +491,8 @@ $lang = array(
         'relItems'      => array (
             'base'    => "<small>Показать %s, относящиеся к профессии <b>%s</b></small>",
             'link'    => " или ",
-            'recipes' => "<a href=\"?items=9.%s\">рецепты</a>",
-            'crafted' => "<a href=\"?items&filter=cr=86;crs=%s;crv=0\">производимые предметы</a>"
+            'recipes' => '<a href="?items=9.%s">рецепты</a>',
+            'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">производимые предметы</a>'
         ),
         'cat'           => array(
               7 => "Способности",
@@ -492,27 +542,27 @@ $lang = array(
             20 => "Удочки",                         14 => "Разное"
         ),
         'subClassMasks' => array(
-            0x02A5F3 => 'Оружие ближнего боя',      0x0060 => 'Щит',                        0x04000C => 'Оружие дальнего боя',      0xA091 => 'Одноручное оружие ближнего боя'
+            0x02A5F3 => "Оружие ближнего боя",      0x0060 => "Щит",                        0x04000C => "Оружие дальнего боя",      0xA091 => "Одноручное оружие ближнего боя"
         ),
         'traitShort'    => array(
             'atkpwr'    => "СА",                    'rgdatkpwr' => "Сил",                   'splpwr'    => "СЗ",                    'arcsplpwr' => "Урон",                  'firsplpwr' => "Урон",
             'frosplpwr' => "Урон",                  'holsplpwr' => "Урон",                  'natsplpwr' => "Урон",                  'shasplpwr' => "Урон",                  'splheal'   => "Исцеление"
         ),
         'spellModOp'    => array(
-            'DAMAGE',                               'DURATION',                             'THREAT',                               'EFFECT1',                              'CHARGES',
-            'RANGE',                                'RADIUS',                               'CRITICAL_CHANCE',                      'ALL_EFFECTS',                          'NOT_LOSE_CASTING_TIME',
-            'CASTING_TIME',                         'COOLDOWN',                             'EFFECT2',                              'IGNORE_ARMOR',                         'COST',
-            'CRIT_DAMAGE_BONUS',                    'RESIST_MISS_CHANCE',                   'JUMP_TARGETS',                         'CHANCE_OF_SUCCESS',                    'ACTIVATION_TIME',
-            'DAMAGE_MULTIPLIER',                    'GLOBAL_COOLDOWN',                      'DOT',                                  'EFFECT3',                              'BONUS_MULTIPLIER',
-            null,                                   'PROC_PER_MINUTE',                      'VALUE_MULTIPLIER',                     'RESIST_DISPEL_CHANCE',                 'CRIT_DAMAGE_BONUS_2',
-            'SPELL_COST_REFUND_ON_FAIL'
+            "DAMAGE",                               "DURATION",                             "THREAT",                               "EFFECT1",                              "CHARGES",
+            "RANGE",                                "RADIUS",                               "CRITICAL_CHANCE",                      "ALL_EFFECTS",                          "NOT_LOSE_CASTING_TIME",
+            "CASTING_TIME",                         "COOLDOWN",                             "EFFECT2",                              "IGNORE_ARMOR",                         "COST",
+            "CRIT_DAMAGE_BONUS",                    "RESIST_MISS_CHANCE",                   "JUMP_TARGETS",                         "CHANCE_OF_SUCCESS",                    "ACTIVATION_TIME",
+            "DAMAGE_MULTIPLIER",                    "GLOBAL_COOLDOWN",                      "DOT",                                  "EFFECT3",                              "BONUS_MULTIPLIER",
+            null,                                   "PROC_PER_MINUTE",                      "VALUE_MULTIPLIER",                     "RESIST_DISPEL_CHANCE",                 "CRIT_DAMAGE_BONUS_2",
+            "SPELL_COST_REFUND_ON_FAIL"
         ),
         'combatRating'  => array(
-            'WEAPON_SKILL',                         'DEFENSE_SKILL',                        'DODGE',                                'PARRY',                                'BLOCK',
-            'HIT_MELEE',                            'HIT_RANGED',                           'HIT_SPELL',                            'CRIT_MELEE',                           'CRIT_RANGED',
-            'CRIT_SPELL',                           'HIT_TAKEN_MELEE',                      'HIT_TAKEN_RANGED',                     'HIT_TAKEN_SPELL',                      'CRIT_TAKEN_MELEE',
-            'CRIT_TAKEN_RANGED',                    'CRIT_TAKEN_SPELL',                     'HASTE_MELEE',                          'HASTE_RANGED',                         'HASTE_SPELL',
-            'WEAPON_SKILL_MAINHAND',                'WEAPON_SKILL_OFFHAND',                 'WEAPON_SKILL_RANGED',                  'EXPERTISE',                            'ARMOR_PENETRATION'
+            "WEAPON_SKILL",                         "DEFENSE_SKILL",                        "DODGE",                                "PARRY",                                "BLOCK",
+            "HIT_MELEE",                            "HIT_RANGED",                           "HIT_SPELL",                            "CRIT_MELEE",                           "CRIT_RANGED",
+            "CRIT_SPELL",                           "HIT_TAKEN_MELEE",                      "HIT_TAKEN_RANGED",                     "HIT_TAKEN_SPELL",                      "CRIT_TAKEN_MELEE",
+            "CRIT_TAKEN_RANGED",                    "CRIT_TAKEN_SPELL",                     "HASTE_MELEE",                          "HASTE_RANGED",                         "HASTE_SPELL",
+            "WEAPON_SKILL_MAINHAND",                "WEAPON_SKILL_OFFHAND",                 "WEAPON_SKILL_RANGED",                  "EXPERTISE",                            "ARMOR_PENETRATION"
         ),
         'lockType'      => array(
             null,                                   "Взлом замков",                         "Травничество",                         "Горное дело",                          "Обезвреживание ловушки",
@@ -521,8 +571,8 @@ $lang = array(
             "Газ'рилльское украшение",              "Взрыв",                                "Медленное открытие (PvP)",             "Медленное закрытие (PvP)",             "Рыбная ловля (DND)",
             "Начертание",                           "Открыть на ходу"
         ),
-        'stealthType'   => ['GENERAL', 'TRAP'],
-        'invisibilityType' => ['GENERAL', 3 => 'TRAP', 6 => 'DRUNK']
+        'stealthType'   => ["GENERAL", "TRAP"],
+        'invisibilityType' => ["GENERAL", 3 => "TRAP", 6 => "DRUNK"]
     ),
     'item' => array(
         'armor'         => "Броня: %s",
@@ -563,7 +613,7 @@ $lang = array(
         'worth'         => "Деньги",
         'consumable'    => "Расходуется",
         'nonConsumable' => "Не расходуется",
-        'accountWide'   => "[Account-wide]",        // 22.10. hm, check with 'source' later
+        'accountWide'   => "Привязано к учетной записи",
         'millable'      => "Можно растолочь",
         'noEquipCD'     => "Нет отката при надевании",
         'prospectable'  => "Просеиваемое",
@@ -640,7 +690,6 @@ $lang = array(
              1 => array("Контейнеры", array(
                  0 => "Сумки",                       1 => "Сумки душ",               3 => "Сумки зачаровывателя",    4 => "Сумки инженера",          7 => "Сумки кожевника",         8 => "Сумки начертателя",
                  2 => "Сумки травника",              6 => "Сумки шахтера",           5 => "Сумки ювелира",
-
             )),
              0 => array("Расходуемые", array(
                  7 => "Бинты",                       5 => "Еда и напитки",           1 => "Зелья",                   0 => "Расходуемые",             4 => "Свитки",                 -3 => "Улучшения (временные)",
@@ -724,7 +773,7 @@ $lang = array(
             "Unknown Bonus #%d (%d)",
         )
     ),
-    'colon'             => ': ',
+    'colon'             => ": ",
     'dateFmtShort'      => "Y-m-d",
     'dateFmtLong'       => "Y-m-d в H:i"
 );

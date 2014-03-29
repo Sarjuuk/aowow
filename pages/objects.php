@@ -29,7 +29,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     if ($_ = $objectFilter->getConditions())
         $conditions[] = $_;
 
-    $objects = new GameObjectList($conditions, true);
+    $objects = new GameObjectList($conditions, ['extraOpts' => $objectFilter->extraOpts]);
 
     // menuId 5: Object   g_initPath()
     //  tabId 0: Database g_initHeader()

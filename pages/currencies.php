@@ -22,7 +22,7 @@ if ($cat)
 if (!$smarty->loadCache($cacheKey, $pageData))
 {
     $money = new CurrencyList($cat ? array(['category', (int)$cat[0]]) : []);
-    $money->addGlobalsToJscript($smarty);
+    $money->addGlobalsToJscript();
 
     // menuId 15: Currency g_initPath()
     //  tabId  0: Database g_initHeader()

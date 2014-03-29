@@ -42,10 +42,10 @@ class CharClassList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJscript(&$template, $addMask = 0)
+    public function addGlobalsToJScript($addMask = 0)
     {
         foreach ($this->iterate() as $__)
-            $template->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
+            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
     }
 
     public function addRewardsToJScript(&$ref) { }

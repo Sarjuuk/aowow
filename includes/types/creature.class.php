@@ -15,14 +15,12 @@ class CreatureList extends BaseType
 
     protected       $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
     public          $queryOpts = array(
-                        'ct'     => [['ft', 'clsMin', 'clsMax', 'qr']],
+                        'ct'     => [['ft', 'clsMin', 'clsMax', 'qse']],
                         'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.factionA', 's' => ', ft.A, ft.H, ft.factionId'],
                         'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', clsMin.attackpower AS mleAtkPwrMin, clsMin.rangedattackpower AS rngAtkPwrMin, clsMin.baseArmor * armorMod AS armorMin, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * dmgMultiplier AS dmgMin, (CASE ct.exp WHEN 0 THEN clsMin.basehp0 WHEN 1 THEN clsMin.basehp1 ELSE clsMin.basehp2 END) * healthMod AS healthMin, clsMin.baseMana * manaMod AS manaMin'],
                         'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', clsMax.attackpower AS mleAtkPwrMax, clsMax.rangedattackpower AS rngAtkPwrMax, clsMax.baseArmor * armorMod AS armorMax, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * dmgMultiplier AS dmgMax, (CASE ct.exp WHEN 0 THEN clsMax.basehp0 WHEN 1 THEN clsMax.basehp1 ELSE clsMax.basehp2 END) * healthMod AS healthMax, clsMax.baseMana * manaMod AS manaMax'],
-                        'qr'     => ['j' => ['creature_questrelation qr ON qr.id = ct.id', true], 's' => ', qr.quest', 'g' => 'ct.id'],          // start
-                        'ir'     => ['j' => ['creature_involvedrelation ir ON ir.id = ct.id', true]],                                            // end
-                        'qtqr'   => ['j' => 'quest_template qtqr ON qr.quest = qtqr.id'],
-                        'qtir'   => ['j' => 'quest_template qtir ON ir.quest = qtir.id'],
+                        'qse'    => ['j' => ['?_quests_startend qse ON qse.type = 1 AND qse.typeId = ct.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'ct.id'],
+                        'qt'     => ['j' => '?_quests qt ON qse.questId = qt.id'],
                         'rep'    => ['j' => ['creature_onkill_reputation rep ON rep.creature_id = ct.id', true]]
                     );
 
@@ -200,7 +198,7 @@ class CreatureList extends BaseType
                     'react'          => [$this->curTpl['A'], $this->curTpl['H']],
                 );
 
-                if ($this->getField('quest'))
+                if ($this->getField('startsQuests'))
                     $data[$this->id]['hasQuests'] = 1;
 
                 if ($_ = $this->getField('subname', true))
@@ -215,10 +213,10 @@ class CreatureList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript(&$template, $addMask = 0)
+    public function addGlobalsToJScript($addMask = 0)
     {
         foreach ($this->iterate() as $__)
-            $template->extendGlobalData(TYPE_NPC, [$this->id => ['name' => $this->getField('name', true)]]);
+            Util::$pageTemplate->extendGlobalData(TYPE_NPC, [$this->id => ['name' => $this->getField('name', true)]]);
     }
 
     public function addRewardsToJScript(&$refs) { }
@@ -280,20 +278,20 @@ class CreatureListFilter extends Filter
                 switch ($cr[1])
                 {
                     case '=':                               // min > max is totally possible
-                        $this->extraOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) <= '.$cr[2];
-                        $this->extraOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) >= '.$cr[2];
+                        $this->extraOpts['clsMin']['h'][] = 'IF(healthMin > healthMax, healthMax, healthMin) <= '.$cr[2];
+                        $this->extraOpts['clsMax']['h'][] = 'IF(healthMin > healthMax, healthMin, healthMax) >= '.$cr[2];
                         break;
                     case '>':
-                        $this->extraOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) > '.$cr[2];
+                        $this->extraOpts['clsMin']['h'][] = 'IF(healthMin > healthMax, healthMax, healthMin) > '.$cr[2];
                         break;
                     case '>=':
-                        $this->extraOpts['clsMin']['h'] = 'IF(healthMin > healthMax, healthMax, healthMin) >= '.$cr[2];
+                        $this->extraOpts['clsMin']['h'][] = 'IF(healthMin > healthMax, healthMax, healthMin) >= '.$cr[2];
                         break;
                     case '<':
-                        $this->extraOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) < '.$cr[2];
+                        $this->extraOpts['clsMax']['h'][] = 'IF(healthMin > healthMax, healthMin, healthMax) < '.$cr[2];
                         break;
                     case '<=':
-                        $this->extraOpts['clsMax']['h'] = 'IF(healthMin > healthMax, healthMin, healthMax) <= '.$cr[2];
+                        $this->extraOpts['clsMax']['h'][] = 'IF(healthMin > healthMax, healthMin, healthMax) <= '.$cr[2];
                         break;
                 }
                 return [1];                                 // always true, use post-filter
@@ -305,20 +303,20 @@ class CreatureListFilter extends Filter
                 switch ($cr[1])
                 {
                     case '=':
-                        $this->extraOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
-                        $this->extraOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) => '.$cr[2];
+                        $this->extraOpts['clsMin']['h'][] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
+                        $this->extraOpts['clsMax']['h'][] = 'IF(manaMin > manaMax, manaMin, manaMax) => '.$cr[2];
                         break;
                     case '>':
-                        $this->extraOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) > '.$cr[2];
+                        $this->extraOpts['clsMax']['h'][] = 'IF(manaMin > manaMax, manaMin, manaMax) > '.$cr[2];
                         break;
                     case '>=':
-                        $this->extraOpts['clsMax']['h'] = 'IF(manaMin > manaMax, manaMin, manaMax) >= '.$cr[2];
+                        $this->extraOpts['clsMax']['h'][] = 'IF(manaMin > manaMax, manaMin, manaMax) >= '.$cr[2];
                         break;
                     case '<':
-                        $this->extraOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) < '.$cr[2];
+                        $this->extraOpts['clsMin']['h'][] = 'IF(manaMin > manaMax, manaMax, manaMin) < '.$cr[2];
                         break;
                     case '<=':
-                        $this->extraOpts['clsMin']['h'] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
+                        $this->extraOpts['clsMin']['h'][] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
                         break;
                 }
                 return [1];                                 // always true, use post-filter
@@ -326,30 +324,32 @@ class CreatureListFilter extends Filter
                 switch ($cr[1])
                 {
                     case 1:                                 // any
-                        return ['ir.quest', 0, '!'];
+                        return ['AND', ['qse.method', 0x1, '&'], ['qse.questId', null, '!']];
                     case 2:                                 // alliance
-                        return ['AND', ['ir.quest', 0, '!'], [['qtqr.RequiredRaces', RACE_MASK_HORDE, '&'], 0], ['qtqr.RequiredRaces', RACE_MASK_ALLIANCE, '&']];
+                        return ['AND', ['qse.method', 0x1, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_HORDE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&']];
                     case 3:                                 // horde
-                        return ['AND', ['ir.quest', 0, '!'], [['qtqr.RequiredRaces', RACE_MASK_ALLIANCE, '&'], 0], ['qtqr.RequiredRaces', RACE_MASK_HORDE, '&']];
+                        return ['AND', ['qse.method', 0x1, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']];
                     case 4:                                 // both
-                        return ['AND', ['ir.quest', 0, '!'], ['OR', ['AND', ['qtqr.RequiredRaces', RACE_MASK_ALLIANCE, '&'], ['qtqr.RequiredRaces', RACE_MASK_HORDE, '&']], ['qtqr.RequiredRaces', 0]]];
+                        return ['AND', ['qse.method', 0x1, '&'], ['qse.questId', null, '!'], ['OR', ['AND', ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']], ['qt.reqRaceMask', 0]]];
                     case 5:                                 // none
-                        return ['ir.quest', NULL];
+                        $this->extraOpts['ct']['h'][] = 'startsQuests = 0';
+                        return [1];
                 }
                 break;
             case 8:                                         // endsquest [enum]
                 switch ($cr[1])
                 {
                     case 1:                                 // any
-                        return ['qr.quest', 0, '!'];
+                        return ['AND', ['qse.method', 0x2, '&'], ['qse.questId', null, '!']];
                     case 2:                                 // alliance
-                        return ['AND', ['qr.quest', 0, '!'], [['qtqi.RequiredRaces', RACE_MASK_HORDE, '&'], 0], ['qtqi.RequiredRaces', RACE_MASK_ALLIANCE, '&']];
+                        return ['AND', ['qse.method', 0x2, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_HORDE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&']];
                     case 3:                                 // horde
-                        return ['AND', ['qr.quest', 0, '!'], [['qtqi.RequiredRaces', RACE_MASK_ALLIANCE, '&'], 0], ['qtqi.RequiredRaces', RACE_MASK_HORDE, '&']];
+                        return ['AND', ['qse.method', 0x2, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']];
                     case 4:                                 // both
-                        return ['AND', ['qr.quest', 0, '!'], ['OR', ['AND', ['qtqi.RequiredRaces', RACE_MASK_ALLIANCE, '&'], ['qtqi.RequiredRaces', RACE_MASK_HORDE, '&']], ['qtqi.RequiredRaces', 0]]];
+                        return ['AND', ['qse.method', 0x2, '&'], ['qse.questId', null, '!'], ['OR', ['AND', ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']], ['qt.reqRaceMask', 0]]];
                     case 5:                                 // none
-                        return ['qr.quest', NULL];
+                        $this->extraOpts['ct']['h'][] = 'endsQuests = 0';
+                        return [1];
                 }
                 break;
             case 3:                                         // faction [enum]

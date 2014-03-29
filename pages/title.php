@@ -71,7 +71,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             {
                 case  4:
                     $quests = new QuestList(array(['id', $entries]));
-                    $quests->addGlobalsToJscript($smarty, GLOBALINFO_REWARDS);
+                    $quests->addGlobalsToJScript(GLOBALINFO_REWARDS);
 
                     $pageData['relTabs'][] = array(
                         'file'   => 'quest',
@@ -87,7 +87,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     break;
                 case 12:
                     $acvs = new AchievementList(array(['id', $entries]));
-                    $acvs->addGlobalsToJscript($smarty);
+                    $acvs->addGlobalsToJscript();
 
                     $pageData['relTabs'][] = array(
                         'file'   => 'achievement',
