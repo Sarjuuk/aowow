@@ -23,13 +23,16 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($event->error)
         $smarty->notFound(Lang::$game['event'], $_id);
 
-    $hId = $event->getField('holidayId');
+    $_hId = $event->getField('holidayId');
+    $_eId = $event->getField('eventBak');
 
     // redirect if associated with a holiday
-    if ($hId && $_id != $hId)
-        header('Location: '.STATIC_URL.'?event='.$hId);
+    if ($_hId && $_id != $_hId)
+        header('Location: '.HOST_URL.'?event='.$_hId);
 
-    if ($hId)
+    $hasFilter = in_array($_hId, [372, 283, 285, 353, 420, 400, 284, 201, 374, 409, 141, 324, 321, 424, 335, 327, 341, 181, 404, 398, 301]);
+
+    if ($_hId)
     {
         switch ($event->getField('scheduleType'))
         {
@@ -48,8 +51,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $infobox = [];
 
-    // - boss
-    // - faction (only darkmoon faire)
+    // boss
+    if ($_ = $event->getField('bossCreature'))
+    {
+        Util::$pageTemplate->extendGlobalIds(TYPE_NPC, $_);
+        $infobox[] = Lang::$npc['rank'][3].Lang::$colon.'[npc='.$_.']';
+    }
 
     // finalized after the cache is handled
 
@@ -87,17 +94,134 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     /* Extra Tabs */
     /**************/
 
-    // NPC spawns
+    // tab: npcs
+    if ($npcIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(ec.eventEntry > 0, 1, 0) AS added FROM creature c, game_event_creature ec WHERE ec.guid = c.guid AND ABS(ec.eventEntry) = ?d', $_eId))
+    {
+        $creatures = new CreatureList(array(['id', array_keys($npcIds)]));
+        if (!$creatures->error)
+        {
+            $data = $creatures->getListviewData();
 
-    // GO spawns
+            foreach ($data as &$d)
+                $d['method'] = $npcIds[$d['id']];
 
-    // Quests
+            $pageData['relTabs'][] = array(
+                'file'   => CreatureList::$brickFile,
+                'data'   => $data,
+                'params' => array(
+                    'tabs' => '$tabsRelated',
+                    'note' => $hasFilter ? sprintf(Util::$filterResultString, '?npcs&filter=cr=38;crs='.$_hId.';crv=0') : null
+                )
+            );
+        }
+    }
 
-    // Items requiring Holiday
+    // tab: objects
+    if ($objectIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(eg.eventEntry > 0, 1, 0) AS added FROM gameobject g, game_event_gameobject eg WHERE eg.guid = g.guid AND ABS(eg.eventEntry) = ?d', $_eId))
+    {
+        $objects = new GameObjectList(array(['id', array_keys($objectIds)]));
+        if (!$objects->error)
+        {
+            $data = $objects->getListviewData();
+            foreach ($data as &$d)
+                $d['method'] = $objectIds[$d['id']];
+
+            $pageData['relTabs'][] = array(
+                'file'   => GameObjectList::$brickFile,
+                'data'   => $data,
+                'params' => array(
+                    'tabs' => '$tabsRelated',
+                    'note' => $hasFilter ? sprintf(Util::$filterResultString, '?objects&filter=cr=16;crs='.$_hId.';crv=0') : null
+                )
+            );
+        }
+    }
+
+    // tab: quests (by table, go & creature)
+    $quests = new QuestList(array(['holidayId', $_hId]));
+    if (!$quests->error)
+    {
+        $quests->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+
+        $pageData['relTabs'][] = array(
+            'file'   => QuestList::$brickFile,
+            'data'   => $quests->getListviewData(),
+            'params' => array(
+                'tabs' => '$tabsRelated',
+                'note' => $hasFilter ? sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$_hId.';crv=0') : null
+            )
+        );
+    }
+
+    // tab: achievements
+    if ($_ = $event->getField('achievementCatOrId'))
+    {
+        $condition = $_ > 0 ? [['category', $_]] : [['id', -$_]];
+        $acvs = new AchievementList($condition);
+        if (!$acvs->error)
+        {
+            $acvs->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
+
+            $pageData['relTabs'][] = array(
+                'file'   => AchievementList::$brickFile,
+                'data'   => $acvs->getListviewData(),
+                'params' => array(
+                    'tabs'        => '$tabsRelated',
+                    'note'        => $hasFilter ? sprintf(Util::$filterResultString, '?achievements&filter=cr=11;crs='.$_hId.';crv=0') : null,
+                    'visibleCols' => "$['category']"
+                )
+            );
+        }
+    }
+
+    // tab: items
+    $conditions = array(
+        'OR',
+        ['holidayId', $_hId],                               // direct requirement on item
+    );
+
+    // items from quests
+    if (!$quests->error)
+    {
+        $questItems = [];
+        foreach (array_column($quests->rewards, TYPE_ITEM) as $arr)
+            $questItems = array_merge($questItems, $arr);
+
+        foreach (array_column($quests->requires, TYPE_ITEM) as $arr)
+            $questItems = array_merge($questItems, $arr);
+
+        if ($questItems)
+            $conditions[] = ['id', $questItems];
+    }
+
+    // items from creature
+    if ($npcIds && !$creatures->error)
+    {
+        // vendor
+        $cIds = $creatures->getFoundIDs();
+        if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv  WHERE entry IN (?a) UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id IN (?a)', $cIds, $cIds))
+            $conditions[] = ['id', $sells];
+    }
+
+    // not checking for loot ... cant distinguish between eventLoot and fillerCrapLoot
+
+    $eventItems = new ItemList($conditions);
+    if (!$eventItems->error)
+    {
+        $eventItems->addGlobalsToJScript(GLOBALINFO_SELF);
+
+        $pageData['relTabs'][] = array(
+            'file'   => ItemList::$brickFile,
+            'data'   => $eventItems->getListviewData(),
+            'params' => array(
+                'tabs' => '$tabsRelated',
+                'note' => $hasFilter ? sprintf(Util::$filterResultString, '?items&filter=cr=160;crs='.$_hId.';crv=0') : null
+            )
+        );
+    }
 
     // tab: see also (event conditions)
-    $eId = $event->getField('eventBak');
-    if($rel = DB::Aowow()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, -prerequisite_event, eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $eId, $eId, $eId))
+    if($rel = DB::Aowow()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, -prerequisite_event, eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $_eId, $_eId, $_eId))
     {
         $list = [];
         array_walk($rel, function(&$v, $k) use (&$list) {
@@ -108,7 +232,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         });
 
         $relEvents = new WorldEventList(array(['id', $list]));
-        $relEvents->addGlobalsToJscript(Util::$pageTemplate);
+        $relEvents->addGlobalsToJscript();
         $relData   = $relEvents->getListviewData(true);
         foreach ($relEvents->iterate() as $id => $__)
         {
@@ -119,7 +243,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             );
         }
 
-        $event->addGlobalsToJscript(Util::$pageTemplate);
+        $event->addGlobalsToJscript();
         foreach ($rel as $r)
         {
             if ($r >= 0)
@@ -138,7 +262,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
 
         $pageData['relTabs'][] = array(
-            'file'   => 'event',
+            'file'   => WorldEventList::$brickFile,
             'data'   => $relData,
             'params' => array(
                 'id'         => 'see-also',
@@ -160,21 +284,21 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
 $updated = WorldEventList::updateDates($pageData['dates']);
 
-// in progress
-if ($updated['start'] < time() && $updated['end'] > time())
-    array_unshift($pageData['page']['infobox'], '[span class=q2]'.Lang::$event['inProgress'].'[/span]');
-
-// occurence
-if ($updated['rec'] > 0)
-    array_unshift($pageData['page']['infobox'], Lang::$event['interval'].Lang::$colon.Util::formatTime($updated['rec'] * 1000));
+// start
+if ($updated['end'])
+    array_push($pageData['page']['infobox'], Lang::$event['start'].Lang::$colon.date(Lang::$dateFmtLong, $updated['start']));
 
 // end
 if ($updated['end'])
-    array_unshift($pageData['page']['infobox'], Lang::$event['end'].Lang::$colon.date(Lang::$dateFmtLong, $updated['end']));
+    array_push($pageData['page']['infobox'], Lang::$event['end'].Lang::$colon.date(Lang::$dateFmtLong, $updated['end']));
 
-// start
-if ($updated['end'])
-    array_unshift($pageData['page']['infobox'], Lang::$event['start'].Lang::$colon.date(Lang::$dateFmtLong, $updated['start']));
+// occurence
+if ($updated['rec'] > 0)
+    array_push($pageData['page']['infobox'], Lang::$event['interval'].Lang::$colon.Util::formatTime($updated['rec'] * 1000));
+
+// in progress
+if ($updated['start'] < time() && $updated['end'] > time())
+    array_push($pageData['page']['infobox'], '[span class=q2]'.Lang::$event['inProgress'].'[/span]');
 
 $pageData['page']['infobox'] = '[ul][li]'.implode('[/li][li]', $pageData['page']['infobox']).'[/li][/ul]';
 

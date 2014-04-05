@@ -59,7 +59,7 @@ define('HOUR',                              60  * MINUTE);
 define('DAY',                               24  * HOUR);
 define('WEEK',                              7   * DAY);
 define('MONTH',                             30  * DAY);
-define('YEAR',                              365 * DAY);
+define('YEAR',                              364 * DAY);
 
 // User Groups
 define('U_GROUP_NONE',                      0x0000);

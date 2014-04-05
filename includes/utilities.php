@@ -1099,7 +1099,7 @@ class Util
 
         if ($short)
         {
-            if ($_ = round($s['d'] / 365))
+            if ($_ = round($s['d'] / 364))
                 return $_." ".Lang::$timeUnits['ab'][0];
             if ($_ = round($s['d'] / 30))
                 return $_." ".Lang::$timeUnits['ab'][1];
@@ -1120,20 +1120,19 @@ class Util
         }
         else
         {
-            $_ = $s['d'] + $s['h'];
-
-            if ($_ && !($_ % 365))                          // whole years
-                return round(($s['d'] + $s['h'] *24) / 365, 2)." ".Lang::$timeUnits[$s['d'] / 365 == 1 && !$s['h'] ? 'sg' : 'pl'][0];
+            $_ = $s['d'] + $s['h'] / 24;
+            if ($_ && !($_ % 364))                          // whole years
+                return round(($s['d'] + $s['h'] / 24) / 364, 2)." ".Lang::$timeUnits[$s['d'] / 364 == 1 && !$s['h'] ? 'sg' : 'pl'][0];
             if ($_ && !($_ % 30))                           // whole month
-                return round(($s['d'] + $s['h'] * 24) / 30, 2)." ".Lang::$timeUnits[$s['d'] / 30 == 1 && !$s['h'] ? 'sg' : 'pl'][1];
+                return round(($s['d'] + $s['h'] / 24) /  30, 2)." ".Lang::$timeUnits[$s['d'] /  30 == 1 && !$s['h'] ? 'sg' : 'pl'][1];
             if ($_ && !($_ % 7))                            // whole weeks
-                return round(($s['d'] + $s['h'] * 24) / 7, 2)." ".Lang::$timeUnits[$s['d'] / 7 == 1 && !$s['h'] ? 'sg' : 'pl'][2];
+                return round(($s['d'] + $s['h'] / 24) /   7, 2)." ".Lang::$timeUnits[$s['d'] /   7 == 1 && !$s['h'] ? 'sg' : 'pl'][2];
             if ($s['d'])
-                return round($s['d'] + $s['h'] / 24, 2)." ".Lang::$timeUnits[$s['d'] == 1 && !$s['h'] ? 'sg' : 'pl'][3];
+                return round($s['d'] + $s['h']  /   24, 2)." ".Lang::$timeUnits[$s['d'] == 1 && !$s['h']  ? 'sg' : 'pl'][3];
             if ($s['h'])
-                return round($s['h'] + $s['m'] / 60, 2)." ".Lang::$timeUnits[$s['h'] == 1 && !$s['m'] ? 'sg' : 'pl'][4];
+                return round($s['h'] + $s['m']  /   60, 2)." ".Lang::$timeUnits[$s['h'] == 1 && !$s['m']  ? 'sg' : 'pl'][4];
             if ($s['m'])
-                return round($s['m'] + $s['s'] / 60, 2)." ".Lang::$timeUnits[$s['m'] == 1 && !$s['s'] ? 'sg' : 'pl'][5];
+                return round($s['m'] + $s['s']  /   60, 2)." ".Lang::$timeUnits[$s['m'] == 1 && !$s['s']  ? 'sg' : 'pl'][5];
             if ($s['s'])
                 return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::$timeUnits[$s['s'] == 1 && !$s['ms'] ? 'sg' : 'pl'][6];
             if ($s['ms'])

@@ -44,8 +44,9 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     // include child categories if current category is empty
     $condition = !empty($cats) ? [['category', (int)end($cats)]] : [];
 
-    if ($_ = $acvFilter->getConditions())
-        $condition[] = $_;
+    $fiCnd = $acvFilter->getConditions();
+    if ($fiCnd)
+        $condition[] = $fiCnd;
 
     $acvList   = new AchievementList($condition);
     if (!$acvList->getMatches())
@@ -56,7 +57,13 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             $curCats = DB::Aowow()->SelectCol('SELECT Id FROM ?_achievementCategory WHERE parentCategory IN (?a)', $curCats);
             $catList = array_merge($catList, $curCats);
         }
-        $acvList = new AchievementList($catList ? [['category', $catList]] : []);
+        $condition = [];
+        if ($fiCnd)
+            $condition[] = $fiCnd;
+        if ($catList)
+            $condition[] = ['category', $catList];
+
+        $acvList = new AchievementList($condition);
     }
 
     // recreate form selection

@@ -228,7 +228,28 @@ class AchievementList extends BaseType
 
 class AchievementListFilter extends Filter
 {
-    // cr => [type, field, misc, extraCol]
+
+    protected $enums         = array(
+        11 => array(
+              327 => 160,                                   // Lunar Festival
+              335 => 187,                                   // Love is in the Air
+              181 => 159,                                   // Noblegarden
+              201 => 163,                                   // Children's Week
+              341 => 161,                                   // Midsummer Fire Festival
+              372 => 162,                                   // Brewfest
+              324 => 158,                                   // Hallow's End
+              404 => 14981,                                 // Pilgrim's Bounty
+              141 => 156,                                   // Feast of Winter Veil
+              409 => -3456,                                 // Day of the Dead
+              398 => -3457,                                 // Pirates' Day
+            -2323 => true,
+            -2324 => false,
+              283 => -1,                                    // valid events without achievements
+              285 => -1,   353 => -1,   420 => -1,
+              400 => -1,   284 => -1,   374 => -1,
+              321 => -1,   424 => -1,   301 => -1
+        )
+    );
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
          2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true      ], // givesreward
          3 => [FILTER_CR_STRING,    'reward',      true      ], // rewardtext
@@ -259,7 +280,21 @@ class AchievementListFilter extends Filter
             case 6:                                         // last in series [yn]
                 return $this->int2Bool($cr[1]) ? ['AND', ['series', 0, '!'], [['series', 0xFFFF, '&'], 0]] : [['series', 0xFFFF, '&'], 0, '!'];
             case 11:                                        // Related Event [enum]
-/* todo */      return [1];                                 // >0:holidayId; -2323:any; -2324:none .. not quite like the subcategories
+                $_ = @$this->enums[$cr[0]][$cr[1]];
+                if ($_ !== null)
+                {
+                    if (is_int($_))
+                        return ($_ > 0) ? ['category', $_] : ['id', abs($_)];
+                    else
+                    {
+                        $ids = array_filter($this->enums[$cr[0]], function($x) {
+                            return is_int($x) && $x > 0;
+                        });
+
+                        return ['category', $ids, $_ ? null : '!'];
+                    }
+                }
+                break;
             case 14:                                        // hascomments [yn]
 /* todo */      return [1];
             case 15:                                        // hasscreenshots [yn]
