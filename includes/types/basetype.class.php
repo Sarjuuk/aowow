@@ -234,15 +234,15 @@ abstract class BaseType
 
         // append grouping
         if ($g = array_column($this->queryOpts, 'g'))
-            $this->queryBase .= ' GROUP BY '.implode(', ', $g);
+            $this->queryBase .= ' GROUP BY '.implode(', ', array_filter($g));
 
         // append post filtering
         if ($h = array_column($this->queryOpts, 'h'))
-            $this->queryBase .= ' HAVING '.implode(' AND ', $h);
+            $this->queryBase .= ' HAVING '.implode(' AND ', array_filter($h));
 
         // append ordering
         if ($o = array_column($this->queryOpts, 'o'))
-            $this->queryBase .= ' ORDER BY '.implode(', ', $o);
+            $this->queryBase .= ' ORDER BY '.implode(', ', array_filter($o));
 
         // apply limit
         if ($limit)
@@ -651,9 +651,10 @@ abstract class Filter
 
                     $this->formData['form'][$w[0]] = $tmp2;
 
-                    array_walk($tmp2, function(&$v) { $v = intVal($v); });
+                    array_walk($tmp2, function(&$v) {
+                        $v = intVal($v);
+                    });
                     $this->fiData['v'][$w[0]] = $tmp2;
-
                 }
                 else
                 {
@@ -662,10 +663,7 @@ abstract class Filter
                     $this->sanitize($w[1]);
 
                     if ($w[1] !== '')
-                    {
-                        Util::checkNumeric($w[1]);
                         $this->fiData['v'][$w[0]] = $w[1];
-                    }
                     else
                         $this->error = true;
                 }

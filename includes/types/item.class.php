@@ -23,7 +23,7 @@ class ItemList extends BaseType
 
     protected     $queryBase  = 'SELECT i.*, i.id AS ARRAY_KEY FROM ?_items i';
     protected     $queryOpts  = array(
-                      'is'  => ['s' => ', 1 as score', 'j' => '?_item_stats AS `is` ON `is`.`id` = `i`.`id`', 'h' => 'score > 0', 'o' => 'score DESC'],
+                      'is'  => ['j' => '?_item_stats AS `is` ON `is`.`id` = `i`.`id`', 'o' => 'score DESC'],
                       's'   => ['j' => ['?_spell AS `s` ON s.effect1CreateItemId = i.id', true], 'g' => 'i.id'],
                       'i'   => ['o' => 'i.quality DESC, i.itemLevel DESC']
                   );
@@ -1407,7 +1407,8 @@ class ItemList extends BaseType
 class ItemListFilter extends Filter
 {
     private   $ubFilter      = [];                          // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
-    public    $extraOpts     = null;                        // score for statWeights
+    public    $extraOpts     = [];                          // score for statWeights
+    public    $wtCnd         = [];
     protected $enums         = array(
         99 => array(                                        // profession | recycled for 86, 87
             null, 171, 164, 185, 333, 202, 129, 755, 165, 186, 197, true, false, 356, 182, 773
@@ -1562,7 +1563,8 @@ class ItemListFilter extends Filter
         if (!$data['wt'] || !$data['wtv'] || count($data['wt']) != count($data['wtv']))
             return null;
 
-        $select = $cnd = [];
+        $this->wtCnd = [];
+        $select = [];
         $wtSum  = 0;
 
         foreach ($data['wt'] as $k => $v)
@@ -1578,9 +1580,9 @@ class ItemListFilter extends Filter
                 if ($str == 'mledps')                       // todo (med): unify rngdps and mledps to dps
                     $str = 'dps';
 
-                $select[] = '(`is`.`'.$str.'` * '.$qty.')';
-                $cnd[]    = ['is.'.$str, 0, '>'];
-                $wtSum   += $qty;
+                $select[]      = '(`is`.`'.$str.'` * '.$qty.')';
+                $this->wtCnd[] = ['is.'.$str, 0, '>'];
+                $wtSum        += $qty;
             }
             else                                            // well look at that.. erronous indizes or zero-weights
             {
@@ -1589,15 +1591,20 @@ class ItemListFilter extends Filter
             }
         }
 
-        if (count($cnd) > 1)
-            array_unshift($cnd, 'OR');
-        else if (count($cnd) == 1)
-            $cnd = $cnd[0];
+        if (count($this->wtCnd) > 1)
+            array_unshift($this->wtCnd, 'OR');
+        else if (count($this->wtCnd) == 1)
+            $this->wtCnd = $this->wtCnd[0];
 
         if ($select)
+        {
             $this->extraOpts['is']['s'][] = ', ('.implode(' + ', $select).') / '.$wtSum.' AS score';
+            $this->extraOpts['i']['o'][]  = null;           // remove default ordering
+        }
+        else
+            $this->extraOpts['is']['s'][] = ', 0 AS score'; // prevent errors
 
-        return $cnd;
+        return $this->wtCnd;
     }
 
     protected function createSQLForCriterium(&$cr)
@@ -1898,12 +1905,18 @@ class ItemListFilter extends Filter
         {
             // valid item?
             if (!is_int($_v['upg']) && !is_array($_v['upg']))
+            {
+                unset($this->formData['form']['upg']);
                 unset($_v['upg']);
+            }
             else
             {
                 $_ = DB::Aowow()->selectCol('SELECT id as ARRAY_KEY, slot FROM ?_items WHERE class IN (2, 3, 4) AND id IN (?a)', (array)$_v['upg']);
                 if ($_ === null)
+                {
                     unset($_v['upg']);
+                    unset($this->formData['form']['upg']);
+                }
                 else
                 {
                     $this->formData['form']['upg'] = $_;

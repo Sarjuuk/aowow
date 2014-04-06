@@ -1880,6 +1880,7 @@ Variations:
 .listview-note
 {
     line-height: 16px;
+    clear: left;
 }
 
 .listview table

@@ -165,8 +165,8 @@ $lang = array(
         'zone'          => "zone",
         'zones'         => "Zones",
 
-        'honorPoints'   => "Honor Points",                  // tooltip_honorpoints
-        'arenaPoints'   => "Arena Points",                  // tooltip_arenapoints
+        'honorPoints'   => "Honor Points",
+        'arenaPoints'   => "Arena Points",
         'heroClass'     => "Hero class",
         'resource'      => "Resource",
         'resources'     => "Resources",

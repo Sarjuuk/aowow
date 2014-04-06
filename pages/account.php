@@ -216,7 +216,7 @@ function signup()
                 $smarty->assign('signup_error', Lang::$account['nameInUse']);
             else
             {
-                $success = DB::Auth()->query('INSERT INTO aowow_account (user, passHash, displayName, email, joindate, lastIP, locale) VALUES (?, ?, ?, ?, NOW(), ?, ?)',
+                $success = DB::Aowow()->query('INSERT INTO aowow_account (user, passHash, displayName, email, joindate, lastIP, locale) VALUES (?, ?, ?, ?, NOW(), ?, ?)',
                     $_POST['username'],
                     sha1(strtoupper($_POST['username']).':'.strtoupper($_POST['password'])),
                     Util::ucFirst($_POST['username']),
@@ -270,24 +270,24 @@ if (User::$id)
             $next = !empty($next[1]) ? '?'.$next[1] : '.';
             header('Location: '.$next);
         case 'weightscales':
-            if (isset($post['save']))
+            if (isset($_POST['save']) && User::$id)
             {
-                if (!isset($post['id']))
+                if (!isset($_POST['id']))
                 {
                     $res = DB::Aowow()->selectRow('SELECT max(id) as max, count(id) as num FROM ?_account_weightscales WHERE account = ?d', User::$id);
                     if ($res['num'] < 5)                    // more or less hard-defined in LANG.message_weightscalesaveerror
-                        $post['id'] = ++$res['max'];
+                        $_POST['id'] = ++$res['max'];
                     else
                         die('0');
                 }
 
-                if (DB::Aowow()->query('REPLACE INTO ?_account_weightscales VALUES (?d, ?d, ?, ?)', intVal($post['id']), User::$id, $post['name'], $post['scale']))
-                    die((string)$post['id']);
+                if (DB::Aowow()->query('REPLACE INTO ?_account_weightscales VALUES (?d, ?d, ?, ?)', intVal($_POST['id']), User::$id, $_POST['name'], $_POST['scale']))
+                    die((string)$_POST['id']);
                 else
                     die('0');
             }
-            else if (isset($post['delete']) && isset($post['id']))
-                DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', intVal($post['id']), User::$id);
+            else if (isset($_POST['delete']) && isset($_POST['id']) && User::$id)
+                DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', intVal($_POST['id']), User::$id);
             else
                 die('0');
 

@@ -109,7 +109,7 @@
 
                     <div id="statweight-disclosure" style="display: none">
                         <div id="statweight-help">
-                            <div><a href="?help=stat-weighting" target="_blank" id="statweight-help" class="icon-help" style="font-size: 13px; font-weight: normal; background: url(template/images/help.gif) no-repeat left center; padding-left: 20px">{$lang.help}</a></div>
+                            <div><a href="?help=stat-weighting" target="_blank" id="statweight-help" class="icon-help">{$lang.help}</a></div>
                         </div>
 
                         <table>
