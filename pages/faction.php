@@ -17,11 +17,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     if ($faction->error)
         $smarty->notFound(Lang::$game['faction'], $_id);
 
-    if ($_ = $faction->getField('cat2'))
-        $_path[] = $_;
+    if ($foo = $faction->getField('cat'))
+    {
+        if ($bar = $faction->getField('cat2'))
+            $_path[] = $bar;
 
-    if ($_ = $faction->getField('cat'))
-        $_path[] = $_;
+        $_path[] = $foo;
+    }
+
 
     /***********/
     /* Infobox */
@@ -112,8 +115,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // reward rates
     if ($rates = DB::Aowow()->selectRow('SELECT * FROM reputation_reward_rate WHERE faction = ?d', $_id))
     {
-        $buff = '[h3 class=clear][Custom Reward Rate][/h3][table width=100px]';
-
+        $buff = '';
         foreach ($rates as $k => $v)
         {
             if ($v == 1)
@@ -121,20 +123,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
             switch ($k)
             {
-                case 'quest_rate':          $buff .= '[tr][td]Quests:[/td]'; break;
-                case 'quest_daily_rate':    $buff .= '[tr][td]Daily Quests:[/td]'; break;
-                case 'quest_weekly_rate':   $buff .= '[tr][td]Weekly Quests:[/td]'; break;
-                case 'quest_monthly_rate':  $buff .= '[tr][td]Monthly Quests:[/td]'; break;
-                case 'creature_rate':       $buff .= '[tr][td]Creatures:[/td]'; break;
-                case 'spell_rate':          $buff .= '[tr][td]Spells:[/td]'; break;
+                case 'quest_rate':          $buff .= '[tr][td]'.Lang::$game['quests'].Lang::$colon.'[/td]';                                  break;
+                case 'quest_daily_rate':    $buff .= '[tr][td]'.Lang::$game['quests'].' ('.Lang::$quest['daily'].')'.Lang::$colon.'[/td]';   break;
+                case 'quest_weekly_rate':   $buff .= '[tr][td]'.Lang::$game['quests'].' ('.Lang::$quest['weekly'].')'.Lang::$colon.'[/td]';  break;
+                case 'quest_monthly_rate':  $buff .= '[tr][td]'.Lang::$game['quests'].' ('.Lang::$quest['monthly'].')'.Lang::$colon.'[/td]'; break;
+                case 'creature_rate':       $buff .= '[tr][td]'.Lang::$game['npcs'].Lang::$colon.'[/td]';                                    break;
+                case 'spell_rate':          $buff .= '[tr][td]'.Lang::$game['spells'].Lang::$colon.'[/td]';                                  break;
             }
 
-            $buff .= '[td]x'.number_format($v, 1).'[/td][/tr]';
+            $buff .= '[td width=30px align=right]x'.number_format($v, 1).'[/td][/tr]';
         }
 
-        $buff .= '[/table]';
-
-        $pageData['page']['extraText'] .= $buff;
+        if ($buff)
+            $pageData['page']['extraText'] = '[h3 class=clear][Custom Reward Rate][/h3][table]'.$buff.'[/table]';
     }
 
     /**************/
@@ -190,36 +191,33 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     // tab: members
-    $conditions = array(
-        ['factionA', $faction->getField('templateIds')],
-        ['factionH', $faction->getField('templateIds')],
-        'OR'
-    );
-
-    $killCreatures = new CreatureList($conditions);
-    if (!$killCreatures->error)
+    if ($_ = $faction->getField('templateIds'))
     {
-        $killCreatures->addGlobalsToJscript();
+        $members = new CreatureList(array(['factionA', $_], ['factionH', $_], 'OR'));
+        if (!$members->error)
+        {
+            $members->addGlobalsToJscript();
 
-        $pageData['relTabs'][] = array(
-            'file'    => 'creature',
-            'data'    => $killCreatures->getListviewData(),
-            'showRep' => true,
-            'params'  => array(
-                'id'   => 'member',
-                'name' => '$LANG.tab_members',
-                'tabs' => '$tabsRelated',
-            )
-        );
+            $pageData['relTabs'][] = array(
+                'file'    => 'creature',
+                'data'    => $members->getListviewData(),
+                'showRep' => true,
+                'params'  => array(
+                    'id'   => 'member',
+                    'name' => '$LANG.tab_members',
+                    'tabs' => '$tabsRelated',
+                )
+            );
+        }
     }
 
     // tab: quests
     $conditions = array(
-        ['AND', ['rewardFactionId1', $_id], ['OR', ['rewardFactionValueId1', 0, '>'], ['rewardFactionValueIdOverride1', 0, '>']]],
-        ['AND', ['rewardFactionId2', $_id], ['OR', ['rewardFactionValueId2', 0, '>'], ['rewardFactionValueIdOverride2', 0, '>']]],
-        ['AND', ['rewardFactionId3', $_id], ['OR', ['rewardFactionValueId3', 0, '>'], ['rewardFactionValueIdOverride3', 0, '>']]],
-        ['AND', ['rewardFactionId4', $_id], ['OR', ['rewardFactionValueId4', 0, '>'], ['rewardFactionValueIdOverride4', 0, '>']]],
-        ['AND', ['rewardFactionId5', $_id], ['OR', ['rewardFactionValueId5', 0, '>'], ['rewardFactionValueIdOverride5', 0, '>']]],
+        ['AND', ['rewardFactionId1', $_id], ['rewardFactionValue1', 0, '>']],
+        ['AND', ['rewardFactionId2', $_id], ['rewardFactionValue2', 0, '>']],
+        ['AND', ['rewardFactionId3', $_id], ['rewardFactionValue3', 0, '>']],
+        ['AND', ['rewardFactionId4', $_id], ['rewardFactionValue4', 0, '>']],
+        ['AND', ['rewardFactionId5', $_id], ['rewardFactionValue5', 0, '>']],
         'OR'
     );
     $quests = new QuestList($conditions);

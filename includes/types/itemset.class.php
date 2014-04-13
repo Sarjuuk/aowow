@@ -62,7 +62,6 @@ class ItemsetList extends BaseType
                 'maxlevel' => $this->curTpl['maxLevel'],
                 'note'     => $this->curTpl['contentGroup'],
                 'type'     => $this->curTpl['type'],
-                'heroic'   => $this->curTpl['heroic'] == 1, // we want to be bool
                 'reqclass' => $this->curTpl['classMask'],
                 'classes'  => $this->curTpl['classes'],
                 'pieces'   => $this->curTpl['pieces'],

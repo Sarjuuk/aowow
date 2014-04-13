@@ -14,14 +14,12 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    {if $curr.rec}
-                        rec:{$curr.rec},
-                    {/if}
-                    category:{$curr.category},
-                    id:{$curr.id},
-                    name:'{$curr.name|escape:"javascript"}',
-                    startDate:'{$curr.startDate}',
-                    endDate:'{$curr.endDate}'
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
+                    id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

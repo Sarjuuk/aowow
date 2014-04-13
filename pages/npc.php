@@ -76,6 +76,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $_altNPCs = new CreatureList(array(['id', array_keys($_altIds)]));
     }
 
+    // hmm, this won't do, if th creature is spawned by event/script
     $mapType = 0;
     $maps = DB::Aowow()->selectCol('SELECT DISTINCT map from creature WHERE id = ?d', $_id);
     if (count($maps) == 1)                                   // should only exist in one instance

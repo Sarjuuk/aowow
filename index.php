@@ -61,6 +61,7 @@ switch ($pageCall)
     case 'quests':
     case 'race':
     case 'races':
+    case 'search':                                          // tool: searches
     case 'skill':
     case 'skills':
     // case 'sound':                                        // db: sounds for zone, creature, spell, ...
@@ -77,6 +78,10 @@ switch ($pageCall)
         else
             $smarty->error();
         break;
+    /* other pages */
+    case '':                                                // no parameter given -> MainPage
+        require 'pages/main.php';
+        break;
     case 'whats-new':
     case 'searchplugins':
     case 'searchbox':
@@ -85,47 +90,6 @@ switch ($pageCall)
     case 'faq':
     case 'aboutus':
         require 'pages/more.php';
-        break;
-    case 'petcalc':                                         // tool: pet talent calculator
-        $petCalc = true;
-    case 'talent':                                          // tool: talent calculator
-        require 'pages/talent.php';
-        break;
-    /* called by script */
-    case 'cookie':                                          // lossless cookies and user settings
-        if (User::$id && $pageParam && !empty($_GET[$pageParam]))
-        {
-            // don't panic .. again .... it get's escaped
-            if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $pageParam, urldecode($_GET[$pageParam])))
-                die('0');                                   // 0: success
-            else
-                die();
-        }
-
-        break;
-    case 'contactus':
-        print_r($_POST);
-        print_r($_GET);
-        die("not yet implemented!");                        // 0:ok; 1:captchaInvalid; 2:tooLong; 3:noReasonGiven; 7:alreadyReported; other:prints String
-    case 'comment':
-        if ($pageParam == 'rating')
-            die('{"success":true,"error":"","up":7,"down":9}');
-        else if ($pageParam == 'rate')
-            die('3');                                       // 0:success, 1:ratingban, 3:rated too often
-
-        break;
-    case 'locale':                                          // subdomain-workaround, change the language
-        User::setLocale($pageParam);
-        User::writeCookie();
-        header('Location: '.(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '.'));
-        break;
-    case 'data':                                            // tool: dataset-loader
-    case 'search':                                          // tool: searches
-        require $pageCall.'.php';
-        break;
-    /* other */
-    case '':                                                // no parameter given -> MainPage
-        require 'pages/main.php';
         break;
     case 'latest-additions':
     case 'latest-articles':
@@ -138,6 +102,23 @@ switch ($pageCall)
     case 'random':
         require 'pages/miscTools.php';
         break;
+    case 'petcalc':                                         // tool: pet talent calculator
+        $petCalc = true;
+    case 'talent':                                          // tool: talent calculator
+        require 'pages/talent.php';
+        break;
+    /* called by script */
+    case 'data':                                            // tool: dataset-loader
+    case 'cookie':                                          // lossless cookies and user settings
+    case 'contactus':
+    case 'comment':
+    case 'locale':                                          // subdomain-workaround, change the language
+        header('Content-type: application/x-javascript; charset=utf-8');
+        if (($_ = $ajax->handle($pageCall)) !== null)
+            die((string)$_);
+
+        break;
+    /* setup */
     case 'build':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {

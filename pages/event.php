@@ -137,22 +137,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // tab: quests (by table, go & creature)
-    $quests = new QuestList(array(['holidayId', $_hId]));
-    if (!$quests->error)
-    {
-        $quests->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
-
-        $pageData['relTabs'][] = array(
-            'file'   => QuestList::$brickFile,
-            'data'   => $quests->getListviewData(),
-            'params' => array(
-                'tabs' => '$tabsRelated',
-                'note' => $hasFilter ? sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$_hId.';crv=0') : null
-            )
-        );
-    }
-
     // tab: achievements
     if ($_ = $event->getField('achievementCatOrId'))
     {
@@ -174,24 +158,39 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
     }
 
-    // tab: items
-    $conditions = array(
-        'OR',
-        ['holidayId', $_hId],                               // direct requirement on item
-    );
-
-    // items from quests
-    if (!$quests->error)
+    $itemCnd = [];
+    if ($_hId)
     {
-        $questItems = [];
-        foreach (array_column($quests->rewards, TYPE_ITEM) as $arr)
-            $questItems = array_merge($questItems, $arr);
+        $itemCnd = array(
+            'OR',
+            ['holidayId', $_hId],                               // direct requirement on item
+        );
 
-        foreach (array_column($quests->requires, TYPE_ITEM) as $arr)
-            $questItems = array_merge($questItems, $arr);
+        // tab: quests (by table, go & creature)
+        $quests = new QuestList(array(['holidayId', $_hId]));
+        if (!$quests->error)
+        {
+            $quests->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
 
-        if ($questItems)
-            $conditions[] = ['id', $questItems];
+            $pageData['relTabs'][] = array(
+                'file'   => QuestList::$brickFile,
+                'data'   => $quests->getListviewData(),
+                'params' => array(
+                    'tabs' => '$tabsRelated',
+                    'note' => $hasFilter ? sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$_hId.';crv=0') : null
+                )
+            );
+
+            $questItems = [];
+            foreach (array_column($quests->rewards, TYPE_ITEM) as $arr)
+                $questItems = array_merge($questItems, $arr);
+
+            foreach (array_column($quests->requires, TYPE_ITEM) as $arr)
+                $questItems = array_merge($questItems, $arr);
+
+            if ($questItems)
+                $itemCnd[] = ['id', $questItems];
+        }
     }
 
     // items from creature
@@ -200,24 +199,27 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         // vendor
         $cIds = $creatures->getFoundIDs();
         if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv  WHERE entry IN (?a) UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id IN (?a)', $cIds, $cIds))
-            $conditions[] = ['id', $sells];
+            $itemCnd[] = ['id', $sells];
     }
 
+    // tab: items
     // not checking for loot ... cant distinguish between eventLoot and fillerCrapLoot
-
-    $eventItems = new ItemList($conditions);
-    if (!$eventItems->error)
+    if ($itemCnd)
     {
-        $eventItems->addGlobalsToJScript(GLOBALINFO_SELF);
+        $eventItems = new ItemList($itemCnd);
+        if (!$eventItems->error)
+        {
+            $eventItems->addGlobalsToJScript(GLOBALINFO_SELF);
 
-        $pageData['relTabs'][] = array(
-            'file'   => ItemList::$brickFile,
-            'data'   => $eventItems->getListviewData(),
-            'params' => array(
-                'tabs' => '$tabsRelated',
-                'note' => $hasFilter ? sprintf(Util::$filterResultString, '?items&filter=cr=160;crs='.$_hId.';crv=0') : null
-            )
-        );
+            $pageData['relTabs'][] = array(
+                'file'   => ItemList::$brickFile,
+                'data'   => $eventItems->getListviewData(),
+                'params' => array(
+                    'tabs' => '$tabsRelated',
+                    'note' => $hasFilter ? sprintf(Util::$filterResultString, '?items&filter=cr=160;crs='.$_hId.';crv=0') : null
+                )
+            );
+        }
     }
 
     // tab: see also (event conditions)

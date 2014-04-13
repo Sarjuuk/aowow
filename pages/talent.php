@@ -9,9 +9,10 @@ if (!isset($petCalc))
 
 // tabId 1: Tools g_initHeader()
 $smarty->updatePageVars(array(
-    'title'  => $petCalc ? Lang::$main['petCalc'] : Lang::$main['talentCalc'],
-    'tab'    => 1,
-    'reqCSS' => array(
+    'title'   => $petCalc ? Lang::$main['petCalc'] : Lang::$main['talentCalc'],
+    'tab'     => 1,
+    'dataKey' => $_SESSION['dataKey'],
+    'reqCSS'  => array(
         ['path' => 'static/css/TalentCalc.css'],
         ['path' => 'static/css/talent.css'],
         ['path' => 'static/css/TalentCalc_ie6.css',  'ieCond' => 'lte IE 6'],

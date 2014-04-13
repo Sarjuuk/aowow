@@ -14,16 +14,12 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    id:{$curr.id},
-                    name:'{$curr.name|escape:"javascript"}',
-                    classes:{$curr.classes},
-                    faction:{$curr.faction},
-                    leader:{$curr.leader},
-                    zone:{$curr.zone},
-                    side:{$curr.side}
-                    {if isset($curr.expansion)}
-                        ,expansion:{$curr.expansion}
-                    {/if}
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
+                    id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

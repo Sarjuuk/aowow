@@ -38,11 +38,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     /* Main Content */
     /****************/
 
+    $fixedTitle = Util::ucFirst(trim(strtr($title->getField('male', true), ['%s' => '', ',' => ''])));
+
     // menuId 10: Title    g_initPath()
     //  tabId  0: Database g_initHeader()
     $pageData = array(
         'page'    => array(
-            'title'      => Util::ucFirst(trim(str_replace('%s', '', str_replace(',', '', $title->getField('male', true)))))." - ".Util::ucfirst(Lang::$game['title']),
+            'title'      => $fixedTitle." - ".Util::ucfirst(Lang::$game['title']),
             'path'       => '[0, 10, '.$title->getField('category').']',
             'tab'        => 0,
             'type'       => TYPE_TITLE,
@@ -52,7 +54,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'expansion'  => Util::$expansionString[$title->getField('expansion')],
             'redButtons' => array(
                 BUTTON_WOWHEAD => true,
-                BUTTON_LINKS   => true
+                BUTTON_LINKS   => ['name' => $fixedTitle]
             ),
         ),
         'relTabs' => []

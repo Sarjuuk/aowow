@@ -26,9 +26,6 @@ enum(array( // UserPropsLimits
 ));
 */
 
-if (!in_array($pageParam, ['dashboard', '', 'signin', 'signup', 'signout', 'signin_do', 'signup_do', 'forgotpassword', 'forgotusername', 'weightscales']))
-    $smarty->error();
-
 function signin()
 {
     if (!isset($_POST['username']) || !isset($_POST['password']))
@@ -264,13 +261,19 @@ if (User::$id)
 {
     switch ($pageParam)
     {
+        case 'exclude':
+            // profiler completion exclude handler
+            // $_POST['groups'] = bitMask of excludeGroupIds when using .. excludeGroups .. duh
+            // should probably occur in g_user.excludegroups (dont forget to also set g_users.settings = {})
+            die();
+            break;
         case 'signout':
             User::destroy();
             $next = explode('?', $_SERVER['HTTP_REFERER']);
             $next = !empty($next[1]) ? '?'.$next[1] : '.';
             header('Location: '.$next);
         case 'weightscales':
-            if (isset($_POST['save']) && User::$id)
+            if (isset($_POST['save']))
             {
                 if (!isset($_POST['id']))
                 {
@@ -292,10 +295,12 @@ if (User::$id)
                 die('0');
 
             break;
-        default;
+        case '';
             dashboard();
             $smarty->display('dashboard.tpl');
             break;
+        default:
+            $smarty->error();
     }
 }
 else

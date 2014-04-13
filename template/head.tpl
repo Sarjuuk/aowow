@@ -19,6 +19,9 @@
         var g_serverTime = new Date('{$smarty.now|date_format:"%Y/%m/%d %H:%M:%S"}');
         var g_staticUrl = "{$smarty.const.STATIC_URL}";
         var g_host = "{$smarty.const.HOST_URL}";
+{if isset($dataKey)}
+        var g_dataKey = '{$dataKey}';
+{/if}
     </script>
     <script src="static/js/jquery-1.4.2.min.js" type="text/javascript"></script>
     <script src="static/js/basic.js?{$AOWOW_REVISION}" type="text/javascript"></script>

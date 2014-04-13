@@ -22,8 +22,8 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 {
     $conditions = [];
 
-    if (!User::isInGroup(U_GROUP_STAFF))
-        $conditions[] = ['reputationIndex', -1, '!'];       // unlisted factions
+    if (!User::isInGroup(U_GROUP_STAFF))                    // unlisted factions
+        $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
     if (isset($cats[0]) && empty($cats[1]))
     {
@@ -35,7 +35,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
             $conditions[] = ['OR', ['parentFactionId', $subs], ['id', $subs]];
         }
 
-        $path[]       = $cats[0];
+        $path[] = $cats[0];
 
         $t = Lang::$faction['cat'][$cats[0]];
         array_unshift($title, is_array($t) ? $t[0] : $t);
@@ -54,9 +54,9 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     //  tabId 0: Database g_initHeader()
     $pageData = array(
         'page' => array(
-            'title'  => implode(' - ', $title),
-            'path'   => json_encode($path, JSON_NUMERIC_CHECK),
-            'tab'    => 0
+            'title' => implode(' - ', $title),
+            'path'  => json_encode($path, JSON_NUMERIC_CHECK),
+            'tab'   => 0
         ),
         'lv' => array(
             array(

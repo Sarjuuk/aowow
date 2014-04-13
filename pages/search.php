@@ -382,11 +382,12 @@ if (!$smarty->loadCache($cacheKey, $found))
         }
         else if (($searchMask & SEARCH_TYPE_JSON) && ($type == TYPE_ITEM || $_slots))
         {
-            $iCnd = [['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]], $cndAdd];
+            $cnd = $cndBase;
+            $cnd[] = ['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]];
+            $cnd[] = $cndAdd;
             if ($_slots)
-                $iCnd[] = ['slot', $_slots];
+                $cnd[] = ['slot', $_slots];
 
-            $cnd   = array_merge($cndBase, [$iCnd]);
             $wData = ['wt' => $_wt, 'wtv' => $_wtv];
 
             $itemFilter = new ItemListFilter();

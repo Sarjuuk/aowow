@@ -14,20 +14,12 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    id:{$curr.id},
-                    category:{$curr.category},
-                    territory:{$curr.territory},
-                    minlevel:{$curr.minlevel},
-                    maxlevel:{$curr.maxlevel},
-                    name:'{$curr.name|escape:"quotes"}'
-                    {if isset($curr.expansion)},expansion:{$curr.expansion}{/if}
-                    {if isset($curr.instance)},instance:{$curr.instance}{/if}
-                    {if isset($curr.nplayers)},nplayers:{$curr.nplayers}{/if}
-                    {if isset($curr.reqlevel)},reqlevel:{$curr.reqlevel}{/if}
-                    {if isset($curr.lfgReqLevel)},lfgReqLevel:{$curr.lfgReqLevel}{/if}
-                    {if isset($curr.heroicLevel)},heroicLevel:{$curr.heroicLevel}{/if}
-                    {if isset($curr.percent)},percent:{$curr.percent}{/if}
-                    {if isset($curr.count)},count:{$curr.count}{/if}
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
+                    id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

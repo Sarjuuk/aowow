@@ -12,7 +12,6 @@
 
             <script type="text/javascript">
                 g_initPath({$path});
-                var g_dataKey = '{$dataKey}';
                 var temp_path = {$path}; {*kill with pageTemplate*}
 {*
 PageTemplate.set({pageName: 'profile', activeTab: 1, breadcrumb: [1,5,0,'eu']});
@@ -30,7 +29,7 @@ var g_pageValue = '';
             <script type="text/javascript">//<![CDATA[
                 var profilah = new Profiler();
                 profilah.initialize('profilah-generic', {ldelim} id: {$profileId} {rdelim});
-                pr_setRegionRealm($WH.gE($WH.ge('topbar'), 'form')[0], '', '');
+                pr_setRegionRealm($WH.gE($WH.ge('topbar'), 'form')[0], '{$region}', '{$realm}');
             //]]></script>
 
             <div class="clear"></div>

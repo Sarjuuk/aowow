@@ -2691,7 +2691,7 @@ function TalentCalc() {
     }
 
     function _updateModel(classId, npcId) {
-        var swfUrl = "http://static.wowhead.com"; // sarjuuk: g_staticUrl
+        var swfUrl = g_staticUrl;                           // "http://static.wowhead.com"
 
         if (_mode != MODE_PET){
             return;

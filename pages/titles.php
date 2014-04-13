@@ -21,7 +21,15 @@ if ($cat)
 
 if (!$smarty->loadCache($cacheKey, $pageData))
 {
-    $titles = new TitleList($cat ? array(['category', (int)$cat[0]]) : []);
+    $conditions = [];
+
+    if (!User::isInGroup(U_GROUP_STAFF))                    // unlisted factions
+        $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
+    if ($cat)
+        $conditions[] = ['category', $cat[0]];
+
+    $titles = new TitleList($conditions);
 
     // menuId 10: Title    g_initPath()
     //  tabId  0: Database g_initHeader()

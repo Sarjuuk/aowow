@@ -328,17 +328,25 @@ class User
         if (empty(self::$characters))
         {
             // todo: do after profiler
-            // existing chars on realm(s)
-            if ($asJSON)
-                $chars = '[{"name":"ExampleChar", "realmname":"Example Realm", "region":"eu", "realm":"exrealm", icon:"inv_axe_04", "race":4, "gender":0, "classs":11, "level":80, "pinned":1}]';
-            else
-                $chars = array(
-                    array("name" => "ExampleChar", "realmname" => "Example Realm", "region" => "eu", "realm" => "exrealm", "icon" => "inv_axe_04", "race" => 4, "gender" => 0, "classs" => 11, "level" => 80, "pinned" => 1)
-                );
+            @include('datasets/ProfilerExampleChar');
 
-            self::$characters = $chars;
+            // existing chars on realm(s)
+            self::$characters = array(
+                array(
+                    'name'      => $character['name'],
+                    'realmname' => $character['realm'][1],
+                    'region'    => $character['region'][0],
+                    'realm'     => $character['realm'][0],
+                    'race'      => $character['race'],
+                    'classs'    => $character['classs'],
+                    'level'     => $character['level'],
+                    'gender'    => $character['gender'],
+                    'pinned'    => $character['pinned']
+                )
+            );
         }
-        return self::$characters;
+
+        return $asJSON ? json_encode(self::$characters, JSON_NUMERIC_CHECK) : self::$characters;
     }
 
     public static function getProfiles($asJSON = true)
@@ -347,17 +355,13 @@ class User
         {
             // todo =>  do after profiler
             // chars build in profiler
-            if ($asJSON)
-                $profiles = '[{"id":21, "name":"Example Profile 1", "race":4, "gender":1, "classs":5, "level":72,  icon:"inv_axe_04"},{"id":23, "name":"Example Profile 2", "race":11, "gender":0, "classs":3, "level":17}]';
-            else
-                $profiles = array(
-                    array("id" => 21, "name" => "Example Profile 1", "race" => 4, "gender" => 1, "classs" => 5, "level" => 72, "icon" => "inv_axe_04"),
-                    array("id" => 23, "name" => "Example Profile 2", "race" => 11, "gender" => 0, "classs" => 3, "level" => 17)
-                );
-
-            self::$profiles = $profiles;
+            self::$profiles = array(
+                array('id' => 21, 'name' => 'Example Profile 1', 'race' => 4,  'classs' => 5, 'level' => 72, 'gender' => 1, 'icon' => 'inv_axe_04'),
+                array('id' => 23, 'name' => 'Example Profile 2', 'race' => 11, 'classs' => 3, 'level' => 17, 'gender' => 0)
+            );
         }
-        return self::$profiles;
+
+        return $asJSON ? json_encode(self::$profiles, JSON_NUMERIC_CHECK) : self::$profiles;
     }
 
     public static function getCookies()

@@ -14,16 +14,12 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    id:{$curr.id},
-                    name:'{$curr.name|escape:"javascript"}',
-                    description:'{$curr.description|escape:"javascript"}',
-                    side:{$curr.faction},
-                    points:{$curr.points},
-                    category:{$curr.category},
-                    parentcat:{$curr.parentcat}
-                    {if isset($curr.type)}, type:{$curr.type}{/if}
-                    {if isset($curr.rewards)}, rewards:{$curr.rewards}{/if}
-                    {if isset($curr.reward)}, reward:'{$curr.reward|escape:"javascript"}'{/if}
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
+                    id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

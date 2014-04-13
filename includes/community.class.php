@@ -86,7 +86,7 @@ class CommunityContent
     {
         return DB::Aowow()->Query("
             SELECT
-                v.Id,
+                v.id,
                 a.displayName AS user,
                 v.date,
                 v.videoId,
@@ -96,7 +96,7 @@ class CommunityContent
                 ?_videos v,
                 ?_account a
             WHERE
-                v.type = ? AND v.typeId = ? AND v.status & 0x2",
+                v.type = ? AND v.typeId = ? AND v.status & 0x2 AND v.uploader = a.id",
             $type,
             $typeId
         );
@@ -106,7 +106,7 @@ class CommunityContent
     {
         return DB::Aowow()->Query("
             SELECT
-                s.Id,
+                s.id,
                 a.displayName AS user,
                 s.date,
                 s.width,
@@ -117,7 +117,7 @@ class CommunityContent
                 ?_screenshots s,
                 ?_account a
             WHERE
-                s.type = ? AND s.typeId = ? AND s.status & 0x2",
+                s.type = ? AND s.typeId = ? AND s.status & 0x2 AND s.uploader = a.id",
             $type,
             $typeId
         );

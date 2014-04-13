@@ -35,6 +35,9 @@ class CharClassList extends BaseType
                 'power'  => $this->curTpl['powerType'],
             );
 
+            if ($this->curTpl['flags'] & 0x40)
+                $data[$this->id]['hero'] = 1;
+
             if ($this->curTpl['expansion'])
                 $data[$this->id]['expansion'] = $this->curTpl['expansion'];
         }

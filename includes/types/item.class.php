@@ -1080,7 +1080,7 @@ class ItemList extends BaseType
         {
             $mod = $this->curTpl['statType'.$h];
             $val = $this->curTpl['statValue'.$h];
-            if (!$mod ||!$val)
+            if (!$mod || !$val)
                 continue;
 
             @$this->itemMods[$this->id][$mod] += $val;
@@ -1124,10 +1124,7 @@ class ItemList extends BaseType
         {
             $gemStats = Util::parseItemEnchantment($geId);
             foreach ($gemStats as $mod => $qty)
-            {
                 @$this->json[$this->id][$mod] += $qty;
-                @$this->itemMods[$this->id][$mId] += $qty;
-            }
         }
 
         foreach ($this->json[$this->id] as $k => $v)
@@ -1202,10 +1199,11 @@ class ItemList extends BaseType
 
         switch ($type)
         {
-            case 'stats':   $mask &= 0x04001F;      break;
-            case 'armor':   $mask &= 0xF001E0;      break;
-            case 'dps'  :   $mask &= 0x007E00;      break;
-            case 'spell':   $mask &= 0x008000;      break;
+            case 'stats':   $mask &= 0x04001F;  break;
+            case 'armor':   $mask &= 0xF001E0;  break;
+            case 'dps'  :   $mask &= 0x007E00;  break;
+            case 'spell':   $mask &= 0x008000;  break;
+            case 'fap'  :   $mask &= 0x010000;  break;      // unused
             default:        $mask &= 0x0;
         }
 

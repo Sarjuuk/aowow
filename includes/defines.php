@@ -174,7 +174,9 @@ define('QUEST_CU_REPEATABLE',               0x01);
 define('QUEST_CU_DAILY',                    0x02);
 define('QUEST_CU_WEEKLY',                   0x04);
 define('QUEST_CU_SEASONAL',                 0x08);
-define('QUEST_CU_SKIP_LOG',                 0x10);          // no idea...
+define('QUEST_CU_SKIP_LOG',                 0x10);
+define('QUEST_CU_AUTO_ACCEPT',              0x20);
+define('QUEST_CU_PVP_ENABLED',              0x40);
 
 define('MAX_LEVEL',                         80);
 

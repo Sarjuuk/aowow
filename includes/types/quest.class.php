@@ -134,6 +134,12 @@ class QuestList extends BaseType
         return $this->curTpl['reqPlayerKills'] || $this->curTpl['rewardHonorPoints'] || $this->curTpl['rewardArenaPoints'];
     }
 
+    // by TC definition
+    public function isSeasonal()
+    {
+        return in_array($this->getField('zoneOrSortBak'), [-22, -284, -366, -369, -370, -376, -374]) && !$this->isRepeatable();
+    }
+
     public function getSourceData()
     {
         $data = [];
@@ -199,25 +205,36 @@ class QuestList extends BaseType
                 if ($_ > 0)
                     $data[$this->id]['money'] = $_;
 
-            if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)
-                $data[$this->id]['daily'] = true;
-
-            if ($this->curTpl['flags'] & QUEST_FLAG_WEEKLY)
-                $data[$this->id]['weekly'] = true;
-
-            // wflags: &1: disabled/historical; &32: AutoAccept; &64: Hostile(?)
             // todo (med): also get disables
             if ($this->curTpl['flags'] & QUEST_FLAG_UNAVAILABLE)
+                $data[$this->id]['historical'] = true;
+
+            // if ($this->isRepeatable())       // dafuque..? says repeatable and is used as 'disabled'..?
+                // $data[$this->id]['wflags'] |= QUEST_CU_REPEATABLE;
+
+            if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)
             {
-                $data[$this->id]['historical'] = true;      // post 5.0
-                $data[$this->id]['wflags']    |= 0x1;       // pre 5.0
+                $data[$this->id]['wflags'] |= QUEST_CU_DAILY;
+                $data[$this->id]['daily'] = true;
             }
 
-            if ($this->curTpl['flags'] & QUEST_FLAG_AUTO_ACCEPT)
-                $data[$this->id]['wflags'] |= 0x20;
+            if ($this->curTpl['flags'] & QUEST_FLAG_WEEKLY)
+            {
+                $data[$this->id]['wflags'] |= QUEST_CU_WEEKLY;
+                $data[$this->id]['weekly'] = true;
+            }
 
-            if ($this->isPvPEnabled())
-                $data[$this->id]['wflags'] |= 0x60;         // not sure why this flag also requires auto-accept to be set
+            if ($this->isSeasonal())
+                $data[$this->id]['wflags'] |= QUEST_CU_SEASONAL;
+
+            if ($this->curTpl['flags'] & QUEST_FLAG_AUTO_REWARDED)  // not shown in log
+                $data[$this->id]['wflags'] |= QUEST_CU_SKIP_LOG;
+
+            if ($this->curTpl['flags'] & QUEST_FLAG_AUTO_ACCEPT)    // self-explanatory
+                $data[$this->id]['wflags'] |= QUEST_CU_AUTO_ACCEPT;
+
+            if ($this->isPvPEnabled())                              // not sure why this flag also requires auto-accept to be set
+                $data[$this->id]['wflags'] |= (QUEST_CU_AUTO_ACCEPT | QUEST_CU_PVP_ENABLED);
 
             $data[$this->id]['reprewards'] = [];
             for ($i = 1; $i < 6; $i++)

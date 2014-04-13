@@ -96,7 +96,7 @@ PageTemplate.init();
             </div>
 
             <script type="text/javascript">//<![CDATA[
-                pr_setRegionRealm($WH.ge('fi').firstChild, 'us', '');
+                pr_setRegionRealm($WH.ge('fi').firstChild, '{$region}', '{$realm}');
                 pr_onChangeRace();
                 fi_init('profiles');
                 {if isset($filter.setCr)}{$filter.setCr}{/if}

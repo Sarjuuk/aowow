@@ -14,18 +14,12 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    id:{$curr.id},
-                    name:'{$curr.name|escape:"javascript"}',
-                    category:{$curr.category},
-                    expansion:{$curr.expansion},
-                    gender:{$curr.gender},
-                    side:{$curr.side}
-                    {if isset($curr.namefemale)}
-                        , namefemale:'{$curr.namefemale|escape:"javascript"}'
-                    {/if}
-                    {if isset($curr.source)}
-                        , source:{$curr.source}
-                    {/if}
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
+                    id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

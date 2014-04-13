@@ -15,7 +15,6 @@
             </div>
             <div id="{$tcType}-itself"></div>
             <script type="text/javascript">
-                var g_dataKey = '{$dataKey}';
                 {$tcType}_init();
             </script>
             <div class="clear"></div>

@@ -14,19 +14,12 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    id:{$curr.id},
-                    name:'{$curr.name|escape:"javascript"}',
-                    races:{$curr.races},
-                    roles:{$curr.roles},
-                    power:{$curr.power},
-                    weapon:{$curr.weapon},
-                    armor:{$curr.armor}
-                    {if isset($curr.hero)}
-                        ,hero:1
-                    {/if}
-                    {if isset($curr.expansion)}
-                        ,expansion:{$curr.expansion}
-                    {/if}
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
+                    id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

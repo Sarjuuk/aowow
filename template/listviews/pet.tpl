@@ -32,23 +32,12 @@ var _ = function(family)
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    id:{$curr.id},
-                    name:'{$curr.name|escape:"javascript"}',
-                    icon:'{$curr.icon|escape:"javascript"}',
-                    minlevel:{$curr.minlevel},
-                    maxlevel:{$curr.maxlevel},
-                    type:{$curr.type},
-                    diet:{$curr.diet},
-                    armor:{$curr.armor},
-                    damage:{$curr.damage},
-                    health:{$curr.health},
-                    spells:{$curr.spells}
-                    {if isset($curr.expansion)}
-                        ,expansion:{$curr.expansion}
-                    {/if}
-                    {if isset($curr.exotic)}
-                        ,exotic:{$curr.exotic}
-                    {/if}
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
+                    id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

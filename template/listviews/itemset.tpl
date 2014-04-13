@@ -14,15 +14,12 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id' && $name != 'name' && $name != 'quality'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
                     name:'{$curr.quality}{$curr.name|escape:"quotes"}',
-                    {if $curr.minlevel}minlevel:{$curr.minlevel},{/if}
-                    {if $curr.maxlevel}maxlevel:{$curr.maxlevel},{/if}
-                    {if $curr.classes}classes:[{section name=j loop=$curr.classes}{$curr.classes[j]}{if $smarty.section.j.last}{else},{/if}{/section}],{/if}
-                    {if $curr.reqclass}reqclass:{$curr.reqclass},{/if}
-                    {if $curr.note}note:{$curr.note},{/if}
-                    {if $curr.pieces}pieces:[{section name=j loop=$curr.pieces}{$curr.pieces[j]}{if $smarty.section.j.last}{else},{/if}{/section}],{/if}
-                    {if isset($curr.type)}type:{$curr.type},{/if}
-                    heroic:{if isset($curr.heroic) && $curr.heroic == 1}true{else}false{/if},
                     id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}

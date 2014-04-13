@@ -794,10 +794,14 @@ span.breadcrumb-ellipsis {
     float: right;
     margin: 0 0 4px 10px;
     background-color: #141414;
-    border: 1px solid #404040;
+    border: 1px solid #101010;
     padding: 8px;
     font-size: 11px;
     text-align: center;
+
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
 }
 
 .minibox-left
@@ -807,11 +811,57 @@ span.breadcrumb-ellipsis {
     margin-right: 10px;
 }
 
-.minibox h3
+.minibox h2
 {
-    margin: 0 0 5px;
+    margin: 0 0 5px 0;
+    font-size: 15px;
+    border: none;
+    font-weight: bold;
 }
 
+.minibox h2, .minibox h2 b,
+.minibox h2 a:link, .minibox h2 a:visited {
+    color: white !important;
+}
+
+.minibox h2 a:link, .minibox h2 a:visited {
+    color: white;
+    text-decoration: none;
+}
+
+.minibox h2 a:hover {
+    text-decoration: underline;
+}
+
+.minibox h3,
+.minibox h3 a:link, .minibox h3 a:visited {
+    color: #9d9d9d !important;
+  font-size: 11px;
+  font-weight: normal;
+  margin: 0px;
+}
+
+.minibox h3 img {
+  vertical-align: middle;
+}
+
+.minibox h3 a:link, .minibox h3 a:visited {
+  text-decoration: underline;
+}
+.minibox h3 a:hover {
+  color: white !important;
+}
+
+h1 a.header-link, h2 a.header-link
+{
+	color: white;
+	text-decoration: none;
+}
+
+h1 a.header-link:hover, h2 a.header-link:hover
+{
+	text-decoration: underline;
+}
 
 /********/
 /* MENU */

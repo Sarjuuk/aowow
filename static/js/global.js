@@ -7717,7 +7717,7 @@ Listview.funcBox = {
                 }
 
                 var z = $WH.ce("img");
-                z.src = "template/images/pixel.gif";
+                z.src = g_staticUrl + "/images/deprecated/pixel.gif";
                 z.className = "toolbar-" + k.id;
                 $WH.ae(o, z);
                 $WH.ae(e, o)
@@ -13284,7 +13284,7 @@ Listview.templates = {
 
                     if (title.expansion) {
                         var i = $WH.ce('span');
-                        i.className = (title.expansion == 1 ? 'icon-bc': 'icon-wotlk');
+                        i.className = g_GetExpansionClassName(title.expansion);
                         $WH.ae(i, sp);
                         $WH.ae(td, i);
                     }
@@ -16473,8 +16473,8 @@ var ModelViewer = new function() {
             var flashVars = {
                 model: model,
                 modelType: modelType,
-                contentPath: 'http://static.wowhead.com/modelviewer/'
-                // contentPath: g_staticUrl + '/modelviewer/'
+                // contentPath: 'http://static.wowhead.com/modelviewer/'
+                contentPath: g_staticUrl + '/modelviewer/'
             };
 
             var params = {
@@ -16492,8 +16492,8 @@ var ModelViewer = new function() {
                 flashVars.equipList = equipList.join(',');
             }
 
-            swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
-            // swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
+            // swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
+            swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
             _w.style.display = '';
         }
         var

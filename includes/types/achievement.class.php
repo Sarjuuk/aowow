@@ -79,7 +79,7 @@ class AchievementList extends BaseType
                 'name'        => $this->getField('name', true),
                 'description' => $this->getField('description', true),
                 'points'      => $this->curTpl['points'],
-                'faction'     => $this->curTpl['faction'],
+                'side'        => $this->curTpl['faction'],
                 'category'    => $this->curTpl['category'],
                 'parentcat'   => $this->curTpl['parentCat'],
             );
@@ -97,9 +97,9 @@ class AchievementList extends BaseType
                     $rewards[] = [$type, $rId];
 
             if ($rewards)
-                $data[$this->id]['rewards'] = json_encode($rewards, JSON_NUMERIC_CHECK);
-            else if (!empty($this->curTpl['reward']))
-                $data[$this->id]['reward'] = $this->getField('reward', true);
+                $data[$this->id]['rewards'] = $rewards;
+            else if ($_ = $this->getField('reward', true))
+                $data[$this->id]['reward'] = $_;
         }
 
         return $data;
@@ -146,6 +146,9 @@ class AchievementList extends BaseType
         $i = 0;
         foreach ($rows as $crt)
         {
+            $obj = (int)$crt['value1'];
+            $qty = (int)$crt['value2'];
+
             // we could show them, but the tooltips are cluttered
             if (($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::$perms <= 0)
                 continue;
@@ -153,25 +156,36 @@ class AchievementList extends BaseType
             $crtName = Util::localizedString($crt, 'name');
             switch ($crt['type'])
             {
+                // link to title - todo (low): crosslink
+                case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
+                    $crtName = Util::ucFirst(Lang::$game['title']).Lang::$colon.$crtName;
+                    break;
+                // link to quest
+                case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+                    if (!$crtName)
+                        $crtName = QuestList::getName($obj);
+                    break;
+                // link to spell (/w icon)
                 case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
                 case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
                 case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
                     if (!$crtName)
-                        $crtName = SpellList::getName($crt['value1']);
+                        $crtName = SpellList::getName($obj);
                     break;
+                // link to item (/w icon)
                 case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
                 case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
                     if (!$crtName)
-                        $crtName = ItemList::getName($crt['value1']);
+                        $crtName = ItemList::getName($obj);
                     break;
+                // link to faction (/w target reputation)
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
                     if (!$crtName)
-                        $crtName = FactionList::getName($crt['value1']);
-                    $crtName .= ' ('.Lang::getReputationLevelForPoints($crt['value2']).')';
+                        $crtName = FactionList::getName($obj);
                     break;
             }
 

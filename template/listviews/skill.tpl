@@ -14,14 +14,12 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    category:{$curr.category},
-                    categorybak:{$curr.categorybak},
-                    id:{$curr.id},
-                    name:'{$curr.name|escape:"javascript"}',
-                    profession:{$curr.profession},
-                    recipeSubclass:{$curr.recipeSubclass},
-                    specializations:{$curr.specializations},
-                    icon:'{$curr.icon|escape:"javascript"}'
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'id'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
+                    id:{$curr.id}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

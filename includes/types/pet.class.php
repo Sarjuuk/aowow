@@ -40,8 +40,6 @@ class PetList extends BaseType
             for ($i = 1; $i <= 4; $i++)
                 if ($this->curTpl['spellId'.$i] > 0)
                     $data[$this->id]['spells'][] = $this->curTpl['spellId'.$i];
-
-            $data[$this->id]['spells'] = json_encode($data[$this->id]['spells'], JSON_NUMERIC_CHECK);
         }
 
         return $data;

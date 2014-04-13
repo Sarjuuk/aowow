@@ -156,7 +156,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $infobox[] = Util::ucFirst($t).Lang::$colon.$_;
     }
 
-    // profession {profession: [skill=X] (123)}
+    // profession / skill
     if ($_ = $quest->getField('reqSkillId'))
     {
         Util::$pageTemplate->extendGlobalIds(TYPE_SKILL, $_);
@@ -403,7 +403,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             if (!$proxy->error)
             {
                 // todo (low): now do it properly this time!
-                $proxyList  = '<a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$id.'\'), this)" class="disclosure-off">'.($altTxt ? $altTxt : CreatureList::getName($id)).'</a>'.($qty > 1 ? ' &nbsp;('.$qty.')' : null);
+                $proxyList  = '<a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$id.'\'), this)" class="disclosure-off">'.($altTxt ? $altTxt : CreatureList::getName($id)).((($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $altTxt) ? '' : ' '.Lang::$achievement['slain']).'</a>'.($qty > 1 ? ' &nbsp;('.$qty.')' : null);
                 $proxyList .= "<div id=\"npcgroup-".$id."\" style=\"display: none\"><div style=\"float: left\">\n<table class=\"iconlist\">\n";
                 foreach ($proxy->iterate() as $pId => $__)
                     $proxyList .= '    <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$proxy->getField('name', true)."</a></td></tr>\n";

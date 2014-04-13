@@ -20,19 +20,19 @@ class TitleList extends BaseType
         parent::__construct($conditions);
 
         // post processing
-        foreach ($this->iterate() as $__)
+        foreach ($this->iterate() as $id => &$_curTpl)
         {
             // preparse sources
-            if (!empty($this->curTpl['source']))
+            if (!empty($_curTpl['source']))
             {
-                $sources = explode(' ', $this->curTpl['source']);
+                $sources = explode(' ', $_curTpl['source']);
                 foreach ($sources as $src)
                 {
                     if (!$src)                              // rogue whitespace slipped through
                         continue;
 
                     $src = explode(':', $src);
-                    $this->sources[$this->id][$src[0]][] = $src[1];
+                    $this->sources[$id][$src[0]][] = $src[1];
                 }
             }
         }
@@ -46,20 +46,18 @@ class TitleList extends BaseType
         foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'id'        => $this->id,
-                'name'      => $this->getField('male', true),
-                'side'      => $this->curTpl['side'],
-                'gender'    => $this->curTpl['gender'],
-                'expansion' => $this->curTpl['expansion'],
-                'category'  => $this->curTpl['category']
+                'id'         => $this->id,
+                'name'       => $this->getField('male', true),
+                'namefemale' => $this->getField('namefemale', true),
+                'side'       => $this->curTpl['side'],
+                'gender'     => $this->curTpl['gender'],
+                'expansion'  => $this->curTpl['expansion'],
+                'category'   => $this->curTpl['category']
             );
 
             if (!empty($this->curTpl['source']))
                 $data[$this->id]['source'] = $this->curTpl['source'];
         }
-
-        if ($_ = $this->getField('female', true))
-            $data[$this->id]['namefemale'] = $_;
 
         return $data;
     }
@@ -70,7 +68,7 @@ class TitleList extends BaseType
 
         foreach ($this->iterate() as $__)
         {
-            $data[$this->id]['name'] = Util::jsEscape($this->getField('male', true));
+            $data[$this->id]['name'] = $this->getField('male', true);
 
             if ($_ = $this->getField('female', true))
                 $data[$this->id]['namefemale'] = $_;
@@ -139,7 +137,7 @@ class TitleList extends BaseType
             if (isset($src[13]))
                 $tmp[13] = [Util::localizedString($sources[13][$this->sources[$Id][13][0]], 'source')];
 
-            $this->templates[$Id]['source'] = json_encode($tmp);
+            $this->templates[$Id]['source'] = $tmp;
         }
     }
 
@@ -156,7 +154,7 @@ class TitleList extends BaseType
         if ($faction == 2)                                  // Horde
             $faction = 0;
         else if ($faction != 1)                             // Alliance
-            $faction = 3;                                   // Both
+            $faction = -1;                                  // Both
     }
 }
 

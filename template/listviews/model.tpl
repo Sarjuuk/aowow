@@ -14,13 +14,12 @@
         data:[
             {foreach name=i from=$data item=curr}
                 {ldelim}
-                    family:{$curr.family},
-                    modelId:{$curr.modelId},
-                    displayId:{$curr.displayId},
-                    skin:'{$curr.skin|escape:"javascript"}',
-                    count:{$curr.count},
-                    minLevel:{$curr.minlevel},
-                    maxLevel:{$curr.maxlevel}
+                    {foreach from=$curr  key='name' item=val}
+                        {if $name != 'count'}
+                            {$name}:{$val|@json_encode:$smarty.const.JSON_NUMERIC_CHECK},
+                        {/if}
+                    {/foreach}
+                    count:{$curr.count}
                 {rdelim}
                 {if $smarty.foreach.i.last}{else},{/if}
             {/foreach}

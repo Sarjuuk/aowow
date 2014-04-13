@@ -24,7 +24,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     $infobox = [];
     // hero class
-    if ($cl->getField('hero'))
+    if ($cl->getField('flags') & 0x40)
         $infobox[] = '[tooltip=tooltip_heroclass]'.Lang::$game['heroClass'].'[/tooltip]';
 
     // resource
@@ -230,7 +230,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
 $smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_CLASS, $_id));       // comments, screenshots, videos
-$smarty->assign('lang', Lang::$main);
+$smarty->assign('lang', array_merge(Lang::$main, ['colon' => Lang::$colon]));
 $smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page

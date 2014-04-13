@@ -35,8 +35,8 @@ var lv_screenshots = [
         date:'{$sc.date|date_format:"%Y/%m/%d %H:%M:%S"}',
         width:{$sc.width},
         height:{$sc.height},
-        type:{$page.type},
-        typeId:{$page.typeId},
+        type:{$type},
+        typeId:{$typeId},
         {if isset($sc.sticky)}
             sticky:{$sc.sticky},
         {/if}
@@ -55,8 +55,8 @@ var lv_videos = [
         date:'{$vi.date|date_format:"%Y/%m/%d %H:%M:%S"}',
         videoType:1, {* there is only youtube *}
         videoId:'{$vi.videoId}',
-        type:{$page.type},
-        typeId:{$page.typeId},
+        type:{$type},
+        typeId:{$typeId},
         {if isset($vi.sticky)}
             sticky:{$vi.sticky},
         {/if}

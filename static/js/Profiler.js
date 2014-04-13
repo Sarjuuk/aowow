@@ -1139,18 +1139,16 @@ function Profiler() {
             td.onclick = function (e) {
                 e = $WH.$E(e);
                 if (e.shiftKey || e.ctrlKey) {
-                    return false ;
+                    return false;
                 }
             };
 
             $WH.ae(tr, td);
-
             $WH.ae(tbl, tr);
             show = true;
         }
 
         _divAuras.style.display = show ? 'block' : 'none';
-
     }
 
     function _showCharacterMenu(e) {
@@ -1374,8 +1372,8 @@ function Profiler() {
             $WH.ae(_ulQuickFacts, li);
         }
 
-        // Custom profiles - disabled for now
-        /*if (false && _isArmoryProfile() && _profile.customs)
+        // Custom profiles
+        if (_isArmoryProfile() && _profile.customs)
         {
             var
                 t   = $WH.ce('table'),
@@ -1410,6 +1408,8 @@ function Profiler() {
                     td = $WH.ce('td'),
                     a  = $WH.ce('a');
 
+                td.style.lineHeight = '1em';
+
                 $WH.ae(th, Icon.create((_profile.customs[i].length == 3 && _profile.customs[i][2] ? _profile.customs[i][2] : 'inv_misc_questionmark'), 0, null, '?profile=' + i));
                 $WH.ae(tr, th);
 
@@ -1425,7 +1425,7 @@ function Profiler() {
 
             if (k > 0)
                 $WH.ae(_ulQuickFacts, li);
-        }*/
+        }
 
         // Gear Score
         li = $WH.ce('li');
@@ -4597,8 +4597,8 @@ function ProfilerInventory(_parent) {
                 fh: _profile.features,
                 fc: _profile.haircolor,
                 mode: 3,
-                contentPath: 'http://static.wowhead.com/modelviewer/'
-                // contentPath: g_staticUrl + '/modelviewer/'
+                // contentPath: 'http://static.wowhead.com/modelviewer/'
+                contentPath: g_staticUrl + '/modelviewer/'
             };
 
             var params = {
@@ -4614,8 +4614,8 @@ function ProfilerInventory(_parent) {
                 style: 'outline: none'
             };
 
-            // swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
-            swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
+            swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
+            // swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
 
             _mvInited = true;
         }
@@ -7455,7 +7455,7 @@ function ProfilerCompletion(_parent) {
         }
 
         if (_opt.onDemand && !_loading && !_loaded) {
-            $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + (_opt.dataArgs ? _opt.dataArgs(_profile) : '') + '&locale=' + Locale.getId() + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
+            $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + (_opt.dataArgs ? _opt.dataArgs(_profile) : '') + '&locale=' + g_locale.id + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
             _imgLoading.style.display = 'block';
             _divTipQuests.style.display = 'none';
             _loading = this;
@@ -8382,7 +8382,7 @@ function ProfilerCompletion(_parent) {
 
                 if (_category !== null) {
                     if (_opt.onDemand && _opt.partial && !_loaded[_category] && !_loading) {
-                        $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + '&locale=' + Locale.getId() + '&catg=' + _category + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
+                        $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + '&locale=' + g_locale.id + '&catg=' + _category + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
                         _imgLoading.style.display = 'block';
                         _divTipQuests.style.display = 'none';
                         _loading = this;

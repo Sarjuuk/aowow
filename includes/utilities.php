@@ -3,6 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
+
 class SimpleXML extends SimpleXMLElement
 {
     public function addCData($str)
@@ -74,8 +75,8 @@ class SmartyAoWoW extends Smarty
         if (isset($tv['type']) && isset($tv['typeId']))
         {
             $article = DB::Aowow()->selectRow(
-                'SELECT SQL_CALC_FOUND_ROWS article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL '.
-                'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = 0 AND FOUND_ROWS() = 0',
+                'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL '.
+                'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = 0 ORDER BY locale DESC LIMIT 1',
                 $tv['type'], $tv['typeId'], User::$localeId,
                 $tv['type'], $tv['typeId']
             );
@@ -1508,6 +1509,7 @@ class Util
         return mb_convert_case($str, MB_CASE_TITLE, 'UTF-8');
     }
 
+    // note: valid integer > 32bit are returned as float
     public static function checkNumeric(&$data)
     {
         if ($data === null)
@@ -2127,6 +2129,65 @@ class Util
         }
 
         return $tabsFinal;
+    }
+
+    public static function urlize($str)
+    {
+        $search  = ['<', '>', ' / ', "'", '(', ')'];
+        $replace = ['&lt;', '&gt;', '-', '', '', ''];
+        $str = str_replace($search, $replace, $str);
+
+        $accents = array(
+            "ß" => "ss",
+            "á" => "a", "ä" => "a", "à" => "a", "â" => "a",
+            "è" => "e", "ê" => "e", "é" => "e", "ë" => "e",
+            "í" => "i", "î" => "i", "ì" => "i", "ï" => "i",
+            "ñ" => "n",
+            "ò" => "o", "ó" => "o", "ö" => "o", "ô" => "o",
+            "ú" => "u", "ü" => "u", "û" => "u", "ù" => "u",
+            "œ" => "oe",
+            "Á" => "A", "Ä" => "A", "À" => "A", "Â" => "A",
+            "È" => "E", "Ê" => "E", "É" => "E", "Ë" => "E",
+            "Í" => "I", "Î" => "I", "Ì" => "I", "Ï" => "I",
+            "Ñ" => "N",
+            "Ò" => "O", "Ó" => "O", "Ö" => "O", "Ô" => "O",
+            "Ú" => "U", "Ü" => "U", "Û" => "U", "Ù" => "U",
+            "œ" => "Oe"
+        );
+        $str = strtr($str, $accents);
+        $str = trim($str);
+        $str = preg_replace('/[^a-z0-9]/ig', '-', $str);
+
+        $str = str_replace('--', '-', $str);
+        $str = str_replace('--', '-', $str);
+
+        $str = rtrim($str, '-');
+        $str = strtolower($str);
+
+        return str;
+    }
+
+    public static function loadStaticFile($file, &$result, $localized = false)
+    {
+        $success = true;
+        if ($localized)
+        {
+            if (file_exists('datasets/'.User::$localeString.'/'.$file))
+                $result .= file_get_contents('datasets/'.User::$localeString.'/'.$file);
+            else if (file_exists('datasets/enus/'.$file))
+                $result .= file_get_contents('datasets/enus/'.$file);
+            else
+                $success = false;
+        }
+        else
+        {
+            if (file_exists('datasets/'.$file))
+                $result .= file_get_contents('datasets/'.$file);
+            else
+                $success = false;
+        }
+
+        return $success;
     }
 }
 
