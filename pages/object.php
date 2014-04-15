@@ -252,14 +252,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 BUTTON_VIEW3D  => ['displayId' => $object->getField('displayId'), 'type' => TYPE_OBJECT, 'typeId' => $_id]
             ),
             'reqCSS' => array(
-                $pageText ? ['path' => 'static/css/Book.css'] : null,
-                // ['path' => 'static/css/Mapper.css'],
-                // ['path' => 'static/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
+                $pageText ? ['path' => STATIC_URL.'/css/Book.css'] : null,
+                // ['path' => STATIC_URL.'/css/Mapper.css'],
+                // ['path' => STATIC_URL.'/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
             ),
             'reqJS'  => array(
-                $pageText ? 'static/js/Book.js' : null,
-                // 'static/js/Mapper.js',
-                'static/js/swfobject.js'
+                $pageText ? STATIC_URL.'/js/Book.js' : null,
+                // STATIC_URL.'/js/Mapper.js',
+                STATIC_URL.'/js/swfobject.js'
             )
         ),
         'relTabs' => []

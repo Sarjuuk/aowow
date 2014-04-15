@@ -88,13 +88,13 @@ $smarty->updatePageVars(array(
     'realm'  => '',                                         // not sure about the use
     'region' => '',                                         // seconded..
     'reqJS'  => array(
-        'static/js/filters.js',
-        'static/js/profile_all.js',
-        'static/js/profile.js',
+        STATIC_URL.'/js/filters.js',
+        STATIC_URL.'/js/profile_all.js',
+        STATIC_URL.'/js/profile.js',
         '?data=weight-presets.realms&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
     ),
     'reqCSS' => array(
-        ['path' => 'static/css/profiler.css']
+        ['path' => STATIC_URL.'/css/profiler.css']
     )
 ));
 $smarty->assign('lang', array_merge(Lang::$main, Lang::$game, ['colon' => Lang::$colon]));

@@ -450,14 +450,14 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'type'       => TYPE_ITEM,
             'typeId'     => $_id,
             'reqJS'      => array(
-                $pageText ? 'static/js/Book.js' : null,
-                'static/js/swfobject.js',
-                'static/js/profile.js',
-                'static/js/filters.js',
+                $pageText ? STATIC_URL.'/js/Book.js' : null,
+                STATIC_URL.'/js/swfobject.js',
+                STATIC_URL.'/js/profile.js',
+                STATIC_URL.'/js/filters.js',
                 '?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
             ),
             'reqCSS'     => array(
-                $pageText ? ['path' => 'static/css/Book.css'] : null,
+                $pageText ? ['path' => STATIC_URL.'/css/Book.css'] : null,
             ),
             'redButtons' => array(
                 BUTTON_WOWHEAD => true,

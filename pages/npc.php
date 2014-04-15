@@ -390,7 +390,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'tab'          => 0,
             'type'         => TYPE_NPC,
             'typeId'       => $_id,
-            'reqJS'        => ['static/js/swfobject.js'],
+            'reqJS'        => [STATIC_URL.'/js/swfobject.js'],
             'redButtons'   => array(
                 BUTTON_WOWHEAD => true,
                 BUTTON_LINKS   => true,

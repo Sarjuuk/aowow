@@ -92,7 +92,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             'path'   => json_encode($path, JSON_NUMERIC_CHECK),
             'tab'    => 0,
             'subCat' => $pageParam ? '='.$pageParam : '',
-            'reqJS'  => ['static/js/filters.js']
+            'reqJS'  => [STATIC_URL.'/js/filters.js']
         ),
         'lv' => array(
             'data'   => $acvList->getListviewData(),

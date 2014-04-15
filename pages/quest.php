@@ -746,12 +746,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 // 'som'  => json_encode($som, JSON_NUMERIC_CHECK)
             // ),
             'reqJS'         => array(
-                // $map ? 'static/js/Mapper.js' : null
+                // $map ? STATIC_URL.'/js/Mapper.js' : null
             ),
             'reqCSS'        => array(
-                ['path' => 'static/css/Book.css'],
-                // $map ? ['path' => 'static/css/Mapper.css'] : null,
-                // $map ? ['path' => 'static/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6'] : null
+                ['path' => STATIC_URL.'/css/Book.css'],
+                // $map ? ['path' => STATIC_URL.'/css/Mapper.css'] : null,
+                // $map ? ['path' => STATIC_URL.'/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6'] : null
             ),
             'redButtons'    => array(
                 BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => 'quest:'.$_id.':'.$_level.''],

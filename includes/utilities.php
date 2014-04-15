@@ -127,7 +127,7 @@ class SmartyAoWoW extends Smarty
                     'mode'   => 1,
                     'status' => 1,
                     'name'   => 'internal error',
-                    'style'  => 'padding-left: 55px; background-image: url(static/images/announcements/warn-small.png); background-position: 10px center; border: dashed 2px #C03030;',
+                    'style'  => 'padding-left: 55px; background-image: url('.STATIC_URL.'/images/announcements/warn-small.png); background-position: 10px center; border: dashed 2px #C03030;',
                     'text'   => '[span id=inputbox-error]'.implode("[br]", $buff).'[/span]',
                 );
             }
@@ -139,7 +139,7 @@ class SmartyAoWoW extends Smarty
             if (!isset($tv['announcements']))
                 $tv['announcements'] = [];
 
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*")', $match[1]);
+            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $match[1], User::$groups);
 
             foreach ($ann as $k => $v)
             {

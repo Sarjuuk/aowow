@@ -39,7 +39,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
             'title'  => implode(" - ", $title),
             'path'   => json_encode($path, JSON_NUMERIC_CHECK),
             'subCat' => $pageParam ? '='.$pageParam : '',
-            'reqJS'  => ['static/js/filters.js']
+            'reqJS'  => [STATIC_URL.'/js/filters.js']
         ),
         'lv' => []
     );

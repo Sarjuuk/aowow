@@ -403,7 +403,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'tab'    => 0,
             'type'   => TYPE_SPELL,
             'typeId' => $_id,
-            'reqJS'  => ['static/js/swfobject.js'],
+            'reqJS'  => [STATIC_URL.'/js/swfobject.js'],
             'redButtons' => array(
                 BUTTON_LINKS   => ['color' => 'ff71d5ff', 'linkId' => Util::$typeStrings[TYPE_SPELL].':'.$_id],
                 BUTTON_VIEW3D  => false,
@@ -1542,7 +1542,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         $trigger->addGlobalsToJScript(GLOBALINFO_SELF);
     }
 
-    // used by - creature
+    // tab: used by - creature
     // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
     $conditions = array(
         'OR',
@@ -1566,29 +1566,6 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
 
         $ubCreature->addGlobalsToJScript(GLOBALINFO_SELF);
-    }
-
-    // tab: questreward
-    $query = 'SELECT q.id FROM ?_quests q JOIN ?_spell s ON s.id = sourceSpellId OR s.id = rewardSpellCast OR (s.id = rewardSpell AND rewardSpellCast = 0)
-              WHERE (effect1Id IN (36, 57) AND effect1TriggerSpell = ?d) OR (effect2Id IN (36, 57) AND effect2TriggerSpell = ?d) OR (effect3Id IN (36, 57) AND effect3TriggerSpell = ?d)';
-
-    if ($ids = DB::Aowow()->selectCol($query, $_id, $_id, $_id))
-    {
-        $tbQuest = new QuestList(array(['id', $ids]));
-        if (!$tbQuest->error)
-        {
-            $pageData['relTabs'][] = array(
-                'file'   => 'quest',
-                'data'   => $tbQuest->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
-                    'id'   => 'reward-from-quest',
-                    'name' => '$LANG.tab_rewardfrom'
-                ]
-            );
-
-            $tbQuest->addGlobalsToJScript();
-        }
     }
 
     // tab: teaches
@@ -1689,11 +1666,13 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     );
 
     $tbSpell = new SpellList($conditions);
+    $tbsData = [];
     if (!$tbSpell->error)
     {
+        $tbsData = $tbSpell->getListviewData();
         $pageData['relTabs'][] = array(
             'file'   => 'spell',
-            'data'   => $tbSpell->getListviewData(),
+            'data'   => $tbsData,
             'params' => [
                 'tabs' => '$tabsRelated',
                 'id'   => 'taught-by-spell',
@@ -1702,6 +1681,33 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
 
         $tbSpell->addGlobalsToJScript(GLOBALINFO_SELF);
+    }
+
+    // tab: taught by quest
+    $conditions = ['OR', ['sourceSpellId', $_id], ['rewardSpell', $_id]];
+    if ($tbsData)
+    {
+        $conditions[] = ['rewardSpell', array_keys($tbsData)];
+        if (User::isInGroup(U_GROUP_STAFF))
+            $conditions[] = ['rewardSpellCast', array_keys($tbsData)];
+    }
+    if (User::isInGroup(U_GROUP_STAFF))
+        $conditions[] = ['rewardSpellCast', $_id];
+
+    $tbQuest = new QuestList($conditions);
+    if (!$tbQuest->error)
+    {
+        $pageData['relTabs'][] = array(
+            'file'   => 'quest',
+            'data'   => $tbQuest->getListviewData(),
+            'params' => [
+                'tabs' => '$tabsRelated',
+                'id'   => 'reward-from-quest',
+                'name' => '$LANG.tab_rewardfrom'
+            ]
+        );
+
+        $tbQuest->addGlobalsToJScript();
     }
 
     // tab: taught by item (i'd like to precheck $spell->sources, but there is no source:item only complicated crap like "drop" and "vendor")

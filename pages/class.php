@@ -70,7 +70,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'tab'        => 0,
             'type'       => TYPE_CLASS,
             'typeId'     => $_id,
-            'reqJS'      => ['static/js/swfobject.js'],
+            'reqJS'      => [STATIC_URL.'/js/swfobject.js'],
             'name'       => $cl->getField('name', true),
             'expansion'  => Util::$expansionString[$cl->getField('expansion')],
             'infobox'    => '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]',

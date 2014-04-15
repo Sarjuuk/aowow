@@ -149,8 +149,8 @@ class AjaxHandler
     */
     private function handleCookie()
     {
-        if (User::$id && $this->params && !empty($this->get[$this->param[0]]))
-            if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $this->param[0], $this->get[$this->param[0]]))
+        if (User::$id && $this->params && !empty($this->get[$this->params[0]]))
+            if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $this->params[0], $this->get[$this->params[0]]))
                 return 0;
 
         return null;

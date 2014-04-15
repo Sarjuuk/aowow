@@ -2,12 +2,12 @@
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <link rel="SHORTCUT ICON" href="template/images/favicon.ico">
-    <link rel="stylesheet" type="text/css" href="static/css/basic.css?{$AOWOW_REVISION}" />
-    <link rel="stylesheet" type="text/css" href="static/css/global.css?{$AOWOW_REVISION}" />
-    <link rel="stylesheet" type="text/css" href="static/css/locale_{$user.language}.css?{$AOWOW_REVISION}" />
-    <!--[if IE]><link rel="stylesheet" type="text/css" href="static/css/global_ie.css?{$AOWOW_REVISION}" /><![endif]-->
-    <!--[if lte IE 6]><link rel="stylesheet" type="text/css" href="static/css/global_ie6.css?{$AOWOW_REVISION}" /><![endif]-->
-    <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="static/css/global_ie67.css?{$AOWOW_REVISION}" /><![endif]-->
+    <link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/basic.css?{$AOWOW_REVISION}" />
+    <link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/global.css?{$AOWOW_REVISION}" />
+    <link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/locale_{$user.language}.css?{$AOWOW_REVISION}" />
+    <!--[if IE]><link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/global_ie.css?{$AOWOW_REVISION}" /><![endif]-->
+    <!--[if lte IE 6]><link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/global_ie6.css?{$AOWOW_REVISION}" /><![endif]-->
+    <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/global_ie67.css?{$AOWOW_REVISION}" /><![endif]-->
 {foreach from=$reqCSS item=css}
 {if isset($css.string)}
     <style type="text/css">{$css.string}</style>
@@ -23,12 +23,12 @@
         var g_dataKey = '{$dataKey}';
 {/if}
     </script>
-    <script src="static/js/jquery-1.4.2.min.js" type="text/javascript"></script>
-    <script src="static/js/basic.js?{$AOWOW_REVISION}" type="text/javascript"></script>
-    <script src="static/widgets/power.js?lang={$user.language|substr:2}" type="text/javascript"></script>
-    <script src="static/js/locale_{$user.language}.js?{$AOWOW_REVISION}" type="text/javascript"></script>
-    <script src="static/js/global.js?{$AOWOW_REVISION}" type="text/javascript"></script>
-    <script src="static/js/Markup.js?{$AOWOW_REVISION}" type="text/javascript"></script>
+    <script src="{$smarty.const.STATIC_URL}/js/jquery-1.4.2.min.js" type="text/javascript"></script>
+    <script src="{$smarty.const.STATIC_URL}/js/basic.js?{$AOWOW_REVISION}" type="text/javascript"></script>
+    <script src="{$smarty.const.STATIC_URL}/widgets/power.js?lang={$user.language|substr:2}" type="text/javascript"></script>
+    <script src="{$smarty.const.STATIC_URL}/js/locale_{$user.language}.js?{$AOWOW_REVISION}" type="text/javascript"></script>
+    <script src="{$smarty.const.STATIC_URL}/js/global.js?{$AOWOW_REVISION}" type="text/javascript"></script>
+    <script src="{$smarty.const.STATIC_URL}/js/Markup.js?{$AOWOW_REVISION}" type="text/javascript"></script>
 {foreach from=$reqJS item=file}
     <script src="{$file}{if $file[0] == '?'}&{else}?{/if}{$AOWOW_REVISION}" type="text/javascript"></script>
 {/foreach}

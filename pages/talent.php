@@ -13,17 +13,17 @@ $smarty->updatePageVars(array(
     'tab'     => 1,
     'dataKey' => $_SESSION['dataKey'],
     'reqCSS'  => array(
-        ['path' => 'static/css/TalentCalc.css'],
-        ['path' => 'static/css/talent.css'],
-        ['path' => 'static/css/TalentCalc_ie6.css',  'ieCond' => 'lte IE 6'],
-        ['path' => 'static/css/TalentCalc_ie67.css', 'ieCond' => 'lte IE 7'],
-        $petCalc ? ['path' => 'static/css/petcalc.css'] : null
+        ['path' => STATIC_URL.'/css/TalentCalc.css'],
+        ['path' => STATIC_URL.'/css/talent.css'],
+        ['path' => STATIC_URL.'/css/TalentCalc_ie6.css',  'ieCond' => 'lte IE 6'],
+        ['path' => STATIC_URL.'/css/TalentCalc_ie67.css', 'ieCond' => 'lte IE 7'],
+        $petCalc ? ['path' => STATIC_URL.'/css/petcalc.css'] : null
     ),
     'reqJS'  => array(
-        'static/js/TalentCalc.js',
+        STATIC_URL.'/js/TalentCalc.js',
        ($petCalc ? '?data=pet-talents.pets' : '?data=glyphs').'&locale='.User::$localeId.'&t='.$_SESSION['dataKey'],
-        $petCalc ? 'static/js/petcalc.js'   : 'static/js/talent.js',
-        $petCalc ? 'static/js/swfobject.js' : null
+        $petCalc ? STATIC_URL.'/js/petcalc.js'   : STATIC_URL.'/js/talent.js',
+        $petCalc ? STATIC_URL.'/js/swfobject.js' : null
     )
 ));
 $smarty->assign('tcType', $petCalc ? 'pc' : 'tc');

@@ -10,12 +10,12 @@ $smarty->updatePageVars(array(
     'tab'    => 1,
     'reqCSS' => array(
         ['string' => 'zone-picker { margin-left: 4px }'],
-        ['path' => 'static/css/Mapper.css'],
-        ['path' => 'static/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
+        ['path' => STATIC_URL.'/css/Mapper.css'],
+        ['path' => STATIC_URL.'/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
     ),
     'reqJS'  => array(
-        'static/js/maps.js',
-        'static/js/Mapper.js',
+        STATIC_URL.'/js/maps.js',
+        STATIC_URL.'/js/Mapper.js',
         '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
     )
 ));

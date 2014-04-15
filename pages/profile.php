@@ -521,17 +521,17 @@ $pageData = array(
         'region'    => 'eu',
         'realm'     => 'realm Name',
         'reqJS'     => array(
-            'static/js/filters.js',
-            'static/js/TalentCalc.js',
-            'static/js/swfobject.js',
-            'static/js/profile_all.js',
-            'static/js/profile.js',
-            'static/js/Profiler.js',
+            STATIC_URL.'/js/filters.js',
+            STATIC_URL.'/js/TalentCalc.js',
+            STATIC_URL.'/js/swfobject.js',
+            STATIC_URL.'/js/profile_all.js',
+            STATIC_URL.'/js/profile.js',
+            STATIC_URL.'/js/Profiler.js',
             '?data=enchants.gems.glyphs.itemsets.pets.pet-talents.quick-excludes.realms.statistics.weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
         ),
         'reqCSS'    => array(
-            ['path' => 'static/css/TalentCalc.css'],
-            ['path' => 'static/css/Profiler.css']
+            ['path' => STATIC_URL.'/css/TalentCalc.css'],
+            ['path' => STATIC_URL.'/css/Profiler.css']
         )
     )
 );
