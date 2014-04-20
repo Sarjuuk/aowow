@@ -6235,61 +6235,93 @@ Listview.extraCols = {
 
         id: 'condition',
         name: LANG.requires,
+        width: '30%',
         compute: function(row, td) {
-            if (!row.condition || !row.condition.type || !row.condition.typeId) {
-                return '';
-            }
-
-            var cnd = Listview.extraCols.condition.getState(row.condition);
-            if (!cnd) {
+            if (!row.condition || !$WH.is_array(row.condition)) {
                 return;
             }
 
             td.className = 'small';
             td.style.lineHeight = '18px';
 
-            var span = $WH.ce('span');
-            span.className = cnd.color;
-            $WH.ae(span, cnd.state);
-            $WH.ae(td, span);
-            $WH.ae(td, $WH.ce('br'));
+            for (i in row.condition) {
+                if (cnd = Listview.extraCols.condition.getState(row.condition[i])) {
+                    if (td.innerHTML)
+                        $WH.ae(td, $WH.ce('br'));
 
-            var a = $WH.ce('a');
-            a.href = cnd.url;
-            a.style.whiteSpace = 'nowrap';
+                    var span = $WH.ce('span');
+                    span.className = cnd.color;
+                    $WH.ae(span, cnd.state);
+                    $WH.ae(td, span);
 
-            if (g_pageInfo.typeId == row.condition.typeId) { // ponts to self
-                a.className = 'q1';
-                $WH.st(a, 'This');
-            }
-            else {
-                $WH.st(a, cnd.name);
+                    for (j in cnd.links) {
+                        if (j > 0) {
+                            $WH.ae(td, $WH.ct(LANG.comma));
+                        }
 
-                if (cnd.icon) {
-                    a.className = 'icontiny tinyspecial';
-                    a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + cnd.icon + '.gif)';
+                        var
+                            l = cnd.links[j],
+                            a = $WH.ce('a');
+
+                        a.href = l.url;
+                        a.style.whiteSpace = 'nowrap';
+
+                        // points to self
+                        if (g_pageInfo.type == row.condition[i].type && g_pageInfo.typeId == row.condition[i].typeId) {
+                            a.className = 'q1';
+                            $WH.st(a, 'This');
+                        }
+                        else {
+                            $WH.ae(a, l.name);
+
+                            if (l.icon) {
+                                a.className = 'icontiny tinyspecial';
+                                a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + l.icon + '.gif)';
+                            }
+
+                            if (l.color) {
+                                a.className += ' ' + l.color;
+                            }
+                        }
+
+                        $WH.ae(td, a);
+                    }
                 }
+                else if ('gender' in row.condition[i]) {
+                    var
+                        gender = g_file_genders[row.condition[i].gender - 1],
+                        sp = $WH.ce('span');
 
-                if (cnd.quality) {
-                    a.className += ' q' + cnd.quality;
+                    sp.className = 'icon-' + gender;
+                    sp.style.position = 'absolute';
+                    sp.style.right = '0px';
+                    sp.style.top   = '3px';
+                    sp.innerHTML = '&nbsp;';
+                    g_addTooltip(sp, LANG[gender]);
+
+                    td.style.position = 'relative';
+
+                    $WH.ae(td, sp);
                 }
             }
-
-            $WH.ae(td, a);
         },
         getVisibleText: function(row) {
             var buff = '';
 
-            if (!row.condition || !row.condition.type || !row.condition.typeId) {
+            if (!row.condition || !$WH.is_array(row.condition)) {
                 return buff;
             }
 
-            var cnd = Listview.extraCols.condition.getState(row.condition);
-            if (!cnd) {
-                return buff;
-            }
+            for (i in row.condition) {
+                var cnd = Listview.extraCols.condition.getState(row.condition[i]);
+                if (!cnd) {
+                    continue;
+                }
 
-            buff += cnd.name + ' ' + cnd.state;
+                for (j in cnd) {
+                    buff += cnd[j].name + ' ' + cnd.state;
+                }
+            }
 
             return buff;
         },
@@ -6307,8 +6339,10 @@ Listview.extraCols = {
                     return Listview.extraCols.condition.getQuestState(cond);
                 case 'event':
                     return Listview.extraCols.condition.getEventState(cond);
+                case 'race':
+                    return Listview.extraCols.condition.getRaceState(cond);
                 default:
-                    return {};
+                    return null;
             }
         },
         getSkillState: function(cond) {
@@ -6320,14 +6354,16 @@ Listview.extraCols = {
                 cnd  = {},
                 item = g_skills[cond.typeId];
 
-            cnd.icon  = item.icon.toLowerCase();
-            cnd.state = cond.status ? $WH.ct(LANG.pr_note_known) : $WH.ct(LANG.pr_note_missing);
+            cnd.state = $WH.ct((cond.status ? LANG.pr_note_known : LANG.pr_note_missing) + LANG.colon);
             cnd.color = cond.status ? 'q2' : 'q10';
-            cnd.name  = item['name_' + g_locale.name];
-            cnd.url   = '?skill=' + cond.typeId;
+            cnd.links = [{
+                icon: item.icon.toLowerCase(),
+                name: $WH.ct(item['name_' + g_locale.name]),
+                url : '?skill=' + cond.typeId
+            }];
 
             if (cond.reqSkillLvl)
-                cnd.name += ' (' + cond.reqSkillLvl + ')';
+                cnd.l.name += ' (' + cond.reqSkillLvl + ')';
 
             return cnd;
         },
@@ -6340,11 +6376,13 @@ Listview.extraCols = {
                 cnd  = {},
                 item = g_spells[cond.typeId];
 
-            cnd.icon  = item.icon.toLowerCase();
-            cnd.state = cond.status ? $WH.ct(LANG.pr_note_known) : $WH.ct(LANG.pr_note_missing);
+            cnd.state = $WH.ct((cond.status ? LANG.pr_note_known : LANG.pr_note_missing) + LANG.colon);
             cnd.color = cond.status ? 'q2' : 'q10';
-            cnd.name  = item['name_' + g_locale.name];
-            cnd.url   = '?spell=' + cond.typeId;
+            cnd.links = [{
+                icon: item.icon.toLowerCase(),
+                name: $WH.ct(item['name_' + g_locale.name]),
+                url : '?spell=' + cond.typeId
+            }];
 
             return cnd;
         },
@@ -6357,12 +6395,14 @@ Listview.extraCols = {
                 cnd  = {},
                 item = g_items[cond.typeId];
 
-            cnd.icon    = item.icon.toLowerCase();
-            cnd.state   = cond.status ? $WH.ct(LANG.pr_note_earned) : $WH.ct(LANG.pr_note_missing);
-            cnd.color   = cond.status ? 'q2' : 'q10';
-            cnd.name    = item['name_' + g_locale.name];
-            cnd.url     = '?item=' + cond.typeId;
-            cnd.quality = item.quality;
+            cnd.state = $WH.ct((cond.status ? LANG.pr_note_earned : LANG.pr_note_missing) + LANG.colon);
+            cnd.color = cond.status ? 'q2' : 'q10';
+            cnd.links = [{
+                icon : item.icon.toLowerCase(),
+                name : $WH.ct(item['name_' + g_locale.name]),
+                url  : '?item=' + cond.typeId,
+                color: 'q' + item.quality
+            }];
 
             return cnd;
         },
@@ -6375,11 +6415,13 @@ Listview.extraCols = {
                 cnd  = {},
                 item = g_achievements[cond.typeId];
 
-            cnd.icon  = item.icon.toLowerCase();
-            cnd.state = cond.status ? $WH.ct(LANG.pr_note_earned) : $WH.ct(LANG.pr_note_incomplete);
+            cnd.state = $WH.ct((cond.status ? LANG.pr_note_earned : LANG.pr_note_incomplete) + LANG.colon);
             cnd.color = cond.status ? 'q2' : 'q10';
-            cnd.name  = item['name_' + g_locale.name];
-            cnd.url   = '?achievement=' + cond.typeId;
+            cnd.links = [{
+                icon: item.icon.toLowerCase(),
+                name: $WH.ct(item['name_' + g_locale.name]),
+                url : '?achievement=' + cond.typeId
+            }];
 
             return cnd;
         },
@@ -6392,11 +6434,35 @@ Listview.extraCols = {
                 cnd  = {},
                 item = g_quests[cond.typeId];
 
-            cnd.icon  = '';
-            cnd.state = cond.status == 1 ? $WH.ct(LANG.progress) : cond.status == 2 ? $WH.ct(LANG.pr_note_complete) : $WH.ct(LANG.pr_note_incomplete);
+            cnd.state = $WH.ct((cond.status == 1 ? LANG.progress : (cond.status == 2 ? LANG.pr_note_complete : LANG.pr_note_incomplete)) + LANG.colon);
             cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
-            cnd.name  = item['name_' + g_locale.name];
-            cnd.url   = '?quest=' + cond.typeId;
+            cnd.links = [{
+                name: $WH.ct(item['name_' + g_locale.name]),
+                url : '?quest=' + cond.typeId
+            }];
+
+            return cnd;
+        },
+        getRaceState: function(cond) {
+            if (!cond.typeId) {
+                return;
+            }
+
+            var
+                cnd   = {},
+                name  = $WH.ce('div'),
+                races = Listview.funcBox.assocBinFlags(cond.typeId, g_chr_races);
+
+            cnd.state = $WH.ct((cond.status ? 'Player is' : 'Player is not') + LANG.colon);
+            cnd.color = 'q1';
+            cnd.links = [];
+
+            for (var i = 0, len = races.length; i < len; ++i) {
+                cnd.links.push({
+                    name: $WH.ct(g_chr_races[races[i]]),
+                    url : '?class=' + races[i]
+                });
+            }
 
             return cnd;
         },
@@ -6409,24 +6475,28 @@ Listview.extraCols = {
                 cnd  = {},
                 item = g_holidays[cond.typeId];
 
-            cnd.icon  = item.icon.toLowerCase();
-            cnd.state = cond.status == 1 ? $WH.ct('active') : cond.status == 2 ? $WH.ct(LANG.pr_note_complete) : $WH.ct('inactive');
+            cnd.state = $WH.ct((cond.status == 1 ? 'active' : (cond.status == 2 ? LANG.pr_note_complete : 'inactive')) + LANG.colon);
             cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
-            cnd.name  = item['name_' + g_locale.name];
-            cnd.url   = '?event=' + cond.typeId;
+            cnd.links = [{
+                icon: item.icon.toLowerCase(),
+                name: item['name_' + g_locale.name],
+                url :'?event=' + cond.typeId
+            }];
 
             return cnd;
         },
         sortFunc: function(a, b, col) {
-            if (a.condition && b.condition) {
-                return $WH.strcmp(a.condition.status, b.condition.status);
-            }
-            else if (a.condition)
+            var text1 = this.getVisibleText(a);
+            var text2 = this.getVisibleText(b);
+
+            if (text1 != '' && text2 == '') {
                 return -1;
-            else if (b.condition)
+            }
+            if (text2 != '' && text1 == '') {
                 return 1;
-            else
-                return 0;
+            }
+
+            return $WH.strcmp(text1, text2);
         }
     },
 };
@@ -11340,7 +11410,10 @@ Listview.templates = {
                 align: 'left',
                 value: 'name',
                 compute: function(zone, td) {
-                    var a = $WH.ce('a');
+                    var
+                        wrapper = $WH.ce('div'),
+                        a = $WH.ce('a');
+
                     a.style.fontFamily = 'Verdana, sans-serif';
                     a.href = this.getItemLink(zone);
                     $WH.ae(a, $WH.ct(zone.name));
@@ -11348,10 +11421,52 @@ Listview.templates = {
                         var sp = $WH.ce('span');
                             sp.className = g_GetExpansionClassName(zone.expansion);
                         $WH.ae(sp, a);
-                        $WH.ae(td, sp);
+                        $WH.ae(wrapper, sp);
                     }
                     else {
-                        $WH.ae(td, a);
+                        $WH.ae(wrapper, a);
+                    }
+
+                    $WH.ae(td, wrapper);
+
+                    if (zone.subzones) {
+                        if (zone.subzones.length == 1 && zone.subzones[0] == zone.id)
+                            return;
+
+                        var nRows = parseInt(zone.subzones.length / 3);
+                        if (nRows != (zone.subzones.length / 3))
+                            nRows++;
+
+                        wrapper.style.position = 'relative';
+                        wrapper.style.minHeight = ((nRows * 12) + 19) + 'px';
+
+                        var d = $WH.ce('div');
+                        d.className       = 'small';
+                        d.style.fontStyle = 'italic';
+                        d.style.position  = 'absolute';
+                        d.style.right     = '2px';
+                        d.style.bottom    = '2px';
+                        d.style.textAlign = 'right';
+
+                        for (i in zone.subzones) {
+                            if (!g_gatheredzones[zone.subzones[i]]) {
+                                continue;
+                            }
+
+                            if (i > 0) {
+                                $WH.ae(d, $WH.ct(LANG.comma));
+                            }
+
+                            var a = $WH.ce('a');
+
+                            a.className = zone.subzones[i] == zone.id ? 'q1' : 'q0';
+                            a.style.whiteSpace = 'nowrap';
+                            a.href = '?zone=' + zone.subzones[i];
+                            $WH.st(a, g_gatheredzones[zone.subzones[i]]['name_' + g_locale.name]);
+                            $WH.ae(d, a);
+                        }
+
+                        $WH.ae(wrapper, d);
                     }
                 },
                 getVisibleText: function(zone) {
@@ -13314,7 +13429,7 @@ Listview.templates = {
                     if (title.gender && title.gender != 3) {
                         var gender = g_file_genders[title.gender - 1];
                         var sp = $WH.ce('span');
-                        sp.className = gender + '-icon';
+                        sp.className = 'icon-' + gender;
                         g_addTooltip(sp, LANG[gender]);
 
                         $WH.ae(td, sp);

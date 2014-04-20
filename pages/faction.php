@@ -148,17 +148,21 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     {
         $items->addGlobalsToJScript(GLOBALINFO_SELF);
 
-        $pageData['relTabs'][] = array(
+        $tab = array(
             'file'    => 'item',
             'data'    => $items->getListviewData(),
             'showRep' => true,
             'params'  => array(
                 'tabs'      => '$tabsRelated',
                 'extraCols' => '$_',
-                'sort'      => "$['standing', 'name']",
-                'note'      => sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$_id.';crv=0')
+                'sort'      => "$['standing', 'name']"
             )
         );
+
+        if ($items->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            $tab['params']['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$_id.';crv=0');
+
+        $pageData['relTabs'][] = $tab;
     }
 
     // tab: creatures with onKill reputation
@@ -178,14 +182,19 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             {
                 $killCreatures->addGlobalsToJscript();
 
-                $pageData['relTabs'][] = array(
+                $tab = array(
                     'file'    => 'creature',
                     'data'    => $killCreatures->getListviewData(),
                     'showRep' => true,
                     'params'  => array(
-                        'tabs'      => '$tabsRelated',
+                        'tabs' => '$tabsRelated',
                     )
                 );
+
+                if ($killCreatures->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                    $tab['params']['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$_id.';crv=0');
+
+                $pageData['relTabs'][] = $tab;
             }
         }
     }
@@ -198,13 +207,34 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         {
             $members->addGlobalsToJscript();
 
-            $pageData['relTabs'][] = array(
+            $tab = array(
                 'file'    => 'creature',
                 'data'    => $members->getListviewData(),
                 'showRep' => true,
                 'params'  => array(
                     'id'   => 'member',
                     'name' => '$LANG.tab_members',
+                    'tabs' => '$tabsRelated'
+                )
+            );
+
+            if ($members->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                $tab['params']['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$_id.';crv=0');
+
+            $pageData['relTabs'][] = $tab;
+        }
+    }
+
+    // tab: objects
+    if ($_ = $faction->getField('templateIds'))
+    {
+        $objects = new GameObjectList(array(['faction', $_]));
+        if (!$objects->error)
+        {
+            $pageData['relTabs'][] = array(
+                'file'    => 'object',
+                'data'    => $objects->getListviewData(),
+                'params'  => array(
                     'tabs' => '$tabsRelated',
                 )
             );
@@ -225,16 +255,20 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     {
         $quests->addGlobalsToJScript(GLOBALINFO_ANY);
 
-        $pageData['relTabs'][] = array(
+        $tab = array(
             'file'    => 'quest',
             'data'    => $quests->getListviewData($_id),
             'showRep' => true,
             'params'  => array(
                 'tabs' => '$tabsRelated',
-                'extraCols' => '$_',
-                'note' => sprintf(Util::$filterResultString, '?quests?filter=cr=1;crs='.$_id.';crv=0')
+                'extraCols' => '$_'
             )
         );
+
+        if ($quests->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            $tab['params']['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$_id.';crv=0');
+
+        $pageData['relTabs'][] = $tab;
     }
 
     // tab: achievements

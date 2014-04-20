@@ -423,7 +423,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
                 $reqQuest[$lv['id']] = 0;
 
-                $itemLoot[$l]['condition'] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
+                $itemLoot[$l]['condition'][] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
             }
 
             $extraCols[] = 'Listview.extraCols.percent';

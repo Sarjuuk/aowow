@@ -7,7 +7,7 @@ if (!defined('AOWOW_REVISION'))
 $cats      = Util::extractURLParams($pageParam);
 $path      = [0, 6];
 $title     = [Util::ucFirst(Lang::$game['zones'])];
-$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_ZONE, -1, $cats[0] ? implode('.', $cats) : -1, User::$localeId]);
+$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_ZONE, -1, $cats ? implode('.', $cats) : -1, User::$localeId]);
 $validCats = array(
     0 => true,
     1 => true,
@@ -31,7 +31,7 @@ if (!$smarty->loadCache($cacheKey, $pageData))
     $mapFile     = 0;
     $spawnMap    = -1;
 
-    if (isset($cats[0]))
+    if ($cats)
     {
         $conditions[] = ['z.category', $cats[0]];
 
@@ -57,10 +57,24 @@ if (!$smarty->loadCache($cacheKey, $pageData))
 
     $zones = new ZoneList($conditions);
 
+    // menuId 6: Zone     g_initPath()
+    //  tabId 0: Database g_initHeader()
     $pageData = array(
-        'som'       => '',
-        'map'       => [],
-        'listviews' => array(
+        'page'     => array(
+            'title'  => implode(' - ', $title),
+            'path'   => json_encode($path, JSON_NUMERIC_CHECK),
+            'tab'    => 0,
+            'map'    => null,
+            'reqCSS' => array(
+                ['path' => STATIC_URL.'/css/Mapper.css'],
+                ['path' => STATIC_URL.'/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
+            ),
+            'reqJS'  => array(
+                STATIC_URL.'/js/Mapper.js',
+                STATIC_URL.'/js/ShowOnMap.js'
+            )
+        ),
+        'lv' => array(
             array(
                 'file'   => 'zone',
                 'data'   => $zones->getListviewData(),
@@ -113,37 +127,24 @@ if (!$smarty->loadCache($cacheKey, $pageData))
             $somData['flightmaster'][] = $data;
         }
 
-        $pageData['map'] = array(
-            'zone'     => $mapFile,
-            'zoom'     => 1,
-            'overlay'  => 'true',
-            'zoomable' => 'false'
+        $pageData['page']['map'] = array(
+            'data' => array(
+                'zone'     => $mapFile,
+                'zoom'     => 1,
+                'overlay'  => 'true',
+                'zoomable' => 'false'
+            ),
+            'som' => json_encode($somData, JSON_NUMERIC_CHECK)
         );
-
-        $pageData['som'] = json_encode($somData, JSON_NUMERIC_CHECK);
     }
 
     $smarty->saveCache($cacheKey, $pageData);
 }
 
 
-// menuId 6: Zone     g_initPath()
-//  tabId 0: Database g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => implode(' - ', $title),
-    'path'   => json_encode($path, JSON_NUMERIC_CHECK),
-    'tab'    => 0,
-    'reqCSS' => array(
-        ['path' => 'template/css/Mapper.css'],
-        ['path' => 'template/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
-    ),
-    'reqJS'  => array(
-        'template/js/Mapper.js',
-        'template/js/ShowOnMap.js'
-    )
-));
+$smarty->updatePageVars($pageData['page']);
 $smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData);
+$smarty->assign('lvData', $pageData['lv']);
 
 // load the page
 $smarty->display('list-page-generic.tpl');

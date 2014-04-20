@@ -152,10 +152,10 @@ abstract class BaseType
                 else
                     return null;
 
-                if (is_array($c[1]))
+                if (is_array($c[1]) && !empty($c[1]))
                 {
                     array_walk($c[1], function(&$item, $key) {
-                         $item = Util::checkNumeric($item) ? $item : DB::Aowow()->escape($item);
+                        $item = Util::checkNumeric($item) ? $item : DB::Aowow()->escape($item);
                     });
 
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
@@ -897,9 +897,9 @@ abstract class Filter
     {
         if (is_bool($value))
             return [$field, 0, ($value ? '>' : '<=')];
-        else if ($value == -2323)                           // any
+        else if ($value == FILTER_ENUM_ANY)                 // any
             return [$field, 0, '>'];
-        else if ($value == -2324)                           // none
+        else if ($value == FILTER_ENUM_NONE)                // none
             return [$field, 0, '<='];
         else if ($value !== null)
             return [$field, $value];

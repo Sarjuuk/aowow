@@ -421,7 +421,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             'rangeName' => $spell->getField('rangeText', true),
             'range'     => $spell->getField('rangeMaxHostile'),
             'gcd'       => Util::formatTime($spell->getField('startRecoveryTime')),
-            'gcdCat'    => "[NYI]",
+            'gcdCat'    => null,                            // todo (low): nyi; find out how this works [n/a; normal; ..]
             'school'    => User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, Util::asHex($spell->getField('schoolMask')), Lang::getMagicSchools($spell->getField('schoolMask'))) : Lang::getMagicSchools($spell->getField('schoolMask')),
             'dispel'    => Lang::$game['dt'][$spell->getField('dispelType')],
             'mechanic'  => Lang::$game['me'][$spell->getField('mechanic')],
@@ -666,7 +666,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         if ($spell->getField('effect'.$i.'RadiusMax') > 0)
             $foo['radius'] = $spell->getField('effect'.$i.'RadiusMax');
 
-        if (($effBP + $effDS) && !($itemIdx && $spell->relItems && !$spell->relItems->error) && (!in_array($i, $spellIdx) || in_array($effAura, [225, 227])))
+        if (!($itemIdx && $spell->relItems && !$spell->relItems->error) && (!in_array($i, $spellIdx) || in_array($effAura, [225, 227])))
             $foo['value'] = ($effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
 
         if ($effRPPL != 0)
@@ -1041,6 +1041,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
                             break;
                         }
+                        case 139:                           // Force Reaction
+                        {
+                            $bar          = ' (<a href="?faction='.$effMV.'">'.FactionList::getName($effMV).'</a>)';
+                            $foo['value'] = sprintf(Util::$dfnString, $foo['value'], Lang::$game['rep'][$foo['value']]);
+                        }
                     }
                     $foo['name'] .= strstr($bar, 'href') || strstr($bar, '#') ? $bar : ($bar ? ' ('.$bar.')' : null);
 
@@ -1058,7 +1063,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         }
 
         // cases where we dont want 'Value' to be displayed
-        if (in_array($effAura, [11, 12, 36, 77]) || in_array($effId, []))
+        if (in_array($effAura, [11, 12, 36, 77]) || in_array($effId, []) || empty($foo['value']))
             unset($foo['value']);
     }
 
@@ -1372,8 +1377,8 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 if (($bar = $spell->getField('effect'.$i.'CreateItemId')) && isset($foo[$bar]))
                 {
                     $lv[$bar] = $foo[$bar];
-                    $lv[$bar]['percent']   = $extraItem['additionalCreateChance'];
-                    $lv[$bar]['condition'] = ['type' => TYPE_SPELL, 'typeId' => $extraItem['requiredSpecialization'], 'status' => 2];
+                    $lv[$bar]['percent']     = $extraItem['additionalCreateChance'];
+                    $lv[$bar]['condition'][] = ['type' => TYPE_SPELL, 'typeId' => $extraItem['requiredSpecialization'], 'status' => 2];
                     $smarty->extendGlobalIds(TYPE_SPELL, $extraItem['requiredSpecialization']);
 
                     $extraCols[] = 'Listview.extraCols.condition';
@@ -1566,6 +1571,130 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         );
 
         $ubCreature->addGlobalsToJScript(GLOBALINFO_SELF);
+    }
+
+    // tab: zone
+    if ($areas = DB::Aowow()->select('SELECT * FROM spell_area WHERE spell = ?d', $_id))
+    {
+        $zones = new ZoneList(array(['id', array_column($areas, 'area')]));
+        if (!$zones->error)
+        {
+            $lvZones = $zones->getListviewData();
+            $zones->addGlobalsToJscript();
+
+            $lv = [];
+            $parents = [];
+            foreach ($areas as $a)
+            {
+                if (empty($lvZones[$a['area']]))
+                    continue;
+
+                $_ = ['condition' => []];
+                $extra = false;
+                if ($a['aura_spell'])
+                {
+                    Util::$pageTemplate->extendGlobalIds(TYPE_SPELL, $a['aura_spell']);
+                    $_['condition'][] = array(
+                        'type'   => TYPE_SPELL,
+                        'typeId' => abs($a['aura_spell']),
+                        'status' => $a['aura_spell'] > 0 ? 1 : 0
+                    );
+                }
+
+                if ($a['quest_start'])                      // status for quests needs work
+                {
+                    Util::$pageTemplate->extendGlobalIds(TYPE_QUEST, $a['quest_start']);
+                    $_['condition'][] = array(
+                        'type'   => TYPE_QUEST,
+                        'typeId' => $a['quest_start'],
+                        'status' => $a['quest_start_status'] & 0x8 ? 1 : 2
+                    );
+                }
+
+                if ($a['quest_end'] && $a['quest_end'] != $a['quest_start'])
+                {
+                    Util::$pageTemplate->extendGlobalIds(TYPE_QUEST, $a['quest_end']);
+                    $_['condition'][] = array(
+                        'type'   => TYPE_QUEST,
+                        'typeId' => $a['quest_end'],
+                        'status' => $a['quest_start_status'] & 0x8 ? 1 : 0
+                    );
+                }
+
+                if ($a['racemask'])
+                {
+                    $foo = [];
+                    for ($i = 0; $i < 10; $i++)
+                        if ($a['racemask'] & $i)
+                            $foo[] = $i + 1;
+
+                    Util::$pageTemplate->extendGlobalIds(TYPE_RACE, $foo);
+                    $_['condition'][] = array(
+                        'type'   => TYPE_RACE,
+                        'typeId' => $a['racemask'],
+                        'status' => 1
+                    );
+                }
+
+                if ($a['gender'] != 2)                      // 2: both
+                    $_['condition'][] = ['gender' => $a['gender'] + 1];
+
+                if ($_['condition'])
+                    $extra = true;
+
+                $row = array_merge($_, $lvZones[$a['area']]);
+
+                // merge subzones, into one row, if: conditions match && parentZone is shared
+                if ($p = $zones->getEntry($a['area'])['parentArea'])
+                {
+                    $parents[] = $p;
+                    $row['parentArea'] = $p;
+                    $row['subzones']   = [$a['area']];
+                }
+                else
+                    $row['parentArea'] = 0;
+
+                $set = false;
+                foreach ($lv as &$v)
+                {
+                    if ($v['condition'] != $row['condition'] || ($v['parentArea'] != $row['parentArea'] && $v['id'] != $row['parentArea']))
+                        continue;
+
+                    if (!$row['parentArea'] && $v['id'] != $row['parentArea'])
+                        continue;
+
+                    $set = true;
+                    $v['subzones'][] = $row['id'];
+                    break;
+                }
+
+                // add self as potential subzone; IF we are a parentZone without added children, we get filtered in JScript
+                if (!$set)
+                {
+                    $row['subzones'] = [$row['id']];
+                    $lv[] = $row;
+                }
+            }
+
+            // overwrite lvData with parent-lvData (condition and subzones are kept)
+            if ($parents)
+            {
+                $parents = (new ZoneList(array(['id', $parents])))->getListviewData();
+                foreach ($lv as &$_)
+                    if (isset($parents[$_['parentArea']]))
+                        $_ = array_merge($_, $parents[$_['parentArea']]);
+            }
+
+            $pageData['relTabs'][] = array(
+                'file'   => 'zone',
+                'data'   => $lv,
+                'params' => [
+                    'tabs'       => '$tabsRelated',
+                    'extraCols'  => $extra ? '$[Listview.extraCols.condition]' : null,
+                    'hiddenCols' => $extra ? "$['instancetype']" : null
+                ]
+            );
+        }
     }
 
     // tab: teaches

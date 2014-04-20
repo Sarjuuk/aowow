@@ -172,7 +172,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
         $path[] = $filter['sl'];
 
     $infoMask = ITEMINFO_JSON;
-    if (array_intersect([63, 64], $xCols))                  // 63:buyPrice; 64:sellPrice
+    if (array_intersect([63, 64, 125], $xCols))             // 63:buyPrice; 64:sellPrice; 125:reqarenartng
         $infoMask |= ITEMINFO_VENDOR;
 
 

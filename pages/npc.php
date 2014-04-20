@@ -520,7 +520,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         if (!isset($extra[0]))
                             $extra[0] = 'Listview.extraCols.condition';
 
-                        $data[$sId]['condition'] = ['type' => TYPE_SKILL, 'typeId' => $_, 'status' => 1, 'reqSkillLvl' => $train['reqSkillValue']];
+                        $data[$sId]['condition'][] = ['type' => TYPE_SKILL, 'typeId' => $_, 'status' => 1, 'reqSkillLvl' => $train['reqSkillValue']];
                     }
 
                     if ($_ = $train['reqLevel'])
@@ -631,7 +631,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
                 $reqQuest[$lv['id']] = 0;
 
-                $itemLoot[$l]['condition'] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
+                $itemLoot[$l]['condition'][] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
             }
 
             $pageData['relTabs'][] = array(

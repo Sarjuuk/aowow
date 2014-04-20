@@ -286,6 +286,10 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         {
             $tokens   = [];
             $currency = [];
+
+            if (!is_array($data))
+                continue;
+
             foreach ($data as $c => $qty)
             {
                 if (is_string($c))
@@ -324,7 +328,27 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $quickInfo[] = Lang::$item['cost'].$each.Lang::$colon.'[ul][li]'.implode('[/li][li]', $costList).'[/li][/ul]';
 
         if ($_reqRating)
-            $quickInfo[] = sprintf(Lang::$item['reqRating'], $_reqRating);
+        {
+            $res   = [];
+            $i     = 0;
+            $len   = 0;
+            $parts = explode(' ', sprintf(Lang::$item['reqRating'], $_reqRating));
+            foreach ($parts as $p)
+            {
+                $res[$i][] = $p;
+                $len += mb_strlen($p);
+
+                if ($len < 30)
+                    continue;
+
+                $len = 0;
+                $i++;
+            }
+            foreach ($res as &$r)
+                $r = implode(' ', $r);
+
+            $quickInfo[] = implode('[br]', $res);
+        }
     }
 
     if ($_ = $item->getField('repairPrice'))
@@ -557,7 +581,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
                 $reqQuest[$lv['id']] = 0;
 
-                $itemLoot[$l]['condition'] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
+                $itemLoot[$l]['condition'][] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
             }
 
             $pageData['relTabs'][] = array(
@@ -900,7 +924,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                         $extraCols[] = 'Listview.extraCols.condition';
 
                     Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $e);
-                    $row['condition'] = array(
+                    $row['condition'][] = array(
                         'type'   => TYPE_WORLDEVENT,
                         'typeId' => -$e,
                         'status' => 1

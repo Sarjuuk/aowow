@@ -98,7 +98,7 @@ if !empty($transfer)}
                             </tr>
                             <tr>
                                 <th style="border-bottom: 0; border-left: 0">{$lang._gcdCategory}</th>
-                                <td style="border-bottom: 0">{$gcdCat}</td>
+                                <td style="border-bottom: 0">{if $gcdCat}{$gcdCat}{else}<span class="q0">{$lang.n_a}</span>{/if}</td>
                             </tr>
                             </table>
                         </td>

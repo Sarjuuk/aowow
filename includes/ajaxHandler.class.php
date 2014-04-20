@@ -239,7 +239,7 @@ class AjaxHandler
     */
     private function handleComment()
     {
-        switch ($this->param[0])
+        switch ($this->params[0])
         {
             case 'rating':
                 return '{"success":true,"error":"","up":7,"down":9}';
@@ -252,7 +252,7 @@ class AjaxHandler
 
     private function handleLocale()                         // not sure if this should be here..
     {
-        User::setLocale($this->param[0]);
+        User::setLocale($this->params[0]);
         User::writeCookie();
         header('Location: '.(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '.'));
     }

@@ -256,8 +256,8 @@ class AchievementListFilter extends Filter
               141 => 156,                                   // Feast of Winter Veil
               409 => -3456,                                 // Day of the Dead
               398 => -3457,                                 // Pirates' Day
-            -2323 => true,
-            -2324 => false,
+              FILTER_ENUM_ANY  => true,
+              FILTER_ENUM_NONE => false,
               283 => -1,                                    // valid events without achievements
               285 => -1,   353 => -1,   420 => -1,
               400 => -1,   284 => -1,   374 => -1,

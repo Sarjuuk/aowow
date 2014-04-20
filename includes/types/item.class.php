@@ -175,9 +175,9 @@ class ItemList extends BaseType
         $tok = @$filter[TYPE_ITEM];
         $cur = @$filter[TYPE_CURRENCY];
 
-        $reqRating = -1;
-        foreach ($result as $itemId => $data)
+        foreach ($result as $itemId => &$data)
         {
+            $reqRating = 0;
             foreach ($data as $npcId => $costs)
             {
                 if ($tok || $cur)                           // bought with specific token or currency
@@ -197,11 +197,14 @@ class ItemList extends BaseType
                 }
 
                 // reqRating ins't really a cost .. so pass it by ref instead of return
-                // use lowest total value
+                // use highest total value
                 // note: how to distinguish between brackets .. or team/pers-rating?
-                if (isset($data[$npcId]) && ($reqRating > $costs['reqRtg'] || $reqRating < 0 ))
+                if (isset($data[$npcId]) && ($reqRating < $costs['reqRtg']))
                     $reqRating = $costs['reqRtg'];
             }
+
+            if ($reqRating)
+                $data['reqRating'] = $reqRating;
 
             if (empty($data))
                 unset($result[$itemId]);
@@ -298,6 +301,9 @@ class ItemList extends BaseType
 
                     if ($tokens)
                         $data[$this->id]['cost'][] = $tokens;
+
+                    if ($_ = @$this->getExtendedCost($miscData)[$this->id]['reqRating'])
+                        $data[$this->id]['reqarenartng'] = $_;
                 }
 
                 if ($x = $this->curTpl['buyPrice'])
@@ -737,7 +743,7 @@ class ItemList extends BaseType
 
         // required arena team rating / personal rating / todo (low): sort out what kind of rating
         if (@$this->getExtendedCost([], $reqRating)[$this->id] && $reqRating)
-            $x .= sprintf(Lang::$item['reqRating'], $reqRating);
+            $x .= sprintf(Lang::$item['reqRating'], $reqRating).'<br />';
 
         // item level
         if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON]))
@@ -1405,6 +1411,9 @@ class ItemList extends BaseType
 class ItemListFilter extends Filter
 {
     private   $ubFilter      = [];                          // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
+    private   $extCostQuery  = 'SELECT item FROM npc_vendor nv              JOIN ?_itemExtendedCost iec ON iec.id =   nv.extendedCost WHERE %s UNION
+                                SELECT item FROM game_event_npc_vendor genv JOIN ?_itemExtendedCost iec ON iec.id = genv.extendedCost WHERE %1$s';
+
     public    $extraOpts     = [];                          // score for statWeights
     public    $wtCnd         = [];
     protected $enums         = array(
@@ -1433,6 +1442,19 @@ class ItemListFilter extends Filter
         ),
         153 => array(                                       // race-specific
             null, 1, 2, 3, 4, 5, 6, 7, 8, null, 10, 11, true, false
+        ),
+        158 => array(                                       // currency
+            32572, 32569, 29736, 44128, 20560, 20559, 29434, 37829, 23247, 44990, 24368, 52027, 52030, 43016, 41596, 34052, 45624, 49426, 40752, 47241, 40753, 29024,
+            24245, 26045, 26044, 38425, 29735, 24579, 24581, 32897, 22484, 52026, 52029,  4291, 28558, 43228, 34664, 47242, 52025, 52028, 37836, 20558, 34597, 43589
+        ),
+        118 => array(                                       // tokens
+            34853, 34854, 34855, 34856, 34857, 34858, 34848, 34851, 34852, 40625, 40626, 40627, 45632, 45633, 45634, 34169, 34186, 29754, 29753, 29755, 31089, 31091, 31090,
+            40610, 40611, 40612, 30236, 30237, 30238, 45635, 45636, 45637, 34245, 34332, 34339, 34345, 40631, 40632, 40633, 45638, 45639, 45640, 34244, 34208, 34180, 34229,
+            34350, 40628, 40629, 40630, 45641, 45642, 45643, 29757, 29758, 29756, 31092, 31094, 31093, 40613, 40614, 40615, 30239, 30240, 30241, 45644, 45645, 45646, 34342,
+            34211, 34243, 29760, 29761, 29759, 31097, 31095, 31096, 40616, 40617, 40618, 30242, 30243, 30244, 45647, 45648, 45649, 34216, 29766, 29767, 29765, 31098, 31100,
+            31099, 40619, 40620, 40621, 30245, 30246, 30247, 45650, 45651, 45652, 34167, 40634, 40635, 40636, 45653, 45654, 45655, 40637, 40638, 40639, 45656, 45657, 45658,
+            34170, 34192, 29763, 29764, 29762, 31101, 31103, 31102, 30248, 30249, 30250, 47557, 47558, 47559, 34233, 34234, 34202, 34195, 34209, 40622, 40623, 40624, 34193,
+            45659, 45660, 45661, 34212, 34351, 34215
         )
     );
     // cr => [type, field, misc, extraCol]
@@ -1696,12 +1718,13 @@ class ItemListFilter extends Filter
                     return ['randomEnchant', $randIds];
                 else
                     return [0];                             // no results aren't really input errors
-            case 125:                                       // reqarenartng [op] [int]      JOIN npc_vendor, game_event_npc_vendor, itemextendedcost.dbc
-                if (!$this->isSaneNumeric($cr[2]))
+            case 125:                                       // reqarenartng [op] [int]  todo (low): find out, why "IN (W, X, Y) AND IN (X, Y, Z)" doesn't result in "(X, Y)"
+                if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
                     break;
 
                 $this->formData['extraCols'][] = $cr[0];
-/* todo */      return [1];
+                $query = sprintf($this->extCostQuery, 'iec.reqPersonalrating '.$cr[1].' '.$cr[2]);
+                return ['id', DB::Aowow()->selectCol($query)];
             case 160:                                       // relatedevent [enum]      like 169 .. crawl though npc_vendor and loot_templates of event-related spawns
 /* todo */      return [1];
             case 152:                                       // classspecific [enum]
@@ -1783,14 +1806,36 @@ class ItemListFilter extends Filter
 /* todo */      return [1];
             case 76:                                        // otskinning [yn]
 /* todo */      return [1];
-            case 158:                                       // purchasablewithcurrency [currency-any]
-/* todo */      return [1];
-            case 118:                                       // purchasablewithitem [itemcurrency-any]
-/* todo */      return [1];
+            case 158:                                       // purchasablewithcurrency [enum]
+            case 118:                                       // purchasablewithitem [enum]
+                if (in_array($cr[1], $this->enums[$cr[0]]))
+                    $_ = (array)$cr[1];
+                else if ($cr[1] == FILTER_ENUM_ANY)
+                    $_ = $this->enums[$cr[0]];
+                else
+                    break;
+
+                $query = sprintf($this->extCostQuery, 'iec.reqItemId1 IN (?a) OR iec.reqItemId2 IN (?a) OR iec.reqItemId3 IN (?a) OR iec.reqItemId4 IN (?a) OR iec.reqItemId5 IN (?a)');
+                if ($foo = DB::Aowow()->selectCol($query, $_, $_, $_, $_, $_, $_, $_, $_, $_, $_))
+                    return ['id', $foo];
+
+                break;
             case 144:                                       // purchasablewithhonor [yn]
-/* todo */      return [1];
+                if ($this->int2Bool($cr[1]))
+                {
+                    $query = sprintf($this->extCostQuery, 'iec.reqHonorPoints > 0');
+                    if ($foo = DB::Aowow()->selectCol($query))
+                        return ['id', $foo, $cr[1] ? null : '!'];
+                }
+                break;
             case 145:                                       // purchasablewitharena [yn]
-/* todo */      return [1];
+                if ($this->int2Bool($cr[1]))
+                {
+                    $query = sprintf($this->extCostQuery, 'iec.reqArenaPoints > 0');
+                    if ($foo = DB::Aowow()->selectCol($query))
+                        return ['id', $foo, $cr[1] ? null : '!'];
+                }
+                break;
             case 18:                                        // rewardedbyfactionquest [side]
 /* todo */      return [1];
             case 126:                                       // rewardedbyquestin [zone-any]

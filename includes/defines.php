@@ -106,6 +106,9 @@ define('FILTER_CR_STRING',                  4);
 define('FILTER_CR_ENUM',                    5);
 define('FILTER_CR_STAFFFLAG',               6);
 
+define('FILTER_ENUM_ANY',                   -2323);
+define('FILTER_ENUM_NONE',                  -2324);
+
 // conditional information in template
 define('GLOBALINFO_SELF',                   0x1);           // id, name, icon
 define('GLOBALINFO_RELATED',                0x2);           // spells used by pet, classes/races required by spell, ect

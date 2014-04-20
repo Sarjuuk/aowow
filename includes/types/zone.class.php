@@ -134,7 +134,7 @@ visibleCols: ['heroiclevel', 'players']
     public function addGlobalsToJScript($addMask = 0)
     {
         foreach ($this->iterate() as $__)
-            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => ['name' => Util::jsEscape($this->getField('name', true))]]);
+            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
     }
 
     public function renderTooltip() { }

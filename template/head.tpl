@@ -9,17 +9,17 @@
     <!--[if lte IE 6]><link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/global_ie6.css?{$AOWOW_REVISION}" /><![endif]-->
     <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/global_ie67.css?{$AOWOW_REVISION}" /><![endif]-->
 {foreach from=$reqCSS item=css}
-{if isset($css.string)}
+{if !empty($css.string)}
     <style type="text/css">{$css.string}</style>
-{else}
-    {if isset($css.ieCond)}<!--[if {$css.ieCond}]>{/if}<link rel="stylesheet" type="text/css" href="{$css.path}?{$AOWOW_REVISION}" />{if isset($css.ieCond)}<![endif]-->{/if}
+{elseif !empty($css.path)}
+    {if !empty($css.ieCond)}<!--[if {$css.ieCond}]>{/if}<link rel="stylesheet" type="text/css" href="{$css.path}?{$AOWOW_REVISION}" />{if !empty($css.ieCond)}<![endif]-->{/if}
 {/if}
 {/foreach}
     <script type="text/javascript">
         var g_serverTime = new Date('{$smarty.now|date_format:"%Y/%m/%d %H:%M:%S"}');
         var g_staticUrl = "{$smarty.const.STATIC_URL}";
         var g_host = "{$smarty.const.HOST_URL}";
-{if isset($dataKey)}
+{if !empty($dataKey)}
         var g_dataKey = '{$dataKey}';
 {/if}
     </script>
@@ -29,9 +29,9 @@
     <script src="{$smarty.const.STATIC_URL}/js/locale_{$user.language}.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="{$smarty.const.STATIC_URL}/js/global.js?{$AOWOW_REVISION}" type="text/javascript"></script>
     <script src="{$smarty.const.STATIC_URL}/js/Markup.js?{$AOWOW_REVISION}" type="text/javascript"></script>
-{foreach from=$reqJS item=file}
+{foreach from=$reqJS item=file}{if !empty($file)}
     <script src="{$file}{if $file[0] == '?'}&{else}?{/if}{$AOWOW_REVISION}" type="text/javascript"></script>
-{/foreach}
+{/if}{/foreach}
     <script type="text/javascript">
         var g_locale = {ldelim} id:{$user.locale}, name:'{$user.language}' {rdelim};
         var g_user = {ldelim} {strip}

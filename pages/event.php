@@ -223,57 +223,60 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
 
     // tab: see also (event conditions)
-    if($rel = DB::Aowow()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, -prerequisite_event, eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $_eId, $_eId, $_eId))
+    if ($rel = DB::Aowow()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, -prerequisite_event, eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $_eId, $_eId, $_eId))
     {
         $list = [];
         array_walk($rel, function(&$v, $k) use (&$list) {
             if ($v > 0)
                 $list[] = $v;
-            else if ($v == null)
+            else if ($v === null)
                 Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'game_event_prerequisite: this event has itself as prerequisite');
         });
 
-        $relEvents = new WorldEventList(array(['id', $list]));
-        $relEvents->addGlobalsToJscript();
-        $relData   = $relEvents->getListviewData(true);
-        foreach ($relEvents->iterate() as $id => $__)
+        if ($list)
         {
-            $relData[$id]['condition'] = array(
-                'type'   => TYPE_WORLDEVENT,
-                'typeId' => -$eId,
-                'status' => 2
+            $relEvents = new WorldEventList(array(['id', $list]));
+            $relEvents->addGlobalsToJscript();
+            $relData   = $relEvents->getListviewData(true);
+            foreach ($relEvents->iterate() as $id => $__)
+            {
+                $relData[$id]['condition'] = array(
+                    'type'   => TYPE_WORLDEVENT,
+                    'typeId' => -$_eId,
+                    'status' => 2
+                );
+            }
+
+            $event->addGlobalsToJscript();
+            foreach ($rel as $r)
+            {
+                if ($r >= 0)
+                    continue;
+
+                Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, -$r);
+
+                $d = $event->getListviewData(true);
+                $d[-$_eId]['condition'][] = array(
+                    'type'   => TYPE_WORLDEVENT,
+                    'typeId' => $r,
+                    'status' => 2
+                );
+
+                $relData= array_merge($relData, $d);
+            }
+
+            $pageData['relTabs'][] = array(
+                'file'   => WorldEventList::$brickFile,
+                'data'   => $relData,
+                'params' => array(
+                    'id'         => 'see-also',
+                    'name'       => '$LANG.tab_seealso',
+                    'tabs'       => '$tabsRelated',
+                    'hiddenCols' => "$['date']",
+                    'extraCols'  => '$[Listview.extraCols.condition]'
+                )
             );
         }
-
-        $event->addGlobalsToJscript();
-        foreach ($rel as $r)
-        {
-            if ($r >= 0)
-                continue;
-
-            Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, -$r);
-
-            $d = $event->getListviewData(true);
-            $d[-$eId]['condition'] = array(
-                'type'   => TYPE_WORLDEVENT,
-                'typeId' => $r,
-                'status' => 2
-            );
-
-            $relData= array_merge($relData, $d);
-        }
-
-        $pageData['relTabs'][] = array(
-            'file'   => WorldEventList::$brickFile,
-            'data'   => $relData,
-            'params' => array(
-                'id'         => 'see-also',
-                'name'       => '$LANG.tab_seealso',
-                'tabs'       => '$tabsRelated',
-                'hiddenCols' => "$['date']",
-                'extraCols'  => '$[Listview.extraCols.condition]'
-            )
-        );
     }
 
 

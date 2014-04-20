@@ -500,9 +500,9 @@ class QuestListFilter extends Filter
                 $_ = intVal($cr[1]);
                 if ($_ > 0)
                     return ['OR', ['reqFactionId1', $_], ['reqFactionId2', $_]];
-                else if ($cr[1] == -2323)                   // any
+                else if ($cr[1] == FILTER_ENUM_ANY)         // any
                     return ['OR', ['reqFactionId1', 0, '>'], ['reqFactionId2', 0, '>']];
-                else if ($cr[1] == -2324)                   // none
+                else if ($cr[1] == FILTER_ENUM_NONE)        // none
                     return ['AND', ['reqFactionId1', 0], ['reqFactionId2', 0]];
 
                 break;

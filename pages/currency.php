@@ -115,7 +115,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
                         $holidays[$_] = 0;                      // applied as back ref.
 
-                        $row['condition'] = array(
+                        $row['condition'][] = array(
                             'type'   => TYPE_WORLDEVENT,
                             'typeId' => &$holidays[$_],
                             'status' => 1
@@ -194,7 +194,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     }
     else
     {
-        $n = in_array($_id, [42, 61, 81, 241, 121, 122, 123, 125, 126, 161, 201, 101, 102, 221, 301, 341]) ? '?items&filter=cr=158;crs='.$currency->getField('itemId').';crv=0' : null;
+        $n = in_array($_id, [42, 61, 81, 241, 121, 122, 123, 125, 126, 161, 201, 101, 102, 221, 301, 341]) ? '?items&filter=cr=158;crs='.$_itemId.';crv=0' : null;
         $w = 'iec.reqItemId1 = '.$_itemId.' OR iec.reqItemId2 = '.$_itemId.' OR iec.reqItemId3 = '.$_itemId.' OR iec.reqItemId4 = '.$_itemId.' OR iec.reqItemId5 = '.$_itemId;
     }
 
