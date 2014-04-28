@@ -1,7 +1,8 @@
     <title>{if $title}{$title|escape:"html"} - {/if}{$appName}</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link rel="SHORTCUT ICON" href="template/images/favicon.ico">
+    <link rel="SHORTCUT ICON" href="{$smarty.const.STATIC_URL}/images/logos/favicon.ico">
+    <link rel="search" type="application/opensearchdescription+xml" href="{$smarty.const.STATIC_URL}/download/searchplugins/aowow.xml" title="Aowow" />
     <link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/basic.css?{$AOWOW_REVISION}" />
     <link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/global.css?{$AOWOW_REVISION}" />
     <link rel="stylesheet" type="text/css" href="{$smarty.const.STATIC_URL}/css/locale_{$user.language}.css?{$AOWOW_REVISION}" />

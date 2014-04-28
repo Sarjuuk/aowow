@@ -202,7 +202,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
     // tab: members
     if ($_ = $faction->getField('templateIds'))
     {
-        $members = new CreatureList(array(['factionA', $_], ['factionH', $_], 'OR'));
+        $members = new CreatureList(array(['faction', $_]));
         if (!$members->error)
         {
             $members->addGlobalsToJscript();

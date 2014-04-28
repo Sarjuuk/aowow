@@ -16,7 +16,7 @@ class CreatureList extends BaseType
     protected       $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
     public          $queryOpts = array(
                         'ct'     => [['ft', 'clsMin', 'clsMax', 'qse']],
-                        'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.factionA', 's' => ', ft.A, ft.H, ft.factionId'],
+                        'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.faction', 's' => ', ft.A, ft.H, ft.factionId'],
                         'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', clsMin.attackpower AS mleAtkPwrMin, clsMin.rangedattackpower AS rngAtkPwrMin, clsMin.baseArmor * ct.armorMod AS armorMin, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * ct.dmgMultiplier AS dmgMin, (CASE ct.exp WHEN 0 THEN clsMin.basehp0 WHEN 1 THEN clsMin.basehp1 ELSE clsMin.basehp2 END) * ct.healthMod AS healthMin, clsMin.baseMana * ct.manaMod AS manaMin'],
                         'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', clsMax.attackpower AS mleAtkPwrMax, clsMax.rangedattackpower AS rngAtkPwrMax, clsMax.baseArmor * ct.armorMod AS armorMax, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * ct.dmgMultiplier AS dmgMax, (CASE ct.exp WHEN 0 THEN clsMax.basehp0 WHEN 1 THEN clsMax.basehp1 ELSE clsMax.basehp2 END) * ct.healthMod AS healthMax, clsMax.baseMana * ct.manaMod AS manaMax'],
                         'qse'    => ['j' => ['?_quests_startend qse ON qse.type = 1 AND qse.typeId = ct.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'ct.id'],
@@ -363,7 +363,7 @@ class CreatureListFilter extends Filter
                     if (!$facTpls)
                         return [0];
 
-                    return ['OR', ['factionA', $facTpls], ['factionH', $facTpls]];
+                    return ['faction', $facTpls];
                 }
                 break;
             case 42:                                        // increasesrepwith [enum]
