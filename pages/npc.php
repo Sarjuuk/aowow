@@ -323,7 +323,27 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // Quotes
     $quotes = [];
-    if ($texts = DB::Aowow()->select('SELECT ct.*, ct.groupid AS ARRAY_KEY, ct.id as ARRAY_KEY2, lct.text_loc2, lct.text_loc3, lct.text_loc6, lct.text_loc8 FROM creature_text ct LEFT JOIN locales_creature_text lct ON ct.entry = lct.entry AND ct.groupid = lct.groupid AND ct.id = lct.id WHERE ct.entry = ?d', $_id))
+    $quoteQuery = '
+        SELECT
+            ct.groupid AS ARRAY_KEY, ct.id as ARRAY_KEY2, ct.`type`,
+            IFNULL(bct.`Language`, ct.`language`) AS lang,
+            IFNULL(bct.MaleText, IFNULL(bct.FemaleText, ct.`text`)) AS text_loc0,
+            IFNULL(lbct.MaleText_loc2, IFNULL(lbct.FemaleText_loc2, lct.text_loc2)) AS text_loc2,
+            IFNULL(lbct.MaleText_loc3, IFNULL(lbct.FemaleText_loc3, lct.text_loc3)) AS text_loc3,
+            IFNULL(lbct.MaleText_loc6, IFNULL(lbct.FemaleText_loc6, lct.text_loc6)) AS text_loc6,
+            IFNULL(lbct.MaleText_loc8, IFNULL(lbct.FemaleText_loc8, lct.text_loc8)) AS text_loc8
+        FROM
+            creature_text ct
+        LEFT JOIN
+            locales_creature_text lct ON ct.entry = lct.entry AND ct.groupid = lct.groupid AND ct.id = lct.id
+        LEFT JOIN
+            broadcast_text bct ON ct.BroadcastTextId = bct.ID
+        LEFT JOIN
+            locales_broadcast_text lbct ON ct.BroadcastTextId = lbct.ID
+        WHERE
+            ct.entry = ?d';
+
+    if ($texts = DB::Aowow()->select($quoteQuery, $_id))
     {
         $nQuotes = 0;
         foreach ($texts as $text)
