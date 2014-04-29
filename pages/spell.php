@@ -667,7 +667,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             $foo['radius'] = $spell->getField('effect'.$i.'RadiusMax');
 
         if (!($itemIdx && $spell->relItems && !$spell->relItems->error) && (!in_array($i, $spellIdx) || in_array($effAura, [225, 227])))
-            $foo['value'] = ($effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
+            $foo['value'] = ($effDS && $effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
 
         if ($effRPPL != 0)
             $foo['value'] = (isset($foo['value']) ? $foo['value'] : '0').sprintf(Lang::$spell['costPerLevel'], $effRPPL);
@@ -696,6 +696,9 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                     $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$colon.$effMV, $_);
                 else if (!$_)
                     $_ = $effMV;
+
+                if ($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER)
+                    $foo['value'] = ($effDS && $effDS != 1 ? (($effBP + 1) / 10).Lang::$game['valueDelim'] : null).(($effBP + $effDS) / 10);
 
                 $foo['name'] .= ' ('.$_.')';
                 break;
