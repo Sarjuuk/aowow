@@ -107,7 +107,12 @@ $lang = array(
         'helpTopics'    => array(
             "Los comentarios y tú",                 "Visualizador de modelos",              "Capturas de pantalla: Sugerencias y trucos", "Medición de atributos",
             "Calculadora de talentos",              "Comparación de objetos",               "Perfiles"
-        )
+        ),
+
+        // formating
+        'colon'         => ': ',
+        'dateFmtShort'  => "d/m/Y",
+        'dateFmtLong'   => "d/m/Y \a \l\a\s H:i"
     ),
     'search' => array(
         'search'        => "Búsqueda",
@@ -773,10 +778,7 @@ $lang = array(
             "Aumenta el valor de bloqueo de tu escudo %d p.",
             "Estadística no utilizada #%d (%d)",
         )
-    ),
-    'colon'             => ': ',
-    'dateFmtShort'      => "d/m/Y",
-    'dateFmtLong'       => "d/m/Y \a \l\a\s H:i"
+    )
 );
 
 ?>

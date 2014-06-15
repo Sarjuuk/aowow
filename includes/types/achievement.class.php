@@ -47,25 +47,26 @@ class AchievementList extends BaseType
         }
     }
 
-    public function addGlobalsToJScript($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals($addMask = GLOBALINFO_ANY)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
         {
             if ($addMask & GLOBALINFO_SELF)
-                Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => array(
-                    'icon' => $this->curTpl['iconString'],
-                    'name' => $this->getField('name', true)
-                )]);
+                $data[TYPE_ACHIEVEMENT][$this->id] = ['icon' => $this->curTpl['iconString'], 'name' => $this->getField('name', true)];
 
             if ($addMask & GLOBALINFO_REWARDS)
             {
                 foreach ($this->curTpl['rewards'][TYPE_ITEM] as $_)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $_);
+                    $data[TYPE_ITEM][$_] = $_;
 
                 foreach ($this->curTpl['rewards'][TYPE_TITLE] as $_)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_TITLE, $_);
+                    $data[TYPE_TITLE][$_] = $_;
             }
         }
+
+        return $data;
     }
 
     public function getListviewData($addInfoMask = 0x0)

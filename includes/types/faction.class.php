@@ -70,10 +70,14 @@ class FactionList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = 0)
+    public function getJSGlobals($addMask = 0)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
-            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
+            $data[TYPE_FACTION][$this->id] = ['name' => $this->getField('name', true)];
+
+        return $data;
     }
 
     public function renderTooltip() { }

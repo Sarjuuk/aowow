@@ -28,8 +28,10 @@ class CurrencyList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = 0)
+    public function getJSGlobals($addMask = 0)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
         {
             // todo (low): find out, why i did this in the first place
@@ -40,11 +42,10 @@ class CurrencyList extends BaseType
             else
                 $icon = [$this->curTpl['iconString'], $this->curTpl['iconString']];
 
-            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => array(
-                'name' => $this->getField('name', true),
-                'icon' => $icon
-            )]);
+            $data[TYPE_CURRENCY][$this->id] = ['name' => $this->getField('name', true), 'icon' => $icon];
         }
+
+        return $data;
     }
 
     public function renderTooltip() { }

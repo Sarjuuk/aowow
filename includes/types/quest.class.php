@@ -344,8 +344,10 @@ class QuestList extends BaseType
         return $x;
     }
 
-    public function addGlobalsToJScript($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals($addMask = GLOBALINFO_ANY)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
         {
             if ($addMask & GLOBALINFO_REWARDS)
@@ -353,31 +355,33 @@ class QuestList extends BaseType
                 // items
                 for ($i = 1; $i < 5; $i++)
                     if ($this->curTpl['rewardItemId'.$i] > 0)
-                        Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $this->curTpl['rewardItemId'.$i]);
+                        $data[TYPE_ITEM][$this->curTpl['rewardItemId'.$i]] = $this->curTpl['rewardItemId'.$i];
 
                 for ($i = 1; $i < 7; $i++)
                     if ($this->curTpl['rewardChoiceItemId'.$i] > 0)
-                        Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $this->curTpl['rewardChoiceItemId'.$i]);
+                        $data[TYPE_ITEM][$this->curTpl['rewardChoiceItemId'.$i]] = $this->curTpl['rewardChoiceItemId'.$i];
 
                 // spells
                 if ($this->curTpl['rewardSpell'] > 0)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_SPELL, $this->curTpl['rewardSpell']);
+                    $data[TYPE_SPELL][$this->curTpl['rewardSpell']] = $this->curTpl['rewardSpell'];
 
                 if ($this->curTpl['rewardSpellCast'] > 0)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_SPELL, $this->curTpl['rewardSpellCast']);
+                    $data[TYPE_SPELL][$this->curTpl['rewardSpellCast']] = $this->curTpl['rewardSpellCast'];
 
                 // titles
                 if ($this->curTpl['rewardTitleId'] > 0)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_TITLE, $this->curTpl['rewardTitleId']);
+                    $data[TYPE_TITLE][$this->curTpl['rewardTitleId']] = $this->curTpl['rewardTitleId'];
 
                 // currencies
                 if ($_ = @$this->rewards[$this->id][TYPE_CURRENCY])
-                    Util::$pageTemplate->extendGlobalIds(TYPE_CURRENCY, array_keys($_));
+                    $data[TYPE_CURRENCY] = array_combine(array_keys($_), array_keys($_));
             }
 
             if ($addMask & GLOBALINFO_SELF)
-                Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
+                $data[TYPE_QUEST][$this->id] = ['name' => $this->getField('name', true)];
         }
+
+        return $data;
     }
 }
 

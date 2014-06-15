@@ -102,7 +102,12 @@ $lang = array(
         'helpTopics'    => array(
             "Commenting and You",                   "Model Viewer",                         "Screenshots: Tips & Tricks",          "Stat Weighting",
             "Talent Calculator",                    "Item Comparison",                      "Profiler"
-        )
+        ),
+
+        // formating
+        'colon'         => ': ',
+        'dateFmtShort'  => "Y/m/d",
+        'dateFmtLong'   => "Y/m/d \a\\t H:i"
     ),
     'search' => array(
         'search'        => "Search",
@@ -805,10 +810,7 @@ $lang = array(
             "Increases the block value of your shield by %d.",
             "Unknown Bonus #%d (%d)",
         )
-    ),
-    'colon'             => ': ',
-    'dateFmtShort'      => "Y/m/d",
-    'dateFmtLong'       => "Y/m/d \a\\t H:i"
+    )
 );
 
 ?>

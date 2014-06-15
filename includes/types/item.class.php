@@ -20,6 +20,7 @@ class ItemList extends BaseType
 
     private       $ssd        = [];
     private       $vendors    = [];
+    private       $jsGlobals  = [];                         // getExtendedCost creates some and has no access to template
 
     protected     $queryBase  = 'SELECT i.*, i.id AS ARRAY_KEY FROM ?_items i';
     protected     $queryOpts  = array(
@@ -106,13 +107,13 @@ class ItemList extends BaseType
                     if ($_ = @$costs['reqArenaPoints'])
                     {
                         $data[-103] = $_;
-                        Util::$pageTemplate->extendGlobalIds(TYPE_CURRENCY, 103);
+                        $this->jsGlobals[TYPE_CURRENCY][103] = [103];
                     }
 
                     if ($_ = @$costs['reqHonorPoints'])
                     {
                         $data[-104] = $_;
-                        Util::$pageTemplate->extendGlobalIds(TYPE_CURRENCY, 104);
+                        $this->jsGlobals[TYPE_CURRENCY][104] = [104];
                     }
 
                     for ($i = 1; $i < 6; $i++)
@@ -134,7 +135,7 @@ class ItemList extends BaseType
             if ($cItems)
             {
                 $moneyItems = new CurrencyList(array(['itemId', $cItems]));
-                $moneyItems->addGlobalsToJscript();
+                $this->jsGlobals = $moneyItems->getJSGlobals();
 
                 foreach ($itemz as $id => $vendors)
                 {
@@ -157,7 +158,7 @@ class ItemList extends BaseType
                                 }
 
                                 if (!$found)
-                                    Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $k);
+                                    $this->jsGlobals[TYPE_ITEM][$k] = [$k];
                             }
                         }
                         $vendors[$l] = $costs;
@@ -288,7 +289,7 @@ class ItemList extends BaseType
 
                     if ($e = $cost['event'])
                     {
-                        Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $e);
+                        $this->jsGlobals[TYPE_WORLDEVENT][$e] = [$e];
                         $data[$this->id]['condition'] = array(
                             'type'   => TYPE_WORLDEVENT,
                             'typeId' => -$e,
@@ -363,36 +364,33 @@ class ItemList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = GLOBALINFO_SELF)
+    public function getJSGlobals($addMask = GLOBALINFO_SELF, &$extra = [])
     {
+        $data = $this->jsGlobals;
+
         foreach ($this->iterate() as $id => $__)
         {
-            $extra = null;
-            $data  = null;
 
             if ($addMask & GLOBALINFO_SELF)
             {
-                $data = array(
-                    $id => array(
-                        'name'    => $this->getField('name', true),
-                        'quality' => $this->curTpl['quality'],
-                        'icon'    => $this->curTpl['iconString']
-                    )
+                $data[TYPE_ITEM][$id] = array(
+                    'name'    => $this->getField('name', true),
+                    'quality' => $this->curTpl['quality'],
+                    'icon'    => $this->curTpl['iconString']
                 );
             }
 
             if ($addMask & GLOBALINFO_EXTRA)
             {
-                $extra = array(
+                $extra[$id] = array(
                     'id'      => $id,
                     'tooltip' => Util::jsEscape($this->renderTooltip(null, true)),
                     'spells'  => ''
                 );
             }
-
-            if ($data || $extra)
-                Util::$pageTemplate->extendGlobalData(self::$type, $data, $extra);
         }
+
+        return $data;
     }
 
     /*

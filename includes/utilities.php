@@ -16,298 +16,6 @@ class SimpleXML extends SimpleXMLElement
     }
 }
 
-class SmartyAoWoW extends Smarty
-{
-    private $jsGlobals = [];
-    private $notices   = [];
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $cwd = str_replace("\\", "/", getcwd());
-
-        $this->template_dir           = $cwd.'/template/';
-        $this->compile_dir            = $cwd.'/cache/template/';
-        $this->config_dir             = $cwd.'/configs/';
-        $this->cache_dir              = $cwd.'/cache/';
-        $this->debugging              = CFG_DEBUG;
-        $this->left_delimiter         = '{';
-        $this->right_delimiter        = '}';
-        $this->caching                = false;              // Total Cache, this site does not work
-        $this->_tpl_vars              = array(
-            'reqJS'      => [],                             // <[string]> path to required JSFile
-            'reqCSS'     => [],                             // <[string,string]> path to required CSSFile, IE condition
-            'title'      => null,                           // [string] page title
-            'tab'        => null,                           // [int] # of tab to highlight in the menu
-            'type'       => null,                           // [int] numCode for spell, npc, object, ect
-            'typeId'     => null,                           // [int] entry to display
-            'path'       => '[]',                           // [string] (js:array) path to preselect in the menu
-            'jsGlobals'  => [],
-            'redButtons' => [],
-            'headIcons'  => [],                             // icons in front of title
-        );
-        $this->assign('appName', CFG_NAME);
-        $this->assign('AOWOW_REVISION', AOWOW_REVISION);
-    }
-
-    // using Smarty::assign would overwrite every pair and result in undefined indizes
-    public function updatePageVars($pageVars)
-    {
-        if (!is_array($pageVars))
-            return;
-
-        foreach ($pageVars as $var => $val)
-            $this->_tpl_vars[$var] = $val;
-    }
-
-    // use, if you want to alert the staff to a problem with Trinity
-    public function internalNotice($uGroupMask, $str)
-    {
-        $this->notices[] = [$uGroupMask, $str];
-    }
-
-    public function display($tpl)
-    {
-        $tv = &$this->_tpl_vars;
-
-        // fetch article & static infobox
-        if (isset($tv['type']) && isset($tv['typeId']))
-        {
-            $article = DB::Aowow()->selectRow(
-                'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL '.
-                'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = 0 ORDER BY locale DESC LIMIT 1',
-                $tv['type'], $tv['typeId'], User::$localeId,
-                $tv['type'], $tv['typeId']
-            );
-
-            if ($article)
-            {
-                $replace = array(
-                    'script'     => 'scr"+"ipt',
-                    'HOST_URL'   => HOST_URL,
-                    'STATIC_URL' => STATIC_URL
-                );
-                $tv['article'] = ['text' => strtr(Util::jsEscape($article['article']), $replace)];
-
-                if (empty($tv['infobox']) && !empty($article['quickInfo']))
-                    $tv['infobox'] = $article['quickInfo'];
-
-                if ($article['locale'] != User::$localeId)
-                    $tv['article']['params'] = ['prepend' => Util::jsEscape('<div class="notice-box"><span class="icon-bubble">'.Lang::$main['englishOnly'].'</span></div>')];
-
-                foreach ($article as $text)
-                    if (preg_match_all('/\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|title|holiday|class|race|skill|currency)=(\d+)[^\]]*\]/i', $text, $matches, PREG_SET_ORDER))
-                        foreach ($matches as $match)
-                            if ($type = array_search($match[1], Util::$typeStrings))
-                            {
-                                if (!isset($this->jsGlobals[$type]))
-                                    $this->jsGlobals[$type] = [];
-
-                                $this->jsGlobals[$type][] = $match[2];
-                            }
-            }
-        }
-
-        // display occured notices
-        if ($this->notices)
-        {
-            $buff = [];
-            foreach ($this->notices as $data)
-                if (!$data[0] || User::isInGroup($data[0]))
-                    $buff[] = Util::jsEscape($data[1]);
-
-            if ($buff)
-            {
-                if (!isset($tv['announcements']))
-                    $tv['announcements'] = [];
-
-                $tv['announcements'][] = array(
-                    'id'     => 0,
-                    'mode'   => 1,
-                    'status' => 1,
-                    'name'   => 'internal error',
-                    'style'  => 'padding-left: 55px; background-image: url('.STATIC_URL.'/images/announcements/warn-small.png); background-position: 10px center; border: dashed 2px #C03030;',
-                    'text'   => '[span id=inputbox-error]'.implode("[br]", $buff).'[/span]',
-                );
-            }
-        }
-
-        // fetch announcements
-        if (preg_match('/^([a-z\-]+)=?.*$/i', $_SERVER['QUERY_STRING'], $match))
-        {
-            if (!isset($tv['announcements']))
-                $tv['announcements'] = [];
-
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $match[1], User::$groups);
-
-            foreach ($ann as $k => $v)
-            {
-                if ($t = Util::localizedString($v, 'text'))
-                {
-                    $ann[$k]['text'] = Util::jsEscape($t);
-                    $tv['announcements'][] = $ann[$k];
-                }
-            }
-        }
-
-        $this->applyGlobals();
-
-        $tv['mysql'] = DB::Aowow()->getStatistics();
-
-        parent::display($tpl);
-    }
-
-    public function extendGlobalIds($type, $data)
-    {
-        if (!$type || !$data)
-            return false;
-
-        if (!isset($this->jsGlobals[$type]))
-            $this->jsGlobals[$type] = [];
-
-        if (is_array($data))
-        {
-            foreach ($data as $id)
-                $this->jsGlobals[$type][] = (int)$id;
-        }
-        else if (is_numeric($data))
-            $this->jsGlobals[$type][] = (int)$data;
-        else
-            return false;
-
-        return true;
-    }
-
-    public function extendGlobalData($type, $data, $extra = null)
-    {
-        $this->initJSGlobal($type);
-        $_ = &$this->_tpl_vars['jsGlobals'][$type];         // shorthand
-
-        if (is_array($data) && $data)
-            foreach ($data as $id => $set)
-                if (!isset($_[1][$id]))
-                    $_[1][$id] = $set;
-
-        if (is_array($extra) && $extra)
-            $_[2] = $extra;
-    }
-
-    private function initJSGlobal($type)
-    {
-        $jsg = &$this->_tpl_vars['jsGlobals'];              // shortcut
-
-        if (isset($jsg[$type]))
-            return;
-
-        $jsg[$type] = array(
-            (new ReflectionProperty(Util::$typeClasses[$type], 'brickFile'))->getValue(),   // brickfile
-            [],                                                                             // data
-            []                                                                              // extra
-        );
-    }
-
-    private function applyGlobals()
-    {
-        foreach ($this->jsGlobals as $type => $ids)
-        {
-            foreach ($ids as $k => $id)                     // filter already generated data, maybe we can save a lookup or two
-                if (isset($this->_tpl_vars['jsGlobals'][$type][1][$id]))
-                    unset($ids[$k]);
-
-            if (!$ids)
-                continue;
-
-            $this->initJSGlobal($type);
-            $ids = array_unique($ids, SORT_NUMERIC);
-            $cnd = [['id', $ids], 0];
-
-            (new Util::$typeClasses[$type]($cnd))->addGlobalsToJScript(GLOBALINFO_SELF);
-        }
-    }
-
-    public function notFound($subject, $entry)
-    {
-        $this->assign([
-            'typeStr'  => Util::ucFirst($subject),
-            'typeId'   => $entry,
-            'title'    => Lang::$main['nfPageTitle'],
-            'notFound' => sprintf(Lang::$main['pageNotFound'], $subject),
-            'lang'     => Lang::$main,
-            'mysql'    => DB::Aowow()->getStatistics()
-        ]);
-
-        $this->display('text-page-generic.tpl');
-        exit();
-    }
-
-    public function error()
-    {
-        $this->assign([
-            'type'   => -99,                                // get error-article
-            'typeId' => 0,
-            'title'  => Lang::$main['errPageTitle'],
-            'name'   => Lang::$main['errPageTitle'],
-            'lang'   => Lang::$main,
-            'mysql'  => DB::Aowow()->getStatistics()
-        ]);
-
-        $this->display('text-page-generic.tpl');
-        exit();
-    }
-
-    public function brb()
-    {
-        $this->display('brb.tpl');
-        exit();
-    }
-
-    // creates the cache file
-    public function saveCache($key, $data, $filter = null)
-    {
-        if ($this->debugging)
-            return;
-
-        $file = $this->cache_dir.'data/'.$key;
-
-        $cacheData  = time()." ".AOWOW_REVISION."\n";
-        $cacheData .= serialize($this->_tpl_vars)."\n";     // todo(med): this should not be nessecary, rework caching
-        $cacheData .= serialize(str_replace(["\n", "\t"], ['\n', '\t'], $data));
-
-        if ($filter)
-            $cacheData .= "\n".serialize($filter);
-
-        file_put_contents($file, $cacheData);
-    }
-
-    // loads and evaluates the cache file
-    public function loadCache($key, &$data, &$filter = null)
-    {
-        if ($this->debugging)
-            return false;
-
-        $cache = @file_get_contents($this->cache_dir.'data/'.$key);
-        if (!$cache)
-            return false;
-
-        $cache = explode("\n", $cache);
-
-        @list($time, $rev) = explode(' ', $cache[0]);
-        $expireTime = $time + CFG_CACHE_DECAY;
-        if ($expireTime <= time() || $rev < AOWOW_REVISION)
-            return false;
-
-        $this->_tpl_vars = unserialize($cache[1]);
-
-        $data = str_replace(['\n', '\t'], ["\n", "\t"], unserialize($cache[2]));
-
-        if (isset($cache[3]))
-            $filter = unserialize($cache[3]);
-
-        return true;
-    }
-}
-
 class Util
 {
     public static $resistanceFields         = array(
@@ -1002,8 +710,25 @@ class Util
     );
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
+    public static $wowheadLink              = '';
+    private static $notes                    = [];
 
-    public static $pageTemplate             = null;
+    // creates an announcement; use if minor issues arise
+    public static function addNote($uGroupMask, $str)
+    {
+        self::$notes[] = [$uGroupMask, $str];
+    }
+
+    public static function getNotes($restricted = true)
+    {
+        $notes = [];
+
+        foreach (self::$notes as $data)
+            if (!$restricted || ($data[0] && User::isInGroup($data[0])))
+                $notes[] = $data[1];
+
+        return $notes;
+    }
 
     private static $execTime = 0.0;
 
@@ -1254,15 +979,23 @@ class Util
         return 'b'.strToUpper($_);
     }
 
-    public static function jsEscape($string)
+    public static function jsEscape($data)
     {
-        return strtr(trim($string), array(
-            '\\' => '\\\\',
-            "'"  => "\\'",
-            '"'  => '\\"',
-            "\r" => '\\r',
-            "\n" => '\\n'
-        ));
+        if (is_array($data))
+        {
+            foreach ($data as &$v)
+                $v = self::jsEscape($v);
+
+            return $data;
+        }
+        else
+            return strtr(trim($data), array(
+                '\\' => '\\\\',
+                "'"  => "\\'",
+                '"'  => '\\"',
+                "\r" => '\\r',
+                "\n" => '\\n'
+            ));
     }
 
     public static function localizedString($data, $field)
@@ -1603,6 +1336,10 @@ class Util
         return $data;
     }
 
+    /*  todo (xxx): loot is extremly uncreative, messy, incomplete and uncreative
+        the type-lookups in particular should be separated in a way the template can access the required jsGloblas
+    */
+
     /*  from TC wiki
         fishing_loot_template           no relation     entry is linked with ID of the fishing zone or area
         creature_loot_template          entry           many <- many        creature_template       lootid
@@ -1708,7 +1445,7 @@ class Util
             }
             else                                            // shouldn't have happened
             {
-                Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by LootId: unhandled case in calculating chance for item '.$entry['item'].'!');
+                self::addNote(U_GROUP_EMPLOYEE, 'Loot by LootId: unhandled case in calculating chance for item '.$entry['item'].'!');
                 continue;
             }
 
@@ -1722,7 +1459,7 @@ class Util
                 $sum = 0;
             else if ($sum > 100)
             {
-                Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by LootId: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
+                self::addNote(U_GROUP_EMPLOYEE, 'Loot by LootId: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
                 $sum = 100;
             }
 
@@ -1759,7 +1496,7 @@ class Util
             return $lv;
 
         $items = new ItemList(array(['i.id', $struct[1]], CFG_SQL_LIMIT_NONE));
-        $items->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED);
         $foo = $items->getListviewData();
 
         // assign listview LV rows to loot rows, not the other way round! The same item may be contained multiple times
@@ -1914,13 +1651,13 @@ class Util
             {
                 // check for possible database inconsistencies
                 if (!$ref['chance'] && !$ref['isGrouped'])
-                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
+                    self::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] > 100)
-                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
+                    self::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] == 100 && !$ref['chance'])
-                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
+                    self::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
 
                 $chance = abs($ref['chance'] ? $ref['chance'] : (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
 
@@ -2058,7 +1795,7 @@ class Util
                     $srcObj = new QuestList($conditions);
                     if (!$srcObj->error)
                     {
-                        $srcObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+                        $srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
                         $srcData = $srcObj->getListviewData();
 
                         foreach ($srcObj->iterate() as $_)
@@ -2079,7 +1816,7 @@ class Util
                     $srcObj = new SpellList($conditions);
                     if (!$srcObj->error)
                     {
-                        $srcObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                        $srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED);
                         $srcData = $srcObj->getListviewData();
 
                         if (!empty($result))
@@ -2106,7 +1843,7 @@ class Util
                     $srcObj = new $oName(array([$field, $ids]));
                     if (!$srcObj->error)
                     {
-                        $srcObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                        $srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED);
                         $srcData = $srcObj->getListviewData();
 
                         foreach ($srcObj->iterate() as $curTpl)
@@ -2188,6 +1925,50 @@ class Util
         }
 
         return $success;
+    }
+
+    public static function createShowOnMap()
+    {
+        /*
+            quest:          "Quest Givers",
+            daily:          "Quest Givers (Daily)",
+            alliancequests: "Quest Givers",
+            hordequests:    "Quest Givers",
+        */
+    }
+
+    private static $alphaMapCache = [];
+
+    public static function alphaMapCheck($areaId, array &$coords)
+    {
+        $file = 'images\\alphaMaps\\'.$areaId.'.png';
+        if (!file_exists($file))
+        {
+            self::addNote(U_GROUP_STAFF, 'Util::alphaMapCheck no suitable alphaMap found for area '.$areaId.'. Positional check omitted!');
+            return false;
+        }
+
+        if (empty(self::$alphaMapCache[$areaId]))
+            self::$alphaMapCache[$areaId] = imagecreatefrompng($file);
+
+        foreach ($coords as $idx => $set)
+        {
+            // invalid and corner cases (literally)
+            if (!is_array($set) || empty($set['xPos']) || empty($set['yPos']) || $set['xPos'] == 100 || $set['yPos'] == 100)
+            {
+                unset($coords[$idx]);
+                continue;
+            }
+
+            // alphaMaps are 1000 x 1000, adapt points [0 => black => valid point]
+            if (imagecolorat(self::$alphaMapCache[$areaId], $set['xPos'] * 10, $set['yPos'] * 10))
+                unset($coords[$idx]);
+        }
+
+        if ($coords)
+            $coords = array_values($coords);                // kill indizes
+
+        return $coords ? true : false;
     }
 }
 

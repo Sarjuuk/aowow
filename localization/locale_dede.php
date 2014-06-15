@@ -115,7 +115,12 @@ $lang = array(
         'helpTopics'    => array(
             "Wie man Kommentare schreibt",          "Modellviewer",                         "Screenshots: Tipps & Tricks",          "Gewichtung von Werten",
             "Talentrechner",                        "Gegenstandsvergleich",                 "Profiler"
-        )
+        ),
+
+        // formating
+        'colon'         => ': ',
+        'dateFmtShort'  => "d.m.Y",
+        'dateFmtLong'   => "d.m.Y \u\m H:i"
     ),
     'search' => array(
         'search'        => "Suche",
@@ -818,10 +823,7 @@ $lang = array(
             "Erhöht Blockwert um %d.",
             "Unbekannter Bonus #%d (%d)",
         )
-    ),
-    'colon'             => ': ',
-    'dateFmtShort'      => "d.m.Y",
-    'dateFmtLong'       => "d.m.Y \u\m H:i"
+    )
 );
 
 ?>

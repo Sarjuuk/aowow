@@ -107,7 +107,12 @@ $lang = array(
         'helpTopics'    => array(
             "Комментарии и Вы",                     "3D просмотр",                          "Скриншоты: Секреты мастерства",       "Значимость характеристик",
             "Расчёт талантов",                      "Сравнение предметов",                  "Профили персонажей"
-        )
+        ),
+
+        // formating
+        'colon'         => ": ",
+        'dateFmtShort'  => "Y-m-d",
+        'dateFmtLong'   => "Y-m-d в H:i"
     ),
     'search' => array(
         'search'        => "Поиск",
@@ -772,10 +777,7 @@ $lang = array(
             "Увеличивает показатель блокирования щита на %d.",
             "Unknown Bonus #%d (%d)",
         )
-    ),
-    'colon'             => ": ",
-    'dateFmtShort'      => "Y-m-d",
-    'dateFmtLong'       => "Y-m-d в H:i"
+    )
 );
 
 ?>

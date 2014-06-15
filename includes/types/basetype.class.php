@@ -392,7 +392,7 @@ abstract class BaseType
     abstract public function getListviewData();
 
     // should return data to extend global js variables for a certain type (e.g. g_items)
-    abstract public function addGlobalsToJScript($addMask = GLOBALINFO_ANY);
+    abstract public function getJSGlobals($addMask = GLOBALINFO_ANY);
 
     // NPC, GO, Item, Quest, Spell, Achievement, Profile would require this
     abstract public function renderTooltip();

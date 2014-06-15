@@ -8,25 +8,38 @@ ini_set('serialize_precision', 4);
 
 require 'includes/defines.php';
 require 'config/config.php';
-require 'includes/libs/Smarty-2.6.26/libs/Smarty.class.php';    // Libraray: http://www.smarty.net/
+require 'includes/genericPage.class.php';
 require 'includes/libs/DbSimple/Generic.php';                   // Libraray: http://en.dklab.ru/lib/DbSimple (using mysqli variant: https://bitbucket.org/brainreaver/dbsimple/src)
 require 'includes/utilities.php';
 require 'includes/ajaxHandler.class.php';
 require 'includes/user.class.php';
 require 'includes/database.class.php';
+require 'includes/community.class.php';
 require 'localization/lang.class.php';
 
-// autoload List-Classes and Associated Filters
+// autoload List-classes, associated filters and pages
 spl_autoload_register(function ($class) {
     $class = str_replace('Filter', '', $class);
 
-    if (strpos($class, 'List') && !class_exists($class))
+    if (class_exists($class))                               // already registered
+        return;
+
+    if (preg_match('/[^\w]/i', $class))                     // name should contain only letters
+        return;
+
+    if (strpos($class, 'List'))
     {
         if (!class_exists('BaseType'))
             require 'includes/types/basetype.class.php';
 
-        require 'includes/types/'.strtr($class, ['List' => '']).'.class.php';
+        if (file_exists(CWD.'includes/types/'.strtr($class, ['List' => '']).'.class.php'))
+            require 'includes/types/'.strtr($class, ['List' => '']).'.class.php';
+
+        return;
     }
+
+    if (file_exists('pages/'.strtr($class, ['Page' => '']).'.php'))
+        require 'pages/'.strtr($class, ['Page' => '']).'.php';
 });
 
 
@@ -46,6 +59,7 @@ foreach ($AoWoWconf['characters'] as $realm => $charDBInfo)
     if (!empty($charDBInfo))
         DB::load(DB_CHARACTERS + $realm, $charDBInfo);
 
+unset($AoWoWconf);                                          // link set up: delete passwords
 
 // load config to constants
 $sets = DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, intValue as i, strValue as s FROM ?_config');
@@ -54,6 +68,7 @@ foreach ($sets as $k => $v)
 
 define('STATIC_URL', substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1).'/static'); // points js to images & scripts (change here if you want to use a separate subdomain)
 define('HOST_URL',   substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));           // points js to executable files
+define('CWD',        strtr(getcwd(), ['\\' => '/']).'/');
 
 $e = CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0;
 error_reporting($e);
@@ -73,14 +88,6 @@ $_SESSION['timeout'] = time() + CFG_SESSION_TIMEOUT_DELAY;
 
 // debug: measure execution times
 Util::execTime(CFG_DEBUG);
-
-
-// create Template-Object
-$smarty = new SmartyAoWoW($AoWoWconf);
-
-
-// attach template to util (yes bandaid, shut up and code me a fix)
-Util::$pageTemplate = &$smarty;
 
 
 // Setup Session
@@ -110,15 +117,10 @@ else
 
 User::setLocale();
 
-
-// assign lang/locale, userdata, characters and custom profiles
-User::assignUserToTemplate($smarty, true);
-
-
 // parse page-parameters .. sanitize before use!
 @list($str, $trash) = explode('&', $_SERVER['QUERY_STRING'], 2);
 @list($pageCall, $pageParam) = explode('=', $str, 2);
-$smarty->assign('wowhead', 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/'.$str);
+Util::$wowheadLink = 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/'.$str;
 
 $ajax = new AjaxHandler($pageParam);
 

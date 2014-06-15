@@ -120,10 +120,14 @@ class GameObjectList extends BaseType
         return $this->tooltips[$this->id];
     }
 
-    public function addGlobalsToJScript($addMask = 0)
+    public function getJSGlobals($addMask = 0)
     {
-        foreach ($this->iterate() as $id => $__)
-            Util::$pageTemplate->extendGlobalData(self::$type, [$id => ['name' => $this->getField('name', true)]]);
+        $data = [];
+
+        foreach ($this->iterate() as $__)
+            $data[TYPE_OBJECT][$this->id] = ['name' => $this->getField('name', true)];
+
+        return $data;
     }
 }
 

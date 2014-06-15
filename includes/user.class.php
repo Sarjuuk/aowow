@@ -253,45 +253,34 @@ class User
         );
     }
 
-    public static function assignUserToTemplate(&$smarty)
+    public static function getUserGlobals()
     {
         $set = array(
-            'id'       => self::$id,
-            'locale'   => self::$localeId,
-            'language' => self::$localeString,
-            'name'     => self::$displayName ? self::$displayName : '',
-            'perms'    => self::$perms ? self::$perms : 0,
-            'roles'    => self::$groups ? self::$groups : 0,
-            'cookies'  => '[]'
+            'commentban'  => false,                         // enforce this for now
+            'ratingban'   => false,                         // enforce this for now
+            'id'          => self::$id,
+            'name'        => self::$displayName ? self::$displayName : '',
+            'roles'       => self::$groups      ? self::$groups      : 0,
+            'permissions' => self::$perms       ? self::$perms       : 0,
+            'cookies'     => []
         );
 
-        if (self::$id > 0)
-        {
-            $subSet = array(
-                'login'     => self::$user,
-                'wow'       => self::$authId,               // todo: get account name from id
-                'email'     => self::$email,
-                'lastIP'    => self::$lastIP,
-                'lastLogin' => self::$lastLogin,
-                'joinDate'  => self::$joindate,
-                'banned'    => self::$banned,               // todo: get duration, banner, reason
-                'unbanDate' => self::$unbanDate,
-                'bannedBy'  => self::$bannedBy,
-                'banReason' => self::$banReason,
-                'avatar'    => self::$avatar,
-                'community' => self::$description,
-                'chars'     => self::getCharacters(),
-                'profiles'  => self::getProfiles(),
-                'cookies'   => self::getCookies(),
-            );
+        if (!self::$id)
+            return $set;
 
-            if ($_ = self::getWeightScales())
-                $subSet['weights'] = json_encode($_, JSON_NUMERIC_CHECK);
+        if ($_ = self::getCharacters())
+            $subSet['characters'] = json_encode($_, JSON_NUMERIC_CHECK);
 
-            $smarty->assign('user', array_merge($set, $subSet));
-        }
-        else
-            $smarty->assign('user', $set);
+        if ($_ = self::getProfiles())
+            $subSet['profiles'] = json_encode($_, JSON_NUMERIC_CHECK);
+
+        if ($_ = self::getWeightScales())
+            $subSet['weightscales'] = json_encode($_, JSON_NUMERIC_CHECK);
+
+        if ($_ = self::getCookies())
+            $subSet['cookies'] = json_encode($_, JSON_NUMERIC_CHECK);
+
+        return array_merge($set, $subSet);
     }
 
     public static function getWeightScales()

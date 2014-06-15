@@ -107,7 +107,12 @@ $lang = array(
         'helpTopics'    => array(
             "Le guide du commentaire",              "Visionneuse 3D",                       "Captures d'écran : Trucs et astuces",  "Échelles de valeurs",
             "Calculateur de talents",               "Comparaison d'objets",                 "Profiler"
-        )
+        ),
+
+        // formating
+        'colon'         => ' : ',
+        'dateFmtShort'  => "Y-m-d",
+        'dateFmtLong'   => "Y-m-d à H:i"
     ),
     'search' => array(
         'search'        => "Recherche",
@@ -773,10 +778,7 @@ $lang = array(
             "Augmente la valeur de blocage de votre bouclier de %d.",
             "Stat Inutilisée #%d (%d)",
         )
-    ),
-    'colon'             => ' : ',
-    'dateFmtShort'      => "Y-m-d",
-    'dateFmtLong'       => "Y-m-d à H:i"
+    )
 );
 
 ?>

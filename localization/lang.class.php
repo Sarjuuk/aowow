@@ -27,10 +27,6 @@ class Lang
     public static $title;
     public static $zone;
 
-    public static $colon;
-    public static $dateFmtLong;
-    public static $dateFmtShort;
-
     public static function load($loc)
     {
         if (!file_exists('localization/locale_'.$loc.'.php'))
