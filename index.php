@@ -15,19 +15,16 @@ require 'includes/kernel.php';
 if (version_compare(PHP_VERSION, '5.4.0') <= 0)
 {
     if (User::isInGroup(U_GROUP_EMPLOYEE))
-        $smarty->internalNotice(U_GROUP_EMPLOYEE, 'PHP Version 5.4.0 or higher required! Your version is '.PHP_VERSION."\nCore functions are unavailable!");
+        Util::addNote(U_GROUP_EMPLOYEE, 'PHP Version 5.4.0 or higher required! Your version is '.PHP_VERSION."[br]Core functions are unavailable!");
     else
-        $smarty->brb();
+        (new GenericPage)->maintenance();
 }
-
-if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE))
-    $smarty->brb();
-else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
-    $smarty->internalNotice(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
 
 switch ($pageCall)
 {
     /* called by user */
+    case '':                                                // no parameter given -> MainPage
+        $pageCall = 'main';
     case 'account':                                         // account management [nyi]
     case 'achievement':
     case 'achievements':
@@ -73,15 +70,10 @@ switch ($pageCall)
     case 'user':                                            // tool: user profiles [nyi]
     case 'zone':
     case 'zones':
-        if (file_exists('pages/'.$pageCall.'.php'))
-            require 'pages/'.$pageCall.'.php';
-        else
-            $smarty->error();
+        $_ = $pageCall.'Page';
+        new $_($pageParam);
         break;
     /* other pages */
-    case '':                                                // no parameter given -> MainPage
-        require 'pages/main.php';
-        break;
     case 'whats-new':
     case 'searchplugins':
     case 'searchbox':
@@ -89,7 +81,7 @@ switch ($pageCall)
     case 'help':
     case 'faq':
     case 'aboutus':
-        require 'pages/more.php';
+        new MorePage($pageCall);
         break;
     case 'latest-additions':
     case 'latest-articles':
@@ -141,7 +133,7 @@ switch ($pageCall)
         if (isset($_GET['power']))
             die('$WowheadPower.register(0, '.User::$localeId.', {})');
         else                                                // in conjunction with a propper rewriteRule in .htaccess...
-            $smarty->error();
+            (new GenericPage)->error();
         break;
 }
 

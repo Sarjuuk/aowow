@@ -5,22 +5,26 @@ if (!defined('AOWOW_REVISION'))
 
 
 /*
-    todo:
+    todo (med):
         - different styles for newsbox
         - flags for news .. disabled, deleted, recurring, whatever..
 */
 
-// load news
-$rows = DB::Aowow()->select('SELECT * FROM ?_news ORDER BY time DESC, id DESC LIMIT 5');
+class MainPage extends GenericPage
+{
+    protected $tpl  = 'main';
+    protected $news = [];
 
-foreach ($rows as $i => $row)
-    $rows[$i]['text'] = Util::localizedString($row, 'text');
+    protected function generateContent()
+    {
+        // load news
+        $rows = DB::Aowow()->select('SELECT * FROM ?_news ORDER BY time DESC, id DESC LIMIT 5');
+        foreach ($rows as $i => $row)
+            $this->news[$i]['text'] = Util::localizedString($row, 'text');
+    }
 
-
-$smarty->assign('news', isset($rows) ? $rows : NULL);
-$smarty->assign('lang', Lang::$main);
-
-// load the page
-$smarty->display('main.tpl');
+    protected function generateTitle() {}
+    protected function generatePath() {}
+}
 
 ?>

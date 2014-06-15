@@ -11131,7 +11131,8 @@ Listview.templates = {
                             buff  = 'coexist';              // without condition
                             break;
                         case 2:
-                            buff2 = '(from same caster)';
+                        case 4:
+                            buff2 = spell.stackRule == 2 ? '(from same caster)' : '(strongest effect is applied)';
                         case 1:
                             buff  = 'exclusive';            // without condition
                             break;

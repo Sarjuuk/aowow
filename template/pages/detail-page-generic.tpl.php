@@ -23,7 +23,7 @@
     $this->brick('redButtons');
 ?>
 
-                <h1<?php echo isset($this->expansion) ? 'class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->name.'</span>' : '>'.$this->name; ?></h1>
+                <h1<?php echo isset($this->expansion) ? ' class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->name.'</span>' : '>'.$this->name; ?></h1>
 
 <?php
     $this->brick('article');

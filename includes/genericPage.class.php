@@ -6,8 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 trait DetailPage
 {
-
-    // require 'includes/community.class.php';
+    protected $hasComContent = true;
 
     function generateCacheKey($cacheType, $params = '-1')
     {
@@ -53,7 +52,6 @@ class GenericPage
     protected $name             = '';                       // for h1-Element
     protected $tabId            = 0;
     protected $community        = ['co' => [], 'sc' => [], 'vi' => []];
-    protected $hasComContent    = false;
 
     private   $js               = [];
     private   $css              = [];
@@ -103,7 +101,7 @@ class GenericPage
             $this->saveCache();
         }
 
-        if ($this->hasComContent)
+        if (!empty($this->hasComContent))
             $this->community = CommunityContent::getAll($this->type, $this->typeId);
 
         $this->mysql = DB::Aowow()->getStatistics();

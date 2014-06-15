@@ -1,5 +1,4 @@
 var _ = g_holidays;
-{strip}
 <?php
 foreach ($vars as $id => $data):
     echo '_['.$id.']={' .

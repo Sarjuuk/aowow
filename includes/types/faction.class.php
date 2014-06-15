@@ -12,7 +12,8 @@ class FactionList extends BaseType
     protected     $queryBase = 'SELECT f.*, f.parentFactionId AS cat2, f.id AS ARRAY_KEY FROM ?_factions f';
     protected     $queryOpts = array(
                       'f'  => [['f2']],
-                      'f2' => ['j' => ['?_factions f2 ON f.parentFactionId = f2.id', true], 's' => ', IFNULL(f2.parentFactionId, 0) AS cat']
+                      'f2' => ['j' => ['?_factions f2 ON f.parentFactionId = f2.id', true], 's' => ', IFNULL(f2.parentFactionId, 0) AS cat'],
+                      'ft' => ['j' => '?_factiontemplate ft ON ft.factionId = f.id']
                   );
 
     public function __construct($conditions = [])
