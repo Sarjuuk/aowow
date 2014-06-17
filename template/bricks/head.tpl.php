@@ -12,11 +12,11 @@
 <?php
 foreach ($this->css as $css):
     if (!empty($css['string'])):
-        echo    '<style type="text/css">'.$css['string']."</style>\n";
+        echo '    <style type="text/css">'.$css['string']."</style>\n";
     elseif (!empty($css['path'])):
-        echo    (!empty($css['ieCond']) ? '<!--[if '.$css['ieCond'].']>' : null) .
-                '<link rel="stylesheet" type="text/css" href="'.$css['.path'].'?'.AOWOW_REVISION.'" />' .
-                (!empty($css['ieCond']) ? '<![endif]-->' : null);
+        echo '    '.(!empty($css['ieCond']) ? '<!--[if '.$css['ieCond'].']>' : null) .
+                '<link rel="stylesheet" type="text/css" href="'.$css['path'].'?'.AOWOW_REVISION.'" />' .
+                (!empty($css['ieCond']) ? '<![endif]-->' : null)."\n";
     endif;
 endforeach;
 ?>
@@ -39,7 +39,7 @@ endif;
 <?php
 foreach ($this->js as $js):
     if (!empty($js)):
-        echo '<script src="'.$js.($file[0] == '?' ? '&' : '?').AOWOW_REVISION."\" type=\"text/javascript\"></script>\n";
+        echo '    <script src="'.$js.($js[0] == '?' ? '&' : '?').AOWOW_REVISION."\" type=\"text/javascript\"></script>\n";
     endif;
 endforeach;
 ?>

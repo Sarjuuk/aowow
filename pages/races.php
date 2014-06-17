@@ -18,9 +18,9 @@ class RacesPage extends GenericPage
 
     public function __construct()
     {
-        $this->name = Util::ucFirst(Lang::$game['races']);
-
         parent::__construct();
+
+        $this->name = Util::ucFirst(Lang::$game['races']);
     }
 
     protected function generateContent()

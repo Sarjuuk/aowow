@@ -18,11 +18,13 @@ class ClassPage extends GenericPage
     protected $mode          = CACHETYPE_PAGE;
     protected $js            = ['swfobject.js'];
 
-    public function __construct($id)
+    public function __construct($__, $id)
     {
+        parent::__construct();
+
         $this->typeId = intVal($id);
 
-        $this->subject = new CharClassList(array(['id', $id]));
+        $this->subject = new CharClassList(array(['id', $this->typeId]));
         if ($this->subject->error)
             $this->notFound(Lang::$game['class']);
 
@@ -32,8 +34,6 @@ class ClassPage extends GenericPage
             'typeId' => $this->typeId,
             'name'   => $this->name
         );
-
-        parent::__construct();
     }
 
     protected function generatePath()

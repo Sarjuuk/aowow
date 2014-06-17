@@ -20,11 +20,12 @@ if (version_compare(PHP_VERSION, '5.4.0') <= 0)
         (new GenericPage)->maintenance();
 }
 
+$altClass = '';
 switch ($pageCall)
 {
     /* called by user */
     case '':                                                // no parameter given -> MainPage
-        $pageCall = 'main';
+        $altClass = 'main';
     case 'account':                                         // account management [nyi]
     case 'achievement':
     case 'achievements':
@@ -52,6 +53,9 @@ switch ($pageCall)
     case 'objects':
     case 'pet':
     case 'pets':
+    case 'petcalc':                                         // tool: pet talent calculator
+        if ($pageCall == 'petcalc')
+            $altClass = 'talent';
     case 'profile':                                         // character profiler [nyi]
     case 'profiles':                                        // character profile listing [nyi]
     case 'quest':
@@ -65,13 +69,14 @@ switch ($pageCall)
     // case 'sounds':
     case 'spell':
     case 'spells':
+    case 'talent':                                          // tool: talent calculator
     case 'title':
     case 'titles':
     case 'user':                                            // tool: user profiles [nyi]
     case 'zone':
     case 'zones':
-        $_ = $pageCall.'Page';
-        new $_($pageParam);
+        $_ = ($altClass ?: $pageCall).'Page';
+        (new $_($pageCall, $pageParam))->display();
         break;
     /* other pages */
     case 'whats-new':
@@ -81,7 +86,7 @@ switch ($pageCall)
     case 'help':
     case 'faq':
     case 'aboutus':
-        new MorePage($pageCall);
+        (new MorePage($pageCall, $pageParam))->display();
         break;
     case 'latest-additions':
     case 'latest-articles':
@@ -93,11 +98,6 @@ switch ($pageCall)
     case 'most-comments':
     case 'random':
         require 'pages/miscTools.php';
-        break;
-    case 'petcalc':                                         // tool: pet talent calculator
-        $petCalc = true;
-    case 'talent':                                          // tool: talent calculator
-        require 'pages/talent.php';
         break;
     /* called by script */
     case 'data':                                            // tool: dataset-loader

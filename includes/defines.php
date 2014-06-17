@@ -30,6 +30,7 @@ define('CACHETYPE_TOOLTIP',                 1);
 define('CACHETYPE_BUFF',                    2);             // only used by spells obviously
 define('CACHETYPE_SEARCH',                  3);
 define('CACHETYPE_XML',                     4);             // only used by items
+define('CACHETYPE_NONE',                    5);             // page will not be cached
 
 define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);

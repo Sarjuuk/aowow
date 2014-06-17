@@ -18,11 +18,11 @@ class RacePage extends GenericPage
     protected $mode          = CACHETYPE_PAGE;
     protected $js            = ['swfobject.js'];
 
-    public function __construct($id)
+    public function __construct($__, $id)
     {
         $this->typeId = intVal($id);
 
-        $this->subject = new CharRaceList(array(['id', $id]));
+        $this->subject = new CharRaceList(array(['id', $this->typeId]));
         if ($this->subject->error)
             $this->notFound(Lang::$game['race']);
 

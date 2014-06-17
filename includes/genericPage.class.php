@@ -24,6 +24,7 @@ trait ListPage
 {
     protected $category  = null;
     protected $validCats = [];
+    protected $typeId    = 0;
 
     function generateCacheKey($cacheType)
     {
@@ -53,16 +54,16 @@ class GenericPage
     protected $tabId            = 0;
     protected $community        = ['co' => [], 'sc' => [], 'vi' => []];
 
-    private   $js               = [];
-    private   $css              = [];
+    protected $js               = [];
+    protected $css              = [];
 
     private   $gLocale          = [];
     protected $gPageInfo        = [];
     private   $gUser            = [];
 
-	protected function generatePath() {}
-	protected function generateTitle() {}
-	protected function generateContent() {}
+    protected function generatePath() {}
+    protected function generateTitle() {}
+    protected function generateContent() {}
 
     public function __construct()
     {
@@ -86,7 +87,10 @@ class GenericPage
 
         if (!$this->tpl)
             return;
+    }
 
+    private function prepare()
+    {
         if (!$this->loadCache())
         {
             // run generators
@@ -105,22 +109,23 @@ class GenericPage
             $this->community = CommunityContent::getAll($this->type, $this->typeId);
 
         $this->mysql = DB::Aowow()->getStatistics();
-
-        $this->display();
     }
 
-	public function display($override = '')
-	{
+    public function display($override = '')
+    {
+        if (!$override)
+            $this->prepare();
+
         if (!$override && !$this->isSaneInclude('template/pages/', $this->tpl))
             die(User::isInGroup(U_GROUP_STAFF) ? 'Error: nonexistant template requestst: template/pages/'.$this->tpl.'.tpl.php' : null);
 
         $this->addAnnouncements();
 
         include('template/pages/'.($override ? $override : $this->tpl).'.tpl.php');
-	}
+    }
 
-	public function gBrick($file, array $localVars = [])
-	{
+    public function gBrick($file, array $localVars = [])
+    {
         foreach ($localVars as $n => $v)
             $$n = $v;
 
@@ -128,10 +133,10 @@ class GenericPage
             echo !User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requestst: template/globals/".$file.".tpl.php\n\n" : null;
         else
             include('template/globals/'.$file.'.tpl.php');
-	}
+    }
 
-	public function brick($file, array $localVars = [])
-	{
+    public function brick($file, array $localVars = [])
+    {
         foreach ($localVars as $n => $v)
             $$n = $v;
 
@@ -139,10 +144,10 @@ class GenericPage
             echo User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requestst: template/bricks/".$file.".tpl.php\n\n" : null;
         else
             include('template/bricks/'.$file.'.tpl.php');
-	}
+    }
 
-	public function lvBrick($file, array $localVars = [])
-	{
+    public function lvBrick($file, array $localVars = [])
+    {
         foreach ($localVars as $n => $v)
             $$n = $v;
 
@@ -150,7 +155,7 @@ class GenericPage
             echo User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requestst: template/listviews/".$file.".tpl.php\n\n" : null;
         else
             include('template/listviews/'.$file.'.tpl.php');
-	}
+    }
 
     private function isSaneInclude($path, $file)
     {
@@ -163,31 +168,41 @@ class GenericPage
         return true;
     }
 
-	public function addJS($name, $unshift = false)
-	{
-		if (!in_array($name, $this->js))
-		{
-			if ($unshift)
-				array_unshift($this->js, $name);
-			else
-				$this->js[] = $name;
-		}
-	}
+    public function addJS($name, $unshift = false)
+    {
+        if (is_array($name))
+        {
+            foreach ($name as $n)
+                $this->addJS($n, $unshift);
+        }
+        else if (!in_array($name, $this->js))
+        {
+            if ($unshift)
+                array_unshift($this->js, $name);
+            else
+                $this->js[] = $name;
+        }
+    }
 
-	public function addCSS($name, $unshift = false)
-	{
-		if (!in_array($name, $this->css))
-		{
-			if ($unshift)
-				array_unshift($this->css, $name);
-			else
-				$this->css[] = $name;
-		}
-	}
+    public function addCSS($struct, $unshift = false)
+    {
+        if (is_array($struct) && empty($struct['path']) && empty($struct['string']))
+        {
+            foreach ($struct as $s)
+                $this->addCSS($s, $unshift);
+        }
+        else if (!in_array($struct, $this->css))
+        {
+            if ($unshift)
+                array_unshift($this->css, $struct);
+            else
+                $this->css[] = $struct;
+        }
+    }
 
     private function addArticle()                           // fetch article & static infobox
     {
-        if (empty($this->type) || !isset($this->typeId))
+        if (empty($this->type) && !isset($this->typeId))
             return;
 
         $article = DB::Aowow()->selectRow(
@@ -216,10 +231,17 @@ class GenericPage
                 }
             }
 
+            $replace = array(
+                '<script'    => '<scr"+"ipt',
+                'script>'    => 'scr"+"ipt>',
+                'HOST_URL'   => HOST_URL,
+                'STATIC_URL' => STATIC_URL
+            );
             $this->article = array(
-                'text'   => $article['article'],
+                'text'   => strtr($article['article'], $replace),
                 'params' => []
             );
+
             if (empty($this->infobox) && !empty($article['quickInfo']))
                 $this->infobox = $article['quickInfo'];
 
