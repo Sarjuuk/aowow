@@ -46,12 +46,7 @@ class ObjectPage extends GenericPage
         if ($this->subject->error)
             $this->notFound(Lang::$game['gameObject']);
 
-        $this->name      = $this->subject->getField('name', true);
-        $this->gPageInfo = array(
-            'type'   => $this->type,
-            'typeId' => $this->typeId,
-            'name'   => $this->name
-        );
+        $this->name = $this->subject->getField('name', true);
     }
 
     protected function generatePath()
@@ -483,7 +478,6 @@ class ObjectPage extends GenericPage
         }
     }
 
-
     protected function generateTooltip($asError = false)
     {
         if ($asError)
@@ -499,7 +493,6 @@ class ObjectPage extends GenericPage
 
         return $x;
     }
-
 }
 
 ?>

@@ -19,406 +19,394 @@ if (!defined('AOWOW_REVISION'))
 *       }
 */
 
-require 'includes/community.class.php';
-
-$_id = intVal($pageParam);
-
-$cacheKeyPage    = implode('_', [CACHETYPE_PAGE,    TYPE_ACHIEVEMENT, $_id, -1, User::$localeId]);
-$cacheKeyTooltip = implode('_', [CACHETYPE_TOOLTIP, TYPE_ACHIEVEMENT, $_id, -1, User::$localeId]);
-
-// AowowPower-request
-if (isset($_GET['power']))
+// menuId 9: Achievement g_initPath()
+//  tabId 0: Database    g_initHeader()
+class AchievementPage extends GenericPage
 {
-    header('Content-type: application/x-javascript; charsetUTF-8');
+    use DetailPage;
 
-    Util::powerUseLocale(@$_GET['domain']);
+    protected $type          = TYPE_ACHIEVEMENT;
+    protected $typeId        = 0;
+    protected $tpl           = 'achievement';
+    protected $path          = [0, 9];
+    protected $tabId         = 0;
+    protected $mode          = CACHETYPE_PAGE;
 
-    if (!$smarty->loadCache($cacheKeyTooltip, $x))
+    public function __construct($__, $id)
     {
-        $acv = new AchievementList(array(['id', $_id]));
-        if ($acv->error)
-            die('$WowheadPower.registerAchievement(\''.$_id.'\', '.User::$localeId.', {})');
+        parent::__construct();
 
-        $x = '$WowheadPower.registerAchievement('.$_id.', '.User::$localeId.",{\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($acv->getField('name', true))."',\n";
-        $x .= "\ticon: '".urlencode($acv->getField('iconString'))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".$acv->renderTooltip()."'\n";
-        $x .= "});";
+        // temp locale
+        if ($this->mode == CACHETYPE_TOOLTIP && isset($_GET['domain']))
+            Util::powerUseLocale($_GET['domain']);
 
-        $smarty->saveCache($cacheKeyTooltip, $x);
-    }
-    die($x);
-}
+        $this->typeId = intVal($id);
 
-// regular page
-if (!$smarty->loadCache($cacheKeyPage, $pageData))
-{
-    $acv = new AchievementList(array(['id', $_id]));
-    if ($acv->error)
-        $smarty->notFound(Lang::$game['achievement'], $_id);
+        $this->subject = new AchievementList(array(['id', $this->typeId]));
+        if ($this->subject->error)
+            $this->notFound(Lang::$game['achievement']);
 
-    // create page title and path
-    $curCat  = $acv->getField('category');
-    $path    = [];
-    do
-    {
-        array_unshift($path, $curCat);
-        $curCat = DB::Aowow()->SelectCell('SELECT parentCategory FROM ?_achievementcategory WHERE id = ?d', $curCat);
-    }
-    while ($curCat > 0);
+        $this->extendGlobalData($this->subject->getJSGlobals(GLOBALINFO_REWARDS));
 
-    array_unshift($path, 0, 9);
-
-    $acv->addGlobalsToJScript(GLOBALINFO_REWARDS);
-
-    /***********/
-    /* Infobox */
-    /***********/
-
-    $infobox = [];
-
-    // points
-    if ($_ = $acv->getField('points'))
-        $infobox[] = Lang::$achievement['points'].Lang::$colon.'[achievementpoints='.$_.']';
-
-    // location
-        // todo (low)
-
-    // faction
-    switch ($acv->getField('faction'))
-    {
-        case 1:
-            $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=icon-alliance]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
-            break;
-        case 2:
-            $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=icon-horde]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
-            break;
-        default:                                        // case 3
-            $infobox[] = Lang::$main['side'].Lang::$colon.Lang::$game['si'][SIDE_BOTH];
+        $this->name = $this->subject->getField('name', true);
     }
 
-    // todo (low): crosslink with charactersDB to check if realmFirsts are still available
-
-    $infobox = array_merge($infobox, Lang::getInfoBoxForFlags($acv->getField('cuFlags')));
-
-    /**********/
-    /* Series */
-    /**********/
-
-    $series = [];
-
-    if ($c = $acv->getField('chainId'))
+    protected function generatePath()
     {
-        $chainAcv = new AchievementList(array(['chainId', $c]));
-
-        foreach ($chainAcv->iterate() as $aId => $__)
+        // create page title and path
+        $curCat = $this->subject->getField('category');
+        do
         {
-            $pos = $chainAcv->getField('chainPos');
-            if (!isset($series[$pos]))
-                $series[$pos] = [];
-
-            $series[$pos][] = array(
-                'side'    => $chainAcv->getField('faction'),
-                'typeStr' => Util::$typeStrings[TYPE_ACHIEVEMENT],
-                'typeId'  => $aId,
-                'name'    => $chainAcv->getField('name', true)
-            );
+            array_unshift($this->path, $curCat);
+            $curCat = DB::Aowow()->SelectCell('SELECT parentCategory FROM ?_achievementcategory WHERE id = ?d', $curCat);
         }
+        while ($curCat > 0);
+
+        array_unshift($this->path, 0, 9);
+        $this->path[] = $this->subject->getField('typeCat');
     }
 
-    /****************/
-    /* Main Content */
-    /****************/
-
-    // menuId 9: Achievement  g_initPath()
-    //  tabId 0: Database     g_initHeader()
-    $pageData = array(
-        'page'    => array(
-            'title'       => $acv->getField('name', true).' - '.Util::ucfirst(Lang::$game['achievement']),
-            'path'        => json_encode($path, JSON_NUMERIC_CHECK),
-            'tab'         => 0,
-            'type'        => TYPE_ACHIEVEMENT,
-            'typeId'      => $_id,
-            'headIcons'   => $acv->getField('iconString'),
-            'infobox'     => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
-            'series'      => $series ? [[$series, null]] : null,
-            'redButtons'  => array(
-                BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$_id.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0'],
-                BUTTON_WOWHEAD => true
-            ),
-            'name'        => $acv->getField('name', true),
-            'description' => $acv->getField('description', true),
-            'count'       => $acv->getField('reqCriteriaCount'),
-            'reward'      => $acv->getField('reward', true),
-            'nCriteria'   => count($acv->getCriteria()),
-            'titleReward' => [],
-            'itemReward'  => [],
-            'criteria'    => [],
-            'icons'       => []
-        ),
-        'relTabs' => []
-    );
-
-    // create rewards
-    if ($foo = $acv->getField('rewards')[TYPE_ITEM])
+    protected function generateTitle()
     {
-        $bar = new ItemList(array(['i.id', $foo]));
-        foreach ($bar->iterate() as $id => $__)
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['achievement']));
+    }
+
+    protected function generateContent()
+    {
+        /***********/
+        /* Infobox */
+        /***********/
+
+        $infobox = [];
+
+        // points
+        if ($_ = $this->subject->getField('points'))
+            $infobox[] = Lang::$achievement['points'].Lang::$main['colon'].'[achievementpoints='.$_.']';
+
+        // location
+            // todo (low)
+
+        // faction
+        switch ($this->subject->getField('faction'))
         {
-            $pageData['page']['itemReward'][] = array(
-                'name'      => $bar->getField('name', true),
-                'quality'   => $bar->getField('quality'),
-                'typeStr'   => Util::$typeStrings[TYPE_ITEM],
-                'id'        => $id,
-                'globalStr' => 'g_items'
-            );
+            case 1:
+                $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-alliance]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
+                break;
+            case 2:
+                $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-horde]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
+                break;
+            default:                                        // case 3
+                $infobox[] = Lang::$main['side'].Lang::$main['colon'].Lang::$game['si'][SIDE_BOTH];
         }
-    }
 
-    if ($foo = $acv->getField('rewards')[TYPE_TITLE])
-    {
-        $bar = new TitleList(array(['id', $foo]));
-        foreach ($bar->iterate() as $__)
-            $pageData['page']['titleReward'][] = sprintf(Lang::$achievement['titleReward'], $bar->id, trim(str_replace('%s', '', $bar->getField('male', true))));
-    }
+        // todo (low): crosslink with charactersDB to check if realmFirsts are still available
 
-    /**************/
-    /* Extra Tabs */
-    /**************/
+        $infobox = array_merge($infobox, Lang::getInfoBoxForFlags($this->subject->getField('cuFlags')));
 
-    // tab: see also
-    $conditions = array(
-        ['name_loc'.User::$localeId, $acv->getField('name', true)],
-        ['id', $_id, '!']
-    );
-    $saList = new AchievementList($conditions);
-    $pageData['relTabs'][] = array(
-        'file'   => 'achievement',
-        'data'   => $saList->getListviewData(),
-        'params' => array(
-            'id'          => 'see-also',
-            'name'        => '$LANG.tab_seealso',
-            'visibleCols' => "$['category']",
-            'tabs'        => '$tabsRelated'
-        )
-    );
+        /**********/
+        /* Series */
+        /**********/
 
-    $saList->addGlobalsToJscript();
+        $series = [];
 
-    // tab: criteria of
-    $refs = DB::Aowow()->SelectCol('SELECT refAchievementId FROM ?_achievementcriteria WHERE Type = ?d AND value1 = ?d',
-        ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT,
-        $_id
-    );
-    if (!empty($refs))
-    {
-        $coList = new AchievementList(array(['id', $refs]));
-        $pageData['relTabs'][] = array(
+        if ($c = $this->subject->getField('chainId'))
+        {
+            $chainAcv = new AchievementList(array(['chainId', $c]));
+
+            foreach ($chainAcv->iterate() as $aId => $__)
+            {
+                $pos = $chainAcv->getField('chainPos');
+                if (!isset($series[$pos]))
+                    $series[$pos] = [];
+
+                $series[$pos][] = array(
+                    'side'    => $chainAcv->getField('faction'),
+                    'typeStr' => Util::$typeStrings[TYPE_ACHIEVEMENT],
+                    'typeId'  => $aId,
+                    'name'    => $chainAcv->getField('name', true)
+                );
+            }
+        }
+
+        /****************/
+        /* Main Content */
+        /****************/
+
+        $this->headIcons   = [$this->subject->getField('iconString')];
+        $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
+        $this->series      = $series ? [[$series, null]] : null;
+        $this->description = $this->subject->getField('description', true);
+        $this->redButtons  = array(
+            BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$this->typeId.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0'],
+            BUTTON_WOWHEAD => !($this->subject->getField('cuFlags') & CUSTOM_SERVERSIDE)
+        );
+        $this->criteria    = array(
+            'reqQty' => $this->subject->getField('reqCriteriaCount'),
+            'icons'  => [],
+            'data'   => []
+        );
+
+        // create rewards
+        if ($foo = $this->subject->getField('rewards')[TYPE_ITEM])
+        {
+            $bar = new ItemList(array(['i.id', $foo]));
+            foreach ($bar->iterate() as $id => $__)
+            {
+                $this->rewards['item'][] = array(
+                    'name'      => $bar->getField('name', true),
+                    'quality'   => $bar->getField('quality'),
+                    'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                    'id'        => $id,
+                    'globalStr' => 'g_items'
+                );
+            }
+        }
+
+        if ($foo = $this->subject->getField('rewards')[TYPE_TITLE])
+        {
+            $bar = new TitleList(array(['id', $foo]));
+            foreach ($bar->iterate() as $__)
+                $this->rewards['title'][] = sprintf(Lang::$achievement['titleReward'], $bar->id, trim(str_replace('%s', '', $bar->getField('male', true))));
+        }
+
+        $this->rewards['text'] = $this->subject->getField('reward', true);
+
+        /**************/
+        /* Extra Tabs */
+        /**************/
+
+        // tab: see also
+        $conditions = array(
+            ['name_loc'.User::$localeId, $this->subject->getField('name', true)],
+            ['id', $this->typeId, '!']
+        );
+        $saList = new AchievementList($conditions);
+        $this->lvData[] = array(
             'file'   => 'achievement',
-            'data'   => $coList->getListviewData(),
+            'data'   => $saList->getListviewData(),
             'params' => array(
-                'id'          => 'criteria-of',
-                'name'        => '$LANG.tab_criteriaof',
+                'id'          => 'see-also',
+                'name'        => '$LANG.tab_seealso',
                 'visibleCols' => "$['category']",
                 'tabs'        => '$tabsRelated'
             )
         );
+        $this->extendGlobalData($saList->getJSGlobals());
 
-        $coList->addGlobalsToJscript();
-    }
-
-    /*****************/
-    /* Criteria List */
-    /*****************/
-
-    $iconId   = 1;
-    $rightCol = [];
-
-    foreach ($acv->getCriteria() as $i => $crt)
-    {
-        // hide hidden criteria for regular users (really do..?)
-        // if (($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::$perms > 0)
-            // continue;
-
-        // alternative display option
-        $displayMoney = $crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER;
-
-        $crtName      = Util::localizedString($crt, 'name');
-        $tmp          = array(
-            'id'   => $crt['id'],
-            'name' => $crtName,
-            'type' => $crt['type'],
+        // tab: criteria of
+        $refs = DB::Aowow()->SelectCol('SELECT refAchievementId FROM ?_achievementcriteria WHERE Type = ?d AND value1 = ?d',
+            ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT,
+            $this->typeId
         );
-
-        $obj = (int)$crt['value1'];
-        $qty = (int)$crt['value2'];
-
-        switch ($crt['type'])
+        if (!empty($refs))
         {
-            // link to npc
-            case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
-            case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
-                $tmp['link'] = array(
-                    'href' => '?npc='.$obj,
-                    'text' => $crtName,
-                );
-                $tmp['extra_text'] = Lang::$achievement['slain'];
-                break;
-            // link to area (by map)
-            case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
-            case ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA:
-            case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
-            case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
-                if ($zoneId = DB::Aowow()->selectCell('SELECT id FROM ?_zones WHERE mapId = ? LIMIT 1', $obj))
+            $coList = new AchievementList(array(['id', $refs]));
+            $this->lvData[] = array(
+                'file'   => 'achievement',
+                'data'   => $coList->getListviewData(),
+                'params' => array(
+                    'id'          => 'criteria-of',
+                    'name'        => '$LANG.tab_criteriaof',
+                    'visibleCols' => "$['category']",
+                    'tabs'        => '$tabsRelated'
+                )
+            );
+            $this->extendGlobalData($coList->getJSGlobals());
+        }
+
+        /*****************/
+        /* Criteria List */
+        /*****************/
+
+        $iconId   = 1;
+        $rightCol = [];
+
+        foreach ($this->subject->getCriteria() as $i => $crt)
+        {
+            // hide hidden criteria for regular users (really do..?)
+            // if (($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::$perms > 0)
+                // continue;
+
+            // alternative display option
+            $displayMoney = $crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER;
+            $crtName      = Util::localizedString($crt, 'name');
+            $tmp          = array(
+                'id'   => $crt['id'],
+                'name' => $crtName,
+                'type' => $crt['type'],
+            );
+
+            $obj = (int)$crt['value1'];
+            $qty = (int)$crt['value2'];
+
+            switch ($crt['type'])
+            {
+                // link to npc
+                case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
+                case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
                     $tmp['link'] = array(
-                        'href' => '?zone='.$zoneId,
+                        'href' => '?npc='.$obj,
                         'text' => $crtName,
                     );
-                else
-                    $tmp['extra_text'] = $crtName;
-                break;
-            // link to area
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
-            case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
-                $tmp['link'] = array(
-                    'href' => '?zone='.$obj,
-                    'text' => $crtName,
-                );
-                break;
-            // link to skills
-            case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
-            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
-            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
-            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
-                $tmp['link'] = array(
-                    'href' => '?skill='.$obj,
-                    'text' => $crtName,
-                );
-                break;
-            // link to class
-            case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
-                $tmp['link'] = array(
-                    'href' => '?class='.$obj,
-                    'text' => $crtName,
-                );
-                break;
-            // link to race
-            case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
-                $tmp['link'] = array(
-                    'href' => '?race='.$obj,
-                    'text' => $crtName,
-                );
-                break;
-            // link to title - todo (low): crosslink
-            case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
-                $tmp['extra_text'] = Util::ucFirst(Lang::$game['title']).Lang::$colon.$crtName;
-                break;
-            // link to achivement (/w icon)
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
-                $tmp['link'] = array(
-                    'href' => '?achievement='.$obj,
-                    'text' => $crtName,
-                );
-                $tmp['icon'] = $iconId;
-                $pageData['page']['icons'][] = array(
-                    'itr'  => $iconId++,
-                    'type' => 'g_achievements',
-                    'id'   => $obj,
-                );
-                $smarty->extendGlobalIds(TYPE_ACHIEVEMENT, $obj);
-                break;
-            // link to quest
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-                // $crtName = ;
-                $tmp['link'] = array(
-                    'href' => '?quest='.$obj,
-                    'text' => $crtName ? $crtName : QuestList::getName($obj),
-                );
-                break;
-            // link to spell (/w icon)
-            case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
-            case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
-            case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
-            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
-            case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-                $text = $crtName ? $crtName : SpellList::getName($obj);
-                $tmp['link'] = array(
-                    'href' => '?spell='.$obj,
-                    'text' => $text
-                );
-                $smarty->extendGlobalIds(TYPE_SPELL, $obj);
-                $tmp['icon'] = $iconId;
-                $pageData['page']['icons'][] = array(
-                    'itr'  => $iconId++,
-                    'type' => 'g_spells',
-                    'id'   => $obj,
-                );
-                break;
-            // link to item (/w icon)
-            case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
-            case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
-            case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
-            case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
-                $crtItm = new ItemList(array(['i.id', $obj]));
-                $text = $crtName ? $crtName : $crtItm->getField('name', true);
-                $tmp['link'] = array(
-                    'href'    => '?item='.$obj,
-                    'text'    => $text,
-                    'quality' => $crtItm->getField('quality'),
-                    'count'   => $qty,
-                );
-                $crtItm->addGlobalsToJscript();
-                $tmp['icon'] = $iconId;
-                $pageData['page']['icons'][] = array(
-                    'itr'   => $iconId++,
-                    'type'  => 'g_items',
-                    'id'    => $obj,
-                    'count' => $qty,
-                );
-                break;
-            // link to faction (/w target reputation)
-            case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
-                $tmp['link'] = array(
-                    'href' => '?faction='.$obj,
-                    'text' => $crtName ? $crtName : FactionList::getName($obj),
-                );
-                $tmp['extra_text'] = ' ('.Lang::getReputationLevelForPoints($qty).')';
-                break;
-            // link to GObject
-            case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
-            case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
-                $tmp['link'] = array(
-                    'href' => '?object='.$obj,
-                    'text' => $crtName,
-                );
-                break;
-            default:
-                $tmp['standard'] = true;
-                // Add a gold coin icon
-                $tmp['extra_text'] = $displayMoney ? Util::formatMoney($qty) : $crtName;
-                break;
+                    $tmp['extraText'] = Lang::$achievement['slain'];
+                    break;
+                // link to area (by map)
+                case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
+                case ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA:
+                case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
+                case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
+                case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
+                    if ($zoneId = DB::Aowow()->selectCell('SELECT id FROM ?_zones WHERE mapId = ? LIMIT 1', $obj))
+                        $tmp['link'] = array(
+                            'href' => '?zone='.$zoneId,
+                            'text' => $crtName,
+                        );
+                    else
+                        $tmp['extraText'] = $crtName;
+                    break;
+                // link to area
+                case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
+                case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
+                    $tmp['link'] = array(
+                        'href' => '?zone='.$obj,
+                        'text' => $crtName,
+                    );
+                    break;
+                // link to skills
+                case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
+                case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
+                case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
+                case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
+                    $tmp['link'] = array(
+                        'href' => '?skill='.$obj,
+                        'text' => $crtName,
+                    );
+                    break;
+                // link to class
+                case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
+                    $tmp['link'] = array(
+                        'href' => '?class='.$obj,
+                        'text' => $crtName,
+                    );
+                    break;
+                // link to race
+                case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
+                    $tmp['link'] = array(
+                        'href' => '?race='.$obj,
+                        'text' => $crtName,
+                    );
+                    break;
+                // link to title - todo (low): crosslink
+                case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
+                    $tmp['extraText'] = Util::ucFirst(Lang::$game['title']).Lang::$main['colon'].$crtName;
+                    break;
+                // link to achivement (/w icon)
+                case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
+                    $tmp['link'] = array(
+                        'href' => '?achievement='.$obj,
+                        'text' => $crtName,
+                    );
+                    $tmp['icon'] = $iconId;
+                    $this->criteria['icons'][] = array(
+                        'itr'  => $iconId++,
+                        'type' => 'g_achievements',
+                        'id'   => $obj,
+                    );
+                    $this->extendGlobalIds(TYPE_ACHIEVEMENT, $obj);
+                    break;
+                // link to quest
+                case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+                    // $crtName = ;
+                    $tmp['link'] = array(
+                        'href' => '?quest='.$obj,
+                        'text' => $crtName ?: QuestList::getName($obj),
+                    );
+                    break;
+                // link to spell (/w icon)
+                case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
+                case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
+                case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
+                case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
+                case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
+                    $tmp['link'] = array(
+                        'href' => '?spell='.$obj,
+                        'text' => ($crtName ?: SpellList::getName($obj))
+                    );
+                    $this->extendGlobalIds(TYPE_SPELL, $obj);
+                    $tmp['icon'] = $iconId;
+                    $this->criteria['icons'][] = array(
+                        'itr'  => $iconId++,
+                        'type' => 'g_spells',
+                        'id'   => $obj,
+                    );
+                    break;
+                // link to item (/w icon)
+                case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
+                case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
+                case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
+                case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
+                    $crtItm = new ItemList(array(['i.id', $obj]));
+                    $tmp['link'] = array(
+                        'href'    => '?item='.$obj,
+                        'text'    => ($crtName ?: $crtItm->getField('name', true)),
+                        'quality' => $crtItm->getField('quality'),
+                        'count'   => $qty,
+                    );
+                    $this->extendGlobalData($crtItm->getJSGlobals());
+                    $tmp['icon'] = $iconId;
+                    $this->criteria['icons'][] = array(
+                        'itr'   => $iconId++,
+                        'type'  => 'g_items',
+                        'id'    => $obj,
+                        'count' => $qty,
+                    );
+                    break;
+                // link to faction (/w target reputation)
+                case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
+                    $tmp['link'] = array(
+                        'href' => '?faction='.$obj,
+                        'text' => $crtName ?: FactionList::getName($obj),
+                    );
+                    $tmp['extraText'] = ' ('.Lang::getReputationLevelForPoints($qty).')';
+                    break;
+                // link to GObject
+                case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
+                case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
+                    $tmp['link'] = array(
+                        'href' => '?object='.$obj,
+                        'text' => $crtName,
+                    );
+                    break;
+                default:
+                    // Add a gold coin icon if required
+                    $tmp['extraText'] = $displayMoney ? Util::formatMoney($qty) : $crtName;
+                    break;
+            }
+            // If the right column
+            if ($i % 2)
+                $this->criteria['data'][] = $tmp;
+            else
+                $rightCol[] = $tmp;
         }
-        // If the right column
-        if ($i % 2)
-            $pageData['page']['criteria'][] = $tmp;
-        else
-            $rightCol[] = $tmp;
+
+        // If you found the second column - merge data from it to the end of the main body
+        if ($rightCol)
+            $this->criteria['data'] = array_merge($this->criteria['data'], $rightCol);
     }
 
-    // If you found the second column - merge data from it to the end of the main body
-    if ($rightCol)
-        $pageData['page']['criteria'] = array_merge($pageData['page']['criteria'], $rightCol);
+    protected function generateTooltip($asError = false)
+    {
+        if ($asError)
+            die('$WowheadPower.registerAchievement('.$this->typeId.', '.User::$localeId.', {});');
 
-    $smarty->saveCache($cacheKeyPage, $pageData);
+        $x = '$WowheadPower.registerAchievement('.$this->typeId.', '.User::$localeId.",{\n";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
+        $x .= "\ticon: '".urlencode($this->subject->getField('iconString'))."',\n";
+        $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
+        $x .= "});";
+
+        return $x;
+    }
 }
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('community', CommunityContent::getAll(TYPE_ACHIEVEMENT, $_id));         // comments, screenshots, videos
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$achievement, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData['relTabs']);
-
-// load the page
-$smarty->display('achievement.tpl');
 
 ?>

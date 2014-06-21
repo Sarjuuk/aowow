@@ -20,7 +20,7 @@ class ObjectsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->category = Util::extractURLParams($pageParam);
+        $this->getCategoryFromUrl($pageParam);;
 
         parent::__construct();
 

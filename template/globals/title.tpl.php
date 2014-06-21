@@ -5,6 +5,6 @@ foreach ($vars as $id => $data):
     if (isset($data['namefemale'])):
         echo ', namefemale_'.User::$localeString.':\''.Util::jsEscape($data['namefemale']).'\'';
     endif;
-    echo '};'
+    echo '};';
 endforeach;
 ?>

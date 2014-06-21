@@ -31,7 +31,7 @@ if (!empty($this->lvData)):
         <script type="text/javascript">//<![CDATA[
 <?php
     if (count($this->lvData) > 1):
-        echo 'var myTabs = new Tabs({parent: $WH.ge(\'tabs-generic\')})';
+        echo 'var myTabs = new Tabs({parent: $WH.ge(\'tabs-generic\')});';
     endif;
 
     foreach ($this->lvData as $lv):

@@ -44,6 +44,8 @@ class AchievementList extends BaseType
                         $_curTpl['rewards'][TYPE_TITLE][] = -$rewId;
                 }
             }
+
+            $_curTpl['iconString'] = $_curTpl['iconString'] ?: 'trade_engineering';
         }
     }
 

@@ -696,7 +696,7 @@ class Util
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
     public static $wowheadLink              = '';
-    private static $notes                    = [];
+    private static $notes                   = [];
 
     // creates an announcement; use if minor issues arise
     public static function addNote($uGroupMask, $str)
@@ -895,7 +895,7 @@ class Util
     // pageText for Books (Item or GO) and questText
     public static function parseHtmlText($text)
     {
-        if (stristr($text, '<HTML>'))                       // text is basicly a html-document with weird linebreak-syntax
+        if (stristr($text, '<HTML>'))                       // text is basically a html-document with weird linebreak-syntax
         {
             $pairs = array(
                 '<HTML>'    => '',
@@ -915,9 +915,9 @@ class Util
             '/\|T([\w]+\\\)*([^\.]+)\.blp:\d+\|t/ui',       // images (force size to tiny)                      |T<fullPath>:<size>|t
             '/\|c(\w{6})\w{2}([^\|]+)\|r/ui',               // color                                            |c<RRGGBBAA><text>|r
             '/\$g\s*([^:;]+)\s*:\s*([^:;]+)\s*(:?[^:;]*);/ui',// directed gender-reference                      $g:<male>:<female>:<refVariable>
-            '/\$t([^;]+);/ui',                              // nonesense, that the client apparently ignores
+            '/\$t([^;]+);/ui',                              // nonsense, that the client apparently ignores
             '/\|\d\-?\d?\((\$\w)\)/ui',                     // and another modifier for something russian       |3-6($r)
-            '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui'                // emotes (workaround: at least one whitespace and never " oder = between brackets)
+            '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui'                // emotes (workaround: at least one whitespace and never " or = between brackets)
         );
 
         $to = array(
@@ -1029,18 +1029,6 @@ class Util
         // nothing to find; be empty
         else
             return '';
-    }
-
-    public static function extractURLParams($str)
-    {
-        $arr    = explode('.', $str);
-        $params = [];
-
-        foreach ($arr as $v)
-            if (is_numeric($v))
-                $params[] = (int)$v;
-
-        return $params;
     }
 
     // for item and spells

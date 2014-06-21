@@ -6272,7 +6272,7 @@ Listview.extraCols = {
                             $WH.st(a, 'This');
                         }
                         else {
-                            $WH.ae(a, l.name);
+                            $WH.ae(a, $WH.ct(l.name));
 
                             if (l.icon) {
                                 a.className = 'icontiny tinyspecial';

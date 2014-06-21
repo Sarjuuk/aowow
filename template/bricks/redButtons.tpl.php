@@ -10,7 +10,7 @@ endif;
 
 // ingame-links/markdown/ect
 if (isset($this->redButtons[BUTTON_LINKS])):
-    if ($b = $this->redButtons[BUTTON_WOWHEAD]):
+    if ($b = $this->redButtons[BUTTON_LINKS]):
         echo '<a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show({' .
         (isset($b['color']) ? "linkColor: '".$b['color']."', " : null) . (isset($b['linkId']) ? "linkId: '".$b['linkId']."', " : null) .
         "linkName: '".Util::jsEscape(isset($b['name']) ? $b['name'] : $this->name)."', type: ".$this->type.', typeId: '.$this->typeId.' });"><em><b><i>'.Lang::$main['links'].'</i></b><span>'.Lang::$main['links'].'</span></em></a>';

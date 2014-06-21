@@ -5,15 +5,15 @@
         <div class="main-contents" id="main-contents">
 
 <?php
-    $this->brick('announcements');
+    $this->brick('announcement');
 
-if (isset($this->subject)):
+if (isset($this->typeStr)):
 ?>
             <div class="pad3"></div>
 
             <div class="inputbox">
-                <h1><?php echo Util::ucFirst($this->subject).' #'.$this->typeId; ?></h1>
-                <div id="inputbox-error"><?php echo sprintf(Lang::$main['pageNotFound'], $this->subject); ?></div>
+                <h1><?php echo Util::ucFirst($this->typeStr).' #'.$this->typeId; ?></h1>
+                <div id="inputbox-error"><?php echo sprintf(Lang::$main['pageNotFound'], $this->typeStr); ?></div>
 <?php
 else:
 ?>
@@ -28,7 +28,7 @@ else:
 <?php
     $this->brick('article');
 
-if (isset($this->extraText)):
+    if (isset($this->extraText)):
 ?>
                 <div id="text-generic" class="left"></div>
                 <script type="text/javascript">//<![CDATA[

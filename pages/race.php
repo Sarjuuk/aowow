@@ -20,20 +20,15 @@ class RacePage extends GenericPage
 
     public function __construct($__, $id)
     {
+        parent::__construct();
+
         $this->typeId = intVal($id);
 
         $this->subject = new CharRaceList(array(['id', $this->typeId]));
         if ($this->subject->error)
             $this->notFound(Lang::$game['race']);
 
-        $this->name      = $this->subject->getField('name', true);
-        $this->gPageInfo = array(
-            'type'   => $this->type,
-            'typeId' => $this->typeId,
-            'name'   => $this->name
-        );
-
-        parent::__construct();
+        $this->name = $this->subject->getField('name', true);
     }
 
     protected function generatePath()

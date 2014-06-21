@@ -28,12 +28,7 @@ class ClassPage extends GenericPage
         if ($this->subject->error)
             $this->notFound(Lang::$game['class']);
 
-        $this->name      = $this->subject->getField('name', true);
-        $this->gPageInfo = array(
-            'type'   => $this->type,
-            'typeId' => $this->typeId,
-            'name'   => $this->name
-        );
+        $this->name = $this->subject->getField('name', true);
     }
 
     protected function generatePath()

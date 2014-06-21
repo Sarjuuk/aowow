@@ -65,7 +65,14 @@ class Loot
         return json_encode($stack, JSON_NUMERIC_CHECK);
     }
 
-    private static function getByItemIdRecursive($tableName, $lootId, &$handledRefs, $groupId = 0, $baseChance = 1.0)
+    private static function storeJSGlobals($data)
+    {
+        foreach ($data as $type => $jsData)
+            foreach ($jsData as $k => $v)
+                self::$jsGlobals[$type][$k] = $v;
+    }
+
+    private static function getByContainerRecursive($tableName, $lootId, &$handledRefs, $groupId = 0, $baseChance = 1.0)
     {
         $loot     = [];
         $rawItems = [];
@@ -118,7 +125,7 @@ class Loot
                 // bandaid.. remove when propperly handling lootmodes
                 if (!in_array($entry['mincountOrRef'], $handledRefs))
                 {                                                                                                   // todo (high): find out, why i used this in the first place. (don't do drugs, kids)
-                    list($data, $raw) = self::getByItemIdRecursive(LOOT_REFERENCE, $entry['mincountOrRef'], $handledRefs, /*$entry['groupid'],*/ 0, abs($entry['ChanceOrQuestChance'] / 100));
+                    list($data, $raw) = self::getByContainerRecursive(LOOT_REFERENCE, $entry['mincountOrRef'], $handledRefs, /*$entry['groupid'],*/ 0, abs($entry['ChanceOrQuestChance'] / 100));
 
                     $handledRefs[] = $entry['mincountOrRef'];
 
@@ -157,7 +164,7 @@ class Loot
             }
             else                                            // shouldn't have happened
             {
-                self::addNote(U_GROUP_EMPLOYEE, 'Loot::getByItemIdRecursive: unhandled case in calculating chance for item '.$entry['item'].'!');
+                self::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: unhandled case in calculating chance for item '.$entry['item'].'!');
                 continue;
             }
 
@@ -171,7 +178,7 @@ class Loot
                 $sum = 0;
             else if ($sum > 100)
             {
-                self::addNote(U_GROUP_EMPLOYEE, 'Loot::getByItemIdRecursive: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
+                self::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
                 $sum = 100;
             }
 
@@ -202,7 +209,7 @@ class Loot
             modes:{"mode":1,"1":{"count":4408,"outof":16013},"4":{"count":4408,"outof":22531}}
         */
         $handledRefs = [];
-        $struct = self::getByItemIdRecursive($table, $entry, $handledRefs);
+        $struct = self::getByContainerRecursive($table, $entry, $handledRefs);
         if (!$struct)
             return false;
 
@@ -496,7 +503,7 @@ class Loot
                     $srcObj = new QuestList($conditions);
                     if (!$srcObj->error)
                     {
-                        $srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
+                        self::storeJSGlobals($srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
                         $srcData = $srcObj->getListviewData();
 
                         foreach ($srcObj->iterate() as $_)
@@ -517,7 +524,7 @@ class Loot
                     $srcObj = new SpellList($conditions);
                     if (!$srcObj->error)
                     {
-                        $srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED);
+                        self::storeJSGlobals($srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
                         $srcData = $srcObj->getListviewData();
 
                         if (!empty($result))
@@ -544,8 +551,8 @@ class Loot
                     $srcObj = new $oName(array([$field, $ids]));
                     if (!$srcObj->error)
                     {
-                        $srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED);
                         $srcData = $srcObj->getListviewData();
+                        self::storeJSGlobals($srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
                         foreach ($srcObj->iterate() as $curTpl)
                         {

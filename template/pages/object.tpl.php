@@ -83,9 +83,11 @@ $this->brick('book');
                 <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
             </div>
 
-<?php $this->brick('tabsRelated'); ?>
+<?php
+$this->brick('tabsRelated');
 
-<?php $this->brick('contribute'); ?>
+$this->brick('contribute');
+?>
 
         </div><!-- main-contents -->
     </div><!-- main -->

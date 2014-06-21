@@ -4,235 +4,243 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/community.class.php';
-
-$_id   = intVal($pageParam);
-$_path = [0, 15];
-
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_CURRENCY, $_id, -1, User::$localeId]);
-
-if (!$smarty->loadCache($cacheKeyPage, $pageData))
+// menuId 15: Currency g_initPath()
+//  tabId  0: Database g_initHeader()
+class CurrencyPage extends GenericPage
 {
-    $currency = new CurrencyList(array(['id', $_id]));
-    if ($currency->error)
-        $smarty->notFound(Lang::$game['skill'], $_id);
+    use DetailPage;
 
-    $_cat       = $currency->getField('category');
-    $_itemId    = $currency->getField('itemId');
-    $_isSpecial = $_id == 103 || $_id == 104;               // honor && arena points are not handled as items
-    $_path[]    = $_cat;
+    protected $type          = TYPE_CURRENCY;
+    protected $typeId        = 0;
+    protected $tpl           = 'detail-page-generic';
+    protected $path          = [0, 15];
+    protected $tabId         = 0;
+    protected $mode          = CACHETYPE_PAGE;
 
-    /***********/
-    /* Infobox */
-    /**********/
-
-    $infobox = '';
-    if ($_id == 103)                                        // Arena Points
-        $infobox = '[ul][li]'.Lang::$currency['cap'].Lang::$colon.'10\'000[/li][/ul]';
-    else if ($_id == 104)                                   // Honor
-        $infobox = '[ul][li]'.Lang::$currency['cap'].Lang::$colon.'75\'000[/li][/ul]';
-
-    /****************/
-    /* Main Content */
-    /****************/
-
-    // menuId 14: Skill    g_initPath()
-    //  tabId  0: Database g_initHeader()
-    $pageData = array(
-        'page'    => array(
-            'title'      => $currency->getField('name', true)." - ".Util::ucfirst(Lang::$game['skill']),
-            'path'       => json_encode($_path, JSON_NUMERIC_CHECK),
-            'tab'        => 0,
-            'type'       => TYPE_CURRENCY,
-            'typeId'     => $_id,
-            'infobox'    => $infobox,
-            'name'       => $currency->getField('name', true),
-            'headIcons'  => $_id == 104 ? ['inv_bannerpvp_02', 'inv_bannerpvp_01'] : [$currency->getField('iconString')],
-            'redButtons' => array(
-                BUTTON_WOWHEAD => true,
-                BUTTON_LINKS   => true
-            )
-        ),
-        'relTabs' => []
-    );
-
-    /**************/
-    /* Extra Tabs */
-    /**************/
-
-    if (!$_isSpecial)
+    public function __construct($__, $id)
     {
-        // tabs: this currency is contained in..
-        $lootTabs = Util::getLootSource($_itemId);
-        foreach ($lootTabs as $tab)
-        {
-            $pageData['relTabs'][] = array(
-                'file'   => $tab[0],
-                'data'   => $tab[1],
-                'params' => [
-                    'tabs'        => '$tabsRelated',
-                    'name'        => $tab[2],
-                    'id'          => $tab[3],
-                    'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
-                    'hiddenCols'  => $tab[5] ? '$['.implode(', ', array_unique($tab[5])).']' : null,
-                    'visibleCols' => $tab[6] ? '$'. json_encode(  array_unique($tab[6]))     : null
-                ]
-            );
-        }
+        parent::__construct();
 
-        // tab: sold by
-        $itemObj = new ItemList(array(['id', $_itemId]));
-        if ($vendors = @$itemObj->getExtendedCost()[$_itemId])
+        $this->typeId = intVal($id);
+
+        $this->subject = new CurrencyList(array(['id', $this->typeId]));
+        if ($this->subject->error)
+            $this->notFound(Lang::$game['currency']);
+
+        $this->name = $this->subject->getField('name', true);
+    }
+
+    protected function generatePath()
+    {
+        $this->path[] = $this->subject->getField('typeCat');
+    }
+
+    protected function generateTitle()
+    {
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['gameObject']));
+    }
+
+    protected function generateContent()
+    {
+        $_itemId    = $this->subject->getField('itemId');
+        $_isSpecial = $this->typeId == 103 || $this->typeId == 104;               // honor && arena points are not handled as items
+
+        /***********/
+        /* Infobox */
+        /**********/
+
+        $infobox = '';
+        if ($this->typeId == 103)                                        // Arena Points
+            $infobox = '[ul][li]'.Lang::$currency['cap'].Lang::$main['colon'].'10\'000[/li][/ul]';
+        else if ($this->typeId == 104)                                   // Honor
+            $infobox = '[ul][li]'.Lang::$currency['cap'].Lang::$main['colon'].'75\'000[/li][/ul]';
+
+        /****************/
+        /* Main Content */
+        /****************/
+
+        $this->infobox    = $infobox;
+        $this->name       = $this->subject->getField('name', true);
+        $this->headIcons  = $this->typeId == 104 ? ['inv_bannerpvp_02', 'inv_bannerpvp_01'] : [$this->subject->getField('iconString')];
+        $this->redButtons = array(
+            BUTTON_WOWHEAD => true,
+            BUTTON_LINKS   => true
+        );
+
+        /**************/
+        /* Extra Tabs */
+        /**************/
+
+        if (!$_isSpecial)
         {
-            $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
-            if (!$soldBy->error)
+            include 'includes/loot.class.php';
+
+            // tabs: this currency is contained in..
+            $lootTabs = Loot::getByItem($_itemId);
+            $this->extendGlobalData(Loot::$jsGlobals);
+
+            foreach ($lootTabs as $tab)
             {
-                $soldBy->addGlobalsToJScript(GLOBALINFO_SELF);
-                $sbData = $soldBy->getListviewData();
+                $this->lvData[] = array(
+                    'file'   => $tab[0],
+                    'data'   => $tab[1],
+                    'params' => [
+                        'tabs'        => '$tabsRelated',
+                        'name'        => $tab[2],
+                        'id'          => $tab[3],
+                        'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
+                        'hiddenCols'  => $tab[5] ? '$['.implode(', ', array_unique($tab[5])).']' : null,
+                        'visibleCols' => $tab[6] ? '$'. json_encode(  array_unique($tab[6]))     : null
+                    ]
+                );
+            }
 
-                $extraCols = ['Listview.extraCols.stock', "Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
+            // tab: sold by
+            $itemObj = new ItemList(array(['id', $_itemId]));
+            if ($vendors = @$itemObj->getExtendedCost()[$_itemId])
+            {
+                $this->extendGlobalData($itemObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                $holidays = [];
-                foreach ($sbData as $k => &$row)
+                $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
+                if (!$soldBy->error)
                 {
-                    $currency = [];
-                    $tokens   = [];
-                    foreach ($vendors[$k] as $id => $qty)
+                    $sbData    = $soldBy->getListviewData();
+                    $extraCols = ['Listview.extraCols.stock', "Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
+                    $holidays  = [];
+
+                    foreach ($sbData as $k => &$row)
                     {
-                        if (is_string($id))
-                            continue;
+                        $this->subject = [];
+                        $tokens   = [];
+                        foreach ($vendors[$k] as $id => $qty)
+                        {
+                            if (is_string($id))
+                                continue;
 
-                        if ($id > 0)
-                            $tokens[] = [$id, $qty];
-                        else if ($id < 0)
-                            $currency[] = [-$id, $qty];
-                    }
+                            if ($id > 0)
+                                $tokens[] = [$id, $qty];
+                            else if ($id < 0)
+                                $this->subject[] = [-$id, $qty];
+                        }
 
-                    if ($_ = $vendors[$k]['event'])
-                    {
-                        if (count($extraCols) == 3)             // not already pushed
-                            $extraCols[] = 'Listview.extraCols.condition';
+                        if ($_ = $vendors[$k]['event'])
+                        {
+                            if (count($extraCols) == 3)             // not already pushed
+                                $extraCols[] = 'Listview.extraCols.condition';
 
-                        $holidays[$_] = 0;                      // applied as back ref.
+                            $holidays[$_] = 0;                      // applied as back ref.
 
-                        $row['condition'][] = array(
-                            'type'   => TYPE_WORLDEVENT,
-                            'typeId' => &$holidays[$_],
-                            'status' => 1
+                            $row['condition'][] = array(
+                                'type'   => TYPE_WORLDEVENT,
+                                'typeId' => &$holidays[$_],
+                                'status' => 1
+                            );
+                        }
+
+                        $row['stock'] = $vendors[$k]['stock'];
+                        $row['stack'] = $itemObj->getField('buyCount');
+                        $row['cost']  = array(
+                            $itemObj->getField('buyPrice'),
+                            $this->subject ? $this->subject : null,
+                            $tokens   ? $tokens   : null
                         );
                     }
 
-                    $row['stock'] = $vendors[$k]['stock'];
-                    $row['stack'] = $itemObj->getField('buyCount');
-                    $row['cost']  = array(
-                        $itemObj->getField('buyPrice'),
-                        $currency ? $currency : null,
-                        $tokens   ? $tokens   : null
+                    if ($holidays)
+                    {
+                        $hObj = new WorldEventList(array(['id', array_keys($holidays)]));
+                        $this->extendGlobalData($hObj->getJSGlobals());
+                        foreach ($hObj->iterate() as $id => $tpl)
+                        {
+                            if ($_ = $tpl['holidayId'])
+                                $holidays[$tpl['eventBak']] = $_;
+                            else
+                                $holidays[-$id] = $id;
+                        }
+                    }
+
+                    $this->lvData[] = array(
+                        'file'   => 'creature',
+                        'data'   => $sbData,
+                        'params' => [
+                            'tabs'       => '$tabsRelated',
+                            'name'       => '$LANG.tab_soldby',
+                            'id'         => 'sold-by-npc',
+                            'extraCols'  => '$['.implode(', ', $extraCols).']',
+                            'hiddenCols' => "$['level', 'type']"
+                        ]
                     );
                 }
+            }
+        }
 
-                if ($holidays)
-                {
-                    $hObj = new WorldEventList(array(['id', array_keys($holidays)]));
-                    $hObj->addGlobalsToJscript();
-                    foreach ($hObj->iterate() as $id => $tpl)
-                    {
-                        if ($_ = $tpl['holidayId'])
-                            $holidays[$tpl['eventBak']] = $_;
-                        else
-                            $holidays[-$id] = $id;
-                    }
-                }
+        // tab: created by (spell) [for items its handled in Util::getLootSource()]
+        if ($this->typeId == 104)
+        {
+            $createdBy = new SpellList(array(['effect1Id', 45], ['effect2Id', 45], ['effect3Id', 45], 'OR'));
+            if (!$createdBy->error)
+            {
+                $this->extendGlobalData($createdBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                $pageData['relTabs'][] = array(
-                    'file'   => 'creature',
-                    'data'   => $sbData,
+                if ($createdBy->hasSetFields(['reagent1']))
+                    $visCols = ['reagents'];
+
+                $this->lvData[] = array(
+                    'file'   => 'spell',
+                    'data'   => $createdBy->getListviewData(),
                     'params' => [
-                        'tabs'       => '$tabsRelated',
-                        'name'       => '$LANG.tab_soldby',
-                        'id'         => 'sold-by-npc',
-                        'extraCols'  => '$['.implode(', ', $extraCols).']',
-                        'hiddenCols' => "$['level', 'type']"
+                        'tabs'        => '$tabsRelated',
+                        'name'        => '$LANG.tab_createdby',
+                        'id'          => 'created-by',
+                        'visibleCols' => isset($visCols) ? '$'.json_encode($visCols) : null
                     ]
                 );
             }
         }
-    }
 
-    // tab: created by (spell) [for items its handled in Util::getLootSource()]
-    if ($_id == 104)
-    {
-        $createdBy = new SpellList(array(['effect1Id', 45], ['effect2Id', 45], ['effect3Id', 45], 'OR'));
-        if (!$createdBy->error)
+        // tab: currency for
+        if ($this->typeId == 103)
         {
-            if ($createdBy->hasSetFields(['reagent1']))
-                $visCols = ['reagents'];
+            $n = '?items&filter=cr=145;crs=1;crv=0';
+            $w = 'iec.reqArenaPoints > 0';
+        }
+        else if ($this->typeId == 104)
+        {
+            $n = '?items&filter=cr=144;crs=1;crv=0';
+            $w = 'iec.reqHonorPoints > 0';
+        }
+        else
+        {
+            $n = in_array($this->typeId, [42, 61, 81, 241, 121, 122, 123, 125, 126, 161, 201, 101, 102, 221, 301, 341]) ? '?items&filter=cr=158;crs='.$_itemId.';crv=0' : null;
+            $w = 'iec.reqItemId1 = '.$_itemId.' OR iec.reqItemId2 = '.$_itemId.' OR iec.reqItemId3 = '.$_itemId.' OR iec.reqItemId4 = '.$_itemId.' OR iec.reqItemId5 = '.$_itemId;
+        }
 
-            $pageData['relTabs'][] = array(
-                'file'   => 'spell',
-                'data'   => $createdBy->getListviewData(),
-                'params' => [
-                    'tabs'        => '$tabsRelated',
-                    'name'        => '$LANG.tab_createdby',
-                    'id'          => 'created-by',
-                    'visibleCols' => isset($visCols) ? '$'.json_encode($visCols) : null
-                ]
-            );
+        $boughtBy = DB::Aowow()->selectCol('
+            SELECT item FROM npc_vendor nv JOIN ?_itemExtendedCost iec ON iec.id = nv.extendedCost WHERE '.$w.'
+            UNION
+            SELECT item FROM game_event_npc_vendor genv JOIN ?_itemExtendedCost iec ON iec.id = genv.extendedCost WHERE '.$w
+        );
+        if ($boughtBy)
+        {
+            $boughtBy = new ItemList(array(['id', $boughtBy]));
+            if (!$boughtBy->error)
+            {
+                $this->lvData[] = array(
+                    'file'   => 'item',
+                    'data'   => $boughtBy->getListviewData(ITEMINFO_VENDOR, [TYPE_CURRENCY => $this->typeId]),
+                    'params' => [
+                        'tabs'      => '$tabsRelated',
+                        'name'      => '$LANG.tab_currencyfor',
+                        'id'        => 'currency-for',
+                        'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]",
+                        'note'      => $n ? '$$WH.sprintf(LANG.lvnote_filterresults, \''.$n.'\')' : null
+                    ]
+                );
+
+                $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+            }
         }
     }
-
-    // tab: currency for
-    if ($_id == 103)
-    {
-        $n = '?items&filter=cr=145;crs=1;crv=0';
-        $w = 'iec.reqArenaPoints > 0';
-    }
-    else if ($_id == 104)
-    {
-        $n = '?items&filter=cr=144;crs=1;crv=0';
-        $w = 'iec.reqHonorPoints > 0';
-    }
-    else
-    {
-        $n = in_array($_id, [42, 61, 81, 241, 121, 122, 123, 125, 126, 161, 201, 101, 102, 221, 301, 341]) ? '?items&filter=cr=158;crs='.$_itemId.';crv=0' : null;
-        $w = 'iec.reqItemId1 = '.$_itemId.' OR iec.reqItemId2 = '.$_itemId.' OR iec.reqItemId3 = '.$_itemId.' OR iec.reqItemId4 = '.$_itemId.' OR iec.reqItemId5 = '.$_itemId;
-    }
-
-    $boughtBy = DB::Aowow()->selectCol('
-        SELECT item FROM npc_vendor nv JOIN ?_itemExtendedCost iec ON iec.id = nv.extendedCost WHERE '.$w.'
-        UNION
-        SELECT item FROM game_event_npc_vendor genv JOIN ?_itemExtendedCost iec ON iec.id = genv.extendedCost WHERE '.$w
-    );
-    if ($boughtBy)
-    {
-        $boughtBy = new ItemList(array(['id', $boughtBy]));
-        if (!$boughtBy->error)
-        {
-            $boughtBy->addGlobalsToJscript();
-
-            $pageData['relTabs'][] = array(
-                'file'   => 'item',
-                'data'   => $boughtBy->getListviewData(ITEMINFO_VENDOR, [TYPE_CURRENCY => $_id]),
-                'params' => [
-                    'tabs'      => '$tabsRelated',
-                    'name'      => '$LANG.tab_currencyfor',
-                    'id'        => 'currency-for',
-                    'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]",
-                    'note'      => $n ? '$$WH.sprintf(LANG.lvnote_filterresults, \''.$n.'\')' : null
-                ]
-            );
-        }
-    }
-
-    $smarty->saveCache($cacheKeyPage, $pageData);
 }
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('community', CommunityContent::getAll(TYPE_CURRENCY, $_id));  // comments, screenshots, videos
-$smarty->assign('lang', array_merge(Lang::$main));
-$smarty->assign('lvData', $pageData['relTabs']);
-
-// load the page
-$smarty->display('detail-page-generic.tpl');
 
 ?>

@@ -107,13 +107,13 @@ class ItemList extends BaseType
                     if ($_ = @$costs['reqArenaPoints'])
                     {
                         $data[-103] = $_;
-                        $this->jsGlobals[TYPE_CURRENCY][103] = [103];
+                        $this->jsGlobals[TYPE_CURRENCY][103] = 103;
                     }
 
                     if ($_ = @$costs['reqHonorPoints'])
                     {
                         $data[-104] = $_;
-                        $this->jsGlobals[TYPE_CURRENCY][104] = [104];
+                        $this->jsGlobals[TYPE_CURRENCY][104] = 104;
                     }
 
                     for ($i = 1; $i < 6; $i++)
@@ -135,7 +135,9 @@ class ItemList extends BaseType
             if ($cItems)
             {
                 $moneyItems = new CurrencyList(array(['itemId', $cItems]));
-                $this->jsGlobals = $moneyItems->getJSGlobals();
+                foreach ($moneyItems->getJSGlobals() as $type => $jsData)
+                    foreach ($jsData as $k => $v)
+                        $this->jsGlobals[$type][$k] = $v;
 
                 foreach ($itemz as $id => $vendors)
                 {
@@ -158,7 +160,7 @@ class ItemList extends BaseType
                                 }
 
                                 if (!$found)
-                                    $this->jsGlobals[TYPE_ITEM][$k] = [$k];
+                                    $this->jsGlobals[TYPE_ITEM][$k] = $k;
                             }
                         }
                         $vendors[$l] = $costs;
@@ -289,7 +291,7 @@ class ItemList extends BaseType
 
                     if ($e = $cost['event'])
                     {
-                        $this->jsGlobals[TYPE_WORLDEVENT][$e] = [$e];
+                        $this->jsGlobals[TYPE_WORLDEVENT][$e] = $e;
                         $data[$this->id]['condition'] = array(
                             'type'   => TYPE_WORLDEVENT,
                             'typeId' => -$e,
@@ -366,7 +368,7 @@ class ItemList extends BaseType
 
     public function getJSGlobals($addMask = GLOBALINFO_SELF, &$extra = [])
     {
-        $data = $this->jsGlobals;
+        $data = $addMask & GLOBALINFO_RELATED ? $this->jsGlobals : [];
 
         foreach ($this->iterate() as $id => $__)
         {
