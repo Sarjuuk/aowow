@@ -149,8 +149,6 @@ class User
     {
         self::$localeId     = isset(Util::$localeStrings[$use]) ? $use : 0;
         self::$localeString = self::localeString(self::$localeId);
-
-        Lang::load(self::$localeString);
     }
 
     public static function isInGroup($group)
@@ -269,16 +267,16 @@ class User
             return $set;
 
         if ($_ = self::getCharacters())
-            $subSet['characters'] = json_encode($_, JSON_NUMERIC_CHECK);
+            $subSet['characters'] = $_;
 
         if ($_ = self::getProfiles())
-            $subSet['profiles'] = json_encode($_, JSON_NUMERIC_CHECK);
+            $subSet['profiles'] = $_;
 
         if ($_ = self::getWeightScales())
-            $subSet['weightscales'] = json_encode($_, JSON_NUMERIC_CHECK);
+            $subSet['weightscales'] = $_;
 
         if ($_ = self::getCookies())
-            $subSet['cookies'] = json_encode($_, JSON_NUMERIC_CHECK);
+            $subSet['cookies'] = $_;
 
         return array_merge($set, $subSet);
     }
@@ -335,7 +333,7 @@ class User
             );
         }
 
-        return $asJSON ? json_encode(self::$characters, JSON_NUMERIC_CHECK) : self::$characters;
+        return self::$characters;
     }
 
     public static function getProfiles($asJSON = true)
@@ -350,7 +348,7 @@ class User
             );
         }
 
-        return $asJSON ? json_encode(self::$profiles, JSON_NUMERIC_CHECK) : self::$profiles;
+        return self::$profiles;
     }
 
     public static function getCookies()
@@ -360,7 +358,7 @@ class User
         if (self::$id)
             $data = DB::Aowow()->selectCol('SELECT name AS ARRAY_KEY, data FROM ?_account_cookies WHERE userId = ?d', self::$id);
 
-        return json_encode($data);
+        return $data;
     }
 
     public static function writeCookie()

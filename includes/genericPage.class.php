@@ -7,13 +7,14 @@ if (!defined('AOWOW_REVISION'))
 trait DetailPage
 {
     protected $hasComContent = true;
+    protected $category      = null;                        // not used on detail pages
 
-    function generateCacheKey($cacheType, $params = '-1')
+    private   $subject       = null;                        // so it will not get cached
+
+    function generateCacheKey()
     {
-        $key = [$cacheType, $this->type, '-1', $params];
-
-        if ($this->isLocalized)
-            $key[] = User::$localeId;
+        //     mode,         type,        typeId,        localeId,        category, filter
+        $key = [$this->mode, $this->type, $this->typeId, User::$localeId, '-1',     '-1'];
 
         return implode('_', $key);
     }
@@ -23,15 +24,19 @@ trait DetailPage
 trait ListPage
 {
     protected $category  = null;
-    protected $validCats = [];
     protected $typeId    = 0;
+    protected $filter    = [];
 
-    function generateCacheKey($cacheType)
+    function generateCacheKey()
     {
-        $key = [$cacheType, $this->type, $this->typeId, '-1'];
+        //     mode,         type,        typeId, localeId,
+        $key = [$this->mode, $this->type, '-1',   User::$localeId];
 
-        if ($this->isLocalized)
-            $key[] = User::$localeId;
+        //category
+        $key[] = $this->category ? implode('.', $this->category) : '-1';
+
+        // filter
+        $key[] = $this->filter ? md5(serialize($this->filter)) : '-1';
 
         return implode('_', $key);
     }
@@ -42,24 +47,23 @@ class GenericPage
 {
     protected $tpl              = '';
     protected $restrictedGroups = U_GROUP_NONE;
+    protected $mode             = CACHETYPE_NONE;
 
     protected $jsGlobals        = [];
-    protected $jsgBuffer        = [];
-    protected $isCachable       = true;
-    protected $isLocalized      = false;
-    protected $hasCacheFile     = false;
     protected $lvData           = [];
     protected $title            = [CFG_NAME];               // for title-Element
     protected $name             = '';                       // for h1-Element
     protected $tabId            = 0;
-    protected $community        = ['co' => [], 'sc' => [], 'vi' => []];
-
     protected $js               = [];
     protected $css              = [];
 
+    // private vars don't get cached
+    private   $cacheDir         = 'cache/template/';
+    private   $jsgBuffer        = [];
     private   $gLocale          = [];
-    protected $gPageInfo        = [];
+    private   $gPageInfo        = [];
     private   $gUser            = [];
+    private   $community        = ['co' => [], 'sc' => [], 'vi' => []];
 
     protected function generatePath() {}
     protected function generateTitle() {}
@@ -76,20 +80,25 @@ class GenericPage
         else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
             Util::addNote(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
 
-        if (isset($this->validCats) && !Util::isValidPage($this->validCats, $this->category))
-            $this->error();
+        // display modes
+        if (isset($_GET['power']) && method_exists($this, 'generateTooltip'))
+            $this->mode = CACHETYPE_TOOLTIP;
+        else if (isset($_GET['xml']) && method_exists($this, 'generateXML'))
+            $this->mode = CACHETYPE_XML;
+        else
+        {
+            if (!$this->isValidPage() || !$this->tpl)
+                $this->error();
 
-        $this->gUser   = User::getUserGlobals();
-        $this->gLocale = array(
-            'id'   => User::$localeId,
-            'name' => User::$localeString
-        );
-
-        if (!$this->tpl)
-            return;
+            $this->gUser   = User::getUserGlobals();
+            $this->gLocale = array(
+                'id'   => User::$localeId,
+                'name' => User::$localeString
+            );
+        }
     }
 
-    private function prepare()
+    private function prepareContent()
     {
         if (!$this->loadCache())
         {
@@ -113,15 +122,47 @@ class GenericPage
 
     public function display($override = '')
     {
-        if (!$override)
-            $this->prepare();
+        if ($override)
+        {
+            $this->addAnnouncements();
 
-        if (!$override && !$this->isSaneInclude('template/pages/', $this->tpl))
-            die(User::isInGroup(U_GROUP_STAFF) ? 'Error: nonexistant template requestst: template/pages/'.$this->tpl.'.tpl.php' : null);
+            include('template/pages/'.$override.'.tpl.php');
+            die();
+        }
+        else if ($this->mode == CACHETYPE_TOOLTIP)
+        {
+            if (!$this->loadCache($tt))
+            {
+                $tt = $this->generateTooltip();
+                $this->saveCache($tt);
+            }
 
-        $this->addAnnouncements();
+            header('Content-type: application/x-javascript; charsetUTF-8');
+            die($tt);
+        }
+        else if ($this->mode == CACHETYPE_XML)
+        {
+            if (!$this->loadCache($xml))
+            {
+                $xml = $this->generateXML();
+                $this->saveCache($xml);
+            }
 
-        include('template/pages/'.($override ? $override : $this->tpl).'.tpl.php');
+            header('Content-type: text/xml; charsetUTF-8');
+            die($xml);
+        }
+        else
+        {
+            $this->prepareContent();
+
+            if (!$this->isSaneInclude('template/pages/', $this->tpl))
+                die(User::isInGroup(U_GROUP_STAFF) ? 'Error: nonexistant template requested: template/pages/'.$this->tpl.'.tpl.php' : null);
+
+            $this->addAnnouncements();
+
+            include('template/pages/'.$this->tpl.'.tpl.php');
+            die();
+        }
     }
 
     public function gBrick($file, array $localVars = [])
@@ -130,7 +171,7 @@ class GenericPage
             $$n = $v;
 
         if (!$this->isSaneInclude('template/globals/', $file))
-            echo !User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requestst: template/globals/".$file.".tpl.php\n\n" : null;
+            echo !User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requested: template/globals/".$file.".tpl.php\n\n" : null;
         else
             include('template/globals/'.$file.'.tpl.php');
     }
@@ -141,7 +182,7 @@ class GenericPage
             $$n = $v;
 
         if (!$this->isSaneInclude('template/bricks/', $file))
-            echo User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requestst: template/bricks/".$file.".tpl.php\n\n" : null;
+            echo User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requested: template/bricks/".$file.".tpl.php\n\n" : null;
         else
             include('template/bricks/'.$file.'.tpl.php');
     }
@@ -152,7 +193,7 @@ class GenericPage
             $$n = $v;
 
         if (!$this->isSaneInclude('template/listviews/', $file))
-            echo User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requestst: template/listviews/".$file.".tpl.php\n\n" : null;
+            echo User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requested: template/listviews/".$file.".tpl.php\n\n" : null;
         else
             include('template/listviews/'.$file.'.tpl.php');
     }
@@ -166,6 +207,33 @@ class GenericPage
             return false;
 
         return true;
+    }
+
+    private function isValidPage()
+    {
+        if ($this->category === null || empty($this->validCats))
+            return true;
+
+        switch (count($this->category))
+        {
+            case 0: // no params works always
+                return true;
+            case 1: // null is avalid              || value in a 1-dim-array                         ||  key in a n-dim-array
+                return $this->category[0] === null || in_array($this->category[0], $this->validCats) || (isset($this->validCats[$this->category[0]]) && is_array($this->validCats[$this->category[0]]));
+            case 2: // first param has to be a key. otherwise invalid
+                if (!isset($this->validCats[$this->category[0]]))
+                    return false;
+
+                // check if the sub-array is n-imensional
+                if (count($this->validCats[$this->category[0]]) == count($this->validCats[$this->category[0]], COUNT_RECURSIVE))
+                    return in_array($this->category[1], $this->validCats[$this->category[0]]); // second param is value in second level array
+                else
+                    return isset($this->validCats[$this->category[0]][$this->category[1]]);    // check if params is key of another array
+            case 3: // 3 params MUST point to a specific value
+                return isset($this->validCats[$this->category[0]][$this->category[1]]) && in_array($this->category[2], $this->validCats[$this->category[0]][$this->category[1]]);
+        }
+
+        return false;
     }
 
     public function addJS($name, $unshift = false)
@@ -395,10 +463,18 @@ class GenericPage
 
     public function notFound($subject)
     {
-        $this->subject = $subject;
-        $this->mysql   = DB::Aowow()->getStatistics();
+        if ($this->mode == CACHETYPE_TOOLTIP)
+            echo $this->generateTooltip(true);
+        else if ($this->mode == CACHETYPE_XML)
+            echo $this->generateXML(true);
+        else
+        {
+            $this->subject = $subject;
+            $this->mysql   = DB::Aowow()->getStatistics();
 
-        $this->display('text-page-generic');
+            $this->display('text-page-generic');
+        }
+
         exit();
     }
 
@@ -424,44 +500,76 @@ class GenericPage
     }
 
     // creates the cache file
-    public function saveCache(/*$key, $data, $filter = null*/)
+    public function saveCache($saveString = null)
     {
-        // if (CFG_DEBUG)
+        if ($this->mode == CACHETYPE_NONE)
+            return false;
+
+        if (CFG_DEBUG)
             return;
 
-        $file = $this->cache_dir.'data/'.$key;
+        $file = CWD.$this->cacheDir.$this->generateCacheKey();
+        $data = time()." ".AOWOW_REVISION." ".($saveString ? '1' : '0')."\n";
+        if (!$saveString)
+        {
+            $cache = [];
+            foreach ($this as $key => $val)
+            {
+                try
+                {
+                    // public, protected and an undocumented flag added to properties created on the fly..?
+                    if ((new ReflectionProperty($this, $key))->getModifiers() & 0x1300)
+                        $cache[$key] = $val;
+                }
+                catch (ReflectionException $e) { }              // shut up!
+            }
 
-        $cacheData = time()." ".AOWOW_REVISION."\n";
-        $cacheData .= serialize(str_replace(["\n", "\t"], ['\n', '\t'], $data));
+            $data .= serialize($cache);
+        }
+        else
+            $data .= (string)$saveString;
 
-        if ($filter)
-            $cacheData .= "\n".serialize($filter);
-
-        file_put_contents($file, $cacheData);
+        file_put_contents($file, $data);
     }
 
     // loads and evaluates the cache file
-    public function loadCache(/*$key, &$data, &$filter = null*/)
+    public function loadCache(&$saveVar = null)
     {
-        // if (CFG_DEBUG)
+        if ($this->mode == CACHETYPE_NONE)
             return false;
 
-        $cache = @file_get_contents($this->cache_dir.'data/'.$key);
+        if (CFG_DEBUG)
+            return false;
+
+        $file = CWD.$this->cacheDir.$this->generateCacheKey();
+        if (!file_exists($file))
+            return false;
+
+        $cache = file_get_contents($file);
         if (!$cache)
             return false;
 
-        $cache = explode("\n", $cache);
+        $cache = explode("\n", $cache, 2);
 
-        @list($time, $rev) = explode(' ', $cache[0]);
-        $expireTime = $time + CFG_CACHE_DECAY;
-        if ($expireTime <= time() || $rev < AOWOW_REVISION)
+        @list($time, $rev, $type) = explode(' ', $cache[0]);
+        if ($time + CFG_CACHE_DECAY <= time() || $rev < AOWOW_REVISION)
             return false;
 
-        $data = str_replace(['\n', '\t'], ["\n", "\t"], unserialize($cache[1]));
-        if (isset($cache[2]))
-            $filter = unserialize($cache[2]);
+        if ($type == '0')
+        {
+            $data = unserialize($cache[1]);
+            foreach ($data as $k => $v)
+                $this->$k = $v;
 
-        return true;
+            return true;
+        }
+        else if ($type == '1')
+        {
+            $saveVar = $cache[1];
+            return true;
+        }
+
+        return false;;
     }
 }
 

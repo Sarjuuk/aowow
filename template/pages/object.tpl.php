@@ -1,38 +1,37 @@
-{include file='header.tpl'}
+<?php $this->brick('header'); ?>
 
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-{if !empty($announcements)}
-    {foreach from=$announcements item=item}
-        {include file='bricks/announcement.tpl' an=$item}
-    {/foreach}
-{/if}
+<?php $this->brick('announcement'); ?>
 
             <script type="text/javascript">//<![CDATA[
-                {include file='bricks/community.tpl'}
-                var g_pageInfo = {ldelim}type: {$type}, typeId: {$typeId}, name: '{$name|escape:"quotes"}'{rdelim};
-                g_initPath({$path});
+<?php
+    $this->brick('community');
+            echo "var g_pageInfo = ".json_encode($this->gPageInfo, JSON_NUMERIC_CHECK).";\n" .
+                 "g_initPath(".json_encode($this->path, JSON_NUMERIC_CHECK).");\n";
+?>
             //]]></script>
 
-{include file='bricks/infobox.tpl'}
+<?php $this->brick('infobox'); ?>
 
             <div class="text">
-{include file='bricks/redButtons.tpl'}
+<?php $this->brick('redButtons'); ?>
 
-                <h1>{$name}</h1>
+                <h1><?php echo $this->name; ?></h1>
 
-{include file='bricks/article.tpl'}
+<?php
+$this->brick('article');
 
-{if $positions}
+if ($this->positions):
+?>
                 <div>{#This_Object_can_be_found_in#}
-{strip}
                 <span id="locations">
                     {foreach from=$object.position item=zone name=zone}
                         <a href="javascript:;" onclick="
                             myMapper.update(
-                                {ldelim}
+                                {
                                 {if $zone.atid}
                                     zone:{$zone.atid}
                                     {if $zone.points}
@@ -45,7 +44,7 @@
                                     coords:[
                                         {foreach from=$zone.points item=point name=point}
                                                 [{$point.x},{$point.y},
-                                                {ldelim}
+                                                {
                                                     label:'$<br>
                                                     <div class=q0>
                                                         <small>{#Respawn#}:
@@ -55,37 +54,40 @@
                                                             {if isset($point.events)}<br>{$point.events|escape:"quotes"}{/if}
                                                         </small>
                                                     </div>',type:'{$point.type}'
-                                                {rdelim}]
+                                                }]
                                                 {if !$smarty.foreach.point.last},{/if}
                                         {/foreach}
                                     ]
                                 {/if}
-                                {rdelim});
+                                });
                             g_setSelectedLink(this, 'mapper'); return false" onmousedown="return false">
                             {$zone.name}</a>{if $zone.population > 1}&nbsp;({$zone.population}){/if}{if $smarty.foreach.zone.last}.{else}, {/if}
                     {/foreach}
                 </span></div>
-{/strip}
+
                 <div id="mapper-generic"></div>
                 <div class="clear"></div>
 
                 <script type="text/javascript">
-                    var myMapper = new Mapper({ldelim}parent: 'mapper-generic', zone: '{$position[0].atid}'{rdelim});
+                    var myMapper = new Mapper({parent: 'mapper-generic', zone: '{$position[0].atid}'});
                     $WH.gE($WH.ge('locations'), 'a')[0].onclick();
                 </script>
-{else}
-                {$lang.unkPosition}
-{/if}
-{include file='bricks/book.tpl'}
+<?php
+else:
+    echo Lang::$gameObject['unkPosition'];
+endif;
 
-                <h2 class="clear">{$lang.related}</h2>
+$this->brick('book');
+?>
+
+                <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
             </div>
 
-{include file='bricks/tabsRelated.tpl' tabs=$lvData}
+<?php $this->brick('tabsRelated'); ?>
 
-{include file='bricks/contribute.tpl'}
+<?php $this->brick('contribute'); ?>
 
         </div><!-- main-contents -->
     </div><!-- main -->
 
-{include file='footer.tpl'}
+<?php $this->brick('footer'); ?>

@@ -25,12 +25,11 @@ define('TYPE_RACE',                         14);
 define('TYPE_SKILL',                        15);
 define('TYPE_CURRENCY',                     17);
 
-define('CACHETYPE_PAGE',                    0);
-define('CACHETYPE_TOOLTIP',                 1);
-define('CACHETYPE_BUFF',                    2);             // only used by spells obviously
+define('CACHETYPE_NONE',                    0);             // page will not be cached
+define('CACHETYPE_PAGE',                    1);
+define('CACHETYPE_TOOLTIP',                 2);
 define('CACHETYPE_SEARCH',                  3);
 define('CACHETYPE_XML',                     4);             // only used by items
-define('CACHETYPE_NONE',                    5);             // page will not be cached
 
 define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);

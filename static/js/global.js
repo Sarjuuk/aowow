@@ -18386,16 +18386,16 @@ var Links = new function() {
             fields:
                 [
                     {
-                        id: 'wowheadurl',
-                        type: 'text',
+                        id:    'wowheadurl',
+                        type:  'text',
                         label: 'Aowow URL',
-                        size: 40
+                        size:  40
                     },
                     {
-                        id: 'markuptag',
-                        type: 'text',
+                        id:    'markuptag',
+                        type:  'text',
                         label: 'Markup Tag',
-                        size: 40
+                        size:  40
                     }
                 ],
 
@@ -18405,7 +18405,7 @@ var Links = new function() {
 
             onShow: function(form) {
                 setTimeout(function() {
-                    document.getElementsByName('ingamelink')[0].select();
+                    $(form.ingamelink).select();
                 }, 50);
                 setTimeout(Lightbox.reveal, 100);
             }
