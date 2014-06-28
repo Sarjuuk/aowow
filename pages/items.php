@@ -85,7 +85,7 @@ class ItemsPage extends GenericPage
 
         parent::__construct();
 
-        $this->name   = Util::ucFirst(Lang::$game['gameObjects']);
+        $this->name   = Util::ucFirst(Lang::$game['items']);
         $this->subCat = $pageParam ? '='.$pageParam : '';
     }
 

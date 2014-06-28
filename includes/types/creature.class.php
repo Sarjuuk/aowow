@@ -164,19 +164,19 @@ class CreatureList extends BaseType
 
                 if (isset($data[$texStr]))
                 {
-                    if ($data[$texStr]['minlevel'] > $this->curTpl['minLevel'])
-                        $data[$texStr]['minlevel'] = $this->curTpl['minLevel'];
+                    if ($data[$texStr]['minLevel'] > $this->curTpl['minLevel'])
+                        $data[$texStr]['minLevel'] = $this->curTpl['minLevel'];
 
-                    if ($data[$texStr]['maxlevel'] < $this->curTpl['maxLevel'])
-                        $data[$texStr]['maxlevel'] = $this->curTpl['maxLevel'];
+                    if ($data[$texStr]['maxLevel'] < $this->curTpl['maxLevel'])
+                        $data[$texStr]['maxLevel'] = $this->curTpl['maxLevel'];
 
                     $data[$texStr]['count']++;
                 }
                 else
                     $data[$texStr] = array(
                         'family'    => $this->curTpl['family'],
-                        'minlevel'  => $this->curTpl['minLevel'],
-                        'maxlevel'  => $this->curTpl['maxLevel'],
+                        'minLevel'  => $this->curTpl['minLevel'],
+                        'maxLevel'  => $this->curTpl['maxLevel'],
                         'modelId'   => $this->curTpl['modelId'],
                         'displayId' => $this->curTpl['displayId1'],
                         'skin'      => $texStr,

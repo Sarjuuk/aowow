@@ -56,7 +56,7 @@ class ObjectPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['gameObject']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['gameObject']));
     }
 
     protected function generateContent()

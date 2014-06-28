@@ -4,123 +4,128 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/community.class.php';
-
-$_id = intVal($pageParam);
-
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_TITLE, $_id, -1, User::$localeId]);
-
-if (!$smarty->loadCache($cacheKeyPage, $pageData))
+// menuId 10: Title    g_initPath()
+//  tabId  0: Database g_initHeader()
+class TitlePage extends GenericPage
 {
-    $title = new TitleList(array(['id', $_id]));
-    if ($title->error)
-        $smarty->notFound(Lang::$game['title'], $_id);
+    use DetailPage;
 
-    /***********/
-    /* Infobox */
-    /***********/
+    protected $type          = TYPE_TITLE;
+    protected $typeId        = 0;
+    protected $tpl           = 'detail-page-generic';
+    protected $path          = [0, 10];
+    protected $tabId         = 0;
+    protected $mode          = CACHETYPE_PAGE;
 
-    $infobox = [];
-    if ($title->getField('side') == SIDE_ALLIANCE)
-        $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=icon-alliance]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
-    else if ($title->getField('side') == SIDE_HORDE)
-        $infobox[] = Lang::$main['side'].Lang::$colon.'[span class=icon-horde]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
-    else
-        $infobox[] = Lang::$main['side'].Lang::$colon.Lang::$game['si'][SIDE_BOTH];
+    private   $nameFixed     = '';
 
-    if ($g = $title->getField('gender'))
-        $infobox[] = Lang::$main['gender'].Lang::$colon.'[span class=icon-'.($g == 2 ? 'female' : 'male').']'.Lang::$main['sex'][$g].'[/span]';
-
-    if ($e = $title->getField('eventId'))
-        $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$e.']'.WorldEventList::getName($e).'[/url]';
-
-    /****************/
-    /* Main Content */
-    /****************/
-
-    $fixedTitle = Util::ucFirst(trim(strtr($title->getField('male', true), ['%s' => '', ',' => ''])));
-
-    // menuId 10: Title    g_initPath()
-    //  tabId  0: Database g_initHeader()
-    $pageData = array(
-        'page'    => array(
-            'title'      => $fixedTitle." - ".Util::ucfirst(Lang::$game['title']),
-            'path'       => '[0, 10, '.$title->getField('category').']',
-            'tab'        => 0,
-            'type'       => TYPE_TITLE,
-            'typeId'     => $_id,
-            'name'       => $title->getHtmlizedName(),
-            'infobox'    => $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null,
-            'expansion'  => Util::$expansionString[$title->getField('expansion')],
-            'redButtons' => array(
-                BUTTON_WOWHEAD => true,
-                BUTTON_LINKS   => ['name' => $fixedTitle]
-            ),
-        ),
-        'relTabs' => []
-    );
-
-    /**************/
-    /* Extra Tabs */
-    /**************/
-
-    // tab: sources
-    if (!empty($title->sources[$_id]))
+    public function __construct($__, $id)
     {
-        foreach ($title->sources[$_id] as $type => $entries)
-        {
-            switch ($type)
-            {
-                case  4:
-                    $quests = new QuestList(array(['id', $entries]));
-                    $quests->addGlobalsToJScript(GLOBALINFO_REWARDS);
+        parent::__construct();
 
-                    $pageData['relTabs'][] = array(
-                        'file'   => 'quest',
-                        'data'   => $quests->getListviewData(),
-                        'params' => array(
-                            'id'          => 'reward-from-quest',
-                            'name'        => '$LANG.tab_rewardfrom',
-                            'hiddenCols'  => "$['experience', 'money']",
-                            'visibleCols' => "$['category']",
-                            'tabs'        => '$tabsRelated'
-                        )
-                    );
-                    break;
-                case 12:
-                    $acvs = new AchievementList(array(['id', $entries]));
-                    $acvs->addGlobalsToJscript();
+        $this->typeId = intVal($id);
 
-                    $pageData['relTabs'][] = array(
-                        'file'   => 'achievement',
-                        'data'   => $acvs->getListviewData(),
-                        'params' => array(
-                            'id'          => 'reward-from-achievement',
-                            'name'        => '$LANG.tab_rewardfrom',
-                            'visibleCols' => "$['category']",
-                            'sort'        => "$['reqlevel', 'name']",
-                            'tabs'        => '$tabsRelated'
-                        )
-                    );
-                    break;
-                // case 13:
-                    // not displayed
-            }
-        }
+        $this->subject = new TitleList(array(['id', $this->typeId]));
+        if ($this->subject->error)
+            $this->notFound(Lang::$game['title']);
+
+        $this->name      = $this->subject->getHtmlizedName();
+        $this->nameFixed = Util::ucFirst(trim(strtr($this->subject->getField('male', true), ['%s' => '', ',' => ''])));
     }
 
-    // tab: criteria of (to be added by TC)
+    protected function generatePath()
+    {
+        $this->path[] = $this->subject->getField('typeCat');
+    }
 
-    $smarty->saveCache($cacheKeyPage, $pageData);
+    protected function generateTitle()
+    {
+        array_unshift($this->title, $this->nameFixed, Util::ucFirst(Lang::$game['title']));
+    }
+
+    protected function generateContent()
+    {
+        /***********/
+        /* Infobox */
+        /***********/
+
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+
+        if ($this->subject->getField('side') == SIDE_ALLIANCE)
+            $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-alliance]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
+        else if ($this->subject->getField('side') == SIDE_HORDE)
+            $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-horde]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
+        else
+            $infobox[] = Lang::$main['side'].Lang::$main['colon'].Lang::$game['si'][SIDE_BOTH];
+
+        if ($g = $this->subject->getField('gender'))
+            $infobox[] = Lang::$main['gender'].Lang::$main['colon'].'[span class=icon-'.($g == 2 ? 'female' : 'male').']'.Lang::$main['sex'][$g].'[/span]';
+
+        if ($e = $this->subject->getField('eventId'))
+            $infobox[] = Lang::$game['eventShort'].Lang::$main['colon'].'[url=?event='.$e.']'.WorldEventList::getName($e).'[/url]';
+
+        /****************/
+        /* Main Content */
+        /****************/
+
+        $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
+        $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
+        $this->redButtons = array(
+            BUTTON_WOWHEAD => true,
+            BUTTON_LINKS   => ['name' => $this->nameFixed]
+        );
+
+        /**************/
+        /* Extra Tabs */
+        /**************/
+
+        // tab: sources
+        if (!empty($this->subject->sources[$this->typeId]))
+        {
+            foreach ($this->subject->sources[$this->typeId] as $type => $entries)
+            {
+                switch ($type)
+                {
+                    case  4:
+                        $quests = new QuestList(array(['id', $entries]));
+                        $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_REWARDS));
+
+                        $this->lvData[] = array(
+                            'file'   => 'quest',
+                            'data'   => $quests->getListviewData(),
+                            'params' => array(
+                                'id'          => 'reward-from-quest',
+                                'name'        => '$LANG.tab_rewardfrom',
+                                'hiddenCols'  => "$['experience', 'money']",
+                                'visibleCols' => "$['category']",
+                                'tabs'        => '$tabsRelated'
+                            )
+                        );
+                        break;
+                    case 12:
+                        $acvs = new AchievementList(array(['id', $entries]));
+                        $this->extendGlobalData($acvs->getJSGlobals());
+
+                        $this->lvData[] = array(
+                            'file'   => 'achievement',
+                            'data'   => $acvs->getListviewData(),
+                            'params' => array(
+                                'id'          => 'reward-from-achievement',
+                                'name'        => '$LANG.tab_rewardfrom',
+                                'visibleCols' => "$['category']",
+                                'sort'        => "$['reqlevel', 'name']",
+                                'tabs'        => '$tabsRelated'
+                            )
+                        );
+                        break;
+                    // case 13:
+                        // not displayed
+                }
+            }
+        }
+
+        // tab: criteria of (to be added by TC)
+    }
 }
-
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('community', CommunityContent::getAll(TYPE_TITLE, $_id));  // comments, screenshots, videos
-$smarty->assign('lang', array_merge(Lang::$main));
-$smarty->assign('lvData', $pageData['relTabs']);
-
-// load the page
-$smarty->display('detail-page-generic.tpl');
 
 ?>

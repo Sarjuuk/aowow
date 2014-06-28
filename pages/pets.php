@@ -4,57 +4,63 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-$cat       = Util::extractURLParams($pageParam);
-$path      = [0, 8];
-$validCats = [0, 1, 2];
-$title     = [Util::ucFirst(Lang::$game['pets'])];
-$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_PET, -1, $cat ? $cat[0] : -1, User::$localeId]);
-
-if (!Util::isValidPage($validCats, $cat))
-    $smarty->error();
-
-if ($cat)
+// menuId 8: Pets     g_initPath()
+//  tabid 0: Database g_initHeader()
+class PetsPage extends GenericPage
 {
-    $path[] = $cat;
-    array_unshift($title, Lang::$pet['cat'][$cat[0]]);
+    use ListPage;
+
+    protected $type          = TYPE_PET;
+    protected $tpl           = 'list-page-generic';
+    protected $path          = [0, 8];
+    protected $tabId         = 0;
+    protected $mode          = CACHETYPE_PAGE;
+    protected $validCats     = [1, 2, 3];
+
+    public function __construct($pageCall, $pageParam)
+    {
+        $this->getCategoryFromUrl($pageParam);;
+
+        parent::__construct();
+
+        $this->name = Util::ucFirst(Lang::$game['pets']);
+    }
+
+    protected function generateContent()
+    {
+        $conditions = [];
+        if ($this->category)
+            $conditions[] = ['type', (int)$this->category[0]];
+
+        $pets = new PetList($conditions);
+        if (!$pets->error)
+        {
+            $this->extendGlobalData($pets->getJSGlobals(GLOBALINFO_RELATED));
+
+            $params = ['visibleCols' => "$['abilities']"];
+            if (!$pets->hasDiffFields(['type']))
+                $params['hiddenCols'] = "$['type']";
+
+            $this->lvData[] = array(
+                'file'   => 'pet',
+                'data'   => $pets->getListviewData(),
+                'params' => $params
+            );
+        };
+    }
+
+    protected function generateTitle()
+    {
+        array_unshift($this->title, Util::ucFirst(Lang::$game['pets']));
+        if ($this->category)
+            array_unshift($this->title, Lang::$pet['cat'][$this->category[0]]);
+    }
+
+    protected function generatePath()
+    {
+        if ($this->category)
+            $this->path[] = $this->category[0];
+    }
 }
-
-if (!$smarty->loadCache($cacheKey, $pageData))
-{
-    $pets = new PetList($cat ? array(['type', (int)$cat[0]]) : []);
-    $pets->addGlobalsToJScript(GLOBALINFO_RELATED);
-
-    $lvPet = array(
-        'file'   => 'pet',
-        'data'   => $pets->getListviewData(),
-        'params' => array(
-            'visibleCols' => "$['abilities']"
-        )
-    );
-
-    if (!$pets->hasDiffFields(['type']))
-        $lvPet['params']['hiddenCols'] = "$['type']";
-
-    // menuId 8: Pets     g_initPath()
-    //  tabid 0: Database g_initHeader()
-    $pageData = array(
-        'page' => array(
-            'title' => implode(" - ", $title),
-            'path'  => json_encode($path, JSON_NUMERIC_CHECK),
-            'tab'   => 0
-        ),
-        'lv'   => [$lvPet]
-    );
-
-    $smarty->saveCache($cacheKey, $pageData);
-}
-
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData['lv']);
-
-// load the page
-$smarty->display('list-page-generic.tpl');
 
 ?>
