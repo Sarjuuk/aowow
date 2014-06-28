@@ -65,7 +65,7 @@ class EventPage extends GenericPage
         /* Infobox */
         /***********/
 
-        $this->infobox = [];
+        $this->infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // boss
         if ($_ = $this->subject->getField('bossCreature'))

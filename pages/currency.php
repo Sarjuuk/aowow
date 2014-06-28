@@ -49,17 +49,18 @@ class CurrencyPage extends GenericPage
         /* Infobox */
         /**********/
 
-        $infobox = '';
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+
         if ($this->typeId == 103)                                        // Arena Points
-            $infobox = '[ul][li]'.Lang::$currency['cap'].Lang::$main['colon'].'10\'000[/li][/ul]';
+            $infobox[] = Lang::$currency['cap'].Lang::$main['colon'].'10\'000';
         else if ($this->typeId == 104)                                   // Honor
-            $infobox = '[ul][li]'.Lang::$currency['cap'].Lang::$main['colon'].'75\'000[/li][/ul]';
+            $infobox[] = Lang::$currency['cap'].Lang::$main['colon'].'75\'000';
 
         /****************/
         /* Main Content */
         /****************/
 
-        $this->infobox    = $infobox;
+        $this->infobox    = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
         $this->name       = $this->subject->getField('name', true);
         $this->headIcons  = $this->typeId == 104 ? ['inv_bannerpvp_02', 'inv_bannerpvp_01'] : [$this->subject->getField('iconString')];
         $this->redButtons = array(
@@ -73,26 +74,28 @@ class CurrencyPage extends GenericPage
 
         if (!$_isSpecial)
         {
-            include 'includes/loot.class.php';
-
             // tabs: this currency is contained in..
-            $lootTabs = Loot::getByItem($_itemId);
-            $this->extendGlobalData(Loot::$jsGlobals);
+            $lootTabs = new Loot();
 
-            foreach ($lootTabs as $tab)
+            if ($lootTabs->getByItem($_itemId))
             {
-                $this->lvData[] = array(
-                    'file'   => $tab[0],
-                    'data'   => $tab[1],
-                    'params' => [
-                        'tabs'        => '$tabsRelated',
-                        'name'        => $tab[2],
-                        'id'          => $tab[3],
-                        'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
-                        'hiddenCols'  => $tab[5] ? '$['.implode(', ', array_unique($tab[5])).']' : null,
-                        'visibleCols' => $tab[6] ? '$'. json_encode(  array_unique($tab[6]))     : null
-                    ]
-                );
+                $this->extendGlobalData($lootTabs->jsGlobals);
+
+                foreach ($lootTabs->iterate() as $tab)
+                {
+                    $this->lvData[] = array(
+                        'file'   => $tab[0],
+                        'data'   => $tab[1],
+                        'params' => [
+                            'tabs'        => '$tabsRelated',
+                            'name'        => $tab[2],
+                            'id'          => $tab[3],
+                            'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
+                            'hiddenCols'  => $tab[5] ? '$['.implode(', ', array_unique($tab[5])).']' : null,
+                            'visibleCols' => $tab[6] ? '$'. json_encode(  array_unique($tab[6]))     : null
+                        ]
+                    );
+                }
             }
 
             // tab: sold by

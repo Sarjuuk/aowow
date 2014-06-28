@@ -37,12 +37,12 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // holiday
     if ($_ev)
-        $infobox[] = Lang::$game['eventShort'].Lang::$colon.'[url=?event='.$_ev.']'.WorldEventList::getName($_ev).'[/url]';
+        $infobox[] = Lang::$game['eventShort'].Lang::$main['colon'].'[url=?event='.$_ev.']'.WorldEventList::getName($_ev).'[/url]';
 
     // itemLevel
     if ($min = $iSet->getField('minLevel'))
     {
-        $foo = Lang::$game['level'].Lang::$colon.$min;
+        $foo = Lang::$game['level'].Lang::$main['colon'].$min;
         $max = $iSet->getField('maxLevel');
 
         if ($min < $max)
@@ -60,7 +60,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
                 $foo[] = (!fMod(count($foo) + 1, 3) ? '\n' : null) . '[class='.($i + 1).']';
 
         $t = count($foo) == 1 ? Lang::$game['class'] : Lang::$game['classes'];
-        $infobox[] = Util::ucFirst($t).Lang::$colon.implode(', ', $foo);
+        $infobox[] = Util::ucFirst($t).Lang::$main['colon'].implode(', ', $foo);
     }
 
     // required level
@@ -69,11 +69,11 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
     // type
     if ($_ty)
-        $infobox[] = Lang::$game['type'].lang::$colon.Lang::$itemset['types'][$_ty];
+        $infobox[] = Lang::$game['type'].Lang::$main['colon'].Lang::$itemset['types'][$_ty];
 
     // tag
     if ($_ta)
-        $infobox[] = Lang::$itemset['_tag'].Lang::$colon.'[url=?itemsets&filter=ta='.$_ta.']'.Lang::$itemset['notes'][$_ta].'[/url]';
+        $infobox[] = Lang::$itemset['_tag'].Lang::$main['colon'].'[url=?itemsets&filter=ta='.$_ta.']'.Lang::$itemset['notes'][$_ta].'[/url]';
 
     /****************/
     /* Main Content */
@@ -208,7 +208,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
         'relTabs' => []
     );
 
-    $iSet->addGlobalsToJscript();
+    $iSet->getJSGlobals();
 
     /**************/
     /* Extra Tabs */
@@ -262,7 +262,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
             if (!$mask)
                 $pageData['related']['params']['hiddenCols'] = "$['classes']";
 
-            $relSets->addGlobalsToJscript();
+            $relSets->getJSGlobals();
         }
     }
 
@@ -272,7 +272,7 @@ if (!$smarty->loadCache($cacheKeyPage, $pageData))
 
 $smarty->updatePageVars($pageData['page']);
 $smarty->assign('community', CommunityContent::getAll(TYPE_ITEMSET, $_id));  // comments, screenshots, videos
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$itemset, ['colon' => Lang::$colon]));
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$itemset, ['colon' => Lang::$main['colon']]));
 $smarty->assign('lvData', $pageData['relTabs']);
 
 // load the page

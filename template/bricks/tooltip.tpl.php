@@ -7,7 +7,16 @@
 <?php if (!empty($this->jsGlobals[6][2]['buff'])): /* not set with items */ ?>
     <h3><?php echo Lang::$spell['_aura']; ?></h3>
     <div id="btt<?php echo $this->typeId; ?>" class="wowhead-tooltip"></div>
-<?php endif; ?>
+<?php
+endif;
+
+/*
+  tt:  Tooltip
+  btt: Buff-Tooltip
+  sl:  Slider for CharLevel
+  ks:  Known Spells
+*/
+?>
 
 <script type="text/javascript">//<![CDATA[
     $WH.ge('ic<?php echo $this->typeId; ?>').appendChild(Icon.create('<?php echo $this->headIcons[0]; ?>', 2, null, 0, <?php echo $this->headIcons[1]; ?>));

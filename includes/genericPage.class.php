@@ -16,9 +16,9 @@ trait DetailPage
         //     mode,         type,        typeId,        localeId,        category, filter
         $key = [$this->mode, $this->type, $this->typeId, User::$localeId, '-1',     '-1'];
 
-        // check for $this->enhancedTT from Item and apply
-        // foreach ($extra as $x)
-            // $key[] = (string)$x;
+        // item special: can modify tooltips
+        if (isset($this->enhancedTT))
+            $key[] = md5(serialize($this->enhancedTT));
 
         return implode('_', $key);
     }
@@ -159,11 +159,12 @@ class GenericPage
             $this->saveCache();
         }
 
-        $this->gPageInfo = array(                           // varies slightly for special pages like maps, user-dashboard or profiler
-            'type'   => $this->type,
-            'typeId' => $this->typeId,
-            'name'   => $this->name
-        );
+        if (isset($this->type) && isset($this->typeId))
+            $this->gPageInfo = array(                       // varies slightly for special pages like maps, user-dashboard or profiler
+                'type'   => $this->type,
+                'typeId' => $this->typeId,
+                'name'   => $this->name
+            );
 
         if (method_exists($this, 'postCache'))              // e.g. update dates for events and such
             $this->postCache();
@@ -258,12 +259,12 @@ class GenericPage
 
     private function addAnnouncements()                     // get announcements and notes for user
     {
+        if (!isset($this->announcements))
+            $this->announcements = [];
+
         // display occured notices
         if ($_ = Util::getNotes(false))
         {
-            if (!isset($this->announcements))
-                $this->announcements = [];
-
             $this->announcements[] = array(
                 'id'     => 0,
                 'mode'   => 1,
@@ -277,9 +278,6 @@ class GenericPage
         // fetch announcements
         if (preg_match('/^([a-z\-]+)=?.*$/i', $_SERVER['QUERY_STRING'], $match))
         {
-            if (!isset($this->announcements))
-                $this->announcements = [];
-
             $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $match[1], User::$groups);
             foreach ($ann as $k => $v)
             {

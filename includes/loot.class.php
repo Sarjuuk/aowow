@@ -20,11 +20,12 @@ if (!defined('AOWOW_REVISION'))
 
 class Loot
 {
-    public static  $jsGlobals     = [];
-    public static  $extraCols     = [];
+    public  $jsGlobals     = [];
+    public  $extraCols     = [];
 
-    private static $results       = [];
-    private static $lootTemplates = array(
+    private $entry         = 0;                             // depending on the lookup itemId oder templateId
+    private $results       = [];
+    private $lootTemplates = array(
         LOOT_REFERENCE,                                     // internal
         LOOT_ITEM,                                          // item
         LOOT_DISENCHANT,                                    // item
@@ -39,20 +40,20 @@ class Loot
         LOOT_SPELL                                          // spell
     );
 
-    public static function &iterate()
+    public function &iterate()
     {
-        reset(self::$results);
+        reset($this->results);
 
-        while (list($k, $__) = each(self::$results))
-            yield self::$results[$k];
+        while (list($k, $__) = each($this->results))
+            yield $this->results[$k];
     }
 
-    public static function getResult()
+    public function getResult()
     {
-        return self::$results;
+        return $this->results;
     }
 
-    private static function createStack($l)                 // issue: TC always has an equal distribution between min/max
+    private function createStack($l)                        // issue: TC always has an equal distribution between min/max
     {
         if (empty($l['min']) || empty($l['max']) || $l['min'] <= $l['max'])
             return null;
@@ -65,14 +66,22 @@ class Loot
         return json_encode($stack, JSON_NUMERIC_CHECK);
     }
 
-    private static function storeJSGlobals($data)
+    private function storeJSGlobals($data)
     {
         foreach ($data as $type => $jsData)
+        {
             foreach ($jsData as $k => $v)
-                self::$jsGlobals[$type][$k] = $v;
+            {
+                // was already set at some point with full data
+                if (isset($this->jsGlobals[$type][$k]) && is_array($this->jsGlobals[$type][$k]))
+                    continue;
+
+                $this->jsGlobals[$type][$k] = $v;
+            }
+        }
     }
 
-    private static function getByContainerRecursive($tableName, $lootId, &$handledRefs, $groupId = 0, $baseChance = 1.0)
+    private function getByContainerRecursive($tableName, $lootId, &$handledRefs, $groupId = 0, $baseChance = 1.0)
     {
         $loot     = [];
         $rawItems = [];
@@ -80,7 +89,7 @@ class Loot
         if (!$tableName || !$lootId)
             return null;
 
-        $rows = DB::Aowow()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, abs($lootId), $groupId ? $groupId : DBSIMPLE_SKIP);
+        $rows = DB::Aowow()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, abs($lootId), $groupId ?: DBSIMPLE_SKIP);
         if (!$rows)
             return null;
 
@@ -164,7 +173,7 @@ class Loot
             }
             else                                            // shouldn't have happened
             {
-                self::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: unhandled case in calculating chance for item '.$entry['item'].'!');
+                Util::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: unhandled case in calculating chance for item '.$entry['item'].'!');
                 continue;
             }
 
@@ -178,7 +187,7 @@ class Loot
                 $sum = 0;
             else if ($sum > 100)
             {
-                self::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
+                Util::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
                 $sum = 100;
             }
 
@@ -190,11 +199,11 @@ class Loot
         return [$loot, array_unique($rawItems)];
     }
 
-    public static function getByContainer($table, $entry)
+    public function getByContainer($table, $entry)
     {
-        $loot = null;
+        $this->entry = intVal($entry);
 
-        if (!$table || !$entry)
+        if (!in_array($table, $this->lootTemplates) || !$this->entry)
             return null;
 
         /*
@@ -202,19 +211,19 @@ class Loot
 
         also
 
-            // if (is_array($entry) && in_array($table, [LOOT_CREATURE, LOOT_GAMEOBJECT])
+            // if (is_array($this->entry) && in_array($table, [LOOT_CREATURE, LOOT_GAMEOBJECT])
                 // iterate over the 4 available difficulties and assign modes
 
 
             modes:{"mode":1,"1":{"count":4408,"outof":16013},"4":{"count":4408,"outof":22531}}
         */
         $handledRefs = [];
-        $struct = self::getByContainerRecursive($table, $entry, $handledRefs);
+        $struct = self::getByContainerRecursive($table, $this->entry, $handledRefs);
         if (!$struct)
             return false;
 
         $items = new ItemList(array(['i.id', $struct[1]], CFG_SQL_LIMIT_NONE));
-        self::$jsGlobals = $items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $this->jsGlobals = $items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED);
         $foo = $items->getListviewData();
 
         // assign listview LV rows to loot rows, not the other way round! The same item may be contained multiple times
@@ -240,13 +249,13 @@ class Loot
             {
                 if (!User::isInGroup(U_GROUP_STAFF))
                 {
-                    if (!isset(self::$results[$loot['content']]))
-                        self::$results[$loot['content']] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
+                    if (!isset($this->results[$loot['content']]))
+                        $this->results[$loot['content']] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
                     else
-                        self::$results[$loot['content']]['percent'] += $base['percent'];
+                        $this->results[$loot['content']]['percent'] += $base['percent'];
                 }
                 else                                        // in case of limited trash loot, check if $foo[<itemId>] exists
-                    self::$results[] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
+                    $this->results[] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
             }
             else if (User::isInGroup(U_GROUP_STAFF))        // create dummy for ref-drop
             {
@@ -256,16 +265,16 @@ class Loot
                     'icon'  => 'trade_engineering',
                     'stack' => [$loot['multiplier'], $loot['multiplier']]
                 );
-                self::$results[] = array_merge($base, $data);
+                $this->results[] = array_merge($base, $data);
 
-                self::$jsGlobals[TYPE_ITEM][$loot['content']] = $data;
+                $this->jsGlobals[TYPE_ITEM][$loot['content']] = $data;
             }
         }
 
         // move excessive % to extra loot
         if (!User::isInGroup(U_GROUP_STAFF))
         {
-            foreach (self::$results as &$_)
+            foreach ($this->results as &$_)
             {
                 if ($_['percent'] <= 100)
                     continue;
@@ -286,7 +295,7 @@ class Loot
             $fields = ['mode', 'reference'];
             $base   = [];
             $set    = 0;
-            foreach (self::$results as $foo)
+            foreach ($this->results as $foo)
             {
                 foreach ($fields as $idx => $field)
                 {
@@ -300,19 +309,21 @@ class Loot
                     break;
             }
 
-            self::$extraCols[] = "Listview.funcBox.createSimpleCol('group', 'Group', '7%', 'group')";
+            $this->extraCols[] = "Listview.funcBox.createSimpleCol('group', 'Group', '7%', 'group')";
             foreach ($fields as $idx => $field)
                 if ($set & (1 << $idx))
-                    self::$extraCols[] = "Listview.funcBox.createSimpleCol('".$field."', '".Util::ucFirst($field)."', '7%', '".$field."')";
+                    $this->extraCols[] = "Listview.funcBox.createSimpleCol('".$field."', '".Util::ucFirst($field)."', '7%', '".$field."')";
         }
 
         return true;
     }
 
-    public static function getByItem($itemId, $maxResults = CFG_SQL_LIMIT_DEFAULT)
+    public function getByItem($entry, $maxResults = CFG_SQL_LIMIT_DEFAULT)
     {
-        if (!$itemId)
-            return [];
+        $this->entry = intVal($entry);
+
+        if (!$this->entry)
+            return false;
 
         //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
         $tabsFinal  = array(
@@ -364,15 +375,15 @@ class Loot
             {
                 // check for possible database inconsistencies
                 if (!$ref['chance'] && !$ref['isGrouped'])
-                    self::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
+                    Util::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] > 100)
-                    self::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
+                    Util::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] == 100 && !$ref['chance'])
-                    self::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
+                    Util::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
 
-                $chance = abs($ref['chance'] ? $ref['chance'] : (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
+                $chance = abs($ref['chance'] ?: (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
 
                 // apply inherited chanceMods
                 if (isset($chanceMods[$ref['item']]))
@@ -390,7 +401,7 @@ class Loot
                     $data = array(
                         'percent' => $chance,
                         'stack'   => [$ref['min'], $ref['max']],
-                        'count'   => 1                          // ..and one for the sort script
+                        'count'   => 1                      // ..and one for the sort script
                     );
 
                     if ($_ = self::createStack($ref))
@@ -416,7 +427,7 @@ class Loot
         $newRefs = DB::Aowow()->select(
             sprintf($query, 'lt1.item = ?d AND lt1.mincountOrRef > 0'),
             LOOT_REFERENCE, LOOT_REFERENCE,
-            $itemId
+            $this->entry
         );
 
         while ($newRefs)
@@ -434,13 +445,13 @@ class Loot
         /*
             search the real loot-templates for the itemId and gathered refds
         */
-        for ($i = 1; $i < count(self::$lootTemplates); $i++)
+        for ($i = 1; $i < count($this->lootTemplates); $i++)
         {
             $result = $calcChance(DB::Aowow()->select(
                 sprintf($query, '{lt1.mincountOrRef IN (?a) OR }(lt1.mincountOrRef > 0 AND lt1.item = ?d)'),
-                self::$lootTemplates[$i], self::$lootTemplates[$i],
+                $this->lootTemplates[$i], $this->lootTemplates[$i],
                 $refResults ? array_keys($refResults) : DBSIMPLE_SKIP,
-                $itemId
+                $this->entry
             ));
 
             // do not skip here if $result is empty. Additional loot for spells and quest is added separately
@@ -457,7 +468,7 @@ class Loot
             // screws with GO-loot and skinnig-loot as these templates are shared for several tabs (fish, herb, ore) (herb, ore, leather)
             $ids = array_slice(array_keys($result), 0, $maxResults);
 
-            switch (self::$lootTemplates[$i])
+            switch ($this->lootTemplates[$i])
             {
                 case LOOT_CREATURE:     $field = 'lootId';              $tabId =  4;    break;
                 case LOOT_PICKPOCKET:   $field = 'pickpocketLootId';    $tabId =  5;    break;
@@ -494,8 +505,8 @@ class Loot
                     }
                     break;
                 case LOOT_MAIL:
-                    $conditions = array(['rewardChoiceItemId1', $itemId], ['rewardChoiceItemId2', $itemId], ['rewardChoiceItemId3', $itemId], ['rewardChoiceItemId4', $itemId], ['rewardChoiceItemId5', $itemId],
-                                        ['rewardChoiceItemId6', $itemId], ['rewardItemId1', $itemId],       ['rewardItemId2', $itemId],       ['rewardItemId3', $itemId],       ['rewardItemId4', $itemId],
+                    $conditions = array(['rewardChoiceItemId1', $this->entry], ['rewardChoiceItemId2', $this->entry], ['rewardChoiceItemId3', $this->entry], ['rewardChoiceItemId4', $this->entry], ['rewardChoiceItemId5', $this->entry],
+                                        ['rewardChoiceItemId6', $this->entry], ['rewardItemId1', $this->entry],       ['rewardItemId2', $this->entry],       ['rewardItemId3', $this->entry],       ['rewardItemId4', $this->entry],
                                         'OR');
                     if ($ids)
                         $conditions[] = ['rewardMailTemplateId', $ids];
@@ -517,7 +528,7 @@ class Loot
 
                     break;
                 case LOOT_SPELL:
-                    $conditions = ['OR', ['effect1CreateItemId', $itemId], ['effect2CreateItemId', $itemId], ['effect3CreateItemId', $itemId]];
+                    $conditions = ['OR', ['effect1CreateItemId', $this->entry], ['effect2CreateItemId', $this->entry], ['effect3CreateItemId', $this->entry]];
                     if ($ids)
                         $conditions[] = ['id', $ids];
 
@@ -573,7 +584,9 @@ class Loot
             }
         }
 
-        return $tabsFinal;
+        $this->results = $tabsFinal;
+
+        return true;
     }
 }
 

@@ -14,7 +14,7 @@ if (!$smarty->loadCache($cacheKey, $pageData, $filter))
     $itemsetFilter = new ItemsetListFilter();
 
     $itemsets = new ItemsetList([$itemsetFilter->getConditions()]);
-    $itemsets->addGlobalsToJscript();
+    $itemsets->getJSGlobals();
 
     // recreate form selection
     $filter = array_merge($itemsetFilter->getForm('form'), $filter);
@@ -70,7 +70,7 @@ asort(Lang::$game['cl']);
 
 $smarty->updatePageVars($pageData['page']);
 $smarty->assign('filter', $filter);
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$itemset, Lang::$item, ['colon' => lang::$colon]));
+$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$itemset, Lang::$item, ['colon' => Lang::$main['colon']]));
 $smarty->assign('lvData', $pageData['lv']);
 
 // load the page

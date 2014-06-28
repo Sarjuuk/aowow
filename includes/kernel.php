@@ -9,13 +9,15 @@ ini_set('serialize_precision', 4);
 require 'includes/defines.php';
 require 'config/config.php';
 require 'includes/genericPage.class.php';
-require 'includes/libs/DbSimple/Generic.php';                   // Libraray: http://en.dklab.ru/lib/DbSimple (using mysqli variant: https://bitbucket.org/brainreaver/dbsimple/src)
-require 'includes/utilities.php';
-require 'includes/ajaxHandler.class.php';
+require 'includes/libs/DbSimple/Generic.php';               // Libraray: http://en.dklab.ru/lib/DbSimple (using mysqli variant: https://bitbucket.org/brainreaver/dbsimple/src)
+require 'includes/utilities.php';                           // misc™ data 'n func
+require 'includes/ajaxHandler.class.php';                   // handles ajax and jsonp requests
 require 'includes/user.class.php';
-require 'includes/database.class.php';
-require 'includes/community.class.php';
+require 'includes/database.class.php';                      // wrap DBSimple
+require 'includes/community.class.php';                     // handle comments, screenshots and videos
+require 'includes/loot.class.php';                          // build lv-tabs containing loot-information
 require 'localization/lang.class.php';
+
 
 // autoload List-classes, associated filters and pages
 spl_autoload_register(function ($class) {

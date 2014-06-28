@@ -77,7 +77,7 @@ class AchievementPage extends GenericPage
         /* Infobox */
         /***********/
 
-        $infobox = [];
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // points
         if ($_ = $this->subject->getField('points'))
@@ -397,7 +397,7 @@ class AchievementPage extends GenericPage
     protected function generateTooltip($asError = false)
     {
         if ($asError)
-            die('$WowheadPower.registerAchievement('.$this->typeId.', '.User::$localeId.', {});');
+            return '$WowheadPower.registerAchievement('.$this->typeId.', '.User::$localeId.', {});';
 
         $x = '$WowheadPower.registerAchievement('.$this->typeId.', '.User::$localeId.",{\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";

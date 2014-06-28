@@ -233,16 +233,16 @@ abstract class BaseType
             $this->queryBase .= ' WHERE ('.implode($linking, $where).')';
 
         // append grouping
-        if ($g = array_column($this->queryOpts, 'g'))
-            $this->queryBase .= ' GROUP BY '.implode(', ', array_filter($g));
+        if ($g = array_filter(array_column($this->queryOpts, 'g')))
+            $this->queryBase .= ' GROUP BY '.implode(', ', $g);
 
         // append post filtering
-        if ($h = array_column($this->queryOpts, 'h'))
-            $this->queryBase .= ' HAVING '.implode(' AND ', array_filter($h));
+        if ($h = array_filter(array_column($this->queryOpts, 'h')))
+            $this->queryBase .= ' HAVING '.implode(' AND ', $h);
 
         // append ordering
-        if ($o = array_column($this->queryOpts, 'o'))
-            $this->queryBase .= ' ORDER BY '.implode(', ', array_filter($o));
+        if ($o = array_filter(array_column($this->queryOpts, 'o')))
+            $this->queryBase .= ' ORDER BY '.implode(', ', $o);
 
         // apply limit
         if ($limit)

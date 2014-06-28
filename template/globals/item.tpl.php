@@ -3,13 +3,13 @@ var _ = g_items;
 foreach ($vars as $id => $data):
     echo '_['.$id.']={' .
             'name_'.User::$localeString.':\''.Util::jsEscape($data['name']).'\',' .
-            'icon:\''.Util::jsEscape($data['icon']).'\'' .
+            'icon:\''.$data['icon'].'\'' .
             (isset($data['quality']) ? ', quality:\''.$data['quality'].'\'' : null) .
         '};';
 endforeach;
 
-if ($extra):
-    echo '_['.$extra['id'].'].tooltip_'.User::$localeString.' = \''.$extra['tooltip'].'\'';
-    echo '_['.$extra['id'].'].spells_'.User::$localeString.' = {'.json_encode($extra['spells'], JSON_NUMERIC_CHECK).'};';
+if (isset($extra[$this->typeId])):
+    echo '_['.$extra[$this->typeId]['id'].'].tooltip_'.User::$localeString.' = \''.Util::jsEscape($extra[$this->typeId]['tooltip']).'\';';
+    echo '_['.$extra[$this->typeId]['id'].'].spells_'.User::$localeString.' = '.json_encode($extra[$this->typeId]['spells'], JSON_NUMERIC_CHECK).';';
 endif;
 ?>

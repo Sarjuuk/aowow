@@ -9,8 +9,8 @@
             <script type="text/javascript">//<![CDATA[
 <?php
     $this->brick('community');
-            echo "var g_pageInfo = ".json_encode($this->gPageInfo, JSON_NUMERIC_CHECK).";\n" .
-                 "g_initPath(".json_encode($this->path, JSON_NUMERIC_CHECK).");\n";
+            echo "                var g_pageInfo = ".json_encode($this->gPageInfo, JSON_NUMERIC_CHECK).";\n" .
+                 "                g_initPath(".json_encode($this->path, JSON_NUMERIC_CHECK).");\n";
 ?>
             //]]></script>
 

@@ -51,7 +51,7 @@ class FactionPage extends GenericPage
         /***********/
         /* Infobox */
         /***********/
-        $infobox = [];
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // Quartermaster if any
         if ($ids = $this->subject->getField('qmNpcIds'))

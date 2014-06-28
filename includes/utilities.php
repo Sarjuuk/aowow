@@ -1090,103 +1090,107 @@ class Util
     // 8 => TYPE_PRISMATIC_SOCKET   Extra Sockets AmountX as socketCount (ignore)
     public static function parseItemEnchantment($ench, $raw = false, &$misc = null)
     {
-        $enchant = [];
-        if (is_numeric($ench))
-            $enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $ench);
-        else if (is_array($ench))
-            $enchant = $ench;
-
-        if (!$enchant)
+        if (!$ench)
             return [];
 
-        $misc = array(
-            'name' => self::localizedString($enchant, 'text'),
-            'text' => array(
-                'text_loc0' => $enchant['text_loc0'],
-                'text_loc2' => $enchant['text_loc2'],
-                'text_loc3' => $enchant['text_loc3'],
-                'text_loc6' => $enchant['text_loc6'],
-                'text_loc8' => $enchant['text_loc8']
-            )
-        );
+        if (is_numeric($ench))
+            $ench = [$ench];
 
-        if ($enchant['skillLine'] > 0)
-            $misc['reqskill'] = $enchant['skillLine'];
+        if (!is_array($ench))
+            return [];
 
-        if ($enchant['skillLevel'] > 0)
-            $misc['reqskillrank'] = $enchant['skillLevel'];
+        $enchants = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE id IN (?a)', $ench);
+        if (!$enchants)
+            return [];
 
-        if ($enchant['requiredLevel'] > 0)
-            $misc['reqlevel'] = $enchant['requiredLevel'];
-
-        // parse stats
-        $jsonStats = [];
-        for ($h = 1; $h <= 3; $h++)
+        $result = [];
+        foreach ($enchants as $eId => $e)
         {
-            $obj = (int)$enchant['object'.$h];
-            $val = (int)$enchant['amount'.$h];
+            $misc[$eId] = array(
+                'name' => self::localizedString($e, 'text'),
+                'text' => array(
+                    'text_loc0' => $e['text_loc0'],
+                    'text_loc2' => $e['text_loc2'],
+                    'text_loc3' => $e['text_loc3'],
+                    'text_loc6' => $e['text_loc6'],
+                    'text_loc8' => $e['text_loc8']
+                )
+            );
 
-            switch ($enchant['type'.$h])
+            if ($e['skillLine'] > 0)
+                $misc[$eId]['reqskill'] = $e['skillLine'];
+
+            if ($e['skillLevel'] > 0)
+                $misc[$eId]['reqskillrank'] = $e['skillLevel'];
+
+            if ($e['requiredLevel'] > 0)
+                $misc[$eId]['reqlevel'] = $e['requiredLevel'];
+
+            // parse stats
+            $jsonStats = [];
+            for ($h = 1; $h <= 3; $h++)
             {
-                case 2:
-                    @$jsonStats[ITEM_MOD_WEAPON_DMG] += $val;
-                    break;
-                case 3:
-                case 7:
-                    $spl   = new SpellList(array(['s.id', $obj]));
-                    if ($spl->error)
+                $obj = (int)$e['object'.$h];
+                $val = (int)$e['amount'.$h];
+
+                switch ($e['type'.$h])
+                {
+                    case 2:
+                        @$jsonStats[ITEM_MOD_WEAPON_DMG] += $val;
                         break;
+                    case 3:
+                    case 7:
+                        $spl   = new SpellList(array(['s.id', $obj]));
+                        if ($spl->error)
+                            break;
 
-                    $gains = $spl->getStatGain();
+                        $gains = $spl->getStatGain();
 
-                    foreach ($gains as $gain)
-                        foreach ($gain as $k => $v)         // array_merge screws up somehow...
-                            @$jsonStats[$k] += $v;
-                    break;
-                case 4:
-                    switch ($obj)
-                    {
-                        case 0:                             // Physical
-                            @$jsonStats[ITEM_MOD_ARMOR] += $val;
-                            break;
-                        case 1:                             // Holy
-                            @$jsonStats[ITEM_MOD_HOLY_RESISTANCE] += $val;
-                            break;
-                        case 2:                             // Fire
-                            @$jsonStats[ITEM_MOD_FIRE_RESISTANCE] += $val;
-                            break;
-                        case 3:                             // Nature
-                            @$jsonStats[ITEM_MOD_NATURE_RESISTANCE] += $val;
-                            break;
-                        case 4:                             // Frost
-                            @$jsonStats[ITEM_MOD_FROST_RESISTANCE] += $val;
-                            break;
-                        case 5:                             // Shadow
-                            @$jsonStats[ITEM_MOD_SHADOW_RESISTANCE] += $val;
-                            break;
-                        case 6:                             // Arcane
-                            @$jsonStats[ITEM_MOD_ARCANE_RESISTANCE] += $val;
-                            break;
-                    }
-                    break;
-                case 5:
-                    @$jsonStats[$obj] += $val;
-                    break;
+                        foreach ($gains as $gain)
+                            foreach ($gain as $k => $v)         // array_merge screws up somehow...
+                                @$jsonStats[$k] += $v;
+                        break;
+                    case 4:
+                        switch ($obj)
+                        {
+                            case 0:                             // Physical
+                                @$jsonStats[ITEM_MOD_ARMOR] += $val;
+                                break;
+                            case 1:                             // Holy
+                                @$jsonStats[ITEM_MOD_HOLY_RESISTANCE] += $val;
+                                break;
+                            case 2:                             // Fire
+                                @$jsonStats[ITEM_MOD_FIRE_RESISTANCE] += $val;
+                                break;
+                            case 3:                             // Nature
+                                @$jsonStats[ITEM_MOD_NATURE_RESISTANCE] += $val;
+                                break;
+                            case 4:                             // Frost
+                                @$jsonStats[ITEM_MOD_FROST_RESISTANCE] += $val;
+                                break;
+                            case 5:                             // Shadow
+                                @$jsonStats[ITEM_MOD_SHADOW_RESISTANCE] += $val;
+                                break;
+                            case 6:                             // Arcane
+                                @$jsonStats[ITEM_MOD_ARCANE_RESISTANCE] += $val;
+                                break;
+                        }
+                        break;
+                    case 5:
+                        @$jsonStats[$obj] += $val;
+                        break;
+                }
             }
+
+            if ($raw)
+                $result[$eId] = $jsonStats;
+            else
+                foreach ($jsonStats as $k => $v)            // check if we use these mods
+                    if ($str = Util::$itemMods[$k])
+                        $result[$eId][$str] = $v;
         }
 
-        if ($raw)
-            return $jsonStats;
-
-        // check if we use these mods
-        $return = [];
-        foreach ($jsonStats as $k => $v)
-        {
-            if ($str = Util::$itemMods[$k])
-                $return[$str] = $v;
-        }
-
-        return $return;
+        return $result;
     }
 
     // default ucFirst doesn't convert UTF-8 chars

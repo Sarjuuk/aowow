@@ -482,13 +482,13 @@ define('ITEM_CLASS_ARMOR',                  4);
 define('ITEM_CLASS_REAGENT',                5);
 define('ITEM_CLASS_AMMUNITION',             6);
 define('ITEM_CLASS_TRADEGOOD',              7);
-// define('ITEM_CLASS_GENERIC',             8);
+define('ITEM_CLASS_GENERIC',                8);
 define('ITEM_CLASS_RECIPE',                 9);
 define('ITEM_CLASS_MONEY',                  10);
 define('ITEM_CLASS_QUIVER',                 11);
 define('ITEM_CLASS_QUEST',                  12);
 define('ITEM_CLASS_KEY',                    13);
-// define('ITEM_CLASS_PERMANENT',           14);
+define('ITEM_CLASS_PERMANENT',              14);
 define('ITEM_CLASS_MISC',                   15);
 define('ITEM_CLASS_GLYPH',                  16);
 

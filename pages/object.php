@@ -65,7 +65,7 @@ class ObjectPage extends GenericPage
         /* Infobox */
         /***********/
 
-        $infobox = [];
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // Event
         if ($_ = DB::Aowow()->selectRow('SELECT e.id, holidayId FROM ?_events e, game_event_gameobject geg, gameobject g WHERE e.id = ABS(geg.eventEntry) AND g.guid = geg.guid AND g.id = ?d', $this->typeId))
@@ -393,17 +393,15 @@ class ObjectPage extends GenericPage
         $reqQuest = [];
         if ($_ = $this->subject->getField('lootId'))
         {
-            include 'includes/loot.class.php';
-
-            if (Loot::getByContainer(LOOT_GAMEOBJECT, $_))
+            $goLoot = new Loot();
+            if ($goLoot->getByContainer(LOOT_GAMEOBJECT, $_))
             {
-                $extraCols  = Loot::$extraCols;
+                $extraCols  = $goLoot->extraCols;
                 $hiddenCols = ['source', 'side', 'slot', 'reqlevel'];
-                $itemLoot   = Loot::getResult();
 
-                $this->extendGlobalData(Loot::$jsGlobals);
+                $this->extendGlobalData($goLoot->jsGlobals);
 
-                foreach ($itemLoot as $l => $lv)
+                foreach ($goLoot->iterate() as &$lv)
                 {
                     if (!empty($hiddenCols))
                         foreach ($hiddenCols as $k => $str)
@@ -417,14 +415,14 @@ class ObjectPage extends GenericPage
 
                     $reqQuest[$lv['id']] = 0;
 
-                    $itemLoot[$l]['condition'][] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
+                    $lv['condition'][] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
                 }
 
                 $extraCols[] = 'Listview.extraCols.percent';
 
                 $this->lvData[] = array(
                     'file'   => 'item',
-                    'data'   => $itemLoot,
+                    'data'   => $goLoot->getResult(),
                     'params' => [
                         'tabs'       => '$tabsRelated',
                         'name'       => '$LANG.tab_contains',
@@ -481,7 +479,7 @@ class ObjectPage extends GenericPage
     protected function generateTooltip($asError = false)
     {
         if ($asError)
-            die('$WowheadPower.registerObject('.$this->typeId.', '.User::$localeId.', {});');
+            return '$WowheadPower.registerObject('.$this->typeId.', '.User::$localeId.', {});';
 
         $s = $this->subject->getSpawns(true);
 

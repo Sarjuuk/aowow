@@ -2,7 +2,7 @@
 if (!empty($this->pageText)):
 ?>
                 <div class="clear"></div>
-                <h3><?php echo Lang::$main['content']; ?></h3>
+                <h3><?php echo Lang::$item['content']; ?></h3>
 
                 <div id="book-generic"></div>
                 <script>//<![CDATA[

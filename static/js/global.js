@@ -6358,7 +6358,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: $WH.ct(item['name_' + g_locale.name]),
+                name: item['name_' + g_locale.name],
                 url : '?skill=' + cond.typeId
             }];
 
@@ -6380,7 +6380,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: $WH.ct(item['name_' + g_locale.name]),
+                name: item['name_' + g_locale.name],
                 url : '?spell=' + cond.typeId
             }];
 
@@ -6399,7 +6399,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon : item.icon.toLowerCase(),
-                name : $WH.ct(item['name_' + g_locale.name]),
+                name : item['name_' + g_locale.name],
                 url  : '?item=' + cond.typeId,
                 color: 'q' + item.quality
             }];
@@ -6419,7 +6419,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: $WH.ct(item['name_' + g_locale.name]),
+                name: item['name_' + g_locale.name],
                 url : '?achievement=' + cond.typeId
             }];
 
@@ -6437,7 +6437,7 @@ Listview.extraCols = {
             cnd.state = $WH.ct((cond.status == 1 ? LANG.progress : (cond.status == 2 ? LANG.pr_note_complete : LANG.pr_note_incomplete)) + LANG.colon);
             cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
             cnd.links = [{
-                name: $WH.ct(item['name_' + g_locale.name]),
+                name: item['name_' + g_locale.name],
                 url : '?quest=' + cond.typeId
             }];
 
@@ -6459,7 +6459,7 @@ Listview.extraCols = {
 
             for (var i = 0, len = races.length; i < len; ++i) {
                 cnd.links.push({
-                    name: $WH.ct(g_chr_races[races[i]]),
+                    name: g_chr_races[races[i]],
                     url : '?class=' + races[i]
                 });
             }
