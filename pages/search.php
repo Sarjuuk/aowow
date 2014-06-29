@@ -3,6 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('invalid access');
 
+
 /*
     if &json
         => search by compare or profiler
@@ -27,154 +28,358 @@ todo    26: Listview - template: 'profile',     id: 'characters',    name: LANG.
         29: Arena Teams..?
 */
 
-$type       = @intVal($_GET['type']);
-$searchMask = 0x0;
-$found      = [];
-$cndBase    = ['AND'];
-$maxResults = CFG_SQL_LIMIT_SEARCH;
 
-$_wt        = isset($_GET['wt'])  ? explode(':', $_GET['wt'])  : null;
-$_wtv       = isset($_GET['wtv']) ? explode(':', $_GET['wtv']) : null;
-$_slots     = [];
-
-$search     = urlDecode(trim($pageParam));
-$query      = strtr($search, '?*', '_%');
-$invalid    = [];
-$include    = [];
-$exclude    = [];
-
-$parts = explode(' ', $query);
-foreach ($parts as $p)
+// tabId 0: Database g_initHeader()
+class SearchPage extends GenericPage
 {
-    if ($p[0] == '-')
+    protected $tpl           = 'search';
+    protected $tabId         = 0;
+    protected $mode          = CACHETYPE_SEARCH;
+    protected $js            = ['swfobject.js'];
+
+    protected $search        = '';                          // output
+    protected $invalid       = [];
+
+    private   $statWeight    = ['wt' => null, 'wtv' => null];
+    private   $maxResults    = CFG_SQL_LIMIT_SEARCH;
+    private   $searchMask    = 0x0;
+    private   $query         = '';                          // lookup
+    private   $included      = [];
+    private   $excluded      = [];
+    private   $searches      = array(
+        ['_searchCharClass'],   ['_searchCharRace'],    ['_searchTitle'],     ['_searchWorldEvent'],      ['_searchCurrency'],
+        ['_searchItemset'],     ['_searchItem'],        ['_searchAbility'],   ['_searchTalent'],          ['_searchGlyph'],
+        ['_searchProficiency'], ['_searchProfession'],  ['_searchCompanion'], ['_searchMount'],           ['_searchCreature'],
+        ['_searchQuest'],       ['_searchAchievement'], ['_searchStatistic'], ['_searchZone'],            ['_searchObject'],
+        ['_searchFaction'],     ['_searchSkill'],       ['_searchPet'],       ['_searchCreatureAbility'], ['_searchSpell'],
+    );
+
+    public function __construct($__, $pageParam)
     {
-        if (strlen($p) < 4)
-            $invalid[] = $p;
+        $this->search = urlDecode(trim($pageParam));
+        $this->query  = strtr($this->search, '?*', '_%');
+
+        // restricted access
+        if ($this->restrictedGroups && !User::isInGroup($this->restrictedGroups))
+            $this->error();
+
+        // statWeight for JSON-search
+        if (isset($_GET['wt']) && isset($_GET['wtv']))
+        {
+            $this->statWeight = array(
+                'wt'  => explode(':', $_GET['wt']),
+                'wtv' => explode(':', $_GET['wtv'])
+            );
+        }
+
+        // select search mode
+        if (isset($_GET['json']))
+        {
+            if ($_ = intVal($this->search))                 // allow for search by Id
+                $this->query = $_;
+
+            $type = @intVal($_GET['type']);
+
+            if (!empty($_GET['slots']))
+                $this->searchMask |= SEARCH_TYPE_JSON | 0x40;
+            else if ($type == TYPE_ITEMSET)
+                $this->searchMask |= SEARCH_TYPE_JSON | 0x60;
+            else if ($type == TYPE_ITEM)
+                $this->searchMask |= SEARCH_TYPE_JSON | 0x40;
+        }
+        else if (isset($_GET['opensearch']))
+        {
+            $this->maxResults = CFG_SQL_LIMIT_QUICKSEARCH;
+            $this->searchMask |= SEARCH_TYPE_OPEN | SEARCH_MASK_OPEN;
+        }
         else
-            $exclude[] = substr($p, 1);
+            $this->searchMask |= SEARCH_TYPE_REGULAR | SEARCH_MASK_ALL;
+
+        // handle maintenance status for js-cases
+        if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE) && !($this->searchMask & SEARCH_TYPE_REGULAR))
+            $this->notFound();
+
+        // fill include, exclude and ignore
+        $this->tokenizeQuery();
+
+        // invalid conditions: not enough characters to search OR no types to search
+        if ((!$this->included || !($this->searchMask & SEARCH_MASK_ALL)) && !CFG_MAINTENANCE && !(($this->searchMask & SEARCH_TYPE_JSON) && intVal($this->search)))
+        {
+            $this->mode = CACHETYPE_NONE;
+            $this->notFound();
+        }
+
+        parent::__construct($__, $pageParam);               // just to set g_user and g_locale
     }
-    else
+
+    private function tokenizeQuery()
     {
-        if (strlen($p) < 3)
-            $invalid[] = $p;
-        else
-            $include[] = $p;
+        if (!$this->query)
+            return;
+
+        $parts = explode(' ', $this->query);
+        foreach ($parts as $p)
+        {
+            if ($p[0] == '-')
+            {
+                if (strlen($p) < 4)
+                    $this->invalid[] = substr($p, 1);
+                else
+                    $this->excluded[] = substr($p, 1);
+            }
+            else if ($p !== '')
+            {
+                if (strlen($p) < 3)
+                    $this->invalid[] = $p;
+                else
+                    $this->included[] = $p;
+            }
+        }
     }
-}
 
-$createLookup = function(array $fields = []) use($include, $exclude)
-{
-    // default to name-field
-    if (!$fields)
-        $fields[] = 'name_loc'.User::$localeId;
-
-    $qry = [];
-    foreach ($fields as $n => $f)
+    protected function generateCacheKey()
     {
-        $sub = [];
-        foreach ($include as $i)
-            $sub[] = [$f, '%'.$i.'%'];
+        $key = [$this->mode, $this->searchMask, md5($this->query), User::$localeId];
 
-        foreach ($exclude as $x)
-            $sub[] = [$f, '%'.$x.'%', '!'];
+        return implode('_', $key);
+    }
+
+    protected function postCache()
+    {
+        if (!empty($this->lvData[3]))                       // has world events
+        {
+            // update WorldEvents to date()
+            foreach ($this->lvData[3]['data'] as &$d)
+            {
+                $updated = WorldEventList::updateDates($d['_date']);
+                unset($d['_date']);
+                $d['startDate'] = $updated['start'] ? date(Util::$dateFormatInternal, $updated['start']) : false;
+                $d['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
+                $d['rec']       = $updated['rec'];
+            }
+        }
+
+        if ($this->searchMask & SEARCH_TYPE_REGULAR)
+        {
+            $foundTotal = 0;
+            foreach ($this->lvData as $_)
+                $foundTotal += count($_['data']);
+
+            if ($foundTotal == 1)                           // only one match -> redirect to find
+            {
+                $_      = array_pop($this->lvData);
+                $type   = Util::$typeStrings[$_['type']];
+                $typeId = key($_['data']);
+
+                header("Location: ?".$type.'='.$typeId);
+                exit();
+            }
+        }
+    }
+
+    protected function generateTitle()
+    {
+        array_unshift($this->title, $this->search, Lang::$search['search']);
+    }
+
+    protected function generatePath() { }
+
+    protected function generateContent()                    // just wrap it, so GenericPage can call and cache it
+    {
+        if ($this->mode == CACHETYPE_NONE)                  // search is invalid
+            return;
+
+        $this->performSearch();
+    }
+
+    public function notFound()
+    {
+        if ($this->searchMask & SEARCH_TYPE_REGULAR)
+        {
+            // empty queries go home
+            if (!$this->query)
+                header("Location:?");
+
+            parent::display();                              // errors are handled in the search-template itself
+        }
+        else if ($this->searchMask & SEARCH_TYPE_OPEN)
+            $result = $this->generateOpenSearch(true);
+        else /* if ($this->searchMask & SEARCH_TYPE_JSON) */
+            $result = $this->generateJsonSearch(true);
+
+        header("Content-type: application/x-javascript");
+        exit($result);
+    }
+
+    public function display($override = '')
+    {
+        if ($override || ($this->searchMask & SEARCH_TYPE_REGULAR))
+            return parent::display($override);
+        else if ($this->searchMask & SEARCH_TYPE_OPEN)
+        {
+            if (!$this->loadCache($open))
+            {
+                $this->performSearch();
+                $open = $this->generateOpenSearch();
+                $this->saveCache($open);
+            }
+            header('Content-type: application/x-javascript; charset=utf-8');
+            die($open);
+        }
+        else /* if ($this->searchMask & SEARCH_TYPE_JSON) */
+        {
+            if (!$this->loadCache($json))
+            {
+                $this->performSearch();
+                $json = $this->generateJsonSearch();
+                $this->saveCache($json);
+            }
+            header('Content-type: application/x-javascript; charset=utf-8');
+            die($json);
+        }
+    }
+
+    private function generateJsonSearch($asError = false)   // !note! dear reader, if you ever try to generate a string, that is to be evaled by JS, NEVER EVER terminate with a \n   .....   $totalHoursWasted +=2;
+    {
+        $outItems = '';
+        $outSets  = '';
+
+        if (!$asError)
+        {
+            if ($itemData = @$this->lvData[6]['data'])
+            {
+                $items = [];
+                foreach ($itemData as $k => $v)
+                    $items[] = json_encode($v, JSON_NUMERIC_CHECK);
+
+                $outItems = "\t".implode(",\n\t", $items)."\n";
+            }
+
+            if ($setData = @$this->lvData[5]['data'])
+            {
+                $sets = [];
+                foreach ($setData as $k => $v)
+                {
+                    unset($v['quality']);
+                    if (!$v['heroic'])
+                        unset($v['heroic']);
+
+                    $sets[] = json_encode($v, JSON_NUMERIC_CHECK);
+                }
+
+                $outSets = "\t".implode(",\n\t", $sets)."\n";
+            }
+        }
+
+        return '["'.Util::jsEscape($this->search)."\", [\n".$outItems."],[\n".$outSets.']]';
+    }
+
+    private function generateOpenSearch($asError = false)
+    {
+        // this one is funny: we want 10 results, ideally equally distributed over each type
+        $foundTotal = 0;
+        $limit      = $this->maxResults;
+        $names      = [];
+        $info       = [];
+
+        foreach ($this->lvData as $_)
+            $foundTotal += $_['matches'];
+
+        if (!$foundTotal || $asError)
+            return '["'.Util::jsEscape($this->search).'", []]';
+
+        foreach ($this->lvData as $idx => $set)
+        {
+            $max = max(1, intVal($limit * $set['matches'] / $foundTotal));
+            $limit -= $max;
+
+            for ($i = 0; $i < $max; $i++)
+            {
+                $data = array_shift($set['data']);
+                if (!$data)
+                    break;
+
+                $names[] = '"'.$data['name'].$set['appendix'].'"';
+                $extra   = [$set['type'], $data['id']];
+
+                if (isset($data['param1']))
+                    $extra[] = $data['param1'];
+
+                if (isset($data['param2']))
+                    $extra[] = $data['param2'];
+
+                $info[]  = '['.implode(', ', $extra).']';
+            }
+
+            if ($limit <= 0)
+                break;
+        }
+
+        return '["'.Util::jsEscape($this->search).'", ['.implode(', ', $names).'], [], [], [], [], [], ['.implode(', ', $info).']]';
+    }
+
+    private function createLookup(array $fields = [])
+    {
+        // default to name-field
+        if (!$fields)
+            $fields[] = 'name_loc'.User::$localeId;
+
+        $qry = [];
+        foreach ($fields as $f)
+        {
+            $sub = [];
+            foreach ($this->included as $i)
+                $sub[] = [$f, '%'.$i.'%'];
+
+            foreach ($this->excluded as $x)
+                $sub[] = [$f, '%'.$x.'%', '!'];
+
+            // single cnd?
+            if (count($sub) > 1)
+                array_unshift($sub, 'AND');
+            else
+                $sub = $sub[0];
+
+            $qry[] = $sub;
+        }
 
         // single cnd?
-        if (count($sub) > 1)
-            array_unshift($sub, 'AND');
+        if (count($qry) > 1)
+            array_unshift($qry, 'OR');
         else
-            $sub = $sub[0];
+            $qry = $qry[0];
 
-        $qry[] = $sub;
+        return $qry;
     }
 
-    // single cnd?
-    if (count($qry) > 1)
-        array_unshift($qry, 'OR');
-    else
-        $qry = $qry[0];
-
-    return $qry;
-};
-
-if (isset($_GET['json']))
-{
-    if ($_ = intVal($search))                               // allow for search by Id
-        $query = $_;
-
-    if (!empty($_GET['slots']))
+    private function performSearch()
     {
-        $_slots = explode(':', $_GET['slots']);
-        array_walk($_slots, function(&$v, $k) {
-            $v = intVal($v);
-        });
+        $cndBase = ['AND', $this->maxResults];
 
-        $searchMask |= SEARCH_TYPE_JSON | 0x40;
+        // Exclude internal wow stuff
+        if (!User::isInGroup(U_GROUP_STAFF))
+            $cndBase[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
+        $shared = [];
+        foreach ($this->searches as $idx => $ref)
+            if ($this->searchMask & (1 << $idx))
+                if ($_ = $this->$ref[0]($cndBase, $shared))
+                    $this->lvData[$idx] = $_;
     }
-    else if ($type == TYPE_ITEMSET)
-        $searchMask |= SEARCH_TYPE_JSON | 0x60;
-    else if ($type == TYPE_ITEM)
-        $searchMask |= SEARCH_TYPE_JSON | 0x40;
-}
-else if (isset($_GET['opensearch']))
-{
-    $maxResults  = CFG_SQL_LIMIT_QUICKSEARCH;
-    $searchMask |= SEARCH_TYPE_OPEN | SEARCH_MASK_OPEN;
-}
-else
-    $searchMask |= SEARCH_TYPE_REGULAR | SEARCH_MASK_ALL;
 
-$cndBase[] = $maxResults;
-
-// Exclude internal wow stuff
-if (!User::isInGroup(U_GROUP_STAFF))
-    $cndBase[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
-
-$cacheKey = implode('_', [CACHETYPE_SEARCH, $searchMask, sha1($query), User::$localeId]);
-
-// invalid conditions: not enough characters to search OR no types to search
-if ((!$include || !($searchMask & SEARCH_MASK_ALL)) && !($searchMask & SEARCH_TYPE_JSON && intVal($search)))
-{
-    if ($searchMask & SEARCH_TYPE_REGULAR)
+    private function _searchCharClass($cndBase)             // 0 Classes: $searchMask & 0x00000001
     {
-        // empty queries go home
-        if (!$query)
-            header("Location:?");
-
-        // insufficient queries throw an error
-        $smarty->assign('lang', array_merge(Lang::$main, Lang::$search));
-        $smarty->assign('found', []);
-        $smarty->assign('search', $search);
-        $smarty->assign('ignored', implode(', ', $invalid));
-
-        $smarty->display('search.tpl');
-        die();
-    }
-    else if ($searchMask & SEARCH_TYPE_OPEN)
-    {
-        header("Content-type: text/javascript");
-        exit('["'.Util::jsEscape($search).'", []]');
-    }
-    else if (!$_wt || !$_wtv)                               // implicitly: SEARCH_TYPE_JSON
-    {
-        header("Content-type: text/javascript");
-        exit ("[\"".Util::jsEscape($search)."\", [\n],[\n]]\n");
-    }
-}
-
-if (!$smarty->loadCache($cacheKey, $found))
-{
-    // 1 Classes:
-    if ($searchMask & 0x00000001)
-    {
-        $cnd = array_merge($cndBase, [$createLookup()]);
+        $result  = [];
+        $cnd     = array_merge($cndBase, [$this->createLookup()]);
         $classes = new CharClassList($cnd);
 
         if ($data = $classes->getListviewData())
         {
-            foreach ($classes->iterate() as $__)
-                $data[$classes->id]['param1'] = '"class_'.strToLower($classes->getField('fileString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($classes->iterate() as $__)
+                    $data[$classes->id]['param1'] = '"class_'.strToLower($classes->getField('fileString')).'"';
 
-            $found['class'] = array(
+            $result = array(
                 'type'     => TYPE_CLASS,
                 'appendix' => ' (Class)',
                 'matches'  => $classes->getMatches(),
@@ -183,32 +388,29 @@ if (!$smarty->loadCache($cacheKey, $found))
                 'params'   => ['tabs' => '$myTabs']
             );
 
-            if ($classes->getMatches() > $maxResults)
+            if ($classes->getMatches() > $this->maxResults)
             {
-                // $found['class']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $classes->getMatches(), $maxResults);
-                $found['class']['params']['_truncated'] = 1;
+                // $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $classes->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
         }
+
+        return $result;
     }
 
-    // 2 Races:
-    if ($searchMask & 0x00000002)
+    private function _searchCharRace($cndBase)              // 1 Races: $searchMask & 0x00000002
     {
-        /*  custom data :(
-            faction:    dbc-data is internal -> doesn't work how to link to displayable faction..?
-            leader:     29611 for human .. DAFUQ?!
-            zone:       starting zone...
-        */
-
-        $cnd = array_merge($cndBase, [$createLookup()]);
-        $races = new CharRaceList($cnd);
+        $result = [];
+        $cnd    = array_merge($cndBase, [$this->createLookup()]);
+        $races  = new CharRaceList($cnd);
 
         if ($data = $races->getListviewData())
         {
-            foreach ($races->iterate() as $__)
-                $data[$races->id]['param1'] = '"race_'.strToLower($races->getField('fileString')).'_male"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($races->iterate() as $__)
+                    $data[$races->id]['param1'] = '"race_'.strToLower($races->getField('fileString')).'_male"';
 
-            $found['race'] = array(
+            $result = array(
                 'type'     => TYPE_RACE,
                 'appendix' => ' (Race)',
                 'matches'  => $races->getMatches(),
@@ -217,34 +419,29 @@ if (!$smarty->loadCache($cacheKey, $found))
                 'params'   => ['tabs' => '$myTabs']
             );
 
-            if ($races->getMatches() > $maxResults)
+            if ($races->getMatches() > $this->maxResults)
             {
-                // $found['race']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $races->getMatches(), $maxResults);
-                $found['race']['params']['_truncated'] = 1;
+                // $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $races->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
         }
+
+        return $result;
     }
 
-    // 3 Titles:
-    if ($searchMask & 0x00000004)
+    private function _searchTitle($cndBase)                 // 2 Titles: $searchMask & 0x00000004
     {
-        /*  custom data :(
-            category:1,     // custom data .. FU!
-            expansion:0,    // custom data .. FU FU!
-            gender:3,       // again.. luckiely 136; 137 only
-            side:2,         // hmm, derive from source..?
-            source: {}      // g_sources .. holy cow.. that will cost some nerves
-        */
-
-        $cnd = array_merge($cndBase, [$createLookup(['male_loc'.User::$localeId, 'female_loc'.User::$localeId])]);
+        $result = [];
+        $cnd    = array_merge($cndBase, [$this->createLookup(['male_loc'.User::$localeId, 'female_loc'.User::$localeId])]);
         $titles = new TitleList($cnd);
 
         if ($data = $titles->getListviewData())
         {
-            foreach ($titles->iterate() as $id => $__)
-                $data[$id]['param1'] = $titles->getField('side');
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($titles->iterate() as $id => $__)
+                    $data[$id]['param1'] = $titles->getField('side');
 
-            $found['title'] = array(
+            $result = array(
                 'type'     => TYPE_TITLE,
                 'appendix' => ' (Title)',
                 'matches'  => $titles->getMatches(),
@@ -253,46 +450,36 @@ if (!$smarty->loadCache($cacheKey, $found))
                 'params'   => ['tabs' => '$myTabs']
             );
 
-            if ($titles->getMatches() > $maxResults)
+            if ($titles->getMatches() > $this->maxResults)
             {
-                // $found['title']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $titles->getMatches(), $maxResults);
-                $found['title']['params']['_truncated'] = 1;
+                // $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $titles->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
         }
+
+        return $result;
     }
 
-    // 4 World Events:
-    if ($searchMask & 0x00000008)
+    private function _searchWorldEvent($cndBase)            // 3 World Events: $searchMask & 0x00000008
     {
-        /*  custom data :(
-            icons: data/interface/calendar/calendar_[a-z]start.blp
-        */
-
-        $cnd = array_merge($cndBase, array(
-            'OR',
-            $createLookup(['h.name_loc'.User::$localeId]),
-            [
-                'AND',
-                $createLookup(['e.description']),
-                ['e.holidayId', 0]
-            ]
+        $result  = [];
+        $cnd     = array_merge($cndBase, array(
+            array(
+                'OR',
+                $this->createLookup(['h.name_loc'.User::$localeId]),
+                ['AND', $this->createLookup(['e.description']), ['e.holidayId', 0]]
+            )
         ));
         $wEvents = new WorldEventList($cnd);
 
-        if ($data  = $wEvents->getListviewData())
+        if ($data = $wEvents->getListviewData())
         {
-            $wEvents->addGlobalsToJscript();
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($wEvents->getJSGlobals());
 
-            foreach ($data as &$d)
-            {
-                $updated = WorldEventList::updateDates($d);
-                unset($d['_date']);
-                $d['startDate'] = $updated['start'] ? date(Util::$dateFormatInternal, $updated['start']) : false;
-                $d['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
-                $d['rec']       = $updated['rec'];
-            }
+            // as allways: dates are updated in postCache-step
 
-            $found['event'] = array(
+            $result = array(
                 'type'     => TYPE_WORLDEVENT,
                 'appendix' => ' (World Event)',
                 'matches'  => $wEvents->getMatches(),
@@ -301,26 +488,29 @@ if (!$smarty->loadCache($cacheKey, $found))
                 'params'   => ['tabs' => '$myTabs']
             );
 
-            if ($wEvents->getMatches() > $maxResults)
+            if ($wEvents->getMatches() > $this->maxResults)
             {
-                // $found['event']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $wEvents->getMatches(), $maxResults);
-                $found['event']['params']['_truncated'] = 1;
+                // $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $wEvents->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
         }
+
+        return $result;
     }
 
-    // 5 Currencies
-    if ($searchMask & 0x0000010)
+    private function _searchCurrency($cndBase)              // 4 Currencies $searchMask & 0x0000010
     {
-        $cnd = array_merge($cndBase, [$createLookup()]);
-        $money = new CurrencyList($cnd);
+        $result = [];
+        $cnd    = array_merge($cndBase, [$this->createLookup()]);
+        $money  = new CurrencyList($cnd);
 
         if ($data = $money->getListviewData())
         {
-            foreach ($money->iterate() as $__)
-                $data[$money->id]['param1'] = '"'.strToLower($money->getField('iconString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($money->iterate() as $__)
+                    $data[$money->id]['param1'] = '"'.strToLower($money->getField('iconString')).'"';
 
-            $found['currency'] = array(
+            $result = array(
                 'type'     => TYPE_CURRENCY,
                 'appendix' => ' (Currency)',
                 'matches'  => $money->getMatches(),
@@ -329,69 +519,86 @@ if (!$smarty->loadCache($cacheKey, $found))
                 'params'   => ['tabs' => '$myTabs']
             );
 
-            if ($money->getMatches() > $maxResults)
+            if ($money->getMatches() > $this->maxResults)
             {
-                $found['currency']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_currenciesfound', $money->getMatches(), $maxResults);
-                $found['currency']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_currenciesfound', $money->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
         }
+
+        return $result;
     }
 
-    // 6 Itemsets
-    if ($searchMask & 0x0000020)
+    private function _searchItemset($cndBase, &$shared)     // 5 Itemsets $searchMask & 0x0000020
     {
-        // ['item1', 0, '!'],                               // remove empty sets from search, set in cuFlags
-        $cnd = array_merge($cndBase, [is_int($query) ? ['id', $query] : $createLookup()]);
-        $sets = new ItemsetList($cnd);
+        $result = [];
+        $cnd    = array_merge($cndBase, [is_int($this->query) ? ['id', $this->query] : $this->createLookup()]);
+        $sets   = new ItemsetList($cnd);
 
         if ($data = $sets->getListviewData())
         {
-            $sets->addGlobalsToJScript(GLOBALINFO_SELF);
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($sets->getJSGlobals(GLOBALINFO_SELF));
 
-            foreach ($sets->iterate() as $__)
-                $data[$sets->id]['param1'] = $sets->getField('quality');
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+            {
+                foreach ($sets->iterate() as $__)
+                {
+                    $data[$sets->id]['param1'] = $sets->getField('quality');
+                    $data[$sets->id]['name']   = substr($data[$sets->id]['name'], 1);
+                }
+            }
 
-            $found['itemset'] = array(
+            $result = array(
                 'type'     => TYPE_ITEMSET,
                 'appendix' => ' (Item Set)',
                 'matches'  => $sets->getMatches(),
                 'file'     => ItemsetList::$brickFile,
                 'data'     => $data,
                 'params'   => ['tabs' => '$myTabs'],
-                'pcsToSet' => $sets->pieceToSet
             );
 
-            if ($sets->getMatches() > $maxResults)
+            $shared['pcsToSet'] = $sets->pieceToSet;
+
+            if ($sets->getMatches() > $this->maxResults)
             {
-                $found['itemset']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsetsfound', $sets->getMatches(), $maxResults);
-                $found['itemset']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsetsfound', $sets->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 7 Items
-    if ($searchMask & 0x0000040)
+    private function _searchItem($cndBase, &$shared)        // 6 Items $searchMask & 0x0000040
     {
+        $result   = [];
         $miscData = [];
-        $cndAdd   = empty($query) ? [] : (is_int($query) ? ['id', $query] : $createLookup());
+        $cndAdd   = empty($this->query) ? [] : (is_int($this->query) ? ['id', $this->query] : $this->createLookup());
 
-        if (($searchMask & SEARCH_TYPE_JSON) && $type == TYPE_ITEMSET && isset($found['itemset']))
+        if (($this->searchMask & SEARCH_TYPE_JSON) && ($this->searchMask & 0x20) && !empty($shared['pcsToSet']))
         {
-            $cnd      = [['i.id', array_keys($found['itemset']['pcsToSet'])], CFG_SQL_LIMIT_NONE];
-            $miscData = ['pcsToSet' => @$found['itemset']['pcsToSet']];
+            $cnd      = [['i.id', array_keys($shared['pcsToSet'])], CFG_SQL_LIMIT_NONE];
+            $miscData = ['pcsToSet' => @$shared['pcsToSet']];
         }
-        else if (($searchMask & SEARCH_TYPE_JSON) && ($type == TYPE_ITEM || $_slots))
+        else if (($this->searchMask & SEARCH_TYPE_JSON) && ($this->searchMask & 0x40))
         {
-            $cnd = $cndBase;
+            $cnd   = $cndBase;
             $cnd[] = ['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]];
             $cnd[] = $cndAdd;
-            if ($_slots)
-                $cnd[] = ['slot', $_slots];
 
-            $wData = ['wt' => $_wt, 'wtv' => $_wtv];
+            $slots = @explode(':', $_GET['slots']);
+            array_walk($slots, function(&$v, $k) { $v = intVal($v); });
+            if ($_ = array_filter($slots))
+                $cnd[] = ['slot', $_];
 
             $itemFilter = new ItemListFilter();
-            if ($_ = $itemFilter->createConditionsForWeights($wData))
+            if ($_ = $itemFilter->createConditionsForWeights($this->statWeight))
             {
                 $miscData['extraOpts'] = $itemFilter->extraOpts;
                 $cnd = array_merge($cnd, [$_]);
@@ -402,20 +609,22 @@ if (!$smarty->loadCache($cacheKey, $found))
 
         $items = new ItemList($cnd, $miscData);
 
-        if ($data = $items->getListviewData($searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
+        if ($data = $items->getListviewData($this->searchMask & SEARCH_TYPE_JSON ? (ITEMINFO_SUBITEMS | ITEMINFO_JSON) : 0))
         {
-            $items->addGlobalsToJscript();
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($items->getJSGlobals());
 
-            foreach ($items->iterate() as $__)
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
             {
-                $data[$items->id]['param1'] = '"'.$items->getField('iconString').'"';
-                $data[$items->id]['param2'] = $items->getField('quality');
-
-                if ($searchMask & SEARCH_TYPE_OPEN)
-                    $data[$items->id]['name'] = substr($data[$items->id]['name'], 1);
+                foreach ($items->iterate() as $__)
+                {
+                    $data[$items->id]['param1'] = '"'.$items->getField('iconString').'"';
+                    $data[$items->id]['param2'] = $items->getField('quality');
+                    $data[$items->id]['name']   = substr($data[$items->id]['name'], 1);
+                }
             }
 
-            $found['item'] = array(
+            $result = array(
                 'type'     => TYPE_ITEM,
                 'appendix' => ' (Item)',
                 'matches'  => $items->getMatches(),
@@ -424,40 +633,51 @@ if (!$smarty->loadCache($cacheKey, $found))
                 'params'   => ['tabs' => '$myTabs']
             );
 
-            if ($items->getMatches() > $maxResults)
+            if ($items->getMatches() > $this->maxResults)
             {
-                $found['item']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsfound', $items->getMatches(), $maxResults);
-                $found['item']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsfound', $items->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 8 Abilities (Player + Pet)
-    if ($searchMask & 0x0000080)
+    private function _searchAbility($cndBase)               // 7 Abilities (Player + Pet) $searchMask & 0x0000080
     {
-        $cnd = array_merge($cndBase, array(                 // hmm, inclued classMounts..?
+        $result = [];
+        $cnd    = array_merge($cndBase, array(              // hmm, inclued classMounts..?
             ['s.typeCat', [7, -2, -3]],
             [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT), '&'], 0],
             [['s.attributes0', 0x80, '&'], 0],
-            $createLookup()
+            $this->createLookup()
         ));
         $abilities = new SpellList($cnd);
 
         if ($data = $abilities->getListviewData())
         {
-            $abilities->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($abilities->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
             $vis = ['level', 'singleclass', 'schools'];
             if ($abilities->hasSetFields(['reagent1']))
                 $vis[] = 'reagents';
 
-            foreach ($abilities->iterate() as $__)
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
             {
-                $data[$abilities->id]['param1'] = '"'.strToLower($abilities->getField('iconString')).'"';
-                $data[$abilities->id]['param2'] = '"'.$abilities->ranks[$abilities->id].'"';
+                foreach ($abilities->iterate() as $__)
+                {
+                    $data[$abilities->id]['param1'] = '"'.strToLower($abilities->getField('iconString')).'"';
+                    $data[$abilities->id]['param2'] = '"'.$abilities->ranks[$abilities->id].'"';
+                }
             }
 
-            $found['ability'] = array(
+            $result = array(
                 'type'     => TYPE_SPELL,
                 'appendix' => ' (Ability)',
                 'matches'  => $abilities->getMatches(),
@@ -471,35 +691,49 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($abilities->getMatches() > $maxResults)
+            if ($abilities->getMatches() > $this->maxResults)
             {
-                $found['ability']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_abilitiesfound', $abilities->getMatches(), $maxResults);
-                $found['ability']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_abilitiesfound', $abilities->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 9 Talents (Player + Pet)
-    if ($searchMask & 0x0000100)
+    private function _searchTalent($cndBase)                // 8 Talents (Player + Pet) $searchMask & 0x0000100
     {
-        $cnd = array_merge($cndBase, [['s.typeCat', [-7, -2]], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            ['s.typeCat', [-7, -2]],
+            $this->createLookup()
+        ));
         $talents = new SpellList($cnd);
 
         if ($data = $talents->getListviewData())
         {
-            $talents->addGlobalsToJscript();
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($talents->getJSGlobals());
 
             $vis = ['level', 'singleclass', 'schools'];
-            if ($abilities->hasSetFields(['reagent1']))
+            if ($talents->hasSetFields(['reagent1']))
                 $vis[] = 'reagents';
 
-            foreach ($talents->iterate() as $__)
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
             {
-                $data[$talents->id]['param1'] = '"'.strToLower($talents->getField('iconString')).'"';
-                $data[$talents->id]['param2'] = '"'.$talents->ranks[$talents->id].'"';
+                foreach ($talents->iterate() as $__)
+                {
+                    $data[$talents->id]['param1'] = '"'.strToLower($talents->getField('iconString')).'"';
+                    $data[$talents->id]['param2'] = '"'.$talents->ranks[$abilities->id].'"';
+                }
             }
 
-            $found['talent'] = array(
+            $result = array(
                 'type'     => TYPE_SPELL,
                 'appendix' => ' (Talent)',
                 'matches'  => $talents->getMatches(),
@@ -513,28 +747,40 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($talents->getMatches() > $maxResults)
+            if ($talents->getMatches() > $this->maxResults)
             {
-                $found['talent']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_talentsfound', $talents->getMatches(), $maxResults);
-                $found['talent']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_talentsfound', $talents->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 10 Glyphs
-    if ($searchMask & 0x0000200)
+    private function _searchGlyph($cndBase)                 // 9 Glyphs $searchMask & 0x0000200
     {
-        $cnd = array_merge($cndBase, [['s.typeCat', -13], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            ['s.typeCat', -13],
+            $this->createLookup()
+        ));
         $glyphs = new SpellList($cnd);
 
         if ($data = $glyphs->getListviewData())
         {
-            $glyphs->addGlobalsToJScript(GLOBALINFO_SELF);
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($glyphs->getJSGlobals(GLOBALINFO_SELF));
 
-            foreach ($glyphs->iterate() as $__)
-                $data[$glyphs->id]['param1'] = '"'.strToLower($glyphs->getField('iconString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($glyphs->iterate() as $__)
+                    $data[$glyphs->id]['param1'] = '"'.strToLower($glyphs->getField('iconString')).'"';
 
-            $found['glyph'] = array(
+            $result = array(
                 'type'     => TYPE_SPELL,
                 'appendix' => ' (Glyph)',
                 'matches'  => $glyphs->getMatches(),
@@ -548,28 +794,40 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($glyphs->getMatches() > $maxResults)
+            if ($glyphs->getMatches() > $this->maxResults)
             {
-                $found['glyph']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_glyphsfound', $glyphs->getMatches(), $maxResults);
-                $found['glyph']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_glyphsfound', $glyphs->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 11 Proficiencies
-    if ($searchMask & 0x0000400)
+    private function _searchProficiency($cndBase)           // 10 Proficiencies $searchMask & 0x0000400
     {
-        $cnd = array_merge($cndBase, [['s.typeCat', -11], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            ['s.typeCat', -11],
+            $this->createLookup()
+        ));
         $prof = new SpellList($cnd);
 
         if ($data = $prof->getListviewData())
         {
-            $prof->addGlobalsToJScript(GLOBALINFO_SELF);
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($prof->getJSGlobals(GLOBALINFO_SELF));
 
-            foreach ($prof->iterate() as $__)
-                $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($prof->iterate() as $__)
+                    $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
 
-            $found['proficiency'] = array(
+            $result = array(
                 'type'     => TYPE_SPELL,
                 'appendix' => ' (Proficiency)',
                 'matches'  => $prof->getMatches(),
@@ -583,28 +841,40 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($prof->getMatches() > $maxResults)
+            if ($prof->getMatches() > $this->maxResults)
             {
-                $found['proficiency']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $prof->getMatches(), $maxResults);
-                $found['proficiency']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $prof->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 12 Professions (Primary + Secondary)
-    if ($searchMask & 0x0000800)
+    private function _searchProfession($cndBase)            // 11 Professions (Primary + Secondary) $searchMask & 0x0000800
     {
-        $cnd = array_merge($cndBase, [['s.typeCat', [9, 11]], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            ['s.typeCat', [9, 11]],
+            $this->createLookup()
+        ));
         $prof = new SpellList($cnd);
 
         if ($data = $prof->getListviewData())
         {
-            $prof->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($prof->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            foreach ($prof->iterate() as $__)
-                $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($prof->iterate() as $__)
+                    $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
 
-            $found['profession'] = array(
+            $result = array(
                 'type'     => TYPE_SPELL,
                 'appendix' => ' (Profession)',
                 'matches'  => $prof->getMatches(),
@@ -618,28 +888,40 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($prof->getMatches() > $maxResults)
+            if ($prof->getMatches() > $this->maxResults)
             {
-                $found['profession']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_professionfound', $prof->getMatches(), $maxResults);
-                $found['profession']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_professionfound', $prof->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 13 Companions
-    if ($searchMask & 0x0001000)
+    private function _searchCompanion($cndBase)             // 12 Companions $searchMask & 0x0001000
     {
-        $cnd = array_merge($cndBase, [['s.typeCat', -6], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            ['s.typeCat', -6],
+            $this->createLookup()
+        ));
         $vPets = new SpellList($cnd);
 
         if ($data = $vPets->getListviewData())
         {
-            $vPets->addGlobalsToJscript();
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($vPets->getJSGlobals());
 
-            foreach ($vPets->iterate() as $__)
-                $data[$vPets->id]['param1'] = '"'.strToLower($vPets->getField('iconString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($vPets->iterate() as $__)
+                    $data[$vPets->id]['param1'] = '"'.strToLower($vPets->getField('iconString')).'"';
 
-            $found['companion'] = array(
+            $result = array(
                 'type'     => TYPE_SPELL,
                 'appendix' => ' (Companion)',
                 'matches'  => $vPets->getMatches(),
@@ -653,28 +935,40 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($vPets->getMatches() > $maxResults)
+            if ($vPets->getMatches() > $this->maxResults)
             {
-                $found['companion']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_companionsfound', $vPets->getMatches(), $maxResults);
-                $found['companion']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_companionsfound', $vPets->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 14 Mounts
-    if ($searchMask & 0x0002000)
+    private function _searchMount($cndBase)                 // 13 Mounts $searchMask & 0x0002000
     {
-        $cnd = array_merge($cndBase, [['s.typeCat', -5], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            ['s.typeCat', -5],
+            $this->createLookup()
+        ));
         $mounts = new SpellList($cnd);
 
         if ($data = $mounts->getListviewData())
         {
-            $mounts->addGlobalsToJScript(GLOBALINFO_SELF);
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($mounts->getJSGlobals(GLOBALINFO_SELF));
 
-            foreach ($mounts->iterate() as $__)
-                $data[$mounts->id]['param1'] = '"'.strToLower($mounts->getField('iconString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($mounts->iterate() as $__)
+                    $data[$mounts->id]['param1'] = '"'.strToLower($mounts->getField('iconString')).'"';
 
-            $found['mount'] = array(
+            $result = array(
                 'type'     => TYPE_SPELL,
                 'appendix' => ' (Mount)',
                 'matches'  => $mounts->getMatches(),
@@ -687,24 +981,34 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($mounts->getMatches() > $maxResults)
+            if ($mounts->getMatches() > $this->maxResults)
             {
-                $found['mount']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_mountsfound', $mounts->getMatches(), $maxResults);
-                $found['mount']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_mountsfound', $mounts->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 15 NPCs
-    if ($searchMask & 0x0004000)
+    private function _searchCreature($cndBase)              // 14 NPCs $searchMask & 0x0004000
     {
-        // [['cuFlags', MASKE, '&'], 0],     // todo (med): exclude trigger creatures and difficulty entries
-        $cnd = array_merge($cndBase, [$createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            [['flagsExtra', 0x80], 0],                      // exclude trigger creatures
+        //  [['cuFlags', MASK, '&'], 0],                    // todo (med): exclude difficulty entries
+            $this->createLookup()
+        ));
         $npcs = new CreatureList($cnd);
 
         if ($data = $npcs->getListviewData())
         {
-            $found['npc'] = array(
+            $result = array(
                 'type'     => TYPE_NPC,
                 'appendix' => ' (NPC)',
                 'matches'  => $npcs->getMatches(),
@@ -717,26 +1021,36 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($npcs->getMatches() > $maxResults)
+            if ($npcs->getMatches() > $this->maxResults)
             {
-                $found['npc']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), $maxResults);
-                $found['npc']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 16 Quests
-    if ($searchMask & 0x0008000)
+    private function _searchQuest($cndBase)                 // 15 Quests $searchMask & 0x0008000
     {
-        //        [['cuFlags', MASK, '&'], 0],                                      // todo (med): identify disabled quests
-        $cnd = array_merge($cndBase, [$createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+        //  [['cuFlags', MASK, '&'], 0],                    // todo (med): identify disabled quests
+            $this->createLookup()
+        ));
         $quests = new QuestList($cnd);
 
         if ($data = $quests->getListviewData())
         {
-            $quests->addGlobalsToJScript();
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($quests->getJSGlobals());
 
-            $found['quest'] = array(
+            $result = array(
                 'type'     => TYPE_QUEST,
                 'appendix' => ' (Quest)',
                 'matches'  => $quests->getMatches(),
@@ -744,29 +1058,41 @@ if (!$smarty->loadCache($cacheKey, $found))
                 'data'     => $data,
                 'params'   => ['tabs' => '$myTabs']
             );
+
+            if ($quests->getMatches() > $this->maxResults)
+            {
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_questsfound', $quests->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
+            }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->search).'\')';
         }
 
-        if ($quests->getMatches() > $maxResults)
-        {
-            $found['quest']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_questsfound', $quests->getMatches(), $maxResults);
-            $found['quest']['params']['_truncated'] = 1;
-        }
+        return $result;
     }
 
-    // 17 Achievements
-    if ($searchMask & 0x0010000)
+    private function _searchAchievement($cndBase)           // 16 Achievements $searchMask & 0x0010000
     {
-        $cnd = array_merge($cndBase, [[['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], 0], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            [['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], 0],  // not a statistic
+            $this->createLookup()
+        ));
         $acvs = new AchievementList($cnd);
 
         if ($data = $acvs->getListviewData())
         {
-            $acvs->addGlobalsToJScript();
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($acvs->getJSGlobals());
 
-            foreach ($acvs->iterate() as $__)
-                $data[$acvs->id]['param1'] = '"'.strToLower($acvs->getField('iconString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($acvs->iterate() as $__)
+                    $data[$acvs->id]['param1'] = '"'.strToLower($acvs->getField('iconString')).'"';
 
-            $found['achievement'] = array(
+            $result = array(
                 'type'     => TYPE_ACHIEVEMENT,
                 'appendix' => ' (Achievement)',
                 'matches'  => $acvs->getMatches(),
@@ -778,25 +1104,36 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($acvs->getMatches() > $maxResults)
+            if ($acvs->getMatches() > $this->maxResults)
             {
-                $found['achievement']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_achievementsfound', $acvs->getMatches(), $maxResults);
-                $found['achievement']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_achievementsfound', $acvs->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?achieveemnts&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 18 Statistics
-    if ($searchMask & 0x0020000)
+    private function _searchStatistic($cndBase)             // 17 Statistics $searchMask & 0x0020000
     {
-        $cnd = array_merge($cndBase, [['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            ['flags', ACHIEVEMENT_FLAG_COUNTER, '&'],       // is a statistic
+            $this->createLookup()
+        ));
         $stats = new AchievementList($cnd);
 
         if ($data = $stats->getListviewData())
         {
-            $stats->addGlobalsToJScript(GLOBALINFO_SELF);
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($stats->getJSGlobals(GLOBALINFO_SELF));
 
-            $found['statistic'] = array(
+            $result = array(
                 'type'     => TYPE_ACHIEVEMENT,
                 'matches'  => $stats->getMatches(),
                 'file'     => AchievementList::$brickFile,
@@ -810,25 +1147,33 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($stats->getMatches() > $maxResults)
+            if ($stats->getMatches() > $this->maxResults)
             {
-                $found['statistic']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_statisticsfound', $stats->getMatches(), $maxResults);
-                $found['statistic']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_statisticsfound', $stats->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 19 Zones
-    if ($searchMask & 0x0040000)
+    private function _searchZone($cndBase)                  // 18 Zones $searchMask & 0x0040000
     {
-        $cnd = array_merge($cndBase, [$createLookup()]);
-        $zones = new ZoneList($cnd);
+        $result = [];
+        $cnd    = array_merge($cndBase, [$this->createLookup()]);
+        $zones  = new ZoneList($cnd);
 
         if ($data = $zones->getListviewData())
         {
-            $zones->addGlobalsToJScript();
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($zones->getJSGlobals());
 
-            $found['zone'] = array(
+            $result = array(
                 'type'     => TYPE_ZONE,
                 'appendix' => ' (Zone)',
                 'matches'  => $zones->getMatches(),
@@ -839,25 +1184,28 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($zones->getMatches() > $maxResults)
+            if ($zones->getMatches() > $this->maxResults)
             {
-                $found['zone']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_zonesfound', $zones->getMatches(), $maxResults);
-                $found['zone']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_zonesfound', $zones->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
         }
+
+        return $result;
     }
 
-    // 20 Objects
-    if ($searchMask & 0x0080000)
+    private function _searchObject($cndBase)                // 19 Objects $searchMask & 0x0080000
     {
-        $cnd = array_merge($cndBase, [$createLookup()]);
+        $result  = [];
+        $cnd     = array_merge($cndBase, [$this->createLookup()]);
         $objects = new GameObjectList($cnd);
 
         if ($data = $objects->getListviewData())
         {
-            $objects->addGlobalsToJScript();
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($objects->getJSGlobals());
 
-            $found['object'] = array(
+            $result = array(
                 'type'     => TYPE_OBJECT,
                 'appendix' => ' (Object)',
                 'matches'  => $objects->getMatches(),
@@ -868,23 +1216,30 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($objects->getMatches() > $maxResults)
+            if ($objects->getMatches() > $this->maxResults)
             {
-                $found['object']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_objectsfound', $objects->getMatches(), $maxResults);
-                $found['object']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_objectsfound', $objects->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 21 Factions
-    if ($searchMask & 0x0100000)
+    private function _searchFaction($cndBase)               // 20 Factions $searchMask & 0x0100000
     {
-        $cnd = array_merge($cndBase, [$createLookup()]);
+        $result   = [];
+        $cnd      = array_merge($cndBase, [$this->createLookup()]);
         $factions = new FactionList($cnd);
 
         if ($data = $factions->getListviewData())
         {
-            $found['faction'] = array(
+            $result = array(
                 'type'     => TYPE_FACTION,
                 'appendix' => ' (Faction)',
                 'matches'  => $factions->getMatches(),
@@ -895,26 +1250,29 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($factions->getMatches() > $maxResults)
+            if ($factions->getMatches() > $this->maxResults)
             {
-                $found['faction']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_factionsfound', $factions->getMatches(), $maxResults);
-                $found['faction']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_factionsfound', $factions->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
         }
+
+        return $result;
     }
 
-    // 22 Skills
-    if ($searchMask & 0x0200000)
+    private function _searchSkill($cndBase)                 // 21 Skills $searchMask & 0x0200000
     {
-        $cnd = array_merge($cndBase, [$createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, [$this->createLookup()]);
         $skills = new SkillList($cnd);
 
         if ($data = $skills->getListviewData())
         {
-            foreach ($skills->iterate() as $id => $__)
-                $data[$id]['param1'] = '"'.$skills->getField('iconString').'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($skills->iterate() as $id => $__)
+                    $data[$id]['param1'] = '"'.$skills->getField('iconString').'"';
 
-            $found['pet'] = array(
+            $result = array(
                 'type'     => TYPE_SKILL,
                 'appendix' => ' (Skill)',
                 'matches'  => $skills->getMatches(),
@@ -925,26 +1283,29 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($skills->getMatches() > $maxResults)
+            if ($skills->getMatches() > $this->maxResults)
             {
-                $found['pet']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_skillsfound', $skills->getMatches(), $maxResults);
-                $found['pet']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_skillsfound', $skills->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
         }
+
+        return $result;
     }
 
-    // 23 Pets
-    if ($searchMask & 0x0400000)
+    private function _searchPet($cndBase)                   // 22 Pets $searchMask & 0x0400000
     {
-        $cnd = array_merge($cndBase, [$createLookup()]);
-        $pets = new PetList($cnd);
+        $result = [];
+        $cnd    = array_merge($cndBase, [$this->createLookup()]);
+        $pets   = new PetList($cnd);
 
         if ($data = $pets->getListviewData())
         {
-            foreach ($pets->iterate() as $__)
-                $data[$pets->id]['param1'] = '"'.$pets->getField('iconString').'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($pets->iterate() as $__)
+                    $data[$pets->id]['param1'] = '"'.$pets->getField('iconString').'"';
 
-            $found['pet'] = array(
+            $result = array(
                 'type'     => TYPE_PET,
                 'appendix' => ' (Pet)',
                 'matches'  => $pets->getMatches(),
@@ -953,28 +1314,35 @@ if (!$smarty->loadCache($cacheKey, $found))
                 'params'   => ['tabs' => '$myTabs']
             );
 
-            if ($pets->getMatches() > $maxResults)
+            if ($pets->getMatches() > $this->maxResults)
             {
-                $found['pet']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_petsfound', $pets->getMatches(), $maxResults);
-                $found['pet']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_petsfound', $pets->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
         }
+
+        return $result;
     }
 
-    // 24 NPCAbilities
-    if ($searchMask & 0x0800000)
+    private function _searchCreatureAbility($cndBase)       // 23 NPCAbilities $searchMask & 0x0800000
     {
-        $cnd = array_merge($cndBase, [['s.typeCat', -8], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            ['s.typeCat', -8],
+            $this->createLookup()
+        ));
         $npcAbilities = new SpellList($cnd);
 
         if ($data = $npcAbilities->getListviewData())
         {
-            $npcAbilities->addGlobalsToJScript(GLOBALINFO_SELF);
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($npcAbilities->getJSGlobals(GLOBALINFO_SELF));
 
-            foreach ($npcAbilities->iterate() as $__)
-                $data[$npcAbilities->id]['param1'] = '"'.strToLower($npcAbilities->getField('iconString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($npcAbilities->iterate() as $__)
+                    $data[$npcAbilities->id]['param1'] = '"'.strToLower($npcAbilities->getField('iconString')).'"';
 
-            $found['npcSpell'] = array(
+            $result = array(
                 'type'     => TYPE_SPELL,
                 'appendix' => ' (Spell)',
                 'matches'  => $npcAbilities->getMatches(),
@@ -989,28 +1357,40 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($npcAbilities->getMatches() > $maxResults)
+            if ($npcAbilities->getMatches() > $this->maxResults)
             {
-                $found['npcSpell']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $npcAbilities->getMatches(), $maxResults);
-                $found['npcSpell']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $npcAbilities->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
+
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->search).'\')';
         }
+
+        return $result;
     }
 
-    // 25 Spells (Misc + GM)
-    if ($searchMask & 0x1000000)
+    private function _searchSpell($cndBase)                 // 24 Spells (Misc + GM) $searchMask & 0x1000000
     {
-        $cnd = array_merge($cndBase, [['s.typeCat', [0, -9]], $createLookup()]);
+        $result = [];
+        $cnd    = array_merge($cndBase, array(
+            ['s.typeCat', [0, -9]],
+            $this->createLookup()
+        ));
         $misc = new SpellList($cnd);
 
         if ($data = $misc->getListviewData())
         {
-            $misc->addGlobalsToJScript(GLOBALINFO_SELF);
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($misc->getJSGlobals(GLOBALINFO_SELF));
 
-            foreach ($misc->iterate() as $__)
-                $data[$misc->id]['param1'] = '"'.strToLower($misc->getField('iconString')).'"';
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($misc->iterate() as $__)
+                    $data[$misc->id]['param1'] = '"'.strToLower($misc->getField('iconString')).'"';
 
-            $found['spell'] = array(
+            $result = array(
                 'type'     => TYPE_SPELL,
                 'appendix' => ' (Spell)',
                 'matches'  => $misc->getMatches(),
@@ -1024,146 +1404,24 @@ if (!$smarty->loadCache($cacheKey, $found))
                 ]
             );
 
-            if ($misc->getMatches() > $maxResults)
+            if ($misc->getMatches() > $this->maxResults)
             {
-                $found['spell']['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $misc->getMatches(), $maxResults);
-                $found['spell']['params']['_truncated'] = 1;
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $misc->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
             }
-        }
-    }
 
-    // 26 Characters
-    // if ($searchMask & 0x2000000)
-
-    // 27 Guilds
-    // if ($searchMask & 0x4000000)
-
-    $smarty->saveCache($cacheKey, $found);
-}
-
-/*
-    !note! dear reader, if you ever try to generate a string, that is to be evaled by JS, NEVER EVER terminate with a \n
-    $totalHoursWasted +=2;
-*/
-if ($searchMask & SEARCH_TYPE_JSON)
-{
-    $outItems = '';
-    $outSets  = '';
-
-    if (isset($found['item']))
-    {
-        $items = [];
-
-        foreach ($found['item']['data'] as $k => $v)
-        {
-            unset($v['param1']);
-            unset($v['param2']);
-
-            $items[] = json_encode($v, JSON_NUMERIC_CHECK);
+            if (isset($result['params']['note']))
+                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->search).'\')';
+            else
+                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->search).'\')';
         }
 
-        $outItems = "\t".implode(",\n\t", $items)."\n";
+        return $result;
     }
 
-    if (isset($found['itemset']))
-    {
-        $sets = [];
-
-        foreach ($found['itemset']['data'] as $k => $v)
-        {
-            $v['name'] = $v['quality'].$v['name'];
-
-            unset($v['param1']);
-            unset($v['quality']);
-            if (!$v['heroic'])
-                unset($v['heroic']);
-
-            $sets[] = json_encode($v, JSON_NUMERIC_CHECK);
-        }
-
-        $outSets = "\t".implode(",\n\t", $sets)."\n";
-    }
-
-    header("Content-type: text/javascript");
-    die ('["'.Util::jsEscape($search)."\", [\n".$outItems."],[\n".$outSets.']]');
-}
-else if ($searchMask & SEARCH_TYPE_OPEN)
-{
-    // this one is funny: we want 10 results, ideally equally distributed over each type
-    $foundTotal = 0;
-    $maxResults = 10;
-    $names      = [];
-    $info       = [];
-
-    foreach ($found as $tmp)
-        $foundTotal += $tmp['matches'];
-
-    if (!$foundTotal)
-        exit('["'.Util::jsEscape($search).'", []]');
-
-    foreach ($found as $id => $set)
-    {
-        $max = max(1, (int)($maxResults * $set['matches'] / $foundTotal));
-        $maxResults -= $max;
-
-        for ($i = 0; $i < $max; $i++)
-        {
-            $data = array_shift($set['data']);
-            if (!$data)
-                break;
-
-            $names[] = '"'.$data['name'].$set['appendix'].'"';
-            $extra   = [$set['type'], $data['id']];
-
-            if (isset($data['param1']))
-                $extra[] = $data['param1'];
-
-            if (isset($data['param2']))
-                $extra[] = $data['param2'];
-
-            $info[]  = '['.implode(', ', $extra).']';
-        }
-
-        if ($maxResults <= 0)
-            break;
-    }
-
-    header("Content-type: text/javascript");
-    die('["'.Util::jsEscape($search).'", ['.implode(', ', $names).'], [], [], [], [], [], ['.implode(', ', $info).']]');
-}
-else /* if ($searchMask & SEARCH_TYPE_REGULAR) */
-{
-    $foundTotal = 0;
-
-    foreach ($found as $tmp)
-        $foundTotal += count($tmp['data']);
-
-    // only one match -> redirect to find
-    if ($foundTotal == 1)
-    {
-        $_      = array_pop($found);
-        $type   = Util::$typeStrings[$_['type']];
-        $typeId = key($_['data']);
-
-        header("Location: ?".$type.'='.$typeId);
-        die();
-    }
-
-
-    // tabId 0: Database g_initHeader()
-    $smarty->updatePageVars(array(
-        'title' => $search.' - '.Lang::$search['search'],
-        'tab'   => 0,
-        'reqJS' => array(
-            STATIC_URL.'/js/swfobject.js'
-        )
-    ));
-    $smarty->assign('lang', array_merge(Lang::$main, Lang::$search));
-    $smarty->assign('found', $found);
-    $smarty->assign('search', $search);
-    $smarty->assign('ignored', implode(', ', $invalid));
-
-    $smarty->display('search.tpl');
+    // private function _searchCharacter($cndBase) { }      // 25 Characters $searchMask & 0x2000000
+    // private function _searchGuild($cndBase) { }          // 26 Guilds $searchMask & 0x4000000
+    // private function _searchArenaTeam($cndBase) { }      // 27 Arena Teams $searchMask & 0x8000000
 }
 
 ?>

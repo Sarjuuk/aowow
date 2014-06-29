@@ -491,6 +491,31 @@ class ObjectPage extends GenericPage
 
         return $x;
     }
+
+    public function display($override = '')
+    {
+        if ($this->mode != CACHETYPE_TOOLTIP)
+            return parent::display($override);
+
+        if (!$this->loadCache($tt))
+        {
+            $tt = $this->generateTooltip();
+            $this->saveCache($tt);
+        }
+
+        header('Content-type: application/x-javascript; charset=utf-8');
+        die($tt);
+    }
+
+    public function notFound($typeStr)
+    {
+        if ($this->mode != CACHETYPE_TOOLTIP)
+            return parent::notFound($typeStr);
+
+        header('Content-type: application/x-javascript; charset=utf-8');
+        echo $this->generateTooltip(true);
+        exit();
+    }
 }
 
 ?>

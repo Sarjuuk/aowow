@@ -1064,6 +1064,52 @@ class ItemPage extends genericPage
 
         return $root->asXML();
     }
+
+    public function display($override = '')
+    {
+        if ($this->mode == CACHETYPE_TOOLTIP)
+        {
+            if (!$this->loadCache($tt))
+            {
+                $tt = $this->generateTooltip();
+                $this->saveCache($tt);
+            }
+
+            header('Content-type: application/x-javascript; charset=utf-8');
+            die($tt);
+        }
+        else if ($this->mode == CACHETYPE_XML)
+        {
+            if (!$this->loadCache($xml))
+            {
+                $xml = $this->generateXML();
+                $this->saveCache($xml);
+            }
+
+            header('Content-type: text/xml; charset=utf-8');
+            die($xml);
+        }
+        else
+            return parent::display($override);
+    }
+
+    public function notFound($typeStr)
+    {
+        if ($this->mode == CACHETYPE_TOOLTIP)
+        {
+            header('Content-type: application/x-javascript; charset=utf-8');
+            echo $this->generateTooltip(true);
+            exit();
+        }
+        else if ($this->mode == CACHETYPE_XML)
+        {
+            header('Content-type: text/xml; charset=utf-8');
+            echo $this->generateXML(true);
+            exit();
+        }
+        else
+            return parent::notFound($typeStr);
+    }
 }
 
 ?>

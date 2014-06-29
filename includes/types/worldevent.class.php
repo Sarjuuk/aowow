@@ -11,8 +11,8 @@ class WorldEventList extends BaseType
 
     protected     $queryBase = 'SELECT *, -e.id as id, -e.id AS ARRAY_KEY FROM ?_events e';
     protected     $queryOpts = array(
-                                   'e' => ['j' => ['?_holidays h2 ON e.holidayId = h2.id', true], 'o' => '-e.id ASC'],
-                                   'h' => ['j' => ['?_holidays h ON e.holidayId = h.id']]
+                                   'e' => [['h']],
+                                   'h' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']
                                );
 
     public function __construct($conditions = [])

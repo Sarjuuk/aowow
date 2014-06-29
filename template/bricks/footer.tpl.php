@@ -1,8 +1,22 @@
         <div id="footer">
 <?php
-if (isset($this->mysql)):
-    echo Lang::$main['numSQL'] . Lang::$main['colon']. $this->mysql['count']."<br>\n";
-    echo Lang::$main['timeSQL']. Lang::$main['colon']. Util::formatTime($this->mysql['time'] * 1000)."\n";
+if ($this->time || isset($this->mysql) || $this->isCached):
+    echo "<table style=\"margin:auto;\">\n";
+
+    if (isset($this->mysql)):
+        echo '<tr><td style="text-align:left;">'.Lang::$main['numSQL'] .'</td><td>'.$this->mysql['count']."</td></tr>\n";
+        echo '<tr><td style="text-align:left;">'.Lang::$main['timeSQL'].'</td><td>'.Util::formatTime($this->mysql['time'] * 1000, true)."</td></tr>\n";
+    endif;
+
+    if ($this->time):
+        echo '<tr><td style="text-align:left;">Page generated in</td><td>'.Util::formatTime($this->time * 1000, true)."</td></tr>\n";
+    endif;
+
+    if ($this->isCached):
+        echo "<tr><td style=\"text-align:left;\">(rebuild from cache)</td><td></td></tr>\n";
+    endif;
+
+    echo "</table>\n";
 endif;
 ?>
         </div>

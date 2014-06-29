@@ -51,12 +51,11 @@ class RacePage extends GenericPage
                             [7952,  33554], null,           [16264, 33557], [17584, 33657]
                         );
 
-
         /***********/
         /* Infobox */
         /***********/
 
-        $infobox = [];                                      // unfortunately, all of this is custom data :/
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // side
         if ($_ = $this->subject->getField('side'))

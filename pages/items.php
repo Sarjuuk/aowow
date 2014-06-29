@@ -94,6 +94,8 @@ class ItemsPage extends GenericPage
         $this->addJS('?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
         $this->hasGroupedTabs = false;
 
+        $conditions = [];
+
         /*******************/
         /* evaluate filter */
         /*******************/
@@ -414,6 +416,9 @@ class ItemsPage extends GenericPage
     protected function generateTitle()
     {
         array_unshift($this->title, $this->name);
+
+        if (!$this->category)
+            return;
 
         if (isset($this->category[2]))
             $tPart = Lang::$item['cat'][$this->category[0]][1][$this->category[1]][1][$this->category[2]];

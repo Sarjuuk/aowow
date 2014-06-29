@@ -4,6 +4,11 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
+/*
+    icons: data/interface/calendar/calendar_[a-z]start.blp
+*/
+
+
 // menuId 10: Title    g_initPath()
 //  tabId  0: Database g_initHeader()
 class TitlePage extends GenericPage

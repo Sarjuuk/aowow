@@ -11,7 +11,7 @@ trait DetailPage
 
     private   $subject       = null;                        // so it will not get cached
 
-    function generateCacheKey()
+    protected function generateCacheKey()
     {
         //     mode,         type,        typeId,        localeId,        category, filter
         $key = [$this->mode, $this->type, $this->typeId, User::$localeId, '-1',     '-1'];
@@ -31,7 +31,7 @@ trait ListPage
     protected $typeId    = 0;
     protected $filter    = [];
 
-    function generateCacheKey()
+    protected function generateCacheKey()
     {
         //     mode,         type,        typeId, localeId,
         $key = [$this->mode, $this->type, '-1',   User::$localeId];
@@ -62,6 +62,8 @@ class GenericPage
     protected $css              = [];
 
     // private vars don't get cached
+    private   $time             = 0;
+    private   $isCached         = false;
     private   $cacheDir         = 'cache/template/';
     private   $jsgBuffer        = [];
     private   $gLocale          = [];
@@ -71,6 +73,8 @@ class GenericPage
 
     public function __construct()
     {
+        $this->time = microtime(true);
+
         // restricted access
         if ($this->restrictedGroups && !User::isInGroup($this->restrictedGroups))
             $this->error();
@@ -158,6 +162,8 @@ class GenericPage
 
             $this->saveCache();
         }
+        else
+            $this->isCached = true;
 
         if (isset($this->type) && isset($this->typeId))
             $this->gPageInfo = array(                       // varies slightly for special pages like maps, user-dashboard or profiler
@@ -172,6 +178,7 @@ class GenericPage
         if (!empty($this->hasComContent))                   // get comments, screenshots, videos
             $this->community = CommunityContent::getAll($this->type, $this->typeId);
 
+        $this->time  = microtime(true) - $this->time;
         $this->mysql = DB::Aowow()->getStatistics();
     }
 
@@ -271,7 +278,7 @@ class GenericPage
                 'status' => 1,
                 'name'   => 'internal error',
                 'style'  => 'padding-left: 40px; background-image: url(static/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
-                'text'   => '[span id=inputbox-error]'.implode("<br>", $_).'[/span]',
+                'text'   => '[span id=inputbox-error]'.implode("[br]", $_).'[/span]',
             );
         }
 
@@ -308,24 +315,10 @@ class GenericPage
 
     public function notFound($typeStr)                      // unknown ID
     {
-        if ($this->mode == CACHETYPE_TOOLTIP)
-        {
-            header('Content-type: application/x-javascript; charset=utf-8');
-            echo $this->generateTooltip(true);
-        }
-        else if ($this->mode == CACHETYPE_XML)
-        {
-            header('Content-type: text/xml; charset=utf-8');
-            echo $this->generateXML(true);
-        }
-        else
-        {
-            $this->typeStr = $typeStr;
-            $this->mysql   = DB::Aowow()->getStatistics();
+        $this->typeStr = $typeStr;
+        $this->mysql   = DB::Aowow()->getStatistics();
 
-            $this->display('text-page-generic');
-        }
-
+        $this->display('text-page-generic');
         exit();
     }
 
@@ -362,28 +355,6 @@ class GenericPage
 
             include('template/pages/'.$override.'.tpl.php');
             die();
-        }
-        else if ($this->mode == CACHETYPE_TOOLTIP)
-        {
-            if (!$this->loadCache($tt))
-            {
-                $tt = $this->generateTooltip();
-                $this->saveCache($tt);
-            }
-
-            header('Content-type: application/x-javascript; charset=utf-8');
-            die($tt);
-        }
-        else if ($this->mode == CACHETYPE_XML)
-        {
-            if (!$this->loadCache($xml))
-            {
-                $xml = $this->generateXML();
-                $this->saveCache($xml);
-            }
-
-            header('Content-type: text/xml; charset=utf-8');
-            die($xml);
         }
         else
         {

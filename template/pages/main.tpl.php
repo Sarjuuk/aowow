@@ -16,7 +16,7 @@
     <div id="layers"></div>
     <div id="home">
 
-<?php $this->brick('announcements'); ?>
+<?php $this->brick('announcement'); ?>
 
         <span id="menu_buttons-generic" class="menu-buttons"></span>
         <script type="text/javascript">

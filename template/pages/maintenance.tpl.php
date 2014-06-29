@@ -15,7 +15,7 @@
 <body>
     <div class="maintenance">
     <div>The website is currently closed for maintenance.</div>
-    <p>It will take a few minutes...</p>
+    <p>This will take a few minutes...</p>
     </div>
 </body>
 </html>

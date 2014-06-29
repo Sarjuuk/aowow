@@ -22,7 +22,7 @@ class ItemList extends BaseType
     private       $vendors    = [];
     private       $jsGlobals  = [];                         // getExtendedCost creates some and has no access to template
 
-    protected     $queryBase  = 'SELECT i.*, `is`.*, i.id AS ARRAY_KEY FROM ?_items i';
+    protected     $queryBase  = 'SELECT i.*, `is`.*, i.id AS id, i.id AS ARRAY_KEY FROM ?_items i';
     protected     $queryOpts  = array(
                       'is'  => ['j' => ['?_item_stats AS `is` ON `is`.`id` = `i`.`id`', true]],
                       's'   => ['j' => ['?_spell AS `s` ON s.effect1CreateItemId = i.id', true], 'g' => 'i.id'],
@@ -1291,23 +1291,33 @@ class ItemList extends BaseType
             {
                 $jsonEquip = [];
                 $jsonText  = [];
+                $enchIds   = [];
 
                 for ($i = 1; $i < 6; $i++)
                 {
                     $enchId = $data['enchantId'.$i];
-
                     if ($enchId <= 0)
                         continue;
 
-                    // subitems may share enchantmentIds
-                    if (!isset($this->rndEnchIds[$enchId]))
-                    {
-                        $stats = Util::parseItemEnchantment($enchId, false, $misc);
-                        $this->rndEnchIds[$enchId] = array(
-                            'text'  => $misc[$enchId]['name'],
-                            'stats' => $stats
-                        );
-                    }
+                    if (isset($this->rndEnchIds[$enchId]))
+                        continue;
+
+                    $enchIds[] = $enchId;
+                }
+
+                foreach (Util::parseItemEnchantment($enchIds, false, $misc) as $eId => $stats)
+                {
+                    $this->rndEnchIds[$eId] = array(
+                        'text'  => $misc[$eId]['name'],
+                        'stats' => $stats
+                    );
+                }
+
+                for ($i = 1; $i < 6; $i++)
+                {
+                    $enchId = $data['enchantId'.$i];
+                    if ($enchId <= 0)
+                        continue;
 
                     if ($data['allocationPct'.$i] > 0)      // RandomSuffix: scaling Enchantment; enchId < 0
                     {
