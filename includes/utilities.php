@@ -1288,9 +1288,10 @@ class Util
                 return [];
         }
 
+        // note: omits required spell and chance in skill_discovery_template
         $data = array_merge(
             DB::Aowow()->selectCol('SELECT spellId FROM spell_learn_spell WHERE entry IN (?a)', $lookup),
-            DB::Aowow()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell IN (?a)', $lookup),   // note: omits required spell and chance
+            DB::Aowow()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell IN (?a)', $lookup),
             $extraIds
         );
 

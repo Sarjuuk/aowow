@@ -373,6 +373,15 @@ class SpellList extends BaseType
         $tools = [];
         for ($i = 1; $i <= 2; $i++)
         {
+            // TotemCategory
+            if ($_ = $this->curTpl['toolCategory'.$i])
+            {
+                $tc = DB::Aowow()->selectRow('SELECT * FROM ?_totemcategory WHERE id = ?d', $_);
+                $tools[$i + 1] = array(
+                    'id'   => $_,
+                    'name' => Util::localizedString($tc, 'name'));
+            }
+
             // Tools
             if (!$this->curTpl['tool'.$i])
                 continue;
@@ -389,15 +398,6 @@ class SpellList extends BaseType
                 );
 
                 break;
-            }
-
-            // TotemCategory
-            if ($_ = $this->curTpl['toolCategory'.$i])
-            {
-                $tc = DB::Aowow()->selectRow('SELECT * FROM ?_totemcategory WHERE id = ?d', $_);
-                $tools[$i + 1] = array(
-                    'id'   => $_,
-                    'name' => Util::localizedString($tc, 'name'));
             }
         }
 
@@ -1533,7 +1533,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                     if ($cId != $this->curTpl['effect'.$idx.'CreateItemId'])
                         continue;
 
-                    $createItem = $this->relItems->renderTooltip([], true, $this->id);
+                    $createItem = $this->relItems->renderTooltip(true, $this->id);
                     break 2;
                 }
             }

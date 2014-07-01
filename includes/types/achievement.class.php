@@ -161,7 +161,7 @@ class AchievementList extends BaseType
             {
                 // link to title - todo (low): crosslink
                 case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
-                    $crtName = Util::ucFirst(Lang::$game['title']).Lang::$colon.$crtName;
+                    $crtName = Util::ucFirst(Lang::$game['title']).Lang::$main['colon'].$crtName;
                     break;
                 // link to quest
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:

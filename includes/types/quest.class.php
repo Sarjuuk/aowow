@@ -332,10 +332,10 @@ class QuestList extends BaseType
 
         if ($_ = $this->getField('rewardOrReqMoney'))
             if ($_ < 0)
-                $xReq .= '<br /> - '.Lang::$quest['money'].Lang::$colon.Util::formatMoney(abs($_));
+                $xReq .= '<br /> - '.Lang::$quest['money'].Lang::$main['colon'].Util::formatMoney(abs($_));
 
         if ($xReq)
-            $x .= '<br /><br /><span class="q">'.Lang::$quest['requirements'].Lang::$colon.'</span>'.$xReq;
+            $x .= '<br /><br /><span class="q">'.Lang::$quest['requirements'].Lang::$main['colon'].'</span>'.$xReq;
 
         $x .= '</td></tr></table>';
 

@@ -9,7 +9,8 @@ foreach ($vars as $id => $data):
 endforeach;
 
 if (isset($this->typeId) && !empty($extra[$this->typeId])):
-    echo '_['.$extra[$this->typeId]['id'].'].tooltip_'.User::$localeString.' = \''.Util::jsEscape($extra[$this->typeId]['tooltip']).'\';';
-    echo '_['.$extra[$this->typeId]['id'].'].spells_'.User::$localeString.' = '.json_encode($extra[$this->typeId]['spells'], JSON_NUMERIC_CHECK).';';
+    $x = $extra[$this->typeId];
+    echo "\n_[".$x['id'].'].tooltip_'.User::$localeString.' = \''.Util::jsEscape($x['tooltip'])."';";
+    echo "\n_[".$x['id'].'].spells_'.User::$localeString.' = '.json_encode($x['spells'], JSON_NUMERIC_CHECK).';';
 endif;
 ?>

@@ -217,7 +217,7 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getClassString($classMask, $asHTML = true, &$n = 0)
+    public static function getClassString($classMask, &$ids = [], &$n = 0, $asHTML = true)
     {
         $classMask &= CLASS_MASK_ALL;                       // clamp to available classes..
 
@@ -227,26 +227,25 @@ class Lang
         $tmp  = [];
         $i    = 1;
         $base = $asHTML ? '<a href="?class=%d" class="c%1$d">%2$s</a>' : '[class=%d]';
-        $br   = $asHTML ? '' : '\n';
+        $br   = $asHTML ? '' : '[br]';
 
         while ($classMask)
         {
             if ($classMask & (1 << ($i - 1)))
             {
-                $tmp[] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['cl'][$i]);
+                $tmp[$i]    = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['cl'][$i]);
                 $classMask &= ~(1 << ($i - 1));
-
-                if (!$asHTML)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_CLASS, $i);
             }
             $i++;
         }
 
-        $n = count($tmp);
+        $n   = count($tmp);
+        $ids = array_keys($tmp);
+
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString($raceMask, &$side = 0, $asHTML = true, &$n = 0)
+    public static function getRaceString($raceMask, &$side = 0, &$ids = [], &$n = 0, $asHTML = true)
     {
         $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
 
@@ -256,7 +255,7 @@ class Lang
         $tmp  = [];
         $i    = 1;
         $base = $asHTML ? '<a href="?race=%d" class="q1">%s</a>' : '[race=%d]';
-        $br   = $asHTML ? '' : '\n';
+        $br   = $asHTML ? '' : '[br]';
 
         if (!$raceMask)
         {
@@ -280,16 +279,15 @@ class Lang
         {
             if ($raceMask & (1 << ($i - 1)))
             {
-                $tmp[] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['ra'][$i]);
+                $tmp[$i]   = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['ra'][$i]);
                 $raceMask &= ~(1 << ($i - 1));
-
-                if (!$asHTML)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_RACE, $i);
             }
             $i++;
         }
 
-        $n = count($tmp);
+        $n   = count($tmp);
+        $ids = array_keys($tmp);
+
         return implode(', ', $tmp);
     }
 }

@@ -1,7 +1,7 @@
-<h3><?php echo Lang::$main['reagents']; ?></h3>
+<h3><?php echo Lang::$spell['reagents']; ?></h3>
 
 <?php
-if ($this->reagents['enhanced']):
+if ($enhanced):
 ?>
 <style type="text/css">
     .iconlist-col                                         { float: left; width: 31%; margin-right: 2%; }
@@ -163,36 +163,36 @@ endif;
 
 <table class="iconlist" id="reagent-list-generic">
 <?php
-if ($this->reagents['enhanced']):
+if ($enhanced):
 ?>
     <tr>
         <th></th>
         <th align="left">
-            <input type="button" style="font-size: 11px; margin-right: 0.5em" onclick="iconlist_expandall('reagent-list-generic',true);" value="{$lang._expandAll}">
-            <input type="button" style="font-size: 11px; margin-right: 0.5em" onclick="iconlist_expandall('reagent-list-generic',false);" value="{$lang._collapseAll}">
+            <input type="button" style="font-size: 11px; margin-right: 0.5em" onclick="iconlist_expandall('reagent-list-generic',true);" value="<?php echo Lang::$spell['_expandAll']; ?>">
+            <input type="button" style="font-size: 11px; margin-right: 0.5em" onclick="iconlist_expandall('reagent-list-generic',false);" value="<?php echo Lang::$spell['_collapseAll']; ?>">
         </th>
     </tr>
 <?php
 endif;
 
-foreach ($this->reagents['data'] as $k => $itr):
+foreach ($reagents as $k => $itr):
     echo '<tr id="reagent-list-generic.'.$itr['path'].'"'.($itr['level'] ? ' style="display: none"' : null).'><th align="right" id="iconlist-icon'.$k.'"></th>' .
-         '<td'.($itr['level'] ? ' style="padding-left: '.$itr['level'].'em"' : null);
+         '<td'.($itr['level'] ? ' style="padding-left: '.$itr['level'].'em"' : null).'>';
 
-    if (!empty($itr['final']) && $this->reagents['enhanced']):
+    if (!empty($itr['final']) && $enhanced):
         echo '<div class="iconlist-tree" style="width: 15px; float: left">&nbsp;</div>';
-    elseif ($this->reagents['enhanced']):
+    elseif ($enhanced):
         echo '<div class="iconlist-tree disclosure-off" onclick="iconlist_showhide(this);" style="padding-left: 0; cursor: pointer; width: 15px; float: left" id="spn.reagent-list-generic.'.$itr['path'].'">&nbsp;</div>';
     endif;
 
-    echo '<span class="q'.($itr['type'] == TYPE_ITEM) ? $itr['quality'] : null).'"><a href="?'.$itr['typeStr'].'='.$itr['typeId'].'">'.$itr['name'].'</a></span>'.($itr['qty'] > 1 ? '&nbsp;('.$itr['qty'].')' : null)."</td></tr>\n";
+    echo '<span class="q'.($itr['type'] == TYPE_ITEM ? $itr['quality'] : null).'"><a href="?'.$itr['typeStr'].'='.$itr['typeId'].'">'.$itr['name'].'</a></span>'.($itr['qty'] > 1 ? '&nbsp;('.$itr['qty'].')' : null)."</td></tr>\n";
 endforeach;
 ?>
 </table>
 
 <script type="text/javascript">//<![CDATA[
 <?php
-foreach ($this->reagents['data'] as $k => $itr):
+foreach ($reagents as $k => $itr):
     echo "\$WH.ge('iconlist-icon".$k."').appendChild(g_".$itr['typeStr']."s.createIcon(".$itr['typeId'].", 0, ".$itr['qty']."));\n";
 endforeach;
 ?>

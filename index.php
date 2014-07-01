@@ -12,10 +12,10 @@ if (!file_exists('config/config.php'))
 // include all necessities, set up basics
 require 'includes/kernel.php';
 
-if (version_compare(PHP_VERSION, '5.4.0') <= 0)
+if (version_compare(PHP_VERSION, '5.5.0') <= 0)
 {
     if (User::isInGroup(U_GROUP_EMPLOYEE))
-        Util::addNote(U_GROUP_EMPLOYEE, 'PHP Version 5.4.0 or higher required! Your version is '.PHP_VERSION."[br]Core functions are unavailable!");
+        Util::addNote(U_GROUP_EMPLOYEE, 'PHP Version 5.5.0 or higher required! Your version is '.PHP_VERSION."[br]Core functions are unavailable!");
     else
         (new GenericPage)->maintenance();
 }

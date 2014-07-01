@@ -718,13 +718,25 @@ class ItemList extends BaseType
             $x .= Lang::$item['durability'].' '.$dur.' / '.$dur.'<br />';
 
         // required classes
-        if ($classes = Lang::getClassString($this->curTpl['requiredClass']))
+        if ($classes = Lang::getClassString($this->curTpl['requiredClass'], $jsg, $__, $interactive))
+        {
+            foreach ($jsg as $js)
+                if (empty($this->jsGlobals[TYPE_CLASS][$js]))
+                    $this->jsGlobals[TYPE_CLASS][$js] = $js;
+
             $x .= Lang::$game['classes'].Lang::$main['colon'].$classes.'<br />';
+        }
 
         // required races
-        if ($races = Lang::getRaceString($this->curTpl['requiredRace']))
+        if ($races = Lang::getRaceString($this->curTpl['requiredRace'], $__, $jsg, $__, $interactive))
+        {
+            foreach ($jsg as $js)
+                if (empty($this->jsGlobals[TYPE_RACE][$js]))
+                    $this->jsGlobals[TYPE_RACE][$js] = $js;
+
             if ($races != Lang::$game['ra'][0])             // not "both", but display combinations like: troll, dwarf
                 $x .= Lang::$game['races'].Lang::$main['colon'].$races.'<br />';
+        }
 
         // required honorRank (not used anymore)
         if ($rhr = $this->curTpl['requiredHonorRank'])

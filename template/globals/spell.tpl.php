@@ -7,10 +7,11 @@ foreach ($vars as $id => $data):
         '};';
 endforeach;
 
-if ($extra):
-    echo '_['.$extra['id'].'].tooltip_'.User::$localeString.' = \''.$extra['tooltip'].'\'';
-    echo '_['.$extra['id'].'].buff_'.User::$localeString.' = \''.$extra['buff'].'\'';
-    echo '_['.$extra['id'].'].spells_'.User::$localeString.' = {'.json_encode($extra['spells'], JSON_NUMERIC_CHECK).'};';
-    echo '_['.$extra['id'].'].buffspells_'.User::$localeString.' = {'.json_encode($extra['buffspells'], JSON_NUMERIC_CHECK).'};';
+if (isset($this->typeId) && !empty($extra[$this->typeId])):
+    $x = $extra[$this->typeId];
+    echo "\n_[".$x['id'].'].tooltip_'.User::$localeString.' = \''.$x['tooltip']."';";
+    echo "\n_[".$x['id'].'].buff_'.User::$localeString.' = \''.$x['buff']."';";
+    echo "\n_[".$x['id'].'].spells_'.User::$localeString.' = '.json_encode($x['spells'], JSON_NUMERIC_CHECK).';';
+    echo "\n_[".$x['id'].'].buffspells_'.User::$localeString.' = '.json_encode($x['buffspells'], JSON_NUMERIC_CHECK).';';
 endif;
 ?>
