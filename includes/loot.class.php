@@ -247,7 +247,7 @@ class Loot
 
             if ($loot['content'] > 0)                       // regular drop
             {
-                if (!User::isInGroup(U_GROUP_STAFF))
+                if (!User::isInGroup(U_GROUP_EMPLOYEE))
                 {
                     if (!isset($this->results[$loot['content']]))
                         $this->results[$loot['content']] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
@@ -257,7 +257,7 @@ class Loot
                 else                                        // in case of limited trash loot, check if $foo[<itemId>] exists
                     $this->results[] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
             }
-            else if (User::isInGroup(U_GROUP_STAFF))        // create dummy for ref-drop
+            else if (User::isInGroup(U_GROUP_EMPLOYEE))     // create dummy for ref-drop
             {
                 $data = array(
                     'id'    => $loot['content'],
@@ -272,7 +272,7 @@ class Loot
         }
 
         // move excessive % to extra loot
-        if (!User::isInGroup(U_GROUP_STAFF))
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
         {
             foreach ($this->results as &$_)
             {

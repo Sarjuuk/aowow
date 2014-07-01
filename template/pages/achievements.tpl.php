@@ -80,7 +80,7 @@ endforeach;
 
             <div id="lv-generic" class="listview"></div>
             <script type="text/javascript">//<![CDATA[
-<?php $this->lvBrick('achievement', ['data' => $this->lvData['data'], 'params' => $this->lvData['params']]  ); ?>
+<?php $this->lvBrick($this->lvData['file'], ['data' => $this->lvData['data'], 'params' => $this->lvData['params']]  ); ?>
             //]]></script>
 
             <div class="clear"></div>

@@ -139,7 +139,7 @@ class SearchPage extends GenericPage
 
     protected function generateCacheKey()
     {
-        $key = [$this->mode, $this->searchMask, md5($this->query), User::$localeId];
+        $key = [$this->mode, $this->searchMask, md5($this->query), intVal(User::isInGroup(U_GROUP_EMPLOYEE)), User::$localeId];
 
         return implode('_', $key);
     }
@@ -299,7 +299,8 @@ class SearchPage extends GenericPage
                 if (!$data)
                     break;
 
-                $names[] = '"'.$data['name'].$set['appendix'].'"';
+                $hasQ    = is_numeric($data['name'][0]) || $data['name'][0] == '@';
+                $names[] = ($hasQ ? substr($data['name'], 1) : $data['name']).$set['appendix'];
                 $extra   = [$set['type'], $data['id']];
 
                 if (isset($data['param1']))
@@ -308,14 +309,14 @@ class SearchPage extends GenericPage
                 if (isset($data['param2']))
                     $extra[] = $data['param2'];
 
-                $info[]  = '['.implode(', ', $extra).']';
+                $info[] = $extra;
             }
 
             if ($limit <= 0)
                 break;
         }
 
-        return '["'.Util::jsEscape($this->search).'", ['.implode(', ', $names).'], [], [], [], [], [], ['.implode(', ', $info).']]';
+        return '["'.Util::jsEscape($this->search).'", '.json_encode($names).', [], [], [], [], [], '.json_encode($info, JSON_NUMERIC_CHECK).']';
     }
 
     private function createLookup(array $fields = [])
@@ -357,7 +358,7 @@ class SearchPage extends GenericPage
         $cndBase = ['AND', $this->maxResults];
 
         // Exclude internal wow stuff
-        if (!User::isInGroup(U_GROUP_STAFF))
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $cndBase[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
         $shared = [];
@@ -377,7 +378,7 @@ class SearchPage extends GenericPage
         {
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($classes->iterate() as $__)
-                    $data[$classes->id]['param1'] = '"class_'.strToLower($classes->getField('fileString')).'"';
+                    $data[$classes->id]['param1'] = 'class_'.strToLower($classes->getField('fileString'));
 
             $result = array(
                 'type'     => TYPE_CLASS,
@@ -508,7 +509,7 @@ class SearchPage extends GenericPage
         {
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($money->iterate() as $__)
-                    $data[$money->id]['param1'] = '"'.strToLower($money->getField('iconString')).'"';
+                    $data[$money->id]['param1'] = strToLower($money->getField('iconString'));
 
             $result = array(
                 'type'     => TYPE_CURRENCY,
@@ -541,13 +542,8 @@ class SearchPage extends GenericPage
                 $this->extendGlobalData($sets->getJSGlobals(GLOBALINFO_SELF));
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-            {
                 foreach ($sets->iterate() as $__)
-                {
                     $data[$sets->id]['param1'] = $sets->getField('quality');
-                    $data[$sets->id]['name']   = substr($data[$sets->id]['name'], 1);
-                }
-            }
 
             $result = array(
                 'type'     => TYPE_ITEMSET,
@@ -618,9 +614,8 @@ class SearchPage extends GenericPage
             {
                 foreach ($items->iterate() as $__)
                 {
-                    $data[$items->id]['param1'] = '"'.$items->getField('iconString').'"';
+                    $data[$items->id]['param1'] = $items->getField('iconString');
                     $data[$items->id]['param2'] = $items->getField('quality');
-                    $data[$items->id]['name']   = substr($data[$items->id]['name'], 1);
                 }
             }
 
@@ -672,8 +667,9 @@ class SearchPage extends GenericPage
             {
                 foreach ($abilities->iterate() as $__)
                 {
-                    $data[$abilities->id]['param1'] = '"'.strToLower($abilities->getField('iconString')).'"';
-                    $data[$abilities->id]['param2'] = '"'.$abilities->ranks[$abilities->id].'"';
+                    $data[$abilities->id]['param1'] = strToLower($abilities->getField('iconString'));
+                    $data[$abilities->id]['param2'] = $abilities->ranks[$abilities->id];
+
                 }
             }
 
@@ -728,8 +724,8 @@ class SearchPage extends GenericPage
             {
                 foreach ($talents->iterate() as $__)
                 {
-                    $data[$talents->id]['param1'] = '"'.strToLower($talents->getField('iconString')).'"';
-                    $data[$talents->id]['param2'] = '"'.$talents->ranks[$abilities->id].'"';
+                    $data[$talents->id]['param1'] = strToLower($talents->getField('iconString'));
+                    $data[$talents->id]['param2'] = $talents->ranks[$talents->id];
                 }
             }
 
@@ -778,7 +774,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($glyphs->iterate() as $__)
-                    $data[$glyphs->id]['param1'] = '"'.strToLower($glyphs->getField('iconString')).'"';
+                    $data[$glyphs->id]['param1'] = strToLower($glyphs->getField('iconString'));
 
             $result = array(
                 'type'     => TYPE_SPELL,
@@ -825,7 +821,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($prof->iterate() as $__)
-                    $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
+                    $data[$prof->id]['param1'] = strToLower($prof->getField('iconString'));
 
             $result = array(
                 'type'     => TYPE_SPELL,
@@ -872,7 +868,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($prof->iterate() as $__)
-                    $data[$prof->id]['param1'] = '"'.strToLower($prof->getField('iconString')).'"';
+                    $data[$prof->id]['param1'] = strToLower($prof->getField('iconString'));
 
             $result = array(
                 'type'     => TYPE_SPELL,
@@ -919,7 +915,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($vPets->iterate() as $__)
-                    $data[$vPets->id]['param1'] = '"'.strToLower($vPets->getField('iconString')).'"';
+                    $data[$vPets->id]['param1'] = strToLower($vPets->getField('iconString'));
 
             $result = array(
                 'type'     => TYPE_SPELL,
@@ -966,7 +962,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($mounts->iterate() as $__)
-                    $data[$mounts->id]['param1'] = '"'.strToLower($mounts->getField('iconString')).'"';
+                    $data[$mounts->id]['param1'] = strToLower($mounts->getField('iconString'));
 
             $result = array(
                 'type'     => TYPE_SPELL,
@@ -1090,7 +1086,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($acvs->iterate() as $__)
-                    $data[$acvs->id]['param1'] = '"'.strToLower($acvs->getField('iconString')).'"';
+                    $data[$acvs->id]['param1'] = strToLower($acvs->getField('iconString'));
 
             $result = array(
                 'type'     => TYPE_ACHIEVEMENT,
@@ -1270,7 +1266,7 @@ class SearchPage extends GenericPage
         {
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($skills->iterate() as $id => $__)
-                    $data[$id]['param1'] = '"'.$skills->getField('iconString').'"';
+                    $data[$id]['param1'] = $skills->getField('iconString');
 
             $result = array(
                 'type'     => TYPE_SKILL,
@@ -1303,7 +1299,7 @@ class SearchPage extends GenericPage
         {
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($pets->iterate() as $__)
-                    $data[$pets->id]['param1'] = '"'.$pets->getField('iconString').'"';
+                    $data[$pets->id]['param1'] = $pets->getField('iconString');
 
             $result = array(
                 'type'     => TYPE_PET,
@@ -1340,7 +1336,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($npcAbilities->iterate() as $__)
-                    $data[$npcAbilities->id]['param1'] = '"'.strToLower($npcAbilities->getField('iconString')).'"';
+                    $data[$npcAbilities->id]['param1'] = strToLower($npcAbilities->getField('iconString'));
 
             $result = array(
                 'type'     => TYPE_SPELL,
@@ -1388,7 +1384,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($misc->iterate() as $__)
-                    $data[$misc->id]['param1'] = '"'.strToLower($misc->getField('iconString')).'"';
+                    $data[$misc->id]['param1'] = strToLower($misc->getField('iconString'));
 
             $result = array(
                 'type'     => TYPE_SPELL,

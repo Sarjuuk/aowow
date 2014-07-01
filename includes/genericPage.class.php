@@ -13,8 +13,8 @@ trait DetailPage
 
     protected function generateCacheKey()
     {
-        //     mode,         type,        typeId,        localeId,        category, filter
-        $key = [$this->mode, $this->type, $this->typeId, User::$localeId, '-1',     '-1'];
+        //     mode,         type,        typeId,        employee-flag,                             localeId,        category, filter
+        $key = [$this->mode, $this->type, $this->typeId, intVal(User::isInGroup(U_GROUP_EMPLOYEE)), User::$localeId, '-1',     '-1'];
 
         // item special: can modify tooltips
         if (isset($this->enhancedTT))
@@ -33,8 +33,8 @@ trait ListPage
 
     protected function generateCacheKey()
     {
-        //     mode,         type,        typeId, localeId,
-        $key = [$this->mode, $this->type, '-1',   User::$localeId];
+        //     mode,         type,        typeId, employee-flag,                             localeId,
+        $key = [$this->mode, $this->type, '-1',   intVal(User::isInGroup(U_GROUP_EMPLOYEE)), User::$localeId];
 
         //category
         $key[] = $this->category ? implode('.', $this->category) : '-1';
@@ -361,7 +361,7 @@ class GenericPage
             $this->prepareContent();
 
             if (!$this->isSaneInclude('template/pages/', $this->tpl))
-                die(User::isInGroup(U_GROUP_STAFF) ? 'Error: nonexistant template requested: template/pages/'.$this->tpl.'.tpl.php' : null);
+                die(User::isInGroup(U_GROUP_EMPLOYEE) ? 'Error: nonexistant template requested: template/pages/'.$this->tpl.'.tpl.php' : null);
 
             $this->addAnnouncements();
 
@@ -376,7 +376,7 @@ class GenericPage
             $$n = $v;
 
         if (!$this->isSaneInclude('template/globals/', $file))
-            echo !User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requested: template/globals/".$file.".tpl.php\n\n" : null;
+            echo !User::isInGroup(U_GROUP_EMPLOYEE) ? "\n\nError: nonexistant template requested: template/globals/".$file.".tpl.php\n\n" : null;
         else
             include('template/globals/'.$file.'.tpl.php');
     }
@@ -387,7 +387,7 @@ class GenericPage
             $$n = $v;
 
         if (!$this->isSaneInclude('template/bricks/', $file))
-            echo User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requested: template/bricks/".$file.".tpl.php\n\n" : null;
+            echo User::isInGroup(U_GROUP_EMPLOYEE) ? "\n\nError: nonexistant template requested: template/bricks/".$file.".tpl.php\n\n" : null;
         else
             include('template/bricks/'.$file.'.tpl.php');
     }
@@ -398,7 +398,7 @@ class GenericPage
             $$n = $v;
 
         if (!$this->isSaneInclude('template/listviews/', $file))
-            echo User::isInGroup(U_GROUP_STAFF) ? "\n\nError: nonexistant template requested: template/listviews/".$file.".tpl.php\n\n" : null;
+            echo User::isInGroup(U_GROUP_EMPLOYEE) ? "\n\nError: nonexistant template requested: template/listviews/".$file.".tpl.php\n\n" : null;
         else
             include('template/listviews/'.$file.'.tpl.php');
     }

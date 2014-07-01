@@ -147,6 +147,8 @@ class FactionPage extends GenericPage
                 $this->extraText .= '[h3 class=clear][Custom Reward Rate][/h3][table]'.$buff.'[/table]';
         }
 
+        // todo (low): create pendant from player_factionchange_reputations
+
         /**************/
         /* Extra Tabs */
         /**************/

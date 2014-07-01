@@ -80,6 +80,8 @@ class TitlePage extends GenericPage
             BUTTON_LINKS   => ['name' => $this->nameFixed]
         );
 
+        // todo (low): create pendant from player_factionchange_titles
+
         /**************/
         /* Extra Tabs */
         /**************/

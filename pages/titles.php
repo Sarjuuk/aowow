@@ -30,7 +30,7 @@ class TitlesPage extends GenericPage
     {
         $conditions = [];
 
-        if (!User::isInGroup(U_GROUP_STAFF))                // hide unused titles
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))                // hide unused titles
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
         if ($this->category)

@@ -171,6 +171,8 @@ class AchievementPage extends GenericPage
 
         $this->rewards['text'] = $this->subject->getField('reward', true);
 
+        // todo (low): create pendant from player_factionchange_achievement
+
         /**************/
         /* Extra Tabs */
         /**************/

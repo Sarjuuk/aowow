@@ -362,7 +362,7 @@ class ItemPage extends genericPage
             );
 
             // merge identical stats and names for normal users (e.g. spellPower of a specific school became generel spellPower with 3.0)
-            if (!User::isInGroup(U_GROUP_STAFF))
+            if (!User::isInGroup(U_GROUP_EMPLOYEE))
             {
                 for ($i = 1; $i < count($this->subItems['data']); $i++)
                 {

@@ -921,7 +921,7 @@ abstract class Filter
                 $result = $this->genericBooleanFlags($gen[1], $gen[2], $cr[1]);
                 break;
             case FILTER_CR_STAFFFLAG:
-                if (User::isInGroup(U_GROUP_STAFF) && $cr[1] >= 0)
+                if (User::isInGroup(U_GROUP_EMPLOYEE) && $cr[1] >= 0)
                     $result = $this->genericBooleanFlags($gen[1], (1 << $cr[1]), true);
                 break;
             case FILTER_CR_BOOLEAN:

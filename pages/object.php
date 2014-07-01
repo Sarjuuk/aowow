@@ -190,7 +190,7 @@ class ObjectPage extends GenericPage
         }
 
         // AI
-        if (User::isInGroup(U_GROUP_STAFF))
+        if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
             if ($_ = $this->subject->getField('ScriptName'))
                 $infobox[] = 'Script'.Lang::$main['colon'].$_;

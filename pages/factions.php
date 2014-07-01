@@ -35,7 +35,7 @@ class FactionsPage extends GenericPage
     {
         $conditions = [];
 
-        if (!User::isInGroup(U_GROUP_STAFF))                    // unlisted factions
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))                    // unlisted factions
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
         if (isset($this->category[1]))
