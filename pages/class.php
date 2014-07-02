@@ -38,7 +38,7 @@ class ClassPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['class']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['class']));
     }
 
     protected function generateContent()

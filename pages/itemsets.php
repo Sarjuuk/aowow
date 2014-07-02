@@ -4,76 +4,83 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-$filter     = [];
-$path       = [0, 2];
-$filterHash = !empty($_GET['filter']) ? sha1(serialize($_GET['filter'])) : -1;
-$cacheKey   = implode('_', [CACHETYPE_PAGE, TYPE_ITEMSET, -1, $filterHash, User::$localeId]);
-
-if (!$smarty->loadCache($cacheKey, $pageData, $filter))
+// menuId 2: Itemset  g_initPath()
+//  tabId 0: Database g_initHeader()
+class ItemsetsPage extends GenericPage
 {
-    $itemsetFilter = new ItemsetListFilter();
+    use ListPage;
 
-    $itemsets = new ItemsetList([$itemsetFilter->getConditions()]);
-    $itemsets->getJSGlobals();
+    protected $type     = TYPE_ITEMSET;
+    protected $tpl      = 'itemsets';
+    protected $path     = [0, 2];
+    protected $tabId    = 0;
+    protected $mode     = CACHETYPE_PAGE;
+    protected $js       = ['filters.js'];
 
-    // recreate form selection
-    $filter = array_merge($itemsetFilter->getForm('form'), $filter);
-    $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['fi']    =  $itemsetFilter->getForm();
-
-    if (isset($filter['cl']))
-        $path[] = $filter['cl'];
-
-    // menuId 2: Itemset  g_initPath()
-    //  tabId 0: Database g_initHeader()
-    $pageData = array(
-        'page' => array(
-            'title'  => Util::ucFirst(Lang::$game['itemsets']),
-            'path'   => json_encode($path, JSON_NUMERIC_CHECK),
-            'tab'    => 0,
-            'subCat' => $pageParam ? '='.$pageParam : '',
-            'reqJS'  => array(
-                STATIC_URL.'/js/filters.js',
-                '?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
-            )
-        ),
-        'lv' => []
-    );
-
-    $lv = array(
-        'data'   => $itemsets->getListviewData(),           // listview content
-        'params' => []
-    );
-
-    if (!empty($filter['fi']['extraCols']))
-        $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
-
-    // create note if search limit was exceeded
-    if ($itemsets->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+    public function __construct($pageCall, $pageParam)
     {
-        $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsetsfound', $itemsets->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-        $lv['params']['_truncated'] = 1;
+        $this->getCategoryFromUrl($pageParam);;
+
+        parent::__construct();
+
+        $this->name = Util::ucFirst(Lang::$game['itemsets']);
     }
 
-    if ($itemsetFilter->error)
-        $lv['params']['_errors'] = '$1';
+    protected function generateContent()
+    {
+        $itemsetFilter = new ItemsetListFilter();
 
-    $pageData['lv'] = $lv;
+        $itemsets = new ItemsetList($itemsetFilter->getConditions());
+        $this->extendGlobalData($itemsets->getJSGlobals());
 
-    $smarty->saveCache($cacheKey, $pageData, $filter);
+        // recreate form selection
+        $this->filter = array_merge($itemsetFilter->getForm('form'), $this->filter);
+        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
+        $this->filter['fi']    =  $itemsetFilter->getForm();
+
+        $this->addJS('?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
+        $lv = array(
+            'file'   => 'itemset',
+            'data'   => $itemsets->getListviewData(),       // listview content
+            'params' => []
+        );
+
+        if (!empty($this->filter['fi']['extraCols']))
+            $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+
+        // create note if search limit was exceeded
+        if ($itemsets->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+        {
+            $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsetsfound', $itemsets->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $lv['params']['_truncated'] = 1;
+        }
+
+        if ($itemsetFilter->error)
+            $lv['params']['_errors'] = '$1';
+
+        $this->lvData = $lv;
+
+        // sort for dropdown-menus
+        asort(Lang::$itemset['notes'], SORT_NATURAL);
+        asort(Lang::$game['cl']);
+    }
+
+    protected function generateTitle()
+    {
+        array_unshift($this->title, $this->name);
+
+        $form = (new ItemsetListFilter())->getForm('form');
+        if (isset($form['cl']))
+            array_unshift($this->title, Lang::$game['cl'][$form['cl']]);
+    }
+
+    protected function generatePath()
+    {
+        $form = (new ItemsetListFilter())->getForm('form');
+        if (isset($form['cl']))
+            $this->path[] = $form['cl'];
+    }
 }
-
-
-// sort for dropdown-menus
-asort(Lang::$itemset['notes'], SORT_NATURAL);
-asort(Lang::$game['cl']);
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('filter', $filter);
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$itemset, Lang::$item, ['colon' => Lang::$main['colon']]));
-$smarty->assign('lvData', $pageData['lv']);
-
-// load the page
-$smarty->display('itemsets.tpl');
 
 ?>

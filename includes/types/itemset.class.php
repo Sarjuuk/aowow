@@ -136,7 +136,8 @@ class ItemsetListFilter extends Filter
 
         // name [str]
         if (isset($_v['na']))
-            $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+            if ($_ = $this->modularizeString(['name_loc'.User::$localeId]))
+                $parts[] = $_;
 
         // quality [enum]
         if (isset($_v['qu']))

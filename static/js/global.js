@@ -6235,7 +6235,7 @@ Listview.extraCols = {
 
         id: 'condition',
         name: LANG.requires,
-        width: '30%',
+        width: '25%',
         compute: function(row, td) {
             if (!row.condition || !$WH.is_array(row.condition)) {
                 return;
