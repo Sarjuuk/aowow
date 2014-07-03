@@ -3,96 +3,97 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-$filter    = [];
-$cat       = Util::extractURLParams($pageParam);            // 0: type; 1:zoneOrSort
-$path      = [0, 3];
-$title     = [Util::ucFirst(Lang::$game['quests'])];
-$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_QUEST, -1, $cat ? implode('.', $cat) : -1, User::$localeId]);
-$validCats = Util::$questClasses;                           // to be reviewed
-
-if (!Util::isValidPage($validCats, $cat))
-    $smarty->error();
-
-if (!$smarty->loadCache($cacheKey, $pageData, $filter))
+// menuId 3: Quest    g_initPath()
+//  tabId 0: Database g_initHeader()
+class QuestsPage extends GenericPage
 {
-    $conditions = [];
+    use ListPage;
 
-    if ($cat)
+    protected $type          = TYPE_QUEST;
+    protected $tpl           = 'quests';
+    protected $path          = [0, 3];
+    protected $tabId         = 0;
+    protected $mode          = CACHETYPE_PAGE;
+    protected $validCats     = [];
+    protected $js            = ['filters.js'];
+
+    public function __construct($pageCall, $pageParam)
     {
-        // path
-        for ($i = 0; $i < count($cat); $i++)
-            $path[] = $cat[$i];
+        $this->validCats = Util::$questClasses;             // needs reviewing (not allowed to set this as default)
 
-        // title
+        $this->filterObj = new QuestListFilter();
+        $this->getCategoryFromUrl($pageParam);;
+
+        parent::__construct();
+
+        $this->name   = Util::ucFirst(Lang::$game['quests']);
+        $this->subCat = $pageParam ? '='.$pageParam : '';
+    }
+
+    protected function generateContent()
+    {
+        $conditions = [];
 
         // cnd
-        if (isset($cat[1]))
-            $conditions[] = ['zoneOrSort', $cat[1]];
-        else if (isset($cat[0]))
-            $conditions[] = ['zoneOrSort', $validCats[$cat[0]]];
+        if (isset($this->category[1]))
+            $conditions[] = ['zoneOrSort', $this->category[1]];
+        else if (isset($this->category[0]))
+            $conditions[] = ['zoneOrSort', $this->validCats[$this->category[0]]];
+
+        if ($_ = $this->filterObj->getConditions())
+            $conditions[] = $_;
+
+        $quests = new QuestList($conditions, ['extraOpts' => $this->filterObj->extraOpts]);
+
+        $this->extendGlobalData($quests->getJSGlobals());
+
+        // recreate form selection
+        $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
+        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
+        $this->filter['fi']    =  $this->filterObj->getForm();
+
+        $lv = array(
+            'file'   => 'quest',
+            'data'   => $quests->getListviewData(),
+            'params' => []
+        );
+
+        if (!empty($this->filter['fi']['extraCols']))
+            $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+
+        // create note if search limit was exceeded
+        if ($quests->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+        {
+            $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_questsfound', $quests->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $lv['params']['_truncated'] = 1;
+        }
+        else if (isset($this->category[1]) && $this->category[1] > 0)
+            $lv['params']['note'] = '$$WH.sprintf(LANG.lvnote_questgivers, '.$this->category[1].', g_zones['.$this->category[1].'], '.$this->category[1].')';
+
+        if ($this->filterObj->error)
+            $lv['params']['_errors'] = '$1';
+
+        $this->lvData = $lv;
     }
 
-    $questFilter = new QuestListFilter();
-
-    if ($_ = $questFilter->getConditions())
-        $conditions[] = $_;
-
-    $quests = new QuestList($conditions, ['extraOpts' => $questFilter->extraOpts]);
-
-    $quests->addGlobalsToJscript();
-
-    // recreate form selection
-    $filter = array_merge($questFilter->getForm('form'), $filter);
-    $filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-    $filter['fi']    =  $questFilter->getForm();
-
-    $lv = array(
-        'file'   => 'quest',
-        'data'   => $quests->getListviewData(),
-        'params' => []
-    );
-
-    if (!empty($filter['fi']['extraCols']))
-        $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
-
-    // create note if search limit was exceeded
-    if ($quests->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+    protected function generateTitle()
     {
-        $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_questsfound', $quests->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-        $lv['params']['_truncated'] = 1;
+        array_unshift($this->title, $this->name);
+
+        if (isset($this->category[1]))
+            array_unshift($this->title, Lang::$quest['cat'][$this->category[0]][$this->category[1]]);
+        else if (isset($this->category[0]))
+        {
+            $c0 = Lang::$quest['cat'][$this->category[0]];
+            array_unshift($this->title, is_array($c0) ? $c0[0] : $c0);
+        }
     }
-    else if (isset($cat[1]) && $cat[1] > 0)
-        $lv['params']['note'] = '$$WH.sprintf(LANG.lvnote_questgivers, '.$cat[1].', g_zones['.$cat[1].'], '.$cat[1].')';
 
-    if ($questFilter->error)
-        $lv['params']['_errors'] = '$1';
-
-
-    // menuId 3: Quest    g_initPath()
-    //  tabId 0: Database g_initHeader()
-    $pageData = array(
-        'page' => array(
-            'title'  => implode(' - ', $title),
-            'path'   => json_encode($path, JSON_NUMERIC_CHECK),
-            'tab'    => 0,
-            'subCat' => $pageParam ? '='.$pageParam : '',
-            'reqJS'  => array(
-                STATIC_URL.'/js/filters.js'
-            )
-        ),
-        'lv' => $lv
-    );
-
-    $smarty->saveCache($cacheKey, $pageData, $filter);
+    protected function generatePath()
+    {
+        foreach ($this->category as $c)
+            $this->path[] = $c;
+    }
 }
-
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('filter', $filter);
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$game, Lang::$quest, ['colon' => Lang::$colon]));
-$smarty->assign('lvData', $pageData['lv']);
-
-// load the page
-$smarty->display('quests.tpl');
 
 ?>

@@ -85,6 +85,7 @@ class SpellsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        $this->filterObj = new SpellListFilter();
         $this->getCategoryFromUrl($pageParam);;
 
         parent::__construct();
@@ -355,8 +356,7 @@ class SpellsPage extends GenericPage
             }
         }
 
-        $spellFilter = new SpellListFilter();
-        if ($_ = $spellFilter->getConditions())
+        if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
         $spells = new SpellList($conditions);
@@ -365,9 +365,9 @@ class SpellsPage extends GenericPage
         $this->lvData['data'] = $spells->getListviewData();
 
         // recreate form selection
-        $this->filter          = array_merge($spellFilter->getForm('form'), $this->filter);
+        $this->filter          = array_merge($this->filterObj->getForm('form'), $this->filter);
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-        $this->filter['fi']    =  $spellFilter->getForm();
+        $this->filter['fi']    =  $this->filterObj->getForm();
 
         if (!empty($this->filter['fi']['extraCols']))
             $this->lvData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
@@ -379,7 +379,7 @@ class SpellsPage extends GenericPage
             $this->lvData['params']['_truncated'] = 1;
         }
 
-        if ($spellFilter->error)
+        if ($this->filterObj->error)
             $this->lvData['params']['_errors'] = '$1';
 
         $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost']);
@@ -433,7 +433,7 @@ class SpellsPage extends GenericPage
         foreach ($this->category as $c)
             $this->path[] = $c;
 
-        $form = (new SpellListFilter())->getForm('form');
+        $form = $this->filterObj->getForm('form');
         if (count($this->path) == 4 && $this->category[0] == -13 && isset($form['gl']) && !is_array($form['gl']))
             $this->path[] = $form['gl'];
     }

@@ -31,6 +31,8 @@ trait ListPage
     protected $typeId    = 0;
     protected $filter    = [];
 
+    private   $filterObj = null;
+
     protected function generateCacheKey()
     {
         //     mode,         type,        typeId, employee-flag,                             localeId,
@@ -40,7 +42,7 @@ trait ListPage
         $key[] = $this->category ? implode('.', $this->category) : '-1';
 
         // filter
-        $key[] = $this->filter ? md5(serialize($this->filter)) : '-1';
+        $key[] = $this->filterObj ? md5(serialize($this->filterObj)) : '-1';
 
         return implode('_', $key);
     }

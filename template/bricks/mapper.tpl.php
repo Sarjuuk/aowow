@@ -31,9 +31,9 @@ if (!empty($this->map['data'])):
 <?php else: ?>
                 var g_mapperData = {<?php echo $this->map['data']['zone']; ?>: {}};
 <?php endif; ?>
-                var myMapper = new Mapper({<?php json_encode($this->map['data'], JSON_NUMERIC_CHECK); /* parent: 'mapper-generic' should come here? */ ?>, parent: 'mapper-generic'});
+                var myMapper = new Mapper(<?php echo json_encode($this->map['data'], JSON_NUMERIC_CHECK); /* dont forget to set "'parent' => 'mapper-generic'" */ ?>);
 <?php if (!empty($this->map['som'])): ?>
-                new ShowOnMap(<?php echo $this->map['som']; ?>);
+                new ShowOnMap(<?php echo json_encode($this->map['som'], JSON_NUMERIC_CHECK); ?>);
 <?php endif; ?>
             //]]></script>
 <?php endif; ?>

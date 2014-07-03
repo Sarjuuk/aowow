@@ -832,11 +832,11 @@ class Util
         else
         {
             $_ = $s['d'] + $s['h'] / 24;
-            if ($_ && !($_ % 364))                          // whole years
+            if ($_ > 1 && !($_ % 364))                      // whole years
                 return round(($s['d'] + $s['h'] / 24) / 364, 2)." ".Lang::$timeUnits[$s['d'] / 364 == 1 && !$s['h'] ? 'sg' : 'pl'][0];
-            if ($_ && !($_ % 30))                           // whole month
+            if ($_ > 1 && !($_ % 30))                       // whole month
                 return round(($s['d'] + $s['h'] / 24) /  30, 2)." ".Lang::$timeUnits[$s['d'] /  30 == 1 && !$s['h'] ? 'sg' : 'pl'][1];
-            if ($_ && !($_ % 7))                            // whole weeks
+            if ($_ > 1 && !($_ % 7))                        // whole weeks
                 return round(($s['d'] + $s['h'] / 24) /   7, 2)." ".Lang::$timeUnits[$s['d'] /   7 == 1 && !$s['h'] ? 'sg' : 'pl'][2];
             if ($s['d'])
                 return round($s['d'] + $s['h']  /   24, 2)." ".Lang::$timeUnits[$s['d'] == 1 && !$s['h']  ? 'sg' : 'pl'][3];

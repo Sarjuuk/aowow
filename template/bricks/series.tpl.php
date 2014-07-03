@@ -4,10 +4,10 @@
         <table class="series">
 <?php
 foreach ($list as $idx => $itr):
-    echo '<tr><th>'.($idx + 1).'</th><td><div>';
+    echo '            <tr><th>'.($idx + 1).'</th><td><div>';
 
     $end = array_pop(array_keys($itr));
-    foreach ($itr as $k => $i): // itemItr
+    foreach ($itr as $k => $i):                             // itemItr
         switch ($i['side']):
             case 1:  $wrap = '<span class="icon-alliance-padded">%s</span>'; break;
             case 2:  $wrap = '<span class="icon-horde">%s</span>'; break;

@@ -426,8 +426,75 @@ $lang = array(
              83 => "Legendär",          84 => "Eskorte",            85 => "Heroisch",           88 => "Schlachtzug (10)",   89 => "Schlachtzug (25)"
         ),
         'cat'           => array(
-            // todo: after zones
-        )
+            0 => array( "Östliche Königreiche",
+                  36 => "Alteracgebirge",                 45 => "Arathihochland",                 46 => "Brennende Steppe",              279 => "Dalarankrater",                  25 => "Der Schwarzfels",
+                2257 => "Die Tiefenbahn",                  1 => "Dun Morogh",                     10 => "Dämmerwald",                   1537 => "Eisenschmiede",                  41 => "Gebirgspass der Totenwinde",
+                3433 => "Geisterlande",                   47 => "Hinterland",                   3430 => "Immersangwald",                4080 => "Insel von Quel'Danas",           38 => "Loch Modan",
+                4298 => "Pestländer: Die Scharlachrote Enklave", 44 => "Rotkammgebirge",          33 => "Schlingendorntal",               51 => "Sengende Schlucht",            3487 => "Silbermond",
+                 130 => "Silberwald",                   1519 => "Sturmwind",                      11 => "Sumpfland",                       8 => "Sümpfe des Elends",              85 => "Tirisfal",
+                1497 => "Unterstadt",                      4 => "Verwüstete Lande",              267 => "Vorgebirge des Hügellands",      12 => "Wald von Elwynn",                40 => "Westfall",
+                  28 => "Westliche Pestländer",            3 => "Ödland",                        139 => "Östliche Pestländer"
+            ),
+            1 => array( "Kalimdor",
+                  16 => "Azshara",                      3524 => "Azurmythosinsel",              3525 => "Blutmythosinsel",                17 => "Brachland",                    1657 => "Darnassus",
+                 405 => "Desolace",                     3557 => "Die Exodar",                   1638 => "Donnerfels",                    148 => "Dunkelküste",                    14 => "Durotar",
+                  15 => "Düstermarschen",                331 => "Eschental",                     357 => "Feralas",                      1216 => "Holzschlundfeste",              490 => "Krater von Un'Goro",
+                 493 => "Mondlichtung",                  215 => "Mulgore",                      1637 => "Orgrimmar",                    1377 => "Silithus",                      406 => "Steinkrallengebirge",
+                 440 => "Tanaris",                       400 => "Tausend Nadeln",                141 => "Teldrassil",                    361 => "Teufelswald",                   618 => "Winterquell"
+            ),
+            8 => array( "Scherbenwelt",
+                3483 => "Höllenfeuerhalbinsel",         3518 => "Nagrand",                      3523 => "Nethersturm",                  3520 => "Schattenmondtal",              3522 => "Schergrat",
+                3703 => "Shattrath",                    3679 => "Skettis",                      3519 => "Wälder von Terokkar",          3521 => "Zangarmarschen"
+            ),
+           10 => array( "Nordend",
+                3537 => "Boreanische Tundra",           4395 => "Dalaran",                       495 => "Der heulende Fjord",           4742 => "Hrothgar's Landeplatz",          67 => "Die Sturmgipfel",
+                  65 => "Drachenöde",                    210 => "Eiskrone",                      394 => "Grizzlyhügel",                 4024 => "Kaltarra",                     3711 => "Sholazarbecken",
+                4197 => "Tausendwintersee",               66 => "Zul'Drak"
+            ),
+            2 => array( "Dungeons",
+                4494 => "Ahn'kahet: Das Alte Königreich", 3790 => "Auchenaikrypta",             4277 => "Azjol-Nerub",                   209 => "Burg Schattenfang",             206 => "Burg Utgarde",
+                4100 => "Das Ausmerzen von Stratholme", 4228 => "Das Oculus",                    796 => "Das Scharlachrote Kloster",     717 => "Das Verlies",                  3713 => "Der Blutkessel",
+                3905 => "Der Echsenkessel",             2437 => "Der Flammenschlund",           4120 => "Der Nexus",                    3716 => "Der Tiefensumpf",              2366 => "Der schwarze Morast",
+                3848 => "Die Arkatraz",                 3847 => "Die Botanika",                 3715 => "Die Dampfkammer",              4272 => "Die Hallen der Blitze",        4264 => "Die Hallen des Steins",
+                 718 => "Die Höhlen des Wehklagens",    3849 => "Die Mechanar",                 4809 => "Die Seelenschmiede",           3717 => "Die Sklavenunterkünfte",       1581 => "Die Todesminen",
+                4415 => "Die Violette Festung",         3714 => "Die zerschmetterten Hallen",   2557 => "Düsterbruch",                  4196 => "Feste Drak'Tharon",            3845 => "Festung der Stürme",
+                 721 => "Gnomeregan",                   4813 => "Grube von Saron",              4416 => "Gundrak",                      4820 => "Hallen der Reflexion",         1941 => "Höhlen der Zeit",
+                3562 => "Höllenfeuerbollwerk",          3535 => "Höllenfeuerzitadelle",          722 => "Hügel der Klingenhauer",        491 => "Kral der Klingenhauer",        3792 => "Managruft",
+                2100 => "Maraudon",                     4723 => "Prüfung des Champions",        3789 => "Schattenlabyrinth",            2057 => "Scholomance",                  1583 => "Schwarzfelsspitze",
+                1584 => "Schwarzfelstiefen",            3791 => "Sethekkhallen",                2017 => "Stratholme",                   4131 => "Terrasse der Magister",         719 => "Tiefschwarze Grotte",
+                1196 => "Turm Utgarde",                 1337 => "Uldaman",                      1477 => "Versunkener Tempel",           2367 => "Vorgebirge des Alten Hügellands", 1176 => "Zul'Farrak"
+            ),
+            3 => array( "Schlachtzüge",
+                4603 => "Archavon's Kammer",            3842 => "Das Auge",                     4500 => "Das Auge der Ewigkeit",        4493 => "Das Obsidiansanktum",          3959 => "Der Schwarze Tempel",
+                4812 => "Eiskronenzitadelle",           2717 => "Geschmolzener Kern",           3923 => "Gruul's Unterschlupf",         3607 => "Höhle des Schlangenschreins",  3606 => "Hyjalgipfel",
+                3457 => "Karazhan",                     3836 => "Magtheridons Kammer",          3456 => "Naxxramas",                    2159 => "Onyxias Hort",                 2677 => "Pechschwingenhort",
+                4722 => "Prüfung des Kreuzfahrers",     3429 => "Ruinen von Ahn'Qiraj",         4075 => "Sonnenbrunnenplateau",         3428 => "Tempel von Ahn'Qiraj",         4273 => "Ulduar",
+                3805 => "Zul'Aman",                     1977 => "Zul'Gurub"
+            ),
+            4 => array( "Klassen",
+                -263 => "Druide",                        -61 => "Hexenmeister",                 -261 => "Jäger",                         -81 => "Krieger",                      -161 => "Magier",
+                -141 => "Paladin",                      -262 => "Priester",                      -82 => "Schamane",                     -162 => "Schurke",                      -372 => "Todesritter"
+            ),
+            5 => array( "Berufe",
+                -181 => "Alchemie",                     -101 => "Angeln",                       -324 => "Erste Hilfe",                  -201 => "Ingenieurskunst",              -371 => "Inschriftenkunde",
+                -373 => "Juwelenschleifen",             -304 => "Kochkunst",                     -24 => "Kräuterkunde",                 -182 => "Lederverarbeitung",            -121 => "Schmiedekunst",
+                -264 => "Schneiderei"
+            ),
+            6 => array( "Schlachtfelder",
+                2597 => "Alteractal",                   3358 => "Arathibecken",                 3820 => "Auge des Sturms",              4710 => "Insel der Eroberung",          3277 => "Kriegshymnenschlucht",
+                 -25 => "Schlachtfelder",               4384 => "Strand der Uralten"
+            ),
+            9 => array( "Weltereignisse",
+                -370 => "Braufest",                    -1002 => "Kinderwoche",                  -364 => "Dunkelmond-Jahrmarkt",          -41 => "Tag der Toten",               -1003 => "Schlotternächte",
+               -1005 => "Erntedankfest",                -376 => "Liebe liegt in der Luft",      -366 => "Mondfest",                     -369 => "Sonnenwende",                 -1006 => "Neujahr",
+                -375 => "Die Pilgerfreuden",            -374 => "Nobelgarten",                 -1001 => "Winterhauch"
+            ),
+            7 => array( "Verschiedenes",
+                -365 => "Krieg von Ahn'Qiraj",         -1010 => "Dungeonfinder",                  -1 => "Episch",                       -344 => "Legendär",                     -367 => "Ruf",
+                -368 => "Invasion der Geißel",          -241 => "Turnier"
+            ),
+           -2 => "Nicht kategorisiert"
+       )
     ),
     'title' => array(
         'cat'           => array(

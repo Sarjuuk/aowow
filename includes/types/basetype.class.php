@@ -668,9 +668,13 @@ abstract class Filter
                         $this->error = true;
                 }
             }
-
-            $this->evaluateFilter();
         }
+    }
+
+    // use to generate cacheKey for filterable pages
+    public function __sleep()
+    {
+        return ['formData'];
     }
 
     public function urlize(array $override = [], array $addCr = [])
@@ -741,6 +745,9 @@ abstract class Filter
 
     public function getConditions()
     {
+        if (!$this->cndSet)
+            $this->evaluateFilter();
+
         return $this->cndSet;
     }
 
@@ -790,7 +797,7 @@ abstract class Filter
 
         // single cnd?
         if (!$qry)
-            $this->error = 1;
+            $this->error = true;
         else if (count($qry) > 1)
             array_unshift($qry, 'OR');
         else

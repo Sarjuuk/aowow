@@ -81,7 +81,8 @@ class ItemsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->getCategoryFromUrl($pageParam);;
+        $this->filterObj = new ItemListFilter();
+        $this->getCategoryFromUrl($pageParam);
 
         parent::__construct();
 
@@ -100,12 +101,10 @@ class ItemsPage extends GenericPage
         /* evaluate filter */
         /*******************/
 
-        $itemFilter = new ItemListFilter();
-
         // recreate form selection
-        $this->filter = array_merge($itemFilter->getForm('form'), $this->filter);
+        $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
         $this->filter['query'] = @$_GET['filter'] ?: NULL;
-        $this->filter['fi']    =  $itemFilter->getForm();
+        $this->filter['fi']    =  $this->filterObj->getForm();
 
         $menu = $this->createExtraMenus();
 
@@ -120,20 +119,20 @@ class ItemsPage extends GenericPage
         if (isset($this->filter['slot'][INVTYPE_SHIELD]))   // "Off Hand" => "Shield"
             $this->filter['slot'][INVTYPE_SHIELD] = Lang::$item['armorSubClass'][6];
 
-        $xCols = $itemFilter->getForm('extraCols', true);
+        $xCols = $this->filterObj->getForm('extraCols', true);
 
         $infoMask = ITEMINFO_JSON;
         if (array_intersect([63, 64, 125], $xCols))         // 63:buyPrice; 64:sellPrice; 125:reqarenartng
             $infoMask |= ITEMINFO_VENDOR;
 
-        if ($itemFilter->error)
-            $this->sharedLV['_errors'] = '$1';
-
         if (!empty($this->filter['fi']['extraCols']))
             $this->sharedLV['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.($this->filter['gm'] ?: 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')';
 
-        if ($_ = $itemFilter->getConditions())
+        if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
+
+        if ($this->filterObj->error)
+            $this->sharedLV['_errors'] = '$1';
 
         /******************/
         /* set conditions */
@@ -150,7 +149,7 @@ class ItemsPage extends GenericPage
         /* handle auto-gemming */
         /***********************/
 
-        $this->gemScores = $this->createGemScores($itemFilter);
+        $this->gemScores = $this->createGemScores();
 
         /*************************/
         /* handle upgrade search */
@@ -159,7 +158,7 @@ class ItemsPage extends GenericPage
         $upgItemData = [];
         if (!empty($this->filter['upg']) && !empty($this->filter['fi']['setWeights']))
         {
-            $upgItems = new ItemList(array(['id', array_keys($this->filter['upg'])]), ['extraOpts' => $itemFilter->extraOpts]);
+            $upgItems = new ItemList(array(['id', array_keys($this->filter['upg'])]), ['extraOpts' => $this->filterObj->extraOpts]);
             if (!$upgItems->error)
             {
                 $this->extendGlobalData($upgItems->getJSGlobals());
@@ -245,7 +244,7 @@ class ItemsPage extends GenericPage
                 break;
             case 2:                                         // itemlevel: first, try to find 10 level steps within range (if given) as tabs
                 // ohkayy, maybe i need to rethink $this
-                $this->filterOpts = $itemFilter->extraOpts;
+                $this->filterOpts = $this->filterObj->extraOpts;
                 $this->filterOpts['is']['o'] = [null];      // remove 'order by' from itemStats
                 $extraOpts = array_merge($this->filterOpts, ['i'  => ['g' => ['itemlevel'], 'o' => ['itemlevel DESC']]]);
 
@@ -293,7 +292,7 @@ class ItemsPage extends GenericPage
         {
             $finalCnd = $gbField ? array_merge($conditions, [[$gbField, abs($group), $group > 0 ? null : '<'], $maxResults]) : $conditions;
 
-            $items = new ItemList($finalCnd, ['extraOpts' => array_merge($extraOpts, $itemFilter->extraOpts)]);
+            $items = new ItemList($finalCnd, ['extraOpts' => array_merge($extraOpts, $this->filterObj->extraOpts)]);
 
             if ($items->error)
                 continue;
@@ -373,7 +372,7 @@ class ItemsPage extends GenericPage
                     $override['upg'] = implode(':', $upg);
 
                 $cls = isset($this->category[0]) ? '='.$this->category[0] : '';
-                $this->filterUrl = $itemFilter->urlize($override, $addCr);
+                $this->filterUrl = $this->filterObj->urlize($override, $addCr);
 
                 if ($note)
                     $tab['params']['note'] = '$$WH.sprintf(LANG.'.$note.', \''.$cls.'\', \''.$this->filterUrl.'\')';
@@ -436,13 +435,13 @@ class ItemsPage extends GenericPage
             $this->path[] = $c;
 
     // if slot-dropdown is available && Armor && $path points to Armor-Class
-    $form = (new ItemListFilter())->getForm('form');
+    $form = $this->filterObj->getForm('form');
     if (count($this->path) == 4 && $this->category[0] == 4 && isset($form['sl']) && !is_array($form['sl']))
         $this->path[] = $form['sl'];
     }
 
     // fetch best possible gems for chosen weights
-    private function createGemScores($itemFilter)
+    private function createGemScores()
     {
         $gemScores = [];
 
@@ -459,10 +458,10 @@ class ItemsPage extends GenericPage
             if (!isset($this->filter['jc']))
                 $cnd[] = ['itemLimitCategory', 0];          // Jeweler's Gems
 
-            If ($itemFilter->wtCnd)
-                $cnd[] = $itemFilter->wtCnd;
+            If ($this->filterObj->wtCnd)
+                $cnd[] = $this->filterObj->wtCnd;
 
-            $anyColor = new ItemList($cnd, ['extraOpts' => $itemFilter->extraOpts]);
+            $anyColor = new ItemList($cnd, ['extraOpts' => $this->filterObj->extraOpts]);
             if (!$anyColor->error)
             {
                 $this->extendGlobalData($anyColor->getJSGlobals());
@@ -473,7 +472,7 @@ class ItemsPage extends GenericPage
             {
                 $mask = 1 << $i;
                 $q    = !$i ? 3 : intVal($this->filter['gm']);    // meta gems are always included.. ($q is backReferenced)
-                $byColor = new ItemList($cnd, ['extraOpts' => $itemFilter->extraOpts]);
+                $byColor = new ItemList($cnd, ['extraOpts' => $this->filterObj->extraOpts]);
                 if (!$byColor->error)
                 {
                     $this->extendGlobalData($byColor->getJSGlobals());

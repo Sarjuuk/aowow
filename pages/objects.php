@@ -20,6 +20,7 @@ class ObjectsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        $this->filterObj = new GameObjectListFilter();
         $this->getCategoryFromUrl($pageParam);;
 
         parent::__construct();
@@ -35,18 +36,16 @@ class ObjectsPage extends GenericPage
         if ($this->category)
             $conditions[] = ['typeCat', (int)$this->category[0]];
 
-        $objectFilter = new GameObjectListFilter();
-
         // recreate form selection
-        $this->filter = $objectFilter->getForm('form');
+        $this->filter = $this->filterObj->getForm('form');
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
-        $this->filter['fi']    =  $objectFilter->getForm();
+        $this->filter['fi']    =  $this->filterObj->getForm();
 
-        if ($_ = $objectFilter->getConditions())
+        if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
         $params = $data = [];
-        $objects = new GameObjectList($conditions, ['extraOpts' => $objectFilter->extraOpts]);
+        $objects = new GameObjectList($conditions, ['extraOpts' => $this->filterObj->extraOpts]);
         if (!$objects->error)
         {
             $data = $objects->getListviewData();
@@ -61,9 +60,8 @@ class ObjectsPage extends GenericPage
                 $params['_truncated'] = 1;
             }
 
-            if ($objectFilter->error)
+            if ($this->filterObj->error)
                 $params['_errors'] = '$1';
-
         }
 
         $this->lvData = array(

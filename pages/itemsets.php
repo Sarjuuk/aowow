@@ -19,7 +19,8 @@ class ItemsetsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->getCategoryFromUrl($pageParam);;
+        $this->filterObj = new ItemsetListFilter();
+        $this->getCategoryFromUrl($pageParam);
 
         parent::__construct();
 
@@ -28,15 +29,13 @@ class ItemsetsPage extends GenericPage
 
     protected function generateContent()
     {
-        $itemsetFilter = new ItemsetListFilter();
-
-        $itemsets = new ItemsetList($itemsetFilter->getConditions());
+        $itemsets = new ItemsetList($this->filterObj->getConditions());
         $this->extendGlobalData($itemsets->getJSGlobals());
 
         // recreate form selection
-        $this->filter = array_merge($itemsetFilter->getForm('form'), $this->filter);
+        $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-        $this->filter['fi']    =  $itemsetFilter->getForm();
+        $this->filter['fi']    =  $this->filterObj->getForm();
 
         $this->addJS('?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
 
@@ -56,7 +55,7 @@ class ItemsetsPage extends GenericPage
             $lv['params']['_truncated'] = 1;
         }
 
-        if ($itemsetFilter->error)
+        if ($this->filterObj->error)
             $lv['params']['_errors'] = '$1';
 
         $this->lvData = $lv;
@@ -70,14 +69,14 @@ class ItemsetsPage extends GenericPage
     {
         array_unshift($this->title, $this->name);
 
-        $form = (new ItemsetListFilter())->getForm('form');
+        $form = $this->filterObj->getForm('form');
         if (isset($form['cl']))
             array_unshift($this->title, Lang::$game['cl'][$form['cl']]);
     }
 
     protected function generatePath()
     {
-        $form = (new ItemsetListFilter())->getForm('form');
+        $form = $this->filterObj->getForm('form');
         if (isset($form['cl']))
             $this->path[] = $form['cl'];
     }

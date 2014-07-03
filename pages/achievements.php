@@ -42,6 +42,7 @@ class AchievementsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        $this->filterObj = new AchievementListFilter();
         $this->getCategoryFromUrl($pageParam);
 
         parent::__construct();
@@ -58,14 +59,12 @@ class AchievementsPage extends GenericPage
         if ($this->category)
             $conditions[] = ['category', (int)end($this->category)];
 
-        $acvFilter = new AchievementListFilter();
-
         // recreate form selection
-        $this->filter = $acvFilter->getForm('form');
+        $this->filter = $this->filterObj->getForm('form');
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
-        $this->filter['fi']    =  $acvFilter->getForm();
+        $this->filter['fi']    =  $this->filterObj->getForm();
 
-        if ($fiCnd = $acvFilter->getConditions())
+        if ($fiCnd = $this->filterObj->getConditions())
             $conditions[] = $fiCnd;
 
         $acvList = new AchievementList($conditions);
@@ -108,7 +107,7 @@ class AchievementsPage extends GenericPage
                 $params['_truncated'] = 1;
             }
 
-            if ($acvFilter->error)
+            if ($this->filterObj->error)
                 $params['_errors'] = '$1';
         }
 

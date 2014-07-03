@@ -20,6 +20,7 @@ class NpcsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        $this->filterObj = new CreatureListFilter();
         $this->getCategoryFromUrl($pageParam);;
 
         parent::__construct();
@@ -40,17 +41,16 @@ class NpcsPage extends GenericPage
         else
             $this->petFamPanel = false;
 
-        $npcFilter = new CreatureListFilter();
-        if ($_ = $npcFilter->getConditions())
+        if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
         // beast subtypes are selected via filter
-        $npcs = new CreatureList($conditions, ['extraOpts' => $npcFilter->extraOpts]);
+        $npcs = new CreatureList($conditions, ['extraOpts' => $this->filterObj->extraOpts]);
 
         // recreate form selection
-        $this->filter = array_merge($npcFilter->getForm('form'), $this->filter);
+        $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-        $this->filter['fi']    =  $npcFilter->getForm();
+        $this->filter['fi']    =  $this->filterObj->getForm();
 
         $lv = array(
             'file'   => 'creature',
@@ -68,7 +68,7 @@ class NpcsPage extends GenericPage
             $lv['params']['_truncated'] = 1;
         }
 
-        if ($npcFilter->error)
+        if ($this->filterObj->error)
             $lv['params']['_errors'] = '$1';
 
         $this->lvData = $lv;
@@ -89,7 +89,7 @@ class NpcsPage extends GenericPage
         if ($this->category)
             $this->path[] = $this->category[0];
 
-        $form = (new CreatureListFilter())->getForm('form');
+        $form = $this->filterObj->getForm('form');
         if (isset($form['fa']) && !is_array($form['fa']))
             $this->path[] = $form['fa'];
     }
