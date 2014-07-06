@@ -5,6 +5,7 @@ class Lang
     public static $timeUnits;
     public static $main;
     public static $account;
+    public static $mail;
     public static $game;
 
     public static $search;
@@ -99,10 +100,10 @@ class Lang
                     $skill = 0;
                     switch ($prop)
                     {
-                        case  1: $skill = 633; break;   // Lockpicking
-                        case  2: $skill = 182; break;   // Herbing
-                        case  3: $skill = 186; break;   // Mining
-                        case 20: $skill = 773; break;   // Scribing
+                        case  1: $skill = 633; break;       // Lockpicking
+                        case  2: $skill = 182; break;       // Herbing
+                        case  3: $skill = 186; break;       // Mining
+                        case 20: $skill = 773; break;       // Scribing
                     }
 
                     if ($skill)

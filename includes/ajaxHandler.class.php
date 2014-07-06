@@ -27,7 +27,7 @@ class AjaxHandler
     public function handle($what)
     {
         $f = 'handle'.ucFirst($what);
-        if (!method_exists($this, $f))
+        if (!$what || !method_exists($this, $f))
             return null;
 
         return $this->$f();
@@ -139,7 +139,7 @@ class AjaxHandler
                     break;
             }
         }
-        
+
         return $result;
     }
 
@@ -253,9 +253,50 @@ class AjaxHandler
     private function handleLocale()                         // not sure if this should be here..
     {
         User::setLocale($this->params[0]);
-        User::writeCookie();
+        User::save();
+
         header('Location: '.(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '.'));
     }
+
+    private function handleAccount()
+    {
+        if (!$this->params || !User::$id)
+            return null;
+
+        switch ($this->params[0])
+        {
+            case 'exclude':
+                // profiler completion exclude handler
+                // $this->post['groups'] = bitMask of excludeGroupIds when using .. excludeGroups .. duh
+                // should probably occur in g_user.excludegroups (dont forget to also set g_users.settings = {})
+                return '';
+            case 'weightscales':
+                if (isset($this->post['save']))
+                {
+                    if (!isset($this->post['id']))
+                    {
+                        $res = DB::Aowow()->selectRow('SELECT max(id) as max, count(id) as num FROM ?_account_weightscales WHERE account = ?d', User::$id);
+                        if ($res['num'] < 5)            // more or less hard-defined in LANG.message_weightscalesaveerror
+                            $this->post['id'] = ++$res['max'];
+                        else
+                            return 0;
+                    }
+
+                    if (DB::Aowow()->query('REPLACE INTO ?_account_weightscales VALUES (?d, ?d, ?, ?)', intVal($this->post['id']), User::$id, $this->post['name'], $this->post['scale']))
+                        return $this->post['id'];
+                    else
+                        return 0;
+                }
+                else if (isset($this->post['delete']) && isset($this->post['id']))
+                    DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', intVal($this->post['id']), User::$id);
+                else
+                    return 0;
+        }
+
+
+        return null;
+    }
+
 }
 
 ?>

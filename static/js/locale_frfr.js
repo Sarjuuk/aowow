@@ -879,7 +879,7 @@ var mn_more = [
     ]],
     [7,"Quoi de neuf?","?whats-new"],
     [,"Extras pour votre site"],
-	[16,"Boîte de recherche", "?searchbox"],
+    [16,"Boîte de recherche", "?searchbox"],
     [8,"Plug-ins de recherche","?searchplugins"],
     [10,"Tooltips","?tooltips"]
 ];

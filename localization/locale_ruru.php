@@ -189,12 +189,14 @@ $lang = array(
         'expansions'    => array("World of Warcraft", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("к силе", "к ловкости", "к выносливости", "к интеллекту", "к духу"),
         'sources'       => array(
-            null,                       "Ремесло",                  "Добыча",                   "PvP",                      "Задание",                  "Продавец",             "Тренер",               "Открытие",
-            "Рекламная акция",          "Талант",                   "Начальное заклинание",     "Мероприятие",              "Достижение"
+            null,                           "Ремесло",                      "Добыча",                       "PvP",                          "Задание",                      "Продавец",
+            "Тренер",                       "Открытие",                     "Рекламная акция",              "Талант",                       "Начальное заклинание",         "Мероприятие",
+            "Достижение"
         ),
         'languages'     => array(
-            1 => "орочий",      2 => "дарнасский",      3 => "таурахэ",     6 => "дворфийский",     7 => "всеобщий",        8 => "язык демонов",    9 => "язык титанов",    10 => "талассийский",
-            11 => "драконий",   12 => "калимаг",        13 => "гномский",   14 => "язык троллей",   33 => "наречие нежити", 35 => "дренейский",     36 => "наречие зомби",  37 => "машинный гномский", 38 => "машинный гоблинский"
+             1 => "орочий",                  2 => "дарнасский",              3 => "таурахэ",                 6 => "дворфийский",             7 => "всеобщий",                8 => "язык демонов",
+             9 => "язык титанов",           10 => "талассийский",           11 => "драконий",               12 => "калимаг",                13 => "гномский",               14 => "язык троллей",
+            33 => "наречие нежити",         35 => "дренейский",             36 => "наречие зомби",          37 => "машинный гномский",      38 => "машинный гоблинский"
         ),
         'gl'            => array(null, "Большой", "Малый"),
         'si'            => array(1 => "Альянс", -1 => "Альянс только", 2 => "Орда", -2 => "Орда только", null, 3 => "Обе"),
@@ -205,39 +207,119 @@ $lang = array(
         'ra'            => array(-2 => "Орда", -1 => "Альянс", "Обе", "Человек", "Орк", "Дворф", "Ночной эльф", "Нежить", "Таурен", "Гном", "Тролль", null, "Эльф крови", "Дреней"),
         'rep'           => array("Ненависть", "Враждебность", "Неприязнь", "Равнодушие", "Дружелюбие", "Уважение", "Почтение", "Превознесение"),
         'st'            => array(
-            "По-умолчанию",     "Облик кошки",                  "TОблик Древа жизни",           "Походный облик",               "Водный облик",
-            "Облик медведя",    null,                           null,                           "Облик лютого медведя",         null,
-            null,               null,                           null,                           "Танец теней",                  null,
-            null,               "Призрачный волк",              "Боевая стойка",                "Оборонительная стойка",        "Стойка берсерка",
-            null,               null,                           "Метаморфоза",                  null,                           null,
-            null,               null,                           "Облик стремительной птицы",    "Облик Тьмы",                   "Облик птицы",
-            "Незаметность",     "Облик лунного совуха",         "Дух воздаяния"
+            "По-умолчанию",                 "Облик кошки",                  "TОблик Древа жизни",           "Походный облик",               "Водный облик",                 "Облик медведя",
+            null,                           null,                           "Облик лютого медведя",         null,                           null,                           null,
+            null,                           "Танец теней",                  null,                           null,                           "Призрачный волк",              "Боевая стойка",
+            "Оборонительная стойка",        "Стойка берсерка",              null,                           null,                           "Метаморфоза",                  null,
+            null,                           null,                           null,                           "Облик стремительной птицы",    "Облик Тьмы",                   "Облик птицы",
+            "Незаметность",                 "Облик лунного совуха",         "Дух воздаяния"
         ),
         'me'            => array(
-            null,                       "Подчинённый",              "Дезориентирован",          "Разоружённый",             "Отвлечён",                 "Убегающий",                "Неуклюжий",                "Оплетён",
-            "Немота",                   "В покое",                  "Усыплён",                  "Пойманный в ловушку",      "Оглушен",                  "Замороженный",             "Бездейственный",           "Кровоточащий",
-            "Целительное",              "Превращён",                "Изгнан",                   "Ограждён",                 "Скован",                   "Оседлавший",               "Соблазнён",                "Обращение",
-            "Испуганный",               "Неуязвимый",               "Прервано",                 "Замедленный",              "Открытие",                 "Неуязвимый",               "Ошеломлён",                "Исступление"
+            null,                           "Подчинённый",                  "Дезориентирован",              "Разоружённый",                 "Отвлечён",                     "Убегающий",
+            "Неуклюжий",                    "Оплетён",                      "Немота",                       "В покое",                      "Усыплён",                      "Пойманный в ловушку",
+            "Оглушен",                      "Замороженный",                 "Бездейственный",               "Кровоточащий",                 "Целительное",                  "Превращён",
+            "Изгнан",                       "Ограждён",                     "Скован",                       "Оседлавший",                   "Соблазнён",                    "Обращение",
+            "Испуганный",                   "Неуязвимый",                   "Прервано",                     "Замедленный",                  "Открытие",                     "Неуязвимый",
+            "Ошеломлён",                    "Исступление"
         ),
         'ct'            => array(
-            "Разное",                   "Животное",                 "Дракон",                   "Демон",                    "Элементаль",               "Великан",                  "Нежить",                   "Гуманоид",
-            "Существо",                 "Механизм",                 "Не указано",               "Тотем",                    "Спутник",                  "Облако газа"
+            "Разное",                       "Животное",                     "Дракон",                       "Демон",                        "Элементаль",                   "Великан",
+            "Нежить",                       "Гуманоид",                     "Существо",                     "Механизм",                     "Не указано",                   "Тотем",
+            "Спутник",                      "Облако газа"
         ),
         'fa'            => array(
-            1 => "Волк",                2 => "Кошка",               3 => "Паук",                4 => "Медведь",             5 => "Вепрь",               6 => "Кроколиск",           7 => "Падальщик",           8 => "Краб",
-            9 => "Горилла",             11 => "Ящер",               12 => "Долгоног",           20 => "Скорпид",            21 => "Черепаха",           24 => "Летучая мышь",       25 => "Гиена",              26 => "Сова",
-            27 => "Крылатый змей",      30 => "Дракондор",          31 => "Опустошитель",       32 => "Прыгуана",           33 => "Спороскат",          34 => "Скат Пустоты",       35 => "Змей",               37 => "Мотылек",
-            38 => "Химера",             39 => "Дьявозавр",          41 => "Силитид",            42 => "Червь",              43 => "Люторог",            44 => "Оса",                45 => "Гончая Недр",        46 => "Дух зверя"
+             1 => "Волк",                    2 => "Кошка",                   3 => "Паук",                    4 => "Медведь",                 5 => "Вепрь",                   6 => "Кроколиск",
+             7 => "Падальщик",               8 => "Краб",                    9 => "Горилла",                11 => "Ящер",                   12 => "Долгоног",               20 => "Скорпид",
+            21 => "Черепаха",               24 => "Летучая мышь",           25 => "Гиена",                  26 => "Сова",                   27 => "Крылатый змей",          30 => "Дракондор",
+            31 => "Опустошитель",           32 => "Прыгуана",               33 => "Спороскат",              34 => "Скат Пустоты",           35 => "Змей",                   37 => "Мотылек",
+            38 => "Химера",                 39 => "Дьявозавр",              41 => "Силитид",                42 => "Червь",                  43 => "Люторог",                44 => "Оса",
+            45 => "Гончая Недр",            46 => "Дух зверя"
         ),
         'pvpRank'       => array(
-            null,                                       "Private / Scout",                      "Corporal / Grunt",
-            "Sergeant / Sergeant",                      "Master Sergeant / Senior Sergeant",    "Sergeant Major / First Sergeant",
-            "Knight / Stone Guard",                     "Knight-Lieutenant / Blood Guard",      "Knight-Captain / Legionnare",
-            "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
-            "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
+            null,                                                           "Private / Scout",                                              "Corporal / Grunt",
+            "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
+            "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
+            "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
+            "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
         ),
     ),
-    'account'  => [],
+    'account' => array(
+        'title'         => "Учетная запись Aowow",
+        'email'         => "Email",
+        'continue'      => "Продолжить",
+        'groups'        => array(
+            -1 => "Нет",                    "Тестер",                       "Администратор",                "Редактор",                     "Модератор",                    "Бюрократ",
+            "Разработчик",                  "VIP",                          "Блогер",                       "Учетная запись Премиум",       "Переводчик",                   "Агент по продажам",
+            "Менеджер изображений",         "Менеджер видео"
+        ),
+        // signIn
+        'doSignIn'      => "Войти в вашу учетную запись Aowow",
+        'signIn'        => "Вход",
+        'user'          => "Логин",
+        'pass'          => "Пароль",
+        'rememberMe'    => "Запомнить меня на этом компьютере",
+        'forgot'        => "Забыл",
+        'forgotUser'    => "Имя пользователя",
+        'forgotPass'    => "Пароль",
+        'accCreate'     => 'У вас еще нет учетной записи? <a href="?account=signup">Зарегистрируйтесь прямо сейчас!</a>',
+
+        // recovery
+        'recoverUser'   => "Запрос имени пользователя",
+        'recoverPass'   => "Сброс пароля: Шаг %s из 2",
+        'newPass'       => "New Password",
+
+        // creation
+        'register'      => "Регистрация: Шаг %s из 2",
+
+        // dashboard
+        'ipAddress'     => "IP-Adress",
+        'lastIP'        => "last used IP",
+        'joinDate'      => "Joined",
+        'lastLogin'     => "Last visit",
+        'userGroups'    => "Role",
+        'myAccount'     => "My Account",
+        'editAccount'   => "Simply use the forms below to update your account information",
+        'publicDesc'    => "Public Description",
+        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+
+        // bans
+        'accBanned'     => "This Account was closed",
+        'bannedBy'      => "Banned by",
+        'ends'          => "Ends on",
+        'permanent'     => "The ban is permanent",
+        'reason'        => "Reason",
+        'noReason'      => "No reason was given.",
+
+        // form-text
+        'emailInvalid'  => "Недопустимый адрес email.", // message_emailnotvalid
+        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
+        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
+        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
+        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
+        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
+        'userNotFound'  => "The username you entered does not exists.",
+        'wrongPass'     => "That password is not vaild.",
+        'accInactive'   => "That account has not yet been confirmed active.",
+        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
+        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+        'errNameLength' => "Имя пользователя не должно быть короче 4 символов.", // message_usernamemin
+        'errNameChars'  => "Имя пользователя может содержать только буквы и цифры.", // message_usernamenotvalid
+        'errPassLength' => "Ваш пароль должен состоять минимум из 6 знаков.", // message_passwordmin
+        'passMismatch'  => "The passwords you entered do not match.",
+        'nameInUse'     => "That username is already taken.",
+        'mailInUse'     => "That email is already registered to an account.",
+        'intError'      => "An internal error occured.",
+        'intError2'     => "An internal error occured. (%s)",
+        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
+        'passCheckFail' => "Пароли не совпадают.", // message_passwordsdonotmatch
+        'newPassDiff'   => "Прежний и новый пароли не должны совпадать." // message_newpassdifferent
+    ),
+    'mail' => array(
+        'tokenExpires'  => "This token expires in %s.",
+        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+    ),
     'gameObject' => array(
         'cat'           => [0 => "Другое", 9 => "Книги", 3 => "Контейнеры", -5 => "Сундуки", 25 => "Рыболовные лунки",-3 => "Травы",    -4 => "Полезные ископаемые", -2 => "Задания", -6 => "Инструменты"],
         'type'          => [               9 => "Книга", 3 => "Контейнер",  -5 => "Сундук",  25 => "",                -3 => "Растение", -4 => "Полезное ископаемое", -2 => "Задание", -6 => ""],

@@ -184,12 +184,14 @@ $lang = array(
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Strength", "Agility", "Stamina", "Intellect", "Spirit"],
         'sources'       => array(
-            null,                       "Crafted",                  "Drop",                     "PvP",                      "Quest",                    "Vendor",                   "Trainer",                  "Discovery",
-            "Redemption",               "Talent",                   "Starter",                  "Event",                    "Achievement"
+            null,                           "Crafted",                      "Drop",                         "PvP",                          "Quest",                        "Vendor",
+            "Trainer",                      "Discovery",                    "Redemption",                   "Talent",                       "Starter",                      "Event",
+            "Achievement"
         ),
         'languages'     => array(
-             1 => "Orcish",      2 => "Darnassian",      3 => "Taurahe",     6 => "Dwarvish",        7 => "Common",          8 => "Demonic",         9 => "Titan",          10 => "Thalassian",
-            11 => "Draconic",   12 => "Kalimag",        13 => "Gnomish",    14 => "Troll",          33 => "Gutterspeak",    35 => "Draenei",        36 => "Zombie",         37 => "Gnomish Binary",     38 => "Goblin Binary"
+             1 => "Orcish",                  2 => "Darnassian",              3 => "Taurahe",                 6 => "Dwarvish",                7 => "Common",                  8 => "Demonic",
+             9 => "Titan",                  10 => "Thalassian",             11 => "Draconic",               12 => "Kalimag",                13 => "Gnomish",                14 => "Troll",
+            33 => "Gutterspeak",            35 => "Draenei",                36 => "Zombie",                 37 => "Gnomish Binary",         38 => "Goblin Binary"
         ),
         'gl'            => [null, "Major", "Minor"],
         'si'            => [1 => "Alliance", -1 => "Alliance only", 2 => "Horde", -2 => "Horde only", 3 => "Both"],
@@ -200,72 +202,118 @@ $lang = array(
         'ra'            => [-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"],
         'rep'           => ["Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"],
         'st'            => array(
-            "Default",          "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",
-            "Bear From",        null,                           null,                           "Dire Bear Form",               null,
-            null,               null,                           null,                           "Shadowdance",                  null,
-            null,               "Ghostwolf",                    "Battle Stance",                "Defensive Stance",             "Berserker Stance",
-            null,               null,                           "Metamorphosis",                null,                           null,
-            null,               null,                           "Swift Flight Form",            "Shadow Form",                  "Flight Form",
-            "Stealth",          "Moonkin Form",                 "Spirit of Redemption"
+            "Default",                      "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",                 "Bear From",
+            null,                           null,                           "Dire Bear Form",               null,                           null,                           null,
+            null,                           "Shadowdance",                  null,                           null,                           "Ghostwolf",                    "Battle Stance",
+            "Defensive Stance",             "Berserker Stance",             null,                           null,                           "Metamorphosis",                null,
+            null,                           null,                           null,                           "Swift Flight Form",            "Shadow Form",                  "Flight Form",
+            "Stealth",                      "Moonkin Form",                 "Spirit of Redemption"
         ),
         'me'            => array(
-            null,                       "Charmed",                  "Disoriented",              "Disarmed",                 "Distracted",               "Fleeing",                  "Gripped",                  "Rooted",
-            "Pacified",                 "Silenced",                 "Asleep",                   "Ensnared",                 "Stunned",                  "Frozen",                   "Incapacitated",            "Bleeding",
-            "Healing",                  "Polymorphed",              "Banished",                 "Shielded",                 "Shackled",                 "Mounted",                  "Seduced",                  "Turned",
-            "Horrified",                "Invulnerable",             "Interrupted",              "Dazed",                    "Discovery",                "Invulnerable",             "Sapped",                   "Enraged"
+            null,                           "Charmed",                      "Disoriented",                  "Disarmed",                     "Distracted",                   "Fleeing",
+            "Gripped",                      "Rooted",                       "Pacified",                     "Silenced",                     "Asleep",                       "Ensnared",
+            "Stunned",                      "Frozen",                       "Incapacitated",                "Bleeding",                     "Healing",                      "Polymorphed",
+            "Banished",                     "Shielded",                     "Shackled",                     "Mounted",                      "Seduced",                      "Turned",
+            "Horrified",                    "Invulnerable",                 "Interrupted",                  "Dazed",                        "Discovery",                    "Invulnerable",
+            "Sapped",                       "Enraged"
         ),
         'ct'            => array(
-            "Uncategorized",            "Beast",                    "Dragonkin",                "Demon",                    "Elemental",                "Giant",                    "Undead",                   "Humanoid",
-            "Critter",                  "Mechanical",               "Not specified",            "Totem",                    "Non-combat Pet",           "Gas Cloud"
+            "Uncategorized",                "Beast",                        "Dragonkin",                    "Demon",                        "Elemental",                    "Giant",
+            "Undead",                       "Humanoid",                     "Critter",                      "Mechanical",                   "Not specified",                "Totem",
+            "Non-combat Pet",               "Gas Cloud"
         ),
         'fa'            => array(
-             1 => "Wolf",                2 => "Cat",                 3 => "Spider",              4 => "Bear",                5 => "Boar",                6 => "Crocolisk",           7 => "Carrion Bird",        8 => "Crab",
-             9 => "Gorilla",            11 => "Raptor",             12 => "Tallstrider",        20 => "Scorpid",            21 => "Turtle",             24 => "Bat",                25 => "Hyena",              26 => "Bird of Prey",
-            27 => "Wind Serpent",       30 => "Dragonhawk",         31 => "Ravager",            32 => "Warp Stalker",       33 => "Sporebat",           34 => "Nether Ray",         35 => "Serpent",            37 => "Moth",
-            38 => "Chimaera",           39 => "Devilsaur",          41 => "Silithid",           42 => "Worm",               43 => "Rhino",              44 => "Wasp",               45 => "Core Hound",         46 => "Spirit Beast"
+             1 => "Wolf",                    2 => "Cat",                     3 => "Spider",                  4 => "Bear",                    5 => "Boar",                    6 => "Crocolisk",
+             7 => "Carrion Bird",            8 => "Crab",                    9 => "Gorilla",                11 => "Raptor",                 12 => "Tallstrider",            20 => "Scorpid",
+            21 => "Turtle",                 24 => "Bat",                    25 => "Hyena",                  26 => "Bird of Prey",           27 => "Wind Serpent",           30 => "Dragonhawk",
+            31 => "Ravager",                32 => "Warp Stalker",           33 => "Sporebat",               34 => "Nether Ray",             35 => "Serpent",                37 => "Moth",
+            38 => "Chimaera",               39 => "Devilsaur",              41 => "Silithid",               42 => "Worm",                   43 => "Rhino",                  44 => "Wasp",
+            45 => "Core Hound",             46 => "Spirit Beast"
         ),
         'pvpRank'       => array(
-            null,                                       "Private / Scout",                      "Corporal / Grunt",
-            "Sergeant / Sergeant",                      "Master Sergeant / Senior Sergeant",    "Sergeant Major / First Sergeant",
-            "Knight / Stone Guard",                     "Knight-Lieutenant / Blood Guard",      "Knight-Captain / Legionnare",
-            "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
-            "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
+            null,                                                           "Private / Scout",                                              "Corporal / Grunt",
+            "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
+            "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
+            "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
+            "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
         ),
     ),
     'account' => array(
+        'title'         => "Aowow Account",
+        'email'         => "Email address",
+        'continue'      => "Continue",
+        'groups'        => array(
+            -1 => "None",                   "Tester",                       "Administrator",                "Editor",                       "Moderator",                    "Bureaucrat",    
+            "Developer",                    "VIP",                          "Blogger",                      "Premium",                      "Localizer",                    "Sales agent",        
+            "Screenshot manager",           "Video manager"
+        ),
+        // signIn
         'doSignIn'      => "Log in to your AoWoW Account",
+        'signIn'        => "Log In",
         'user'          => "Username",
         'pass'          => "Password",
         'rememberMe'    => "Stay logged in",
         'forgot'        => "Forgot",
-        'accNoneYet'    => "Don't have an account",
-        'accCreateNow'  => "Create one now",
-        'userNotFound'  => "Such user does not exists",
-        'userBanned'    => "This Account was closed",
-        'passMismatch'  => "Entered passwords does not match",
-        'loginsExceeded'=> "The maximum number of logins from this IP has been exceeded. Please try again in %s minutes.",
-        'nameInUse'     => "Such user already exists",
-        'email'         => "Email address",
-        'unkError'      => "Unknown error on account create",
-        'accCreate'     => "Create your account",
-        'passConfirm'   => "Confirm password",
-        'signup'        => "Signup",
-        'requestName'   => "Username Request",
-        'resetPass'     => "Password Reset",
-        'emailInvalid'  => "This email address is invalid.",
-        'emailUnknown'  => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email feedback@aowow.com for assistance.",
-        'passJustSend'  => "An email containing a new password was just sent to %s",
-        'nameJustSend'  => "An email containing your username was just sent to %s",
-        'wrongPass'     => "Wrong Password",
+        'forgotUser'    => "Username",
+        'forgotPass'    => "Password",
+        'accCreate'     => 'Don\'t have an account? <a href="?account=signup">Create one now!</a>',
+
+        // recovery
+        'recoverUser'   => "Username Request",
+        'recoverPass'   => "Password Reset: Step %s of 2",
+        'newPass'       => "New Password",
+
+        // creation
+        'register'      => "Registration - Step %s of 2",
+
+        // dashboard
         'ipAddress'     => "IP-Adress",
         'lastIP'        => "last used IP",
         'joinDate'      => "Joined",
         'lastLogin'     => "Last visit",
-        'userGroups'    => "Rolle",
+        'userGroups'    => "Role",
         'myAccount'     => "My Account",
         'editAccount'   => "Simply use the forms below to update your account information",
         'publicDesc'    => "Public Description",
         'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+
+        // bans
+        'accBanned'     => "This Account was closed",
+        'bannedBy'      => "Banned by",
+        'ends'          => "Ends on",
+        'permanent'     => "The ban is permanent",
+        'reason'        => "Reason",
+        'noReason'      => "No reason was given.",
+
+        // form-text
+        'emailInvalid'  => "That email address is not valid.", // message_emailnotvalid
+        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
+        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
+        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
+        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
+        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
+        'userNotFound'  => "The username you entered does not exists.",
+        'wrongPass'     => "That password is not vaild.",
+        'accInactive'   => "That account has not yet been confirmed active.",
+        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
+        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+        'errNameLength' => "Your username must be at least 4 characters long.", // message_usernamemin
+        'errNameChars'  => "Your username can only contain letters and numbers.", // message_usernamenotvalid
+        'errPassLength' => "Your password must be at least 6 characters long.", // message_passwordmin
+        'passMismatch'  => "The passwords you entered do not match.",
+        'nameInUse'     => "That username is already taken.",
+        'mailInUse'     => "That email is already registered to an account.",
+        'intError'      => "An internal error occured.",
+        'intError2'     => "An internal error occured. (%s)",
+        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
+        'passCheckFail' => "Passwords do not match.", // message_passwordsdonotmatch
+        'newPassDiff'   => "Your new password must be different than your previous one." // message_newpassdifferent
+    ),
+    'mail' => array(
+        'tokenExpires'  => "This token expires in %s.",
+        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
     ),
     'gameObject' => array(
         'cat'           => [0 => "Other", 9 => "Books", 3 => "Containers", -5 => "Chests", 25 => "Fishing Pools", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],

@@ -81,11 +81,6 @@ class GenericPage
         if ($this->restrictedGroups && !User::isInGroup($this->restrictedGroups))
             $this->error();
 
-        if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE))
-            $this->maintenance();
-        else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
-            Util::addNote(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
-
         // display modes
         if (isset($_GET['power']) && method_exists($this, 'generateTooltip'))
             $this->mode = CACHETYPE_TOOLTIP;
@@ -102,6 +97,11 @@ class GenericPage
             if (!$this->isValidPage() || !$this->tpl)
                 $this->error();
         }
+
+        if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE))
+            $this->maintenance();
+        else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
+            Util::addNote(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
     }
 
     /**********/
@@ -311,6 +311,12 @@ class GenericPage
         $this->category = $params;
     }
 
+    protected function forwardToSignIn($next = '')
+    {
+        $next = $next ? '&next='.$next : '';
+        header('Location: ?account=signin'.$next);
+    }
+
     /*******************/
     /* Special Display */
     /*******************/
@@ -351,6 +357,8 @@ class GenericPage
 
     public function display($override = '')                 // load given template string or GenericPage::$tpl
     {
+        session_regenerate_id(true);                        // can only reagenerate for real pages, otherwise a simple tooltip would be fatal for the session
+
         if ($override)
         {
             $this->addAnnouncements();
@@ -562,7 +570,7 @@ class GenericPage
                 catch (ReflectionException $e) { }          // shut up!
             }
 
-            $data .= serialize($cache);
+            $data .= gzcompress(serialize($cache), 9);
         }
         else
             $data .= (string)$saveString;
@@ -594,7 +602,7 @@ class GenericPage
 
         if ($type == '0')
         {
-            $data = unserialize($cache[1]);
+            $data = unserialize(gzuncompress($cache[1]));
             foreach ($data as $k => $v)
                 $this->$k = $v;
 

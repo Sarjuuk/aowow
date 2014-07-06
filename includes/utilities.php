@@ -1339,6 +1339,11 @@ class Util
         return str;
     }
 
+    public static function isValidEmail($email)
+    {
+        return preg_match('/^([a-z0-9._-]+)(\+[a-z0-9._-]+)?(@[a-z0-9.-]+\.[a-z]{2,4})$/i', $email);
+    }
+
     public static function loadStaticFile($file, &$result, $localized = false)
     {
         $success = true;
@@ -1360,6 +1365,17 @@ class Util
         }
 
         return $success;
+    }
+
+    public static function createHash($length = 40)         // just some random numbers for unsafe identifictaion purpose
+    {
+        static $seed = ".abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        $hash = '';
+
+        for ($i = 0; $i < $length; $i++)
+            $hash .= substr($seed, mt_rand(0, 62), 1);
+
+        return $hash;
     }
 
     public static function createShowOnMap()

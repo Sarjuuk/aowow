@@ -66,8 +66,11 @@ class ItemPage extends genericPage
 
         $this->name = $this->subject->getField('name', true);
 
-        $jsg = $this->subject->getJSGlobals(GLOBALINFO_EXTRA | GLOBALINFO_SELF, $extra);
-        $this->extendGlobalData($jsg, $extra);
+        if ($this->mode == CACHETYPE_PAGE)
+        {
+            $jsg = $this->subject->getJSGlobals(GLOBALINFO_EXTRA | GLOBALINFO_SELF, $extra);
+            $this->extendGlobalData($jsg, $extra);
+        }
     }
 
     protected function generatePath()
@@ -918,7 +921,7 @@ class ItemPage extends genericPage
     {
         $itemString = $this->typeId;
         foreach ($this->enhancedTT as $k => $val)
-            $itemString .= $k.(is_array($val) ? implode(':', $val) : $val);
+            $itemString .= $k.(is_array($val) ? implode(',', $val) : $val);
 
         if ($asError)
             return '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.', {})';

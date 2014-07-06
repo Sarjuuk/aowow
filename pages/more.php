@@ -40,8 +40,7 @@ class MorePage extends GenericPage
                 if (($_[1] = array_search($subPage, $this->subPages[$_[0]])) === false)
                     $this->error();
 
-                // ye.. hack .. can for some reason not be defined in the array itself
-                if ($page == 'help')
+                if ($page == 'help')                        // ye.. hack .. class definitions only allow static values
                     $_[2] = Lang::$main['helpTopics'][$_[1]];
             }
             $this->type      = $_[0];

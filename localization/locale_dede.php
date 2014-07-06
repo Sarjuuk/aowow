@@ -47,14 +47,6 @@ $lang = array(
         'forum'         => "Forum",
         'n_a'           => "n. v.",
 
-        // err_title = Fehler in AoWoW
-        // un_err = Gib bitte deinen Benutzernamen ein
-        // pwd_err = Gib bitte dein Passwort ein
-        // signin_msg = Gib bitte deinen Accountnamen ein
-        // c_pwd = Passwort wiederholen
-        // facts = Übersicht
-        // This_Object_cant_be_found = Der Standort dieses Objekts ist nicht bekannt.
-
         // filter
         'extSearch'     => "Erweiterte Suche",
         'addFilter'     => "Weiteren Filter hinzufügen",
@@ -197,12 +189,14 @@ $lang = array(
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"],
         'sources'       => array(
-            null,                       "Hergestellt",              "Drop",                     "PvP",                      "Quest",                    "Händler",              "Lehrer",               "Entdeckung",
-            "Einlösung",                "Talent",                   "Startausrüstung",          "Ereignis",                 "Erfolg"
+            null,                           "Hergestellt",                  "Drop",                         "PvP",                          "Quest",                        "Händler",
+            "Lehrer",                       "Entdeckung",                   "Einlösung",                    "Talent",                       "Startausrüstung",              "Ereignis",
+            "Erfolg"
         ),
         'languages'     => array(
-             1 => "Orcisch",     2 => "Darnassisch",     3 => "Taurisch",    6 => "Zwergisch",       7 => "Gemeinsprache",   8 => "Dämonisch",       9 => "Titanisch",      10 => "Thalassisch",
-            11 => "Drachisch",  12 => "Kalimagisch",    13 => "Gnomisch",   14 => "Trollisch",      33 => "Gossensprache",  35 => "Draeneiisch",    36 => "Zombie",         37 => "Gnomenbinär",        38 => "Goblinbinär"
+             1 => "Orcisch",                 2 => "Darnassisch",             3 => "Taurisch",                6 => "Zwergisch",               7 => "Gemeinsprache",           8 => "Dämonisch",
+             9 => "Titanisch",              10 => "Thalassisch",            11 => "Drachisch",              12 => "Kalimagisch",            13 => "Gnomisch",               14 => "Trollisch",
+            33 => "Gossensprache",          35 => "Draeneiisch",            36 => "Zombie",                 37 => "Gnomenbinär",            38 => "Goblinbinär"
         ),
         'gl'            => [null, "Erhebliche", "Geringe"],
         'si'            => [1 => "Allianz", -1 => "Nur für Allianz", 2 => "Horde", -2 => "Nur für Horde", 3 => "Beide"],
@@ -213,72 +207,118 @@ $lang = array(
         'ra'            => [-2 => "Horde", -1 => "Allianz", "Beide", "Mensch", "Orc", "Zwerg", "Nachtelf", "Untoter", "Tauren", "Gnom", "Troll", null, "Blutelf", "Draenei"],
         'rep'           => ["Hasserfüllt", "Feindselig", "Unfreundlich", "Neutral", "Freundlich", "Wohlwollend", "Respektvoll", "Ehrfürchtig"],
         'st'            => array(
-            "Vorgabe",              "Katzengestalt",                "Baum des Lebens",              "Reisegestalt",                 "Wassergestalt",
-            "Bärengestalt",         null,                           null,                           "Terrorbärengestalt",           null,
-            null,                   null,                           null,                           "Schattentanz",                 null,
-            null,                   "Geisterwolf",                  "Kampfhaltung",                 "Verteidigungshaltung",         "Berserkerhaltung",
-            null,                   null,                           "Metamorphosis",                null,                           null,
-            null,                   null,                           "Schnelle Fluggestalt",         "Schattengestalt",              "Fluggestalt",
-            "Verstohlenheit",       "Mondkingestalt",               "Geist der Erlösung"
+            "Vorgabe",                      "Katzengestalt",                "Baum des Lebens",              "Reisegestalt",                 "Wassergestalt",                "Bärengestalt",
+            null,                           null,                           "Terrorbärengestalt",           null,                           null,                            null,
+            null,                           "Schattentanz",                 null,                           null,                           "Geisterwolf",                  "Kampfhaltung",
+            "Verteidigungshaltung",         "Berserkerhaltung",             null,                           null,                           "Metamorphosis",                null,
+            null,                           null,                           null,                           "Schnelle Fluggestalt",         "Schattengestalt",              "Fluggestalt",
+            "Verstohlenheit",               "Mondkingestalt",               "Geist der Erlösung"
         ),
         'me'            => array(
-            null,                       "Bezaubert",                "Desorientiert",            "Entwaffnet",               "Abgelenkt",                "Flüchtend",                "Ergriffen",                "Unbeweglich",
-            "Befriedet",                "Schweigend",               "Schlafend",                "Verlangsamt",              "Betäubt",                  "Eingefroren",              "Handlungsunfähig",         "Blutend",
-            "Heilung",                  "Verwandelt",               "Verbannt",                 "Abgeschirmt",              "Gefesselt",                "Reitend",                  "Verführt",                 "Vertrieben",
-            "Entsetzt",                 "Unverwundbar",             "Unterbrochen",             "Benommen",                 "Entdeckung",               "Unverwundbar",             "Kopfnuss",                 "Wütend"
+            null,                           "Bezaubert",                    "Desorientiert",                "Entwaffnet",                   "Abgelenkt",                    "Flüchtend",
+            "Ergriffen",                    "Unbeweglich",                  "Befriedet",                    "Schweigend",                   "Schlafend",                    "Verlangsamt",
+            "Betäubt",                      "Eingefroren",                  "Handlungsunfähig",             "Blutend",                      "Heilung",                      "Verwandelt",
+            "Verbannt",                     "Abgeschirmt",                  "Gefesselt",                    "Reitend",                      "Verführt",                     "Vertrieben",
+            "Entsetzt",                     "Unverwundbar",                 "Unterbrochen",                 "Benommen",                     "Entdeckung",                   "Unverwundbar",
+            "Kopfnuss",                     "Wütend"
         ),
         'ct'            => array(
-            "Nicht kategorisiert",      "Wildtier",                 "Drachkin",                 "Dämon",                    "Elementar",                "Riese",                    "Untoter",                  "Humanoid",
-            "Tier",                     "Mechanisch",               "Nicht spezifiziert",       "Totem",                    "Haustier",                 "Gaswolke"
+            "Nicht kategorisiert",          "Wildtier",                     "Drachkin",                     "Dämon",                        "Elementar",                    "Riese",
+            "Untoter",                      "Humanoid",                     "Tier",                         "Mechanisch",                   "Nicht spezifiziert",           "Totem",
+            "Haustier",                     "Gaswolke"
         ),
         'fa'            => array(
-             1 => "Wolf",                2 => "Katze",               3 => "Spinne",              4 => "Bär",                 5 => "Eber",                6 => "Krokilisk",           7 => "Aasvogel",            8 => "Krebs",
-             9 => "Gorilla",            11 => "Raptor",             12 => "Weitschreiter",      20 => "Skorpid",            21 => "Schildkröte",        24 => "Fledermaus",         25 => "Hyäne",              26 => "Raubvogel",
-            27 => "Windnatter",         30 => "Drachenfalke",       31 => "Felshetzer",         32 => "Sphärenjäger",       33 => "Sporensegler",       34 => "Netherrochen",       35 => "Schlange",           37 => "Motte",
-            38 => "Schimäre",           39 => "Teufelssaurier",     41 => "Silithid",           42 => "Wurm",               43 => "Rhinozeros",         44 => "Wespe",              45 => "Kernhund",           46 => "Geisterbestie"
+             1 => "Wolf",                    2 => "Katze",                   3 => "Spinne",                  4 => "Bär",                     5 => "Eber",                    6 => "Krokilisk",
+             7 => "Aasvogel",                8 => "Krebs",                   9 => "Gorilla",                11 => "Raptor",                 12 => "Weitschreiter",          20 => "Skorpid",
+            21 => "Schildkröte",            24 => "Fledermaus",             25 => "Hyäne",                  26 => "Raubvogel",              27 => "Windnatter",             30 => "Drachenfalke",
+            31 => "Felshetzer",             32 => "Sphärenjäger",           33 => "Sporensegler",           34 => "Netherrochen",           35 => "Schlange",               37 => "Motte",
+            38 => "Schimäre",               39 => "Teufelssaurier",         41 => "Silithid",               42 => "Wurm",                   43 => "Rhinozeros",             44 => "Wespe",
+            45 => "Kernhund",               46 => "Geisterbestie"
         ),
         'pvpRank'       => array(
-            null,                                       "Gefreiter / Späher",                   "Fußknecht / Grunzer",
-            "Landsknecht / Waffenträger",               "Feldwebel / Schlachtrufer",            "Fähnrich / Rottenmeister",
-            "Leutnant / Steingardist",                  "Hauptmann / Blutgardist",              "Kürassier / Zornbringer",
-            "Ritter der Allianz / Klinge der Horde",    "Feldkomandant / Feldherr",             "Rittmeister / Sturmreiter",
-            "Marschall / Kriegsherr",                   "Feldmarschall / Kriegsfürst",          "Großmarschall / Oberster Kriegsfürst"
+            null,                                                           "Gefreiter / Späher",                                           "Fußknecht / Grunzer",
+            "Landsknecht / Waffenträger",                                   "Feldwebel / Schlachtrufer",                                    "Fähnrich / Rottenmeister",
+            "Leutnant / Steingardist",                                      "Hauptmann / Blutgardist",                                      "Kürassier / Zornbringer",
+            "Ritter der Allianz / Klinge der Horde",                        "Feldkomandant / Feldherr",                                     "Rittmeister / Sturmreiter",
+            "Marschall / Kriegsherr",                                       "Feldmarschall / Kriegsfürst",                                  "Großmarschall / Oberster Kriegsfürst"
         ),
     ),
     'account' => array(
+        'title'         => "Aowow-Konto",
+        'email'         => "E-Mail-Adresse",
+        'continue'      => "Fortsetzen",
+        'groups'        => array(
+            -1 => "Keine",                  "Tester",                       "Administrator",                "Editor",                       "Moderator",                    "Bürokrat",
+            "Entwickler",                   "VIP",                          "Blogger",                      "Premium",                      "Übersetzer",                   "Handelsvertreter",
+            "Screenshot-Verwalter",         "Video-Verwalter"
+        ),
+        // signIn
         'doSignIn'      => "Mit Eurem AoWoW-Konto anmelden",
+        'signIn'        => "Anmelden",
         'user'          => "Benutzername",
         'pass'          => "Kennwort",
         'rememberMe'    => "Angemeldet bleiben",
         'forgot'        => "Vergessen",
-        'accNoneYet'    => "Noch kein Konto",
-        'accCreateNow'  => "Jetzt eins erstellen",
-        'userNotFound'  => "Ein Konto mit diesem Namen existiert nicht",
-        'userBanned'    => "Dieses Konto wurde geschlossen",
-        'passMismatch'  => "Die eingegebenen Passwörter stimmen nicht überein",
-        'loginsExceeded'=> "Die maximale Anzahl an Login-Versuchen von dieser IP wurde überschritten. Bitte versuchen Sie es in %s Minuten noch einmal.",
-        'nameInUse'     => "Es existiert bereits ein Konto mit diesem Namen",
-        'email'         => "E-Mail-Adresse",
-        'unkError'      => "Unbekannter Fehler bei der Accounterstellung",
-        'accCreate'     => "Konto erstellen",
-        'passConfirm'   => "Passwort bestätigen",
-        'signup'        => "Anmelden",
-        'requestName'   => "Username Request",
-        'resetPass'     => "Password Reset",
-        'emailInvalid'  => "Diese E-Mail-Adresse ist ungültig.",
-        'emailUnknown'  => "Die E-Mail-Adresse, die Ihr eingegeben habt, ist mit keinem Konto verbunden.<br><br>Falls Ihr die E-Mail-Adresse vergessen habt, mit der Ihr Euer Konto erstellt habt, kontaktiert Ihr bitte feedback@aowow.com für Hilfestellung.",
-        'passJustSend'  => "Eine Nachricht mit einem neuen Passwort wurde soeben an %s versandt.",
-        'nameJustSend'  => "Eine Nachricht mit Eurem Benutzernamen wurde soeben an %s versandt.",
-        'wrongPass'     => "Falsches Passwort",
+        'forgotUser'    => "Benutzername",
+        'forgotPass'    => "Kennwort",
+        'accCreate'     => 'Noch kein Konto? <a href="?account=signup">Jetzt eins erstellen!</a>',
+
+        // recovery
+        'recoverUser'   => "Benutzernamenanfrage",
+        'recoverPass'   => "Kennwort zurücksetzen: Schritt %s von 2",
+        'newPass'       => "Neues Kennwort",
+
+        // creation
+        'register'      => "Registrierung: Schritt %s von 2",
+
+        // dashboard
         'ipAddress'     => "IP-Adresse",
         'lastIP'        => "Letzte bekannte IP",
         'joinDate'      => "Mitglied seit",
         'lastLogin'     => "Letzter Besuch",
-        'userGroups'    => "Role",
+        'userGroups'    => "Rolle",
         'myAccount'     => "Mein Account",
         'editAccount'   => "Benutze die folgenden Formulare um deine Account-Informationen zu aktualisieren",
         'publicDesc'    => "Öffentliche Beschreibung",
         'viewPubDesc'   => 'Die Beschreibung in deinem <a href="?user=%s">öffentlichen Profil</a> ansehen',
+
+        // bans
+        'accBanned'     => "Dieses Konto wurde geschlossen",
+        'bannedBy'      => "Gebannt durch",
+        'ends'          => "Endet am",
+        'permanent'     => "Der Bann ist permanent",
+        'reason'        => "Grund",
+        'noReason'      => "Es wurde kein Grund angegeben.",
+
+        // form-text
+        'emailInvalid'  => "Diese E-Mail-Adresse ist ungültig.", // message_emailnotvalid
+        'emailNotFound' => "Die E-Mail-Adresse, die Ihr eingegeben habt, ist mit keinem Konto verbunden.<br><br>Falls Ihr die E-Mail-Adresse vergessen habt, mit der Ihr Euer Konto erstellt habt, kontaktiert Ihr bitte ".CFG_CONTACT_EMAIL." für Hilfestellung.",
+        'createAccSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt den Anweisungen um euer Konto zu erstellen.",
+        'recovUserSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt den Anweisungen um euren Benutzernamen zu erhalten.",
+        'recovPassSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt den Anweisungen um euer Kennwort zurückzusetzen.",
+        'accActivated'  => 'Euer Konto wurde soeben aktiviert.<br>Ihr könnt euch nun <a href="?account=signin&token=%s">anmelden</a>',
+        'userNotFound'  => "Ein Konto mit diesem Namen existiert nicht.",
+        'wrongPass'     => "Dieses Kennwort ist ungültig.",
+        'accInactive'   => "Dieses Konto wurde bisher nicht aktiviert.",
+        'loginExceeded' => "Die maximale Anzahl an Anmelde-Versuchen von dieser IP wurde überschritten. Bitte versucht es in %s erneut.",
+        'signupExceeded'=> "Die maximale Anzahl an Regustrierungen von dieser IP wurde überschritten. Bitte versucht es in %s erneut.",
+        'errNameLength' => "Euer Benutzername muss mindestens 4 Zeichen lang sein.", // message_usernamemin
+        'errNameChars'  => "Euer Benutzername kann nur aus Buchstaben und Zahlen bestehen.", // message_usernamenotvalid
+        'errPassLength' => "Euer Kennwort muss mindestens 6 Zeichen lang sein.", // message_passwordmin
+        'passMismatch'  => "Die eingegebenen Kennworte stimmen nicht überein.",
+        'nameInUse'     => "Es existiert bereits ein Konto mit diesem Namen.",
+        'mailInUse'     => "Diese E-Mail-Adresse ist bereits mit einem Konto verbunden.",
+        'intError'      => "Ein interner Fehler ist aufgetreten.",
+        'intError2'     => "Ein interner Fehler ist aufgetreten. (%s)",
+        'isRecovering'  => "Dieses Konto wird bereits wiederhergestellt. Folgt den Anweisungen in der Nachricht oder wartet %s bis das Token verfällt.",
+        'passCheckFail' => "Die Kennwörter stimmen nicht überein.", // message_passwordsdonotmatch
+        'newPassDiff'   => "Euer neues Kennwort muss sich von eurem alten Kennwort unterscheiden." // message_newpassdifferent
+    ),
+    'mail' => array(
+        'tokenExpires'  => "Das Token wird in %s verfallen.",
+        'accConfirm'    => ["Kontobestätigung",     "Willkommen bei ".CFG_NAME_SHORT."!\r\n\r\nKlicke auf den Link um euren Account zu aktivieren.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
+        'recoverUser'   => ["Benutzernamenanfrage", "Folgt diesem Link um euch anzumelden.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
+        'resetPass'     => ["Kennwortreset",        "Folgt diesem Link um euer Kennwort zurückzusetzen.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."]
     ),
     'gameObject' => array(
         'cat'           => [0 => "Anderes", 9 => "Bücher", 3 => "Behälter", -5 => "Truhen", 25 => "Fischschwärme", -3 => "Kräuter", -4 => "Erzadern",     -2 => "Quest", -6 => "Werkzeuge"],

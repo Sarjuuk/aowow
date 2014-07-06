@@ -925,7 +925,7 @@ var mn_more = [
     ]],
     [7,"What's New","?whats-new"],
     [,"Goodies"],
-	[16, "Search Box","?searchbox"],
+    [16, "Search Box","?searchbox"],
     [8,"Search Plugins (FF, IE7, ...)","?searchplugins"],
     [10,"Tooltips","?tooltips"]
 ];

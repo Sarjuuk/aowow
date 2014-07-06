@@ -3,148 +3,113 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-/*
-    Cookie-Content
-    W X Y [Z] : base64
-           Z : passHash                 length: ?   exampleValue: base64_encode('+RQGbSW7Yqyz6fTNAUrI3BE-Zt0FoiMh8ke1_sCmLDwOjgXda9JxH2KcPVu4l5vnp')
-        Y : X chars accId as hex        length: X   exampleValue: 0xF29
-      X : [1-9] num chars of Y as int   length: 1   exampleValue: 3
-    W : locale [0, 2, 3, 6, 8]          length: 1   exampleValue: 0
-
-    03F29K1JRR2JTVzdZcXl6NmZUTkFVckkzQkUtWnQwRm9pTWg4a2UxX3NDbUxEd09qZ1hkYTlKeEgyS2NQVnU0bDV2bnA=
-*/
 
 class User
 {
-    public static $id;
-    public static $authId;
-    public static $displayName;
-    public static $email;
+    public static $id           = 0;
+    public static $displayName  = '';
+    public static $banStatus    = 0x0;                      // &1: banedIP; &2: banUser; &4: ratingBan; &8: commentBan; &16: disableUpload
+    public static $groups       = 0x0;
+    public static $perms        = 0;
+    public static $localeId     = 0;
+    public static $localeString = 'enus';
 
-    public static $user;
-    private static $passHash;
-    private static $timeout;
+    private static $dataKey     = '';
+    private static $expires     = false;
+    private static $passHash    = '';
 
-    public static $lastIP;
-    public static $lastLogin;
-    public static $joindate;
-
-    public static $groups;
-    public static $perms;
-    public static $localeId;
-    public static $localeString;
-    public static $profiles;
-    public static $characters;
-    public static $avatar;
-    public static $description;
-
-    /* public static $ratingBan; */
-    /* public static $commentBan; .. jeez.. banflags..?  &1: banIP; &2: banUser; &4: disableRating; &8: disableComment; &16: disableUpload ?? */
-    public static $bannedIP;
-    public static $banned;
-    public static $unbanDate;
-    public static $bannedBy;
-    public static $banReason;
-
-    public static function init($userId)
+    public static function init()
     {
-        self::$id = $userId;
+        self::setLocale();
 
-        $ipBan = DB::Aowow()->SelectRow('SELECT count, unbanDate AS unbanDateIP FROM ?_account_bannedIPs WHERE ip = ? AND type = 0',
-            $_SERVER['REMOTE_ADDR']
-        );
-        // explicit " > "; incremented first, checked after
-        self::$bannedIP = $ipBan && $ipBan['count'] > CFG_FAILED_AUTH_COUNT && $ipBan['unbanDateIP'] > time();
+        // session have a dataKey to access the JScripts (yes, also the anons)
+        if (empty($_SESSION['dataKey']))
+            $_SESSION['dataKey'] = Util::createHash();      // just some random numbers for identifictaion purpose
 
-        $query = !$userId ? null : DB::Aowow()->SelectRow('
-                SELECT
-                    a.id, a.authId, a.user, a.passHash, a.displayName, a.email, a.lastIP, a.lastLogin, a.joindate, a.locale, a.avatar, a.description, a.userGroups, a.userPerms, a.timeout,
-                    ab.bannedBy, ab.banReason, ab.isActive, ab.unbanDate
-                FROM
-                    ?_account a
-                LEFT JOIN
-                    ?_account_banned ab ON a.id = ab.id AND ab.isActive = 1
-                WHERE
-                    a.id = ?d
-                ORDER
-                    BY ab.banDate DESC
-                LIMIT
-                    1
-            ',
-            $userId
-        );
+        self::$dataKey = $_SESSION['dataKey'];
 
-        if ($query)
+        // check IP bans
+        if ($ipBan = DB::Aowow()->selectRow('SELECT count, unbanDate FROM ?_account_bannedIPs WHERE ip = ? AND type = 0', $_SERVER['REMOTE_ADDR']))
         {
-            self::$authId       = intval($query['authId']);
-            self::$user         = $query['user'];
-            self::$passHash     = $query['passHash'];
-            self::$email        = $query['email'];
-            self::$lastIP       = $query['lastIP'];
-            self::$lastLogin    = intval($query['lastLogin']);
-            self::$joindate     = intval($query['joindate']);
-            self::$localeId     = intval($query['locale']);
-            self::$localeString = self::localeString(self::$localeId);
-            self::$timeout      = intval($query['timeout']);
-            self::$groups       = intval($query['userGroups']);
-            self::$perms        = intval($query['userPerms']);
-            self::$banned       = $query['isActive'] == 1 && $query['unbanDate'] > time();
-            self::$unbanDate    = intval($query['unbanDate']);
-            self::$bannedBy     = intval($query['bannedBy']);
-            self::$banReason    = $query['banReason'];
-
-            self::$displayName  = $query['displayName'];
-            self::$avatar       = $query['avatar'];
-            self::$description  = $query['description'];
+            if ($ipBan['count'] > CFG_FAILED_AUTH_COUNT && $ipBan['unbanDate'] > time())
+                return false;
+            else if ($ipBan['unbanDate'] <= time())
+                DB::Aowow()->query('DELETE FROM ?_account_bannedIPs WHERE ip = ?', $_SERVER['REMOTE_ADDR']);
         }
-        else
-            self::setLocale();
+
+        // try to restore session
+        if (empty($_SESSION['user']))
+            return false;
+
+        // timed out...
+        if (!empty($_SESSION['timeout']) && $_SESSION['timeout'] <= time())
+            return false;
+
+        $query = DB::Aowow()->SelectRow('
+            SELECT    a.id, a.passHash, a.displayName, a.locale, a.userGroups, a.userPerms, a.allowExpire, BIT_OR(ab.typeMask) AS bans
+            FROM      ?_account a
+            LEFT JOIN ?_account_banned ab ON a.id = ab.userId AND ab.end > UNIX_TIMESTAMP()
+            WHERE     a.id = ?d
+            GROUP     BY a.id',
+            $_SESSION['user']
+        );
+
+        if (!$query)
+            return false;
+
+        // password changed, terminate session
+        if (AUTH_MODE_SELF && $query['passHash'] != $_SESSION['hash'])
+        {
+            self::destroy();
+            return;
+        }
+
+        self::$id          = intval($query['id']);
+        self::$displayName = $query['displayName'];
+        self::$passHash    = $query['passHash'];
+        self::$expires     = (bool)$query['allowExpire'];
+        self::$banStatus   = $query['bans'];
+        self::$groups      = $query['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($query['userGroups']);
+        self::$perms       = $query['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($query['userPerms']);
+
+        self::setLocale(intVal($query['locale']));          // reset, if changed
+
+        return true;
     }
 
-    // set and use until further notice
+    // set and save
     public static function setLocale($set = -1)
     {
-        if ($set != -1)
+        $loc = LOCALE_EN;
+
+        // get
+        if ($set != -1 && isset(Util::$localeStrings[$set]))
+            $loc = $set;
+        else if (isset($_SESSION['locale']) && isset(Util::$localeStrings[$_SESSION['locale']]))
+            $loc = $_SESSION['locale'];
+        else if (!empty($_SERVER["HTTP_ACCEPT_LANGUAGE"]))
         {
-            $loc = isset(Util::$localeStrings[$set]) ? $set : 0;
-            if (self::$id)
-            {
-                DB::Aowow()->query('UPDATE ?_account SET locale = ? WHERE id = ?',
-                    $loc,
-                    self::$id
-                );
-            }
-        }
-        else if (isset($_COOKIE[COOKIE_AUTH]))
-        {
-            $loc = intval(substr($_COOKIE[COOKIE_AUTH], 0, 1));
-            $loc = isset(Util::$localeStrings[$loc]) ? $loc : 0;
-        }
-        else
-        {
-            if (empty($_SERVER["HTTP_ACCEPT_LANGUAGE"]))
-                $loc = 0;
-            else
-            {
-                $loc = strtolower(substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2));
-                switch ($loc) {
-                    case 'ru': $loc = 8; break;
-                    case 'es': $loc = 6; break;
-                    case 'de': $loc = 3; break;
-                    case 'fr': $loc = 2; break;
-                    default:   $loc = 0;
-                }
+            $loc = strtolower(substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2));
+            switch ($loc) {
+                case 'ru': $loc = LOCALE_RU; break;
+                case 'es': $loc = LOCALE_ES; break;
+                case 'de': $loc = LOCALE_DE; break;
+                case 'fr': $loc = LOCALE_FR; break;
+                default:   $loc = LOCALE_EN;
             }
         }
 
         // set
-        self::$localeId     = $loc;
-        self::$localeString = self::localeString($loc);
+        if ($loc != self::$localeId)
+        {
+            if (self::$id)
+                DB::Aowow()->query('UPDATE ?_account SET locale = ? WHERE id = ?', $loc, self::$id);
 
-        Lang::load(self::$localeString);
+            self::useLocale($loc);
+        }
     }
 
-    // only use this once
+    // only use once
     public static function useLocale($use)
     {
         self::$localeId     = isset(Util::$localeStrings[$use]) ? $use : 0;
@@ -156,50 +121,6 @@ class User
         return (self::$groups & $group) != 0;
     }
 
-    public static function Auth($pass = '')
-    {
-        if (self::$bannedIP)
-            return AUTH_IPBANNED;
-
-        if (!$pass)                                         // pass not set, check against cookie
-        {
-            $offset = intVal($_COOKIE[COOKIE_AUTH][1]) + 2; // value of second char in string + 1 for locale
-            $cookiePass = base64_decode(substr($_COOKIE[COOKIE_AUTH], $offset));
-            if ($cookiePass != self::$passHash)
-                return AUTH_WRONGPASS;
-
-            // "stay logged in" unchecked; kill session in time() + 5min
-            // if (self::$timeout > 0 && self::$timeout < time())
-                // return AUTH_TIMEDOUT;
-
-            if (self::$timeout > 0)
-                DB::Aowow()->query('UPDATE ?_account SET timeout = ?d WHERE id = ?d',
-                    time() + CFG_SESSION_TIMEOUT_DELAY,
-                    self::$id
-                );
-        }
-        else
-        {
-            if (self::$passHash[0] == '$')                  // salted hash -> aowow-password
-            {
-                if (!self::verifyCrypt($pass))
-                    return AUTH_WRONGPASS;
-            }
-            else                                            // assume sha1 hash; account got copied from wow database
-            {
-                if (self::verifySHA1($pass))
-                    self::convertAuthInfo($pass);           // drop sha1 and generate with crypt
-                else
-                    return AUTH_WRONGPASS;
-            }
-        }
-
-        if (self::$banned)
-            return AUTH_BANNED;
-
-        return AUTH_OK;
-    }
-
     private static function localeString($loc = -1)
     {
         if (!isset(Util::$localeStrings[$loc]))
@@ -208,32 +129,150 @@ class User
         return Util::$localeStrings[$loc];
     }
 
+    public static function Auth($name, $pass)
+    {
+        $user = 0;
+        $hash = '';
+
+        switch (CFG_AUTH_MODE)
+        {
+            case AUTH_MODE_SELF:
+            {
+                // handle login try limitation
+                $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?', $_SERVER['REMOTE_ADDR']);
+                if (!$ip || $ip['unbanDate'] < time())      // no entry exists or time expired; set count to 1
+                    DB::Aowow()->query('REPLACE INTO ?_account_bannedIPs (ip, type, count, unbanDate) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', $_SERVER['REMOTE_ADDR'], CFG_FAILED_AUTH_EXCLUSION);
+                else                                        // entry already exists; increment count
+                    DB::Aowow()->query('UPDATE ?_account_bannedIPs SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ?', CFG_FAILED_AUTH_EXCLUSION, $_SERVER['REMOTE_ADDR']);
+
+                if ($ip && $ip['count'] >= CFG_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
+                    return AUTH_IPBANNED;
+
+                $query = DB::Aowow()->SelectRow('
+                    SELECT    a.id, a.passHash, BIT_OR(ab.typeMask) AS bans, status
+                    FROM      ?_account a
+                    LEFT JOIN ?_account_banned ab ON a.id = ab.userId AND ab.end > UNIX_TIMESTAMP()
+                    WHERE     a.user = ?
+                    GROUP     BY a.id',
+                    $name
+                );
+                if (!$query)
+                    return AUTH_WRONGUSER;
+
+                self::$passHash = $query['passHash'];
+                if (!self::verifyCrypt($pass))
+                    return AUTH_WRONGPASS;
+
+                if ($query['status'] & ACC_STATUS_NEW)
+                    return AUTH_ACC_INACTIVE;
+
+                // successfull auth; clear bans for this IP
+                DB::Aowow()->query('DELETE FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?', $_SERVER['REMOTE_ADDR']);
+
+                if ($query['bans'] & (ACC_BAN_PERM | ACC_BAN_TEMP))
+                    return AUTH_BANNED;
+
+                $user = $query['id'];
+                $hash = $query['passHash'];
+                break;
+            }
+            case AUTH_MODE_REALM:
+            {
+                if (!DB::isConnected(DB_AUTH))
+                    return AUTH_INTERNAL_ERR;
+
+                $wow = DB::Auth()->selectRow('SELECT a.id, a.sha_pass_hash, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id WHERE username = ? AND ORDER BY ab.active DESC LIMIT 1', $name);
+                if (!$wow)
+                    return AUTH_WRONGUSER;
+
+                self::$passHash = $wow['sha_pass_hash'];
+                if (!self::verifySHA1($pass))
+                    return AUTH_WRONGPASS;
+
+                if ($wow && !$wow['hasBan'])
+                    if (!self::checkOrCreateInDB($wow['id'], $name))
+                        return AUTH_INTERNAL_ERR;
+
+                else if ($wow['hasBan'])
+                    return AUTH_BANNED;
+
+                $user = $wow['id'];
+                break;
+            }
+            case AUTH_MODE_EXTERNAL:
+            {
+                if (!file_exists('/config/extAuth.php'))
+                    return AUTH_INTERNAL_ERR;
+
+                require '/config/extAuth.php';
+                $result = extAuth($name, $pass, $extId);
+
+                if ($result == AUTH_OK && $extId)
+                {
+                    if (!self::checkOrCreateInDB($extId, $name))
+                        return AUTH_INTERNAL_ERR;
+
+                    $user = $extId;
+                    break;
+                }
+
+                return $result;
+            }
+            default:
+                return AUTH_INTERNAL_ERR;
+        }
+
+        // kickstart session
+        session_unset();
+        $_SESSION['user'] = $user;
+        $_SESSION['hash'] = $hash;
+
+        return AUTH_OK;
+    }
+
+    // create a linked account for our settings if nessecary
+    private static function checkOrCreateInDB($extId, $name)
+    {
+        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE extId = ?d', $extId))
+            return true;
+
+        $ok = DB::Aowow()->query('INSERT INTO ?_account (extId, user, displayName, lastIP, locale, status) VALUES (?d, ?, ?, ?, ?d, ?d)',
+            $extId,
+            $name,
+            Util::ucFirst($name),
+            isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : '',
+            User::$localeId,
+            ACC_STATUS_OK
+        );
+
+        return $ok;
+    }
+
     private static function createSalt()
     {
-        static $seed = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         $algo        = '$2a';
         $strength    = '$09';
-        $salt        = '$';
-
-        for ($i = 0; $i < 22; $i++)
-            $salt .= substr($seed, mt_rand(0, 63), 1);
+        $salt        = '$'.Util::createHash(22);
 
         return $algo.$strength.$salt;
     }
 
-    private static function hashCrypt($pass)
+    // crypt used by aowow
+    public static function hashCrypt($pass)
     {
         return crypt($pass, self::createSalt());
     }
 
+    public static function verifyCrypt($pass, $hash = '')
+    {
+        $_ = $hash ?: self::$passHash;
+        return $_ == crypt($pass, $_);
+    }
+
+    // sha1 used by TC / MaNGOS
     private static function hashSHA1($pass)
     {
         return sha1(strtoupper(self::$user).':'.strtoupper($pass));
-    }
-
-    private static function verifyCrypt($pass)
-    {
-        return self::$passHash == crypt($pass, self::$passHash);
     }
 
     private static function verifySHA1($pass)
@@ -241,44 +280,34 @@ class User
         return self::$passHash == self::hashSHA1($pass);
     }
 
-    private static function convertAuthInfo($pass)
-    {
-        self::$passHash = self::hashCrypt($pass);
-
-        DB::Aowow()->query('UPDATE ?_account SET passHash = ? WHERE id = ?d',
-            self::$passHash,
-            self::$id
-        );
-    }
-
     public static function getUserGlobals()
     {
-        $set = array(
-            'commentban'  => false,                         // enforce this for now
-            'ratingban'   => false,                         // enforce this for now
+        $gUser = array(
+            'commentban'  => (bool)(self::$banStatus & ACC_BAN_COMMENT),
+            'ratingban'   => (bool)(self::$banStatus & ACC_BAN_RATE),
             'id'          => self::$id,
-            'name'        => self::$displayName ? self::$displayName : '',
-            'roles'       => self::$groups      ? self::$groups      : 0,
-            'permissions' => self::$perms       ? self::$perms       : 0,
+            'name'        => self::$displayName,
+            'roles'       => self::$groups,
+            'permissions' => self::$perms,
             'cookies'     => []
         );
 
-        if (!self::$id)
-            return $set;
+        if (!self::$id || self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM))
+            return $gUser;
 
         if ($_ = self::getCharacters())
-            $subSet['characters'] = $_;
+            $gUser['characters'] = $_;
 
         if ($_ = self::getProfiles())
-            $subSet['profiles'] = $_;
+            $gUser['profiles'] = $_;
 
         if ($_ = self::getWeightScales())
-            $subSet['weightscales'] = $_;
+            $gUser['weightscales'] = $_;
 
         if ($_ = self::getCookies())
-            $subSet['cookies'] = $_;
+            $gUser['cookies'] = $_;
 
-        return array_merge($set, $subSet);
+        return $gUser;
     }
 
     public static function getWeightScales()
@@ -312,43 +341,37 @@ class User
 
     public static function getCharacters($asJSON = true)
     {
-        if (empty(self::$characters))
-        {
-            // todo: do after profiler
-            @include('datasets/ProfilerExampleChar');
+        // todo: do after profiler
+        @include('datasets/ProfilerExampleChar');
 
-            // existing chars on realm(s)
-            self::$characters = array(
-                array(
-                    'name'      => $character['name'],
-                    'realmname' => $character['realm'][1],
-                    'region'    => $character['region'][0],
-                    'realm'     => $character['realm'][0],
-                    'race'      => $character['race'],
-                    'classs'    => $character['classs'],
-                    'level'     => $character['level'],
-                    'gender'    => $character['gender'],
-                    'pinned'    => $character['pinned']
-                )
-            );
-        }
+        // existing chars on realm(s)
+        $characters = array(
+            array(
+                'name'      => $character['name'],
+                'realmname' => $character['realm'][1],
+                'region'    => $character['region'][0],
+                'realm'     => $character['realm'][0],
+                'race'      => $character['race'],
+                'classs'    => $character['classs'],
+                'level'     => $character['level'],
+                'gender'    => $character['gender'],
+                'pinned'    => $character['pinned']
+            )
+        );
 
-        return self::$characters;
+        return $characters;
     }
 
     public static function getProfiles($asJSON = true)
     {
-        if (empty(self::$profiles))
-        {
-            // todo =>  do after profiler
-            // chars build in profiler
-            self::$profiles = array(
-                array('id' => 21, 'name' => 'Example Profile 1', 'race' => 4,  'classs' => 5, 'level' => 72, 'gender' => 1, 'icon' => 'inv_axe_04'),
-                array('id' => 23, 'name' => 'Example Profile 2', 'race' => 11, 'classs' => 3, 'level' => 17, 'gender' => 0)
-            );
-        }
+        // todo =>  do after profiler
+        // chars build in profiler
+        $profiles = array(
+            array('id' => 21, 'name' => 'Example Profile 1', 'race' => 4,  'classs' => 5, 'level' => 72, 'gender' => 1, 'icon' => 'inv_axe_04'),
+            array('id' => 23, 'name' => 'Example Profile 2', 'race' => 11, 'classs' => 3, 'level' => 17, 'gender' => 0)
+        );
 
-        return self::$profiles;
+        return $profiles;
     }
 
     public static function getCookies()
@@ -361,23 +384,25 @@ class User
         return $data;
     }
 
-    public static function writeCookie()
+    public static function save()
     {
-        $cookie = self::$localeId.count(dechex(self::$id)).dechex(self::$id).base64_encode(self::$passHash);
-        SetCookie(COOKIE_AUTH, $cookie, time() + YEAR);
+        $_SESSION['user']    = self::$id;
+        $_SESSION['hash']    = self::$passHash;
+        $_SESSION['locale']  = self::$localeId;
+        $_SESSION['timeout'] = self::$expires ? time() + CFG_SESSION_TIMEOUT_DELAY : 0;
+        // $_SESSION['dataKey'] does not depend on user login status and is set in User::init()
     }
 
     public static function destroy()
     {
-        $cookie = self::$localeId.'10';                       // id = 0, length of this is 1, empty base64_encode is 0
-        SetCookie(COOKIE_AUTH, $cookie, time() + YEAR);
+        session_unset();
+        $_SESSION['locale']  = self::$localeId;             // keep locale
+        $_SESSION['dataKey'] = self::$dataKey;              // keep dataKey
 
-        self::$id = 0;
-        self::$displayName = '';
-        self::$perms = 0;
-        self::$groups = 0;
-        self::$characters = NULL;
-        self::$profiles = NULL;
+        self::$id           = 0;
+        self::$displayName  = '';
+        self::$perms        = 0;
+        self::$groups       = U_GROUP_NONE;
     }
 }
 

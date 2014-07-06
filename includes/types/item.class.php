@@ -655,7 +655,7 @@ class ItemList extends BaseType
         {
             $gems = DB::Aowow()->select('SELECT i.id AS ARRAY_KEY, i.iconString, ae.*, i.gemColorMask AS colorMask FROM ?_items i JOIN ?_itemenchantment ae ON ae.id = i.gemEnchantmentId WHERE i.id IN (?a)', $enhance['g']);
             foreach ($enhance['g'] as $k => $v)
-                if (!in_array(array_keys($gems), $v))
+                if (!in_array($v, array_keys($gems)))
                     unset($enhance['g'][$k]);
         }
         else

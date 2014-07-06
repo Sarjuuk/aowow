@@ -237,7 +237,83 @@ $lang = array(
             "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
         ),
     ),
-    'account'  => [],
+    'account' => array(
+        'title'         => "Compte Aowow",
+        'email'         => "Courriel",
+        'continue'      => "Poursuivre",
+        'groups'        => array(
+            -1 => "None",                   "Testeur",                      "Administrateur",               "Éditeur",                      "Modérateur",                   "Bureaucrate",
+            "Développeur",                  "VIP",                          "Bloggeur",                     "Premium",                      "Traducteur",                   "Agent de ventes",
+            "Gestionnaire de capture d'écran","Gestionnaire de vidéos"
+        ),
+        // signIn
+        'doSignIn'      => "Connexion à votre compte Aowow",
+        'signIn'        => "Connexion",
+        'user'          => "Nom d'utilisateur",
+        'pass'          => "Mot de passe",
+        'rememberMe'    => "Rester connecté",
+        'forgot'        => "Oublié",
+        'forgotUser'    => "Nom d'utilisateur",
+        'forgotPass'    => "Mot de passe",
+        'accCreate'     => 'Vous n\'avez pas encore de compte ? <a href="/account=signup">Créez-en un maintenant !</a>',
+
+        // recovery
+        'recoverUser'   => "Demande de nom d'utilisateur",
+        'recoverPass'   => "Changement de mot de passe : Étape %s de 2",
+        'newPass'       => "New Password",
+
+        // creation
+        'register'      => "Enregistrement : Étape %s de 2",
+
+        // dashboard
+        'ipAddress'     => "IP-Adress",
+        'lastIP'        => "last used IP",
+        'joinDate'      => "Joined",
+        'lastLogin'     => "Last visit",
+        'userGroups'    => "Role",
+        'myAccount'     => "My Account",
+        'editAccount'   => "Simply use the forms below to update your account information",
+        'publicDesc'    => "Public Description",
+        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+
+        // bans
+        'accBanned'     => "This Account was closed",
+        'bannedBy'      => "Banned by",
+        'ends'          => "Ends on",
+        'permanent'     => "The ban is permanent",
+        'reason'        => "Reason",
+        'noReason'      => "No reason was given.",
+
+        // form-text
+        'emailInvalid'  => "Cette adresse courriel est invalide.", // message_emailnotvalid
+        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
+        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
+        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
+        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
+        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
+        'userNotFound'  => "The username you entered does not exists.",
+        'wrongPass'     => "That password is not vaild.",
+        'accInactive'   => "That account has not yet been confirmed active.",
+        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
+        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+        'errNameLength' => "Votre nom d'utilisateur doit faire au moins 4 caractères de long.", // message_usernamemin
+        'errNameChars'  => "Votre nom d'utilisateur doit contenir seulement des lettres et des chiffres.", // message_usernamenotvalid
+        'errPassLength' => "Votre mot de passe doit faire au moins 6 caractères de long.", // message_passwordmin
+        'passMismatch'  => "The passwords you entered do not match.",
+        'nameInUse'     => "That username is already taken.",
+        'mailInUse'     => "That email is already registered to an account.",
+        'intError'      => "An internal error occured.",
+        'intError2'     => "An internal error occured. (%s)",
+        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
+        'passCheckFail' => "Les mots de passe ne correspondent pas.", // message_passwordsdonotmatch
+        'newPassDiff'   => "Votre nouveau mot de passe doit être différent de l'ancien." // message_newpassdifferent
+    ),
+    'mail' => array(
+        'tokenExpires'  => "This token expires in %s.",
+        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+    ),
     'gameObject' => array(
         'cat'           => [0 => "Autre", 9 => "Livres", 3 => "Conteneurs", -5 => "Coffres", 25 => "Bancs de poissons", -3 => "Herbes", -4 => "Filons de minerai", -2 => "Quêtes", -6 => "Outils"],
         'type'          => [              9 => "Livre",  3 => "Conteneur",  -5 => "Coffre",  25 => "",                  -3 => "Herbe",  -4 => "Filon de minerai",  -2 => "Quête",  -6 => ""],

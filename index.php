@@ -27,6 +27,11 @@ switch ($pageCall)
     case '':                                                // no parameter given -> MainPage
         $altClass = 'main';
     case 'account':                                         // account management [nyi]
+        if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
+        {
+            header('Content-type: application/x-javascript; charset=utf-8');
+            die((string)$_);
+        }
     case 'achievement':
     case 'achievements':
     // case 'arena-team':
@@ -72,7 +77,7 @@ switch ($pageCall)
     case 'talent':                                          // tool: talent calculator
     case 'title':
     case 'titles':
-    case 'user':                                            // tool: user profiles [nyi]
+    // case 'user':                                            // tool: user profiles [nyi]
     case 'zone':
     case 'zones':
         $_ = ($altClass ?: $pageCall).'Page';
@@ -97,7 +102,7 @@ switch ($pageCall)
     case 'missing-screenshots':
     case 'most-comments':
     case 'random':
-        require 'pages/miscTools.php';
+        (new UtilityPage($pageCall, $pageParam))->display();
         break;
     /* called by script */
     case 'data':                                            // tool: dataset-loader
@@ -105,10 +110,11 @@ switch ($pageCall)
     case 'contactus':
     case 'comment':
     case 'locale':                                          // subdomain-workaround, change the language
-        header('Content-type: application/x-javascript; charset=utf-8');
-        if (($_ = $ajax->handle($pageCall)) !== null)
+        if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
+        {
+            header('Content-type: application/x-javascript; charset=utf-8');
             die((string)$_);
-
+        }
         break;
     /* setup */
     case 'build':

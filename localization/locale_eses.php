@@ -237,7 +237,84 @@ $lang = array(
             "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
         ),
     ),
-    'account'  => [],
+    'account' => array(
+        'title'         => "Cuenta de Aowow",
+        'email'         => "Dirección de correo electrónico",
+        'continue'      => "Continuar",
+        'groups'        => array(
+            -1 => "Ninguno",                "Probador",                     "Administrador",                "Editor",                       "Moderador",                    "Burócrata",
+            "Desarrollador",                "VIP",                          "Bloggor",                      "Premium",                      "Traductor",                    "Agente de ventas",
+            "Gestor de Capturas de pantalla","Gestor de vídeos"
+        ),
+
+        // signIn
+        'doSignIn'      => "Iniciar sesión con tu cuenta de Aowow",
+        'signIn'        => "Iniciar sesión",
+        'user'          => "Nombre de usuario",
+        'pass'          => "Contraseña",
+        'rememberMe'    => "Seguir conectado",
+        'forgot'        => "Se me olvidó mi",
+        'forgotUser'    => "Nombre de usuario",
+        'forgotPass'    => "Contraseña",
+        'accCreate '    => '¿No tienes una cuenta? <a href="?account=signup">¡Crea una ahora!</a>',
+
+        // recovery
+        'recoverUser'   => "Pedir nombre de usuario",
+        'recoverPass'   => "Reiniciar contraseña: Paso %s de 2",
+        'newPass'       => "New Password",
+
+        // creation
+        'register'      => "Inscripción: Paso %s de 2",
+
+        // dashboard
+        'ipAddress'     => "IP-Adress",
+        'lastIP'        => "last used IP",
+        'joinDate'      => "Joined",
+        'lastLogin'     => "Last visit",
+        'userGroups'    => "Role",
+        'myAccount'     => "My Account",
+        'editAccount'   => "Simply use the forms below to update your account information",
+        'publicDesc'    => "Public Description",
+        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+
+        // bans
+        'accBanned'     => "This Account was closed",
+        'bannedBy'      => "Banned by",
+        'ends'          => "Ends on",
+        'permanent'     => "The ban is permanent",
+        'reason'        => "Reason",
+        'noReason'      => "No reason was given.",
+
+        // form-text
+        'emailInvalid'  => "Esa dirección de correo electrónico no es válida.", // message_emailnotvalid
+        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
+        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
+        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
+        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
+        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
+        'userNotFound'  => "The username you entered does not exists.",
+        'wrongPass'     => "That password is not vaild.",
+        'accInactive'   => "That account has not yet been confirmed active.",
+        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
+        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+        'errNameLength' => "Tu nombre de usuario tiene que tener por lo menos cuatro caracteres.", // message_usernamemin
+        'errNameChars'  => "Tu nombre de usuario solo puede contener números y letras.", // message_usernamenotvalid
+        'errPassLength' => "Tu contraseña tiene que tener por lo menos seis caracteres.", // message_passwordmin
+        'passMismatch'  => "The passwords you entered do not match.",
+        'nameInUse'     => "That username is already taken.",
+        'mailInUse'     => "That email is already registered to an account.",
+        'intError'      => "An internal error occured.",
+        'intError2'     => "An internal error occured. (%s)",
+        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
+        'passCheckFail' => "Las contraseñas no son iguales.", // message_passwordsdonotmatch
+        'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a Su contraseña anterior." // message_newpassdifferent
+    ),
+    'mail' => array(
+        'tokenExpires'  => "This token expires in %s.",
+        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+    ),
     'gameObject' => array(
         'cat'           => [0 => "Otros", 9 => "Libros", 3 => "Contenedores", -5 => "Cofres", 25 => "Bancos de peces", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas"],
         'type'          => [              9 => "Libro",  3 => "Contenedore",  -5 => "Cofre",  25 => "",                -3 => "Hierba",  -4 => "Filóne de mineral",  -2 => "Misión",   -6 => ""],
