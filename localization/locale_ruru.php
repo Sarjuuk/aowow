@@ -102,6 +102,10 @@ $lang = array(
         'chooseClass'   => "Выберите класс",
         'chooseFamily'  => "Выберите семейство питомцев",
 
+        // profiler
+        'realm'         => "Игровой мир",
+        'region'        => "Регион",
+
         // help
         'help'          => "Справка",
         'helpTopics'    => array(
@@ -270,6 +274,7 @@ $lang = array(
 
         // creation
         'register'      => "Регистрация: Шаг %s из 2",
+        'passConfirm'   => "Повторите пароль",
 
         // dashboard
         'ipAddress'     => "IP-Adress",

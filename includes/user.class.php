@@ -178,7 +178,7 @@ class User
             }
             case AUTH_MODE_REALM:
             {
-                if (!DB::isConnected(DB_AUTH))
+                if (!DB::isConnectable(DB_AUTH))
                     return AUTH_INTERNAL_ERR;
 
                 $wow = DB::Auth()->selectRow('SELECT a.id, a.sha_pass_hash, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id WHERE username = ? AND ORDER BY ab.active DESC LIMIT 1', $name);
@@ -189,12 +189,11 @@ class User
                 if (!self::verifySHA1($pass))
                     return AUTH_WRONGPASS;
 
-                if ($wow && !$wow['hasBan'])
-                    if (!self::checkOrCreateInDB($wow['id'], $name))
-                        return AUTH_INTERNAL_ERR;
-
-                else if ($wow['hasBan'])
+                if ($wow['hasBan'])
                     return AUTH_BANNED;
+
+                if (!self::checkOrCreateInDB($wow['id'], $name))
+                    return AUTH_INTERNAL_ERR;
 
                 $user = $wow['id'];
                 break;
@@ -395,7 +394,9 @@ class User
 
     public static function destroy()
     {
+        session_regenerate_id(true);                        // session itself is not destroyed; status changed => regenerate id
         session_unset();
+
         $_SESSION['locale']  = self::$localeId;             // keep locale
         $_SESSION['dataKey'] = self::$dataKey;              // keep dataKey
 

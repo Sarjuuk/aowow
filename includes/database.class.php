@@ -62,6 +62,11 @@ class DB
         return isset(self::$connectionCache[$idx]);
     }
 
+    public static function isConnectable($idx)
+    {
+        return isset(self::$optionsCache[$idx]);
+    }
+
     private static function safeGetDB($idx)
     {
         if(!self::isConnected($idx))
@@ -74,12 +79,12 @@ class DB
      * @static
      * @return DbSimple_Mysql
      */
-    public static function Characters($realm_id)
+    public static function Characters($realm)
     {
-        if (!isset(self::$optionsCache[DB_CHARACTERS+$realm_id]))
-            die('Connection info not found for live database of realm #'.$realm_id.'. Aborted.');
+        if (!isset(self::$optionsCache[DB_CHARACTERS.$realm]))
+            die('Connection info not found for live database of realm #'.$realm.'. Aborted.');
 
-        return self::safeGetDB(DB_CHARACTERS+$realm_id);
+        return self::safeGetDB(DB_CHARACTERS.$realm);
     }
 
     /**

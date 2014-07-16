@@ -102,6 +102,10 @@ $lang = array(
         'chooseClass'   => "Wählt eine Klasse",
         'chooseFamily'  => "Wählt eine Tierart",
 
+        // profiler
+        'realm'         => "Realm",
+        'region'        => "Region",
+
         // help
         'help'          => "Hilfe",
         'helpTopics'    => array(
@@ -270,6 +274,7 @@ $lang = array(
 
         // creation
         'register'      => "Registrierung: Schritt %s von 2",
+        'passConfirm'   => "Kennwort bestätigen",
 
         // dashboard
         'ipAddress'     => "IP-Adresse",

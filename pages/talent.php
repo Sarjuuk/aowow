@@ -10,6 +10,7 @@ class TalentPage extends GenericPage
     protected $tpl           = 'talent';
     protected $tabId         = 1;
     protected $mode          = CACHETYPE_NONE;
+    protected $gDataKey      = true;
     protected $js            = ['TalentCalc.js'];
     protected $css           = array(
         ['path' => 'TalentCalc.css'],
@@ -39,7 +40,6 @@ class TalentPage extends GenericPage
         $this->addCSS($this->isPetCalc ? ['path' => 'petcalc.css'] : null);
 
         $this->tcType  = $this->isPetCalc ? 'pc' : 'tc';
-        $this->dataKey = $_SESSION['dataKey'];
     }
 
     protected function generateTitle()

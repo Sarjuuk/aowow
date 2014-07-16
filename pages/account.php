@@ -4,35 +4,6 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-/*
-enum(array( // AcctError
-    'ACCT_USERNAME_LENGTH'      => 'activate_usernamelength',
-    'ACCT_PASSWORD_LENGTH'      => 'activate_passwordlength',
-    'ACCT_USERNAME_SYMBOLS'     => 'activate_invalidusername',
-    'ACCT_PASSWORD_SYMBOLS'     => 'activate_invalidpassword',
-    'ACCT_EMAIL_SYMBOLS'        => 'signup_emailinvalid',
-
-    'ACCT_PASSWORDS_NOT_EQUAL'  => 'signup_passwordsnotequal',
-    'ACCT_USERNAME_EXISTS'      => 'activate_usernameinuse',
-    'ACCT_NO_SUCH_ACCT'         => 'signin_un_or_pass_fail',
-    'ACCT_IP_LOCKED'            => 'signin_ip_locked',
-
-    'ACCT_SIGNUP_BLOCKED'       => 'signup_blocked',
-    'ACCT_SIGNIN_BLOCKED'       => 'signin_blocked',
-
-    'ACCT_INTERNAL_ERROR'       => 'internal_error',
-));
-
-message_emailnotvalid:        "That email address is not valid.",
-message_newemaildifferent:    "Your new email address must be different than your previous one.",
-message_newpassdifferent:     "Your new password must be different than your previous one.",
-message_passwordmin:          "Your password must be at least 6 characters long.",
-message_passwordsdonotmatch:  "Passwords do not match.",
-message_usernamemin:          "Your username must be at least 4 characters long.",
-message_usernamenotvalid:     "Your username can only contain letters and numbers.",
-
-*/
-
 // exclude & weightscales are handled as Ajax
 class AccountPage extends GenericPage
 {
@@ -114,12 +85,16 @@ class AccountPage extends GenericPage
                 break;
             case 'signin':
                 $this->tpl = 'acc-signIn';
+                $this->next = $this->getNext();
                 if (isset($_POST['username']) || isset($_POST['password']))
                 {
                     if ($err = $this->doSignIn())
                         $this->error = $err;
                     else
+                    {
+                        session_regenerate_id(true);        // user status changed => regenerate id
                         header('Location: '.$this->getNext(true));
+                    }
                 }
                 else if (!empty($_GET['token']) && ($_ = DB::Aowow()->selectCell('SELECT user FROM ?_account WHERE status IN (?a) AND token = ? AND statusTimer >  UNIX_TIMESTAMP()', [ACC_STATUS_RECOVER_USER, ACC_STATUS_OK], $_GET['token'])))
                     $this->user = $_;

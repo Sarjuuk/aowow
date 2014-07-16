@@ -60,6 +60,7 @@ class GenericPage
     protected $title            = [CFG_NAME];               // for title-Element
     protected $name             = '';                       // for h1-Element
     protected $tabId            = 0;
+    protected $gDataKey         = false;                    // adds the dataKey to the user vars
     protected $js               = [];
     protected $css              = [];
 
@@ -357,8 +358,6 @@ class GenericPage
 
     public function display($override = '')                 // load given template string or GenericPage::$tpl
     {
-        session_regenerate_id(true);                        // can only reagenerate for real pages, otherwise a simple tooltip would be fatal for the session
-
         if ($override)
         {
             $this->addAnnouncements();

@@ -101,7 +101,7 @@
                                 <td>
                                     <label for="remember_me"><?php echo Lang::$account['rememberMe']; ?></label>
                                     <div class="pad2"></div>
-                                    <input type="submit" name="signup" value="<?php echo Lang::$account['signup']; ?>" />
+                                    <input type="submit" name="signup" value="<?php echo Lang::$account['continue']; ?>" />
                                 </td>
                             </tr>
                         </table>

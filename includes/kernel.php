@@ -59,7 +59,7 @@ if (!empty($AoWoWconf['auth']['db']))
 
 foreach ($AoWoWconf['characters'] as $realm => $charDBInfo)
     if (!empty($charDBInfo))
-        DB::load(DB_CHARACTERS + $realm, $charDBInfo);
+        DB::load(DB_CHARACTERS . $realm, $charDBInfo);
 
 unset($AoWoWconf);                                          // link set up: delete passwords
 

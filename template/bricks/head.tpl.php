@@ -25,8 +25,8 @@ endforeach;
         var g_staticUrl = "<?php echo STATIC_URL; ?>";
         var g_host = "<?php echo HOST_URL; ?>";
 <?php
-if (!empty($this->dataKey)):
-        echo "var g_dataKey = '".$this->dataKey."'\n";
+if ($this->gDataKey):
+        echo "        var g_dataKey = '".$_SESSION['dataKey']."'\n";
 endif;
 ?>
     </script>

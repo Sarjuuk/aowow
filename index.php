@@ -27,11 +27,6 @@ switch ($pageCall)
     case '':                                                // no parameter given -> MainPage
         $altClass = 'main';
     case 'account':                                         // account management [nyi]
-        if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
-        {
-            header('Content-type: application/x-javascript; charset=utf-8');
-            die((string)$_);
-        }
     case 'achievement':
     case 'achievements':
     // case 'arena-team':
@@ -80,6 +75,15 @@ switch ($pageCall)
     // case 'user':                                            // tool: user profiles [nyi]
     case 'zone':
     case 'zones':
+        if (in_array($pageCall, ['account', 'profile']))
+        {
+            if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
+            {
+                header('Content-type: application/x-javascript; charset=utf-8');
+                die((string)$_);
+            }
+        }
+
         $_ = ($altClass ?: $pageCall).'Page';
         (new $_($pageCall, $pageParam))->display();
         break;

@@ -1694,7 +1694,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
             $data[$this->id] = array(
                 'id'           => $this->id,
-                'name'         => ($quality ? $quality : '@').$this->getField('name', true),
+                'name'         => ($quality ?: '@').$this->getField('name', true),
                 'icon'         => $this->curTpl['iconStringAlt'] ? $this->curTpl['iconStringAlt'] : $this->curTpl['iconString'],
                 'level'        => $talent ? $this->curTpl['talentLevel'] : $this->curTpl['spellLevel'],
                 'school'       => $this->curTpl['schoolMask'],

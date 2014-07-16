@@ -97,6 +97,10 @@ $lang = array(
         'chooseClass'   => "Choose a class",
         'chooseFamily'  => "Choose a pet family",
 
+        // profiler
+        'realm'         => "Realm",
+        'region'        => "Region",
+
         // help
         'help'          => "Help",
         'helpTopics'    => array(
@@ -243,8 +247,8 @@ $lang = array(
         'email'         => "Email address",
         'continue'      => "Continue",
         'groups'        => array(
-            -1 => "None",                   "Tester",                       "Administrator",                "Editor",                       "Moderator",                    "Bureaucrat",    
-            "Developer",                    "VIP",                          "Blogger",                      "Premium",                      "Localizer",                    "Sales agent",        
+            -1 => "None",                   "Tester",                       "Administrator",                "Editor",                       "Moderator",                    "Bureaucrat",
+            "Developer",                    "VIP",                          "Blogger",                      "Premium",                      "Localizer",                    "Sales agent",
             "Screenshot manager",           "Video manager"
         ),
         // signIn
@@ -265,6 +269,7 @@ $lang = array(
 
         // creation
         'register'      => "Registration - Step %s of 2",
+        'passConfirm'   => "Confirm password",
 
         // dashboard
         'ipAddress'     => "IP-Adress",

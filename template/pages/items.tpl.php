@@ -27,7 +27,7 @@ endif;
                         <div class="clear"></div>
                         <select name="qu[]" size="7" multiple="multiple" class="rightselect" style="background-color: #181818">
 <?php
-foreach (Lang::$item['quality'] as  $k => $str):
+foreach (Lang::$item['quality'] as $k => $str):
     echo '                            <option value="'.$k.'" class="q'.$k.'"'.(isset($f['qu']) && in_array($k, (array)$f['qu']) ? ' selected' : null).'>'.$str."</option>\n";
 endforeach;
 ?>
@@ -43,7 +43,7 @@ if (!empty($f['slot'])):
                         <div class="clear"></div>
                         <select name="sl[]" size="<?php echo min(@count($f['slot']), 7); ?>" multiple="multiple" class="rightselect">
 <?php
-    foreach ($f['slot'] as  $k => $str):
+    foreach ($f['slot'] as $k => $str):
         echo '                            <option value="'.$k.'" '.(isset($f['sl']) && in_array($k, (array)$f['sl']) ? ' selected' : null).'>'.$str."</option>\n";
     endforeach;
 ?>
@@ -60,7 +60,7 @@ if (!empty($f['type'])):
                         <div class="clear"></div>
                         <select name="ty[]" size="<?php echo min(@count($f['type']), 7); ?>" multiple="multiple" class="rightselect">
 <?php
-    foreach ($f['type'] as  $k => $str):
+    foreach ($f['type'] as $k => $str):
         echo '                            <option value="'.$k.'" '.(isset($f['ty']) && in_array($k, (array)$f['ty']) ? ' selected' : null).'>'.$str."</option>\n";
     endforeach;
 ?>
@@ -90,7 +90,7 @@ if (!empty($f['type'])):
                             <td class="padded">&nbsp;<select name="si" style="margin-right: 0.5em">
                                 <option></option>
 <?php
-foreach (Lang::$game['si'] as  $k => $str):
+foreach (Lang::$game['si'] as $k => $str):
     echo '                            <option value="'.$k.'"'.(isset($f['si']) && $k == $f['si'] ? ' selected' : null).'>'.$str."</option>\n";
 endforeach;
 ?>
@@ -99,7 +99,7 @@ endforeach;
                                 &nbsp;<select name="ub">
                                     <option></option>
 <?php
-foreach (Lang::$game['cl'] as  $k => $str):
+foreach (Lang::$game['cl'] as $k => $str):
     if ($str):
         echo '                            <option value="'.$k.'"'.(isset($f['ub']) && $k == $f['ub'] ? ' selected' : null).'>'.$str."</option>\n";
     endif;

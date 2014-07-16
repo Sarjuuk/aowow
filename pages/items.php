@@ -101,7 +101,10 @@ class ItemsPage extends GenericPage
         /* evaluate filter */
         /*******************/
 
-        // recreate form selection
+        // recreate form selection (must be evaluated first via getConditions())
+        if ($_ = $this->filterObj->getConditions())
+            $conditions[] = $_;
+
         $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
         $this->filter['query'] = @$_GET['filter'] ?: NULL;
         $this->filter['fi']    =  $this->filterObj->getForm();
@@ -127,9 +130,6 @@ class ItemsPage extends GenericPage
 
         if (!empty($this->filter['fi']['extraCols']))
             $this->sharedLV['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.($this->filter['gm'] ?: 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')';
-
-        if ($_ = $this->filterObj->getConditions())
-            $conditions[] = $_;
 
         if ($this->filterObj->error)
             $this->sharedLV['_errors'] = '$1';
