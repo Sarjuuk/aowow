@@ -73,7 +73,7 @@ class QuestsPage extends GenericPage
         if ($this->filterObj->error)
             $lv['params']['_errors'] = '$1';
 
-        $this->lvData = $lv;
+        $this->lvTabs[] = $lv;
     }
 
     protected function generateTitle()

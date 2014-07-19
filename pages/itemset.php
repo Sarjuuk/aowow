@@ -253,15 +253,14 @@ class ItemsetPage extends GenericPage
                     'data'   => $relSets->getListviewData(),
                     'params' => array(
                         'id'   => 'see-also',
-                        'name' => '$LANG.tab_seealso',
-                        'tabs' => '$tabsRelated'
+                        'name' => '$LANG.tab_seealso'
                     )
                 );
 
                 if (!$relSets->hasDiffFields(['classMask']))
                     $lv['params']['hiddenCols'] = "$['classes']";
 
-                $this->lvData[] = $lv;
+                $this->lvTabs[] = $lv;
 
                 $this->extendGlobalData($relSets->getJSGlobals());
             }

@@ -86,12 +86,11 @@ class PetPage extends GenericPage
         );
         $tng = new CreatureList($condition);
 
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'creature',
             'data'   => $tng->getListviewData(NPCINFO_TAMEABLE),
             'params' => array(
                 'name'        => '$LANG.tab_tameable',
-                'tabs'        => '$tabsRelated',
                 'hiddenCols'  => "$['type']",
                 'visibleCols' => "$['skin']",
                 'note'        => sprintf(Util::$filterResultString, '?npcs=1&filter=fa=38'),
@@ -99,12 +98,10 @@ class PetPage extends GenericPage
             )
         );
 
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'model',
             'data'   => $tng->getListviewData(NPCINFO_MODEL),
-            'params' => array(
-                'tabs' => '$tabsRelated'
-            )
+            'params' => []
         );
 
         // tab: diet
@@ -117,12 +114,11 @@ class PetPage extends GenericPage
         $food = new ItemList(array(['i.subClass', [5, 8]], ['i.FoodType', $list], CFG_SQL_LIMIT_NONE));
         $this->extendGlobalData($food->getJSGlobals());
 
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'item',
             'data'   => $food->getListviewData(),
             'params' => array(
                 'name'       => '$LANG.diet',
-                'tabs'       => '$tabsRelated',
                 'hiddenCols' => "$['source', 'slot', 'side']",
                 'sort'       => "$['level']",
                 'id'         => 'diet'
@@ -155,12 +151,11 @@ class PetPage extends GenericPage
         $spells = new SpellList($conditions);
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
 
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'spell',
             'data'   => $spells->getListviewData(),
             'params' => array(
                 'name'        => '$LANG.tab_abilities',
-                'tabs'        => '$tabsRelated',
                 'visibleCols' => "$['schools', 'level']",
                 'id'          => 'abilities'
             )
@@ -186,11 +181,10 @@ class PetPage extends GenericPage
         $talents = new SpellList($conditions);
         $this->extendGlobalData($talents->getJSGlobals(GLOBALINFO_SELF));
 
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'spell',
             'data'   => $talents->getListviewData(),
             'params' => array(
-                'tabs'        => '$tabsRelated',
                 'visibleCols' => "$['tier', 'level']",
                 'name'        => '$LANG.tab_talents',
                 'id'          => 'talents',

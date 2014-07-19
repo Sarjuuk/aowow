@@ -13,7 +13,7 @@ $f = $this->filter;                                         // shorthand
                 g_initPath(<?php echo json_encode($this->path, JSON_NUMERIC_CHECK).', '.(empty($f['query']) ? 0 : 1) ?>);
 <?php
 if (!empty($f['query'])):
-  // todo: update menu-class         Menu.modifyUrl(Menu.findItem(mn_database, [3]), { filter: '+={$filter.query|escape:'quotes'}' }, { onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [3])) });
+  // todo: update menu-class         Menu.modifyUrl(Menu.findItem(mn_database, [3]), { filter: '+={$f['query']|escape:'quotes'}' }, { onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [3])) });
 endif;
 ?>
             </script>
@@ -93,10 +93,7 @@ endforeach;
 ?>
             //]]></script>
 
-            <div id="lv-generic" class="listview"></div>
-            <script type="text/javascript">//<![CDATA[
-<?php $this->lvBrick($this->lvData['file'], ['data' => $this->lvData['data'], 'params' => $this->lvData['params']]); ?>
-            //]]></script>
+<?php $this->brick('lvTabs'); ?>
 
             <div class="clear"></div>
         </div><!-- main-contents -->

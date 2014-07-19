@@ -93,7 +93,7 @@ class ProfilesPage extends GenericPage
         // dont send ID for real chars unless they have some kind of custom avatar
         // on second thought .. ids are required for resync, but the function that generates the icon is faulty
 
-        $this->lvData = array(
+        $this->lvTabs[] = array(
             'file'   => 'profile',
             'data'   => [$exampleRow],
             'params' => [

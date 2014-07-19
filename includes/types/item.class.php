@@ -718,7 +718,7 @@ class ItemList extends BaseType
             $x .= Lang::$item['durability'].' '.$dur.' / '.$dur.'<br />';
 
         // required classes
-        if ($classes = Lang::getClassString($this->curTpl['requiredClass'], $jsg, $__, !$interactive))
+        if ($classes = Lang::getClassString($this->curTpl['requiredClass'], $jsg, $__))
         {
             foreach ($jsg as $js)
                 if (empty($this->jsGlobals[TYPE_CLASS][$js]))
@@ -728,7 +728,7 @@ class ItemList extends BaseType
         }
 
         // required races
-        if ($races = Lang::getRaceString($this->curTpl['requiredRace'], $__, $jsg, $__, !$interactive))
+        if ($races = Lang::getRaceString($this->curTpl['requiredRace'], $__, $jsg, $__))
         {
             foreach ($jsg as $js)
                 if (empty($this->jsGlobals[TYPE_RACE][$js]))

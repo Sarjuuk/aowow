@@ -100,7 +100,7 @@ class SpellsPage extends GenericPage
         $conditions   = [];
         $visibleCols  = [];
         $hiddenCols   = [];
-        $this->lvData = array(
+        $tab = array(
             'file'   => 'spell',
             'data'   => [],
             'params' => []
@@ -200,10 +200,10 @@ class SpellsPage extends GenericPage
                                 break;
                         }
 
-                        $this->lvData['params']['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';
+                        $tab['params']['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';
                     }
 
-                    $this->lvData['params']['_petTalents'] = 1;       // not conviced, this is correct, but .. it works
+                    $tab['params']['_petTalents'] = 1;      // not conviced, this is correct, but .. it works
 
                     break;
                 case -11:                                   // Proficiencies ... the subIds are actually SkillLineCategories
@@ -298,8 +298,8 @@ class SpellsPage extends GenericPage
                             if (is_array($note))
                                 $note = $note[0];
 
-                            $this->lvData['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
-                            $this->lvData['params']['sort'] = "$['skill', 'name']";
+                            $tab['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
+                            $tab['params']['sort'] = "$['skill', 'name']";
                         }
                     }
 
@@ -337,8 +337,8 @@ class SpellsPage extends GenericPage
                             if (is_array($note))
                                 $note = $note[0];
 
-                            $this->lvData['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
-                            $this->lvData['params']['sort'] = "$['skill', 'name']";
+                            $tab['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
+                            $tab['params']['sort'] = "$['skill', 'name']";
                         }
                     }
 
@@ -362,7 +362,7 @@ class SpellsPage extends GenericPage
         $spells = new SpellList($conditions);
 
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-        $this->lvData['data'] = $spells->getListviewData();
+        $tab['data'] = $spells->getListviewData();
 
         // recreate form selection
         $this->filter          = array_merge($this->filterObj->getForm('form'), $this->filter);
@@ -370,17 +370,17 @@ class SpellsPage extends GenericPage
         $this->filter['fi']    =  $this->filterObj->getForm();
 
         if (!empty($this->filter['fi']['extraCols']))
-            $this->lvData['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+            $tab['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         // create note if search limit was exceeded; overwriting 'note' is intentional
         if ($spells->getMatches() > CFG_SQL_LIMIT_DEFAULT)
         {
-            $this->lvData['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-            $this->lvData['params']['_truncated'] = 1;
+            $tab['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $tab['params']['_truncated'] = 1;
         }
 
         if ($this->filterObj->error)
-            $this->lvData['params']['_errors'] = '$1';
+            $tab['params']['_errors'] = '$1';
 
         $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost']);
         if ($mask & 0x1)
@@ -391,10 +391,12 @@ class SpellsPage extends GenericPage
             $visibleCols[] = 'trainingcost';
 
         if ($visibleCols)
-            $this->lvData['params']['visibleCols'] = '$'.json_encode($visibleCols);
+            $tab['params']['visibleCols'] = '$'.json_encode($visibleCols);
 
         if ($hiddenCols)
-            $this->lvData['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
+            $tab['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
+
+        $this->lvTabs[] = $tab;
 
         // sort for dropdown-menus
         asort(Lang::$game['ra']);

@@ -1,8 +1,8 @@
 <?php $this->brick('header'); ?>
 
-    <div id="main">
-        <div id="main-precontents"></div>
-        <div id="main-contents" class="main-contents">
+    <div class="main" id="main">
+        <div class="main-precontents" id="main-precontents"></div>
+        <div class="main-contents" id="main-contents">
 
 <?php $this->brick('announcement'); ?>
 
@@ -55,7 +55,8 @@
                     <div class="clear"></div>
                 </div>
             </div>
-        </div>
-    </div>
+
+        </div><!-- main-contents -->
+    </div><!-- main -->
 
 <?php $this->brick('footer'); ?>

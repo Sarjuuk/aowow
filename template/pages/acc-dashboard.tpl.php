@@ -1,8 +1,8 @@
 <?php $this->brick('header'); ?>
 
-        <div id="main">
-            <div id="main-precontents"></div>
-            <div id="main-contents" class="main-contents">
+    <div class="main" id="main">
+        <div class="main-precontents" id="main-precontents"></div>
+        <div class="main-contents" id="main-contents">
 
 <?php $this->brick('announcement'); ?>
 
@@ -10,21 +10,21 @@
 
 <?php $this->brick('infobox'); ?>
 
-                <div class="text">
-                    <h1><?php echo Lang::$account['myAccount']; ?></h1>
+            <div class="text">
+                <h1><?php echo Lang::$account['myAccount']; ?></h1>
 
 <?php
 // Banned-Minibox
 if ($b = $this->banned):
 ?>
-                    <div style="max-width:300px;" class="minibox">
-                        <h1 class="q10"><?php echo Lang::$account['accBanned']; ?></h1>
-                        <ul style="text-align:left">
-                            <li><div><?php echo '<b>'.Lang::$account['bannedBy'].'</b>'.Lang::$main['colon'].'<a href="?user='.$b['by'][0].'">'.$b['by'][1].'</a>'; ?></div></li>
-                            <li><div><?php echo '<b>'.Lang::$account['ends'].'</b>'.Lang::$main['colon'].($b['end'] ? date(Lang::$main['dateFmtLong'], $b['end']) : Lang::$account['permanent']); ?></div></li>
-                            <li><div><?php echo '<b>'.Lang::$account['reason'].'</b>'.Lang::$main['colon'].'<span class="msg-failure">'.($b['reason'] ?: Lang::$account['noReason']).'</span>'; ?></div></li>
-                        </ul>
-                    </div>
+                <div style="max-width:300px;" class="minibox">
+                    <h1 class="q10"><?php echo Lang::$account['accBanned']; ?></h1>
+                    <ul style="text-align:left">
+                        <li><div><?php echo '<b>'.Lang::$account['bannedBy'].'</b>'.Lang::$main['colon'].'<a href="?user='.$b['by'][0].'">'.$b['by'][1].'</a>'; ?></div></li>
+                        <li><div><?php echo '<b>'.Lang::$account['ends'].'</b>'.Lang::$main['colon'].($b['end'] ? date(Lang::$main['dateFmtLong'], $b['end']) : Lang::$account['permanent']); ?></div></li>
+                        <li><div><?php echo '<b>'.Lang::$account['reason'].'</b>'.Lang::$main['colon'].'<span class="msg-failure">'.($b['reason'] ?: Lang::$account['noReason']).'</span>'; ?></div></li>
+                    </ul>
+                </div>
 <?php
 /* todo (sometime else)
 else:
@@ -105,21 +105,18 @@ echo '                    '.Lang::$account['editAccount']."\n";
     */
     endif;
 ?>
-                </div>
-
-                <div class="clear"></div>
+            </div>
+<?php
+/*
+            <div class="clear"></div>
             <div id="related-tabs"></div>
             <div id="lv-generic" class="listview">
             <script type="text/javascript">//<![CDATA[
                 var tabsRelated = new Tabs({parent: $WH.ge('related-tabs')});
-<?php
-foreach ($this->lvData as $lv):
-    if (!empty($lv['data'])):
-        $this->lvBrick($lv['file'], ['data' => $lv['data'], 'params' => $lv['params']]);
-    endif;
-endforeach;
-?>
-                /* set in header*/
+
+    // relevant tabs here
+
+                # set in header
                 var lv_comments = [{id:1191765,type:12,typeId:1,subject:'Example Comment',preview:'And here is a little preview for this comment, that is capped after 75 char....',rating:15,date:'2010/11/27 22:23:16',elapsed:43866462,deleted:0,purged:1,domain:'live'}];
                 var lv_screenshots = [], lv_videos = [];
                 new Listview({template: "commentpreview", id: "comments", name: LANG.tab_comments, tabs: tabsRelated, parent: "lv-generic", onBeforeCreate: Listview.funcBox.beforeUserComments, hiddenCols: ['author'], data: lv_comments});
@@ -127,7 +124,13 @@ endforeach;
                 new Listview({template: "video", id: "videos", name: LANG.tab_videos, tabs: tabsRelated, parent: "lv-generic", data: lv_videos});
                 tabsRelated.flush();
             //]]></script>
-            </div>
-        </div>
+*/
+?>
+
+<?php $this->brick('lvTabs'); ?>
+
+            <div class="clear"></div>
+        </div><!-- main-contents -->
+    </div><!-- main -->
 
 <?php $this->brick('footer'); ?>

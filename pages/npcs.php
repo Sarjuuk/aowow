@@ -71,7 +71,7 @@ class NpcsPage extends GenericPage
         if ($this->filterObj->error)
             $lv['params']['_errors'] = '$1';
 
-        $this->lvData = $lv;
+        $this->lvTabs[] = $lv;
 
         // sort for dropdown-menus
         asort(Lang::$game['fa']);

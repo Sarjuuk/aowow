@@ -1,6 +1,6 @@
 <?php
 $this->brick('header');
-$f = $this->filter
+$f = $this->filter;                                         // shorthand
 ?>
 
     <div class="main" id="main">
@@ -13,7 +13,7 @@ $f = $this->filter
                 g_initPath(<?php echo json_encode($this->path, JSON_NUMERIC_CHECK).', '.(empty($f['query']) ? 0 : 1) ?>);
 <?php
 if (!empty($f['query'])):
-  // todo: update menu-class         Menu.modifyUrl(Menu.findItem(mn_database, [2]), { filter: '+={$filter.query|escape:'quotes'}' }, { onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [2])) });
+  // todo: update menu-class         Menu.modifyUrl(Menu.findItem(mn_database, [2]), { filter: '+={$f['query']|escape:'quotes'}' }, { onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [2])) });
 endif;
 ?>
             </script>
@@ -27,9 +27,7 @@ endif;
                         <select name="qu[]" size="7" multiple="multiple" class="rightselect" style="background-color: #181818">
 <?php
 foreach (Lang::$item['quality'] as $i => $str):
-    if ($str):
-        echo '                            <option value="'.$i.'" class="q'.$i.'"'.(isset($f['qu']) && in_array($i, (array)$f['qu']) ? ' selected' : null).'>'.$str."</option>\n";
-    endif;
+    echo '                            <option value="'.$i.'" class="q'.$i.'"'.(isset($f['qu']) && in_array($i, (array)$f['qu']) ? ' selected' : null).'>'.$str."</option>\n";
 endforeach;
 ?>
                         </select>
@@ -121,10 +119,7 @@ endforeach;
 ?>
             //]]></script>
 
-            <div id="lv-generic" class="listview"></div>
-            <script type="text/javascript">//<![CDATA[
-<?php $this->lvBrick($this->lvData['file'], ['data' => $this->lvData['data'], 'params' => $this->lvData['params']]); ?>
-            //]]></script>
+<?php $this->brick('lvTabs'); ?>
 
             <div class="clear"></div>
         </div><!-- main-contents -->

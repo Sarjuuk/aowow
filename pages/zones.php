@@ -67,7 +67,7 @@ class ZonesPage extends GenericPage
         $zones = new ZoneList($conditions);
 
         $this->map    = null;
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'zone',
             'data'   => $zones->getListviewData(),
             'params' => []

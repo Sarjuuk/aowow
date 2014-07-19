@@ -67,34 +67,34 @@ class UtilityPage extends GenericPage
                 header('Location: ?'.Util::$typeStrings[$type].'='.$typeId);
                 die();
             case 'latest-comments':
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'commentpreview',
                     'data'   => [],
                     'params' => []
                 );
                 break;
             case 'latest-screenshots':
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'screenshot',
                     'data'   => [],
                     'params' => []
                 );
                 break;
             case 'latest-videos':
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'video',
                     'data'   => [],
                     'params' => []
                 );
                 break;
             case 'latest-articles':
-                $this->lvData = [];
+                $this->lvTabs = [];
                 break;
             case 'latest-additions':
                 $extraText = '';
                 break;
             case 'unrated-comments':
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'commentpreview',
                     'data'   => [],
                     'params' => []
@@ -115,10 +115,10 @@ class UtilityPage extends GenericPage
                     if (!$typeObj->error)
                     {
                         $this->extendGlobalData($typeObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED | GLOBALINFO_REWARDS));
-                        $this->lvData[] = array(
+                        $this->lvTabs[] = array(
                             'file'   => $typeObj::$brickFile,
                             'data'   => $typeObj->getListviewData(),
-                            'params' => ['tabs' => '$myTabs']
+                            'params' => []
                         );
                     }
                 }
@@ -127,7 +127,7 @@ class UtilityPage extends GenericPage
                 if ($this->category && !in_array($this->category[0], [1, 7, 30]))
                     header('Location: ?most-comments=1'.($this->rss ? '&rss' : null));
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'commentpreview',
                     'data'   => [],
                     'params' => []

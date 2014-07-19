@@ -32,7 +32,7 @@ class CurrencyPage extends GenericPage
 
     protected function generatePath()
     {
-        $this->path[] = $this->subject->getField('typeCat');
+        $this->path[] = $this->subject->getField('category');
     }
 
     protected function generateTitle()
@@ -83,11 +83,10 @@ class CurrencyPage extends GenericPage
 
                 foreach ($lootTabs->iterate() as $tab)
                 {
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => $tab[0],
                         'data'   => $tab[1],
                         'params' => [
-                            'tabs'        => '$tabsRelated',
                             'name'        => $tab[2],
                             'id'          => $tab[3],
                             'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
@@ -162,11 +161,10 @@ class CurrencyPage extends GenericPage
                         }
                     }
 
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => 'creature',
                         'data'   => $sbData,
                         'params' => [
-                            'tabs'       => '$tabsRelated',
                             'name'       => '$LANG.tab_soldby',
                             'id'         => 'sold-by-npc',
                             'extraCols'  => '$['.implode(', ', $extraCols).']',
@@ -188,11 +186,10 @@ class CurrencyPage extends GenericPage
                 if ($createdBy->hasSetFields(['reagent1']))
                     $visCols = ['reagents'];
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'spell',
                     'data'   => $createdBy->getListviewData(),
                     'params' => [
-                        'tabs'        => '$tabsRelated',
                         'name'        => '$LANG.tab_createdby',
                         'id'          => 'created-by',
                         'visibleCols' => isset($visCols) ? '$'.json_encode($visCols) : null
@@ -228,11 +225,10 @@ class CurrencyPage extends GenericPage
             $boughtBy = new ItemList(array(['id', $boughtBy]));
             if (!$boughtBy->error)
             {
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'item',
                     'data'   => $boughtBy->getListviewData(ITEMINFO_VENDOR, [TYPE_CURRENCY => $this->typeId]),
                     'params' => [
-                        'tabs'      => '$tabsRelated',
                         'name'      => '$LANG.tab_currencyfor',
                         'id'        => 'currency-for',
                         'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]",

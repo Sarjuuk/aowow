@@ -1392,7 +1392,7 @@ class Util
 
     public static function alphaMapCheck($areaId, array &$coords)
     {
-        $file = 'images\\alphaMaps\\'.$areaId.'.png';
+        $file = 'cache\\alphaMaps\\'.$areaId.'.png';
         if (!file_exists($file))
         {
             self::addNote(U_GROUP_STAFF, 'Util::alphaMapCheck no suitable alphaMap found for area '.$areaId.'. Positional check omitted!');

@@ -73,11 +73,10 @@ class SkillPage extends GenericPage
             {
                 $this->extendGlobalData($recipes->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'spell',
                     'data'   => $recipes->getListviewData(),
                     'params' => array(
-                        'tabs'        => '$tabsRelated',
                         'id'          => 'recipes',
                         'name'        => '$LANG.tab_recipes',
                         'visibleCols' => "$['reagents', 'source']",
@@ -102,13 +101,12 @@ class SkillPage extends GenericPage
                 if ($_ = array_search($this->typeId, $filterRecipe))
                     $_ = sprintf(Util::$filterResultString, "?items=9.".$_);
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'item',
                     'data'   => $recipeItems->getListviewData(),
                     'params' => array(
                         'id'   => 'recipe-items',
                         'name' => '$LANG.tab_recipeitems',
-                        'tabs' => '$tabsRelated',
                         'note' => $_
                     )
                 );
@@ -132,13 +130,12 @@ class SkillPage extends GenericPage
                     if ($_ = array_search($this->typeId, $filterItem))
                         $_ = sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=".$_.";crv=0");
 
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => 'item',
                         'data'   => $created->getListviewData(),
                         'params' => array(
                             'id'   => 'crafted-items',
                             'name' => '$LANG.tab_crafteditems',
-                            'tabs' => '$tabsRelated',
                             'note' => $_
                         )
                     );
@@ -160,13 +157,12 @@ class SkillPage extends GenericPage
                 if ($_ = array_search($this->typeId, $filterItem))
                     $_ = sprintf(Util::$filterResultString, "?items&filter=cr=99:168;crs=".$_.":2;crv=0:0");
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'item',
                     'data'   => $reqBy->getListviewData(),
                     'params' => array(
                         'id'   => 'required-by',
                         'name' => '$LANG.tab_requiredby',
-                        'tabs' => '$tabsRelated',
                         'note' => $_
                     )
                 );
@@ -183,13 +179,12 @@ class SkillPage extends GenericPage
             {
                 $this->extendGlobalData($reqBy->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'itemset',
                     'data'   => $reqBy->getListviewData(),
                     'params' => array(
                         'id'   => 'required-by-set',
-                        'name' => '$LANG.tab_requiredby',
-                        'tabs' => '$tabsRelated'
+                        'name' => '$LANG.tab_requiredby'
                     )
                 );
             }
@@ -226,10 +221,7 @@ class SkillPage extends GenericPage
             $lv = array(
                 'file'   => 'spell',
                 'data'   => $spells->getListviewData(),
-                'params' => array(
-                    'tabs'        => '$tabsRelated',
-                    'visibleCols' => "$['source']"
-                )
+                'params' => ['visibleCols' => "$['source']"]
             );
 
             switch ($this->cat)
@@ -247,7 +239,7 @@ class SkillPage extends GenericPage
                     break;
             }
 
-            $this->lvData[] = $lv;
+            $this->lvTabs[] = $lv;
         }
 
         // tab: trainers [npcs]
@@ -282,11 +274,10 @@ class SkillPage extends GenericPage
                 {
                     $this->extendGlobalData($trainer->getJSGlobals());
 
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => 'creature',
                         'data'   => $trainer->getListviewData(),
                         'params' => array(
-                            'tabs' => '$tabsRelated',
                             'id'   => 'trainer',
                             'name' => '$LANG.tab_trainers',
                         )
@@ -320,12 +311,10 @@ class SkillPage extends GenericPage
                 if (!$quests->error)
                 {
                     $this->extendGlobalData($quests->getJSGlobals());
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => 'quest',
                         'data'   => $quests->getListviewData(),
-                        'params' => array(
-                            'tabs' => '$tabsRelated',
-                        )
+                        'params' => []
                     );
                 }
             }
@@ -342,12 +331,10 @@ class SkillPage extends GenericPage
             $classes = new CharClassList(array(['id', $class]));
             if (!$classes->error)
             {
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'class',
                     'data'   => $classes->getListviewData(),
-                    'params' => array(
-                        'tabs' => '$tabsRelated',
-                    )
+                    'params' => []
                 );
             }
         }
@@ -363,12 +350,10 @@ class SkillPage extends GenericPage
             $races = new CharRaceList(array(['id', $race]));
             if (!$races->error)
             {
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'race',
                     'data'   => $races->getListviewData(),
-                    'params' => array(
-                        'tabs' => '$tabsRelated',
-                    )
+                    'params' => []
                 );
             }
         }

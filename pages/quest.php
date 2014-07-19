@@ -547,7 +547,7 @@ class QuestPage extends GenericPage
         );
 
         if ($maTab)
-            $this->lvData[] = $maTab;
+            $this->lvTabs[] = $maTab;
 
         if ($_ = $this->subject->getField('reqMinRepFaction'))
         {
@@ -572,14 +572,13 @@ class QuestPage extends GenericPage
         if (!$seeAlso->error)
         {
             $this->extendGlobalData($seeAlso->getJSGlobals());
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'quest',
                 'data'   => $seeAlso->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'name' => '$LANG.tab_seealso',
                     'id'   => 'see-also'
-                ]
+                )
             );
         }
 
@@ -588,14 +587,13 @@ class QuestPage extends GenericPage
         if (!$criteriaOf->error)
         {
             $this->extendGlobalData($criteriaOf->getJSGlobals());
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'achievement',
                 'data'   => $criteriaOf->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'name' => '$LANG.tab_criteriaof',
                     'id'   => 'criteria-of'
-                ]
+                )
             );
         }
     }
@@ -825,13 +823,12 @@ class QuestPage extends GenericPage
                 $attachmentTab = array(
                     'file'   => 'item',
                     'data'   => $mailLoot->getResult(),
-                    'params' => [
-                        'tabs'        => '$tabsRelated',
+                    'params' => array(
                         'name'        => '[Mail Attachments]',
                         'id'          => 'mail-attachments',
                         'extraCols'   => "$[".implode(', ', array_merge($extraCols, $mailLoot->extraCols))."]",
                         'hiddenCols'  => "$['side', 'slot', 'reqlevel']"
-                    ]
+                    )
                 );
             }
         }

@@ -164,7 +164,6 @@ class FactionPage extends GenericPage
                 'data'    => $items->getListviewData(),
                 'showRep' => true,
                 'params'  => array(
-                    'tabs'      => '$tabsRelated',
                     'extraCols' => '$_',
                     'sort'      => "$['standing', 'name']"
                 )
@@ -173,7 +172,7 @@ class FactionPage extends GenericPage
             if ($items->getMatches() > CFG_SQL_LIMIT_DEFAULT)
                 $tab['params']['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
 
-            $this->lvData[] = $tab;
+            $this->lvTabs[] = $tab;
         }
 
         // tab: creatures with onKill reputation
@@ -195,15 +194,13 @@ class FactionPage extends GenericPage
                         'file'    => 'creature',
                         'data'    => $killCreatures->getListviewData(),
                         'showRep' => true,
-                        'params'  => array(
-                            'tabs' => '$tabsRelated',
-                        )
+                        'params'  => []
                     );
 
                     if ($killCreatures->getMatches() > CFG_SQL_LIMIT_DEFAULT)
                         $tab['params']['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
 
-                    $this->lvData[] = $tab;
+                    $this->lvTabs[] = $tab;
                 }
             }
         }
@@ -220,15 +217,14 @@ class FactionPage extends GenericPage
                     'showRep' => true,
                     'params'  => array(
                         'id'   => 'member',
-                        'name' => '$LANG.tab_members',
-                        'tabs' => '$tabsRelated'
+                        'name' => '$LANG.tab_members'
                     )
                 );
 
                 if ($members->getMatches() > CFG_SQL_LIMIT_DEFAULT)
                     $tab['params']['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
 
-                $this->lvData[] = $tab;
+                $this->lvTabs[] = $tab;
             }
         }
 
@@ -238,12 +234,10 @@ class FactionPage extends GenericPage
             $objects = new GameObjectList(array(['faction', $_]));
             if (!$objects->error)
             {
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'    => 'object',
                     'data'    => $objects->getListviewData(),
-                    'params'  => array(
-                        'tabs' => '$tabsRelated',
-                    )
+                    'params'  => []
                 );
             }
         }
@@ -266,16 +260,13 @@ class FactionPage extends GenericPage
                 'file'    => 'quest',
                 'data'    => $quests->getListviewData($this->typeId),
                 'showRep' => true,
-                'params'  => array(
-                    'tabs' => '$tabsRelated',
-                    'extraCols' => '$_'
-                )
+                'params'  => ['extraCols' => '$_']
             );
 
             if ($quests->getMatches() > CFG_SQL_LIMIT_DEFAULT)
                 $tab['params']['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
 
-            $this->lvData[] = $tab;
+            $this->lvTabs[] = $tab;
         }
 
         // tab: achievements
@@ -288,13 +279,12 @@ class FactionPage extends GenericPage
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_ANY));
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'achievement',
                 'data'   => $acvs->getListviewData(),
                 'params' => array(
                     'id'          => 'criteria-of',
                     'name'        => '$LANG.tab_criteriaof',
-                    'tabs'        => '$tabsRelated',
                     'visibleCols' => "$['category']"
                 )
             );

@@ -28,7 +28,7 @@ class RacesPage extends GenericPage
         $races = new CharRaceList(array(['side', 0, '!']));
         if (!$races->error)
         {
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'race',
                 'data'   => $races->getListviewData(),
                 'params' => []

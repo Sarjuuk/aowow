@@ -327,16 +327,15 @@ class SpellPage extends GenericPage
                 if (!$modSpells->hasSetFields(['skillLines']))
                     $msH = "$['skill']";
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'spell',
                     'data'   => $modSpells->getListviewData(),
-                    'params' => [
-                        'tabs'        => '$tabsRelated',
+                    'params' => array(
                         'id'          => 'modifies',
                         'name'        => '$LANG.tab_modifies',
                         'visibleCols' => "$['level']",
                         'hiddenCols'  => isset($msH) ? $msH : null
-                    ]
+                    )
                 );
 
                 $this->extendGlobalData($modSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -379,16 +378,15 @@ class SpellPage extends GenericPage
                 if (!$modsSpell->hasSetFields(['skillLines']))
                     $mbH = "$['skill']";
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'spell',
                     'data'   => $modsSpell->getListviewData(),
-                    'params' => [
-                        'tabs'        => '$tabsRelated',
+                    'params' => array(
                         'id'          => 'modified-by',
                         'name'        => '$LANG.tab_modifiedby',
                         'visibleCols' => "$['level']",
                         'hiddenCols'  => isset($mbH) ? $mbH : null
-                    ]
+                    )
                 );
 
                 $this->extendGlobalData($modsSpell->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -444,17 +442,16 @@ class SpellPage extends GenericPage
             if (!$saSpells->hasSetFields(['skillLines']))
                 $saH = "$['skill']";
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'spell',
                 'data'   => $data,
-                'params' => [
-                    'tabs'        => '$tabsRelated',
+                'params' => array(
                     'id'          => 'see-also',
                     'name'        => '$LANG.tab_seealso',
                     'visibleCols' => "$['level']",
                     'extraCols'   => isset($saE) ? $saE : null,
                     'hiddenCols'  => isset($saH) ? $saH : null
-                ]
+                )
             );
 
             $this->extendGlobalData($saSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -470,14 +467,13 @@ class SpellPage extends GenericPage
         $ubSets = new ItemsetList($conditions);
         if (!$ubSets->error)
         {
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'itemset',
                 'data'   => $ubSets->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'used-by-itemset',
                     'name' => '$LANG.tab_usedby'
-                ]
+                )
             );
 
             $this->extendGlobalData($ubSets->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -496,14 +492,13 @@ class SpellPage extends GenericPage
         $ubItems = new ItemList($conditions);
         if (!$ubItems->error)
         {
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'item',
                 'data'   => $ubItems->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'used-by-item',
                     'name' => '$LANG.tab_usedby'
-                ]
+                )
             );
 
             $this->extendGlobalData($ubItems->getJSGlobals(GLOBALINFO_SELF));
@@ -519,14 +514,13 @@ class SpellPage extends GenericPage
         $ubObjects = new GameObjectList($conditions);
         if (!$ubObjects->error)
         {
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'object',
                 'data'   => $ubObjects->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'used-by-object',
                     'name' => '$LANG.tab_usedby'
-                ]
+                )
             );
 
             $this->extendGlobalData($ubObjects->getJSGlobals());
@@ -542,14 +536,13 @@ class SpellPage extends GenericPage
         $coAchievemnts = new AchievementList($conditions);
         if (!$coAchievemnts->error)
         {
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'achievement',
                 'data'   => $coAchievemnts->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'criteria-of',
                     'name' => '$LANG.tab_criteriaof'
-                ]
+                )
             );
 
             $this->extendGlobalData($coAchievemnts->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -591,16 +584,15 @@ class SpellPage extends GenericPage
                 }
             }
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'item',
                 'data'   => $lv,
-                'params' => [
-                    'tabs'       => '$tabsRelated',
+                'params' => array(
                     'name'       => '$LANG.tab_contains',
                     'id'         => 'contains',
                     'hiddenCols' => "$['side', 'slot', 'source', 'reqlevel']",
                     'extraCols'  => '$'.json_encode($extraCols, JSON_NUMERIC_CHECk)
-                ]
+                )
             );
         }
 
@@ -652,16 +644,15 @@ class SpellPage extends GenericPage
                     if (!$stacks->hasSetFields(['skillLines']))
                         $sH = "$['skill']";
 
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => 'spell',
                         'data'   => $data,
-                        'params' => [
-                            'tabs'        => '$tabsRelated',
+                        'params' => array(
                             'id'          => 'spell-group-stack',
                             'name'        => 'Stack Group', // todo (med): localize
                             'visibleCols' => "$['stackRules']",
                             'hiddenCols'  => isset($sH) ? $sH : null
-                        ]
+                        )
                     );
 
                     $this->extendGlobalData($stacks->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -705,16 +696,15 @@ class SpellPage extends GenericPage
                 }
             }
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'spell',
                 'data'   => $data,
-                'params' => [
-                    'tabs'        => '$tabsRelated',
+                'params' => array(
                     'id'          => 'spell-link',
                     'name'        => 'Linked with',         // todo (med): localize
                     'hiddenCols'  => "$['skill', 'name']",
                     'visibleCols' => "$['linkedTrigger', 'linkedEffect']"
-                ]
+                )
             );
 
             $this->extendGlobalData($linked->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -732,14 +722,13 @@ class SpellPage extends GenericPage
         $trigger = new SpellList($conditions);
         if (!$trigger->error)
         {
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'spell',
                 'data'   => $trigger->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'triggered-by',
                     'name' => '$LANG.tab_triggeredby'
-                ]
+                )
             );
 
             $this->extendGlobalData($trigger->getJSGlobals(GLOBALINFO_SELF));
@@ -758,14 +747,13 @@ class SpellPage extends GenericPage
         $ubCreature = new CreatureList($conditions);
         if (!$ubCreature->error)
         {
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'creature',
                 'data'   => $ubCreature->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'used-by-npc',
                     'name' => '$LANG.tab_usedby'
-                ]
+                )
             );
 
             $this->extendGlobalData($ubCreature->getJSGlobals(GLOBALINFO_SELF));
@@ -883,14 +871,13 @@ class SpellPage extends GenericPage
                             $_ = array_merge($_, $parents[$_['parentArea']]);
                 }
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'zone',
                     'data'   => $lv,
-                    'params' => [
-                        'tabs'       => '$tabsRelated',
+                    'params' => array(
                         'extraCols'  => $extra ? '$[Listview.extraCols.condition]' : null,
                         'hiddenCols' => $extra ? "$['instancetype']" : null
-                    ]
+                    )
                 );
             }
         }
@@ -916,16 +903,15 @@ class SpellPage extends GenericPage
                     break;
                 }
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'spell',
                     'data'   => $teaches->getListviewData(),
-                    'params' => [
-                        'tabs'        => '$tabsRelated',
+                    'params' => array(
                         'id'          => 'teaches-spell',
                         'name'        => '$LANG.tab_teaches',
                         'visibleCols' => '$'.json_encode($vis),
                         'hiddenCols'  => $hid ? '$'.json_encode($hid) : null
-                    ]
+                    )
                 );
             }
         }
@@ -976,11 +962,10 @@ class SpellPage extends GenericPage
                 if (!$tbTrainer->error)
                 {
                     $this->extendGlobalData($tbTrainer->getJSGlobals());
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => 'creature',
                         'data'   => $tbTrainer->getListviewData(),
                         'params' => array(
-                            'tabs' => '$tabsRelated',
                             'id'   => 'taught-by-npc',
                             'name' => '$LANG.tab_taughtby',
                         )
@@ -1002,14 +987,13 @@ class SpellPage extends GenericPage
         if (!$tbSpell->error)
         {
             $tbsData = $tbSpell->getListviewData();
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'spell',
                 'data'   => $tbsData,
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'taught-by-spell',
                     'name' => '$LANG.tab_taughtby'
-                ]
+                )
             );
 
             $this->extendGlobalData($tbSpell->getJSGlobals(GLOBALINFO_SELF));
@@ -1029,14 +1013,13 @@ class SpellPage extends GenericPage
         $tbQuest = new QuestList($conditions);
         if (!$tbQuest->error)
         {
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'quest',
                 'data'   => $tbQuest->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'reward-from-quest',
                     'name' => '$LANG.tab_rewardfrom'
-                ]
+                )
             );
 
             $this->extendGlobalData($tbQuest->getJSGlobals());
@@ -1055,14 +1038,13 @@ class SpellPage extends GenericPage
         $tbItem = new ItemList($conditions);
         if (!$tbItem->error)
         {
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'item',
                 'data'   => $tbItem->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'taught-by-item',
                     'name' => '$LANG.tab_taughtby'
-                ]
+                )
             );
 
             $this->extendGlobalData($tbItem->getJSGlobals(GLOBALINFO_SELF));

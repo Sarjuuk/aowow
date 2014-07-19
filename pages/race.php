@@ -109,12 +109,10 @@ class RacePage extends GenericPage
         if (!$classes->error)
         {
             $this->extendGlobalData($classes->getJSGlobals());
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'class',
                 'data'   => $classes->getListviewData(),
-                'params' => array(
-                    'tabs' => '$tabsRelated'
-                )
+                'params' => []
             );
         }
 
@@ -128,14 +126,13 @@ class RacePage extends GenericPage
         if (!$tongues->error)
         {
             $this->extendGlobalData($tongues->getJSGlobals());
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'spell',
                 'data'   => $tongues->getListviewData(),
                 'params' => array(
                     'id'          => 'languages',
                     'name'        => '$LANG.tab_languages',
-                    'hiddenCols'  => "$['reagents']",
-                    'tabs'        => '$tabsRelated'
+                    'hiddenCols'  => "$['reagents']"
                 )
             );
         }
@@ -150,14 +147,13 @@ class RacePage extends GenericPage
         if (!$racials->error)
         {
             $this->extendGlobalData($racials->getJSGlobals());
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'spell',
                 'data'   => $racials->getListviewData(),
                 'params' => array(
                     'id'          => 'racial-traits',
                     'name'        => '$LANG.tab_racialtraits',
-                    'hiddenCols'  => "$['reagents']",
-                    'tabs'        => '$tabsRelated'
+                    'hiddenCols'  => "$['reagents']"
                 )
             );
         }
@@ -173,12 +169,10 @@ class RacePage extends GenericPage
         if (!$quests->error)
         {
             $this->extendGlobalData($quests->getJSGlobals());
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'quest',
                 'data'   => $quests->getListviewData(),
-                'params' => array(
-                    'tabs' => '$tabsRelated'
-                )
+                'params' => []
             );
         }
 
@@ -196,13 +190,12 @@ class RacePage extends GenericPage
         if (!$mounts->error)
         {
             $this->extendGlobalData($mounts->getJSGlobals());
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'item',
                 'data'   => $mounts->getListviewData(),
                 'params' => array(
                     'id'         => 'mounts',
                     'name'       => '$LANG.tab_mounts',
-                    'tabs'       => '$tabsRelated',
                     'hiddenCols' => "$['slot', 'type']"
                 )
             );

@@ -111,7 +111,7 @@ class AchievementsPage extends GenericPage
                 $params['_errors'] = '$1';
         }
 
-        $this->lvData = array(
+        $this->lvTabs[] = array(
             'file'   => 'achievement',
             'data'   => $data,
             'params' => $params

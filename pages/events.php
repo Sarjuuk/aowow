@@ -49,19 +49,16 @@ class EventsPage extends GenericPage
             if ($d = $events->getField('requires'))
                 $this->deps[$events->id] = $d;
 
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'event',
             'data'   => $events->getListviewData(),
-            'params' => ['tabs' => '$myTabs']
+            'params' => []
         );
 
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'calendar',
             'data'   => array_filter($events->getListviewData(), function($x) {return $x['id'] > 0;}),
-            'params' => array(
-                'tabs'      => '$myTabs',
-                'hideCount' => 1
-            )
+            'params' => ['hideCount' => 1]
         );
     }
 
@@ -81,7 +78,7 @@ class EventsPage extends GenericPage
     protected function postCache()
     {
         // recalculate dates with now()
-        foreach ($this->lvData as &$views)
+        foreach ($this->lvTabs as &$views)
         {
             foreach ($views['data'] as &$data)
             {

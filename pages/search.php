@@ -146,10 +146,10 @@ class SearchPage extends GenericPage
 
     protected function postCache()
     {
-        if (!empty($this->lvData[3]))                       // has world events
+        if (!empty($this->lvTabs[3]))                       // has world events
         {
             // update WorldEvents to date()
-            foreach ($this->lvData[3]['data'] as &$d)
+            foreach ($this->lvTabs[3]['data'] as &$d)
             {
                 $updated = WorldEventList::updateDates($d['_date']);
                 unset($d['_date']);
@@ -162,12 +162,12 @@ class SearchPage extends GenericPage
         if ($this->searchMask & SEARCH_TYPE_REGULAR)
         {
             $foundTotal = 0;
-            foreach ($this->lvData as $_)
+            foreach ($this->lvTabs as $_)
                 $foundTotal += count($_['data']);
 
             if ($foundTotal == 1)                           // only one match -> redirect to find
             {
-                $_      = array_pop($this->lvData);
+                $_      = array_pop($this->lvTabs);
                 $type   = Util::$typeStrings[$_['type']];
                 $typeId = key($_['data']);
 
@@ -246,7 +246,7 @@ class SearchPage extends GenericPage
 
         if (!$asError)
         {
-            if ($itemData = @$this->lvData[6]['data'])
+            if ($itemData = @$this->lvTabs[6]['data'])
             {
                 $items = [];
                 foreach ($itemData as $k => $v)
@@ -255,7 +255,7 @@ class SearchPage extends GenericPage
                 $outItems = "\t".implode(",\n\t", $items)."\n";
             }
 
-            if ($setData = @$this->lvData[5]['data'])
+            if ($setData = @$this->lvTabs[5]['data'])
             {
                 $sets = [];
                 foreach ($setData as $k => $v)
@@ -282,13 +282,13 @@ class SearchPage extends GenericPage
         $names      = [];
         $info       = [];
 
-        foreach ($this->lvData as $_)
+        foreach ($this->lvTabs as $_)
             $foundTotal += $_['matches'];
 
         if (!$foundTotal || $asError)
             return '["'.Util::jsEscape($this->search).'", []]';
 
-        foreach ($this->lvData as $idx => $set)
+        foreach ($this->lvTabs as $idx => $set)
         {
             $max = max(1, intVal($limit * $set['matches'] / $foundTotal));
             $limit -= $max;
@@ -365,7 +365,7 @@ class SearchPage extends GenericPage
         foreach ($this->searches as $idx => $ref)
             if ($this->searchMask & (1 << $idx))
                 if ($_ = $this->$ref[0]($cndBase, $shared))
-                    $this->lvData[$idx] = $_;
+                    $this->lvTabs[$idx] = $_;
     }
 
     private function _searchCharClass($cndBase)             // 0 Classes: $searchMask & 0x00000001
@@ -386,7 +386,7 @@ class SearchPage extends GenericPage
                 'matches'  => $classes->getMatches(),
                 'file'     => CharClassList::$brickFile,
                 'data'     => $data,
-                'params'   => ['tabs' => '$myTabs']
+                'params'   => []
             );
 
             if ($classes->getMatches() > $this->maxResults)
@@ -417,7 +417,7 @@ class SearchPage extends GenericPage
                 'matches'  => $races->getMatches(),
                 'file'     => CharRaceList::$brickFile,
                 'data'     => $data,
-                'params'   => ['tabs' => '$myTabs']
+                'params'   => []
             );
 
             if ($races->getMatches() > $this->maxResults)
@@ -448,7 +448,7 @@ class SearchPage extends GenericPage
                 'matches'  => $titles->getMatches(),
                 'file'     => TitleList::$brickFile,
                 'data'     => $data,
-                'params'   => ['tabs' => '$myTabs']
+                'params'   => []
             );
 
             if ($titles->getMatches() > $this->maxResults)
@@ -486,7 +486,7 @@ class SearchPage extends GenericPage
                 'matches'  => $wEvents->getMatches(),
                 'file'     => WorldEventList::$brickFile,
                 'data'     => $data,
-                'params'   => ['tabs' => '$myTabs']
+                'params'   => []
             );
 
             if ($wEvents->getMatches() > $this->maxResults)
@@ -517,7 +517,7 @@ class SearchPage extends GenericPage
                 'matches'  => $money->getMatches(),
                 'file'     => CurrencyList::$brickFile,
                 'data'     => $data,
-                'params'   => ['tabs' => '$myTabs']
+                'params'   => []
             );
 
             if ($money->getMatches() > $this->maxResults)
@@ -551,7 +551,7 @@ class SearchPage extends GenericPage
                 'matches'  => $sets->getMatches(),
                 'file'     => ItemsetList::$brickFile,
                 'data'     => $data,
-                'params'   => ['tabs' => '$myTabs'],
+                'params'   => [],
             );
 
             $shared['pcsToSet'] = $sets->pieceToSet;
@@ -625,7 +625,7 @@ class SearchPage extends GenericPage
                 'matches'  => $items->getMatches(),
                 'file'     => ItemList::$brickFile,
                 'data'     => $data,
-                'params'   => ['tabs' => '$myTabs']
+                'params'   => []
             );
 
             if ($items->getMatches() > $this->maxResults)
@@ -681,7 +681,6 @@ class SearchPage extends GenericPage
                 'data'     => $data,
                 'params'   => [
                     'id'          => 'abilities',
-                    'tabs'        => '$myTabs',
                     'name'        => '$LANG.tab_abilities',
                     'visibleCols' => '$'.json_encode($vis)
                 ]
@@ -737,7 +736,6 @@ class SearchPage extends GenericPage
                 'data'     => $data,
                 'params'   => [
                     'id'          => 'talents',
-                    'tabs'        => '$myTabs',
                     'name'        => '$LANG.tab_talents',
                     'visibleCols' => '$'.json_encode($vis)
                 ]
@@ -784,7 +782,6 @@ class SearchPage extends GenericPage
                 'data'     => $data,
                 'params'   => [
                     'id'          => 'glyphs',
-                    'tabs'        => '$myTabs',
                     'name'        => '$LANG.tab_glyphs',
                     'visibleCols' => "$['singleclass', 'glyphtype']"
                 ]
@@ -831,7 +828,6 @@ class SearchPage extends GenericPage
                 'data'     => $data,
                 'params'   => [
                     'id'          => 'proficiencies',
-                    'tabs'        => '$myTabs',
                     'name'        => '$LANG.tab_proficiencies',
                     'visibleCols' => "$['classes']"
                 ]
@@ -878,7 +874,6 @@ class SearchPage extends GenericPage
                 'data'     => $data,
                 'params'   => [
                     'id'          => 'professions',
-                    'tabs'        => '$myTabs',
                     'name'        => '$LANG.tab_professions',
                     'visibleCols' => "$['source', 'reagents']"
                 ]
@@ -925,7 +920,6 @@ class SearchPage extends GenericPage
                 'data'     => $data,
                 'params'   => [
                     'id'          => 'companions',
-                    'tabs'        => '$myTabs',
                     'name'        => '$LANG.tab_companions',
                     'visibleCols' => "$['reagents']"
                 ]
@@ -972,7 +966,6 @@ class SearchPage extends GenericPage
                 'data'     => $data,
                 'params'   => [
                     'id'   => 'mounts',
-                    'tabs' => '$myTabs',
                     'name' => '$LANG.tab_mounts',
                 ]
             );
@@ -1012,7 +1005,6 @@ class SearchPage extends GenericPage
                 'data'     => $data,
                 'params'   => [
                     'id'   => 'npcs',
-                    'tabs' => '$myTabs',
                     'name' => '$LANG.tab_npcs',
                 ]
             );
@@ -1052,7 +1044,7 @@ class SearchPage extends GenericPage
                 'matches'  => $quests->getMatches(),
                 'file'     => QuestList::$brickFile,
                 'data'     => $data,
-                'params'   => ['tabs' => '$myTabs']
+                'params'   => []
             );
 
             if ($quests->getMatches() > $this->maxResults)
@@ -1095,7 +1087,6 @@ class SearchPage extends GenericPage
                 'file'     => AchievementList::$brickFile,
                 'data'     => $data,
                 'params'   => [
-                    'tabs'        => '$myTabs',
                     'visibleCols' => "$['category']"
                 ]
             );
@@ -1135,7 +1126,6 @@ class SearchPage extends GenericPage
                 'file'     => AchievementList::$brickFile,
                 'data'     => $data,
                 'params'   => [
-                    'tabs'        => '$myTabs',
                     'visibleCols' => "$['category']",
                     'hiddenCols'  => "$['side', 'points', 'rewards']",
                     'name'        => '$LANG.tab_statistics',
@@ -1175,9 +1165,7 @@ class SearchPage extends GenericPage
                 'matches'  => $zones->getMatches(),
                 'file'     => ZoneList::$brickFile,
                 'data'     => $data,
-                'params'   => [
-                    'tabs' => '$myTabs'
-                ]
+                'params'   => []
             );
 
             if ($zones->getMatches() > $this->maxResults)
@@ -1207,9 +1195,7 @@ class SearchPage extends GenericPage
                 'matches'  => $objects->getMatches(),
                 'file'     => GameObjectList::$brickFile,
                 'data'     => $data,
-                'params'   => [
-                    'tabs' => '$myTabs'
-                ]
+                'params'   => []
             );
 
             if ($objects->getMatches() > $this->maxResults)
@@ -1241,9 +1227,7 @@ class SearchPage extends GenericPage
                 'matches'  => $factions->getMatches(),
                 'file'     => FactionList::$brickFile,
                 'data'     => $data,
-                'params'   => [
-                    'tabs' => '$myTabs'
-                ]
+                'params'   => []
             );
 
             if ($factions->getMatches() > $this->maxResults)
@@ -1274,9 +1258,7 @@ class SearchPage extends GenericPage
                 'matches'  => $skills->getMatches(),
                 'file'     => SkillList::$brickFile,
                 'data'     => $data,
-                'params'   => [
-                    'tabs' => '$myTabs'
-                ]
+                'params'   => []
             );
 
             if ($skills->getMatches() > $this->maxResults)
@@ -1307,7 +1289,7 @@ class SearchPage extends GenericPage
                 'matches'  => $pets->getMatches(),
                 'file'     => PetList::$brickFile,
                 'data'     => $data,
-                'params'   => ['tabs' => '$myTabs']
+                'params'   => []
             );
 
             if ($pets->getMatches() > $this->maxResults)
@@ -1346,7 +1328,6 @@ class SearchPage extends GenericPage
                 'data'     => $data,
                 'params'   => [
                     'id'          => 'npc-abilities',
-                    'tabs'        => '$myTabs',
                     'name'        => '$LANG.tab_npcabilities',
                     'visibleCols' => "$['level']",
                     'hiddenCols'  => "$['skill']"
@@ -1393,7 +1374,6 @@ class SearchPage extends GenericPage
                 'file'     => SpellList::$brickFile,
                 'data'     => $data,
                 'params'   => [
-                    'tabs'        => '$myTabs',
                     'name'        => '$LANG.tab_uncategorizedspells',
                     'visibleCols' => "$['level']",
                     'hiddenCols'  => "$['skill']",

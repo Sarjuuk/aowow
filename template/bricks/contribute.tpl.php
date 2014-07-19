@@ -1,3 +1,4 @@
+<div class="clear"></div>
 <div class="text">
 <h2><?php echo Lang::$main['contribute']; ?></h2>
 </div>
@@ -17,4 +18,3 @@
         tabsContribute.add(LANG.tab_suggestavideo, {id: 'suggest-a-video'});
     tabsContribute.flush();
 </script>
-<div class="clear"></div>

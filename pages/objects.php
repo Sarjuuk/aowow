@@ -64,7 +64,7 @@ class ObjectsPage extends GenericPage
                 $params['_errors'] = '$1';
         }
 
-        $this->lvData = array(
+        $this->lvTabs[] = array(
             'file'   => 'object',
             'data'   => $data,
             'params' => $params

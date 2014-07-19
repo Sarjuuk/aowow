@@ -97,15 +97,14 @@ class TitlePage extends GenericPage
                         $quests = new QuestList(array(['id', $entries]));
                         $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_REWARDS));
 
-                        $this->lvData[] = array(
+                        $this->lvTabs[] = array(
                             'file'   => 'quest',
                             'data'   => $quests->getListviewData(),
                             'params' => array(
                                 'id'          => 'reward-from-quest',
                                 'name'        => '$LANG.tab_rewardfrom',
                                 'hiddenCols'  => "$['experience', 'money']",
-                                'visibleCols' => "$['category']",
-                                'tabs'        => '$tabsRelated'
+                                'visibleCols' => "$['category']"
                             )
                         );
                         break;
@@ -113,15 +112,14 @@ class TitlePage extends GenericPage
                         $acvs = new AchievementList(array(['id', $entries]));
                         $this->extendGlobalData($acvs->getJSGlobals());
 
-                        $this->lvData[] = array(
+                        $this->lvTabs[] = array(
                             'file'   => 'achievement',
                             'data'   => $acvs->getListviewData(),
                             'params' => array(
                                 'id'          => 'reward-from-achievement',
                                 'name'        => '$LANG.tab_rewardfrom',
                                 'visibleCols' => "$['category']",
-                                'sort'        => "$['reqlevel', 'name']",
-                                'tabs'        => '$tabsRelated'
+                                'sort'        => "$['reqlevel', 'name']"
                             )
                         );
                         break;

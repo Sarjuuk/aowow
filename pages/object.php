@@ -270,14 +270,13 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($summons->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'spell',
                 'data'   => $summons->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'id'   => 'summoned-by',
                     'name' => '$LANG.tab_summonedby'
-                ]
+                )
             );
         }
 
@@ -293,16 +292,15 @@ class ObjectPage extends GenericPage
                 foreach ($data as $relId => $d)
                     $data[$relId]['trigger'] = array_search($relId, $_);
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'spell',
                     'data'   => $data,
-                    'params' => [
-                        'tabs'       => '$tabsRelated',
+                    'params' => array(
                         'id'         => 'spells',
                         'name'       => '$LANG.tab_spells',
                         'hiddenCols' => "$['skill']",
                         'extraCols'  => "$[Listview.funcBox.createSimpleCol('trigger', 'Condition', '10%', 'trigger')]"
-                    ]
+                    )
                 );
             }
         }
@@ -313,14 +311,13 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'achievement',
                 'data'   => $acvs->getListviewData(),
-                'params' => [
-                    'tabs'       => '$tabsRelated',
-                    'id'         => 'criteria-of',
-                    'name'       => '$LANG.tab_criteriaof'
-                ]
+                'params' => array(
+                    'id'   => 'criteria-of',
+                    'name' => '$LANG.tab_criteriaof'
+                )
             );
         }
 
@@ -344,27 +341,25 @@ class ObjectPage extends GenericPage
 
             if ($_[0])
             {
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'quest',
                     'data'   => $_[0],
-                    'params' => [
-                        'tabs' => '$tabsRelated',
+                    'params' => array(
                         'name' => '$LANG.tab_starts',
                         'id'   => 'starts'
-                    ]
+                    )
                 );
             }
 
             if ($_[1])
             {
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'quest',
                     'data'   => $_[1],
-                    'params' => [
-                        'tabs' => '$tabsRelated',
+                    'params' => array(
                         'name' => '$LANG.tab_ends',
                         'id'   => 'ends'
-                    ]
+                    )
                 );
             }
         }
@@ -377,14 +372,13 @@ class ObjectPage extends GenericPage
             {
                 $this->extendGlobalData($relQuest->getJSGlobals());
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'quest',
                     'data'   => $relQuest->getListviewData(),
-                    'params' => [
-                        'tabs' => '$tabsRelated',
+                    'params' => array(
                         'name' => '$LANG.tab_quests',
                         'id'   => 'quests'
-                    ]
+                    )
                 );
             }
         }
@@ -420,16 +414,15 @@ class ObjectPage extends GenericPage
 
                 $extraCols[] = 'Listview.extraCols.percent';
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'item',
                     'data'   => $goLoot->getResult(),
-                    'params' => [
-                        'tabs'       => '$tabsRelated',
+                    'params' => array(
                         'name'       => '$LANG.tab_contains',
                         'id'         => 'contains',
                         'extraCols'  => "$[".implode(', ', array_unique($extraCols))."]",
                         'hiddenCols' => $hiddenCols ? '$'.json_encode(array_values($hiddenCols)) : null
-                    ]
+                    )
                 );
             }
         }
@@ -464,14 +457,13 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($sameModel->getJSGlobals());
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'object',
                 'data'   => $sameModel->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'name' => '$LANG.tab_samemodelas',
                     'id'   => 'same-model-as'
-                ]
+                )
             );
         }
     }

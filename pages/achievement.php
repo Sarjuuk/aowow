@@ -183,14 +183,13 @@ class AchievementPage extends GenericPage
             ['id', $this->typeId, '!']
         );
         $saList = new AchievementList($conditions);
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'achievement',
             'data'   => $saList->getListviewData(),
             'params' => array(
                 'id'          => 'see-also',
                 'name'        => '$LANG.tab_seealso',
-                'visibleCols' => "$['category']",
-                'tabs'        => '$tabsRelated'
+                'visibleCols' => "$['category']"
             )
         );
         $this->extendGlobalData($saList->getJSGlobals());
@@ -203,14 +202,13 @@ class AchievementPage extends GenericPage
         if (!empty($refs))
         {
             $coList = new AchievementList(array(['id', $refs]));
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'achievement',
                 'data'   => $coList->getListviewData(),
                 'params' => array(
                     'id'          => 'criteria-of',
                     'name'        => '$LANG.tab_criteriaof',
-                    'visibleCols' => "$['category']",
-                    'tabs'        => '$tabsRelated'
+                    'visibleCols' => "$['category']"
                 )
             );
             $this->extendGlobalData($coList->getJSGlobals());

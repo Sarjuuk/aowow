@@ -296,25 +296,23 @@ class NpcPage extends GenericPage
                 }
 
                 if ($normal)
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => 'spell',
                         'data'   => $normal,
-                        'params' => [
-                            'tabs'        => '$tabsRelated',
-                            'name'        => '$LANG.tab_abilities',
-                            'id'          => 'abilities'
-                        ]
+                        'params' => array(
+                            'name' => '$LANG.tab_abilities',
+                            'id'   => 'abilities'
+                        )
                     );
 
                 if ($controled)
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => 'spell',
                         'data'   => $controled,
-                        'params' => [
-                            'tabs'        => '$tabsRelated',
-                            'name'        => '$LANG.tab_controlledabilities',
-                            'id'          => 'controlled-abilities'
-                        ]
+                        'params' => array(
+                            'name' => '$LANG.tab_controlledabilities',
+                            'id'   => 'controlled-abilities'
+                        )
                     );
             }
         }
@@ -332,14 +330,13 @@ class NpcPage extends GenericPage
         {
             $this->extendGlobalData($summoned->getJSGlobals());
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'spell',
                 'data'   => $summoned->getListviewData(),
-                'params' => [
-                    'tabs'      => '$tabsRelated',
+                'params' => array(
                     'name'      => '$LANG.tab_summonedby',
                     'id'        => 'summoned-by'
-                ]
+                )
             );
         }
 
@@ -385,16 +382,15 @@ class NpcPage extends GenericPage
                             $data[$sId]['trainingcost'] = $_;
                     }
 
-                    $this->lvData[] = array(
+                    $this->lvTabs[] = array(
                         'file'   => 'spell',
                         'data'   => $data,
-                        'params' => [
-                            'tabs'        => '$tabsRelated',
+                        'params' => array(
                             'name'        => '$LANG.tab_teaches',
                             'id'          => 'teaches',
                             'visibleCols' => "$['trainingcost']",
                             'extraCols'   => $extra ? '$['.implode(', ', $extra).']' : null
-                        ]
+                        )
                     );
                 }
             }
@@ -410,15 +406,14 @@ class NpcPage extends GenericPage
             {
                 $this->extendGlobalData($soldItems->getJSGlobals());
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'item',
                     'data'   => $soldItems->getListviewData(ITEMINFO_VENDOR, [TYPE_NPC => $this->typeId]),
-                    'params' => [
-                        'tabs'      => '$tabsRelated',
+                    'params' => array(
                         'name'      => '$LANG.tab_sells',
                         'id'        => 'currency-for',
                         'extraCols' => "$[Listview.extraCols.condition, Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]"
-                    ]
+                    )
                 );
             }
         }
@@ -488,18 +483,17 @@ class NpcPage extends GenericPage
                     $lv['condition'][] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
                 }
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'item',
                     'data'   => $creatureLoot->getResult(),
-                    'params' => [
-                        'tabs'        => '$tabsRelated',
+                    'params' => array(
                         'name'        => $sf[2],
                         'id'          => $sf[3],
                         'extraCols'   => $sf[4] ? "$[".implode(', ', array_unique($sf[4]))."]" : null,
                         'hiddenCols'  => $sf[5] ? "$".json_encode($sf[5]) : null,
                         'visibleCols' => $sf[6] ? '$'.json_encode($sf[6]) : null,
                         'sort'        => "$['-percent', 'name']",
-                    ]
+                    )
                 );
             }
         }
@@ -548,27 +542,25 @@ class NpcPage extends GenericPage
 
             if ($_[0])
             {
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'quest',
                     'data'   => $_[0],
-                    'params' => [
-                        'tabs' => '$tabsRelated',
+                    'params' => array(
                         'name' => '$LANG.tab_starts',
                         'id'   => 'starts'
-                    ]
+                    )
                 );
             }
 
             if ($_[1])
             {
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => 'quest',
                     'data'   => $_[1],
-                    'params' => [
-                        'tabs' => '$tabsRelated',
+                    'params' => array(
                         'name' => '$LANG.tab_ends',
                         'id'   => 'ends'
-                    ]
+                    )
                 );
             }
         }
@@ -587,14 +579,13 @@ class NpcPage extends GenericPage
         {
             $this->extendGlobalData($objectiveOf->getJSGlobals());
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'quest',
                 'data'   => $objectiveOf->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'name' => '$LANG.tab_objectiveof',
                     'id'   => 'objective-of'
-                ]
+                )
             );
         }
 
@@ -609,14 +600,13 @@ class NpcPage extends GenericPage
         {
             $this->extendGlobalData($crtOf->getJSGlobals());
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'achievement',
                 'data'   => $crtOf->getListviewData(),
-                'params' => [
-                    'tabs' => '$tabsRelated',
+                'params' => array(
                     'name' => '$LANG.tab_criteriaof',
                     'id'   => 'criteria-of'
-                ]
+                )
             );
         }
     }

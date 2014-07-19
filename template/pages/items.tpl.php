@@ -20,7 +20,6 @@ endif;
 
             <div id="fi" style="display: <?php echo empty($f['query']) ? 'none' : 'block' ?>;">
                 <form action="?items<?php echo $this->subCat; ?>&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
-
                     <div class="rightpanel">
                         <div style="float: left"><?php echo Lang::$item['_quality'].Lang::$main['colon']; ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['qu[]'].selectedIndex = -1; return false" onmousedown="return false"><?php echo Lang::$main['clear']; ?></a></small>
@@ -193,31 +192,7 @@ endforeach;
 ?>
             //]]></script>
 
-<?php
-if ($this->hasGroupedTabs):
-    echo "            <div id=\"tabs-generic\"></div>\n";
-endif;
-?>
-            <div id="lv-generic" class="listview"></div>
-            <script type="text/javascript">//<![CDATA[
-<?php
-if (!empty($this->gemScores)):
-    echo "                var fi_gemScores = ".json_encode($this->gemScores, JSON_NUMERIC_CHECK).";\n";
-endif;
-
-if ($this->hasGroupedTabs):
-    echo "                var tabsGroups = new Tabs({parent: \$WH.ge('tabs-generic')});\n";
-endif;
-
-foreach ($this->lvData as $tab):
-    $this->lvBrick('item', ['data' => $tab['data'], 'params' => $tab['params']]);
-endforeach;
-
-if ($this->hasGroupedTabs):
-    echo "                tabsGroups.flush();\n";
-endif;
-?>
-            //]]></script>
+<?php $this->brick('lvTabs'); ?>
 
             <div class="clear"></div>
         </div><!-- main-contents -->

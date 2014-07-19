@@ -41,7 +41,7 @@ class PetsPage extends GenericPage
             if (!$pets->hasDiffFields(['type']))
                 $params['hiddenCols'] = "$['type']";
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'pet',
                 'data'   => $pets->getListviewData(),
                 'params' => $params

@@ -11,7 +11,7 @@ class ProfilePage extends GenericPage
     protected $path         = [1, 5, 1];
     protected $tabId        = 1;
     protected $tpl          = 'profile';
-    protected $reqDataKey   = true;
+    protected $gDataKey     = true;
     protected $js           = ['filters.js', 'TalentCalc.js', 'swfobject.js', 'profile_all.js', 'profile.js', 'Profiler.js'];
     protected $css          = array(
         ['path' => 'TalentCalc.css'],

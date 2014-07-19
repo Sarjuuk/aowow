@@ -106,13 +106,10 @@ class EventPage extends GenericPage
                 foreach ($data as &$d)
                     $d['method'] = $npcIds[$d['id']];
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => CreatureList::$brickFile,
                     'data'   => $data,
-                    'params' => array(
-                        'tabs' => '$tabsRelated',
-                        'note' => $hasFilter ? sprintf(Util::$filterResultString, '?npcs&filter=cr=38;crs='.$this->hId.';crv=0') : null
-                    )
+                    'params' => ['note' => $hasFilter ? sprintf(Util::$filterResultString, '?npcs&filter=cr=38;crs='.$this->hId.';crv=0') : null]
                 );
             }
         }
@@ -127,13 +124,10 @@ class EventPage extends GenericPage
                 foreach ($data as &$d)
                     $d['method'] = $objectIds[$d['id']];
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => GameObjectList::$brickFile,
                     'data'   => $data,
-                    'params' => array(
-                        'tabs' => '$tabsRelated',
-                        'note' => $hasFilter ? sprintf(Util::$filterResultString, '?objects&filter=cr=16;crs='.$this->hId.';crv=0') : null
-                    )
+                    'params' => ['note' => $hasFilter ? sprintf(Util::$filterResultString, '?objects&filter=cr=16;crs='.$this->hId.';crv=0') : null]
                 );
             }
         }
@@ -147,11 +141,10 @@ class EventPage extends GenericPage
             {
                 $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => AchievementList::$brickFile,
                     'data'   => $acvs->getListviewData(),
                     'params' => array(
-                        'tabs'        => '$tabsRelated',
                         'note'        => $hasFilter ? sprintf(Util::$filterResultString, '?achievements&filter=cr=11;crs='.$this->hId.';crv=0') : null,
                         'visibleCols' => "$['category']"
                     )
@@ -173,13 +166,10 @@ class EventPage extends GenericPage
             {
                 $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => QuestList::$brickFile,
                     'data'   => $quests->getListviewData(),
-                    'params' => array(
-                        'tabs' => '$tabsRelated',
-                        'note' => $hasFilter ? sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$this->hId.';crv=0') : null
-                    )
+                    'params' => ['note' => $hasFilter ? sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$this->hId.';crv=0') : null]
                 );
 
                 $questItems = [];
@@ -212,13 +202,10 @@ class EventPage extends GenericPage
             {
                 $this->extendGlobalData($eventItems->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => ItemList::$brickFile,
                     'data'   => $eventItems->getListviewData(),
-                    'params' => array(
-                        'tabs' => '$tabsRelated',
-                        'note' => $hasFilter ? sprintf(Util::$filterResultString, '?items&filter=cr=160;crs='.$this->hId.';crv=0') : null
-                    )
+                    'params' => ['note' => $hasFilter ? sprintf(Util::$filterResultString, '?items&filter=cr=160;crs='.$this->hId.';crv=0') : null]
                 );
             }
         }
@@ -266,13 +253,12 @@ class EventPage extends GenericPage
                     $relData = array_merge($relData, $d);
                 }
 
-                $this->lvData[] = array(
+                $this->lvTabs[] = array(
                     'file'   => WorldEventList::$brickFile,
                     'data'   => $relData,
                     'params' => array(
                         'id'         => 'see-also',
                         'name'       => '$LANG.tab_seealso',
-                        'tabs'       => '$tabsRelated',
                         'hiddenCols' => "$['date']",
                         'extraCols'  => '$[Listview.extraCols.condition]'
                     )
@@ -312,7 +298,7 @@ class EventPage extends GenericPage
         /* finalize related events */
         /***************************/
 
-        foreach($this->lvData as &$view)
+        foreach($this->lvTabs as &$view)
         {
             if ($view['file'] !=  WorldEventList::$brickFile)
                 continue;
@@ -327,8 +313,6 @@ class EventPage extends GenericPage
             }
 
         }
-
-
     }
 }
 

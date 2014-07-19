@@ -56,7 +56,7 @@ class FactionsPage extends GenericPage
         if (!$factions->error)
             $data = $factions->getListviewData();
 
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'faction',
             'data'   => $data,
             'params' => []

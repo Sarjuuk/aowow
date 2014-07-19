@@ -83,11 +83,12 @@ $this->brick('book');
             </div>
 
 <?php
-    $this->brick('tabsRelated');
+    $this->brick('lvTabs', ['relTabs' => true]);
 
     $this->brick('contribute');
 ?>
 
+            <div class="clear"></div>
         </div><!-- main-contents -->
     </div><!-- main -->
 

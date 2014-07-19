@@ -46,7 +46,7 @@ class TitlesPage extends GenericPage
             if (!$titles->hasAnySource())
                 $params['hiddenCols'] = "$['source']";
 
-            $this->lvData[] = array(
+            $this->lvTabs[] = array(
                 'file'   => 'title',
                 'data'   => $titles->getListviewData(),
                 'params' => $params

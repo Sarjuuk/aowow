@@ -33,7 +33,7 @@ class CurrenciesPage extends GenericPage
             $conditions[] = ['category', (int)$this->category[0]];
 
         $money = new CurrencyList($conditions);
-        $this->lvData[] = array(
+        $this->lvTabs[] = array(
             'file'   => 'currency',
             'data'   => $money->getListviewData(),
             'params' => []

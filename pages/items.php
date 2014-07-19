@@ -93,7 +93,6 @@ class ItemsPage extends GenericPage
     protected function generateContent()
     {
         $this->addJS('?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
-        $this->hasGroupedTabs = false;
 
         $conditions = [];
 
@@ -237,7 +236,7 @@ class ItemsPage extends GenericPage
                 if ($groups)
                 {
                     $nameSource = Lang::$item['inventoryType'];
-                    $this->hasGroupedTabs = true;
+                    $this->forceTabs = true;
                     $gbField = 'slot';
                 }
 
@@ -263,7 +262,7 @@ class ItemsPage extends GenericPage
                     $groups[] = $l;                         // push last value as negativ to signal misc group after $this level
                     $extraOpts = ['i' => ['o' => ['itemlevel DESC']]];
                     $nameSource[$l] = Lang::$item['tabOther'];
-                    $this->hasGroupedTabs = true;
+                    $this->forceTabs = true;
                     $gbField = 'itemlevel';
                 }
 
@@ -275,7 +274,7 @@ class ItemsPage extends GenericPage
                 });
 
                 $nameSource = Lang::$game['sources'];
-                $this->hasGroupedTabs = true;
+                $this->forceTabs = true;
                 $gbField = 'source';
 
                 break;
@@ -299,6 +298,7 @@ class ItemsPage extends GenericPage
 
             $this->extendGlobalData($items->getJSGlobals());
             $tab = array(
+                'file'   => 'item',
                 'data'   => $items->getListviewData($infoMask),
                 'params' => $this->sharedLV
             );
@@ -396,7 +396,7 @@ class ItemsPage extends GenericPage
             if ($gbField)
                 $tab['params']['hideCount'] = '$1';
 
-            $this->lvData[] = $tab;
+            $this->lvTabs[] = $tab;
         }
 
         // reformat for use in template
@@ -404,8 +404,8 @@ class ItemsPage extends GenericPage
             $this->filter['upg'] = implode(':', array_keys($this->filter['upg']));
 
         // whoops, we have no data? create emergency content
-        if (!$this->lvData)
-            $this->lvData[] = ['data' => [], 'params' => []];
+        if (empty($this->lvTabs))
+            $this->lvTabs[] = ['file' => 'item', 'data' => [], 'params' => []];
 
         // sort for dropdown-menus
         asort(Lang::$game['ra']);

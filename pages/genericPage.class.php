@@ -8,6 +8,7 @@ trait DetailPage
 {
     protected $hasComContent = true;
     protected $category      = null;                        // not used on detail pages
+    protected $lvTabs        = [];                          // most pages have this
 
     private   $subject       = null;                        // so it will not get cached
 
@@ -30,6 +31,7 @@ trait ListPage
     protected $category  = null;
     protected $typeId    = 0;
     protected $filter    = [];
+    protected $lvTabs    = [];                              // most pages have this
 
     private   $filterObj = null;
 
