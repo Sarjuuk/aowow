@@ -102,12 +102,21 @@ $lang = array(
         'chooseClass'   => "Escoge una clase",
         'chooseFamily'  => "Escoge una familia de mascota",
 
+        // profiler
+        'realm'         => "Reino",
+        'region'        => "Región",
+
         // help
         'help'          => "Ayuda",
         'helpTopics'    => array(
             "Los comentarios y tú",                 "Visualizador de modelos",              "Capturas de pantalla: Sugerencias y trucos", "Medición de atributos",
             "Calculadora de talentos",              "Comparación de objetos",               "Perfiles"
-        )
+        ),
+
+        // formating
+        'colon'         => ': ',
+        'dateFmtShort'  => "d/m/Y",
+        'dateFmtLong'   => "d/m/Y \a \l\a\s H:i"
     ),
     'search' => array(
         'search'        => "Búsqueda",
@@ -232,7 +241,85 @@ $lang = array(
             "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
         ),
     ),
-    'account'  => [],
+    'account' => array(
+        'title'         => "Cuenta de Aowow",
+        'email'         => "Dirección de correo electrónico",
+        'continue'      => "Continuar",
+        'groups'        => array(
+            -1 => "Ninguno",                "Probador",                     "Administrador",                "Editor",                       "Moderador",                    "Burócrata",
+            "Desarrollador",                "VIP",                          "Bloggor",                      "Premium",                      "Traductor",                    "Agente de ventas",
+            "Gestor de Capturas de pantalla","Gestor de vídeos"
+        ),
+
+        // signIn
+        'doSignIn'      => "Iniciar sesión con tu cuenta de Aowow",
+        'signIn'        => "Iniciar sesión",
+        'user'          => "Nombre de usuario",
+        'pass'          => "Contraseña",
+        'rememberMe'    => "Seguir conectado",
+        'forgot'        => "Se me olvidó mi",
+        'forgotUser'    => "Nombre de usuario",
+        'forgotPass'    => "Contraseña",
+        'accCreate '    => '¿No tienes una cuenta? <a href="?account=signup">¡Crea una ahora!</a>',
+
+        // recovery
+        'recoverUser'   => "Pedir nombre de usuario",
+        'recoverPass'   => "Reiniciar contraseña: Paso %s de 2",
+        'newPass'       => "New Password",
+
+        // creation
+        'register'      => "Inscripción: Paso %s de 2",
+        'passConfirm'   => "Confirmar contraseña",
+
+        // dashboard
+        'ipAddress'     => "IP-Adress",
+        'lastIP'        => "last used IP",
+        'joinDate'      => "Joined",
+        'lastLogin'     => "Last visit",
+        'userGroups'    => "Role",
+        'myAccount'     => "My Account",
+        'editAccount'   => "Simply use the forms below to update your account information",
+        'publicDesc'    => "Public Description",
+        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+
+        // bans
+        'accBanned'     => "This Account was closed",
+        'bannedBy'      => "Banned by",
+        'ends'          => "Ends on",
+        'permanent'     => "The ban is permanent",
+        'reason'        => "Reason",
+        'noReason'      => "No reason was given.",
+
+        // form-text
+        'emailInvalid'  => "Esa dirección de correo electrónico no es válida.", // message_emailnotvalid
+        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
+        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
+        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
+        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
+        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
+        'userNotFound'  => "The username you entered does not exists.",
+        'wrongPass'     => "That password is not vaild.",
+        'accInactive'   => "That account has not yet been confirmed active.",
+        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
+        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+        'errNameLength' => "Tu nombre de usuario tiene que tener por lo menos cuatro caracteres.", // message_usernamemin
+        'errNameChars'  => "Tu nombre de usuario solo puede contener números y letras.", // message_usernamenotvalid
+        'errPassLength' => "Tu contraseña tiene que tener por lo menos seis caracteres.", // message_passwordmin
+        'passMismatch'  => "The passwords you entered do not match.",
+        'nameInUse'     => "That username is already taken.",
+        'mailInUse'     => "That email is already registered to an account.",
+        'intError'      => "An internal error occured.",
+        'intError2'     => "An internal error occured. (%s)",
+        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
+        'passCheckFail' => "Las contraseñas no son iguales.", // message_passwordsdonotmatch
+        'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a Su contraseña anterior." // message_newpassdifferent
+    ),
+    'mail' => array(
+        'tokenExpires'  => "This token expires in %s.",
+        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+    ),
     'gameObject' => array(
         'cat'           => [0 => "Otros", 9 => "Libros", 3 => "Contenedores", -5 => "Cofres", 25 => "Bancos de peces", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas"],
         'type'          => [              9 => "Libro",  3 => "Contenedore",  -5 => "Cofre",  25 => "",                -3 => "Hierba",  -4 => "Filóne de mineral",  -2 => "Misión",   -6 => ""],
@@ -376,7 +463,74 @@ $lang = array(
             83 => "Legendaria",         84 => "Escolta",            85 => "Heroica",            88 => "Banda (10)",         89 => "Banda (25)"
         ),
         'cat'           => array(
-            // todo: after zones
+            0 => array( "Reinos del Este",
+                3430 => "Bosque Canción Eterna",         130 => "Bosque de Argénteos",            12 => "Bosque de Elwynn",               10 => "Bosque del Ocaso",             3487 => "Ciudad de Lunargenta",
+                1519 => "Ciudad de Ventormenta",          85 => "Claros de Tirisfal",            279 => "Cráter de Dalaran",               1 => "Dun Morogh",                   1497 => "Entrañas",
+                1537 => "Forjaz",                       4080 => "Isla de Quel'Danas",             51 => "La Garganta de Fuego",          267 => "Laderas de Trabalomas",          46 => "Las Estepas Ardientes",
+                   4 => "Las Tierras Devastadas",         38 => "Loch Modan",                     11 => "Los Humedales",                  25 => "Montaña Roca Negra",             44 => "Montañas Crestagrana",
+                  36 => "Montañas de Alterac",             8 => "Pantano de las Penas",           41 => "Paso de la Muerte",              40 => "Páramos de Poniente",            45 => "Tierras Altas de Arathi",
+                3433 => "Tierras Fantasma",                3 => "Tierras Inhóspitas",            139 => "Tierras de la Peste del Este",   28 => "Tierras de la Peste del Oeste",4298 => "Tierras de la Peste: El Enclave Escarlata",
+                  47 => "Tierras del Interior",         2257 => "Tranvía Subterráneo",            33 => "Vega de Tuercespina"
+            ),
+            1 => array( "Kalimdor",
+                  16 => "Azshara",                      1216 => "Bastión Fauces de Madera",     1638 => "Cima del Trueno",               493 => "Claro de la Luna",              148 => "Costa Oscura",
+                 490 => "Cráter de Un'Goro",             618 => "Cuna del Invierno",            1657 => "Darnassus",                     405 => "Desolace",                       14 => "Durotar",
+                3557 => "El Exodar",                     357 => "Feralas",                       361 => "Frondavil",                    3524 => "Isla Bruma Azur",              3525 => "Isla Bruma de Sangre",
+                 400 => "Las Mil Agujas",                 17 => "Los Baldíos",                    15 => "Marjal Revolcafango",           215 => "Mulgore",                      1637 => "Orgrimmar",
+                 406 => "Sierra Espolón",               1377 => "Silithus",                      440 => "Tanaris",                       141 => "Teldrassil",                    331 => "Vallefresno"
+            ),
+            8 => array( "Terrallende",
+                3519 => "Bosque de Terokkar",           3703 => "Ciudad de Shattrath",          3521 => "Marisma de Zangar",            3522 => "Montañas Filospada",           3518 => "Nagrand",
+                3483 => "Península del Fuego Infernal", 3679 => "Skettis",                      3523 => "Tormenta Abisal",              3520 => "Valle Sombraluna"
+            ),
+           10 => array( "Rasganorte",
+                  65 => "Cementerio de Dragones",        394 => "Colinas Pardas",               4197 => "Conquista del Invierno",        210 => "Corona de Hielo",              3711 => "Cuenca de Sholazar",
+                4395 => "Dalaran",                      4742 => "Desembarco de Hrothgar",        495 => "Fiordo Aquilonal",             4024 => "Gelidar",                        67 => "Las Cumbres Tormentosas",
+                3537 => "Tundra Boreal",                  66 => "Zul'Drak"
+            ),
+            6 => array( "Campos de batalla",
+                 -25 => "Campos de batalla",            3358 => "Cuenca de Arathi",             3277 => "Garganta Grito de Guerra",     4710 => "Isla de la Conquista",         3820 => "Ojo de la Tormenta",
+                4384 => "Playa de los Ancestros",       2597 => "Valle de Alterac"
+            ),
+            4 => array( "Clases",
+                 -61 => "Brujo",                        -372 => "Caballero de la Muerte",       -261 => "Cazador",                       -82 => "Chamán",                       -263 => "Druida",
+                 -81 => "Guerrero",                     -161 => "Mago",                         -141 => "Paladín",                      -162 => "Pícaro",                       -262 => "Sacerdote"
+            ),
+            2 => array( "Mazmorras",
+                4494 => "Ahn'kahet: El Antiguo Reino",  2367 => "Antiguas Laderas de Trabalomas", 4277 => "Azjol-Nerub",                4131 => "Bancal del Magister",           209 => "Castillo de Colmillo Oscuro",
+                 719 => "Cavernas de Brazanegra",       1941 => "Cavernas del Tiempo",          3535 => "Ciudadela del Fuego Infernal", 3790 => "Criptas Auchenai",              718 => "Cuevas de los Lamentos",
+                1583 => "Cumbre de Roca Negra",         4264 => "Cámaras de Piedra",            4820 => "Cámaras de Reflexión",         4272 => "Cámaras de Relámpagos",        3848 => "El Arcatraz",
+                4415 => "El Bastión Violeta",           3845 => "El Castillo de la Tempestad",  3713 => "El Horno de Sangre",           3847 => "El Invernáculo",               3849 => "El Mechanar",
+                4120 => "El Nexo",                      4228 => "El Oculus",                    4196 => "Fortaleza de Drak'Tharon",      206 => "Fortaleza de Utgarde",         4813 => "Foso de Saron",
+                 721 => "Gnomeregan",                   4416 => "Gundrak",                       491 => "Horado Rajacieno",             2366 => "La Ciénaga Negra",             3715 => "La Cámara de Vapor",
+                4809 => "La Forja de Almas",            2557 => "La Masacre",                   4100 => "La Matanza de Stratholme",     3716 => "La Sotiénaga",                 3789 => "Laberinto de las Sombras",
+                 717 => "Las Mazmorras",                1581 => "Las Minas de la Muerte",       3714 => "Las Salas Arrasadas",          2100 => "Maraudon",                      796 => "Monasterio Escarlata",
+                3562 => "Murallas del Fuego Infernal",  1196 => "Pináculo de Utgarde",          1584 => "Profundidades de Roca Negra",  4723 => "Prueba del Campeón",           3717 => "Recinto de los Esclavos",
+                3905 => "Reserva Colmillo Torcido",     3791 => "Salas Sethekk",                2057 => "Scholomance",                  2437 => "Sima Ígnea",                   2017 => "Stratholme",
+                1477 => "Templo Sumergido",             3792 => "Tumbas de Maná",               1337 => "Uldaman",                       722 => "Zahúrda Rajacieno",            1176 => "Zul'Farrak"
+            ),
+            5 => array( "Profesiones",
+                -181 => "Alquimia",                     -304 => "Cocina",                        -24 => "Herboristería",                -121 => "Herrería",                     -201 => "Ingeniería",
+                -371 => "Inscripción",                  -373 => "Joyería",                      -182 => "Peletería",                    -101 => "Pesca",                        -324 => "Primeros auxilios",
+                -264 => "Sastrería"
+            ),
+            3 => array( "Bandas",
+                3428 => "Ahn'Qiraj",                    3607 => "Caverna Santuario Serpiente",  4812 => "Ciudadela de la Corona de Hielo", 3842 => "El Castillo de la Tempestad", 4500 => "El Ojo de la Eternidad",
+                4493 => "El Sagrario Obsidiana",        3959 => "El Templo Oscuro",             2677 => "Guarida de Alanegra",          3923 => "Guarida de Gruul",             3836 => "Guarida de Magtheridon",
+                2159 => "Guarida de Onyxia",            3457 => "Karazhan",                     4603 => "La Cámara de Archavon",        3606 => "La Cima Hyjal",                4075 => "Meseta de La Fuente del Sol",
+                3456 => "Naxxramas",                    2717 => "Núcleo de Magma",              4722 => "Prueba del Cruzado",           3429 => "Ruinas de Ahn'Qiraj",          4273 => "Ulduar",
+                 805 => "Zul'Aman",                     1977 => "Zul'Gurub"
+            ),
+            9 => array( "Eventos del mundo",
+                -370 => "Fiesta de la cerveza",        -1002 => "Los Niños",                    -364 => "Feria de la Luna Negra",        -41 => "Día de los Muertos",          -1003 => "Halloween",
+               -1005 => "Festival de la cosecha",       -376 => "Amor en el aire",              -366 => "Festival Lunar",               -369 => "Solsticio",                   -1006 => "Año nuevo",
+                -375 => "Generosidad",                  -374 => "Jardín Noble",                -1001 => "Festival de Invierno"
+            ),
+            7 => array( "Miscelánea",
+                -365 => "Guerra de Ahn'Qiraj",         -1010 => "Buscador de Mazmorras",          -1 => "Épica",                        -344 => "Legendaria",                   -367 => "Reputación",
+                -368 => "Invasión",                     -241 => "Torneo"
+            ),
+           -2 => "Sin categoría"
         )
     ),
     'title' => array(
@@ -773,10 +927,7 @@ $lang = array(
             "Aumenta el valor de bloqueo de tu escudo %d p.",
             "Estadística no utilizada #%d (%d)",
         )
-    ),
-    'colon'             => ': ',
-    'dateFmtShort'      => "d/m/Y",
-    'dateFmtLong'       => "d/m/Y \a \l\a\s H:i"
+    )
 );
 
 ?>

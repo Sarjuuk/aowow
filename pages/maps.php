@@ -5,23 +5,40 @@ if (!defined('AOWOW_REVISION'))
 
 
 // tabId 1: Tools g_initHeader()
-$smarty->updatePageVars(array(
-    'title'  => Lang::$maps['maps'],
-    'tab'    => 1,
-    'reqCSS' => array(
+class MapsPage extends GenericPage
+{
+    protected $tpl           = 'maps';
+    protected $tabId         = 1;
+    protected $mode          = CACHETYPE_NONE;
+    protected $js            = array(
+        'maps.js',
+        'Mapper.js'
+    );
+    protected $css           = array(
         ['string' => 'zone-picker { margin-left: 4px }'],
-        ['path' => STATIC_URL.'/css/Mapper.css'],
-        ['path' => STATIC_URL.'/css/Mapper_ie6.css', 'ieCond' => 'lte IE 6']
-    ),
-    'reqJS'  => array(
-        STATIC_URL.'/js/maps.js',
-        STATIC_URL.'/js/Mapper.js',
-        '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']
-    )
-));
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$maps));
+        ['path' => 'Mapper.css'],
+        ['path' => 'Mapper_ie6.css', 'ieCond' => 'lte IE 6']
+    );
 
-// load the page
-$smarty->display('maps.tpl');
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->name = Lang::$maps['maps'];
+    }
+
+    protected function generateContent()
+    {
+        // add conditional js
+        $this->addJS('?data=zones&locale=' . User::$localeId . '&t=' . $_SESSION['dataKey']);
+    }
+
+    protected function generateTitle()
+    {
+        array_unshift($this->title, $this->name);
+    }
+
+    protected function generatePath() {}
+}
 
 ?>

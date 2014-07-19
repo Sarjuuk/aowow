@@ -1,6 +1,6 @@
-# smarty cache
-/cache/*.tmp
-/cache/*.php
+# cache
+/cache/template/*
+/cache/alphaMaps/*.png
 
 # generated files
 /static/js/profile_all.js

@@ -1858,7 +1858,7 @@ var Markup = {
 							if(attr.url && Markup._isUrlSafe(attr.url))
 								str += '<a href="' + Markup._fixUrl(attr.url) + '"' + (Markup._isUrlExternal(attr.url) ? ' target="_blank"' : '') + '>' + username + '</a>';
 							else if(g_isUsernameValid(username))
-								str += '<a href="/user=' + username + '">' + username + '</a>';
+								str += '<a href="?user=' + username + '">' + username + '</a>';
 							else
 								str += username;
 							str += '</b> '+ LANG.markup_said + '</small><div class="pad"></div>';
@@ -2125,7 +2125,7 @@ var Markup = {
 			toHtml: function(attr)
 			{
 				return;
-				return '<img' + Markup._addGlobalAttributes(attr) + ' src="/signature=generate&id=' + attr.unnamed + '.png" alt="" />';
+				return '<img' + Markup._addGlobalAttributes(attr) + ' src="?signature=generate&id=' + attr.unnamed + '.png" alt="" />';
 			}
 		},
 		small:
@@ -2913,7 +2913,7 @@ var Markup = {
 				if(g_customColors[username])
 					postColor = 'comment-' + g_customColors[username];
 
-				str += postColor + '"><small class="icon-wowhead"><b class="' + postColor + '"><a href="/user=' + username + '">' + username + '</a></b> ' + LANG.markup_said + '</small><div class="pad"></div>';
+				str += postColor + '"><small class="icon-wowhead"><b class="' + postColor + '"><a href="?user=' + username + '">' + username + '</a></b> ' + LANG.markup_said + '</small><div class="pad"></div>';
 				return [str, '</div>'];
 			}
 		},

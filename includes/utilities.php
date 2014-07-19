@@ -16,298 +16,6 @@ class SimpleXML extends SimpleXMLElement
     }
 }
 
-class SmartyAoWoW extends Smarty
-{
-    private $jsGlobals = [];
-    private $notices   = [];
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $cwd = str_replace("\\", "/", getcwd());
-
-        $this->template_dir           = $cwd.'/template/';
-        $this->compile_dir            = $cwd.'/cache/template/';
-        $this->config_dir             = $cwd.'/configs/';
-        $this->cache_dir              = $cwd.'/cache/';
-        $this->debugging              = CFG_DEBUG;
-        $this->left_delimiter         = '{';
-        $this->right_delimiter        = '}';
-        $this->caching                = false;              // Total Cache, this site does not work
-        $this->_tpl_vars              = array(
-            'reqJS'      => [],                             // <[string]> path to required JSFile
-            'reqCSS'     => [],                             // <[string,string]> path to required CSSFile, IE condition
-            'title'      => null,                           // [string] page title
-            'tab'        => null,                           // [int] # of tab to highlight in the menu
-            'type'       => null,                           // [int] numCode for spell, npc, object, ect
-            'typeId'     => null,                           // [int] entry to display
-            'path'       => '[]',                           // [string] (js:array) path to preselect in the menu
-            'jsGlobals'  => [],
-            'redButtons' => [],
-            'headIcons'  => [],                             // icons in front of title
-        );
-        $this->assign('appName', CFG_NAME);
-        $this->assign('AOWOW_REVISION', AOWOW_REVISION);
-    }
-
-    // using Smarty::assign would overwrite every pair and result in undefined indizes
-    public function updatePageVars($pageVars)
-    {
-        if (!is_array($pageVars))
-            return;
-
-        foreach ($pageVars as $var => $val)
-            $this->_tpl_vars[$var] = $val;
-    }
-
-    // use, if you want to alert the staff to a problem with Trinity
-    public function internalNotice($uGroupMask, $str)
-    {
-        $this->notices[] = [$uGroupMask, $str];
-    }
-
-    public function display($tpl)
-    {
-        $tv = &$this->_tpl_vars;
-
-        // fetch article & static infobox
-        if (isset($tv['type']) && isset($tv['typeId']))
-        {
-            $article = DB::Aowow()->selectRow(
-                'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL '.
-                'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = 0 ORDER BY locale DESC LIMIT 1',
-                $tv['type'], $tv['typeId'], User::$localeId,
-                $tv['type'], $tv['typeId']
-            );
-
-            if ($article)
-            {
-                $replace = array(
-                    'script'     => 'scr"+"ipt',
-                    'HOST_URL'   => HOST_URL,
-                    'STATIC_URL' => STATIC_URL
-                );
-                $tv['article'] = ['text' => strtr(Util::jsEscape($article['article']), $replace)];
-
-                if (empty($tv['infobox']) && !empty($article['quickInfo']))
-                    $tv['infobox'] = $article['quickInfo'];
-
-                if ($article['locale'] != User::$localeId)
-                    $tv['article']['params'] = ['prepend' => Util::jsEscape('<div class="notice-box"><span class="icon-bubble">'.Lang::$main['englishOnly'].'</span></div>')];
-
-                foreach ($article as $text)
-                    if (preg_match_all('/\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|title|holiday|class|race|skill|currency)=(\d+)[^\]]*\]/i', $text, $matches, PREG_SET_ORDER))
-                        foreach ($matches as $match)
-                            if ($type = array_search($match[1], Util::$typeStrings))
-                            {
-                                if (!isset($this->jsGlobals[$type]))
-                                    $this->jsGlobals[$type] = [];
-
-                                $this->jsGlobals[$type][] = $match[2];
-                            }
-            }
-        }
-
-        // display occured notices
-        if ($this->notices)
-        {
-            $buff = [];
-            foreach ($this->notices as $data)
-                if (!$data[0] || User::isInGroup($data[0]))
-                    $buff[] = Util::jsEscape($data[1]);
-
-            if ($buff)
-            {
-                if (!isset($tv['announcements']))
-                    $tv['announcements'] = [];
-
-                $tv['announcements'][] = array(
-                    'id'     => 0,
-                    'mode'   => 1,
-                    'status' => 1,
-                    'name'   => 'internal error',
-                    'style'  => 'padding-left: 55px; background-image: url('.STATIC_URL.'/images/announcements/warn-small.png); background-position: 10px center; border: dashed 2px #C03030;',
-                    'text'   => '[span id=inputbox-error]'.implode("[br]", $buff).'[/span]',
-                );
-            }
-        }
-
-        // fetch announcements
-        if (preg_match('/^([a-z\-]+)=?.*$/i', $_SERVER['QUERY_STRING'], $match))
-        {
-            if (!isset($tv['announcements']))
-                $tv['announcements'] = [];
-
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $match[1], User::$groups);
-
-            foreach ($ann as $k => $v)
-            {
-                if ($t = Util::localizedString($v, 'text'))
-                {
-                    $ann[$k]['text'] = Util::jsEscape($t);
-                    $tv['announcements'][] = $ann[$k];
-                }
-            }
-        }
-
-        $this->applyGlobals();
-
-        $tv['mysql'] = DB::Aowow()->getStatistics();
-
-        parent::display($tpl);
-    }
-
-    public function extendGlobalIds($type, $data)
-    {
-        if (!$type || !$data)
-            return false;
-
-        if (!isset($this->jsGlobals[$type]))
-            $this->jsGlobals[$type] = [];
-
-        if (is_array($data))
-        {
-            foreach ($data as $id)
-                $this->jsGlobals[$type][] = (int)$id;
-        }
-        else if (is_numeric($data))
-            $this->jsGlobals[$type][] = (int)$data;
-        else
-            return false;
-
-        return true;
-    }
-
-    public function extendGlobalData($type, $data, $extra = null)
-    {
-        $this->initJSGlobal($type);
-        $_ = &$this->_tpl_vars['jsGlobals'][$type];         // shorthand
-
-        if (is_array($data) && $data)
-            foreach ($data as $id => $set)
-                if (!isset($_[1][$id]))
-                    $_[1][$id] = $set;
-
-        if (is_array($extra) && $extra)
-            $_[2] = $extra;
-    }
-
-    private function initJSGlobal($type)
-    {
-        $jsg = &$this->_tpl_vars['jsGlobals'];              // shortcut
-
-        if (isset($jsg[$type]))
-            return;
-
-        $jsg[$type] = array(
-            (new ReflectionProperty(Util::$typeClasses[$type], 'brickFile'))->getValue(),   // brickfile
-            [],                                                                             // data
-            []                                                                              // extra
-        );
-    }
-
-    private function applyGlobals()
-    {
-        foreach ($this->jsGlobals as $type => $ids)
-        {
-            foreach ($ids as $k => $id)                     // filter already generated data, maybe we can save a lookup or two
-                if (isset($this->_tpl_vars['jsGlobals'][$type][1][$id]))
-                    unset($ids[$k]);
-
-            if (!$ids)
-                continue;
-
-            $this->initJSGlobal($type);
-            $ids = array_unique($ids, SORT_NUMERIC);
-            $cnd = [['id', $ids], 0];
-
-            (new Util::$typeClasses[$type]($cnd))->addGlobalsToJScript(GLOBALINFO_SELF);
-        }
-    }
-
-    public function notFound($subject, $entry)
-    {
-        $this->assign([
-            'typeStr'  => Util::ucFirst($subject),
-            'typeId'   => $entry,
-            'title'    => Lang::$main['nfPageTitle'],
-            'notFound' => sprintf(Lang::$main['pageNotFound'], $subject),
-            'lang'     => Lang::$main,
-            'mysql'    => DB::Aowow()->getStatistics()
-        ]);
-
-        $this->display('text-page-generic.tpl');
-        exit();
-    }
-
-    public function error()
-    {
-        $this->assign([
-            'type'   => -99,                                // get error-article
-            'typeId' => 0,
-            'title'  => Lang::$main['errPageTitle'],
-            'name'   => Lang::$main['errPageTitle'],
-            'lang'   => Lang::$main,
-            'mysql'  => DB::Aowow()->getStatistics()
-        ]);
-
-        $this->display('text-page-generic.tpl');
-        exit();
-    }
-
-    public function brb()
-    {
-        $this->display('brb.tpl');
-        exit();
-    }
-
-    // creates the cache file
-    public function saveCache($key, $data, $filter = null)
-    {
-        if ($this->debugging)
-            return;
-
-        $file = $this->cache_dir.'data/'.$key;
-
-        $cacheData  = time()." ".AOWOW_REVISION."\n";
-        $cacheData .= serialize($this->_tpl_vars)."\n";     // todo(med): this should not be nessecary, rework caching
-        $cacheData .= serialize(str_replace(["\n", "\t"], ['\n', '\t'], $data));
-
-        if ($filter)
-            $cacheData .= "\n".serialize($filter);
-
-        file_put_contents($file, $cacheData);
-    }
-
-    // loads and evaluates the cache file
-    public function loadCache($key, &$data, &$filter = null)
-    {
-        if ($this->debugging)
-            return false;
-
-        $cache = @file_get_contents($this->cache_dir.'data/'.$key);
-        if (!$cache)
-            return false;
-
-        $cache = explode("\n", $cache);
-
-        @list($time, $rev) = explode(' ', $cache[0]);
-        $expireTime = $time + CFG_CACHE_DECAY;
-        if ($expireTime <= time() || $rev < AOWOW_REVISION)
-            return false;
-
-        $this->_tpl_vars = unserialize($cache[1]);
-
-        $data = str_replace(['\n', '\t'], ["\n", "\t"], unserialize($cache[2]));
-
-        if (isset($cache[3]))
-            $filter = unserialize($cache[3]);
-
-        return true;
-    }
-}
-
 class Util
 {
     public static $resistanceFields         = array(
@@ -488,21 +196,6 @@ class Util
 
     public static $itemDurabilityQualityMod = array(        // from DurabilityQuality.dbc
         null,   1.0,    0.6,    1.0,    0.8,    1.0,    1.0,    1.2,    1.25,   1.44,   2.5,    1.728,  3.0,    0.0,    0.0,    1.2,    1.25
-    );
-
-    public static $lootTemplates = array(
-        LOOT_REFERENCE,     // internal
-        LOOT_ITEM,          // item
-        LOOT_DISENCHANT,    // item
-        LOOT_PROSPECTING,   // item
-        LOOT_MILLING,       // item
-        LOOT_CREATURE,      // npc
-        LOOT_PICKPOCKET,    // npc
-        LOOT_SKINNING,      // npc (see its flags for mining, herbing or actual skinning)
-        LOOT_FISHING,       // zone
-        LOOT_GAMEOBJECT,    // object
-        LOOT_MAIL,          // quest || achievement
-        LOOT_SPELL          // spell
     );
 
     // todo: translate and move to Lang
@@ -1002,8 +695,25 @@ class Util
     );
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
+    public static $wowheadLink              = '';
+    private static $notes                   = [];
 
-    public static $pageTemplate             = null;
+    // creates an announcement; use if minor issues arise
+    public static function addNote($uGroupMask, $str)
+    {
+        self::$notes[] = [$uGroupMask, $str];
+    }
+
+    public static function getNotes($restricted = true)
+    {
+        $notes = [];
+
+        foreach (self::$notes as $data)
+            if (!$restricted || ($data[0] && User::isInGroup($data[0])))
+                $notes[] = $data[1];
+
+        return $notes;
+    }
 
     private static $execTime = 0.0;
 
@@ -1122,11 +832,11 @@ class Util
         else
         {
             $_ = $s['d'] + $s['h'] / 24;
-            if ($_ && !($_ % 364))                          // whole years
+            if ($_ > 1 && !($_ % 364))                      // whole years
                 return round(($s['d'] + $s['h'] / 24) / 364, 2)." ".Lang::$timeUnits[$s['d'] / 364 == 1 && !$s['h'] ? 'sg' : 'pl'][0];
-            if ($_ && !($_ % 30))                           // whole month
+            if ($_ > 1 && !($_ % 30))                       // whole month
                 return round(($s['d'] + $s['h'] / 24) /  30, 2)." ".Lang::$timeUnits[$s['d'] /  30 == 1 && !$s['h'] ? 'sg' : 'pl'][1];
-            if ($_ && !($_ % 7))                            // whole weeks
+            if ($_ > 1 && !($_ % 7))                        // whole weeks
                 return round(($s['d'] + $s['h'] / 24) /   7, 2)." ".Lang::$timeUnits[$s['d'] /   7 == 1 && !$s['h'] ? 'sg' : 'pl'][2];
             if ($s['d'])
                 return round($s['d'] + $s['h']  /   24, 2)." ".Lang::$timeUnits[$s['d'] == 1 && !$s['h']  ? 'sg' : 'pl'][3];
@@ -1185,7 +895,7 @@ class Util
     // pageText for Books (Item or GO) and questText
     public static function parseHtmlText($text)
     {
-        if (stristr($text, '<HTML>'))                       // text is basicly a html-document with weird linebreak-syntax
+        if (stristr($text, '<HTML>'))                       // text is basically a html-document with weird linebreak-syntax
         {
             $pairs = array(
                 '<HTML>'    => '',
@@ -1205,9 +915,9 @@ class Util
             '/\|T([\w]+\\\)*([^\.]+)\.blp:\d+\|t/ui',       // images (force size to tiny)                      |T<fullPath>:<size>|t
             '/\|c(\w{6})\w{2}([^\|]+)\|r/ui',               // color                                            |c<RRGGBBAA><text>|r
             '/\$g\s*([^:;]+)\s*:\s*([^:;]+)\s*(:?[^:;]*);/ui',// directed gender-reference                      $g:<male>:<female>:<refVariable>
-            '/\$t([^;]+);/ui',                              // nonesense, that the client apparently ignores
+            '/\$t([^;]+);/ui',                              // nonsense, that the client apparently ignores
             '/\|\d\-?\d?\((\$\w)\)/ui',                     // and another modifier for something russian       |3-6($r)
-            '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui'                // emotes (workaround: at least one whitespace and never " oder = between brackets)
+            '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui'                // emotes (workaround: at least one whitespace and never " or = between brackets)
         );
 
         $to = array(
@@ -1254,15 +964,36 @@ class Util
         return 'b'.strToUpper($_);
     }
 
-    public static function jsEscape($string)
+    public static function htmlEscape($data)
     {
-        return strtr(trim($string), array(
-            '\\' => '\\\\',
-            "'"  => "\\'",
-            '"'  => '\\"',
-            "\r" => '\\r',
-            "\n" => '\\n'
-        ));
+        if (is_array($data))
+        {
+            foreach ($data as &$v)
+                $v = self::htmlEscape($v);
+
+            return $data;
+        }
+        else
+            return htmlspecialchars(trim($data), ENT_QUOTES, 'utf-8');
+    }
+
+    public static function jsEscape($data)
+    {
+        if (is_array($data))
+        {
+            foreach ($data as &$v)
+                $v = self::jsEscape($v);
+
+            return $data;
+        }
+        else
+            return strtr(trim($data), array(
+                '\\' => '\\\\',
+                "'"  => "\\'",
+                '"'  => '\\"',
+                "\r" => '\\r',
+                "\n" => '\\n'
+            ));
     }
 
     public static function localizedString($data, $field)
@@ -1298,18 +1029,6 @@ class Util
         // nothing to find; be empty
         else
             return '';
-    }
-
-    public static function extractURLParams($str)
-    {
-        $arr    = explode('.', $str);
-        $params = [];
-
-        foreach ($arr as $v)
-            if (is_numeric($v))
-                $params[] = (int)$v;
-
-        return $params;
     }
 
     // for item and spells
@@ -1371,127 +1090,107 @@ class Util
     // 8 => TYPE_PRISMATIC_SOCKET   Extra Sockets AmountX as socketCount (ignore)
     public static function parseItemEnchantment($ench, $raw = false, &$misc = null)
     {
-        $enchant = [];
-        if (is_numeric($ench))
-            $enchant = DB::Aowow()->selectRow('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE Id = ?d', $ench);
-        else if (is_array($ench))
-            $enchant = $ench;
-
-        if (!$enchant)
+        if (!$ench)
             return [];
 
-        $misc = array(
-            'name' => self::localizedString($enchant, 'text'),
-            'text' => array(
-                'text_loc0' => $enchant['text_loc0'],
-                'text_loc2' => $enchant['text_loc2'],
-                'text_loc3' => $enchant['text_loc3'],
-                'text_loc6' => $enchant['text_loc6'],
-                'text_loc8' => $enchant['text_loc8']
-            )
-        );
+        if (is_numeric($ench))
+            $ench = [$ench];
 
-        if ($enchant['skillLine'] > 0)
-            $misc['reqskill'] = $enchant['skillLine'];
+        if (!is_array($ench))
+            return [];
 
-        if ($enchant['skillLevel'] > 0)
-            $misc['reqskillrank'] = $enchant['skillLevel'];
+        $enchants = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE id IN (?a)', $ench);
+        if (!$enchants)
+            return [];
 
-        if ($enchant['requiredLevel'] > 0)
-            $misc['reqlevel'] = $enchant['requiredLevel'];
-
-        // parse stats
-        $jsonStats = [];
-        for ($h = 1; $h <= 3; $h++)
+        $result = [];
+        foreach ($enchants as $eId => $e)
         {
-            $obj = (int)$enchant['object'.$h];
-            $val = (int)$enchant['amount'.$h];
+            $misc[$eId] = array(
+                'name' => self::localizedString($e, 'text'),
+                'text' => array(
+                    'text_loc0' => $e['text_loc0'],
+                    'text_loc2' => $e['text_loc2'],
+                    'text_loc3' => $e['text_loc3'],
+                    'text_loc6' => $e['text_loc6'],
+                    'text_loc8' => $e['text_loc8']
+                )
+            );
 
-            switch ($enchant['type'.$h])
+            if ($e['skillLine'] > 0)
+                $misc[$eId]['reqskill'] = $e['skillLine'];
+
+            if ($e['skillLevel'] > 0)
+                $misc[$eId]['reqskillrank'] = $e['skillLevel'];
+
+            if ($e['requiredLevel'] > 0)
+                $misc[$eId]['reqlevel'] = $e['requiredLevel'];
+
+            // parse stats
+            $jsonStats = [];
+            for ($h = 1; $h <= 3; $h++)
             {
-                case 2:
-                    @$jsonStats[ITEM_MOD_WEAPON_DMG] += $val;
-                    break;
-                case 3:
-                case 7:
-                    $spl   = new SpellList(array(['s.id', $obj]));
-                    if ($spl->error)
+                $obj = (int)$e['object'.$h];
+                $val = (int)$e['amount'.$h];
+
+                switch ($e['type'.$h])
+                {
+                    case 2:
+                        @$jsonStats[ITEM_MOD_WEAPON_DMG] += $val;
                         break;
+                    case 3:
+                    case 7:
+                        $spl   = new SpellList(array(['s.id', $obj]));
+                        if ($spl->error)
+                            break;
 
-                    $gains = $spl->getStatGain();
+                        $gains = $spl->getStatGain();
 
-                    foreach ($gains as $gain)
-                        foreach ($gain as $k => $v)         // array_merge screws up somehow...
-                            @$jsonStats[$k] += $v;
-                    break;
-                case 4:
-                    switch ($obj)
-                    {
-                        case 0:                             // Physical
-                            @$jsonStats[ITEM_MOD_ARMOR] += $val;
-                            break;
-                        case 1:                             // Holy
-                            @$jsonStats[ITEM_MOD_HOLY_RESISTANCE] += $val;
-                            break;
-                        case 2:                             // Fire
-                            @$jsonStats[ITEM_MOD_FIRE_RESISTANCE] += $val;
-                            break;
-                        case 3:                             // Nature
-                            @$jsonStats[ITEM_MOD_NATURE_RESISTANCE] += $val;
-                            break;
-                        case 4:                             // Frost
-                            @$jsonStats[ITEM_MOD_FROST_RESISTANCE] += $val;
-                            break;
-                        case 5:                             // Shadow
-                            @$jsonStats[ITEM_MOD_SHADOW_RESISTANCE] += $val;
-                            break;
-                        case 6:                             // Arcane
-                            @$jsonStats[ITEM_MOD_ARCANE_RESISTANCE] += $val;
-                            break;
-                    }
-                    break;
-                case 5:
-                    @$jsonStats[$obj] += $val;
-                    break;
+                        foreach ($gains as $gain)
+                            foreach ($gain as $k => $v)         // array_merge screws up somehow...
+                                @$jsonStats[$k] += $v;
+                        break;
+                    case 4:
+                        switch ($obj)
+                        {
+                            case 0:                             // Physical
+                                @$jsonStats[ITEM_MOD_ARMOR] += $val;
+                                break;
+                            case 1:                             // Holy
+                                @$jsonStats[ITEM_MOD_HOLY_RESISTANCE] += $val;
+                                break;
+                            case 2:                             // Fire
+                                @$jsonStats[ITEM_MOD_FIRE_RESISTANCE] += $val;
+                                break;
+                            case 3:                             // Nature
+                                @$jsonStats[ITEM_MOD_NATURE_RESISTANCE] += $val;
+                                break;
+                            case 4:                             // Frost
+                                @$jsonStats[ITEM_MOD_FROST_RESISTANCE] += $val;
+                                break;
+                            case 5:                             // Shadow
+                                @$jsonStats[ITEM_MOD_SHADOW_RESISTANCE] += $val;
+                                break;
+                            case 6:                             // Arcane
+                                @$jsonStats[ITEM_MOD_ARCANE_RESISTANCE] += $val;
+                                break;
+                        }
+                        break;
+                    case 5:
+                        @$jsonStats[$obj] += $val;
+                        break;
+                }
             }
+
+            if ($raw)
+                $result[$eId] = $jsonStats;
+            else
+                foreach ($jsonStats as $k => $v)            // check if we use these mods
+                    if ($str = Util::$itemMods[$k])
+                        $result[$eId][$str] = $v;
         }
 
-        if ($raw)
-            return $jsonStats;
-
-        // check if we use these mods
-        $return = [];
-        foreach ($jsonStats as $k => $v)
-        {
-            if ($str = Util::$itemMods[$k])
-                $return[$str] = $v;
-        }
-
-        return $return;
-    }
-
-    public static function isValidPage($struct, $keys)
-    {
-        switch (count($keys))
-        {
-            case 0: // no params works always
-                return true;
-            case 1: // null is avalid    || value in a 1-dim-array      ||  key in a n-dim-array
-                return $keys[0] === null || in_array($keys[0], $struct) || (isset($struct[$keys[0]]));
-            case 2: // first param has to be a key. otherwise invalid
-                if (!isset($struct[$keys[0]]))
-                    return false;
-
-                // check if the sub-array is n-imensional
-                if (count($struct[$keys[0]]) == count($struct[$keys[0]], COUNT_RECURSIVE))
-                    return in_array($keys[1], $struct[$keys[0]]); // second param is value in second level array
-                else
-                    return isset($struct[$keys[0]][$keys[1]]);    // check if params is key of another array
-            case 3: // 3 params MUST point to a specific value
-                return isset($struct[$keys[0]][$keys[1]]) && in_array($keys[2], $struct[$keys[0]][$keys[1]]);
-        }
-
-        return false;
+        return $result;
     }
 
     // default ucFirst doesn't convert UTF-8 chars
@@ -1589,9 +1288,10 @@ class Util
                 return [];
         }
 
+        // note: omits required spell and chance in skill_discovery_template
         $data = array_merge(
             DB::Aowow()->selectCol('SELECT spellId FROM spell_learn_spell WHERE entry IN (?a)', $lookup),
-            DB::Aowow()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell IN (?a)', $lookup),   // note: omits required spell and chance
+            DB::Aowow()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell IN (?a)', $lookup),
             $extraIds
         );
 
@@ -1601,534 +1301,6 @@ class Util
         });
 
         return $data;
-    }
-
-    /*  from TC wiki
-        fishing_loot_template           no relation     entry is linked with ID of the fishing zone or area
-        creature_loot_template          entry           many <- many        creature_template       lootid
-        gameobject_loot_template        entry           many <- many        gameobject_template     data1           Only GO type 3 (CHEST) or 25 (FISHINGHOLE)
-        item_loot_template              entry           many <- one         item_template           entry
-        disenchant_loot_template        entry           many <- many        item_template           DisenchantID
-        prospecting_loot_template       entry           many <- one         item_template           entry
-        milling_loot_template           entry           many <- one         item_template           entry
-        pickpocketing_loot_template     entry           many <- many        creature_template       pickpocketloot
-        skinning_loot_template          entry           many <- many        creature_template       skinloot        Can also store minable/herbable items gathered from creatures
-        quest_mail_loot_template        entry                               quest_template          RewMailTemplateId
-        reference_loot_template         entry           many <- many        _loot_template          -mincountOrRef  In case of negative mincountOrRef
-    */
-    private static function getLootByEntry($tableName, $lootId, &$handledRefs, $groupId = 0, $baseChance = 1.0)
-    {
-        $loot     = [];
-        $rawItems = [];
-
-        if (!$tableName || !$lootId)
-            return null;
-
-        $rows = DB::Aowow()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, abs($lootId), $groupId ? $groupId : DBSIMPLE_SKIP);
-        if (!$rows)
-            return null;
-
-        $groupChances = [];
-        $nGroupEquals = [];
-        foreach ($rows as $entry)
-        {
-            $set = array(
-                'quest'         => $entry['ChanceOrQuestChance'] < 0,
-                'group'         => $entry['groupid'],
-                'reference'     => $lootId < 0 ? abs($lootId) : 0,
-                'realChanceMod' => $baseChance
-            );
-
-            // if ($entry['lootmode'] > 1)
-            // {
-                $buff = [];
-                for ($i = 0; $i < 8; $i++)
-                    if ($entry['lootmode'] & (1 << $i))
-                        $buff[] = $i + 1;
-
-                $set['mode'] = implode(', ', $buff);
-            // }
-            // else
-                // $set['mode'] = 0;
-
-            /*
-                modes:{"mode":8,"4":{"count":7173,"outof":17619},"8":{"count":7173,"outof":10684}}
-                ignore lootmodes from sharedDefines.h use different creatures/GOs from each template
-                modes.mode = b6543210
-                              ||||||'dungeon heroic
-                              |||||'dungeon normal
-                              ||||'<empty>
-                              |||'10man normal
-                              ||'25man normal
-                              |'10man heroic
-                              '25man heroic
-            */
-
-            if ($entry['mincountOrRef'] < 0)
-            {
-                // bandaid.. remove when propperly handling lootmodes
-                if (!in_array($entry['mincountOrRef'], $handledRefs))
-                {                                                                                                   // todo (high): find out, why i used this in the first place. (don't do drugs, kids)
-                    list($data, $raw) = self::getLootByEntry(LOOT_REFERENCE, $entry['mincountOrRef'], $handledRefs, /*$entry['groupid'],*/ 0, abs($entry['ChanceOrQuestChance'] / 100));
-
-                    $handledRefs[] = $entry['mincountOrRef'];
-
-                    $loot     = array_merge($loot, $data);
-                    $rawItems = array_merge($rawItems, $raw);
-                }
-
-                $set['content']    = $entry['mincountOrRef'];
-                $set['multiplier'] = $entry['maxcount'];
-            }
-            else
-            {
-                $rawItems[]     = $entry['item'];
-                $set['content'] = $entry['item'];
-                $set['min']     = $entry['mincountOrRef'];
-                $set['max']     = $entry['maxcount'];
-            }
-
-            if (!isset($groupChances[$entry['groupid']]))
-            {
-                $groupChances[$entry['groupid']] = 0;
-                $nGroupEquals[$entry['groupid']] = 0;
-            }
-
-            if ($set['quest'] || !$set['group'])
-                $set['groupChance'] = abs($entry['ChanceOrQuestChance']);
-            else if ($entry['groupid'] && !$entry['ChanceOrQuestChance'])
-            {
-                $nGroupEquals[$entry['groupid']]++;
-                $set['groupChance'] = &$groupChances[$entry['groupid']];
-            }
-            else if ($entry['groupid'] && $entry['ChanceOrQuestChance'])
-            {
-                @$groupChances[$entry['groupid']] += $entry['ChanceOrQuestChance'];
-                $set['groupChance'] = abs($entry['ChanceOrQuestChance']);
-            }
-            else                                            // shouldn't have happened
-            {
-                Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by LootId: unhandled case in calculating chance for item '.$entry['item'].'!');
-                continue;
-            }
-
-            $loot[] = $set;
-        }
-
-        foreach (array_keys($nGroupEquals) as $k)
-        {
-            $sum = $groupChances[$k];
-            if (!$sum)
-                $sum = 0;
-            else if ($sum > 100)
-            {
-                Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by LootId: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
-                $sum = 100;
-            }
-
-            $cnt = empty($nGroupEquals[$k]) ? 1 : $nGroupEquals[$k];
-
-            $groupChances[$k] = (100 - $sum) / $cnt;        // is applied as backReference to items with 0-chance
-        }
-
-        return [$loot, array_unique($rawItems)];
-    }
-
-    public static function handleLoot($table, $entry, $debug = false, &$debugCols = [])
-    {
-        $lv    = [];
-        $loot  = null;
-
-        if (!$table || !$entry)
-            return null;
-
-        /*
-            todo (high): implement conditions on loot (and conditions in general)
-
-        also
-
-            // if (is_array($entry) && in_array($table, [LOOT_CREATURE, LOOT_GAMEOBJECT])
-                // iterate over the 4 available difficulties and assign modes
-
-
-            modes:{"mode":1,"1":{"count":4408,"outof":16013},"4":{"count":4408,"outof":22531}}
-        */
-        $handledRefs = [];
-        $struct = self::getLootByEntry($table, $entry, $handledRefs);
-        if (!$struct)
-            return $lv;
-
-        $items = new ItemList(array(['i.id', $struct[1]], CFG_SQL_LIMIT_NONE));
-        $items->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
-        $foo = $items->getListviewData();
-
-        // assign listview LV rows to loot rows, not the other way round! The same item may be contained multiple times
-        foreach ($struct[0] as $loot)
-        {
-            $base = array(
-                'percent' => round($loot['groupChance'] * $loot['realChanceMod'], 3),
-                'group'   => $loot['group'],
-                'quest'   => $loot['quest'],
-                'count'   => 1                              // satisfies the sort-script
-            );
-
-            if ($_ = $loot['mode'])
-                $base['mode'] = $_;
-
-            if ($_ = $loot['reference'])
-                $base['reference'] = $_;
-
-            $stack = [];                                    // equal distribution between min/max .. not blizzlike, but hey, TC-issue
-            if (isset($loot['max']) && isset($loot['min']) && ($loot['max'] > $loot['min']))
-                for ($i = $loot['min']; $i <= $loot['max']; $i++)
-                    $stack[$i] = round(100 / (1 + $loot['max'] - $loot['min']), 3);
-
-            if ($stack)                                     // yes, it wants a string .. how weired is that..
-                $base['pctstack'] = json_encode($stack, JSON_NUMERIC_CHECK);
-
-            if ($loot['content'] > 0)                       // regular drop
-            {
-                if (!$debug)
-                {
-                    if (!isset($lv[$loot['content']]))
-                        $lv[$loot['content']] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
-                    else
-                        $lv[$loot['content']]['percent'] += $base['percent'];
-                }
-                else                                        // in case of limited trash loot, check if $foo[<itemId>] exists
-                    $lv[] = array_merge($foo[$loot['content']], $base, ['stack' => [$loot['min'], $loot['max']]]);
-            }
-            else if ($debug)                                // create dummy for ref-drop
-            {
-                $data = array(
-                    'id'    => $loot['content'],
-                    'name'  => '@REFERENCE: '.abs($loot['content']),
-                    'icon'  => 'trade_engineering',
-                    'stack' => [$loot['multiplier'], $loot['multiplier']]
-                );
-                $lv[] = array_merge($base, $data);
-
-                Util::$pageTemplate->extendGlobalData(TYPE_ITEM, [$loot['content'] => $data]);
-            }
-        }
-
-        // move excessive % to extra loot
-        if (!$debug)
-        {
-            foreach ($lv as &$_)
-            {
-                if ($_['percent'] <= 100)
-                    continue;
-
-                while ($_['percent'] > 200)
-                {
-                    $_['stack'][0]++;
-                    $_['stack'][1]++;
-                    $_['percent'] -= 100;
-                }
-
-                $_['stack'][1]++;
-                $_['percent'] = 100;
-            }
-        }
-        else
-        {
-            $fields = ['mode', 'reference'];
-            $base   = [];
-            $set    = 0;
-            foreach ($lv as $foo)
-            {
-                foreach ($fields as $idx => $field)
-                {
-                    if (!isset($base[$idx]))
-                        $base[$idx] = @$foo[$field];
-                    else if ($base[$idx] != @$foo[$field])
-                        $set |= 1 << $idx;
-                }
-
-                if ($set == (pow(2, count($fields)) - 1))
-                    break;
-            }
-
-            $debugCols[] = "Listview.funcBox.createSimpleCol('group', 'Group', '7%', 'group')";
-            foreach ($fields as $idx => $field)
-                if ($set & (1 << $idx))
-                    $debugCols[] = "Listview.funcBox.createSimpleCol('".$field."', '".Util::ucFirst($field)."', '7%', '".$field."')";
-        }
-
-        return $lv;
-    }
-
-    public static function getLootSource($itemId, $maxResults = CFG_SQL_LIMIT_DEFAULT)
-    {
-        if (!$itemId)
-            return [];
-
-        //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
-        $tabsFinal  = array(
-            ['item',        [], '$LANG.tab_containedin',      'contained-in-item',      [], [], []],
-            ['item',        [], '$LANG.tab_disenchantedfrom', 'disenchanted-from',      [], [], []],
-            ['item',        [], '$LANG.tab_prospectedfrom',   'prospected-from',        [], [], []],
-            ['item',        [], '$LANG.tab_milledfrom',       'milled-from',            [], [], []],
-            ['creature',    [], '$LANG.tab_droppedby',        'dropped-by',             [], [], []],
-            ['creature',    [], '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',      [], [], []],
-            ['creature',    [], '$LANG.tab_skinnedfrom',      'skinned-from',           [], [], []],
-            ['creature',    [], '$LANG.tab_minedfromnpc',     'mined-from-npc',         [], [], []],
-            ['creature',    [], '$LANG.tab_salvagedfrom',     'salvaged-from',          [], [], []],
-            ['creature',    [], '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',      [], [], []],
-            ['quest',       [], '$LANG.tab_rewardfrom',       'reward-from-quest',      [], [], []],
-            ['zone',        [], '$LANG.tab_fishedin',         'fished-in-zone',         [], [], []],
-            ['object',      [], '$LANG.tab_containedin',      'contained-in-object',    [], [], []],
-            ['object',      [], '$LANG.tab_minedfrom',        'mined-from-object',      [], [], []],
-            ['object',      [], '$LANG.tab_gatheredfrom',     'gathered-from-object',   [], [], []],
-            ['object',      [], '$LANG.tab_fishedin',         'fished-in-object',       [], [], []],
-            ['spell',       [], '$LANG.tab_createdby',        'created-by',             [], [], []],
-            ['achievement', [], '$LANG.tab_rewardfrom',       'reward-from-achievemnt', [], [], []]
-        );
-        $refResults = [];
-        $chanceMods = [];
-        $query      =   'SELECT
-                           -lt1.entry AS ARRAY_KEY,
-                            IF(lt1.mincountOrRef > 0, lt1.item, lt1.mincountOrRef) AS item,
-                            lt1.ChanceOrQuestChance AS chance,
-                            SUM(IF(lt2.ChanceOrQuestChance = 0, 1, 0)) AS nZeroItems,
-                            SUM(IF(lt2.ChanceOrQuestChance > 0, lt2.ChanceOrQuestChance, 0)) AS sumChance,
-                            IF(lt1.groupid > 0, 1, 0) AS isGrouped,
-                            IF(lt1.mincountOrRef > 0, lt1.mincountOrRef, 1) AS min,
-                            IF(lt1.mincountOrRef > 0, lt1.maxcount, 1) AS max,
-                            IF(lt1.mincountOrRef < 0, lt1.maxcount, 1) AS multiplier
-                        FROM
-                            ?# lt1
-                        LEFT JOIN
-                            ?# lt2 ON lt1.entry = lt2.entry AND lt1.groupid = lt2.groupid
-                        WHERE
-                            %s
-                        GROUP BY lt2.entry';
-
-        $calcChance = function ($refs, $parents = []) use (&$chanceMods)
-        {
-            $retData = [];
-            $retKeys = [];
-
-            foreach ($refs as $rId => $ref)
-            {
-                // check for possible database inconsistencies
-                if (!$ref['chance'] && !$ref['isGrouped'])
-                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
-
-                if ($ref['isGrouped'] && $ref['sumChance'] > 100)
-                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
-
-                if ($ref['isGrouped'] && $ref['sumChance'] == 100 && !$ref['chance'])
-                    Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
-
-                $chance = abs($ref['chance'] ? $ref['chance'] : (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
-
-                // apply inherited chanceMods
-                if (isset($chanceMods[$ref['item']]))
-                {
-                    $chance *= $chanceMods[$ref['item']][0];
-                    $chance  = 1 - pow(1 - $chance, $chanceMods[$ref['item']][1]);
-                }
-
-                // save chance for parent-ref
-                $chanceMods[$rId] = [$chance, $ref['multiplier']];
-
-                // refTemplate doesn't point to a new ref -> we are done
-                if (!in_array($rId, $parents))
-                {
-                    $data = array(
-                        'percent' => $chance,
-                        'stack'   => [$ref['min'], $ref['max']],
-                        'count'   => 1                          // ..and one for the sort script
-                    );
-
-                    $stack = [];                                // equal distribution between min/max .. not blizzlike, but hey, TC-issue
-                    if ($ref['max'] > 1)
-                        for ($i = $ref['min']; $i <= $ref['max']; $i++)
-                            $stack[$i] = round(100 / (1 + $ref['max'] - $ref['min']), 3);
-
-                    if ($stack)                                 // yes, it wants a string .. how weired is that..
-                        $data['pctstack'] = json_encode($stack, JSON_NUMERIC_CHECK);
-
-                    // sort highest chances first
-                    $i = 0;
-                    for (; $i < count($retData); $i++)
-                        if ($retData[$i]['percent'] < $data['percent'])
-                            break;
-
-                    array_splice($retData, $i, 0, [$data]);
-                    array_splice($retKeys, $i, 0, [$rId]);
-                }
-            }
-
-            return array_combine($retKeys, $retData);
-        };
-
-        /*
-            get references containing the item
-        */
-        $newRefs = DB::Aowow()->select(
-            sprintf($query, 'lt1.item = ?d AND lt1.mincountOrRef > 0'),
-            LOOT_REFERENCE, LOOT_REFERENCE,
-            $itemId
-        );
-
-        while ($newRefs)
-        {
-            $curRefs = $newRefs;
-            $newRefs = DB::Aowow()->select(
-                sprintf($query, 'lt1.mincountOrRef IN (?a)'),
-                LOOT_REFERENCE, LOOT_REFERENCE,
-                array_keys($curRefs)
-            );
-
-            $refResults += $calcChance($curRefs, array_column($newRefs, 'item'));
-        }
-
-        /*
-            search the real loot-templates for the itemId and gathered refds
-        */
-        for ($i = 1; $i < count(self::$lootTemplates); $i++)
-        {
-            $result = $calcChance(DB::Aowow()->select(
-                sprintf($query, '{lt1.mincountOrRef IN (?a) OR }(lt1.mincountOrRef > 0 AND lt1.item = ?d)'),
-                self::$lootTemplates[$i], self::$lootTemplates[$i],
-                $refResults ? array_keys($refResults) : DBSIMPLE_SKIP,
-                $itemId
-            ));
-
-            // do not skip here if $result is empty. Additional loot for spells and quest is added separately
-
-            // format for actual use
-            foreach ($result as $k => $v)
-            {
-                unset($result[$k]);
-                $v['percent'] = round($v['percent'] * 100, 3);
-                $result[abs($k)] = $v;
-            }
-
-            // cap fetched entries to the sql-limit to guarantee, that the highest chance items get selected first
-            // screws with GO-loot and skinnig-loot as these templates are shared for several tabs (fish, herb, ore) (herb, ore, leather)
-            $ids = array_slice(array_keys($result), 0, $maxResults);
-
-            switch (self::$lootTemplates[$i])
-            {
-                case LOOT_CREATURE:     $field = 'lootId';              $tabId =  4;    break;
-                case LOOT_PICKPOCKET:   $field = 'pickpocketLootId';    $tabId =  5;    break;
-                case LOOT_SKINNING:     $field = 'skinLootId';          $tabId = -6;    break;      // assigned later
-                case LOOT_PROSPECTING:  $field = 'id';                  $tabId =  2;    break;
-                case LOOT_MILLING:      $field = 'id';                  $tabId =  3;    break;
-                case LOOT_ITEM:         $field = 'id';                  $tabId =  0;    break;
-                case LOOT_DISENCHANT:   $field = 'disenchantId';        $tabId =  1;    break;
-                case LOOT_FISHING:      $field = 'id';                  $tabId = 11;    break;      // subAreas are currently ignored
-                case LOOT_GAMEOBJECT:
-                    if (!$ids)
-                        break;
-
-                    $srcObj = new GameObjectList(array(['lootId', $ids]));
-                    if ($srcObj->error)
-                        break;
-
-                    $srcData = $srcObj->getListviewData();
-
-                    foreach ($srcObj->iterate() as $curTpl)
-                    {
-                        switch ($curTpl['type'])
-                        {
-                            case 25: $tabId = 15; break;    // fishing node
-                            case -3: $tabId = 14; break;    // herb
-                            case -4: $tabId = 13; break;    // vein
-                            default: $tabId = 12; break;    // general chest loot
-                        }
-
-                        $tabsFinal[$tabId][1][] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField('lootId')]);
-                        $tabsFinal[$tabId][4][] = 'Listview.extraCols.percent';
-                        if ($tabId != 15)
-                            $tabsFinal[$tabId][6][] = 'skill';
-                    }
-                    break;
-                case LOOT_MAIL:
-                    $conditions = array(['rewardChoiceItemId1', $itemId], ['rewardChoiceItemId2', $itemId], ['rewardChoiceItemId3', $itemId], ['rewardChoiceItemId4', $itemId], ['rewardChoiceItemId5', $itemId],
-                                        ['rewardChoiceItemId6', $itemId], ['rewardItemId1', $itemId],       ['rewardItemId2', $itemId],       ['rewardItemId3', $itemId],       ['rewardItemId4', $itemId],
-                                        'OR');
-                    if ($ids)
-                        $conditions[] = ['rewardMailTemplateId', $ids];
-
-                    $srcObj = new QuestList($conditions);
-                    if (!$srcObj->error)
-                    {
-                        $srcObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
-                        $srcData = $srcObj->getListviewData();
-
-                        foreach ($srcObj->iterate() as $_)
-                            $tabsFinal[10][1][] = array_merge($srcData[$srcObj->id], empty($result[$srcObj->id]) ? ['percent' => -1] : $result[$srcObj->id]);
-                    }
-
-                    /*
-                        todo: search for achievements here
-                        $tabsFinal[17]
-                    */
-
-                    break;
-                case LOOT_SPELL:
-                    $conditions = ['OR', ['effect1CreateItemId', $itemId], ['effect2CreateItemId', $itemId], ['effect3CreateItemId', $itemId]];
-                    if ($ids)
-                        $conditions[] = ['id', $ids];
-
-                    $srcObj = new SpellList($conditions);
-                    if (!$srcObj->error)
-                    {
-                        $srcObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
-                        $srcData = $srcObj->getListviewData();
-
-                        if (!empty($result))
-                            $tabsFinal[16][4][] = 'Listview.extraCols.percent';
-
-                        if ($srcObj->hasSetFields(['reagent1']))
-                            $tabsFinal[16][6][] = 'reagents';
-
-                        foreach ($srcObj->iterate() as $_)
-                            $tabsFinal[16][1][] = array_merge($srcData[$srcObj->id], empty($result[$srcObj->id]) ? ['percent' => -1] : $result[$srcObj->id]);
-                    }
-                    break;
-            }
-
-            if (!$ids)
-                continue;
-
-            switch ($tabsFinal[abs($tabId)][0])
-            {
-                case 'creature':                            // new CreatureList
-                case 'item':                                // new ItemList
-                case 'zone':                                // new ZoneList
-                    $oName  = ucFirst($tabsFinal[abs($tabId)][0]).'List';
-                    $srcObj = new $oName(array([$field, $ids]));
-                    if (!$srcObj->error)
-                    {
-                        $srcObj->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
-                        $srcData = $srcObj->getListviewData();
-
-                        foreach ($srcObj->iterate() as $curTpl)
-                        {
-                            if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_HERBLOOT)
-                                $tabId = 9;
-                            else if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_ENGINEERLOOT)
-                                $tabId = 8;
-                            else if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_MININGLOOT)
-                                $tabId = 7;
-                            else if ($tabId < 0)
-                                $tabId = abs($tabId);       // general case (skinning)
-
-                            $tabsFinal[$tabId][1][] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField($field)]);
-                            $tabsFinal[$tabId][4][] = 'Listview.extraCols.percent';
-                        }
-                    }
-                    break;
-            }
-        }
-
-        return $tabsFinal;
     }
 
     public static function urlize($str)
@@ -2167,6 +1339,11 @@ class Util
         return str;
     }
 
+    public static function isValidEmail($email)
+    {
+        return preg_match('/^([a-z0-9._-]+)(\+[a-z0-9._-]+)?(@[a-z0-9.-]+\.[a-z]{2,4})$/i', $email);
+    }
+
     public static function loadStaticFile($file, &$result, $localized = false)
     {
         $success = true;
@@ -2188,6 +1365,61 @@ class Util
         }
 
         return $success;
+    }
+
+    public static function createHash($length = 40)         // just some random numbers for unsafe identifictaion purpose
+    {
+        static $seed = ".abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        $hash = '';
+
+        for ($i = 0; $i < $length; $i++)
+            $hash .= substr($seed, mt_rand(0, 62), 1);
+
+        return $hash;
+    }
+
+    public static function createShowOnMap()
+    {
+        /*
+            quest:          "Quest Givers",
+            daily:          "Quest Givers (Daily)",
+            alliancequests: "Quest Givers",
+            hordequests:    "Quest Givers",
+        */
+    }
+
+    private static $alphaMapCache = [];
+
+    public static function alphaMapCheck($areaId, array &$coords)
+    {
+        $file = 'cache\\alphaMaps\\'.$areaId.'.png';
+        if (!file_exists($file))
+        {
+            self::addNote(U_GROUP_STAFF, 'Util::alphaMapCheck no suitable alphaMap found for area '.$areaId.'. Positional check omitted!');
+            return false;
+        }
+
+        if (empty(self::$alphaMapCache[$areaId]))
+            self::$alphaMapCache[$areaId] = imagecreatefrompng($file);
+
+        foreach ($coords as $idx => $set)
+        {
+            // invalid and corner cases (literally)
+            if (!is_array($set) || empty($set['xPos']) || empty($set['yPos']) || $set['xPos'] == 100 || $set['yPos'] == 100)
+            {
+                unset($coords[$idx]);
+                continue;
+            }
+
+            // alphaMaps are 1000 x 1000, adapt points [0 => black => valid point]
+            if (imagecolorat(self::$alphaMapCache[$areaId], $set['xPos'] * 10, $set['yPos'] * 10))
+                unset($coords[$idx]);
+        }
+
+        if ($coords)
+            $coords = array_values($coords);                // kill indizes
+
+        return $coords ? true : false;
     }
 }
 

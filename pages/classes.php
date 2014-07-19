@@ -4,38 +4,44 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-$cacheKey = implode('_', [CACHETYPE_PAGE, TYPE_CLASS, -1, -1, User::$localeId]);
-
-if (!$smarty->loadCache($cacheKey, $pageData))
+// menuId 12: Class    g_initPath()
+//  tabId  0: Database g_initHeader()
+class ClassesPage extends GenericPage
 {
-    $classes = new CharClassList();
+    use ListPage;
 
-    // menuId 12: Class    g_initPath()
-    //  tabId  0: Database g_initHeader()
-    $pageData = array(
-        'page' => array(
-            'title' => Util::ucFirst(Lang::$game['classes']),
-            'path'  => "[0, 12]",
-            'tab'   => 0
-        ),
-        'lv' => array(
-            array(
+    protected $type          = TYPE_CLASS;
+    protected $tpl           = 'list-page-generic';
+    protected $path          = [0, 12];
+    protected $tabId         = 0;
+    protected $mode          = CACHETYPE_PAGE;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->name = Util::ucFirst(Lang::$game['classes']);
+    }
+
+    protected function generateContent()
+    {
+        $classes = new CharClassList();
+        if (!$classes->error)
+        {
+            $this->lvTabs[] = array(
                 'file'   => 'class',
                 'data'   => $classes->getListviewData(),
                 'params' => []
-            )
-        )
-    );
+            );
+        }
+    }
 
-    $smarty->saveCache($cacheKey, $pageData);
+    protected function generateTitle()
+    {
+        array_unshift($this->title, Util::ucFirst(Lang::$game['classes']));
+    }
+
+    protected function generatePath() {}
 }
-
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData['lv']);
-
-// load the page
-$smarty->display('list-page-generic.tpl');
 
 ?>

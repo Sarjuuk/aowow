@@ -62,19 +62,19 @@ class TitleList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = 0)
+    public function getJSGlobals($addMask = 0)
     {
         $data = [];
 
         foreach ($this->iterate() as $__)
         {
-            $data[$this->id]['name'] = $this->getField('male', true);
+            $data[TYPE_TITLE][$this->id]['name'] = $this->getField('male', true);
 
             if ($_ = $this->getField('female', true))
-                $data[$this->id]['namefemale'] = $_;
+                $data[TYPE_TITLE][$this->id]['namefemale'] = $_;
         }
 
-        Util::$pageTemplate->extendGlobalData(self::$type, $data);
+        return $data;
     }
 
     private function createSource()

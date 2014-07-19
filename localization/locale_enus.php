@@ -97,12 +97,21 @@ $lang = array(
         'chooseClass'   => "Choose a class",
         'chooseFamily'  => "Choose a pet family",
 
+        // profiler
+        'realm'         => "Realm",
+        'region'        => "Region",
+
         // help
         'help'          => "Help",
         'helpTopics'    => array(
             "Commenting and You",                   "Model Viewer",                         "Screenshots: Tips & Tricks",          "Stat Weighting",
             "Talent Calculator",                    "Item Comparison",                      "Profiler"
-        )
+        ),
+
+        // formating
+        'colon'         => ': ',
+        'dateFmtShort'  => "Y/m/d",
+        'dateFmtLong'   => "Y/m/d \a\\t H:i"
     ),
     'search' => array(
         'search'        => "Search",
@@ -179,12 +188,14 @@ $lang = array(
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Strength", "Agility", "Stamina", "Intellect", "Spirit"],
         'sources'       => array(
-            null,                       "Crafted",                  "Drop",                     "PvP",                      "Quest",                    "Vendor",                   "Trainer",                  "Discovery",
-            "Redemption",               "Talent",                   "Starter",                  "Event",                    "Achievement"
+            null,                           "Crafted",                      "Drop",                         "PvP",                          "Quest",                        "Vendor",
+            "Trainer",                      "Discovery",                    "Redemption",                   "Talent",                       "Starter",                      "Event",
+            "Achievement"
         ),
         'languages'     => array(
-             1 => "Orcish",      2 => "Darnassian",      3 => "Taurahe",     6 => "Dwarvish",        7 => "Common",          8 => "Demonic",         9 => "Titan",          10 => "Thalassian",
-            11 => "Draconic",   12 => "Kalimag",        13 => "Gnomish",    14 => "Troll",          33 => "Gutterspeak",    35 => "Draenei",        36 => "Zombie",         37 => "Gnomish Binary",     38 => "Goblin Binary"
+             1 => "Orcish",                  2 => "Darnassian",              3 => "Taurahe",                 6 => "Dwarvish",                7 => "Common",                  8 => "Demonic",
+             9 => "Titan",                  10 => "Thalassian",             11 => "Draconic",               12 => "Kalimag",                13 => "Gnomish",                14 => "Troll",
+            33 => "Gutterspeak",            35 => "Draenei",                36 => "Zombie",                 37 => "Gnomish Binary",         38 => "Goblin Binary"
         ),
         'gl'            => [null, "Major", "Minor"],
         'si'            => [1 => "Alliance", -1 => "Alliance only", 2 => "Horde", -2 => "Horde only", 3 => "Both"],
@@ -195,72 +206,119 @@ $lang = array(
         'ra'            => [-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"],
         'rep'           => ["Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"],
         'st'            => array(
-            "Default",          "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",
-            "Bear From",        null,                           null,                           "Dire Bear Form",               null,
-            null,               null,                           null,                           "Shadowdance",                  null,
-            null,               "Ghostwolf",                    "Battle Stance",                "Defensive Stance",             "Berserker Stance",
-            null,               null,                           "Metamorphosis",                null,                           null,
-            null,               null,                           "Swift Flight Form",            "Shadow Form",                  "Flight Form",
-            "Stealth",          "Moonkin Form",                 "Spirit of Redemption"
+            "Default",                      "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",                 "Bear From",
+            null,                           null,                           "Dire Bear Form",               null,                           null,                           null,
+            null,                           "Shadowdance",                  null,                           null,                           "Ghostwolf",                    "Battle Stance",
+            "Defensive Stance",             "Berserker Stance",             null,                           null,                           "Metamorphosis",                null,
+            null,                           null,                           null,                           "Swift Flight Form",            "Shadow Form",                  "Flight Form",
+            "Stealth",                      "Moonkin Form",                 "Spirit of Redemption"
         ),
         'me'            => array(
-            null,                       "Charmed",                  "Disoriented",              "Disarmed",                 "Distracted",               "Fleeing",                  "Gripped",                  "Rooted",
-            "Pacified",                 "Silenced",                 "Asleep",                   "Ensnared",                 "Stunned",                  "Frozen",                   "Incapacitated",            "Bleeding",
-            "Healing",                  "Polymorphed",              "Banished",                 "Shielded",                 "Shackled",                 "Mounted",                  "Seduced",                  "Turned",
-            "Horrified",                "Invulnerable",             "Interrupted",              "Dazed",                    "Discovery",                "Invulnerable",             "Sapped",                   "Enraged"
+            null,                           "Charmed",                      "Disoriented",                  "Disarmed",                     "Distracted",                   "Fleeing",
+            "Gripped",                      "Rooted",                       "Pacified",                     "Silenced",                     "Asleep",                       "Ensnared",
+            "Stunned",                      "Frozen",                       "Incapacitated",                "Bleeding",                     "Healing",                      "Polymorphed",
+            "Banished",                     "Shielded",                     "Shackled",                     "Mounted",                      "Seduced",                      "Turned",
+            "Horrified",                    "Invulnerable",                 "Interrupted",                  "Dazed",                        "Discovery",                    "Invulnerable",
+            "Sapped",                       "Enraged"
         ),
         'ct'            => array(
-            "Uncategorized",            "Beast",                    "Dragonkin",                "Demon",                    "Elemental",                "Giant",                    "Undead",                   "Humanoid",
-            "Critter",                  "Mechanical",               "Not specified",            "Totem",                    "Non-combat Pet",           "Gas Cloud"
+            "Uncategorized",                "Beast",                        "Dragonkin",                    "Demon",                        "Elemental",                    "Giant",
+            "Undead",                       "Humanoid",                     "Critter",                      "Mechanical",                   "Not specified",                "Totem",
+            "Non-combat Pet",               "Gas Cloud"
         ),
         'fa'            => array(
-             1 => "Wolf",                2 => "Cat",                 3 => "Spider",              4 => "Bear",                5 => "Boar",                6 => "Crocolisk",           7 => "Carrion Bird",        8 => "Crab",
-             9 => "Gorilla",            11 => "Raptor",             12 => "Tallstrider",        20 => "Scorpid",            21 => "Turtle",             24 => "Bat",                25 => "Hyena",              26 => "Bird of Prey",
-            27 => "Wind Serpent",       30 => "Dragonhawk",         31 => "Ravager",            32 => "Warp Stalker",       33 => "Sporebat",           34 => "Nether Ray",         35 => "Serpent",            37 => "Moth",
-            38 => "Chimaera",           39 => "Devilsaur",          41 => "Silithid",           42 => "Worm",               43 => "Rhino",              44 => "Wasp",               45 => "Core Hound",         46 => "Spirit Beast"
+             1 => "Wolf",                    2 => "Cat",                     3 => "Spider",                  4 => "Bear",                    5 => "Boar",                    6 => "Crocolisk",
+             7 => "Carrion Bird",            8 => "Crab",                    9 => "Gorilla",                11 => "Raptor",                 12 => "Tallstrider",            20 => "Scorpid",
+            21 => "Turtle",                 24 => "Bat",                    25 => "Hyena",                  26 => "Bird of Prey",           27 => "Wind Serpent",           30 => "Dragonhawk",
+            31 => "Ravager",                32 => "Warp Stalker",           33 => "Sporebat",               34 => "Nether Ray",             35 => "Serpent",                37 => "Moth",
+            38 => "Chimaera",               39 => "Devilsaur",              41 => "Silithid",               42 => "Worm",                   43 => "Rhino",                  44 => "Wasp",
+            45 => "Core Hound",             46 => "Spirit Beast"
         ),
         'pvpRank'       => array(
-            null,                                       "Private / Scout",                      "Corporal / Grunt",
-            "Sergeant / Sergeant",                      "Master Sergeant / Senior Sergeant",    "Sergeant Major / First Sergeant",
-            "Knight / Stone Guard",                     "Knight-Lieutenant / Blood Guard",      "Knight-Captain / Legionnare",
-            "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
-            "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
+            null,                                                           "Private / Scout",                                              "Corporal / Grunt",
+            "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
+            "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
+            "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
+            "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
         ),
     ),
     'account' => array(
+        'title'         => "Aowow Account",
+        'email'         => "Email address",
+        'continue'      => "Continue",
+        'groups'        => array(
+            -1 => "None",                   "Tester",                       "Administrator",                "Editor",                       "Moderator",                    "Bureaucrat",
+            "Developer",                    "VIP",                          "Blogger",                      "Premium",                      "Localizer",                    "Sales agent",
+            "Screenshot manager",           "Video manager"
+        ),
+        // signIn
         'doSignIn'      => "Log in to your AoWoW Account",
+        'signIn'        => "Log In",
         'user'          => "Username",
         'pass'          => "Password",
         'rememberMe'    => "Stay logged in",
         'forgot'        => "Forgot",
-        'accNoneYet'    => "Don't have an account",
-        'accCreateNow'  => "Create one now",
-        'userNotFound'  => "Such user does not exists",
-        'userBanned'    => "This Account was closed",
-        'passMismatch'  => "Entered passwords does not match",
-        'loginsExceeded'=> "The maximum number of logins from this IP has been exceeded. Please try again in %s minutes.",
-        'nameInUse'     => "Such user already exists",
-        'email'         => "Email address",
-        'unkError'      => "Unknown error on account create",
-        'accCreate'     => "Create your account",
+        'forgotUser'    => "Username",
+        'forgotPass'    => "Password",
+        'accCreate'     => 'Don\'t have an account? <a href="?account=signup">Create one now!</a>',
+
+        // recovery
+        'recoverUser'   => "Username Request",
+        'recoverPass'   => "Password Reset: Step %s of 2",
+        'newPass'       => "New Password",
+
+        // creation
+        'register'      => "Registration - Step %s of 2",
         'passConfirm'   => "Confirm password",
-        'signup'        => "Signup",
-        'requestName'   => "Username Request",
-        'resetPass'     => "Password Reset",
-        'emailInvalid'  => "This email address is invalid.",
-        'emailUnknown'  => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email feedback@aowow.com for assistance.",
-        'passJustSend'  => "An email containing a new password was just sent to %s",
-        'nameJustSend'  => "An email containing your username was just sent to %s",
-        'wrongPass'     => "Wrong Password",
+
+        // dashboard
         'ipAddress'     => "IP-Adress",
         'lastIP'        => "last used IP",
         'joinDate'      => "Joined",
         'lastLogin'     => "Last visit",
-        'userGroups'    => "Rolle",
+        'userGroups'    => "Role",
         'myAccount'     => "My Account",
         'editAccount'   => "Simply use the forms below to update your account information",
         'publicDesc'    => "Public Description",
         'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+
+        // bans
+        'accBanned'     => "This Account was closed",
+        'bannedBy'      => "Banned by",
+        'ends'          => "Ends on",
+        'permanent'     => "The ban is permanent",
+        'reason'        => "Reason",
+        'noReason'      => "No reason was given.",
+
+        // form-text
+        'emailInvalid'  => "That email address is not valid.", // message_emailnotvalid
+        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
+        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
+        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
+        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
+        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
+        'userNotFound'  => "The username you entered does not exists.",
+        'wrongPass'     => "That password is not vaild.",
+        'accInactive'   => "That account has not yet been confirmed active.",
+        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
+        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+        'errNameLength' => "Your username must be at least 4 characters long.", // message_usernamemin
+        'errNameChars'  => "Your username can only contain letters and numbers.", // message_usernamenotvalid
+        'errPassLength' => "Your password must be at least 6 characters long.", // message_passwordmin
+        'passMismatch'  => "The passwords you entered do not match.",
+        'nameInUse'     => "That username is already taken.",
+        'mailInUse'     => "That email is already registered to an account.",
+        'intError'      => "An internal error occured.",
+        'intError2'     => "An internal error occured. (%s)",
+        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
+        'passCheckFail' => "Passwords do not match.", // message_passwordsdonotmatch
+        'newPassDiff'   => "Your new password must be different than your previous one." // message_newpassdifferent
+    ),
+    'mail' => array(
+        'tokenExpires'  => "This token expires in %s.",
+        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
     ),
     'gameObject' => array(
         'cat'           => [0 => "Other", 9 => "Books", 3 => "Containers", -5 => "Chests", 25 => "Fishing Pools", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],
@@ -408,7 +466,74 @@ $lang = array(
             83 => "Legendary",          84 => "Escort",             85 => "Heroic",             88 => "Raid (10)",          89 => "Raid (25)"
         ),
         'cat'           => array(
-            // todo: after zones
+            0 => array( "Eastern Kingdoms",
+                  36 => "Alterac Mountains",              45 => "Arathi Highlands",                3 => "Badlands",                       25 => "Blackrock Mountain",              4 => "Blasted Lands",
+                  46 => "Burning Steppes",               279 => "Dalaran Crater",                 41 => "Deadwind Pass",                2257 => "Deeprun Tram",                    1 => "Dun Morogh",
+                  10 => "Duskwood",                      139 => "Eastern Plaguelands",            12 => "Elwynn Forest",                3430 => "Eversong Woods",               3433 => "Ghostlands",
+                 267 => "Hillsbrad Foothills",          1537 => "Ironforge",                    4080 => "Isle of Quel'Danas",             38 => "Loch Modan",                     44 => "Redridge Mountains",
+                  51 => "Searing Gorge",                3487 => "Silvermoon City",               130 => "Silverpine Forest",            1519 => "Stormwind City",                 33 => "Stranglethorn Vale",
+                   8 => "Swamp of Sorrows",               47 => "The Hinterlands",              4298 => "The Scarlet Enclave",            85 => "Tirisfal Glades",              1497 => "Undercity",
+                  28 => "Western Plaguelands",            40 => "Westfall",                       11 => "Wetlands"
+            ),
+            1 => array( "Kalimdor",
+                  331 => "Ashenvale",                     16 => "Azshara",                      3524 => "Azuremyst Isle",               3525 => "Bloodmyst Isle",                148 => "Darkshore",
+                 1657 => "Darnassus",                    405 => "Desolace",                       14 => "Durotar",                        15 => "Dustwallow Marsh",              361 => "Felwood",
+                  357 => "Feralas",                      493 => "Moonglade",                     215 => "Mulgore",                      1637 => "Orgrimmar",                    1377 => "Silithus",
+                  406 => "Stonetalon Mountains",         440 => "Tanaris",                       141 => "Teldrassil",                     17 => "The Barrens",                  3557 => "The Exodar",
+                  457 => "The Veiled Sea",               400 => "Thousand Needles",             1638 => "Thunder Bluff",                 490 => "Un'Goro Crater",                618 => "Winterspring"
+             ),
+            8 => array( "Outland",
+                3522 => "Blade's Edge Mountains",       3483 => "Hellfire Peninsula",           3518 => "Nagrand",                      3523 => "Netherstorm",                  3520 => "Shadowmoon Valley",
+                 703 => "Shattrath City",               3679 => "Skettis",                      3519 => "Terokkar Forest",              3521 => "Zangarmarsh"
+            ),
+           10 => array( "Northrend",
+                3537 => "Borean Tundra",                2817 => "Crystalsong Forest",           4395 => "Dalaran",                        65 => "Dragonblight",                  394 => "Grizzly Hills",
+                 495 => "Howling Fjord",                4742 => "Hrothgar's Landing",            210 => "Icecrown",                     3711 => "Sholazar Basin",                 67 => "The Storm Peaks",
+                4197 => "Wintergrasp",                    66 => "Zul'Drak"
+            ),
+            2 => array( "Dungeons",
+                4494 => "Ahn'kahet: The Old Kingdom",   3790 => "Auchenai Crypts",              4277 => "Azjol-Nerub",                   719 => "Blackfathom Deeps",            1584 => "Blackrock Depths",
+                1583 => "Blackrock Spire",              1941 => "Caverns of Time",              3905 => "Coilfang Reservoir",           2557 => "Dire Maul",                    4196 => "Drak'Tharon Keep",
+                 721 => "Gnomeregan",                   4416 => "Gundrak",                      4272 => "Halls of Lightning",           4820 => "Halls of Reflection",          4264 => "Halls of Stone",
+                3562 => "Hellfire Ramparts",            3535 => "Hellfire Citadel",             4131 => "Magisters' Terrace",           3792 => "Mana-Tombs",                   2100 => "Maraudon",
+                2367 => "Old Hillsbrad Foothills",      4813 => "Pit of Saron",                 2437 => "Ragefire Chasm",                722 => "Razorfen Downs",                491 => "Razorfen Kraul",
+                 796 => "Scarlet Monastery",            2057 => "Scholomance",                  3791 => "Sethekk Halls",                3789 => "Shadow Labyrinth",              209 => "Shadowfang Keep",
+                2017 => "Stratholme",                   1477 => "Sunken Temple",                3845 => "Tempest Keep",                 3848 => "The Arcatraz",                 2366 => "The Black Morass",
+                3713 => "The Blood Furnace",            3847 => "The Botanica",                 4100 => "The Culling of Stratholme",    1581 => "The Deadmines",                4809 => "The Forge of Souls",
+                3849 => "The Mechanar",                 4120 => "The Nexus",                    4228 => "The Oculus",                   3714 => "The Shattered Halls",          3717 => "The Slave Pens",
+                3715 => "The Steamvault",                717 => "The Stockade",                 3716 => "The Underbog",                 4415 => "The Violet Hold",              4723 => "Trial of the Champion",
+                1337 => "Uldaman",                       206 => "Utgarde Keep",                 1196 => "Utgarde Pinnacle",              718 => "Wailing Caverns",              1176 => "Zul'Farrak"
+            ),
+            3 => array( "Raids",
+                3959 => "Black Temple",                 2677 => "Blackwing Lair",               3923 => "Gruul's Lair",                 3606 => "Hyjal Summit",                 4812 => "Icecrown Citadel",
+                3457 => "Karazhan",                     3836 => "Magtheridon's Lair",           2717 => "Molten Core",                  3456 => "Naxxramas",                    2159 => "Onyxia's Lair",
+                3429 => "Ruins of Ahn'Qiraj",           3607 => "Serpentshrine Cavern",         4075 => "Sunwell Plateau",              3428 => "Temple of Ahn'Qiraj",          3842 => "The Eye",
+                4500 => "The Eye of Eternity",          4493 => "The Obsidian Sanctum",         4722 => "Trial of the Crusader",        4273 => "Ulduar",                       4603 => "Vault of Archavon",
+                3805 => "Zul'Aman",                     1977 => "Zul'Gurub"
+            ),
+            4 => array( "Classes",
+                -372 => "Death Knight",                 -263 => "Druid",                        -261 => "Hunter",                       -161 => "Mage",                         -141 => "Paladin",
+                -262 => "Priest",                       -162 => "Rogue",                         -82 => "Shaman",                        -61 => "Warlock",                       -81 => "Warrior"
+                    ),
+            5 => array( "Professions",
+                -181 => "Alchemy",                      -121 => "Blacksmithing",                -304 => "Cooking",                      -201 => "Engineering",                  -324 => "First Aid",
+                -101 => "Fishing",                       -24 => "Herbalism",                    -371 => "Inscription",                  -373 => "Jewelcrafting",                -182 => "Leatherworking",
+                -264 => "Tailoring"
+            ),
+            6 => array( "Battlegrounds",
+                 -25 => "All",                          2597 => "Alterac Valley",               3358 => "Arathi Basin",                 3820 => "Eye of the Storm",             4710 => "Isle of Conquest",
+                4384 => "Strand of the Ancients",       3277 => "Warsong Gulch"
+            ),
+            9 => array( "Seasonal",
+                -370 => "Brewfest",                    -1002 => "Children's Week",              -364 => "Darkmoon Faire",                -41 => "Day of the Dead",             -1003 => "Hallow's End",
+               -1005 => "Harvest Festival",             -376 => "Love is in the Air",           -366 => "Lunar Festival",               -369 => "Midsummer",                   -1006 => "New Year's Eve",
+                -375 => "Pilgrim's Bounty",             -374 => "Noblegarden",                 -1001 => "Winter Veil"
+            ),
+            7 => array( "Miscellaneous",
+                -365 => "Ahn'Qiraj War Effort",         -241 => "Argent Tournament",           -1010 => "Dungeon Finder",                 -1 => "Epic",                         -344 => "Legendary",
+                -367 => "Reputation",                   -368 => "Scourge Invasion"
+            ),
+           -2 => "Uncategorized"
         )
     ),
     'title' => array(
@@ -805,10 +930,7 @@ $lang = array(
             "Increases the block value of your shield by %d.",
             "Unknown Bonus #%d (%d)",
         )
-    ),
-    'colon'             => ': ',
-    'dateFmtShort'      => "Y/m/d",
-    'dateFmtLong'       => "Y/m/d \a\\t H:i"
+    )
 );
 
 ?>

@@ -1,359 +1,445 @@
 <?php
-/*
-enum(array( // AcctError
-    'ACCT_USERNAME_LENGTH'      => 'activate_usernamelength',
-    'ACCT_PASSWORD_LENGTH'      => 'activate_passwordlength',
-    'ACCT_USERNAME_SYMBOLS'     => 'activate_invalidusername',
-    'ACCT_PASSWORD_SYMBOLS'     => 'activate_invalidpassword',
-    'ACCT_EMAIL_SYMBOLS'        => 'signup_emailinvalid',
 
-    'ACCT_PASSWORDS_NOT_EQUAL'  => 'signup_passwordsnotequal',
-    'ACCT_USERNAME_EXISTS'      => 'activate_usernameinuse',
-    'ACCT_NO_SUCH_ACCT'         => 'signin_un_or_pass_fail',
-    'ACCT_IP_LOCKED'            => 'signin_ip_locked',
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
 
-    'ACCT_SIGNUP_BLOCKED'       => 'signup_blocked',
-    'ACCT_SIGNIN_BLOCKED'       => 'signin_blocked',
 
-    'ACCT_INTERNAL_ERROR'       => 'internal_error',
-));
-
-enum(array( // UserPropsLimits
-    'USERNAME_LENGTH_MIN'    => 4,
-    'USERNAME_LENGTH_MAX'    => 16,
-    'PASSWORD_LENGTH_MIN'    => 6,
-    'PASSWORD_LENGTH_MAX'    => 16,
-));
-*/
-
-function signin()
+// exclude & weightscales are handled as Ajax
+class AccountPage extends GenericPage
 {
-    if (!isset($_POST['username']) || !isset($_POST['password']))
-        return Lang::$account['userNotFound'];
-
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $remember = $_POST['remember_me'] == 'yes';
-
-    // handle login try limitation
-    $ipBan = DB::Aowow()->selectRow('SELECT ip, count, UNIX_TIMESTAMP(unbanDate) as unbanDate FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?',
-        $_SERVER['REMOTE_ADDR']
+    protected $tpl       = 'acc-dashboard';
+    protected $js        = ['user.js', 'profile.js'];
+    protected $css       = [['path' => 'Profiler.css']];
+    protected $mode      = CACHETYPE_NONE;
+    protected $category  = null;
+    protected $validCats = array(
+        'signin'         => [false],
+        'signup'         => [false],
+        'signout'        => [true],
+        'forgotpassword' => [false],
+        'forgotusername' => [false]
     );
 
-    if (!$ipBan)                                        // no entry exists; set count to 1
-        DB::Aowow()->query('INSERT INTO ?_account_bannedIPs VALUES (?, 0, 1, FROM_UNIXTIME(?))',
-            $_SERVER['REMOTE_ADDR'],
-            time() + CFG_FAILED_AUTH_EXCLUSION
-        );
-    else if ($ipBan['unbanDate'] < time())              // ip has accumulated counts but time expired; reset count to 1
-        DB::Aowow()->query('INSERT IGNORE INTO ?_account_bannedIPs VALUES (?, 0, 1, ?)',
-            $_SERVER['REMOTE_ADDR'],
-            time() + CFG_FAILED_AUTH_EXCLUSION
-        );
-    else                                                // entry already exists; increment count
-        DB::Aowow()->query('UPDATE ?_account_bannedIPs SET count = count + 1, unbanDate = FROM_UNIXTIME(?) WHERE ip = ?',
-            time() + CFG_FAILED_AUTH_EXCLUSION,
-            $_SERVER['REMOTE_ADDR']
-        );
+    protected $user      = '';
+    protected $error     = '';
+    protected $next      = '';
 
-    $id = DB::Aowow()->SelectCell('SELECT id FROM ?_account WHERE user = ?', $username);
-    if (!$id)
-        return Lang::$account['userNotFound'];
-
-    User::init($id);
-
-    switch (User::Auth($password))
+    public function __construct($pageCall, $pageParam)
     {
-        case AUTH_OK:
-            DB::Aowow()->query('DELETE FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?',
-                $_SERVER['REMOTE_ADDR']
-            );
-            DB::Aowow()->query('UPDATE ?_account SET lastLogin = FROM_UNIXTIME(?), timeout = FROM_UNIXTIME(?) WHERE id = ?',
-                time(),
-                $remember ?  0 : time() + CFG_SESSION_TIMEOUT_DELAY,
-                $id
-            );
-            User::writeCookie();                    // overwrites the current user
-            return;
-        case AUTH_BANNED:
-           User::writeCookie();
-           return Lang::$account['userBanned'];
-        case AUTH_WRONGPASS:
-            User::destroy();
-            return Lang::$account['wrongPass'];
-        case AUTH_IPBANNED:
-            User::destroy();
-            return sprintf(Lang::$account['loginsExceeded'], round(CFG_FAILED_AUTH_EXCLUSION / 60));
-        default:
-            return;
-    }
-}
+        if ($pageParam)
+            $this->category = [$pageParam];
 
-function signup()
-{
-    global $smarty;
+        parent::__construct($pageCall, $pageParam);
 
-/*
-        $username = Get(GET_STRING, 'username', 'POST');
-        $password = Get(GET_STRING, 'password', 'POST');
-        $pwd2     = Get(GET_STRING, 'password2', 'POST');
-        $email    = Get(GET_STRING, 'email', 'POST');
-        $remember = Get(GET_BOOL, 'remember_me', 'POST');
-
-        if($password != $pwd2)
+        if ($pageParam)
         {
-            $this->acct_error = ACCT_PASSWORDS_NOT_EQUAL;
-            $this->type = 'signup';
-            return;
-        }
-
-        // Check length
-        if(strlen($username) > USERNAME_LENGTH_MAX || strlen($username) < USERNAME_LENGTH_MIN)
-        {
-            $this->acct_error = ACCT_USERNAME_LENGTH;
-            $this->type = 'signup';
-            return;
-        }
-        if(strlen($password) > PASSWORD_LENGTH_MAX || strlen($password) < PASSWORD_LENGTH_MIN)
-        {
-            $this->acct_error = ACCT_PASSWORD_LENGTH;
-            $this->type = 'signup';
-            return;
-        }
-
-        // Check symbols
-        if(preg_match('/[^\w\d]/i', $username))
-        {
-            $this->acct_error = ACCT_USERNAME_SYMBOLS;
-            $this->type = 'signup';
-            return;
-        }
-        if(preg_match('/[^\w\d!"#\$%]/', $password))
-        {
-            $this->acct_error = ACCT_PASSWORD_SYMBOLS;
-            $this->type = 'signup';
-            return;
-        }
-        if(!preg_match('/^([a-z0-9._-]+)(\+[a-z0-9._-]+)?(@[a-z0-9.-]+\.[a-z]{2,4})$/i', $email))
-        {
-            $this->acct_error = ACCT_EMAIL_SYMBOLS;
-            $this->type = 'signup';
-            return;
-        }
-
-        // After 5 signup tries in a row,
-        // or after a single successful signup,
-        // the signup feature is blocked for 3 min
-        // and the time is expanded to full-time block.
-
-        DB::Realm()->Query('DELETE FROM account_ip_signup WHERE ip = ? AND time <= ?d', $_SERVER['REMOTE_ADDR'], time() - 3*MINUTE);
-        DB::Realm()->Query('INSERT IGNORE INTO account_ip_signup (ip,time,tries) VALUES (?,?d,?d)', $_SERVER['REMOTE_ADDR'], time(), 0);
-        $tries = DB::Realm()->SelectCell('SELECT tries FROM account_ip_signup WHERE ip = ?', $_SERVER['REMOTE_ADDR']);
-        if($tries >= 5)
-        {
-            DB::Realm()->Query('UPDATE account_ip_signup SET time = ?d WHERE ip = ?', time(), $_SERVER['REMOTE_ADDR']);
-            $this->acct_error = ACCT_SIGNUP_BLOCKED;
-            $this->type = 'signup';
-            return;
-        }
-        DB::Realm()->Query('UPDATE account_ip_signup SET tries = tries + 1 WHERE ip = ?', $_SERVER['REMOTE_ADDR']);
-
-        $result = DB::Realm()->SelectCell('SELECT 1 FROM account WHERE username = ?', $username);
-        if($result)
-        {
-            $this->acct_error = ACCT_USERNAME_EXISTS;
-            $this->type = 'signup';
-            return;
-        }
-
-        DB::Realm()->Query('UPDATE account_ip_signup SET tries = tries + 5 WHERE ip = ?', $_SERVER['REMOTE_ADDR']);
-        $id = DB::Realm()->Query('
-                INSERT INTO account (username,sha_pass_hash,email,joindate,expansion,last_ip)
-                VALUES (?,?,?,NOW(),?d,?)
-            ',
-            strtoupper($username),
-            $hash = AccountPage::CreateHash($username, $password),
-            strtolower($email),
-            2,
-            $_SERVER['REMOTE_ADDR']
-        );
-        if($id)
-        {
-            DB::Realm()->Query('UPDATE account_ip_signup SET tries = tries + 5 WHERE ip = ?', $_SERVER['REMOTE_ADDR']);
-            DB::Realm()->Query('INSERT INTO account_aowow_extend (id,name) VALUES (?d,?)', $id, 'user-'.wn_create($id, WN_));
-
-            $us = new User($id);
-            if($us->Auth($hash) == AUTH_OK)
-                $us->SetAuthCookies($remember);
-            else
-            {
-                $this->acct_error = ACCT_INTERNAL_ERROR;
-                $this->type = 'signin';
-                return;
-            }
-        }
-        else
-        {
-            $this->acct_error = ACCT_INTERNAL_ERROR;
-            $this->type = 'signup';
-            return;
-        }
-*/
-
-    // Account creation
-    if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['c_password']) && CFG_ALLOW_REGISTER)
-    {
-        // password mismatch
-        if ($_POST['password'] != $_POST['c_password'])
-            $smarty->assign('signup_error', Lang::$account['passMismatch']);
-        else
-        {
-            // AccName already in use
-            if (DB::Aowow()->selectCell('SELECT 1 FROM aowow_account WHERE user = ? LIMIT 1', $_POST['username']))
-                $smarty->assign('signup_error', Lang::$account['nameInUse']);
-            else
-            {
-                $success = DB::Aowow()->query('INSERT INTO aowow_account (user, passHash, displayName, email, joindate, lastIP, locale) VALUES (?, ?, ?, ?, NOW(), ?, ?)',
-                    $_POST['username'],
-                    sha1(strtoupper($_POST['username']).':'.strtoupper($_POST['password'])),
-                    Util::ucFirst($_POST['username']),
-                    (isset($_POST['email']))? $_POST['email'] : '',
-                    (isset($_SERVER["REMOTE_ADDR"]))? $_SERVER["REMOTE_ADDR"] : '',
-                    0
-                );
-                if ($success > 0)
-                    // all fine, send to login
-                    $_REQUEST['account']='signin';
-                else
-                    // something went wrong
-                    $smarty->assign('signup_error', Lang::$account['unkError']);
-            }
+            // requires auth && not authed
+            if ($this->validCats[$pageParam][0] && !User::$id)
+                $this->forwardToSignIn('account='.$pageParam);
+            // doesn't require auth && authed
+            else if (!$this->validCats[$pageParam][0] && User::$id)
+                header('Location: ?account');               // goto dashboard
         }
     }
-}
 
-function dashboard()
-{
-    // cpmsg    change pass messaeg class:failure|success, msg:blabla
-}
-
-function recoverPass()
-{
-}
-
-function recoverUser()
-{
-}
-
-$smarty->updatePageVars(array(
-    'reqCSS' => array(
-        ['path' => STATIC_URL.'/css/Profiler.css'],
-    ),
-    'reqJS'  => array(
-        STATIC_URL.'/js/user.js',
-        STATIC_URL.'/js/profile.js',
-    ),
-));
-
-$smarty->assign('lang', array_merge(Lang::$main, Lang::$account, ['colon' => Lang::$colon]));
-
-if (User::$id)
-{
-    switch ($pageParam)
+    protected function generateContent()
     {
-        case 'exclude':
-            // profiler completion exclude handler
-            // $_POST['groups'] = bitMask of excludeGroupIds when using .. excludeGroups .. duh
-            // should probably occur in g_user.excludegroups (dont forget to also set g_users.settings = {})
-            die();
-            break;
-        case 'signout':
-            User::destroy();
-            $next = explode('?', $_SERVER['HTTP_REFERER']);
-            $next = !empty($next[1]) ? '?'.$next[1] : '.';
-            header('Location: '.$next);
-        case 'weightscales':
-            if (isset($_POST['save']))
-            {
-                if (!isset($_POST['id']))
+        if (!$this->category)
+        {
+            $this->createDashboard();
+            return;
+        }
+
+        switch ($this->category[0])
+        {
+            case 'forgotpassword':
+                if (CFG_AUTH_MODE != AUTH_MODE_SELF)        // only recover own accounts
+                    $this->error();
+
+                $this->tpl = 'acc-recover';
+                $this->resetPass = false;
+
+                if ($this->createRecoverPass($nStep))       // location-header after final step
+                    header('Location: ?account=signin');
+
+                $this->head = sprintf(Lang::$account['recoverPass'], $nStep);
+                break;
+            case 'forgotusername':
+                if (CFG_AUTH_MODE != AUTH_MODE_SELF)        // only recover own accounts
+                    $this->error();
+
+                $this->tpl = 'acc-recover';
+                if (isset($_POST['email']))
                 {
-                    $res = DB::Aowow()->selectRow('SELECT max(id) as max, count(id) as num FROM ?_account_weightscales WHERE account = ?d', User::$id);
-                    if ($res['num'] < 5)                    // more or less hard-defined in LANG.message_weightscalesaveerror
-                        $_POST['id'] = ++$res['max'];
+                    if (!Util::isValidEmail($_POST['email']))
+                        $this->error = Lang::$account['emailInvalid'];
+                    else if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE email = ?', $_POST['email']))
+                        $this->error = Lang::$account['emailNotFound'];
+                    else if ($err = $this->doRecoverUser($_POST['email']))
+                        $this->error = $err;
                     else
-                        die('0');
+                        $this->text = sprintf(Lang::$account['recovUserSent']. $_POST['email']);
                 }
 
-                if (DB::Aowow()->query('REPLACE INTO ?_account_weightscales VALUES (?d, ?d, ?, ?)', intVal($_POST['id']), User::$id, $_POST['name'], $_POST['scale']))
-                    die((string)$_POST['id']);
+                $this->head = Lang::$account['recoverUser'];
+                break;
+            case 'signin':
+                $this->tpl = 'acc-signIn';
+                $this->next = $this->getNext();
+                if (isset($_POST['username']) || isset($_POST['password']))
+                {
+                    if ($err = $this->doSignIn())
+                        $this->error = $err;
+                    else
+                    {
+                        session_regenerate_id(true);        // user status changed => regenerate id
+                        header('Location: '.$this->getNext(true));
+                    }
+                }
+                else if (!empty($_GET['token']) && ($_ = DB::Aowow()->selectCell('SELECT user FROM ?_account WHERE status IN (?a) AND token = ? AND statusTimer >  UNIX_TIMESTAMP()', [ACC_STATUS_RECOVER_USER, ACC_STATUS_OK], $_GET['token'])))
+                    $this->user = $_;
+
+                break;
+            case 'signup':
+                if (!CFG_ALLOW_REGISTER || CFG_AUTH_MODE != AUTH_MODE_SELF)
+                    $this->error();
+
+                $this->tpl = 'acc-signUp';
+                $nStep = 1;
+                if (isset($_POST['username']) || isset($_POST['password']) || isset($_POST['c_password']) || isset($_POST['email']))
+                {
+                    if ($err = $this->doSignUp())
+                        $this->error = $err;
+                    else
+                    {
+                        $nStep = 1.5;
+                        $this->text = sprintf(Lang::$account['createAccSent']. $_POST['email']);
+                    }
+                }
+                else if (!empty($_GET['token']) && DB::Aowow()->query('SELECT 1 FROM ?_account WHERE status = ?d AND token = ?', ACC_STATUS_NEW, $_GET['token']))
+                {
+                    $nStep = 2;
+                    DB::Aowow()->query('UPDATE ?_account SET status = ?d WHERE token = ?', ACC_STATUS_OK, $_GET['token']);
+                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, ?d + 1, UNIX_TIMESTAMP() + ?d)', $_SERVER['REMOTE_ADDR'], CFG_FAILED_AUTH_COUNT, CFG_FAILED_AUTH_EXCLUSION);
+                    $this->text = sprintf(Lang::$account['accActivated'], $_GET['token']);
+                }
                 else
-                    die('0');
-            }
-            else if (isset($_POST['delete']) && isset($_POST['id']) && User::$id)
-                DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', intVal($_POST['id']), User::$id);
-            else
-                die('0');
+                    $this->next = $this->getNext();
 
-            break;
-        case '';
-            dashboard();
-            $smarty->display('dashboard.tpl');
-            break;
-        default:
-            $smarty->error();
+                $this->head = sprintf(Lang::$account['register'], $nStep);
+                break;
+            case 'signout':
+                User::destroy();
+            default:
+                header('Location: '.$this->getNext(true));
+                break;
+        }
     }
-}
-else
-{
-    switch ($pageParam)
+
+    protected function generateTitle()
     {
-        case 'signin_do':
-            $error = signin();
-            if ($error)
-                $smarty->assign('signinError', $error);
-            else
-                header('Location: '.$_GET['next']);
-        case 'signin':
-            if (!isset($_GET['next']))
-            {
-                $next = isset($_SERVER['HTTP_REFERER']) ? explode('?', $_SERVER['HTTP_REFERER']) : '.';
-                $smarty->assign('next', isset($next[1]) ? '?'.$next[1] : '.');
-            }
-            else
-                $smarty->assign('next', $_GET['next']);
+        $this->title = [Lang::$account['title']];
+    }
 
-            $smarty->assign('register', CFG_ALLOW_REGISTER);
-            $smarty->display('signin.tpl');
-            break;
-        case 'signup_do':
-            $error = signup();
-            if ($error)
-                $smarty->assign('signupError', $error);
+    protected function generatePath() { }
+
+    private function createDashboard()
+    {
+        if (!User::$id)
+            $this->forwardToSignIn('account');
+
+        $user = DB::Aowow()->selectRow('SELECT * FROM ?_account WHERE id = ?d', User::$id);
+        $bans = DB::Aowow()->select('SELECT ab.*, a.displayName, ab.id AS ARRAY_KEY FROM ?_account_banned ab LEFT JOIN ?_account a ON a.id = ab.staffId WHERE ab.userId = ?d', User::$id);
+
+        /***********/
+        /* Infobox */
+        /***********/
+
+        $infobox   = [];
+        $infobox[] = Lang::$account['joinDate']. Lang::$main['colon'].'[tooltip name=joinDate]'. date('l, G:i:s', $user['joinDate']). '[/tooltip][span class=tip tooltip=joinDate]'. date(Lang::$main['dateFmtShort'], $user['joinDate']). '[/span]';
+        $infobox[] = Lang::$account['lastLogin'].Lang::$main['colon'].'[tooltip name=lastLogin]'.date('l, G:i:s', $user['prevLogin']).'[/tooltip][span class=tip tooltip=lastLogin]'.date(Lang::$main['dateFmtShort'], $user['prevLogin']).'[/span]';
+        $infobox[] = Lang::$account['lastIP'].   Lang::$main['colon'].$user['prevIP'];
+        $infobox[] = Lang::$account['email'].    Lang::$main['colon'].$user['email'];
+
+        $groups = [];
+        foreach (Lang::$account['groups'] as $idx => $key)
+            if ($idx >= 0 && $user['userGroups'] & (1 << $idx))
+                $groups[] = (!fMod(count($groups) + 1, 3) ? '[br]' : null).Lang::$account['groups'][$idx];
+
+        $infobox[] = Lang::$account['userGroups'].Lang::$main['colon'].($groups ? implode(', ', $groups) : Lang::$account['groups'][-1]);
+
+        $this->infobox = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
+
+        /*************/
+        /* Ban Popup */
+        /*************/
+
+        $this->banned = [];
+        foreach ($bans as $b)
+        {
+            if (!($b['typeMask'] & (ACC_BAN_TEMP | ACC_BAN_PERM)) || ($b['end'] && $b['end'] <= time()))
+                continue;
+
+            $this->banned = array(
+                'by'     => [$b['staffId'], $b['displayName']],
+                'end'    => $b['end'],
+                'reason' => $b['reason']
+            );
+
+            break;                                          // one is enough
+        }
+
+        /************/
+        /* Listview */
+        /************/
+
+        // claimed characters
+        // profiles
+        // own screenshots
+        // own videos
+        // own comments (preview)
+        // articles guides..?
+
+        $this->lvData = [];
+
+        // cpmsg    change pass messaeg class:failure|success, msg:blabla
+    }
+
+    private function createRecoverPass(&$step)
+    {
+        $step = 1;
+
+        if (isset($_POST['email']))                         // step 1
+        {
+            if (!Util::isValidEmail($_POST['email']))
+                $this->error = Lang::$account['emailInvalid'];
+            else if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE email = ?', $_POST['email']))
+                $this->error = Lang::$account['emailNotFound'];
+            else if ($err = $this->doRecoverPass($_POST['email']))
+                $this->error = $err;
             else
-                header('Location: '.$_GET['next']);
-            break;
-        case 'signup':
-            if (!isset($_GET['next']))
             {
-                $next = isset($_SERVER['HTTP_REFERER']) ? explode('?', $_SERVER['HTTP_REFERER']) : '.';
-                $smarty->assign('next', isset($next[1]) ? '?'.$next[1] : '.');
+                $step = 1.5;
+                $this->text = sprintf(Lang::$account['recovPassSent'], $_POST['email']);
             }
+        }
+        else if (isset($_GET['token']))                     // step 2
+        {
+            $step = 2;
+            $this->resetPass = true;
+            $this->token     = $_GET['token'];
+        }
+        else if (isset($_POST['token']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['c_password']))
+        {
+            $step = 2;
+            $this->resetPass = true;
+            $this->token     = $_GET['token'];              // insecure source .. that sucks; but whats the worst that could happen .. this account cannot be recovered for some minutes
+
+            if ($err = $this->doResetPass())
+                $this->error = $err;
             else
-                $smarty->assign('next', $_GET['next']);
-            $smarty->display('signup.tpl');
-            break;
-        case 'forgotpassword':
-            recoverPass();
-            $smarty->display('recoverPass.tpl');
-            break;
-        case 'forgotusername':
-            recoverUser();
-            $smarty->display('recoverUser.tpl');
-            break;
-        default:
-            header('Location: '.($_GET['next'] ? $_GET['next'] : '.'));
-            break;
+                return true;
+        }
+
+        return false;
+    }
+
+    private function doSignIn()
+    {
+        if (!isset($_POST['username']) || !isset($_POST['password']))
+            return Lang::$account['userNotFound'];
+
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+        $doExpire = $_POST['remember_me'] != 'yes';
+
+        switch (User::Auth($username, $password))
+        {
+            case AUTH_OK:
+                // reset account status, update expiration
+                DB::Aowow()->query('UPDATE ?_account SET prevLogin = curLogin, curLogin = UNIX_TIMESTAMP(), prevIP = curIP, curIP = ?, allowExpire = ?d, status = 0, statusTimer = 0, token = "" WHERE user = ?',
+                    $_SERVER['REMOTE_ADDR'],
+                    $doExpire,
+                    $username
+                );
+                if (User::init())
+                    User::save();                           // overwrites the current user
+                return;
+            case AUTH_BANNED:
+                if (User::init())
+                    User::save();
+               return Lang::$account['accBanned'];
+            case AUTH_WRONGUSER:
+                User::destroy();
+                return Lang::$account['userNotFound'];
+            case AUTH_WRONGPASS:
+                User::destroy();
+                return Lang::$account['wrongPass'];
+            case AUTH_ACC_INACTIVE:
+                User::destroy();
+                return Lang::$account['accInactive'];
+            case AUTH_IPBANNED:
+                User::destroy();
+                return sprintf(Lang::$account['loginExceeded'], Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
+            default:
+                return;
+        }
+    }
+
+    private function doSignUp()
+    {
+        $username  = @$_POST['username'];
+        $password  = @$_POST['password'];
+        $cPassword = @$_POST['c_password'];
+        $email     = @$_POST['email'];
+        $doExpire  = @$_POST['remember_me'] != 'yes';
+
+        // check username
+        if (strlen($username) > 4 || strlen($username) < 16)
+            return Lang::$account['errNameLength'];
+
+        if (preg_match('/[^\w\d]/i', $username))
+            return Lang::$account['errNameChars'];
+
+        // check password
+        if (strlen($password) > 6 || strlen($password) < 16)
+            return Lang::$account['errPassLength'];
+
+        // if (preg_match('/[^\w\d!"#\$%]/', $password))    // such things exist..? :o
+            // return Lang::$account['errPassChars'];
+
+        if ($password != $cPassword)
+            return Lang::$account['passMismatch'];
+
+        // check email
+        if (!Util::isValidEmail($email))
+            return Lang::$account['emailInvalid'];
+
+        // limit account creation
+        $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedIPs WHERE type = 1 AND ip = ?', $_SERVER['REMOTE_ADDR']);
+        if ($ip && $ip['count'] >= CFG_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
+        {
+            DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, $_SERVER['REMOTE_ADDR']);
+            return sprintf(Lang::$account['signupExceeded'], Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
+        }
+
+        // username taken
+        if ($_ = DB::Aowow()->SelectCell('SELECT user FROM ?_account WHERE (user = ? OR email = ?) AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $username, $email, ACC_STATUS_NEW, ACC_STATUS_NEW))
+            return $_ == $username ? Lang::$account['nameInUse'] : Lang::$account['mailInUse'];
+
+        // create..
+        $token = Util::createHash();
+        $delay = 7 * DAY;
+        $id = DB::Aowow()->query('INSERT INTO ?_account (user, passHash, displayName, email, joindate, curIP, allowExpire, locale, status, statusTimer, token) VALUES (?, ?, ?, ?,  UNIX_TIMESTAMP(), ?, ?d, ?d, ?d, UNIX_TIMESTAMP() + ?d, ?)',
+            $username,
+            User::hashCrypt($_POST['password']),
+            Util::ucFirst($username),
+            $email,
+            isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : '',
+            $doExpire,
+            User::$localeId,
+            ACC_STATUS_NEW,
+            $delay,
+            $token
+        );
+        if (!$id)                                           // something went wrong
+            return Lang::$account['intError'];
+        else if ($_ = $this->sendMail($email, Lang::$mail['accConfirm'][0], sprintf(Lang::$mail['accConfirm'][1], $token), $delay))
+        {
+            // success:: update ip-bans
+            if (!$ip || $ip['unbanDate'] < time())
+                DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, 1, UNIX_TIMESTAMP() + ?d)', $_SERVER['REMOTE_ADDR'], CFG_FAILED_AUTH_EXCLUSION);
+            else
+                DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, $_SERVER['REMOTE_ADDR']);
+
+            return $_;
+        }
+    }
+
+    private function doRecoverPass($target)
+    {
+        $delay = 5 * MINUTE;
+        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_PASS, $target, $delay, $token))
+            return $_;
+
+        // send recovery mail
+        return $this->sendMail($target, Lang::$mail['resetPass'][0], sprintf(Lang::$mail['resetPass'][1], $token), $delay);
+    }
+
+    private function doResetPass()
+    {
+        $token = $_POST['token'];
+        $email = $_POST['email'];
+        $pass  = $_POST['password'];
+        $cPass = $_POST['c_password'];
+
+        if ($pass != $cPass)
+            return Lang::$account['passCheckFail'];
+
+        $uRow = DB::Aowow()->selectRow('SELECT id, user, passHash FROM ?_account WHERE token = ? AND email = ? AND status = ?d AND statusTimer > UNIX_TIMESTAMP()', $token, $email, ACC_STATUS_RECOVER_PASS);
+        if (!$uRow)
+            return Lang::$account['emailNotFound'];         // assume they didn't meddle with the token
+
+        if (!User::verifyCrypt($newPass))
+            return Lang::$account['newPassDiff'];
+
+        if (!DB::Aowow()->query('UPDATE ?_account SET passHash = ?, status = ?d WHERE id = ?d', User::hashcrypt($newPass), ACC_STATUS_OK, $uRow['id']))
+            return Lang::$account['intError'];
+    }
+
+    private function doRecoverUser($target)
+    {
+        $delay = 5 * MINUTE;
+        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_USER, $target, $delay, $token))
+            return $_;
+
+        // send recovery mail
+        return $this->sendMail($target, Lang::$mail['recoverUser'][0], sprintf(Lang::$mail['recoverUser'][1], $token), $delay);
+    }
+
+    private function initRecovery($type, $target, $delay, &$token)
+    {
+        if (!$type)
+            return Lang::$account['intError'];
+
+        // check if already processing
+        if ($_ = DB::Aowow()->selectCell('SELECT statusTimer - UNIX_TIMESTAMP() FROM ?_account WHERE email = ? AND status <> ?d AND statusTimer > UNIX_TIMESTAMP()', $target, ACC_STATUS_OK))
+            return sprintf(lang::$account['isRecovering'], Util::formatTime($_));
+
+        // create new token and write to db
+        $token = Util::createHash();
+        if (!DB::Aowow()->query('UPDATE ?_account SET token = ?, status = ?d, statusTimer =  UNIX_TIMESTAMP() + ?d WHERE email = ?', $token, $type, $delay, $target))
+            return Lang::$account['intError'];
+    }
+
+    private function sendMail($target, $subj, $msg, $delay = 300)
+    {
+        // send recovery mail
+        $subj   = CFG_NAME_SHORT.Lang::$main['colon'] . $subj;
+        $msg   .= "\r\n\r\n".sprintf(Lang::$mail['tokenExpires'], Util::formatTime($delay * 1000))."\r\n";
+        $header = 'From: '.CFG_CONTACT_EMAIL . "\r\n" .
+                  'Reply-To: '.CFG_CONTACT_EMAIL . "\r\n" .
+                  'X-Mailer: PHP/' . phpversion();
+
+        if (!mail($target, $subj, $msg, $header))
+            return sprintf(Lang::$account['intError2'], 'send mail');
+    }
+
+    private function getNext($forHeader = false)
+    {
+        $next = $forHeader ? '.' : '';
+        if (isset($_GET['next']))
+            $next = $_GET['next'];
+        else if (isset($_SERVER['HTTP_REFERER']) && strstr($_SERVER['HTTP_REFERER'], '?'))
+            $next = explode('?', $_SERVER['HTTP_REFERER'])[1];
+
+        if ($forHeader && !$next)
+            $next = '.';
+
+        return ($forHeader && $next != '.' ? '?' : '').$next;
     }
 }
+
+
 
 ?>

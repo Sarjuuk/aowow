@@ -11,8 +11,8 @@ class WorldEventList extends BaseType
 
     protected     $queryBase = 'SELECT *, -e.id as id, -e.id AS ARRAY_KEY FROM ?_events e';
     protected     $queryOpts = array(
-                                   'e' => ['j' => ['?_holidays h2 ON e.holidayId = h2.id', true], 'o' => '-e.id ASC'],
-                                   'h' => ['j' => ['?_holidays h ON e.holidayId = h.id']]
+                                   'e' => [['h']],
+                                   'h' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']
                                );
 
     public function __construct($conditions = [])
@@ -148,15 +148,14 @@ class WorldEventList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = 0)
+    public function getJSGlobals($addMask = 0)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
-        {
-            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => array(
-                'name' => $this->getField('name', true),
-                'icon' => $this->curTpl['iconString']
-            )]);
-        }
+            $data[TYPE_WORLDEVENT][$this->id] = ['name' => $this->getField('name', true), 'icon' => $this->curTpl['iconString']];
+
+        return $data;
     }
 
     public function renderTooltip() { }

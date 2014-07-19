@@ -789,7 +789,7 @@ span.breadcrumb-ellipsis {
     padding: 0;
 }
 
-.minibox
+.text .minibox
 {
     float: right;
     margin: 0 0 4px 10px;
@@ -804,52 +804,53 @@ span.breadcrumb-ellipsis {
     border-radius: 6px;
 }
 
-.minibox-left
+.text .minibox-left
 {
     float: left;
     margin-left: 0;
     margin-right: 10px;
 }
 
-.minibox h2
+.text .minibox h2
 {
     margin: 0 0 5px 0;
     font-size: 15px;
     border: none;
     font-weight: bold;
+    padding: 0px;
 }
 
-.minibox h2, .minibox h2 b,
-.minibox h2 a:link, .minibox h2 a:visited {
+.text .minibox h2, .text .minibox h2 b,
+.text .minibox h2 a:link, .text .minibox h2 a:visited {
     color: white !important;
 }
 
-.minibox h2 a:link, .minibox h2 a:visited {
+.text .minibox h2 a:link, .text .minibox h2 a:visited {
     color: white;
     text-decoration: none;
 }
 
-.minibox h2 a:hover {
+.text .minibox h2 a:hover {
     text-decoration: underline;
 }
 
-.minibox h3,
-.minibox h3 a:link, .minibox h3 a:visited {
+.text .minibox h3,
+.text .minibox h3 a:link, .text .minibox h3 a:visited {
     color: #9d9d9d !important;
-  font-size: 11px;
-  font-weight: normal;
-  margin: 0px;
+    font-size: 11px;
+    font-weight: normal;
+    margin: 0px;
 }
 
-.minibox h3 img {
-  vertical-align: middle;
+.text .minibox h3 img {
+    vertical-align: middle;
 }
 
-.minibox h3 a:link, .minibox h3 a:visited {
-  text-decoration: underline;
+.text .minibox h3 a:link, .text .minibox h3 a:visited {
+    text-decoration: underline;
 }
-.minibox h3 a:hover {
-  color: white !important;
+.text .minibox h3 a:hover {
+    color: white !important;
 }
 
 h1 a.header-link, h2 a.header-link

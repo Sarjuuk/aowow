@@ -45,18 +45,22 @@ class PetList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals($addMask = GLOBALINFO_ANY)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
         {
             if ($addMask & GLOBALINFO_RELATED)
                 for ($i = 1; $i <= 4; $i++)
                     if ($this->curTpl['spellId'.$i] > 0)
-                        Util::$pageTemplate->extendGlobalIds(TYPE_SPELL, $this->curTpl['spellId'.$i]);
+                        $data[TYPE_SPELL][$this->curTpl['spellId'.$i]] = $this->curTpl['spellId'.$i];
 
             if ($addMask & GLOBALINFO_SELF)
-                Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => ['icon' => $this->curTpl['iconString']]]);
+                $data[TYPE_PET][$this->id] = ['icon' => $this->curTpl['iconString']];
         }
+
+        return $data;
     }
 
     public function renderTooltip() { }

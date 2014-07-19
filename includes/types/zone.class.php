@@ -31,26 +31,34 @@ UPDATE dbc.worldmaparea a, world.aowow_zones z SET yMax = `left`, xMax = top, yM
     LFG_TYPE_RANDOM                              = 6
 
 CREATE TABLE `aowow_zones` (
-    `id`          mediumint(8) UNSIGNED NOT NULL COMMENT 'Zone Id' ,
-    `mapId`       mediumint(8) UNSIGNED NOT NULL COMMENT 'Map Identifier' ,
-    `category`    smallint(6) NOT NULL ,
-    `flags`       int(11) NOT NULL ,
-    `faction`     tinyint(2) NOT NULL ,
-    `expansion`   tinyint(2) NOT NULL ,
-    `type`        tinyint(2) UNSIGNED NOT NULL ,
-    `maxPlayer`   smallint(6) NOT NULL ,
-    `levelReq`    smallint(6) NOT NULL ,
-    `levelReqLFG` smallint(6) NOT NULL ,
-    `levelHeroic` smallint(6) NOT NULL ,
-    `levelMax`    smallint(6) NOT NULL ,
-    `levelMin`    smallint(6) NOT NULL ,
-    `name_loc0`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-    `name_loc2`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-    `name_loc3`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-    `name_loc6`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-    `name_loc8`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
-    PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
+	`id` MEDIUMINT(8) UNSIGNED NOT NULL COMMENT 'Zone Id',
+	`mapId` MEDIUMINT(8) UNSIGNED NOT NULL COMMENT 'Map Identifier',
+	`mapIdBak` MEDIUMINT(8) UNSIGNED NOT NULL,
+	`parentArea` MEDIUMINT(8) UNSIGNED NOT NULL,
+	`category` SMALLINT(6) NOT NULL,
+	`flags` INT(11) NOT NULL,
+	`cuFlags` INT(10) UNSIGNED NOT NULL,
+	`faction` TINYINT(2) NOT NULL,
+	`expansion` TINYINT(2) NOT NULL,
+	`type` TINYINT(2) UNSIGNED NOT NULL,
+	`areaType` TINYINT(2) UNSIGNED NOT NULL,
+	`xMin` FLOAT NOT NULL,
+	`xMax` FLOAT NOT NULL,
+	`yMin` FLOAT NOT NULL,
+	`yMax` FLOAT NOT NULL,
+	`maxPlayer` SMALLINT(6) NOT NULL,
+	`levelReq` SMALLINT(6) NOT NULL,
+	`levelReqLFG` SMALLINT(6) NOT NULL,
+	`levelHeroic` SMALLINT(6) NOT NULL,
+	`levelMax` SMALLINT(6) NOT NULL,
+	`levelMin` SMALLINT(6) NOT NULL,
+	`name_loc0` VARCHAR(255) NOT NULL COMMENT 'Map Name',
+	`name_loc2` VARCHAR(255) NOT NULL,
+	`name_loc3` VARCHAR(255) NOT NULL,
+	`name_loc6` VARCHAR(255) NOT NULL,
+	`name_loc8` VARCHAR(255) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
 
 var g_zone_categories = {
 	0: "Eastern Kingdoms",                                      // areaTable.map == 0 AND
@@ -131,10 +139,14 @@ visibleCols: ['heroiclevel', 'players']
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = 0)
+    public function getJSGlobals($addMask = 0)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
-            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
+            $data[TYPE_ZONE][$this->id] = ['name' => $this->getField('name', true)];
+
+        return $data;
     }
 
     public function renderTooltip() { }

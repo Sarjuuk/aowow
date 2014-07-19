@@ -44,28 +44,31 @@ class AchievementList extends BaseType
                         $_curTpl['rewards'][TYPE_TITLE][] = -$rewId;
                 }
             }
+
+            $_curTpl['iconString'] = $_curTpl['iconString'] ?: 'trade_engineering';
         }
     }
 
-    public function addGlobalsToJScript($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals($addMask = GLOBALINFO_ANY)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
         {
             if ($addMask & GLOBALINFO_SELF)
-                Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => array(
-                    'icon' => $this->curTpl['iconString'],
-                    'name' => $this->getField('name', true)
-                )]);
+                $data[TYPE_ACHIEVEMENT][$this->id] = ['icon' => $this->curTpl['iconString'], 'name' => $this->getField('name', true)];
 
             if ($addMask & GLOBALINFO_REWARDS)
             {
                 foreach ($this->curTpl['rewards'][TYPE_ITEM] as $_)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $_);
+                    $data[TYPE_ITEM][$_] = $_;
 
                 foreach ($this->curTpl['rewards'][TYPE_TITLE] as $_)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_TITLE, $_);
+                    $data[TYPE_TITLE][$_] = $_;
             }
         }
+
+        return $data;
     }
 
     public function getListviewData($addInfoMask = 0x0)
@@ -158,7 +161,7 @@ class AchievementList extends BaseType
             {
                 // link to title - todo (low): crosslink
                 case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
-                    $crtName = Util::ucFirst(Lang::$game['title']).Lang::$colon.$crtName;
+                    $crtName = Util::ucFirst(Lang::$game['title']).Lang::$main['colon'].$crtName;
                     break;
                 // link to quest
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:

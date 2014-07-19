@@ -1,0 +1,19 @@
+<?php
+
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
+
+    function extAuth($user, $pass, &$userId = 0)
+    {
+        /*
+            insert some auth mechanism here
+
+            see defines for usable return values
+            set userId for identification
+        */
+
+        return AUTH_INTERNAL_ERR;
+    }
+
+?>

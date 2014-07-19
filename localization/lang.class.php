@@ -5,6 +5,7 @@ class Lang
     public static $timeUnits;
     public static $main;
     public static $account;
+    public static $mail;
     public static $game;
 
     public static $search;
@@ -26,10 +27,6 @@ class Lang
     public static $spell;
     public static $title;
     public static $zone;
-
-    public static $colon;
-    public static $dateFmtLong;
-    public static $dateFmtShort;
 
     public static function load($loc)
     {
@@ -59,6 +56,9 @@ class Lang
 
         if ($flags & CUSTOM_UNAVAILABLE)
             $tmp[] = self::$main['unavailable'];
+
+        if ($flags & CUSTOM_EXCLUDE_FOR_LISTVIEW && User::isInGroup(U_GROUP_STAFF))
+            $tmp[] = '[tooltip name=excludedHint]This entry is excluded from lists and is not searchable.[/tooltip][span tooltip=excludedHint class="tip q10"]Hidden[/span]';
 
         return $tmp;
     }
@@ -100,10 +100,10 @@ class Lang
                     $skill = 0;
                     switch ($prop)
                     {
-                        case  1: $skill = 633; break;   // Lockpicking
-                        case  2: $skill = 182; break;   // Herbing
-                        case  3: $skill = 186; break;   // Mining
-                        case 20: $skill = 773; break;   // Scribing
+                        case  1: $skill = 633; break;       // Lockpicking
+                        case  2: $skill = 182; break;       // Herbing
+                        case  3: $skill = 186; break;       // Mining
+                        case 20: $skill = 773; break;       // Scribing
                     }
 
                     if ($skill)
@@ -218,7 +218,7 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getClassString($classMask, $asHTML = true, &$n = 0)
+    public static function getClassString($classMask, &$ids = [], &$n = 0, $asHTML = true)
     {
         $classMask &= CLASS_MASK_ALL;                       // clamp to available classes..
 
@@ -228,26 +228,25 @@ class Lang
         $tmp  = [];
         $i    = 1;
         $base = $asHTML ? '<a href="?class=%d" class="c%1$d">%2$s</a>' : '[class=%d]';
-        $br   = $asHTML ? '' : '\n';
+        $br   = $asHTML ? '' : '[br]';
 
         while ($classMask)
         {
             if ($classMask & (1 << ($i - 1)))
             {
-                $tmp[] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['cl'][$i]);
+                $tmp[$i]    = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['cl'][$i]);
                 $classMask &= ~(1 << ($i - 1));
-
-                if (!$asHTML)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_CLASS, $i);
             }
             $i++;
         }
 
-        $n = count($tmp);
+        $n   = count($tmp);
+        $ids = array_keys($tmp);
+
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString($raceMask, &$side = 0, $asHTML = true, &$n = 0)
+    public static function getRaceString($raceMask, &$side = 0, &$ids = [], &$n = 0, $asHTML = true)
     {
         $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
 
@@ -257,7 +256,7 @@ class Lang
         $tmp  = [];
         $i    = 1;
         $base = $asHTML ? '<a href="?race=%d" class="q1">%s</a>' : '[race=%d]';
-        $br   = $asHTML ? '' : '\n';
+        $br   = $asHTML ? '' : '[br]';
 
         if (!$raceMask)
         {
@@ -281,16 +280,15 @@ class Lang
         {
             if ($raceMask & (1 << ($i - 1)))
             {
-                $tmp[] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['ra'][$i]);
+                $tmp[$i]   = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['ra'][$i]);
                 $raceMask &= ~(1 << ($i - 1));
-
-                if (!$asHTML)
-                    Util::$pageTemplate->extendGlobalIds(TYPE_RACE, $i);
             }
             $i++;
         }
 
-        $n = count($tmp);
+        $n   = count($tmp);
+        $ids = array_keys($tmp);
+
         return implode(', ', $tmp);
     }
 }

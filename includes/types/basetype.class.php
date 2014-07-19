@@ -233,16 +233,16 @@ abstract class BaseType
             $this->queryBase .= ' WHERE ('.implode($linking, $where).')';
 
         // append grouping
-        if ($g = array_column($this->queryOpts, 'g'))
-            $this->queryBase .= ' GROUP BY '.implode(', ', array_filter($g));
+        if ($g = array_filter(array_column($this->queryOpts, 'g')))
+            $this->queryBase .= ' GROUP BY '.implode(', ', $g);
 
         // append post filtering
-        if ($h = array_column($this->queryOpts, 'h'))
-            $this->queryBase .= ' HAVING '.implode(' AND ', array_filter($h));
+        if ($h = array_filter(array_column($this->queryOpts, 'h')))
+            $this->queryBase .= ' HAVING '.implode(' AND ', $h);
 
         // append ordering
-        if ($o = array_column($this->queryOpts, 'o'))
-            $this->queryBase .= ' ORDER BY '.implode(', ', array_filter($o));
+        if ($o = array_filter(array_column($this->queryOpts, 'o')))
+            $this->queryBase .= ' ORDER BY '.implode(', ', $o);
 
         // apply limit
         if ($limit)
@@ -320,9 +320,11 @@ abstract class BaseType
 
     public function getRandomId()
     {
-        // its not optimal, so if anyone has an alternative idea..
+        // ORDER BY RAND() is not optimal, so if anyone has an alternative idea..
+        $where   = User::isInGroup(U_GROUP_EMPLOYEE) ? 'WHERE (cuFlags & '.CUSTOM_EXCLUDE_FOR_LISTVIEW.') = 0' : null;
         $pattern = '/SELECT .* (-?`?[\w_]*\`?.?`?(id|entry)`?) AS ARRAY_KEY,?.* FROM (\?[\w_-]+) (`?\w*`?)/i';
-        $replace = 'SELECT $1 FROM $3 $4 WHERE (cuFlags & '.CUSTOM_EXCLUDE_FOR_LISTVIEW.') = 0 ORDER BY RAND() ASC LIMIT 1';
+        $replace = 'SELECT $1 FROM $3 $4 '.$where.' ORDER BY RAND() ASC LIMIT 1';
+
         $query   = preg_replace($pattern, $replace, $this->queryBase);
 
         return DB::Aowow()->selectCell($query);
@@ -392,7 +394,7 @@ abstract class BaseType
     abstract public function getListviewData();
 
     // should return data to extend global js variables for a certain type (e.g. g_items)
-    abstract public function addGlobalsToJScript($addMask = GLOBALINFO_ANY);
+    abstract public function getJSGlobals($addMask = GLOBALINFO_ANY);
 
     // NPC, GO, Item, Quest, Spell, Achievement, Profile would require this
     abstract public function renderTooltip();
@@ -668,9 +670,13 @@ abstract class Filter
                         $this->error = true;
                 }
             }
-
-            $this->evaluateFilter();
         }
+    }
+
+    // use to generate cacheKey for filterable pages
+    public function __sleep()
+    {
+        return ['formData'];
     }
 
     public function urlize(array $override = [], array $addCr = [])
@@ -741,6 +747,9 @@ abstract class Filter
 
     public function getConditions()
     {
+        if (!$this->cndSet)
+            $this->evaluateFilter();
+
         return $this->cndSet;
     }
 
@@ -790,7 +799,7 @@ abstract class Filter
 
         // single cnd?
         if (!$qry)
-            $this->error = 1;
+            $this->error = true;
         else if (count($qry) > 1)
             array_unshift($qry, 'OR');
         else
@@ -921,7 +930,7 @@ abstract class Filter
                 $result = $this->genericBooleanFlags($gen[1], $gen[2], $cr[1]);
                 break;
             case FILTER_CR_STAFFFLAG:
-                if (User::isInGroup(U_GROUP_STAFF) && $cr[1] >= 0)
+                if (User::isInGroup(U_GROUP_EMPLOYEE) && $cr[1] >= 0)
                     $result = $this->genericBooleanFlags($gen[1], (1 << $cr[1]), true);
                 break;
             case FILTER_CR_BOOLEAN:

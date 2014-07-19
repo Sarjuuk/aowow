@@ -4,32 +4,50 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-if (!isset($petCalc))
-    $petCalc = false;
-
 // tabId 1: Tools g_initHeader()
-$smarty->updatePageVars(array(
-    'title'   => $petCalc ? Lang::$main['petCalc'] : Lang::$main['talentCalc'],
-    'tab'     => 1,
-    'dataKey' => $_SESSION['dataKey'],
-    'reqCSS'  => array(
-        ['path' => STATIC_URL.'/css/TalentCalc.css'],
-        ['path' => STATIC_URL.'/css/talent.css'],
-        ['path' => STATIC_URL.'/css/TalentCalc_ie6.css',  'ieCond' => 'lte IE 6'],
-        ['path' => STATIC_URL.'/css/TalentCalc_ie67.css', 'ieCond' => 'lte IE 7'],
-        $petCalc ? ['path' => STATIC_URL.'/css/petcalc.css'] : null
-    ),
-    'reqJS'  => array(
-        STATIC_URL.'/js/TalentCalc.js',
-       ($petCalc ? '?data=pet-talents.pets' : '?data=glyphs').'&locale='.User::$localeId.'&t='.$_SESSION['dataKey'],
-        $petCalc ? STATIC_URL.'/js/petcalc.js'   : STATIC_URL.'/js/talent.js',
-        $petCalc ? STATIC_URL.'/js/swfobject.js' : null
-    )
-));
-$smarty->assign('tcType', $petCalc ? 'pc' : 'tc');
-$smarty->assign('lang', array_merge(Lang::$main, ['colon' => Lang::$colon]));
+class TalentPage extends GenericPage
+{
+    protected $tpl           = 'talent';
+    protected $tabId         = 1;
+    protected $mode          = CACHETYPE_NONE;
+    protected $gDataKey      = true;
+    protected $js            = ['TalentCalc.js'];
+    protected $css           = array(
+        ['path' => 'TalentCalc.css'],
+        ['path' => 'talent.css'],
+        ['path' => 'TalentCalc_ie6.css',  'ieCond' => 'lte IE 6'],
+        ['path' => 'TalentCalc_ie67.css', 'ieCond' => 'lte IE 7'],
+    );
 
-// load the page
-$smarty->display('talent.tpl');
+    private   $isPetCalc     = false;
+
+    public function __construct($pageCall)
+    {
+        parent::__construct();
+
+        $this->isPetCalc = $pageCall == 'petcalc';
+        $this->name      = $this->isPetCalc ? Lang::$main['petCalc'] : Lang::$main['talentCalc'];
+    }
+
+    protected function generateContent()
+    {
+        // add conditional js & css
+        $this->addJS(array(
+           ($this->isPetCalc ? '?data=pet-talents.pets' : '?data=glyphs').'&locale='.User::$localeId.'&t='.$_SESSION['dataKey'],
+            $this->isPetCalc ? 'petcalc.js'   : 'talent.js',
+            $this->isPetCalc ? 'swfobject.js' : null
+        ));
+        $this->addCSS($this->isPetCalc ? ['path' => 'petcalc.css'] : null);
+
+        $this->tcType  = $this->isPetCalc ? 'pc' : 'tc';
+    }
+
+    protected function generateTitle()
+    {
+        array_unshift($this->title, $this->name);
+    }
+
+    protected function generatePath() {}
+}
 
 ?>

@@ -20,12 +20,13 @@ class ItemList extends BaseType
 
     private       $ssd        = [];
     private       $vendors    = [];
+    private       $jsGlobals  = [];                         // getExtendedCost creates some and has no access to template
 
-    protected     $queryBase  = 'SELECT i.*, i.id AS ARRAY_KEY FROM ?_items i';
+    protected     $queryBase  = 'SELECT i.*, `is`.*, i.id AS id, i.id AS ARRAY_KEY FROM ?_items i';
     protected     $queryOpts  = array(
-                      'is'  => ['j' => '?_item_stats AS `is` ON `is`.`id` = `i`.`id`', 'o' => 'score DESC'],
+                      'is'  => ['j' => ['?_item_stats AS `is` ON `is`.`id` = `i`.`id`', true]],
                       's'   => ['j' => ['?_spell AS `s` ON s.effect1CreateItemId = i.id', true], 'g' => 'i.id'],
-                      'i'   => ['o' => 'i.quality DESC, i.itemLevel DESC']
+                      'i'   => [['is'], 'o' => 'i.quality DESC, i.itemLevel DESC']
                   );
 
     public function __construct($conditions = [], $miscData = null)
@@ -106,13 +107,13 @@ class ItemList extends BaseType
                     if ($_ = @$costs['reqArenaPoints'])
                     {
                         $data[-103] = $_;
-                        Util::$pageTemplate->extendGlobalIds(TYPE_CURRENCY, 103);
+                        $this->jsGlobals[TYPE_CURRENCY][103] = 103;
                     }
 
                     if ($_ = @$costs['reqHonorPoints'])
                     {
                         $data[-104] = $_;
-                        Util::$pageTemplate->extendGlobalIds(TYPE_CURRENCY, 104);
+                        $this->jsGlobals[TYPE_CURRENCY][104] = 104;
                     }
 
                     for ($i = 1; $i < 6; $i++)
@@ -134,7 +135,9 @@ class ItemList extends BaseType
             if ($cItems)
             {
                 $moneyItems = new CurrencyList(array(['itemId', $cItems]));
-                $moneyItems->addGlobalsToJscript();
+                foreach ($moneyItems->getJSGlobals() as $type => $jsData)
+                    foreach ($jsData as $k => $v)
+                        $this->jsGlobals[$type][$k] = $v;
 
                 foreach ($itemz as $id => $vendors)
                 {
@@ -157,7 +160,7 @@ class ItemList extends BaseType
                                 }
 
                                 if (!$found)
-                                    Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $k);
+                                    $this->jsGlobals[TYPE_ITEM][$k] = $k;
                             }
                         }
                         $vendors[$l] = $costs;
@@ -227,12 +230,12 @@ class ItemList extends BaseType
         if ($addInfoMask & ITEMINFO_SUBITEMS)
             $this->initSubItems();
 
+        if ($addInfoMask & ITEMINFO_JSON)
+            $this->extendJsonStats();
+
         $data = [];
         foreach ($this->iterate() as $__)
         {
-            if ($addInfoMask & ITEMINFO_JSON)
-                $this->extendJsonStats();
-
             foreach ($this->json[$this->id] as $k => $v)
                 $data[$this->id][$k] = $v;
 
@@ -243,7 +246,7 @@ class ItemList extends BaseType
             if ($addInfoMask & ITEMINFO_JSON)
             {
                 foreach ($this->itemMods[$this->id] as $k => $v)
-                    $data[$this->id][Util::$itemMods[$k]] = $v;
+                    $data[$this->id][$k] = $v;
 
                 if ($_ = intVal(($this->curTpl['minMoneyLoot'] + $this->curTpl['maxMoneyLoot']) / 2))
                     $data[$this->id]['avgmoney'] = $_;
@@ -266,8 +269,7 @@ class ItemList extends BaseType
             {
                 // just use the first results
                 // todo (med): dont use first result; search for the right one
-                $cost = @reset($this->getExtendedCost($miscData)[$this->id]);
-                if ($cost)
+                if ($cost = @reset($this->getExtendedCost($miscData)[$this->id]))
                 {
                     $currency = [];
                     $tokens   = [];
@@ -288,7 +290,7 @@ class ItemList extends BaseType
 
                     if ($e = $cost['event'])
                     {
-                        Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $e);
+                        $this->jsGlobals[TYPE_WORLDEVENT][$e] = $e;
                         $data[$this->id]['condition'] = array(
                             'type'   => TYPE_WORLDEVENT,
                             'typeId' => -$e,
@@ -363,36 +365,33 @@ class ItemList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = GLOBALINFO_SELF)
+    public function getJSGlobals($addMask = GLOBALINFO_SELF, &$extra = [])
     {
+        $data = $addMask & GLOBALINFO_RELATED ? $this->jsGlobals : [];
+
         foreach ($this->iterate() as $id => $__)
         {
-            $extra = null;
-            $data  = null;
 
             if ($addMask & GLOBALINFO_SELF)
             {
-                $data = array(
-                    $id => array(
-                        'name'    => $this->getField('name', true),
-                        'quality' => $this->curTpl['quality'],
-                        'icon'    => $this->curTpl['iconString']
-                    )
+                $data[TYPE_ITEM][$id] = array(
+                    'name'    => $this->getField('name', true),
+                    'quality' => $this->curTpl['quality'],
+                    'icon'    => $this->curTpl['iconString']
                 );
             }
 
             if ($addMask & GLOBALINFO_EXTRA)
             {
-                $extra = array(
+                $extra[$id] = array(
                     'id'      => $id,
-                    'tooltip' => Util::jsEscape($this->renderTooltip(null, true)),
-                    'spells'  => ''
+                    'tooltip' => $this->renderTooltip(true),
+                    'spells'  => new StdClass               // placeholder for knownSpells
                 );
             }
-
-            if ($data || $extra)
-                Util::$pageTemplate->extendGlobalData(self::$type, $data, $extra);
         }
+
+        return $data;
     }
 
     /*
@@ -404,7 +403,7 @@ class ItemList extends BaseType
         interactive (set to place javascript/anchors to manipulate level and ratings or link to filters (static tooltips vs popup tooltip))
         subOf (tabled layout doesn't work if used as sub-tooltip in other item or spell tooltips; use line-break instead)
     */
-    public function renderTooltip($enhance = [], $interactive = false, $subOf = 0)
+    public function renderTooltip($interactive = false, $subOf = 0, $enhance = [])
     {
         if ($this->error)
             return;
@@ -421,30 +420,34 @@ class ItemList extends BaseType
         $_slot         = $this->curTpl['slot'];
         $causesScaling = false;
 
-        if (!empty($enhance['rand']))
+        if (!empty($enhance['r']))
         {
-            $rndEnch     = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE Id = ?d', $enhance['rand']);
-            $_name      .= ' '.Util::localizedString($rndEnch, 'name');
-            $randEnchant = '';
-
-            for ($i = 1; $i < 6; $i++)
+            if ($rndEnch = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE Id = ?d', $enhance['r']))
             {
-                if ($rndEnch['enchantId'.$i] <= 0)
-                    continue;
+                $_name      .= ' '.Util::localizedString($rndEnch, 'name');
+                $randEnchant = '';
 
-                $enchant = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $rndEnch['enchantId'.$i]);
-                if ($rndEnch['allocationPct'.$i] > 0)
+                for ($i = 1; $i < 6; $i++)
                 {
-                    $amount = intVal($rndEnch['allocationPct'.$i] * $this->generateEnchSuffixFactor());
-                    $randEnchant .= '<span>'.str_replace('$i', $amount, Util::localizedString($enchant, 'text')).'</span><br />';
+                    if ($rndEnch['enchantId'.$i] <= 0)
+                        continue;
+
+                    $enchant = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $rndEnch['enchantId'.$i]);
+                    if ($rndEnch['allocationPct'.$i] > 0)
+                    {
+                        $amount = intVal($rndEnch['allocationPct'.$i] * $this->generateEnchSuffixFactor());
+                        $randEnchant .= '<span>'.str_replace('$i', $amount, Util::localizedString($enchant, 'text')).'</span><br />';
+                    }
+                    else
+                        $randEnchant .= '<span>'.Util::localizedString($enchant, 'text').'</span><br />';
                 }
-                else
-                    $randEnchant .= '<span>'.Util::localizedString($enchant, 'text').'</span><br />';
             }
+            else
+                unset($enhance['r']);
         }
 
-        if (isset($enhance['sock']) && !in_array($_slot, [INVTYPE_WRISTS, INVTYPE_WAIST, INVTYPE_HANDS]))
-            unset($enhance['sock']);
+        if (isset($enhance['s']) && !in_array($_slot, [INVTYPE_WRISTS, INVTYPE_WAIST, INVTYPE_HANDS]))
+            unset($enhance['s']);
 
         // IMPORTAT: DO NOT REMOVE THE HTML-COMMENTS! THEY ARE REQUIRED TO UPDATE THE TOOLTIP CLIENTSIDE
         $x = '';
@@ -500,12 +503,12 @@ class ItemList extends BaseType
         else if ($this->curTpl['itemLimitCategory'])
         {
             $limit = DB::Aowow()->selectRow("SELECT * FROM ?_itemlimitcategory WHERE id = ?", $this->curTpl['itemLimitCategory']);
-            $x .= '<br />'.($limit['isGem'] ? Lang::$item['uniqueEquipped'] : Lang::$item['unique']).Lang::$colon.Util::localizedString($limit, 'name').' ('.$limit['count'].')';
+            $x .= '<br />'.($limit['isGem'] ? Lang::$item['uniqueEquipped'] : Lang::$item['unique']).Lang::$main['colon'].Util::localizedString($limit, 'name').' ('.$limit['count'].')';
         }
 
         // max duration
         if ($dur = $this->curTpl['duration'])
-            $x .= "<br />".Lang::$game['duration'].Lang::$colon.Util::formatTime(abs($dur) * 1000).($this->curTpl['flagsCustom'] & 0x1 ? ' ('.Lang::$item['realTime'].')' : null);
+            $x .= "<br />".Lang::$game['duration'].Lang::$main['colon'].Util::formatTime(abs($dur) * 1000).($this->curTpl['flagsCustom'] & 0x1 ? ' ('.Lang::$item['realTime'].')' : null);
 
         // required holiday
         if ($hId = $this->curTpl['holidayId'])
@@ -607,9 +610,9 @@ class ItemList extends BaseType
         }
 
         // Random Enchantment - if random enchantment is set, prepend stats from it
-        if ($this->curTpl['randomEnchant'] && !isset($enhance['rand']))
+        if ($this->curTpl['randomEnchant'] && !isset($enhance['r']))
             $x .= '<span class="q2">'.Lang::$item['randEnchant'].'</span><br />';
-        else if (isset($enhance['rand']))
+        else if (isset($enhance['r']))
             $x .= $randEnchant;
 
         // itemMods (display stats and save ratings for later use)
@@ -634,41 +637,36 @@ class ItemList extends BaseType
                 $x .= '+'.$this->curTpl[$rowName].' '.Lang::$game['resistances'][$j].'<br />';
 
         // Enchantment
-        if (isset($enhance['ench']))
+        if (isset($enhance['e']))
         {
-            $enchText = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?', $enhance['ench']);
-            $x .= '<span class="q2"><!--e-->'.Util::localizedString($enchText, 'text').'</span><br />';
+            if ($enchText = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?', $enhance['e']))
+                $x .= '<span class="q2"><!--e-->'.Util::localizedString($enchText, 'text').'</span><br />';
+            else
+            {
+                unset($enhance['e']);
+                $x .= '<!--e-->';
+            }
         }
         else                                                // enchantment placeholder
             $x .= '<!--e-->';
 
         // Sockets w/ Gems
-        if (!empty($enhance['gems']))
+        if (!empty($enhance['g']))
         {
-            $gems = DB::Aowow()->select('
-                SELECT
-                    i.id AS ARRAY_KEY,
-                    i.iconString,
-                    ae.*,
-                    i.gemColorMask AS colorMask
-                FROM
-                    ?_items i
-                JOIN
-                    ?_itemenchantment ae ON ae.id = i.gemEnchantmentId
-                WHERE
-                    i.id IN (?a)',
-                $enhance['gems']
-            );
+            $gems = DB::Aowow()->select('SELECT i.id AS ARRAY_KEY, i.iconString, ae.*, i.gemColorMask AS colorMask FROM ?_items i JOIN ?_itemenchantment ae ON ae.id = i.gemEnchantmentId WHERE i.id IN (?a)', $enhance['g']);
+            foreach ($enhance['g'] as $k => $v)
+                if (!in_array($v, array_keys($gems)))
+                    unset($enhance['g'][$k]);
         }
         else
-            $enhance['gems'] = [];
+            $enhance['g'] = [];
 
         // zero fill empty sockets
-        $sockCount = $this->curTpl['socketColor1'] + $this->curTpl['socketColor2'] + $this->curTpl['socketColor3'] + (isset($enhance['sock']) ? 1 : 0);
-        while ($sockCount > count($enhance['gems']))
-            $enhance['gems'][] = 0;
+        $sockCount = $this->curTpl['socketColor1'] + $this->curTpl['socketColor2'] + $this->curTpl['socketColor3'] + (isset($enhance['s']) ? 1 : 0);
+        while ($sockCount > count($enhance['g']))
+            $enhance['g'][] = 0;
 
-        $enhance['gems'] = array_reverse($enhance['gems']);
+        $enhance['g'] = array_reverse($enhance['g']);
 
         $hasMatch = 1;
         // fill native sockets
@@ -681,7 +679,7 @@ class ItemList extends BaseType
                 if (($this->curTpl['socketColor'.$j] & (1 << $i)))
                     $colorId = $i;
 
-            $pop       = array_pop($enhance['gems']);
+            $pop       = array_pop($enhance['g']);
             $col       = $pop ? 1 : 0;
             $hasMatch &= $pop ? (($gems[$pop]['colorMask'] & (1 << $colorId)) ? 1 : 0) : 0;
             $icon      = $pop ? sprintf(Util::$bgImagePath['tiny'], STATIC_URL, strtolower($gems[$pop]['iconString'])) : null;
@@ -694,9 +692,9 @@ class ItemList extends BaseType
         }
 
         // fill extra socket
-        if (isset($enhance['sock']))
+        if (isset($enhance['s']))
         {
-            $pop  = array_pop($enhance['gems']);
+            $pop  = array_pop($enhance['g']);
             $col  = $pop ? 1 : 0;
             $icon = $pop ? sprintf(Util::$bgImagePath['tiny'], STATIC_URL, strtolower($gems[$pop]['iconString'])) : null;
             $text = $pop ? Util::localizedString($gems[$pop], 'text') : Lang::$item['socket'][-1];
@@ -712,7 +710,7 @@ class ItemList extends BaseType
         if ($this->curTpl['socketBonus'])
         {
             $sbonus = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $this->curTpl['socketBonus']);
-            $x .= '<span class="q'.($hasMatch ? '2' : '0').'">'.Lang::$item['socketBonus'].Lang::$colon.Util::localizedString($sbonus, 'text').'</span><br />';
+            $x .= '<span class="q'.($hasMatch ? '2' : '0').'">'.Lang::$item['socketBonus'].Lang::$main['colon'].Util::localizedString($sbonus, 'text').'</span><br />';
         }
 
         // durability
@@ -720,13 +718,25 @@ class ItemList extends BaseType
             $x .= Lang::$item['durability'].' '.$dur.' / '.$dur.'<br />';
 
         // required classes
-        if ($classes = Lang::getClassString($this->curTpl['requiredClass']))
-            $x .= Lang::$game['classes'].Lang::$colon.$classes.'<br />';
+        if ($classes = Lang::getClassString($this->curTpl['requiredClass'], $jsg, $__))
+        {
+            foreach ($jsg as $js)
+                if (empty($this->jsGlobals[TYPE_CLASS][$js]))
+                    $this->jsGlobals[TYPE_CLASS][$js] = $js;
+
+            $x .= Lang::$game['classes'].Lang::$main['colon'].$classes.'<br />';
+        }
 
         // required races
-        if ($races = Lang::getRaceString($this->curTpl['requiredRace']))
+        if ($races = Lang::getRaceString($this->curTpl['requiredRace'], $__, $jsg, $__))
+        {
+            foreach ($jsg as $js)
+                if (empty($this->jsGlobals[TYPE_RACE][$js]))
+                    $this->jsGlobals[TYPE_RACE][$js] = $js;
+
             if ($races != Lang::$game['ra'][0])             // not "both", but display combinations like: troll, dwarf
-                $x .= Lang::$game['races'].Lang::$colon.$races.'<br />';
+                $x .= Lang::$game['races'].Lang::$main['colon'].$races.'<br />';
+        }
 
         // required honorRank (not used anymore)
         if ($rhr = $this->curTpl['requiredHonorRank'])
@@ -920,7 +930,7 @@ class ItemList extends BaseType
                     $craftItem  = new ItemList(array(['i.id', (int)$craftSpell->curTpl['effect1CreateItemId']]));
                     if (!$craftItem->error)
                     {
-                        if ($itemTT = $craftItem->renderTooltip(null, $interactive, $this->id))
+                        if ($itemTT = $craftItem->renderTooltip($interactive, $this->id))
                             $xCraft .= '<div><br />'.$itemTT.'</div>';
 
                         $reagentItems = [];
@@ -970,7 +980,7 @@ class ItemList extends BaseType
             $x .= implode('<br />', $xMisc);
 
         if ($sp = $this->curTpl['sellPrice'])
-            $x .= '<div class="q1 whtt-sellprice">'.Lang::$item['sellPrice'].Lang::$colon.Util::formatMoney($sp).'</div>';
+            $x .= '<div class="q1 whtt-sellprice">'.Lang::$item['sellPrice'].Lang::$main['colon'].Util::formatMoney($sp).'</div>';
 
         if (!$subOf)
             $x .= '</td></tr></table>';
@@ -1078,64 +1088,74 @@ class ItemList extends BaseType
 
     public function extendJsonStats()
     {
-        $onUseStats = [];
+        $enchantments = [];                                 // buffer Ids for lookup id => src; src>0: socketBonus; src<0: gemEnchant
 
-        // convert ItemMods
-        $this->itemMods[$this->id] = [];
-        for ($h = 1; $h <= 10; $h++)
+        foreach ($this->iterate() as $__)
         {
-            $mod = $this->curTpl['statType'.$h];
-            $val = $this->curTpl['statValue'.$h];
-            if (!$mod || !$val)
-                continue;
+            $this->itemMods[$this->id] = [];
 
-            @$this->itemMods[$this->id][$mod] += $val;
+            foreach (Util::$itemMods as $mod)
+                if (!empty($this->curTpl[$mod]))
+                    @$this->itemMods[$this->id][$mod] += $this->curTpl[$mod];
+
+            // fetch and add socketbonusstats
+            if (@$this->json[$this->id]['socketbonus'] > 0)
+                $enchantments[$this->json[$this->id]['socketbonus']][] = $this->id;
+
+
+            // Item is a gem (don't mix with sockets)
+            if ($geId = $this->curTpl['gemEnchantmentId'])
+                $enchantments[$geId][] = -$this->id;
         }
 
+        if ($enchantments)
+        {
+            $parsed = Util::parseItemEnchantment(array_keys($enchantments));
+
+            // and merge enchantments back
+            foreach ($parsed as $eId => $stats)
+            {
+                foreach ($enchantments[$eId] as $item)
+                {
+                    if ($item > 0)                          // apply socketBonus
+                        $this->json[$item]['socketbonusstat'] = $stats;
+                    else /* if ($item < 0) */
+                        foreach ($stats as $mod => $qty)    // apply gemEnchantment
+                            @$this->json[-$item][$mod] += $qty;
+                }
+            }
+        }
+
+        foreach ($this->json as $item => $json)
+            foreach ($json as $k => $v)
+                if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side']))
+                    unset($this->json[$item][$k]);
+    }
+
+    public function getOnUseStats()
+    {
+        $onUseStats = [];
+
         // convert Spells
-        $equipSpells = [];
+        $useSpells = [];
         for ($h = 1; $h <= 5; $h++)
         {
             if ($this->curTpl['spellId'.$h] <= 0)
                 continue;
 
-            // armor & weapons only onEquip && consumables only onUse
-            if (!(in_array($this->curTpl['class'],  [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $this->curTpl['spellTrigger'.$h] == 1) &&
-                !(         $this->curTpl['class'] == ITEM_CLASS_CONSUMABLE                 && $this->curTpl['spellTrigger'.$h] == 0))
+            if ($this->curTpl['class'] != ITEM_CLASS_CONSUMABLE || $this->curTpl['spellTrigger'.$h])
                 continue;
 
-            $equipSpells[] = $this->curTpl['spellId'.$h];
+            $useSpells[] = $this->curTpl['spellId'.$h];
         }
 
-        if ($equipSpells)
+        if ($useSpells)
         {
-            $eqpSplList = new SpellList(array(['s.id', $equipSpells]));
+            $eqpSplList = new SpellList(array(['s.id', $useSpells]));
             foreach ($eqpSplList->getStatGain() as $stat)
-            {
                 foreach ($stat as $mId => $qty)
-                {
-                    @$this->itemMods[$this->id][$mId] += $qty;
-                    if ($this->curTpl['class'] == ITEM_CLASS_CONSUMABLE)
-                        @$onUseStats[$mId] += $qty;
-                }
-            }
+                    @$onUseStats[$mId] += $qty;
         }
-
-        // fetch and add socketbonusstats
-        if (@$this->json[$this->id]['socketbonus'] > 0)
-            $this->json[$this->id]['socketbonusstat'] = Util::parseItemEnchantment($this->json[$this->id]['socketbonus']);
-
-        // Item is a gem (don't mix with sockets)
-        if ($geId = $this->curTpl['gemEnchantmentId'])
-        {
-            $gemStats = Util::parseItemEnchantment($geId);
-            foreach ($gemStats as $mod => $qty)
-                @$this->json[$this->id][$mod] += $qty;
-        }
-
-        foreach ($this->json[$this->id] as $k => $v)
-            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'quality', 'side']) && $v == "0"))
-                unset($this->json[$this->id][$k]);
 
         return $onUseStats;
     }
@@ -1283,23 +1303,33 @@ class ItemList extends BaseType
             {
                 $jsonEquip = [];
                 $jsonText  = [];
+                $enchIds   = [];
 
                 for ($i = 1; $i < 6; $i++)
                 {
                     $enchId = $data['enchantId'.$i];
-
                     if ($enchId <= 0)
                         continue;
 
-                    // subitems may share enchantmentIds
-                    if (!isset($this->rndEnchIds[$enchId]))
-                    {
-                        $stats = Util::parseItemEnchantment($enchId, false, $misc);
-                        $this->rndEnchIds[$enchId] = array(
-                            'text'  => $misc['name'],
-                            'stats' => $stats
-                        );
-                    }
+                    if (isset($this->rndEnchIds[$enchId]))
+                        continue;
+
+                    $enchIds[] = $enchId;
+                }
+
+                foreach (Util::parseItemEnchantment($enchIds, false, $misc) as $eId => $stats)
+                {
+                    $this->rndEnchIds[$eId] = array(
+                        'text'  => $misc[$eId]['name'],
+                        'stats' => $stats
+                    );
+                }
+
+                for ($i = 1; $i < 6; $i++)
+                {
+                    $enchId = $data['enchantId'.$i];
+                    if ($enchId <= 0)
+                        continue;
 
                     if ($data['allocationPct'.$i] > 0)      // RandomSuffix: scaling Enchantment; enchId < 0
                     {
@@ -1398,7 +1428,7 @@ class ItemList extends BaseType
 
         // clear zero-values afterwards
         foreach ($json as $k => $v)
-            if (!isset($v) || $v === "false" || (!in_array($k, ['classs', 'subclass', 'quality', 'side']) && $v == "0"))
+            if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side']))
                 unset($json[$k]);
 
         $this->json[$json['id']] = $json;
@@ -1618,7 +1648,8 @@ class ItemListFilter extends Filter
 
         if ($select)
         {
-            $this->extraOpts['is']['s'][] = ', ('.implode(' + ', $select).') / '.$wtSum.' AS score';
+            $this->extraOpts['is']['s'][] = ', IF(is.id IS NULL, 0, ('.implode(' + ', $select).') / '.$wtSum.') AS score';
+            $this->extraOpts['is']['o'][] = 'score DESC';
             $this->extraOpts['i']['o'][]  = null;           // remove default ordering
         }
         else

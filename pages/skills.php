@@ -4,53 +4,57 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-$cat       = Util::extractURLParams($pageParam);
-$path      = [0, 14];
-$title     = [Util::ucFirst(Lang::$game['skills'])];
-$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_SKILL, -1, $cat ? $cat[0] : -1, User::$localeId]);
-$validCats = [-6, -5, -4, 6, 7, 8, 9, 10, 11];
-
-if (!Util::isValidPage($validCats, $cat))
-    $smarty->error();
-
-if (!$smarty->loadCache($cacheKey, $pageData))
+// menuId 14: Skill    g_initPath()
+//  tabId  0: Database g_initHeader()
+class SkillsPage extends GenericPage
 {
-    $conditions = [['categoryId', 12, '!']];                // DND
-    if ($cat)
+    use ListPage;
+
+    protected $type      = TYPE_SKILL;
+    protected $tpl       = 'list-page-generic';
+    protected $path      = [0, 14];
+    protected $tabId     = 0;
+    protected $mode      = CACHETYPE_PAGE;
+    protected $validCats = [-6, -5, -4, 6, 7, 8, 9, 10, 11];
+
+    public function __construct($pageCall, $pageParam)
     {
-        $conditions[] = ['typeCat', $cat[0]];
-        $path[]       = $cat[0];
-        array_unshift($title, Lang::$skill['cat'][$cat[0]]);
+        $this->getCategoryFromUrl($pageParam);;
+
+        parent::__construct();
+
+        $this->name = Util::ucFirst(Lang::$game['skills']);
     }
 
-    $skills = new SkillList($conditions);
+    protected function generateContent()
+    {
+        $conditions = [];
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $conditions[] = ['categoryId', 12, '!'];       // GENERIC (DND)
 
-    // menuId 14: Skill    g_initPath()
-    //  tabId  0: Database g_initHeader()
-    $pageData = array(
-        'page' => array(
-            'title' => implode(' - ', $title),
-            'path'  => json_encode($path, JSON_NUMERIC_CHECK),
-            'tab'   => 0
-        ),
-        'lv' => array(
-            array(
-                'file'   => 'skill',
-                'data'   => $skills->getListviewData(),
-                'params' => []
-            )
-        )
-    );
+        if ($this->category)
+            $conditions[] = ['typeCat', $this->category[0]];
 
-    $smarty->saveCache($cacheKey, $pageData);
+        $skills = new SkillList($conditions);
+
+        $this->lvTabs[] = array(
+            'file'   => 'skill',
+            'data'   => $skills->getListviewData(),         // listview content
+            'params' => []
+        );
+    }
+
+    protected function generateTitle()
+    {
+        if ($this->category)
+            array_unshift($this->title, Lang::$skill['cat'][$this->category[0]]);
+    }
+
+    protected function generatePath()
+    {
+        if ($this->category)
+            $this->path[] = $this->category[0];
+    }
 }
-
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData['lv']);
-
-// load the page
-$smarty->display('list-page-generic.tpl');
 
 ?>

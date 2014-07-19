@@ -56,8 +56,7 @@ class ItemsetList extends BaseType
             $data[$this->id] = array(
                 'id'       => $this->id,
                 'idbak'    => $this->curTpl['refSetId'],
-                'name'     => $this->getField('name', true),
-                'quality'  => 7 - $this->curTpl['quality'],
+                'name'     => (7 - $this->curTpl['quality']).$this->getField('name', true),
                 'minlevel' => $this->curTpl['minLevel'],
                 'maxlevel' => $this->curTpl['maxLevel'],
                 'note'     => $this->curTpl['contentGroup'],
@@ -72,13 +71,17 @@ class ItemsetList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals($addMask = GLOBALINFO_ANY)
     {
+        $data = [];
+
         if ($this->classes && ($addMask & GLOBALINFO_RELATED))
-            Util::$pageTemplate->extendGlobalIds(TYPE_CLASS, $this->classes);
+            $data[TYPE_CLASS] = array_combine($this->classes, $this->classes);
 
         if ($this->pieceToSet && ($addMask & GLOBALINFO_SELF))
-            Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, array_keys($this->pieceToSet));
+            $data[TYPE_ITEM] = array_combine(array_keys($this->pieceToSet), array_keys($this->pieceToSet));
+
+        return $data;
     }
 
     public function renderTooltip() { }
@@ -133,7 +136,8 @@ class ItemsetListFilter extends Filter
 
         // name [str]
         if (isset($_v['na']))
-            $parts[] = ['name_loc'.User::$localeId, $_v['na']];
+            if ($_ = $this->modularizeString(['name_loc'.User::$localeId]))
+                $parts[] = $_;
 
         // quality [enum]
         if (isset($_v['qu']))

@@ -25,9 +25,9 @@ define('TYPE_RACE',                         14);
 define('TYPE_SKILL',                        15);
 define('TYPE_CURRENCY',                     17);
 
-define('CACHETYPE_PAGE',                    0);
-define('CACHETYPE_TOOLTIP',                 1);
-define('CACHETYPE_BUFF',                    2);             // only used by spells obviously
+define('CACHETYPE_NONE',                    0);             // page will not be cached
+define('CACHETYPE_PAGE',                    1);
+define('CACHETYPE_TOOLTIP',                 2);
 define('CACHETYPE_SEARCH',                  3);
 define('CACHETYPE_XML',                     4);             // only used by items
 
@@ -43,15 +43,31 @@ define('DB_WORLD',                          1);
 define('DB_AUTH',                           2);
 define('DB_CHARACTERS',                     3);
 
+// Account Status
+define('ACC_STATUS_OK',                     0);             // nothing special
+define('ACC_STATUS_NEW',                    1);             // just created, awaiting confirmation
+define('ACC_STATUS_RECOVER_USER',           2);             // currently recovering username
+define('ACC_STATUS_RECOVER_PASS',           3);             // currently recovering password
+
+define('ACC_BAN_NONE',                      0x00);          // all clear
+define('ACC_BAN_TEMP',                      0x01);
+define('ACC_BAN_PERM',                      0x02);
+define('ACC_BAN_RATE',                      0x04);          // cannot rate community items
+define('ACC_BAN_COMMENT',                   0x08);          // cannot create comments
+define('ACC_BAN_UPLOAD',                    0x10);          // cannot upload screenshots / suggest videos
+
 // Auth Result
 define('AUTH_OK',                           0);
-define('AUTH_WRONGPASS',                    1);
-define('AUTH_TIMEDOUT',                     2);
+define('AUTH_WRONGUSER',                    1);
+define('AUTH_WRONGPASS',                    2);
 define('AUTH_BANNED',                       3);
 define('AUTH_IPBANNED',                     4);
+define('AUTH_ACC_INACTIVE',                 5);
+define('AUTH_INTERNAL_ERR',                 6);
 
-// Cookie Names
-define('COOKIE_AUTH',                  'aw_a');
+define('AUTH_MODE_SELF',                    0);             // uses ?_accounts
+define('AUTH_MODE_REALM',                   1);             // uses given realm-table
+define('AUTH_MODE_EXTERNAL',                2);             // uses external script
 
 // Times
 define('MINUTE',                            60);
@@ -74,6 +90,11 @@ define('U_GROUP_BLOGGER',                   0x0080);
 define('U_GROUP_PREMIUM',                   0x0100);
 define('U_GROUP_LOCALIZER',                 0x0200);
 define('U_GROUP_SALESAGENT',                0x0400);
+define('U_GROUP_SCREENSHOT',                0x0800);
+define('U_GROUP_VIDEO',                     0x1000);
+// define('U_GROUP_APIONLY,                 0x2000);        // the heck..?
+// define('U_GROUP_PENDING,                 0x4000);
+
 define('U_GROUP_STAFF',                     (U_GROUP_ADMIN|U_GROUP_EDITOR|U_GROUP_MOD|U_GROUP_BUREAU|U_GROUP_DEV|U_GROUP_BLOGGER|U_GROUP_LOCALIZER|U_GROUP_SALESAGENT));
 define('U_GROUP_EMPLOYEE',                  (U_GROUP_ADMIN|U_GROUP_BUREAU|U_GROUP_DEV));
 define('U_GROUP_GREEN_TEXT',                (U_GROUP_MOD|U_GROUP_BUREAU|U_GROUP_DEV));
@@ -482,13 +503,13 @@ define('ITEM_CLASS_ARMOR',                  4);
 define('ITEM_CLASS_REAGENT',                5);
 define('ITEM_CLASS_AMMUNITION',             6);
 define('ITEM_CLASS_TRADEGOOD',              7);
-// define('ITEM_CLASS_GENERIC',             8);
+define('ITEM_CLASS_GENERIC',                8);
 define('ITEM_CLASS_RECIPE',                 9);
 define('ITEM_CLASS_MONEY',                  10);
 define('ITEM_CLASS_QUIVER',                 11);
 define('ITEM_CLASS_QUEST',                  12);
 define('ITEM_CLASS_KEY',                    13);
-// define('ITEM_CLASS_PERMANENT',           14);
+define('ITEM_CLASS_PERMANENT',              14);
 define('ITEM_CLASS_MISC',                   15);
 define('ITEM_CLASS_GLYPH',                  16);
 

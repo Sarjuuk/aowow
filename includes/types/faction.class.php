@@ -9,10 +9,11 @@ class FactionList extends BaseType
     public static $type      = TYPE_FACTION;
     public static $brickFile = 'faction';
 
-    protected     $queryBase = 'SELECT f.*, f.parentFactionId AS cat2, f.id AS ARRAY_KEY FROM ?_factions f';
+    protected     $queryBase = 'SELECT f.*, f.parentFactionId AS cat, f.id AS ARRAY_KEY FROM ?_factions f';
     protected     $queryOpts = array(
                       'f'  => [['f2']],
-                      'f2' => ['j' => ['?_factions f2 ON f.parentFactionId = f2.id', true], 's' => ', IFNULL(f2.parentFactionId, 0) AS cat']
+                      'f2' => ['j' => ['?_factions f2 ON f.parentFactionId = f2.id', true], 's' => ', IFNULL(f2.parentFactionId, 0) AS cat2'],
+                      'ft' => ['j' => '?_factiontemplate ft ON ft.factionId = f.id']
                   );
 
     public function __construct($conditions = [])
@@ -70,10 +71,14 @@ class FactionList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = 0)
+    public function getJSGlobals($addMask = 0)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
-            Util::$pageTemplate->extendGlobalData(self::$type, [$this->id => ['name' => $this->getField('name', true)]]);
+            $data[TYPE_FACTION][$this->id] = ['name' => $this->getField('name', true)];
+
+        return $data;
     }
 
     public function renderTooltip() { }

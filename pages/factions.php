@@ -4,78 +4,88 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-$cats      = Util::extractURLParams($pageParam);
-$path      = [0, 7];
-$title     = [Util::ucFirst(Lang::$game['factions'])];
-$cacheKey  = implode('_', [CACHETYPE_PAGE, TYPE_FACTION, -1, implode('.', $cats), User::$localeId]);
-$validCats = array(
-    1118 => [469, 891, 67, 892, 169],
-    980  => [936],
-    1097 => [1037, 1052, 1117],
-    0    => true
-);
-
-if (!Util::isValidPage($validCats, $cats))
-    $smarty->error();
-
-if (!$smarty->loadCache($cacheKey, $pageData))
+// menuId 7: Faction  g_initPath()
+//  tabId 0: Database g_initHeader()
+class FactionsPage extends GenericPage
 {
-    $conditions = [];
+    use ListPage;
 
-    if (!User::isInGroup(U_GROUP_STAFF))                    // unlisted factions
-        $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
-
-    if (isset($cats[0]) && empty($cats[1]))
-    {
-        if (!$cats[0])
-            $conditions[] = ['parentFactionId', [1118, 980, 1097, 469, 891, 67, 892, 169, 1037, 1052, 1117, 936], '!'];
-        else
-        {
-            $subs = DB::Aowow()->selectCol('SELECT id FROM ?_factions WHERE parentFactionId = ?d', $cats[0]);
-            $conditions[] = ['OR', ['parentFactionId', $subs], ['id', $subs]];
-        }
-
-        $path[] = $cats[0];
-
-        $t = Lang::$faction['cat'][$cats[0]];
-        array_unshift($title, is_array($t) ? $t[0] : $t);
-    }
-    else if (!empty($cats[1]))
-    {
-        $conditions[] = ['parentFactionId', $cats[1]];
-        $path[]       = $cats[0];
-        $path[]       = $cats[1];
-        array_unshift($title, Lang::$faction['cat'][$cats[0]][$cats[1]]);
-    }
-
-    $factions = new FactionList($conditions);
-
-    // menuId 7: Faction  g_initPath()
-    //  tabId 0: Database g_initHeader()
-    $pageData = array(
-        'page' => array(
-            'title' => implode(' - ', $title),
-            'path'  => json_encode($path, JSON_NUMERIC_CHECK),
-            'tab'   => 0
-        ),
-        'lv' => array(
-            array(
-                'file'   => 'faction',
-                'data'   => $factions->getListviewData(),
-                'params' => []
-            )
-        )
+    protected $type          = TYPE_FACTION;
+    protected $tpl           = 'list-page-generic';
+    protected $path          = [0, 7];
+    protected $tabId         = 0;
+    protected $mode          = CACHETYPE_PAGE;
+    protected $validCats     = array(
+        1118 => [469, 891, 67, 892, 169],
+        980  => [936],
+        1097 => [1037, 1052, 1117],
+        0    => true
     );
 
-    $smarty->saveCache($cacheKey, $pageData);
+    public function __construct($pageCall, $pageParam)
+    {
+        $this->getCategoryFromUrl($pageParam);;
+
+        parent::__construct();
+
+        $this->name = Util::ucFirst(Lang::$game['factions']);
+    }
+
+    protected function generateContent()
+    {
+        $conditions = [];
+
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))                    // unlisted factions
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
+        if (isset($this->category[1]))
+            $conditions[] = ['parentFactionId', $this->category[1]];
+        else if (isset($this->category[0]))
+        {
+            if (!$this->category[0])
+                $conditions[] = ['parentFactionId', [1118, 980, 1097, 469, 891, 67, 892, 169, 1037, 1052, 1117, 936], '!'];
+            else
+            {
+                $subs = DB::Aowow()->selectCol('SELECT id FROM ?_factions WHERE parentFactionId = ?d', $this->category[0]);
+                $conditions[] = ['OR', ['parentFactionId', $subs], ['id', $subs]];
+            }
+        }
+
+        $data = [];
+        $factions = new FactionList($conditions);
+        if (!$factions->error)
+            $data = $factions->getListviewData();
+
+        $this->lvTabs[] = array(
+            'file'   => 'faction',
+            'data'   => $data,
+            'params' => []
+        );
+    }
+
+    protected function generateTitle()
+    {
+        array_unshift($this->title, $this->name);
+        if ($this->category)
+        {
+            switch (count($this->category))
+            {
+                case 1:
+                    $t = Lang::$faction['cat'][$this->category[0]];
+                    array_unshift($this->title, is_array($t) ? $t[0] : $t);
+                    break;
+                case 2:
+                    array_unshift($this->title, Lang::$faction['cat'][$this->category[0]][$this->category[1]]);
+                    break;
+            }
+        }
+    }
+
+    protected function generatePath()
+    {
+        foreach ($this->category as $c)
+            $this->path[] = $c;
+    }
 }
-
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('lang', Lang::$main);
-$smarty->assign('lvData', $pageData['lv']);
-
-// load the page
-$smarty->display('list-page-generic.tpl');
 
 ?>

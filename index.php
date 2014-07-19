@@ -12,22 +12,20 @@ if (!file_exists('config/config.php'))
 // include all necessities, set up basics
 require 'includes/kernel.php';
 
-if (version_compare(PHP_VERSION, '5.4.0') <= 0)
+if (version_compare(PHP_VERSION, '5.5.0') <= 0)
 {
     if (User::isInGroup(U_GROUP_EMPLOYEE))
-        $smarty->internalNotice(U_GROUP_EMPLOYEE, 'PHP Version 5.4.0 or higher required! Your version is '.PHP_VERSION."\nCore functions are unavailable!");
+        Util::addNote(U_GROUP_EMPLOYEE, 'PHP Version 5.5.0 or higher required! Your version is '.PHP_VERSION."[br]Core functions are unavailable!");
     else
-        $smarty->brb();
+        (new GenericPage)->maintenance();
 }
 
-if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE))
-    $smarty->brb();
-else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
-    $smarty->internalNotice(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
-
+$altClass = '';
 switch ($pageCall)
 {
     /* called by user */
+    case '':                                                // no parameter given -> MainPage
+        $altClass = 'main';
     case 'account':                                         // account management [nyi]
     case 'achievement':
     case 'achievements':
@@ -55,6 +53,9 @@ switch ($pageCall)
     case 'objects':
     case 'pet':
     case 'pets':
+    case 'petcalc':                                         // tool: pet talent calculator
+        if ($pageCall == 'petcalc')
+            $altClass = 'talent';
     case 'profile':                                         // character profiler [nyi]
     case 'profiles':                                        // character profile listing [nyi]
     case 'quest':
@@ -68,20 +69,25 @@ switch ($pageCall)
     // case 'sounds':
     case 'spell':
     case 'spells':
+    case 'talent':                                          // tool: talent calculator
     case 'title':
     case 'titles':
-    case 'user':                                            // tool: user profiles [nyi]
+    // case 'user':                                            // tool: user profiles [nyi]
     case 'zone':
     case 'zones':
-        if (file_exists('pages/'.$pageCall.'.php'))
-            require 'pages/'.$pageCall.'.php';
-        else
-            $smarty->error();
+        if (in_array($pageCall, ['account', 'profile']))
+        {
+            if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
+            {
+                header('Content-type: application/x-javascript; charset=utf-8');
+                die((string)$_);
+            }
+        }
+
+        $_ = ($altClass ?: $pageCall).'Page';
+        (new $_($pageCall, $pageParam))->display();
         break;
     /* other pages */
-    case '':                                                // no parameter given -> MainPage
-        require 'pages/main.php';
-        break;
     case 'whats-new':
     case 'searchplugins':
     case 'searchbox':
@@ -89,7 +95,7 @@ switch ($pageCall)
     case 'help':
     case 'faq':
     case 'aboutus':
-        require 'pages/more.php';
+        (new MorePage($pageCall, $pageParam))->display();
         break;
     case 'latest-additions':
     case 'latest-articles':
@@ -100,12 +106,7 @@ switch ($pageCall)
     case 'missing-screenshots':
     case 'most-comments':
     case 'random':
-        require 'pages/miscTools.php';
-        break;
-    case 'petcalc':                                         // tool: pet talent calculator
-        $petCalc = true;
-    case 'talent':                                          // tool: talent calculator
-        require 'pages/talent.php';
+        (new UtilityPage($pageCall, $pageParam))->display();
         break;
     /* called by script */
     case 'data':                                            // tool: dataset-loader
@@ -113,10 +114,11 @@ switch ($pageCall)
     case 'contactus':
     case 'comment':
     case 'locale':                                          // subdomain-workaround, change the language
-        header('Content-type: application/x-javascript; charset=utf-8');
-        if (($_ = $ajax->handle($pageCall)) !== null)
+        if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
+        {
+            header('Content-type: application/x-javascript; charset=utf-8');
             die((string)$_);
-
+        }
         break;
     /* setup */
     case 'build':
@@ -141,7 +143,7 @@ switch ($pageCall)
         if (isset($_GET['power']))
             die('$WowheadPower.register(0, '.User::$localeId.', {})');
         else                                                // in conjunction with a propper rewriteRule in .htaccess...
-            $smarty->error();
+            (new GenericPage)->error();
         break;
 }
 

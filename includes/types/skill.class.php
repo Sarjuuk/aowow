@@ -69,17 +69,14 @@ class SkillList extends BaseType
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = 0)
+    public function getJSGlobals($addMask = 0)
     {
+        $data = [];
+
         foreach ($this->iterate() as $__)
-        {
-            Util::$pageTemplate->extendGlobalData(self::$type, [
-                $this->id => [
-                    'name' => Util::jsEscape($this->getField('name', true)),
-                    'icon' => Util::jsEscape($this->curTpl['iconString'])
-                ]
-            ]);
-        }
+            $data[self::$type][$this->id] = ['name' => Util::jsEscape($this->getField('name', true)), 'icon' => Util::jsEscape($this->curTpl['iconString'])];
+
+        return $data;
     }
 
     public function renderTooltip() { }

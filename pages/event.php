@@ -4,316 +4,316 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-require 'includes/community.class.php';
-
-$_id   = intVal($pageParam);
-$_path = [0, 11];
-
-$cacheKeyPage = implode('_', [CACHETYPE_PAGE, TYPE_WORLDEVENT, $_id, -1, User::$localeId]);
-
-if (!$smarty->loadCache($cacheKeyPage, $pageData))
+// menuId 11: Object   g_initPath()
+//  tabId  0: Database g_initHeader()
+class EventPage extends GenericPage
 {
-    $conditions = [];
-    if ($_id < 0)
-        $conditions[] = ['id', -$_id];
-    else
-        $conditions[] = ['holidayId', $_id];
+    use DetailPage;
 
-    $event = new WorldEventList($conditions);
-    if ($event->error)
-        $smarty->notFound(Lang::$game['event'], $_id);
+    protected $type          = TYPE_WORLDEVENT;
+    protected $typeId        = 0;
+    protected $tpl           = 'detail-page-generic';
+    protected $path          = [0, 11];
+    protected $tabId         = 0;
+    protected $mode          = CACHETYPE_PAGE;
 
-    $_hId = $event->getField('holidayId');
-    $_eId = $event->getField('eventBak');
+    private   $hId           = 0;
+    private   $eId           = 0;
 
-    // redirect if associated with a holiday
-    if ($_hId && $_id != $_hId)
-        header('Location: '.HOST_URL.'?event='.$_hId);
-
-    $hasFilter = in_array($_hId, [372, 283, 285, 353, 420, 400, 284, 201, 374, 409, 141, 324, 321, 424, 335, 327, 341, 181, 404, 398, 301]);
-
-    if ($_hId)
+    public function __construct($__, $id)
     {
-        switch ($event->getField('scheduleType'))
+        parent::__construct();
+
+        $this->typeId = intVal($id);
+
+        $conditions = $this->typeId < 0 ? [['id', -$this->typeId]] : [['holidayId', $this->typeId]];
+
+        $this->subject = new WorldEventList($conditions);
+        if ($this->subject->error)
+            $this->notFound(Lang::$game['event']);
+
+        $this->hId = $this->subject->getField('holidayId');
+        $this->eId = $this->subject->getField('eventBak');
+
+        // redirect if associated with a holiday
+        if ($this->hId && $this->typeId != $this->hId)
+            header('Location: '.HOST_URL.'?event='.$this->hId);
+
+        $this->name = $this->subject->getField('name', true);
+    }
+
+    protected function generatePath()
+    {
+        switch ($this->subject->getField('scheduleType'))
         {
-            case -1:    $_path[] = 1;   break;
+            case '': $this->path[] = 0; break;
+            case -1: $this->path[] = 1; break;
             case  0:
-            case  1:    $_path[] = 2;   break;
-            case  2:    $_path[] = 3;   break;
+            case  1: $this->path[] = 2; break;
+            case  2: $this->path[] = 3; break;
         }
     }
-    else
-        $_path[] = 0;
 
-    /***********/
-    /* Infobox */
-    /***********/
-
-    $infobox = [];
-
-    // boss
-    if ($_ = $event->getField('bossCreature'))
+    protected function generateTitle()
     {
-        Util::$pageTemplate->extendGlobalIds(TYPE_NPC, $_);
-        $infobox[] = Lang::$npc['rank'][3].Lang::$colon.'[npc='.$_.']';
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['event']));
     }
 
-    // finalized after the cache is handled
-
-    /****************/
-    /* Main Content */
-    /****************/
-
-    // menuId 11: Event    g_initPath()
-    //  tabId  0: Database g_initHeader()
-    $pageData = array(
-        'dates'   => array(
-            'firstDate' => $event->getField('startTime'),
-            'lastDate'  => $event->getField('endTime'),
-            'length'    => $event->getField('length'),
-            'rec'       => $event->getField('occurence')
-        ),
-        'page'    => array(
-            'title'      => $event->getField('name', true).' - '.Util::ucFirst(Lang::$game['event']),
-            'name'       => $event->getField('name', true),
-            'path'       => json_encode($_path, JSON_NUMERIC_CHECK),
-            'tab'        => 0,
-            'type'       => TYPE_WORLDEVENT,
-            'typeId'     => $_id,
-            'infobox'    => $infobox,
-            'headIcons'  => [$event->getField('iconString')],
-            'redButtons' => array(
-                BUTTON_WOWHEAD => $_id > 0,
-                BUTTON_LINKS   => true
-            )
-        ),
-        'relTabs' => []
-    );
-
-    /**************/
-    /* Extra Tabs */
-    /**************/
-
-    // tab: npcs
-    if ($npcIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(ec.eventEntry > 0, 1, 0) AS added FROM creature c, game_event_creature ec WHERE ec.guid = c.guid AND ABS(ec.eventEntry) = ?d', $_eId))
+    protected function generateContent()
     {
-        $creatures = new CreatureList(array(['id', array_keys($npcIds)]));
-        if (!$creatures->error)
+        /***********/
+        /* Infobox */
+        /***********/
+
+        $this->infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+
+        // boss
+        if ($_ = $this->subject->getField('bossCreature'))
         {
-            $data = $creatures->getListviewData();
-
-            foreach ($data as &$d)
-                $d['method'] = $npcIds[$d['id']];
-
-            $pageData['relTabs'][] = array(
-                'file'   => CreatureList::$brickFile,
-                'data'   => $data,
-                'params' => array(
-                    'tabs' => '$tabsRelated',
-                    'note' => $hasFilter ? sprintf(Util::$filterResultString, '?npcs&filter=cr=38;crs='.$_hId.';crv=0') : null
-                )
-            );
+            $this->extendGlobalIds(TYPE_NPC, $_);
+            $this->infobox[] = Lang::$npc['rank'][3].Lang::$main['colon'].'[npc='.$_.']';
         }
-    }
 
-    // tab: objects
-    if ($objectIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(eg.eventEntry > 0, 1, 0) AS added FROM gameobject g, game_event_gameobject eg WHERE eg.guid = g.guid AND ABS(eg.eventEntry) = ?d', $_eId))
-    {
-        $objects = new GameObjectList(array(['id', array_keys($objectIds)]));
-        if (!$objects->error)
-        {
-            $data = $objects->getListviewData();
-            foreach ($data as &$d)
-                $d['method'] = $objectIds[$d['id']];
+        /****************/
+        /* Main Content */
+        /****************/
 
-            $pageData['relTabs'][] = array(
-                'file'   => GameObjectList::$brickFile,
-                'data'   => $data,
-                'params' => array(
-                    'tabs' => '$tabsRelated',
-                    'note' => $hasFilter ? sprintf(Util::$filterResultString, '?objects&filter=cr=16;crs='.$_hId.';crv=0') : null
-                )
-            );
-        }
-    }
-
-    // tab: achievements
-    if ($_ = $event->getField('achievementCatOrId'))
-    {
-        $condition = $_ > 0 ? [['category', $_]] : [['id', -$_]];
-        $acvs = new AchievementList($condition);
-        if (!$acvs->error)
-        {
-            $acvs->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_RELATED);
-
-            $pageData['relTabs'][] = array(
-                'file'   => AchievementList::$brickFile,
-                'data'   => $acvs->getListviewData(),
-                'params' => array(
-                    'tabs'        => '$tabsRelated',
-                    'note'        => $hasFilter ? sprintf(Util::$filterResultString, '?achievements&filter=cr=11;crs='.$_hId.';crv=0') : null,
-                    'visibleCols' => "$['category']"
-                )
-            );
-        }
-    }
-
-    $itemCnd = [];
-    if ($_hId)
-    {
-        $itemCnd = array(
-            'OR',
-            ['holidayId', $_hId],                               // direct requirement on item
+        $this->headIcons  = [$this->subject->getField('iconString')];
+        $this->redButtons = array(
+            BUTTON_WOWHEAD => $this->typeId > 0,
+            BUTTON_LINKS   => true
+        );
+        $this->dates      = array(
+            'firstDate' => $this->subject->getField('startTime'),
+            'lastDate'  => $this->subject->getField('endTime'),
+            'length'    => $this->subject->getField('length'),
+            'rec'       => $this->subject->getField('occurence')
         );
 
-        // tab: quests (by table, go & creature)
-        $quests = new QuestList(array(['holidayId', $_hId]));
-        if (!$quests->error)
+        /**************/
+        /* Extra Tabs */
+        /**************/
+
+        $hasFilter = in_array($this->hId, [372, 283, 285, 353, 420, 400, 284, 201, 374, 409, 141, 324, 321, 424, 335, 327, 341, 181, 404, 398, 301]);
+
+        // tab: npcs
+        if ($npcIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(ec.eventEntry > 0, 1, 0) AS added FROM creature c, game_event_creature ec WHERE ec.guid = c.guid AND ABS(ec.eventEntry) = ?d', $this->eId))
         {
-            $quests->addGlobalsToJScript(GLOBALINFO_SELF | GLOBALINFO_REWARDS);
-
-            $pageData['relTabs'][] = array(
-                'file'   => QuestList::$brickFile,
-                'data'   => $quests->getListviewData(),
-                'params' => array(
-                    'tabs' => '$tabsRelated',
-                    'note' => $hasFilter ? sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$_hId.';crv=0') : null
-                )
-            );
-
-            $questItems = [];
-            foreach (array_column($quests->rewards, TYPE_ITEM) as $arr)
-                $questItems = array_merge($questItems, $arr);
-
-            foreach (array_column($quests->requires, TYPE_ITEM) as $arr)
-                $questItems = array_merge($questItems, $arr);
-
-            if ($questItems)
-                $itemCnd[] = ['id', $questItems];
-        }
-    }
-
-    // items from creature
-    if ($npcIds && !$creatures->error)
-    {
-        // vendor
-        $cIds = $creatures->getFoundIDs();
-        if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv  WHERE entry IN (?a) UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id IN (?a)', $cIds, $cIds))
-            $itemCnd[] = ['id', $sells];
-    }
-
-    // tab: items
-    // not checking for loot ... cant distinguish between eventLoot and fillerCrapLoot
-    if ($itemCnd)
-    {
-        $eventItems = new ItemList($itemCnd);
-        if (!$eventItems->error)
-        {
-            $eventItems->addGlobalsToJScript(GLOBALINFO_SELF);
-
-            $pageData['relTabs'][] = array(
-                'file'   => ItemList::$brickFile,
-                'data'   => $eventItems->getListviewData(),
-                'params' => array(
-                    'tabs' => '$tabsRelated',
-                    'note' => $hasFilter ? sprintf(Util::$filterResultString, '?items&filter=cr=160;crs='.$_hId.';crv=0') : null
-                )
-            );
-        }
-    }
-
-    // tab: see also (event conditions)
-    if ($rel = DB::Aowow()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, -prerequisite_event, eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $_eId, $_eId, $_eId))
-    {
-        $list = [];
-        array_walk($rel, function(&$v, $k) use (&$list) {
-            if ($v > 0)
-                $list[] = $v;
-            else if ($v === null)
-                Util::$pageTemplate->internalNotice(U_GROUP_EMPLOYEE, 'game_event_prerequisite: this event has itself as prerequisite');
-        });
-
-        if ($list)
-        {
-            $relEvents = new WorldEventList(array(['id', $list]));
-            $relEvents->addGlobalsToJscript();
-            $relData   = $relEvents->getListviewData(true);
-            foreach ($relEvents->iterate() as $id => $__)
+            $creatures = new CreatureList(array(['id', array_keys($npcIds)]));
+            if (!$creatures->error)
             {
-                $relData[$id]['condition'] = array(
-                    'type'   => TYPE_WORLDEVENT,
-                    'typeId' => -$_eId,
-                    'status' => 2
+                $data = $creatures->getListviewData();
+                foreach ($data as &$d)
+                    $d['method'] = $npcIds[$d['id']];
+
+                $this->lvTabs[] = array(
+                    'file'   => CreatureList::$brickFile,
+                    'data'   => $data,
+                    'params' => ['note' => $hasFilter ? sprintf(Util::$filterResultString, '?npcs&filter=cr=38;crs='.$this->hId.';crv=0') : null]
                 );
             }
+        }
 
-            $event->addGlobalsToJscript();
-            foreach ($rel as $r)
+        // tab: objects
+        if ($objectIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(eg.eventEntry > 0, 1, 0) AS added FROM gameobject g, game_event_gameobject eg WHERE eg.guid = g.guid AND ABS(eg.eventEntry) = ?d', $this->eId))
+        {
+            $objects = new GameObjectList(array(['id', array_keys($objectIds)]));
+            if (!$objects->error)
             {
-                if ($r >= 0)
-                    continue;
+                $data = $objects->getListviewData();
+                foreach ($data as &$d)
+                    $d['method'] = $objectIds[$d['id']];
 
-                Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, -$r);
+                $this->lvTabs[] = array(
+                    'file'   => GameObjectList::$brickFile,
+                    'data'   => $data,
+                    'params' => ['note' => $hasFilter ? sprintf(Util::$filterResultString, '?objects&filter=cr=16;crs='.$this->hId.';crv=0') : null]
+                );
+            }
+        }
 
-                $d = $event->getListviewData(true);
-                $d[-$_eId]['condition'][] = array(
-                    'type'   => TYPE_WORLDEVENT,
-                    'typeId' => $r,
-                    'status' => 2
+        // tab: achievements
+        if ($_ = $this->subject->getField('achievementCatOrId'))
+        {
+            $condition = $_ > 0 ? [['category', $_]] : [['id', -$_]];
+            $acvs = new AchievementList($condition);
+            if (!$acvs->error)
+            {
+                $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+                $this->lvTabs[] = array(
+                    'file'   => AchievementList::$brickFile,
+                    'data'   => $acvs->getListviewData(),
+                    'params' => array(
+                        'note'        => $hasFilter ? sprintf(Util::$filterResultString, '?achievements&filter=cr=11;crs='.$this->hId.';crv=0') : null,
+                        'visibleCols' => "$['category']"
+                    )
+                );
+            }
+        }
+
+        $itemCnd = [];
+        if ($this->hId)
+        {
+            $itemCnd = array(
+                'OR',
+                ['holidayId', $this->hId],                  // direct requirement on item
+            );
+
+            // tab: quests (by table, go & creature)
+            $quests = new QuestList(array(['holidayId', $this->hId]));
+            if (!$quests->error)
+            {
+                $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+
+                $this->lvTabs[] = array(
+                    'file'   => QuestList::$brickFile,
+                    'data'   => $quests->getListviewData(),
+                    'params' => ['note' => $hasFilter ? sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$this->hId.';crv=0') : null]
                 );
 
-                $relData= array_merge($relData, $d);
-            }
+                $questItems = [];
+                foreach (array_column($quests->rewards, TYPE_ITEM) as $arr)
+                    $questItems = array_merge($questItems, $arr);
 
-            $pageData['relTabs'][] = array(
-                'file'   => WorldEventList::$brickFile,
-                'data'   => $relData,
-                'params' => array(
-                    'id'         => 'see-also',
-                    'name'       => '$LANG.tab_seealso',
-                    'tabs'       => '$tabsRelated',
-                    'hiddenCols' => "$['date']",
-                    'extraCols'  => '$[Listview.extraCols.condition]'
-                )
-            );
+                foreach (array_column($quests->requires, TYPE_ITEM) as $arr)
+                    $questItems = array_merge($questItems, $arr);
+
+                if ($questItems)
+                    $itemCnd[] = ['id', $questItems];
+            }
+        }
+
+        // items from creature
+        if ($npcIds && !$creatures->error)
+        {
+            // vendor
+            $cIds = $creatures->getFoundIDs();
+            if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv  WHERE entry IN (?a) UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id IN (?a)', $cIds, $cIds))
+                $itemCnd[] = ['id', $sells];
+        }
+
+        // tab: items
+        // not checking for loot ... cant distinguish between eventLoot and fillerCrapLoot
+        if ($itemCnd)
+        {
+            $eventItems = new ItemList($itemCnd);
+            if (!$eventItems->error)
+            {
+                $this->extendGlobalData($eventItems->getJSGlobals(GLOBALINFO_SELF));
+
+                $this->lvTabs[] = array(
+                    'file'   => ItemList::$brickFile,
+                    'data'   => $eventItems->getListviewData(),
+                    'params' => ['note' => $hasFilter ? sprintf(Util::$filterResultString, '?items&filter=cr=160;crs='.$this->hId.';crv=0') : null]
+                );
+            }
+        }
+
+        // tab: see also (event conditions)
+        if ($rel = DB::Aowow()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, -prerequisite_event, eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $this->eId, $this->eId, $this->eId))
+        {
+            $list = [];
+            array_walk($rel, function($v, $k) use (&$list) {
+                if ($v > 0)
+                    $list[] = $v;
+                else if ($v === null)
+                    Util::addNote(U_GROUP_EMPLOYEE, 'game_event_prerequisite: this event has itself as prerequisite');
+            });
+
+            if ($list)
+            {
+                $relEvents = new WorldEventList(array(['id', $list]));
+                $this->extendGlobalData($relEvents->getJSGlobals());
+                $relData   = $relEvents->getListviewData();
+                foreach ($relEvents->iterate() as $id => $__)
+                {
+                    $relData[$id]['condition'][] = array(
+                        'type'   => TYPE_WORLDEVENT,
+                        'typeId' => -$this->eId,
+                        'status' => 2
+                    );
+                }
+
+                $this->extendGlobalData($this->subject->getJSGlobals());
+                foreach ($rel as $r)
+                {
+                    if ($r >= 0)
+                        continue;
+
+                    $this->extendGlobalIds(TYPE_WORLDEVENT, -$r);
+
+                    $d = $this->subject->getListviewData();
+                    $d[-$this->eId]['condition'][] = array(
+                        'type'   => TYPE_WORLDEVENT,
+                        'typeId' => $r,
+                        'status' => 2
+                    );
+
+                    $relData = array_merge($relData, $d);
+                }
+
+                $this->lvTabs[] = array(
+                    'file'   => WorldEventList::$brickFile,
+                    'data'   => $relData,
+                    'params' => array(
+                        'id'         => 'see-also',
+                        'name'       => '$LANG.tab_seealso',
+                        'hiddenCols' => "$['date']",
+                        'extraCols'  => '$[Listview.extraCols.condition]'
+                    )
+                );
+            }
         }
     }
 
+    protected function postCache()
+    {
+        /********************/
+        /* finalize infobox */
+        /********************/
 
-    $smarty->saveCache($cacheKeyPage, $pageData);
+        // update dates to now()
+        $updated = WorldEventList::updateDates($this->dates);
+
+        // start
+        if ($updated['start'])
+            array_push($this->infobox, Lang::$event['start'].Lang::$main['colon'].date(Lang::$main['dateFmtLong'], $updated['start']));
+
+        // end
+        if ($updated['end'])
+            array_push($this->infobox, Lang::$event['end'].Lang::$main['colon'].date(Lang::$main['dateFmtLong'], $updated['end']));
+
+        // occurence
+        if ($updated['rec'] > 0)
+            array_push($this->infobox, Lang::$event['interval'].Lang::$main['colon'].Util::formatTime($updated['rec'] * 1000));
+
+        // in progress
+        if ($updated['start'] < time() && $updated['end'] > time())
+            array_push($this->infobox, '[span class=q2]'.Lang::$event['inProgress'].'[/span]');
+
+        $this->infobox = '[ul][li]'.implode('[/li][li]', $this->infobox).'[/li][/ul]';
+
+        /***************************/
+        /* finalize related events */
+        /***************************/
+
+        foreach($this->lvTabs as &$view)
+        {
+            if ($view['file'] !=  WorldEventList::$brickFile)
+                continue;
+
+            foreach ($view['data'] as &$data)
+            {
+                $updated = WorldEventList::updateDates($data['_date']);
+                unset($data['_date']);
+                $data['startDate'] = $updated['start'] ? date(Util::$dateFormatInternal, $updated['start']) : false;
+                $data['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
+                $data['rec']       = $updated['rec'];
+            }
+
+        }
+    }
 }
-
-/***********/
-/* Infobox */
-/***********/
-
-$updated = WorldEventList::updateDates($pageData['dates']);
-
-// start
-if ($updated['end'])
-    array_push($pageData['page']['infobox'], Lang::$event['start'].Lang::$colon.date(Lang::$dateFmtLong, $updated['start']));
-
-// end
-if ($updated['end'])
-    array_push($pageData['page']['infobox'], Lang::$event['end'].Lang::$colon.date(Lang::$dateFmtLong, $updated['end']));
-
-// occurence
-if ($updated['rec'] > 0)
-    array_push($pageData['page']['infobox'], Lang::$event['interval'].Lang::$colon.Util::formatTime($updated['rec'] * 1000));
-
-// in progress
-if ($updated['start'] < time() && $updated['end'] > time())
-    array_push($pageData['page']['infobox'], '[span class=q2]'.Lang::$event['inProgress'].'[/span]');
-
-$pageData['page']['infobox'] = '[ul][li]'.implode('[/li][li]', $pageData['page']['infobox']).'[/li][/ul]';
-
-
-$smarty->updatePageVars($pageData['page']);
-$smarty->assign('community', CommunityContent::getAll(TYPE_WORLDEVENT, $_id));  // comments, screenshots, videos
-$smarty->assign('lang', array_merge(Lang::$main));
-$smarty->assign('lvData', $pageData['relTabs']);
-
-// load the page
-$smarty->display('detail-page-generic.tpl');
 
 ?>

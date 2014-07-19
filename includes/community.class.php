@@ -76,54 +76,76 @@ class CommunityContent
 {
     /* todo: administration of content */
 
-    private function getComments($type, $typeId)
+    private static function getComments($type, $typeId)
     {
+/*
+        number:{$co.number},
+        user:'{$co.user}',
+        body:'{$co.body|escape:"javascript"}',
+        date:'{$co.date|date_format:"%Y/%m/%d %H:%M:%S"}',
+        {if $co.roles!=0}
+            roles:{$co.roles},
+        {/if}
+        {if $co.indent!=0}
+            indent:{$co.indent},
+        {/if}
+        rating:{$co.rating},
+        replyTo:{$co.replyto},
+        purged:{$co.purged},
+        deleted:0,
+        raters:[{foreach name=foo2 key=id from=$co.raters item=rater}[{$rater.userid},{$rater.rate}]{if $smarty.foreach.foo2.last}{else},{/if}{/foreach}],
+        id:{$co.id}
+
+        ,sticky:{$co.sticky}
+        ,userRating:{$co.userRating}
+*/
         // comments
         return [];
     }
 
-    private function getVideos($type, $typeId)
+    private static function getVideos($type, $typeId)
     {
-        return DB::Aowow()->Query("
-            SELECT
-                v.id,
-                a.displayName AS user,
-                v.date,
-                v.videoId,
-                v.caption,
-                IF(v.status & 0x4, 1, 0) AS 'sticky'
-            FROM
-                ?_videos v,
-                ?_account a
-            WHERE
-                v.type = ? AND v.typeId = ? AND v.status & 0x2 AND v.uploader = a.id",
+        $videos = DB::Aowow()->Query("
+            SELECT v.id, a.displayName AS user, v.date, v.videoId, v.caption, IF(v.status & 0x4, 1, 0) AS 'sticky', v.type, v.typeId
+            FROM ?_videos v, ?_account a
+            WHERE v.type = ? AND v.typeId = ? AND v.status & 0x2 AND v.uploader = a.id",
+            $type, $typeId
+        );
+
+        // format data to meet requirements of the js
+        foreach ($videos as &$v)
+        {
+            $v['date']      = date(Util::$dateFormatInternal, $v['date']);
+            $v['videoType'] = 1;            // always youtube
+            if (!$v['sticky'])
+                unset($v['sticky']);
+        }
+
+        return $videos;
+    }
+
+    private static function getScreenshots($type, $typeId)
+    {
+        $screenshots = DB::Aowow()->Query("
+            SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.type, s.typeId, s.caption, IF(s.status & 0x4, 1, 0) AS 'sticky'
+            FROM ?_screenshots s, ?_account a
+            WHERE s.type = ? AND s.typeId = ? AND s.status & 0x2 AND s.uploader = a.id",
             $type,
             $typeId
         );
+
+        // format data to meet requirements of the js
+        foreach ($screenshots as &$s)
+        {
+            $s['date'] = date(Util::$dateFormatInternal, $s['date']);
+            if (!$s['sticky'])
+                unset($s['sticky']);
+        }
+
+        return $screenshots;
     }
 
-    private function getScreenshots($type, $typeId)
-    {
-        return DB::Aowow()->Query("
-            SELECT
-                s.id,
-                a.displayName AS user,
-                s.date,
-                s.width,
-                s.height,
-                s.caption,
-                IF(s.status & 0x4, 1, 0) AS 'sticky'
-            FROM
-                ?_screenshots s,
-                ?_account a
-            WHERE
-                s.type = ? AND s.typeId = ? AND s.status & 0x2 AND s.uploader = a.id",
-            $type,
-            $typeId
-        );
-    }
-
-    public function getAll($type, $typeId)
+    public static function getAll($type, $typeId)
     {
         return array(
             'vi' => self::getVideos($type, $typeId),

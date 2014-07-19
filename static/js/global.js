@@ -6235,7 +6235,7 @@ Listview.extraCols = {
 
         id: 'condition',
         name: LANG.requires,
-        width: '30%',
+        width: '25%',
         compute: function(row, td) {
             if (!row.condition || !$WH.is_array(row.condition)) {
                 return;
@@ -6272,7 +6272,7 @@ Listview.extraCols = {
                             $WH.st(a, 'This');
                         }
                         else {
-                            $WH.ae(a, l.name);
+                            $WH.ae(a, $WH.ct(l.name));
 
                             if (l.icon) {
                                 a.className = 'icontiny tinyspecial';
@@ -6358,7 +6358,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: $WH.ct(item['name_' + g_locale.name]),
+                name: item['name_' + g_locale.name],
                 url : '?skill=' + cond.typeId
             }];
 
@@ -6380,7 +6380,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: $WH.ct(item['name_' + g_locale.name]),
+                name: item['name_' + g_locale.name],
                 url : '?spell=' + cond.typeId
             }];
 
@@ -6399,7 +6399,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon : item.icon.toLowerCase(),
-                name : $WH.ct(item['name_' + g_locale.name]),
+                name : item['name_' + g_locale.name],
                 url  : '?item=' + cond.typeId,
                 color: 'q' + item.quality
             }];
@@ -6419,7 +6419,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: $WH.ct(item['name_' + g_locale.name]),
+                name: item['name_' + g_locale.name],
                 url : '?achievement=' + cond.typeId
             }];
 
@@ -6437,7 +6437,7 @@ Listview.extraCols = {
             cnd.state = $WH.ct((cond.status == 1 ? LANG.progress : (cond.status == 2 ? LANG.pr_note_complete : LANG.pr_note_incomplete)) + LANG.colon);
             cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
             cnd.links = [{
-                name: $WH.ct(item['name_' + g_locale.name]),
+                name: item['name_' + g_locale.name],
                 url : '?quest=' + cond.typeId
             }];
 
@@ -6459,7 +6459,7 @@ Listview.extraCols = {
 
             for (var i = 0, len = races.length; i < len; ++i) {
                 cnd.links.push({
-                    name: $WH.ct(g_chr_races[races[i]]),
+                    name: g_chr_races[races[i]],
                     url : '?class=' + races[i]
                 });
             }
@@ -11131,7 +11131,8 @@ Listview.templates = {
                             buff  = 'coexist';              // without condition
                             break;
                         case 2:
-                            buff2 = '(from same caster)';
+                        case 4:
+                            buff2 = spell.stackRule == 2 ? '(from same caster)' : '(strongest effect is applied)';
                         case 1:
                             buff  = 'exclusive';            // without condition
                             break;
@@ -18385,16 +18386,16 @@ var Links = new function() {
             fields:
                 [
                     {
-                        id: 'wowheadurl',
-                        type: 'text',
+                        id:    'wowheadurl',
+                        type:  'text',
                         label: 'Aowow URL',
-                        size: 40
+                        size:  40
                     },
                     {
-                        id: 'markuptag',
-                        type: 'text',
+                        id:    'markuptag',
+                        type:  'text',
                         label: 'Markup Tag',
-                        size: 40
+                        size:  40
                     }
                 ],
 
@@ -18404,7 +18405,7 @@ var Links = new function() {
 
             onShow: function(form) {
                 setTimeout(function() {
-                    document.getElementsByName('ingamelink')[0].select();
+                    $(form.ingamelink).select();
                 }, 50);
                 setTimeout(Lightbox.reveal, 100);
             }

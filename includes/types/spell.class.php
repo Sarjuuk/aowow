@@ -331,7 +331,7 @@ class SpellList extends BaseType
 
                 /*  ISSUE!
                     mods formated like ['<statName>' => [<points>, 'percentOf', '<statName>']] are applied as multiplier and not
-                    as a flat value (that is equal to the percentage, like they should be). So the stats-tabe won't show the actual deficit
+                    as a flat value (that is equal to the percentage, like they should be). So the stats-table won't show the actual deficit
                 */
 
                 switch ($this->curTpl['effect'.$i.'AuraId'])
@@ -373,6 +373,15 @@ class SpellList extends BaseType
         $tools = [];
         for ($i = 1; $i <= 2; $i++)
         {
+            // TotemCategory
+            if ($_ = $this->curTpl['toolCategory'.$i])
+            {
+                $tc = DB::Aowow()->selectRow('SELECT * FROM ?_totemcategory WHERE id = ?d', $_);
+                $tools[$i + 1] = array(
+                    'id'   => $_,
+                    'name' => Util::localizedString($tc, 'name'));
+            }
+
             // Tools
             if (!$this->curTpl['tool'.$i])
                 continue;
@@ -389,15 +398,6 @@ class SpellList extends BaseType
                 );
 
                 break;
-            }
-
-            // TotemCategory
-            if ($_ = $this->curTpl['toolCategory'.$i])
-            {
-                $tc = DB::Aowow()->selectRow('SELECT * FROM ?_totemcategory WHERE id = ?d', $_);
-                $tools[$i + 1] = array(
-                    'id'   => $_,
-                    'name' => Util::localizedString($tc, 'name'));
             }
         }
 
@@ -1533,7 +1533,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                     if ($cId != $this->curTpl['effect'.$idx.'CreateItemId'])
                         continue;
 
-                    $createItem = $this->relItems->renderTooltip([], true, $this->id);
+                    $createItem = $this->relItems->renderTooltip(true, $this->id);
                     break 2;
                 }
             }
@@ -1694,8 +1694,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
             $data[$this->id] = array(
                 'id'           => $this->id,
-                'quality'      => $quality ? $quality : '@',
-                'name'         => $this->getField('name', true),
+                'name'         => ($quality ?: '@').$this->getField('name', true),
                 'icon'         => $this->curTpl['iconStringAlt'] ? $this->curTpl['iconStringAlt'] : $this->curTpl['iconString'],
                 'level'        => $talent ? $this->curTpl['talentLevel'] : $this->curTpl['spellLevel'],
                 'school'       => $this->curTpl['schoolMask'],
@@ -1766,10 +1765,12 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         return $data;
     }
 
-    public function addGlobalsToJScript($addMask = GLOBALINFO_SELF)
+    public function getJSGlobals($addMask = GLOBALINFO_SELF, &$extra = [])
     {
+        $data  = [];
+
         if ($this->relItems && ($addMask & GLOBALINFO_RELATED))
-            $this->relItems->addGlobalsToJscript();
+            $data = $this->relItems->getJSGlobals();
 
         foreach ($this->iterate() as $id => $__)
         {
@@ -1778,25 +1779,21 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
                 if ($mask = $this->curTpl['reqClassMask'])
                     for ($i = 0; $i < 11; $i++)
                         if ($mask & (1 << $i))
-                            Util::$pageTemplate->extendGlobalIds(TYPE_CLASS, $i + 1);
+                            $data[TYPE_CLASS][$i + 1] = $i + 1;
 
                 if ($mask = $this->curTpl['reqRaceMask'])
                     for ($i = 0; $i < 11; $i++)
                         if ($mask & (1 << $i))
-                            Util::$pageTemplate->extendGlobalIds(TYPE_RACE, $i + 1);
+                            $data[TYPE_RACE][$i + 1] = $i + 1;
             }
 
-            $data  = null;
-            $extra = null;
             if ($addMask & GLOBALINFO_SELF)
             {
                 $iconString = $this->curTpl['iconStringAlt'] ? 'iconStringAlt' : 'iconString';
 
-                $data = array(
-                    $id => array(
-                        'icon' => $this->curTpl[$iconString],
-                        'name' => $this->getField('name', true),
-                    )
+                $data[TYPE_SPELL][$id] = array(
+                    'icon' => $this->curTpl[$iconString],
+                    'name' => $this->getField('name', true),
                 );
             }
 
@@ -1811,7 +1808,7 @@ spells / buffspells = {
                 $buff = $this->renderBuff(MAX_LEVEL, true);
                 $tTip = $this->renderTooltip(MAX_LEVEL, true);
 
-                $extra = array(
+                $extra[$id] = array(
                     'id'         => $id,
                     'tooltip'    => Util::jsEscape($tTip[0]),
                     'buff'       => @Util::jsEscape($buff[0]),
@@ -1819,10 +1816,9 @@ spells / buffspells = {
                     'buffspells' => @$buff[1]
                 );
             }
-
-            if ($data || $extra)
-                Util::$pageTemplate->extendGlobalData(self::$type, $data, $extra);
         }
+
+        return $data;
     }
 
     // mostly similar to TC
