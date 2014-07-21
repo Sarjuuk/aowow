@@ -9,7 +9,7 @@ class ComparePage extends GenericPage
 {
     protected $tpl           = 'compare';
     protected $tabId         = 1;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHETYPE_NONE;
     protected $js            = array(
         'profile.js',
         'Draggable.js',

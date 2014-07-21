@@ -1503,12 +1503,11 @@ class SpellPage extends GenericPage
             if ($this->subject->getField('effect'.$i.'RadiusMax') > 0)
                 $foo['radius'] = $this->subject->getField('effect'.$i.'RadiusMax');
 
-            if (!($itemIdx && $this->subject->relItems && !$this->subject->relItems->error) && (!in_array($i, $spellIdx) || in_array($effAura, [225, 227])))
+            if (!in_array($i, $itemIdx) && !in_array($i, $spellIdx) && !in_array($effAura, [225, 227]))
                 $foo['value'] = ($effDS && $effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
 
             if ($effRPPL != 0)
                 $foo['value'] = (isset($foo['value']) ? $foo['value'] : '0').sprintf(Lang::$spell['costPerLevel'], $effRPPL);
-
             if ($this->subject->getField('effect'.$i.'Periode') > 0)
                 $foo['interval'] = Util::formatTime($this->subject->getField('effect'.$i.'Periode'));
 

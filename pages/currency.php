@@ -37,13 +37,12 @@ class CurrencyPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['gameObject']));
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['currency']));
     }
 
     protected function generateContent()
     {
         $_itemId    = $this->subject->getField('itemId');
-        $_isSpecial = $this->typeId == 103 || $this->typeId == 104;               // honor && arena points are not handled as items
 
         /***********/
         /* Infobox */
@@ -51,9 +50,9 @@ class CurrencyPage extends GenericPage
 
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
-        if ($this->typeId == 103)                                        // Arena Points
+        if ($this->typeId == 103)                           // Arena Points
             $infobox[] = Lang::$currency['cap'].Lang::$main['colon'].'10\'000';
-        else if ($this->typeId == 104)                                   // Honor
+        else if ($this->typeId == 104)                      // Honor
             $infobox[] = Lang::$currency['cap'].Lang::$main['colon'].'75\'000';
 
         /****************/
@@ -72,7 +71,7 @@ class CurrencyPage extends GenericPage
         /* Extra Tabs */
         /**************/
 
-        if (!$_isSpecial)
+        if ($this->typeId != 103 && $this->typeId != 104)   // honor && arena points are not handled as items
         {
             // tabs: this currency is contained in..
             $lootTabs = new Loot();
@@ -220,6 +219,7 @@ class CurrencyPage extends GenericPage
             UNION
             SELECT item FROM game_event_npc_vendor genv JOIN ?_itemExtendedCost iec ON iec.id = genv.extendedCost WHERE '.$w
         );
+
         if ($boughtBy)
         {
             $boughtBy = new ItemList(array(['id', $boughtBy]));
