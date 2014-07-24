@@ -582,20 +582,13 @@ function pr_addEquipButton(id, itemId)
 
 function pr_onBreadcrumbUpdate() // Add character lookup textbox to the breadcrumb
 {
-    // var breadcrumb = PageTemplate.get('breadcrumb');
-    var breadcrumb = temp_path;
-    // end
-
+    var breadcrumb = PageTemplate.get('breadcrumb');
     if(!breadcrumb || breadcrumb.length != 6) // Realm is required
         return;
 
     var path = Menu.getFullPath(mn_path, breadcrumb);
     var menuItem = path[path.length - 1];
-
-    // var span = PageTemplate.expandBreadcrumb()[0];
-    $('.path').children('span:last').addClass('breadcrumb-arrow');
-    var span = ($('<span/>').appendTo($('.path')))[0];
-    // end
+    var span = PageTemplate.expandBreadcrumb()[0];
 
     var f = $WH.ce('form'),
         i = $WH.ce('input'),
@@ -797,10 +790,5 @@ if($WH.isset('mn_profiles'))
     Menu.findItem(mn_path, [1,5,2])[MENU_IDX_SUB] = mn_guilds;
     Menu.findItem(mn_path, [1,5,3])[MENU_IDX_SUB] = mn_arenateams;
 
-
-    // todo (low): understand and use pageTemplate
-    // PageTemplate.getBreadcrumb().bind('update', pr_onBreadcrumbUpdate);
-    DomContentLoaded.addEvent(function() {
-        pr_onBreadcrumbUpdate();
-    });
+    PageTemplate.getBreadcrumb().bind('update', pr_onBreadcrumbUpdate);
 }

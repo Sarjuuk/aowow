@@ -27,12 +27,12 @@ class MorePage extends GenericPage
         'help'          => [-13, null, '']
     );
 
-    public function __construct($page, $subPage)
+    public function __construct($pageCall, $subPage)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $subPage);
 
         // chack if page is valid
-        if ($_ = @$this->validPages[$page])
+        if ($_ = @$this->validPages[$pageCall])
         {
             // check if subpage is valid
             if (!isset($_[1]))
@@ -40,7 +40,7 @@ class MorePage extends GenericPage
                 if (($_[1] = array_search($subPage, $this->subPages[$_[0]])) === false)
                     $this->error();
 
-                if ($page == 'help')                        // ye.. hack .. class definitions only allow static values
+                if ($pageCall == 'help')                    // ye.. hack .. class definitions only allow static values
                     $_[2] = Lang::$main['helpTopics'][$_[1]];
             }
             $this->type      = $_[0];

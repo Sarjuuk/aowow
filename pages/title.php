@@ -24,9 +24,9 @@ class TitlePage extends GenericPage
 
     private   $nameFixed     = '';
 
-    public function __construct($__, $id)
+    public function __construct($pageCall, $id)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $id);
 
         $this->typeId = intVal($id);
 
@@ -40,7 +40,7 @@ class TitlePage extends GenericPage
 
     protected function generatePath()
     {
-        $this->path[] = $this->subject->getField('typeCat');
+        $this->path[] = $this->subject->getField('category');
     }
 
     protected function generateTitle()

@@ -52,6 +52,7 @@ endif;
         <div id="toplinks" class="toplinks">
 <?php $this->brick('headerMenu'); ?>
         </div>
+<?php $this->brick('pageTemplate'); ?>
     </div>
 
     <div id="footer">

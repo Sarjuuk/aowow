@@ -4,7 +4,11 @@
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-<?php $this->brick('announcement'); ?>
+<?php
+    $this->brick('announcement');
+
+    $this->brick('pageTemplate');
+?>
 
         <div id="<?php echo $this->tcType; ?>-classes">
                 <div id="<?php echo $this->tcType; ?>-classes-outer">

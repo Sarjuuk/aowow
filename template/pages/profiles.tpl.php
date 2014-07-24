@@ -7,20 +7,13 @@ $f = $this->filter;                                         // shorthand
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-<?php $this->brick('announcement'); ?>
-
-            <script type="text/javascript">
-                g_initPath(<?php echo json_encode($this->path, JSON_NUMERIC_CHECK).', '.(empty($f['query']) ? 0 : 1) ?>);
-                var temp_path = <?php echo json_encode($this->path, JSON_NUMERIC_CHECK); // kill with pageTemplate ?>;
 <?php
-/*
-    PageTemplate.set({pageName: 'profiles', activeTab: 1, breadcrumb: [1,5,0,'eu']});
-    PageTemplate.init();
-*/
-?>
-            </script>
+$this->brick('announcement');
 
-<?php # for some arcane reason a newline (\n) means, the first childNode is a text instead of the form ?>
+$this->brick('pageTemplate');
+
+# for some arcane reason a newline (\n) means, the first childNode is a text instead of the form for the following div
+?>
             <div id="fi" style="display: <?php echo empty($f['query']) ? 'none' : 'block' ?>;"><form
                 action="?profiles&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="rightpanel">

@@ -8,13 +8,9 @@
     $this->brick('announcement');
 
     $this->brick('mapper');
-?>
 
-            <script type="text/javascript">//<![CDATA[
-                g_initPath(<?php echo json_encode($this->path, JSON_NUMERIC_CHECK); ?>);
-            //]]></script>
+    $this->brick('pageTemplate');
 
-<?php
 if (!empty($this->name) || !empty($this->h1Links)):
     echo '<div class="text">' .
         (!empty($this->h1Links) ? '<div class="h1-links">'.$this->h1Links.'</div>' : null) .

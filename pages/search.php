@@ -54,7 +54,7 @@ class SearchPage extends GenericPage
         ['_searchFaction'],     ['_searchSkill'],       ['_searchPet'],       ['_searchCreatureAbility'], ['_searchSpell'],
     );
 
-    public function __construct($__, $pageParam)
+    public function __construct($pageCall, $pageParam)
     {
         $this->search = urlDecode(trim($pageParam));
         $this->query  = strtr($this->search, '?*', '_%');
@@ -109,7 +109,7 @@ class SearchPage extends GenericPage
             $this->notFound();
         }
 
-        parent::__construct($__, $pageParam);               // just to set g_user and g_locale
+        parent::__construct($pageCall, $pageParam);         // just to set g_user and g_locale
     }
 
     private function tokenizeQuery()

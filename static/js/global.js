@@ -330,326 +330,630 @@ function g_urlize(str, allowLocales, profile) {
     return str;
 }
 
-function g_createHeader(c) {
-    var k = $WH.ce("dl"),
-    p = (c == 5);
-    for (var j = 0, l = mn_path.length; j < l; ++j) {
-        var f = $WH.ce("dt");
-        var q = $WH.ce("a");
-        var m = $WH.ce("ins");
-        var g = $WH.ce("big");
-        var e = $WH.ce("span");
-        var o = mn_path[j][0];
-        var h = (o == c);
-        var d = (!h && mn_path[j][3]);
-        if (p && o == 5) {
-            d = true;
-            mn_path[j][3] = mn_profiles
-        }
-        if (d) {
-            Menu.add(q, mn_path[j][3]);
-        } else {
-            q.onmouseover = Menu._hide
-        }
-        if (mn_path[j][2]) {
-            q.href = mn_path[j][2]
-        } else {
-            q.href = "javascript:;";
-            $WH.ns(q);
-            q.style.cursor = "default"
-        }
-        if (h) {
-            q.className = "selected"
-        }
-        $WH.ae(g, $WH.ct(mn_path[j][1].charAt(0)));
-        $WH.ae(m, g);
-        $WH.ae(m, $WH.ct(mn_path[j][1].substr(1)));
-        $WH.ae(q, m);
-        $WH.ae(q, e);
-        $WH.ae(f, q);
-        $WH.ae(k, f)
+var PageTemplate = new function()
+{
+    var self = this;
+
+    /**********/
+    /* PUBLIC */
+    /**********/
+
+    self.init = function()
+    {
+        // Top links
+        initUserMenu();
+        initFeedbackLink();
+        initLanguageMenu();
+
+        initFilterDisclosure();                             // sarjuuk: custom (visibility toggle for filters was removed at some point)
+
+        // UI before page contents
+        initFloatingStuff();
+        initTopTabs();
+        initTopBar();
+        initBreadcrumb();
+
+        inited = true;
     }
-    $WH.ae($WH.ge("toptabs-generic"), k);
-    var b = $WH.ge("topbar-buttons");
-    if (c != null && c >= 0 && c < mn_path.length) {
-        c = parseInt(c);
-        switch (c) {
+
+    self.get = function(name)
+    {
+        return opt[name];
+    }
+
+    self.set = function(options)
+    {
+        if(!options)
+            return;
+
+        var old = {};
+        $.extend(old, opt);
+        $.extend(opt, options);
+
+        opt.activeTab = parseInt(opt.activeTab);
+
+        if(inited) // Update UI on the fly if already created
+        {
+            if(opt.activeTab != old.activeTab)
+            {
+                updateTopTabs();
+                updateTopBar();
+            }
+
+            if(opt.breadcrumb != old.breadcrumb)
+            {
+                updateBreadcrumb();
+            }
+        }
+    }
+
+    self.getBreadcrumb = function()
+    {
+        return $bread;
+    }
+
+    self.updateBreadcrumb = function()
+    {
+        updateBreadcrumb();
+    }
+
+    self.expandBreadcrumb = function()
+    {
+        return expandBreadcrumb();
+    }
+
+    /***********/
+    /* PRIVATE */
+    /***********/
+
+    var inited = false;
+    var opt = {};
+    var $bread;
+    var $tabs;
+    var checkedMenuItems = [];
+
+    function construct()
+    {
+        createDomElements(); // Create nodes for which getters are available
+        addBrowserClasses();
+    }
+
+    function createDomElements()
+    {
+        $bread = $('<div class="breadcrumb"></div>');
+    }
+
+    function addBrowserClasses()
+    {
+        // This is done before the <body> tag is loaded, so class names are added to the <html> tag instead
+        if($WH.Browser.ie6) $(document.documentElement).addClass('ie6 ie67 ie678');
+        if($WH.Browser.ie7) $(document.documentElement).addClass('ie7 ie67 ie678');
+        if($WH.Browser.ie8) $(document.documentElement).addClass('ie8 ie678');
+    }
+
+    function initUserMenu()
+    {
+        var $link = $('#toplinks-user');
+        if(!$link.length)
+            return;
+
+        $link.attr('href', '?user=' + g_user.name);
+
+        var menu = [];
+
+        // User Page
+        var userPage = ['user-page', LANG.userpage, '?user=' + g_user.name, null, {checkedUrl: new RegExp('user=' + g_user.name + '$', 'i')}];
+        menu.push(userPage);
+
+        // Settings
+        var settings = ['settings', LANG.settings, 'https://' + window.location.hostname + '?account', null, {icon: g_staticUrl + '/images/icons/cog.gif', checkedUrl: /account/i}];
+        menu.push(settings);
+
+        // Reputation
+        var reputation = ['reputation', LANG.reputation, '?reputation'];
+        menu.push(reputation);
+
+        // Guides
+        var guides = ['guides', 'My Guides', '?my-guides'];
+        menu.push(guides);
+
+        addCharactersMenu(menu);
+        addProfilesMenu(menu);
+
+        // Premium Upgrade
+        var premiumUpgrade;
+        if(!g_user.premium)
+        {
+            premiumUpgrade = ['premium-upgrade', LANG.premiumupgrade, '?premium', null, {className: 'q7', checkedUrl: /premium/i}];
+            menu.push(premiumUpgrade);
+        }
+
+        // Sign Out
+        menu.push(['sign-out', LANG.signout,  '?account=signout']);
+
+        Menu.add($link, menu);
+        $link.addClass('hassubmenu');
+    }
+
+    function addCharactersMenu(userMenu)
+    {
+        if(!g_user.characters || !g_user.characters.length)
+            return;
+
+        // Menu will be generated on the fly
+        var characters = ['characters', LANG.tab_characters, '?user=' + g_user.name + '#characters', null, {onBeforeShow: generateCharactersSubmenu} ];
+
+        userMenu.push(characters);
+    }
+
+    function addProfilesMenu(userMenu)
+    {
+        if(!g_user.profiles || !g_user.profiles.length)
+            return;
+
+        // Menu will be generated on the fly
+        var profiles = ['profiles', LANG.tab_profiles, '?user=' + g_user.name + '#profiles', null, {onBeforeShow: generateProfilesSubmenu} ];
+
+        userMenu.push(profiles);
+    }
+
+    function generateCharactersSubmenu(menuItem)
+    {
+        var submenu = [];
+
+        // Sort by realm, region, name
+        g_user.characters.sort(function(a, b)
+        {
+            return $WH.strcmp(a.realmname, b.realmname) || $WH.strcmp(a.region, b.region) || $WH.strcmp(a.name, b.name);
+        });
+
+        var lastKey;
+        $.each(g_user.characters, function(idx, character)
+        {
+            if(!character.region || !character.realm || !character.name)
+                return;
+
+            // Group by realm+region
+            var key = character.region + character.realm;
+            if(key != lastKey)
+            {
+                var heading = [, character.realmname + ' (' + character.region.toUpperCase() + ')', g_getProfileRealmUrl(character)];
+                submenu.push(heading);
+                lastKey = key;
+            }
+
+            var menuItem = [character.id, character.name, g_getProfileUrl(character), null,
+            {
+                className: (character.pinned ? 'icon-star-right ' : '') + 'c' + character.classs,
+                tinyIcon: $WH.g_getProfileIcon(character.race, character.classs, character.gender, character.level, character.id, 'tiny')
+            }];
+
+            submenu.push(menuItem);
+        });
+
+        menuItem[MENU_IDX_SUB] = submenu;
+    }
+
+    function generateProfilesSubmenu(menuItem)
+    {
+        var submenu = [];
+
+        // Sort by name
+        g_user.profiles.sort(function(a, b)
+        {
+            return $WH.strcmp(a.name, b.name);
+        });
+
+        $.each(g_user.profiles, function(idx, profile)
+        {
+            var menuItem = [profile.id, profile.name, g_getProfileUrl(profile), null,
+            {
+                className: 'c' + profile.classs,
+                tinyIcon: $WH.g_getProfileIcon(profile.race, profile.classs, profile.gender, profile.level, profile.icon, 'tiny')
+            }];
+
+            submenu.push(menuItem);
+        });
+
+        submenu.push([0, LANG.menu_newprofile, '?profile&new', null, {tinyIcon: 'inv_misc_questionmark'}]);
+
+        menuItem[MENU_IDX_SUB] = submenu;
+    }
+
+    function initFeedbackLink()
+    {
+        $('#toplinks-feedback')
+        .attr('href', 'javascript:;')
+        .click(function()
+        {
+            ContactTool.show();
+        });
+    }
+
+    function initLanguageMenu()
+    {
+        var linkBefore = 'http://';
+        var linkAfter  = location.pathname + location.search + location.hash;
+        var localeId   = Locale.getId();
+
+        var menu = [];
+        var currentLocale;
+
+        $.each(Locale.getAllByName(), function(idx, locale)
+        {
+            var menuItem = [
+                locale.id,
+                locale.description,
+                g_host + '?locale=' + locale.id,                            // sarjuuk: edited for unsupported subdomains # linkBefore + locale.domain + linkAfter
+                null,                                                       // more custom
+                {rel: linkBefore + linkAfter + " domain=" + locale.domain}  // also custom
+            ];
+
+            if(locale.id == localeId)
+            {
+                menuItem.checked = true;
+                currentLocale = locale;
+            }
+
+            menu.push(menuItem);
+        });
+
+        setLanguageMenu($('#toplinks-language'), menu, currentLocale);
+
+        $(document).ready(function()
+        {
+            setLanguageMenu($('#footer-links-language'), menu, currentLocale);
+        });
+    }
+
+    function setLanguageMenu($node, menu, locale)
+    {
+        $node.attr('href', 'javascript:;');
+        // $node.text(locale.description);
+
+        $node.addClass('hassubmenu');
+        Menu.add($node, menu);
+    }
+
+    function initFloatingStuff()
+    {
+        // Expand button
+        $('#header-expandsite')
+        .attr('href', 'javascript:;')
+        .click(expandButtonClick);
+    }
+
+    function initTopTabs()
+    {
+        var $topTabs = $('#toptabs-generic');
+        if(!$topTabs.length)
+            return;
+
+        $tabs = $('<dl/>');
+
+        $.each(mn_path, function(idx, menuItem)
+        {
+            var $dt = $('<dt><a><ins><big>' + menuItem[MENU_IDX_NAME].charAt(0) + '</big>' + menuItem[MENU_IDX_NAME].substr(1) + '</ins><span></span></a></dt>');
+            var $a = $dt.children('a');
+
+            Menu.linkifyItem(menuItem, $a);
+
+            $dt.appendTo($tabs);
+        });
+
+        updateTopTabs();
+
+        $tabs.appendTo($topTabs);
+    }
+
+    function initTopBar()
+    {
+        var $topBar = $('#topbar');
+        if(!$topBar.length)
+            return;
+
+        // Search
+        var $search = $('div.topbar-search', $topBar);
+
+        // custom start (note: html5 supports placeholder attribute)
+        var inp = $WH.ge('livesearch-generic');
+        if (inp.value == '') {
+            inp.className = 'search-database';
+        }
+        inp.onmouseover = function() {
+            if ($WH.trim(this.value) != '') {
+                this.className = '';
+            }
+        };
+        inp.onfocus = function() {
+            this.className = '';
+        };
+        inp.onblur = function() {
+            if ($WH.trim(this.value) == '') {
+                this.className = 'search-database';
+                this.value = '';
+            }
+        };
+        // custom end
+
+        // Icon
+        var $icon = $('<a></a>').attr('href', 'javascript:;');
+
+        $icon.click(searchIconClick)
+        .appendTo($search);
+
+        $('form', $search).submit(g_preventEmptyFormSubmission);
+        LiveSearch.attach($('input', $search));
+
+        var windowSize = $WH.g_getWindowSize();
+        if(windowSize.w && windowSize.w < 1024)
+            $('div.topbar-search input').css('width', '180px');
+
+        updateTopBar();
+    }
+
+    function initBreadcrumb()
+    {
+        // (Already created)
+
+        updateBreadcrumb();
+
+        $bread.appendTo($('#main-precontents'));
+    }
+
+    function initFilterDisclosure()
+    {
+        if (opt.filter == null)
+            return;
+
+        var
+            _ = $WH.ge('main-precontents'),
+            d = $WH.ce('div'),
+            a = $WH.ce('a');
+
+        d.className = 'path-right';
+        a.href = 'javascript:;';
+        a.id = 'fi_toggle';
+        $WH.ns(a);
+        a.onclick = fi_toggle;
+
+        if (opt.filter) {
+            a.className = 'disclosure-on';
+            $WH.ae(a, $WH.ct(LANG.fihide));
+        }
+        else {
+            a.className = 'disclosure-off';
+            $WH.ae(a, $WH.ct(LANG.fishow));
+        }
+
+        $WH.ae(d, a);
+        $WH.ae(_, d);
+    }
+
+    function updateTopTabs()
+    {
+        if(!$tabs)
+            return;
+
+        var $as = $('a', $tabs);
+
+        $.each(mn_path, function(idx, menuItem)
+        {
+            var $a = $($as.get(idx));
+
+            var isActiveTab = (menuItem[MENU_IDX_ID] == opt.activeTab);
+            if(isActiveTab)
+            {
+                $a.addClass('active');
+                Menu.remove($a);
+            }
+            else
+            {
+                $a.removeClass('active');
+                if(menuItem[MENU_IDX_SUB])
+                    Menu.add($a, menuItem[MENU_IDX_SUB]);
+            }
+        });
+    }
+
+    function updateTopBar()
+    {
+        var $buttons = $('#topbar div.topbar-buttons');
+        if(!$buttons.length)
+            return;
+
+        $buttons.empty();
+
+        switch(opt.activeTab)
+        {
             case 0: // Database
-                Menu.addButtons(b, [
-                    [0, LANG.menu_browse, null, mn_database],         // Browse
-                    Menu.findItem(mn_tools, [8]),                     // Utilities
-                    Menu.findItem(mn_tools, [8, 4])                   // Random Page
-                   ]);
-                break;
-            case 1: // Tools
-                Menu.addButtons(b, [
-                    [0, LANG.calculators, null, mn_tools.slice(0,4)], // Calculators
-                    Menu.findItem(mn_tools, [1]),                     // Maps
-                    Menu.findItem(mn_tools, [8]),                     // Utilities
-                    Menu.findItem(mn_tools, [6]),                     // Guides
+                Menu.addButtons($buttons,[
+                    [0, LANG.menu_browse, null, mn_database], // Browse
+                    Menu.findItem(mn_tools, [8]),             // Utilities
+                    Menu.findItem(mn_tools, [8, 4])           // Random Page
                 ]);
                 break;
-            case 2:
-                Menu.addButtons(b, Menu.implode(mn_more));
+
+            case 1: // Tools
+                // Create "Calculators" group to decrease width used
+                var calculators = [
+                    [, LANG.calculators],
+                    Menu.findItem(mn_tools, [0]), // Talent Calculator
+                    Menu.findItem(mn_tools, [2]), // Hunter Pet Calculator
+                    Menu.findItem(mn_tools, [3])  // Item Comparison
+                ];
+
+                // MoP link
+                if (mn_tools[2][0] == 10) {
+                    var tmp = calculators[3];
+                    calculators[3] = Menu.findItem(mn_tools, [10]);
+                    calculators[4] = tmp;
+
+                    Menu.addButtons($buttons, Menu.implode(calculators));
+                    Menu.addButtons($buttons, Menu.implode(mn_tools.slice(4))); // Skip first 4 menu items
+                } else {
+                    Menu.addButtons($buttons, Menu.implode(calculators));
+                    Menu.addButtons($buttons, Menu.implode(mn_tools.slice(3))); // Skip first 4 menu items
+                }
+
                 break;
-            case 5:
-                pr_initTopBarSearch();
-                break
-        }
-    }
-    else {
-        $WH.ae(b, $WH.ct(String.fromCharCode(160)));
-    }
-}
-function g_updateHeader(a) {
-    $WH.ee($WH.ge("toptabs-generic"));
-    $WH.ee($WH.ge("topbar-buttons"));
-    g_createHeader(a)
-}
-function g_initHeader(a) {
-    g_createHeader(a);
-    var d = $WH.ge("livesearch-generic");
-    var b = d.previousSibling;
-    var c = d.parentNode;
-    $WH.ns(b);
-    b.onclick = function() {
-        this.parentNode.onsubmit()
-    };
-    if ($WH.Browser.ie) {
-        setTimeout(function() {
-            d.value = ""
-        },
-        1)
-    }
-    if (d.value == "") {
-        d.className = "search-database"
-    }
-    d.onmouseover = function() {
-        if ($WH.trim(this.value) != "") {
-            this.className = ""
-        }
-    };
-    d.onfocus = function() {
-        this.className = ""
-    };
-    d.onblur = function() {
-        if ($WH.trim(this.value) == "") {
-            this.className = "search-database";
-            this.value = ""
-        }
-    };
-    c.onsubmit = function() {
-        var e = this.elements[0].value;
-        if ($WH.trim(e) == "") {
-            return false
-        }
-        this.submit()
-    }
-}
-function g_initHeaderMenus() {
-    var c = $WH.ge("toptabs-menu-user");
-    if (c) {
-        menu = [[0, LANG.userpage, "?user=" + g_user.name], [0, LANG.settings, "?account"], [0, LANG.signout, "?account=signout"]];
-        if (location.href.match(new RegExp("/?user=" + g_user.name + "$", "i"))) {
-            menu[0].checked = 1
-        } else {
-            if (location.href.indexOf("?account") != -1) {
-                menu[1].checked = 1
-            }
-        }
-        Menu.add(c, menu);
-        c.href = "?user=" + g_user.name
-    }
-    c = $WH.ge("toptabs-menu-profiles");
-    if (c) {
-        c.menu = [];
-        if (g_user.characters) {
-            c.menu.push([, LANG.tab_characters]);
-            for (var f = 0, b = g_user.characters.length; f < b; ++f) {
-                var h = g_user.characters[f],
-                e = [0, h.name + " (" + h.realmname + LANG.hyphen + h.region.toUpperCase() + ")", "?profile=" + h.region + "." + h.realm + "." + g_cleanCharacterName(h.name)];
-                e.smallIcon = h.icon ? h.icon: "chr_" + g_file_races[h.race] + "_" + g_file_genders[h.gender] + "_" + g_file_classes[h.classs] + "0" + (h.level > 59 ? (Math.floor((h.level - 60) / 10) + 2) : 1);
-                c.menu.push(e)
-            }
-        }
-        c.menu.push([, LANG.tab_profiles]);
-        if (g_user.profiles) {
-            for (var f = 0, b = g_user.profiles.length; f < b; ++f) {
-                var h = g_user.profiles[f],
-                e = [0, h.name, "?profile=" + h.id];
-                e.smallIcon = h.icon ? h.icon: "chr_" + g_file_races[h.race] + "_" + g_file_genders[h.gender] + "_" + g_file_classes[h.classs] + "0" + (h.level > 59 ? (Math.floor((h.level - 60) / 10) + 2) : 1);
-                c.menu.push(e)
-            }
-        }
-        var e = [0, "(" + LANG.button_new + ")", "?profile&new"];
-        e.smallIcon = "inv_misc_questionmark";
-        c.menu.push(e);
-        c.menu.rightAligned = 1;
-        Menu.add(c, c.menu);
-        c.href = "?user=" + g_user.name + (g_user.profiles ? "#profiles": (g_user.characters ? "#characters": ""))
-    }
-    c = $WH.ge("toptabs-menu-language");
-    if (c) {
-        var g = "www",
-        d = location.href,
-        j = location.hostname.indexOf(".");
-        if (j != -1 && j <= 5) {
-            g = location.hostname.substr(0, j)
-        }
-        j = d.indexOf("#");
-        if (j != -1) {
-            d = d.substr(0, j)
-        }
-        //menu = [[0, "Deutsch", (g_locale.id != 3 ? d.replace(g, "de") : null)], [0, "English", (g_locale.id != 0 ? d.replace(g, "www") : null)], [0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? d.replace(g, "es") : null)], [0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? d.replace(g, "fr") : null)], [0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? d.replace(g, "ru") : null)]];
 
-        var rel = d.match(/()\?((item|quest|spell|achievement|npc|object)=([0-9]+))/);
-        rel = (rel && rel[2]) ? rel[2] : "";
+            case 2: // More
+                Menu.addButtons($buttons, Menu.implode(mn_more));
+                break;
 
-        menu = [
-            [0, "Deutsch", (g_locale.id != 3 ? "?locale=3" : null), , {rel: rel + " domain=de"}],
-            [0, "English", (g_locale.id != 0 ? "?locale=0" : null), , {rel: rel + " domain=en"}],
-            [0, "Espa" + String.fromCharCode(241) + "ol", (g_locale.id != 6 ? "?locale=6" : null), , {rel: rel + " domain=es"}],
-            [0, "Fran" + String.fromCharCode(231) + "ais", (g_locale.id != 2 ? "?locale=2" : null), , {rel: rel + " domain=fr"}],
-            [0, String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081), (g_locale.id != 8 ? "?locale=8" : null), , {rel: rel + " domain=ru"}]
-        ];
-        menu.rightAligned = 1;
-        if (g_locale.id != 25) {
-            menu[{
-                0 : 1,
-                2 : 3,
-                3 : 0,
-                6 : 2,
-                8 : 4
-            } [g_locale.id]].checked = 1
+            case 3: // Community
+                Menu.addButtons($buttons, Menu.implode(mn_community));
+                Menu.addButtons($buttons, [
+                    Menu.findItem(mn_tools, [8]) // Utilities
+                ]);
+                break;
+
+            case 4: // Staff
+                Menu.addButtons($buttons, Menu.implode(mn_staff));
+                break;
+
+            case 5: // News
+                Menu.addButtons($buttons, Menu.implode(mn_news));
+                break;
+
+            case 6: // Guides
+                var entries = [ [ 1, 'List of guides', '/guides' ], [ 2, 'Write new guide', '/guide=new' ] ];
+
+                if(g_user.id)
+                    entries.push([ 3, 'My guides', '/my-guides' ]);
+
+                Menu.addButtons($buttons, entries);
+                break;
         }
-        Menu.add(c, menu);
     }
 
-    $('#toplinks-feedback').attr('href', 'javascript:;').click(function()
+    function updateBreadcrumb()
     {
-        ContactTool.show();
-    });
-}
-function g_initPath(q, f) {
-    var h = mn_path,
-    c = null,
-    k = null,
-    p = 0,
-    l = $WH.ge("main-precontents"),
-    o = $WH.ce("div");
-    $WH.ee(l);
-    if (g_initPath.lastIt) {
-        g_initPath.lastIt.checked = null
-    }
-    o.className = "path";
-    if (f != null) {
-        var m = $WH.ce("div");
-        m.className = "path-right";
-        var r = $WH.ce("a");
-        r.href = "javascript:;";
-        r.id = "fi_toggle";
-        $WH.ns(r);
-        r.onclick = fi_toggle;
-        if (f) {
-            r.className = "disclosure-on";
-            $WH.ae(r, $WH.ct(LANG.fihide))
-        } else {
-            r.className = "disclosure-off";
-            $WH.ae(r, $WH.ct(LANG.fishow))
-        }
-        $WH.ae(m, r);
-        $WH.ae(l, m)
-    }
-    for (var g = 0; g < q.length; ++g) {
-        var r, b, t = 0;
-        for (var e = 0; e < h.length; ++e) {
-            if (h[e][0] == q[g]) {
-                t = 1;
-                h = h[e];
-                h.checked = 1;
-                break
-            }
-        }
-        if (!t) {
-            p = 1;
-            break
-        }
-        r = $WH.ce("a");
-        b = $WH.ce("span");
-        if (h[2]) {
-            r.href = h[2]
-        } else {
-            r.href = "javascript:;";
-            $WH.ns(r);
-            r.style.textDecoration = "none";
-            r.style.color = "white";
-            r.style.cursor = "default"
-        }
-        if (g < q.length - 1 && h[3]) {
-            b.className = "menuarrow"
-        }
-        //$WH.ae(r, $WH.ct(h[4] == null ? h[1] : h[4]));
-        $WH.ae(r, $WH.ct(h[1]));
-        if (g == 0) {
-            Menu.add(r, mn_path);
-        } else {
-            Menu.add(r, c[3]);
+        if(!opt.breadcrumb || !opt.breadcrumb.length) // Empty
+        {
+            $bread.hide();
+            return;
         }
 
-        $WH.ae(b, r);
-        $WH.ae(o, b);
-        k = b;
-        c = h;
-        h = h[3];
-        if (!h) {
-            p = 1;
-            break
+        $bread.empty();
+
+        // Uncheck previously checked menu items, if any
+        if(checkedMenuItems.length)
+        {
+            $.each(checkedMenuItems, function() {this.checked = false;Menu.updateItem(this)});
+            checkedMenuItems = [];
         }
+
+        var path = Menu.getFullPath(mn_path, opt.breadcrumb);
+        if(!path.length)
+            return;
+
+        var lastIdx = (path.length - 1);
+
+        $.each(path, function(idx, menuItem)
+        {
+            var menuOpt = Menu.getItemOpt(menuItem);
+
+            menuItem.checked = true;
+            checkedMenuItems.push(menuItem);
+            Menu.updateItem(menuItem);
+
+            var $span = expandBreadcrumb();
+            var $textHolder = $span;
+
+            if(menuItem[MENU_IDX_URL])
+            {
+                $textHolder = $('<a/>', {
+                    href: Menu.getItemUrl(menuItem)
+                }).appendTo($span);
+            }
+
+            if(menuOpt.breadcrumb)
+                $textHolder.text(menuOpt.breadcrumb);
+            else
+                $textHolder.text(menuItem[MENU_IDX_NAME]);
+
+            Menu.add($textHolder, menuItem.parentMenu);
+
+            $span.appendTo($bread);
+
+            // Add ellipsis as appropriate
+            if(idx == lastIdx && menuItem[MENU_IDX_SUB])
+            {
+                $span.addClass('breadcrumb-arrow');
+
+                var $ellipsis = $('<span class="breadcrumb-ellipsis">...</span>');
+                Menu.add($ellipsis, menuItem[MENU_IDX_SUB]);
+
+                $ellipsis.appendTo($bread);
+            }
+        });
+
+        $bread.trigger('update'); // Some features rely on this event to add stuff to the breadcrumb
+        $bread.show();
     }
-    if (p && k) {
-        k.className = ""
-    } else {
-        if (c && c[3]) {
-            k.className = "menuarrow";
-            r = $WH.ce("a");
-            b = $WH.ce("span");
-            r.href = "javascript:;";
-            $WH.ns(r);
-            r.style.textDecoration = "none";
-            r.style.paddingRight = "16px";
-            r.style.color = "white";
-            r.style.cursor = "default";
-            $WH.ae(r, $WH.ct("..."));
-            Menu.add(r, c[3]);
-            $WH.ae(b, r);
-            $WH.ae(o, b)
-        }
+
+    function expandBreadcrumb()
+    {
+        $bread.children('span:last').addClass('breadcrumb-arrow');
+
+        return $('<span/>').appendTo($bread);
     }
-    // not really usefull
-    // var m = $WH.ce("div");
-    // m.className = "clear";
-    // $WH.ae(o, m);
-    $WH.ae(l, o);
-    g_initPath.lastIt = c
+
+    // EVENTS
+
+    function expandButtonClick()
+    {
+        $('#sidebar, #header-expandsite').remove();
+
+        if($('#layout').hasClass('nosidebar'))
+            return;
+
+        // Free room allocated for the sidebar
+        $('#wrapper').animate(
+            {'margin-right': '10px'},
+            333,
+            null,
+            function()
+            {
+                $('#wrapper').css('margin-right', '0px');
+                $('#layout').addClass('nosidebar');
+            }
+        );
+    }
+
+    function searchIconClick()
+    {
+        $(this).prev('form').submit().children('input').focus();
+    }
+
+    construct();
 }
-function g_addTooltip(b, c, a) {
-    if (!a && c.indexOf("<table>") == -1) {
-        a = "q"
+
+function g_addTooltip(element, text, className) {
+    if (!className && text.indexOf('<table>') == -1) {
+        className = 'q';
     }
-    b.onmouseover = function(d) {
-        $WH.Tooltip.showAtCursor(d, c, 0, 0, a)
+
+    element.onmouseover = function(d) {
+        $WH.Tooltip.showAtCursor(d, text, 0, 0, className);
     };
-    b.onmousemove = $WH.Tooltip.cursorUpdate;
-    b.onmouseout = $WH.Tooltip.hide
+
+    element.onmousemove = $WH.Tooltip.cursorUpdate;
+    element.onmouseout  = $WH.Tooltip.hide;
 }
-function g_addStaticTooltip(b, c, a) {
-    if (!a && c.indexOf("<table>") == -1) {
-        a = "q"
+
+function g_addStaticTooltip(icon, text, className) {
+    if (!className && text.indexOf('<table>') == -1) {
+        className = 'q';
     }
-    b.onmouseover = function(d) {
-        $WH.Tooltip.show(b, c, 0, 0, a)
+
+    icon.onmouseover = function(d) {
+        $WH.Tooltip.show(icon, text, 0, 0, className);
     };
-    b.onmouseout = $WH.Tooltip.hide
+
+    icon.onmouseout = $WH.Tooltip.hide;
 }
 
 function g_formatTimeElapsed(delay) {
@@ -1100,80 +1404,51 @@ function g_getMoneyHtml(money, side, costItems, costCurrency, achievementPoints)
     return html;
 }
 
-function g_numberFormat(f, b, l, h) {
-    var c = f,
-    a = b;
-    var e = function(r, q) {
-        var i = Math.pow(10, q);
-        return (Math.round(r * i) / i).toString()
-    };
-    c = !isFinite( + c) ? 0 : +c;
-    a = !isFinite( + a) ? 0 : Math.abs(a);
-    var p = (typeof h === "undefined") ? ",": h;
-    var d = (typeof l === "undefined") ? ".": l;
-    var o = (a > 0) ? e(c, a) : e(Math.round(c), a);
-    var m = e(Math.abs(c), a);
-    var k, g;
-    if (m >= 1000) {
-        k = m.split(/\D/);
-        g = k[0].length % 3 || 3;
-        k[0] = o.slice(0, g + (c < 0)) + k[0].slice(g).replace(/(\d{3})/g, p + "$1");
-        o = k.join(d)
-    } else {
-        o = o.replace(".", d)
-    }
-    var j = o.indexOf(d);
-    if (a >= 1 && j !== -1 && (o.length - j - 1) < a) {
-        o += new Array(a - (o.length - j - 1)).join(0) + "0"
-    } else {
-        if (a >= 1 && j === -1) {
-            o += d + new Array(a).join(0) + "0"
+function g_insertTag(where, tagOpen, tagClose, repFunc) {
+    var n = $WH.ge(where);
+
+    n.focus();
+    if (n.selectionStart != null) {
+        var
+            s = n.selectionStart,
+            e = n.selectionEnd,
+            sL = n.scrollLeft,
+            sT = n.scrollTop;
+
+            var selectedText = n.value.substring(s, e);
+        if (typeof repFunc == 'function') {
+            selectedText = repFunc(selectedText);
         }
+
+        n.value = n.value.substr(0, s) + tagOpen + selectedText + tagClose + n.value.substr(e);
+        n.selectionStart = n.selectionEnd = e + tagOpen.length;
+
+        n.scrollLeft = sL;
+        n.scrollTop  = sT;
     }
-    return o
-}
-function g_expandSite() {
-    $WH.ge("wrapper").className = "nosidebar";
-    var a = $WH.ge("topbar-expand");
-    if (a) {
-        $WH.de(a)
-    }
-    a = $WH.ge("sidebar");
-    if (a) {
-        $WH.de(a)
-    }
-}
-function g_insertTag(d, a, i, j) {
-    var b = $(d);
-    b.focus();
-    if (b.selectionStart != null) {
-        var l = b.selectionStart,
-        h = b.selectionEnd,
-        k = b.scrollLeft,
-        c = b.scrollTop;
-        var g = b.value.substring(l, h);
-        if (typeof j == "function") {
-            g = j(g)
+    else if (document.selection && document.selection.createRange) {
+        var range = document.selection.createRange();
+
+        if (range.parentElement() != n) {
+            return;
         }
-        b.value = b.value.substr(0, l) + a + g + i + b.value.substr(h);
-        b.selectionStart = b.selectionEnd = h + a.length;
-        b.scrollLeft = k;
-        b.scrollTop = c
-    } else {
-        if (document.selection && document.selection.createRange) {
-            var f = document.selection.createRange();
-            if (f.parentElement() != b) {
-                return
-            }
-            var g = f.text;
-            if (typeof j == "function") {
-                g = j(g)
-            }
-            f.text = a + g + i
+
+        var selectedText = range.text;
+        if (typeof repFunc == 'function') {
+            selectedText = repFunc(selectedText);
         }
+
+        range.text = tagOpen + selectedText + tagClose;
+/*
+        range.moveEnd("character", -tagClose.length);
+        range.moveStart("character", range.text.length);
+
+        range.select();
+*/
     }
-    if (b.onkeyup) {
-        b.onkeyup()
+
+    if (n.onkeyup) {
+        n.onkeyup();
     }
 }
 
@@ -1200,7 +1475,7 @@ function g_getCurrentDomain() {
     if (!g_isIpAddress(hostname)) {
         // Only keep the last 2 parts
         var parts = hostname.split('.');
-        if(parts.length > 2) {
+        if (parts.length > 2) {
             parts.splice(0, parts.length - 2);
         }
         hostname = parts.join('.');
@@ -1211,52 +1486,77 @@ function g_getCurrentDomain() {
     return hostname;
 }
 
-function g_onAfterTyping(a, d, c) {
-    var e;
-    var b = function() {
-        if (e) {
-            clearTimeout(e);
-            e = null
+function g_onAfterTyping(input, func, delay) {
+    var timerId;
+    var ldsgksdgnlk623 = function() {
+        if (timerId) {
+            clearTimeout(timerId);
+            timerId = null;
         }
-        e = setTimeout(d, c)
+        timerId = setTimeout(func, delay);
     };
-    a.onkeyup = b
+    input.onkeyup = ldsgksdgnlk623;
 }
-function g_onClick(c, d) {
-    var b = 0;
-    function a(e) {
-        if (b) {
-            if (b != e) {
-                return
-            }
-        } else {
-            b = e
-        }
-        d(true)
-    }
-    c.oncontextmenu = function() {
-        a(1);
-        return false
-    };
-    c.onmouseup = function(f) {
-        f = $WH.$E(f);
-        if (f._button == 3 || f.shiftKey || f.ctrlKey) {
-            a(2)
-        } else {
-            if (f._button == 1) {
-                d(false)
+
+function g_onClick(el, func) {
+    var firstEvent = 0;
+
+    function rightClk(n) {
+        if (firstEvent) {
+            if (firstEvent != n) {
+                return;
             }
         }
-        return false
+        else {
+            firstEvent = n;
+        }
+
+        func(true);
+    }
+
+    el.onclick = function(e) {
+        e = $WH.$E(e);
+
+        if (e._button == 2) { // middle click
+            return true;
+        }
+
+        return false;
+    }
+
+    el.oncontextmenu = function() {
+        rightClk(1);
+
+        return false;
+    };
+
+    el.onmouseup = function(e) {
+        e = $WH.$E(e);
+
+        if (e._button == 3 || e.shiftKey || e.ctrlKey) { // Right/Shift/Ctrl
+            rightClk(2);
+        }
+        else if (e._button == 1) { // Left
+            func(false);
+        }
+
+        return false;
     }
 }
-function g_isLeftClick(a) {
-    a = $WH.$E(a);
-    return (a && a._button == 1)
+
+function g_isLeftClick(e) {
+    e = $WH.$E(e);
+    return (e && e._button == 1);
+}
+
+function g_preventEmptyFormSubmission() { // Used on the homepage and in the top bar
+    if (!$.trim(this.elements[0].value)) {
+        return false;
+    }
 }
 
 function g_isExternalUrl(url) {
-    if(!url) {
+    if (!url) {
         return false;
     }
 
@@ -1376,6 +1676,215 @@ function g_modifyUrl(url, params, opt) {
     return url + hash;
 }
 
+function g_GetExpansionClassName(expansion) {
+    switch (expansion) {
+        case 0:
+            return null;
+        case 1:
+            return "icon-bc-right";
+        case 2:
+            return "icon-wotlk-right";
+    }
+
+    return null;
+}
+
+function g_addPages(d, opt) {
+    function createPageSquare(n, customText) {
+        var foo;
+        if (n == opt.page) {
+            foo = $WH.ce('span');
+            foo.className = 'selected';
+        }
+        else {
+            foo = $WH.ce('a');
+            foo.href = (n > 1 ? opt.url + opt.sep + n + opt.pound : opt.url + opt.pound);
+        }
+        $WH.ae(foo, $WH.ct(customText != null ? customText : n));
+        return foo;
+    }
+
+    if (!opt.pound) {
+        opt.pound = '';
+    }
+
+    if (!opt.sep) {
+        opt.sep = '.';
+    }
+
+    if (opt.allOrNothing && opt.nPages <= 1) {
+        return;
+    }
+
+    var leftAligned = (opt.align && opt.align == 'left');
+
+    var
+        divPages = $WH.ce('div'),
+        pagesNumbers,
+        para = $WH.ce('var');
+
+        divPages.className = 'pages';
+    if (leftAligned) {
+        divPages.className += ' pages-left';
+    }
+
+    // Pages
+    if (opt.nPages > 1) {
+        pagesNumbers = $WH.ce('div');
+        pagesNumbers.className = 'pages-numbers';
+
+        var minPage = Math.max(2, opt.page - 2);
+        var maxPage = Math.min(opt.nPages - 1, opt.page + 2);
+
+        var elements = []; // Temporarily stored in an array so the order can be reversed when left-aligned.
+
+        if (opt.page != opt.nPages) {
+            elements.push(createPageSquare(opt.page + 1, LANG.lvpage_next + String.fromCharCode(8250)));
+        }
+
+        elements.push(createPageSquare(opt.nPages));
+        if (maxPage < opt.nPages - 1) {
+            var sp = $WH.ce('span');
+            $WH.ae(sp, $WH.ct('...'));
+            elements.push(sp);
+        }
+
+        for (var i = maxPage; i >= minPage; --i) {
+            elements.push(createPageSquare(i));
+        }
+
+        if (minPage > 2) {
+            var sp = $WH.ce('span');
+            $WH.ae(sp, $WH.ct('...'));
+            elements.push(sp);
+        }
+        elements.push(createPageSquare(1));
+
+        if (opt.page != 1) {
+            elements.push(createPageSquare(opt.page - 1, String.fromCharCode(8249) + LANG.lvpage_previous));
+        }
+
+        if (leftAligned) {
+            elements.reverse();
+        }
+
+        for (var i = 0, len = elements.length; i < len; ++i) {
+            $WH.ae(pagesNumbers, elements[i]);
+        }
+
+        pagesNumbers.firstChild.style.marginRight = '0';
+        pagesNumbers.lastChild.style.marginLeft = '0';
+    }
+
+    // Number of items
+    var para = $WH.ce('var');
+    $WH.ae(para, $WH.ct($WH.sprintf(LANG[opt.wording[opt.nItems == 1 ? 0 : 1]], opt.nItems)));
+
+    if (opt.nPages > 1) { // Go to page
+        var sp = $WH.ce('span');
+        $WH.ae(sp, $WH.ct(String.fromCharCode(8211)));
+        $WH.ae(para, sp);
+
+        var pageIcon = $WH.ce('a');
+        pageIcon.className = 'gotopage';
+        pageIcon.href = 'javascript:;';
+        $WH.ns(pageIcon);
+
+        if ($WH.Browser.ie) {
+            $WH.ae(pageIcon, $WH.ct(' '));
+        }
+
+        pageIcon.onclick = function() {
+            var n = prompt($WH.sprintf(LANG.prompt_gotopage, 1, opt.nPages), opt.page);
+            if (n != null) {
+                n |= 0;
+                if (n != opt.page && n >= 1 && n <= opt.nPages) {
+                    document.location.href = (n > 1 ? opt.url + opt.sep + n + opt.pound : opt.url + opt.pound);
+                }
+            }
+        };
+        pageIcon.onmouseover = function(event) {
+            $WH.Tooltip.showAtCursor(event, LANG.tooltip_gotopage, 0, 0, 'q2');
+        };
+        pageIcon.onmousemove = $WH.Tooltip.cursorUpdate;
+        pageIcon.onmouseout = $WH.Tooltip.hide;
+        $WH.ae(para, pageIcon);
+    }
+
+    if (leftAligned) {
+        $WH.ae(divPages, para);
+        if (pagesNumbers) {
+            $WH.ae(divPages, pagesNumbers);
+        }
+    }
+    else {
+        if (pagesNumbers) {
+            $WH.ae(divPages, pagesNumbers);
+        }
+        $WH.ae(divPages, para);
+    }
+
+    $WH.ae(d, divPages);
+}
+
+function g_disclose(el, _this) {
+    _this.className = 'disclosure-' + (g_toggleDisplay(el) ? 'on' : 'off');
+
+    return false;
+}
+
+/* Displays a warning when the user attempts to leave the page if some elements are modified, unless the user leaves the page
+ * by submitting the form.
+ *
+ * The jQuery form object must be passed as first argument; the second argument is an array of jQuery objects of fields that
+ * are being watched for changes. The third argument is the warning message shown.
+ *
+ * This function must be called in the on ready event.
+ */
+
+function g_setupChangeWarning(form, elements, warningMessage) {
+    /* Still skip IE since it triggers this when anchor links are clicked. */
+    if ($.browser.msie) {
+        return;
+    }
+
+    if (!form) {
+        return;
+    }
+
+    function ShowWarning() { return warningMessage; }
+
+    form.submit(function() { window.onbeforeunload = null; });
+
+    var initialText = [];
+
+    for (var idx in elements) {
+        var text = elements[idx];
+
+        if (!text) {
+            continue;
+        }
+
+        initialText[idx] = text.val();
+        text.keydown(function() {
+            for (var idx in elements) {
+                var text = elements[idx];
+
+                if (!text) {
+                    continue;
+                }
+
+                if (text.val() != initialText[idx]) {
+                    window.onbeforeunload = ShowWarning;
+                    return;
+                }
+
+                window.onbeforeunload = null;
+            }
+        });
+    }
+}
+
 DomContentLoaded.addEvent(function () {
     $WH.array_apply($WH.gE(document, 'dfn'), function(x){
         var text = x.title;
@@ -1402,142 +1911,24 @@ DomContentLoaded.addEvent(function () {
 */
 });
 
-function g_GetExpansionClassName(expansion) {
-    switch (expansion) {
-        case 0:
-            return null;
-        case 1:
-            return "icon-bc-right";
-        case 2:
-            return "icon-wotlk-right";
-    }
 
-    return null;
-}
+/*
+Global comment-related functions
+*/
 
-function g_addPages(l, b) {
-    function p(r, d) {
-        var i;
-        if (r == b.page) {
-            i = $WH.ce("span");
-            i.className = "selected"
-        } else {
-            i = $WH.ce("a");
-            i.href = (r > 1 ? b.url + b.sep + r + b.pound: b.url + b.pound)
-        }
-        $WH.ae(i, $WH.ct(d != null ? d: r));
-        return i
-    }
-    if (!b.pound) {
-        b.pound = ""
-    }
-    if (!b.sep) {
-        b.sep = "."
-    }
-    if (b.allOrNothing && b.nPages <= 1) {
-        return
-    }
-    var c = (b.align && b.align == "left");
-    var e = $WH.ce("div"),
-    k,
-    q = $WH.ce("var");
-    e.className = "pages";
-    if (c) {
-        e.className += " pages-left"
-    }
-    if (b.nPages > 1) {
-        k = $WH.ce("div");
-        k.className = "pages-numbers";
-        var o = Math.max(2, b.page - 3);
-        var h = Math.min(b.nPages - 1, b.page + 3);
-        var m = [];
-        if (b.page != b.nPages) {
-            m.push(p(b.page + 1, LANG.lvpage_next + String.fromCharCode(8250)))
-        }
-        m.push(p(b.nPages));
-        if (h < b.nPages - 1) {
-            var a = $WH.ce("span");
-            $WH.ae(a, $WH.ct("..."));
-            m.push(a)
-        }
-        for (var g = h; g >= o; --g) {
-            m.push(p(g))
-        }
-        if (o > 2) {
-            var a = $WH.ce("span");
-            $WH.ae(a, $WH.ct("..."));
-            m.push(a)
-        }
-        m.push(p(1));
-        if (b.page != 1) {
-            m.push(p(b.page - 1, String.fromCharCode(8249) + LANG.lvpage_previous))
-        }
-        if (c) {
-            m.reverse()
-        }
-        for (var g = 0, j = m.length; g < j; ++g) {
-            $WH.ae(k, m[g])
-        }
-        k.firstChild.style.marginRight = "0";
-        k.lastChild.style.marginLeft = "0"
-    }
-    var q = $WH.ce("var");
-    $WH.ae(q, $WH.ct($WH.sprintf(LANG[b.wording[b.nItems == 1 ? 0 : 1]], b.nItems)));
-    if (b.nPages > 1) {
-        var a = $WH.ce("span");
-        $WH.ae(a, $WH.ct(String.fromCharCode(8211)));
-        $WH.ae(q, a);
-        var f = $WH.ce("a");
-        f.className = "gotopage";
-        f.href = "javascript:;";
-        $WH.ns(f);
-        if ($WH.Browser.ie) {
-            $WH.ae(f, $WH.ct(" "))
-        }
-        f.onclick = function() {
-            var d = prompt($WH.sprintf(LANG.prompt_gotopage, 1, b.nPages), b.page);
-            if (d != null) {
-                d |= 0;
-                if (d != b.page && d >= 1 && d <= b.nPages) {
-                    document.location.href = (d > 1 ? b.url + b.sep + d + b.pound: b.url + b.pound)
-                }
-            }
-        };
-        f.onmouseover = function(d) {
-            $WH.Tooltip.showAtCursor(d, LANG.tooltip_gotopage, 0, 0, "q")
-        };
-        f.onmousemove = $WH.Tooltip.cursorUpdate;
-        f.onmouseout = $WH.Tooltip.hide;
-        $WH.ae(q, f)
-    }
-    if (c) {
-        $WH.ae(e, q);
-        if (k) {
-            $WH.ae(e, k)
-        }
-    } else {
-        if (k) {
-            $WH.ae(e, k)
-        }
-        $WH.ae(e, q)
-    }
-    $WH.ae(l, e)
-}
-function g_disclose(a, b) {
-    b.className = "disclosure-" + (g_toggleDisplay(a) ? "on": "off");
-    return false
-}
 function co_addYourComment() {
     tabsContribute.focus(0);
-    var ta = $WH.gE(document.forms['addcomment'], "textarea")[0];
-    ta.focus()
+    var ta = $WH.gE(document.forms['addcomment'], 'textarea')[0];
+    ta.focus();
 }
+
 function co_cancelReply() {
-    $WH.ge("replybox-generic").style.display = "none";
-    document.forms.addcomment.elements.replyto.value = ""
+    $WH.ge('replybox-generic').style.display = 'none';
+    document.forms.addcomment.elements.replyto.value = '';
 }
+
 function co_validateForm(f) {
-    var ta = $WH.gE(f, "textarea")[0];
+    var ta = $WH.gE(f, 'textarea')[0];
 
     if (g_user.permissions & 1) {
         return true;
@@ -1546,55 +1937,70 @@ function co_validateForm(f) {
     if (Listview.funcBox.coValidate(ta)) {
         return true;
     }
-    return false
+
+    return false;
 }
+
+
+/*
+Global screenshot-related functions
+*/
 function ss_submitAScreenshot() {
-    tabsContribute.focus(1)
+    tabsContribute.focus(1);
 }
+
 function ss_validateForm(f) {
     if (!f.elements.screenshotfile.value.length) {
         alert(LANG.message_noscreenshot);
         return false;
     }
+
     return true;
 }
+
 function ss_appendSticky() {
-    var _ = $WH.ge("infobox-sticky-ss");
-    var type = g_pageInfo.type;
+    var _ = $WH.ge('infobox-sticky-ss');
+
+    var type   = g_pageInfo.type;
     var typeId = g_pageInfo.typeId;
-    var pos = $WH.in_array(lv_screenshots, 1, function(a) {
-        return a.sticky;
+
+    var pos = $WH.in_array(lv_screenshots, 1, function(x) {
+        return x.sticky;
     });
 
     if (pos != -1) {
         var screenshot = lv_screenshots[pos];
 
-        var a = $WH.ce("a");
-        a.href = "#screenshots:id=" + screenshot.id;
+        var a = $WH.ce('a');
+        a.href = '#screenshots:id=' + screenshot.id;
         a.onclick = function(a) {
-            ScreenshotViewer.show({
-                screenshots: lv_screenshots,
-                pos: pos
-            });
+            ScreenshotViewer.show({ screenshots: lv_screenshots, pos: pos });
             return $WH.rf2(a);
         };
 
         var size = (lv_videos && lv_videos.length ? [120, 90] : [150, 150]);
         var
-            img = $WH.ce("img"),
+            img   = $WH.ce('img'),
             scale = Math.min(size[0] / screenshot.width, size[1] / screenshot.height);
 
-        img.src    = g_staticUrl + "/uploads/screenshots/thumb/" + screenshot.id + ".jpg";
+        img.src    = g_staticUrl + '/uploads/screenshots/thumb/' + screenshot.id + '.jpg';
         img.width  = Math.round(scale * screenshot.width);
         img.height = Math.round(scale * screenshot.height);
-        img.className = "border";
+        img.className = 'border';
         $WH.ae(a, img);
+
         $WH.ae(_, a);
 
         var th = $WH.ge('infobox-screenshots');
-        var a = $WH.ce("a");
-        $WH.ae(a, $WH.ct(th.innerText + " (" + lv_screenshots.length + ")"));
-        a.href = "#screenshots"
+        var a = $WH.ce('a');
+
+        if (!th) {
+            var sections = $('th', _.parentNode);
+            th = sections[sections.length - (lv_videos && lv_videos.length ? 2 : 1)];
+        }
+
+        $WH.ae(a, $WH.ct(th.innerText + ' (' + lv_screenshots.length + ')'));
+        a.href = '#screenshots'
         a.title = $WH.sprintf(LANG.infobox_showall, lv_screenshots.length);
         a.onclick = function() {
             tabsRelated.focus((lv_videos && lv_videos.length) || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)) ? -2 : -1);
@@ -1605,27 +2011,561 @@ function ss_appendSticky() {
     }
     else {
         var a;
+
         if (g_user.id > 0) {
             a = '<a href="javascript:;" onclick="ss_submitAScreenshot(); return false">';
         }
         else {
             a = '<a href="?account=signin">';
         }
-        _.innerHTML = $WH.sprintf(LANG.infobox_noneyet, a + LANG.infobox_submitone + "</a>")
+        _.innerHTML = $WH.sprintf(LANG.infobox_noneyet, a + LANG.infobox_submitone + '</a>')
     }
 }
+
+var g_screenshots = {};
+var ScreenshotViewer = new function() {
+    var
+        screenshots,
+        pos,
+        imgWidth,
+        imgHeight,
+        scale,
+        desiredScale,
+        oldHash,
+        mode = 0,
+        collectionId,
+        container,
+        screen,
+        imgDiv,
+        aPrev,
+        aNext,
+        aCover,
+        aOriginal,
+        divFrom,
+        divCaption,
+        loadingImage,
+        lightboxComponents;
+
+    function computeDimensions(captionExtraHeight) {
+        var screenshot = screenshots[pos];
+
+        var availHeight = Math.max(50, Math.min(618, $WH.g_getWindowSize().h - 72 - captionExtraHeight));
+
+        if (mode != 1 || screenshot.id || screenshot.resize) {
+            desiredScale = Math.min(772 / screenshot.width, 618 / screenshot.height);
+            scale        = Math.min(772 / screenshot.width, availHeight / screenshot.height);
+        }
+        else {
+            desiredScale = scale = 1;
+        }
+
+        if (desiredScale > 1) {
+            desiredScale = 1;
+        }
+
+        if (scale > 1) {
+            scale = 1;
+        }
+
+        imgWidth = Math.round(scale * screenshot.width);
+        imgHeight = Math.round(scale * screenshot.height);
+        var lbWidth = Math.max(480, imgWidth);
+
+        Lightbox.setSize(lbWidth + 20, imgHeight + 52 + captionExtraHeight);
+
+        if ($WH.Browser.ie6) {
+            screen.style.width = lbWidth + 'px';
+            if (screenshots.length > 1) {
+                aPrev.style.height = aNext.style.height = imgHeight + 'px'
+            } else {
+                aCover.style.height = imgHeight + 'px'
+            }
+        }
+        if (captionExtraHeight) {
+            imgDiv.firstChild.width = imgWidth;
+            imgDiv.firstChild.height = imgHeight;
+        }
+    }
+
+    function getPound(pos) {
+        var
+            screenshot = screenshots[pos],
+            buff = '#screenshots:';
+
+        if (mode == 0) {
+            buff += 'id=' + screenshot.id;
+        }
+        else {
+            buff += collectionId + ':' + (pos + 1);
+        }
+        return buff;
+    }
+
+    function render(resizing) {
+        if (resizing && (scale == desiredScale) && $WH.g_getWindowSize().h > container.offsetHeight) {
+            return;
+        }
+        container.style.visibility = 'hidden';
+        var
+            screenshot = screenshots[pos],
+            resized = (screenshot.width > 772 || screenshot.height > 618);
+
+        computeDimensions(0);
+
+        var url = (screenshot.url ? screenshot.url: g_staticUrl + '/uploads/screenshots/' + (resized ? 'resized/': 'normal/') + screenshot.id + '.jpg');
+
+        var html =
+            '<img src="' + url + '"'
+        + ' width="' + imgWidth + '"'
+        + ' height="' + imgHeight + '"';
+        if ($WH.Browser.ie6) {
+            html += ' galleryimg="no"';
+        }
+        html += '>';
+
+        imgDiv.innerHTML = html;
+
+        if (!resizing) {
+            if (screenshot.url) {
+                aOriginal.href = url;
+            }
+            else {
+                aOriginal.href = g_staticUrl + '/uploads/screenshots/normal/' + screenshot.id + '.jpg';
+            }
+            if (!screenshot.user && typeof g_pageInfo == 'object') {
+                screenshot.user = g_pageInfo.username;
+            }
+
+            var
+                hasFrom1 = (screenshot.date && screenshot.user),
+                hasFrom2 = (screenshots.length > 1);
+
+            if (hasFrom1) {
+                var
+                    postedOn = new Date(screenshot.date),
+                    elapsed = (g_serverTime - postedOn) / 1000;
+                var a = divFrom.firstChild.childNodes[1];
+                a.href = '?user=' + screenshot.user;
+                a.innerHTML = screenshot.user;
+
+                var s = divFrom.firstChild.childNodes[3];
+                $WH.ee(s);
+                Listview.funcBox.coFormatDate(s, elapsed, postedOn);
+
+                divFrom.firstChild.style.display = '';
+            }
+            else {
+                divFrom.firstChild.style.display = 'none';
+            }
+
+            var s = divFrom.childNodes[1];
+            $WH.ee(s);
+            if (screenshot.user) {
+                if (hasFrom1) {
+                    $WH.ae(s, $WH.ct(' ' + LANG.dash + ' '));
+                }
+                var a = $WH.ce('a');
+                a.href = 'javascript:;';
+                a.onclick = ContactTool.show.bind(ContactTool, {
+                    mode: 3,
+                    screenshot: screenshot
+                });
+                a.className = 'icon-report'
+                g_addTooltip(a, LANG.report_tooltip, 'q2');
+                $WH.ae(a, $WH.ct(LANG.report));
+                $WH.ae(s, a);
+            }
+
+            s = divFrom.childNodes[2];
+
+            if (hasFrom2) {
+                var buff = '';
+                if (screenshot.user) {
+                    buff = LANG.dash;
+                }
+                buff += (pos + 1) + LANG.lvpage_of + screenshots.length;
+
+                s.innerHTML = buff;
+                s.style.display = '';
+            }
+            else {
+                s.style.display = 'none';
+            }
+
+            divFrom.style.display = (hasFrom1 || hasFrom2 ? '': 'none');
+
+            var hasCaption = (screenshot.caption != null && screenshot.caption.length);
+            var hasSubject = (screenshot.subject != null && screenshot.subject.length && screenshot.type && screenshot.typeId);
+
+            if (hasCaption || hasSubject) {
+                var html = '';
+
+                if (hasSubject) {
+                    html += LANG.types[screenshot.type][0] + LANG.colon;
+                    html += '<a href="?' + g_types[screenshot.type] + '=' + screenshot.typeId + '">';
+                    html += screenshot.subject;
+                    html += '</a>';
+                }
+
+                if (hasCaption) {
+                    if (hasSubject) {
+                        html += LANG.dash;
+                    }
+                    html += (screenshot.noMarkup ? screenshot.caption : Markup.toHtml(screenshot.caption, { mode: Markup.MODE_SIGNATURE }));
+                }
+
+                divCaption.innerHTML = html;
+                divCaption.style.display = '';
+            }
+            else {
+                divCaption.style.display = 'none';
+            }
+
+            if (screenshots.length > 1) {
+                aPrev.href = getPound(peekPos(-1));
+                aNext.href = getPound(peekPos(1));
+
+                aPrev.style.display = aNext.style.display = '';
+                aCover.style.display = 'none';
+            }
+            else {
+                aPrev.style.display = aNext.style.display = 'none';
+                aCover.style.display = '';
+            }
+
+            location.replace(getPound(pos));
+        }
+
+        Lightbox.reveal();
+
+        if (divCaption.offsetHeight > 18) {
+            computeDimensions(divCaption.offsetHeight - 18);
+        }
+        container.style.visibility = 'visible';
+    }
+
+    function peekPos(change) {
+        var foo = pos;
+        foo += change;
+
+        if (foo < 0) {
+            foo = screenshots.length - 1;
+        }
+        else if (foo >= screenshots.length) {
+            foo = 0;
+        }
+
+        return foo;
+    }
+
+    function prevScreenshot() {
+        pos = peekPos(-1);
+        onRender();
+
+        return false;
+    }
+
+    function nextScreenshot() {
+        pos = peekPos(1);
+        onRender();
+
+        return false;
+    }
+
+    function onKeyUp(e) {
+        e = $WH.$E(e);
+        switch (e.keyCode) {
+            case 37: // Left
+                prevScreenshot();
+                break;
+            case 39: // Right
+                nextScreenshot();
+                break;
+        }
+    }
+
+    function onResize() {
+        render(1);
+    }
+
+    function onHide() {
+        cancelImageLoading();
+
+        if (screenshots.length > 1) {
+            $WH.dE(document, 'keyup', onKeyUp);
+        }
+
+        if (oldHash && mode == 0) {
+            if (oldHash.indexOf(':id=') != -1) {
+                oldHash = '#screenshots';
+            }
+            location.replace(oldHash);
+        }
+        else {
+            location.replace('#.');
+        }
+    }
+
+    function onShow(dest, first, opt) {
+        if (typeof opt.screenshots == 'string') {
+            screenshots = g_screenshots[opt.screenshots];
+            mode = 1;
+            collectionId = opt.screenshots;
+        }
+        else {
+            screenshots = opt.screenshots;
+            mode = 0;
+            collectionId = null;
+        }
+        container = dest;
+
+        pos = 0;
+        if (opt.pos && opt.pos >= 0 && opt.pos < screenshots.length) {
+            pos = opt.pos;
+        }
+
+        if (first) {
+            dest.className = 'screenshotviewer';
+
+            screen = $WH.ce('div');
+
+            screen.className = 'screenshotviewer-screen';
+
+            aPrev = $WH.ce('a');
+            aNext = $WH.ce('a');
+            aPrev.className = 'screenshotviewer-prev';
+            aNext.className = 'screenshotviewer-next';
+            aPrev.href = 'javascript:;';
+            aNext.href = 'javascript:;';
+
+            var foo = $WH.ce('span');
+            $WH.ae(foo, $WH.ce('b'));
+            // var b = $WH.ce('b');
+            // $WH.ae(b, $WH.ct(LANG.previous));
+            // $WH.ae(foo, b);
+            $WH.ae(aPrev, foo);
+            var foo = $WH.ce('span');
+            $WH.ae(foo, $WH.ce('b'));
+            // var b = $WH.ce('b');
+            // $WH.ae(b, $WH.ct(LANG.next));
+            // $WH.ae(foo, b);
+            $WH.ae(aNext, foo);
+
+            aPrev.onclick = prevScreenshot;
+            aNext.onclick = nextScreenshot;
+
+            aCover = $WH.ce('a');
+            aCover.className = 'screenshotviewer-cover';
+            aCover.href = 'javascript:;';
+            aCover.onclick = Lightbox.hide;
+            var foo = $WH.ce('span');
+            $WH.ae(foo, $WH.ce('b'));
+            // var b = $WH.ce('b');
+            // $WH.ae(b, $WH.ct(LANG.close));
+            // $WH.ae(foo, b);
+            $WH.ae(aCover, foo);
+            if ($WH.Browser.ie6) {
+                $WH.ns(aPrev);
+                $WH.ns(aNext);
+                aPrev.onmouseover = aNext.onmouseover = aCover.onmouseover = function() {
+                    this.firstChild.style.display = 'block';
+                };
+                aPrev.onmouseout = aNext.onmouseout = aCover.onmouseout = function() {
+                    this.firstChild.style.display = '';
+                };
+
+            }
+            $WH.ae(screen, aPrev);
+            $WH.ae(screen, aNext);
+            $WH.ae(screen, aCover);
+
+            imgDiv = $WH.ce('div');
+            $WH.ae(screen, imgDiv);
+
+            $WH.ae(dest, screen);
+
+            var aClose = $WH.ce('a');
+            aClose.className = 'screenshotviewer-close';
+            // aClose.className = 'dialog-x';
+            aClose.href = 'javascript:;';
+            aClose.onclick = Lightbox.hide;
+            $WH.ae(aClose, $WH.ce('span'));
+            // $WH.ae(aClose, $WH.ct(LANG.close));
+            $WH.ae(dest, aClose);
+
+            aOriginal = $WH.ce('a');
+            aOriginal.className = 'screenshotviewer-original';
+            // aOriginal.className = 'dialog-arrow';
+            aOriginal.href = 'javascript:;';
+            aOriginal.target = '_blank';
+            $WH.ae(aOriginal, $WH.ce('span'));
+            // $WH.ae(aOriginal, $WH.ct(LANG.original));
+            $WH.ae(dest, aOriginal);
+
+            divFrom = $WH.ce('div');
+            divFrom.className = 'screenshotviewer-from';
+            var sp = $WH.ce('span');
+            $WH.ae(sp, $WH.ct(LANG.lvscreenshot_from));
+            $WH.ae(sp, $WH.ce('a'));
+            $WH.ae(sp, $WH.ct(' '));
+            $WH.ae(sp, $WH.ce('span'));
+            $WH.ae(divFrom, sp);
+            $WH.ae(divFrom, $WH.ce('span'));
+            $WH.ae(divFrom, $WH.ce('span'));
+            $WH.ae(dest, divFrom);
+
+            divCaption = $WH.ce('div');
+            divCaption.className = 'screenshotviewer-caption';
+            $WH.ae(dest, divCaption);
+            var d = $WH.ce('div');
+            d.className = 'clear';
+            $WH.ae(dest, d);
+        }
+
+        oldHash = location.hash;
+
+        if (screenshots.length > 1) {
+            $WH.aE(document, 'keyup', onKeyUp);
+        }
+
+        onRender();
+    }
+
+    function onRender() {
+        var screenshot = screenshots[pos];
+        if (!screenshot.width || !screenshot.height) {
+            if (loadingImage) {
+                loadingImage.onload = null;
+                loadingImage.onerror = null;
+            }
+            else {
+                container.className = '';
+                lightboxComponents = [];
+                while (container.firstChild) {
+                    lightboxComponents.push(container.firstChild);
+                    $WH.de(container.firstChild);
+                }
+            }
+
+            var lightboxTimer = setTimeout(function() {
+                screenshot.width = 126;
+                screenshot.height = 22;
+                computeDimensions(0);
+                screenshot.width = null;
+                screenshot.height = null;
+
+                var div = $WH.ce('div');
+                div.style.margin = '0 auto';
+                div.style.width = '126px';
+                var img = $WH.ce('img');
+                img.src = g_staticUrl + '/images/ui/misc/progress-anim.gif';
+                img.width = 126;
+                img.height = 22;
+                $WH.ae(div, img);
+                $WH.ae(container, div);
+
+                Lightbox.reveal();
+                container.style.visiblity = 'visible';
+            }, 150);
+
+            loadingImage = new Image();
+            loadingImage.onload = (function(screen, timer) {
+                clearTimeout(timer);
+                screen.width = this.width;
+                screen.height = this.height;
+                loadingImage = null;
+                restoreLightbox();
+                render();
+            }).bind(loadingImage, screenshot, lightboxTimer);
+            loadingImage.onerror = (function(timer) {
+                clearTimeout(timer);
+                loadingImage = null;
+                Lightbox.hide();
+                restoreLightbox();
+            }).bind(loadingImage, lightboxTimer);
+            loadingImage.src = (screenshot.url ? screenshot.url : g_staticUrl + '/uploads/screenshots/normal/' + screenshot.id + '.jpg');
+        }
+        else {
+            render();
+        }
+    }
+
+    function cancelImageLoading() {
+        if (!loadingImage) {
+            return;
+        }
+
+        loadingImage.onload = null;
+        loadingImage.onerror = null;
+        loadingImage = null;
+
+        restoreLightbox();
+    }
+
+    function restoreLightbox() {
+        if (!lightboxComponents) {
+            return;
+        }
+
+        $WH.ee(container);
+        container.className = 'screenshotviewer';
+        for (var i = 0; i < lightboxComponents.length; ++i)
+            $WH.ae(container, lightboxComponents[i]);
+        lightboxComponents = null;
+    }
+
+    this.checkPound = function() {
+        if (location.hash && location.hash.indexOf('#screenshots') == 0) {
+            if (!g_listviews['screenshots']) { // Standalone screenshot viewer
+                var parts = location.hash.split(':');
+                if (parts.length == 3) {
+                    var
+                        collection = g_screenshots[parts[1]],
+                        p = parseInt(parts[2]);
+
+                    if (collection && p >= 1 && p <= collection.length) {
+                        ScreenshotViewer.show({
+                            screenshots: parts[1],
+                            pos: p - 1
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    this.show = function(opt) {
+        Lightbox.show('screenshotviewer', {
+            onShow: onShow,
+            onHide: onHide,
+            onResize: onResize
+        }, opt);
+    }
+
+    DomContentLoaded.addEvent(this.checkPound)
+};
+
+
+/*
+Global video-related functions
+*/
+
 var vi_thumbnails = {
-    1 : "http://i3.ytimg.com/vi/$1/default.jpg"
+    1: 'http://i3.ytimg.com/vi/$1/default.jpg' // YouTube
 };
+
 var vi_siteurls = {
-    1 : "http://www.youtube.com/watch?v=$1"
+    1: 'http://www.youtube.com/watch?v=$1' // YouTube
 };
+
 var vi_sitevalidation = {
-    1 : /^http:\/\/www\.youtube\.com\/watch\?v=([^& ]{11})/
+    1: /^http:\/\/www\.youtube\.com\/watch\?v=([^& ]{11})/ // YouTube
 };
+
 function vi_submitAVideo() {
-    tabsContribute.focus(2)
+    tabsContribute.focus(2);
 }
+
 function vi_validateForm(f) {
     if (!f.elements['videourl'].value.length) {
         alert(LANG.message_novideo);
@@ -1636,7 +2576,7 @@ function vi_validateForm(f) {
     for (var i in vi_sitevalidation) {
         if (f.elements['videourl'].value.match(vi_sitevalidation[i])) {
             urlmatch = true;
-            break
+            break;
         }
     }
 
@@ -1644,39 +2584,46 @@ function vi_validateForm(f) {
         alert(LANG.message_novideo);
         return false;
     }
+
     return true;
 }
+
 function vi_appendSticky() {
-    var _ = $WH.ge("infobox-sticky-vi");
-    var type = g_pageInfo.type;
+    var _ = $WH.ge('infobox-sticky-vi');
+
+    var type   = g_pageInfo.type;
     var typeId = g_pageInfo.typeId;
-    var pos = $WH.in_array(lv_videos, 1, function(a) {
-        return a.sticky
+
+    var pos = $WH.in_array(lv_videos, 1, function(x) {
+        return x.sticky;
     });
 
     if (pos != -1) {
         var video = lv_videos[pos];
 
-        var a = $WH.ce("a");
-        a.href = "#videos:id=" + video.id;
+        var a = $WH.ce('a');
+        a.href = '#videos:id=' + video.id;
         a.onclick = function(e) {
-            VideoViewer.show({
-                videos: lv_videos,
-                pos: pos
-            });
-            return $WH.rf2(e)
+            VideoViewer.show({ videos: lv_videos, pos: pos });
+            return $WH.rf2(e);
         };
 
-        var img = $WH.ce("img");
+        var img = $WH.ce('img');
         img.src = $WH.sprintf(vi_thumbnails[video.videoType], video.videoId);
-        img.className = "border";
+        img.className = 'border';
         $WH.ae(a, img);
+
         $WH.ae(_, a);
 
         var th = $WH.ge('infobox-videos');
-        var a = $WH.ce("a");
-        $WH.ae(a, $WH.ct(th.innerText + " (" + lv_videos.length + ")"));
-        a.href = "#videos"
+        var a = $WH.ce('a');
+        if (!th) {
+            var sections = $('th', _.parentNode);
+            th = sections[sections.length - (lv_videos && lv_videos.length ? 2 : 1)];
+        }
+
+        $WH.ae(a, $WH.ct(th.innerText + ' (' + lv_videos.length + ')'));
+        a.href = '#videos'
         a.title = $WH.sprintf(LANG.infobox_showall, lv_videos.length);
         a.onclick = function() {
             tabsRelated.focus(-1);
@@ -1687,6 +2634,7 @@ function vi_appendSticky() {
     }
     else {
         var a;
+
         if (g_user.id > 0) {
             a = '<a href="javascript:;" onclick="vi_submitAVideo(); return false">'
         }
@@ -1694,7 +2642,7 @@ function vi_appendSticky() {
             a = '<a href="?account=signin">'
         }
 
-        _.innerHTML = $WH.sprintf(LANG.infobox_noneyet, a + LANG.infobox_suggestone + "</a>")
+        _.innerHTML = $WH.sprintf(LANG.infobox_noneyet, a + LANG.infobox_suggestone + '</a>')
     }
 }
 
@@ -2092,6 +3040,7 @@ var VideoViewer = new function() {
 
     DomContentLoaded.addEvent(this.checkPound)
 };
+
 
 var Dialog = function() {
 var
@@ -3136,7 +4085,7 @@ Tabs.prototype = {
             return;
         }
 
-        if(this.tabs[index].locked) {
+        if (this.tabs[index].locked) {
             return this.onShow(this.tabs[index], this.tabs[this.selectedTab]);
         }
 
@@ -3224,7 +4173,7 @@ Tabs.prototype = {
                 $WH.ae(d, s);
             }
 
-            if(tab.tooltip) {
+            if (tab.tooltip) {
                 a.onmouseover = (function(tooltip, e) { $WH.Tooltip.showAtCursor(e, tooltip, 0, 0, 'q'); }).bind(a, tab.tooltip);
                 a.onmousemove = $WH.Tooltip.cursorUpdate;
                 a.onmouseout  = $WH.Tooltip.hide;
@@ -3288,7 +4237,7 @@ Tabs.prototype = {
         this.tabs[index].tooltip = text;
 
         var _ = $WH.gE(this.uls[0], 'a');
-        if(text == null) {
+        if (text == null) {
             _[index].onmouseover = _[index].onmousemove = _[index].onmouseout = null;
         }
         else {
@@ -3331,7 +4280,7 @@ Tabs.onLoad = function() {
     var _ = location.hash.substr(1).split(':')[0];
     if (_) {
         return $WH.in_array(this.tabs, _, function(x) {
-            if(!x.locked) {
+            if (!x.locked) {
                 return x.id;
             }
         });
@@ -3837,7 +4786,7 @@ Listview.prototype = {
 
         if (this.mode == Listview.MODE_DIV) {
             this.mainContainer = this.mainDiv = $WH.ce('div');
-            if(!this.noStyle) {
+            if (!this.noStyle) {
                 this.mainContainer.className = 'listview-mode-div';
             }
         }
@@ -3851,7 +4800,7 @@ Listview.prototype = {
             }
 
             if (this.mode == Listview.MODE_TILED || this.mode == Listview.MODE_CALENDAR) {
-                if(!this.noStyle)
+                if (!this.noStyle)
                     this.table.className = 'listview-mode-' + (this.mode == Listview.MODE_TILED ? 'tiled' : 'calendar');
 
                 var
@@ -4238,7 +5187,7 @@ Listview.prototype = {
             this.createCbControls(div, topBar);
         }
 
-        if(div.firstChild) { // Not empty
+        if (div.firstChild) { // Not empty
             div.className = 'listview-withselected' + (topBar ? '' : '2');
         }
 
@@ -4276,7 +5225,7 @@ Listview.prototype = {
 
         if (this.nDaysPerMonth && this.nDaysPerMonth.length) {
             starti = 0;
-            for(var i = 0; i < this.rowOffset; ++i) {
+            for (var i = 0; i < this.rowOffset; ++i) {
                 starti += this.nDaysPerMonth[i];
             }
             endi = starti + this.nDaysPerMonth[i];
@@ -4366,7 +5315,7 @@ Listview.prototype = {
         else if (this.mode == Listview.MODE_CALENDAR) {
             var tr = $WH.ce('tr');
 
-            for(var i = 0; i < 7; ++i) {
+            for (var i = 0; i < 7; ++i) {
                 var th = $WH.ce('th');
                 $WH.st(th, LANG.date_days[i]);
                 $WH.ae(tr, th);
@@ -4392,7 +5341,7 @@ Listview.prototype = {
             }
 
             if (k != 0) {
-                for(; k < 7; ++k) {
+                for (; k < 7; ++k) {
                     var foo = $WH.ce('td');
                     foo.className = 'empty-cell';
                     $WH.ae(tr, foo);
@@ -5518,7 +6467,7 @@ Listview.sortIndexedRows = function(a, b) {
     for (var idx in sort) {
         _ = cols[Math.abs(sort[idx]) - 1];
 
-        if(!_) {
+        if (!_) {
             _ = this.template;
         }
 
@@ -6153,7 +7102,7 @@ Listview.extraCols = {
                 a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + g_achievements[item.achievement].icon.toLowerCase() + '.gif)';
                 a.style.whiteSpace = 'nowrap';
 
-                $WH.st(a, g_achievements[item.achievement]['name_' + g_locale.name]);
+                $WH.st(a, g_achievements[item.achievement]['name_' + Locale.getName()]);
                 $WH.ae(td, a);
             }
         },
@@ -6199,14 +7148,14 @@ Listview.extraCols = {
                 a.style.fontFamily = 'Verdana, sans-serif';
                 a.href = '?item=' + row.yield;
                 a.className = 'q' + g_items[row.yield].quality;
-                $WH.ae(a, $WH.ct(g_items[row.yield]['name_' + g_locale.name]));
+                $WH.ae(a, $WH.ct(g_items[row.yield]['name_' + Locale.getName()]));
                 $WH.ae(wrapper, a);
                 $WH.ae(td, wrapper);
             }
         },
         getVisibleText: function(row) {
             if (row.yield && g_items[row.yield]) {
-                return g_items[row.yield]['name_' + g_locale.name];
+                return g_items[row.yield]['name_' + Locale.getName()];
             }
         },
         sortFunc: function(a, b, col) {
@@ -6214,7 +7163,7 @@ Listview.extraCols = {
                 return (a.yield && g_items[a.yield] ? 1 : (b.yield && g_items[b.yield] ? -1 : 0));
             }
             return -$WH.strcmp(g_items[a.yield].quality, g_items[b.yield].quality) ||
-                    $WH.strcmp(g_items[a.yield]['name_' + g_locale.name], g_items[b.yield]['name_' + g_locale.name]);
+                    $WH.strcmp(g_items[a.yield]['name_' + Locale.getName()], g_items[b.yield]['name_' + Locale.getName()]);
         }
     },
 
@@ -6358,7 +7307,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: item['name_' + g_locale.name],
+                name: item['name_' + Locale.getName()],
                 url : '?skill=' + cond.typeId
             }];
 
@@ -6380,7 +7329,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: item['name_' + g_locale.name],
+                name: item['name_' + Locale.getName()],
                 url : '?spell=' + cond.typeId
             }];
 
@@ -6399,7 +7348,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon : item.icon.toLowerCase(),
-                name : item['name_' + g_locale.name],
+                name : item['name_' + Locale.getName()],
                 url  : '?item=' + cond.typeId,
                 color: 'q' + item.quality
             }];
@@ -6419,7 +7368,7 @@ Listview.extraCols = {
             cnd.color = cond.status ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: item['name_' + g_locale.name],
+                name: item['name_' + Locale.getName()],
                 url : '?achievement=' + cond.typeId
             }];
 
@@ -6437,7 +7386,7 @@ Listview.extraCols = {
             cnd.state = $WH.ct((cond.status == 1 ? LANG.progress : (cond.status == 2 ? LANG.pr_note_complete : LANG.pr_note_incomplete)) + LANG.colon);
             cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
             cnd.links = [{
-                name: item['name_' + g_locale.name],
+                name: item['name_' + Locale.getName()],
                 url : '?quest=' + cond.typeId
             }];
 
@@ -6479,7 +7428,7 @@ Listview.extraCols = {
             cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
             cnd.links = [{
                 icon: item.icon.toLowerCase(),
-                name: item['name_' + g_locale.name],
+                name: item['name_' + Locale.getName()],
                 url :'?event=' + cond.typeId
             }];
 
@@ -7118,7 +8067,7 @@ Listview.funcBox = {
                         a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
                         a.style.whiteSpace = 'nowrap';
 
-                        $WH.st(a, item['name_' + g_locale.name]);
+                        $WH.st(a, item['name_' + Locale.getName()]);
                         $WH.ae(sp, a);
 
                         if (num > 1) {
@@ -8494,7 +9443,7 @@ Listview.funcBox = {
     },
 
     moneyCurrencyOver: function(currencyId, count, e) {
-        var buff = g_gatheredcurrencies[currencyId]['name_' + g_locale.name /*g_loc.getName()*/];
+        var buff = g_gatheredcurrencies[currencyId]['name_' + Locale.getName() /*g_loc.getName()*/];
 
         // justice / valor points handling removed
 
@@ -9834,7 +10783,7 @@ Listview.templates = {
 
                     if (npc.minlevel > 0 && npc.maxlevel > 0) {
                         buff += ' ';
-                        if(npc.maxlevel == 9999) {
+                        if (npc.maxlevel == 9999) {
                             buff += '??';
                         }
                         else if (npc.minlevel != npc.maxlevel) {
@@ -10269,7 +11218,7 @@ Listview.templates = {
                     }
 
                     if (quest.titlereward && g_titles[quest.titlereward]) {
-                        var title = g_titles[quest.titlereward]['name_' + g_locale.name];
+                        var title = g_titles[quest.titlereward]['name_' + Locale.getName()];
                         title = title.replace('%s', '<span class="q0">&lt;' + LANG.name + '&gt;</span>');
                         var span = $WH.ce('a');
                         span.className = 'q1';
@@ -10290,7 +11239,7 @@ Listview.templates = {
                     }
 
                     if (quest.titlereward && g_titles[quest.titlereward]) {
-                        buff += ' ' + g_titles[quest.titlereward]['name_' + g_locale.name];
+                        buff += ' ' + g_titles[quest.titlereward]['name_' + Locale.getName()];
                     }
 
                     return buff;
@@ -10298,8 +11247,8 @@ Listview.templates = {
                 sortFunc: function(a, b, col) {
                     var lenA = (a.itemchoices != null ? a.itemchoices.length : 0) + (a.itemrewards != null ? a.itemrewards.length : 0);
                     var lenB = (b.itemchoices != null ? b.itemchoices.length : 0) + (b.itemrewards != null ? b.itemrewards.length : 0);
-                    var titleA = (a.titlereward && g_titles[a.titlereward] ? g_titles[a.titlereward]['name_' + g_locale.name] : '');
-                    var titleB = (b.titlereward && g_titles[b.titlereward] ? g_titles[b.titlereward]['name_' + g_locale.name] : '');
+                    var titleA = (a.titlereward && g_titles[a.titlereward] ? g_titles[a.titlereward]['name_' + Locale.getName()] : '');
+                    var titleB = (b.titlereward && g_titles[b.titlereward] ? g_titles[b.titlereward]['name_' + Locale.getName()] : '');
                     return $WH.strcmp(lenA, lenB) || $WH.strcmp(titleA, titleB);
                 }
             },
@@ -10329,7 +11278,7 @@ Listview.templates = {
                     var buff = '';
                     for (var i = 0; quest.currencyrewards && i < quest.currencyrewards.length; ++i) {
                         if (g_gatheredcurrencies[quest.currencyrewards[i][0]]) {
-                            buff += ' ' + g_gatheredcurrencies[quest.currencyrewards[i][0]]['name_' + g_locale.name];
+                            buff += ' ' + g_gatheredcurrencies[quest.currencyrewards[i][0]]['name_' + Locale.getName()];
                         }
                     }
                     return buff;
@@ -11221,7 +12170,7 @@ Listview.templates = {
                         var item = g_spells[Math.abs(trigger)];
                         a.className = 'icontiny tinyspecial';
                         a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + item['icon'] + '.gif)';
-                        $WH.st(a, item['name_' + g_locale.name]);
+                        $WH.st(a, item['name_' + Locale.getName()]);
                     }
                     $WH.ae(td, a);
 
@@ -11245,7 +12194,7 @@ Listview.templates = {
                         buff += 'This';
                     }
                     else {
-                        buff += g_spells[Math.abs(trigger)]['name_' + g_locale.name];
+                        buff += g_spells[Math.abs(trigger)]['name_' + Locale.getName()];
                     }
 
                     switch (spell.linked[2]) {
@@ -11281,7 +12230,7 @@ Listview.templates = {
                         return -1;
                     }
                     else if (trA != trB) {
-                        return $WH.strcmp(g_spells[Math.abs(trA)]['name_' + g_locale.name],  g_spells[Math.abs(trB)]['name_' + g_locale.name]);
+                        return $WH.strcmp(g_spells[Math.abs(trA)]['name_' + Locale.getName()],  g_spells[Math.abs(trB)]['name_' + Locale.getName()]);
                     }
 
                     return 0;
@@ -11326,7 +12275,7 @@ Listview.templates = {
                         var item = g_spells[Math.abs(effect)];
                         a.className = 'icontiny tinyspecial';
                         a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + item['icon'] + '.gif)';
-                        $WH.st(a, item['name_' + g_locale.name]);
+                        $WH.st(a, item['name_' + Locale.getName()]);
                     }
                     $WH.ae(td, a);
 
@@ -11350,7 +12299,7 @@ Listview.templates = {
                         buff += 'This';
                     }
                     else {
-                        buff += g_spells[Math.abs(effect)]['name_' + g_locale.name];
+                        buff += g_spells[Math.abs(effect)]['name_' + Locale.getName()];
                     }
 
                     switch (spell.linked[2]) {
@@ -11384,7 +12333,7 @@ Listview.templates = {
                         return -1;
                     }
                     else if (effA != effB) {
-                        return $WH.strcmp(g_spells[Math.abs(effA)]['name_' + g_locale.name],  g_spells[Math.abs(effB)]['name_' + g_locale.name]);
+                        return $WH.strcmp(g_spells[Math.abs(effA)]['name_' + Locale.getName()],  g_spells[Math.abs(effB)]['name_' + Locale.getName()]);
                     }
 
                     return 0;
@@ -11463,7 +12412,7 @@ Listview.templates = {
                             a.className = zone.subzones[i] == zone.id ? 'q1' : 'q0';
                             a.style.whiteSpace = 'nowrap';
                             a.href = '?zone=' + zone.subzones[i];
-                            $WH.st(a, g_gatheredzones[zone.subzones[i]]['name_' + g_locale.name]);
+                            $WH.st(a, g_gatheredzones[zone.subzones[i]]['name_' + Locale.getName()]);
                             $WH.ae(d, a);
                         }
 
@@ -12996,7 +13945,7 @@ Listview.templates = {
                         var spells = '';
                         for (var i = 0, len = pet.spells.length; i < len; ++i) {
                             if (pet.spells[i]) {
-                                spells += g_spells[pet.spells[i]]['name_' + g_locale.name];
+                                spells += g_spells[pet.spells[i]]['name_' + Locale.getName()];
                             }
                         }
                         return spells;
@@ -13233,7 +14182,7 @@ Listview.templates = {
                                 a.href = '?item=' + itemrewards[i];
                                 a.className = 'q' + item.quality + ' icontiny tinyspecial';
                                 a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
-                                $WH.ae(a, $WH.ct(item['name_' + g_locale.name]));
+                                $WH.ae(a, $WH.ct(item['name_' + Locale.getName()]));
                                 var span = $WH.ce('span');
                                 $WH.ae(span, a);
                                 $WH.ae(td, span);
@@ -13251,7 +14200,7 @@ Listview.templates = {
                                 a.href = '?spell=' + spellrewards[i];
                                 a.className = 'q8 icontiny tinyspecial';
                                 a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + item.icon.toLowerCase() + '.gif)';
-                                $WH.ae(a, $WH.ct(item['name_' + g_locale.name]));
+                                $WH.ae(a, $WH.ct(item['name_' + Locale.getName()]));
                                 var span = $WH.ce('span');
                                 $WH.ae(span, a);
                                 $WH.ae(td, span);
@@ -13264,7 +14213,7 @@ Listview.templates = {
                                     return;
                                 }
 
-                                var title = g_titles[titlerewards[i]]['name_' + g_locale.name];
+                                var title = g_titles[titlerewards[i]]['name_' + Locale.getName()];
                                 title = title.replace('%s', '<span class="q0">&lt;' + LANG.name + '&gt;</span>');
                                 var span = $WH.ce('a');
                                 span.className = 'q1';
@@ -13287,13 +14236,13 @@ Listview.templates = {
                     if (achievement.rewards) {
                         for (var i = 0; i < achievement.rewards.length; i++) {
                             if (achievement.rewards[i][0] == 11) {
-                                buff += ' ' + g_titles[achievement.rewards[i][1]]['name_' + g_locale.name].replace('%s', '<' + LANG.name + '>');
+                                buff += ' ' + g_titles[achievement.rewards[i][1]]['name_' + Locale.getName()].replace('%s', '<' + LANG.name + '>');
                             }
                             else if (achievement.rewards[i][0] == 3) {
-                                buff += ' ' + g_items[achievement.rewards[i][1]]['name_' + g_locale.name];
+                                buff += ' ' + g_items[achievement.rewards[i][1]]['name_' + Locale.getName()];
                             }
                             else if (achievement.rewards[i][0] == 6) {
-                                buff += ' ' + g_spells[achievement.rewards[i][1]]['name_' + g_locale.name];
+                                buff += ' ' + g_spells[achievement.rewards[i][1]]['name_' + Locale.getName()];
                             }
                         }
                     }
@@ -14678,7 +15627,7 @@ var Menu = new function()
             x.modifyUrl = json;
         });
 
-        // uncomment with breadcrumbs PageTemplate.updateBreadcrumb();
+        PageTemplate.updateBreadcrumb();
     };
 
     self.fixUrls = function(menu, url, opt)
@@ -14910,9 +15859,6 @@ var Menu = new function()
         .mouseleave(menuDivOut)
         .delegate('a', 'mouseenter', { depth: depth }, menuItemOver)
         .delegate('a', 'click', menuItemClick);
-
-        if($WH.isset('g_thottbot') && g_thottbot)
-            $div.hide();
 
         $div.appendTo(document.body);
 
@@ -15464,23 +16410,11 @@ $(document).ready(function() // Locale is only known later
 });
 
 var g_dev = false;
-var g_locale = {
-    id: 0,
-    name: "enus"
-};
 var g_localTime = new Date();
 var g_user = {
     id: 0,
     name: "",
     roles: 0
-};
-
-var g_locales = {
-    0: 'enus',
-    2: 'frfr',
-    3: 'dede',
-    6: 'eses',
-    8: 'ruru'
 };
 
 /*
@@ -15657,7 +16591,7 @@ var Icon = {
     displayIcon: function(icon) {
         if (!Dialog.templates.icondisplay) {
             var w = 364;
-            switch (g_locale.id) {
+            switch (Locale.getId()) {
                 case 6:
                     w = 380;
                     break;
@@ -15924,11 +16858,11 @@ var LiveSearch = new function() {
 
     function colorDiv(div, fromOver) {
         if (lastDiv) {
-            lastDiv.className = lastDiv.className.replace("live-search-selected", "");
+            lastDiv.className = lastDiv.className.replace('live-search-selected', '');
         }
 
         lastDiv = div;
-        lastDiv.className += " live-search-selected";
+        lastDiv.className += ' live-search-selected';
         selection = div.i;
 
         if (!fromOver) {
@@ -15947,7 +16881,7 @@ var LiveSearch = new function() {
             return false;
         }
 
-        return container.style.display != "none";
+        return container.style.display != 'none';
     }
 
     function adjust(fromResize) {
@@ -15972,30 +16906,30 @@ var LiveSearch = new function() {
 
         prepared = 1;
 
-        container = $WH.ce("div");
-        container.className = "live-search";
-        container.style.display = "none";
+        container = $WH.ce('div');
+        container.className = 'live-search';
+        container.style.display = 'none';
 
-        $WH.ae($WH.ge("layers"), container);
-        $WH.aE(window, "resize", adjust.bind(0, 1));
-        $WH.aE(document, "click", hide);
+        $WH.ae($WH.ge('layers'), container);
+        $WH.aE(window, 'resize', adjust.bind(0, 1));
+        $WH.aE(document, 'click', hide);
     }
 
     function show() {
         if (container && !isVisible()) {
             adjust();
-            container.style.display = "";
+            container.style.display = '';
         }
     }
 
     function hide() {
         if (container) {
-            container.style.display = "none";
+            container.style.display = 'none';
         }
     }
 
     function highlight(match) {
-        return "<b><u>" + match + "</u></b>";
+        return '<b><u>' + match + '</u></b>';
     }
 
     function display(textbox, search, suggz, dataz) {
@@ -16010,18 +16944,18 @@ var LiveSearch = new function() {
         }
 
         if (!$WH.Browser.ie6) {
-            $WH.ae(container, $WH.ce("em"));
-            $WH.ae(container, $WH.ce("var"));
-            $WH.ae(container, $WH.ce("strong"));
+            $WH.ae(container, $WH.ce('em'));
+            $WH.ae(container, $WH.ce('var'));
+            $WH.ae(container, $WH.ce('strong'));
         }
 
-        search = search.replace(/[^a-z0-9\-]/i, " ");
-        search = $WH.trim(search.replace(/\s+/g, " "));
+        search = search.replace(/[^a-z0-9\-]/i, ' ');
+        search = $WH.trim(search.replace(/\s+/g, ' '));
 
         var regex = g_createOrRegex(search);
 
         for (var i = 0, len = suggz.length; i < len; ++i) {
-            var pos = suggz[i].lastIndexOf("(");
+            var pos = suggz[i].lastIndexOf('(');
             if (pos != -1) {
                 suggz[i] = suggz[i].substr(0, pos - 1);
             }
@@ -16031,15 +16965,15 @@ var LiveSearch = new function() {
                 typeId = dataz[i][1],
                 param1 = dataz[i][2],
                 param2 = dataz[i][3],
-                a      = $WH.ce("a"),
-                sp     = $WH.ce("i"),
-                sp2    = $WH.ce("span"),
-                div    = $WH.ce("div"),
-                div2   = $WH.ce("div");
+                a      = $WH.ce('a'),
+                sp     = $WH.ce('i'),
+                sp2    = $WH.ce('span'),
+                div    = $WH.ce('div'),
+                div2   = $WH.ce('div');
                 div.i  = i;
 
             a.onmouseover = aOver;
-            a.href = "?" + g_types[type] + "=" + typeId;
+            a.href = '?' + g_types[type] + '=' + typeId;
 
             if (textbox._append) {
                 a.rel += textbox._append;
@@ -16049,21 +16983,21 @@ var LiveSearch = new function() {
                 div.className += ' live-search-icon-boss';
             }
             if (type == 3 && param2 != null) {
-                a.className += " q" + param2;
+                a.className += ' q' + param2;
             }
             else if (type == 4 && param1 != null) {
-                a.className += " q" + param1;
+                a.className += ' q' + param1;
             }
             else if (type == 13) {
                 a.className += ' c' + typeId;
             }
 
             if ((type == 3 || type == 6 || type == 9 || type == 10 || type == 13 || type == 14 || type == 15 || type == 17) && param1) {
-                div.className += " live-search-icon";
-                div.style.backgroundImage = "url(" + g_staticUrl + "/images/wow/icons/small/" + param1.toLowerCase() + ".jpg)";
+                div.className += ' live-search-icon';
+                div.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/small/' + param1.toLowerCase() + '.jpg)';
             }
             else if ((type == 5 || type == 11) && param1 >= 1 && param1 <= 2) {
-                div.className += " live-search-icon-quest-" + (param1 == 1 ? "alliance" : "horde");
+                div.className += ' live-search-icon-quest-' + (param1 == 1 ? 'alliance' : 'horde');
             }
 
             $WH.ae(sp, $WH.ct(LANG.types[type][0]));
@@ -16080,7 +17014,7 @@ var LiveSearch = new function() {
             $WH.ae(a, sp2);
 
             if (type == 6 && param2) {
-                $WH.ae(a, $WH.ct(" (" + param2 + ")"));
+                $WH.ae(a, $WH.ct(' (' + param2 + ')'));
             }
 
             $WH.ae(div2, a);
@@ -16091,7 +17025,7 @@ var LiveSearch = new function() {
 
     function receive(xhr, opt) {
         var text = xhr.responseText;
-        if (text.charAt(0) != "[" || text.charAt(text.length - 1) != "]") {
+        if (text.charAt(0) != '[' || text.charAt(text.length - 1) != ']') {
             return;
         }
 
@@ -16109,13 +17043,13 @@ var LiveSearch = new function() {
     }
 
     function fetch(textbox, search) {
-        var url = "?search=" + $WH.urlencode(search);
+        var url = '?search=' + $WH.urlencode(search);
 
         if (textbox._type) {
-            url += "&json&type=" + textbox._type;
+            url += '&json&type=' + textbox._type;
         }
         else {
-            url += "&opensearch";
+            url += '&opensearch';
         }
 
         new Ajax(url, {
@@ -16182,7 +17116,7 @@ var LiveSearch = new function() {
                 break;
         }
 
-        var search = $WH.trim(textbox.value.replace(/\s+/g, " "));
+        var search = $WH.trim(textbox.value.replace(/\s+/g, ' '));
         if (search == lastSearch[textbox.id]) {
             return;
         }
@@ -16223,19 +17157,27 @@ var LiveSearch = new function() {
     }
 
     this.attach = function(textbox) {
-        if (textbox.getAttribute("autocomplete") == "off") {
+        textbox = $(textbox);
+        if (!textbox.length) {
             return;
         }
-        textbox.setAttribute("autocomplete", "off");
 
-        $WH.aE(textbox, "focus", onFocus);
-        $WH.aE(textbox, "keyup", onKeyUp);
-        $WH.aE(textbox, "keydown", onKeyDown);
+        textbox = textbox[0];
+
+        if (textbox.getAttribute('autocomplete') == 'off') {
+            return;
+        }
+
+        textbox.setAttribute('autocomplete', 'off');
+
+        $WH.aE(textbox, 'focus', onFocus);
+        $WH.aE(textbox, 'keyup', onKeyUp);
+        $WH.aE(textbox, 'keydown', onKeyDown);
     };
 
     this.reset = function(textbox) {
         lastSearch[textbox.id] = null;
-        textbox.value = "";
+        textbox.value = '';
         hasData = 0;
         hide();
     };
@@ -16411,8 +17353,7 @@ var LOCALE_ENUS = 0;
 var LOCALE_FRFR = 2;
 var LOCALE_DEDE = 3;
 var LOCALE_ESES = 6;
-var LOCALE_RURU = 7;
-var LOCALE_PTBR = 8;
+var LOCALE_RURU = 8;
 
 var Locale = {
 
@@ -16423,31 +17364,31 @@ var Locale = {
         0: { // English
             id: LOCALE_ENUS,
             name: 'enus',
-            // domain: 'www.wowhead.com',
+            domain: 'www',
             description: 'English'
         },
         2: { // French
             id: LOCALE_FRFR,
             name: 'frfr',
-            // domain: 'fr.wowhead.com',
+            domain: 'fr',
             description: 'Fran' + String.fromCharCode(231) + 'ais'
         },
         3: { // German
             id: LOCALE_DEDE,
             name: 'dede',
-            // domain: 'de.wowhead.com',
+            domain: 'de',
             description: 'Deutsch'
         },
         6: { // Spanish
             id: LOCALE_ESES,
             name: 'eses',
-            // domain: 'es.wowhead.com',
+            domain: 'es',
             description: 'Espa' + String.fromCharCode(241) + 'ol'
         },
         8: { // Russian
             id: LOCALE_RURU,
             name: 'ruru',
-            // domain: 'ru.wowhead.com',
+            domain: 'ru',
             description: String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081)
         }
     },
@@ -16455,7 +17396,7 @@ var Locale = {
     getAll: function() {
         var result = [];
 
-        for(var id in Locale.locales) {
+        for (var id in Locale.locales) {
             result.push(Locale.locales[id]);
         }
 
@@ -16494,8 +17435,7 @@ var Locale = {
 
 };
 
-// Locale.set(LOCALE_ENUS); // Default
-Locale.set(g_locale.id); // Default
+Locale.set(LOCALE_ENUS); // Default
 
 var ModelViewer = new function() {
     this.validSlots = [1,3,4,5,6,7,8,9,10,13,14,15,16,17,19,20,21,22,23,25,26];
@@ -17097,530 +18037,6 @@ var ModelViewer = new function() {
 
     DomContentLoaded.addEvent(this.checkPound)
 };
-
-var g_screenshots = {};
-var ScreenshotViewer = new function() {
-    var
-        screenshots,
-        pos,
-        imgWidth,
-        imgHeight,
-        scale,
-        desiredScale,
-        oldHash,
-        mode = 0,
-        collectionId,
-        container,
-        screen,
-        imgDiv,
-        aPrev,
-        aNext,
-        aCover,
-        aOriginal,
-        divFrom,
-        divCaption,
-        loadingImage,
-        lightboxComponents;
-
-    function computeDimensions(captionExtraHeight) {
-        var screenshot = screenshots[pos];
-
-        var availHeight = Math.max(50, Math.min(618, $WH.g_getWindowSize().h - 72 - captionExtraHeight));
-
-        if (mode != 1 || screenshot.id || screenshot.resize) {
-            desiredScale = Math.min(772 / screenshot.width, 618 / screenshot.height);
-            scale        = Math.min(772 / screenshot.width, availHeight / screenshot.height);
-        }
-        else {
-            desiredScale = scale = 1;
-        }
-
-        if (desiredScale > 1) {
-            desiredScale = 1;
-        }
-
-        if (scale > 1) {
-            scale = 1;
-        }
-
-        imgWidth = Math.round(scale * screenshot.width);
-        imgHeight = Math.round(scale * screenshot.height);
-        var lbWidth = Math.max(480, imgWidth);
-
-        Lightbox.setSize(lbWidth + 20, imgHeight + 52 + captionExtraHeight);
-
-        if ($WH.Browser.ie6) {
-            screen.style.width = lbWidth + 'px';
-            if (screenshots.length > 1) {
-                aPrev.style.height = aNext.style.height = imgHeight + 'px'
-            } else {
-                aCover.style.height = imgHeight + 'px'
-            }
-        }
-        if (captionExtraHeight) {
-            imgDiv.firstChild.width = imgWidth;
-            imgDiv.firstChild.height = imgHeight;
-        }
-    }
-
-    function getPound(pos) {
-        var
-            screenshot = screenshots[pos],
-            buff = '#screenshots:';
-
-        if (mode == 0) {
-            buff += 'id=' + screenshot.id;
-        }
-        else {
-            buff += collectionId + ':' + (pos + 1);
-        }
-        return buff;
-    }
-
-    function render(resizing) {
-        if (resizing && (scale == desiredScale) && $WH.g_getWindowSize().h > container.offsetHeight) {
-            return;
-        }
-        container.style.visibility = 'hidden';
-        var
-            screenshot = screenshots[pos],
-            resized = (screenshot.width > 772 || screenshot.height > 618);
-
-        computeDimensions(0);
-
-        var url = (screenshot.url ? screenshot.url: g_staticUrl + '/uploads/screenshots/' + (resized ? 'resized/': 'normal/') + screenshot.id + '.jpg');
-
-        var html =
-            '<img src="' + url + '"'
-        + ' width="' + imgWidth + '"'
-        + ' height="' + imgHeight + '"';
-        if ($WH.Browser.ie6) {
-            html += ' galleryimg="no"';
-        }
-        html += '>';
-
-        imgDiv.innerHTML = html;
-
-        if (!resizing) {
-            if (screenshot.url) {
-                aOriginal.href = url;
-            }
-            else {
-                aOriginal.href = g_staticUrl + '/uploads/screenshots/normal/' + screenshot.id + '.jpg';
-            }
-            if (!screenshot.user && typeof g_pageInfo == 'object') {
-                screenshot.user = g_pageInfo.username;
-            }
-
-            var
-                hasFrom1 = (screenshot.date && screenshot.user),
-                hasFrom2 = (screenshots.length > 1);
-
-            if (hasFrom1) {
-                var
-                    postedOn = new Date(screenshot.date),
-                    elapsed = (g_serverTime - postedOn) / 1000;
-                var a = divFrom.firstChild.childNodes[1];
-                a.href = '?user=' + screenshot.user;
-                a.innerHTML = screenshot.user;
-
-                var s = divFrom.firstChild.childNodes[3];
-                $WH.ee(s);
-                Listview.funcBox.coFormatDate(s, elapsed, postedOn);
-
-                divFrom.firstChild.style.display = '';
-            }
-            else {
-                divFrom.firstChild.style.display = 'none';
-            }
-
-            var s = divFrom.childNodes[1];
-            $WH.ee(s);
-            if (screenshot.user) {
-                if (hasFrom1) {
-                    $WH.ae(s, $WH.ct(' ' + LANG.dash + ' '));
-                }
-                var a = $WH.ce('a');
-                a.href = 'javascript:;';
-                a.onclick = ContactTool.show.bind(ContactTool, {
-                    mode: 3,
-                    screenshot: screenshot
-                });
-                a.className = 'icon-report'
-                g_addTooltip(a, LANG.report_tooltip, 'q2');
-                $WH.ae(a, $WH.ct(LANG.report));
-                $WH.ae(s, a);
-            }
-
-            s = divFrom.childNodes[2];
-
-            if (hasFrom2) {
-                var buff = '';
-                if (screenshot.user) {
-                    buff = LANG.dash;
-                }
-                buff += (pos + 1) + LANG.lvpage_of + screenshots.length;
-
-                s.innerHTML = buff;
-                s.style.display = '';
-            }
-            else {
-                s.style.display = 'none';
-            }
-
-            divFrom.style.display = (hasFrom1 || hasFrom2 ? '': 'none');
-
-            var hasCaption = (screenshot.caption != null && screenshot.caption.length);
-            var hasSubject = (screenshot.subject != null && screenshot.subject.length && screenshot.type && screenshot.typeId);
-
-            if (hasCaption || hasSubject) {
-                var html = '';
-
-                if (hasSubject) {
-                    html += LANG.types[screenshot.type][0] + LANG.colon;
-                    html += '<a href="?' + g_types[screenshot.type] + '=' + screenshot.typeId + '">';
-                    html += screenshot.subject;
-                    html += '</a>';
-                }
-
-                if (hasCaption) {
-                    if (hasSubject) {
-                        html += LANG.dash;
-                    }
-                    html += (screenshot.noMarkup ? screenshot.caption : Markup.toHtml(screenshot.caption, { mode: Markup.MODE_SIGNATURE }));
-                }
-
-                divCaption.innerHTML = html;
-                divCaption.style.display = '';
-            }
-            else {
-                divCaption.style.display = 'none';
-            }
-
-            if (screenshots.length > 1) {
-                aPrev.href = getPound(peekPos(-1));
-                aNext.href = getPound(peekPos(1));
-
-                aPrev.style.display = aNext.style.display = '';
-                aCover.style.display = 'none';
-            }
-            else {
-                aPrev.style.display = aNext.style.display = 'none';
-                aCover.style.display = '';
-            }
-
-            location.replace(getPound(pos));
-        }
-
-        Lightbox.reveal();
-
-        if (divCaption.offsetHeight > 18) {
-            computeDimensions(divCaption.offsetHeight - 18);
-        }
-        container.style.visibility = 'visible';
-    }
-
-    function peekPos(change) {
-        var foo = pos;
-        foo += change;
-
-        if (foo < 0) {
-            foo = screenshots.length - 1;
-        }
-        else if (foo >= screenshots.length) {
-            foo = 0;
-        }
-
-        return foo;
-    }
-
-    function prevScreenshot() {
-        pos = peekPos(-1);
-        onRender();
-
-        return false;
-    }
-
-    function nextScreenshot() {
-        pos = peekPos(1);
-        onRender();
-
-        return false;
-    }
-
-    function onKeyUp(e) {
-        e = $WH.$E(e);
-        switch (e.keyCode) {
-            case 37: // Left
-                prevScreenshot();
-                break;
-            case 39: // Right
-                nextScreenshot();
-                break;
-        }
-    }
-
-    function onResize() {
-        render(1);
-    }
-
-    function onHide() {
-        cancelImageLoading();
-
-        if (screenshots.length > 1) {
-            $WH.dE(document, 'keyup', onKeyUp);
-        }
-
-        if (oldHash && mode == 0) {
-            if (oldHash.indexOf(':id=') != -1) {
-                oldHash = '#screenshots';
-            }
-            location.replace(oldHash);
-        }
-        else {
-            location.replace('#.');
-        }
-    }
-
-    function onShow(dest, first, opt) {
-        if (typeof opt.screenshots == 'string') {
-            screenshots = g_screenshots[opt.screenshots];
-            mode = 1;
-            collectionId = opt.screenshots;
-        }
-        else {
-            screenshots = opt.screenshots;
-            mode = 0;
-            collectionId = null;
-        }
-        container = dest;
-
-        pos = 0;
-        if (opt.pos && opt.pos >= 0 && opt.pos < screenshots.length) {
-            pos = opt.pos;
-        }
-
-        if (first) {
-            dest.className = 'screenshotviewer';
-
-            screen = $WH.ce('div');
-
-            screen.className = 'screenshotviewer-screen';
-
-            aPrev = $WH.ce('a');
-            aNext = $WH.ce('a');
-            aPrev.className = 'screenshotviewer-prev';
-            aNext.className = 'screenshotviewer-next';
-            aPrev.href = 'javascript:;';
-            aNext.href = 'javascript:;';
-
-            var foo = $WH.ce('span');
-            $WH.ae(foo, $WH.ce('b'));
-            // var b = $WH.ce('b');
-            // $WH.ae(b, $WH.ct(LANG.previous));
-            // $WH.ae(foo, b);
-            $WH.ae(aPrev, foo);
-            var foo = $WH.ce('span');
-            $WH.ae(foo, $WH.ce('b'));
-            // var b = $WH.ce('b');
-            // $WH.ae(b, $WH.ct(LANG.next));
-            // $WH.ae(foo, b);
-            $WH.ae(aNext, foo);
-
-            aPrev.onclick = prevScreenshot;
-            aNext.onclick = nextScreenshot;
-
-            aCover = $WH.ce('a');
-            aCover.className = 'screenshotviewer-cover';
-            aCover.href = 'javascript:;';
-            aCover.onclick = Lightbox.hide;
-            var foo = $WH.ce('span');
-            $WH.ae(foo, $WH.ce('b'));
-            // var b = $WH.ce('b');
-            // $WH.ae(b, $WH.ct(LANG.close));
-            // $WH.ae(foo, b);
-            $WH.ae(aCover, foo);
-            if ($WH.Browser.ie6) {
-                $WH.ns(aPrev);
-                $WH.ns(aNext);
-                aPrev.onmouseover = aNext.onmouseover = aCover.onmouseover = function() {
-                    this.firstChild.style.display = 'block';
-                };
-                aPrev.onmouseout = aNext.onmouseout = aCover.onmouseout = function() {
-                    this.firstChild.style.display = '';
-                };
-
-            }
-            $WH.ae(screen, aPrev);
-            $WH.ae(screen, aNext);
-            $WH.ae(screen, aCover);
-
-            imgDiv = $WH.ce('div');
-            $WH.ae(screen, imgDiv);
-
-            $WH.ae(dest, screen);
-
-            var aClose = $WH.ce('a');
-            aClose.className = 'screenshotviewer-close';
-            // aClose.className = 'dialog-x';
-            aClose.href = 'javascript:;';
-            aClose.onclick = Lightbox.hide;
-            $WH.ae(aClose, $WH.ce('span'));
-            // $WH.ae(aClose, $WH.ct(LANG.close));
-            $WH.ae(dest, aClose);
-
-            aOriginal = $WH.ce('a');
-            aOriginal.className = 'screenshotviewer-original';
-            // aOriginal.className = 'dialog-arrow';
-            aOriginal.href = 'javascript:;';
-            aOriginal.target = '_blank';
-            $WH.ae(aOriginal, $WH.ce('span'));
-            // $WH.ae(aOriginal, $WH.ct(LANG.original));
-            $WH.ae(dest, aOriginal);
-
-            divFrom = $WH.ce('div');
-            divFrom.className = 'screenshotviewer-from';
-            var sp = $WH.ce('span');
-            $WH.ae(sp, $WH.ct(LANG.lvscreenshot_from));
-            $WH.ae(sp, $WH.ce('a'));
-            $WH.ae(sp, $WH.ct(' '));
-            $WH.ae(sp, $WH.ce('span'));
-            $WH.ae(divFrom, sp);
-            $WH.ae(divFrom, $WH.ce('span'));
-            $WH.ae(divFrom, $WH.ce('span'));
-            $WH.ae(dest, divFrom);
-
-            divCaption = $WH.ce('div');
-            divCaption.className = 'screenshotviewer-caption';
-            $WH.ae(dest, divCaption);
-            var d = $WH.ce('div');
-            d.className = 'clear';
-            $WH.ae(dest, d);
-        }
-
-        oldHash = location.hash;
-
-        if (screenshots.length > 1) {
-            $WH.aE(document, 'keyup', onKeyUp);
-        }
-
-        onRender();
-    }
-
-    function onRender() {
-        var screenshot = screenshots[pos];
-        if (!screenshot.width || !screenshot.height) {
-            if (loadingImage) {
-                loadingImage.onload = null;
-                loadingImage.onerror = null;
-            }
-            else {
-                container.className = '';
-                lightboxComponents = [];
-                while (container.firstChild) {
-                    lightboxComponents.push(container.firstChild);
-                    $WH.de(container.firstChild);
-                }
-            }
-
-            var lightboxTimer = setTimeout(function() {
-                screenshot.width = 126;
-                screenshot.height = 22;
-                computeDimensions(0);
-                screenshot.width = null;
-                screenshot.height = null;
-
-                var div = $WH.ce('div');
-                div.style.margin = '0 auto';
-                div.style.width = '126px';
-                var img = $WH.ce('img');
-                img.src = g_staticUrl + '/images/ui/misc/progress-anim.gif';
-                img.width = 126;
-                img.height = 22;
-                $WH.ae(div, img);
-                $WH.ae(container, div);
-
-                Lightbox.reveal();
-                container.style.visiblity = 'visible';
-            }, 150);
-
-            loadingImage = new Image();
-            loadingImage.onload = (function(screen, timer) {
-                clearTimeout(timer);
-                screen.width = this.width;
-                screen.height = this.height;
-                loadingImage = null;
-                restoreLightbox();
-                render();
-            }).bind(loadingImage, screenshot, lightboxTimer);
-            loadingImage.onerror = (function(timer) {
-                clearTimeout(timer);
-                loadingImage = null;
-                Lightbox.hide();
-                restoreLightbox();
-            }).bind(loadingImage, lightboxTimer);
-            loadingImage.src = (screenshot.url ? screenshot.url : g_staticUrl + '/uploads/screenshots/normal/' + screenshot.id + '.jpg');
-        }
-        else {
-            render();
-        }
-    }
-
-    function cancelImageLoading() {
-        if (!loadingImage) {
-            return;
-        }
-
-        loadingImage.onload = null;
-        loadingImage.onerror = null;
-        loadingImage = null;
-
-        restoreLightbox();
-    }
-
-    function restoreLightbox() {
-        if (!lightboxComponents) {
-            return;
-        }
-
-        $WH.ee(container);
-        container.className = 'screenshotviewer';
-        for (var i = 0; i < lightboxComponents.length; ++i)
-            $WH.ae(container, lightboxComponents[i]);
-        lightboxComponents = null;
-    }
-
-    this.checkPound = function() {
-        if (location.hash && location.hash.indexOf('#screenshots') == 0) {
-            if (!g_listviews['screenshots']) { // Standalone screenshot viewer
-                var parts = location.hash.split(':');
-                if (parts.length == 3) {
-                    var
-                        collection = g_screenshots[parts[1]],
-                        p = parseInt(parts[2]);
-
-                    if (collection && p >= 1 && p <= collection.length) {
-                        ScreenshotViewer.show({
-                            screenshots: parts[1],
-                            pos: p - 1
-                        });
-                    }
-                }
-            }
-        }
-    }
-
-    this.show = function(opt) {
-        Lightbox.show('screenshotviewer', {
-            onShow: onShow,
-            onHide: onHide,
-            onResize: onResize
-        }, opt);
-    }
-
-    DomContentLoaded.addEvent(this.checkPound)
-};
-
 // TODO: Create a "Cookies" object
 
 function g_cookiesEnabled() {
@@ -17653,6 +18069,11 @@ function g_setWowheadCookie(name, data, browser) {
         $WH.sc(name, 14, data, null, location.hostname);
     }
 }
+
+// Display a warning if a user attempts to leave the page and he has started writing a message
+$(document).ready(function() {
+    g_setupChangeWarning($("form[name=addcomment]"), [$("textarea[name=commentbody]")], LANG.message_startedpost);
+});
 
 var ContactTool = new function() {
     this.general    = 0;

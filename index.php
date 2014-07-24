@@ -58,6 +58,7 @@ switch ($pageCall)
             $altClass = 'talent';
     case 'profile':                                         // character profiler [nyi]
     case 'profiles':                                        // character profile listing [nyi]
+    case 'profiler':                                        // character profiler main page
     case 'quest':
     case 'quests':
     case 'race':
@@ -142,8 +143,8 @@ switch ($pageCall)
     default:                                                // unk parameter given -> ErrorPage
         if (isset($_GET['power']))
             die('$WowheadPower.register(0, '.User::$localeId.', {})');
-        else                                                // in conjunction with a propper rewriteRule in .htaccess...
-            (new GenericPage)->error();
+        else                                                // in conjunction with a proper rewriteRule in .htaccess...
+            (new GenericPage($pageCall))->error();
         break;
 }
 

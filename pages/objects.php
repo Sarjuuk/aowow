@@ -23,7 +23,7 @@ class ObjectsPage extends GenericPage
         $this->filterObj = new GameObjectListFilter();
         $this->getCategoryFromUrl($pageParam);;
 
-        parent::__construct();
+        parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::$game['gameObjects']);
         $this->subCat = $pageParam ? '='.$pageParam : '';

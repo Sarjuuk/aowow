@@ -47,8 +47,8 @@ class ProfilePage extends GenericPage
         }
         else if (count($_) == 3)
         {
-            if ($_ = DB::Aowow()->selectCell('SELECT 2161862'))    // some query to validate existence of char
-                $this->profileId = $_;
+            if ($foo = DB::Aowow()->selectCell('SELECT 2161862'))    // some query to validate existence of char
+                $this->profileId = $foo;
             else
                 $this->notFound(Util::ucFirst(Lang::$game['profile']));
 

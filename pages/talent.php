@@ -9,6 +9,7 @@ class TalentPage extends GenericPage
 {
     protected $tpl           = 'talent';
     protected $tabId         = 1;
+    protected $path          = [1];
     protected $mode          = CACHETYPE_NONE;
     protected $gDataKey      = true;
     protected $js            = ['TalentCalc.js'];
@@ -21,9 +22,9 @@ class TalentPage extends GenericPage
 
     private   $isPetCalc     = false;
 
-    public function __construct($pageCall)
+    public function __construct($pageCall, $__)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $__);
 
         $this->isPetCalc = $pageCall == 'petcalc';
         $this->name      = $this->isPetCalc ? Lang::$main['petCalc'] : Lang::$main['talentCalc'];
@@ -47,7 +48,10 @@ class TalentPage extends GenericPage
         array_unshift($this->title, $this->name);
     }
 
-    protected function generatePath() {}
+    protected function generatePath()
+    {
+        $this->path[] = $this->isPetCalc ? 2 : 0;
+    }
 }
 
 ?>

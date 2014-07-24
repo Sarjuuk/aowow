@@ -45,7 +45,7 @@ class AchievementsPage extends GenericPage
         $this->filterObj = new AchievementListFilter();
         $this->getCategoryFromUrl($pageParam);
 
-        parent::__construct();
+        parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::$game['achievements']);
         $this->subCat = $pageParam ? '='.$pageParam : '';

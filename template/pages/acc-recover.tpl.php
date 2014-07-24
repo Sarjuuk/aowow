@@ -3,6 +3,7 @@
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
+<?php $this->brick('pageTemplate'); ?>
             <div class="pad3"></div>
 <?php if (!empty($this->text)): ?>
             <div class="inputbox">

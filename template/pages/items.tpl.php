@@ -7,16 +7,11 @@ $f = $this->filter;                                         // shorthand
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-<?php $this->brick('announcement'); ?>
-
-            <script type="text/javascript">
-                g_initPath(<?php echo json_encode($this->path, JSON_NUMERIC_CHECK).', '.(empty($f['query']) ? 0 : 1) ?>);
 <?php
-if (!empty($f['query'])):
-  // todo: update menu-class         Menu.modifyUrl(Menu.findItem(mn_database, [0]), { filter: '+={$f['query']|escape:'quotes'}' }, { onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [0])) });
-endif;
+$this->brick('announcement');
+
+$this->brick('pageTemplate', ['fi' => empty($f['query']) ? null : ['query' => $f['query'], 'menuItem' => 0]]);
 ?>
-            </script>
 
             <div id="fi" style="display: <?php echo empty($f['query']) ? 'none' : 'block' ?>;">
                 <form action="?items<?php echo $this->subCat; ?>&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">

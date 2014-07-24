@@ -20,9 +20,9 @@ class EventPage extends GenericPage
     private   $hId           = 0;
     private   $eId           = 0;
 
-    public function __construct($__, $id)
+    public function __construct($pageCall, $id)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $id);
 
         $this->typeId = intVal($id);
 

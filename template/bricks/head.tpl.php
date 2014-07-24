@@ -44,6 +44,5 @@ foreach ($this->js as $js):
 endforeach;
 ?>
     <script type="text/javascript">
-        var g_locale = <?php echo json_encode($this->gLocale, JSON_NUMERIC_CHECK); ?>;
         var g_user = <?php echo json_encode($this->gUser, JSON_NUMERIC_CHECK); ?>;
     </script>

@@ -84,7 +84,7 @@ class ItemsPage extends GenericPage
         $this->filterObj = new ItemListFilter();
         $this->getCategoryFromUrl($pageParam);
 
-        parent::__construct();
+        parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::$game['items']);
         $this->subCat = $pageParam ? '='.$pageParam : '';

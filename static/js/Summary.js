@@ -3245,7 +3245,7 @@ Summary.prototype = {
                     for (var i = 0, len = a[1].length; i < len; ++i) {
                         var row       = {};
                         row.id        = a[1][i].id;
-                        row.name      = row['name_' + g_locale.name] = a[1][i].name.substring(1);
+                        row.name      = row['name_' + Locale.getName()] = a[1][i].name.substring(1);
                         row.quality   = 7 - a[1][i].name.charAt(0);
                         row.icon      = a[1][i].icon;
                         row.level     = a[1][i].level;
@@ -3266,7 +3266,7 @@ Summary.prototype = {
                     for (var i = 0, len = a[2].length; i < len; ++i) {
                         var row = {};
                         row.id        = a[2][i].id;
-                        row.name      = row['name_' + g_locale.name] = a[2][i].name.substring(1);
+                        row.name      = row['name_' + Locale.getName()] = a[2][i].name.substring(1);
                         row.quality   = 7 - a[2][i].name.charAt(0);
                         row.minlevel  = a[2][i].minlevel;
                         row.maxlevel  = a[2][i].maxlevel;
@@ -3687,7 +3687,7 @@ Summary.groupOver = function(group, e) {
             buff += '<tr>';
             buff += '<td style="text-align: right">x' + count[itemId] + '</td>';
             buff += '<td><div class="indent q' + g_items[itemId].quality + '">';
-            buff += '<span class="icontiny" style="background: url(' + g_staticUrl + '/images/wow/icons/tiny/' + g_items[itemId].icon.toLowerCase() + '.gif) left center no-repeat">' + g_items[itemId]['name_' + g_locale.name] + '</span>';
+            buff += '<span class="icontiny" style="background: url(' + g_staticUrl + '/images/wow/icons/tiny/' + g_items[itemId].icon.toLowerCase() + '.gif) left center no-repeat">' + g_items[itemId]['name_' + Locale.getName()] + '</span>';
             buff += '</div></td>';
             buff += '<td><div class="indent q1"><small><em>' + LANG.level + ' ' + g_items[itemId].jsonequip.level + '</em></small></div></td>';
             buff += '</tr>';
@@ -4660,7 +4660,7 @@ Listview.templates.subitempicker = {
                 a.href = url;
                 a.rel = 'rand=' + subitem.id;
 
-                $WH.ae(a, $WH.ct(item['name_' + g_locale.name] + ' ' + subitem.name));
+                $WH.ae(a, $WH.ct(item['name_' + Locale.getName()] + ' ' + subitem.name));
 
                 $WH.nw(td);
                 $WH.ae(td, a);

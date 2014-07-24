@@ -4,7 +4,11 @@
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-<?php $this->brick('announcement'); ?>
+<?php
+    $this->brick('announcement');
+
+    $this->brick('pageTemplate');
+?>
 
             <script type="text/javascript">var g_pageInfo = { username: '<?php echo Util::jsEscape($this->gUser['name']); ?>' }</script>
 

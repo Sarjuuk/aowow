@@ -5,7 +5,9 @@
         <div class="main-contents" id="main-contents">
 
 <?php
-    $this->brick('announcement');
+$this->brick('announcement');
+
+$this->brick('pageTemplate');
 
 if (isset($this->typeStr)):
 ?>
@@ -17,11 +19,6 @@ if (isset($this->typeStr)):
 <?php
 else:
 ?>
-            <script type="text/javascript">//<![CDATA[
-                var g_pageInfo = <?php echo json_encode($this->gPageInfo, JSON_NUMERIC_CHECK); ?>;
-    <?php echo isset($this->path) ? 'g_initPath('.json_encode($this->path, JSON_NUMERIC_CHECK).');' : null; ?>
-            //]]></script>
-
             <div class="text">
                 <h1><?php echo $this->name; ?></h1>
 

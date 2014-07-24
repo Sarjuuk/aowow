@@ -2243,7 +2243,7 @@ function TalentCalc() {
                     c.div.style.display = "";
                 }
                 else {
-                    $WH.g_ajaxIshRequest('?data=talents&class=' + classId + '&locale=' + g_locale.id + '&t=' + g_dataKey + '&' + _versionBuild);
+                    $WH.g_ajaxIshRequest('?data=talents&class=' + classId + '&locale=' + Locale.getId() + '&t=' + g_dataKey + '&' + _versionBuild);
                 }
             }
 
@@ -2529,7 +2529,7 @@ function TalentCalc() {
     function _simplifyGlyphName(name) {
         var str;
 
-        switch (g_locale.id) {
+        switch (Locale.getId()) {
             case 0:
                 str = name.replace(/^Glyph of (the )?/i, '');
                 break;

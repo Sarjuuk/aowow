@@ -9,6 +9,7 @@ class ComparePage extends GenericPage
 {
     protected $tpl           = 'compare';
     protected $tabId         = 1;
+    protected $path          = [1, 3];
     protected $mode          = CACHETYPE_NONE;
     protected $js            = array(
         'profile.js',
@@ -27,9 +28,9 @@ class ComparePage extends GenericPage
 
     private   $compareString = '';
 
-    public function __construct()
+    public function __construct($pageCall, $__)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $__);
 
         // prefer $_GET over $_COOKIE
         if (!empty($_GET['compare']))

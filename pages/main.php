@@ -17,6 +17,8 @@ class MainPage extends GenericPage
 
     protected function generateContent()
     {
+        parent::__construct('home');
+
         // load news
         $rows = DB::Aowow()->select('SELECT * FROM ?_news ORDER BY time DESC, id DESC LIMIT 5');
         foreach ($rows as $i => $row)

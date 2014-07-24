@@ -9,6 +9,7 @@ class MapsPage extends GenericPage
 {
     protected $tpl           = 'maps';
     protected $tabId         = 1;
+    protected $path          = [1, 1];
     protected $mode          = CACHETYPE_NONE;
     protected $js            = array(
         'maps.js',
@@ -20,9 +21,9 @@ class MapsPage extends GenericPage
         ['path' => 'Mapper_ie6.css', 'ieCond' => 'lte IE 6']
     );
 
-    public function __construct()
+    public function __construct($pageCall, $__)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $__);
 
         $this->name = Lang::$maps['maps'];
     }

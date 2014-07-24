@@ -21,9 +21,9 @@ class ItemsetPage extends GenericPage
         'Summary.js'
     );
 
-    public function __construct($__, $id)
+    public function __construct($pageCall, $id)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $id);
 
         $this->typeId = intVal($id);
 

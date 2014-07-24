@@ -346,7 +346,7 @@ Mapper.prototype = {
             this.level = level;
         }
 
-        var type = g_locale.name;
+        var type = Locale.getName();
 
         if($WH.isset('g_ptr') && g_ptr)
             type = 'ptr';

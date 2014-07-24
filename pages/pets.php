@@ -21,7 +21,7 @@ class PetsPage extends GenericPage
     {
         $this->getCategoryFromUrl($pageParam);;
 
-        parent::__construct();
+        parent::__construct($pageCall, $pageParam);
 
         $this->name = Util::ucFirst(Lang::$game['pets']);
     }

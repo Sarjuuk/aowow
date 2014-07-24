@@ -4,7 +4,11 @@
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-<?php $this->brick('announcement'); ?>
+<?php
+$this->brick('announcement');
+
+$this->brick('pageTemplate');
+?>
 
             <div class="text">
                 <a href="<?php echo Util::$wowheadLink; ?>" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>

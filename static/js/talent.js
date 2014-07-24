@@ -11,7 +11,7 @@ function tc_init() {
         _,
         clear;
 
-    g_initPath([1, 0]);
+    // PageTemplate.set({ breadcrumb: [1, 0] });
 
     $WH.ge('tc-classes').className = 'choose';
 
@@ -88,7 +88,7 @@ function tc_onChange(tc, info, data) {
         _ = tc_classIcons[tc_classId];
         _.className += ' iconmedium-gold-selected';
 
-        g_initPath([1, 0, tc_classId]);
+        PageTemplate.set({ breadcrumb: [1, 0, tc_classId] });
     }
 
     tc_build  = tc.getWhBuild();

@@ -23,9 +23,9 @@ class ItemPage extends genericPage
         'filters.js'                                        // lolwut?
     );
 
-    public function __construct($__, $param)
+    public function __construct($pageCall, $param)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $param);
 
         $conditions = [['i.id', intVal($param)]];
 
@@ -777,7 +777,7 @@ class ItemPage extends genericPage
                         if (count($extraCols) == 3)
                             $extraCols[] = 'Listview.extraCols.condition';
 
-                        Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $e);
+                        $this->extendGlobalIds(TYPE_WORLDEVENT, $e);
                         $row['condition'][] = array(
                             'type'   => TYPE_WORLDEVENT,
                             'typeId' => -$e,

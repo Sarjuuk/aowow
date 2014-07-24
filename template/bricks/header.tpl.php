@@ -31,8 +31,6 @@
         </div>
 
         <script type="text/javascript">
-            g_initHeader(<?php echo $this->tabId; ?>);
-            LiveSearch.attach($WH.ge('livesearch-generic'));
 <?php
 foreach ($this->jsGlobals as $glob):
     $this->gBrick($glob[0], ['vars' => $glob[1], 'extra' => $glob[2]]);

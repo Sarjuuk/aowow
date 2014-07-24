@@ -405,7 +405,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h1 a.icontiny span, h2 a.icontiny span, h3 a.icont
     overflow: hidden;
 }
 
-a#toptabs-menu-language
+a#toplinks-language
 {
     padding-left: 21px;
     background: url(../images/icons/language.gif) left center no-repeat;
@@ -536,7 +536,7 @@ a#toptabs-menu-language
 #main-precontents
 {
     background: #141414;
-    padding: 10px;
+    padding: 5px;
     border-left: 1px solid #101010;
     border-right: 1px solid #101010;
 }
@@ -580,15 +580,7 @@ span.breadcrumb-ellipsis {
     float: right;
     font-size: 14px;
     margin-right: 4px;
-}
-
-.path
-{
-    cursor: default;
-    font-size: 15px;
-    /*padding: 0 0 10px 20px; */
-    padding-left: 20px;
-    background: url(../images/icons/favicon.gif) left 1px no-repeat;
+    padding: 5px 0 5px 0px;
 }
 
 #footer
@@ -993,20 +985,6 @@ span.menu-buttons span.hassubmenu {
     padding-right: 13px;
     background: url(../images/Menu/arrow-down.gif) right center no-repeat;
 }
-
-/* start note: remove with breadcrumbs */
-.menuarrow
-{
-    padding-right: 16px;
-    background: url(../images/Menu/arrow-right.gif) right center no-repeat;
-}
-
-.menuarrowd
-{
-    padding-right: 11px;
-    background: url(../images/Menu/arrow-down.gif) right center no-repeat;
-}
-/* end note */
 
 .tabs, .text ul.tabs, ul.tabs
 {
@@ -3575,7 +3553,7 @@ a:hover, a.open, .infobox li div, .text b
     color: #E5CC80;
 }
 
-.text ul li, .comment-body ul li
+.text ul, .comment-body ul
 {
     /* color: #c3030b; */
     list-style-type: square;

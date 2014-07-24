@@ -884,7 +884,7 @@ $lang = array(
             )),
             10 => "Währung",
             12 => "Quest",
-            13 => "schlüssel",
+            13 => "Schlüssel",
         ),
         'statType'      => array(
             "Erhöht Euer Mana um %d.",

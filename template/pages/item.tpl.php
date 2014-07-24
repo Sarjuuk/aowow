@@ -4,20 +4,13 @@
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-<?php $this->brick('announcement'); ?>
-
-            <script type="text/javascript">//<![CDATA[
 <?php
-    $this->brick('community');
-            echo "                var g_pageInfo = ".json_encode($this->gPageInfo, JSON_NUMERIC_CHECK).";\n" .
-                 "                g_initPath(".json_encode($this->path, JSON_NUMERIC_CHECK).");\n";
-    if (User::$id > 0 && $this->redButtons[BUTTON_EQUIP]):
-        echo "                DomContentLoaded.addEvent(function() { pr_addEquipButton('equip-pinned-button', ".$this->typeId."); });\n";
-    endif;
-?>
-            //]]></script>
+    $this->brick('announcement');
 
-<?php $this->brick('infobox'); ?>
+    $this->brick('pageTemplate');
+
+    $this->brick('infobox');
+?>
 
             <div class="text">
 <?php $this->brick('redButtons'); ?>

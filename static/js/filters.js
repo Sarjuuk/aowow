@@ -522,6 +522,12 @@ function fi_reset(_this) {
     fi_resetCriterion($WH.ge('fi_criteria'));
     fi_resetCriterion($WH.ge('fi_weight'));
 
+    // custom start (originally a click on reset would reload the page with empty filters)
+    var bc = PageTemplate.get('breadcrumb');
+    if (typeof bc[1] !== 'undefined')
+        Menu.modifyUrl(Menu.findItem(mn_database, [bc[1]]), {}, {});
+    // custom end
+
     var _ = $WH.ge('sdkgnsdkn436');
     if (_) {
         _.parentNode.style.display = 'none';
@@ -1467,11 +1473,12 @@ function fi_dropdownSync(_this) {
 function fi_init(type) {
     fi_type = type;
 
-    var s = $WH.ge('fi_subcat');
-    if (g_initPath.lastIt && g_initPath.lastIt[3]) {
-        if (s) {
-            Menu.add(s, g_initPath.lastIt[3]);
-        }
+    var
+        s = $WH.ge('fi_subcat'),
+        m = Menu.findItem(mn_path, PageTemplate.get('breadcrumb'));
+
+    if (s && m[3]) {
+        Menu.add(s, m[3]);
     }
     else if (s) {
         $WH.de(s.parentNode);
@@ -1846,7 +1853,7 @@ function fi_filterParamToJson(filters) {
     if(filters) {
         var parts = filters.split(';');
 
-        $WH.array_walk(parts, function(part){
+        $.each(parts, function(idx, part) {
             $WH.g_splitQueryParam(part, result);
         });
     }
@@ -1859,7 +1866,7 @@ function fi_filterJsonToParam(json) {
 
     var i = 0;
 
-    $WH.array_walk(json, function(value, _, __, name) {
+    $.each(json, function(name, value) {
         if (value !== '') {
             if (i++ > 0) {
                 result += ';';

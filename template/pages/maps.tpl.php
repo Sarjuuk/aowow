@@ -4,11 +4,14 @@
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-<?php $this->brick('announcement'); ?>
+<?php
+    $this->brick('announcement');
+
+    $this->brick('pageTemplate');
+?>
 
             <div class="text">
                 <div style="text-align: center">
-                    <script type="text/javascript">g_initPath([1,1])</script>
                     <div class="text">
                         <div style="text-align: center">
                             <select id="maps-ek" onchange="ma_ChooseZone(this)" class="zone-picker" style="margin: 0">

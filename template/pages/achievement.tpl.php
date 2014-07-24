@@ -4,17 +4,13 @@
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-<?php $this->brick('announcement'); ?>
-
-            <script type="text/javascript">//<![CDATA[
 <?php
-    $this->brick('community');
-            echo "                var g_pageInfo = ".json_encode($this->gPageInfo, JSON_NUMERIC_CHECK).";\n" .
-                 "                g_initPath(".json_encode($this->path, JSON_NUMERIC_CHECK).");\n";
-?>
-            //]]></script>
+    $this->brick('announcement');
 
-<?php $this->brick('infobox', ['series' => $this->series]); ?>
+    $this->brick('pageTemplate');
+
+    $this->brick('infobox');
+?>
 
             <div class="text">
 <?php

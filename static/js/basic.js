@@ -1328,8 +1328,8 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
 
     if (_ == 'number') {
         var arr = $WH.g_getDataSource();
-        if (arr[tooltip] && arr[tooltip][(buff ? 'buff_' : 'tooltip_')  + g_locale.name]) {
-            tooltip = arr[tooltip][(buff ? 'buff_' : 'tooltip_')  + g_locale.name];
+        if (arr[tooltip] && arr[tooltip][(buff ? 'buff_' : 'tooltip_')  + Locale.getName()]) {
+            tooltip = arr[tooltip][(buff ? 'buff_' : 'tooltip_')  + Locale.getName()];
         }
         else {
             return tooltip; // Error
@@ -1528,9 +1528,9 @@ $WH.g_enhanceTooltip = function(tooltip, isStatic, useGets, showSlider, buff, kn
             arr = $WH.g_getDataSource(),
             id = tooltip;
 
-        if (arr[id] && arr[id][(buff ? 'buff_' : 'tooltip_') + g_locale.name]) {
-            tooltip = arr[id][(buff ? 'buff_' : 'tooltip_') + g_locale.name];
-            spellJson = arr[id][(buff ? 'buff' : '') + 'spells_' + g_locale.name];
+        if (arr[id] && arr[id][(buff ? 'buff_' : 'tooltip_') + Locale.getName()]) {
+            tooltip = arr[id][(buff ? 'buff_' : 'tooltip_') + Locale.getName()];
+            spellJson = arr[id][(buff ? 'buff' : '') + 'spells_' + Locale.getName()];
 
             if (spellJson) {
                 tooltip = $WH.g_setTooltipSpells(tooltip, knownSpells, spellJson);
@@ -1595,7 +1595,7 @@ $WH.g_enhanceTooltip = function(tooltip, isStatic, useGets, showSlider, buff, kn
 
                 $(chooseSpells)
                     .append('<input type="checkbox" id="known-' + i + '" />')
-                    .append('<label for="known-' + i + '"><a rel="spell=' + i + '&know=' + i + '">' + g_spells[i]['name_' + g_locale.name] + (g_spells[i]['rank_' + g_locale.name] ? ' (' + g_spells[i]['rank_' + g_locale.name] + ')' : '') + '</a></label>')
+                    .append('<label for="known-' + i + '"><a rel="spell=' + i + '&know=' + i + '">' + g_spells[i]['name_' + Locale.getName()] + (g_spells[i]['rank_' + Locale.getName()] ? ' (' + g_spells[i]['rank_' + Locale.getName()] + ')' : '') + '</a></label>')
                     .append('<br />');
 
                 $('#known-' + i).change($WH.g_tooltipSpellsChange.bind(this));
@@ -1646,7 +1646,7 @@ $WH.g_staticTooltipLevelClick = function (div, level, noSlider, buff) {
     }
 
     var arr = $WH.g_getDataSource();
-    _ = $WH.g_setTooltipLevel(arr[itemId][(buff ? 'buff_' : 'tooltip_') + g_locale.name], level, buff);
+    _ = $WH.g_setTooltipLevel(arr[itemId][(buff ? 'buff_' : 'tooltip_') + Locale.getName()], level, buff);
     _ = $WH.g_enhanceTooltip(_, true);
 
     div.innerHTML = '<table><tr><td>' + _ + '</td><th style="background-position: top right"></th></tr><tr><th style="background-position: bottom left"></th><th style="background-position: bottom right"></th></tr></table>';

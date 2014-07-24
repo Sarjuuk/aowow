@@ -18,9 +18,9 @@ class RacePage extends GenericPage
     protected $mode          = CACHETYPE_PAGE;
     protected $js            = ['swfobject.js'];
 
-    public function __construct($__, $id)
+    public function __construct($pageCall, $id)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $id);
 
         $this->typeId = intVal($id);
 

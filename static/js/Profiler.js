@@ -981,12 +981,10 @@ function Profiler() {
         // Breadcrumb
 
         if (_isArmoryProfile(_profile.genuine)) {
-            // PageTemplate.set({ breadcrumb: [1, 5, 0, _profile.region[0], _profile.battlegroup[0], _profile.realm[0]] });
-            g_initPath([1, 5, 0, _profile.region[0], _profile.battlegroup[0], _profile.realm[0]]);
+            PageTemplate.set({ breadcrumb: [1, 5, 0, _profile.region[0], _profile.battlegroup[0], _profile.realm[0]] });
         }
         else {
-            // PageTemplate.set({ breadcrumb: [1, 5, 1] });
-            g_initPath([1, 5, 1]);
+            PageTemplate.set({ breadcrumb: [1, 5, 1] });
         }
 
         // ************************
@@ -7455,7 +7453,7 @@ function ProfilerCompletion(_parent) {
         }
 
         if (_opt.onDemand && !_loading && !_loaded) {
-            $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + (_opt.dataArgs ? _opt.dataArgs(_profile) : '') + '&locale=' + g_locale.id + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
+            $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + (_opt.dataArgs ? _opt.dataArgs(_profile) : '') + '&locale=' + Locale.getId() + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
             _imgLoading.style.display = 'block';
             _divTipQuests.style.display = 'none';
             _loading = this;
@@ -8382,7 +8380,7 @@ function ProfilerCompletion(_parent) {
 
                 if (_category !== null) {
                     if (_opt.onDemand && _opt.partial && !_loaded[_category] && !_loading) {
-                        $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + '&locale=' + g_locale.id + '&catg=' + _category + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
+                        $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + '&locale=' + Locale.getId() + '&catg=' + _category + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
                         _imgLoading.style.display = 'block';
                         _divTipQuests.style.display = 'none';
                         _loading = this;

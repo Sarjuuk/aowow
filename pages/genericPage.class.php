@@ -61,7 +61,7 @@ class GenericPage
     protected $lvData           = [];
     protected $title            = [CFG_NAME];               // for title-Element
     protected $name             = '';                       // for h1-Element
-    protected $tabId            = 0;
+    protected $tabId            = null;
     protected $gDataKey         = false;                    // adds the dataKey to the user vars
     protected $js               = [];
     protected $css              = [];
@@ -71,12 +71,12 @@ class GenericPage
     private   $isCached         = false;
     private   $cacheDir         = 'cache/template/';
     private   $jsgBuffer        = [];
-    private   $gLocale          = [];
     private   $gPageInfo        = [];
     private   $gUser            = [];
+    private   $pageTemplate     = [];
     private   $community        = ['co' => [], 'sc' => [], 'vi' => []];
 
-    public function __construct()
+    public function __construct($pageCall/*, $pageParam */)
     {
         $this->time = microtime(true);
 
@@ -92,10 +92,10 @@ class GenericPage
         else
         {
             $this->gUser   = User::getUserGlobals();
-            $this->gLocale = array(
-                'id'   => User::$localeId,
-                'name' => User::$localeString
-            );
+            $this->pageTemplate['pageName'] = strtolower($pageCall);
+
+            if (isset($this->tabId))
+                $this->pageTemplate['activeTab'] = $this->tabId;
 
             if (!$this->isValidPage() || !$this->tpl)
                 $this->error();
@@ -176,6 +176,12 @@ class GenericPage
                 'typeId' => $this->typeId,
                 'name'   => $this->name
             );
+
+        if (!empty($this->path))
+            $this->pageTemplate['breadcrumb'] = $this->path;
+
+        if (!empty($this->filter))
+            $this->pageTemplate['filter'] = empty($this->filter['query']) ? 0 : 1;
 
         if (method_exists($this, 'postCache'))              // e.g. update dates for events and such
             $this->postCache();
@@ -326,8 +332,9 @@ class GenericPage
 
     public function notFound($typeStr)                      // unknown ID
     {
-        $this->typeStr = $typeStr;
-        $this->mysql   = DB::Aowow()->getStatistics();
+        $this->typeStr       = $typeStr;
+        $this->mysql         = DB::Aowow()->getStatistics();
+        $this->hasComContent = false;
 
         $this->display('text-page-generic');
         exit();

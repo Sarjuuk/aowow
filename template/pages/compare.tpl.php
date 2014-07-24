@@ -4,9 +4,12 @@
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
 
-<?php $this->brick('announcement'); ?>
+<?php
+    $this->brick('announcement');
 
-            <script type="text/javascript">g_initPath([1,3])</script>
+    $this->brick('pageTemplate');
+?>
+
             <div class="text">
                 <div id="compare-generic"></div>
                 <script type="text/javascript">//<![CDATA[

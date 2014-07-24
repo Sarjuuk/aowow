@@ -23,7 +23,7 @@ class NpcsPage extends GenericPage
         $this->filterObj = new CreatureListFilter();
         $this->getCategoryFromUrl($pageParam);;
 
-        parent::__construct();
+        parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::$game['npcs']);
         $this->subCat = $pageParam ? '='.$pageParam : '';

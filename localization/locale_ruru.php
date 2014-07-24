@@ -94,7 +94,7 @@ $lang = array(
         'cappedHint'    => 'Подсказка: <a href="javascript:;" onclick="fi_presetDetails();">Удалите</a> характеристики с капом (например, меткость).',
         'groupBy'       => "Группировать",
         'gb'            => array(
-            ['Нет", "none'],         ['Слот", "slot'],       ['Уровень", "level'],     ['Источник", "source']
+            ['Нет', 'none'],         ['Слот', 'slot'],       ['Уровень', 'level'],     ['Источник', 'source']
         ),
         'compareTool'   => "Инструмент сравнения предметов",
         'talentCalc'    => "Расчёт талантов",

@@ -16,9 +16,9 @@ class RacesPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHETYPE_PAGE;
 
-    public function __construct()
+    public function __construct($pageCall, $pageParam)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $pageParam);
 
         $this->name = Util::ucFirst(Lang::$game['races']);
     }

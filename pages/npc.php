@@ -25,9 +25,9 @@ class NpcPage extends GenericPage
         // ['path' => 'Mapper_ie6.css', 'ieCond' => 'lte IE 6']
     );
 
-    public function __construct($__, $id)
+    public function __construct($pageCall, $id)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $id);
 
         // temp locale
         if ($this->mode == CACHETYPE_TOOLTIP && isset($_GET['domain']))
@@ -100,7 +100,7 @@ class NpcPage extends GenericPage
         {
             if ($h = $_['holidayId'])
             {
-                Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $_['id']);
+                $this->extendGlobalIds(TYPE_WORLDEVENT, $_['id']);
                 $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].'[event='.$h.']';
             }
         }

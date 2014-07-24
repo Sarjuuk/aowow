@@ -10,7 +10,7 @@ function pc_init() {
         _,
         clear;
 
-    g_initPath([1, 2]);
+    // PageTemplate.set({ breadcrumb: [1, 2] });
 
     $WH.ge('pc-classes').className = 'choose';
 
@@ -97,7 +97,7 @@ function pc_onChange(tc, info, data) {
         _ = pc_classIcons[pc_classId];
         _.className += ' iconmedium-gold-selected';
 
-        g_initPath([1, 2, pc_classId]);
+        PageTemplate.set({ breadcrumb: [1, 2, pc_classId] });
     }
 
     pc_build = tc.getWhBuild();

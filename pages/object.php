@@ -32,9 +32,9 @@ class ObjectPage extends GenericPage
 
         all of this has to be done manually
     */
-    public function __construct($__, $id)
+    public function __construct($pageCall, $id)
     {
-        parent::__construct();
+        parent::__construct($pageCall, $id);
 
         // temp locale
         if ($this->mode == CACHETYPE_TOOLTIP && isset($_GET['domain']))
@@ -72,7 +72,7 @@ class ObjectPage extends GenericPage
         {
             if ($h = $_['holidayId'])
             {
-                Util::$pageTemplate->extendGlobalIds(TYPE_WORLDEVENT, $_['id']);
+                $this->extendGlobalIds(TYPE_WORLDEVENT, $_['id']);
                 $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].'[event='.$h.']';
             }
         }
@@ -107,7 +107,7 @@ class ObjectPage extends GenericPage
                     if ($idx < 0)
                         continue;
 
-                    Util::$pageTemplate->extendGlobalIds(TYPE_ITEM, $idx);
+                    $this->extendGlobalIds(TYPE_ITEM, $idx);
                     $l = Lang::$gameObject['key'].Lang::$main['colon'].'[item='.$idx.']';
                 }
 
@@ -120,7 +120,7 @@ class ObjectPage extends GenericPage
         // linked trap
         if ($_ = $this->subject->getField('linkedTrap'))
         {
-            Util::$pageTemplate->extendGlobalIds(TYPE_OBJECT, $_);
+            $this->extendGlobalIds(TYPE_OBJECT, $_);
             $infobox[] = Lang::$gameObject['trap'].Lang::$main['colon'].'[object='.$_.']';
         }
 
@@ -152,7 +152,7 @@ class ObjectPage extends GenericPage
         {
             if ($_ = $this->subject->getField('mStone'))
             {
-                Util::$pageTemplate->extendGlobalIds(TYPE_ZONE, $_[2]);
+                $this->extendGlobalIds(TYPE_ZONE, $_[2]);
                 $m = Lang::$game['meetingStone'].Lang::$main['colon'].'[zone='.$_[2].']';
 
                 $l = $_[0];

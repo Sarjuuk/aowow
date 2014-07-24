@@ -88,7 +88,7 @@ class SpellsPage extends GenericPage
         $this->filterObj = new SpellListFilter();
         $this->getCategoryFromUrl($pageParam);;
 
-        parent::__construct();
+        parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::$game['spells']);
         $this->subCat = $pageParam ? '='.$pageParam : '';
