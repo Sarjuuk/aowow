@@ -105,6 +105,11 @@ $lang = array(
         // profiler
         'realm'         => "Realm",
         'region'        => "Region",
+        'viewCharacter' => "Charakter anzeigen",
+        '_cpHead'       => "Charakter-Profiler",
+        '_cpHint'       => "Der <b>Charakter-Profiler</b> gibt Euch die Möglichkeit, Euren Charakter zu editieren, bessere Ausrüstung zu finden, Eure Gearscore zu überprüfen, und mehr!",
+        '_cpHelp'       => "Um loszulegen, folgt einfach den untenstehenden Schritten. Falls Ihr mehr Informationen benötigt, schaut auf unserer ausführlichen <a href=\"?help=profiler\">Hilfeseite</a> nach.",
+        '_cpFooter'     => "Falls Ihr eine genauere Suche möchtet, probiert unsere <a href=\"?profiles\">erweiterten Suchoptionen</a>. Ihr könnt außerdem ein <a href=\"?profile&amp;new\">neues individuelles Profil</a> erstellen.",
 
         // help
         'help'          => "Hilfe",
@@ -113,17 +118,17 @@ $lang = array(
             "Talentrechner",                        "Gegenstandsvergleich",                 "Profiler"
         ),
 
-        // formating
-        'colon'         => ': ',
-        'dateFmtShort'  => "d.m.Y",
-        'dateFmtLong'   => "d.m.Y \u\m H:i"
-    ),
-    'search' => array(
+        // search
         'search'        => "Suche",
         'foundResult'   => "Suchergebnisse für",
         'noResult'      => "Keine Ergebnisse für",
         'tryAgain'      => "Bitte versucht es mit anderen Suchbegriffen oder überprüft deren Schreibweise.",
-        'ignoredTerms'  => "Die folgenden Wörter wurden in Eurer Suche ignoriert: %s"
+        'ignoredTerms'  => "Die folgenden Wörter wurden in Eurer Suche ignoriert: %s",
+
+        // formating
+        'colon'         => ': ',
+        'dateFmtShort'  => "d.m.Y",
+        'dateFmtLong'   => "d.m.Y \u\m H:i"
     ),
     'game' => array(
         'achievement'   => "Erfolg",

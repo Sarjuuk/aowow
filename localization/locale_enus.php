@@ -100,6 +100,11 @@ $lang = array(
         // profiler
         'realm'         => "Realm",
         'region'        => "Region",
+        'viewCharacter' => "View Character",
+        '_cpHead'       => "Character Profiler",
+        '_cpHint'       => "The <b>Character Profiler</b> lets you edit your character, find gear upgrades, check your gearscore and more!",
+        '_cpHelp'       => "To get started, just follow the steps below. If you'd like more information, check out our extensive <a href=\"?help=profiler\">help page</a>.",
+        '_cpFooter'     => "If you want a more refined search try out our <a href=\"?profiles\">advanced search</a> options. You can also create a <a href=\"?profile&amp;new\">new custom profile</a>.",
 
         // help
         'help'          => "Help",
@@ -108,17 +113,17 @@ $lang = array(
             "Talent Calculator",                    "Item Comparison",                      "Profiler"
         ),
 
-        // formating
-        'colon'         => ': ',
-        'dateFmtShort'  => "Y/m/d",
-        'dateFmtLong'   => "Y/m/d \a\\t H:i"
-    ),
-    'search' => array(
+        // search
         'search'        => "Search",
         'foundResult'   => "Search Results for",
         'noResult'      => "No Results for",
         'tryAgain'      => "Please try some different keywords or check your spelling.",
-        'ignoredTerms'  => "The following words were ignored in your search: %s"
+        'ignoredTerms'  => "The following words were ignored in your search: %s",
+
+        // formating
+        'colon'         => ': ',
+        'dateFmtShort'  => "Y/m/d",
+        'dateFmtLong'   => "Y/m/d \a\\t H:i"
     ),
     'game' => array(
         'achievement'   => "achievement",

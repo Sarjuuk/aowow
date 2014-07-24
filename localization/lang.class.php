@@ -8,9 +8,6 @@ class Lang
     public static $mail;
     public static $game;
 
-    public static $search;
-    public static $profiler;
-
     public static $achievement;
     public static $class;
     public static $currency;

@@ -288,7 +288,7 @@ class GenericPage
                 'mode'   => 1,
                 'status' => 1,
                 'name'   => 'internal error',
-                'style'  => 'padding-left: 40px; background-image: url(static/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
+                'style'  => 'padding-left: 40px; background-image: url('.STATIC_URL.'/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
                 'text'   => '[span id=inputbox-error]'.implode("[br]", $_).'[/span]',
             );
         }
@@ -301,7 +301,13 @@ class GenericPage
             {
                 if ($t = Util::localizedString($v, 'text'))
                 {
-                    $ann[$k]['text'] = $t;
+                    $replace = array(
+                        'HOST_URL'   => HOST_URL,
+                        'STATIC_URL' => STATIC_URL
+                    );
+
+                    $ann[$k]['text']  = strtr($t, $replace);
+                    $ann[$k]['style'] = strtr($ann[$k]['style'], $replace);
                     $this->announcements[] = $ann[$k];
                 }
             }

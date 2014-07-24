@@ -638,7 +638,7 @@ function pr_DirectLookup(form, browse)
     if(browse)
     {
         if(region.val() || server.val() || name.val())
-            location.href = '/profiles' + (region.val() ? '=' + region.val() + (server.val() ? '.' + g_urlize(server.val(), false, true) : '') : '') + (name.val() ? '?filter=na=' + name.val() + ';ex=on' : '');
+            location.href = '?profiles' + (region.val() ? '=' + region.val() + (server.val() ? '.' + g_urlize(server.val(), false, true) : '') : '') + (name.val() ? '?filter=na=' + name.val() + ';ex=on' : '');
         return false;
     }
 
@@ -673,7 +673,7 @@ function pr_DirectLookup(form, browse)
     if(region.val() && server.val())
         usePath = false;
 
-    location.href = (usePath ? menuItem[2].replace('profiles', 'profile') : '/profile=' + region.val() + '.' + g_urlize(server.val(), false, true)) + '.' + g_cleanCharacterName(name.val());
+    location.href = (usePath ? menuItem[2].replace('profiles', 'profile') : '?profile=' + region.val() + '.' + g_urlize(server.val(), false, true)) + '.' + g_cleanCharacterName(name.val());
     return false;
 }
 

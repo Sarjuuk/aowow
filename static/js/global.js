@@ -586,7 +586,7 @@ var PageTemplate = new function()
                 locale.description,
                 g_host + '?locale=' + locale.id,                            // sarjuuk: edited for unsupported subdomains # linkBefore + locale.domain + linkAfter
                 null,                                                       // more custom
-                {rel: linkBefore + linkAfter + " domain=" + locale.domain}  // also custom
+                {rel: location.href + " domain=" + locale.domain}           // also custom
             ];
 
             if(locale.id == localeId)

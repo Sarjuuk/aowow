@@ -105,6 +105,11 @@ $lang = array(
         // profiler
         'realm'         => "Royaume",
         'region'        => "Région",
+        'viewCharacter' => "Voir Personnage",
+        '_cpHead'       => "Profiler de Personnage",
+        '_cpHint'       => "Le <b>Profiler de Personnage</b> vous permets de modifier votre personnage, trouver des améliorations d'équipement, vérifier votre score d'équipement et plus!",
+        '_cpHelp'       => "Pour débuter, suivez simplement les étapes ci-dessous. Si vous voulez plus d'information, lisez notre <a href=\"?help=profiler\">page d'aide</a> détaillée.",
+        '_cpFooter'     => "Si vous voulez une recherche plus raffinée, essayez nos options de <a href=\"?profiles\">recherche avancée</a>. Vous pouvez aussi créer un <a href=\"?profile&amp;new\">nouveau profile personnalisé</a>.",
 
         // help
         'help'          => "Aide",
@@ -113,17 +118,17 @@ $lang = array(
             "Calculateur de talents",               "Comparaison d'objets",                 "Profiler"
         ),
 
-        // formating
-        'colon'         => ' : ',
-        'dateFmtShort'  => "Y-m-d",
-        'dateFmtLong'   => "Y-m-d à H:i"
-    ),
-    'search' => array(
+        // search
         'search'        => "Recherche",
         'foundResult'   => "Résultats de recherche pour",
         'noResult'      => "Aucun résultat pour malordawsne",
         'tryAgain'      => "Veuillez essayer d'autres mots ou vérifiez l'orthographe des termes de recherche.",
-        'ignoredTerms'  => "Les mots suivants ont été ignorés dans votre recherches : %s"
+        'ignoredTerms'  => "Les mots suivants ont été ignorés dans votre recherches : %s",
+
+        // formating
+        'colon'         => ' : ',
+        'dateFmtShort'  => "Y-m-d",
+        'dateFmtLong'   => "Y-m-d à H:i"
     ),
     'game' => array (
         'achievement'   => "haut fait",

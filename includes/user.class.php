@@ -346,6 +346,7 @@ class User
         // existing chars on realm(s)
         $characters = array(
             array(
+                'id'        => $character['id'],
                 'name'      => $character['name'],
                 'realmname' => $character['realm'][1],
                 'region'    => $character['region'][0],

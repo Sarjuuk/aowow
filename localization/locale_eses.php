@@ -105,6 +105,11 @@ $lang = array(
         // profiler
         'realm'         => "Reino",
         'region'        => "Región",
+        'viewCharacter' => "View Character",
+        '_cpHead'       => "Perfiles de Personaje",
+        '_cpHint'       => "l <b>Gestor de perfiles</b> te permite editar tu personaje, encontrar mejoras de equipo, comprobar tu gearscore, ¡y más!",
+        '_cpHelp'       => "Para comenzar, sigue los pasos abajo indicados. Si quieres más información, revisa nuestra amplia <a href=\"?help=profiler\">página de ayuda</a>.",
+        '_cpFooter'     => "Si quieres una búsqueda más refinada, prueba con nuestras opciones de <a href=\"?profiles\">búsqueda avanzada</a>. También puedes crear un <a href=\"?profile&amp;new\">perfil nuevo personalizado</a>.",
 
         // help
         'help'          => "Ayuda",
@@ -113,17 +118,17 @@ $lang = array(
             "Calculadora de talentos",              "Comparación de objetos",               "Perfiles"
         ),
 
-        // formating
-        'colon'         => ': ',
-        'dateFmtShort'  => "d/m/Y",
-        'dateFmtLong'   => "d/m/Y \a \l\a\s H:i"
-    ),
-    'search' => array(
+        // search
         'search'        => "Búsqueda",
         'foundResult'   => "Resultados de busqueda para",
         'noResult'      => "Ningún resultado para",
         'tryAgain'      => "Por favor, introduzca otras palabras claves o verifique el término ingresado.",
-        'ignoredTerms'  => "Las siguientes palabras fueron ignoradas en tu búsqueda: %s"
+        'ignoredTerms'  => "Las siguientes palabras fueron ignoradas en tu búsqueda: %s",
+
+        // formating
+        'colon'         => ': ',
+        'dateFmtShort'  => "d/m/Y",
+        'dateFmtLong'   => "d/m/Y \a \l\a\s H:i"
     ),
     'game' => array(
         'achievement'   => "logro",
