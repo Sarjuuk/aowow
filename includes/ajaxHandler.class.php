@@ -26,11 +26,23 @@ class AjaxHandler
 
     public function handle($what)
     {
-        $f = 'handle'.ucFirst($what);
+        $f = 'handle'.ucFirst(str_replace(['-', '_'], '', $what));
         if (!$what || !method_exists($this, $f))
             return null;
 
         return $this->$f();
+    }
+
+    /* responses
+        header()
+    */
+    private function handleGotocomment()
+    {
+        if (empty($this->get['id']))
+            return;
+
+        if ($_ = DB::Aowow()->selectRow('SELECT c2.id as zwei, c1.id as eins, IFNULL(c2.id, c1.id) AS id, IFNULL(c2.type, c1.type) AS type, IFNULL(c2.typeId, c1.typeId) AS typeId FROM ?_comments c1 LEFT JOIN ?_comments c2 ON c1.replyTo = c2.id WHERE c1.id = ?d', $this->get['id']))
+            header('Location: ?'.Util::$typeStrings[$_['type']].'='.$_['typeId'].'#comments:id='.$_['id'].($_['id'] != $this->get['id'] ? ':reply='.$this->get['id'] : null));
     }
 
     /* responses
@@ -219,7 +231,7 @@ class AjaxHandler
         if (!$desc)
             return 3;
 
-        if (strlen($desc) > 500)
+        if (mb_strlen($desc) > 500)
             return 2;
 
         // check already reported
@@ -253,26 +265,296 @@ class AjaxHandler
         return 'save to db unsuccessful';
     }
 
-    /* responses
-        - rate:
-            0: success
-            1: ratingban
-            3: rated too often
-            $: silent error
-        - rating:
-            yet to check
-    */
     private function handleComment()
     {
+        // post sizes
+        $_minCmt = 10;
+        $_maxCmt = 7500 * (User::isPremium() ? 3 : 1);
+
+        $_minRpl = 15;
+        $_maxRpl = 600;
+
+        $result = null;
+        /*
+            note: return values must be formated as STRICT json!
+        */
         switch ($this->params[0])
         {
-            case 'rating':
-                return '{"success":true,"error":"","up":7,"down":9}';
-            case 'rate':
-                return 3;
-            default:
-                return null;
+            case 'add':                                     // i .. have problems believing, that everything uses nifty ajax while adding comments requires a brutal header(Loacation: <wherever>), yet, thats how it is
+                if (empty($this->get['typeid']) || empty($this->get['type']) || !isset(Util::$typeStrings[$this->get['type']]))
+                    return;                                 // whatever, we cant even send him back
+
+                // trim to max length
+                if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->post['commentbody']) > $_maxCmt)
+                    $this->post['body'] = substr($this->post['body'], 0, $_maxCmt);
+
+                if (User::canComment() && !empty($this->post['commentbody']) && mb_strlen($this->post['commentbody']) >= $_minCmt)
+                {
+                    if ($postIdx = DB::Aowow()->query('INSERT INTO ?_comments (type, typeId, userId, roles, body, date) VALUES (?d, ?d, ?d, ?d, ?, UNIX_TIMESTAMP())', $this->get['type'], $this->get['typeid'], User::$id, User::$groups, $this->post['commentbody']))
+                    {
+                        Util::gainSiteReputation(User::$id, SITEREP_ACTION_COMMENT, ['id' => $postIdx]);
+                        // every comment starts with a rating of +1 and i guess the simplest thing to do is create a db-entry with the system as owner
+                        DB::Aowow()->query('INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, 0, 1)', $postIdx);
+                    }
+                }
+
+                header('Location: ?'.Util::$typeStrings[$this->get['type']].'='.$this->get['typeid'].'#comments');
+                break;
+            case 'edit':
+                if ((!User::canComment() && !User::isInGroup(U_GROUP_MODERATOR)) || empty($this->get['id']) || empty($this->post['body']))
+                    break;
+
+                if (mb_strlen($this->post['body']) < $_minCmt)
+                    break;
+
+                // trim to max length
+                if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->post['body']) > $_maxCmt)
+                    $this->post['body'] = substr($this->post['body'], 0, $_maxCmt);
+
+                $update = array(
+                    'body'       => $this->post['body'],
+                    'editUserId' => User::$id,
+                    'editDate'   => time()
+                );
+
+                if (User::isInGroup(U_GROUP_MODERATOR))
+                {
+                    $update['responseBody']   = empty($this->post['response']) ? '' : $this->post['response'];
+                    $update['responseUserId'] = empty($this->post['response']) ? 0  : User::$id;
+                    $update['responseRoles']  = empty($this->post['response']) ? 0  : User::$groups;
+                }
+
+                DB::Aowow()->query('UPDATE ?_comments SET editCount = editCount + 1, ?a WHERE id = ?d', $update, $this->get['id']);
+                break;
+            case 'delete':                                  // user.js uses GET; global.js uses POST
+                if (empty($this->post['id']) && empty($this->get['id']))
+                    break;
+
+                DB::Aowow()->query('UPDATE ?_comments SET flags = flags | 0x2, deleteUserId = ?d, deleteDate = UNIX_TIMESTAMP() WHERE id = ?d{ AND userId = ?d}',
+                    User::$id,
+                    empty($this->post['id']) ? $this->get['id'] : $this->post['id'],
+                    User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
+                );
+
+                break;
+            case 'undelete':                                // user.js uses GET; global.js uses POST
+                if (empty($this->post['id']) && empty($this->get['id']))
+                    break;
+
+
+                DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~0x2 WHERE id = ?d{ AND userId = deleteUserId AND deleteUserId = ?d}',
+                    empty($this->post['id']) ? $this->get['id'] : $this->post['id'],
+                    User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
+                );
+
+                break;
+            case 'rating':                                  // up/down - distribution
+                if (empty($this->get['id']))
+                {
+                    $result = ['success' => 0];
+                    break;
+                }
+
+                if ($votes = DB::Aowow()->selectRow('SELECT 1 AS success, SUM(IF(value > 0, value, 0)) AS up, SUM(IF(value < 0, -value, 0)) AS down FROM ?_comments_rates WHERE commentId = ?d GROUP BY commentId', $this->get['id']))
+                    return json_encode($votes, JSON_NUMERIC_CHECK);
+
+                $result = ['success' => 1, 'up' => 0, 'down' => 0];
+                break;
+            case 'vote':                                    // up, down and remove
+                if (!User::$id || empty($this->get['id']) || empty($this->get['rating']))
+                {
+                    $result = ['error' => 1, 'message' => Lang::$main['genericError']];
+                    break;
+                }
+
+                $target = DB::Aowow()->selectRow('SELECT c.userId AS owner, cr.value FROM ?_comments c LEFT JOIN ?_comments_rates cr ON cr.commentId = c.id AND cr.userId = ?d WHERE c.id = ?d', User::$id, $this->get['id']);
+                $val    = User::canSupervote() ? 2 : 1;
+                if ($this->get['rating'] < 0)
+                    $val *= -1;
+
+                if (User::getCurDailyVotes() <= 0)
+                    $result = ['error' => 1, 'message' => Lang::$main['tooManyVotes']];
+
+                else if (!$target || $val != $this->get['rating'])
+                    $result = ['error' => 1, 'message' => Lang::$main['genericError']];
+
+                else if (($val > 0 && !User::canUpvote()) || ($val < 0 && !User::canDownvote()))
+                    $result = ['error' => 1, 'message' => Lang::$main['bannedRating']];
+
+                if ($result)
+                    break;
+
+                $ok = false;
+                // old and new have same sign; undo vote (user may have gained/lost access to superVote in the meantime)
+                if ($target['value'] && ($target['value'] < 0) == ($val < 0))
+                    $ok = DB::Aowow()->query('DELETE FROM ?_comments_rates WHERE commentId = ?d AND userId = ?d', $this->get['id'], User::$id);
+                else                                        // replace, because we may be overwriting an old, opposing vote
+                    if ($ok = DB::Aowow()->query('REPLACE INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)', (int)$this->get['id'], User::$id, $val))
+                        User::decrementDailyVotes();        // do not refund retracted votes!
+
+                if (!$ok)
+                {
+                    $result = ['error' => 1, 'message' => Lang::$main['genericError']];
+                    break;
+                }
+
+                if ($val > 0)                               // gain rep
+                    Util::gainSiteReputation($target['owner'], SITEREP_ACTION_UPVOTED, ['id' => $this->get['id'], 'voterId' => User::$id]);
+                else if ($val < 0)
+                    Util::gainSiteReputation($target['owner'], SITEREP_ACTION_DOWNVOTED, ['id' => $this->get['id'], 'voterId' => User::$id]);
+
+                $result = ['error' => 0];
+                break;
+            case 'sticky':                                  // toggle flag
+                if (empty($this->post['id']) || !User::isInGroup(U_GROUP_MODERATOR))
+                    break;
+
+                if (!empty($this->post['sticky']))
+                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  0x1 WHERE id = ?d', $this->post['id']);
+                else
+                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~0x1 WHERE id = ?d', $this->post['id']);
+
+                break;
+            case 'out-of-date':                             // toggle flag
+                if (empty($this->post['id']))
+                {
+                    $result = 'The comment does not exist.';
+                    break;
+                }
+
+                $ok = false;
+                if (User::isInGroup(U_GROUP_MODERATOR))     // directly mark as outdated
+                {
+                    if (empty($this->post['remove']))
+                        $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  0x4 WHERE id = ?d', $this->post['id']);
+                    else
+                        $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~0x4 WHERE id = ?d', $this->post['id']);
+                }
+                else if (User::$id && empty($this->post['reason']) || mb_strlen($this->post['reason']) < 15)
+                {
+                    $result = 'Your message is too short.';
+                    break;
+                }
+                else if (User::$id)                         // only report as outdated
+                {
+                    $ok = DB::Aowow()->query(
+                        'INSERT INTO ?_reports (userId, mode, reason, subject, ip, description, userAgent, appName) VALUES (?d, 1, 17, ?d, ?, "<automated comment report>", ?, ?)',
+                        User::$id,
+                        $this->post['id'],
+                        $_SERVER['REMOTE_ADDR'],
+                        $_SERVER['HTTP_USER_AGENT'],
+                        get_browser(null, true)['browser']
+                    );
+                }
+
+                if ($ok)                                    // this one is very special; as in: completely retarded
+                    return 'ok';                            // the script expects the actual characters 'ok' not some string like "ok"
+
+                $result = Lang::$main['genericError'];
+                break;
+            case 'show-replies':
+                $result = empty($this->get['id']) ? [] : CommunityContent::getCommentReplies($this->get['id']);
+                break;
+            case 'add-reply':                               // also returns all replies on success
+                if (!User::canComment())
+                    $result = 'You are not allowed to reply.';
+
+                else if (empty($this->post['body']) || mb_strlen($this->post['body']) < $_minRpl || mb_strlen($this->post['body']) > $_maxRpl)
+                    $result = 'Your reply has '.mb_strlen(@$this->post['body']).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
+
+                else if (empty($this->post['commentId']) || !DB::Aowow()->selectCell('SELECT 1 FROM ?_comments WHERE id = ?d', $this->post['commentId']))
+                    $result = Lang::$main['genericError'];
+
+                else if (DB::Aowow()->query('INSERT INTO ?_comments (`userId`, `roles`, `body`, `date`, `replyTo`) VALUES (?d, ?d, ?, UNIX_TIMESTAMP(), ?d)', User::$id, User::$groups, $this->post['body'], $this->post['commentId']))
+                    $result = CommunityContent::getCommentReplies($this->post['commentId']);
+
+                else
+                    $result = Lang::$main['genericError'];
+
+                break;
+            case 'edit-reply':                              // also returns all replies on success
+                if (!User::canComment())
+                    $result = 'You are not allowed to reply.';
+
+                else if (empty($this->post['replyId']) || empty($this->post['commentId']))
+                    $result = Lang::$main['genericError'];
+
+                else if (empty($this->post['body']) || mb_strlen($this->post['body']) < $_minRpl || mb_strlen($this->post['body']) > $_maxRpl)
+                    $result = 'Your reply has '.mb_strlen(@$this->post['body']).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
+
+                if ($result)
+                    break;
+
+                $ok = DB::Aowow()->query(
+                    'UPDATE ?_comments SET body = ?, editUserId = ?d, editDate = UNIX_TIMESTAMP(), editCount = editCount + 1 WHERE id = ?d AND replyTo = ?d{ AND userId = ?d}',
+                    $this->post['body'],
+                    User::$id,
+                    $this->post['replyId'],
+                    $this->post['commentId'],
+                    User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
+                );
+
+                $result = $ok ? CommunityContent::getCommentReplies($this->post['commentId']) : Lang::$main['genericError'];
+                break;
+            case 'detach-reply':
+                if (!User::isInGroup(U_GROUP_MODERATOR) || empty($this->post['id']))
+                    break;
+
+                DB::Aowow()->query('UPDATE ?_comments c1, ?_comments c2 SET c1.replyTo = 0, c1.type = c2.type, c1.typeId = c2.typeId WHERE c1.replyTo = c2.id AND c1.id = ?d', $this->post['id']);
+                break;
+            case 'delete-reply':
+                if (!User::$id || empty($this->post['id']))
+                    break;
+
+                if (DB::Aowow()->query('DELETE FROM ?_comments WHERE id = ?d{ AND userId = ?d}', $this->post['id'], User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id))
+                    DB::Aowow()->query('DELETE FROM ?_comments_rates WHERE commentId = ?d', $this->post['id']);
+
+                break;
+            case 'flag-reply':
+                if (!User::$id || empty($this->post['id']))
+                    break;
+
+                DB::Aowow()->query(
+                    'INSERT INTO ?_reports (userId, mode, reason, subject, ip, description, userAgent, appName) VALUES (?d, 1, 19, ?d, ?, "<automated commentreply report>", ?, ?)',
+                    User::$id,
+                    $this->post['id'],
+                    $_SERVER['REMOTE_ADDR'],
+                    $_SERVER['HTTP_USER_AGENT'],
+                    get_browser(null, true)['browser']
+                );
+
+                break;
+            case 'upvote-reply':
+                if (empty($this->post['id']) || !User::canUpvote())
+                    break;
+
+                $ok = DB::Aowow()->query(
+                    'INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)',
+                    $this->post['id'],
+                    User::$id,
+                    User::canSupervote() ? 2 : 1
+                );
+
+                if ($ok)
+                    User::decrementDailyVotes();
+
+                break;
+            case 'downvote-reply':
+                if (empty($this->post['id']) || !User::canUpvote())
+                    break;
+
+                $ok = DB::Aowow()->query(
+                    'INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)',
+                    $this->post['id'],
+                    User::$id,
+                    User::canSupervote() ? -2 : -1
+                );
+
+                if ($ok)
+                    User::decrementDailyVotes();
         }
+
+        return json_encode($result, JSON_NUMERIC_CHECK);
     }
 
     private function handleLocale()                         // not sure if this should be here..

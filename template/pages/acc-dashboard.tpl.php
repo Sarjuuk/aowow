@@ -8,15 +8,18 @@
     $this->brick('announcement');
 
     $this->brick('pageTemplate');
+
+    $this->brick('infobox');
 ?>
 
             <script type="text/javascript">var g_pageInfo = { username: '<?php echo Util::jsEscape($this->gUser['name']); ?>' }</script>
 
-<?php $this->brick('infobox'); ?>
-
             <div class="text">
-                <h1><?php echo Lang::$account['myAccount']; ?></h1>
-
+                <div id="h1-icon-generic" class="h1-icon"></div>
+                <script type="text/javascript">
+                    $WH.ge('h1-icon-generic').appendChild(Icon.createUser(<?php echo (is_numeric(User::$avatar) ? 2 : 1).' , \''.User::$avatar.'\''?>, 1, null, <?php echo User::isInGroup(U_GROUP_PREMIUM) ? 0 : 2; ?>, false, Icon.getPrivilegeBorder(<?php echo User::getReputation(); ?>)));
+                </script>
+                <h1 class="h1-icon"><?php echo Lang::$account['myAccount']; ?></h1>
 <?php
 // Banned-Minibox
 if ($b = $this->banned):

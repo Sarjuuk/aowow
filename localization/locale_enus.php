@@ -9,14 +9,14 @@ $lang = array(
     'timeUnits' => array(
         'sg'            => ["year",  "month",  "week",  "day",  "hour",  "minute",  "second",  "millisecond"],
         'pl'            => ["years", "months", "weeks", "days", "hours", "minutes", "seconds", "milliseconds"],
-        'ab'            => ["yr",    "mo",     "wk",    "day",  "hr",    "min",     "sec",     "ms"]
+        'ab'            => ["yr",    "mo",     "wk",    "day",  "hr",    "min",     "sec",     "ms"],
+        'ago'           => '%s ago'
     ),
     'main' => array(
         'name'          => "name",
         'link'          => "Link",
         'signIn'        => "Log in / Register",
         'jsError'       => "Please make sure you have javascript enabled.",
-        'searchButton'  => "Search",
         'language'      => "Language",
         'feedback'      => "Feedback",
         'numSQL'        => "Number of MySQL queries",
@@ -41,6 +41,8 @@ $lang = array(
         'login'         => "Login",
         'forum'         => "Forum",
         'n_a'           => "n/a",
+        'siteRep'       => "Reputation",
+        'aboutUs'       => "About us & contact",
 
         // filter
         'extSearch'     => "Extended search",
@@ -110,11 +112,12 @@ $lang = array(
         'help'          => "Help",
         'helpTopics'    => array(
             "Commenting and You",                   "Model Viewer",                         "Screenshots: Tips & Tricks",          "Stat Weighting",
-            "Talent Calculator",                    "Item Comparison",                      "Profiler"
+            "Talent Calculator",                    "Item Comparison",                      "Profiler",                            "Markup Guide"
         ),
 
         // search
         'search'        => "Search",
+        'searchButton'  => "Search",
         'foundResult'   => "Search Results for",
         'noResult'      => "No Results for",
         'tryAgain'      => "Please try some different keywords or check your spelling.",
@@ -123,7 +126,12 @@ $lang = array(
         // formating
         'colon'         => ': ',
         'dateFmtShort'  => "Y/m/d",
-        'dateFmtLong'   => "Y/m/d \a\\t H:i"
+        'dateFmtLong'   => "Y/m/d \a\\t H:i",
+
+        // error
+        'genericError'  => "An error has occurred; refresh the page and try again. If the error persists email <a href=\"#contact\">feedback</a>", # LANG.genericerror
+        'bannedRating'  => "You have been banned from rating comments.", # LANG.tooltip_banned_rating
+        'tooManyVotes'  => "You have reached the daily voting cap. Come back tomorrow!" # LANG.tooltip_too_many_votes
     ),
     'game' => array(
         'achievement'   => "achievement",

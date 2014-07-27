@@ -21,8 +21,7 @@ class NpcPage extends GenericPage
         // 'Mapper.js'
     );
     protected $css           = array(
-        // ['path' => 'Mapper.css'],
-        // ['path' => 'Mapper_ie6.css', 'ieCond' => 'lte IE 6']
+        // ['path' => 'Mapper.css']
     );
 
     public function __construct($pageCall, $id)

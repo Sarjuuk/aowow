@@ -35,6 +35,11 @@ class TitleList extends BaseType
                     $this->sources[$id][$src[0]][] = $src[1];
                 }
             }
+
+            // shorthand for more generic access
+            foreach (Util::$localeStrings as $i => $str)
+                if ($str)
+                    $_curTpl['name_loc'.$i] = trim(str_replace('%s', '', $_curTpl['male_loc'.$i]));
         }
     }
 

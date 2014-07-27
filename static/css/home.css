@@ -1,0 +1,154 @@
+.home-wrapper {
+    text-align:center;
+    padding-top:25px;
+}
+
+.home-wrapper h1 {
+    position:absolute;
+    left:-2323px;
+    top:-2323px;
+}
+
+.home-logo a:visited,.home-logo a:link {
+    display:block;
+    cursor:default;
+    text-indent:-9000px;
+    cursor:pointer;
+}
+
+.home-logo {
+    display:block;
+    cursor:default;
+    width:261px;
+    height:119px;
+    margin:0 auto 20px auto;
+    background:url(../images/logos/home.png) no-repeat;
+}
+
+.home-menu {
+    padding-top:10px;
+}
+
+.home-search form {
+    display:block;
+    position:relative;
+    width:425px;
+    margin:0 auto;
+}
+
+.home-search input {
+    width:100%;
+    font-size:20px;
+    color:black;
+    padding:3px;
+    margin:0;
+    outline:0;
+    border:1px solid #adadad;
+    background:white url(../images/ui/form/input-textbox-bg.gif) repeat-x;
+    -webkit-border-radius:3px;
+    -moz-border-radius:3px;
+    border-radius:3px;
+}
+
+.home-search a {
+    display:block;
+    position:absolute;
+    right:-3px;
+    top:4px;
+    width:24px;
+    height:24px;
+    background:url(../images/header/search2.gif) 4px 4px no-repeat;
+}
+
+.home-oneliner {
+    margin:0;
+    padding-top:53px;
+    color:#ccc;
+    line-height:1.75em;
+    font-size:12px;
+}
+
+.home-featuredbox {
+    font-size:13px;
+    position:relative;
+    text-align:left;
+    width:415px;
+    height:191px;
+    margin:37px auto 10px auto;
+    background:no-repeat;
+    background-color:transparent;
+}
+
+.home-featuredbox-extended {
+    width:515px;
+}
+
+.home-featuredbox-links a,.home-featuredbox-links var {
+    position:absolute;
+    display:block;
+}
+
+.home-featuredbox-links a {
+    z-index:5;
+}
+
+.home-featuredbox-links var.active {
+    background-color:white!important;
+    opacity:.075!important;
+    filter:alpha(opacity=7.5)!important;
+    -webkit-border-radius:6px;
+    -moz-border-radius:6px;
+    border-radius:6px;
+}
+
+.home-featuredbox-inner {
+    padding:25px 0 0 26px;
+    margin:0;
+    position:absolute;
+    left:0;
+    top:0;
+    z-index:2;
+}
+
+.home-featuredbox li {
+    line-height:2em;
+}
+
+.toplinks {
+    background:black;
+    padding:5px 2px;
+    position:absolute;
+    line-height:normal;
+    height:auto;
+    overflow:visible;
+    right:0;
+    top:0;
+}
+
+body, html {
+    height:100%;
+}
+
+.home-footer {
+    width:500px;
+    margin:0 auto;
+    text-align:center;
+    font-size:11px;
+    margin-top:40px;
+}
+
+.home-footer ul {
+    margin:0;
+    padding:0;
+}
+
+.home-footer li {
+    display:inline;
+    padding:0 6px;
+    border-right:1px solid #333;
+    background:none;
+}
+
+.home-footer li:last-child {
+    border:0;
+}

@@ -1,3 +1,25 @@
+var l_reputation_names = [
+    '', // 0
+    "Compte enregistré",
+    "Visite journalière",
+    "Commentaire posté",
+    "Votre commentaire a reçu des votes positifs",
+    "Votre commentaire a reçu des votes négatifs",
+    "Capture d'écran envoyée",
+    "Voter",
+    "Données téléchargées",
+    "Signalement accepté",
+    "Signalement refusé", // 10
+    "Haut-fait de bronze",
+    "Haut-fait d'argent",
+    "Haut-fait d'or",
+    'Test 1',
+    'Test 2',
+    "Guide approuvé",
+    "Avertissement d'un modérateur",
+    "Suspension par un modérateur"
+];
+
 var mn_classes = [
     [6,"Chevalier de la mort",,,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druide",,,{className:"c11",tinyIcon:"class_druid"}],
@@ -875,7 +897,8 @@ var mn_more = [
         [6,"Profiler","?help=profiler"],
         [2,"Captures d'écran : Trucs et astuces","?help=screenshots-tips-tricks"],
         [3,"Échelles de valeurs","?help=stat-weighting"],
-        [4,"Calculateur de talents","?help=talent-calculator"]
+        [4,"Calculateur de talents","?help=talent-calculator"],
+        [7,"Markup Guide","?help=markup-guide"]
     ]],
     [7,"Quoi de neuf?","?whats-new"],
     [,"Extras pour votre site"],
@@ -2352,16 +2375,12 @@ var LANG = {
     lvclass_hero: "Classe de héros",
 
     lvcomment_add:         "Ajouter votre commentaire",
-// old
-    lvcomment_sort:        "Trier par : ",
-    lvcomment_sortdate:    "Date",
-    lvcomment_sortrating:  "Le plus haut noté",
-// < - >
+
     sort:                  "Trier",
     newestfirst_stc:       "Le plus récent en premier",
     oldestfirst_stc:       "Le plus ancien en premier",
     highestrated_stc:      "Le plus haut noté",
-// new
+
     lvcomment_patchfilter: "Filtrer par mise-à-jour : ",
     lvcomment_by:          "Par ",
     lvcomment_patch:       " (Mise à jour $1)",
@@ -2378,6 +2397,13 @@ var LANG = {
     lvcomment_reply:       "Répondre",
     lvcomment_report:      "Rapporter",
     lvcomment_reported:    "Rapporté !",
+
+    lvcomment_uptodate:                "À Jour",
+    lvcomment_uptodateresponse:        "Commentaire marqué comme à jour",
+    lvcomment_outofdate:               "Obsolète",
+    lvcomment_outofdateresponse:       "Le commentaire a été marqué obsolète.",
+    lvcomment_outofdateresponsequeued: "Commentaire ajouté à la file des obsolètes.",
+    lvcomment_outofdate_tip:           "Étes-vous sûr(e) de vouloir marquer ce commentaire comme obsolète. Si oui, entrez une raison ci-dessous. Tout abus est susceptible de modération !",
 
     lvcomment_deleted: " (Supprimé)",
     lvcomment_purged:  " (Effacé)",
@@ -2640,7 +2666,7 @@ var LANG = {
     prompt_nameweightscale: "Veuillez fournir un nom pour cette échelle de valeurs.",
     prompt_tcbuild:         "Copiez-coller l'URL suivante pour créer un lien vers cet arbre de talents :",
 
-    genericerror:                      "Une erreur est survenue; Actualisez la page et essayez à nouveau. Si l'erreur persiste, envoyez un email à feedback@wowhead.com",
+    genericerror:                      "Une erreur est survenue; Actualisez la page et essayez à nouveau. Si l'erreur persiste, envoyez un email à <a href='#contact'>feedback</a>",
 
     tooltip_activeholiday:             "L'évènement est présentement en cours",
     tooltip_achievementcomplete:       "Haut-fait reçu par $1 le $2/$3/$4",
@@ -2713,6 +2739,11 @@ var LANG = {
     tooltip_trainingpoints:            "Points d'entraînement",
     tooltip_uprate:                    "Intéressant/drôle",
     tooltip_zonelink:                  "Cliquer sur ce lien vous amènera<br />à la page de la zone correspondante.",
+
+    reputationhistory: "Historique de réputation",
+    reputationaction:  "Action de réputation",
+
+    outofdate_stc: "Périmé",
 
     tab_pettrainer:          "Entraîneur",
     tab_feedback:            "Feedback",
@@ -2847,6 +2878,35 @@ var LANG = {
     tab_world:               "Monde",
     tab_zones:               "Zones",
 
+    numberofupvotesreceived_tip: "Nombre de votes positifs reçus",
+    deletethisreply_stc:         "Effacer cette réponse",
+    editthisreply_stc:           "Éditer cette réponse",
+    save:                        "Sauver",
+    reportthisreply_stc:         "Signaler cette réponse aux modérateurs",
+    deletereplyconfirmation_tip: "Êtes-vous sûr(e) de vous vouloir effacer définitivement cette réponse ?",
+    upvote_tip:                  "Ce commentaire est utile (cliquez à nouveau pour annuler)",
+    upvoted_tip:                 "Vous avez émis un vote positif pour ce commentaire ; cliquez à nouveau pour annuler",
+    downvote_tip:                "Ce commentaire n'est pas utile (cliquez à nouveau pour annuler)",
+    downvote_tip:                "Ce commentaire n'est pas utile (cliquez à nouveau pour annuler)",
+    commentdeleted_tip:          "Ce commentaire a été effacé ; il n'est plus visible que par vous et par les modérateurs.",
+    addreply:                    "Ajouter une réponse",
+    replylength1_format:         "Entrez au moins $1 caractères",
+    replylength2_format:         "Encore $1 caractères&hellip;",
+    replylength3_format:         "$1 caractères restants",
+    replylength4_format:         "1 caractère restant",
+
+    votelogin_tip:             "Vous devez avoir un compte pour voter sur les commentaires. Veuillez <a href=\"?account=signin\">vous connecter</a> ou <a href=\"?account=signup\">vous inscrire</a>.",
+    voteself_tip:              "Vous ne pouvez pas voter sur votre propre commentaire.",
+    votedeleted_tip:           "Vous ne pouvez pas voter pour les commentaires effacés.",
+    upvotenorep_tip:           "Vous avez besoin d'au moins <b>$1</b> <a href=\"/reputation\">en réputation</a> pour émettre des votes positifs pour les commentaires.",
+    downvotenorep_tip:         "Vous avez besoin d'au moins <b>$1</b> <a href=\"/reputation\">en réputation</a> pour émettre des votes négatifs pour les commentaires.",
+    stickycomment_tip:         "Ce commentaire a été mis en évidence (sticky) par un modérateur.",
+    addreply_stc:              "Ajouter une réponse",
+    show1morereply_stc:        "Afficher 1 réponse de plus",
+    showmorereplies_format:    "Afficher $1 réponses de plus",
+    addshow1morereply_stc:     "Ajouter / Montrer 1 réponse de plus",
+    addshowmorereplies_format: "Ajouter / Montrer $1 réponses de plus",
+
     menu_browse: "Consulter",
 
     mapper_tipzoom:  "Astuce : Cliquer pour agrandir la carte",
@@ -2946,7 +3006,7 @@ var LANG = {
     markup_toc:     "Table des matières",
     markup_links:   "Liens",
     markup_prompt:  "Veuillez entrer le ID de $1.",
-    markup_helpdoc: 'Vous pouvez aussi ajouter des liens vers la base de données et avoir le noms et les informations ajoutées automatiquement.<br />Pour plus d\'informations, consultez notre <a href="?help=wowhead-markup>document d\'aide des balises</a>.',
+    markup_helpdoc: 'Vous pouvez aussi ajouter des liens vers la base de données et avoir le noms et les informations ajoutées automatiquement.<br />Pour plus d\'informations, consultez notre <a href="?help=markup-guide>document d\'aide des balises</a>.',
     markup_help1:   "Vous tapez :",
     markup_help2:   "Vous voyez :",
 
@@ -4124,6 +4184,8 @@ var LANG = {
     stackof_format: "Paquet de $1: $2%",
 
     charactersremaining_format: "$1 caractères restants.",
+
+    reputationtip: "Points de réputation",
 
     // Context-less terms
     added:       "Ajouté",

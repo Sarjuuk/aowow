@@ -19,8 +19,7 @@ class QuestPage extends GenericPage
     protected $js            = ['Mapper.js'];
     protected $css           = array(
         ['path' => 'Book.css'],
-        ['path' => 'Mapper.css'],
-        ['path' => 'Mapper_ie6.css', 'ieCond' => 'lte IE 6']
+        ['path' => 'Mapper.css']
     );
 
     public function __construct($pageCall, $id)

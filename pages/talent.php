@@ -15,9 +15,7 @@ class TalentPage extends GenericPage
     protected $js            = ['TalentCalc.js'];
     protected $css           = array(
         ['path' => 'TalentCalc.css'],
-        ['path' => 'talent.css'],
-        ['path' => 'TalentCalc_ie6.css',  'ieCond' => 'lte IE 6'],
-        ['path' => 'TalentCalc_ie67.css', 'ieCond' => 'lte IE 7'],
+        ['path' => 'talent.css']
     );
 
     private   $isPetCalc     = false;

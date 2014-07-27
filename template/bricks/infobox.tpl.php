@@ -3,7 +3,26 @@
 if (!empty($this->infobox)):
 ?>
         <tr><th id="infobox-quick-facts"><?php echo Lang::$main['quickFacts']; ?></th></tr>
-        <tr><td><div class="infobox-spacer"></div><div id="infobox-contents0"></div></td></tr>
+        <tr><td>
+            <div class="infobox-spacer"></div>
+            <div id="infobox-contents0"></div>
+            <script type="text/javascript">
+                Markup.printHtml("<?php echo Util::jsEscape($this->infobox); ?>", "infobox-contents0", { allow: Markup.CLASS_STAFF, dbpage: true });
+            </script>
+        </td></tr>
+<?php
+endif;
+
+if (!empty($this->contributions)):
+?>
+        <tr><th id="infobox-contributions"><?php echo Lang::$main['contributions']; ?></th></tr>
+        <tr><td>
+            <div class="infobox-spacer"></div>
+            <div id="infobox-contents1"></div>
+            <script type="text/javascript">
+                Markup.printHtml('<?php echo Util::jsEscape($this->contributions); ?>', 'infobox-contents1', { allow: Markup.CLASS_STAFF });
+            </script>
+        </td></tr>
 <?php
 endif;
 
@@ -27,11 +46,4 @@ else:
     echo "    </table>\n";
 endif;
 
-if (!empty($this->infobox)):
-?>
-    <script type="text/javascript">
-        Markup.printHtml("<?php echo Util::jsEscape($this->infobox); ?>", "infobox-contents0", { allow: Markup.CLASS_STAFF, dbpage: true });
-    </script>
-<?php
-endif;
 ?>

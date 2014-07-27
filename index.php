@@ -25,7 +25,7 @@ switch ($pageCall)
 {
     /* called by user */
     case '':                                                // no parameter given -> MainPage
-        $altClass = 'main';
+        $altClass = 'home';
     case 'account':                                         // account management [nyi]
     case 'achievement':
     case 'achievements':
@@ -114,6 +114,7 @@ switch ($pageCall)
     case 'cookie':                                          // lossless cookies and user settings
     case 'contactus':
     case 'comment':
+    case 'go-to-comment':                                   // find page the comment is on and forward
     case 'locale':                                          // subdomain-workaround, change the language
         if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
         {

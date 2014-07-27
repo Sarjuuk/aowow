@@ -1,3 +1,25 @@
+var l_reputation_names = [
+    '', // 0
+    "Registriertes Konto",
+    "Täglicher Besuch",
+    "Kommentar eingesendet",
+    "Euer Kommentar wurde positiv bewertet",
+    "Euer Kommentar wurde negativ bewertet",
+    "Screenshot eingesendet",
+    "Bewerten",
+    "Daten hochgeladen",
+    "Meldung akzeptiert",
+    "Meldung abgelehnt", // 10
+    "Bronzeerfolg",
+    "Silbererfolg",
+    "Golderfolg",
+    'Test 1',
+    'Test 2',
+    "Leitfaden zugelassen",
+    "Warnung durch Moderator",
+    "Suspendierung durch Moderator"
+];
+
 var mn_classes = [
     [6,"Todesritter",,,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druide",,,{className:"c11",tinyIcon:"class_druid"}],
@@ -875,7 +897,8 @@ var mn_more = [
         [6,"Profiler","?help=profiler"],
         [2,"Screenshots: Tipps & Tricks","?help=screenshots-tips-tricks"],
         [3,"Gewichtung von Werten","?help=stat-weighting"],
-        [4,"Talentrechner","?help=talent-calculator"]
+        [4,"Talentrechner","?help=talent-calculator"],
+        [7,"Markup Guide","?help=markup-guide"]
     ]],
     [7,"Was gibt's Neues?","?whats-new"],
     [,"Tolle Sachen"],
@@ -2362,16 +2385,12 @@ var LANG = {
     lvclass_hero: "Heldenklasse",
 
     lvcomment_add:         "Euren Kommentar hinzufügen",
-// old
-    lvcomment_sort:        "Sortieren nach:  ",
-    lvcomment_sortdate:    "Datum",
-    lvcomment_sortrating:  "Höchstbewertete zuerst",
-// < - >
+
     sort:                  "Sortieren",
     newestfirst_stc:       "Neueste zuerst",
     oldestfirst_stc:       "Älteste zuerst",
     highestrated_stc:      "Höchstbewertete zuerst",
-// new
+
     lvcomment_patchfilter: "Nach Patch sortieren:  ",
     lvcomment_by:          "Von ",
     lvcomment_patch:       "(Patch $1)",
@@ -2388,6 +2407,13 @@ var LANG = {
     lvcomment_reply:       "Antworten",
     lvcomment_report:      "Melden",
     lvcomment_reported:    "Gemeldet!",
+
+    lvcomment_uptodate:                "Zeitgemäß",
+    lvcomment_uptodateresponse:        "Kommentar als zeitgemäß markiert",
+    lvcomment_outofdate:               "Veraltet",
+    lvcomment_outofdateresponse:       "Kommentar wurde als veraltet markiert.",
+    lvcomment_outofdateresponsequeued: "Kommentar wurde zur Veraltet-Warteschlange hinzugefügt.",
+    lvcomment_outofdate_tip:           "Seid Ihr sicher, dass Ihr diesen Kommentar als veraltet markieren möchtet? Wenn so, bitte gebt unten einen Grund dafür an. Missbrauch wird moderiert!",
 
     lvcomment_deleted: " (Gelöscht)",
     lvcomment_purged:  " (Bereinigt)",
@@ -2650,7 +2676,7 @@ var LANG = {
     prompt_nameweightscale: "Bitte gebt einen Namen für diese Gewichtung ein.",
     prompt_tcbuild:         "Kopiert folgende URL, um diesen Talentbaum zu verlinken:",
 
-    genericerror:                      "Ein Fehler trat auf; aktualisiert die Seite und versucht es nochmal. Wenn der Fehler bestehen bleibt, bitte meldet es bei feedback@wowhead.com",
+    genericerror:                      "Ein Fehler trat auf; aktualisiert die Seite und versucht es nochmal. Wenn der Fehler bestehen bleibt, bitte meldet es bei <a href='#contact'>feedback</a>",
 
     tooltip_activeholiday:             "Ereignis findet gerade statt",
     tooltip_achievementcomplete:       "Erfolg wurde von $1 am $3.$2.$4 errungen",
@@ -2723,6 +2749,11 @@ var LANG = {
     tooltip_trainingpoints:            "Trainingspunkte",
     tooltip_uprate:                    "Hilfreich/lustig",
     tooltip_zonelink:                  "Ein Klick auf diesen Link<br />bringt Euch zur Gebietsseite.",
+
+    reputationhistory: "Rufgeschichte",
+    reputationaction:  "Aktion",
+
+    outofdate_stc: "Veraltet",
 
     tab_pettrainer:          "Trainer",
     tab_feedback:            "Rückmeldung",
@@ -2857,6 +2888,35 @@ var LANG = {
     tab_world:               "Welt",
     tab_zones:               "Gebiete",
 
+    numberofupvotesreceived_tip: "Anzahl von positiven Bewertungen erhalten",
+    deletethisreply_stc:         "Antwort löschen",
+    editthisreply_stc:           "Diese Antwort bearbeiten",
+    save:                        "Speichern",
+    reportthisreply_stc:         "Diese Antwort den Moderatoren melden",
+    deletereplyconfirmation_tip: "Seid Ihr sicher, dass Ihr diese Antwort permanent löschen möchtet?",
+    upvote_tip:                  "Dieser Kommentat ist hilfreich (klickt, um rückgängig zu machen)",
+    upvoted_tip:                 "Ihr habt diesen Kommentar positiv bewertet; klickt, um dies rückgängig zu machen",
+    downvote_tip:                "Dieser Kommentar ist nicht hilfreich (klickt, um rückgängig zu machen)",
+    downvote_tip:                "Dieser Kommentar ist nicht hilfreich (klickt, um rückgängig zu machen)",
+    commentdeleted_tip:          "Dieser Kommentar wurde gelöscht; er kann nur noch von Euch und Morderatoren gesehen werden.",
+    addreply:                    "Antwort hinzufügen",
+    replylength1_format:         "Gebt mindestens $1 Zeichen ein",
+    replylength2_format:         "$1 weitere Zeichen&hellip;",
+    replylength3_format:         "$1 Zeichen verbleiben",
+    replylength4_format:         "1 Zeichen verbleibt",
+
+    votelogin_tip:             "Ihr benötigt ein registriertes Konto, um Kommentare bewerten zu können. Bitte <a href=\"/account=signin\">meldet Euch an</a>, oder <a href=\"/account=signup\">registriert Euch</a>.",
+    voteself_tip:              "Ihr könnt Euren eigenen Kommentar nicht bewerten.",
+    votedeleted_tip:           "Gelöschte Kommentare können nicht bewertet werden.",
+    upvotenorep_tip:           "Ihr benötigt wenigstens <b>$1</b> <a href=\"/reputation\">Ruf</a>, um Kommentare positiv bewerten zu können.",
+    downvotenorep_tip:         "Ihr benötigt wenigstens <b>$1</b> <a href=\"/reputation\">Ruf</a>, um Kommentare negativ bewerten zu können.",
+    stickycomment_tip:         "Dieser Kommentar wurde von einem Moderator zu einem Sticky gemacht.",
+    addreply_stc:              "Antwort hinzufügen",
+    show1morereply_stc:        "1 weitere Antwort anzeigen",
+    showmorereplies_format:    "$1 weitere Antworten anzeigen",
+    addshow1morereply_stc:     "1 weitere Antwort anzeigen/hinzufügen",
+    addshowmorereplies_format: "$1 weitere Antworten anzeigen/hinzufügen",
+
     menu_browse: "Durchsuchen",
 
     mapper_tipzoom:  "Tipp:  Klicken, um zu zoomen",
@@ -2956,7 +3016,7 @@ var LANG = {
     markup_toc:     "Inhaltsverzeichnis",
     markup_links:   "Links",
     markup_prompt:  "Bitte gebt die $1-ID ein.",
-    markup_helpdoc: 'Ihr könnt außerdem Datenbank-Links verwenden und den Namen sowie Info automatisch anzeigen lassen.<br />Besucht unsere <a href="?help=wowhead-markup">Markup-Hilfeseite</a> für mehr Informationen.',
+    markup_helpdoc: 'Ihr könnt außerdem Datenbank-Links verwenden und den Namen sowie Info automatisch anzeigen lassen.<br />Besucht unsere <a href="?help=markup-guide">Markup-Hilfeseite</a> für mehr Informationen.',
     markup_help1:   "Was Ihr schreibt:",
     markup_help2:   "Was Ihr seht:",
 
@@ -4174,6 +4234,8 @@ var LANG = {
     stackof_format: "Stapel aus $1: $2%",
 
     charactersremaining_format: "$1 Zeichen verbleiben.",
+
+    reputationtip: "Rufpunkte",
 
     // Context-less terms
     added:       "Hinzugefügt",

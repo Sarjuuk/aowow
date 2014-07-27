@@ -8,12 +8,15 @@ class User
 {
     public static $id           = 0;
     public static $displayName  = '';
-    public static $banStatus    = 0x0;                      // &1: banedIP; &2: banUser; &4: ratingBan; &8: commentBan; &16: disableUpload
+    public static $banStatus    = 0x0;                      // see ACC_BAN_* defines
     public static $groups       = 0x0;
     public static $perms        = 0;
     public static $localeId     = 0;
     public static $localeString = 'enus';
+    public static $avatar       = 'inv_misc_questionmark';
+    public static $dailyVotes   = 0;
 
+    private static $reputation  = 0;
     private static $dataKey     = '';
     private static $expires     = false;
     private static $passHash    = '';
@@ -46,9 +49,10 @@ class User
             return false;
 
         $query = DB::Aowow()->SelectRow('
-            SELECT    a.id, a.passHash, a.displayName, a.locale, a.userGroups, a.userPerms, a.allowExpire, BIT_OR(ab.typeMask) AS bans
+            SELECT    a.id, a.passHash, a.displayName, a.locale, a.userGroups, a.userPerms, a.allowExpire, BIT_OR(ab.typeMask) AS bans, IFNULL(SUM(r.amount), 0) as reputation, a.avatar, a.dailyVotes
             FROM      ?_account a
             LEFT JOIN ?_account_banned ab ON a.id = ab.userId AND ab.end > UNIX_TIMESTAMP()
+            LEFT JOIN ?_account_reputation r ON a.id = r.userId
             WHERE     a.id = ?d
             GROUP     BY a.id',
             $_SESSION['user']
@@ -68,14 +72,58 @@ class User
         self::$displayName = $query['displayName'];
         self::$passHash    = $query['passHash'];
         self::$expires     = (bool)$query['allowExpire'];
+        self::$reputation  = $query['reputation'];
         self::$banStatus   = $query['bans'];
         self::$groups      = $query['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($query['userGroups']);
         self::$perms       = $query['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($query['userPerms']);
+        self::$dailyVotes  = $query['dailyVotes'];
+
+        if ($query['avatar'])
+            self::$avatar = $query['avatar'];
 
         self::setLocale(intVal($query['locale']));          // reset, if changed
 
+        // stuff, that update on daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
+        // - conscutive visits
+        // - votes per day
+        // - reputation for daily visit
+        if (self::$id)
+        {
+            $lastLogin = DB::Aowow()->selectCell('SELECT curLogin FROM ?_account WHERE id = ?d', self::$id);
+            // either the day changed or the last visit was >24h ago
+            if (date('j', $lastLogin) != date('j') || (time() - $lastLogin) > 1 * DAY)
+            {
+                // daily votes (we need to reset this one)
+                self::$dailyVotes = self::getMaxDailyVotes();
+
+                DB::Aowow()->query('
+                    UPDATE  ?_account
+                    SET     dailyVotes = ?d, prevLogin = curLogin, curLogin = UNIX_TIMESTAMP(), prevIP = curIP, curIP = ?
+                    WHERE   id = ?d',
+                    self::$dailyVotes,
+                    $_SERVER['REMOTE_ADDR'],
+                    self::$id
+                );
+
+                // gain rep for daily visit
+                if (!(self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM)))
+                    Util::gainSiteReputation(self::$id, SITEREP_ACTION_DAILYVISIT);
+
+                // increment consecutive visits (next day or first of new month and not more than 48h)
+                // i bet my ass i forgott a corner case
+                if ((date('j', $lastLogin) + 1 == date('j') || (date('j') == 1 && date('n', $lastLogin) != date('n'))) && (time() - $lastLogin) < 2 * DAY)
+                    DB::Aowow()->query('UPDATE ?_account SET consecutiveVisits = consecutiveVisits + 1 WHERE id = ?d', self::$id);
+                else
+                    DB::Aowow()->query('UPDATE ?_account SET consecutiveVisits = 0 WHERE id = ?d', self::$id);
+            }
+        }
+
         return true;
     }
+
+    /****************/
+    /* set language */
+    /****************/
 
     // set and save
     public static function setLocale($set = -1)
@@ -116,11 +164,6 @@ class User
         self::$localeString = self::localeString(self::$localeId);
     }
 
-    public static function isInGroup($group)
-    {
-        return (self::$groups & $group) != 0;
-    }
-
     private static function localeString($loc = -1)
     {
         if (!isset(Util::$localeStrings[$loc]))
@@ -128,6 +171,10 @@ class User
 
         return Util::$localeStrings[$loc];
     }
+
+    /*******************/
+    /* auth mechanisms */
+    /*******************/
 
     public static function Auth($name, $pass)
     {
@@ -279,11 +326,106 @@ class User
         return self::$passHash == self::hashSHA1($pass);
     }
 
+    public static function save()
+    {
+        $_SESSION['user']    = self::$id;
+        $_SESSION['hash']    = self::$passHash;
+        $_SESSION['locale']  = self::$localeId;
+        $_SESSION['timeout'] = self::$expires ? time() + CFG_SESSION_TIMEOUT_DELAY : 0;
+        // $_SESSION['dataKey'] does not depend on user login status and is set in User::init()
+    }
+
+    public static function destroy()
+    {
+        session_regenerate_id(true);                        // session itself is not destroyed; status changed => regenerate id
+        session_unset();
+
+        $_SESSION['locale']  = self::$localeId;             // keep locale
+        $_SESSION['dataKey'] = self::$dataKey;              // keep dataKey
+
+        self::$id           = 0;
+        self::$displayName  = '';
+        self::$perms        = 0;
+        self::$groups       = U_GROUP_NONE;
+    }
+
+    /*********************/
+    /* access management */
+    /*********************/
+
+    public static function isInGroup($group)
+    {
+        return (self::$groups & $group) != 0;
+    }
+
+    public static function canComment()
+    {
+        if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
+            return false;
+
+        return self::$perms || self::$reputation >= CFG_REP_REQ_COMMENT;
+    }
+
+    public static function canUpvote()
+    {
+        if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
+            return false;
+
+        return self::$perms || (self::$reputation >= CFG_REP_REQ_UPVOTE && self::$dailyVotes > 0);
+    }
+
+    public static function canDownvote()
+    {
+        if (!self::$id || self::$banStatus & (ACC_BAN_RATE | ACC_BAN_PERM | ACC_BAN_TEMP))
+            return false;
+
+        return self::$perms || (self::$reputation >= CFG_REP_REQ_DOWNVOTE && self::$dailyVotes > 0);
+    }
+
+    public static function canSupervote()
+    {
+        if (!self::$id || self::$banStatus & (ACC_BAN_RATE | ACC_BAN_PERM | ACC_BAN_TEMP))
+            return false;
+
+        return self::$reputation >= CFG_REP_REQ_SUPERVOTE;
+    }
+
+    public static function isPremium()
+    {
+        return self::isInGroup(U_GROUP_PREMIUM) || self::$reputation >= CFG_REP_REQ_PREMIUM;
+    }
+
+    /**************/
+    /* js-related */
+    /**************/
+
+    public static function decrementDailyVotes()
+    {
+        self::$dailyVotes--;
+        DB::Aowow()->query('UPDATE ?_account SET dailyVotes = ?d WHERE id = ?d', self::$dailyVotes, self::$id);
+    }
+
+    public static function getCurDailyVotes()
+    {
+        return self::$dailyVotes;
+    }
+
+    public static function getMaxDailyVotes()
+    {
+        if (!self::$id || self::$banStatus & (ACC_BAN_PERM | ACC_BAN_TEMP))
+            return 0;
+
+        return CFG_USER_MAX_VOTES + (self::$reputation >= CFG_REP_REQ_VOTEMORE_BASE ? 1 + intVal((self::$reputation - CFG_REP_REQ_VOTEMORE_BASE) / CFG_REP_REQ_VOTEMORE_ADD) : 0);
+    }
+
+    public static function getReputation()
+    {
+        return self::$reputation;
+    }
+
     public static function getUserGlobals()
     {
         $gUser = array(
-            'commentban'  => (bool)(self::$banStatus & ACC_BAN_COMMENT),
-            'ratingban'   => (bool)(self::$banStatus & ACC_BAN_RATE),
             'id'          => self::$id,
             'name'        => self::$displayName,
             'roles'       => self::$groups,
@@ -293,6 +435,14 @@ class User
 
         if (!self::$id || self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM))
             return $gUser;
+
+        $gUser['commentban']        = (bool)(self::$banStatus & ACC_BAN_COMMENT);
+        $gUser['canUpvote']         = self::canUpvote();
+        $gUser['canDownvote']       = self::canDownvote();
+        $gUser['canPostReplies']    = self::canComment();
+        $gUser['superCommentVotes'] = self::canSupervote();
+        $gUser['downvoteRep']       = CFG_REP_REQ_DOWNVOTE;
+        $gUser['upvoteRep']         = CFG_REP_REQ_UPVOTE;
 
         if ($_ = self::getCharacters())
             $gUser['characters'] = $_;
@@ -338,7 +488,7 @@ class User
         return $data;
     }
 
-    public static function getCharacters($asJSON = true)
+    public static function getCharacters()
     {
         // todo: do after profiler
         @include('datasets/ProfilerExampleChar');
@@ -362,7 +512,7 @@ class User
         return $characters;
     }
 
-    public static function getProfiles($asJSON = true)
+    public static function getProfiles()
     {
         // todo =>  do after profiler
         // chars build in profiler
@@ -382,29 +532,6 @@ class User
             $data = DB::Aowow()->selectCol('SELECT name AS ARRAY_KEY, data FROM ?_account_cookies WHERE userId = ?d', self::$id);
 
         return $data;
-    }
-
-    public static function save()
-    {
-        $_SESSION['user']    = self::$id;
-        $_SESSION['hash']    = self::$passHash;
-        $_SESSION['locale']  = self::$localeId;
-        $_SESSION['timeout'] = self::$expires ? time() + CFG_SESSION_TIMEOUT_DELAY : 0;
-        // $_SESSION['dataKey'] does not depend on user login status and is set in User::init()
-    }
-
-    public static function destroy()
-    {
-        session_regenerate_id(true);                        // session itself is not destroyed; status changed => regenerate id
-        session_unset();
-
-        $_SESSION['locale']  = self::$localeId;             // keep locale
-        $_SESSION['dataKey'] = self::$dataKey;              // keep dataKey
-
-        self::$id           = 0;
-        self::$displayName  = '';
-        self::$perms        = 0;
-        self::$groups       = U_GROUP_NONE;
     }
 }
 

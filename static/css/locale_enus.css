@@ -1,20 +1,16 @@
-.topbar-search input.search-database
-{
+.topbar-search input.search-database {
     background: white url(../images/enus/searchdatabase.gif) .2em center no-repeat;
 }
 
-.listview-quicksearch input.search-within-results
-{
+.listview-quicksearch input.search-within-results {
     background: white url(../images/enus/searchwithinresults.gif) .2em center no-repeat;
 }
 
-.listview-quicksearch input.search-within-results2
-{
+.listview-quicksearch input.search-within-results2 {
     background: white url(../images/enus/searchwithinresults2.gif) .2em center no-repeat;
 }
 
-div.modelviewer-quality div
-{
+div.modelviewer-quality div {
     float: left;
     width: 61px;
     height: 22px;
@@ -22,8 +18,7 @@ div.modelviewer-quality div
     background: url(../images/enus/modelviewer-picshures.gif) left center no-repeat;
 }
 
-div.modelviewer-model div
-{
+div.modelviewer-model div {
     margin-left: 40px;
     margin-right: 10px;
     float: left;
@@ -32,84 +27,72 @@ div.modelviewer-model div
     background: url(../images/enus/modelviewer-picshures.gif) -506px center no-repeat;
 }
 
-a.modelviewer-help span
-{
+a.modelviewer-help span {
     display: block;
     width: 52px;
     height: 22px;
     background: url(../images/enus/modelviewer-picshures.gif) -100px center no-repeat;
 }
 
-a:hover.modelviewer-help span
-{
+a:hover.modelviewer-help span {
     background-position: -200px center;
 }
 
-a.modelviewer-close span
-{
+a.modelviewer-close span {
     display: block;
     width: 66px;
     height: 22px;
     background: url(../images/enus/modelviewer-picshures.gif) -300px center no-repeat;
 }
 
-a:hover.modelviewer-close span
-{
+a:hover.modelviewer-close span {
     background-position: -400px center;
 }
 
-a.screenshotviewer-prev b
-{
+a.screenshotviewer-prev b {
     display: block;
     width: 88px;
     height: 22px;
     background: url(../images/enus/screenshotviewer-picshures.gif?2) -200px center no-repeat;
 }
 
-a.screenshotviewer-next b
-{
+a.screenshotviewer-next b {
     display: block;
     width: 53px;
     height: 22px;
     background: url(../images/enus/screenshotviewer-picshures.gif?2) -300px center no-repeat;
 }
 
-a.screenshotviewer-cover span
-{
+a.screenshotviewer-cover span {
     width: 66px;
     height: 22px;
 }
 
-a.screenshotviewer-cover b
-{
+a.screenshotviewer-cover b {
     display: block;
     width: 66px;
     height: 22px;
     background: url(../images/enus/screenshotviewer-picshures.gif?2) -100px center no-repeat;
 }
 
-a.screenshotviewer-original span
-{
+a.screenshotviewer-original span {
     display: block;
     width: 93px;
     height: 22px;
     background: url(../images/enus/screenshotviewer-picshures.gif?2) -400px center no-repeat;
 }
 
-a:hover.screenshotviewer-original span
-{
+a:hover.screenshotviewer-original span {
     background-position: -500px center;
 }
 
-a.screenshotviewer-close span
-{
+a.screenshotviewer-close span {
     display: block;
     width: 66px;
     height: 22px;
     background: url(../images/enus/screenshotviewer-picshures.gif?2) 0 center no-repeat;
 }
 
-a:hover.screenshotviewer-close span
-{
+a:hover.screenshotviewer-close span {
     background-position: -100px center;
 }

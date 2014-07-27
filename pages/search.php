@@ -36,7 +36,7 @@ class SearchPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHETYPE_SEARCH;
     protected $js            = ['swfobject.js'];
-
+    protected $lvTabs        = [];
     protected $search        = '';                          // output
     protected $invalid       = [];
 

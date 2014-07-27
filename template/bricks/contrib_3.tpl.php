@@ -13,15 +13,10 @@ if (User::$id > 0):
             </ul>
 
             <form name="addcomment" action="?comment=add&amp;type=<?php echo $this->type.'&amp;typeid='.$this->typeId; ?>" method="post" onsubmit="return co_validateForm(this)">
-                <div id="replybox-generic" style="display: none">
-                    Antwort zu einem Kommentar von <span></span>. &nbsp;<a href="javascript:;" onclick="co_cancelReply()">Abbrechen</a>
-                    <div class="pad"></div>
-                </div>
                 <div id="funcbox-generic"></div>
-                <script type="text/javascript">Listview.funcBox.coEditAppend($WH.ge('funcbox-generic'), {body: ''}, 1)</script>
+                <script type="text/javascript">Listview.funcBox.coEditAppend($('#funcbox-generic'), {body: ''}, 1)</script>
                 <div class="pad"></div>
                 <input type="submit" value="Absenden"></input>
-                <input type="hidden" name="replyto" value=""></input>
             </form>
 
         </div>

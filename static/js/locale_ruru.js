@@ -1,3 +1,25 @@
+var l_reputation_names = [
+    '', // 0
+    "Зарегистрированный аккаунт",
+    "Ежедневное посещение",
+    "Отправлен комментарий",
+    "Рейтинг вашего комментария увеличился",
+    "Рейтинг вашего комментария уменьшился",
+    "Отправлено изображение",
+    "Голос отдан",
+    "Загружены данные",
+    "Жалоба принята",
+    "Жалоба отклонена", // 10
+    "Бронзовое достижение",
+    "Серебряное достижение",
+    "Золотое достижение",
+    "Test 1",
+    "Test 2",
+    "Гайд одобрен",
+    "Пожаловаться модератору",
+    "[Moderator Suspension]"
+];
+
 var mn_classes = [
     [6,"Рыцарь смерти",,,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Друид",,,{className:"c11",tinyIcon:"class_druid"}],
@@ -875,7 +897,8 @@ var mn_more = [
         [6,"Профили персонажей","?help=profiler"],
         [2,"Скриншоты: Секреты мастерства","?help=screenshots-tips-tricks"],
         [3,"Значимость характеристик","?help=stat-weighting"],
-        [4,"Расчёт талантов","?help=talent-calculator"]
+        [4,"Расчёт талантов","?help=talent-calculator"],
+        [7,"Markup Guide","?help=markup-guide"]
     ]],
     [7,"Новости","?whats-new"],
     [,"Для вашего сайта"],
@@ -2352,16 +2375,12 @@ var LANG = {
     lvclass_hero: "Героический класс",
 
     lvcomment_add:         "Разместить комментарий",
-// old
-    lvcomment_sort:        "Сортировать: ",
-    lvcomment_sortdate:    "По дате",
-    lvcomment_sortrating:  "По рейтингу",
-// < - >
+
     sort:                  "Сортировка",
     newestfirst_stc:       "Сначала новые",
     oldestfirst_stc:       "Сначала старые",
     highestrated_stc:      "По рейтингу",
-// new
+
     lvcomment_patchfilter: "Обновление: ",
     lvcomment_by:          "От ",
     lvcomment_patch:       " (Обновление $1)",
@@ -2378,6 +2397,13 @@ var LANG = {
     lvcomment_reply:       "Ответить",
     lvcomment_report:      "Жалоба",
     lvcomment_reported:    "Получена жалоба!",
+
+    lvcomment_uptodate:                "До настоящего времени",
+    lvcomment_uptodateresponse:        "Комментарий помечен, как актуальный",
+    lvcomment_outofdate:               "Устарело",
+    lvcomment_outofdateresponse:       "Комментарий был помечен, как устаревший.",
+    lvcomment_outofdateresponsequeued: "Комментарий помещен в очередь на удаление как устаревший.",
+    lvcomment_outofdate_tip:           "Вы уверены, что хотите пометить этот комментарий, как устаревший? Если да, укажите причину. Ваша заявка пройдет модерацию.",
 
     lvcomment_deleted: " (Удалено)",
     lvcomment_purged:  " (Удалено)",
@@ -2640,7 +2666,7 @@ var LANG = {
     prompt_nameweightscale: "Введите имя для раскладки значимости характеристик.",
     prompt_tcbuild:         "Скопируйте и вставьте следующий URL, чтобы получить ссылку на эту раскладку:",
 
-    genericerror:                      "Произошла ошибка; обновите страницу и попробуйте снова. Если ситуация повторяется, отправьте сообщение на feedback@wowhead.com",
+    genericerror:                      "Произошла ошибка; обновите страницу и попробуйте снова. Если ситуация повторяется, отправьте сообщение на <a href='#contact'>feedback</a>",
 
     tooltip_activeholiday:             "Событие активно в данный момент",
     tooltip_achievementcomplete:       "Достижение получено $1 $2/$3/$4",
@@ -2713,6 +2739,11 @@ var LANG = {
     tooltip_trainingpoints:            "Очки обучения",
     tooltip_uprate:                    "Высокий",
     tooltip_zonelink:                  "Щелкнув по этой ссылке вы<br />попадете на страницу местности.",
+
+    reputationhistory: "История репутации",
+    reputationaction:  "Действие Репутации",
+
+    outofdate_stc: "Устарело",
 
     tab_pettrainer:          "Учитель",
     tab_feedback:            "Отзыв",
@@ -2847,6 +2878,35 @@ var LANG = {
     tab_world:               "Игровой мир",
     tab_zones:               "Местности",
 
+    numberofupvotesreceived_tip: "Голосов получено",
+    deletethisreply_stc:         "Удалить этот ответ",
+    editthisreply_stc:           "Редактировать этот ответ",
+    save:                        "Сохранить",
+    reportthisreply_stc:         "Отправить этот ответ на модерацию",
+    deletereplyconfirmation_tip: "Вы уверены, что хотите удалить этот ответ без возможности восстановления?",
+    upvote_tip:                  "Этот комментарий полезен (нажмите еще раз, чтобы отменить)",
+    upvoted_tip:                 "Вы проголосовали за повышение этого комментария, нажмите снова для отмены",
+    downvote_tip:                "Этот комментарий бесполезен (нажмите снова для отмены)",
+    downvote_tip:                "Этот комментарий бесполезен (нажмите снова для отмены)",
+    commentdeleted_tip:          "Этот комментарий был удален, теперь он видим только вам и модераторам.",
+    addreply:                    "Ответить",
+    replylength1_format:         "Введите еще по меньшей мере $1 символов",
+    replylength2_format:         "Еще символов требуется: $1",
+    replylength3_format:         "Осталось символов: $1",
+    replylength4_format:         "Осталось символов: 1",
+
+    votelogin_tip:             "Вы должны иметь зарегистрированный аккаунт, чтобы голосовать за комментарии. Пожалуйста, <a href=\"?account=signin\">войдите</a> или <a href=\"?account=signin\">зарегистрируйтесь</a>.",
+    voteself_tip:              "Вы не можете голосовать за свой комментарий.",
+    votedeleted_tip:           "Голосование за удаленные комментарии невозможно.",
+    upvotenorep_tip:           "Вам необходимо иметь по меньшей мере <b>$1</b> <a href=\"/reputation\">репутации</a>, чтобы голосовать за комментарии.",
+    downvotenorep_tip:         "Вам нужно еще по меньшей мере <b>$1</b> <a href=\"/reputation\">репутации</a>, чтобы понижать комментарии.",
+    stickycomment_tip:         "Этот комментарий был закреплен модератором.",
+    addreply_stc:              "Ответить",
+    show1morereply_stc:        "Показать еще один ответ",
+    showmorereplies_format:    "Показать еще $1 комментариев",
+    addshow1morereply_stc:     "Добавить / показать еще комментарии",
+    addshowmorereplies_format: "Добавить / Показать еще $1 комментариев",
+
     menu_browse: "Просмотр",
 
     mapper_tipzoom:  "Щелкните по карте для увеличения",
@@ -2946,7 +3006,7 @@ var LANG = {
     markup_toc:     "Содержание",
     markup_links:   "Ссылки",
     markup_prompt:  "Введите ID для создания ссылки на $1.",
-    markup_helpdoc: "Вы также можете добавить ссылки из базы данных с автоматической подстановкой имен и другой информации.<br />Чтобы узнать больше, посетите нашу <a href=\"/help=wowhead-markup\">страницу помощи</a>.",
+    markup_helpdoc: "Вы также можете добавить ссылки из базы данных с автоматической подстановкой имен и другой информации.<br />Чтобы узнать больше, посетите нашу <a href=\"/help=markup-guide\">страницу помощи</a>.",
     markup_help1:   "До",
     markup_help2:   "После",
 
@@ -4125,6 +4185,8 @@ var LANG = {
     stackof_format: "$1 предмет: $2%",
 
     charactersremaining_format: "Осталось символов: $1",
+
+    reputationtip: "Очки репутации",
 
     // Context-less terms
     added:       "Добавлено",

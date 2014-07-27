@@ -1,5 +1,4 @@
-#layers
-{
+#layers {
     text-align: left;
     color: #ffffff;
     font-family: "Arial", sans-serif;
@@ -17,14 +16,14 @@
 
 .wowhead-tooltip th { height: auto; padding: 3px; vertical-align: top; }
 .wowhead-tooltip td { padding: 8px 4px 1px 9px; text-align: left; vertical-align: top; }
-.wowhead-tooltip b  { font-size: 14px; line-height: 19px; font-weight: normal; }
+.wowhead-tooltip b { font-size: 14px; line-height: 19px; font-weight: normal; }
 
 .wowhead-tooltip div.indent { padding-left: .6em; }
 .wowhead-tooltip td th, .wowhead-tooltip td td { background: none; }
 .wowhead-tooltip td th { padding: 0 0 0 4em; text-align: right; font-weight: normal; }
 .wowhead-tooltip td td { padding: 0; text-align: left; }
 
-.wowhead-tooltip p     { position: absolute; left: -44px; top: -1px; width: 44px; height: 44px; background: 4px 4px no-repeat; margin: 0; padding: 0; }
+.wowhead-tooltip p    { position: absolute; left: -44px; top: -1px; width: 44px; height: 44px; background: 4px 4px no-repeat; margin: 0; padding: 0; }
 .wowhead-tooltip p div { width: 44px; height: 44px; background-image: url(../images/Icon/medium/border/default.png); }
 
 .wowhead-tooltip table.shrink b { font-size: 12px; line-height: 15px; }
@@ -181,12 +180,12 @@ a span.moneyitem, a span.moneysocketmeta, a span.moneysocketred, a span.moneysoc
     -webkit-border-radius: 5px;
     border-radius: 5px;
     padding: 15px;
-    background:url(../images/blk.png) repeat;
+    background:url(../images/ui/blk.png) repeat;
 }
 
 .message-box .close {
     text-indent: -9999px;
-    background:url(../images/close.png) no-repeat;
+    background:url(../images/icons/close.png) no-repeat;
     width: 10px;
     height: 10px;
     position: absolute;

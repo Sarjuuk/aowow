@@ -24,6 +24,7 @@ define('TYPE_CLASS',                        13);
 define('TYPE_RACE',                         14);
 define('TYPE_SKILL',                        15);
 define('TYPE_CURRENCY',                     17);
+define('TYPE_USER',                         100);           // internal use only
 
 define('CACHETYPE_NONE',                    0);             // page will not be cached
 define('CACHETYPE_PAGE',                    1);
@@ -52,9 +53,32 @@ define('ACC_STATUS_RECOVER_PASS',           3);             // currently recover
 define('ACC_BAN_NONE',                      0x00);          // all clear
 define('ACC_BAN_TEMP',                      0x01);
 define('ACC_BAN_PERM',                      0x02);
-define('ACC_BAN_RATE',                      0x04);          // cannot rate community items
-define('ACC_BAN_COMMENT',                   0x08);          // cannot create comments
-define('ACC_BAN_UPLOAD',                    0x10);          // cannot upload screenshots / suggest videos
+define('ACC_BAN_RATE',                      0x04);          // cannot rate community items (overrides site reputation)
+define('ACC_BAN_COMMENT',                   0x08);          // cannot comment and reply
+define('ACC_BAN_UPLOAD',                    0x10);          // cannot upload avatar / signature files
+define('ACC_BAN_SCREENSHOT',                0x20);          // cannot upload screenshots
+define('ACC_BAN_VIDEO',                     0x40);          // cannot suggest videos
+// define('ACC_BAN_FORUM',                  0x80);          // cannot use forums (not used here)
+
+// Site Reputation/Priviledges
+define('SITEREP_ACTION_REGISTER',           1);             // Registered account
+define('SITEREP_ACTION_DAILYVISIT',         2);             // Daily visit
+define('SITEREP_ACTION_COMMENT',            3);             // Posted comment
+define('SITEREP_ACTION_UPVOTED',            4);             // Your comment was upvoted
+define('SITEREP_ACTION_DOWNVOTED',          5);             // Your comment was downvoted
+define('SITEREP_ACTION_UPLOAD',             6);             // Submitted screenshot (suggested video)
+                                                            // Cast vote
+                                                            // Uploaded data
+define('SITEREP_ACTION_GOOD_REPORT',        9);             // Report accepted
+define('SITEREP_ACTION_BAD_REPORT',         10);            // Report declined
+                                                            // Copper Achievement
+                                                            // Silver Achievement
+                                                            // Gold Achievement
+                                                            // Test 1
+                                                            // Test 2
+define('SITEREP_ACTION_ARTICLE',            16);            // Guide approved (article approved)
+define('SITEREP_ACTION_USER_WARNED',        17);            // Moderator Warning
+define('SITEREP_ACTION_USER_SUSPENDED',     18);            // Moderator Suspension
 
 // Auth Result
 define('AUTH_OK',                           0);
@@ -93,7 +117,7 @@ define('U_GROUP_SALESAGENT',                0x0400);
 define('U_GROUP_SCREENSHOT',                0x0800);
 define('U_GROUP_VIDEO',                     0x1000);
 // define('U_GROUP_APIONLY,                 0x2000);        // the heck..?
-// define('U_GROUP_PENDING,                 0x4000);
+// define('U_GROUP_PENDING,                 0x4000);        // would restrict some markup like urls
 
 define('U_GROUP_STAFF',                     (U_GROUP_ADMIN|U_GROUP_EDITOR|U_GROUP_MOD|U_GROUP_BUREAU|U_GROUP_DEV|U_GROUP_BLOGGER|U_GROUP_LOCALIZER|U_GROUP_SALESAGENT));
 define('U_GROUP_EMPLOYEE',                  (U_GROUP_ADMIN|U_GROUP_BUREAU|U_GROUP_DEV));
@@ -539,10 +563,10 @@ define('ITEM_MOD_STRENGTH',                 4);
 define('ITEM_MOD_INTELLECT',                5);
 define('ITEM_MOD_SPIRIT',                   6);
 define('ITEM_MOD_STAMINA',                  7);
-define('ITEM_MOD_ENERGY' ,                  8);             // powers v
-define('ITEM_MOD_RAGE' ,                    9);
-define('ITEM_MOD_FOCUS' ,                   10);
-define('ITEM_MOD_RUNIC_POWER' ,             11);
+define('ITEM_MOD_ENERGY',                   8);             // powers v
+define('ITEM_MOD_RAGE',                     9);
+define('ITEM_MOD_FOCUS',                    10);
+define('ITEM_MOD_RUNIC_POWER',              11);
 define('ITEM_MOD_DEFENSE_SKILL_RATING',     12);            // ratings v
 define('ITEM_MOD_DODGE_RATING',             13);
 define('ITEM_MOD_PARRY_RATING',             14);

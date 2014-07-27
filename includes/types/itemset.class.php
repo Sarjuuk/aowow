@@ -81,6 +81,10 @@ class ItemsetList extends BaseType
         if ($this->pieceToSet && ($addMask & GLOBALINFO_SELF))
             $data[TYPE_ITEM] = array_combine(array_keys($this->pieceToSet), array_keys($this->pieceToSet));
 
+        if ($addMask & GLOBALINFO_SELF)
+            foreach ($this->iterate() as $id => $__)
+                $data[TYPE_ITEMSET][$id] = ['name' => $this->getField('name', true)];
+
         return $data;
     }
 

@@ -1,0 +1,72 @@
+.stafffooter {
+    margin-top:150px;
+    background-color:#141414;
+    border-top:1px solid #404040;
+    padding:10px;
+    color:#fff;
+}
+
+.stafffooter h3 {
+    font-size:15px;
+    margin:1.5em 0 .5em 0;
+    padding:0;
+}
+
+.stafffooter small {
+    font-size:11px;
+}
+
+.stafffooter a {
+    color:#ffd100;
+}
+
+.stafffooter a.disclosure-on,.stafffooter a.disclosure-off {
+    color:#fff;
+    font-weight:bold;
+}
+
+.stafffooter-dev {
+    text-align:center;
+}
+
+#db-check-consistency #status-success {
+    color:#1EFF00;
+}
+
+#db-check-consistency #status-errors,#db-check-consistency #status-failed {
+    color:#F00;
+}
+
+#db-check-consistency #status-progress {
+    color:#FFF468;
+}
+
+#db-check-consistency #status-progress span {
+    background:url(../images/icons/ajax.gif) no-repeat right center;
+    padding-right:18px;
+}
+
+#db-check-consistency fieldset {
+    width:80%;
+    margin-bottom:1em;
+    border:1px #CCC solid;
+    padding:.35em .625em .75em;
+    padding-right:1.1em;
+}
+
+#db-check-consistency fieldset legend {
+    border:medium none;
+    float:none;
+    height:auto;
+    padding-left:2px;
+    padding-right:2px;
+    position:static;
+    white-space:nowrap;
+    font-size:120%;
+    font-weight:bold;
+    color:white;
+}
+
+#db-check-consistency textarea {
+    width:100%;
+}

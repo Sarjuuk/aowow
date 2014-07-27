@@ -20,14 +20,14 @@
 #tc-classes .iconmedium {
     float:left;
     margin-right:2px;
-	margin-bottom:2px;
+    margin-bottom:2px;
     opacity:.6666;
-	filter:alpha(opacity=66);
+    filter:alpha(opacity=66);
 }
 
 #tc-classes .iconmedium-gold-selected {
     opacity: 1;
-	filter:alpha(opacity=100);
+    filter:alpha(opacity=100);
 }
 
 #tc-classes.choose {
@@ -47,5 +47,5 @@
 
 #tc-classes.choose .iconmedium {
     opacity:1;
-	filter:alpha(opacity=100);
+    filter:alpha(opacity=100);
 }

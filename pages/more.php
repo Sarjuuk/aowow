@@ -16,7 +16,7 @@ class MorePage extends GenericPage
     protected $mode          = CACHETYPE_NONE;
     protected $js            = ['swfobject.js'];
 
-    private   $subPages      = [ -13 => ['commenting-and-you', 'modelviewer', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'item-comparison', 'profiler']];
+    private   $subPages      = [ -13 => ['commenting-and-you', 'modelviewer', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'item-comparison', 'profiler', 'markup-guide']];
     private   $validPages    = array(                       // [type, typeId, name]
         'whats-new'     => [ -7,    0, "What's New"],
         'searchbox'     => [-16,    0, 'Search Box'],

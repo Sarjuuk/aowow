@@ -113,14 +113,17 @@ class AccountPage extends GenericPage
                     else
                     {
                         $nStep = 1.5;
-                        $this->text = sprintf(Lang::$account['createAccSent']. $_POST['email']);
+                        $this->text = sprintf(Lang::$account['createAccSent'], $_POST['email']);
                     }
                 }
-                else if (!empty($_GET['token']) && DB::Aowow()->query('SELECT 1 FROM ?_account WHERE status = ?d AND token = ?', ACC_STATUS_NEW, $_GET['token']))
+                else if (!empty($_GET['token']) && ($newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE status = ?d AND token = ?', ACC_STATUS_NEW, $_GET['token'])))
                 {
                     $nStep = 2;
                     DB::Aowow()->query('UPDATE ?_account SET status = ?d WHERE token = ?', ACC_STATUS_OK, $_GET['token']);
                     DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, ?d + 1, UNIX_TIMESTAMP() + ?d)', $_SERVER['REMOTE_ADDR'], CFG_FAILED_AUTH_COUNT, CFG_FAILED_AUTH_EXCLUSION);
+
+                    Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
+
                     $this->text = sprintf(Lang::$account['accActivated'], $_GET['token']);
                 }
                 else
@@ -165,8 +168,9 @@ class AccountPage extends GenericPage
         foreach (Lang::$account['groups'] as $idx => $key)
             if ($idx >= 0 && $user['userGroups'] & (1 << $idx))
                 $groups[] = (!fMod(count($groups) + 1, 3) ? '[br]' : null).Lang::$account['groups'][$idx];
-
         $infobox[] = Lang::$account['userGroups'].Lang::$main['colon'].($groups ? implode(', ', $groups) : Lang::$account['groups'][-1]);
+        $infobox[] = Util::ucFirst(Lang::$main['siteRep']).Lang::$main['colon'].User::getReputation();
+
 
         $this->infobox = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
 
@@ -193,6 +197,67 @@ class AccountPage extends GenericPage
         /* Listview */
         /************/
 
+        $this->lvTabs = [];
+        $this->forceTabs = true;
+
+        // Reputation changelog (params only for comment-events)
+        if ($repData = DB::Aowow()->select('SELECT action, amount, date AS \'when\', IF(action IN (3, 4, 5), sourceA, 0) AS param FROM ?_account_reputation WHERE userId = ?d', User::$id))
+        {
+            foreach ($repData as &$r)
+                $r['when'] = date(Util::$dateFormatInternal, $r['when']);
+
+            $this->lvTabs[] = array(
+                'file'   => 'reputationhistory',
+                'data'   => $repData,
+                'params' => []
+            );
+        }
+
+        // comments
+        if ($_ = CommunityContent::getCommentPreviews(['user' => User::$id, 'replies' => false]))
+        {
+            // needs foundCount for params
+            // _totalCount: 377,
+            // note: $WH.sprintf(LANG.lvnote_usercomments, 377),
+
+            $this->lvTabs[] = array(
+                'file'   => 'commentpreview',
+                'data'   => $_,
+                'params' => array(
+                    'hiddenCols'     => "$['author']",
+                    'onBeforeCreate' =>  '$Listview.funcBox.beforeUserComments'
+                )
+            );
+        }
+
+        // replies
+        if ($_ = CommunityContent::getCommentPreviews(['user' => User::$id, 'replies' => true]))
+        {
+            // needs commentid (parentComment) for data
+            // needs foundCount for params
+            // _totalCount: 377,
+            // note: $WH.sprintf(LANG.lvnote_usercomments, 377),
+
+            $this->lvTabs[] = array(
+                'file'   => 'replypreview',
+                'data'   => $_,
+                'params' => array(
+                    'hiddenCols' => "$['author']"
+                )
+            );
+        }
+
+/*
+<div id="description" class="left"><div id="description-generic"></div>
+
+<script type="text/javascript">//<![CDATA[
+Markup.printHtml("description text here", "description-generic", { allow: Markup.CLASS_PREMIUM, roles: "256" });
+//]]></script>
+
+</div>
+<script type="text/javascript">us_addDescription()</script>
+
+*/
         // claimed characters
         // profiles
         // own screenshots
@@ -200,7 +265,6 @@ class AccountPage extends GenericPage
         // own comments (preview)
         // articles guides..?
 
-        $this->lvData = [];
 
         // cpmsg    change pass messaeg class:failure|success, msg:blabla
     }
@@ -262,8 +326,10 @@ class AccountPage extends GenericPage
                     $doExpire,
                     $username
                 );
+
                 if (User::init())
                     User::save();                           // overwrites the current user
+
                 return;
             case AUTH_BANNED:
                 if (User::init())
@@ -295,14 +361,14 @@ class AccountPage extends GenericPage
         $doExpire  = @$_POST['remember_me'] != 'yes';
 
         // check username
-        if (strlen($username) > 4 || strlen($username) < 16)
+        if (strlen($username) < 4 || strlen($username) > 16)
             return Lang::$account['errNameLength'];
 
         if (preg_match('/[^\w\d]/i', $username))
             return Lang::$account['errNameChars'];
 
         // check password
-        if (strlen($password) > 6 || strlen($password) < 16)
+        if (strlen($password) < 6 || strlen($password) > 16)
             return Lang::$account['errPassLength'];
 
         // if (preg_match('/[^\w\d!"#\$%]/', $password))    // such things exist..? :o

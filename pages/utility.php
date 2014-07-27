@@ -69,7 +69,7 @@ class UtilityPage extends GenericPage
             case 'latest-comments':
                 $this->lvTabs[] = array(
                     'file'   => 'commentpreview',
-                    'data'   => [],
+                    'data'   => CommunityContent::getCommentPreviews(),
                     'params' => []
                 );
                 break;
@@ -138,19 +138,30 @@ class UtilityPage extends GenericPage
 
     protected function generateRSS()
     {
+        $this->generateContent();
+
         $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
-            "<rss version=\"2.0\">\n\t<channel>\n".
-            "\t\t<title>".CFG_NAME_SHORT.' - '.$this->name."</title>\n".
-            "\t\t<link>".HOST_URL.'?'.$this->page . ($this->category ? '='.$this->category[0] : null)."</link>\n".
-            "\t\t<description>".CFG_NAME."</description>\n".
-            "\t\t<language>".implode('-', str_split(User::$localeString, 2))."</language>\n".
-            "\t\t<ttl>".CFG_TTL_RSS."</ttl>\n".
-            "\t\t<lastBuildDate>".date(DATE_RSS)."</lastBuildDate>\n".
-            "\t</channel>\n";
+            "<rss version=\"2.0\">\n<channel>\n".
+            "<title>".CFG_NAME_SHORT.' - '.$this->name."</title>\n".
+            "<link>".HOST_URL.'?'.$this->page . ($this->category ? '='.$this->category[0] : null)."</link>\n".
+            "<description>".CFG_NAME."</description>\n".
+            "<language>".implode('-', str_split(User::$localeString, 2))."</language>\n".
+            "<ttl>".CFG_TTL_RSS."</ttl>\n".
+            "<lastBuildDate>".date(DATE_RSS)."</lastBuildDate>\n";
 
-        # generate <item>'s here
+        foreach ($this->lvTabs[0]['data'] as $row)
+        {
+            $xml .= "<item>\n".
+                "<title><![CDATA[".$row['subject']."]]></title>\n".
+                "<link>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</link>\n".
+                "<description><![CDATA[".$row['preview']." ".sprintf(Lang::$timeUnits['ago'], Util::formatTime($row['elapsed'] * 100, true))."]]></description>\n". // todo (low): preview should be html-formated
+                "<pubDate>".date(DATE_RSS, time() - $row['elapsed'])."</pubDate>\n".
+                "<guid>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</guid>\n".
+                "<domain />\n".
+                "</item>\n";
+        }
 
-        $xml .= '</rss>';
+        $xml .= "</channel>\n</rss>";
 
         return $xml;
     }

@@ -1431,9 +1431,6 @@ class SpellPage extends GenericPage
     {
         // proc data .. maybe use more information..?
         $procData = DB::Aowow()->selectRow('SELECT IF(ppmRate > 0, -ppmRate, customChance) AS chance, cooldown FROM world.spell_proc_event WHERE entry = ?d', $this->typeId);
-        if (empty($procData['chance']))
-            $procData['chance'] = $this->subject->getField('procChance');
-
         if (!isset($procData['cooldown']))
             $procData['cooldown'] = 0;
 
@@ -1514,12 +1511,17 @@ class SpellPage extends GenericPage
             if ($_ = $this->subject->getField('effect'.$i.'Mechanic'))
                 $foo['mechanic'] = Lang::$game['me'][$_];
 
-            if ($procData['chance'] && $procData['chance'] < 100)
-                if (in_array($i, $this->subject->canTriggerSpell()))
-                    $foo['procData'] = array(
-                        $procData['chance'],
-                        $procData['cooldown'] ? Util::formatTime($procData['cooldown'] * 1000, true) : null
-                    );
+            if (!empty($procData['chance']) && $procData['chance'] < 100)
+                $foo['procData'] = array(
+                    $procData['chance'],
+                    $procData['cooldown'] ? Util::formatTime($procData['cooldown'] * 1000, true) : null
+                );
+            else if (in_array($i, $this->subject->canTriggerSpell()) && $this->subject->getField('procChance'))
+                $foo['procData'] = array(
+                    $this->subject->getField('procChance'),
+                    $procData['cooldown'] ? Util::formatTime($procData['cooldown'] * 1000, true) : null
+                );
+
 
             // parse masks and indizes
             switch ($effId)

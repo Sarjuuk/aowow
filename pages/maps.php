@@ -17,8 +17,7 @@ class MapsPage extends GenericPage
     );
     protected $css           = array(
         ['string' => 'zone-picker { margin-left: 4px }'],
-        ['path' => 'Mapper.css'],
-        ['path' => 'Mapper_ie6.css', 'ieCond' => 'lte IE 6']
+        ['path' => 'Mapper.css']
     );
 
     public function __construct($pageCall, $__)

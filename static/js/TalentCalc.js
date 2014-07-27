@@ -863,7 +863,6 @@ function TalentCalc() {
             _.className = 'talentcalc-lower-tree' + (tree + 1);
 
             __ = $WH.ce('p');
-            __.className = 'rcorners';
             $WH.ae(__, $WH.ce('b'));
             $WH.ae(__, $WH.ce('span'));
             ___ = $WH.ce('a');
@@ -948,7 +947,7 @@ function TalentCalc() {
             ___;
 
         _divSidebar = $WH.ce('div');
-        _divSidebar.className = 'talentcalc-sidebar rcorners';
+        _divSidebar.className = 'talentcalc-sidebar';
 
         sidebarDivInner = $WH.ce('div');
         sidebarDivInner.className = 'talentcalc-sidebar-inner';
@@ -1350,7 +1349,7 @@ function TalentCalc() {
             __;
 
         _divUpper = $WH.ce('div');
-        _divUpper.className = 'talentcalc-upper rcorners';
+        _divUpper.className = 'talentcalc-upper';
         _divUpper.style.display = 'none';
 
         _ = $WH.ce('span');

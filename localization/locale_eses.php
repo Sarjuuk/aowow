@@ -15,13 +15,13 @@ $lang = array(
         'sg'            => ["año",  "mes",   "semana",  "día",  "hora",  "minuto",  "segundo",  "milisegundo"],
         'pl'            => ["años", "meses", "semanas", "dias", "horas", "minutos", "segundos", "milisegundos"],
         'ab'            => ["año",  "mes",   "sem",     "",     "h",     "min",     "seg",      "ms"],
+        'ago'           => 'hace %s'
     ),
     'main' => array(
         'name'          => "nombre",
         'link'          => "Enlace",
         'signIn'        => "Iniciar sesión / Registrarse",
         'jsError'       => "Por favor, asegúrese de que ha habilitado javascript.",
-        'searchButton'  => "búsqueda",
         'language'      => "lengua",
         'feedback'      => "Feedback",
         'numSQL'        => "Número de consultas de MySQL",
@@ -46,6 +46,8 @@ $lang = array(
         'login'         => "[Login]",
         'forum'         => "Foro",
         'n_a'           => "n/d",
+        'siteRep'       => "Reputación",
+        'aboutUs'       => "Sobre Aowow",
 
         // filter
         'extSearch'     => "Extender búsqueda",
@@ -115,11 +117,12 @@ $lang = array(
         'help'          => "Ayuda",
         'helpTopics'    => array(
             "Los comentarios y tú",                 "Visualizador de modelos",              "Capturas de pantalla: Sugerencias y trucos", "Medición de atributos",
-            "Calculadora de talentos",              "Comparación de objetos",               "Perfiles"
+            "Calculadora de talentos",              "Comparación de objetos",               "Perfiles",                                   "Markup Guide"
         ),
 
         // search
         'search'        => "Búsqueda",
+        'searchButton'  => "búsqueda",
         'foundResult'   => "Resultados de busqueda para",
         'noResult'      => "Ningún resultado para",
         'tryAgain'      => "Por favor, introduzca otras palabras claves o verifique el término ingresado.",
@@ -128,7 +131,12 @@ $lang = array(
         // formating
         'colon'         => ': ',
         'dateFmtShort'  => "d/m/Y",
-        'dateFmtLong'   => "d/m/Y \a \l\a\s H:i"
+        'dateFmtLong'   => "d/m/Y \a \l\a\s H:i",
+
+        // error
+        'genericError'  => "Ha ocurrido un error; refresca la página e inténtalo de nuevo. Si el error persiste manda un correo a <a href='#contact'>feedback</a>", # LANG.genericerror
+        'bannedRating'  => "Has sido baneado y no podrás valorar comentarios.", # LANG.tooltip_banned_rating
+        'tooManyVotes'  => "Has alcanzado el límite diario de votos. Vuelve mañana." # LANG.tooltip_too_many_votes
     ),
     'game' => array(
         'achievement'   => "logro",

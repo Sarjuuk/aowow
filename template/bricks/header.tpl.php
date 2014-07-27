@@ -4,26 +4,19 @@
 <?php $this->brick('head'); ?>
 </head>
 
-<body>
+<body<?php echo User::isPremium() ? ' class="premium-logo"' : null; ?>>
 <div id="layers"></div>
-<!--[if lte IE 6]><table id="ie6layout"><tr><th class="ie6layout-th"></th><td id="ie6layout-td"><div id="ie6layout-div"></div><![endif]-->
-<div id="layout">
-    <div id="header">
+<div class="layout nosidebar" id="layout">
+    <div class="layout-inner" id="layout-inner">
+    <div class="header" id="header">
         <div id="header-logo">
-            <a href="."></a>
+            <a class="header-logo" href="."></a>
             <h1><?php echo htmlentities($this->name); ?></h1>
         </div>
     </div>
-    <div id="wrapper" class="nosidebar">
-        <div id="toptabs">
-            <div id="toptabs-inner">
-                <div id="toptabs-right">
-<?php $this->brick('headerMenu'); ?>
-                </div>
-                <div id="toptabs-generic"></div>
-                <div class="clear"></div>
-            </div>
-        </div>
+    <div id="wrapper" class="wrapper">
+        <div class="toplinks linklist"><?php $this->brick('headerMenu'); ?></div>
+        <div class="toptabs" id="toptabs"></div>
         <div class="topbar" id="topbar">
             <div class="topbar-search"><form action="."><a href="javascript:;"></a><input name="search" size="35" value="" id="livesearch-generic" /></form></div>
             <div class="topbar-browse" id="topbar-browse"></div>

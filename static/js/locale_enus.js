@@ -1,3 +1,25 @@
+var l_reputation_names = [
+    '', // 0
+    "Registered account",
+    "Daily visit",
+    "Posted comment",
+    "Your comment was upvoted",
+    "Your comment was downvoted",
+    "Submitted screenshot",
+    "Cast vote",
+    "Uploaded data",
+    "Report accepted",
+    "Report declined", // 10
+    "Copper Achievement",
+    "Silver Achievement",
+    "Gold Achievement",
+    'Test 1',
+    'Test 2',
+    "Guide approved",
+    "Moderator Warning",
+    "Moderator Suspension"
+];
+
 var mn_classes = [
     [6,"Death Knight",,,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druid",,,{className:"c11",tinyIcon:"class_druid"}],
@@ -921,7 +943,8 @@ var mn_more = [
         [6,"Profiler","?help=profiler"],
         [2,"Screenshots: Tips & Tricks","?help=screenshots-tips-tricks"],
         [3,"Stat Weighting","?help=stat-weighting"],
-        [4,"Talent Calculator","?help=talent-calculator"]
+        [4,"Talent Calculator","?help=talent-calculator"],
+        [7,"Markup Guide","?help=markup-guide"]
     ]],
     [7,"What's New","?whats-new"],
     [,"Goodies"],
@@ -2408,16 +2431,12 @@ var LANG = {
     lvclass_hero: "Hero class",
 
     lvcomment_add:         "Add your comment",
-// old
-    lvcomment_sort:        "Sort by: ",
-    lvcomment_sortdate:    "Date",
-    lvcomment_sortrating:  "Highest rated first",
-// < - >
+
     sort:                  "Sort",
     newestfirst_stc:       "Newest first",
     oldestfirst_stc:       "Oldest first",
-    highestrated_stc:      "Highest rated",
-// new
+    highestrated_stc:      "Highest rated first",
+
     lvcomment_patchfilter: "Filter by patch: ",
     lvcomment_by:          "By ",
     lvcomment_patch:       " (Patch $1)",
@@ -2434,6 +2453,13 @@ var LANG = {
     lvcomment_reply:       "Reply",
     lvcomment_report:      "Report",
     lvcomment_reported:    "Reported!",
+
+    lvcomment_uptodate:                "Up to Date",
+    lvcomment_uptodateresponse:        "Comment marked as current",
+    lvcomment_outofdate:               "Out of Date",
+    lvcomment_outofdateresponse:       "Comment has been marked as out of date.",
+    lvcomment_outofdateresponsequeued: "Comment added to out of date queue.",
+    lvcomment_outofdate_tip:           "Are you sure you want to mark this comment as out of date? If so, enter a reason below. Abuse is subject to moderation! ",
 
     lvcomment_deleted: " (Deleted)",
     lvcomment_purged:  " (Purged)",
@@ -2696,7 +2722,7 @@ var LANG = {
     prompt_nameweightscale: "Please provide a name for this weight scale.",
     prompt_tcbuild:         "Copy and paste the following URL to link to this build:",
 
-    genericerror:                      "An error has occurred; refresh the page and try again. If the error persists email feedback@wowhead.com",
+    genericerror:                      'An error has occurred; refresh the page and try again. If the error persists email <a href="#contact">feedback</a>',
 
     tooltip_activeholiday:             "Event is currently in progress",
     tooltip_achievementcomplete:       "Achievement earned by $1 on $2/$3/$4",
@@ -2769,6 +2795,11 @@ var LANG = {
     tooltip_trainingpoints:            "Training points",
     tooltip_uprate:                    "Insightful/funny",
     tooltip_zonelink:                  "Clicking on this link will<br />take you to the zone page.",
+
+    reputationhistory: "Reputation History",
+    reputationaction:  "Reputation Action",
+
+    outofdate_stc: "Out of date",
 
     tab_pettrainer:          "Trainer",
     tab_feedback:            "Feedback",
@@ -2903,6 +2934,35 @@ var LANG = {
     tab_world:               "World",
     tab_zones:               "Zones",
 
+    numberofupvotesreceived_tip: "Number of upvotes received",
+    deletethisreply_stc:         "Delete this reply",
+    editthisreply_stc:           "Edit this reply",
+    save:                        "Save",
+    reportthisreply_stc:         "Report this reply to the moderators",
+    deletereplyconfirmation_tip: "Are you sure you want to permanently delete this reply?",
+    upvote_tip:                  "This comment is helpful (click again to undo)",
+    upvoted_tip:                 "You have upvoted this comment; click again to undo",
+    downvote_tip:                "This comment is not helpful (click again to undo)",
+    downvote_tip:                "This comment is not helpful (click again to undo)",
+    commentdeleted_tip:          "This comment has been deleted; it is now visible only to you and to moderators.",
+    addreply:                    "Add reply",
+    replylength1_format:         "Enter at least $1 characters",
+    replylength2_format:         "$1 to go&hellip;",
+    replylength3_format:         "$1 characters remaining",
+    replylength4_format:         "1 character remaining",
+
+    votelogin_tip:             "You must have a registered account to vote on comments. Please <a href=\"?account=signin\">log in</a> or <a href=\"?account=signup\">register</a>.",
+    voteself_tip:              "You can't vote your own comment.",
+    votedeleted_tip:           "Deleted comments cannot be voted on.",
+    upvotenorep_tip:           "You need at least <b>$1</b> <a href=\"?reputation\">reputation</a> to upvote comments.",
+    downvotenorep_tip:         "You need at least <b>$1</b> <a href=\"?reputation\">reputation</a> to downvote comments.",
+    stickycomment_tip:         "This comment has been made sticky by a moderator.",
+    addreply_stc:              "Add reply",
+    show1morereply_stc:        "Show 1 more reply",
+    showmorereplies_format:    "Show $1 more replies",
+    addshow1morereply_stc:     "Add / Show 1 more reply",
+    addshowmorereplies_format: "Add / Show $1 more replies",
+
     menu_browse: "Browse",
 
     mapper_tipzoom:  "Tip: Click map to zoom",
@@ -3002,7 +3062,7 @@ var LANG = {
     markup_toc:     "Table of Contents",
     markup_links:   "Links",
     markup_prompt:  "Please enter the ID of the $1.",
-    markup_helpdoc: 'You can also add database links and have the name and info entered automatically.<br />For more information, please see our <a href="?help=wowhead-markup">markup help document</a>.',
+    markup_helpdoc: 'You can also add database links and have the name and info entered automatically.<br />For more information, please see our <a href="?help=markup-guide">markup help document</a>.',
     markup_help1:   "You type:",
     markup_help2:   "You see:",
 
@@ -4219,6 +4279,8 @@ var LANG = {
     stackof_format: "Stack of $1: $2%",
 
     charactersremaining_format: "$1 characters remaining.",
+
+    reputationtip: "Reputation points",
 
     // Context-less terms
     added:       "Added",

@@ -230,7 +230,7 @@ a.talentcalc-button-summary {
 .talentcalc-arrow-rightdown  td { background-image:url(../images/TalentCalc/arrows/rightdown.png);  }
 .talentcalc-arrow-rightdown2 td { background-image:url(../images/TalentCalc/arrows/rightdown2.png); }
 
-.talentcalc-arrow-right td { background-image:url(../images/TalentCalc/arrows/right.png);           }
+.talentcalc-arrow-right td  { background-image:url(../images/TalentCalc/arrows/right.png);          }
 .talentcalc-arrow-right2 td { background-image:url(../images/TalentCalc/arrows/right2.png);         }
 
 .talentcalc-arrow-left  td { background-image:url(../images/TalentCalc/arrows/left.png);            }

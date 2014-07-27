@@ -1,8 +1,0 @@
-/*
- TalentCalc_ie6.css version 278
-*/
-.mapper .pin a   { filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/Mapper/pin-yellow.png'); }
-.mapper .pin-1 a { filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/Mapper/pin-green.png');  }
-.mapper .pin-2 a { filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/Mapper/pin-red.png');    }
-.mapper .pin-3 a { filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/Mapper/pin-blue.png');   } 
-.mapper .pin-4 a { filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/Mapper/pin-purple.png'); }

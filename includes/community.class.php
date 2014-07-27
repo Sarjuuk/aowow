@@ -8,99 +8,270 @@ if (!defined('AOWOW_REVISION'))
 * get Community Content
 ************/
 
-/*  latest comments
-		// $comments = array();
-		// $rows = $DB->select('
-			// SELECT `id`, `type`, `typeID`, LEFT(`commentbody`, 120) as `preview`, `userID` as `user`, `post_date` as `date`, (NOW()-`post_date`) as `elapsed`
-			// FROM ?_comments
-			// WHERE 1
-			// ORDER BY post_date DESC
-			// LIMIT 300
-		// ');
-		// foreach($rows as $i => $row)
-		// {
-			// $comments[$i] = array();
-			// $comments[$i] = $row;
-			// switch($row['type'])
-			// {
-				// case 1: // NPC
-					// $comments[$i]['subject'] = $DB->selectCell('SELECT name FROM creature_template WHERE entry=?d LIMIT 1', $row['typeID']);
-					// break;
-				// case 2: // GO
-					// $comments[$i]['subject'] = $DB->selectCell('SELECT name FROM gameobject_template WHERE entry=?d LIMIT 1', $row['typeID']);
-					// break;
-				// case 3: // Item
-					// $comments[$i]['subject'] = $DB->selectCell('SELECT name FROM item_template WHERE entry=?d LIMIT 1', $row['typeID']);
-					// break;
-				// case 4: // Item Set
-					// $comments[$i]['subject'] = $DB->selectCell('SELECT name_loc'.$_SESSION['locale'].' FROM ?_itemset WHERE Id=?d LIMIT 1', $row['typeID']);
-					// break;
-				// case 5: // Quest
-					// $comments[$i]['subject'] = $DB->selectCell('SELECT Title FROM quest_template WHERE entry=?d LIMIT 1', $row['typeID']);
-					// break;
-				// case 6: // Spell
-					// $comments[$i]['subject'] = $DB->selectCell('SELECT spellname_loc'.$_SESSION['locale'].' FROM ?_spell WHERE spellID=?d LIMIT 1', $row['typeID']);
-					// break;
-				// case 7: // Zone
-					// // TODO
-					// break;
-				// case 8: // Faction
-					// $comments[$i]['subject'] = $DB->selectCell('SELECT name_loc'.$_SESSION['locale'].' FROM ?_factions WHERE factionID=?d LIMIT 1', $row['typeID']);
-					// break;
-				// default:
-					// $comments[$i]['subject'] = 'Unknown';
-					// break;;
-			// }
-			// $comments[$i]['user'] = $rDB->selectCell('SELECT CONCAT(UCASE(SUBSTRING(username, 1,1)),LOWER(SUBSTRING(username, 2))) FROM aowow_account WHERE id=?d LIMIT 1', $row['user']);
-			// if(empty($comments[$i]['user']))
-				// $comments[$i]['user'] = 'Anonymous';
-			// $comments[$i]['rating'] = array_sum($DB->selectCol('SELECT rate FROM ?_comments_rates WHERE commentid=?d', $row['id']));
-			// $comments[$i]['purged'] = ($comments[$i]['rating'] <= -50)? 1: 0;
-			// $comments[$i]['deleted'] = 0;
-		// }
-		// $smarty->assign('comments', $comments);
-*/
-
-/* yet another todo (aug. 2010)
-    extend g_users with authors
-    _['ArgentSun']={border:1,roles:140,joined:'2007/11/17 17:21:48',posts:5575,title:'The Ambitious',avatar:2,avatarmore:'395',             sig:'[i] ‎"Schrödinger\'s cat walks into a bar...\n... and it doesn\'t!"[/i]'};
-    _['Fearow']=   {         roles:0,  joined:'2009/12/25 08:36:58',posts:3,                         avatar:1,avatarmore:'inv_misc_herb_17',sig:'But if your life is such a big joke, then why should I care?'};
-*/
 /*
     {id:115,user:'Ciderhelm',date:'2010/05/10 19:14:18',caption:'TankSpot\'s Guide to the Fury Warrior (Part 1)',videoType:1,videoId:'VUvxFvVmttg',type:13,typeId:1},
     {id:116,user:'Ciderhelm',date:'2010/05/10 19:14:18',caption:'TankSpot\'s Guide to the Fury Warrior (Part 2)',videoType:1,videoId:'VEfnuIcq7n8',type:13,typeId:1},
     {id:117,user:'Ciderhelm',date:'2010/05/10 19:14:18',caption:'TankSpot\'s Protection Warrior Guide',videoType:1,videoId:'vF-7kmvJZXY',type:13,typeId:1,sticky:1}
 */
 
+/* todo: administration of content */
+
 class CommunityContent
 {
-    /* todo: administration of content */
+    private static $jsGlobals = [];
+
+    private static $commentQuery = '
+        SELECT
+            c.*,
+            a1.displayName AS user,
+            a2.displayName AS editUser,
+            a3.displayName AS deleteUser,
+            a4.displayName AS responseUser,
+            IFNULL(SUM(cr.value), 0) AS rating,
+            SUM(IF (cr.userId = ?d, value, 0)) AS userRating,
+            SUM(IF (r.userId = ?d, 1, 0)) AS userReported
+        FROM
+            ?_comments c
+        JOIN
+            ?_account a1 ON c.userId = a1.id
+        LEFT JOIN
+            ?_account a2 ON c.editUserId = a2.id
+        LEFT JOIN
+            ?_account a3 ON c.deleteUserId = a3.id
+        LEFT JOIN
+            ?_account a4 ON c.responseUserId = a4.id
+        LEFT JOIN
+            ?_comments_rates cr ON c.id = cr.commentId
+        LEFT JOIN
+            ?_reports r ON r.subject = c.id AND r.mode = 1 AND r.reason = 19
+        WHERE
+            c.replyTo = ?d AND c.type = ?d AND c.typeId = ?d AND
+            ((c.flags & 0x2) = 0 OR c.userId = ?d OR ?d)
+        GROUP BY
+            c.id
+        ORDER BY
+            rating ASC
+    ';
+
+    private static $previewQuery = '
+        SELECT
+            c.id,
+            c.body AS preview,
+            c.date,
+            c.replyTo AS commentid,
+            UNIX_TIMESTAMP() - c.date AS elapsed,
+            IF(c.flags & 0x2, 1, 0) AS deleted,
+            IF(c.type <> 0, c.type, c2.type) AS type,
+            IF(c.typeId <> 0, c.typeId, c2.typeId) AS typeId,
+            IFNULL(SUM(cr.value), 0) AS rating,
+            a.displayName AS user
+        FROM
+            ?_comments c
+        JOIN
+            ?_account a ON c.userId = a.id
+        LEFT JOIN
+            ?_comments_rates cr ON cr.commentId = c.id
+        LEFT JOIN
+            ?_comments c2 ON c.replyTo = c2.id
+        WHERE
+            {c.userId = ?d AND}
+            {c.replyTo <> ?d AND}
+            {c.replyTo = ?d AND}
+            ((c.flags & 0x2) = 0 OR c.userId = ?d OR ?d)
+        GROUP BY
+            c.id
+        ORDER BY
+            date DESC
+        LIMIT
+            ?d
+    ';
+
+    public static function getCommentPreviews($params = [])
+    {
+        /*
+            purged:0,           <- doesnt seem to be used anymore
+            domain:'live'       <- irrelevant for our case
+        */
+
+        $subjCache = [];
+        $comments  = DB::Aowow()->select(
+            self::$previewQuery,
+             empty($params['user'])    ? DBSIMPLE_SKIP : $params['user'],
+             empty($params['replies']) ? DBSIMPLE_SKIP : 0, // i dont know, how to switch the sign around
+            !empty($params['replies']) ? DBSIMPLE_SKIP : 0,
+            User::$id,
+            User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
+            CFG_SQL_LIMIT_DEFAULT
+        );
+
+        foreach ($comments as $c)
+            $subjCache[$c['type']][$c['typeId']] = $c['typeId'];
+
+        foreach ($subjCache as $type => $ids)
+        {
+            $cnd = [CFG_SQL_LIMIT_NONE, ['id', array_unique($ids, SORT_NUMERIC)]];
+
+            switch ($type)
+            {
+                case TYPE_NPC:         $obj = new CreatureList($cnd);    break;
+                case TYPE_OBJECT:      $obj = new GameobjectList($cnd);  break;
+                case TYPE_ITEM:        $obj = new ItemList($cnd);        break;
+                case TYPE_ITEMSET:     $obj = new ItemsetList($cnd);     break;
+                case TYPE_QUEST:       $obj = new QuestList($cnd);       break;
+                case TYPE_SPELL:       $obj = new SpellList($cnd);       break;
+                case TYPE_ZONE:        $obj = new ZoneList($cnd);        break;
+                case TYPE_FACTION:     $obj = new FactionList($cnd);     break;
+                case TYPE_PET:         $obj = new PetList($cnd);         break;
+                case TYPE_ACHIEVEMENT: $obj = new AchievementList($cnd); break;
+                case TYPE_TITLE:       $obj = new TitleList($cnd);       break;
+                case TYPE_WORLDEVENT:  $obj = new WorldEventList($cnd);  break;
+                case TYPE_CLASS:       $obj = new CharClassList($cnd);   break;
+                case TYPE_RACE:        $obj = new CharRaceList($cnd);    break;
+                case TYPE_SKILL:       $obj = new SkillList($cnd);       break;
+                case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
+                default: continue;
+            }
+
+            foreach ($obj->iterate() as $id => $__)
+                $subjCache[$type][$id] = $obj->getField('name', true);
+        }
+
+        foreach ($comments as $idx => &$c)
+        {
+            if ($subj = @$subjCache[$c['type']][$c['typeId']])
+            {
+                // apply subject
+                $c['subject'] = $subj;
+
+                // format date
+                $c['date'] = date(Util::$dateFormatInternal, $c['date']);
+
+                // remove commentid if not looking for replies
+                if (empty($params['replies']))
+                    unset($c['commentid']);
+
+                // remove line breaks
+                $c['preview'] = strtr($c['preview'], ["\n" => ' ', "\r" => ' ']);
+                // limit whitespaces to one at a time
+                $c['preview'] = preg_replace('/\s+/',' ', $c['preview']);
+                // limit previews to 100 chars + whatever it takes to make the last word full
+                if (strlen($c['preview']) > 100)
+                {
+                    $n = 0;
+                    $b = [];
+                    $parts = explode(' ', $c['preview']);
+                    while ($n < 100 && $parts)
+                    {
+                        $_ = array_shift($parts);
+                        $n += strlen($_);
+                        $b[] = $_;
+                    }
+
+                    $c['preview'] = implode(' ', $b).'…';
+                }
+            }
+            else
+            {
+                Util::addNote(U_GROUP_STAFF, 'CommunityClass::getCommentPreviews - comment '.$c['id'].' belongs to nonexistant subject');
+                unset($comments[$idx]);
+            }
+        }
+
+        return $comments;
+    }
+
+    public static function getCommentReplies($commentId, $limit = 0, &$nFound = null)
+    {
+        $replies = [];
+        $query = $limit > 0 ? self::$commentQuery.' LIMIT '.$limit : self::$commentQuery;
+
+        // get replies
+        $results = DB::Aowow()->SelectPage($nFound, $query, User::$id, User::$id, $commentId, 0, 0, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+        foreach ($results as $r)
+        {
+            (new Markup($r['body']))->parseGlobalsFromText(self::$jsGlobals);
+
+            $reply = array(
+                'commentid'    => $commentId,
+                'id'           => $r['id'],
+                'body'         => $r['body'],
+                'username'     => $r['user'],
+                'roles'        => $r['roles'],
+                'creationdate' => date(Util::$dateFormatInternal, $r['date']),
+                'lasteditdate' => date(Util::$dateFormatInternal, $r['editDate']),
+                'rating'       => (string)$r['rating']
+            );
+
+            if ($r['userReported'])
+                $reply['reportedByUser'] = true;
+
+            if ($r['userRating'] > 0)
+                $reply['votedByUser'] = true;
+            else if ($r['userRating'] < 0)
+                $reply['downvotedByUser'] = true;
+
+            $replies[] = $reply;
+        }
+
+        return $replies;
+    }
 
     private static function getComments($type, $typeId)
     {
-/*
-        number:{$co.number},
-        user:'{$co.user}',
-        body:'{$co.body|escape:"javascript"}',
-        date:'{$co.date|date_format:"%Y/%m/%d %H:%M:%S"}',
-        {if $co.roles!=0}
-            roles:{$co.roles},
-        {/if}
-        {if $co.indent!=0}
-            indent:{$co.indent},
-        {/if}
-        rating:{$co.rating},
-        replyTo:{$co.replyto},
-        purged:{$co.purged},
-        deleted:0,
-        raters:[{foreach name=foo2 key=id from=$co.raters item=rater}[{$rater.userid},{$rater.rate}]{if $smarty.foreach.foo2.last}{else},{/if}{/foreach}],
-        id:{$co.id}
 
-        ,sticky:{$co.sticky}
-        ,userRating:{$co.userRating}
-*/
-        // comments
-        return [];
+        $results  = DB::Aowow()->query(self::$commentQuery, User::$id, User::$id, 0, $type, $typeId, User::$id, (int)User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+        $comments = [];
+
+        // additional informations
+        $i = 0;
+        foreach ($results as $r)
+        {
+            (new Markup($r['body']))->parseGlobalsFromText(self::$jsGlobals);
+
+            self::$jsGlobals[TYPE_USER][$r['userId']] = $r['userId'];
+
+            $c = array(
+                'commentv2'  => 1,                          // always 1.. enables some features i guess..?
+                'number'     => $i++,                       // some iterator .. unsued?
+                'id'         => $r['id'],
+                'date'       => date(Util::$dateFormatInternal, $r['date']),
+                'roles'      => $r['roles'],
+                'body'       => $r['body'],
+                'rating'     => $r['rating'],
+                'userRating' => $r['userRating'],
+                'user'       => $r['user'],
+            );
+
+            $c['replies'] = self::getCommentReplies($r['id'], 5, $c['nreplies']);
+
+            if ($r['responseBody'])                         // adminResponse
+            {
+                $c['response']      = $r['responseBody'];
+                $c['responseroles'] = $r['responseRoles'];
+                $c['responseuser']  = $r['responseUser'];
+
+                (new Markup($r['responseBody']))->parseGlobalsFromText(self::$jsGlobals);
+            }
+
+            if ($r['editCount'])                            // lastEdit
+                $c['lastEdit'] = [date(Util::$dateFormatInternal, $r['editDate']), $r['editCount'], $r['editUser']];
+
+            if ($r['flags'] & 0x1)
+                $c['sticky'] = true;
+
+            if ($r['flags'] & 0x2)
+            {
+                $c['deleted']     = true;
+                $c['deletedInfo'] = [date(Util::$dateFormatInternal, $r['deleteDate']), $r['deleteUser']];
+            }
+
+            if ($r['flags'] & 0x4)
+                $c['outofdate'] = true;
+
+            $comments[] = $c;
+        }
+
+        return $comments;
     }
 
     private static function getVideos($type, $typeId)
@@ -145,13 +316,17 @@ class CommunityContent
         return $screenshots;
     }
 
-    public static function getAll($type, $typeId)
+    public static function getAll($type, $typeId, &$jsg)
     {
-        return array(
+        $result = array(
             'vi' => self::getVideos($type, $typeId),
             'sc' => self::getScreenshots($type, $typeId),
             'co' => self::getComments($type, $typeId)
         );
+
+        Util::mergeJsGlobals($jsg, self::$jsGlobals);
+
+        return $result;
     }
 }
 ?>

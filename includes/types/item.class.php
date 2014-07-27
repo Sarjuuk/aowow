@@ -371,7 +371,6 @@ class ItemList extends BaseType
 
         foreach ($this->iterate() as $id => $__)
         {
-
             if ($addMask & GLOBALINFO_SELF)
             {
                 $data[TYPE_ITEM][$id] = array(
@@ -1130,6 +1129,8 @@ class ItemList extends BaseType
             foreach ($json as $k => $v)
                 if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side']))
                     unset($this->json[$item][$k]);
+
+        Util::checkNumeric($this->json);
     }
 
     public function getOnUseStats()
@@ -1375,7 +1376,7 @@ class ItemList extends BaseType
             'level'       => $this->curTpl['itemLevel'],
             'reqlevel'    => $this->curTpl['requiredLevel'],
             'displayid'   => $this->curTpl['displayId'],
-            // 'commondrop'  => 'true' / null           // set if the item is a loot-filler-item .. check common ref-templates..?
+            // 'commondrop'  => 'true' / null               // set if the item is a loot-filler-item .. check common ref-templates..?
             'holres'      => $this->curTpl['resHoly'],
             'firres'      => $this->curTpl['resFire'],
             'natres'      => $this->curTpl['resNature'],
@@ -1430,6 +1431,8 @@ class ItemList extends BaseType
         foreach ($json as $k => $v)
             if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side']))
                 unset($json[$k]);
+
+        Util::checkNumeric($json);
 
         $this->json[$json['id']] = $json;
     }

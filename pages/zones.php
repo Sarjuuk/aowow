@@ -17,8 +17,7 @@ class ZonesPage extends GenericPage
     protected $mode      = CACHETYPE_PAGE;
     protected $validCats = [true, true, [0, 1, 2], [0, 1, 2], true, true, true, true, true];
     protected $css       = array(
-        ['path' => 'Mapper.css'],
-        ['path' => 'Mapper_ie6.css', 'ieCond' => 'lte IE 6']
+        ['path' => 'Mapper.css']
     );
     protected $js        = array(
         'Mapper.js',

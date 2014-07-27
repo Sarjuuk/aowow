@@ -12,6 +12,7 @@ require 'includes/libs/DbSimple/Generic.php';               // Libraray: http://
 require 'includes/utilities.php';                           // misc™ data 'n func
 require 'includes/ajaxHandler.class.php';                   // handles ajax and jsonp requests
 require 'includes/user.class.php';
+require 'includes/markup.class.php';                        // manipulate markup text
 require 'includes/database.class.php';                      // wrap DBSimple
 require 'includes/community.class.php';                     // handle comments, screenshots and videos
 require 'includes/loot.class.php';                          // build lv-tabs containing loot-information

@@ -1,4 +1,4 @@
-        <div id="footer">
+        <div class="footer">
 <?php
 if (User::isInGroup(U_GROUP_EMPLOYEE) && ($this->time || isset($this->mysql) || $this->isCached)):
     echo "            <table style=\"margin:auto;\">\n";
@@ -21,8 +21,8 @@ endif;
 ?>
         </div>
     </div><!-- #wrapper .nosidebar -->
-</div><!-- #layout -->
-<!--[if lte IE 6]></td><th class="ie6layout-th"></th></tr></table><![endif]-->
+    </div<!-- #layout-inner -->
+</div><!-- #layout .nosidebar -->
 
 <noscript>
     <div id="noscript-bg"></div>

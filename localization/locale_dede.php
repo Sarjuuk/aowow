@@ -10,18 +10,19 @@ if (!defined('AOWOW_REVISION'))
 */
 
 $lang = array(
+
     // page variables
     'timeUnits' => array(
         'sg'            => ["Jahr",  "Monat",  "Woche",  "Tag",   "Stunde",  "Minute",  "Sekunde",  "Millisekunde"],
         'pl'            => ["Jahre", "Monate", "Wochen", "Tage",  "Stunden", "Minuten", "Sekunden", "Millisekunden"],
         'ab'            => ["J.",    "M.",     "W.",     "Tag",   "Std.",    "Min.",    "Sek.",     "Ms."],
+        'ago'           => 'vor %s'
     ),
     'main' => array(
         'name'          => "Name",
         'link'          => "Link",
         'signIn'        => "Anmelden / Registrieren",
         'jsError'       => "Stelle bitte sicher, dass JavaScript aktiviert ist.",
-        'searchButton'  => "Suche",
         'language'      => "Sprache",
         'feedback'      => "Rückmeldung",
         'numSQL'        => "Anzahl an MySQL-Queries",
@@ -46,6 +47,8 @@ $lang = array(
         'login'         => "Login",
         'forum'         => "Forum",
         'n_a'           => "n. v.",
+        'siteRep'       => "Ruf",
+        'aboutUs'       => "Über Aowow",
 
         // filter
         'extSearch'     => "Erweiterte Suche",
@@ -115,11 +118,12 @@ $lang = array(
         'help'          => "Hilfe",
         'helpTopics'    => array(
             "Wie man Kommentare schreibt",          "Modellviewer",                         "Screenshots: Tipps & Tricks",          "Gewichtung von Werten",
-            "Talentrechner",                        "Gegenstandsvergleich",                 "Profiler"
+            "Talentrechner",                        "Gegenstandsvergleich",                 "Profiler",                             "Markup Guide"
         ),
 
         // search
         'search'        => "Suche",
+        'searchButton'  => "Suche",
         'foundResult'   => "Suchergebnisse für",
         'noResult'      => "Keine Ergebnisse für",
         'tryAgain'      => "Bitte versucht es mit anderen Suchbegriffen oder überprüft deren Schreibweise.",
@@ -128,7 +132,12 @@ $lang = array(
         // formating
         'colon'         => ': ',
         'dateFmtShort'  => "d.m.Y",
-        'dateFmtLong'   => "d.m.Y \u\m H:i"
+        'dateFmtLong'   => "d.m.Y \u\m H:i",
+
+        // error
+        'genericError'  => "Ein Fehler trat auf; aktualisiert die Seite und versucht es nochmal. Wenn der Fehler bestehen bleibt, bitte meldet es bei <a href='#contact'>feedback</a>", # LANG.genericerror
+        'bannedRating'  => "Ihr wurdet davon gesperrt, Kommentare zu bewerten.", # LANG.tooltip_banned_rating
+        'tooManyVotes'  => "Ihr habt die tägliche Grenze für erlaubte Bewertungen erreicht. Kommt morgen mal wieder!" # LANG.tooltip_too_many_votes
     ),
     'game' => array(
         'achievement'   => "Erfolg",

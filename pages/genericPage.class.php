@@ -187,7 +187,11 @@ class GenericPage
             $this->postCache();
 
         if (!empty($this->hasComContent))                   // get comments, screenshots, videos
-            $this->community = CommunityContent::getAll($this->type, $this->typeId);
+        {
+            $this->community = CommunityContent::getAll($this->type, $this->typeId, $jsGlobals);
+            $this->extendGlobalData($jsGlobals);            // as comments are not cached, those globals cant be either
+            $this->applyGlobals();
+        }
 
         $this->time  = microtime(true) - $this->time;
         $this->mysql = DB::Aowow()->getStatistics();
@@ -240,21 +244,7 @@ class GenericPage
         if ($article)
         {
             foreach ($article as $text)
-            {
-                if (preg_match_all('/\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|title|event|class|race|skill|currency)=(\d+)[^\]]*\]/i', $text, $matches, PREG_SET_ORDER))
-                {
-                    foreach ($matches as $match)
-                    {
-                        if ($type = array_search($match[1], Util::$typeStrings))
-                        {
-                            if (!isset($this->jsgBuffer[$type]))
-                                $this->jsgBuffer[$type] = [];
-
-                            $this->jsgBuffer[$type][] = $match[2];
-                        }
-                    }
-                }
-            }
+                (new Markup($text))->parseGlobalsFromText($this->jsgBuffer);
 
             $replace = array(
                 '<script'    => '<scr"+"ipt',
@@ -262,6 +252,7 @@ class GenericPage
                 'HOST_URL'   => HOST_URL,
                 'STATIC_URL' => STATIC_URL
             );
+
             $this->article = array(
                 'text'   => strtr($article['article'], $replace),
                 'params' => []
@@ -485,6 +476,7 @@ class GenericPage
             case TYPE_NPC:         $jsg[TYPE_NPC]         = ['creature',    [], []]; break;
             case TYPE_OBJECT:      $jsg[TYPE_OBJECT]      = ['object',      [], []]; break;
             case TYPE_ITEM:        $jsg[TYPE_ITEM]        = ['item',        [], []]; break;
+            case TYPE_ITEMSET:     $jsg[TYPE_ITEMSET]     = ['itemset',     [], []]; break;
             case TYPE_QUEST:       $jsg[TYPE_QUEST]       = ['quest',       [], []]; break;
             case TYPE_SPELL:       $jsg[TYPE_SPELL]       = ['spell',       [], []]; break;
             case TYPE_ZONE:        $jsg[TYPE_ZONE]        = ['zone',        [], []]; break;
@@ -497,6 +489,8 @@ class GenericPage
             case TYPE_RACE:        $jsg[TYPE_RACE]        = ['race',        [], []]; break;
             case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['skill',       [], []]; break;
             case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['currency',    [], []]; break;
+            // well, this is awkward
+            case TYPE_USER:        $jsg[TYPE_USER]        = ['user',        [], []]; break;
         }
     }
 
@@ -537,6 +531,7 @@ class GenericPage
                 case TYPE_NPC:         $obj = new CreatureList($cnd);    break;
                 case TYPE_OBJECT:      $obj = new GameobjectList($cnd);  break;
                 case TYPE_ITEM:        $obj = new ItemList($cnd);        break;
+                case TYPE_ITEMSET:     $obj = new ItemsetList($cnd);     break;
                 case TYPE_QUEST:       $obj = new QuestList($cnd);       break;
                 case TYPE_SPELL:       $obj = new SpellList($cnd);       break;
                 case TYPE_ZONE:        $obj = new ZoneList($cnd);        break;
@@ -549,10 +544,15 @@ class GenericPage
                 case TYPE_RACE:        $obj = new CharRaceList($cnd);    break;
                 case TYPE_SKILL:       $obj = new SkillList($cnd);       break;
                 case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
+                // "um, eh":, he ums and ehs.
+                case TYPE_USER:        $obj = new UserList($cnd);        break;
                 default: continue;
             }
 
             $this->extendGlobalData($obj->getJSGlobals(GLOBALINFO_SELF));
+
+            // delete processed ids
+            $this->jsgBuffer[$type] = [];
         }
     }
 

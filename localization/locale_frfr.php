@@ -14,14 +14,14 @@ $lang = array(
     'timeUnits' => array(
         'sg'            => ["année",  "mois", "semaine",  "jour",  "heure",  "minute",  "seconde",  "milliseconde"],
         'pl'            => ["années", "mois", "semaines", "jours", "heures", "minutes", "secondes", "millisecondes"],
-        'ab'            => ["an",     "mo",   "sem",      "jour",  "h",      "min",     "s",        "ms"]
+        'ab'            => ["an",     "mo",   "sem",      "jour",  "h",      "min",     "s",        "ms"],
+        'ago'           => 'il y a %s'
     ),
     'main' => array(
         'name'          => "nom",
         'link'          => "Lien",
         'signIn'        => "Se connecter / S'inscrire",
         'jsError'       => "S'il vous plait, assurez vous d'avoir le javascript autorisé.",
-        'searchButton'  => "Rechercher",
         'language'      => "Langue",
         'feedback'      => "Feedback",
         'numSQL'        => "Nombre de requêtes SQL",
@@ -46,6 +46,8 @@ $lang = array(
         'login'         => "[Login]",
         'forum'         => "Forum",
         'n_a'           => "n/d",
+        'siteRep'       => "Réputation",
+        'aboutUs'       => "À propos de Aowow",
 
         // filter
         'extSearch'     => "Recherche avancée",
@@ -115,11 +117,12 @@ $lang = array(
         'help'          => "Aide",
         'helpTopics'    => array(
             "Le guide du commentaire",              "Visionneuse 3D",                       "Captures d'écran : Trucs et astuces",  "Échelles de valeurs",
-            "Calculateur de talents",               "Comparaison d'objets",                 "Profiler"
+            "Calculateur de talents",               "Comparaison d'objets",                 "Profiler",                             "Markup Guide"
         ),
 
         // search
         'search'        => "Recherche",
+        'searchButton'  => "Rechercher",
         'foundResult'   => "Résultats de recherche pour",
         'noResult'      => "Aucun résultat pour malordawsne",
         'tryAgain'      => "Veuillez essayer d'autres mots ou vérifiez l'orthographe des termes de recherche.",
@@ -128,7 +131,12 @@ $lang = array(
         // formating
         'colon'         => ' : ',
         'dateFmtShort'  => "Y-m-d",
-        'dateFmtLong'   => "Y-m-d à H:i"
+        'dateFmtLong'   => "Y-m-d à H:i",
+
+        // error
+        'genericError'  => "Une erreur est survenue; Actualisez la page et essayez à nouveau. Si l'erreur persiste, envoyez un email à <a href='#contact'>feedback</a>", # LANG.genericerror
+        'bannedRating'  => "Vous avez été banni du score des commentaires.", # LANG.tooltip_banned_rating
+        'tooManyVotes'  => "Vous avez voté trop souvent aujourd'hui! Revenez demain." # LANG.tooltip_too_many_votes
     ),
     'game' => array (
         'achievement'   => "haut fait",

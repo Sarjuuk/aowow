@@ -81,7 +81,7 @@ function us_addProfilesTab(e) {
     }
 }
 Listview.funcBox.beforeUserComments = function () {
-    if (g_user.roles & U_GROUP_COMMENTS_MODERATOR) {
+    if (us_isOwnProfile() || (g_user.roles & U_GROUP_COMMENTS_MODERATOR)) {
         this.mode = 1;
         this.createCbControls = function (b) {
             var a = $WH.ce("input");
@@ -146,7 +146,7 @@ Listview.funcBox.beforeUserComments = function () {
         }
     }
     this.customFilter = function (b, a) {
-        return (g_user.roles & U_GROUP_COMMENTS_MODERATOR ? a < 250 : !(b.deleted || b.purged || b.removed))
+        return (us_isOwnProfile() || (g_user.roles & U_GROUP_COMMENTS_MODERATOR) ? 1 : !(b.deleted || b.purged || b.removed))
     };
     this.onAfterCreate = function () {
         if (this.nRowsVisible == 0) {

@@ -1,59 +1,59 @@
 #pc-classes {
-	width:946px;
-	margin:0 auto;
-	padding-bottom:10px;
+    width:946px;
+    margin:0 auto;
+    padding-bottom:10px;
 }
 
 #pc-classes-inner {
-	width:874px;
-	margin:0 auto;
+    width:874px;
+    margin:0 auto;
     text-align:center;
     z-index:3;
 }
 
 #pc-classes p {
-	font-size:32px;
-	margin:0 0 16px 0;
-	padding:0;
-	text-align:center;
+    font-size:32px;
+    margin:0 0 16px 0;
+    padding:0;
+    text-align:center;
 }
 
 #pc-classes .iconmedium {
-	float:left;
-	margin-right:2px;
-	margin-bottom:2px;
-	opacity:.6666;
-	filter:alpha(opacity=66);
+    float:left;
+    margin-right:2px;
+    margin-bottom:2px;
+    opacity:.6666;
+    filter:alpha(opacity=66);
 }
 
 #pc-classes .iconmedium-gold-selected {
-	opacity:1;
-	filter:alpha(opacity=100);
+    opacity:1;
+    filter:alpha(opacity=100);
 }
 
 #pc-classes.choose {
-	position:relative;
-	padding:0;
+    position:relative;
+    padding:0;
 }
 
 #pc-classes.choose #pc-classes-outer {
-	width:614px;
+    width:614px;
 }
 
 #pc-classes.choose #pc-classes-inner {
-	position:absolute;
-	left:54px;
-	top:150px;
-	width:506px;
+    position:absolute;
+    left:54px;
+    top:150px;
+    width:506px;
 }
 
 #pc-classes.choose .iconmedium {
-	opacity:1;
-	filter:alpha(opacity=100);
+    opacity:1;
+    filter:alpha(opacity=100);
 }
 
 #pc-itself.choose .talentcalc-main {
-	width:614px;
-	height:554px!important;
-	margin-left:0;
+    width:614px;
+    height:554px!important;
+    margin-left:0;
 }

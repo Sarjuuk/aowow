@@ -42,7 +42,8 @@ class Util
 
     public static $typeStrings              = array(        // zero-indexed
         null,           'npc',          'object',       'item',         'itemset',      'quest',        'spell',        'zone',         'faction',
-        'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency'
+        'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency',
+        TYPE_USER => 'user'
     );
 
     public static $combatRatingToItemMod    = array(        // zero-indexed idx:CR; val:Mod
@@ -996,7 +997,7 @@ class Util
             ));
     }
 
-    public static function localizedString($data, $field)
+    public static function localizedString($data, $field, $silent = false)
     {
         $sqlLocales = ['EN', 2 => 'FR', 3 => 'DE', 6 => 'ES', 8 => 'RU'];
 
@@ -1010,17 +1011,17 @@ class Util
         else if (!empty($data[$field.$sqlLocales[User::$localeId]]))
             return $data[$field.$sqlLocales[User::$localeId]];
 
-        // locale not enUS; aowow-type localization available; add brackets
+        // locale not enUS; aowow-type localization available; add brackets if not silent
         else if (User::$localeId != LOCALE_EN && isset($data[$field.'_loc0']) && !empty($data[$field.'_loc0']))
-            return  '['.$data[$field.'_loc0'].']';
+            return $silent ? $data[$field.'_loc0'] : '['.$data[$field.'_loc0'].']';
 
         // dbc-case
         else if (User::$localeId != LOCALE_EN && isset($data[$field.$sqlLocales[0]]) && !empty($data[$field.$sqlLocales[0]]))
-            return  '['.$data[$field.$sqlLocales[0]].']';
+            return $silent ? $data[$field.$sqlLocales[0]] : '['.$data[$field.$sqlLocales[0]].']';
 
-        // locale not enUS; TC localization; add brackets
+        // locale not enUS; TC localization; add brackets if not silent
         else if (User::$localeId != LOCALE_EN && isset($data[$field]) && !empty($data[$field]))
-            return '['.$data[$field].']';
+            return $silent ? $data[$field] : '['.$data[$field].']';
 
         // locale enUS; TC localization; return normal
         else if (User::$localeId == LOCALE_EN && isset($data[$field]) && !empty($data[$field]))
@@ -1376,6 +1377,122 @@ class Util
             $hash .= substr($seed, mt_rand(0, 62), 1);
 
         return $hash;
+    }
+
+    public static function mergeJsGlobals(&$master)
+    {
+        $args = func_get_args();
+        if (count($args) < 2)                               // insufficient args
+            return false;
+
+        if (!is_array($master))
+            $master = [];
+
+        for ($i = 1; $i < count($args); $i++)               // skip first (master) entry
+        {
+            foreach ($args[$i] as $type => $data)
+            {
+                // bad data or empty
+                if (empty(Util::$typeStrings[$type]) || !is_array($data) || !$data)
+                    continue;
+
+                if (!isset($master[$type]))
+                    $master[$type] = [];
+
+                foreach ($data as $k => $d)
+                {
+                    if (!isset($master[$type][$k]))         // int: id, yet to look up
+                        $master[$type][$k] = $d;
+                    else if (is_array($d))                  // array: already fetched data (overwrite old value if set)
+                        $master[$type][$k] = $d;
+                    // else                                 // id overwrites data .. do not want
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static function gainSiteReputation($user, $action, $miscData = [])
+    {
+        if (!$user || !$action)
+            return false;
+
+        $x = [];
+
+        switch ($action)
+        {
+            case SITEREP_ACTION_REGISTER:
+                $x['amount'] = CFG_REP_REWARD_REGISTER;
+                break;
+            case SITEREP_ACTION_DAILYVISIT:
+                $x['sourceA'] = time();
+                $x['amount']  = CFG_REP_REWARD_DAILYVISIT;
+                break;
+            case SITEREP_ACTION_COMMENT:
+                if (empty($miscData['id']))
+                    return false;
+
+                $x['sourceA'] = $miscData['id'];            // commentId
+                $x['amount']  = CFG_REP_REWARD_COMMENT;
+                break;
+            case SITEREP_ACTION_UPVOTED:
+            case SITEREP_ACTION_DOWNVOTED:
+                if (empty($miscData['id']) || empty($miscData['voterId']))
+                    return false;
+
+                DB::Aowow()->query(                         // delete old votes the user has cast
+                    'DELETE FROM ?_account_reputation WHERE sourceA = ?d AND sourceB = ?d AND userId = ?d AND action IN (?a)',
+                    $miscData['id'],
+                    $miscData['voterId'],
+                    $user,
+                    [SITEREP_ACTION_UPVOTED, SITEREP_ACTION_DOWNVOTED]
+                );
+
+                $x['sourceA'] = $miscData['id'];            // commentId
+                $x['sourceB'] = $miscData['voterId'];
+                $x['amount']  = $action == SITEREP_ACTION_UPVOTED ? CFG_REP_REWARD_UPVOTED : CFG_REP_REWARD_DOWNVOTED;
+                break;
+            case SITEREP_ACTION_UPLOAD:                     // NYI
+                if (empty($miscData['id']) || empty($miscData['what']))
+                    return false;
+
+                $x['sourceA'] = $miscData['id'];            // screenshotId or videoId
+                $x['sourceB'] = $miscData['what'];          // screenshot or video
+                $x['amount']  = CFG_REP_REWARD_UPLOAD;
+                break;
+            case SITEREP_ACTION_GOOD_REPORT:                // NYI
+            case SITEREP_ACTION_BAD_REPORT:
+                if (empty($miscData['id']))                 // reportId
+                    return false;
+
+                $x['sourceA'] = $miscData['id'];
+                $x['amount']  = $action == SITEREP_ACTION_GOOD_REPORT ? CFG_REP_REWARD_GOOD_REPORT : CFG_REP_REWARD_BAD_REPORT;
+                break;
+            case SITEREP_ACTION_ARTICLE:                    // NYI
+                if (empty($miscData['id']))                 // reportId
+                    return false;
+
+                $x['sourceA'] = $miscData['id'];
+                $x['amount']  = CFG_REP_REWARD_ARTICLE;
+                break;
+            case SITEREP_ACTION_USER_WARNED:                // NYI
+            case SITEREP_ACTION_USER_SUSPENDED:
+                if (empty($miscData['id']))                 // banId
+                    return false;
+
+                $x['sourceA'] = $miscData['id'];
+                $x['amount']  = $action == SITEREP_ACTION_USER_WARNED ? CFG_REP_REWARD_USER_WARNED : CFG_REP_REWARD_USER_SUSPENDED;
+                break;
+        }
+
+        $x = array_merge($x, array(
+            'userId' => $user,
+            'action' => $action,
+            'date'   => time()
+        ));
+
+        return DB::Aowow()->query('INSERT IGNORE INTO ?_account_reputation (?#) VALUES (?a)', array_keys($x), array_values($x));
     }
 
     public static function createShowOnMap()

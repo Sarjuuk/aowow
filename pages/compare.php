@@ -18,10 +18,7 @@ class ComparePage extends GenericPage
         'Summary.js',
         'swfobject.js',
     );
-    protected $css           = array(
-        ['path' => 'Summary.css'],
-        ['path' => 'Summary_ie6.css', 'ieCond' => 'lte IE 6'],
-    );
+    protected $css           = [['path' => 'Summary.css']];
 
     protected $summary       = [];
     protected $cmpItems      = [];
