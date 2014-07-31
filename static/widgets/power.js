@@ -8,7 +8,7 @@ if (typeof $WH == "undefined") {
 
         var match = document.scripts[i].src.match(/(https?:\/\/[^\/]+)((\/[\w\d-_%]+)*)\/widgets\/power\.js/i);
         if (match) {
-            var g_host      = match[1];
+            var g_host      = match[1];                     // todo: probably incorrect for most cases :/
             var g_staticUrl = match[1] + match[2];
             break;
         }
@@ -94,7 +94,8 @@ if (typeof $WowheadPower == "undefined") {
             },
             REDIRECTS = {
                 wotlk: "www",
-                ptr:   "www"
+                ptr:   "www",
+                www:   "en"
             };
 
         if (isRemote) {
@@ -105,7 +106,7 @@ if (typeof $WowheadPower == "undefined") {
             if (isRemote) {
                 var script = document.createElement("script");
                 // script.src = (document.location.protocol != "https:" ? "http:": document.location.protocol) + "//wowjs.zamimg.com/js/basic.js?5";
-                script.src = g_host + "/static/js/basic.js";
+                script.src = g_staticUrl + "/js/basic.js";
                 head.appendChild(script);
             }
             else {
@@ -181,27 +182,9 @@ if (typeof $WowheadPower == "undefined") {
                 $WH.ae(head, $WH.ce("link", {
                     type: "text/css",
                     // href: (document.location.protocol != "https:" ? "http:": document.location.protocol) + "//wowcss.zamimg.com/css/basic.css?5",
-                    href: g_host + "/static/css/basic.css",
+                    href: g_staticUrl + "/css/basic.css",
                     rel:  "stylesheet"
                 }));
-
-                if ($WH.Browser.ie67) {
-                    $WH.ae(head, $WH.ce("link", {
-                        type: "text/css",
-                        // href: "http://static.wowhead.com/css/basic_ie67.css?4",
-                        href: g_host + "/static/css/global_ie67.css",
-                        rel:  "stylesheet"
-                    }));
-
-                    if ($WH.Browser.ie6) {
-                        $WH.ae(head, $WH.ce("link", {
-                            type: "text/css",
-                            // href: "http://static.wowhead.com/css/basic_ie6.css?4",
-                            href: g_host + "/static/css/global_ie6.css",
-                            rel:  "stylesheet"
-                        }));
-                    }
-                }
             }
             attachEvent();
 
@@ -298,9 +281,9 @@ if (typeof $WowheadPower == "undefined") {
                 i1 = 1;
                 i2 = 2;
                 url = t.rel.match(/(item|quest|spell|achievement|npc|object).?([0-9]+)/);
-                if (url == null) {
-                    url = t.rel.match(/(profile).?([^&#]+)/);
-                }
+                // if (url == null) {                       // sarjuuk: also matches 'profiler' and 'profiles' which screws with the language-menu workaround
+                    // url = t.rel.match(/(profile).?([^&#]+)/);
+                // }
                 showLogo = 1;
             }
 
@@ -413,7 +396,7 @@ if (typeof $WowheadPower == "undefined") {
                         t.style.paddingLeft = "18px !important";
                         t.style.verticalAlign = "center";
                         // t.style.background = "url(" + (document.location.protocol != "https:" ? "http:": document.location.protocol) + "//wowimg.zamimg.com/images/wow/icons/tiny/" + data.icon.toLocaleLowerCase() + ".gif) left center no-repeat"
-                        t.style.background = "url(" + g_host + "/static/images/wow/icons/tiny/" + data.icon.toLocaleLowerCase() + ".gif) left center no-repeat"
+                        t.style.background = "url(" + g_staticUrl + "/images/wow/icons/tiny/" + data.icon.toLocaleLowerCase() + ".gif) left center no-repeat"
                     }
 
                     if (aowow_tooltips.colorlinks) {

@@ -1810,8 +1810,8 @@ spells / buffspells = {
 
                 $extra[$id] = array(
                     'id'         => $id,
-                    'tooltip'    => Util::jsEscape($tTip[0]),
-                    'buff'       => @Util::jsEscape($buff[0]),
+                    'tooltip'    => $tTip[0],
+                    'buff'       => $buff[0],
                     'spells'     => $tTip[1],
                     'buffspells' => @$buff[1]
                 );

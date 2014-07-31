@@ -24,9 +24,5 @@
         </div>
 
         <script type="text/javascript">
-<?php
-foreach ($this->jsGlobals as $glob):
-    $this->gBrick($glob[0], ['vars' => $glob[1], 'extra' => $glob[2]]);
-endforeach;
-?>
+<?php echo $this->writeGlobalVars(); ?>
         </script>

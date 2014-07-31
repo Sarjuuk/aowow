@@ -38,11 +38,7 @@
         </div>
 
         <script type="text/javascript">//<![CDATA[
-<?php
-    foreach ($this->jsGlobals as $glob):
-        $this->gBrick($glob[0], ['vars' => $glob[1], 'extra' => $glob[2]]);
-    endforeach;
-?>
+<?php echo $this->writeGlobalVars(); ?>
             Markup.printHtml(<?php echo json_encode($this->news['text']); ?>, 'news-generic', { allow: Markup.CLASS_ADMIN });
         //]]></script>
 <?php endif; ?>

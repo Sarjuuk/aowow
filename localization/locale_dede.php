@@ -10,7 +10,6 @@ if (!defined('AOWOW_REVISION'))
 */
 
 $lang = array(
-
     // page variables
     'timeUnits' => array(
         'sg'            => ["Jahr",  "Monat",  "Woche",  "Tag",   "Stunde",  "Minute",  "Sekunde",  "Millisekunde"],

@@ -60,7 +60,7 @@ define('ACC_BAN_SCREENSHOT',                0x20);          // cannot upload scr
 define('ACC_BAN_VIDEO',                     0x40);          // cannot suggest videos
 // define('ACC_BAN_FORUM',                  0x80);          // cannot use forums (not used here)
 
-// Site Reputation/Priviledges
+// Site Reputation/Privileges
 define('SITEREP_ACTION_REGISTER',           1);             // Registered account
 define('SITEREP_ACTION_DAILYVISIT',         2);             // Daily visit
 define('SITEREP_ACTION_COMMENT',            3);             // Posted comment

@@ -385,15 +385,50 @@ class GenericPage
         }
     }
 
-    public function gBrick($file, array $localVars = [])    // load jsGlobal
+    public function writeGlobalVars()                       // load jsGlobal
     {
-        foreach ($localVars as $n => $v)
-            $$n = $v;
+        $buff = '';
 
-        if (!$this->isSaneInclude('template/globals/', $file))
-            echo !User::isInGroup(U_GROUP_EMPLOYEE) ? "\n\nError: nonexistant template requested: template/globals/".$file.".tpl.php\n\n" : null;
-        else
-            include('template/globals/'.$file.'.tpl.php');
+        foreach ($this->jsGlobals as $type => $struct)
+        {
+            $buff .= "            var _ = ".$struct[0].';';
+
+            foreach ($struct[1] as $key => $data)
+            {
+                foreach ($data as $k => $v)
+                {
+                    // localizes expected fields
+                    if (in_array($k, ['name', 'namefemale']))
+                    {
+                        $data[$k.'_'.User::$localeString] = $v;
+                        unset($data[$k]);
+                    }
+                }
+
+                $buff .= ' _['.(is_numeric($key) ? $key : "'".$key."'")."]=".json_encode($data, JSON_NUMERIC_CHECK).';';
+            }
+
+            $buff .= "\n";
+
+            if (!empty($this->typeId) && !empty($struct[2][$this->typeId]))
+            {
+                $x = $struct[2][$this->typeId];
+
+                // spell
+                if (!empty($x['tooltip']))                  // spell + item
+                    $buff .= "\n            _[".$x['id'].'].tooltip_'.User::$localeString.' = '.json_encode($x['tooltip']).";\n";
+                if (!empty($x['buff']))                     // spell
+                    $buff .= "            _[".$x['id'].'].buff_'.User::$localeString.' = '.json_encode($x['buff']).";\n";
+                if (!empty($x['spells']))                   // spell + item
+                    $buff .= "            _[".$x['id'].'].spells_'.User::$localeString.' = '.json_encode($x['spells'], JSON_NUMERIC_CHECK).";\n";
+                if (!empty($x['buffspells']))               // spell
+                    $buff .= "            _[".$x['id'].'].buffspells_'.User::$localeString.' = '.json_encode($x['buffspells'], JSON_NUMERIC_CHECK).";\n";
+
+                $buff .= "\n";
+            }
+        }
+
+        return $buff;
     }
 
     public function brick($file, array $localVars = [])     // load brick
@@ -472,25 +507,25 @@ class GenericPage
             return;
 
         switch ($type)
-        {                                                // [brickFile,  [data], [extra]]
-            case TYPE_NPC:         $jsg[TYPE_NPC]         = ['creature',    [], []]; break;
-            case TYPE_OBJECT:      $jsg[TYPE_OBJECT]      = ['object',      [], []]; break;
-            case TYPE_ITEM:        $jsg[TYPE_ITEM]        = ['item',        [], []]; break;
-            case TYPE_ITEMSET:     $jsg[TYPE_ITEMSET]     = ['itemset',     [], []]; break;
-            case TYPE_QUEST:       $jsg[TYPE_QUEST]       = ['quest',       [], []]; break;
-            case TYPE_SPELL:       $jsg[TYPE_SPELL]       = ['spell',       [], []]; break;
-            case TYPE_ZONE:        $jsg[TYPE_ZONE]        = ['zone',        [], []]; break;
-            case TYPE_FACTION:     $jsg[TYPE_FACTION]     = ['faction',     [], []]; break;
-            case TYPE_PET:         $jsg[TYPE_PET]         = ['pet',         [], []]; break;
-            case TYPE_ACHIEVEMENT: $jsg[TYPE_ACHIEVEMENT] = ['achievement', [], []]; break;
-            case TYPE_TITLE:       $jsg[TYPE_TITLE]       = ['title',       [], []]; break;
-            case TYPE_WORLDEVENT:  $jsg[TYPE_WORLDEVENT]  = ['event',       [], []]; break;
-            case TYPE_CLASS:       $jsg[TYPE_CLASS]       = ['class',       [], []]; break;
-            case TYPE_RACE:        $jsg[TYPE_RACE]        = ['race',        [], []]; break;
-            case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['skill',       [], []]; break;
-            case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['currency',    [], []]; break;
+        {                                                // [varName,            [data], [extra]]
+            case TYPE_NPC:         $jsg[TYPE_NPC]         = ['g_npcs',               [], []]; break;
+            case TYPE_OBJECT:      $jsg[TYPE_OBJECT]      = ['g_objects',            [], []]; break;
+            case TYPE_ITEM:        $jsg[TYPE_ITEM]        = ['g_items',              [], []]; break;
+            case TYPE_ITEMSET:     $jsg[TYPE_ITEMSET]     = ['g_itemsets',           [], []]; break;
+            case TYPE_QUEST:       $jsg[TYPE_QUEST]       = ['g_quests',             [], []]; break;
+            case TYPE_SPELL:       $jsg[TYPE_SPELL]       = ['g_spells',             [], []]; break;
+            case TYPE_ZONE:        $jsg[TYPE_ZONE]        = ['g_gatheredzones',      [], []]; break;
+            case TYPE_FACTION:     $jsg[TYPE_FACTION]     = ['g_factions',           [], []]; break;
+            case TYPE_PET:         $jsg[TYPE_PET]         = ['g_pets',               [], []]; break;
+            case TYPE_ACHIEVEMENT: $jsg[TYPE_ACHIEVEMENT] = ['g_achievements',       [], []]; break;
+            case TYPE_TITLE:       $jsg[TYPE_TITLE]       = ['g_titles',             [], []]; break;
+            case TYPE_WORLDEVENT:  $jsg[TYPE_WORLDEVENT]  = ['g_holidays',           [], []]; break;
+            case TYPE_CLASS:       $jsg[TYPE_CLASS]       = ['g_classes',            [], []]; break;
+            case TYPE_RACE:        $jsg[TYPE_RACE]        = ['g_races',              [], []]; break;
+            case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['g_skills',             [], []]; break;
+            case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['g_gatheredcurrencies', [], []]; break;
             // well, this is awkward
-            case TYPE_USER:        $jsg[TYPE_USER]        = ['user',        [], []]; break;
+            case TYPE_USER:        $jsg[TYPE_USER]        = ['g_users',              [], []]; break;
         }
     }
 
