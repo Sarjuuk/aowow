@@ -55,7 +55,7 @@ class Loot
 
     private function createStack($l)                        // issue: TC always has an equal distribution between min/max
     {
-        if (empty($l['min']) || empty($l['max']) || $l['min'] <= $l['max'])
+        if (empty($l['min']) || empty($l['max']) || $l['max'] <= $l['min'])
             return null;
 
         $stack = [];

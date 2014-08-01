@@ -342,9 +342,16 @@ class NpcPage extends GenericPage
         // tab: teaches
         if ($this->subject->getField('npcflag') & NPC_FLAG_TRAINER)
         {
-            $teachQuery = 'SELECT IFNULL(t2.spell, t1.spell) AS ARRAY_KEY,                      IFNULL(t2.spellcost, t1.spellcost) AS cost,  IFNULL(t2.reqskill, t1.reqskill) AS reqSkillId,
-                                                   IFNULL(t2.reqskillvalue, t1.reqskillvalue) AS reqSkillValue,  IFNULL(t2.reqlevel, t1.reqlevel) AS reqLevel
-                                            FROM npc_trainer t1 LEFT JOIN npc_trainer t2 ON t2.entry = IF(t1.spell < 0, -t1.spell, null) WHERE t1.entry = ?d';
+            $teachQuery = '
+                SELECT    IFNULL(t2.spell, t1.spell) AS ARRAY_KEY,
+                          IFNULL(t2.spellcost, t1.spellcost) AS cost,
+                          IFNULL(t2.reqskill, t1.reqskill) AS reqSkillId,
+                          IFNULL(t2.reqskillvalue, t1.reqskillvalue) AS reqSkillValue,
+                          IFNULL(t2.reqlevel, t1.reqlevel) AS reqLevel
+                FROM      npc_trainer t1
+                LEFT JOIN npc_trainer t2 ON t2.entry = IF(t1.spell < 0, -t1.spell, null)
+                WHERE     t1.entry = ?d
+            ';
 
             if ($tSpells = DB::Aowow()->select($teachQuery, $this->typeId))
             {
@@ -658,7 +665,7 @@ class NpcPage extends GenericPage
                   IF(f.id = RewOnKillRepFaction1, RewOnKillRepValue1, RewOnKillRepValue2) AS qty,
                   IF(f.id = RewOnKillRepFaction1, MaxStanding1, MaxStanding2)             AS maxRank,
                   IF(f.id = RewOnKillRepFaction1, isTeamAward1, isTeamAward2)             AS spillover
-              FROM aowow_factions f JOIN creature_onkill_reputation cor ON f.Id = cor.RewOnKillRepFaction1 OR f.Id = cor.RewOnKillRepFaction2 WHERE cor.creature_id IN (?a)';
+              FROM ?_factions f JOIN creature_onkill_reputation cor ON f.Id = cor.RewOnKillRepFaction1 OR f.Id = cor.RewOnKillRepFaction2 WHERE cor.creature_id IN (?a)';
 
         foreach (DB::Aowow()->select($q, (array)$entries) as $_)
         {

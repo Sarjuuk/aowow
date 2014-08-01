@@ -133,7 +133,8 @@ class ObjectPage extends GenericPage
 
         // SpellFocus
         if ($_ = $this->subject->getField('spellFocusId'))
-            $infobox[] = '[tooltip name=focus]'.Lang::$gameObject['focusDesc'].'[/tooltip][span class=tip tooltip=focus]'.Lang::$gameObject['focus'].Lang::$main['colon'].Util::localizedString(DB::Aowow()->selectRow('SELECT * FROM ?_spellFocusObject WHERE id = ?d', $_), 'name').'[/span]';
+            if ($sfo = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE id = ?d', $_))
+                $infobox[] = '[tooltip name=focus]'.Lang::$gameObject['focusDesc'].'[/tooltip][span class=tip tooltip=focus]'.Lang::$gameObject['focus'].Lang::$main['colon'].Util::localizedString($sfo, 'name').'[/span]';
 
         // lootinfo: [min, max, restock]
         if (($_ = $this->subject->getField('lootStack')) && $_[0])

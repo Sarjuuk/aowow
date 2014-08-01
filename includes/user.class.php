@@ -32,12 +32,12 @@ class User
         self::$dataKey = $_SESSION['dataKey'];
 
         // check IP bans
-        if ($ipBan = DB::Aowow()->selectRow('SELECT count, unbanDate FROM ?_account_bannedIPs WHERE ip = ? AND type = 0', $_SERVER['REMOTE_ADDR']))
+        if ($ipBan = DB::Aowow()->selectRow('SELECT count, unbanDate FROM ?_account_bannedips WHERE ip = ? AND type = 0', $_SERVER['REMOTE_ADDR']))
         {
             if ($ipBan['count'] > CFG_FAILED_AUTH_COUNT && $ipBan['unbanDate'] > time())
                 return false;
             else if ($ipBan['unbanDate'] <= time())
-                DB::Aowow()->query('DELETE FROM ?_account_bannedIPs WHERE ip = ?', $_SERVER['REMOTE_ADDR']);
+                DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE ip = ?', $_SERVER['REMOTE_ADDR']);
         }
 
         // try to restore session
@@ -186,11 +186,11 @@ class User
             case AUTH_MODE_SELF:
             {
                 // handle login try limitation
-                $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?', $_SERVER['REMOTE_ADDR']);
+                $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 0 AND ip = ?', $_SERVER['REMOTE_ADDR']);
                 if (!$ip || $ip['unbanDate'] < time())      // no entry exists or time expired; set count to 1
-                    DB::Aowow()->query('REPLACE INTO ?_account_bannedIPs (ip, type, count, unbanDate) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', $_SERVER['REMOTE_ADDR'], CFG_FAILED_AUTH_EXCLUSION);
+                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', $_SERVER['REMOTE_ADDR'], CFG_FAILED_AUTH_EXCLUSION);
                 else                                        // entry already exists; increment count
-                    DB::Aowow()->query('UPDATE ?_account_bannedIPs SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ?', CFG_FAILED_AUTH_EXCLUSION, $_SERVER['REMOTE_ADDR']);
+                    DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ?', CFG_FAILED_AUTH_EXCLUSION, $_SERVER['REMOTE_ADDR']);
 
                 if ($ip && $ip['count'] >= CFG_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
                     return AUTH_IPBANNED;
@@ -214,7 +214,7 @@ class User
                     return AUTH_ACC_INACTIVE;
 
                 // successfull auth; clear bans for this IP
-                DB::Aowow()->query('DELETE FROM ?_account_bannedIPs WHERE type = 0 AND ip = ?', $_SERVER['REMOTE_ADDR']);
+                DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE type = 0 AND ip = ?', $_SERVER['REMOTE_ADDR']);
 
                 if ($query['bans'] & (ACC_BAN_PERM | ACC_BAN_TEMP))
                     return AUTH_BANNED;

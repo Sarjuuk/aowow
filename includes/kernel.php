@@ -22,7 +22,7 @@ require 'pages/genericPage.class.php';
 
 // autoload List-classes, associated filters and pages
 spl_autoload_register(function ($class) {
-    $class = str_replace('Filter', '', $class);
+    $class = strtolower(str_replace('Filter', '', $class));
 
     if (class_exists($class))                               // already registered
         return;
@@ -30,19 +30,19 @@ spl_autoload_register(function ($class) {
     if (preg_match('/[^\w]/i', $class))                     // name should contain only letters
         return;
 
-    if (strpos($class, 'List'))
+    if (strpos($class, 'list'))
     {
         if (!class_exists('BaseType'))
             require 'includes/types/basetype.class.php';
 
-        if (file_exists(CWD.'includes/types/'.strtr($class, ['List' => '']).'.class.php'))
-            require 'includes/types/'.strtr($class, ['List' => '']).'.class.php';
+        if (file_exists(CWD.'includes/types/'.strtr($class, ['list' => '']).'.class.php'))
+            require 'includes/types/'.strtr($class, ['list' => '']).'.class.php';
 
         return;
     }
 
-    if (file_exists('pages/'.strtr($class, ['Page' => '']).'.php'))
-        require 'pages/'.strtr($class, ['Page' => '']).'.php';
+    if (file_exists('pages/'.strtr($class, ['page' => '']).'.php'))
+        require 'pages/'.strtr($class, ['page' => '']).'.php';
 });
 
 

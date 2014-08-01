@@ -108,7 +108,7 @@ class TitleList extends BaseType
             $sources[12] = (new AchievementList(array(['id', $sources[12]])))->getSourceData();
 
         if (!empty($sources[13]))
-            $sources[13] = DB::Aowow()->SELECT('SELECT *, Id AS ARRAY_KEY FROM ?_sourceStrings WHERE Id IN (?a)', $sources[13]);
+            $sources[13] = DB::Aowow()->SELECT('SELECT *, Id AS ARRAY_KEY FROM ?_sourcestrings WHERE Id IN (?a)', $sources[13]);
 
         foreach ($this->sources as $Id => $src)
         {

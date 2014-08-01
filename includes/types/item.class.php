@@ -849,7 +849,7 @@ class ItemList extends BaseType
         {
             $pieces = DB::Aowow()->select('
                 SELECT b.id AS ARRAY_KEY, b.name_loc0, b.name_loc2, b.name_loc3, b.name_loc6, b.name_loc8, GROUP_CONCAT(a.id SEPARATOR \':\') AS equiv
-                FROM   aowow_items a, aowow_items b
+                FROM   ?_items a, ?_items b
                 WHERE  a.slotBak = b.slotBak AND a.itemset = b.itemset AND b.id IN (?a)
                 GROUP BY b.id;',
                 array_keys($itemset->pieceToSet)
@@ -1015,7 +1015,7 @@ class ItemList extends BaseType
     // from Trinity
     public function generateEnchSuffixFactor()
     {
-        $rpp = DB::Aowow()->selectRow('SELECT * FROM ?_itemRandomPropPoints WHERE Id = ?', $this->curTpl['itemLevel']);
+        $rpp = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomproppoints WHERE Id = ?', $this->curTpl['itemLevel']);
         if (!$rpp)
             return 0;
 
@@ -1291,9 +1291,9 @@ class ItemList extends BaseType
 
         $ire = DB::Aowow()->select('
             SELECT  i.id AS ARRAY_KEY_1, ire.id AS ARRAY_KEY_2, iet.chance, ire.*
-            FROM    aowow_items i
+            FROM    ?_items i
             JOIN    item_enchantment_template iet ON iet.entry = ABS(i.randomEnchant)
-            JOIN    aowow_itemRandomEnchant ire ON IF(i.randomEnchant > 0, ire.id = iet.ench, ire.id = -iet.ench)
+            JOIN    ?_itemRandomEnchant ire ON IF(i.randomEnchant > 0, ire.id = iet.ench, ire.id = -iet.ench)
             WHERE   i.id IN (?a)',
             array_keys($this->templates)
         );
@@ -1444,8 +1444,8 @@ class ItemList extends BaseType
 class ItemListFilter extends Filter
 {
     private   $ubFilter      = [];                          // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
-    private   $extCostQuery  = 'SELECT item FROM npc_vendor nv              JOIN ?_itemExtendedCost iec ON iec.id =   nv.extendedCost WHERE %s UNION
-                                SELECT item FROM game_event_npc_vendor genv JOIN ?_itemExtendedCost iec ON iec.id = genv.extendedCost WHERE %1$s';
+    private   $extCostQuery  = 'SELECT item FROM npc_vendor nv              JOIN ?_itemextendedcost iec ON iec.id =   nv.extendedCost WHERE %s UNION
+                                SELECT item FROM game_event_npc_vendor genv JOIN ?_itemextendedcost iec ON iec.id = genv.extendedCost WHERE %1$s';
 
     public    $extraOpts     = [];                          // score for statWeights
     public    $wtCnd         = [];

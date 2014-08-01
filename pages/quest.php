@@ -805,7 +805,7 @@ class QuestPage extends GenericPage
         if ($_ = $this->subject->getField('rewardMailTemplateId'))
         {
             $delay  = $this->subject->getField('rewardMailDelay');
-            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailTemplate WHERE id = ?d', $_);
+            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $_);
 
             $mail = array(
                 'delay'   => $delay  ? sprintf(Lang::$quest['mailIn'], Util::formatTime($delay * 1000)) : null,

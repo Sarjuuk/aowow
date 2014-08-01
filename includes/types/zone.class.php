@@ -20,7 +20,7 @@ class ZoneList extends BaseType
     {
         $data = [];
 /*
-UPDATE dbc.worldmaparea a, world.aowow_zones z SET yMax = `left`, xMax = top, yMin = `right`, xMin = bottom WHERE a.areaId = z.id;
+UPDATE dbc.worldmaparea a, world.?_zones z SET yMax = `left`, xMax = top, yMin = `right`, xMin = bottom WHERE a.areaId = z.id;
 
     LFG_TYPE_NONE                                = 0,      // Internal use only
     LFG_TYPE_DUNGEON                             = 1,

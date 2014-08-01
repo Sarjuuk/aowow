@@ -963,7 +963,7 @@ class AjaxHandler
         }
 
         // hey, still here? you're not a Tauren/Nelf as bear or cat, are you?
-        return DB::Aowow()->selectCell('SELECT IF(?d == 1, IFNULL(displayIdA, displayIdH), IFNULL(displayIdH, displayIdA)) FROM ?_shapeshiftForm WHERE id = ?d', Util::sideByRaceMask(1 << ($char['race'] - 1)), $form);
+        return DB::Aowow()->selectCell('SELECT IF(?d == 1, IFNULL(displayIdA, displayIdH), IFNULL(displayIdH, displayIdA)) FROM ?_shapeshiftform WHERE id = ?d', Util::sideByRaceMask(1 << ($char['race'] - 1)), $form);
     }
 
 

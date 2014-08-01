@@ -83,7 +83,7 @@ class Util
     );
 
     /*  why:
-        Because petSkills (and ranged weapon skills) are the only ones with more than two skillLines attached. Because Left Joining ?_spell with ?_skillLineAbility  causes more trouble than it has uses.
+        Because petSkills (and ranged weapon skills) are the only ones with more than two skillLines attached. Because Left Joining ?_spell with ?_skillLineability  causes more trouble than it has uses.
         Because this is more or less the only reaonable way to fit all that information into one database field, so..
         .. the indizes of this array are bits of skillLine2OrMask in ?_spell if skillLineId1 is negative
     */

@@ -382,7 +382,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             return Lang::$account['emailInvalid'];
 
         // limit account creation
-        $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedIPs WHERE type = 1 AND ip = ?', $_SERVER['REMOTE_ADDR']);
+        $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 1 AND ip = ?', $_SERVER['REMOTE_ADDR']);
         if ($ip && $ip['count'] >= CFG_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
         {
             DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, $_SERVER['REMOTE_ADDR']);

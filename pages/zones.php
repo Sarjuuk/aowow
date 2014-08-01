@@ -76,8 +76,22 @@ class ZonesPage extends GenericPage
         if ($mapFile)
         {
             $somData = ['flightmaster' => []];
-            $nodes   = DB::Aowow()->select('SELECT id AS ARRAY_KEY, tn.* FROM ?_taxiNodes tn WHERE mapId = ?d ', $spawnMap);
-            $paths   = DB::Aowow()->select('SELECT IF(tn1.reactA = tn1.reactH AND tn2.reactA = tn2.reactH, 1, 0) AS neutral, tp.startNodeId AS startId, tn1.posX AS startPosX, tn1.posY AS startPosY, tp.endNodeId AS endId, tn2.posX AS endPosX, tn2.posY AS endPosY FROM ?_taxiPath tp, ?_taxiNodes tn1 , ?_taxiNodes tn2 WHERE tn1.Id = tp.endNodeId AND tn2.Id = tp.startNodeId AND (tp.startNodeId IN (?a) OR tp.EndNodeId IN (?a))', array_keys($nodes), array_keys($nodes));
+            $nodes   = DB::Aowow()->select('SELECT id AS ARRAY_KEY, tn.* FROM ?_taxinodes tn WHERE mapId = ?d ', $spawnMap);
+            $paths   = DB::Aowow()->select('
+                        SELECT  IF(tn1.reactA = tn1.reactH AND tn2.reactA = tn2.reactH, 1, 0) AS neutral,
+                                tp.startNodeId AS startId,
+                                tn1.posX AS startPosX,
+                                tn1.posY AS startPosY,
+                                tp.endNodeId AS endId,
+                                tn2.posX AS endPosX,
+                                tn2.posY AS endPosY
+                        FROM    ?_taxipath tp,
+                                ?_taxinodes tn1,
+                                ?_taxinodes tn2
+                        WHERE   tn1.Id = tp.endNodeId AND
+                                tn2.Id = tp.startNodeId AND
+                                (tp.startNodeId IN (?a) OR tp.EndNodeId IN (?a))
+                        ', array_keys($nodes), array_keys($nodes));
 
             foreach ($nodes as $i => $n)
             {

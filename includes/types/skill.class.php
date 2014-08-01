@@ -9,7 +9,7 @@ class SkillList extends BaseType
     public static $type      = TYPE_SKILL;
     public static $brickFile = 'skill';
 
-    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_skillLine sl';
+    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_skillline sl';
 
     public function __construct($conditions = [])
     {
@@ -40,7 +40,7 @@ class SkillList extends BaseType
                 name_loc6,
                 name_loc8
             FROM
-                ?_skillLine
+                ?_skillline
             WHERE
                 id = ?d',
             $id

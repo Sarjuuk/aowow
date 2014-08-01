@@ -73,7 +73,7 @@ class AchievementsPage extends GenericPage
             $curCats = $catList = [!empty($this->category) ? (int)end($this->category) : 0];
             while ($curCats)
             {
-                $curCats = DB::Aowow()->SelectCol('SELECT Id FROM ?_achievementCategory WHERE parentCategory IN (?a)', $curCats);
+                $curCats = DB::Aowow()->SelectCol('SELECT Id FROM ?_achievementcategory WHERE parentCategory IN (?a)', $curCats);
                 $catList = array_merge($catList, $curCats);
             }
             $conditions = [];

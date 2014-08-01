@@ -258,7 +258,7 @@ class SkillPage extends GenericPage
                 $list = DB::Aowow()->selectCol('
                     SELECT    IF(t1.entry > 200000, t2.entry, t1.entry)
                     FROM      npc_trainer t1
-                    JOIN      aowow_spell s  ON s.id = t1.spell
+                    JOIN      ?_spell s  ON s.id = t1.spell
                     LEFT JOIN npc_trainer t2 ON t2.spell = -t1.entry
                     WHERE     s.typeCat IN (-11, 9) AND (s.skillLine1 = ?d OR (s.skillLine1 > 0 AND s.skillLine2OrMask = ?d) '.($mask ? ' OR (s.skilllIne1 = -3 AND s.skillLine2OrMask = '.$mask.')' : null).')',
                     $this->typeId,

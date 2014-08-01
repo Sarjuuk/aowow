@@ -215,9 +215,9 @@ class CurrencyPage extends GenericPage
         }
 
         $boughtBy = DB::Aowow()->selectCol('
-            SELECT item FROM npc_vendor nv JOIN ?_itemExtendedCost iec ON iec.id = nv.extendedCost WHERE '.$w.'
+            SELECT item FROM npc_vendor nv JOIN ?_itemextendedcost iec ON iec.id = nv.extendedCost WHERE '.$w.'
             UNION
-            SELECT item FROM game_event_npc_vendor genv JOIN ?_itemExtendedCost iec ON iec.id = genv.extendedCost WHERE '.$w
+            SELECT item FROM game_event_npc_vendor genv JOIN ?_itemextendedcost iec ON iec.id = genv.extendedCost WHERE '.$w
         );
 
         if ($boughtBy)

@@ -442,7 +442,7 @@ class SpellList extends BaseType
                         2289 => [2289, 29415, 29418, 29419, 29420, 29421]   // Bear - Tauren
                     );
 
-                    if ($st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftForms WHERE id = ?d', $effMV))
+                    if ($st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftforms WHERE id = ?d', $effMV))
                     {
                         foreach ([1, 2] as $i)
                             if (isset($subForms[$st['model'.$i]]))
@@ -1228,7 +1228,7 @@ class SpellList extends BaseType
         {
             if (empty($this->spellVars[$this->id]))
             {
-                $spellVars = DB::Aowow()->SelectCell('SELECT vars FROM ?_spellVariables WHERE id = ?d', $this->curTpl['spellDescriptionVariableId']);
+                $spellVars = DB::Aowow()->SelectCell('SELECT vars FROM ?_spellvariables WHERE id = ?d', $this->curTpl['spellDescriptionVariableId']);
                 $spellVars = explode("\n", $spellVars);
                 foreach ($spellVars as $sv)
                     if (preg_match('/\$(\w*\d*)=(.*)/i', trim($sv), $matches))
@@ -1811,7 +1811,7 @@ spells / buffspells = {
                 $extra[$id] = array(
                     'id'         => $id,
                     'tooltip'    => $tTip[0],
-                    'buff'       => $buff[0],
+                    'buff'       => @$buff[0],
                     'spells'     => $tTip[1],
                     'buffspells' => @$buff[1]
                 );

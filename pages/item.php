@@ -173,7 +173,7 @@ class ItemPage extends genericPage
 
         // tool
         if ($tId = $this->subject->getField('totemCategory'))
-            if ($tName = DB::Aowow()->selectRow('SELECT * FROM ?_totemCategory WHERE id = ?d', $tId))
+            if ($tName = DB::Aowow()->selectRow('SELECT * FROM ?_totemcategory WHERE id = ?d', $tId))
                 $infobox[] = Lang::$item['tool'].Lang::$main['colon'].'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
 
         // extendedCost
@@ -825,9 +825,9 @@ class ItemPage extends genericPage
             $w = 'iec.reqItemId1 = '.$this->typeId.' OR iec.reqItemId2 = '.$this->typeId.' OR iec.reqItemId3 = '.$this->typeId.' OR iec.reqItemId4 = '.$this->typeId.' OR iec.reqItemId5 = '.$this->typeId;
 
         $boughtBy = DB::Aowow()->selectCol('
-            SELECT item FROM npc_vendor nv JOIN ?_itemExtendedCost iec ON iec.id = nv.extendedCost WHERE '.$w.'
+            SELECT item FROM npc_vendor nv JOIN ?_itemextendedcost iec ON iec.id = nv.extendedCost WHERE '.$w.'
             UNION
-            SELECT item FROM game_event_npc_vendor genv JOIN ?_itemExtendedCost iec ON iec.id = genv.extendedCost WHERE '.$w
+            SELECT item FROM game_event_npc_vendor genv JOIN ?_itemextendedcost iec ON iec.id = genv.extendedCost WHERE '.$w
         );
         if ($boughtBy)
         {

@@ -156,7 +156,7 @@ class SpellPage extends GenericPage
         // spell focus
         if ($_ = $this->subject->getField('spellFocusObject'))
         {
-            $bar = DB::Aowow()->selectRow('SELECT * FROM ?_spellFocusObject WHERE id = ?d', $_);
+            $bar = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE id = ?d', $_);
             $focus = new GameObjectList(array(['spellFocusId', $_], 1));
             $infobox[] = '[li]'.Lang::$game['requires2'].' '.($focus->error ? Util::localizedString($bar, 'name') : '[url=?object='.$focus->id.']'.Util::localizedString($bar, 'name').'[/url]').'[/li]';
         }
@@ -1430,7 +1430,7 @@ class SpellPage extends GenericPage
     private function createEffects(&$infobox, &$redButtons)
     {
         // proc data .. maybe use more information..?
-        $procData = DB::Aowow()->selectRow('SELECT IF(ppmRate > 0, -ppmRate, customChance) AS chance, cooldown FROM world.spell_proc_event WHERE entry = ?d', $this->typeId);
+        $procData = DB::Aowow()->selectRow('SELECT IF(ppmRate > 0, -ppmRate, customChance) AS chance, cooldown FROM spell_proc_event WHERE entry = ?d', $this->typeId);
         if (!isset($procData['cooldown']))
             $procData['cooldown'] = 0;
 
@@ -1569,7 +1569,7 @@ class SpellPage extends GenericPage
                 case 53:                                    // Enchant Item Perm
                 case 54:                                    // Enchant Item Temp
                 case 156:                                   // Enchant Item Prismatic
-                    if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemEnchantment WHERE id = ?d', $effMV))
+                    if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE id = ?d', $effMV))
                         $foo['name'] .= ' <span class="q2">'.Util::localizedString($_, 'text').'</span> ('.$effMV.')';
                     else
                         $foo['name'] .= ' #'.$effMV;
@@ -1611,7 +1611,7 @@ class SpellPage extends GenericPage
                     $foo['name'] .= Lang::$main['colon'].$_;
                     break;
                 case 74:                                    // Apply Glyph
-                    if ($_ = DB::Aowow()->selectCell('SELECT spellId FROM ?_glyphProperties WHERE id = ?d', $effMV))
+                    if ($_ = DB::Aowow()->selectCell('SELECT spellId FROM ?_glyphproperties WHERE id = ?d', $effMV))
                     {
                         if ($n = SpellList::getName($_))
                             $foo['name'] .= Lang::$main['colon'].'(<a href="?spell='.$_.'">'.$n.'</a>)';
