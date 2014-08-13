@@ -655,7 +655,7 @@ $lang = array(
             'AMMOSLOT' => "[Ammo]",         'STEAM' => "[Steam Pressure]",      'WRATH'       => "[Wrath]",         'PYRITE' => "[Pyrite]",
             'HEAT'     => "[Heat]",         'OOZE'  => "[Ooze]",                'BLOOD_POWER' => "[Blood Power]" // spellname of 72370
         ),
-        'relItems'      => array (
+        'relItems'      => array(
             'base'    => "<small>Muestra %s relacionados con <b>%s</b></small>",
             'link'    => " u ",
             'recipes' => '<a href="?items=9.%s">objetos de receta</a>',
@@ -790,7 +790,7 @@ $lang = array(
         'tool'          => "Herramienta",
         'cost'          => "Coste",
         'content'       => "Contenido",
-        '_transfer'     => 'Este objeto será convertido a <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(static/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Este objeto será convertido a <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
         '_unavailable'  => "Este objeto no está disponible para los jugadores.",
         '_rndEnchants'  => "Encantamientos aleatorios",
         '_chance'       => "(probabilidad %s%%)",
@@ -806,15 +806,23 @@ $lang = array(
         'socket'        => array(
             "Ranura meta",          "Ranura roja",      "Ranura amarilla",          "Ranura azul",            -1 => "Ranura prismática"
         ),
-        'quality'       => array (
+        'gemColors'     => array(                           // *_GEM
+            "meta",                 "roja(s)",          "amarilla(s)",              "azul(es)"
+        ),
+        'gemConditions' => array(                           // ENCHANT_CONDITION_*
+            2 => ["menos de %d %s gema", "menos de %d %s gemas"],
+            3 => "más gemas %s que gemas %s",
+            5 => ["al menos %d %s gema", "al menos %d %s gemas"]
+        ),
+        'quality'       => array(
             "Pobre",                "Común",            "Poco Común",               "Raro",
             "Épica",                "Legendaria",       "Artefacto",                "Reliquia"
         ),
-        'trigger'       => array (
+        'trigger'       => array(
             "Uso: ",                "Equipar: ",        "Probabilidad al acertar: ", null,                          null,
             null,                   null
         ),
-        'bonding'       => array (
+        'bonding'       => array(
             "Se liga a la cuenta",                      "Se liga al recogerlo",                                     "Se liga al equiparlo",
             "Se liga al usarlo",                        "Objeto de misión",                                         "Objeto de misión"
         ),

@@ -658,7 +658,7 @@ $lang = array(
             'AMMOSLOT' => "Ammo",           'STEAM' => "Steam Pressure",        'WRATH'       => "Wrath",           'PYRITE' => "Pyrite",
             'HEAT'     => "Heat",           'OOZE'  => "Ooze",                  'BLOOD_POWER' => "Blood Power"
         ),
-        'relItems'      => array (
+        'relItems'      => array(
             'base'    => "<small>Show %s related to <b>%s</b></small>",
             'link'    => " or ",
             'recipes' => '<a href="?items=9.%s">recipe items</a>',
@@ -793,7 +793,7 @@ $lang = array(
         'tool'          => "Tool",
         'cost'          => "Cost",
         'content'       => "Content",
-        '_transfer'     => 'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(static/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         '_unavailable'  => "This item is not available to players.",
         '_rndEnchants'  => "Random Enchantments",
         '_chance'       => "(%s%% chance)",
@@ -807,17 +807,25 @@ $lang = array(
         'gems'          => "Gems",
         'socketBonus'   => "Socket Bonus",
         'socket'        => array(
-            "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",            -1 => "Prismatic Socket"
+            "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",          -1 => "Prismatic Socket"
         ),
-        'quality'       => array (
+        'gemColors'     => array(
+            "meta",                 "red",              "yellow",               "blue"
+        ),
+        'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua
+            2 => ["less than %d %s gem", "less than %d %s gems"],
+            3 => "more %s gems than %s gems",
+            5 => ["at least %d %s gem", "at least %d %s gems"]
+        ),
+        'quality'       => array(
             "Poor",                 "Common",           "Uncommon",             "Rare",
             "Epic",                 "Legendary",        "Artifact",             "Heirloom"
         ),
-        'trigger'       => array (
+        'trigger'       => array(
             "Use: ",                "Equip: ",          "Chance on hit: ",      null,                           null,
             null,                   null
         ),
-        'bonding'       => array (
+        'bonding'       => array(
             "Binds to account",                         "Binds when picked up",                                 "Binds when equipped",
             "Binds when used",                          "Quest Item",                                           "Quest Item"
         ),

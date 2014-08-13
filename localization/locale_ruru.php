@@ -660,7 +660,7 @@ $lang = array(
             'AMMOSLOT' => "[Ammo]",         'STEAM' => "[Steam Pressure]",      'WRATH'       => "Гневу",           'PYRITE' => "Колчедан",
             'HEAT'     => "Жар",            'OOZE'  => "Слизнюка",              'BLOOD_POWER' => "Сила крови"
         ),
-        'relItems'      => array (
+        'relItems'      => array(
             'base'    => "<small>Показать %s, относящиеся к профессии <b>%s</b></small>",
             'link'    => " или ",
             'recipes' => '<a href="?items=9.%s">рецепты</a>',
@@ -795,7 +795,7 @@ $lang = array(
         'tool'          => "Инструмент",
         'cost'          => "Цена",
         'content'       => "Материал",
-        '_transfer'     => 'Этот предмет превратится в <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(static/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Этот предмет превратится в <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         '_unavailable'  => "Этот предмет не доступен игрокам.",
         '_rndEnchants'  => "Случайные улучшения",
         '_chance'       => "(шанс %s%%)",
@@ -811,15 +811,23 @@ $lang = array(
         'socket'        => array(
             "Особое гнездо",        "Красное гнездо",   "Желтое гнездо",        "Синее гнездо",           -1 => "Бесцветное гнездо"
         ),
-        'quality'       => array (
+        'gemColors'     => array(                           // *_GEM
+            "Особый",               "Красный",          "Желтый",               "Синий"
+        ),
+        'gemConditions' => array(                           // ENCHANT_CONDITION_*      so whats that pipe-code..?
+            2 => ["меньше, чем %d камень %s цвета", "меньше, чем %d камня %s цвета"],   // меньше, чем %d |4камень:камня:камней; |3-1(%s) цвета
+            3 => "больше %s, чем %s камней",                                            // больше |3-7(%s), чем |3-7(%s) камней
+            5 => ["хотя бы %d камень %s цвета", "хотя бы %d камня %s цвета"]            // хотя бы %d |4камень:камня:камней; |3-1(%s) цвета; same here
+        ),
+        'quality'       => array(
             "Низкий",               "Обычный",          "Необычный",            "Редкий",
             "Эпический",            "Легендарный",      "Артефакт",             "Фамильная черта"
         ),
-        'trigger'       => array (
+        'trigger'       => array(
             "Использование: ",      "Если на персонаже: ",                      "Возможный эффект при попадании: ",
             null,                   null,               null,                   null
         ),
-        'bonding'       => array (
+        'bonding'       => array(
             "Привязано к учетной записи",               "Персональный при поднятии",                            "Становится персональным при надевании",
             "Персональный при использовании",           "Предмет, необходимый для задания",                     "Предмет, необходимый для задания"
         ),

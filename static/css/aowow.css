@@ -3679,10 +3679,13 @@ a:hover.pet-zoom {
     padding: 5px 0 5px 0px;
 }
 
-/* still in use */
+/* still in use, merge with .hassubmenu */
 a#toplinks-language {
-    padding: 0 0 0 21px;
-    background: url(../images/icons/language.gif) left center no-repeat;
+    /* padding: 0 0 0 21px; */
+    padding: 0 13px 0 21px;
+    background-image: url(../images/icons/language.gif), url(../images/Menu/arrow-down-ffcd55.gif);
+    background-position: left center, right center;
+    background-repeat: no-repeat, no-repeat;
 }
 
 /* the search.css is basicly empty without the styles for googleseach */

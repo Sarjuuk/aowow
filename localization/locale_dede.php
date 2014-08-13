@@ -660,7 +660,7 @@ $lang = array(
         'powerRunes'    => ["Frost", "Unheilig", "Blut", "Tod"],
         'powerTypes'    => array(
             -2 => "Gesundheit", -1 => null, "Mana",     "Wut",      "Fokus",    "Energie",      "Zufriedenheit",    "Runen",    "Runenmacht",
-            'AMMOSLOT' => "Munition",       'STEAM' => "Dampfdruck",            'WRATH'       => "Zorn",            'PYRITE' => "Pyrit",
+            'AMMOSLOT' => "Munition",       'STEAM' => "Dampfdruck",            'WRATH'       => "Wrath",           'PYRITE' => "Pyrit",
             'HEAT'     => "Hitze",          'OOZE'  => "Schlamm",               'BLOOD_POWER' => "Blutmacht"
         ),
         'relItems'      => array(
@@ -798,7 +798,7 @@ $lang = array(
         'tool'          => "Werkzeug",
         'cost'          => "Preis",
         'content'       => "Inhalt",
-        '_transfer'     => 'Dieser Gegenstand wird mit <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(static/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
+        '_transfer'     => 'Dieser Gegenstand wird mit <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         '_unavailable'  => "Dieser Gegenstand ist nicht für Spieler verfügbar.",
         '_rndEnchants'  => "Zufällige Verzauberungen",
         '_chance'       => "(Chance von %s%%)",
@@ -811,18 +811,26 @@ $lang = array(
         'tabOther'      => "Anderes",
         'gems'          => "Edelsteine",
         'socketBonus'   => "Sockelbonus",
-        'socket'        => array (
+        'socket'        => array(
             "Metasockel",           "Roter Sockel",     "Gelber Sockel",        "Blauer Sockel",          -1 => "Prismatischer Sockel"
         ),
-        'quality'       => array (
+        'gemColors'     => array(                           // *_GEM
+            "Meta",                 "Rot",              "Gelb",                 "Blau"
+        ),
+        'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua; 2 not in use (use as PH)
+            2 => ["weniger als %d Edelstein der Kategorie %s", "weniger als %d Edelsteine der Kategorie %s"],
+            3 => "mehr Edelsteine der Kategorie %s als Edelsteine der Kategorie %s",
+            5 => ["mindestens %d Edelstein der Kategorie %s", "mindestens %d Edelsteine der Kategorie %s"]
+        ),
+        'quality'       => array(
             "Schlecht",             "Verbreitet",       "Selten",               "Rar",
             "Episch",               "Legendär",         "Artefakt",             "Erbstücke",
         ),
-        'trigger'       => array (
+        'trigger'       => array(
             "Benutzen: ",           "Anlegen: ",        "Chance bei Treffer: ", null,                           null,
             null,                   null
         ),
-        'bonding'       => array (
+        'bonding'       => array(
             "Accountgebunden",                          "Wird beim Aufheben gebunden",                          "Wird beim Anlegen gebunden",
             "Wird bei Benutzung gebunden",              "Questgegenstand",                                      "Questgegenstand"
         ),

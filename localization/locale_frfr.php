@@ -138,7 +138,7 @@ $lang = array(
         'bannedRating'  => "Vous avez été banni du score des commentaires.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Vous avez voté trop souvent aujourd'hui! Revenez demain." # LANG.tooltip_too_many_votes
     ),
-    'game' => array (
+    'game' => array(
         'achievement'   => "haut fait",
         'achievements'  => "Hauts faits",
         'class'         => "classe",
@@ -653,7 +653,7 @@ $lang = array(
             'AMMOSLOT' => "[Ammo]",         'STEAM' => "[Steam Pressure]",      'WRATH'       => "courroux",        'PYRITE' => "Pyrite",
             'HEAT'     => "chaleur",        'OOZE'  => "limon",                 'BLOOD_POWER' => "puissance de sang"
         ),
-        'relItems'      => array (
+        'relItems'      => array(
             'base'    => "<small>Montre %s reliés à <b>%s</b></small>",
             'link'    => " ou ",
             'recipes' => "les <a href=\"?items=9.%s\">recettes</a>",
@@ -788,7 +788,7 @@ $lang = array(
         'tool'          => "Outil",
         'cost'          => "Coût",
         'content'       => "Contenu",
-        '_transfer'     => 'Cet objet sera converti en <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(static/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Cet objet sera converti en <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         '_unavailable'  => "Este objeto no está disponible para los jugadores.",
         '_rndEnchants'  => "Enchantements aléatoires",
         '_chance'       => "(%s%% de chance)",
@@ -804,15 +804,23 @@ $lang = array(
         'socket'        => array(
             "Méta-châsse",          "Châsse rouge",     "Châsse jaune",         "Châsse bleue",           -1 => "Châsse prismatique"
         ),
-        'quality'       => array (
+        'gemColors'     => array(                           // *_GEM
+            "Méta",                 "rouge(s)",         "jaune(s)",             "bleue(s)"
+        ),
+        'gemConditions' => array(                           // ENCHANT_CONDITION_*
+            2 => ["moins de %d gemme %s", "moins de %d gemmes %s"],
+            3 => "plus de gemmes %s que de %s",             // plus de gemmes %s que |2 %s
+            5 => ["au moins %d gemme %s", "au moins %d gemmes %s"]
+        ),
+        'quality'       => array(
             "Médiocre",             "Classique",        "Bonne",                "Rare",
             "Épique",               "Légendaire",       "Artefact",             "Héritage"
         ),
-        'trigger'       => array (
+        'trigger'       => array(
             "Utilise : ",           "Équipé : ",        "Chances quand vous touchez : ", null,                  null,
             null,                   null
         ),
-        'bonding'       => array (
+        'bonding'       => array(
             "Lié au compte",                            "Lié quand ramassé",                                    "Lié quand équipé",
             "Lié quand utilisé",                        "Objet de quête",                                       "Objet de quête"
         ),

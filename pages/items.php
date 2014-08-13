@@ -128,7 +128,7 @@ class ItemsPage extends GenericPage
             $infoMask |= ITEMINFO_VENDOR;
 
         if (!empty($this->filter['fi']['extraCols']))
-            $this->sharedLV['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.($this->filter['gm'] ?: 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')';
+            $this->sharedLV['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.(isset($this->filter['gm']) ? $this->filter['gm'] : 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')';
 
         if ($this->filterObj->error)
             $this->sharedLV['_errors'] = '$1';

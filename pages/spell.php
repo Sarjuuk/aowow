@@ -1511,7 +1511,7 @@ class SpellPage extends GenericPage
             if ($_ = $this->subject->getField('effect'.$i.'Mechanic'))
                 $foo['mechanic'] = Lang::$game['me'][$_];
 
-            if (!empty($procData['chance']) && $procData['chance'] < 100)
+            if (!empty($procData['chance']))
                 $foo['procData'] = array(
                     $procData['chance'],
                     $procData['cooldown'] ? Util::formatTime($procData['cooldown'] * 1000, true) : null

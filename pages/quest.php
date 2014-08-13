@@ -347,6 +347,8 @@ class QuestPage extends GenericPage
         /* Objectives List */
         /*******************/
 
+        $this->objectiveList = [];
+
         // gather ids for lookup
         $olItems = $olNPCs = $olGOs = $olFactions = [];
 

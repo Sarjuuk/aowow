@@ -6,4 +6,4 @@ else:
 endif;
 ?>
 |<a href="#" id="toplinks-feedback" class="icon-email"><?php echo Lang::$main['feedback']; ?></a>
-|<a href="javascript:;" id="toplinks-language"><?php echo Lang::$main['language']; ?><small>&#9660;</small></a>
+|<a href="javascript:;" id="toplinks-language"><?php echo Lang::$main['language']; ?></a>

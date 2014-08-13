@@ -196,7 +196,7 @@ class User
                     return AUTH_IPBANNED;
 
                 $query = DB::Aowow()->SelectRow('
-                    SELECT    a.id, a.passHash, BIT_OR(ab.typeMask) AS bans, status
+                    SELECT    a.id, a.passHash, BIT_OR(ab.typeMask) AS bans, a.status
                     FROM      ?_account a
                     LEFT JOIN ?_account_banned ab ON a.id = ab.userId AND ab.end > UNIX_TIMESTAMP()
                     WHERE     a.user = ?
@@ -282,7 +282,7 @@ class User
         if (DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE extId = ?d', $extId))
             return true;
 
-        $ok = DB::Aowow()->query('INSERT INTO ?_account (extId, user, displayName, lastIP, locale, status) VALUES (?d, ?, ?, ?, ?d, ?d)',
+        $newId = DB::Aowow()->query('INSERT INTO ?_account (extId, user, displayName, lastIP, locale, status) VALUES (?d, ?, ?, ?, ?d, ?d)',
             $extId,
             $name,
             Util::ucFirst($name),
@@ -291,7 +291,10 @@ class User
             ACC_STATUS_OK
         );
 
-        return $ok;
+        if ($newId)
+            Util::gainSiteReputation(SITEREP_ACTION_REGISTER, $newId);
+
+        return $newId;
     }
 
     private static function createSalt()

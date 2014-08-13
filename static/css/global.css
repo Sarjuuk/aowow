@@ -308,7 +308,7 @@
 }
 
 .dragged {
-    z-index: 1000;
+    z-index: 1000 !important;
     opacity: 0.35;
     filter: alpha(opacity=35);
 }

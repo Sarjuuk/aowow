@@ -604,8 +604,33 @@ class ItemList extends BaseType
         // Item is a gem (don't mix with sockets)
         if ($geId = $this->curTpl['gemEnchantmentId'])
         {
-            $gemText = DB::Aowow()->selectRow('SELECT * FROM ?_itemEnchantment WHERE id = ?d', $geId);
-            $x .= Util::localizedString($gemText, 'text').'<br />';
+            $gemEnch = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE id = ?d', $geId);
+            $x .= '<span class="q1">'.Util::localizedString($gemEnch, 'text').'</span><br />';
+
+            // activation conditions for meta gems
+            if ($gemEnch['conditionId'])
+            {
+                if ($gemCnd = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantmentcondition WHERE id = ?d', $gemEnch['conditionId']))
+                {
+                    for ($i = 1; $i < 6; $i++)
+                    {
+                        if (!$gemCnd['color'.$i])
+                            continue;
+
+                        switch ($gemCnd['comparator'.$i])
+                        {
+                            case 2:                         // requires less <color> than (<value> || <comparecolor>) gems
+                            case 5:                         // requires at least <color> than (<value> || <comparecolor>) gems
+                                $sp = (int)$gemCnd['value'.$i] > 1;
+                                $x .= '<span class="q0">'.Lang::$achievement['reqNumCrt'].' '.sprintf(Lang::$item['gemConditions'][$gemCnd['comparator'.$i]][$sp], $gemCnd['value'.$i], Lang::$item['gemColors'][$gemCnd['color'.$i] - 1]).'</span><br />';
+                                break;
+                            case 3:                         // requires more <color> than (<value> || <comparecolor>) gems
+                                $x .= '<span class="q0">'.Lang::$achievement['reqNumCrt'].' '.sprintf(Lang::$item['gemConditions'][3], Lang::$item['gemColors'][$gemCnd['color'.$i] - 1], Lang::$item['gemColors'][$gemCnd['cmpColor'.$i] - 1]).'</span><br />';
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         // Random Enchantment - if random enchantment is set, prepend stats from it
@@ -654,14 +679,17 @@ class ItemList extends BaseType
         {
             $gems = DB::Aowow()->select('SELECT i.id AS ARRAY_KEY, i.iconString, ae.*, i.gemColorMask AS colorMask FROM ?_items i JOIN ?_itemenchantment ae ON ae.id = i.gemEnchantmentId WHERE i.id IN (?a)', $enhance['g']);
             foreach ($enhance['g'] as $k => $v)
-                if (!in_array($v, array_keys($gems)))
+                if ($v && !in_array($v, array_keys($gems))) // 0 is valid
                     unset($enhance['g'][$k]);
         }
         else
             $enhance['g'] = [];
 
         // zero fill empty sockets
-        $sockCount = $this->curTpl['socketColor1'] + $this->curTpl['socketColor2'] + $this->curTpl['socketColor3'] + (isset($enhance['s']) ? 1 : 0);
+        $sockCount = isset($enhance['s']) ? 1 : 0;
+        if (!empty($this->json[$this->id]['nsockets']))
+            $sockCount += $this->json[$this->id]['nsockets'];
+
         while ($sockCount > count($enhance['g']))
             $enhance['g'][] = 0;
 

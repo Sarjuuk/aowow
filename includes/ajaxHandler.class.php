@@ -41,7 +41,7 @@ class AjaxHandler
         if (empty($this->get['id']))
             return;
 
-        if ($_ = DB::Aowow()->selectRow('SELECT c2.id as zwei, c1.id as eins, IFNULL(c2.id, c1.id) AS id, IFNULL(c2.type, c1.type) AS type, IFNULL(c2.typeId, c1.typeId) AS typeId FROM ?_comments c1 LEFT JOIN ?_comments c2 ON c1.replyTo = c2.id WHERE c1.id = ?d', $this->get['id']))
+        if ($_ = DB::Aowow()->selectRow('SELECT IFNULL(c2.id, c1.id) AS id, IFNULL(c2.type, c1.type) AS type, IFNULL(c2.typeId, c1.typeId) AS typeId FROM ?_comments c1 LEFT JOIN ?_comments c2 ON c1.replyTo = c2.id WHERE c1.id = ?d', $this->get['id']))
             header('Location: ?'.Util::$typeStrings[$_['type']].'='.$_['typeId'].'#comments:id='.$_['id'].($_['id'] != $this->get['id'] ? ':reply='.$this->get['id'] : null));
     }
 
