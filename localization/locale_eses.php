@@ -206,12 +206,16 @@ $lang = array(
         'expansions'    => ["World of Warcraft", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Fuerza", "Agilidad", "Aguante", "Intelecto", "Espíritu"],
         'sources'       => array(
-            null,                       "Creado",                   "Encontrado",               "JcJ",                      "Misión",                   "Vendedor",                 "Entrenador",               "Descubierto",
-            "Redención",                "Talento",                  "Habilidad Inicial",        "Evento",                   "Logro"
+            "Desconocido",                  "Creado",                       "Encontrado",                   "JcJ",                          "Misión",                       "Vendedor",
+            "Entrenador",                   "Descubierto",                  "Redención",                    "Talento",                      "Habilidad Inicial",            "Evento",
+            "Logro",                        null,                           "Mercado negro",                "Desencantado",                 "Pescado",                      "Recolectado",
+            "Molido",                       "Minado",                       "Prospectar",                   "Robado",                       "Rescatado",                    "Despellejado",
+            "Tienda del juego"
         ),
         'languages'     => array(
-            1 => "Orco",        2 => "Darnassiano",     3 => "Taurahe",     6 => "Enánico",         7 => "Lengua común",    8 => "Demoníaco",       9 => "Titánico",        10 => "Thalassiano",
-            11 => "Dracónico",  12 => "Kalimag",        13 => "Gnomótico",  14 => "Trol",           33 => "Viscerálico",    35 => "Draenei",        36 => "Zombie",         37 => "Binario gnomo",      38 => "Binario goblin"
+             1 => "Orco",                    2 => "Darnassiano",             3 => "Taurahe",                 6 => "Enánico",                 7 => "Lengua común",            8 => "Demoníaco",
+             9 => "Titánico",               10 => "Thalassiano",            11 => "Dracónico",              12 => "Kalimag",                13 => "Gnomótico",              14 => "Trol",
+            33 => "Viscerálico",            35 => "Draenei",                36 => "Zombie",                 37 => "Binario gnomo",          38 => "Binario goblin"
         ),
         'gl'            => [null, "Sublime", "Menor"],
         'si'            => [1 => "Alianza", -1 => "Alianza solamente", 2 => "Horda", -2 => "Horda solamente", 3 => "Ambos"],
@@ -222,36 +226,40 @@ $lang = array(
         'ra'            => [-2 => "Horda", -1 => "Alianza", "Ambos", "Humano", "Orco", "Enano", "Elfo de la noche", "No-muerto", "Tauren", "Gnomo", "Trol  ", null, "Blood Elf", "Elfo de sangre"],
         'rep'           => ["Odiado", "Hostil", "Adverso", "Neutral", "Amistoso", "Honorable", "Reverenciado", "Exaltado"],
         'st'            => array(
-            "Defecto",          "Forma felina",                 "Árbol de vida",                "Forma de viaje",               "Forma acuática",
-            "Forma de oso",     null,                           null,                           "Forma de oso temible",         null,
-            null,               null,                           null,                           "Danza de las Sombras",         null,
-            null,               "Lobo fantasmal",               "Actitud de batalla",           "Actitud defensiva",            "Actitud rabiosa",
-            null,               null,                           "Metamorfosis",                 null,                           null,
-            null,               null,                           "Forma de vuelo presto",        "Forma de las Sombras",         "Forma de vuelo",
-            "Sigilo",           "Forma de lechúcico lunar",     "Espíritu redentor"
+            "Defecto",                      "Forma felina",                 "Árbol de vida",                "Forma de viaje",               "Forma acuática",               "Forma de oso",
+            null,                           null,                           "Forma de oso temible",         null,                           null,                           null,
+            null,                           "Danza de las Sombras",         null,                           null,                           "Lobo fantasmal",               "Actitud de batalla",
+            "Actitud defensiva",            "Actitud rabiosa",              null,                           null,                           "Metamorfosis",                 null,
+            null,                           null,                           null,                           "Forma de vuelo presto",        "Forma de las Sombras",         "Forma de vuelo",
+            "Sigilo",                       "Forma de lechúcico lunar",     "Espíritu redentor"
         ),
         'me'            => array(
-            null,                       "Embelesado",               "Desorientado",             "Desarmado",                "Distraído",                "Huyendo",                  "Agarrado",                 "Enraizado",
-            "Pacificado",               "Silenciado",               "Dormido",                  "Frenado",                  "Aturdido",                 "Congelado",                "Incapacitado",             "Sangrando",
-            "Sanacíon",                 "Polimorfado",              "Desterrado",               "Protegido",                "Aprisionado",              "Montado",                  "Seducido",                 "Girado",
-            "Horrorizado",              "Invulnerable",             "Interrumpido",             "Atontado",                 "Descubierto",              "Invulnerable",             "Aporreado",                "Iracundo"
+            null,                           "Embelesado",                   "Desorientado",                 "Desarmado",                    "Distraído",                    "Huyendo",
+            "Agarrado",                     "Enraizado",                    "Pacificado",                   "Silenciado",                   "Dormido",                      "Frenado",
+            "Aturdido",                     "Congelado",                    "Incapacitado",                 "Sangrando",                    "Sanacíon",                     "Polimorfado",
+            "Desterrado",                   "Protegido",                    "Aprisionado",                  "Montado",                      "Seducido",                     "Girado",
+            "Horrorizado",                  "Invulnerable",                 "Interrumpido",                 "Atontado",                     "Descubierto",                  "Invulnerable",
+            "Aporreado",                    "Iracundo"
         ),
         'ct'            => array(
-            "Sin categoría",            "Bestia",                   "Dragonante",               "Demonio",                  "Elemental",                "Gigante",                  "No-muerto",                "Humanoide",
-            "Alimaña",                  "Mecánico",                 "Sin especificar",          "Tótem",                    "Mascota mansa",            "Nube de gas"
+            "Sin categoría",                "Bestia",                       "Dragonante",                   "Demonio",                      "Elemental",                    "Gigante",
+            "No-muerto",                    "Humanoide",                    "Alimaña",                      "Mecánico",                     "Sin especificar",              "Tótem",
+            "Mascota mansa",                "Nube de gas"
         ),
         'fa'            => array(
-             1 => "Lobo",                2 => "Felino",              3 => "Araña",               4 => "Oso",                 5 => "Jabalí",              6 => "Crocolisco",          7 => "Carroñero",           8 => "Cangrejo",
-             9 => "Gorila",             11 => "Raptor",             12 => "Zancaalta",          20 => "Escórpido",          21 => "Tortuga",            24 => "Murciélago",         25 => "Hiena",              26 => "Ave rapaz",
-            27 => "Serpiente alada",    30 => "Dracohalcón",        31 => "Devastador",         32 => "Acechador deformado",33 => "Esporiélago",        34 => "Raya abisal",        35 => "Serpiente",          37 => "Palomilla",
-            38 => "Quimera",            39 => "Demosaurio",         41 => "Silítido",           42 => "Gusano",             43 => "Rinoceronte",        44 => "Avispa",             45 => "Can del Núcleo",     46 => "Bestia espíritu"
+             1 => "Lobo",                    2 => "Felino",                  3 => "Araña",                   4 => "Oso",                     5 => "Jabalí",                  6 => "Crocolisco",
+             7 => "Carroñero",               8 => "Cangrejo",                9 => "Gorila",                 11 => "Raptor",                 12 => "Zancaalta",              20 => "Escórpido",
+            21 => "Tortuga",                24 => "Murciélago",             25 => "Hiena",                  26 => "Ave rapaz",              27 => "Serpiente alada",        30 => "Dracohalcón",
+            31 => "Devastador",             32 => "Acechador deformado",    33 => "Esporiélago",            34 => "Raya abisal",            35 => "Serpiente",              37 => "Palomilla",
+            38 => "Quimera",                39 => "Demosaurio",             41 => "Silítido",               42 => "Gusano",                 43 => "Rinoceronte",            44 => "Avispa",
+            45 => "Can del Núcleo",         46 => "Bestia espíritu"
         ),
         'pvpRank'       => array(
-            null,                                       "Private / Scout",                      "Corporal / Grunt",
-            "Sergeant / Sergeant",                      "Master Sergeant / Senior Sergeant",    "Sergeant Major / First Sergeant",
-            "Knight / Stone Guard",                     "Knight-Lieutenant / Blood Guard",      "Knight-Captain / Legionnare",
-            "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
-            "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
+            null,                                                           "Private / Scout",                                              "Corporal / Grunt",
+            "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
+            "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
+            "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
+            "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
         ),
     ),
     'account' => array(
@@ -458,8 +466,9 @@ $lang = array(
         'enabledByQDesc'=> "Para aceptar esta misión debes haber tener activa alguna de estas misiones",
         'gainsDesc'     => "Cuando completes esta misión ganarás",
         'theTitle'      => 'el título "%s"',
-        'mailDelivery'  => "Usted recibirá esta carta %s",
-        'mailIn'        => "después de %s",
+        'mailDelivery'  => "Usted recibirá esta carta%s%s",
+        'mailBy'        => ' del <a href="?npc=%d">%s</a>',
+        'mailIn'        => " después de %s",
         'unavailable'   => "Esta misión fue marcada como obsoleta y no puede ser obtenida o completada.",
         'experience'    => "experiencia",
         'expConvert'    => "(o %s si se completa al nivel %d)",

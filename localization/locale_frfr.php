@@ -206,12 +206,16 @@ $lang = array(
         'expansions'    => ["Classique", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Force", "Agilité", "Endurance", "Intelligence", "Esprit"],
         'sources'       => array(
-            null,                       "Fabriqué",                 "Butin",                    "JcJ",                      "Quête",                    "Vendeur",              "Maître",               "Découverte",
-            "Échange d'un code",        "Talent",                   "Débutant",                 "Événement",                "Haut fait"
+            "Inconnu",                      "Fabriqué",                     "Butin",                        "JcJ",                          "Quête",                        "Vendeur",
+            "Maître",                       "Découverte",                   "Échange d'un code",            "Talent",                       "Débutant",                     "Événement",
+            "Haut fait",                    null,                           "Marché Noir",                  "Désenchanté",                  "Pêché",                        "Cueilli",
+            "Moulu",                        "Miné",                         "Prospecté",                    "Subtilisé (pickpocket)",       "Ferraillé",                    "Dépecé",
+            "Boutique en jeu"
         ),
         'languages'     => array(
-             1 => "Orc",         2 => "Darnassien",      3 => "Taurahe",     6 => "Nain",            7 => "Commun",          8 => "Démoniaque",      9 => "Titan",          10 => "Thalassien",
-            11 => "Draconique", 12 => "Kalimag",        13 => "Gnome",      14 => "Troll",          33 => "Bas-parler",     35 => "Draeneï",        36 => "Zombie",         37 => "Binaire gnome",      38 => "Binaire gobelin"
+             1 => "Orc",                     2 => "Darnassien",              3 => "Taurahe",                 6 => "Nain",                    7 => "Commun",                  8 => "Démoniaque",
+             9 => "Titan",                  10 => "Thalassien",             11 => "Draconique",             12 => "Kalimag",                13 => "Gnome",                  14 => "Troll",
+            33 => "Bas-parler",             35 => "Draeneï",                36 => "Zombie",                 37 => "Binaire gnome",          38 => "Binaire gobelin"
         ),
         'gl'            => [null, "Majeur", "Mineur"],
         'si'            => [1 => "Alliance", -1 => "Alliance seulement", 2 => "Horde", -2 => "Horde seulement", 3 => "Les deux"],
@@ -222,36 +226,40 @@ $lang = array(
         'ra'            => [-2 => "Horde", -1 => "Alliance", "Les deux", "Humain", "Orc", "Nain", "Elfe de la nuit", "Mort-vivant", "Tauren", "Gnome", "Troll", null, "Elfe de sang", "Draeneï"],
         'rep'           => ["Détesté", "Hostile", "Inamical", "Neutre", "Amical", "Honoré", "Révéré", "Exalté"],
         'st'            => array(
-            "Défaut",           "Forme de félin",               "Arbre de vie",                 "Forme de voyage",              "Aquatic Form",
-            "Forme d'ours",     null,                           null,                           "Forme d'ours redoutable",      null,
-            null,               null,                           null,                           "Danse de l'ombre",             null,
-            null,               "Ghostwolf",                    "Posture de combat",            "Posture défensive",            "Posture berserker",
-            null,               null,                           "Métamorphe",                   null,                           null,
-            null,               null,                           "Forme de vol rapide",          "Forme d'Ombre",                "Forme de vol",
-            "Camouflage",       "Forme de sélénien",            "Esprit de rédemption"
+            "Défaut",                       "Forme de félin",               "Arbre de vie",                 "Forme de voyage",              "Forme aquatique",              "Forme d'ours",
+            null,                           null,                           "Forme d'ours redoutable",      null,                           null,                           null,
+            null,                           "Danse de l'ombre",             null,                           null,                           "Loup fantôme",                 "Posture de combat",
+            "Posture défensive",            "Posture berserker",            null,                           null,                           "Métamorphe",                   null,
+            null,                           null,                           null,                           "Forme de vol rapide",          "Forme d'Ombre",                "Forme de vol",
+            "Camouflage",                   "Forme de sélénien",            "Esprit de rédemption"
         ),
         'me'            => array(
-            null,                       "Charmé",                   "Désorienté",               "Désarmé",                  "Distrait",                 "En fuite",                 "Maladroit",                "Immobilisé",
-            "Pacifié",                  "Réduit au silence",        "Endormi",                  "Pris au piège",            "Étourdi",                  "Gelé",                     "Stupéfié",                 "Sanguinolent",
-            "Soins",                    "Métamorphosé",             "Banni",                    "Protégé",                  "Entravé",                  "Monté",                    "Séduit",                   "Repoussé",
-            "Horrifié",                 "Invulnérable",             "Interrompu",               "Hébété",                   "Découverte",               "Invulnérable",             "Assommé",                  "Enragé"
+            null,                           "Charmé",                       "Désorienté",                   "Désarmé",                      "Distrait",                     "En fuite",
+            "Maladroit",                    "Immobilisé",                   "Pacifié",                      "Réduit au silence",            "Endormi",                      "Pris au piège",
+            "Étourdi",                      "Gelé",                         "Stupéfié",                     "Sanguinolent",                 "Soins",                        "Métamorphosé",
+            "Banni",                        "Protégé",                      "Entravé",                      "Monté",                        "Séduit",                       "Repoussé",
+            "Horrifié",                     "Invulnérable",                 "Interrompu",                   "Hébété",                       "Découverte",                   "Invulnérable",
+            "Assommé",                      "Enragé"
         ),
         'ct'            => array(
-            "Non classés",              "Bête",                     "Draconien",                "Démon",                    "Élémentaire",              "Géant",                    "Mort-vivant",              "Humanoïde",
-            "Bestiole",                 "Mécanique",                "Non spécifié",             "Totem",                    "Familier pacifique",       "Nuage de gaz"
+            "Non classés",                  "Bête",                         "Draconien",                    "Démon",                        "Élémentaire",                  "Géant",
+            "Mort-vivant",                  "Humanoïde",                    "Bestiole",                     "Mécanique",                    "Non spécifié",                 "Totem",
+            "Familier pacifique",           "Nuage de gaz"
         ),
         'fa'            => array(
-             1 => "Loup",                2 => "Félin",               3 => "Araignée",            4 => "Ours",                5 => "Sanglier",            6 => "Crocilisque",         7 => "Charognard",          8 => "Crabe",
-             9 => "Gorille",            11 => "Raptor",             12 => "Haut-trotteur",      20 => "Scorpide",           21 => "Tortue",             24 => "Chauve-souris",      25 => "Hyène",              26 => "Oiseau de proie",
-            27 => "Serpent des vents",  30 => "Faucon-dragon",      31 => "Ravageur",           32 => "Traqueur dim.",      33 => "Sporoptère",         34 => "Raie du Néant",      35 => "Serpent",            37 => "Phalène",
-            38 => "Chimère",            39 => "Diablosaure",        41 => "Silithide",          42 => "Ver",                43 => "Rhinocéros",         44 => "Guêpe",              45 => "Chien du Magma",     46 => "Esprit de bête"
+             1 => "Loup",                    2 => "Félin",                   3 => "Araignée",                4 => "Ours",                    5 => "Sanglier",                6 => "Crocilisque",
+             7 => "Charognard",              8 => "Crabe",                   9 => "Gorille",                11 => "Raptor",                 12 => "Haut-trotteur",          20 => "Scorpide",
+            21 => "Tortue",                 24 => "Chauve-souris",          25 => "Hyène",                  26 => "Oiseau de proie",        27 => "Serpent des vents",      30 => "Faucon-dragon",
+            31 => "Ravageur",               32 => "Traqueur dim.",          33 => "Sporoptère",             34 => "Raie du Néant",          35 => "Serpent",                37 => "Phalène",
+            38 => "Chimère",                39 => "Diablosaure",            41 => "Silithide",              42 => "Ver",                    43 => "Rhinocéros",             44 => "Guêpe",
+            45 => "Chien du Magma",         46 => "Esprit de bête"
         ),
         'pvpRank'       => array(
-            null,                                       "Private / Scout",                      "Corporal / Grunt",
-            "Sergeant / Sergeant",                      "Master Sergeant / Senior Sergeant",    "Sergeant Major / First Sergeant",
-            "Knight / Stone Guard",                     "Knight-Lieutenant / Blood Guard",      "Knight-Captain / Legionnare",
-            "Knight-Champion / Centurion",              "Lieutenant Commander / Champion",      "Commander / Lieutenant General",
-            "Marshal / General",                        "Field Marshal / Warlord",              "Grand Marshal / High Warlord"
+            null,                                                           "Private / Scout",                                              "Corporal / Grunt",
+            "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
+            "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
+            "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
+            "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
         ),
     ),
     'account' => array(
@@ -457,8 +465,9 @@ $lang = array(
         'enabledByQDesc'=> "Vous pouvez faire cette quête seulement quand cette quête est active",
         'gainsDesc'     => "Lors de l'achèvement de cette quête vous gagnerez",
         'theTitle'      => '"%s"',                          // empty on purpose!
-        'mailDelivery'  => "Vous recevrez cette lettre %s",
-        'mailIn'        => "après %s",
+        'mailDelivery'  => "Vous recevrez cette lettre%s%s",
+        'mailBy'        => ' de <a href="?npc=%d">%s</a>',
+        'mailIn'        => " après %s",
         'unavailable'   => "Cette quête est marquée comme obsolète et ne peut être obtenue ou accomplie.",
         'experience'    => "points d'expérience",
         'expConvert'    => "(ou %s si completé au niveau %d)",

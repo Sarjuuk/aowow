@@ -206,9 +206,11 @@ $lang = array(
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"],
         'sources'       => array(
-            null,                           "Hergestellt",                  "Drop",                         "PvP",                          "Quest",                        "Händler",
+            "Unbekannt",                    "Hergestellt",                  "Drop",                         "PvP",                          "Quest",                        "Händler",
             "Lehrer",                       "Entdeckung",                   "Einlösung",                    "Talent",                       "Startausrüstung",              "Ereignis",
-            "Erfolg"
+            "Erfolg",                       null,                           "Schwarzmarkt",                 "Entzaubert",                   "Geangelt",                     "Gesammelt",
+            "Gemahlen",                     "Abgebaut",                     "Sondiert",                     "Aus Taschendiebstahl",         "Geborgen",                     "Gehäutet",
+            "In-Game-Store"
         ),
         'languages'     => array(
              1 => "Orcisch",                 2 => "Darnassisch",             3 => "Taurisch",                6 => "Zwergisch",               7 => "Gemeinsprache",           8 => "Dämonisch",
@@ -466,8 +468,9 @@ $lang = array(
         'enabledByQDesc'=> "Ihr könnt diese Quest nur annehmen, wenn eins der nachfolgenden Quests aktiv ist",
         'gainsDesc'     => "Bei Abschluss dieser Quest erhaltet Ihr",
         'theTitle'      => 'den Titel "%s"',
-        'mailDelivery'  => "Ihr werdet diesen Brief %serhalten",
-        'mailIn'        => "nach %s ",
+        'mailDelivery'  => "Ihr werdet diesen Brief%s%s erhalten",
+        'mailBy'        => ' von <a href="?npc=%d">%s</a>',
+        'mailIn'        => " nach %s",
         'unavailable'   => "Diese Quest wurde als nicht genutzt markiert und kann weder erhalten noch vollendet werden.",
         'experience'    => "Erfahrung",
         'expConvert'    => "(oder %s, wenn auf Stufe %d vollendet)",

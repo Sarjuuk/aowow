@@ -382,6 +382,11 @@ class SpellsPage extends GenericPage
         if ($this->filterObj->error)
             $tab['params']['_errors'] = '$1';
 
+        // add source to cols if explicitly searching for it
+        if ($_ = $this->filterObj->getForm('setCriteria', true))
+            if (in_array(9, $_['cr']) && !in_array('source', $visibleCols))
+                $visibleCols[] = 'source';
+
         $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost']);
         if ($mask & 0x1)
             $visibleCols[] = 'reagents';

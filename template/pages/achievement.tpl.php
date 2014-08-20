@@ -80,7 +80,7 @@ endforeach;
 if ($r = $this->rewards):
     if (!empty($r['item'])):
         echo '<h3>'.Lang::$main['rewards']."</h3>\n";
-        $this->brick('rewards', ['rewards' => $this->rewards['item']]);
+        $this->brick('rewards', ['rewards' => $r['item'], 'rewTitle' => null]);
     endif;
 
     if (!empty($r['title'])):
@@ -93,9 +93,12 @@ if ($r = $this->rewards):
 
     if (empty($r['title']) && empty($r['item']) && $r['text']):
         echo '<h3>'.Lang::$main['rewards']."</h3>\n" .
-             '<ul><li><div><'.$r['text']."</div></li></ul>\n";
+             '<ul><li><div>'.$r['text']."</div></li></ul>\n";
     endif;
 endif;
+
+$this->brick('mail');
+
 ?>
 
                 <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>

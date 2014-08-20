@@ -205,17 +205,8 @@ if ($g = $this->gains):
     echo "                    </ul>\n";
 endif;
 
-if ($m = $this->mail):
-    echo '                        <h3>'.sprintf(Lang::$quest['mailDelivery'], $m['delay'])."</h3>\n";
+$this->brick('mail');
 
-    if ($m['subject']):
-        echo '                        <div class="book"><div class="page">'.$m['subject']."</div></div>\n";
-    endif;
-
-    if ($m['text']):
-        echo '                        <div class="book"><div class="page">'.$m['text']."</div></div>\n";
-    endif;
-endif;
 ?>
                 <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
             </div>

@@ -132,6 +132,7 @@ class AchievementPage extends GenericPage
         /* Main Content */
         /****************/
 
+        $this->mail        = $this->createMail($reqBook);
         $this->headIcons   = [$this->subject->getField('iconString')];
         $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->series      = $series ? [[$series, null]] : null;
@@ -146,9 +147,16 @@ class AchievementPage extends GenericPage
             'data'   => []
         );
 
+        if ($reqBook)
+            $this->addCss(['path' => 'Book.css']);
+
         // create rewards
-        if ($foo = $this->subject->getField('rewards')[TYPE_ITEM])
+        if ($foo = $this->subject->getField('rewards'))
         {
+            array_walk($foo, function(&$item) {
+                $item = $item[0] != TYPE_ITEM ? null : $item[1];
+            });
+
             $bar = new ItemList(array(['i.id', $foo]));
             foreach ($bar->iterate() as $id => $__)
             {
@@ -162,8 +170,12 @@ class AchievementPage extends GenericPage
             }
         }
 
-        if ($foo = $this->subject->getField('rewards')[TYPE_TITLE])
+        if ($foo = $this->subject->getField('rewards'))
         {
+            array_walk($foo, function(&$item) {
+                $item = $item[0] != TYPE_TITLE ? null : $item[1];
+            });
+
             $bar = new TitleList(array(['id', $foo]));
             foreach ($bar->iterate() as $__)
                 $this->rewards['title'][] = sprintf(Lang::$achievement['titleReward'], $bar->id, trim(str_replace('%s', '', $bar->getField('male', true))));
@@ -431,6 +443,41 @@ class AchievementPage extends GenericPage
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);
         exit();
+    }
+
+    private function createMail(&$reqCss = false)
+    {
+        $mail = [];
+
+        if ($_ = $this->subject->getField('mailTemplate'))
+        {
+            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $_);
+            if (!$letter)
+                return [];
+
+            $reqCss = true;
+            $mail   = array(
+                'delay'   => null,
+                'sender'  => null,
+                'subject' => Util::parseHtmlText(Util::localizedString($letter, 'subject', true)),
+                'text'    => Util::parseHtmlText(Util::localizedString($letter, 'text', true))
+            );
+        }
+        else if ($_ = Util::parseHtmlText($this->subject->getField('text', true, true)))
+        {
+            $reqCss = true;
+            $mail   = array(
+                'delay'   => null,
+                'sender'  => null,
+                'subject' => Util::parseHtmlText($this->subject->getField('subject', true, true)),
+                'text'    => $_
+            );
+        }
+
+        if ($_ = CreatureList::getName($this->subject->getField('sender')))
+            $mail['sender'] = sprintf(Lang::$quest['mailBy'], $this->subject->getField('sender'), $_);
+
+        return $mail;
     }
 }
 

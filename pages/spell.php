@@ -304,7 +304,7 @@ class SpellPage extends GenericPage
         for ($i = 1; $i < 4; $i++)
         {
             // Flat Mods (107), Pct Mods (108), No Reagent Use (256) .. include dummy..? (4)
-            if (!in_array($this->subject->getField('effect'.$i.'AuraId'), [107, 108, 256 /*, 4*/]))
+            if (!in_array($this->subject->getField('effect'.$i.'AuraId'), [107, 108, 256, 286 /*, 4*/]))
                 continue;
 
             $m1 = $this->subject->getField('effect1SpellClassMask'.$j[$i]);
@@ -360,7 +360,7 @@ class SpellPage extends GenericPage
 
             $sub[] = array(
                 'AND',
-                ['s.effect'.$i.'AuraId', [107, 108, 256 /*, 4*/]],
+                ['s.effect'.$i.'AuraId', [107, 108, 256, 286 /*, 4*/]],
                 [
                     'OR',
                     ['s.effect1SpellClassMask'.$j[$i], $m1, '&'],
@@ -555,6 +555,8 @@ class SpellPage extends GenericPage
 
         if ($spellLoot->getByContainer(LOOT_SPELL, $this->subject->id) || $extraItem)
         {
+            $this->extendGlobalData($spellLoot->jsGlobals);
+
             $lv = $spellLoot->getResult();
             $extraCols   = $spellLoot->extraCols;
             $extraCols[] = 'Listview.extraCols.percent';
@@ -591,7 +593,7 @@ class SpellPage extends GenericPage
                     'name'       => '$LANG.tab_contains',
                     'id'         => 'contains',
                     'hiddenCols' => "$['side', 'slot', 'source', 'reqlevel']",
-                    'extraCols'  => '$'.json_encode($extraCols, JSON_NUMERIC_CHECk)
+                    'extraCols'  => '$['.implode(', ', $extraCols).']'
                 )
             );
         }

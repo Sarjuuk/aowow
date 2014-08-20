@@ -201,9 +201,11 @@ $lang = array(
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Strength", "Agility", "Stamina", "Intellect", "Spirit"],
         'sources'       => array(
-            null,                           "Crafted",                      "Drop",                         "PvP",                          "Quest",                        "Vendor",
+            "Unknown",                      "Crafted",                      "Drop",                         "PvP",                          "Quest",                        "Vendor",
             "Trainer",                      "Discovery",                    "Redemption",                   "Talent",                       "Starter",                      "Event",
-            "Achievement"
+            "Achievement",                  null,                           "Black Market",                 "Disenchanted",                 "Fished",                       "Gathered",
+            "Milled",                       "Mined",                        "Prospected",                   "Pickpocketed",                 "Salvaged",                     "Skinned",
+            "In-Game Store"
         ),
         'languages'     => array(
              1 => "Orcish",                  2 => "Darnassian",              3 => "Taurahe",                 6 => "Dwarvish",                7 => "Common",                  8 => "Demonic",
@@ -461,8 +463,9 @@ $lang = array(
         'enabledByQDesc'=> "This quest is available only, when one of these quests are active",
         'gainsDesc'     => "Upon completion of this quest you will gain",
         'theTitle'      => 'the title "%s"',
-        'mailDelivery'  => "You will receive this letter %s",
-        'mailIn'        => "after %s",
+        'mailDelivery'  => "You will receive this letter%s%s",
+        'mailBy'        => ' by <a href="?npc=%d">%s</a>',
+        'mailIn'        => " after %s",
         'unavailable'   => "This quest was marked obsolete and cannot be obtained or completed.",
         'experience'    => "experience",
         'expConvert'    => "(or %s if completed at level %d)",

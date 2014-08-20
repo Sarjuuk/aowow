@@ -532,7 +532,7 @@ class QuestPage extends GenericPage
         /****************/
 
         $this->gains         = $this->createGains();
-        $this->mail          = $this->createMail($maTab);
+        $this->mail          = $this->createMail($maTab, $startEnd);
         $this->rewards       = $this->createRewards();
         $this->objectives    = $this->subject->parseText('objectives', false);
         $this->details       = $this->subject->parseText('details', false);
@@ -800,7 +800,7 @@ class QuestPage extends GenericPage
         return $rewards;
     }
 
-    private function createMail(&$attachmentTab)
+    private function createMail(&$attachmentTab, $startEnd)
     {
         $mail = [];
 
@@ -811,9 +811,22 @@ class QuestPage extends GenericPage
 
             $mail = array(
                 'delay'   => $delay  ? sprintf(Lang::$quest['mailIn'], Util::formatTime($delay * 1000)) : null,
+                'sender'  => null,
                 'text'    => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text'))      : null,
                 'subject' => Util::parseHtmlText(Util::localizedString($letter, 'subject'))
             );
+
+            foreach ($startEnd as $se)
+            {
+                if (!($se['method'] & 0x2) || $se['type'] != TYPE_NPC)
+                    continue;
+
+                if ($_ = CreatureList::getName($se['typeId']))
+                {
+                    $mail['sender'] = sprintf(Lang::$quest['mailBy'], $se['typeId'], $_);
+                    break;
+                }
+            }
 
             $extraCols = ['Listview.extraCols.percent'];
             $mailLoot = new Loot();

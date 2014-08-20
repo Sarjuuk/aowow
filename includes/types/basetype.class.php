@@ -299,13 +299,13 @@ abstract class BaseType
         return null;
     }
 
-    public function getField($field, $localized = false)
+    public function getField($field, $localized = false, $silent = false)
     {
         if (!$this->curTpl || (!$localized && !isset($this->curTpl[$field])))
             return '';
 
         if ($localized)
-            return Util::localizedString($this->curTpl, $field);
+            return Util::localizedString($this->curTpl, $field, $silent);
 
         $value = $this->curTpl[$field];
         if (Util::checkNumeric($value))
@@ -612,7 +612,7 @@ abstract class Filter
                     if (strpos($term, $c.'=') === 0)
                     {
                         $$c = explode(':', explode('=', $term)[1]);
-                        $this->formData['setCriteria'][$c] = json_encode($$c, JSON_NUMERIC_CHECK);      // todo (high): move to checks
+                        $this->formData['setCriteria'][$c] = $$c;      // todo (high): move to checks
                         unset($tmp[$i]);
                     }
                 }
@@ -725,7 +725,10 @@ abstract class Filter
             switch ($name)
             {
                 case 'setCriteria':
-                    $form[$name] = $raw ? $data : 'fi_setCriteria('.(empty($data['cr']) ? '[]' : $data['cr']).', '.(empty($data['crs']) ? '[]' : $data['crs']).', '.(empty($data['crv']) ? '[]' : $data['crv']).');';
+                    if ($data || $raw)
+                        $form[$name] = $raw ? $data : 'fi_setCriteria('.json_encode($data['cr'], JSON_NUMERIC_CHECK).', '.json_encode($data['crs'], JSON_NUMERIC_CHECK).', '.json_encode($data['crv'], JSON_NUMERIC_CHECK).');';
+                    else
+                        $form[$name] = 'fi_setCriteria([], [], []);';
                     break;
                 case 'extraCols':
                     $form[$name] = $raw ? $data : 'fi_extraCols = '.json_encode(array_unique($data), JSON_NUMERIC_CHECK).';';

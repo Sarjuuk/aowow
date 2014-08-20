@@ -14,14 +14,16 @@ class AchievementList extends BaseType
     public        $criteria  = [];
     public        $tooltip   = [];
 
-    protected     $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
+    protected     $queryBase = 'SELECT `a`.*, `ar`.*, `lar`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
     protected     $queryOpts = array(
-                        'a'  => ['o' => 'orderInGroup ASC'],
-                        'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
+                          'a' => [['ar', 'lar'], 'o' => 'orderInGroup ASC'],
+                         'ar' => ['j' => ['achievement_reward ar ON ar.entry = a.id', true]],
+                        'lar' => ['j' => ['locales_achievement_reward lar ON lar.entry = a.id', true]],
+                         'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
                   );
 
     /*
-        todo: evaluate TC custom-data-tables: a*_criteria_data should be merged on installation, a*_reward linked with mail_loot_template and achievement
+        todo: evaluate TC custom-data-tables: a*_criteria_data should be merged on installation
     */
 
     public function __construct($conditions = [], $miscData = null)
@@ -32,19 +34,18 @@ class AchievementList extends BaseType
         foreach ($this->iterate() as &$_curTpl)
         {
             //"rewards":[[11,137],[3,138]]   [type, typeId]
-            $_curTpl['rewards'] = [TYPE_ITEM => [], TYPE_TITLE => []];
-            if (!empty($_curTpl['rewardIds']))
-            {
-                $rewIds  = explode(" ", $_curTpl['rewardIds']);
-                foreach ($rewIds as $rewId)
-                {
-                    if ($rewId > 0)
-                        $_curTpl['rewards'][TYPE_ITEM][]  = $rewId;
-                    else if ($rewId < 0)
-                        $_curTpl['rewards'][TYPE_TITLE][] = -$rewId;
-                }
-            }
+            $_curTpl['rewards'] = [];
+            if ($_ = $_curTpl['item'])
+                $_curTpl['rewards'][] = [TYPE_ITEM, $_];
+            if ($_ = $_curTpl['itemExtra'])
+                $_curTpl['rewards'][] = [TYPE_ITEM, $_];
+            if ($_ = $_curTpl['title_A'])
+                $_curTpl['rewards'][] = [TYPE_TITLE, $_];
+            if ($_ = $_curTpl['title_H'])
+                if ($_ != $_curTpl['title_A'])
+                    $_curTpl['rewards'][] = [TYPE_TITLE, $_];
 
+            // icon
             $_curTpl['iconString'] = $_curTpl['iconString'] ?: 'trade_engineering';
         }
     }
@@ -59,13 +60,8 @@ class AchievementList extends BaseType
                 $data[TYPE_ACHIEVEMENT][$this->id] = ['icon' => $this->curTpl['iconString'], 'name' => $this->getField('name', true)];
 
             if ($addMask & GLOBALINFO_REWARDS)
-            {
-                foreach ($this->curTpl['rewards'][TYPE_ITEM] as $_)
-                    $data[TYPE_ITEM][$_] = $_;
-
-                foreach ($this->curTpl['rewards'][TYPE_TITLE] as $_)
-                    $data[TYPE_TITLE][$_] = $_;
-            }
+                foreach ($this->curTpl['rewards'] as $_)
+                    $data[$_[0]][$_[1]] = $_[1];
         }
 
         return $data;
@@ -91,16 +87,11 @@ class AchievementList extends BaseType
                 $data[$this->id]['icon'] = $this->curTpl['iconString'];
 
             // going out on a limb here: type = 1 if in level 3 of statistics tree, so, IF (statistic AND parentCat NOT statistic (1)) i guess
-            if  ($this->curTpl['flags'] & ACHIEVEMENT_FLAG_COUNTER && $this->curTpl['parentCat'] != 1)
+            if ($this->curTpl['flags'] & ACHIEVEMENT_FLAG_COUNTER && $this->curTpl['parentCat'] != 1)
                 $data[$this->id]['type'] = 1;
 
-            $rewards = [];
-            foreach ($this->curTpl['rewards'] as $type => $rIds)
-                foreach ($rIds as $rId)
-                    $rewards[] = [$type, $rId];
-
-            if ($rewards)
-                $data[$this->id]['rewards'] = $rewards;
+            if ($_ = $this->curTpl['rewards'])
+                $data[$this->id]['rewards'] = $_;
             else if ($_ = $this->getField('reward', true))
                 $data[$this->id]['reward'] = $_;
         }
