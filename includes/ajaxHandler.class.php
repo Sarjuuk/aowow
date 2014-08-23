@@ -293,8 +293,13 @@ class AjaxHandler
                     if ($postIdx = DB::Aowow()->query('INSERT INTO ?_comments (type, typeId, userId, roles, body, date) VALUES (?d, ?d, ?d, ?d, ?, UNIX_TIMESTAMP())', $this->get['type'], $this->get['typeid'], User::$id, User::$groups, $this->post['commentbody']))
                     {
                         Util::gainSiteReputation(User::$id, SITEREP_ACTION_COMMENT, ['id' => $postIdx]);
+
                         // every comment starts with a rating of +1 and i guess the simplest thing to do is create a db-entry with the system as owner
                         DB::Aowow()->query('INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, 0, 1)', $postIdx);
+
+                        // flag target with hasComment (if filtrable)
+                        if ($tbl = Util::getCCTableParent($this->get['type']))
+                            DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $this->get['typeid']);
                     }
                 }
 
@@ -330,22 +335,43 @@ class AjaxHandler
                 if (empty($this->post['id']) && empty($this->get['id']))
                     break;
 
-                DB::Aowow()->query('UPDATE ?_comments SET flags = flags | 0x2, deleteUserId = ?d, deleteDate = UNIX_TIMESTAMP() WHERE id = ?d{ AND userId = ?d}',
+                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags | ?d, deleteUserId = ?d, deleteDate = UNIX_TIMESTAMP() WHERE id = ?d{ AND userId = ?d}',
+                    CC_FLAG_DELETED,
                     User::$id,
                     empty($this->post['id']) ? $this->get['id'] : $this->post['id'],
                     User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
                 );
+
+                // deflag hasComment (if filtrable)
+                if ($ok)
+                {
+                    $coInfo = DB::Aowow()->selectRow('SELECT IF(BIT_OR(~b.flags) & ?d, 1, 0) as hasMore, b.type, b.typeId FROM ?_comments a JOIN ?_comments b ON a.type = b.type AND a.typeId = b.typeId WHERE a.id = ?d',
+                        CC_FLAG_DELETED,
+                        empty($this->post['id']) ? $this->get['id'] : $this->post['id']
+                    );
+
+                    if (!$coInfo['hasMore'] && ($tbl = Util::getCCTableParent($coInfo['type'])))
+                        DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
+                }
 
                 break;
             case 'undelete':                                // user.js uses GET; global.js uses POST
                 if (empty($this->post['id']) && empty($this->get['id']))
                     break;
 
-
-                DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~0x2 WHERE id = ?d{ AND userId = deleteUserId AND deleteUserId = ?d}',
+                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id = ?d{ AND userId = deleteUserId AND deleteUserId = ?d}',
+                    CC_FLAG_DELETED,
                     empty($this->post['id']) ? $this->get['id'] : $this->post['id'],
                     User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
                 );
+
+                // reflag hasComment (if filtrable)
+                if ($ok)
+                {
+                    $coInfo = DB::Aowow()->selectRow('SELECT type, typeId FROM ?_comments WHERE id = ?d', empty($this->post['id']) ? $this->get['id'] : $this->post['id']);
+                    if ($tbl = Util::getCCTableParent($coInfo['type']))
+                        DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
+                }
 
                 break;
             case 'rating':                                  // up/down - distribution
@@ -410,9 +436,9 @@ class AjaxHandler
                     break;
 
                 if (!empty($this->post['sticky']))
-                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  0x1 WHERE id = ?d', $this->post['id']);
+                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  ?d WHERE id = ?d', CC_FLAG_STICKY, $this->post['id']);
                 else
-                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~0x1 WHERE id = ?d', $this->post['id']);
+                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id = ?d', CC_FLAG_STICKY, $this->post['id']);
 
                 break;
             case 'out-of-date':                             // toggle flag

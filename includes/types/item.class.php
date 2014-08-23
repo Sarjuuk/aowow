@@ -1617,6 +1617,9 @@ class ItemListFilter extends Filter
          91 => [FILTER_CR_ENUM,      'totemCategory'                                        ], // tool
         176 => [FILTER_CR_STAFFFLAG, 'flags'                                                ], // flags
         177 => [FILTER_CR_STAFFFLAG, 'flagsExtra'                                           ], // flags2
+        130 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_COMMENT           ], // hascomments
+        113 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT        ], // hasscreenshots
+        167 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_VIDEO             ], // hasvideos
     );
 
     public function __construct()
@@ -1968,12 +1971,6 @@ class ItemListFilter extends Filter
                     case 5:                                 // none
                         return ['startQuest', 0];
                 }
-                break;
-            case 130:                                       // hascomments [yn]
-                break;
-            case 113:                                       // hasscreenshots [yn]
-                break;
-            case 167:                                       // hasvideos [yn]
                 break;
         }
 

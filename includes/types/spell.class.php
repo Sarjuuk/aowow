@@ -1927,7 +1927,10 @@ class SpellListFilter extends Filter
         14 => [FILTER_CR_NUMERIC, 'id',               null,               true],    // id
         15 => [FILTER_CR_STRING,  'iconString',                               ],    // icon
         19 => [FILTER_CR_FLAG,    'attributes0',      0x80000                 ],    // scaling
-        25 => [FILTER_CR_BOOLEAN, 'skillLevelYellow'                          ]     // rewardsskillups
+        25 => [FILTER_CR_BOOLEAN, 'skillLevelYellow'                          ],    // rewardsskillups
+        11 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_COMMENT      ],    // hascomments
+         8 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_SCREENSHOT   ],    // hasscreenshots
+        17 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_VIDEO        ],    // hasvideos
     );
 
     protected function createSQLForCriterium(&$cr)
@@ -1970,12 +1973,6 @@ class SpellListFilter extends Filter
                     else
                         return ['AND', ['reagent1', 0], ['reagent2', 0], ['reagent3', 0], ['reagent4', 0], ['reagent5', 0], ['reagent6', 0], ['reagent7', 0], ['reagent8', 0]];
                 }
-            case 11:                                        // hascomments [yn]
-/* todo */      return [1];
-            case 8:                                         // hasscreenshots [yn]
-/* todo */      return [1];
-            case 17:                                        // hasvideos [yn]
-/* todo */      return [1];
         }
 
         unset($cr);

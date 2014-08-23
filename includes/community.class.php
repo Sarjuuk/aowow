@@ -46,7 +46,7 @@ class CommunityContent
             ?_reports r ON r.subject = c.id AND r.mode = 1 AND r.reason = 19
         WHERE
             c.replyTo = ?d AND c.type = ?d AND c.typeId = ?d AND
-            ((c.flags & 0x2) = 0 OR c.userId = ?d OR ?d)
+            ((c.flags & ?d) = 0 OR c.userId = ?d OR ?d)
         GROUP BY
             c.id
         ORDER BY
@@ -60,7 +60,7 @@ class CommunityContent
             c.date,
             c.replyTo AS commentid,
             UNIX_TIMESTAMP() - c.date AS elapsed,
-            IF(c.flags & 0x2, 1, 0) AS deleted,
+            IF(c.flags & ?d, 1, 0) AS deleted,
             IF(c.type <> 0, c.type, c2.type) AS type,
             IF(c.typeId <> 0, c.typeId, c2.typeId) AS typeId,
             IFNULL(SUM(cr.value), 0) AS rating,
@@ -77,7 +77,7 @@ class CommunityContent
             {c.userId = ?d AND}
             {c.replyTo <> ?d AND}
             {c.replyTo = ?d AND}
-            ((c.flags & 0x2) = 0 OR c.userId = ?d OR ?d)
+            ((c.flags & ?d) = 0 OR c.userId = ?d OR ?d)
         GROUP BY
             c.id
         ORDER BY
@@ -96,9 +96,11 @@ class CommunityContent
         $subjCache = [];
         $comments  = DB::Aowow()->select(
             self::$previewQuery,
+            CC_FLAG_DELETED,
              empty($params['user'])    ? DBSIMPLE_SKIP : $params['user'],
              empty($params['replies']) ? DBSIMPLE_SKIP : 0, // i dont know, how to switch the sign around
             !empty($params['replies']) ? DBSIMPLE_SKIP : 0,
+            CC_FLAG_DELETED,
             User::$id,
             User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
             CFG_SQL_LIMIT_DEFAULT
@@ -186,7 +188,7 @@ class CommunityContent
         $query = $limit > 0 ? self::$commentQuery.' LIMIT '.$limit : self::$commentQuery;
 
         // get replies
-        $results = DB::Aowow()->SelectPage($nFound, $query, User::$id, User::$id, $commentId, 0, 0, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+        $results = DB::Aowow()->SelectPage($nFound, $query, User::$id, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
         foreach ($results as $r)
         {
             (new Markup($r['body']))->parseGlobalsFromText(self::$jsGlobals);
@@ -219,7 +221,7 @@ class CommunityContent
     private static function getComments($type, $typeId)
     {
 
-        $results  = DB::Aowow()->query(self::$commentQuery, User::$id, User::$id, 0, $type, $typeId, User::$id, (int)User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+        $results  = DB::Aowow()->query(self::$commentQuery, User::$id, User::$id, 0, $type, $typeId, CC_FLAG_DELETED, User::$id, (int)User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
         $comments = [];
 
         // additional informations
@@ -256,16 +258,16 @@ class CommunityContent
             if ($r['editCount'])                            // lastEdit
                 $c['lastEdit'] = [date(Util::$dateFormatInternal, $r['editDate']), $r['editCount'], $r['editUser']];
 
-            if ($r['flags'] & 0x1)
+            if ($r['flags'] & CC_FLAG_STICKY)
                 $c['sticky'] = true;
 
-            if ($r['flags'] & 0x2)
+            if ($r['flags'] & CC_FLAG_DELETED)
             {
                 $c['deleted']     = true;
                 $c['deletedInfo'] = [date(Util::$dateFormatInternal, $r['deleteDate']), $r['deleteUser']];
             }
 
-            if ($r['flags'] & 0x4)
+            if ($r['flags'] & CC_FLAG_OUTDATED)
                 $c['outofdate'] = true;
 
             $comments[] = $c;

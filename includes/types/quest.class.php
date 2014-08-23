@@ -394,18 +394,21 @@ class QuestListFilter extends Filter
         38 => [null, 1, 2, 3, 4, 5, 6, 7, 8, null,   10, 11, true, false],
     );
     protected $genericFilter = array(
-        27 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_DAILY                ], // daily
-        28 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_WEEKLY               ], // weekly
-        29 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_REPEATABLE           ], // repeatable
-        30 => [FILTER_CR_NUMERIC,   'id',               null,                       true], // id
-         5 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_SHARABLE             ], // sharable
-        11 => [FILTER_CR_NUMERIC,   'suggestedPlayers',                                 ], // suggestedplayers
-         6 => [FILTER_CR_NUMERIC,   'timeLimit',                                        ], // timer
-        42 => [FILTER_CR_STAFFFLAG, 'flags',                                            ], // flags
-        45 => [FILTER_CR_BOOLEAN,   'rewardTitleId',                                    ], // titlerewarded
-         2 => [FILTER_CR_NUMERIC,   'rewardXP',                                         ], // experiencegained
-         3 => [FILTER_CR_NUMERIC,   'rewardOrReqMoney',                                 ], // moneyrewarded
-        33 => [FILTER_CR_ENUM,      'holidayId',                                        ], // relatedevent
+        27 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_DAILY          ], // daily
+        28 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_WEEKLY         ], // weekly
+        29 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_REPEATABLE     ], // repeatable
+        30 => [FILTER_CR_NUMERIC,   'id',               null,                 true], // id
+         5 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_SHARABLE       ], // sharable
+        11 => [FILTER_CR_NUMERIC,   'suggestedPlayers',                           ], // suggestedplayers
+         6 => [FILTER_CR_NUMERIC,   'timeLimit',                                  ], // timer
+        42 => [FILTER_CR_STAFFFLAG, 'flags',                                      ], // flags
+        45 => [FILTER_CR_BOOLEAN,   'rewardTitleId',                              ], // titlerewarded
+         2 => [FILTER_CR_NUMERIC,   'rewardXP',                                   ], // experiencegained
+         3 => [FILTER_CR_NUMERIC,   'rewardOrReqMoney',                           ], // moneyrewarded
+        33 => [FILTER_CR_ENUM,      'holidayId',                                  ], // relatedevent
+        25 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT        ], // hascomments
+        18 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
+        36 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos
     );
 
     protected function createSQLForCriterium(&$cr)
@@ -568,10 +571,6 @@ class QuestListFilter extends Filter
             case 15:                                        // lastquestseries
             case 16:                                        // partseries
 /* todo */      return [1];                                 // self-joining eats substential amounts of time: should restructure that and also incorporate reqQ and openQ cases from infobox
-            case 25:                                        // hascomments
-            case 18:                                        // hasscreenshots
-            case 36:                                        // hasvideos
-/* todo */      return [1];
             default:
                 break;
         }

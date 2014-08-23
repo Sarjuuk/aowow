@@ -259,12 +259,15 @@ class AchievementListFilter extends Filter
         )
     );
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true      ], // givesreward
-         3 => [FILTER_CR_STRING,    'reward',      true      ], // rewardtext
-         7 => [FILTER_CR_BOOLEAN,   'series',                ], // givesreward
-         9 => [FILTER_CR_NUMERIC,   'id',          null, true], // prcntbasemanarequired
-        10 => [FILTER_CR_STRING,    'iconString',            ], // icon
-        18 => [FILTER_CR_STAFFFLAG, 'flags',                 ], // lastrank
+         2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true                      ], // givesreward
+         3 => [FILTER_CR_STRING,    'reward',      true                      ], // rewardtext
+         7 => [FILTER_CR_BOOLEAN,   'series',                                ], // givesreward
+         9 => [FILTER_CR_NUMERIC,   'id',          null,                 true], // prcntbasemanarequired
+        10 => [FILTER_CR_STRING,    'iconString',                            ], // icon
+        18 => [FILTER_CR_STAFFFLAG, 'flags',                                 ], // lastrank
+        14 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_COMMENT        ], // hascomments
+        15 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
+        16 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_VIDEO          ], // hasvideos
     );
 
     protected function createSQLForCriterium(&$cr)
@@ -303,12 +306,6 @@ class AchievementListFilter extends Filter
                     }
                 }
                 break;
-            case 14:                                        // hascomments [yn]
-/* todo */      return [1];
-            case 15:                                        // hasscreenshots [yn]
-/* todo */      return [1];
-            case 16:                                        // hasvideos [yn]
-/* todo */      return [1];
         }
 
         unset($cr);

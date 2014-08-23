@@ -257,7 +257,10 @@ class CreatureListFilter extends Filter
         19 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_BANKER            ], // banker
         37 => [FILTER_CR_NUMERIC, 'id',               null,                  true], // id
         35 => [FILTER_CR_STRING,  'textureString'                                ], // useskin
-        32 => [FILTER_CR_FLAG,    'cuFlags',          NPC_CU_INSTANCE_BOSS       ]  // instanceboss
+        32 => [FILTER_CR_FLAG,    'cuFlags',          NPC_CU_INSTANCE_BOSS       ], // instanceboss
+        33 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_COMMENT         ], // hascomments
+        31 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_SCREENSHOT      ], // hasscreenshots
+        40 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_VIDEO           ], // hasvideos
     );
 
     protected function createSQLForCriterium(&$cr)
@@ -424,9 +427,6 @@ class CreatureListFilter extends Filter
             case 6:                                         // foundin [enum]
             case 38:                                        // relatedevent [enum]
             case 34:                                        // usemodel [str]          // displayId -> id:creatureDisplayInfo.dbc/model -> id:cratureModelData.dbc/modelPath
-            case 33:                                        // hascomments [yn]
-            case 31:                                        // hasscreenshots [yn]
-            case 40:                                        // hasvideos [yn]
             case 41:                                        // haslocation [yn] [staff]
 /* todo */      return [1];
         }

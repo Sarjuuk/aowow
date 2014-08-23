@@ -97,11 +97,14 @@ class ItemsetListFilter extends Filter
 {
     // cr => [type, field, misc, extraCol]
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         2 => [FILTER_CR_NUMERIC, 'id',        null, true], // id
-         3 => [FILTER_CR_NUMERIC, 'npieces',             ], // pieces
-         4 => [FILTER_CR_STRING,  'bonusText', true      ], // bonustext
-         5 => [FILTER_CR_BOOLEAN, 'heroic',              ], // heroic
-         6 => [FILTER_CR_ENUM,    'holidayId',           ], // relatedevent
+         2 => [FILTER_CR_NUMERIC, 'id',        null,                 true], // id
+         3 => [FILTER_CR_NUMERIC, 'npieces',                             ], // pieces
+         4 => [FILTER_CR_STRING,  'bonusText', true                      ], // bonustext
+         5 => [FILTER_CR_BOOLEAN, 'heroic',                              ], // heroic
+         6 => [FILTER_CR_ENUM,    'holidayId',                           ], // relatedevent
+         8 => [FILTER_CR_FLAG,    'cuFlags',   CUSTOM_HAS_COMMENT        ], // hascomments
+         9 => [FILTER_CR_FLAG,    'cuFlags',   CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
+        10 => [FILTER_CR_FLAG,    'cuFlags',   CUSTOM_HAS_VIDEO          ], // hasvideos
     );
 
     protected function createSQLForCriterium(&$cr)
@@ -119,12 +122,6 @@ class ItemsetListFilter extends Filter
         switch ($cr[0])
         {
             case 12:                                        // available to players [yn]                ugh .. scan loot, quest and vendor templates and write to ?_itemset
-/* todo */      return [1];
-            case 8:                                         // hascomments [yn]
-/* todo */      return [1];
-            case 9:                                         // hasscreenshots [yn]
-/* todo */      return [1];
-            case 10:                                        // hasvideos [yn]
 /* todo */      return [1];
         }
 

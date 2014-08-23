@@ -137,8 +137,11 @@ class GameObjectListFilter extends Filter
     public    $extraOpts     = [];
 
     protected $genericFilter = array(
-        15 => [FILTER_CR_NUMERIC,   'id',       null],      // id
-         7 => [FILTER_CR_NUMERIC,   'reqSkill', null],      // requiredskilllevel
+        15 => [FILTER_CR_NUMERIC, 'id',       null                 ], // id
+         7 => [FILTER_CR_NUMERIC, 'reqSkill', null                 ], // requiredskilllevel
+        13 => [FILTER_CR_FLAG,    'cuFlags',  CUSTOM_HAS_COMMENT   ], // hascomments
+        11 => [FILTER_CR_FLAG,    'cuFlags',  CUSTOM_HAS_SCREENSHOT], // hasscreenshots
+        18 => [FILTER_CR_FLAG,    'cuFlags',  CUSTOM_HAS_VIDEO     ], // hasvideos
     );
 
 /*
@@ -201,12 +204,6 @@ class GameObjectListFilter extends Filter
                         $this->extraOpts['o']['h'][] = 'endsQuests = 0';
                         return [1];
                 }
-                break;
-            case 13:                                        // hascomments [yn]
-                break;
-            case 11:                                        // hasscreenshots [yn]
-                break;
-            case 18:                                        // hasvideos [yn]
                 break;
         }
 

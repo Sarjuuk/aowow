@@ -177,6 +177,12 @@ define('SPAWNINFO_ZONES',                   1);             // not a mask, mutua
 define('SPAWNINFO_SHORT',                   2);
 define('SPAWNINFO_FULL',                    3);
 
+// Community Content
+define('CC_FLAG_STICKY',                    0x1);
+define('CC_FLAG_DELETED',                   0x2);
+define('CC_FLAG_OUTDATED',                  0x4);
+define('CC_FLAG_APPROVED',                  0x8);
+
 /*
  * Game
  */
