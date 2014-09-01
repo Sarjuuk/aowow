@@ -40,7 +40,7 @@ if (!defined('AOWOW_REVISION'))
         );
 
         foreach ($dataz as $class => &$data)
-            $data[2] = array_values(DB::Aowow()->selectRow('SELECT mle.chance*100 cMle, spl.chance*100 cSpl FROM dbc.gtChanceToMeleeCritBase mle, dbc.gtChanceToSpellCritBase spl WHERE mle.idx = spl.idx AND mle.idx = ?d', $class - 1));
+            $data[2] = array_values(DB::Aowow()->selectRow('SELECT mle.chance*100 cMle, spl.chance*100 cSpl FROM dbc.gtchancetomeleecritbase mle, dbc.gtchancetospellcritbase spl WHERE mle.idx = spl.idx AND mle.idx = ?d', $class - 1));
 
         return $dataz;
     }

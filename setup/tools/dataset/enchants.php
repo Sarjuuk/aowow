@@ -127,7 +127,7 @@ if (!defined('AOWOW_REVISION'))
                 $ench['jsonequip']['requiredLevel'] = $misc['requiredLevel'];
 
             // check if the spell has an entry in skill_line_ability -> Source:Profession
-            if ($skill = DB::Aowow()->SelectCell('SELECT skillLineId FROM dbc.skillLineAbility WHERE spellId = ?d', $enchantSpells->id))
+            if ($skill = DB::Aowow()->SelectCell('SELECT skillLineId FROM dbc.skilllineability WHERE spellId = ?d', $enchantSpells->id))
             {
                 $ench['name'][]   = $enchantSpells->getField('name', true);
                 $ench['source'][] = $enchantSpells->id;

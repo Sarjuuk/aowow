@@ -1320,8 +1320,8 @@ class ItemList extends BaseType
         $ire = DB::Aowow()->select('
             SELECT  i.id AS ARRAY_KEY_1, ire.id AS ARRAY_KEY_2, iet.chance, ire.*
             FROM    ?_items i
-            JOIN    item_enchantment_template iet ON iet.entry = ABS(i.randomEnchant)
-            JOIN    ?_itemRandomEnchant ire ON IF(i.randomEnchant > 0, ire.id = iet.ench, ire.id = -iet.ench)
+            JOIN    item_enchantment_template iet ON iet.entry = ABS(i.randomenchant)
+            JOIN    ?_itemrandomenchant ire ON IF(i.randomenchant > 0, ire.id = iet.ench, ire.id = -iet.ench)
             WHERE   i.id IN (?a)',
             array_keys($this->templates)
         );

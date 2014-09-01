@@ -42,7 +42,7 @@ if (!defined('AOWOW_REVISION'))
             ?_spell s1 ON
                 s1.Id = i.spellid_1
         LEFT JOIN
-            ?_glyphProperties g ON
+            ?_glyphproperties g ON
                 g.Id = s1.effect1MiscValue
         LEFT JOIN
             ?_spell s2 ON
