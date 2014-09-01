@@ -48,16 +48,16 @@ if (!defined('AOWOW_REVISION'))
         FROM
             world.creature_template ct
         JOIN
-            ?_factionTemplate ft ON
-                ft.Id = ct.faction_A    -- no beast has different faction set for Horde
+            ?_factiontemplate ft ON
+                ft.Id = ct.faction    -- no beast has different faction set for Horde
         JOIN
-            dbc.creatureFamily cf ON
+            dbc.creaturefamily cf ON
                 cf.Id = ct.family
         LEFT JOIN
             world.locales_creature lc ON
                 lc.entry = ct.entry
         JOIN
-            dbc.creatureDisplayInfo cdi ON
+            dbc.creaturedisplayinfo cdi ON
                 cdi.id = ct.modelId1
         WHERE
             cf.petTalentType <> -1 AND
