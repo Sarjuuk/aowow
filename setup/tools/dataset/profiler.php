@@ -40,18 +40,21 @@ if (!defined('AOWOW_REVISION'))
 
         foreach ($locales as $l)
         {
+            set_time_limit(20);
+
             User::useLocale($l);
+            Lang::load(Util::$localeStrings[$l]);
             $handle = fOpen('datasets\\'.User::$localeString.'\\p-quests', "w");
             if (!$handle)
                 die('could not create quests file '.$l);
 
             $buff = "var _ = g_gatheredcurrencies;\n";
             foreach($relCurr->getListviewData() as $id => $data)
-                $buff .= '_['.$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).";\n";
+                $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
 
             $buff .= "\n\nvar _ = g_quests;\n";
             foreach($questz->getListviewData() as $id => $data)
-                $buff .= '_['.$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).";\n";
+                $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
 
             $buff .= "\ng_quest_catorder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\n";
 
@@ -68,6 +71,8 @@ if (!defined('AOWOW_REVISION'))
     /* Achievements */
     /****************/
     {
+        set_time_limit(10);
+
         $cnd = array(
             CFG_SQL_LIMIT_NONE,
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
@@ -77,6 +82,7 @@ if (!defined('AOWOW_REVISION'))
         foreach ($locales as $l)
         {
             User::useLocale($l);
+            Lang::load(Util::$localeStrings[$l]);
             $handle = fOpen('datasets\\'.User::$localeString.'\\p-achievements', "w");
             if (!$handle)
                 die('could not create achievements file '.$l);
@@ -86,7 +92,7 @@ if (!defined('AOWOW_REVISION'))
             foreach ($achievez->getListviewData(ACHIEVEMENTINFO_PROFILE) as $id => $data)
             {
                 $sumPoints += $data['points'];
-                $buff .= '_['.$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).";\n";
+                $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
             }
 
             // categories to sort by
@@ -107,6 +113,8 @@ if (!defined('AOWOW_REVISION'))
     /* Titles */
     /**********/
     {
+        set_time_limit(10);
+
         $cnd = array(
             CFG_SQL_LIMIT_NONE,
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
@@ -117,6 +125,7 @@ if (!defined('AOWOW_REVISION'))
             foreach ([0, 1] as $g)                          // gender
             {
                 User::useLocale($l);
+                Lang::load(Util::$localeStrings[$l]);
                 $handle = fOpen('datasets\\'.User::$localeString.'\\p-titles-'.$g, "w");
                 if (!$handle)
                     die('could not create titles file '.$l.' '.$g);
@@ -126,7 +135,7 @@ if (!defined('AOWOW_REVISION'))
                 {
                     $data['name'] = Util::localizedString($titlez->getEntry($id), $g ? 'female' : 'male');
                     unset($data['namefemale']);
-                    $buff .= '_['.$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).";\n";
+                    $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
                 }
                 fWrite($handle, $buff);
                 fClose($handle);
@@ -142,6 +151,8 @@ if (!defined('AOWOW_REVISION'))
     /* Mounts */
     /**********/
     {
+        set_time_limit(10);
+
         $cnd = array(
             CFG_SQL_LIMIT_NONE,
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
@@ -151,13 +162,18 @@ if (!defined('AOWOW_REVISION'))
         foreach ($locales as $l)
         {
             User::useLocale($l);
+            Lang::load(Util::$localeStrings[$l]);
             $handle = fOpen('datasets\\'.User::$localeString.'\\p-mounts', "w");
             if (!$handle)
                 die('could not create mounts file '.$l);
 
             $buff = "var _ = g_spells;\n";
             foreach ($mountz->getListviewData(ITEMINFO_MODEL) as $id => $data)
-                $buff .= '_['.$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).";\n";
+            {
+                $data['quality'] = $data['name'][0];
+                $data['name']    = substr($data['name'], 1);
+                $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+            }
 
             fWrite($handle, $buff);
             fClose($handle);
@@ -172,6 +188,8 @@ if (!defined('AOWOW_REVISION'))
     /* Companions */
     /**************/
     {
+        set_time_limit(10);
+
         $cnd = array(
             CFG_SQL_LIMIT_NONE,
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
@@ -181,13 +199,18 @@ if (!defined('AOWOW_REVISION'))
         foreach ($locales as $l)
         {
             User::useLocale($l);
+            Lang::load(Util::$localeStrings[$l]);
             $handle = fOpen('datasets\\'.User::$localeString.'\\p-companions', "w");
             if (!$handle)
                 die('could not create companions file '.$l);
 
             $buff = "var _ = g_spells;\n";
             foreach ($companionz->getListviewData(ITEMINFO_MODEL) as $id => $data)
-                $buff .= '_['.$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).";\n";
+            {
+                $data['quality'] = $data['name'][0];
+                $data['name']    = substr($data['name'], 1);
+                $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+            }
 
             fWrite($handle, $buff);
             fClose($handle);
@@ -202,6 +225,8 @@ if (!defined('AOWOW_REVISION'))
     /* Factions */
     /************/
     {
+        set_time_limit(10);
+
         // todo (med): exclude non-gaining reputation-header
         $cnd = array(
             CFG_SQL_LIMIT_NONE,
@@ -211,13 +236,14 @@ if (!defined('AOWOW_REVISION'))
         foreach ($locales as $l)
         {
             User::useLocale($l);
+            Lang::load(Util::$localeStrings[$l]);
             $handle = fOpen('datasets\\'.User::$localeString.'\\p-factions', "w");
             if (!$handle)
                 die('could not create factions file '.$l);
 
             $buff = "var _ = g_factions;\n";
             foreach ($factionz->getListviewData() as $id => $data)
-                $buff .= '_['.$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).";\n";
+                $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
 
             $buff .= "\ng_faction_order = [0, 469, 891, 1037, 1118, 67, 1052, 892, 936, 1117, 169, 980, 1097];\n";
 
@@ -245,6 +271,8 @@ if (!defined('AOWOW_REVISION'))
         );
         foreach ($skills as $s)
         {
+            set_time_limit(20);
+
             $file    = is_array($s) ? 'sec' : (string)$s;
             $cnd     = array_merge($baseCnd, [['skillLine1', $s]]);
             $recipez = new SpellList($cnd);
@@ -261,13 +289,11 @@ if (!defined('AOWOW_REVISION'))
             foreach ($locales as $l)
             {
                 User::useLocale($l);
+                Lang::load(Util::$localeStrings[$l]);
                 $buff = '';
                 foreach ($recipez->getListviewData() as $id => $data)
-                {
-                    $data['name'] = $data['quality'].$data['name'];
-                    unset($data['quality']);
-                    $buff .= '_['.$id.'] = '.json_encode($data, JSON_NUMERIC_CHECK).";\n";
-                }
+                    $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+
                 if (!$buff)
                 {
                     echo " - file: ".$file." has no content => skipping<br>\n";
@@ -293,8 +319,10 @@ if (!defined('AOWOW_REVISION'))
         echo "<br>\n";
     }
 
-    User::useLocale(LOCALE_EN);
     echo "<br>\nall done";
+
+    Lang::load(Util::$localeStrings[LOCALE_EN]);
+
     $stats = DB::Aowow()->getStatistics();
     echo "<br>\n".$stats['count']." queries in: ".Util::formatTime($stats['time'] * 1000);
 ?>

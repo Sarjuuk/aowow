@@ -83,7 +83,7 @@ class User
 
         self::setLocale(intVal($query['locale']));          // reset, if changed
 
-        // stuff, that update on daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
+        // stuff, that updates on a daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
         // - conscutive visits
         // - votes per day
         // - reputation for daily visit
@@ -228,7 +228,7 @@ class User
                 if (!DB::isConnectable(DB_AUTH))
                     return AUTH_INTERNAL_ERR;
 
-                $wow = DB::Auth()->selectRow('SELECT a.id, a.sha_pass_hash, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id WHERE username = ? AND ORDER BY ab.active DESC LIMIT 1', $name);
+                $wow = DB::Auth()->selectRow('SELECT a.id, a.sha_pass_hash, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id AND active <> 0 WHERE username = ? DESC LIMIT 1', $name);
                 if (!$wow)
                     return AUTH_WRONGUSER;
 
@@ -493,23 +493,20 @@ class User
 
     public static function getCharacters()
     {
-        // todo: do after profiler
-        @include('datasets/ProfilerExampleChar');
-
         // existing chars on realm(s)
         $characters = array(
-            array(
-                'id'        => $character['id'],
-                'name'      => $character['name'],
-                'realmname' => $character['realm'][1],
-                'region'    => $character['region'][0],
-                'realm'     => $character['realm'][0],
-                'race'      => $character['race'],
-                'classs'    => $character['classs'],
-                'level'     => $character['level'],
-                'gender'    => $character['gender'],
-                'pinned'    => $character['pinned']
-            )
+            // array(
+                // 'id'        => 22,
+                // 'name'      => 'Example Char',
+                // 'realmname' => 'Example Realm',
+                // 'region'    => 'eu',
+                // 'realm'     => 'example-realm',
+                // 'race'      => 6,
+                // 'classs'    => 11,
+                // 'level'     => 80,
+                // 'gender'    => 1,
+                // 'pinned'    => 1
+            // )
         );
 
         return $characters;
@@ -517,11 +514,10 @@ class User
 
     public static function getProfiles()
     {
-        // todo =>  do after profiler
         // chars build in profiler
         $profiles = array(
-            array('id' => 21, 'name' => 'Example Profile 1', 'race' => 4,  'classs' => 5, 'level' => 72, 'gender' => 1, 'icon' => 'inv_axe_04'),
-            array('id' => 23, 'name' => 'Example Profile 2', 'race' => 11, 'classs' => 3, 'level' => 17, 'gender' => 0)
+            // array('id' => 21, 'name' => 'Example Profile 1', 'race' => 4,  'classs' => 5, 'level' => 72, 'gender' => 1, 'icon' => 'inv_axe_04'),
+            // array('id' => 23, 'name' => 'Example Profile 2', 'race' => 11, 'classs' => 3, 'level' => 17, 'gender' => 0)
         );
 
         return $profiles;

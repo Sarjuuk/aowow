@@ -9,11 +9,11 @@ if (!defined('AOWOW_REVISION'))
 // class ArenaTeamList extends BaseType
 class ProfileList extends BaseType
 {
-    public static   $type      = 0;                         // profiles dont actually have one
-    public static $brickFile   = 'profile';
+    public static $type      = 0;                           // profiles dont actually have one
+    public static $brickFile = 'profile';
 
-    protected       $queryBase = ''; // SELECT p.*, p.id AS ARRAY_KEY FROM ?_profiles p';
-    protected       $queryOpts = array(
+    protected     $queryBase = ''; // SELECT p.*, p.id AS ARRAY_KEY FROM ?_profiles p';
+    protected     $queryOpts = array(
                         'p'   => [['pa', 'pg']],
                         'pam' => [['?_profiles_arenateam_member pam ON pam.memberId = p.id', true], 's' => ', pam.status'],
                         'pa'  => ['?_profiles_arenateam pa ON pa.id = pam.teamId', 's' => ', pa.mode, pa.name'],
@@ -149,9 +149,6 @@ class ProfileList extends BaseType
         if (!$this->curTpl)
             return [];
 
-        if (isset($this->tooltips[$this->id]))
-            return $this->tooltips[$this->id];
-
         $x  = '<table>';
         $x .= '<tr><td><b class="q">'.$this->getField('name').'</b></td></tr>';
         if ($g = $this->getField('name'))
@@ -161,9 +158,7 @@ class ProfileList extends BaseType
         $x .= '<tr><td>'.Lang::$game['level'].' '.$this->getField('level').' '.Lang::$game['ra'][$this->curTpl['race']].' '.Lang::$game['cl'][$this->curTpl['classs']].'</td></tr>';
         $x .= '</table>';
 
-        $this->tooltips[$this->id] = $x;
-
-        return $this->tooltips[$this->id];
+        return $x;
     }
 
     public function getJSGlobals($addMask = 0) {}

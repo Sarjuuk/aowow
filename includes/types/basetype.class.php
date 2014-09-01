@@ -294,7 +294,11 @@ abstract class BaseType
     public function getEntry($id)
     {
         if (isset($this->templates[$id]))
+        {
+            $this->curTpl = $this->templates[$id];
+            $this->id     = $id;
             return $this->templates[$id];
+        }
 
         return null;
     }

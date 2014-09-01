@@ -273,9 +273,6 @@ class QuestList extends BaseType
         if (!$this->curTpl)
             return null;
 
-        if (isset($this->tooltips[$this->id]))
-            return $this->tooltips[$this->id];
-
         $title = Util::jsEscape($this->getField('name', true));
         $level = $this->curTpl['level'];
         if ($level < 0)
@@ -338,8 +335,6 @@ class QuestList extends BaseType
             $x .= '<br /><br /><span class="q">'.Lang::$quest['requirements'].Lang::$main['colon'].'</span>'.$xReq;
 
         $x .= '</td></tr></table>';
-
-        $this->tooltips[$this->id] = $x;
 
         return $x;
     }

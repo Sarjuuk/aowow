@@ -4,7 +4,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-    // Create 'itemsets'-file for available locales (and should probably order the itemests_dbc-table too (see below))
+    // Create 'itemsets'-file for available locales
     // this script requires the following dbc-files to be parsed and available
     // GlyphProperties, Spells, SkillLineAbility
 
@@ -29,32 +29,6 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
-    /* Todo:
-        well .. strictly spoken this script is bogus. All data has to be assembled beforehand either by hand or by querying wowhead
-        we would need this script to prevent this type-fest and do it propperly ourselves.. *dang*
-
-        probably like this:
-
-        virtualId = 0
-        get itemsetIds ordered ascending
-        foreach itemsetId
-            lookup pieces
-            sort pieces by slot
-            if slots conflict
-                group items by ItemLevel ordered ascending
-                assign: first group => regularId
-                assign: other groups => --virtualId
-            end if
-        end foreach
-
-        this will probably screw the order of your set-pieces and will not result in the same virtualIds like wowhead, but
-        they are years beyond our content anyway, so what gives...
-
-        lets assume, you've done something like that, so ...
-
-        ... onwards!
-    */
-
     $setList   = DB::Aowow()->Select('SELECT * FROM ?_itemset ORDER BY refSetId DESC');
     $locales   = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
     $jsonBonus = [];
@@ -69,11 +43,13 @@ if (!defined('AOWOW_REVISION'))
     foreach ($locales as $lId)
     {
         User::useLocale($lId);
+        Lang::load(Util::$localeStrings[$lId]);
 
         $itemsetOut = [];
-
         foreach ($setList as $set)
         {
+            set_time_limit(15);
+
             $setOut = array(
                 'id'       => $set['id'],
                 'name'     => (7 - $set['quality']).Util::jsEscape(Util::localizedString($set, 'name')),
@@ -112,18 +88,13 @@ if (!defined('AOWOW_REVISION'))
 
                 // costy and locale-independant -> cache
                 if (!isset($jsonBonus[$set['spell'.$i]]))
-                {
-                    $bSpell = new SpellList(array(['s.id', $set['spell'.$i]]));
-                    $jsonBonus[$set['spell'.$i]] = $bSpell->getStatGain()[$set['spell'.$i]];
-                }
+                    $jsonBonus[$set['spell'.$i]] = (new SpellList(array(['s.id', (int)$set['spell'.$i]])))->getStatGain()[$set['spell'.$i]];
 
-                if (isset($setOut['setbonus'][$set['bonus'.$i]]))
-                {
+                if (!isset($setOut['setbonus'][$set['bonus'.$i]]))
+                    $setOut['setbonus'][$set['bonus'.$i]] = $jsonBonus[$set['spell'.$i]];
+                else
                     foreach ($jsonBonus[$set['spell'.$i]] as $k => $v)
                         @$setOut['setbonus'][$set['bonus'.$i]][$k] += $v;
-                }
-                else
-                    $setOut['setbonus'][$set['bonus'.$i]] = $jsonBonus[$set['spell'.$i]];
             }
 
             foreach ($setOut['setbonus'] as $k => $v)
@@ -150,7 +121,7 @@ if (!defined('AOWOW_REVISION'))
         }
 
         $toFile  = "var g_itemsets = ";
-        $toFile .= json_encode($itemsetOut, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        $toFile .= json_encode($itemsetOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         $toFile .= ";";
         $file    = 'datasets\\'.User::$localeString.'\\itemsets';
 
@@ -163,9 +134,8 @@ if (!defined('AOWOW_REVISION'))
 
     echo "<br>\nall done";
 
-    User::useLocale(LOCALE_EN);
+    Lang::load(Util::$localeStrings[LOCALE_EN]);
 
     $stats = DB::Aowow()->getStatistics();
     echo "<br>\n".$stats['count']." queries in: ".Util::formatTime($stats['time'] * 1000);
-
 ?>

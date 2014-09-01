@@ -8,13 +8,11 @@ class CreatureList extends BaseType
 {
     use spawnHelper;
 
-    public static   $type      = TYPE_NPC;
-    public static $brickFile   = 'creature';
+    public static $type      = TYPE_NPC;
+    public static $brickFile = 'creature';
 
-    public          $tooltips  = [];
-
-    protected       $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
-    public          $queryOpts = array(
+    protected     $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
+    public        $queryOpts = array(
                         'ct'     => [['ft', 'clsMin', 'clsMax', 'qse']],
                         'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.faction', 's' => ', ft.A, ft.H, ft.factionId'],
                         'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', clsMin.attackpower AS mleAtkPwrMin, clsMin.rangedattackpower AS rngAtkPwrMin, clsMin.baseArmor * ct.armorMod AS armorMin, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * ct.dmgMultiplier AS dmgMin, (CASE ct.exp WHEN 0 THEN clsMin.basehp0 WHEN 1 THEN clsMin.basehp1 ELSE clsMin.basehp2 END) * ct.healthMod AS healthMin, clsMin.baseMana * ct.manaMod AS manaMin'],
@@ -46,9 +44,6 @@ class CreatureList extends BaseType
     {
         if (!$this->curTpl)
             return null;
-
-        if (isset($this->tooltips[$this->id]))
-            return $this->tooltips[$this->id];
 
         $level = '??';
         $type  = $this->curTpl['type'];
@@ -87,8 +82,6 @@ class CreatureList extends BaseType
             $x .= '<tr><td>'.$f.'</td></tr>';
 
         $x .= '</table>';
-
-        $this->tooltips[$this->id] = $x;
 
         return $x;
     }

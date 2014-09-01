@@ -8,11 +8,11 @@ class GameObjectList extends BaseType
 {
     use listviewHelper, spawnHelper;
 
-    public static   $type      = TYPE_OBJECT;
-    public static $brickFile   = 'object';
+    public static $type      = TYPE_OBJECT;
+    public static $brickFile = 'object';
 
-    protected       $queryBase = 'SELECT o.*, o.id AS ARRAY_KEY FROM ?_objects o';
-    protected       $queryOpts = array(
+    protected     $queryBase = 'SELECT o.*, o.id AS ARRAY_KEY FROM ?_objects o';
+    protected     $queryOpts = array(
                         'o'   => [['ft', 'qse']],
                         'ft'  => ['j' => ['?_factiontemplate ft ON ft.id = o.faction', true], 's' => ', ft.factionId, ft.A, ft.H'],
                         'qse' => ['j' => ['?_quests_startend qse ON qse.type = 2 AND qse.typeId = o.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'o.id'],
@@ -100,9 +100,6 @@ class GameObjectList extends BaseType
         if (!$this->curTpl)
             return array();
 
-        if (isset($this->tooltips[$this->id]))
-            return $this->tooltips[$this->id];
-
         $x  = '<table>';
         $x .= '<tr><td><b class="q">'.$this->getField('name', true).'</b></td></tr>';
         if ($_ = @Lang::$gameObject['type'][$this->curTpl['typeCat']])
@@ -115,9 +112,7 @@ class GameObjectList extends BaseType
 
         $x .= '</table>';
 
-        $this->tooltips[$this->id] = $x;
-
-        return $this->tooltips[$this->id];
+        return $x;
     }
 
     public function getJSGlobals($addMask = 0)

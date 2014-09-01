@@ -86,7 +86,7 @@ if (!defined('AOWOW_REVISION'))
                 $offset = [20, 20, 20, 20, 20];
 
             $rows = DB::Aowow()->select('SELECT pls.level AS ARRAY_KEY, str-?d, agi-?d, sta-?d, inte-?d, spi-?d, basehp, IF(basemana <> 0, basemana, 100), mlecrt.chance*100, splcrt.chance*100, mlecrt.chance*100 * ?f, baseHP5.ratio*1, extraHP5.ratio*1 ' .
-                                'FROM world.player_levelstats pls JOIN world.player_classlevelstats pcls ON pls.level = pcls.level AND pls.class = pcls.class JOIN' .
+                                'FROM player_levelstats pls JOIN player_classlevelstats pcls ON pls.level = pcls.level AND pls.class = pcls.class JOIN' .
                                     ' dbc.gtchancetomeleecrit mlecrt ON mlecrt.idx   = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
                                     ' dbc.gtchancetospellcrit splcrt ON splcrt.idx   = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
                                     ' dbc.gtoctregenhp baseHP5       ON baseHP5.idx  = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .

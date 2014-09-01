@@ -25,9 +25,8 @@ if (!defined('AOWOW_REVISION'))
     // t - array of talent-objects
     // f - array:int [pets only] creatureFamilies in that category
 
-    function buildTree($class)
+    $buildTree = function ($class) use (&$petFamIcons, &$tSpells)
     {
-        global $petFamIcons;    // h8!
         $petCategories = [];
 
         $mask = $class ? 1 << ($class - 1) : 0;
@@ -116,12 +115,14 @@ if (!defined('AOWOW_REVISION'))
 
                 for ($k = 0; $k <= ($m - 1); $k++)
                 {
-                    $tSpell = new SpellList(array(['s.id', (int)$talents[$j]['rank'.($k + 1)]]));
-                    $d[] = $tSpell->parseText()[0];
+                    if (!$tSpells->getEntry($talents[$j]['rank'.($k + 1)]))
+                        continue;
+
+                    $d[] = $tSpells->parseText()[0];
                     $s[] = $talents[$j]['rank'.($k + 1)];
 
                     if ($talents[$j]['talentSpell'])
-                        $t[] = $tSpell->getTalentHeadForCurrent();
+                        $t[] = $tSpells->getTalentHeadForCurrent();
                 }
 
                 if ($talents[$j]['reqTalent'])
@@ -130,7 +131,7 @@ if (!defined('AOWOW_REVISION'))
                     if (!isset($tNums[$talents[$j]['reqTalent']]))
                         $depLinks[$talents[$j]['reqTalent']] = $j;
 
-                    $r = [$tNums[$talents[$j]['reqTalent']], $talents[$j]['reqRank'] + 1];
+                    $r = @[$tNums[$talents[$j]['reqTalent']], $talents[$j]['reqRank'] + 1];
                 }
 
                 $result[$l]['t'][$j] = array(
@@ -169,7 +170,7 @@ if (!defined('AOWOW_REVISION'))
         }
 
         return $result;
-    }
+    };
 
     $classes       = [CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_PRIEST, CLASS_DEATHKNIGHT, CLASS_SHAMAN, CLASS_MAGE, CLASS_WARLOCK, CLASS_DRUID];
     $locales       = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
@@ -182,11 +183,15 @@ if (!defined('AOWOW_REVISION'))
         if (!is_dir('datasets\\'.$dir))
             mkdir('datasets\\'.$dir, 0755, true);
 
+    $tSpellIds = DB::Aowow()->selectCol('SELECT rank1 FROM dbc.talent UNION SELECT rank2 FROM dbc.talent UNION SELECT rank3 FROM dbc.talent UNION SELECT rank4 FROM dbc.talent UNION SELECT rank5 FROM dbc.talent');
+    $tSpells   = new SpellList(array(['s.id', $tSpellIds], CFG_SQL_LIMIT_NONE));
+
     echo "script set up in ".Util::execTime()."<br>\n";
 
     foreach ($locales as $lId)
     {
         User::useLocale($lId);
+        Lang::load(Util::$localeStrings[$lId]);
 
         // TalentCalc
         foreach ($classes as $cMask)
@@ -195,7 +200,7 @@ if (!defined('AOWOW_REVISION'))
 
             $cId    = log($cMask, 2) + 1;
             $file   = 'datasets\\'.User::$localeString.'\\talents-'.$cId;
-            $toFile = '$WowheadTalentCalculator.registerClass('.$cId.', '.json_encode(buildTree($cId), JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK).')';
+            $toFile = '$WowheadTalentCalculator.registerClass('.$cId.', '.json_encode($buildTree($cId), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).')';
 
             $handle = fOpen($file, "w");
             fWrite($handle, $toFile);
@@ -208,11 +213,11 @@ if (!defined('AOWOW_REVISION'))
         if (empty($petIcons))
         {
             $pets = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, iconString FROM ?_pet');
-            $petIcons = json_encode($pets, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+            $petIcons = json_encode($pets, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         }
 
         $toFile  = "var g_pet_icons = ".$petIcons."\n\n";
-        $toFile .= 'var g_pet_talents = '.json_encode(buildTree(0), JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        $toFile .= 'var g_pet_talents = '.json_encode($buildTree(0), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         $file    = 'datasets\\'.User::$localeString.'\\pet-talents';
 
         $handle = fOpen($file, "w");
@@ -224,9 +229,8 @@ if (!defined('AOWOW_REVISION'))
 
     echo "<br>\nall done";
 
-    User::useLocale(LOCALE_EN);
+    Lang::load(Util::$localeStrings[LOCALE_EN]);
 
     $stats = DB::Aowow()->getStatistics();
     echo "<br>\n".$stats['count']." queries in: ".Util::formatTime($stats['time'] * 1000);
-
 ?>

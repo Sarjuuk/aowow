@@ -22,38 +22,31 @@ if (!defined('AOWOW_REVISION'))
 
     $queryGlyphs = '
         SELECT
-            i.entry as itemId,
-            i.name,
-            li.*,
-            IF (g.typeFlags & 0x1, 2, 1) as type,
-            i.subclass as classs,
-            i.requiredLevel as level,
-            s1.Id as glyphSpell,
-            s1.iconStringAlt as icon,
-            s1.skillLine1 as skillId,
-            s2.Id as glyphEffect,
-            s2.Id as ARRAY_KEY
+            i.id AS itemId,
+            i.*,
+            IF (g.typeFlags & 0x1, 2, 1) AS type,
+            i.subclass AS classs,
+            i.requiredLevel AS level,
+            s1.Id AS glyphSpell,
+            s1.iconStringAlt AS icon,
+            s1.skillLine1 AS skillId,
+            s2.Id AS glyphEffect,
+            s2.Id AS ARRAY_KEY
         FROM
-            item_template i
-        LEFT JOIN
-            locales_item li ON
-                i.entry = li.entry
-        LEFT JOIN
-            ?_spell s1 ON
-                s1.Id = i.spellid_1
-        LEFT JOIN
-            ?_glyphproperties g ON
-                g.Id = s1.effect1MiscValue
-        LEFT JOIN
-            ?_spell s2 ON
-                s2.Id = g.spellId
+            ?_items i
+        JOIN
+            ?_spell s1 ON s1.Id = i.spellid1
+        JOIN
+            ?_glyphproperties g ON g.Id = s1.effect1MiscValue
+        JOIN
+            ?_spell s2 ON s2.Id = g.spellId
         WHERE
-            i.class = 16
+            i.classBak = 16
         ;
     ';
 
-    $glyphList   = DB::Aowow()->Select($queryGlyphs);
-    $locales     = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
+    $glyphList = DB::Aowow()->Select($queryGlyphs);
+    $locales   = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
 
     // check directory-structure
     foreach (Util::$localeStrings as $dir)
@@ -62,11 +55,12 @@ if (!defined('AOWOW_REVISION'))
 
     echo "script set up in ".Util::execTime()."<br>\n";
 
-    $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)], 0));
+    $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)], CFG_SQL_LIMIT_NONE));
 
     foreach ($locales as $lId)
     {
         User::useLocale($lId);
+        Lang::load(Util::$localeStrings[$lId]);
 
         $glyphsOut = [];
         foreach ($glyphSpells->iterate() as $__)
@@ -104,9 +98,8 @@ if (!defined('AOWOW_REVISION'))
 
     echo "<br>\nall done";
 
-    User::useLocale(LOCALE_EN);
+    Lang::load(Util::$localeStrings[LOCALE_EN]);
 
     $stats = DB::Aowow()->getStatistics();
     echo "<br>\n".$stats['count']." queries in: ".Util::formatTime($stats['time'] * 1000);
-
 ?>

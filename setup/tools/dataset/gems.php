@@ -26,22 +26,20 @@ if (!defined('AOWOW_REVISION'))
 
     $gemQuery = "
         SELECT
-            it.entry as itemId,
+            it.entry AS itemId,
             it.name,
             li.*,
             IF (it.entry < 36000 OR it.ItemLevel < 70, 1 , 2) AS expansion,
-            (it.Quality) AS quality,
-            i.inventoryicon1 as icon,
-            ie.*,
-            gp.colorMask as colors
+            it.Quality AS quality,
+            i.inventoryicon1 AS icon,
+            gp.spellItemEnchantmentId AS enchId,
+            gp.colorMask AS colors
         FROM
             item_template it
         LEFT JOIN
             locales_item li ON li.entry = it.entry
         JOIN
-            dbc.gemProperties gp ON gp.Id = it.GemProperties
-        JOIN
-            ?_itemEnchantment ie ON gp.spellItemEnchantmentId = ie.Id
+            dbc.gemproperties gp ON gp.Id = it.GemProperties
         JOIN
             dbc.itemdisplayinfo i ON i.Id = it.displayid
         WHERE
@@ -51,41 +49,44 @@ if (!defined('AOWOW_REVISION'))
         ;
     ";
 
-    $gems     = Db::Aowow()->Select($gemQuery);
-    $locales  = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
-    $jsonGems = [];
+    $gems    = DB::Aowow()->Select($gemQuery);
+    $locales = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
 
     // check directory-structure
     foreach (Util::$localeStrings as $dir)
         if (!is_dir('datasets\\'.$dir))
             mkdir('datasets\\'.$dir, 0755, true);
 
+    $enchIds = [];
+    foreach ($gems as $pop)
+        $enchIds[] = $pop['enchId'];
+
+    $enchMisc = [];
+    $enchJSON = Util::parseItemEnchantment($enchIds, false, $enchMisc);
+
     echo "script set up in ".Util::execTime()."<br>\n";
 
     foreach ($locales as $lId)
     {
         User::useLocale($lId);
+        Lang::load(Util::$localeStrings[$lId]);
 
         $gemsOut = [];
         foreach ($gems as $pop)
         {
-            // costy and locale-independant -> cache
-            if (!isset($jsonGems[$pop['itemId']]))
-                $jsonGems[$pop['itemId']] = Util::parseItemEnchantment($pop);
-
             $gemsOut[$pop['itemId']] = array(
                 'name'        => Util::localizedString($pop, 'name'),
                 'quality'     => $pop['quality'],
                 'icon'        => strToLower($pop['icon']),
-                'enchantment' => Util::localizedString($pop, 'text'),
-                'jsonequip'   => $jsonGems[$pop['itemId']],
+                'enchantment' => Util::localizedString(@$enchMisc[$pop['enchId']]['text'] ?: [], 'text'),
+                'jsonequip'   => @$enchJSON[$pop['enchId']] ?: [],
                 'colors'      => $pop['colors'],
                 'expansion'   => $pop['expansion']
             );
         }
 
         $toFile  = "var g_gems = ";
-        $toFile .= json_encode($gemsOut, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        $toFile .= json_encode($gemsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         $toFile .= ";";
         $file    = 'datasets\\'.User::$localeString.'\\gems';
 
@@ -98,9 +99,8 @@ if (!defined('AOWOW_REVISION'))
 
     echo "<br>\nall done";
 
-    User::useLocale(LOCALE_EN);
+    Lang::load(Util::$localeStrings[LOCALE_EN]);
 
     $stats = DB::Aowow()->getStatistics();
     echo "<br>\n".$stats['count']." queries in: ".Util::formatTime($stats['time'] * 1000);
-
 ?>

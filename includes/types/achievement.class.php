@@ -12,7 +12,6 @@ class AchievementList extends BaseType
     public static $brickFile = 'achievement';
 
     public        $criteria  = [];
-    public        $tooltip   = [];
 
     protected     $queryBase = 'SELECT `a`.*, `ar`.*, `lar`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
     protected     $queryOpts = array(
@@ -116,9 +115,6 @@ class AchievementList extends BaseType
 
     public function renderTooltip()
     {
-        if (isset($this->tooltip[$this->id]))
-            return $this->tooltip[$this->id];
-
         $criteria = $this->getCriteria();
         $tmp  = [];
         $rows = [];
@@ -209,10 +205,7 @@ class AchievementList extends BaseType
         if ($description || $criteria)
             $x .= '</td></tr></table>';
 
-        // Completed
-        $this->tooltip[$this->id] = $x;
-
-        return $this->tooltip[$this->id];
+        return $x;
     }
 
     public function getSourceData()

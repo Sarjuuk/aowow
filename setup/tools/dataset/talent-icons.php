@@ -9,30 +9,16 @@ if (!defined('AOWOW_REVISION'))
     // this script requires the following dbc-files to be parsed and available
     // Talent, TalentTab, Spell
 
-    $query = '
-        SELECT
-            s.iconString
-        FROM
-            ?_spell s
-        JOIN
-            dbc.talent t On
-                t.rank1 = s.Id
-        JOIN
-            dbc.talenttab tt ON
-                tt.Id = t.tabId
-        WHERE
-            tt.?# = ?d AND
-            tt.tabNumber = ?d
-        ORDER BY
-            t.row, t.column, t.petCategory1 ASC ;
-    ';
-
+    $query     = 'SELECT s.iconString FROM ?_spell s JOIN dbc.talent t ON t.rank1 = s.Id JOIN dbc.talenttab tt ON tt.Id = t.tabId WHERE tt.?# = ?d AND tt.tabNumber = ?d ORDER BY t.row, t.column, t.petCategory1 ASC;';
     $dims      = 36; //v-pets
     $filenames = ['icons', 'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'deathknight', 'shaman', 'mage', 'warlock', null, 'druid'];
 
     // create directory if missing
-    if (!is_dir('images\\talent\\classes\\icons'))
-        mkdir('images\\talent\\classes\\icons', 0755, true);
+    if (!is_dir('static\\images\\wow\\talents\\icons'))
+        mkdir('static\\images\\wow\\talents\\icons', 0755, true);
+
+    if (!is_dir('static\\images\\wow\\hunterpettalents'))
+        mkdir('static\\images\\wow\\hunterpettalents', 0755, true);
 
     echo "script set up in ".Util::execTime()."<br>\n";
 
@@ -41,12 +27,14 @@ if (!defined('AOWOW_REVISION'))
         if (!$v)
             continue;
 
+        set_time_limit(10);
+
         for ($tree = 0; $tree < 3; $tree++)
         {
             $what   = $k ? 'classMask' : 'creatureFamilyMask';
             $set    = $k ? 1 << ($k - 1) : 1 << $tree;
             $subset = $k ? $tree : 0;
-            $path   = $k ? 'classes\\icons' : 'pets';
+            $path   = $k ? 'talents\\icons' : 'hunterpettalents';
 
             $icons = DB::Aowow()->SelectCol($query, $what, $set, $subset);
 
@@ -57,7 +45,7 @@ if (!defined('AOWOW_REVISION'))
 
             for($i = 0; $i < count($icons); $i++)
             {
-                $im = @imagecreatefromjpeg('images\\icons\\medium\\'.$icons[$i].'.jpg');
+                $im = @imagecreatefromjpeg('static\\images\\wow\\icons\\medium\\'.$icons[$i].'.jpg');
                 if(!$im)
                     die('error: raw image '.$icons[$i]. ' not found');
 
@@ -71,12 +59,12 @@ if (!defined('AOWOW_REVISION'))
                 for ($j = 0; $j < imagecolorstotal($im); $j++)
                 {
                     $color = imagecolorsforindex($im, $j);
-                    $gray = round(0.299 * $color['red'] + 0.587 * $color['green'] + 0.114 * $color['blue']);
+                    $gray  = round(0.299 * $color['red'] + 0.587 * $color['green'] + 0.114 * $color['blue']);
                     imagecolorset($im, $j, $gray, $gray, $gray);
                 }
                 imagecopymerge($res, $im, $i * $dims, $dims, 0, 0, imageSX($im), imageSY($im), 100);
 
-                if (!@imagejpeg($res, 'images\\talent\\'.$path.'\\'.$v.'_'.($tree + 1).'.jpg'))
+                if (@!imagejpeg($res, 'static\\images\\wow\\'.$path.'\\'.$v.'_'.($tree + 1).'.jpg'))
                     die('error: '.$v.'_'.($tree + 1).'.jpg could not be written!');
             }
         }
@@ -85,8 +73,6 @@ if (!defined('AOWOW_REVISION'))
     }
 
     echo "<br>\nall done";
-
-    User::useLocale(LOCALE_EN);
 
     $stats = DB::Aowow()->getStatistics();
     echo "<br>\n".$stats['count']." queries in: ".Util::formatTime($stats['time'] * 1000);

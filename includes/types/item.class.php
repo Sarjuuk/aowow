@@ -11,7 +11,6 @@ class ItemList extends BaseType
     public static $type       = TYPE_ITEM;
     public static $brickFile  = 'item';
 
-    public        $tooltip    = [];
     public        $json       = [];
     public        $itemMods   = [];
 
@@ -406,9 +405,6 @@ class ItemList extends BaseType
     {
         if ($this->error)
             return;
-
-        if (!empty($this->tooltip[$this->id]))
-            return $this->tooltip[$this->id];
 
         $_name         = $this->getField('name', true);
         $_reqLvl       = $this->curTpl['requiredLevel'];
@@ -1035,9 +1031,7 @@ class ItemList extends BaseType
             $x .= '<!--?'.implode(':', $link).'-->';
         }
 
-        $this->tooltip[$this->id] = $x;
-
-        return $this->tooltip[$this->id];
+        return $x;
     }
 
     // from Trinity
@@ -1122,13 +1116,12 @@ class ItemList extends BaseType
             $this->itemMods[$this->id] = [];
 
             foreach (Util::$itemMods as $mod)
-                if (!empty($this->curTpl[$mod]))
-                    @$this->itemMods[$this->id][$mod] += $this->curTpl[$mod];
+                if (isset($this->curTpl[$mod]) && ($_ = floatVal($this->curTpl[$mod])))
+                    @$this->itemMods[$this->id][$mod] += $_;
 
             // fetch and add socketbonusstats
             if (@$this->json[$this->id]['socketbonus'] > 0)
                 $enchantments[$this->json[$this->id]['socketbonus']][] = $this->id;
-
 
             // Item is a gem (don't mix with sockets)
             if ($geId = $this->curTpl['gemEnchantmentId'])

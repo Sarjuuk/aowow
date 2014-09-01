@@ -8,8 +8,6 @@ class SpellList extends BaseType
 {
     use listviewHelper;
 
-    public        $tooltips    = [];
-    public        $buffs       = [];
     public        $ranks       = [];
     public        $relItems    = null;
     public        $sources     = [];
@@ -1438,9 +1436,6 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         if (!$this->curTpl)
             return array();
 
-        if (isset($this->buffs[$this->id]))
-            return $this->buffs[$this->id];
-
         // doesn't have a buff
         if (!$this->getField('buff', true))
             return array();
@@ -1473,18 +1468,13 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         // scaling information - spellId:min:max:curr
         $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
 
-        $this->buffs[$this->id] = array($x, $btt[1]);
-
-        return $this->buffs[$this->id];
+        return array($x, $btt[1]);
     }
 
     public function renderTooltip($level = MAX_LEVEL, $interactive = false)
     {
         if (!$this->curTpl)
             return array();
-
-        if (isset($this->tooltips[$this->id]))
-            return $this->tooltips[$this->id];
 
         $this->interactive = $interactive;
 
@@ -1627,9 +1617,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         // scaling information - spellId:min:max:curr
         $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
 
-        $this->tooltips[$this->id] = array($x, $desc ? $desc[1] : null);
-
-        return $this->tooltips[$this->id];
+        return array($x, $desc ? $desc[1] : null);
     }
 
     public function getTalentHeadForCurrent()

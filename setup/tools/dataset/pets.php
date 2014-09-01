@@ -33,28 +33,28 @@ if (!defined('AOWOW_REVISION'))
 
     $petQuery = '
         SELECT
-            ct.entry as id,
+            ct.entry AS id,
             ct.name,
             lc.*,
             ct.minlevel,
             ct.maxlevel,
-            CONCAT("[", ft.A, ", ", ft.H, "]") as react,
-            ct.rank as classification,
+            CONCAT("[", ft.A, ", ", ft.H, "]") AS react,
+            ct.rank AS classification,
             ct.family,
-            ct.modelId1 as displayId,
-            cdi.skin1 as skin,
-            SUBSTRING_INDEX(cf.iconFile, "\\\\", -1) as icon,
-            cf.petTalentType as type
+            ct.modelId1 AS displayId,
+            cdi.skin1 AS skin,
+            SUBSTRING_INDEX(cf.iconFile, "\\\\", -1) AS icon,
+            cf.petTalentType AS type
         FROM
-            world.creature_template ct
+            creature_template ct
         JOIN
             ?_factiontemplate ft ON
-                ft.Id = ct.faction    -- no beast has different faction set for Horde
+                ft.Id = ct.faction
         JOIN
             dbc.creaturefamily cf ON
                 cf.Id = ct.family
         LEFT JOIN
-            world.locales_creature lc ON
+            locales_creature lc ON
                 lc.entry = ct.entry
         JOIN
             dbc.creaturedisplayinfo cdi ON
@@ -68,9 +68,9 @@ if (!defined('AOWOW_REVISION'))
 
     $queryZones = '
         SELECT DISTINCT
-            z.id AS location
+            z.id
         FROM
-            world.creature c
+            creature c
         JOIN
             ?_zones z ON
                 z.xMin < c.position_x AND
@@ -84,9 +84,9 @@ if (!defined('AOWOW_REVISION'))
 
     $queryInstanceZone = '
         SELECT DISTINCT
-            z.id AS location
+            z.id
         FROM
-            world.creature c,
+            creature c,
             ?_zones z
         WHERE
             z.mapId = c.map AND
@@ -107,9 +107,9 @@ if (!defined('AOWOW_REVISION'))
     foreach ($locales as $lId)
     {
         User::useLocale($lId);
+        Lang::load(Util::$localeStrings[$lId]);
 
         $petsOut = [];
-
         foreach ($petList as $pet)
         {
             // get locations
@@ -124,7 +124,7 @@ if (!defined('AOWOW_REVISION'))
                         $locations[$pet['id']][] = $z;
             }
 
-            $pet = array(
+            $petsOut[$pet['id']] = array(
                 'id'             => $pet['id'],
                 'name'           => Util::localizedString($pet, 'name'),
                 'minlevel'       => $pet['minlevel'],
@@ -138,12 +138,10 @@ if (!defined('AOWOW_REVISION'))
                 'icon'           => $pet['icon'],
                 'type'           => $pet['type']
             );
-
-            $petsOut[$pet['id']] = $pet;
         }
 
         $toFile  = "var g_pets = ";
-        $toFile .= json_encode($petsOut, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        $toFile .= json_encode($petsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         $toFile .= ";";
         $file    = 'datasets\\'.User::$localeString.'\\pets';
 
@@ -156,9 +154,8 @@ if (!defined('AOWOW_REVISION'))
 
     echo "<br>\nall done";
 
-    User::useLocale(LOCALE_EN);
+    Lang::load(Util::$localeStrings[LOCALE_EN]);
 
     $stats = DB::Aowow()->getStatistics();
     echo "<br>\n".$stats['count']." queries in: ".Util::formatTime($stats['time'] * 1000);
-
 ?>

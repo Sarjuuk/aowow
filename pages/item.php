@@ -910,12 +910,11 @@ class ItemPage extends genericPage
         if ($asError)
             return '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.', {})';
 
-        $this->subject->renderTooltip(false, 0, $this->enhancedTT);
         $x  = '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
         $x .= "\tquality: ".$this->subject->getField('quality').",\n";
         $x .= "\ticon: '".urlencode($this->subject->getField('iconString'))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->tooltip[$this->typeId])."'\n";
+        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip(false, 0, $this->enhancedTT))."'\n";
         $x .= "});";
 
         return $x;
@@ -967,7 +966,7 @@ class ItemPage extends genericPage
             }
             $xml->addChild('json')->addCData(substr($json, 1));
 
-            // jsonEquip missing: avgbuyout, cooldown
+            // jsonEquip missing: avgbuyout, cooldown, source, sourcemore
             $json = '';
             if ($_ = $this->subject->getField('sellPrice'))          // sellprice
                 $json .= ',"sellprice":'.$_;

@@ -63,15 +63,22 @@ if (!defined('AOWOW_REVISION'))
         if (!is_dir('datasets\\'.$dir))
             mkdir('datasets\\'.$dir, 0755, true);
 
+    $enchIds = [];
+    foreach ($enchantSpells->iterate() as $__)
+        $enchIds[] = $enchantSpells->getField('effect1MiscValue');
+
+    $enchMisc = [];
+    $enchJSON = Util::parseItemEnchantment($enchIds, false, $enchMisc);
+
     echo "script set up in ".Util::execTime()."<br>\n";
 
     foreach ($locales as $lId)
     {
         set_time_limit(180);
         User::useLocale($lId);
+        Lang::load(Util::$localeStrings[$lId]);
 
         $enchantsOut = [];
-
         foreach ($enchantSpells->iterate() as $__)
         {
             // slots have to be recalculated
@@ -101,7 +108,6 @@ if (!defined('AOWOW_REVISION'))
             }
 
             $eId = $enchantSpells->getField('effect1MiscValue');
-            $jsonequip = Util::parseItemEnchantment($eId, false, $misc);
 
             // defaults
             $ench = array(
@@ -111,20 +117,20 @@ if (!defined('AOWOW_REVISION'))
                 'source'      => [],                        // <0: item; >0:spell
                 'skill'       => -1,                        // modified if skill
                 'slots'       => [],                        // determined per spell but set per item
-                'enchantment' => $misc['name'],
-                'jsonequip'   => $jsonequip,
+                'enchantment' => Util::localizedString($enchMisc[$eId]['text'], 'text'),
+                'jsonequip'   => @$enchJSON[$eId] ?: [],
                 'temp'        => 0,                         // always 0
                 'classes'     => 0,                         // modified by item
             );
 
-            if (isset($misc['reqskill']))
-                $ench['jsonequip']['reqskill'] = $misc['reqskill'];
+            if (isset($enchMisc[$eId]['reqskill']))
+                $ench['jsonequip']['reqskill'] = $enchMisc[$eId]['reqskill'];
 
-            if (isset($misc['reqskillrank']))
-                $ench['jsonequip']['reqskill'] = $misc['reqskillrank'];
+            if (isset($enchMisc[$eId]['reqskillrank']))
+                $ench['jsonequip']['reqskill'] = $enchMisc[$eId]['reqskillrank'];
 
-            if (isset($misc['requiredLevel']))
-                $ench['jsonequip']['requiredLevel'] = $misc['requiredLevel'];
+            if (isset($enchMisc[$eId]['requiredLevel']))
+                $ench['jsonequip']['requiredLevel'] = $enchMisc[$eId]['requiredLevel'];
 
             // check if the spell has an entry in skill_line_ability -> Source:Profession
             if ($skill = DB::Aowow()->SelectCell('SELECT skillLineId FROM dbc.skilllineability WHERE spellId = ?d', $enchantSpells->id))
@@ -196,17 +202,15 @@ if (!defined('AOWOW_REVISION'))
         }
 
         // walk over each entry and strip single-item arrays
-        foreach ($enchantsOut as $eId => $ench)
+        foreach ($enchantsOut as &$ench)
         {
             foreach ($ench as $k => $v)
                 if (is_array($v) && count($v) == 1 && $k != 'jsonequip')
-                    $enchantsOut[$eId][$k] = $v[0];
+                    $ench[$k] = $v[0];
         }
 
-        ksort($enchantsOut);
-
         $toFile  = "var g_enchants = ";
-        $toFile .= json_encode($enchantsOut, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        $toFile .= json_encode($enchantsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         $toFile .= ";";
         $file    = 'datasets\\'.User::$localeString.'\\enchants';
 
@@ -219,9 +223,8 @@ if (!defined('AOWOW_REVISION'))
 
     echo "<br>\nall done";
 
-    User::useLocale(LOCALE_EN);
+    Lang::load(Util::$localeStrings[LOCALE_EN]);
 
     $stats = DB::Aowow()->getStatistics();
     echo "<br>\n".$stats['count']." queries in: ".Util::formatTime($stats['time'] * 1000);
-
 ?>
