@@ -210,15 +210,14 @@ class ItemsPage extends GenericPage
         );
         $groups     = [];
         $nameSource = [];
-        $gbField    = '';
+        $grouping   = @$this->filter['gb'];
         $extraOpts  = [];
         $maxResults = CFG_SQL_LIMIT_DEFAULT;
 
-        switch (@$this->filter['gb'])
+        switch ($grouping)
         {
             // slot: (try to limit the lookups by class grouping and intersecting with preselected slots)
             // if intersect yields an empty array no lookups will occur
-            case 3:                                         // todo(med): source .. well .. no, not at the moment .. the database doesn't event have a field for that, so reroute to slots
             case 1:
                 if (isset($this->category[0]) && $this->category[0] == ITEM_CLASS_ARMOR)
                     $groups = $availableSlots[ITEM_CLASS_ARMOR];
@@ -237,7 +236,6 @@ class ItemsPage extends GenericPage
                 {
                     $nameSource = Lang::$item['inventoryType'];
                     $this->forceTabs = true;
-                    $gbField = 'slot';
                 }
 
                 break;
@@ -263,23 +261,18 @@ class ItemsPage extends GenericPage
                     $extraOpts = ['i' => ['o' => ['itemlevel DESC']]];
                     $nameSource[$l] = Lang::$item['tabOther'];
                     $this->forceTabs = true;
-                    $gbField = 'itemlevel';
                 }
 
                 break;
-            case 3:
-                $groups = array_filter(array_keys(Lang::$game['sources']));
-                array_walk($groups, function (&$v, $k) {
-                    $v = $v.':';
-                });
-
+            case 3:                                         // source
+                $groups = [0, 1, 2, 3, 4, 5, 10, 11, 12];
                 $nameSource = Lang::$game['sources'];
                 $this->forceTabs = true;
-                $gbField = 'source';
 
                 break;
             // none
             default:
+                $grouping  = 0;
                 $groups[0] = null;
         }
 
@@ -289,7 +282,20 @@ class ItemsPage extends GenericPage
 
         foreach ($groups as $group)
         {
-            $finalCnd = $gbField ? array_merge($conditions, [[$gbField, abs($group), $group > 0 ? null : '<'], $maxResults]) : $conditions;
+            switch ($grouping)
+            {
+                case 1:
+                    $finalCnd = array_merge($conditions, [['slot', $group], $maxResults]);
+                    break;
+                case 2:
+                    $finalCnd = array_merge($conditions, [['itemlevel', abs($group), $group > 0 ? null : '<'], $maxResults]);
+                    break;
+                case 3:
+                    $finalCnd = array_merge($conditions, [$group ? ['src.src'.$group, null, '!'] : ['src.typeId', null], $maxResults]);
+                    break;
+                default:
+                    $finalCnd = $conditions;
+            }
 
             $items = new ItemList($finalCnd, ['extraOpts' => array_merge($extraOpts, $this->filterObj->extraOpts)]);
 
@@ -306,7 +312,7 @@ class ItemsPage extends GenericPage
             $upg = [];
             if ($upgItemData)
             {
-                if ($gbField == 'slot')                     // match upgradeItem to slot
+                if ($grouping == 1)                         // slot: match upgradeItem to slot
                 {
                     $upg = array_keys(array_filter($this->filter['upg'], function ($v) use ($group) {
                         return $v == $group;
@@ -318,7 +324,7 @@ class ItemsPage extends GenericPage
                     if ($upg)
                         $tab['params']['_upgradeIds'] = '$'.json_encode($upg, JSON_NUMERIC_CHECK);
                 }
-                else if ($gbField)
+                else if ($grouping)
                 {
                     $upg = array_keys($this->filter['upg']);
                     $tab['params']['_upgradeIds'] = '$'.json_encode($upg, JSON_NUMERIC_CHECK);
@@ -327,9 +333,21 @@ class ItemsPage extends GenericPage
                 }
             }
 
-            if ($gbField)
+            if ($grouping)
             {
-                $tab['params']['id']   = $group > 0 ? $gbField.'-'.$group : 'other';
+                switch ($grouping)
+                {
+                    case 1:
+                        $tab['params']['id'] = 'slot-'.$group;
+                        break;
+                    case 2:
+                        $tab['params']['id'] = $group > 0 ? 'level-'.$group : 'other';
+                        break;
+                    case 3:
+                        $tab['params']['id'] = $group ? 'source-'.$group : 'unknown';
+                        break;
+                }
+
                 $tab['params']['name'] = $nameSource[$group];
                 $tab['params']['tabs'] = '$tabsGroups';
             }
@@ -343,39 +361,34 @@ class ItemsPage extends GenericPage
             {
                 $tab['params']['_truncated'] = 1;
 
-                $addCr = [];
-                if ($gbField == 'slot')
-                {
-                    $note = 'lvnote_viewmoreslot';
-                    $override = ['sl' => $group, 'gb' => ''];
-                }
-                else if ($gbField == 'itemlevel')
-                {
-                    $note = 'lvnote_viewmorelevel';
-                    if ($group > 0)
-                        $override = ['minle' => $group, 'maxle' => $group, 'gb' => ''];
-                    else
-                        $override = ['maxle' => abs($group) - 1, 'gb' => ''];
-                }
-                else if ($gbField == 'source')
-                {
-                    if ($_ = @[null, 3, 4, 5, 6, 7, 8][$group])
-                    {
-                        $note  = 'lvnote_viewmoresource';
-                        $addCr = ['cr' => 128, 'crs' => $_, 'crv' => 0];
-                    }
-
-                    $override = ['gb' => ''];
-                }
-
+                $cls      = isset($this->category[0]) ? '='.$this->category[0] : '';
+                $override = ['gb' => ''];
                 if ($upg)
                     $override['upg'] = implode(':', $upg);
 
-                $cls = isset($this->category[0]) ? '='.$this->category[0] : '';
-                $this->filterUrl = $this->filterObj->urlize($override, $addCr);
+                switch ($grouping)
+                {
+                    case 1:
+                        $override['sl'] = $group;
+                        $tab['params']['note'] = '$$WH.sprintf(LANG.lvnote_viewmoreslot, \''.$cls.'\', \''.$this->filterObj->urlize($override).'\')';
+                        break;
+                    case 2:
+                        if ($group > 0)
+                        {
+                            $override['minle'] = $group;
+                            $override['maxle'] = $group;
+                        }
+                        else
+                            $override['maxle'] = abs($group) - 1;
 
-                if ($note)
-                    $tab['params']['note'] = '$$WH.sprintf(LANG.'.$note.', \''.$cls.'\', \''.$this->filterUrl.'\')';
+                        $tab['params']['note'] = '$$WH.sprintf(LANG.lvnote_viewmorelevel, \''.$cls.'\', \''.$this->filterObj->urlize($override).'\')';
+                        break;
+                    case 3:
+                        if ($_ = [null, 3, 4, 5, 6, 7, 9, 10, 11][$group])
+                            $tab['params']['note'] = '$$WH.sprintf(LANG.lvnote_viewmoresource, \''.$cls.'\', \''.$this->filterObj->urlize($override, ['cr' => 128, 'crs' => $_, 'crv' => 0]).'\')';
+
+                        break;
+                }
             }
             else if ($items->getMatches() > $maxResults)
             {
@@ -393,7 +406,7 @@ class ItemsPage extends GenericPage
                 if (!$p)
                     unset($tab['params'][$k]);
 
-            if ($gbField)
+            if ($grouping)
                 $tab['params']['hideCount'] = '$1';
 
             $this->lvTabs[] = $tab;
@@ -405,7 +418,10 @@ class ItemsPage extends GenericPage
 
         // whoops, we have no data? create emergency content
         if (empty($this->lvTabs))
-            $this->lvTabs[] = ['file' => 'item', 'data' => [], 'params' => []];
+        {
+            $this->forceTabs = false;
+            $this->lvTabs[]  = ['file' => 'item', 'data' => [], 'params' => []];
+        }
 
         // sort for dropdown-menus
         asort(Lang::$game['ra']);

@@ -124,6 +124,24 @@ class GameObjectList extends BaseType
 
         return $data;
     }
+
+    public function getSourceData()
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $__)
+        {
+            $data[$this->id] = array(
+                'n'  => $this->getField('name', true),
+                't'  => TYPE_OBJECT,
+                'ti' => $this->id
+             // 'bd' => bossdrop
+             // 'dd' => dungeondifficulty
+            );
+        }
+
+        return $data;
+    }
 }
 
 

@@ -50,7 +50,11 @@ class SpellList extends BaseType
     private       $interactive = false;
     private       $charLevel   = MAX_LEVEL;
 
-    protected     $queryBase   = 'SELECT *, id AS ARRAY_KEY FROM ?_spell s';
+    protected     $queryBase   = 'SELECT s.*, id AS ARRAY_KEY FROM ?_spell s';
+    protected     $queryOpts   = array(
+                      's'   => [['src']],                   //  6: TYPE_SPELL
+                      'src' => ['j' => ['?_source src ON type = 6 AND typeId = s.id', true], 's' => ', src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
+    );
 
     public function __construct($conditions = [])
     {
@@ -80,15 +84,12 @@ class SpellList extends BaseType
             $this->ranks[$this->id] = $this->getField('rank', true);
 
             // sources
-            if (!empty($_curTpl['source']))
+            for ($i = 1; $i < 25; $i++)
             {
-                $sources = explode(' ', $_curTpl['source']);
-                foreach ($sources as $src)
-                {
-                    $src = explode(':', $src);
-                    if ($src[0] != -3)                      // todo (high): sourcemore - implement after items
-                        $this->sources[$this->id][$src[0]][] = $src[1];
-                }
+                if ($_ = $_curTpl['src'.$i])
+                    $this->sources[$this->id][$i][] = $_;
+
+                unset($_curTpl['src'.$i]);
             }
 
             // set full masks to 0
@@ -1695,7 +1696,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
             );
 
             // Sources
-            if (!empty($this->sources[$this->id]) && $s = $this->sources[$this->id])
+            if (!empty($this->sources[$this->id]) && ($s = $this->sources[$this->id]))
                 $data[$this->id]['source'] = array_keys($s);
 
             // Proficiencies
@@ -1883,6 +1884,24 @@ spells / buffspells = {
         return $castingTime;
     }
 
+    public function getSourceData()
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $__)
+        {
+            $data[$this->id] = array(
+                'n'    => $this->getField('name', true),
+                't'    => TYPE_SPELL,
+                'ti'   => $this->id,
+                's'    => empty($this->curTpl['skillLines']) ? 0 : $this->curTpl['skillLines'][0],
+                'c'    => $this->curTpl['typeCat'],
+                'icon' => $this->curTpl['iconStringAlt'] ? $this->curTpl['iconStringAlt'] : $this->curTpl['iconString'],
+            );
+        }
+
+        return $data;
+    }
 }
 
 
@@ -1943,14 +1962,16 @@ class SpellListFilter extends Filter
                     break;
 
                 return ['OR', ['AND', ['powerType', [1, 6]], ['powerCost', (10 * $cr[2]), $cr[1]]], ['AND', ['powerType', [1, 6], '!'], ['powerCost', $cr[2], $cr[1]]]];
-            case 9:                                         // Source [enum]
+            case 9:                                         // source [enum]
                 $_ = @$this->enums[$cr[0]][$cr[1]];
                 if ($_ !== null)
                 {
-                    if (is_bool($_))
-                        return ['source', 0, ($_ ? '!' : null)];
-                    else if (is_int($_))
-                        return ['source', '%'.$_.':%'];
+                    if (is_int($_))                         // specific
+                        return ['src.src'.$_, null, '!'];
+                    else if ($_)                            // any
+                        return ['OR', ['src.src1', null, '!'], ['src.src2', null, '!'], ['src.src4', null, '!'], ['src.src5', null, '!'], ['src.src6', null, '!'], ['src.src7', null, '!'], ['src.src9', null, '!']];
+                    else if (!$_)                           // none
+                        return ['AND', ['src.src1', null], ['src.src2', null], ['src.src4', null], ['src.src5', null], ['src.src6', null], ['src.src7', null], ['src.src9', null]];
                 }
                 break;
             case 20:                                        // has Reagents [yn]

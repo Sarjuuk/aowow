@@ -393,6 +393,22 @@ abstract class BaseType
         }
     }
 
+    /* source More .. keys seen used
+         'n':   name [always set]
+         't':   type [always set]
+        'ti':   typeId [always set]
+        'bd':   BossDrop [0; 1] [Creature / GO]
+        'dd':   DungeonDifficulty [-2: DungeonHC; -1: DungeonNM; 1: Raid10NM; 2:Raid25NM; 3:Raid10HM; 4: Raid25HM] [Creature / GO]
+         'q':   cssQuality [Items]
+         'z':   zone [set when all happens in here]
+         'p':   PvP [pvpSourceId]
+         's':   TYPE_TITLE: side; TYPE_SPELL: skillId (yeah, double use. Ain't life just grand)
+         'c':   category [Spells / Quests]
+        'c2':   subCat [Quests]
+      'icon':   iconString
+    */
+    public function getSourceData() {}
+
     // should return data required to display a listview of any kind
     // this is a rudimentary example, that will not suffice for most Types
     abstract public function getListviewData();
@@ -689,12 +705,23 @@ abstract class Filter
         foreach (array_merge($this->fiData['c'], $this->fiData['v'], $override) as $k => $v)
         {
             if (isset($addCr[$k]))
+            {
                 $v = $v ? array_merge((array)$v, (array)$addCr[$k]) : $addCr[$k];
+                unset($addCr[$k]);
+            }
 
             if (is_array($v) && !empty($v))
                 $_[$k] = $k.'='.implode(':', $v);
             else if ($v !== '')
                 $_[$k] = $k.'='.$v;
+        }
+
+        // no criteria were set, so no merge occured .. append
+        if ($addCr)
+        {
+            $_['cr']  = 'cr='.$addCr['cr'];
+            $_['crs'] = 'crs='.$addCr['crs'];
+            $_['crv'] = 'crv='.$addCr['crv'];
         }
 
         return implode(';', $_);

@@ -13,7 +13,11 @@ class TitleList extends BaseType
 
     public        $sources   = [];
 
-    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_titles t';
+    protected     $queryBase = 'SELECT t.*, id AS ARRAY_KEY FROM ?_titles t';
+    protected     $queryOpts = array(
+                      't'   => [['src']],                   //  11: TYPE_TITLE
+                      'src' => ['j' => ['?_source src ON type = 11 AND typeId = t.id', true], 's' => ', src3, moreType, moreTypeId']
+    );
 
     public function __construct($conditions = [])
     {
@@ -22,19 +26,22 @@ class TitleList extends BaseType
         // post processing
         foreach ($this->iterate() as $id => &$_curTpl)
         {
-            // preparse sources
-            if (!empty($_curTpl['source']))
-            {
-                $sources = explode(' ', $_curTpl['source']);
-                foreach ($sources as $src)
-                {
-                    if (!$src)                              // rogue whitespace slipped through
-                        continue;
+            // preparse sources - notice: under this system titles can't have more than one source (or two for achivements), which is enough for standard TC cases but may break custom cases
+            if ($_curTpl['moreType'] == TYPE_ACHIEVEMENT)
+                $this->sources[$this->id][12][] = $_curTpl['moreTypeId'];
+            else if ($_curTpl['moreType'] == TYPE_QUEST)
+                $this->sources[$this->id][4][] = $_curTpl['moreTypeId'];
+            else if ($_curTpl['src3'])
+                $this->sources[$this->id][3][] = $_curTpl['src3'];
 
-                    $src = explode(':', $src);
-                    $this->sources[$id][$src[0]][] = $src[1];
-                }
-            }
+            // titles display up to two achievements at once
+            if ($_curTpl['src12Ext'])
+                $this->sources[$this->id][12][] = $_curTpl['src12Ext'];
+
+            unset($_curTpl['src12Ext']);
+            unset($_curTpl['moreType']);
+            unset($_curTpl['moreTypeId']);
+            unset($_curTpl['src3']);
 
             // shorthand for more generic access
             foreach (Util::$localeStrings as $i => $str)

@@ -13,6 +13,8 @@ class ItemList extends BaseType
 
     public        $json       = [];
     public        $itemMods   = [];
+    public        $sources    = [];
+    public        $sourceMore = [];
 
     public        $rndEnchIds = [];
     public        $subItems   = [];
@@ -25,7 +27,8 @@ class ItemList extends BaseType
     protected     $queryOpts  = array(
                       'is'  => ['j' => ['?_item_stats AS `is` ON `is`.`id` = `i`.`id`', true]],
                       's'   => ['j' => ['?_spell AS `s` ON s.effect1CreateItemId = i.id', true], 'g' => 'i.id'],
-                      'i'   => [['is'], 'o' => 'i.quality DESC, i.itemLevel DESC']
+                      'i'   => [['is', 'src'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
+                      'src' => ['j' => ['?_source src ON type = 3 AND typeId = i.id', true], 's' => ', moreType, moreTypeId, src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
                   );
 
     public function __construct($conditions = [], $miscData = null)
@@ -52,6 +55,18 @@ class ItemList extends BaseType
             $_ = &$_curTpl['requiredRace'];
             if ($_ < 0 || ($_ & RACE_MASK_ALL) == RACE_MASK_ALL)
                 $_ = 0;
+
+            // sources
+            if ($_curTpl['moreType'] && $_curTpl['moreTypeId'])
+                $this->sourceMore[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
+
+            for ($i = 1; $i < 25; $i++)
+            {
+                if ($_ = $_curTpl['src'.$i])
+                    $this->sources[$this->id][$i][] = $_;
+
+                unset($_curTpl['src'.$i]);
+            }
         }
     }
 
@@ -225,6 +240,8 @@ class ItemList extends BaseType
         * ITEMINFO_MODEL    (0x20): sameModelAs-Tab
         */
 
+        $data = [];
+
         // random item is random
         if ($addInfoMask & ITEMINFO_SUBITEMS)
             $this->initSubItems();
@@ -232,7 +249,11 @@ class ItemList extends BaseType
         if ($addInfoMask & ITEMINFO_JSON)
             $this->extendJsonStats();
 
-        $data = [];
+        // gather sourceMore data
+        if (!($addInfoMask & ITEMINFO_MODEL))               // probably others too
+            foreach ($this->sourceMore as $type => $ids)
+                $this->sourceMore[$type] = (new Util::$typeClasses[$type](array(['id', $ids], CFG_SQL_LIMIT_NONE)))->getSourceData();
+
         foreach ($this->iterate() as $__)
         {
             foreach ($this->json[$this->id] as $k => $v)
@@ -354,10 +375,16 @@ class ItemList extends BaseType
             if ($addInfoMask & ITEMINFO_MODEL)
                 if ($_ = $this->getField('displayId'))
                     $data[$this->id]['displayid'] = $_;
+
+            if (!empty($this->sources[$this->id]))
+            {
+                $data[$this->id]['source'] = array_keys($this->sources[$this->id]);
+                if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && !empty($this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]))
+                    $data[$this->id]['sourcemore'] = [$this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]];
+            }
         }
 
         /* even more complicated crap
-            "source":[5],"sourcemore":[{"n":"Commander Oxheart","t":1,"ti":64606,"z":5842}],
             modelviewer {type:X, displayid:Y, slot:z} .. not sure, when to set
         */
 
@@ -1182,6 +1209,25 @@ class ItemList extends BaseType
         return $onUseStats;
     }
 
+    public function getSourceData()
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $__)
+        {
+            $data[$this->id] = array(
+                'n'    => $this->getField('name', true),
+                't'    => TYPE_ITEM,
+                'ti'   => $this->id,
+                'q'    => $this->curTpl['quality'],
+             // 'p'    => PvP [NYI]
+                'icon' => $this->curTpl['iconString']
+            );
+        }
+
+        return $data;
+    }
+
     private function canTeachSpell()
     {
         // 483: learn recipe; 55884: learn mount/pet
@@ -1467,6 +1513,7 @@ class ItemListFilter extends Filter
     private   $ubFilter      = [];                          // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
     private   $extCostQuery  = 'SELECT item FROM npc_vendor nv              JOIN ?_itemextendedcost iec ON iec.id =   nv.extendedCost WHERE %s UNION
                                 SELECT item FROM game_event_npc_vendor genv JOIN ?_itemextendedcost iec ON iec.id = genv.extendedCost WHERE %1$s';
+    private   $otFields      = [18 => 4, 68 => 15, 69 => 16, 70 => 17, 72 => 2, 73 => 19, 75 => 21, 76 => 23, 88 => 20, 92 => 5, 93 => 3, 143 => 18, 171 => 8, 172 => 12];
 
     public    $extraOpts     = [];                          // score for statWeights
     public    $wtCnd         = [];
@@ -1485,7 +1532,7 @@ class ItemListFilter extends Filter
              8 => [10656, 10658, 10660                                                                      ],
              9 => -1,
             10 => [26798, 26801, 26797                                                                      ],
-            11 => [ 9788,  9787, 17041, 17040, 17039, 20219, 20222, 10656, 10658, 10660, 26798, 26801, 26797],      // i know, i know .. lazy as fuck
+            11 => [ 9788,  9787, 17041, 17040, 17039, 20219, 20222, 10656, 10658, 10660, 26798, 26801, 26797],  // i know, i know .. lazy as fuck
             12 => false,
             13 => -1,
             14 => -1,
@@ -1509,8 +1556,31 @@ class ItemListFilter extends Filter
             31099, 40619, 40620, 40621, 30245, 30246, 30247, 45650, 45651, 45652, 34167, 40634, 40635, 40636, 45653, 45654, 45655, 40637, 40638, 40639, 45656, 45657, 45658,
             34170, 34192, 29763, 29764, 29762, 31101, 31103, 31102, 30248, 30249, 30250, 47557, 47558, 47559, 34233, 34234, 34202, 34195, 34209, 40622, 40623, 40624, 34193,
             45659, 45660, 45661, 34212, 34351, 34215
+        ),
+        128 => array(                                       // source
+             1 => true,                                     // Any
+             2 => false,                                    // None
+             3 => 1,                                        // Crafted
+             4 => 2,                                        // Drop
+             5 => 3,                                        // PvP
+             6 => 4,                                        // Quest
+             7 => 5,                                        // Vendor
+             9 => 10,                                       // Starter
+            10 => 11,                                       // Event
+            11 => 12                                        // Achievement
+        ),
+        126 => array(                                       // Zones
+            4494,   36, 2597, 3358,   45,  331, 3790, 4277,   16, 3524,    3, 3959,  719, 1584,   25, 1583, 2677, 3702, 3522,    4, 3525, 3537,   46, 1941,
+            2918, 3905, 4024, 2817, 4395, 4378,  148,  393, 1657,   41, 2257,  405, 2557,   65, 4196,    1,   14,   10,   15,  139,   12, 3430, 3820,  361,
+             357, 3433,  721,  394, 3923, 4416, 2917, 4272, 4820, 4264, 3483, 3562,  267,  495, 4742, 3606,  210, 4812, 1537, 4710, 4080, 3457,   38, 4131,
+            3836, 3792, 2100, 2717,  493,  215, 3518, 3698, 3456, 3523, 2367, 2159, 1637, 4813, 4298, 2437,  722,  491,   44, 3429, 3968,  796, 2057,   51,
+            3607, 3791, 3789,  209, 3520, 3703, 3711, 1377, 3487,  130, 3679,  406, 1519, 4384,   33, 2017, 1477, 4075,    8,  440,  141, 3428, 3519, 3848,
+              17, 2366, 3840, 3713, 3847, 3775, 4100, 1581, 3557, 3845, 4500, 4809,   47, 3849, 4265, 4493, 4228, 3698, 4406, 3714, 3717, 3715,  717,   67,
+            3716,  457, 4415,  400, 1638, 1216,   85, 4723, 4722, 1337, 4273,  490, 1497,  206, 1196, 4603, 718, 3277,    28,   40,   11, 4197,  618, 3521,
+            3805,   66, 1176, 1977
         )
     );
+
     // cr => [type, field, misc, extraCol]
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
           9 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_CONJURED           ], // conjureditem
@@ -1610,6 +1680,8 @@ class ItemListFilter extends Filter
          91 => [FILTER_CR_ENUM,      'totemCategory'                                        ], // tool
         176 => [FILTER_CR_STAFFFLAG, 'flags'                                                ], // flags
         177 => [FILTER_CR_STAFFFLAG, 'flagsExtra'                                           ], // flags2
+         71 => [FILTER_CR_FLAG,      'cuFlags',                ITEM_CU_OT_ITEMLOOT          ], // otitemopening
+         74 => [FILTER_CR_FLAG,      'cuFlags',                ITEM_CU_OT_OBJECTLOOT        ], // otobjectopening
         130 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_COMMENT           ], // hascomments
         113 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT        ], // hasscreenshots
         167 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_VIDEO             ], // hasvideos
@@ -1819,7 +1891,7 @@ class ItemListFilter extends Filter
             case 86:                                        // craftedprof [enum]
                 $_ = @$this->enums[99][$cr[1]];             // recycled enum
                 if (is_bool($_))
-                    return ['i.source', '1:', $_ ? null : '!'];
+                    return ['src.src1', null, $_ ? '!' : null];
                 else if (is_int($_))
                     return ['s.skillLine1', $_];
 
@@ -1838,32 +1910,49 @@ class ItemListFilter extends Filter
 /* todo */      return [1];
             case 150:                                       // dropsinheroic25 [heroicraid-any]
 /* todo */      return [1];
-            case 68:                                        // otdisenchanting [yn]
-/* todo */      return [1];
-            case 69:                                        // otfishing [yn]
-/* todo */      return [1];
-            case 70:                                        // otherbgathering [yn]
-/* todo */      return [1];
-            case 71:                                        // otitemopening [yn]
-/* todo */      return [1];
-            case 72:                                        // otlooting [yn]
-/* todo */      return [1];
+            case  68:                                       // otdisenchanting [yn]
+            case  69:                                       // otfishing [yn]
+            case  70:                                       // otherbgathering [yn]
+            // case  71:                                    // otitemopening [yn] [implemented via cuFlags]
+            case  72:                                       // otlooting [yn]
+            case  73:                                       // otmining [yn]
+            // case  74:                                    // otobjectopening [yn] [implemented via cuFlags]
+            case  75:                                       // otpickpocketing [yn]
+            case  76:                                       // otskinning [yn]
+            case  88:                                       // otprospecting [yn]
+            case  93:                                       // otpvp [pvp]
             case 143:                                       // otmilling [yn]
-/* todo */      return [1];
-            case 73:                                        // otmining [yn]
-/* todo */      return [1];
-            case 74:                                        // otobjectopening [yn]
-/* todo */      return [1];
-            case 75:                                        // otpickpocketing [yn]
-/* todo */      return [1];
-            case 88:                                        // otprospecting [yn]
-/* todo */      return [1];
-            case 93:                                        // otpvp [pvp]
-/* todo */      return [1];
             case 171:                                       // otredemption [yn]
-/* todo */      return [1];
-            case 76:                                        // otskinning [yn]
-/* todo */      return [1];
+            case 172:                                       // rewardedbyachievement [yn]
+            case 92:                                        // soldbyvendor [yn]
+                if ($this->int2Bool($cr[1]))
+                    return ['src.src'.$this->otFields[$cr[0]], null, $cr[1] ? '!' : null];
+
+                break;
+            case 18:                                        // rewardedbyfactionquest [side]
+                $field = 'src.src'.$this->otFields[$cr[0]];
+                switch ($cr[1])
+                {
+                    case 1:                                 // Yes
+                        return [$field, null, '!'];
+                    case 2:                                 // Alliance
+                        return [$field, 1];
+                    case 3:                                 // Horde
+                        return [$field, 2];
+                    case 4:                                 // Both
+                        return [$field, 3];
+                    case 5:                                 // No
+                        return [$field, null];
+                }
+
+                break;
+            case 126:                                       // rewardedbyquestin [zone-any]
+                if (in_array($cr[1], $this->enums[$cr[0]]))
+                    return ['AND', ['src.src4', null, '!'], ['src.moreZoneId', $cr[1]]];
+                else if ($cr[1] == FILTER_ENUM_ANY)
+                    return ['src.src4', null, '!'];         // well, this seems a bit redundant..
+
+                break;
             case 158:                                       // purchasablewithcurrency [enum]
             case 118:                                       // purchasablewithitem [enum]
                 if (in_array($cr[1], $this->enums[$cr[0]]))
@@ -1894,18 +1983,29 @@ class ItemListFilter extends Filter
                         return ['id', $foo, $cr[1] ? null : '!'];
                 }
                 break;
-            case 18:                                        // rewardedbyfactionquest [side]
-/* todo */      return [1];
-            case 126:                                       // rewardedbyquestin [zone-any]
-/* todo */      return [1];
-            case 172:                                       // rewardedbyachievement [yn]
-/* todo */      return [1];
-            case 92:                                        // soldbyvendor [yn]
-/* todo */      return [1];
             case 129:                                       // soldbynpc [str-small]
-/* todo */      return [1];
+                if (!$this->isSaneNumeric($cr[2], true))
+                    break;
+
+                if ($iIds = DB::Aowow()->selectCol('SELECT item FROM npc_vendor WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor v JOIN creature c ON c.guid = v.guid WHERE c.id = ?d', $cr[2], $cr[2]))
+                    return ['i.id', $iIds];
+                else
+                    return [0];
             case 90:                                        // avgbuyout [op] [int]
-/* todo */      return [1];
+                if (!DB::isConnectable(DB_CHARACTERS))
+                    return [1];
+
+                if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
+                    break;
+
+        /* no no no .. for each realm!
+                // todo (med): get the avgbuyout into the listview
+                if ($_ = DB::Characters()->select('SELECT ii.itemEntry AS ARRAY_KEY, AVG(ah.buyoutprice / ii.count) AS buyout FROM auctionhouse ah JOIN item_instance ii ON ah.itemguid = ii.guid GROUP BY ii.itemEntry HAVING avgbuyout '.$cr[1].' ?f', $c[1]))
+                    return ['i.id', array_keys($_)];
+                else
+                    return [0];
+        */
+                    return [0];
             case 65:                                        // avgmoney [op] [int]
                 if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
                     break;
@@ -1921,7 +2021,7 @@ class ItemListFilter extends Filter
             case 163:                                       // disenchantsinto [disenchanting]
                 if (!$this->isSaneNumeric($cr[1]))
                     break;
-            // 35
+
 /* todo */      return [1];
             case 85:                                        // objectivequest [side]
 /* todo */      return [1];
@@ -1963,6 +2063,18 @@ class ItemListFilter extends Filter
                         return ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], 0]];
                     case 5:                                 // none
                         return ['startQuest', 0];
+                }
+                break;
+            case 128:                                       // source [enum]
+                $_ = @$this->enums[$cr[0]][$cr[1]];
+                if ($_ !== null)
+                {
+                    if (is_int($_))                         // specific
+                        return ['src.src'.$_, null, '!'];
+                    else if ($_)                            // any
+                        return ['OR', ['src.src1', null, '!'], ['src.src2', null, '!'], ['src.src3', null, '!'], ['src.src4', null, '!'], ['src.src5', null, '!'], ['src.src8', null, '!']];
+                    else if (!$_)                           // none
+                        return ['AND', ['src.src1', null], ['src.src2', null], ['src.src3', null], ['src.src4', null], ['src.src5', null], ['src.src8', null]];
                 }
                 break;
         }

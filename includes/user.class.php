@@ -292,16 +292,16 @@ class User
         );
 
         if ($newId)
-            Util::gainSiteReputation(SITEREP_ACTION_REGISTER, $newId);
+            Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
         return $newId;
     }
 
     private static function createSalt()
     {
-        $algo        = '$2a';
-        $strength    = '$09';
-        $salt        = '$'.Util::createHash(22);
+        $algo     = '$2a';
+        $strength = '$09';
+        $salt     = '$'.Util::createHash(22);
 
         return $algo.$strength.$salt;
     }
@@ -446,9 +446,7 @@ class User
         $gUser['superCommentVotes'] = self::canSupervote();
         $gUser['downvoteRep']       = CFG_REP_REQ_DOWNVOTE;
         $gUser['upvoteRep']         = CFG_REP_REQ_UPVOTE;
-
-        if ($_ = self::getCharacters())
-            $gUser['characters'] = $_;
+        $gUser['characters']        = self::getCharacters();
 
         if ($_ = self::getProfiles())
             $gUser['profiles'] = $_;

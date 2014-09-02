@@ -86,47 +86,40 @@ class TitlePage extends GenericPage
         /* Extra Tabs */
         /**************/
 
-        // tab: sources
-        if (!empty($this->subject->sources[$this->typeId]))
+        // tab: quest source
+        $quests = new QuestList(array(['rewardTitleId', $this->typeId]));
+        if (!$quests->error)
         {
-            foreach ($this->subject->sources[$this->typeId] as $type => $entries)
-            {
-                switch ($type)
-                {
-                    case  4:
-                        $quests = new QuestList(array(['id', $entries]));
-                        $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_REWARDS));
+            $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_REWARDS));
 
-                        $this->lvTabs[] = array(
-                            'file'   => 'quest',
-                            'data'   => $quests->getListviewData(),
-                            'params' => array(
-                                'id'          => 'reward-from-quest',
-                                'name'        => '$LANG.tab_rewardfrom',
-                                'hiddenCols'  => "$['experience', 'money']",
-                                'visibleCols' => "$['category']"
-                            )
-                        );
-                        break;
-                    case 12:
-                        $acvs = new AchievementList(array(['id', $entries]));
-                        $this->extendGlobalData($acvs->getJSGlobals());
+            $this->lvTabs[] = array(
+                'file'   => 'quest',
+                'data'   => $quests->getListviewData(),
+                'params' => array(
+                    'id'          => 'reward-from-quest',
+                    'name'        => '$LANG.tab_rewardfrom',
+                    'hiddenCols'  => "$['experience', 'money']",
+                    'visibleCols' => "$['category']"
+                )
+            );
+        }
 
-                        $this->lvTabs[] = array(
-                            'file'   => 'achievement',
-                            'data'   => $acvs->getListviewData(),
-                            'params' => array(
-                                'id'          => 'reward-from-achievement',
-                                'name'        => '$LANG.tab_rewardfrom',
-                                'visibleCols' => "$['category']",
-                                'sort'        => "$['reqlevel', 'name']"
-                            )
-                        );
-                        break;
-                    // case 13:
-                        // not displayed
-                }
-            }
+        // tab: achievement source
+        $acvs = new AchievementList(array(['ar.title_A', $this->typeId], ['ar.title_H', $this->typeId], 'OR'));
+        if (!$acvs->error)
+        {
+            $this->extendGlobalData($acvs->getJSGlobals());
+
+            $this->lvTabs[] = array(
+                'file'   => 'achievement',
+                'data'   => $acvs->getListviewData(),
+                'params' => array(
+                    'id'          => 'reward-from-achievement',
+                    'name'        => '$LANG.tab_rewardfrom',
+                    'visibleCols' => "$['category']",
+                    'sort'        => "$['reqlevel', 'name']"
+                )
+            );
         }
 
         // tab: criteria of (to be added by TC)

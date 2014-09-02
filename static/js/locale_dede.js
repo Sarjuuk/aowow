@@ -1592,7 +1592,18 @@ var g_sources = {
      9: 'Talent',
     10: 'Startausrüstung',
     11: 'Ereignis',
-    12: 'Erfolg'
+    12: 'Erfolg',
+    14: 'Schwarzmarkt',
+    15: 'Entzaubert',
+    16: 'Geangelt',
+    17: 'Gesammelt',
+    18: 'Gemahlen',
+    19: 'Abgebaut',
+    20: 'Sondiert',
+    21: 'Aus Taschendiebstahl',
+    22: 'Geborgen',
+    23: 'Gehäutet',
+    24: 'In-Game-Store'
 };
 
 var g_sources_pvp = {
@@ -3415,8 +3426,8 @@ var LANG = {
                             [10, "Talent"],                         [8, "Lehrer"],                          [7, "Händler"],                         [2, "Nichts"]
                         ],
         itemsource:     [
-                            [1, "Beliebig"],                        [3, "Hergestellt"],                     [4, "Drop"],                            [5, "PvP"],                             [6, "Quest"],
-                            [8, "Einlösung"],                       [7, "Händler"],                         [2, "Nichts"]
+                            [1, "Beliebig"],                        [11, "Erfolg"],                         [3, "Hergestellt"],                     [4, "Drop"],                            [10, "Ereignis"],
+                            [5, "PvP"],                             [6, "Quest"],                           [9, "Startausrüstung"],                 [7, "Händler"],                         [2, "Nichts"]
                         ],
         glyphtype:      [[  1, "Erhebliche"],                       [2, "Geringe"]                          ],
         classs:         [

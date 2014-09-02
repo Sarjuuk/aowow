@@ -1637,7 +1637,19 @@ var g_sources = {
      9: 'Talent',
     10: 'Starter',
     11: 'Event',
-    12: 'Achievement'
+    12: 'Achievement',
+    // sarjuuk: 13 is string from serverside table, used by titles
+    14: 'Black Market',
+    15: 'Disenchanted',
+    16: 'Fished',
+    17: 'Gathered',
+    18: 'Milled',
+    19: 'Mined',
+    20: 'Prospected',
+    21: 'Pickpocketed',
+    22: 'Salvaged',
+    23: 'Skinned',
+    24: 'In-Game Store'
 };
 
 var g_sources_pvp = {
@@ -3460,8 +3472,8 @@ var LANG = {
                             [10, "Talent"],                         [8, "Trainer"],                         [7, "Vendor"],                          [2, "None"]
                         ],
         itemsource:     [
-                            [1, "Any"],                             [3, "Crafted"],                         [4, "Drop"],                            [5, "PvP"],                             [6, "Quest"],
-                            [8, "Redemption"],                      [7, "Vendor"],                          [2, "None"]
+                            [1, "Any"],                             [11, "Achievement"],                    [3, "Crafted"],                         [4, "Drop"],                            [10, "Event"],
+                            [5, "PvP"],                             [6, "Quest"],                           [9, "Starter"],                         [7, "Vendor"],                          [2, "None"]
                         ],
         glyphtype:      [   [1, "Major"],                           [2, "Minor"]                            ],
         classs:         [

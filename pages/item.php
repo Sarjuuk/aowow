@@ -332,7 +332,7 @@ class ItemPage extends genericPage
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['color' => 'ff'.Util::$rarityColorStings[$this->subject->getField('quality')], 'linkId' => 'item:'.$this->typeId.':0:0:0:0:0:0:0:0'],
             BUTTON_VIEW3D  => in_array($_slot, $_visSlots) && $_model ? ['displayId' => $this->subject->getField('displayId'), 'slot' => $_slot, 'type' => TYPE_ITEM, 'typeId' => $this->typeId] : false,
-            BUTTON_COMPARE => $_cu,                      // bool required
+            BUTTON_COMPARE => $_cu,
             BUTTON_EQUIP   => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]),
             BUTTON_UPGRADE => $_cu ? ['class' => $_class, 'slot' => $_slot] : false
         );
@@ -425,6 +425,23 @@ class ItemPage extends genericPage
             }
         }
 
+        // tab: achievement reward
+        $acvReward = new AchievementList(array(['ar.item', $this->typeId], ['a.itemExtra', $this->typeId], 'OR'));
+        if (!$acvReward->error)
+        {
+            $this->extendGlobalData($acvReward->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+
+            $this->lvTabs[] = array(
+                'file'   => 'achievement',
+                'data'   => $acvReward->getListviewData(),
+                'params' => [
+                    'name'        => '$LANG.tab_rewardfrom',
+                    'id'          => 'reward-from-achievement',
+                    'visibleCols' => "$['category']"
+                ]
+            );
+        }
+
         // tabs: this item contains..
         $sourceFor = array(
              [LOOT_ITEM,        $this->subject->id,                       '$LANG.tab_contains',      'contains',      ['Listview.extraCols.percent'], []                          , []],
@@ -467,7 +484,7 @@ class ItemPage extends genericPage
             }
         }
 
-        if ($reqIds = array_keys($reqQuest))                    // apply quest-conditions as back-reference
+        if ($reqIds = array_keys($reqQuest))                // apply quest-conditions as back-reference
         {
             $conditions = array(
                 'OR',
@@ -494,7 +511,7 @@ class ItemPage extends genericPage
         // tab: container can contain
         if ($this->subject->getField('slots') > 0)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<'], 0));
+            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<'], CFG_SQL_LIMIT_NONE));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
@@ -518,7 +535,7 @@ class ItemPage extends genericPage
         // tab: can be contained in (except keys)
         else if ($_bagFamily != 0x0100)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>'], 0));
+            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>'], CFG_SQL_LIMIT_NONE));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
@@ -547,7 +564,7 @@ class ItemPage extends genericPage
                 $this->extendGlobalData($criteriaOf->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
                 $hCols = [];
-                if (!$criteriaOf->hasSetFields(['rewardIds']))
+                if (!$criteriaOf->hasSetFields(['reward_loc0']))
                     $hCols = ['rewards'];
 
                 $this->lvTabs[] = array(
@@ -769,6 +786,12 @@ class ItemPage extends genericPage
                             $currency[] = [-$id, $qty];
                     }
 
+                    if ($currency)
+                        $this->extendGlobalIds(TYPE_CURRENCY, array_column($currency, 0));
+
+                    if ($tokens)
+                        $this->extendGlobalIds(TYPE_ITEM, array_column($tokens, 0));
+
                     $row['stock'] = $vendors[$k]['stock'];
                     $row['cost']  = [$this->subject->getField('buyPrice')];
 
@@ -785,7 +808,7 @@ class ItemPage extends genericPage
                         );
                     }
 
-                    if ($currency || $tokens)                   // fill idx:3 if required
+                    if ($currency || $tokens)               // fill idx:3 if required
                         $row['cost'][] = $currency;
 
                     if ($tokens)
@@ -834,8 +857,6 @@ class ItemPage extends genericPage
             $boughtBy = new ItemList(array(['id', $boughtBy]));
             if (!$boughtBy->error)
             {
-                $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF));
-
                 $iCur   = new CurrencyList(array(['itemId', $this->typeId]));
                 $filter = $iCur->error ? [TYPE_ITEM => $this->typeId] : [TYPE_CURRENCY => $iCur->id];
 
@@ -848,6 +869,7 @@ class ItemPage extends genericPage
                         'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]"
                     ]
                 );
+                $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_ANY));
             }
         }
 

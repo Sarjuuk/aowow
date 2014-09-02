@@ -194,7 +194,7 @@ define('CUSTOM_HAS_VIDEO',                  0x04000000);
 define('CUSTOM_DISABLED',                   0x08000000);
 define('CUSTOM_SERVERSIDE',                 0x10000000);
 define('CUSTOM_UNAVAILABLE',                0x20000000);
-define('CUSTOM_EXCLUDE_FOR_LISTVIEW',       0x40000000);   // will not show up in search or on listPage (override for staff)
+define('CUSTOM_EXCLUDE_FOR_LISTVIEW',       0x40000000);    // will not show up in search or on listPage (override for staff)
 
 // Custom Flags (per type)
 define('SPELL_CU_TALENT',                   0x0001);        // passive talent
@@ -222,6 +222,9 @@ define('OBJECT_CU_NOT_PERSISTANT',          0x80);
 define('NPC_CU_INSTANCE_BOSS',              0x01);
 define('NPC_CU_DIFFICULTY_DUMMY',           0x02);
 define('NPC_CU_DUNGEON_ENCOUNTER',          0x04);
+
+define('ITEM_CU_OT_ITEMLOOT',               0x01);          // there are no sourceTypes for these two cases
+define('ITEM_CU_OT_OBJECTLOOT',             0x02);
 
 // as seen in wFlags
 define('QUEST_CU_REPEATABLE',               0x01);

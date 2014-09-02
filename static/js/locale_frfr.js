@@ -1581,7 +1581,18 @@ var g_sources = {
      9: 'Talent',
     10: 'Débutant',
     11: 'Événement',
-    12: 'Haut fait'
+    12: 'Haut fait',
+    14: 'Marché Noir',
+    15: 'Désenchanté',
+    16: 'Pêché',
+    17: 'Cueilli',
+    18: 'Moulu',
+    19: 'Miné',
+    20: 'Prospecté',
+    21: 'Subtilisé (pickpocket)',
+    22: 'Ferraillé',
+    23: 'Dépecé',
+    24: 'Boutique en jeu'
 };
 
 var g_sources_pvp = {
@@ -3406,8 +3417,8 @@ var LANG = {
                             [10, "Talent"],                         [8, "Maître"],                          [7, "Vendeur"],                         [2, "Aucun"]
                         ],
         itemsource:     [
-                            [1, "N'importe quelle"],                [3, "Fabriqué"],                        [4, "Butin"],                           [5, "JcJ"],                             [6, "Quête"],
-                            [8, "Échange d'un code"],               [7, "Vendeur"],                         [2, "Aucun"]
+                            [1, "N'importe quelle"],                [11, "Haut fait"],                      [3, "Fabriqué"],                        [4, "Butin"],                           [10, "Événement"],
+                            [5, "JcJ"],                             [6, "Quête"],                           [9, "Débutant"],                        [7, "Vendeur"],                         [2, "Aucun"]
                         ],
         glyphtype:      [   [1, "Majeur"],                          [2, "Mineur"]                           ],
         classs:         [

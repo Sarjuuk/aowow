@@ -33,10 +33,10 @@ class Loot
         LOOT_MILLING,                                       // item
         LOOT_CREATURE,                                      // npc
         LOOT_PICKPOCKET,                                    // npc
-        LOOT_SKINNING,                                      // npc (see its flags for mining, herbing or actual skinning)
+        LOOT_SKINNING,                                      // npc (see its flags for mining, herbing, salvaging or actual skinning)
         LOOT_FISHING,                                       // zone
-        LOOT_GAMEOBJECT,                                    // object
-        LOOT_MAIL,                                          // quest || achievement
+        LOOT_GAMEOBJECT,                                    // object (see its lockType for mining, herbing, fishing or generic looting)
+        LOOT_MAIL,                                          // quest
         LOOT_SPELL                                          // spell
     );
 
@@ -343,8 +343,7 @@ class Loot
             ['object',      [], '$LANG.tab_minedfrom',        'mined-from-object',      [], [], []],
             ['object',      [], '$LANG.tab_gatheredfrom',     'gathered-from-object',   [], [], []],
             ['object',      [], '$LANG.tab_fishedin',         'fished-in-object',       [], [], []],
-            ['spell',       [], '$LANG.tab_createdby',        'created-by',             [], [], []],
-            ['achievement', [], '$LANG.tab_rewardfrom',       'reward-from-achievemnt', [], [], []]
+            ['spell',       [], '$LANG.tab_createdby',        'created-by',             [], [], []]
         );
         $refResults = [];
         $chanceMods = [];
@@ -520,12 +519,6 @@ class Loot
                         foreach ($srcObj->iterate() as $_)
                             $tabsFinal[10][1][] = array_merge($srcData[$srcObj->id], empty($result[$srcObj->id]) ? ['percent' => -1] : $result[$srcObj->id]);
                     }
-
-                    /*
-                        todo: search for achievements here
-                        $tabsFinal[17]
-                    */
-
                     break;
                 case LOOT_SPELL:
                     $conditions = ['OR', ['effect1CreateItemId', $this->entry], ['effect2CreateItemId', $this->entry], ['effect3CreateItemId', $this->entry]];

@@ -1361,7 +1361,7 @@ class SearchPage extends GenericPage
         if ($data = $misc->getListviewData())
         {
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
-                $this->extendGlobalData($misc->getJSGlobals(GLOBALINFO_SELF));
+                $this->extendGlobalData($misc->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($misc->iterate() as $__)

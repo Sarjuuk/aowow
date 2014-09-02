@@ -216,6 +216,25 @@ class CreatureList extends BaseType
         return $data;
     }
 
+    public function getSourceData()
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $__)
+        {
+            $data[$this->id] = array(
+                'n'  => $this->getField('name', true),
+                't'  => TYPE_NPC,
+                'ti' => $this->id,
+             // 'bd' => (int)($this->curTpl['cuFlags'] & NPC_CU_INSTANCE_BOSS || ($this->curTpl['typeFlags'] & 0x4 && $this->curTpl['rank']))
+             // 'z'   where am i spawned
+             // 'dd'   DungeonDifficulty requires 'z'
+            );
+        }
+
+        return $data;
+    }
+
     public function addRewardsToJScript(&$refs) { }
 
 }
