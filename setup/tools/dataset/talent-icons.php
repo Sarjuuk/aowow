@@ -14,11 +14,11 @@ if (!defined('AOWOW_REVISION'))
     $filenames = ['icons', 'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'deathknight', 'shaman', 'mage', 'warlock', null, 'druid'];
 
     // create directory if missing
-    if (!is_dir('static\\images\\wow\\talents\\icons'))
-        mkdir('static\\images\\wow\\talents\\icons', 0755, true);
+    if (!is_dir('static/images/wow/talents/icons'))
+        mkdir('static/images/wow/talents/icons', 0755, true);
 
-    if (!is_dir('static\\images\\wow\\hunterpettalents'))
-        mkdir('static\\images\\wow\\hunterpettalents', 0755, true);
+    if (!is_dir('static/images/wow/hunterpettalents'))
+        mkdir('static/images/wow/hunterpettalents', 0755, true);
 
     echo "script set up in ".Util::execTime()."<br>\n";
 
@@ -34,7 +34,7 @@ if (!defined('AOWOW_REVISION'))
             $what   = $k ? 'classMask' : 'creatureFamilyMask';
             $set    = $k ? 1 << ($k - 1) : 1 << $tree;
             $subset = $k ? $tree : 0;
-            $path   = $k ? 'talents\\icons' : 'hunterpettalents';
+            $path   = $k ? 'talents/icons' : 'hunterpettalents';
 
             $icons = DB::Aowow()->SelectCol($query, $what, $set, $subset);
 
@@ -45,7 +45,7 @@ if (!defined('AOWOW_REVISION'))
 
             for($i = 0; $i < count($icons); $i++)
             {
-                $im = @imagecreatefromjpeg('static\\images\\wow\\icons\\medium\\'.$icons[$i].'.jpg');
+                $im = @imagecreatefromjpeg('static/images/wow/icons/medium/'.strtolower($icons[$i]).'.jpg');
                 if(!$im)
                     die('error: raw image '.$icons[$i]. ' not found');
 
@@ -64,7 +64,7 @@ if (!defined('AOWOW_REVISION'))
                 }
                 imagecopymerge($res, $im, $i * $dims, $dims, 0, 0, imageSX($im), imageSY($im), 100);
 
-                if (@!imagejpeg($res, 'static\\images\\wow\\'.$path.'\\'.$v.'_'.($tree + 1).'.jpg'))
+                if (@!imagejpeg($res, 'static/images/wow/'.$path.'/'.$v.'_'.($tree + 1).'.jpg'))
                     die('error: '.$v.'_'.($tree + 1).'.jpg could not be written!');
             }
         }
