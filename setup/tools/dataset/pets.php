@@ -43,7 +43,7 @@ if (!defined('AOWOW_REVISION'))
             ct.family,
             ct.modelId1 AS displayId,
             cdi.skin1 AS skin,
-            SUBSTRING_INDEX(cf.iconFile, "//", -1) AS icon,
+            SUBSTRING_INDEX(cf.iconFile, "\\", -1) AS icon,
             cf.petTalentType AS type
         FROM
             creature_template ct
