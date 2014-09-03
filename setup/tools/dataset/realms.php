@@ -70,7 +70,7 @@ if (!defined('AOWOW_REVISION'))
         return preg_replace('/[^\d\w\-]/', '', strtr(strToLower($str), $pairs));
     }
 
-    if (!file_exists('config\\profile_all.js.in'))
+    if (!file_exists('config/profile_all.js.in'))
         die('profile_all source file is missing; cannot create realm file');
 
     $menu = [
@@ -85,7 +85,7 @@ if (!defined('AOWOW_REVISION'))
     $rows = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ? AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0', CFG_BATTLEGROUP);
     $str  = 'var g_realms = '.json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE).';';
 
-    $handle = fOpen('datasets\\realms', "w");
+    $handle = fOpen('datasets/realms', "w");
     fWrite($handle, $str);
     fClose($handle);
 
@@ -110,8 +110,8 @@ if (!defined('AOWOW_REVISION'))
     if (!($set & 0x2))
         array_shift($menu);
 
-    $file = file_get_contents('config\\profile_all.js.in');
-    $dest = fOpen('template\\js\\profile_all.js', "w");
+    $file = file_get_contents('config/profile_all.js.in');
+    $dest = fOpen('template/js/profile_all.js', "w");
 
     fWrite($dest, str_replace('[/*setup:realms*/]', json_encode($menu, JSON_UNESCAPED_UNICODE), $file));
     fClose($dest);

@@ -35,8 +35,8 @@ if (!defined('AOWOW_REVISION'))
 
     // check directory-structure
     foreach (Util::$localeStrings as $dir)
-        if (!is_dir('datasets\\'.$dir))
-            mkdir('datasets\\'.$dir, 0755, true);
+        if (!is_dir('datasets/'.$dir))
+            mkdir('datasets/'.$dir, 0755, true);
 
     echo "script set up in ".Util::execTime()."<br>\n";
 
@@ -123,7 +123,7 @@ if (!defined('AOWOW_REVISION'))
         $toFile  = "var g_itemsets = ";
         $toFile .= json_encode($itemsetOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         $toFile .= ";";
-        $file    = 'datasets\\'.User::$localeString.'\\itemsets';
+        $file    = 'datasets/'.User::$localeString.'/itemsets';
 
         $handle = fOpen($file, "w");
         fWrite($handle, $toFile);

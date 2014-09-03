@@ -60,8 +60,8 @@ if (!defined('AOWOW_REVISION'))
 
     // check directory-structure
     foreach (Util::$localeStrings as $dir)
-        if (!is_dir('datasets\\'.$dir))
-            mkdir('datasets\\'.$dir, 0755, true);
+        if (!is_dir('datasets/'.$dir))
+            mkdir('datasets/'.$dir, 0755, true);
 
     $enchIds = [];
     foreach ($enchantSpells->iterate() as $__)
@@ -212,7 +212,7 @@ if (!defined('AOWOW_REVISION'))
         $toFile  = "var g_enchants = ";
         $toFile .= json_encode($enchantsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         $toFile .= ";";
-        $file    = 'datasets\\'.User::$localeString.'\\enchants';
+        $file    = 'datasets/'.User::$localeString.'/enchants';
 
         $handle = fOpen($file, "w");
         fWrite($handle, $toFile);
