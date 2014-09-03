@@ -1,5 +1,6 @@
 <?php
-
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -180,8 +181,8 @@ if (!defined('AOWOW_REVISION'))
 
     // check directory-structure
     foreach (Util::$localeStrings as $dir)
-        if (!is_dir('datasets\\'.$dir))
-            mkdir('datasets\\'.$dir, 0755, true);
+        if (!is_dir('datasets/'.$dir))
+            mkdir('datasets/'.$dir, 0755, true);
 
     $tSpellIds = DB::Aowow()->selectCol('SELECT rank1 FROM dbc.talent UNION SELECT rank2 FROM dbc.talent UNION SELECT rank3 FROM dbc.talent UNION SELECT rank4 FROM dbc.talent UNION SELECT rank5 FROM dbc.talent');
     $tSpells   = new SpellList(array(['s.id', $tSpellIds], CFG_SQL_LIMIT_NONE));
@@ -199,7 +200,7 @@ if (!defined('AOWOW_REVISION'))
             set_time_limit(20);
 
             $cId    = log($cMask, 2) + 1;
-            $file   = 'datasets\\'.User::$localeString.'\\talents-'.$cId;
+            $file   = 'datasets/'.User::$localeString.'/talents-'.$cId;
             $toFile = '$WowheadTalentCalculator.registerClass('.$cId.', '.json_encode($buildTree($cId), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).')';
 
             $handle = fOpen($file, "w");
@@ -218,7 +219,7 @@ if (!defined('AOWOW_REVISION'))
 
         $toFile  = "var g_pet_icons = ".$petIcons."\n\n";
         $toFile .= 'var g_pet_talents = '.json_encode($buildTree(0), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
-        $file    = 'datasets\\'.User::$localeString.'\\pet-talents';
+        $file    = 'datasets/'.User::$localeString.'/pet-talents';
 
         $handle = fOpen($file, "w");
         fWrite($handle, $toFile);

@@ -132,7 +132,7 @@ if (!defined('AOWOW_REVISION'))
     $json = json_encode($out, JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     $json = preg_replace('/"\$([^$"]+)"/', '\1', $json);
 
-    $handle = fOpen('datasets\\statistics', "w");
+    $handle = fOpen('datasets/statistics', "w");
     fWrite($handle, 'g_statistics = '.$json.';');
     fClose($handle);
 

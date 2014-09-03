@@ -43,7 +43,7 @@ if (!defined('AOWOW_REVISION'))
             ct.family,
             ct.modelId1 AS displayId,
             cdi.skin1 AS skin,
-            SUBSTRING_INDEX(cf.iconFile, "\\\\", -1) AS icon,
+            SUBSTRING_INDEX(cf.iconFile, "//", -1) AS icon,
             cf.petTalentType AS type
         FROM
             creature_template ct
@@ -99,8 +99,8 @@ if (!defined('AOWOW_REVISION'))
 
     // check directory-structure
     foreach (Util::$localeStrings as $dir)
-        if (!is_dir('datasets\\'.$dir))
-            mkdir('datasets\\'.$dir, 0755, true);
+        if (!is_dir('datasets/'.$dir))
+            mkdir('datasets/'.$dir, 0755, true);
 
     echo "script set up in ".Util::execTime()."<br>\n";
 
@@ -143,7 +143,7 @@ if (!defined('AOWOW_REVISION'))
         $toFile  = "var g_pets = ";
         $toFile .= json_encode($petsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         $toFile .= ";";
-        $file    = 'datasets\\'.User::$localeString.'\\pets';
+        $file    = 'datasets/'.User::$localeString.'/pets';
 
         $handle = fOpen($file, "w");
         fWrite($handle, $toFile);
