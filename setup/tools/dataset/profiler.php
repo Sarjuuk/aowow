@@ -12,8 +12,8 @@ if (!defined('AOWOW_REVISION'))
 
     // check directory-structure
     foreach (Util::$localeStrings as $dir)
-        if (!is_dir('datasets\\'.$dir))
-            mkdir('datasets\\'.$dir, 0755, true);
+        if (!is_dir('datasets/'.$dir))
+            mkdir('datasets/'.$dir, 0755, true);
 
     echo "script set up in ".Util::execTime()."<br><br>\n\n";
 
@@ -44,7 +44,7 @@ if (!defined('AOWOW_REVISION'))
 
             User::useLocale($l);
             Lang::load(Util::$localeStrings[$l]);
-            $handle = fOpen('datasets\\'.User::$localeString.'\\p-quests', "w");
+            $handle = fOpen('datasets/'.User::$localeString.'/p-quests', "w");
             if (!$handle)
                 die('could not create quests file '.$l);
 
@@ -83,7 +83,7 @@ if (!defined('AOWOW_REVISION'))
         {
             User::useLocale($l);
             Lang::load(Util::$localeStrings[$l]);
-            $handle = fOpen('datasets\\'.User::$localeString.'\\p-achievements', "w");
+            $handle = fOpen('datasets/'.User::$localeString.'/p-achievements', "w");
             if (!$handle)
                 die('could not create achievements file '.$l);
 
@@ -126,7 +126,7 @@ if (!defined('AOWOW_REVISION'))
             {
                 User::useLocale($l);
                 Lang::load(Util::$localeStrings[$l]);
-                $handle = fOpen('datasets\\'.User::$localeString.'\\p-titles-'.$g, "w");
+                $handle = fOpen('datasets/'.User::$localeString.'/p-titles-'.$g, "w");
                 if (!$handle)
                     die('could not create titles file '.$l.' '.$g);
 
@@ -163,7 +163,7 @@ if (!defined('AOWOW_REVISION'))
         {
             User::useLocale($l);
             Lang::load(Util::$localeStrings[$l]);
-            $handle = fOpen('datasets\\'.User::$localeString.'\\p-mounts', "w");
+            $handle = fOpen('datasets/'.User::$localeString.'/p-mounts', "w");
             if (!$handle)
                 die('could not create mounts file '.$l);
 
@@ -200,7 +200,7 @@ if (!defined('AOWOW_REVISION'))
         {
             User::useLocale($l);
             Lang::load(Util::$localeStrings[$l]);
-            $handle = fOpen('datasets\\'.User::$localeString.'\\p-companions', "w");
+            $handle = fOpen('datasets/'.User::$localeString.'/p-companions', "w");
             if (!$handle)
                 die('could not create companions file '.$l);
 
@@ -237,7 +237,7 @@ if (!defined('AOWOW_REVISION'))
         {
             User::useLocale($l);
             Lang::load(Util::$localeStrings[$l]);
-            $handle = fOpen('datasets\\'.User::$localeString.'\\p-factions', "w");
+            $handle = fOpen('datasets/'.User::$localeString.'/p-factions', "w");
             if (!$handle)
                 die('could not create factions file '.$l);
 
@@ -300,7 +300,7 @@ if (!defined('AOWOW_REVISION'))
                     continue;
                 }
 
-                $handle = fOpen('datasets\\'.User::$localeString.'\\p-recipes-'.$file, "w");
+                $handle = fOpen('datasets/'.User::$localeString.'/p-recipes-'.$file, "w");
                 if (!$handle)
                     die('could not create '.$file.' file '.$l);
 

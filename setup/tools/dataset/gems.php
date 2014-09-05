@@ -54,8 +54,8 @@ if (!defined('AOWOW_REVISION'))
 
     // check directory-structure
     foreach (Util::$localeStrings as $dir)
-        if (!is_dir('datasets\\'.$dir))
-            mkdir('datasets\\'.$dir, 0755, true);
+        if (!is_dir('datasets/'.$dir))
+            mkdir('datasets/'.$dir, 0755, true);
 
     $enchIds = [];
     foreach ($gems as $pop)
@@ -88,7 +88,7 @@ if (!defined('AOWOW_REVISION'))
         $toFile  = "var g_gems = ";
         $toFile .= json_encode($gemsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         $toFile .= ";";
-        $file    = 'datasets\\'.User::$localeString.'\\gems';
+        $file    = 'datasets/'.User::$localeString.'/gems';
 
         $handle = fOpen($file, "w");
         fWrite($handle, $toFile);
