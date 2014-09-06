@@ -8,7 +8,7 @@ ini_set('serialize_precision', 4);
 
 require 'includes/defines.php';
 require 'config/config.php';
-require 'includes/libs/DbSimple/Generic.php';               // Libraray: http://en.dklab.ru/lib/DbSimple (using mysqli variant: https://bitbucket.org/brainreaver/dbsimple/src)
+require 'includes/libs/DbSimple/Generic.php';               // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
 require 'includes/utilities.php';                           // misc™ data 'n func
 require 'includes/ajaxHandler.class.php';                   // handles ajax and jsonp requests
 require 'includes/user.class.php';

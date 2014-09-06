@@ -118,7 +118,7 @@ class DbSimple_Connect
 		if (!isset($parsed['scheme']))
 			$this->errorHandler('Невозможно загрузить драйвер базы данных', $parsed);
 		$this->shema = ucfirst($parsed['scheme']);
-		require_once dirname(__FILE__).'/'.$this->shema.'.php';
+		require_once __DIR__.'/'.$this->shema.'.php';
 		$class = 'DbSimple_'.$this->shema;
 		$this->DbSimple = new $class($parsed);
 		$this->errmsg = &$this->DbSimple->errmsg;
@@ -256,18 +256,7 @@ class DbSimple_Connect
 	 */
 	protected function parseDSN($dsn)
 	{
-		$parsed = parse_url($dsn);
-		if (!$parsed)
-			return null;
-		$params = null;
-		if (!empty($parsed['query']))
-		{
-			parse_str($parsed['query'], $params);
-			$parsed += $params;
-		}
-		$parsed['dsn'] = $dsn;
-		return $parsed;
+        return DbSimple_Generic::parseDSN($dsn);
 	}
-}
 
-?>
+}

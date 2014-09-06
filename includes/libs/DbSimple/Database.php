@@ -74,6 +74,15 @@ if (!defined('DBSIMPLE_ARRAY_KEY'))
 if (!defined('DBSIMPLE_PARENT_KEY'))
     define('DBSIMPLE_PARENT_KEY', 'PARENT_KEY'); // forrest-based resultset support
 
+
+if ( !interface_exists('Zend_Cache_Backend_Interface', false) ) {
+    require_once __DIR__ . '/Zend/Cache.php';
+    require_once __DIR__ . '/Zend/Cache/Backend/Interface.php';
+}
+
+require_once __DIR__ . '/CacherImpl.php';
+
+
 /**
  *
  * Base class for all databases.
@@ -262,10 +271,24 @@ abstract class DbSimple_Database extends DbSimple_LastError
      * Set cache mechanism called during each query if specified.
      * Returns previous handler.
      */
-    public function setCacher(Zend_Cache_Backend_Interface $cacher=null)
+    public function setCacher($cacher=null)
     {
         $prev = $this->_cacher;
-        $this->_cacher = $cacher;
+
+        if ( is_null($cacher) ) {
+            return $prev;
+        }
+
+        if ($cacher instanceof Zend_Cache_Backend_Interface) {
+            $this->_cacher = $cacher;
+            return $prev;
+        }
+
+        if ( is_callable($cacher) ) {
+            $this->_cacher = new CacherImpl($cacher);
+            return $prev;
+        }
+
         return $prev;
     }
 
@@ -444,7 +467,7 @@ abstract class DbSimple_Database extends DbSimple_LastError
         $rows = false;
         $cache_it = false;
         // Кешер у нас либо null либо соответствует Zend интерфейсу
-        if (!empty($this->attributes['CACHE']) && $this->_cacher)
+        if ( !empty($this->attributes['CACHE']) && ($this->_cacher instanceof Zend_Cache_Backend_Interface) )
         {
 
             $hash = $this->_cachePrefix . md5(serialize($query));
@@ -1323,7 +1346,7 @@ abstract class DbSimple_LastError
      * Return part of stacktrace before calling first library method.
      * Used in debug purposes (query logging etc.).
      */
-    protected function findLibraryCaller()
+    public function findLibraryCaller()
     {
         $caller = call_user_func(
             array(&$this, 'debug_backtrace_smart'),
@@ -1387,4 +1410,3 @@ abstract class DbSimple_LastError
     }
 
 }
-?>

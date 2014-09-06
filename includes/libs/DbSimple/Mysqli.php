@@ -1,6 +1,6 @@
 <?php
 /**
- * DbSimple_Mysqli: MySQLi database.
+ * DbSimple_Mysql: MySQL database.
  * (C) Dk Lab, http://en.dklab.ru
  *
  * This library is free software; you can redistribute it and/or
@@ -9,177 +9,223 @@
  * version 2.1 of the License, or (at your option) any later version.
  * See http://www.gnu.org/copyleft/lesser.html
  *
- * Placeholders are emulated because of logging purposes.
+ * Placeholders end blobs are emulated.
  *
- * @author Andrey Stavitsky
+ * @author Dmitry Koterov, http://forum.dklab.ru/users/DmitryKoterov/
+ * @author Konstantin Zhinko, http://forum.dklab.ru/users/KonstantinGinkoTit/
  *
- * @version 2.x $Id$
+ * @version 2.x $Id: Mysqli.php 247 2008-08-18 21:17:08Z dk $
  */
-require_once dirname(__FILE__).'/Database.php';
+require_once __DIR__.'/Database.php';
+
 
 /**
  * Database class for MySQL.
  */
 class DbSimple_Mysqli extends DbSimple_Database
 {
-	private $link;
-	private $isMySQLnd;
+    var $link;
 
-	public function DbSimple_Mysqli($dsn)
-	{
-		$base = preg_replace('{^/}s', '', $dsn['path']);
-		if (!class_exists('mysqli'))
-			return $this->_setLastError('-1', 'mysqli extension is not loaded', 'mysqli');
+    /**
+     * constructor(string $dsn)
+     * Connect to MySQL server.
+     */
+    function DbSimple_Mysqli($dsn)
+    {
 
-		try
-		{
-			$this->link = mysqli_init();
+        if (!is_callable("mysqli_connect"))
+            return $this->_setLastError("-1", "MySQLi extension is not loaded", "mysqli_connect");
 
-			$this->link->options(MYSQLI_OPT_CONNECT_TIMEOUT,
-				isset($dsn['timeout']) && $dsn['timeout'] ? $dsn['timeout'] : 0);
-
-			if (@$this->link->real_connect((isset($dsn['persist']) && $dsn['persist'])?'p:'.$dsn['host']:$dsn['host'],
-				$dsn['user'], isset($dsn['pass'])?$dsn['pass']:'', $base,
-				empty($dsn['port'])?NULL:$dsn['port'], NULL,
-				(isset($dsn['compression']) && $dsn['compression']) ? MYSQLI_CLIENT_COMPRESS : NULL))
-            {
-                $this->link->set_charset((isset($dsn['enc']) ? $dsn['enc'] : 'UTF8'));
-
-                $this->isMySQLnd = method_exists('mysqli_result', 'fetch_all');
+        if (!empty($dsn["persist"])) {
+            if (version_compare(PHP_VERSION, '5.3') < 0) {
+                return $this->_setLastError("-1", "Persistent connections in MySQLi is allowable since PHP 5.3", "mysqli_connect");
+            } else {
+                $dsn["host"] = "p:".$dsn["host"];
             }
-            else
-                return $this->_setDbError(null, 'mysqli_real_connect @ ' . $dsn['host']);
-		}
-		catch (mysqli_sql_exception $e)
-		{
-			$this->_setLastError($e->getCode() , $e->getMessage(), 'new mysqli');
-		}
-	}
+        }
 
-	protected function _performGetPlaceholderIgnoreRe()
-	{
-		return '
-			"   (?> [^"\\\\]+|\\\\"|\\\\)*    "   |
-			\'  (?> [^\'\\\\]+|\\\\\'|\\\\)* \'   |
-			`   (?> [^`]+ | ``)*              `   |   # backticks
-			/\* .*?                          \*/      # comments
-		';
-	}
+        if ( isset($dsn['socket']) ) {
+            // Socket connection
+            $this->link = mysqli_connect(
+                null                                         // host
+                ,empty($dsn['user']) ? 'root' : $dsn['user'] // user
+                ,empty($dsn['pass']) ? '' : $dsn['pass']     // password
+                ,preg_replace('{^/}s', '', $dsn['path'])     // schema
+                ,null                                        // port
+                ,$dsn['socket']                              // socket
+            );
+        } else if (isset($dsn['host']) ) {
+            // Host connection
+            $this->link = mysqli_connect(
+                $dsn['host']
+                ,empty($dsn['user']) ? 'root' : $dsn['user']
+                ,empty($dsn['pass']) ? '' : $dsn['pass']
+                ,preg_replace('{^/}s', '', $dsn['path'])
+                ,empty($dsn['port']) ? null : $dsn['port']
+            );
+        } else {
+            return $this->_setDbError('mysqli_connect()');
+        }
+        $this->_resetLastError();
+        if (!$this->link) return $this->_setDbError('mysqli_connect()');
 
-	protected function _performEscape($s, $isIdent=false)
-	{
-		if (!$isIdent)
-		{
-			return "'" .$this->link->escape_string($s). "'";
-		}
-		else
-		{
-			return "`" . str_replace('`', '``', $s) . "`";
-		}
-	}
+        mysqli_set_charset($this->link, isset($dsn['enc']) ? $dsn['enc'] : 'UTF8');
+    }
 
-	protected function _performTransaction($parameters=null)
-	{
-		return $this->link->query('BEGIN');
-	}
 
-	protected function _performCommit()
-	{
-		return $this->link->query('COMMIT');
-	}
+    protected function _performEscape($s, $isIdent=false)
+    {
+        if (!$isIdent)
+            return "'" . mysqli_real_escape_string($this->link, $s) . "'";
+        else
+            return "`" . str_replace('`', '``', $s) . "`";
+    }
 
-	protected function _performRollback()
-	{
-		return $this->link->query('ROLLBACK');
-	}
 
-	protected function _performQuery($queryMain)
-	{
-		$this->_lastQuery = $queryMain;
+    protected function _performNewBlob($blobid=null)
+    {
+        return new DbSimple_Mysqli_Blob($this, $blobid);
+    }
 
-		$this->_expandPlaceholders($queryMain, false);
 
-		$result = $this->link->query($queryMain[0]);
+    protected function _performGetBlobFieldNames($result)
+    {
+        $allFields = mysqli_fetch_fields($result);
+        $blobFields = array();
 
-		if (!$result)
-			return $this->_setDbError($this->link, $queryMain[0]);
+        if (!empty($allFields))
+        {
+            foreach ($allFields as $field)
+                if (stripos($field["type"], "BLOB") !== false)
+                    $blobFields[] = $field["name"];
+        }
+        return $blobFields;
+    }
 
-		if ($this->link->errno!=0)
-			return $this->_setDbError($this->link, $queryMain[0]);
 
-        if (preg_match('/^\s* INSERT \s+/six', $queryMain[0]))
-            return $this->link->insert_id;
+    protected function _performGetPlaceholderIgnoreRe()
+    {
+        return '
+            "   (?> [^"\\\\]+|\\\\"|\\\\)*    "   |
+            \'  (?> [^\'\\\\]+|\\\\\'|\\\\)* \'   |
+            `   (?> [^`]+ | ``)*              `   |   # backticks
+            /\* .*?                          \*/      # comments
+        ';
+    }
 
-		if ($this->link->field_count == 0)
-			return $this->link->affected_rows;
 
-		if ($this->isMySQLnd)
-		{
-			$res = $result->fetch_all(MYSQLI_ASSOC);
-			$result->close();
-		}
-		else
-		{
-			$res = $result;
-		}
+    protected function _performTransaction($parameters=null)
+    {
+        return mysqli_begin_transaction($this->link);
+    }
 
-        return $res;
-	}
 
-	protected function _performTransformQuery(&$queryMain, $how)
-	{
-		// If we also need to calculate total number of found rows...
-		switch ($how)
-		{
-			// Prepare total calculation (if possible)
-			case 'CALC_TOTAL':
-				$m = null;
-				if (preg_match('/^(\s* SELECT)(.*)/six', $queryMain[0], $m))
-					$queryMain[0] = $m[1] . ' SQL_CALC_FOUND_ROWS' . $m[2];
-				return true;
+    protected function _performCommit()
+    {
+        return mysqli_commit($this->link);
+    }
 
-			// Perform total calculation.
-			case 'GET_TOTAL':
-				// Built-in calculation available?
-				$queryMain = array('SELECT FOUND_ROWS()');
-				return true;
-		}
-		return false;
-	}
 
-	protected function _setDbError($obj,$q)
-	{
-		$info=$obj?$obj:$this->link;
-		return $this->_setLastError($info->errno, $info->error, $q);
-	}
+    protected function _performRollback()
+    {
+        return mysqli_rollback($this->link);
+    }
 
-	protected function _performNewBlob($id=null)
-	{
-	}
 
-	protected function _performGetBlobFieldNames($result)
-	{
-		return array();
-	}
+    protected function _performTransformQuery(&$queryMain, $how)
+    {
+        // If we also need to calculate total number of found rows...
+        switch ($how)
+        {
+            // Prepare total calculation (if possible)
+            case 'CALC_TOTAL':
+                $m = null;
+                if (preg_match('/^(\s* SELECT)(.*)/six', $queryMain[0], $m))
+                    $queryMain[0] = $m[1] . ' SQL_CALC_FOUND_ROWS' . $m[2];
+                return true;
 
-	protected function _performFetch($result)
-	{
-		if ($this->isMySQLnd)
-			return $result;
+            // Perform total calculation.
+            case 'GET_TOTAL':
+                // Built-in calculation available?
+                $queryMain = array('SELECT FOUND_ROWS()');
+                return true;
+        }
 
-		$row = $result->fetch_assoc();
+        return false;
+    }
 
-        if ($this->link->error)
-			return $this->_setDbError($this->_lastQuery);
 
-        if ($row === false)
-		{
-			$result->close();
-			return null;
-		}
-		
+    protected function _performQuery($queryMain)
+    {
+        $this->_lastQuery = $queryMain;
+        $this->_expandPlaceholders($queryMain, false);
+        $result = mysqli_query($this->link, $queryMain[0]);
+        if ($result === false)
+            return $this->_setDbError($queryMain[0]);
+        if (!is_object($result)) {
+            if (preg_match('/^\s* INSERT \s+/six', $queryMain[0]))
+            {
+                // INSERT queries return generated ID.
+                return mysqli_insert_id($this->link);
+            }
+            // Non-SELECT queries return number of affected rows, SELECT - resource.
+            return mysqli_affected_rows($this->link);
+        }
+        return $result;
+    }
+
+
+    protected function _performFetch($result)
+    {
+        $row = mysqli_fetch_assoc($result);
+        if (mysql_error()) return $this->_setDbError($this->_lastQuery);
+        if ($row === false) return null;
         return $row;
-	}
+    }
+
+
+    protected function _setDbError($query)
+    {
+    	if ($this->link) {
+	        return $this->_setLastError(mysqli_errno($this->link), mysqli_error($this->link), $query);
+	    } else {
+	        return $this->_setLastError(mysqli_connect_errno(), mysqli_connect_error(), $query);
+	    }
+    }
 }
 
-?>
+
+class DbSimple_Mysqli_Blob implements DbSimple_Blob
+{
+    // MySQL does not support separate BLOB fetching.
+    private $blobdata = null;
+    private $curSeek = 0;
+
+    public function __construct(&$database, $blobdata=null)
+    {
+        $this->blobdata = $blobdata;
+        $this->curSeek = 0;
+    }
+
+    public function read($len)
+    {
+        $p = $this->curSeek;
+        $this->curSeek = min($this->curSeek + $len, strlen($this->blobdata));
+        return substr($this->blobdata, $p, $len);
+    }
+
+    public function write($data)
+    {
+        $this->blobdata .= $data;
+    }
+
+    public function close()
+    {
+        return $this->blobdata;
+    }
+
+    public function length()
+    {
+        return strlen($this->blobdata);
+    }
+}
