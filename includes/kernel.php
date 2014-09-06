@@ -35,7 +35,7 @@ spl_autoload_register(function ($class) {
         if (!class_exists('BaseType'))
             require 'includes/types/basetype.class.php';
 
-        if (file_exists(CWD.'includes/types/'.strtr($class, ['list' => '']).'.class.php'))
+        if (file_exists('includes/types/'.strtr($class, ['list' => '']).'.class.php'))
             require 'includes/types/'.strtr($class, ['list' => '']).'.class.php';
 
         return;
@@ -72,7 +72,6 @@ foreach ($sets as $k => $v)
 
 define('STATIC_URL', substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1).'/static'); // points js to images & scripts (change here if you want to use a separate subdomain)
 define('HOST_URL',   substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));           // points js to executable files
-define('CWD',        strtr(getcwd(), ['\\' => '/']).'/');
 
 $e = CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0;
 error_reporting($e);

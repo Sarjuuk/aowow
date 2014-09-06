@@ -660,7 +660,7 @@ class AjaxHandler
 
         $id = $matches[1];
 
-        if (file_exists(CWD.'/uploads/avatars/'.$id.'.jpg'))
+        if (file_exists('/uploads/avatars/'.$id.'.jpg'))
         {
             $offsetX = $offsetY = 0;
 

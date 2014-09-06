@@ -116,7 +116,7 @@ class GenericPage
         if (preg_match('/[^\w\-]/i', $file))
             return false;
 
-        if (!is_file(CWD.$path.$file.'.tpl.php'))
+        if (!is_file($path.$file.'.tpl.php'))
             return false;
 
         return true;
@@ -603,7 +603,7 @@ class GenericPage
         if (CFG_DEBUG)
             return;
 
-        $file = CWD.$this->cacheDir.$this->generateCacheKey();
+        $file = $this->cacheDir.$this->generateCacheKey();
         $data = time()." ".AOWOW_REVISION." ".($saveString ? '1' : '0')."\n";
         if (!$saveString)
         {
@@ -635,7 +635,7 @@ class GenericPage
         if (CFG_DEBUG)
             return false;
 
-        $file = CWD.$this->cacheDir.$this->generateCacheKey();
+        $file = $this->cacheDir.$this->generateCacheKey();
         if (!file_exists($file))
             return false;
 
