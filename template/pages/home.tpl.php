@@ -38,7 +38,12 @@
         </div>
 
         <script type="text/javascript">//<![CDATA[
-<?php echo $this->writeGlobalVars(); ?>
+<?php
+    if (User::$localeId):
+        echo "            Locale.set(".User::$localeId.");\n";
+    endif;
+    echo $this->writeGlobalVars();
+?>
             Markup.printHtml(<?php echo json_encode($this->news['text']); ?>, 'news-generic', { allow: Markup.CLASS_ADMIN });
         //]]></script>
 <?php endif; ?>

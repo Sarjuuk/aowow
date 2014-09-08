@@ -16,7 +16,7 @@ if (!empty($this->gPageInfo)):
 endif;
 
 if (!empty($this->pageTemplate)):
-    if (User::$localeId):
+    if (User::$localeId && $this->pageTemplate['pageName'] != 'home'):
         echo "                Locale.set(".User::$localeId.");\n";
     endif;
 
