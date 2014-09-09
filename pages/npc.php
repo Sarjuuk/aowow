@@ -410,7 +410,9 @@ class NpcPage extends GenericPage
             $soldItems = new ItemList(array(['id', $sells]));
             if (!$soldItems->error)
             {
-                $this->extendGlobalData($soldItems->getJSGlobals());
+                $extraCols = ["Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
+                if ($soldItems->hasSetFields(['condition']))
+                    $extraCols[] = 'Listview.extraCols.condition';
 
                 $this->lvTabs[] = array(
                     'file'   => 'item',
@@ -418,9 +420,11 @@ class NpcPage extends GenericPage
                     'params' => array(
                         'name'      => '$LANG.tab_sells',
                         'id'        => 'currency-for',
-                        'extraCols' => "$[Listview.extraCols.condition, Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]"
+                        'extraCols' => '$['.implode(', ', $extraCols).']'
                     )
                 );
+
+                $this->extendGlobalData($soldItems->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
         }
 

@@ -70,8 +70,13 @@ $sets = DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, intValue as i, strValue 
 foreach ($sets as $k => $v)
     define('CFG_'.strtoupper($k), $v['s'] ?: intVal($v['i']));
 
-define('STATIC_URL', substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1).'/static'); // points js to images & scripts (change here if you want to use a separate subdomain)
-define('HOST_URL',   substr('http://'.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));           // points js to executable files
+
+$protocoll = 'http://';
+if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || CFG_FORCE_SSL)
+    $protocoll = 'https://';
+
+define('STATIC_URL', substr($protocoll.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1).'/static'); // points js to images & scripts (change here if you want to use a separate subdomain)
+define('HOST_URL',   substr($protocoll.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));           // points js to executable files
 
 $e = CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0;
 error_reporting($e);
