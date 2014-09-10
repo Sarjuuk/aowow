@@ -13,7 +13,7 @@ class QuestsPage extends GenericPage
     protected $tpl           = 'quests';
     protected $path          = [0, 3];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $validCats     = [];
     protected $js            = ['filters.js'];
 

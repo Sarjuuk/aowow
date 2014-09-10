@@ -10,7 +10,7 @@ class AccountPage extends GenericPage
     protected $tpl       = 'acc-dashboard';
     protected $js        = ['user.js', 'profile.js'];
     protected $css       = [['path' => 'Profiler.css']];
-    protected $mode      = CACHETYPE_NONE;
+    protected $mode      = CACHE_TYPE_NONE;
     protected $category  = null;
     protected $validCats = array(
         'signin'         => [false],

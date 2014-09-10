@@ -32,7 +32,7 @@ class ProfilePage extends GenericPage
         parent::__construct($pageCall, $pageParam);
 
         // temp locale
-        if ($this->mode == CACHETYPE_TOOLTIP && isset($_GET['domain']))
+        if ($this->mode == CACHE_TYPE_TOOLTIP && isset($_GET['domain']))
             Util::powerUseLocale($_GET['domain']);
 
         if (count($_) == 1 && intVal($_[0]))
@@ -114,7 +114,7 @@ class ProfilePage extends GenericPage
 
     public function display($override = '')
     {
-        if ($this->mode != CACHETYPE_TOOLTIP)
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
             return parent::display($override);
 
         // do not cache profile tooltips
@@ -124,7 +124,7 @@ class ProfilePage extends GenericPage
 
     public function notFound($typeStr)
     {
-        if ($this->mode != CACHETYPE_TOOLTIP)
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
             return parent::notFound($typeStr);
 
         header('Content-type: application/x-javascript; charset=utf-8');

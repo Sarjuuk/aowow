@@ -11,7 +11,7 @@ class UtilityPage extends GenericPage
     protected $tpl           = 'list-page-generic';
     protected $path          = [1, 8];
     protected $tabId         = 1;
-    protected $mode          = CACHETYPE_NONE;
+    protected $mode          = CACHE_TYPE_NONE;
     protected $validPages    = array(
         'latest-additions',       'latest-articles',       'latest-comments',       'latest-screenshots',  'random',
         'unrated-comments', 11 => 'latest-videos',   12 => 'most-comments',   13 => 'missing-screenshots'

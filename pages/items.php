@@ -14,7 +14,7 @@ class ItemsPage extends GenericPage
     protected $tpl           = 'items';
     protected $path          = [0, 0];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['filters.js', 'swfobject.js'];
     protected $validCats     = array(                       // if > 0 class => subclass
          2 => [15, 13, 0, 4, 7, 6, 10, 1, 5, 8, 2, 18, 3, 16, 19, 20, 14],

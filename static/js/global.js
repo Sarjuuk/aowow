@@ -19785,7 +19785,7 @@ function g_modifyUrl(url, params, opt) {
     // Polish
     url = url.replace('?&', '?');
     url = url.replace(/&&/g, '&');
-    url = url.replace(/\/\?/g, '/');
+    url = url.replace(/\/\?/g, '?');
     url = url.replace(/(&|\?)+$/, ''); // Remove trailing & and ? characters
 
     return url + hash;

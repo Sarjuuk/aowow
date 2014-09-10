@@ -14,7 +14,7 @@ class TitlesPage extends GenericPage
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 10];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $validCats     = [0, 1, 2, 3, 4, 5, 6];
 
     public function __construct($pageCall, $pageParam)

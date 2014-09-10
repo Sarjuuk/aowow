@@ -14,7 +14,7 @@ class FactionsPage extends GenericPage
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 7];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $validCats     = array(
         1118 => [469, 891, 67, 892, 169],
         980  => [936],

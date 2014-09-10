@@ -12,10 +12,12 @@ trait DetailPage
 
     private   $subject       = null;                        // so it will not get cached
 
-    protected function generateCacheKey()
+    protected function generateCacheKey($withStaff = true)
     {
-        //     mode,         type,        typeId,        employee-flag,                             localeId,        category, filter
-        $key = [$this->mode, $this->type, $this->typeId, intVal(User::isInGroup(U_GROUP_EMPLOYEE)), User::$localeId, '-1',     '-1'];
+        $staff = intVal($withStaff && User::isInGroup(U_GROUP_EMPLOYEE));
+
+        //     mode,         type,        typeId,        employee-flag, localeId,        category, filter
+        $key = [$this->mode, $this->type, $this->typeId, $staff,        User::$localeId, '-1',     '-1'];
 
         // item special: can modify tooltips
         if (isset($this->enhancedTT))
@@ -35,10 +37,12 @@ trait ListPage
 
     private   $filterObj = null;
 
-    protected function generateCacheKey()
+    protected function generateCacheKey($withStaff = true)
     {
-        //     mode,         type,        typeId, employee-flag,                             localeId,
-        $key = [$this->mode, $this->type, '-1',   intVal(User::isInGroup(U_GROUP_EMPLOYEE)), User::$localeId];
+        $staff = intVal($withStaff && User::isInGroup(U_GROUP_EMPLOYEE));
+
+        //     mode,         type,        typeId, employee-flag, localeId,
+        $key = [$this->mode, $this->type, '-1',   $staff,        User::$localeId];
 
         //category
         $key[] = $this->category ? implode('.', $this->category) : '-1';
@@ -55,7 +59,7 @@ class GenericPage
 {
     protected $tpl              = '';
     protected $restrictedGroups = U_GROUP_NONE;
-    protected $mode             = CACHETYPE_NONE;
+    protected $mode             = CACHE_TYPE_NONE;
 
     protected $jsGlobals        = [];
     protected $lvData           = [];
@@ -68,7 +72,6 @@ class GenericPage
 
     // private vars don't get cached
     private   $time             = 0;
-    private   $isCached         = false;
     private   $cacheDir         = 'cache/template/';
     private   $jsgBuffer        = [];
     private   $gPageInfo        = [];
@@ -76,9 +79,24 @@ class GenericPage
     private   $pageTemplate     = [];
     private   $community        = ['co' => [], 'sc' => [], 'vi' => []];
 
+    private   $cacheLoaded      = [];
+    private   $skipCache        = 0x0;
+    private   $memcached        = null;
+
     public function __construct($pageCall/*, $pageParam */)
     {
         $this->time = microtime(true);
+
+        // force page refresh
+        if (isset($_GET['refresh']) && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV))
+        {
+            if ($_GET['refresh'] == 'filecache')
+                $this->skipCache = CACHE_MODE_FILECACHE;
+            else if ($_GET['refresh'] == 'memcached')
+                $this->skipCache = CACHE_MODE_MEMCACHED;
+            else if ($_GET['refresh'] == '')
+                $this->skipCache = CACHE_MODE_FILECACHE | CACHE_MODE_MEMCACHED;
+        }
 
         // restricted access
         if ($this->restrictedGroups && !User::isInGroup($this->restrictedGroups))
@@ -86,9 +104,9 @@ class GenericPage
 
         // display modes
         if (isset($_GET['power']) && method_exists($this, 'generateTooltip'))
-            $this->mode = CACHETYPE_TOOLTIP;
+            $this->mode = CACHE_TYPE_TOOLTIP;
         else if (isset($_GET['xml']) && method_exists($this, 'generateXML'))
-            $this->mode = CACHETYPE_XML;
+            $this->mode = CACHE_TYPE_XML;
         else
         {
             $this->gUser   = User::getUserGlobals();
@@ -167,8 +185,6 @@ class GenericPage
 
             $this->saveCache();
         }
-        else
-            $this->isCached = true;
 
         if (isset($this->type) && isset($this->typeId))
             $this->gPageInfo = array(                       // varies slightly for special pages like maps, user-dashboard or profiler
@@ -597,17 +613,16 @@ class GenericPage
 
     public function saveCache($saveString = null)           // visible properties or given strings are cached
     {
-        if ($this->mode == CACHETYPE_NONE)
+        if ($this->mode == CACHE_TYPE_NONE)
             return false;
 
-        if (CFG_DEBUG)
+        if (!CFG_CACHE_MODE || CFG_DEBUG)
             return;
 
-        $file = $this->cacheDir.$this->generateCacheKey();
-        $data = time()." ".AOWOW_REVISION." ".($saveString ? '1' : '0')."\n";
+        $cKey  = $this->generateCacheKey();
+        $cache = [];
         if (!$saveString)
         {
-            $cache = [];
             foreach ($this as $key => $val)
             {
                 try
@@ -618,40 +633,118 @@ class GenericPage
                 }
                 catch (ReflectionException $e) { }          // shut up!
             }
-
-            $data .= gzcompress(serialize($cache), 9);
         }
         else
-            $data .= (string)$saveString;
+            $cache = (string)$saveString;
 
-        file_put_contents($file, $data);
+        if (CFG_CACHE_MODE & CACHE_MODE_MEMCACHED)
+        {
+            // on &refresh also clear related
+            if ($this->skipCache == CACHE_MODE_FILECACHE)
+            {
+                $oldMode = $this->mode;
+                for ($i = 1; $i < 5; $i++)                  // page (1), tooltips (2), searches (3) and xml (4)
+                {
+                    $this->mode = $i;
+                    for ($j = 0; $j < 2; $j++)              // staff / normal
+                        $this->memcached()->delete($this->generateCacheKey($j));
+                }
+
+                $this->mode = $oldMode;
+            }
+
+            $data = array(
+                'timestamp' => time(),
+                'revision'  => AOWOW_REVISION,
+                'isString'  => $saveString ? 1 : 0,
+                'data'      => $cache
+            );
+
+            $this->memcached()->set($cKey, $data);
+        }
+
+        if (CFG_CACHE_MODE & CACHE_MODE_FILECACHE)
+        {
+            $data  = time()." ".AOWOW_REVISION." ".($saveString ? '1' : '0')."\n";
+            $data .= gzcompress($saveString ? $cache : serialize($cache), 9);
+
+            // on &refresh also clear related
+            if ($this->skipCache == CACHE_MODE_FILECACHE)
+            {
+                $oldMode = $this->mode;
+                for ($i = 1; $i < 5; $i++)                  // page (1), tooltips (2), searches (3) and xml (4)
+                {
+                    $this->mode = $i;
+                    for ($j = 0; $j < 2; $j++)              // staff / normal
+                    {
+                        $key = $this->generateCacheKey($j);
+                        if (file_exists($this->cacheDir.$key))
+                            unlink($this->cacheDir.$key);
+                    }
+                }
+
+                $this->mode = $oldMode;
+            }
+
+            file_put_contents($this->cacheDir.$cKey, $data);
+        }
     }
 
     public function loadCache(&$saveString = null)
     {
-        if ($this->mode == CACHETYPE_NONE)
+        if ($this->mode == CACHE_TYPE_NONE)
             return false;
 
-        if (CFG_DEBUG)
+        if (!CFG_CACHE_MODE || CFG_DEBUG)
             return false;
 
-        $file = $this->cacheDir.$this->generateCacheKey();
-        if (!file_exists($file))
-            return false;
+        $cKey = $this->generateCacheKey();
+        $rev = $type = $cache = $data = null;
 
-        $cache = file_get_contents($file);
+        if ((CFG_CACHE_MODE & CACHE_MODE_MEMCACHED) && !($this->skipCache & CACHE_MODE_MEMCACHED))
+        {
+            if ($cache = $this->memcached()->get($cKey))
+            {
+                $type = $cache['isString'];
+                $data = $cache['data'];
+
+                if ($cache['timestamp'] + CFG_CACHE_DECAY <= time() || $cache['revision'] < AOWOW_REVISION)
+                    $cache = null;
+                else
+                    $this->cacheLoaded = [CACHE_MODE_MEMCACHED, $cache['timestamp']];
+            }
+        }
+
+        if (!$cache && (CFG_CACHE_MODE & CACHE_MODE_FILECACHE) && !($this->skipCache & CACHE_MODE_FILECACHE))
+        {
+            if (!file_exists($this->cacheDir.$cKey))
+                return false;
+
+            $cache = file_get_contents($this->cacheDir.$cKey);
+            if (!$cache)
+                return false;
+
+            $cache = explode("\n", $cache, 2);
+            $data  = $cache[1];
+            @list($time, $rev, $type) = explode(' ', $cache[0]);
+
+            if ($time + CFG_CACHE_DECAY <= time() || $rev < AOWOW_REVISION)
+                $cache = null;
+            else
+            {
+                $this->cacheLoaded = [CACHE_MODE_FILECACHE, $time];
+                $data = gzuncompress($data);
+            }
+        }
+
         if (!$cache)
-            return false;
-
-        $cache = explode("\n", $cache, 2);
-
-        @list($time, $rev, $type) = explode(' ', $cache[0]);
-        if ($time + CFG_CACHE_DECAY <= time() || $rev < AOWOW_REVISION)
             return false;
 
         if ($type == '0')
         {
-            $data = unserialize(gzuncompress($cache[1]));
+            if (is_string($data))
+                $data = unserialize($data);
+
             foreach ($data as $k => $v)
                 $this->$k = $v;
 
@@ -659,11 +752,22 @@ class GenericPage
         }
         else if ($type == '1')
         {
-            $saveString = $cache[1];
+            $saveString = $data;
             return true;
         }
 
         return false;;
+    }
+
+    private function memcached()
+    {
+        if (!$this->memcached && (CFG_CACHE_MODE & CACHE_MODE_MEMCACHED))
+        {
+            $this->memcached = new Memcached();
+            $this->memcached->addServer('localhost', 11211);
+        }
+
+        return $this->memcached;
     }
 }
 

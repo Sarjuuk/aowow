@@ -15,7 +15,7 @@ class RacePage extends GenericPage
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 13];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['swfobject.js'];
 
     public function __construct($pageCall, $id)

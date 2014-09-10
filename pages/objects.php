@@ -14,7 +14,7 @@ class ObjectsPage extends GenericPage
     protected $tpl           = 'objects';
     protected $path          = [0, 5];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $validCats     = [-2, -3, -4, -5, -6, 0, 3, 9, 25];
     protected $js            = ['filters.js'];
 

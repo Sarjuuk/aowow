@@ -30,14 +30,14 @@ class AchievementPage extends GenericPage
     protected $tpl           = 'achievement';
     protected $path          = [0, 9];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
 
     public function __construct($pageCall, $id)
     {
         parent::__construct($pageCall, $id);
 
         // temp locale
-        if ($this->mode == CACHETYPE_TOOLTIP && isset($_GET['domain']))
+        if ($this->mode == CACHE_TYPE_TOOLTIP && isset($_GET['domain']))
             Util::powerUseLocale($_GET['domain']);
 
         $this->typeId = intVal($id);
@@ -422,7 +422,7 @@ class AchievementPage extends GenericPage
 
     public function display($override = '')
     {
-        if ($this->mode != CACHETYPE_TOOLTIP)
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
             return parent::display($override);
 
         if (!$this->loadCache($tt))
@@ -437,7 +437,7 @@ class AchievementPage extends GenericPage
 
     public function notFound($typeStr)
     {
-        if ($this->mode != CACHETYPE_TOOLTIP)
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
             return parent::notFound($typeStr);
 
         header('Content-type: application/x-javascript; charset=utf-8');

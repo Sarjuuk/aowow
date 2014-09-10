@@ -13,7 +13,7 @@ class MorePage extends GenericPage
     protected $tpl           = 'text-page-generic';
     protected $path          = [2];
     protected $tabId         = 2;
-    protected $mode          = CACHETYPE_NONE;
+    protected $mode          = CACHE_TYPE_NONE;
     protected $js            = ['swfobject.js'];
 
     private   $subPages      = [ -13 => ['commenting-and-you', 'modelviewer', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'item-comparison', 'profiler', 'markup-guide']];

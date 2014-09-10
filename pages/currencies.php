@@ -14,7 +14,7 @@ class CurrenciesPage extends GenericPage
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 15];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $validCats     = [1, 2, 3, 22];
 
     public function __construct($pageCall, $pageParam)

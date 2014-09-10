@@ -34,7 +34,7 @@ class SearchPage extends GenericPage
 {
     protected $tpl           = 'search';
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_SEARCH;
+    protected $mode          = CACHE_TYPE_SEARCH;
     protected $js            = ['swfobject.js'];
     protected $lvTabs        = [];
     protected $search        = '';                          // output
@@ -105,7 +105,7 @@ class SearchPage extends GenericPage
         // invalid conditions: not enough characters to search OR no types to search
         if ((!$this->included || !($this->searchMask & SEARCH_MASK_ALL)) && !CFG_MAINTENANCE && !(($this->searchMask & SEARCH_TYPE_JSON) && intVal($this->search)))
         {
-            $this->mode = CACHETYPE_NONE;
+            $this->mode = CACHE_TYPE_NONE;
             $this->notFound();
         }
 
@@ -137,9 +137,11 @@ class SearchPage extends GenericPage
         }
     }
 
-    protected function generateCacheKey()
+    protected function generateCacheKey($withStaff = true)
     {
-        $key = [$this->mode, $this->searchMask, md5($this->query), intVal(User::isInGroup(U_GROUP_EMPLOYEE)), User::$localeId];
+        $staff = intVal($withStaff && User::isInGroup(U_GROUP_EMPLOYEE));
+
+        $key = [$this->mode, $this->searchMask, md5($this->query), $staff, User::$localeId];
 
         return implode('_', $key);
     }
@@ -186,7 +188,7 @@ class SearchPage extends GenericPage
 
     protected function generateContent()                    // just wrap it, so GenericPage can call and cache it
     {
-        if ($this->mode == CACHETYPE_NONE)                  // search is invalid
+        if ($this->mode == CACHE_TYPE_NONE)                 // search is invalid
             return;
 
         $this->performSearch();

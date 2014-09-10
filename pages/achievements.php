@@ -14,7 +14,7 @@ class AchievementsPage extends GenericPage
     protected $tpl           = 'achievements';
     protected $path          = [0, 9];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['filters.js'];
     protected $validCats     = array(
         92  => true,

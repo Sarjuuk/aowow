@@ -10,7 +10,7 @@ class TalentPage extends GenericPage
     protected $tpl           = 'talent';
     protected $tabId         = 1;
     protected $path          = [1];
-    protected $mode          = CACHETYPE_NONE;
+    protected $mode          = CACHE_TYPE_NONE;
     protected $gDataKey      = true;
     protected $js            = ['TalentCalc.js'];
     protected $css           = array(

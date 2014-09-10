@@ -26,11 +26,14 @@ define('TYPE_SKILL',                        15);
 define('TYPE_CURRENCY',                     17);
 define('TYPE_USER',                         100);           // internal use only
 
-define('CACHETYPE_NONE',                    0);             // page will not be cached
-define('CACHETYPE_PAGE',                    1);
-define('CACHETYPE_TOOLTIP',                 2);
-define('CACHETYPE_SEARCH',                  3);
-define('CACHETYPE_XML',                     4);             // only used by items
+define('CACHE_TYPE_NONE',                   0);             // page will not be cached
+define('CACHE_TYPE_PAGE',                   1);
+define('CACHE_TYPE_TOOLTIP',                2);
+define('CACHE_TYPE_SEARCH',                 3);
+define('CACHE_TYPE_XML',                    4);             // only used by items
+
+define('CACHE_MODE_FILECACHE',              0x1);
+define('CACHE_MODE_MEMCACHED',              0x2);
 
 define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);

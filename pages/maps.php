@@ -10,7 +10,7 @@ class MapsPage extends GenericPage
     protected $tpl           = 'maps';
     protected $tabId         = 1;
     protected $path          = [1, 1];
-    protected $mode          = CACHETYPE_NONE;
+    protected $mode          = CACHE_TYPE_NONE;
     protected $js            = array(
         'maps.js',
         'Mapper.js'

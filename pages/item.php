@@ -15,7 +15,7 @@ class ItemPage extends genericPage
     protected $tpl           = 'item';
     protected $path          = [0, 0];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $enhancedTT    = [];
     protected $js            = array(
         'swfobject.js',                                     // view in 3d, ok
@@ -31,7 +31,7 @@ class ItemPage extends genericPage
 
         $this->typeId = intVal($param);
 
-        if ($this->mode == CACHETYPE_TOOLTIP)
+        if ($this->mode == CACHE_TYPE_TOOLTIP)
         {
             // temp locale
             if (isset($_GET['domain']))
@@ -46,7 +46,7 @@ class ItemPage extends genericPage
             if (isset($_GET['sock']))
                 $this->enhancedTT['s'] = '';
         }
-        else if ($this->mode == CACHETYPE_XML)
+        else if ($this->mode == CACHE_TYPE_XML)
         {
             // temp locale
             if (isset($_GET['domain']))
@@ -66,7 +66,7 @@ class ItemPage extends genericPage
 
         $this->name = $this->subject->getField('name', true);
 
-        if ($this->mode == CACHETYPE_PAGE)
+        if ($this->mode == CACHE_TYPE_PAGE)
         {
             $jsg = $this->subject->getJSGlobals(GLOBALINFO_EXTRA | GLOBALINFO_SELF, $extra);
             $this->extendGlobalData($jsg, $extra);
@@ -1075,7 +1075,7 @@ class ItemPage extends genericPage
 
     public function display($override = '')
     {
-        if ($this->mode == CACHETYPE_TOOLTIP)
+        if ($this->mode == CACHE_TYPE_TOOLTIP)
         {
             if (!$this->loadCache($tt))
             {
@@ -1086,7 +1086,7 @@ class ItemPage extends genericPage
             header('Content-type: application/x-javascript; charset=utf-8');
             die($tt);
         }
-        else if ($this->mode == CACHETYPE_XML)
+        else if ($this->mode == CACHE_TYPE_XML)
         {
             if (!$this->loadCache($xml))
             {
@@ -1103,13 +1103,13 @@ class ItemPage extends genericPage
 
     public function notFound($typeStr)
     {
-        if ($this->mode == CACHETYPE_TOOLTIP)
+        if ($this->mode == CACHE_TYPE_TOOLTIP)
         {
             header('Content-type: application/x-javascript; charset=utf-8');
             echo $this->generateTooltip(true);
             exit();
         }
-        else if ($this->mode == CACHETYPE_XML)
+        else if ($this->mode == CACHE_TYPE_XML)
         {
             header('Content-type: text/xml; charset=utf-8');
             echo $this->generateXML(true);

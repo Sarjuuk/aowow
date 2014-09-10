@@ -15,7 +15,7 @@ class QuestPage extends GenericPage
     protected $tpl           = 'quest';
     protected $path          = [0, 3];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['Mapper.js'];
     protected $css           = array(
         ['path' => 'Book.css'],
@@ -27,7 +27,7 @@ class QuestPage extends GenericPage
         parent::__construct($pageCall, $id);
 
         // temp locale
-        if ($this->mode == CACHETYPE_TOOLTIP && isset($_GET['domain']))
+        if ($this->mode == CACHE_TYPE_TOOLTIP && isset($_GET['domain']))
             Util::powerUseLocale($_GET['domain']);
 
         $this->typeId = intVal($id);
@@ -616,7 +616,7 @@ class QuestPage extends GenericPage
 
     public function display($override = '')
     {
-        if ($this->mode != CACHETYPE_TOOLTIP)
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
             return parent::display($override);
 
         if (!$this->loadCache($tt))
@@ -631,7 +631,7 @@ class QuestPage extends GenericPage
 
     public function notFound($typeStr)
     {
-        if ($this->mode != CACHETYPE_TOOLTIP)
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
             return parent::notFound($typeStr);
 
         header('Content-type: application/x-javascript; charset=utf-8');

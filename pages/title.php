@@ -20,7 +20,7 @@ class TitlePage extends GenericPage
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 10];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
 
     private   $nameFixed     = '';
 

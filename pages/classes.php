@@ -14,7 +14,7 @@ class ClassesPage extends GenericPage
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 12];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
 
     public function __construct($pageCall, $pageParam)
     {

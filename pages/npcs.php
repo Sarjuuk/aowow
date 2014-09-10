@@ -14,7 +14,7 @@ class NpcsPage extends GenericPage
     protected $tpl           = 'npcs';
     protected $path          = [0, 4];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $validCats     = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
     protected $js            = ['filters.js'];
 

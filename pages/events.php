@@ -14,7 +14,7 @@ class EventsPage extends GenericPage
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 11];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $validCats     = [0, 1, 2, 3];
 
     public function __construct($pageCall, $pageParam)

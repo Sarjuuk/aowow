@@ -14,7 +14,7 @@ class SpellsPage extends GenericPage
     protected $tpl           = 'spells';
     protected $path          = [0, 1];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['filters.js'];
     protected $validCats     = array(
         -2  => array(                                       // Talents: Class => Skill

@@ -14,7 +14,7 @@ class ItemsetsPage extends GenericPage
     protected $tpl      = 'itemsets';
     protected $path     = [0, 2];
     protected $tabId    = 0;
-    protected $mode     = CACHETYPE_PAGE;
+    protected $mode     = CACHE_TYPE_PAGE;
     protected $js       = ['filters.js'];
 
     public function __construct($pageCall, $pageParam)

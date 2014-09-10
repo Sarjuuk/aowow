@@ -15,7 +15,7 @@ class EventPage extends GenericPage
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 11];
     protected $tabId         = 0;
-    protected $mode          = CACHETYPE_PAGE;
+    protected $mode          = CACHE_TYPE_PAGE;
 
     private   $hId           = 0;
     private   $eId           = 0;

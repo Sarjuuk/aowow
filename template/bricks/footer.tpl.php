@@ -12,8 +12,10 @@ if (User::isInGroup(U_GROUP_EMPLOYEE) && ($this->time || isset($this->mysql) || 
         echo '                <tr><td style="text-align:left;">Page generated in</td><td>'.Util::formatTime($this->time * 1000, true)."</td></tr>\n";
     endif;
 
-    if ($this->isCached):
-        echo "                <tr><td style=\"text-align:left;\">(rebuild from cache)</td><td></td></tr>\n";
+    if ($this->cacheLoaded && $this->cacheLoaded[0] == CACHE_MODE_FILECACHE):
+        echo "                <tr><td style=\"text-align:left;\">reloaded from filecache</td><td>created".Lang::$main['colon'].date(Lang::$main['dateFmtLong'], $this->cacheLoaded[1])."</td></tr>\n";
+    elseif ($this->cacheLoaded && $this->cacheLoaded[0] == CACHE_MODE_MEMCACHED):
+        echo "                <tr><td style=\"text-align:left;\">reloaded from memcached</td><td>created".Lang::$main['colon'].date(Lang::$main['dateFmtLong'], $this->cacheLoaded[1])."</td></tr>\n";
     endif;
 
     echo "            </table>\n";
