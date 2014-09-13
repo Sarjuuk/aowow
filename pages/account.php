@@ -347,6 +347,9 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             case AUTH_IPBANNED:
                 User::destroy();
                 return sprintf(Lang::$account['loginExceeded'], Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
+            case AUTH_INTERNAL_ERR:
+                User::destroy();
+                return Lang::$account['intError'];
             default:
                 return;
         }

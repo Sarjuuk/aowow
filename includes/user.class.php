@@ -65,7 +65,7 @@ class User
         if (AUTH_MODE_SELF && $query['passHash'] != $_SESSION['hash'])
         {
             self::destroy();
-            return;
+            return false;
         }
 
         self::$id          = intval($query['id']);
@@ -232,21 +232,22 @@ class User
                 if (!DB::isConnectable(DB_AUTH))
                     return AUTH_INTERNAL_ERR;
 
-                $wow = DB::Auth()->selectRow('SELECT a.id, a.sha_pass_hash, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id AND active <> 0 WHERE username = ? DESC LIMIT 1', $name);
+                $wow = DB::Auth()->selectRow('SELECT a.id, a.sha_pass_hash, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id AND active <> 0 WHERE username = ? LIMIT 1', $name);
                 if (!$wow)
                     return AUTH_WRONGUSER;
 
                 self::$passHash = $wow['sha_pass_hash'];
-                if (!self::verifySHA1($pass))
+                if (!self::verifySHA1($name, $pass))
                     return AUTH_WRONGPASS;
 
                 if ($wow['hasBan'])
                     return AUTH_BANNED;
 
-                if (!self::checkOrCreateInDB($wow['id'], $name))
+                if ($_ = self::checkOrCreateInDB($wow['id'], $name))
+                    $user = $_;
+                else
                     return AUTH_INTERNAL_ERR;
 
-                $user = $wow['id'];
                 break;
             }
             case AUTH_MODE_EXTERNAL:
@@ -259,10 +260,11 @@ class User
 
                 if ($result == AUTH_OK && $extId)
                 {
-                    if (!self::checkOrCreateInDB($extId, $name))
+                    if ($_ = self::checkOrCreateInDB($extId, $name))
+                        $user = $_;
+                    else
                         return AUTH_INTERNAL_ERR;
 
-                    $user = $extId;
                     break;
                 }
 
@@ -283,10 +285,10 @@ class User
     // create a linked account for our settings if nessecary
     private static function checkOrCreateInDB($extId, $name)
     {
-        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE extId = ?d', $extId))
-            return true;
+        if ($_ = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE extId = ?d', $extId))
+            return $_;
 
-        $newId = DB::Aowow()->query('INSERT INTO ?_account (extId, user, displayName, lastIP, locale, status) VALUES (?d, ?, ?, ?, ?d, ?d)',
+        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (extId, user, displayName, prevIP, locale, status) VALUES (?d, ?, ?, ?, ?d, ?d)',
             $extId,
             $name,
             Util::ucFirst($name),
@@ -323,14 +325,14 @@ class User
     }
 
     // sha1 used by TC / MaNGOS
-    private static function hashSHA1($pass)
+    private static function hashSHA1($name, $pass)
     {
-        return sha1(strtoupper(self::$user).':'.strtoupper($pass));
+        return sha1(strtoupper($name).':'.strtoupper($pass));
     }
 
-    private static function verifySHA1($pass)
+    private static function verifySHA1($name, $pass)
     {
-        return self::$passHash == self::hashSHA1($pass);
+        return self::$passHash == self::hashSHA1($name, $pass);
     }
 
     public static function save()
