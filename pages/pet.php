@@ -171,7 +171,7 @@ class PetPage extends GenericPage
             ]
         );
 
-        switch($this->subject->getField('type'))
+        switch ($this->subject->getField('type'))
         {
             case 0: $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE0, '&']; break;
             case 1: $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE1, '&']; break;

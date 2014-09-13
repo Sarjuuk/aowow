@@ -17808,96 +17808,8 @@ var Lightbox = new function() {
 };
 
 /*
-Locale class
+Locale class moved to own file
 */
-
-var LOCALE_ENUS = 0;
-var LOCALE_FRFR = 2;
-var LOCALE_DEDE = 3;
-var LOCALE_ESES = 6;
-var LOCALE_RURU = 8;
-
-var Locale = {
-
-    current: {},
-
-    // All
-    locales: {
-        0: { // English
-            id: LOCALE_ENUS,
-            name: 'enus',
-            domain: 'www',
-            description: 'English'
-        },
-        2: { // French
-            id: LOCALE_FRFR,
-            name: 'frfr',
-            domain: 'fr',
-            description: 'Fran' + String.fromCharCode(231) + 'ais'
-        },
-        3: { // German
-            id: LOCALE_DEDE,
-            name: 'dede',
-            domain: 'de',
-            description: 'Deutsch'
-        },
-        6: { // Spanish
-            id: LOCALE_ESES,
-            name: 'eses',
-            domain: 'es',
-            description: 'Espa' + String.fromCharCode(241) + 'ol'
-        },
-        8: { // Russian
-            id: LOCALE_RURU,
-            name: 'ruru',
-            domain: 'ru',
-            description: String.fromCharCode(1056, 1091, 1089, 1089, 1082, 1080, 1081)
-        }
-    },
-
-    getAll: function() {
-        var result = [];
-
-        for (var id in Locale.locales) {
-            result.push(Locale.locales[id]);
-        }
-
-        return result;
-    },
-
-    getAllByName: function() {
-        var result = Locale.getAll();
-
-        result.sort(function(a, b) {
-            return $WH.strcmp(a.description, b.description);
-        });
-
-        return result;
-    },
-
-    getId: function() {
-        return Locale.current.id;
-    },
-
-    getName: function() {
-        var localeId = Locale.getId();
-
-        return Locale.locales[localeId].name;
-    },
-
-    get: function() {
-        var localeId = Locale.getId();
-
-        return Locale.locales[localeId];
-    },
-
-    set: function(localeId) {
-        $.extend(Locale.current, Locale.locales[localeId]);
-    }
-
-};
-
-Locale.set(LOCALE_ENUS); // Default
 
 var ModelViewer = new function() {
     this.validSlots = [1,3,4,5,6,7,8,9,10,13,14,15,16,17,19,20,21,22,23,25,26];
@@ -19597,21 +19509,21 @@ function g_urlize(str, allowLocales, profile) {
         str = $WH.str_replace(str, '(', '');
         str = $WH.str_replace(str, ')', '');
         var accents = {
-            "ﬂ": "ss",
-            "·": "a", "‰": "a", "‡": "a", "‚": "a",
-            "Ë": "e", "Í": "e", "È": "e", "Î": "e",
-            "Ì": "i", "Ó": "i", "Ï": "i", "Ô": "i",
-            "Ò": "n",
-            "Ú": "o", "Û": "o", "ˆ": "o", "Ù": "o",
-            "˙": "u", "¸": "u", "˚": "u", "˘": "u",
-            "ú": "oe",
-            "¡": "A", "ƒ": "A", "¿": "A", "¬": "A",
-            "»": "E", " ": "E", "…": "E", "À": "E",
-            "Õ": "I", "Œ": "I", "Ã": "I", "œ": "I",
-            "—": "N",
-            "“": "O", "”": "O", "÷": "O", "‘": "O",
-            "⁄": "U", "‹": "U", "€": "U", "Ÿ": "U",
-            "ú": "Oe"
+            "√ü": "ss",
+            "√°": "a", "√§": "a", "√†": "a", "√¢": "a",
+            "√®": "e", "√™": "e", "√©": "e", "√´": "e",
+            "√≠": "i", "√Æ": "i", "√¨": "i", "√Ø": "i",
+            "√±": "n",
+            "√≤": "o", "√≥": "o", "√∂": "o", "√¥": "o",
+            "√∫": "u", "√º": "u", "√ª": "u", "√π": "u",
+            "≈ì": "oe",
+            "√Å": "A", "√Ñ": "A", "√Ä": "A", "√Ç": "A",
+            "√à": "E", "√ä": "E", "√â": "E", "√ã": "E",
+            "√ç": "I", "√é": "I", "√å": "I", "√è": "I",
+            "√ë": "N",
+            "√í": "O", "√ì": "O", "√ñ": "O", "√î": "O",
+            "√ö": "U", "√ú": "U", "√õ": "U", "√ô": "U",
+            "≈ì": "Oe"
         };
         for (var character in accents) {
             str = str.replace(new RegExp(character, "g"), accents[character]);

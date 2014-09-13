@@ -14,7 +14,7 @@ class TalentPage extends GenericPage
     protected $gDataKey      = true;
     protected $js            = ['TalentCalc.js'];
     protected $css           = array(
-        ['path' => 'TalentCalc.css'],
+        ['path' => 'talentcalc.css'],
         ['path' => 'talent.css']
     );
 

@@ -126,7 +126,7 @@ switch ($pageCall)
     case 'build':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            require 'setup/tools/dataset/'.$pageParam.'.php';
+            require 'setup/tools/filegen/scriptGen.php';
             break;
         }
     case 'sql':

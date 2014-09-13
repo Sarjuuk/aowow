@@ -281,8 +281,10 @@ class SearchPage extends GenericPage
         // this one is funny: we want 10 results, ideally equally distributed over each type
         $foundTotal = 0;
         $limit      = $this->maxResults;
-        $names      = [];
-        $info       = [];
+        $result     = array(                                //idx1: names, idx3: resultUrl; idx7: extraInfo
+            $this->search,
+            [], [], [], [], [], [], []
+        );
 
         foreach ($this->lvTabs as $_)
             $foundTotal += $_['matches'];
@@ -301,9 +303,10 @@ class SearchPage extends GenericPage
                 if (!$data)
                     break;
 
-                $hasQ    = is_numeric($data['name'][0]) || $data['name'][0] == '@';
-                $names[] = ($hasQ ? substr($data['name'], 1) : $data['name']).$set['appendix'];
-                $extra   = [$set['type'], $data['id']];
+                $hasQ        = is_numeric($data['name'][0]) || $data['name'][0] == '@';
+                $result[1][] = ($hasQ ? substr($data['name'], 1) : $data['name']).$set['appendix'];
+                $result[3][] = HOST_URL.'/?'.Util::$typeStrings[$set['type']].'='.$data['id'];
+                $extra       = [$set['type'], $data['id']];
 
                 if (isset($data['param1']))
                     $extra[] = $data['param1'];
@@ -311,14 +314,14 @@ class SearchPage extends GenericPage
                 if (isset($data['param2']))
                     $extra[] = $data['param2'];
 
-                $info[] = $extra;
+                $result[7][] = $extra;
             }
 
             if ($limit <= 0)
                 break;
         }
 
-        return '["'.Util::jsEscape($this->search).'", '.json_encode($names).', [], [], [], [], [], '.json_encode($info, JSON_NUMERIC_CHECK).']';
+        return json_encode($result, JSON_NUMERIC_CHECK);
     }
 
     private function createLookup(array $fields = [])

@@ -428,7 +428,7 @@ class SpellsPage extends GenericPage
             array_unshift($foo, is_array($_) ? $_[0] : $_);
         }
 
-        if(count($foo) < 2)
+        if (count($foo) < 2)
             array_unshift($foo, $this->name);
 
         foreach ($foo as $bar)

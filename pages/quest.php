@@ -107,7 +107,7 @@ class QuestPage extends GenericPage
                     break;
                 default:
                     $lm = Lang::$quest['loremaster'].Lang::$main['colon'].'[ul]';
-                    foreach($loremaster->iterate() as $id => $__)
+                    foreach ($loremaster->iterate() as $id => $__)
                         $lm .= '[li][achievement='.$id.'][/li]';
 
                     $infobox[] = $lm.'[/ul]';

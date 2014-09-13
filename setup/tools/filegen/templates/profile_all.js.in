@@ -1,4 +1,4 @@
-var mn_profiles = [/*setup:realms*/];
+var mn_profiles = /*setup:mnProfiles*/;
 
 var mn_guilds = $.extend(true,[],mn_profiles);
 var mn_arenateams = $.extend(true,[],mn_profiles);

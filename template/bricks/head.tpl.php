@@ -37,6 +37,7 @@ endif;
     <script src="<?php echo STATIC_URL.'/widgets/power.js?lang='.substr(User::$localeString, 2); ?>" type="text/javascript"></script>
     <script src="<?php echo STATIC_URL.'/js/locale_'.User::$localeString.'.js?'.AOWOW_REVISION; ?>" type="text/javascript"></script>
     <script src="<?php echo STATIC_URL.'/js/global.js?'.AOWOW_REVISION; ?>" type="text/javascript"></script>
+    <script src="<?php echo STATIC_URL.'/js/locale.js?'.AOWOW_REVISION; ?>" type="text/javascript"></script>
     <script src="<?php echo STATIC_URL.'/js/Markup.js?'.AOWOW_REVISION; ?>" type="text/javascript"></script>
 <?php
 if (User::isInGroup(U_GROUP_STAFF)):

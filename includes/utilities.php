@@ -1329,7 +1329,7 @@ class Util
         );
         $str = strtr($str, $accents);
         $str = trim($str);
-        $str = preg_replace('/[^a-z0-9]/ig', '-', $str);
+        $str = preg_replace('/[^a-z0-9]/i', '-', $str);
 
         $str = str_replace('--', '-', $str);
         $str = str_replace('--', '-', $str);
@@ -1337,7 +1337,7 @@ class Util
         $str = rtrim($str, '-');
         $str = strtolower($str);
 
-        return str;
+        return $str;
     }
 
     public static function isValidEmail($email)

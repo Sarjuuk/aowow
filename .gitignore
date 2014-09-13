@@ -4,7 +4,14 @@
 
 # generated files
 /static/js/profile_all.js
+/static/js/locale.js
+/static/widgets/power.js
+/static/widgets/power/demo.html
+/static/widgets/searchbox.js
+/static/widgets/searchbox/searchbox.html
+/static/download/searchplugins/aowow.xml
 /config/config.php
+# /datasets/item-scaling
 
 # extracted images
 /static/images/wow/icons/large/*

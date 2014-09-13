@@ -298,7 +298,7 @@ class EventPage extends GenericPage
         /* finalize related events */
         /***************************/
 
-        foreach($this->lvTabs as &$view)
+        foreach ($this->lvTabs as &$view)
         {
             if ($view['file'] !=  WorldEventList::$brickFile)
                 continue;

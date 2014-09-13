@@ -147,6 +147,10 @@ class User
             }
         }
 
+        // check
+        if ($loc != LOCALE_EN && !(CFG_LOCALES & (1 << $loc)))
+            $loc = LOCALE_EN;
+
         // set
         if ($loc != self::$localeId)
         {

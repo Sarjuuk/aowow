@@ -1,6 +1,6 @@
 <?php
 
-if(!defined('AOWOW_REVISION'))
+if (!defined('AOWOW_REVISION'))
     die("illegal access");
 
 
@@ -188,7 +188,7 @@ abstract class BaseType
 
         foreach ($conditions as $i => $c)
         {
-            switch(getType($c))
+            switch (getType($c))
             {
                 case 'array':
                     break;

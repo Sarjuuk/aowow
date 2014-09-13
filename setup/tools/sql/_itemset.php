@@ -411,7 +411,7 @@ else
     }
 
     foreach ($items as &$list)
-        while(count($list) < 10)
+        while (count($list) < 10)
             $list[] = 0;
 
     $rId = $id;
@@ -441,7 +441,7 @@ else
 
         if (!$note)
         {
-            foreach($tagsByNamePart as $tag => $strings)
+            foreach ($tagsByNamePart as $tag => $strings)
             {
                 foreach ($strings as $str)
                 {

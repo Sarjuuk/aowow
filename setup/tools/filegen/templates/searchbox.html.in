@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Aowow</title>
+        <title>CFG_NAME_SHORT</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <base target="_blank" />
         <link rel="stylesheet" type="text/css" href="searchbox.css" />
-        <script type="text/javascript" src="/static/js/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="STATIC_URL/js/jquery-1.4.2.min.js"></script>
         <script type="text/javascript" src="searchbox.js"></script>
     </head>
     <body>
-        <a href="/" class="logo"></a>
-        <form action="/" class="search">
+        <a href="HOST_URL" class="logo"></a>
+        <form action="HOST_URL" class="search">
             <span><a href="#"></a><input type="text" name="search" /></span>
         </form>
 
         <div class="expanded">
-            <div class="links"><a href="/?talent">Talent Calculator</a></div>
-            <div class="links"><a href="/?profiles">Profiler</a></div>
-            <div class="links"><a href="/?maps">Maps</a></div>
+            <div class="links"><a href="HOST_URL/?talent">Talent Calculator</a></div>
+            <div class="links"><a href="HOST_URL/?profiles">Profiler</a></div>
+            <div class="links"><a href="HOST_URL/?maps">Maps</a></div>
         </div>
 
     </body>

@@ -69,7 +69,7 @@ class DB
 
     private static function safeGetDB($idx)
     {
-        if(!self::isConnected($idx))
+        if (!self::isConnected($idx))
             self::connect($idx);
 
         return self::getDB($idx);

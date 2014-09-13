@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>'Powered by CFG_NAME_SHORT' Demo</title>
+
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+
+<script src="../power.js?lang=en" type="text/javascript"></script>
+<script>var aowow_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true, "hide": { "reagents": true, "sellprice": true }}</script>
+
+<style type="text/css">
+body { padding: 50px 15px 15px 15px; margin: 0; font-family: Arial; color: white; background: black }
+a { color: #FFD100; cursor: pointer; outline: none }
+a:hover { color: white }
+h2 { font-size: 20px; margin-top: 0; padding-top: 0; line-height: 1.5em }
+h2 small { font-size: 13px; font-weight: normal }
+</style>
+
+</head>
+
+<body>
+
+<h2>'Powered by CFG_NAME_SHORT' Demo<br /><small><a href="/">&laquo; Return to the site</a></small></h2>
+
+<div style="float: left; width: 400px; margin-right: 64px">
+
+<i>Items</i><br /><br />
+
+<a href="HOST_URL/?item=31015" class="q4">Skyshatter Cover</a><br />
+<a href="HOST_URL/?item=30987" class="q4">Lightbringer Faceguard</a><br /><br />
+
+<a href="HOST_URL/?item=48718" rel="lvl=42" class="q7">Repurposed Lava Dredger</a> <small>(Level 42 scaling)</small><br /><br />
+
+<a href="http://www.example.com" rel="item=28288" class="q3">Abacus of Violent Odds</a> <small>(Custom URL)</small><br />
+<a href="HOST_URL/?item=22589&amp;lvl=80" class="q5">Atiesh, Greatstaff of the Guardian</a> <small>(Level 80 conversions)</small><br />
+<a href="HOST_URL/?item=25697" rel="gems=23121&amp;ench=2647&amp;pcs=25697:25695:25696" class="q3">Felstalker Bracers</a> <small>(Enchant, gem, set bonus)</small><br />
+<a href="HOST_URL/?item=31928" rel="rand=-63&amp;ench=2931" class="q3">Dark Band of Agility</a> <small>(Random enchantment, enchant)</small><br />
+<a href="HOST_URL/?item=32474" rel="ench=3003&amp;gems=32409:31865" class="q3">Surestrike Goggles v2.0</a> <small>(Enchant, gems)</small><br /><br />
+
+<hr />
+
+<i>Spells</i><br /><br />
+<a href="HOST_URL/?spell=18562">Swiftmend</a><br />
+<a href="HOST_URL/?spell=589">Shadow Word: Pain</a><br />
+<a href="HOST_URL/?spell=36257">Blacksmithing: Bulwark of the Ancient Kings</a><br /><br />
+
+<a href="HOST_URL/?spell=1126" rel="buff">Mark of the Wild</a> <small>(Buff)</small><br /><br />
+
+<hr />
+
+<i>Quests</i><br /><br />
+<a href="HOST_URL/?quest=826">Zalazane</a><br />
+<a href="HOST_URL/?quest=11389">Wanted: Arcatraz Sentinels</a><br />
+<a href="HOST_URL/?quest=11058">An Apexis Relic</a><br />
+<a href="HOST_URL/?quest=9637">Kalynna's Request</a><br /><br />
+
+<hr />
+
+<i>Achievements</i><br /><br />
+<a href="HOST_URL/?achievement=277">'Tis the Season</a><br />
+<a href="HOST_URL/?achievement=1558" rel="who=Shadowrogue&amp;when=1273022820000">100 Fish</a> <small>(Earned)</small><br /><br />
+
+<hr />
+
+<i>Profiles</i><br /><br />
+<a href="HOST_URL/?profile=us.draenor.drekdarok">Drekdarok</a><br />
+<a href="HOST_URL/?profile=10344553">DPS</a><br /><br/>
+
+<a href="http://www.example.com" rel="profile=us.draenor.drekdarok">Drekdarok</a><small> (Custom URL)</small><br />
+<a href="http://www.example.com" rel="profile=10344553">DPS</a><small> (Custom URL)</small><br />
+<hr />
+
+<i>Custom</i><br /><br />
+<a href="javascript:;" onmouseover="$WowheadPower.showTooltip(event, 'Hello :0', 'inv_sword_14')" onmousemove="$WowheadPower.moveTooltip(event)" onmouseout="$WowheadPower.hideTooltip();">Hai to you!</a><br /><br />
+
+<hr />
+
+<i>Image Map</i><br /><br />
+
+<map id="planetmap" name="planetmap">
+<area shape="rect"   coords="0,0,82,126" href="HOST_URL/?item=30987"    target="_blank" alt="Sun" />
+<area shape="circle" coords="90,58,3"    href="HOST_URL/?spell=1126" target="_blank" alt="Mercury" />
+<area shape="circle" coords="124,58,8"   href="HOST_URL/?quest=11058"  target="_blank" alt="Venus" />
+</map>
+<img src="http://www.w3schools.com/TAGS/planets.gif" width="145" height="126" alt="" border="0" usemap ="#planetmap" />
+
+</div>
+
+<div style="float: left">
+<i>Localized links</i> <small>(requires your site to use UTF-8 encoding)</small><br /><br />
+
+<b>Deutsch:</b> <a href="http://de.wowhead.com/item=31015">Skyshatter Cover</a><br />
+<b>Français:</b> <a href="http://www.wowhead.com/item=31015" rel="domain=fr">Skyshatter Cover</a><br />
+<b>Español:</b> <a href="http://es.wowhead.com/item=31015">Skyshatter Cover</a><br />
+<b>&#1056;&#1091;&#1089;&#1089;&#1082;&#1080;&#1081;:</b> <a href="http://ru.wowhead.com/item=31015">Skyshatter Cover</a><br />
+</div>
+
+<div style="clear: both"></div>
+
+<div style="width: 30px; height: 800px"></div>
+
+<center>
+<a href="HOST_URL/?item=30301">Item #30301</a><br />
+<a href="HOST_URL/?item=99999">Item #99999</a>
+</center>
+
+<a style="position: absolute; right: 0; bottom: 0; background: black" href="HOST_URL/?item=30319">Item #30319</a>
+<a style="position: absolute; left: 0; bottom: 0; background: black" href="HOST_URL/?item=22589">Item #22589</a>
+<a style="position: absolute; right: 0; top: 0; background: black" href="HOST_URL/?item=8171">Item #8171</a>
+<a style="position: absolute; left: 0; top: 0; background: black" href="HOST_URL/?item=6479">Item #6479!</a>
+
+</body>
+</html>

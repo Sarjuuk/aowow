@@ -2,17 +2,8 @@ if (typeof $WH == "undefined") {
     $WH = { wowheadRemote: true };
 
     /* custom */
-    for (i in document.scripts) {
-        if (!document.scripts[i].src)
-            continue;
-
-        var match = document.scripts[i].src.match(/(https?:\/\/[^\/]+)((\/[\w\d-_%]+)*)\/widgets\/power\.js/i);
-        if (match) {
-            var g_host      = match[1];                     // todo: probably incorrect for most cases :/
-            var g_staticUrl = match[1] + match[2];
-            break;
-        }
-    }
+    var g_host      = 'HOST_URL';
+    var g_staticUrl = 'STATIC_URL';
 }
 
 if (typeof $WowheadPower == "undefined") {
@@ -258,10 +249,10 @@ if (typeof $WowheadPower == "undefined") {
                 if (t.href.indexOf("http://") == 0 || t.href.indexOf("https://") == 0) {
                     i0 = 1;
                     // url = t.href.match(/^https?:\/\/(.+?)?\.?wowhead\.com(?:\:\d+)?\/\??(item|quest|spell|achievement|npc|object)=([0-9]+)/);
-                    url = t.href.match(/^http:\/\/(.*)\/\??(item|quest|spell|achievement|npc|object)=([0-9]+)/);
+                    url = t.href.match(/^https?:\/\/(.*)\/?\??(item|quest|spell|achievement|npc|object)=([0-9]+)/);
                     if (url == null) {
                         // url = t.href.match(/^http:\/\/(.+?)?\.?wowhead\.com\/\?(profile)=([^&#]+)/)
-                        url = t.href.match(/^http:\/\/(.*)\/\??(profile)=([^&#]+)/);
+                        url = t.href.match(/^https?:\/\/(.*)\/?\??(profile)=([^&#]+)/);
                     }
 
                     showLogo = 0;

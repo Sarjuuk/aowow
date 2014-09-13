@@ -722,7 +722,7 @@ class NpcPage extends GenericPage
         {
             $spilled = new FactionList(array(['parentFactionId', array_keys($spilledParents)]));
 
-            foreach($reputation as &$sets)
+            foreach ($reputation as &$sets)
             {
                 foreach ($sets[1] as &$row)
                 {
