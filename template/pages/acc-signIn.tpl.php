@@ -3,7 +3,11 @@
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
-<?php $this->brick('pageTemplate'); ?>
+<?php
+    $this->brick('announcement');
+
+    $this->brick('pageTemplate');
+?>
             <div class="pad3"></div>
             <script type="text/javascript">
                 function inputBoxValidate(f)

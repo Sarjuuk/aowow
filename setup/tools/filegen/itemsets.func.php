@@ -54,7 +54,7 @@ if (!defined('AOWOW_REVISION'))
                     'id'       => $set['id'],
                     'name'     => (7 - $set['quality']).Util::jsEscape(Util::localizedString($set, 'name')),
                     'pieces'   => [],
-                    'heroic'   => DB::Aowow()->SelectCell('SELECT IF (Flags & 0x8, "true", "false") FROM item_template WHERE entry = ?d', $set['item1']),
+                    'heroic'   => DB::Aowow()->SelectCell('SELECT IF (flags & 0x8, "true", "false") FROM ?_items WHERE id = ?d', $set['item1']),
                     'maxlevel' => $set['maxLevel'],
                     'minlevel' => $set['minLevel'],
                     'type'     => $set['type'],

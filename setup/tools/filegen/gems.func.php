@@ -26,20 +26,16 @@ if (!defined('AOWOW_REVISION'))
         // sketchy, but should work
         // Id < 36'000 || ilevel < 70 ? BC : WOTLK
         $gems   = DB::Aowow()->Select(
-           'SELECT    it.entry AS itemId,
-                      it.name,
-                      li.*,
-                      IF (it.entry < 36000 OR it.ItemLevel < 70, 1 , 2) AS expansion,
-                      it.Quality AS quality,
-                      i.inventoryicon1 AS icon,
-                      gp.spellItemEnchantmentId AS enchId,
-                      gp.colorMask AS colors
-            FROM      item_template it
-            LEFT JOIN locales_item li ON li.entry = it.entry
-            JOIN      dbc.gemproperties gp ON gp.Id = it.GemProperties
-            JOIN      dbc.itemdisplayinfo i ON i.Id = it.displayid
-            WHERE     it.GemProperties <> 0
-            ORDER BY  it.entry DESC');
+           'SELECT    i.id AS itemId,
+                      i.name_loc0, i.name_loc2, i.name_loc3, i.name_loc6, i.name_loc8,
+                      IF (i.id < 36000 OR i.itemLevel < 70, 1 , 2) AS expansion,
+                      i.quality,
+                      i.iconString AS icon,
+                      i.gemEnchantmentId AS enchId,
+                      i.gemColorMask AS colors
+            FROM      ?_items i
+            WHERE     i.gemEnchantmentId <> 0
+            ORDER BY  i.id DESC');
         $success = true;
 
 

@@ -44,25 +44,23 @@ if (!defined('AOWOW_REVISION'))
                        WHERE           z.mapId = c.map AND c.id = ?d';
 
         $petList    = DB::Aowow()->Select(
-           'SELECT    ct.entry AS id,
-                      ct.name,
-                      lc.*,
-                      ct.minlevel,
-                      ct.maxlevel,
+           'SELECT    cr. id,
+                      cr.name_loc0, cr.name_loc2, cr.name_loc3, cr.name_loc6, cr.name_loc8,
+                      cr.minLevel,
+                      cr.maxLevel,
                       CONCAT("[", ft.A, ", ", ft.H, "]") AS react,
-                      ct.rank AS classification,
-                      ct.family,
-                      ct.modelId1 AS displayId,
+                      cr.rank AS classification,
+                      cr.family,
+                      cr.displayId1 AS displayId,
                       cdi.skin1 AS skin,
                       SUBSTRING_INDEX(cf.iconFile, "\\\\", -1) AS icon,
                       cf.petTalentType AS type
-            FROM      creature_template ct
-            JOIN      ?_factiontemplate ft ON ft.Id = ct.faction
-            JOIN      dbc.creaturefamily cf ON cf.Id = ct.family
-            LEFT JOIN locales_creature lc ON lc.entry = ct.entry
-            JOIN      dbc.creaturedisplayinfo cdi ON cdi.id = ct.modelId1
-            WHERE     cf.petTalentType <> -1 AND ct.type_flags & 0x1
-            ORDER BY  ct.entry ASC');
+            FROM      ?_creature cr
+            JOIN      ?_factiontemplate ft ON ft.Id = cr.faction
+            JOIN      dbc.creaturefamily cf ON cf.Id = cr.family
+            JOIN      dbc.creaturedisplayinfo cdi ON cdi.id = cr.displayId1
+            WHERE     cf.petTalentType <> -1 AND cr.typeFlags & 0x1
+            ORDER BY  cr.id ASC');
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
@@ -92,8 +90,8 @@ if (!defined('AOWOW_REVISION'))
                 $petsOut[$pet['id']] = array(
                     'id'             => $pet['id'],
                     'name'           => Util::localizedString($pet, 'name'),
-                    'minlevel'       => $pet['minlevel'],
-                    'maxlevel'       => $pet['maxlevel'],
+                    'minlevel'       => $pet['minLevel'],
+                    'maxlevel'       => $pet['maxLevel'],
                     'location'       => $locations[$pet['id']],
                     'react'          => $pet['react'],
                     'classification' => $pet['classification'],

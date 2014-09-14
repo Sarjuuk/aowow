@@ -69,6 +69,8 @@ class AccountPage extends GenericPage
                     $this->error();
 
                 $this->tpl = 'acc-recover';
+                $this->resetPass = false;
+
                 if (isset($_POST['email']))
                 {
                     if (!Util::isValidEmail($_POST['email']))
@@ -473,7 +475,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
         // check if already processing
         if ($_ = DB::Aowow()->selectCell('SELECT statusTimer - UNIX_TIMESTAMP() FROM ?_account WHERE email = ? AND status <> ?d AND statusTimer > UNIX_TIMESTAMP()', $target, ACC_STATUS_OK))
-            return sprintf(lang::$account['isRecovering'], Util::formatTime($_));
+            return sprintf(lang::$account['isRecovering'], Util::formatTime($_ * 1000));
 
         // create new token and write to db
         $token = Util::createHash();
@@ -508,7 +510,5 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         return ($forHeader && $next != '.' ? '?' : '').$next;
     }
 }
-
-
 
 ?>
