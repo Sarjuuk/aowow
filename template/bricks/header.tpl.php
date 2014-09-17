@@ -18,7 +18,7 @@
         <div class="toplinks linklist"><?php $this->brick('headerMenu'); ?></div>
         <div class="toptabs" id="toptabs"></div>
         <div class="topbar" id="topbar">
-            <div class="topbar-search"><form action="."><a href="javascript:;"></a><input name="search" size="35" value="" id="livesearch-generic" /></form></div>
+            <div class="topbar-search"><form action="."><a href="javascript:;"></a><input name="search" size="35" id="livesearch-generic" value="<?php echo isset($this->search) ? $this->search : ''; ?>" /></form></div>
             <div class="topbar-browse" id="topbar-browse"></div>
             <div class="topbar-buttons" id="topbar-buttons"></div>
         </div>

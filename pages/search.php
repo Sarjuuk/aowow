@@ -56,7 +56,7 @@ class SearchPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->search = urlDecode(trim($pageParam));
+        $this->search = trim(urlDecode($pageParam));
         $this->query  = strtr($this->search, '?*', '_%');
 
         // restricted access
@@ -117,10 +117,11 @@ class SearchPage extends GenericPage
         if (!$this->query)
             return;
 
-        $parts = explode(' ', $this->query);
-        foreach ($parts as $p)
+        foreach (explode(' ', $this->query) as $p)
         {
-            if ($p[0] == '-')
+            if (!$p)                                        // multiple spaces
+                continue;
+            else if ($p[0] == '-')
             {
                 if (strlen($p) < 4)
                     $this->invalid[] = substr($p, 1);
