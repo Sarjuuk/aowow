@@ -64,7 +64,7 @@ class UtilityPage extends GenericPage
                 $type   = array_rand(array_filter(Util::$typeStrings));
                 $typeId = (new Util::$typeClasses[$type](null))->getRandomId();
 
-                header('Location: ?'.Util::$typeStrings[$type].'='.$typeId);
+                header('Location: ?'.Util::$typeStrings[$type].'='.$typeId, true, 302);
                 die();
             case 'latest-comments':
                 $this->lvTabs[] = array(
@@ -125,7 +125,7 @@ class UtilityPage extends GenericPage
                 break;
             case 'most-comments':
                 if ($this->category && !in_array($this->category[0], [1, 7, 30]))
-                    header('Location: ?most-comments=1'.($this->rss ? '&rss' : null));
+                    header('Location: ?most-comments=1'.($this->rss ? '&rss' : null), true, 302);
 
                 $this->lvTabs[] = array(
                     'file'   => 'commentpreview',

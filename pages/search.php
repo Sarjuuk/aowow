@@ -173,7 +173,7 @@ class SearchPage extends GenericPage
                 $type   = Util::$typeStrings[$_['type']];
                 $typeId = key($_['data']);
 
-                header("Location: ?".$type.'='.$typeId);
+                header('Location: ?'.$type.'='.$typeId, true, 302);
                 exit();
             }
         }
@@ -200,7 +200,7 @@ class SearchPage extends GenericPage
         {
             // empty queries go home
             if (!$this->query)
-                header("Location:?");
+                header('Location: .', true, 302);
 
             parent::display();                              // errors are handled in the search-template itself
         }

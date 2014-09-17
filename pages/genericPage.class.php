@@ -336,7 +336,7 @@ class GenericPage
     protected function forwardToSignIn($next = '')
     {
         $next = $next ? '&next='.$next : '';
-        header('Location: ?account=signin'.$next);
+        header('Location: ?account=signin'.$next, true, 302);
     }
 
     /*******************/
@@ -380,6 +380,14 @@ class GenericPage
 
     public function display($override = '')                 // load given template string or GenericPage::$tpl
     {
+        // Heisenbug: IE11 and FF32 will sometimes (under unknown circumstances) cache 302 redirects and stop
+        // re-requesting them from the server but load them from local cache, thus breaking menu features.
+        header('Expires: Sat, 01 Jan 2000 01:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        header('Cache-Control: post-check=0, pre-check=0', false);
+        header('Pragma: no-cache');
+
         if ($override)
         {
             $this->addAnnouncements();

@@ -628,7 +628,7 @@ var PageTemplate = new function()
             var menuItem = [
                 locale.id,
                 locale.description,
-                g_host + '?locale=' + locale.id,                            // sarjuuk: edited for unsupported subdomains # linkBefore + locale.domain + linkAfter
+                g_host + '/?locale=' + locale.id,                           // sarjuuk: edited for unsupported subdomains # linkBefore + locale.domain + linkAfter
                 null,                                                       // more custom
                 {rel: location.href + " domain=" + locale.domain}           // also custom
             ];

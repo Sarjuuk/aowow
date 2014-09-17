@@ -37,7 +37,7 @@ class EventPage extends GenericPage
 
         // redirect if associated with a holiday
         if ($this->hId && $this->typeId != $this->hId)
-            header('Location: '.HOST_URL.'?event='.$this->hId);
+            header('Location: '.HOST_URL.'?event='.$this->hId, true, 302);
 
         $this->name = $this->subject->getField('name', true);
     }

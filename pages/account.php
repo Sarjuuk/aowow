@@ -38,7 +38,7 @@ class AccountPage extends GenericPage
                 $this->forwardToSignIn('account='.$pageParam);
             // doesn't require auth && authed
             else if (!$this->validCats[$pageParam][0] && User::$id)
-                header('Location: ?account');               // goto dashboard
+                header('Location: ?account', true, 302);    // goto dashboard
         }
     }
 
@@ -60,7 +60,7 @@ class AccountPage extends GenericPage
                 $this->resetPass = false;
 
                 if ($this->createRecoverPass($nStep))       // location-header after final step
-                    header('Location: ?account=signin');
+                    header('Location: ?account=signin', true, 302);
 
                 $this->head = sprintf(Lang::$account['recoverPass'], $nStep);
                 break;
@@ -95,7 +95,7 @@ class AccountPage extends GenericPage
                     else
                     {
                         session_regenerate_id(true);        // user status changed => regenerate id
-                        header('Location: '.$this->getNext(true));
+                        header('Location: '.$this->getNext(true), true, 302);
                     }
                 }
                 else if (!empty($_GET['token']) && ($_ = DB::Aowow()->selectCell('SELECT user FROM ?_account WHERE status IN (?a) AND token = ? AND statusTimer >  UNIX_TIMESTAMP()', [ACC_STATUS_RECOVER_USER, ACC_STATUS_OK], $_GET['token'])))
@@ -136,7 +136,7 @@ class AccountPage extends GenericPage
             case 'signout':
                 User::destroy();
             default:
-                header('Location: '.$this->getNext(true));
+                header('Location: '.$this->getNext(true), true, 302);
                 break;
         }
     }

@@ -617,7 +617,7 @@ abstract class Filter
             }
 
             // do get request
-            header('Location: '.HOST_URL.'?'.$_SERVER['QUERY_STRING'].'='.$this->urlize());
+            header('Location: '.HOST_URL.'?'.$_SERVER['QUERY_STRING'].'='.$this->urlize(), true, 302);
         }
         // sanitize input and build sql
         else if (!empty($_GET['filter']))

@@ -42,7 +42,7 @@ class AjaxHandler
             return;
 
         if ($_ = DB::Aowow()->selectRow('SELECT IFNULL(c2.id, c1.id) AS id, IFNULL(c2.type, c1.type) AS type, IFNULL(c2.typeId, c1.typeId) AS typeId FROM ?_comments c1 LEFT JOIN ?_comments c2 ON c1.replyTo = c2.id WHERE c1.id = ?d', $this->get['id']))
-            header('Location: ?'.Util::$typeStrings[$_['type']].'='.$_['typeId'].'#comments:id='.$_['id'].($_['id'] != $this->get['id'] ? ':reply='.$this->get['id'] : null));
+            header('Location: ?'.Util::$typeStrings[$_['type']].'='.$_['typeId'].'#comments:id='.$_['id'].($_['id'] != $this->get['id'] ? ':reply='.$this->get['id'] : null), true, 302);
     }
 
     /* responses
@@ -303,7 +303,7 @@ class AjaxHandler
                     }
                 }
 
-                header('Location: ?'.Util::$typeStrings[$this->get['type']].'='.$this->get['typeid'].'#comments');
+                header('Location: ?'.Util::$typeStrings[$this->get['type']].'='.$this->get['typeid'].'#comments', true, 302);
                 break;
             case 'edit':
                 if ((!User::canComment() && !User::isInGroup(U_GROUP_MODERATOR)) || empty($this->get['id']) || empty($this->post['body']))
@@ -588,7 +588,7 @@ class AjaxHandler
         User::setLocale($this->params[0]);
         User::save();
 
-        header('Location: '.(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '.'));
+        header('Location: '.(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '.'), true, 302);
     }
 
     private function handleAccount()
