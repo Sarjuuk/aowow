@@ -3257,8 +3257,8 @@ var LANG = {
 
     fidropdowns:{
         yn:             [   [1, "Sí"],                              [2, "No"]                               ],
-        num:            [   [1, ">"],                               [2, ">="],                              [3, "="],                               [4, "<="],                              [5, "<"]                            ],
-        side:           [   [1, "Sí"],                              [2, "Alianza"],                         [3, "Horda"],                           [4, "Ambos"],                           [5, "No"]                           ],
+        num:            [   [1, ">"],                               [2, ">="],                              [3, "="],                               [4, "<="],                              [5, "<"],                              [6, "!="]],                            ],
+        side:           [   [1, "Sí"],                              [2, "Alianza"],                         [3, "Horda"],                           [4, "Ambos"],                           [5, "No"]                                       ],
         faction:        [
                             [1015, "Ala Abisal"],                   [469, "Alianza"],                       [21, "Bahía del Botín"],                [1011, "Bajo Arrabal"],                 [946, "Bastión del Honor"],
                             [576, "Bastión Fauces de Madera"],      [87, "Bucaneros Velasangre"],           [1098, "Caballeros de la Espada de Ébano"],                                     [92, "Centauros del clan Gelkis"],

@@ -3245,8 +3245,8 @@ var LANG = {
 
     fidropdowns: {
         yn:             [   [1, "Oui"],                             [2, "Non"]                              ],
-        num:            [   [1, ">"],                               [2, ">="],                              [3, "="],                               [4, "<="],                              [5, "<"]                            ],
-        side:           [   [1, "Oui"],                             [2, "Alliance"],                        [3, "Horde"],                           [4, "Les deux"],                        [5, "Non"]                          ],
+        num:            [   [1, ">"],                               [2, ">="],                              [3, "="],                               [4, "<="],                              [5, "<"],                              [6, "!="]],
+        side:           [   [1, "Oui"],                             [2, "Alliance"],                        [3, "Horde"],                           [4, "Les deux"],                        [5, "Non"]                                      ],
         faction:        [
                             [1015, "Aile-du-Néant"],                [469, "Alliance"],                      [529, "Aube d'argent"],                 [1037, "Avant-garde de l'Alliance"],    [21, "Baie-du-Butin"],
                             [946, "Bastion de l'Honneur"],          [470, "Cabestan"],                      [169, "Cartel Gentepression"],          [92, "Centaures (Gelkis)"],             [93, "Centaures (Magram)"],

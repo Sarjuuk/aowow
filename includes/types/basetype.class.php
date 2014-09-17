@@ -851,6 +851,7 @@ abstract class Filter
             case 3: $op = '=';    return true;
             case 4: $op = '<=';   return true;
             case 5: $op = '<';    return true;
+            case 6: $op = '!=';   return true;
             default: return false;
         }
     }

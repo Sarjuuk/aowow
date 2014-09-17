@@ -3302,8 +3302,8 @@ var LANG = {
 
     fidropdowns: {
         yn:             [   [1, "Yes"],                             [2, "No"]                               ],
-        num:            [   [1, ">"],                               [2, ">="],                              [3, "="],                               [4, "<="],                              [5, "<"]                            ],
-        side:           [   [1, "Yes"],                             [2, "Alliance"],                        [3, "Horde"],                           [4, "Both"],                            [5, "No"]                           ],
+        num:            [   [1, ">"],                               [2, ">="],                              [3, "="],                               [4, "<="],                              [5, "<"],                              [6, "!="]],
+        side:           [   [1, "Yes"],                             [2, "Alliance"],                        [3, "Horde"],                           [4, "Both"],                            [5, "No"]                                       ],
         faction:        [
                             [469, "Alliance"],                      [1037, "Alliance Vanguard"],            [1106, "Argent Crusade"],               [529, "Argent Dawn"],                   [1012, "Ashtongue Deathsworn"],
                             [87, "Bloodsail Buccaneers"],           [21, "Booty Bay"],                      [910, "Brood of Nozdormu"],             [609, "Cenarion Circle"],               [942, "Cenarion Expedition"],

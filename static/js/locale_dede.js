@@ -3255,8 +3255,8 @@ var LANG = {
 
     fidropdowns: {
         yn:             [   [1, "Ja"],                              [2, "Nein"]                             ],
-        num:            [   [1, ">"],                               [2, ">="],                              [3, "="],                               [4, "<="],                              [5, "<"]                            ],
-        side:           [   [1, "Ja"],                              [2, "Allianz"],                         [3, "Horde"],                           [4, "Beide"],                           [5, "Nein"]                         ],
+        num:            [   [1, ">"],                               [2, ">="],                              [3, "="],                               [4, "<="],                              [5, "<"],                              [6, "!="]],
+        side:           [   [1, "Ja"],                              [2, "Allianz"],                         [3, "Horde"],                           [4, "Beide"],                           [5, "Nein"]                                     ],
         faction:        [
                             [469, "Allianz"],                       [529, "Argentumdämmerung"],             [1106, "Argentumkreuzzug"],             [21, "Beutebucht"],                     [87, "Blutsegelbukaniere"],
                             [910, "Brut Nozdormus"],                [169, "Dampfdruckkartell"],             [69, "Darnassus"],                      [933, "Das Konsortium"],                [967, "Das Violette Auge"],
