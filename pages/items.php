@@ -268,7 +268,7 @@ class ItemsPage extends GenericPage
 
                 break;
             case 3:                                         // source
-                $groups = [0, 1, 2, 3, 4, 5, 10, 11, 12];
+                $groups = [1, 2, 3, 4, 5, 10, 11, 12, 0];
                 $nameSource = Lang::$game['sources'];
                 $this->forceTabs = true;
 

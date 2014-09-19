@@ -95,13 +95,10 @@ class NpcPage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // Event
-        if ($_ = DB::Aowow()->selectRow('SELECT e.id, holidayId FROM ?_events e, game_event_creature gec, creature c WHERE e.id = ABS(gec.eventEntry) AND c.guid = gec.guid AND c.id = ?d', $this->typeId))
+        if ($_ = DB::Aowow()->selectCell('SELECT holidayId FROM ?_events e, game_event_creature gec, creature c WHERE e.id = ABS(gec.eventEntry) AND c.guid = gec.guid AND c.id = ?d', $this->typeId))
         {
-            if ($h = $_['holidayId'])
-            {
-                $this->extendGlobalIds(TYPE_WORLDEVENT, $_['id']);
-                $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].'[event='.$h.']';
-            }
+            $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
+            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].'[event='.$_.']';
         }
 
         // Level

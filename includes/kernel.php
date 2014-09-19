@@ -71,9 +71,8 @@ foreach ($sets as $k => $v)
     define('CFG_'.strtoupper($k), $v['s'] ?: intVal($v['i']));
 
 
-$protocoll = 'http://';
-if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || CFG_FORCE_SSL)
-    $protocoll = 'https://';
+$secure    = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || CFG_FORCE_SSL;
+$protocoll = $secure ? 'https://' : 'http://';
 
 define('STATIC_URL', substr($protocoll.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1).'/static'); // points js to images & scripts (change here if you want to use a separate subdomain)
 define('HOST_URL',   substr($protocoll.$_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1));           // points js to executable files
@@ -87,7 +86,7 @@ Util::execTime(CFG_DEBUG);
 
 
 // Setup Session
-ini_set('session.cookie_httponly', true);
+session_set_cookie_params(15 * YEAR, '/', '', $secure, true);
 session_cache_limiter('private');
 session_start();
 if (User::init())

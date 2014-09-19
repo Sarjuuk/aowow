@@ -1873,7 +1873,6 @@ class SpellPage extends GenericPage
                                 break;
                             case 78:                        // Mounted
                             case 56:                        // Transform
-                            {
                                 if ($transform = $this->subject->getModelInfo($this->typeId))
                                 {
                                     $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $transform['displayId']];
@@ -1883,12 +1882,12 @@ class SpellPage extends GenericPage
                                     $bar = Lang::$main['colon'].Lang::$game['npc'].' #'.$effMV;;
 
                                 break;
-                            }
                             case 139:                       // Force Reaction
-                            {
-                                $bar          = ' (<a href="?faction='.$effMV.'">'.FactionList::getName($effMV).'</a>)';
                                 $foo['value'] = sprintf(Util::$dfnString, $foo['value'], Lang::$game['rep'][$foo['value']]);
-                            }
+                                // DO NOT BREAK
+                            case 190:                       // Mod Faction Reputation Gain
+                                $bar          = ' (<a href="?faction='.$effMV.'">'.FactionList::getName($effMV).'</a>)';
+                                break;                      // also breaks for 139
                         }
                         $foo['name'] .= strstr($bar, 'href') || strstr($bar, '#') ? $bar : ($bar ? ' ('.$bar.')' : null);
 
