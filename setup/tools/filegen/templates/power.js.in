@@ -206,7 +206,7 @@ if (typeof $WowheadPower == "undefined") {
                 return;
             }
 
-            if (t.rel && t.rel.indexOf("np") != -1) {
+            if (t.rel && t.rel.indexOf("np") != -1 && t.rel.indexOf("np") != t.rel.indexOf("npc=")) {
                 return;
             }
 

@@ -630,8 +630,11 @@ var PageTemplate = new function()
                 locale.description,
                 g_host + '/?locale=' + locale.id,                           // sarjuuk: edited for unsupported subdomains # linkBefore + locale.domain + linkAfter
                 null,                                                       // more custom
-                {rel: location.href + " domain=" + locale.domain}           // also custom
+                null                                                        // also custom
             ];
+
+            if (typeof g_pageInfo != 'undefined' && g_pageInfo.type && g_types[g_pageInfo.type])
+                menuItem[4] = {rel: g_types[g_pageInfo.type] + '=' + g_pageInfo.typeId + " domain=" + locale.domain};
 
             if(locale.id == localeId)
             {
