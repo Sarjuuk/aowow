@@ -61,6 +61,9 @@ class NpcsPage extends GenericPage
         if (!empty($this->filter['fi']['extraCols']))
             $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
+        if ($this->category)
+            $lv['params']['hiddenCols'] = "$['type']";
+
         // create note if search limit was exceeded
         if ($npcs->getMatches() > CFG_SQL_LIMIT_DEFAULT)
         {

@@ -97,7 +97,9 @@ if ($this->quotes[0]):
 
         $last = end($group);
         foreach ($group as $itr):
-            echo '<div><span class="s'.$itr['type'].'">'.($itr['type'] != 4 ? $this->name.' '.Lang::$npc['textTypes'][$itr['type']].Lang::$main['colon'].($itr['lang'] ? '['.$itr['lang'].']' : null) : null).$itr['text'].'</span></div>';
+            $_ = ($itr['type'] != 4 ? $this->name.' '.Lang::$npc['textTypes'][$itr['type']].Lang::$main['colon'].($itr['lang'] ? '['.$itr['lang'].']' : null) : null).$itr['text'];
+
+            echo '<div><span class="s'.$itr['type'].'">'.($itr['range'] ? sprintf(Util::$dfnString, Lang::$npc['textRanges'][$itr['range']], $_) : $_).'</span></div>';
             echo ($itr == $last) ? null : "</li>\n<li>";
         endforeach;
 

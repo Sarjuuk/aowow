@@ -40,7 +40,7 @@ class SkillPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['class']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['skill']));
     }
 
     protected function generateContent()

@@ -364,7 +364,9 @@ $lang = array(
         'ranged'        => "Ranged",
         'armor'         => "Armor",
         'foundIn'       => "This NPC can be found in",
+        'tameable'      => "Tameable (%s)",
         'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rare", 2 => "Rare Elite", 3 => "Boss"],
+        'textRanges'    => [null, "sent to area", "sent to zone", "sent to map", "sent to world"],
         'textTypes'     => [null, "yells", "says", "whispers"],
         'modes'         => array(
             1 => ["Normal", "Heroic"],

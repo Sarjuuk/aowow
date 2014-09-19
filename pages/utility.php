@@ -101,8 +101,8 @@ class UtilityPage extends GenericPage
                 );
                 break;
             case 'missing-screenshots':
-                $cnd = [[['cuFlags', CUSTOM_HAS_SCREENSHOT, '&'], 0]];
-
+                // limit to 200 entries each (it generates faster, consumes less memory and should be enough options)
+                $cnd = [[['cuFlags', CUSTOM_HAS_SCREENSHOT, '&'], 0], 200];
                 if (!User::isInGroup(U_GROUP_EMPLOYEE))
                     $cnd[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 

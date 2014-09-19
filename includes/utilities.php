@@ -1186,9 +1186,12 @@ class Util
             if ($raw)
                 $result[$eId] = $jsonStats;
             else
+            {
+                $result[$eId] = [];
                 foreach ($jsonStats as $k => $v)            // check if we use these mods
                     if ($str = Util::$itemMods[$k])
                         $result[$eId][$str] = $v;
+            }
         }
 
         return $result;

@@ -369,7 +369,9 @@ $lang = array(
         'ranged'        => "Fernkampf",
         'armor'         => "Rüstung",
         'foundIn'       => "Dieser NPC befindet sich in",
+        'tameable'      => "Zähmbar (%s)",
         'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rar", 2 => "Rar Elite", 3 => "Boss"],
+        'textRanges'    => [null, "an das Gebiet gesendet", "an die Zone gesendet", "an die Map gesendet", "an die Welt gesendet"],
         'textTypes'     => [null, "schreit", "sagt", "flüstert"],
         'modes'         => array(
             1 => ["Normal", "Heroisch"],

@@ -368,7 +368,9 @@ $lang = array(
         'melee'         => "Cuerpo a cuerpo",
         'ranged'        => "Ataque a distancia",
         'armor'         => "Armadura",
+        'tameable'      => "Domesticable (%s)",
         'rank'          => [0 => "Normal", 1 => "Élite", 4 => "Raro", 2 => "Élite raro", 3 => "Jefe"],
+        'textRanges'    => [null, "[sent to area]", "[sent to zone]", "[sent to map]", "[sent to world]"],
         'textTypes'     => [null, "grita", "dice", "susurra"],
         'modes'         => array(
             1 => ["Normal", "Heroico"],

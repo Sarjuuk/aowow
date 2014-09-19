@@ -367,7 +367,9 @@ $lang = array(
         'melee'         => "Ближнего боя",
         'ranged'        => "Дальнего боя",
         'armor'         => "Броня",
+        'tameable'      => "Можно приручить (%s)",
         'rank'          => [0 => "Обычный", 1 => "Элитный", 4 => "Редкий", 2 => "Редкий элитный", 3 =>"Босс"],
+        'textRanges'    => [null, "[sent to area]", "[sent to zone]", "[sent to map]", "[sent to world]"],
         'textTypes'     => [null, "кричит", "говорит", "шепчет"],
         'modes'         => array(
             1 => ["Обычный", "Героический"],

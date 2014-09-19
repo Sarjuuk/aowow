@@ -137,6 +137,11 @@ class NpcPage extends GenericPage
         $this->extendGlobalIds(TYPE_FACTION, $this->subject->getField('factionId'));
         $infobox[] = Util::ucFirst(Lang::$game['faction']).Lang::$main['colon'].'[faction='.$this->subject->getField('factionId').']';
 
+        // Tameable
+        if ($_typeFlags & 0x1)
+            if ($_ = $this->subject->getField('family'))
+                $infobox[] = sprintf(Lang::$npc['tameable'], '[url=pet='.$_.']'.Lang::$game['fa'][$_].'[/url]');
+
         // Wealth
         if ($_ = intVal(($this->subject->getField('minGold') + $this->subject->getField('maxGold')) / 2))
             $infobox[] = Lang::$npc['worth'].Lang::$main['colon'].'[tooltip=tooltip_avgmoneydropped][money='.$_.'][/tooltip]';
@@ -255,7 +260,7 @@ class NpcPage extends GenericPage
         /**************/
 
         // tab: SAI
-            // hmm, how should this loot like
+            // hmm, how should this look like
 
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
         // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
@@ -273,24 +278,55 @@ class NpcPage extends GenericPage
         if ($smartSpells)
             $conditions[] = ['id', $smartSpells];
 
-        if ($tplSpells || $smartSpells)
+        // Pet-Abilities
+        if ($_typeFlags & 0x1 && ($_ = $this->subject->getField('family')))
+        {
+            $skill = 0;
+            $mask  = 0x0;
+            foreach (Util::$skillLineMask[-1] as $idx => $pair)
+            {
+                if ($pair[0] != $_)
+                    continue;
+
+                $skill = $pair[1];
+                $mask  = 1 << $idx;
+                break;
+            }
+            $conditions[] = [
+                'AND',
+                ['s.typeCat', -3],
+                [
+                    'OR',
+                    ['skillLine1', $skill],
+                    ['AND', ['skillLine1', 0, '>'], ['skillLine2OrMask', $skill]],
+                    ['AND', ['skillLine1', -1], ['skillLine2OrMask', $mask, '&']]
+                ]
+            ];
+        }
+
+        if (count($conditions) > 1)
         {
             $abilities = new SpellList($conditions);
             if (!$abilities->error)
             {
                 $this->extendGlobalData($abilities->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-                $normal    = $abilities->getListviewData();
-                $controled = [];
+                $controled = $abilities->getListviewData();
+                $normal    = [];
 
-                if ($this->subject->getField('vehicleId'))  // not quite right. All seats should be checked for allowed-to-cast-flag-something
+                foreach ($controled as $id => $values)
                 {
-                    foreach ($normal as $id => $values)
+                    if (in_array($id, $smartSpells))
                     {
-                        if (in_array($id, $smartSpells))
-                            continue;
+                        $normal[$id] = $values;
+                        unset($controled[$id]);
+                        continue;
+                    }
 
-                        $controled[$id] = $values;
-                        unset($normal[$id]);
+                    // not quite right. All seats should be checked for allowed-to-cast-flag-something
+                    if (!$this->subject->getField('vehicleId') && in_array($id, $tplSpells))
+                    {
+                        $normal[$id] = $values;
+                        unset($controled[$id]);
                     }
                 }
 
@@ -762,12 +798,13 @@ class NpcPage extends GenericPage
         $quoteQuery = '
             SELECT
                 ct.groupid AS ARRAY_KEY, ct.id as ARRAY_KEY2, ct.`type`,
+                ct.TextRange AS `range`,
                 IFNULL(bct.`Language`, ct.`language`) AS lang,
-                IFNULL(bct.MaleText, IFNULL(bct.FemaleText, ct.`text`)) AS text_loc0,
-                IFNULL(lbct.MaleText_loc2, IFNULL(lbct.FemaleText_loc2, lct.text_loc2)) AS text_loc2,
-                IFNULL(lbct.MaleText_loc3, IFNULL(lbct.FemaleText_loc3, lct.text_loc3)) AS text_loc3,
-                IFNULL(lbct.MaleText_loc6, IFNULL(lbct.FemaleText_loc6, lct.text_loc6)) AS text_loc6,
-                IFNULL(lbct.MaleText_loc8, IFNULL(lbct.FemaleText_loc8, lct.text_loc8)) AS text_loc8
+                IFNULL(NULLIF(bct.MaleText, ""), IFNULL(NULLIF(bct.FemaleText, ""), IFNULL(ct.`text`, ""))) AS text_loc0,
+                IFNULL(NULLIF(lbct.MaleText_loc2, ""), IFNULL(NULLIF(lbct.FemaleText_loc2, ""), IFNULL(lct.text_loc2, ""))) AS text_loc2,
+                IFNULL(NULLIF(lbct.MaleText_loc3, ""), IFNULL(NULLIF(lbct.FemaleText_loc3, ""), IFNULL(lct.text_loc3, ""))) AS text_loc3,
+                IFNULL(NULLIF(lbct.MaleText_loc6, ""), IFNULL(NULLIF(lbct.FemaleText_loc6, ""), IFNULL(lct.text_loc6, ""))) AS text_loc6,
+                IFNULL(NULLIF(lbct.MaleText_loc8, ""), IFNULL(NULLIF(lbct.FemaleText_loc8, ""), IFNULL(lct.text_loc8, ""))) AS text_loc8
             FROM
                 creature_text ct
             LEFT JOIN
@@ -785,14 +822,15 @@ class NpcPage extends GenericPage
             foreach ($text as $t)
             {
                 // fixup .. either set %s for emotes or dont >.<
-                $text = Util::localizedString($t, 'text');
-                if (in_array($t['type'], [2, 16]) && strpos($text, '%s') === false)
-                    $text = '%s '.$text;
+                $msg = Util::localizedString($t, 'text');
+                if (in_array($t['type'], [2, 16]) && strpos($msg, '%s') === false)
+                    $msg = '%s '.$msg;
 
                 $line = array(
+                    'range' => $t['range'],
                     'type' => 2,                            // [type: 0, 12] say: yellow-ish
                     'lang'  => !empty($t['language']) ? Lang::$game['languages'][$t['language']] : null,
-                    'text'  => sprintf(Util::parseHtmlText(htmlentities($text)), $this->name),
+                    'text'  => sprintf(Util::parseHtmlText(htmlentities($msg)), $this->name),
                 );
 
                 switch ($t['type'])
