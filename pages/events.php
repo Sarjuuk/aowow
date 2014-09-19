@@ -30,6 +30,9 @@ class EventsPage extends GenericPage
     {
         $condition = [];
 
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $condition[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
         if ($this->category)
         {
             switch ($this->category[0])

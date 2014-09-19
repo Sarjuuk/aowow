@@ -34,7 +34,9 @@ class QuestsPage extends GenericPage
     {
         $conditions = [];
 
-        // cnd
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
         if (isset($this->category[1]))
             $conditions[] = ['zoneOrSort', $this->category[1]];
         else if (isset($this->category[0]))

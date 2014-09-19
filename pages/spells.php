@@ -239,7 +239,7 @@ class SpellsPage extends GenericPage
                     array_push($visibleCols, 'level', 'singleclass', 'schools');
 
                     $conditions[] = ['s.typeCat', [7, -2]];
-                    $conditions[] = [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT | CUSTOM_EXCLUDE_FOR_LISTVIEW), '&'], 0];
+                    $conditions[] = [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT), '&'], 0];
 
                     // Runeforging listed multiple times, exclude from explicit skill-listing
                     // if (isset($this->category[1]) && $this->category[1] == 6 && isset($this->category[2]) && $this->category[2] != 776)
@@ -346,15 +346,13 @@ class SpellsPage extends GenericPage
                 case 0:                                     // misc. Spells
                     array_push($visibleCols, 'level');
 
-                    $conditions[] = array(
-                        'OR',
-                        ['s.typeCat', 0],
-                        ['s.cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&']
-                    );
-
+                    $conditions[] = ['s.typeCat', 0];
                     break;
             }
         }
+
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;

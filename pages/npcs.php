@@ -33,6 +33,9 @@ class NpcsPage extends GenericPage
     {
         $conditions = [];
 
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
         if ($this->category)
         {
             $conditions[] = ['type', $this->category[0]];

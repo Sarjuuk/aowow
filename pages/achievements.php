@@ -55,6 +55,9 @@ class AchievementsPage extends GenericPage
     {
         $conditions = [];
 
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
         // include child categories if current category is empty
         if ($this->category)
             $conditions[] = ['category', (int)end($this->category)];

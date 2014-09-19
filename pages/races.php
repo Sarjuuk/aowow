@@ -25,7 +25,12 @@ class RacesPage extends GenericPage
 
     protected function generateContent()
     {
-        $races = new CharRaceList(array(['side', 0, '!']));
+        $conditions = [];
+
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
+        $races = new CharRaceList($conditions);
         if (!$races->error)
         {
             $this->lvTabs[] = array(

@@ -29,8 +29,9 @@ class SkillsPage extends GenericPage
     protected function generateContent()
     {
         $conditions = [];
+
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
-            $conditions[] = ['categoryId', 12, '!'];       // GENERIC (DND)
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
         if ($this->category)
             $conditions[] = ['typeCat', $this->category[0]];

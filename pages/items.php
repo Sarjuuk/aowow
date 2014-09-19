@@ -96,6 +96,9 @@ class ItemsPage extends GenericPage
 
         $conditions = [];
 
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
         /*******************/
         /* evaluate filter */
         /*******************/

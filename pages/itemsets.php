@@ -29,7 +29,15 @@ class ItemsetsPage extends GenericPage
 
     protected function generateContent()
     {
-        $itemsets = new ItemsetList($this->filterObj->getConditions());
+        $conditions = [];
+
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
+        if ($_ = $this->filterObj->getConditions())
+            $conditions[] = $_;
+
+        $itemsets = new ItemsetList($conditions);
         $this->extendGlobalData($itemsets->getJSGlobals());
 
         // recreate form selection
