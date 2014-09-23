@@ -400,8 +400,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
         // create..
         $token = Util::createHash();
-        $delay = 7 * DAY;
-        $id = DB::Aowow()->query('INSERT INTO ?_account (user, passHash, displayName, email, joindate, curIP, allowExpire, locale, status, statusTimer, token) VALUES (?, ?, ?, ?,  UNIX_TIMESTAMP(), ?, ?d, ?d, ?d, UNIX_TIMESTAMP() + ?d, ?)',
+        $id = DB::Aowow()->query('REPLACE INTO ?_account (user, passHash, displayName, email, joindate, curIP, allowExpire, locale, status, statusTimer, token) VALUES (?, ?, ?, ?,  UNIX_TIMESTAMP(), ?, ?d, ?d, ?d, UNIX_TIMESTAMP() + ?d, ?)',
             $username,
             User::hashCrypt($_POST['password']),
             Util::ucFirst($username),
@@ -410,12 +409,12 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             $doExpire,
             User::$localeId,
             ACC_STATUS_NEW,
-            $delay,
+            CFG_ACCOUNT_CREATE_SAVE_DECAY,
             $token
         );
         if (!$id)                                           // something went wrong
             return Lang::$account['intError'];
-        else if ($_ = $this->sendMail($email, Lang::$mail['accConfirm'][0], sprintf(Lang::$mail['accConfirm'][1], $token), $delay))
+        else if ($_ = $this->sendMail($email, Lang::$mail['accConfirm'][0], sprintf(Lang::$mail['accConfirm'][1], $token), CFG_ACCOUNT_CREATE_SAVE_DECAY))
         {
             // success:: update ip-bans
             if (!$ip || $ip['unbanDate'] < time())
@@ -429,12 +428,11 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
     private function doRecoverPass($target)
     {
-        $delay = 5 * MINUTE;
-        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_PASS, $target, $delay, $token))
+        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_PASS, $target, CFG_ACCOUNT_RECOVERY_DECAY, $token))
             return $_;
 
         // send recovery mail
-        return $this->sendMail($target, Lang::$mail['resetPass'][0], sprintf(Lang::$mail['resetPass'][1], $token), $delay);
+        return $this->sendMail($target, Lang::$mail['resetPass'][0], sprintf(Lang::$mail['resetPass'][1], $token), CFG_ACCOUNT_RECOVERY_DECAY);
     }
 
     private function doResetPass()
@@ -460,12 +458,11 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
     private function doRecoverUser($target)
     {
-        $delay = 5 * MINUTE;
-        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_USER, $target, $delay, $token))
+        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_USER, $target, CFG_ACCOUNT_RECOVERY_DECAY, $token))
             return $_;
 
         // send recovery mail
-        return $this->sendMail($target, Lang::$mail['recoverUser'][0], sprintf(Lang::$mail['recoverUser'][1], $token), $delay);
+        return $this->sendMail($target, Lang::$mail['recoverUser'][0], sprintf(Lang::$mail['recoverUser'][1], $token), CFG_ACCOUNT_RECOVERY_DECAY);
     }
 
     private function initRecovery($type, $target, $delay, &$token)
