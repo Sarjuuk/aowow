@@ -93,9 +93,9 @@ class ItemList extends BaseType
         {
             $ids = array_keys($this->templates);
             $itemz = DB::Aowow()->select('
-                SELECT   nv.item AS ARRAY_KEY1, nv.entry AS ARRAY_KEY2,               0 AS eventId,   nv.maxcount, iec.* FROM            npc_vendor   nv                                       LEFT JOIN ?_itemextendedcost iec ON   nv.extendedCost = iec.id                                                   WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
+                SELECT   nv.item AS ARRAY_KEY1, nv.entry AS ARRAY_KEY2,                                             0  AS eventId,   nv.maxcount, iec.* FROM            npc_vendor   nv                                                                                      LEFT JOIN ?_itemextendedcost iec ON   nv.extendedCost = iec.id                                                   WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
                 UNION
-                SELECT genv.item AS ARRAY_KEY1,     c.id AS ARRAY_KEY2, genv.eventEntry AS eventId, genv.maxcount, iec.* FROM game_event_npc_vendor genv JOIN creature c ON c.guid = genv.guid LEFT JOIN ?_itemextendedcost iec ON genv.extendedCost = iec.id {JOIN creature c ON c.guid = genv.guid AND 1= ?d} WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
+                SELECT genv.item AS ARRAY_KEY1,     c.id AS ARRAY_KEY2, IFNULL(IF(e.holidayId, e.holidayId, -e.id), 0) AS eventId, genv.maxcount, iec.* FROM game_event_npc_vendor genv JOIN creature c ON c.guid = genv.guid LEFT JOIN ?_events e ON genv.eventEntry = e.id LEFT JOIN ?_itemextendedcost iec ON genv.extendedCost = iec.id {JOIN creature c ON c.guid = genv.guid AND 1= ?d} WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
                 empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
                 $ids,
                 empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : 1,
@@ -308,14 +308,10 @@ class ItemList extends BaseType
                     $data[$this->id]['avail'] = $cost['stock']; // display as number on icon
                     $data[$this->id]['cost']  = [$this->getField('buyPrice')];
 
-                    if ($e = $cost['event'])
+                    if ($cost['event'])
                     {
-                        $this->jsGlobals[TYPE_WORLDEVENT][$e] = $e;
-                        $data[$this->id]['condition'] = array(
-                            'type'   => TYPE_WORLDEVENT,
-                            'typeId' => -$e,
-                            'status' => 1
-                        );
+                        $this->jsGlobals[TYPE_WORLDEVENT][$cost['event']] = $cost['event'];
+                        $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $cost['event']]];
                     }
 
                     if ($currency || $tokens)               // fill idx:3 if required

@@ -31,7 +31,6 @@ trait DetailPage
 trait ListPage
 {
     protected $category  = null;
-    protected $typeId    = 0;
     protected $filter    = [];
     protected $lvTabs    = [];                              // most pages have this
 
@@ -247,7 +246,7 @@ class GenericPage
 
     private function addArticle()                           // get article & static infobox (run before processing jsGlobals)
     {
-        if (empty($this->type) && !isset($this->typeId))
+        if (empty($this->type) || !isset($this->typeId))
             return;
 
         $article = DB::Aowow()->selectRow(
@@ -577,7 +576,10 @@ class GenericPage
                     $cnd[] = ['holidayId', array_unique($hIds, SORT_NUMERIC)];
 
                 if ($eIds)
-                    $cnd[] = ['id', array_unique($eIds, SORT_NUMERIC)];
+                {
+                    array_walk($eIds, function(&$v) { $v = abs($v);});
+                    $cnd[] = ['e.id', array_unique($eIds, SORT_NUMERIC)];
+                }
 
                 if ($eIds && $hIds)
                     $cnd[] = 'OR';

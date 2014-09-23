@@ -266,8 +266,6 @@ class SpellPage extends GenericPage
         if (($_ = $this->subject->getField('duration')) && $_ > 0)
             $this->duration = Util::formatTime($_);
 
-
-
         // factionchange-equivalent
         /* nyi
             $pendant = DB::Aowow()->selectCell('SELECT IF(hordethis->typeId = ?d, alliancethis->typeId, -hordethis->typeId) FROM player_factionchange_spells WHERE alliancethis->typeId = ?d OR hordethis->typeId = ?d', $this->typeId, $this->typeId, $this->typeId);
@@ -570,10 +568,9 @@ class SpellPage extends GenericPage
                     if (($bar = $this->subject->getField('effect'.$i.'CreateItemId')) && isset($foo[$bar]))
                     {
                         $lv[$bar] = $foo[$bar];
-                        $lv[$bar]['percent']     = $extraItem['additionalCreateChance'];
-                        $lv[$bar]['condition'][] = ['type' => TYPE_SPELL, 'typeId' => $extraItem['requiredSpecialization'], 'status' => 2];
+                        $lv[$bar]['percent'] = $extraItem['additionalCreateChance'];
+                        $lv[$bar]['condition'][0][$this->typeId][] = [[CND_SPELL, $extraItem['requiredSpecialization']]];
                         $this->extendGlobalIds(TYPE_SPELL, $extraItem['requiredSpecialization']);
-
                         $extraCols[] = 'Listview.extraCols.condition';
                         if ($max = $extraItem['additionalMaxNum'])
                         {
@@ -777,60 +774,80 @@ class SpellPage extends GenericPage
                     if (empty($lvZones[$a['area']]))
                         continue;
 
-                    $_ = ['condition' => []];
+                    $condition = [];
                     $extra = false;
                     if ($a['aura_spell'])
                     {
-                        $this->extendGlobalIds(TYPE_SPELL, $a['aura_spell']);
-                        $_['condition'][] = array(
-                            'type'   => TYPE_SPELL,
-                            'typeId' => abs($a['aura_spell']),
-                            'status' => $a['aura_spell'] > 0 ? 1 : 0
-                        );
+                        $this->extendGlobalIds(TYPE_SPELL, abs($a['aura_spell']));
+                        $condition[0][$this->typeId][] = [[$a['aura_spell'] >  0 ? CND_AURA : -CND_AURA, abs($a['aura_spell'])]];
                     }
 
                     if ($a['quest_start'])                  // status for quests needs work
                     {
                         $this->extendGlobalIds(TYPE_QUEST, $a['quest_start']);
-                        $_['condition'][] = array(
-                            'type'   => TYPE_QUEST,
-                            'typeId' => $a['quest_start'],
-                            'status' => $a['quest_start_status'] & 0x8 ? 1 : 2
-                        );
+                        $group = [];
+                        for ($i = 0; $i < 7; $i++)
+                        {
+                            if (!($a['quest_start_status'] & (1 << $i)))
+                                continue;
+
+                            if ($i == 0)
+                                $group[] = [CND_QUEST_NONE, $a['quest_start']];
+                            else if ($i == 1)
+                                $group[] = [CND_QUEST_COMPLETE, $a['quest_start']];
+                            else if ($i == 3)
+                                $group[] = [CND_QUESTTAKEN, $a['quest_start']];
+                            else if ($i == 6)
+                                $group[] = [CND_QUESTREWARDED, $a['quest_start']];
+                        }
+
+                        if ($group)
+                            $condition[0][$this->typeId][] = $group;
                     }
 
                     if ($a['quest_end'] && $a['quest_end'] != $a['quest_start'])
                     {
                         $this->extendGlobalIds(TYPE_QUEST, $a['quest_end']);
-                        $_['condition'][] = array(
-                            'type'   => TYPE_QUEST,
-                            'typeId' => $a['quest_end'],
-                            'status' => $a['quest_start_status'] & 0x8 ? 1 : 0
-                        );
+                        $group = [];
+                        for ($i = 0; $i < 7; $i++)
+                        {
+                            if (!($a['quest_end_status'] & (1 << $i)))
+                                continue;
+
+                            if ($i == 0)
+                                $group[] = [-CND_QUEST_NONE, $a['quest_end']];
+                            else if ($i == 1)
+                                $group[] = [-CND_QUEST_COMPLETE, $a['quest_end']];
+                            else if ($i == 3)
+                                $group[] = [-CND_QUESTTAKEN, $a['quest_end']];
+                            else if ($i == 6)
+                                $group[] = [-CND_QUESTREWARDED, $a['quest_end']];
+                        }
+
+                        if ($group)
+                            $condition[0][$this->typeId][] = $group;
                     }
 
                     if ($a['racemask'])
                     {
                         $foo = [];
-                        for ($i = 0; $i < 10; $i++)
-                            if ($a['racemask'] & $i)
+                        for ($i = 0; $i < 11; $i++)
+                            if ($a['racemask'] & (1 << $i))
                                 $foo[] = $i + 1;
 
                         $this->extendGlobalIds(TYPE_RACE, $foo);
-                        $_['condition'][] = array(
-                            'type'   => TYPE_RACE,
-                            'typeId' => $a['racemask'],
-                            'status' => 1
-                        );
+                        $condition[0][$this->typeId][] = [[CND_RACE, $a['racemask']]];
                     }
 
                     if ($a['gender'] != 2)                  // 2: both
-                        $_['condition'][] = ['gender' => $a['gender'] + 1];
+                        $condition[0][$this->typeId][] = [[CND_GENDER, $a['gender'] + 1]];
 
-                    if ($_['condition'])
+                    $row = $lvZones[$a['area']];
+                    if ($condition)
+                    {
                         $extra = true;
-
-                    $row = array_merge($_, $lvZones[$a['area']]);
+                        $row   = array_merge($row, ['condition' => $condition]);
+                    }
 
                     // merge subzones, into one row, if: conditions match && parentZone is shared
                     if ($p = $zones->getEntry($a['area'])['parentArea'])
@@ -845,7 +862,13 @@ class SpellPage extends GenericPage
                     $set = false;
                     foreach ($lv as &$v)
                     {
-                        if ($v['condition'] != $row['condition'] || ($v['parentArea'] != $row['parentArea'] && $v['id'] != $row['parentArea']))
+                        if ($v['parentArea'] != $row['parentArea'] && $v['id'] != $row['parentArea'])
+                            continue;
+
+                        if (empty($v['condition']) xor empty($row['condition']))
+                            continue;
+
+                        if (!empty($row['condition']) && !empty($v['condition']) && $v['condition'] != $row['condition'])
                             continue;
 
                         if (!$row['parentArea'] && $v['id'] != $row['parentArea'])
@@ -1058,11 +1081,28 @@ class SpellPage extends GenericPage
         // taughtbytrainers
         // taughtbyitem
 
+        // tab: conditions
+        $sc = Util::getServerConditions([CND_SRC_SPELL_LOOT_TEMPLATE, CND_SRC_SPELL_IMPLICIT_TARGET, CND_SRC_SPELL, CND_SRC_SPELL_CLICK_EVENT, CND_SRC_VEHICLE_SPELL, CND_SRC_SPELL_PROC], null, $this->typeId);
+        if ($sc[0])
+        {
+            if (!empty($sc[0]))
+            {
+                $this->extendGlobalData($sc[1]);
+                $tab = "<script type=\"text/javascript\">\n" .
+                       "var markup = ConditionList.createTab(".json_encode($sc[0], JSON_NUMERIC_CHECK).");\n" .
+                       "Markup.printHtml(markup, 'tab-conditions', { allow: Markup.CLASS_STAFF })" .
+                       "</script>";
 
-        /* NEW
-            conditions
-        */
-
+                $this->lvTabs[] = array(
+                    'file'   => null,
+                    'data'   => $tab,
+                    'params' => array(
+                        'id'   => 'conditions',
+                        'name' => '$LANG.requires'
+                    )
+                );
+            }
+        }
     }
 
     protected function generateTooltip($asError = false)
@@ -1550,6 +1590,7 @@ class SpellPage extends GenericPage
                     break;
                 case 28:                                    // Summon
                 case 90:                                    // Kill Credit
+                case 134:                                   // Kill Credit2
                     $_ = Lang::$game['npc'].' #'.$effMV;
                     if ($summon = $this->subject->getModelInfo($this->typeId))
                     {
@@ -1608,7 +1649,6 @@ class SpellPage extends GenericPage
                         $_ = '(<a href="?object='.$summon['typeId'].'">'.$summon['displayName'].'</a>)';
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_OBJECT, 'displayId' => $summon['displayId']];
                     }
-
 
                     $foo['name'] .= Lang::$main['colon'].$_;
                     break;

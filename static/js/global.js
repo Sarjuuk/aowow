@@ -6824,7 +6824,7 @@ Listview.headerFilter = function(col, res) {
     }
 
     if (res == null) {
-        var res = prompt($WH.sprintf(LANG.prompt_colfilter1 + (col.type == 'text' ? LANG.prompt_colfilter2: LANG.prompt_colfilter3), col.name), prefilled);
+        var res = prompt($WH.sprintf(LANG.prompt_colfilter1 + (col.type == 'text' ? LANG.prompt_colfilter2 : LANG.prompt_colfilter3), col.name), prefilled);
     }
 
     if (res != null) {
@@ -7428,282 +7428,45 @@ Listview.extraCols = {
     },
 
     condition: {
-        /*
-            condition.status: [
-                0: missing
-                1: active
-                2: done / obtained
-            ]
-
-            LANG.completed
-            LANG.earned
-            LANG.progress
-
-            probably also zones, skill, faction, ..
-        */
-
         id: 'condition',
         name: LANG.requires,
+        type: 'text',
         width: '25%',
         compute: function(row, td) {
-            if (!row.condition || !$WH.is_array(row.condition)) {
+            if (!row.condition)
                 return;
-            }
 
             td.className = 'small';
             td.style.lineHeight = '18px';
 
-            for (i in row.condition) {
-                if (cnd = Listview.extraCols.condition.getState(row.condition[i])) {
-                    if (td.innerHTML)
-                        $WH.ae(td, $WH.ce('br'));
+            var mText = ConditionList.createCell(row.condition);
+            Markup.printHtml(mText, td);
 
-                    var span = $WH.ce('span');
-                    span.className = cnd.color;
-                    $WH.ae(span, cnd.state);
-                    $WH.ae(td, span);
+            return;
 
-                    for (j in cnd.links) {
-                        if (j > 0) {
-                            $WH.ae(td, $WH.ct(LANG.comma));
-                        }
-
-                        var
-                            l = cnd.links[j],
-                            a = $WH.ce('a');
-
-                        a.href = l.url;
-                        a.style.whiteSpace = 'nowrap';
-
-                        // points to self
-                        if (g_pageInfo.type == row.condition[i].type && g_pageInfo.typeId == row.condition[i].typeId) {
-                            a.className = 'q1';
-                            $WH.st(a, 'This');
-                        }
-                        else {
-                            $WH.ae(a, $WH.ct(l.name));
-
-                            if (l.icon) {
-                                a.className = 'icontiny tinyspecial';
-                                a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + l.icon + '.gif)';
-                            }
-
-                            if (l.color) {
-                                a.className += ' ' + l.color;
-                            }
-                        }
-
-                        $WH.ae(td, a);
-                    }
-                }
-                else if ('gender' in row.condition[i]) {
-                    var
-                        gender = g_file_genders[row.condition[i].gender - 1],
-                        sp = $WH.ce('span');
-
-                    sp.className = 'icon-' + gender;
-                    sp.style.position = 'absolute';
-                    sp.style.right = '0px';
-                    sp.style.top   = '3px';
-                    sp.innerHTML = '&nbsp;';
-                    g_addTooltip(sp, LANG[gender]);
-
-                    td.style.position = 'relative';
-
-                    $WH.ae(td, sp);
-                }
-            }
         },
         getVisibleText: function(row) {
-            var buff = '';
+            var
+                buff = '',
+                mText;
 
-            if (!row.condition || !$WH.is_array(row.condition)) {
+            if (!row.condition)
                 return buff;
-            }
 
-            for (i in row.condition) {
-                var cnd = Listview.extraCols.condition.getState(row.condition[i]);
-                if (!cnd) {
-                    continue;
-                }
+            mText = ConditionList.createCell(row.condition);
 
-                for (j in cnd) {
-                    buff += cnd[j].name + ' ' + cnd.state;
-                }
-            }
-
-            return buff;
-        },
-        getState: function(cond) {
-            switch (g_types[cond.type]) {
-                case 'skill':
-                    return Listview.extraCols.condition.getSkillState(cond);
-                case 'spell':
-                    return Listview.extraCols.condition.getSpellState(cond);
-                case 'item':
-                    return Listview.extraCols.condition.getItemState(cond);
-                case 'achievement':
-                    return Listview.extraCols.condition.getAchievementState(cond);
-                case 'quest':
-                    return Listview.extraCols.condition.getQuestState(cond);
-                case 'event':
-                    return Listview.extraCols.condition.getEventState(cond);
-                case 'race':
-                    return Listview.extraCols.condition.getRaceState(cond);
-                default:
-                    return null;
-            }
-        },
-        getSkillState: function(cond) {
-            if (!cond.typeId || !g_skills[cond.typeId]) {
-                return;
-            }
-
-            var
-                cnd  = {},
-                item = g_skills[cond.typeId];
-
-            cnd.state = $WH.ct((cond.status ? LANG.pr_note_known : LANG.pr_note_missing) + LANG.colon);
-            cnd.color = cond.status ? 'q2' : 'q10';
-            cnd.links = [{
-                icon: item.icon.toLowerCase(),
-                name: item['name_' + Locale.getName()],
-                url : '?skill=' + cond.typeId
-            }];
-
-            if (cond.reqSkillLvl)
-                cnd.l.name += ' (' + cond.reqSkillLvl + ')';
-
-            return cnd;
-        },
-        getSpellState: function(cond) {
-            if (!cond.typeId || !g_spells[cond.typeId]) {
-                return;
-            }
-
-            var
-                cnd  = {},
-                item = g_spells[cond.typeId];
-
-            cnd.state = $WH.ct((cond.status ? LANG.pr_note_known : LANG.pr_note_missing) + LANG.colon);
-            cnd.color = cond.status ? 'q2' : 'q10';
-            cnd.links = [{
-                icon: item.icon.toLowerCase(),
-                name: item['name_' + Locale.getName()],
-                url : '?spell=' + cond.typeId
-            }];
-
-            return cnd;
-        },
-        getItemState: function(cond) {
-            if (!cond.typeId || !g_items[cond.typeId]) {
-                return;
-            }
-
-            var
-                cnd  = {},
-                item = g_items[cond.typeId];
-
-            cnd.state = $WH.ct((cond.status ? LANG.pr_note_earned : LANG.pr_note_missing) + LANG.colon);
-            cnd.color = cond.status ? 'q2' : 'q10';
-            cnd.links = [{
-                icon : item.icon.toLowerCase(),
-                name : item['name_' + Locale.getName()],
-                url  : '?item=' + cond.typeId,
-                color: 'q' + item.quality
-            }];
-
-            return cnd;
-        },
-        getAchievementState: function(cond) {
-            if (!cond.typeId || !g_achievements[cond.typeId]) {
-                return;
-            }
-
-            var
-                cnd  = {},
-                item = g_achievements[cond.typeId];
-
-            cnd.state = $WH.ct((cond.status ? LANG.pr_note_earned : LANG.pr_note_incomplete) + LANG.colon);
-            cnd.color = cond.status ? 'q2' : 'q10';
-            cnd.links = [{
-                icon: item.icon.toLowerCase(),
-                name: item['name_' + Locale.getName()],
-                url : '?achievement=' + cond.typeId
-            }];
-
-            return cnd;
-        },
-        getQuestState: function(cond) {
-            if (!cond.typeId || !g_quests[cond.typeId]) {
-                return;
-            }
-
-            var
-                cnd  = {},
-                item = g_quests[cond.typeId];
-
-            cnd.state = $WH.ct((cond.status == 1 ? LANG.progress : (cond.status == 2 ? LANG.pr_note_complete : LANG.pr_note_incomplete)) + LANG.colon);
-            cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
-            cnd.links = [{
-                name: item['name_' + Locale.getName()],
-                url : '?quest=' + cond.typeId
-            }];
-
-            return cnd;
-        },
-        getRaceState: function(cond) {
-            if (!cond.typeId) {
-                return;
-            }
-
-            var
-                cnd   = {},
-                name  = $WH.ce('div'),
-                races = Listview.funcBox.assocBinFlags(cond.typeId, g_chr_races);
-
-            cnd.state = $WH.ct((cond.status ? 'Player is' : 'Player is not') + LANG.colon);
-            cnd.color = 'q1';
-            cnd.links = [];
-
-            for (var i = 0, len = races.length; i < len; ++i) {
-                cnd.links.push({
-                    name: g_chr_races[races[i]],
-                    url : '?class=' + races[i]
-                });
-            }
-
-            return cnd;
-        },
-        getEventState: function(cond) {
-            if (!cond.typeId || !g_holidays[cond.typeId]) {
-                return;
-            }
-
-            var
-                cnd  = {},
-                item = g_holidays[cond.typeId];
-
-            cnd.state = $WH.ct((cond.status == 1 ? 'active' : (cond.status == 2 ? LANG.pr_note_complete : 'inactive')) + LANG.colon);
-            cnd.color = cond.status == 1 ? 'q1' : cond.status == 2 ? 'q2' : 'q10';
-            cnd.links = [{
-                icon: item.icon.toLowerCase(),
-                name: item['name_' + Locale.getName()],
-                url :'?event=' + cond.typeId
-            }];
-
-            return cnd;
+            return Markup.removeTags(mText);
         },
         sortFunc: function(a, b, col) {
-            var text1 = this.getVisibleText(a);
-            var text2 = this.getVisibleText(b);
+            var
+                text1 = this.getVisibleText(a),
+                text2 = this.getVisibleText(b);
 
-            if (text1 != '' && text2 == '') {
+            if (text1 != '' && text2 == '')
                 return -1;
-            }
-            if (text2 != '' && text1 == '') {
+
+            if (text2 != '' && text1 == '')
                 return 1;
-            }
 
             return $WH.strcmp(text1, text2);
         }
@@ -20100,3 +19863,277 @@ function g_getIngameLink(color, id, name) {
  * Wowhead Site Achievements (WSA)
  * which i intend to ignore
 */
+
+/* custom */
+var ConditionList = new function() {
+    var
+        self = this,
+        _conditions = null;
+
+    self.createCell = function(conditions) {
+        if (!conditions)
+            return null;
+
+        _conditions = conditions;
+
+        return _createCell();
+    };
+    self.createTab = function(conditions) {
+        if (!conditions)
+            return null;
+
+        _conditions = conditions;
+
+        return _createTab();
+    };
+
+    function _listing(mask, src, tpl) {
+        var
+            arr  = Listview.funcBox.assocBinFlags(mask, src).sort(),
+            buff = '';
+
+        for (var i = 0, len = arr.length; i < len; ++i) {
+            if (len > 1 && i == len - 1)
+                buff += LANG.or;
+            else if (i > 0)
+                buff += ', ';
+
+            buff += $WH.sprintf(tpl, arr[i], src[arr[i]]);;
+        }
+
+        return buff;
+    }
+
+    function _parseEntry(entry) {
+        var
+            cnd    = entry,
+            str    = '',
+            param  = ['', null];
+            strIdx = Math.abs(entry[0]);
+
+        if (strIdx == 22 || strIdx == 23)
+            strIdx = 4;
+        else if (strIdx == 16 || strIdx == 30 || strIdx == 32)
+            strIdx--;;
+
+        if (!g_conditions[strIdx])
+            return 'unknown condition index ' + strIdx;
+
+        // these cases are not (yet) handled in detail
+        if ($WH.in_array([11, 13, 21, 24, 33, 34], strIdx) != -1)
+            return g_conditions[strIdx].replace(/\$([^\$:;]*):([^\$:;]*);/, '$' + (entry[0] > 0 ? 1 : 2));
+
+        switch (Math.abs(entry[0])) {
+            case  1:
+            case 25: param[0] = '[spell=' + entry[1] + ']'; break;
+            case  2: param[1] = entry[2];             // do not break
+            case  3: param[0] = '[item=' + entry[1] + ']'; break;
+            case  4:
+            case 23: param[0] = '[zone=' + entry[1] + ']'; break;
+            case  8:
+            case  9:
+            case 14:
+            case 28: param[0] = '[quest=' + entry[1] + ']'; break;
+            case 12: param[0] = '[event=' + entry[1] + ']'; break;
+            case 17: param[0] = '[achievement=' + entry[1] + ']'; break;
+            case 18: param[0] = '[title=' + entry[1] + ']'; break;
+            case  6: param[0] = g_sides[entry[1]]; break;
+            case 10: param[0] = g_drunk_states[entry[1]]; break;
+            case 22: param[0] = g_zone_categories[entry[1]]; break;
+            case 15: param[0] = _listing(entry[1], g_chr_classes, '[class=$1]'); break;
+            case 16: param[0] = _listing(entry[1], g_chr_races, '[race=$1]'); break;
+            case  7: param[0] = '[skill=' + entry[1] + ']';
+                     if (entry[2])
+                         param[0] += $WH.sprintf(LANG.qty, entry[2]);
+                     break;
+            case  5: var standings = {};
+                     for (i in g_reputation_standings)
+                        standings[i * 1 + 1] = g_reputation_standings[i];
+
+                     param[0] = '[faction=' + entry[1] + ']';
+                     param[1] = _listing(entry[2], standings, '$2');
+                     break;
+            case 20: if (entry[1] == 0) {
+                         param[0] = LANG.male;
+                         param[1] = g_file_genders[0];
+                     }
+                     else if (entry[1] == 1) {
+                         param[0] = LANG.female;
+                         param[1] = g_file_genders[1];
+                     }
+                     else
+                         param[0] = g_npc_types[10];
+                     break;
+            case 29: param[0] = '[npc=' + entry[1] + ']';
+                     param[1] = entry[2];
+                     break;
+            case 30: param[0] = '[object=' + entry[1] + ']';
+                     param[1] = entry[2];
+                     break;
+            case 31: if (entry[2] && entry[1] == 3) {
+                         param[0] = '[npc=' + entry[2] + ']';
+                         break;
+                     }
+                     else if (entry[2] && entry[1] == 5) {
+                         param[0] = '[object=' + entry[2] + ']';
+                         break;
+                     }
+                     else                           // create mask from id and resolve in case 32
+                        entry[1] == (1 << entry[1]);
+            case 32: param[0] = _listing(entry[1], g_world_object_types, '$1'); break;
+            case 36: break;
+            case 27:
+            case 37:
+            case 38: param[0] = entry[1];
+                     param[1] = g_operators[entry[2]];
+                     break;
+            case 35: param[0] = entry[2];
+                     param[1] = g_operators[entry[3]];
+                     break;
+            case 26:
+                    var pIndex = 0;
+                    while (entry[1]) {
+                        if (entry[1] & (1 << pIndex)) {
+                            if (param[0])
+                                param[0] += ', ';
+
+                            param[0] += pIndex + 1;
+                            entry[1] &= ~(1 << pIndex);
+                        }
+                        pIndex++;
+                    }
+        }
+
+        str = g_conditions[strIdx];
+
+        // resolve nagation
+        str = str.replace(/\$([^\$:;]*):([^\$:;]*);/, '$' + (entry[0] > 0 ? 1 : 2));
+
+        // resolve params
+        return $WH.sprintf(str, param[0], param[1]);
+    }
+
+    function _createTab() {
+        var
+            nTabs    = Object.keys(_conditions).length,
+            nSubTabs = [],
+            buff     = '';
+
+        for (g in _conditions) {
+            nSubTabs[g] = Object.keys(_conditions[g]).length;
+            if (nSubTabs[g] > 1)
+                nTabs += nSubTabs[g];
+        }
+
+        if (nTabs > 1)
+            buff += '[tabs name=conditionSource]';
+
+        // tabs for conditionsTypes
+        for (g in _conditions) {
+            if (!g_condition_types[g])
+                continue;
+
+            var nSubTypes = Object.keys(_conditions[g]).length;
+
+            for (h in _conditions[g]) {
+                var
+                    srcGrp   = h.split(':');
+                    nGroups  = Object.keys(_conditions[g][h]).length,
+                    curGroup = 1;
+
+                if (nTabs > 1) {
+                    if (nSubTabs[g] > 1) {
+                        // only set for NPCs
+                        var sName = srcGrp[1];
+                        if ($WH.in_array([18, 21, 23], g) != -1)
+                            sName = g_npcs[srcGrp[1]]['name_' + Locale.getName()];
+                        buff += '[tab name="' + g_condition_types[g][0] + ' (' + sName + ')"]';
+                    }
+                    else
+                        buff += '[tab name="' + g_condition_types[g][0] + '"]';
+                }
+
+                buff += '[h3]' + $WH.sprintf(g_condition_types[g][1], srcGrp[0], srcGrp[1] || '') + '[/h3]';
+
+                if (nGroups > 1) {
+                    buff += LANG.note_condition_group + '[br][br]';
+                    buff += '[table class=grid]';
+                }
+
+                // table for elseGroups
+                for (i in _conditions[g][h]) {
+                    var
+                        group    = _conditions[g][h][i],
+                        nEntries = Object.keys(_conditions[g][h][i]).length;
+
+                    if (nGroups <= 1 && nEntries > 1)
+                        buff += LANG.note_condition + '[br][br]';
+                    if (nGroups > 1)
+                        buff += '[tr][td width=70px valign=middle align=center]' + LANG.group + ' ' + (curGroup++) + LANG.colon + '[/td][td]';
+
+                    // individual conditions
+                    for (j in group)
+                        buff += _parseEntry(group[j]) + '[br]';
+
+                    if (nGroups > 1)
+                        buff += '[/td][/tr]';
+                }
+
+                if (nGroups > 1)
+                    buff += '[/tr][/table]';
+
+                if (nTabs > 1)
+                    buff += '[/tab]';
+            }
+        }
+
+        if (nTabs > 1)
+            buff += '[/tabs]';
+
+        return buff;
+    }
+
+    function _createCell() {
+        var rows = [];
+
+        // tabs for conditionsTypes
+        for (g in _conditions) {
+            for (h in _conditions[g]) {
+
+                // table for elseGroups
+                for (i in _conditions[g][h]) {
+                    var
+                        subGroup = [],
+                        group    = _conditions[g][h][i],
+                        nEntries = Object.keys(_conditions[g][h][i]).length;
+
+                    // individual conditions
+                    for (j in group) {
+                        if (nEntries > 1)
+                            subGroup.push(_parseEntry(group[j]));
+                        else
+                            rows.push(_parseEntry(group[j]));
+                    }
+
+                    if (subGroup.length) {
+                        var buff = '';
+                        for (j in subGroup) {
+                            if (j > 0 && j == subGroup.length - 1)
+                                buff += LANG.and;
+                            else if (j > 0)
+                                buff += ', ';
+
+                            buff += subGroup[j];
+                        }
+
+                        rows.push(buff);
+                    }
+                }
+            }
+        }
+
+        return rows.length > 1 ? '[ul][li]' + rows.join('[/li][li]') + '[/li][/ul]' : rows[0];
+    }
+
+}
+/* end custom */

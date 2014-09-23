@@ -8,7 +8,15 @@ if ($isTabbed):
             <div class="clear"></div>
             <div id="tabs-generic"></div>
 <?php endif; ?>
-            <div id="lv-generic" class="listview"></div>
+            <div id="lv-generic" class="listview"><?php
+foreach ($this->lvTabs as $lv):
+    if ($lv['file']):
+        continue;
+    endif;
+
+    echo '<div class="text tabbed-contents" id="tab-'.$lv['params']['id'].'" style="display:none;">'.$lv['data'].'</div>';
+endforeach;
+            ?></div>
             <script type="text/javascript">//<![CDATA[
 <?php
 if (!empty($this->gemScores)):                              // inherited from items.tpl.php
@@ -25,7 +33,12 @@ foreach ($this->lvTabs as $lv):
             $lv['params']['tabs'] = '$'.$tabVar;
         endif;
 
-        $this->lvBrick($lv['file'], ['data' => $lv['data'], 'params' => $lv['params']]);
+        if ($lv['file']):
+            $this->lvBrick($lv['file'], ['data' => $lv['data'], 'params' => $lv['params']]);
+        elseif ($isTabbed):
+            $n = $lv['params']['name'][0] == '$' ? substr($lv['params']['name'], 1) : "'".$lv['params']['name']."'";
+            echo $tabVar.".add(".$n.", { id: '".$lv['params']['id']."' });\n";
+        endif;
     endif;
 endforeach;
 

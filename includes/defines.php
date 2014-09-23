@@ -754,4 +754,68 @@ define('ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE',                    112);
 // define('ACHIEVEMENT_CRITERIA_TYPE_DISENCHANT_ROLLS',                 117);
 // define('ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS',    119);
 
+// TrinityCore - Condition System
+define('CND_SRC_CREATURE_LOOT_TEMPLATE',      1);
+define('CND_SRC_DISENCHANT_LOOT_TEMPLATE',    2);
+define('CND_SRC_FISHING_LOOT_TEMPLATE',       3);
+define('CND_SRC_GAMEOBJECT_LOOT_TEMPLATE',    4);
+define('CND_SRC_ITEM_LOOT_TEMPLATE',          5);
+define('CND_SRC_MAIL_LOOT_TEMPLATE',          6);
+define('CND_SRC_MILLING_LOOT_TEMPLATE',       7);
+define('CND_SRC_PICKPOCKETING_LOOT_TEMPLATE', 8);
+define('CND_SRC_PROSPECTING_LOOT_TEMPLATE',   9);
+define('CND_SRC_REFERENCE_LOOT_TEMPLATE',     10);
+define('CND_SRC_SKINNING_LOOT_TEMPLATE',      11);
+define('CND_SRC_SPELL_LOOT_TEMPLATE',         12);
+define('CND_SRC_SPELL_IMPLICIT_TARGET',       13);
+define('CND_SRC_GOSSIP_MENU',                 14);
+define('CND_SRC_GOSSIP_MENU_OPTION',          15);
+define('CND_SRC_CREATURE_TEMPLATE_VEHICLE',   16);
+define('CND_SRC_SPELL',                       17);
+define('CND_SRC_SPELL_CLICK_EVENT',           18);
+define('CND_SRC_QUEST_ACCEPT',                19);
+define('CND_SRC_QUEST_SHOW_MARK',             20);
+define('CND_SRC_VEHICLE_SPELL',               21);
+define('CND_SRC_SMART_EVENT',                 22);
+define('CND_SRC_NPC_VENDOR',                  23);
+define('CND_SRC_SPELL_PROC',                  24);
+
+define('CND_AURA',            1);                           // aura is applied:         spellId,        UNUSED,     NULL
+define('CND_ITEM',            2);                           // owns item:               itemId,         count,      UNUSED
+define('CND_ITEM_EQUIPPED',   3);                           // has item equipped:       itemId,         NULL,       NULL
+define('CND_ZONEID',          4);                           // is in zone:              areaId,         NULL,       NULL
+define('CND_REPUTATION_RANK', 5);                           // reputation status:       factionId,      rankMask,   NULL
+define('CND_TEAM',            6);                           // is on team:              teamId,         NULL,       NULL
+define('CND_SKILL',           7);                           // has skill:               skillId,        value,      NULL
+define('CND_QUESTREWARDED',   8);                           // has finished quest:      questId,        NULL,       NULL
+define('CND_QUESTTAKEN',      9);                           // has accepted quest:      questId,        NULL,       NULL
+define('CND_DRUNKENSTATE',    10);                          // has drunken status:      stateId,        NULL,       NULL
+define('CND_WORLD_STATE',     11);
+define('CND_ACTIVE_EVENT',    12);                          // world event is active:   eventId,        NULL,       NULL
+define('CND_INSTANCE_INFO',   13);
+define('CND_QUEST_NONE',      14);                          // never seen quest:        questId,        NULL,       NULL
+define('CND_CLASS',           15);                          // belongs to classes:      classMask,      NULL,       NULL
+define('CND_RACE',            16);                          // belongs to races:        raceMask,       NULL,       NULL
+define('CND_ACHIEVEMENT',     17);                          // obtained achievement:    achievementId,  NULL,       NULL
+define('CND_TITLE',           18);                          // obtained title:          titleId,        NULL,       NULL
+define('CND_SPAWNMASK',       19);
+define('CND_GENDER',          20);                          // has gender:              genderId,       NULL,       NULL
+define('CND_UNIT_STATE',      21);
+define('CND_MAPID',           22);                          // is on map:               mapId,          NULL,       NULL
+define('CND_AREAID',          23);                          // is in area:              areaId,         NULL,       NULL
+define('CND_UNUSED_24',       24);
+define('CND_SPELL',           25);                          // knows spell:             spellId,        NULL,       NULL
+define('CND_PHASEMASK',       26);                          // is in phase:             phaseMask,      NULL,       NULL
+define('CND_LEVEL',           27);                          // player level is..:       level,          operator,   NULL
+define('CND_QUEST_COMPLETE',  28);                          // has completed quest:     questId,        NULL,       NULL
+define('CND_NEAR_CREATURE',   29);                          // is near creature:        creatureId,     dist,       NULL
+define('CND_NEAR_GAMEOBJECT', 30);                          // is near gameObject:      gameObjectId,   dist,       NULL
+define('CND_OBJECT_ENTRY',    31);                          // target is ???:           objectType,     id,         NULL
+define('CND_TYPE_MASK',       32);                          // target is type:          typeMask,       NULL,       NULL
+define('CND_RELATION_TO',     33);
+define('CND_REACTION_TO',     34);
+define('CND_DISTANCE_TO',     35);                          // distance to target       targetType,     dist,       operator
+define('CND_ALIVE',           36);                          // target is alive:         NULL,           NULL,       NULL
+define('CND_HP_VAL',          37);                          // targets absolute health: amount,         operator,   NULL
+define('CND_HP_PCT',          38);                          // targets relative health: amount,         operator,   NULL
 ?>

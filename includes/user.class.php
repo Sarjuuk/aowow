@@ -152,19 +152,16 @@ class User
             $loc = LOCALE_EN;
 
         // set
-        if ($loc != self::$localeId)
-        {
-            if (self::$id)
-                DB::Aowow()->query('UPDATE ?_account SET locale = ? WHERE id = ?', $loc, self::$id);
+        if (self::$id)
+            DB::Aowow()->query('UPDATE ?_account SET locale = ? WHERE id = ?', $loc, self::$id);
 
-            self::useLocale($loc);
-        }
+        self::useLocale($loc);
     }
 
     // only use once
     public static function useLocale($use)
     {
-        self::$localeId     = isset(Util::$localeStrings[$use]) ? $use : 0;
+        self::$localeId     = isset(Util::$localeStrings[$use]) ? $use : LOCALE_EN;
         self::$localeString = self::localeString(self::$localeId);
     }
 

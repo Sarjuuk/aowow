@@ -1374,6 +1374,12 @@ Variations:
     padding: 0;
 }
 
+.listview ul {
+    text-align: left;
+    margin: 0 0 0 15px;
+    padding: 0;
+}
+
 .listview th a:hover {
     background-color: #606060;
 }

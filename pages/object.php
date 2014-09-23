@@ -67,13 +67,10 @@ class ObjectPage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // Event
-        if ($_ = DB::Aowow()->selectRow('SELECT e.id, holidayId FROM ?_events e, game_event_gameobject geg, gameobject g WHERE e.id = ABS(geg.eventEntry) AND g.guid = geg.guid AND g.id = ?d', $this->typeId))
+        if ($_ = DB::Aowow()->selectCell('SELECT IF(holidayId, holidayId, -e.id) FROM ?_events e, game_event_gameobject geg, gameobject g WHERE e.id = ABS(geg.eventEntry) AND g.guid = geg.guid AND g.id = ?d', $this->typeId))
         {
-            if ($h = $_['holidayId'])
-            {
-                $this->extendGlobalIds(TYPE_WORLDEVENT, $_['id']);
-                $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].'[event='.$h.']';
-            }
+            $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
+            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].'[event='.$_.']';
         }
 
         // Reaction
@@ -409,7 +406,7 @@ class ObjectPage extends GenericPage
 
                     $reqQuest[$lv['id']] = 0;
 
-                    $lv['condition'][] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
+                    $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
                 }
 
                 $extraCols[] = 'Listview.extraCols.percent';

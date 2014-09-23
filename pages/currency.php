@@ -42,7 +42,7 @@ class CurrencyPage extends GenericPage
 
     protected function generateContent()
     {
-        $_itemId    = $this->subject->getField('itemId');
+        $_itemId = $this->subject->getField('itemId');
 
         /***********/
         /* Infobox */
@@ -111,8 +111,8 @@ class CurrencyPage extends GenericPage
 
                     foreach ($sbData as $k => &$row)
                     {
-                        $this->subject = [];
-                        $tokens   = [];
+                        $items  = [];
+                        $tokens = [];
                         foreach ($vendors[$k] as $id => $qty)
                         {
                             if (is_string($id))
@@ -121,43 +121,25 @@ class CurrencyPage extends GenericPage
                             if ($id > 0)
                                 $tokens[] = [$id, $qty];
                             else if ($id < 0)
-                                $this->subject[] = [-$id, $qty];
+                                $items[] = [-$id, $qty];
                         }
 
-                        if ($_ = $vendors[$k]['event'])
+                        if ($vendors[$k]['event'])
                         {
                             if (count($extraCols) == 3)             // not already pushed
                                 $extraCols[] = 'Listview.extraCols.condition';
 
-                            $holidays[$_] = 0;                      // applied as back ref.
-
-                            $row['condition'][] = array(
-                                'type'   => TYPE_WORLDEVENT,
-                                'typeId' => &$holidays[$_],
-                                'status' => 1
-                            );
+                            $this->extendGlobalIds(TYPE_WORLDEVENT, $vendors[$k]['event']);
+                            $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $vendors[$k]['event']]];
                         }
 
                         $row['stock'] = $vendors[$k]['stock'];
                         $row['stack'] = $itemObj->getField('buyCount');
                         $row['cost']  = array(
                             $itemObj->getField('buyPrice'),
-                            $this->subject ? $this->subject : null,
-                            $tokens   ? $tokens   : null
+                            $items  ? $items  : null,
+                            $tokens ? $tokens : null
                         );
-                    }
-
-                    if ($holidays)
-                    {
-                        $hObj = new WorldEventList(array(['id', array_keys($holidays)]));
-                        $this->extendGlobalData($hObj->getJSGlobals());
-                        foreach ($hObj->iterate() as $id => $tpl)
-                        {
-                            if ($_ = $tpl['holidayId'])
-                                $holidays[$tpl['eventBak']] = $_;
-                            else
-                                $holidays[-$id] = $id;
-                        }
                     }
 
                     $this->lvTabs[] = array(
@@ -231,7 +213,7 @@ class CurrencyPage extends GenericPage
                     'params' => [
                         'name'      => '$LANG.tab_currencyfor',
                         'id'        => 'currency-for',
-                        'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]",
+                        'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')]",
                         'note'      => $n ? '$$WH.sprintf(LANG.lvnote_filterresults, \''.$n.'\')' : null
                     ]
                 );

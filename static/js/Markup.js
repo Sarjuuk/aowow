@@ -576,7 +576,7 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
+                unnamed: { req: true, valid: /^-?[0-9]+$/ },
                 domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
                 site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
             },
@@ -2428,7 +2428,8 @@ var Markup = {
                 return str;
             }
         },
-        tr: {
+        tr:
+        {
             empty: false,
             itrim: true,
             allowedChildren: { td: 1 },

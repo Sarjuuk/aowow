@@ -22,7 +22,7 @@ class MorePage extends GenericPage
         'searchbox'     => [-16,    0, 'Search Box'],
         'tooltips'      => [-10,    0, 'Tooltips'],
         'faq'           => [ -3,    0, 'Frequently Asked Questions'],
-        'aboutus'       => [  0,    0, 'What is AoWoW?'],
+        'aboutus'       => [ -1,    0, 'What is AoWoW?'],
         'searchplugins' => [ -8,    0, 'Search Plugins'],
         'help'          => [-13, null, '']
     );

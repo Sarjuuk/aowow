@@ -92,8 +92,11 @@ session_start();
 if (User::init())
     User::save();                                           // save user-variables in session
 
-
+// hard-override locale for this call (should this be here..?)
 // all strings attached..
+if (isset($_GET['locale']) && (CFG_LOCALES & (1 << (int)$_GET['locale'])))
+    User::useLocale($_GET['locale']);
+
 Lang::load(User::$localeString);
 
 

@@ -426,7 +426,7 @@ class SpellList extends BaseType
                     break;
                 }
                 // NPC Model from MiscVal
-                else if (in_array($this->curTpl['effect'.$i.'Id'], [28, 90]) || in_array($this->curTpl['effect'.$i.'AuraId'], [56, 78]))
+                else if (in_array($this->curTpl['effect'.$i.'Id'], [28, 90, 134]) || in_array($this->curTpl['effect'.$i.'AuraId'], [56, 78]))
                 {
                     $displays[TYPE_NPC][$id] = $effMV;
                     break;

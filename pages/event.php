@@ -226,14 +226,8 @@ class EventPage extends GenericPage
                 $relEvents = new WorldEventList(array(['id', $list]));
                 $this->extendGlobalData($relEvents->getJSGlobals());
                 $relData   = $relEvents->getListviewData();
-                foreach ($relEvents->iterate() as $id => $__)
-                {
-                    $relData[$id]['condition'][] = array(
-                        'type'   => TYPE_WORLDEVENT,
-                        'typeId' => -$this->eId,
-                        'status' => 2
-                    );
-                }
+                foreach ($relEvents->getFoundIDs() as $id)
+                    $relData[$id]['condition'][0][$this->typeId][] = [[-CND_ACTIVE_EVENT, -$this->eId]];
 
                 $this->extendGlobalData($this->subject->getJSGlobals());
                 foreach ($rel as $r)
@@ -241,14 +235,10 @@ class EventPage extends GenericPage
                     if ($r >= 0)
                         continue;
 
-                    $this->extendGlobalIds(TYPE_WORLDEVENT, -$r);
+                    $this->extendGlobalIds(TYPE_WORLDEVENT, $r);
 
                     $d = $this->subject->getListviewData();
-                    $d[-$this->eId]['condition'][] = array(
-                        'type'   => TYPE_WORLDEVENT,
-                        'typeId' => $r,
-                        'status' => 2
-                    );
+                    $d[-$this->eId]['condition'][0][$this->typeId][] = [[-CND_ACTIVE_EVENT, $r]];
 
                     $relData = array_merge($relData, $d);
                 }

@@ -1558,6 +1558,149 @@ class Util
 
         return $coords ? true : false;
     }
+
+    public static function getServerConditions($srcType, $srcGroup = null, $srcEntry = null)
+    {
+        if (!$srcGroup && !$srcEntry)
+            return [];
+
+        $result    = [];
+        $jsGlobals = [];
+
+        $conditions = DB::Aowow()->select(
+            'SELECT  SourceTypeOrReferenceId, SourceEntry, SourceGroup, ElseGroup,
+                     ConditionTypeOrReference, ConditionTarget, ConditionValue1, ConditionValue2, ConditionValue3, NegativeCondition
+            FROM     conditions
+            WHERE    SourceTypeOrReferenceId IN (?a) AND ?# = ?d
+            ORDER BY SourceTypeOrReferenceId, SourceEntry, SourceGroup, ElseGroup ASC',
+            is_array($srcType) ? $srcType : [$srcType],
+            $srcGroup ? 'SourceGroup' : 'SourceEntry',
+            $srcGroup ?: $srcEntry
+        );
+
+        foreach ($conditions as $c)
+        {
+            switch ($c['SourceTypeOrReferenceId'])
+            {
+                case CND_SRC_SPELL_CLICK_EVENT:             // 18
+                case CND_SRC_VEHICLE_SPELL:                 // 21
+                case CND_SRC_NPC_VENDOR:                    // 23
+                    $jsGlobals[TYPE_NPC][] = $c['SourceGroup'];
+                    break;
+            }
+
+            switch ($c['ConditionTypeOrReference'])
+            {
+                case CND_AURA:                              // 1
+                    $c['ConditionValue2'] = NULL;           // do not use his param
+                case CND_SPELL:                             // 25
+                    $jsGlobals[TYPE_SPELL][] = $c['ConditionValue1'];
+                    break;
+                case CND_ITEM:                              // 2
+                    $c['ConditionValue3'] = NULL;           // do not use his param
+                case CND_ITEM_EQUIPPED:                     // 3
+                    $jsGlobals[TYPE_ITEM][] = $c['ConditionValue1'];
+                    break;
+                case CND_MAPID:                             // 22 - break down to area or remap for use with g_zone_categories
+                    switch ($c['ConditionValue1'])
+                    {
+                        case 530:                           // outland
+                            $c['ConditionValue1'] = 8;
+                            break;
+                        case 571:                           // northrend
+                            $c['ConditionValue1'] = 10;
+                            break;
+                        case 0:                             // old world is fine
+                        case 1:
+                            break;
+                        default:                            // remap for area
+                            $cnd = array(
+                                ['mapId', (int)$c['ConditionValue1']],
+                                ['parentArea', 0],          // not child zones
+                                [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
+                                1                           // only one result
+                            );
+                            $zone = new ZoneList($cnd);
+                            if (!$zone->error)
+                            {
+                                $jsGlobals[TYPE_ZONE][] = $zone->getField('id');
+                                $c['ConditionTypeOrReference'] = CND_ZONEID;
+                                $c['ConditionValue1'] = $zone->getField('id');
+                                break;
+                            }
+                            else
+                                continue;
+                    }
+                case CND_ZONEID:                            // 4
+                case CND_AREAID:                            // 23
+                    $jsGlobals[TYPE_ZONE][] = $c['ConditionValue1'];
+                    break;
+                case CND_REPUTATION_RANK:                   // 5
+                    $jsGlobals[TYPE_FACTION][] = $c['ConditionValue1'];
+                    break;
+                case CND_SKILL:                             // 7
+                    $jsGlobals[TYPE_SKILL][] = $c['ConditionValue1'];
+                    break;
+                case CND_QUESTREWARDED:                     // 8
+                case CND_QUESTTAKEN:                        // 9
+                case CND_QUEST_NONE:                        // 14
+                case CND_QUEST_COMPLETE:                    // 28
+                    $jsGlobals[TYPE_QUEST][] = $c['ConditionValue1'];
+                    break;
+                case CND_ACTIVE_EVENT:                      // 12
+                    $jsGlobals[TYPE_WORLDEVENT][] = $c['ConditionValue1'];
+                    break;
+                case CND_ACHIEVEMENT:                       // 17
+                    $jsGlobals[TYPE_ACHIEVEMENT][] = $c['ConditionValue1'];
+                    break;
+                case CND_TITLE:                             // 18
+                    $jsGlobals[TYPE_TITLE][] = $c['ConditionValue1'];
+                    break;
+                case CND_NEAR_CREATURE:                     // 29
+                    $jsGlobals[TYPE_NPC][] = $c['ConditionValue1'];
+                    break;
+                case CND_NEAR_GAMEOBJECT:                   // 30
+                    $jsGlobals[TYPE_OBJECT][] = $c['ConditionValue1'];
+                    break;
+                case CND_CLASS:                             // 15
+                    for ($i = 0; $i < 11; $i++)
+                        if ($c['ConditionValue1'] & (1 << $i))
+                            $jsGlobals[TYPE_CLASS][] = $i + 1;
+                    break;
+                case CND_RACE:                              // 16
+                    for ($i = 0; $i < 11; $i++)
+                        if ($c['ConditionValue1'] & (1 << $i))
+                            $jsGlobals[TYPE_RACE][] = $i + 1;
+                    break;
+                case CND_OBJECT_ENTRY:                      // 31
+                    if ($c['ConditionValue1'] == 3)
+                        $jsGlobals[TYPE_NPC][] = $c['ConditionValue2'];
+                    else if ($c['ConditionValue1'] == 5)
+                        $jsGlobals[TYPE_OBJECT][] = $c['ConditionValue2'];
+                    break;
+                case CND_TEAM:                              // 6
+                    if ($c['ConditionValue1'] == 469)       // Alliance
+                        $c['ConditionValue1'] = 1;
+                    else if ($c['ConditionValue1'] == 67)   // Horde
+                        $c['ConditionValue1'] = 2;
+                    else
+                        continue;
+            }
+
+            $res = [$c['NegativeCondition'] ? -$c['ConditionTypeOrReference'] : $c['ConditionTypeOrReference']];
+            foreach ([1, 2, 3] as $i)
+                if (($_ = $c['ConditionValue'.$i]) || $c['ConditionTypeOrReference'] = CND_DISTANCE_TO)
+                    $res[] = $_;
+
+            $group = $c['SourceEntry'];
+            if (!in_array($c['SourceTypeOrReferenceId'], [CND_SRC_CREATURE_TEMPLATE_VEHICLE, CND_SRC_SPELL, CND_SRC_QUEST_ACCEPT, CND_SRC_QUEST_SHOW_MARK, CND_SRC_SPELL_PROC]))
+                $group = $c['SourceEntry'] . ':' . $c['SourceGroup'];
+
+            $result[$c['SourceTypeOrReferenceId']] [$group] [$c['ElseGroup']] [] = $res;
+        }
+
+        return [$result, $jsGlobals];
+    }
 }
 
 ?>

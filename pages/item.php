@@ -467,7 +467,7 @@ class ItemPage extends genericPage
 
                     $reqQuest[$lv['id']] = 0;
 
-                    $lv['condition'][] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
+                    $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
                 }
 
                 $this->lvTabs[] = array(
@@ -801,11 +801,7 @@ class ItemPage extends genericPage
                             $extraCols[] = 'Listview.extraCols.condition';
 
                         $this->extendGlobalIds(TYPE_WORLDEVENT, $e);
-                        $row['condition'][] = array(
-                            'type'   => TYPE_WORLDEVENT,
-                            'typeId' => -$e,
-                            'status' => 1
-                        );
+                        $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $e]];
                     }
 
                     if ($currency || $tokens)               // fill idx:3 if required

@@ -406,7 +406,7 @@ class NpcPage extends GenericPage
                             if (!isset($extra[0]))
                                 $extra[0] = 'Listview.extraCols.condition';
 
-                            $data[$sId]['condition'][] = ['type' => TYPE_SKILL, 'typeId' => $_, 'status' => 1, 'reqSkillLvl' => $train['reqSkillValue']];
+                            $data[$sId]['condition'][0][$this->typeId][] = [[CND_SKILL, $_, $train['reqSkillValue']]];
                         }
 
                         if ($_ = $train['reqLevel'])
@@ -438,7 +438,7 @@ class NpcPage extends GenericPage
         }
 
         // tab: sells
-        if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv  WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id = ?d', $this->typeId, $this->typeId))
+        if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id = ?d', $this->typeId, $this->typeId))
         {
             $soldItems = new ItemList(array(['id', $sells]));
             if (!$soldItems->error)
@@ -447,9 +447,25 @@ class NpcPage extends GenericPage
                 if ($soldItems->hasSetFields(['condition']))
                     $extraCols[] = 'Listview.extraCols.condition';
 
+                $lvData = $soldItems->getListviewData(ITEMINFO_VENDOR, [TYPE_NPC => $this->typeId]);
+
+                $sc = Util::getServerConditions(CND_SRC_NPC_VENDOR, $this->typeId);
+                if ($sc[0])
+                {
+                    $this->extendGlobalData($sc[1]);
+
+                    if (!array_search('Listview.extraCols.condition', $extraCols))
+                        $extraCols[] = 'Listview.extraCols.condition';
+
+                    foreach ($lvData as $id => &$row)
+                        foreach ($sc[0] as $srcType => $cndData)
+                        if (!empty($cndData[$id.':'.$this->typeId]))
+                            $row['condition'][0][$id.':'.$this->typeId] = $cndData[$id.':'.$this->typeId];
+                }
+
                 $this->lvTabs[] = array(
                     'file'   => 'item',
-                    'data'   => $soldItems->getListviewData(ITEMINFO_VENDOR, [TYPE_NPC => $this->typeId]),
+                    'data'   => $lvData,
                     'params' => array(
                         'name'      => '$LANG.tab_sells',
                         'id'        => 'currency-for',
