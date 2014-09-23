@@ -241,16 +241,19 @@ class AjaxHandler
         if (mb_strlen($desc) > 500)
             return 2;
 
+        if (!User::$id && !User::$ip)
+            return 'your ip could not be determined';
+
         // check already reported
         $field = User::$id ? 'userId' : 'ip';
-        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND ?# = ?', $mode, $rsn, $subj, $field, User::$id ? User::$id : $_SERVER['REMOTE_ADDR']))
+        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND ?# = ?', $mode, $rsn, $subj, $field, User::$id ?: User::$ip))
             return 7;
 
         $update = array(
             'userId'      => User::$id,
             'mode'        => $mode,
             'reason'      => $rsn,
-            'ip'          => $_SERVER['REMOTE_ADDR'],
+            'ip'          => User::$ip,
             'description' => $desc,
             'userAgent'   => $ua,
             'appName'     => $app,
@@ -474,7 +477,7 @@ class AjaxHandler
                         'INSERT INTO ?_reports (userId, mode, reason, subject, ip, description, userAgent, appName) VALUES (?d, 1, 17, ?d, ?, "<automated comment report>", ?, ?)',
                         User::$id,
                         $this->post['id'],
-                        $_SERVER['REMOTE_ADDR'],
+                        User::$ip,
                         $_SERVER['HTTP_USER_AGENT'],
                         get_browser(null, true)['browser']
                     );
@@ -551,7 +554,7 @@ class AjaxHandler
                     'INSERT INTO ?_reports (userId, mode, reason, subject, ip, description, userAgent, appName) VALUES (?d, 1, 19, ?d, ?, "<automated commentreply report>", ?, ?)',
                     User::$id,
                     $this->post['id'],
-                    $_SERVER['REMOTE_ADDR'],
+                    User::$ip,
                     $_SERVER['HTTP_USER_AGENT'],
                     get_browser(null, true)['browser']
                 );

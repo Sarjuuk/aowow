@@ -15,6 +15,7 @@ class User
     public static $localeString = 'enus';
     public static $avatar       = 'inv_misc_questionmark';
     public static $dailyVotes   = 0;
+    public static $ip           = null;
 
     private static $reputation  = 0;
     private static $dataKey     = '';
@@ -23,6 +24,7 @@ class User
 
     public static function init()
     {
+        self::setIP();
         self::setLocale();
 
         // session have a dataKey to access the JScripts (yes, also the anons)
@@ -31,13 +33,16 @@ class User
 
         self::$dataKey = $_SESSION['dataKey'];
 
+        if (!self::$ip)
+            return false;
+
         // check IP bans
-        if ($ipBan = DB::Aowow()->selectRow('SELECT count, unbanDate FROM ?_account_bannedips WHERE ip = ? AND type = 0', $_SERVER['REMOTE_ADDR']))
+        if ($ipBan = DB::Aowow()->selectRow('SELECT count, unbanDate FROM ?_account_bannedips WHERE ip = ? AND type = 0', self::$ip))
         {
             if ($ipBan['count'] > CFG_FAILED_AUTH_COUNT && $ipBan['unbanDate'] > time())
                 return false;
             else if ($ipBan['unbanDate'] <= time())
-                DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE ip = ?', $_SERVER['REMOTE_ADDR']);
+                DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE ip = ?', self::$ip);
         }
 
         // try to restore session
@@ -101,7 +106,7 @@ class User
                     SET     dailyVotes = ?d, prevLogin = curLogin, curLogin = UNIX_TIMESTAMP(), prevIP = curIP, curIP = ?
                     WHERE   id = ?d',
                     self::$dailyVotes,
-                    $_SERVER['REMOTE_ADDR'],
+                    self::$ip,
                     self::$id
                 );
 
@@ -119,6 +124,28 @@ class User
         }
 
         return true;
+    }
+
+    private static function setIP()
+    {
+        $ipAddr = '';
+        $method = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'];
+
+        foreach ($method as $m)
+        {
+            if ($ipAddr = getenv($m))
+            {
+                // check IPv4
+                if ($ipAddr = filter_var($ipAddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
+                    break;
+
+                // check IPv6
+                if ($ipAddr = filter_var($ipAddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
+                    break;
+            }
+        }
+
+        self::$ip = $ipAddr ?: null;
     }
 
     /****************/
@@ -186,12 +213,15 @@ class User
         {
             case AUTH_MODE_SELF:
             {
+                if (!self::$ip)
+                    return AUTH_INTERNAL_ERR;
+
                 // handle login try limitation
-                $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 0 AND ip = ?', $_SERVER['REMOTE_ADDR']);
+                $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 0 AND ip = ?', self::$ip);
                 if (!$ip || $ip['unbanDate'] < time())      // no entry exists or time expired; set count to 1
-                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', $_SERVER['REMOTE_ADDR'], CFG_FAILED_AUTH_EXCLUSION);
+                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, CFG_FAILED_AUTH_EXCLUSION);
                 else                                        // entry already exists; increment count
-                    DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ?', CFG_FAILED_AUTH_EXCLUSION, $_SERVER['REMOTE_ADDR']);
+                    DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ?', CFG_FAILED_AUTH_EXCLUSION, self::$ip);
 
                 if ($ip && $ip['count'] >= CFG_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
                     return AUTH_IPBANNED;
@@ -215,7 +245,7 @@ class User
                     return AUTH_ACC_INACTIVE;
 
                 // successfull auth; clear bans for this IP
-                DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE type = 0 AND ip = ?', $_SERVER['REMOTE_ADDR']);
+                DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE type = 0 AND ip = ?', self::$ip);
 
                 if ($query['bans'] & (ACC_BAN_PERM | ACC_BAN_TEMP))
                     return AUTH_BANNED;
