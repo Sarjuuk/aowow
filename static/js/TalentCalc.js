@@ -960,7 +960,7 @@ function TalentCalc() {
 
         _ = $WH.ce('a');
         _.className = 'talentcalc-button-help';
-        _.href = (_mode == MODE_PET ? 'http://petopia.brashendeavors.net/html/patch30/patch30faq_talents.php' : '?help=talent-calculator');
+        _.href = (_mode == MODE_PET ? 'http://www.wow-petopia.com/talents/talents.html' : '?help=talent-calculator');
         _.target = '_blank';
         $WH.ae(_, $WH.ct(LANG.tc_help));
         $WH.ae(sidebarDivInner, _);

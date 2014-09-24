@@ -122,7 +122,7 @@ class AccountPage extends GenericPage
                 {
                     $nStep = 2;
                     DB::Aowow()->query('UPDATE ?_account SET status = ?d WHERE token = ?', ACC_STATUS_OK, $_GET['token']);
-                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, ?d + 1, UNIX_TIMESTAMP() + ?d)', $_SERVER['REMOTE_ADDR'], CFG_FAILED_AUTH_COUNT, CFG_FAILED_AUTH_EXCLUSION);
+                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, ?d + 1, UNIX_TIMESTAMP() + ?d)', User::$ip, CFG_FAILED_AUTH_COUNT, CFG_FAILED_AUTH_EXCLUSION);
 
                     Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
@@ -322,9 +322,12 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         switch (User::Auth($username, $password))
         {
             case AUTH_OK:
+                if (!User::$ip)
+                    return Lang::$account['intError'];
+
                 // reset account status, update expiration
-                DB::Aowow()->query('UPDATE ?_account SET prevLogin = curLogin, curLogin = UNIX_TIMESTAMP(), prevIP = curIP, curIP = ?, allowExpire = ?d, status = 0, statusTimer = 0, token = "" WHERE user = ?',
-                    $_SERVER['REMOTE_ADDR'],
+                DB::Aowow()->query('UPDATE ?_account SET prevIP = IF(curIp = ?, prevIP, curIP), curIP = IF(curIp = ?, curIP, ?), allowExpire = ?d, status = 0, statusTimer = 0, token = "" WHERE user = ?',
+                    User::$ip, User::$ip, User::$ip,
                     $doExpire,
                     $username
                 );
@@ -386,11 +389,15 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         if (!Util::isValidEmail($email))
             return Lang::$account['emailInvalid'];
 
+        // check ip
+        if (!User::$ip)
+            return Lang::$account['intError'];
+
         // limit account creation
-        $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 1 AND ip = ?', $_SERVER['REMOTE_ADDR']);
+        $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 1 AND ip = ?', User::$ip);
         if ($ip && $ip['count'] >= CFG_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
         {
-            DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, $_SERVER['REMOTE_ADDR']);
+            DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, User::$ip);
             return sprintf(Lang::$account['signupExceeded'], Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
         }
 
@@ -405,7 +412,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             User::hashCrypt($_POST['password']),
             Util::ucFirst($username),
             $email,
-            isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : '',
+            User::$ip,
             $doExpire,
             User::$localeId,
             ACC_STATUS_NEW,
@@ -418,9 +425,9 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         {
             // success:: update ip-bans
             if (!$ip || $ip['unbanDate'] < time())
-                DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, 1, UNIX_TIMESTAMP() + ?d)', $_SERVER['REMOTE_ADDR'], CFG_FAILED_AUTH_EXCLUSION);
+                DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, 1, UNIX_TIMESTAMP() + ?d)', User::$ip, CFG_FAILED_AUTH_EXCLUSION);
             else
-                DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, $_SERVER['REMOTE_ADDR']);
+                DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, User::$ip);
 
             return $_;
         }
