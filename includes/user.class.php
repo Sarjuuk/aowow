@@ -86,7 +86,8 @@ class User
         if ($query['avatar'])
             self::$avatar = $query['avatar'];
 
-        self::setLocale(intVal($query['locale']));          // reset, if changed
+        if (self::$localeId != $query['locale'])            // reset, if changed
+            self::setLocale(intVal($query['locale']));
 
         // stuff, that updates on a daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
         // - conscutive visits

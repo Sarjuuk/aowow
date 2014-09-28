@@ -58,11 +58,14 @@ class EventsPage extends GenericPage
             'params' => []
         );
 
-        $this->lvTabs[] = array(
-            'file'   => 'calendar',
-            'data'   => array_filter($events->getListviewData(), function($x) {return $x['id'] > 0;}),
-            'params' => ['hideCount' => 1]
-        );
+        if ($_ = array_filter($events->getListviewData(), function($x) {return $x['id'] > 0;}))
+        {
+            $this->lvTabs[] = array(
+                'file'   => 'calendar',
+                'data'   => $_,
+                'params' => ['hideCount' => 1]
+            );
+        }
     }
 
     protected function generateTitle()

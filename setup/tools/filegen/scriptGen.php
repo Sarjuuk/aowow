@@ -130,28 +130,17 @@ if ($scList)
                 }
 
                 if (fWrite($dest, $content))
-                {
-                    fClose($dest);
                     $log[] = [time(), sprintf(ERR_NONE, $destPath.$file)];
-                }
                 else
-                {
                     $log[] = [time(), sprintf(ERR_WRITE_FILE, $destPath.$file)];
-                    fClose($dest);
-                    continue;
-                }
+
+                fClose($dest);
             }
             else
-            {
                 $log[] = [time(), sprintf(ERR_CREATE_FILE, $destPath.$file)];
-                continue;
-            }
         }
         else
-        {
             $log[] = [time(), sprintf(ERR_READ_FILE, $tplPath.$file.'.in')];
-            continue;
-        }
     }
 
     // files without template

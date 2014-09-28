@@ -15,7 +15,7 @@ if (!defined('AOWOW_REVISION'))
     pickpocketing_loot_template     entry           many <- many        creature_template       pickpocketloot
     skinning_loot_template          entry           many <- many        creature_template       skinloot        Can also store minable/herbable items gathered from creatures
     quest_mail_loot_template        entry                               quest_template          RewMailTemplateId
-    reference_loot_template         entry           many <- many        _loot_template          -mincountOrRef  In case of negative mincountOrRef
+    reference_loot_template         entry           many <- many        *_loot_template         reference
 */
 
 class Loot
@@ -89,7 +89,7 @@ class Loot
         if (!$tableName || !$lootId)
             return null;
 
-        $rows = DB::Aowow()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, abs($lootId), $groupId ?: DBSIMPLE_SKIP);
+        $rows = DB::Aowow()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, $lootId, $groupId ?: DBSIMPLE_SKIP);
         if (!$rows)
             return null;
 
@@ -98,9 +98,9 @@ class Loot
         foreach ($rows as $entry)
         {
             $set = array(
-                'quest'         => $entry['ChanceOrQuestChance'] < 0,
+                'quest'         => $entry['needsquest'],
                 'group'         => $entry['groupid'],
-                'reference'     => $lootId < 0 ? abs($lootId) : 0,
+                'parentRef'     => $tableName == LOOT_REFERENCE ? $lootId : 0,
                 'realChanceMod' => $baseChance
             );
 
@@ -129,27 +129,26 @@ class Loot
                               '25man heroic
             */
 
-            if ($entry['mincountOrRef'] < 0)
+            if ($entry['reference'])
             {
                 // bandaid.. remove when propperly handling lootmodes
-                if (!in_array($entry['mincountOrRef'], $handledRefs))
+                if (!in_array($entry['reference'], $handledRefs))
                 {                                                                                                   // todo (high): find out, why i used this in the first place. (don't do drugs, kids)
-                    list($data, $raw) = self::getByContainerRecursive(LOOT_REFERENCE, $entry['mincountOrRef'], $handledRefs, /*$entry['groupid'],*/ 0, abs($entry['ChanceOrQuestChance'] / 100));
+                    list($data, $raw) = self::getByContainerRecursive(LOOT_REFERENCE, $entry['reference'], $handledRefs, /*$entry['groupid'],*/ 0, $entry['chance'] / 100);
 
-                    $handledRefs[] = $entry['mincountOrRef'];
+                    $handledRefs[] = $entry['reference'];
 
                     $loot     = array_merge($loot, $data);
                     $rawItems = array_merge($rawItems, $raw);
                 }
-
-                $set['content']    = $entry['mincountOrRef'];
+                $set['reference']  = $entry['reference'];
                 $set['multiplier'] = $entry['maxcount'];
             }
             else
             {
                 $rawItems[]     = $entry['item'];
                 $set['content'] = $entry['item'];
-                $set['min']     = $entry['mincountOrRef'];
+                $set['min']     = $entry['mincount'];
                 $set['max']     = $entry['maxcount'];
             }
 
@@ -160,16 +159,16 @@ class Loot
             }
 
             if ($set['quest'] || !$set['group'])
-                $set['groupChance'] = abs($entry['ChanceOrQuestChance']);
-            else if ($entry['groupid'] && !$entry['ChanceOrQuestChance'])
+                $set['groupChance'] = $entry['chance'];
+            else if ($entry['groupid'] && !$entry['chance'])
             {
                 $nGroupEquals[$entry['groupid']]++;
                 $set['groupChance'] = &$groupChances[$entry['groupid']];
             }
-            else if ($entry['groupid'] && $entry['ChanceOrQuestChance'])
+            else if ($entry['groupid'] && $entry['chance'])
             {
-                @$groupChances[$entry['groupid']] += $entry['ChanceOrQuestChance'];
-                $set['groupChance'] = abs($entry['ChanceOrQuestChance']);
+                @$groupChances[$entry['groupid']] += $entry['chance'];
+                $set['groupChance'] = $entry['chance'];
             }
             else                                            // shouldn't have happened
             {
@@ -239,13 +238,13 @@ class Loot
             if ($_ = $loot['mode'])
                 $base['mode'] = $_;
 
-            if ($_ = $loot['reference'])
+            if ($_ = $loot['parentRef'])
                 $base['reference'] = $_;
 
             if ($_ = self::createStack($loot))
                 $base['pctstack'] = $_;
 
-            if ($loot['content'] > 0)                       // regular drop
+            if (empty($loot['reference']))                  // regular drop
             {
                 if (!User::isInGroup(U_GROUP_EMPLOYEE))
                 {
@@ -260,14 +259,14 @@ class Loot
             else if (User::isInGroup(U_GROUP_EMPLOYEE))     // create dummy for ref-drop
             {
                 $data = array(
-                    'id'    => $loot['content'],
-                    'name'  => '@REFERENCE: '.abs($loot['content']),
+                    'id'    => $loot['reference'],
+                    'name'  => '@REFERENCE: '.$loot['reference'],
                     'icon'  => 'trade_engineering',
                     'stack' => [$loot['multiplier'], $loot['multiplier']]
                 );
                 $this->results[] = array_merge($base, $data);
 
-                $this->jsGlobals[TYPE_ITEM][$loot['content']] = $data;
+                $this->jsGlobals[TYPE_ITEM][$loot['reference']] = $data;
             }
         }
 
@@ -348,22 +347,22 @@ class Loot
         $refResults = [];
         $chanceMods = [];
         $query      =   'SELECT
-                           -lt1.entry AS ARRAY_KEY,
-                            IF(lt1.mincountOrRef > 0, lt1.item, lt1.mincountOrRef) AS item,
-                            lt1.ChanceOrQuestChance AS chance,
-                            SUM(IF(lt2.ChanceOrQuestChance = 0, 1, 0)) AS nZeroItems,
-                            SUM(IF(lt2.ChanceOrQuestChance > 0, lt2.ChanceOrQuestChance, 0)) AS sumChance,
+                            lt1.entry AS ARRAY_KEY,
+                            IF(lt1.reference = 0, lt1.item, lt1.reference) AS item,
+                            lt1.chance,
+                            SUM(IF(lt2.chance = 0, 1, 0)) AS nZeroItems,
+                            SUM(lt2.chance) AS sumChance,
                             IF(lt1.groupid > 0, 1, 0) AS isGrouped,
-                            IF(lt1.mincountOrRef > 0, lt1.mincountOrRef, 1) AS min,
-                            IF(lt1.mincountOrRef > 0, lt1.maxcount, 1) AS max,
-                            IF(lt1.mincountOrRef < 0, lt1.maxcount, 1) AS multiplier
+                            IF(lt1.reference = 0, lt1.mincount, 1) AS min,
+                            IF(lt1.reference = 0, lt1.maxcount, 1) AS max,
+                            IF(lt1.reference > 0, lt1.maxcount, 1) AS multiplier
                         FROM
                             ?# lt1
                         LEFT JOIN
                             ?# lt2 ON lt1.entry = lt2.entry AND lt1.groupid = lt2.groupid
                         WHERE
                             %s
-                        GROUP BY lt2.entry';
+                        GROUP BY lt2.entry, lt2.groupid';
 
         $calcChance = function ($refs, $parents = []) use (&$chanceMods)
         {
@@ -424,7 +423,7 @@ class Loot
             get references containing the item
         */
         $newRefs = DB::Aowow()->select(
-            sprintf($query, 'lt1.item = ?d AND lt1.mincountOrRef > 0'),
+            sprintf($query, 'lt1.item = ?d AND lt1.reference = 0'),
             LOOT_REFERENCE, LOOT_REFERENCE,
             $this->entry
         );
@@ -433,7 +432,7 @@ class Loot
         {
             $curRefs = $newRefs;
             $newRefs = DB::Aowow()->select(
-                sprintf($query, 'lt1.mincountOrRef IN (?a)'),
+                sprintf($query, 'lt1.reference IN (?a)'),
                 LOOT_REFERENCE, LOOT_REFERENCE,
                 array_keys($curRefs)
             );
@@ -447,7 +446,7 @@ class Loot
         for ($i = 1; $i < count($this->lootTemplates); $i++)
         {
             $result = $calcChance(DB::Aowow()->select(
-                sprintf($query, '{lt1.mincountOrRef IN (?a) OR }(lt1.mincountOrRef > 0 AND lt1.item = ?d)'),
+                sprintf($query, '{lt1.reference IN (?a) OR }(lt1.reference = 0 AND lt1.item = ?d)'),
                 $this->lootTemplates[$i], $this->lootTemplates[$i],
                 $refResults ? array_keys($refResults) : DBSIMPLE_SKIP,
                 $this->entry
@@ -487,9 +486,9 @@ class Loot
 
                     $srcData = $srcObj->getListviewData();
 
-                    foreach ($srcObj->iterate() as $curTpl)
+                    foreach ($srcObj->iterate() as $__id => $curTpl)
                     {
-                        switch ($curTpl['type'])
+                        switch ($curTpl['typeCat'])
                         {
                             case 25: $tabId = 15; break;    // fishing node
                             case -3: $tabId = 14; break;    // herb

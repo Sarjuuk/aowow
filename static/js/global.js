@@ -10136,7 +10136,7 @@ Listview.templates = {
         ],
 
         getItemLink: function(item) {
-            return item.id > 0 ? '?item=' + item.id : 'javascript:;';
+            return item.name.charAt(0) == '@' ? 'javascript:;' : '?item=' + item.id;
         },
 
         onBeforeCreate: function() {

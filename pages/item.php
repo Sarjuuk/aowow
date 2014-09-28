@@ -457,13 +457,14 @@ class ItemPage extends genericPage
             if ($lootTab->getByContainer($sf[0], $sf[1]))
             {
                 $this->extendGlobalData($lootTab->jsGlobals);
+                $sf[4] = array_merge($sf[4], $lootTab->extraCols);
 
                 foreach ($lootTab->iterate() as $lv)
                 {
                     if (!$lv['quest'])
                         continue;
 
-                    $sf[4] = array_merge($sf[4], $lootTab->extraCols, ['Listview.extraCols.condition']);
+                    $sf[4] = array_merge($sf[4], ['Listview.extraCols.condition']);
 
                     $reqQuest[$lv['id']] = 0;
 

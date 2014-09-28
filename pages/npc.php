@@ -478,13 +478,13 @@ class NpcPage extends GenericPage
         }
 
         // tabs: this creature contains..
-        $skinTab = ['tab_skinning', 'skinned-from'];
+        $skinTab = ['tab_skinning', 'skinning'];
         if ($_typeFlags & NPC_TYPEFLAG_HERBLOOT)
-            $skinTab = ['tab_gatheredfromnpc', 'gathered-from-npc'];
+            $skinTab = ['tab_herbalism', 'herbalism'];
         else if ($_typeFlags & NPC_TYPEFLAG_MININGLOOT)
-            $skinTab = ['tab_minedfromnpc', 'mined-from-npc'];
+            $skinTab = ['tab_mining', 'mining'];
         else if ($_typeFlags & NPC_TYPEFLAG_ENGINEERLOOT)
-            $skinTab = ['tab_salvagedfrom', 'salvaged-from-npc'];
+            $skinTab = ['tab_engineering', 'engineering'];
 
     /*
             extraCols: [Listview.extraCols.count, Listview.extraCols.percent, Listview.extraCols.mode],
