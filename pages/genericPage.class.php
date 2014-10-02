@@ -287,7 +287,7 @@ class GenericPage
             $this->announcements = [];
 
         // display occured notices
-        if ($_ = Util::getNotes(false))
+        if ($_ = Util::getNotes())
         {
             $this->announcements[] = array(
                 'id'     => 0,

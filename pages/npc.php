@@ -18,10 +18,10 @@ class NpcPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = array(
         'swfobject.js',
-        // 'Mapper.js'
+        'Mapper.js'
     );
     protected $css           = array(
-        // ['path' => 'Mapper.css']
+        ['path' => 'Mapper.css']
     );
 
     public function __construct($pageCall, $id)
@@ -57,6 +57,8 @@ class NpcPage extends GenericPage
 
     protected function generateContent()
     {
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         $_typeFlags = $this->subject->getField('typeFlags');
         $_altIds    = [];
         $_altNPCs   = null;
@@ -79,14 +81,24 @@ class NpcPage extends GenericPage
                 $_altNPCs = new CreatureList(array(['id', array_keys($_altIds)]));
         }
 
-        // hmm, this won't do if the creature is spawned by event/script
-        $mapType = 2;                                       // should be 0, tmp-override until Zones
-        // $maps = DB::Aowow()->selectCol('SELECT DISTINCT map from creature WHERE id = ?d', $this->typeId);
-        // if (count($maps) == 1)                              // should only exist in one instance
-        // {
-            // $map = new ZoneList(array(1, ['mapId', $maps[0]], ['parentArea', 0]));
-            // $mapType = $map->getField('areaType');
-        // }
+        // try to determine, if it's spawned in a dungeon or raid (shaky at best, if spawned by script)
+        $mapType = 0;
+        if ($maps = DB::Aowow()->selectCol('SELECT DISTINCT areaId from ?_spawns WHERE type = ?d AND typeId = ?d', TYPE_NPC, $this->typeId))
+        {
+            if (count($maps) == 1)                          // should only exist in one instance
+            {
+                $map = new ZoneList(array(['id', $maps], 1));
+                if (!$map->error)
+                    $mapType = $map->getField('areaType');
+            }
+        }
+        else if ($_altIds)                                  // not spawned, but has difficultyDummies
+        {
+            if (count($_altIds) > 1)                        // 3 or more version -> definitly raid (10/25 + hc)
+                $mapType = 2;
+            else                                            // 2 versions; may be Heroic (use this), but may also be 10/25-raid
+                $mapType = 1;
+        }
 
         /***********/
         /* Infobox */
@@ -95,10 +107,14 @@ class NpcPage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // Event
-        if ($_ = DB::Aowow()->selectCell('SELECT holidayId FROM ?_events e, game_event_creature gec, creature c WHERE e.id = ABS(gec.eventEntry) AND c.guid = gec.guid AND c.id = ?d', $this->typeId))
+        if ($_ = DB::Aowow()->selectCol('SELECT DISTINCT IF(holidayId, holidayId, -e.id) FROM ?_events e, game_event_creature gec, creature c WHERE e.id = ABS(gec.eventEntry) AND c.guid = gec.guid AND c.id = ?d', $this->typeId))
         {
             $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
-            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].'[event='.$_.']';
+            $ev = [];
+            foreach ($_ as $idx => $id)
+                $ev[] = ($ev && !fmod(count($ev), 2) ? '[br]' : '') . '[event='.$id.']';
+
+            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].implode(', ', $ev);
         }
 
         // Level
@@ -235,13 +251,24 @@ class NpcPage extends GenericPage
         /* Main Content */
         /****************/
 
-        // get spawns and such
+        // get spawns and path
+        $map = null;
+        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
+        {
+            $map = ['data' => ['parent' => 'mapper-generic'], 'mapperData' => &$spawns];
 
-        // consider phaseMasks
+            foreach ($spawns as $areaId => &$areaData)
+            {
+                $map['extra'][$areaId] = ZoneList::getName($areaId);
+                foreach ($areaData as &$floor)
+                    $floor['count'] = count($floor['coords']);
+            }
+        }
 
         // consider pooled spawns
 
-        // $this->mapper = true,
+
+        $this->map          = $map;
         $this->infobox      = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
         $this->position     = $position;
         $this->quotes       = $this->getQuotes();
@@ -539,7 +566,7 @@ class NpcPage extends GenericPage
 
                     $sf[4][] = 'Listview.extraCols.condition';
                     $reqQuest[$lv['id']] = 0;
-                    $lv['condition'][] = ['type' => TYPE_QUEST, 'typeId' => &$reqQuest[$lv['id']], 'status' => 1];
+                    $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
                 }
 
                 $this->lvTabs[] = array(
@@ -834,8 +861,11 @@ class NpcPage extends GenericPage
             $group = [];
             foreach ($text as $t)
             {
-                // fixup .. either set %s for emotes or dont >.<
                 $msg = Util::localizedString($t, 'text');
+                if (!$msg)
+                    continue;
+
+                // fixup .. either set %s for emotes or dont >.<
                 if (in_array($t['type'], [2, 16]) && strpos($msg, '%s') === false)
                     $msg = '%s '.$msg;
 
@@ -863,7 +893,9 @@ class NpcPage extends GenericPage
                 $nQuotes++;
                 $group[] = $line;
             }
-            $quotes[] = $group;
+
+            if ($group)
+                $quotes[] = $group;
         }
 
         return [$quotes, $nQuotes];

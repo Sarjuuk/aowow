@@ -48,6 +48,8 @@ $lang = array(
         'n_a'           => "n/d",
         'siteRep'       => "Réputation",
         'aboutUs'       => "À propos de Aowow",
+        'and'           => " et ",
+        'or'            => " ou ",
 
         // filter
         'extSearch'     => "Recherche avancée",
@@ -192,6 +194,7 @@ $lang = array(
         'zone'          => "zone",
         'zones'         => "Zones",
 
+        'pvp'           => "JcJ",
         'honorPoints'   => "Points d'honneur",
         'arenaPoints'   => "Points d'arène",
         'heroClass'     => "Classe de héros",
@@ -202,7 +205,9 @@ $lang = array(
         'specs'         => "Specialisations",
         '_roles'        => ["Soigneur", "DPS mêlée", "DPS à distance", "Tank"],
 
-        'modes'         => ["Standard / Normal 10", "Héroïque / Normal 25", "10 héroïque", "25 héroïque"],
+        'phases'        => "Phases",
+        'mode'          => "Mode",
+        'modes'         => [-1 => "Tout", "Standard / Normal 10", "Héroïque / Normal 25", "10 héroïque", "25 héroïque"],
         'expansions'    => ["Classique", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Force", "Agilité", "Endurance", "Intelligence", "Esprit"],
         'sources'       => array(
@@ -351,7 +356,7 @@ $lang = array(
         'triggeredBy'   => "Déclenché par",
         'capturePoint'  => "Point de capture"
     ),
-    'npc'   => array(
+    'npc' => array(
         'classification'=> "Classification",
         'petFamily'     => "Familier",
         'react'         => "Réaction",
@@ -368,6 +373,9 @@ $lang = array(
         'ranged'        => "à distance",
         'armor'         => "Armure",
         'tameable'      => "Domptable (%s)",
+        'waypoint'      => "Point de route",
+        'wait'          => "Période d'attente",
+        'respawnIn'     => "Rentrée en",
         'rank'          => [0 => "Standard", 1 => "Élite", 4 => "Rare", 2 => "Élite rare", 3 =>"Boss"],
         'textRanges'    => [null, "[sent to area]", "[sent to zone]", "[sent to map]", "[sent to world]"],
         'textTypes'     => [null, "crie", "dit", "chuchote"],
@@ -420,8 +428,15 @@ $lang = array(
         'CosmicMap'     => "Carte cosmique",
     ),
     'zone' => array(
-        // 'zone'          => "Zone",
         // 'zonePartOf'    => "Cette zone fait partie de la zone",
+        'city'          => "Город",
+        'territory'     => "Territoire",
+        'instanceType'  => "Type d'instance",
+        'hcAvailable'   => "Mode héroïque disponible&nbsp;(%d)",
+        'numPlayers'    => "Nombre de joueurs",
+        'noMap'         => "Il n'y a aucune carte disponible pour cette zone.",
+        'instanceTypes' => ["Zone",     "Transit", "Donjon",   "Raid",       "Champ de bataille", "Donjon",    "Arène", "Raid", "Raid"],
+        'territories'   => ["Alliance", "Horde",   "Contesté", "Sanctuaire", "JcJ",               "JcJ Global"],
         'cat'           => array(
             "Royaumes de l'est",        "Kalimdor",                 "Donjons",                  "Raids",                    "Inutilisées",              null,
             "Champs de bataille",       null,                       "Outreterre",               "Arènes",                   "Norfendre"

@@ -25,60 +25,8 @@ if (is_array($this->position)):
 ?>
                 <div class="pad"></div>
 <?php
-elseif (!empty($this->position)):
-?>
-                <div>{#This_NPC_can_be_found_in#}<span id="locations">
-                    {foreach from=$position item=zone name=zone}
-                        <a href="javascript:;" onclick="
-                        {if $zone.atid}
-                            myMapper.update(
-                                {
-                                    zone:{$zone.atid}
-                                    {if $zone.points}
-                                        ,
-                                    {/if}
-                                {if $zone.points}
-                                    coords:[
-                                        {foreach from=$zone.points item=point name=point}
-                                                [{$point.x},{$point.y},
-                                                {
-                                                    label:'$<br>
-                                                    <div class=q0>
-                                                        <small>
-                                                            {if isset($point.r)}
-                                                                {#Respawn#}:
-                                                                {if isset($point.r.h)} {$point.r.h}{#hr#}{/if}
-                                                                {if isset($point.r.m)} {$point.r.m}{#min#}{/if}
-                                                                {if isset($point.r.s)} {$point.r.s}{#sec#}{/if}
-                                                            {else}
-                                                                {#Waypoint#}
-                                                            {/if}
-                                                            {if isset($point.events)}<br>{$point.events|escape:"quotes"}{/if}
-                                                        </small>
-                                                    </div>',type:'{$point.type}'
-                                                }]
-                                                {if !$smarty.foreach.point.last},{/if}
-                                        {/foreach}
-                                    ]
-                                {/if}
-                                });
-                            $WH.ge('mapper-generic').style.display='block';
-                        {else}
-                            $WH.ge('mapper-generic').style.display='none';
-                        {/if}
-                                g_setSelectedLink(this, 'mapper'); return false" onmousedown="return false">
-                            {$zone.name}</a>{if $zone.population > 1}&nbsp;({$zone.population}){/if}{if $smarty.foreach.zone.last}.{else}, {/if}
-                    {/foreach}
-                </span></div>
-
-                <div id="mapper-generic"></div>
-                <div class="clear"></div>
-
-                <script type="text/javascript">
-                    var myMapper = new Mapper({parent: 'mapper-generic', zone: '{$position[0].atid}'});
-                    $WH.gE($WH.ge('locations'), 'a')[0].onclick();
-                </script>
-<?php
+elseif (!empty($this->map)):
+    $this->brick('mapper');
 else:
     echo '                '.Lang::$npc['unkPosition']."\n";
 endif;

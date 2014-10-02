@@ -214,7 +214,7 @@ class CurrencyPage extends GenericPage
                         'name'      => '$LANG.tab_currencyfor',
                         'id'        => 'currency-for',
                         'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')]",
-                        'note'      => $n ? '$$WH.sprintf(LANG.lvnote_filterresults, \''.$n.'\')' : null
+                        'note'      => $n ? sprintf(Util::$filterResultString, $n) : null
                     ]
                 );
 

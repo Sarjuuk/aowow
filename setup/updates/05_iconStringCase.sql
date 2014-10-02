@@ -1,9 +1,0 @@
-UPDATE aowow_achievement SET iconString = LOWER(iconString);
-UPDATE aowow_creature SET iconString = LOWER(iconString);
-UPDATE aowow_currencies SET iconString = LOWER(iconString);
-UPDATE aowow_holidays SET iconString = LOWER(iconString);
-UPDATE aowow_items SET iconString = LOWER(iconString);
-UPDATE aowow_pet SET iconString = LOWER(iconString);
-UPDATE aowow_shapeshiftforms SET iconString = LOWER(iconString);
-UPDATE aowow_skillline SET iconString = LOWER(iconString);
-UPDATE aowow_spell SET iconString = LOWER(iconString);

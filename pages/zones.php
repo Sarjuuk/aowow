@@ -35,9 +35,10 @@ class ZonesPage extends GenericPage
 
     protected function generateContent()
     {
-        $conditions  = [];
+        $conditions  = [CFG_SQL_LIMIT_NONE];
         $visibleCols = [];
         $hiddenCols  = [];
+        $params      = [];
         $mapFile     = 0;
         $spawnMap    = -1;
 
@@ -47,6 +48,7 @@ class ZonesPage extends GenericPage
         if ($this->category)
         {
             $conditions[] = ['z.category', $this->category[0]];
+            $hiddenCols[] = 'category';
 
             if (isset($this->category[1]) && in_array($this->category[0], [2, 3]))
                 $conditions[] = ['z.expansion', $this->category[1]];
@@ -59,17 +61,38 @@ class ZonesPage extends GenericPage
                     case  1:    $mapFile = -6;  $spawnMap = 1;      break;
                     case  8:    $mapFile = -2;  $spawnMap = 530;    break;
                     case 10:    $mapFile = -5;  $spawnMap = 571;    break;
-                }
+               }
+
+                $hiddenCols[] = 'instancetype';
+            }
+
+            switch ($this->category[0])
+            {
+                case 6:
+                case 2:
+                case 2:
+                case 3:
+                    array_push($visibleCols, 'level', 'players');
+                case 9:
+                    $hiddenCols[] = 'territory';
+                    break;
             }
         }
 
         $zones = new ZoneList($conditions);
 
-        $this->map    = null;
+
+        if ($visibleCols)
+            $params['visibleCols'] = "$['".implode("', '", $visibleCols)."']";
+
+        if ($hiddenCols)
+            $params['hiddenCols'] = "$['".implode("', '", $hiddenCols)."']";
+
+        $this->map      = null;
         $this->lvTabs[] = array(
             'file'   => 'zone',
             'data'   => $zones->getListviewData(),
-            'params' => []
+            'params' => $params
         );
 
         // create flight map
@@ -139,7 +162,8 @@ class ZonesPage extends GenericPage
                     'zoomable' => false,
                     'parent'   => 'mapper-generic'
                 ),
-                'som' => $somData
+                'som' => $somData,
+                'mapperData' => [$mapFile => new stdClass()]
             );
         }
     }

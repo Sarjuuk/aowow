@@ -918,7 +918,8 @@ class Util
             '/\$g\s*([^:;]+)\s*:\s*([^:;]+)\s*(:?[^:;]*);/ui',// directed gender-reference                      $g:<male>:<female>:<refVariable>
             '/\$t([^;]+);/ui',                              // nonsense, that the client apparently ignores
             '/\|\d\-?\d?\((\$\w)\)/ui',                     // and another modifier for something russian       |3-6($r)
-            '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui'                // emotes (workaround: at least one whitespace and never " or = between brackets)
+            '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui',               // emotes (workaround: at least one whitespace and never " or = between brackets)
+            '/\$(\d+)w/ui'                                  // worldState(?)-ref found on some pageTexts        $1234w
         );
 
         $to = array(
@@ -927,7 +928,8 @@ class Util
             '&lt;\1/\2&gt;',
             '',
             '\1',
-            '&lt;\1&gt;'
+            '&lt;\1&gt;',
+            '<span class="q0">WorldState #\1</span>'
         );
 
         $text = preg_replace($from, $to, $text);
@@ -1525,38 +1527,29 @@ class Util
         */
     }
 
+    // setup only
     private static $alphaMapCache = [];
-
-    public static function alphaMapCheck($areaId, array &$coords)
+    public static function alphaMapCheck($areaId, array &$set)
     {
         $file = 'cache/alphaMaps/'.$areaId.'.png';
-        if (!file_exists($file))
-        {
-            self::addNote(U_GROUP_STAFF, 'Util::alphaMapCheck no suitable alphaMap found for area '.$areaId.'. Positional check omitted!');
+        if (!file_exists($file))                            // file does not exist (probably instanced area)
             return false;
+
+        // invalid and corner cases (literally)
+        if (!is_array($set) || empty($set['posX']) || empty($set['posY']) || $set['posX'] == 100 || $set['posY'] == 100)
+        {
+            $set = null;
+            return true;
         }
 
         if (empty(self::$alphaMapCache[$areaId]))
             self::$alphaMapCache[$areaId] = imagecreatefrompng($file);
 
-        foreach ($coords as $idx => $set)
-        {
-            // invalid and corner cases (literally)
-            if (!is_array($set) || empty($set['xPos']) || empty($set['yPos']) || $set['xPos'] == 100 || $set['yPos'] == 100)
-            {
-                unset($coords[$idx]);
-                continue;
-            }
+        // alphaMaps are 1000 x 1000, adapt points [0 => black => valid point]
+        if (imagecolorat(self::$alphaMapCache[$areaId], $set['posX'] * 10, $set['posY'] * 10))
+            $set = null;
 
-            // alphaMaps are 1000 x 1000, adapt points [0 => black => valid point]
-            if (imagecolorat(self::$alphaMapCache[$areaId], $set['xPos'] * 10, $set['yPos'] * 10))
-                unset($coords[$idx]);
-        }
-
-        if ($coords)
-            $coords = array_values($coords);                // kill indizes
-
-        return $coords ? true : false;
+        return true;
     }
 
     public static function getServerConditions($srcType, $srcGroup = null, $srcEntry = null)

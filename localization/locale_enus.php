@@ -43,6 +43,8 @@ $lang = array(
         'n_a'           => "n/a",
         'siteRep'       => "Reputation",
         'aboutUs'       => "About us & contact",
+        'and'           => " and ",
+        'or'            => " or ",
 
         // filter
         'extSearch'     => "Extended search",
@@ -187,6 +189,7 @@ $lang = array(
         'zone'          => "zone",
         'zones'         => "Zones",
 
+        'pvp'           => "PvP",
         'honorPoints'   => "Honor Points",
         'arenaPoints'   => "Arena Points",
         'heroClass'     => "Hero class",
@@ -197,7 +200,9 @@ $lang = array(
         'specs'         => "Specs",
         '_roles'        => ["Healer", "Melee DPS", "Ranged DPS", "Tank"],
 
-        'modes'         => ["Normal / Normal 10", "Heroic / Normal 25", "Heroic 10", "Heroic 25"],
+        'phases'        => "Phases",
+        'mode'          => "Mode",
+        'modes'         => [-1 => "Any", "Normal / Normal 10", "Heroic / Normal 25", "Heroic 10", "Heroic 25"],
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Strength", "Agility", "Stamina", "Intellect", "Spirit"],
         'sources'       => array(
@@ -365,6 +370,9 @@ $lang = array(
         'armor'         => "Armor",
         'foundIn'       => "This NPC can be found in",
         'tameable'      => "Tameable (%s)",
+        'waypoint'      => "Waypoint",
+        'wait'          => "Wait",
+        'respawnIn'     => "Respawn in",
         'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rare", 2 => "Rare Elite", 3 => "Boss"],
         'textRanges'    => [null, "sent to area", "sent to zone", "sent to map", "sent to world"],
         'textTypes'     => [null, "yells", "says", "whispers"],
@@ -415,11 +423,17 @@ $lang = array(
         'Miscellaneous' => "Miscellaneous",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Cosmic Map",
-        'selectorLink'  => " and ",
     ),
     'zone' => array(
-        // 'zone'          => "Zone",
         // 'zonePartOf'    => "This zone is part of",
+        'city'          => "City",
+        'territory'     => "Territory",
+        'instanceType'  => "Instance type",
+        'hcAvailable'   => "Heroic mode available &nbsp;(%d)",
+        'numPlayers'    => "Number of players",
+        'noMap'         => "There is no map available for this zone.",
+        'instanceTypes' => ["Zone",     "Transit", "Dungeon",   "Raid",      "Battleground", "Dungeon",  "Arena", "Raid", "Raid"],
+        'territories'   => ["Alliance", "Horde",   "Contested", "Sanctuary", "PvP",          "World PvP"],
         'cat'           => array(
             "Eastern Kingdoms",         "Kalimdor",                 "Dungeons",                 "Raids",                    "Unused",                   null,
             "Battlegrounds",            null,                       "Outland",                  "Arenas",                   "Northrend"

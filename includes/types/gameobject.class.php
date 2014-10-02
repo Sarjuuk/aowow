@@ -16,7 +16,8 @@ class GameObjectList extends BaseType
                         'o'   => [['ft', 'qse']],
                         'ft'  => ['j' => ['?_factiontemplate ft ON ft.id = o.faction', true], 's' => ', ft.factionId, ft.A, ft.H'],
                         'qse' => ['j' => ['?_quests_startend qse ON qse.type = 2 AND qse.typeId = o.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'o.id'],
-                        'qt'  => ['j' => '?_quests qt ON qse.questId = qt.id']
+                        'qt'  => ['j' => '?_quests qt ON qse.questId = qt.id'],
+                        's'   => ['j' => '?_spawns s ON s.type = 2 AND s.typeId = o.id']
                     );
 
     public function __construct($conditions = [], $miscData = null)
@@ -79,9 +80,10 @@ class GameObjectList extends BaseType
         foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'id'   => $this->id,
-                'name' => $this->getField('name', true),
-                'type' => $this->curTpl['typeCat']
+                'id'       => $this->id,
+                'name'     => $this->getField('name', true),
+                'type'     => $this->curTpl['typeCat'],
+                'location' => $this->getSpawns(SPAWNINFO_ZONES)
             );
 
             if (!empty($this->curTpl['reqSkill']))
@@ -150,17 +152,13 @@ class GameObjectListFilter extends Filter
     public    $extraOpts     = [];
 
     protected $genericFilter = array(
-        15 => [FILTER_CR_NUMERIC, 'id',       null                 ], // id
+         1 => [FILTER_CR_ENUM,    's.areaId', null                 ], // foundin
          7 => [FILTER_CR_NUMERIC, 'reqSkill', null                 ], // requiredskilllevel
-        13 => [FILTER_CR_FLAG,    'cuFlags',  CUSTOM_HAS_COMMENT   ], // hascomments
         11 => [FILTER_CR_FLAG,    'cuFlags',  CUSTOM_HAS_SCREENSHOT], // hasscreenshots
+        13 => [FILTER_CR_FLAG,    'cuFlags',  CUSTOM_HAS_COMMENT   ], // hascomments
+        15 => [FILTER_CR_NUMERIC, 'id',       null                 ], // id
         18 => [FILTER_CR_FLAG,    'cuFlags',  CUSTOM_HAS_VIDEO     ], // hasvideos
     );
-
-/*
-        { id: 1,   name: 'foundin',             type: 'zone' },
-        { id: 16,  name: 'relatedevent',        type: 'event-any+none' },
-*/
 
     protected function createSQLForCriterium(&$cr)
     {
@@ -217,6 +215,27 @@ class GameObjectListFilter extends Filter
                         $this->extraOpts['o']['h'][] = 'endsQuests = 0';
                         return [1];
                 }
+                break;
+            case 16;                                        // relatedevent
+                if (!$this->isSaneNumeric($cr[1]))
+                    break;
+
+                if ($cr[1] == FILTER_ENUM_ANY)
+                {
+                    $goGuids = DB::Aowow()->selectCol('SELECT DISTINCT geo.guid FROM game_event_gameobject geo JOIN ?_events e ON e.id = ABS(geo.eventEntry) WHERE e.holidayId <> 0');
+                    return ['s.guid', $goGuids];
+                }
+                else if ($cr[1] == FILTER_ENUM_NONE)
+                {
+                    $goGuids = DB::Aowow()->selectCol('SELECT DISTINCT geo.guid FROM game_event_gameobject geo JOIN ?_events e ON e.id = ABS(geo.eventEntry) WHERE e.holidayId <> 0');
+                    return ['s.guid', $goGuids, '!'];
+                }
+                else if ($cr[1])
+                {
+                    $goGuids = DB::Aowow()->selectCol('SELECT DISTINCT geo.guid FROM game_event_gameobject geo JOIN ?_events e ON e.id = ABS(geo.eventEntry) WHERE e.holidayId = ?d', $cr[1]);
+                    return ['s.guid', $goGuids];
+                }
+
                 break;
         }
 

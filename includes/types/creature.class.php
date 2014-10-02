@@ -19,7 +19,8 @@ class CreatureList extends BaseType
                         'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', clsMax.attackpower AS mleAtkPwrMax, clsMax.rangedattackpower AS rngAtkPwrMax, clsMax.baseArmor * ct.armorMod AS armorMax, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * ct.dmgMultiplier AS dmgMax, (CASE ct.exp WHEN 0 THEN clsMax.basehp0 WHEN 1 THEN clsMax.basehp1 ELSE clsMax.basehp2 END) * ct.healthMod AS healthMax, clsMax.baseMana * ct.manaMod AS manaMax'],
                         'qse'    => ['j' => ['?_quests_startend qse ON qse.type = 1 AND qse.typeId = ct.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'ct.id'],
                         'qt'     => ['j' => '?_quests qt ON qse.questId = qt.id'],
-                        'rep'    => ['j' => ['creature_onkill_reputation rep ON rep.creature_id = ct.id', true]]
+                        'rep'    => ['j' => ['creature_onkill_reputation rep ON rep.creature_id = ct.id', true]],
+                        's'      => ['j' => '?_spawns s ON s.type = 1 AND s.typeId = ct.id']
                     );
 
     public static function getName($id)
@@ -77,9 +78,9 @@ class CreatureList extends BaseType
         if ($type == 1 && $fam)                             // 1: Beast
             $x .= '<tr><td>'.Lang::$game['fa'][$fam].'</td></tr>';
 
-        // todo (low): exclude not displayed factions
-        if ($f = FactionList::getName($this->getField('factionId')))
-            $x .= '<tr><td>'.$f.'</td></tr>';
+        $fac = new FactionList(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0], ['id', (int)$this->getField('factionId')]));
+        if (!$fac->error)
+            $x .= '<tr><td>'.$fac->getField('name', true).'</td></tr>';
 
         $x .= '</table>';
 
@@ -139,6 +140,11 @@ class CreatureList extends BaseType
         }
     }
 
+    public function isBoss()
+    {
+        return ($this->curTpl['cuFlags'] & NPC_CU_INSTANCE_BOSS) || ($this->curTpl['typeFlags'] & 0x4 && $this->curTpl['rank']);
+    }
+
     public function getListviewData($addInfoMask = 0x0)
     {
         /* looks like this data differs per occasion
@@ -183,7 +189,7 @@ class CreatureList extends BaseType
                     'minlevel'       => $this->curTpl['minLevel'],
                     'maxlevel'       => $this->curTpl['maxLevel'],
                     'id'             => $this->id,
-                    'boss'           => $this->curTpl['typeFlags'] & 0x4 && $this->curTpl['rank'] ? 1 : 0,
+                    'boss'           => $this->isBoss() ? 1 : 0,
                     'classification' => $this->curTpl['rank'],
                     'location'       => $this->getSpawns(SPAWNINFO_ZONES),
                     'name'           => $this->getField('name', true),
@@ -252,8 +258,9 @@ class CreatureListFilter extends Filter
 
     // cr => [type, field, misc, extraCol]
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-        5  => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_REPAIRER          ], // canrepair
-        9  => [FILTER_CR_BOOLEAN, 'lootId',                                      ], // lootable
+         5 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_REPAIRER          ], // canrepair
+         6 => [FILTER_CR_ENUM,    's.areaId',         null                       ], // foundin
+         9 => [FILTER_CR_BOOLEAN, 'lootId',                                      ], // lootable
         11 => [FILTER_CR_BOOLEAN, 'pickpocketLootId',                            ], // pickpocketable
         18 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_AUCTIONEER        ], // auctioneer
         19 => [FILTER_CR_FLAG,    'npcflag',          NPC_FLAG_BANKER            ], // banker
@@ -385,6 +392,27 @@ class CreatureListFilter extends Filter
                     return ['faction', $facTpls];
                 }
                 break;
+            case 38;                                        // relatedevent
+                if (!$this->isSaneNumeric($cr[1]))
+                    break;
+
+                if ($cr[1] == FILTER_ENUM_ANY)
+                {
+                    $cGuids = DB::Aowow()->selectCol('SELECT DISTINCT gec.guid FROM game_event_creature gec JOIN ?_events e ON e.id = ABS(gec.eventEntry) WHERE e.holidayId <> 0');
+                    return ['s.guid', $cGuids];
+                }
+                else if ($cr[1] == FILTER_ENUM_NONE)
+                {
+                    $cGuids = DB::Aowow()->selectCol('SELECT DISTINCT gec.guid FROM game_event_creature gec JOIN ?_events e ON e.id = ABS(gec.eventEntry) WHERE e.holidayId <> 0');
+                    return ['s.guid', $cGuids, '!'];
+                }
+                else if ($cr[1])
+                {
+                    $cGuids = DB::Aowow()->selectCol('SELECT DISTINCT gec.guid FROM game_event_creature gec JOIN ?_events e ON e.id = ABS(gec.eventEntry) WHERE e.holidayId = ?d', $cr[1]);
+                    return ['s.guid', $cGuids];
+                }
+
+                break;
             case 42:                                        // increasesrepwith [enum]
                 if (in_array($cr[1], $this->enums[3]))      // reuse
                     return ['OR', ['AND', ['rep.RewOnKillRepFaction1', $cr[1]], ['rep.RewOnKillRepValue1', 0, '>']], ['AND', ['rep.RewOnKillRepFaction2', $cr[1]], ['rep.RewOnKillRepValue2', 0, '>']]];
@@ -436,8 +464,6 @@ class CreatureListFilter extends Filter
                         return ['OR', ['skinLootId', 0], [['typeFlags', NPC_TYPEFLAG_SPECIALLOOT, '&'], 0, '!']];
                 }
                 break;
-            case 6:                                         // foundin [enum]
-            case 38:                                        // relatedevent [enum]
             case 34:                                        // usemodel [str]          // displayId -> id:creatureDisplayInfo.dbc/model -> id:cratureModelData.dbc/modelPath
             case 41:                                        // haslocation [yn] [staff]
 /* todo */      return [1];

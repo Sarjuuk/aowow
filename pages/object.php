@@ -18,10 +18,10 @@ class ObjectPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = array(
         'swfobject.js',
-        // 'Mapper.js'
+        'Mapper.js'
     );
     protected $css           = array(
-        // ['path' => 'Mapper.css']
+        ['path' => 'Mapper.css']
     );
 
     /*  NOTE
@@ -60,6 +60,8 @@ class ObjectPage extends GenericPage
 
     protected function generateContent()
     {
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         /***********/
         /* Infobox */
         /***********/
@@ -219,30 +221,25 @@ class ObjectPage extends GenericPage
             $this->addJS('Book.js');
         }
 
-        // positions
-        $positions = [];
-        /*
-            $positions = position($object['entry'], 'gameobject');
-            // Исправить type, чтобы подсвечивались event-овые объекты
-            if ($object['position'])
-                foreach ($object['position'] as $z => $zone)
-                    foreach ($zone['points'] as $p => $pos)
-                        if ($pos['type'] == 0 && ($events = event_find(array('object_guid' => $pos['guid']))))
-                        {
-                            $names = arraySelectKey(event_name($events), 'name');
-                            $object['position'][$z]['points'][$p]['type'] = 4;
-                            $object['position'][$z]['points'][$p]['events'] = implode(", ", $names);
-                        }
-        */
+        // get spawns and path
+        $map = null;
+        if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
+        {
+            $map = ['data' => ['parent' => 'mapper-generic'], 'mapperData' => &$spawns];
 
-
-        // consider phaseMasks
+            foreach ($spawns as $areaId => &$areaData)
+            {
+                $map['extra'][$areaId] = ZoneList::getName($areaId);
+                foreach ($areaData as &$floor)
+                    $floor['count'] = count($floor['coords']);
+            }
+        }
 
         // consider pooled spawns
 
         $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->pageText   = $pageText;
-        $this->positions  = $positions;
+        $this->map        = $map;
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => true,

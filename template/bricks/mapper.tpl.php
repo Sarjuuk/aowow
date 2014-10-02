@@ -1,39 +1,71 @@
 <?php
-if (!empty($this->map['data'])):
-    if ($this->map['data']['zone'] < 0):
+if (isset($this->map) && empty($this->map)):
+    echo Lang::$zone['noMap'];
+elseif (!empty($this->map['data'])):
+    if ($this->type != TYPE_ZONE):
+        echo '            <div>'.($this->type == TYPE_OBJECT ? Lang::$gameObject['foundIn'] : Lang::$npc['foundIn']).' <span id="locations">';
+
+        $n = count($this->map['mapperData']);
+        $i = 0;
+        foreach ($this->map['mapperData'] as $areaId => $areaData):
+            if ($n > 1 && $i++ > 0):
+                echo $i < $n ? ', ' : Lang::$main['and'];
+            endif;
+
+            echo '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$this->map['extra'][$areaId].'</a>&nbsp;('.reset($areaData)['count'].')';
+        endforeach;
+
+        echo ".</span></div>\n";
+    endif;
+
+    if (!empty($this->map['data']['zone']) && $this->map['data']['zone'] < 0):
 ?>
             <div id="mapper" style="width: 778px; margin: 0 auto">
-<?php if (isset($this->map['som'])): ?>
+<?php
+        if (isset($this->map['som'])):
+?>
                 <div id="som-generic"></div>
-<?php endif; ?>
+<?php
+        endif;
+?>
                 <div id="mapper-generic"></div>
                 <div class="pad clear"></div>
             </div>
-<?php else: ?>
+<?php
+    else:
+?>
             <div class="pad"></div>
-<?php if (isset($this->map['som'])): ?>
+<?php
+        if (isset($this->map['som'])):
+?>
             <div id="som-generic"></div>
 <?php
-    endif;
-    if (isset($this->map['mapperData'])):
+        endif;
 ?>
-            <div><?php echo Lang::$map['foundIn']; ?> <span id="locations"><?php echo $this->map['mapSelector']; ?>.</span></div>
-<?php endif; ?>
             <div id="mapper-generic"></div>
             <div style="clear: left"></div>
-<?php endif; ?>
+<?php
+    endif;
+?>
 
             <script type="text/javascript">//<![CDATA[
-<?php if ($this->map['data']['zone'] < 0): ?>
-                var g_pageInfo = {id:<?php echo $this->map['data']['zone']; ?>};
-<?php elseif (!empty($this->map['mapperData'])): ?>
-                var g_mapperData = <?php echo $this->map['mapperData']; ?>;
-<?php else: ?>
-                var g_mapperData = {<?php echo $this->map['data']['zone']; ?>: {}};
-<?php endif; ?>
-                var myMapper = new Mapper(<?php echo json_encode($this->map['data'], JSON_NUMERIC_CHECK); /* dont forget to set "'parent' => 'mapper-generic'" */ ?>);
-<?php if (!empty($this->map['som'])): ?>
-                new ShowOnMap(<?php echo json_encode($this->map['som'], JSON_NUMERIC_CHECK); ?>);
-<?php endif; ?>
+<?php
+    if (!empty($this->map['data']['zone'])):
+        echo "                var g_pageInfo = {id: ".$this->map['data']['zone']."};\n";
+    elseif (!empty($this->map['mapperData'])):
+        echo "                var g_mapperData = ".json_encode($this->map['mapperData'], JSON_NUMERIC_CHECK).";\n";
+    endif;
+
+    // dont forget to set "parent: 'mapper-generic'"
+    echo "                var myMapper = new Mapper(".json_encode($this->map['data'], JSON_NUMERIC_CHECK).");\n";
+
+    if (isset($this->map['som'])):
+        echo "                new ShowOnMap(".json_encode($this->map['som'], JSON_NUMERIC_CHECK).");\n";
+    endif;
+
+    if ($this->type != TYPE_ZONE):
+        echo "                                    \$WH.gE(\$WH.ge('locations'), 'a')[0].onclick();\n";
+    endif;
+?>
             //]]></script>
 <?php endif; ?>

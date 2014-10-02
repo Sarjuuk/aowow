@@ -224,7 +224,6 @@ define('OBJECT_CU_NOT_PERSISTANT',          0x80);
 
 define('NPC_CU_INSTANCE_BOSS',              0x01);
 define('NPC_CU_DIFFICULTY_DUMMY',           0x02);
-define('NPC_CU_DUNGEON_ENCOUNTER',          0x04);
 
 define('ITEM_CU_OT_ITEMLOOT',               0x01);          // there are no sourceTypes for these two cases
 define('ITEM_CU_OT_OBJECTLOOT',             0x02);

@@ -48,6 +48,8 @@ $lang = array(
         'n_a'           => "n/d",
         'siteRep'       => "Reputación",
         'aboutUs'       => "Sobre Aowow",
+        'and'           => " y ",
+        'or'            => " o ",
 
         // filter
         'extSearch'     => "Extender búsqueda",
@@ -192,6 +194,7 @@ $lang = array(
         'zone'          => "zona",
         'zones'         => "Zonas",
 
+        'pvp'           => "JcJ",
         'honorPoints'   => "Puntos de Honor",
         'arenaPoints'   => "Puntos de arena",
         'heroClass'     => "Clase héroe",
@@ -202,7 +205,9 @@ $lang = array(
         'specs'         => "Especializaciones",
         '_roles'        => ["Sanador", "DPS cuerpo", "DPS a distancia", "Tanque"],
 
-        'modes'         => ["Normal / Normal 10", "Heroico / Normal 25", "Heróico 10", "Heróico 25"],
+        'phases'        => "Fases",
+        'mode'          => "Modo",
+        'modes'         => [-1 => "Cualquiera", "Normal / Normal 10", "Heroico / Normal 25", "Heróico 10", "Heróico 25"],
         'expansions'    => ["World of Warcraft", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Fuerza", "Agilidad", "Aguante", "Intelecto", "Espíritu"],
         'sources'       => array(
@@ -352,7 +357,7 @@ $lang = array(
         'triggeredBy'   => "Accionado por",
         'capturePoint'  => "Punto de captura"
     ),
-    'npc'   => array(
+    'npc' => array(
         'classification'=> "Clasificación",
         'petFamily'     => "Familia de mascota",
         'react'         => "Reacción",
@@ -369,6 +374,9 @@ $lang = array(
         'ranged'        => "Ataque a distancia",
         'armor'         => "Armadura",
         'tameable'      => "Domesticable (%s)",
+        'waypoint'      => "punto de recorrido",
+        'wait'          => "Tiempo de espera",
+        'respawnIn'     => "Reingreso en",
         'rank'          => [0 => "Normal", 1 => "Élite", 4 => "Raro", 2 => "Élite raro", 3 => "Jefe"],
         'textRanges'    => [null, "[sent to area]", "[sent to zone]", "[sent to map]", "[sent to world]"],
         'textTypes'     => [null, "grita", "dice", "susurra"],
@@ -421,8 +429,15 @@ $lang = array(
         'CosmicMap'     => "Mapa cósmico",
     ),
     'zone' => array(
-        // 'zone'          => "Zone",
         // 'zonePartOf'    => "Cette zone fait partie de la zone",
+        'city'          => "Ciudad",
+        'territory'     => "Territorio",
+        'instanceType'  => "Tipo de instancia",
+        'hcAvailable'   => "Modo heroico disponible&nbsp;(%di)",
+        'numPlayers'    => "Número de jugadores",
+        'noMap'         => "No hay mapa disponible para esta zona.",
+        'instanceTypes' => ["Zona",    "Tránsito", "Mazmorra",   "Banda",     "Campo de batalla", "Mazmorra",   "Arena", "Banda", "Banda"],
+        'territories'   => ["Alianza", "Horda",    "En disputa", "Santuario", "JcJ",              "JcJ abierto"],
         'cat'           => array(
             "Reinos del Este",          "Kalimdor",                 "Mazmorras",                "Bandas",                   "No las uso",               null,
             "Campos de batalla",        null,                       "Terrallende",              "Arenas",                   "Rasganorte"

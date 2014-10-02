@@ -48,6 +48,8 @@ $lang = array(
         'n_a'           => "n. v.",
         'siteRep'       => "Ruf",
         'aboutUs'       => "Über Aowow",
+        'and'           => " und ",
+        'or'            => " oder ",
 
         // filter
         'extSearch'     => "Erweiterte Suche",
@@ -192,6 +194,7 @@ $lang = array(
         'zone'          => "Zone",
         'zones'         => "Gebiete",
 
+        'pvp'           => "PvP",
         'honorPoints'   => "Ehrenpunkte",
         'arenaPoints'   => "Arenapunkte",
         'heroClass'     => "Heldenklasse",
@@ -202,7 +205,9 @@ $lang = array(
         'specs'         => "Spezialisierungen",
         '_roles'        => ["Heiler", "Nahkampf-DPS", "Distanz-DPS", "Tank"],
 
-        'modes'         => ["Normal / Normal 10", "Heroisch / Normal 25", "Heroisch 10", "Heroisch 25"],
+        'phases'        => "Phasen",
+        'mode'          => "Modus",
+        'modes'         => [-1 => "Beliebig", "Normal / Normal 10", "Heroisch / Normal 25", "Heroisch 10", "Heroisch 25"],
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"],
         'sources'       => array(
@@ -352,7 +357,7 @@ $lang = array(
         'capturePoint'  => "Eroberungspunkt",
         'foundIn'       => "Dieses Objekt befindet sich in"
     ),
-    'npc'   => array(
+    'npc' => array(
         'classification'=> "Einstufung",
         'petFamily'     => "Tierart",
         'react'         => "Reaktion",
@@ -370,6 +375,9 @@ $lang = array(
         'armor'         => "Rüstung",
         'foundIn'       => "Dieser NPC befindet sich in",
         'tameable'      => "Zähmbar (%s)",
+        'waypoint'      => "Wegpunkt",
+        'wait'          => "Wartezeit",
+        'respawnIn'     => "Wiedereinstieg in",
         'rank'          => [0 => "Normal", 1 => "Elite", 4 => "Rar", 2 => "Rar Elite", 3 => "Boss"],
         'textRanges'    => [null, "an das Gebiet gesendet", "an die Zone gesendet", "an die Map gesendet", "an die Welt gesendet"],
         'textTypes'     => [null, "schreit", "sagt", "flüstert"],
@@ -420,11 +428,17 @@ $lang = array(
         'Miscellaneous' => "Diverse",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Kosmische Karte",
-        'selectorLink'  => " und ",
     ),
     'zone' => array(
-        // 'zone'          => "Zone",
         // 'zonePartOf'    => "Diese Zone ist Teil der Zone",
+        'city'          => "Stadt",
+        'territory'     => "Territorium",
+        'instanceType'  => "Instanzart",
+        'hcAvailable'   => "Heroischer Modus verfügbar&nbsp;(%d)",
+        'numPlayers'    => "Anzahl an Spielern",
+        'noMap'         => "Für dieses Gebiet steht keine Karte zur Verfügung.",
+        'instanceTypes' => ["Zone",    "Durchgang", "Dungeon",  "Schlachtzug",     "Battleground", "Dungeon", "Arena", "Schlachtzug", "Schlachtzug"],
+        'territories'   => ["Allianz", "Horde",     "Umkämpft", "Sicheres Gebiet", "PvP",          "Welt-PvP"],
         'cat'           => array(
             "Östliche Königreiche",     "Kalimdor",                 "Dungeons",                 "Schlachtzüge",             "Unbenutzt",                null,
             "Schlachtfelder",           null,                       "Scherbenwelt",             "Arenen",                   "Nordend"
