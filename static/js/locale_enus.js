@@ -925,12 +925,12 @@ var mn_tools = [
     ]]
 ];
 var mn_community = [
-    [3,"Forum","http://forums.battle.net",null,{tinyIcon:"static/images/icons/forum.png"}],
-    [7,"Blog","http://worldpress.com",null,{tinyIcon:"static/images/icons/blog.png"}],
-    [4,"IRC-Channel","http://webchat.quakenet.org/",null,{tinyIcon:"static/images/icons/irc.png"}],
+    [3,"Forum","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
+    [7,"Blog","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
+    [4,"IRC-Channel","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
     [,"Social"],
-    [6,"Facebook Page","http://www.facebook.com",null,{tinyIcon:"static/images/icons/facebook.gif"}],
-    [5,"Twitter Page","http://twitter.com",null,{tinyIcon:"static/images/icons/twitter.gif"}]
+    [6,"Facebook Page","http://www.facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.gif"}],
+    [5,"Twitter Page","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.gif"}]
 ];
 var mn_more = [
     [,"All About AoWoW"],
@@ -2288,59 +2288,59 @@ var g_world_object_types = {
 };
 
 var g_condition_types = {
-     1: ['Looting',        'If the conditions are met, this item can be dropped by [npc=$1].'], // CND_SRC_CREATURE_LOOT_TEMPLATE
-     2: ['Disenchanting',  'If the conditions are met, this item can be found when disenchanting [item=$1].'], // CND_SRC_DISENCHANT_LOOT_TEMPLATE
-     3: ['Fishing',        'If the conditions are met, fishing in [zone=$1] can yield this item.'], // CND_SRC_FISHING_LOOT_TEMPLATE
-     4: ['Object Opening', 'If the conditions are met, this item can be found in [object=$1].'], // CND_SRC_GAMEOBJECT_LOOT_TEMPLATE
-     5: ['Item Opening',   'If the conditions are met, this item can be found in [item=$1].'], // CND_SRC_ITEM_LOOT_TEMPLATE
-     6: ['Mail Attachm.',  'If the conditions are met, this item can be attached to this mail.'], // CND_SRC_MAIL_LOOT_TEMPLATE
-     7: ['Milling',        'If the conditions are met, this item can be milled from [item=$1].'], // CND_SRC_MILLING_LOOT_TEMPLATE
-     8: ['Pickpocketing',  'If the conditions are met, this item can be picked from [npc=$1].'], // CND_SRC_PICKPOCKETING_LOOT_TEMPLATE
-     9: ['Prospecting',    'If the conditions are met, this item can be prospected from [item=$1].'], // CND_SRC_PROSPECTING_LOOT_TEMPLATE
-    10: ['Ref. Looting',   '<this should not be displayed and the template merged into its surce>'], // CND_SRC_REFERENCE_LOOT_TEMPLATE
-    11: ['Skinning',       'If the conditions are met, this item can be skinned (salvaged, (mined, (herbed))) from [npc=$1].'], // CND_SRC_SKINNING_LOOT_TEMPLATE
-    12: ['Crafting',       'If the conditions are met, casting [spell=$1] may also create this item.'], // CND_SRC_SPELL_LOOT_TEMPLATE
-    13: ['Auto Target',    'Only targets matching the conditions can be affected by the spell.'], // CND_SRC_SPELL_IMPLICIT_TARGET
-    14: ['Gossip',         'Display the related Gossip entry on [npc=$2], if the conditions are met.'], // CND_SRC_GOSSIP_MENU
-    15: ['Gossip Menu',    'Display the related Gossip menu, if the conditions are met.'], // CND_SRC_GOSSIP_MENU_OPTION
-    16: ['Vehicle',        'This Creature can be used as a vehicle, if the conditions are met.'], // CND_SRC_CREATURE_TEMPLATE_VEHICLE
-    17: ['Spell',          'This Spell can only be cast, if the conditions are met.'], // CND_SRC_SPELL
-    18: ['Spell Click',    'If the conditions are met, [npc=$2] casts [spell=$1] if clicked on.'], // CND_SRC_SPELL_CLICK_EVENT
-    19: ['Quest Sign',     'A [icon name=quest_startend]&nbsp;[/icon] will be shown for this quest, if the condition is met.'], // CND_SRC_QUEST_ACCEPT
-    20: ['Quest Accept',   'The Player can accept this quest, if the condition is met.'], // CND_SRC_QUEST_SHOW_MARK
-    21: ['Vehicle Spell',  'If the conditions are met, vehicle [npc=$2] has [spell=$1] available.'], // CND_SRC_VEHICLE_SPELL
-    22: ['SmartAI',        'If the conditions are met, the creatures AI may perform additional actions.'], // CND_SRC_SMART_EVENT
-    23: ['Vendor',         'If the conditions are met, the vendor will have this item available.'], // CND_SRC_NPC_VENDOR
-    24: ['Spell Proc',     'If the conditions are met, the spell is allowed to proc.']  // CND_SRC_SPELL_PROC
+     1: ['Looting',        'If the conditions are met, this item can be dropped by [npc=$1].'],                                 // CND_SRC_CREATURE_LOOT_TEMPLATE
+     2: ['Disenchanting',  'If the conditions are met, this item can be found when disenchanting [item=$1].'],                  // CND_SRC_DISENCHANT_LOOT_TEMPLATE
+     3: ['Fishing',        'If the conditions are met, fishing in [zone=$1] can yield this item.'],                             // CND_SRC_FISHING_LOOT_TEMPLATE
+     4: ['Object Opening', 'If the conditions are met, this item can be found in [object=$1].'],                                // CND_SRC_GAMEOBJECT_LOOT_TEMPLATE
+     5: ['Item Opening',   'If the conditions are met, this item can be found in [item=$1].'],                                  // CND_SRC_ITEM_LOOT_TEMPLATE
+     6: ['Mail Attachm.',  'If the conditions are met, this item can be attached to this mail.'],                               // CND_SRC_MAIL_LOOT_TEMPLATE
+     7: ['Milling',        'If the conditions are met, this item can be milled from [item=$1].'],                               // CND_SRC_MILLING_LOOT_TEMPLATE
+     8: ['Pickpocketing',  'If the conditions are met, this item can be picked from [npc=$1].'],                                // CND_SRC_PICKPOCKETING_LOOT_TEMPLATE
+     9: ['Prospecting',    'If the conditions are met, this item can be prospected from [item=$1].'],                           // CND_SRC_PROSPECTING_LOOT_TEMPLATE
+    10: ['Ref. Looting',   ''],                                                                                                 // CND_SRC_REFERENCE_LOOT_TEMPLATE
+    11: ['Skinning',       'If the conditions are met, this item can be skinned from [npc=$1].'],                               // CND_SRC_SKINNING_LOOT_TEMPLATE
+    12: ['Crafting',       'If the conditions are met, casting [spell=$1] may also create this item.'],                         // CND_SRC_SPELL_LOOT_TEMPLATE
+    13: ['Auto Target',    'Only targets matching the conditions can be affected by the spell.'],                               // CND_SRC_SPELL_IMPLICIT_TARGET
+    14: ['Gossip',         'Display the related Gossip entry on [npc=$2], if the conditions are met.'],                         // CND_SRC_GOSSIP_MENU
+    15: ['Gossip Menu',    'Display the related Gossip menu, if the conditions are met.'],                                      // CND_SRC_GOSSIP_MENU_OPTION
+    16: ['Vehicle',        'This Creature can be used as a vehicle, if the conditions are met.'],                               // CND_SRC_CREATURE_TEMPLATE_VEHICLE
+    17: ['Spell',          'This Spell can only be cast, if the conditions are met.'],                                          // CND_SRC_SPELL
+    18: ['Spell Click',    'If the conditions are met, [npc=$2] casts [spell=$1] if clicked on.'],                              // CND_SRC_SPELL_CLICK_EVENT
+    19: ['Quest Accept',   'The Player can accept this quest, if the condition is met.'],                                       // CND_SRC_QUEST_SHOW_MARK
+    20: ['Quest Sign',     'A [icon name=quest_startend]&nbsp;[/icon] will be shown for this quest, if the condition is met.'], // CND_SRC_QUEST_ACCEPT
+    21: ['Vehicle Spell',  'If the conditions are met, vehicle [npc=$2] has [spell=$1] available.'],                            // CND_SRC_VEHICLE_SPELL
+    22: ['SmartAI',        'If the conditions are met, the creatures AI may perform additional actions.'],                      // CND_SRC_SMART_EVENT
+    23: ['Vendor',         'If the conditions are met, the vendor will have this item available.'],                             // CND_SRC_NPC_VENDOR
+    24: ['Spell Proc',     'If the conditions are met, the spell is allowed to proc.']                                          // CND_SRC_SPELL_PROC
 };
 
 var g_conditions = {
      1: 'The Player $has:does not have; an aura of $1',
      2: 'The Player $owns: does not own; $1',
      3: 'The Player $has:does not have; $1 equipped',
-     4: 'The Player is$: not; in $1',                       // also used by 22, 23
+     4: 'The Player is$: not; in $1',                                       // also used by 22, 23
      5: 'The Player\'s standing with $1 is$: not; $2',
      6: 'The Player is$: not; $1',
      7: 'The Player $knows: does not know; $1',
      8: 'The Player has$: not; finished $1',
      9: 'The Player has$: not; accepted $1',
     10: 'The Player is$: not; $1',
-    11: 'The game word is$: not; in a certain state',       // nyi
+    11: 'The game word is$: not; in a certain state',                       // nyi
     12: '$1 must$: not; be active',
-    13: 'The instance $has:does not have; a certain state', // nyi
+    13: 'The instance $has:does not have; a certain state',                 // nyi
     14: 'The Player has $never:; interacted with $1',
-    15: 'The Player is$: not; a $1',                        // also used by 16
+    15: 'The Player is$: not; a $1',                                        // also used by 16
     17: 'The Player has$: not; achieved $1',
     18: 'The Player has$: not; obtained $1',
     20: 'The Player\'s gender is$: not; [span class=icon-$2]$1[/span]',
-    21: 'The target $has:does not have; a certain state',   // nyi
-    24: '',                                                 // not used
+    21: 'The target $has:does not have; a certain state',                   // nyi
+    24: '',                                                                 // not used
     25: 'The Player $knows: does not know; $1',
     26: 'The Creature is$: not; in phase $1',
     27: 'The target\'s level is$: not; $2 $1',
     28: 'The Player has$: not; completed $1',
-    29: 'The Player is$: not; within $2yd of $1',           // also used by 30
-    31: 'Casters\'s target is$: not; $1',                   // also used by 32
+    29: 'The Player is$: not; within $2yd of $1',                           // also used by 30
+    31: 'Casters\'s target is$: not; $1',                                   // also used by 32
     33: 'The Player $has:does not have; a certain relation to the target',  // nyi
     34: 'The target $has:does not have; a certain reaction to the Player',  // nyi
     35: 'The target is$: not; $2 $1yd away',

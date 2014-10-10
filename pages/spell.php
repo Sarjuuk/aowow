@@ -1083,25 +1083,22 @@ class SpellPage extends GenericPage
 
         // tab: conditions
         $sc = Util::getServerConditions([CND_SRC_SPELL_LOOT_TEMPLATE, CND_SRC_SPELL_IMPLICIT_TARGET, CND_SRC_SPELL, CND_SRC_SPELL_CLICK_EVENT, CND_SRC_VEHICLE_SPELL, CND_SRC_SPELL_PROC], null, $this->typeId);
-        if ($sc[0])
+        if (!empty($sc[0]))
         {
-            if (!empty($sc[0]))
-            {
-                $this->extendGlobalData($sc[1]);
-                $tab = "<script type=\"text/javascript\">\n" .
-                       "var markup = ConditionList.createTab(".json_encode($sc[0], JSON_NUMERIC_CHECK).");\n" .
-                       "Markup.printHtml(markup, 'tab-conditions', { allow: Markup.CLASS_STAFF })" .
-                       "</script>";
+            $this->extendGlobalData($sc[1]);
+            $tab = "<script type=\"text/javascript\">\n" .
+                   "var markup = ConditionList.createTab(".json_encode($sc[0], JSON_NUMERIC_CHECK).");\n" .
+                   "Markup.printHtml(markup, 'tab-conditions', { allow: Markup.CLASS_STAFF })" .
+                   "</script>";
 
-                $this->lvTabs[] = array(
-                    'file'   => null,
-                    'data'   => $tab,
-                    'params' => array(
-                        'id'   => 'conditions',
-                        'name' => '$LANG.requires'
-                    )
-                );
-            }
+            $this->lvTabs[] = array(
+                'file'   => null,
+                'data'   => $tab,
+                'params' => array(
+                    'id'   => 'conditions',
+                    'name' => '$LANG.requires'
+                )
+            );
         }
     }
 

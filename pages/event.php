@@ -74,6 +74,10 @@ class EventPage extends GenericPage
             $this->infobox[] = Lang::$npc['rank'][3].Lang::$main['colon'].'[npc='.$_.']';
         }
 
+        // display internal id to staff
+        if (User::isInGroup(U_GROUP_STAFF))
+            $this->infobox[] = 'Event-Id'.Lang::$main['colon'].$this->eId;
+
         /****************/
         /* Main Content */
         /****************/

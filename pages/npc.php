@@ -477,7 +477,7 @@ class NpcPage extends GenericPage
                 $lvData = $soldItems->getListviewData(ITEMINFO_VENDOR, [TYPE_NPC => $this->typeId]);
 
                 $sc = Util::getServerConditions(CND_SRC_NPC_VENDOR, $this->typeId);
-                if ($sc[0])
+                if (!empty($sc[0]))
                 {
                     $this->extendGlobalData($sc[1]);
 

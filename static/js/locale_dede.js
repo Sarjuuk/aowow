@@ -879,12 +879,12 @@ var mn_tools = [
     ]]
 ];
 var mn_community = [
-    [3,"Forum","http://forums.battle.net",null,{tinyIcon:"static/images/icons/forum.png"}],
-    [7,"Blog","http://worldpress.com",null,{tinyIcon:"static/images/icons/blog.png"}],
-    [4,"IRC-Channel","http://webchat.quakenet.org/",null,{tinyIcon:"static/images/icons/irc.png"}],
+    [3,"Forum","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
+    [7,"Blog","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
+    [4,"IRC-Channel","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
     [,"Soziales"],
-    [6,"Facebook-Seite","http://www.facebook.com",null,{tinyIcon:"static/images/icons/facebook.gif"}],
-    [5,"Twitter-Seite","http://twitter.com",null,{tinyIcon:"static/images/icons/twitter.gif"}]
+    [6,"Facebook-Seite","http://www.facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.gif"}],
+    [5,"Twitter-Seite","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.gif"}]
 ];
 var mn_more = [
     [,"Alles über AoWoW"],
@@ -2241,60 +2241,60 @@ var g_world_object_types = {
 };
 
 var g_condition_types = {
-     1: ['Plündern',         'If the conditions are met, this item can be dropped by [npc=$1].'], // CND_SRC_CREATURE_LOOT_TEMPLATE
-     2: ['Entzaubern',       'If the conditions are met, this item can be found when disenchanting [item=$1].'], // CND_SRC_DISENCHANT_LOOT_TEMPLATE
-     3: ['Angeln',           'If the conditions are met, fishing in [zone=$1] can yield this item.'], // CND_SRC_FISHING_LOOT_TEMPLATE
-     4: ['Objekt Öffnen',    'If the conditions are met, this item can be found in [object=$1].'], // CND_SRC_GAMEOBJECT_LOOT_TEMPLATE
-     5: ['Gegenst. Öffnen',  'If the conditions are met, this item can be found in [item=$1].'], // CND_SRC_ITEM_LOOT_TEMPLATE
-     6: ['Brief Anhang.',    'If the conditions are met, this item can be attached to this mail.'], // CND_SRC_MAIL_LOOT_TEMPLATE
-     7: ['Mahlen',           'If the conditions are met, this item can be milled from [item=$1].'], // CND_SRC_MILLING_LOOT_TEMPLATE
-     8: ['Stehlen',          'If the conditions are met, this item can be picked from [npc=$1].'], // CND_SRC_PICKPOCKETING_LOOT_TEMPLATE
-     9: ['Sondieren',        'If the conditions are met, this item can be prospected from [item=$1].'], // CND_SRC_PROSPECTING_LOOT_TEMPLATE
-    10: ['Ref. Plündern',    '<das hier sollte eigentlich nicht sichtbar sein>'], // CND_SRC_REFERENCE_LOOT_TEMPLATE
-    11: ['Kürschnern',       'If the conditions are met, this item can be skinned (salvaged, (mined, (herbed))) from [npc=$1].'], // CND_SRC_SKINNING_LOOT_TEMPLATE
-    12: ['Herstellen',       'If the conditions are met, casting [spell=$1] may also create this item.'], // CND_SRC_SPELL_LOOT_TEMPLATE
-    13: ['Autom. Zielwahl',  'Nur Ziele, welche diese Bedinungen erfüllen, können von diesem Zauber betroffen sein.'], // CND_SRC_SPELL_IMPLICIT_TARGET
-    14: ['Dialog',           'Zeige den verwandten Dialog, wenn die Bedingungen erfüllt sind.'], // CND_SRC_GOSSIP_MENU
-    15: ['Dialog Menü',      'Zeige das verwandte Dialogmenü, wenn die Bedingungen erfüllt sind.'], // CND_SRC_GOSSIP_MENU_OPTION
-    16: ['Vehicle',          'Diese Kreatur kann als Fahrzeug benutzt werden, wenn die Bedingungen erfüllt sind.'], // CND_SRC_CREATURE_TEMPLATE_VEHICLE
-    17: ['Zauber',           'Der Zauber kann nur gewirkt werden, wenn die Bedingungen erfüllt sind.'], // CND_SRC_SPELL
-    18: ['Klick',            'Wenn die Bedingung erfüllt ist, wirkt [npc=$2] [spell=$1], wenn man darauf klickt.'], // CND_SRC_SPELL_CLICK_EVENT
-    19: ['Quest Symbol',     'Ein [icon name=quest_startend]&nbsp;[/icon] wird für dieses Quest angezeigt, wenn die Bedingungen erfüllt sind.'], // CND_SRC_QUEST_ACCEPT
-    20: ['Quest Annahme',    'Der Spieler kann dieses Quest annehmen, wenn die Bedingungen erfüllt sind.'], // CND_SRC_QUEST_SHOW_MARK
-    21: ['Fahrzeug Fähigk.', 'Wenn die Bedingung erfüllt ist, ist im Fahrzeug [npc=$2] [spell=$1] verfügbar'], // CND_SRC_VEHICLE_SPELL
-    22: ['SmartKI',          'If the conditions are met, the creatures AI may perform additional actions.'], // CND_SRC_SMART_EVENT
-    23: ['Händler',          'If the conditions are met, the vendor will have this item available.'], // CND_SRC_NPC_VENDOR
-    24: ['Zauberauslösung',  'If the conditions are met, the spell is allowed to proc.']  // CND_SRC_SPELL_PROC
+     1: ['Plündern',         'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand aus [npc=$1] geplündert werden.'],                          // CND_SRC_CREATURE_LOOT_TEMPLATE
+     2: ['Entzaubern',       'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand aus [item=$1] entzaubert werden.'],                         // CND_SRC_DISENCHANT_LOOT_TEMPLATE
+     3: ['Angeln',           'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand beim Angeln in [zone=$1] gefunden werden.'],                // CND_SRC_FISHING_LOOT_TEMPLATE
+     4: ['Objekt Öffnen',    'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand in [object=$1] gefunden werden.'],                          // CND_SRC_GAMEOBJECT_LOOT_TEMPLATE
+     5: ['Gegenst. Öffnen',  'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand in [item=$1] gefunden werden.'],                            // CND_SRC_ITEM_LOOT_TEMPLATE
+     6: ['Brief Anhang',     'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand an diesem Brief angehängt sein.'],                          // CND_SRC_MAIL_LOOT_TEMPLATE
+     7: ['Mahlen',           'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand beim Mahlen von [item=$1] gefunden werden.'],               // CND_SRC_MILLING_LOOT_TEMPLATE
+     8: ['Stehlen',          'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand von [npc=$1] gesammelt werden.'],                           // CND_SRC_PICKPOCKETING_LOOT_TEMPLATE
+     9: ['Sondieren',        'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand beim Sondieren von [item=$1] gefunden werden.'],            // CND_SRC_PROSPECTING_LOOT_TEMPLATE
+    10: ['Ref. Plündern',    ''],                                                                                                                // CND_SRC_REFERENCE_LOOT_TEMPLATE
+    11: ['Kürschnern',       'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand beim Kürschnern von [item=$1] gefunden werden.'],           // CND_SRC_SKINNING_LOOT_TEMPLATE
+    12: ['Herstellen',       'Wenn die Bedingung erfüllt ist, kann beim Wirken von [spell=$1] zusätzlich dieser Gegenstand erzeugt werden.'],    // CND_SRC_SPELL_LOOT_TEMPLATE
+    13: ['Autom. Zielwahl',  'Nur Ziele, welche diese Bedinungen erfüllen, können von diesem Zauber betroffen sein.'],                           // CND_SRC_SPELL_IMPLICIT_TARGET
+    14: ['Dialog',           'Zeige den verwandten Dialog, wenn die Bedingungen erfüllt sind.'],                                                 // CND_SRC_GOSSIP_MENU
+    15: ['Dialog Menü',      'Zeige das verwandte Dialogmenü, wenn die Bedingungen erfüllt sind.'],                                              // CND_SRC_GOSSIP_MENU_OPTION
+    16: ['Vehicle',          'Diese Kreatur kann als Fahrzeug benutzt werden, wenn die Bedingungen erfüllt sind.'],                              // CND_SRC_CREATURE_TEMPLATE_VEHICLE
+    17: ['Zauber',           'Der Zauber kann nur gewirkt werden, wenn die Bedingungen erfüllt sind.'],                                          // CND_SRC_SPELL
+    18: ['Klick',            'Wenn die Bedingung erfüllt ist, wirkt [npc=$2] [spell=$1], wenn man darauf klickt.'],                              // CND_SRC_SPELL_CLICK_EVENT
+    19: ['Quest Annahme',    'Der Spieler kann dieses Quest annehmen, wenn die Bedingungen erfüllt sind.'],                                      // CND_SRC_QUEST_SHOW_MARK
+    20: ['Quest Symbol',     'Ein [icon name=quest_startend]&nbsp;[/icon] wird für dieses Quest angezeigt, wenn die Bedingungen erfüllt sind.'], // CND_SRC_QUEST_ACCEPT
+    21: ['Fahrzeug Fähigk.', 'Wenn die Bedingung erfüllt ist, ist im Fahrzeug [npc=$2] [spell=$1] verfügbar'],                                   // CND_SRC_VEHICLE_SPELL
+    22: ['SmartAI',          'Wenn die Bedingung erfüllt ist, kann die KI dieser Kreatur zusätzliche Handlungen durchführen.'],                  // CND_SRC_SMART_EVENT
+    23: ['Händler',          'Wenn die Bedingung erfüllt ist, hat der Händler diesen Gegenstand im Sortiment.'],                                 // CND_SRC_NPC_VENDOR
+    24: ['Zauberauslösung',  'Wenn die Bedingung erfüllt ist, kann der Zauber auslösen.']                                                        // CND_SRC_SPELL_PROC
 };
 
 var g_conditions = {
      1: 'Der Spieler hat $eine:keine; Aura von $1',
      2: 'Der Spieler besitzt$: nicht; $1',
      3: 'Der Spieler hat$: nicht; $1 ausgerüstet',
-     4: 'Der Spieler befindet sich$: nicht; in $1',         // also used by 22, 23
+     4: 'Der Spieler befindet sich$: nicht; in $1',                           // also used by 22, 23
      5: 'Der Ruf bei $1 ist$: nicht; $2',
      6: 'Der Spieler ist$: nicht; $1',
      7: 'Der Spieler beherrscht $1$: nicht;',
      8: 'Der Spieler hat $1$: nicht; beendet',
      9: 'Der Spieler hat $1$: nicht; angenommen',
     10: 'Der Spieler ist$: nicht; $1',
-    11: 'Die Spielwelt hat einen bestimmten Zustand$: nicht;',// nyi
+    11: 'Die Spielwelt hat einen bestimmten Zustand$: nicht;',                // nyi
     12: '$1 ist$: nicht; aktiv',
-    13: 'Die Instanz hat einen bestimmten Zustand$: nicht;',// nyi
+    13: 'Die Instanz hat einen bestimmten Zustand$: nicht;',                  // nyi
     14: 'Der Spieler hat $nie :;mit $1 interagiert',
-    15: 'Der Spieler ist$: nicht; ein $1',                  // also used by 16
+    15: 'Der Spieler ist$: nicht; ein $1',                                    // also used by 16
     17: 'Der Spieler hat $1$: nicht; erlangt',
     18: 'Der Spieler hat $1$: nicht; erhalten',
     20: 'Des Spielers Geschlecht is$: nicht; [span class=icon-$2]$1[/span]',
-    21: 'Das Ziel hat einen bestimmten Zustand$: nicht;',   // nyi
-    24: '',                                                 // not used
+    21: 'Das Ziel hat einen bestimmten Zustand$: nicht;',                     // nyi
+    24: '',                                                                   // not used
     25: 'Der Spieler kennt$: nicht; $1',
     26: 'Die Kreatur befindet sich$: nicht; in Phase $1',
     27: 'Die Stufe des Ziels ist$: nicht; $2 $1',
     28: 'Der Spieler hat $1$: nicht; abgeschlossen',
-    29: 'Der Spieler befindet sich$: nicht; in $2m zu $1',  // also used by 30
-    31: 'Das Ziel des Zaubers ist$: nicht;: $1',            // also used by 32
-    33: 'Der Spieler hat eine bestimmte Beziehung mit dem Ziel$: nicht;',  // nyi
+    29: 'Der Spieler befindet sich$: nicht; in $2m zu $1',                    // also used by 30
+    31: 'Das Ziel des Zaubers ist$: nicht;: $1',                              // also used by 32
+    33: 'Der Spieler hat eine bestimmte Beziehung mit dem Ziel$: nicht;',     // nyi
     34: 'Der Spieler hat eine bestimmte Ruf-Reaktion mit dem Ziel$: nicht;',  // nyi
     35: 'Das Ziel ist$: nicht; $2 $1m entfernt',
     36: 'Das Ziel ist$: nicht; am Leben',
