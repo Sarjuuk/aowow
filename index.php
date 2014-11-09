@@ -9,16 +9,21 @@ if (!file_exists('config/config.php'))
     exit;
 }
 
+$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'mcrypt'];
+$error  = '';
+foreach ($reqExt as $r)
+    if (!extension_loaded($r))
+        $error .= 'Required Extension <b>'.$r."</b> was not found. Please see if it exists, using <i>php -m</i>\n\n";
+
+if (version_compare(PHP_VERSION, '5.5.0') < 0)
+    $error .= 'PHP Version <b>5.5.0</b> or higher required! Your version is <b>'.PHP_VERSION."</b>.\nCore functions are unavailable!";
+
+if ($error)
+    die('<pre>'.$error.'</pre>');
+
 // include all necessities, set up basics
 require 'includes/kernel.php';
 
-if (version_compare(PHP_VERSION, '5.5.0') <= 0)
-{
-    if (User::isInGroup(U_GROUP_EMPLOYEE))
-        Util::addNote(U_GROUP_EMPLOYEE, 'PHP Version 5.5.0 or higher required! Your version is '.PHP_VERSION."[br]Core functions are unavailable!");
-    else
-        (new GenericPage)->maintenance();
-}
 
 $altClass = '';
 switch ($pageCall)
