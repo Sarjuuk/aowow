@@ -8,12 +8,6 @@ if (!defined('AOWOW_REVISION'))
     // this script requires the following dbc-files to be parsed and available
     // CreatureFamily, CreatureDisplayInfo, FactionTemplate, AreaTable
 
-    // Todo:
-    // locations are a tiny bit wide at the moment.
-    // I'm still undecided wether the old system is pure genius or pure madness. While building the zone-maps it also generated masks for that zone, using the alpha-channel in the *.blp
-    // When deciding what spawn lies where you could check against the relative coordinates of that mask. black => isInZone; white => notInZone
-    // Since i'm lacking other options this will probably be reimplemented.
-
     /* Example data
         30: {
             id:30,
@@ -35,14 +29,6 @@ if (!defined('AOWOW_REVISION'))
     {
         $success    = true;
         $locations  = [];
-        $qZones     = 'SELECT DISTINCT z.id
-                       FROM            creature c
-                       JOIN            ?_zones z ON z.xMin < c.position_x AND z.xMax > c.position_x AND z.yMin < c.position_y AND z.yMax > c.position_y AND z.mapId = c.map
-                       WHERE           c.id = ?d';
-        $qInstances = 'SELECT DISTINCT z.id
-                       FROM            creature c, ?_zones z
-                       WHERE           z.mapId = c.map AND c.id = ?d';
-
         $petList    = DB::Aowow()->Select(
            'SELECT    cr. id,
                       cr.name_loc0, cr.name_loc2, cr.name_loc3, cr.name_loc6, cr.name_loc8,
@@ -59,7 +45,7 @@ if (!defined('AOWOW_REVISION'))
             JOIN      ?_factiontemplate ft ON ft.Id = cr.faction
             JOIN      dbc.creaturefamily cf ON cf.Id = cr.family
             JOIN      dbc.creaturedisplayinfo cdi ON cdi.id = cr.displayId1
-            WHERE     cf.petTalentType <> -1 AND cr.typeFlags & 0x1
+            WHERE     cf.petTalentType <> -1 AND cr.typeFlags & 0x1 AND (cr.cuFlags & 0x2) = 0
             ORDER BY  cr.id ASC');
 
         // check directory-structure
@@ -78,14 +64,7 @@ if (!defined('AOWOW_REVISION'))
                 // get locations
                 // again: caching will save you time and nerves
                 if (!isset($locations[$pet['id']]))
-                {
-                    $locations[$pet['id']] = DB::Aowow()->SelectCol($qZones, $pet['id']);
-
-                    // probably instanced, map <=> areaId _should_ be bijective
-                    if (empty($locations[$pet['id']]))
-                        if ($z = DB::Aowow()->SelectCell($qInstances, $pet['id']))
-                            $locations[$pet['id']][] = $z;
-                }
+                    $locations[$pet['id']] = DB::Aowow()->SelectCol('SELECT DISTINCT areaId FROM ?_spawns WHERE type = ?d AND typeId = ?d', TYPE_NPC, $pet['id']);
 
                 $petsOut[$pet['id']] = array(
                     'id'             => $pet['id'],
