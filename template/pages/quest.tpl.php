@@ -22,23 +22,6 @@
 <?php
 endif;
 
-if (isset($this->reqMinRep) || isset($this->reqMaxRep)):
-?>
-                <h3><?php echo Lang::$quest['additionalReq'].Lang::$main['colon']; ?></h3>
-                <ul style="border-bottom:solid 1px #505050;">
-<?php
-if (isset($this->reqMinRep)):
-    echo '                    <li><div>'.$this->reqMinRep."</div></li>\n";
-endif;
-if (isset($this->reqMaxRep)):
-    echo '                    <li><div>'.$this->reqMaxRep."</div></li>\n";
-endif;
-?>
-                    <br />
-                </ul>
-<?php
-endif;
-
 if ($this->objectives):
     echo $this->objectives."\n";
 elseif ($this->requestItems):

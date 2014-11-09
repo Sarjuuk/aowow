@@ -121,22 +121,9 @@ class Lang
 
     public static function getReputationLevelForPoints($pts)
     {
-        if ($pts >= 41999)
-            return self::$game['rep'][REP_EXALTED];
-        else if ($pts >= 20999)
-            return self::$game['rep'][REP_REVERED];
-        else if ($pts >= 8999)
-            return self::$game['rep'][REP_HONORED];
-        else if ($pts >= 2999)
-            return self::$game['rep'][REP_FRIENDLY];
-        else if ($pts >= 0)
-            return self::$game['rep'][REP_NEUTRAL];
-        else if ($pts >= -3000)
-            return self::$game['rep'][REP_UNFRIENDLY];
-        else if ($pts >= -6000)
-            return self::$game['rep'][REP_HOSTILE];
-        else
-            return self::$game['rep'][REP_HATED];
+        $_ = Util::getReputationLevelForPoints($pts);
+
+        return self::$game['rep'][$_];
     }
 
     public static function getRequiredItems($class, $mask, $short = true)

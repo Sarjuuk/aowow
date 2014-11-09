@@ -29,7 +29,7 @@ else:
 ?>
                 <div id="text-generic" class="left"></div>
                 <script type="text/javascript">//<![CDATA[
-                    Markup.printHtml("<?php echo Util::jsEscape($extraText); ?>", "text-generic", {
+                    Markup.printHtml("<?php echo Util::jsEscape($this->extraText); ?>", "text-generic", {
                         allow: Markup.CLASS_ADMIN,
                         dbpage: true
                     });
@@ -38,6 +38,11 @@ else:
                 <div class="pad2"></div>
 <?php
     endif;
+
+    if (isset($this->extraHTML)):
+        echo $this->extraHTML;
+    endif;
+
 endif;
 ?>
             </div>

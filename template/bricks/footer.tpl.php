@@ -23,7 +23,7 @@ endif;
 ?>
         </div>
     </div><!-- #wrapper .nosidebar -->
-    </div<!-- #layout-inner -->
+    </div><!-- #layout-inner -->
 </div><!-- #layout .nosidebar -->
 
 <noscript>

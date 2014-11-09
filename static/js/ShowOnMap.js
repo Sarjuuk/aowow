@@ -787,18 +787,3 @@ ShowOnMap.buildTooltip = function(list, dailyOnly) {
 
     return ret;
 };
-
-
-// // !sarjuuk: tempfix!
-Markup._fixUrl = function(url) {
-    if(!url) {
-        return '';
-    }
-
-    // Make local URLs absolute
-    var firstChar = url.charAt(0);
-    if(firstChar == '/' || firstChar == '?')
-        url = '?' + url.replace(/^[\/\?]+/, '');
-
-    return url;
-}

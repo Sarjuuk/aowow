@@ -297,7 +297,7 @@ class QuestPage extends GenericPage
             $this->series[] = [$chain, null];
 
 
-        // todo (low): sensibly merge te following lists into 'series'
+        // todo (low): sensibly merge the following lists into 'series'
         $listGen = function($cnd)
         {
             $chain = [];
@@ -522,10 +522,11 @@ class QuestPage extends GenericPage
 
         // $startend + reqNpcOrGo[1-4]
 
-        $this->map = array(
-            'data' => ['zone' => $this->typeId],
+        $this->map = null;
+        // array(
+            // 'data' => ['zone' => $this->typeId],
             // 'som'  => json_encode($som, JSON_NUMERIC_CHECK)
-        );
+        // );
 
         /****************/
         /* Main Content */
@@ -549,18 +550,6 @@ class QuestPage extends GenericPage
 
         if ($maTab)
             $this->lvTabs[] = $maTab;
-
-        if ($_ = $this->subject->getField('reqMinRepFaction'))
-        {
-            $val = $this->subject->getField('reqMinRepValue');
-            $this->reqMinRep = sprintf(Lang::$quest['reqRepWith'], $_, FactionList::getName($_), Lang::$quest['reqRepMin'], sprintf(Util::$dfnString, $val.' '.Lang::$achievement['points'], Lang::getReputationLevelForPoints($val)));
-        }
-
-        if ($_ = $this->subject->getField('reqMaxRepFaction'))
-        {
-            $val = $this->subject->getField('reqMaxRepValue');
-            $this->reqMaxRep = sprintf(Lang::$quest['reqRepWith'], $_, FactionList::getName($_), Lang::$quest['reqRepMax'], sprintf(Util::$dfnString, $val.' '.Lang::$achievement['points'], Lang::getReputationLevelForPoints($val)));
-        }
 
         // todo (low): create pendant from player_factionchange_quests
 
@@ -599,12 +588,41 @@ class QuestPage extends GenericPage
         }
 
         // tab: conditions
-        $sc = Util::getServerConditions([CND_SRC_QUEST_ACCEPT, CND_SRC_QUEST_SHOW_MARK], null, $this->typeId);
-        if (!empty($sc[0]))
+        $cnd = [];
+        if ($_ = $this->subject->getField('reqMinRepFaction'))
         {
-            $this->extendGlobalData($sc[1]);
+            $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [CND_REPUTATION_RANK, $_, 1 << Util::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))];
+            $this->extendGlobalIds(TYPE_FACTION, $_);
+        }
+
+        if ($_ = $this->subject->getField('reqMaxRepFaction'))
+        {
+            $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [-CND_REPUTATION_RANK, $_, 1 << Util::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue'))];
+            $this->extendGlobalIds(TYPE_FACTION, $_);
+        }
+
+        $_ = Util::getServerConditions([CND_SRC_QUEST_ACCEPT, CND_SRC_QUEST_SHOW_MARK], null, $this->typeId);
+        if (!empty($_[0]))
+        {
+            // awkward merger
+            if (isset($_[0][CND_SRC_QUEST_ACCEPT][$this->typeId][0]))
+            {
+                if (isset($cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0]))
+                    $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0] = array_merge($cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0], $_[0][CND_SRC_QUEST_ACCEPT][$this->typeId][0]);
+                else
+                    $cnd[CND_SRC_QUEST_ACCEPT] = $_[0][CND_SRC_QUEST_ACCEPT];
+            }
+
+            if (isset($_[0][CND_SRC_QUEST_SHOW_MARK]))
+                $cnd[CND_SRC_QUEST_SHOW_MARK] = $_[0][CND_SRC_QUEST_SHOW_MARK];
+
+            $this->extendGlobalData($_[1]);
+        }
+
+        if ($cnd)
+        {
             $tab = "<script type=\"text/javascript\">\n" .
-                   "var markup = ConditionList.createTab(".json_encode($sc[0], JSON_NUMERIC_CHECK).");\n" .
+                   "var markup = ConditionList.createTab(".json_encode($cnd, JSON_NUMERIC_CHECK).");\n" .
                    "Markup.printHtml(markup, 'tab-conditions', { allow: Markup.CLASS_STAFF })" .
                    "</script>";
 

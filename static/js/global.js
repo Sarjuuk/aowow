@@ -90,7 +90,7 @@ function Ajax(url, opt) {
     $WH.cO(this, opt);
     this.method = this.method || (this.params && 'POST') || 'GET';
 
-    _.open(this.method, url, this.async == null ? true: this.async);
+    _.open(this.method, url, this.async == null ? true : this.async);
     _.onreadystatechange = Ajax.onReadyStateChange.bind(this);
 
     if (this.method.toUpperCase() == 'POST') {
@@ -1364,7 +1364,7 @@ function g_createAchievementBar(points, outOf, overall, bonus) {
     }
 
     var opt = {
-        text: points + (bonus > 0 ? '(+' + bonus + ')': '') + (outOf > 0 ? ' / ' + outOf: ''),
+        text: points + (bonus > 0 ? '(+' + bonus + ')' : '') + (outOf > 0 ? ' / ' + outOf : ''),
         color: (overall ? 'rep7' : 'ach' + (outOf > 0 ? 0 : 1)),
         width: (outOf > 0 ? parseInt(points / outOf * 100) : 100)
     };
@@ -2368,7 +2368,7 @@ var ScreenshotViewer = new function() {
 
         computeDimensions(0);
 
-        var url = (screenshot.url ? screenshot.url: g_staticUrl + '/uploads/screenshots/' + (resized ? 'resized/': 'normal/') + screenshot.id + '.jpg');
+        var url = (screenshot.url ? screenshot.url : g_staticUrl + '/uploads/screenshots/' + (resized ? 'resized/': 'normal/') + screenshot.id + '.jpg');
 
         var html =
             '<img src="' + url + '"'
@@ -3055,7 +3055,7 @@ var VideoViewer = new function() {
                         html += LANG.dash;
                     }
 
-                    html += (video.noMarkup ? video.caption: Markup.toHtml(video.caption, {
+                    html += (video.noMarkup ? video.caption : Markup.toHtml(video.caption, {
                         mode: Markup.MODE_SIGNATURE
                     }));
                 }
@@ -3458,7 +3458,7 @@ var
             field.__tr = tr;
 
             if (_data[field.id] == null) {
-                _data[field.id] = (field.value ? field.value: '');
+                _data[field.id] = (field.value ? field.value : '');
             }
 
             var options;
@@ -4208,7 +4208,7 @@ Dialog.templates.docompare = {
             id: 'selecteditems',
             type: 'caption',
             compute: function(field, value, form, td) {
-                td.innerHTML = $WH.sprintf((value == 1 ? LANG.dialog_selecteditem: LANG.dialog_selecteditems), value);
+                td.innerHTML = $WH.sprintf((value == 1 ? LANG.dialog_selecteditem : LANG.dialog_selecteditems), value);
             }
         },
         {
@@ -4847,7 +4847,7 @@ function Listview(opt) {
             var col = this.extraCols[i];
 
             if (col.after || col.before) {
-                var index = $WH.in_array(this.columns, (col.after ? col.after: col.before), function(x) {
+                var index = $WH.in_array(this.columns, (col.after ? col.after : col.before), function(x) {
                     return x.id;
                 });
 
@@ -5455,7 +5455,7 @@ Listview.prototype = {
     },
 
     refreshRows: function() {
-        var target = (this.mode == Listview.MODE_DIV ? this.mainContainer: this.tbody);
+        var target = (this.mode == Listview.MODE_DIV ? this.mainContainer : this.tbody);
         $WH.ee(target);
 
         if (this.nRowsVisible == 0) {
@@ -5642,7 +5642,7 @@ Listview.prototype = {
         }
 
         if (result == -1) {
-            $WH.ae(this.noData, $WH.ct(this.filtered ? LANG.lvnodata2: LANG.lvnodata));
+            $WH.ae(this.noData, $WH.ct(this.filtered ? LANG.lvnodata2 : LANG.lvnodata));
         }
     },
 
@@ -5875,7 +5875,7 @@ Listview.prototype = {
     getRowOffset: function(rowNo) {
         var rpp = this.nItemsPerPage;
 
-        return (rpp > 0 && rowNo > 0 ? Math.floor(rowNo / rpp) * rpp: 0);
+        return (rpp > 0 && rowNo > 0 ? Math.floor(rowNo / rpp) * rpp : 0);
     },
 
     resetRowVisibility: function() {
@@ -6957,15 +6957,15 @@ Listview.headerFilter = function(col, res) {
 Listview.headerOver = function(a, col, e) {
     var buffer = '';
 
-    buffer += '<b class="q1">' + (col.tooltip ? col.tooltip: col.name) + '</b>';
+    buffer += '<b class="q1">' + (col.tooltip ? col.tooltip : col.name) + '</b>';
 
     if (col.__filter) {
-        buffer += '<br />' + $WH.sprintf((col.__filter.invert ? LANG.tooltip_colfilter2: LANG.tooltip_colfilter1), col.__filter.text);
+        buffer += '<br />' + $WH.sprintf((col.__filter.invert ? LANG.tooltip_colfilter2 : LANG.tooltip_colfilter1), col.__filter.text);
     }
 
     buffer += '<br /><span class="q2">' + LANG.tooltip_lvheader1 + '</span>';
     if (this.filtrable && (col.filtrable == null || col.filtrable)) {
-        buffer += '<br /><span class="q2">' + ($WH.Browser.opera ? LANG.tooltip_lvheader3: LANG.tooltip_lvheader2) + '</span>';
+        buffer += '<br /><span class="q2">' + ($WH.Browser.opera ? LANG.tooltip_lvheader3 : LANG.tooltip_lvheader2) + '</span>';
     }
 
     $WH.Tooltip.show(a, buffer, 0, 0, 'q');
@@ -9842,10 +9842,10 @@ Listview.templates = {
                 value: 'level',
                 type: 'range',
                 getMinValue: function(item) {
-                    return item.minlevel ? item.minlevel: item.level;
+                    return item.minlevel ? item.minlevel : item.level;
                 },
                 getMaxValue: function(item) {
-                    return item.maxlevel ? item.maxlevel: item.level;
+                    return item.maxlevel ? item.maxlevel : item.level;
                 },
                 compute: function(item, td) {
                     if (item.minlevel && item.maxlevel) {
@@ -10100,8 +10100,8 @@ Listview.templates = {
                     }
 
                     var
-                        na = (a.sourcemore && a.source.length == 1 ? a.sourcemore[0].n: null),
-                        nb = (b.sourcemore && b.source.length == 1 ? b.sourcemore[0].n: null);
+                        na = (a.sourcemore && a.source.length == 1 ? a.sourcemore[0].n : null),
+                        nb = (b.sourcemore && b.source.length == 1 ? b.sourcemore[0].n : null);
 
                     return $WH.strcmp(na, nb);
                 }
@@ -10398,8 +10398,8 @@ Listview.templates = {
                     Listview.funcBox.createCenteredIcons(itemSet.pieces, td);
                 },
                 sortFunc: function(a, b) {
-                    var lena = (a.pieces != null ? a.pieces.length: 0);
-                    var lenb = (b.pieces != null ? b.pieces.length: 0);
+                    var lena = (a.pieces != null ? a.pieces.length : 0);
+                    var lenb = (b.pieces != null ? b.pieces.length : 0);
                     return $WH.strcmp(lena, lenb);
                 }
             },
@@ -11577,7 +11577,7 @@ Listview.templates = {
                 hidden: true,
                 compute: function(spell, td) {
                     var text = '';
-                    var schools = spell.schools ? spell.schools: spell.school;
+                    var schools = spell.schools ? spell.schools : spell.school;
 
                     for (var i = 0; i < 32; ++i) {
                         if (!(schools & (1 << i))) {
@@ -11693,7 +11693,7 @@ Listview.templates = {
                 width: '9%',
                 hidden: true,
                 getValue: function(spell) {
-                    return (spell.reagents ? spell.reagents.length: 0);
+                    return (spell.reagents ? spell.reagents.length : 0);
                 },
                 compute: function(spell, td) {
                     var hasIcons = (spell.reagents != null);
@@ -11718,8 +11718,8 @@ Listview.templates = {
                     }
                 },
                 sortFunc: function(a, b) {
-                    var lena = (a.reagents != null ? a.reagents.length: 0);
-                    var lenb = (b.reagents != null ? b.reagents.length: 0);
+                    var lena = (a.reagents != null ? a.reagents.length : 0);
+                    var lenb = (b.reagents != null ? b.reagents.length : 0);
                     if (lena > 0 && lena == lenb) {
                         return $WH.strcmp(a.reagents.toString(), b.reagents.toString());
                     }
@@ -11901,7 +11901,7 @@ Listview.templates = {
 
                     var skill = [a.learnedat, b.learnedat];
                     for (var s = 0; s < 2; ++s) {
-                        var sp = (s == 0 ? a: b);
+                        var sp = (s == 0 ? a : b);
                         if (skill[s] == 9999 && sp.colors != null) {
                             var i = 0;
                             while (sp.colors[i] == 0 && i < sp.colors.length) {
@@ -13500,7 +13500,7 @@ Listview.templates = {
         ],
 
         getItemLink: function(comment) {
-            return '?' + g_types[comment.type] + '=' + comment.typeId + (comment.id != null ? '#comments:id=' + comment.id: '')
+            return '?' + g_types[comment.type] + '=' + comment.typeId + (comment.id != null ? '#comments:id=' + comment.id : '')
         }
     },
 
@@ -16583,12 +16583,12 @@ function MessageBox(parent, text) {
     box.addClass("message-box");
     box.html('<p class="message">' + text + '</p><p class="close">(Click on this box to close it)</p>');
 
-    setTimeout(function() {                                // sarjuuk - custom: popups that never vanish are just insane
+    setTimeout(function() {                                 // sarjuuk - custom: popups that never vanish are just insane
         box.fadeOut();
     }, 5000);
 
     box.click(function (e) {
-        e.stopPropagation();                                // sarjuuk - custom: without this, the comment-header would also register the click
+        $WH.sp(e);                                          // sarjuuk - custom: without this, the comment-header would also register the click
         $(this).fadeOut();
     });
 
@@ -17050,7 +17050,7 @@ var RedButton = {
     },
 
     setFunc: function(button, func) {
-        button.onclick = (func ? func: null);
+        button.onclick = (func ? func : null);
     }
 };
 
@@ -17315,7 +17315,7 @@ var LiveSearch = new function() {
             colorDiv(bakDiv);
         }
         else {
-            var div = dir ? lastDiv.nextSibling: lastDiv.previousSibling;
+            var div = dir ? lastDiv.nextSibling : lastDiv.previousSibling;
             if (div) {
                 if (div.nodeName == "STRONG") {
                     div = container.lastChild;
@@ -20047,6 +20047,7 @@ var ConditionList = new function() {
                         var sName = srcGrp[1];
                         if ($WH.in_array([18, 21, 23], g) != -1)
                             sName = g_npcs[srcGrp[1]]['name_' + Locale.getName()];
+
                         buff += '[tab name="' + g_condition_types[g][0] + ' (' + sName + ')"]';
                     }
                     else

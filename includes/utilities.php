@@ -702,6 +702,7 @@ class Util
     // creates an announcement; use if minor issues arise
     public static function addNote($uGroupMask, $str)
     {
+        // todo (med): log all those errors to DB
         self::$notes[] = [$uGroupMask, $str];
     }
 
@@ -891,6 +892,26 @@ class Util
             return 1;
 
         return 3;
+    }
+
+    public static function getReputationLevelForPoints($pts)
+    {
+        if ($pts >= 41999)
+            return REP_EXALTED;
+        else if ($pts >= 20999)
+            return REP_REVERED;
+        else if ($pts >= 8999)
+            return REP_HONORED;
+        else if ($pts >= 2999)
+            return REP_FRIENDLY;
+        else if ($pts >= 0)
+            return REP_NEUTRAL;
+        else if ($pts >= -3000)
+            return REP_UNFRIENDLY;
+        else if ($pts >= -6000)
+            return REP_HOSTILE;
+        else
+            return REP_HATED;
     }
 
     // pageText for Books (Item or GO) and questText

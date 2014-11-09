@@ -11,10 +11,11 @@
 
     $this->brick('pageTemplate');
 
-if (!empty($this->name) || !empty($this->h1Links)):
+if (!empty($this->name) || !empty($this->h1Links) || !empty($this->extraHTML)):
     echo '<div class="text">' .
-        (!empty($this->h1Links) ? '<div class="h1-links">'.$this->h1Links.'</div>' : null) .
-        (!empty($this->name)    ? '<h1>'.$this->name.'</h1>'                       : null) .
+        (!empty($this->h1Links)   ? '<div class="h1-links">'.$this->h1Links.'</div>' : null) .
+        (!empty($this->name)      ? '<h1>'.$this->name.'</h1>'                       : null) .
+        (!empty($this->extraHTML) ? $this->extraHTML                                 : null) .
     '</div>';
 endif;
 
