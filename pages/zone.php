@@ -40,7 +40,7 @@ class ZonePage extends GenericPage
         /* Infobox */
         /***********/
 
-        $infobox = [];
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // City
         if ($this->subject->getField('flags') & 0x200000 && !$this->subject->getField('parentArea'))

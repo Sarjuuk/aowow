@@ -60,7 +60,7 @@ class SearchPage extends GenericPage
         $this->query  = strtr($this->search, '?*', '_%');
 
         // restricted access
-        if ($this->restrictedGroups && !User::isInGroup($this->restrictedGroups))
+        if ($this->reqUGroup && !User::isInGroup($this->reqUGroup))
             $this->error();
 
         // statWeight for JSON-search

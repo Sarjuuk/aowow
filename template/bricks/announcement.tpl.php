@@ -1,18 +1,12 @@
 <?php
-foreach ($this->announcements as $_):
+foreach ($this->announcements as $id => $data):
+    $data = json_encode($data, JSON_NUMERIC_CHECK);
+    // json_encode does not recognize variables
+    $data = preg_replace('/"\$((.+?)([^\\\\]))"/i', '$1', $data);
 ?>
-            <div id="announcement-<?php echo abs($_['id']); ?>"></div>
+            <div id="announcement-<?php echo $id; ?>"></div>
             <script type="text/javascript">
-                new Announcement({
-                    parent: 'announcement-<?php echo abs($_['id']); ?>',
-                        id: <?php echo $_['id']; ?>,
-                      text: <?php echo $_['text'][0] == '$' ? substr($_['text'], 1) : "'".Util::jsEscape($_['text'])."'" ?>,
-                      name: '<?php echo $_['name']; ?>',
-                     style: '<?php echo $_['style']; ?>',
-                    status: <?php echo $_['status']; ?>,
-                      mode: <?php echo $_['mode']; ?>
-
-                });
+                new Announcement(<?php echo $data; ?>);
             </script>
 <?php
 endforeach;

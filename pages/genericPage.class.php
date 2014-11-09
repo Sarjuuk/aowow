@@ -56,31 +56,32 @@ trait ListPage
 
 class GenericPage
 {
-    protected $tpl              = '';
-    protected $restrictedGroups = U_GROUP_NONE;
-    protected $mode             = CACHE_TYPE_NONE;
+    protected $tpl          = '';
+    protected $reqUGroup    = U_GROUP_NONE;
+    protected $reqAuth      = false;
+    protected $mode         = CACHE_TYPE_NONE;
 
-    protected $jsGlobals        = [];
-    protected $lvData           = [];
-    protected $title            = [CFG_NAME];               // for title-Element
-    protected $name             = '';                       // for h1-Element
-    protected $tabId            = null;
-    protected $gDataKey         = false;                    // adds the dataKey to the user vars
-    protected $js               = [];
-    protected $css              = [];
+    protected $jsGlobals    = [];
+    protected $lvData       = [];
+    protected $title        = [CFG_NAME];                   // for title-Element
+    protected $name         = '';                           // for h1-Element
+    protected $tabId        = null;
+    protected $gDataKey     = false;                        // adds the dataKey to the user vars
+    protected $js           = [];
+    protected $css          = [];
 
     // private vars don't get cached
-    private   $time             = 0;
-    private   $cacheDir         = 'cache/template/';
-    private   $jsgBuffer        = [];
-    private   $gPageInfo        = [];
-    private   $gUser            = [];
-    private   $pageTemplate     = [];
-    private   $community        = ['co' => [], 'sc' => [], 'vi' => []];
+    private   $time         = 0;
+    private   $cacheDir     = 'cache/template/';
+    private   $jsgBuffer    = [];
+    private   $gPageInfo    = [];
+    private   $gUser        = [];
+    private   $pageTemplate = [];
+    private   $community    = ['co' => [], 'sc' => [], 'vi' => []];
 
-    private   $cacheLoaded      = [];
-    private   $skipCache        = 0x0;
-    private   $memcached        = null;
+    private   $cacheLoaded  = [];
+    private   $skipCache    = 0x0;
+    private   $memcached    = null;
 
     public function __construct($pageCall/*, $pageParam */)
     {
@@ -97,10 +98,6 @@ class GenericPage
                 $this->skipCache = CACHE_MODE_FILECACHE | CACHE_MODE_MEMCACHED;
         }
 
-        // restricted access
-        if ($this->restrictedGroups && !User::isInGroup($this->restrictedGroups))
-            $this->error();
-
         // display modes
         if (isset($_GET['power']) && method_exists($this, 'generateTooltip'))
             $this->mode = CACHE_TYPE_TOOLTIP;
@@ -111,11 +108,21 @@ class GenericPage
             $this->gUser   = User::getUserGlobals();
             $this->pageTemplate['pageName'] = strtolower($pageCall);
 
-            if (isset($this->tabId))
-                $this->pageTemplate['activeTab'] = $this->tabId;
-
             if (!$this->isValidPage() || !$this->tpl)
                 $this->error();
+        }
+
+        // requires authed user
+        if ($this->reqAuth && !User::$id)
+            $this->forwardToSignIn($_SERVER['QUERY_STRING']);
+
+        // restricted access
+        if ($this->reqUGroup && !User::isInGroup($this->reqUGroup))
+        {
+            if (User::$id)
+                $this->error();
+            else
+                $this->forwardToSignIn($_SERVER['QUERY_STRING']);
         }
 
         if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE))
@@ -289,7 +296,8 @@ class GenericPage
         // display occured notices
         if ($_ = Util::getNotes())
         {
-            $this->announcements[] = array(
+            $this->announcements[0] = array(
+                'parent' => 'announcement-0',
                 'id'     => 0,
                 'mode'   => 1,
                 'status' => 1,
@@ -302,7 +310,7 @@ class GenericPage
         // fetch announcements
         if (preg_match('/^([a-z\-]+)=?.*$/i', $_SERVER['QUERY_STRING'], $match))
         {
-            $ann = DB::Aowow()->Select('SELECT * FROM ?_announcements WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $match[1], User::$groups);
+            $ann = DB::Aowow()->Select('SELECT ABS(id) AS ARRAY_KEY, a.* FROM ?_announcements a WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $match[1], User::$groups);
             foreach ($ann as $k => $v)
             {
                 if ($t = Util::localizedString($v, 'text'))
@@ -312,9 +320,19 @@ class GenericPage
                         'STATIC_URL' => STATIC_URL
                     );
 
-                    $ann[$k]['text']  = strtr($t, $replace);
-                    $ann[$k]['style'] = strtr($ann[$k]['style'], $replace);
-                    $this->announcements[] = $ann[$k];
+                    $_ = array(
+                        'parent' => 'announcement-'.$k,
+                        'id'     => $v['id'],
+                        'mode'   => $v['mode'],
+                        'status' => $v['status'],
+                        'name'   => $v['name'],
+                        'text'   => strtr($t, $replace)
+                    );
+
+                    if ($v['style'])                        // may be empty
+                        $_['style'] = strtr($v['style'], $replace);
+
+                    $this->announcements[$k] = $_;
                 }
             }
         }
@@ -348,12 +366,17 @@ class GenericPage
         $this->mysql         = DB::Aowow()->getStatistics();
         $this->hasComContent = false;
 
+        if (isset($this->tabId))
+            $this->pageTemplate['activeTab'] = $this->tabId;
+
         $this->display('text-page-generic');
         exit();
     }
 
     public function error()                                 // unknown page
     {
+        $this->path    = null;
+        $this->tabId   = null;
         $this->type    = -99;                               // get error-article
         $this->typeId  = 0;
         $this->title[] = Lang::$main['errPageTitle'];
@@ -381,11 +404,10 @@ class GenericPage
     {
         // Heisenbug: IE11 and FF32 will sometimes (under unknown circumstances) cache 302 redirects and stop
         // re-requesting them from the server but load them from local cache, thus breaking menu features.
-        header('Expires: Sat, 01 Jan 2000 01:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Cache-Control: no-store, no-cache, must-revalidate');
-        header('Cache-Control: post-check=0, pre-check=0', false);
-        header('Pragma: no-cache');
+        Util::sendNoCacheHeader();
+
+        if (isset($this->tabId))
+            $this->pageTemplate['activeTab'] = $this->tabId;
 
         if ($override)
         {
