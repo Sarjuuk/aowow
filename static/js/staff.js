@@ -1,69 +1,69 @@
 var mn_content = [
-    [22, 'Achievements',             '?admin=achievements',                   null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV | U_GROUP_BUREAU}],
+//  [22, 'Achievements',             '?admin=achievements',                   null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV | U_GROUP_BUREAU}],
     [3,  'Announcements',            '?admin=announcements',                  null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
-    [25, 'Guides Awaiting Approval', '?admin=guides',                         null,           {requiredAccess: U_GROUP_STAFF}],
-    [20, 'Global Images & Headers',  '?admin=headers',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
-    [21, 'Modelviewer',              '?admin=modelviewer',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
+//  [25, 'Guides Awaiting Approval', '?admin=guides',                         null,           {requiredAccess: U_GROUP_STAFF}],
+//  [20, 'Global Images & Headers',  '?admin=headers',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
+//  [21, 'Modelviewer',              '?admin=modelviewer',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
     [23, 'Out of Date Comments',     '?admin=out-of-date',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_MOD}],
     [5,  'Screenshots',              '?admin=screenshots',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SCREENSHOT}],
-    [18, 'Upload Image',             '?npc=15384#submit-a-screenshot',        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_EDITOR, rel: 'np'}],
+//  [18, 'Upload Image',             '?npc=15384#submit-a-screenshot',        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_EDITOR, rel: 'np'}],
     [17, 'Videos',                   '?admin=videos',                         null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO}],
 
     [,   'Homepage'],
     [13, 'Featured Box',             '?admin=home-featuredbox',               null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Featured Box'}],
-    [14, 'Oneliners',                '?admin=home-oneliners',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Oneliners'}],
-    [15, 'Skins',                    '?admin=home-skins',                     null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SALESAGENT, breadcrumb: 'Homepage Skins'}],
-    [16, 'Titles',                   '?admin=home-titles',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Titles'}],
+//  [14, 'Oneliners',                '?admin=home-oneliners',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Oneliners'}],
+//  [15, 'Skins',                    '?admin=home-skins',                     null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SALESAGENT, breadcrumb: 'Homepage Skins'}],
+//  [16, 'Titles',                   '?admin=home-titles',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Titles'}],
 
-    [,   'Articles'],
-    [8,  'List',                     '?admin=articles',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_EDITOR | U_GROUP_LOCALIZER, breadcrumb: 'List of Articles'}],
-    [9,  'Editors\' Lounge',         '?admin=editors-lounge',                 null,           {requiredAccess: U_GROUP_EMPLOYEE | U_GROUP_EDITOR | U_GROUP_LOCALIZER}],
-    [23, 'Related Links',            '?admin=related-links',                  null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
+//  [,   'Articles'],
+//  [8,  'List',                     '?admin=articles',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_EDITOR | U_GROUP_LOCALIZER, breadcrumb: 'List of Articles'}],
+//  [9,  'Editors\' Lounge',         '?admin=editors-lounge',                 null,           {requiredAccess: U_GROUP_EMPLOYEE | U_GROUP_EDITOR | U_GROUP_LOCALIZER}],
+//  [23, 'Related Links',            '?admin=related-links',                  null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
 
-    [,   'News'],
-    [10, 'New Post',                 '?edit=news',                            null,           {requiredAccess: U_GROUP_EMPLOYEE | U_GROUP_BLOGGER, breadcrumb: 'News Post'}],
-    [11, 'Content Corner',           '?admin=content-corner',                 null,           {requiredAccess: U_GROUP_EMPLOYEE | U_GROUP_BLOGGER}],
-    [12, 'Tags',                     '?admin=newstag',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_BLOGGER, breadcrumb: 'News Tags'}],
-    [24, 'Patch Updates',            '?admin=patch-updates',                  null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
-    [26, 'Featured Guides',          '?admin=featuredguides',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Featured Guides'}],
+//  [,   'News'],
+//  [10, 'New Post',                 '?edit=news',                            null,           {requiredAccess: U_GROUP_EMPLOYEE | U_GROUP_BLOGGER, breadcrumb: 'News Post'}],
+//  [11, 'Content Corner',           '?admin=content-corner',                 null,           {requiredAccess: U_GROUP_EMPLOYEE | U_GROUP_BLOGGER}],
+//  [12, 'Tags',                     '?admin=newstag',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_BLOGGER, breadcrumb: 'News Tags'}],
+//  [24, 'Patch Updates',            '?admin=patch-updates',                  null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
+//  [26, 'Featured Guides',          '?admin=featuredguides',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Featured Guides'}],
 
-    [,   'Community'],
-    [4,  'Contests',                 '?admin=contests',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SALESAGENT}],
-    [27, 'Top User Contest',         '?admin=topuser-contest',                null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SALESAGENT}],
-    [19, 'Forums',                   '?admin=forums',                         null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
-    [6,  'Profanity Filter',         '?admin=profanity',                      null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
+//  [,   'Community'],
+//  [4,  'Contests',                 '?admin=contests',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SALESAGENT}],
+//  [27, 'Top User Contest',         '?admin=topuser-contest',                null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SALESAGENT}],
+//  [19, 'Forums',                   '?admin=forums',                         null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
+//  [6,  'Profanity Filter',         '?admin=profanity',                      null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
 
-    [,   'Other'],
-    [7,  'Holiday Gift Guide',       '?admin=holidaygift',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}]
+//  [,   'Other'],
+//  [7,  'Holiday Gift Guide',       '?admin=holidaygift',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}]
 ];
 
 var mn_dev = [
-    [17, 'Cookies',                  '?admin=cookies',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
+//  [17, 'Cookies',                  '?admin=cookies',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
     [21, 'PHP Information',          '?admin=phpinfo',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
     [18, 'Site Configuration',       '?admin=siteconfig',                     null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-    [16, 'Weight Presets',           '?admin=weight-presets',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
-    [22, 'API Keys',                 '?admin=apikey',                         null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
+//  [16, 'Weight Presets',           '?admin=weight-presets',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
+//  [22, 'API Keys',                 '?admin=apikey',                         null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
 
-    [,   'Cache'],
-    [2,  'Create Folders',           '?admin=cache-folder',                   null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Create Cache Folders'}],
-    [3,  'Expire Range',             '?admin=cache-expire',                   null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Expire Cache Range'}],
-    [1,  'Manage',                   '?admin=cache-manage',                   null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Manage Cache'}],
-    [20, 'Memcached',                '?admin=memcached',                      null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Manage Memcached'}],
+//  [,   'Cache'],
+//  [2,  'Create Folders',           '?admin=cache-folder',                   null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Create Cache Folders'}],
+//  [3,  'Expire Range',             '?admin=cache-expire',                   null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Expire Cache Range'}],
+//  [1,  'Manage',                   '?admin=cache-manage',                   null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Manage Cache'}],
+//  [20, 'Memcached',                '?admin=memcached',                      null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Manage Memcached'}],
 
-    [, 'Database'],
-    [8,  'Add Fake Item',            '?admin=fakeitem',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-    [10, 'Add Fake NPC',             '?admin=fakenpc',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-    [19, 'Check Consistency',        '?admin=db-check-consistency',           null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Check Database Consistency'}],
-    [4,  'Execute SQL',              '?admin=sql',                            null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-    [9,  'Export Fake Item',         '?admin=luaitem',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-    [26, 'Denormalized Fields Fix',  '?admin=denormalized-fix',               null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-    [11, 'Minimum & Maximum Values', '?admin=minmax',                         null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-    [7,  'SQL Find & Replace',       '?admin=sql-replace',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-    [25, 'Switch Active Database',   '?admin=active-db',                      null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-    [5,  'Updates',                  '?admin=db-update',                      null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Database Updates'}],
+//  [, 'Database'],
+//  [8,  'Add Fake Item',            '?admin=fakeitem',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
+//  [10, 'Add Fake NPC',             '?admin=fakenpc',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
+//  [19, 'Check Consistency',        '?admin=db-check-consistency',           null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Check Database Consistency'}],
+//  [4,  'Execute SQL',              '?admin=sql',                            null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
+//  [9,  'Export Fake Item',         '?admin=luaitem',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
+//  [26, 'Denormalized Fields Fix',  '?admin=denormalized-fix',               null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
+//  [11, 'Minimum & Maximum Values', '?admin=minmax',                         null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
+//  [7,  'SQL Find & Replace',       '?admin=sql-replace',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
+//  [25, 'Switch Active Database',   '?admin=active-db',                      null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
+//  [5,  'Updates',                  '?admin=db-update',                      null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV, breadcrumb: 'Database Updates'}],
 
-    [,   'Generators'],
-    [12, 'Talent Calculator Icons',  '?admin=talentcalc-icons',               null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}]
+//  [,   'Generators'],
+//  [12, 'Talent Calculator Icons',  '?admin=talentcalc-icons',               null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}]
 ];
 
 var mn_localization = [
@@ -103,10 +103,10 @@ var mn_users = [
 var mn_staff = [
     [1,   'Content',                 null,                                    mn_content],
     [2,   'Development',             null,                                    mn_dev],
-    [3,   'Localization',            null,                                    mn_localization],
-    [7,   'Statistics',              null,                                    mn_statistics,  {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
-    [4,   'Users',                   null,                                    mn_users],
-    [5,   'View Reports',            '?admin=reports',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_EDITOR | U_GROUP_MOD | U_GROUP_LOCALIZER | U_GROUP_SCREENSHOT | U_GROUP_VIDEO} ],
+//  [3,   'Localization',            null,                                    mn_localization],
+//  [7,   'Statistics',              null,                                    mn_statistics,  {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
+//  [4,   'Users',                   null,                                    mn_users],
+//  [5,   'View Reports',            '?admin=reports',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_EDITOR | U_GROUP_MOD | U_GROUP_LOCALIZER | U_GROUP_SCREENSHOT | U_GROUP_VIDEO} ],
 
     [,    'Page'],
     [102, 'Validate',                'http://validator.w3.org/check/referer', null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_TESTER}]];
@@ -114,42 +114,42 @@ var mn_staff = [
 mn_path.push([4, 'Staff', null, mn_staff]);
 
 $(document).ready(function () {
-    var f = $('div.stafffooter');
-    if (f.length > 0) {
-        var g = $(window).height();
-        if (f.offset().top < (g - 100)) {
-            var e = f.offset();
-            e.top = g - 100;
-            f.offset(e)
+    var footer = $('div.stafffooter');
+    if (footer.length > 0) {
+        var totalHeight = $(window).height();
+        if (footer.offset().top < (totalHeight - 100)) {
+            var offset = footer.offset();
+            offset.top = totalHeight - 100;
+            footer.offset(offset);
         }
     }
-    var a = U_GROUP_EMPLOYEE | U_GROUP_EDITOR | (Locale.getId() != LOCALE_ENUS ? U_GROUP_LOCALIZER : 0);
-    var j = $WH.g_getGets();
-    var b;
-    var c = {};
-    var h = null;
-    if (j.refresh != null) {
-        b = 'See Cached';
-        c.refresh = null
+    var articleAccess = U_GROUP_EMPLOYEE | U_GROUP_EDITOR | (Locale.getId() != LOCALE_ENUS ? U_GROUP_LOCALIZER : 0);
+    var urlParams = $WH.g_getGets();
+    var buff;
+    var refresh = {};
+    var subMenu = null;
+    if (urlParams.refresh != null) {
+        buff = 'See Cached';
+        refresh.refresh = null
     }
     else {
-        var k = {};
-        var i = {};
-        b = 'Refresh';
+        var mCached = {};
+        var fiCache = {};
+        buff = 'Refresh';
         if (PageTemplate.get('pageName') == 'home') {
-            c.home = '';
-            k.home = '';
-            i.home = ''
+            refresh.home = '';
+            mCached.home = '';
+            fiCache.home = ''
         }
-        c.refresh = '';
-        k.refresh = 'memcached';
-        i.refresh = 'filecache';
-        h = [
-            [1, 'Memcached',  g_modifyUrl(location.href, k), null, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
-            [2, 'File cache', g_modifyUrl(location.href, i), null, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}]
+        refresh.refresh = '';
+        mCached.refresh = 'memcached';
+        fiCache.refresh = 'filecache';
+        subMenu = [
+            [1, 'Memcached',  g_modifyUrl(location.href, mCached), null, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
+            [2, 'File cache', g_modifyUrl(location.href, fiCache), null, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}]
         ]
     }
-    mn_staff.push([100, b, g_modifyUrl(location.href, c), h, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}]);
+    mn_staff.push([100, buff, g_modifyUrl(location.href, refresh), subMenu, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}]);
     if (location.href.match(/website-achievement=([0-9]+)(\/.*)?/i)) {
         mn_staff.push([, 'Achievement']);
         mn_staff.push([200, 'Manage', '?admin=achievements&action=edit&id=' + RegExp.$1, null, {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV | U_GROUP_BUREAU}])
@@ -170,14 +170,14 @@ $(document).ready(function () {
     if ($WH.isset('g_pageInfo')) {
         if (g_pageInfo.type && g_pageInfo.typeId) {
             mn_staff.push([, 'DB Entry']);
-            mn_staff.push([1001, 'Edit Article', '?edit=article&type=' + g_pageInfo.type + '&typeid=' + g_pageInfo.typeId, null, {requiredAccess: a}]);
+//          mn_staff.push([1001, 'Edit Article', '?edit=article&type=' + g_pageInfo.type + '&typeid=' + g_pageInfo.typeId, null, {requiredAccess: articleAccess}]);
             mn_staff.push([1000, 'Manage Screenshots', '?admin=screenshots&type=' + g_pageInfo.type + '&typeid=' + g_pageInfo.typeId, null, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SCREENSHOT}]);
             mn_staff.push([1000, 'Manage Videos', '?admin=videos&type=' + g_pageInfo.type + '&typeid=' + g_pageInfo.typeId, null, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO}])
         }
         if (g_pageInfo.articleUrl) {
             mn_staff.push([, 'Article']);
-            mn_staff.push([1002, 'Edit', '?edit=article&' + g_pageInfo.articleUrl, null, {requiredAccess: (g_pageInfo.editAccess ? g_pageInfo.editAccess: a)}]);
-            mn_staff.push([1003, 'Options', '?edit=article-options&url=' + g_pageInfo.articleUrl, null, {requiredAccess: a}])
+            mn_staff.push([1002, 'Edit', '?edit=article&' + g_pageInfo.articleUrl, null, {requiredAccess: (g_pageInfo.editAccess ? g_pageInfo.editAccess: articleAccess)}]);
+            mn_staff.push([1003, 'Options', '?edit=article-options&url=' + g_pageInfo.articleUrl, null, {requiredAccess: articleAccess}])
         }
     }
     Menu.sort(mn_staff)
@@ -292,11 +292,10 @@ var TwigProfiler = new function () {
         var tbl = $('#footer-twig-table');
         for (var i = 0; i < len; ++i) {
             tbl.append($('<tr/>')
-            .append($('<td/>',    { css: { 'white-space': 'nowrap', 'text-align': 'right' }, 'class': 'q2', text: rows[i].action }))
-            .append($('<td/>',    { css: { 'white-space': 'nowrap' } })
-            .append($('<small/>', { text: rows[i].name }))
-            .append($('<td/>',    { css: { 'white-space': 'nowrap' } })
-            .append($('<small/>', { text: rows[i].time })))));
+                .append($('<td/>', {css: {'white-space': 'nowrap', 'text-align': 'right'}, 'class': 'q2', text: rows[i].action} ))
+                .append($('<td/>', {css: {'white-space': 'nowrap'}} ).append($('<small/>', {text: rows[i].name} )))
+                .append($('<td/>', {css: {'white-space': 'nowrap'}} ).append($('<small/>', {text: rows[i].time} )))
+            );
         }
     }
 };

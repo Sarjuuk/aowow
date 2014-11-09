@@ -4,8 +4,6 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-ini_set('serialize_precision', 4);
-
 require 'includes/defines.php';
 require 'config/config.php';
 require 'includes/libs/DbSimple/Generic.php';               // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
@@ -66,9 +64,34 @@ unset($AoWoWconf);                                          // link set up: dele
 
 
 // load config to constants
-$sets = DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, intValue as i, strValue as s FROM ?_config');
+$sets = DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, `value`, `flags` FROM ?_config');
 foreach ($sets as $k => $v)
-    define('CFG_'.strtoupper($k), $v['s'] ?: intVal($v['i']));
+{
+    // this should not have been possible
+    if (!strlen($v['value']))
+        continue;
+
+    $php = $v['flags'] & CON_FLAG_PHP;
+
+    if ($v['flags'] & CON_FLAG_TYPE_INT)
+        $val = intVal($v['value']);
+    else if ($v['flags'] & CON_FLAG_TYPE_FLOAT)
+        $val = floatVal($v['value']);
+    else if ($v['flags'] & CON_FLAG_TYPE_BOOL)
+        $val = (bool)$v['value'];
+    else if ($v['flags'] & CON_FLAG_TYPE_STRING)
+        $val = preg_replace('/[^\p{L}0-9\s_\-\'\.,]/ui', '', $v['value']);
+    else
+    {
+        Util::addNote(U_GROUP_ADMIN | U_GROUP_DEV, 'Kernel: '.($php ? 'PHP' : 'Aowow').' config value '.($php ? strtolower($k) : 'CFG_'.strtoupper($k)).' has no type set. Value forced to 0!');
+        $val = 0;
+    }
+
+    if ($php)
+        ini_set(strtolower($k), $val);
+    else
+        define('CFG_'.strtoupper($k), $val);
+}
 
 
 $secure    = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || CFG_FORCE_SSL;

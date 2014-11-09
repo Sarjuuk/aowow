@@ -31,6 +31,8 @@ switch ($pageCall)
     /* called by user */
     case '':                                                // no parameter given -> MainPage
         $altClass = 'home';
+    case 'home':
+    case 'admin':
     case 'account':                                         // account management [nyi]
     case 'achievement':
     case 'achievements':
@@ -81,7 +83,7 @@ switch ($pageCall)
     // case 'user':                                            // tool: user profiles [nyi]
     case 'zone':
     case 'zones':
-        if (in_array($pageCall, ['account', 'profile']))
+        if (in_array($pageCall, ['admin', 'account', 'profile']))
         {
             if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
             {

@@ -83,6 +83,16 @@ define('SITEREP_ACTION_ARTICLE',            16);            // Guide approved (a
 define('SITEREP_ACTION_USER_WARNED',        17);            // Moderator Warning
 define('SITEREP_ACTION_USER_SUSPENDED',     18);            // Moderator Suspension
 
+// config flags
+define('CON_FLAG_TYPE_INT',                 0x01);          // validate with intVal()
+define('CON_FLAG_TYPE_FLOAT',               0x02);          // validate with floatVal()
+define('CON_FLAG_TYPE_BOOL',                0x04);          // 0 || 1
+define('CON_FLAG_TYPE_STRING',              0x08);          //
+define('CON_FLAG_OPT_LIST',                 0x10);          // single option
+define('CON_FLAG_BITMASK',                  0x20);          // multiple options
+define('CON_FLAG_PHP',                      0x40);          // applied with ini_set() [restrictions apply!]
+define('CON_FLAG_PERSISTANT',               0x80);          // can not be deleted
+
 // Auth Result
 define('AUTH_OK',                           0);
 define('AUTH_WRONGUSER',                    1);

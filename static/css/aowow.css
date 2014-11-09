@@ -129,10 +129,7 @@ h5 a.icontiny span { text-decoration:none !important; }
 
 .quote .quote, .quote .quote .quote .quote { background:#111; }
 .quote .quote .quote { background:#1b1b1b; }
-
-.quote .quote {
-    background:rgba(255,255,255,.065)!important;
-}
+.quote .quote { background:rgba(255,255,255,.065) !important; }
 
 .entryc .quote:after, .comment-body .quote:after,
 .text .quote:after, .text blockquote:after,
@@ -1101,7 +1098,7 @@ Variations:
 
 .icon-report {
     padding-left: 16px !important;
-    background: url(../images/icons/report.gif) 3px center no-repeat;
+    background: url(../images/icons/report.png) no-repeat left center;
 }
 
 .icon-return {
@@ -1122,6 +1119,11 @@ Variations:
 .icon-sticky {
     padding-left: 21px;
     background: url(../images/icons/sticky.gif) no-repeat left center;
+}
+
+.icon-tick {
+    padding-left:19px;
+    background: url(../images/icons/tick.png) no-repeat left center;
 }
 
 .icon-twitter {
@@ -3694,7 +3696,7 @@ a#toplinks-language {
     background-repeat: no-repeat, no-repeat;
 }
 
-/* the search.css is basicly empty without the styles for googleseach */
+/* the search.css is basicly empty without the styles for googlesearch */
 .search-noresults {
     background:url(../images/search/noresults.jpg) left no-repeat;
     width:254px;

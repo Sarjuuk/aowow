@@ -635,6 +635,83 @@ class AjaxHandler
         return null;
     }
 
+    private function handleAdmin()
+    {
+        if (empty($this->get['action']) || !$this->params)
+            return null;
+
+        if ($this->params[0] == 'siteconfig')
+        {
+            if (!User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+                return null;
+
+            switch ($this->get['action'])
+            {
+                case 'remove':
+                    if (empty($this->get['id']))
+                        return 'invalid configuration option given';
+
+                    if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $this->get['id'], CON_FLAG_PERSISTANT))
+                        return '';
+                    else
+                        return 'option name is either protected or was not found';
+                case 'add':
+                    $key = strtolower(trim(@$this->get['id']));
+                    $val = trim(@$this->get['val']);
+
+                    if (!strlen($key))
+                        return 'empty option name given';
+                    if (!strlen($val))
+                        return 'empty value given';
+
+                    if (preg_match('/[^a-z0-9_\.\-]/i', $key, $m))
+                        return 'invalid chars in option name: "'.$m[0].'"';
+
+                    if (ini_get($key) === false || ini_set($key, $val) === false)
+                        return 'this configuration option cannot be set';
+
+                    if (DB::Aowow()->selectCell('SELECT 1 FROM ?_config WHERE `flags` & ?d AND `key` = ?', CON_FLAG_PHP, $key))
+                        return 'this configuration option is already in use';
+
+                    DB::Aowow()->query('INSERT IGNORE INTO ?_config (`key`, `value`, `flags`) VALUES (?, ?, ?d)', $key, $val, CON_FLAG_TYPE_STRING | CON_FLAG_PHP);
+                    return '';
+                case 'update':
+                    $key = trim(@$this->get['id']);
+                    $val = trim(@$this->get['val']);
+
+                    if (!strlen($key))
+                        return 'empty option name given';
+                    if (!strlen($val))
+                        return 'empty value given';
+
+                    if (substr($key, 0, 4) == 'CFG_')
+                        $key = substr($key, 4);
+
+                    $flags = DB::Aowow()->selectCell('SELECT `flags` FROM ?_config WHERE `key` = ?', $key);
+                    if (!$flags)
+                        return 'configuration option not found';
+
+                    if (preg_match('/[^a-z0-9_\-]/i', $key, $m))
+                        return 'invalid chars in option name: "'.$m[0].'"';
+
+                    if ($flags & CON_FLAG_TYPE_INT && !preg_match('/^-?\d+$/i', $val))
+                        return "value must be integer";
+                    else if ($flags & CON_FLAG_TYPE_FLOAT && !preg_match('/^-?\d*(,|.)?\d+$/i', $val))
+                        return "value must be float";
+                    else if ($flags & CON_FLAG_TYPE_BOOL)
+                        $val = (int)!!$val;                 // *snort* bwahahaa
+
+                    DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $val, $key);
+                    return '';
+                default:
+                    return null;
+            }
+        }
+
+        return null;
+    }
+
+
     /**********/
     /* Helper */
     /**********/
@@ -996,8 +1073,6 @@ class AjaxHandler
         // hey, still here? you're not a Tauren/Nelf as bear or cat, are you?
         return DB::Aowow()->selectCell('SELECT IF(?d == 1, IFNULL(displayIdA, displayIdH), IFNULL(displayIdH, displayIdA)) FROM ?_shapeshiftform WHERE id = ?d', Util::sideByRaceMask(1 << ($char['race'] - 1)), $form);
     }
-
-
 }
 
 ?>

@@ -137,7 +137,7 @@ class GenericPage
 
     private function isSaneInclude($path, $file)            // "template_exists"
     {
-        if (preg_match('/[^\w\-]/i', $file))
+        if (preg_match('/[^\w\-]/i', str_replace('admin/', '', $file)))
             return false;
 
         if (!is_file($path.$file.'.tpl.php'))
@@ -308,9 +308,9 @@ class GenericPage
         }
 
         // fetch announcements
-        if (preg_match('/^([a-z\-]+)=?.*$/i', $_SERVER['QUERY_STRING'], $match))
+        if ($this->pageTemplate['pageName'])
         {
-            $ann = DB::Aowow()->Select('SELECT ABS(id) AS ARRAY_KEY, a.* FROM ?_announcements a WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $match[1], User::$groups);
+            $ann = DB::Aowow()->Select('SELECT ABS(id) AS ARRAY_KEY, a.* FROM ?_announcements a WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $this->pageTemplate['pageName'], User::$groups);
             foreach ($ann as $k => $v)
             {
                 if ($t = Util::localizedString($v, 'text'))
