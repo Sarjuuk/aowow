@@ -564,10 +564,10 @@ trait spawnHelper
             $label = [];
 
             if (User::isInGroup(U_GROUP_STAFF))
-                $label[] = 'GUID'.Lang::$main['colon'].$s['guid'];
+                $label[] = $s['guid'] < 0 ? 'Vehicle Accessory' : 'GUID'.Lang::$main['colon'].$s['guid'];
 
-            if ($_ = Util::formatTime($s['respawn'] * 1000, false))
-                $label[] = Lang::$npc['respawnIn'].Lang::$main['colon'].$_;
+            if ($s['respawn'])
+                $label[] = Lang::$npc['respawnIn'].Lang::$main['colon'].Util::formatTime($s['respawn'] * 1000, false);
 
             if (User::isInGroup(U_GROUP_STAFF))
             {

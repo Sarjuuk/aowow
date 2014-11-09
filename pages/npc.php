@@ -63,6 +63,7 @@ class NpcPage extends GenericPage
         $_altIds    = [];
         $_altNPCs   = null;
         $position   = null;
+        $accessory  = [];
 
         // difficulty entries of self
         if ($this->subject->getField('cuFlags') & NPC_CU_DIFFICULTY_DUMMY)
@@ -79,6 +80,13 @@ class NpcPage extends GenericPage
 
             if ($_altIds)
                 $_altNPCs = new CreatureList(array(['id', array_keys($_altIds)]));
+        }
+
+        if ($_ = DB::World()->selectCol('SELECT DISTINCT entry FROM vehicle_template_accessory WHERE accessory_entry = ?d', $this->typeId))
+        {
+            $vehicles = new CreatureList(array(['id', $_]));
+            foreach ($vehicles->iterate() as $id => $__)
+                $accessory[] = [$id, $vehicles->getField('name', true)];
         }
 
         // try to determine, if it's spawned in a dungeon or raid (shaky at best, if spawned by script)
@@ -271,6 +279,7 @@ class NpcPage extends GenericPage
         $this->map          = $map;
         $this->infobox      = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
         $this->position     = $position;
+        $this->accessory    = $accessory;
         $this->quotes       = $this->getQuotes();
         $this->reputation   = $this->getOnKillRep($_altIds, $mapType);
         $this->redButtons   = array(
@@ -694,6 +703,36 @@ class NpcPage extends GenericPage
                     'id'   => 'criteria-of'
                 )
             );
+        }
+
+        // tab: passengers
+        if ($_ = DB::World()->selectCol('SELECT accessory_entry as ARRAY_KEY, GROUP_CONCAT(seat_id) FROM vehicle_template_accessory WHERE entry = ?d', $this->typeId))
+        {
+            $passengers = new CreatureList(array(['id', array_keys($_)]));
+            if (!$passengers->error)
+            {
+                $data = $passengers->getListviewData();
+
+                $xCols = null;
+                if (User::isInGroup(U_GROUP_STAFF))
+                {
+                    foreach ($data as $id => &$d)
+                        $d['seat'] = str_replace(',', ', ', $_[$id]);
+
+                    $xCols = "$[Listview.funcBox.createSimpleCol('seat', '".Lang::$npc['seat']."', '10%', 'seat')]";
+                }
+
+                $this->extendGlobalData($passengers->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = array(
+                    'file'   => 'creature',
+                    'data'   => $data,
+                    'params' => array(
+                        'extraCols' => $xCols,
+                        'name'      => Lang::$npc['accessory'],
+                        'id'        => 'accessory'
+                    )
+                );
+            }
         }
     }
 

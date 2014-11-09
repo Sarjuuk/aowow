@@ -20,6 +20,20 @@
 <?php
     $this->brick('article');
 
+if ($this->accessory):
+    echo '                <div>'.Lang::$npc['accessoryFor'].' ';
+
+    $n = count($this->accessory);
+    foreach ($this->accessory as $i => $ac):
+        if ($n > 1 && $i > 0):
+            echo ($i == $n - 1) ? Lang::$main['and'] : ', ';
+        endif;
+        echo '<a href="?npc='.$ac[0].'">'.$ac[1].'</a>';
+    endforeach;
+
+    echo ".</div>\n";
+endif;
+
 if (is_array($this->position)):
     echo '                <div>'.Lang::$npc['difficultyPH'].' <a href="?npc='.$this->position[0].'">'.$this->position[1]."</a>.</div>\n";
 ?>
