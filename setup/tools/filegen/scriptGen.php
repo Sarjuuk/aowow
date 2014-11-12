@@ -24,14 +24,22 @@ function writeFile($file, $content, &$log)
         $log[] = [time(), sprintf(ERR_CREATE_FILE, $file)];
 
     if ($success)
-        chmod($file, 0766);
+        @chmod($file, 0766);
 
     return $success;
 }
 
 function writeDir($dir, &$log)
 {
-    if (is_dir($dir) || @mkdir($dir, 0766, true))
+    if (is_dir($dir))
+    {
+        if (!is_writable($dir))
+            $log[] = [time(), '  error: cannot write into output directory '.$dir];
+
+        return is_writable($dir);
+    }
+
+    if (@mkdir($dir, 0766, true))
         return true;
 
     $log[] = [time(), '  error: could not create output directory '.$dir];
@@ -65,13 +73,20 @@ $tplFiles  = array(
     'locales'         => ['locale.js',      'static/js/'                    ],
 //  'itemScaling      => ['item-scaling',   'datasets/'                     ],  # provided 'as is', as dbc-content doesn't usualy change
 );
-$nullFiles = array(
+$datasets = array(
     'realms',       'statistics',       'profiler',         // profiler related
     'talents',      'talentIcons',      'glyphs',           // talentCalc related
     'itemsets',     'enchants',         'gems',             // comparison related
     'pets',
 );
-
+$reqDirs   = array(
+    'static/uploads/screenshots/normal',
+    'static/uploads/screenshots/pending',
+    'static/uploads/screenshots/resized',
+    'static/uploads/screenshots/temp',
+    'static/uploads/screenshots/thumb',
+    'static/uploads/temp/'
+);
 
 // restrict actual locales
 foreach (Util::$localeStrings as $idx => $str)
@@ -80,14 +95,25 @@ foreach (Util::$localeStrings as $idx => $str)
 
 
 // check $pageParam; limit to real scriptNames
-$scList = array_merge(array_keys($tplFiles), $nullFiles);
+$scList = array_merge(array_keys($tplFiles), $datasets);
 if ($pageParam)
     $scList = array_intersect(explode(';', $pageParam), $scList);
 
 
 if ($scList)
 {
-    // start
+    // create directory structure
+    $log[]  = [time(), 'begin creation of directory structure'];
+    $pathOk = 0;
+    foreach ($reqDirs as $d)
+        if (writeDir($d, $log))
+            $pathOk++;
+
+    $log[] = [time(), 'finished directory structure.'];
+    $log[] = [time(), 'created '.$pathOk.' extra paths'.($pathOk == count($reqDirs) ? '' : ' with errors')];
+    $log[] = null;
+
+    // start file generation
     $log[] = [time(), 'begin generation of '. implode(', ', $scList)];
     $log[] = null;
 
@@ -144,7 +170,7 @@ if ($scList)
     }
 
     // files without template
-    foreach ($nullFiles as $file)
+    foreach ($datasets as $file)
     {
         if ($scList && !in_array($file, $scList))
             continue;
@@ -162,6 +188,7 @@ if ($scList)
         else
             $log[] = [time(), sprintf(ERR_MISSING_INCL, $file, 'setup/tools/filegen/'.$file.'.func.php')];
     }
+
 
     // end
     $log[] = null;
