@@ -218,6 +218,128 @@ class CommunityContent
         return $replies;
     }
 
+    public static function getScreenshotsForManager($type, $typeId, $userId = 0)
+    {
+        $screenshots = DB::Aowow()->select('
+            SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.type, s.typeId, s.caption, s.status, s.status AS "flags"
+            FROM   ?_screenshots s, ?_account a
+            WHERE
+                   s.uploader = a.id AND
+                   { s.type = ?d}
+                   { AND s.typeId = ?d}
+                   { s.uploader = ?d}
+            LIMIT 100',
+            $userId ? DBSIMPLE_SKIP : $type,
+            $userId ? DBSIMPLE_SKIP : $typeId,
+            $userId ? $userId : DBSIMPLE_SKIP
+        );
+
+        $num = [];
+        foreach ($screenshots as $s)
+        {
+            if (empty($num[$s['type']][$s['typeId']]))
+                $num[$s['type']][$s['typeId']] = 1;
+            else
+                $num[$s['type']][$s['typeId']]++;
+        }
+
+        // format data to meet requirements of the js
+        foreach ($screenshots as $idx => &$s)
+        {
+            $s['date'] = date(Util::$dateFormatInternal, $s['date']);
+
+            $s['name'] = "Screenshot #".$s['id'];           // what should we REALLY name it?
+
+            if (isset($screenshots[$idx - 1]))
+                $s['prev'] = $idx - 1;
+
+            if (isset($screenshots[$idx + 1]))
+                $s['next'] = $idx + 1;
+
+            // order gives priority for 'status'
+            if (!($s['flags'] & CC_FLAG_APPROVED))
+            {
+                $s['pending'] = 1;
+                $s['status']  = 0;
+            }
+            else
+                $s['status'] = 100;
+
+            if ($s['flags'] & CC_FLAG_STICKY)
+            {
+                $s['sticky'] = 1;
+                $s['status'] = 105;
+            }
+
+            if ($s['flags'] & CC_FLAG_DELETED)
+            {
+                $s['deleted'] = 1;
+                $s['status'] = 999;
+            }
+
+            // something todo with massSelect .. am i doing this right?
+            if ($num[$s['type']][$s['typeId']] == 1)
+                $s['unique'] = 1;
+        }
+
+        return $screenshots;
+    }
+
+    public static function getScreenshotPagesForManager($all, &$nFound)
+    {
+        // i GUESS .. ss_getALL ? everything : unapproved
+        $nFound = 0;
+        $pages  = DB::Aowow()->select('
+             SELECT   s.`type`, s.`typeId`, count(1) AS "count", MIN(s.`date`) AS "date"
+             FROM     ?_screenshots s
+            {WHERE    (s.status & ?d) = 0}
+             GROUP BY s.`type`, s.`typeId`',
+            $all ? DBSIMPLE_SKIP : CC_FLAG_APPROVED
+        );
+
+        if ($pages)
+        {
+            // limit to one actually existing type each
+            $types = array_intersect(array_unique(array_column($pages, 'type')), array_keys(Util::$typeClasses));
+            foreach ($types as $t)
+            {
+                $ids = [];
+                foreach ($pages as $row)
+                    if ($row['type'] == $t)
+                        $ids[] = $row['typeId'];
+
+                if (!$ids)
+                    continue;
+
+                $cnd = [['id', $ids]];
+                if ($t == TYPE_WORLDEVENT)                  // FKIN HOLIDAYS
+                    array_push($cnd, ['holidayId', $ids], 'OR');
+
+                $tClass = new Util::$typeClasses[$t]($cnd);
+                foreach ($pages as &$p)
+                    if ($p['type'] == $t)
+                        if ($tClass->getEntry($p['typeId']))
+                            $p['name'] = $tClass->getField('name', true);
+            }
+
+            foreach ($pages as &$p)
+            {
+                if (empty($p['name']))
+                {
+                    Util::addNote(U_GROUP_STAFF | U_GROUP_SCREENSHOT, 'AdminPage::handleScreenshots() - Screenshot linked to nonexistant type/typeId combination '.$p['type'].'/'.$p['typeId']);
+                    unset($p);
+                }
+                else
+                {
+                    $nFound   += $p['count'];
+                    $p['date'] = date(Util::$dateFormatInternal, $p['date']);
+                }
+            }
+        }
+
+        return $pages;
+    }
+
     private static function getComments($type, $typeId)
     {
 
@@ -300,11 +422,14 @@ class CommunityContent
     private static function getScreenshots($type, $typeId)
     {
         $screenshots = DB::Aowow()->Query("
-            SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.type, s.typeId, s.caption, IF(s.status & 0x4, 1, 0) AS 'sticky'
+            SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.type, s.typeId, s.caption, IF(s.status & ?d, 1, 0) AS 'sticky'
             FROM ?_screenshots s, ?_account a
-            WHERE s.type = ? AND s.typeId = ? AND s.status & 0x2 AND s.uploader = a.id",
+            WHERE s.type = ? AND s.typeId = ? AND s.status & ?d AND (s.status & ?d) = 0 AND s.uploader = a.id",
+            CC_FLAG_STICKY,
             $type,
-            $typeId
+            $typeId,
+            CC_FLAG_APPROVED,
+            CC_FLAG_DELETED
         );
 
         // format data to meet requirements of the js

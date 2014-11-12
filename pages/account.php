@@ -323,7 +323,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         {
             case AUTH_OK:
                 if (!User::$ip)
-                    return Lang::$account['intError'];
+                    return Lang::$main['intError'];
 
                 // reset account status, update expiration
                 DB::Aowow()->query('UPDATE ?_account SET prevIP = IF(curIp = ?, prevIP, curIP), curIP = IF(curIp = ?, curIP, ?), allowExpire = ?d, status = 0, statusTimer = 0, token = "" WHERE user = ?',
@@ -354,7 +354,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
                 return sprintf(Lang::$account['loginExceeded'], Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
             case AUTH_INTERNAL_ERR:
                 User::destroy();
-                return Lang::$account['intError'];
+                return Lang::$main['intError'];
             default:
                 return;
         }
@@ -391,7 +391,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
         // check ip
         if (!User::$ip)
-            return Lang::$account['intError'];
+            return Lang::$main['intError'];
 
         // limit account creation
         $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 1 AND ip = ?', User::$ip);
@@ -420,7 +420,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             $token
         );
         if (!$id)                                           // something went wrong
-            return Lang::$account['intError'];
+            return Lang::$main['intError'];
         else if ($_ = $this->sendMail($email, Lang::$mail['accConfirm'][0], sprintf(Lang::$mail['accConfirm'][1], $token), CFG_ACCOUNT_CREATE_SAVE_DECAY))
         {
             // success:: update ip-bans
@@ -460,7 +460,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             return Lang::$account['newPassDiff'];
 
         if (!DB::Aowow()->query('UPDATE ?_account SET passHash = ?, status = ?d WHERE id = ?d', User::hashcrypt($newPass), ACC_STATUS_OK, $uRow['id']))
-            return Lang::$account['intError'];
+            return Lang::$main['intError'];
     }
 
     private function doRecoverUser($target)
@@ -475,7 +475,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
     private function initRecovery($type, $target, $delay, &$token)
     {
         if (!$type)
-            return Lang::$account['intError'];
+            return Lang::$main['intError'];
 
         // check if already processing
         if ($_ = DB::Aowow()->selectCell('SELECT statusTimer - UNIX_TIMESTAMP() FROM ?_account WHERE email = ? AND status <> ?d AND statusTimer > UNIX_TIMESTAMP()', $target, ACC_STATUS_OK))
@@ -484,7 +484,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         // create new token and write to db
         $token = Util::createHash();
         if (!DB::Aowow()->query('UPDATE ?_account SET token = ?, status = ?d, statusTimer =  UNIX_TIMESTAMP() + ?d WHERE email = ?', $token, $type, $delay, $target))
-            return Lang::$account['intError'];
+            return Lang::$main['intError'];
     }
 
     private function sendMail($target, $subj, $msg, $delay = 300)
@@ -497,7 +497,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
                   'X-Mailer: PHP/' . phpversion();
 
         if (!mail($target, $subj, $msg, $header))
-            return sprintf(Lang::$account['intError2'], 'send mail');
+            return sprintf(Lang::$main['intError2'], 'send mail');
     }
 
     private function getNext($forHeader = false)

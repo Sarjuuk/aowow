@@ -70,6 +70,7 @@ switch ($pageCall)
     case 'quests':
     case 'race':
     case 'races':
+    case 'screenshot':                                      // prepare uploaded screenshots
     case 'search':                                          // tool: searches
     case 'skill':
     case 'skills':

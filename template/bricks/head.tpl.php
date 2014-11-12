@@ -1,6 +1,6 @@
     <title><?php echo htmlentities(implode(' - ', $this->title)); ?></title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="SHORTCUT ICON" href="<?php echo STATIC_URL; ?>/images/logos/favicon.ico" />
     <link rel="search" type="application/opensearchdescription+xml" href="<?php echo STATIC_URL; ?>/download/searchplugins/aowow.xml" title="Aowow" />
     <link rel="stylesheet" type="text/css" href="<?php echo STATIC_URL.'/css/basic.css?'.AOWOW_REVISION; ?>" />
@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="<?php echo STATIC_URL.'/css/aowow.css?'.AOWOW_REVISION; ?>" />
     <link rel="stylesheet" type="text/css" href="<?php echo STATIC_URL.'/css/locale_'.User::$localeString.'.css?'.AOWOW_REVISION; ?>" />
 <?php
-if (User::isInGroup(U_GROUP_STAFF)):
+if (User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT | U_GROUP_VIDEO)):
     echo '    <link rel="stylesheet" type="text/css" href="'.STATIC_URL.'/css/staff.css?'.AOWOW_REVISION."\" />\n";
 endif;
 
@@ -40,7 +40,7 @@ endif;
     <script src="<?php echo STATIC_URL.'/js/locale.js?'.AOWOW_REVISION; ?>" type="text/javascript"></script>
     <script src="<?php echo STATIC_URL.'/js/Markup.js?'.AOWOW_REVISION; ?>" type="text/javascript"></script>
 <?php
-if (User::isInGroup(U_GROUP_STAFF)):
+if (User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT | U_GROUP_VIDEO)):
     echo '    <script src="'.STATIC_URL.'/js/staff.js?'.AOWOW_REVISION."\" type=\"text/javascript\"></script>\n";
 endif;
 

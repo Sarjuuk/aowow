@@ -36,12 +36,22 @@ if (!empty($this->type) && !empty($this->typeId)):
 ?>
         <tr><th id="infobox-screenshots"><?php echo Lang::$main['screenshots']; ?></th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-ss"></div></td></tr>
+<?php
+    if (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi'])):
+?>
         <tr><th id="infobox-videos"><?php echo Lang::$main['videos']; ?></th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-vi"></div></td></tr>
+<?php
+    endif;
+?>
     </table>
     <script type="text/javascript">ss_appendSticky()</script>
+<?php
+    if (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi'])):
+?>
     <script type="text/javascript">vi_appendSticky()</script>
 <?php
+    endif;
 else:
     echo "    </table>\n";
 endif;

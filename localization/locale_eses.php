@@ -50,6 +50,7 @@ $lang = array(
         'aboutUs'       => "Sobre Aowow",
         'and'           => " y ",
         'or'            => " o ",
+        'back'          => "Arrière",
 
         // filter
         'extSearch'     => "Extender búsqueda",
@@ -136,9 +137,36 @@ $lang = array(
         'dateFmtLong'   => "d/m/Y \a \l\a\s H:i",
 
         // error
+        'intError'      => "[An internal error occured.]",
+        'intError2'     => "[An internal error occured. (%s)]",
         'genericError'  => "Ha ocurrido un error; refresca la página e inténtalo de nuevo. Si el error persiste manda un correo a <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Has sido baneado y no podrás valorar comentarios.", # LANG.tooltip_banned_rating
-        'tooManyVotes'  => "Has alcanzado el límite diario de votos. Vuelve mañana." # LANG.tooltip_too_many_votes
+        'tooManyVotes'  => "Has alcanzado el límite diario de votos. Vuelve mañana.", # LANG.tooltip_too_many_votes
+
+        // screenshots
+        'prepError'     => "[An error occured preparing your screenshot]",
+        'cropHint'      => "[Crop the image by dragging the selection.<br>Please refer to <a href=\"?help=screenshots-tips-tricks\">Screenshots: Tips & Tricks</a> for an optimal layout.]",
+        'caption'       => "[Caption]",
+        'originalSize'  => "[Original size]",
+        'targetSize'    => "[Target size]",
+        'minSize'       => "[Minimum size]",
+        'displayOn'     => "[Displayed on: %s[br][%s=%d]]",
+        'ssEdit'        => "[Edit uploaded screenshot]",
+        'ssUpload'      => "[Screenshot Upload]",
+        'ssSubmit'      => "[Submit Screenshot]",
+        'ssErrors'      => array(
+            'noUpload'    => "[The file was not uploaded!]",
+            'maxSize'     => "[The file exceeds the maximum size of %s!]",
+            'interrupted' => "[The upload process was interrupted!]",
+            'noFile'      => "[The file was not received!]",
+            'noDest'      => "[The page this screenshot should be displayed on, does not exist!]",
+            'notAllowed'  => "[You are not allowed to upload screenshots!]",
+            'noImage'     => "[The uploaded file is not an image file!]",
+            'wrongFormat' => "[The image file must be a png or jpg!]",
+            'load'        => "[The image file could not be loaded!]",
+            'tooSmall'    => "[The image size is too small! (lower than %d x %d)]",
+            'tooLarge'    => "[The image size is too large! (greater than %d x %d)]"
+        )
     ),
     'game' => array(
         'achievement'   => "logro",
@@ -334,8 +362,6 @@ $lang = array(
         'passMismatch'  => "The passwords you entered do not match.",
         'nameInUse'     => "That username is already taken.",
         'mailInUse'     => "That email is already registered to an account.",
-        'intError'      => "An internal error occured.",
-        'intError2'     => "An internal error occured. (%s)",
         'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
         'passCheckFail' => "Las contraseñas no son iguales.", // message_passwordsdonotmatch
         'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a Su contraseña anterior." // message_newpassdifferent

@@ -91,7 +91,7 @@ define('CON_FLAG_TYPE_STRING',              0x08);          //
 define('CON_FLAG_OPT_LIST',                 0x10);          // single option
 define('CON_FLAG_BITMASK',                  0x20);          // multiple options
 define('CON_FLAG_PHP',                      0x40);          // applied with ini_set() [restrictions apply!]
-define('CON_FLAG_PERSISTANT',               0x80);          // can not be deleted
+define('CON_FLAG_PERSISTENT',               0x80);          // can not be deleted
 
 // Auth Result
 define('AUTH_OK',                           0);

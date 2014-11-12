@@ -640,7 +640,28 @@ class AjaxHandler
         if (empty($this->get['action']) || !$this->params)
             return null;
 
-        if ($this->params[0] == 'siteconfig')
+        if ($this->params[0] == 'screenshots')
+        {
+            if (!User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT))  // comment_mod, handleSSmod, vi_mod ?
+                return null;
+
+            switch ($this->get['action'])
+            {
+                case 'list':                                // get all => null (optional)
+                case 'manage':                              // get: [type => type, typeId => typeId] || [user => username]
+                case 'editalt':                             // get: id => ssId; post: alt => caption
+                case 'approve':                             // get: id => ssId || ,-separated id-list
+                case 'sticky':                              // get: id => ssId || ,-separated id-list
+                case 'delete':                              // get: id => ssId || ,-separated id-list
+                case 'relocate':                            // get: id => ssId, typeid => typeId    (but not type..?)
+                    $fn = 'admin_handleSS'.ucfirst($this->get['action']);
+                    return $this->$fn();
+                    break;
+                default:
+                    return null;
+            }
+        }
+        else if ($this->params[0] == 'siteconfig')
         {
             if (!User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
                 return null;
@@ -651,7 +672,7 @@ class AjaxHandler
                     if (empty($this->get['id']))
                         return 'invalid configuration option given';
 
-                    if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $this->get['id'], CON_FLAG_PERSISTANT))
+                    if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $this->get['id'], CON_FLAG_PERSISTENT))
                         return '';
                     else
                         return 'option name is either protected or was not found';
@@ -1072,6 +1093,198 @@ class AjaxHandler
 
         // hey, still here? you're not a Tauren/Nelf as bear or cat, are you?
         return DB::Aowow()->selectCell('SELECT IF(?d == 1, IFNULL(displayIdA, displayIdH), IFNULL(displayIdH, displayIdA)) FROM ?_shapeshiftform WHERE id = ?d', Util::sideByRaceMask(1 << ($char['race'] - 1)), $form);
+    }
+
+    // get all => null (optional)
+    // evaled response .. UNK
+    private function admin_handleSSList()
+    {
+        // ssm_screenshotPages
+        // ssm_numPagesFound
+
+        $pages = CommunityContent::getScreenshotPagesForManager(isset($this->get['all']), $nPages);
+        $buff  = 'ssm_screenshotPages = '.json_encode($pages, JSON_NUMERIC_CHECK).";\n";
+        $buff .= 'ssm_numPagesFound = '.$nPages.';';
+
+        return $buff;
+    }
+
+    // get: [type => type, typeId => typeId] || [user => username]
+    // evaled response .. UNK
+    private function admin_handleSSManage()
+    {
+        $res = [];
+
+        if (!empty($this->get['type']) && intVal($this->get['type']) && !empty($this->get['typeid']) && intVal($this->get['typeid']))
+            $res = CommunityContent::getScreenshotsForManager($this->get['type'], $this->get['typeid']);
+        else if (!empty($this->get['user']) && strlen(urldecode($this->get['user'])) > 2)
+            if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', strtolower(urldecode($this->get['user']))))
+                $res = CommunityContent::getScreenshotsForManager(0, 0, $uId);
+
+        return 'ssm_screenshotData = '.json_encode($res, JSON_NUMERIC_CHECK);
+    }
+
+    // get: id => SSid
+    // resp: ''
+    private function admin_handleSSEditalt()
+    {
+        if (empty($_GET['id']) || empty($this->post['alt']))
+            return '';
+
+        // doesn't need to be htmlEscaped, ths javascript does that
+        DB::Aowow()->query('UPDATE ?_screenshots SET caption = ? WHERE id = ?d', $this->post['alt'], $_GET['id']);
+
+        return '';
+    }
+
+    // get: id => comma-separated SSids
+    // resp: ''
+    private function admin_handleSSApprove($override = [])
+    {
+        if (empty($_GET['id']))
+            return '';
+
+        $ids = $override ?: array_map('intval', explode(',', $_GET['id']));
+
+        // create resized and thumb version of screenshot
+        $resized = [772, 618];
+        $thumb   = [150, 150];
+        $path    = 'static/uploads/screenshots/%s/%d.jpg';
+
+        foreach ($ids as $id)
+        {
+            // must not be already approved
+            if ($_ = DB::Aowow()->selectCell('SELECT uploader FROM ?_screenshots WHERE (status & ?d) = 0 AND id = ?d', CC_FLAG_APPROVED, $id))
+            {
+                // should also error-log
+                if (!file_exists(sprintf($path, 'pending', $id)))
+                    continue;
+
+                $srcImg = imagecreatefromjpeg(sprintf($path, 'pending', $id));
+                $srcW   = imagesx($srcImg);
+                $srcH   = imagesy($srcImg);
+
+                // write thumb
+                $scale   = min(1.0, min($thumb[0] / $srcW, $thumb[1] / $srcH));
+                $destW   = $srcW * $scale;
+                $destH   = $srcH * $scale;
+                $destImg = imagecreatetruecolor($destW, $destH);
+
+                imagefill($destImg, 0, 0, imagecolorallocate($destImg, 255, 255, 255));
+                imagecopyresampled($destImg, $srcImg, 0, 0, 0, 0, $destW, $destH, $srcW, $srcH);
+
+                imagejpeg($destImg, sprintf($path, 'thumb', $id), 100);
+
+                // write resized (only if required)
+                if ($srcW > $resized[0] || $srcH > $resized[1])
+                {
+                    $scale   = min(1.0, min($resized[0] / $srcW, $resized[1] / $srcH));
+                    $destW   = $srcW * $scale;
+                    $destH   = $srcH * $scale;
+                    $destImg = imagecreatetruecolor($destW, $destH);
+
+                    imagefill($destImg, 0, 0, imagecolorallocate($destImg, 255, 255, 255));
+                    imagecopyresampled($destImg, $srcImg, 0, 0, 0, 0, $destW, $destH, $srcW, $srcH);
+
+                    imagejpeg($destImg, sprintf($path, 'resized', $id), 100);
+                }
+
+                imagedestroy($srcImg);
+
+                // move screenshot from pending to normal
+                rename(sprintf($path, 'pending', $id), sprintf($path, 'normal', $id));
+
+                // set as approved in DB and gain rep (once!)
+                DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, approvedBy = ?d WHERE id = ?d', CC_FLAG_APPROVED, User::$id, $id);
+                Util::gainSiteReputation($_, SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1]);
+            }
+        }
+
+        return '';
+    }
+
+    // get: id => comma-separated SSids
+    // resp: ''
+    private function admin_handleSSSticky()
+    {
+        if (empty($_GET['id']))
+            return '';
+
+        // this one is a bit strange: as far as i've seen, the only thing a 'sticky' screenshot does is show up in the infobox
+        // this also means, that only one screenshot per page should be sticky
+        // so, handle it one by one and the last one affecting one particular type/typId-key gets the cake
+        $ids = array_map('intval', explode(',', $_GET['id']));
+
+        foreach ($ids as $id)
+        {
+            // reset all others
+            DB::Aowow()->query('UPDATE ?_screenshots a, ?_screenshots b SET a.status = a.status & ~?d WHERE a.type = b.type AND a.typeId = b.typeId AND a.id <> b.id AND b.id = ?d', CC_FLAG_STICKY, $id);
+
+            // approve this one (if not already)
+            $this->admin_handleSSApprove([$id]);
+
+            // toggle sticky status
+            DB::Aowow()->query('UPDATE ?_screenshots SET `status` = IF(`status` & ?d, `status` & ~?d, `status` | ?d) WHERE id = ?d AND `status` & ?d', CC_FLAG_STICKY, CC_FLAG_STICKY, CC_FLAG_STICKY, $id, CC_FLAG_APPROVED);
+        }
+
+        return '';
+    }
+
+    // get: id => comma-separated SSids
+    // resp: ''
+    // 2 steps: 1) remove from sight, 2) remove from disk
+    private function admin_handleSSDelete()
+    {
+        if (empty($_GET['id']))
+            return '';
+
+        $path = 'static/uploads/screenshots/%s/%d.jpg';
+        $ids  = array_map('intval', explode(',', $_GET['id']));
+
+        foreach ($ids as $id)
+        {
+            // irrevocably remove already deleted files
+            if (DB::Aowow()->selectCell('SELECT 1 FROM ?_screenshots WHERE status & ?d AND id = ?d', CC_FLAG_DELETED, $id))
+            {
+                DB::Aowow()->query('DELETE FROM ?_screenshots WHERE id = ?d', $id);
+                if (file_exists(sprintf($path, 'pending', $id)))
+                    unlink(sprintf($path, 'pending', $id));
+
+                continue;
+            }
+
+            // move pending or normal to pending
+            if (file_exists(sprintf($path, 'normal', $id)))
+                rename(sprintf($path, 'normal', $id), sprintf($path, 'pending', $id));
+
+            // remove resized and thumb
+            if (file_exists(sprintf($path, 'thumb', $id)))
+                unlink(sprintf($path, 'thumb', $id));
+
+            if (file_exists(sprintf($path, 'resized', $id)))
+                unlink(sprintf($path, 'resized', $id));
+        }
+
+        // flag as deleted if not aready
+        DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, deletedBy = ?d WHERE id IN (?a)', CC_FLAG_DELETED, User::$id, $ids);
+
+        return '';
+    }
+
+    // get: id => ssId, typeid => typeId    (but not type..?)
+    // resp: ''
+    private function admin_handleSSRelocate()
+    {
+        if (empty($this->get['id']) || empty($this->get['typeid']))
+            return '';
+
+        $type   = DB::Aowow()->selectCell('SELECT type FROM ?_screenshots WHERE id = ?d', $this->get['id']);
+        $typeId = (int)$this->get['typeid'];
+
+        if (!(new Util::$typeClasses[$type]([['id', $typeId]]))->error)
+            DB::Aowow()->query('UPDATE ?_screenshots SET typeId = ?d WHERE id = ?d', $typeId, $this->get['id']);
+
+        return '';
     }
 }
 

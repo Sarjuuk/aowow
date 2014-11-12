@@ -19,6 +19,14 @@ class AdminPage extends GenericPage
     {
         switch ($pageParam)
         {
+            case 'screenshots':
+                $this->reqUGroup = U_GROUP_STAFF | U_GROUP_SCREENSHOT;
+                $this->generator = 'handleScreenshots';
+                $this->tpl       = 'admin/screenshots';
+
+                array_push($this->path, 1, 5);
+                $this->name = 'Screenshot Manager';
+                break;
             case 'phpinfo':
                 $this->reqUGroup = U_GROUP_ADMIN | U_GROUP_DEV;
                 $this->generator = 'handlePhpInfo';
@@ -439,6 +447,45 @@ class AdminPage extends GenericPage
         }
     }
 
+    private function handleScreenshots()
+    {
+        $this->addJS('screenshot.js');
+        $this->addCSS(array(
+            ['string' => '.layout {margin: 0px 25px; max-width: inherit; min-width: 1200px; }'],
+            ['string' => '#highlightedRow { background-color: #322C1C; }']
+        ));
+
+        $ssGetAll = isset($_GET['all']) && empty($_GET['all']);
+        $ssPages  = [];
+        $ssData   = [];
+        $nMatches = 0;
+
+        if (!empty($_GET['type']) && !empty($_GET['typeid']))
+        {
+            $ssData   = CommunityContent::getScreenshotsForManager(intVal($_GET['type']), intVal($_GET['typeid']));
+            $nMatches = count($ssData);
+        }
+        else if (!empty($_GET['user']))
+        {
+            $name = urldecode($_GET['user']);
+            if (strlen($name) > 3)
+            {
+                if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', ucFirst($name)))
+                {
+                    $ssData   = CommunityContent::getScreenshotsForManager(0, 0, $uId);
+                    $nMatches = count($ssData);
+                }
+            }
+        }
+        else
+            $ssPages = CommunityContent::getScreenshotPagesForManager($ssGetAll, $nMatches);
+
+        $this->getAll   = $ssGetAll;
+        $this->ssPages  = $ssPages;
+        $this->ssData   = $ssData;
+        $this->ssNFound = $nMatches;                        // ssm_numPagesFound
+    }
+
     private function configAddRow($r)
     {
         $buff = '<tr>';
@@ -487,7 +534,7 @@ class AdminPage extends GenericPage
         else
             $buff .= '|<a class="icon-refresh tip disabled"></a>';
 
-        if (!($r['flags'] & CON_FLAG_PERSISTANT))
+        if (!($r['flags'] & CON_FLAG_PERSISTENT))
             $buff .= '|<a class="icon-delete tip" onclick="cfg_remove.bind(this, \''.$key.'\')()" onmouseover="$WH.Tooltip.showAtCursor(event, \'Remove Setting\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"></a>';
 
         $buff .= '<span class="status"></span></td></tr>';

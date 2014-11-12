@@ -1479,7 +1479,7 @@ class Util
                 $x['sourceB'] = $miscData['voterId'];
                 $x['amount']  = $action == SITEREP_ACTION_UPVOTED ? CFG_REP_REWARD_UPVOTED : CFG_REP_REWARD_DOWNVOTED;
                 break;
-            case SITEREP_ACTION_UPLOAD:                     // NYI
+            case SITEREP_ACTION_UPLOAD:
                 if (empty($miscData['id']) || empty($miscData['what']))
                     return false;
 

@@ -50,6 +50,7 @@ $lang = array(
         'aboutUs'       => "Über Aowow",
         'and'           => " und ",
         'or'            => " oder ",
+        'back'          => "Zurück",
 
         // filter
         'extSearch'     => "Erweiterte Suche",
@@ -136,9 +137,36 @@ $lang = array(
         'dateFmtLong'   => "d.m.Y \u\m H:i",
 
         // error
+        'intError'      => "Ein interner Fehler ist aufgetreten.",
+        'intError2'     => "Ein interner Fehler ist aufgetreten. (%s)",
         'genericError'  => "Ein Fehler trat auf; aktualisiert die Seite und versucht es nochmal. Wenn der Fehler bestehen bleibt, bitte meldet es bei <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Ihr wurdet davon gesperrt, Kommentare zu bewerten.", # LANG.tooltip_banned_rating
-        'tooManyVotes'  => "Ihr habt die tägliche Grenze für erlaubte Bewertungen erreicht. Kommt morgen mal wieder!" # LANG.tooltip_too_many_votes
+        'tooManyVotes'  => "Ihr habt die tägliche Grenze für erlaubte Bewertungen erreicht. Kommt morgen mal wieder!", # LANG.tooltip_too_many_votes
+
+        // screenshots
+        'prepError'     => "Bei der Aufbereitung eures Screenshots ist ein Fehler aufgetreten",
+        'cropHint'      => "Schneidet das Bild zu, indem ihr die Auswahl verschiebt.<br>Bitte beachtet <a href=\"?help=screenshots-tips-tricks\">Screenshots: Tipps & Tricks</a> für eine optimale Darstellung.",
+        'caption'       => "Kurzbeschreibung",
+        'originalSize'  => "Originalgröße",
+        'targetSize'    => "Zielgröße",
+        'minSize'       => "Mindestgröße",
+        'displayOn'     => "Hochgeladen für: %s[br][%s=%d]",
+        'ssEdit'        => "Screenshot bearbeiten",
+        'ssUpload'      => "Screenshot hochladen",
+        'ssSubmit'      => "Screenshot einsenden",
+        'ssErrors'      => array(
+            'noUpload'    => "Die Datei wurde nicht hochgeladen!",
+            'maxSize'     => "Die Datei überschreitet die max. Größe von %s!",
+            'interrupted' => "Der Vorgang wurde unterbrochen!",
+            'noFile'      => "Es wurde keine Datei empfangen!",
+            'noDest'      => "Die Seite auf welcher der Screenshot angezeigt werden sollte existiert nicht!",
+            'notAllowed'  => "Es ist euch nicht erlaubt einen Screenshot hochzuladen!",
+            'noImage'     => "Die hochgeladene Datei ist kein Bild!",
+            'wrongFormat' => "Das Bild muss im PNG oder JPG-Format sein!",
+            'load'        => "Das Bild konnte nicht geladen werden!",
+            'tooSmall'    => "Die Abmessungen sind zu klein! (kleiner als %d x %d)",
+            'tooLarge'    => "Die Abmessungen sind zu groß! (größer als %d x %d)"
+        )
     ),
     'game' => array(
         'achievement'   => "Erfolg",
@@ -333,8 +361,6 @@ $lang = array(
         'passMismatch'  => "Die eingegebenen Kennworte stimmen nicht überein.",
         'nameInUse'     => "Es existiert bereits ein Konto mit diesem Namen.",
         'mailInUse'     => "Diese E-Mail-Adresse ist bereits mit einem Konto verbunden.",
-        'intError'      => "Ein interner Fehler ist aufgetreten.",
-        'intError2'     => "Ein interner Fehler ist aufgetreten. (%s)",
         'isRecovering'  => "Dieses Konto wird bereits wiederhergestellt. Folgt den Anweisungen in der Nachricht oder wartet %s bis das Token verfällt.",
         'passCheckFail' => "Die Kennwörter stimmen nicht überein.", // message_passwordsdonotmatch
         'newPassDiff'   => "Euer neues Kennwort muss sich von eurem alten Kennwort unterscheiden." // message_newpassdifferent

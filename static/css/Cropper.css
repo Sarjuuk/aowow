@@ -1,0 +1,129 @@
+.cropper {
+    width:488px;
+    height:325px;
+    border:3px solid #404040;
+    text-align:center;
+    background:black;
+}
+
+.canvas {
+    position:relative;
+    margin:0 auto;
+}
+
+.selection {
+    position:absolute;
+    cursor:move;
+}
+
+.selection .opac {
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background-color:#369;
+    filter:alpha(opacity=40);
+    opacity:.4;
+}
+
+.selection div {
+    position:absolute;
+    font-size:1px;
+}
+
+.selection .grabw {
+    left:-4px;
+    top:0;
+    width:9px;
+    height:100%;
+    cursor:w-resize;
+}
+
+.selection .grabe {
+    right:-4px;
+    top:0;
+    width:9px;
+    height:100%;
+    cursor:w-resize;
+}
+
+.selection .grabn {
+    left:0;
+    top:-4px;
+    width:100%;
+    height:9px;
+    cursor:n-resize;
+}
+
+.selection .grabs {
+    left:0;
+    bottom:-4px;
+    width:100%;
+    height:9px;
+    cursor:n-resize;
+}
+
+.selection .grabnw {
+    left:-3px;
+    top:-3px;
+    width:10px;
+    height:10px;
+    cursor:nw-resize;
+}
+
+.selection .grabne {
+    right:-3px;
+    top:-3px;
+    width:10px;
+    height:10px;
+    cursor:ne-resize;
+}
+
+.selection .grabsw {
+    left:-3px;
+    bottom:-3px;
+    width:10px;
+    height:10px;
+    cursor:ne-resize;
+}
+
+.selection .grabse {
+    right:-3px;
+    bottom:-3px;
+    width:10px;
+    height:10px;
+    cursor:nw-resize;
+}
+
+.selection .hborder {
+    left:0;
+    top:0;
+    width:100%;
+    height:1px;
+    background:url(//wowimg.zamimg.com/images/ui/misc/selection-h.gif) repeat-x top;
+}
+
+.selection .hborder2 {
+    left:0;
+    bottom:0;
+    width:100%;
+    height:1px;
+    background:url(//wowimg.zamimg.com/images/ui/misc/selection-h.gif) repeat-x bottom;
+}
+
+.selection .vborder {
+    left:0;
+    top:0;
+    width:1px;
+    height:100%;
+    background:url(//wowimg.zamimg.com/images/ui/misc/selection-v.gif) repeat-y left;
+}
+
+.selection .vborder2 {
+    right:0;
+    top:0;
+    width:1px;
+    height:100%;
+    background:url(//wowimg.zamimg.com/images/ui/misc/selection-v.gif) repeat-y right;
+}
