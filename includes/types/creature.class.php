@@ -15,13 +15,36 @@ class CreatureList extends BaseType
     public        $queryOpts = array(
                         'ct'     => [['ft', 'clsMin', 'clsMax', 'qse']],
                         'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.faction', 's' => ', ft.A, ft.H, ft.factionId'],
-                        'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', clsMin.attackpower AS mleAtkPwrMin, clsMin.rangedattackpower AS rngAtkPwrMin, clsMin.baseArmor * ct.armorMod AS armorMin, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * ct.dmgMultiplier AS dmgMin, (CASE ct.exp WHEN 0 THEN clsMin.basehp0 WHEN 1 THEN clsMin.basehp1 ELSE clsMin.basehp2 END) * ct.healthMod AS healthMin, clsMin.baseMana * ct.manaMod AS manaMin'],
-                        'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', clsMax.attackpower AS mleAtkPwrMax, clsMax.rangedattackpower AS rngAtkPwrMax, clsMax.baseArmor * ct.armorMod AS armorMax, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) * ct.dmgMultiplier AS dmgMax, (CASE ct.exp WHEN 0 THEN clsMax.basehp0 WHEN 1 THEN clsMax.basehp1 ELSE clsMax.basehp2 END) * ct.healthMod AS healthMax, clsMax.baseMana * ct.manaMod AS manaMax'],
+                        'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', clsMin.attackpower AS mleAtkPwrMin, clsMin.rangedattackpower AS rngAtkPwrMin, clsMin.baseArmor * ct.armorMod AS armorMin, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) AS dmgMin, (CASE ct.exp WHEN 0 THEN clsMin.basehp0 WHEN 1 THEN clsMin.basehp1 ELSE clsMin.basehp2 END) * ct.healthMod AS healthMin, clsMin.baseMana * ct.manaMod AS manaMin'],
+                        'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', clsMax.attackpower AS mleAtkPwrMax, clsMax.rangedattackpower AS rngAtkPwrMax, clsMax.baseArmor * ct.armorMod AS armorMax, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) AS dmgMax, (CASE ct.exp WHEN 0 THEN clsMax.basehp0 WHEN 1 THEN clsMax.basehp1 ELSE clsMax.basehp2 END) * ct.healthMod AS healthMax, clsMax.baseMana * ct.manaMod AS manaMax'],
                         'qse'    => ['j' => ['?_quests_startend qse ON qse.type = 1 AND qse.typeId = ct.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'ct.id'],
                         'qt'     => ['j' => '?_quests qt ON qse.questId = qt.id'],
                         'rep'    => ['j' => ['creature_onkill_reputation rep ON rep.creature_id = ct.id', true]],
                         's'      => ['j' => '?_spawns s ON s.type = 1 AND s.typeId = ct.id']
                     );
+
+    public function __construct($conditions = [], $miscData = null)
+    {
+        parent::__construct($conditions, $miscData);
+
+        if ($this->error)
+            return;
+
+        // post processing
+        foreach ($this->iterate() as $_id => &$curTpl)
+        {
+            // check for attackspeeds
+            if (!$curTpl['atkSpeed'])
+                $curTpl['atkSpeed'] = 2.0;
+            else
+                $curTpl['atkSpeed'] /= 1000;
+
+            if (!$curTpl['rngAtkSpeed'])
+                $curTpl['rngAtkSpeed'] = 2.0;
+            else
+                $curTpl['rngAtkSpeed'] /= 1000;
+        }
+    }
 
     public static function getName($id)
     {
@@ -111,8 +134,6 @@ class CreatureList extends BaseType
 
     public function getBaseStats($type)
     {
-        // unsure of implementation: creature_classlevestats just got reworked
-
         switch ($type)
         {
             case 'health':
@@ -128,12 +149,12 @@ class CreatureList extends BaseType
                 $aMax = $this->getField('armorMax');
                 return [$aMin, $aMax];
             case 'melee':
-                $mleMin =  $this->getField('dmgMin') + $this->getField('mleAtkPwrMin') / 7;
-                $mleMax = ($this->getField('dmgMax') + $this->getField('mleAtkPwrMax') / 7) * 1.5;
+                $mleMin = ($this->getField('dmgMin')       + ($this->getField('mleAtkPwrMin') / 14)) * $this->getField('dmgMultiplier') * $this->getField('atkSpeed');
+                $mleMax = ($this->getField('dmgMax') * 1.5 + ($this->getField('mleAtkPwrMax') / 14)) * $this->getField('dmgMultiplier') * $this->getField('atkSpeed');
                 return [$mleMin, $mleMax];
             case 'ranged':
-                $rngMin =  $this->getField('dmgMin') + $this->getField('rngAtkPwrMin') / 7;
-                $rngMax = ($this->getField('dmgMax') + $this->getField('rngAtkPwrMax') / 7) * 1.5;
+                $rngMin = ($this->getField('dmgMin')       + ($this->getField('rngAtkPwrMin') / 14)) * $this->getField('dmgMultiplier') * $this->getField('rngAtkSpeed');
+                $rngMax = ($this->getField('dmgMax') * 1.5 + ($this->getField('rngAtkPwrMax') / 14)) * $this->getField('dmgMultiplier') * $this->getField('rngAtkSpeed');
                 return [$rngMin, $rngMax];
             default:
                 return [0, 0];
