@@ -15,9 +15,10 @@ class AchievementList extends BaseType
 
     protected     $queryBase = 'SELECT `a`.*, `ar`.*, `lar`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
     protected     $queryOpts = array(
-                          'a' => [['ar', 'lar'], 'o' => 'orderInGroup ASC'],
+                          'a' => [['ar', 'lar', 'si'], 'o' => 'orderInGroup ASC'],
                          'ar' => ['j' => ['achievement_reward ar ON ar.entry = a.id', true]],
                         'lar' => ['j' => ['locales_achievement_reward lar ON lar.entry = a.id', true]],
+                         'si' => ['j' => ['?_spellicon si ON si.id = a.iconId', true], 's' => ', si.iconString'],
                          'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
                   );
 
@@ -252,15 +253,15 @@ class AchievementListFilter extends Filter
         )
     );
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true                      ], // givesreward
-         3 => [FILTER_CR_STRING,    'reward',      true                      ], // rewardtext
-         7 => [FILTER_CR_BOOLEAN,   'series',                                ], // givesreward
-         9 => [FILTER_CR_NUMERIC,   'id',          null,                 true], // prcntbasemanarequired
-        10 => [FILTER_CR_STRING,    'iconString',                            ], // icon
-        18 => [FILTER_CR_STAFFFLAG, 'flags',                                 ], // lastrank
-        14 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_COMMENT        ], // hascomments
-        15 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
-        16 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_VIDEO          ], // hasvideos
+         2 => [FILTER_CR_BOOLEAN,   'reward_loc0',    true                      ], // givesreward
+         3 => [FILTER_CR_STRING,    'reward',         true                      ], // rewardtext
+         7 => [FILTER_CR_BOOLEAN,   'series',                                   ], // givesreward
+         9 => [FILTER_CR_NUMERIC,   'id',             null,                 true], // id
+        10 => [FILTER_CR_STRING,    'si.iconString',                            ], // icon
+        18 => [FILTER_CR_STAFFFLAG, 'flags',                                    ], // lastrank
+        14 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_COMMENT        ], // hascomments
+        15 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
+        16 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_VIDEO          ], // hasvideos
     );
 
     protected function createSQLForCriterium(&$cr)
