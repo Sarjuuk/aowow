@@ -1,28 +1,39 @@
 <?php
 
 define('AOWOW_REVISION', 12);
+define('CLI', PHP_SAPI === 'cli');
 
-if (!file_exists('config/config.php'))
-{
-    $cwDir = /*$_SERVER['DOCUMENT_ROOT']; //*/getcwd();
-    require 'setup/setup.php';
-    exit;
-}
 
-$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'mcrypt'];
+$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring'];
 $error  = '';
 foreach ($reqExt as $r)
     if (!extension_loaded($r))
-        $error .= 'Required Extension <b>'.$r."</b> was not found. Please see if it exists, using <i>php -m</i>\n\n";
+        $error .= 'Required Extension <b>'.$r."</b> was not found. Please check if it should exist, using \"<i>php -m</i>\"\n\n";
 
 if (version_compare(PHP_VERSION, '5.5.0') < 0)
-    $error .= 'PHP Version <b>5.5.0</b> or higher required! Your version is <b>'.PHP_VERSION."</b>.\nCore functions are unavailable!";
+    $error .= 'PHP Version <b>5.5.0</b> or higher required! Your version is <b>'.PHP_VERSION."</b>.\nCore functions are unavailable!\n";
+
+// not in root dir
+if (CLI && getcwd().DIRECTORY_SEPARATOR.'index.php' != __FILE__)
+    $error .= "Aowow must be used from root directory\n";
 
 if ($error)
-    die('<pre>'.$error.'</pre>');
+{
+    echo CLI ? strip_tags($error) : $error;
+    die();
+}
+
 
 // include all necessities, set up basics
-require 'includes/kernel.php';
+require_once 'includes/kernel.php';
+
+
+if (CLI || !file_exists('config/config.php'))
+{
+    $cwDir = /*$_SERVER['DOCUMENT_ROOT']; //*/getcwd();
+    require 'setup/setup.php';
+    die();
+}
 
 
 $altClass = '';
@@ -81,7 +92,8 @@ switch ($pageCall)
     case 'talent':                                          // tool: talent calculator
     case 'title':
     case 'titles':
-    // case 'user':                                            // tool: user profiles [nyi]
+    // case 'user':                                         // tool: user profiles [nyi]
+    case 'video':
     case 'zone':
     case 'zones':
         if (in_array($pageCall, ['admin', 'account', 'profile']))
@@ -134,19 +146,14 @@ switch ($pageCall)
     case 'build':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            require 'setup/tools/filegen/scriptGen.php';
+            define('TMP_BUILD', 1);                         // todo (med): needs better solution
+            require 'setup/setup.php';
             break;
         }
     case 'sql':
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
             require 'setup/tools/database/_'.$pageParam.'.php';
-            break;
-        }
-    case 'setup':
-        if (User::isInGroup(U_GROUP_EMPLOYEE))
-        {
-            require 'setup/syncronize.php';
             break;
         }
     default:                                                // unk parameter given -> ErrorPage

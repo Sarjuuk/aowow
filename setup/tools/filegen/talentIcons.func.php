@@ -6,21 +6,35 @@ if (!defined('AOWOW_REVISION'))
 
     // builds image-textures for the talent-calculator
     // spellIcons must be extracted and converted to at least medium size
-    // this script requires the following dbc-files to be parsed and available
-    // Talent, TalentTab, Spell
+    // this script requires the following dbc-files to be available
+    // Talent.dbc, TalentTab.dbc
 
-    function talentIcons(&$log)
+    function talentIcons()
     {
+        // expected dbcs
+        $req   = ['dbc_talenttab', 'dbc_talent'];
+        $found = DB::Aowow()->selectCol('SHOW TABLES LIKE "dbc_%"');
+        if ($missing = array_diff($req, $found))
+        {
+            foreach ($missing as $m)
+            {
+                $file = explode('_', $m)[1];
+                $dbc  = new DBC($file);
+                if ($dbc->readFromFile($file == 'talenttab'))
+                    $dbc->writeToDB();
+            }
+        }
+
         $success   = true;
-        $query     = 'SELECT s.iconString FROM ?_spell s JOIN dbc.talent t ON t.rank1 = s.Id JOIN dbc.talenttab tt ON tt.Id = t.tabId WHERE tt.?# = ?d AND tt.tabNumber = ?d ORDER BY t.row, t.column, t.petCategory1 ASC;';
+        $query     = 'SELECT s.iconString FROM ?_spell s JOIN dbc_talent t ON t.rank1 = s.Id JOIN dbc_talenttab tt ON tt.Id = t.tabId WHERE tt.?# = ?d AND tt.tabNumber = ?d ORDER BY t.row, t.column, t.petCategory1 ASC;';
         $dims      = 36; //v-pets
         $filenames = ['icons', 'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'deathknight', 'shaman', 'mage', 'warlock', null, 'druid'];
 
         // create directory if missing
-        if (!writeDir('static/images/wow/talents/icons', $log))
+        if (!FileGen::writeDir('static/images/wow/talents/icons'))
             $success = false;
 
-        if (!writeDir('static/images/wow/hunterpettalents', $log))
+        if (!FileGen::writeDir('static/images/wow/hunterpettalents'))
             $success = false;
 
         foreach ($filenames as $k => $v)
@@ -41,7 +55,7 @@ if (!defined('AOWOW_REVISION'))
 
                 if (empty($icons))
                 {
-                    $log[]   = [time(), '  error: talentIcons - query for '.$v.' tree: '.$k.' empty'];
+                    FileGen::status('talentIcons - query for '.$v.' tree: '.$k.' returned empty', MSG_LVL_ERROR);
                     $success = false;
                     continue;
                 }
@@ -53,7 +67,7 @@ if (!defined('AOWOW_REVISION'))
                         $imgFile = 'static/images/wow/icons/medium/'.strtolower($icons[$i]).'.jpg';
                         if (!file_exists($imgFile))
                         {
-                            $log[]   = [time(), '  error: talentIcons - raw image '.$imgFile. ' not found'];
+                            FileGen::status('talentIcons - raw image '.$imgFile. ' not found', MSG_LVL_ERROR);
                             $success = false;
                             break;
                         }
@@ -77,17 +91,17 @@ if (!defined('AOWOW_REVISION'))
                     }
 
                     if (@imagejpeg($res, $outFile))
-                        $log[] = [time(), sprintf(ERR_NONE, $outFile)];
+                        FileGen::status(sprintf(ERR_NONE, $outFile), MSG_LVL_OK);
                     else
                     {
                         $success = false;
-                        $log[]   = [time(), '  error: talentIcons - '.$outFile.'.jpg could not be written!'];
+                        FileGen::status('talentIcons - '.$outFile.'.jpg could not be written', MSG_LVL_ERROR);
                     }
                 }
                 else
                 {
                     $success = false;
-                    $log[]   = [time(), '  error: talentIcons - image resource not created'];
+                    FileGen::status('talentIcons - image resource not created', MSG_LVL_ERROR);
                     continue;
                 }
             }

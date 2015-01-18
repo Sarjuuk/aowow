@@ -52,18 +52,17 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
-    function enchants(&$log, $locales)
+    function enchants()
     {
         // from g_item_slots: 13:"One-Hand", 26:"Ranged", 17:"Two-Hand",
         $slotPointer   = [13, 17, 26, 26, 13, 17, 17, 13, 17, null, 17, null, null, 13, null, 13, null, null, null, null, 17];
-        $locales       = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
         $castItems     = [];
         $successs      = true;
         $enchantSpells = new SpellList([['effect1Id', 53], ['name_loc0', 'QA%', '!'], CFG_SQL_LIMIT_NONE]);     // enchantItemPermanent && !qualityAssurance
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!writeDir('datasets/'.$dir, $log))
+            if (!FileGen::writeDir('datasets/'.$dir))
                 $success = false;
 
         $enchIds = [];
@@ -73,7 +72,7 @@ if (!defined('AOWOW_REVISION'))
         $enchMisc = [];
         $enchJSON = Util::parseItemEnchantment($enchIds, false, $enchMisc);
 
-        foreach ($locales as $lId)
+        foreach (FileGen::$localeIds as $lId)
         {
             set_time_limit(120);
 
@@ -135,11 +134,11 @@ if (!defined('AOWOW_REVISION'))
                     $ench['jsonequip']['requiredLevel'] = $enchMisc[$eId]['requiredLevel'];
 
                 // check if the spell has an entry in skill_line_ability -> Source:Profession
-                if ($skill = DB::Aowow()->SelectCell('SELECT skillLineId FROM dbc.skilllineability WHERE spellId = ?d', $enchantSpells->id))
+                if ($skills = $enchantSpells->getField('skillLines'))
                 {
                     $ench['name'][]   = $enchantSpells->getField('name', true);
                     $ench['source'][] = $enchantSpells->id;
-                    $ench['skill']    = $skill;
+                    $ench['skill']    = $skills[0];
                     $ench['slots'][]  = $slot;
                 }
 
@@ -209,12 +208,10 @@ if (!defined('AOWOW_REVISION'))
                     if (is_array($v) && count($v) == 1 && $k != 'jsonequip')
                         $ench[$k] = $v[0];
 
-            $toFile  = "var g_enchants = ";
-            $toFile .= json_encode($enchantsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
-            $toFile .= ";";
-            $file    = 'datasets/'.User::$localeString.'/enchants';
+            $toFile = "var g_enchants = ".Util::toJSON($enchantsOut).";";
+            $file   = 'datasets/'.User::$localeString.'/enchants';
 
-            if (!writeFile($file, $toFile, $log))
+            if (!FileGen::writeFile($file, $toFile))
                 $success = false;
         }
 

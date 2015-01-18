@@ -7,7 +7,7 @@ if (!defined('AOWOW_REVISION'))
     // gatheres quasi-static data used in profiler: all available quests, achievements, titles, mounts, companions, factions, recipes
     // this script requires a fully set up database and is expected to be run last
 
-    function profiler(&$log, $locales)
+    function profiler()
     {
         $success = true;
         $scripts = [];
@@ -15,7 +15,7 @@ if (!defined('AOWOW_REVISION'))
         /**********/
         /* Quests */
         /**********/
-        $scripts[] = function(&$log) use ($locales)
+        $scripts[] = function()
         {
             $success   = true;
             $condition = [
@@ -35,7 +35,7 @@ if (!defined('AOWOW_REVISION'))
 
             $relCurr = new CurrencyList(array(['id', $_]));
 
-            foreach ($locales as $l)
+            foreach (FileGen::$localeIds as $l)
             {
                 set_time_limit(20);
 
@@ -44,15 +44,15 @@ if (!defined('AOWOW_REVISION'))
 
                 $buff = "var _ = g_gatheredcurrencies;\n";
                 foreach ($relCurr->getListviewData() as $id => $data)
-                    $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
 
                 $buff .= "\n\nvar _ = g_quests;\n";
                 foreach ($questz->getListviewData() as $id => $data)
-                    $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
 
                 $buff .= "\ng_quest_catorder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\n";
 
-                if (!writeFile('datasets/'.User::$localeString.'/p-quests', $buff, $log))
+                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-quests', $buff))
                     $success = false;
             }
 
@@ -62,7 +62,7 @@ if (!defined('AOWOW_REVISION'))
         /****************/
         /* Achievements */
         /****************/
-        $scripts[] = function(&$log) use ($locales)
+        $scripts[] = function()
         {
             $success   = true;
             $condition = array(
@@ -72,7 +72,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $achievez = new AchievementList($condition);
 
-            foreach ($locales as $l)
+            foreach (FileGen::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -84,7 +84,7 @@ if (!defined('AOWOW_REVISION'))
                 foreach ($achievez->getListviewData(ACHIEVEMENTINFO_PROFILE) as $id => $data)
                 {
                     $sumPoints += $data['points'];
-                    $buff      .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+                    $buff      .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
 
                 // categories to sort by
@@ -92,7 +92,7 @@ if (!defined('AOWOW_REVISION'))
                 // sum points
                 $buff .= "\ng_achievement_points = [".$sumPoints."];\n";
 
-                if (!writeFile('datasets/'.User::$localeString.'/p-achievements', $buff, $log))
+                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-achievements', $buff))
                     $success = false;
             }
 
@@ -102,7 +102,7 @@ if (!defined('AOWOW_REVISION'))
         /**********/
         /* Titles */
         /**********/
-        $scripts[] = function(&$log) use ($locales)
+        $scripts[] = function()
         {
             $success   = true;
             $condition = array(
@@ -111,7 +111,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $titlez = new TitleList($condition);
 
-            foreach ($locales as $l)
+            foreach (FileGen::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -125,10 +125,10 @@ if (!defined('AOWOW_REVISION'))
                     {
                         $data['name'] = Util::localizedString($titlez->getEntry($id), $g ? 'female' : 'male');
                         unset($data['namefemale']);
-                        $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+                        $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                     }
 
-                    if (!writeFile('datasets/'.User::$localeString.'/p-titles-'.$g, $buff, $log))
+                    if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-titles-'.$g, $buff))
                         $success = false;
                 }
             }
@@ -139,7 +139,7 @@ if (!defined('AOWOW_REVISION'))
         /**********/
         /* Mounts */
         /**********/
-        $scripts[] = function(&$log) use ($locales)
+        $scripts[] = function()
         {
             $success   = true;
             $condition = array(
@@ -149,7 +149,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $mountz = new SpellList($condition);
 
-            foreach ($locales as $l)
+            foreach (FileGen::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -161,10 +161,10 @@ if (!defined('AOWOW_REVISION'))
                 {
                     $data['quality'] = $data['name'][0];
                     $data['name']    = substr($data['name'], 1);
-                    $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
 
-                if (!writeFile('datasets/'.User::$localeString.'/p-mounts', $buff, $log))
+                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-mounts', $buff))
                     $success = false;
             }
 
@@ -174,7 +174,7 @@ if (!defined('AOWOW_REVISION'))
         /**************/
         /* Companions */
         /**************/
-        $scripts[] = function(&$log) use ($locales)
+        $scripts[] = function()
         {
             $success   = true;
             $condition = array(
@@ -184,7 +184,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $companionz = new SpellList($condition);
 
-            foreach ($locales as $l)
+            foreach (FileGen::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -196,10 +196,10 @@ if (!defined('AOWOW_REVISION'))
                 {
                     $data['quality'] = $data['name'][0];
                     $data['name']    = substr($data['name'], 1);
-                    $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
 
-                if (!writeFile('datasets/'.User::$localeString.'/p-companions', $buff, $log))
+                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-companions', $buff))
                     $success = false;
             }
 
@@ -209,7 +209,7 @@ if (!defined('AOWOW_REVISION'))
         /************/
         /* Factions */
         /************/
-        $scripts[] = function(&$log) use ($locales)
+        $scripts[] = function()
         {
             $success   = true;
             $condition = array(                             // todo (med): exclude non-gaining reputation-header
@@ -218,7 +218,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $factionz = new FactionList($condition);
 
-            foreach ($locales as $l)
+            foreach (FileGen::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -227,11 +227,11 @@ if (!defined('AOWOW_REVISION'))
 
                 $buff = "var _ = g_factions;\n";
                 foreach ($factionz->getListviewData() as $id => $data)
-                    $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
 
                 $buff .= "\ng_faction_order = [0, 469, 891, 1037, 1118, 67, 1052, 892, 936, 1117, 169, 980, 1097];\n";
 
-                if (!writeFile('datasets/'.User::$localeString.'/p-factions', $buff, $log))
+                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-factions', $buff))
                     $success = false;
             }
 
@@ -241,7 +241,7 @@ if (!defined('AOWOW_REVISION'))
         /***********/
         /* Recipes */
         /***********/
-        $scripts[] = function(&$log) use ($locales)
+        $scripts[] = function()
         {
             // special case: secondary skills are always requested, so put them in one single file (185, 129, 356); it also contains g_skill_order
             $skills  = [171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, [185, 129, 356]];
@@ -269,7 +269,7 @@ if (!defined('AOWOW_REVISION'))
                     }
                 }
 
-                foreach ($locales as $l)
+                foreach (FileGen::$localeIds as $l)
                 {
                     set_time_limit(10);
 
@@ -278,12 +278,12 @@ if (!defined('AOWOW_REVISION'))
 
                     $buff = '';
                     foreach ($recipez->getListviewData() as $id => $data)
-                        $buff .= '_['.$id.'] = '.json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).";\n";
+                        $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
 
                     if (!$buff)
                     {
                         // this behaviour is intended, do not create an error
-                        $log[] = [time(), ' notice: profiler - file datasets/'.User::$localeString.'/p-recipes-'.$file.' has no content => skipping'];
+                        FileGen::status('profiler - file datasets/'.User::$localeString.'/p-recipes-'.$file.' has no content => skipping', MSG_LVL_WARN);
                         continue;
                     }
 
@@ -292,7 +292,7 @@ if (!defined('AOWOW_REVISION'))
                     if (is_array($s))
                         $buff .= "\ng_skill_order = [171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356];\n";
 
-                    if (!writeFile('datasets/'.User::$localeString.'/p-recipes-'.$file, $buff, $log))
+                    if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-recipes-'.$file, $buff))
                         $success = false;
                 }
             }
@@ -302,12 +302,12 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!writeDir('datasets/'.$dir, $log))
+            if (!FileGen::writeDir('datasets/'.$dir))
                 $success = false;
 
         // run scripts
         foreach ($scripts as $func)
-            if (!$func($log))
+            if (!$func())
                 $success = false;
 
         return $success;

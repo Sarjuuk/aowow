@@ -5,11 +5,25 @@ if (!defined('AOWOW_REVISION'))
 
 
     // Create 'statistics'-file in datasets
-    // this script requires the following dbcs to be parsed and available
-    // gtChanceToMeleeCrit.dbc, gtChanceToSpellCrit.dbc, gtChanceToMeleeCritBase.dbc, gtChanceToSpellCritBase.dbc, gtOCTRegenHP, gtRegenHPPperSpt.dbc, gtRegenMPPerSpt.dbc
+    // this script requires the following dbcs to be available
+    // gtChanceToMeleeCrit.dbc, gtChanceToSpellCrit.dbc, gtChanceToMeleeCritBase.dbc, gtChanceToSpellCritBase.dbc, gtOCTRegenHP.dbc, gtRegenMPPerSpt.dbc, gtRegenHPPerSpt.dbc
 
-    function statistics(&$log)
+    function statistics()
     {
+        // expected dbcs
+        $req   = ['dbc_gtchancetomeleecrit', 'dbc_gtchancetomeleecritbase', 'dbc_gtchancetospellcrit', 'dbc_gtchancetospellcritbase', 'dbc_gtoctregenhp', 'dbc_gtregenmpperspt', 'dbc_gtregenhpperspt'];
+        $found = DB::Aowow()->selectCol('SHOW TABLES LIKE "dbc_%"');
+        if ($missing = array_diff($req, $found))
+        {
+            foreach ($missing as $m)
+            {
+                $file = explode('_', $m)[1];
+                $dbc  = new DBC($file);
+                if ($dbc->readFromFile())
+                    $dbc->writeToDB();
+            }
+        }
+
         $classs = function()
         {
             // constants and mods taken from TrinityCore (Player.cpp, StatSystem.cpp)
@@ -42,7 +56,7 @@ if (!defined('AOWOW_REVISION'))
             );
 
             foreach ($dataz as $class => &$data)
-                $data[2] = array_values(DB::Aowow()->selectRow('SELECT mle.chance*100 cMle, spl.chance*100 cSpl FROM dbc.gtchancetomeleecritbase mle, dbc.gtchancetospellcritbase spl WHERE mle.idx = spl.idx AND mle.idx = ?d', $class - 1));
+                $data[2] = array_values(DB::Aowow()->selectRow('SELECT mle.chance*100 cMle, spl.chance*100 cSpl FROM dbc_gtchancetomeleecritbase mle, dbc_gtchancetospellcritbase spl WHERE mle.idx = spl.idx AND mle.idx = ?d', $class - 1));
 
             return $dataz;
         };
@@ -89,10 +103,10 @@ if (!defined('AOWOW_REVISION'))
 
                 $rows = DB::Aowow()->select('SELECT pls.level AS ARRAY_KEY, str-?d, agi-?d, sta-?d, inte-?d, spi-?d, basehp, IF(basemana <> 0, basemana, 100), mlecrt.chance*100, splcrt.chance*100, mlecrt.chance*100 * ?f, baseHP5.ratio*1, extraHP5.ratio*1 ' .
                                     'FROM player_levelstats pls JOIN player_classlevelstats pcls ON pls.level = pcls.level AND pls.class = pcls.class JOIN' .
-                                        ' dbc.gtchancetomeleecrit mlecrt ON mlecrt.idx   = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
-                                        ' dbc.gtchancetospellcrit splcrt ON splcrt.idx   = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
-                                        ' dbc.gtoctregenhp baseHP5       ON baseHP5.idx  = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
-                                        ' dbc.gtregenhpperspt extraHP5   ON extraHP5.idx = ((pls.class - 1) * 100) + (pls.level - 1) ' .
+                                        ' dbc_gtchancetomeleecrit mlecrt ON mlecrt.idx   = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
+                                        ' dbc_gtchancetospellcrit splcrt ON splcrt.idx   = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
+                                        ' dbc_gtoctregenhp baseHP5       ON baseHP5.idx  = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
+                                        ' dbc_gtregenhpperspt extraHP5   ON extraHP5.idx = ((pls.class - 1) * 100) + (pls.level - 1) ' .
                                     'WHERE pls.race = ?d AND pls.class = ?d ORDER BY pls.level ASC',
                     $offset[0], $offset[1], $offset[2], $offset[3], $offset[4],
                     $mod,
@@ -114,7 +128,7 @@ if (!defined('AOWOW_REVISION'))
             // identical across classes (just use one, that acutally has mana (offset: 100))
             // content of gtRegenMPPerSpt.dbc
 
-            return DB::Aowow()->selectCol('SELECT idx-99 AS ARRAY_KEY, ratio FROM dbc.gtregenmpperspt WHERE idx >= 100 AND idx < 100 + ?d', MAX_LEVEL);
+            return DB::Aowow()->selectCol('SELECT idx-99 AS ARRAY_KEY, ratio FROM dbc_gtregenmpperspt WHERE idx >= 100 AND idx < 100 + ?d', MAX_LEVEL);
         };
 
         $skills = function()
@@ -135,15 +149,14 @@ if (!defined('AOWOW_REVISION'))
             $out[$s] = $res;
             if (!$res)
             {
-                $log[]   = [time(), '  error: statistics - generator $'.$s.'() returned empty'];
+                FileGen::status('statistics - generator $'.$s.'() returned empty', MSG_LVL_WARN);
                 $success = false;
             }
         }
 
-        $json   = json_encode($out, JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $toFile = 'g_statistics = '.preg_replace('/"\$([^$"]+)"/', '\1', $json).';';
+        $toFile = 'g_statistics = '.preg_replace('/"\$([^$"]+)"/', '\1', Util::toJSON($out)).';';
 
-        if (!writeFile('datasets/statistics', $toFile, $log))
+        if (!FileGen::writeFile('datasets/statistics', $toFile))
             $success = false;
 
         return $success;

@@ -7,7 +7,7 @@ if (!defined('AOWOW_REVISION'))
     // Create 'locale.js'-file in static/js
     // available locales have to be set in aowow.aowow_config
 
-    function locales(&$log, $locales)
+    function locales()
     {
         $result    = [];
         $available = array(
@@ -43,7 +43,7 @@ if (!defined('AOWOW_REVISION'))
                          "        }",
         );
 
-        foreach ($locales as $l)
+        foreach (FileGen::$localeIds as $l)
             if (isset($available[$l]))
                 $result[] = $available[$l];
 

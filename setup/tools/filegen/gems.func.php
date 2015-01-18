@@ -21,7 +21,7 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
-    function gems(&$log, $locales)
+    function gems()
     {
         // sketchy, but should work
         // Id < 36'000 || ilevel < 70 ? BC : WOTLK
@@ -41,7 +41,7 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!writeDir('datasets/'.$dir, $log))
+            if (!FileGen::writeDir('datasets/'.$dir))
                 $success = false;
 
         $enchIds = [];
@@ -51,7 +51,7 @@ if (!defined('AOWOW_REVISION'))
         $enchMisc = [];
         $enchJSON = Util::parseItemEnchantment($enchIds, false, $enchMisc);
 
-        foreach ($locales as $lId)
+        foreach (FileGen::$localeIds as $lId)
         {
             set_time_limit(5);
 
@@ -72,12 +72,10 @@ if (!defined('AOWOW_REVISION'))
                 );
             }
 
-            $toFile  = "var g_gems = ";
-            $toFile .= json_encode($gemsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
-            $toFile .= ";";
-            $file    = 'datasets/'.User::$localeString.'/gems';
+            $toFile = "var g_gems = ".Util::toJSON($gemsOut).";";
+            $file   = 'datasets/'.User::$localeString.'/gems';
 
-            if (!writeFile($file, $toFile, $log))
+            if (!FileGen::writeFile($file, $toFile))
                 $success = false;
         }
 

@@ -29,7 +29,7 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
-    function itemsets(&$log, $locales)
+    function itemsets()
     {
         $success   = true;
         $setList   = DB::Aowow()->Select('SELECT * FROM ?_itemset ORDER BY refSetId DESC');
@@ -37,10 +37,10 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!writeDir('datasets/'.$dir, $log))
+            if (!FileGen::writeDir('datasets/'.$dir))
                 $success = false;
 
-        foreach ($locales as $lId)
+        foreach (FileGen::$localeIds as $lId)
         {
             User::useLocale($lId);
             Lang::load(Util::$localeStrings[$lId]);
@@ -120,12 +120,10 @@ if (!defined('AOWOW_REVISION'))
                 $itemsetOut[$setOut['id']] = $setOut;
             }
 
-            $toFile  = "var g_itemsets = ";
-            $toFile .= json_encode($itemsetOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
-            $toFile .= ";";
-            $file    = 'datasets/'.User::$localeString.'/itemsets';
+            $toFile = "var g_itemsets = ".Util::toJSON($itemsetOut).";";
+            $file   = 'datasets/'.User::$localeString.'/itemsets';
 
-            if (!writeFile($file, $toFile, $log))
+            if (!FileGen::writeFile($file, $toFile))
                 $success = false;
         }
 

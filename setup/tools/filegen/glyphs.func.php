@@ -20,7 +20,7 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
-    function glyphs(&$log, $locales)
+    function glyphs()
     {
         $success   = true;
         $glyphList = DB::Aowow()->Select(
@@ -42,12 +42,12 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!writeDir('datasets/'.$dir, $log))
+            if (!FileGen::writeDir('datasets/'.$dir))
                 $success = false;
 
         $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)], CFG_SQL_LIMIT_NONE));
 
-        foreach ($locales as $lId)
+        foreach (FileGen::$localeIds as $lId)
         {
             set_time_limit(30);
 
@@ -76,12 +76,10 @@ if (!defined('AOWOW_REVISION'))
                 );
             }
 
-            $toFile  = "var g_glyphs = ";
-            $toFile .= json_encode($glyphsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
-            $toFile .= ";";
-            $file    = 'datasets/'.User::$localeString.'/glyphs';
+            $toFile = "var g_glyphs = ".Util::toJSON($glyphsOut).";";
+            $file   = 'datasets/'.User::$localeString.'/glyphs';
 
-            if (!writeFile($file, $toFile, $log))
+            if (!FileGen::writeFile($file, $toFile))
                 $success = false;
         }
 

@@ -5,8 +5,8 @@ if (!defined('AOWOW_REVISION'))
 
 
     // builds talent-tree-data for the talent-calculator
-    // this script requires the following dbc-files to be parsed and available
-    // Talent, TalentTab, Spell, CreatureFamily
+    // this script requires the following dbc-files to be available
+    // Talent.dbc, TalentTab.dbc
 
     // talents
     // i - int talentId (id of aowow_talent)
@@ -25,8 +25,22 @@ if (!defined('AOWOW_REVISION'))
     // t - array of talent-objects
     // f - array:int [pets only] creatureFamilies in that category
 
-    function talents(&$log, $locales)
+    function talents()
     {
+        // expected dbcs
+        $req   = ['dbc_talenttab', 'dbc_talent'];
+        $found = DB::Aowow()->selectCol('SHOW TABLES LIKE "dbc_%"');
+        if ($missing = array_diff($req, $found))
+        {
+            foreach ($missing as $m)
+            {
+                $file = explode('_', $m)[1];
+                $dbc  = new DBC($file);
+                if ($dbc->readFromFile($file == 'talenttab'))
+                    $dbc->writeToDB();
+            }
+        }
+
         $success   = true;
         $buildTree = function ($class) use (&$petFamIcons, &$tSpells)
         {
@@ -35,19 +49,12 @@ if (!defined('AOWOW_REVISION'))
             $mask = $class ? 1 << ($class - 1) : 0;
 
             // All "tabs" of a given class talent
-            $tabs   = DB::Aowow()->select('SELECT * FROM dbc.talenttab WHERE classMask = ?d ORDER BY `tabNumber`, `creatureFamilyMask`', $mask);
+            $tabs   = DB::Aowow()->select('SELECT * FROM dbc_talenttab WHERE classMask = ?d ORDER BY `tabNumber`, `creatureFamilyMask`', $mask);
             $result = [];
 
             for ($l = 0; $l < count($tabs); $l++)
             {
-                $talents = DB::Aowow()->select('
-                    SELECT t.id AS tId, t.*, s.*
-                    FROM   dbc.talent t, ?_spell s
-                    WHERE  t.`tabId`= ?d AND s.`Id` = t.`rank1`
-                    ORDER  by t.`row`, t.`column`',
-                    $tabs[$l]['Id']
-                );
-
+                $talents    = DB::Aowow()->select('SELECT t.id AS tId, t.*, s.* FROM dbc_talent t, ?_spell s WHERE t.`tabId`= ?d AND s.`Id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$l]['Id']);
                 $result[$l] = array(
                     'n' => Util::localizedString($tabs[$l], 'name'),
                     't' => []
@@ -163,13 +170,13 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!writeDir('datasets/'.$dir, $log))
+            if (!FileGen::writeDir('datasets/'.$dir))
                 $success = false;
 
-        $tSpellIds = DB::Aowow()->selectCol('SELECT rank1 FROM dbc.talent UNION SELECT rank2 FROM dbc.talent UNION SELECT rank3 FROM dbc.talent UNION SELECT rank4 FROM dbc.talent UNION SELECT rank5 FROM dbc.talent');
+        $tSpellIds = DB::Aowow()->selectCol('SELECT rank1 FROM dbc_talent UNION SELECT rank2 FROM dbc_talent UNION SELECT rank3 FROM dbc_talent UNION SELECT rank4 FROM dbc_talent UNION SELECT rank5 FROM dbc_talent');
         $tSpells   = new SpellList(array(['s.id', $tSpellIds], CFG_SQL_LIMIT_NONE));
 
-        foreach ($locales as $lId)
+        foreach (FileGen::$localeIds as $lId)
         {
             User::useLocale($lId);
             Lang::load(Util::$localeStrings[$lId]);
@@ -181,9 +188,9 @@ if (!defined('AOWOW_REVISION'))
 
                 $cId    = log($cMask, 2) + 1;
                 $file   = 'datasets/'.User::$localeString.'/talents-'.$cId;
-                $toFile = '$WowheadTalentCalculator.registerClass('.$cId.', '.json_encode($buildTree($cId), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).')';
+                $toFile = '$WowheadTalentCalculator.registerClass('.$cId.', '.Util::toJSON($buildTree($cId)).')';
 
-                if (!writeFile($file, $toFile, $log))
+                if (!FileGen::writeFile($file, $toFile))
                     $success = false;
             }
 
@@ -191,14 +198,14 @@ if (!defined('AOWOW_REVISION'))
             if (empty($petIcons))
             {
                 $pets = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, iconString FROM ?_pet');
-                $petIcons = json_encode($pets, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+                $petIcons = Util::toJSON($pets);
             }
 
             $toFile  = "var g_pet_icons = ".$petIcons.";\n\n";
-            $toFile .= 'var g_pet_talents = '.json_encode($buildTree(0), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK).';';
+            $toFile .= 'var g_pet_talents = '.Util::toJSON($buildTree(0)).';';
             $file    = 'datasets/'.User::$localeString.'/pet-talents';
 
-            if (!writeFile($file, $toFile, $log))
+            if (!FileGen::writeFile($file, $toFile))
                 $success = false;
         }
 

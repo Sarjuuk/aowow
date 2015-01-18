@@ -5,8 +5,6 @@ if (!defined('AOWOW_REVISION'))
 
 
     // builds 'pets'-file for available locales
-    // this script requires the following dbc-files to be parsed and available
-    // CreatureFamily, CreatureDisplayInfo, FactionTemplate, AreaTable
 
     /* Example data
         30: {
@@ -25,7 +23,7 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
-    function pets(&$log, $locales)
+    function pets()
     {
         $success    = true;
         $locations  = [];
@@ -38,22 +36,21 @@ if (!defined('AOWOW_REVISION'))
                       cr.rank AS classification,
                       cr.family,
                       cr.displayId1 AS displayId,
-                      cdi.skin1 AS skin,
-                      SUBSTRING_INDEX(cf.iconFile, "\\\\", -1) AS icon,
-                      cf.petTalentType AS type
+                      cr.textureString AS skin,
+                      p.iconString AS icon,
+                      p.type
             FROM      ?_creature cr
             JOIN      ?_factiontemplate ft ON ft.Id = cr.faction
-            JOIN      dbc.creaturefamily cf ON cf.Id = cr.family
-            JOIN      dbc.creaturedisplayinfo cdi ON cdi.id = cr.displayId1
-            WHERE     cf.petTalentType <> -1 AND cr.typeFlags & 0x1 AND (cr.cuFlags & 0x2) = 0
+            JOIN      ?_pet p ON p.id = cr.family
+            WHERE     cr.typeFlags & 0x1 AND (cr.cuFlags & 0x2) = 0
             ORDER BY  cr.id ASC');
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!writeDir('datasets/'.$dir, $log))
+            if (!FileGen::writeDir('datasets/'.$dir))
                 $success = false;
 
-        foreach ($locales as $lId)
+        foreach (FileGen::$localeIds as $lId)
         {
             User::useLocale($lId);
             Lang::load(Util::$localeStrings[$lId]);
@@ -82,12 +79,10 @@ if (!defined('AOWOW_REVISION'))
                 );
             }
 
-            $toFile  = "var g_pets = ";
-            $toFile .= json_encode($petsOut, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
-            $toFile .= ";";
-            $file    = 'datasets/'.User::$localeString.'/pets';
+            $toFile = "var g_pets = ".Util::toJSON($petsOut).";";
+            $file   = 'datasets/'.User::$localeString.'/pets';
 
-            if (!writeFile($file, $toFile, $log))
+            if (!FileGen::writeFile($file, $toFile))
                 $success = false;
         }
 

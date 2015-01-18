@@ -23,13 +23,14 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
-    function realms(&$log)
+    function realms()
     {
-        $file = 'datasets/realms';
-        $rows = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ? AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0', CFG_BATTLEGROUP);
-        $str  = 'var g_realms = '.json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE).';';
+        $realms = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ? AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0', CFG_BATTLEGROUP);
 
-        return writeFile($file, $str, $log);
+        $toFile = "var g_realms = ".Util::toJSON($realms).";";
+        $file   = 'datasets/realms';
+
+        return FileGen::writeFile($file, $toFile);
     }
 
 ?>

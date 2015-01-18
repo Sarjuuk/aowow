@@ -28,7 +28,7 @@ class DB
         $options = &self::$optionsCache[$idx];
         $interface = DbSimple_Generic::connect(self::createConnectSyntax($options));
 
-        $interface->setErrorHandler(array('DB', 'errorHandler'));
+        $interface->setErrorHandler(['DB', 'errorHandler']);
 
         if ($interface->error)
             die('Failed to connect to database.');
@@ -46,9 +46,9 @@ class DB
         if (!error_reporting())
             return;
 
-        echo "DB ERROR:<br /><br />\n\n<pre>";
-        print_r($data);
-        echo "</pre>";
+        $error = "DB ERROR:<br /><br />\n\n<pre>".print_r($data, true)."</pre>";
+
+        echo CLI ? strip_tags($error) : $error;
         exit;
     }
 

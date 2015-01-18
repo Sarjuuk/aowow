@@ -221,6 +221,19 @@ class SpellPage extends GenericPage
             if ($id == $this->typeId)                       // "Mode" seems to be multilingual acceptable
                 $infobox[] = '[li]Mode'.Lang::$main['colon'].Lang::$game['modes'][$n].'[/li]';
 
+        $effects = $this->createEffects($infobox, $redButtons);
+        $infobox = $infobox ? '[ul]'.implode('', $infobox).'[/ul]' : '';
+
+        // append glyph symbol if available
+        $glyphId = 0;
+        for ($i = 1; $i < 4; $i++)
+            if ($this->subject->getField('effect'.$i.'Id') == 74)
+                $glyphId = $this->subject->getField('effect'.$i.'MiscValue');
+
+        if ($_ = DB::Aowow()->selectCell('SELECT si.iconString FROM ?_glyphproperties gp JOIN ?_spellicon si ON gp.iconId = si.id WHERE gp.spellId = ?d { OR gp.id = ?d }', $this->typeId, $glyphId ?: DBSIMPLE_SKIP))
+            if (file_exists('static/images/wow/interface/Spellbook/'.$_.'.png'))
+                $infobox .= '[img src='.STATIC_URL.'/images/wow/interface/Spellbook/'.$_.'.png border=0 float=center margin=15]';
+
 
         /****************/
         /* Main Content */
@@ -236,8 +249,8 @@ class SpellPage extends GenericPage
         $this->scaling     = $this->createScalingData();
         $this->items       = $this->createRequiredItems();
         $this->tools       = $this->createTools();
-        $this->effects     = $this->createEffects($infobox, $redButtons);
-        $this->infobox     = $infobox ? '[ul]'.implode('', $infobox).'[/ul]' : null;
+        $this->effects     = $effects;
+        $this->infobox     = $infobox;
         $this->powerCost   = $this->subject->createPowerCostForCurrent();
         $this->castTime    = $this->subject->createCastTimeForCurrent(false, false);
         $this->name        = $this->subject->getField('name', true);
@@ -934,8 +947,8 @@ class SpellPage extends GenericPage
                     'params' => array(
                         'id'          => 'teaches-spell',
                         'name'        => '$LANG.tab_teaches',
-                        'visibleCols' => '$'.json_encode($vis),
-                        'hiddenCols'  => $hid ? '$'.json_encode($hid) : null
+                        'visibleCols' => '$'.Util::toJSON($vis),
+                        'hiddenCols'  => $hid ? '$'.Util::toJSON($hid) : null
                     )
                 );
             }
@@ -1087,7 +1100,7 @@ class SpellPage extends GenericPage
         {
             $this->extendGlobalData($sc[1]);
             $tab = "<script type=\"text/javascript\">\n" .
-                   "var markup = ConditionList.createTab(".json_encode($sc[0], JSON_NUMERIC_CHECK).");\n" .
+                   "var markup = ConditionList.createTab(".Util::toJSON($sc[0]).");\n" .
                    "Markup.printHtml(markup, 'tab-conditions', { allow: Markup.CLASS_STAFF })" .
                    "</script>";
 
@@ -1116,12 +1129,12 @@ class SpellPage extends GenericPage
         if ($tt = $this->subject->renderTooltip())
         {
             $pt[] = "\ttooltip_".User::$localeString.": '".Util::jsEscape($tt[0])."'";
-            $pt[] = "\tspells_".User::$localeString.": ".json_encode($tt[1], JSON_UNESCAPED_UNICODE);
+            $pt[] = "\tspells_".User::$localeString.": ".Util::toJSON($tt[1]);
         }
         if ($btt = $this->subject->renderBuff())
         {
             $pt[] = "\tbuff_".User::$localeString.": '".Util::jsEscape($btt[0])."'";
-            $pt[] = "\tbuffspells_".User::$localeString.": ".json_encode($btt[1], JSON_UNESCAPED_UNICODE);;
+            $pt[] = "\tbuffspells_".User::$localeString.": ".Util::toJSON($btt[1]);;
         }
         $x .= implode(",\n", $pt)."\n});";
 
