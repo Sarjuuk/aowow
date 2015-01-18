@@ -2059,7 +2059,6 @@ var g_zone_areas = {
     4395: ['Dalaran City', 'The Underbelly'],
     4494: ['Ahn\'Kahet', 'Level 2'],
     4722: ['Crusaders\' Coliseum', 'The Icy Depths'],
-    4723: ['Crusaders\' Coliseum', 'The Icy Depths'],
     4812: ['The Lower Citadel', 'The Rampart of Skulls', 'Deathbringer\'s Rise', 'The Frost Queen\'s Lair', 'The Upper Reaches', 'Royal Quarters', 'The Frozen Throne', 'Frostmourne']
 };
 

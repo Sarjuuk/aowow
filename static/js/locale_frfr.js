@@ -2002,7 +2002,6 @@ var g_zone_areas = {
     4395: ['Dalaran', 'Les Entrailles'],
     4494: ['Ahn\'kahet', 'Plancher 2'],
     4722: ['L\'colisée d\'Argent', 'Les Profondeurs Glacées'],
-    4723: ['L\'colisée d\'Argent', 'Les Profondeurs Glacées'],
     4812: ['La Citadelle Inférieure', 'Le Rempart des Cranes', 'Ascension de Porte-mort', 'Le repaire de la reine du Givre', 'Les étages supérieurs', 'Quartiers Royaux', 'Le Trône Gelé', 'Deuillegivre']
 };
 

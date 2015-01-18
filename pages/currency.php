@@ -90,7 +90,7 @@ class CurrencyPage extends GenericPage
                             'id'          => $tab[3],
                             'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
                             'hiddenCols'  => $tab[5] ? '$['.implode(', ', array_unique($tab[5])).']' : null,
-                            'visibleCols' => $tab[6] ? '$'. json_encode(  array_unique($tab[6]))     : null
+                            'visibleCols' => $tab[6] ? '$'. Util::toJSON( array_unique($tab[6]))     : null
                         ]
                     );
                 }
@@ -173,7 +173,7 @@ class CurrencyPage extends GenericPage
                     'params' => [
                         'name'        => '$LANG.tab_createdby',
                         'id'          => 'created-by',
-                        'visibleCols' => isset($visCols) ? '$'.json_encode($visCols) : null
+                        'visibleCols' => isset($visCols) ? '$'.Util::toJSON($visCols) : null
                     ]
                 );
             }

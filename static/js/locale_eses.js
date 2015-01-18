@@ -2015,7 +2015,6 @@ var g_zone_areas = {
     4395: ['Ciudad de Dalaran', 'Los Bajos Fondos'],
     4494: ['Ahn\'kahet', 'Nivel 2'],
     4722: ['El Coliseo Argenta', 'Las profundidades heladas'],
-    4723: ['El Coliseo Argenta', 'Las profundidades heladas'],
     4812: ['La ciudadela inferior', 'La Muralla de las Calaveras', 'Ascenso del Libramorte', 'La guarida de la Reina de Escarcha', 'Los Confines superiores', 'Cuarteles Reales', 'El Trono Helado', 'Agonía de Escarcha']
 };
 

@@ -14,10 +14,7 @@ class ZonePage extends GenericPage
     protected $tabId    = 0;
     protected $type     = TYPE_ZONE;
     protected $tpl      = 'detail-page-generic';
-    protected $js       = ['Mapper.js', 'ShowOnMap.js'];
-    protected $css      = array(
-        ['path' => 'Mapper.css']
-    );
+    protected $js       = ['ShowOnMap.js'];
 
     public function __construct($pageCall, $id)
     {

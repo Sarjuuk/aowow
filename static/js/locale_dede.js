@@ -2013,7 +2013,6 @@ var g_zone_areas = {
     4395: ['Dalaran', 'Die Schattenseite'],
     4494: ['Ahn\'kahet', '2. Stockwerk'],
     4722: ['Kolosseum der Kreuzfahrer', 'Die eisigen Tiefen'],
-    4723: ['Kolosseum der Kreuzfahrer', 'Die eisigen Tiefen'],
     4812: ['Die untere Zitadelle', 'Das Schädelbollwerk', 'Dom des Todbringers', 'Hort der Frostkönigin', 'Der obere Bereich', 'Königliche Quartiere', 'Der Frostthron', 'Frostgram']
 };
 

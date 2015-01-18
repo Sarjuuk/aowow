@@ -325,12 +325,12 @@ class ItemsPage extends GenericPage
                         $tab['data'][$uId] = $upgItemData[$uId];
 
                     if ($upg)
-                        $tab['params']['_upgradeIds'] = '$'.json_encode($upg, JSON_NUMERIC_CHECK);
+                        $tab['params']['_upgradeIds'] = '$'.Util::toJSON($upg);
                 }
                 else if ($grouping)
                 {
                     $upg = array_keys($this->filter['upg']);
-                    $tab['params']['_upgradeIds'] = '$'.json_encode($upg, JSON_NUMERIC_CHECK);
+                    $tab['params']['_upgradeIds'] = '$'.Util::toJSON($upg);
                     foreach ($upgItemData as $uId => $data) // using numeric keys => cant use array_merge
                         $tab['data'][$uId] = $data;
                 }
@@ -400,10 +400,10 @@ class ItemsPage extends GenericPage
             }
 
             if (!empty($tab['params']['hiddenCols']))
-                $tab['params']['hiddenCols'] = '$'.json_encode($tab['params']['hiddenCols']);
+                $tab['params']['hiddenCols'] = '$'.Util::toJSON($tab['params']['hiddenCols']);
 
             if (!empty($tab['params']['visibleCols']))
-                $tab['params']['visibleCols'] = '$'.json_encode($tab['params']['visibleCols']);
+                $tab['params']['visibleCols'] = '$'.Util::toJSON($tab['params']['visibleCols']);
 
             foreach ($tab['params'] as $k => $p)
                 if (!$p)

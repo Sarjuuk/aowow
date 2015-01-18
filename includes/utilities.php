@@ -927,8 +927,12 @@ class Util
                 '<BR></BR>' => '<br />'
             );
 
-            // html may contain 'Pictures'
-            $text = preg_replace('/"Interface\\\Pictures\\\([\w_\-]+)"/i', '"images/wow/interface/Pictures/\1.jpg"', strtr($text, $pairs));
+            // html may contain 'Pictures' and FlavorImages and "stuff"
+            $text = preg_replace_callback(
+                '/src="([^"]+)"/i',
+                function ($m) { return 'src="'.STATIC_URL.'/images/wow/'.strtr($m[1], ['\\' => '/']).'.png"'; },
+                strtr($text, $pairs)
+            );
         }
         else
             $text = strtr($text, ["\n" => '<br />', "\r" => '']);
@@ -1723,6 +1727,19 @@ class Util
         header('Cache-Control: no-store, no-cache, must-revalidate');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
+    }
+
+    public static function toJSON($data)
+    {
+        $flags = JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE;
+
+        if (CFG_DEBUG)
+            $flags |= JSON_PRETTY_PRINT;
+
+        // just a thought: .. about prefixing variables with $ to mark them as function code and retroactively stripping escapes from them
+        // like it's done already in with listviews for example
+
+        return json_encode($data, $flags);
     }
 }
 

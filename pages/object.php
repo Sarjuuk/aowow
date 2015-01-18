@@ -16,13 +16,7 @@ class ObjectPage extends GenericPage
     protected $path          = [0, 5];
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
-    protected $js            = array(
-        'swfobject.js',
-        'Mapper.js'
-    );
-    protected $css           = array(
-        ['path' => 'Mapper.css']
-    );
+    protected $js            = ['swfobject.js'];
 
     /*  NOTE
 
@@ -226,13 +220,8 @@ class ObjectPage extends GenericPage
         if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
         {
             $map = ['data' => ['parent' => 'mapper-generic'], 'mapperData' => &$spawns];
-
             foreach ($spawns as $areaId => &$areaData)
-            {
                 $map['extra'][$areaId] = ZoneList::getName($areaId);
-                foreach ($areaData as &$floor)
-                    $floor['count'] = count($floor['coords']);
-            }
         }
 
         // consider pooled spawns
@@ -415,7 +404,7 @@ class ObjectPage extends GenericPage
                         'name'       => '$LANG.tab_contains',
                         'id'         => 'contains',
                         'extraCols'  => "$[".implode(', ', array_unique($extraCols))."]",
-                        'hiddenCols' => $hiddenCols ? '$'.json_encode(array_values($hiddenCols)) : null
+                        'hiddenCols' => $hiddenCols ? '$'.Util::toJSON(array_values($hiddenCols)) : null
                     )
                 );
             }
@@ -467,12 +456,12 @@ class ObjectPage extends GenericPage
         if ($asError)
             return '$WowheadPower.registerObject('.$this->typeId.', '.User::$localeId.', {});';
 
-        $s = $this->subject->getSpawns(true);
+        $s = $this->subject->getSpawns(SPAWNINFO_SHORT);
 
         $x  = '$WowheadPower.registerObject('.$this->typeId.', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip())."'\n";
-        // $x .= "\tmap: ".($s ? '{zone: '.$s[0].', coords: {0:'.json_encode($s[1], JSON_NUMERIC_CHECK).'}' : '{}')."\n";
+        $x .= "\tmap: ".($s ? Util::toJSON(['zone' => $s[0], 'coords' => [$s[1] => $s[2]]]) : '{}')."\n";
         $x .= "});";
 
         return $x;

@@ -450,7 +450,7 @@ class GenericPage
                     }
                 }
 
-                $buff .= ' _['.(is_numeric($key) ? $key : "'".$key."'")."]=".json_encode($data, JSON_NUMERIC_CHECK).';';
+                $buff .= ' _['.(is_numeric($key) ? $key : "'".$key."'")."]=".Util::toJSON($data).';';
             }
 
             $buff .= "\n";
@@ -461,13 +461,13 @@ class GenericPage
 
                 // spell
                 if (!empty($x['tooltip']))                  // spell + item
-                    $buff .= "\n            _[".$x['id'].'].tooltip_'.User::$localeString.' = '.json_encode($x['tooltip']).";\n";
+                    $buff .= "\n            _[".$x['id'].'].tooltip_'.User::$localeString.' = '.Util::toJSON($x['tooltip']).";\n";
                 if (!empty($x['buff']))                     // spell
-                    $buff .= "            _[".$x['id'].'].buff_'.User::$localeString.' = '.json_encode($x['buff']).";\n";
+                    $buff .= "            _[".$x['id'].'].buff_'.User::$localeString.' = '.Util::toJSON($x['buff']).";\n";
                 if (!empty($x['spells']))                   // spell + item
-                    $buff .= "            _[".$x['id'].'].spells_'.User::$localeString.' = '.json_encode($x['spells'], JSON_NUMERIC_CHECK).";\n";
+                    $buff .= "            _[".$x['id'].'].spells_'.User::$localeString.' = '.Util::toJSON($x['spells']).";\n";
                 if (!empty($x['buffspells']))               // spell
-                    $buff .= "            _[".$x['id'].'].buffspells_'.User::$localeString.' = '.json_encode($x['buffspells'], JSON_NUMERIC_CHECK).";\n";
+                    $buff .= "            _[".$x['id'].'].buffspells_'.User::$localeString.' = '.Util::toJSON($x['buffspells']).";\n";
 
                 $buff .= "\n";
             }

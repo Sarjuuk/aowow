@@ -253,7 +253,7 @@ class SearchPage extends GenericPage
             {
                 $items = [];
                 foreach ($itemData as $k => $v)
-                    $items[] = json_encode($v, JSON_NUMERIC_CHECK);
+                    $items[] = Util::toJSON($v);
 
                 $outItems = "\t".implode(",\n\t", $items)."\n";
             }
@@ -267,7 +267,7 @@ class SearchPage extends GenericPage
                     if (!$v['heroic'])
                         unset($v['heroic']);
 
-                    $sets[] = json_encode($v, JSON_NUMERIC_CHECK);
+                    $sets[] = Util::toJSON($v);
                 }
 
                 $outSets = "\t".implode(",\n\t", $sets)."\n";
@@ -322,7 +322,7 @@ class SearchPage extends GenericPage
                 break;
         }
 
-        return json_encode($result, JSON_NUMERIC_CHECK);
+        return Util::toJSON($result);
     }
 
     private function createLookup(array $fields = [])
@@ -688,7 +688,7 @@ class SearchPage extends GenericPage
                 'params'   => [
                     'id'          => 'abilities',
                     'name'        => '$LANG.tab_abilities',
-                    'visibleCols' => '$'.json_encode($vis)
+                    'visibleCols' => '$'.Util::toJSON($vis)
                 ]
             );
 
@@ -743,7 +743,7 @@ class SearchPage extends GenericPage
                 'params'   => [
                     'id'          => 'talents',
                     'name'        => '$LANG.tab_talents',
-                    'visibleCols' => '$'.json_encode($vis)
+                    'visibleCols' => '$'.Util::toJSON($vis)
                 ]
             );
 

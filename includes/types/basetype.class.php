@@ -517,18 +517,28 @@ trait spawnHelper
     );
 
     /*
-        todo (med): implement this alpha-map-check-virtual-map-transform-wahey!
-        note: map in tooltips is activated by either '#map' as anchor (will automatic open mapviewer, when clicking link) in the href or as parameterless rel-parameter e.g. rel="map" in the anchor
+        todo (med): map in tooltips is activated by either '#map' as anchor (will automatic open mapviewer, when hovering link) in the href or as parameterless rel-parameter e.g. rel="map" in the anchor
     */
 
-    private function createShortSpawns()                    // [zoneId, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> (one area, one floor, one craeture, no survivor)
+    private function createShortSpawns()                    // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> (one area, one floor, one creature, no survivor)
     {
-        $this->spawnResult[SPAWNINFO_SHORT] = null;         // NYI
+        // first get zone/floor with the most spawns
+        if ($res = DB::Aowow()->selectRow('SELECT areaId, floor FROM ?_spawns WHERE type = ?d && typeId = ?d GROUP BY areaId, floor ORDER BY count(1) DESC LIMIT 1', self::$type, $this->id))
+        {
+            // get relevant spawn points
+            $points = DB::Aowow()->select('SELECT posX, posY FROM ?_spawns WHERE type = ?d && typeId = ?d && areaId = ?d && floor = ?d', self::$type, $this->id, $res['areaId'], $res['floor']);
+            $spawns = [];
+            foreach ($points as $p)
+                $spawns[] = [$p['posX'], $p['posY']];
+
+            $this->spawnResult[SPAWNINFO_SHORT] = [$res['areaId'], $res['floor'], $spawns];
+        }
     }
 
     private function createFullSpawns()                     // for display on map (objsct/npc detail page)
     {
         $data   = [];
+        $wpSum  = [];
         $wpIdx  = 0;
         $spawns = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE type = ?d AND typeId = ?d", self::$type, $this->id);
         if (!$spawns)
@@ -556,6 +566,7 @@ trait spawnHelper
                             $set['lines'] = [[$wPoints[$i - 1]['posX'], $wPoints[$i - 1]['posY']]];
 
                         $data[$s['areaId']][$s['floor']]['coords'][] = [$p['posX'], $p['posY'], $set];
+                        @$wpSum[$s['areaId']][$s['floor']]++;
                     }
                     $wpIdx++;
                 }
@@ -589,6 +600,9 @@ trait spawnHelper
 
             $data[$s['areaId']] [$s['floor']] ['coords'] [] = [$s['posX'], $s['posY'], ['label' => '$<br><span class="q0">'.implode('<br>', $label).'</span>']];
         }
+        foreach ($data as $a => &$areas)
+            foreach ($areas as $f => &$floor)
+                $floor['count'] = count($floor['coords']) - (!empty($wpSum[$a][$f]) ? $wpSum[$a][$f] : 0);
 
         $this->spawnResult[SPAWNINFO_FULL] = $data;
     }
@@ -609,7 +623,7 @@ trait spawnHelper
     public function getSpawns($mode)
     {
         // ony Creatures and GOs can be spawned
-        if (!self::$type && self::$type != TYPE_NPC && self::$type != TYPE_OBJECT)
+        if (!self::$type || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT))
             return [];
 
         switch ($mode)
@@ -833,15 +847,15 @@ abstract class Filter
             {
                 case 'setCriteria':
                     if ($data || $raw)
-                        $form[$name] = $raw ? $data : 'fi_setCriteria('.json_encode($data['cr'], JSON_NUMERIC_CHECK).', '.json_encode($data['crs'], JSON_NUMERIC_CHECK).', '.json_encode($data['crv'], JSON_NUMERIC_CHECK).');';
+                        $form[$name] = $raw ? $data : 'fi_setCriteria('.Util::toJSON($data['cr']).', '.Util::toJSON($data['crs']).', '.Util::toJSON($data['crv']).');';
                     else
                         $form[$name] = 'fi_setCriteria([], [], []);';
                     break;
                 case 'extraCols':
-                    $form[$name] = $raw ? $data : 'fi_extraCols = '.json_encode(array_unique($data), JSON_NUMERIC_CHECK).';';
+                    $form[$name] = $raw ? $data : 'fi_extraCols = '.Util::toJSON(array_unique($data)).';';
                     break;
                 case 'setWeights':
-                    $form[$name] = $raw ? $data : 'fi_setWeights('.json_encode($data, JSON_NUMERIC_CHECK).', 0, 1, 1);';
+                    $form[$name] = $raw ? $data : 'fi_setWeights('.Util::toJSON($data).', 0, 1, 1);';
                     break;
                 case 'form':
                     if ($key == $name)                      // only if explicitely specified

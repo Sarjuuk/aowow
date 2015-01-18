@@ -16,11 +16,7 @@ class QuestPage extends GenericPage
     protected $path          = [0, 3];
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
-    protected $js            = ['Mapper.js'];
-    protected $css           = array(
-        ['path' => 'Book.css'],
-        ['path' => 'Mapper.css']
-    );
+    protected $css           = [['path' => 'Book.css']];
 
     public function __construct($pageCall, $id)
     {
@@ -525,7 +521,7 @@ class QuestPage extends GenericPage
         $this->map = null;
         // array(
             // 'data' => ['zone' => $this->typeId],
-            // 'som'  => json_encode($som, JSON_NUMERIC_CHECK)
+            // 'som'  => Util::toJSON($som)
         // );
 
         /****************/
@@ -622,7 +618,7 @@ class QuestPage extends GenericPage
         if ($cnd)
         {
             $tab = "<script type=\"text/javascript\">\n" .
-                   "var markup = ConditionList.createTab(".json_encode($cnd, JSON_NUMERIC_CHECK).");\n" .
+                   "var markup = ConditionList.createTab(".Util::toJSON($cnd).");\n" .
                    "Markup.printHtml(markup, 'tab-conditions', { allow: Markup.CLASS_STAFF })" .
                    "</script>";
 

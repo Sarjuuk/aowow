@@ -11,14 +11,8 @@ class MapsPage extends GenericPage
     protected $tabId         = 1;
     protected $path          = [1, 1];
     protected $mode          = CACHE_TYPE_NONE;
-    protected $js            = array(
-        'maps.js',
-        'Mapper.js'
-    );
-    protected $css           = array(
-        ['string' => 'zone-picker { margin-left: 4px }'],
-        ['path' => 'Mapper.css']
-    );
+    protected $js            = ['maps.js'];
+    protected $css           = [['string' => 'zone-picker { margin-left: 4px }']];
 
     public function __construct($pageCall, $__)
     {

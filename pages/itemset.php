@@ -72,7 +72,7 @@ class ItemsetPage extends GenericPage
         if ($h = $this->subject->getField('holidayId'))
         {
             $infobox[] = Lang::$game['eventShort'].Lang::$main['colon'].'[event='.$h.']';
-            $this->extendGlobalIds(TYPE_GAMEVENT, $h);
+            $this->extendGlobalIds(TYPE_WORLDEVENT, $h);
         }
 
         // itemLevel

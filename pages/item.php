@@ -419,7 +419,7 @@ class ItemPage extends genericPage
                         'id'          => $tab[3],
                         'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
                         'hiddenCols'  => $tab[5] ? '$['.implode(', ', array_unique($tab[5])).']' : null,
-                        'visibleCols' => $tab[6] ? '$'. json_encode(  array_unique($tab[6]))     : null
+                        'visibleCols' => $tab[6] ? '$'. Util::toJSON( array_unique($tab[6]))     : null
                     ]
                 );
             }
@@ -478,8 +478,8 @@ class ItemPage extends genericPage
                         'name'        => $sf[2],
                         'id'          => $sf[3],
                         'extraCols'   => $sf[4] ? "$[".implode(', ', array_unique($sf[4]))."]" : null,
-                        'hiddenCols'  => $sf[5] ? "$".json_encode($sf[5]) : null,
-                        'visibleCols' => $sf[6] ? '$'.json_encode($sf[6]) : null
+                        'hiddenCols'  => $sf[5] ? "$".Util::toJSON($sf[5]) : null,
+                        'visibleCols' => $sf[6] ? '$'.Util::toJSON($sf[6]) : null
                     ]
                 );
             }
@@ -527,7 +527,7 @@ class ItemPage extends genericPage
                     'params' => [
                         'name'       => '$LANG.tab_cancontain',
                         'id'         => 'can-contain',
-                        'hiddenCols' => '$'.json_encode($hCols)
+                        'hiddenCols' => '$'.Util::toJSON($hCols)
                     ]
                 );
             }
@@ -575,7 +575,7 @@ class ItemPage extends genericPage
                         'name'        => '$LANG.tab_criteriaof',
                         'id'          => 'criteria-of',
                         'visibleCols' => "$['category']",
-                        'hiddenCols'  => '$'.json_encode($hCols)
+                        'hiddenCols'  => '$'.Util::toJSON($hCols)
                     ]
                 );
         }
@@ -909,7 +909,7 @@ class ItemPage extends genericPage
                     'params' => [
                         'name'        => '$LANG.tab_teaches',
                         'id'          => 'teaches',
-                        'visibleCols' => '$'.json_encode($visCols)
+                        'visibleCols' => '$'.Util::toJSON($visCols)
                     ]
                 );
             }

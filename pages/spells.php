@@ -394,10 +394,10 @@ class SpellsPage extends GenericPage
             $visibleCols[] = 'trainingcost';
 
         if ($visibleCols)
-            $tab['params']['visibleCols'] = '$'.json_encode($visibleCols);
+            $tab['params']['visibleCols'] = '$'.Util::toJSON($visibleCols);
 
         if ($hiddenCols)
-            $tab['params']['hiddenCols'] = '$'.json_encode($hiddenCols);
+            $tab['params']['hiddenCols'] = '$'.Util::toJSON($hiddenCols);
 
         $this->lvTabs[] = $tab;
 
