@@ -98,17 +98,17 @@ class Loot
         foreach ($rows as $entry)
         {
             $set = array(
-                'quest'         => $entry['needsquest'],
-                'group'         => $entry['groupid'],
+                'quest'         => $entry['QuestRequired'],
+                'group'         => $entry['GroupId'],
                 'parentRef'     => $tableName == LOOT_REFERENCE ? $lootId : 0,
                 'realChanceMod' => $baseChance
             );
 
-            // if ($entry['lootmode'] > 1)
+            // if ($entry['LootMode'] > 1)
             // {
                 $buff = [];
                 for ($i = 0; $i < 8; $i++)
-                    if ($entry['lootmode'] & (1 << $i))
+                    if ($entry['LootMode'] & (1 << $i))
                         $buff[] = $i + 1;
 
                 $set['mode'] = implode(', ', $buff);
@@ -129,50 +129,50 @@ class Loot
                               '25man heroic
             */
 
-            if ($entry['reference'])
+            if ($entry['Reference'])
             {
                 // bandaid.. remove when propperly handling lootmodes
-                if (!in_array($entry['reference'], $handledRefs))
+                if (!in_array($entry['Reference'], $handledRefs))
                 {                                                                                                   // todo (high): find out, why i used this in the first place. (don't do drugs, kids)
-                    list($data, $raw) = self::getByContainerRecursive(LOOT_REFERENCE, $entry['reference'], $handledRefs, /*$entry['groupid'],*/ 0, $entry['chance'] / 100);
+                    list($data, $raw) = self::getByContainerRecursive(LOOT_REFERENCE, $entry['Reference'], $handledRefs, /*$entry['GroupId'],*/ 0, $entry['Chance'] / 100);
 
-                    $handledRefs[] = $entry['reference'];
+                    $handledRefs[] = $entry['Reference'];
 
                     $loot     = array_merge($loot, $data);
                     $rawItems = array_merge($rawItems, $raw);
                 }
-                $set['reference']  = $entry['reference'];
-                $set['multiplier'] = $entry['maxcount'];
+                $set['reference']  = $entry['Reference'];
+                $set['multiplier'] = $entry['MaxCount'];
             }
             else
             {
-                $rawItems[]     = $entry['item'];
-                $set['content'] = $entry['item'];
-                $set['min']     = $entry['mincount'];
-                $set['max']     = $entry['maxcount'];
+                $rawItems[]     = $entry['Item'];
+                $set['content'] = $entry['Item'];
+                $set['min']     = $entry['MinCount'];
+                $set['max']     = $entry['MaxCount'];
             }
 
-            if (!isset($groupChances[$entry['groupid']]))
+            if (!isset($groupChances[$entry['GroupId']]))
             {
-                $groupChances[$entry['groupid']] = 0;
-                $nGroupEquals[$entry['groupid']] = 0;
+                $groupChances[$entry['GroupId']] = 0;
+                $nGroupEquals[$entry['GroupId']] = 0;
             }
 
             if ($set['quest'] || !$set['group'])
-                $set['groupChance'] = $entry['chance'];
-            else if ($entry['groupid'] && !$entry['chance'])
+                $set['groupChance'] = $entry['Chance'];
+            else if ($entry['GroupId'] && !$entry['Chance'])
             {
-                $nGroupEquals[$entry['groupid']]++;
-                $set['groupChance'] = &$groupChances[$entry['groupid']];
+                $nGroupEquals[$entry['GroupId']]++;
+                $set['groupChance'] = &$groupChances[$entry['GroupId']];
             }
-            else if ($entry['groupid'] && $entry['chance'])
+            else if ($entry['GroupId'] && $entry['Chance'])
             {
-                @$groupChances[$entry['groupid']] += $entry['chance'];
-                $set['groupChance'] = $entry['chance'];
+                @$groupChances[$entry['GroupId']] += $entry['Chance'];
+                $set['groupChance'] = $entry['Chance'];
             }
             else                                            // shouldn't have happened
             {
-                Util::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: unhandled case in calculating chance for item '.$entry['item'].'!');
+                Util::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: unhandled case in calculating chance for item '.$entry['Item'].'!');
                 continue;
             }
 

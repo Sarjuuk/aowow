@@ -134,14 +134,17 @@ class User
 
         foreach ($method as $m)
         {
-            if ($ipAddr = getenv($m))
+            if ($rawIp = getenv($m))
             {
+                if ($m == 'HTTP_X_FORWARDED')
+                    $rawIp = explode(',', $rawIp)[0];       // [ip, proxy1, proxy2]
+
                 // check IPv4
-                if ($ipAddr = filter_var($ipAddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
+                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
                     break;
 
                 // check IPv6
-                if ($ipAddr = filter_var($ipAddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
+                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
                     break;
             }
         }
@@ -361,6 +364,30 @@ class User
     private static function verifySHA1($name, $pass)
     {
         return self::$passHash == self::hashSHA1($name, $pass);
+    }
+
+    public static function isValidName($name, &$errCode = 0)
+    {
+        $errCode = 0;
+
+        if (strlen($name) < 4 || strlen($name) > 16)
+            $errCode = 1;
+        else if (preg_match('/[^\w\d]/i', $name))
+            $errCode = 2;
+
+        return $errCode == 0;
+    }
+
+    public static function isValidPass($pass, &$errCode = 0)
+    {
+        $errCode = 0;
+
+        if (strlen($pass) < 6 || strlen($pass) > 16)
+            $errCode = 1;
+     // else if (preg_match('/[^\w\d!"#\$%]/', $pass))    // such things exist..? :o
+         // $errCode = 2;
+
+        return $errCode == 0;
     }
 
     public static function save()

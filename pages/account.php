@@ -312,12 +312,17 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
     private function doSignIn()
     {
-        if (!isset($_POST['username']) || !isset($_POST['password']))
+        $username = @$_POST['username'];
+        $password = @$_POST['password'];
+        $doExpire = @$_POST['remember_me'] != 'yes';
+
+        // check username
+        if (!User::isValidName($username))
             return Lang::$account['userNotFound'];
 
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-        $doExpire = $_POST['remember_me'] != 'yes';
+        // check password
+        if (!User::isValidPass($password))
+            return Lang::$account['wrongPass'];
 
         switch (User::Auth($username, $password))
         {
@@ -369,18 +374,12 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         $doExpire  = @$_POST['remember_me'] != 'yes';
 
         // check username
-        if (strlen($username) < 4 || strlen($username) > 16)
-            return Lang::$account['errNameLength'];
-
-        if (preg_match('/[^\w\d]/i', $username))
-            return Lang::$account['errNameChars'];
+        if (!User::isValidName($username, $e))
+            return Lang::$account[$e == 1 ? 'errNameLength' : 'errNameChars'];
 
         // check password
-        if (strlen($password) < 6 || strlen($password) > 16)
-            return Lang::$account['errPassLength'];
-
-        // if (preg_match('/[^\w\d!"#\$%]/', $password))    // such things exist..? :o
-            // return Lang::$account['errPassChars'];
+        if (!User::isValidPass($password, $e))
+            return Lang::$account[$e == 1 ? 'errPassLength' : 'errPassChars'];
 
         if ($password != $cPassword)
             return Lang::$account['passMismatch'];
