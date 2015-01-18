@@ -13,7 +13,7 @@
 <?php $this->brick('announcement'); ?>
 
         <div class="home-search" id="home-search">
-            <form method="get" action="/">
+            <form method="get" action="">
                 <input type="text" name="search" />
             </form>
         </div>

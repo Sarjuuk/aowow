@@ -21,7 +21,7 @@
 <?php
 $this->brick('tooltip');
 
-if ($this->reagents[0]):
+if ($this->reagents[1]):
     if ($this->tools):
         echo "                <div style=\"float: left; margin-right: 75px\">\n";
     endif;
@@ -30,9 +30,7 @@ if ($this->reagents[0]):
 
     if ($this->tools):
         echo "                </div>\n";
-    endif;
 
-    if ($this->tools):
         if ($this->reagents[0]):
             echo "                <div style=\"float: left\">\n";
         endif;
@@ -132,7 +130,8 @@ if !empty($transfer)}
                         <td><?php echo $this->gcd; ?></td>
                     </tr>
 <?php
-if (array_values($this->scaling) != [-1, -1, 0, 0]):        // not default values
+// not default values
+if (!in_array(array_values($this->scaling), [[-1, -1, 0, 0], [0, 0, 0, 0]])):
 ?>
                     <tr>
                         <th><?php echo Lang::$spell['_scaling']; ?></th>
@@ -190,7 +189,10 @@ foreach ($this->effects as $i => $e):
         endif;
 
         if ($e['procData'][1]):
-            echo sprintf(Lang::$spell['cooldown'], $e['procData'][1]);
+            if ($e['procData'][0] < 100.0):
+                echo '<br>';
+            endif;
+            echo sprintf(Lang::$game['cooldown'], $e['procData'][1]);
         endif;
     endif;
 

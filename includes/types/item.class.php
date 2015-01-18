@@ -542,7 +542,8 @@ class ItemList extends BaseType
         // containerType (slotCount)
         if ($this->curTpl['slots'] > 0)
         {
-            $fam = log($this->curTpl['bagFamily'], 2) + 1;
+            $fam = $this->curTpl['bagFamily'] ? log($this->curTpl['bagFamily'], 2) + 1 : 0;
+
             // word order differs <_<
             if (in_array(User::$localeId, [LOCALE_FR, LOCALE_ES, LOCALE_RU]))
                 $x .= '<br />'.sprintf(Lang::$item['bagSlotString'], Lang::$item['bagFamily'][$fam], $this->curTpl['slots']);
@@ -2068,9 +2069,23 @@ class ItemListFilter extends Filter
                     if (is_int($_))                         // specific
                         return ['src.src'.$_, null, '!'];
                     else if ($_)                            // any
-                        return ['OR', ['src.src1', null, '!'], ['src.src2', null, '!'], ['src.src3', null, '!'], ['src.src4', null, '!'], ['src.src5', null, '!'], ['src.src8', null, '!']];
+                    {
+                        $foo = ['OR'];
+                        foreach ($this->enums[$cr[0]] as $bar)
+                            if (is_int($bar))
+                                $foo[] = ['src.src'.$bar, null, '!'];
+
+                        return $foo;
+                    }
                     else if (!$_)                           // none
-                        return ['AND', ['src.src1', null], ['src.src2', null], ['src.src3', null], ['src.src4', null], ['src.src5', null], ['src.src8', null]];
+                    {
+                        $foo = ['AND'];
+                        foreach ($this->enums[$cr[0]] as $bar)
+                            if (is_int($bar))
+                                $foo[] = ['src.src'.$bar, null];
+
+                        return $foo;
+                    }
                 }
                 break;
         }

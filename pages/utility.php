@@ -152,9 +152,9 @@ class UtilityPage extends GenericPage
         foreach ($this->lvTabs[0]['data'] as $row)
         {
             $xml .= "<item>\n".
-                "<title><![CDATA[".$row['subject']."]]></title>\n".
+                "<title><![CDATA[".htmlentities($row['subject'])."]]></title>\n".
                 "<link>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</link>\n".
-                "<description><![CDATA[".$row['preview']." ".sprintf(Lang::$timeUnits['ago'], Util::formatTime($row['elapsed'] * 100, true))."]]></description>\n". // todo (low): preview should be html-formated
+                "<description><![CDATA[".htmlentities($row['preview'])." ".sprintf(Lang::$timeUnits['ago'], Util::formatTime($row['elapsed'] * 100, true))."]]></description>\n". // todo (low): preview should be html-formated
                 "<pubDate>".date(DATE_RSS, time() - $row['elapsed'])."</pubDate>\n".
                 "<guid>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</guid>\n".
                 "<domain />\n".

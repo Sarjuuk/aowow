@@ -47,7 +47,7 @@ endif;
 
 if ($this->quotes[0]):
 ?>
-                <h3><a class="disclosure-off" onclick="return g_disclose($WH.ge('quotes-generic'), this)"><?php echo Lang::$npc['quotes'].' ('.$this->quotes[1]; ?>)</a></h3>
+                <h3><a class="disclosure-off" onclick="return g_disclose($WH.ge('quotes-generic'), this)"><?php echo Lang::$npc['quotes'].'&nbsp;('.$this->quotes[1]; ?>)</a></h3>
                 <div id="quotes-generic" style="display: none"><ul>
 <?php
     foreach ($this->quotes[0] as $group):
@@ -92,7 +92,7 @@ if ($this->reputation):
 
         foreach ($set[1] as $itr):
             echo '<li><div'.($itr['qty'] < 0 ? ' class="reputation-negative-amount"' : null).'><span>'.$itr['qty'].'</span> '.Lang::$npc['repWith'] .
-                ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'] > 0 ? ' ('.sprintf(Lang::$npc['stopsAt'], $itr['cap']).')' : null).'</div></li>';
+                ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'] > 0 ? '&nbsp;('.sprintf(Lang::$npc['stopsAt'], $itr['cap']).')' : null).'</div></li>';
         endforeach;
 
         echo '</ul>';

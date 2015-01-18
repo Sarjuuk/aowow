@@ -44,7 +44,7 @@ foreach ($this->criteria['data'] as $i => $cr):
     endif;
 
     if (!empty($l['count']) && $l['count'] > 1):
-        echo ' ('.$l['count'].')';
+        echo '&nbsp;('.$l['count'].')';
     endif;
 
     if (isset($cr['extraText'])):
