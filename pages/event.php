@@ -61,6 +61,8 @@ class EventPage extends GenericPage
 
     protected function generateContent()
     {
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         /***********/
         /* Infobox */
         /***********/
@@ -101,7 +103,7 @@ class EventPage extends GenericPage
         $hasFilter = in_array($this->hId, [372, 283, 285, 353, 420, 400, 284, 201, 374, 409, 141, 324, 321, 424, 335, 327, 341, 181, 404, 398, 301]);
 
         // tab: npcs
-        if ($npcIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(ec.eventEntry > 0, 1, 0) AS added FROM creature c, game_event_creature ec WHERE ec.guid = c.guid AND ABS(ec.eventEntry) = ?d', $this->eId))
+        if ($npcIds = DB::World()->selectCol('SELECT id AS ARRAY_KEY, IF(ec.eventEntry > 0, 1, 0) AS added FROM creature c, game_event_creature ec WHERE ec.guid = c.guid AND ABS(ec.eventEntry) = ?d', $this->eId))
         {
             $creatures = new CreatureList(array(['id', array_keys($npcIds)]));
             if (!$creatures->error)
@@ -119,7 +121,7 @@ class EventPage extends GenericPage
         }
 
         // tab: objects
-        if ($objectIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(eg.eventEntry > 0, 1, 0) AS added FROM gameobject g, game_event_gameobject eg WHERE eg.guid = g.guid AND ABS(eg.eventEntry) = ?d', $this->eId))
+        if ($objectIds = DB::World()->selectCol('SELECT id AS ARRAY_KEY, IF(eg.eventEntry > 0, 1, 0) AS added FROM gameobject g, game_event_gameobject eg WHERE eg.guid = g.guid AND ABS(eg.eventEntry) = ?d', $this->eId))
         {
             $objects = new GameObjectList(array(['id', array_keys($objectIds)]));
             if (!$objects->error)
@@ -193,7 +195,7 @@ class EventPage extends GenericPage
         {
             // vendor
             $cIds = $creatures->getFoundIDs();
-            if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv  WHERE entry IN (?a) UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id IN (?a)', $cIds, $cIds))
+            if ($sells = DB::World()->selectCol('SELECT item FROM npc_vendor nv WHERE entry IN (?a) UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id IN (?a)', $cIds, $cIds))
                 $itemCnd[] = ['id', $sells];
         }
 
@@ -215,7 +217,7 @@ class EventPage extends GenericPage
         }
 
         // tab: see also (event conditions)
-        if ($rel = DB::Aowow()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, -prerequisite_event, eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $this->eId, $this->eId, $this->eId))
+        if ($rel = DB::World()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, -prerequisite_event, eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $this->eId, $this->eId, $this->eId))
         {
             $list = [];
             array_walk($rel, function($v, $k) use (&$list) {

@@ -42,6 +42,8 @@ class CurrencyPage extends GenericPage
 
     protected function generateContent()
     {
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         $_itemId = $this->subject->getField('itemId');
 
         /***********/
@@ -59,7 +61,7 @@ class CurrencyPage extends GenericPage
         /* Main Content */
         /****************/
 
-        $this->infobox    = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
+        $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->name       = $this->subject->getField('name', true);
         $this->headIcons  = $this->typeId == 104 ? ['inv_bannerpvp_02', 'inv_bannerpvp_01'] : [$this->subject->getField('iconString')];
         $this->redButtons = array(
@@ -98,8 +100,9 @@ class CurrencyPage extends GenericPage
 
             // tab: sold by
             $itemObj = new ItemList(array(['id', $_itemId]));
-            if ($vendors = @$itemObj->getExtendedCost()[$_itemId])
+            if (!empty($itemObj->getExtendedCost()[$_itemId]))
             {
+                $vendors = $itemObj->getExtendedCost()[$_itemId];
                 $this->extendGlobalData($itemObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
                 $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
@@ -183,30 +186,29 @@ class CurrencyPage extends GenericPage
         if ($this->typeId == 103)
         {
             $n = '?items&filter=cr=145;crs=1;crv=0';
-            $w = 'iec.reqArenaPoints > 0';
+            $w = 'reqArenaPoints > 0';
         }
         else if ($this->typeId == 104)
         {
             $n = '?items&filter=cr=144;crs=1;crv=0';
-            $w = 'iec.reqHonorPoints > 0';
+            $w = 'reqHonorPoints > 0';
         }
         else
         {
             $n = in_array($this->typeId, [42, 61, 81, 241, 121, 122, 123, 125, 126, 161, 201, 101, 102, 221, 301, 341]) ? '?items&filter=cr=158;crs='.$_itemId.';crv=0' : null;
-            $w = 'iec.reqItemId1 = '.$_itemId.' OR iec.reqItemId2 = '.$_itemId.' OR iec.reqItemId3 = '.$_itemId.' OR iec.reqItemId4 = '.$_itemId.' OR iec.reqItemId5 = '.$_itemId;
+            $w = 'reqItemId1 = '.$_itemId.' OR reqItemId2 = '.$_itemId.' OR reqItemId3 = '.$_itemId.' OR reqItemId4 = '.$_itemId.' OR reqItemId5 = '.$_itemId;
         }
 
-        $boughtBy = DB::Aowow()->selectCol('
-            SELECT item FROM npc_vendor nv JOIN ?_itemextendedcost iec ON iec.id = nv.extendedCost WHERE '.$w.'
-            UNION
-            SELECT item FROM game_event_npc_vendor genv JOIN ?_itemextendedcost iec ON iec.id = genv.extendedCost WHERE '.$w
-        );
-
+        $xCosts   = DB::Aowow()->selectCol('SELECT id FROM ?_itemextendedcost WHERE '.$w);
+        $boughtBy = DB::World()->selectCol('SELECT item FROM npc_vendor WHERE extendedCost IN (?a) UNION SELECT item FROM game_event_npc_vendor WHERE extendedCost IN (?a)', $xCosts, $xCosts);
         if ($boughtBy)
         {
             $boughtBy = new ItemList(array(['id', $boughtBy]));
             if (!$boughtBy->error)
             {
+                if ($boughtBy->getMatches() <= CFG_SQL_LIMIT_DEFAULT)
+                    $n = null;
+
                 $this->lvTabs[] = array(
                     'file'   => 'item',
                     'data'   => $boughtBy->getListviewData(ITEMINFO_VENDOR, [TYPE_CURRENCY => $this->typeId]),

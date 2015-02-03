@@ -80,7 +80,21 @@ class TitlePage extends GenericPage
             BUTTON_LINKS   => ['name' => $this->nameFixed]
         );
 
-        // todo (low): create pendant from player_factionchange_titles
+        // factionchange-equivalent
+        if ($pendant = DB::World()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_titles WHERE alliance_id = ?d OR horde_id = ?d', $this->typeId, $this->typeId, $this->typeId))
+        {
+            $altTitle = new TitleList(array(['id', abs($pendant)]));
+            if (!$altTitle->error)
+            {
+                $this->transfer = sprintf(
+                    Lang::title('_transfer'),
+                    $altTitle->id,
+                    $altTitle->getHtmlizedName(),
+                    $pendant > 0 ? 'alliance' : 'horde',
+                    $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                );
+            }
+        }
 
         /**************/
         /* Extra Tabs */

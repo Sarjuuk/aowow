@@ -43,6 +43,8 @@ class ClassPage extends GenericPage
 
     protected function generateContent()
     {
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         $infobox   = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
         $_mask     = 1 << ($this->typeId - 1);
         $tcClassId = [null, 8, 3, 1, 5, 4, 9, 6, 2, 7, null, 0]; // see TalentCalc.js

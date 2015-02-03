@@ -291,7 +291,14 @@ class ZonePage extends GenericPage
                     $data = array_values($data);
 
                 if (!in_array($what, ['vein', 'herb', 'rare']))
-                    $dataz = array_column($dataz, 0);
+                {
+                    $foo = [];
+                    foreach ($dataz as $d)
+                        foreach ($d as $_)
+                            $foo[] = $_;
+
+                    $dataz = $foo;
+                }
             }
 
             // append paths between nodes

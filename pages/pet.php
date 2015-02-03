@@ -43,6 +43,8 @@ class PetPage extends GenericPage
 
     protected function generateContent()
     {
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         /***********/
         /* Infobox */
         /***********/

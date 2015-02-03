@@ -46,6 +46,11 @@ if (isset($this->unavailable)):
                 <b style="color: red"><?php echo Lang::$main['_unavailable']; ?></b>
 <?php
 endif;
+
+if (!empty($this->transfer)):
+    echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
+endif;
+
 ?>
                 <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
             </div>

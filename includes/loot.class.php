@@ -89,7 +89,7 @@ class Loot
         if (!$tableName || !$lootId)
             return null;
 
-        $rows = DB::Aowow()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, $lootId, $groupId ?: DBSIMPLE_SKIP);
+        $rows = DB::World()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, $lootId, $groupId ?: DBSIMPLE_SKIP);
         if (!$rows)
             return null;
 
@@ -167,7 +167,10 @@ class Loot
             }
             else if ($entry['GroupId'] && $entry['Chance'])
             {
-                @$groupChances[$entry['GroupId']] += $entry['Chance'];
+                if (empty($groupChances[$entry['GroupId']]))
+                    $groupChances[$entry['GroupId']] = 0;
+
+                $groupChances[$entry['GroupId']] += $entry['Chance'];
                 $set['groupChance'] = $entry['Chance'];
             }
             else                                            // shouldn't have happened
@@ -184,7 +187,7 @@ class Loot
             $sum = $groupChances[$k];
             if (!$sum)
                 $sum = 0;
-            else if ($sum > 100)
+            else if ($sum >= 100.01)
             {
                 Util::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
                 $sum = 100;
@@ -298,9 +301,10 @@ class Loot
             {
                 foreach ($fields as $idx => $field)
                 {
+                    $val = isset($foo[$field]) ? $foo[$field] : 0;
                     if (!isset($base[$idx]))
-                        $base[$idx] = @$foo[$field];
-                    else if ($base[$idx] != @$foo[$field])
+                        $base[$idx] = $val;
+                    else if ($base[$idx] != $val)
                         $set |= 1 << $idx;
                 }
 
@@ -422,7 +426,7 @@ class Loot
         /*
             get references containing the item
         */
-        $newRefs = DB::Aowow()->select(
+        $newRefs = DB::World()->select(
             sprintf($query, 'lt1.item = ?d AND lt1.reference = 0'),
             LOOT_REFERENCE, LOOT_REFERENCE,
             $this->entry
@@ -431,7 +435,7 @@ class Loot
         while ($newRefs)
         {
             $curRefs = $newRefs;
-            $newRefs = DB::Aowow()->select(
+            $newRefs = DB::World()->select(
                 sprintf($query, 'lt1.reference IN (?a)'),
                 LOOT_REFERENCE, LOOT_REFERENCE,
                 array_keys($curRefs)
@@ -445,7 +449,7 @@ class Loot
         */
         for ($i = 1; $i < count($this->lootTemplates); $i++)
         {
-            $result = $calcChance(DB::Aowow()->select(
+            $result = $calcChance(DB::World()->select(
                 sprintf($query, '{lt1.reference IN (?a) OR }(lt1.reference = 0 AND lt1.item = ?d)'),
                 $this->lootTemplates[$i], $this->lootTemplates[$i],
                 $refResults ? array_keys($refResults) : DBSIMPLE_SKIP,

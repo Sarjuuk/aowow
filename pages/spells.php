@@ -284,8 +284,9 @@ class SpellsPage extends GenericPage
                             ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->category[1]]]
                         ];
 
-                        if ($sf = @$this->shortFilter[$this->category[1]])
+                        if (!empty($this->shortFilter[$this->category[1]]))
                         {
+                            $sf  = $this->shortFilter[$this->category[1]];
                             $txt = '';
                             if ($sf[0] && $sf[1])
                                 $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]) . Lang::$spell['relItems']['link'] . sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
@@ -323,8 +324,9 @@ class SpellsPage extends GenericPage
                     {
                         $conditions[] = ['s.skillLine1', $this->category[1]];
 
-                        if ($sf = @$this->shortFilter[$this->category[1]])
+                        if (!empty($this->shortFilter[$this->category[1]]))
                         {
+                            $sf  = $this->shortFilter[$this->category[1]];
                             $txt = '';
                             if ($sf[0] && $sf[1])
                                 $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]) . Lang::$spell['relItems']['link'] . sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);

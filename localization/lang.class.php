@@ -40,6 +40,24 @@ class Lang
         self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
     }
 
+    // todo: make static props private and access through this
+    public static function __callStatic($name, $args)
+    {
+        if (!isset(self::$$name))
+            return null;
+
+        $var = self::$$name;
+        foreach ($args as $key)
+        {
+            if (!isset($var[$key]))
+                return null;
+
+            $var = $var[$key];
+        }
+
+        return $var;
+    }
+
     // todo: expand
     public static function getInfoBoxForFlags($flags)
     {

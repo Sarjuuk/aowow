@@ -498,7 +498,6 @@ trait listviewHelper
 
         return false;
     }
-
 }
 
 /*
@@ -516,11 +515,7 @@ trait spawnHelper
         SPAWNINFO_ZONES => null
     );
 
-    /*
-        todo (med): map in tooltips is activated by either '#map' as anchor (will automatic open mapviewer, when hovering link) in the href or as parameterless rel-parameter e.g. rel="map" in the anchor
-    */
-
-    private function createShortSpawns()                    // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> (one area, one floor, one creature, no survivor)
+    private function createShortSpawns()                    // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> or anchor #map (one area, one floor, one creature, no survivors)
     {
         // first get zone/floor with the most spawns
         if ($res = DB::Aowow()->selectRow('SELECT areaId, floor FROM ?_spawns WHERE type = ?d && typeId = ?d GROUP BY areaId, floor ORDER BY count(1) DESC LIMIT 1', self::$type, $this->id))
@@ -547,7 +542,7 @@ trait spawnHelper
         foreach ($spawns as $s)
         {
             // check, if we can attach waypoints to creature
-            // we will get a nice clusterfuck of dots if we do this for more GUIDs, than we have colors
+            // we will get a nice clusterfuck of dots if we do this for more GUIDs, than we have colors though
             if (count($spawns) < 6 && self::$type == TYPE_NPC)
             {
                 if ($wPoints = DB::Aowow()->select('SELECT * FROM ?_creature_waypoints WHERE creatureOrPath = ?d AND floor = ?d', $s['pathId'] ? -$s['pathId'] : $this->id, $s['floor']))
@@ -566,7 +561,10 @@ trait spawnHelper
                             $set['lines'] = [[$wPoints[$i - 1]['posX'], $wPoints[$i - 1]['posY']]];
 
                         $data[$s['areaId']][$s['floor']]['coords'][] = [$p['posX'], $p['posY'], $set];
-                        @$wpSum[$s['areaId']][$s['floor']]++;
+                        if (empty($wpSum[$s['areaId']][$s['floor']]))
+                            $wpSum[$s['areaId']][$s['floor']] = 1;
+                        else
+                            $wpSum[$s['areaId']][$s['floor']]++;
                     }
                     $wpIdx++;
                 }

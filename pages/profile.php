@@ -86,7 +86,7 @@ class ProfilePage extends GenericPage
         if ($asError)
             return $x."});";
 
-        @include('datasets/ProfilerExampleChar');       // tmp char data
+        @include('datasets/ProfilerExampleChar');           // tmp char data
 
         $name       = $character['name'];
         $guild      = $character['guild'];

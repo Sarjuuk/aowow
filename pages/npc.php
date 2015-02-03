@@ -108,15 +108,15 @@ class NpcPage extends GenericPage
 
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
-        // Event
-        if ($_ = DB::Aowow()->selectCol('SELECT DISTINCT IF(holidayId, holidayId, -e.id) FROM ?_events e, game_event_creature gec, creature c WHERE e.id = ABS(gec.eventEntry) AND c.guid = gec.guid AND c.id = ?d', $this->typeId))
+        // Event (ignore events, where the object only gets removed)
+        if ($_ = DB::World()->selectCol('SELECT DISTINCT IF(ge.holiday, ge.holiday, -ge.eventEntry) FROM game_event ge, game_event_creature gec, creature c WHERE ge.eventEntry = gec.eventEntry AND c.guid = gec.guid AND c.id = ?d', $this->typeId))
         {
             $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
             $ev = [];
-            foreach ($_ as $idx => $id)
-                $ev[] = ($ev && !fmod(count($ev), 2) ? '[br]' : '') . '[event='.$id.']';
+            foreach ($_ as $i => $e)
+                $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';
 
-            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].implode(', ', $ev);
+            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].implode(',', $ev);
         }
 
         // Level
@@ -286,7 +286,7 @@ class NpcPage extends GenericPage
 
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
         // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
-        $smartSpells = DB::Aowow()->selectCol('SELECT action_param1 FROM smart_scripts WHERE source_type = 0 AND action_type IN (11, 75, 85, 86) AND entryOrGUID = ?d', $this->typeId);
+        $smartSpells = DB::World()->selectCol('SELECT action_param1 FROM smart_scripts WHERE source_type = 0 AND action_type IN (11, 75, 85, 86) AND entryOrGUID = ?d', $this->typeId);
         $tplSpells   = [];
         $conditions  = ['OR'];
 
@@ -411,7 +411,7 @@ class NpcPage extends GenericPage
                 WHERE     t1.entry = ?d
             ';
 
-            if ($tSpells = DB::Aowow()->select($teachQuery, $this->typeId))
+            if ($tSpells = DB::World()->select($teachQuery, $this->typeId))
             {
                 $teaches = new SpellList(array(['id', array_keys($tSpells)]));
                 if (!$teaches->error)
@@ -463,7 +463,7 @@ class NpcPage extends GenericPage
         }
 
         // tab: sells
-        if ($sells = DB::Aowow()->selectCol('SELECT item FROM npc_vendor nv WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id = ?d', $this->typeId, $this->typeId))
+        if ($sells = DB::World()->selectCol('SELECT item FROM npc_vendor nv WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id = ?d', $this->typeId, $this->typeId))
         {
             $soldItems = new ItemList(array(['id', $sells]));
             if (!$soldItems->error)
@@ -472,7 +472,7 @@ class NpcPage extends GenericPage
                 if ($soldItems->hasSetFields(['condition']))
                     $extraCols[] = 'Listview.extraCols.condition';
 
-                $lvData = $soldItems->getListviewData(ITEMINFO_VENDOR, [TYPE_NPC => $this->typeId]);
+                $lvData = $soldItems->getListviewData(ITEMINFO_VENDOR, [TYPE_NPC => [$this->typeId]]);
 
                 $sc = Util::getServerConditions(CND_SRC_NPC_VENDOR, $this->typeId);
                 if (!empty($sc[0]))
@@ -695,7 +695,7 @@ class NpcPage extends GenericPage
         }
 
         // tab: passengers
-        if ($_ = DB::World()->selectCol('SELECT accessory_entry as ARRAY_KEY, GROUP_CONCAT(seat_id) FROM vehicle_template_accessory WHERE entry = ?d', $this->typeId))
+        if ($_ = DB::World()->selectCol('SELECT accessory_entry AS ARRAY_KEY, GROUP_CONCAT(seat_id) FROM vehicle_template_accessory WHERE entry = ?d GROUP BY accessory_entry', $this->typeId))
         {
             $passengers = new CreatureList(array(['id', array_keys($_)]));
             if (!$passengers->error)
@@ -768,27 +768,34 @@ class NpcPage extends GenericPage
 
     private function getRepForId($entries, &$spillover)
     {
-        $result = [];
-        $q = 'SELECT f.id, f.parentFactionId, cor.creature_id AS npc,
-                  IF(f.id = RewOnKillRepFaction1, RewOnKillRepValue1, RewOnKillRepValue2) AS qty,
-                  IF(f.id = RewOnKillRepFaction1, MaxStanding1, MaxStanding2)             AS maxRank,
-                  IF(f.id = RewOnKillRepFaction1, isTeamAward1, isTeamAward2)             AS spillover
-              FROM ?_factions f JOIN creature_onkill_reputation cor ON f.Id = cor.RewOnKillRepFaction1 OR f.Id = cor.RewOnKillRepFaction2 WHERE cor.creature_id IN (?a)';
+        $rows  = DB::World()->select('
+            SELECT creature_id AS npc, RewOnKillRepFaction1 AS faction, RewOnKillRepValue1 AS qty, MaxStanding1 AS maxRank, isTeamAward1 AS spillover
+            FROM creature_onkill_reputation WHERE creature_id IN (?a) AND RewOnKillRepFaction1 > 0 UNION
+            SELECT creature_id AS npc, RewOnKillRepFaction2 As faction, RewOnKillRepValue2 AS qty, MaxStanding2 AS maxRank, isTeamAward2 AS spillover
+            FROM creature_onkill_reputation WHERE creature_id IN (?a) AND RewOnKillRepFaction2 > 0',
+            (array)$entries, (array)$entries
+        );
 
-        foreach (DB::Aowow()->select($q, (array)$entries) as $_)
+        $factions = new FactionList(array(['id', array_column($rows, 'faction')]));
+        $result   = [];
+
+        foreach ($rows as $row)
         {
+            if (!$factions->getEntry($row['faction']))
+                continue;
+
             $set = array(
-                'id'   => $_['id'],
-                'qty'  => $_['qty'],
-                'name' => FactionList::getName($_['id']),   // << this sucks .. maybe format this whole table with markdown and add name via globals?
-                'npc'  => $_['npc'],
-                'cap'  => $_['maxRank'] && $_['maxRank'] < REP_EXALTED ? Lang::$game['rep'][$_['maxRank']] : null
+                'id'   => $row['faction'],
+                'qty'  => $row['qty'],
+                'name' => $factions->getField('name', true),
+                'npc'  => $row['npc'],
+                'cap'  => $row['maxRank'] && $row['maxRank'] < REP_EXALTED ? Lang::$game['rep'][$row['maxRank']] : null
             );
 
-            if ($_['spillover'])
+            if ($row['spillover'])
             {
-                $spillover[$_['parentFactionId']] = [intVal($_['qty'] / 2), $_['maxRank']];
-                $set['spillover'] = $_['parentFactionId'];
+                $spillover[$factions->getField('cat')] = [intVal($row['qty'] / 2), $row['maxRank']];
+                $set['spillover'] = $factions->getField('cat');
             }
 
             $result[] = $set;
@@ -884,7 +891,7 @@ class NpcPage extends GenericPage
             WHERE
                 ct.entry = ?d';
 
-        foreach (DB::Aowow()->select($quoteQuery, $this->typeId) as $text)
+        foreach (DB::World()->select($quoteQuery, $this->typeId) as $text)
         {
             $group = [];
             foreach ($text as $t)

@@ -82,6 +82,7 @@ class GenericPage
     private   $cacheLoaded  = [];
     private   $skipCache    = 0x0;
     private   $memcached    = null;
+    private   $mysql        = ['time' => 0, 'count' => 0];
 
     public function __construct($pageCall/*, $pageParam */)
     {
@@ -216,7 +217,7 @@ class GenericPage
         }
 
         $this->time  = microtime(true) - $this->time;
-        $this->mysql = DB::Aowow()->getStatistics();
+        Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
     }
 
     public function addJS($name, $unshift = false)
@@ -363,8 +364,8 @@ class GenericPage
     public function notFound($typeStr)                      // unknown ID
     {
         $this->typeStr       = $typeStr;
-        $this->mysql         = DB::Aowow()->getStatistics();
         $this->hasComContent = false;
+        Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
 
         if (isset($this->tabId))
             $this->pageTemplate['activeTab'] = $this->tabId;
@@ -384,7 +385,7 @@ class GenericPage
 
         $this->addArticle();
 
-        $this->mysql   = DB::Aowow()->getStatistics();
+        Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
 
         $this->display('text-page-generic');
         exit();
@@ -758,7 +759,10 @@ class GenericPage
 
             $cache = explode("\n", $cache, 2);
             $data  = $cache[1];
-            @list($time, $rev, $type) = explode(' ', $cache[0]);
+            if (substr_count($cache[0], ' ') < 2)
+                return false;
+
+            list($time, $rev, $type) = explode(' ', $cache[0]);
 
             if ($time + CFG_CACHE_DECAY <= time() || $rev < AOWOW_REVISION)
                 $cache = null;

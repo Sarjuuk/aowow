@@ -95,7 +95,44 @@ foreach ($sets as $k => $v)
 }
 
 
+// handle occuring errors
 error_reporting($AoWoWconf && CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0);
+$errHandled = false;
+set_error_handler(function($errNo, $errStr, $errFile, $errLine) use (&$errHandled) {
+    $errName = 'unknown error';                             // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
+    if ($errNo == E_WARNING)                                // 0x0002
+        $errName = 'E_WARNING';
+    else if ($errNo == E_PARSE)                             // 0x0004
+        $errName = 'E_PARSE';
+    else if ($errNo == E_NOTICE)                            // 0x0008
+        $errName = 'E_NOTICE';
+    else if ($errNo == E_USER_ERROR)                        // 0x0100
+        $errName = 'E_USER_ERROR';
+    else if ($errNo == E_USER_WARNING)                      // 0x0200
+        $errName = 'E_USER_WARNING';
+    else if ($errNo == E_USER_NOTICE)                       // 0x0400
+        $errName = 'E_USER_NOTICE';
+    else if ($errNo == E_RECOVERABLE_ERROR)                 // 0x1000
+        $errName = 'E_RECOVERABLE_ERROR';
+
+    if (User::isInGroup(U_GROUP_STAFF))
+    {
+        if (!$errHandled)
+        {
+            Util::addNote(U_GROUP_STAFF, 'one or more php related error occured, while generating this page.');
+            $errHandled = true;
+        }
+
+        Util::addNote(U_GROUP_STAFF, $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine);
+    }
+
+    DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+        AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $errStr
+    );
+
+    return !(User::isInGroup(U_GROUP_STAFF) && defined('CFG_DEBUG') && CFG_DEBUG);
+}, E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
+
 
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || ($AoWoWconf && CFG_FORCE_SSL);
 if (defined('CFG_STATIC_HOST'))                             // points js to images & scripts
@@ -141,8 +178,11 @@ if (!CLI)
     }
 
     // parse page-parameters .. sanitize before use!
-    @list($str, $trash) = explode('&', $_SERVER['QUERY_STRING'], 2);
-    @list($pageCall, $pageParam) = explode('=', $str, 2);
+    $str = explode('&', $_SERVER['QUERY_STRING'], 2)[0];
+    $_   = explode('=', $str, 2);
+    $pageCall  = $_[0];
+    $pageParam = isset($_[1]) ? $_[1] : null;
+
     Util::$wowheadLink = 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/'.$str;
 }
 else if ($AoWoWconf)

@@ -13,11 +13,9 @@ class AchievementList extends BaseType
 
     public        $criteria  = [];
 
-    protected     $queryBase = 'SELECT `a`.*, `ar`.*, `lar`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
+    protected     $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
     protected     $queryOpts = array(
-                          'a' => [['ar', 'lar', 'si'], 'o' => 'orderInGroup ASC'],
-                         'ar' => ['j' => ['achievement_reward ar ON ar.entry = a.id', true]],
-                        'lar' => ['j' => ['locales_achievement_reward lar ON lar.entry = a.id', true]],
+                          'a' => [['si'], 'o' => 'orderInGroup ASC'],
                          'si' => ['j' => ['?_spellicon si ON si.id = a.iconId', true], 's' => ', si.iconString'],
                          'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
                   );
@@ -30,20 +28,31 @@ class AchievementList extends BaseType
     {
         parent::__construct($conditions, $miscData);
 
+        if ($this->error)
+            return;
+
         // post processing
-        foreach ($this->iterate() as &$_curTpl)
+        $rewards = DB::World()->select('
+            SELECT ar.entry AS ARRAY_KEY, ar.*, lar.* FROM achievement_reward ar LEFT JOIN locales_achievement_reward lar ON lar.entry = ar.entry WHERE ar.entry IN (?a)',
+            $this->getFoundIDs()
+        );
+
+        foreach ($this->iterate() as $_id => &$_curTpl)
         {
+            if (!empty($rewards[$_id]))
+                $_curTpl = array_merge($rewards[$_id], $_curTpl);
+
             //"rewards":[[11,137],[3,138]]   [type, typeId]
             $_curTpl['rewards'] = [];
-            if ($_ = $_curTpl['item'])
-                $_curTpl['rewards'][] = [TYPE_ITEM, $_];
-            if ($_ = $_curTpl['itemExtra'])
-                $_curTpl['rewards'][] = [TYPE_ITEM, $_];
-            if ($_ = $_curTpl['title_A'])
-                $_curTpl['rewards'][] = [TYPE_TITLE, $_];
-            if ($_ = $_curTpl['title_H'])
-                if ($_ != $_curTpl['title_A'])
-                    $_curTpl['rewards'][] = [TYPE_TITLE, $_];
+            if (!empty($_curTpl['item']))
+                $_curTpl['rewards'][] = [TYPE_ITEM, $_curTpl['item']];
+            if (!empty($_curTpl['itemExtra']))
+                $_curTpl['rewards'][] = [TYPE_ITEM, $_curTpl['itemExtra']];
+            if (!empty($_curTpl['title_A']))
+                $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['title_A']];
+            if (!empty($_curTpl['title_H']))
+                if (empty($_curTpl['title_A']) || $_curTpl['title_A'] != $_curTpl['title_H'])
+                    $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['title_H']];
 
             // icon
             $_curTpl['iconString'] = $_curTpl['iconString'] ?: 'trade_engineering';
@@ -285,7 +294,7 @@ class AchievementListFilter extends Filter
             case 6:                                         // last in series [yn]
                 return $this->int2Bool($cr[1]) ? ['AND', ['series', 0, '!'], [['series', 0xFFFF, '&'], 0]] : [['series', 0xFFFF, '&'], 0, '!'];
             case 11:                                        // Related Event [enum]
-                $_ = @$this->enums[$cr[0]][$cr[1]];
+                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
                 if ($_ !== null)
                 {
                     if (is_int($_))

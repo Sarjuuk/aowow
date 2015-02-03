@@ -164,7 +164,7 @@ var mn_items = [
         [9,"Hexenmeister",,[[1,"Erhebliche"],[2,"Geringe"]],{className:"c9",tinyIcon:"class_warlock"}],
         [1,"Krieger",,[[1,"Erhebliche"],[2,"Geringe"]],{className:"c1",tinyIcon:"class_warrior"}]
     ]],
-    [7,"Trade Goods",,[
+    [7,"Handwerkswaren",,[
         [14,"Rüstungsverzauberungen"],
         [5,"Stoff"],
         [3,"Geräte"],

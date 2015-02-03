@@ -24,12 +24,23 @@ class AccountPage extends GenericPage
     protected $error     = '';
     protected $next      = '';
 
+    private   $_post     = array(
+        'username'    => [FILTER_SANITIZE_SPECIAL_CHARS, 0xC], // FILTER_FLAG_STRIP_LOW | *_HIGH
+        'password'    => [FILTER_UNSAFE_RAW, null],
+        'c_password'  => [FILTER_UNSAFE_RAW, null],
+        'remember_me' => [FILTER_CALLBACK, ['options' => 'AccountPage::rememberCallback']],
+        'email'       => [FILTER_SANITIZE_EMAIL, null]
+    );
+
     public function __construct($pageCall, $pageParam)
     {
         if ($pageParam)
             $this->category = [$pageParam];
 
         parent::__construct($pageCall, $pageParam);
+
+        foreach ($this->_post as $k => &$v)
+            $v = !empty($_POST[$k]) ? filter_input(INPUT_POST, $k, $v[0], $v[1]) : null;
 
         if ($pageParam)
         {
@@ -40,6 +51,11 @@ class AccountPage extends GenericPage
             else if (!$this->validCats[$pageParam][0] && User::$id)
                 header('Location: ?account', true, 302);    // goto dashboard
         }
+    }
+
+    private function rememberCallback($val)
+    {
+        return $val == 'yes' ? $val : null;
     }
 
     protected function generateContent()
@@ -71,16 +87,16 @@ class AccountPage extends GenericPage
                 $this->tpl = 'acc-recover';
                 $this->resetPass = false;
 
-                if (isset($_POST['email']))
+                if ($this->_post['email'])
                 {
-                    if (!Util::isValidEmail($_POST['email']))
+                    if (!Util::isValidEmail($this->_post['email']))
                         $this->error = Lang::$account['emailInvalid'];
-                    else if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE email = ?', $_POST['email']))
+                    else if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE email = ?', $this->_post['email']))
                         $this->error = Lang::$account['emailNotFound'];
-                    else if ($err = $this->doRecoverUser($_POST['email']))
+                    else if ($err = $this->doRecoverUser())
                         $this->error = $err;
                     else
-                        $this->text = sprintf(Lang::$account['recovUserSent']. $_POST['email']);
+                        $this->text = sprintf(Lang::$account['recovUserSent']. $this->_post['email']);
                 }
 
                 $this->head = Lang::$account['recoverUser'];
@@ -88,7 +104,7 @@ class AccountPage extends GenericPage
             case 'signin':
                 $this->tpl = 'acc-signIn';
                 $this->next = $this->getNext();
-                if (isset($_POST['username']) || isset($_POST['password']))
+                if ($this->_post['username'] || $this->_post['password'])
                 {
                     if ($err = $this->doSignIn())
                         $this->error = $err;
@@ -108,14 +124,14 @@ class AccountPage extends GenericPage
 
                 $this->tpl = 'acc-signUp';
                 $nStep = 1;
-                if (isset($_POST['username']) || isset($_POST['password']) || isset($_POST['c_password']) || isset($_POST['email']))
+                if ($this->_post['username'] || $this->_post['password'] || $this->_post['c_password'] || $this->_post['email'])
                 {
                     if ($err = $this->doSignUp())
                         $this->error = $err;
                     else
                     {
                         $nStep = 1.5;
-                        $this->text = sprintf(Lang::$account['createAccSent'], $_POST['email']);
+                        $this->text = sprintf(Lang::$account['createAccSent'], $this->_post['email']);
                     }
                 }
                 else if (!empty($_GET['token']) && ($newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE status = ?d AND token = ?', ACC_STATUS_NEW, $_GET['token'])))
@@ -275,18 +291,18 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
     {
         $step = 1;
 
-        if (isset($_POST['email']))                         // step 1
+        if ($this->_post['email'])                          // step 1
         {
-            if (!Util::isValidEmail($_POST['email']))
+            if (!Util::isValidEmail($this->_post['email']))
                 $this->error = Lang::$account['emailInvalid'];
-            else if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE email = ?', $_POST['email']))
+            else if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE email = ?', $this->_post['email']))
                 $this->error = Lang::$account['emailNotFound'];
-            else if ($err = $this->doRecoverPass($_POST['email']))
+            else if ($err = $this->doRecoverPass())
                 $this->error = $err;
             else
             {
                 $step = 1.5;
-                $this->text = sprintf(Lang::$account['recovPassSent'], $_POST['email']);
+                $this->text = sprintf(Lang::$account['recovPassSent'], $this->_post['email']);
             }
         }
         else if (isset($_GET['token']))                     // step 2
@@ -295,7 +311,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             $this->resetPass = true;
             $this->token     = $_GET['token'];
         }
-        else if (isset($_POST['token']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['c_password']))
+        else if ($this->_post['token'] && $this->_post['email'] && $this->_post['password'] && $this->_post['c_password'])
         {
             $step = 2;
             $this->resetPass = true;
@@ -312,19 +328,15 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
     private function doSignIn()
     {
-        $username = @$_POST['username'];
-        $password = @$_POST['password'];
-        $doExpire = @$_POST['remember_me'] != 'yes';
-
         // check username
-        if (!User::isValidName($username))
+        if (!User::isValidName($this->_post['username']))
             return Lang::$account['userNotFound'];
 
         // check password
-        if (!User::isValidPass($password))
+        if (!User::isValidPass($this->_post['password']))
             return Lang::$account['wrongPass'];
 
-        switch (User::Auth($username, $password))
+        switch (User::Auth($this->_post['username'], $this->_post['password']))
         {
             case AUTH_OK:
                 if (!User::$ip)
@@ -333,8 +345,8 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
                 // reset account status, update expiration
                 DB::Aowow()->query('UPDATE ?_account SET prevIP = IF(curIp = ?, prevIP, curIP), curIP = IF(curIp = ?, curIP, ?), allowExpire = ?d, status = 0, statusTimer = 0, token = "" WHERE user = ?',
                     User::$ip, User::$ip, User::$ip,
-                    $doExpire,
-                    $username
+                    $this->_post['remember_me'] != 'yes',
+                    $this->_post['username']
                 );
 
                 if (User::init())
@@ -367,25 +379,19 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
     private function doSignUp()
     {
-        $username  = @$_POST['username'];
-        $password  = @$_POST['password'];
-        $cPassword = @$_POST['c_password'];
-        $email     = @$_POST['email'];
-        $doExpire  = @$_POST['remember_me'] != 'yes';
-
         // check username
-        if (!User::isValidName($username, $e))
+        if (!User::isValidName($this->_post['username'], $e))
             return Lang::$account[$e == 1 ? 'errNameLength' : 'errNameChars'];
 
         // check password
-        if (!User::isValidPass($password, $e))
+        if (!User::isValidPass($this->_post['password'], $e))
             return Lang::$account[$e == 1 ? 'errPassLength' : 'errPassChars'];
 
-        if ($password != $cPassword)
+        if ($this->_post['password'] != $this->_post['c_password'])
             return Lang::$account['passMismatch'];
 
         // check email
-        if (!Util::isValidEmail($email))
+        if (!Util::isValidEmail($this->_post['email']))
             return Lang::$account['emailInvalid'];
 
         // check ip
@@ -401,18 +407,18 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         }
 
         // username taken
-        if ($_ = DB::Aowow()->SelectCell('SELECT user FROM ?_account WHERE (user = ? OR email = ?) AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $username, $email, ACC_STATUS_NEW, ACC_STATUS_NEW))
-            return $_ == $username ? Lang::$account['nameInUse'] : Lang::$account['mailInUse'];
+        if ($_ = DB::Aowow()->SelectCell('SELECT user FROM ?_account WHERE (user = ? OR email = ?) AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $this->_post['username'], $email, ACC_STATUS_NEW, ACC_STATUS_NEW))
+            return $_ == $this->_post['username'] ? Lang::$account['nameInUse'] : Lang::$account['mailInUse'];
 
         // create..
         $token = Util::createHash();
         $id = DB::Aowow()->query('REPLACE INTO ?_account (user, passHash, displayName, email, joindate, curIP, allowExpire, locale, status, statusTimer, token) VALUES (?, ?, ?, ?,  UNIX_TIMESTAMP(), ?, ?d, ?d, ?d, UNIX_TIMESTAMP() + ?d, ?)',
-            $username,
-            User::hashCrypt($_POST['password']),
-            Util::ucFirst($username),
-            $email,
+            $this->_post['username'],
+            User::hashCrypt($this->_post['password']),
+            Util::ucFirst($this->_post['username']),
+            $this->_post['email'],
             User::$ip,
-            $doExpire,
+            $this->_post['remember_me'] != 'yes',
             User::$localeId,
             ACC_STATUS_NEW,
             CFG_ACCOUNT_CREATE_SAVE_DECAY,
@@ -420,7 +426,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         );
         if (!$id)                                           // something went wrong
             return Lang::$main['intError'];
-        else if ($_ = $this->sendMail($email, Lang::$mail['accConfirm'][0], sprintf(Lang::$mail['accConfirm'][1], $token), CFG_ACCOUNT_CREATE_SAVE_DECAY))
+        else if ($_ = $this->sendMail(Lang::$mail['accConfirm'][0], sprintf(Lang::$mail['accConfirm'][1], $token), CFG_ACCOUNT_CREATE_SAVE_DECAY))
         {
             // success:: update ip-bans
             if (!$ip || $ip['unbanDate'] < time())
@@ -432,61 +438,63 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         }
     }
 
-    private function doRecoverPass($target)
+    private function doRecoverPass()
     {
-        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_PASS, $target, CFG_ACCOUNT_RECOVERY_DECAY, $token))
+        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_PASS, CFG_ACCOUNT_RECOVERY_DECAY, $token))
             return $_;
 
         // send recovery mail
-        return $this->sendMail($target, Lang::$mail['resetPass'][0], sprintf(Lang::$mail['resetPass'][1], $token), CFG_ACCOUNT_RECOVERY_DECAY);
+        return $this->sendMail(Lang::$mail['resetPass'][0], sprintf(Lang::$mail['resetPass'][1], $token), CFG_ACCOUNT_RECOVERY_DECAY);
     }
 
     private function doResetPass()
     {
-        $token = $_POST['token'];
-        $email = $_POST['email'];
-        $pass  = $_POST['password'];
-        $cPass = $_POST['c_password'];
-
-        if ($pass != $cPass)
+        if ($this->_post['password'] != $this->_post['c_password'])
             return Lang::$account['passCheckFail'];
 
-        $uRow = DB::Aowow()->selectRow('SELECT id, user, passHash FROM ?_account WHERE token = ? AND email = ? AND status = ?d AND statusTimer > UNIX_TIMESTAMP()', $token, $email, ACC_STATUS_RECOVER_PASS);
-        if (!$uRow)
+        if (!Util::isValidEmail($this->_post['email']))
+            return Lang::$account['emailInvalid'];
+
+        $uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE token = ? AND email = ? AND status = ?d AND statusTimer > UNIX_TIMESTAMP()',
+            $this->_post['token'],
+            $this->_post['email'],
+            ACC_STATUS_RECOVER_PASS
+        );
+        if (!$uId)
             return Lang::$account['emailNotFound'];         // assume they didn't meddle with the token
 
         if (!User::verifyCrypt($newPass))
             return Lang::$account['newPassDiff'];
 
-        if (!DB::Aowow()->query('UPDATE ?_account SET passHash = ?, status = ?d WHERE id = ?d', User::hashcrypt($newPass), ACC_STATUS_OK, $uRow['id']))
+        if (!DB::Aowow()->query('UPDATE ?_account SET passHash = ?, status = ?d WHERE id = ?d', User::hashcrypt($newPass), ACC_STATUS_OK, $uId))
             return Lang::$main['intError'];
     }
 
-    private function doRecoverUser($target)
+    private function doRecoverUser()
     {
-        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_USER, $target, CFG_ACCOUNT_RECOVERY_DECAY, $token))
+        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_USER, CFG_ACCOUNT_RECOVERY_DECAY, $token))
             return $_;
 
         // send recovery mail
-        return $this->sendMail($target, Lang::$mail['recoverUser'][0], sprintf(Lang::$mail['recoverUser'][1], $token), CFG_ACCOUNT_RECOVERY_DECAY);
+        return $this->sendMail(Lang::$mail['recoverUser'][0], sprintf(Lang::$mail['recoverUser'][1], $token), CFG_ACCOUNT_RECOVERY_DECAY);
     }
 
-    private function initRecovery($type, $target, $delay, &$token)
+    private function initRecovery($type, $delay, &$token)
     {
         if (!$type)
             return Lang::$main['intError'];
 
         // check if already processing
-        if ($_ = DB::Aowow()->selectCell('SELECT statusTimer - UNIX_TIMESTAMP() FROM ?_account WHERE email = ? AND status <> ?d AND statusTimer > UNIX_TIMESTAMP()', $target, ACC_STATUS_OK))
+        if ($_ = DB::Aowow()->selectCell('SELECT statusTimer - UNIX_TIMESTAMP() FROM ?_account WHERE email = ? AND status <> ?d AND statusTimer > UNIX_TIMESTAMP()', $this->_post['email'], ACC_STATUS_OK))
             return sprintf(lang::$account['isRecovering'], Util::formatTime($_ * 1000));
 
         // create new token and write to db
         $token = Util::createHash();
-        if (!DB::Aowow()->query('UPDATE ?_account SET token = ?, status = ?d, statusTimer =  UNIX_TIMESTAMP() + ?d WHERE email = ?', $token, $type, $delay, $target))
+        if (!DB::Aowow()->query('UPDATE ?_account SET token = ?, status = ?d, statusTimer =  UNIX_TIMESTAMP() + ?d WHERE email = ?', $token, $type, $delay, $this->_post['email']))
             return Lang::$main['intError'];
     }
 
-    private function sendMail($target, $subj, $msg, $delay = 300)
+    private function sendMail($subj, $msg, $delay = 300)
     {
         // send recovery mail
         $subj   = CFG_NAME_SHORT.Lang::$main['colon'] . $subj;
@@ -495,7 +503,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
                   'Reply-To: '.CFG_CONTACT_EMAIL . "\r\n" .
                   'X-Mailer: PHP/' . phpversion();
 
-        if (!mail($target, $subj, $msg, $header))
+        if (!mail($this->_post['email'], $subj, $msg, $header))
             return sprintf(Lang::$main['intError2'], 'send mail');
     }
 

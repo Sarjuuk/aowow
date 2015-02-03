@@ -13,13 +13,10 @@ class CreatureList extends BaseType
 
     protected     $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
     public        $queryOpts = array(
-                        'ct'     => [['ft', 'clsMin', 'clsMax', 'qse']],
+                        'ct'     => [['ft', 'qse']],
                         'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.faction', 's' => ', ft.A, ft.H, ft.factionId'],
-                        'clsMin' => ['j' => 'creature_classlevelstats clsMin ON ct.unitClass = clsMin.class AND ct.minLevel = clsMin.level', 's' => ', clsMin.attackpower AS mleAtkPwrMin, clsMin.rangedattackpower AS rngAtkPwrMin, clsMin.baseArmor * ct.armorMod AS armorMin, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) AS dmgMin, (CASE ct.exp WHEN 0 THEN clsMin.basehp0 WHEN 1 THEN clsMin.basehp1 ELSE clsMin.basehp2 END) * ct.healthMod AS healthMin, clsMin.baseMana * ct.manaMod AS manaMin'],
-                        'clsMax' => ['j' => 'creature_classlevelstats clsMax ON ct.unitClass = clsMax.class AND ct.maxLevel = clsMax.level', 's' => ', clsMax.attackpower AS mleAtkPwrMax, clsMax.rangedattackpower AS rngAtkPwrMax, clsMax.baseArmor * ct.armorMod AS armorMax, (CASE ct.exp WHEN 0 THEN clsMin.damage_base WHEN 1 THEN clsMin.damage_exp1 ELSE clsMin.damage_exp2 END) AS dmgMax, (CASE ct.exp WHEN 0 THEN clsMax.basehp0 WHEN 1 THEN clsMax.basehp1 ELSE clsMax.basehp2 END) * ct.healthMod AS healthMax, clsMax.baseMana * ct.manaMod AS manaMax'],
                         'qse'    => ['j' => ['?_quests_startend qse ON qse.type = 1 AND qse.typeId = ct.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'ct.id'],
                         'qt'     => ['j' => '?_quests qt ON qse.questId = qt.id'],
-                        'rep'    => ['j' => ['creature_onkill_reputation rep ON rep.creature_id = ct.id', true]],
                         's'      => ['j' => '?_spawns s ON s.type = 1 AND s.typeId = ct.id']
                     );
 
@@ -48,19 +45,7 @@ class CreatureList extends BaseType
 
     public static function getName($id)
     {
-        $n = DB::Aowow()->SelectRow('
-            SELECT
-                name_loc0,
-                name_loc2,
-                name_loc3,
-                name_loc6,
-                name_loc8
-            FROM
-                ?_creature
-            WHERE
-                id = ?d',
-            $id
-        );
+        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE id = ?d', $id);
         return Util::localizedString($n, 'name');
     }
 
@@ -134,6 +119,7 @@ class CreatureList extends BaseType
 
     public function getBaseStats($type)
     {
+        // i'm aware of the BaseVariance/RangedVariance fields ... i'm just totaly unsure about the whole damage calculation
         switch ($type)
         {
             case 'health':
@@ -171,7 +157,7 @@ class CreatureList extends BaseType
         /* looks like this data differs per occasion
         *
         * NPCINFO_TAMEABLE (0x1): include texture & react
-        * NPCINFO_MODEL (0x2):
+        * NPCINFO_MODEL    (0x2):
         */
 
         $data = [];
@@ -325,20 +311,19 @@ class CreatureListFilter extends Filter
                 switch ($cr[1])
                 {
                     case '=':                               // min > max is totally possible
-                        $this->extraOpts['clsMin']['h'][] = 'IF(healthMin > healthMax, healthMax, healthMin) <= '.$cr[2];
-                        $this->extraOpts['clsMax']['h'][] = 'IF(healthMin > healthMax, healthMin, healthMax) >= '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'healthMin = healthMax AND healthMin = '.$cr[2];
                         break;
                     case '>':
-                        $this->extraOpts['clsMin']['h'][] = 'IF(healthMin > healthMax, healthMax, healthMin) > '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'IF(healthMin > healthMax, healthMax, healthMin) > '.$cr[2];
                         break;
                     case '>=':
-                        $this->extraOpts['clsMin']['h'][] = 'IF(healthMin > healthMax, healthMax, healthMin) >= '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'IF(healthMin > healthMax, healthMax, healthMin) >= '.$cr[2];
                         break;
                     case '<':
-                        $this->extraOpts['clsMax']['h'][] = 'IF(healthMin > healthMax, healthMin, healthMax) < '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'IF(healthMin > healthMax, healthMin, healthMax) < '.$cr[2];
                         break;
                     case '<=':
-                        $this->extraOpts['clsMax']['h'][] = 'IF(healthMin > healthMax, healthMin, healthMax) <= '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'IF(healthMin > healthMax, healthMin, healthMax) <= '.$cr[2];
                         break;
                 }
                 return [1];                                 // always true, use post-filter
@@ -350,20 +335,19 @@ class CreatureListFilter extends Filter
                 switch ($cr[1])
                 {
                     case '=':
-                        $this->extraOpts['clsMin']['h'][] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
-                        $this->extraOpts['clsMax']['h'][] = 'IF(manaMin > manaMax, manaMin, manaMax) => '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'manaMin = manaMax AND manaMin = '.$cr[2];
                         break;
                     case '>':
-                        $this->extraOpts['clsMax']['h'][] = 'IF(manaMin > manaMax, manaMin, manaMax) > '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'IF(manaMin > manaMax, manaMin, manaMax) > '.$cr[2];
                         break;
                     case '>=':
-                        $this->extraOpts['clsMax']['h'][] = 'IF(manaMin > manaMax, manaMin, manaMax) >= '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'IF(manaMin > manaMax, manaMin, manaMax) >= '.$cr[2];
                         break;
                     case '<':
-                        $this->extraOpts['clsMin']['h'][] = 'IF(manaMin > manaMax, manaMax, manaMin) < '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'IF(manaMin > manaMax, manaMax, manaMin) < '.$cr[2];
                         break;
                     case '<=':
-                        $this->extraOpts['clsMin']['h'][] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
+                        $this->extraOpts['ct']['h'][] = 'IF(manaMin > manaMax, manaMax, manaMin) <= '.$cr[2];
                         break;
                 }
                 return [1];                                 // always true, use post-filter
@@ -419,29 +403,42 @@ class CreatureListFilter extends Filter
 
                 if ($cr[1] == FILTER_ENUM_ANY)
                 {
-                    $cGuids = DB::Aowow()->selectCol('SELECT DISTINCT gec.guid FROM game_event_creature gec JOIN ?_events e ON e.id = ABS(gec.eventEntry) WHERE e.holidayId <> 0');
+                    $eventIds = DB::Aowow()->selectCol('SELECT id FROM ?_events WHERE holidayId <> 0');
+                    $cGuids   = DB::World()->selectCol('SELECT DISTINCT guid FROM game_event_creature WHERE eventEntry IN (?a)', $eventIds);
                     return ['s.guid', $cGuids];
                 }
                 else if ($cr[1] == FILTER_ENUM_NONE)
                 {
-                    $cGuids = DB::Aowow()->selectCol('SELECT DISTINCT gec.guid FROM game_event_creature gec JOIN ?_events e ON e.id = ABS(gec.eventEntry) WHERE e.holidayId <> 0');
+                    $eventIds = DB::Aowow()->selectCol('SELECT id FROM ?_events WHERE holidayId <> 0');
+                    $cGuids   = DB::World()->selectCol('SELECT DISTINCT guid FROM game_event_creature WHERE eventEntry IN (?a)', $eventIds);
                     return ['s.guid', $cGuids, '!'];
                 }
                 else if ($cr[1])
                 {
-                    $cGuids = DB::Aowow()->selectCol('SELECT DISTINCT gec.guid FROM game_event_creature gec JOIN ?_events e ON e.id = ABS(gec.eventEntry) WHERE e.holidayId = ?d', $cr[1]);
+                    $eventIds = DB::Aowow()->selectCol('SELECT id FROM ?_events WHERE holidayId = ?d', $cr[1]);
+                    $cGuids   = DB::World()->selectCol('SELECT DISTINCT guid FROM game_event_creature WHERE eventEntry IN (?a)', $eventIds);
                     return ['s.guid', $cGuids];
                 }
 
                 break;
             case 42:                                        // increasesrepwith [enum]
                 if (in_array($cr[1], $this->enums[3]))      // reuse
-                    return ['OR', ['AND', ['rep.RewOnKillRepFaction1', $cr[1]], ['rep.RewOnKillRepValue1', 0, '>']], ['AND', ['rep.RewOnKillRepFaction2', $cr[1]], ['rep.RewOnKillRepValue2', 0, '>']]];
+                {
+                    if ($cIds = DB::World()->selectCol('SELECT creature_id FROM creature_onkill_reputation WHERE (RewOnKillRepFaction1 = ?d AND RewOnKillRepValue1 > 0) OR (RewOnKillRepFaction2 = ?d AND RewOnKillRepValue2 > 0)', $cr[1], $cr[1]))
+                        return ['id', $cIds];
+                    else
+                        return [0];
+                }
 
                 break;
             case 43:                                        // decreasesrepwith [enum]
                 if (in_array($cr[1], $this->enums[3]))      // reuse
-                    return ['OR', ['AND', ['rep.RewOnKillRepFaction1', $cr[1]], ['rep.RewOnKillRepValue1', 0, '<']], ['AND', ['rep.RewOnKillRepFaction2', $cr[1]], ['rep.RewOnKillRepValue2', 0, '<']]];
+                {
+                    if ($cIds = DB::World()->selectCol('SELECT creature_id FROM creature_onkill_reputation WHERE (RewOnKillRepFaction1 = ?d AND RewOnKillRepValue1 < 0) OR (RewOnKillRepFaction2 = ?d AND RewOnKillRepValue2 < 0)', $cr[1], $cr[1]))
+                        return ['id', $cIds];
+                    else
+                        return [0];
+                }
 
                 break;
             case 12:                                        // averagemoneydropped [op] [int]

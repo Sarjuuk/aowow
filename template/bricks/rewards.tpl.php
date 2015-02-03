@@ -28,7 +28,7 @@ if ($rewards):
                 <script type="text/javascript">//<![CDATA[
 <?php
     foreach ($rewards as $k => $i):
-        echo '                    $WH.ge(\'icontab-icon'.($k + 1 + $offset).'\').appendChild('.$i['globalStr'].'.createIcon('.$i['id'].', 1, '.(@$i['qty'] ?: 0)."));\n";
+        echo '                    $WH.ge(\'icontab-icon'.($k + 1 + $offset).'\').appendChild('.$i['globalStr'].'.createIcon('.$i['id'].', 1, '.(empty($i['qty']) ? 0 : $i['qty'])."));\n";
     endforeach;
 ?>
                 //]]></script>

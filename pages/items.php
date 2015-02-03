@@ -108,7 +108,7 @@ class ItemsPage extends GenericPage
             $conditions[] = $_;
 
         $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
-        $this->filter['query'] = @$_GET['filter'] ?: NULL;
+        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
         $this->filter['fi']    =  $this->filterObj->getForm();
 
         $menu = $this->createExtraMenus();
@@ -213,7 +213,7 @@ class ItemsPage extends GenericPage
         );
         $groups     = [];
         $nameSource = [];
-        $grouping   = @$this->filter['gb'];
+        $grouping   = isset($this->filter['gb']) ? $this->filter['gb'] : null;
         $extraOpts  = [];
         $maxResults = CFG_SQL_LIMIT_DEFAULT;
 
@@ -438,9 +438,9 @@ class ItemsPage extends GenericPage
         if (!$this->category)
             return;
 
-        if (isset($this->category[2]))
+        if (isset($this->category[2]) && is_array(Lang::$item['cat'][$this->category[0]][1][$this->category[1]]))
             $tPart = Lang::$item['cat'][$this->category[0]][1][$this->category[1]][1][$this->category[2]];
-        else if (isset($this->category[1]))
+        else if (isset($this->category[1]) && is_array(Lang::$item['cat'][$this->category[0]]))
             $tPart = Lang::$item['cat'][$this->category[0]][1][$this->category[1]];
         else
             $tPart = Lang::$item['cat'][$this->category[0]];
@@ -453,10 +453,10 @@ class ItemsPage extends GenericPage
         foreach ($this->category as $c)
             $this->path[] = $c;
 
-    // if slot-dropdown is available && Armor && $path points to Armor-Class
-    $form = $this->filterObj->getForm('form');
-    if (count($this->path) == 4 && $this->category[0] == 4 && isset($form['sl']) && !is_array($form['sl']))
-        $this->path[] = $form['sl'];
+        // if slot-dropdown is available && Armor && $path points to Armor-Class
+        $form = $this->filterObj->getForm('form');
+        if (count($this->path) == 4 && $this->category[0] == 4 && isset($form['sl']) && !is_array($form['sl']))
+            $this->path[] = $form['sl'];
     }
 
     // fetch best possible gems for chosen weights
@@ -524,9 +524,9 @@ class ItemsPage extends GenericPage
         }
         else
         {
-            if (isset($this->category[2]))
+            if (isset($this->category[2]) && is_array(Lang::$item['cat'][$this->category[0]][1][$this->category[1]]))
                 $catList = Lang::$item['cat'][$this->category[0]][1][$this->category[1]][1][$this->category[2]];
-            else if (isset($this->category[1]))
+            else if (isset($this->category[1]) && is_array(Lang::$item['cat'][$this->category[0]]))
                 $catList = Lang::$item['cat'][$this->category[0]][1][$this->category[1]];
             else
                 $catList = Lang::$item['cat'][$this->category[0]];

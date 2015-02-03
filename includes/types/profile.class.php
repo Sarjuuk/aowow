@@ -166,7 +166,7 @@ class ProfileList extends BaseType
     private function getTalentDistribution()
     {
         if (!empty($this->tDistribution))
-            $this->tDistribution[$this->curTpl['classId']] = DB::Aowow()->selectCol('SELECT COUNT(t.id) FROM dbc.talent t JOIN dbc.talenttab tt ON t.tabId = tt.id WHERE tt.classMask & ?d GROUP BY tt.id ORDER BY tt.tabNumber ASC', 1 << ($this->curTpl['classId'] - 1));
+            $this->tDistribution[$this->curTpl['classId']] = DB::Aowow()->selectCol('SELECT COUNT(t.id) FROM dbc_talent t JOIN dbc_talenttab tt ON t.tabId = tt.id WHERE tt.classMask & ?d GROUP BY tt.id ORDER BY tt.tabNumber ASC', 1 << ($this->curTpl['classId'] - 1));
 
         $result = [];
         $start  = 0;

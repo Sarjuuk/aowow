@@ -95,13 +95,13 @@ if (!defined('AOWOW_REVISION'))
                 'ui-paperdoll-slot-waist'         => 'inventoryslot_waist',
                 'ui-paperdoll-slot-wrists'        => 'inventoryslot_wrists'
             ),
-            3 => array(
-                ['race_human_male',    'race_dwarf_male',    'race_gnome_male',   'race_nightelf_male',   'race_draenai_male'   ],
-                ['race_tauren_male',   'race_undead_male',   'race_troll_male',   'race_orc_male',        'race_bloodelf_male'  ],
-                ['race_human_female',  'race_dwarf_female',  'race_gnome_female', 'race_nightelf_female', 'race_draenai_female' ],
-                ['race_tauren_female', 'race_undead_female', 'race_troll_female', 'race_orc_female',      'race_bloodelf_female']
+            3 => array(                                     // uses nameINT from ChrRaces.dbc
+                ['race_human_male',    'race_dwarf_male',     'race_gnome_male',   'race_nightelf_male',   'race_draenei_male'   ],
+                ['race_tauren_male',   'race_scourge_male',   'race_troll_male',   'race_orc_male',        'race_bloodelf_male'  ],
+                ['race_human_female',  'race_dwarf_female',   'race_gnome_female', 'race_nightelf_female', 'race_draenei_female' ],
+                ['race_tauren_female', 'race_scourge_female', 'race_troll_female', 'race_orc_female',      'race_bloodelf_female']
             ),
-            4 => array(
+            4 => array(                                     // uses nameINT from ChrClasses.dbc
                 ['class_warrior', 'class_mage',       'class_rogue',  'class_druid'  ],
                 ['class_hunter',  'class_shaman',     'class_priest', 'class_warlock'],
                 ['class_paladin', 'class_deathknight'                                ]

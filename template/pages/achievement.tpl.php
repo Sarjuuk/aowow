@@ -39,12 +39,12 @@ foreach ($this->criteria['data'] as $i => $cr):
 
     echo '</th><td>';
 
-    if ($l = @$cr['link']):
-        echo '<a href="'.$l['href'].'"'.(isset($l['quality']) ? ' class="q'.$l['quality'].'"' : null).'>'.Util::htmlEscape($l['text']).'</a>';
+    if (!empty($cr['link'])):
+        echo '<a href="'.$cr['link']['href'].'"'.(isset($cr['link']['quality']) ? ' class="q'.$cr['link']['quality'].'"' : null).'>'.Util::htmlEscape($cr['link']['text']).'</a>';
     endif;
 
-    if (!empty($l['count']) && $l['count'] > 1):
-        echo '&nbsp;('.$l['count'].')';
+    if (!empty($cr['link']['count']) && $cr['link']['count'] > 1):
+        echo '&nbsp;('.$cr['link']['count'].')';
     endif;
 
     if (isset($cr['extraText'])):
@@ -69,7 +69,7 @@ endforeach;
                 <script type="text/javascript">//<![CDATA[
 <?php
 foreach ($this->criteria['icons'] as $k => $ic):
-    echo '                    $WH.ge(\'iconlist-icon'.$ic['itr'].'\').appendChild('.$ic['type'].'.createIcon('.$ic['id'].', 0, '.(@$ic['count'] ?: 0)."));\n";
+    echo '                    $WH.ge(\'iconlist-icon'.$ic['itr'].'\').appendChild('.$ic['type'].'.createIcon('.$ic['id'].', 0, '.(!empty($ic['count']) ? $ic['count'] : 0)."));\n";
 endforeach;
 ?>
                 //]]></script>
@@ -98,6 +98,10 @@ if ($r = $this->rewards):
 endif;
 
 $this->brick('mail');
+
+if (!empty($this->transfer)):
+    echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
+endif;
 
 ?>
 

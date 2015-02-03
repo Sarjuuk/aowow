@@ -368,8 +368,11 @@ class QuestList extends BaseType
                     $data[TYPE_TITLE][$this->curTpl['rewardTitleId']] = $this->curTpl['rewardTitleId'];
 
                 // currencies
-                if ($_ = @$this->rewards[$this->id][TYPE_CURRENCY])
+                if (!empty($this->rewards[$this->id][TYPE_CURRENCY]))
+                {
+                    $_ = $this->rewards[$this->id][TYPE_CURRENCY];
                     $data[TYPE_CURRENCY] = array_combine(array_keys($_), array_keys($_));
+                }
             }
 
             if ($addMask & GLOBALINFO_SELF)
@@ -509,7 +512,7 @@ class QuestListFilter extends Filter
 
                 break;
             case 37:                                        // classspecific [enum]
-                $_ = @$this->enums[$cr[0]][$cr[1]];
+                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
                 if ($_ !== null)
                 {
                     if ($_ === true)
@@ -521,7 +524,7 @@ class QuestListFilter extends Filter
                 }
                 break;
             case 38:                                        // racespecific [enum]
-                $_ = @$this->enums[$cr[0]][$cr[1]];
+                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
                 if ($_ !== null)
                 {
                     if ($_ === true)

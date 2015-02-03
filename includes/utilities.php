@@ -711,7 +711,7 @@ class Util
         $notes = [];
 
         foreach (self::$notes as $data)
-            if (!$restricted || ($data[0] && User::isInGroup($data[0])))
+            if (!$restricted || !$data[0] || User::isInGroup($data[0]))
                 $notes[] = $data[1];
 
         return $notes;
@@ -1164,49 +1164,57 @@ class Util
                 switch ($e['type'.$h])
                 {
                     case 2:
-                        @$jsonStats[ITEM_MOD_WEAPON_DMG] += $val;
+                        $obj = ITEM_MOD_WEAPON_DMG;
                         break;
                     case 3:
                     case 7:
-                        $spl   = new SpellList(array(['s.id', $obj]));
+                        $spl = new SpellList(array(['s.id', $obj]));
                         if ($spl->error)
                             break;
 
-                        $gains = $spl->getStatGain();
-
-                        foreach ($gains as $gain)
-                            foreach ($gain as $k => $v)         // array_merge screws up somehow...
-                                @$jsonStats[$k] += $v;
+                        Util::arraySumByKey($jsonStats, $spl->getStatGain()[$obj]);
+                        $obj = null;
                         break;
                     case 4:
                         switch ($obj)
                         {
-                            case 0:                             // Physical
-                                @$jsonStats[ITEM_MOD_ARMOR] += $val;
+                            case 0:                         // Physical
+                                $obj = ITEM_MOD_ARMOR;
                                 break;
-                            case 1:                             // Holy
-                                @$jsonStats[ITEM_MOD_HOLY_RESISTANCE] += $val;
+                            case 1:                         // Holy
+                                $obj = ITEM_MOD_HOLY_RESISTANCE;
                                 break;
-                            case 2:                             // Fire
-                                @$jsonStats[ITEM_MOD_FIRE_RESISTANCE] += $val;
+                            case 2:                         // Fire
+                                $obj = ITEM_MOD_FIRE_RESISTANCE;
                                 break;
-                            case 3:                             // Nature
-                                @$jsonStats[ITEM_MOD_NATURE_RESISTANCE] += $val;
+                            case 3:                         // Nature
+                                $obj = ITEM_MOD_NATURE_RESISTANCE;
                                 break;
-                            case 4:                             // Frost
-                                @$jsonStats[ITEM_MOD_FROST_RESISTANCE] += $val;
+                            case 4:                         // Frost
+                                $obj = ITEM_MOD_FROST_RESISTANCE;
                                 break;
-                            case 5:                             // Shadow
-                                @$jsonStats[ITEM_MOD_SHADOW_RESISTANCE] += $val;
+                            case 5:                         // Shadow
+                                $obj = ITEM_MOD_SHADOW_RESISTANCE;
                                 break;
-                            case 6:                             // Arcane
-                                @$jsonStats[ITEM_MOD_ARCANE_RESISTANCE] += $val;
+                            case 6:                         // Arcane
+                                $obj = ITEM_MOD_ARCANE_RESISTANCE;
                                 break;
+                            default:
+                                $obj = null;
                         }
                         break;
                     case 5:
-                        @$jsonStats[$obj] += $val;
                         break;
+                    default:                                // skip assignment below
+                        $obj = null;
+                }
+
+                if ($obj)
+                {
+                    if (!isset($jsonStats[$obj]))
+                        $jsonStats[$obj] = 0;
+
+                    $jsonStats[$obj] += $val;
                 }
             }
 
@@ -1321,8 +1329,8 @@ class Util
 
         // note: omits required spell and chance in skill_discovery_template
         $data = array_merge(
-            DB::Aowow()->selectCol('SELECT spellId FROM spell_learn_spell WHERE entry IN (?a)', $lookup),
-            DB::Aowow()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell IN (?a)', $lookup),
+            DB::World()->selectCol('SELECT spellId FROM spell_learn_spell WHERE entry IN (?a)', $lookup),
+            DB::World()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell IN (?a)', $lookup),
             $extraIds
         );
 
@@ -1570,8 +1578,8 @@ class Util
         if (empty(self::$alphaMapCache[$areaId]))
             self::$alphaMapCache[$areaId] = imagecreatefrompng($file);
 
-        // alphaMaps are 1000 x 1000, adapt points [0 => black => valid point]
-        if (imagecolorat(self::$alphaMapCache[$areaId], $set['posX'] * 10, $set['posY'] * 10))
+        // alphaMaps are 1000 x 1000, adapt points [black => valid point]
+        if (!imagecolorat(self::$alphaMapCache[$areaId], $set['posX'] * 10, $set['posY'] * 10))
             $set = null;
 
         return true;
@@ -1585,7 +1593,7 @@ class Util
         $result    = [];
         $jsGlobals = [];
 
-        $conditions = DB::Aowow()->select(
+        $conditions = DB::World()->select(
             'SELECT  SourceTypeOrReferenceId, SourceEntry, SourceGroup, ElseGroup,
                      ConditionTypeOrReference, ConditionTarget, ConditionValue1, ConditionValue2, ConditionValue3, NegativeCondition
             FROM     conditions

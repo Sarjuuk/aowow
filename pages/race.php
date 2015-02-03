@@ -46,10 +46,10 @@ class RacePage extends GenericPage
         $infobox      = [];
         $_mask        = 1 << ($this->typeId - 1);
         $mountVendors = array(                              // race => [starter, argent tournament]
-                            null,           [384,   33307], [3362,  33553], [1261,  33310],
-                            [4730,  33653], [4731,  33555], [3685,  33556], [7955,  33650],
-                            [7952,  33554], null,           [16264, 33557], [17584, 33657]
-                        );
+            null,           [384,   33307], [3362,  33553], [1261,  33310],
+            [4730,  33653], [4731,  33555], [3685,  33556], [7955,  33650],
+            [7952,  33554], null,           [16264, 33557], [17584, 33657]
+        );
 
         /***********/
         /* Infobox */
@@ -178,7 +178,7 @@ class RacePage extends GenericPage
 
         // Mounts
         // ok, this sucks, but i rather hardcode the trainer, than fetch items by namepart
-        $items = isset($mountVendors[$this->typeId]) ? DB::Aowow()->selectCol('SELECT item FROM npc_vendor WHERE entry IN (?a)', $mountVendors[$this->typeId]) : 0;
+        $items = isset($mountVendors[$this->typeId]) ? DB::World()->selectCol('SELECT item FROM npc_vendor WHERE entry IN (?a)', $mountVendors[$this->typeId]) : 0;
 
         $conditions = array(
             ['i.id', $items],

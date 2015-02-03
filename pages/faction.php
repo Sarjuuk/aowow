@@ -48,6 +48,8 @@ class FactionPage extends GenericPage
 
     protected function generateContent()
     {
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         /***********/
         /* Infobox */
         /***********/
@@ -91,7 +93,7 @@ class FactionPage extends GenericPage
 
         // Spillover Effects
         /* todo (low): also check on reputation_spillover_template (but its data is identical to calculation below
-        $rst = DB::Aowow()->selectRow('SELECT
+        $rst = DB::World()->selectRow('SELECT
             CONCAT_WS(" ", faction1, faction2, faction3, faction4) AS faction,
             CONCAT_WS(" ", rate_1,   rate_2,   rate_3,   rate_4)   AS rate,
             CONCAT_WS(" ", rank_1,   rank_2,   rank_3,   rank_4)   AS rank
@@ -100,14 +102,14 @@ class FactionPage extends GenericPage
 
 
         $conditions = array(
-            ['id', $this->typeId, '!'],                              // not self
+            ['id', $this->typeId, '!'],                     // not self
             ['reputationIndex', -1, '!']                    // only gainable
         );
 
-        if ($p = $this->subject->getField('parentFactionId'))     // linked via parent
+        if ($p = $this->subject->getField('parentFactionId')) // linked via parent
             $conditions[] = ['OR', ['id', $p], ['parentFactionId', $p]];
-        else
-            $conditions[] = ['parentFactionId', $this->typeId];      // self as parent
+        else                                                // self as parent
+            $conditions[] = ['parentFactionId', $this->typeId];
 
         $spillover = new FactionList($conditions);
         $this->extendGlobalData($spillover->getJSGlobals());
@@ -121,8 +123,8 @@ class FactionPage extends GenericPage
             $this->extraText .= '[h3 class=clear]'.Lang::$faction['spillover'].'[/h3][div margin=15px]'.Lang::$faction['spilloverDesc'].'[/div][table class=grid width=400px][tr][td width=150px][b]'.Util::ucFirst(Lang::$game['faction']).'[/b][/td][td width=100px][b]'.Lang::$spell['_value'].'[/b][/td][td width=150px][b]'.Lang::$faction['maxStanding'].'[/b][/td][/tr]'.$buff.'[/table]';
 
 
-        // reward rates
-        if ($rates = DB::Aowow()->selectRow('SELECT * FROM reputation_reward_rate WHERE faction = ?d', $this->typeId))
+        // reward rates (ultimately this should be calculated into each reward display)
+        if ($rates = DB::World()->selectRow('SELECT * FROM reputation_reward_rate WHERE faction = ?d', $this->typeId))
         {
             $buff = '';
             foreach ($rates as $k => $v)
@@ -140,14 +142,28 @@ class FactionPage extends GenericPage
                     case 'spell_rate':          $buff .= '[tr][td]'.Lang::$game['spells'].Lang::$main['colon'].'[/td]';                                  break;
                 }
 
-                $buff .= '[td width=30px align=right]x'.number_format($v, 1).'[/td][/tr]';
+                $buff .= '[td width=35px align=right][span class=q'.($v < 1 ? '10]' : '2]+').intVal(($v - 1) * 100).'%[/span][/td][/tr]';
             }
 
             if ($buff)
-                $this->extraText .= '[h3 class=clear][Custom Reward Rate][/h3][table]'.$buff.'[/table]';
+                $this->extraText .= '[h3 class=clear]'.Lang::faction('customRewRate').'[/h3][table]'.$buff.'[/table]';
         }
 
-        // todo (low): create pendant from player_factionchange_reputations
+        // factionchange-equivalent
+        if ($pendant = DB::World()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_reputations WHERE alliance_id = ?d OR horde_id = ?d', $this->typeId, $this->typeId, $this->typeId))
+        {
+            $altFac = new FactionList(array(['id', abs($pendant)]));
+            if (!$altFac->error)
+            {
+                $this->transfer = sprintf(
+                    Lang::faction('_transfer'),
+                    $altFac->id,
+                    $altFac->getField('name', true),
+                    $pendant > 0 ? 'alliance' : 'horde',
+                    $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                );
+            }
+        }
 
         /**************/
         /* Extra Tabs */
@@ -178,11 +194,12 @@ class FactionPage extends GenericPage
         // tab: creatures with onKill reputation
         if ($this->subject->getField('reputationIndex') != -1)        // only if you can actually gain reputation by kills
         {
-            $cIds = DB::Aowow()->selectCol('SELECT DISTINCT cor.creature_id FROM creature_onkill_reputation cor, ?_factions f WHERE
-                (cor.RewOnKillRepValue1 > 0 AND (cor.RewOnKillRepFaction1 = ?d OR (cor.RewOnKillRepFaction1 = f.id AND f.parentFactionId = ?d AND cor.IsTeamAward1 <> 0))) OR
-                (cor.RewOnKillRepValue2 > 0 AND (cor.RewOnKillRepFaction2 = ?d OR (cor.RewOnKillRepFaction2 = f.id AND f.parentFactionId = ?d AND cor.IsTeamAward2 <> 0)))',
-                $this->typeId, $this->subject->getField('parentFactionId'),
-                $this->typeId, $this->subject->getField('parentFactionId')
+            // inherit siblings/children from $spillover
+            $cIds = DB::World()->selectCol('SELECT DISTINCT creature_id FROM creature_onkill_reputation WHERE
+                (RewOnKillRepValue1 > 0 AND (RewOnKillRepFaction1 = ?d OR (RewOnKillRepFaction1 IN (?a) AND IsTeamAward1 <> 0))) OR
+                (RewOnKillRepValue2 > 0 AND (RewOnKillRepFaction2 = ?d OR (RewOnKillRepFaction2 IN (?a) AND IsTeamAward2 <> 0)))',
+                $this->typeId, $spillover->getFoundIDs(),
+                $this->typeId, $spillover->getFoundIDs()
             );
 
             if ($cIds)

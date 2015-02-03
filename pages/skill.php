@@ -246,8 +246,8 @@ class SkillPage extends GenericPage
         if (in_array($this->cat, [-5, 6, 7, 8, 9, 11]))
         {
             $list = [];
-            if (@$tt = Util::$trainerTemplates[TYPE_SKILL][$this->typeId])
-                $list = DB::Aowow()->selectCol('SELECT DISTINCT entry FROM npc_trainer WHERE spell IN (?a) AND entry < 200000', $tt);
+            if (!empty(Util::$trainerTemplates[TYPE_SKILL][$this->typeId]))
+                $list = DB::World()->selectCol('SELECT DISTINCT entry FROM npc_trainer WHERE spell IN (?a) AND entry < 200000', Util::$trainerTemplates[TYPE_SKILL][$this->typeId]);
             else
             {
                 $mask = 0;
@@ -255,19 +255,26 @@ class SkillPage extends GenericPage
                     if ($pair[1] == $this->typeId)
                         $mask |= 1 << $idx;
 
-                $list = DB::Aowow()->selectCol('
+                $spellIds = DB::Aowow()->selectCol(
+                    'SELECT id FROM ?_spell WHERE typeCat IN (-11, 9) AND (skillLine1 = ?d OR (skillLine1 > 0 AND skillLine2OrMask = ?d) {OR (skillLine1 = -3 AND skillLine2OrMask = ?d)})',
+                    $this->typeId,
+                    $this->typeId,
+                    $mask ?: DBSIMPLE_SKIP
+                );
+
+                $list = $spellIds ? DB::World()->selectCol('
                     SELECT    IF(t1.entry > 200000, t2.entry, t1.entry)
                     FROM      npc_trainer t1
-                    JOIN      ?_spell s  ON s.id = t1.spell
                     LEFT JOIN npc_trainer t2 ON t2.spell = -t1.entry
-                    WHERE     s.typeCat IN (-11, 9) AND (s.skillLine1 = ?d OR (s.skillLine1 > 0 AND s.skillLine2OrMask = ?d) '.($mask ? ' OR (s.skilllIne1 = -3 AND s.skillLine2OrMask = '.$mask.')' : null).')',
-                    $this->typeId,
-                    $this->typeId
-                );
+                    WHERE     t1.spell IN (?a)',
+                    $spellIds
+                ) : [];
             }
 
             if ($list)
             {
+                $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
                 $trainer = new CreatureList(array(CFG_SQL_LIMIT_NONE, ['ct.id', $list], ['ct.spawns', 0, '>'], ['ct.npcflag', 0x10, '&']));
 
                 if (!$trainer->error)

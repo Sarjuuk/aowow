@@ -58,19 +58,7 @@ class GameObjectList extends BaseType
 
     public static function getName($id)
     {
-        $n = DB::Aowow()->SelectRow('
-            SELECT
-                name,
-                name_loc2,
-                name_loc3,
-                name_loc6,
-                name_loc8
-            FROM
-                ?_objects
-            WHERE
-                id = ?d',
-            $id
-        );
+        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_objects WHERE id = ?d', $id);
         return Util::localizedString($n, 'name');
     }
 
@@ -104,7 +92,7 @@ class GameObjectList extends BaseType
 
         $x  = '<table>';
         $x .= '<tr><td><b class="q">'.$this->getField('name', true).'</b></td></tr>';
-        if ($_ = @Lang::$gameObject['type'][$this->curTpl['typeCat']])
+        if ($_ = Lang::gameObject('type', $this->curTpl['typeCat']))
             $x .= '<tr><td>'.$_.'</td></tr>';
 
         if (isset($this->curTpl['lockId']))
@@ -216,23 +204,26 @@ class GameObjectListFilter extends Filter
                         return [1];
                 }
                 break;
-            case 16;                                        // relatedevent
+            case 16;                                        // relatedevent (ignore removed by event)
                 if (!$this->isSaneNumeric($cr[1]))
                     break;
 
                 if ($cr[1] == FILTER_ENUM_ANY)
                 {
-                    $goGuids = DB::Aowow()->selectCol('SELECT DISTINCT geo.guid FROM game_event_gameobject geo JOIN ?_events e ON e.id = ABS(geo.eventEntry) WHERE e.holidayId <> 0');
+                    $eventIds = DB::Aowow()->selectCol('SELECT id FROM ?_events WHERE holidayId <> 0');
+                    $goGuids  = DB::World()->selectCol('SELECT DISTINCT guid FROM game_event_gameobject WHERE eventEntry IN (?a)', $eventIds);
                     return ['s.guid', $goGuids];
                 }
                 else if ($cr[1] == FILTER_ENUM_NONE)
                 {
-                    $goGuids = DB::Aowow()->selectCol('SELECT DISTINCT geo.guid FROM game_event_gameobject geo JOIN ?_events e ON e.id = ABS(geo.eventEntry) WHERE e.holidayId <> 0');
+                    $eventIds = DB::Aowow()->selectCol('SELECT id FROM ?_events WHERE holidayId <> 0');
+                    $goGuids  = DB::World()->selectCol('SELECT DISTINCT guid FROM game_event_gameobject WHERE eventEntry IN (?a)', $eventIds);
                     return ['s.guid', $goGuids, '!'];
                 }
                 else if ($cr[1])
                 {
-                    $goGuids = DB::Aowow()->selectCol('SELECT DISTINCT geo.guid FROM game_event_gameobject geo JOIN ?_events e ON e.id = ABS(geo.eventEntry) WHERE e.holidayId = ?d', $cr[1]);
+                    $eventIds = DB::Aowow()->selectCol('SELECT id FROM ?_events WHERE holidayId = ?d', $cr[1]);
+                    $goGuids  = DB::World()->selectCol('SELECT DISTINCT guid FROM game_event_gameobject WHERE eventEntry IN (?a)', $eventIds);
                     return ['s.guid', $goGuids];
                 }
 

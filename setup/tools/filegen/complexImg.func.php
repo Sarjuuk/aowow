@@ -51,6 +51,7 @@ if (!defined('AOWOW_REVISION'))
 
         $mapWidth  = 1002;
         $mapHeight = 668;
+        $threshold = 95;                                    // alpha threshold to define subZones: set it too low and you have unspawnable areas inside a zone; set it too high and the border regions overlap
         $runTime   = ini_get('max_execution_time');
         $locStr    = null;
         $dbcPath   = FileGen::$srcDir.'%sDBFilesClient/';
@@ -69,9 +70,11 @@ if (!defined('AOWOW_REVISION'))
 
             $bgColor = imagecolorallocatealpha($img, 0, 0, 0, 127);
             imagefilledrectangle($img, 0, 0, imagesx($img) - 1, imagesy($img) - 1, $bgColor);
-            imagecolordeallocate($img, $bgColor);
 
+            imagecolortransparent($img, $bgColor);
             imagealphablending($img, true);
+
+            imagecolordeallocate($img, $bgColor);
 
             return $img;
         };
@@ -161,7 +164,7 @@ if (!defined('AOWOW_REVISION'))
             return $ok;
         };
 
-        $createSpawnMap = function($img, $zoneId) use ($mapHeight, $mapWidth)
+        $createSpawnMap = function($img, $zoneId) use ($mapHeight, $mapWidth, $threshold)
         {
             FileGen::status(' - creating spawn map');
 
@@ -174,7 +177,7 @@ if (!defined('AOWOW_REVISION'))
                 for ($x = 0; $x < 1000; $x++)
                 {
                     $a = imagecolorat($img, ($x * $mapWidth) / 1000, ($y * $mapHeight) / 1000) >> 24;
-                    imagesetpixel($tmp, $x, $y, $a < 30 ? $cfg : $cbg);
+                    imagesetpixel($tmp, $x, $y, $a < $threshold ? $cfg : $cbg);
                 }
             }
 
@@ -480,7 +483,7 @@ if (!defined('AOWOW_REVISION'))
 
                                         for ($my = 0; $my < imagesy($img); $my++)
                                             for ($mx = 0; $mx < imagesx($img); $mx++)
-                                                if ((imagecolorat($img, $mx, $my) >> 24) < 30)
+                                                if ((imagecolorat($img, $mx, $my) >> 24) < $threshold)
                                                     imagesetpixel($row['maskimage'], $x + $mx, $y + $my, $row['maskcolor']);
                                     }
 
@@ -566,7 +569,6 @@ if (!defined('AOWOW_REVISION'))
 
                         if (!$multiLeveled)
                         {
-                            imagecolortransparent($overlay, imagecolorat($overlay, imagesx($overlay)-1, imagesy($overlay)-1));
                             imagecopymerge($map, $overlay, 0, 0, 0, 0, imagesx($overlay), imagesy($overlay), 100);
                             imagedestroy($overlay);
                         }
@@ -635,7 +637,7 @@ if (!defined('AOWOW_REVISION'))
 
         if ($modeMask & 0x08)                               // optional tidbits (not used by default)
         {
-            if (FileGen::writeDir($destDir.'interface/Glues/Credits/'))
+            if (FileGen::writeDir($destDir.'Interface/Glues/Credits/'))
             {
                 // tile ordering
                 $order = array(
@@ -692,7 +694,7 @@ if (!defined('AOWOW_REVISION'))
 
                     $sum++;
                     $done = ' - '.str_pad($sum.'/'.$total, 8).str_pad('('.number_format($sum * 100 / $total, 2).'%)', 9);
-                    $name = $destDir.'interface/Glues/Credits/'.$file;
+                    $name = $destDir.'Interface/Glues/Credits/'.$file;
 
                     if (!isset(FileGen::$cliOpts['force']) && file_exists($name.'.png'))
                     {

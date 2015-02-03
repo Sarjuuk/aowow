@@ -23,7 +23,8 @@ class ScreenshotPage extends GenericPage
         parent::__construct($pageCall, $pageParam);
 
         $this->name    = Lang::$main['ssEdit'];
-        $this->caption = @$_POST['screenshotcaption'];      // do not htmlEscape. It's applied as textnode
+        // do not htmlEscape caption. It's applied as textnode
+        $this->caption = !empty($_POST['screenshotcaption']) ? $_POST['screenshotcaption'] : '';
 
         // what are its other uses..? (finalize is custom)
         if ($pageParam == 'finalize')
@@ -37,7 +38,7 @@ class ScreenshotPage extends GenericPage
         // get screenshot destination
         foreach ($_GET as $k => $v)
         {
-            if ($v)                                         // taret delivered as empty type.typeId key
+            if ($v)                                         // target delivered as empty type.typeId key
                 continue;
 
             $x = explode('_', $k);                          // . => _ as array key

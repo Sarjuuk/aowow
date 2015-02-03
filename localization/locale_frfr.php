@@ -380,7 +380,8 @@ $lang = array(
         'focusDesc'     => "[Spells requiring this Focus can be cast near this Object]",
         'trap'          => "Piège",
         'triggeredBy'   => "Déclenché par",
-        'capturePoint'  => "Point de capture"
+        'capturePoint'  => "Point de capture",
+        'restock'       => "[Restocks every %s.]"
     ),
     'npc' => array(
         'classification'=> "Classification",
@@ -433,7 +434,8 @@ $lang = array(
         'itemReward'    => "Vous recevrez",
         'titleReward'   => "Vous devriez recevoir le titre \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "tué",
-        'reqNumCrt'     => "Nécessite"
+        'reqNumCrt'     => "Nécessite",
+        '_transfer'     => 'Cet haut fait sera converti en <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
     ),
     'class' => array(
         'racialLeader'  => "Leader racial",
@@ -472,6 +474,8 @@ $lang = array(
         )
     ),
     'quest' => array(
+        '_transfer'     => 'Cette quête sera converti en <a href="?quest=%d" class="q1">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
+
         'questLevel'    => "Niveau %s",
         'requirements'  => "Conditions",
         'reqMoney'      => "Argent requis",
@@ -600,6 +604,7 @@ $lang = array(
         )
     ),
     'title' => array(
+        '_transfer'     => 'Ce titre sera converti en <a href="?title=%d" class="q1">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         'cat'           => array(
             "Général",      "Joueur ctr. Joueur",    "Réputation",       "Donjons & raids",     "Quêtes",       "Métiers",      "Évènements mondiaux"
         )
@@ -622,9 +627,11 @@ $lang = array(
     ),
     'faction' => array(
         'spillover'     => "[Reputation Spillover]",
-        'spilloverDesc' => "[Gaining Reputation with this faction also yields a proportional gain with the factions listed below.]",
+        'spilloverDesc' => "[Gaining reputation with this faction also yields a proportional gain with the factions listed below.]",
         'maxStanding'   => "Niveau maximum",
         'quartermaster' => "Intendant",
+        'customRewRate' => "[Custom Reward Rate]",
+        '_transfer'     => '[The reputation with this faction will be converted to <a href="?faction=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.]',
         'cat'           => array(
             1118 => ["Classique", 469 => "Alliance", 169 => "Cartel Gentepression", 67 => "Horde", 891 => "Forces de l'Alliance", 892 => "Forces de la Horde"],
             980  => ["The Burning Crusade", 936 => "Shattrath"],
@@ -676,7 +683,7 @@ $lang = array(
         '_inSlot'       => "dans l'emplacement",
         '_collapseAll'  => "Replier Tout",
         '_expandAll'    => "Déplier Tout",
-
+        '_transfer'     => 'Cet sort sera converti en <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         'discovered'    => "Appris via une découverte",
         'ppm'           => "%s déclenchements par minute",
         'procChance'    => "Chance",

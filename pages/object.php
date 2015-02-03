@@ -62,11 +62,15 @@ class ObjectPage extends GenericPage
 
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
-        // Event
-        if ($_ = DB::Aowow()->selectCell('SELECT IF(holidayId, holidayId, -e.id) FROM ?_events e, game_event_gameobject geg, gameobject g WHERE e.id = ABS(geg.eventEntry) AND g.guid = geg.guid AND g.id = ?d', $this->typeId))
+        // Event (ignore events, where the object only gets removed)
+        if ($_ = DB::World()->selectCol('SELECT DISTINCT IF(ge.holiday, ge.holiday, -ge.eventEntry) FROM game_event ge, game_event_gameobject geg, gameobject g WHERE ge.eventEntry = geg.eventEntry AND g.guid = geg.guid AND g.id = ?d', $this->typeId))
         {
             $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
-            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].'[event='.$_.']';
+            $ev = [];
+            foreach ($_ as $i => $e)
+                $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';
+
+            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].implode(',', $ev);
         }
 
         // Reaction
@@ -137,7 +141,7 @@ class ObjectPage extends GenericPage
                 $buff .= Lang::$game['valueDelim'].$_[1];
 
             // since Veins don't have charges anymore, the timer is questionable
-            $infobox[] = $_[2] > 1 ? '[tooltip name=restock][Recharges every '.Util::formatTime($_[2] * 1000).'][/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;
+            $infobox[] = $_[2] > 1 ? '[tooltip name=restock]'.sprintf(Lang::gameObject('restock'), Util::formatTime($_[2] * 1000)).'[/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;
         }
 
         // meeting stone [minLevel, maxLevel, zone]
@@ -202,7 +206,7 @@ class ObjectPage extends GenericPage
         {
             while ($next)
             {
-                $row = DB::Aowow()->selectRow('SELECT *, text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.entry = lpt.entry WHERE pt.entry = ?d', $next);
+                $row = DB::World()->selectRow('SELECT *, text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.entry = lpt.entry WHERE pt.entry = ?d', $next);
                 $next = $row['next_page'];
                 $pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
             }
@@ -460,7 +464,7 @@ class ObjectPage extends GenericPage
 
         $x  = '$WowheadPower.registerObject('.$this->typeId.', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip())."'\n";
+        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip())."',\n";
         $x .= "\tmap: ".($s ? Util::toJSON(['zone' => $s[0], 'coords' => [$s[1] => $s[2]]]) : '{}')."\n";
         $x .= "});";
 

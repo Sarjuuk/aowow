@@ -183,7 +183,23 @@ class AchievementPage extends GenericPage
 
         $this->rewards['text'] = $this->subject->getField('reward', true);
 
-        // todo (low): create pendant from player_factionchange_achievement
+        // factionchange-equivalent
+        if ($pendant = DB::World()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_achievement WHERE alliance_id = ?d OR horde_id = ?d', $this->typeId, $this->typeId, $this->typeId))
+        {
+            $altAcv = new AchievementList(array(['id', abs($pendant)]));
+            if (!$altAcv->error)
+            {
+                $this->transfer = sprintf(
+                    Lang::$achievement['_transfer'],
+                    $altAcv->id,
+                    1,                                      // quality
+                    $altAcv->getField('iconString'),
+                    $altAcv->getField('name', true),
+                    $pendant > 0 ? 'alliance' : 'horde',
+                    $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                );
+            }
+        }
 
         /**************/
         /* Extra Tabs */

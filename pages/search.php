@@ -78,7 +78,7 @@ class SearchPage extends GenericPage
             if ($_ = intVal($this->search))                 // allow for search by Id
                 $this->query = $_;
 
-            $type = @intVal($_GET['type']);
+            $type = isset($_GET['type']) ? intVal($_GET['type']) : 0;
 
             if (!empty($_GET['slots']))
                 $this->searchMask |= SEARCH_TYPE_JSON | 0x40;
@@ -249,19 +249,21 @@ class SearchPage extends GenericPage
 
         if (!$asError)
         {
-            if ($itemData = @$this->lvTabs[6]['data'])
+            // items
+            if (!empty($this->lvTabs[6]['data']))
             {
                 $items = [];
-                foreach ($itemData as $k => $v)
+                foreach ($this->lvTabs[6]['data'] as $k => $v)
                     $items[] = Util::toJSON($v);
 
                 $outItems = "\t".implode(",\n\t", $items)."\n";
             }
 
-            if ($setData = @$this->lvTabs[5]['data'])
+            // sets
+            if (!empty($this->lvTabs[5]['data']))
             {
                 $sets = [];
-                foreach ($setData as $k => $v)
+                foreach ($this->lvTabs[5]['data'] as $k => $v)
                 {
                     unset($v['quality']);
                     if (!$v['heroic'])
@@ -586,7 +588,7 @@ class SearchPage extends GenericPage
         if (($this->searchMask & SEARCH_TYPE_JSON) && ($this->searchMask & 0x20) && !empty($shared['pcsToSet']))
         {
             $cnd      = [['i.id', array_keys($shared['pcsToSet'])], CFG_SQL_LIMIT_NONE];
-            $miscData = ['pcsToSet' => @$shared['pcsToSet']];
+            $miscData = ['pcsToSet' => $shared['pcsToSet']];
         }
         else if (($this->searchMask & SEARCH_TYPE_JSON) && ($this->searchMask & 0x40))
         {
@@ -594,7 +596,7 @@ class SearchPage extends GenericPage
             $cnd[] = ['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]];
             $cnd[] = $cndAdd;
 
-            $slots = @explode(':', $_GET['slots']);
+            $slots = isset($_GET['slots']) ? explode(':', $_GET['slots']) : [];
             array_walk($slots, function(&$v, $k) { $v = intVal($v); });
             if ($_ = array_filter($slots))
                 $cnd[] = ['slot', $_];

@@ -25,9 +25,9 @@ class ItemList extends BaseType
 
     protected     $queryBase  = 'SELECT i.*, `is`.*, i.id AS id, i.id AS ARRAY_KEY FROM ?_items i';
     protected     $queryOpts  = array(
+                      'i'   => [['is', 'src'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
                       'is'  => ['j' => ['?_item_stats AS `is` ON `is`.`id` = `i`.`id`', true]],
                       's'   => ['j' => ['?_spell AS `s` ON s.effect1CreateItemId = i.id', true], 'g' => 'i.id'],
-                      'i'   => [['is', 'src'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
                       'src' => ['j' => ['?_source src ON type = 3 AND typeId = i.id', true], 's' => ', moreType, moreTypeId, src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
                   );
 
@@ -73,15 +73,7 @@ class ItemList extends BaseType
     // use if you JUST need the name
     public static function getName($id)
     {
-        $n = DB::Aowow()->selectRow('
-            SELECT
-                name_loc0, name_loc2, name_loc3, name_loc6, name_loc8
-            FROM
-                ?_items
-            WHERE
-                id = ?d',
-            $id
-        );
+        $n = DB::Aowow()->selectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_items WHERE id = ?d', $id);
         return Util::localizedString($n, 'name');
     }
 
@@ -91,53 +83,64 @@ class ItemList extends BaseType
     {
         if (empty($this->vendors))
         {
-            $ids = array_keys($this->templates);
-            $itemz = DB::Aowow()->select('
-                SELECT   nv.item AS ARRAY_KEY1, nv.entry AS ARRAY_KEY2,                                             0  AS eventId,   nv.maxcount, iec.* FROM            npc_vendor   nv                                                                                      LEFT JOIN ?_itemextendedcost iec ON   nv.extendedCost = iec.id                                                   WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
+            $itemz = DB::World()->select('
+                SELECT   nv.item AS ARRAY_KEY1, nv.entry AS ARRAY_KEY2,                                                    0  AS eventId,   nv.maxcount,   nv.extendedCost FROM            npc_vendor   nv                                                                                                  WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
                 UNION
-                SELECT genv.item AS ARRAY_KEY1,     c.id AS ARRAY_KEY2, IFNULL(IF(e.holidayId, e.holidayId, -e.id), 0) AS eventId, genv.maxcount, iec.* FROM game_event_npc_vendor genv JOIN creature c ON c.guid = genv.guid LEFT JOIN ?_events e ON genv.eventEntry = e.id LEFT JOIN ?_itemextendedcost iec ON genv.extendedCost = iec.id {JOIN creature c ON c.guid = genv.guid AND 1= ?d} WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
+                SELECT genv.item AS ARRAY_KEY1,     c.id AS ARRAY_KEY2, IFNULL(IF(ge.holiday, ge.holiday, -ge.eventEntry), 0) AS eventId, genv.maxcount, genv.extendedCost FROM game_event_npc_vendor genv LEFT JOIN game_event ge ON genv.eventEntry = ge.eventEntry JOIN creature c ON c.guid = genv.guid WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
                 empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
-                $ids,
-                empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : 1,
+                array_keys($this->templates),
                 empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
-                $ids
+                array_keys($this->templates)
             );
+
+            $xCosts = [];
+            foreach ($itemz as $i => $vendors)
+                $xCosts = array_merge($xCosts, array_column($vendors, 'extendedCost'));
+
+            if ($xCosts)
+                $xCosts = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_itemextendedcost WHERE id IN (?a)', $xCosts);
 
             $cItems = [];
             foreach ($itemz as $k => $vendors)
             {
-                foreach ($vendors as $l => $costs)
+                foreach ($vendors as $l => $vInfo)
                 {
-                    $data = array(
-                        'stock'  => $costs['maxcount'] ? $costs['maxcount'] : -1,
-                        'event'  => $costs['eventId'],
-                        'reqRtg' => $costs['reqPersonalRating']
+                    $costs = [];
+                    if (!empty($xCosts[$vInfo['extendedCost']]))
+                        $costs = $xCosts[$vInfo['extendedCost']];
+
+                    $data   = array(
+                        'stock'  => $vInfo['maxcount'] ?: -1,
+                        'event'  => $vInfo['eventId'],
+                        'reqRtg' => $costs ? $costs['reqPersonalRating'] : 0
                     );
 
-                    if ($_ = $this->getField('buyPrice'))   // somewhat nonsense.. is identical for all vendors (obviously)
-                        $data[0] = $_;
-
                     // hardcode arena(103) & honor(104)
-                    if ($_ = @$costs['reqArenaPoints'])
+                    if (!empty($costs['reqArenaPoints']))
                     {
-                        $data[-103] = $_;
+                        $data[-103] = $costs['reqArenaPoints'];
                         $this->jsGlobals[TYPE_CURRENCY][103] = 103;
                     }
 
-                    if ($_ = @$costs['reqHonorPoints'])
+                    if (!empty($costs['reqHonorPoints']))
                     {
-                        $data[-104] = $_;
+                        $data[-104] = $costs['reqHonorPoints'];
                         $this->jsGlobals[TYPE_CURRENCY][104] = 104;
                     }
 
                     for ($i = 1; $i < 6; $i++)
                     {
-                        if (($_ = @$costs['reqItemId'.$i]) && $costs['itemCount'.$i] > 0)
+                        if (!empty($costs['reqItemId'.$i]) && $costs['itemCount'.$i] > 0)
                         {
-                            $data[$_] = $costs['itemCount'.$i];
-                            $cItems[] = $_;
+                            $data[$costs['reqItemId'.$i]] = $costs['itemCount'.$i];
+                            $cItems[] = $costs['reqItemId'.$i];
                         }
                     }
+
+                    // no extended cost or additional gold required
+                    if (!$costs || $this->getField('flagsExtra') & 0x04)
+                        if ($_ = $this->getField('buyPrice'))
+                            $data[0] = $_;
 
                     $vendors[$l] = $data;
                 }
@@ -189,8 +192,8 @@ class ItemList extends BaseType
         $result = $this->vendors;
 
         // apply filter if given
-        $tok = @$filter[TYPE_ITEM];
-        $cur = @$filter[TYPE_CURRENCY];
+        $tok = !empty($filter[TYPE_ITEM])     ? $filter[TYPE_ITEM]     : null;
+        $cur = !empty($filter[TYPE_CURRENCY]) ? $filter[TYPE_CURRENCY] : null;
 
         foreach ($result as $itemId => &$data)
         {
@@ -289,10 +292,12 @@ class ItemList extends BaseType
             {
                 // just use the first results
                 // todo (med): dont use first result; search for the right one
-                if ($cost = @reset($this->getExtendedCost($miscData)[$this->id]))
+                if (!empty($this->getExtendedCost($miscData)[$this->id]))
                 {
+                    $cost     = reset($this->getExtendedCost($miscData)[$this->id]);
                     $currency = [];
                     $tokens   = [];
+
                     foreach ($cost as $k => $qty)
                     {
                         if (is_string($k))
@@ -306,7 +311,7 @@ class ItemList extends BaseType
 
                     $data[$this->id]['stock'] = $cost['stock']; // display as column in lv
                     $data[$this->id]['avail'] = $cost['stock']; // display as number on icon
-                    $data[$this->id]['cost']  = [$this->getField('buyPrice')];
+                    $data[$this->id]['cost']  = [empty($cost[0]) ? 0 : $cost[0]];
 
                     if ($cost['event'])
                     {
@@ -320,8 +325,8 @@ class ItemList extends BaseType
                     if ($tokens)
                         $data[$this->id]['cost'][] = $tokens;
 
-                    if ($_ = @$this->getExtendedCost($miscData)[$this->id]['reqRating'])
-                        $data[$this->id]['reqarenartng'] = $_;
+                    if (!empty($cost['reqRating']))
+                        $data[$this->id]['reqarenartng'] = $cost['reqRating'];
                 }
 
                 if ($x = $this->curTpl['buyPrice'])
@@ -799,7 +804,7 @@ class ItemList extends BaseType
             $x .= sprintf(Lang::$game['reqLevel'], $_reqLvl).'<br />';
 
         // required arena team rating / personal rating / todo (low): sort out what kind of rating
-        if (@$this->getExtendedCost([], $reqRating)[$this->id] && $reqRating)
+        if (!empty($this->getExtendedCost([], $reqRating)[$this->id]) && $reqRating)
             $x .= sprintf(Lang::$item['reqRating'], $reqRating).'<br />';
 
         // item level
@@ -1140,11 +1145,18 @@ class ItemList extends BaseType
             $this->itemMods[$this->id] = [];
 
             foreach (Util::$itemMods as $mod)
+            {
                 if (isset($this->curTpl[$mod]) && ($_ = floatVal($this->curTpl[$mod])))
-                    @$this->itemMods[$this->id][$mod] += $_;
+                {
+                    if (!isset($this->itemMods[$this->id][$mod]))
+                        $this->itemMods[$this->id][$mod] = 0;
+
+                    $this->itemMods[$this->id][$mod] += $_;
+                }
+            }
 
             // fetch and add socketbonusstats
-            if (@$this->json[$this->id]['socketbonus'] > 0)
+            if (!empty($this->json[$this->id]['socketbonus']))
                 $enchantments[$this->json[$this->id]['socketbonus']][] = $this->id;
 
             // Item is a gem (don't mix with sockets)
@@ -1163,9 +1175,8 @@ class ItemList extends BaseType
                 {
                     if ($item > 0)                          // apply socketBonus
                         $this->json[$item]['socketbonusstat'] = $stats;
-                    else /* if ($item < 0) */
-                        foreach ($stats as $mod => $qty)    // apply gemEnchantment
-                            @$this->json[-$item][$mod] += $qty;
+                    else /* if ($item < 0) */               // apply gemEnchantment
+                        Util::arraySumByKey($this->json[-$item][$mod], $stats);
                 }
             }
         }
@@ -1199,8 +1210,7 @@ class ItemList extends BaseType
         {
             $eqpSplList = new SpellList(array(['s.id', $useSpells]));
             foreach ($eqpSplList->getStatGain() as $stat)
-                foreach ($stat as $mId => $qty)
-                    @$onUseStats[$mId] += $qty;
+                Util::arraySumByKey($onUseStats, $stat);
         }
 
         return $onUseStats;
@@ -1353,19 +1363,45 @@ class ItemList extends BaseType
         if (!array_keys($this->templates))
             return;
 
-        $ire = DB::Aowow()->select('
-            SELECT  i.id AS ARRAY_KEY_1, ire.id AS ARRAY_KEY_2, iet.chance, ire.*
-            FROM    ?_items i
-            JOIN    item_enchantment_template iet ON iet.entry = ABS(i.randomenchant)
-            JOIN    ?_itemrandomenchant ire ON IF(i.randomenchant > 0, ire.id = iet.ench, ire.id = -iet.ench)
-            WHERE   i.id IN (?a)',
-            array_keys($this->templates)
+        $subItemIds = [];
+        foreach ($this->iterate() as $__)
+            if ($_ = $this->getField('randomEnchant'))
+                $subItemIds[abs($_)] = $_;
+
+        if (!$subItemIds)
+            return;
+
+        // remember: id < 0: randomSuffix; id > 0: randomProperty
+        $subItemTpls = DB::World()->select('
+            SELECT CAST( entry as SIGNED) AS ARRAY_KEY, CAST( ench as SIGNED) AS ARRAY_KEY2, chance FROM item_enchantment_template WHERE entry IN (?a) UNION
+            SELECT CAST(-entry as SIGNED) AS ARRAY_KEY, CAST(-ench as SIGNED) AS ARRAY_KEY2, chance FROM item_enchantment_template WHERE entry IN (?a)',
+            array_keys(array_filter($subItemIds, function ($v) { return $v > 0; })) ?: [0],
+            array_keys(array_filter($subItemIds, function ($v) { return $v < 0; })) ?: [0]
         );
 
-        foreach ($ire as $mstItem => $subItem)
+        $randIds = [];
+        foreach ($subItemTpls as $tpl)
+            $randIds = array_merge($randIds, array_keys($tpl));
+
+        if (!$randIds)
+            return;
+
+        $randEnchants = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_itemrandomenchant WHERE id IN (?a)', $randIds);
+
+        foreach ($this->iterate() as $mstItem => $__)
         {
-            foreach ($subItem as $subId => $data)
+            if (!$this->getField('randomEnchant'))
+                continue;
+
+            if (empty($subItemTpls[$this->getField('randomEnchant')]))
+                continue;
+
+            foreach ($subItemTpls[$this->getField('randomEnchant')] as $subId => $data)
             {
+                if (empty($randEnchants[$subId]))
+                    continue;
+
+                $data      = array_merge($randEnchants[$subId], $data);
                 $jsonEquip = [];
                 $jsonText  = [];
                 $enchIds   = [];
@@ -1419,7 +1455,8 @@ class ItemList extends BaseType
                 );
             }
 
-            $this->json[$mstItem]['subitems'] = $this->subItems[$mstItem];
+            if (!empty($this->subItems[$mstItem]))
+                $this->json[$mstItem]['subitems'] = $this->subItems[$mstItem];
         }
     }
 
@@ -1508,8 +1545,8 @@ class ItemList extends BaseType
 class ItemListFilter extends Filter
 {
     private   $ubFilter      = [];                          // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
-    private   $extCostQuery  = 'SELECT item FROM npc_vendor nv              JOIN ?_itemextendedcost iec ON iec.id =   nv.extendedCost WHERE %s UNION
-                                SELECT item FROM game_event_npc_vendor genv JOIN ?_itemextendedcost iec ON iec.id = genv.extendedCost WHERE %1$s';
+    private   $extCostQuery  = 'SELECT item FROM npc_vendor            WHERE extendedCost IN (?a) UNION
+                                SELECT item FROM game_event_npc_vendor WHERE extendedCost IN (?a)';
     private   $otFields      = [18 => 4, 68 => 15, 69 => 16, 70 => 17, 72 => 2, 73 => 19, 75 => 21, 76 => 23, 88 => 20, 92 => 5, 93 => 3, 143 => 18, 171 => 8, 172 => 12];
 
     public    $extraOpts     = [];                          // score for statWeights
@@ -1715,8 +1752,8 @@ class ItemListFilter extends Filter
 
         foreach ($data['wt'] as $k => $v)
         {
-            @$str = Util::$itemFilter[$v];
-            $qty  = intVal($data['wtv'][$k]);
+            $str = isset(Util::$itemFilter[$v]) ? Util::$itemFilter[$v] : null;
+            $qty = intVal($data['wtv'][$k]);
 
             if ($str && $qty)
             {
@@ -1828,7 +1865,7 @@ class ItemListFilter extends Filter
                 break;
             case 107:                                       // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.User::$localeId, $cr[2]]
 /* todo */      return [1];
-            case 132:                                       // glyphtype [enum]                 susubclass not yet set
+            case 132:                                       // glyphtype [enum]
                 switch ($cr[1])
                 {
                     case 1:                                 // Major
@@ -1837,12 +1874,14 @@ class ItemListFilter extends Filter
                 }
                 break;
             case 124:                                       // randomenchants [str]
-                // joining this in one step results in hell ..  so .. two steps
-                // todo (low): in _theory_ Filter::modularizeString() should also be applied here
-                $randIds = DB::Aowow()->selectCol('SELECT IF (ire.id > 0, iet.entry, -iet.entry) FROM item_enchantment_template iet JOIN ?_itemrandomenchant ire ON ABS(ire.id) = iet.ench WHERE ire.name_loc'.User::$localeId.' LIKE ?', '%'.$cr[2].'%');
+                $randIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, ABS(id) FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', User::$localeId, '%'.$cr[2].'%');
+                $tplIds  = $randIds ? DB::World()->select('SELECT entry, ench FROM item_enchantment_template WHERE ench IN (?a)', $randIds) : [];
+                foreach ($tplIds as $k => &$set)
+                    if (array_search($set['ench'], $randIds) < 0)
+                        $set['entry'] *= -1;
 
-                if ($randIds)
-                    return ['randomEnchant', $randIds];
+                if ($tplIds)
+                    return ['randomEnchant', array_column($tplIds, 'entry')];
                 else
                     return [0];                             // no results aren't really input errors
             case 125:                                       // reqarenartng [op] [int]  todo (low): find out, why "IN (W, X, Y) AND IN (X, Y, Z)" doesn't result in "(X, Y)"
@@ -1850,12 +1889,13 @@ class ItemListFilter extends Filter
                     break;
 
                 $this->formData['extraCols'][] = $cr[0];
-                $query = sprintf($this->extCostQuery, 'iec.reqPersonalrating '.$cr[1].' '.$cr[2]);
-                return ['id', DB::Aowow()->selectCol($query)];
+                $costs = DB::Aowow()->selectCol('SELECT id FROM ?_itemextendedcost WHERE reqPersonalrating '.$cr[1].' '.$cr[2]);
+                $items = DB::World()->selectCol($this->extCostQuery, $costs, $costs);
+                return ['id', $items];
             case 160:                                       // relatedevent [enum]      like 169 .. crawl though npc_vendor and loot_templates of event-related spawns
 /* todo */      return [1];
             case 152:                                       // classspecific [enum]
-                $_ = @$this->enums[$cr[0]][$cr[1]];
+                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
                 if ($_ !== null)
                 {
                     if (is_bool($_))
@@ -1865,7 +1905,7 @@ class ItemListFilter extends Filter
                 }
                 break;
             case 153:                                       // racespecific [enum]
-                $_ = @$this->enums[$cr[0]][$cr[1]];
+                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
                 if ($_ !== null)
                 {
                     if (is_bool($_))
@@ -1886,7 +1926,7 @@ class ItemListFilter extends Filter
                 $this->formData['extraCols'][] = $cr[0];
                 return ['AND', ['armordamagemodifier', $cr[2], $cr[1]], ['class', ITEM_CLASS_ARMOR]];
             case 86:                                        // craftedprof [enum]
-                $_ = @$this->enums[99][$cr[1]];             // recycled enum
+                $_ = isset($this->enums[99][$cr[1]]) ? $this->enums[99][$cr[1]] : null;
                 if (is_bool($_))
                     return ['src.src1', null, $_ ? '!' : null];
                 else if (is_int($_))
@@ -1959,32 +1999,35 @@ class ItemListFilter extends Filter
                 else
                     break;
 
-                $query = sprintf($this->extCostQuery, 'iec.reqItemId1 IN (?a) OR iec.reqItemId2 IN (?a) OR iec.reqItemId3 IN (?a) OR iec.reqItemId4 IN (?a) OR iec.reqItemId5 IN (?a)');
-                if ($foo = DB::Aowow()->selectCol($query, $_, $_, $_, $_, $_, $_, $_, $_, $_, $_))
-                    return ['id', $foo];
+                $costs = DB::Aowow()->selectCol(
+                    'SELECT id FROM ?_itemextendedcost WHERE reqItemId1 IN (?a) OR reqItemId2 IN (?a) OR reqItemId3 IN (?a) OR reqItemId4 IN (?a) OR reqItemId5 IN (?a)',
+                    $_, $_, $_, $_, $_
+                );
+                if ($items = DB::World()->selectCol($this->extCostQuery, $costs, $costs))
+                    return ['id', $items];
 
                 break;
             case 144:                                       // purchasablewithhonor [yn]
                 if ($this->int2Bool($cr[1]))
                 {
-                    $query = sprintf($this->extCostQuery, 'iec.reqHonorPoints > 0');
-                    if ($foo = DB::Aowow()->selectCol($query))
-                        return ['id', $foo, $cr[1] ? null : '!'];
+                    $costs = DB::Aowow()->selectCol('SELECT id FROM ?_itemextendedcost WHERE reqHonorPoints > 0');
+                    if ($items = DB::World()->selectCol($this->extCostQuery, $costs, $costs))
+                        return ['id', $items, $cr[1] ? null : '!'];
                 }
                 break;
             case 145:                                       // purchasablewitharena [yn]
                 if ($this->int2Bool($cr[1]))
                 {
-                    $query = sprintf($this->extCostQuery, 'iec.reqArenaPoints > 0');
-                    if ($foo = DB::Aowow()->selectCol($query))
-                        return ['id', $foo, $cr[1] ? null : '!'];
+                    $costs = DB::Aowow()->selectCol('SELECT id FROM ?_itemextendedcost WHERE reqArenaPoints > 0');
+                    if ($items = DB::World()->selectCol($this->extCostQuery, $costs, $costs))
+                        return ['id', $items, $cr[1] ? null : '!'];
                 }
                 break;
             case 129:                                       // soldbynpc [str-small]
                 if (!$this->isSaneNumeric($cr[2], true))
                     break;
 
-                if ($iIds = DB::Aowow()->selectCol('SELECT item FROM npc_vendor WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor v JOIN creature c ON c.guid = v.guid WHERE c.id = ?d', $cr[2], $cr[2]))
+                if ($iIds = DB::World()->selectCol('SELECT item FROM npc_vendor WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor v JOIN creature c ON c.guid = v.guid WHERE c.id = ?d', $cr[2], $cr[2]))
                     return ['i.id', $iIds];
                 else
                     return [0];
@@ -2023,7 +2066,7 @@ class ItemListFilter extends Filter
             case 85:                                        // objectivequest [side]
 /* todo */      return [1];
             case 87:                                        // reagentforability [enum]
-                $_ = @$this->enums[99][$cr[1]];             // recycled enum
+                $_ = isset($this->enums[99][$cr[1]]) ? $this->enums[99][$cr[1]] : null;
                 if ($_ !== null)
                 {
                     $ids    = [];
@@ -2063,7 +2106,7 @@ class ItemListFilter extends Filter
                 }
                 break;
             case 128:                                       // source [enum]
-                $_ = @$this->enums[$cr[0]][$cr[1]];
+                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
                 if ($_ !== null)
                 {
                     if (is_int($_))                         // specific

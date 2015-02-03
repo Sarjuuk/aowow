@@ -381,7 +381,8 @@ $lang = array(
         'trap'          => "Falle",
         'triggeredBy'   => "Ausgelöst durch",
         'capturePoint'  => "Eroberungspunkt",
-        'foundIn'       => "Dieses Objekt befindet sich in"
+        'foundIn'       => "Dieses Objekt befindet sich in",
+        'restock'       => "Wird alle %s wieder aufgefüllt."
     ),
     'npc' => array(
         'classification'=> "Einstufung",
@@ -435,7 +436,8 @@ $lang = array(
         'itemReward'    => "Ihr bekommt",
         'titleReward'   => 'Euch wird der Titel "<a href="?title=%d">%s</a>" verliehen',
         'slain'         => "getötet",
-        'reqNumCrt'     => "Benötigt"
+        'reqNumCrt'     => "Benötigt",
+        '_transfer'     => 'Dieser Erfolg wird mit <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
     ),
     'class' => array(
         'racialLeader'  => "Volksanführer",
@@ -474,6 +476,8 @@ $lang = array(
         )
     ),
     'quest' => array(
+        '_transfer'     => 'Dieses Quest wird mit <a href="?quest=%d" class="q1">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
+
         'questLevel'    => "Stufe %s",
         'requirements'  => "Anforderungen",
         'reqMoney'      => "Benötigtes Geld",
@@ -603,6 +607,7 @@ $lang = array(
        )
     ),
     'title' => array(
+        '_transfer'     => 'Dieser Titel wird mit <a href="?title=%d" class="q1">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'cat'           => array(
             "Allgemein",      "Spieler gegen Spieler",    "Ruf",       "Dungeon & Schlachtzug",     "Quests",       "Berufe",      "Weltereignisse"
         )
@@ -628,6 +633,8 @@ $lang = array(
         'spilloverDesc' => "Für diese Fraktion erhaltener Ruf wird zusätzlich mit den unten aufgeführten Fraktionen anteilig verrechnet.",
         'maxStanding'   => "Max. Ruf",
         'quartermaster' => "Rüstmeister",
+        'customRewRate' => "Abweichende Belohnungsraten",
+        '_transfer'     => 'Die Reputation mit dieser Fraktion wird mit dem für <a href="?faction=%d" class="q1">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'cat'           => array(
             1118 => ["Classic", 469 => "Allianz", 169 => "Dampfdruckkartell", 67 => "Horde", 891 => "Streitkräfte der Allianz", 892 => "Streitkräfte der Horde"],
             980  => ["The Burning Crusade", 936 => "Shattrath"],
@@ -679,7 +686,7 @@ $lang = array(
         '_inSlot'       => "im Platz",
         '_collapseAll'  => "Alle einklappen",
         '_expandAll'    => "Alle ausklappen",
-
+        '_transfer'     => 'Dieser Zauber wird mit <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'discovered'    => "Durch Geistesblitz erlernt",
         'ppm'           => "%s Auslösungen pro Minute",
         'procChance'    => "Procchance",

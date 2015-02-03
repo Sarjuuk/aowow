@@ -120,7 +120,7 @@ class ProfilesPage extends GenericPage
     private function getTalentDistribution($tString)
     {
         $classMask = 1 << ($this->character['classs'] - 1);
-        $distrib   = DB::Aowow()->selectCol('SELECT COUNT(t.id) FROM dbc.talent t JOIN dbc.talenttab tt ON t.tabId = tt.id WHERE tt.classMask & ?d GROUP BY tt.id ORDER BY tt.tabNumber ASC', $classMask);
+        $distrib   = DB::Aowow()->selectCol('SELECT COUNT(t.id) FROM dbc_talent t JOIN dbc_talenttab tt ON t.tabId = tt.id WHERE tt.classMask & ?d GROUP BY tt.id ORDER BY tt.tabNumber ASC', $classMask);
         $result    = [];
 
         $start = 0;

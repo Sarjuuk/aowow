@@ -125,13 +125,13 @@ class SpellList extends BaseType
         }
 
         if ($foo)
-            $this->relItems = new ItemList(array(['i.id', array_unique($foo)], 0));
+            $this->relItems = new ItemList(array(['i.id', array_unique($foo)], CFG_SQL_LIMIT_NONE));
     }
 
     // use if you JUST need the name
     public static function getName($id)
     {
-        $n = DB::Aowow()->SelectRow('SELECT * FROM ?_spell WHERE id = ?d', $id );
+        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_spell WHERE id = ?d', $id );
         return Util::localizedString($n, 'name');
     }
     // end static use
@@ -167,10 +167,10 @@ class SpellList extends BaseType
                         if ($mv < 0)                        // all stats
                         {
                             for ($j = 0; $j < 5; $j++)
-                                @$stats[ITEM_MOD_AGILITY + $j] += $pts;
+                                Util::arraySumByKey($stats, [(ITEM_MOD_AGILITY + $j) => $pts]);
                         }
                         else                                // one stat
-                            @$stats[ITEM_MOD_AGILITY + $mv] += $pts;
+                            Util::arraySumByKey($stats, [(ITEM_MOD_AGILITY + $mv) => $pts]);
 
                         break;
                     }
@@ -178,7 +178,7 @@ class SpellList extends BaseType
                     case 230:
                     case 250:
                     {
-                        @$stats[ITEM_MOD_HEALTH] += $pts;
+                        Util::arraySumByKey($stats, [ITEM_MOD_HEALTH => $pts]);
                         break;
                     }
                     case 13:                                // damage splpwr + physical (dmg & any)
@@ -186,80 +186,80 @@ class SpellList extends BaseType
                         // + weapon damage
                         if ($mv == (1 << SPELL_SCHOOL_NORMAL))
                         {
-                            @$stats[ITEM_MOD_WEAPON_DMG] += $pts;
+                            Util::arraySumByKey($stats, [ITEM_MOD_WEAPON_DMG => $pts]);
                             break;
                         }
 
                         // full magic mask, also counts towards healing
                         if ($mv == 0x7E)
                         {
-                            @$stats[ITEM_MOD_SPELL_POWER] += $pts;
-                            @$stats[ITEM_MOD_SPELL_DAMAGE_DONE] += $pts;
+                            Util::arraySumByKey($stats, [ITEM_MOD_SPELL_POWER       => $pts]);
+                            Util::arraySumByKey($stats, [ITEM_MOD_SPELL_DAMAGE_DONE => $pts]);
                         }
                         else
                         {
                             // HolySpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_HOLY))
-                                @$stats[ITEM_MOD_HOLY_POWER] += $pts;
+                                Util::arraySumByKey($stats, [ITEM_MOD_HOLY_POWER   => $pts]);
 
                             // FireSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_FIRE))
-                                @$stats[ITEM_MOD_FIRE_POWER] += $pts;
+                                Util::arraySumByKey($stats, [ITEM_MOD_FIRE_POWER   => $pts]);
 
                             // NatureSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_NATURE))
-                                @$stats[ITEM_MOD_NATURE_POWER] += $pts;
+                                Util::arraySumByKey($stats, [ITEM_MOD_NATURE_POWER => $pts]);
 
                             // FrostSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_FROST))
-                                @$stats[ITEM_MOD_FROST_POWER] += $pts;
+                                Util::arraySumByKey($stats, [ITEM_MOD_FROST_POWER  => $pts]);
 
                             // ShadowSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_SHADOW))
-                                @$stats[ITEM_MOD_SHADOW_POWER] += $pts;
+                                Util::arraySumByKey($stats, [ITEM_MOD_SHADOW_POWER => $pts]);
 
                             // ArcaneSpellpower (deprecated; still used in randomproperties)
                             if ($mv & (1 << SPELL_SCHOOL_ARCANE))
-                                @$stats[ITEM_MOD_ARCANE_POWER] += $pts;
+                                Util::arraySumByKey($stats, [ITEM_MOD_ARCANE_POWER => $pts]);
                         }
 
                         break;
                     }
                     case 135:                               // healing splpwr (healing & any) .. not as a mask..
                     {
-                        @$stats[ITEM_MOD_SPELL_HEALING_DONE] += $pts;
+                        Util::arraySumByKey($stats, [ITEM_MOD_SPELL_HEALING_DONE => $pts]);
                         break;
                     }
                     case 35:                                // ModPower - MiscVal:type see defined Powers only energy/mana in use
                     {
                         if ($mv == POWER_HEALTH)
-                            @$stats[ITEM_MOD_HEALTH] += $pts;
+                            Util::arraySumByKey($stats, [ITEM_MOD_HEALTH      => $pts]);
                         if ($mv == POWER_ENERGY)
-                            @$stats[ITEM_MOD_ENERGY] += $pts;
+                            Util::arraySumByKey($stats, [ITEM_MOD_ENERGY      => $pts]);
                         else if ($mv == POWER_MANA)
-                            @$stats[ITEM_MOD_MANA] += $pts;
+                            Util::arraySumByKey($stats, [ITEM_MOD_MANA        => $pts]);
                         else if ($mv == POWER_RUNIC_POWER)
-                            @$stats[ITEM_MOD_RUNIC_POWER] += $pts;
+                            Util::arraySumByKey($stats, [ITEM_MOD_RUNIC_POWER => $pts]);
 
                         break;
                     }
                     case 189:                               // CombatRating MiscVal:ratingMask
                     case 220:
                         if ($mod = Util::itemModByRatingMask($mv))
-                            @$stats[$mod] += $pts;
+                            Util::arraySumByKey($stats, [$mod => $pts]);
                         break;
                     case 143:                               // Resistance MiscVal:school
                     case 83:
                     case 22:
                         if ($mv == 1)                       // Armor only if explicitly specified
                         {
-                            @$stats[ITEM_MOD_ARMOR] += $pts;
+                            Util::arraySumByKey($stats, [ITEM_MOD_ARMOR => $pts]);
                             break;
                         }
 
                         if ($mv == 2)                       // holy-resistance ONLY if explicitly specified (shouldn't even exist...)
                         {
-                            @$stats[ITEM_MOD_HOLY_RESISTANCE] += $pts;
+                            Util::arraySumByKey($stats, [ITEM_MOD_HOLY_RESISTANCE => $pts]);
                             break;
                         }
 
@@ -271,19 +271,19 @@ class SpellList extends BaseType
                             switch ($j)
                             {
                                 case 2:
-                                    @$stats[ITEM_MOD_FIRE_RESISTANCE] += $pts;
+                                    Util::arraySumByKey($stats, [ITEM_MOD_FIRE_RESISTANCE   => $pts]);
                                     break;
                                 case 3:
-                                    @$stats[ITEM_MOD_NATURE_RESISTANCE] += $pts;
+                                    Util::arraySumByKey($stats, [ITEM_MOD_NATURE_RESISTANCE => $pts]);
                                     break;
                                 case 4:
-                                    @$stats[ITEM_MOD_FROST_RESISTANCE] += $pts;
+                                    Util::arraySumByKey($stats, [ITEM_MOD_FROST_RESISTANCE  => $pts]);
                                     break;
                                 case 5:
-                                    @$stats[ITEM_MOD_SHADOW_RESISTANCE] += $pts;
+                                    Util::arraySumByKey($stats, [ITEM_MOD_SHADOW_RESISTANCE => $pts]);
                                     break;
                                 case 6:
-                                    @$stats[ITEM_MOD_ARCANE_RESISTANCE] += $pts;
+                                    Util::arraySumByKey($stats, [ITEM_MOD_ARCANE_RESISTANCE => $pts]);
                                     break;
                             }
                         }
@@ -291,22 +291,22 @@ class SpellList extends BaseType
                     case 8:                                 // hp5
                     case 84:
                     case 161:
-                        @$stats[ITEM_MOD_HEALTH_REGEN] += $pts;
+                        Util::arraySumByKey($stats, [ITEM_MOD_HEALTH_REGEN        => $pts]);
                         break;
                     case 85:                                // mp5
-                        @$stats[ITEM_MOD_MANA_REGENERATION] += $pts;
+                        Util::arraySumByKey($stats, [ITEM_MOD_MANA_REGENERATION   => $pts]);
                         break;
                     case 99:                                // atkpwr
-                        @$stats[ITEM_MOD_ATTACK_POWER] += $pts;
+                        Util::arraySumByKey($stats, [ITEM_MOD_ATTACK_POWER        => $pts]);
                         break;                              // ?carries over to rngatkpwr?
                     case 124:                               // rngatkpwr
-                        @$stats[ITEM_MOD_RANGED_ATTACK_POWER] += $pts;
+                        Util::arraySumByKey($stats, [ITEM_MOD_RANGED_ATTACK_POWER => $pts]);
                         break;
                     case 158:                               // blockvalue
-                        @$stats[ITEM_MOD_BLOCK_VALUE] += $pts;
+                        Util::arraySumByKey($stats, [ITEM_MOD_BLOCK_VALUE         => $pts]);
                         break;
                     case 240:                               // ModExpertise
-                        @$stats[ITEM_MOD_EXPERTISE_RATING] += $pts;
+                        Util::arraySumByKey($stats, [ITEM_MOD_EXPERTISE_RATING    => $pts]);
                         break;
                 }
             }
@@ -490,7 +490,10 @@ class SpellList extends BaseType
             }
         }
 
-        return $targetId ? @$results[$targetId] : $results;
+        if ($targetId)
+            return !empty($results[$targetId]) ? $results[$targetId] : 0;
+
+        return $results;
     }
 
     private function createRangesForCurrent()
@@ -679,7 +682,10 @@ class SpellList extends BaseType
     private function resolveEvaluation($formula)
     {
         // see Traits in javascript locales
-        $pl    = $PL    = $this->charLevel;
+
+        // if (character level is set manually (profiler only))
+            // $pl = $PL   = $this->charLevel;
+
         $PlayerName     = Lang::$main['name'];
         $ap    = $AP    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.atkpwr[0]',    Lang::$spell['traitShort']['atkpwr'])    : Lang::$spell['traitShort']['atkpwr'];
         $rap   = $RAP   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.rgdatkpwr[0]', Lang::$spell['traitShort']['rgdatkpwr']) : Lang::$spell['traitShort']['rgdatkpwr'];
@@ -715,7 +721,7 @@ class SpellList extends BaseType
 
             foreach ($vars[0] as $var)                      // oh lord, forgive me this sin .. but is_callable seems to bug out and function_exists doesn't find lambda-functions >.<
             {
-                $eval = eval('return '.$var.';');
+                $eval = eval('return @'.$var.';');          // attention: error suppression active here
                 if (getType($eval) == 'object')
                     continue;
                 else if (is_numeric($eval))
@@ -1085,7 +1091,7 @@ class SpellList extends BaseType
                 $formCurPos++;
             }
 
-            if (@$formula[++$formCurPos] == '.')
+            if (isset($formula[++$formCurPos]) && $formula[$formCurPos] == '.')
             {
                 $formPrecision = (int)$formula[++$formCurPos];
                 ++$formCurPos;                              // for some odd reason the precision decimal survives if wo dont increment further..
@@ -1743,11 +1749,11 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
             if ($addInfoMask & ITEMINFO_MODEL)
             {
-                if ($mi = @$modelInfo[$this->id])
+                if (!empty($modelInfo[$this->id]))
                 {
-                    $data[$this->id]['npcId']       = $mi['typeId'];
-                    $data[$this->id]['displayId']   = $mi['displayId'];
-                    $data[$this->id]['displayName'] = $mi['displayName'];
+                    $data[$this->id]['npcId']       = $modelInfo[$this->id]['typeId'];
+                    $data[$this->id]['displayId']   = $modelInfo[$this->id]['displayId'];
+                    $data[$this->id]['displayName'] = $modelInfo[$this->id]['displayName'];
                 }
             }
         }
@@ -1801,9 +1807,9 @@ spells / buffspells = {
                 $extra[$id] = array(
                     'id'         => $id,
                     'tooltip'    => $tTip[0],
-                    'buff'       => @$buff[0],
+                    'buff'       => !empty($buff[0]) ? $buff[0] : null,
                     'spells'     => $tTip[1],
-                    'buffspells' => @$buff[1]
+                    'buffspells' => !empty($buff[1]) ? $buff[1] : null
                 );
             }
         }
@@ -1964,7 +1970,7 @@ class SpellListFilter extends Filter
 
                 return ['OR', ['AND', ['powerType', [1, 6]], ['powerCost', (10 * $cr[2]), $cr[1]]], ['AND', ['powerType', [1, 6], '!'], ['powerCost', $cr[2], $cr[1]]]];
             case 9:                                         // source [enum]
-                $_ = @$this->enums[$cr[0]][$cr[1]];
+                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
                 if ($_ !== null)
                 {
                     if (is_int($_))                         // specific

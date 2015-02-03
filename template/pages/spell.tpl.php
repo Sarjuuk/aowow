@@ -63,12 +63,10 @@ endif;
 
 <?php $this->brick('article'); ?>
 
-<?php /*
-if !empty($transfer)}
-    <div class="pad"></div>
-        {$lang._transfer|sprintf:$transfer.id:´´:$transfer.icon:$transfer.name:$transfer.facInt:$transfer.facName}
-{/if}
-*/
+<?php
+if (!empty($this->transfer)):
+    echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
+endif;
 ?>
 
                 <h3><?php echo Lang::$spell['_spellDetails']; ?></h3>

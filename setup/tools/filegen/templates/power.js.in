@@ -673,9 +673,9 @@ if (typeof $WowheadPower == "undefined") {
                         zoom: 3,
                         zoomable: false,
                         buttons: false
-                    });
+                    }, true);
                 }
-                arr[id].map.update(json.map);
+                arr[id].map.update(json.map, true);
                 delete json.map;
             }
 

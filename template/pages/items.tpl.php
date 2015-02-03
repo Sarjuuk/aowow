@@ -35,7 +35,7 @@ if (!empty($f['slot'])):
                         <div style="float: left"><?php echo Lang::$item['slot'].Lang::$main['colon']; ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['sl[]'].selectedIndex = -1; return false" onmousedown="return false"><?php echo Lang::$main['clear']; ?></a></small>
                         <div class="clear"></div>
-                        <select name="sl[]" size="<?php echo min(@count($f['slot']), 7); ?>" multiple="multiple" class="rightselect">
+                        <select name="sl[]" size="<?php echo min(count($f['slot']), 7); ?>" multiple="multiple" class="rightselect">
 <?php
     foreach ($f['slot'] as $k => $str):
         echo '                            <option value="'.$k.'" '.(isset($f['sl']) && in_array($k, (array)$f['sl']) ? ' selected' : null).'>'.$str."</option>\n";
@@ -52,7 +52,7 @@ if (!empty($f['type'])):
                         <div style="float: left"><?php echo Lang::$game['type'].Lang::$main['colon']; ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['ty[]'].selectedIndex = -1; return false" onmousedown="return false"><?php echo Lang::$main['clear']; ?></a></small>
                         <div class="clear"></div>
-                        <select name="ty[]" size="<?php echo min(@count($f['type']), 7); ?>" multiple="multiple" class="rightselect">
+                        <select name="ty[]" size="<?php echo min(count($f['type']), 7); ?>" multiple="multiple" class="rightselect">
 <?php
     foreach ($f['type'] as $k => $str):
         echo '                            <option value="'.$k.'" '.(isset($f['ty']) && in_array($k, (array)$f['ty']) ? ' selected' : null).'>'.$str."</option>\n";

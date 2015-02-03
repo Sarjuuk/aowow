@@ -111,7 +111,7 @@ class ItemPage extends genericPage
 
     protected function generateContent()
     {
-        $this->addJS('?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        $this->addJS('?data=weight-presets.zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
 
         $_flags     = $this->subject->getField('flags');
         $_slot      = $this->subject->getField('slot');
@@ -177,12 +177,13 @@ class ItemPage extends genericPage
                 $infobox[] = Lang::$item['tool'].Lang::$main['colon'].'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
 
         // extendedCost
-        if ($_ = @$this->subject->getExtendedCost([], $_reqRating)[$this->subject->id])
+        if (!empty($this->subject->getExtendedCost([], $_reqRating)[$this->subject->id]))
         {
+            $vendors  = $this->subject->getExtendedCost()[$this->subject->id];
             $each     = $this->subject->getField('stackable') > 1 ? '[color=q0] ('.Lang::$item['each'].')[/color]' : null;
             $handled  = [];
             $costList = [];
-            foreach ($_ as $npcId => $data)
+            foreach ($vendors as $npcId => $data)
             {
                 $tokens   = [];
                 $currency = [];
@@ -348,7 +349,7 @@ class ItemPage extends genericPage
 
             while ($next)
             {
-                $row = DB::Aowow()->selectRow('SELECT *, text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.entry = lpt.entry WHERE pt.entry = ?d', $next);
+                $row = DB::World()->selectRow('SELECT *, text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.entry = lpt.entry WHERE pt.entry = ?d', $next);
                 $next = $row['next_page'];
                 $this->pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
             }
@@ -382,7 +383,7 @@ class ItemPage extends genericPage
         }
 
         // factionchange-equivalent
-        if ($pendant = DB::Aowow()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_items WHERE alliance_id = ?d OR horde_id = ?d', $this->typeId, $this->typeId, $this->typeId))
+        if ($pendant = DB::World()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_items WHERE alliance_id = ?d OR horde_id = ?d', $this->typeId, $this->typeId, $this->typeId))
         {
             $altItem = new ItemList(array(['id', abs($pendant)]));
             if (!$altItem->error)
@@ -761,9 +762,10 @@ class ItemPage extends genericPage
         }
 
         // tab: sold by
-        if ($vendors = @$this->subject->getExtendedCost([], $_reqRating)[$this->subject->id])
+        if (!empty($this->subject->getExtendedCost([], $_reqRating)[$this->subject->id]))
         {
-            $soldBy = new CreatureList(array(['id', array_keys($vendors)]));
+            $vendors = $this->subject->getExtendedCost()[$this->subject->id];
+            $soldBy  = new CreatureList(array(['id', array_keys($vendors)]));
             if (!$soldBy->error)
             {
                 $sbData = $soldBy->getListviewData();
@@ -794,7 +796,7 @@ class ItemPage extends genericPage
                         $this->extendGlobalIds(TYPE_ITEM, array_column($tokens, 0));
 
                     $row['stock'] = $vendors[$k]['stock'];
-                    $row['cost']  = [$this->subject->getField('buyPrice')];
+                    $row['cost']  = [empty($vendors[$k][0]) ? 0 : $vendors[$k][0]];
 
                     if ($e = $vendors[$k]['event'])
                     {
@@ -838,22 +840,31 @@ class ItemPage extends genericPage
         // tab: currency for
         // some minor trickery: get arenaPoints(43307) and honorPoints(43308) directly
         if ($this->typeId == 43307)
-            $w = 'iec.reqArenaPoints > 0';
+        {
+            $n = '?items&filter=cr=145;crs=1;crv=0';
+            $w = 'reqArenaPoints > 0';
+        }
         else if ($this->typeId == 43308)
-            $w = 'iec.reqHonorPoints > 0';
+        {
+            $n = '?items&filter=cr=144;crs=1;crv=0';
+            $w = 'reqHonorPoints > 0';
+        }
         else
-            $w = 'iec.reqItemId1 = '.$this->typeId.' OR iec.reqItemId2 = '.$this->typeId.' OR iec.reqItemId3 = '.$this->typeId.' OR iec.reqItemId4 = '.$this->typeId.' OR iec.reqItemId5 = '.$this->typeId;
+        {
+            $n = in_array($this->typeId, [42, 61, 81, 241, 121, 122, 123, 125, 126, 161, 201, 101, 102, 221, 301, 341]) ? '?items&filter=cr=158;crs='.$_itemId.';crv=0' : null;
+            $w = 'reqItemId1 = '.$this->typeId.' OR reqItemId2 = '.$this->typeId.' OR reqItemId3 = '.$this->typeId.' OR reqItemId4 = '.$this->typeId.' OR reqItemId5 = '.$this->typeId;
+        }
 
-        $boughtBy = DB::Aowow()->selectCol('
-            SELECT item FROM npc_vendor nv JOIN ?_itemextendedcost iec ON iec.id = nv.extendedCost WHERE '.$w.'
-            UNION
-            SELECT item FROM game_event_npc_vendor genv JOIN ?_itemextendedcost iec ON iec.id = genv.extendedCost WHERE '.$w
-        );
+        $xCosts   = DB::Aowow()->selectCol('SELECT id FROM ?_itemextendedcost WHERE '.$w);
+        $boughtBy = $xCosts ? DB::World()->selectCol('SELECT item FROM npc_vendor WHERE extendedCost IN (?a) UNION SELECT item FROM game_event_npc_vendor WHERE extendedCost IN (?a)', $xCosts, $xCosts) : null;
         if ($boughtBy)
         {
             $boughtBy = new ItemList(array(['id', $boughtBy]));
             if (!$boughtBy->error)
             {
+                if ($boughtBy->getMatches() <= CFG_SQL_LIMIT_DEFAULT)
+                    $n = null;
+
                 $iCur   = new CurrencyList(array(['itemId', $this->typeId]));
                 $filter = $iCur->error ? [TYPE_ITEM => $this->typeId] : [TYPE_CURRENCY => $iCur->id];
 
@@ -863,7 +874,8 @@ class ItemPage extends genericPage
                     'params' => [
                         'name'      => '$LANG.tab_currencyfor',
                         'id'        => 'currency-for',
-                        'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]"
+                        'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]",
+                        'note'      => $n ? sprintf(Util::$filterResultString, $n) : null
                     ]
                 );
                 $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_ANY));
@@ -977,9 +989,12 @@ class ItemPage extends genericPage
             $json   = '';
             foreach ($fields as $f)
             {
-                if (($_ = @$this->subject->json[$this->subject->id][$f]) !== null)
+                if (isset($this->subject->json[$this->subject->id][$f]))
                 {
-                    $_ = $f == 'name' ? (7 - $this->subject->getField('quality')).$_ : $_;
+                    $_ = $this->subject->json[$this->subject->id][$f];
+                    if ($f == 'name')
+                        $_ = (7 - $this->subject->getField('quality')).$_;
+
                     $json .= ',"'.$f.'":'.$_;
                 }
             }

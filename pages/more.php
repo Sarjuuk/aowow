@@ -32,8 +32,10 @@ class MorePage extends GenericPage
         parent::__construct($pageCall, $subPage);
 
         // chack if page is valid
-        if ($_ = @$this->validPages[$pageCall])
+        if (isset($this->validPages[$pageCall]))
         {
+            $_ = $this->validPages[$pageCall];
+
             // check if subpage is valid
             if (!isset($_[1]))
             {

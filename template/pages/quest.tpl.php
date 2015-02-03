@@ -154,7 +154,7 @@ if ($r = $this->rewards):
             echo "                        <div class=\"pad\"></div>\n";
         endif;
 
-        $addData = ['rewards' => @$r['items'], 'offset' => $offset, 'extra' => @$r['money']];
+        $addData = ['rewards' => !empty($r['items']) ? $r['items'] : null, 'offset' => $offset, 'extra' => !empty($r['money']) ? $r['money'] : null];
         $addData['rewTitle'] = empty($r['choice']) ? Lang::$quest['receiveItems'] : Lang::$quest['receiveAlso'];
 
         $this->brick('rewards', $addData);
@@ -189,6 +189,10 @@ if ($g = $this->gains):
 endif;
 
 $this->brick('mail');
+
+if (!empty($this->transfer)):
+    echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
+endif;
 
 ?>
                 <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>

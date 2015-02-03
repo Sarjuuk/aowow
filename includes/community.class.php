@@ -140,10 +140,10 @@ class CommunityContent
 
         foreach ($comments as $idx => &$c)
         {
-            if ($subj = @$subjCache[$c['type']][$c['typeId']])
+            if (!empty($subjCache[$c['type']][$c['typeId']]))
             {
                 // apply subject
-                $c['subject'] = $subj;
+                $c['subject'] = $subjCache[$c['type']][$c['typeId']];
 
                 // format date
                 $c['date'] = date(Util::$dateFormatInternal, $c['date']);
