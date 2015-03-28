@@ -14,9 +14,9 @@ $this->brick('pageTemplate');
                 <a href="<?php echo Util::$wowheadLink; ?>" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
 <?php
 if ($this->lvTabs):
-    echo '                <h1>'.Lang::$main['foundResult'].' <i>'.Util::htmlEscape($this->search).'</i>';
+    echo '                <h1>'.Lang::main('foundResult').' <i>'.Util::htmlEscape($this->search).'</i>';
     if ($this->invalid):
-        echo '<span class="sub">'.sprintf(Lang::$main['ignoredTerms'], implode(', ', $this->invalid)).'</span>';
+        echo '<span class="sub">'.sprintf(Lang::main('ignoredTerms'), implode(', ', $this->invalid)).'</span>';
     endif;
     echo "</h1>\n";
 ?>
@@ -25,16 +25,16 @@ if ($this->lvTabs):
 $this->brick('lvTabs');
 
 else:
-    echo '            <h1>'.Lang::$main['noResult'].' <i>'.Util::htmlEscape($this->search).'</i>';
+    echo '            <h1>'.Lang::main('noResult').' <i>'.Util::htmlEscape($this->search).'</i>';
     if ($this->invalid):
-        echo '<span class="sub">'.sprintf(Lang::$main['ignoredTerms'], implode(', ', $this->invalid)).'</span>';
+        echo '<span class="sub">'.sprintf(Lang::main('ignoredTerms'), implode(', ', $this->invalid)).'</span>';
     endif;
     echo "</h1>\n";
 ?>
             <div class="search-noresults"></div>
 
 <?php
-    echo '            '.Lang::$main['tryAgain']."\n";
+    echo '            '.Lang::main('tryAgain')."\n";
 endif;
 ?>
             <div class="clear"></div>

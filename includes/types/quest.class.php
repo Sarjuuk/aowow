@@ -281,10 +281,10 @@ class QuestList extends BaseType
         $x = '';
         if ($level)
         {
-            $level = sprintf(Lang::$quest['questLevel'], $level);
+            $level = sprintf(Lang::quest('questLevel'), $level);
 
             if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)  // daily
-                $level .= ' '.Lang::$quest['daily'];
+                $level .= ' '.Lang::quest('daily');
 
             $x .= '<table><tr><td><table width="100%"><tr><td><b class="q">'.$title.'</b></td><th><b class="q0">'.$level.'</b></th></tr></table></td></tr></table>';
         }
@@ -329,10 +329,10 @@ class QuestList extends BaseType
 
         if ($_ = $this->getField('rewardOrReqMoney'))
             if ($_ < 0)
-                $xReq .= '<br /> - '.Lang::$quest['money'].Lang::$main['colon'].Util::formatMoney(abs($_));
+                $xReq .= '<br /> - '.Lang::quest('money').Lang::main('colon').Util::formatMoney(abs($_));
 
         if ($xReq)
-            $x .= '<br /><br /><span class="q">'.Lang::$quest['requirements'].Lang::$main['colon'].'</span>'.$xReq;
+            $x .= '<br /><br /><span class="q">'.Lang::quest('requirements').Lang::main('colon').'</span>'.$xReq;
 
         $x .= '</td></tr></table>';
 

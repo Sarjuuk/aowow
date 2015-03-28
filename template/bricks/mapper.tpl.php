@@ -1,15 +1,15 @@
 <?php
 if (isset($this->map) && empty($this->map)):
-    echo Lang::$zone['noMap'];
+    echo Lang::zone('noMap');
 elseif (!empty($this->map['data'])):
     if ($this->type != TYPE_ZONE):
-        echo '            <div>'.($this->type == TYPE_OBJECT ? Lang::$gameObject['foundIn'] : Lang::$npc['foundIn']).' <span id="locations">';
+        echo '            <div>'.($this->type == TYPE_OBJECT ? Lang::gameObject('foundIn') : Lang::npc('foundIn')).' <span id="locations">';
 
         $n = count($this->map['mapperData']);
         $i = 0;
         foreach ($this->map['mapperData'] as $areaId => $areaData):
             if ($n > 1 && $i++ > 0):
-                echo $i < $n ? ', ' : Lang::$main['and'];
+                echo $i < $n ? ', ' : Lang::main('and');
             endif;
 
             echo '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$this->map['extra'][$areaId].'</a>&nbsp;('.reset($areaData)['count'].')';

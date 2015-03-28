@@ -18,7 +18,7 @@ class MapsPage extends GenericPage
     {
         parent::__construct($pageCall, $__);
 
-        $this->name = Lang::$maps['maps'];
+        $this->name = Lang::maps('maps');
     }
 
     protected function generateContent()

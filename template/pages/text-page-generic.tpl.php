@@ -15,7 +15,7 @@ if (isset($this->typeStr)):
 
             <div class="inputbox">
                 <h1><?php echo Util::ucFirst($this->typeStr).' #'.$this->typeId; ?></h1>
-                <div id="inputbox-error"><?php echo sprintf(Lang::$main['pageNotFound'], $this->typeStr); ?></div>
+                <div id="inputbox-error"><?php echo sprintf(Lang::main('pageNotFound'), $this->typeStr); ?></div>
 <?php
 else:
 ?>

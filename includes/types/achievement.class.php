@@ -158,7 +158,7 @@ class AchievementList extends BaseType
             {
                 // link to title - todo (low): crosslink
                 case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
-                    $crtName = Util::ucFirst(Lang::$game['title']).Lang::$main['colon'].$crtName;
+                    $crtName = Util::ucFirst(Lang::game('title')).Lang::main('colon').$crtName;
                     break;
                 // link to quest
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
@@ -209,7 +209,7 @@ class AchievementList extends BaseType
 
         if ($criteria)
         {
-            $x .= '<br /><span class="q">'.Lang::$achievement['criteria'].':</span>';
+            $x .= '<br /><span class="q">'.Lang::achievement('criteria').':</span>';
             $x .= '<table width="100%"><tr><td class="q0" style="white-space: nowrap"><small>'.$criteria.'</small></th></tr></table>';
         }
         if ($description || $criteria)

@@ -37,7 +37,7 @@ class ObjectPage extends GenericPage
 
         $this->subject = new GameObjectList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['gameObject']);
+            $this->notFound(Lang::game('gameObject'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -49,7 +49,7 @@ class ObjectPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['gameObject']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('gameObject')));
     }
 
     protected function generateContent()
@@ -70,7 +70,7 @@ class ObjectPage extends GenericPage
             foreach ($_ as $i => $e)
                 $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';
 
-            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].implode(',', $ev);
+            $infobox[] = Util::ucFirst(Lang::game('eventShort')).Lang::main('colon').implode(',', $ev);
         }
 
         // Reaction
@@ -80,19 +80,19 @@ class ObjectPage extends GenericPage
             if ($r == -1) return 10;
             return;
         };
-        $infobox[] = Lang::$npc['react'].Lang::$main['colon'].'[color=q'.$_($this->subject->getField('A')).']A[/color] [color=q'.$_($this->subject->getField('H')).']H[/color]';
+        $infobox[] = Lang::npc('react').Lang::main('colon').'[color=q'.$_($this->subject->getField('A')).']A[/color] [color=q'.$_($this->subject->getField('H')).']H[/color]';
 
         // reqSkill
         switch ($this->subject->getField('typeCat'))
         {
             case -3:                                            // Herbalism
-                $infobox[] = sprintf(Lang::$game['requires'], Lang::$spell['lockType'][2].' ('.$this->subject->getField('reqSkill').')');
+                $infobox[] = sprintf(Lang::game('requires'), Lang::spell('lockType', 2).' ('.$this->subject->getField('reqSkill').')');
                 break;
             case -4:                                            // Mining
-                $infobox[] = sprintf(Lang::$game['requires'], Lang::$spell['lockType'][3].' ('.$this->subject->getField('reqSkill').')');
+                $infobox[] = sprintf(Lang::game('requires'), Lang::spell('lockType', 3).' ('.$this->subject->getField('reqSkill').')');
                 break;
             case -5:                                            // Lockpicking
-                $infobox[] = sprintf(Lang::$game['requires'], Lang::$spell['lockType'][1].' ('.$this->subject->getField('reqSkill').')');
+                $infobox[] = sprintf(Lang::game('requires'), Lang::spell('lockType', 1).' ('.$this->subject->getField('reqSkill').')');
                 break;
             default:                                            // requires key .. maybe
             {
@@ -104,7 +104,7 @@ class ObjectPage extends GenericPage
                         continue;
 
                     $this->extendGlobalIds(TYPE_ITEM, $idx);
-                    $l = Lang::$gameObject['key'].Lang::$main['colon'].'[item='.$idx.']';
+                    $l = Lang::gameObject('key').Lang::main('colon').'[item='.$idx.']';
                 }
 
                 // if no propper item is found use a skill
@@ -117,7 +117,7 @@ class ObjectPage extends GenericPage
         if ($_ = $this->subject->getField('linkedTrap'))
         {
             $this->extendGlobalIds(TYPE_OBJECT, $_);
-            $infobox[] = Lang::$gameObject['trap'].Lang::$main['colon'].'[object='.$_.']';
+            $infobox[] = Lang::gameObject('trap').Lang::main('colon').'[object='.$_.']';
         }
 
         // trap for
@@ -125,20 +125,20 @@ class ObjectPage extends GenericPage
         if (!$trigger->error)
         {
             $this->extendGlobalData($trigger->getJSGlobals());
-            $infobox[] = Lang::$gameObject['triggeredBy'].Lang::$main['colon'].'[object='.$trigger->id.']';
+            $infobox[] = Lang::gameObject('triggeredBy').Lang::main('colon').'[object='.$trigger->id.']';
         }
 
         // SpellFocus
         if ($_ = $this->subject->getField('spellFocusId'))
             if ($sfo = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE id = ?d', $_))
-                $infobox[] = '[tooltip name=focus]'.Lang::$gameObject['focusDesc'].'[/tooltip][span class=tip tooltip=focus]'.Lang::$gameObject['focus'].Lang::$main['colon'].Util::localizedString($sfo, 'name').'[/span]';
+                $infobox[] = '[tooltip name=focus]'.Lang::gameObject('focusDesc').'[/tooltip][span class=tip tooltip=focus]'.Lang::gameObject('focus').Lang::main('colon').Util::localizedString($sfo, 'name').'[/span]';
 
         // lootinfo: [min, max, restock]
         if (($_ = $this->subject->getField('lootStack')) && $_[0])
         {
-            $buff = Lang::$item['charges'].Lang::$main['colon'].$_[0];
+            $buff = Lang::item('charges').Lang::main('colon').$_[0];
             if ($_[0] < $_[1])
-                $buff .= Lang::$game['valueDelim'].$_[1];
+                $buff .= Lang::game('valueDelim').$_[1];
 
             // since Veins don't have charges anymore, the timer is questionable
             $infobox[] = $_[2] > 1 ? '[tooltip name=restock]'.sprintf(Lang::gameObject('restock'), Util::formatTime($_[2] * 1000)).'[/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;
@@ -150,13 +150,13 @@ class ObjectPage extends GenericPage
             if ($_ = $this->subject->getField('mStone'))
             {
                 $this->extendGlobalIds(TYPE_ZONE, $_[2]);
-                $m = Lang::$game['meetingStone'].Lang::$main['colon'].'[zone='.$_[2].']';
+                $m = Lang::game('meetingStone').Lang::main('colon').'[zone='.$_[2].']';
 
                 $l = $_[0];
                 if ($_[0] > 1 && $_[1] > $_[0])
-                    $l .= Lang::$game['valueDelim'].min($_[1], MAX_LEVEL);
+                    $l .= Lang::game('valueDelim').min($_[1], MAX_LEVEL);
 
-                $infobox[] = $l ? '[tooltip name=meetingstone]'.sprintf(Lang::$game['reqLevel'], $l).'[/tooltip][span class=tip tooltip=meetingstone]'.$m.'[/span]' : $m;
+                $infobox[] = $l ? '[tooltip name=meetingstone]'.sprintf(Lang::game('reqLevel'), $l).'[/tooltip][span class=tip tooltip=meetingstone]'.$m.'[/span]' : $m;
             }
         }
 
@@ -165,19 +165,19 @@ class ObjectPage extends GenericPage
         {
             if ($_ = $this->subject->getField('capture'))
             {
-                $buff = Lang::$gameObject['capturePoint'];
+                $buff = Lang::gameObject('capturePoint');
 
                 if ($_[2] > 1 || $_[0])
-                    $buff .= Lang::$main['colon'].'[ul]';
+                    $buff .= Lang::main('colon').'[ul]';
 
                 if ($_[2] > 1)
-                    $buff .= '[li]'.Lang::$game['duration'].Lang::$main['colon'].($_[3] > $_[2] ? Util::FormatTime($_[3] * 1000, true).' - ' : null).Util::FormatTime($_[2] * 1000, true).'[/li]';
+                    $buff .= '[li]'.Lang::game('duration').Lang::main('colon').($_[3] > $_[2] ? Util::FormatTime($_[3] * 1000, true).' - ' : null).Util::FormatTime($_[2] * 1000, true).'[/li]';
 
                 if ($_[1])
-                    $buff .= '[li]'.Lang::$main['players'].Lang::$main['colon'].$_[0].($_[1] > $_[0] ? ' - '.$_[1] : null).'[/li]';
+                    $buff .= '[li]'.Lang::main('players').Lang::main('colon').$_[0].($_[1] > $_[0] ? ' - '.$_[1] : null).'[/li]';
 
                 if ($_[4])
-                    $buff .= '[li]'.sprintf(Lang::$spell['range'], $_[4]).'[/li]';
+                    $buff .= '[li]'.sprintf(Lang::spell('range'), $_[4]).'[/li]';
 
                 if ($_[2] > 1 || $_[0])
                     $buff .= '[/ul]';
@@ -190,9 +190,9 @@ class ObjectPage extends GenericPage
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
             if ($_ = $this->subject->getField('ScriptName'))
-                $infobox[] = 'Script'.Lang::$main['colon'].$_;
+                $infobox[] = 'Script'.Lang::main('colon').$_;
             else if ($_ = $this->subject->getField('AIName'))
-                $infobox[] = 'AI'.Lang::$main['colon'].$_;
+                $infobox[] = 'AI'.Lang::main('colon').$_;
         }
 
 

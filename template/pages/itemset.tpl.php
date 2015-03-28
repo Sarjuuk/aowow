@@ -54,28 +54,28 @@ endforeach;
 if ($this->unavailable):
 ?>
                 <div class="pad"></div>
-                <b style="color: red"><?php echo Lang::$itemset['_unavailable']; ?></b>
+                <b style="color: red"><?php echo Lang::itemset('_unavailable'); ?></b>
 <?php endif; ?>
 
-                <h3><?php echo Lang::$itemset['_setBonuses'].$this->bonusExt; ?></h3>
+                <h3><?php echo Lang::itemset('_setBonuses').$this->bonusExt; ?></h3>
 
-<?php echo "                ".Lang::$itemset['_conveyBonus']."\n"; ?>
+<?php echo "                ".Lang::itemset('_conveyBonus')."\n"; ?>
                 <ul>
 <?php
 foreach ($this->spells as $i => $s):
-    echo '                    <li><div>'.$s['bonus'].' '.Lang::$itemset['_pieces'].Lang::$main['colon'].'<a href="?spell='.$s['id'].'">'.$s['desc']."</a></div></li>\n";
+    echo '                    <li><div>'.$s['bonus'].' '.Lang::itemset('_pieces').Lang::main('colon').'<a href="?spell='.$s['id'].'">'.$s['desc']."</a></div></li>\n";
 endforeach;
 ?>
                 </ul>
 
-                <h2 class="clear"><?php echo Lang::$itemset['summary']; ?></h2>
+                <h2 class="clear"><?php echo Lang::itemset('summary'); ?></h2>
 
                 <div id="summary-generic"></div>
                 <script type="text/javascript">//<![CDATA[
                     new Summary({ id: 'itemset', template: 'itemset', parent: 'summary-generic', groups: <?php echo json_encode($this->compare['items'], JSON_NUMERIC_CHECK).', level: '.$this->compare['level']; ?>});
                 //]]></script>
 
-                <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
+                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
             </div>
 
 <?php

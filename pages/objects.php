@@ -25,7 +25,7 @@ class ObjectsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name   = Util::ucFirst(Lang::$game['gameObjects']);
+        $this->name   = Util::ucFirst(Lang::game('gameObjects'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
     }
 
@@ -78,7 +78,7 @@ class ObjectsPage extends GenericPage
     {
         array_unshift($this->title, $this->name);
         if ($this->category)
-            array_unshift($this->title, Lang::$gameObject['cat'][$this->category[0]]);
+            array_unshift($this->title, Lang::gameObject('cat', $this->category[0]));
     }
 
     protected function generatePath()

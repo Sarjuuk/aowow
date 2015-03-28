@@ -2,28 +2,28 @@
 
 class Lang
 {
-    public static $timeUnits;
-    public static $main;
-    public static $account;
-    public static $mail;
-    public static $game;
+    private static $timeUnits;
+    private static $main;
+    private static $account;
+    private static $mail;
+    private static $game;
 
-    public static $achievement;
-    public static $class;
-    public static $currency;
-    public static $event;
-    public static $faction;
-    public static $gameObject;
-    public static $item;
-    public static $itemset;
-    public static $maps;
-    public static $npc;
-    public static $pet;
-    public static $quest;
-    public static $skill;
-    public static $spell;
-    public static $title;
-    public static $zone;
+    private static $achievement;
+    private static $class;
+    private static $currency;
+    private static $event;
+    private static $faction;
+    private static $gameObject;
+    private static $item;
+    private static $itemset;
+    private static $maps;
+    private static $npc;
+    private static $pet;
+    private static $quest;
+    private static $skill;
+    private static $spell;
+    private static $title;
+    private static $zone;
 
     public static function load($loc)
     {
@@ -44,13 +44,19 @@ class Lang
     public static function __callStatic($name, $args)
     {
         if (!isset(self::$$name))
+        {
+            Util::addNote(U_GROUP_STAFF, 'Lang: tried to use undefined property Lang::$'.$name);
             return null;
+        }
 
         $var = self::$$name;
         foreach ($args as $key)
         {
             if (!isset($var[$key]))
+            {
+                Util::addNote(U_GROUP_STAFF, 'Lang: undefined key "'.$key.'" in property Lang::$'.$name.'. Full key chain: '.implode(', ', $args));
                 return null;
+            }
 
             $var = $var[$key];
         }
@@ -64,13 +70,13 @@ class Lang
         $tmp = [];
 
         if ($flags & CUSTOM_DISABLED)
-            $tmp[] = '[tooltip name=disabledHint]'.Util::jsEscape(self::$main['disabledHint']).'[/tooltip][span class=tip tooltip=disabledHint]'.Util::jsEscape(self::$main['disabled']).'[/span]';
+            $tmp[] = '[tooltip name=disabledHint]'.Util::jsEscape(self::main('disabledHint')).'[/tooltip][span class=tip tooltip=disabledHint]'.Util::jsEscape(self::main('disabled')).'[/span]';
 
         if ($flags & CUSTOM_SERVERSIDE)
-            $tmp[] = '[tooltip name=serversideHint]'.Util::jsEscape(self::$main['serversideHint']).'[/tooltip][span class=tip tooltip=serversideHint]'.Util::jsEscape(self::$main['serverside']).'[/span]';
+            $tmp[] = '[tooltip name=serversideHint]'.Util::jsEscape(self::main('serversideHint')).'[/tooltip][span class=tip tooltip=serversideHint]'.Util::jsEscape(self::main('serverside')).'[/span]';
 
         if ($flags & CUSTOM_UNAVAILABLE)
-            $tmp[] = self::$main['unavailable'];
+            $tmp[] = self::main('unavailable');
 
         if ($flags & CUSTOM_EXCLUDE_FOR_LISTVIEW && User::isInGroup(U_GROUP_STAFF))
             $tmp[] = '[tooltip name=excludedHint]This entry is excluded from lists and is not searchable.[/tooltip][span tooltip=excludedHint class="tip q10"]Hidden[/span]';
@@ -106,7 +112,7 @@ class Lang
                 if (!in_array($prop, [1, 2, 3, 4, 9, 16, 20]))
                     continue;
 
-                $name = Lang::$spell['lockType'][$prop];
+                $name = self::spell('lockType', $prop);
                 if (!$name)
                     continue;
 
@@ -131,7 +137,7 @@ class Lang
             else
                 continue;
 
-            $locks[$lock['type'.$i] == 1 ? $prop : -$prop] = sprintf(Lang::$game['requires'], $name);
+            $locks[$lock['type'.$i] == 1 ? $prop : -$prop] = sprintf(self::game('requires'), $name);
         }
 
         return $locks;
@@ -141,7 +147,7 @@ class Lang
     {
         $_ = Util::getReputationLevelForPoints($pts);
 
-        return self::$game['rep'][$_];
+        return self::game('rep', $_);
     }
 
     public static function getRequiredItems($class, $mask, $short = true)
@@ -164,16 +170,16 @@ class Lang
             if ($class == ITEM_CLASS_WEAPON && ($mask & 0x1DE5FF) == 0x1DE5FF)
                 return '';
 
-            foreach (Lang::$spell['subClassMasks'] as $m => $str)
+            foreach (self::spell('subClassMasks') as $m => $str)
                 if ($mask == $m)
                     return $str;
         }
 
         if ($class == ITEM_CLASS_MISC)                      // yeah hardcoded.. sue me!
-            return Lang::$spell['cat'][-5];
+            return self::spell('cat', -5);
 
         $tmp  = [];
-        $strs = Lang::$spell[$class == ITEM_CLASS_ARMOR ? 'armorSubClass' : 'weaponSubClass'];
+        $strs = self::spell($class == ITEM_CLASS_ARMOR ? 'armorSubClass' : 'weaponSubClass');
         foreach ($strs as $k => $str)
             if ($mask & (1 << $k) && $str)
                 $tmp[] = $str;
@@ -192,7 +198,7 @@ class Lang
         {
             if ($stanceMask & (1 << ($i - 1)))
             {
-                $tmp[] = self::$game['st'][$i];
+                $tmp[] = self::game('st', $i);
                 $stanceMask &= ~(1 << ($i - 1));
             }
             $i++;
@@ -211,7 +217,7 @@ class Lang
         {
             if ($schoolMask & (1 << $i))
             {
-                $tmp[] = self::$game['sc'][$i];
+                $tmp[] = self::game('sc', $i);
                 $schoolMask &= ~(1 << $i);
             }
             $i++;
@@ -236,7 +242,7 @@ class Lang
         {
             if ($classMask & (1 << ($i - 1)))
             {
-                $tmp[$i]    = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['cl'][$i]);
+                $tmp[$i]    = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::game('cl', $i));
                 $classMask &= ~(1 << ($i - 1));
             }
             $i++;
@@ -263,7 +269,7 @@ class Lang
         if (!$raceMask)
         {
             $side |= SIDE_BOTH;
-            return self::$game['ra'][0];
+            return self::game('ra', 0);
         }
 
         if ($raceMask & RACE_MASK_HORDE)
@@ -273,16 +279,16 @@ class Lang
             $side |= SIDE_ALLIANCE;
 
         if ($raceMask == RACE_MASK_HORDE)
-            return self::$game['ra'][-2];
+            return self::game('ra', -2);
 
         if ($raceMask == RACE_MASK_ALLIANCE)
-            return self::$game['ra'][-1];
+            return self::game('ra', -1);
 
         while ($raceMask)
         {
             if ($raceMask & (1 << ($i - 1)))
             {
-                $tmp[$i]   = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::$game['ra'][$i]);
+                $tmp[$i]   = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::game('ra', $i));
                 $raceMask &= ~(1 << ($i - 1));
             }
             $i++;

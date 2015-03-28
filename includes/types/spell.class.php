@@ -503,19 +503,19 @@ class SpellList extends BaseType
 
         // minRange exists; show as range
         if ($this->curTpl['rangeMinHostile'])
-            return sprintf(Lang::$spell['range'], $this->curTpl['rangeMinHostile'].' - '.$this->curTpl['rangeMaxHostile']);
+            return sprintf(Lang::spell('range'), $this->curTpl['rangeMinHostile'].' - '.$this->curTpl['rangeMaxHostile']);
         // friend and hostile differ; do color
         else if ($this->curTpl['rangeMaxHostile'] != $this->curTpl['rangeMaxFriend'])
-            return sprintf(Lang::$spell['range'], '<span class="q10">'.$this->curTpl['rangeMaxHostile'].'</span> - <span class="q2">'.$this->curTpl['rangeMaxHostile']. '</span>');
+            return sprintf(Lang::spell('range'), '<span class="q10">'.$this->curTpl['rangeMaxHostile'].'</span> - <span class="q2">'.$this->curTpl['rangeMaxHostile']. '</span>');
         // hardcode: "melee range"
         else if ($this->curTpl['rangeMaxHostile'] == 5)
-            return Lang::$spell['meleeRange'];
+            return Lang::spell('meleeRange');
         // hardcode "unlimited range"
         else if ($this->curTpl['rangeMaxHostile'] == 50000)
-            return Lang::$spell['unlimRange'];
+            return Lang::spell('unlimRange');
         // regular case
         else
-            return sprintf(Lang::$spell['range'], $this->curTpl['rangeMaxHostile']);
+            return sprintf(Lang::spell('range'), $this->curTpl['rangeMaxHostile']);
     }
 
     public function createPowerCostForCurrent()
@@ -527,29 +527,29 @@ class SpellList extends BaseType
 
         // power cost: pct over static
         if ($this->curTpl['powerCostPercent'] > 0)
-            $str .= $this->curTpl['powerCostPercent']."% ".sprintf(Lang::$spell['pctCostOf'], strtolower(Lang::$spell['powerTypes'][$pt]));
+            $str .= $this->curTpl['powerCostPercent']."% ".sprintf(Lang::spell('pctCostOf'), strtolower(Lang::spell('powerTypes', $pt)));
         else if ($this->curTpl['powerCost'] > 0 || $this->curTpl['powerPerSecond'] > 0 || $this->curTpl['powerCostPerLevel'] > 0)
-            $str .= ($pt == POWER_RAGE || $pt == POWER_RUNIC_POWER ? $this->curTpl['powerCost'] / 10 : $this->curTpl['powerCost']).' '.Util::ucFirst(Lang::$spell['powerTypes'][$pt]);
+            $str .= ($pt == POWER_RAGE || $pt == POWER_RUNIC_POWER ? $this->curTpl['powerCost'] / 10 : $this->curTpl['powerCost']).' '.Util::ucFirst(Lang::spell('powerTypes', $pt));
         else if ($rCost = ($this->curTpl['powerCostRunes'] & 0x333))
         {   // Blood 2|1 - Unholy 2|1 - Frost 2|1
             $runes = [];
             if ($_ = (($rCost & 0x300) >> 8))
-                $runes[] = $_.' '.Lang::$spell['powerRunes'][2];
+                $runes[] = $_.' '.Lang::spell('powerRunes', 2);
             if ($_ = (($rCost & 0x030) >> 4))
-                $runes[] = $_.' '.Lang::$spell['powerRunes'][1];
+                $runes[] = $_.' '.Lang::spell('powerRunes', 1);
             if ($_ =  ($rCost & 0x003))
-                $runes[] = $_.' '.Lang::$spell['powerRunes'][0];
+                $runes[] = $_.' '.Lang::spell('powerRunes', 0);
 
             $str .= implode(', ', $runes);
         }
 
         // append periodic cost
         if ($this->curTpl['powerPerSecond'] > 0)
-            $str .= sprintf(Lang::$spell['costPerSec'], $this->curTpl['powerPerSecond']);
+            $str .= sprintf(Lang::spell('costPerSec'), $this->curTpl['powerPerSecond']);
 
         // append level cost (todo (low): work in as scaling cost)
         if ($this->curTpl['powerCostPerLevel'] > 0)
-            $str .= sprintf(Lang::$spell['costPerLevel'], $this->curTpl['powerCostPerLevel']);
+            $str .= sprintf(Lang::spell('costPerLevel'), $this->curTpl['powerCostPerLevel']);
 
         return $str;
     }
@@ -557,25 +557,25 @@ class SpellList extends BaseType
     public function createCastTimeForCurrent($short = true, $noInstant = true)
     {
         if ($this->curTpl['interruptFlagsChannel'])
-            return Lang::$spell['channeled'];
+            return Lang::spell('channeled');
         else if ($this->curTpl['castTime'] > 0)
-            return $short ? sprintf(Lang::$spell['castIn'], $this->curTpl['castTime'] / 1000) : Util::formatTime($this->curTpl['castTime']);
+            return $short ? sprintf(Lang::spell('castIn'), $this->curTpl['castTime'] / 1000) : Util::formatTime($this->curTpl['castTime']);
         // show instant only for player/pet/npc abilities (todo (low): unsure when really hidden (like talent-case))
         else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -6, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
             return '';
         // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only (todo (low): rule is imperfect)
         else if ($this->curTpl['damageClass'] != 1 || $this->curTpl['attributes0'] & 0x10)
-            return Lang::$spell['instantPhys'];
+            return Lang::spell('instantPhys');
         else                                                // instant cast
-            return Lang::$spell['instantMagic'];
+            return Lang::spell('instantMagic');
     }
 
     private function createCooldownForCurrent()
     {
         if ($this->curTpl['recoveryTime'])
-            return sprintf(Lang::$game['cooldown'], Util::formatTime($this->curTpl['recoveryTime'], true));
+            return sprintf(Lang::game('cooldown'), Util::formatTime($this->curTpl['recoveryTime'], true));
         else if ($this->curTpl['recoveryCategory'])
-            return sprintf(Lang::$game['cooldown'], Util::formatTime($this->curTpl['recoveryCategory'], true));
+            return sprintf(Lang::game('cooldown'), Util::formatTime($this->curTpl['recoveryCategory'], true));
         else
             return '';
     }
@@ -686,17 +686,17 @@ class SpellList extends BaseType
         // if (character level is set manually (profiler only))
             // $pl = $PL   = $this->charLevel;
 
-        $PlayerName     = Lang::$main['name'];
-        $ap    = $AP    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.atkpwr[0]',    Lang::$spell['traitShort']['atkpwr'])    : Lang::$spell['traitShort']['atkpwr'];
-        $rap   = $RAP   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.rgdatkpwr[0]', Lang::$spell['traitShort']['rgdatkpwr']) : Lang::$spell['traitShort']['rgdatkpwr'];
-        $sp    = $SP    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.splpwr[0]',    Lang::$spell['traitShort']['splpwr'])    : Lang::$spell['traitShort']['splpwr'];
-        $spa   = $SPA   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.arcsplpwr[0]', Lang::$spell['traitShort']['arcsplpwr']) : Lang::$spell['traitShort']['arcsplpwr'];
-        $spfi  = $SPFI  = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.firsplpwr[0]', Lang::$spell['traitShort']['firsplpwr']) : Lang::$spell['traitShort']['firsplpwr'];
-        $spfr  = $SPFR  = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.frosplpwr[0]', Lang::$spell['traitShort']['frosplpwr']) : Lang::$spell['traitShort']['frosplpwr'];
-        $sph   = $SPH   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.holsplpwr[0]', Lang::$spell['traitShort']['holsplpwr']) : Lang::$spell['traitShort']['holsplpwr'];
-        $spn   = $SPN   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.natsplpwr[0]', Lang::$spell['traitShort']['natsplpwr']) : Lang::$spell['traitShort']['natsplpwr'];
-        $sps   = $SPS   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.shasplpwr[0]', Lang::$spell['traitShort']['shasplpwr']) : Lang::$spell['traitShort']['shasplpwr'];
-        $bh    = $BH    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.splheal[0]',   Lang::$spell['traitShort']['splheal'])   : Lang::$spell['traitShort']['splheal'];
+        $PlayerName     = Lang::main('name');
+        $ap    = $AP    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.atkpwr[0]',    Lang::spell('traitShort', 'atkpwr'))    : Lang::spell('traitShort', 'atkpwr');
+        $rap   = $RAP   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.rgdatkpwr[0]', Lang::spell('traitShort', 'rgdatkpwr')) : Lang::spell('traitShort', 'rgdatkpwr');
+        $sp    = $SP    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.splpwr[0]',    Lang::spell('traitShort', 'splpwr'))    : Lang::spell('traitShort', 'splpwr');
+        $spa   = $SPA   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.arcsplpwr[0]', Lang::spell('traitShort', 'arcsplpwr')) : Lang::spell('traitShort', 'arcsplpwr');
+        $spfi  = $SPFI  = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.firsplpwr[0]', Lang::spell('traitShort', 'firsplpwr')) : Lang::spell('traitShort', 'firsplpwr');
+        $spfr  = $SPFR  = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.frosplpwr[0]', Lang::spell('traitShort', 'frosplpwr')) : Lang::spell('traitShort', 'frosplpwr');
+        $sph   = $SPH   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.holsplpwr[0]', Lang::spell('traitShort', 'holsplpwr')) : Lang::spell('traitShort', 'holsplpwr');
+        $spn   = $SPN   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.natsplpwr[0]', Lang::spell('traitShort', 'natsplpwr')) : Lang::spell('traitShort', 'natsplpwr');
+        $sps   = $SPS   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.shasplpwr[0]', Lang::spell('traitShort', 'shasplpwr')) : Lang::spell('traitShort', 'shasplpwr');
+        $bh    = $BH    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.splheal[0]',   Lang::spell('traitShort', 'splheal'))   : Lang::spell('traitShort', 'splheal');
 
         $HND   = $hnd   = $this->interactive ? sprintf(Util::$dfnString, '[Hands required by weapon]', 'HND') : 'HND';    // todo (med): localize this one
         $MWS   = $mws   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.mlespeed[0]',    'MWS') : 'MWS';
@@ -815,7 +815,7 @@ class SpellList extends BaseType
                     $base = $this->getField('duration');
 
                 if ($base <= 0)
-                    return Lang::$spell['untilCanceled'];
+                    return Lang::spell('untilCanceled');
 
                 if ($op && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
@@ -948,9 +948,9 @@ class SpellList extends BaseType
                         eval("\$min = $min $op $oparg;");
 
                 if ($this->interactive)
-                    return $modStrMin.$min . (!$equal ? Lang::$game['valueDelim'] . $modStrMax.$max : null);
+                    return $modStrMin.$min . (!$equal ? Lang::game('valueDelim') . $modStrMax.$max : null);
                 else
-                    return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
+                    return $min . (!$equal ? Lang::game('valueDelim') . $max : null);
             case 'q':                                       // EffectMiscValue
             case 'Q':
                 if ($lookup)
@@ -1008,9 +1008,9 @@ class SpellList extends BaseType
                 else if ($rType && $equal && $aura == 189)
                     return '<!--rtg'.$rType.'-->'.$min.'&nbsp;<small>('.Util::setRatingLevel($this->charLevel, $rType, $min).')</small>';
                 else if ($this->interactive && $aura == 189)
-                    return $modStrMin.$min . (!$equal ? Lang::$game['valueDelim'] . $modStrMax.$max : null);
+                    return $modStrMin.$min . (!$equal ? Lang::game('valueDelim') . $modStrMax.$max : null);
                 else
-                    return $min . (!$equal ? Lang::$game['valueDelim'] . $max : null);
+                    return $min . (!$equal ? Lang::game('valueDelim') . $max : null);
             case 't':                                       // Periode
             case 'T':
                 if ($lookup)
@@ -1056,7 +1056,7 @@ class SpellList extends BaseType
 
                 return $base;
             case 'z':                                   // HomeZone
-                return Lang::$spell['home'];
+                return Lang::spell('home');
         }
     }
 
@@ -1456,7 +1456,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         $x .= '<td><b class="q">'.$this->getField('name', true).'</b></td>';
 
         // dispelType (if applicable)
-        if ($dispel = Lang::$game['dt'][$this->curTpl['dispelType']])
+        if ($dispel = Lang::game('dt', $this->curTpl['dispelType']))
             $x .= '<th><b class="q">'.$dispel.'</b></th>';
 
         $x .= '</tr></table>';
@@ -1469,7 +1469,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
         // duration
         if ($this->curTpl['duration'] > 0)
-            $x .= '<span class="q">'.sprintf(Lang::$spell['remaining'], Util::formatTime($this->curTpl['duration'])).'<span>';
+            $x .= '<span class="q">'.sprintf(Lang::spell('remaining'), Util::formatTime($this->curTpl['duration'])).'<span>';
 
         $x .= '</td></tr></table>';
 
@@ -1506,7 +1506,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         // get stances (check: SPELL_ATTR2_NOT_NEED_SHAPESHIFT)
         $stances = '';
         if ($this->curTpl['stanceMask'] && !($this->curTpl['attributes2'] & 0x80000))
-            $stances = Lang::$game['requires2'].' '.Lang::getStances($this->curTpl['stanceMask']);
+            $stances = Lang::game('requires2').' '.Lang::getStances($this->curTpl['stanceMask']);
 
         // get item requirement (skip for professions)
         $reqItems = '';
@@ -1576,7 +1576,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
         if ($tools)
         {
-            $_ = Lang::$spell['tools'].':<br/><div class="indent q1">';
+            $_ = Lang::spell('tools').':<br/><div class="indent q1">';
             while ($tool = array_pop($tools))
             {
                 if (isset($tool['itemId']))
@@ -1597,7 +1597,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
         if ($reagents)
         {
-            $_ = Lang::$spell['reagents'].':<br/><div class="indent q1">';
+            $_ = Lang::spell('reagents').':<br/><div class="indent q1">';
             while ($reagent = array_pop($reagents))
             {
                 $_ .= '<a href="?item='.$reagent[0].'">'.$reagent[2].'</a>';
@@ -1611,7 +1611,7 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
         }
 
         if ($reqItems)
-            $xTmp[] = Lang::$game['requires2'].' '.$reqItems;
+            $xTmp[] = Lang::game('requires2').' '.$reqItems;
 
         if ($desc[0])
             $xTmp[] = '<span class="q">'.$desc[0].'</span>';

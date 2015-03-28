@@ -46,7 +46,7 @@ class ProfilesPage extends GenericPage
 
     protected function generateTitle()
     {
-        $this->title[] = Util::ucFirst(Lang::$game['profiles']);
+        $this->title[] = Util::ucFirst(Lang::game('profiles'));
     }
 
     protected function generatePath()
@@ -113,8 +113,8 @@ class ProfilesPage extends GenericPage
         $this->filter = ['query' => 1];
 
 
-        asort(Lang::$game['cl']);
-        asort(Lang::$game['ra']);
+        asort(Lang::game('cl'));
+        asort(Lang::game('ra'));
     }
 
     private function getTalentDistribution($tString)

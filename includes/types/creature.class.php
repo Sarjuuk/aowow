@@ -56,7 +56,7 @@ class CreatureList extends BaseType
 
         $level = '??';
         $type  = $this->curTpl['type'];
-        $row3  = [Lang::$game['level']];
+        $row3  = [Lang::game('level')];
         $fam   = $this->curTpl['family'];
 
         if (!($this->curTpl['typeFlags'] & 0x4))
@@ -71,9 +71,9 @@ class CreatureList extends BaseType
         $row3[] = $level;
 
         if ($type)
-            $row3[] = Lang::$game['ct'][$type];
+            $row3[] = Lang::game('ct', $type);
 
-        $row3[] = '('.Lang::$npc['rank'][$this->curTpl['rank']].')';
+        $row3[] = '('.Lang::npc('rank', $this->curTpl['rank']).')';
 
         $x  = '<table>';
         $x .= '<tr><td><b class="q">'.$this->getField('name', true).'</b></td></tr>';
@@ -84,7 +84,7 @@ class CreatureList extends BaseType
         $x .= '<tr><td>'.implode(' ', $row3).'</td></tr>';
 
         if ($type == 1 && $fam)                             // 1: Beast
-            $x .= '<tr><td>'.Lang::$game['fa'][$fam].'</td></tr>';
+            $x .= '<tr><td>'.Lang::game('fa', $fam).'</td></tr>';
 
         $fac = new FactionList(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0], ['id', (int)$this->getField('factionId')]));
         if (!$fac->error)

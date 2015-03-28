@@ -182,7 +182,7 @@ class SearchPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->search, Lang::$main['search']);
+        array_unshift($this->title, $this->search, Lang::main('search'));
     }
 
     protected function generatePath() { }

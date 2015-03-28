@@ -33,7 +33,7 @@ class SpellPage extends GenericPage
 
         $this->subject = new SpellList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['spell']);
+            $this->notFound(Lang::game('spell'));
 
         $jsg = $this->subject->getJSGlobals(GLOBALINFO_ANY, $extra);
         $this->extendGlobalData($jsg, $extra);
@@ -112,7 +112,7 @@ class SpellPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['spell']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('spell')));
     }
 
     protected function generateContent()
@@ -137,19 +137,19 @@ class SpellPage extends GenericPage
        if (!in_array($_cat, [-5, -6]))                      // not mount or vanity pet
         {
             if ($_ = $this->subject->getField('talentLevel'))
-                $infobox[] = '[li]'.(in_array($_cat, [-2, 7, -13]) ? sprintf(Lang::$game['reqLevel'], $_) : Lang::$game['level'].Lang::$main['colon'].$_).'[/li]';
+                $infobox[] = '[li]'.(in_array($_cat, [-2, 7, -13]) ? sprintf(Lang::game('reqLevel'), $_) : Lang::game('level').Lang::main('colon').$_).'[/li]';
             else if ($_ = $this->subject->getField('spellLevel'))
-                $infobox[] = '[li]'.(in_array($_cat, [-2, 7, -13]) ? sprintf(Lang::$game['reqLevel'], $_) : Lang::$game['level'].Lang::$main['colon'].$_).'[/li]';
+                $infobox[] = '[li]'.(in_array($_cat, [-2, 7, -13]) ? sprintf(Lang::game('reqLevel'), $_) : Lang::game('level').Lang::main('colon').$_).'[/li]';
         }
 
         // races
         if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $__, $jsg, $n, false))
         {
-            if ($_ != Lang::$game['ra'][0])                 // omit: "both"
+            if ($_ != Lang::game('ra', 0))                  // omit: "both"
             {
                 $this->extendGlobalIds(TYPE_RACE, $jsg);
-                $t = $n == 1 ? Lang::$game['race'] : Lang::$game['races'];
-                $infobox[] = '[li]'.Util::ucFirst($t).Lang::$main['colon'].$_.'[/li]';
+                $t = $n == 1 ? Lang::game('race') : Lang::game('races');
+                $infobox[] = '[li]'.Util::ucFirst($t).Lang::main('colon').$_.'[/li]';
             }
         }
 
@@ -157,8 +157,8 @@ class SpellPage extends GenericPage
         if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, $n, false))
         {
             $this->extendGlobalIds(TYPE_CLASS, $jsg);
-            $t = $n == 1 ? Lang::$game['class'] : Lang::$game['classes'];
-            $infobox[] = '[li]'.Util::ucFirst($t).Lang::$main['colon'].$_.'[/li]';
+            $t = $n == 1 ? Lang::game('class') : Lang::game('classes');
+            $infobox[] = '[li]'.Util::ucFirst($t).Lang::main('colon').$_.'[/li]';
         }
 
         // spell focus
@@ -166,7 +166,7 @@ class SpellPage extends GenericPage
         {
             $bar = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE id = ?d', $_);
             $focus = new GameObjectList(array(['spellFocusId', $_], 1));
-            $infobox[] = '[li]'.Lang::$game['requires2'].' '.($focus->error ? Util::localizedString($bar, 'name') : '[url=?object='.$focus->id.']'.Util::localizedString($bar, 'name').'[/url]').'[/li]';
+            $infobox[] = '[li]'.Lang::game('requires2').' '.($focus->error ? Util::localizedString($bar, 'name') : '[url=?object='.$focus->id.']'.Util::localizedString($bar, 'name').'[/url]').'[/li]';
         }
 
         // primary & secondary trades
@@ -180,7 +180,7 @@ class SpellPage extends GenericPage
                 {
                     $this->extendGlobalData($rSkill->getJSGlobals());
 
-                    $bar = sprintf(Lang::$game['requires'], '[skill='.$rSkill->id.']');
+                    $bar = sprintf(Lang::game('requires'), '[skill='.$rSkill->id.']');
                     if ($_ = $this->subject->getField('learnedAt'))
                         $bar .= ' ('.$_.')';
 
@@ -195,7 +195,7 @@ class SpellPage extends GenericPage
                 if (!$rSpell->error)
                 {
                     $this->extendGlobalData($rSpell->getJSGlobals());
-                    $infobox[] = '[li]'.Lang::$game['requires2'].' [spell='.$rSpell->id.'][/li]';
+                    $infobox[] = '[li]'.Lang::game('requires2').' [spell='.$rSpell->id.'][/li]';
                 }
             }
 
@@ -207,24 +207,24 @@ class SpellPage extends GenericPage
                     if ($_[$i])
                         $bar[] = '[color=r'.($i + 1).']'.$_[$i].'[/color]';
 
-                $infobox[] = '[li]'.Lang::$game['difficulty'].Lang::$main['colon'].implode(' ', $bar).'[/li]';
+                $infobox[] = '[li]'.Lang::game('difficulty').Lang::main('colon').implode(' ', $bar).'[/li]';
             }
         }
 
         // accquisition..   10: starter spell; 7: discovery
         if (isset($this->subject->sources[$this->subject->id][10]))
-            $infobox[] = '[li]'.Lang::$spell['starter'].'[/li]';
+            $infobox[] = '[li]'.Lang::spell('starter').'[/li]';
         else if (isset($this->subject->sources[$this->subject->id][7]))
-            $infobox[] = '[li]'.Lang::$spell['discovered'].'[/li]';
+            $infobox[] = '[li]'.Lang::spell('discovered').'[/li]';
 
         // training cost
         if ($cost = DB::World()->selectCell('SELECT spellcost FROM npc_trainer WHERE spell = ?d', $this->subject->id))
-            $infobox[] = '[li]'.Lang::$spell['trainingCost'].Lang::$main['colon'].'[money='.$cost.'][/li]';
+            $infobox[] = '[li]'.Lang::spell('trainingCost').Lang::main('colon').'[money='.$cost.'][/li]';
 
         // used in mode
         foreach ($this->difficulties as $n => $id)
             if ($id == $this->typeId)                       // "Mode" seems to be multilingual acceptable
-                $infobox[] = '[li]Mode'.Lang::$main['colon'].Lang::$game['modes'][$n].'[/li]';
+                $infobox[] = '[li]Mode'.Lang::main('colon').Lang::game('modes', $n).'[/li]';
 
         $effects = $this->createEffects($infobox, $redButtons);
         $infobox = $infobox ? '[ul]'.implode('', $infobox).'[/ul]' : '';
@@ -260,8 +260,8 @@ class SpellPage extends GenericPage
         $this->gcd         = Util::formatTime($this->subject->getField('startRecoveryTime'));
         $this->gcdCat      = null;                          // todo (low): nyi; find out how this works [n/a; normal; ..]
         $this->school      = [Util::asHex($this->subject->getField('schoolMask')), Lang::getMagicSchools($this->subject->getField('schoolMask'))];
-        $this->dispel      = Lang::$game['dt'][$this->subject->getField('dispelType')];
-        $this->mechanic    = Lang::$game['me'][$this->subject->getField('mechanic')];
+        $this->dispel      = Lang::game('dt', $this->subject->getField('dispelType'));
+        $this->mechanic    = Lang::game('me', $this->subject->getField('mechanic'));
         $this->unavailable = $this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE;
         $this->redButtons  = $redButtons;
 
@@ -285,13 +285,13 @@ class SpellPage extends GenericPage
             if (!$altSpell->error)
             {
                 $this->transfer = sprintf(
-                    Lang::$spell['_transfer'],
+                    Lang::spell('_transfer'),
                     $altSpell->id,
                     1,                                      // quality
                     $altSpell->getField('iconString'),
                     $altSpell->getField('name', true),
                     $pendant > 0 ? 'alliance' : 'horde',
-                    $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                    $pendant > 0 ? Lang::game('si', 1) : Lang::game('si', 2)
                 );
             }
         }
@@ -1447,13 +1447,13 @@ class SpellPage extends GenericPage
             }
 
             $_ = [];
-            $strs = Lang::$item['inventoryType'];
+            $strs = Lang::item('inventoryType');
             foreach ($strs as $k => $str)
                 if ($invType & 1 << $k && $str)
                     $_[] = $str;
 
-            $title[] = Lang::$item['slot'].Lang::$main['colon'].Util::asHex($invType);
-            $text   .= ' '.Lang::$spell['_inSlot'].Lang::$main['colon'].implode(', ', $_);
+            $title[] = Lang::item('slot').Lang::main('colon').Util::asHex($invType);
+            $text   .= ' '.Lang::spell('_inSlot').Lang::main('colon').implode(', ', $_);
         }
 
         return [$title, $text];
@@ -1538,7 +1538,7 @@ class SpellPage extends GenericPage
 
                 $foo['icon'] = array(
                     'id'    => $_,
-                    'name'  => $trig->error ? Util::ucFirst(Lang::$game['spell']).' #'.$_ : $trig->getField('name', true),
+                    'name'  => $trig->error ? Util::ucFirst(Lang::game('spell')).' #'.$_ : $trig->getField('name', true),
                     'count' => 0
                 );
 
@@ -1552,15 +1552,15 @@ class SpellPage extends GenericPage
                 $foo['radius'] = $this->subject->getField('effect'.$i.'RadiusMax');
 
             if (!in_array($i, $itemIdx) && !in_array($i, $spellIdx) && !in_array($effAura, [225, 227]))
-                $foo['value'] = ($effDS && $effDS != 1 ? ($effBP + 1).Lang::$game['valueDelim'] : null).($effBP + $effDS);
+                $foo['value'] = ($effDS && $effDS != 1 ? ($effBP + 1).Lang::game('valueDelim') : null).($effBP + $effDS);
 
             if ($effRPPL != 0)
-                $foo['value'] = (isset($foo['value']) ? $foo['value'] : '0').sprintf(Lang::$spell['costPerLevel'], $effRPPL);
+                $foo['value'] = (isset($foo['value']) ? $foo['value'] : '0').sprintf(Lang::spell('costPerLevel'), $effRPPL);
             if ($this->subject->getField('effect'.$i.'Periode') > 0)
                 $foo['interval'] = Util::formatTime($this->subject->getField('effect'.$i.'Periode'));
 
             if ($_ = $this->subject->getField('effect'.$i.'Mechanic'))
-                $foo['mechanic'] = Lang::$game['me'][$_];
+                $foo['mechanic'] = Lang::game('me', $_);
 
             if (!empty($procData['chance']))
                 $foo['procData'] = array(
@@ -1581,37 +1581,37 @@ class SpellPage extends GenericPage
                 case 137:                                   // Energize Pct
                     $_ = Lang::spell('powerTypes', $effMV);
                     if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
-                        $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_);
+                        $_ = sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_);
                     else if (!$_)
                         $_ = $effMV;
 
                     if ($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER)
-                        $foo['value'] = ($effDS && $effDS != 1 ? (($effBP + 1) / 10).Lang::$game['valueDelim'] : null).(($effBP + $effDS) / 10);
+                        $foo['value'] = ($effDS && $effDS != 1 ? (($effBP + 1) / 10).Lang::game('valueDelim') : null).(($effBP + $effDS) / 10);
 
                     $foo['name'] .= ' ('.$_.')';
                     break;
                 case 16:                                    // QuestComplete
                     if ($_ = QuestList::getName($effMV))
-                        $foo['name'] .= Lang::$main['colon'].'(<a href="?quest='.$effMV.'">'.$_.'</a>)';
+                        $foo['name'] .= Lang::main('colon').'(<a href="?quest='.$effMV.'">'.$_.'</a>)';
                     else
-                        $foo['name'] .= Lang::$main['colon'].Util::ucFirst(Lang::$game['quest']).' #'.$effMV;;
+                        $foo['name'] .= Lang::main('colon').Util::ucFirst(Lang::game('quest')).' #'.$effMV;;
                     break;
                 case 28:                                    // Summon
                 case 90:                                    // Kill Credit
                 case 134:                                   // Kill Credit2
-                    $_ = Lang::$game['npc'].' #'.$effMV;
+                    $_ = Lang::game('npc').' #'.$effMV;
                     if ($summon = $this->subject->getModelInfo($this->typeId))
                     {
                         $_ = '(<a href="?npc='.$summon['typeId'].'">'.$summon['displayName'].'</a>)';
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon['displayId']];
                     }
 
-                    $foo['name'] .= Lang::$main['colon'].$_;
+                    $foo['name'] .= Lang::main('colon').$_;
                     break;
                 case 33:                                    // Open Lock
                     $_ = Lang::spell('lockType', $effMV);
                     if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
-                        $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_);
+                        $_ = sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_);
                     else if (!$_)
                         $_ = $effMV;
 
@@ -1629,7 +1629,7 @@ class SpellPage extends GenericPage
                 case 126:                                   // Steal Aura
                     $_ = Lang::game('dt', $effMV);
                     if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
-                        $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_);
+                        $_ = sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_);
                     else if (!$_)
                         $_ = $effMV;
 
@@ -1638,7 +1638,7 @@ class SpellPage extends GenericPage
                 case 39:                                    // Learn Language
                     $_ = Lang::game('languages', $effMV);
                     if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
-                        $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_);
+                        $_ = sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_);
                     else if (!$_)
                         $_ = $effMV;
 
@@ -1651,22 +1651,22 @@ class SpellPage extends GenericPage
                 case 105:                                   // Summon Object (slot 2)
                 case 106:                                   // Summon Object (slot 3)
                 case 107:                                   // Summon Object (slot 4)
-                    $_ = Util::ucFirst(Lang::$game['gameObject']).' #'.$effMV;
+                    $_ = Util::ucFirst(Lang::game('gameObject')).' #'.$effMV;
                     if ($summon = $this->subject->getModelInfo($this->typeId))
                     {
                         $_ = '(<a href="?object='.$summon['typeId'].'">'.$summon['displayName'].'</a>)';
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_OBJECT, 'displayId' => $summon['displayId']];
                     }
 
-                    $foo['name'] .= Lang::$main['colon'].$_;
+                    $foo['name'] .= Lang::main('colon').$_;
                     break;
                 case 74:                                    // Apply Glyph
                     if ($_ = DB::Aowow()->selectCell('SELECT spellId FROM ?_glyphproperties WHERE id = ?d', $effMV))
                     {
                         if ($n = SpellList::getName($_))
-                            $foo['name'] .= Lang::$main['colon'].'(<a href="?spell='.$_.'">'.$n.'</a>)';
+                            $foo['name'] .= Lang::main('colon').'(<a href="?spell='.$_.'">'.$n.'</a>)';
                         else
-                            $foo['name'] .= Lang::$main['colon'].Util::ucFirst(Lang::$game['spell']).' #'.$effMV;
+                            $foo['name'] .= Lang::main('colon').Util::ucFirst(Lang::game('spell')).' #'.$effMV;
                     }
                     else
                         $foo['name'] .= ' #'.$effMV;;
@@ -1674,14 +1674,14 @@ class SpellPage extends GenericPage
                 case 95:                                    // Skinning
                     switch ($effMV)
                     {
-                        case 0:  $_ = Lang::$game['ct'][1].', '.Lang::$game['ct'][2]; break;    // Beast, Dragonkin
+                        case 0:  $_ = Lang::game('ct', 1).', '.Lang::game('ct', 2); break;    // Beast, Dragonkin
                         case 1:
-                        case 2:  $_ = Lang::$game['ct'][4]; break;                              // Elemental (nature based, earth based)
-                        case 3:  $_ = Lang::$game['ct'][9]; break;                              // Mechanic
+                        case 2:  $_ = Lang::game('ct', 4); break;                             // Elemental (nature based, earth based)
+                        case 3:  $_ = Lang::game('ct', 9); break;                             // Mechanic
                         default; $_ = '';
                     }
                     if (User::isInGroup(U_GROUP_EMPLOYEE))
-                        $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_);
+                        $_ = sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_);
                     else
                         $_ = $effMV;
 
@@ -1690,7 +1690,7 @@ class SpellPage extends GenericPage
                 case 108:                                   // Dispel Mechanic
                     $_ = Lang::game('me', $effMV);
                     if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
-                        $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_);
+                        $_ = sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_);
                     else if (!$_)
                         $_ = $effMV;
 
@@ -1698,14 +1698,14 @@ class SpellPage extends GenericPage
                     break;
                 case 118:                                   // Require Skill
                     if ($_ = SkillList::getName($effMV))
-                        $foo['name'] .= Lang::$main['colon'].'(<a href="?skill='.$effMV.'">'.$_.'</a>)';
+                        $foo['name'] .= Lang::main('colon').'(<a href="?skill='.$effMV.'">'.$_.'</a>)';
                     else
-                        $foo['name'] .= Lang::$main['colon'].Util::ucFirst(Lang::$game['skill']).' #'.$effMV;;
+                        $foo['name'] .= Lang::main('colon').Util::ucFirst(Lang::game('skill')).' #'.$effMV;;
                     break;
                 case 146:                                   // Activate Rune
                     $_ = Lang::spell('powerRunes', $effMV);
                     if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
-                        $_ = sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_);
+                        $_ = sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_);
                     else if (!$_)
                         $_ = $effMV;
 
@@ -1729,19 +1729,19 @@ class SpellPage extends GenericPage
                 {
                     if ($effAura > 0 && isset(Util::$spellAuraStrings[$effAura]))
                     {
-                        $foo['name'] .= User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'AuraId: '.$effAura, Lang::$main['colon'].Util::$spellAuraStrings[$effAura]) : Lang::$main['colon'].Util::$spellAuraStrings[$effAura];
+                        $foo['name'] .= User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'AuraId: '.$effAura, Lang::main('colon').Util::$spellAuraStrings[$effAura]) : Lang::main('colon').Util::$spellAuraStrings[$effAura];
 
                         $bar = $effMV;
                         switch ($effAura)
                         {
                             case 17:                        // Mod Stealth Detection
                                 if ($_ = Lang::spell('stealthType', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
                             case 19:                        // Mod Invisibility Detection
                                 if ($_ = Lang::spell('invisibilityType', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
                             case 24:                        // Periodic Energize
@@ -1750,7 +1750,7 @@ class SpellPage extends GenericPage
                             case 85:                        // Mod Power Regeneration
                             case 110:                       // Mod Power Regeneration Pct
                                 if ($_ = Lang::spell('powerTypes', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
                             case 29:                        // Mod Stat
@@ -1764,10 +1764,10 @@ class SpellPage extends GenericPage
                                 $_ = [];
                                 for ($j = 0; $j < 5; $j++)
                                     if ($mask & (1 << $j))
-                                        $_[] = Lang::$game['stats'][$j];
+                                        $_[] = Lang::game('stats', $j);
 
                                 if ($_ = implode(', ', $_));
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
                             case 36:                        // Shapeshift
@@ -1779,17 +1779,17 @@ class SpellPage extends GenericPage
                                     );
 
                                     if ($st['creatureType'] > 0)
-                                        $infobox[] = '[li]'.Lang::$game['type'].Lang::$main['colon'].Lang::$game['ct'][$st['creatureType']].'[/li]';
+                                        $infobox[] = '[li]'.Lang::game('type').Lang::main('colon').Lang::game('ct', $st['creatureType']).'[/li]';
 
                                     if ($_ = $st['displayName'])
-                                        $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                        $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
                                 }
                                 break;
                             case 37:                        // Effect immunity
                                 if (isset(Util::$spellEffectStrings[$effMV]))
                                 {
                                     $_ = Util::$spellEffectStrings[$effMV];
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
                                 }
 
                                 break;
@@ -1797,7 +1797,7 @@ class SpellPage extends GenericPage
                                 if (isset(Util::$spellAuraStrings[$effMV]))
                                 {
                                     $_ = Util::$spellAuraStrings[$effMV];
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
                                 }
 
                                 break;
@@ -1805,22 +1805,22 @@ class SpellPage extends GenericPage
                             case 178:                       // Mod Debuff Resistance
                             case 245:                       // Mod Aura Duration By Dispel
                                 if ($_ = Lang::game('dt', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
                             case 44:                        // Track Creature
                                 if ($_ = Lang::game('ct', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
                             case 45:                        // Track Resource
                                 if ($_ = Lang::spell('lockType', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
                             case 75:                        // Language
                                 if ($_ = Lang::game('languages', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
                             case 77:                        // Mechanic Immunity
@@ -1830,17 +1830,17 @@ class SpellPage extends GenericPage
                             case 255:                       // Mod Mechanic Damage Taken Pct
                             case 276:                       // Mod Mechanic Damage Done Percent
                                 if ($_ = Lang::game('me', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].Util::asHex($effMV), $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').Util::asHex($effMV), $_) : $_;
 
                                 break;
                             case 147:                       // Mechanic Immunity Mask
                                 $_ = [];
-                                foreach (Lang::$game['me'] as $k => $str)
+                                foreach (Lang::game('me') as $k => $str)
                                     if ($effMV & (1 << $k - 1))
                                         $_[] = $str;
 
                                 if ($_ = implode(', ', $_))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].Util::asHex($effMV), $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').Util::asHex($effMV), $_) : $_;
 
                                 break;
                             case 10:                        // Mod Threat
@@ -1880,7 +1880,7 @@ class SpellPage extends GenericPage
                             case 271:                       // Mod Damage Percent Taken Form Caster
                             case 310:                       // Mod Creature AoE Damage Avoidance
                                 if ($_ = Lang::getMagicSchools($effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].Util::asHex($effMV), $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').Util::asHex($effMV), $_) : $_;
 
                                 break;
                             case 30:                        // Mod Skill
@@ -1888,41 +1888,41 @@ class SpellPage extends GenericPage
                                 if ($_ = SkillList::getName($effMV))
                                     $bar = ' (<a href="?skill='.$effMV.'">'.SkillList::getName($effMV).'</a>)';
                                 else
-                                    $bar = Lang::$main['colon'].Util::ucFirst(Lang::$game['skill']).' #'.$effMV;;
+                                    $bar = Lang::main('colon').Util::ucFirst(Lang::game('skill')).' #'.$effMV;;
 
                                 break;
                             case 107:                       // Flat Modifier
                             case 108:                       // Pct Modifier
                                 if ($_ = Lang::spell('spellModOp', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$effMV, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
                             case 189:                       // Mod Rating
                             case 220:                       // Combat Rating From Stat
                                 $_ = [];
-                                foreach (Lang::$spell['combatRating'] as $k => $str)
+                                foreach (Lang::spell('combatRating') as $k => $str)
                                     if ((1 << $k) & $effMV)
                                         $_[] = $str;
 
                                 if ($_ = implode(', ', $_))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].Util::asHex($effMV), $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').Util::asHex($effMV), $_) : $_;
 
                                 break;
                             case 168:                       // Mod Damage Done Versus
                             case 59:                        // Mod Damage Done Versus Creature
                                 $_ = [];
-                                foreach (Lang::$game['ct'] as $k => $str)
+                                foreach (Lang::game('ct') as $k => $str)
                                     if ($effMV & (1 << $k - 1))
                                         $_[] = $str;
 
                                 if ($_ = implode(', ', $_))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].Util::asHex($effMV), $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').Util::asHex($effMV), $_) : $_;
 
                                 break;
                             case 249:                       // Convert Rune
                                 $x = $this->subject->getField('effect'.$i.'MiscValueB');
                                 if ($_ = Lang::spell('powerRunes', $x))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::$spell['_value'].Lang::$main['colon'].$x, $_) : $_;
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$x, $_) : $_;
 
                                 break;
                             case 78:                        // Mounted
@@ -1933,11 +1933,11 @@ class SpellPage extends GenericPage
                                     $bar = ' (<a href="?npc='.$transform['typeId'].'">'.$transform['displayName'].'</a>)';
                                 }
                                 else
-                                    $bar = Lang::$main['colon'].Lang::$game['npc'].' #'.$effMV;;
+                                    $bar = Lang::main('colon').Lang::game('npc').' #'.$effMV;;
 
                                 break;
                             case 139:                       // Force Reaction
-                                $foo['value'] = sprintf(Util::$dfnString, $foo['value'], Lang::$game['rep'][$foo['value']]);
+                                $foo['value'] = sprintf(Util::$dfnString, $foo['value'], Lang::game('rep', $foo['value']));
                                 // DO NOT BREAK
                             case 190:                       // Mod Faction Reputation Gain
                                 $bar          = ' (<a href="?faction='.$effMV.'">'.FactionList::getName($effMV).'</a>)';
@@ -1946,13 +1946,13 @@ class SpellPage extends GenericPage
                         $foo['name'] .= strstr($bar, 'href') || strstr($bar, '#') ? $bar : ($bar ? ' ('.$bar.')' : null);
 
                         if (in_array($effAura, [174, 220, 182]))
-                            $foo['name'] .= ' ['.sprintf(Util::$dfnString, Lang::$game['stats'][$this->subject->getField('effect'.$i.'MiscValueB')], $this->subject->getField('effect'.$i.'MiscValueB')).']';
+                            $foo['name'] .= ' ['.sprintf(Util::$dfnString, Lang::game('stats', $this->subject->getField('effect'.$i.'MiscValueB')), $this->subject->getField('effect'.$i.'MiscValueB')).']';
                         else if ($this->subject->getField('effect'.$i.'MiscValueB') > 0)
                             $foo['name'] .= ' ['.$this->subject->getField('effect'.$i.'MiscValueB').']';
 
                     }
                     else if ($effAura > 0)
-                        $foo['name'] .= Lang::$main['colon'].'Unknown Aura ('.$effAura.')';
+                        $foo['name'] .= Lang::main('colon').'Unknown Aura ('.$effAura.')';
 
                     break;
                 }

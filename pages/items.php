@@ -86,7 +86,7 @@ class ItemsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name   = Util::ucFirst(Lang::$game['items']);
+        $this->name   = Util::ucFirst(Lang::game('items'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
     }
 
@@ -122,7 +122,7 @@ class ItemsPage extends GenericPage
                 $this->filter['slot'][$k] = $str;
 
         if (isset($this->filter['slot'][INVTYPE_SHIELD]))   // "Off Hand" => "Shield"
-            $this->filter['slot'][INVTYPE_SHIELD] = Lang::$item['armorSubClass'][6];
+            $this->filter['slot'][INVTYPE_SHIELD] = Lang::item('armorSubClass', 6);
 
         $xCols = $this->filterObj->getForm('extraCols', true);
 
@@ -237,7 +237,7 @@ class ItemsPage extends GenericPage
 
                 if ($groups)
                 {
-                    $nameSource = Lang::$item['inventoryType'];
+                    $nameSource = Lang::item('inventoryType');
                     $this->forceTabs = true;
                 }
 
@@ -254,7 +254,7 @@ class ItemsPage extends GenericPage
                 {
                     $l = $levelRef->getField('itemLevel');
                     $groups[] = $l;
-                    $nameSource[$l] = Lang::$game['level'].' '.$l;
+                    $nameSource[$l] = Lang::game('level').' '.$l;
                 }
 
                 if ($groups)
@@ -262,14 +262,14 @@ class ItemsPage extends GenericPage
                     $l = -end($groups);
                     $groups[] = $l;                         // push last value as negativ to signal misc group after $this level
                     $extraOpts = ['i' => ['o' => ['itemlevel DESC']]];
-                    $nameSource[$l] = Lang::$item['tabOther'];
+                    $nameSource[$l] = Lang::item('tabOther');
                     $this->forceTabs = true;
                 }
 
                 break;
             case 3:                                         // source
                 $groups = [1, 2, 3, 4, 5, 10, 11, 12, 0];
-                $nameSource = Lang::$game['sources'];
+                $nameSource = Lang::game('sources');
                 $this->forceTabs = true;
 
                 break;
@@ -427,8 +427,8 @@ class ItemsPage extends GenericPage
         }
 
         // sort for dropdown-menus
-        asort(Lang::$game['ra']);
-        asort(Lang::$game['cl']);
+        asort(Lang::game('ra'));
+        asort(Lang::game('cl'));
     }
 
     protected function generateTitle()
@@ -438,12 +438,12 @@ class ItemsPage extends GenericPage
         if (!$this->category)
             return;
 
-        if (isset($this->category[2]) && is_array(Lang::$item['cat'][$this->category[0]][1][$this->category[1]]))
-            $tPart = Lang::$item['cat'][$this->category[0]][1][$this->category[1]][1][$this->category[2]];
-        else if (isset($this->category[1]) && is_array(Lang::$item['cat'][$this->category[0]]))
-            $tPart = Lang::$item['cat'][$this->category[0]][1][$this->category[1]];
+        if (isset($this->category[2]) && is_array(Lang::item('cat', $this->category[0], 1, $this->category[1])))
+            $tPart = Lang::item('cat', $this->category[0], 1, $this->category[1], 1, $this->category[2]);
+        else if (isset($this->category[1]) && is_array(Lang::item('cat', $this->category[0])))
+            $tPart = Lang::item('cat', $this->category[0], 1, $this->category[1]);
         else
-            $tPart = Lang::$item['cat'][$this->category[0]];
+            $tPart = Lang::item('cat', $this->category[0]);
 
         array_unshift($this->title, is_array($tPart) ? $tPart[0] : $tPart);
     }
@@ -519,45 +519,45 @@ class ItemsPage extends GenericPage
 
         if (!$this->category)
         {
-            $menu['slot'] = [Lang::$item['inventoryType'], null];
+            $menu['slot'] = [Lang::item('inventoryType'), null];
             asort($menu['slot'][0]);
         }
         else
         {
-            if (isset($this->category[2]) && is_array(Lang::$item['cat'][$this->category[0]][1][$this->category[1]]))
-                $catList = Lang::$item['cat'][$this->category[0]][1][$this->category[1]][1][$this->category[2]];
-            else if (isset($this->category[1]) && is_array(Lang::$item['cat'][$this->category[0]]))
-                $catList = Lang::$item['cat'][$this->category[0]][1][$this->category[1]];
+            if (isset($this->category[2]) && is_array(Lang::item('cat', $this->category[0], 1, $this->category[1])))
+                $catList = Lang::item('cat', $this->category[0], 1, $this->category[1], 1, $this->category[2]);
+            else if (isset($this->category[1]) && is_array(Lang::item('cat', $this->category[0])))
+                $catList = Lang::item('cat', $this->category[0], 1, $this->category[1]);
             else
-                $catList = Lang::$item['cat'][$this->category[0]];
+                $catList = Lang::item('cat', $this->category[0]);
 
             switch ($this->category[0])
             {
                 case 0:
                     if (!isset($this->category[1]))
-                        $menu['type'] = [Lang::$item['cat'][0][1], null];
+                        $menu['type'] = [Lang::item('cat', 0, 1), null];
 
                     if (!isset($this->category[1]) || in_array($this->category[1], [6, -3]))
                     {
-                        $menu['slot'] = [Lang::$item['inventoryType'], 0x63EFEA];
+                        $menu['slot'] = [Lang::item('inventoryType'), 0x63EFEA];
                         asort($menu['slot'][0]);
                     }
                     break;
                 case 2:
                     if (!isset($this->category[1]))
-                        $menu['type'] = [Lang::$spell['weaponSubClass'], null];
+                        $menu['type'] = [Lang::spell('weaponSubClass'), null];
 
-                    $menu['slot'] = [Lang::$item['inventoryType'], 0x262A000];
+                    $menu['slot'] = [Lang::item('inventoryType'), 0x262A000];
                     asort($menu['slot'][0]);
                     break;
                 case 4:
                     if (!isset($this->category[1]))
                     {
-                        $menu['slot'] = [Lang::$item['inventoryType'], 0x10895FFE];
-                        $menu['type'] = [Lang::$item['cat'][4][1], null];
+                        $menu['slot'] = [Lang::item('inventoryType'), 0x10895FFE];
+                        $menu['type'] = [Lang::item('cat', 4, 1), null];
                     }
                     else if (in_array($this->category[1], [1, 2, 3, 4]))
-                        $menu['slot'] = [Lang::$item['inventoryType'], 0x7EA];
+                        $menu['slot'] = [Lang::item('inventoryType'), 0x7EA];
 
                     asort($menu['slot'][0]);
                     break;

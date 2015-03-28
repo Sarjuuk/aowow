@@ -25,7 +25,7 @@ class CurrencyPage extends GenericPage
 
         $this->subject = new CurrencyList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['currency']);
+            $this->notFound(Lang::game('currency'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -37,7 +37,7 @@ class CurrencyPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['currency']));
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('currency')));
     }
 
     protected function generateContent()
@@ -53,9 +53,9 @@ class CurrencyPage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         if ($this->typeId == 103)                           // Arena Points
-            $infobox[] = Lang::$currency['cap'].Lang::$main['colon'].'10\'000';
+            $infobox[] = Lang::currency('cap').Lang::main('colon').'10\'000';
         else if ($this->typeId == 104)                      // Honor
-            $infobox[] = Lang::$currency['cap'].Lang::$main['colon'].'75\'000';
+            $infobox[] = Lang::currency('cap').Lang::main('colon').'75\'000';
 
         /****************/
         /* Main Content */

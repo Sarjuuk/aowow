@@ -32,7 +32,7 @@ class TitlePage extends GenericPage
 
         $this->subject = new TitleList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['title']);
+            $this->notFound(Lang::game('title'));
 
         $this->name      = $this->subject->getHtmlizedName();
         $this->nameFixed = Util::ucFirst(trim(strtr($this->subject->getField('male', true), ['%s' => '', ',' => ''])));
@@ -45,7 +45,7 @@ class TitlePage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->nameFixed, Util::ucFirst(Lang::$game['title']));
+        array_unshift($this->title, $this->nameFixed, Util::ucFirst(Lang::game('title')));
     }
 
     protected function generateContent()
@@ -57,17 +57,17 @@ class TitlePage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         if ($this->subject->getField('side') == SIDE_ALLIANCE)
-            $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-alliance]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
+            $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-alliance]'.Lang::game('si', SIDE_ALLIANCE).'[/span]';
         else if ($this->subject->getField('side') == SIDE_HORDE)
-            $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-horde]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
+            $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-horde]'.Lang::game('si', SIDE_HORDE).'[/span]';
         else
-            $infobox[] = Lang::$main['side'].Lang::$main['colon'].Lang::$game['si'][SIDE_BOTH];
+            $infobox[] = Lang::main('side').Lang::main('colon').Lang::game('si', SIDE_BOTH);
 
         if ($g = $this->subject->getField('gender'))
-            $infobox[] = Lang::$main['gender'].Lang::$main['colon'].'[span class=icon-'.($g == 2 ? 'female' : 'male').']'.Lang::$main['sex'][$g].'[/span]';
+            $infobox[] = Lang::main('gender').Lang::main('colon').'[span class=icon-'.($g == 2 ? 'female' : 'male').']'.Lang::main('sex', $g).'[/span]';
 
         if ($e = $this->subject->getField('eventId'))
-            $infobox[] = Lang::$game['eventShort'].Lang::$main['colon'].'[url=?event='.$e.']'.WorldEventList::getName($e).'[/url]';
+            $infobox[] = Lang::game('eventShort').Lang::main('colon').'[url=?event='.$e.']'.WorldEventList::getName($e).'[/url]';
 
         /****************/
         /* Main Content */
@@ -91,7 +91,7 @@ class TitlePage extends GenericPage
                     $altTitle->id,
                     $altTitle->getHtmlizedName(),
                     $pendant > 0 ? 'alliance' : 'horde',
-                    $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                    $pendant > 0 ? Lang::game('si', 1) : Lang::game('si', 2)
                 );
             }
         }

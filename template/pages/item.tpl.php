@@ -25,7 +25,7 @@
 if ($this->disabled):
 ?>
 	<div class="pad"></div>
-    <b style="color: red"><?php echo Lang::$item['_unavailable']; ?></b>
+    <b style="color: red"><?php echo Lang::item('_unavailable'); ?></b>
 <?php
 endif;
 
@@ -36,7 +36,7 @@ endif;
 if (!empty($this->subItems)):
 ?>
                 <div class="clear"></div>
-                <h3><?php echo Lang::$item['_rndEnchants']; ?></h3>
+                <h3><?php echo Lang::item('_rndEnchants'); ?></h3>
 
                 <div class="random-enchantments" style="margin-right: 25px">
                     <ul>
@@ -44,7 +44,7 @@ if (!empty($this->subItems)):
         foreach ($this->subItems['data'] as $k => $i):
             if ($k < (count($this->subItems['data']) / 2)):
                 echo '                        <li><div><span class="q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
-                echo '                        <small class="q0">'.sprintf(Lang::$item['_chance'], $i['chance']).'</small><br />'.$i['enchantment'].'</div></li>';
+                echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.$i['enchantment'].'</div></li>';
             endif;
         endforeach;
 ?>
@@ -59,7 +59,7 @@ if (!empty($this->subItems)):
         foreach ($this->subItems['data'] as $k => $i):
             if ($k >= (count($this->subItems['data']) / 2)):
                 echo '                        <li><div><span class="q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
-                echo '                        <small class="q0">'.sprintf(Lang::$item['_chance'], $i['chance']).'</small><br />'.$i['enchantment'].'</div></li>';
+                echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.$i['enchantment'].'</div></li>';
             endif;
         endforeach;
 ?>
@@ -72,7 +72,7 @@ endif;
 $this->brick('book');
 ?>
 
-                <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
+                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
             </div>
 
 <?php

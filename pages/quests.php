@@ -26,7 +26,7 @@ class QuestsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name   = Util::ucFirst(Lang::$game['quests']);
+        $this->name   = Util::ucFirst(Lang::game('quests'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
     }
 
@@ -83,10 +83,10 @@ class QuestsPage extends GenericPage
         array_unshift($this->title, $this->name);
 
         if (isset($this->category[1]))
-            array_unshift($this->title, Lang::$quest['cat'][$this->category[0]][$this->category[1]]);
+            array_unshift($this->title, Lang::quest('cat', $this->category[0], $this->category[1]));
         else if (isset($this->category[0]))
         {
-            $c0 = Lang::$quest['cat'][$this->category[0]];
+            $c0 = Lang::quest('cat', $this->category[0]);
             array_unshift($this->title, is_array($c0) ? $c0[0] : $c0);
         }
     }

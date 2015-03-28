@@ -47,7 +47,7 @@ class AchievementsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name   = Util::ucFirst(Lang::$game['achievements']);
+        $this->name   = Util::ucFirst(Lang::game('achievements'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
     }
 
@@ -121,12 +121,12 @@ class AchievementsPage extends GenericPage
         );
 
         // sort for dropdown-menus in filter
-        asort(Lang::$game['si']);
+        asort(Lang::game('si'));
     }
 
     protected function generateTitle()
     {
-        array_unshift($this->title, Util::ucFirst(Lang::$game['achievements']));
+        array_unshift($this->title, Util::ucFirst(Lang::game('achievements')));
         if ($this->category)
         {
             $catrow = DB::Aowow()->SelectRow('SELECT * FROM ?_achievementcategory WHERE id = ?d', end($this->category));

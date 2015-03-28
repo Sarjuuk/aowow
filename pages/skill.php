@@ -27,7 +27,7 @@ class SkillPage extends GenericPage
 
         $this->subject = new SkillList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['skill']);
+            $this->notFound(Lang::game('skill'));
 
         $this->name = $this->subject->getField('name', true);
         $this->cat  = $this->subject->getField('typeCat');
@@ -40,7 +40,7 @@ class SkillPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['skill']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('skill')));
     }
 
     protected function generateContent()

@@ -16,8 +16,8 @@ if (isset($this->error)):
             <div class="pad3"></div>
 
             <div class="inputbox">
-                <h1><?php echo Lang::$main['prepError']; ?></h1>
-                <div id="inputbox-error"><?php echo $this->error; ?><br><a href="<?php echo $this->destType ? '?'.Util::$typeStrings[$this->destType].'='.$this->destTypeId : 'javascript:history.back();'; ?>"><?php echo Lang::$main['back']; ?></a></div>
+                <h1><?php echo Lang::main('prepError'); ?></h1>
+                <div id="inputbox-error"><?php echo $this->error; ?><br><a href="<?php echo $this->destType ? '?'.Util::$typeStrings[$this->destType].'='.$this->destTypeId : 'javascript:history.back();'; ?>"><?php echo Lang::main('back'); ?></a></div>
 <?php
 else:
 ?>
@@ -29,15 +29,15 @@ else:
 ?>
                 <div id="ss-container" style="float:right;"></div>
                 <div id="img-edit-form">
-                    <span><?php echo Lang::$main['cropHint']; ?></span>
+                    <span><?php echo Lang::main('cropHint'); ?></span>
                     <div class="pad"></div>
-                    <b><?php echo Lang::$main['caption'].Lang::$main['colon']; ?></b><br>
+                    <b><?php echo Lang::main('caption').Lang::main('colon'); ?></b><br>
                     <form action="?screenshot=finalize" method="post">
                         <textarea style="resize: none;" name="screenshotcaption" cols="27" rows="4"><?php echo $this->caption; ?></textarea>
                         <div class="text-counter">text counter ph</div>
                         <div style="clear:right;"></div>
                         <input type="hidden" id="selection" name="selection" value=""></input>
-                        <input type="submit" value="<?php echo Lang::$main['ssSubmit']; ?>"></input>
+                        <input type="submit" value="<?php echo Lang::main('ssSubmit'); ?>"></input>
                     </form>
                 </div>
                 <script type="text/javascript">//<![CDATA[

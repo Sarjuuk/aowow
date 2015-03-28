@@ -26,7 +26,7 @@ class PetPage extends GenericPage
 
         $this->subject = new PetList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['pet']);
+            $this->notFound(Lang::game('pet'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -38,7 +38,7 @@ class PetPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['pet']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('pet')));
     }
 
     protected function generateContent()
@@ -52,11 +52,11 @@ class PetPage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // level range
-        $infobox[] = Lang::$game['level'].Lang::$main['colon'].$this->subject->getField('minLevel').' - '.$this->subject->getField('maxLevel');
+        $infobox[] = Lang::game('level').Lang::main('colon').$this->subject->getField('minLevel').' - '.$this->subject->getField('maxLevel');
 
         // exotic
         if ($this->subject->getField('exotic'))
-            $infobox[] = '[url=?spell=53270]'.Lang::$pet['exotic'].'[/url]';
+            $infobox[] = '[url=?spell=53270]'.Lang::pet('exotic').'[/url]';
 
         /****************/
         /* Main Content */

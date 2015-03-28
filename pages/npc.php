@@ -30,7 +30,7 @@ class NpcPage extends GenericPage
 
         $this->subject = new CreatureList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['npc']);
+            $this->notFound(Lang::game('npc'));
 
         $this->name    = $this->subject->getField('name', true);
         $this->subname = $this->subject->getField('subname', true);
@@ -46,7 +46,7 @@ class NpcPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['npc']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('npc')));
     }
 
     protected function generateContent()
@@ -116,7 +116,7 @@ class NpcPage extends GenericPage
             foreach ($_ as $i => $e)
                 $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';
 
-            $infobox[] = Util::ucFirst(Lang::$game['eventShort']).Lang::$main['colon'].implode(',', $ev);
+            $infobox[] = Util::ucFirst(Lang::game('eventShort')).Lang::main('colon').implode(',', $ev);
         }
 
         // Level
@@ -130,13 +130,13 @@ class NpcPage extends GenericPage
         else                                                // Boss Level
             $level = '??';
 
-        $infobox[] = Lang::$game['level'].Lang::$main['colon'].$level;
+        $infobox[] = Lang::game('level').Lang::main('colon').$level;
 
         // Classification
         if ($_ = $this->subject->getField('rank'))          //  != NPC_RANK_NORMAL
         {
-            $str = $_typeFlags & 0x4 ? '[span class=icon-boss]'.Lang::$npc['rank'][$_].'[/span]' : Lang::$npc['rank'][$_];
-            $infobox[] = Lang::$npc['classification'].Lang::$main['colon'].$str;
+            $str = $_typeFlags & 0x4 ? '[span class=icon-boss]'.Lang::npc('rank', $_).'[/span]' : Lang::npc('rank', $_);
+            $infobox[] = Lang::npc('classification').Lang::main('colon').$str;
         }
 
         // Reaction
@@ -146,32 +146,32 @@ class NpcPage extends GenericPage
             if ($r == -1) return 10;
             return;
         };
-        $infobox[] = Lang::$npc['react'].Lang::$main['colon'].'[color=q'.$_($this->subject->getField('A')).']A[/color] [color=q'.$_($this->subject->getField('H')).']H[/color]';
+        $infobox[] = Lang::npc('react').Lang::main('colon').'[color=q'.$_($this->subject->getField('A')).']A[/color] [color=q'.$_($this->subject->getField('H')).']H[/color]';
 
         // Faction
         $this->extendGlobalIds(TYPE_FACTION, $this->subject->getField('factionId'));
-        $infobox[] = Util::ucFirst(Lang::$game['faction']).Lang::$main['colon'].'[faction='.$this->subject->getField('factionId').']';
+        $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$this->subject->getField('factionId').']';
 
         // Tameable
         if ($_typeFlags & 0x1)
             if ($_ = $this->subject->getField('family'))
-                $infobox[] = sprintf(Lang::$npc['tameable'], '[url=pet='.$_.']'.Lang::$game['fa'][$_].'[/url]');
+                $infobox[] = sprintf(Lang::npc('tameable'), '[url=pet='.$_.']'.Lang::game('fa', $_).'[/url]');
 
         // Wealth
         if ($_ = intVal(($this->subject->getField('minGold') + $this->subject->getField('maxGold')) / 2))
-            $infobox[] = Lang::$npc['worth'].Lang::$main['colon'].'[tooltip=tooltip_avgmoneydropped][money='.$_.'][/tooltip]';
+            $infobox[] = Lang::npc('worth').Lang::main('colon').'[tooltip=tooltip_avgmoneydropped][money='.$_.'][/tooltip]';
 
         // is Vehicle
         if ($this->subject->getField('vehicleId'))
-            $infobox[] = Lang::$npc['vehicle'];
+            $infobox[] = Lang::npc('vehicle');
 
         // AI
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
             if ($_ = $this->subject->getField('scriptName'))
-                $infobox[] = 'Script'.Lang::$main['colon'].$_;
+                $infobox[] = 'Script'.Lang::main('colon').$_;
             else if ($_ = $this->subject->getField('aiName'))
-                $infobox[] = 'AI'.Lang::$main['colon'].$_;
+                $infobox[] = 'AI'.Lang::main('colon').$_;
         }
 
         if (User::isInGroup(U_GROUP_STAFF))
@@ -233,26 +233,26 @@ class NpcPage extends GenericPage
         $modeRow = '[tr][td]%s&nbsp;&nbsp;[/td][td]%s[/td][/tr]';
         // Health
         $health = $this->subject->getBaseStats('health');
-        $stats['health'] = Util::ucFirst(Lang::$spell['powerTypes'][-2]).Lang::$main['colon'].($health[0] < $health[1] ? $_nf($health[0]).' - '.$_nf($health[1]) : $_nf($health[0]));
+        $stats['health'] = Util::ucFirst(Lang::spell('powerTypes', -2)).Lang::main('colon').($health[0] < $health[1] ? $_nf($health[0]).' - '.$_nf($health[1]) : $_nf($health[0]));
 
         // Mana (may be 0)
         $mana = $this->subject->getBaseStats('power');
-        $stats['mana'] = $mana[0] ? Lang::$spell['powerTypes'][0].Lang::$main['colon'].($mana[0] < $mana[1] ? $_nf($mana[0]).' - '.$_nf($mana[1]) : $_nf($mana[0])) : null;
+        $stats['mana'] = $mana[0] ? Lang::spell('powerTypes', 0).Lang::main('colon').($mana[0] < $mana[1] ? $_nf($mana[0]).' - '.$_nf($mana[1]) : $_nf($mana[0])) : null;
 
         // Armor
         $armor = $this->subject->getBaseStats('armor');
-        $stats['armor'] = Lang::$npc['armor'].Lang::$main['colon'].($armor[0] < $armor[1] ? $_nf($armor[0]).' - '.$_nf($armor[1]) : $_nf($armor[0]));
+        $stats['armor'] = Lang::npc('armor').Lang::main('colon').($armor[0] < $armor[1] ? $_nf($armor[0]).' - '.$_nf($armor[1]) : $_nf($armor[0]));
 
         // Melee Damage
         $melee = $this->subject->getBaseStats('melee');
         if ($_ = $this->subject->getField('dmgSchool'))     // magic damage
-            $stats['melee'] = Lang::$npc['melee'].Lang::$main['colon'].$_nf($melee[0]).' - '.$_nf($melee[1]).' ('.Lang::$game['sc'][$_].')';
+            $stats['melee'] = Lang::npc('melee').Lang::main('colon').$_nf($melee[0]).' - '.$_nf($melee[1]).' ('.Lang::game('sc', $_).')';
         else                                                // phys. damage
-            $stats['melee'] = Lang::$npc['melee'].Lang::$main['colon'].$_nf($melee[0]).' - '.$_nf($melee[1]);
+            $stats['melee'] = Lang::npc('melee').Lang::main('colon').$_nf($melee[0]).' - '.$_nf($melee[1]);
 
         // Ranged Damage
         $ranged = $this->subject->getBaseStats('ranged');
-        $stats['ranged'] = Lang::$npc['ranged'].Lang::$main['colon'].$_nf($ranged[0]).' - '.$_nf($ranged[1]);
+        $stats['ranged'] = Lang::npc('ranged').Lang::main('colon').$_nf($ranged[0]).' - '.$_nf($ranged[1]);
 
         if (in_array($mapType, [1, 2]))                     // Dungeon or Raid
         {
@@ -263,7 +263,7 @@ class NpcPage extends GenericPage
                     if ($dId != $id)
                         continue;
 
-                    $m = Lang::$npc['modes'][$mapType][$mode];
+                    $m = Lang::npc('modes', $mapType, $mode);
 
                     // Health
                     $health = $_altNPCs->getBaseStats('health');
@@ -280,7 +280,7 @@ class NpcPage extends GenericPage
                     // Melee Damage
                     $melee = $_altNPCs->getBaseStats('melee');
                     if ($_ = $_altNPCs->getField('dmgSchool'))  // magic damage
-                        $modes['melee'][] = sprintf($modeRow, $m, $_nf($melee[0]).' - '.$_nf($melee[1]).' ('.Lang::$game['sc'][$_].')');
+                        $modes['melee'][] = sprintf($modeRow, $m, $_nf($melee[0]).' - '.$_nf($melee[1]).' ('.Lang::game('sc', $_).')');
                     else                                        // phys. damage
                         $modes['melee'][] = sprintf($modeRow, $m, $_nf($melee[0]).' - '.$_nf($melee[1]));
 
@@ -298,7 +298,7 @@ class NpcPage extends GenericPage
 
         // < Stats
         if ($stats)
-            $infobox[] = Lang::$npc['stats'].($modes ? ' ('.Lang::$npc['modes'][$mapType][0].')' : null).Lang::$main['colon'].'[ul][li]'.implode('[/li][li]', $stats).'[/li][/ul]';
+            $infobox[] = Lang::npc('stats').($modes ? ' ('.Lang::npc('modes', $mapType, 0).')' : null).Lang::main('colon').'[ul][li]'.implode('[/li][li]', $stats).'[/li][/ul]';
 
         /****************/
         /* Main Content */
@@ -759,7 +759,7 @@ class NpcPage extends GenericPage
                     foreach ($data as $id => &$d)
                         $d['seat'] = str_replace(',', ', ', $_[$id]);
 
-                    $xCols = "$[Listview.funcBox.createSimpleCol('seat', '".Lang::$npc['seat']."', '10%', 'seat')]";
+                    $xCols = "$[Listview.funcBox.createSimpleCol('seat', '".Lang::npc('seat')."', '10%', 'seat')]";
                 }
 
                 $this->extendGlobalData($passengers->getJSGlobals(GLOBALINFO_SELF));
@@ -768,7 +768,7 @@ class NpcPage extends GenericPage
                     'data'   => $data,
                     'params' => array(
                         'extraCols' => $xCols,
-                        'name'      => Lang::$npc['accessory'],
+                        'name'      => Lang::npc('accessory'),
                         'id'        => 'accessory'
                     )
                 );
@@ -840,7 +840,7 @@ class NpcPage extends GenericPage
                 'qty'  => $row['qty'],
                 'name' => $factions->getField('name', true),
                 'npc'  => $row['npc'],
-                'cap'  => $row['maxRank'] && $row['maxRank'] < REP_EXALTED ? Lang::$game['rep'][$row['maxRank']] : null
+                'cap'  => $row['maxRank'] && $row['maxRank'] < REP_EXALTED ? Lang::game('rep', $row['maxRank']) : null
             );
 
             if ($row['spillover'])
@@ -862,7 +862,7 @@ class NpcPage extends GenericPage
 
         // base NPC
         if ($base = $this->getRepForId($this->typeId, $spilledParents))
-            $reputation[] = [Lang::$npc['modes'][1][0], $base];
+            $reputation[] = [Lang::npc('modes', 1, 0), $base];
 
         // difficulty dummys
         if ($dummyIds)
@@ -876,7 +876,7 @@ class NpcPage extends GenericPage
 
             // apply by difficulty
             foreach ($alt as $mode => $dat)
-                $reputation[] = [Lang::$npc['modes'][$mapType][$mode], $dat];
+                $reputation[] = [Lang::npc('modes', $mapType, $mode), $dat];
         }
 
         // get spillover factions and apply
@@ -907,7 +907,7 @@ class NpcPage extends GenericPage
                             'id'   => $spId,
                             'qty'  => $spilledParents[$row['spillover']][0],
                             'name' => $spilled->getField('name', true),
-                            'cap'  => $spMax && $spMax < REP_EXALTED ? Lang::$game['rep'][$spMax] : null
+                            'cap'  => $spMax && $spMax < REP_EXALTED ? Lang::game('rep', $spMax) : null
                         );
                     }
                 }
@@ -958,7 +958,7 @@ class NpcPage extends GenericPage
                 $line = array(
                     'range' => $t['range'],
                     'type' => 2,                            // [type: 0, 12] say: yellow-ish
-                    'lang'  => !empty($t['language']) ? Lang::$game['languages'][$t['language']] : null,
+                    'lang'  => !empty($t['language']) ? Lang::game('languages', $t['language']) : null,
                     'text'  => sprintf(Util::parseHtmlText(htmlentities($msg)), $this->name),
                 );
 

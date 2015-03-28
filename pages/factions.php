@@ -28,7 +28,7 @@ class FactionsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name = Util::ucFirst(Lang::$game['factions']);
+        $this->name = Util::ucFirst(Lang::game('factions'));
     }
 
     protected function generateContent()
@@ -71,11 +71,11 @@ class FactionsPage extends GenericPage
             switch (count($this->category))
             {
                 case 1:
-                    $t = Lang::$faction['cat'][$this->category[0]];
+                    $t = Lang::faction('cat', $this->category[0]);
                     array_unshift($this->title, is_array($t) ? $t[0] : $t);
                     break;
                 case 2:
-                    array_unshift($this->title, Lang::$faction['cat'][$this->category[0]][$this->category[1]]);
+                    array_unshift($this->title, Lang::faction('cat', $this->category[0], $this->category[1]));
                     break;
             }
         }

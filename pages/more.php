@@ -43,7 +43,7 @@ class MorePage extends GenericPage
                     $this->error();
 
                 if ($pageCall == 'help')                    // ye.. hack .. class definitions only allow static values
-                    $_[2] = Lang::$main['helpTopics'][$_[1]];
+                    $_[2] = Lang::main('helpTopics', $_[1]);
             }
             $this->type      = $_[0];
             $this->typeId    = $_[1];

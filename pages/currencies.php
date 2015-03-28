@@ -23,7 +23,7 @@ class CurrenciesPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name = Util::ucFirst(Lang::$game['currencies']);
+        $this->name = Util::ucFirst(Lang::game('currencies'));
     }
 
     protected function generateContent()
@@ -48,7 +48,7 @@ class CurrenciesPage extends GenericPage
     {
         array_unshift($this->title, $this->name);
         if ($this->category)
-            array_unshift($this->title, Lang::$currency['cat'][$this->category[0]]);
+            array_unshift($this->title, Lang::currency('cat', $this->category[0]));
     }
 
     protected function generatePath()

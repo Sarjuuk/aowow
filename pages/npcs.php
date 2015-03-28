@@ -25,12 +25,14 @@ class NpcsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name   = Util::ucFirst(Lang::$game['npcs']);
+        $this->name   = Util::ucFirst(Lang::game('npcs'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
     }
 
     protected function generateContent()
     {
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         $conditions = [];
 
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
@@ -80,14 +82,14 @@ class NpcsPage extends GenericPage
         $this->lvTabs[] = $lv;
 
         // sort for dropdown-menus
-        asort(Lang::$game['fa']);
+        asort(Lang::game('fa'));
     }
 
     protected function generateTitle()
     {
         array_unshift($this->title, $this->name);
         if ($this->category)
-            array_unshift($this->title, Lang::$npc['cat'][$this->category[0]]);
+            array_unshift($this->title, Lang::npc('cat', $this->category[0]));
     }
 
     protected function generatePath()

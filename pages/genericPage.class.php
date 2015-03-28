@@ -285,7 +285,7 @@ class GenericPage
                 $this->infobox = $article['quickInfo'];
 
             if ($article['locale'] != User::$localeId)
-                $this->article['params'] = ['prepend' => Util::jsEscape('<div class="notice-box"><span class="icon-bubble">'.Lang::$main['englishOnly'].'</span></div>')];
+                $this->article['params'] = ['prepend' => Util::jsEscape('<div class="notice-box"><span class="icon-bubble">'.Lang::main('englishOnly').'</span></div>')];
         }
     }
 
@@ -380,8 +380,8 @@ class GenericPage
         $this->tabId   = null;
         $this->type    = -99;                               // get error-article
         $this->typeId  = 0;
-        $this->title[] = Lang::$main['errPageTitle'];
-        $this->name    = Lang::$main['errPageTitle'];
+        $this->title[] = Lang::main('errPageTitle');
+        $this->name    = Lang::main('errPageTitle');
 
         $this->addArticle();
 

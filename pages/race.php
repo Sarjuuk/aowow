@@ -26,7 +26,7 @@ class RacePage extends GenericPage
 
         $this->subject = new CharRaceList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['race']);
+            $this->notFound(Lang::game('race'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -38,7 +38,7 @@ class RacePage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['class']));
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('class')));
     }
 
     protected function generateContent()
@@ -59,28 +59,28 @@ class RacePage extends GenericPage
 
         // side
         if ($_ = $this->subject->getField('side'))
-            $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-'.($_ == 2 ? 'horde' : 'alliance').']'.Lang::$game['si'][$_].'[/span]';
+            $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-'.($_ == 2 ? 'horde' : 'alliance').']'.Lang::game('si', $_).'[/span]';
 
         // faction
         if ($_ = $this->subject->getField('factionId'))
         {
             $fac = new FactionList(array(['ft.id', $_]));
             $this->extendGlobalData($fac->getJSGlobals());
-            $infobox[] = Util::ucFirst(Lang::$game['faction']).Lang::$main['colon'].'[faction='.$fac->id.']';
+            $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$fac->id.']';
         }
 
         // leader
         if ($_ = $this->subject->getField('leader'))
         {
             $this->extendGlobalIds(TYPE_NPC, $_);
-            $infobox[] = Lang::$class['racialLeader'].Lang::$main['colon'].'[npc='.$_.']';
+            $infobox[] = Lang::class('racialLeader').Lang::main('colon').'[npc='.$_.']';
         }
 
         // start area
         if ($_ = $this->subject->getField('startAreaId'))
         {
             $this->extendGlobalIds(TYPE_ZONE, $_);
-            $infobox[] = Lang::$class['startZone'].Lang::$main['colon'].'[zone='.$_.']';
+            $infobox[] = Lang::class('startZone').Lang::main('colon').'[zone='.$_.']';
         }
 
 

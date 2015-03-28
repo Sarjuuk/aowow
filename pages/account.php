@@ -78,7 +78,7 @@ class AccountPage extends GenericPage
                 if ($this->createRecoverPass($nStep))       // location-header after final step
                     header('Location: ?account=signin', true, 302);
 
-                $this->head = sprintf(Lang::$account['recoverPass'], $nStep);
+                $this->head = sprintf(Lang::account('recoverPass'), $nStep);
                 break;
             case 'forgotusername':
                 if (CFG_AUTH_MODE != AUTH_MODE_SELF)        // only recover own accounts
@@ -90,16 +90,16 @@ class AccountPage extends GenericPage
                 if ($this->_post['email'])
                 {
                     if (!Util::isValidEmail($this->_post['email']))
-                        $this->error = Lang::$account['emailInvalid'];
+                        $this->error = Lang::account('emailInvalid');
                     else if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE email = ?', $this->_post['email']))
-                        $this->error = Lang::$account['emailNotFound'];
+                        $this->error = Lang::account('emailNotFound');
                     else if ($err = $this->doRecoverUser())
                         $this->error = $err;
                     else
-                        $this->text = sprintf(Lang::$account['recovUserSent']. $this->_post['email']);
+                        $this->text = sprintf(Lang::account('recovUserSent'). $this->_post['email']);
                 }
 
-                $this->head = Lang::$account['recoverUser'];
+                $this->head = Lang::account('recoverUser');
                 break;
             case 'signin':
                 $this->tpl = 'acc-signIn';
@@ -131,7 +131,7 @@ class AccountPage extends GenericPage
                     else
                     {
                         $nStep = 1.5;
-                        $this->text = sprintf(Lang::$account['createAccSent'], $this->_post['email']);
+                        $this->text = sprintf(Lang::account('createAccSent'), $this->_post['email']);
                     }
                 }
                 else if (!empty($_GET['token']) && ($newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE status = ?d AND token = ?', ACC_STATUS_NEW, $_GET['token'])))
@@ -142,12 +142,12 @@ class AccountPage extends GenericPage
 
                     Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
-                    $this->text = sprintf(Lang::$account['accActivated'], $_GET['token']);
+                    $this->text = sprintf(Lang::account('accActivated'), $_GET['token']);
                 }
                 else
                     $this->next = $this->getNext();
 
-                $this->head = sprintf(Lang::$account['register'], $nStep);
+                $this->head = sprintf(Lang::account('register'), $nStep);
                 break;
             case 'signout':
                 User::destroy();
@@ -159,7 +159,7 @@ class AccountPage extends GenericPage
 
     protected function generateTitle()
     {
-        $this->title = [Lang::$account['title']];
+        $this->title = [Lang::account('title')];
     }
 
     protected function generatePath() { }
@@ -177,17 +177,17 @@ class AccountPage extends GenericPage
         /***********/
 
         $infobox   = [];
-        $infobox[] = Lang::$account['joinDate']. Lang::$main['colon'].'[tooltip name=joinDate]'. date('l, G:i:s', $user['joinDate']). '[/tooltip][span class=tip tooltip=joinDate]'. date(Lang::$main['dateFmtShort'], $user['joinDate']). '[/span]';
-        $infobox[] = Lang::$account['lastLogin'].Lang::$main['colon'].'[tooltip name=lastLogin]'.date('l, G:i:s', $user['prevLogin']).'[/tooltip][span class=tip tooltip=lastLogin]'.date(Lang::$main['dateFmtShort'], $user['prevLogin']).'[/span]';
-        $infobox[] = Lang::$account['lastIP'].   Lang::$main['colon'].$user['prevIP'];
-        $infobox[] = Lang::$account['email'].    Lang::$main['colon'].$user['email'];
+        $infobox[] = Lang::account('joinDate'). Lang::main('colon').'[tooltip name=joinDate]'. date('l, G:i:s', $user['joinDate']). '[/tooltip][span class=tip tooltip=joinDate]'. date(Lang::main('dateFmtShort'), $user['joinDate']). '[/span]';
+        $infobox[] = Lang::account('lastLogin').Lang::main('colon').'[tooltip name=lastLogin]'.date('l, G:i:s', $user['prevLogin']).'[/tooltip][span class=tip tooltip=lastLogin]'.date(Lang::main('dateFmtShort'), $user['prevLogin']).'[/span]';
+        $infobox[] = Lang::account('lastIP').   Lang::main('colon').$user['prevIP'];
+        $infobox[] = Lang::account('email').    Lang::main('colon').$user['email'];
 
         $groups = [];
-        foreach (Lang::$account['groups'] as $idx => $key)
+        foreach (Lang::account('groups') as $idx => $key)
             if ($idx >= 0 && $user['userGroups'] & (1 << $idx))
-                $groups[] = (!fMod(count($groups) + 1, 3) ? '[br]' : null).Lang::$account['groups'][$idx];
-        $infobox[] = Lang::$account['userGroups'].Lang::$main['colon'].($groups ? implode(', ', $groups) : Lang::$account['groups'][-1]);
-        $infobox[] = Util::ucFirst(Lang::$main['siteRep']).Lang::$main['colon'].User::getReputation();
+                $groups[] = (!fMod(count($groups) + 1, 3) ? '[br]' : null).Lang::account('groups', $idx);
+        $infobox[] = Lang::account('userGroups').Lang::main('colon').($groups ? implode(', ', $groups) : Lang::account('groups', -1));
+        $infobox[] = Util::ucFirst(Lang::main('siteRep')).Lang::main('colon').User::getReputation();
 
 
         $this->infobox = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
@@ -294,15 +294,15 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         if ($this->_post['email'])                          // step 1
         {
             if (!Util::isValidEmail($this->_post['email']))
-                $this->error = Lang::$account['emailInvalid'];
+                $this->error = Lang::account('emailInvalid');
             else if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE email = ?', $this->_post['email']))
-                $this->error = Lang::$account['emailNotFound'];
+                $this->error = Lang::account('emailNotFound');
             else if ($err = $this->doRecoverPass())
                 $this->error = $err;
             else
             {
                 $step = 1.5;
-                $this->text = sprintf(Lang::$account['recovPassSent'], $this->_post['email']);
+                $this->text = sprintf(Lang::account('recovPassSent'), $this->_post['email']);
             }
         }
         else if (isset($_GET['token']))                     // step 2
@@ -330,17 +330,17 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
     {
         // check username
         if (!User::isValidName($this->_post['username']))
-            return Lang::$account['userNotFound'];
+            return Lang::account('userNotFound');
 
         // check password
         if (!User::isValidPass($this->_post['password']))
-            return Lang::$account['wrongPass'];
+            return Lang::account('wrongPass');
 
         switch (User::Auth($this->_post['username'], $this->_post['password']))
         {
             case AUTH_OK:
                 if (!User::$ip)
-                    return Lang::$main['intError'];
+                    return Lang::main('intError');
 
                 // reset account status, update expiration
                 DB::Aowow()->query('UPDATE ?_account SET prevIP = IF(curIp = ?, prevIP, curIP), curIP = IF(curIp = ?, curIP, ?), allowExpire = ?d, status = 0, statusTimer = 0, token = "" WHERE user = ?',
@@ -356,22 +356,22 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             case AUTH_BANNED:
                 if (User::init())
                     User::save();
-               return Lang::$account['accBanned'];
+               return Lang::account('accBanned');
             case AUTH_WRONGUSER:
                 User::destroy();
-                return Lang::$account['userNotFound'];
+                return Lang::account('userNotFound');
             case AUTH_WRONGPASS:
                 User::destroy();
-                return Lang::$account['wrongPass'];
+                return Lang::account('wrongPass');
             case AUTH_ACC_INACTIVE:
                 User::destroy();
-                return Lang::$account['accInactive'];
+                return Lang::account('accInactive');
             case AUTH_IPBANNED:
                 User::destroy();
-                return sprintf(Lang::$account['loginExceeded'], Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
+                return sprintf(Lang::account('loginExceeded'), Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
             case AUTH_INTERNAL_ERR:
                 User::destroy();
-                return Lang::$main['intError'];
+                return Lang::main('intError');
             default:
                 return;
         }
@@ -381,34 +381,34 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
     {
         // check username
         if (!User::isValidName($this->_post['username'], $e))
-            return Lang::$account[$e == 1 ? 'errNameLength' : 'errNameChars'];
+            return Lang::account($e == 1 ? 'errNameLength' : 'errNameChars');
 
         // check password
         if (!User::isValidPass($this->_post['password'], $e))
-            return Lang::$account[$e == 1 ? 'errPassLength' : 'errPassChars'];
+            return Lang::account($e == 1 ? 'errPassLength' : 'errPassChars');
 
         if ($this->_post['password'] != $this->_post['c_password'])
-            return Lang::$account['passMismatch'];
+            return Lang::account('passMismatch');
 
         // check email
         if (!Util::isValidEmail($this->_post['email']))
-            return Lang::$account['emailInvalid'];
+            return Lang::account('emailInvalid');
 
         // check ip
         if (!User::$ip)
-            return Lang::$main['intError'];
+            return Lang::main('intError');
 
         // limit account creation
         $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 1 AND ip = ?', User::$ip);
         if ($ip && $ip['count'] >= CFG_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
         {
             DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, User::$ip);
-            return sprintf(Lang::$account['signupExceeded'], Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
+            return sprintf(Lang::account('signupExceeded'), Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
         }
 
         // username taken
         if ($_ = DB::Aowow()->SelectCell('SELECT user FROM ?_account WHERE (user = ? OR email = ?) AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $this->_post['username'], $email, ACC_STATUS_NEW, ACC_STATUS_NEW))
-            return $_ == $this->_post['username'] ? Lang::$account['nameInUse'] : Lang::$account['mailInUse'];
+            return $_ == $this->_post['username'] ? Lang::account('nameInUse') : Lang::account('mailInUse');
 
         // create..
         $token = Util::createHash();
@@ -425,8 +425,8 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             $token
         );
         if (!$id)                                           // something went wrong
-            return Lang::$main['intError'];
-        else if ($_ = $this->sendMail(Lang::$mail['accConfirm'][0], sprintf(Lang::$mail['accConfirm'][1], $token), CFG_ACCOUNT_CREATE_SAVE_DECAY))
+            return Lang::main('intError');
+        else if ($_ = $this->sendMail(Lang::mail('accConfirm', 0), sprintf(Lang::mail('accConfirm', 1), $token), CFG_ACCOUNT_CREATE_SAVE_DECAY))
         {
             // success:: update ip-bans
             if (!$ip || $ip['unbanDate'] < time())
@@ -444,16 +444,16 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             return $_;
 
         // send recovery mail
-        return $this->sendMail(Lang::$mail['resetPass'][0], sprintf(Lang::$mail['resetPass'][1], $token), CFG_ACCOUNT_RECOVERY_DECAY);
+        return $this->sendMail(Lang::mail('resetPass', 0), sprintf(Lang::mail('resetPass', 1), $token), CFG_ACCOUNT_RECOVERY_DECAY);
     }
 
     private function doResetPass()
     {
         if ($this->_post['password'] != $this->_post['c_password'])
-            return Lang::$account['passCheckFail'];
+            return Lang::account('passCheckFail');
 
         if (!Util::isValidEmail($this->_post['email']))
-            return Lang::$account['emailInvalid'];
+            return Lang::account('emailInvalid');
 
         $uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE token = ? AND email = ? AND status = ?d AND statusTimer > UNIX_TIMESTAMP()',
             $this->_post['token'],
@@ -461,13 +461,13 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             ACC_STATUS_RECOVER_PASS
         );
         if (!$uId)
-            return Lang::$account['emailNotFound'];         // assume they didn't meddle with the token
+            return Lang::account('emailNotFound');          // assume they didn't meddle with the token
 
         if (!User::verifyCrypt($newPass))
-            return Lang::$account['newPassDiff'];
+            return Lang::account('newPassDiff');
 
         if (!DB::Aowow()->query('UPDATE ?_account SET passHash = ?, status = ?d WHERE id = ?d', User::hashcrypt($newPass), ACC_STATUS_OK, $uId))
-            return Lang::$main['intError'];
+            return Lang::main('intError');
     }
 
     private function doRecoverUser()
@@ -476,35 +476,35 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             return $_;
 
         // send recovery mail
-        return $this->sendMail(Lang::$mail['recoverUser'][0], sprintf(Lang::$mail['recoverUser'][1], $token), CFG_ACCOUNT_RECOVERY_DECAY);
+        return $this->sendMail(Lang::mail('recoverUser', 0), sprintf(Lang::mail('recoverUser', 1), $token), CFG_ACCOUNT_RECOVERY_DECAY);
     }
 
     private function initRecovery($type, $delay, &$token)
     {
         if (!$type)
-            return Lang::$main['intError'];
+            return Lang::main('intError');
 
         // check if already processing
         if ($_ = DB::Aowow()->selectCell('SELECT statusTimer - UNIX_TIMESTAMP() FROM ?_account WHERE email = ? AND status <> ?d AND statusTimer > UNIX_TIMESTAMP()', $this->_post['email'], ACC_STATUS_OK))
-            return sprintf(lang::$account['isRecovering'], Util::formatTime($_ * 1000));
+            return sprintf(Lang::account('isRecovering'), Util::formatTime($_ * 1000));
 
         // create new token and write to db
         $token = Util::createHash();
         if (!DB::Aowow()->query('UPDATE ?_account SET token = ?, status = ?d, statusTimer =  UNIX_TIMESTAMP() + ?d WHERE email = ?', $token, $type, $delay, $this->_post['email']))
-            return Lang::$main['intError'];
+            return Lang::main('intError');
     }
 
     private function sendMail($subj, $msg, $delay = 300)
     {
         // send recovery mail
-        $subj   = CFG_NAME_SHORT.Lang::$main['colon'] . $subj;
-        $msg   .= "\r\n\r\n".sprintf(Lang::$mail['tokenExpires'], Util::formatTime($delay * 1000))."\r\n";
+        $subj   = CFG_NAME_SHORT.Lang::main('colon') . $subj;
+        $msg   .= "\r\n\r\n".sprintf(Lang::mail('tokenExpires'), Util::formatTime($delay * 1000))."\r\n";
         $header = 'From: '.CFG_CONTACT_EMAIL . "\r\n" .
                   'Reply-To: '.CFG_CONTACT_EMAIL . "\r\n" .
                   'X-Mailer: PHP/' . phpversion();
 
         if (!mail($this->_post['email'], $subj, $msg, $header))
-            return sprintf(Lang::$main['intError2'], 'send mail');
+            return sprintf(Lang::main('intError2'), 'send mail');
     }
 
     private function getNext($forHeader = false)

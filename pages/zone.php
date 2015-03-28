@@ -24,7 +24,7 @@ class ZonePage extends GenericPage
 
         $this->subject = new ZoneList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['zone']);
+            $this->notFound(Lang::game('zone'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -41,7 +41,7 @@ class ZonePage extends GenericPage
 
         // City
         if ($this->subject->getField('flags') & 0x200000 && !$this->subject->getField('parentArea'))
-            $infobox[] = Lang::$zone['city'];
+            $infobox[] = Lang::zone('city');
 
         // Level
         if ($_ = $this->subject->getField('levelMin'))
@@ -49,7 +49,7 @@ class ZonePage extends GenericPage
             if ($_ < $this->subject->getField('levelMax'))
                 $_ .= ' - '.$this->subject->getField('levelMax');
 
-            $infobox[] = Lang::$game['level'].Lang::$main['colon'].$_;
+            $infobox[] = Lang::game('level').Lang::main('colon').$_;
         }
 
         // required Level
@@ -65,18 +65,18 @@ class ZonePage extends GenericPage
         else if ($_ == 4)
             $__ = '[span class=icon-ffa]%s[/span]';
 
-        $infobox[] = Lang::$zone['territory'].Lang::$main['colon'].sprintf($__, lang::$zone['territories'][$_]);
+        $infobox[] = Lang::zone('territory').Lang::main('colon').sprintf($__, Lang::zone('territories', $_));
 
         // Instance Type
-        $infobox[] = Lang::$zone['instanceType'].Lang::$main['colon'].'[span class=icon-instance'.$this->subject->getField('type').']'.Lang::$zone['instanceTypes'][$this->subject->getField('type')].'[/span]';
+        $infobox[] = Lang::zone('instanceType').Lang::main('colon').'[span class=icon-instance'.$this->subject->getField('type').']'.Lang::zone('instanceTypes', $this->subject->getField('type')).'[/span]';
 
         // Heroic mode
         if ($_ = $this->subject->getField('levelHeroic'))
-            $infobox[] = '[icon preset=heroic]'.sprintf(Lang::$zone['hcAvailable'], $_).'[/icon]';
+            $infobox[] = '[icon preset=heroic]'.sprintf(Lang::zone('hcAvailable'), $_).'[/icon]';
 
         // number of players
         if ($_ = $this->subject->getField('maxPlayer'))
-            $infobox[] = Lang::$zone['numPlayers'].Lang::$main['colon'].($_ == -2 ? '10/25' : $_);
+            $infobox[] = Lang::zone('numPlayers').Lang::main('colon').($_ == -2 ? '10/25' : $_);
 
         // attunement
         // [li]Attunement: [quest=24712][/li]
@@ -462,7 +462,7 @@ class ZonePage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['zone']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('zone')));
     }
 
 }

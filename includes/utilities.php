@@ -813,45 +813,45 @@ class Util
         if ($short)
         {
             if ($_ = round($s['d'] / 364))
-                return $_." ".Lang::$timeUnits['ab'][0];
+                return $_." ".Lang::timeUnits('ab', 0);
             if ($_ = round($s['d'] / 30))
-                return $_." ".Lang::$timeUnits['ab'][1];
+                return $_." ".Lang::timeUnits('ab', 1);
             if ($_ = round($s['d'] / 7))
-                return $_." ".Lang::$timeUnits['ab'][2];
+                return $_." ".Lang::timeUnits('ab', 2);
             if ($_ = round($s['d']))
-                return $_." ".Lang::$timeUnits['ab'][3];
+                return $_." ".Lang::timeUnits('ab', 3);
             if ($_ = round($s['h']))
-                return $_." ".Lang::$timeUnits['ab'][4];
+                return $_." ".Lang::timeUnits('ab', 4);
             if ($_ = round($s['m']))
-                return $_." ".Lang::$timeUnits['ab'][5];
+                return $_." ".Lang::timeUnits('ab', 5);
             if ($_ = round($s['s'] + $s['ms'] / 1000, 2))
-                return $_." ".Lang::$timeUnits['ab'][6];
+                return $_." ".Lang::timeUnits('ab', 6);
             if ($s['ms'])
-                return $s['ms']." ".Lang::$timeUnits['ab'][7];
+                return $s['ms']." ".Lang::timeUnits('ab', 7);
 
-            return '0 '.Lang::$timeUnits['ab'][6];
+            return '0 '.Lang::timeUnits('ab', 6);
         }
         else
         {
             $_ = $s['d'] + $s['h'] / 24;
             if ($_ > 1 && !($_ % 364))                      // whole years
-                return round(($s['d'] + $s['h'] / 24) / 364, 2)." ".Lang::$timeUnits[$s['d'] / 364 == 1 && !$s['h'] ? 'sg' : 'pl'][0];
+                return round(($s['d'] + $s['h'] / 24) / 364, 2)." ".Lang::timeUnits($s['d'] / 364 == 1 && !$s['h'] ? 'sg' : 'pl', 0);
             if ($_ > 1 && !($_ % 30))                       // whole month
-                return round(($s['d'] + $s['h'] / 24) /  30, 2)." ".Lang::$timeUnits[$s['d'] /  30 == 1 && !$s['h'] ? 'sg' : 'pl'][1];
+                return round(($s['d'] + $s['h'] / 24) /  30, 2)." ".Lang::timeUnits($s['d'] /  30 == 1 && !$s['h'] ? 'sg' : 'pl', 1);
             if ($_ > 1 && !($_ % 7))                        // whole weeks
-                return round(($s['d'] + $s['h'] / 24) /   7, 2)." ".Lang::$timeUnits[$s['d'] /   7 == 1 && !$s['h'] ? 'sg' : 'pl'][2];
+                return round(($s['d'] + $s['h'] / 24) /   7, 2)." ".Lang::timeUnits($s['d'] /   7 == 1 && !$s['h'] ? 'sg' : 'pl', 2);
             if ($s['d'])
-                return round($s['d'] + $s['h']  /   24, 2)." ".Lang::$timeUnits[$s['d'] == 1 && !$s['h']  ? 'sg' : 'pl'][3];
+                return round($s['d'] + $s['h']  /   24, 2)." ".Lang::timeUnits($s['d'] == 1 && !$s['h']  ? 'sg' : 'pl', 3);
             if ($s['h'])
-                return round($s['h'] + $s['m']  /   60, 2)." ".Lang::$timeUnits[$s['h'] == 1 && !$s['m']  ? 'sg' : 'pl'][4];
+                return round($s['h'] + $s['m']  /   60, 2)." ".Lang::timeUnits($s['h'] == 1 && !$s['m']  ? 'sg' : 'pl', 4);
             if ($s['m'])
-                return round($s['m'] + $s['s']  /   60, 2)." ".Lang::$timeUnits[$s['m'] == 1 && !$s['s']  ? 'sg' : 'pl'][5];
+                return round($s['m'] + $s['s']  /   60, 2)." ".Lang::timeUnits($s['m'] == 1 && !$s['s']  ? 'sg' : 'pl', 5);
             if ($s['s'])
-                return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::$timeUnits[$s['s'] == 1 && !$s['ms'] ? 'sg' : 'pl'][6];
+                return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::timeUnits($s['s'] == 1 && !$s['ms'] ? 'sg' : 'pl', 6);
             if ($s['ms'])
-                return $s['ms']." ".Lang::$timeUnits[$s['ms'] == 1 ? 'sg' : 'pl'][7];
+                return $s['ms']." ".Lang::timeUnits($s['ms'] == 1 ? 'sg' : 'pl', 7);
 
-            return '0 '.Lang::$timeUnits['pl'][6];
+            return '0 '.Lang::timeUnits('pl', 6);
         }
     }
 
@@ -960,12 +960,12 @@ class Util
         $text = preg_replace($from, $to, $text);
 
         $pairs = array(
-            '$c' => '&lt;'.Lang::$game['class'].'&gt;',
-            '$C' => '&lt;'.Lang::$game['class'].'&gt;',
-            '$r' => '&lt;'.Lang::$game['race'].'&gt;',
-            '$R' => '&lt;'.Lang::$game['race'].'&gt;',
-            '$n' => '&lt;'.Lang::$main['name'].'&gt;',
-            '$N' => '&lt;'.Lang::$main['name'].'&gt;',
+            '$c' => '&lt;'.Lang::game('class').'&gt;',
+            '$C' => '&lt;'.Lang::game('class').'&gt;',
+            '$r' => '&lt;'.Lang::game('race').'&gt;',
+            '$R' => '&lt;'.Lang::game('race').'&gt;',
+            '$n' => '&lt;'.Lang::main('name').'&gt;',
+            '$N' => '&lt;'.Lang::main('name').'&gt;',
             '$b' => '<br />',
             '$B' => '<br />',
             '|n' => ''                                      // what .. the fuck .. another type of line terminator? (only in spanish though)
@@ -1084,7 +1084,7 @@ class Util
         if (!in_array($type, array(ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_EXPERTISE_RATING)))
             $result .= '%';
 
-        return sprintf(Lang::$item['ratingString'], '<!--rtg%'.$type.'-->'.$result, '<!--lvl-->'.$level);
+        return sprintf(Lang::item('ratingString'), '<!--rtg%'.$type.'-->'.$result, '<!--lvl-->'.$level);
     }
 
     public static function powerUseLocale($domain = 'www')

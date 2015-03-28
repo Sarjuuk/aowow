@@ -18,17 +18,17 @@
                 <h1><?php echo $this->name; ?></h1>
 <?php if ($this->unavailable): ?>
                 <div class="pad"></div>
-                <b style="color: red"><?php echo Lang::$quest['unavailable']; ?></b>
+                <b style="color: red"><?php echo Lang::quest('unavailable'); ?></b>
 <?php
 endif;
 
 if ($this->objectives):
     echo $this->objectives."\n";
 elseif ($this->requestItems):
-    echo '                <h3>'.Lang::$quest['progress']."</h3>\n";
+    echo '                <h3>'.Lang::quest('progress')."</h3>\n";
     echo $this->requestItems."\n";
 elseif ($this->offerReward):
-    echo '                <h3>'.Lang::$quest['completion']."</h3>\n";
+    echo '                <h3>'.Lang::quest('completion')."</h3>\n";
     echo $this->offerReward."\n";
 endif;
 
@@ -37,7 +37,7 @@ if ($e = $this->end):
                 <table class="iconlist">
                     <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td><?php echo $e; ?></td></tr>
 <?php if ($s = $this->suggestedPl): ?>
-                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td><?php echo Lang::$quest['suggestedPl'].lang::$main['colon'].$s; ?></td></tr>
+                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td><?php echo Lang::quest('suggestedPl').Lang::main('colon').$s; ?></td></tr>
 <?php endif; ?>
                 </table>
                 <div class="pad"></div>
@@ -46,7 +46,7 @@ endif;
 
 if ($o = $this->objectiveList):
     if ($e = $this->end):
-        echo '                '.Lang::$quest['providedItem'].Lang::$main['colon']."\n";
+        echo '                '.Lang::quest('providedItem').Lang::main('colon')."\n";
     endif;
 ?>
                 <table class="iconlist">
@@ -88,7 +88,7 @@ if ($o = $this->objectiveList):
     endforeach;
 
     if ($this->suggestedPl && !$this->end):
-        echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.Lang::$quest['suggestedPl'].lang::$main['colon'].$this->suggestedPl."</td></tr>\n";
+        echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.Lang::quest('suggestedPl').Lang::main('colon').$this->suggestedPl."</td></tr>\n";
     endif;
 ?>
                 </table>
@@ -108,19 +108,19 @@ endif;
 $this->brick('mapper');
 
 if ($this->details):
-    echo '                <h3>'.Lang::$quest['description']."</h3>\n" . $this->details."\n";
+    echo '                <h3>'.Lang::quest('description')."</h3>\n" . $this->details."\n";
 endif;
 
 if ($this->requestItems && $this->objectives):
 ?>
-                <h3><a href="javascript:;" class="disclosure-off" onclick="return g_disclose($WH.ge('disclosure-progress'), this)"><?php echo Lang::$quest['progress']; ?></a></h3>
+                <h3><a href="javascript:;" class="disclosure-off" onclick="return g_disclose($WH.ge('disclosure-progress'), this)"><?php echo Lang::quest('progress'); ?></a></h3>
                 <div id="disclosure-progress" style="display: none"><?php echo $this->requestItems; ?></div>
 <?php
 endif;
 
 if ($this->offerReward && ($this->requestItems || $this->objectives)):
 ?>
-                <h3><a href="javascript:;" class="disclosure-off" onclick="return g_disclose($WH.ge('disclosure-completion'), this)"><?php echo Lang::$quest['completion']; ?></a></h3>
+                <h3><a href="javascript:;" class="disclosure-off" onclick="return g_disclose($WH.ge('disclosure-completion'), this)"><?php echo Lang::quest('completion'); ?></a></h3>
                 <div id="disclosure-completion" style="display: none"><?php echo $this->offerReward; ?></div>
 <?php
 endif;
@@ -128,10 +128,10 @@ endif;
 if ($r = $this->rewards):
     $offset = 0;
 
-    echo '                <h3>'.Lang::$main['rewards']."</h3>\n";
+    echo '                <h3>'.Lang::main('rewards')."</h3>\n";
 
     if (!empty($r['choice'])):
-        $this->brick('rewards', ['rewTitle' => Lang::$quest['chooseItems'], 'rewards' => $r['choice'], 'offset' => $offset]);
+        $this->brick('rewards', ['rewTitle' => Lang::quest('chooseItems'), 'rewards' => $r['choice'], 'offset' => $offset]);
         $offset += count($r['choice']);
     endif;
 
@@ -141,10 +141,10 @@ if ($r = $this->rewards):
         endif;
 
         if (!empty($r['spells']['learn'])):
-            $this->brick('rewards', ['rewTitle' => Lang::$quest['spellLearn'], 'rewards' => $r['spells']['learn'], 'offset' => $offset, 'extra' => $r['spells']['extra']]);
+            $this->brick('rewards', ['rewTitle' => Lang::quest('spellLearn'), 'rewards' => $r['spells']['learn'], 'offset' => $offset, 'extra' => $r['spells']['extra']]);
             $offset += count($r['spells']['learn']);
         elseif (!empty($r['spells']['cast'])):
-            $this->brick('rewards', ['rewTitle' => Lang::$quest['spellCast'], 'rewards' => $r['spells']['cast'], 'offset' => $offset, 'extra' => $r['spells']['extra']]);
+            $this->brick('rewards', ['rewTitle' => Lang::quest('spellCast'), 'rewards' => $r['spells']['cast'], 'offset' => $offset, 'extra' => $r['spells']['extra']]);
             $offset += count($r['spells']['cast']);
         endif;
     endif;
@@ -155,7 +155,7 @@ if ($r = $this->rewards):
         endif;
 
         $addData = ['rewards' => !empty($r['items']) ? $r['items'] : null, 'offset' => $offset, 'extra' => !empty($r['money']) ? $r['money'] : null];
-        $addData['rewTitle'] = empty($r['choice']) ? Lang::$quest['receiveItems'] : Lang::$quest['receiveAlso'];
+        $addData['rewTitle'] = empty($r['choice']) ? Lang::quest('receiveItems') : Lang::quest('receiveAlso');
 
         $this->brick('rewards', $addData);
     endif;
@@ -163,26 +163,26 @@ if ($r = $this->rewards):
 endif;
 
 if ($g = $this->gains):
-    echo '                    <h3>'.Lang::$main['gains']."</h3>\n";
-    echo '                    '.Lang::$quest['gainsDesc'].Lang::$main['colon']."\n";
+    echo '                    <h3>'.Lang::main('gains')."</h3>\n";
+    echo '                    '.Lang::quest('gainsDesc').Lang::main('colon')."\n";
     echo "                    <ul>\n";
 
     if (!empty($g['xp'])):
-        echo '                        <li><div>'.number_format($g['xp']).' '.Lang::$quest['experience']."</div></li>\n";
+        echo '                        <li><div>'.number_format($g['xp']).' '.Lang::quest('experience')."</div></li>\n";
     endif;
 
     if (!empty($g['rep'])):
         foreach ($g['rep'] as $r):
-            echo '                        <li><div>'.($r['qty'] < 0 ? '<b class="q10">'.$r['qty'].'</b>' : $r['qty']).' '.Lang::$npc['repWith'].' <a href="?faction='.$r['id'].'">'.$r['name']."</a></div></li>\n";
+            echo '                        <li><div>'.($r['qty'] < 0 ? '<b class="q10">'.$r['qty'].'</b>' : $r['qty']).' '.Lang::npc('repWith').' <a href="?faction='.$r['id'].'">'.$r['name']."</a></div></li>\n";
         endforeach;
     endif;
 
     if (!empty($g['title'])):
-        echo '                        <li><div>'.sprintf(Lang::$quest['theTitle'], $g['title'])."</div></li>\n";
+        echo '                        <li><div>'.sprintf(Lang::quest('theTitle'), $g['title'])."</div></li>\n";
     endif;
 
     if (!empty($g['tp'])):
-        echo '                        <li><div>'.$g['tp'].' '.Lang::$quest['bonusTalents']."</div></li>\n";
+        echo '                        <li><div>'.$g['tp'].' '.Lang::quest('bonusTalents')."</div></li>\n";
     endif;
 
     echo "                    </ul>\n";
@@ -195,7 +195,7 @@ if (!empty($this->transfer)):
 endif;
 
 ?>
-                <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
+                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
             </div>
 
 <?php

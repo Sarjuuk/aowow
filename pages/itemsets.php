@@ -24,7 +24,7 @@ class ItemsetsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name = Util::ucFirst(Lang::$game['itemsets']);
+        $this->name = Util::ucFirst(Lang::game('itemsets'));
     }
 
     protected function generateContent()
@@ -69,8 +69,8 @@ class ItemsetsPage extends GenericPage
         $this->lvTabs[] = $lv;
 
         // sort for dropdown-menus
-        asort(Lang::$itemset['notes'], SORT_NATURAL);
-        asort(Lang::$game['cl']);
+        asort(Lang::itemset('notes'), SORT_NATURAL);
+        asort(Lang::game('cl'));
     }
 
     protected function generateTitle()
@@ -79,7 +79,7 @@ class ItemsetsPage extends GenericPage
 
         $form = $this->filterObj->getForm('form');
         if (isset($form['cl']))
-            array_unshift($this->title, Lang::$game['cl'][$form['cl']]);
+            array_unshift($this->title, Lang::game('cl', $form['cl']));
     }
 
     protected function generatePath()

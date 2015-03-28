@@ -549,10 +549,10 @@ trait spawnHelper
                 {
                     foreach ($wPoints as $i => $p)
                     {
-                        $label = [Lang::$npc['waypoint'].Lang::$main['colon'].$p['point']];
+                        $label = [Lang::npc('waypoint').Lang::main('colon').$p['point']];
 
                         if ($p['wait'])
-                            $label[] = Lang::$npc['wait'].Lang::$main['colon'].Util::formatTime($p['wait'], false);
+                            $label[] = Lang::npc('wait').Lang::main('colon').Util::formatTime($p['wait'], false);
 
                         $set = ['label' => '$<br><span class="q0">'.implode('<br>', $label).'</span>', 'type'  => $wpIdx];
 
@@ -573,26 +573,26 @@ trait spawnHelper
             $label = [];
 
             if (User::isInGroup(U_GROUP_STAFF))
-                $label[] = $s['guid'] < 0 ? 'Vehicle Accessory' : 'GUID'.Lang::$main['colon'].$s['guid'];
+                $label[] = $s['guid'] < 0 ? 'Vehicle Accessory' : 'GUID'.Lang::main('colon').$s['guid'];
 
             if ($s['respawn'])
-                $label[] = Lang::$npc['respawnIn'].Lang::$main['colon'].Util::formatTime($s['respawn'] * 1000, false);
+                $label[] = Lang::npc('respawnIn').Lang::main('colon').Util::formatTime($s['respawn'] * 1000, false);
 
             if (User::isInGroup(U_GROUP_STAFF))
             {
                 if ($s['phaseMask'] > 1)
-                    $label[] = Lang::$game['phases'].Lang::$main['colon'].$s['phaseMask'];
+                    $label[] = Lang::game('phases').Lang::main('colon').$s['phaseMask'];
 
                 if ($s['spawnMask'] == 15)
-                    $label[] = Lang::$game['mode'].Lang::$main['colon'].Lang::$game['modes'][-1];
+                    $label[] = Lang::game('mode').Lang::main('colon').Lang::game('modes', -1);
                 else if ($s['spawnMask'])
                 {
                     $_ = [];
                     for ($i = 0; $i < 4; $i++)
                         if ($s['spawnMask'] & 1 << $i)
-                            $_[] = Lang::$game['modes'][$i];
+                            $_[] = Lang::game('modes', $i);
 
-                    $label[] = Lang::$game['mode'].Lang::$main['colon'].implode(', ', $_);
+                    $label[] = Lang::game('mode').Lang::main('colon').implode(', ', $_);
                 }
             }
 

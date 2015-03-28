@@ -35,7 +35,7 @@ class ComparePage extends GenericPage
         else if (!empty($_COOKIE['compare_groups']))
             $this->compareString = urldecode($_COOKIE['compare_groups']);
 
-        $this->name = Lang::$main['compareTool'];
+        $this->name = Lang::main('compareTool');
     }
 
     protected function generateContent()

@@ -35,7 +35,7 @@ if ($this->reagents[1]):
             echo "                <div style=\"float: left\">\n";
         endif;
 ?>
-                <h3><?php echo Lang::$spell['tools']; ?></h3>
+                <h3><?php echo Lang::spell('tools'); ?></h3>
                 <table class="iconlist">
 <?php
         foreach ($this->tools as $i => $t):
@@ -69,7 +69,7 @@ if (!empty($this->transfer)):
 endif;
 ?>
 
-                <h3><?php echo Lang::$spell['_spellDetails']; ?></h3>
+                <h3><?php echo Lang::spell('_spellDetails'); ?></h3>
 
                 <table class="grid" id="spelldetails">
                     <colgroup>
@@ -85,46 +85,46 @@ endif;
                                 <td style="height: 0; padding: 0; border: 0" colspan="2"></td>
                             </tr>
                             <tr>
-                                <th style="border-left: 0; border-top: 0"><?php echo Lang::$game['duration']; ?></th>
-                                <td width="100%" style="border-top: 0"><?php echo !empty($this->duration) ? $this->duration : '<span class="q0">'.Lang::$main['n_a'].'</span>'; ?></td>
+                                <th style="border-left: 0; border-top: 0"><?php echo Lang::game('duration'); ?></th>
+                                <td width="100%" style="border-top: 0"><?php echo !empty($this->duration) ? $this->duration : '<span class="q0">'.Lang::main('n_a').'</span>'; ?></td>
                             </tr>
                             <tr>
-                                <th style="border-left: 0"><?php echo Lang::$game['school']; ?></th>
+                                <th style="border-left: 0"><?php echo Lang::game('school'); ?></th>
                                 <td><?php echo User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, $this->school[0], $this->school[1]) : $this->school[1]; ?></td>
                             </tr>
                             <tr>
-                                <th style="border-left: 0"><?php echo Lang::$game['mechanic']; ?></th>
-                                <td width="100%" style="border-top: 0"><?php echo !empty($this->mechanic) ? $this->mechanic : '<span class="q0">'.Lang::$main['n_a'].'</span>'; ?></td>
+                                <th style="border-left: 0"><?php echo Lang::game('mechanic'); ?></th>
+                                <td width="100%" style="border-top: 0"><?php echo !empty($this->mechanic) ? $this->mechanic : '<span class="q0">'.Lang::main('n_a').'</span>'; ?></td>
                             </tr>
                             <tr>
-                                <th style="border-left: 0"><?php echo Lang::$game['dispelType']; ?></th>
-                                <td width="100%" style="border-top: 0"><?php echo !empty($this->dispel) ? $this->dispel : '<span class="q0">'.Lang::$main['n_a'].'</span>'; ?></td>
+                                <th style="border-left: 0"><?php echo Lang::game('dispelType'); ?></th>
+                                <td width="100%" style="border-top: 0"><?php echo !empty($this->dispel) ? $this->dispel : '<span class="q0">'.Lang::main('n_a').'</span>'; ?></td>
                             </tr>
                             <tr>
-                                <th style="border-bottom: 0; border-left: 0"><?php echo Lang::$spell['_gcdCategory']; ?></th>
-                                <td style="border-bottom: 0"><?php echo !empty($this->gcdCat) ? $this->gcdCat : '<span class="q0">'.Lang::$main['n_a'].'</span>'; ?></td>
+                                <th style="border-bottom: 0; border-left: 0"><?php echo Lang::spell('_gcdCategory'); ?></th>
+                                <td style="border-bottom: 0"><?php echo !empty($this->gcdCat) ? $this->gcdCat : '<span class="q0">'.Lang::main('n_a').'</span>'; ?></td>
                             </tr>
                             </table>
                         </td>
                     </tr>
                     <tr>
-                        <th style="border-top: 0"><?php echo Lang::$spell['_cost']; ?></th>
-                        <td style="border-top: 0"><?php echo !empty($this->powerCost) ? $this->powerCost : Lang::$spell['_none']; ?></td>
+                        <th style="border-top: 0"><?php echo Lang::spell('_cost'); ?></th>
+                        <td style="border-top: 0"><?php echo !empty($this->powerCost) ? $this->powerCost : Lang::spell('_none'); ?></td>
                     </tr>
                     <tr>
-                        <th><?php echo Lang::$spell['_range']; ?></th>
-                        <td><?php echo $this->range.' '.Lang::$spell['_distUnit'].' <small>('.$this->rangeName; ?>)</small></td>
+                        <th><?php echo Lang::spell('_range'); ?></th>
+                        <td><?php echo $this->range.' '.Lang::spell('_distUnit').' <small>('.$this->rangeName; ?>)</small></td>
                     </tr>
                     <tr>
-                        <th><?php echo Lang::$spell['_castTime']; ?></th>
+                        <th><?php echo Lang::spell('_castTime'); ?></th>
                         <td><?php echo $this->castTime; ?></td>
                     </tr>
                     <tr>
-                        <th><?php echo Lang::$spell['_cooldown']; ?></th>
-                        <td><?php echo !empty($this->cooldown) ? $this->cooldown : '<span class="q0">'.Lang::$main['n_a'].'</span>'; ?></td>
+                        <th><?php echo Lang::spell('_cooldown'); ?></th>
+                        <td><?php echo !empty($this->cooldown) ? $this->cooldown : '<span class="q0">'.Lang::main('n_a').'</span>'; ?></td>
                     </tr>
                     <tr>
-                        <th><dfn title="<?php echo Lang::$spell['_globCD'].'">'.Lang::$spell['_gcd']; ?></dfn></th>
+                        <th><dfn title="<?php echo Lang::spell('_globCD').'">'.Lang::spell('_gcd'); ?></dfn></th>
                         <td><?php echo $this->gcd; ?></td>
                     </tr>
 <?php
@@ -132,13 +132,13 @@ endif;
 if (!in_array(array_values($this->scaling), [[-1, -1, 0, 0], [0, 0, 0, 0]])):
 ?>
                     <tr>
-                        <th><?php echo Lang::$spell['_scaling']; ?></th>
+                        <th><?php echo Lang::spell('_scaling'); ?></th>
                         <td colspan="3">
 
 <?php
     foreach ($this->scaling as $k => $s):
         if ($s > 0):
-            echo '                            '.sprintf(Lang::$spell['scaling'][$k], $s * 100)."<br>\n";
+            echo '                            '.sprintf(Lang::spell('scaling', $k), $s * 100)."<br>\n";
         endif;
     endforeach;
 ?>
@@ -150,7 +150,7 @@ endif;
 if (!empty($this->stances)):
 ?>
                     <tr>
-                        <th><?php echo Lang::$spell['_forms']; ?></th>
+                        <th><?php echo Lang::spell('_forms'); ?></th>
                         <td colspan="3"><?php echo $this->stances; ?></td>
                     </tr>
 <?php
@@ -159,7 +159,7 @@ endif;
 if (!empty($this->items)):
 ?>
                     <tr>
-                        <th><?php echo Lang::$game['requires2']; ?></th>
+                        <th><?php echo Lang::game('requires2'); ?></th>
                         <td colspan="3"><?php echo User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, implode(' | ', $this->items[0]), $this->items[1]) : $this->items[1]; ?></td>
                     </tr>
 <?php
@@ -168,29 +168,29 @@ endif;
 foreach ($this->effects as $i => $e):
 ?>
                     <tr>
-                        <th><?php echo Lang::$spell['_effect'].' #'.($i + 1); ?></th>
+                        <th><?php echo Lang::spell('_effect').' #'.($i + 1); ?></th>
                         <td colspan="3" style="line-height: 17px">
 <?php
     echo '                            '.$e['name'].'<small>' .
-        (isset($e['value'])    ? '<br>'.Lang::$spell['_value']   .Lang::$main['colon'].$e['value']    : null) .
-        (isset($e['radius'])   ? '<br>'.Lang::$spell['_radius']  .Lang::$main['colon'].$e['radius'].' '.Lang::$spell['_distUnit'] : null) .
-        (isset($e['interval']) ? '<br>'.Lang::$spell['_interval'].Lang::$main['colon'].$e['interval'] : null) .
-        (isset($e['mechanic']) ? '<br>'.Lang::$game['mechanic']  .Lang::$main['colon'].$e['mechanic'] : null);
+        (isset($e['value'])    ? '<br>'.Lang::spell('_value')   .Lang::main('colon').$e['value']    : null) .
+        (isset($e['radius'])   ? '<br>'.Lang::spell('_radius')  .Lang::main('colon').$e['radius'].' '.Lang::spell('_distUnit') : null) .
+        (isset($e['interval']) ? '<br>'.Lang::spell('_interval').Lang::main('colon').$e['interval'] : null) .
+        (isset($e['mechanic']) ? '<br>'.Lang::game('mechanic')  .Lang::main('colon').$e['mechanic'] : null);
 
     if (isset($e['procData'])):
         echo '<br>';
 
         if ($e['procData'][0] < 0):
-            echo sprintf(Lang::$spell['ppm'], -$e['procData'][0]);
+            echo sprintf(Lang::spell('ppm'), -$e['procData'][0]);
         elseif ($e['procData'][0] < 100.0):
-            echo Lang::$spell['procChance'].Lang::$main['colon'].$e['procData'][0].'%';
+            echo Lang::spell('procChance').Lang::main('colon').$e['procData'][0].'%';
         endif;
 
         if ($e['procData'][1]):
             if ($e['procData'][0] < 100.0):
                 echo '<br>';
             endif;
-            echo sprintf(Lang::$game['cooldown'], $e['procData'][1]);
+            echo sprintf(Lang::game('cooldown'), $e['procData'][1]);
         endif;
     endif;
 
@@ -224,7 +224,7 @@ endforeach;
 ?>
                 </table>
 
-                <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
+                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
             </div>
 
 <?php

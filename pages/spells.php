@@ -90,7 +90,7 @@ class SpellsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name   = Util::ucFirst(Lang::$game['spells']);
+        $this->name   = Util::ucFirst(Lang::game('spells'));
         $this->subCat = $pageParam !== null ? '='.$pageParam : '';
         $this->filter = ['classPanel' => false, 'glyphPanel' => false];
     }
@@ -289,17 +289,17 @@ class SpellsPage extends GenericPage
                             $sf  = $this->shortFilter[$this->category[1]];
                             $txt = '';
                             if ($sf[0] && $sf[1])
-                                $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]) . Lang::$spell['relItems']['link'] . sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
+                                $txt = sprintf(Lang::spell('relItems', 'crafted'), $sf[0]) . Lang::spell('relItems', 'link') . sprintf(Lang::spell('relItems', 'recipes'), $sf[1]);
                             else if ($sf[0])
-                                $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]);
+                                $txt = sprintf(Lang::spell('relItems', 'crafted'), $sf[0]);
                             else if ($sf[1])
-                                $txt = sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
+                                $txt = sprintf(Lang::spell('relItems', 'recipes'), $sf[1]);
 
-                            $note = Lang::$spell['cat'][$this->category[0]][$this->category[1]];
+                            $note = Lang::spell('cat', $this->category[0], $this->category[1]);
                             if (is_array($note))
                                 $note = $note[0];
 
-                            $tab['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
+                            $tab['params']['note'] = sprintf(Lang::spell('relItems', 'base'), $txt, $note);
                             $tab['params']['sort'] = "$['skill', 'name']";
                         }
                     }
@@ -329,17 +329,17 @@ class SpellsPage extends GenericPage
                             $sf  = $this->shortFilter[$this->category[1]];
                             $txt = '';
                             if ($sf[0] && $sf[1])
-                                $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]) . Lang::$spell['relItems']['link'] . sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
+                                $txt = sprintf(Lang::spell('relItems', 'crafted'), $sf[0]) . Lang::spell('relItems', 'link') . sprintf(Lang::spell('relItems', 'recipes'), $sf[1]);
                             else if ($sf[0])
-                                $txt = sprintf(Lang::$spell['relItems']['crafted'], $sf[0]);
+                                $txt = sprintf(Lang::spell('relItems', 'crafted'), $sf[0]);
                             else if ($sf[1])
-                                $txt = sprintf(Lang::$spell['relItems']['recipes'], $sf[1]);
+                                $txt = sprintf(Lang::spell('relItems', 'recipes'), $sf[1]);
 
-                            $note = Lang::$spell['cat'][$this->category[0]][$this->category[1]];
+                            $note = Lang::spell('cat', $this->category[0], $this->category[1]);
                             if (is_array($note))
                                 $note = $note[0];
 
-                            $tab['params']['note'] = sprintf(Lang::$spell['relItems']['base'], $txt, $note);
+                            $tab['params']['note'] = sprintf(Lang::spell('relItems', 'base'), $txt, $note);
                             $tab['params']['sort'] = "$['skill', 'name']";
                         }
                     }
@@ -404,10 +404,10 @@ class SpellsPage extends GenericPage
         $this->lvTabs[] = $tab;
 
         // sort for dropdown-menus
-        asort(Lang::$game['ra']);
-        asort(Lang::$game['cl']);
-        asort(Lang::$game['sc']);
-        asort(Lang::$game['me']);
+        asort(Lang::game('ra'));
+        asort(Lang::game('cl'));
+        asort(Lang::game('sc'));
+        asort(Lang::game('me'));
     }
 
     protected function generateTitle()
@@ -415,16 +415,16 @@ class SpellsPage extends GenericPage
         $foo = [];
         $c = $this->category;                               // shothand
         if (isset($c[2]) && $c[0] == 11)
-            array_unshift($foo, Lang::$spell['cat'][$c[0]][$c[1]][$c[2]]);
+            array_unshift($foo, Lang::spell('cat', $c[0], $c[1], $c[2]));
         else if (isset($c[1]))
         {
-            $_ = in_array($c[0], [-2, -13, 7]) ? Lang::$game['cl'] : Lang::$spell['cat'][$c[0]];
+            $_ = in_array($c[0], [-2, -13, 7]) ? Lang::game('cl') : Lang::spell('cat', $c[0])];
             array_unshift($foo, is_array($_[$c[1]]) ? $_[$c[1]][0] : $_[$c[1]]);
         }
 
         if (isset($c[0]) && count($foo) < 2)
         {
-            $_ = Lang::$spell['cat'][$c[0]];
+            $_ = Lang::spell('cat', $c[0]);
             array_unshift($foo, is_array($_) ? $_[0] : $_);
         }
 

@@ -23,13 +23,13 @@ $this->brick('article');
 if (!empty($this->map)):
     $this->brick('mapper');
 else:
-    echo Lang::$gameObject['unkPosition'];
+    echo Lang::gameObject('unkPosition');
 endif;
 
 $this->brick('book');
 ?>
 
-                <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
+                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
             </div>
 
 <?php

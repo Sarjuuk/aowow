@@ -2,7 +2,7 @@
 <?php
 if (!empty($this->infobox)):
 ?>
-        <tr><th id="infobox-quick-facts"><?php echo Lang::$main['quickFacts']; ?></th></tr>
+        <tr><th id="infobox-quick-facts"><?php echo Lang::main('quickFacts'); ?></th></tr>
         <tr><td>
             <div class="infobox-spacer"></div>
             <div id="infobox-contents0"></div>
@@ -15,7 +15,7 @@ endif;
 
 if (!empty($this->contributions)):
 ?>
-        <tr><th id="infobox-contributions"><?php echo Lang::$main['contributions']; ?></th></tr>
+        <tr><th id="infobox-contributions"><?php echo Lang::main('contributions'); ?></th></tr>
         <tr><td>
             <div class="infobox-spacer"></div>
             <div id="infobox-contents1"></div>
@@ -34,12 +34,12 @@ endif;
 
 if (!empty($this->type) && !empty($this->typeId)):
 ?>
-        <tr><th id="infobox-screenshots"><?php echo Lang::$main['screenshots']; ?></th></tr>
+        <tr><th id="infobox-screenshots"><?php echo Lang::main('screenshots'); ?></th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-ss"></div></td></tr>
 <?php
     if (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi'])):
 ?>
-        <tr><th id="infobox-videos"><?php echo Lang::$main['videos']; ?></th></tr>
+        <tr><th id="infobox-videos"><?php echo Lang::main('videos'); ?></th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-vi"></div></td></tr>
 <?php
     endif;

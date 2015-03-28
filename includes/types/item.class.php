@@ -487,7 +487,7 @@ class ItemList extends BaseType
 
         // heroic tag
         if (($_flags & ITEM_FLAG_HEROIC) && $_quality == ITEM_QUALITY_EPIC)
-            $x .= '<br /><span class="q2">'.Lang::$item['heroic'].'</span>';
+            $x .= '<br /><span class="q2">'.Lang::item('heroic').'</span>';
 
         // requires map (todo: reparse ?_zones for non-conflicting data; generate Link to zone)
         if ($_ = $this->curTpl['map'])
@@ -505,44 +505,44 @@ class ItemList extends BaseType
 
         // conjured
         if ($_flags & ITEM_FLAG_CONJURED)
-            $x .= '<br />'.Lang::$item['conjured'];
+            $x .= '<br />'.Lang::item('conjured');
 
         // bonding
         if ($_flags & ITEM_FLAG_ACCOUNTBOUND)
-            $x .= '<br /><!--bo-->'.Lang::$item['bonding'][0];
+            $x .= '<br /><!--bo-->'.Lang::item('bonding', 0);
         else if ($this->curTpl['bonding'])
-            $x .= '<br /><!--bo-->'.Lang::$item['bonding'][$this->curTpl['bonding']];
+            $x .= '<br /><!--bo-->'.Lang::item('bonding', $this->curTpl['bonding']);
 
         // unique || unique-equipped || unique-limited
         if ($this->curTpl['maxCount'] > 0)
         {
-            $x .= '<br />'.Lang::$item['unique'];
+            $x .= '<br />'.Lang::item('unique');
 
             if ($this->curTpl['maxCount'] > 1)
                 $x .= ' ('.$this->curTpl['maxCount'].')';
         }
         else if ($_flags & ITEM_FLAG_UNIQUEEQUIPPED)
-            $x .= '<br />'.Lang::$item['uniqueEquipped'];
+            $x .= '<br />'.Lang::item('uniqueEquipped');
         else if ($this->curTpl['itemLimitCategory'])
         {
             $limit = DB::Aowow()->selectRow("SELECT * FROM ?_itemlimitcategory WHERE id = ?", $this->curTpl['itemLimitCategory']);
-            $x .= '<br />'.($limit['isGem'] ? Lang::$item['uniqueEquipped'] : Lang::$item['unique']).Lang::$main['colon'].Util::localizedString($limit, 'name').' ('.$limit['count'].')';
+            $x .= '<br />'.($limit['isGem'] ? Lang::item('uniqueEquipped') : Lang::item('unique')).Lang::main('colon').Util::localizedString($limit, 'name').' ('.$limit['count'].')';
         }
 
         // max duration
         if ($dur = $this->curTpl['duration'])
-            $x .= "<br />".Lang::$game['duration'].Lang::$main['colon'].Util::formatTime(abs($dur) * 1000).($this->curTpl['flagsCustom'] & 0x1 ? ' ('.Lang::$item['realTime'].')' : null);
+            $x .= "<br />".Lang::game('duration').Lang::main('colon').Util::formatTime(abs($dur) * 1000).($this->curTpl['flagsCustom'] & 0x1 ? ' ('.Lang::item('realTime').')' : null);
 
         // required holiday
         if ($hId = $this->curTpl['holidayId'])
         {
             $hDay = DB::Aowow()->selectRow("SELECT * FROM ?_holidays WHERE id = ?", $hId);
-            $x .= '<br />'.sprintf(Lang::$game['requires'], '<a href="'.$hId.'" class="q1">'.Util::localizedString($hDay, 'name').'</a>');
+            $x .= '<br />'.sprintf(Lang::game('requires'), '<a href="'.$hId.'" class="q1">'.Util::localizedString($hDay, 'name').'</a>');
         }
 
         // item begins a quest
         if ($this->curTpl['startQuest'])
-            $x .= '<br /><a class="q1" href="?quest='.$this->curTpl['startQuest'].'">'.Lang::$item['startQuest'].'</a>';
+            $x .= '<br /><a class="q1" href="?quest='.$this->curTpl['startQuest'].'">'.Lang::item('startQuest').'</a>';
 
         // containerType (slotCount)
         if ($this->curTpl['slots'] > 0)
@@ -551,9 +551,9 @@ class ItemList extends BaseType
 
             // word order differs <_<
             if (in_array(User::$localeId, [LOCALE_FR, LOCALE_ES, LOCALE_RU]))
-                $x .= '<br />'.sprintf(Lang::$item['bagSlotString'], Lang::$item['bagFamily'][$fam], $this->curTpl['slots']);
+                $x .= '<br />'.sprintf(Lang::item('bagSlotString'), Lang::item('bagFamily', $fam), $this->curTpl['slots']);
             else
-                $x .= '<br />'.sprintf(Lang::$item['bagSlotString'], $this->curTpl['slots'], Lang::$item['bagFamily'][$fam]);
+                $x .= '<br />'.sprintf(Lang::item('bagSlotString'), $this->curTpl['slots'], Lang::item('bagFamily', $fam));
         }
 
         if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]))
@@ -561,20 +561,20 @@ class ItemList extends BaseType
             $x .= '<table width="100%"><tr>';
 
             // Class
-            $x .= '<td>'.Lang::$item['inventoryType'][$_slot].'</td>';
+            $x .= '<td>'.Lang::item('inventoryType', $_slot).'</td>';
 
             // Subclass
             if ($_class == ITEM_CLASS_ARMOR && $_subClass > 0)
-                $x .= '<th><!--asc'.$_subClass.'-->'.Lang::$item['armorSubClass'][$_subClass].'</th>';
+                $x .= '<th><!--asc'.$_subClass.'-->'.Lang::item('armorSubClass', $_subClass).'</th>';
             else if ($_class == ITEM_CLASS_WEAPON)
-                $x .= '<th>'.Lang::$item['weaponSubClass'][$_subClass].'</th>';
+                $x .= '<th>'.Lang::item('weaponSubClass', $_subClass).'</th>';
             else if ($_class == ITEM_CLASS_AMMUNITION)
-                $x .= '<th>'.Lang::$item['projectileSubClass'][$_subClass].'</th>';
+                $x .= '<th>'.Lang::item('projectileSubClass', $_subClass).'</th>';
 
             $x .= '</tr></table>';
         }
         else if ($_slot && $_class != ITEM_CLASS_CONTAINER) // yes, slot can occur on random items and is then also displayed <_< .. excluding Bags >_>
-            $x .= '<br />'.Lang::$item['inventoryType'][$_slot].'<br />';
+            $x .= '<br />'.Lang::item('inventoryType', $_slot).'<br />';
         else
             $x .= '<br />';
 
@@ -585,29 +585,29 @@ class ItemList extends BaseType
         $dps     = $speed ? ($dmgmin1 + $dmgmax1) / (2 * $speed) : 0;
 
         if ($_class == ITEM_CLASS_AMMUNITION && $dmgmin1 && $dmgmax1)
-            $x .= Lang::$item['addsDps'].' '.number_format(($dmgmin1 + $dmgmax1) / 2, 1).' '.Lang::$item['dps2'].'<br />';
+            $x .= Lang::item('addsDps').' '.number_format(($dmgmin1 + $dmgmax1) / 2, 1).' '.Lang::item('dps2').'<br />';
         else if ($dps)
         {
             if ($_class == ITEM_CLASS_WEAPON)
             {
                 $x .= '<table width="100%"><tr>';
-                $x .= '<td><!--dmg-->'.sprintf($this->curTpl['dmgType1'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmgMin1'].' - '.$this->curTpl['dmgMax1'], Lang::$game['sc'][$this->curTpl['dmgType1']]).'</td>';
-                $x .= '<th>'.Lang::$item['speed'].' <!--spd-->'.number_format($speed, 2).'</th>';
+                $x .= '<td><!--dmg-->'.sprintf($this->curTpl['dmgType1'] ? Lang::item('damageMagic') : Lang::item('damagePhys'), $this->curTpl['dmgMin1'].' - '.$this->curTpl['dmgMax1'], Lang::game('sc', $this->curTpl['dmgType1'])).'</td>';
+                $x .= '<th>'.Lang::item('speed').' <!--spd-->'.number_format($speed, 2).'</th>';
                 $x .= '</tr></table>';
             }
             else
-                $x .= '<!--dmg-->'.sprintf($this->curTpl['dmgType1'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmgMin1'].' - '.$this->curTpl['dmgMax1'], Lang::$game['sc'][$this->curTpl['dmgType1']]).'<br />';
+                $x .= '<!--dmg-->'.sprintf($this->curTpl['dmgType1'] ? Lang::item('damageMagic') : Lang::item('damagePhys'), $this->curTpl['dmgMin1'].' - '.$this->curTpl['dmgMax1'], Lang::game('sc', $this->curTpl['dmgType1'])).'<br />';
 
             // secondary damage is set
             if ($this->curTpl['dmgMin2'])
-                $x .= '+'.sprintf($this->curTpl['dmgType2'] ? Lang::$item['damageMagic'] : Lang::$item['damagePhys'], $this->curTpl['dmgMin2'].' - '.$this->curTpl['dmgMax2'], Lang::$game['sc'][$this->curTpl['dmgType2']]).'<br />';
+                $x .= '+'.sprintf($this->curTpl['dmgType2'] ? Lang::item('damageMagic') : Lang::item('damagePhys'), $this->curTpl['dmgMin2'].' - '.$this->curTpl['dmgMax2'], Lang::game('sc', $this->curTpl['dmgType2'])).'<br />';
 
             if ($_class == ITEM_CLASS_WEAPON)
-                $x .= '<!--dps-->('.number_format($dps, 1).' '.Lang::$item['dps'].')<br />';
+                $x .= '<!--dps-->('.number_format($dps, 1).' '.Lang::item('dps').')<br />';
 
             // display FeralAttackPower if set
             if ($fap = $this->getFeralAP())
-                $x .= '<span class="c11"><!--fap-->('.$fap.' '.Lang::$item['fap'].')</span><br />';
+                $x .= '<span class="c11"><!--fap-->('.$fap.' '.Lang::item('fap').')</span><br />';
         }
 
         // Armor
@@ -617,14 +617,14 @@ class ItemList extends BaseType
             if ($interactive)
                 $spanI = 'class="q2 tip" onmouseover="$WH.Tooltip.showAtCursor(event, $WH.sprintf(LANG.tooltip_armorbonus, '.$this->curTpl['armorDamageModifier'].'), 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"';
 
-            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.sprintf(Lang::$item['armor'], intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])).'</span></span><br />';
+            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.sprintf(Lang::item('armor'), intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])).'</span></span><br />';
         }
         else if (($this->curTpl['armor'] + $this->curTpl['armorDamageModifier']) > 0)
-            $x .= '<span><!--amr-->'.sprintf(Lang::$item['armor'], intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])).'</span><br />';
+            $x .= '<span><!--amr-->'.sprintf(Lang::item('armor'), intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])).'</span><br />';
 
         // Block
         if ($this->curTpl['block'])
-            $x .= '<span>'.sprintf(Lang::$item['block'], $this->curTpl['block']).'</span><br />';
+            $x .= '<span>'.sprintf(Lang::item('block'), $this->curTpl['block']).'</span><br />';
 
         // Item is a gem (don't mix with sockets)
         if ($geId = $this->curTpl['gemEnchantmentId'])
@@ -647,10 +647,10 @@ class ItemList extends BaseType
                             case 2:                         // requires less <color> than (<value> || <comparecolor>) gems
                             case 5:                         // requires at least <color> than (<value> || <comparecolor>) gems
                                 $sp = (int)$gemCnd['value'.$i] > 1;
-                                $x .= '<span class="q0">'.Lang::$achievement['reqNumCrt'].' '.sprintf(Lang::$item['gemConditions'][$gemCnd['comparator'.$i]][$sp], $gemCnd['value'.$i], Lang::$item['gemColors'][$gemCnd['color'.$i] - 1]).'</span><br />';
+                                $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.sprintf(Lang::item('gemConditions', $gemCnd['comparator'.$i], $sp), $gemCnd['value'.$i], Lang::item('gemColors', $gemCnd['color'.$i] - 1)).'</span><br />';
                                 break;
                             case 3:                         // requires more <color> than (<value> || <comparecolor>) gems
-                                $x .= '<span class="q0">'.Lang::$achievement['reqNumCrt'].' '.sprintf(Lang::$item['gemConditions'][3], Lang::$item['gemColors'][$gemCnd['color'.$i] - 1], Lang::$item['gemColors'][$gemCnd['cmpColor'.$i] - 1]).'</span><br />';
+                                $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.sprintf(Lang::item('gemConditions', 3), Lang::item('gemColors', $gemCnd['color'.$i] - 1), Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1)).'</span><br />';
                                 break;
                         }
                     }
@@ -660,7 +660,7 @@ class ItemList extends BaseType
 
         // Random Enchantment - if random enchantment is set, prepend stats from it
         if ($this->curTpl['randomEnchant'] && !isset($enhance['r']))
-            $x .= '<span class="q2">'.Lang::$item['randEnchant'].'</span><br />';
+            $x .= '<span class="q2">'.Lang::item('randEnchant').'</span><br />';
         else if (isset($enhance['r']))
             $x .= $randEnchant;
 
@@ -675,7 +675,7 @@ class ItemList extends BaseType
 
             // base stat
             if ($type >= ITEM_MOD_AGILITY && $type <= ITEM_MOD_STAMINA)
-                $x .= '<span><!--stat'.$type.'-->'.($qty > 0 ? '+' : '-').abs($qty).' '.Lang::$item['statType'][$type].'</span><br />';
+                $x .= '<span><!--stat'.$type.'-->'.($qty > 0 ? '+' : '-').abs($qty).' '.Lang::item('statType', $type).'</span><br />';
             else                                            // rating with % for reqLevel
                 $green[] = $this->parseRating($type, $qty, $interactive, $causesScaling);
         }
@@ -683,7 +683,7 @@ class ItemList extends BaseType
         // magic resistances
         foreach (Util::$resistanceFields as $j => $rowName)
             if ($rowName && $this->curTpl[$rowName] != 0)
-                $x .= '+'.$this->curTpl[$rowName].' '.Lang::$game['resistances'][$j].'<br />';
+                $x .= '+'.$this->curTpl[$rowName].' '.Lang::game('resistances', $j).'<br />';
 
         // Enchantment
         if (isset($enhance['e']))
@@ -735,7 +735,7 @@ class ItemList extends BaseType
             $col       = $pop ? 1 : 0;
             $hasMatch &= $pop ? (($gems[$pop]['colorMask'] & (1 << $colorId)) ? 1 : 0) : 0;
             $icon      = $pop ? sprintf(Util::$bgImagePath['tiny'], STATIC_URL, strtolower($gems[$pop]['iconString'])) : null;
-            $text      = $pop ? Util::localizedString($gems[$pop], 'text') : Lang::$item['socket'][$colorId];
+            $text      = $pop ? Util::localizedString($gems[$pop], 'text') : Lang::item('socket', $colorId);
 
             if ($interactive)
                 $x .= '<a href="?items=3&amp;filter=cr=81;crs='.($colorId + 1).';crv=0" class="socket-'.Util::$sockets[$colorId].' q'.$col.'" '.$icon.'>'.$text.'</a><br />';
@@ -749,7 +749,7 @@ class ItemList extends BaseType
             $pop  = array_pop($enhance['g']);
             $col  = $pop ? 1 : 0;
             $icon = $pop ? sprintf(Util::$bgImagePath['tiny'], STATIC_URL, strtolower($gems[$pop]['iconString'])) : null;
-            $text = $pop ? Util::localizedString($gems[$pop], 'text') : Lang::$item['socket'][-1];
+            $text = $pop ? Util::localizedString($gems[$pop], 'text') : Lang::item('socket', -1);
 
             if ($interactive)
                 $x .= '<a href="?items=3&amp;filter=cr=81;crs=5;crv=0" class="socket-prismatic q'.$col.'" '.$icon.'>'.$text.'</a><br />';
@@ -762,12 +762,12 @@ class ItemList extends BaseType
         if ($this->curTpl['socketBonus'])
         {
             $sbonus = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $this->curTpl['socketBonus']);
-            $x .= '<span class="q'.($hasMatch ? '2' : '0').'">'.Lang::$item['socketBonus'].Lang::$main['colon'].Util::localizedString($sbonus, 'text').'</span><br />';
+            $x .= '<span class="q'.($hasMatch ? '2' : '0').'">'.Lang::item('socketBonus').Lang::main('colon').Util::localizedString($sbonus, 'text').'</span><br />';
         }
 
         // durability
         if ($dur = $this->curTpl['durability'])
-            $x .= Lang::$item['durability'].' '.$dur.' / '.$dur.'<br />';
+            $x .= Lang::item('durability').' '.$dur.' / '.$dur.'<br />';
 
         // required classes
         if ($classes = Lang::getClassString($this->curTpl['requiredClass'], $jsg, $__))
@@ -776,7 +776,7 @@ class ItemList extends BaseType
                 if (empty($this->jsGlobals[TYPE_CLASS][$js]))
                     $this->jsGlobals[TYPE_CLASS][$js] = $js;
 
-            $x .= Lang::$game['classes'].Lang::$main['colon'].$classes.'<br />';
+            $x .= Lang::game('classes').Lang::main('colon').$classes.'<br />';
         }
 
         // required races
@@ -786,30 +786,30 @@ class ItemList extends BaseType
                 if (empty($this->jsGlobals[TYPE_RACE][$js]))
                     $this->jsGlobals[TYPE_RACE][$js] = $js;
 
-            if ($races != Lang::$game['ra'][0])             // not "both", but display combinations like: troll, dwarf
-                $x .= Lang::$game['races'].Lang::$main['colon'].$races.'<br />';
+            if ($races != Lang::game('ra', 0))              // not "both", but display combinations like: troll, dwarf
+                $x .= Lang::game('races').Lang::main('colon').$races.'<br />';
         }
 
         // required honorRank (not used anymore)
         if ($rhr = $this->curTpl['requiredHonorRank'])
-            $x .= sprintf(Lang::$game['requires'], Lang::$game['pvpRank'][$rhr]).'<br />';
+            $x .= sprintf(Lang::game('requires'), Lang::game('pvpRank', $rhr)).'<br />';
 
         // required CityRank..?
         // what the f..
 
         // required level
         if (($_flags & ITEM_FLAG_ACCOUNTBOUND) && $_quality == ITEM_QUALITY_HEIRLOOM)
-            $x .= sprintf(Lang::$game['reqLevelHlm'], ' 1'.Lang::$game['valueDelim'].MAX_LEVEL.' ('.($interactive ? sprintf(Util::$changeLevelString, MAX_LEVEL) : '<!--lvl-->'.MAX_LEVEL).')').'<br />';
+            $x .= sprintf(Lang::game('reqLevelHlm'), ' 1'.Lang::game('valueDelim').MAX_LEVEL.' ('.($interactive ? sprintf(Util::$changeLevelString, MAX_LEVEL) : '<!--lvl-->'.MAX_LEVEL).')').'<br />';
         else if ($_reqLvl > 1)
-            $x .= sprintf(Lang::$game['reqLevel'], $_reqLvl).'<br />';
+            $x .= sprintf(Lang::game('reqLevel'), $_reqLvl).'<br />';
 
         // required arena team rating / personal rating / todo (low): sort out what kind of rating
         if (!empty($this->getExtendedCost([], $reqRating)[$this->id]) && $reqRating)
-            $x .= sprintf(Lang::$item['reqRating'], $reqRating).'<br />';
+            $x .= sprintf(Lang::item('reqRating'), $reqRating).'<br />';
 
         // item level
         if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON]))
-            $x .= Lang::$item['itemLevel'].' '.$this->curTpl['itemLevel'].'<br />';
+            $x .= Lang::item('itemLevel').' '.$this->curTpl['itemLevel'].'<br />';
 
         // required skill
         if ($reqSkill = $this->curTpl['requiredSkill'])
@@ -818,22 +818,22 @@ class ItemList extends BaseType
             if ($this->curTpl['requiredSkillRank'] > 0)
                 $_ .= ' ('.$this->curTpl['requiredSkillRank'].')';
 
-            $x .= sprintf(Lang::$game['requires'], $_).'<br />';
+            $x .= sprintf(Lang::game('requires'), $_).'<br />';
         }
 
         // required spell
         if ($reqSpell = $this->curTpl['requiredSpell'])
-            $x .= Lang::$game['requires2'].' <a class="q1" href="?spell='.$reqSpell.'">'.SpellList::getName($reqSpell).'</a><br />';
+            $x .= Lang::game('requires2').' <a class="q1" href="?spell='.$reqSpell.'">'.SpellList::getName($reqSpell).'</a><br />';
 
         // required reputation w/ faction
         if ($reqFac = $this->curTpl['requiredFaction'])
-            $x .= sprintf(Lang::$game['requires'], '<a class="q1" href=?faction="'.$reqFac.'">'.FactionList::getName($reqFac).'</a> - '.Lang::$game['rep'][$this->curTpl['requiredFactionRank']]).'<br />';
+            $x .= sprintf(Lang::game('requires'), '<a class="q1" href=?faction="'.$reqFac.'">'.FactionList::getName($reqFac).'</a> - '.Lang::game('rep', $this->curTpl['requiredFactionRank'])).'<br />';
 
         // locked or openable
         if ($locks = Lang::getLocks($this->curTpl['lockId'], true))
-            $x .= '<span class="q0">'.Lang::$item['locked'].'<br />'.implode('<br />', $locks).'</span><br />';
+            $x .= '<span class="q0">'.Lang::item('locked').'<br />'.implode('<br />', $locks).'</span><br />';
         else if ($this->curTpl['flags'] & ITEM_FLAG_OPENABLE)
-            $x .= '<span class="q2">'.Lang::$item['openClick'].'</span><br />';
+            $x .= '<span class="q2">'.Lang::item('openClick').'</span><br />';
 
         // upper table: done
         if (!$subOf)
@@ -851,7 +851,7 @@ class ItemList extends BaseType
                     if ($cd < $this->curTpl['spellCategoryCooldown'.$j])
                         $cd = $this->curTpl['spellCategoryCooldown'.$j];
 
-                    $cd = $cd < 5000 ? null : ' ('.sprintf(Lang::$game['cooldown'], Util::formatTime($cd)).')';
+                    $cd = $cd < 5000 ? null : ' ('.sprintf(Lang::game('cooldown'), Util::formatTime($cd)).')';
 
                     $itemSpellsAndTrigger[$this->curTpl['spellId'.$j]] = [$this->curTpl['spellTrigger'.$j], $cd];
                 }
@@ -879,7 +879,7 @@ class ItemList extends BaseType
                                 $parsed = sprintF($link, $parsed);
                         }
 
-                        $green[] = Lang::$item['trigger'][$itemSpellsAndTrigger[$itemSpells->id][0]].$parsed.$itemSpellsAndTrigger[$itemSpells->id][1];
+                        $green[] = Lang::item('trigger', $itemSpellsAndTrigger[$itemSpells->id][0]).$parsed.$itemSpellsAndTrigger[$itemSpells->id][1];
                     }
             }
         }
@@ -915,7 +915,7 @@ class ItemList extends BaseType
 
             if ($skId = $itemset->getField('skillId'))      // bonus requires skill to activate
             {
-                $xSet .= '<br />'.sprintf(Lang::$game['requires'], '<a href="?skills='.$skId.'" class="q1">'.SkillList::getName($skId).'</a>');
+                $xSet .= '<br />'.sprintf(Lang::game('requires'), '<a href="?skills='.$skId.'" class="q1">'.SkillList::getName($skId).'</a>');
 
                 if ($_ = $itemset->getField('skillLevel'))
                     $xSet .= ' ('.$_.')';
@@ -959,7 +959,7 @@ class ItemList extends BaseType
                     $setSpells[$i] = $setSpells[$j];
                     $setSpells[$j] = $tmp;
                 }
-                $xSet .= '<span>('.$setSpells[$i]['bonus'].') '.Lang::$item['set'].': <a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a></span>';
+                $xSet .= '<span>('.$setSpells[$i]['bonus'].') '.Lang::item('set').': <a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a></span>';
                 if ($i < count($setSpells) - 1)
                     $xSet .= '<br />';
             }
@@ -974,7 +974,7 @@ class ItemList extends BaseType
             {
                 $xCraft = '';
                 if ($desc = $this->getField('description', true))
-                    $x .= '<span class="q2">'.Lang::$item['trigger'][0].' <a href="?spell='.$this->curTpl['spellId2'].'">'.$desc.'</a></span><br />';
+                    $x .= '<span class="q2">'.Lang::item('trigger', 0).' <a href="?spell='.$this->curTpl['spellId2'].'">'.$desc.'</a></span><br />';
 
                 // recipe handling (some stray Techniques have subclass == 0), place at bottom of tooltipp
                 if ($_class == ITEM_CLASS_RECIPE || $this->curTpl['bagFamily'] == 16)
@@ -998,7 +998,7 @@ class ItemList extends BaseType
                             foreach ($reagents->iterate() as $__)
                                 $reqReag[] = '<a href="?item='.$reagents->id.'">'.$reagents->getField('name', true).'</a> ('.$reagentItems[$reagents->id].')';
 
-                            $xCraft .= '<div class="q1 whtt-reagents"><br />'.Lang::$game['requires2'].' '.implode(', ', $reqReag).'</div>';
+                            $xCraft .= '<div class="q1 whtt-reagents"><br />'.Lang::game('requires2').' '.implode(', ', $reqReag).'</div>';
                         }
                     }
                 }
@@ -1018,11 +1018,11 @@ class ItemList extends BaseType
 
         // readable
         if ($this->curTpl['pageTextId'])
-            $xMisc[] = '<span class="q2">'.Lang::$item['readClick'].'</span>';
+            $xMisc[] = '<span class="q2">'.Lang::item('readClick').'</span>';
 
         // charges (i guess checking first spell is enough (single charges not shown))
         if ($this->curTpl['spellCharges1'] > 1 || $this->curTpl['spellCharges1'] < -1)
-            $xMisc[] = '<span class="q1">'.abs($this->curTpl['spellCharges1']).' '.Lang::$item['charges'].'</span>';
+            $xMisc[] = '<span class="q1">'.abs($this->curTpl['spellCharges1']).' '.Lang::item('charges').'</span>';
 
         // list required reagents
         if (isset($xCraft))
@@ -1032,7 +1032,7 @@ class ItemList extends BaseType
             $x .= implode('<br />', $xMisc);
 
         if ($sp = $this->curTpl['sellPrice'])
-            $x .= '<div class="q1 whtt-sellprice">'.Lang::$item['sellPrice'].Lang::$main['colon'].Util::formatMoney($sp).'</div>';
+            $x .= '<div class="q1 whtt-sellprice">'.Lang::item('sellPrice').Lang::main('colon').Util::formatMoney($sp).'</div>';
 
         if (!$subOf)
             $x .= '</td></tr></table>';
@@ -1277,10 +1277,10 @@ class ItemList extends BaseType
         $reqLvl = $this->curTpl['requiredLevel'] > 1 ? $this->curTpl['requiredLevel'] : MAX_LEVEL;
         $level  = min(max($reqLvl, $ssdLvl), MAX_LEVEL);
 
-        if (!Lang::$item['statType'][$type])                // unknown rating
-            return sprintf(Lang::$item['statType'][count(Lang::$item['statType']) - 1], $type, $value);
+        if (!Lang::item('statType', $type))                 // unknown rating
+            return sprintf(Lang::item('statType', count(Lang::item('statType')) - 1), $type, $value);
         else if (in_array($type, Util::$lvlIndepRating))    // level independant Bonus
-            return Lang::$item['trigger'][1].str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::$item['statType'][$type]);
+            return Lang::item('trigger', 1).str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::item('statType', $type));
         else                                                // rating-Bonuses
         {
             $scaling = true;
@@ -1290,7 +1290,7 @@ class ItemList extends BaseType
             else
                 $js = "&nbsp;<small>(".Util::setRatingLevel($level, $type, $value).")</small>";
 
-            return Lang::$item['trigger'][1].str_replace('%d', '<!--rtg'.$type.'-->'.$value.$js, Lang::$item['statType'][$type]);
+            return Lang::item('trigger', 1).str_replace('%d', '<!--rtg'.$type.'-->'.$value.$js, Lang::item('statType', $type));
         }
     }
 

@@ -156,7 +156,7 @@ class TitleList extends BaseType
     public function getHtmlizedName($gender = GENDER_MALE)
     {
         $field = $gender == GENDER_FEMALE ? 'female' : 'male';
-        return str_replace('%s', '<span class="q0">&lt;'.Util::ucFirst(Lang::$main['name']).'&gt;</span>', $this->getField($field, true));
+        return str_replace('%s', '<span class="q0">&lt;'.Util::ucFirst(Lang::main('name')).'&gt;</span>', $this->getField($field, true));
     }
 
     public function renderTooltip() { }

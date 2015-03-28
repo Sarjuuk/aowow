@@ -29,7 +29,7 @@ class ItemsetPage extends GenericPage
 
         $this->subject = new ItemsetList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['itemset']);
+            $this->notFound(Lang::game('itemset'));
 
         $this->name = $this->subject->getField('name', true);
         $this->extendGlobalData($this->subject->getJSGlobals());
@@ -49,7 +49,7 @@ class ItemsetPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['itemset']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('itemset')));
     }
 
     protected function generateContent()
@@ -66,19 +66,19 @@ class ItemsetPage extends GenericPage
 
         // unavailable (todo (low): set data)
         if ($this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE)
-            $infobox[] = Lang::$main['unavailable'];
+            $infobox[] = Lang::main('unavailable');
 
         // holiday
         if ($h = $this->subject->getField('holidayId'))
         {
-            $infobox[] = Lang::$game['eventShort'].Lang::$main['colon'].'[event='.$h.']';
+            $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$h.']';
             $this->extendGlobalIds(TYPE_WORLDEVENT, $h);
         }
 
         // itemLevel
         if ($min = $this->subject->getField('minLevel'))
         {
-            $foo = Lang::$game['level'].Lang::$main['colon'].$min;
+            $foo = Lang::game('level').Lang::main('colon').$min;
             $max = $this->subject->getField('maxLevel');
 
             if ($min < $max)
@@ -91,21 +91,21 @@ class ItemsetPage extends GenericPage
         if ($cl = Lang::getClassString($this->subject->getField('classMask'), $jsg, $qty, false))
         {
             $this->extendGlobalIds(TYPE_CLASS, $jsg);
-            $t = $qty == 1 ? Lang::$game['class'] : Lang::$game['classes'];
-            $infobox[] = Util::ucFirst($t).Lang::$main['colon'].$cl;
+            $t = $qty == 1 ? Lang::game('class') : Lang::game('classes');
+            $infobox[] = Util::ucFirst($t).Lang::main('colon').$cl;
         }
 
         // required level
         if ($lvl = $this->subject->getField('reqLevel'))
-            $infobox[] = sprintf(Lang::$game['reqLevel'], $lvl);
+            $infobox[] = sprintf(Lang::game('reqLevel'), $lvl);
 
         // type
         if ($_ty)
-            $infobox[] = Lang::$game['type'].Lang::$main['colon'].Lang::$itemset['types'][$_ty];
+            $infobox[] = Lang::game('type').Lang::main('colon').Lang::itemset('types', $_ty);
 
         // tag
         if ($_ta)
-            $infobox[] = Lang::$itemset['_tag'].Lang::$main['colon'].'[url=?itemsets&filter=ta='.$_ta.']'.Lang::$itemset['notes'][$_ta].'[/url]';
+            $infobox[] = Lang::itemset('_tag').Lang::main('colon').'[url=?itemsets&filter=ta='.$_ta.']'.Lang::itemset('notes', $_ta).'[/url]';
 
         /****************/
         /* Main Content */
@@ -186,12 +186,12 @@ class ItemsetPage extends GenericPage
         $skill = '';
         if ($_sk = $this->subject->getField('skillId'))
         {
-            $spellLink = sprintf('<a href="?spells=11.%s">%s</a> (%s)', $_sk, Lang::$spell['cat'][11][$_sk][0], $this->subject->getField('skillLevel'));
-            $skill = ' &ndash; <small><b>'.sprintf(Lang::$game['requires'], $spellLink).'</b></small>';
+            $spellLink = sprintf('<a href="?spells=11.%s">%s</a> (%s)', $_sk, Lang::spell('cat', 11, $_sk, 0), $this->subject->getField('skillLevel'));
+            $skill = ' &ndash; <small><b>'.sprintf(Lang::game('requires'), $spellLink).'</b></small>';
         }
 
         $this->bonusExt    = $skill;
-        $this->description = $_ta ? sprintf(Lang::$itemset['_desc'], $this->name, Lang::$itemset['notes'][$_ta], $_cnt) : sprintf(Lang::$itemset['_descTagless'], $this->name, $_cnt);
+        $this->description = $_ta ? sprintf(Lang::itemset('_desc'), $this->name, Lang::itemset('notes', $_ta), $_cnt) : sprintf(Lang::itemset('_descTagless'), $this->name, $_cnt);
         $this->unavailable = $this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE;
         $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->pieces      = $pieces;

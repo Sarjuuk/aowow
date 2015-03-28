@@ -27,14 +27,14 @@ class UtilityPage extends GenericPage
 
         $this->page = $pageCall;
         $this->rss  = isset($_GET['rss']);
-        $this->name = Lang::$main['utilities'][array_search($pageCall, $this->validPages)];
+        $this->name = Lang::main('utilities', array_search($pageCall, $this->validPages));
 
         if ($this->page == 'most-comments')
         {
             if ($this->category && in_array($this->category[0], [7, 30]))
-                $this->name .= Lang::$main['colon'] . sprintf(Lang::$main['mostComments'][1], $this->category[0]);
+                $this->name .= Lang::main('colon') . sprintf(Lang::main('mostComments', 1), $this->category[0]);
             else
-                $this->name .= Lang::$main['colon'] . Lang::$main['mostComments'][0];
+                $this->name .= Lang::main('colon') . Lang::main('mostComments', 0);
         }
     }
 
@@ -56,7 +56,7 @@ class UtilityPage extends GenericPage
         /****************/
 
         if (in_array(array_search($this->page, $this->validPages), [0, 1, 2, 3, 11, 12]))
-            $this->h1Links = '<small><a href="?'.$this->page.($this->category ? '='.$this->category[0] : null).'&rss" class="icon-rss">'.Lang::$main['subscribe'].'</a></small>';
+            $this->h1Links = '<small><a href="?'.$this->page.($this->category ? '='.$this->category[0] : null).'&rss" class="icon-rss">'.Lang::main('subscribe').'</a></small>';
 
         switch ($this->page)
         {
@@ -154,7 +154,7 @@ class UtilityPage extends GenericPage
             $xml .= "<item>\n".
                 "<title><![CDATA[".htmlentities($row['subject'])."]]></title>\n".
                 "<link>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</link>\n".
-                "<description><![CDATA[".htmlentities($row['preview'])." ".sprintf(Lang::$timeUnits['ago'], Util::formatTime($row['elapsed'] * 100, true))."]]></description>\n". // todo (low): preview should be html-formated
+                "<description><![CDATA[".htmlentities($row['preview'])." ".sprintf(Lang::timeUnits('ago'), Util::formatTime($row['elapsed'] * 100, true))."]]></description>\n". // todo (low): preview should be html-formated
                 "<pubDate>".date(DATE_RSS, time() - $row['elapsed'])."</pubDate>\n".
                 "<guid>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</guid>\n".
                 "<domain />\n".
@@ -171,12 +171,12 @@ class UtilityPage extends GenericPage
         if ($this->page == 'most-comments')
         {
             if ($this->category && in_array($this->category[0], [7, 30]))
-                array_unshift($this->title, sprintf(Lang::$main['mostComments'][1], $this->category[0]));
+                array_unshift($this->title, sprintf(Lang::main('mostComments', 1), $this->category[0]));
             else
-                array_unshift($this->title, Lang::$main['mostComments'][0]);
+                array_unshift($this->title, Lang::main('mostComments', 0));
         }
 
-        array_unshift($this->title, Lang::$main['utilities'][array_search($this->page, $this->validPages)]);
+        array_unshift($this->title, Lang::main('utilities', array_search($this->page, $this->validPages)));
     }
 
     protected function generatePath()

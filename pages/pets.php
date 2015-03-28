@@ -23,7 +23,7 @@ class PetsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name = Util::ucFirst(Lang::$game['pets']);
+        $this->name = Util::ucFirst(Lang::game('pets'));
     }
 
     protected function generateContent()
@@ -55,9 +55,9 @@ class PetsPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, Util::ucFirst(Lang::$game['pets']));
+        array_unshift($this->title, Util::ucFirst(Lang::game('pets')));
         if ($this->category)
-            array_unshift($this->title, Lang::$pet['cat'][$this->category[0]]);
+            array_unshift($this->title, Lang::pet('cat', $this->category[0]));
     }
 
     protected function generatePath()

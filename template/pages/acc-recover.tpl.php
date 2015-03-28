@@ -67,20 +67,20 @@
 
                     <table align="center">
                         <tr>
-                            <td align="right"><?php echo Lang::$account['email'].lang::$main['colon']; ?></td>
+                            <td align="right"><?php echo Lang::account('email').Lang::main('colon'); ?></td>
                             <td><input type="text" name="email" style="width: 10em" /></td>
                         </tr>
                         <tr>
-                            <td align="right"><?php echo Lang::$account['newPass'].lang::$main['colon']; ?></td>
+                            <td align="right"><?php echo Lang::account('newPass').Lang::main('colon'); ?></td>
                             <td><input type="password" name="password" style="width: 10em" /></td>
                         </tr>
                         <tr>
-                            <td align="right"><?php echo Lang::$account['passConfirm'].lang::$main['colon']; ?></td>
+                            <td align="right"><?php echo Lang::account('passConfirm').Lang::main('colon'); ?></td>
                             <td><input type="password" name="c_password" style="width: 10em" /></td>
                         </tr>
                         <tr>
                             <td align="right" valign="top"></td>
-                            <td><input type="submit" name="signup" value="<?php echo Lang::$account['continue']; ?>" /></td>
+                            <td><input type="submit" name="signup" value="<?php echo Lang::account('continue'); ?>" /></td>
                         </tr>
                         <input type="hidden" name="token" value="<?php echo $this->token; ?>" />
                     </table>
@@ -117,10 +117,10 @@
                     <div id="inputbox-error"><?php echo $this->error; ?></div>
 
                     <div style="text-align: center">
-                        <?php echo Lang::$account['email'].Lang::$main['colon']; ?><input type="text" name="email" value="" id="email-generic" style="width: 12em" />
+                        <?php echo Lang::account('email').Lang::main('colon'); ?><input type="text" name="email" value="" id="email-generic" style="width: 12em" />
                         <div class="pad2"></div>
 
-                        <input type="submit" value="<?php echo Lang::$account['continue']; ?>" />
+                        <input type="submit" value="<?php echo Lang::account('continue'); ?>" />
                     </div>
 
                 </div>

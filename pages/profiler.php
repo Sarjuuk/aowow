@@ -22,7 +22,7 @@ class ProfilerPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, Util::ucFirst(Lang::$main['_cpHead']));
+        array_unshift($this->title, Util::ucFirst(Lang::main('_cpHead')));
     }
 }
 

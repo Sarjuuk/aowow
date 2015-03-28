@@ -24,7 +24,7 @@ class ZonesPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name = Util::ucFirst(Lang::$game['zones']);
+        $this->name = Util::ucFirst(Lang::game('zones'));
     }
 
     protected function generateContent()
@@ -167,9 +167,9 @@ class ZonesPage extends GenericPage
         if ($this->category)
         {
             if (isset($this->category[1]))
-                array_unshift($this->title, Lang::$game['expansions'][$this->category[1]]);
+                array_unshift($this->title, Lang::game('expansions', $this->category[1]));
 
-            array_unshift($this->title, Lang::$zone['cat'][$this->category[0]]);
+            array_unshift($this->title, Lang::zone('cat', $this->category[0]));
         }
     }
 

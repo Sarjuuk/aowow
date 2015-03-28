@@ -59,7 +59,7 @@ class ItemPage extends genericPage
 
         $this->subject = new ItemList($conditions);
         if ($this->subject->error)
-            $this->notFound(Lang::$game['item']);
+            $this->notFound(Lang::game('item'));
 
         if (!is_numeric($param))
             $this->typeId = $this->subject->id;
@@ -106,7 +106,7 @@ class ItemPage extends genericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['item']));
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('item')));
     }
 
     protected function generateContent()
@@ -133,16 +133,16 @@ class ItemPage extends genericPage
 
         // itemlevel
         if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]) || $this->subject->getField('gemEnchantmentId'))
-            $infobox[] = Lang::$game['level'].Lang::$main['colon'].$this->subject->getField('itemLevel');
+            $infobox[] = Lang::game('level').Lang::main('colon').$this->subject->getField('itemLevel');
 
         // account-wide
         if ($_flags & ITEM_FLAG_ACCOUNTBOUND)
-            $infobox[] = Lang::$item['accountWide'];
+            $infobox[] = Lang::item('accountWide');
 
         // side
         if ($si = $this->subject->json[$this->typeId]['side'])
             if ($si != 3)
-                $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-'.($si == 1 ? 'alliance' : 'horde').']'.Lang::$game['si'][$si].'[/span]';
+                $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-'.($si == 1 ? 'alliance' : 'horde').']'.Lang::game('si', $si).'[/span]';
 
         // consumable / not consumable
         if (!$_slot)
@@ -158,29 +158,29 @@ class ItemPage extends genericPage
                 if ($this->subject->getField('spellCharges'.$i) >= 0)
                     continue;
 
-                $tt = '[tooltip=tooltip_consumedonuse]'.Lang::$item['consumable'].'[/tooltip]';
+                $tt = '[tooltip=tooltip_consumedonuse]'.Lang::item('consumable').'[/tooltip]';
                 break;
             }
 
             if ($hasUse)
-                $infobox[] = isset($tt) ? $tt : '[tooltip=tooltip_notconsumedonuse]'.Lang::$item['nonConsumable'].'[/tooltip]';
+                $infobox[] = isset($tt) ? $tt : '[tooltip=tooltip_notconsumedonuse]'.Lang::item('nonConsumable').'[/tooltip]';
         }
 
         // related holiday
         if ($hId = $this->subject->getField('holidayId'))
             if ($hName = DB::Aowow()->selectRow('SELECT * FROM ?_holidays WHERE id = ?d', $hId))
-                $infobox[] = Lang::$game['eventShort'].Lang::$main['colon'].'[url=?event='.$hId.']'.Util::localizedString($hName, 'name').'[/url]';
+                $infobox[] = Lang::game('eventShort').Lang::main('colon').'[url=?event='.$hId.']'.Util::localizedString($hName, 'name').'[/url]';
 
         // tool
         if ($tId = $this->subject->getField('totemCategory'))
             if ($tName = DB::Aowow()->selectRow('SELECT * FROM ?_totemcategory WHERE id = ?d', $tId))
-                $infobox[] = Lang::$item['tool'].Lang::$main['colon'].'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
+                $infobox[] = Lang::item('tool').Lang::main('colon').'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
 
         // extendedCost
         if (!empty($this->subject->getExtendedCost([], $_reqRating)[$this->subject->id]))
         {
             $vendors  = $this->subject->getExtendedCost()[$this->subject->id];
-            $each     = $this->subject->getField('stackable') > 1 ? '[color=q0] ('.Lang::$item['each'].')[/color]' : null;
+            $each     = $this->subject->getField('stackable') > 1 ? '[color=q0] ('.Lang::item('each').')[/color]' : null;
             $handled  = [];
             $costList = [];
             foreach ($vendors as $npcId => $data)
@@ -225,16 +225,16 @@ class ItemPage extends genericPage
             }
 
             if (count($costList) == 1)
-                $infobox[] = Lang::$item['cost'].Lang::$main['colon'].$costList[0].$each;
+                $infobox[] = Lang::item('cost').Lang::main('colon').$costList[0].$each;
             else if (count($costList) > 1)
-                $infobox[] = Lang::$item['cost'].$each.Lang::$main['colon'].'[ul][li]'.implode('[/li][li]', $costList).'[/li][/ul]';
+                $infobox[] = Lang::item('cost').$each.Lang::main('colon').'[ul][li]'.implode('[/li][li]', $costList).'[/li][/ul]';
 
             if ($_reqRating)
             {
                 $res   = [];
                 $i     = 0;
                 $len   = 0;
-                $parts = explode(' ', sprintf(Lang::$item['reqRating'], $_reqRating));
+                $parts = explode(' ', sprintf(Lang::item('reqRating'), $_reqRating));
                 foreach ($parts as $p)
                 {
                     $res[$i][] = $p;
@@ -255,17 +255,17 @@ class ItemPage extends genericPage
 
         // repair cost
         if ($_ = $this->subject->getField('repairPrice'))
-            $infobox[] = Lang::$item['repairCost'].Lang::$main['colon'].'[money='.$_.']';
+            $infobox[] = Lang::item('repairCost').Lang::main('colon').'[money='.$_.']';
 
         // avg auction buyout
         if (in_array($this->subject->getField('bonding'), [0, 2, 3]))
             if ($_ = Util::getBuyoutForItem($this->typeId))
-                $infobox[] = '[tooltip=tooltip_buyoutprice]'.Lang::$item['buyout.'].'[/tooltip]'.Lang::$main['colon'].'[money='.$_.']'.$each;
+                $infobox[] = '[tooltip=tooltip_buyoutprice]'.Lang::item('buyout.').'[/tooltip]'.Lang::main('colon').'[money='.$_.']'.$each;
 
         // avg money contained
         if ($_flags & ITEM_FLAG_OPENABLE)
             if ($_ = intVal(($this->subject->getField('minMoneyLoot') + $this->subject->getField('maxMoneyLoot')) / 2))
-                $infobox[] = Lang::$item['worth'].Lang::$main['colon'].'[tooltip=tooltip_avgmoneycontained][money='.$_.'][/tooltip]';
+                $infobox[] = Lang::item('worth').Lang::main('colon').'[tooltip=tooltip_avgmoneycontained][money='.$_.'][/tooltip]';
 
         // if it goes into a slot it may be disenchanted
         if ($_slot && $_class != ITEM_CLASS_CONTAINER)
@@ -276,49 +276,49 @@ class ItemPage extends genericPage
                 if ($_ < 1)                                 // these are some items, that never went live .. extremely rough emulation here
                     $_ = intVal($this->subject->getField('itemLevel') / 7.5) * 25;
 
-                $infobox[] = Lang::$item['disenchantable'].'&nbsp;([tooltip=tooltip_reqenchanting]'.$_.'[/tooltip])';
+                $infobox[] = Lang::item('disenchantable').'&nbsp;([tooltip=tooltip_reqenchanting]'.$_.'[/tooltip])';
             }
             else
-                $infobox[] = Lang::$item['cantDisenchant'];
+                $infobox[] = Lang::item('cantDisenchant');
         }
 
         if (($_flags & ITEM_FLAG_MILLABLE) && $this->subject->getField('requiredSkill') == 773)
-            $infobox[] = Lang::$item['millable'].'&nbsp;([tooltip=tooltip_reqinscription]'.$this->subject->getField('requiredSkillRank').'[/tooltip])';
+            $infobox[] = Lang::item('millable').'&nbsp;([tooltip=tooltip_reqinscription]'.$this->subject->getField('requiredSkillRank').'[/tooltip])';
 
         if (($_flags & ITEM_FLAG_PROSPECTABLE) && $this->subject->getField('requiredSkill') == 755)
-            $infobox[] = Lang::$item['prospectable'].'&nbsp;([tooltip=tooltip_reqjewelcrafting]'.$this->subject->getField('requiredSkillRank').'[/tooltip])';
+            $infobox[] = Lang::item('prospectable').'&nbsp;([tooltip=tooltip_reqjewelcrafting]'.$this->subject->getField('requiredSkillRank').'[/tooltip])';
 
         if ($_flags & ITEM_FLAG_DEPRECATED)
-            $infobox[] = '[tooltip=tooltip_deprecated]'.Lang::$item['deprecated'].'[/tooltip]';
+            $infobox[] = '[tooltip=tooltip_deprecated]'.Lang::item('deprecated').'[/tooltip]';
 
         if ($_flags & ITEM_FLAG_NO_EQUIPCD)
-            $infobox[] = '[tooltip=tooltip_noequipcooldown]'.Lang::$item['noEquipCD'].'[/tooltip]';
+            $infobox[] = '[tooltip=tooltip_noequipcooldown]'.Lang::item('noEquipCD').'[/tooltip]';
 
         if ($_flags & ITEM_FLAG_PARTYLOOT)
-            $infobox[] = '[tooltip=tooltip_partyloot]'.Lang::$item['partyLoot'].'[/tooltip]';
+            $infobox[] = '[tooltip=tooltip_partyloot]'.Lang::item('partyLoot').'[/tooltip]';
 
         if ($_flags & ITEM_FLAG_REFUNDABLE)
-            $infobox[] = '[tooltip=tooltip_refundable]'.Lang::$item['refundable'].'[/tooltip]';
+            $infobox[] = '[tooltip=tooltip_refundable]'.Lang::item('refundable').'[/tooltip]';
 
         if ($_flags & ITEM_FLAG_SMARTLOOT)
-            $infobox[] = '[tooltip=tooltip_smartloot]'.Lang::$item['smartLoot'].'[/tooltip]';
+            $infobox[] = '[tooltip=tooltip_smartloot]'.Lang::item('smartLoot').'[/tooltip]';
 
         if ($_flags & ITEM_FLAG_INDESTRUCTIBLE)
-            $infobox[] = Lang::$item['indestructible'];
+            $infobox[] = Lang::item('indestructible');
 
         if ($_flags & ITEM_FLAG_USABLE_ARENA)
-            $infobox[] = Lang::$item['useInArena'];
+            $infobox[] = Lang::item('useInArena');
 
         if ($_flags & ITEM_FLAG_USABLE_SHAPED)
-            $infobox[] = Lang::$item['useInShape'];
+            $infobox[] = Lang::item('useInShape');
 
         // cant roll need
         if ($this->subject->getField('flagsExtra') & 0x0100)
-            $infobox[] = '[tooltip=tooltip_cannotrollneed]'.Lang::$item['noNeedRoll'].'[/tooltip]';
+            $infobox[] = '[tooltip=tooltip_cannotrollneed]'.Lang::item('noNeedRoll').'[/tooltip]';
 
         // fits into keyring
         if ($_bagFamily & 0x0100)
-            $infobox[] = Lang::$item['atKeyring'];
+            $infobox[] = Lang::item('atKeyring');
 
         /****************/
         /* Main Content */
@@ -389,13 +389,13 @@ class ItemPage extends genericPage
             if (!$altItem->error)
             {
                 $this->transfer = sprintf(
-                    Lang::$item['_transfer'],
+                    Lang::item('_transfer'),
                     $altItem->id,
                     $altItem->getField('quality'),
                     $altItem->getField('iconString'),
                     $altItem->getField('name', true),
                     $pendant > 0 ? 'alliance' : 'horde',
-                    $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                    $pendant > 0 ? Lang::game('si', 1) : Lang::game('si', 2)
                 );
             }
         }
@@ -968,17 +968,17 @@ class ItemPage extends genericPage
             // itemlevel
             $xml->addChild('level', $this->subject->getField('itemLevel'));
             // quality
-            $xml->addChild('quality', Lang::$item['quality'][$this->subject->getField('quality')])->addAttribute('id', $this->subject->getField('quality'));
+            $xml->addChild('quality', Lang::item('quality', $this->subject->getField('quality')))->addAttribute('id', $this->subject->getField('quality'));
             // class
-            $x = Lang::$item['cat'][$this->subject->getField('class')];
+            $x = Lang::item('cat', $this->subject->getField('class'));
             $xml->addChild('class')->addCData(is_array($x) ? $x[0] : $x)->addAttribute('id', $this->subject->getField('class'));
             // subclass
-            $x = $this->subject->getField('class') == 2 ? Lang::$spell['weaponSubClass'] : Lang::$item['cat'][$this->subject->getField('class')][1];
+            $x = $this->subject->getField('class') == 2 ? Lang::spell('weaponSubClass') : Lang::item('cat', $this->subject->getField('class'), 1);
             $xml->addChild('subclass')->addCData(is_array($x) ? (is_array($x[$this->subject->getField('subClass')]) ? $x[$this->subject->getField('subClass')][0] : $x[$this->subject->getField('subClass')]) : null)->addAttribute('id', $this->subject->getField('subClass'));
             // icon + displayId
             $xml->addChild('icon', $this->subject->getField('iconString'))->addAttribute('displayId', $this->subject->getField('displayId'));
             // inventorySlot
-            $xml->addChild('inventorySlot', Lang::$item['inventoryType'][$this->subject->getField('slot')])->addAttribute('id', $this->subject->getField('slot'));
+            $xml->addChild('inventorySlot', Lang::item('inventoryType', $this->subject->getField('slot')))->addAttribute('id', $this->subject->getField('slot'));
             // tooltip
             $xml->addChild('htmlTooltip')->addCData($this->subject->renderTooltip());
 

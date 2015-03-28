@@ -155,7 +155,7 @@ class ProfileList extends BaseType
             $x .= '<tr><td>&lt;'.$g.'&gt; ('.$this->getField('guildrank').')</td></tr>';
         else if ($d = $this->getField('description'))
             $x .= '<tr><td>'.$d.'</td></tr>';
-        $x .= '<tr><td>'.Lang::$game['level'].' '.$this->getField('level').' '.Lang::$game['ra'][$this->curTpl['race']].' '.Lang::$game['cl'][$this->curTpl['classs']].'</td></tr>';
+        $x .= '<tr><td>'.Lang::game('level').' '.$this->getField('level').' '.Lang::game('ra', $this->curTpl['race']).' '.Lang::game('cl', $this->curTpl['classs']).'</td></tr>';
         $x .= '</table>';
 
         return $x;

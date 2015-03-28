@@ -22,7 +22,7 @@ class ScreenshotPage extends GenericPage
     {
         parent::__construct($pageCall, $pageParam);
 
-        $this->name    = Lang::$main['ssEdit'];
+        $this->name    = Lang::main('ssEdit');
         // do not htmlEscape caption. It's applied as textnode
         $this->caption = !empty($_POST['screenshotcaption']) ? $_POST['screenshotcaption'] : '';
 
@@ -133,13 +133,13 @@ class ScreenshotPage extends GenericPage
 
         if (!$this->destType)
         {
-            $this->error = Lang::$main['ssErrors']['noDest'];
+            $this->error = Lang::main('ssErrors', 'noDest');
             return;
         }
 
         if (User::$banStatus & ACC_BAN_SCREENSHOT)
         {
-            $this->error = Lang::$main['ssErrors']['notAllowed'];
+            $this->error = Lang::main('ssErrors', 'notAllowed');
             return;
         }
 
@@ -152,7 +152,7 @@ class ScreenshotPage extends GenericPage
         $im = $isPNG ? $this->loadFromPNG() : $this->loadFromJPG();
         if (!$im)
         {
-            $this->error = Lang::$main['ssErrors']['load'];
+            $this->error = Lang::main('ssErrors', 'load');
             return;
         }
 
@@ -191,17 +191,17 @@ class ScreenshotPage extends GenericPage
         $infobox = [];
 
         // target
-        $infobox[] = sprintf(Lang::$main['displayOn'], Util::ucFirst(Lang::$game[Util::$typeStrings[$this->destType]]), Util::$typeStrings[$this->destType], $this->destTypeId);
+        $infobox[] = sprintf(Lang::main('displayOn'), Util::ucFirst(Lang::game(Util::$typeStrings[$this->destType])), Util::$typeStrings[$this->destType], $this->destTypeId);
         $this->extendGlobalIds($this->destType, $this->destTypeId);
 
         // dimensions
-        $infobox[] = Lang::$main['originalSize'].Lang::$main['colon'].$oSize[0].' x '.$oSize[1];
-        $infobox[] = Lang::$main['targetSize'].Lang::$main['colon'].'[span id=qf-newSize][/span]';
+        $infobox[] = Lang::main('originalSize').Lang::main('colon').$oSize[0].' x '.$oSize[1];
+        $infobox[] = Lang::main('targetSize').Lang::main('colon').'[span id=qf-newSize][/span]';
 
         // minimum dimensions
         if (!User::isInGroup(U_GROUP_STAFF))
         {
-            $infobox[] = Lang::$main['minSize'].Lang::$main['colon'].$minCrop.' x '.$minCrop;
+            $infobox[] = Lang::main('minSize').Lang::main('colon').$minCrop.' x '.$minCrop;
             $this->cropper['minCrop'] = $minCrop;
         }
 
@@ -240,35 +240,35 @@ class ScreenshotPage extends GenericPage
     {
         // no upload happened or some error occured
         if (!$_FILES || empty($_FILES['screenshotfile']))
-            return Lang::$main['ssErrors']['noUpload'];
+            return Lang::main('ssErrors', 'noUpload');
 
         switch ($_FILES['screenshotfile']['error'])
         {
             case 1:
-                return sprintf(Lang::$main['ssErrors']['maxSize'], ini_get('upload_max_filesize'));;
+                return sprintf(Lang::main('ssErrors', 'maxSize'), ini_get('upload_max_filesize'));;
             case 3:
-                return Lang::$main['ssErrors']['interrupted'];
+                return Lang::main('ssErrors', 'interrupted');
             case 4:
-                return Lang::$main['ssErrors']['noFile'];
+                return Lang::main('ssErrors', 'noFile');
             case 6:
                 Util::addNote(U_GROUP_ADMIN, 'ScreenshotPage::validateScreenshot() - temporary upload directory is not set');
-                return Lang::$main['intError'];
+                return Lang::main('intError');
             case 7:
                 Util::addNote(U_GROUP_ADMIN, 'ScreenshotPage::validateScreenshot() - could not write temporary file to disk');
-                return Lang::$main['genericError'];
+                return Lang::main('genericError');
         }
 
         // points to invalid file (hack attempt)
         if (!is_uploaded_file($_FILES['screenshotfile']['tmp_name']))
         {
             Util::addNote(U_GROUP_ADMIN, 'ScreenshotPage::validateScreenshot() - uploaded file not in upload directory');
-            return Lang::$main['genericError'];
+            return Lang::main('genericError');
         }
 
         // invalid file
         $is = getimagesize($_FILES['screenshotfile']['tmp_name']);
         if (!$is || empty($is['mime']))
-            return Lang::$main['ssErrors']['notImage'];
+            return Lang::main('ssErrors', 'notImage');
 
         // allow jpeg, png
         switch ($is['mime'])
@@ -279,15 +279,15 @@ class ScreenshotPage extends GenericPage
             case 'image/jpeg':
                 break;
             default:
-                return Lang::$main['ssErrors']['wrongFormat'];
+                return Lang::main('ssErrors', 'wrongFormat');
         }
 
         // size-missmatch: 4k UHD upper limit; 150px lower limit
         if ($is[0] < 150 || $is[1] < 150)
-            return sprintf(Lang::$main['ssErrors']['tooSmall'], 150, 150);
+            return sprintf(Lang::main('ssErrors', 'tooSmall'), 150, 150);
 
         if ($is[0] > 3840 || $is[1] > 2160)
-            return sprintf(Lang::$main['ssErrors']['tooLarge'], 150, 150);
+            return sprintf(Lang::main('ssErrors', 'tooLarge'), 150, 150);
 
         return null;
     }
@@ -295,7 +295,7 @@ class ScreenshotPage extends GenericPage
     protected function generatePath() { }
     protected function generateTitle()
     {
-        array_unshift($this->title, Lang::$main['ssUpload']);
+        array_unshift($this->title, Lang::main('ssUpload'));
     }
 }
 

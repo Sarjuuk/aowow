@@ -23,7 +23,7 @@ $this->brick('redButtons');
 <?php
     echo $this->description;
 
-    echo '<h3>'.Lang::$achievement['criteria'].($this->criteria['reqQty'] ? ' &ndash; <small><b>'.Lang::$achievement['reqNumCrt'].' '.$this->criteria['reqQty'].' '.Lang::$achievement['outOf'].' '.count($this->criteria['data']).'</b></small>' : null)."</h3>\n";
+    echo '<h3>'.Lang::achievement('criteria').($this->criteria['reqQty'] ? ' &ndash; <small><b>'.Lang::achievement('reqNumCrt').' '.$this->criteria['reqQty'].' '.Lang::achievement('outOf').' '.count($this->criteria['data']).'</b></small>' : null)."</h3>\n";
 ?>
 
 
@@ -52,7 +52,7 @@ foreach ($this->criteria['data'] as $i => $cr):
     endif;
 
     if (User::isInGroup(U_GROUP_STAFF)):
-        echo ' <small title="'.Lang::$achievement['criteriaType'].' '.$cr['type'].'" class="q0">['.$cr['id'].']</small>';
+        echo ' <small title="'.Lang::achievement('criteriaType').' '.$cr['type'].'" class="q0">['.$cr['id'].']</small>';
     endif;
 
     echo '</td></tr>';
@@ -79,12 +79,12 @@ endforeach;
 <?php
 if ($r = $this->rewards):
     if (!empty($r['item'])):
-        echo '<h3>'.Lang::$main['rewards']."</h3>\n";
+        echo '<h3>'.Lang::main('rewards')."</h3>\n";
         $this->brick('rewards', ['rewards' => $r['item'], 'rewTitle' => null]);
     endif;
 
     if (!empty($r['title'])):
-        echo '<h3>'.Lang::$main['gains']."</h3>\n<ul>";
+        echo '<h3>'.Lang::main('gains')."</h3>\n<ul>";
         foreach ($r['title'] as $i):
             echo '    <li><div>'.$i."</div></li>\n";
         endforeach;
@@ -92,7 +92,7 @@ if ($r = $this->rewards):
     endif;
 
     if (empty($r['title']) && empty($r['item']) && $r['text']):
-        echo '<h3>'.Lang::$main['rewards']."</h3>\n" .
+        echo '<h3>'.Lang::main('rewards')."</h3>\n" .
              '<ul><li><div>'.$r['text']."</div></li></ul>\n";
     endif;
 endif;
@@ -105,7 +105,7 @@ endif;
 
 ?>
 
-                <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
+                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
             </div>
 
 <?php

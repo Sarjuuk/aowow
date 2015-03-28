@@ -30,7 +30,7 @@ class QuestPage extends GenericPage
 
         $this->subject = new QuestList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['quest']);
+            $this->notFound(Lang::game('quest'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -45,7 +45,7 @@ class QuestPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['quest']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('quest')));
     }
 
     protected function generateContent()
@@ -66,12 +66,12 @@ class QuestPage extends GenericPage
         if ($_ = $this->subject->getField('holidayId'))
         {
             $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
-            $infobox[] = Lang::$game['eventShort'].Lang::$main['colon'].'[event='.$_.']';
+            $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$_.']';
         }
 
         // level
         if ($_level > 0)
-            $infobox[] = Lang::$game['level'].Lang::$main['colon'].$_level;
+            $infobox[] = Lang::game('level').Lang::main('colon').$_level;
 
         // reqlevel
         if ($_minLevel)
@@ -80,7 +80,7 @@ class QuestPage extends GenericPage
             if ($_ = $this->subject->getField('maxLevel'))
                 $lvl .= ' - '.$_;
 
-            $infobox[] = sprintf(Lang::$game['reqLevel'], $lvl);
+            $infobox[] = sprintf(Lang::game('reqLevel'), $lvl);
         }
 
         // loremaster (i dearly hope those flags cover every case...)
@@ -99,10 +99,10 @@ class QuestPage extends GenericPage
                 case 0:
                     break;
                 case 1:
-                    $infobox[] = Lang::$quest['loremaster'].Lang::$main['colon'].'[achievement='.$loremaster->id.']';
+                    $infobox[] = Lang::quest('loremaster').Lang::main('colon').'[achievement='.$loremaster->id.']';
                     break;
                 default:
-                    $lm = Lang::$quest['loremaster'].Lang::$main['colon'].'[ul]';
+                    $lm = Lang::quest('loremaster').Lang::main('colon').'[ul]';
                     foreach ($loremaster->iterate() as $id => $__)
                         $lm .= '[li][achievement='.$id.'][/li]';
 
@@ -114,41 +114,41 @@ class QuestPage extends GenericPage
         // type (maybe expand uppon?)
         $_ = [];
         if ($_flags & QUEST_FLAG_DAILY)
-            $_[] = Lang::$quest['daily'];
+            $_[] = Lang::quest('daily');
         else if ($_flags & QUEST_FLAG_WEEKLY)
-            $_[] = Lang::$quest['weekly'];
+            $_[] = Lang::quest('weekly');
         else if ($_specialFlags & QUEST_FLAG_SPECIAL_MONTHLY)
-            $_[] = Lang::$quest['monthly'];
+            $_[] = Lang::quest('monthly');
 
         if ($t = $this->subject->getField('type'))
-            $_[] = Lang::$quest['questInfo'][$t];
+            $_[] = Lang::quest('questInfo', $t);
 
         if ($_)
-            $infobox[] = Lang::$game['type'].Lang::$main['colon'].implode(' ', $_);
+            $infobox[] = Lang::game('type').Lang::main('colon').implode(' ', $_);
 
         // side
-        $_ = Lang::$main['side'].Lang::$main['colon'];
+        $_ = Lang::main('side').Lang::main('colon');
         switch ($_side)
         {
-            case 3: $infobox[] = $_.Lang::$game['si'][3];                                        break;
-            case 2: $infobox[] = $_.'[span class=icon-horde]'.Lang::$game['si'][2].'[/span]';    break;
-            case 1: $infobox[] = $_.'[span class=icon-alliance]'.Lang::$game['si'][1].'[/span]'; break;
+            case 3: $infobox[] = $_.Lang::game('si', 3);                                        break;
+            case 2: $infobox[] = $_.'[span class=icon-horde]'.Lang::game('si', 2).'[/span]';    break;
+            case 1: $infobox[] = $_.'[span class=icon-alliance]'.Lang::game('si', 1).'[/span]'; break;
         }
 
         // races
         if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $__, $jsg, $n, false))
         {
             $this->extendGlobalIds(TYPE_RACE, $jsg);
-            $t = $n == 1 ? Lang::$game['race'] : Lang::$game['races'];
-            $infobox[] = Util::ucFirst($t).Lang::$main['colon'].$_;
+            $t = $n == 1 ? Lang::game('race') : Lang::game('races');
+            $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
 
         // classes
         if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, $n, false))
         {
             $this->extendGlobalIds(TYPE_CLASS, $jsg);
-            $t = $n == 1 ? Lang::$game['class'] : Lang::$game['classes'];
-            $infobox[] = Util::ucFirst($t).Lang::$main['colon'].$_;
+            $t = $n == 1 ? Lang::game('class') : Lang::game('classes');
+            $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
 
         // profession / skill
@@ -159,17 +159,17 @@ class QuestPage extends GenericPage
             if ($_ = $this->subject->getField('reqSkillPoints'))
                 $sk .= ' ('.$_.')';
 
-            $infobox[] = Lang::$quest['profession'].Lang::$main['colon'].$sk;
+            $infobox[] = Lang::quest('profession').Lang::main('colon').$sk;
         }
 
         // timer
         if ($_ = $this->subject->getField('timeLimit'))
-            $infobox[] = Lang::$quest['timer'].Lang::$main['colon'].Util::formatTime($_ * 1000);
+            $infobox[] = Lang::quest('timer').Lang::main('colon').Util::formatTime($_ * 1000);
 
         $startEnd = DB::Aowow()->select('SELECT * FROM ?_quests_startend WHERE questId = ?d', $this->typeId);
 
         // start
-        $start = '[icon name=quest_start'.($this->subject->isDaily() ? '_daily' : '').']'.lang::$event['start'].Lang::$main['colon'].'[/icon]';
+        $start = '[icon name=quest_start'.($this->subject->isDaily() ? '_daily' : '').']'.Lang::event('start').Lang::main('colon').'[/icon]';
         $s     = [];
         foreach ($startEnd as $se)
         {
@@ -184,7 +184,7 @@ class QuestPage extends GenericPage
             $infobox[] = implode('[br]', $s);
 
         // end
-        $end = '[icon name=quest_end'.($this->subject->isDaily() ? '_daily' : '').']'.lang::$event['end'].Lang::$main['colon'].'[/icon]';
+        $end = '[icon name=quest_end'.($this->subject->isDaily() ? '_daily' : '').']'.Lang::event('end').Lang::main('colon').'[/icon]';
         $e   = [];
         foreach ($startEnd as $se)
         {
@@ -200,14 +200,14 @@ class QuestPage extends GenericPage
 
         // Repeatable
         if ($_flags & QUEST_FLAG_REPEATABLE || $_specialFlags & QUEST_FLAG_SPECIAL_REPEATABLE)
-            $infobox[] = Lang::$quest['repeatable'];
+            $infobox[] = Lang::quest('repeatable');
 
         // sharable | not sharable
-        $infobox[] = $_flags & QUEST_FLAG_SHARABLE ? Lang::$quest['sharable'] : Lang::$quest['notSharable'];
+        $infobox[] = $_flags & QUEST_FLAG_SHARABLE ? Lang::quest('sharable') : Lang::quest('notSharable');
 
         // Keeps you PvP flagged
         if ($this->subject->isPvPEnabled())
-            $infobox[] = Lang::$quest['keepsPvpFlag'];
+            $infobox[] = Lang::quest('keepsPvpFlag');
 
         // difficulty (todo (low): formula unclear. seems to be [minLevel,] -4, -2, (level), +3, +(9 to 15))
         if ($_level > 0)
@@ -232,7 +232,7 @@ class QuestPage extends GenericPage
             $_[] = '[color=r4]'.($_level + 3 + ceil(12 * $_level / MAX_LEVEL)).'[/color]';
 
             if ($_)
-                $infobox[] = Lang::$game['difficulty'].Lang::$main['colon'].implode('[small] &nbsp;[/small]', $_);
+                $infobox[] = Lang::game('difficulty').Lang::main('colon').implode('[small] &nbsp;[/small]', $_);
         }
 
         $this->infobox = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
@@ -337,7 +337,7 @@ class QuestPage extends GenericPage
 
         foreach ($extraLists as $el)
             if ($_ = $listGen($el[1]))
-                $this->series[] = [$_, sprintf(Util::$dfnString, Lang::$quest[$el[0].'Desc'], Lang::$quest[$el[0]])];
+                $this->series[] = [$_, sprintf(Util::$dfnString, Lang::quest($el[0].'Desc'), Lang::quest($el[0]))];
 
         /*******************/
         /* Objectives List */
@@ -380,7 +380,7 @@ class QuestPage extends GenericPage
                     'name'      => $olItemData->json[$pair[0]]['name'],
                     'qty'       => $pair[1] > 1 ? $pair[1] : 0,
                     'quality'   => 7 - $olItemData->json[$pair[0]]['quality'],
-                    'extraText' => $i ? '' : '&nbsp;('.Lang::$quest['provided'].')'
+                    'extraText' => $i ? '' : '&nbsp;('.Lang::quest('provided').')'
                 );
             }
         }
@@ -425,7 +425,7 @@ class QuestPage extends GenericPage
                     'id'        => $i,
                     'name'      => $pair[1] ?: Util::localizedString($olNPCData->getEntry($i), 'name'),
                     'qty'       => $pair[0] > 1 ? $pair[0] : 0,
-                    'extraText' => (($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $pair[1]) ? '' : ' '.Lang::$achievement['slain'],
+                    'extraText' => (($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $pair[1]) ? '' : ' '.Lang::achievement('slain'),
                     'proxy'     => $pair[2]
                 );
 
@@ -481,7 +481,7 @@ class QuestPage extends GenericPage
                     'typeStr'   => Util::$typeStrings[TYPE_FACTION],
                     'id'        => $i,
                     'name'      => Util::localizedString($olFactionsData->getEntry($i), 'name'),
-                    'qty'       => sprintf(Util::$dfnString, $val.' '.Lang::$achievement['points'], Lang::getReputationLevelForPoints($val)),
+                    'qty'       => sprintf(Util::$dfnString, $val.' '.Lang::achievement('points'), Lang::getReputationLevelForPoints($val)),
                     'extraText' => ''
                 );
             }
@@ -496,17 +496,17 @@ class QuestPage extends GenericPage
                 'id'        => $_,
                 'name'      => SpellList::getName($_),
                 'qty'       => 0,
-                'extraText' => '&nbsp;('.Lang::$quest['provided'].')'
+                'extraText' => '&nbsp;('.Lang::quest('provided').')'
             );
         }
 
         // required money
         if ($this->subject->getField('rewardOrReqMoney') < 0)
-            $this->objectiveList[] = ['text' => Lang::$quest['reqMoney'].Lang::$main['colon'].Util::formatMoney(abs($this->subject->getField('rewardOrReqMoney')))];
+            $this->objectiveList[] = ['text' => Lang::quest('reqMoney').Lang::main('colon').Util::formatMoney(abs($this->subject->getField('rewardOrReqMoney')))];
 
         // required pvp kills
         if ($_ = $this->subject->getField('reqPlayerKills'))
-            $this->objectiveList[] = ['text' => Lang::$quest['playerSlain'].'&nbsp;('.$_.')'];
+            $this->objectiveList[] = ['text' => Lang::quest('playerSlain').'&nbsp;('.$_.')'];
 
         /**********/
         /* Mapper */
@@ -560,7 +560,7 @@ class QuestPage extends GenericPage
                     $altQuest->id,
                     $altQuest->getField('name', true),
                     $pendant > 0 ? 'alliance' : 'horde',
-                    $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                    $pendant > 0 ? Lang::game('si', 1) : Lang::game('si', 2)
                 );
             }
         }
@@ -700,10 +700,10 @@ class QuestPage extends GenericPage
         {
             $rewards['money'] = Util::formatMoney($questMoney);
             if ($comp > 0)
-                $rewards['money'] .= '&nbsp;' . sprintf(Lang::$quest['expConvert'], Util::formatMoney($questMoney + $comp), MAX_LEVEL);
+                $rewards['money'] .= '&nbsp;' . sprintf(Lang::quest('expConvert'), Util::formatMoney($questMoney + $comp), MAX_LEVEL);
         }
         else if ($questMoney <= 0 && $questMoney + $comp > 0)
-            $rewards['money'] = sprintf(Lang::$quest['expConvert2'], Util::formatMoney($questMoney + $comp), MAX_LEVEL);
+            $rewards['money'] = sprintf(Lang::quest('expConvert2'), Util::formatMoney($questMoney + $comp), MAX_LEVEL);
 
         // itemChoices
         if (!empty($this->subject->choices[$this->typeId][TYPE_ITEM]))
@@ -788,7 +788,7 @@ class QuestPage extends GenericPage
             {
                 $extra = null;
                 if ($_ = $rewSpells->getEntry($displ))
-                    $extra = sprintf(Lang::$quest['spellDisplayed'], $displ, Util::localizedString($_, 'name'));
+                    $extra = sprintf(Lang::quest('spellDisplayed'), $displ, Util::localizedString($_, 'name'));
 
                 if ($_ = $rewSpells->getEntry($cast))
                 {
@@ -863,7 +863,7 @@ class QuestPage extends GenericPage
             $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $_);
 
             $mail = array(
-                'delay'   => $delay  ? sprintf(Lang::$quest['mailIn'], Util::formatTime($delay * 1000)) : null,
+                'delay'   => $delay  ? sprintf(Lang::quest('mailIn'), Util::formatTime($delay * 1000)) : null,
                 'sender'  => null,
                 'text'    => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text'))      : null,
                 'subject' => Util::parseHtmlText(Util::localizedString($letter, 'subject'))
@@ -876,7 +876,7 @@ class QuestPage extends GenericPage
 
                 if ($_ = CreatureList::getName($se['typeId']))
                 {
-                    $mail['sender'] = sprintf(Lang::$quest['mailBy'], $se['typeId'], $_);
+                    $mail['sender'] = sprintf(Lang::quest('mailBy'), $se['typeId'], $_);
                     break;
                 }
             }

@@ -1,6 +1,6 @@
 <div class="clear"></div>
 <div class="text">
-<h2><?php echo Lang::$main['contribute']; ?></h2>
+<h2><?php echo Lang::main('contribute'); ?></h2>
 </div>
 <div id="tabs-contribute-generic" style="width: 50%"></div>
 <div class="text" style="margin-right: 310px">

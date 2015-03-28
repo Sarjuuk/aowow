@@ -9,7 +9,7 @@ $hasBuff = !empty($this->jsGlobals[6][2][$this->typeId]['buff']); // not set wit
 
 if ($hasBuff):
 ?>
-    <h3><?php echo Lang::$spell['_aura']; ?></h3>
+    <h3><?php echo Lang::spell('_aura'); ?></h3>
     <div id="btt<?php echo $this->typeId; ?>" class="wowhead-tooltip"></div>
 <?php
 endif;

@@ -44,7 +44,7 @@ class AchievementPage extends GenericPage
 
         $this->subject = new AchievementList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['achievement']);
+            $this->notFound(Lang::game('achievement'));
 
         $this->extendGlobalData($this->subject->getJSGlobals(GLOBALINFO_REWARDS));
 
@@ -68,7 +68,7 @@ class AchievementPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['achievement']));
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('achievement')));
     }
 
     protected function generateContent()
@@ -81,7 +81,7 @@ class AchievementPage extends GenericPage
 
         // points
         if ($_ = $this->subject->getField('points'))
-            $infobox[] = Lang::$achievement['points'].Lang::$main['colon'].'[achievementpoints='.$_.']';
+            $infobox[] = Lang::achievement('points').Lang::main('colon').'[achievementpoints='.$_.']';
 
         // location
             // todo (low)
@@ -90,13 +90,13 @@ class AchievementPage extends GenericPage
         switch ($this->subject->getField('faction'))
         {
             case 1:
-                $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-alliance]'.Lang::$game['si'][SIDE_ALLIANCE].'[/span]';
+                $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-alliance]'.Lang::game('si', SIDE_ALLIANCE).'[/span]';
                 break;
             case 2:
-                $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-horde]'.Lang::$game['si'][SIDE_HORDE].'[/span]';
+                $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-horde]'.Lang::game('si', SIDE_HORDE).'[/span]';
                 break;
             default:                                        // case 3
-                $infobox[] = Lang::$main['side'].Lang::$main['colon'].Lang::$game['si'][SIDE_BOTH];
+                $infobox[] = Lang::main('side').Lang::main('colon').Lang::game('si', SIDE_BOTH);
         }
 
         // todo (low): crosslink with charactersDB to check if realmFirsts are still available
@@ -178,7 +178,7 @@ class AchievementPage extends GenericPage
 
             $bar = new TitleList(array(['id', $foo]));
             foreach ($bar->iterate() as $__)
-                $this->rewards['title'][] = sprintf(Lang::$achievement['titleReward'], $bar->id, trim(str_replace('%s', '', $bar->getField('male', true))));
+                $this->rewards['title'][] = sprintf(Lang::achievement('titleReward'), $bar->id, trim(str_replace('%s', '', $bar->getField('male', true))));
         }
 
         $this->rewards['text'] = $this->subject->getField('reward', true);
@@ -190,13 +190,13 @@ class AchievementPage extends GenericPage
             if (!$altAcv->error)
             {
                 $this->transfer = sprintf(
-                    Lang::$achievement['_transfer'],
+                    Lang::achievement('_transfer'),
                     $altAcv->id,
                     1,                                      // quality
                     $altAcv->getField('iconString'),
                     $altAcv->getField('name', true),
                     $pendant > 0 ? 'alliance' : 'horde',
-                    $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                    $pendant > 0 ? Lang::game('si', 1) : Lang::game('si', 2)
                 );
             }
         }
@@ -276,7 +276,7 @@ class AchievementPage extends GenericPage
                         'href' => '?npc='.$obj,
                         'text' => $crtName,
                     );
-                    $tmp['extraText'] = Lang::$achievement['slain'];
+                    $tmp['extraText'] = Lang::achievement('slain');
                     break;
                 // link to area (by map)
                 case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
@@ -326,7 +326,7 @@ class AchievementPage extends GenericPage
                     break;
                 // link to title - todo (low): crosslink
                 case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
-                    $tmp['extraText'] = Util::ucFirst(Lang::$game['title']).Lang::$main['colon'].$crtName;
+                    $tmp['extraText'] = Util::ucFirst(Lang::game('title')).Lang::main('colon').$crtName;
                     break;
                 // link to achivement (/w icon)
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
@@ -491,7 +491,7 @@ class AchievementPage extends GenericPage
         }
 
         if ($_ = CreatureList::getName($this->subject->getField('sender')))
-            $mail['sender'] = sprintf(Lang::$quest['mailBy'], $this->subject->getField('sender'), $_);
+            $mail['sender'] = sprintf(Lang::quest('mailBy'), $this->subject->getField('sender'), $_);
 
         return $mail;
     }

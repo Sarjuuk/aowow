@@ -20,7 +20,7 @@ class RacesPage extends GenericPage
     {
         parent::__construct($pageCall, $pageParam);
 
-        $this->name = Util::ucFirst(Lang::$game['races']);
+        $this->name = Util::ucFirst(Lang::game('races'));
     }
 
     protected function generateContent()
@@ -43,7 +43,7 @@ class RacesPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, Util::ucFirst(Lang::$game['races']));
+        array_unshift($this->title, Util::ucFirst(Lang::game('races')));
     }
 
     protected function generatePath() {}

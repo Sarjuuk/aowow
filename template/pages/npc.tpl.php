@@ -21,12 +21,12 @@
     $this->brick('article');
 
 if ($this->accessory):
-    echo '                <div>'.Lang::$npc['accessoryFor'].' ';
+    echo '                <div>'.Lang::npc('accessoryFor').' ';
 
     $n = count($this->accessory);
     foreach ($this->accessory as $i => $ac):
         if ($n > 1 && $i > 0):
-            echo ($i == $n - 1) ? Lang::$main['and'] : ', ';
+            echo ($i == $n - 1) ? Lang::main('and') : ', ';
         endif;
         echo '<a href="?npc='.$ac[0].'">'.$ac[1].'</a>';
     endforeach;
@@ -35,19 +35,19 @@ if ($this->accessory):
 endif;
 
 if (is_array($this->position)):
-    echo '                <div>'.Lang::$npc['difficultyPH'].' <a href="?npc='.$this->position[0].'">'.$this->position[1]."</a>.</div>\n";
+    echo '                <div>'.Lang::npc('difficultyPH').' <a href="?npc='.$this->position[0].'">'.$this->position[1]."</a>.</div>\n";
 ?>
                 <div class="pad"></div>
 <?php
 elseif (!empty($this->map)):
     $this->brick('mapper');
 else:
-    echo '                '.Lang::$npc['unkPosition']."\n";
+    echo '                '.Lang::npc('unkPosition')."\n";
 endif;
 
 if ($this->quotes[0]):
 ?>
-                <h3><a class="disclosure-off" onclick="return g_disclose($WH.ge('quotes-generic'), this)"><?php echo Lang::$npc['quotes'].'&nbsp;('.$this->quotes[1]; ?>)</a></h3>
+                <h3><a class="disclosure-off" onclick="return g_disclose($WH.ge('quotes-generic'), this)"><?php echo Lang::npc('quotes').'&nbsp;('.$this->quotes[1]; ?>)</a></h3>
                 <div id="quotes-generic" style="display: none"><ul>
 <?php
     foreach ($this->quotes[0] as $group):
@@ -59,9 +59,9 @@ if ($this->quotes[0]):
 
         $last = end($group);
         foreach ($group as $itr):
-            $_ = ($itr['type'] != 4 ? $this->name.' '.Lang::$npc['textTypes'][$itr['type']].Lang::$main['colon'].($itr['lang'] ? '['.$itr['lang'].']' : null) : null).$itr['text'];
+            $_ = ($itr['type'] != 4 ? $this->name.' '.Lang::npc('textTypes', $itr['type']).Lang::main('colon').($itr['lang'] ? '['.$itr['lang'].']' : null) : null).$itr['text'];
 
-            echo '<div><span class="s'.$itr['type'].'">'.($itr['range'] ? sprintf(Util::$dfnString, Lang::$npc['textRanges'][$itr['range']], $_) : $_).'</span></div>';
+            echo '<div><span class="s'.$itr['type'].'">'.($itr['range'] ? sprintf(Util::$dfnString, Lang::npc('textRanges', $itr['range']), $_) : $_).'</span></div>';
             echo ($itr == $last) ? null : "</li>\n<li>";
         endforeach;
 
@@ -79,9 +79,9 @@ endif;
 
 if ($this->reputation):
 ?>
-                <h3><?php echo Lang::$main['gains']; ?></h3>
+                <h3><?php echo Lang::main('gains'); ?></h3>
 <?php
-    echo Lang::$npc['gainsDesc'].Lang::$main['colon'];
+    echo Lang::npc('gainsDesc').Lang::main('colon');
 
     foreach ($this->reputation as $set):
         if (count($this->reputation) > 1):
@@ -91,8 +91,8 @@ if ($this->reputation):
         echo '<ul>';
 
         foreach ($set[1] as $itr):
-            echo '<li><div'.($itr['qty'] < 0 ? ' class="reputation-negative-amount"' : null).'><span>'.$itr['qty'].'</span> '.Lang::$npc['repWith'] .
-                ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'] > 0 ? '&nbsp;('.sprintf(Lang::$npc['stopsAt'], $itr['cap']).')' : null).'</div></li>';
+            echo '<li><div'.($itr['qty'] < 0 ? ' class="reputation-negative-amount"' : null).'><span>'.$itr['qty'].'</span> '.Lang::npc('repWith') .
+                ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'] > 0 ? '&nbsp;('.sprintf(Lang::npc('stopsAt'), $itr['cap']).')' : null).'</div></li>';
         endforeach;
 
         echo '</ul>';
@@ -103,7 +103,7 @@ if ($this->reputation):
     endforeach;
 endif;
 ?>
-                <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
+                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
             </div>
 
 <?php

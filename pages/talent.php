@@ -25,7 +25,7 @@ class TalentPage extends GenericPage
         parent::__construct($pageCall, $__);
 
         $this->isPetCalc = $pageCall == 'petcalc';
-        $this->name      = $this->isPetCalc ? Lang::$main['petCalc'] : Lang::$main['talentCalc'];
+        $this->name      = $this->isPetCalc ? Lang::main('petCalc') : Lang::main('talentCalc');
     }
 
     protected function generateContent()

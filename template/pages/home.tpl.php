@@ -53,14 +53,14 @@
 
     <div class="footer">
         <div class="footer-links linklist">
-            <a href="?aboutus"><?php echo lang::$main['aboutUs']; ?></a>|
-            <a href="#" id="footer-links-language"><?php echo Lang::$main['language']; ?></a>
+            <a href="?aboutus"><?php echo Lang::main('aboutUs'); ?></a>|
+            <a href="#" id="footer-links-language"><?php echo Lang::main('language'); ?></a>
         </div>
         <div class="footer-copy">&#12484; 2014 Aowow</div>
     </div>
 
 <?php $this->brick('pageTemplate'); ?>
 
-    <noscript><div id="noscript-bg"></div><div id="noscript-text"><b><?php echo Lang::$main['jsError']; ?></div></noscript>
+    <noscript><div id="noscript-bg"></div><div id="noscript-text"><b><?php echo Lang::main('jsError'); ?></div></noscript>
 </body>
 </html>

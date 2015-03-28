@@ -394,7 +394,7 @@ class AjaxHandler
             case 'vote':                                    // up, down and remove
                 if (!User::$id || empty($this->get['id']) || empty($this->get['rating']))
                 {
-                    $result = ['error' => 1, 'message' => Lang::$main['genericError']];
+                    $result = ['error' => 1, 'message' => Lang::main('genericError')];
                     break;
                 }
 
@@ -404,13 +404,13 @@ class AjaxHandler
                     $val *= -1;
 
                 if (User::getCurDailyVotes() <= 0)
-                    $result = ['error' => 1, 'message' => Lang::$main['tooManyVotes']];
+                    $result = ['error' => 1, 'message' => Lang::main('tooManyVotes')];
 
                 else if (!$target || $val != $this->get['rating'])
-                    $result = ['error' => 1, 'message' => Lang::$main['genericError']];
+                    $result = ['error' => 1, 'message' => Lang::main('genericError')];
 
                 else if (($val > 0 && !User::canUpvote()) || ($val < 0 && !User::canDownvote()))
-                    $result = ['error' => 1, 'message' => Lang::$main['bannedRating']];
+                    $result = ['error' => 1, 'message' => Lang::main('bannedRating')];
 
                 if ($result)
                     break;
@@ -425,7 +425,7 @@ class AjaxHandler
 
                 if (!$ok)
                 {
-                    $result = ['error' => 1, 'message' => Lang::$main['genericError']];
+                    $result = ['error' => 1, 'message' => Lang::main('genericError')];
                     break;
                 }
 
@@ -481,7 +481,7 @@ class AjaxHandler
                 if ($ok)                                    // this one is very special; as in: completely retarded
                     return 'ok';                            // the script expects the actual characters 'ok' not some string like "ok"
 
-                $result = Lang::$main['genericError'];
+                $result = Lang::main('genericError');
                 break;
             case 'show-replies':
                 $result = empty($this->get['id']) ? [] : CommunityContent::getCommentReplies($this->get['id']);
@@ -494,13 +494,13 @@ class AjaxHandler
                     $result = 'Your reply has '.mb_strlen(@$this->post['body']).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
 
                 else if (empty($this->post['commentId']) || !DB::Aowow()->selectCell('SELECT 1 FROM ?_comments WHERE id = ?d', $this->post['commentId']))
-                    $result = Lang::$main['genericError'];
+                    $result = Lang::main('genericError');
 
                 else if (DB::Aowow()->query('INSERT INTO ?_comments (`userId`, `roles`, `body`, `date`, `replyTo`) VALUES (?d, ?d, ?, UNIX_TIMESTAMP(), ?d)', User::$id, User::$groups, $this->post['body'], $this->post['commentId']))
                     $result = CommunityContent::getCommentReplies($this->post['commentId']);
 
                 else
-                    $result = Lang::$main['genericError'];
+                    $result = Lang::main('genericError');
 
                 break;
             case 'edit-reply':                              // also returns all replies on success
@@ -508,7 +508,7 @@ class AjaxHandler
                     $result = 'You are not allowed to reply.';
 
                 else if (empty($this->post['replyId']) || empty($this->post['commentId']))
-                    $result = Lang::$main['genericError'];
+                    $result = Lang::main('genericError');
 
                 else if (empty($this->post['body']) || mb_strlen($this->post['body']) < $_minRpl || mb_strlen($this->post['body']) > $_maxRpl)
                     $result = 'Your reply has '.mb_strlen(@$this->post['body']).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
@@ -525,7 +525,7 @@ class AjaxHandler
                     User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
                 );
 
-                $result = $ok ? CommunityContent::getCommentReplies($this->post['commentId']) : Lang::$main['genericError'];
+                $result = $ok ? CommunityContent::getCommentReplies($this->post['commentId']) : Lang::main('genericError');
                 break;
             case 'detach-reply':
                 if (!User::isInGroup(U_GROUP_MODERATOR) || empty($this->post['id']))

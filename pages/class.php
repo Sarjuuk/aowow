@@ -26,7 +26,7 @@ class ClassPage extends GenericPage
 
         $this->subject = new CharClassList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::$game['class']);
+            $this->notFound(Lang::game('class'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -38,7 +38,7 @@ class ClassPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::$game['class']));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('class')));
     }
 
     protected function generateContent()
@@ -56,27 +56,27 @@ class ClassPage extends GenericPage
 
         // hero class
         if ($this->subject->getField('flags') & 0x40)
-            $infobox[] = '[tooltip=tooltip_heroclass]'.Lang::$game['heroClass'].'[/tooltip]';
+            $infobox[] = '[tooltip=tooltip_heroclass]'.Lang::game('heroClass').'[/tooltip]';
 
         // resource
         if ($this->typeId == 11)                                // special Druid case
-            $infobox[] = Lang::$game['resources'].Lang::$main['colon'].
-            '[tooltip name=powertype1]'.Lang::$game['st'][0].', '.Lang::$game['st'][31].', '.Lang::$game['st'][2].'[/tooltip][span class=tip tooltip=powertype1]'.Util::ucFirst(Lang::$spell['powerTypes'][0]).'[/span], '.
-            '[tooltip name=powertype2]'.Lang::$game['st'][5].', '.Lang::$game['st'][8].'[/tooltip][span class=tip tooltip=powertype2]'.Util::ucFirst(Lang::$spell['powerTypes'][1]).'[/span], '.
-            '[tooltip name=powertype8]'.Lang::$game['st'][1].'[/tooltip][span class=tip tooltip=powertype8]'.Util::ucFirst(Lang::$spell['powerTypes'][3]).'[/span]';
+            $infobox[] = Lang::game('resources').Lang::main('colon').
+            '[tooltip name=powertype1]'.Lang::game('st', 0).', '.Lang::game('st', 31).', '.Lang::game('st', 2).'[/tooltip][span class=tip tooltip=powertype1]'.Util::ucFirst(Lang::spell('powerTypes', 0)).'[/span], '.
+            '[tooltip name=powertype2]'.Lang::game('st', 5).', '.Lang::game('st', 8).'[/tooltip][span class=tip tooltip=powertype2]'.Util::ucFirst(Lang::spell('powerTypes', 1)).'[/span], '.
+            '[tooltip name=powertype8]'.Lang::game('st', 1).'[/tooltip][span class=tip tooltip=powertype8]'.Util::ucFirst(Lang::spell('powerTypes', 3)).'[/span]';
         else if ($this->typeId == 6)                            // special DK case
-            $infobox[] = Lang::$game['resources'].Lang::$main['colon'].'[span]'.Util::ucFirst(Lang::$spell['powerTypes'][5]).', '.Util::ucFirst(Lang::$spell['powerTypes'][$this->subject->getField('powerType')]).'[/span]';
+            $infobox[] = Lang::game('resources').Lang::main('colon').'[span]'.Util::ucFirst(Lang::spell('powerTypes', 5)).', '.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
         else                                                    // regular case
-            $infobox[] = Lang::$game['resource'].Lang::$main['colon'].'[span]'.Util::ucFirst(Lang::$spell['powerTypes'][$this->subject->getField('powerType')]).'[/span]';
+            $infobox[] = Lang::game('resource').Lang::main('colon').'[span]'.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
 
         // roles
         $roles = [];
         for ($i = 0; $i < 4; $i++)
             if ($this->subject->getField('roles') & (1 << $i))
-                $roles[] = (count($roles) == 2 ? "\n" : '').Lang::$game['_roles'][$i];
+                $roles[] = (count($roles) == 2 ? "\n" : '').Lang::game('_roles', $i);
 
         if ($roles)
-            $infobox[] = (count($roles) > 1 ? Lang::$game['roles'] : Lang::$game['role']).Lang::$main['colon'].implode(', ', $roles);
+            $infobox[] = (count($roles) > 1 ? Lang::game('roles') : Lang::game('role')).Lang::main('colon').implode(', ', $roles);
 
         // specs
         $specList = [];
@@ -85,7 +85,7 @@ class ClassPage extends GenericPage
             $specList[$k] = '[icon name='.$skills->getField('iconString').'][url=?spells=7.'.$this->typeId.'.'.$k.']'.$skills->getField('name', true).'[/url][/icon]';
 
         if ($specList)
-            $infobox[] = Lang::$game['specs'].Lang::$main['colon'].'[ul][li]'.implode('[/li][li]', $specList).'[/li][/ul]';
+            $infobox[] = Lang::game('specs').Lang::main('colon').'[ul][li]'.implode('[/li][li]', $specList).'[/li][/ul]';
 
 
         /****************/

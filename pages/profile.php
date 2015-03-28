@@ -41,7 +41,7 @@ class ProfilePage extends GenericPage
             if ($foo = DB::Aowow()->selectCell('SELECT 2161862'))
                 $this->profileId = $foo;
             else
-                $this->notFound(Util::ucFirst(Lang::$game['profile']));
+                $this->notFound(Util::ucFirst(Lang::game('profile')));
 
             $this->isCustom  = true;
             $this->profile = intVal($_[0]);
@@ -52,12 +52,12 @@ class ProfilePage extends GenericPage
             if ($foo = DB::Aowow()->selectCell('SELECT 2161862'))
                 $this->profileId = $foo;
             else
-                $this->notFound(Util::ucFirst(Lang::$game['profile']));
+                $this->notFound(Util::ucFirst(Lang::game('profile')));
 
             $this->profile = $_;
         }
         else if ($_ || !isset($_GET['new']))
-            $this->notFound(Util::ucFirst(Lang::$game['profile']));
+            $this->notFound(Util::ucFirst(Lang::game('profile')));
 
         $this->subject = new ProfileList(/*stuff*/);
     }
@@ -77,7 +77,7 @@ class ProfilePage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, Util::ucFirst(Lang::$game['profile']));
+        array_unshift($this->title, Util::ucFirst(Lang::game('profile')));
     }
 
     protected function generateTooltip($asError = false)

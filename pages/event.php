@@ -30,7 +30,7 @@ class EventPage extends GenericPage
 
         $this->subject = new WorldEventList($conditions);
         if ($this->subject->error)
-            $this->notFound(Lang::$game['event']);
+            $this->notFound(Lang::game('event'));
 
         $this->hId = $this->subject->getField('holidayId');
         $this->eId = $this->subject->getField('eventBak');
@@ -56,7 +56,7 @@ class EventPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['event']));
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('event')));
     }
 
     protected function generateContent()
@@ -73,12 +73,12 @@ class EventPage extends GenericPage
         if ($_ = $this->subject->getField('bossCreature'))
         {
             $this->extendGlobalIds(TYPE_NPC, $_);
-            $this->infobox[] = Lang::$npc['rank'][3].Lang::$main['colon'].'[npc='.$_.']';
+            $this->infobox[] = Lang::npc('rank', 3).Lang::main('colon').'[npc='.$_.']';
         }
 
         // display internal id to staff
         if (User::isInGroup(U_GROUP_STAFF))
-            $this->infobox[] = 'Event-Id'.Lang::$main['colon'].$this->eId;
+            $this->infobox[] = 'Event-Id'.Lang::main('colon').$this->eId;
 
         /****************/
         /* Main Content */
@@ -274,19 +274,19 @@ class EventPage extends GenericPage
 
         // start
         if ($updated['start'])
-            array_push($this->infobox, Lang::$event['start'].Lang::$main['colon'].date(Lang::$main['dateFmtLong'], $updated['start']));
+            array_push($this->infobox, Lang::event('start').Lang::main('colon').date(Lang::main('dateFmtLong'), $updated['start']));
 
         // end
         if ($updated['end'])
-            array_push($this->infobox, Lang::$event['end'].Lang::$main['colon'].date(Lang::$main['dateFmtLong'], $updated['end']));
+            array_push($this->infobox, Lang::event('end').Lang::main('colon').date(Lang::main('dateFmtLong'), $updated['end']));
 
         // occurence
         if ($updated['rec'] > 0)
-            array_push($this->infobox, Lang::$event['interval'].Lang::$main['colon'].Util::formatTime($updated['rec'] * 1000));
+            array_push($this->infobox, Lang::event('interval').Lang::main('colon').Util::formatTime($updated['rec'] * 1000));
 
         // in progress
         if ($updated['start'] < time() && $updated['end'] > time())
-            array_push($this->infobox, '[span class=q2]'.Lang::$event['inProgress'].'[/span]');
+            array_push($this->infobox, '[span class=q2]'.Lang::event('inProgress').'[/span]');
 
         $this->infobox = '[ul][li]'.implode('[/li][li]', $this->infobox).'[/li][/ul]';
 

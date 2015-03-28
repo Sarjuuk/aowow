@@ -43,7 +43,7 @@ endif;
 if (isset($this->unavailable)):
 ?>
                 <div class="pad"></div>
-                <b style="color: red"><?php echo Lang::$main['_unavailable']; ?></b>
+                <b style="color: red"><?php echo Lang::main('_unavailable'); ?></b>
 <?php
 endif;
 
@@ -52,7 +52,7 @@ if (!empty($this->transfer)):
 endif;
 
 ?>
-                <h2 class="clear"><?php echo Lang::$main['related']; ?></h2>
+                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
             </div>
 
 <?php

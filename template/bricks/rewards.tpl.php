@@ -4,7 +4,7 @@ if (!isset($offset))                                        // in case we have m
     $offset = 0;
 
 if ($rewTitle):
-    echo $rewTitle.Lang::$main['colon'].(isset($extra) ? $extra : null);
+    echo $rewTitle.Lang::main('colon').(isset($extra) ? $extra : null);
 endif;
 
 if ($rewards):

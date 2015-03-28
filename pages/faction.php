@@ -25,7 +25,7 @@ class FactionPage extends GenericPage
 
         $this->subject = new FactionList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $smarty->notFound(Lang::$game['faction']);
+            $smarty->notFound(Lang::game('faction'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -43,7 +43,7 @@ class FactionPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::$game['faction']));
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('faction')));
     }
 
     protected function generateContent()
@@ -60,7 +60,7 @@ class FactionPage extends GenericPage
         {
             $this->extendGlobalIds(TYPE_NPC, $ids);
 
-            $qmStr = Lang::$faction['quartermaster'].Lang::$main['colon'];
+            $qmStr = Lang::faction('quartermaster').Lang::main('colon');
 
             if (count($ids) ==  1)
                 $qmStr .= '[npc='.$ids[0].']';
@@ -78,7 +78,7 @@ class FactionPage extends GenericPage
 
         // side if any
         if ($_ = $this->subject->getField('side'))
-            $infobox[] = Lang::$main['side'].Lang::$main['colon'].'[span class=icon-'.($_ == 1 ? 'alliance' : 'horde').']'.Lang::$game['si'][$_].'[/span]';
+            $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-'.($_ == 1 ? 'alliance' : 'horde').']'.Lang::game('si', $_).'[/span]';
 
         /****************/
         /* Main Content */
@@ -117,10 +117,10 @@ class FactionPage extends GenericPage
         $buff = '';
         foreach ($spillover->iterate() as $spillId => $__)
             if ($val = ($spillover->getField('spilloverRateIn') * $this->subject->getField('spilloverRateOut') * 100))
-                $buff .= '[tr][td][faction='.$spillId.'][/td][td][span class=q'.($val > 0 ? '2]+' : '10]').$val.'%[/span][/td][td]'.Lang::$game['rep'][$spillover->getField('spilloverMaxRank')].'[/td][/tr]';
+                $buff .= '[tr][td][faction='.$spillId.'][/td][td][span class=q'.($val > 0 ? '2]+' : '10]').$val.'%[/span][/td][td]'.Lang::game('rep', $spillover->getField('spilloverMaxRank')).'[/td][/tr]';
 
         if ($buff)
-            $this->extraText .= '[h3 class=clear]'.Lang::$faction['spillover'].'[/h3][div margin=15px]'.Lang::$faction['spilloverDesc'].'[/div][table class=grid width=400px][tr][td width=150px][b]'.Util::ucFirst(Lang::$game['faction']).'[/b][/td][td width=100px][b]'.Lang::$spell['_value'].'[/b][/td][td width=150px][b]'.Lang::$faction['maxStanding'].'[/b][/td][/tr]'.$buff.'[/table]';
+            $this->extraText .= '[h3 class=clear]'.Lang::faction('spillover').'[/h3][div margin=15px]'.Lang::faction('spilloverDesc').'[/div][table class=grid width=400px][tr][td width=150px][b]'.Util::ucFirst(Lang::game('faction')).'[/b][/td][td width=100px][b]'.Lang::spell('_value').'[/b][/td][td width=150px][b]'.Lang::faction('maxStanding').'[/b][/td][/tr]'.$buff.'[/table]';
 
 
         // reward rates (ultimately this should be calculated into each reward display)
@@ -134,12 +134,12 @@ class FactionPage extends GenericPage
 
                 switch ($k)
                 {
-                    case 'quest_rate':          $buff .= '[tr][td]'.Lang::$game['quests'].Lang::$main['colon'].'[/td]';                                  break;
-                    case 'quest_daily_rate':    $buff .= '[tr][td]'.Lang::$game['quests'].' ('.Lang::$quest['daily'].')'.Lang::$main['colon'].'[/td]';   break;
-                    case 'quest_weekly_rate':   $buff .= '[tr][td]'.Lang::$game['quests'].' ('.Lang::$quest['weekly'].')'.Lang::$main['colon'].'[/td]';  break;
-                    case 'quest_monthly_rate':  $buff .= '[tr][td]'.Lang::$game['quests'].' ('.Lang::$quest['monthly'].')'.Lang::$main['colon'].'[/td]'; break;
-                    case 'creature_rate':       $buff .= '[tr][td]'.Lang::$game['npcs'].Lang::$main['colon'].'[/td]';                                    break;
-                    case 'spell_rate':          $buff .= '[tr][td]'.Lang::$game['spells'].Lang::$main['colon'].'[/td]';                                  break;
+                    case 'quest_rate':          $buff .= '[tr][td]'.Lang::game('quests')                                .Lang::main('colon').'[/td]'; break;
+                    case 'quest_daily_rate':    $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('daily').')'  .Lang::main('colon').'[/td]'; break;
+                    case 'quest_weekly_rate':   $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('weekly').')' .Lang::main('colon').'[/td]'; break;
+                    case 'quest_monthly_rate':  $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('monthly').')'.Lang::main('colon').'[/td]'; break;
+                    case 'creature_rate':       $buff .= '[tr][td]'.Lang::game('npcs')                                  .Lang::main('colon').'[/td]'; break;
+                    case 'spell_rate':          $buff .= '[tr][td]'.Lang::game('spells')                                .Lang::main('colon').'[/td]'; break;
                 }
 
                 $buff .= '[td width=35px align=right][span class=q'.($v < 1 ? '10]' : '2]+').intVal(($v - 1) * 100).'%[/span][/td][/tr]';
@@ -160,7 +160,7 @@ class FactionPage extends GenericPage
                     $altFac->id,
                     $altFac->getField('name', true),
                     $pendant > 0 ? 'alliance' : 'horde',
-                    $pendant > 0 ? Lang::$game['si'][1] : Lang::$game['si'][2]
+                    $pendant > 0 ? Lang::game('si', 1) : Lang::game('si', 2)
                 );
             }
         }

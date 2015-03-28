@@ -87,27 +87,27 @@
 
                     <table align="center">
                         <tr>
-                            <td align="right"><?php echo Lang::$account['user'].lang::$main['colon']; ?></td>
+                            <td align="right"><?php echo Lang::account('user').Lang::main('colon'); ?></td>
                             <td><input type="text" name="username" value="" maxlength="16" id="username-generic" style="width: 10em" /></td>
                         </tr>
                         <tr>
-                            <td align="right"><?php echo Lang::$account['pass'].lang::$main['colon']; ?></td>
+                            <td align="right"><?php echo Lang::account('pass').Lang::main('colon'); ?></td>
                             <td><input type="password" name="password" style="width: 10em" /></td>
                         </tr>
                         <tr>
-                            <td align="right"><?php echo Lang::$account['passConfirm'].lang::$main['colon']; ?></td>
+                            <td align="right"><?php echo Lang::account('passConfirm').Lang::main('colon'); ?></td>
                             <td><input type="password" name="c_password" style="width: 10em" /></td>
                         </tr>
                         <tr>
                         <tr>
-                            <td align="right"><?php echo Lang::$account['email'].lang::$main['colon']; ?></td>
+                            <td align="right"><?php echo Lang::account('email').Lang::main('colon'); ?></td>
                             <td><input type="text" name="email" style="width: 10em" /></td>
                         </tr>
                             <td align="right" valign="top"><input type="checkbox" name="remember_me" id="remember_me" value="yes" /></td>
                             <td>
-                                <label for="remember_me"><?php echo Lang::$account['rememberMe']; ?></label>
+                                <label for="remember_me"><?php echo Lang::account('rememberMe'); ?></label>
                                 <div class="pad2"></div>
-                                <input type="submit" name="signup" value="<?php echo Lang::$account['continue']; ?>" />
+                                <input type="submit" name="signup" value="<?php echo Lang::account('continue'); ?>" />
                             </td>
                         </tr>
                     </table>
