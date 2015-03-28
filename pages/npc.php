@@ -174,6 +174,57 @@ class NpcPage extends GenericPage
                 $infobox[] = 'AI'.Lang::$main['colon'].$_;
         }
 
+        if (User::isInGroup(U_GROUP_STAFF))
+        {
+            // Mechanic immune
+            if ($immuneMask = $this->subject->getField('mechanicImmuneMask'))
+            {
+                $buff = [];
+                for ($i = 0; $i < 31; $i++)
+                    if ($immuneMask & (1 << $i))
+                        $buff[] = (!fMod(count($buff), 3) ? "\n" : null).'[url=?spells&filter=me='.($i + 1).']'.Lang::game('me', $i + 1).'[/url]';
+
+                $infobox[] = 'Not affected by mechanic'.Lang::main('colon').implode(', ', $buff);
+            }
+
+            // extra flags
+            if ($flagsExtra = $this->subject->getField('flagsExtra'))
+            {
+                $buff = [];
+                if ($flagsExtra & 0x000001)
+                    $buff[] = 'Binds attacker to instance on death';
+                if ($flagsExtra & 0x000002)
+                    $buff[] = '[tooltip name=civilian]does not aggro[/tooltip][span class=tip tooltip=civilian]Civilian[/span]';
+                if ($flagsExtra & 0x000004)
+                    $buff[] = 'Cannot parry';
+                if ($flagsExtra & 0x000008)
+                    $buff[] = 'Has no parry haste';
+                if ($flagsExtra & 0x000010)
+                    $buff[] = 'Cannot block';
+                if ($flagsExtra & 0x000020)
+                    $buff[] = 'Cannot deal Crushing Blows';
+                if ($flagsExtra & 0x000040)
+                    $buff[] = 'Rewards no experience';
+                if ($flagsExtra & 0x000080)
+                    $buff[] = 'Trigger-Creature';
+                if ($flagsExtra & 0x000100)
+                    $buff[] = 'Immune to Taunt';
+                if ($flagsExtra & 0x008000)
+                    $buff[] = '[tooltip name=guard]ignores enemy stealth, invisibility and Feign Death[/tooltip][span class=tip tooltip=guard]Guard[/span]';
+                if ($flagsExtra & 0x020000)
+                    $buff[] = 'Cannot deal Critical Hits';
+                if ($flagsExtra & 0x040000)
+                    $buff[] = 'Attacker does not gain weapon skill';
+                if ($flagsExtra & 0x080000)
+                    $buff[] = 'Taunt has diminishing returns';
+                if ($flagsExtra & 0x100000)
+                    $buff[] = 'Is subject to diminishing returns';
+
+                if ($buff)
+                    $infobox[] = 'Extra Flags'.Lang::main('colon').'[ul][li]'.implode('[/li][li]', $buff).'[/li][/ul]';
+            }
+        }
+
         // > Stats
         $_nf     = function ($num) { return number_format($num, 0, '', '.'); };
         $stats   = [];
@@ -735,7 +786,7 @@ class NpcPage extends GenericPage
         $x  = '$WowheadPower.registerNpc('.$this->typeId.', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip())."',\n";
-        $x .= "\tmap: ".($s ? Util::toJSON(['zone' => $s[0], 'coords' => [$s[1] => $s[2]]]) : '{}')."\n";
+        $x .= "\tmap: ".($s ? "{zone: ".$s[0].", coords: {".$s[1].":".Util::toJSON($s[2])."}}" : '{}')."\n";
         $x .= "});";
 
         return $x;

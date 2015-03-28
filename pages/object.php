@@ -465,7 +465,7 @@ class ObjectPage extends GenericPage
         $x  = '$WowheadPower.registerObject('.$this->typeId.', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip())."',\n";
-        $x .= "\tmap: ".($s ? Util::toJSON(['zone' => $s[0], 'coords' => [$s[1] => $s[2]]]) : '{}')."\n";
+        $x .= "\tmap: ".($s ? "{zone: ".$s[0].", coords: {".$s[1].":".Util::toJSON($s[2])."}}" : '{}')."\n";
         $x .= "});";
 
         return $x;

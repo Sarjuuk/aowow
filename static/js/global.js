@@ -10493,6 +10493,9 @@ Listview.templates = {
                         a.style.backgroundImage = "url(" + g_staticUrl + "/images/wow/icons/tiny/quest_start.gif)";
                     }
 
+                    if (g_user.roles & U_GROUP_PREMIUM_PERMISSIONS)
+                        a.rel = 'map';
+
                     $WH.ae(wrapper, a);
 
                     if (npc.tag != null) {
@@ -10730,6 +10733,9 @@ Listview.templates = {
                         a.className += " icontiny tinyspecial";
                         a.style.backgroundImage = "url(" + g_staticUrl + "/images/wow/icons/tiny/quest_start.gif)";
                     }
+
+                    if (g_user.roles & U_GROUP_PREMIUM_PERMISSIONS)
+                        a.rel = 'map';
 
                     $WH.ae(wrapper, a);
 

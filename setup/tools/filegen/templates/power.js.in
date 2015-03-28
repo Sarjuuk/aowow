@@ -666,7 +666,7 @@ if (typeof $WowheadPower == "undefined") {
                 arr[id].timer = null;
             }
 
-            if (!$WH.wowheadRemote && json.map) {
+            if (!$WH.wowheadRemote && !$.isEmptyObject(json.map)) {
                 if (arr[id].map == null) {
                     arr[id].map = new Mapper({
                         parent: $WH.ce("div"),
