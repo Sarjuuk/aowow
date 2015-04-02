@@ -711,9 +711,9 @@ $lang = array(
         ),
         'powerRunes'    => ["Givre", "Impie", "Sang", "Mort"],
         'powerTypes'    => array(
-            -2 => "vie",     -1 => null,    "mana",     "rage",     "focus",    "énergie",      "[Happiness]",      "[Rune]",   "puissance runique",
-            'AMMOSLOT' => "[Ammo]",         'STEAM' => "[Steam Pressure]",      'WRATH'       => "courroux",        'PYRITE' => "Pyrite",
-            'HEAT'     => "chaleur",        'OOZE'  => "limon",                 'BLOOD_POWER' => "puissance de sang"
+            -2 => "vie",     -1 => null,    "mana",     "rage",     "focus",    "énergie",      "Satisfaction",     "Runes",    "puissance runique",
+            'AMMOSLOT' => "Munitions",      'STEAM' => "Pression vapeur",       'WRATH'       => "Courroux",        'PYRITE' => "Pyrite",
+            'HEAT'     => "Chaleur",        'OOZE'  => "Limon",                 'BLOOD_POWER' => "Puissance de sang"
         ),
         'relItems'      => array(
             'base'    => "<small>Montre %s reliés à <b>%s</b></small>",

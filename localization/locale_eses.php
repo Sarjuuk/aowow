@@ -712,10 +712,10 @@ $lang = array(
             'dotSP'    => "[+%.2f%% of spell power per tick]",                   'dotAP'    => "[+%.2f%% of attack power per tick]"
         ),
         'powerRunes'    => ["Escarcha", "Profano", "Sangre", "Muerte"],
-        'powerTypes'    => array(   // heat => spell 70174
-            -2 => "Salud",   -1 => null,   "Maná",     "Ira",     "Enfoque",    "Energía",      "[Happiness]",      "Runa",    "Poder rúnico",
-            'AMMOSLOT' => "[Ammo]",         'STEAM' => "[Steam Pressure]",      'WRATH'       => "[Wrath]",         'PYRITE' => "[Pyrite]",
-            'HEAT'     => "[Heat]",         'OOZE'  => "[Ooze]",                'BLOOD_POWER' => "[Blood Power]" // spellname of 72370
+        'powerTypes'    => array(
+            -2 => "Salud",   -1 => null,   "Maná",     "Ira",     "Enfoque",    "Energía",      "Felicidad",        "Runa",     "Poder rúnico",
+            'AMMOSLOT' => "Munición",       'STEAM' => "Presión de vapor",      'WRATH'       => "Cólera",          'PYRITE' => "Pirita",
+            'HEAT'     => "Calor",          'OOZE'  => "Moco",                  'BLOOD_POWER' => "Poder de sangre"
         ),
         'relItems'      => array(
             'base'    => "<small>Muestra %s relacionados con <b>%s</b></small>",

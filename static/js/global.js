@@ -490,7 +490,8 @@ var PageTemplate = new function()
         menu.push(userPage);
 
         // Settings
-        var settings = ['settings', LANG.settings, 'http://' + window.location.hostname + '?account', null, {icon: g_staticUrl + '/images/icons/cog.gif', checkedUrl: /account/i}];
+        // var settings = ['settings', LANG.settings, 'http://' + window.location.hostname + '?account', null, {icon: g_staticUrl + '/images/icons/cog.gif', checkedUrl: /account/i}];
+        var settings = ['settings', LANG.settings, '?account', null, {icon: g_staticUrl + '/images/icons/cog.gif', checkedUrl: /account/i}];
         menu.push(settings);
 
         // Reputation

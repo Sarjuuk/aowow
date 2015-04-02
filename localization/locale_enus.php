@@ -709,7 +709,7 @@ $lang = array(
         ),
         'powerRunes'    => ["Frost", "Unholy", "Blood", "Death"],
         'powerTypes'    => array(
-            -2 => "Health",   -1 => null,   "Mana",     "Rage",     "Focus",    "Energy",       "Happiness",        "Rune",    "Runic Power",
+            -2 => "Health",   -1 => null,   "Mana",     "Rage",     "Focus",    "Energy",       "Happiness",        "Runes",    "Runic Power",
             'AMMOSLOT' => "Ammo",           'STEAM' => "Steam Pressure",        'WRATH'       => "Wrath",           'PYRITE' => "Pyrite",
             'HEAT'     => "Heat",           'OOZE'  => "Ooze",                  'BLOOD_POWER' => "Blood Power"
         ),
