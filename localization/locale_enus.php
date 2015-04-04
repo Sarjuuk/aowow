@@ -434,7 +434,7 @@ $lang = array(
         'reqNumCrt'     => "Requires",
         '_transfer'     => 'This achievement will be converted to <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
     ),
-    'class' => array(
+    'race' => array(
         'racialLeader'  => "Racial leader",
         'startZone'     => "Starting zone",
     ),
@@ -456,7 +456,14 @@ $lang = array(
         'CosmicMap'     => "Cosmic Map",
     ),
     'zone' => array(
-        // 'zonePartOf'    => "This zone is part of",
+        'attunement'    => ["Attunement", "Heroic attunement"],
+        'key'           => ["Key", "Heroic key"],
+        'location'      => "Location",
+        'raidFaction'   => "Raid faction",
+        'boss'          => "Final boss",
+        'reqLevels'     => "Required levels: [tooltip=instancereqlevel_tip]%d[/tooltip], [tooltip=lfgreqlevel_tip]%d[/tooltip]",
+        'zonePartOf'    => "This zone is part of [zone=%].",
+        'autoRez'       => "Automatic resurrection",
         'city'          => "City",
         'territory'     => "Territory",
         'instanceType'  => "Instance type",
@@ -709,9 +716,12 @@ $lang = array(
         ),
         'powerRunes'    => ["Frost", "Unholy", "Blood", "Death"],
         'powerTypes'    => array(
-            -2 => "Health",   -1 => null,   "Mana",     "Rage",     "Focus",    "Energy",       "Happiness",        "Runes",    "Runic Power",
-            'AMMOSLOT' => "Ammo",           'STEAM' => "Steam Pressure",        'WRATH'       => "Wrath",           'PYRITE' => "Pyrite",
-            'HEAT'     => "Heat",           'OOZE'  => "Ooze",                  'BLOOD_POWER' => "Blood Power"
+            // conventional
+              -2 => "Health",              0 => "Mana",                1 => "Rage",                2 => "Focus",               3 => "Energy",              4 => "Happiness",
+               5 => "Rune",                6 => "Runic Power",
+            // powerDisplay
+              -1 => "Ammo",              -41 => "Pyrite",            -61 => "Steam Pressure",   -101 => "Heat",             -121 => "Ooze",             -141 => "Blood Power",
+            -142 => "Wrath"
         ),
         'relItems'      => array(
             'base'    => "<small>Show %s related to <b>%s</b></small>",
@@ -852,7 +862,6 @@ $lang = array(
         '_unavailable'  => "This item is not available to players.",
         '_rndEnchants'  => "Random Enchantments",
         '_chance'       => "(%s%% chance)",
-        'reqRating'     => "Requires personal and team arena rating of %d in 3v3 or 5v5 brackets",
         'slot'          => "Slot",
         '_quality'      => "Quality",
         'usableBy'      => "Usable by",
@@ -871,6 +880,11 @@ $lang = array(
             2 => ["less than %d %s gem", "less than %d %s gems"],
             3 => "more %s gems than %s gems",
             5 => ["at least %d %s gem", "at least %d %s gems"]
+        ),
+        'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
+            "Requires personal and team arena rating of %d",
+            "Requires personal and team arena rating of %d<br>in 3v3 or 5v5 brackets",
+            "Requires personal and team arena rating of %d<br>in 5v5 brackets"
         ),
         'quality'       => array(
             "Poor",                 "Common",           "Uncommon",             "Rare",

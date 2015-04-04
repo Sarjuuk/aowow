@@ -3,27 +3,21 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
+
+
+    /* deps:
+     * player_classlevelstats
+     * player_levelstats
+    */
 
     // Create 'statistics'-file in datasets
     // this script requires the following dbcs to be available
-    // gtChanceToMeleeCrit.dbc, gtChanceToSpellCrit.dbc, gtChanceToMeleeCritBase.dbc, gtChanceToSpellCritBase.dbc, gtOCTRegenHP.dbc, gtRegenMPPerSpt.dbc, gtRegenHPPerSpt.dbc
+    $reqDBC = ['gtchancetomeleecrit', 'gtchancetomeleecritbase', 'gtchancetospellcrit', 'gtchancetospellcritbase', 'gtoctregenhp', 'gtregenmpperspt', 'gtregenhpperspt'];
 
     function statistics()
     {
-        // expected dbcs
-        $req   = ['dbc_gtchancetomeleecrit', 'dbc_gtchancetomeleecritbase', 'dbc_gtchancetospellcrit', 'dbc_gtchancetospellcritbase', 'dbc_gtoctregenhp', 'dbc_gtregenmpperspt', 'dbc_gtregenhpperspt'];
-        $found = DB::Aowow()->selectCol('SHOW TABLES LIKE "dbc_%"');
-        if ($missing = array_diff($req, $found))
-        {
-            foreach ($missing as $m)
-            {
-                $file = explode('_', $m)[1];
-                $dbc  = new DBC($file);
-                if ($dbc->readFromFile())
-                    $dbc->writeToDB();
-            }
-        }
-
         $classs = function()
         {
             // constants and mods taken from TrinityCore (Player.cpp, StatSystem.cpp)
@@ -101,22 +95,38 @@ if (!defined('AOWOW_REVISION'))
                 else
                     $offset = [20, 20, 20, 20, 20];
 
-                $rows = DB::Aowow()->select('SELECT pls.level AS ARRAY_KEY, str-?d, agi-?d, sta-?d, inte-?d, spi-?d, basehp, IF(basemana <> 0, basemana, 100), mlecrt.chance*100, splcrt.chance*100, mlecrt.chance*100 * ?f, baseHP5.ratio*1, extraHP5.ratio*1 ' .
-                                    'FROM player_levelstats pls JOIN player_classlevelstats pcls ON pls.level = pcls.level AND pls.class = pcls.class JOIN' .
-                                        ' dbc_gtchancetomeleecrit mlecrt ON mlecrt.idx   = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
-                                        ' dbc_gtchancetospellcrit splcrt ON splcrt.idx   = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
-                                        ' dbc_gtoctregenhp baseHP5       ON baseHP5.idx  = ((pls.class - 1) * 100) + (pls.level - 1) JOIN' .
-                                        ' dbc_gtregenhpperspt extraHP5   ON extraHP5.idx = ((pls.class - 1) * 100) + (pls.level - 1) ' .
-                                    'WHERE pls.race = ?d AND pls.class = ?d ORDER BY pls.level ASC',
-                    $offset[0], $offset[1], $offset[2], $offset[3], $offset[4],
+                $gtData = DB::Aowow()->select('
+                    SELECT mlecrt.idx - ?d AS ARRAY_KEY, mlecrt.chance * 100, splcrt.chance * 100, mlecrt.chance * 100 * ?f, baseHP5.ratio * 1, extraHP5.ratio * 1
+                    FROM   dbc_gtchancetomeleecrit mlecrt
+                    JOIN   dbc_gtchancetospellcrit splcrt ON splcrt.idx   = mlecrt.idx
+                    JOIN   dbc_gtoctregenhp baseHP5       ON baseHP5.idx  = mlecrt.idx
+                    JOIN   dbc_gtregenhpperspt extraHP5   ON extraHP5.idx = mlecrt.idx
+                    WHERE  mlecrt.idx BETWEEN ?d AND ?d',
+                    (($class - 1) * 100) - 1,                                   // class-offset
                     $mod,
+                    (($class - 1) * 100) + 0,                                   // lvl 1
+                    (($class - 1) * 100) + 79                                   // lvl 80
+                );
+
+                $rows = DB::World()->select('
+                    SELECT
+                        pls.level AS ARRAY_KEY,
+                        pls.str - ?d, pls.agi - ?d, pls.sta - ?d, pls.inte - ?d, pls.spi - ?d,
+                        pcls.basehp, IF(pcls.basemana <> 0, pcls.basemana, 100)
+                    FROM
+                        player_levelstats pls
+                    JOIN
+                        player_classlevelstats pcls ON pls.level = pcls.level AND pls.class = pcls.class
+                    WHERE
+                        pls.race = ?d AND pls.class = ?d ORDER BY pls.level ASC',
+                    $offset[0], $offset[1], $offset[2], $offset[3], $offset[4],
                     in_array($class, [3, 7, 11]) ? 6 : 1,
                     $class
                 );
 
                 $result[$class] = [];
-                foreach ($rows as $k => $row)
-                    $result[$class][$k] = array_values($row);
+                foreach ($rows as $lvl => $row)
+                    $result[$class][$lvl] = array_values(array_merge($row, $gtData[$lvl]));
             }
 
             return $result;
@@ -149,14 +159,14 @@ if (!defined('AOWOW_REVISION'))
             $out[$s] = $res;
             if (!$res)
             {
-                FileGen::status('statistics - generator $'.$s.'() returned empty', MSG_LVL_WARN);
+                CLISetup::log('statistics - generator $'.$s.'() returned empty', CLISetup::LOG_WARN);
                 $success = false;
             }
         }
 
         $toFile = 'g_statistics = '.preg_replace('/"\$([^$"]+)"/', '\1', Util::toJSON($out)).';';
 
-        if (!FileGen::writeFile('datasets/statistics', $toFile))
+        if (!CLISetup::writeFile('datasets/statistics', $toFile))
             $success = false;
 
         return $success;

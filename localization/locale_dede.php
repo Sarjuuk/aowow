@@ -439,7 +439,7 @@ $lang = array(
         'reqNumCrt'     => "Benötigt",
         '_transfer'     => 'Dieser Erfolg wird mit <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
     ),
-    'class' => array(
+    'race' => array(
         'racialLeader'  => "Volksanführer",
         'startZone'     => "Startgebiet",
     ),
@@ -461,7 +461,14 @@ $lang = array(
         'CosmicMap'     => "Kosmische Karte",
     ),
     'zone' => array(
-        // 'zonePartOf'    => "Diese Zone ist Teil der Zone",
+        'attunement'    => ["Einstimmung", "Heroische Einstimmung"],
+        'key'           => ["Schlüssel", "Heroischer Schlüssel"],
+        'location'      => "Ort",
+        'raidFaction'   => "Schlachtzugsfraktion",
+        'boss'          => "Endboss",
+        'reqLevels'     => "Mindeststufe: [tooltip=instancereqlevel_tip]%d[/tooltip], [tooltip=lfgreqlevel_tip]%d[/tooltip]",
+        'zonePartOf'    => "Diese Zone ist Teil von [zone=%d].",
+        'autoRez'       => "Automatische Wiederbelebung",
         'city'          => "Stadt",
         'territory'     => "Territorium",
         'instanceType'  => "Instanzart",
@@ -714,9 +721,12 @@ $lang = array(
         ),
         'powerRunes'    => ["Frost", "Unheilig", "Blut", "Tod"],
         'powerTypes'    => array(
-            -2 => "Gesundheit", -1 => null, "Mana",     "Wut",      "Fokus",    "Energie",      "Zufriedenheit",    "Runen",    "Runenmacht",
-            'AMMOSLOT' => "Munition",       'STEAM' => "Dampfdruck",            'WRATH'       => "Wrath",           'PYRITE' => "Pyrit",
-            'HEAT'     => "Hitze",          'OOZE'  => "Schlamm",               'BLOOD_POWER' => "Blutmacht"
+            // conventional
+              -2 => "Gesundheit",          0 => "Mana",                1 => "Wut",                 2 => "Fokus",               3 => "Energie",             4 => "Zufriedenheit",
+               5 => "Runen",               6 => "Runenmacht",
+            // powerDisplay
+              -1 => "Munition",          -41 => "Pyrit",             -61 => "Dampfdruck",       -101 => "Hitze",            -121 => "Schlamm",          -141 => "Blutmacht",
+            -142 => "Wrath"
         ),
         'relItems'      => array(
             'base'    => "<small>%s im Zusammenhang mit <b>%s</b> anzeigen</small>",
@@ -857,7 +867,6 @@ $lang = array(
         '_unavailable'  => "Dieser Gegenstand ist nicht für Spieler verfügbar.",
         '_rndEnchants'  => "Zufällige Verzauberungen",
         '_chance'       => "(Chance von %s%%)",
-        'reqRating'     => "Benötigt eine persönliche Arenawertung und Teamwertung von %d.",
         'slot'          => "Platz",
         '_quality'      => "Qualität",
         'usableBy'      => "Benutzbar von",
@@ -876,6 +885,11 @@ $lang = array(
             2 => ["weniger als %d Edelstein der Kategorie %s", "weniger als %d Edelsteine der Kategorie %s"],
             3 => "mehr Edelsteine der Kategorie %s als Edelsteine der Kategorie %s",
             5 => ["mindestens %d Edelstein der Kategorie %s", "mindestens %d Edelsteine der Kategorie %s"]
+        ),
+        'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
+            "Benötigt eine persönliche Arenawertung und Teamwertung von %d.",
+            "Benötigt eine persönliche und eine Teamwertung von %d<br>in 3v3- oder 5v5-Turnieren",
+            "Benötigt eine persönliche und eine Teamwertung von %d<br>in 5v5-Turnieren"
         ),
         'quality'       => array(
             "Schlecht",             "Verbreitet",       "Selten",               "Rar",

@@ -3,6 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
+
 
     // gatheres quasi-static data used in profiler: all available quests, achievements, titles, mounts, companions, factions, recipes
     // this script requires a fully set up database and is expected to be run last
@@ -35,7 +38,7 @@ if (!defined('AOWOW_REVISION'))
 
             $relCurr = new CurrencyList(array(['id', $_]));
 
-            foreach (FileGen::$localeIds as $l)
+            foreach (CLISetup::$localeIds as $l)
             {
                 set_time_limit(20);
 
@@ -52,7 +55,7 @@ if (!defined('AOWOW_REVISION'))
 
                 $buff .= "\ng_quest_catorder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\n";
 
-                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-quests', $buff))
+                if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-quests', $buff))
                     $success = false;
             }
 
@@ -72,7 +75,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $achievez = new AchievementList($condition);
 
-            foreach (FileGen::$localeIds as $l)
+            foreach (CLISetup::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -92,7 +95,7 @@ if (!defined('AOWOW_REVISION'))
                 // sum points
                 $buff .= "\ng_achievement_points = [".$sumPoints."];\n";
 
-                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-achievements', $buff))
+                if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-achievements', $buff))
                     $success = false;
             }
 
@@ -111,7 +114,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $titlez = new TitleList($condition);
 
-            foreach (FileGen::$localeIds as $l)
+            foreach (CLISetup::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -128,7 +131,7 @@ if (!defined('AOWOW_REVISION'))
                         $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                     }
 
-                    if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-titles-'.$g, $buff))
+                    if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-titles-'.$g, $buff))
                         $success = false;
                 }
             }
@@ -149,7 +152,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $mountz = new SpellList($condition);
 
-            foreach (FileGen::$localeIds as $l)
+            foreach (CLISetup::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -164,7 +167,7 @@ if (!defined('AOWOW_REVISION'))
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
 
-                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-mounts', $buff))
+                if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-mounts', $buff))
                     $success = false;
             }
 
@@ -184,7 +187,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $companionz = new SpellList($condition);
 
-            foreach (FileGen::$localeIds as $l)
+            foreach (CLISetup::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -199,7 +202,7 @@ if (!defined('AOWOW_REVISION'))
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
 
-                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-companions', $buff))
+                if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-companions', $buff))
                     $success = false;
             }
 
@@ -218,7 +221,7 @@ if (!defined('AOWOW_REVISION'))
             );
             $factionz = new FactionList($condition);
 
-            foreach (FileGen::$localeIds as $l)
+            foreach (CLISetup::$localeIds as $l)
             {
                 set_time_limit(5);
 
@@ -231,7 +234,7 @@ if (!defined('AOWOW_REVISION'))
 
                 $buff .= "\ng_faction_order = [0, 469, 891, 1037, 1118, 67, 1052, 892, 936, 1117, 169, 980, 1097];\n";
 
-                if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-factions', $buff))
+                if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-factions', $buff))
                     $success = false;
             }
 
@@ -269,7 +272,7 @@ if (!defined('AOWOW_REVISION'))
                     }
                 }
 
-                foreach (FileGen::$localeIds as $l)
+                foreach (CLISetup::$localeIds as $l)
                 {
                     set_time_limit(10);
 
@@ -283,7 +286,7 @@ if (!defined('AOWOW_REVISION'))
                     if (!$buff)
                     {
                         // this behaviour is intended, do not create an error
-                        FileGen::status('profiler - file datasets/'.User::$localeString.'/p-recipes-'.$file.' has no content => skipping', MSG_LVL_WARN);
+                        CLISetup::log('profiler - file datasets/'.User::$localeString.'/p-recipes-'.$file.' has no content => skipping', CLISetup::LOG_WARN);
                         continue;
                     }
 
@@ -292,7 +295,7 @@ if (!defined('AOWOW_REVISION'))
                     if (is_array($s))
                         $buff .= "\ng_skill_order = [171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356];\n";
 
-                    if (!FileGen::writeFile('datasets/'.User::$localeString.'/p-recipes-'.$file, $buff))
+                    if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-recipes-'.$file, $buff))
                         $success = false;
                 }
             }
@@ -302,7 +305,7 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!FileGen::writeDir('datasets/'.$dir))
+            if (!CLISetup::writeDir('datasets/'.$dir))
                 $success = false;
 
         // run scripts

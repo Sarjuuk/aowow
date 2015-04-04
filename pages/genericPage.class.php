@@ -109,7 +109,7 @@ class GenericPage
             $this->gUser   = User::getUserGlobals();
             $this->pageTemplate['pageName'] = strtolower($pageCall);
 
-            if (!$this->isValidPage() || !$this->tpl)
+            if (!$this->isValidPage())
                 $this->error();
         }
 
@@ -216,7 +216,7 @@ class GenericPage
             $this->applyGlobals();
         }
 
-        $this->time  = microtime(true) - $this->time;
+        $this->time = microtime(true) - $this->time;
         Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
     }
 
@@ -417,7 +417,7 @@ class GenericPage
             include('template/pages/'.$override.'.tpl.php');
             die();
         }
-        else
+        else if ($this->tpl)
         {
             $this->prepareContent();
 
@@ -429,6 +429,8 @@ class GenericPage
             include('template/pages/'.$this->tpl.'.tpl.php');
             die();
         }
+        else
+            $this->error();
     }
 
     public function writeGlobalVars()                       // load jsGlobal

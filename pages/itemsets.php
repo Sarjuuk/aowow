@@ -69,8 +69,8 @@ class ItemsetsPage extends GenericPage
         $this->lvTabs[] = $lv;
 
         // sort for dropdown-menus
-        asort(Lang::itemset('notes'), SORT_NATURAL);
-        asort(Lang::game('cl'));
+        Lang::sort('itemset', 'notes', SORT_NATURAL);
+        Lang::sort('game', 'si');
     }
 
     protected function generateTitle()

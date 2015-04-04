@@ -84,11 +84,11 @@ class QuestPage extends GenericPage
         }
 
         // loremaster (i dearly hope those flags cover every case...)
-        if ($this->subject->getField('zoneOrSort') > 0 && !$this->subject->isRepeatable())
+        if ($this->subject->getField('zoneOrSortBak') > 0 && !$this->subject->isRepeatable())
         {
             $conditions = array(
                 ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE],
-                ['ac.value1', $this->subject->getField('zoneOrSort')],
+                ['ac.value1', $this->subject->getField('zoneOrSortBak')],
                 ['a.faction', $_side, '&']
             );
             $loremaster = new AchievementList($conditions);

@@ -6,10 +6,49 @@ if (!defined('AOWOW_REVISION'))
 
 class ZoneList extends BaseType
 {
+    use listviewHelper;
+
     public static $type      = TYPE_ZONE;
     public static $brickFile = 'zone';
 
     protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_zones z';
+
+    public function __construct($conditions = [], $miscData = null)
+    {
+        parent::__construct($conditions, $miscData);
+
+        foreach ($this->iterate() as &$_curTpl)
+        {
+            // unpack attunements
+            $_curTpl['attunes'] = [];
+
+            if ($_curTpl['attunementsN'])
+            {
+                foreach (explode(' ', $_curTpl['attunementsN']) as $req)
+                {
+                    $req = explode(':', $req);
+                    if (!isset($_curTpl['attunes'][$req[0]]))
+                        $_curTpl['attunes'][$req[0]] = [$req[1]];
+                    else
+                        $_curTpl['attunes'][$req[0]][] = $req[1];
+                }
+            }
+            if ($_curTpl['attunementsH'])
+            {
+                foreach (explode(' ', $_curTpl['attunementsH']) as $req)
+                {
+                    $req = explode(':', $req);
+                    if (!isset($_curTpl['attunes'][$req[0]]))
+                        $_curTpl['attunes'][$req[0]] = [-$req[1]];
+                    else
+                        $_curTpl['attunes'][$req[0]][] = -$req[1];
+                }
+            }
+
+            unset($_curTpl['attunementsN']);
+            unset($_curTpl['attunementsH']);
+        }
+    }
 
     // use if you JUST need the name
     public static function getName($id)

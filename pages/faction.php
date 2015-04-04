@@ -25,7 +25,7 @@ class FactionPage extends GenericPage
 
         $this->subject = new FactionList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $smarty->notFound(Lang::game('faction'));
+            $this->notFound(Lang::game('faction'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -103,7 +103,7 @@ class FactionPage extends GenericPage
 
         $conditions = array(
             ['id', $this->typeId, '!'],                     // not self
-            ['reputationIndex', -1, '!']                    // only gainable
+            ['repIdx', -1, '!']                             // only gainable
         );
 
         if ($p = $this->subject->getField('parentFactionId')) // linked via parent
@@ -196,10 +196,10 @@ class FactionPage extends GenericPage
         {
             // inherit siblings/children from $spillover
             $cIds = DB::World()->selectCol('SELECT DISTINCT creature_id FROM creature_onkill_reputation WHERE
-                (RewOnKillRepValue1 > 0 AND (RewOnKillRepFaction1 = ?d OR (RewOnKillRepFaction1 IN (?a) AND IsTeamAward1 <> 0))) OR
-                (RewOnKillRepValue2 > 0 AND (RewOnKillRepFaction2 = ?d OR (RewOnKillRepFaction2 IN (?a) AND IsTeamAward2 <> 0)))',
-                $this->typeId, $spillover->getFoundIDs(),
-                $this->typeId, $spillover->getFoundIDs()
+                (RewOnKillRepValue1 > 0 AND (RewOnKillRepFaction1 = ?d{ OR (RewOnKillRepFaction1 IN (?a) AND IsTeamAward1 <> 0)})) OR
+                (RewOnKillRepValue2 > 0 AND (RewOnKillRepFaction2 = ?d{ OR (RewOnKillRepFaction2 IN (?a) AND IsTeamAward2 <> 0)}))',
+                $this->typeId, $spillover->getFoundIDs() ?: DBSIMPLE_SKIP,
+                $this->typeId, $spillover->getFoundIDs() ?: DBSIMPLE_SKIP
             );
 
             if ($cIds)

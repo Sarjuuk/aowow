@@ -1,0 +1,31 @@
+CREATE TABLE `aowow_sync` (
+	`table` VARCHAR(50) NOT NULL,
+	`entry` INT NOT NULL,
+	`action` TINYINT NOT NULL COMMENT '0:delete; 1:insert; 2:update'
+) COLLATE='utf8_general_ci' ENGINE=MyISAM;
+
+
+delimiter |
+
+CREATE TRIGGER aowow_sync_<table>_delete BEFORE DELETE ON <table>
+  FOR EACH ROW
+  BEGIN
+    REPLACE INTO aowow_sync (`table`, `entry`, `action`) VALUES ('<table>', OLD.entry, 0);
+  END;
+|
+
+CREATE TRIGGER aowow_sync_<table>_insert AFTER INSERT ON <table>
+  FOR EACH ROW
+  BEGIN
+    REPLACE INTO aowow_sync (`table`, `entry`, `action`) VALUES ('<table>', NEW.entry, 1);
+  END;
+|
+
+CREATE TRIGGER aowow_sync_<table>_update AFTER UPDATE ON <table>
+  FOR EACH ROW
+  BEGIN
+    REPLACE INTO aowow_sync (`table`, `entry`, `action`) VALUES ('<table>', NEW.entry, 2);
+  END;
+|
+
+delimiter ;

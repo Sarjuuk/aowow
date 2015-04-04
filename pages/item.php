@@ -234,11 +234,11 @@ class ItemPage extends genericPage
                 $res   = [];
                 $i     = 0;
                 $len   = 0;
-                $parts = explode(' ', sprintf(Lang::item('reqRating'), $_reqRating));
+                $parts = explode(' ', str_replace('<br>', ' ', sprintf(Lang::item('reqRating', $_reqRating[1]), $_reqRating[0])));
                 foreach ($parts as $p)
                 {
                     $res[$i][] = $p;
-                    $len += mb_strlen($p);
+                    $len += (mb_strlen($p) + 1);
 
                     if ($len < 30)
                         continue;
@@ -419,28 +419,11 @@ class ItemPage extends genericPage
                         'name'        => $tab[2],
                         'id'          => $tab[3],
                         'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
-                        'hiddenCols'  => $tab[5] ? '$['.implode(', ', array_unique($tab[5])).']' : null,
+                        'hiddenCols'  => $tab[5] ? '$ '.Util::toJSON( array_unique($tab[5]))     : null,
                         'visibleCols' => $tab[6] ? '$'. Util::toJSON( array_unique($tab[6]))     : null
                     ]
                 );
             }
-        }
-
-        // tab: achievement reward
-        $acvReward = new AchievementList(array(['ar.item', $this->typeId], ['a.itemExtra', $this->typeId], 'OR'));
-        if (!$acvReward->error)
-        {
-            $this->extendGlobalData($acvReward->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
-
-            $this->lvTabs[] = array(
-                'file'   => 'achievement',
-                'data'   => $acvReward->getListviewData(),
-                'params' => [
-                    'name'        => '$LANG.tab_rewardfrom',
-                    'id'          => 'reward-from-achievement',
-                    'visibleCols' => "$['category']"
-                ]
-            );
         }
 
         // tabs: this item contains..
@@ -762,7 +745,7 @@ class ItemPage extends genericPage
         }
 
         // tab: sold by
-        if (!empty($this->subject->getExtendedCost([], $_reqRating)[$this->subject->id]))
+        if (!empty($this->subject->getExtendedCost()[$this->subject->id]))
         {
             $vendors = $this->subject->getExtendedCost()[$this->subject->id];
             $soldBy  = new CreatureList(array(['id', array_keys($vendors)]));

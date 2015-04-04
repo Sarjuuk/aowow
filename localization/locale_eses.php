@@ -438,7 +438,7 @@ $lang = array(
         'reqNumCrt'     => "Requiere",
         '_transfer'     => 'Este logro será convertido a <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
     ),
-    'class' => array(
+    'race' => array(
         'racialLeader'  => "Lider racial",
         'startZone'     => "Zona de inicio",
     ),
@@ -460,7 +460,14 @@ $lang = array(
         'CosmicMap'     => "Mapa cósmico",
     ),
     'zone' => array(
-        // 'zonePartOf'    => "Cette zone fait partie de la zone",
+        'attunement'    => ["Requisito", "Requisito heroica"],
+        'key'           => ["Llave", "Llave heroica"],
+        'location'      => "Ubicación",
+        'raidFaction'   => "[Raid faction]",
+        'boss'          => "Jefe Final",
+        'reqLevels'     => "Niveles requeridos: [tooltip=instancereqlevel_tip]%d[/tooltip], [tooltip=lfgreqlevel_tip]%d[/tooltip]",
+        'zonePartOf'    => "Cette zone fait partie de la zone [zone=%d].",
+        'autoRez'       => "Resurrección automática",
         'city'          => "Ciudad",
         'territory'     => "Territorio",
         'instanceType'  => "Tipo de instancia",
@@ -713,9 +720,12 @@ $lang = array(
         ),
         'powerRunes'    => ["Escarcha", "Profano", "Sangre", "Muerte"],
         'powerTypes'    => array(
-            -2 => "Salud",   -1 => null,   "Maná",     "Ira",     "Enfoque",    "Energía",      "Felicidad",        "Runa",     "Poder rúnico",
-            'AMMOSLOT' => "Munición",       'STEAM' => "Presión de vapor",      'WRATH'       => "Cólera",          'PYRITE' => "Pirita",
-            'HEAT'     => "Calor",          'OOZE'  => "Moco",                  'BLOOD_POWER' => "Poder de sangre"
+            // conventional
+              -2 => "Salud",               0 => "Maná",                1 => "Ira",                 2 => "Enfoque",             3 => "Energía",             4 => "Felicidad",
+               5 => "Runa",                6 => "Poder rúnico",
+            // powerDisplay
+              -1 => "Munición",          -41 => "Pirita",            -61 => "Presión de vapor", -101 => "Calor",            -121 => "Moco",             -141 => "Poder de sangre",
+            -142 => "Cólera"
         ),
         'relItems'      => array(
             'base'    => "<small>Muestra %s relacionados con <b>%s</b></small>",
@@ -856,7 +866,6 @@ $lang = array(
         '_unavailable'  => "Este objeto no está disponible para los jugadores.",
         '_rndEnchants'  => "Encantamientos aleatorios",
         '_chance'       => "(probabilidad %s%%)",
-        'reqRating'     => "Requiere un índice de arena personal y de equipo de %d",
         'slot'          => "Casilla",
         '_quality'      => "Calidad",
         'usableBy'      => "Usable por",
@@ -875,6 +884,11 @@ $lang = array(
             2 => ["menos de %d %s gema", "menos de %d %s gemas"],
             3 => "más gemas %s que gemas %s",
             5 => ["al menos %d %s gema", "al menos %d %s gemas"]
+        ),
+        'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
+            "Requiere un índice de arena personal y de equipo de %d",
+            "Requiere un índice de arena personal y de equipo de %d<br>en la rama de 3c3 o de 5c5",
+            "Requiere un índice de arena personal y de equipo de %d<br>en la rama de 5c5"
         ),
         'quality'       => array(
             "Pobre",                "Común",            "Poco Común",               "Raro",

@@ -28,11 +28,10 @@ class DB
         $options = &self::$optionsCache[$idx];
         $interface = DbSimple_Generic::connect(self::createConnectSyntax($options));
 
-        $interface->setErrorHandler(['DB', 'errorHandler']);
-
-        if ($interface->error)
+        if (!$interface || $interface->error)
             die('Failed to connect to database.');
 
+        $interface->setErrorHandler(['DB', 'errorHandler']);
         $interface->query('SET NAMES ?', 'utf8');
         if ($options['prefix'])
             $interface->setIdentPrefix($options['prefix']);

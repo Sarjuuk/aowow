@@ -36,7 +36,7 @@ class Loot
         LOOT_SKINNING,                                      // npc (see its flags for mining, herbing, salvaging or actual skinning)
         LOOT_FISHING,                                       // zone
         LOOT_GAMEOBJECT,                                    // object (see its lockType for mining, herbing, fishing or generic looting)
-        LOOT_MAIL,                                          // quest
+        LOOT_MAIL,                                          // quest + achievement
         LOOT_SPELL                                          // spell
     );
 
@@ -330,23 +330,24 @@ class Loot
 
         //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
         $tabsFinal  = array(
-            ['item',        [], '$LANG.tab_containedin',      'contained-in-item',      [], [], []],
-            ['item',        [], '$LANG.tab_disenchantedfrom', 'disenchanted-from',      [], [], []],
-            ['item',        [], '$LANG.tab_prospectedfrom',   'prospected-from',        [], [], []],
-            ['item',        [], '$LANG.tab_milledfrom',       'milled-from',            [], [], []],
-            ['creature',    [], '$LANG.tab_droppedby',        'dropped-by',             [], [], []],
-            ['creature',    [], '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',      [], [], []],
-            ['creature',    [], '$LANG.tab_skinnedfrom',      'skinned-from',           [], [], []],
-            ['creature',    [], '$LANG.tab_minedfromnpc',     'mined-from-npc',         [], [], []],
-            ['creature',    [], '$LANG.tab_salvagedfrom',     'salvaged-from',          [], [], []],
-            ['creature',    [], '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',      [], [], []],
-            ['quest',       [], '$LANG.tab_rewardfrom',       'reward-from-quest',      [], [], []],
-            ['zone',        [], '$LANG.tab_fishedin',         'fished-in-zone',         [], [], []],
-            ['object',      [], '$LANG.tab_containedin',      'contained-in-object',    [], [], []],
-            ['object',      [], '$LANG.tab_minedfrom',        'mined-from-object',      [], [], []],
-            ['object',      [], '$LANG.tab_gatheredfrom',     'gathered-from-object',   [], [], []],
-            ['object',      [], '$LANG.tab_fishedin',         'fished-in-object',       [], [], []],
-            ['spell',       [], '$LANG.tab_createdby',        'created-by',             [], [], []]
+            ['item',        [], '$LANG.tab_containedin',      'contained-in-item',       [], [], []],
+            ['item',        [], '$LANG.tab_disenchantedfrom', 'disenchanted-from',       [], [], []],
+            ['item',        [], '$LANG.tab_prospectedfrom',   'prospected-from',         [], [], []],
+            ['item',        [], '$LANG.tab_milledfrom',       'milled-from',             [], [], []],
+            ['creature',    [], '$LANG.tab_droppedby',        'dropped-by',              [], [], []],
+            ['creature',    [], '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',       [], [], []],
+            ['creature',    [], '$LANG.tab_skinnedfrom',      'skinned-from',            [], [], []],
+            ['creature',    [], '$LANG.tab_minedfromnpc',     'mined-from-npc',          [], [], []],
+            ['creature',    [], '$LANG.tab_salvagedfrom',     'salvaged-from',           [], [], []],
+            ['creature',    [], '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',       [], [], []],
+            ['quest',       [], '$LANG.tab_rewardfrom',       'reward-from-quest',       [], [], []],
+            ['zone',        [], '$LANG.tab_fishedin',         'fished-in-zone',          [], [], []],
+            ['object',      [], '$LANG.tab_containedin',      'contained-in-object',     [], [], []],
+            ['object',      [], '$LANG.tab_minedfrom',        'mined-from-object',       [], [], []],
+            ['object',      [], '$LANG.tab_gatheredfrom',     'gathered-from-object',    [], [], []],
+            ['object',      [], '$LANG.tab_fishedin',         'fished-in-object',        [], [], []],
+            ['spell',       [], '$LANG.tab_createdby',        'created-by',              [], [], []],
+            ['achievement', [], '$LANG.tab_rewardfrom',       'reward-from-achievement', [], [], []]
         );
         $refResults = [];
         $chanceMods = [];
@@ -382,7 +383,7 @@ class Loot
                 if ($ref['isGrouped'] && $ref['sumChance'] > 100)
                     Util::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
 
-                if ($ref['isGrouped'] && $ref['sumChance'] == 100 && !$ref['chance'])
+                if ($ref['isGrouped'] && $ref['sumChance'] >= 100 && !$ref['chance'])
                     Util::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
 
                 $chance = abs($ref['chance'] ?: (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
@@ -482,11 +483,11 @@ class Loot
                 case LOOT_FISHING:      $field = 'id';                  $tabId = 11;    break;      // subAreas are currently ignored
                 case LOOT_GAMEOBJECT:
                     if (!$ids)
-                        break;
+                        continue 2;
 
                     $srcObj = new GameObjectList(array(['lootId', $ids]));
                     if ($srcObj->error)
-                        break;
+                        continue 2;
 
                     $srcData = $srcObj->getListviewData();
 
@@ -505,8 +506,9 @@ class Loot
                         if ($tabId != 15)
                             $tabsFinal[$tabId][6][] = 'skill';
                     }
-                    break;
+                    continue 2;
                 case LOOT_MAIL:
+                    // quest part
                     $conditions = array(['rewardChoiceItemId1', $this->entry], ['rewardChoiceItemId2', $this->entry], ['rewardChoiceItemId3', $this->entry], ['rewardChoiceItemId4', $this->entry], ['rewardChoiceItemId5', $this->entry],
                                         ['rewardChoiceItemId6', $this->entry], ['rewardItemId1', $this->entry],       ['rewardItemId2', $this->entry],       ['rewardItemId3', $this->entry],       ['rewardItemId4', $this->entry],
                                         'OR');
@@ -522,7 +524,25 @@ class Loot
                         foreach ($srcObj->iterate() as $_)
                             $tabsFinal[10][1][] = array_merge($srcData[$srcObj->id], empty($result[$srcObj->id]) ? ['percent' => -1] : $result[$srcObj->id]);
                     }
-                    break;
+
+                    // achievement part
+                    $conditions = array(['itemExtra', $this->entry]);
+                    if ($ar = DB::World()->selectCol('SELECT entry FROM achievement_reward WHERE item = ?d{ OR mailTemplate IN (?a)}', $this->entry, $ids ?: DBSIMPLE_SKIP))
+                        array_push($conditions, ['id', $ar], 'OR');
+
+                    $srcObj = new AchievementList($conditions);
+                    if (!$srcObj->error)
+                    {
+                        self::storeJSGlobals($srcObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+                        $srcData = $srcObj->getListviewData();
+
+                        foreach ($srcObj->iterate() as $_)
+                            $tabsFinal[17][1][] = array_merge($srcData[$srcObj->id], empty($result[$srcObj->id]) ? ['percent' => -1] : $result[$srcObj->id]);
+
+                        $tabsFinal[17][5][] = 'rewards';
+                        $tabsFinal[17][6][] = 'category';
+                    }
+                    continue 2;
                 case LOOT_SPELL:
                     $conditions = ['OR', ['effect1CreateItemId', $this->entry], ['effect2CreateItemId', $this->entry], ['effect3CreateItemId', $this->entry]];
                     if ($ids)
@@ -543,7 +563,7 @@ class Loot
                         foreach ($srcObj->iterate() as $_)
                             $tabsFinal[16][1][] = array_merge($srcData[$srcObj->id], empty($result[$srcObj->id]) ? ['percent' => -1] : $result[$srcObj->id]);
                     }
-                    break;
+                    continue 2;
             }
 
             if (!$ids)

@@ -9,7 +9,11 @@ class CurrencyList extends BaseType
     public static $type      = TYPE_CURRENCY;
     public static $brickFile = 'currency';
 
-    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_currencies c';
+    protected     $queryBase = 'SELECT *, c.id AS ARRAY_KEY FROM ?_currencies c';
+    protected     $queryOpts = array(
+                          'c' => [['ic']],
+                         'ic' => ['j' => ['?_icons ic ON ic.id = c.iconId', true], 's' => ', ic.iconString']
+                  );
 
     public function getListviewData()
     {

@@ -3,38 +3,27 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
+
 
     // builds image-textures for the talent-calculator
     // spellIcons must be extracted and converted to at least medium size
     // this script requires the following dbc-files to be available
-    // Talent.dbc, TalentTab.dbc
+    $reqDBC = ['talenttab', 'talent', 'spell'];
 
     function talentIcons()
     {
-        // expected dbcs
-        $req   = ['dbc_talenttab', 'dbc_talent'];
-        $found = DB::Aowow()->selectCol('SHOW TABLES LIKE "dbc_%"');
-        if ($missing = array_diff($req, $found))
-        {
-            foreach ($missing as $m)
-            {
-                $file = explode('_', $m)[1];
-                $dbc  = new DBC($file);
-                if ($dbc->readFromFile($file == 'talenttab'))
-                    $dbc->writeToDB();
-            }
-        }
-
         $success   = true;
-        $query     = 'SELECT s.iconString FROM ?_spell s JOIN dbc_talent t ON t.rank1 = s.Id JOIN dbc_talenttab tt ON tt.Id = t.tabId WHERE tt.?# = ?d AND tt.tabNumber = ?d ORDER BY t.row, t.column, t.petCategory1 ASC;';
+        $query     = 'SELECT ic.iconString FROM ?_icons ic JOIN dbc_spell s ON s.iconId = ic.Id JOIN dbc_talent t ON t.rank1 = s.Id JOIN dbc_talenttab tt ON tt.Id = t.tabId WHERE tt.?# = ?d AND tt.tabNumber = ?d ORDER BY t.row, t.column, t.petCategory1 ASC';
         $dims      = 36; //v-pets
         $filenames = ['icons', 'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'deathknight', 'shaman', 'mage', 'warlock', null, 'druid'];
 
         // create directory if missing
-        if (!FileGen::writeDir('static/images/wow/talents/icons'))
+        if (!CLISetup::writeDir('static/images/wow/talents/icons'))
             $success = false;
 
-        if (!FileGen::writeDir('static/images/wow/hunterpettalents'))
+        if (!CLISetup::writeDir('static/images/wow/hunterpettalents'))
             $success = false;
 
         foreach ($filenames as $k => $v)
@@ -55,7 +44,7 @@ if (!defined('AOWOW_REVISION'))
 
                 if (empty($icons))
                 {
-                    FileGen::status('talentIcons - query for '.$v.' tree: '.$k.' returned empty', MSG_LVL_ERROR);
+                    CLISetup::log('talentIcons - query for '.$v.' tree: '.$k.' returned empty', CLISetup::LOG_ERROR);
                     $success = false;
                     continue;
                 }
@@ -67,7 +56,7 @@ if (!defined('AOWOW_REVISION'))
                         $imgFile = 'static/images/wow/icons/medium/'.strtolower($icons[$i]).'.jpg';
                         if (!file_exists($imgFile))
                         {
-                            FileGen::status('talentIcons - raw image '.$imgFile. ' not found', MSG_LVL_ERROR);
+                            CLISetup::log('talentIcons - raw image '.CLISetup::bold($imgFile). ' not found', CLISetup::LOG_ERROR);
                             $success = false;
                             break;
                         }
@@ -91,17 +80,17 @@ if (!defined('AOWOW_REVISION'))
                     }
 
                     if (@imagejpeg($res, $outFile))
-                        FileGen::status(sprintf(ERR_NONE, $outFile), MSG_LVL_OK);
+                        CLISetup::log(sprintf(ERR_NONE, CLISetup::bold($outFile)), CLISetup::LOG_OK);
                     else
                     {
                         $success = false;
-                        FileGen::status('talentIcons - '.$outFile.'.jpg could not be written', MSG_LVL_ERROR);
+                        CLISetup::log('talentIcons - '.CLISetup::bold($outFile.'.jpg').' could not be written', CLISetup::LOG_ERROR);
                     }
                 }
                 else
                 {
                     $success = false;
-                    FileGen::status('talentIcons - image resource not created', MSG_LVL_ERROR);
+                    CLISetup::log('talentIcons - image resource not created', CLISetup::LOG_ERROR);
                     continue;
                 }
             }

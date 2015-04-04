@@ -256,7 +256,7 @@ class AdminPage extends GenericPage
         }
         else if (node.tagName == 'INPUT')                   // string or numeric
         {
-            if (!node.value.search(/[\d\s\/\*\-\+]/i))
+            if (node.value.search(/[^\d\s\/\*\-\+\.]/i) == -1)
                 node.value = eval(node.value);
 
             value = node.value;

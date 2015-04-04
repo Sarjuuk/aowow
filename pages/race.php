@@ -64,7 +64,7 @@ class RacePage extends GenericPage
         // faction
         if ($_ = $this->subject->getField('factionId'))
         {
-            $fac = new FactionList(array(['ft.id', $_]));
+            $fac = new FactionList(array(['f.id', $_]));
             $this->extendGlobalData($fac->getJSGlobals());
             $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$fac->id.']';
         }
@@ -73,14 +73,14 @@ class RacePage extends GenericPage
         if ($_ = $this->subject->getField('leader'))
         {
             $this->extendGlobalIds(TYPE_NPC, $_);
-            $infobox[] = Lang::class('racialLeader').Lang::main('colon').'[npc='.$_.']';
+            $infobox[] = Lang::race('racialLeader').Lang::main('colon').'[npc='.$_.']';
         }
 
         // start area
         if ($_ = $this->subject->getField('startAreaId'))
         {
             $this->extendGlobalIds(TYPE_ZONE, $_);
-            $infobox[] = Lang::class('startZone').Lang::main('colon').'[zone='.$_.']';
+            $infobox[] = Lang::race('startZone').Lang::main('colon').'[zone='.$_.']';
         }
 
 

@@ -87,7 +87,7 @@ class ItemsPage extends GenericPage
         parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::game('items'));
-        $this->subCat = $pageParam ? '='.$pageParam : '';
+        $this->subCat = is_numeric($pageParam) ? '='.$pageParam : '';
     }
 
     protected function generateContent()
@@ -427,8 +427,8 @@ class ItemsPage extends GenericPage
         }
 
         // sort for dropdown-menus
-        asort(Lang::game('ra'));
-        asort(Lang::game('cl'));
+        Lang::sort('game', 'ra');
+        Lang::sort('game', 'cl');
     }
 
     protected function generateTitle()

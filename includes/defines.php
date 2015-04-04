@@ -219,9 +219,11 @@ define('SPELL_CU_PET_TALENT_TYPE2',         0x0020);        // Cunning
 define('SPELL_CU_GLYPH_MAJOR',              0x0040);
 define('SPELL_CU_GLYPH_MINOR',              0x0080);
 define('SPELL_CU_QUALITY_MASK',             0x0F00);        // set if spell creates an item: (7 - Quality) << 8
-// define('SPELL_CU_EXCLUDE_CATEGORY_SEARCH',  0x1000);     // migrate to CUSTOM_EXCLUDE_FOR_LISTVIEW
-define('SPELL_CU_FIRST_RANK',               0x2000);        // used by filter
-define('SPELL_CU_LAST_RANK',                0x4000);
+define('SPELL_CU_FIRST_RANK',               0x1000);        // used by filter
+define('SPELL_CU_LAST_RANK',                0x2000);
+
+define('ACHIEVEMENT_CU_FIRST_SERIES',       0x01);
+define('ACHIEVEMENT_CU_LAST_SERIES',        0x02);
 
 define('OBJECT_CU_DESTRUCTABLE',            0x01);
 define('OBJECT_CU_CHECK_LOS',               0x02);

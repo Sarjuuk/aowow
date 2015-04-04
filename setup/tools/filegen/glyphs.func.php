@@ -3,10 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
 
-    // Create 'glyphs'-file for available locales
-    // this script requires the following dbc-files to be parsed and available
-    // GlyphProperties, Spells, SkillLineAbility
 
     /* Example
         40896: {
@@ -20,6 +19,9 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
+    // Create 'glyphs'-file for available locales
+    // this script requires the following dbc-files to be parsed and available
+
     function glyphs()
     {
         $success   = true;
@@ -30,7 +32,7 @@ if (!defined('AOWOW_REVISION'))
                    i.subclass AS classs,
                    i.requiredLevel AS level,
                    s1.Id AS glyphSpell,
-                   s1.iconStringAlt AS icon,
+                   ic.iconString AS icon,
                    s1.skillLine1 AS skillId,
                    s2.Id AS glyphEffect,
                    s2.Id AS ARRAY_KEY
@@ -38,16 +40,17 @@ if (!defined('AOWOW_REVISION'))
             JOIN   ?_spell s1 ON s1.Id = i.spellid1
             JOIN   ?_glyphproperties g ON g.Id = s1.effect1MiscValue
             JOIN   ?_spell s2 ON s2.Id = g.spellId
+            JOIN   ?_icons ic ON ic.Id = s1.iconIdAlt
             WHERE  i.classBak = 16');
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!FileGen::writeDir('datasets/'.$dir))
+            if (!CLISetup::writeDir('datasets/'.$dir))
                 $success = false;
 
         $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)], CFG_SQL_LIMIT_NONE));
 
-        foreach (FileGen::$localeIds as $lId)
+        foreach (CLISetup::$localeIds as $lId)
         {
             set_time_limit(30);
 
@@ -79,7 +82,7 @@ if (!defined('AOWOW_REVISION'))
             $toFile = "var g_glyphs = ".Util::toJSON($glyphsOut).";";
             $file   = 'datasets/'.User::$localeString.'/glyphs';
 
-            if (!FileGen::writeFile($file, $toFile))
+            if (!CLISetup::writeFile($file, $toFile))
                 $success = false;
         }
 

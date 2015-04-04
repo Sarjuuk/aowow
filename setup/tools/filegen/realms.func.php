@@ -3,6 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
+
 
     // Create 'realms'-file in datasets
     // this script requires all realms in use to be defined in auth.realmlist
@@ -25,12 +28,16 @@ if (!defined('AOWOW_REVISION'))
 
     function realms()
     {
-        $realms = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ? AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0', CFG_BATTLEGROUP);
+        $realms = [];
+        if (DB::isConnectable(DB_AUTH))
+            $realms = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ? AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0', CFG_BATTLEGROUP);
+        else
+            CLISetup::log(' - realms: Auth-DB not set up .. static data g_realms will be empty', CLISetup::LOG_WARN);
 
         $toFile = "var g_realms = ".Util::toJSON($realms).";";
         $file   = 'datasets/realms';
 
-        return FileGen::writeFile($file, $toFile);
+        return CLISetup::writeFile($file, $toFile);
     }
 
 ?>

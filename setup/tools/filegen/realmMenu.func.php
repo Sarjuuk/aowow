@@ -3,6 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
+
 
     // Create 'profile_all.js'-file in static/js;
     // this script requires all realms in use to be defined in auth.realmlist
@@ -37,27 +40,32 @@ if (!defined('AOWOW_REVISION'))
     {
         $subEU = [];
         $subUS = [];
+        $set   = 0x0;
         $menu  = [
             ['us', 'US & Oceanic', null,[[Util::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subEU]]],
             ['eu', 'Europe',       null,[[Util::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subUS]]]
         ];
 
-        $rows = DB::Auth()->select('SELECT name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0');
-        $set  = 0x0;
-
-        foreach ($rows as $row)
+        if (DB::isConnectable(DB_AUTH))
         {
-            if ($row['region'] == 'eu')
+            $rows = DB::Auth()->select('SELECT name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0');
+
+            foreach ($rows as $row)
             {
-                $set |= 0x1;
-                $subEU[] = [Util::urlize($row['name']), $row['name']];
-            }
-            else if ($row['region'] == 'us')
-            {
-                $set |= 0x2;
-                $subUS[] = [Util::urlize($row['name']), $row['name']];
+                if ($row['region'] == 'eu')
+                {
+                    $set |= 0x1;
+                    $subEU[] = [Util::urlize($row['name']), $row['name']];
+                }
+                else if ($row['region'] == 'us')
+                {
+                    $set |= 0x2;
+                    $subUS[] = [Util::urlize($row['name']), $row['name']];
+                }
             }
         }
+        else
+            CLISetup::log(' - realmMenu: Auth-DB not set up .. menu will be empty', CLISetup::LOG_WARN);
 
         if (!($set & 0x1))
             array_shift($menu);

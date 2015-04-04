@@ -56,14 +56,11 @@ class ZonesPage extends GenericPage
                     case  8:    $mapFile = -2;  $spawnMap = 530;    break;
                     case 10:    $mapFile = -5;  $spawnMap = 571;    break;
                }
-
-                $hiddenCols[] = 'instancetype';
             }
 
             switch ($this->category[0])
             {
                 case 6:
-                case 2:
                 case 2:
                 case 3:
                     array_push($visibleCols, 'level', 'players');
@@ -75,6 +72,8 @@ class ZonesPage extends GenericPage
 
         $zones = new ZoneList($conditions);
 
+        if (!$zones->hasSetFields(['type']))
+            $hiddenCols[] = 'instancetype';
 
         if ($visibleCols)
             $params['visibleCols'] = "$['".implode("', '", $visibleCols)."']";

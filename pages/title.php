@@ -4,11 +4,6 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-/*
-    icons: data/interface/calendar/calendar_[a-z]start.blp
-*/
-
-
 // menuId 10: Title    g_initPath()
 //  tabId  0: Database g_initHeader()
 class TitlePage extends GenericPage
@@ -66,7 +61,7 @@ class TitlePage extends GenericPage
         if ($g = $this->subject->getField('gender'))
             $infobox[] = Lang::main('gender').Lang::main('colon').'[span class=icon-'.($g == 2 ? 'female' : 'male').']'.Lang::main('sex', $g).'[/span]';
 
-        if ($e = $this->subject->getField('eventId'))
+        if ($e = $this->subject->getField('holidayId'))
             $infobox[] = Lang::game('eventShort').Lang::main('colon').'[url=?event='.$e.']'.WorldEventList::getName($e).'[/url]';
 
         /****************/
@@ -119,21 +114,24 @@ class TitlePage extends GenericPage
         }
 
         // tab: achievement source
-        $acvs = new AchievementList(array(['ar.title_A', $this->typeId], ['ar.title_H', $this->typeId], 'OR'));
-        if (!$acvs->error)
+        if ($aIds = DB::World()->selectCol('SELECT entry FROM achievement_reward WHERE title_A = ?d OR title_H = ?d', $this->typeId, $this->typeId))
         {
-            $this->extendGlobalData($acvs->getJSGlobals());
+            $acvs = new AchievementList(array(['id', $aIds]));
+            if (!$acvs->error)
+            {
+                $this->extendGlobalData($acvs->getJSGlobals());
 
-            $this->lvTabs[] = array(
-                'file'   => 'achievement',
-                'data'   => $acvs->getListviewData(),
-                'params' => array(
-                    'id'          => 'reward-from-achievement',
-                    'name'        => '$LANG.tab_rewardfrom',
-                    'visibleCols' => "$['category']",
-                    'sort'        => "$['reqlevel', 'name']"
-                )
-            );
+                $this->lvTabs[] = array(
+                    'file'   => 'achievement',
+                    'data'   => $acvs->getListviewData(),
+                    'params' => array(
+                        'id'          => 'reward-from-achievement',
+                        'name'        => '$LANG.tab_rewardfrom',
+                        'visibleCols' => "$['category']",
+                        'sort'        => "$['reqlevel', 'name']"
+                    )
+                );
+            }
         }
 
         // tab: criteria of (to be added by TC)

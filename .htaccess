@@ -25,7 +25,7 @@ RewriteEngine on
 # RewriteBase /~user/localPath/     # enable if the rules do not work, when they should
 
 # Mapper-Helper: If you cant provide maps for all locales, redirect the browser
-RewriteRule ^(.*/?)static/images/wow/maps/(frfr|dede|eses|ruru)/(.*)$ $1static/images/wow/maps/enus/$3 [NC]
+# RewriteRule ^(.*/?)static/images/wow/maps/(frfr|dede|eses|ruru)/(.*)$ $1static/images/wow/maps/enus/$3 [NC]
 
 # accept flattened urls | NYI - need more work :x
 #   RewriteRule     ^([a-z0-9\-]+)$                             ?$1       [NC]      # /items                 => ?items

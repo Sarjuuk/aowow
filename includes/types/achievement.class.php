@@ -16,7 +16,7 @@ class AchievementList extends BaseType
     protected     $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
     protected     $queryOpts = array(
                           'a' => [['si'], 'o' => 'orderInGroup ASC'],
-                         'si' => ['j' => ['?_spellicon si ON si.id = a.iconId', true], 's' => ', si.iconString'],
+                         'si' => ['j' => ['?_icons si ON si.id = a.iconId', true], 's' => ', si.iconString'],
                          'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
                   );
 
@@ -39,11 +39,28 @@ class AchievementList extends BaseType
 
         foreach ($this->iterate() as $_id => &$_curTpl)
         {
+            $_curTpl['rewards'] = [];
+
             if (!empty($rewards[$_id]))
+            {
                 $_curTpl = array_merge($rewards[$_id], $_curTpl);
 
+                if ($rewards[$_id]['mailTemplate'])
+                {
+                    // using class Loot creates an inifinite loop cirling between Loot, ItemList and SpellList or something
+                    // $mailSrc = new Loot();
+                    // $mailSrc->getByContainer(LOOT_MAIL, $rewards[$_id]['mailTemplate']);
+                    // foreach ($mailSrc->iterate() as $loot)
+                        // $_curTpl['rewards'][] = [TYPE_ITEM, $loot['id']];
+
+                    // lets just assume for now, that mailRewards for achievements do not contain references
+                    $mailRew = DB::World()->selectCol('SELECT Item FROM mail_loot_template WHERE Reference <= 0 AND entry = ?d', $rewards[$_id]['mailTemplate']);
+                    foreach ($mailRew AS $mr)
+                        $_curTpl['rewards'][] = [TYPE_ITEM, $mr];
+                }
+            }
+
             //"rewards":[[11,137],[3,138]]   [type, typeId]
-            $_curTpl['rewards'] = [];
             if (!empty($_curTpl['item']))
                 $_curTpl['rewards'][] = [TYPE_ITEM, $_curTpl['item']];
             if (!empty($_curTpl['itemExtra']))
@@ -264,10 +281,10 @@ class AchievementListFilter extends Filter
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
          2 => [FILTER_CR_BOOLEAN,   'reward_loc0',    true                      ], // givesreward
          3 => [FILTER_CR_STRING,    'reward',         true                      ], // rewardtext
-         7 => [FILTER_CR_BOOLEAN,   'series',                                   ], // givesreward
+         7 => [FILTER_CR_BOOLEAN,   'chainId',                                  ], // partseries
          9 => [FILTER_CR_NUMERIC,   'id',             null,                 true], // id
         10 => [FILTER_CR_STRING,    'si.iconString',                            ], // icon
-        18 => [FILTER_CR_STAFFFLAG, 'flags',                                    ], // lastrank
+        18 => [FILTER_CR_STAFFFLAG, 'flags',                                    ], // flags
         14 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_COMMENT        ], // hascomments
         15 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
         16 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_VIDEO          ], // hasvideos
@@ -290,9 +307,15 @@ class AchievementListFilter extends Filter
             case 4:                                         // location [enum]
 /* todo */      return [1];                                 // no plausible locations parsed yet
             case 5:                                         // first in series [yn]
-                return $this->int2Bool($cr[1]) ? ['AND', ['series', 0, '!'], [['series', 0xFFFF0000, '&'], 0]] : [['series', 0xFFFF0000, '&'], 0, '!'];
+                if ($this->int2Bool($cr[1]))
+                    return $cr[1] ? ['AND', ['chainId', 0, '!'], ['cuFlags', ACHIEVEMENT_CU_FIRST_SERIES, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', ACHIEVEMENT_CU_FIRST_SERIES, '&'], 0]];
+
+                break;
             case 6:                                         // last in series [yn]
-                return $this->int2Bool($cr[1]) ? ['AND', ['series', 0, '!'], [['series', 0xFFFF, '&'], 0]] : [['series', 0xFFFF, '&'], 0, '!'];
+                if ($this->int2Bool($cr[1]))
+                    return $cr[1] ? ['AND', ['chainId', 0, '!'], ['cuFlags', ACHIEVEMENT_CU_LAST_SERIES, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', ACHIEVEMENT_CU_LAST_SERIES, '&'], 0]];
+
+                break;
             case 11:                                        // Related Event [enum]
                 $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
                 if ($_ !== null)

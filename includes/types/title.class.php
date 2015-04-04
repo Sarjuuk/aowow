@@ -16,7 +16,7 @@ class TitleList extends BaseType
     protected     $queryBase = 'SELECT t.*, id AS ARRAY_KEY FROM ?_titles t';
     protected     $queryOpts = array(
                       't'   => [['src']],                   //  11: TYPE_TITLE
-                      'src' => ['j' => ['?_source src ON type = 11 AND typeId = t.id', true], 's' => ', src3, moreType, moreTypeId']
+                      'src' => ['j' => ['?_source src ON type = 11 AND typeId = t.id', true], 's' => ', src13, moreType, moreTypeId']
     );
 
     public function __construct($conditions = [])
@@ -31,8 +31,8 @@ class TitleList extends BaseType
                 $this->sources[$this->id][12][] = $_curTpl['moreTypeId'];
             else if ($_curTpl['moreType'] == TYPE_QUEST)
                 $this->sources[$this->id][4][] = $_curTpl['moreTypeId'];
-            else if ($_curTpl['src3'])
-                $this->sources[$this->id][3][] = $_curTpl['src3'];
+            else if ($_curTpl['src13'])
+                $this->sources[$this->id][13][] = $_curTpl['src13'];
 
             // titles display up to two achievements at once
             if ($_curTpl['src12Ext'])
@@ -60,7 +60,7 @@ class TitleList extends BaseType
             $data[$this->id] = array(
                 'id'         => $this->id,
                 'name'       => $this->getField('male', true),
-                'namefemale' => $this->getField('namefemale', true),
+                'namefemale' => $this->getField('female', true),
                 'side'       => $this->curTpl['side'],
                 'gender'     => $this->curTpl['gender'],
                 'expansion'  => $this->curTpl['expansion'],

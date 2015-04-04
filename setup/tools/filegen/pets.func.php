@@ -3,6 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
+
 
     // builds 'pets'-file for available locales
 
@@ -23,6 +26,8 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
+    $reqDBC = ['creatureFamily'];
+
     function pets()
     {
         $success    = true;
@@ -32,25 +37,26 @@ if (!defined('AOWOW_REVISION'))
                       cr.name_loc0, cr.name_loc2, cr.name_loc3, cr.name_loc6, cr.name_loc8,
                       cr.minLevel,
                       cr.maxLevel,
-                      CONCAT("[", ft.A, ", ", ft.H, "]") AS react,
+                      ft.A,
+                      ft.H,
                       cr.rank AS classification,
                       cr.family,
                       cr.displayId1 AS displayId,
                       cr.textureString AS skin,
-                      p.iconString AS icon,
-                      p.type
+                      LOWER(SUBSTRING_INDEX(cf.iconString, "\\\\", -1)) AS icon,
+                      cf.petTalentType AS type
             FROM      ?_creature cr
-            JOIN      ?_factiontemplate ft ON ft.Id = cr.faction
-            JOIN      ?_pet p ON p.id = cr.family
+            JOIN      ?_factiontemplate  ft ON ft.Id = cr.faction
+            JOIN      dbc_creaturefamily cf ON cf.id = cr.family
             WHERE     cr.typeFlags & 0x1 AND (cr.cuFlags & 0x2) = 0
             ORDER BY  cr.id ASC');
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!FileGen::writeDir('datasets/'.$dir))
+            if (!CLISetup::writeDir('datasets/'.$dir))
                 $success = false;
 
-        foreach (FileGen::$localeIds as $lId)
+        foreach (CLISetup::$localeIds as $lId)
         {
             User::useLocale($lId);
             Lang::load(Util::$localeStrings[$lId]);
@@ -69,7 +75,7 @@ if (!defined('AOWOW_REVISION'))
                     'minlevel'       => $pet['minLevel'],
                     'maxlevel'       => $pet['maxLevel'],
                     'location'       => $locations[$pet['id']],
-                    'react'          => $pet['react'],
+                    'react'          => [$pet['A'], $pet['H']],
                     'classification' => $pet['classification'],
                     'family'         => $pet['family'],
                     'displayId'      => $pet['displayId'],
@@ -82,7 +88,7 @@ if (!defined('AOWOW_REVISION'))
             $toFile = "var g_pets = ".Util::toJSON($petsOut).";";
             $file   = 'datasets/'.User::$localeString.'/pets';
 
-            if (!FileGen::writeFile($file, $toFile))
+            if (!CLISetup::writeFile($file, $toFile))
                 $success = false;
         }
 

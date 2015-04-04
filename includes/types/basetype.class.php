@@ -221,7 +221,7 @@ abstract class BaseType
 
         // insert additional selected fields
         if ($s = array_column($this->queryOpts, 's'))
-            $this->queryBase = str_replace(' FROM', implode('', $s).' FROM', $this->queryBase);
+            $this->queryBase = str_replace('ARRAY_KEY', 'ARRAY_KEY '.implode('', $s), $this->queryBase);
 
         // append joins
         if ($j = array_column($this->queryOpts, 'j'))

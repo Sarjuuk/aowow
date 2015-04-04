@@ -89,9 +89,14 @@ class NpcPage extends GenericPage
         {
             if (count($maps) == 1)                          // should only exist in one instance
             {
-                $map = new ZoneList(array(['id', $maps], 1));
-                if (!$map->error)
-                    $mapType = $map->getField('areaType');
+                switch ((new ZoneList(array(['id', $maps], 1)))->getField('type'))
+                {
+                    case 2:
+                    case 5: $mapType = 1; break;
+                    case 3:
+                    case 7:
+                    case 8: $mapType = 2; break;
+                }
             }
         }
         else if ($_altIds)                                  // not spawned, but has difficultyDummies
@@ -314,7 +319,6 @@ class NpcPage extends GenericPage
         }
 
         // consider pooled spawns
-
 
         $this->map          = $map;
         $this->infobox      = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
@@ -865,7 +869,7 @@ class NpcPage extends GenericPage
             $reputation[] = [Lang::npc('modes', 1, 0), $base];
 
         // difficulty dummys
-        if ($dummyIds)
+        if ($dummyIds && ($mapType == 1 || $mapType == 2))
         {
             $alt = [];
             $rep = $this->getRepForId(array_keys($dummyIds), $spilledParents);

@@ -40,8 +40,12 @@ class ZonePage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // City
-        if ($this->subject->getField('flags') & 0x200000 && !$this->subject->getField('parentArea'))
+        if ($this->subject->getField('flags') & 0x8 && !$this->subject->getField('parentArea'))
             $infobox[] = Lang::zone('city');
+
+        // Auto repop
+        if ($this->subject->getField('flags') & 0x1000 && !$this->subject->getField('parentArea'))
+            $infobox[] = Lang::zone('autoRez');
 
         // Level
         if ($_ = $this->subject->getField('levelMin'))
@@ -53,7 +57,15 @@ class ZonePage extends GenericPage
         }
 
         // required Level
-        // [li]Requires level 80[/li] || [li]Required levels: [tooltip=instancereqlevel_tip]80[/tooltip], [tooltip=lfgreqlevel_tip]80[/tooltip][/li]
+        if ($_ = $this->subject->getField('levelReq'))
+        {
+            if ($__ = $this->subject->getField('levelReqLFG'))
+                $buff = sprintf(Lang::zone('reqLevels'), $_, $__);
+            else
+                $buff = Lang::main('_reqLevel').Lang::main('colon').$_;
+
+            $infobox[] = $buff;
+        }
 
         // Territory
         $_  = $this->subject->getField('faction');
@@ -78,28 +90,58 @@ class ZonePage extends GenericPage
         if ($_ = $this->subject->getField('maxPlayer'))
             $infobox[] = Lang::zone('numPlayers').Lang::main('colon').($_ == -2 ? '10/25' : $_);
 
-        // attunement
-        // [li]Attunement: [quest=24712][/li]
+        // Attunement Quest/Achievements & Keys
+        if ($attmnt = $this->subject->getField('attunes'))
+        {
+            foreach ($attmnt as $type => $ids)
+            {
+                $this->extendGlobalIds($type, array_map('abs', $ids));
+                foreach ($ids as $id)
+                {
+                    if ($type == TYPE_ITEM)
+                        $infobox[] = Lang::zone('key', (int)($id < 0)).Lang::main('colon').'[item='.abs($id).']';
+                    else
+                        $infobox[] = Lang::zone('attunement', (int)($id < 0)).Lang::main('colon').'['.Util::$typeStrings[$type].'='.abs($id).']';
+                }
+            }
+        }
+
+        // Instances
+        if ($_ = DB::Aowow()->selectCol('SELECT id FROM ?_zones WHERE parentAreaId = ?d AND (flags & ?d) = 0', $this->typeId, CUSTOM_EXCLUDE_FOR_LISTVIEW))
+        {
+            $this->extendGlobalIds(TYPE_ZONE, $_);
+            $infobox[] = Lang::maps('Instances').Lang::main('colon')."\n[zone=".implode("], \n[zone=", $_).']';
+        }
 
         // location (if instance)
-        // [li]Location: [lightbox=map zone=210 pins=514883]Icecrown[/lightbox][/li]
+        if ($pa = $this->subject->getField('parentAreaId'))
+        {
+            $paO = new ZoneList(array(['id', $pa]));
+            if (!$paO->error)
+            {
+                $pins = str_pad($this->subject->getField('parentX') * 10, 3, '0', STR_PAD_LEFT) . str_pad($this->subject->getField('parentY') * 10, 3, '0', STR_PAD_LEFT);
+                $infobox[] = Lang::zone('location').Lang::main('colon').'[lightbox=map zone='.$pa.' pins='.$pins.']'.$paO->getField('name', true).'[/lightbox]';
+            }
+        }
 
-        // Continent (if zone)
-        // Continent: Outland
+/*  has to be defined in an article, i think
 
-        // instances in this zone
-        // Instance: The Slave Pens, The Steamvault, The Underbog, Serpentshrine Cavern
+    // faction(s) / Reputation Hub / Raid Faction
+    // [li]Raid faction: [faction=1156][/li] || [li]Factions: [faction=1156]/[faction=1156][/li]
 
-        // faction(s) / Reputation Hub / Raid Faction
-        // [li]Raid faction: [faction=1156][/li] || [li]Factions: [faction=1156]/[faction=1156][/li]
-
-        // final boss
-        // [li]Final boss: [icon preset=boss][npc=37226][/icon][/li]
-
+    // final boss
+    // [li]Final boss: [icon preset=boss][npc=37226][/icon][/li]
+*/
 
         /****************/
         /* Main Content */
         /****************/
+
+        if ($_ = $this->subject->getField('parentArea'))
+        {
+            $this->extraText = sprintf(Lang::zone('zonePartOf'), $_);
+            $this->extendGlobalIds(TYPE_ZONE, $_);
+        }
 
         $oSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_OBJECT);
         $conditions = [['id', array_column($oSpawns, 'typeId')]];
@@ -340,7 +382,7 @@ class ZonePage extends GenericPage
             }
 
             // preselect bosses for raids/dungeons
-            if (in_array($this->subject->getField('areaType'), [1, 2]))
+            if (in_array($this->subject->getField('type'), [2, 3, 4, 5, 7, 8]))
                 $som['instance'] = true;
 
             /*
@@ -368,10 +410,7 @@ class ZonePage extends GenericPage
         );
 
     /*
-        - sub zones..?
-        - parent zone..?
         - associated with holiday?
-        - spell_area ?
      */
 
         /**************/
@@ -449,6 +488,123 @@ class ZonePage extends GenericPage
                     'hiddenCols'  => "$['side']"
                 ]
             );
+        }
+
+        // tab: spells
+        if ($saData = DB::World()->select('SELECT * FROM spell_area WHERE area = ?d', $this->typeId))
+        {
+            $spells = new SpellList(array(['id', array_column($saData, 'spell')]));
+            if (!$spells->error)
+            {
+                $lvSpells = $spells->getListviewData();
+                $this->extendGlobalData($spells->getJSGlobals());
+
+                $extra = false;
+                foreach ($saData as $a)
+                {
+                    if (empty($lvSpells[$a['spell']]))
+                        continue;
+
+                    $condition = [];
+                    if ($a['aura_spell'])
+                    {
+                        $this->extendGlobalIds(TYPE_SPELL, abs($a['aura_spell']));
+                        $condition[0][$this->typeId][] = [[$a['aura_spell'] >  0 ? CND_AURA : -CND_AURA, abs($a['aura_spell'])]];
+                    }
+
+                    if ($a['quest_start'])                  // status for quests needs work
+                    {
+                        $this->extendGlobalIds(TYPE_QUEST, $a['quest_start']);
+                        $group = [];
+                        for ($i = 0; $i < 7; $i++)
+                        {
+                            if (!($a['quest_start_status'] & (1 << $i)))
+                                continue;
+
+                            if ($i == 0)
+                                $group[] = [CND_QUEST_NONE, $a['quest_start']];
+                            else if ($i == 1)
+                                $group[] = [CND_QUEST_COMPLETE, $a['quest_start']];
+                            else if ($i == 3)
+                                $group[] = [CND_QUESTTAKEN, $a['quest_start']];
+                            else if ($i == 6)
+                                $group[] = [CND_QUESTREWARDED, $a['quest_start']];
+                        }
+
+                        if ($group)
+                            $condition[0][$this->typeId][] = $group;
+                    }
+
+                    if ($a['quest_end'] && $a['quest_end'] != $a['quest_start'])
+                    {
+                        $this->extendGlobalIds(TYPE_QUEST, $a['quest_end']);
+                        $group = [];
+                        for ($i = 0; $i < 7; $i++)
+                        {
+                            if (!($a['quest_end_status'] & (1 << $i)))
+                                continue;
+
+                            if ($i == 0)
+                                $group[] = [-CND_QUEST_NONE, $a['quest_end']];
+                            else if ($i == 1)
+                                $group[] = [-CND_QUEST_COMPLETE, $a['quest_end']];
+                            else if ($i == 3)
+                                $group[] = [-CND_QUESTTAKEN, $a['quest_end']];
+                            else if ($i == 6)
+                                $group[] = [-CND_QUESTREWARDED, $a['quest_end']];
+                        }
+
+                        if ($group)
+                            $condition[0][$this->typeId][] = $group;
+                    }
+
+                    if ($a['racemask'])
+                    {
+                        $foo = [];
+                        for ($i = 0; $i < 11; $i++)
+                            if ($a['racemask'] & (1 << $i))
+                                $foo[] = $i + 1;
+
+                        $this->extendGlobalIds(TYPE_RACE, $foo);
+                        $condition[0][$this->typeId][] = [[CND_RACE, $a['racemask']]];
+                    }
+
+                    if ($a['gender'] != 2)                  // 2: both
+                        $condition[0][$this->typeId][] = [[CND_GENDER, $a['gender'] + 1]];
+
+                    if ($condition)
+                    {
+                        $extra = true;
+                        $lvSpells[$a['spell']] = array_merge($lvSpells[$a['spell']], ['condition' => $condition]);
+                    }
+                }
+
+                $this->lvTabs[] = array(
+                    'file'   => 'spell',
+                    'data'   => $lvSpells,
+                    'params' => array(
+                        'extraCols'  => $extra ? '$[Listview.extraCols.condition]' : null,
+                        'hiddenCols' => "$['skill']"
+                    )
+                );
+            }
+        }
+
+        // tab: subzones
+        $subZones = new ZoneList(array(['parentArea', $this->typeId]));
+        if (!$subZones->error)
+        {
+            $this->lvTabs[] = array(
+                'file'   => 'zone',
+                'data'   => $subZones->getListviewData(),
+                'params' => [
+                    'name'        => '$LANG.tab_zones',
+                    'id'          => 'subzones',
+                    'hiddenCols'  => "$['territory', 'instancetype']"
+                ]
+            );
+
+            $this->extendGlobalData($subZones->getJSGlobals(GLOBALINFO_SELF));
         }
     }
 

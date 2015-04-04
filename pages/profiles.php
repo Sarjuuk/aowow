@@ -113,8 +113,8 @@ class ProfilesPage extends GenericPage
         $this->filter = ['query' => 1];
 
 
-        asort(Lang::game('cl'));
-        asort(Lang::game('ra'));
+        Lang::sort('game', 'cl');
+        Lang::sort('game', 'ra');
     }
 
     private function getTalentDistribution($tString)

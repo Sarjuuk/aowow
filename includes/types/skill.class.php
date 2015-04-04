@@ -6,10 +6,14 @@ if (!defined('AOWOW_REVISION'))
 
 class SkillList extends BaseType
 {
-    public static $type      = TYPE_SKILL;
-    public static $brickFile = 'skill';
+    public static   $type      = TYPE_SKILL;
+    public static   $brickFile = 'skill';
 
-    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_skillline sl';
+    protected       $queryBase = 'SELECT *, sl.id AS ARRAY_KEY FROM ?_skillline sl';
+    protected       $queryOpts = array(
+                        'sl' => [['si']],
+                        'si' => ['j' => '?_icons si ON si.id = sl.iconId', 's' => ', si.iconString'],
+                    );
 
     public function __construct($conditions = [])
     {

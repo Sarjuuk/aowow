@@ -42,13 +42,12 @@ class FactionsPage extends GenericPage
             $conditions[] = ['parentFactionId', $this->category[1]];
         else if (isset($this->category[0]))
         {
-            if (!$this->category[0])
-                $conditions[] = ['parentFactionId', [1118, 980, 1097, 469, 891, 67, 892, 169, 1037, 1052, 1117, 936], '!'];
-            else
-            {
+            if ($this->category[0])
                 $subs = DB::Aowow()->selectCol('SELECT id FROM ?_factions WHERE parentFactionId = ?d', $this->category[0]);
-                $conditions[] = ['OR', ['parentFactionId', $subs], ['id', $subs]];
-            }
+            else
+                $subs = [0];
+
+            $conditions[] = ['OR', ['parentFactionId', $subs], ['id', $subs]];
         }
 
         $data = [];

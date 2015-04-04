@@ -3,6 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
+
 
     // Create 'enchants'-file for available locales
     // this script requires the following dbc-files to be parsed and available
@@ -62,7 +65,7 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!FileGen::writeDir('datasets/'.$dir))
+            if (!CLISetup::writeDir('datasets/'.$dir))
                 $success = false;
 
         $enchIds = [];
@@ -72,7 +75,7 @@ if (!defined('AOWOW_REVISION'))
         $enchMisc = [];
         $enchJSON = Util::parseItemEnchantment($enchIds, false, $enchMisc);
 
-        foreach (FileGen::$localeIds as $lId)
+        foreach (CLISetup::$localeIds as $lId)
         {
             set_time_limit(120);
 
@@ -211,7 +214,7 @@ if (!defined('AOWOW_REVISION'))
             $toFile = "var g_enchants = ".Util::toJSON($enchantsOut).";";
             $file   = 'datasets/'.User::$localeString.'/enchants';
 
-            if (!FileGen::writeFile($file, $toFile))
+            if (!CLISetup::writeFile($file, $toFile))
                 $success = false;
         }
 

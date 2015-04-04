@@ -3,10 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
 
-    // builds talent-tree-data for the talent-calculator
-    // this script requires the following dbc-files to be available
-    // Talent.dbc, TalentTab.dbc
 
     // talents
     // i - int talentId (id of aowow_talent)
@@ -25,22 +24,12 @@ if (!defined('AOWOW_REVISION'))
     // t - array of talent-objects
     // f - array:int [pets only] creatureFamilies in that category
 
+    // builds talent-tree-data for the talent-calculator
+    // this script requires the following dbc-files to be available
+    $reqDBC = ['talenttab', 'talent', 'spell', 'creaturefamily', 'spellicon'];
+
     function talents()
     {
-        // expected dbcs
-        $req   = ['dbc_talenttab', 'dbc_talent'];
-        $found = DB::Aowow()->selectCol('SHOW TABLES LIKE "dbc_%"');
-        if ($missing = array_diff($req, $found))
-        {
-            foreach ($missing as $m)
-            {
-                $file = explode('_', $m)[1];
-                $dbc  = new DBC($file);
-                if ($dbc->readFromFile($file == 'talenttab'))
-                    $dbc->writeToDB();
-            }
-        }
-
         $success   = true;
         $buildTree = function ($class) use (&$petFamIcons, &$tSpells)
         {
@@ -54,7 +43,7 @@ if (!defined('AOWOW_REVISION'))
 
             for ($l = 0; $l < count($tabs); $l++)
             {
-                $talents    = DB::Aowow()->select('SELECT t.id AS tId, t.*, s.* FROM dbc_talent t, ?_spell s WHERE t.`tabId`= ?d AND s.`Id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$l]['Id']);
+                $talents    = DB::Aowow()->select('SELECT t.id AS tId, t.*, s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc6, s.name_loc8, LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AS iconString FROM dbc_talent t, dbc_spell s, dbc_spellicon si WHERE si.`Id` = s.`iconId` AND t.`tabId`= ?d AND s.`Id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$l]['Id']);
                 $result[$l] = array(
                     'n' => Util::localizedString($tabs[$l], 'name'),
                     't' => []
@@ -64,7 +53,7 @@ if (!defined('AOWOW_REVISION'))
                 {
                     $petFamId           = log($tabs[$l]['creatureFamilyMask'], 2);
                     $result[$l]['icon'] = $petFamIcons[$petFamId];
-                    $petCategories      = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, category FROM ?_pet WHERE type = ?d', $petFamId);
+                    $petCategories      = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, categoryEnumID FROM dbc_creaturefamily WHERE petTalentType = ?d', $petFamId);
                     $result[$l]['f']    = array_keys($petCategories);
                 }
 
@@ -170,13 +159,13 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!FileGen::writeDir('datasets/'.$dir))
+            if (!CLISetup::writeDir('datasets/'.$dir))
                 $success = false;
 
         $tSpellIds = DB::Aowow()->selectCol('SELECT rank1 FROM dbc_talent UNION SELECT rank2 FROM dbc_talent UNION SELECT rank3 FROM dbc_talent UNION SELECT rank4 FROM dbc_talent UNION SELECT rank5 FROM dbc_talent');
         $tSpells   = new SpellList(array(['s.id', $tSpellIds], CFG_SQL_LIMIT_NONE));
 
-        foreach (FileGen::$localeIds as $lId)
+        foreach (CLISetup::$localeIds as $lId)
         {
             User::useLocale($lId);
             Lang::load(Util::$localeStrings[$lId]);
@@ -190,14 +179,14 @@ if (!defined('AOWOW_REVISION'))
                 $file   = 'datasets/'.User::$localeString.'/talents-'.$cId;
                 $toFile = '$WowheadTalentCalculator.registerClass('.$cId.', '.Util::toJSON($buildTree($cId)).')';
 
-                if (!FileGen::writeFile($file, $toFile))
+                if (!CLISetup::writeFile($file, $toFile))
                     $success = false;
             }
 
             // PetCalc
             if (empty($petIcons))
             {
-                $pets = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, iconString FROM ?_pet');
+                $pets = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)) AS iconString FROM dbc_creaturefamily WHERE petTalentType IN (0, 1, 2)');
                 $petIcons = Util::toJSON($pets);
             }
 
@@ -205,7 +194,7 @@ if (!defined('AOWOW_REVISION'))
             $toFile .= 'var g_pet_talents = '.Util::toJSON($buildTree(0)).';';
             $file    = 'datasets/'.User::$localeString.'/pet-talents';
 
-            if (!FileGen::writeFile($file, $toFile))
+            if (!CLISetup::writeFile($file, $toFile))
                 $success = false;
         }
 

@@ -23,11 +23,12 @@ class ItemList extends BaseType
     private       $vendors    = [];
     private       $jsGlobals  = [];                         // getExtendedCost creates some and has no access to template
 
-    protected     $queryBase  = 'SELECT i.*, `is`.*, i.id AS id, i.id AS ARRAY_KEY FROM ?_items i';
+    protected     $queryBase  = 'SELECT i.*, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
     protected     $queryOpts  = array(
-                      'i'   => [['is', 'src'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
-                      'is'  => ['j' => ['?_item_stats AS `is` ON `is`.`id` = `i`.`id`', true]],
-                      's'   => ['j' => ['?_spell AS `s` ON s.effect1CreateItemId = i.id', true], 'g' => 'i.id'],
+                      'i'   => [['is', 'src', 'ic'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
+                      'ic'  => ['j' => ['?_icons ic ON ic.id = -i.displayId', true], 's' => ', ic.iconString'],
+                      'is'  => ['j' => ['?_item_stats `is` ON `is`.`id` = `i`.`id`', true], 's' => ', `is`.*'],
+                      's'   => ['j' => ['?_spell `s` ON s.effect1CreateItemId = i.id', true], 'g' => 'i.id'],
                       'src' => ['j' => ['?_source src ON type = 3 AND typeId = i.id', true], 's' => ', moreType, moreTypeId, src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
                   );
 
@@ -79,8 +80,11 @@ class ItemList extends BaseType
 
     // todo (med): information will get lost if one vendor sells one item multiple times with different costs (e.g. for item 54637)
     //             wowhead seems to have had the same issues
-    public function getExtendedCost($filter = [], &$reqRating = 0)
+    public function getExtendedCost($filter = [], &$reqRating = [])
     {
+        if ($this->error)
+            return [];
+
         if (empty($this->vendors))
         {
             $itemz = DB::World()->select('
@@ -110,9 +114,10 @@ class ItemList extends BaseType
                         $costs = $xCosts[$vInfo['extendedCost']];
 
                     $data   = array(
-                        'stock'  => $vInfo['maxcount'] ?: -1,
-                        'event'  => $vInfo['eventId'],
-                        'reqRtg' => $costs ? $costs['reqPersonalRating'] : 0
+                        'stock'      => $vInfo['maxcount'] ?: -1,
+                        'event'      => $vInfo['eventId'],
+                        'reqRating'  => $costs ? $costs['reqPersonalRating'] : 0,
+                        'reqBracket' => $costs ? $costs['reqArenaSlot']      : 0
                     );
 
                     // hardcode arena(103) & honor(104)
@@ -197,7 +202,7 @@ class ItemList extends BaseType
 
         foreach ($result as $itemId => &$data)
         {
-            $reqRating = 0;
+            $reqRating = [];
             foreach ($data as $npcId => $costs)
             {
                 if ($tok || $cur)                           // bought with specific token or currency
@@ -218,13 +223,12 @@ class ItemList extends BaseType
 
                 // reqRating ins't really a cost .. so pass it by ref instead of return
                 // use highest total value
-                // note: how to distinguish between brackets .. or team/pers-rating?
-                if (isset($data[$npcId]) && ($reqRating < $costs['reqRtg']))
-                    $reqRating = $costs['reqRtg'];
+                if (isset($data[$npcId]) && $costs['reqRating'] && (!$reqRating || $reqRating[0] < $costs['reqRating']))
+                    $reqRating = [$costs['reqRating'], $costs['reqBracket']];
             }
 
             if ($reqRating)
-                $data['reqRating'] = $reqRating;
+                $data['reqRating'] = $reqRating[0];
 
             if (empty($data))
                 unset($result[$itemId]);
@@ -316,7 +320,7 @@ class ItemList extends BaseType
                     if ($cost['event'])
                     {
                         $this->jsGlobals[TYPE_WORLDEVENT][$cost['event']] = $cost['event'];
-                        $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $cost['event']]];
+                        $row['condition'][0][$this->id][] = [[CND_ACTIVE_EVENT, $cost['event']]];
                     }
 
                     if ($currency || $tokens)               // fill idx:3 if required
@@ -382,6 +386,8 @@ class ItemList extends BaseType
                 $data[$this->id]['source'] = array_keys($this->sources[$this->id]);
                 if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && !empty($this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]))
                     $data[$this->id]['sourcemore'] = [$this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]];
+                else if (!empty($this->sources[$this->id][3]))
+                    $data[$this->id]['sourcemore'] = [['p' => $this->sources[$this->id][3][0]]];
             }
         }
 
@@ -805,7 +811,7 @@ class ItemList extends BaseType
 
         // required arena team rating / personal rating / todo (low): sort out what kind of rating
         if (!empty($this->getExtendedCost([], $reqRating)[$this->id]) && $reqRating)
-            $x .= sprintf(Lang::item('reqRating'), $reqRating).'<br />';
+            $x .= sprintf(Lang::item('reqRating', $reqRating[1]), $reqRating[0]).'<br />';
 
         // item level
         if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON]))
@@ -895,75 +901,77 @@ class ItemList extends BaseType
 
         // Item Set
         $pieces  = [];
-        $condition = ['OR', ['item1', $this->id], ['item2', $this->id], ['item3', $this->id], ['item4', $this->id], ['item5', $this->id], ['item6', $this->id], ['item7', $this->id], ['item8', $this->id], ['item9', $this->id], ['item10', $this->id]];
-        $itemset = new ItemsetList($condition);
-
-        if (!$itemset->error)
+        if ($setId = $this->getField('itemset'))
         {
-            $pieces = DB::Aowow()->select('
-                SELECT b.id AS ARRAY_KEY, b.name_loc0, b.name_loc2, b.name_loc3, b.name_loc6, b.name_loc8, GROUP_CONCAT(a.id SEPARATOR \':\') AS equiv
-                FROM   ?_items a, ?_items b
-                WHERE  a.slotBak = b.slotBak AND a.itemset = b.itemset AND b.id IN (?a)
-                GROUP BY b.id;',
-                array_keys($itemset->pieceToSet)
-            );
-
-            foreach ($pieces as $k => &$p)
-                $p = '<span><!--si'.$p['equiv'].'--><a href="?item='.$k.'">'.Util::localizedString($p, 'name').'</a></span>';
-
-            $xSet = '<br /><span class="q"><a href="?itemset='.$itemset->id.'" class="q">'.$itemset->getField('name', true).'</a> (0/'.count($pieces).')</span>';
-
-            if ($skId = $itemset->getField('skillId'))      // bonus requires skill to activate
+            // while Ids can technically be used multiple times the only difference in data are the items used. So it doesn't matter what we get
+            $itemset = new ItemsetList(array(['id', $setId]));
+            if (!$itemset->error && $itemset->pieceToSet)
             {
-                $xSet .= '<br />'.sprintf(Lang::game('requires'), '<a href="?skills='.$skId.'" class="q1">'.SkillList::getName($skId).'</a>');
+                $pieces = DB::Aowow()->select('
+                    SELECT b.id AS ARRAY_KEY, b.name_loc0, b.name_loc2, b.name_loc3, b.name_loc6, b.name_loc8, GROUP_CONCAT(a.id SEPARATOR \':\') AS equiv
+                    FROM   ?_items a, ?_items b
+                    WHERE  a.slotBak = b.slotBak AND a.itemset = b.itemset AND b.id IN (?a)
+                    GROUP BY b.id;',
+                    array_keys($itemset->pieceToSet)
+                );
 
-                if ($_ = $itemset->getField('skillLevel'))
-                    $xSet .= ' ('.$_.')';
+                foreach ($pieces as $k => &$p)
+                    $p = '<span><!--si'.$p['equiv'].'--><a href="?item='.$k.'">'.Util::localizedString($p, 'name').'</a></span>';
 
-                $xSet .= '<br />';
-            }
+                $xSet = '<br /><span class="q"><a href="?itemset='.$itemset->id.'" class="q">'.$itemset->getField('name', true).'</a> (0/'.count($pieces).')</span>';
 
-            // list pieces
-            $xSet .= '<div class="q0 indent">'.implode('<br />', $pieces).'</div><br />';
-
-            // get bonuses
-            $setSpellsAndIdx = [];
-            for ($j = 1; $j <= 8; $j++)
-                if ($_ = $itemset->getField('spell'.$j))
-                    $setSpellsAndIdx[$_] = $j;
-
-            $setSpells = [];
-            if ($setSpellsAndIdx)
-            {
-                $boni = new SpellList(array(['s.id', array_keys($setSpellsAndIdx)]));
-                foreach ($boni->iterate() as $__)
+                if ($skId = $itemset->getField('skillId'))      // bonus requires skill to activate
                 {
-                    $setSpells[] = array(
-                        'tooltip' => $boni->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0],
-                        'entry'   => $itemset->getField('spell'.$setSpellsAndIdx[$boni->id]),
-                        'bonus'   => $itemset->getField('bonus'.$setSpellsAndIdx[$boni->id])
-                    );
-                }
-            }
+                    $xSet .= '<br />'.sprintf(Lang::game('requires'), '<a href="?skills='.$skId.'" class="q1">'.SkillList::getName($skId).'</a>');
 
-            // sort and list bonuses
-            $xSet .= '<span class="q0">';
-            for ($i = 0; $i < count($setSpells); $i++)
-            {
-                for ($j = $i; $j < count($setSpells); $j++)
-                {
-                    if ($setSpells[$j]['bonus'] >= $setSpells[$i]['bonus'])
-                        continue;
+                    if ($_ = $itemset->getField('skillLevel'))
+                        $xSet .= ' ('.$_.')';
 
-                    $tmp = $setSpells[$i];
-                    $setSpells[$i] = $setSpells[$j];
-                    $setSpells[$j] = $tmp;
-                }
-                $xSet .= '<span>('.$setSpells[$i]['bonus'].') '.Lang::item('set').': <a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a></span>';
-                if ($i < count($setSpells) - 1)
                     $xSet .= '<br />';
+                }
+
+                // list pieces
+                $xSet .= '<div class="q0 indent">'.implode('<br />', $pieces).'</div><br />';
+
+                // get bonuses
+                $setSpellsAndIdx = [];
+                for ($j = 1; $j <= 8; $j++)
+                    if ($_ = $itemset->getField('spell'.$j))
+                        $setSpellsAndIdx[$_] = $j;
+
+                $setSpells = [];
+                if ($setSpellsAndIdx)
+                {
+                    $boni = new SpellList(array(['s.id', array_keys($setSpellsAndIdx)]));
+                    foreach ($boni->iterate() as $__)
+                    {
+                        $setSpells[] = array(
+                            'tooltip' => $boni->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0],
+                            'entry'   => $itemset->getField('spell'.$setSpellsAndIdx[$boni->id]),
+                            'bonus'   => $itemset->getField('bonus'.$setSpellsAndIdx[$boni->id])
+                        );
+                    }
+                }
+
+                // sort and list bonuses
+                $xSet .= '<span class="q0">';
+                for ($i = 0; $i < count($setSpells); $i++)
+                {
+                    for ($j = $i; $j < count($setSpells); $j++)
+                    {
+                        if ($setSpells[$j]['bonus'] >= $setSpells[$i]['bonus'])
+                            continue;
+
+                        $tmp = $setSpells[$i];
+                        $setSpells[$i] = $setSpells[$j];
+                        $setSpells[$j] = $tmp;
+                    }
+                    $xSet .= '<span>('.$setSpells[$i]['bonus'].') '.Lang::item('set').': <a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a></span>';
+                    if ($i < count($setSpells) - 1)
+                        $xSet .= '<br />';
+                }
+                $xSet .= '</span>';
             }
-            $xSet .= '</span>';
         }
 
         // recipes, vanity pets, mounts

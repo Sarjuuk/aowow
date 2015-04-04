@@ -47,13 +47,23 @@ class FactionList extends BaseType
         foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'category'  => $this->curTpl['cat'],
-                'category2' => $this->curTpl['cat2'],
                 'expansion' => $this->curTpl['expansion'],
                 'id'        => $this->id,
                 'side'      => $this->curTpl['side'],
                 'name'      => $this->getField('name', true)
             );
+
+            if ($this->curTpl['cat2'])
+            {
+                $data[$this->id]['category']  = $this->curTpl['cat'];
+                $data[$this->id]['category2'] = $this->curTpl['cat2'];
+            }
+            else
+            {
+                $data[$this->id]['category']  = $this->curTpl['cat2'];
+                $data[$this->id]['category2'] = $this->curTpl['cat'];
+            }
+
         }
 
         return $data;

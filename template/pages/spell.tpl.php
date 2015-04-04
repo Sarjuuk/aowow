@@ -47,7 +47,7 @@ if ($this->reagents[1]):
 <?php
         foreach ($this->tools as $i => $t):
             if (isset($t['itemId'])):
-                echo "                    $WH.ge('iconlist-icon.".($i + 1)."').appendChild(g_items.createIcon(".$t['itemId'].", 0, 1));\n";
+                echo "                    \$WH.ge('iconlist-icon.".($i + 1)."').appendChild(g_items.createIcon(".$t['itemId'].", 0, 1));\n";
             endif;
         endforeach;
 ?>
@@ -90,7 +90,7 @@ endif;
                             </tr>
                             <tr>
                                 <th style="border-left: 0"><?php echo Lang::game('school'); ?></th>
-                                <td><?php echo User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, $this->school[0], $this->school[1]) : $this->school[1]; ?></td>
+                                <td width="100%" style="border-top: 0"><?php echo !empty($this->school[1]) ? (User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, $this->school[0], $this->school[1]) : $this->school[1]) : '<span class="q0">'.Lang::main('n_a').'</span>'; ?></td>
                             </tr>
                             <tr>
                                 <th style="border-left: 0"><?php echo Lang::game('mechanic'); ?></th>

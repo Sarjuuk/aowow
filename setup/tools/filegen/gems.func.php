@@ -3,6 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
+
 
     // Create 'gems'-file for available locales
     // this script requires the following dbc-files to be parsed and available
@@ -30,10 +33,11 @@ if (!defined('AOWOW_REVISION'))
                       i.name_loc0, i.name_loc2, i.name_loc3, i.name_loc6, i.name_loc8,
                       IF (i.id < 36000 OR i.itemLevel < 70, 1 , 2) AS expansion,
                       i.quality,
-                      i.iconString AS icon,
+                      ic.iconString AS icon,
                       i.gemEnchantmentId AS enchId,
                       i.gemColorMask AS colors
             FROM      ?_items i
+            JOIN      ?_icons ic ON ic.id = -i.displayId
             WHERE     i.gemEnchantmentId <> 0
             ORDER BY  i.id DESC');
         $success = true;
@@ -41,7 +45,7 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!FileGen::writeDir('datasets/'.$dir))
+            if (!CLISetup::writeDir('datasets/'.$dir))
                 $success = false;
 
         $enchIds = [];
@@ -51,7 +55,7 @@ if (!defined('AOWOW_REVISION'))
         $enchMisc = [];
         $enchJSON = Util::parseItemEnchantment($enchIds, false, $enchMisc);
 
-        foreach (FileGen::$localeIds as $lId)
+        foreach (CLISetup::$localeIds as $lId)
         {
             set_time_limit(5);
 
@@ -75,7 +79,7 @@ if (!defined('AOWOW_REVISION'))
             $toFile = "var g_gems = ".Util::toJSON($gemsOut).";";
             $file   = 'datasets/'.User::$localeString.'/gems';
 
-            if (!FileGen::writeFile($file, $toFile))
+            if (!CLISetup::writeFile($file, $toFile))
                 $success = false;
         }
 

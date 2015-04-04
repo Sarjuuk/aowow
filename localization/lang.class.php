@@ -9,7 +9,6 @@ class Lang
     private static $game;
 
     private static $achievement;
-    private static $class;
     private static $currency;
     private static $event;
     private static $faction;
@@ -20,6 +19,7 @@ class Lang
     private static $npc;
     private static $pet;
     private static $quest;
+    private static $race;
     private static $skill;
     private static $spell;
     private static $title;
@@ -41,20 +41,20 @@ class Lang
     }
 
     // todo: make static props private and access through this
-    public static function __callStatic($name, $args)
+    public static function __callStatic($prop, $args)
     {
-        if (!isset(self::$$name))
+        if (!isset(self::$$prop))
         {
-            Util::addNote(U_GROUP_STAFF, 'Lang: tried to use undefined property Lang::$'.$name);
+            Util::addNote(U_GROUP_STAFF, 'Lang::__callStatic() - tried to use undefined property Lang::$'.$prop);
             return null;
         }
 
-        $var = self::$$name;
+        $var = self::$$prop;
         foreach ($args as $key)
         {
             if (!isset($var[$key]))
             {
-                Util::addNote(U_GROUP_STAFF, 'Lang: undefined key "'.$key.'" in property Lang::$'.$name.'. Full key chain: '.implode(', ', $args));
+                Util::addNote(U_GROUP_STAFF, 'Lang::__callStatic() - undefined key "'.$key.'" in property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\']');
                 return null;
             }
 
@@ -62,6 +62,25 @@ class Lang
         }
 
         return $var;
+    }
+
+    public static function sort($prop, $group, $method = SORT_NATURAL)
+    {
+
+        if (!isset(self::$$prop))
+        {
+            Util::addNote(U_GROUP_STAFF, 'Lang::sort() - tried to use undefined property Lang::$'.$prop);
+            return null;
+        }
+
+        $var = &self::$$prop;
+        if (!isset($var[$group]))
+        {
+            Util::addNote(U_GROUP_STAFF, 'Lang::sort() - tried to use undefined property Lang::$'.$prop.'[\''.$group.'\']');
+            return null;
+        }
+
+        asort($var[$group], $method);
     }
 
     // todo: expand

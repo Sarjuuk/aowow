@@ -195,10 +195,6 @@ class Util
         null,   4,      10,     9,      8,      6,      15,     11,     3,      5,      null,   7
     );
 
-    public static $itemDurabilityQualityMod = array(        // from DurabilityQuality.dbc
-        null,   1.0,    0.6,    1.0,    0.8,    1.0,    1.0,    1.2,    1.25,   1.44,   2.5,    1.728,  3.0,    0.0,    0.0,    1.2,    1.25
-    );
-
     // todo: translate and move to Lang
     public static $spellEffectStrings       = array(
           0 => 'None',
@@ -1026,31 +1022,21 @@ class Util
 
     public static function localizedString($data, $field, $silent = false)
     {
-        $sqlLocales = ['EN', 2 => 'FR', 3 => 'DE', 6 => 'ES', 8 => 'RU'];
-
         // default back to enUS if localization unavailable
 
         // default case: selected locale available
         if (!empty($data[$field.'_loc'.User::$localeId]))
             return $data[$field.'_loc'.User::$localeId];
 
-        // dbc-case
-        else if (!empty($data[$field.$sqlLocales[User::$localeId]]))
-            return $data[$field.$sqlLocales[User::$localeId]];
-
         // locale not enUS; aowow-type localization available; add brackets if not silent
         else if (User::$localeId != LOCALE_EN && isset($data[$field.'_loc0']) && !empty($data[$field.'_loc0']))
             return $silent ? $data[$field.'_loc0'] : '['.$data[$field.'_loc0'].']';
 
-        // dbc-case
-        else if (User::$localeId != LOCALE_EN && isset($data[$field.$sqlLocales[0]]) && !empty($data[$field.$sqlLocales[0]]))
-            return $silent ? $data[$field.$sqlLocales[0]] : '['.$data[$field.$sqlLocales[0]].']';
-
-        // locale not enUS; TC localization; add brackets if not silent
+        // OBSOLETE - locale not enUS; TC localization; add brackets if not silent
         else if (User::$localeId != LOCALE_EN && isset($data[$field]) && !empty($data[$field]))
             return $silent ? $data[$field] : '['.$data[$field].']';
 
-        // locale enUS; TC localization; return normal
+        // OBSOLETE - locale enUS; TC localization; return normal
         else if (User::$localeId == LOCALE_EN && isset($data[$field]) && !empty($data[$field]))
             return $data[$field];
 
@@ -1558,31 +1544,6 @@ class Util
             alliancequests: "Quest Givers",
             hordequests:    "Quest Givers",
         */
-    }
-
-    // setup only
-    private static $alphaMapCache = [];
-    public static function alphaMapCheck($areaId, array &$set)
-    {
-        $file = 'cache/alphaMaps/'.$areaId.'.png';
-        if (!file_exists($file))                            // file does not exist (probably instanced area)
-            return false;
-
-        // invalid and corner cases (literally)
-        if (!is_array($set) || empty($set['posX']) || empty($set['posY']) || $set['posX'] == 100 || $set['posY'] == 100)
-        {
-            $set = null;
-            return true;
-        }
-
-        if (empty(self::$alphaMapCache[$areaId]))
-            self::$alphaMapCache[$areaId] = imagecreatefrompng($file);
-
-        // alphaMaps are 1000 x 1000, adapt points [black => valid point]
-        if (!imagecolorat(self::$alphaMapCache[$areaId], $set['posX'] * 10, $set['posY'] * 10))
-            $set = null;
-
-        return true;
     }
 
     public static function getServerConditions($srcType, $srcGroup = null, $srcEntry = null)

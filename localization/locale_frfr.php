@@ -437,7 +437,7 @@ $lang = array(
         'reqNumCrt'     => "Nécessite",
         '_transfer'     => 'Cet haut fait sera converti en <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
     ),
-    'class' => array(
+    'race' => array(
         'racialLeader'  => "Leader racial",
         'startZone'     => "Zone initiales",
     ),
@@ -459,7 +459,14 @@ $lang = array(
         'CosmicMap'     => "Carte cosmique",
     ),
     'zone' => array(
-        // 'zonePartOf'    => "Cette zone fait partie de la zone",
+        'attunement'    => ["Accès", "Accès Héroïque"],
+        'key'           => ["Clef", "Clef Héroïque"],
+        'location'      => "Localisation",
+        'raidFaction'   => "Faction de raid",
+        'boss'          => "Boss final",
+        'reqLevels'     => "Niveaux requis : [tooltip=instancereqlevel_tip]%d[/tooltip], [tooltip=lfgreqlevel_tip]%d[/tooltip]",
+        'zonePartOf'    => "Cette zone fait partie de la zone [zone=%d].",
+        'autoRez'       => "Résurrection automatique",
         'city'          => "Город",
         'territory'     => "Territoire",
         'instanceType'  => "Type d'instance",
@@ -695,7 +702,7 @@ $lang = array(
         'instantPhys'   => "Incantation immédiate",
         'instantMagic'  => "Instantanée",
         'channeled'     => "Canalisée",
-        'range'         => "m de portée",
+        'range'         => "%s m de portée",
         'meleeRange'    => "Allonge",
         'unlimRange'    => "Portée illimitée",
         'reagents'      => "Composants",
@@ -711,9 +718,12 @@ $lang = array(
         ),
         'powerRunes'    => ["Givre", "Impie", "Sang", "Mort"],
         'powerTypes'    => array(
-            -2 => "vie",     -1 => null,    "mana",     "rage",     "focus",    "énergie",      "Satisfaction",     "Runes",    "puissance runique",
-            'AMMOSLOT' => "Munitions",      'STEAM' => "Pression vapeur",       'WRATH'       => "Courroux",        'PYRITE' => "Pyrite",
-            'HEAT'     => "Chaleur",        'OOZE'  => "Limon",                 'BLOOD_POWER' => "Puissance de sang"
+            // conventional
+              -2 => "vie",                 0 => "mana",                1 => "rage",                2 => "focus",               3 => "énergie",             4 => "Satisfaction",
+               5 => "Runes",               6 => "puissance runique",
+            // powerDisplay
+              -1 => "Munitions",         -41 => "Pyrite",            -61 => "Pression vapeur",  -101 => "Chaleur",          -121 => "Limon",            -141 => "Puissance de sang",
+            -142 => "Courroux"
         ),
         'relItems'      => array(
             'base'    => "<small>Montre %s reliés à <b>%s</b></small>",
@@ -854,7 +864,6 @@ $lang = array(
         '_unavailable'  => "Este objeto no está disponible para los jugadores.",
         '_rndEnchants'  => "Enchantements aléatoires",
         '_chance'       => "(%s%% de chance)",
-        'reqRating'     => "Nécessite une cote d'arène personnelle et en équipe de %d en arène de 3c3 ou 5c5.",
         'slot'          => "Emplacement",
         '_quality'      => "Qualité",
         'usableBy'      => "Utilisable par",
@@ -873,6 +882,11 @@ $lang = array(
             2 => ["moins de %d gemme %s", "moins de %d gemmes %s"],
             3 => "plus de gemmes %s que de %s",             // plus de gemmes %s que |2 %s
             5 => ["au moins %d gemme %s", "au moins %d gemmes %s"]
+        ),
+        'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
+            "Nécessite une cote d'arène personnelle et en équipe de %d",
+            "Nécessite une cote d'arène personnelle et en équipe de %d<br>en arène de 3c3 ou 5c5.",
+            "Nécessite une cote d'arène personnelle et en équipe de %d<br>en arène de 5c5."
         ),
         'quality'       => array(
             "Médiocre",             "Classique",        "Bonne",                "Rare",

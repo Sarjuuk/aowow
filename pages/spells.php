@@ -404,10 +404,10 @@ class SpellsPage extends GenericPage
         $this->lvTabs[] = $tab;
 
         // sort for dropdown-menus
-        asort(Lang::game('ra'));
-        asort(Lang::game('cl'));
-        asort(Lang::game('sc'));
-        asort(Lang::game('me'));
+        Lang::sort('game', 'ra');
+        Lang::sort('game', 'cl');
+        Lang::sort('game', 'sc');
+        Lang::sort('game', 'me');
     }
 
     protected function generateTitle()
@@ -418,7 +418,7 @@ class SpellsPage extends GenericPage
             array_unshift($foo, Lang::spell('cat', $c[0], $c[1], $c[2]));
         else if (isset($c[1]))
         {
-            $_ = in_array($c[0], [-2, -13, 7]) ? Lang::game('cl') : Lang::spell('cat', $c[0])];
+            $_ = in_array($c[0], [-2, -13, 7]) ? Lang::game('cl') : Lang::spell('cat', $c[0]);
             array_unshift($foo, is_array($_[$c[1]]) ? $_[$c[1]][0] : $_[$c[1]]);
         }
 

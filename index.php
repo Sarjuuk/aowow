@@ -28,12 +28,16 @@ if ($error)
 require_once 'includes/kernel.php';
 
 
-if (CLI || !file_exists('config/config.php'))
+if (CLI)
 {
-    $cwDir = /*$_SERVER['DOCUMENT_ROOT']; //*/getcwd();
     require 'setup/setup.php';
     die();
 }
+
+
+// maybe add additional setup checks?
+if (!DB::isConnectable(DB_AOWOW) || !DB::isConnectable(DB_WORLD))
+    (new GenericPage($pageCall))->maintenance();
 
 
 $altClass = '';
@@ -142,20 +146,6 @@ switch ($pageCall)
             die((string)$_);
         }
         break;
-    /* setup */
-    case 'build':
-        if (User::isInGroup(U_GROUP_EMPLOYEE))
-        {
-            define('TMP_BUILD', 1);                         // todo (med): needs better solution
-            require 'setup/setup.php';
-            break;
-        }
-    case 'sql':
-        if (User::isInGroup(U_GROUP_EMPLOYEE))
-        {
-            require 'setup/tools/database/_'.$pageParam.'.php';
-            break;
-        }
     default:                                                // unk parameter given -> ErrorPage
         if (isset($_GET['power']))
             die('$WowheadPower.register(0, '.User::$localeId.', {})');

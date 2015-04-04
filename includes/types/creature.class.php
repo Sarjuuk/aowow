@@ -17,7 +17,7 @@ class CreatureList extends BaseType
                         'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.faction', 's' => ', ft.A, ft.H, ft.factionId'],
                         'qse'    => ['j' => ['?_quests_startend qse ON qse.type = 1 AND qse.typeId = ct.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'ct.id'],
                         'qt'     => ['j' => '?_quests qt ON qse.questId = qt.id'],
-                        's'      => ['j' => '?_spawns s ON s.type = 1 AND s.typeId = ct.id']
+                        's'      => ['j' => ['?_spawns s ON s.type = 1 AND s.typeId = ct.id', true]]
                     );
 
     public function __construct($conditions = [], $miscData = null)

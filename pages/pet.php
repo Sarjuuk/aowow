@@ -169,7 +169,7 @@ class PetPage extends GenericPage
             [                                                   // last rank or unranked
                 'OR',
                 ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
-                ['s.rankId', 0]
+                ['s.rankNo', 0]
             ]
         );
 

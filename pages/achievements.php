@@ -121,7 +121,7 @@ class AchievementsPage extends GenericPage
         );
 
         // sort for dropdown-menus in filter
-        asort(Lang::game('si'));
+        Lang::sort('game', 'si');
     }
 
     protected function generateTitle()

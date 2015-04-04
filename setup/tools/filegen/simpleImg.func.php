@@ -1,13 +1,18 @@
 <?php
 
-
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
+
+if (!CLI)
+    die('not in cli mode');
 
 
     // note: for the sake of simplicity, this function handles all whole images (which are mostly icons)
     // quest icons from GossipFrame have an alphaChannel that cannot be handled by this script
     // lfgFrame/lfgIcon*.blp .. candidates for zonePage, but in general too detailed to scale them down from 128 to 56, 36, ect
+
+    $reqDBC = ['holidays', 'spellicon', 'itemdisplayinfo'];
+
     function simpleImg()
     {
         if (isset(FileGen::$cliOpts['help']))
@@ -22,22 +27,10 @@ if (!defined('AOWOW_REVISION'))
             return true;
         }
 
-        if (!class_exists('DBC'))
-        {
-            FileGen::status(' - simpleImg: required class DBC was not included', MSG_LVL_ERROR);
-            return false;
-        }
-
-        if (!function_exists('imagecreatefromblp'))
-        {
-            FileGen::status(' - simpleImg: required include imagecreatefromblp() was not included', MSG_LVL_ERROR);
-            return false;
-        }
-
-        $locStr   = '';
+        $locStr   = null;
         $groups   = [];
-        $dbcPath  = FileGen::$srcDir.'%sDBFilesClient/';
-        $imgPath  = FileGen::$srcDir.'%sInterface/';
+        $dbcPath  = CLISetup::$srcDir.'%sDBFilesClient/';
+        $imgPath  = CLISetup::$srcDir.'%sInterface/';
         $destDir  = 'static/images/wow/';
         $success  = true;
         $iconDirs = array(
@@ -154,36 +147,43 @@ if (!defined('AOWOW_REVISION'))
                     $ok = imagepng($dest, $name.'.'.$ext);
                     break;
                 default:
-                    FileGen::status($done.' - unsupported file fromat: '.$ext, MSG_LVL_WARN);
+                    CLISetup::log($done.' - unsupported file fromat: '.$ext, CLISetup::LOG_WARN);
             }
 
             imagedestroy($dest);
 
             if ($ok)
             {
-                chmod($name.'.'.$ext, FileGen::$accessMask);
-                FileGen::status($done.' - image '.$name.'.'.$ext.' written', MSG_LVL_OK);
+                chmod($name.'.'.$ext, CLISetup::FILE_ACCESS);
+                CLISetup::log($done.' - image '.$name.'.'.$ext.' written', CLISetup::LOG_OK);
             }
             else
-                FileGen::status($done.' - could not create image '.$name.'.'.$ext, MSG_LVL_ERROR);
+                CLISetup::log($done.' - could not create image '.$name.'.'.$ext, CLISetup::LOG_ERROR);
 
             return $ok;
         };
 
         $checkSourceDirs = function($sub, &$missing = []) use ($imgPath, $dbcPath, $paths)
         {
+            $hasMissing = false;
             foreach (array_column($paths, 0) as $subDir)
             {
                 $p = sprintf($imgPath, $sub).$subDir;
-                if (!FileGen::fileExists($p))
-                    $missing[] = $p;
+                if (!CLISetup::fileExists($p))
+                {
+                    $hasMissing = true;
+                    $missing[]  = $p;
+                }
             }
 
             $p = sprintf($dbcPath, $sub);
-            if (!FileGen::fileExists($p))
-                $missing[] = $p;
+            if (!CLISetup::fileExists($p))
+            {
+                $hasMissing = true;
+                $missing[]  = $p;
+            }
 
-            return !$missing;
+            return !$hasMissing;
         };
 
         if (isset(FileGen::$cliOpts['icons']))
@@ -203,25 +203,24 @@ if (!defined('AOWOW_REVISION'))
                 if (!in_array($k, $groups))
                     unset($paths[$k]);
 
-        foreach (FileGen::$localeIds as $l)
+        foreach (CLISetup::$expectedPaths as $xp => $__)
         {
-            if ($checkSourceDirs(Util::$localeStrings[$l].'/'))
+            if ($xp)                                        // if in subDir add trailing slash
+                $xp .= '/';
+
+            if ($checkSourceDirs($xp, $missing))
             {
-                $locStr = Util::$localeStrings[$l].'/';
+                $locStr = $xp;
                 break;
             }
         }
 
-        // manually check for enGB
-        if (!$locStr && $checkSourceDirs('enGB/'))
-            $locStr = 'enGB/';
-
-        // if no subdir had sufficient data, check mpq-root
-        if (!$locStr && !$checkSourceDirs('', $missing))
+        // if no subdir had sufficient data, diaf
+        if ($locStr === null)
         {
-            FileGen::status('one or more required directories are missing:', MSG_LVL_ERROR);
+            CLISetup::log('one or more required directories are missing:', CLISetup::LOG_ERROR);
             foreach ($missing as $m)
-                FileGen::status(' - '.$m, MSG_LVL_ERROR);
+                CLISetup::log(' - '.$m, CLISetup::LOG_ERROR);
 
             return;
         }
@@ -229,7 +228,7 @@ if (!defined('AOWOW_REVISION'))
         // init directories
         foreach (array_column($paths, 1) as $subDirs)
             foreach ($subDirs as $sd)
-                if (!FileGen::writeDir($destDir.$sd[0]))
+                if (!CLISetup::writeDir($destDir.$sd[0]))
                     $success = false;
 
         // ok, departure from std::procedure here
@@ -240,44 +239,42 @@ if (!defined('AOWOW_REVISION'))
 
         if (isset($paths[0]) || isset($paths[1]))           // generates icons or glyphs
         {
-            $spellIcon = new DBC('SpellIcon');
             if (isset($paths[0]) && !isset($paths[1]))
-                $siRows = $spellIcon->readFiltered(function(&$val) { return !stripos($val['iconPath'], 'glyph-rune'); });
+                $siRows = DB::Aowow()->selectCol('SELECT iconPath FROM dbc_spellicon WHERE iconPath NOT LIKE "glyph-rune"');
             else if (!isset($paths[0]) && isset($paths[1]))
-                $siRows = $spellIcon->readFiltered(function(&$val) { return  stripos($val['iconPath'], 'glyph-rune'); });
+                $siRows = DB::Aowow()->selectCol('SELECT iconPath FROM dbc_spellicon WHERE iconPath LIKE "glyph-rune"');
             else
-                $siRows = $spellIcon->readArbitrary();
+                $siRows = DB::Aowow()->selectCol('SELECT iconPath FROM dbc_spellicon');
 
-            foreach ($siRows as $row)
-                $dbcEntries[] = sprintf('setup/mpqdata/%s', $locStr).strtr($row['iconPath'], ['\\' => '/']).'.blp';
+            foreach ($siRows as $icon)
+                $dbcEntries[] = strtolower(sprintf('setup/mpqdata/%s', $locStr).strtr($icon, ['\\' => '/']).'.blp');
         }
 
         if (isset($paths[0]))
         {
-            $itemDisplayInfo = new DBC('ItemDisplayInfo');
-            foreach ($itemDisplayInfo->readArbitrary() as $row)
-                $dbcEntries[] = sprintf($imgPath, $locStr).'Icons/'.$row['inventoryIcon1'].'.blp';
+            $itemIcons = DB::Aowow()->selectCol('SELECT inventoryIcon1 FROM dbc_itemdisplayinfo WHERE inventoryIcon1 <> ""');
+            foreach ($itemIcons as $icon)
+                $dbcEntries[] = strtolower(sprintf($imgPath, $locStr).'Icons/'.$icon.'.blp');
 
-            $holidays = new DBC('Holidays');
-            $holiRows = $holidays->readFiltered(function(&$val) { return !empty($val['textureString']); });
-            foreach ($holiRows as $row)
-                $dbcEntries[] = sprintf($imgPath, $locStr).'Calendar/Holidays/'.$row['textureString'].'Start.blp';
+            $eventIcons = DB::Aowow()->selectCol('SELECT textureString FROM dbc_holidays WHERE textureString <> ""');
+            foreach ($eventIcons as $icon)
+                $dbcEntries[] = strtolower(sprintf($imgPath, $locStr).'Calendar/Holidays/'.$icon.'Start.blp');
         }
 
         // case-insensitive array_unique *vomits silently into a corner*
-        $dbcEntries = array_intersect_key($dbcEntries, array_unique(array_map('strtolower',$dbcEntries)));
+        $dbcEntries = array_intersect_key($dbcEntries, array_unique($dbcEntries));
 
         $allPaths = [];
         foreach ($paths as $i => $p)
         {
             $path = sprintf($imgPath, $locStr).$p[0];
-            if (!FileGen::fileExists($path))
+            if (!CLISetup::fileExists($path))
                 continue;
 
             $files    = glob($path.$p[2], GLOB_BRACE);
             $allPaths = array_merge($allPaths, $files);
 
-            FileGen::status('processing '.count($files).' files in '.$path.'...');
+            CLISetup::log('processing '.count($files).' files in '.$path.'...');
 
             $j = 0;
             foreach ($files as $f)
@@ -297,7 +294,7 @@ if (!defined('AOWOW_REVISION'))
                     else if (!$p[4])
                     {
                         $j += count($p[1]);
-                        FileGen::status('skipping extraneous file '.$img.' (+'.count($p[1]).')');
+                        CLISetup::log('skipping extraneous file '.$img.' (+'.count($p[1]).')');
                         continue;
                     }
                 }
@@ -318,7 +315,7 @@ if (!defined('AOWOW_REVISION'))
 
                                 if (!isset(FileGen::$cliOpts['force']) && file_exists($destDir.$info[0].$img.'.'.$info[1]))
                                 {
-                                    FileGen::status($done.' - file '.$info[0].$img.'.'.$info[1].' was already processed');
+                                    CLISetup::log($done.' - file '.$info[0].$img.'.'.$info[1].' was already processed');
                                     continue;
                                 }
 
@@ -359,10 +356,10 @@ if (!defined('AOWOW_REVISION'))
                             imagecopyresampled($dest, $src, 5, 0, 64 + 1, 32 + 1, 10, 16, 18, 28);
 
                             if (imagegif($dest, $destDir.$info[0].'quest_startend.gif'))
-                                FileGen::status('                extra - image '.$destDir.$info[0].'quest_startend.gif written', MSG_LVL_OK);
+                                CLISetup::log('                extra - image '.$destDir.$info[0].'quest_startend.gif written', CLISetup::LOG_OK);
                             else
                             {
-                                FileGen::status('                extra - could not create image '.$destDir.$info[0].'quest_startend.gif', MSG_LVL_ERROR);
+                                CLISetup::log('                extra - could not create image '.$destDir.$info[0].'quest_startend.gif', CLISetup::LOG_ERROR);
                                 $success = false;
                             }
 
@@ -381,7 +378,7 @@ if (!defined('AOWOW_REVISION'))
 
                         if (!isset(FileGen::$cliOpts['force']) && file_exists($destDir.$info[0].$img.'.'.$info[1]))
                         {
-                            FileGen::status($done.' - file '.$info[0].$img.'.'.$info[1].' was already processed');
+                            CLISetup::log($done.' - file '.$info[0].$img.'.'.$info[1].' was already processed');
                             continue;
                         }
 
@@ -419,9 +416,9 @@ if (!defined('AOWOW_REVISION'))
         if ($missing = array_diff(array_map('strtolower', $dbcEntries), array_map('strtolower', $allPaths)))
         {
             asort($missing);
-            FileGen::status('the following '.count($missing).' images where referenced by DBC but not in the mpqData directory. They may need to be converted by hand later on.', MSG_LVL_WARN);
+            CLISetup::log('the following '.count($missing).' images where referenced by DBC but not in the mpqData directory. They may need to be converted by hand later on.', CLISetup::LOG_WARN);
             foreach ($missing as $m)
-                FileGen::status(' - '.$m);
+                CLISetup::log(' - '.$m);
         }
 
         return $success;

@@ -3,10 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
 
-    // Create 'itemsets'-file for available locales
-    // this script requires the following dbc-files to be parsed and available
-    // GlyphProperties, Spells, SkillLineAbility
 
     /* Example
         "-447": {                                           // internal id, freely chosen
@@ -29,6 +28,9 @@ if (!defined('AOWOW_REVISION'))
         },
     */
 
+    // Create 'itemsets'-file for available locales
+    // this script requires the following dbc-files to be parsed and available
+
     function itemsets()
     {
         $success   = true;
@@ -37,10 +39,10 @@ if (!defined('AOWOW_REVISION'))
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
-            if (!FileGen::writeDir('datasets/'.$dir))
+            if (!CLISetup::writeDir('datasets/'.$dir))
                 $success = false;
 
-        foreach (FileGen::$localeIds as $lId)
+        foreach (CLISetup::$localeIds as $lId)
         {
             User::useLocale($lId);
             Lang::load(Util::$localeStrings[$lId]);
@@ -54,7 +56,7 @@ if (!defined('AOWOW_REVISION'))
                     'id'       => $set['id'],
                     'name'     => (7 - $set['quality']).Util::jsEscape(Util::localizedString($set, 'name')),
                     'pieces'   => [],
-                    'heroic'   => DB::Aowow()->SelectCell('SELECT IF (flags & 0x8, "true", "false") FROM ?_items WHERE id = ?d', $set['item1']),
+                    'heroic'   => !!$set['heroic'],         // should be bool
                     'maxlevel' => $set['maxLevel'],
                     'minlevel' => $set['minLevel'],
                     'type'     => $set['type'],
@@ -123,7 +125,7 @@ if (!defined('AOWOW_REVISION'))
             $toFile = "var g_itemsets = ".Util::toJSON($itemsetOut).";";
             $file   = 'datasets/'.User::$localeString.'/itemsets';
 
-            if (!FileGen::writeFile($file, $toFile))
+            if (!CLISetup::writeFile($file, $toFile))
                 $success = false;
         }
 

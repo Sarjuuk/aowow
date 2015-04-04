@@ -24,6 +24,9 @@ class AccountPage extends GenericPage
     protected $error     = '';
     protected $next      = '';
 
+    protected $lvTabs    = [];
+    protected $banned    = [];
+
     private   $_post     = array(
         'username'    => [FILTER_SANITIZE_SPECIAL_CHARS, 0xC], // FILTER_FLAG_STRIP_LOW | *_HIGH
         'password'    => [FILTER_UNSAFE_RAW, null],
@@ -196,7 +199,6 @@ class AccountPage extends GenericPage
         /* Ban Popup */
         /*************/
 
-        $this->banned = [];
         foreach ($bans as $b)
         {
             if (!($b['typeMask'] & (ACC_BAN_TEMP | ACC_BAN_PERM)) || ($b['end'] && $b['end'] <= time()))

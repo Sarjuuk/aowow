@@ -82,7 +82,7 @@ class NpcsPage extends GenericPage
         $this->lvTabs[] = $lv;
 
         // sort for dropdown-menus
-        asort(Lang::game('fa'));
+        Lang::sort('game', 'fa');
     }
 
     protected function generateTitle()

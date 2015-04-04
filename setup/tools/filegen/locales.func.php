@@ -3,6 +3,9 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+if (!CLI)
+    die('not in cli mode');
+
 
     // Create 'locale.js'-file in static/js
     // available locales have to be set in aowow.aowow_config
@@ -43,7 +46,7 @@ if (!defined('AOWOW_REVISION'))
                          "        }",
         );
 
-        foreach (FileGen::$localeIds as $l)
+        foreach (CLISetup::$localeIds as $l)
             if (isset($available[$l]))
                 $result[] = $available[$l];
 
