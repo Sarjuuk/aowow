@@ -2727,7 +2727,7 @@ var LANG = {
     message_sharetheurlbelow:     "Teilt die URL unten mit:",
     message_usernamemin:          "Euer Benutzername muss mindestens 4 Zeichen lang sein.",
     message_usernamenotvalid:     "Euer Benutzername kann nur aus Buchstaben und Zahlen bestehen.",
-    message_weightscalesaveerror: "Fehler: Eure individuelle Gewichtung konnte nicht gespeichert werden. Wowhead-Konten haben eine Beschränkung auf fünf individuelle Gewichtungen. Jede Gewichtung muss wenigstens ein Wertegewicht haben.",
+    message_weightscalesaveerror: "Fehler: Eure individuelle Gewichtung konnte nicht gespeichert werden. Konten haben eine Beschränkung auf fünf individuelle Gewichtungen. Jede Gewichtung muss wenigstens ein Wertegewicht haben.",
 
     comments:    "Kommentare",
     posts:       "Forenbeiträge",
@@ -2768,7 +2768,7 @@ var LANG = {
     prompt_ingamelink:      "Kopiert folgendes und gebt es in Euer Chatfenster im Spiel ein: ",
     prompt_linkurl:         "Bitte gebt den URL Eures Links ein: ",
     prompt_ratinglevel:     "Bitte gebt die Stufe an, die der Berechnung zugrunde liegt ($1 - $2): ",
-    prompt_signaturemarkup: "Kopiert folgendes und gebt es in Eure Wowhead-Signatur ein:",
+    prompt_signaturemarkup: "Kopiert folgendes und gebt es in Eure Signatur ein:",
     prompt_signaturedirect: "Kopiert folgendes, um dieses Bild direkt zu verlinken.",
     prompt_nameweightscale: "Bitte gebt einen Namen für diese Gewichtung ein.",
     prompt_tcbuild:         "Kopiert folgende URL, um diesen Talentbaum zu verlinken:",
@@ -3118,7 +3118,7 @@ var LANG = {
     markup_help2:   "Was Ihr seht:",
 
     ct_dialog_captcha:        "Bitte gebt den obigen Code ein: ",
-    ct_dialog_contactwowhead: "Wowhead kontaktieren",
+    ct_dialog_contactwowhead: "Kontaktiert uns",
     ct_dialog_description:    "Beschreibung",
     ct_dialog_desc_caption:   "Bitte seid so konkret wie möglich.",
     ct_dialog_email:          "E-Mail-Adresse: ",
@@ -3865,7 +3865,7 @@ var LANG = {
     },
 
     pr_notice:     'Zum ersten Mal hier? &ndash; Seid nicht schüchtern! Schaut ruhig mal auf unserer <a href="?help=profiler" target="_blank">Hilfeseite</a> (zurzeit noch unübersetzt) nach! &nbsp; <small class="q0"><a href="javascript:;">Schließen</a></small>',
-    pr_datasource: 'Daten in dieser Registerkarte wurden das letzte Mal $2 von <a href="?user=$1" target="_blank">$1</a> durch den <a href="?client" target="_blank">Wowhead-Client</a> aktualisiert.',
+    pr_datasource: 'Daten in dieser Registerkarte wurden das letzte Mal $2 von <a href="?user=$1" target="_blank">$1</a> aktualisiert.',
     pr_purgedata:  "Klickt, um alle Abschlussdaten in der aktuellen Registerkarte zu löschen.<br />Nur der Benuzter, der die Daten hochgeladen hat, darf sie löschen.",
 
     message_nocharacterselected: "Es wurden keine Charakter ausgewählt.",
@@ -3966,10 +3966,10 @@ var LANG = {
     pr_tt_earned2:  "$1 hat alle Bosse in dieser Instanz besiegt.",
     pr_tt_progress: "Fortschritt",
     pr_tt_obtained: "Gesamte Anzahl erhalten: $1",
-    pr_tt_nodata:   "Diese Statistiken sind nicht im Spiel erhältlich<br />und können nicht von Wowhead registriert werden.",
+    pr_tt_nodata:   "Diese Statistiken sind nicht im Spiel erhältlich<br />und können nicht registriert werden.",
     pr_tt_enchreq:  "Verzauberung benötigt Stufe $1",
     pr_tt_new:      '<b class="q">Neu</b><br />Erstellt ein komplett neues individuelles Profil.',
-    pr_tt_saveas:   '<b class="q">Speichern als</b><br />Speichert den aktuellen Charakter als ein individuelles Profil, das an Euer Wowhead-Konto gebunden ist.',
+    pr_tt_saveas:   '<b class="q">Speichern als</b><br />Speichert den aktuellen Charakter als ein individuelles Profil, das an Euer Konto gebunden ist.',
     pr_tt_resync:   '<b class="q">Resynchronisieren</b><br />Resynchronisiert den Charakter<br /> mit der aktuellen Version im Arsenal.',
     pr_tt_claim:    '<b class="q">Charakter in Besitz nehmen</b><br />Fügt diesen Charakter zu eurer Charakterliste hinzu.',
     pr_tt_include:  '<b class="q">Einschließen</b><br />Verschiebt die ausgewählten Einträge aus Eurer Ausschlussliste.',

@@ -1779,6 +1779,68 @@ div.live-search-icon-quest-horde {
     margin: 0 5px;
 }
 
+div.mapviewer {
+    padding: 10px 10px 0 10px;
+    background-color: #303030;
+    font-size: 13px;
+}
+
+div.mapviewer-screen {
+    background-color: black;
+    position: relative;
+    text-align: center;
+}
+
+div.mapviewer-screen a.mapviewer-cover {
+    display: block;
+    position: absolute;
+    z-index: 100;
+    top: 0;
+    margin: 0 auto;
+}
+
+a.mapviewer-cover {
+    text-decoration: none;
+    left: 325px;
+}
+
+a.mapviewer-cover b {
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 15px;
+    font-family: Tahoma, sans-serif !important;
+    font-weight: normal;
+    display: block;
+    height: 22px;
+    line-height: 22px;
+    padding-right: 24px;
+    color: #e0e0e0;
+    background: url(../images/icons/dialog_icons.gif) right -220px no-repeat;
+}
+
+div.mapviewer-screen a.mapviewer-cover span {
+    display: block;
+    position: absolute;
+    top: 10%;
+    padding: 10px;
+    background-color: #303030;
+}
+
+div.mapviewer-screen a.mapviewer-cover:hover span {
+    display: inline-block;
+}
+
+a.mapviewer-cover span {
+    position: static !important;
+    margin: 0 auto;
+}
+
+a.mapviewer-close {
+    float: right;
+    display: block;
+    padding: 10px 0 10px 10px;
+}
+
 /********/
 /* MENU */
 /********/

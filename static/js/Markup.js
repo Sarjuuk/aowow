@@ -1192,7 +1192,7 @@ var Markup = {
                 switch(attr.unnamed)
                 {
                     case 'map':
-                        url = '/maps=' + attr.zone;
+                        url = '?maps=' + attr.zone;
                         if(attr.floor)
                             url += '.' + attr.floor;
                         if(attr.pins)
