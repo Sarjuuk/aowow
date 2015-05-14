@@ -436,6 +436,7 @@ $lang = array(
         'titleReward'   => 'Deberías obtener el título "<a href="?title=%d">%s</a>"',
         'slain'         => "matado",
         'reqNumCrt'     => "Requiere",
+        'rfAvailable'   => "Disponible en reino:",
         '_transfer'     => 'Este logro será convertido a <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
     ),
     'race' => array(

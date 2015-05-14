@@ -435,6 +435,7 @@ $lang = array(
         'titleReward'   => 'Наградное звание: "<a href="?title=%d">%s</a>"',
         'slain'         => "убито",
         'reqNumCrt'     => "Требуется",
+        'rfAvailable'   => "[Available on realm]:",
         '_transfer'     => 'Этот предмет превратится в <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
     ),
     'race' => array(

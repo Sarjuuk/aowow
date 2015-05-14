@@ -4,6 +4,8 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
+// use as example. File is generated from setup.
+
 // -- Aowow Database --
 // contains world-data, user-data and logs
 $AoWoWconf['aowow'] = array(
@@ -36,14 +38,12 @@ $AoWoWconf['auth'] = array(
 
 // -- Characters Database --
 // used to display profiles
-$AoWoWconf['characters'][0] = array(
+$AoWoWconf['characters'][<realmId>] = array(
     'host'      => '127.0.0.1',
     'user'      => '<user>',
     'pass'      => '<pass>',
     'db'        => 'characters',
     'prefix'    => ''
 );
-// add other realms if necessary
-// $AoWoWconf['characters'][] = [];
 
 ?>

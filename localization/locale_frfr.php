@@ -60,7 +60,7 @@ $lang = array(
         'oneFilter'     => "Au moins un",
         'applyFilter'   => "Appliquer le filtre",
         'resetForm'     => "Rétablir",
-        'refineSearch'  => "Astuce : Affinez votre recherche en utilisant une <a href=\"javascript:;\" id=\"fi_subcat\">sous-catégorie</a>.",
+        'refineSearch'  => "Astuce : Affinez votre recherche en utilisant une <a href=\"javascript:;\" id=\"fi_subcat\">sous-catégorie</a>.",
         'clear'         => "effacer",
         'exactMatch'    => "Concordance exacte",
         '_reqLevel'     => "Niveau requis",
@@ -119,7 +119,7 @@ $lang = array(
         // help
         'help'          => "Aide",
         'helpTopics'    => array(
-            "Le guide du commentaire",              "Visionneuse 3D",                       "Captures d'écran : Trucs et astuces",  "Échelles de valeurs",
+            "Le guide du commentaire",              "Visionneuse 3D",                       "Captures d'écran : Trucs et astuces",  "Échelles de valeurs",
             "Calculateur de talents",               "Comparaison d'objets",                 "Profiler",                             "Markup Guide"
         ),
 
@@ -129,7 +129,7 @@ $lang = array(
         'foundResult'   => "Résultats de recherche pour",
         'noResult'      => "Aucun résultat pour malordawsne",
         'tryAgain'      => "Veuillez essayer d'autres mots ou vérifiez l'orthographe des termes de recherche.",
-        'ignoredTerms'  => "Les mots suivants ont été ignorés dans votre recherches : %s",
+        'ignoredTerms'  => "Les mots suivants ont été ignorés dans votre recherches : %s",
 
         // formating
         'colon'         => ' : ',
@@ -317,11 +317,11 @@ $lang = array(
 
         // recovery
         'recoverUser'   => "Demande de nom d'utilisateur",
-        'recoverPass'   => "Changement de mot de passe : Étape %s de 2",
+        'recoverPass'   => "Changement de mot de passe : Étape %s de 2",
         'newPass'       => "New Password",
 
         // creation
-        'register'      => "Enregistrement : Étape %s de 2",
+        'register'      => "Enregistrement : Étape %s de 2",
         'passConfirm'   => "Confirmez",
 
         // dashboard
@@ -430,11 +430,12 @@ $lang = array(
         'points'        => "Points",
         'series'        => "Série",
         'outOf'         => "sur",
-        'criteriaType'  => "Criterium Type-Id:",
+        'criteriaType'  => "Criterium Type-Id : ",
         'itemReward'    => "Vous recevrez",
         'titleReward'   => "Vous devriez recevoir le titre \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "tué",
         'reqNumCrt'     => "Nécessite",
+        'rfAvailable'   => "Disponibles sur les royaumes : ",
         '_transfer'     => 'Cet haut fait sera converti en <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
     ),
     'race' => array(
@@ -546,7 +547,7 @@ $lang = array(
                    1 => "Dun Morogh",                     41 => "Défilé de Deuillevent",        1537 => "Forgefer",                       12 => "Forêt d'Elwynn",                130 => "Forêt des Pins argentés",
                 1497 => "Fossoyeuse",                     51 => "Gorge des Vents brûlants",       45 => "Hautes-terres d'Arathi",       1519 => "Hurlevent",                      44 => "Les Carmines",
                   47 => "Les Hinterlands",                11 => "Les Paluns",                   3433 => "Les Terres fantômes",            38 => "Loch Modan",                   3487 => "Lune-d'argent",
-                 139 => "Maleterres de l'est",            28 => "Maleterres de l'ouest",        4298 => "Maleterres : l'enclave Écarlate", 8 => "Marais des Chagrins",            40 => "Marche de l'Ouest",
+                 139 => "Maleterres de l'est",            28 => "Maleterres de l'ouest",        4298 => "Maleterres : l'enclave Écarlate", 8 => "Marais des Chagrins",            40 => "Marche de l'Ouest",
                   25 => "Mont Rochenoire",                36 => "Montagnes d'Alterac",            46 => "Steppes ardentes",                4 => "Terres foudroyées",               3 => "Terres ingrates",
                 2257 => "Tram des profondeurs",           33 => "Vallée de Strangleronce",      4080 => "Île de Quel'Danas"
             ),
@@ -575,7 +576,7 @@ $lang = array(
                  -81 => "Guerrier",                     -161 => "Mage",                         -141 => "Paladin",                      -262 => "Prêtre",                       -162 => "Voleur"
             ),
             2 => array( "Donjons",
-                4494 => "Ahn'kahet : l'Ancien royaume", 4277 => "Azjol-Nérub",                   718 => "Cavernes des lamentations",    1196 => "Cime d'Utgarde",               2367 => "Contreforts de Hautebrande d'antan",
+                4494 => "Ahn'kahet : l'Ancien royaume", 4277 => "Azjol-Nérub",                   718 => "Cavernes des lamentations",    1196 => "Cime d'Utgarde",               2367 => "Contreforts de Hautebrande d'antan",
                 3790 => "Cryptes Auchenaï",              209 => "Donjon d'Ombrecroc",            206 => "Donjon d'Utgarde",             4196 => "Donjon de Drak'Tharon",        3845 => "Donjon de la Tempête",
                 4813 => "Fosse de Saron",                721 => "Gnomeregan",                   2437 => "Gouffre de Ragefeu",           1941 => "Grottes du temps",             4416 => "Gundrak",
                 2557 => "Hache-tripes",                  491 => "Kraal de Tranchebauge",        3848 => "L'Arcatraz",                   4228 => "L'Oculus",                     4100 => "L'Épuration de Stratholme",
@@ -893,7 +894,7 @@ $lang = array(
             "Épique",               "Légendaire",       "Artefact",             "Héritage"
         ),
         'trigger'       => array(
-            "Utilise : ",           "Équipé : ",        "Chances quand vous touchez : ", null,                  null,
+            "Utilise : ",           "Équipé : ",        "Chances quand vous touchez : ", null,                  null,
             null,                   null
         ),
         'bonding'       => array(

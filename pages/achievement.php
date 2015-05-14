@@ -99,9 +99,22 @@ class AchievementPage extends GenericPage
                 $infobox[] = Lang::main('side').Lang::main('colon').Lang::game('si', SIDE_BOTH);
         }
 
-        // todo (low): crosslink with charactersDB to check if realmFirsts are still available
+        // realm first available?
+        if ($this->subject->getField('flags') & 0x100 && DB::isConnectable(DB_AUTH))
+        {
+            $avlb = [];
+            foreach (DB::Auth()->selectCol('SELECT id AS ARRAY_KEY, name FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_VERSION) AS $rId => $name)
+            {
+                if (!DB::isConnectable(DB_CHARACTERS . $rId))
+                    continue;
 
-        $infobox = array_merge($infobox, Lang::getInfoBoxForFlags($this->subject->getField('cuFlags')));
+                if (!DB::Characters($rId)->selectCell('SELECT 1 FROM character_achievement WHERE achievement = ?d LIMIT 1', $this->typeId))
+                    $avlb[] = $name;
+            }
+
+            if ($avlb)
+                $infobox[] = Lang::achievement('rfAvailable').implode(', ', $avlb);
+        }
 
         /**********/
         /* Series */

@@ -432,6 +432,7 @@ $lang = array(
         'titleReward'   => 'You shall be granted the title "<a href="?title=%d">%s</a>"',
         'slain'         => "slain",
         'reqNumCrt'     => "Requires",
+        'rfAvailable'   => "Available on realm:",
         '_transfer'     => 'This achievement will be converted to <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
     ),
     'race' => array(

@@ -250,6 +250,7 @@ define('QUEST_CU_AUTO_ACCEPT',              0x20);
 define('QUEST_CU_PVP_ENABLED',              0x40);
 
 define('MAX_LEVEL',                         80);
+define('WOW_BUILD',                         12340);
 
 // Loot handles
 define('LOOT_FISHING',            'fishing_loot_template');

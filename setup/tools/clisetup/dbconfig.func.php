@@ -24,7 +24,7 @@ function dbconfig()
     );
     $testDB    = function($idx, $name, $dbInfo)
     {
-        $buff   = '['.CLISetup::bold($idx).'] '.str_pad($name, 12);
+        $buff   = '['.CLISetup::bold($idx).'] '.str_pad($name, 17);
         $errStr = '';
 
         if ($dbInfo['host'])
@@ -50,9 +50,7 @@ function dbconfig()
 
     foreach ($databases as $idx => $name)
     {
-        if ($name == 'characters' && empty($AoWoWconf[$name][0]))
-            $AoWoWconf[$name][0] = array_combine(array_keys($dbFields), ['', '', '', '', '']);
-        else if (empty($AoWoWconf[$name]))
+        if (empty($AoWoWconf[$name]) && $name != 'characters' )
             $AoWoWconf[$name] = array_combine(array_keys($dbFields), ['', '', '', '', '']);
     }
 
@@ -61,39 +59,50 @@ function dbconfig()
         CLISetup::log();
         CLISetup::log("select a numerical index to use the corresponding entry");
 
-        $charOffset = 0;
+        $nCharDBs = 0;
         foreach ($databases as $idx => $name)
         {
             if ($idx != 3)
                 CLISetup::log($testDB($idx, $name, $AoWoWconf[$name]));
             else
                 foreach ($AoWoWconf[$name] as $charIdx => $dbInfo)
-                    CLISetup::log($testDB($idx + $charOffset++, $name, $AoWoWconf[$name][$charIdx]));
+                    CLISetup::log($testDB($idx + $nCharDBs++, $name.' ['.$charIdx.']', $AoWoWconf[$name][$charIdx]));
         }
 
-        CLISetup::log("[".CLISetup::bold(3 + $charOffset)."] add an additional Character DB");
+        CLISetup::log("[".CLISetup::bold(3 + $nCharDBs)."] add an additional Character DB");
 
         while (true)
         {
             $inp = ['idx' => ['', true, '/\d/']];
             if (CLISetup::readInput($inp, true) && $inp)
             {
-                if (is_numeric($inp['idx']) && $inp['idx'] >= 0 && $inp['idx'] <= (3 + $charOffset))
+                if ($inp['idx'] >= 0 && $inp['idx'] <= (3 + $nCharDBs))
                 {
                     $curFields = $dbFields;
+
+                    if ($inp['idx'] == 3 + $nCharDBs)       // add new realmDB
+                        $curFields['realmId'] = ['Realm Id',  false, '/[1-9][0-9]*/'];
+
                     if (CLISetup::readInput($curFields))
                     {
+                        // auth, world or aowow
                         if ($inp['idx'] < 3)
                             $AoWoWconf[$databases[$inp['idx']]] = $curFields ?: array_combine(array_keys($dbFields), ['', '', '', '', '']);
-                        else if ($inp['idx'] == 3 + $charOffset)
+                        // new char DB
+                        else if ($inp['idx'] == 3 + $nCharDBs)
                         {
                             if ($curFields)
-                                $AoWoWconf[$databases[3]][] = $curFields;
+                            {
+                                $_ = $curFields['realmId'];
+                                unset($curFields['realmId']);
+                                $AoWoWconf[$databases[3]][$_] = $curFields;
+                            }
                         }
+                        // existing char DB
                         else
                         {
                             $i = 0;
-                            foreach ($AoWoWconf[$databases[3]] as $offset => &$dbInfo)
+                            foreach ($AoWoWconf[$databases[3]] as $realmId => &$dbInfo)
                             {
                                 if ($inp['idx'] - 3 != $i++)
                                     continue;
@@ -101,7 +110,7 @@ function dbconfig()
                                 if ($curFields)
                                     $dbInfo = $curFields;
                                 else
-                                    unset($AoWoWconf[$databases[3]][$offset]);
+                                    unset($AoWoWconf[$databases[3]][$realmId]);
                             }
                         }
 
