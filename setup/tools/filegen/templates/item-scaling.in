@@ -1,8 +1,8 @@
-$WH.g_convertRatingToPercent.RB = {/*setup:gtCombatRatings*/};
+$WH.g_convertRatingToPercent.RB = /*setup:itemScalingRB*/;
 
-$WH.g_convertScalingFactor.SV = {/*setup:scalingStatValues*/};
+$WH.g_convertScalingFactor.SV = /*setup:itemScalingSV*/;
 
-$WH.g_convertScalingFactor.SD = {/*setup:scalingStatDistribution*/};
+$WH.g_convertScalingFactor.SD = /*setup:itemScalingSD*/;
 
 if ($WH.isset('$WowheadPower')) {
     $WowheadPower.loadScales(3);

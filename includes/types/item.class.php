@@ -1321,7 +1321,7 @@ class ItemList extends BaseType
             if ($mask & (1 << $i))
                 $field = Util::$ssdMaskFields[$i];
 
-        return $field ? DB::Aowow()->selectCell("SELECT ?# FROM ?_scalingstatvalues WHERE charLevel = ?", $field, $this->ssd[$this->id]['maxLevel']) : 0;
+        return $field ? DB::Aowow()->selectCell("SELECT ?# FROM ?_scalingstatvalues WHERE id = ?", $field, $this->ssd[$this->id]['maxLevel']) : 0;
     }
 
     private function initScalingStats()

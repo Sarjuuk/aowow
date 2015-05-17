@@ -48,17 +48,14 @@ class Util
 
     public static $combatRatingToItemMod    = array(        // zero-indexed idx:CR; val:Mod
         null,           12,             13,             14,             15,             16,             17,             18,             19,
-        20,             21,             null,           null,           null,           null,           null,           null,           28,
+        20,             21,             22,             23,             24,             25,             26,             27,             28,
         29,             30,             null,           null,           null,           37,             44
     );
 
-    /* manual corrections
-        idx:35 => 25*1.15 => 28.75                              strange, this was not mentioned anywhere
-        idx:44 => 4,69512176513672/1.1 => 4,268292513760655     see: gtOCTclasscombatRatingScalar.dbc (also reflects changes to haste (+30% for sham, drui, ect))
-    */
+    # todo (high): find a sensible way to write data here on setup
     public static $gtCombatRatings          = array(
-        12 => 1.5,      13 => 12,       14 => 15,       15 => 5,        16 => 10,       17 => 10,       18 => 8,        19 => 14,       20 => 14,
-        21 => 14,       22 => 10,       23 => 10,       24 => 0,        25 => 0,        26 => 0,        27 => 0,        28 => 10,       29 => 10,
+        12 => 1.5,      13 => 13.8,     14 => 13.8,     15 => 5,        16 => 10,       17 => 10,       18 => 8,        19 => 14,       20 => 14,
+        21 => 14,       22 => 10,       23 => 10,       24 => 8,        25 => 0,        26 => 0,        27 => 0,        28 => 10,       29 => 10,
         30 => 10,       31 => 10,       32 => 14,       33 => 0,        34 => 0,        35 => 28.75,    36 => 10,       37 => 2.5,      44 => 4.268292513760655
     );
 
@@ -1020,25 +1017,16 @@ class Util
             ));
     }
 
+    // default back to enUS if localization unavailable
     public static function localizedString($data, $field, $silent = false)
     {
-        // default back to enUS if localization unavailable
-
         // default case: selected locale available
         if (!empty($data[$field.'_loc'.User::$localeId]))
             return $data[$field.'_loc'.User::$localeId];
 
         // locale not enUS; aowow-type localization available; add brackets if not silent
-        else if (User::$localeId != LOCALE_EN && isset($data[$field.'_loc0']) && !empty($data[$field.'_loc0']))
+        else if (User::$localeId != LOCALE_EN && !empty($data[$field.'_loc0']))
             return $silent ? $data[$field.'_loc0'] : '['.$data[$field.'_loc0'].']';
-
-        // OBSOLETE - locale not enUS; TC localization; add brackets if not silent
-        else if (User::$localeId != LOCALE_EN && isset($data[$field]) && !empty($data[$field]))
-            return $silent ? $data[$field] : '['.$data[$field].']';
-
-        // OBSOLETE - locale enUS; TC localization; return normal
-        else if (User::$localeId == LOCALE_EN && isset($data[$field]) && !empty($data[$field]))
-            return $data[$field];
 
         // nothing to find; be empty
         else
@@ -1048,7 +1036,7 @@ class Util
     // for item and spells
     public static function setRatingLevel($level, $type, $val)
     {
-        if (in_array($type, [ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING]) && $level < 34)
+        if (in_array($type, [ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING, ITEM_MOD_RESILIENCE_RATING]) && $level < 34)
             $level = 34;
 
         if (!isset(Util::$gtCombatRatings[$type]))

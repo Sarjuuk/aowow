@@ -29,7 +29,7 @@ class FileGen
         'searchboxBody'   => ['searchbox.html', 'static/widgets/searchbox/',      []],
         'realmMenu'       => ['profile_all.js', 'static/js/',                     ['realmlist']],
         'locales'         => ['locale.js',      'static/js/',                     []],
-    //  'itemScaling      => ['item-scaling',   'datasets/',                      []],  # provided 'as is', as dbc-content doesn't usualy change
+        'itemScaling'     => ['item-scaling',   'datasets/',                      []]
     );
     public static $datasets   = array(                      // name => [AowowDeps, TCDeps]
         'realms'      => [null, ['realmlist']],

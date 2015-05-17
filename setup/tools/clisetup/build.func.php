@@ -28,12 +28,23 @@ function build()
         // files with template
         foreach (FileGen::$tplFiles as $name => list($file, $destPath, $deps))
         {
+            $reqDBC = [];
+
             if (!in_array($name, FileGen::$subScripts))
                 continue;
 
             if (!file_exists(FileGen::$tplPath.$file.'.in'))
             {
                 CLISetup::log(sprintf(ERR_MISSING_FILE, FileGen::$tplPath.$file.'.in'), CLISetup::LOG_ERROR);
+                $allOk = false;
+                continue;
+            }
+
+            if (file_exists('setup/tools/filegen/'.$name.'.func.php'))
+                require_once 'setup/tools/filegen/'.$name.'.func.php';
+            else
+            {
+                CLISetup::log(sprintf(ERR_MISSING_INCL, $name, 'setup/tools/filegen/'.$name.'.func.php'), CLISetup::LOG_ERROR);
                 $allOk = false;
                 continue;
             }
@@ -49,21 +60,22 @@ function build()
                     // replace constants
                     $content = strtr($content, FileGen::$txtConstants);
 
+                    // check for required auxiliary DBC files
+                    foreach ($reqDBC as $req)
+                        if (!CLISetup::loadDBC($req))
+                            continue 2;
+
                     // must generate content
                     // PH format: /*setup:<setupFunc>*/
-                    if (preg_match('/\/\*setup:([\w\d_-]+)\*\//i', $content, $m))
+                    if (preg_match_all('/\/\*setup:([\w\-_]+)\*\//i', $content, $m))
                     {
-                        $content = '';
-                        if (file_exists('setup/tools/filegen/'.$m[1].'.func.php'))
+                        foreach ($m[1] as $func)
                         {
-                            require_once 'setup/tools/filegen/'.$m[1].'.func.php';
-                            if (function_exists($m[1]))
-                                $content = str_replace('/*setup:'.$m[1].'*/', $m[1](), $content);
+                            if (function_exists($func))
+                                $content = str_replace('/*setup:'.$func.'*/', $func(), $content);
                             else
                                 CLISetup::log('Placeholder in template file does not match any known function name.', CLISetup::LOG_ERROR);
                         }
-                        else
-                            CLISetup::log(sprintf(ERR_MISSING_INCL, $m[1], 'setup/tools/filegen/'.$m[1].'.func.php'), CLISetup::LOG_ERROR);
                     }
 
                     if (fWrite($dest, $content))
