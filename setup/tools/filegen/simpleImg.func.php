@@ -15,6 +15,32 @@ if (!CLI)
 
     function simpleImg()
     {
+        // prefer manually converted PNG files (as the imagecreatefromblp-script has issues with some formats)
+        // see: https://github.com/Kanma/BLPConverter
+        $loadImageFile = function($path)
+        {
+            $result = null;
+
+            if (in_array(substr($path, -4, 4), ['.png', '.blp']))
+                $path = substr($path, 0, strlen($path) - 4);
+
+            $file = $path.'.png';
+            if (CLISetup::fileExists($file))
+            {
+                CLISetup::log('manually converted png file present for '.$path.'.', CLISetup::LOG_WARN);
+                $result = imagecreatefrompng($file);
+            }
+
+            if (!$result)
+            {
+                $file = $path.'.blp';
+                if (CLISetup::fileExists($file))
+                    $result = imagecreatefromblp($file);
+            }
+
+            return $result;
+        };
+
         if (isset(FileGen::$cliOpts['help']))
         {
             echo "\n";
@@ -131,8 +157,11 @@ if (!CLI)
         {
             $ok   = false;
             $dest = imagecreatetruecolor($destDims['w'], $destDims['h']);
+
             imagesavealpha($dest, true);
-            imagealphablending($dest, false);
+            if ($ext == 'png')
+                imagealphablending($dest, false);
+
             imagecopyresampled($dest, $src, $destDims['x'], $destDims['x'], $srcDims['x'], $srcDims['y'], $destDims['w'], $destDims['h'], $srcDims['w'], $srcDims['h']);
 
             switch ($ext)
@@ -320,7 +349,7 @@ if (!CLI)
                                 }
 
                                 if (!$src)
-                                    $src = imagecreatefromblp($f);
+                                    $src = $loadImageFile($f);
 
                                 if (!$src)                              // error should be created by imagecreatefromblp
                                     continue;
@@ -383,7 +412,7 @@ if (!CLI)
                         }
 
                         if (!$src)
-                            $src = imagecreatefromblp($f);
+                            $src = $loadImageFile($f);
 
                         if (!$src)                              // error should be created by imagecreatefromblp
                             continue;

@@ -82,7 +82,10 @@ if (!CLI)
 
             $file = $path.'.png';
             if (CLISetup::fileExists($file))
+            {
+                CLISetup::log('manually converted png file present for '.$path.'.', CLISetup::LOG_WARN);
                 $result = imagecreatefrompng($file);
+            }
 
             if (!$result)
             {

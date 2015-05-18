@@ -113,7 +113,7 @@ function build()
                 $allOk = false;
 
             CLISetup::log(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLISetup::LOG_OK : CLISetup::LOG_ERROR);
-            set_time_limit(SqlGen::$defaultExecTime);      // reset to default for the next script
+            set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
         }
 
         // end
