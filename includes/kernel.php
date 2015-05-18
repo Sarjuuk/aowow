@@ -81,7 +81,7 @@ foreach ($sets as $k => $v)
     else if ($v['flags'] & CON_FLAG_TYPE_BOOL)
         $val = (bool)$v['value'];
     else if ($v['flags'] & CON_FLAG_TYPE_STRING)
-        $val = preg_replace('/[^\p{L}0-9~\s_\-\'\/\.,]/ui', '', $v['value']);
+        $val = preg_replace('/[^\p{L}0-9~\s_\-\'\/\.:,]/ui', '', $v['value']);
     else
     {
         Util::addNote(U_GROUP_ADMIN | U_GROUP_DEV, 'Kernel: '.($php ? 'PHP' : 'Aowow').' config value '.($php ? strtolower($k) : 'CFG_'.strtoupper($k)).' has no type set. Value forced to 0!');

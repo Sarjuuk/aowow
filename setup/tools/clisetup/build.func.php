@@ -42,12 +42,7 @@ function build()
 
             if (file_exists('setup/tools/filegen/'.$name.'.func.php'))
                 require_once 'setup/tools/filegen/'.$name.'.func.php';
-            else
-            {
-                CLISetup::log(sprintf(ERR_MISSING_INCL, $name, 'setup/tools/filegen/'.$name.'.func.php'), CLISetup::LOG_ERROR);
-                $allOk = false;
-                continue;
-            }
+            // else     not necessarily an error, may only need replacement of const text
 
             if (!CLISetup::writeDir($destPath))
                 continue;
@@ -74,14 +69,19 @@ function build()
                             if (function_exists($func))
                                 $content = str_replace('/*setup:'.$func.'*/', $func(), $content);
                             else
-                                CLISetup::log('Placeholder in template file does not match any known function name.', CLISetup::LOG_ERROR);
+                            {
+                                $allOk = false;
+                                CLISetup::log('No function for was registered for placeholder '.$func.'().', CLISetup::LOG_ERROR);
+                                if (!array_reduce(get_included_files(), function ($inArray, $itr) use ($func) { return $inArray || false !== strpos($itr, $func); }, false))
+                                    CLISetup::log('Also, expected include setup/tools/filegen/'.$name.'.func.php was not found.');
+                            }
                         }
                     }
 
                     if (fWrite($dest, $content))
                     {
                         CLISetup::log(sprintf(ERR_NONE, CLISetup::bold($destPath.$file)), CLISetup::LOG_OK);
-                        if ($content)
+                        if ($content && $allOk)
                             $ok = true;
                     }
                     else

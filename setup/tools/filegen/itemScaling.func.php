@@ -59,12 +59,12 @@ if (!CLI)
         $data = $ratings;
 
         $offsets = array_map(function ($v) {                // LookupEntry(cr*GT_MAX_LEVEL+level-1)
-            return abs($v) * 100 + 60 - 1;
+            return $v * 100 + 60 - 1;
         }, $ratings);
         $base = DB::Aowow()->selectCol('SELECT CAST((idx + 1 - 60) / 100 AS UNSIGNED) AS ARRAY_KEY, ratio FROM dbc_gtcombatratings WHERE idx IN (?a)', $offsets);
 
         $offsets = array_map(function ($v) {                // LookupEntry((getClass()-1)*GT_MAX_RATING+cr+1)
-            return (CLASS_WARRIOR - 1) * 32 + abs($v) + 1;
+            return (CLASS_WARRIOR - 1) * 32 + $v + 1;
         }, $ratings);
         $mods = DB::Aowow()->selectCol('SELECT idx - 1 AS ARRAY_KEY, ratio FROM dbc_gtoctclasscombatratingscalar WHERE idx IN (?a)', $offsets);
 
