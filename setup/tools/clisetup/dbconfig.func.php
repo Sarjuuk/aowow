@@ -64,7 +64,7 @@ function dbconfig()
         {
             if ($idx != 3)
                 CLISetup::log($testDB($idx, $name, $AoWoWconf[$name]));
-            else
+            else if (!empty($AoWoWconf[$name]))
                 foreach ($AoWoWconf[$name] as $charIdx => $dbInfo)
                     CLISetup::log($testDB($idx + $nCharDBs++, $name.' ['.$charIdx.']', $AoWoWconf[$name][$charIdx]));
         }

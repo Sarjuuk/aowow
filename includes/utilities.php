@@ -1028,6 +1028,14 @@ class Util
         else if (User::$localeId != LOCALE_EN && !empty($data[$field.'_loc0']))
             return $silent ? $data[$field.'_loc0'] : '['.$data[$field.'_loc0'].']';
 
+        // locale not enUS; TC localization; add brackets if not silent
+        else if (User::$localeId != LOCALE_EN && !empty($data[$field]))
+            return $silent ? $data[$field] : '['.$data[$field].']';
+
+        // locale enUS; TC localization; return normal
+        else if (User::$localeId == LOCALE_EN && !empty($data[$field]))
+            return $data[$field];
+
         // nothing to find; be empty
         else
             return '';
@@ -1143,10 +1151,9 @@ class Util
                     case 3:
                     case 7:
                         $spl = new SpellList(array(['s.id', $obj]));
-                        if ($spl->error)
-                            break;
+                        if (!$spl->error)
+                            Util::arraySumByKey($jsonStats, $spl->getStatGain()[$obj]);
 
-                        Util::arraySumByKey($jsonStats, $spl->getStatGain()[$obj]);
                         $obj = null;
                         break;
                     case 4:

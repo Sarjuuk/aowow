@@ -24,6 +24,22 @@ class AjaxHandler
             $this->get[$k] = Util::checkNumeric($v) ? $v : is_string($v) ? trim(urldecode($v)) : $v;
     }
 
+    private function get($var)
+    {
+        if (isset($this->get[$var]))
+            return $this->get[$var];
+
+        return null;
+    }
+
+    private function post($var)
+    {
+        if (isset($this->post[$var]))
+            return $this->post[$var];
+
+        return null;
+    }
+
     public function handle($what)
     {
         $f = 'handle'.ucFirst(str_replace(['-', '_'], '', $what));
@@ -40,11 +56,11 @@ class AjaxHandler
     */
     private function handleGotocomment()
     {
-        if (empty($this->get['id']))
+        if (!$this->get('id'))
             return;
 
-        if ($_ = DB::Aowow()->selectRow('SELECT IFNULL(c2.id, c1.id) AS id, IFNULL(c2.type, c1.type) AS type, IFNULL(c2.typeId, c1.typeId) AS typeId FROM ?_comments c1 LEFT JOIN ?_comments c2 ON c1.replyTo = c2.id WHERE c1.id = ?d', $this->get['id']))
-            header('Location: ?'.Util::$typeStrings[$_['type']].'='.$_['typeId'].'#comments:id='.$_['id'].($_['id'] != $this->get['id'] ? ':reply='.$this->get['id'] : null), true, 302);
+        if ($_ = DB::Aowow()->selectRow('SELECT IFNULL(c2.id, c1.id) AS id, IFNULL(c2.type, c1.type) AS type, IFNULL(c2.typeId, c1.typeId) AS typeId FROM ?_comments c1 LEFT JOIN ?_comments c2 ON c1.replyTo = c2.id WHERE c1.id = ?d', $this->get('id')))
+            header('Location: ?'.Util::$typeStrings[$_['type']].'='.$_['typeId'].'#comments:id='.$_['id'].($_['id'] != $this->get('id') ? ':reply='.$this->get('id') : null), true, 302);
     }
 
     /* responses
@@ -52,8 +68,8 @@ class AjaxHandler
     */
     private function handleData()
     {
-        if (isset($this->get['locale']) && is_numeric($this->get['locale']))
-            User::useLocale($this->get['locale']);
+        if (is_numeric($this->get('locale')))
+            User::useLocale($this->get('locale'));
 
         $result = '';
 
@@ -62,7 +78,7 @@ class AjaxHandler
         {
             // requires valid token to hinder automated access
             if ($set != 'item-scaling')
-                if (empty($this->get['t']) || empty($_SESSION['dataKey']) || $this->get['t'] != $_SESSION['dataKey'])
+                if (!$this->get('t') || empty($_SESSION['dataKey']) || $this->get('t') != $_SESSION['dataKey'])
                     continue;
 
             switch ($set)
@@ -85,7 +101,7 @@ class AjaxHandler
                     // &partial: im not doing this right
                     // it expects a full quest dump on first lookup but will query subCats again if clicked..?
                     // for now omiting the detail clicks with empty results and just set catg update
-                    $catg = isset($this->get['catg']) ? $this->get['catg'] : 'null';
+                    $catg = $this->get('catg') ?: 'null';
                     if ($catg == 'null')
                         $result .= $this->data_loadProfilerData($set);
                     else if ($this->data_isLoadOnDemand())
@@ -93,10 +109,10 @@ class AjaxHandler
 
                     break;
                 case 'recipes':
-                    if (!$this->data_isLoadOnDemand() || empty($this->get['skill']))
+                    if (!$this->data_isLoadOnDemand() || !$this->get('skill'))
                         break;
 
-                    $skills = array_intersect(explode(',', $this->get['skill']), [171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356]);
+                    $skills = array_intersect(explode(',', $this->get('skill')), [171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356]);
                     if (!$skills)
                         break;
 
@@ -121,8 +137,8 @@ class AjaxHandler
                     break;
                 // localized
                 case 'talents':
-                    if (isset($this->get['class']))
-                        $set .= "-".intVal($this->get['class']);
+                    if ($_ = $this->get('class'))
+                        $set .= "-".intVal($_);
                 case 'pet-talents':
                 case 'glyphs':
                 case 'gems':
@@ -205,14 +221,14 @@ class AjaxHandler
     */
     private function handleContactus()
     {
-        $mode = @$this->post['mode'];
-        $rsn  = @$this->post['reason'];
-        $ua   = @$this->post['ua'];
-        $app  = @$this->post['appname'];
-        $url  = @$this->post['page'];
-        $desc = @$this->post['desc'];
+        $mode = $this->post('mode');
+        $rsn  = $this->post('reason');
+        $ua   = $this->post('ua');
+        $app  = $this->post('appname');
+        $url  = $this->post('page');
+        $desc = $this->post('desc');
 
-        $subj = @intVal($this->post['id']);
+        $subj = intVal($this->post('id'));
 
         $contexts = array(
             [1, 2, 3, 4, 5, 6, 7, 8],
@@ -258,10 +274,10 @@ class AjaxHandler
         if ($subj)
             $update['subject'] = $subj;
 
-        if ($_ = @$this->post['relatedurl'])
+        if ($_ = $this->post('relatedurl'))
             $update['relatedurl'] = $_;
 
-        if ($_ = @$this->post['email'])
+        if ($_ = $this->post('email'))
             $update['email'] = $_;
 
         if (DB::Aowow()->query('INSERT INTO ?_reports (?#) VALUES (?a)', array_keys($update), array_values($update)))
@@ -286,16 +302,16 @@ class AjaxHandler
         switch ($this->params[0])
         {
             case 'add':                                     // i .. have problems believing, that everything uses nifty ajax while adding comments requires a brutal header(Loacation: <wherever>), yet, thats how it is
-                if (empty($this->get['typeid']) || empty($this->get['type']) || !isset(Util::$typeStrings[$this->get['type']]))
+                if (!$this->get('typeid') || !$this->get('type') || !isset(Util::$typeStrings[$this->get('type')]))
                     return;                                 // whatever, we cant even send him back
 
                 // trim to max length
-                if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->post['commentbody']) > $_maxCmt)
-                    $this->post['body'] = substr($this->post['body'], 0, $_maxCmt);
+                if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->post('commentbody')) > $_maxCmt)
+                    $this->post['body'] = substr($this->post('body'), 0, $_maxCmt);
 
-                if (User::canComment() && !empty($this->post['commentbody']) && mb_strlen($this->post['commentbody']) >= $_minCmt)
+                if (User::canComment() && !empty($this->post('commentbody')) && mb_strlen($this->post('commentbody')) >= $_minCmt)
                 {
-                    if ($postIdx = DB::Aowow()->query('INSERT INTO ?_comments (type, typeId, userId, roles, body, date) VALUES (?d, ?d, ?d, ?d, ?, UNIX_TIMESTAMP())', $this->get['type'], $this->get['typeid'], User::$id, User::$groups, $this->post['commentbody']))
+                    if ($postIdx = DB::Aowow()->query('INSERT INTO ?_comments (type, typeId, userId, roles, body, date) VALUES (?d, ?d, ?d, ?d, ?, UNIX_TIMESTAMP())', $this->get('type'), $this->get('typeid'), User::$id, User::$groups, $this->post('commentbody')))
                     {
                         Util::gainSiteReputation(User::$id, SITEREP_ACTION_COMMENT, ['id' => $postIdx]);
 
@@ -303,47 +319,47 @@ class AjaxHandler
                         DB::Aowow()->query('INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, 0, 1)', $postIdx);
 
                         // flag target with hasComment (if filtrable)
-                        if ($tbl = Util::getCCTableParent($this->get['type']))
-                            DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $this->get['typeid']);
+                        if ($tbl = Util::getCCTableParent($this->get('type')))
+                            DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $this->get('typeid'));
                     }
                 }
 
-                header('Location: ?'.Util::$typeStrings[$this->get['type']].'='.$this->get['typeid'].'#comments', true, 302);
+                header('Location: ?'.Util::$typeStrings[$this->get('type')].'='.$this->get('typeid').'#comments', true, 302);
                 break;
             case 'edit':
-                if ((!User::canComment() && !User::isInGroup(U_GROUP_MODERATOR)) || empty($this->get['id']) || empty($this->post['body']))
+                if ((!User::canComment() && !User::isInGroup(U_GROUP_MODERATOR)) || !$this->get('id') || !$this->post('body'))
                     break;
 
-                if (mb_strlen($this->post['body']) < $_minCmt)
+                if (mb_strlen($this->post('body')) < $_minCmt)
                     break;
 
                 // trim to max length
-                if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->post['body']) > $_maxCmt)
-                    $this->post['body'] = substr($this->post['body'], 0, $_maxCmt);
+                if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->post('body')) > $_maxCmt)
+                    $this->post['body'] = substr($this->post('body'), 0, $_maxCmt);
 
                 $update = array(
-                    'body'       => $this->post['body'],
+                    'body'       => $this->post('body'),
                     'editUserId' => User::$id,
                     'editDate'   => time()
                 );
 
                 if (User::isInGroup(U_GROUP_MODERATOR))
                 {
-                    $update['responseBody']   = empty($this->post['response']) ? '' : $this->post['response'];
-                    $update['responseUserId'] = empty($this->post['response']) ? 0  : User::$id;
-                    $update['responseRoles']  = empty($this->post['response']) ? 0  : User::$groups;
+                    $update['responseBody']   = !$this->post('response') ? '' : $this->post('response');
+                    $update['responseUserId'] = !$this->post('response') ? 0  : User::$id;
+                    $update['responseRoles']  = !$this->post('response') ? 0  : User::$groups;
                 }
 
-                DB::Aowow()->query('UPDATE ?_comments SET editCount = editCount + 1, ?a WHERE id = ?d', $update, $this->get['id']);
+                DB::Aowow()->query('UPDATE ?_comments SET editCount = editCount + 1, ?a WHERE id = ?d', $update, $this->get('id'));
                 break;
             case 'delete':                                  // user.js uses GET; global.js uses POST
-                if (empty($this->post['id']) && empty($this->get['id']))
+                if (!$this->post('id') && !$this->get('id'))
                     break;
 
                 $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags | ?d, deleteUserId = ?d, deleteDate = UNIX_TIMESTAMP() WHERE id = ?d{ AND userId = ?d}',
                     CC_FLAG_DELETED,
                     User::$id,
-                    empty($this->post['id']) ? $this->get['id'] : $this->post['id'],
+                    $this->post('id') ?: $this->get('id'),
                     User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
                 );
 
@@ -352,7 +368,7 @@ class AjaxHandler
                 {
                     $coInfo = DB::Aowow()->selectRow('SELECT IF(BIT_OR(~b.flags) & ?d, 1, 0) as hasMore, b.type, b.typeId FROM ?_comments a JOIN ?_comments b ON a.type = b.type AND a.typeId = b.typeId WHERE a.id = ?d',
                         CC_FLAG_DELETED,
-                        empty($this->post['id']) ? $this->get['id'] : $this->post['id']
+                        $this->post('id') ?: $this->get('id')
                     );
 
                     if (!$coInfo['hasMore'] && ($tbl = Util::getCCTableParent($coInfo['type'])))
@@ -361,52 +377,52 @@ class AjaxHandler
 
                 break;
             case 'undelete':                                // user.js uses GET; global.js uses POST
-                if (empty($this->post['id']) && empty($this->get['id']))
+                if (!$this->post('id') && !$this->get('id'))
                     break;
 
                 $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id = ?d{ AND userId = deleteUserId AND deleteUserId = ?d}',
                     CC_FLAG_DELETED,
-                    empty($this->post['id']) ? $this->get['id'] : $this->post['id'],
+                    $this->post('id') ?: $this->get('id'),
                     User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
                 );
 
                 // reflag hasComment (if filtrable)
                 if ($ok)
                 {
-                    $coInfo = DB::Aowow()->selectRow('SELECT type, typeId FROM ?_comments WHERE id = ?d', empty($this->post['id']) ? $this->get['id'] : $this->post['id']);
+                    $coInfo = DB::Aowow()->selectRow('SELECT type, typeId FROM ?_comments WHERE id = ?d', $this->post('id') ?: $this->get('id'));
                     if ($tbl = Util::getCCTableParent($coInfo['type']))
                         DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
                 }
 
                 break;
             case 'rating':                                  // up/down - distribution
-                if (empty($this->get['id']))
+                if (!$this->get('id'))
                 {
                     $result = ['success' => 0];
                     break;
                 }
 
-                if ($votes = DB::Aowow()->selectRow('SELECT 1 AS success, SUM(IF(value > 0, value, 0)) AS up, SUM(IF(value < 0, -value, 0)) AS down FROM ?_comments_rates WHERE commentId = ?d GROUP BY commentId', $this->get['id']))
+                if ($votes = DB::Aowow()->selectRow('SELECT 1 AS success, SUM(IF(value > 0, value, 0)) AS up, SUM(IF(value < 0, -value, 0)) AS down FROM ?_comments_rates WHERE commentId = ?d GROUP BY commentId', $this->get('id')))
                     return json_encode($votes, JSON_NUMERIC_CHECK);
 
                 $result = ['success' => 1, 'up' => 0, 'down' => 0];
                 break;
             case 'vote':                                    // up, down and remove
-                if (!User::$id || empty($this->get['id']) || empty($this->get['rating']))
+                if (!User::$id || !$this->get('id') || $this->get('rating'))
                 {
                     $result = ['error' => 1, 'message' => Lang::main('genericError')];
                     break;
                 }
 
-                $target = DB::Aowow()->selectRow('SELECT c.userId AS owner, cr.value FROM ?_comments c LEFT JOIN ?_comments_rates cr ON cr.commentId = c.id AND cr.userId = ?d WHERE c.id = ?d', User::$id, $this->get['id']);
+                $target = DB::Aowow()->selectRow('SELECT c.userId AS owner, cr.value FROM ?_comments c LEFT JOIN ?_comments_rates cr ON cr.commentId = c.id AND cr.userId = ?d WHERE c.id = ?d', User::$id, $this->get('id'));
                 $val    = User::canSupervote() ? 2 : 1;
-                if ($this->get['rating'] < 0)
+                if ($this->get('rating') < 0)
                     $val *= -1;
 
                 if (User::getCurDailyVotes() <= 0)
                     $result = ['error' => 1, 'message' => Lang::main('tooManyVotes')];
 
-                else if (!$target || $val != $this->get['rating'])
+                else if (!$target || $val != $this->get('rating'))
                     $result = ['error' => 1, 'message' => Lang::main('genericError')];
 
                 else if (($val > 0 && !User::canUpvote()) || ($val < 0 && !User::canDownvote()))
@@ -418,9 +434,9 @@ class AjaxHandler
                 $ok = false;
                 // old and new have same sign; undo vote (user may have gained/lost access to superVote in the meantime)
                 if ($target['value'] && ($target['value'] < 0) == ($val < 0))
-                    $ok = DB::Aowow()->query('DELETE FROM ?_comments_rates WHERE commentId = ?d AND userId = ?d', $this->get['id'], User::$id);
+                    $ok = DB::Aowow()->query('DELETE FROM ?_comments_rates WHERE commentId = ?d AND userId = ?d', $this->get('id'), User::$id);
                 else                                        // replace, because we may be overwriting an old, opposing vote
-                    if ($ok = DB::Aowow()->query('REPLACE INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)', (int)$this->get['id'], User::$id, $val))
+                    if ($ok = DB::Aowow()->query('REPLACE INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)', (int)$this->get('id'), User::$id, $val))
                         User::decrementDailyVotes();        // do not refund retracted votes!
 
                 if (!$ok)
@@ -430,24 +446,24 @@ class AjaxHandler
                 }
 
                 if ($val > 0)                               // gain rep
-                    Util::gainSiteReputation($target['owner'], SITEREP_ACTION_UPVOTED, ['id' => $this->get['id'], 'voterId' => User::$id]);
+                    Util::gainSiteReputation($target['owner'], SITEREP_ACTION_UPVOTED, ['id' => $this->get('id'), 'voterId' => User::$id]);
                 else if ($val < 0)
-                    Util::gainSiteReputation($target['owner'], SITEREP_ACTION_DOWNVOTED, ['id' => $this->get['id'], 'voterId' => User::$id]);
+                    Util::gainSiteReputation($target['owner'], SITEREP_ACTION_DOWNVOTED, ['id' => $this->get('id'), 'voterId' => User::$id]);
 
                 $result = ['error' => 0];
                 break;
             case 'sticky':                                  // toggle flag
-                if (empty($this->post['id']) || !User::isInGroup(U_GROUP_MODERATOR))
+                if (!$this->post('id') || !User::isInGroup(U_GROUP_MODERATOR))
                     break;
 
-                if (!empty($this->post['sticky']))
-                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  ?d WHERE id = ?d', CC_FLAG_STICKY, $this->post['id']);
+                if ($this->post('sticky'))
+                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  ?d WHERE id = ?d', CC_FLAG_STICKY, $this->post('id'));
                 else
-                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id = ?d', CC_FLAG_STICKY, $this->post['id']);
+                    DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id = ?d', CC_FLAG_STICKY, $this->post('id'));
 
                 break;
             case 'out-of-date':                             // toggle flag
-                if (empty($this->post['id']))
+                if (!$this->post('id'))
                 {
                     $result = 'The comment does not exist.';
                     break;
@@ -456,12 +472,12 @@ class AjaxHandler
                 $ok = false;
                 if (User::isInGroup(U_GROUP_MODERATOR))     // directly mark as outdated
                 {
-                    if (empty($this->post['remove']))
-                        $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  0x4 WHERE id = ?d', $this->post['id']);
+                    if (!$this->post('remove'))
+                        $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  0x4 WHERE id = ?d', $this->post('id'));
                     else
-                        $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~0x4 WHERE id = ?d', $this->post['id']);
+                        $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~0x4 WHERE id = ?d', $this->post('id'));
                 }
-                else if (User::$id && empty($this->post['reason']) || mb_strlen($this->post['reason']) < 15)
+                else if (User::$id && !$this->post('reason') || mb_strlen($this->post('reason')) < 15)
                 {
                     $result = 'Your message is too short.';
                     break;
@@ -471,7 +487,7 @@ class AjaxHandler
                     $ok = DB::Aowow()->query(
                         'INSERT INTO ?_reports (userId, mode, reason, subject, ip, description, userAgent, appName) VALUES (?d, 1, 17, ?d, ?, "<automated comment report>", ?, ?)',
                         User::$id,
-                        $this->post['id'],
+                        $this->post('id'),
                         User::$ip,
                         $_SERVER['HTTP_USER_AGENT'],
                         get_browser(null, true)['browser']
@@ -484,20 +500,20 @@ class AjaxHandler
                 $result = Lang::main('genericError');
                 break;
             case 'show-replies':
-                $result = empty($this->get['id']) ? [] : CommunityContent::getCommentReplies($this->get['id']);
+                $result = !$this->get('id') ? [] : CommunityContent::getCommentReplies($this->get('id'));
                 break;
             case 'add-reply':                               // also returns all replies on success
                 if (!User::canComment())
                     $result = 'You are not allowed to reply.';
 
-                else if (empty($this->post['body']) || mb_strlen($this->post['body']) < $_minRpl || mb_strlen($this->post['body']) > $_maxRpl)
-                    $result = 'Your reply has '.mb_strlen(@$this->post['body']).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
+                else if (!$this->post('body') || mb_strlen($this->post('body')) < $_minRpl || mb_strlen($this->post('body')) > $_maxRpl)
+                    $result = 'Your reply has '.mb_strlen($this->post('body')).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
 
-                else if (empty($this->post['commentId']) || !DB::Aowow()->selectCell('SELECT 1 FROM ?_comments WHERE id = ?d', $this->post['commentId']))
+                else if (!$this->post('commentId') || !DB::Aowow()->selectCell('SELECT 1 FROM ?_comments WHERE id = ?d', $this->post('commentId')))
                     $result = Lang::main('genericError');
 
-                else if (DB::Aowow()->query('INSERT INTO ?_comments (`userId`, `roles`, `body`, `date`, `replyTo`) VALUES (?d, ?d, ?, UNIX_TIMESTAMP(), ?d)', User::$id, User::$groups, $this->post['body'], $this->post['commentId']))
-                    $result = CommunityContent::getCommentReplies($this->post['commentId']);
+                else if (DB::Aowow()->query('INSERT INTO ?_comments (`userId`, `roles`, `body`, `date`, `replyTo`) VALUES (?d, ?d, ?, UNIX_TIMESTAMP(), ?d)', User::$id, User::$groups, $this->post('body'), $this->post('commentId')))
+                    $result = CommunityContent::getCommentReplies($this->post('commentId'));
 
                 else
                     $result = Lang::main('genericError');
@@ -507,48 +523,48 @@ class AjaxHandler
                 if (!User::canComment())
                     $result = 'You are not allowed to reply.';
 
-                else if (empty($this->post['replyId']) || empty($this->post['commentId']))
+                else if (!$this->post('replyId') || $this->post('commentId'))
                     $result = Lang::main('genericError');
 
-                else if (empty($this->post['body']) || mb_strlen($this->post['body']) < $_minRpl || mb_strlen($this->post['body']) > $_maxRpl)
-                    $result = 'Your reply has '.mb_strlen(@$this->post['body']).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
+                else if (!$this->post('body') || mb_strlen($this->post('body')) < $_minRpl || mb_strlen($this->post('body')) > $_maxRpl)
+                    $result = 'Your reply has '.mb_strlen($this->post('body')).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
 
                 if ($result)
                     break;
 
                 $ok = DB::Aowow()->query(
                     'UPDATE ?_comments SET body = ?, editUserId = ?d, editDate = UNIX_TIMESTAMP(), editCount = editCount + 1 WHERE id = ?d AND replyTo = ?d{ AND userId = ?d}',
-                    $this->post['body'],
+                    $this->post('body'),
                     User::$id,
-                    $this->post['replyId'],
-                    $this->post['commentId'],
+                    $this->post('replyId'),
+                    $this->post('commentId'),
                     User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
                 );
 
-                $result = $ok ? CommunityContent::getCommentReplies($this->post['commentId']) : Lang::main('genericError');
+                $result = $ok ? CommunityContent::getCommentReplies($this->post('commentId')) : Lang::main('genericError');
                 break;
             case 'detach-reply':
-                if (!User::isInGroup(U_GROUP_MODERATOR) || empty($this->post['id']))
+                if (!User::isInGroup(U_GROUP_MODERATOR) || !$this->post('id'))
                     break;
 
-                DB::Aowow()->query('UPDATE ?_comments c1, ?_comments c2 SET c1.replyTo = 0, c1.type = c2.type, c1.typeId = c2.typeId WHERE c1.replyTo = c2.id AND c1.id = ?d', $this->post['id']);
+                DB::Aowow()->query('UPDATE ?_comments c1, ?_comments c2 SET c1.replyTo = 0, c1.type = c2.type, c1.typeId = c2.typeId WHERE c1.replyTo = c2.id AND c1.id = ?d', $this->post('id'));
                 break;
             case 'delete-reply':
-                if (!User::$id || empty($this->post['id']))
+                if (!User::$id || !$this->post('id'))
                     break;
 
-                if (DB::Aowow()->query('DELETE FROM ?_comments WHERE id = ?d{ AND userId = ?d}', $this->post['id'], User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id))
-                    DB::Aowow()->query('DELETE FROM ?_comments_rates WHERE commentId = ?d', $this->post['id']);
+                if (DB::Aowow()->query('DELETE FROM ?_comments WHERE id = ?d{ AND userId = ?d}', $this->post('id'), User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id))
+                    DB::Aowow()->query('DELETE FROM ?_comments_rates WHERE commentId = ?d', $this->post('id'));
 
                 break;
             case 'flag-reply':
-                if (!User::$id || empty($this->post['id']))
+                if (!User::$id || $this->post('id'))
                     break;
 
                 DB::Aowow()->query(
                     'INSERT INTO ?_reports (userId, mode, reason, subject, ip, description, userAgent, appName) VALUES (?d, 1, 19, ?d, ?, "<automated commentreply report>", ?, ?)',
                     User::$id,
-                    $this->post['id'],
+                    $this->post('id'),
                     User::$ip,
                     $_SERVER['HTTP_USER_AGENT'],
                     get_browser(null, true)['browser']
@@ -556,12 +572,12 @@ class AjaxHandler
 
                 break;
             case 'upvote-reply':
-                if (empty($this->post['id']) || !User::canUpvote())
+                if (!$this->post('id') || !User::canUpvote())
                     break;
 
                 $ok = DB::Aowow()->query(
                     'INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)',
-                    $this->post['id'],
+                    $this->post('id'),
                     User::$id,
                     User::canSupervote() ? 2 : 1
                 );
@@ -571,12 +587,12 @@ class AjaxHandler
 
                 break;
             case 'downvote-reply':
-                if (empty($this->post['id']) || !User::canUpvote())
+                if (!$this->post('id') || !User::canUpvote())
                     break;
 
                 $ok = DB::Aowow()->query(
                     'INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)',
-                    $this->post['id'],
+                    $this->post('id'),
                     User::$id,
                     User::canSupervote() ? -2 : -1
                 );
@@ -605,11 +621,11 @@ class AjaxHandler
         {
             case 'exclude':
                 // profiler completion exclude handler
-                // $this->post['groups'] = bitMask of excludeGroupIds when using .. excludeGroups .. duh
+                // $this->post('groups') = bitMask of excludeGroupIds when using .. excludeGroups .. duh
                 // should probably occur in g_user.excludegroups (dont forget to also set g_users.settings = {})
                 return '';
             case 'weightscales':
-                if (isset($this->post['save']))
+                if (!$this->post('save'))
                 {
                     if (!isset($this->post['id']))
                     {
@@ -620,13 +636,13 @@ class AjaxHandler
                             return 0;
                     }
 
-                    if (DB::Aowow()->query('REPLACE INTO ?_account_weightscales VALUES (?d, ?d, ?, ?)', intVal($this->post['id']), User::$id, $this->post['name'], $this->post['scale']))
-                        return $this->post['id'];
+                    if (DB::Aowow()->query('REPLACE INTO ?_account_weightscales VALUES (?d, ?d, ?, ?)', intVal($this->post('id')), User::$id, $this->post('name'), $this->post('scale')))
+                        return $this->post('id');
                     else
                         return 0;
                 }
-                else if (isset($this->post['delete']) && isset($this->post['id']))
-                    DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', intVal($this->post['id']), User::$id);
+                else if ($this->post('delete') && $this->post('id'))
+                    DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', intVal($this->post('id')), User::$id);
                 else
                     return 0;
         }
@@ -637,7 +653,7 @@ class AjaxHandler
 
     private function handleAdmin()
     {
-        if (empty($this->get['action']) || !$this->params)
+        if (!$this->get('action') || !$this->params)
             return null;
 
         if ($this->params[0] == 'screenshots')
@@ -645,7 +661,7 @@ class AjaxHandler
             if (!User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT))  // comment_mod, handleSSmod, vi_mod ?
                 return null;
 
-            switch ($this->get['action'])
+            switch ($this->get('action'))
             {
                 case 'list':                                // get all => null (optional)
                 case 'manage':                              // get: [type => type, typeId => typeId] || [user => username]
@@ -654,7 +670,7 @@ class AjaxHandler
                 case 'sticky':                              // get: id => ssId || ,-separated id-list
                 case 'delete':                              // get: id => ssId || ,-separated id-list
                 case 'relocate':                            // get: id => ssId, typeid => typeId    (but not type..?)
-                    $fn = 'admin_handleSS'.ucfirst($this->get['action']);
+                    $fn = 'admin_handleSS'.ucfirst($this->get('action'));
                     return $this->$fn();
                     break;
                 default:
@@ -666,19 +682,19 @@ class AjaxHandler
             if (!User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
                 return null;
 
-            switch ($this->get['action'])
+            switch ($this->get('action'))
             {
                 case 'remove':
-                    if (empty($this->get['id']))
+                    if (!$this->get('id'))
                         return 'invalid configuration option given';
 
-                    if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $this->get['id'], CON_FLAG_PERSISTENT))
+                    if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $this->get('id'), CON_FLAG_PERSISTENT))
                         return '';
                     else
                         return 'option name is either protected or was not found';
                 case 'add':
-                    $key = strtolower(trim(@$this->get['id']));
-                    $val = trim(@$this->get['val']);
+                    $key = strtolower(trim($this->get('id')));
+                    $val = trim($this->get('val'));
 
                     if (!strlen($key))
                         return 'empty option name given';
@@ -697,8 +713,8 @@ class AjaxHandler
                     DB::Aowow()->query('INSERT IGNORE INTO ?_config (`key`, `value`, `flags`) VALUES (?, ?, ?d)', $key, $val, CON_FLAG_TYPE_STRING | CON_FLAG_PHP);
                     return '';
                 case 'update':
-                    $key = trim(@$this->get['id']);
-                    $val = trim(@$this->get['val']);
+                    $key = trim($this->get('id'));
+                    $val = trim($this->get('val'));
 
                     if (!strlen($key))
                         return 'empty option name given';
@@ -739,7 +755,7 @@ class AjaxHandler
 
     private function data_isLoadOnDemand()
     {
-        return substr(@$this->get['callback'], 0, 29) == '$WowheadProfiler.loadOnDemand';
+        return substr($this->get('callback'), 0, 29) == '$WowheadProfiler.loadOnDemand';
     }
 
     private function data_loadProfilerData($file, $catg = 'null')
@@ -756,9 +772,9 @@ class AjaxHandler
     {
         // something happened in the last years: those textures do not include tiny icons
         $s    = [/* 'tiny' => 15, */'small' => 18, 'medium' => 36, 'large' => 56];
-        $size = empty($this->get['size']) ? 'medium' : $this->get['size'];
+        $size = $this->get('size') ?: 'medium';
 
-        if (empty($this->get['id']) || !preg_match('/^([0-9]+)\.(jpg|gif)$/', $this->get['id'], $matches) || !in_array($size, array_keys($s)))
+        if (!$this->get('id') || !preg_match('/^([0-9]+)\.(jpg|gif)$/', $this->get('id'), $matches) || !in_array($size, array_keys($s)))
             return false;
 
         $id = $matches[1];
@@ -913,7 +929,7 @@ class AjaxHandler
         // and some onLoad-hook to .. load it registerProfile($data)
         // everything else goes through data.php .. strangely enough
 
-        $char = new ProfileList(array(['id', $this->get['id']])); // or string or whatever
+        $char = new ProfileList(array(['id', $this->get('id')])); // or string or whatever
 
         // modify model from auras with profile_getModelForForm
 
@@ -1115,10 +1131,10 @@ class AjaxHandler
     {
         $res = [];
 
-        if (!empty($this->get['type']) && intVal($this->get['type']) && !empty($this->get['typeid']) && intVal($this->get['typeid']))
-            $res = CommunityContent::getScreenshotsForManager($this->get['type'], $this->get['typeid']);
-        else if (!empty($this->get['user']) && strlen(urldecode($this->get['user'])) > 2)
-            if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', strtolower(urldecode($this->get['user']))))
+        if ($this->get('type') && intVal($this->get('type')) && $this->get('typeid') && intVal($this->get('typeid')))
+            $res = CommunityContent::getScreenshotsForManager($this->get('type'), $this->get('typeid'));
+        else if ($this->get('user') && strlen(urldecode($this->get('user'))) > 2)
+            if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', strtolower(urldecode($this->get('user')))))
                 $res = CommunityContent::getScreenshotsForManager(0, 0, $uId);
 
         return 'ssm_screenshotData = '.json_encode($res, JSON_NUMERIC_CHECK);
@@ -1128,11 +1144,11 @@ class AjaxHandler
     // resp: ''
     private function admin_handleSSEditalt()
     {
-        if (empty($_GET['id']) || empty($this->post['alt']))
+        if (!$this->get('id') || !$this->post('alt'))
             return '';
 
         // doesn't need to be htmlEscaped, ths javascript does that
-        DB::Aowow()->query('UPDATE ?_screenshots SET caption = ? WHERE id = ?d', $this->post['alt'], $_GET['id']);
+        DB::Aowow()->query('UPDATE ?_screenshots SET caption = ? WHERE id = ?d', $this->post('alt'), $this->get('id'));
 
         return '';
     }
@@ -1141,10 +1157,10 @@ class AjaxHandler
     // resp: ''
     private function admin_handleSSApprove($override = [])
     {
-        if (empty($_GET['id']))
+        if (!$this->get('id'))
             return '';
 
-        $ids = $override ?: array_map('intval', explode(',', $_GET['id']));
+        $ids = $override ?: array_map('intval', explode(',', $this->get('id')));
 
         // create resized and thumb version of screenshot
         $resized = [772, 618];
@@ -1207,13 +1223,13 @@ class AjaxHandler
     // resp: ''
     private function admin_handleSSSticky()
     {
-        if (empty($_GET['id']))
+        if (!$this->get('id'))
             return '';
 
         // this one is a bit strange: as far as i've seen, the only thing a 'sticky' screenshot does is show up in the infobox
         // this also means, that only one screenshot per page should be sticky
         // so, handle it one by one and the last one affecting one particular type/typId-key gets the cake
-        $ids = array_map('intval', explode(',', $_GET['id']));
+        $ids = array_map('intval', explode(',', $this->get('id')));
 
         foreach ($ids as $id)
         {
@@ -1235,11 +1251,11 @@ class AjaxHandler
     // 2 steps: 1) remove from sight, 2) remove from disk
     private function admin_handleSSDelete()
     {
-        if (empty($_GET['id']))
+        if (!$this->get('id'))
             return '';
 
         $path = 'static/uploads/screenshots/%s/%d.jpg';
-        $ids  = array_map('intval', explode(',', $_GET['id']));
+        $ids  = array_map('intval', explode(',', $this->get('id')));
 
         foreach ($ids as $id)
         {
@@ -1275,14 +1291,14 @@ class AjaxHandler
     // resp: ''
     private function admin_handleSSRelocate()
     {
-        if (empty($this->get['id']) || empty($this->get['typeid']))
+        if (!$this->get('id') || !$this->get('typeid'))
             return '';
 
-        $type   = DB::Aowow()->selectCell('SELECT type FROM ?_screenshots WHERE id = ?d', $this->get['id']);
-        $typeId = (int)$this->get['typeid'];
+        $type   = DB::Aowow()->selectCell('SELECT type FROM ?_screenshots WHERE id = ?d', $this->get('id'));
+        $typeId = (int)$this->get('typeid');
 
         if (!(new Util::$typeClasses[$type]([['id', $typeId]]))->error)
-            DB::Aowow()->query('UPDATE ?_screenshots SET typeId = ?d WHERE id = ?d', $typeId, $this->get['id']);
+            DB::Aowow()->query('UPDATE ?_screenshots SET typeId = ?d WHERE id = ?d', $typeId, $this->get('id'));
 
         return '';
     }
