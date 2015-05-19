@@ -96,7 +96,7 @@ switch ($pageCall)
     case 'talent':                                          // tool: talent calculator
     case 'title':
     case 'titles':
-    // case 'user':                                         // tool: user profiles [nyi]
+    case 'user':
     case 'video':
     case 'zone':
     case 'zones':

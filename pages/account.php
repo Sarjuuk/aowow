@@ -180,16 +180,16 @@ class AccountPage extends GenericPage
         /***********/
 
         $infobox   = [];
-        $infobox[] = Lang::account('joinDate'). Lang::main('colon').'[tooltip name=joinDate]'. date('l, G:i:s', $user['joinDate']). '[/tooltip][span class=tip tooltip=joinDate]'. date(Lang::main('dateFmtShort'), $user['joinDate']). '[/span]';
-        $infobox[] = Lang::account('lastLogin').Lang::main('colon').'[tooltip name=lastLogin]'.date('l, G:i:s', $user['prevLogin']).'[/tooltip][span class=tip tooltip=lastLogin]'.date(Lang::main('dateFmtShort'), $user['prevLogin']).'[/span]';
-        $infobox[] = Lang::account('lastIP').   Lang::main('colon').$user['prevIP'];
-        $infobox[] = Lang::account('email').    Lang::main('colon').$user['email'];
+        $infobox[] = Lang::user('joinDate'). Lang::main('colon').'[tooltip name=joinDate]'. date('l, G:i:s', $user['joinDate']). '[/tooltip][span class=tip tooltip=joinDate]'. date(Lang::main('dateFmtShort'), $user['joinDate']). '[/span]';
+        $infobox[] = Lang::user('lastLogin').Lang::main('colon').'[tooltip name=lastLogin]'.date('l, G:i:s', $user['prevLogin']).'[/tooltip][span class=tip tooltip=lastLogin]'.date(Lang::main('dateFmtShort'), $user['prevLogin']).'[/span]';
+        $infobox[] = Lang::account('lastIP').Lang::main('colon').$user['prevIP'];
+        $infobox[] = Lang::account('email'). Lang::main('colon').$user['email'];
 
         $groups = [];
         foreach (Lang::account('groups') as $idx => $key)
             if ($idx >= 0 && $user['userGroups'] & (1 << $idx))
                 $groups[] = (!fMod(count($groups) + 1, 3) ? '[br]' : null).Lang::account('groups', $idx);
-        $infobox[] = Lang::account('userGroups').Lang::main('colon').($groups ? implode(', ', $groups) : Lang::account('groups', -1));
+        $infobox[] = Lang::user('userGroups').Lang::main('colon').($groups ? implode(', ', $groups) : Lang::account('groups', -1));
         $infobox[] = Util::ucFirst(Lang::main('siteRep')).Lang::main('colon').User::getReputation();
 
 

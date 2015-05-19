@@ -5,6 +5,7 @@ class Lang
     private static $timeUnits;
     private static $main;
     private static $account;
+    private static $user;
     private static $mail;
     private static $game;
 

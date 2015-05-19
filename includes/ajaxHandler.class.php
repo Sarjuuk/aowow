@@ -352,14 +352,14 @@ class AjaxHandler
 
                 DB::Aowow()->query('UPDATE ?_comments SET editCount = editCount + 1, ?a WHERE id = ?d', $update, $this->get('id'));
                 break;
-            case 'delete':                                  // user.js uses GET; global.js uses POST
-                if (!$this->post('id') && !$this->get('id'))
+            case 'delete':
+                if (!$this->post('id'))
                     break;
 
-                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags | ?d, deleteUserId = ?d, deleteDate = UNIX_TIMESTAMP() WHERE id = ?d{ AND userId = ?d}',
+                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags | ?d, deleteUserId = ?d, deleteDate = UNIX_TIMESTAMP() WHERE id IN (?a){ AND userId = ?d}',
                     CC_FLAG_DELETED,
                     User::$id,
-                    $this->post('id') ?: $this->get('id'),
+                    (array)$this->post('id'),
                     User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
                 );
 
@@ -376,13 +376,13 @@ class AjaxHandler
                 }
 
                 break;
-            case 'undelete':                                // user.js uses GET; global.js uses POST
-                if (!$this->post('id') && !$this->get('id'))
+            case 'undelete':
+                if (!$this->post('id'))
                     break;
 
-                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id = ?d{ AND userId = deleteUserId AND deleteUserId = ?d}',
+                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id IN (?a){ AND userId = deleteUserId AND deleteUserId = ?d}',
                     CC_FLAG_DELETED,
-                    $this->post('id') ?: $this->get('id'),
+                    (array)$this->post('id'),
                     User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
                 );
 
@@ -777,7 +777,10 @@ class AjaxHandler
         if (!$this->get('id') || !preg_match('/^([0-9]+)\.(jpg|gif)$/', $this->get('id'), $matches) || !in_array($size, array_keys($s)))
             return false;
 
-        $id = $matches[1];
+        header('Content-Type: image/'.$matches[2]);
+
+        $id   = $matches[1];
+        $dest = imageCreateTruecolor($s[$size], $s[$size]);
 
         if (file_exists('/uploads/avatars/'.$id.'.jpg'))
         {
@@ -793,22 +796,16 @@ class AjaxHandler
                     $offsetX += $s['large'];
             }
 
-            $src  = imageCreateFromJpeg('uploads/avatars/'.$id.'.jpg');
-            $dest = imageCreateTruecolor($s[$size], $s[$size]);
-
+            $src = imageCreateFromJpeg('uploads/avatars/'.$id.'.jpg');
             imagecopymerge($dest, $src, 0, 0, $offsetX, $offsetY, $s[$size], $s[$size], 100);
-
-            header('Content-Type: image/'.$matches[2]);
-
-            if ($matches[2] == 'gif')
-                imageGif($dest);
-            else
-                imageJpeg($dest);
-
-            return true;
         }
 
-        return false;
+        if ($matches[2] == 'gif')
+            imageGif($dest);
+        else
+            imageJpeg($dest);
+
+        return true;
     }
 
     private function profile_handlePin($id, $mode)          // (un)favorite

@@ -327,12 +327,8 @@ $lang = array(
         // dashboard
         'ipAddress'     => "IP-Adress",
         'lastIP'        => "last used IP",
-        'joinDate'      => "Joined",
-        'lastLogin'     => "Last visit",
-        'userGroups'    => "Role",
         'myAccount'     => "My Account",
         'editAccount'   => "Simply use the forms below to update your account information",
-        'publicDesc'    => "Public Description",
         'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
 
         // bans
@@ -364,6 +360,22 @@ $lang = array(
         'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
         'passCheckFail' => "Пароли не совпадают.", // message_passwordsdonotmatch
         'newPassDiff'   => "Прежний и новый пароли не должны совпадать." // message_newpassdifferent
+    ),
+    'user' => array(
+        'notFound'      => "Пользователь \"%s\" не найден!",
+        'removed'       => "(Удалено)",
+        'joinDate'      => "Зарегистрировался",
+        'lastLogin'     => "Последняя активность",
+        'userGroups'    => "Роль",
+        'consecVisits'  => "Регулярные посещения",
+        'publicDesc'    => "Описание",
+        'profileTitle'  => "Профиль %s",
+        'contributions' => "Вклад",
+        'uploads'       => "Данных загружено",
+        'comments'      => "Комментарии",
+        'screenshots'   => "Скриншоты",
+        'videos'        => "Видео",
+        'posts'         => "Сообщений на форумах"
     ),
     'mail' => array(
         'tokenExpires'  => "This token expires in %s.",

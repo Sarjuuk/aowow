@@ -1,6 +1,6 @@
 <?php
 $relTabs  = !empty($relTabs);
-$tabVar   = $relTabs ? 'tabsRelated' : 'myTabs';
+$tabVar   = $relTabs || !empty($this->user) ? 'tabsRelated' : 'myTabs';
 $isTabbed = !empty($this->forceTabs) || $relTabs || count($this->lvTabs) > 1;
 
 if ($isTabbed):
@@ -42,7 +42,14 @@ foreach ($this->lvTabs as $lv):
     endif;
 endforeach;
 
-if ($relTabs):
+if (!empty($this->user)):
+    if (!empty($this->user['characterData'])):
+        echo '                us_addCharactersTab('.Util::toJSON($this->user['characterData']).");\n";
+    endif;
+    if (!empty($this->user['profileData'])):
+        echo '                us_addProfilesTab('.Util::toJSON($this->user['profileData']).");\n";
+    endif;
+elseif ($relTabs):
 ?>
                 new Listview({template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: <?php echo $tabVar; ?>, parent: 'lv-generic', data: lv_comments});
                 new Listview({template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: <?php echo $tabVar; ?>, parent: 'lv-generic', data: lv_screenshots});

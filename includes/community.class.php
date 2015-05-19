@@ -19,6 +19,7 @@ if (!defined('AOWOW_REVISION'))
 class CommunityContent
 {
     private static $jsGlobals = [];
+    private static $subjCache = [];
 
     private static $commentQuery = '
         SELECT
@@ -86,32 +87,21 @@ class CommunityContent
             ?d
     ';
 
-    public static function getCommentPreviews($params = [])
+    private static function addSubject($type, $typeId)
     {
-        /*
-            purged:0,           <- doesnt seem to be used anymore
-            domain:'live'       <- irrelevant for our case
-        */
+        if (!isset(self::$subjCache[$type][$typeId]))
+            self::$subjCache[$type][$typeId] = 0;
+    }
 
-        $subjCache = [];
-        $comments  = DB::Aowow()->select(
-            self::$previewQuery,
-            CC_FLAG_DELETED,
-             empty($params['user'])    ? DBSIMPLE_SKIP : $params['user'],
-             empty($params['replies']) ? DBSIMPLE_SKIP : 0, // i dont know, how to switch the sign around
-            !empty($params['replies']) ? DBSIMPLE_SKIP : 0,
-            CC_FLAG_DELETED,
-            User::$id,
-            User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
-            CFG_SQL_LIMIT_DEFAULT
-        );
-
-        foreach ($comments as $c)
-            $subjCache[$c['type']][$c['typeId']] = $c['typeId'];
-
-        foreach ($subjCache as $type => $ids)
+    private static function getSubjects()
+    {
+        foreach (self::$subjCache as $type => $ids)
         {
-            $cnd = [CFG_SQL_LIMIT_NONE, ['id', array_unique($ids, SORT_NUMERIC)]];
+            $_ = array_filter(array_keys($ids), 'is_numeric');
+            if (!$_)
+                continue;
+
+            $cnd = [CFG_SQL_LIMIT_NONE, ['id', $_]];
 
             switch ($type)
             {
@@ -135,15 +125,41 @@ class CommunityContent
             }
 
             foreach ($obj->iterate() as $id => $__)
-                $subjCache[$type][$id] = $obj->getField('name', true);
+                self::$subjCache[$type][$id] = $obj->getField('name', true);
         }
+    }
+
+    public static function getCommentPreviews($params = [], &$nFound = 0)
+    {
+        /*
+            purged:0,           <- doesnt seem to be used anymore
+            domain:'live'       <- irrelevant for our case
+        */
+
+        $comments  = DB::Aowow()->selectPage(
+            $nFound,
+            self::$previewQuery,
+            CC_FLAG_DELETED,
+             empty($params['user'])    ? DBSIMPLE_SKIP : $params['user'],
+             empty($params['replies']) ? DBSIMPLE_SKIP : 0, // i dont know, how to switch the sign around
+            !empty($params['replies']) ? DBSIMPLE_SKIP : 0,
+            CC_FLAG_DELETED,
+            User::$id,
+            User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
+            CFG_SQL_LIMIT_DEFAULT
+        );
+
+        foreach ($comments as $c)
+            self::addSubject($c['type'], $c['typeId']);
+
+        self::getSubjects();
 
         foreach ($comments as $idx => &$c)
         {
-            if (!empty($subjCache[$c['type']][$c['typeId']]))
+            if (!empty(self::$subjCache[$c['type']][$c['typeId']]))
             {
                 // apply subject
-                $c['subject'] = $subjCache[$c['type']][$c['typeId']];
+                $c['subject'] = self::$subjCache[$c['type']][$c['typeId']];
 
                 // format date
                 $c['date'] = date(Util::$dateFormatInternal, $c['date']);
@@ -155,7 +171,7 @@ class CommunityContent
                 // remove line breaks
                 $c['preview'] = strtr($c['preview'], ["\n" => ' ', "\r" => ' ']);
                 // limit whitespaces to one at a time
-                $c['preview'] = preg_replace('/\s+/',' ', $c['preview']);
+                $c['preview'] = preg_replace('/\s+/', ' ', $c['preview']);
                 // limit previews to 100 chars + whatever it takes to make the last word full
                 if (strlen($c['preview']) > 100)
                 {
@@ -164,8 +180,8 @@ class CommunityContent
                     $parts = explode(' ', $c['preview']);
                     while ($n < 100 && $parts)
                     {
-                        $_ = array_shift($parts);
-                        $n += strlen($_);
+                        $_   = array_shift($parts);
+                        $n  += strlen($_);
                         $b[] = $_;
                     }
 
@@ -182,13 +198,13 @@ class CommunityContent
         return $comments;
     }
 
-    public static function getCommentReplies($commentId, $limit = 0, &$nFound = null)
+    public static function getCommentReplies($commentId, $limit = 0, &$nFound = 0)
     {
         $replies = [];
         $query = $limit > 0 ? self::$commentQuery.' LIMIT '.$limit : self::$commentQuery;
 
         // get replies
-        $results = DB::Aowow()->SelectPage($nFound, $query, User::$id, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+        $results = DB::Aowow()->selectPage($nFound, $query, User::$id, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
         foreach ($results as $r)
         {
             (new Markup($r['body']))->parseGlobalsFromText(self::$jsGlobals);
@@ -398,18 +414,39 @@ class CommunityContent
         return $comments;
     }
 
-    private static function getVideos($type, $typeId)
+    public static function getVideos($typeOrUser, $typeId = 0, &$nFound = 0)
     {
-        $videos = DB::Aowow()->Query("
-            SELECT v.id, a.displayName AS user, v.date, v.videoId, v.caption, IF(v.status & 0x4, 1, 0) AS 'sticky', v.type, v.typeId
+        $videos = DB::Aowow()->selectPage($nFound, "
+            SELECT v.id, a.displayName AS user, v.date, v.videoId, v.caption, IF(v.status & ?d, 1, 0) AS 'sticky', v.type, v.typeId
             FROM ?_videos v, ?_account a
-            WHERE v.type = ? AND v.typeId = ? AND v.status & 0x2 AND v.uploader = a.id",
-            $type, $typeId
+            WHERE {v.uploader = ?d }{v.type = ? }{AND v.typeId = ? }AND v.status & ?d AND (v.status & ?d) = 0 AND v.uploader = a.id",
+            CC_FLAG_STICKY,
+            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
+            CC_FLAG_APPROVED,
+            CC_FLAG_DELETED
         );
+
+        if ($typeOrUser < 0)                                // only for user page
+        {
+            foreach ($videos as $v)
+                self::addSubject($v['type'], $v['typeId']);
+
+            self::getSubjects();
+        }
 
         // format data to meet requirements of the js
         foreach ($videos as &$v)
         {
+            if ($typeOrUser < 0)                            // only for user page
+            {
+                if (!empty(self::$subjCache[$v['type']][$v['typeId']]) && !is_numeric(self::$subjCache[$v['type']][$v['typeId']]))
+                    $v['subject'] = self::$subjCache[$v['type']][$v['typeId']];
+                else
+                    $v['subject'] = Lang::user('removed');
+            }
+
             $v['date']      = date(Util::$dateFormatInternal, $v['date']);
             $v['videoType'] = 1;            // always youtube
             if (!$v['sticky'])
@@ -419,22 +456,39 @@ class CommunityContent
         return $videos;
     }
 
-    private static function getScreenshots($type, $typeId)
+    public static function getScreenshots($typeOrUser, $typeId = 0, &$nFound = 0)
     {
-        $screenshots = DB::Aowow()->Query("
-            SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.type, s.typeId, s.caption, IF(s.status & ?d, 1, 0) AS 'sticky'
+        $screenshots = DB::Aowow()->selectPage($nFound, "
+            SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.caption, IF(s.status & ?d, 1, 0) AS 'sticky', s.type, s.typeId
             FROM ?_screenshots s, ?_account a
-            WHERE s.type = ? AND s.typeId = ? AND s.status & ?d AND (s.status & ?d) = 0 AND s.uploader = a.id",
+            WHERE {s.uploader = ?d }{s.type = ? }{AND s.typeId = ? }AND s.status & ?d AND (s.status & ?d) = 0 AND s.uploader = a.id",
             CC_FLAG_STICKY,
-            $type,
-            $typeId,
+            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
             CC_FLAG_APPROVED,
             CC_FLAG_DELETED
         );
 
+        if ($typeOrUser < 0)                                // only for user page
+        {
+            foreach ($screenshots as $s)
+                self::addSubject($s['type'], $s['typeId']);
+
+            self::getSubjects();
+        }
+
         // format data to meet requirements of the js
         foreach ($screenshots as &$s)
         {
+            if ($typeOrUser < 0)                            // only for user page
+            {
+                if (!empty(self::$subjCache[$s['type']][$s['typeId']]) && !is_numeric(self::$subjCache[$s['type']][$s['typeId']]))
+                    $s['subject'] = self::$subjCache[$s['type']][$s['typeId']];
+                else
+                    $s['subject'] = Lang::user('removed');
+            }
+
             $s['date'] = date(Util::$dateFormatInternal, $s['date']);
             if (!$s['sticky'])
                 unset($s['sticky']);

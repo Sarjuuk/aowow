@@ -1,9 +1,9 @@
 new Listview({
     template:'commentpreview',
 <?php
-    echo !isset($params['id'])     ? "id:'comments',"                : null;
-    echo !isset($params['name'])   ? "name:LANG.tab_latestcomments," : null;
-    echo !isset($params['parent']) ? "parent:'lv-generic',"          : null;
+    echo !isset($params['id'])     ? "id:'comments',"          : null;
+    echo !isset($params['name'])   ? "name:LANG.tab_comments," : null;
+    echo !isset($params['parent']) ? "parent:'lv-generic',"    : null;
 
     foreach ($params as $k => $v):
         if ($v[0] == '$'):

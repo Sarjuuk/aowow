@@ -58,10 +58,10 @@ define('ACC_BAN_TEMP',                      0x01);
 define('ACC_BAN_PERM',                      0x02);
 define('ACC_BAN_RATE',                      0x04);          // cannot rate community items (overrides site reputation)
 define('ACC_BAN_COMMENT',                   0x08);          // cannot comment and reply
-define('ACC_BAN_UPLOAD',                    0x10);          // cannot upload avatar / signature files
+define('ACC_BAN_UPLOAD',                    0x10);          // cannot upload avatar / signature files [originally: ban from data upload]
 define('ACC_BAN_SCREENSHOT',                0x20);          // cannot upload screenshots
 define('ACC_BAN_VIDEO',                     0x40);          // cannot suggest videos
-// define('ACC_BAN_FORUM',                  0x80);          // cannot use forums (not used here)
+// define('ACC_BAN_FORUM',                  0x80);          // cannot use forums [not used here]
 
 // Site Reputation/Privileges
 define('SITEREP_ACTION_REGISTER',           1);             // Registered account

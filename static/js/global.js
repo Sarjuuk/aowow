@@ -9237,9 +9237,9 @@ Listview.funcBox = {
     },
 
     moneyCurrencyOver: function(currencyId, count, e) {
-        var buff = g_gatheredcurrencies[currencyId]['name_' + Locale.getName() /*g_loc.getName()*/];
+        var buff = g_gatheredcurrencies[currencyId]['name_' + Locale.getName()];
 
-        // justice / valor points handling removed
+        // sarjuuk: justice / valor points handling removed
 
         $WH.Tooltip.showAtCursor(e, buff, 0, 0, 'q1');
     },

@@ -9,13 +9,13 @@ $this->brick('announcement');
 
 $this->brick('pageTemplate');
 
-if (isset($this->typeStr)):
+if (isset($this->notFound)):
 ?>
             <div class="pad3"></div>
 
             <div class="inputbox">
-                <h1><?php echo Util::ucFirst($this->typeStr).' #'.$this->typeId; ?></h1>
-                <div id="inputbox-error"><?php echo sprintf(Lang::main('pageNotFound'), $this->typeStr); ?></div>
+                <h1><?php echo $this->notFound['title']; ?></h1>
+                <div id="inputbox-error"><?php echo $this->notFound['msg']; ?></div>
 <?php
 else:
 ?>

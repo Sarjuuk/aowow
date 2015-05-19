@@ -1,8 +1,9 @@
 new Listview({
     template:'screenshot',
 <?php
-    echo !isset($params['id'])     ? "id:'screenshots',"    : null;
-    echo !isset($params['parent']) ? "parent:'lv-generic'," : null;
+    echo !isset($params['id'])     ? "id:'screenshots',"          : null;
+    echo !isset($params['name'])   ? "name:LANG.tab_screenshots," : null;
+    echo !isset($params['parent']) ? "parent:'lv-generic',"       : null;
 
     foreach ($params as $k => $v):
         if ($v[0] == '$'):

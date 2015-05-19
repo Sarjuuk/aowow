@@ -24,7 +24,7 @@ $this->brick('pageTemplate');
                             <select id="pagetype">
 <?php
 foreach (Util::$typeStrings as $i => $str):
-    if (isset(Lang::game($str))):
+    if (Lang::game($str)):
         echo "                                <option value=\"".$i."\">".Util::ucFirst(Lang::game($str))."</option>\n";
     endif;
 endforeach;

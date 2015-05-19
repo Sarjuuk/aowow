@@ -327,12 +327,8 @@ $lang = array(
         // dashboard
         'ipAddress'     => "IP-Adresse",
         'lastIP'        => "Letzte bekannte IP",
-        'joinDate'      => "Mitglied seit",
-        'lastLogin'     => "Letzter Besuch",
-        'userGroups'    => "Rolle",
         'myAccount'     => "Mein Account",
         'editAccount'   => "Benutze die folgenden Formulare um deine Account-Informationen zu aktualisieren",
-        'publicDesc'    => "Öffentliche Beschreibung",
         'viewPubDesc'   => 'Die Beschreibung in deinem <a href="?user=%s">öffentlichen Profil</a> ansehen',
 
         // bans
@@ -364,6 +360,22 @@ $lang = array(
         'isRecovering'  => "Dieses Konto wird bereits wiederhergestellt. Folgt den Anweisungen in der Nachricht oder wartet %s bis das Token verfällt.",
         'passCheckFail' => "Die Kennwörter stimmen nicht überein.", // message_passwordsdonotmatch
         'newPassDiff'   => "Euer neues Kennwort muss sich von eurem alten Kennwort unterscheiden." // message_newpassdifferent
+    ),
+    'user' => array(
+        'notFound'      => "Der Benutzer \"%s\" wurde nicht gefunden!",
+        'removed'       => "(Entfernt)",
+        'joinDate'      => "Mitglied seit",
+        'lastLogin'     => "Letzter Besuch",
+        'userGroups'    => "Rolle",
+        'consecVisits'  => "Aufeinanderfolgende Besuche",
+        'publicDesc'    => "Öffentliche Beschreibung",
+        'profileTitle'  => "Profil von %s",
+        'contributions' => "Beiträge",
+        'uploads'       => "Hochladevorgänge",
+        'comments'      => "Kommentare",
+        'screenshots'   => "Screenshots",
+        'videos'        => "Videos",
+        'posts'         => "Forenbeiträge"
     ),
     'mail' => array(
         'tokenExpires'  => "Das Token wird in %s verfallen.",

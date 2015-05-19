@@ -15,7 +15,7 @@ endif;
 
 if (!empty($this->contributions)):
 ?>
-        <tr><th id="infobox-contributions"><?php echo Lang::main('contributions'); ?></th></tr>
+        <tr><th id="infobox-contributions"><?php echo Lang::user('contributions'); ?></th></tr>
         <tr><td>
             <div class="infobox-spacer"></div>
             <div id="infobox-contents1"></div>

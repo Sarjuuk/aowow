@@ -361,9 +361,12 @@ class GenericPage
     /* Special Display */
     /*******************/
 
-    public function notFound($typeStr)                      // unknown ID
+    public function notFound($title, $msg = '')             // unknown entry
     {
-        $this->typeStr       = $typeStr;
+        $this->notFound      = array(
+            'title' =>          $this->typeId ? Util::ucFirst($title).' #'.$this->typeId    : $title,
+            'msg'   => !$msg && $this->typeId ? sprintf(Lang::main('pageNotFound'), $title) : $msg
+        );
         $this->hasComContent = false;
         Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
 

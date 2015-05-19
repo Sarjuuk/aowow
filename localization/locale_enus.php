@@ -322,12 +322,8 @@ $lang = array(
         // dashboard
         'ipAddress'     => "IP-Adress",
         'lastIP'        => "last used IP",
-        'joinDate'      => "Joined",
-        'lastLogin'     => "Last visit",
-        'userGroups'    => "Role",
         'myAccount'     => "My Account",
         'editAccount'   => "Simply use the forms below to update your account information",
-        'publicDesc'    => "Public Description",
         'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
 
         // bans
@@ -359,6 +355,22 @@ $lang = array(
         'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
         'passCheckFail' => "Passwords do not match.", // message_passwordsdonotmatch
         'newPassDiff'   => "Your new password must be different than your previous one." // message_newpassdifferent
+    ),
+    'user' => array(
+        'notFound'      => "User \"%s\" not found!",
+        'removed'       => "(Removed)",
+        'joinDate'      => "Joined",
+        'lastLogin'     => "Last visit",
+        'userGroups'    => "Role",
+        'consecVisits'  => "Consecutive visits",
+        'publicDesc'    => "Public Description",
+        'profileTitle'  => "%s's Profile",
+        'contributions' => "Contributions",
+        'uploads'       => "Data uploads",
+        'comments'      => "Comments",
+        'screenshots'   => "Screenshots",
+        'videos'        => "Videos",
+        'posts'         => "Forum posts"
     ),
     'mail' => array(
         'tokenExpires'  => "This token expires in %s.",
