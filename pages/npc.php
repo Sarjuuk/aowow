@@ -923,9 +923,9 @@ class NpcPage extends GenericPage
 
     private function getQuotes()
     {
-        $nQuotes    = 0;
-        $quotes     = [];
-        $quoteQuery = '
+        $nQuotes  = 0;
+        $quotes   = [];
+        $quoteSrc = DB::World()->select('
             SELECT
                 ct.groupid AS ARRAY_KEY, ct.id as ARRAY_KEY2, ct.`type`,
                 ct.TextRange AS `range`,
@@ -944,9 +944,11 @@ class NpcPage extends GenericPage
             LEFT JOIN
                 locales_broadcast_text lbct ON ct.BroadcastTextId = lbct.ID
             WHERE
-                ct.entry = ?d';
+                ct.entry = ?d',
+            $this->typeId
+        );
 
-        foreach (DB::World()->select($quoteQuery, $this->typeId) as $text)
+        foreach ($quoteSrc as $text)
         {
             $group = [];
             foreach ($text as $t)
