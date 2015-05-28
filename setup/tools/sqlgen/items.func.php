@@ -181,6 +181,27 @@ function items(array $ids = [])
     // move armor tokens to own category
     DB::Aowow()->query('UPDATE ?_items SET subClass = -2 WHERE quality = 4 AND class = 15 AND subClassBak = 0 AND requiredClass AND (requiredClass & 0x5FF) <> 0x5FF');
 
+    // move some junk to holiday if it requires one
+    DB::Aowow()->query('UPDATE ?_items SET subClass = 3 WHERE classBak = 15 AND subClassBak = 0 AND holidayId <> 0');
+
+    // move misc items that start quests to class: quest (except Sayges scrolls for consistency)
+    DB::Aowow()->query('UPDATE ?_items SET class = 12 WHERE classBak = 15 AND startQuest <> 0 AND name_loc0 NOT LIKE "sayge\'s fortune%"');
+
+    // move perm. enchantments into appropriate cat/subcat
+    DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.class = 0, i.subClass = 6 WHERE s.Id = i.spellId1 AND s.effect1Id = 53 AND i.classBak = 12');
+
+    // move some generic recipes into appropriate sub-categories
+    $skillz = array(
+        773 => 11,                                          // inscription
+        356 =>  9,                                          // fishing
+        186 => 12,                                          // mining
+        185 =>  5,                                          // cooking
+        171 =>  6                                           // alchemy
+
+    );
+    foreach ($skillz as $skill => $cat)
+        DB::Aowow()->query('UPDATE ?_items SET subClass = ?d WHERE classBak = 9 AND subClassBak = 0 AND requiredSkill = ?d', $cat, $skill);
+
     // calculate durabilityCosts
     DB::Aowow()->query('
         UPDATE

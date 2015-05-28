@@ -61,11 +61,7 @@ class NpcPage extends GenericPage
 
         // difficulty entries of self
         if ($this->subject->getField('cuFlags') & NPC_CU_DIFFICULTY_DUMMY)
-        {
-            // find and create link to regular creature
-            $regNPC = new CreatureList(array(['OR', ['difficultyEntry1', $this->typeId], ['difficultyEntry2', $this->typeId], ['difficultyEntry3', $this->typeId]]));
-            $position = [$regNPC->id, $regNPC->getField('name', true)];
-        }
+            $position = [$this->subject->getField('parentId'), $this->subject->getField('parent', true)];
         else
         {
             for ($i = 1; $i < 4; $i++)

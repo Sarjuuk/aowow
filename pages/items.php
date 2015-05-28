@@ -65,11 +65,11 @@ class ItemsPage extends GenericPage
          7 => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
          6 => [2, 3],
         11 => [2, 3],
-         9 => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],   // some of the books to propper professions
+         9 => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
          3 => [0, 1, 2, 3, 4, 5, 6, 7, 8],
-        15 => [-2, -7, 0, 1, 2, 3, 4, 5],                   // -2: armor tokes, -7: flying mounts               fuck it .. need major overhaul
+        15 => [-2, -7, 0, 1, 2, 3, 4, 5],                   // -2: armor tokes, -7: flying mounts
         10 => true,
-        12 => true,                                         // todo: contains enchantments
+        12 => true,
         13 => true
     );
 
