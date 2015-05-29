@@ -31,6 +31,7 @@ class AccountPage extends GenericPage
         'username'    => [FILTER_SANITIZE_SPECIAL_CHARS, 0xC], // FILTER_FLAG_STRIP_LOW | *_HIGH
         'password'    => [FILTER_UNSAFE_RAW, null],
         'c_password'  => [FILTER_UNSAFE_RAW, null],
+        'token'       => [FILTER_UNSAFE_RAW, null],
         'remember_me' => [FILTER_CALLBACK, ['options' => 'AccountPage::rememberCallback']],
         'email'       => [FILTER_SANITIZE_EMAIL, null]
     );

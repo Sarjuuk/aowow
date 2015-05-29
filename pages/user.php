@@ -4,7 +4,6 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// exclude & weightscales are handled as Ajax
 class UserPage extends GenericPage
 {
     protected $tpl      = 'user';
@@ -28,10 +27,13 @@ class UserPage extends GenericPage
                 $this->notFound(sprintf(Lang::user('notFound'), $pageParam));
         }
         else if (User::$id)
+        {
             header('Location: ?user='.User::$displayName, true, 302);
+            die();
+        }
         else
             $this->forwardToSignIn('user');
-    }
+   }
 
     protected function generateContent()
     {

@@ -110,7 +110,7 @@ class ProfilesPage extends GenericPage
 
 
 
-        $this->filter = ['query' => 1];
+        $this->filter = ['query' => 1, 'fi' => []];
 
 
         Lang::sort('game', 'cl');
@@ -121,12 +121,12 @@ class ProfilesPage extends GenericPage
     {
         $classMask = 1 << ($this->character['classs'] - 1);
         $distrib   = DB::Aowow()->selectCol('SELECT COUNT(t.id) FROM dbc_talent t JOIN dbc_talenttab tt ON t.tabId = tt.id WHERE tt.classMask & ?d GROUP BY tt.id ORDER BY tt.tabNumber ASC', $classMask);
-        $result    = [];
+        $result    = [0, 0, 0];
 
         $start = 0;
-        foreach ($distrib as $len)
+        foreach ($distrib as $idx => $len)
         {
-            $result[] = array_sum(str_split(substr($tString, $start, $len)));
+            $result[$idx] = array_sum(str_split(substr($tString, $start, $len)));
             $start += $len;
         }
 

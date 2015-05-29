@@ -33,7 +33,7 @@
     {
         if (!CLISetup::fileExists($fileName))
         {
-            CLISetup::log('file '.$fileName.' could not be found', MSG_LVL_ERROR);
+            CLISetup::log('file '.$fileName.' could not be found', CLISetup::LOG_ERROR);
             return;
         }
 
@@ -41,14 +41,14 @@
 
         if (!$file)
         {
-            CLISetup::log('could not open file '.$fileName, MSG_LVL_ERROR);
+            CLISetup::log('could not open file '.$fileName, CLISetup::LOG_ERROR);
             return;
         }
 
         $fileSize = fileSize($fileName);
         if ($fileSize < 16)
         {
-            CLISetup::log('file '.$fileName.' is too small for a BLP file', MSG_LVL_ERROR);
+            CLISetup::log('file '.$fileName.' is too small for a BLP file', CLISetup::LOG_ERROR);
             return;
         }
 
@@ -64,14 +64,14 @@
                 $data = substr($data, 0x44);
             else
             {
-                CLISetup::log('file '.$fileName.' is an incremental patch file and cannot be used by this script.', MSG_LVL_ERROR);
+                CLISetup::log('file '.$fileName.' is an incremental patch file and cannot be used by this script.', CLISetup::LOG_ERROR);
                 return;
             }
         }
 
         if (substr($data, 0, 4) != "BLP2")
         {
-            CLISetup::log('file '.$fileName.' has incorrect/unsupported magic bytes', MSG_LVL_ERROR);
+            CLISetup::log('file '.$fileName.' has incorrect/unsupported magic bytes', CLISetup::LOG_ERROR);
             return;
         }
 
@@ -83,7 +83,7 @@
 
         if ($header['format'] != 1)
         {
-            CLISetup::log('file '.$fileName.' has unsupported format'.$debugStr, MSG_LVL_ERROR);
+            CLISetup::log('file '.$fileName.' has unsupported format'.$debugStr, CLISetup::LOG_ERROR);
             return;
         }
 
@@ -99,12 +99,12 @@
 
         if ($size == 0)
         {
-            CLISetup::log('file '.$fileName.' contains zeroes in a mips table'.$debugStr, MSG_LVL_ERROR);
+            CLISetup::log('file '.$fileName.' contains zeroes in a mips table'.$debugStr, CLISetup::LOG_ERROR);
             return;
         }
         if ($offs + $size > $fileSize)
         {
-            CLISetup::log('file '.$fileName.' is corrupted/incomplete'.$debugStr, MSG_LVL_ERROR);
+            CLISetup::log('file '.$fileName.' is corrupted/incomplete'.$debugStr, CLISetup::LOG_ERROR);
             return;
         }
 
@@ -116,7 +116,7 @@
             $img = icfb3($header['width'], $header['height'], substr($data, $offs, $size));
         else
         {
-            CLISetup::log('file '.$fileName.' has unsupported type'.$debugStr, MSG_LVL_ERROR);
+            CLISetup::log('file '.$fileName.' has unsupported type'.$debugStr, CLISetup::LOG_ERROR);
             return;
         }
 
@@ -152,7 +152,7 @@
     {
         if (!in_array($alphaBits * 10 + $alphaType, [0, 10, 41, 81, 87, 88]))
         {
-            CLISetup::log('unsupported compression type', MSG_LVL_ERROR);
+            CLISetup::log('unsupported compression type', CLISetup::LOG_ERROR);
             return;
         }
 

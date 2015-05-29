@@ -159,11 +159,12 @@ if (!CLI)
 
         define('HOST_URL',   ($secure ? 'https://' : 'http://').$host);
         define('STATIC_URL', ($secure ? 'https://' : 'http://').$host.'/static');
-        if (User::isInGroup(U_GROUP_ADMIN) && !empty($AoWoWconf['aowow']))   // initial set
+
+        if (User::isInGroup(U_GROUP_ADMIN))                 // initial set
         {
-            DB::Aowow()->query('INSERT IGNORE INTO ?_config VALUES (?, ?, ?d, ?), (?, ?, ?d, ?)',
-                'site_host',   $host,           CON_FLAG_TYPE_STRING | CON_FLAG_PERSISTENT, 'default: '.$host.' - points js to executable files (automaticly set on first run)',
-                'static_host', $host.'/static', CON_FLAG_TYPE_STRING | CON_FLAG_PERSISTENT, 'default: '.$host.'/static - points js to images & scripts (automaticly set on first run)'
+            DB::Aowow()->query('REPLACE INTO ?_config VALUES (?a)',
+                [['site_host',   $host,           CON_FLAG_TYPE_STRING | CON_FLAG_PERSISTENT, 'default: '.$host.' - points js to executable files (automaticly set on first run)'],
+                 ['static_host', $host.'/static', CON_FLAG_TYPE_STRING | CON_FLAG_PERSISTENT, 'default: '.$host.'/static - points js to images & scripts (automaticly set on first run)']]
             );
         }
     }

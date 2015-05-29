@@ -21,7 +21,7 @@ if (!CLI)
         {
             $result = null;
 
-            if (in_array(substr($path, -4, 4), ['.png', '.blp']))
+            if (in_array(substr($path, -4, 4), ['.png', '.blp', '.BLP', '.PNG']))
                 $path = substr($path, 0, strlen($path) - 4);
 
             $file = $path.'.png';
@@ -44,11 +44,11 @@ if (!CLI)
         if (isset(FileGen::$cliOpts['help']))
         {
             echo "\n";
-            echo "available Options for subScript 'simpleImg':\n";
+            echo "available options for subScript 'simpleImg':\n";
             echo " --icons          (generates square icons that are used for basicly everything)\n";
             echo " --glyphs         (decorative tidbit displayed on Infobox for Glyph Spells)\n";
             echo " --pagetexts      (imagery contained in PageTexts on readable GameObjects or Items)\n";
-            echo " --loadingscreens (loadingscreens (not used, skipped by default))\n";
+            echo " --loadingscreens (loading screens (not used, skipped by default))\n";
 
             return true;
         }
@@ -269,9 +269,9 @@ if (!CLI)
         if (isset($paths[0]) || isset($paths[1]))           // generates icons or glyphs
         {
             if (isset($paths[0]) && !isset($paths[1]))
-                $siRows = DB::Aowow()->selectCol('SELECT iconPath FROM dbc_spellicon WHERE iconPath NOT LIKE "glyph-rune"');
+                $siRows = DB::Aowow()->selectCol('SELECT iconPath FROM dbc_spellicon WHERE iconPath NOT LIKE "%glyph-rune%"');
             else if (!isset($paths[0]) && isset($paths[1]))
-                $siRows = DB::Aowow()->selectCol('SELECT iconPath FROM dbc_spellicon WHERE iconPath LIKE "glyph-rune"');
+                $siRows = DB::Aowow()->selectCol('SELECT iconPath FROM dbc_spellicon WHERE iconPath LIKE "%glyph-rune%"');
             else
                 $siRows = DB::Aowow()->selectCol('SELECT iconPath FROM dbc_spellicon');
 
