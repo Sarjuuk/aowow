@@ -137,28 +137,47 @@ class ZonePage extends GenericPage
         /* Main Content */
         /****************/
 
+        $addToMap = function ($what, $entry) use (&$som)
+        {
+            // entry always contains: type, id, name, level, coords[]
+            if (!isset($som[$what][$entry['name']]))        // not found yet
+                $som[$what][$entry['name']][] = $entry;
+            else                                            // found .. something..
+            {
+                // check for identical floors
+                foreach ($som[$what][$entry['name']] as &$byFloor)
+                {
+                    if ($byFloor['level'] != $entry['level'])
+                        continue;
+
+                    // found existing floor, ammending coords
+                    $byFloor['coords'][] = $entry['coords'][0];
+                    break;
+                }
+
+                // floor not used yet, create it
+                $som[$what][$entry['name']][] = $entry;
+            }
+        };
+
         if ($_ = $this->subject->getField('parentArea'))
         {
             $this->extraText = sprintf(Lang::zone('zonePartOf'), $_);
             $this->extendGlobalIds(TYPE_ZONE, $_);
         }
 
+        // we cannot fetch spawns via lists. lists are grouped by entry
         $oSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_OBJECT);
-        $conditions = [['id', array_column($oSpawns, 'typeId')]];
-        if (!User::isInGroup(U_GROUP_STAFF))
-            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
-
-        if ($oSpawns)
-            $objectSpawns = new GameObjectList($conditions);
-
         $cSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_NPC);
 
-        $conditions = [['id', array_column($cSpawns, 'typeId')]];
+        $conditions = [['s.areaId', $this->typeId]];
         if (!User::isInGroup(U_GROUP_STAFF))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
-        if ($cSpawns)
-            $creatureSpawns = new CreatureList($conditions);
+        $objectSpawns   = new GameObjectList($conditions);
+        $creatureSpawns = new CreatureList($conditions);
+
+        $questsLV = $rewardsLV = [];
 
         // see if we can actually display a map
         $hasMap = file_exists('static/images/wow/maps/'.Util::$localeStrings[User::$localeId].'/normal/'.$this->typeId.'.jpg');
@@ -197,45 +216,60 @@ class ZonePage extends GenericPage
                             $what = 'anvil';
                         else if ($tpl['spellFocusId'] == 3)
                             $what = 'forge';
-                        else
-                            continue 2;
 
                         break;
-                    default:
-                        continue 2;
                 }
 
-                if (!isset($som[$what][$n]))                    // not found yet
-                {
-                    $som[$what][$n][] = array(
+                if ($what)
+                    $addToMap($what, array(
                         'coords' => [[$spawn['posX'], $spawn['posY']]],
                         'level'  => $spawn['floor'],
                         'name'   => $n,
                         'type'   => TYPE_OBJECT,
                         'id'     => $tpl['id']
-                    );
-                }
-                else                                            // found .. something..
+                    ));
+
+                if ($tpl['startsQuests'])
                 {
-                    // check for identical floors
-                    foreach ($som[$what][$n] as &$byFloor)
-                    {
-                        if ($byFloor['level'] != $spawn['floor'])
+                        $started = new QuestList(array(['qse.method', 1, '&'], ['qse.type', TYPE_OBJECT], ['qse.typeId', $tpl['id']]));
+                        if ($started->error)
                             continue;
 
-                        // found existing floor, ammending coords
-                        $byFloor['coords'][] = [$spawn['posX'], $spawn['posY']];
-                        continue 2;
-                    }
+                        // store data for misc tabs
+                        foreach ($started->getListviewData() as $id => $data)
+                        {
+                            if (!empty($started->rewards[$id][TYPE_ITEM]))
+                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][TYPE_ITEM]));
 
-                    // floor not used yet, create it
-                    $som[$what][$n][] = array(
-                        'coords' => [[$spawn['posX'], $spawn['posY']]],
-                        'level'  => $spawn['floor'],
-                        'name'   => $n,
-                        'type'   => TYPE_OBJECT,
-                        'id'     => $tpl['id']
-                    );
+                            if (!empty($started->choices[$id][TYPE_ITEM]))
+                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][TYPE_ITEM]));
+
+                            $questsLV[$id] = $data;
+                        }
+
+                        $this->extendGlobalData($started->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+
+                        if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
+                            $addToMap('alliancequests', array(
+                                'coords' => [[$spawn['posX'], $spawn['posY']]],
+                                'level'  => $spawn['floor'],
+                                'name'   => $n,
+                                'type'   => TYPE_OBJECT,
+                                'id'     => $tpl['id'],
+                                'side'   => (($tpl['A'] < 0 ? 0 : 0x1) | ($tpl['H'] < 0 ? 0 : 0x2)),
+                                'quests' => array_values($_)
+                            ));
+
+                        if (($tpl['H'] != -1) & ($_ = $started->getSOMData(SIDE_HORDE)))
+                            $addToMap('hordequests', array(
+                                'coords' => [[$spawn['posX'], $spawn['posY']]],
+                                'level'  => $spawn['floor'],
+                                'name'   => $n,
+                                'type'   => TYPE_OBJECT,
+                                'id'     => $tpl['id'],
+                                'side'   => (($tpl['A'] < 0 ? 0 : 0x1) | ($tpl['H'] < 0 ? 0 : 0x2)),
+                                'quests' => array_values($_)
+                            ));
                 }
             }
 
@@ -275,17 +309,13 @@ class ZonePage extends GenericPage
                     $what = 'guildmaster';
                 else if ($tpl['npcflag'] & (NPC_FLAG_SPIRIT_HEALER | NPC_FLAG_SPIRIT_GUIDE))
                     $what = 'spirithealer';
-                else if ($creatureSpawns->isBoss())             // ($tpl['rank'] == 3 || $tpl['cuFlags'] & NPC_CU_INSTANCE_BOSS)
+                else if ($creatureSpawns->isBoss())
                     $what = 'boss';
                 else if ($tpl['rank'] == 2 || $tpl['rank'] == 4)
                     $what = 'rare';
-                // questgiver (any type) ?
-                else
-                    continue;
 
-                if (!isset($som[$what][$n]))                    // not found yet
-                {
-                    $som[$what][$n][] = array(
+                if ($what)
+                    $addToMap($what, array(
                         'coords'        => [[$spawn['posX'], $spawn['posY']]],
                         'level'         => $spawn['floor'],
                         'name'          => $n,
@@ -294,32 +324,51 @@ class ZonePage extends GenericPage
                         'reacthorde'    => $tpl['H'] ?: 1,      // no neutral (0) setting
                         'reactalliance' => $tpl['A'] ?: 1,
                         'description'   => $sn
-                    );
-                }
-                else                                            // found .. something..
+                    ));
+
+                if ($tpl['startsQuests'])
                 {
-                    // check for identical floors
-                    foreach ($som[$what][$n] as &$byFloor)
-                    {
-                        if ($byFloor['level'] != $spawn['floor'])
+                        $started = new QuestList(array(['qse.method', 1, '&'], ['qse.type', TYPE_NPC], ['qse.typeId', $tpl['id']]));
+                        if ($started->error)
                             continue;
 
-                        // found existing floor, ammending coords
-                        $byFloor['coords'][] = [$spawn['posX'], $spawn['posY']];
-                        continue 2;
-                    }
+                        // store data for misc tabs
+                        foreach ($started->getListviewData() as $id => $data)
+                        {
+                            if (!empty($started->rewards[$id][TYPE_ITEM]))
+                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][TYPE_ITEM]));
 
-                    // floor not used yet, create it
-                    $som[$what][$n][] = array(
-                        'coords'        => [[$spawn['posX'], $spawn['posY']]],
-                        'level'         => $spawn['floor'],
-                        'name'          => $n,
-                        'type'          => TYPE_NPC,
-                        'id'            => $tpl['id'],
-                        'reacthorde'    => $tpl['H'] ?: 1,      // no neutral (0) setting
-                        'reactalliance' => $tpl['A'] ?: 1,
-                        'description'   => $sn
-                    );
+                            if (!empty($started->choices[$id][TYPE_ITEM]))
+                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][TYPE_ITEM]));
+
+                            $questsLV[$id] = $data;
+                        }
+
+                        if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
+                            $addToMap('alliancequests', array(
+                                'coords'        => [[$spawn['posX'], $spawn['posY']]],
+                                'level'         => $spawn['floor'],
+                                'name'          => $n,
+                                'type'          => TYPE_NPC,
+                                'id'            => $tpl['id'],
+                                'reacthorde'    => $tpl['H'],
+                                'reactalliance' => $tpl['A'],
+                                'side'          => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
+                                'quests'        => array_values($_)
+                            ));
+
+                        if (($tpl['H'] != -1) & ($_ = $started->getSOMData(SIDE_HORDE)))
+                            $addToMap('hordequests', array(
+                                'coords'        => [[$spawn['posX'], $spawn['posY']]],
+                                'level'         => $spawn['floor'],
+                                'name'          => $n,
+                                'type'          => TYPE_NPC,
+                                'id'            => $tpl['id'],
+                                'reacthorde'    => $tpl['H'],
+                                'reactalliance' => $tpl['A'],
+                                'side'          => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
+                                'quests'        => array_values($_)
+                            ));
                 }
             }
 
@@ -385,15 +434,6 @@ class ZonePage extends GenericPage
             if (in_array($this->subject->getField('type'), [2, 3, 4, 5, 7, 8]))
                 $som['instance'] = true;
 
-            /*
-            var mapShower = new ShowOnMap(
-                {
-            1/2        alliancequests: [{ coords: [[71.8,46.4]], level: 0, name: 'Lord Ello Ebonlocke', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 19, name: 'The Embalmer\'s Revenge', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 263 },{ coords: [[73.6,46.8]], level: 0, name: 'Commander Althea Ebonlocke', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 18, name: 'Bones That Walk', series: 1, first: 0, category: 10, _category: 0 },{ level: 19, name: 'The Hermit', series: 0, first: 0, category: 10, _category: 0 },{ level: 19, name: 'The Night Watch', series: 1, first: 1, category: 10, _category: 0 },{ level: 19, name: 'Wolves at Our Heels', series: 1, first: 0, category: 10, _category: 0 },{ level: 23, name: 'Mor\'Ladim', series: 1, first: 0, category: 10, _category: 0 },{ level: 23, name: 'The Daughter Who Lived', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 264 },{ coords: [[75.8,45.2]], level: 0, name: 'Madame Eva', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 19, name: 'Deliver the Thread', series: 1, first: 0, category: 10, _category: 0 },{ level: 19, name: 'Ghost Hair Thread', series: 1, first: 0, category: 10, _category: 0 },{ level: 21, name: 'Mistmantle\'s Revenge', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 265 },{ coords: [[72.6,46.8]], level: 0, name: 'Clerk Daltry', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 21, name: 'In A Dark Corner', series: 1, first: 0, category: 10, _category: 0 },{ level: 21, name: 'Roland\'s Doom', series: 1, first: 0, category: 10, _category: 0 },{ level: 21, name: 'The Fate of Stalvan Mistmantle', series: 1, first: 0, category: 10, _category: 0 },{ level: 21, name: 'The Stolen Letters', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 267 },{ coords: [[72.6,47.6]], level: 0, name: 'Sirra Von\'Indi', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 23, name: 'Morgan Ladimore', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 268 },{ coords: [[73.8,43.6]], level: 0, name: 'Chef Grual', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 18, name: 'Dusky Crab Cakes', series: 0, first: 0, category: 10, _category: 0 },{ level: 18, name: 'Seasoned Wolf Kabobs', series: 0, first: 0, category: 10, _category: 0 }], type: 1, id: 272 },{ coords: [[73.8,44.4]], level: 0, name: 'Tavernkeep Smitts', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 19, name: 'Gather Rot Blossoms', series: 1, first: 0, category: 10, _category: 0 },{ level: 19, name: 'Juice Delivery', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 273 },{ coords: [[79.4,47.2]], level: 0, name: 'Viktori Prism\'Antras', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 19, name: 'Classy Glass', series: 1, first: 0, category: 10, _category: 0 },{ level: 19, name: 'Look To The Stars', series: 1, first: 1, category: 10, _category: 0 }], type: 1, id: 276 },{ coords: [[18.6,58.2]], level: 0, name: 'Jitters', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 22, name: 'Bear In Mind', series: 1, first: 0, category: 10, _category: 0 },{ level: 22, name: 'The Jitters-Bugs', series: 1, first: 1, category: 10, _category: 0 }], type: 1, id: 288 },{ coords: [[87.4,35.4]], level: 0, name: 'Abercrombie', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 19, name: 'Ghoulish Effigy', series: 1, first: 0, category: 10, _category: 0 },{ level: 19, name: 'Note to the Mayor', series: 1, first: 0, category: 10, _category: 0 },{ level: 19, name: 'Ogre Thieves', series: 1, first: 0, category: 10, _category: 0 },{ level: 19, name: 'Supplies from Darkshire', series: 1, first: 1, category: 10, _category: 0 },{ level: 19, name: 'Zombie Juice', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 289 },{ coords: [[81.8,59.2]], level: 0, name: 'Blind Mary', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 19, name: 'Return the Comb', series: 1, first: 0, category: 10, _category: 0 },{ level: 19, name: 'The Insane Ghoul', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 302 },{ coords: [[73.6,46.8]], level: 0, name: 'Watcher Ladimore', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 23, name: 'A Daughter\'s Love', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 576 },{ coords: [[77.6,44.4]], level: 0, name: 'Chicken', reacthorde: 0, reactalliance: 0, side: 3, quests: [{ level: 1, name: 'CLUCK!', series: 0, first: 0, category: 40, _category: 0 }], type: 1, id: 620 },{ coords: [[75.2,47.8]], level: 0, name: 'Calor', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 21, name: 'The Rotting Orchard', series: 1, first: 0, category: 10, _category: 0 },{ level: 21, name: 'Vile and Tainted', series: 1, first: 0, category: 10, _category: 0 },{ level: 21, name: 'Worgen in the Woods', series: 1, first: 1, category: 10, _category: 0 },{ level: 21, name: 'Worgen in the Woods', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 663 },{ coords: [[45,66.8]], level: 0, name: 'Watcher Dodds', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 20, name: 'Vulgar Vul\'Gol', series: 0, first: 0, category: 10, _category: 0 }], type: 1, id: 888 },{ coords: [[73.6,53.8]], level: 0, name: 'Fire Eater', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 1, name: 'Playing with Fire', series: 0, first: 0, category: -369, _category: 9 }], type: 1, id: 25962 },{ coords: [[79,44.2]], level: 0, name: 'Tobias Mistmantle', reacthorde: 0, reactalliance: 1, side: 1, quests: [{ level: 21, name: 'Clawing at the Truth', series: 1, first: 0, category: 10, _category: 0 },{ level: 21, name: 'Part of the Pack', series: 0, first: 0, category: 10, _category: 0 },{ level: 21, name: 'The Legend of Stalvan', series: 1, first: 1, category: 10, _category: 0 }], type: 1, id: 43453 },{ coords: [[18.4,57.6]], level: 0, name: 'Oliver Harris', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 21, name: 'Cry For The Moon', series: 1, first: 0, category: 10, _category: 0 },{ level: 22, name: 'A Curse We Cannot Lift', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 43730 },{ coords: [[19.8,57.8]], level: 0, name: 'Sister Elsington', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 22, name: 'Guided by the Light', series: 1, first: 0, category: 10, _category: 0 },{ level: 22, name: 'Soothing Spirits', series: 0, first: 0, category: 10, _category: 0 },{ level: 22, name: 'The Cries of the Dead', series: 0, first: 0, category: 10, _category: 0 },{ level: 24, name: 'Rebels Without a Clue', series: 1, first: 1, category: 33, _category: 0 }], type: 1, id: 43731 },{ coords: [[44.8,67.2]], level: 0, name: 'Apprentice Fess', reacthorde: -1, reactalliance: 1, side: 1, quests: [{ level: 22, name: 'A Deadly Vine', series: 0, first: 0, category: 10, _category: 0 },{ level: 22, name: 'Delivery to Master Harris', series: 1, first: 0, category: 10, _category: 0 },{ level: 22, name: 'The Yorgen Worgen', series: 1, first: 1, category: 10, _category: 0 }], type: 1, id: 43738 },{ coords: [[18.4,57.8]], level: 0, name: 'Sven Yorgen', reacthorde: 0, reactalliance: 1, side: 1, quests: [{ level: 22, name: 'The Fate of Morbent Fel', series: 1, first: 1, category: 10, _category: 0 },{ level: 22, name: 'The Lurking Lich', series: 1, first: 0, category: 10, _category: 0 }], type: 1, id: 43861 },{ coords: [[19.8,44.8]], level: 0, name: 'Eric Davidson', reacthorde: 1, reactalliance: 1, side: 1, quests: [{ level: 1, name: 'Eric Davidson', series: 0, first: 0, category: -394, _category: 7, daily: 1 },{ level: 1, name: 'Steven Lisbane', series: 1, first: 0, category: -394, _category: 7 }], type: 1, id: 65655 },{ coords: [[17.7,29.1]], level: 0, name: 'A Weathered Grave', side: 1, quests: [{ level: 23, name: 'The Weathered Grave', series: 1, first: 1, category: 10, _category: 0 }], type: 2, id: 61 },{ coords: [[23.5,35.5]], level: 0, name: 'Lightforged Rod', side: 1, quests: [{ level: 22, name: 'The Halls of the Dead', series: 1, first: 0, category: 10, _category: 0 }], type: 2, id: 204817 },{ coords: [[20.4,27.6]], level: 0, name: 'Lightforged Arch', side: 1, quests: [{ level: 22, name: 'Buried Below', series: 1, first: 0, category: 10, _category: 0 }], type: 2, id: 204824 },{ coords: [[18.1,25.3]], level: 0, name: 'Lightforged Crest', side: 1, quests: [{ level: 22, name: 'Morbent\'s Bane', series: 1, first: 0, category: 10, _category: 0 }], type: 2, id: 204825 }],
-            1/2        hordequests: [{ coords: [[77.6,44.4]], level: 0, name: 'Chicken', reacthorde: 0, reactalliance: 0, side: 3, quests: [{ level: 1, name: 'CLUCK!', series: 0, first: 0, category: 40, _category: 0 }], type: 1, id: 620 },{ coords: [[19.8,44.8]], level: 0, name: 'Eric Davidson', reacthorde: 1, reactalliance: 1, side: 3, quests: [{ level: 1, name: 'Steven Lisbane', series: 1, first: 0, category: -394, _category: 7 }], type: 1, id: 65655 }],
-            1          flightmaster: [{ coords: [[77.4,44.2]], level: 0, name: 'Felicia Maline', type: 1, id: 2409, reacthorde: -1, reactalliance: 1, description: 'Gryphon Master', paths: [[21,56.6]] },{ coords: [[21,56.6]], level: 0, name: 'John Shelby', type: 1, id: 43697, reacthorde: -1, reactalliance: 1, description: 'Gryphon Master' }],
-                }
-            */
-
             $this->map        = array(
                 'data' => ['parent' => 'mapper-generic', 'zone' => $this->typeId],
                 'som'  => $som
@@ -451,11 +491,64 @@ class ZonePage extends GenericPage
             $this->lvTabs[] = $lvData;
         }
 
-        // tab: Quests
+        // tab: Quests [data collected by SOM-routine]
+        if ($questsLV)
+        {
+            $this->lvTabs[] = array(
+                'file'   => 'quest',
+                'data'   => $questsLV,
+                'params' => ['note' => '$$WH.sprintf(LANG.lvnote_zonequests, '.$this->subject->getField('mapId').', '.$this->typeId.', \''.Util::jsEscape($this->subject->getField('name', true)).'\', '.$this->typeId.')']
+            );
+        }
 
-        // tab: items
+        // tab: item-quest starter
+        // select every quest starter, that is a drop
+        $questStartItem = DB::Aowow()->select('
+            SELECT qse.typeId AS ARRAY_KEY, moreType, moreTypeId, moreZoneId
+            FROM   ?_quests_startend qse JOIN ?_source src ON src.type = qse.type AND src.typeId = qse.typeId
+            WHERE  src.src2 IS NOT NULL AND qse.type = ?d AND (moreZoneId = ?d OR (moreType = ?d AND moreTypeId IN (?a)) OR (moreType = ?d AND moreTypeId IN (?a)))',
+            TYPE_ITEM,   $this->typeId,
+            TYPE_NPC,    array_unique(array_column($cSpawns, 'typeId')) ?: [0],
+            TYPE_OBJECT, array_unique(array_column($oSpawns, 'typeId')) ?: [0]
+        );
 
-        // tab: Quest Rewards
+        if ($questStartItem)
+        {
+            $qsiList = new ItemList(array(['id', array_keys($questStartItem)]));
+            if (!$qsiList->error)
+            {
+                $this->lvTabs[] = array(
+                    'file'   => 'item',
+                    'data'   => $qsiList->getListviewData(),
+                    'params' => [
+                        'name' => '$LANG.tab_startsquest',
+                        'id'   => 'starts-quest'
+                    ]
+                );
+
+                $this->extendGlobalData($qsiList->getJSGlobals(GLOBALINFO_SELF));
+            }
+        }
+
+        // tab: Quest Rewards [ids collected by SOM-routine]
+        if ($rewardsLV)
+        {
+            $rewards = new ItemList(array(['id', array_unique($rewardsLV)]));
+            if (!$rewards->error)
+            {
+                $this->lvTabs[] = array(
+                    'file'   => 'item',
+                    'data'   => $rewards->getListviewData(),
+                    'params' => [
+                        'name' => '$LANG.tab_questrewards',
+                        'id'   => 'quest-rewards',
+                        'note' => sprintf(Util::$filterResultString, '?items&filter=cr=126;crs='.$this->typeId.';crv=0')
+                    ]
+                );
+
+                $this->extendGlobalData($rewards->getJSGlobals(GLOBALINFO_SELF));
+            }
+        }
 
         // tab: achievements
 
