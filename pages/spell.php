@@ -227,6 +227,12 @@ class SpellPage extends GenericPage
                 $infobox[] = 'Mode'.Lang::main('colon').Lang::game('modes', $n);
 
         $effects = $this->createEffects($infobox, $redButtons);
+
+        // spell script
+        if (User::isInGroup(U_GROUP_STAFF))
+            if ($_ = DB::World()->selectCell('SELECT ScriptName FROM spell_script_names WHERE ABS(spell_id) = ?d', $this->firstRank))
+                $infobox[] = 'Script'.Lang::main('colon').$_;
+
         $infobox = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : '';
 
         // append glyph symbol if available
