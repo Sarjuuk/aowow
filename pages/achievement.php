@@ -44,7 +44,7 @@ class AchievementPage extends GenericPage
 
         $this->subject = new AchievementList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('achievement'));
+            $this->notFound();
 
         $this->extendGlobalData($this->subject->getJSGlobals(GLOBALINFO_REWARDS));
 
@@ -464,10 +464,10 @@ class AchievementPage extends GenericPage
         die($tt);
     }
 
-    public function notFound($typeStr)
+    public function notFound()
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($typeStr);
+            return parent::notFound(Lang::game('achievement'), Lang::achievement('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

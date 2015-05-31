@@ -384,6 +384,7 @@ $lang = array(
         'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
     ),
     'gameObject' => array(
+        'notFound'      => "Cette entité n'existe pas.",
         'cat'           => [0 => "Autre", 9 => "Livres", 3 => "Conteneurs", -5 => "Coffres", 25 => "Bancs de poissons", -3 => "Herbes", -4 => "Filons de minerai", -2 => "Quêtes", -6 => "Outils"],
         'type'          => [              9 => "Livre",  3 => "Conteneur",  -5 => "Coffre",  25 => "",                  -3 => "Herbe",  -4 => "Filon de minerai",  -2 => "Quête",  -6 => ""],
         'unkPosition'   => "L'emplacement de cette entité est inconnu.",
@@ -396,6 +397,7 @@ $lang = array(
         'restock'       => "[Restocks every %s.]"
     ),
     'npc' => array(
+        'notFound'      => "Ce PNJ n'existe pas.",
         'classification'=> "Classification",
         'petFamily'     => "Familier",
         'react'         => "Réaction",
@@ -431,6 +433,7 @@ $lang = array(
         )
     ),
     'event' => array(
+        'notFound'      => "Cet évènement mondial n'existe pas.",
         'start'         => "Début",
         'end'           => "Fin",
         'interval'      => "Intervalle",
@@ -438,6 +441,7 @@ $lang = array(
         'category'      => ["Non classés", "Vacances", "Récurrent", "Joueur ctr. Joueur"]
     ),
     'achievement' => array(
+        'notFound'      => "Ce haut fait n'existe pas.",
         'criteria'      => "Critères",
         'points'        => "Points",
         'series'        => "Série",
@@ -450,7 +454,11 @@ $lang = array(
         'rfAvailable'   => "Disponibles sur les royaumes : ",
         '_transfer'     => 'Cet haut fait sera converti en <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
     ),
+    'chrClass' => array(
+        'notFound'      => "Cette classe n'existe pas."
+    ),
     'race' => array(
+        'notFound'      => "Cette race n'existe pas.",
         'racialLeader'  => "Leader racial",
         'startZone'     => "Zone initiales",
     ),
@@ -472,6 +480,7 @@ $lang = array(
         'CosmicMap'     => "Carte cosmique",
     ),
     'zone' => array(
+        'notFound'      => "Cette zone n'existe pas.",
         'attunement'    => ["Accès", "Accès Héroïque"],
         'key'           => ["Clef", "Clef Héroïque"],
         'location'      => "Localisation",
@@ -494,8 +503,8 @@ $lang = array(
         )
     ),
     'quest' => array(
+        'notFound'      => "Cette quête n'existe pas.",
         '_transfer'     => 'Cette quête sera converti en <a href="?quest=%d" class="q1">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
-
         'questLevel'    => "Niveau %s",
         'requirements'  => "Conditions",
         'reqMoney'      => "Argent requis",
@@ -624,28 +633,33 @@ $lang = array(
         )
     ),
     'title' => array(
+        'notFound'      => "Ce titre n'existe pas.",
         '_transfer'     => 'Ce titre sera converti en <a href="?title=%d" class="q1">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         'cat'           => array(
             "Général",      "Joueur ctr. Joueur",    "Réputation",       "Donjons & raids",     "Quêtes",       "Métiers",      "Évènements mondiaux"
         )
     ),
     'skill' => array(
+        'notFound'      => "Cette compétence n'existe pas.",
         'cat'           => array(
             -6 => "Compagnons",         -5 => "Montures",           -4 => "Traits raciaux",     5 => "Caractéristiques",    6 => "Compétences d'armes", 7 => "Compétences de classe", 8 => "Armures utilisables",
              9 => "Compétences secondaires", 10 => "Langues",       11 => "Métiers"
         )
     ),
     'currency' => array(
+        'notFound'      => "Cette monnaie n'existe pas.",
         'cap'           => "Maximum total",
         'cat'           => array(
             1 => "Divers", 2 => "JcJ", 4 => "Classique", 21 => "Wrath of the Lich King", 22 => "Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Inutilisées"
         )
     ),
     'pet'      => array(
+        'notFound'      => "Cette famille de familiers n'existe pas.",
         'exotic'        => "Exotique",
         'cat'           => ["Férocité", "Tenacité", "Ruse"]
     ),
     'faction' => array(
+        'notFound'      => "Cette faction n'existe pas.",
         'spillover'     => "[Reputation Spillover]",
         'spilloverDesc' => "[Gaining reputation with this faction also yields a proportional gain with the factions listed below.]",
         'maxStanding'   => "Niveau maximum",
@@ -660,6 +674,7 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        'notFound'      => "Cet ensemble d'objets n'existe pas.",
         '_desc'         => "<b>%s</b> est le <b>%s</b>. Il contient %s pièces.",
         '_descTagless'  => "<b>%s</b> est un ensemble d'objet qui contient %s pièces.",
         '_setBonuses'   => "Bonus de l'ensemble",
@@ -684,6 +699,7 @@ $lang = array(
         )
     ),
     'spell' => array(
+        'notFound'      => "Ce sort n'existe pas.",
         '_spellDetails' => "Détails sur le sort",
         '_cost'         => "Coût",
         '_range'        => "Portée",
@@ -825,6 +841,7 @@ $lang = array(
         'invisibilityType' => ["GENERAL", 3 => "TRAP", 6 => "DRUNK"]
     ),
     'item' => array(
+        'notFound'      => "Cet objet n'existe pas.",
         'armor'         => "Armure : %s",
         'block'         => "Bloquer : %s",
         'charges'       => "Charges",

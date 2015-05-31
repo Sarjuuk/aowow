@@ -25,7 +25,7 @@ class FactionPage extends GenericPage
 
         $this->subject = new FactionList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('faction'));
+            $this->notFound(Lang::game('faction'), Lang::faction('notFound'));
 
         $this->name = $this->subject->getField('name', true);
     }

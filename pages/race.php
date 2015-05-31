@@ -26,7 +26,7 @@ class RacePage extends GenericPage
 
         $this->subject = new CharRaceList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('race'));
+            $this->notFound(Lang::game('race'), Lang::race('notFound'));
 
         $this->name = $this->subject->getField('name', true);
     }

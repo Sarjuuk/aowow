@@ -37,7 +37,7 @@ class ObjectPage extends GenericPage
 
         $this->subject = new GameObjectList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('gameObject'));
+            $this->notFound();
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -486,10 +486,10 @@ class ObjectPage extends GenericPage
         die($tt);
     }
 
-    public function notFound($typeStr)
+    public function notFound()
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($typeStr);
+            return parent::notFound(Lang::game('gameObject'), Lang:gameObject('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

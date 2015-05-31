@@ -379,6 +379,7 @@ $lang = array(
         'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
     ),
     'gameObject' => array(
+        'notFound'      => "This object doesn't exist.",
         'cat'           => [0 => "Other", 9 => "Books", 3 => "Containers", -5 => "Chests", 25 => "Fishing Pools", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],
         'type'          => [              9 => "Book",  3 => "Container",  -5 => "Chest",  25 => "",              -3 => "Herb",  -4 => "Mineral Vein",  -2 => "Quest", -6 => ""],
         'unkPosition'   => "The location of this object is unknown.",
@@ -392,6 +393,7 @@ $lang = array(
         'restock'       => "Restocks every %s."
     ),
     'npc' => array(
+        'notFound'      => "This NPC doesn't exist.",
         'classification'=> "Classification",
         'petFamily'     => "Pet familiy",
         'react'         => "React",
@@ -428,6 +430,7 @@ $lang = array(
         ),
     ),
     'event' => array(
+        'notFound'      => "This world event doesn't exist.",
         'start'         => "Start",
         'end'           => "End",
         'interval'      => "Interval",
@@ -435,6 +438,7 @@ $lang = array(
         'category'      => ["Uncategorized", "Holidays", "Recurring", "Player vs. Player"]
     ),
     'achievement' => array(
+        'notFound'      => "This achievement doesn't exist.",
         'criteria'      => "Criteria",
         'points'        => "Points",
         'series'        => "Series",
@@ -447,7 +451,11 @@ $lang = array(
         'rfAvailable'   => "Available on realm:",
         '_transfer'     => 'This achievement will be converted to <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
     ),
+    'chrClass' => array(
+        'notFound'      => "This class doesn't exist."
+    ),
     'race' => array(
+        'notFound'      => "This race doesn't exist.",
         'racialLeader'  => "Racial leader",
         'startZone'     => "Starting zone",
     ),
@@ -469,6 +477,7 @@ $lang = array(
         'CosmicMap'     => "Cosmic Map",
     ),
     'zone' => array(
+        'notFound'      => "This zone doesn't exist.",
         'attunement'    => ["Attunement", "Heroic attunement"],
         'key'           => ["Key", "Heroic key"],
         'location'      => "Location",
@@ -491,8 +500,8 @@ $lang = array(
         )
     ),
     'quest' => array(
+        'notFound'      => "This quest doesn't exist.",
         '_transfer'     => 'This quest will be converted to <a href="?quest=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
-
         'questLevel'    => "Level %s",
         'requirements'  => "Requirements",
         'reqMoney'      => "Required money",
@@ -622,28 +631,33 @@ $lang = array(
         )
     ),
     'title' => array(
+        'notFound'      => "This title doesn't exist.",
         '_transfer'     => 'This title will be converted to <a href="?title=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'cat'           => array(
             "General",      "Player vs. Player",    "Reputation",       "Dungeons & Raids",     "Quests",       "Professions",      "World Events"
         )
     ),
     'skill' => array(
+        'notFound'      => "This skill doesn't exist.",
         'cat'           => array(
             -6 => "Companions",         -5 => "Mounts",             -4 => "Racial Traits",      5 => "Attributes",          6 => "Weapon Skills",       7 => "Class Skills",        8 => "Armor Proficiencies",
              9 => "Secondary Skills",   10 => "Languages",          11 => "Professions"
         )
     ),
     'currency' => array(
+        'notFound'      => "This currency doesn't exist.",
         'cap'           => "Total cap",
         'cat'           => array(
             1 => "Miscellaneous", 2 => "Player vs. Player", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon and Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Unused"
         )
     ),
     'pet'      => array(
+        'notFound'      => "This pet family doesn't exist.",
         'exotic'        => "Exotic",
         'cat'           => ["Ferocity", "Tenacity", "Cunning"]
     ),
     'faction' => array(
+        'notFound'      => "This faction doesn't exist.",
         'spillover'     => "Reputation Spillover",
         'spilloverDesc' => "Gaining reputation with this faction also yields a proportional gain with the factions listed below.",
         'maxStanding'   => "Max. Standing",
@@ -658,6 +672,7 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        'notFound'      => "This item set doesn't exist.",
         '_desc'         => "<b>%s</b> is the <b>%s</b>. It contains %s pieces.",
         '_descTagless'  => "<b>%s</b> is an item set that contains %s pieces.",
         '_setBonuses'   => "Set Bonuses",
@@ -682,6 +697,7 @@ $lang = array(
         )
     ),
     'spell' => array(
+        'notFound'      => "This spell doesn't exist.",
         '_spellDetails' => "Spell Details",
         '_cost'         => "Cost",
         '_range'        => "Range",
@@ -823,6 +839,7 @@ $lang = array(
         'invisibilityType' => ["General", 3 => "Trap", 6 => "Drunk"]
     ),
     'item' => array(
+        'notFound'      => "This item doesn't exist.",
         'armor'         => "%s Armor",
         'block'         => "%s Block",
         'charges'       => "Charges",

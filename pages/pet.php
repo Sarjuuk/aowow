@@ -26,7 +26,7 @@ class PetPage extends GenericPage
 
         $this->subject = new PetList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('pet'));
+            $this->notFound(Lang::game('pet'), Lang::pet('notFound'));
 
         $this->name = $this->subject->getField('name', true);
     }

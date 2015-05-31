@@ -24,7 +24,7 @@ class ZonePage extends GenericPage
 
         $this->subject = new ZoneList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('zone'));
+            $this->notFound(Lang::game('zone'), Lang::zone('notFound'));
 
         $this->name = $this->subject->getField('name', true);
     }

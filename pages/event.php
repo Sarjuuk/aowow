@@ -30,7 +30,7 @@ class EventPage extends GenericPage
 
         $this->subject = new WorldEventList($conditions);
         if ($this->subject->error)
-            $this->notFound(Lang::game('event'));
+            $this->notFound(Lang::game('event'), Lang::event('notFound'));
 
         $this->hId = $this->subject->getField('holidayId');
         $this->eId = $this->subject->getField('eventBak');

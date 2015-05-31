@@ -59,7 +59,7 @@ class ItemPage extends genericPage
 
         $this->subject = new ItemList($conditions);
         if ($this->subject->error)
-            $this->notFound(Lang::game('item'));
+            $this->notFound();
 
         if (!is_numeric($param))
             $this->typeId = $this->subject->id;
@@ -1136,7 +1136,7 @@ class ItemPage extends genericPage
             return parent::display($override);
     }
 
-    public function notFound($typeStr)
+    public function notFound()
     {
         if ($this->mode == CACHE_TYPE_TOOLTIP)
         {
@@ -1151,7 +1151,7 @@ class ItemPage extends genericPage
             exit();
         }
         else
-            return parent::notFound($typeStr);
+            return parent::notFound(Lang::game('item'), Lang::item('notFound'));
     }
 }
 

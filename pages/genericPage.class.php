@@ -363,6 +363,8 @@ class GenericPage
 
     public function notFound($title, $msg = '')             // unknown entry
     {
+        array_unshift($this->title, Lang::main('nfPageTitle'));
+
         $this->notFound      = array(
             'title' =>          $this->typeId ? Util::ucFirst($title).' #'.$this->typeId    : $title,
             'msg'   => !$msg && $this->typeId ? sprintf(Lang::main('pageNotFound'), $title) : $msg

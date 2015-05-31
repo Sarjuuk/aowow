@@ -25,7 +25,7 @@ class CurrencyPage extends GenericPage
 
         $this->subject = new CurrencyList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('currency'));
+            $this->notFound(Lang::game('currency'), Lang::currency('notFound'));
 
         $this->name = $this->subject->getField('name', true);
     }

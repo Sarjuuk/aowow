@@ -10,6 +10,7 @@ class Lang
     private static $game;
 
     private static $achievement;
+    private static $chrClass;
     private static $currency;
     private static $event;
     private static $faction;

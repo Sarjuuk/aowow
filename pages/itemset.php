@@ -29,7 +29,7 @@ class ItemsetPage extends GenericPage
 
         $this->subject = new ItemsetList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('itemset'));
+            $this->notFound(Lang::game('itemset'), Lang::itemset('notFound'));
 
         $this->name = $this->subject->getField('name', true);
         $this->extendGlobalData($this->subject->getJSGlobals());
