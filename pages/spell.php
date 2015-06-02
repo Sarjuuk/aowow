@@ -33,7 +33,7 @@ class SpellPage extends GenericPage
 
         $this->subject = new SpellList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('spell'));
+            $this->notFound();
 
         $jsg = $this->subject->getJSGlobals(GLOBALINFO_ANY, $extra);
         $this->extendGlobalData($jsg, $extra);
@@ -227,6 +227,12 @@ class SpellPage extends GenericPage
                 $infobox[] = 'Mode'.Lang::main('colon').Lang::game('modes', $n);
 
         $effects = $this->createEffects($infobox, $redButtons);
+
+        // spell script
+        if (User::isInGroup(U_GROUP_STAFF))
+            if ($_ = DB::World()->selectCell('SELECT ScriptName FROM spell_script_names WHERE ABS(spell_id) = ?d', $this->firstRank))
+                $infobox[] = 'Script'.Lang::main('colon').$_;
+
         $infobox = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : '';
 
         // append glyph symbol if available
@@ -1186,10 +1192,10 @@ class SpellPage extends GenericPage
         die($tt);
     }
 
-    public function notFound($typeStr)
+    public function notFound()
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($typeStr);
+            return parent::notFound(Lang::game('spell'), Lang::spell('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

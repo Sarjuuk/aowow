@@ -30,7 +30,7 @@ class NpcPage extends GenericPage
 
         $this->subject = new CreatureList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('npc'));
+            $this->notFound();
 
         $this->name    = $this->subject->getField('name', true);
         $this->subname = $this->subject->getField('subname', true);
@@ -61,11 +61,7 @@ class NpcPage extends GenericPage
 
         // difficulty entries of self
         if ($this->subject->getField('cuFlags') & NPC_CU_DIFFICULTY_DUMMY)
-        {
-            // find and create link to regular creature
-            $regNPC = new CreatureList(array(['OR', ['difficultyEntry1', $this->typeId], ['difficultyEntry2', $this->typeId], ['difficultyEntry3', $this->typeId]]));
-            $position = [$regNPC->id, $regNPC->getField('name', true)];
-        }
+            $position = [$this->subject->getField('parentId'), $this->subject->getField('parent', true)];
         else
         {
             for ($i = 1; $i < 4; $i++)
@@ -811,10 +807,10 @@ class NpcPage extends GenericPage
         die($tt);
     }
 
-    public function notFound($typeStr)
+    public function notFound()
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($typeStr);
+            return parent::notFound(Lang::game('npc'), Lang::npc('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);
@@ -963,7 +959,7 @@ class NpcPage extends GenericPage
 
                 $line = array(
                     'range' => $t['range'],
-                    'type' => 2,                            // [type: 0, 12] say: yellow-ish
+                    'type'  => 2,                           // [type: 0, 12] say: yellow-ish
                     'lang'  => !empty($t['language']) ? Lang::game('languages', $t['language']) : null,
                     'text'  => sprintf(Util::parseHtmlText(htmlentities($msg)), $this->name),
                 );

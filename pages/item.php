@@ -59,7 +59,7 @@ class ItemPage extends genericPage
 
         $this->subject = new ItemList($conditions);
         if ($this->subject->error)
-            $this->notFound(Lang::game('item'));
+            $this->notFound();
 
         if (!is_numeric($param))
             $this->typeId = $this->subject->id;
@@ -405,13 +405,20 @@ class ItemPage extends genericPage
         /**************/
 
         // tabs: this item is contained in..
-        $lootTabs = new Loot();
+        $lootTabs  = new Loot();
+        $createdBy = [];
         if ($lootTabs->getByItem($this->typeId))
         {
             $this->extendGlobalData($lootTabs->jsGlobals);
 
-            foreach ($lootTabs->iterate() as $tab)
+            foreach ($lootTabs->iterate() as $idx => $tab)
             {
+                if (!$tab[1])
+                    continue;
+
+                if ($idx == 16)
+                    $createdBy = array_column($tab[1], 'id');
+
                 $this->lvTabs[] = array(
                     'file'   => $tab[0],
                     'data'   => $tab[1],
@@ -910,9 +917,42 @@ class ItemPage extends genericPage
             }
         }
 
-        // todo: taught by (req. workaround over the spell taught)
+        // tab: Shared cooldown
+        $cdCats = [];
+        for ($i = 1; $i < 6; $i++)
+            if ($this->subject->getField('spellId'.$i) > 0 && $this->subject->getField('spellCategory'.$i) > 0)
+                $cdCats[] = $this->subject->getField('spellCategory'.$i);
 
-        // todo: Shared cooldown
+        if ($cdCats)
+        {
+            $conditions = array(
+                'OR',
+                ['spellCategory1', $cdCats],
+                ['spellCategory2', $cdCats],
+                ['spellCategory3', $cdCats],
+                ['spellCategory4', $cdCats],
+                ['spellCategory5', $cdCats]
+            );
+            $cdItems = new ItemList($conditions);
+            if (!$cdItems->error)
+            {
+                $this->lvTabs[] = array(
+                    'file'   => 'item',
+                    'data'   => $cdItems->getListviewData(),
+                    'params' => [
+                        'name' => '$LANG.tab_sharedcooldown',
+                        'id'   => 'shared-cooldown'
+                    ]
+                );
+
+                $this->extendGlobalData($cdItems->getJSGlobals(GLOBALINFO_SELF));
+            }
+        }
+
+        // // todo - tab: taught by
+        // use var $createdBy to find source of this spell
+        // id: 'taught-by-X',
+        // name: LANG.tab_taughtby
     }
 
     protected function generateTooltip($asError = false)
@@ -1096,7 +1136,7 @@ class ItemPage extends genericPage
             return parent::display($override);
     }
 
-    public function notFound($typeStr)
+    public function notFound()
     {
         if ($this->mode == CACHE_TYPE_TOOLTIP)
         {
@@ -1111,7 +1151,7 @@ class ItemPage extends genericPage
             exit();
         }
         else
-            return parent::notFound($typeStr);
+            return parent::notFound(Lang::game('item'), Lang::item('notFound'));
     }
 }
 

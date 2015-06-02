@@ -389,6 +389,9 @@ class ItemList extends BaseType
                 else if (!empty($this->sources[$this->id][3]))
                     $data[$this->id]['sourcemore'] = [['p' => $this->sources[$this->id][3][0]]];
             }
+
+            if (!empty($this->curTpl['cooldown']))
+                $data[$this->id]['cooldown'] = $this->curTpl['cooldown'] / 1000;
         }
 
         /* even more complicated crap
@@ -1620,6 +1623,10 @@ class ItemListFilter extends Filter
               17, 2366, 3840, 3713, 3847, 3775, 4100, 1581, 3557, 3845, 4500, 4809,   47, 3849, 4265, 4493, 4228, 3698, 4406, 3714, 3717, 3715,  717,   67,
             3716,  457, 4415,  400, 1638, 1216,   85, 4723, 4722, 1337, 4273,  490, 1497,  206, 1196, 4603, 718, 3277,    28,   40,   11, 4197,  618, 3521,
             3805,   66, 1176, 1977
+        ),
+        163 => array(                                       // enchantment mats
+            34057, 22445, 11176, 34052, 11082, 34055, 16203, 10939, 11135, 11175, 22446, 16204, 34054, 14344, 11084, 11139, 22449, 11178,
+            10998, 34056, 16202, 10938, 11134, 11174, 22447, 20725, 14343, 34053, 10978, 11138, 22448, 11177, 11083, 10940, 11137, 22450
         )
     );
 
@@ -2064,15 +2071,68 @@ class ItemListFilter extends Filter
                 if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
                     break;
 
+                $cr[2] *= 1000;                             // field supplied in milliseconds
+
                 $this->formData['extraCols'][] = $cr[0];
-/* todo */      return [1];
+                $this->extraOpts['is']['s'][] = ', IF(spellCooldown1 > 1, spellCooldown1, IF(spellCooldown2 > 1, spellCooldown2, IF(spellCooldown3 > 1, spellCooldown3, IF(spellCooldown4 > 1, spellCooldown4, IF(spellCooldown5 > 1, spellCooldown5,))))) AS cooldown';
+
+                return [
+                    'OR',
+                    ['AND', ['spellTrigger1', 0], ['spellId1', 0, '!'], ['spellCooldown1', 0, '>'], ['spellCooldown1', $cr[2], $cr[1]]],
+                    ['AND', ['spellTrigger2', 0], ['spellId2', 0, '!'], ['spellCooldown2', 0, '>'], ['spellCooldown2', $cr[2], $cr[1]]],
+                    ['AND', ['spellTrigger3', 0], ['spellId3', 0, '!'], ['spellCooldown3', 0, '>'], ['spellCooldown3', $cr[2], $cr[1]]],
+                    ['AND', ['spellTrigger4', 0], ['spellId4', 0, '!'], ['spellCooldown4', 0, '>'], ['spellCooldown4', $cr[2], $cr[1]]],
+                    ['AND', ['spellTrigger5', 0], ['spellId5', 0, '!'], ['spellCooldown5', 0, '>'], ['spellCooldown5', $cr[2], $cr[1]]],
+                ];
             case 163:                                       // disenchantsinto [disenchanting]
                 if (!$this->isSaneNumeric($cr[1]))
                     break;
 
-/* todo */      return [1];
+                if (!in_array($cr[1], $this->enums[$cr[0]]))
+                    break;
+
+                $refResults = [];
+                $newRefs = DB::World()->selectCol('SELECT entry FROM ?# WHERE item = ?d AND reference = 0', LOOT_REFERENCE, $cr[1]);
+                while ($newRefs)
+                {
+                    $refResults += $newRefs;
+                    $newRefs     = DB::World()->selectCol('SELECT entry FROM ?# WHERE reference IN (?a)', LOOT_REFERENCE, $newRefs);
+                }
+
+                $lootIds = DB::World()->selectCol('SELECT entry FROM ?# WHERE {reference IN (?a) OR }(reference = 0 AND item = ?d)', LOOT_DISENCHANT, $refResults ?: DBSIMPLE_SKIP, $cr[1]);
+
+                return $lootIds ? ['disenchantId', $lootIds] : [0];
             case 85:                                        // objectivequest [side]
-/* todo */      return [1];
+                $w = '';
+                switch ($cr[1])
+                {
+                    case 1:                                 // Yes
+                    case 5:                                 // No
+                        $w = 1;
+                        break;
+                    case 2:                                 // Alliance
+                        $w = 'reqRaceMask & '.RACE_MASK_ALLIANCE.' AND (reqRaceMask & '.RACE_MASK_HORDE.') = 0';
+                        break;
+                    case 3:                                 // Horde
+                        $w = 'reqRaceMask & '.RACE_MASK_HORDE.' AND (reqRaceMask & '.RACE_MASK_ALLIANCE.') = 0';
+                        break;
+                    case 4:                                 // Both
+                        $w = '(reqRaceMask & '.RACE_MASK_ALLIANCE.' AND reqRaceMask & '.RACE_MASK_HORDE.') OR reqRaceMask = 0';
+                        break;
+                    default:
+                        break 2;
+                }
+
+                $itemIds = DB::Aowow()->selectCol(sprintf('
+                    SELECT reqItemId1 FROM ?_quests WHERE %1$s UNION SELECT reqItemId2 FROM ?_quests WHERE %1$s UNION
+                    SELECT reqItemId3 FROM ?_quests WHERE %1$s UNION SELECT reqItemId4 FROM ?_quests WHERE %1$s UNION
+                    SELECT reqItemId5 FROM ?_quests WHERE %1$s UNION SELECT reqItemId6 FROM ?_quests WHERE %1$s', $w)
+                );
+
+                if ($itemIds)
+                    return ['id', $itemIds, $cr[1] == 5 ? '!' : null];
+
+                return [0];
             case 87:                                        // reagentforability [enum]
                 $_ = isset($this->enums[99][$cr[1]]) ? $this->enums[99][$cr[1]] : null;
                 if ($_ !== null)

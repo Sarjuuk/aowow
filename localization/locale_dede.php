@@ -28,7 +28,7 @@ $lang = array(
         'timeSQL'       => "Zeit für MySQL-Queries",
         'noJScript'     => '<b>Diese Seite macht ausgiebigen Gebrauch von JavaScript.</b><br />Bitte <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">aktiviert JavaScript</a> in Eurem Browser.',
         'userProfiles'  => "Deine Charaktere",
-        'pageNotFound'  => "Diese|Dieser|Dieses %s existiert nicht.",        // todo: dämliche Fälle...
+        'pageNotFound'  => "Dies %s existiert nicht.",
         'gender'        => "Geschlecht",
         'sex'           => [null, "Mann", "Frau"],
         'players'       => "Spieler",
@@ -384,6 +384,7 @@ $lang = array(
         'resetPass'     => ["Kennwortreset",        "Folgt diesem Link um euer Kennwort zurückzusetzen.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."]
     ),
     'gameObject' => array(
+        'notFound'      => "Dieses Objekt existiert nicht .",
         'cat'           => [0 => "Anderes", 9 => "Bücher", 3 => "Behälter", -5 => "Truhen", 25 => "Fischschwärme", -3 => "Kräuter", -4 => "Erzadern",     -2 => "Quest", -6 => "Werkzeuge"],
         'type'          => [                9 => "Buch",   3 => "Behälter", -5 => "Truhe",  25 => "",              -3 => "Kraut",   -4 => "Erzvorkommen", -2 => "Quest", -6 => ""],
         'unkPosition'   => "Der Standort dieses Objekts ist nicht bekannt.",
@@ -397,6 +398,7 @@ $lang = array(
         'restock'       => "Wird alle %s wieder aufgefüllt."
     ),
     'npc' => array(
+        'notFound'      => "Dieser NPC existiert nicht.",
         'classification'=> "Einstufung",
         'petFamily'     => "Tierart",
         'react'         => "Reaktion",
@@ -433,6 +435,7 @@ $lang = array(
         )
     ),
     'event' => array(
+        'notFound'      => "Dieses Weltereignis existiert nicht.",
         'start'         => "Anfang",
         'end'           => "Ende",
         'interval'      => "Intervall",
@@ -440,6 +443,7 @@ $lang = array(
         'category'      => ["Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler"]
     ),
     'achievement' => array(
+        'notFound'      => "Dieser Erfolg existiert nicht.",
         'criteria'      => "Kriterien",
         'points'        => "Punkte",
         'series'        => "Reihe",
@@ -452,7 +456,11 @@ $lang = array(
         'rfAvailable'   => "Verfügbar auf Realm:",
         '_transfer'     => 'Dieser Erfolg wird mit <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
     ),
+    'chrClass' => array(
+        'notFound'      => "Diese Klasse existiert nicht."
+    ),
     'race' => array(
+        'notFound'      => "Dieses Volk existiert nicht.",
         'racialLeader'  => "Volksanführer",
         'startZone'     => "Startgebiet",
     ),
@@ -474,6 +482,7 @@ $lang = array(
         'CosmicMap'     => "Kosmische Karte",
     ),
     'zone' => array(
+        'notFound'      => "Dieses Gebiet existiert nicht.",
         'attunement'    => ["Einstimmung", "Heroische Einstimmung"],
         'key'           => ["Schlüssel", "Heroischer Schlüssel"],
         'location'      => "Ort",
@@ -496,8 +505,8 @@ $lang = array(
         )
     ),
     'quest' => array(
+        'notFound'      => "Diese Quest existiert nicht.",
         '_transfer'     => 'Dieses Quest wird mit <a href="?quest=%d" class="q1">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
-
         'questLevel'    => "Stufe %s",
         'requirements'  => "Anforderungen",
         'reqMoney'      => "Benötigtes Geld",
@@ -627,28 +636,33 @@ $lang = array(
        )
     ),
     'title' => array(
+        'notFound'      => "Dieser Titel existiert nicht.",
         '_transfer'     => 'Dieser Titel wird mit <a href="?title=%d" class="q1">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'cat'           => array(
             "Allgemein",      "Spieler gegen Spieler",    "Ruf",       "Dungeon & Schlachtzug",     "Quests",       "Berufe",      "Weltereignisse"
         )
     ),
     'skill' => array(
+        'notFound'      => "Diese Fertigkeit existiert nicht.",
         'cat'           => array(
             -6 => "Haustiere",          -5 => "Reittiere",          -4 => "Völkerfertigkeiten", 5 => "Attribute",           6 => "Waffenfertigkeiten",  7 => "Klassenfertigkeiten", 8 => "Rüstungssachverstand",
              9 => "Nebenberufe",        10 => "Sprachen",           11 => "Berufe"
         )
     ),
     'currency' => array(
+        'notFound'      => "Diese Währung existiert nicht.",
         'cap'           => "Obergrenze",
         'cat'           => array(
             1 => "Verschiedenes", 2 => "Spieler gegen Spieler", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon und Schlachtzug", 23 => "Burning Crusade", 41 => "Test", 3 => "Unbenutzt"
         )
     ),
     'pet'      => array(
+        'notFound'      => "Diese Tierart existiert nicht.",
         'exotic'        => "Exotisch",
         'cat'           => ["Wildheit", "Hartnäckigkeit", "Gerissenheit"]
     ),
     'faction' => array(
+        'notFound'      => "Diese Fraktion existiert nicht.",
         'spillover'     => "Reputationsüberlauf",
         'spilloverDesc' => "Für diese Fraktion erhaltener Ruf wird zusätzlich mit den unten aufgeführten Fraktionen anteilig verrechnet.",
         'maxStanding'   => "Max. Ruf",
@@ -663,6 +677,7 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        'notFound'      => "Dieses Ausrüstungsset existiert nicht.",
         '_desc'         => "<b>%s</b> ist das <b>%s</b>. Es enthält %s Teile.",
         '_descTagless'  => "<b>%s</b> ist ein Ausrüstungsset, das %s Teile enthält.",
         '_setBonuses'   => "Setboni",
@@ -687,6 +702,7 @@ $lang = array(
         )
     ),
     'spell' => array(
+        'notFound'      => "Dieser Zauber existiert nicht.",
         '_spellDetails' => "Zauberdetails",
         '_cost'         => "Kosten",
         '_range'        => "Reichweite",
@@ -723,7 +739,7 @@ $lang = array(
         'unlimRange'    => "Unbegrenzte Reichweite",
         'reagents'      => "Reagenzien",
         'tools'         => "Extras",
-        'home'          => "%lt;Gasthaus&gt;",
+        'home'          => "&lt;Gasthaus&gt;",
         'pctCostOf'     => "vom Grund%s",
         'costPerSec'    => ", plus %s pro Sekunde",
         'costPerLevel'  => ", plus %s pro Stufe",
@@ -828,6 +844,7 @@ $lang = array(
         'invisibilityType' => ["Allgemein", 3 => "Falle", 6 => "Trunkenheit"]
     ),
     'item' => array(
+        'notFound'      => "Dieser Gegenstand existiert nicht .",
         'armor'         => "%s Rüstung",
         'block'         => "%s Blocken",
         'charges'       => "Aufladungen",

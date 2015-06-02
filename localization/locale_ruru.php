@@ -384,6 +384,7 @@ $lang = array(
         'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
     ),
     'gameObject' => array(
+        'notFound'      => "Такой объект не существует.",
         'cat'           => [0 => "Другое", 9 => "Книги", 3 => "Контейнеры", -5 => "Сундуки", 25 => "Рыболовные лунки",-3 => "Травы",    -4 => "Полезные ископаемые", -2 => "Задания", -6 => "Инструменты"],
         'type'          => [               9 => "Книга", 3 => "Контейнер",  -5 => "Сундук",  25 => "",                -3 => "Растение", -4 => "Полезное ископаемое", -2 => "Задание", -6 => ""],
         'unkPosition'   => "Местонахождение этого объекта неизвестно.",
@@ -396,6 +397,7 @@ $lang = array(
         'restock'       => "[Restocks every %s.]"
     ),
     'npc' => array(
+        'notFound'      => "Такой НИП не существует.",
         'classification'=> "Классификация",
         'petFamily'     => "Семейство питомца",
         'react'         => "Реакция",
@@ -431,6 +433,7 @@ $lang = array(
         )
     ),
     'event' => array(
+        'notFound'      => "Это игровое событие не существует.",
         'start'         => "Начало",
         'end'           => "Конец",
         'interval'      => "[Interval]",
@@ -438,6 +441,7 @@ $lang = array(
         'category'      => array("Разное", "Праздники", "Периодические", "PvP")
     ),
     'achievement' => array(
+        'notFound'      => "Такое достижение не существует.",
         'criteria'      => "Критерий",
         'points'        => "Очки",
         'series'        => "Серии",
@@ -450,7 +454,11 @@ $lang = array(
         'rfAvailable'   => "[Available on realm]:",
         '_transfer'     => 'Этот предмет превратится в <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
     ),
+    'chrClass' => array(
+        'notFound'      => "Такой класс не существует."
+    ),
     'race' => array(
+        'notFound'      => "Такая раса не существует.",
         'racialLeader'  => "Лидер расы",
         'startZone'     => "Начальная локация",
     ),
@@ -472,6 +480,7 @@ $lang = array(
         'CosmicMap'     => "Звёздная карта",
     ),
     'zone' => array(
+        'notFound'      => "Такая местность не существует.",
         'attunement'    => ["[Attunement]", "[Heroic attunement]"],
         'key'           => ["[Key]", "[Heroic key]"],
         'location'      => "Местоположение",
@@ -494,8 +503,8 @@ $lang = array(
         )
     ),
     'quest' => array(
+        'notFound'      => "Такое задание не существует.",
         '_transfer'     => 'Этот предмет превратится в <a href="?quest=%d" class="q1">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
-
         'questLevel'    => "%s-го уровня",
         'requirements'  => "Требования",
         'reqMoney'      => "Требуется денег",
@@ -625,28 +634,33 @@ $lang = array(
         )
     ),
     'title' => array(
+        'notFound'      => "Такое звание не существует.",
         '_transfer'     => 'Этот предмет превратится в <a href="?title=%d" class="q1">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         'cat'           => array(
             'Общее",      "PvP",    "Репутация",       "Подземелья и рейды",     "Задания",       "Профессии",      "Игровые события'
         )
     ),
     'skill' => array(
+        'notFound'      => "Этот навык не существует.",
         'cat'           => array(
             -6 => "Спутники",           -5 => "Транспорт",          -4 => "Классовые навыки",   5 => "Характеристики",      6 => "Оружейные навыки",    7 => "Классовые навыки",    8 => "Доспехи",
              9 => "Вторичные навыки",   10 => "Языки",              11 => "Профессии"
         )
     ),
     'currency' => array(
+        'notFound'      => "Такая валюта не существует.",
         'cap'           => "Максимум всего",
         'cat'           => array(
             1 => "Разное", 2 => "PvP", 4 => "World of Warcraft", 21 => "Wrath of the Lich King", 22 => "Подземелья и рейды", 23 => "Burning Crusade", 41 => "Test", 3 => "Неактивно"
         )
     ),
     'pet'      => array(
+        'notFound'      => "Такой породы питомцев не существует.",
         'exotic'        => "Экзотический",
         'cat'           => ["Свирепость", "Упорство", "Хитрость"]
     ),
     'faction' => array(
+        'notFound'      => "Такая фракция не существует.",
         'spillover'     => "[Reputation Spillover]",
         'spilloverDesc' => "[Gaining reputation with this faction also yields a proportional gain with the factions listed below.]",
         'maxStanding'   => "Макс Уровень",
@@ -661,6 +675,7 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        'notFound'      => "Такой комплект не существует.",
         '_desc'         => "<b>%s</b> — <b>%s</b>. Он состоит из %s предметов.",
         '_descTagless'  => "<b>%s</b> — набор из %s предметов.",
         '_setBonuses'   => "Бонус за комплект",
@@ -685,6 +700,7 @@ $lang = array(
         )
     ),
     'spell' => array(
+        'notFound'      => "Такое заклинание не существует.",
         '_spellDetails' => "Описание заклинания",
         '_cost'         => "Цена",
         '_range'        => "Радиус действия",
@@ -827,6 +843,7 @@ $lang = array(
         'invisibilityType' => ["GENERAL", 3 => "TRAP", 6 => "DRUNK"]
     ),
     'item' => array(
+        'notFound'      => "Такой предмет не существует.",
         'armor'         => "Броня: %s",
         'block'         => "Блок: %s",
         'charges'       => "зарядов",

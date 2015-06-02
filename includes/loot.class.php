@@ -45,7 +45,7 @@ class Loot
         reset($this->results);
 
         while (list($k, $__) = each($this->results))
-            yield $this->results[$k];
+            yield $k => $this->results[$k];
     }
 
     public function getResult()
@@ -321,7 +321,7 @@ class Loot
         return true;
     }
 
-    public function getByItem($entry, $maxResults = CFG_SQL_LIMIT_DEFAULT)
+    public function getByItem($entry, $maxResults = CFG_SQL_LIMIT_DEFAULT, $lootTableList = [])
     {
         $this->entry = intVal($entry);
 
@@ -450,6 +450,9 @@ class Loot
         */
         for ($i = 1; $i < count($this->lootTemplates); $i++)
         {
+            if ($lootTableList && !in_array($this->lootTemplates[$i], $lootTableList))
+                continue;
+
             $result = $calcChance(DB::World()->select(
                 sprintf($query, '{lt1.reference IN (?a) OR }(lt1.reference = 0 AND lt1.item = ?d)'),
                 $this->lootTemplates[$i], $this->lootTemplates[$i],
@@ -544,7 +547,12 @@ class Loot
                     }
                     continue 2;
                 case LOOT_SPELL:
-                    $conditions = ['OR', ['effect1CreateItemId', $this->entry], ['effect2CreateItemId', $this->entry], ['effect3CreateItemId', $this->entry]];
+                    $conditions = array(
+                        'OR',
+                        ['AND', ['effect1CreateItemId', $this->entry], ['OR', ['effect1Id', SpellList::$effects['itemCreate']], ['effect1AuraId', SpellList::$auras['itemCreate']]]],
+                        ['AND', ['effect2CreateItemId', $this->entry], ['OR', ['effect2Id', SpellList::$effects['itemCreate']], ['effect2AuraId', SpellList::$auras['itemCreate']]]],
+                        ['AND', ['effect3CreateItemId', $this->entry], ['OR', ['effect3Id', SpellList::$effects['itemCreate']], ['effect3AuraId', SpellList::$auras['itemCreate']]]],
+                    );
                     if ($ids)
                         $conditions[] = ['id', $ids];
 

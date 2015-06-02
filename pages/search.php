@@ -201,7 +201,10 @@ class SearchPage extends GenericPage
         {
             // empty queries go home
             if (!$this->query)
+            {
                 header('Location: .', true, 302);
+                die();
+            }
 
             parent::display();                              // errors are handled in the search-template itself
         }

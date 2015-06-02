@@ -30,7 +30,7 @@ class QuestPage extends GenericPage
 
         $this->subject = new QuestList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('quest'));
+            $this->notFound();
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -679,10 +679,10 @@ class QuestPage extends GenericPage
         die($tt);
     }
 
-    public function notFound($typeStr)
+    public function notFound()
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($typeStr);
+            return parent::notFound(Lang::game('quest'), Lang::quest('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

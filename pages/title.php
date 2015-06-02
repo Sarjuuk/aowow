@@ -27,7 +27,7 @@ class TitlePage extends GenericPage
 
         $this->subject = new TitleList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('title'));
+            $this->notFound(Lang::game('title'), Lang::title('notFound'));
 
         $this->name      = $this->subject->getHtmlizedName();
         $this->nameFixed = Util::ucFirst(trim(strtr($this->subject->getField('male', true), ['%s' => '', ',' => ''])));

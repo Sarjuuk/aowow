@@ -26,7 +26,7 @@ class ClassPage extends GenericPage
 
         $this->subject = new CharClassList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('class'));
+            $this->notFound(Lang::game('class'), Lang::chrClass('notFound'));
 
         $this->name = $this->subject->getField('name', true);
     }

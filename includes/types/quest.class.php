@@ -158,6 +158,31 @@ class QuestList extends BaseType
         return $data;
     }
 
+    public function getSOMData($side = SIDE_BOTH)
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $__)
+        {
+            if (!(Util::sideByRaceMask($this->curTpl['reqRaceMask']) & $side))
+                continue;
+
+            $data[$this->id] = array(
+                'level'     => $this->curTpl['level'] < 0 ? MAX_LEVEL : $this->curTpl['level'],
+                'name'      => $this->getField('name', true),
+                'category'  => $this->curTpl['cat1'],
+                'category2' => $this->curTpl['cat2'],
+                'series'    => 0,                           // todo (med)
+                'first'     => 0,                           // todo (med)
+            );
+
+            if ($this->isDaily())
+                $data[$this->id]['daily'] = 1;
+        }
+
+        return $data;
+    }
+
     public function getListviewData($extraFactionId = 0)    // i should formulate a propper parameter..
     {
         $data = [];

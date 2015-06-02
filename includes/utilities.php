@@ -874,17 +874,17 @@ class Util
     {
         // Any
         if (!$race || ($race & RACE_MASK_ALL) == RACE_MASK_ALL)
-            return 3;
+            return SIDE_BOTH;
 
         // Horde
         if ($race & RACE_MASK_HORDE && !($race & RACE_MASK_ALLIANCE))
-            return 2;
+            return SIDE_HORDE;
 
         // Alliance
         if ($race & RACE_MASK_ALLIANCE && !($race & RACE_MASK_HORDE))
-            return 1;
+            return SIDE_ALLIANCE;
 
-        return 3;
+        return SIDE_BOTH;
     }
 
     public static function getReputationLevelForPoints($pts)

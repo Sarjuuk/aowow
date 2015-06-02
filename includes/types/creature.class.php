@@ -13,7 +13,10 @@ class CreatureList extends BaseType
 
     protected     $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
     public        $queryOpts = array(
-                        'ct'     => [['ft', 'qse']],
+                        'ct'     => [['ft', 'qse', 'dct1', 'dct2', 'dct3'], 's' => ', IFNULL(dct1.id, IFNULL(dct2.id, IFNULL(dct3.id, 0))) AS parentId, IFNULL(dct1.name_loc0, IFNULL(dct2.name_loc0, IFNULL(dct3.name_loc0, ""))) AS parent_loc0, IFNULL(dct1.name_loc2, IFNULL(dct2.name_loc2, IFNULL(dct3.name_loc2, ""))) AS parent_loc2, IFNULL(dct1.name_loc3, IFNULL(dct2.name_loc3, IFNULL(dct3.name_loc3, ""))) AS parent_loc3, IFNULL(dct1.name_loc6, IFNULL(dct2.name_loc6, IFNULL(dct3.name_loc6, ""))) AS parent_loc6, IFNULL(dct1.name_loc8, IFNULL(dct2.name_loc8, IFNULL(dct3.name_loc8, ""))) AS parent_loc8, IF(dct1.difficultyEntry1 = ct.id, 1, IF(dct2.difficultyEntry2 = ct.id, 2, IF(dct3.difficultyEntry3 = ct.id, 3, 0))) AS difficultyMode'],
+                        'dct1'   => ['j' => ['?_creature dct1 ON ct.cuFlags & 0x02 AND dct1.difficultyEntry1 = ct.id', true]],
+                        'dct2'   => ['j' => ['?_creature dct2 ON ct.cuFlags & 0x02 AND dct2.difficultyEntry2 = ct.id', true]],
+                        'dct3'   => ['j' => ['?_creature dct3 ON ct.cuFlags & 0x02 AND dct3.difficultyEntry3 = ct.id', true]],
                         'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.faction', 's' => ', ft.A, ft.H, ft.factionId'],
                         'qse'    => ['j' => ['?_quests_startend qse ON qse.type = 1 AND qse.typeId = ct.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'ct.id'],
                         'qt'     => ['j' => '?_quests qt ON qse.questId = qt.id'],
@@ -236,9 +239,9 @@ class CreatureList extends BaseType
         foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'n'  => $this->getField('name', true),
+                'n'  => $this->getField('parentId') ? $this->getField('parent', true) : $this->getField('name', true),
                 't'  => TYPE_NPC,
-                'ti' => $this->id,
+                'ti' => $this->getField('parentId') ?: $this->id,
              // 'bd' => (int)($this->curTpl['cuFlags'] & NPC_CU_INSTANCE_BOSS || ($this->curTpl['typeFlags'] & 0x4 && $this->curTpl['rank']))
              // 'z'   where am i spawned
              // 'dd'   DungeonDifficulty requires 'z'

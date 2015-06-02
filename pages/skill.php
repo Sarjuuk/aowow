@@ -27,7 +27,7 @@ class SkillPage extends GenericPage
 
         $this->subject = new SkillList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('skill'));
+            $this->notFound(Lang::game('skill'), Lang::skill('notFound'));
 
         $this->name = $this->subject->getField('name', true);
         $this->cat  = $this->subject->getField('typeCat');

@@ -44,7 +44,7 @@ function zones()
                             IF(m.areaType = 4, 9,
                                 IF(m.isBG = 1, 6,
                                     IF(a.mapId = 571, 10,
-                                        IF(a.mapId = 530, 8, 0))))))),
+                                        IF(a.mapId = 530, 8, a.mapId))))))),
                 a.flags,
                 IF(wma.id IS NULL AND m.areaType <> 4, ?d, 0),  -- cuFlags,
                 IF(a.flags & 0x01000000, 5,                 -- g_zone_territories
