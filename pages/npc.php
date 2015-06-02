@@ -195,7 +195,7 @@ class NpcPage extends GenericPage
                 if ($flagsExtra & 0x000001)
                     $buff[] = 'Binds attacker to instance on death';
                 if ($flagsExtra & 0x000002)
-                    $buff[] = '[tooltip name=civilian]does not aggro[/tooltip][span class=tip tooltip=civilian]Civilian[/span]';
+                    $buff[] = "[tooltip name=civilian]- does not aggro\n- death costs Honor[/tooltip][span class=tip tooltip=civilian]Civilian[/span]";
                 if ($flagsExtra & 0x000004)
                     $buff[] = 'Cannot parry';
                 if ($flagsExtra & 0x000008)
@@ -211,7 +211,7 @@ class NpcPage extends GenericPage
                 if ($flagsExtra & 0x000100)
                     $buff[] = 'Immune to Taunt';
                 if ($flagsExtra & 0x008000)
-                    $buff[] = '[tooltip name=guard]ignores enemy stealth, invisibility and Feign Death[/tooltip][span class=tip tooltip=guard]Guard[/span]';
+                    $buff[] = "[tooltip name=guard]- engages PvP-Attacker\n- ignores enemy stealth, invisibility and Feign Death[/tooltip][span class=tip tooltip=guard]Guard[/span]";
                 if ($flagsExtra & 0x020000)
                     $buff[] = 'Cannot deal Critical Hits';
                 if ($flagsExtra & 0x040000)
