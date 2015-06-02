@@ -1,0 +1,12 @@
+<?php
+
+require 'includes/shared.php';
+
+if (!CLI)
+    die("this script must be run from CLI\n");
+if (CLI && getcwd().DIRECTORY_SEPARATOR.'aowow' != __FILE__)
+    die("this script must be run from root directory\n");
+else
+    require 'setup/setup.php';
+
+?>
