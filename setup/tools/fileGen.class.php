@@ -161,7 +161,7 @@ class FileGen
 
     public static function printCLIHelp()
     {
-        echo "\nusage: php index.php --build=<subScriptList,> [-h --help] [-f --force]\n\n";
+        echo "\nusage: php aowow --build=<subScriptList,> [-h --help] [-f --force]\n\n";
         echo "--build    : available subScripts:\n";
         foreach (array_merge(array_keys(self::$tplFiles), array_keys(self::$datasets)) as $s)
         {

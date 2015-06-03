@@ -40,7 +40,7 @@ function finish()
     die("\n");
 }
 
-$scriptOpt = getopt('', ['account', 'dbconfig', 'siteconfig', 'sql', 'build', 'sync']);
+$scriptOpt = getopt('', ['account', 'dbconfig', 'siteconfig', 'sql', 'build', 'sync', 'update']);
 if (!$scriptOpt)
 {
     echo "\nAowow Setup\n";
@@ -50,6 +50,7 @@ if (!$scriptOpt)
     echo "--sql                    : generate db content from your world tables\n";
     echo "--build                  : create server specific files\n";
     echo "--sync=<tabelList,>      : regenerate tables/files that depend on given world-table\n";
+    echo "--update                 : apply new sql updates fetched from github\n";
     // echo "--firstrun               : goes through the nessecary hoops of the initial setup. Can be interrupted and --resume'd";
     echo "additional options\n";
     echo "--log logfile            : write ouput to file\n";
@@ -65,6 +66,11 @@ else
 $cmd = array_pop(array_keys($scriptOpt));
 switch ($cmd)                  // we accept only one main parameter
 {
+    case 'update':
+        require_once 'setup/tools/clisetup/update.func.php';
+        update();
+
+        return;
     case 'account':
     case 'dbconfig':
     case 'siteconfig':

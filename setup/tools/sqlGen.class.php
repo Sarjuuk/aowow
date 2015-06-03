@@ -131,7 +131,7 @@ class SqlGen
 
     public static function printCLIHelp()
     {
-        echo "\nusage: php index.php --sql=<tableList,> [-h --help]\n\n";
+        echo "\nusage: php aowow --sql=<tableList,> [-h --help]\n\n";
         echo "--sql              : available tables:\n";
         foreach (self::$tables as $t => $info)
             echo " * ".str_pad($t, 24).(isset($info[3]) ? ' - TC deps: '.implode(', ', $info[3]) : '').(isset($info[2]) ? ' - Aowow deps: '.implode(', ', $info[2]) : '')."\n";
