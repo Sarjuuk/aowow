@@ -178,7 +178,7 @@ if (!CLI)
                 }
             }
 
-            imagepng($tmp, 'cache/alphaMaps/' . $zoneId . '.png');
+            imagepng($tmp, 'setup/generated/alphaMaps/' . $zoneId . '.png');
 
             imagecolordeallocate($tmp, $cbg);
             imagecolordeallocate($tmp, $cfg);
@@ -374,7 +374,7 @@ if (!CLI)
                         $dirError = true;
 
                 if ($modeMask & 0x04)
-                    if (!CLISetup::writeDir('cache/alphaMaps'))
+                    if (!CLISetup::writeDir('setup/generated/alphaMaps'))
                         $dirError = true;
 
                 if ($dirError)
