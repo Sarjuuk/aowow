@@ -711,7 +711,13 @@ class ItemList extends BaseType
         // Sockets w/ Gems
         if (!empty($enhance['g']))
         {
-            $gems = DB::Aowow()->select('SELECT i.id AS ARRAY_KEY, i.iconString, ae.*, i.gemColorMask AS colorMask FROM ?_items i JOIN ?_itemenchantment ae ON ae.id = i.gemEnchantmentId WHERE i.id IN (?a)', $enhance['g']);
+            $gems = DB::Aowow()->select('
+                SELECT it.id AS ARRAY_KEY, ic.iconString, ae.*, it.gemColorMask AS colorMask
+                FROM   ?_items it
+                JOIN   ?_itemenchantment ae ON ae.id = it.gemEnchantmentId
+                JOIN   ?_icons ic ON ic.id = -it.displayId
+                WHERE  it.id IN (?a)',
+                $enhance['g']);
             foreach ($enhance['g'] as $k => $v)
                 if ($v && !in_array($v, array_keys($gems))) // 0 is valid
                     unset($enhance['g'][$k]);

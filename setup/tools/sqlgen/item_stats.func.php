@@ -99,7 +99,7 @@ class ItemStatSetup extends ItemList
                     if ($item > 0)                          // apply socketBonus
                         $this->json[$item]['socketbonusstat'] = $stats;
                     else /* if ($item < 0) */               // apply gemEnchantment
-                        Util::arraySumByKey($this->json[-$item][$mod], $stats);
+                        Util::arraySumByKey($this->json[-$item], $stats);
                 }
             }
         }
