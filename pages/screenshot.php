@@ -104,7 +104,7 @@ class ScreenshotPage extends GenericPage
 
         // write to db
         $newId = DB::Aowow()->query(
-            'INSERT INTO ?_screenshots (type, typeId, uploader, date, width, height, caption) VALUES (?d, ?d, ?d, UNIX_TIMESTAMP(), ?d, ?d, ?)',
+            'INSERT INTO ?_screenshots (type, typeId, userIdOwner, date, width, height, caption) VALUES (?d, ?d, ?d, UNIX_TIMESTAMP(), ?d, ?d, ?)',
             $_SESSION['ssUpload']['type'], $_SESSION['ssUpload']['typeId'],
             User::$id,
             $w, $h,

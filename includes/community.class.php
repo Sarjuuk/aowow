@@ -237,14 +237,14 @@ class CommunityContent
     public static function getScreenshotsForManager($type, $typeId, $userId = 0)
     {
         $screenshots = DB::Aowow()->select('
-            SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.type, s.typeId, s.caption, s.status, s.status AS "flags"
-            FROM   ?_screenshots s, ?_account a
+            SELECT    s.id, a.displayName AS user, s.date, s.width, s.height, s.type, s.typeId, s.caption, s.status, s.status AS "flags"
+            FROM      ?_screenshots s,
+            LEFT JOIN ?_account a ON s.userIdOwner = a.id
             WHERE
-                   s.uploader = a.id AND
-                   { s.type = ?d}
-                   { AND s.typeId = ?d}
-                   { s.uploader = ?d}
-            LIMIT 100',
+                    { s.type = ?d}
+                    { AND s.typeId = ?d}
+                    { s.userIdOwner = ?d}
+            LIMIT     100',
             $userId ? DBSIMPLE_SKIP : $type,
             $userId ? DBSIMPLE_SKIP : $typeId,
             $userId ? $userId : DBSIMPLE_SKIP
@@ -296,6 +296,9 @@ class CommunityContent
             // something todo with massSelect .. am i doing this right?
             if ($num[$s['type']][$s['typeId']] == 1)
                 $s['unique'] = 1;
+
+            if (!$s['user'])
+                unset($s['user']);
         }
 
         return $screenshots;
@@ -418,8 +421,9 @@ class CommunityContent
     {
         $videos = DB::Aowow()->selectPage($nFound, "
             SELECT v.id, a.displayName AS user, v.date, v.videoId, v.caption, IF(v.status & ?d, 1, 0) AS 'sticky', v.type, v.typeId
-            FROM ?_videos v, ?_account a
-            WHERE {v.uploader = ?d }{v.type = ? }{AND v.typeId = ? }AND v.status & ?d AND (v.status & ?d) = 0 AND v.uploader = a.id",
+            FROM ?_videos v
+            LEFT JOIN ?_account a ON v.userIdOwner = a.id
+            WHERE {v.userIdOwner = ?d }{v.type = ? }{AND v.typeId = ? }AND v.status & ?d AND (v.status & ?d) = 0",
             CC_FLAG_STICKY,
             $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
@@ -449,8 +453,12 @@ class CommunityContent
 
             $v['date']      = date(Util::$dateFormatInternal, $v['date']);
             $v['videoType'] = 1;            // always youtube
+
             if (!$v['sticky'])
                 unset($v['sticky']);
+
+            if (!$v['user'])
+                unset($v['user']);
         }
 
         return $videos;
@@ -460,8 +468,9 @@ class CommunityContent
     {
         $screenshots = DB::Aowow()->selectPage($nFound, "
             SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.caption, IF(s.status & ?d, 1, 0) AS 'sticky', s.type, s.typeId
-            FROM ?_screenshots s, ?_account a
-            WHERE {s.uploader = ?d }{s.type = ? }{AND s.typeId = ? }AND s.status & ?d AND (s.status & ?d) = 0 AND s.uploader = a.id",
+            FROM ?_screenshots s
+            LEFT JOIN ?_account a ON s.userIdOwner = a.id
+            WHERE {s.userIdOwner = ?d }{s.type = ? }{AND s.typeId = ? }AND s.status & ?d AND (s.status & ?d) = 0",
             CC_FLAG_STICKY,
             $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
@@ -490,8 +499,12 @@ class CommunityContent
             }
 
             $s['date'] = date(Util::$dateFormatInternal, $s['date']);
+
             if (!$s['sticky'])
                 unset($s['sticky']);
+
+            if (!$s['user'])
+                unset($s['user']);
         }
 
         return $screenshots;

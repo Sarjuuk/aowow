@@ -629,7 +629,7 @@ class AjaxHandler
                 {
                     if (!isset($this->post['id']))
                     {
-                        $res = DB::Aowow()->selectRow('SELECT max(id) as max, count(id) as num FROM ?_account_weightscales WHERE account = ?d', User::$id);
+                        $res = DB::Aowow()->selectRow('SELECT max(id) as max, count(id) as num FROM ?_account_weightscales WHERE userId = ?d', User::$id);
                         if ($res['num'] < 5)            // more or less hard-defined in LANG.message_weightscalesaveerror
                             $this->post['id'] = ++$res['max'];
                         else
@@ -642,7 +642,7 @@ class AjaxHandler
                         return 0;
                 }
                 else if ($this->post('delete') && $this->post('id'))
-                    DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND account = ?d', intVal($this->post('id')), User::$id);
+                    DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND userId = ?d', intVal($this->post('id')), User::$id);
                 else
                     return 0;
         }
@@ -782,7 +782,7 @@ class AjaxHandler
         $id   = $matches[1];
         $dest = imageCreateTruecolor($s[$size], $s[$size]);
 
-        if (file_exists('/uploads/avatars/'.$id.'.jpg'))
+        if (file_exists('uploads/avatars/'.$id.'.jpg'))
         {
             $offsetX = $offsetY = 0;
 
@@ -1167,7 +1167,7 @@ class AjaxHandler
         foreach ($ids as $id)
         {
             // must not be already approved
-            if ($_ = DB::Aowow()->selectCell('SELECT uploader FROM ?_screenshots WHERE (status & ?d) = 0 AND id = ?d', CC_FLAG_APPROVED, $id))
+            if ($_ = DB::Aowow()->selectCell('SELECT userIdOwner FROM ?_screenshots WHERE (status & ?d) = 0 AND id = ?d', CC_FLAG_APPROVED, $id))
             {
                 // should also error-log
                 if (!file_exists(sprintf($path, 'pending', $id)))
@@ -1208,7 +1208,7 @@ class AjaxHandler
                 rename(sprintf($path, 'pending', $id), sprintf($path, 'normal', $id));
 
                 // set as approved in DB and gain rep (once!)
-                DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, approvedBy = ?d WHERE id = ?d', CC_FLAG_APPROVED, User::$id, $id);
+                DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdApprove = ?d WHERE id = ?d', CC_FLAG_APPROVED, User::$id, $id);
                 Util::gainSiteReputation($_, SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1]);
             }
         }
@@ -1279,7 +1279,7 @@ class AjaxHandler
         }
 
         // flag as deleted if not aready
-        DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, deletedBy = ?d WHERE id IN (?a)', CC_FLAG_DELETED, User::$id, $ids);
+        DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdDelete = ?d WHERE id IN (?a)', CC_FLAG_DELETED, User::$id, $ids);
 
         return '';
     }

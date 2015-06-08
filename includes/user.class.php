@@ -525,7 +525,7 @@ class User
     {
         $data = [];
 
-        $res = DB::Aowow()->select('SELECT * FROM ?_account_weightscales WHERE account = ?d', self::$id);
+        $res = DB::Aowow()->select('SELECT * FROM ?_account_weightscales WHERE userId = ?d', self::$id);
         foreach ($res as $i)
         {
             $set = array (
