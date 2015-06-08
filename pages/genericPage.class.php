@@ -680,7 +680,7 @@ class GenericPage
         if (CFG_CACHE_MODE & CACHE_MODE_MEMCACHED)
         {
             // on &refresh also clear related
-            if ($this->skipCache == CACHE_MODE_FILECACHE)
+            if ($this->skipCache == CACHE_MODE_MEMCACHED)
             {
                 $oldMode = $this->mode;
                 for ($i = 1; $i < 5; $i++)                  // page (1), tooltips (2), searches (3) and xml (4)

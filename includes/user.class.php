@@ -283,10 +283,10 @@ class User
             }
             case AUTH_MODE_EXTERNAL:
             {
-                if (!file_exists('/config/extAuth.php'))
+                if (!file_exists('config/extAuth.php'))
                     return AUTH_INTERNAL_ERR;
 
-                require '/config/extAuth.php';
+                require 'config/extAuth.php';
                 $result = extAuth($name, $pass, $extId);
 
                 if ($result == AUTH_OK && $extId)
