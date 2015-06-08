@@ -319,7 +319,7 @@ class User
         if ($_ = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE extId = ?d', $extId))
             return $_;
 
-        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (extId, user, displayName, prevIP, locale, status) VALUES (?d, ?, ?, ?, ?d, ?d)',
+        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (extId, user, displayName, joinDate, prevIP, prevLogin, locale, status) VALUES (?d, ?, ?, UNIX_TIMESTAMP(), ?, UNIX_TIMESTAMP(), ?d, ?d)',
             $extId,
             $name,
             Util::ucFirst($name),
