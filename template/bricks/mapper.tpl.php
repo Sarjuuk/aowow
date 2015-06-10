@@ -51,7 +51,7 @@ elseif (!empty($this->map['data'])):
             <script type="text/javascript">//<![CDATA[
 <?php
     if (!empty($this->map['data']['zone'])):
-        echo "                $.extend(g_pageInfo, {id: ".$this->map['data']['zone']."});\n";
+        echo "                ".(!empty($this->gPageInfo) ? "$.extend(g_pageInfo, {id: ".$this->map['data']['zone']."})" : "var g_pageInfo = {id: ".$this->map['data']['zone']."}").";\n";
     elseif (!empty($this->map['mapperData'])):
         echo "                var g_mapperData = ".json_encode($this->map['mapperData'], JSON_NUMERIC_CHECK).";\n";
     endif;

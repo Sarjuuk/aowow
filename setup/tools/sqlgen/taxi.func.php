@@ -120,7 +120,7 @@ function taxi()                                             // path & nodes
                 continue;
 
             $dist = pow($c['posX'] - $n['origPosX'], 2) + pow($c['posY'] - $n['origPosY'], 2);
-            if ($dist  > 1000)
+            if ($dist > 1000)
                 continue;
 
             if (!isset($n['dist']) || $n['dist'] < $dist)

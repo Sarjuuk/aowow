@@ -30,7 +30,7 @@ function spawns()                                           // and waypoints
     $alphaMapCache = [];
     $alphaMapCheck = function ($areaId, array &$set) use (&$alphaMapCache)
     {
-        $file = 'cache/alphaMaps/'.$areaId.'.png';
+        $file = 'setup/generated/alphaMaps/'.$areaId.'.png';
         if (!file_exists($file))                            // file does not exist (probably instanced area)
             return false;
 

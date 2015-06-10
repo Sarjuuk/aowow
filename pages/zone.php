@@ -170,7 +170,7 @@ class ZonePage extends GenericPage
         $oSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_OBJECT);
         $cSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_NPC);
 
-        $conditions = [['s.areaId', $this->typeId]];
+        $conditions = [CFG_SQL_LIMIT_NONE, ['s.areaId', $this->typeId]];
         if (!User::isInGroup(U_GROUP_STAFF))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 

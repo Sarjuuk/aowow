@@ -61,7 +61,7 @@ class UserPage extends GenericPage
         if ($co['sum'])
             $contrib[] = Lang::user('comments').Lang::main('colon').$co['sum'].' [small]([tooltip=tooltip_totalratings]'.$co['nRates'].'[/tooltip])[/small]';
 
-        $ss = DB::Aowow()->selectRow('SELECT COUNT(id) AS sum, SUM(IF(status & ?d, 1, 0)) as nSticky FROM ?_screenshots WHERE uploader = ?d AND status & ?d AND (status & ?d) = 0',
+        $ss = DB::Aowow()->selectRow('SELECT COUNT(id) AS sum, SUM(IF(status & ?d, 1, 0)) as nSticky FROM ?_screenshots WHERE userIdOwner = ?d AND status & ?d AND (status & ?d) = 0',
             CC_FLAG_STICKY,
             $this->user['id'],
             CC_FLAG_APPROVED,
@@ -70,7 +70,7 @@ class UserPage extends GenericPage
         if ($ss['sum'])
             $contrib[] = Lang::user('screenshots').Lang::main('colon').$ss['sum'].' [small]([tooltip=tooltip_normal]'.($ss['sum'] - $ss['nSticky']).'[/tooltip] + [tooltip=tooltip_sticky]'.$ss['nSticky'].'[/tooltip])[/small]';
 
-        $vi = DB::Aowow()->selectRow('SELECT COUNT(id) AS sum, SUM(IF(status & ?d, 1, 0)) as nSticky FROM ?_videos WHERE uploader = ?d AND status & ?d AND (status & ?d) = 0',
+        $vi = DB::Aowow()->selectRow('SELECT COUNT(id) AS sum, SUM(IF(status & ?d, 1, 0)) as nSticky FROM ?_videos WHERE userIdOwner = ?d AND status & ?d AND (status & ?d) = 0',
             CC_FLAG_STICKY,
             $this->user['id'],
             CC_FLAG_APPROVED,

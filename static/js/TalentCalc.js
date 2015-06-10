@@ -604,10 +604,13 @@ function TalentCalc() {
             buffer += '<p></p>';
 
             // custom: deploy old armory-string
-            buffer += '<h3>' + LANG.tc_export + LANG.colon + '</h3>';
-            buffer += '<blockquote style="font-family: \'Courier New\';">?cid=' + _currentClass + '&tal=' + $WowheadTalentCalculator.getBlizzBuild() + '</blockquote>';
-            buffer += '<p></p>';
+            if ($WowheadTalentCalculator !== undefined) {
+                buffer += '<h3>' + LANG.tc_export + LANG.colon + '</h3>';
+                buffer += '<blockquote style="font-family: \'Courier New\';">?cid=' + _currentClass + '&tal=' + $WowheadTalentCalculator.getBlizzBuild() + '</blockquote>';
+                buffer += '<p></p>';
+            }
             // custom end
+
 
             for (i = 0; i < _nTrees; ++i) {
                 buffer += '<h3>' + c[i].n + ' (' + c[i].k + ' ' + LANG[c[i].k == 1 ? 'tc_point': 'tc_points'] + ')</h3>';

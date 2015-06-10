@@ -283,10 +283,10 @@ class User
             }
             case AUTH_MODE_EXTERNAL:
             {
-                if (!file_exists('/config/extAuth.php'))
+                if (!file_exists('config/extAuth.php'))
                     return AUTH_INTERNAL_ERR;
 
-                require '/config/extAuth.php';
+                require 'config/extAuth.php';
                 $result = extAuth($name, $pass, $extId);
 
                 if ($result == AUTH_OK && $extId)
@@ -319,7 +319,7 @@ class User
         if ($_ = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE extId = ?d', $extId))
             return $_;
 
-        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (extId, user, displayName, prevIP, locale, status) VALUES (?d, ?, ?, ?, ?d, ?d)',
+        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (extId, user, displayName, joinDate, prevIP, prevLogin, locale, status) VALUES (?d, ?, ?, UNIX_TIMESTAMP(), ?, UNIX_TIMESTAMP(), ?d, ?d)',
             $extId,
             $name,
             Util::ucFirst($name),
@@ -525,7 +525,7 @@ class User
     {
         $data = [];
 
-        $res = DB::Aowow()->select('SELECT * FROM ?_account_weightscales WHERE account = ?d', self::$id);
+        $res = DB::Aowow()->select('SELECT * FROM ?_account_weightscales WHERE userId = ?d', self::$id);
         foreach ($res as $i)
         {
             $set = array (

@@ -384,7 +384,8 @@ if (typeof $WowheadPower == "undefined") {
                     if (aowow_tooltips.iconizelinks && (type == TYPE_ITEM || type == TYPE_ACHIEVEMENT || type == TYPE_SPELL) && data.icon) {
                         // t.children[0].style.marginLeft = "18px";
                         t.className += " icontinyl";
-                        t.style.paddingLeft = "18px !important";
+                        // t.style.paddingLeft = "18px !important";
+                        t.setAttribute("style", t.getAttribute("style") + "; padding-left:18px !important;");
                         t.style.verticalAlign = "center";
                         // t.style.background = "url(" + (document.location.protocol != "https:" ? "http:": document.location.protocol) + "//wowimg.zamimg.com/images/wow/icons/tiny/" + data.icon.toLocaleLowerCase() + ".gif) left center no-repeat"
                         t.style.background = "url(" + g_staticUrl + "/images/wow/icons/tiny/" + data.icon.toLocaleLowerCase() + ".gif) left center no-repeat"

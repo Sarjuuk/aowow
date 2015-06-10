@@ -3017,7 +3017,7 @@ a.button-red i {
     left: -1px;
     top: 2px;
     z-index: 1;
-    font-style: normal;
+    /* font-style: normal; sarjuuk: breaks textShadow*/
     color: black;
 }
 
