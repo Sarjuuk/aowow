@@ -1639,9 +1639,9 @@ class SpellPage extends GenericPage
                 case 90:                                    // Kill Credit
                 case 134:                                   // Kill Credit2
                     $_ = Lang::game('npc').' #'.$effMV;
-                    if ($summon = $this->subject->getModelInfo($this->typeId))
+                    if ($summon = $this->subject->getModelInfo($this->typeId, $i))
                     {
-                        $_ = '(<a href="?npc='.$summon['typeId'].'">'.$summon['displayName'].'</a>)';
+                        $_ = $summon['typeId'] ? ' (<a href="?npc='.$summon['typeId'].'">'.$summon['displayName'].'</a>)' : ' (#0)';
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon['displayId']];
                     }
 
@@ -1691,9 +1691,9 @@ class SpellPage extends GenericPage
                 case 106:                                   // Summon Object (slot 3)
                 case 107:                                   // Summon Object (slot 4)
                     $_ = Util::ucFirst(Lang::game('gameObject')).' #'.$effMV;
-                    if ($summon = $this->subject->getModelInfo($this->typeId))
+                    if ($summon = $this->subject->getModelInfo($this->typeId, $i))
                     {
-                        $_ = '(<a href="?object='.$summon['typeId'].'">'.$summon['displayName'].'</a>)';
+                        $_ = $summon['typeId'] ? ' (<a href="?object='.$summon['typeId'].'">'.$summon['displayName'].'</a>)' : ' (#0)';
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_OBJECT, 'displayId' => $summon['displayId']];
                     }
 
@@ -1810,11 +1810,11 @@ class SpellPage extends GenericPage
 
                                 break;
                             case 36:                        // Shapeshift
-                                if ($st = $this->subject->getModelInfo($this->typeId))
+                                if ($st = $this->subject->getModelInfo($this->typeId, $i))
                                 {
                                     $redButtons[BUTTON_VIEW3D] = array(
                                         'type'      => TYPE_NPC,
-                                        'displayId' => $st['displayId'][1] ? $st['displayId'][rand(0, 1)] : $st['displayId'][0]
+                                        'displayId' => $st['displayId']
                                     );
 
                                     if ($st['creatureType'] > 0)
@@ -1966,10 +1966,10 @@ class SpellPage extends GenericPage
                                 break;
                             case 78:                        // Mounted
                             case 56:                        // Transform
-                                if ($transform = $this->subject->getModelInfo($this->typeId))
+                                if ($transform = $this->subject->getModelInfo($this->typeId, $i))
                                 {
                                     $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $transform['displayId']];
-                                    $bar = ' (<a href="?npc='.$transform['typeId'].'">'.$transform['displayName'].'</a>)';
+                                    $bar = $transform['typeId'] ? ' (<a href="?npc='.$transform['typeId'].'">'.$transform['displayName'].'</a>)' : ' (#0)';
                                 }
                                 else
                                     $bar = Lang::main('colon').Lang::game('npc').' #'.$effMV;;
