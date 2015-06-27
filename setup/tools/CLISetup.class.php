@@ -87,7 +87,7 @@ class CLISetup
     /*  the problem
         1) paths provided in dbc files are case-insensitive and random
         2) paths to the actual textures contained in the mpq archives are case-insensitive and random
-        unix systems will throw a fit if you try to get from one to the other, so lets save the paths from 2) and cast it to lowecase
+        unix systems will throw a fit if you try to get from one to the other, so lets save the paths from 2) and cast it to lowercase
         lookups will be done in lowercase. A successfull match will return the real path.
     */
     private static function buildFileList()

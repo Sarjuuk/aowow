@@ -74,12 +74,12 @@ class SqlGen
     public static $defaultExecTime = 30;
     public static $stepSize        = 1000;
 
-    public static function init()
+    public static function init($firstrun = false)
     {
         self::$defaultExecTime = ini_get('max_execution_time');
         $doScripts = [];
 
-        if (getopt(self::$shortOpts, self::$longOpts))
+        if (getopt(self::$shortOpts, self::$longOpts) || $firstrun)
             self::handleCLIOpts($doScripts);
         else
         {

@@ -502,7 +502,7 @@ class SpellList extends BaseType
                 {
                     $results[$srcId][$idx] = array(
                         'typeId'      => $oId,
-                        'displayId'   => $oModels->getRandomModelId(),
+                        'displayId'   => $oModels->getField('displayId'),
                         'displayName' => $oModels->getField('name', true)
                     );
                 }
@@ -1305,7 +1305,7 @@ class SpellList extends BaseType
            b) elseif    - $?cond[A]?cond[B]..[C]            // can probably be repeated as often as you wanted
            c) recursive - $?cond[A][$?cond[B][..]]          // can probably be stacked as deep as you wanted
 
-           only case a) can be used for KNOW-parameter IF, AND ONLY IF it is not containing further variables ($) AND it has a spimple spell-condition ( \(?!?[as]\d+\)? )
+           only case a) can be used for KNOW-parameter IF, AND ONLY IF it is not containing further variables ($) AND it has a simple spell-condition ( \(?!?[as]\d+\)? )
 
            _[100].tooltip_enus = '<table><tr><td><b>Charge</b><br />8 - 25 yd range<table width="100%"><tr><td>Instant</td><th>20 sec cooldown</th></tr></table>Requires Warrior<br />Requires level 3</td></tr></table><table><tr><td><span class="q">Charge to an enemy, stunning it <!--sp58377:0--><!--sp58377-->for <!--sp103828:0-->1 sec<!--sp103828-->. Generates 20 Rage.</span></td></tr></table>';
            _[100].buff_enus = '';
