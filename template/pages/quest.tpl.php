@@ -40,12 +40,12 @@ if ($e = $this->end):
                     <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td><?php echo Lang::quest('suggestedPl').Lang::main('colon').$s; ?></td></tr>
 <?php endif; ?>
                 </table>
-                <div class="pad"></div>
 <?php
 endif;
 
 if ($o = $this->objectiveList):
     if ($e = $this->end):
+        echo "                <div class=\"pad\"></div>\n";
         echo '                '.Lang::quest('providedItem').Lang::main('colon')."\n";
     endif;
 ?>
