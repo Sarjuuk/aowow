@@ -140,7 +140,7 @@ function siteconfig()
                 $buff .= $conf['flags'] & CON_FLAG_PHP ? "  PHP: " : "AOWOW: ";
                 $buff .= $conf['flags'] & CON_FLAG_PHP ? strtolower($conf['key']) : strtoupper('cfg_'.$conf['key']);
 
-                if ($info[1])
+                if (!empty($info[1]))
                     $buff .= " - ".$info[1];
 
                 CLISetup::log($buff);

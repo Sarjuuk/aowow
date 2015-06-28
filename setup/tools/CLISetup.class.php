@@ -12,7 +12,8 @@ class CLISetup
     const CHR_BELL      = 7;
     const CHR_BACK      = 8;
     const CHR_TAB       = 9;
-    const CHR_RETURN    = 10;
+    const CHR_LF        = 10;
+    const CHR_CR        = 13;
     const CHR_ESC       = 27;
     const CHR_BACKSPACE = 127;
 
@@ -325,10 +326,18 @@ class CLISetup
     /* read input */
     /**************/
 
+    /*
+        since the CLI on WIN ist not interactive, the following things have to be considered
+        you do not receive keystrokes but whole strings upon pressing <Enter> (wich also appends a \r)
+        as such <ESC> and probably other control chars can not be registered
+        this also means, you can't hide input at all, least process it
+    */
+
     public static function readInput(&$fields, $singleChar = false)
     {
-        // prevent default output
-        readline_callback_handler_install('', function() { });
+        // prevent default output on *nix (readline doen't exist for WIN)
+        if (!self::$win)
+            readline_callback_handler_install('', function() { });
 
         foreach ($fields as $name => $data)
         {
@@ -353,7 +362,10 @@ class CLISetup
                     if ($keyId == self::CHR_TAB)            // ignore this one
                         continue;
 
-                    if ($keyId == self::CHR_ESC)
+                    if ($keyId == self::CHR_CR)             // also ignore this bastard!
+                        continue;
+
+                    if ($keyId == self::CHR_ESC)            // will not be send on WIN .. other ways of returning from setup? (besides ctrl + c)
                     {
                         echo chr(self::CHR_BELL);
                         return false;
@@ -366,7 +378,7 @@ class CLISetup
                         $charBuff = substr($charBuff, 0, -1);
                         echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
                     }
-                    else if ($keyId == self::CHR_RETURN)
+                    else if ($keyId == self::CHR_LF)
                     {
                         $fields[$name] = $charBuff;
                         break;
@@ -374,10 +386,10 @@ class CLISetup
                     else if (!$validPattern || preg_match($validPattern, $char))
                     {
                         $charBuff .= $char;
-                        if (!$isHidden)
+                        if (!$isHidden && !self::$win)      // see note above
                             echo $char;
 
-                        if ($singleChar)
+                        if ($singleChar && !self::$win)     // see note above
                         {
                             $fields[$name] = $charBuff;
                             break;
