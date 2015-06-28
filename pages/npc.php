@@ -452,14 +452,14 @@ class NpcPage extends GenericPage
         if ($this->subject->getField('npcflag') & NPC_FLAG_TRAINER)
         {
             $teachQuery = '
-                SELECT    IFNULL(t2.spell, t1.spell) AS ARRAY_KEY,
-                          IFNULL(t2.spellcost, t1.spellcost) AS cost,
-                          IFNULL(t2.reqskill, t1.reqskill) AS reqSkillId,
-                          IFNULL(t2.reqskillvalue, t1.reqskillvalue) AS reqSkillValue,
-                          IFNULL(t2.reqlevel, t1.reqlevel) AS reqLevel
+                SELECT    IFNULL(t2.SpellID, t1.SpellID) AS ARRAY_KEY,
+                          IFNULL(t2.MoneyCost, t1.MoneyCost) AS cost,
+                          IFNULL(t2.ReqSkillLine, t1.ReqSkillLine) AS reqSkillId,
+                          IFNULL(t2.ReqSkillRank, t1.ReqSkillRank) AS reqSkillValue,
+                          IFNULL(t2.ReqLevel, t1.ReqLevel) AS reqLevel
                 FROM      npc_trainer t1
-                LEFT JOIN npc_trainer t2 ON t2.entry = IF(t1.spell < 0, -t1.spell, null)
-                WHERE     t1.entry = ?d
+                LEFT JOIN npc_trainer t2 ON t2.ID = IF(t1.SpellID < 0, -t1.SpellID, null)
+                WHERE     t1.ID = ?d
             ';
 
             if ($tSpells = DB::World()->select($teachQuery, $this->typeId))

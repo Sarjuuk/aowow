@@ -38,9 +38,9 @@ class QuestsPage extends GenericPage
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
         if (isset($this->category[1]))
-            $conditions[] = ['zoneOrSort', $this->category[1]];
+            $conditions[] = ['questSortID', $this->category[1]];
         else if (isset($this->category[0]))
-            $conditions[] = ['zoneOrSort', $this->validCats[$this->category[0]]];
+            $conditions[] = ['questSortID', $this->validCats[$this->category[0]]];
 
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;

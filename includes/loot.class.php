@@ -7,7 +7,7 @@ if (!defined('AOWOW_REVISION'))
 /*  from TC wiki
     fishing_loot_template           no relation     entry is linked with ID of the fishing zone or area
     creature_loot_template          entry           many <- many        creature_template       lootid
-    gameobject_loot_template        entry           many <- many        gameobject_template     data1           Only GO type 3 (CHEST) or 25 (FISHINGHOLE)
+    gameobject_loot_template        entry           many <- many        gameobject_template     Data1           Only GO type 3 (CHEST) or 25 (FISHINGHOLE)
     item_loot_template              entry           many <- one         item_template           entry
     disenchant_loot_template        entry           many <- many        item_template           DisenchantID
     prospecting_loot_template       entry           many <- one         item_template           entry
