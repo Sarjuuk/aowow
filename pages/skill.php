@@ -278,7 +278,7 @@ class SkillPage extends GenericPage
             {
                 $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
 
-                $trainer = new CreatureList(array(CFG_SQL_LIMIT_NONE, ['ct.ID', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
+                $trainer = new CreatureList(array(CFG_SQL_LIMIT_NONE, ['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
 
                 if (!$trainer->error)
                 {

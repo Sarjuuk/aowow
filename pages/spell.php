@@ -1032,7 +1032,7 @@ class SpellPage extends GenericPage
 
             if ($list)
             {
-                $tbTrainer = new CreatureList(array(CFG_SQL_LIMIT_NONE, ['ct.ID', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
+                $tbTrainer = new CreatureList(array(CFG_SQL_LIMIT_NONE, ['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
                 if (!$tbTrainer->error)
                 {
                     $this->extendGlobalData($tbTrainer->getJSGlobals());
