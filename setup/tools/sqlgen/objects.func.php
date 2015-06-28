@@ -24,7 +24,7 @@ function objects(array $ids = [])
             go.entry,
             `type`,
             IF(`type` = 2, -2,                                                                  -- quests 1
-                IF(`type` = 8 AND data0 IN (1, 2, 3, 4, 1552), -6,                              -- tools
+                IF(`type` = 8 AND Data0 IN (1, 2, 3, 4, 1552), -6,                              -- tools
                 IF(`type` = 3 AND questitem1 <> 0, -2,                                          -- quests 2
                 IF(`type` IN (3, 9, 25), `type`, 0)))),                                         -- regular chests, books, pools
             0 AS event,                                                                         -- linked worldevent
@@ -34,30 +34,30 @@ function objects(array $ids = [])
             flags,
             0 AS cuFlags,                                                                       -- custom Flags
             questItem1, questItem2, questItem3, questItem4, questItem5, questItem6,
-            IF(`type` IN (3, 25), data1, 0),                                                    -- lootId
-            IF(`type` IN (2, 3, 6, 10, 13, 24, 26), data0, IF(`type` IN (0, 1), data1, 0)),     -- lockId
+            IF(`type` IN (3, 25), Data1, 0),                                                    -- lootId
+            IF(`type` IN (2, 3, 6, 10, 13, 24, 26), Data0, IF(`type` IN (0, 1), Data1, 0)),     -- lockId
             0 AS reqSkill,                                                                      -- reqSkill
-            IF(`type` = 9, data0, IF(`type` = 10, data7, 0)),                                   -- pageTextId
-            IF(`type` = 1, data3,                                                               -- linkedTrapIds
-                IF(`type` = 3, data7,
-                    IF(`type` = 10, data12,
-                        IF(`type` = 8, data2, 0)))),
-            IF(`type` = 5, data5,                                                               -- reqQuest
-                IF(`type` = 3, data8,
-                    IF(`type` = 10, data1,
-                        IF(`type` = 8, data4, 0)))),
-            IF(`type` = 8, data0, 0),                                                           -- spellFocusId
-            IF(`type` = 10, data10,                                                             -- onUseSpell
-                IF(`type` IN (18, 24), data1,
-                    IF(`type` = 26, data2,
-                        IF(`type` = 22, data0, 0)))),
-            IF(`type` = 18, data4, 0),                                                          -- onSuccessSpell
-            IF(`type` = 18, data2, IF(`type` = 24, data3, 0)),                                  -- auraSpell
-            IF(`type` = 30, data2, IF(`type` = 24, data4, IF(`type` = 6, data3, 0))),           -- triggeredSpell
-            IF(`type` = 29, CONCAT_WS(" ", data14, data15, data16, data17, data0),              -- miscInfo: capturePoint
-                IF(`type` =  3, CONCAT_WS(" ", data4, data5, data2),                            -- miscInfo: loot v
-                    IF(`type` = 25, CONCAT_WS(" ", data2, data3, 0),
-                        IF(`type` = 23, CONCAT_WS(" ", data0, data1, data2), "")))),            -- miscInfo: meetingStone
+            IF(`type` = 9, Data0, IF(`type` = 10, Data7, 0)),                                   -- pageTextId
+            IF(`type` = 1, Data3,                                                               -- linkedTrapIds
+                IF(`type` = 3, Data7,
+                    IF(`type` = 10, Data12,
+                        IF(`type` = 8, Data2, 0)))),
+            IF(`type` = 5, Data5,                                                               -- reqQuest
+                IF(`type` = 3, Data8,
+                    IF(`type` = 10, Data1,
+                        IF(`type` = 8, Data4, 0)))),
+            IF(`type` = 8, Data0, 0),                                                           -- spellFocusId
+            IF(`type` = 10, Data10,                                                             -- onUseSpell
+                IF(`type` IN (18, 24), Data1,
+                    IF(`type` = 26, Data2,
+                        IF(`type` = 22, Data0, 0)))),
+            IF(`type` = 18, Data4, 0),                                                          -- onSuccessSpell
+            IF(`type` = 18, Data2, IF(`type` = 24, Data3, 0)),                                  -- auraSpell
+            IF(`type` = 30, Data2, IF(`type` = 24, Data4, IF(`type` = 6, Data3, 0))),           -- triggeredSpell
+            IF(`type` = 29, CONCAT_WS(" ", Data14, Data15, Data16, Data17, Data0),              -- miscInfo: capturePoint
+                IF(`type` =  3, CONCAT_WS(" ", Data4, Data5, Data2),                            -- miscInfo: loot v
+                    IF(`type` = 25, CONCAT_WS(" ", Data2, Data3, 0),
+                        IF(`type` = 23, CONCAT_WS(" ", Data0, Data1, Data2), "")))),            -- miscInfo: meetingStone
             IF(ScriptName <> "", ScriptName, AIName)
         FROM
             gameobject_template go

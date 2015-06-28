@@ -30,7 +30,7 @@ class QuestList extends BaseType
         // post processing
         foreach ($this->iterate() as $id => &$_curTpl)
         {
-            $_curTpl['cat1'] = $_curTpl['zoneOrSort'];      // should probably be in a method...
+            $_curTpl['cat1'] = $_curTpl['questSortID'];      // should probably be in a method...
             $_curTpl['cat2'] = 0;
 
             foreach (Util::$questClasses as $k => $arr)
@@ -516,9 +516,9 @@ class QuestListFilter extends Filter
                 if ($this->int2Bool($cr[1]))
                 {
                     if ($cr[1])
-                        return ['AND', ['zoneOrSort', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE , '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY , '&'], 0]];
+                        return ['AND', ['questSortID', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE , '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY , '&'], 0]];
                     else
-                        return ['OR', ['zoneOrSort', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE , '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY , '&']];;
+                        return ['OR', ['questSortID', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE , '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY , '&']];;
                 }
 
                 break;

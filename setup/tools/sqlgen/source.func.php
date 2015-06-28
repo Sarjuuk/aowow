@@ -250,11 +250,11 @@ function source(array $ids = [])
         FROM
             gameobject_loot_template glt
         JOIN
-            gameobject_template gt ON glt.entry = gt.data1
+            gameobject_template gt ON glt.entry = gt.Data1
         LEFT JOIN
             item_template it ON it.entry = glt.Item AND glt.Reference <= 0
         WHERE
-            `type` = 3 AND gt.data1 > 0 AND gt.data0 NOT IN (?a)
+            `type` = 3 AND gt.Data1 > 0 AND gt.Data0 NOT IN (?a)
         GROUP BY
             ARRAY_KEY',
         $exclLocks
@@ -388,17 +388,17 @@ function source(array $ids = [])
     $spellBuff  = [];
     $itemBuff   = [];
     $quests     = DB::World()->select(
-        'SELECT n.item AS ARRAY_KEY, n.Id AS quest, SUM(n.qty) AS qty, BIT_OR(n.side) AS side, it.class, it.subclass, it.spellid_1, it.spelltrigger_1, it.spellid_2, it.spelltrigger_2 FROM (
-            SELECT rewardChoiceItemId1 AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemId1 > 0 GROUP BY item UNION
-            SELECT rewardChoiceItemId2 AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemId2 > 0 GROUP BY item UNION
-            SELECT rewardChoiceItemId3 AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemId3 > 0 GROUP BY item UNION
-            SELECT rewardChoiceItemId4 AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemId4 > 0 GROUP BY item UNION
-            SELECT rewardChoiceItemId5 AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemId5 > 0 GROUP BY item UNION
-            SELECT rewardChoiceItemId6 AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemId6 > 0 GROUP BY item UNION
-            SELECT rewardItemId1       AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardItemId1       > 0 GROUP BY item UNION
-            SELECT rewardItemId2       AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardItemId2       > 0 GROUP BY item UNION
-            SELECT rewardItemId3       AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardItemId3       > 0 GROUP BY item UNION
-            SELECT rewardItemId4       AS item, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardItemId4       > 0 GROUP BY item
+        'SELECT n.item AS ARRAY_KEY, n.ID AS quest, SUM(n.qty) AS qty, BIT_OR(n.side) AS side, it.class, it.subclass, it.spellid_1, it.spelltrigger_1, it.spellid_2, it.spelltrigger_2 FROM (
+            SELECT RewardChoiceItemID1 AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE RewardChoiceItemID1 > 0 GROUP BY item UNION
+            SELECT RewardChoiceItemID2 AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemID2 > 0 GROUP BY item UNION
+            SELECT RewardChoiceItemID3 AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemID3 > 0 GROUP BY item UNION
+            SELECT RewardChoiceItemID4 AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemID4 > 0 GROUP BY item UNION
+            SELECT RewardChoiceItemID5 AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemID5 > 0 GROUP BY item UNION
+            SELECT RewardChoiceItemID6 AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardChoiceItemID6 > 0 GROUP BY item UNION
+            SELECT RewardItem1         AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardItem1         > 0 GROUP BY item UNION
+            SELECT RewardItem2         AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardItem2         > 0 GROUP BY item UNION
+            SELECT RewardItem3         AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardItem3         > 0 GROUP BY item UNION
+            SELECT RewardItem4         AS item, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE rewardItem4         > 0 GROUP BY item
         ) n JOIN item_template it ON it.entry = n.item
         GROUP BY item'
     );
@@ -413,7 +413,7 @@ function source(array $ids = [])
     $mailLoot = DB::World()->select('
         SELECT
             IF(mlt.Reference > 0, -mlt.Reference, mlt.Item) AS ARRAY_KEY,
-            qt.Id AS entry,
+            qt.ID AS entry,
             it.class, it.subclass, it.spellid_1, it.spelltrigger_1, it.spellid_2, it.spelltrigger_2,
             count(1) AS qty,
             BIT_OR(IF(qt.RequiredRaces & 0x2B2 AND !(qt.RequiredRaces & 0x44D), 2, IF(qt.RequiredRaces & 0x44D AND !(qt.RequiredRaces & 0x2B2), 1, 3))) AS side
@@ -635,7 +635,7 @@ function source(array $ids = [])
             count(1) AS qty
         FROM (
             SELECT 0 AS entry, IF(flt.Reference > 0, -flt.Reference, flt.Item) itemOrRef FROM fishing_loot_template flt UNION
-            SELECT   gt.entry, IF(glt.Reference > 0, -glt.Reference, glt.Item) itemOrRef FROM gameobject_template   gt  JOIN gameobject_loot_template glt ON glt.entry = gt.data1 WHERE `type` = 25 AND gt.data1 > 0
+            SELECT   gt.entry, IF(glt.Reference > 0, -glt.Reference, glt.Item) itemOrRef FROM gameobject_template   gt  JOIN gameobject_loot_template glt ON glt.entry = gt.Data1 WHERE `type` = 25 AND gt.Data1 > 0
         ) src
         LEFT JOIN
             item_template it ON src.itemOrRef > 0 AND src.itemOrRef = it.entry
@@ -688,7 +688,7 @@ function source(array $ids = [])
             src.srcType
         FROM (
             SELECT ct.entry, IF(slt.Reference > 0, -slt.Reference, slt.Item) itemOrRef, ?d AS srcType FROM creature_template   ct JOIN skinning_loot_template   slt ON slt.entry = ct.skinloot WHERE (type_flags & ?d) AND ct.skinloot > 0 UNION
-            SELECT gt.entry, IF(glt.Reference > 0, -glt.Reference, glt.Item) itemOrRef, ?d AS srcType FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.entry = gt.data1    WHERE gt.`type` = 3 AND gt.data1 > 0 AND data0 IN (?a)
+            SELECT gt.entry, IF(glt.Reference > 0, -glt.Reference, glt.Item) itemOrRef, ?d AS srcType FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.entry = gt.Data1    WHERE gt.`type` = 3 AND gt.Data1 > 0 AND Data0 IN (?a)
         ) src
         LEFT JOIN
             item_template it ON src.itemOrRef > 0 AND src.itemOrRef = it.entry
@@ -794,7 +794,7 @@ function source(array $ids = [])
             src.srcType
         FROM (
             SELECT ct.entry, IF(slt.Reference > 0, -slt.Reference, slt.Item) itemOrRef, ?d AS srcType FROM creature_template   ct JOIN skinning_loot_template   slt ON slt.entry = ct.skinloot WHERE (type_flags & ?d) AND ct.skinloot > 0 UNION
-            SELECT gt.entry, IF(glt.Reference > 0, -glt.Reference, glt.Item) itemOrRef, ?d AS srcType FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.entry = gt.data1    WHERE gt.`type` = 3 AND gt.data1 > 0 AND data0 IN (?a)
+            SELECT gt.entry, IF(glt.Reference > 0, -glt.Reference, glt.Item) itemOrRef, ?d AS srcType FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.entry = gt.Data1    WHERE gt.`type` = 3 AND gt.Data1 > 0 AND Data0 IN (?a)
         ) src
         LEFT JOIN
             item_template it ON src.itemOrRef > 0 AND src.itemOrRef = it.entry
@@ -1045,9 +1045,9 @@ function source(array $ids = [])
     CLISetup::log('   * #4  Quest');
     $quests = DB::World()->select('
         SELECT spell AS ARRAY_KEY, id, SUM(qty) AS qty, BIT_OR(side) AS side FROM (
-            SELECT IF(rewardSpellCast = 0, rewardSpell, rewardSpellCast) AS spell, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE IF(rewardSpellCast = 0, rewardSpell, rewardSpellCast) > 0 GROUP BY spell
+            SELECT IF(rewardSpellCast = 0, rewardSpell, rewardSpellCast) AS spell, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE IF(rewardSpellCast = 0, rewardSpell, rewardSpellCast) > 0 GROUP BY spell
             UNION
-            SELECT SourceSpellId AS spell, Id, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE SourceSpellId > 0 GROUP BY spell
+            SELECT SourceSpellId AS spell, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE SourceSpellId > 0 GROUP BY spell
         ) t GROUP BY spell');
 
     if ($quests)
@@ -1071,7 +1071,7 @@ function source(array $ids = [])
 
     #  6: Trainer
     CLISetup::log('   * #6  Trainer');
-    if ($tNpcs = DB::World()->select('SELECT spell AS ARRAY_KEY, entry, COUNT(1) AS qty FROM npc_trainer WHERE spell > 0 GROUP BY ARRAY_KEY'))
+    if ($tNpcs = DB::World()->select('SELECT SpellID AS ARRAY_KEY, ID, COUNT(1) AS qty FROM npc_trainer WHERE SpellID > 0 GROUP BY ARRAY_KEY'))
     {
         $tSpells = DB::Aowow()->select('SELECT Id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE Id IN (?a)', array_keys($tNpcs));
         $buff    = [];
@@ -1083,7 +1083,7 @@ function source(array $ids = [])
                 continue;
 
             $effects   = $tSpells[$spellId];
-            $trainerId = $npc['entry'] > 200000 || $npc['qty'] > 1 ? null : $npc['entry'];
+            $trainerId = $npc['ID'] > 200000 || $npc['qty'] > 1 ? null : $npc['ID'];
 
             $triggered = false;
             for ($i = 1; $i <= 3; $i++)
@@ -1167,7 +1167,7 @@ function source(array $ids = [])
 
     #  4: Quest
     CLISetup::log('   * #4  Quest');
-    if ($quests = DB::World()->select('SELECT ?d, RewardTitleId, 1, ?d, Id FROM quest_template WHERE RewardTitleId > 0', TYPE_TITLE, TYPE_QUEST))
+    if ($quests = DB::World()->select('SELECT ?d, RewardTitle, 1, ?d, ID FROM quest_template WHERE RewardTitle > 0', TYPE_TITLE, TYPE_QUEST))
         DB::Aowow()->query(queryfy('[V]', $quests, $insMore), 4, 4, 4);
 
     # 12: Achievement

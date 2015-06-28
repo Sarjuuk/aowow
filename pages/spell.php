@@ -1010,7 +1010,7 @@ class SpellPage extends GenericPage
                 }
 
                 if ($tt)
-                    $list = DB::World()->selectCol('SELECT DISTINCT entry FROM npc_trainer WHERE spell IN (?a) AND entry < 200000', $tt);
+                    $list = DB::World()->selectCol('SELECT DISTINCT ID FROM npc_trainer WHERE SpellID IN (?a) AND ID < 200000', $tt);
                 else
                 {
                     $mask = 0;
@@ -1019,10 +1019,10 @@ class SpellPage extends GenericPage
                             $mask |= 1 << $idx;
 
                     $list = DB::World()->selectCol('
-                        SELECT    IF(t1.entry > 200000, t2.entry, t1.entry)
+                        SELECT    IF(t1.ID > 200000, t2.ID, t1.ID)
                         FROM      npc_trainer t1
-                        LEFT JOIN npc_trainer t2 ON t2.spell = -t1.entry
-                        WHERE     t1.spell = ?d',
+                        LEFT JOIN npc_trainer t2 ON t2.SpellID = -t1.ID
+                        WHERE     t1.SpellID = ?d',
                         $this->typeId
                     );
                 }
