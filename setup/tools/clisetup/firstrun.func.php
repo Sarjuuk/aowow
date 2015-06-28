@@ -150,8 +150,8 @@ function firstrun($resume)
         $prot = $res['force_ssl'] ? 'https://' : 'http://';
         if ($res['site_host'])
         {
-            if (!$test($prot.$res['site_host'].'/README', $resp))
-                $error[] = ' * could not access '.$prot.$res['site_host'].'/README ['.$resp.']';
+            if (!$test($prot.$res['site_host'].'/README.md', $resp))
+                $error[] = ' * could not access '.$prot.$res['site_host'].'/README.md ['.$resp.']';
         }
         else
             $error[] = ' * SITE_HOST is empty';

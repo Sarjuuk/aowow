@@ -54,7 +54,8 @@ class FileGen
         'static/uploads/screenshots/resized',
         'static/uploads/screenshots/temp',
         'static/uploads/screenshots/thumb',
-        'static/uploads/temp/'
+        'static/uploads/temp/',
+        'static/download/searchplugins/'
     );
 
     public static $txtConstants = array(
