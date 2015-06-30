@@ -408,12 +408,12 @@ class SpellList extends BaseType
         return $this->tools;
     }
 
-    public function getModelInfo($targetId = 0)
+    public function getModelInfo($spellId = 0, $effIdx = 0)
     {
         $displays = [0 => []];
         foreach ($this->iterate() as $id => $__)
         {
-            if ($targetId && $targetId != $id)
+            if ($spellId && $spellId != $id)
                 continue;
 
             for ($i = 1; $i < 4; $i++)
@@ -425,14 +425,18 @@ class SpellList extends BaseType
                 // GO Model from MiscVal
                 if (in_array($this->curTpl['effect'.$i.'Id'], [50, 76, 104, 105, 106, 107]))
                 {
-                    $displays[TYPE_OBJECT][$id] = $effMV;
-                    break;
+                    if (isset($displays[TYPE_OBJECT][$id]))
+                        $displays[TYPE_OBJECT][$id][0][] = $i;
+                    else
+                        $displays[TYPE_OBJECT][$id] = [[$i], $effMV];
                 }
                 // NPC Model from MiscVal
                 else if (in_array($this->curTpl['effect'.$i.'Id'], [28, 90, 134]) || in_array($this->curTpl['effect'.$i.'AuraId'], [56, 78]))
                 {
-                    $displays[TYPE_NPC][$id] = $effMV;
-                    break;
+                    if (isset($displays[TYPE_NPC][$id]))
+                        $displays[TYPE_NPC][$id][0][] = $i;
+                    else
+                        $displays[TYPE_NPC][$id] = [[$i], $effMV];
                 }
                 // Shapeshift
                 else if ($this->curTpl['effect'.$i.'AuraId'] == 36)
@@ -446,17 +450,16 @@ class SpellList extends BaseType
 
                     if ($st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftforms WHERE id = ?d', $effMV))
                     {
-                        foreach ([1, 2] as $i)
-                            if (isset($subForms[$st['model'.$i]]))
-                                $st['model'.$i] = $subForms[$st['model'.$i]][array_rand($subForms[$st['model'.$i]])];
+                        foreach ([1, 2] as $j)
+                            if (isset($subForms[$st['model'.$j]]))
+                                $st['model'.$j] = $subForms[$st['model'.$j]][array_rand($subForms[$st['model'.$j]])];
 
-                        $displays[0][$id] = array(
-                            'npcId'        => 0,
-                            'displayId'    => [$st['model1'], $st['model2']],
+                        $displays[0][$id][$i] = array(
+                            'typeId'       => 0,
+                            'displayId'    => $st['model2'] ? $st['model'.rand(1, 2)] : $st['model1'],
                             'creatureType' => $st['creatureType'],
                             'displayName'  => Util::localizedString($st, 'name')
                         );
-                        break;
                     }
                 }
             }
@@ -466,34 +469,48 @@ class SpellList extends BaseType
 
         if (!empty($displays[TYPE_NPC]))
         {
-            $nModels = new CreatureList(array(['id', $displays[TYPE_NPC]]));
+            $nModels = new CreatureList(array(['id', array_column($displays[TYPE_NPC], 1)]));
             foreach ($nModels->iterate() as $nId => $__)
             {
-                $srcId = array_search($nId, $displays[TYPE_NPC]);
-                $results[$srcId] = array(
-                    'typeId'      => $nId,
-                    'displayId'   => $nModels->getRandomModelId(),
-                    'displayName' => $nModels->getField('name', true)
-                );
+                $srcId = 0;
+                foreach ($displays[TYPE_NPC] as $srcId => $set)
+                    if ($set[1] == $nId)
+                        break;
+
+                foreach ($set[0] as $idx)
+                {
+                    $results[$srcId][$idx] = array(
+                        'typeId'      => $nId,
+                        'displayId'   => $nModels->getRandomModelId(),
+                        'displayName' => $nModels->getField('name', true)
+                    );
+                }
             }
         }
 
         if (!empty($displays[TYPE_OBJECT]))
         {
-            $oModels = new GameObjectList(array(['id', $displays[TYPE_OBJECT]]));
+            $oModels = new GameObjectList(array(['id', array_column($displays[TYPE_OBJECT], 1)]));
             foreach ($oModels->iterate() as $oId => $__)
             {
-                $srcId = array_search($oId, $displays[TYPE_OBJECT]);
-                $results[$srcId] = array(
-                    'typeId'      => $oId,
-                    'displayId'   => $oModels->getField('displayId'),
-                    'displayName' => $oModels->getField('name', true)
-                );
+                $srcId = 0;
+                foreach ($displays[TYPE_OBJECT] as $srcId => $set)
+                    if ($set[1] == $oId)
+                        break;
+
+                foreach ($set[0] as $idx)
+                {
+                    $results[$srcId][$idx] = array(
+                        'typeId'      => $oId,
+                        'displayId'   => $oModels->getField('displayId'),
+                        'displayName' => $oModels->getField('name', true)
+                    );
+                }
             }
         }
 
-        if ($targetId)
-            return !empty($results[$targetId]) ? $results[$targetId] : 0;
+        if ($spellId && $effIdx)
+            return !empty($results[$spellId][$effIdx]) ? $results[$spellId][$effIdx] : 0;
 
         return $results;
     }
@@ -736,7 +753,7 @@ class SpellList extends BaseType
 
                 if (isset($$var))
                 {
-                    $eval = eval('return @$'.$var.';');      // attention: error suppression active here (will be logged anyway)
+                    $eval = eval('return @$'.$var.';');     // attention: error suppression active here (will be logged anyway)
                     if (getType($eval) == 'object')
                         continue;
                     else if (is_numeric($eval))
@@ -769,6 +786,7 @@ class SpellList extends BaseType
         }
 
         // since this function may be called recursively, there are cases, where the already evaluated string is tried to be evaled again, throwing parse errors
+        // todo (med): also quit, if we replaced vars with non-interactive text
         if (strstr($formula, '</dfn>'))
             return $formula;
 
@@ -1112,7 +1130,7 @@ class SpellList extends BaseType
             if (isset($formula[++$formCurPos]) && $formula[$formCurPos] == '.')
             {
                 $formPrecision = (int)$formula[++$formCurPos];
-                ++$formCurPos;                              // for some odd reason the precision decimal survives if wo dont increment further..
+                ++$formCurPos;                              // for some odd reason the precision decimal survives if we dont increment further..
             }
 
             $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
@@ -1281,13 +1299,30 @@ class SpellList extends BaseType
 
     // step 2: resolving conditions
         // aura- or spell-conditions cant be resolved for our purposes, so force them to false for now (todo (low): strg+f "know" in aowowPower.js ^.^)
+
+        /* sequences
+           a) simple    - $?cond[A][B]                      // simple case of b)
+           b) elseif    - $?cond[A]?cond[B]..[C]            // can probably be repeated as often as you wanted
+           c) recursive - $?cond[A][$?cond[B][..]]          // can probably be stacked as deep as you wanted
+
+           only case a) can be used for KNOW-parameter IF, AND ONLY IF it is not containing further variables ($) AND it has a simple spell-condition ( \(?!?[as]\d+\)? )
+
+           _[100].tooltip_enus = '<table><tr><td><b>Charge</b><br />8 - 25 yd range<table width="100%"><tr><td>Instant</td><th>20 sec cooldown</th></tr></table>Requires Warrior<br />Requires level 3</td></tr></table><table><tr><td><span class="q">Charge to an enemy, stunning it <!--sp58377:0--><!--sp58377-->for <!--sp103828:0-->1 sec<!--sp103828-->. Generates 20 Rage.</span></td></tr></table>';
+           _[100].buff_enus = '';
+           _[100].spells_enus = {"58377": [["", "and 2 additional nearby targets "]], "103828": [["1 sec", "3 sec and reducing movement speed by 50% for 15 sec"]]};
+           _[100].buffspells_enus = {};
+
+           Turns the Shaman into a Ghost Wolf, increasing speed by $s2%$?s59289[ and regenerating $59289s1% of your maximum health every 5 sec][].
+           Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
+       */
+
         // \1: full pattern match; \2: any sequence, that may include an aura/spell-ref; \3: any other sequence, between "?$" and "["
         while (preg_match('/\$\?(([\W\D]*[as]\d+)|([^\[]*))/i', $data, $matches))
         {
             $condBrktCnt = 0;
             $targetPart  = 3;                               // we usually want the second pair of brackets
             $curPart     = 0;                               // parts: $? 0 [ 1 ] 2 [ 3 ] 4
-            $relSpells   = [];    // see spells_enus
+            $relSpells   = [];                              // see spells_enus
 
             $condOutStr  = '';
 
@@ -1301,14 +1336,6 @@ class SpellList extends BaseType
                 $condCurPos   = $condStartPos;
 
             }
-/*
-_[100].tooltip_enus = '<table><tr><td><b>Charge</b><br />8 - 25 yd range<table width="100%"><tr><td>Instant</td><th>20 sec cooldown</th></tr></table>Requires Warrior<br />Requires level 3</td></tr></table><table><tr><td><span class="q">Charge to an enemy, stunning it <!--sp58377:0--><!--sp58377-->for <!--sp103828:0-->1 sec<!--sp103828-->. Generates 20 Rage.</span></td></tr></table>';
-_[100].buff_enus = '';
-_[100].spells_enus = {"58377": [["", "and 2 additional nearby targets "]], "103828": [["1 sec", "3 sec and reducing movement speed by 50% for 15 sec"]]};
-_[100].buffspells_enus = {};
-Turns the Shaman into a Ghost Wolf, increasing speed by $s2%$?s59289[ and regenerating $59289s1% of your maximum health every 5 sec][].
-Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
-*/
 
             else if (!empty($matches[2]))
             {
@@ -1780,11 +1807,16 @@ Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
 
             if ($addInfoMask & ITEMINFO_MODEL)
             {
-                if (!empty($modelInfo[$this->id]))
+                // may have multiple models set, in this case i've no idea what should be picked
+                for ($i = 1; $i < 4; $i++)
                 {
-                    $data[$this->id]['npcId']       = $modelInfo[$this->id]['typeId'];
-                    $data[$this->id]['displayId']   = $modelInfo[$this->id]['displayId'];
-                    $data[$this->id]['displayName'] = $modelInfo[$this->id]['displayName'];
+                    if (!empty($modelInfo[$this->id][$i]))
+                    {
+                        $data[$this->id]['npcId']       = $modelInfo[$this->id][$i]['typeId'];
+                        $data[$this->id]['displayId']   = $modelInfo[$this->id][$i]['displayId'];
+                        $data[$this->id]['displayName'] = $modelInfo[$this->id][$i]['displayName'];
+                        break;
+                    }
                 }
             }
         }

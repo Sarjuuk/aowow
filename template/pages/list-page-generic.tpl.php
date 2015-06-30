@@ -7,9 +7,9 @@
 <?php
     $this->brick('announcement');
 
-    $this->brick('mapper');
-
     $this->brick('pageTemplate');
+
+    $this->brick('mapper');
 
 if (!empty($this->name) || !empty($this->h1Links) || !empty($this->extraHTML)):
     echo '<div class="text">' .

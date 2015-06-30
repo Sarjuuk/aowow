@@ -158,10 +158,7 @@ if (!CLI)
             $res = $$s();
             $out[$s] = $res;
             if (!$res)
-            {
                 CLISetup::log('statistics - generator $'.$s.'() returned empty', CLISetup::LOG_WARN);
-                $success = false;
-            }
         }
 
         $toFile = 'g_statistics = '.preg_replace('/"\$([^$"]+)"/', '\1', Util::toJSON($out)).';';

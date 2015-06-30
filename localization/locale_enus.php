@@ -484,7 +484,7 @@ $lang = array(
         'raidFaction'   => "Raid faction",
         'boss'          => "Final boss",
         'reqLevels'     => "Required levels: [tooltip=instancereqlevel_tip]%d[/tooltip], [tooltip=lfgreqlevel_tip]%d[/tooltip]",
-        'zonePartOf'    => "This zone is part of [zone=%].",
+        'zonePartOf'    => "This zone is part of [zone=%s].",
         'autoRez'       => "Automatic resurrection",
         'city'          => "City",
         'territory'     => "Territory",

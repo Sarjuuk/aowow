@@ -40,63 +40,18 @@ function build()
                 continue;
             }
 
-            if (file_exists('setup/tools/filegen/'.$name.'.func.php'))
-                require_once 'setup/tools/filegen/'.$name.'.func.php';
-            // else     not necessarily an error, may only need replacement of const text
-
             if (!CLISetup::writeDir($destPath))
                 continue;
 
-            $ok = false;
-            if ($content = file_get_contents(FileGen::$tplPath.$file.'.in'))
-            {
-                if ($dest = @fOpen($destPath.$file, "w"))
-                {
-                    // replace constants
-                    $content = strtr($content, FileGen::$txtConstants);
+            $syncIds = [];                                  // todo: fetch what exactly must be regenerated
 
-                    // check for required auxiliary DBC files
-                    foreach ($reqDBC as $req)
-                        if (!CLISetup::loadDBC($req))
-                            continue 2;
-
-                    // must generate content
-                    // PH format: /*setup:<setupFunc>*/
-                    if (preg_match_all('/\/\*setup:([\w\-_]+)\*\//i', $content, $m))
-                    {
-                        foreach ($m[1] as $func)
-                        {
-                            if (function_exists($func))
-                                $content = str_replace('/*setup:'.$func.'*/', $func(), $content);
-                            else
-                            {
-                                $allOk = false;
-                                CLISetup::log('No function for was registered for placeholder '.$func.'().', CLISetup::LOG_ERROR);
-                                if (!array_reduce(get_included_files(), function ($inArray, $itr) use ($func) { return $inArray || false !== strpos($itr, $func); }, false))
-                                    CLISetup::log('Also, expected include setup/tools/filegen/'.$name.'.func.php was not found.');
-                            }
-                        }
-                    }
-
-                    if (fWrite($dest, $content))
-                    {
-                        CLISetup::log(sprintf(ERR_NONE, CLISetup::bold($destPath.$file)), CLISetup::LOG_OK);
-                        if ($content && $allOk)
-                            $ok = true;
-                    }
-                    else
-                        CLISetup::log(sprintf(ERR_WRITE_FILE, CLISetup::bold($destPath.$file)), CLISetup::LOG_ERROR);
-
-                    fClose($dest);
-                }
-                else
-                    CLISetup::log(sprintf(ERR_CREATE_FILE, CLISetup::bold($destPath.$file)), CLISetup::LOG_ERROR);
-            }
-            else
-                CLISetup::log(sprintf(ERR_READ_FILE, CLISetup::bold(FileGen::$tplPath.$file.'.in')), CLISetup::LOG_ERROR);
+            $ok = FileGen::generate($name, $syncIds);
 
             if (!$ok)
                 $allOk = false;
+
+            CLISetup::log(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLISetup::LOG_OK : CLISetup::LOG_ERROR);
+            set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
         }
 
         // files without template
