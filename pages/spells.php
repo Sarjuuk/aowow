@@ -345,10 +345,15 @@ class SpellsPage extends GenericPage
                     }
 
                     break;
-                case 0:                                     // misc. Spells
+                case 0:                                     // misc. Spells & triggered player abilities
                     array_push($visibleCols, 'level');
 
-                    $conditions[] = ['s.typeCat', 0];
+                    $conditions[] = [
+                        'OR',
+                        ['s.typeCat', 0],
+                        ['AND', ['s.cuFlags', SPELL_CU_TRIGGERED, '&'], ['s.typeCat', [7, -2]]]
+                    ];
+
                     break;
             }
         }
@@ -387,13 +392,16 @@ class SpellsPage extends GenericPage
             if (in_array(9, $_['cr']) && !in_array('source', $visibleCols))
                 $visibleCols[] = 'source';
 
-        $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost']);
+        $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost', 'reqClassMask']);
         if ($mask & 0x1)
             $visibleCols[] = 'reagents';
         if (!($mask & 0x2) && $this->category && !in_array($this->category[0], [9, 11]))
             $hiddenCols[] = 'skill';
         if (($mask & 0x4))
             $visibleCols[] = 'trainingcost';
+        if (($mask & 0x8) && !in_array('singleclass', $visibleCols))
+            $visibleCols[] = 'singleclass';
+
 
         if ($visibleCols)
             $tab['params']['visibleCols'] = '$'.Util::toJSON($visibleCols);
