@@ -32,62 +32,52 @@ elseif ($this->offerReward):
     echo $this->offerReward."\n";
 endif;
 
-if ($e = $this->end):
+if ($this->end || $this->objectiveList):
 ?>
                 <table class="iconlist">
-                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td><?php echo $e; ?></td></tr>
-<?php if ($s = $this->suggestedPl): ?>
-                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td><?php echo Lang::quest('suggestedPl').Lang::main('colon').$s; ?></td></tr>
-<?php endif; ?>
-                </table>
 <?php
-endif;
-
-if ($o = $this->objectiveList):
-    if ($e = $this->end):
-        echo "                <div class=\"pad\"></div>\n";
-        echo '                '.Lang::quest('providedItem').Lang::main('colon')."\n";
+    if ($this->end):
+        echo "                    <tr><th><p style=\"height: 26px; width: 30px;\">&nbsp;</p></th><td>".$this->end."</td></tr>\n";
     endif;
-?>
-                <table class="iconlist">
-<?php
-    foreach ($o as $i => $ol):
 
-        if (isset($ol['text'])):
-            echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.$ol['text']."</td></tr>\n";
-        elseif (!empty($ol['proxy'])):                      // this implies creatures
-            echo '                    <tr><th><p style="height: 26px">&nbsp;</p></th><td><a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$ol['id'].'\'), this)" class="disclosure-off">'.$ol['name'].$ol['extraText'].'</a>'.($ol['qty'] > 1 ? '&nbsp;('.$ol['qty'].')' : null).'<div id="npcgroup-'.$ol['id']."\" style=\"display: none\">\n";
+    if ($o = $this->objectiveList):
+        foreach ($o as $i => $ol):
+            if (isset($ol['text'])):
+                echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.$ol['text']."</td></tr>\n";
+            elseif (!empty($ol['proxy'])):                      // this implies creatures
+                echo '                    <tr><th><p style="height: 26px">&nbsp;</p></th><td><a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$ol['id'].'\'), this)" class="disclosure-off">'.$ol['name'].$ol['extraText'].'</a>'.($ol['qty'] > 1 ? '&nbsp;('.$ol['qty'].')' : null).'<div id="npcgroup-'.$ol['id']."\" style=\"display: none\">\n";
 
-            $block1 = array_slice($ol['proxy'], 0, ceil(count($ol['proxy']) / 2), true);
-            $block2 = array_slice($ol['proxy'], ceil(count($ol['proxy']) / 2), null, true);
+                $block1 = array_slice($ol['proxy'], 0, ceil(count($ol['proxy']) / 2), true);
+                $block2 = array_slice($ol['proxy'], ceil(count($ol['proxy']) / 2), null, true);
 
-            echo "                        <div style=\"float: left\"><table class=\"iconlist\">\n";
-            foreach ($block1 as $pId => $name):
-                            echo '                            <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$name."</a></td></tr>\n";
-            endforeach;
-            echo "                        </table></div>\n";
-
-            if ($block2):                                   // may be empty
                 echo "                        <div style=\"float: left\"><table class=\"iconlist\">\n";
-                foreach ($block2 as $pId => $name):
+                foreach ($block1 as $pId => $name):
                                 echo '                            <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$name."</a></td></tr>\n";
                 endforeach;
                 echo "                        </table></div>\n";
+
+                if ($block2):                                   // may be empty
+                    echo "                        <div style=\"float: left\"><table class=\"iconlist\">\n";
+                    foreach ($block2 as $pId => $name):
+                                    echo '                            <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$name."</a></td></tr>\n";
+                    endforeach;
+                    echo "                        </table></div>\n";
+                endif;
+
+                echo "                    </div></td></tr>\n";
+            elseif (isset($ol['typeStr'])):
+                if (in_array($ol['typeStr'], ['item', 'spell'])):
+                    echo '                    <tr><th align="right" id="iconlist-icon-'.$i.'"></th>';
+                else /* if (in_array($ol['typeStr'], ['npc', 'object', 'faction'])) */:
+                    echo '                    <tr><th><ul><li><var>&nbsp;</var></li></ul></th>';
+                endif;
+
+                echo '<td><span class="q'.(isset($ol['quality']) ? $ol['quality'] : null).'"><a href="?'.$ol['typeStr'].'='.$ol['id'].'">'.$ol['name'].'</a></span>'.($ol['extraText']).(!empty($ol['qty']) ? '&nbsp;('.$ol['qty'].')' : null)."</td></tr>\n";
             endif;
+        endforeach;
+    endif;
 
-            echo "                    </div></td></tr>\n";
-        elseif (isset($ol['typeStr'])):
-            if (in_array($ol['typeStr'], ['item', 'spell'])):
-                echo '                    <tr><th align="right" id="iconlist-icon-'.$i.'"></th>';
-            else /* if (in_array($ol['typeStr'], ['npc', 'object', 'faction'])) */:
-                echo '                    <tr><th><ul><li><var>&nbsp;</var></li></ul></th>';
-            endif;
-
-            echo '<td><span class="q'.(isset($ol['quality']) ? $ol['quality'] : null).'"><a href="?'.$ol['typeStr'].'='.$ol['id'].'">'.$ol['name'].'</a></span>'.(!$this->end ? $ol['extraText'] : null).(!empty($ol['qty']) ? '&nbsp;('.$ol['qty'].')' : null)."</td></tr>\n";
-        endif;
-    endforeach;
-
-    if ($this->suggestedPl && !$this->end):
+    if ($this->suggestedPl):
         echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.Lang::quest('suggestedPl').Lang::main('colon').$this->suggestedPl."</td></tr>\n";
     endif;
 ?>
@@ -95,7 +85,7 @@ if ($o = $this->objectiveList):
 
                 <script type="text/javascript">//<![CDATA[
 <?php
-    foreach ($this->objectiveList as $k => $i):
+    foreach ($o as $k => $i):
         if (isset($i['typeStr']) && ($i['typeStr'] == 'item' || $i['typeStr'] == 'spell')):
             echo "                    \$WH.ge('iconlist-icon-".$k."').appendChild(g_".$i['typeStr']."s.createIcon(".$i['id'].", 0, ".$i['qty']."));\n";
         endif;
@@ -103,6 +93,22 @@ if ($o = $this->objectiveList):
 ?>
                 //]]></script>
 <?php
+    if ($p = $this->providedItem):
+        echo "                <div class=\"pad\"></div>\n";
+        echo '                '.Lang::quest('providedItem').Lang::main('colon')."\n";
+        echo "                <table class=\"iconlist\">\n";
+        echo '                    <tr><th align="right" id="iconlist-icon-'.count($this->objectiveList).'"></th>';
+        echo '<td><span class="q'.$p['quality'].'"><a href="?item='.$p['id'].'">'.$p['name'].'</a></span>'.($p['qty'] ? '&nbsp;('.$ol['qty'].')' : null)."</td></tr>\n";
+?>
+                </table>
+
+                <script type="text/javascript">//<![CDATA[
+<?php
+        echo "                    \$WH.ge('iconlist-icon-".count($this->objectiveList)."').appendChild(g_items.createIcon(".$p['id'].", 0, ".$p['qty']."));\n";
+?>
+                //]]></script>
+<?php
+    endif;
 endif;
 
 $this->brick('mapper');
