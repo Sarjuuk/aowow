@@ -36,6 +36,8 @@ class UtilityPage extends GenericPage
             else
                 $this->name .= Lang::main('colon') . Lang::main('mostComments', 0);
         }
+
+        $this->lvTabs = [];
     }
 
     public function display($override = '')
@@ -61,7 +63,7 @@ class UtilityPage extends GenericPage
         switch ($this->page)
         {
             case 'random':
-                $type   = array_rand(array_filter(Util::$typeStrings));
+                $type   = array_rand(array_keys(array_filter(Util::$typeClasses)));
                 $typeId = (new Util::$typeClasses[$type](null))->getRandomId();
 
                 header('Location: ?'.Util::$typeStrings[$type].'='.$typeId, true, 302);
@@ -114,7 +116,7 @@ class UtilityPage extends GenericPage
                     $typeObj = new $classStr($cnd);
                     if (!$typeObj->error)
                     {
-                        $this->extendGlobalData($typeObj->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED | GLOBALINFO_REWARDS));
+                        $this->extendGlobalData($typeObj->getJSGlobals(GLOBALINFO_ANY));
                         $this->lvTabs[] = array(
                             'file'   => $typeObj::$brickFile,
                             'data'   => $typeObj->getListviewData(),
@@ -127,12 +129,55 @@ class UtilityPage extends GenericPage
                 if ($this->category && !in_array($this->category[0], [1, 7, 30]))
                     header('Location: ?most-comments=1'.($this->rss ? '&rss' : null), true, 302);
 
-                $this->lvTabs[] = array(
-                    'file'   => 'commentpreview',
-                    'data'   => [],
-                    'params' => []
+                $params = array(
+                    'extraCols' => '$[Listview.funcBox.createSimpleCol(\'ncomments\', \'tab_comments\', \'10%\', \'ncomments\')]',
+                    'sort'      => '$[\'-ncomments\']'
                 );
+
+                foreach (Util::$typeClasses as $type => $classStr)
+                {
+                    if (!$classStr)
+                        continue;
+
+                    $comments = DB::Aowow()->selectCol('
+                        SELECT   `typeId` AS ARRAY_KEY, count(1) AS nComments FROM ?_comments
+                        WHERE    `replyTo` = 0 AND (`flags` & ?d) = 0 AND `type`= ?d AND `date` > (UNIX_TIMESTAMP() - ?d)
+                        GROUP BY `type`, `typeId`
+                        LIMIT    100',
+                        CC_FLAG_DELETED,
+                        $type,
+                        (isset($this->category[0]) ? $this->category[0] : 1) * DAY
+                    );
+                    if (!$comments)
+                        continue;
+
+                    $typeClass = new $classStr(array(['id', array_keys($comments)]));
+                    if (!$typeClass->error)
+                    {
+                        $data = $typeClass->getListviewData();
+                        foreach ($data as $typeId => &$d)
+                            $d['ncomments'] = $comments[$typeId];
+
+                        $this->extendGlobalData($typeClass->getJSGlobals(GLOBALINFO_ANY));
+                        $this->lvTabs[] = array(
+                            'file'   => $typeClass::$brickFile,
+                            'data'   => $data,
+                            'params' => $params,
+                            '_type'  => Util::$typeStrings[$type]
+                        );
+                    }
+                }
                 break;
+        }
+
+        // found nothing => set empty content
+        if (!$this->lvTabs)
+        {
+            $this->lvTabs[] = array(
+                'file'   => 'commentpreview',               // anything, doesn't matter what
+                'data'   => [],
+                'params' => []
+            );
         }
     }
 
@@ -149,16 +194,35 @@ class UtilityPage extends GenericPage
             "<ttl>".CFG_TTL_RSS."</ttl>\n".
             "<lastBuildDate>".date(DATE_RSS)."</lastBuildDate>\n";
 
-        foreach ($this->lvTabs[0]['data'] as $row)
+
+        if ($this->page == 'most-comments')
         {
-            $xml .= "<item>\n".
-                "<title><![CDATA[".htmlentities($row['subject'])."]]></title>\n".
-                "<link>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</link>\n".
-                "<description><![CDATA[".htmlentities($row['preview'])." ".sprintf(Lang::timeUnits('ago'), Util::formatTime($row['elapsed'] * 100, true))."]]></description>\n". // todo (low): preview should be html-formated
-                "<pubDate>".date(DATE_RSS, time() - $row['elapsed'])."</pubDate>\n".
-                "<guid>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</guid>\n".
-                "<domain />\n".
-                "</item>\n";
+            foreach ($this->lvTabs as $tab)
+            {
+                foreach ($tab['data'] as $row)
+                {
+                    $xml .= "<item>\n".
+                        "<title><![CDATA[".htmlentities($tab['_type'] == 'item' ? substr($row['name'], 1) : $row['name'])."]]></title>\n".
+                        "<type>".$tab['_type']."</type>\n".
+                        "<link>".HOST_URL.'/?'.$tab['_type'].'='.$row['id']."</link>\n".
+                        "<ncomments>".$row['ncomments']."</ncomments>\n".
+                        "</item>\n";
+                }
+            }
+        }
+        else
+        {
+            foreach ($this->lvTabs[0]['data'] as $row)
+            {
+                $xml .= "<item>\n".
+                    "<title><![CDATA[".htmlentities($row['subject'])."]]></title>\n".
+                    "<link>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</link>\n".
+                    "<description><![CDATA[".htmlentities($row['preview'])." ".sprintf(Lang::timeUnits('ago'), Util::formatTime($row['elapsed'] * 100, true))."]]></description>\n". // todo (low): preview should be html-formated
+                    "<pubDate>".date(DATE_RSS, time() - $row['elapsed'])."</pubDate>\n".
+                    "<guid>".HOST_URL.'?go-to-comment&amp;id='.$row['id']."</guid>\n".
+                    "<domain />\n".
+                    "</item>\n";
+            }
         }
 
         $xml .= "</channel>\n</rss>";
