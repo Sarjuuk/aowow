@@ -55,29 +55,59 @@ class UserPage extends GenericPage
         // contrib -> [url=http://www.wowhead.com/client]Data uploads: n [small]([tooltip=tooltip_totaldatauploads]xx.y MB[/tooltip])[/small][/url]
 
         $co = DB::Aowow()->selectRow(
-            'SELECT COUNT(DISTINCT c.id) AS sum, COUNT(cr.commentId) AS nRates FROM ?_comments c LEFT JOIN ?_comments_rates cr ON cr.commentId = c.id WHERE c.replyTo = 0 AND c.userId = ?d',
+            'SELECT COUNT(DISTINCT c.id) AS sum, SUM(IFNULL(cr.value, 0)) AS nRates FROM ?_comments c LEFT JOIN ?_comments_rates cr ON cr.commentId = c.id AND cr.userId <> 0 WHERE c.replyTo = 0 AND c.userId = ?d',
             $this->user['id']
         );
         if ($co['sum'])
-            $contrib[] = Lang::user('comments').Lang::main('colon').$co['sum'].' [small]([tooltip=tooltip_totalratings]'.$co['nRates'].'[/tooltip])[/small]';
+            $contrib[] = Lang::user('comments').Lang::main('colon').$co['sum'].($co['nRates'] ? ' [small]([tooltip=tooltip_totalratings]'.$co['nRates'].'[/tooltip])[/small]' : null);
 
-        $ss = DB::Aowow()->selectRow('SELECT COUNT(id) AS sum, SUM(IF(status & ?d, 1, 0)) as nSticky FROM ?_screenshots WHERE userIdOwner = ?d AND status & ?d AND (status & ?d) = 0',
+        $ss = DB::Aowow()->selectRow('SELECT COUNT(*) AS sum, SUM(IF(status & ?d, 1, 0)) AS nSticky, SUM(IF(status & ?d, 0, 1)) AS nPending FROM ?_screenshots WHERE userIdOwner = ?d AND (status & ?d) = 0',
             CC_FLAG_STICKY,
-            $this->user['id'],
             CC_FLAG_APPROVED,
+            $this->user['id'],
             CC_FLAG_DELETED
         );
         if ($ss['sum'])
-            $contrib[] = Lang::user('screenshots').Lang::main('colon').$ss['sum'].' [small]([tooltip=tooltip_normal]'.($ss['sum'] - $ss['nSticky']).'[/tooltip] + [tooltip=tooltip_sticky]'.$ss['nSticky'].'[/tooltip])[/small]';
+        {
+            $buff = [];
+            if ($ss['nSticky'] || $ss['nPending'])
+            {
+                if ($normal = ($ss['sum'] - $ss['nSticky'] - $ss['nPending']))
+                    $buff[] = '[tooltip=tooltip_normal]'.$normal.'[/tooltip]';
 
-        $vi = DB::Aowow()->selectRow('SELECT COUNT(id) AS sum, SUM(IF(status & ?d, 1, 0)) as nSticky FROM ?_videos WHERE userIdOwner = ?d AND status & ?d AND (status & ?d) = 0',
+                if ($ss['nSticky'])
+                    $buff[] = '[tooltip=tooltip_sticky]'.$ss['nSticky'].'[/tooltip]';
+
+                if ($ss['nPending'])
+                    $buff[] = '[tooltip=tooltip_pending]'.$ss['nPending'].'[/tooltip]';
+            }
+
+            $contrib[] = Lang::user('screenshots').Lang::main('colon').$ss['sum'].($buff ? ' [small]('.implode($buff, ' + ').')[/small]' : null);
+        }
+
+        $vi = DB::Aowow()->selectRow('SELECT COUNT(id) AS sum, SUM(IF(status & ?d, 1, 0)) AS nSticky, SUM(IF(status & ?d, 0, 1)) AS nPending FROM ?_videos WHERE userIdOwner = ?d AND (status & ?d) = 0',
             CC_FLAG_STICKY,
-            $this->user['id'],
             CC_FLAG_APPROVED,
+            $this->user['id'],
             CC_FLAG_DELETED
         );
         if ($vi['sum'])
-            $contrib[] = Lang::user('videos').Lang::main('colon').$vi['sum'].' [small]([tooltip=tooltip_normal]'.($vi['sum'] - $vi['nSticky']).'[/tooltip] + [tooltip=tooltip_sticky]'.$vi['nSticky'].'[/tooltip])[/small]';
+        {
+            $buff = [];
+            if ($vi['nSticky'] || $vi['nPending'])
+            {
+                if ($normal = ($vi['sum'] - $vi['nSticky'] - $vi['nPending']))
+                    $buff[] = '[tooltip=tooltip_normal]'.$normal.'[/tooltip]';
+
+                if ($vi['nSticky'])
+                    $buff[] = '[tooltip=tooltip_sticky]'.$vi['nSticky'].'[/tooltip]';
+
+                if ($vi['nPending'])
+                    $buff[] = '[tooltip=tooltip_pending]'.$vi['nPending'].'[/tooltip]';
+            }
+
+            $contrib[] = Lang::user('videos').Lang::main('colon').$vi['sum'].($buff ? ' [small]('.implode($buff, ' + ').')[/small]' : null);
+        }
 
         // contrib -> Forum posts: 5769 [small]([tooltip=topics]579[/tooltip] + [tooltip=replies]5190[/tooltip])[/small]
 
