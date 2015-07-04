@@ -85,7 +85,7 @@ class UtilityPage extends GenericPage
             case 'latest-videos':
                 $this->lvTabs[] = array(
                     'file'   => 'video',
-                    'data'   => [],
+                    'data'   => CommunityContent::getVideos(),
                     'params' => []
                 );
                 break;

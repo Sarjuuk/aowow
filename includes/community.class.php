@@ -417,22 +417,26 @@ class CommunityContent
         return $comments;
     }
 
-    public static function getVideos($typeOrUser, $typeId = 0, &$nFound = 0)
+    public static function getVideos($typeOrUser = 0, $typeId = 0, &$nFound = 0)
     {
         $videos = DB::Aowow()->selectPage($nFound, "
             SELECT v.id, a.displayName AS user, v.date, v.videoId, v.caption, IF(v.status & ?d, 1, 0) AS 'sticky', v.type, v.typeId
             FROM ?_videos v
             LEFT JOIN ?_account a ON v.userIdOwner = a.id
-            WHERE {v.userIdOwner = ?d }{v.type = ? }{AND v.typeId = ? }AND v.status & ?d AND (v.status & ?d) = 0",
+            WHERE {v.userIdOwner = ?d AND }{v.type = ? AND }{v.typeId = ? AND }v.status & ?d AND (v.status & ?d) = 0
+            {ORDER BY ?# DESC}
+            {LIMIT ?d}",
             CC_FLAG_STICKY,
-            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
+            $typeOrUser < 0 ? -$typeOrUser         : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser         : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId             : DBSIMPLE_SKIP,
             CC_FLAG_APPROVED,
-            CC_FLAG_DELETED
+            CC_FLAG_DELETED,
+            !$typeOrUser    ? 'date'               : DBSIMPLE_SKIP,
+            !$typeOrUser    ? CFG_SQL_LIMIT_SEARCH : DBSIMPLE_SKIP
         );
 
-        if ($typeOrUser < 0)                                // only for user page
+        if ($typeOrUser <= 0)                               // not for search by type/typeId
         {
             foreach ($videos as $v)
                 self::addSubject($v['type'], $v['typeId']);
@@ -443,7 +447,7 @@ class CommunityContent
         // format data to meet requirements of the js
         foreach ($videos as &$v)
         {
-            if ($typeOrUser < 0)                            // only for user page
+            if ($typeOrUser <= 0)                           // not for search by type/typeId
             {
                 if (!empty(self::$subjCache[$v['type']][$v['typeId']]) && !is_numeric(self::$subjCache[$v['type']][$v['typeId']]))
                     $v['subject'] = self::$subjCache[$v['type']][$v['typeId']];
@@ -452,7 +456,7 @@ class CommunityContent
             }
 
             $v['date']      = date(Util::$dateFormatInternal, $v['date']);
-            $v['videoType'] = 1;            // always youtube
+            $v['videoType'] = 1;                            // always youtube
 
             if (!$v['sticky'])
                 unset($v['sticky']);
@@ -483,7 +487,7 @@ class CommunityContent
             !$typeOrUser    ? CFG_SQL_LIMIT_SEARCH : DBSIMPLE_SKIP
         );
 
-        if ($typeOrUser < 0)                                // only for user page
+        if ($typeOrUser <= 0)                               // not for search by type/typeId
         {
             foreach ($screenshots as $s)
                 self::addSubject($s['type'], $s['typeId']);
@@ -494,7 +498,7 @@ class CommunityContent
         // format data to meet requirements of the js
         foreach ($screenshots as &$s)
         {
-            if ($typeOrUser < 0)                            // only for user page
+            if ($typeOrUser <= 0)                           // not for search by type/typeId
             {
                 if (!empty(self::$subjCache[$s['type']][$s['typeId']]) && !is_numeric(self::$subjCache[$s['type']][$s['typeId']]))
                     $s['subject'] = self::$subjCache[$s['type']][$s['typeId']];
