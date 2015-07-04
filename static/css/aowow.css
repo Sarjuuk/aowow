@@ -3775,3 +3775,13 @@ a#toplinks-language {
     font-size: 11px;
     padding: 3px 0 3px 20px;
 }
+
+/* site-rep custom */
+span#toplinks-rep {
+    margin-right: 0.8em;
+}
+
+span#toplinks-rep a {
+    margin: 0px;
+    color: #0C9722;
+}

@@ -1,6 +1,7 @@
 <?php
 if (User::$id):
     echo '<a id="toplinks-user">'.User::$displayName.'</a>';
+    echo '<span id="toplinks-rep" title="'.Lang::main('reputationTip').'">(<a href="?reputation">'.User::getReputation().'</a>)</span>';
 else:
     echo '<a href="?account=signin">'.Lang::main('signIn').'</a>';
 endif;

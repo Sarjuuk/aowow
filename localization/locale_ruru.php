@@ -51,6 +51,7 @@ $lang = array(
         'and'           => " и ",
         'or'            => " или ",
         'back'          => "Назад",
+        'reputationTip' => "Очки репутации",
 
         // filter
         'extSearch'     => "Расширенный поиск",

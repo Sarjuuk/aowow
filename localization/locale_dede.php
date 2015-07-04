@@ -51,6 +51,7 @@ $lang = array(
         'and'           => " und ",
         'or'            => " oder ",
         'back'          => "Zurück",
+        'reputationTip' => "Rufpunkte",
 
         // filter
         'extSearch'     => "Erweiterte Suche",
