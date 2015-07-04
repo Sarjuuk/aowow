@@ -1141,11 +1141,11 @@ class AjaxHandler
     // resp: ''
     private function admin_handleSSEditalt()
     {
-        if (!$this->get('id') || !$this->post('alt'))
+        if (!$this->get('id') || $this->post('alt') === null)
             return '';
 
         // doesn't need to be htmlEscaped, ths javascript does that
-        DB::Aowow()->query('UPDATE ?_screenshots SET caption = ? WHERE id = ?d', $this->post('alt'), $this->get('id'));
+        DB::Aowow()->query('UPDATE ?_screenshots SET caption = ? WHERE id = ?d', trim($this->post('alt')), $this->get('id'));
 
         return '';
     }
@@ -1167,7 +1167,7 @@ class AjaxHandler
         foreach ($ids as $id)
         {
             // must not be already approved
-            if ($_ = DB::Aowow()->selectCell('SELECT userIdOwner FROM ?_screenshots WHERE (status & ?d) = 0 AND id = ?d', CC_FLAG_APPROVED, $id))
+            if ($_ = DB::Aowow()->selectRow('SELECT userIdOwner, date FROM ?_screenshots WHERE (status & ?d) = 0 AND id = ?d', CC_FLAG_APPROVED, $id))
             {
                 // should also error-log
                 if (!file_exists(sprintf($path, 'pending', $id)))
@@ -1209,7 +1209,7 @@ class AjaxHandler
 
                 // set as approved in DB and gain rep (once!)
                 DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdApprove = ?d WHERE id = ?d', CC_FLAG_APPROVED, User::$id, $id);
-                Util::gainSiteReputation($_, SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1]);
+                Util::gainSiteReputation($_['userIdOwner'], SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1, 'date' => $_['date']]);
             }
         }
 

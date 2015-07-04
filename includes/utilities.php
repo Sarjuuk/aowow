@@ -1477,7 +1477,7 @@ class Util
                     return false;
 
                 $x['sourceA'] = $miscData['id'];            // screenshotId or videoId
-                $x['sourceB'] = $miscData['what'];          // screenshot or video
+                $x['sourceB'] = $miscData['what'];          // screenshot:1 or video:NYD
                 $x['amount']  = CFG_REP_REWARD_UPLOAD;
                 break;
             case SITEREP_ACTION_GOOD_REPORT:                // NYI
@@ -1508,7 +1508,7 @@ class Util
         $x = array_merge($x, array(
             'userId' => $user,
             'action' => $action,
-            'date'   => time()
+            'date'   => !empty($miscData['date']) ? $miscData['date'] : time()
         ));
 
         return DB::Aowow()->query('INSERT IGNORE INTO ?_account_reputation (?#) VALUES (?a)', array_keys($x), array_values($x));
