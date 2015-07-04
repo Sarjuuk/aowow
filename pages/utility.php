@@ -76,7 +76,7 @@ class UtilityPage extends GenericPage
             case 'latest-screenshots':
                 $this->lvTabs[] = array(
                     'file'   => 'screenshot',
-                    'data'   => [],
+                    'data'   => CommunityContent::getScreenshots(),
                     'params' => []
                 );
                 break;

@@ -464,19 +464,23 @@ class CommunityContent
         return $videos;
     }
 
-    public static function getScreenshots($typeOrUser, $typeId = 0, &$nFound = 0)
+    public static function getScreenshots($typeOrUser = 0, $typeId = 0, &$nFound = 0)
     {
         $screenshots = DB::Aowow()->selectPage($nFound, "
             SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.caption, IF(s.status & ?d, 1, 0) AS 'sticky', s.type, s.typeId
             FROM ?_screenshots s
             LEFT JOIN ?_account a ON s.userIdOwner = a.id
-            WHERE {s.userIdOwner = ?d }{s.type = ? }{AND s.typeId = ? }AND s.status & ?d AND (s.status & ?d) = 0",
+            WHERE {s.userIdOwner = ?d AND }{s.type = ? AND }{s.typeId = ? AND }s.status & ?d AND (s.status & ?d) = 0
+            {ORDER BY ?# DESC}
+            {LIMIT ?d}",
             CC_FLAG_STICKY,
-            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
+            $typeOrUser < 0 ? -$typeOrUser         : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser         : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId             : DBSIMPLE_SKIP,
             CC_FLAG_APPROVED,
-            CC_FLAG_DELETED
+            CC_FLAG_DELETED,
+            !$typeOrUser    ? 'date'               : DBSIMPLE_SKIP,
+            !$typeOrUser    ? CFG_SQL_LIMIT_SEARCH : DBSIMPLE_SKIP
         );
 
         if ($typeOrUser < 0)                                // only for user page
