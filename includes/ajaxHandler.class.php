@@ -408,7 +408,7 @@ class AjaxHandler
                 $result = ['success' => 1, 'up' => 0, 'down' => 0];
                 break;
             case 'vote':                                    // up, down and remove
-                if (!User::$id || !$this->get('id') || $this->get('rating'))
+                if (!User::$id || !$this->get('id') || !$this->get('rating'))
                 {
                     $result = ['error' => 1, 'message' => Lang::main('genericError')];
                     break;

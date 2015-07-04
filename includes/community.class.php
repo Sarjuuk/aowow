@@ -29,8 +29,8 @@ class CommunityContent
             a3.displayName AS deleteUser,
             a4.displayName AS responseUser,
             IFNULL(SUM(cr.value), 0) AS rating,
-            SUM(IF (cr.userId = ?d, value, 0)) AS userRating,
-            SUM(IF (r.userId = ?d, 1, 0)) AS userReported
+            SUM(IF(cr.userId > 0 AND cr.userId = ?d, cr.value, 0)) AS userRating,
+            SUM(IF( r.userId > 0 AND  r.userId = ?d, 1, 0)) AS userReported
         FROM
             ?_comments c
         JOIN
@@ -238,7 +238,7 @@ class CommunityContent
     {
         $screenshots = DB::Aowow()->select('
             SELECT    s.id, a.displayName AS user, s.date, s.width, s.height, s.type, s.typeId, s.caption, s.status, s.status AS "flags"
-            FROM      ?_screenshots s,
+            FROM      ?_screenshots s
             LEFT JOIN ?_account a ON s.userIdOwner = a.id
             WHERE
                     { s.type = ?d}

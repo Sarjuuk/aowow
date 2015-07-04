@@ -1725,7 +1725,7 @@ class ItemListFilter extends Filter
          59 => [FILTER_CR_NUMERIC,   'durability',             null,                    true], // dura
         104 => [FILTER_CR_STRING,    'description',            true                         ], // flavortext
           7 => [FILTER_CR_BOOLEAN,   'description_loc0',       true                         ], // hasflavortext
-        142 => [FILTER_CR_STRING,    'iconString',                                          ], // icon
+        142 => [FILTER_CR_STRING,    'ic.iconString',                                       ], // icon
          12 => [FILTER_CR_BOOLEAN,   'itemset',                                             ], // partofset
          13 => [FILTER_CR_BOOLEAN,   'randomEnchant',                                       ], // randomlyenchanted
          14 => [FILTER_CR_BOOLEAN,   'pageTextId',                                          ], // readable

@@ -126,7 +126,8 @@ class ClassPage extends GenericPage
                 'OR',
                 ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
                 ['s.rankNo', 0]
-            ]
+            ],
+            CFG_SQL_LIMIT_NONE
         );
 
         $genSpells = new SpellList($conditions);

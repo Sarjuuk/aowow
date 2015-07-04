@@ -680,7 +680,6 @@ class SearchPage extends GenericPage
                 {
                     $data[$abilities->id]['param1'] = strToLower($abilities->getField('iconString'));
                     $data[$abilities->id]['param2'] = $abilities->ranks[$abilities->id];
-
                 }
             }
 
@@ -1360,11 +1359,15 @@ class SearchPage extends GenericPage
         return $result;
     }
 
-    private function _searchSpell($cndBase)                 // 24 Spells (Misc + GM) $searchMask & 0x1000000
+    private function _searchSpell($cndBase)                 // 24 Spells (Misc + GM + triggered abilities) $searchMask & 0x1000000
     {
         $result = [];
         $cnd    = array_merge($cndBase, array(
-            ['s.typeCat', [0, -9]],
+            [
+                'OR',
+                ['s.typeCat', [0, -9]],
+                ['AND', ['s.cuFlags', SPELL_CU_TRIGGERED, '&'], ['s.typeCat', [7, -2]]]
+            ],
             $this->createLookup()
         ));
         $misc = new SpellList($cnd);

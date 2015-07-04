@@ -145,29 +145,15 @@ if (defined('CFG_SITE_HOST'))                               // points js to exec
 
 if (!CLI)
 {
+    if (!defined('CFG_SITE_HOST') || !defined('CFG_STATIC_HOST'))
+        die('error: SITE_HOST or STATIC_HOST not configured');
+
     // Setup Session
     session_set_cookie_params(15 * YEAR, '/', '', $secure, true);
     session_cache_limiter('private');
     session_start();
     if (!empty($AoWoWconf['aowow']) && User::init())
         User::save();                                       // save user-variables in session
-
-    // todo: (low) - move to setup web-interface (when it begins its existance)
-    if (!defined('CFG_SITE_HOST') || !defined('CFG_STATIC_HOST'))
-    {
-        $host = substr($_SERVER['SERVER_NAME'].strtr($_SERVER['SCRIPT_NAME'], ['index.php' => '']), 0, -1);
-
-        define('HOST_URL',   ($secure ? 'https://' : 'http://').$host);
-        define('STATIC_URL', ($secure ? 'https://' : 'http://').$host.'/static');
-
-        if (User::isInGroup(U_GROUP_ADMIN))                 // initial set
-        {
-            DB::Aowow()->query('REPLACE INTO ?_config VALUES (?a)',
-                [['site_host',   $host,           CON_FLAG_TYPE_STRING | CON_FLAG_PERSISTENT, 'default: '.$host.' - points js to executable files (automaticly set on first run)'],
-                 ['static_host', $host.'/static', CON_FLAG_TYPE_STRING | CON_FLAG_PERSISTENT, 'default: '.$host.'/static - points js to images & scripts (automaticly set on first run)']]
-            );
-        }
-    }
 
     // hard-override locale for this call (should this be here..?)
     // all strings attached..

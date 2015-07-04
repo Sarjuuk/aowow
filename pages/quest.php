@@ -344,6 +344,7 @@ class QuestPage extends GenericPage
         /*******************/
 
         $this->objectiveList = [];
+        $this->providedItem  = [];
 
         // gather ids for lookup
         $olItems = $olNPCs = $olGOs = $olFactions = [];
@@ -351,17 +352,18 @@ class QuestPage extends GenericPage
         // items
         $olItems[0] = array(                                // srcItem on idx:0
             $this->subject->getField('sourceItemId'),
-            $this->subject->getField('sourceItemCount')
+            $this->subject->getField('sourceItemCount'),
+            false
         );
 
         for ($i = 1; $i < 7; $i++)                          // reqItem in idx:1-6
         {
             $id  = $this->subject->getField('reqItemId'.$i);
             $qty = $this->subject->getField('reqItemCount'.$i);
-            if (!$id || !$qty || $id == $olItems[0][0])
+            if (!$id || !$qty)
                 continue;
 
-            $olItems[$i] = [$id, $qty];
+            $olItems[$i] = [$id, $qty, $id == $olItems[0][0]];
         }
 
         if ($ids = array_column($olItems, 0))
@@ -369,18 +371,33 @@ class QuestPage extends GenericPage
             $olItemData = new ItemList(array(['id', $ids]));
             $this->extendGlobalData($olItemData->getJSGlobals(GLOBALINFO_SELF));
 
-            foreach ($olItems as $i => $pair)
+            $providedRequired = false;
+            foreach ($olItems as $i => list($itemId, $qty, $provided))
             {
-                if (!$pair[0] || !in_array($pair[0], $olItemData->getFoundIDs()))
+                if (!$i || !$itemId || !in_array($itemId, $olItemData->getFoundIDs()))
                     continue;
+
+                if ($provided)
+                    $providedRequired = true;
 
                 $this->objectiveList[] = array(
                     'typeStr'   => Util::$typeStrings[TYPE_ITEM],
-                    'id'        => $pair[0],
-                    'name'      => $olItemData->json[$pair[0]]['name'],
-                    'qty'       => $pair[1] > 1 ? $pair[1] : 0,
-                    'quality'   => 7 - $olItemData->json[$pair[0]]['quality'],
-                    'extraText' => $i ? '' : '&nbsp;('.Lang::quest('provided').')'
+                    'id'        => $itemId,
+                    'name'      => $olItemData->json[$itemId]['name'],
+                    'qty'       => $qty > 1 ? $qty : 0,
+                    'quality'   => 7 - $olItemData->json[$itemId]['quality'],
+                    'extraText' => $provided ? '&nbsp;('.Lang::quest('provided').')' : ''
+                );
+            }
+
+            // if providd item is not required by quest, list it below other requirements
+            if (!$providedRequired && $olItems[0][0] && in_array($olItems[0][0], $olItemData->getFoundIDs()))
+            {
+                $this->providedItem = array(
+                    'id'        => $olItems[0][0],
+                    'name'      => $olItemData->json[$olItems[0][0]]['name'],
+                    'qty'       => $olItems[0][1] > 1 ? $olItems[0][1] : 0,
+                    'quality'   => 7 - $olItemData->json[$olItems[0][0]]['quality']
                 );
             }
         }
