@@ -9,8 +9,7 @@ $lang = array(
     'timeUnits' => array(
         'sg'            => ["year",  "month",  "week",  "day",  "hour",  "minute",  "second",  "millisecond"],
         'pl'            => ["years", "months", "weeks", "days", "hours", "minutes", "seconds", "milliseconds"],
-        'ab'            => ["yr",    "mo",     "wk",    "day",  "hr",    "min",     "sec",     "ms"],
-        'ago'           => '%s ago'
+        'ab'            => ["yr",    "mo",     "wk",    "day",  "hr",    "min",     "sec",     "ms"]
     ),
     'main' => array(
         'name'          => "name",
@@ -47,6 +46,7 @@ $lang = array(
         'or'            => " or ",
         'back'          => "Back",
         'reputationTip' => "Reputation points",
+        'byUserTimeAgo' => "By <a href=\"".HOST_URL."/?user=%s\">%1s</a> %s ago",
 
         // filter
         'extSearch'     => "Extended search",

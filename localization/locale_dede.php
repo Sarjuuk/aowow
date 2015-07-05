@@ -14,8 +14,7 @@ $lang = array(
     'timeUnits' => array(
         'sg'            => ["Jahr",  "Monat",  "Woche",  "Tag",   "Stunde",  "Minute",  "Sekunde",  "Millisekunde"],
         'pl'            => ["Jahre", "Monate", "Wochen", "Tage",  "Stunden", "Minuten", "Sekunden", "Millisekunden"],
-        'ab'            => ["J.",    "M.",     "W.",     "Tag",   "Std.",    "Min.",    "Sek.",     "Ms."],
-        'ago'           => 'vor %s'
+        'ab'            => ["J.",    "M.",     "W.",     "Tag",   "Std.",    "Min.",    "Sek.",     "Ms."]
     ),
     'main' => array(
         'name'          => "Name",
@@ -52,6 +51,7 @@ $lang = array(
         'or'            => " oder ",
         'back'          => "Zurück",
         'reputationTip' => "Rufpunkte",
+        'byUserTimeAgo' => "Von <a href=\"".HOST_URL."/?user=%s\">%1s</a> vor %s",
 
         // filter
         'extSearch'     => "Erweiterte Suche",
