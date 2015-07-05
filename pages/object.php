@@ -49,7 +49,7 @@ class ObjectPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('gameObject')));
+        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('object')));
     }
 
     protected function generateContent()
@@ -489,7 +489,7 @@ class ObjectPage extends GenericPage
     public function notFound()
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Lang::game('gameObject'), Lang::gameObject('notFound'));
+            return parent::notFound(Lang::game('object'), Lang::gameObject('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

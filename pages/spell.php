@@ -1690,7 +1690,7 @@ class SpellPage extends GenericPage
                 case 105:                                   // Summon Object (slot 2)
                 case 106:                                   // Summon Object (slot 3)
                 case 107:                                   // Summon Object (slot 4)
-                    $_ = Util::ucFirst(Lang::game('gameObject')).' #'.$effMV;
+                    $_ = Util::ucFirst(Lang::game('object')).' #'.$effMV;
                     if ($summon = $this->subject->getModelInfo($this->typeId, $i))
                     {
                         $_ = $summon['typeId'] ? ' (<a href="?object='.$summon['typeId'].'">'.$summon['displayName'].'</a>)' : ' (#0)';

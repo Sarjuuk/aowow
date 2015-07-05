@@ -25,7 +25,7 @@ class ObjectsPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        $this->name   = Util::ucFirst(Lang::game('gameObjects'));
+        $this->name   = Util::ucFirst(Lang::game('objects'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
     }
 

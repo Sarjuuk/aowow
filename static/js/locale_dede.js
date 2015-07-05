@@ -2235,7 +2235,7 @@ var g_operators = {
 var g_world_object_types = {
     3: 'Kreatur',
     4: 'Spieler',
-    5: 'Gameobject',
+    5: 'Objekt',
     7: 'Spielerleiche'
 };
 
