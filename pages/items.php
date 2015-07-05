@@ -232,7 +232,7 @@ class ItemsPage extends GenericPage
                 if (isset($this->filter['sl']))             // skip lookups for unselected slots
                     $groups = array_intersect($groups, (array)$this->filter['sl']);
 
-                if (isset($this->filter['upg']))            // skip lookups for slots we dont have items to upgrade for
+                if (!empty($this->filter['upg']))           // skip lookups for slots we dont have items to upgrade for
                     $groups = array_intersect($groups, (array)$this->filter['upg']);
 
                 if ($groups)
@@ -416,7 +416,7 @@ class ItemsPage extends GenericPage
         }
 
         // reformat for use in template
-        if (isset($this->filter['upg']))
+        if (!empty($this->filter['upg']))
             $this->filter['upg'] = implode(':', array_keys($this->filter['upg']));
 
         // whoops, we have no data? create emergency content

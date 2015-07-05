@@ -957,6 +957,9 @@ class NpcPage extends GenericPage
                 if (in_array($t['type'], [2, 16]) && strpos($msg, '%s') === false)
                     $msg = '%s '.$msg;
 
+                // fixup: bad case-insensivity
+                $msg = str_replace('%S', '%s', $msg);
+
                 $line = array(
                     'range' => $t['range'],
                     'type'  => 2,                           // [type: 0, 12] say: yellow-ish
