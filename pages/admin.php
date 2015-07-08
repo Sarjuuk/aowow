@@ -60,12 +60,13 @@ class AdminPage extends GenericPage
     private function handleConfig()
     {
         $this->addCSS(array(
-            ['string' => '.grid input[type=\'text\'] { width:250px; }'],
+            ['string' => '.grid input[type=\'text\'], .grid input[type=\'number\'] { width:250px; text-align:left; }'],
             ['string' => '.grid input[type=\'button\'] { width:65px; padding:2px; }'],
-            ['string' => '.disabled { opacity:0.4 !important; }'],
             ['string' => '.grid a.tip { margin:0px 5px; opacity:0.8; }'],
             ['string' => '.grid a.tip:hover  { opacity:1; }'],
-            ['string' => '.status { position:absolute; right:5px; }'],
+            ['string' => '.grid tr { height:30px; }'],
+            ['string' => '.grid .disabled { opacity:0.4 !important; }'],
+            ['string' => '.grid .status { position:absolute; right:5px; }'],
         ));
 
         // well .. fuck!
@@ -256,7 +257,7 @@ class AdminPage extends GenericPage
         }
         else if (node.tagName == 'INPUT')                   // string or numeric
         {
-            if (node.value.search(/[^\d\s\/\*\-\+\.]/i) == -1)
+            if (node.value && node.value.search(/[^\d\s\/\*\-\+\.]/i) == -1)
                 node.value = eval(node.value);
 
             value = node.value;
@@ -264,7 +265,7 @@ class AdminPage extends GenericPage
 
         value = value.toString().trim();
 
-        if (!value.length)
+        if (!value.length && (node.tagName != 'INPUT' || node.type != 'text'))
         {
             $WH.ae(_status, createStatusIcon('value is empty'));
             return;
@@ -298,7 +299,7 @@ class AdminPage extends GenericPage
         else if (node.tagName == 'SELECT')                  // opt-list
             $(node).find('option').each(function(idx, opt) { opt.selected = opt.value == val; });
         else if (node.tagName == 'INPUT')                   // string or numeric
-            node.value = val;
+            node.value = node.type == 'text' ? val : eval(val);
     }
 
     function cfg_remove(id)
@@ -339,12 +340,15 @@ class AdminPage extends GenericPage
 
         $head = '<table class="grid"><tr><th><b>Key</b></th><th><b>Value</b></th><th style="width:150px;"><b>Options</b></th></tr>';
 
-        // for aowow
-        if ($rows = DB::Aowow()->select('SELECT * FROM ?_config WHERE (flags & ?d) = 0 ORDER BY `key` ASC', CON_FLAG_PHP))
+        foreach (Util::$configCats as $id => $catName)
+        if ($rows = DB::Aowow()->select('SELECT * FROM ?_config WHERE cat = ?d ORDER BY `flags`DESC, `key` ASC', $id))
         {
             $buff = $head;
             foreach ($rows as $r)
                 $buff .= $this->configAddRow($r);
+
+            if ($id == 5)                                   //cat: misc
+                $buff .= '<tr><td colspan="3"><a class="icon-add" onclick="cfg_add(this)">new configuration</a></td></tr>';
 
             $buff .= '</table>';
 
@@ -352,29 +356,11 @@ class AdminPage extends GenericPage
                 'file'   => null,
                 'data'   => $buff,
                 'params' => array(
-                    'name' => 'Aowow',
-                    'id'   => 'aowow'
+                    'name' => $catName,
+                    'id'   => Util::urlize($catName)
                 )
             );
         }
-
-        // for php
-        $rows = DB::Aowow()->select('SELECT * FROM ?_config WHERE flags & ?d ORDER BY `key` ASC', CON_FLAG_PHP);
-        $buff = $head;
-        foreach ($rows as $r)
-            $buff .= $this->configAddRow($r);
-
-        $buff .= '<tr><td colspan="3"><a class="icon-add" onclick="cfg_add(this)">new configuration</a></td></tr>';
-        $buff .= '</table>';
-
-        $this->lvTabs[] = array(
-            'file'   => null,
-            'data'   => $buff,
-            'params' => array(
-                'name' => 'PHP',
-                'id'   => 'php'
-            )
-        );
     }
 
     private function handlePhpInfo()
@@ -490,7 +476,7 @@ class AdminPage extends GenericPage
     {
         $buff = '<tr>';
         $info = explode(' - ', $r['comment']);
-        $key  = $r['flags'] & CON_FLAG_PHP ? strtolower($r['key']) : 'CFG_'.strtoupper($r['key']);
+        $key  = $r['flags'] & CON_FLAG_PHP ? strtolower($r['key']) : strtoupper($r['key']);
 
         // name
         if (!empty($info[1]))
@@ -522,7 +508,7 @@ class AdminPage extends GenericPage
             $buff .= '</div></td>';
         }
         else
-            $buff .= '<td><input id="'.$key.'" type="text" name="'.$key.'" value="'.$r['value'].'" /></td>';
+            $buff .= '<td><input id="'.$key.'" type="'.($r['flags'] & CON_FLAG_TYPE_STRING ? 'text" placeholder="<empty>' : 'number'.($r['flags'] & CON_FLAG_TYPE_FLOAT ? '" step="any' : '')).'" name="'.$key.'" value="'.$r['value'].'" /></td>';
 
         // actions
         $buff .= '<td style="position:relative;">';

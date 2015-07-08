@@ -55,7 +55,7 @@ function account()
     else
     {
         CLISetup::log();
-        CLISetup::log("account creation aborted", CLISetup::LOG_WARN);
+        CLISetup::log("account creation aborted", CLISetup::LOG_INFO);
     }
 }
 

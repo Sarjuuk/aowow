@@ -18,6 +18,8 @@ class SimpleXML extends SimpleXMLElement
 
 class Util
 {
+    const FILE_ACCESS = 0755;
+
     public static $resistanceFields         = array(
         null,           'resHoly',      'resFire',      'resNature',    'resFrost',     'resShadow',    'resArcane'
     );
@@ -686,6 +688,10 @@ class Util
         'small'  => 'style="background-image: url(%s/images/wow/icons/small/%s.jpg)"',
         'medium' => 'style="background-image: url(%s/images/wow/icons/medium/%s.jpg)"',
         'large'  => 'style="background-image: url(%s/images/wow/icons/large/%s.jpg)"',
+    );
+
+    public static $configCats               = array(
+        'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Other'
     );
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
@@ -1704,6 +1710,21 @@ class Util
         // like it's done already in with listviews for example
 
         return json_encode($data, $flags);
+    }
+
+    public static function checkOrCreateDirectory($path)
+    {
+        // remove multiple slashes
+        $path = preg_replace('|/+|', '/', $path);
+
+        if (!is_dir($path) && !@mkdir($path, self::FILE_ACCESS, true))
+            self::addNote(U_GROUP_EMPLOYEE, 'could not create directory: '.$path);
+        else if (!is_writable($path) && !@chmod($path, self::FILE_ACCESS))
+            self::addNote(U_GROUP_EMPLOYEE, 'cannot write into directory: '.$path);
+        else
+            return true;
+
+        return false;
     }
 }
 

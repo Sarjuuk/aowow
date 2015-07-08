@@ -73,7 +73,7 @@ class AccountPage extends GenericPage
         switch ($this->category[0])
         {
             case 'forgotpassword':
-                if (CFG_AUTH_MODE != AUTH_MODE_SELF)        // only recover own accounts
+                if (CFG_ACC_AUTH_MODE != AUTH_MODE_SELF)    // only recover own accounts
                     $this->error();
 
                 $this->tpl = 'acc-recover';
@@ -85,7 +85,7 @@ class AccountPage extends GenericPage
                 $this->head = sprintf(Lang::account('recoverPass'), $nStep);
                 break;
             case 'forgotusername':
-                if (CFG_AUTH_MODE != AUTH_MODE_SELF)        // only recover own accounts
+                if (CFG_ACC_AUTH_MODE != AUTH_MODE_SELF)    // only recover own accounts
                     $this->error();
 
                 $this->tpl = 'acc-recover';
@@ -123,7 +123,7 @@ class AccountPage extends GenericPage
 
                 break;
             case 'signup':
-                if (!CFG_ALLOW_REGISTER || CFG_AUTH_MODE != AUTH_MODE_SELF)
+                if (!CFG_ACC_ALLOW_REGISTER || CFG_ACC_AUTH_MODE != AUTH_MODE_SELF)
                     $this->error();
 
                 $this->tpl = 'acc-signUp';
@@ -142,7 +142,7 @@ class AccountPage extends GenericPage
                 {
                     $nStep = 2;
                     DB::Aowow()->query('UPDATE ?_account SET status = ?d WHERE token = ?', ACC_STATUS_OK, $_GET['token']);
-                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, ?d + 1, UNIX_TIMESTAMP() + ?d)', User::$ip, CFG_FAILED_AUTH_COUNT, CFG_FAILED_AUTH_EXCLUSION);
+                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, ?d + 1, UNIX_TIMESTAMP() + ?d)', User::$ip, CFG_ACC_FAILED_AUTH_COUNT, CFG_ACC_FAILED_AUTH_BLOCK);
 
                     Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
@@ -371,7 +371,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
                 return Lang::account('accInactive');
             case AUTH_IPBANNED:
                 User::destroy();
-                return sprintf(Lang::account('loginExceeded'), Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
+                return sprintf(Lang::account('loginExceeded'), Util::formatTime(CFG_ACC_FAILED_AUTH_BLOCK * 1000));
             case AUTH_INTERNAL_ERR:
                 User::destroy();
                 return Lang::main('intError');
@@ -403,10 +403,10 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
         // limit account creation
         $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 1 AND ip = ?', User::$ip);
-        if ($ip && $ip['count'] >= CFG_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
+        if ($ip && $ip['count'] >= CFG_ACC_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
         {
-            DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, User::$ip);
-            return sprintf(Lang::account('signupExceeded'), Util::formatTime(CFG_FAILED_AUTH_EXCLUSION * 1000));
+            DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_ACC_FAILED_AUTH_BLOCK, User::$ip);
+            return sprintf(Lang::account('signupExceeded'), Util::formatTime(CFG_ACC_FAILED_AUTH_BLOCK * 1000));
         }
 
         // username taken
@@ -424,18 +424,18 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             $this->_post['remember_me'] != 'yes',
             User::$localeId,
             ACC_STATUS_NEW,
-            CFG_ACCOUNT_CREATE_SAVE_DECAY,
+            CFG_ACC_CREATE_SAVE_DECAY,
             $token
         );
         if (!$id)                                           // something went wrong
             return Lang::main('intError');
-        else if ($_ = $this->sendMail(Lang::mail('accConfirm', 0), sprintf(Lang::mail('accConfirm', 1), $token), CFG_ACCOUNT_CREATE_SAVE_DECAY))
+        else if ($_ = $this->sendMail(Lang::mail('accConfirm', 0), sprintf(Lang::mail('accConfirm', 1), $token), CFG_ACC_CREATE_SAVE_DECAY))
         {
             // success:: update ip-bans
             if (!$ip || $ip['unbanDate'] < time())
-                DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, 1, UNIX_TIMESTAMP() + ?d)', User::$ip, CFG_FAILED_AUTH_EXCLUSION);
+                DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, 1, UNIX_TIMESTAMP() + ?d)', User::$ip, CFG_ACC_FAILED_AUTH_BLOCK);
             else
-                DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_FAILED_AUTH_EXCLUSION, User::$ip);
+                DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', CFG_ACC_FAILED_AUTH_BLOCK, User::$ip);
 
             return $_;
         }
@@ -443,11 +443,11 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
     private function doRecoverPass()
     {
-        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_PASS, CFG_ACCOUNT_RECOVERY_DECAY, $token))
+        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_PASS, CFG_ACC_RECOVERY_DECAY, $token))
             return $_;
 
         // send recovery mail
-        return $this->sendMail(Lang::mail('resetPass', 0), sprintf(Lang::mail('resetPass', 1), $token), CFG_ACCOUNT_RECOVERY_DECAY);
+        return $this->sendMail(Lang::mail('resetPass', 0), sprintf(Lang::mail('resetPass', 1), $token), CFG_ACC_RECOVERY_DECAY);
     }
 
     private function doResetPass()
@@ -475,11 +475,11 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
     private function doRecoverUser()
     {
-        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_USER, CFG_ACCOUNT_RECOVERY_DECAY, $token))
+        if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_USER, CFG_ACC_RECOVERY_DECAY, $token))
             return $_;
 
         // send recovery mail
-        return $this->sendMail(Lang::mail('recoverUser', 0), sprintf(Lang::mail('recoverUser', 1), $token), CFG_ACCOUNT_RECOVERY_DECAY);
+        return $this->sendMail(Lang::mail('recoverUser', 0), sprintf(Lang::mail('recoverUser', 1), $token), CFG_ACC_RECOVERY_DECAY);
     }
 
     private function initRecovery($type, $delay, &$token)

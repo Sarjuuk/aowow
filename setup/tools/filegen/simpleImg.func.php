@@ -27,7 +27,7 @@ if (!CLI)
             $file = $path.'.png';
             if (CLISetup::fileExists($file))
             {
-                CLISetup::log('manually converted png file present for '.$path.'.', CLISetup::LOG_WARN);
+                CLISetup::log('manually converted png file present for '.$path.'.', CLISetup::LOG_INFO);
                 $result = imagecreatefrompng($file);
             }
 
@@ -183,7 +183,7 @@ if (!CLI)
 
             if ($ok)
             {
-                chmod($name.'.'.$ext, CLISetup::FILE_ACCESS);
+                chmod($name.'.'.$ext, Util::FILE_ACCESS);
                 CLISetup::log($done.' - image '.$name.'.'.$ext.' written', CLISetup::LOG_OK);
             }
             else

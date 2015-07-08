@@ -68,11 +68,14 @@ if (!empty($AoWoWconf['characters']))
 $sets = DB::isConnectable(DB_AOWOW) ? DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, `value`, `flags` FROM ?_config') : [];
 foreach ($sets as $k => $v)
 {
-    // this should not have been possible
-    if (!strlen($v['value']))
-        continue;
-
     $php = $v['flags'] & CON_FLAG_PHP;
+
+    // this should not have been possible
+    if (!strlen($v['value']) && !($v['flags'] & CON_FLAG_TYPE_STRING) && !$php)
+    {
+        Util::addNote(U_GROUP_ADMIN | U_GROUP_DEV, 'Kernel: Aowow config value CFG_'.strtoupper($k).' is empty - config will not be used!');
+        continue;
+    }
 
     if ($v['flags'] & CON_FLAG_TYPE_INT)
         $val = intVal($v['value']);
@@ -82,9 +85,14 @@ foreach ($sets as $k => $v)
         $val = (bool)$v['value'];
     else if ($v['flags'] & CON_FLAG_TYPE_STRING)
         $val = preg_replace('/[^\p{L}0-9~\s_\-\'\/\.:,]/ui', '', $v['value']);
-    else
+    else if ($php)
     {
-        Util::addNote(U_GROUP_ADMIN | U_GROUP_DEV, 'Kernel: '.($php ? 'PHP' : 'Aowow').' config value '.($php ? strtolower($k) : 'CFG_'.strtoupper($k)).' has no type set. Value forced to 0!');
+        Util::addNote(U_GROUP_ADMIN | U_GROUP_DEV, 'Kernel: PHP config value '.strtolower($k).' has no type set - config will not be used!');
+        continue;
+    }
+    else // if (!$php)
+    {
+        Util::addNote(U_GROUP_ADMIN | U_GROUP_DEV, 'Kernel: Aowow config value CFG_'.strtoupper($k).' has no type set - value forced to 0!');
         $val = 0;
     }
 
@@ -149,6 +157,9 @@ if (!CLI)
         die('error: SITE_HOST or STATIC_HOST not configured');
 
     // Setup Session
+    if (CFG_SESSION_CACHE_DIR && Util::checkOrCreateDirectory(CFG_SESSION_CACHE_DIR))
+        session_save_path(CFG_SESSION_CACHE_DIR);
+
     session_set_cookie_params(15 * YEAR, '/', '', $secure, true);
     session_cache_limiter('private');
     session_start();

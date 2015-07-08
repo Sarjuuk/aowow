@@ -17,11 +17,10 @@ class CLISetup
     const CHR_ESC       = 27;
     const CHR_BACKSPACE = 127;
 
-    const FILE_ACCESS   = 0755;
-
     const LOG_OK        = 0;
     const LOG_WARN      = 1;
     const LOG_ERROR     = 2;
+    const LOG_INFO      = 3;
 
     private static $win           = true;
     private static $logFile       = '';
@@ -200,6 +199,11 @@ class CLISetup
         return "\e[33m".$str."\e[0m";
     }
 
+    public static function blue($str)
+    {
+        return "\e[36m".$str."\e[0m";
+    }
+
     public static function bold($str)
     {
         return "\e[1m".$str."\e[0m";
@@ -230,14 +234,17 @@ class CLISetup
             $msg = str_pad(date('H:i:s'), 10);
             switch ($lvl)
             {
-                case self::LOG_ERROR:                       // red      error
+                case self::LOG_ERROR:                       // red      critical error
                     $msg .= '['.self::red('ERR').']   ';
                     break;
-                case self::LOG_WARN:                        // yellow   warn
-                    $msg .= '['.self::yellow('INFO').']  ';
+                case self::LOG_WARN:                        // yellow   notice
+                    $msg .= '['.self::yellow('WARN').']  ';
                     break;
                 case self::LOG_OK:                          // green    success
                     $msg .= '['.self::green('OK').']    ';
+                    break;
+                case self::LOG_INFO:                        // blue     info
+                    $msg .= '['.self::blue('INFO').']  ';
                     break;
                 default:
                     $msg .= '        ';
@@ -281,7 +288,7 @@ class CLISetup
             self::log(sprintf(ERR_CREATE_FILE, self::bold($file)), self::LOG_ERROR);
 
         if ($success)
-            @chmod($file, self::FILE_ACCESS);
+            @chmod($file, Util::FILE_ACCESS);
 
         return $success;
     }
@@ -290,13 +297,13 @@ class CLISetup
     {
         if (is_dir($dir))
         {
-            if (!is_writable($dir) && !@chmod($dir, self::FILE_ACCESS))
+            if (!is_writable($dir) && !@chmod($dir, Util::FILE_ACCESS))
                 self::log('cannot write into output directory '.$dir, self::LOG_ERROR);
 
             return is_writable($dir);
         }
 
-        if (@mkdir($dir, self::FILE_ACCESS, true))
+        if (@mkdir($dir, Util::FILE_ACCESS, true))
             return true;
 
         self::log('could not create output directory '.$dir, self::LOG_ERROR);

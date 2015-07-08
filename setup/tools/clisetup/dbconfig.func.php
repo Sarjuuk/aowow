@@ -132,7 +132,7 @@ function dbconfig()
                     else
                     {
                         CLISetup::log();
-                        CLISetup::log("edit canceled! returning to list...", CLISetup::LOG_WARN);
+                        CLISetup::log("edit canceled! returning to list...", CLISetup::LOG_INFO);
                         sleep(1);
                         continue 2;
                     }
@@ -141,7 +141,7 @@ function dbconfig()
             else
             {
                 CLISetup::log();
-                CLISetup::log("db setup aborted", CLISetup::LOG_WARN);
+                CLISetup::log("db setup aborted", CLISetup::LOG_INFO);
                 break 2;
             }
         }

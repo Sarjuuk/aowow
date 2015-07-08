@@ -13,6 +13,8 @@ if (!CLI)
 
 function siteconfig()
 {
+    $reqKeys = ['SITE_HOST', 'STATIC_HOST'];
+
     if (!DB::isConnected(DB_AOWOW))
     {
         CLISetup::log();
@@ -25,55 +27,65 @@ function siteconfig()
         CLISetup::log();
         CLISetup::log('select a numerical index to use the corresponding entry');
 
-        $results  = DB::Aowow()->select('SELECT *, (flags & ?d) AS php FROM ?_config ORDER BY php ASC', CON_FLAG_PHP);
+        $sumNum   = 0;
+        $cfgList  = [];
         $hasEmpty = false;
-
-        foreach ($results as $idx => $data)
+        foreach (Util::$configCats as $idx => $cat)
         {
-            if (!($data['flags'] & CON_FLAG_PHP) && $data['value'] === '')
-                $hasEmpty = true;
+            CLISetup::log('=====  '.$cat.'  =====');
+            $results  = DB::Aowow()->select('SELECT *, (flags & ?d) AS php FROM ?_config WHERE `cat` = ?d ORDER BY `key` ASC', CON_FLAG_PHP, $idx);
 
-            $php   = $data['flags'] & CON_FLAG_PHP;
-            $buff  = "[".CLISetup::bold($idx)."] ".($idx > 9 ? '' : ' ').($php ? '  PHP   ' : ' AOWOW  ');
-            $buff .= str_pad($php ? strtolower($data['key']) : strtoupper('cfg_'.$data['key']), 35);
-            if ($data['value'] === '')
-                $buff .= CLISetup::red('<empty>');
-            else
+            foreach ($results as $num => $data)
             {
-                $info = explode(' - ', $data['comment']);
+                if (!($data['flags'] & CON_FLAG_PHP) && $data['value'] === '' && in_array($data['key'], $reqKeys))
+                    $hasEmpty = true;
 
-                if ($data['flags'] & CON_FLAG_TYPE_BOOL)
-                    $buff .= '[bool] '.($data['value'] ? '<Enabled>' : '<Disabled>');
-                else if ($data['flags'] & CON_FLAG_OPT_LIST && !empty($info[2]))
+                $cfgList[$sumNum + $num] = $data;
+
+                $php   = $data['flags'] & CON_FLAG_PHP;
+                $buff  = "[".CLISetup::bold($sumNum + $num)."] ".(($sumNum + $num) > 9 ? '' : ' ').($php ? '  PHP   ' : ' AOWOW  ');
+                $buff .= str_pad($php ? strtolower($data['key']) : strtoupper($data['key']), 35);
+                if ($data['value'] === '')
+                    $buff .= in_array($data['key'], $reqKeys) ? CLISetup::red('<empty>') : '<empty>';
+                else
                 {
-                    $buff .= "[opt]  ";
-                    foreach (explode(', ', $info[2]) as $option)
+                    $info = explode(' - ', $data['comment']);
+
+                    if ($data['flags'] & CON_FLAG_TYPE_BOOL)
+                        $buff .= '[bool] '.($data['value'] ? '<Enabled>' : '<Disabled>');
+                    else if ($data['flags'] & CON_FLAG_OPT_LIST && !empty($info[2]))
                     {
-                        $opt = explode(':', $option);
-                        $buff .= '['.($data['value'] == $opt[0] ? 'x' : ' ').']'.$opt[1].' ';
+                        $buff .= "[opt]  ";
+                        foreach (explode(', ', $info[2]) as $option)
+                        {
+                            $opt = explode(':', $option);
+                            $buff .= '['.($data['value'] == $opt[0] ? 'x' : ' ').']'.$opt[1].' ';
+                        }
                     }
-                }
-                else if ($data['flags'] & CON_FLAG_BITMASK && !empty($info[2]))
-                {
-                    $buff .= "[mask] ";
-                    foreach (explode(', ', $info[2]) as $option)
+                    else if ($data['flags'] & CON_FLAG_BITMASK && !empty($info[2]))
                     {
-                        $opt = explode(':', $option);
-                        $buff .= '['.($data['value'] & (1 << $opt[0]) ? 'x' : ' ').']'.$opt[1].' ';
+                        $buff .= "[mask] ";
+                        foreach (explode(', ', $info[2]) as $option)
+                        {
+                            $opt = explode(':', $option);
+                            $buff .= '['.($data['value'] & (1 << $opt[0]) ? 'x' : ' ').']'.$opt[1].' ';
+                        }
                     }
+                    else if ($data['flags'] & CON_FLAG_TYPE_STRING)
+                        $buff .= "[str]  ".$data['value'];
+                    else if ($data['flags'] & CON_FLAG_TYPE_FLOAT)
+                        $buff .= "[float] ".floatVal($data['value']);
+                    else /* if ($data['flags'] & CON_FLAG_TYPE_INT) */
+                        $buff .= "[int]  ".intVal($data['value']);
                 }
-                else if ($data['flags'] & CON_FLAG_TYPE_STRING)
-                    $buff .= "[str]  ".$data['value'];
-                else if ($data['flags'] & CON_FLAG_TYPE_FLOAT)
-                    $buff .= "[float] ".floatVal($data['value']);
-                else /* if ($data['flags'] & CON_FLAG_TYPE_INT) */
-                    $buff .= "[int]  ".intVal($data['value']);
+
+                CLISetup::log($buff);
             }
 
-            CLISetup::log($buff);
+            $sumNum += count($results);
         }
 
-        CLISetup::log(str_pad("[".CLISetup::bold(count($results))."]", 21)."add another php configuration");
+        CLISetup::log(str_pad("[".CLISetup::bold($sumNum)."]", 21)."add another php configuration");
 
         if ($hasEmpty)
         {
@@ -85,7 +97,7 @@ function siteconfig()
         if (CLISetup::readInput($inp) && $inp && $inp['idx'] !== '')
         {
             // add new php setting
-            if ($inp['idx'] == count($results))
+            if ($inp['idx'] == $sumNum)
             {
                 CLISetup::log();
                 CLISetup::log("Adding additional php configuration.");
@@ -123,16 +135,16 @@ function siteconfig()
                     else
                     {
                         CLISetup::log();
-                        CLISetup::log("edit canceled! returning to list...", CLISetup::LOG_WARN);
+                        CLISetup::log("edit canceled! returning to list...", CLISetup::LOG_INFO);
                         sleep(1);
                         break;
                     }
                 }
             }
             // edit existing setting
-            else if ($inp['idx'] >= 0 && $inp['idx'] < count($results))
+            else if ($inp['idx'] >= 0 && $inp['idx'] < $sumNum)
             {
-                $conf = $results[$inp['idx']];
+                $conf = $cfgList[$inp['idx']];
                 $info = explode(' - ', $conf['comment']);
                 $buff = '';
 
@@ -240,11 +252,11 @@ function siteconfig()
                                 while (true)
                                 {
                                     $use = $value;
-                                    if (CLISetup::readInput($use, $single) && $use)
+                                    if (CLISetup::readInput($use, $single))
                                     {
                                         CLISetup::log();
 
-                                        if (!$validate($use['idx']))
+                                        if (!$validate($use ? $use['idx'] : ''))
                                         {
                                             CLISetup::log("value not in range", CLISetup::LOG_ERROR);
                                             sleep(1);
@@ -260,7 +272,7 @@ function siteconfig()
                                     }
                                     else
                                     {
-                                        CLISetup::log("edit canceled! returning to selection...", CLISetup::LOG_WARN);
+                                        CLISetup::log("edit canceled! returning to selection...", CLISetup::LOG_INFO);
                                         sleep(1);
                                         break;
                                     }
@@ -293,7 +305,7 @@ function siteconfig()
                     else
                     {
                         CLISetup::log();
-                        CLISetup::log("edit canceled! returning to list...", CLISetup::LOG_WARN);
+                        CLISetup::log("edit canceled! returning to list...", CLISetup::LOG_INFO);
                         sleep(1);
                         break;
                     }
@@ -309,7 +321,7 @@ function siteconfig()
         else
         {
             CLISetup::log();
-            CLISetup::log("site configuration aborted", CLISetup::LOG_WARN);
+            CLISetup::log("site configuration aborted", CLISetup::LOG_INFO);
             break;
         }
     }

@@ -698,8 +698,6 @@ class AjaxHandler
 
                     if (!strlen($key))
                         return 'empty option name given';
-                    if (!strlen($val))
-                        return 'empty value given';
 
                     if (preg_match('/[^a-z0-9_\.\-]/i', $key, $m))
                         return 'invalid chars in option name: "'.$m[0].'"';
@@ -718,20 +716,14 @@ class AjaxHandler
 
                     if (!strlen($key))
                         return 'empty option name given';
-                    if (!strlen($val))
-                        return 'empty value given';
-
-                    if (substr($key, 0, 4) == 'CFG_')
-                        $key = substr($key, 4);
 
                     $flags = DB::Aowow()->selectCell('SELECT `flags` FROM ?_config WHERE `key` = ?', $key);
                     if (!$flags)
                         return 'configuration option not found';
 
-                    if (preg_match('/[^a-z0-9_\-]/i', $key, $m))
-                        return 'invalid chars in option name: "'.$m[0].'"';
-
-                    if ($flags & CON_FLAG_TYPE_INT && !preg_match('/^-?\d+$/i', $val))
+                    if (!($flags & CON_FLAG_TYPE_STRING) && !strlen($val))
+                        return 'empty value given';
+                    else if ($flags & CON_FLAG_TYPE_INT && !preg_match('/^-?\d+$/i', $val))
                         return "value must be integer";
                     else if ($flags & CON_FLAG_TYPE_FLOAT && !preg_match('/^-?\d*(,|.)?\d+$/i', $val))
                         return "value must be float";

@@ -39,7 +39,7 @@ class User
         // check IP bans
         if ($ipBan = DB::Aowow()->selectRow('SELECT count, unbanDate FROM ?_account_bannedips WHERE ip = ? AND type = 0', self::$ip))
         {
-            if ($ipBan['count'] > CFG_FAILED_AUTH_COUNT && $ipBan['unbanDate'] > time())
+            if ($ipBan['count'] > CFG_ACC_FAILED_AUTH_COUNT && $ipBan['unbanDate'] > time())
                 return false;
             else if ($ipBan['unbanDate'] <= time())
                 DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE ip = ?', self::$ip);
@@ -213,7 +213,7 @@ class User
         $user = 0;
         $hash = '';
 
-        switch (CFG_AUTH_MODE)
+        switch (CFG_ACC_AUTH_MODE)
         {
             case AUTH_MODE_SELF:
             {
@@ -223,11 +223,11 @@ class User
                 // handle login try limitation
                 $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 0 AND ip = ?', self::$ip);
                 if (!$ip || $ip['unbanDate'] < time())      // no entry exists or time expired; set count to 1
-                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, CFG_FAILED_AUTH_EXCLUSION);
+                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, CFG_ACC_FAILED_AUTH_BLOCK);
                 else                                        // entry already exists; increment count
-                    DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ?', CFG_FAILED_AUTH_EXCLUSION, self::$ip);
+                    DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ?', CFG_ACC_FAILED_AUTH_BLOCK, self::$ip);
 
-                if ($ip && $ip['count'] >= CFG_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
+                if ($ip && $ip['count'] >= CFG_ACC_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
                     return AUTH_IPBANNED;
 
                 $query = DB::Aowow()->SelectRow('
