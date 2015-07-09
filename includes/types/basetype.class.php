@@ -580,8 +580,8 @@ trait spawnHelper
 
             if (User::isInGroup(U_GROUP_STAFF))
             {
-                if ($s['phaseMask'] > 1)
-                    $label[] = Lang::game('phases').Lang::main('colon').$s['phaseMask'];
+                if ($s['phaseMask'] > 1 && ($s['phaseMask'] & 0xFFFF) != 0xFFFF)
+                    $label[] = Lang::game('phases').Lang::main('colon').Util::asHex($s['phaseMask']);
 
                 if ($s['spawnMask'] == 15)
                     $label[] = Lang::game('mode').Lang::main('colon').Lang::game('modes', -1);
