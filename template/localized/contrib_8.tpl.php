@@ -16,7 +16,7 @@ if (User::$id > 0):
                 <div id="funcbox-generic"></div>
                 <script type="text/javascript">Listview.funcBox.coEditAppend($('#funcbox-generic'), {body: ''}, 1)</script>
                 <div class="pad"></div>
-                <input type="submit" value="Submit"></input>
+                <input type="submit" value="Отправить"></input>
             </form>
 
         </div>
@@ -30,13 +30,14 @@ if (User::$id > 0):
             <li><div>Если вы ещё не читали, то настоятельно рекомендуем вам прочесть <a href="?help=screenshots-tips-tricks" target="_blank">советы и особенности</a> получения изображений при помощи снимков экрана.</div></li>
             </ul>
 
+<?php
+    echo $this->ssError ? '            <div class="msg-failure">'.$this->ssError."</div>\n            <div class=\"pad\"></div>\n" : '';
+?>
             <form action="?screenshot=add&<?php echo $this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
 
-            File:<input type="file" name="screenshotfile" style="width: 35%"/><br />
+            <input type="file" name="screenshotfile" style="width: 35%"/><br />
             <div class="pad2"></div>
-            Caption:<input type="text" name="screenshotcaption" maxlength="200" /> <small>Optional, up to 200 characters</small><br />
-            <div class="pad2"></div>
-            <input type="submit" value="Submit" />
+            <input type="submit" value="Отправить" />
 
             <div class="pad3"></div>
             <small class="q0">Примечание: перед тем как появиться на сайте, ваше Скриншот должны быть утверждены.</small>
@@ -51,11 +52,9 @@ if (User::$id > 0):
             <div class="pad2"></div>
             <form action="?video=add&<?php echo $this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
 
-            URL:<input type="text" name="videourl" style="width: 35%" /> <small>Поддерживается: только YouTube</small>
+            <input type="text" name="videourl" style="width: 35%" /> <small>Поддерживается: только YouTube</small>
             <div class="pad2"></div>
-            Title:<input type="text" name="videotitle" maxlength="200" /> <small>Optional, up to 200 characters</small><br />
-            <div class="pad"></div>
-            <input type="submit" value="Submit" />
+            <input type="submit" value="Отправить" />
 
             <div class="pad3"></div>
             <small class="q0">Примечание: перед тем как появиться на сайте, ваше видео должно быть одобрено.</small>

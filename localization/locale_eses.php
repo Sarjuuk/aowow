@@ -143,30 +143,24 @@ $lang = array(
         'genericError'  => "Ha ocurrido un error; refresca la página e inténtalo de nuevo. Si el error persiste manda un correo a <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Has sido baneado y no podrás valorar comentarios.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Has alcanzado el límite diario de votos. Vuelve mañana.", # LANG.tooltip_too_many_votes
-
-        // screenshots
-        'prepError'     => "[An error occured preparing your screenshot]",
-        'cropHint'      => "[Crop the image by dragging the selection.<br>Please refer to <a href=\"?help=screenshots-tips-tricks\">Screenshots: Tips & Tricks</a> for an optimal layout.]",
+    ),
+    'screenshot' => array(
+        'submission'    => "Enviar una captura de pantalla",
+        'selectAll'     => "Seleccionar todos",
+        'cropHint'      => "Puede reducir su imagen e introducir una etiqueta.",
+        'displayOn'     => "[Displayed on:[br]%s - [%s=%d]]",
         'caption'       => "[Caption]",
-        'originalSize'  => "[Original size]",
-        'targetSize'    => "[Target size]",
-        'minSize'       => "[Minimum size]",
-        'displayOn'     => "[Displayed on: %s[br][%s=%d]]",
-        'ssEdit'        => "[Edit uploaded screenshot]",
-        'ssUpload'      => "[Screenshot Upload]",
-        'ssSubmit'      => "[Submit Screenshot]",
-        'ssErrors'      => array(
-            'noUpload'    => "[The file was not uploaded!]",
-            'maxSize'     => "[The file exceeds the maximum size of %s!]",
-            'interrupted' => "[The upload process was interrupted!]",
-            'noFile'      => "[The file was not received!]",
-            'noDest'      => "[The page this screenshot should be displayed on, does not exist!]",
+        'charLimit'     => "Opcional, hasta 200 caracteres",
+        'thanks'        => array(
+            'contrib' => "¡Muchísimas gracias por tu aportación!",
+            'goBack'  => '<a href="?%s=%d">aquí vuelve</a> a la página de la que viniste.',
+            'note'    => "Nota: Su captura de imagen tiene que ser aprobada antes de que pueda aparecer en el sitio. Esto puede tomar hasta 72 horas."
+        ),
+        'error'         => array(
+            'unkFormat'   => "Formato de imagen desconocido.",
+            'tooSmall'    => "Su captura de pantalla es muy pequeña. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
+            'selectSS'    => "Por favor seleccione la captura de pantalla para subir.",
             'notAllowed'  => "[You are not allowed to upload screenshots!]",
-            'noImage'     => "[The uploaded file is not an image file!]",
-            'wrongFormat' => "[The image file must be a png or jpg!]",
-            'load'        => "[The image file could not be loaded!]",
-            'tooSmall'    => "[The image size is too small! (lower than %d x %d)]",
-            'tooLarge'    => "[The image size is too large! (greater than %d x %d)]"
         )
     ),
     'game' => array(

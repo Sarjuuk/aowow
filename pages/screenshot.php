@@ -7,84 +7,194 @@ if (!defined('AOWOW_REVISION'))
 
 class ScreenshotPage extends GenericPage
 {
+    const     MAX_W        = 488;
+    const     MAX_H        = 325;
+
     protected $tpl         = 'screenshot';
     protected $js          = ['Cropper.js'];
     protected $css         = [['path' => 'Cropper.css']];
     protected $reqAuth     = true;
+    protected $tabId       = 0;
 
     private   $tmpPath     = 'static/uploads/temp/';
     private   $pendingPath = 'static/uploads/screenshots/pending/';
     private   $destination = null;
+    private   $minSize     = CFG_SCREENSHOT_MIN_SIZE;
+
+    protected $validCats   = ['add', 'crop', 'complete', 'thankyou'];
     protected $destType    = 0;
     protected $destTypeId  = 0;
+    protected $imgHash     = '';
 
     public function __construct($pageCall, $pageParam)
     {
         parent::__construct($pageCall, $pageParam);
 
-        $this->name    = Lang::main('ssEdit');
-        // do not htmlEscape caption. It's applied as textnode
-        $this->caption = !empty($_POST['screenshotcaption']) ? $_POST['screenshotcaption'] : '';
+        $this->name    = Lang::screenshot('submission');
+        $this->command = $pageParam;
 
-        // what are its other uses..? (finalize is custom)
-        if ($pageParam == 'finalize')
+        if ($this->minSize <= 0)
         {
-            if (!$this->handleFinalize())
-                $this->error();
+            Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::__construct() - config error: dimensions for uploaded screenshots egual or less than zero. Value forced to 200');
+            $this->minSize = 200;
         }
-        else if ($pageParam != 'add')
-            $this->error();
 
         // get screenshot destination
-        foreach ($_GET as $k => $v)
+        // target delivered as screenshot=<command>&<type>.<typeId>.<hash:16> (hash is optional)
+        if (preg_match('/^screenshot=\w+&(-?\d+)\.(-?\d+)(\.(\w{16}))?$/i', $_SERVER['QUERY_STRING'], $m))
         {
-            if ($v)                                         // target delivered as empty type.typeId key
-                continue;
-
-            $x = explode('_', $k);                          // . => _ as array key
-            if (count($x) != 2)
-                continue;
-
             // no such type
-            if (empty(Util::$typeClasses[$x[0]]))
-                continue;
+            if (empty(Util::$typeClasses[$m[1]]))
+                $this->error();
 
-            $t = Util::$typeClasses[$x[0]];
-            $c = [['id', intVal($x[1])]];
-            if ($x[0] == TYPE_WORLDEVENT)                   // ohforfsake..
-                $c = array_merge($c, ['OR', ['holidayId', intVal($x[1])]]);
+            $t = Util::$typeClasses[$m[1]];
+            $c = [['id', intVal($m[2])]];
+            if ($m[1] == TYPE_WORLDEVENT && $m[2] < 0)      // ohforfsake..
+                $c = [['id', -intVal($m[2])]];
 
             $this->destination = new $t($c);
 
             // no such typeId
-             if ($this->destination->error)
-                continue;
+            if ($this->destination->error)
+                $this->error();
 
-            $this->destType   = intVal($x[0]);
-            $this->destTypeId = intVal($x[1]);
+            // only accept/expect hash for crop & complete
+            if (empty($m[4]) && ($this->command == 'crop' || $this->command == 'complete'))
+                $this->error();
+            else if (!empty($m[4]) && ($this->command == 'add' || $this->command == 'thankyou'))
+                $this->error();
+            else if (!empty($m[4]))
+                $this->imgHash = $m[4];
+
+            $this->destType   = intVal($m[1]);
+            $this->destTypeId = intVal($m[2]);
+        }
+        else
+            $this->error();
+    }
+
+    protected function generateContent()
+    {
+        switch ($this->command)
+        {
+            case 'add':
+                if ($this->handleAdd())
+                    header('Location: ?screenshot=crop&'.$this->destType.'.'.$this->destTypeId.'.'.$this->imgHash, true, 302);
+                else
+                    header('Location: ?'.Util::$typeStrings[$this->destType].'='.$this->destTypeId.'#submit-a-screenshot', true, 302);
+                die();
+            case 'crop':
+                $this->handleCrop();
+                break;
+            case 'complete':
+                if ($_ = $this->handleComplete())
+                    $this->notFound(Lang::main('nfPageTitle'), sprintf(Lang::main('intError2'), '#'.$_));
+                else
+                    header('Location: ?screenshot=thankyou&'.$this->destType.'.'.$this->destTypeId, true, 302);
+                die();
+            case 'thankyou':
+                $this->tpl = 'text-page-generic';
+                $this->handleThankyou();
+                break;
         }
     }
 
-    private function handleFinalize()
+
+    /*******************/
+    /* command handler */
+    /*******************/
+
+
+    private function handleAdd()
     {
-        if (empty($_SESSION['ssUpload']))
+        $this->imgHash = Util::createHash(16);
+
+        if (User::$banStatus & ACC_BAN_SCREENSHOT)
+        {
+            $_SESSION['error']['ss'] = Lang::screenshot('error', 'notAllowed');
             return false;
+        }
 
-        // as its saved in session it should be valid
-        $file = $_SESSION['ssUpload']['file'];
+        if ($_ = $this->validateScreenshot($isPNG))
+        {
+            $_SESSION['error']['ss'] = $_;
+            return false;
+        }
 
+        $im = $isPNG ? $this->loadFromPNG() : $this->loadFromJPG();
+        if (!$im)
+        {
+            $_SESSION['error']['ss'] = Lang::main('intError');
+            return false;
+        }
+
+        $oSize = $rSize = [imagesx($im), imagesy($im)];
+        $rel   = $oSize[0] / $oSize[1];
+
+        // check for oversize and refit to crop-screen
+        if ($rel >= 1.5 && $oSize[0] > self::MAX_W)
+            $rSize = [self::MAX_W, self::MAX_W / $rel];
+        else if ($rel < 1.5 && $oSize[1] > self::MAX_H)
+            $rSize = [self::MAX_H * $rel, self::MAX_H];
+
+        $name  = User::$displayName.'-'.$this->destType.'-'.$this->destTypeId.'-'.$this->imgHash;
+
+        $this->writeImage($im, $oSize, $name.'_original');  // use this image for work
+        $this->writeImage($im, $rSize, $name);              // use this image to display
+
+        return true;
+    }
+
+    private function handleCrop()
+    {
+        $im = imagecreatefromjpeg($this->tmpPath.$this->ssName().'_original.jpg');
+
+        $oSize = $rSize = [imagesx($im), imagesy($im)];
+        $rel   = $oSize[0] / $oSize[1];
+
+        // check for oversize and refit to crop-screen
+        if ($rel >= 1.5 && $oSize[0] > self::MAX_W)
+            $rSize = [self::MAX_W, self::MAX_W / $rel];
+        else if ($rel < 1.5 && $oSize[1] > self::MAX_H)
+            $rSize = [self::MAX_H * $rel, self::MAX_H];
+
+        // r: resized; o: original
+        // r: x <= 488 && y <= 325  while x proportional to y
+        // mincrop is optional and specifies the minimum resulting image size
+        $this->cropper = [
+            'url'     => STATIC_URL.'/uploads/temp/'.$this->ssName().'.jpg',
+            'parent'  => 'ss-container',
+            'oWidth'  => $oSize[0],
+            'rWidth'  => $rSize[0],
+            'oHeight' => $oSize[1],
+            'rHeight' => $rSize[1],
+            'type'    => $this->destType,                   // only used to check against NPC: 15384 [OLDWorld Trigger (DO NOT DELETE)]
+            'typeId'  => $this->destTypeId                  // i guess this was used to upload arbitrary imagery
+        ];
+
+        // minimum dimensions
+        if (!User::isInGroup(U_GROUP_STAFF))
+            $this->cropper['minCrop'] = $this->minSize;
+
+        // target
+        $this->infobox = sprintf(Lang::screenshot('displayOn'), Util::ucFirst(Lang::game(Util::$typeStrings[$this->destType])), Util::$typeStrings[$this->destType], $this->destTypeId);
+        $this->extendGlobalIds($this->destType, $this->destTypeId);
+    }
+
+    private function handleComplete()
+    {
         // check tmp file
-        $fullPath = $this->tmpPath.$file.'_original.jpg';
+        $fullPath = $this->tmpPath.$this->ssName().'_original.jpg';
         if (!file_exists($fullPath))
-            return false;
+            return 1;
 
         // check post data
-        if (empty($_POST) || empty($_POST['selection']))
-            return false;
+        if (empty($_POST) || empty($_POST['coords']))
+            return 2;
 
-        $dims = explode(',', $_POST['selection']);
+        $dims = explode(',', $_POST['coords']);
         if (count($dims) != 4)
-            return false;
+            return 3;
 
         Util::checkNumeric($dims);
 
@@ -105,108 +215,31 @@ class ScreenshotPage extends GenericPage
         // write to db
         $newId = DB::Aowow()->query(
             'INSERT INTO ?_screenshots (type, typeId, userIdOwner, date, width, height, caption) VALUES (?d, ?d, ?d, UNIX_TIMESTAMP(), ?d, ?d, ?)',
-            $_SESSION['ssUpload']['type'], $_SESSION['ssUpload']['typeId'],
+            $this->destType, $this->destTypeId,
             User::$id,
             $w, $h,
-            $this->caption
+            !empty($_POST['screenshotalt']) ? $_POST['screenshotalt'] : ''
         );
 
         // write to file
         if (is_int($newId))         // 0 is valid, NULL or FALSE is not
             imagejpeg($destImg, $this->pendingPath.$newId.'.jpg', 100);
-
-        unset($_SESSION['ssUpload']);
-        header('Location: ?user='.User::$displayName.'#screenshots');
+        else
+            return 6;
     }
 
-    protected function generateContent()
+    private function handleThankyou()
     {
-        $maxW    = 488;
-        $maxH    = 325;
-        $minCrop = CFG_SCREENSHOT_MIN_SIZE;
-
-        if ($minCrop <= 0)
-        {
-            Util::addNote(U_GROUP_DEV | U_GROUP_ADMIN, 'ScreenshotPage::generateContent() - config error: dimensions for uploaded screenshots egual or less than zero. Value forced to 200');
-            $minCrop = 200;
-        }
-
-        if (!$this->destType)
-        {
-            $this->error = Lang::main('ssErrors', 'noDest');
-            return;
-        }
-
-        if (User::$banStatus & ACC_BAN_SCREENSHOT)
-        {
-            $this->error = Lang::main('ssErrors', 'notAllowed');
-            return;
-        }
-
-        if ($_ = $this->validateScreenshot($isPNG))
-        {
-            $this->error = $_;
-            return;
-        }
-
-        $im = $isPNG ? $this->loadFromPNG() : $this->loadFromJPG();
-        if (!$im)
-        {
-            $this->error = Lang::main('ssErrors', 'load');
-            return;
-        }
-
-        $name  = User::$displayName.'-'.$this->destType.'-'.$this->destTypeId.'-'.Util::createHash(16);
-        $oSize = $rSize = [imagesx($im), imagesy($im)];
-        $rel   = $oSize[0] / $oSize[1];
-
-        // not sure if this is the best way
-        $_SESSION['ssUpload'] = array(
-            'file'   => $name,
-            'type'   => $this->destType,
-            'typeId' => $this->destTypeId
-        );
-
-        // check for oversize and refit to crop-screen
-        if ($rel >= 1.5 && $oSize[0] > $maxW)
-            $rSize = [$maxW, $maxW / $rel];
-        else if ($rel < 1.5 && $oSize[1] > $maxH)
-            $rSize = [$maxH * $rel, $maxH];
-
-        $this->writeImage($im, $oSize, $name.'_original');  // use this image for work
-        $this->writeImage($im, $rSize, $name);              // use this image to display
-
-        // r: resized; o: original
-        // r: x <= 488 && y <= 325  while x proportional to y
-        // mincrop is optional and specifies the minimum resulting image size
-        $this->cropper = [
-            'url'     => $this->tmpPath.$name.'.jpg',
-            'parent'  => 'ss-container',
-            'oWidth'  => $oSize[0],
-            'rWidth'  => $rSize[0],
-            'oHeight' => $oSize[1],
-            'rHeight' => $rSize[1],
-        ];
-
-        $infobox = [];
-
-        // target
-        $infobox[] = sprintf(Lang::main('displayOn'), Util::ucFirst(Lang::game(Util::$typeStrings[$this->destType])), Util::$typeStrings[$this->destType], $this->destTypeId);
-        $this->extendGlobalIds($this->destType, $this->destTypeId);
-
-        // dimensions
-        $infobox[] = Lang::main('originalSize').Lang::main('colon').$oSize[0].' x '.$oSize[1];
-        $infobox[] = Lang::main('targetSize').Lang::main('colon').'[span id=qf-newSize][/span]';
-
-        // minimum dimensions
-        if (!User::isInGroup(U_GROUP_STAFF))
-        {
-            $infobox[] = Lang::main('minSize').Lang::main('colon').$minCrop.' x '.$minCrop;
-            $this->cropper['minCrop'] = $minCrop;
-        }
-
-        $this->infobox = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
+        $this->extraHTML  = Lang::screenshot('thanks', 'contrib').'<br><br>';
+        $this->extraHTML .= sprintf(Lang::screenshot('thanks', 'goBack'), Util::$typeStrings[$this->destType], $this->destTypeId)."<br /><br />\n";
+        $this->extraHTML .= '<i>'.Lang::screenshot('thanks', 'note').'</i>';
     }
+
+
+    /**********/
+    /* helper */
+    /**********/
+
 
     private function loadFromPNG()
     {
@@ -240,35 +273,38 @@ class ScreenshotPage extends GenericPage
     {
         // no upload happened or some error occured
         if (!$_FILES || empty($_FILES['screenshotfile']))
-            return Lang::main('ssErrors', 'noUpload');
+            return Lang::screenshot('error', 'selectSS');
 
         switch ($_FILES['screenshotfile']['error'])
         {
             case 1:
-                return sprintf(Lang::main('ssErrors', 'maxSize'), ini_get('upload_max_filesize'));;
+                Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - the file exceeds the maximum size of '.ini_get('upload_max_filesize'));
+            return Lang::screenshot('error', 'selectSS');
             case 3:
-                return Lang::main('ssErrors', 'interrupted');
+                Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - upload was interrupted');
+            return Lang::screenshot('error', 'selectSS');
             case 4:
-                return Lang::main('ssErrors', 'noFile');
+                 Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - no file was received');
+            return Lang::screenshot('error', 'selectSS');
             case 6:
-                Util::addNote(U_GROUP_ADMIN, 'ScreenshotPage::validateScreenshot() - temporary upload directory is not set');
+                Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - temporary upload directory is not set');
                 return Lang::main('intError');
             case 7:
-                Util::addNote(U_GROUP_ADMIN, 'ScreenshotPage::validateScreenshot() - could not write temporary file to disk');
-                return Lang::main('genericError');
+                Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - could not write temporary file to disk');
+                return Lang::main('intError');
         }
 
         // points to invalid file (hack attempt)
         if (!is_uploaded_file($_FILES['screenshotfile']['tmp_name']))
         {
-            Util::addNote(U_GROUP_ADMIN, 'ScreenshotPage::validateScreenshot() - uploaded file not in upload directory');
-            return Lang::main('genericError');
+            Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - uploaded file not in upload directory');
+            return Lang::main('intError');
         }
 
         // invalid file
         $is = getimagesize($_FILES['screenshotfile']['tmp_name']);
         if (!$is || empty($is['mime']))
-            return Lang::main('ssErrors', 'notImage');
+            return Lang::screenshot('error', 'selectSS');
 
         // allow jpeg, png
         switch ($is['mime'])
@@ -279,23 +315,27 @@ class ScreenshotPage extends GenericPage
             case 'image/jpeg':
                 break;
             default:
-                return Lang::main('ssErrors', 'wrongFormat');
+                return Lang::screenshot('error', 'unkFormat');
         }
 
         // size-missmatch: 4k UHD upper limit; 150px lower limit
-        if ($is[0] < 150 || $is[1] < 150)
-            return sprintf(Lang::main('ssErrors', 'tooSmall'), 150, 150);
-
-        if ($is[0] > 3840 || $is[1] > 2160)
-            return sprintf(Lang::main('ssErrors', 'tooLarge'), 150, 150);
+        if ($is[0] < $this->minSize || $is[1] < $this->minSize)
+            return Lang::screenshot('error', 'tooSmall');
+        else if ($is[0] > 3840 || $is[1] > 2160)
+            return Lang::screenshot('error', 'selectSS');
 
         return null;
+    }
+
+    private function ssName()
+    {
+        return $this->imgHash ? User::$displayName.'-'.$this->destType.'-'.$this->destTypeId.'-'.$this->imgHash : '';
     }
 
     protected function generatePath() { }
     protected function generateTitle()
     {
-        array_unshift($this->title, Lang::main('ssUpload'));
+        array_unshift($this->title, Lang::screenshot('submission'));
     }
 }
 

@@ -11,59 +11,45 @@ $this->brick('pageTemplate');
 
 $this->brick('infobox');
 
-if (isset($this->error)):
-?>
-            <div class="pad3"></div>
-
-            <div class="inputbox">
-                <h1><?php echo Lang::main('prepError'); ?></h1>
-                <div id="inputbox-error"><?php echo $this->error; ?><br><a href="<?php echo $this->destType ? '?'.Util::$typeStrings[$this->destType].'='.$this->destTypeId : 'javascript:history.back();'; ?>"><?php echo Lang::main('back'); ?></a></div>
-<?php
-else:
 ?>
             <div class="text">
                 <h1><?php echo $this->name; ?></h1>
 
-<?php
-    if ($this->mode == 'add'):
-?>
-                <div id="ss-container" style="float:right;"></div>
-                <div id="img-edit-form">
-                    <span><?php echo Lang::main('cropHint'); ?></span>
+                <span><?php echo Lang::screenshot('cropHint'); ?></span>
+                <div class="pad"></div>
+                <div id="ss-container"></div><script type="text/javascript">//<![CDATA[
+                    var myCropper = new Cropper(<?php echo json_encode($this->cropper, JSON_NUMERIC_CHECK); ?>);
+                //]]></script>
+
+                <div class="pad"></div>
+                <button style="margin:4px 0 0 5px" onclick="myCropper.selectAll()"><?php echo Lang::screenshot('selectAll'); ?></button>
+                <div class="clear"></div>
+
+                <div class="pad3"></div>
+
+                <form action="?screenshot=complete&amp;<?php echo $this->destType.'.'.$this->destTypeId.'.'.$this->imgHash; ?>" method="post" onsubmit="this.elements['coords'].value = myCropper.getCoords()">
+                    <?php echo Lang::screenshot('caption').Lang::main('colon'); ?><input type="text" name="screenshotalt" style="width: 55%" maxlength="200" /> <small> <?php echo Lang::screenshot('charLimit'); ?></small><br />
                     <div class="pad"></div>
-                    <b><?php echo Lang::main('caption').Lang::main('colon'); ?></b><br>
-                    <form action="?screenshot=finalize" method="post">
-                        <textarea style="resize: none;" name="screenshotcaption" cols="27" rows="4"><?php echo $this->caption; ?></textarea>
-                        <div class="text-counter">text counter ph</div>
-                        <div style="clear:right;"></div>
-                        <input type="hidden" id="selection" name="selection" value=""></input>
-                        <input type="submit" value="<?php echo Lang::main('ssSubmit'); ?>"></input>
-                    </form>
-                </div>
+
+<?php $this->localizedBrick('ssReminder', User::$localeId); ?>
+
+                    <input type="submit" value="<?php echo Lang::main('submit'); ?>" />
+                    <input type="hidden" name="coords" />
+                </form>
+
                 <script type="text/javascript">//<![CDATA[
                     var
-                        cropper       = new Cropper(<?php echo json_encode($this->cropper, JSON_NUMERIC_CHECK); ?>),
                         captionMaxLen = 200;
 
-                    Body        = $('#img-edit-form').find('textarea');
-                    TextCounter = $('#img-edit-form').find('div.text-counter');
-                    Form        = $('#img-edit-form').find('form');
-                    qfSizeDiv   = $('.infobox').find('#qf-newSize');
+                    Body        = $('#main-contents').find('input[type=text]');
+                    TextCounter = $('#main-contents').find('small');
 
-                    $('body').mouseup(UpdateImageSelection);
-
-                    Form.submit(function () { return submitSS(); });
-
-                    UpdateTextCounter();
-                    UpdateImageSelection();
-
+                    Body.focus();
                     Body.keyup(function (e) { return UpdateTextCounter(); });
                     Body.keypress(function (e) {            // ENTER
                         if (e.keyCode == 13 || captionMaxLen - getCaptionLen() <= 0 )
                             return false;
                     });
-
-                    Form.find('textarea').focus();
 
                     function getCaptionLen()
                     {
@@ -89,29 +75,7 @@ else:
                         TextCounter.html(text).attr('class', cssClass);
                     }
 
-                    function UpdateImageSelection()
-                    {
-                        dims = cropper.getCoords().split(',');
-
-                        w = Math.floor(cropper.oWidth  * dims[2]);
-                        h = Math.floor(cropper.oHeight * dims[3]);
-
-                        qfSizeDiv.html(w + ' x ' + h);
-                    }
-
-                    function submitSS()
-                    {
-                        $('#selection').val(cropper.getCoords());
-
-                        return true;
-                    }
                 //]]></script>
-
-                <div class="pad2"></div>
-<?php
-    endif;
-endif;
-?>
             </div>
         </div><!-- main-contents -->
     </div><!-- main -->

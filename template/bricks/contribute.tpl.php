@@ -6,7 +6,7 @@
 <div class="text" style="margin-right: 310px">
     <div class="tabbed-contents" style="clear: none">
 <?php
-    $this->brick('contrib_'.User::$localeId);
+    $this->localizedBrick('contrib', User::$localeId);
 ?>
     </div>
 </div>

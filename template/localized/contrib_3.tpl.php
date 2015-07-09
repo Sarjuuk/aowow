@@ -20,7 +20,6 @@ if (User::$id > 0):
             </form>
 
         </div>
-
         <div id="tab-submit-a-screenshot" style="display: none">
 
             Wählt einfach Euren Screenshot mit dem folgenden Formular aus.
@@ -31,11 +30,12 @@ if (User::$id > 0):
             <li><div>Lest Euch unbedingt die <a href="?help=screenshots-tips-tricks" target="_blank">Tipps &amp; Tricks</a> durch, wenn nicht bereits geschehen.</div></li>
             </ul>
 
+<?php
+    echo $this->ssError ? '            <div class="msg-failure">'.$this->ssError."</div>\n            <div class=\"pad\"></div>\n" : '';
+?>
             <form action="?screenshot=add&<?php echo $this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
 
-            Datei:<input type="file" name="screenshotfile" style="width: 35%"/><br />
-            <div class="pad2"></div>
-            Titel:<input type="text" name="screenshotcaption" maxlength="200" /> <small>Optional, bis zu 200 Zeichen</small><br />
+            <input type="file" name="screenshotfile" style="width: 35%"/><br />
             <div class="pad2"></div>
             <input type="submit" value="Senden" />
 
@@ -45,7 +45,6 @@ if (User::$id > 0):
             </form>
 
         </div>
-
         <div id="tab-suggest-a-video" style="display: none">
 
             Gebt einfach die URL des Videos im folgenden Formular ein.
@@ -53,10 +52,8 @@ if (User::$id > 0):
             <div class="pad2"></div>
             <form action="?video=add&<?php echo $this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
 
-            URL:<input type="text" name="videourl" style="width: 35%" /> <small>Unterstützt: nur YouTube</small>
+            <input type="text" name="videourl" style="width: 35%" /> <small>Unterstützt: nur YouTube</small>
             <div class="pad2"></div>
-            Titel:<input type="text" name="videotitle" maxlength="200" /> <small>Optional, bis zu 200 Zeichen</small><br />
-            <div class="pad"></div>
             <input type="submit" value="Senden" />
 
             <div class="pad3"></div>
@@ -87,7 +84,6 @@ else:
             </form>
 
         </div>
-
         <div id="tab-submit-a-screenshot" style="display: none">
 
             Wählt einfach Euren Screenshot mit dem folgenden Formular aus.
@@ -106,7 +102,6 @@ else:
             </form>
 
         </div>
-
         <div id="tab-suggest-a-video" style="display: none">
 
             Gebt einfach die URL des Videos im folgenden Formular ein.
@@ -114,7 +109,7 @@ else:
             <div class="pad2"></div>
             <form action="/video=add&amp;13.7" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
 
-            URL:<input type="text" name="videourl" style="width: 35%" /> <small>Unterstützt: nur YouTube</small>
+            <input type="text" name="videourl" style="width: 35%" /> <small>Unterstützt: nur YouTube</small>
             <div class="pad"></div>
             <input type="submit" value="Senden" />
 

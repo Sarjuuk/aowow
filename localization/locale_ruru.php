@@ -143,30 +143,24 @@ $lang = array(
         'genericError'  => "Произошла ошибка; обновите страницу и попробуйте снова. Если ситуация повторяется, отправьте сообщение на <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Вам была заблокирована возможность оценивать комментарии.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Вы сегодня проголосовали слишком много раз! Вы сможете продолжить завтра.", # LANG.tooltip_too_many_votes
-
-        // screenshots
-        'prepError'     => "[An error occured preparing your screenshot]",
-        'cropHint'      => "[Crop the image by dragging the selection.<br>Please refer to <a href=\"?help=screenshots-tips-tricks\">Screenshots: Tips & Tricks</a> for an optimal layout.]",
+    ),
+    'screenshot' => array(
+        'submission'    => "Добавление изображения",
+        'selectAll'     => "Выбрать всё",
+        'cropHint'      => "Вы можете произвести кадрирование изображения и указать заголовок.",
+        'displayOn'     => "[Displayed on:[br]%s - [%s=%d]]",
         'caption'       => "[Caption]",
-        'originalSize'  => "[Original size]",
-        'targetSize'    => "[Target size]",
-        'minSize'       => "[Minimum size]",
-        'displayOn'     => "[Displayed on: %s[br][%s=%d]]",
-        'ssEdit'        => "[Edit uploaded screenshot]",
-        'ssUpload'      => "[Screenshot Upload]",
-        'ssSubmit'      => "[Submit Screenshot]",
-        'ssErrors'      => array(
-            'noUpload'    => "[The file was not uploaded!]",
-            'maxSize'     => "[The file exceeds the maximum size of %s!]",
-            'interrupted' => "[The upload process was interrupted!]",
-            'noFile'      => "[The file was not received!]",
-            'noDest'      => "[The page this screenshot should be displayed on, does not exist!]",
+        'charLimit'     => "Не обязательно, вплоть до 200 знаков",
+        'thanks'        => array(
+            'contrib' => "Спасибо за ваш вклад!",
+            'goBack'  => '<a href="?%s=%d">здесь</a> чтобы перейти к предыдущей странице.',
+            'note'    => "Примечание: Перед появлением на сайте, ваше изображение должно быть одобрено. Это может занять до 72 часов."
+        ),
+        'error'         => array(
+            'unkFormat'   => "неизвестный формат изображения.",
+            'tooSmall'    => "Изображение слишком маленькое. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
+            'selectSS'    => "Выберите изображение для загрузки.",
             'notAllowed'  => "[You are not allowed to upload screenshots!]",
-            'noImage'     => "[The uploaded file is not an image file!]",
-            'wrongFormat' => "[The image file must be a png or jpg!]",
-            'load'        => "[The image file could not be loaded!]",
-            'tooSmall'    => "[The image size is too small! (lower than %d x %d)]",
-            'tooLarge'    => "[The image size is too large! (greater than %d x %d)]"
         )
     ),
     'game' => array(

@@ -8,7 +8,10 @@ class Lang
     private static $user;
     private static $mail;
     private static $game;
+    private static $maps;
+    private static $screenshot;
 
+    // types
     private static $achievement;
     private static $chrClass;
     private static $currency;
@@ -17,7 +20,6 @@ class Lang
     private static $gameObject;
     private static $item;
     private static $itemset;
-    private static $maps;
     private static $npc;
     private static $pet;
     private static $quest;

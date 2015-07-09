@@ -10,7 +10,11 @@ trait DetailPage
     protected $category      = null;                        // not used on detail pages
     protected $lvTabs        = [];                          // most pages have this
 
-    private   $subject       = null;                        // so it will not get cached
+    protected $ssError       = null;
+    protected $coError       = null;
+    protected $viError       = null;
+
+    protected $subject       = null;                        // so it will not get cached
 
     protected function generateCacheKey($withStaff = true)
     {
@@ -24,6 +28,21 @@ trait DetailPage
             $key[] = md5(serialize($this->enhancedTT));
 
         return implode('_', $key);
+    }
+
+
+    protected function applyCCErrors()
+    {
+        if (!empty($_SESSION['error']['co']))
+            $this->coError = $_SESSION['error']['co'];
+
+        if (!empty($_SESSION['error']['ss']))
+            $this->ssError = $_SESSION['error']['ss'];
+
+        if (!empty($_SESSION['error']['vi']))
+            $this->viError = $_SESSION['error']['vi'];
+
+        unset($_SESSION['error']);
     }
 }
 
@@ -133,6 +152,10 @@ class GenericPage
             $this->maintenance();
         else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
             Util::addNote(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
+
+        // get errors from previous page from session and apply to template
+        if (method_exists($this, 'applyCCErrors'))
+            $this->applyCCErrors();
     }
 
     /**********/
@@ -369,8 +392,8 @@ class GenericPage
         array_unshift($this->title, Lang::main('nfPageTitle'));
 
         $this->notFound      = array(
-            'title' =>          $this->typeId ? Util::ucFirst($title).' #'.$this->typeId    : $title,
-            'msg'   => !$msg && $this->typeId ? sprintf(Lang::main('pageNotFound'), $title) : $msg
+            'title' =>          isset($this->typeId) ? Util::ucFirst($title).' #'.$this->typeId    : $title,
+            'msg'   => !$msg && isset($this->typeId) ? sprintf(Lang::main('pageNotFound'), $title) : $msg
         );
         $this->hasComContent = false;
         Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
@@ -507,6 +530,19 @@ class GenericPage
             echo User::isInGroup(U_GROUP_EMPLOYEE) ? "\n\nError: nonexistant template requested: template/listviews/".$file.".tpl.php\n\n" : null;
         else
             include('template/listviews/'.$file.'.tpl.php');
+    }
+
+    public function localizedBrick($file, $loc = LOCALE_EN) // load brick with more text then vars
+    {
+        if (!$this->isSaneInclude('template/localized/', $file.'_'.$loc))
+        {
+            if ($loc == LOCALE_EN || !$this->isSaneInclude('template/localized/', $file.'_'.LOCALE_EN))
+                echo User::isInGroup(U_GROUP_EMPLOYEE) ? "\n\nError: nonexistant template requested: template/localized/".$file.'_'.$loc.".tpl.php\n\n" : null;
+            else
+                include('template/localized/'.$file.'_'.LOCALE_EN.'.tpl.php');
+        }
+        else
+            include('template/localized/'.$file.'_'.$loc.'.tpl.php');
     }
 
     /**********************/
@@ -662,8 +698,9 @@ class GenericPage
         if (!CFG_CACHE_MODE || CFG_DEBUG)
             return;
 
-        $cKey  = $this->generateCacheKey();
-        $cache = [];
+        $noCache = ['coError', 'ssError', 'viError'];
+        $cKey    = $this->generateCacheKey();
+        $cache   = [];
         if (!$saveString)
         {
             foreach ($this as $key => $val)
@@ -672,7 +709,8 @@ class GenericPage
                 {
                     // public, protected and an undocumented flag added to properties created on the fly..?
                     if ((new ReflectionProperty($this, $key))->getModifiers() & 0x1300)
-                        $cache[$key] = $val;
+                        if (!in_array($key, $noCache))
+                            $cache[$key] = $val;
                 }
                 catch (ReflectionException $e) { }          // shut up!
             }

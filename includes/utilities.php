@@ -1395,11 +1395,11 @@ class Util
 
     public static function createHash($length = 40)         // just some random numbers for unsafe identifictaion purpose
     {
-        static $seed = ".abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        static $seed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $hash = '';
 
         for ($i = 0; $i < $length; $i++)
-            $hash .= substr($seed, mt_rand(0, 62), 1);
+            $hash .= substr($seed, mt_rand(0, 61), 1);
 
         return $hash;
     }

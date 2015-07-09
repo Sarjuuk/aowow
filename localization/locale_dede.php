@@ -143,30 +143,24 @@ $lang = array(
         'genericError'  => "Ein Fehler trat auf; aktualisiert die Seite und versucht es nochmal. Wenn der Fehler bestehen bleibt, bitte meldet es bei <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Ihr wurdet davon gesperrt, Kommentare zu bewerten.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Ihr habt die tägliche Grenze für erlaubte Bewertungen erreicht. Kommt morgen mal wieder!", # LANG.tooltip_too_many_votes
-
-        // screenshots
-        'prepError'     => "Bei der Aufbereitung eures Screenshots ist ein Fehler aufgetreten",
-        'cropHint'      => "Schneidet das Bild zu, indem ihr die Auswahl verschiebt.<br>Bitte beachtet <a href=\"?help=screenshots-tips-tricks\">Screenshots: Tipps & Tricks</a> für eine optimale Darstellung.",
+    ),
+    'screenshot' => array(
+        'submission'    => "Screenshot-Einsendung",
+        'selectAll'     => "Alles auswählen",
+        'cropHint'      => "Ihr könnt Euren Screenshot zuschneiden und beschriften.",
+        'displayOn'     => "Hochgeladen für:[br]%s - [%s=%d]",
         'caption'       => "Kurzbeschreibung",
-        'originalSize'  => "Originalgröße",
-        'targetSize'    => "Zielgröße",
-        'minSize'       => "Mindestgröße",
-        'displayOn'     => "Hochgeladen für: %s[br][%s=%d]",
-        'ssEdit'        => "Screenshot bearbeiten",
-        'ssUpload'      => "Screenshot hochladen",
-        'ssSubmit'      => "Screenshot einsenden",
-        'ssErrors'      => array(
-            'noUpload'    => "Die Datei wurde nicht hochgeladen!",
-            'maxSize'     => "Die Datei überschreitet die max. Größe von %s!",
-            'interrupted' => "Der Vorgang wurde unterbrochen!",
-            'noFile'      => "Es wurde keine Datei empfangen!",
-            'noDest'      => "Die Seite auf welcher der Screenshot angezeigt werden sollte existiert nicht!",
+        'charLimit'     => "Optional, bis zu 200 Zeichen",
+        'thanks'        => array(
+            'contrib' => "Vielen Dank für Euren Beitrag!",
+            'goBack'  => '<a href="?%s=%d">Klickt hier</a>, um zu der vorherigen Seite zurückzukehren.',
+            'note'    => "Hinweis: Euer Screenshot muss zunächst zugelassen werden, bevor es auf der Seite erscheint. Dies kann bis zu 72 Stunden dauern."
+        ),
+        'error'         => array(
+            'unkFormat'   => "Unbekanntes Bildformat.",
+            'tooSmall'    => "Euer Screenshot ist viel zu klein. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
+            'selectSS'    => "Wählt bitte den Screenshot aus, den Ihr hochladen möchtet.",
             'notAllowed'  => "Es ist euch nicht erlaubt einen Screenshot hochzuladen!",
-            'noImage'     => "Die hochgeladene Datei ist kein Bild!",
-            'wrongFormat' => "Das Bild muss im PNG oder JPG-Format sein!",
-            'load'        => "Das Bild konnte nicht geladen werden!",
-            'tooSmall'    => "Die Abmessungen sind zu klein! (kleiner als %d x %d)",
-            'tooLarge'    => "Die Abmessungen sind zu groß! (größer als %d x %d)"
         )
     ),
     'game' => array(
