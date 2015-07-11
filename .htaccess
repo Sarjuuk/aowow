@@ -21,8 +21,7 @@ AddDefaultCharset utf8
     CharsetRecodeMultipartForms Off
 </IfModule>
 
-# 5MB should be enough for the largest screenshots in the land
-    php_value       default_charset                             UTF-8
+# 5MB should be enough for the largest screenshots in the land (cannot be set in config)
     php_value       upload_max_filesize                         5M
 
 RewriteEngine on
