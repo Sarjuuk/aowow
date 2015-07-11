@@ -15,6 +15,7 @@ if (!CLI)
 
 /* deps:
  * item_template
+ * game_event
 */
 
 
@@ -32,6 +33,11 @@ function itemset()
         785 => 341,                                             // Midsummer
         812 => 181,                                             // Noblegarden
     );
+
+    // find events associated with holidayIds
+    if ($pairs = DB::World()->selectCol('SELECT holiday AS ARRAY_KEY, eventEntry FROM game_event WHERE holiday IN (?a)', array_values($setToHoliday)))
+        foreach ($setToHoliday as &$hId)
+            $hId = !empty($pairs[$hId]) ? $pairs[$hId] : 0;
 
     // tags where refId == virtualId
     // in pve sets are not recycled beyond the contentGroup

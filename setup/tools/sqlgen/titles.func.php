@@ -14,27 +14,32 @@ if (!CLI)
 */
 
 $customData = array(
-    137 => ['holidayId' => 201, 'gender' => 2],
-    138 => ['holidayId' => 201, 'gender' => 1],
-    124 => ['holidayId' => 324],
-    135 => ['holidayId' => 423],
-    155 => ['holidayId' => 181],
-    133 => ['holidayId' => 372],
-     74 => ['holidayId' => 327],
-     75 => ['holidayId' => 341],
-     76 => ['holidayId' => 341],
-    134 => ['holidayId' => 141],
-    168 => ['holidayId' => 404]
+    137 => ['gender' => 2],
+    138 => ['gender' => 1],
 );
 $reqDBC = ['chartitles'];
 
 function titles()
 {
+    $titleHoliday = array(
+        137 => 201,
+        138 => 201,
+        124 => 324,
+        135 => 423,
+        155 => 181,
+        133 => 372,
+         74 => 327,
+         75 => 341,
+         76 => 341,
+        134 => 141,
+        168 => 404
+    );
+
     $questQuery = '
         SELECT
              qt.RewardTitleId AS ARRAY_KEY,
              qt.RequiredRaces,
-             ge.holiday
+             ge.eventEntry
         FROM
             quest_template qt
         LEFT JOIN
@@ -61,13 +66,19 @@ function titles()
     DB::Aowow()->query('UPDATE ?_titles SET category = 4 WHERE id IN (81, 125)');
     DB::Aowow()->query('UPDATE ?_titles SET category = 3 WHERE id IN (53, 64, 120, 121, 122, 129, 139, 140, 141, 142) OR (id >= 158 AND category = 0)');
 
+    // update event
+    if ($assoc = DB::World()->selectCol('SELECT holiday AS ARRAY_KEY, eventEntry FROM game_event WHERE holiday IN (?a)', array_values($titleHoliday)))
+        foreach ($titleHoliday as $tId => $hId)
+            if (!empty($assoc[$hId]))
+                DB::Aowow()->query('UPDATE ?_titles SET eventId = ?d WHERE id = ?d', $assoc[$hId], $tId);
+
     // update side
     $questInfo = DB::World()->select($questQuery);
     $sideUpd   = DB::World()->selectCol('SELECT IF (title_A, title_A, title_H) AS ARRAY_KEY, BIT_OR(IF(title_A, 1, 2)) AS side FROM achievement_reward WHERE (title_A <> 0 AND title_H = 0) OR (title_H <> 0 AND title_A = 0) GROUP BY ARRAY_KEY HAVING side <> 3');
     foreach ($questInfo as $tId => $data)
     {
-        if ($data['holiday'])
-            DB::Aowow()->query('UPDATE ?_titles SET holidayId = ?d WHERE id = ?d', $data['holiday'], $tId);
+        if ($data['eventEntry'])
+            DB::Aowow()->query('UPDATE ?_titles SET eventId = ?d WHERE id = ?d', $data['eventEntry'], $tId);
 
         $side = Util::sideByRaceMask($data['RequiredRaces']);
         if ($side == 3)

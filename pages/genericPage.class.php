@@ -634,27 +634,7 @@ class GenericPage
 
             $this->initJSGlobal($type);
 
-            // todo (med): properly distinguish holidayId and eventId
-            $cnd = [CFG_SQL_LIMIT_NONE];
-            if ($type == TYPE_WORLDEVENT)
-            {
-                $hIds = array_filter($ids, function($v) { return $v > 0; });
-                $eIds = array_filter($ids, function($v) { return $v < 0; });
-
-                if ($hIds)
-                    $cnd[] = ['holidayId', array_unique($hIds, SORT_NUMERIC)];
-
-                if ($eIds)
-                {
-                    array_walk($eIds, function(&$v) { $v = abs($v);});
-                    $cnd[] = ['e.id', array_unique($eIds, SORT_NUMERIC)];
-                }
-
-                if ($eIds && $hIds)
-                    $cnd[] = 'OR';
-            }
-            else
-                $cnd [] = ['id', array_unique($ids, SORT_NUMERIC)];
+            $cnd = [CFG_SQL_LIMIT_NONE, ['id', array_unique($ids, SORT_NUMERIC)]];
 
             switch ($type)
             {

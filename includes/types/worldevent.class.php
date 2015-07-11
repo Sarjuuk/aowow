@@ -9,7 +9,7 @@ class WorldEventList extends BaseType
     public static $type      = TYPE_WORLDEVENT;
     public static $brickFile = 'event';
 
-    protected     $queryBase = 'SELECT *, -e.id as id, -e.id AS ARRAY_KEY FROM ?_events e';
+    protected     $queryBase = 'SELECT *, e.id as id, e.id AS ARRAY_KEY FROM ?_events e';
     protected     $queryOpts = array(
                                    'e' => [['h']],
                                    'h' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']
@@ -40,12 +40,9 @@ class WorldEventList extends BaseType
             if ($this->curTpl['requires'])
                 $this->curTpl['requires'] = explode(' ', $this->curTpl['requires']);
 
-            $this->curTpl['eventBak'] = -$this->curTpl['id'];
-
             // change Ids if holiday is set
             if ($this->curTpl['holidayId'] > 0)
             {
-                $this->curTpl['id']   = $this->curTpl['holidayId'];
                 $this->curTpl['name'] = $this->getField('name', true);
                 $replace[$this->id]   = $this->curTpl;
                 unset($this->curTpl['description']);

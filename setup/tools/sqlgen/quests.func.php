@@ -33,7 +33,7 @@ function quests(array $ids = [])
             Type,
             SuggestedPlayers,
             LimitTime,
-            0 AS holidayId,                                 -- holidayId
+            IFNULL(gesqr.eventEntry, 0) AS eventId,
             PrevQuestId,
             NextQuestId,
             ExclusiveGroup,
@@ -90,6 +90,8 @@ function quests(array $ids = [])
             quest_template q
         LEFT JOIN
             locales_quest lq ON q.Id = lq.Id
+        LEFT JOIN
+            game_event_seasonal_questrelation gesqr ON gesqr.questId = q.Id
         {
         WHERE
             q.Id IN (?a)
@@ -155,7 +157,7 @@ function quests(array $ids = [])
         DB::Aowow()->query($repQuery, $i, $i, $i, $i, $ids ?: DBSIMPLE_SKIP);
 
     // update zoneOrSort .. well .. now "not documenting" bites me in the ass .. ~700 quests were changed, i don't know by what method
-    $questByHoliday = DB::World()->selectCol('SELECT sq.questId AS ARRAY_KEY, ge.holiday FROM game_event_seasonal_questrelation sq JOIN game_event ge ON ge.eventEntry = sq.eventEntry');
+    $eventSet = DB::World()->selectCol('SELECT holiday AS ARRAY_KEY, eventEntry FROM game_event WHERE holiday <> 0');
     $holidaySorts   = array(
         141 => -1001,       181 => -374,        201 => -1002,
         301 => -101,        321 => -1005,       324 => -1003,
@@ -163,9 +165,9 @@ function quests(array $ids = [])
         374 => -364,        376 => -364,        404 => -375,
         409 => -41,         423 => -376,        424 => -101
     );
-    foreach ($questByHoliday as $qId => $hId)
-        if ($hId)
-            DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE id = ?d{ AND id IN (?a)}', $holidaySorts[$hId], $qId, $ids ?: DBSIMPLE_SKIP);
+    foreach ($holidaySorts as $hId => $sort)
+        if (!empty($eventSet[$hId]))
+            DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE eventId = ?d{ AND id IN (?a)}', $sort, $eventSet[$hId], $ids ?: DBSIMPLE_SKIP);
 
 /*
     zoneorsort for quests will need updating
@@ -192,10 +194,6 @@ function quests(array $ids = [])
     DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE id IN (?a){ AND id IN (?a)}',  -101, [8228, 8229], $ids ?: DBSIMPLE_SKIP);
     // dungeon quests to Misc/Dungeon Finder
     DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE (specialFlags & ?d OR id IN (?a)){ AND id IN (?a)}', -1010, QUEST_FLAG_SPECIAL_DUNGEON_FINDER, [24789, 24791, 24923], $ids ?: DBSIMPLE_SKIP);
-
-    // finally link related events (after zoneorSort has been updated)
-    foreach ($holidaySorts as $hId => $sort)
-        DB::Aowow()->query('UPDATE ?_quests SET holidayId = ?d WHERE zoneOrSort = ?d{ AND id IN (?a)}', $hId, $sort, $ids ?: DBSIMPLE_SKIP);
 
     return true;
 }

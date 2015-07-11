@@ -63,7 +63,7 @@ class QuestPage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // event (todo: assign eventData)
-        if ($_ = $this->subject->getField('holidayId'))
+        if ($_ = $this->subject->getField('eventId'))
         {
             $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
             $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$_.']';

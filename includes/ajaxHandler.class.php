@@ -575,6 +575,10 @@ class AjaxHandler
                 if (!$this->post('id') || !User::canUpvote())
                     break;
 
+                $owner = DB::Aowow()->selectCell('SELECT userId FROM ?_comments WHERE id = ?d', $this->post('id'));
+                if (!$owner)
+                    break;
+
                 $ok = DB::Aowow()->query(
                     'INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)',
                     $this->post('id'),
@@ -583,11 +587,18 @@ class AjaxHandler
                 );
 
                 if ($ok)
+                {
+                    Util::gainSiteReputation($owner, SITEREP_ACTION_UPVOTED, ['id' => $this->post('id'), 'voterId' => User::$id]);
                     User::decrementDailyVotes();
+                }
 
                 break;
             case 'downvote-reply':
                 if (!$this->post('id') || !User::canUpvote())
+                    break;
+
+                $owner = DB::Aowow()->selectCell('SELECT userId FROM ?_comments WHERE id = ?d', $this->post('id'));
+                if (!$owner)
                     break;
 
                 $ok = DB::Aowow()->query(
@@ -598,7 +609,10 @@ class AjaxHandler
                 );
 
                 if ($ok)
+                {
+                    Util::gainSiteReputation($owner, SITEREP_ACTION_DOWNVOTED, ['id' => $this->post('id'), 'voterId' => User::$id]);
                     User::decrementDailyVotes();
+                }
         }
 
         return json_encode($result, JSON_NUMERIC_CHECK);

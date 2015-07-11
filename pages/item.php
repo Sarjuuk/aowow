@@ -167,9 +167,11 @@ class ItemPage extends genericPage
         }
 
         // related holiday
-        if ($hId = $this->subject->getField('holidayId'))
-            if ($hName = DB::Aowow()->selectRow('SELECT * FROM ?_holidays WHERE id = ?d', $hId))
-                $infobox[] = Lang::game('eventShort').Lang::main('colon').'[url=?event='.$hId.']'.Util::localizedString($hName, 'name').'[/url]';
+        if ($eId = $this->subject->getField('eventId'))
+        {
+            $this->extendGlobalIds(TYPE_WORLDEVENT, $eId);
+            $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$eId.']';
+        }
 
         // tool
         if ($tId = $this->subject->getField('totemCategory'))

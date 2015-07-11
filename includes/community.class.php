@@ -330,11 +330,7 @@ class CommunityContent
                 if (!$ids)
                     continue;
 
-                $cnd = [['id', $ids]];
-                if ($t == TYPE_WORLDEVENT)                  // FKIN HOLIDAYS
-                    array_push($cnd, ['holidayId', $ids], 'OR');
-
-                $tClass = new Util::$typeClasses[$t]($cnd);
+                $tClass = new Util::$typeClasses[$t](array(['id', $ids]));
                 foreach ($pages as &$p)
                     if ($p['type'] == $t)
                         if ($tClass->getEntry($p['typeId']))

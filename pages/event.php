@@ -26,18 +26,12 @@ class EventPage extends GenericPage
 
         $this->typeId = intVal($id);
 
-        $conditions = $this->typeId < 0 ? [['id', -$this->typeId]] : [['holidayId', $this->typeId]];
-
-        $this->subject = new WorldEventList($conditions);
+        $this->subject = new WorldEventList(array(['id', $this->typeId]));
         if ($this->subject->error)
             $this->notFound(Lang::game('event'), Lang::event('notFound'));
 
         $this->hId = $this->subject->getField('holidayId');
-        $this->eId = $this->subject->getField('eventBak');
-
-        // redirect if associated with a holiday
-        if ($this->hId && $this->typeId != $this->hId)
-            header('Location: '.HOST_URL.'?event='.$this->hId, true, 302);
+        $this->eId = $this->typeId;
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -86,7 +80,7 @@ class EventPage extends GenericPage
 
         $this->headIcons  = [$this->subject->getField('iconString')];
         $this->redButtons = array(
-            BUTTON_WOWHEAD => $this->typeId > 0,
+            BUTTON_WOWHEAD => $this->hId > 0,
             BUTTON_LINKS   => true
         );
         $this->dates      = array(
@@ -163,11 +157,11 @@ class EventPage extends GenericPage
         {
             $itemCnd = array(
                 'OR',
-                ['holidayId', $this->hId],                  // direct requirement on item
+                ['eventId', $this->eId],                    // direct requirement on item
             );
 
             // tab: quests (by table, go & creature)
-            $quests = new QuestList(array(['holidayId', $this->hId]));
+            $quests = new QuestList(array(['eventId', $this->eId]));
             if (!$quests->error)
             {
                 $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
@@ -217,7 +211,7 @@ class EventPage extends GenericPage
         }
 
         // tab: see also (event conditions)
-        if ($rel = DB::World()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, -prerequisite_event, eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $this->eId, $this->eId, $this->eId))
+        if ($rel = DB::World()->selectCol('SELECT IF(eventEntry = prerequisite_event, NULL, IF(eventEntry = ?d, prerequisite_event, -eventEntry)) FROM game_event_prerequisite WHERE prerequisite_event = ?d OR eventEntry = ?d', $this->eId, $this->eId, $this->eId))
         {
             $list = [];
             array_walk($rel, function($v, $k) use (&$list) {
@@ -233,18 +227,18 @@ class EventPage extends GenericPage
                 $this->extendGlobalData($relEvents->getJSGlobals());
                 $relData   = $relEvents->getListviewData();
                 foreach ($relEvents->getFoundIDs() as $id)
-                    $relData[$id]['condition'][0][$this->typeId][] = [[-CND_ACTIVE_EVENT, -$this->eId]];
+                    $relData[$id]['condition'][0][$this->typeId][] = [[-CND_ACTIVE_EVENT, $this->eId]];
 
                 $this->extendGlobalData($this->subject->getJSGlobals());
                 foreach ($rel as $r)
                 {
-                    if ($r >= 0)
+                    if ($r <= 0)
                         continue;
 
                     $this->extendGlobalIds(TYPE_WORLDEVENT, $r);
 
                     $d = $this->subject->getListviewData();
-                    $d[-$this->eId]['condition'][0][$this->typeId][] = [[-CND_ACTIVE_EVENT, $r]];
+                    $d[$this->eId]['condition'][0][$this->typeId][] = [[-CND_ACTIVE_EVENT, $r]];
 
                     $relData = array_merge($relData, $d);
                 }
@@ -265,6 +259,9 @@ class EventPage extends GenericPage
 
     protected function postCache()
     {
+        if ($this->hId)
+            Util::$wowheadLink = 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/event='.$this->hId;
+
         /********************/
         /* finalize infobox */
         /********************/

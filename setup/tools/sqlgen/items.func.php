@@ -11,6 +11,7 @@ if (!CLI)
  * item_template
  * locales_item
  * spell_group
+ * game_event
 */
 
 $customData = array(
@@ -80,7 +81,7 @@ function items(array $ids = [])
             spellid_4,              spelltrigger_4,         spellcharges_4,         spellppmRate_4,         spellcooldown_4,        spellcategory_4,        spellcategorycooldown_4,
             spellid_5,              spelltrigger_5,         spellcharges_5,         spellppmRate_5,         spellcooldown_5,        spellcategory_5,        spellcategorycooldown_5,
             bonding,
-            description,            description_loc2,       description_loc3,       description_loc6,       description_loc8,
+            it.description,         description_loc2,       description_loc3,       description_loc6,       description_loc8,
             PageText,
             LanguageID,
             startquest,
@@ -101,7 +102,7 @@ function items(array $ids = [])
             DisenchantID,
             duration,
             ItemLimitCategory,
-            HolidayId,
+            IFNULL(ge.eventEntry, 0),
             ScriptName,
             FoodType,
             0 AS gemEnchantmentId,
@@ -113,6 +114,8 @@ function items(array $ids = [])
             locales_item li ON li.entry = it.entry
         LEFT JOIN
             spell_group sg ON sg.spell_id = it.spellid_1 AND it.class = 0 AND it.subclass = 2 AND sg.id IN (1, 2)
+        LEFT JOIN
+            game_event ge ON ge.holiday = it.HolidayId AND it.HolidayId > 0
         {
         WHERE
             ct.entry IN (?a)
@@ -182,7 +185,7 @@ function items(array $ids = [])
     DB::Aowow()->query('UPDATE ?_items SET subClass = -2 WHERE quality = 4 AND class = 15 AND subClassBak = 0 AND requiredClass AND (requiredClass & 0x5FF) <> 0x5FF');
 
     // move some junk to holiday if it requires one
-    DB::Aowow()->query('UPDATE ?_items SET subClass = 3 WHERE classBak = 15 AND subClassBak = 0 AND holidayId <> 0');
+    DB::Aowow()->query('UPDATE ?_items SET subClass = 3 WHERE classBak = 15 AND subClassBak = 0 AND eventId <> 0');
 
     // move misc items that start quests to class: quest (except Sayges scrolls for consistency)
     DB::Aowow()->query('UPDATE ?_items SET class = 12 WHERE classBak = 15 AND startQuest <> 0 AND name_loc0 NOT LIKE "sayge\'s fortune%"');

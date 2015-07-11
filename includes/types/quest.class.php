@@ -18,6 +18,7 @@ class QuestList extends BaseType
                         'q'   => [],
                         'rsc' => ['j' => '?_spell rsc ON q.rewardSpellCast = rsc.id'],      // limit rewardSpellCasts
                         'qse' => ['j' => '?_quests_startend qse ON q.id = qse.questId', 's' => ', qse.method'],    // groupConcat..?
+                        'e'   => ['j' => ['?_events e ON e.id = `q`.eventId', true], 's' => ', e.holidayId']
                     );
 
     public function __construct($conditions = [], $miscData = null)
@@ -433,7 +434,7 @@ class QuestListFilter extends Filter
         45 => [FILTER_CR_BOOLEAN,   'rewardTitleId',                              ], // titlerewarded
          2 => [FILTER_CR_NUMERIC,   'rewardXP',                                   ], // experiencegained
          3 => [FILTER_CR_NUMERIC,   'rewardOrReqMoney',                           ], // moneyrewarded
-        33 => [FILTER_CR_ENUM,      'holidayId',                                  ], // relatedevent
+        33 => [FILTER_CR_ENUM,      'e.holidayId',                                ], // relatedevent
         25 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT        ], // hascomments
         18 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
         36 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos

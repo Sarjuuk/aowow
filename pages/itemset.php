@@ -68,11 +68,11 @@ class ItemsetPage extends GenericPage
         if ($this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE)
             $infobox[] = Lang::main('unavailable');
 
-        // holiday
-        if ($h = $this->subject->getField('holidayId'))
+        // worldevent
+        if ($e = $this->subject->getField('eventId'))
         {
-            $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$h.']';
-            $this->extendGlobalIds(TYPE_WORLDEVENT, $h);
+            $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$e.']';
+            $this->extendGlobalIds(TYPE_WORLDEVENT, $e);
         }
 
         // itemLevel
@@ -184,10 +184,10 @@ class ItemsetPage extends GenericPage
             $rel[] = ['classMask', 1 << (end($this->path) - 1), '&'];
             $rel[] = ['contentGroup', (int)$_ta];
         }
-        else if ($this->subject->getField('holidayId'))
+        else if ($this->subject->getField('eventId'))
         {
             $rel[] = ['id', $this->typeId, '!'];
-            $rel[] = ['holidayId', 0, '!'];
+            $rel[] = ['eventId', 0, '!'];
         }
         else if ($this->subject->getField('skillId'))
         {

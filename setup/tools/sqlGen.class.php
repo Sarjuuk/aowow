@@ -57,10 +57,10 @@ class SqlGen
         'spelldifficulty'          => [null, null, null,                      ['spelldifficulty_dbc']],
         'taxi' /* nodes + paths */ => [null, null, null,                      ['creature_template', 'creature']],
         'titles'                   => [null, null, null,                      ['quest_template', 'game_event_seasonal_questrelation', 'game_event', 'achievement_reward']],
-        'items'                    => [null, null, null,                      ['item_template', 'locales_item', 'spell_group']],
+        'items'                    => [null, null, null,                      ['item_template', 'locales_item', 'spell_group', 'game_event']],
         'spawns' /* + waypoints */ => [null, null, null,                      ['creature', 'creature_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'script_waypoint', 'waypoints', 'waypoint_data']],
         'zones'                    => [null, null, null,                      ['access_requirement']],
-        'itemset'                  => [null, null, ['spell'],                 ['item_template']],
+        'itemset'                  => [null, null, ['spell'],                 ['item_template', 'game_event']],
         'item_stats'               => [null, null, ['items', 'spell'],        null],
         'source'                   => [null, null, ['spell', 'achievements'], ['npc_vendor', 'game_event_npc_vendor', 'creature', 'quest_template', 'playercreateinfo_item', 'npc_trainer', 'skill_discovery_template', 'playercreateinfo_spell', 'achievement_reward']]
     );

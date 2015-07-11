@@ -61,8 +61,11 @@ class TitlePage extends GenericPage
         if ($g = $this->subject->getField('gender'))
             $infobox[] = Lang::main('gender').Lang::main('colon').'[span class=icon-'.($g == 2 ? 'female' : 'male').']'.Lang::main('sex', $g).'[/span]';
 
-        if ($e = $this->subject->getField('holidayId'))
-            $infobox[] = Lang::game('eventShort').Lang::main('colon').'[url=?event='.$e.']'.WorldEventList::getName($e).'[/url]';
+        if ($eId = $this->subject->getField('eventId'))
+        {
+            $this->extendGlobalIds(TYPE_WORLDEVENT, $eId);
+            $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$eId.']';
+        }
 
         /****************/
         /* Main Content */

@@ -49,8 +49,6 @@ class ScreenshotPage extends GenericPage
 
             $t = Util::$typeClasses[$m[1]];
             $c = [['id', intVal($m[2])]];
-            if ($m[1] == TYPE_WORLDEVENT && $m[2] < 0)      // ohforfsake..
-                $c = [['id', -intVal($m[2])]];
 
             $this->destination = new $t($c);
 

@@ -14,8 +14,11 @@ class ItemsetList extends BaseType
     public        $pieceToSet = [];                             // used to build g_items and search
     private       $classes    = [];                             // used to build g_classes
 
-    protected     $queryBase  = 'SELECT *, id AS ARRAY_KEY FROM ?_itemset `set`';
-    protected     $queryOpts  = ['set' => ['o' => 'maxlevel DESC']];
+    protected     $queryBase  = 'SELECT `set`.*, `set`.id AS ARRAY_KEY FROM ?_itemset `set`';
+    protected     $queryOpts  = array(
+                        'set' => ['o' => 'maxlevel DESC'],
+                        'e'   => ['j' => ['?_events e ON e.id = `set`.eventId', true], 's' => ', e.holidayId']
+                    );
 
     public function __construct($conditions = [])
     {
@@ -171,7 +174,7 @@ class ItemsetListFilter extends Filter
          3 => [FILTER_CR_NUMERIC, 'npieces',                             ], // pieces
          4 => [FILTER_CR_STRING,  'bonusText', true                      ], // bonustext
          5 => [FILTER_CR_BOOLEAN, 'heroic',                              ], // heroic
-         6 => [FILTER_CR_ENUM,    'holidayId',                           ], // relatedevent
+         6 => [FILTER_CR_ENUM,    'e.holidayId',                         ], // relatedevent
          8 => [FILTER_CR_FLAG,    'cuFlags',   CUSTOM_HAS_COMMENT        ], // hascomments
          9 => [FILTER_CR_FLAG,    'cuFlags',   CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
         10 => [FILTER_CR_FLAG,    'cuFlags',   CUSTOM_HAS_VIDEO          ], // hasvideos

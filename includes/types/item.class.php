@@ -29,6 +29,7 @@ class ItemList extends BaseType
                       'ic'  => ['j' => ['?_icons ic ON ic.id = -i.displayId', true], 's' => ', ic.iconString'],
                       'is'  => ['j' => ['?_item_stats `is` ON `is`.`id` = `i`.`id`', true], 's' => ', `is`.*'],
                       's'   => ['j' => ['?_spell `s` ON s.effect1CreateItemId = i.id', true], 'g' => 'i.id'],
+                      'e'   => ['j' => ['?_events `e` ON e.id = i.eventId', true], 's' => ', e.holidayId'],
                       'src' => ['j' => ['?_source src ON type = 3 AND typeId = i.id', true], 's' => ', moreType, moreTypeId, src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
                   );
 
@@ -88,9 +89,9 @@ class ItemList extends BaseType
         if (empty($this->vendors))
         {
             $itemz = DB::World()->select('
-                SELECT   nv.item AS ARRAY_KEY1, nv.entry AS ARRAY_KEY2,                                                    0  AS eventId,   nv.maxcount,   nv.extendedCost FROM            npc_vendor   nv                                                                                                  WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
+                SELECT   nv.item AS ARRAY_KEY1, nv.entry AS ARRAY_KEY2,            0  AS eventId,   nv.maxcount,   nv.extendedCost FROM            npc_vendor   nv                                                                                                  WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
                 UNION
-                SELECT genv.item AS ARRAY_KEY1,     c.id AS ARRAY_KEY2, IFNULL(IF(ge.holiday, ge.holiday, -ge.eventEntry), 0) AS eventId, genv.maxcount, genv.extendedCost FROM game_event_npc_vendor genv LEFT JOIN game_event ge ON genv.eventEntry = ge.eventEntry JOIN creature c ON c.guid = genv.guid WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
+                SELECT genv.item AS ARRAY_KEY1,     c.id AS ARRAY_KEY2, ge.eventEntry AS eventId, genv.maxcount, genv.extendedCost FROM game_event_npc_vendor genv LEFT JOIN game_event ge ON genv.eventEntry = ge.eventEntry JOIN creature c ON c.guid = genv.guid WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
                 empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
                 array_keys($this->templates),
                 empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
@@ -543,11 +544,9 @@ class ItemList extends BaseType
             $x .= "<br />".Lang::game('duration').Lang::main('colon').Util::formatTime(abs($dur) * 1000).($this->curTpl['flagsCustom'] & 0x1 ? ' ('.Lang::item('realTime').')' : null);
 
         // required holiday
-        if ($hId = $this->curTpl['holidayId'])
-        {
-            $hDay = DB::Aowow()->selectRow("SELECT * FROM ?_holidays WHERE id = ?", $hId);
-            $x .= '<br />'.sprintf(Lang::game('requires'), '<a href="'.$hId.'" class="q1">'.Util::localizedString($hDay, 'name').'</a>');
-        }
+        if ($eId = $this->curTpl['eventId'])
+            if ($hName = DB::Aowow()->selectRow('SELECT h.* FROM ?_holidays h JOIN ?_events e ON e.holidayId = h.id WHERE e.id = ?d', $eId))
+                $x .= '<br />'.sprintf(Lang::game('requires'), '<a href="'.$eId.'" class="q1">'.Util::localizedString($hName, 'name').'</a>');
 
         // item begins a quest
         if ($this->curTpl['startQuest'])
@@ -1657,7 +1656,7 @@ class ItemListFilter extends Filter
          99 => [FILTER_CR_ENUM,      'requiredSkill'                                        ], // requiresprof
          66 => [FILTER_CR_ENUM,      'requiredSpell'                                        ], // requiresprofspec
          17 => [FILTER_CR_ENUM,      'requiredFaction'                                      ], // requiresrepwith
-        169 => [FILTER_CR_ENUM,      'holidayId'                                            ], // requiresevent
+        169 => [FILTER_CR_ENUM,      'e.holidayId'                                          ], // requiresevent
          21 => [FILTER_CR_NUMERIC,   'is.agi',                 null,                    true], // agi
          23 => [FILTER_CR_NUMERIC,   'is.int',                 null,                    true], // int
          22 => [FILTER_CR_NUMERIC,   'is.sta',                 null,                    true], // sta
