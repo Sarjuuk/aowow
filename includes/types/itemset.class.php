@@ -88,7 +88,77 @@ class ItemsetList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip()
+    {
+        if (!$this->curTpl)
+            return array();
+
+        $x  = '<table><tr><td>';
+        $x .= '<span class="q'.$this->getField('quality').'">'.Util::jsEscape($this->getField('name', true)).'</span><br />';
+
+        $nClasses = 0;
+        if ($_ = $this->getField('classMask'))
+        {
+            $cl = Lang::getClassString($_, $__, $nClasses);
+            $x .= Util::ucFirst($nClasses > 1 ? Lang::game('classes') : Lang::game('class')).Lang::main('colon').$cl.'<br />';
+        }
+
+        if ($_ = $this->getField('contentGroup'))
+            $x .= Util::jsEscape(Lang::itemset('notes', $_)).($this->getField('heroic') ? ' <i class="q2">('.Lang::item('heroic').')</i>' : '').'<br />';
+
+        if (!$nClasses || !$this->getField('contentGroup'))
+            $x.= Lang::itemset('types', $this->getField('type')).'<br />';
+
+        if ($bonuses = $this->getBonuses())
+        {
+            $x .= '<span>';
+
+            foreach ($bonuses as $b)
+                $x .= '<br /><span class=\"q13\">'.$b['bonus'].' '.Lang::itemset('_pieces').Lang::main('colon').'</span>'.Util::jsEscape($b['desc']);
+
+            $x .= '</span>';
+        }
+
+        $x .= '</td></tr></table>';
+
+        return $x;
+   }
+
+   public function getBonuses()
+   {
+        $spells = [];
+        for ($i = 1; $i < 9; $i++)
+        {
+            $spl = $this->getField('spell'.$i);
+            $qty = $this->getField('bonus'.$i);
+
+            // cant use spell as index, would change order
+            if ($spl && $qty)
+                $spells[] = ['id' => $spl, 'bonus' => $qty];
+        }
+
+        // sort by required pieces ASC
+        usort($spells, function($a, $b) {
+            if ($a['bonus'] == $b['bonus'])
+                return 0;
+
+            return ($a['bonus'] > $b['bonus']) ? 1 : -1;
+        });
+
+        $setSpells = new SpellList(array(['s.id', array_column($spells, 'id')]));
+        foreach ($setSpells->iterate() as $spellId => $__)
+        {
+            foreach ($spells as &$s)
+            {
+                if ($spellId != $s['id'])
+                    continue;
+
+                $s['desc'] = $setSpells->parseText('description', $this->getField('reqLevel') ?: MAX_LEVEL)[0];
+            }
+        }
+
+        return $spells;
+   }
 }
 
 

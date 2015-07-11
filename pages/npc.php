@@ -227,33 +227,32 @@ class NpcPage extends GenericPage
         }
 
         // > Stats
-        $_nf     = function ($num) { return number_format($num, 0, '', '.'); };
         $stats   = [];
         $modes   = [];                                      // get difficulty versions if set
         $hint    = '[tooltip name=%3$s][table cellspacing=10][tr]%1s[/tr][/table][/tooltip][span class=tip tooltip=%3$s]%2s[/span]';
         $modeRow = '[tr][td]%s&nbsp;&nbsp;[/td][td]%s[/td][/tr]';
         // Health
         $health = $this->subject->getBaseStats('health');
-        $stats['health'] = Util::ucFirst(Lang::spell('powerTypes', -2)).Lang::main('colon').($health[0] < $health[1] ? $_nf($health[0]).' - '.$_nf($health[1]) : $_nf($health[0]));
+        $stats['health'] = Util::ucFirst(Lang::spell('powerTypes', -2)).Lang::main('colon').($health[0] < $health[1] ? Lang::nf($health[0]).' - '.Lang::nf($health[1]) : Lang::nf($health[0]));
 
         // Mana (may be 0)
         $mana = $this->subject->getBaseStats('power');
-        $stats['mana'] = $mana[0] ? Lang::spell('powerTypes', 0).Lang::main('colon').($mana[0] < $mana[1] ? $_nf($mana[0]).' - '.$_nf($mana[1]) : $_nf($mana[0])) : null;
+        $stats['mana'] = $mana[0] ? Lang::spell('powerTypes', 0).Lang::main('colon').($mana[0] < $mana[1] ? Lang::nf($mana[0]).' - '.Lang::nf($mana[1]) : Lang::nf($mana[0])) : null;
 
         // Armor
         $armor = $this->subject->getBaseStats('armor');
-        $stats['armor'] = Lang::npc('armor').Lang::main('colon').($armor[0] < $armor[1] ? $_nf($armor[0]).' - '.$_nf($armor[1]) : $_nf($armor[0]));
+        $stats['armor'] = Lang::npc('armor').Lang::main('colon').($armor[0] < $armor[1] ? Lang::nf($armor[0]).' - '.Lang::nf($armor[1]) : Lang::nf($armor[0]));
 
         // Melee Damage
         $melee = $this->subject->getBaseStats('melee');
         if ($_ = $this->subject->getField('dmgSchool'))     // magic damage
-            $stats['melee'] = Lang::npc('melee').Lang::main('colon').$_nf($melee[0]).' - '.$_nf($melee[1]).' ('.Lang::game('sc', $_).')';
+            $stats['melee'] = Lang::npc('melee').Lang::main('colon').Lang::nf($melee[0]).' - '.Lang::nf($melee[1]).' ('.Lang::game('sc', $_).')';
         else                                                // phys. damage
-            $stats['melee'] = Lang::npc('melee').Lang::main('colon').$_nf($melee[0]).' - '.$_nf($melee[1]);
+            $stats['melee'] = Lang::npc('melee').Lang::main('colon').Lang::nf($melee[0]).' - '.Lang::nf($melee[1]);
 
         // Ranged Damage
         $ranged = $this->subject->getBaseStats('ranged');
-        $stats['ranged'] = Lang::npc('ranged').Lang::main('colon').$_nf($ranged[0]).' - '.$_nf($ranged[1]);
+        $stats['ranged'] = Lang::npc('ranged').Lang::main('colon').Lang::nf($ranged[0]).' - '.Lang::nf($ranged[1]);
 
         if (in_array($mapType, [1, 2]))                     // Dungeon or Raid
         {
@@ -268,26 +267,26 @@ class NpcPage extends GenericPage
 
                     // Health
                     $health = $_altNPCs->getBaseStats('health');
-                    $modes['health'][] = sprintf($modeRow, $m, $health[0] < $health[1] ? $_nf($health[0]).' - '.$_nf($health[1]) : $_nf($health[0]));
+                    $modes['health'][] = sprintf($modeRow, $m, $health[0] < $health[1] ? Lang::nf($health[0]).' - '.Lang::nf($health[1]) : Lang::nf($health[0]));
 
                     // Mana (may be 0)
                     $mana = $_altNPCs->getBaseStats('power');
-                    $modes['mana'][] = $mana[0] ? sprintf($modeRow, $m, $mana[0] < $mana[1] ? $_nf($mana[0]).' - '.$_nf($mana[1]) : $_nf($mana[0])) : null;
+                    $modes['mana'][] = $mana[0] ? sprintf($modeRow, $m, $mana[0] < $mana[1] ? Lang::nf($mana[0]).' - '.Lang::nf($mana[1]) : Lang::nf($mana[0])) : null;
 
                     // Armor
                     $armor = $_altNPCs->getBaseStats('armor');
-                    $modes['armor'][] = sprintf($modeRow, $m, $armor[0] < $armor[1] ? $_nf($armor[0]).' - '.$_nf($armor[1]) : $_nf($armor[0]));
+                    $modes['armor'][] = sprintf($modeRow, $m, $armor[0] < $armor[1] ? Lang::nf($armor[0]).' - '.Lang::nf($armor[1]) : Lang::nf($armor[0]));
 
                     // Melee Damage
                     $melee = $_altNPCs->getBaseStats('melee');
                     if ($_ = $_altNPCs->getField('dmgSchool'))  // magic damage
-                        $modes['melee'][] = sprintf($modeRow, $m, $_nf($melee[0]).' - '.$_nf($melee[1]).' ('.Lang::game('sc', $_).')');
+                        $modes['melee'][] = sprintf($modeRow, $m, Lang::nf($melee[0]).' - '.Lang::nf($melee[1]).' ('.Lang::game('sc', $_).')');
                     else                                        // phys. damage
-                        $modes['melee'][] = sprintf($modeRow, $m, $_nf($melee[0]).' - '.$_nf($melee[1]));
+                        $modes['melee'][] = sprintf($modeRow, $m, Lang::nf($melee[0]).' - '.Lang::nf($melee[1]));
 
                     // Ranged Damage
                     $ranged = $_altNPCs->getBaseStats('ranged');
-                    $modes['ranged'][] = sprintf($modeRow, $m, $_nf($ranged[0]).' - '.$_nf($ranged[1]));
+                    $modes['ranged'][] = sprintf($modeRow, $m, Lang::nf($ranged[0]).' - '.Lang::nf($ranged[1]));
                 }
             }
         }

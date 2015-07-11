@@ -144,45 +144,6 @@ class ItemsetPage extends GenericPage
             );
         }
 
-        // spells
-        $foo    = [];
-        $spells = [];
-        for ($i = 1; $i < 9; $i++)
-        {
-            $spl = $this->subject->getField('spell'.$i);
-            $qty = $this->subject->getField('bonus'.$i);
-
-            if ($spl && $qty)
-            {
-                $foo[]    = $spl;
-                $spells[] = array(                          // cant use spell as index, would change order
-                    'id'    => $spl,
-                    'bonus' => $qty,
-                    'desc'  => ''
-                );
-            }
-        }
-
-        // sort by required pieces ASC
-        usort($spells, function($a, $b) {
-            if ($a['bonus'] == $b['bonus'])
-                return 0;
-
-            return ($a['bonus'] > $b['bonus']) ? 1 : -1;
-        });
-
-        $setSpells = new SpellList(array(['s.id', $foo]));
-        foreach ($setSpells->iterate() as $spellId => $__)
-        {
-            foreach ($spells as &$s)
-            {
-                if ($spellId != $s['id'])
-                    continue;
-
-                $s['desc'] = $setSpells->parseText('description')[0];
-            }
-        }
-
         $skill = '';
         if ($_sk = $this->subject->getField('skillId'))
         {
@@ -195,7 +156,7 @@ class ItemsetPage extends GenericPage
         $this->unavailable = $this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE;
         $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->pieces      = $pieces;
-        $this->spells      = $spells;
+        $this->spells      = $this->subject->getBonuses();
         $this->expansion   = 0;
         $this->redButtons  = array(
             BUTTON_WOWHEAD => $this->typeId > 0,            // bool only
@@ -265,6 +226,44 @@ class ItemsetPage extends GenericPage
                 $this->extendGlobalData($relSets->getJSGlobals());
             }
         }
+    }
+
+    protected function generateTooltip($asError = false)
+    {
+        if ($asError)
+            return '$WowheadPower.registerItemSet('.$this->typeId.', '.User::$localeId.', {});';
+
+        $x = '$WowheadPower.registerItemSet('.$this->typeId.', '.User::$localeId.", {\n";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
+        $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
+        $x .= "});";
+
+        return $x;
+    }
+
+    public function display($override = '')
+    {
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
+            return parent::display($override);
+
+        if (!$this->loadCache($tt))
+        {
+            $tt = $this->generateTooltip();
+            $this->saveCache($tt);
+        }
+
+        header('Content-type: application/x-javascript; charset=utf-8');
+        die($tt);
+    }
+
+    public function notFound()
+    {
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
+            return parent::notFound(Lang::game('itemset'), Lang::itemset('notFound'));
+
+        header('Content-type: application/x-javascript; charset=utf-8');
+        echo $this->generateTooltip(true);
+        exit();
     }
 }
 

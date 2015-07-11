@@ -27,13 +27,15 @@ if (typeof $WowheadPower == "undefined") {
 
             eventAttached = false,
 
-            npcs = {},
-            objects = {},
-            items = {},
-            quests = {},
-            spells = {},
+            npcs         = {},
+            objects      = {},
+            items        = {},
+            quests       = {},
+            spells       = {},
             achievements = {},
-            profiles = {},
+            itemsets     = {},
+            currencies   = {},
+            profiles     = {},
 
             showLogo = 1,
 
@@ -51,9 +53,11 @@ if (typeof $WowheadPower == "undefined") {
             TYPE_NPC         = 1,
             TYPE_OBJECT      = 2,
             TYPE_ITEM        = 3,
+            TYPE_ITEMSET     = 4,
             TYPE_QUEST       = 5,
             TYPE_SPELL       = 6,
             TYPE_ACHIEVEMENT = 10,
+            TYPE_CURRENCY    = 17,
             TYPE_PROFILE     = 100,
 
             CURSOR_HSPACE = 15,
@@ -68,9 +72,11 @@ if (typeof $WowheadPower == "undefined") {
                   1: [npcs,         "npc",         "NPC"        ],
                   2: [objects,      "object",      "Object"     ],
                   3: [items,        "item",        "Item"       ],
+                  4: [itemsets,     "itemset",     "Item Set"   ],
                   5: [quests,       "quest",       "Quest"      ],
                   6: [spells,       "spell",       "Spell"      ],
                  10: [achievements, "achievement", "Achievement"],
+                 17: [currencies,   "currency",    "Currency"   ],
                 100: [profiles,     "profile",     "Profile"    ]
             },
             SCALES = {
@@ -90,7 +96,14 @@ if (typeof $WowheadPower == "undefined") {
             };
 
         if (isRemote) {
-            var Locale = { id: 0, name: "enus" };
+            var Locale = {
+                getId: function () {
+                    return 0;
+                },
+                getName: function () {
+                    return "enus";
+                }
+            }
         }
 
         function init() {
@@ -248,8 +261,8 @@ if (typeof $WowheadPower == "undefined") {
                 i2 = 3;
                 if (t.href.indexOf("http://") == 0 || t.href.indexOf("https://") == 0) {
                     i0 = 1;
-                    // url = t.href.match(/^https?:\/\/(.+?)?\.?wowhead\.com(?:\:\d+)?\/\??(item|quest|spell|achievement|npc|object)=([0-9]+)/);
-                    url = t.href.match(/^https?:\/\/(.*)\/?\??(item|quest|spell|achievement|npc|object)=([0-9]+)/);
+                    // url = t.href.match(/^https?:\/\/(.+?)?\.?wowhead\.com(?:\:\d+)?\/\??(item|quest|spell|achievement|npc|object|itemset|currency)=(-?[0-9]+)/);
+                    url = t.href.match(/^https?:\/\/(.*)\/?\??(item|quest|spell|achievement|npc|object|itemset|currency)=(-?[0-9]+)/);
                     if (url == null) {
                         // url = t.href.match(/^http:\/\/(.+?)?\.?wowhead\.com\/\?(profile)=([^&#]+)/)
                         url = t.href.match(/^https?:\/\/(.*)\/?\??(profile)=([^&#]+)/);
@@ -258,7 +271,7 @@ if (typeof $WowheadPower == "undefined") {
                     showLogo = 0;
                 }
                 else {
-                    url = t.href.match(/()\?(item|quest|spell|achievement|npc|object)=([0-9]+)/);
+                    url = t.href.match(/()\?(item|quest|spell|achievement|npc|object|itemset|currency)=(-?[0-9]+)/);
                     if (url == null) {
                         url = t.href.match(/()\?(profile)=([^&#]+)/);
                     }
@@ -271,7 +284,7 @@ if (typeof $WowheadPower == "undefined") {
                 i0 = 0;
                 i1 = 1;
                 i2 = 2;
-                url = t.rel.match(/(item|quest|spell|achievement|npc|object).?([0-9]+)/);
+                url = t.rel.match(/(item|quest|spell|achievement|npc|object|itemset|currency).?(-?[0-9]+)/);
                 // if (url == null) {                       // sarjuuk: also matches 'profiler' and 'profiles' which screws with the language-menu workaround
                     // url = t.rel.match(/(profile).?([^&#]+)/);
                 // }
@@ -700,12 +713,20 @@ if (typeof $WowheadPower == "undefined") {
             this.register(TYPE_NPC, id, locale, json);
         };
 
+        this.registerCurrency = function (id, locale, json) {
+            this.register(TYPE_CURRENCY, id, locale, json)
+        };
+
         this.registerObject = function (id, locale, json) {
             this.register(TYPE_OBJECT, id, locale, json);
         };
 
         this.registerItem = function (id, locale, json) {
             this.register(TYPE_ITEM, id, locale, json);
+        };
+
+        this.registerItemSet = function (id, locale, json) {
+            this.register(TYPE_ITEMSET, id, locale, json);
         };
 
         this.registerQuest = function (id, locale, json) {
@@ -740,11 +761,11 @@ if (typeof $WowheadPower == "undefined") {
         };
 
         this.requestItem = function (id, params) {
-            this.request(TYPE_ITEM, id, Locale.id, params);
+            this.request(TYPE_ITEM, id, Locale.getId(), params);
         };
 
         this.requestSpell = function (id) {
-            this.request(TYPE_SPELL, id, Locale.id);
+            this.request(TYPE_SPELL, id, Locale.getId());
         };
 
         this.getStatus = function (type, id, locale) {

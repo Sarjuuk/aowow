@@ -52,7 +52,25 @@ class CurrencyList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip()
+    {
+        if (!$this->curTpl)
+            return array();
+
+        $x  = '<table><tr><td>';
+        $x .= '<b>'.Util::jsEscape($this->getField('name', true)).'</b><br>';
+
+        // cata+ (or go fill it by hand)
+        if ($_ = $this->getField('description', true))
+            $x .= '<div style="max-width: 300px" class="q">'.Util::jsEscape($_).'</div>';
+
+        if ($_ = $this->getField('cap'))
+            $x .= '<br><span class="q">'.Lang::currency('cap').Lang::main('colon').'</span>'.Lang::nf($_).'<br>';
+
+        $x .= '</td></tr></table>';
+
+        return $x;
+    }
 }
 
 ?>

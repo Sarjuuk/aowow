@@ -322,6 +322,20 @@ class Lang
 
         return implode(', ', $tmp);
     }
+
+    public static function nf($number, $decimals = 0)
+    {
+        //               [decimal, thousand]
+        $seps = array(
+            LOCALE_EN => [',', '.'],
+            LOCALE_FR => [' ', ','],
+            LOCALE_DE => ['.', ','],
+            LOCALE_ES => ['.', ','],
+            LOCALE_RU => [' ', ',']
+        );
+
+        return number_format($number, $decimals, $seps[User::$localeId][1], $seps[User::$localeId][0]);
+    }
 }
 
 ?>

@@ -18,7 +18,9 @@ $customData = array(
       2 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3],
       4 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3],
      22 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3],
-    141 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3]
+    141 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3],
+    103 => ['cap' => 10000],                                // Arena Points
+    104 => ['cap' => 75000]                                 // Honor Points
 );
 $reqDBC = ['itemdisplayinfo', 'currencytypes'];
 

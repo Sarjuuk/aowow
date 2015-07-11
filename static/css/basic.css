@@ -83,18 +83,19 @@ a span.moneyitem, a span.moneysocketmeta, a span.moneysocketred, a span.moneysoc
 /* ITEM QUALITY COLORS */
 /***********************/
 
-.q,   .q a,   .color-q,   .wowhead-tooltip .q a   { color: #ffd100 !important; } /* Default (yellow) */
-.q0,  .q0 a,  .color-q0,  .wowhead-tooltip .q0 a  { color: #9d9d9d !important; } /* Poor */
-.q1,  .q1 a,  .color-q1,  .wowhead-tooltip .q1 a  { color: #ffffff !important; } /* Common */
-.q2,  .q2 a,  .color-q2,  .wowhead-tooltip .q2 a  { color: #1eff00 !important; } /* Uncommon */
-.q3,  .q3 a,  .color-q3,  .wowhead-tooltip .q3 a  { color: #0070dd !important; } /* Rare */
-.q4,  .q4 a,  .color-q4,  .wowhead-tooltip .q4 a  { color: #a335ee !important; } /* Epic */
-.q5,  .q5 a,  .color-q5,  .wowhead-tooltip .q5 a  { color: #ff8000 !important; } /* Legendary */
-.q6,  .q6 a,  .color-q6,  .wowhead-tooltip .q6 a  { color: #e5cc80 !important; } /* Artifact */
-.q7,  .q7 a,  .color-q7,  .wowhead-tooltip .q7 a  { color: #e5cc80 !important; } /* Heirloom */
-.q8,  .q8 a,  .color-q8,  .wowhead-tooltip .q8 a  { color: #ffff98 !important; } /* Light yellow (item set bonuses) */
-.q9,  .q9 a,  .color-q9,  .wowhead-tooltip .q9 a  { color: #71d5ff !important; } /* Light blue (glyph type) */
-.q10, .q10 a, .color-q10, .wowhead-tooltip .q10 a { color: #ff4040 !important; } /* Red (requirement not met, error) */
+ .q,   .q  a, .color-q,   .wowhead-tooltip .q   a { color: #ffd100 !important } /* Default (yellow) */
+ .q0,  .q0 a, .color-q0,  .wowhead-tooltip .q0  a { color: #9d9d9d !important } /* Poor */
+ .q1,  .q1 a, .color-q1,  .wowhead-tooltip .q1  a { color: #ffffff !important } /* Common */
+ .q2,  .q2 a, .color-q2,  .wowhead-tooltip .q2  a { color: #1eff00 !important } /* Uncommon */
+ .q3,  .q3 a, .color-q3,  .wowhead-tooltip .q3  a { color: #0070dd !important } /* Rare */
+ .q4,  .q4 a, .color-q4,  .wowhead-tooltip .q4  a { color: #a335ee !important } /* Epic */
+ .q5,  .q5 a, .color-q5,  .wowhead-tooltip .q5  a { color: #ff8000 !important } /* Legendary */
+ .q6,  .q6 a, .color-q6,  .wowhead-tooltip .q6  a { color: #e5cc80 !important } /* Artifact */
+ .q7,  .q7 a, .color-q7,  .wowhead-tooltip .q7  a { color: #e5cc80 !important } /* Heirloom */
+ .q8,  .q8 a, .color-q8,  .wowhead-tooltip .q8  a { color: #ffff98 !important } /* Light yellow (item set bonuses) */
+ .q9,  .q9 a, .color-q9,  .wowhead-tooltip .q9  a { color: #71d5ff !important } /* Light blue (glyph type) */
+.q10, .q10 a, .color-q10, .wowhead-tooltip .q10 a { color: #ff4040 !important } /* Red (requirement not met, error) */
+.q13, .q13 a, .color-q13, .wowhead-tooltip .q13 a { color: #ffff98 !important }
 
 /*********************/
 /* DIFFICULTY COLORS */

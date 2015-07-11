@@ -513,6 +513,7 @@ CREATE TABLE `aowow_currencies` (
   `cuFlags` int(10) unsigned NOT NULL,
   `iconId` mediumint(9) NOT NULL,
   `itemId` int(16) NOT NULL,
+  `cap` mediumint(8) unsigned NOT NULL,
   `name_loc0` varchar(64) NOT NULL,
   `name_loc2` varchar(64) NOT NULL,
   `name_loc3` varchar(64) NOT NULL,

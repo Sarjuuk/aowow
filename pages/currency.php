@@ -21,6 +21,10 @@ class CurrencyPage extends GenericPage
     {
         parent::__construct($pageCall, $id);
 
+        // temp locale
+        if ($this->mode == CACHE_TYPE_TOOLTIP && isset($_GET['domain']))
+            Util::powerUseLocale($_GET['domain']);
+
         $this->typeId = intVal($id);
 
         $this->subject = new CurrencyList(array(['id', $this->typeId]));
@@ -52,10 +56,8 @@ class CurrencyPage extends GenericPage
 
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
-        if ($this->typeId == 103)                           // Arena Points
-            $infobox[] = Lang::currency('cap').Lang::main('colon').'10\'000';
-        else if ($this->typeId == 104)                      // Honor
-            $infobox[] = Lang::currency('cap').Lang::main('colon').'75\'000';
+        if ($_ = $this->subject->getField('cap'))
+            $infobox[] = Lang::currency('cap').Lang::main('colon').Lang::nf($_);
 
         /****************/
         /* Main Content */
@@ -68,6 +70,9 @@ class CurrencyPage extends GenericPage
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => true
         );
+
+        if ($_ = $this->subject->getField('description', true))
+            $this->extraText = $_;
 
         /**************/
         /* Extra Tabs */
@@ -224,6 +229,46 @@ class CurrencyPage extends GenericPage
             }
         }
     }
+
+   protected function generateTooltip($asError = false)
+    {
+        if ($asError)
+            return '$WowheadPower.registerCurrency('.$this->typeId.', '.User::$localeId.', {});';
+
+        $x = '$WowheadPower.registerCurrency('.$this->typeId.', '.User::$localeId.", {\n";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
+        $x .= "\ticon: '".urlencode($this->subject->getField('iconString'))."',\n";
+        $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
+        $x .= "});";
+
+        return $x;
+    }
+
+    public function display($override = '')
+    {
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
+            return parent::display($override);
+
+        if (!$this->loadCache($tt))
+        {
+            $tt = $this->generateTooltip();
+            $this->saveCache($tt);
+        }
+
+        header('Content-type: application/x-javascript; charset=utf-8');
+        die($tt);
+    }
+
+    public function notFound()
+    {
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
+            return parent::notFound(Lang::game('currency'), Lang::currency('notFound'));
+
+        header('Content-type: application/x-javascript; charset=utf-8');
+        echo $this->generateTooltip(true);
+        exit();
+    }
+
 }
 
 ?>

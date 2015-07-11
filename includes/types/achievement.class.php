@@ -207,7 +207,7 @@ class AchievementList extends BaseType
             }
 
             if ($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER)
-                $criteria .= '- '.Util::jsEscape($crtName).' <span class="moneygold">'.number_format($crt['value2' ] / 10000).'</span><br />';
+                $criteria .= '- '.Util::jsEscape($crtName).' <span class="moneygold">'.Lang::nf($crt['value2' ] / 10000).'</span><br />';
             else
                 $criteria .= '- '.Util::jsEscape($crtName).'<br />';
 

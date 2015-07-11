@@ -50,7 +50,7 @@ class UserPage extends GenericPage
         $infobox[] = Lang::user('lastLogin').Lang::main('colon').'[tooltip name=lastLogin]'.date('l, G:i:s', $this->user['prevLogin']).'[/tooltip][span class=tip tooltip=lastLogin]'.date(Lang::main('dateFmtShort'), $this->user['prevLogin']).'[/span]';
         $infobox[] = Lang::user('userGroups').Lang::main('colon').($groups ? implode(', ', $groups) : Lang::account('groups', -1));
         $infobox[] = Lang::user('consecVisits').Lang::main('colon').$this->user['consecutiveVisits'];
-        $infobox[] = Util::ucFirst(Lang::main('siteRep')).Lang::main('colon').number_format($this->user['sumRep']);
+        $infobox[] = Util::ucFirst(Lang::main('siteRep')).Lang::main('colon').Lang::nf($this->user['sumRep']);
 
         // contrib -> [url=http://www.wowhead.com/client]Data uploads: n [small]([tooltip=tooltip_totaldatauploads]xx.y MB[/tooltip])[/small][/url]
 
