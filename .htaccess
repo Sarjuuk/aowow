@@ -1,10 +1,14 @@
 Order Deny,Allow
-<FilesMatch "\.(conf|php|in)|aowow$">
-	Deny from all
+<FilesMatch "\.(conf|php|in)$">
+    Deny from all
 </FilesMatch>
 <FilesMatch "^(index)\.php$">
-	Allow from all
+    Allow from all
 </FilesMatch>
+
+<Files "aowow">
+    ForceType application/x-httpd-php
+</Files>
 
 # Block view of some folders
 Options -Indexes
@@ -13,8 +17,8 @@ DirectoryIndex index.php
 # Support for UTF8
 AddDefaultCharset utf8
 <IfModule mod_charset.c>
-	CharsetDisable on
-	CharsetRecodeMultipartForms Off
+    CharsetDisable on
+    CharsetRecodeMultipartForms Off
 </IfModule>
 
 # 5MB should be enough for the largest screenshots in the land
