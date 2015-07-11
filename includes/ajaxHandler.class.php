@@ -403,9 +403,10 @@ class AjaxHandler
                 }
 
                 if ($votes = DB::Aowow()->selectRow('SELECT 1 AS success, SUM(IF(value > 0, value, 0)) AS up, SUM(IF(value < 0, -value, 0)) AS down FROM ?_comments_rates WHERE commentId = ?d GROUP BY commentId', $this->get('id')))
-                    return json_encode($votes, JSON_NUMERIC_CHECK);
+                    $result = $votes;
+                else
+                    $result = ['success' => 1, 'up' => 0, 'down' => 0];
 
-                $result = ['success' => 1, 'up' => 0, 'down' => 0];
                 break;
             case 'vote':                                    // up, down and remove
                 if (!User::$id || !$this->get('id') || !$this->get('rating'))
@@ -504,44 +505,37 @@ class AjaxHandler
                 break;
             case 'add-reply':                               // also returns all replies on success
                 if (!User::canComment())
-                    $result = 'You are not allowed to reply.';
+                    return 'You are not allowed to reply.';
 
                 else if (!$this->post('body') || mb_strlen($this->post('body')) < $_minRpl || mb_strlen($this->post('body')) > $_maxRpl)
-                    $result = 'Your reply has '.mb_strlen($this->post('body')).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
+                    return 'Your reply has '.mb_strlen($this->post('body')).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
 
                 else if (!$this->post('commentId') || !DB::Aowow()->selectCell('SELECT 1 FROM ?_comments WHERE id = ?d', $this->post('commentId')))
-                    $result = Lang::main('genericError');
+                    return Lang::main('genericError');
 
                 else if (DB::Aowow()->query('INSERT INTO ?_comments (`userId`, `roles`, `body`, `date`, `replyTo`) VALUES (?d, ?d, ?, UNIX_TIMESTAMP(), ?d)', User::$id, User::$groups, $this->post('body'), $this->post('commentId')))
                     $result = CommunityContent::getCommentReplies($this->post('commentId'));
 
                 else
-                    $result = Lang::main('genericError');
+                    return Lang::main('genericError');
 
                 break;
             case 'edit-reply':                              // also returns all replies on success
                 if (!User::canComment())
-                    $result = 'You are not allowed to reply.';
+                    return 'You are not allowed to reply.';
 
-                else if (!$this->post('replyId') || $this->post('commentId'))
-                    $result = Lang::main('genericError');
+                else if (!$this->post('replyId') || !$this->post('commentId'))
+                    return Lang::main('genericError');
 
                 else if (!$this->post('body') || mb_strlen($this->post('body')) < $_minRpl || mb_strlen($this->post('body')) > $_maxRpl)
-                    $result = 'Your reply has '.mb_strlen($this->post('body')).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
+                    return 'Your reply has '.mb_strlen($this->post('body')).' characters and must have at least '.$_minRpl.' and at most '.$_maxRpl.'.';
 
-                if ($result)
-                    break;
+                if (DB::Aowow()->query('UPDATE ?_comments SET body = ?, editUserId = ?d, editDate = UNIX_TIMESTAMP(), editCount = editCount + 1 WHERE id = ?d AND replyTo = ?d{ AND userId = ?d}',
+                    $this->post('body'), User::$id, $this->post('replyId'), $this->post('commentId'), User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id))
+                        $result = CommunityContent::getCommentReplies($this->post('commentId'));
+                else
+                    return Lang::main('genericError');
 
-                $ok = DB::Aowow()->query(
-                    'UPDATE ?_comments SET body = ?, editUserId = ?d, editDate = UNIX_TIMESTAMP(), editCount = editCount + 1 WHERE id = ?d AND replyTo = ?d{ AND userId = ?d}',
-                    $this->post('body'),
-                    User::$id,
-                    $this->post('replyId'),
-                    $this->post('commentId'),
-                    User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
-                );
-
-                $result = $ok ? CommunityContent::getCommentReplies($this->post('commentId')) : Lang::main('genericError');
                 break;
             case 'detach-reply':
                 if (!User::isInGroup(U_GROUP_MODERATOR) || !$this->post('id'))
@@ -615,7 +609,7 @@ class AjaxHandler
                 }
         }
 
-        return json_encode($result, JSON_NUMERIC_CHECK);
+        return Util::toJSON($result);
     }
 
     private function handleLocale()                         // not sure if this should be here..
@@ -945,7 +939,7 @@ class AjaxHandler
 
             // get and apply inventory
             foreach ($itemz->iterate() as $iId => $__)
-                $buff .= 'g_items.add('.$iId.', {name_'.User::$localeString.":'".Util::jsEscape($itemz->getField('name', true))."', quality:".$itemz->getField('quality').", icon:'".$itemz->getField('iconString')."', jsonequip:".json_encode($data[$iId], JSON_NUMERIC_CHECK)."});\n";
+                $buff .= 'g_items.add('.$iId.', {name_'.User::$localeString.":'".Util::jsEscape($itemz->getField('name', true))."', quality:".$itemz->getField('quality').", icon:'".$itemz->getField('iconString')."', jsonequip:".Util::toJSON($data[$iId])."});\n";
 
             $buff .= "\n";
         }
@@ -971,7 +965,7 @@ class AjaxHandler
                     }
                 }
 
-                $buff .= 'g_spells.add('.$id.", {id:".$id.", name:'".Util::jsEscape(substr($data['name'], 1))."', icon:'".$data['icon']."', modifier:".json_encode($mods, JSON_NUMERIC_CHECK)."});\n";
+                $buff .= 'g_spells.add('.$id.", {id:".$id.", name:'".Util::jsEscape(substr($data['name'], 1))."', icon:'".$data['icon']."', modifier:".Util::toJSON($mods)."});\n";
             }
             $buff .= "\n";
         }
@@ -1010,7 +1004,7 @@ class AjaxHandler
         // $buff .= "\n\ng_excludes = {};";
 
         // add profile to buffer
-        $buff .= "\n\n\$WowheadProfiler.registerProfile(".json_encode($char->getEntry(2)).");"; // can't use JSON_NUMERIC_CHECK or the talent-string becomes a float
+        $buff .= "\n\n\$WowheadProfiler.registerProfile(".Util::toJSON($char->getEntry(2)).");"; // can't use JSON_NUMERIC_CHECK or the talent-string becomes a float
 
         return $buff."\n";
     }
@@ -1122,7 +1116,7 @@ class AjaxHandler
         // ssm_numPagesFound
 
         $pages = CommunityContent::getScreenshotPagesForManager(isset($this->get['all']), $nPages);
-        $buff  = 'ssm_screenshotPages = '.json_encode($pages, JSON_NUMERIC_CHECK).";\n";
+        $buff  = 'ssm_screenshotPages = '.Util::toJSON($pages).";\n";
         $buff .= 'ssm_numPagesFound = '.$nPages.';';
 
         return $buff;
@@ -1140,7 +1134,7 @@ class AjaxHandler
             if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', strtolower(urldecode($this->get('user')))))
                 $res = CommunityContent::getScreenshotsForManager(0, 0, $uId);
 
-        return 'ssm_screenshotData = '.json_encode($res, JSON_NUMERIC_CHECK);
+        return 'ssm_screenshotData = '.Util::toJSON($res);
     }
 
     // get: id => SSid

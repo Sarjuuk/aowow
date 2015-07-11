@@ -63,7 +63,7 @@ class Loot
             $stack[$i] = round(100 / (1 + $l['max'] - $l['min']), 3);
 
         // yes, it wants a string .. how weired is that..
-        return json_encode($stack, JSON_NUMERIC_CHECK);
+        return json_encode($stack, JSON_NUMERIC_CHECK);     // do not replace with Util::toJSON !
     }
 
     private function storeJSGlobals($data)
