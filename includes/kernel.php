@@ -158,7 +158,7 @@ if (!CLI)
 
     // Setup Session
     if (CFG_SESSION_CACHE_DIR && Util::checkOrCreateDirectory(CFG_SESSION_CACHE_DIR))
-        session_save_path(CFG_SESSION_CACHE_DIR);
+        session_save_path(getcwd().'/'.CFG_SESSION_CACHE_DIR);
 
     session_set_cookie_params(15 * YEAR, '/', '', $secure, true);
     session_cache_limiter('private');
