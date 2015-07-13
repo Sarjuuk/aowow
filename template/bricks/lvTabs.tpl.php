@@ -24,7 +24,7 @@ if (!empty($this->gemScores)):                              // inherited from it
 endif;
 
 if ($isTabbed):
-    echo "                var ".$tabVar." = new Tabs({parent: \$WH.ge('tabs-generic')});\n";
+    echo "                var ".$tabVar." = new Tabs({parent: \$WH.ge('tabs-generic')".(isset($this->type) ? ", trackable: '".ucfirst(Util::$typeStrings[$this->type]."'") : null)."});\n";
 endif;
 
 foreach ($this->lvTabs as $lv):

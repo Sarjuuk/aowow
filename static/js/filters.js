@@ -982,6 +982,11 @@ function fi_setCriteria(cr, crs, crv) {
     for (i = 0; i < _.length; ++i) {
         if (_[i].value == cr[0]) {
             _[i].selected = true;
+
+            if (fi_Lookup(cr[0])) {
+                g_trackEvent('Filters', fi_type, fi_Lookup(cr[0]).name);
+            }
+
             break;
         }
     }
@@ -990,6 +995,10 @@ function fi_setCriteria(cr, crs, crv) {
     var a = $WH.ge('fi_addcriteria');
     for (i = 1; i < cr.length && i < 5; ++i) {
         fi_criterionChange(fi_addCriterion(a, cr[i]), crs[i], crv[i]);
+
+        if (fi_Lookup(cr[i])) {
+            g_trackEvent('Filters', fi_type, fi_Lookup(cr[i]).name);
+        }
     }
 }
 

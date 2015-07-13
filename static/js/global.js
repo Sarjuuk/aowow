@@ -184,6 +184,21 @@ function g_setInnerHtml(n, text, nodeType) {
     }
 }
 
+function g_getFirstTextContent(node) {
+    for (var i = 0; i < node.childNodes.length; ++i) {
+        if (node.childNodes[i].nodeName == '#text') {
+            return node.childNodes[i].nodeValue;
+        }
+
+        var ret = g_getFirstTextContent(node.childNodes[i]);
+        if (ret) {
+            return ret;
+        }
+    }
+
+    return false;
+}
+
 function g_getTextContent(el) {
     var txt = '';
     for (var i = 0; i < el.childNodes.length; ++i) {
@@ -2383,6 +2398,8 @@ var ScreenshotViewer = new function() {
         imgDiv.innerHTML = html;
 
         if (!resizing) {
+            g_trackEvent('Screenshots', 'Show', screenshot.id + ( (screenshot.caption && screenshot.caption.length) ? ' (' + screenshot.caption + ')' : ''));
+
             if (screenshot.url) {
                 aOriginal.href = url;
             }
@@ -2970,6 +2987,8 @@ var VideoViewer = new function() {
         computeDimensions();
 
         if (!resizing) {
+            g_trackEvent('Videos', 'Show', video.id + (video.caption.length ? ' (' + video.caption + ')' : ''));
+
             if (video.videoType == 1) {
                 imgDiv.innerHTML = Markup.toHtml('[youtube=' + video.videoId + ' width=' + imgWidth + ' height=' + imgHeight + ' autoplay=true]', {mode:Markup.MODE_ARTICLE});
             }
@@ -4260,6 +4279,8 @@ function Tabs(opt) {
     if (this.onHide) {
         this.onHide = this.onHide.bind(this);
     }
+
+    this.trackClick = Tabs.trackClick.bind(this);
 }
 
 Tabs.prototype = {
@@ -4560,6 +4581,10 @@ Tabs.onShow = function(newTab, oldTab) {
         $WH.ge('tab-' + oldTab.id).style.display = 'none';
     }
 
+    if (this.poundedTab != null || oldTab) {
+        this.trackClick(newTab);
+    }
+
     _ = $WH.ge('tab-' + newTab.id);
     _.style.display = '';
 
@@ -4577,6 +4602,145 @@ Tabs.onShow = function(newTab, oldTab) {
         setTimeout($WH.g_scrollTo.bind(null, el, padd), 10);
     }
 };
+
+Tabs.trackClick = function(tab)
+{
+    if (!this.trackable || tab.tracked) {
+        return;
+    }
+
+    g_trackEvent('Tabs', 'Show', this.trackable + ': ' + tab.id);
+    tab.tracked = 1;
+}
+
+/*
+TODO: Create "Tracking" class
+*/
+
+function g_trackPageview(tag)
+{
+    function track()
+    {
+        if (typeof ga == 'function')
+            ga('send', 'pageview', tag);
+    };
+
+    $(document).ready(track);
+}
+
+function g_trackEvent(category, action, label, value)
+{
+    function track()
+    {
+        if (typeof ga == 'function')
+            ga('send', 'event', category, action, label, value);
+    };
+
+    $(document).ready(track);
+}
+
+function g_attachTracking(node, category, action, label, value)
+{
+    var $node = $(node);
+
+    $node.click(function() { g_trackEvent(category, action, label, value); });
+}
+
+function g_addAnalytics()
+{
+    var objs = {
+        'home-logo': {
+            'category': 'Homepage Logo',
+            'actions': {
+                'Click image': function(node) { return true; }
+            }
+        },
+        'home-featuredbox': {
+            'category': 'Featured Box',
+            'actions': {
+                'Follow link': function(node) { return (node.parentNode.className != 'home-featuredbox-links'); },
+                'Click image': function(node) { return (node.parentNode.className == 'home-featuredbox-links'); }
+            }
+        },
+        'home-oneliner': {
+            'category': 'Oneliner',
+            'actions': {
+                'Follow link': function(node) { return true; }
+            }
+        },
+        'sidebar-container': {
+            'category': 'Page sidebar',
+            'actions': {
+                'Click image': function(node) { return true; }
+            }
+        },
+        'toptabs-promo': {
+            'category': 'Page header',
+            'actions': {
+                'Click image': function(node) { return true; }
+            }
+        }
+    };
+
+    for (var i in objs)
+    {
+        var e = $WH.ge(i);
+        if (e)
+            g_addAnalyticsToNode(e, objs[i]);
+    }
+}
+
+function g_getNodeTextId(node)
+{
+    var
+        id   = null,
+        text = g_getFirstTextContent(node);
+
+    if (text)
+        id = g_urlize(text);
+    else if (node.title)
+        id = g_urlize(node.title);
+    else if (node.id)
+        id = g_urlize(node.id);
+
+    return id;
+}
+
+function g_addAnalyticsToNode(node, opts, labelPrefix)
+{
+    if (!opts || !opts.actions || !opts.category)
+    {
+        if ($WH.isset('g_dev') && g_dev)
+        {
+            console.log('Tried to add analytics event without appropriate parameters.');
+            console.log(node);
+            console.log(opts);
+        }
+
+        return;
+    }
+
+    var category = opts.category;
+    var tags = $WH.gE(node, 'a');
+    for (var i = 0; i < tags.length; ++i)
+    {
+        var node = tags[i];
+        var action = 'Follow link';
+        for (var a in opts.actions)
+        {
+            if (opts.actions[a] && opts.actions[a](node))
+            {
+                action = a;
+                break;
+            }
+        }
+        var label = (labelPrefix ? labelPrefix + '-' : '') + g_getNodeTextId(node);
+
+        g_attachTracking(node, category, action, label);
+    }
+}
+
+$(document).ready(g_addAnalytics);
 
 var g_listviews = {};
 
@@ -4997,6 +5161,8 @@ function Listview(opt) {
             id: this.id,
             onLoad: this.initialize.bind(this)
         });
+
+        this.tabClick = Tabs.trackClick.bind(this.tabs, this.tabs.tabs[this.tabIndex]);
     }
     else {
         this.initialize();
@@ -19521,6 +19687,39 @@ var ModelViewer = new function() {
             setTimeout(render, 1);
         }
 
+        var trackCode = '';
+        if (opt.fromTag)
+        {
+            trackCode += 'Custom ';
+            switch (opt.type)
+            {
+                case 1: // npc
+                    trackCode += 'NPC ' + opt.displayId + (opt.humanoid ? ' humanoid' : ''); break;
+                case 2: // object
+                    trackCode += 'Object ' + opt.displayId; break;
+                case 3: // item
+                    trackCode += 'Item ' + opt.displayId + ' Slot ' + (opt.slot | 0); break;
+                case 4: // item set
+                    trackCode += 'Item set ' + equipList.join('.'); break;
+            }
+        }
+        else
+        {
+            switch (opt.type)
+            {
+                case 1: // npc
+                    trackCode += 'NPC ' + (opt.typeId ? opt.typeId : ' DisplayID ' + opt.displayId); break;
+                case 2: // object
+                    trackCode += 'Object ' + opt.typeId; break;
+                case 3: // item
+                    trackCode += 'Item ' + opt.typeId; break;
+                case 4: // item set
+                    trackCode += 'Item set ' + equipList.join('.'); break;
+            }
+        }
+
+        g_trackEvent('Model Viewer', 'Show', g_urlize(trackCode));
+
         oldHash = location.hash;
     }
 
@@ -20505,6 +20704,7 @@ Announcement.prototype = {
         // todo: iron out the quirks
         this.parentDiv.style.opacity = '100';
         this.parentDiv.style.height = (this.parentDiv.offsetHeight + 10) + 'px'; // + margin-bottom of child
+        g_trackEvent('Announcements', 'Show', '' + this.name);
     },
 
     hide: function() {
@@ -20525,6 +20725,7 @@ Announcement.prototype = {
     },
 
     markRead: function() {
+        g_trackEvent('Announcements', 'Close', '' + this.name);
         g_setWowheadCookie('announcement-' + this.id, 'closed');
         // $WH.sc('announcement-' + this.id, 20, 'closed', "/", location.hostname);
         this.hide();
@@ -20538,6 +20739,12 @@ Announcement.prototype = {
     setText: function(text) {
         this.text = text;
         Markup.printHtml(this.text, this.parent + '-markup');
+        g_addAnalyticsToNode($WH.ge(this.parent + '-markup'), {
+            'category': 'Announcements',
+            'actions': {
+                'Follow link': function(node) { return true; }
+            }
+        }, this.id);
     }
 };
 
