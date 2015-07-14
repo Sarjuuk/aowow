@@ -346,7 +346,8 @@ CREATE TABLE `aowow_comments` (
   `responseUserId` int(10) unsigned NOT NULL DEFAULT '0',
   `responseBody` text,
   `responseRoles` smallint(5) unsigned NOT NULL DEFAULT '0',
-  UNIQUE KEY `id` (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `type_typeId` (`type`, `typeId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
