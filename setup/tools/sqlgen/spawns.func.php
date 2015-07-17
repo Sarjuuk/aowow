@@ -56,25 +56,26 @@ function spawns()                                           // and waypoints
         $result   = [];
         $capitals = array(                                  // capitals take precedence over their surroundings
             1497, 1637, 1638, 3487,                         // Undercity,      Ogrimmar,  Thunder Bluff, Silvermoon City
-            1519, 1537, 1657, 3557                          // Stormwind City, Ironforge, Darnassus,     The Exodar
+            1519, 1537, 1657, 3557,                         // Stormwind City, Ironforge, Darnassus,     The Exodar
+            3703, 4395                                      // Shattrath City, Dalaran
         );
 
         foreach ($points as $res)
         {
-            // some rough measure how central the spawn is on the map (the lower the number, the better)
-            // 0: perfect center; 1: touches a border
-            $q = abs( (($res['posX'] - 50) / 50) * (($res['posY'] - 50) / 50) );
-
-            if (in_array($res['areaId'], $capitals))        // capitals may also be auto-discovered
-                return $res;
-            else if ($alphaMapCheck($res['areaId'], $res))
+            if ($alphaMapCheck($res['areaId'], $res))
             {
                 if (!$res)
                     continue;
 
+                // some rough measure how central the spawn is on the map (the lower the number, the better)
+                // 0: perfect center; 1: touches a border
+                $q = abs( (($res['posX'] - 50) / 50) * (($res['posY'] - 50) / 50) );
+
                 if (empty($result) || $result[0] > $q)
                     $result = [$q, $res];
             }
+            else if (in_array($res['areaId'], $capitals))   // capitals (auto-discovered) and no hand-made alphaMap available
+                return $res;
             else if (empty($result))                        // add with lowest quality if alpha map is missing
                 $result = [1.0, $res];
         }
@@ -119,6 +120,14 @@ function spawns()                                           // and waypoints
                  'WHERE wma.mapId = ?d AND IF(?d, wma.areaId = ?d, wma.areaId <> 0) ' .
                  'HAVING (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9) AND (dm.Id IS NULL OR ?d) ' .
                  'ORDER BY quality ASC';
+
+
+    /*********************/
+    /* truncate old data */
+    /*********************/
+
+    DB::Aowow()->query('TRUNCATE TABLE ?_spawns');
+    DB::Aowow()->query('TRUNCATE TABLE ?_creature_waypoints');
 
 
     /**************************/
@@ -205,6 +214,7 @@ function spawns()                                           // and waypoints
         }
     }
 
+
     /*****************************/
     /* spawn vehicle accessories */
     /*****************************/
@@ -247,6 +257,7 @@ function spawns()                                           // and waypoints
     }
     if ($accessories)
         CLISetup::log(count($accessories).' accessories could not be fitted onto a spawned vehicle.', CLISetup::LOG_WARN);
+
 
     /********************************/
     /* restrict difficulty displays */
