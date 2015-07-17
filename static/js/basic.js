@@ -1458,13 +1458,25 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
     });
 
     // Rating to percent
+    nMatch = [];
     tooltip = tooltip.replace(/(<!--rtg%(\d+)-->)([\.0-9]+)/g, function(_all, prefix, ratingId, percent) {
+/*  sarjuuk: fix tooltips with multiple occurences of the same rating
         _ = tooltip.match(new RegExp('<!--rtg' + ratingId + '-->(\\d+)'));
         if (!_) {
             return _all;
         }
 
         return prefix + Math.round($WH.g_convertRatingToPercent(level, ratingId, _[1]) * 100) / 100;
+*/
+    if (!nMatch[ratingId])
+        nMatch[ratingId] = 0;
+
+        _ = tooltip.match(new RegExp('<!--rtg' + ratingId + '-->(\\d+)', 'g'))[nMatch[ratingId]++];
+        if (!_) {
+            return _all;
+        }
+
+        return prefix + Math.round($WH.g_convertRatingToPercent(level, ratingId, _.split('>')[1]) * 100) / 100;
     });
 
     // Level

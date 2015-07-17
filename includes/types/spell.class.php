@@ -798,6 +798,7 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
+    // returns [min, max, minFulltext, maxFulltext, ratingId]
     private function resolveVariableString($variable, &$usesScalingRating)
     {
         $signs  = ['+', '-', '/', '*', '%', '^'];
@@ -809,8 +810,10 @@ class SpellList extends BaseType
         $effIdx = $variable[6] ? null         : $variable[9];
         $switch = $variable[7] ? explode(':', $variable[7]) : null;
 
+        $result = [null];
+
         if (!$var)
-            return;
+            return $result;
 
         if (!$effIdx)                                       // if EffectIdx is omitted, assume EffectIdx: 1
             $effIdx = 1;
@@ -819,111 +822,92 @@ class SpellList extends BaseType
         if ($lookup && !isset($this->refSpells[$lookup]))
             $this->refSpells[$lookup] = new SpellList(array(['s.id', $lookup]));
 
+        $srcSpell = $lookup ? $this->refSpells[$lookup] : $this;
+
         switch ($var)
         {
             case 'a':                                       // EffectRadiusMin
             case 'A':                                       // EffectRadiusMax
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'RadiusMax');
-                else
-                    $base = $this->getField('effect'.$effIdx.'RadiusMax');
+                $base = $srcSpell->getField('effect'.$effIdx.'RadiusMax');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'b':                                       // PointsPerComboPoint
             case 'B':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'PointsPerComboPoint');
-                else
-                    $base = $this->getField('effect'.$effIdx.'PointsPerComboPoint');
+                $base = $srcSpell->getField('effect'.$effIdx.'PointsPerComboPoint');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'd':                                       // SpellDuration
             case 'D':                                       // todo (med): min/max?; /w unit?
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('duration');
-                else
-                    $base = $this->getField('duration');
+                $base = $srcSpell->getField('duration');
 
                 if ($base <= 0)
-                    return Lang::spell('untilCanceled');
+                    $result[2] = Lang::spell('untilCanceled');
+                else
+                    $result[2] = Util::formatTime($base, true);
 
-                if ($op && is_numeric($oparg) && is_numeric($base))
+                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return explode(' ', Util::formatTime(abs($base), true));
+                $result[0] = $base < 0 ? 0 : $base;
+                break;
             case 'e':                                       // EffectValueMultiplier
             case 'E':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'ValueMultiplier');
-                else
-                    $base = $this->getField('effect'.$effIdx.'ValueMultiplier');
+                $base = $srcSpell->getField('effect'.$effIdx.'ValueMultiplier');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'f':                                       // EffectDamageMultiplier
             case 'F':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'DamageMultiplier');
-                else
-                    $base = $this->getField('effect'.$effIdx.'DamageMultiplier');
+                $base = $srcSpell->getField('effect'.$effIdx.'DamageMultiplier');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'g':                                       // boolean choice with casters gender as condition $gX:Y;
             case 'G':
-                return '&lt;'.$switch[0].'/'.$switch[1].'&gt;';
+                $result[2] = '&lt;'.$switch[0].'/'.$switch[1].'&gt;';
+                break;
             case 'h':                                       // ProcChance
             case 'H':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('procChance');
-                else
-                    $base = $this->getField('procChance');
+                $base = $srcSpell->getField('procChance');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'i':                                       // MaxAffectedTargets
             case 'I':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('maxAffectedTargets');
-                else
-                    $base = $this->getField('maxAffectedTargets');
+                $base = $srcSpell->getField('maxAffectedTargets');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'l':                                       // boolean choice with last value as condition $lX:Y;
             case 'L':
-                return '$l'.$switch[0].':'.$switch[1];      // resolve later by backtracking
+                $result[2] = '$l'.$switch[0].':'.$switch[1];// resolve later by backtracking
+                break;
             case 'm':                                       // BasePoints (minValue)
             case 'M':                                       // BasePoints (maxValue)
-                if ($lookup)
-                {
-                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'BasePoints');
-                    $add  = $this->refSpells[$lookup]->getField('effect'.$effIdx.'DieSides');
-                    $mv   = $this->refSpells[$lookup]->getField('effect'.$effIdx.'MiscValue');
-                    $aura = $this->refSpells[$lookup]->getField('effect'.$effIdx.'AuraId');
-
-                }
-                else
-                {
-                    $base = $this->getField('effect'.$effIdx.'BasePoints');
-                    $add  = $this->getField('effect'.$effIdx.'DieSides');
-                    $mv   = $this->getField('effect'.$effIdx.'MiscValue');
-                    $aura = $this->getField('effect'.$effIdx.'AuraId');
-                }
+                $base = $srcSpell->getField('effect'.$effIdx.'BasePoints');
+                $add  = $srcSpell->getField('effect'.$effIdx.'DieSides');
+                $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
+                $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
 
                 if (ctype_lower($var))
                     $add = 1;
@@ -940,37 +924,28 @@ class SpellList extends BaseType
                         $usesScalingRating = true;
                 // Aura end
 
-                if ($rType && $this->interactive && $aura == 189)
-                    return '<!--rtg'.$rType.'-->'.abs($base).'&nbsp;<small>('.sprintf(Util::$setRatingLevelString, $this->charLevel, $rType, abs($base), Util::setRatingLevel($this->charLevel, $rType, abs($base))).')</small>';
-                else if ($rType && $aura == 189)
-                    return '<!--rtg'.$rType.'-->'.abs($base).'&nbsp;<small>('.Util::setRatingLevel($this->charLevel, $rType, abs($base)).')</small>';
-                else
-                    return $base;
+                if ($rType)
+                {
+                    $result[2] = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
+                    $result[4] = $rType;
+                }
+
+                $result[0] = $base;
+                break;
             case 'n':                                       // ProcCharges
             case 'N':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('procCharges');
-                else
-                    $base = $this->getField('procCharges');
+                $base = $srcSpell->getField('procCharges');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'o':                                       // TotalAmount for periodic auras (with variance)
             case 'O':
-                if ($lookup)
-                {
-                    list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx, $this->refSpells[$lookup]);
-                    $periode  = $this->refSpells[$lookup]->getField('effect'.$effIdx.'Periode');
-                    $duration = $this->refSpells[$lookup]->getField('duration');
-                }
-                else
-                {
-                    list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx);
-                    $periode  = $this->getField('effect'.$effIdx.'Periode');
-                    $duration = $this->getField('duration');
-                }
+                list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx, $srcSpell);
+                $periode  = $srcSpell->getField('effect'.$effIdx.'Periode');
+                $duration = $srcSpell->getField('duration');
 
                 if (!$periode)
                     $periode = 3000;
@@ -980,49 +955,45 @@ class SpellList extends BaseType
                 $equal = $min == $max;
 
                 if (in_array($op, $signs) && is_numeric($oparg))
-                    if ($equal)
-                        eval("\$min = $min $op $oparg;");
+                {
+                    eval("\$min = $min $op $oparg;");
+                    if (!$equal)
+                        eval("\$max = $max $op $oparg;");
+                }
 
                 if ($this->interactive)
-                    return $modStrMin.$min . (!$equal ? Lang::game('valueDelim') . $modStrMax.$max : null);
-                else
-                    return $min . (!$equal ? Lang::game('valueDelim') . $max : null);
+                {
+                    $result[2] = $modStrMin.'%s';
+                    $result[3] = $modStrMax.'%s';
+                }
+
+                $result[0] = $min;
+                $result[1] = $max;
+                break;
             case 'q':                                       // EffectMiscValue
             case 'Q':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'MiscValue');
-                else
-                    $base = $this->getField('effect'.$effIdx.'MiscValue');
+                $base = $srcSpell->getField('effect'.$effIdx.'MiscValue');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'r':                                       // SpellRange
             case 'R':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('rangeMaxHostile');
-                else
-                    $base = $this->getField('rangeMaxHostile');
+                $base = $srcSpell->getField('rangeMaxHostile');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 's':                                       // BasePoints (with variance)
             case 'S':
-                if ($lookup)
-                {
-                    list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx, $this->refSpells[$lookup]);
-                    $mv   = $this->refSpells[$lookup]->getField('effect'.$effIdx.'MiscValue');
-                    $aura = $this->refSpells[$lookup]->getField('effect'.$effIdx.'AuraId');
-                }
-                else
-                {
-                    list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx);
-                    $mv   = $this->getField('effect'.$effIdx.'MiscValue');
-                    $aura = $this->getField('effect'.$effIdx.'AuraId');
-                }
+                list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx, $srcSpell);
+                $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
+                $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
+
                 $equal = $min == $max;
 
                 if (in_array($op, $signs) && is_numeric($oparg))
@@ -1039,66 +1010,70 @@ class SpellList extends BaseType
                         $usesScalingRating = true;
                 // Aura end
 
-                if ($rType && $equal && $this->interactive && $aura == 189)
-                    return '<!--rtg'.$rType.'-->'.$min.'&nbsp;<small>('.sprintf(Util::$setRatingLevelString, $this->charLevel, $rType, $min, Util::setRatingLevel($this->charLevel, $rType, $min)).')</small>';
-                else if ($rType && $equal && $aura == 189)
-                    return '<!--rtg'.$rType.'-->'.$min.'&nbsp;<small>('.Util::setRatingLevel($this->charLevel, $rType, $min).')</small>';
-                else if ($this->interactive && $aura == 189)
-                    return $modStrMin.$min . (!$equal ? Lang::game('valueDelim') . $modStrMax.$max : null);
-                else
-                    return $min . (!$equal ? Lang::game('valueDelim') . $max : null);
+                if ($rType)
+                {
+                    $result[2] = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
+                    $result[4] = $rType;
+                }
+                else if ($aura == 189 && $this->interactive)
+                {
+                    $result[2] = $modStrMin.'%s';
+                    $result[3] = $modStrMax.'%s';
+                }
+
+                $result[0] = $min;
+                $result[1] = $max;
+                break;
             case 't':                                       // Periode
             case 'T':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'Periode') / 1000;
-                else
-                    $base = $this->getField('effect'.$effIdx.'Periode') / 1000;
+                $base = $srcSpell->getField('effect'.$effIdx.'Periode') / 1000;
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'u':                                       // StackCount
             case 'U':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('stackAmount');
-                else
-                    $base = $this->getField('stackAmount');
+                $base = $srcSpell->getField('stackAmount');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'v':                                   // MaxTargetLevel
             case 'V':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('MaxTargetLevel');
-                else
-                    $base = $this->getField('MaxTargetLevel');
+                $base = $srcSpell->getField('MaxTargetLevel');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'x':                                   // ChainTargetCount
             case 'X':
-                if ($lookup)
-                    $base = $this->refSpells[$lookup]->getField('effect'.$effIdx.'ChainTarget');
-                else
-                    $base = $this->getField('effect'.$effIdx.'ChainTarget');
+                $base = $srcSpell->getField('effect'.$effIdx.'ChainTarget');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                return $base;
+                $result[0] = $base;
+                break;
             case 'z':                                   // HomeZone
-                return Lang::spell('home');
+                $result[2] = Lang::spell('home');
+                break;
         }
+
+        return $result;
     }
 
     // description-, buff-parsing component
     private function resolveFormulaString($formula, $precision = 0, &$scaling)
     {
+        $fSuffix = '%s';
+        $fRating = 0;
+
         // step 1: formula unpacking redux
         while (($formStartPos = strpos($formula, '${')) !== false)
         {
@@ -1133,7 +1108,7 @@ class SpellList extends BaseType
                 ++$formCurPos;                              // for some odd reason the precision decimal survives if we dont increment further..
             }
 
-            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
+            list($formOutStr, $fSuffix, $fRating) = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
 
             $formula = substr_replace($formula, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
@@ -1141,7 +1116,6 @@ class SpellList extends BaseType
         // step 2: resolve variables
         $pos    = 0;                                        // continue strpos-search from this offset
         $str    = '';
-        $suffix = '';
         while (($npos = strpos($formula, '$', $pos)) !== false)
         {
             if ($npos != $pos)
@@ -1159,14 +1133,17 @@ class SpellList extends BaseType
             }
             $pos += strlen($result[0]);
 
-            $var = $this->resolveVariableString($result, $scaling);
-            if (is_array($var))
-            {
-                $str   .= $var[0];
-                $suffix = ' '.$var[1];
-            }
-            else
-                $str .= $var;
+            // we are resolving a formula -> omit ranges
+            $var  = $this->resolveVariableString($result, $scaling);
+            $str .= $var[0];
+
+            // overwrite eventually inherited strings
+            if (isset($var[2]))
+                $fSuffix = $var[2];
+
+            // overwrite eventually inherited ratings
+            if (isset($var[4]))
+                $fRating = $var[4];
         }
         $str .= substr($formula, $pos);
         $str  = str_replace('#', '$', $str);                // reset marks
@@ -1175,7 +1152,7 @@ class SpellList extends BaseType
         $evaled = $this->resolveEvaluation($str);
 
         $return = is_numeric($evaled) ? Lang::nf($evaled, $precision) : $evaled;
-        return $return.$suffix;
+        return [$return, $fSuffix, $fRating];
     }
 
     // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
@@ -1432,9 +1409,16 @@ class SpellList extends BaseType
                 $formPrecision = $data[$formCurPos + 1];
                 $formCurPos += 2;
             }
-            $formOutStr = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
+            list($formOutVal, $formOutStr, $ratingId) = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
 
-            $data = substr_replace($data, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
+            if ($ratingId && is_numeric($formOutVal) && $this->interactive)
+                $resolved = sprintf($formOutStr, $ratingId, abs($formOutVal), sprintf(Util::$setRatingLevelString, $this->charLevel, $ratingId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $ratingId, abs($formOutVal))));
+            else if ($ratingId && is_numeric($formOutVal))
+                $resolved = sprintf($formOutStr, $ratingId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $ratingId, abs($formOutVal)));
+            else
+                $resolved = sprintf($formOutStr, is_numeric($formOutVal) ? abs($formOutVal) : $formOutVal);
+
+            $data = substr_replace($data, $resolved, $formStartPos, ($formCurPos - $formStartPos));
         }
 
     // step 4: find and eliminate regular variables
@@ -1460,10 +1444,25 @@ class SpellList extends BaseType
             $pos += strlen($result[0]);
 
             $var = $this->resolveVariableString($result, $scaling);
-            $resolved = is_array($var) ? $var[0] : $var;
-            $str .= is_numeric($resolved) ? abs($resolved) : $resolved;
-            if (is_array($var))
-                $str .= ' '.$var[1];
+            $resolved = is_numeric($var[0]) ? abs($var[0]) : $var[0];
+            if (isset($var[2]))
+            {
+                if (isset($var[4]) && $this->interactive)
+                    $resolved = sprintf($var[2], $var[4], abs($var[0]), sprintf(Util::$setRatingLevelString, $this->charLevel, $var[4], abs($var[0]), Util::setRatingLevel($this->charLevel, $var[4], abs($var[0]))));
+                else if (isset($var[4]))
+                    $resolved = sprintf($var[2], $var[4], abs($var[0]), Util::setRatingLevel($this->charLevel, $var[4], abs($var[0])));
+                else
+                    $resolved = sprintf($var[2], $resolved);
+            }
+
+            if (isset($var[1]) && $var[0] != $var[1] && !isset($var[4]))
+            {
+                $_ = is_numeric($var[0]) ? abs($var[0]) : $var[0];
+                $resolved .= Lang::game('valueDelim');
+                $resolved .= isset($var[3]) ? sprintf($var[3], $_) : $_;
+            }
+
+            $str .= $resolved;
         }
         $str .= substr($data, $pos);
         $str = str_replace('#', '$', $str);                 // reset marker
