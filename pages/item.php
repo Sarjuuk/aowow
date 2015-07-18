@@ -346,15 +346,26 @@ class ItemPage extends genericPage
         // pageText
         if ($next = $this->subject->getField('pageTextId'))
         {
-            $this->addJS('Book.js');
-            $this->addCSS(['path' => 'Book.css']);
-
             while ($next)
             {
-                $row = DB::World()->selectRow('SELECT *, text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.entry = lpt.entry WHERE pt.entry = ?d', $next);
-                $next = $row['next_page'];
-                $this->pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
+                if ($row = DB::World()->selectRow('SELECT *, text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.entry = lpt.entry WHERE pt.entry = ?d', $next))
+                {
+                    $next = $row['next_page'];
+                    $this->pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
+                }
+                else
+                {
+                    Util::addNote(U_GROUP_STAFF, 'Referenced PageTextId #'.$next.' is not in DB');
+                    break;
+                }
             }
+        }
+
+        // add conditional js & css
+        if ($this->pageText)
+        {
+            $this->addJS('Book.js');
+            $this->addCSS(['path' => 'Book.css']);
         }
 
         // subItems
