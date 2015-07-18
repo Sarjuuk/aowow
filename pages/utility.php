@@ -214,7 +214,7 @@ class UtilityPage extends GenericPage
                         continue;
 
                     $comments = DB::Aowow()->selectCol('
-                        SELECT   `typeId` AS ARRAY_KEY, count(1) AS nComments FROM ?_comments
+                        SELECT   `typeId` AS ARRAY_KEY, count(1) AS ncomments FROM ?_comments
                         WHERE    `replyTo` = 0 AND (`flags` & ?d) = 0 AND `type`= ?d AND `date` > (UNIX_TIMESTAMP() - ?d)
                         GROUP BY `type`, `typeId`
                         LIMIT    100',
