@@ -175,7 +175,7 @@ class Loot
             }
             else                                            // shouldn't have happened
             {
-                Util::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: unhandled case in calculating chance for item '.$entry['Item'].'!');
+                Util::logError('Unhandled case in calculating chance for item '.$entry['Item'].'!');
                 continue;
             }
 
@@ -189,7 +189,7 @@ class Loot
                 $sum = 0;
             else if ($sum >= 100.01)
             {
-                Util::addNote(U_GROUP_EMPLOYEE, 'Loot::getByContainerRecursive: entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
+                Util::logError('Loot entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
                 $sum = 100;
             }
 
@@ -378,13 +378,13 @@ class Loot
             {
                 // check for possible database inconsistencies
                 if (!$ref['chance'] && !$ref['isGrouped'])
-                    Util::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
+                    Util::logError('Loot by Item: Ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] > 100)
-                    Util::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
+                    Util::logError('Loot by Item: Group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
 
                 if ($ref['isGrouped'] && $ref['sumChance'] >= 100 && !$ref['chance'])
-                    Util::addNote(U_GROUP_EMPLOYEE, 'Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
+                    Util::logError('Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
 
                 $chance = abs($ref['chance'] ?: (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
 

@@ -190,7 +190,7 @@ class CommunityContent
             }
             else
             {
-                Util::addNote(U_GROUP_STAFF, 'CommunityClass::getCommentPreviews - comment '.$c['id'].' belongs to nonexistant subject');
+                Util::logError('Comment '.$c['id'].' belongs to nonexistant subject.', E_USER_NOTICE);
                 unset($comments[$idx]);
             }
         }
@@ -341,7 +341,7 @@ class CommunityContent
             {
                 if (empty($p['name']))
                 {
-                    Util::addNote(U_GROUP_STAFF | U_GROUP_SCREENSHOT, 'AdminPage::handleScreenshots() - Screenshot linked to nonexistant type/typeId combination '.$p['type'].'/'.$p['typeId']);
+                    Util::logError('Screenshot linked to nonexistant type/typeId combination: '.$p['type'].'/'.$p['typeId'], E_USER_NOTICE);
                     unset($p);
                 }
                 else

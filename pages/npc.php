@@ -509,7 +509,7 @@ class NpcPage extends GenericPage
                 }
             }
             else
-                Util::addNote(U_GROUP_EMPLOYEE, 'NPC '.$this->typeId.' is flagged as trainer, but doesn\'t have any spells set');
+                Util::logError('NPC '.$this->typeId.' is flagged as trainer, but doesn\'t have any spells set');
         }
 
         // tab: sells

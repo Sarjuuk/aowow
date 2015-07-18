@@ -355,7 +355,7 @@ class ItemPage extends genericPage
                 }
                 else
                 {
-                    Util::addNote(U_GROUP_STAFF, 'Referenced PageTextId #'.$next.' is not in DB');
+                    Util::logError('Referenced PageTextId #'.$next.' is not in DB');
                     break;
                 }
             }

@@ -323,6 +323,8 @@ class GenericPage
         // display occured notices
         if ($_ = Util::getNotes())
         {
+            array_unshift($_, 'One or more errors occured, while generating this page.');
+
             $this->announcements[0] = array(
                 'parent' => 'announcement-0',
                 'id'     => 0,

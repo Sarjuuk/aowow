@@ -73,7 +73,7 @@ foreach ($sets as $k => $v)
     // this should not have been possible
     if (!strlen($v['value']) && !($v['flags'] & CON_FLAG_TYPE_STRING) && !$php)
     {
-        Util::addNote(U_GROUP_ADMIN | U_GROUP_DEV, 'Kernel: Aowow config value CFG_'.strtoupper($k).' is empty - config will not be used!');
+        Util::logError('Aowow config value CFG_'.strtoupper($k).' is empty - config will not be used!', E_USER_ERROR);
         continue;
     }
 
@@ -87,12 +87,12 @@ foreach ($sets as $k => $v)
         $val = preg_replace('/[^\p{L}0-9~\s_\-\'\/\.:,]/ui', '', $v['value']);
     else if ($php)
     {
-        Util::addNote(U_GROUP_ADMIN | U_GROUP_DEV, 'Kernel: PHP config value '.strtolower($k).' has no type set - config will not be used!');
+        Util::logError('PHP config value '.strtolower($k).' has no type set - config will not be used!', E_USER_ERROR);
         continue;
     }
     else // if (!$php)
     {
-        Util::addNote(U_GROUP_ADMIN | U_GROUP_DEV, 'Kernel: Aowow config value CFG_'.strtoupper($k).' has no type set - value forced to 0!');
+        Util::logError('Aowow config value CFG_'.strtoupper($k).' has no type set - value forced to 0!', E_USER_ERROR);
         $val = 0;
     }
 
@@ -105,9 +105,10 @@ foreach ($sets as $k => $v)
 
 // handle occuring errors
 error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0);
-$errHandled = false;
-set_error_handler(function($errNo, $errStr, $errFile, $errLine) use (&$errHandled) {
+set_error_handler(function($errNo, $errStr, $errFile, $errLine) {
     $errName = 'unknown error';                             // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
+    $uGroup  = U_GROUP_EMPLOYEE;
+
     if ($errNo == E_WARNING)                                // 0x0002
         $errName = 'E_WARNING';
     else if ($errNo == E_PARSE)                             // 0x0004
@@ -120,26 +121,18 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine) use (&$errHandle
         $errName = 'E_USER_WARNING';
     else if ($errNo == E_USER_NOTICE)                       // 0x0400
         $errName = 'E_USER_NOTICE';
+        $uGroup  = U_GROUP_STAFF;
     else if ($errNo == E_RECOVERABLE_ERROR)                 // 0x1000
         $errName = 'E_RECOVERABLE_ERROR';
 
-    if (User::isInGroup(U_GROUP_STAFF))
-    {
-        if (!$errHandled)
-        {
-            Util::addNote(U_GROUP_STAFF, 'one or more php related error occured, while generating this page.');
-            $errHandled = true;
-        }
-
-        Util::addNote(U_GROUP_STAFF, $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine);
-    }
+    Util::addNote($uGroup, $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine);
 
     if (DB::isConnectable(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
             AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $errStr
         );
 
-    return !((User::isInGroup(U_GROUP_STAFF) && defined('CFG_DEBUG') && CFG_DEBUG) || CLI);
+    return true;
 }, E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
 
 
@@ -158,7 +151,7 @@ if (!CLI)
 
     // Setup Session
     if (CFG_SESSION_CACHE_DIR && Util::checkOrCreateDirectory(CFG_SESSION_CACHE_DIR))
-        session_save_path(getcwd().'/'.CFG_SESSION_CACHE_DIR);
+        session_save_path(CFG_SESSION_CACHE_DIR);
 
     session_set_cookie_params(15 * YEAR, '/', '', $secure, true);
     session_cache_limiter('private');

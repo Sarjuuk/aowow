@@ -218,7 +218,7 @@ class EventPage extends GenericPage
                 if ($v > 0)
                     $list[] = $v;
                 else if ($v === null)
-                    Util::addNote(U_GROUP_EMPLOYEE, 'game_event_prerequisite: this event has itself as prerequisite');
+                    Util::logError('game_event_prerequisite: this event has itself as prerequisite');
             });
 
             if ($list)

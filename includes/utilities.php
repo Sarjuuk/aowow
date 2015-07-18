@@ -698,19 +698,23 @@ class Util
     public static $wowheadLink              = '';
     private static $notes                   = [];
 
-    // creates an announcement; use if minor issues arise
+    public static function logError($errStr, $mode = E_USER_WARNING)
+    {
+        // handled by set_error_handler
+        trigger_error($errStr, $mode);
+    }
+
     public static function addNote($uGroupMask, $str)
     {
-        // todo (med): log all those errors to DB
         self::$notes[] = [$uGroupMask, $str];
     }
 
-    public static function getNotes($restricted = true)
+    public static function getNotes()
     {
         $notes = [];
 
         foreach (self::$notes as $data)
-            if (!$restricted || !$data[0] || User::isInGroup($data[0]))
+            if (!$data[0] || User::isInGroup($data[0]))
                 $notes[] = $data[1];
 
         return $notes;
@@ -1718,9 +1722,9 @@ class Util
         $path = preg_replace('|/+|', '/', $path);
 
         if (!is_dir($path) && !@mkdir($path, self::FILE_ACCESS, true))
-            self::addNote(U_GROUP_EMPLOYEE, 'could not create directory: '.$path);
+            self::logError('Could not create directory: '.$path, E_USER_ERROR);
         else if (!is_writable($path) && !@chmod($path, self::FILE_ACCESS))
-            self::addNote(U_GROUP_EMPLOYEE, 'cannot write into directory: '.$path);
+            self::logError('Cannot write into directory: '.$path, E_USER_ERROR);
         else
             return true;
 

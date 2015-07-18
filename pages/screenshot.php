@@ -35,7 +35,7 @@ class ScreenshotPage extends GenericPage
 
         if ($this->minSize <= 0)
         {
-            Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::__construct() - config error: dimensions for uploaded screenshots egual or less than zero. Value forced to 200');
+            Util::logError('config error: dimensions for uploaded screenshots equal or less than zero. Value forced to 200');
             $this->minSize = 200;
         }
 
@@ -276,26 +276,26 @@ class ScreenshotPage extends GenericPage
         switch ($_FILES['screenshotfile']['error'])
         {
             case 1:
-                Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - the file exceeds the maximum size of '.ini_get('upload_max_filesize'));
+                Util::logError('validateScreenshot - the file exceeds the maximum size of '.ini_get('upload_max_filesize'));
             return Lang::screenshot('error', 'selectSS');
             case 3:
-                Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - upload was interrupted');
+                Util::logError('validateScreenshot - upload was interrupted');
             return Lang::screenshot('error', 'selectSS');
             case 4:
-                 Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - no file was received');
+                 Util::logError('validateScreenshot() - no file was received');
             return Lang::screenshot('error', 'selectSS');
             case 6:
-                Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - temporary upload directory is not set');
+                Util::logError('validateScreenshot - temporary upload directory is not set');
                 return Lang::main('intError');
             case 7:
-                Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - could not write temporary file to disk');
+                Util::logError('validateScreenshot - could not write temporary file to disk');
                 return Lang::main('intError');
         }
 
         // points to invalid file (hack attempt)
         if (!is_uploaded_file($_FILES['screenshotfile']['tmp_name']))
         {
-            Util::addNote(U_GROUP_EMPLOYEE, 'ScreenshotPage::validateScreenshot() - uploaded file not in upload directory');
+            Util::logError('validateScreenshot - uploaded file not in upload directory');
             return Lang::main('intError');
         }
 

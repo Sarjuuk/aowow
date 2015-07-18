@@ -49,7 +49,7 @@ class Lang
     {
         if (!isset(self::$$prop))
         {
-            Util::addNote(U_GROUP_STAFF, 'Lang::__callStatic() - tried to use undefined property Lang::$'.$prop);
+            Util::logError('Lang - tried to use undefined property Lang::$'.$prop);
             return null;
         }
 
@@ -58,7 +58,7 @@ class Lang
         {
             if (!isset($var[$key]))
             {
-                Util::addNote(U_GROUP_STAFF, 'Lang::__callStatic() - undefined key "'.$key.'" in property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\']');
+                Util::logError('Lang - undefined key "'.$key.'" in property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\']');
                 return null;
             }
 
@@ -73,14 +73,14 @@ class Lang
 
         if (!isset(self::$$prop))
         {
-            Util::addNote(U_GROUP_STAFF, 'Lang::sort() - tried to use undefined property Lang::$'.$prop);
+            Util::logError('Lang::sort - tried to use undefined property Lang::$'.$prop);
             return null;
         }
 
         $var = &self::$$prop;
         if (!isset($var[$group]))
         {
-            Util::addNote(U_GROUP_STAFF, 'Lang::sort() - tried to use undefined property Lang::$'.$prop.'[\''.$group.'\']');
+            Util::logError('Lang::sort - tried to use undefined property Lang::$'.$prop.'[\''.$group.'\']');
             return null;
         }
 
