@@ -957,8 +957,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
                     eval("\$min = $min $op $oparg;");
-                    if (!$equal)
-                        eval("\$max = $max $op $oparg;");
+                    eval("\$max = $max $op $oparg;");
                 }
 
                 if ($this->interactive)
@@ -999,10 +998,8 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
                     eval("\$min = $min $op $oparg;");
-                    if (!$equal)
-                        eval("\$max = $max $op $oparg;");
+                    eval("\$max = $max $op $oparg;");
                 }
-
                 // Aura giving combat ratings
                 $rType = 0;
                 if ($aura == 189)
@@ -1064,6 +1061,10 @@ class SpellList extends BaseType
                 $result[2] = Lang::spell('home');
                 break;
         }
+
+        // handle excessively precise floats
+        if (is_float($result[0]))
+            $result[0] = round($result[0], 2);
 
         return $result;
     }
@@ -1134,7 +1135,15 @@ class SpellList extends BaseType
             $pos += strlen($result[0]);
 
             // we are resolving a formula -> omit ranges
-            $var  = $this->resolveVariableString($result, $scaling);
+            $var = $this->resolveVariableString($result, $scaling);
+
+            // time within formula -> rebase to seconds and omit timeUnit
+            if (strtolower($result[6] ?: $result[8]) == 'd')
+            {
+               $var[0] /= 1000;
+               unset($var[2]);
+            }
+
             $str .= $var[0];
 
             // overwrite eventually inherited strings
@@ -1152,6 +1161,7 @@ class SpellList extends BaseType
         $evaled = $this->resolveEvaluation($str);
 
         $return = is_numeric($evaled) ? Lang::nf($evaled, $precision) : $evaled;
+
         return [$return, $fSuffix, $fRating];
     }
 
@@ -1240,7 +1250,7 @@ class SpellList extends BaseType
     // step 0: get text
         $data = $this->getField($type, true);
         if (empty($data) || $data == "[]")                  // empty tooltip shouldn't be displayed anyway
-            return array("", []);
+            return ['', []];
 
     // step 1: if the text is supplemented with text-variables, get and replace them
         if ($this->curTpl['spellDescriptionVariableId'] > 0)
@@ -1282,96 +1292,36 @@ class SpellList extends BaseType
            b) elseif    - $?cond[A]?cond[B]..[C]            // can probably be repeated as often as you wanted
            c) recursive - $?cond[A][$?cond[B][..]]          // can probably be stacked as deep as you wanted
 
-           only case a) can be used for KNOW-parameter IF, AND ONLY IF it is not containing further variables ($) AND it has a simple spell-condition ( \(?!?[as]\d+\)? )
-
-           _[100].tooltip_enus = '<table><tr><td><b>Charge</b><br />8 - 25 yd range<table width="100%"><tr><td>Instant</td><th>20 sec cooldown</th></tr></table>Requires Warrior<br />Requires level 3</td></tr></table><table><tr><td><span class="q">Charge to an enemy, stunning it <!--sp58377:0--><!--sp58377-->for <!--sp103828:0-->1 sec<!--sp103828-->. Generates 20 Rage.</span></td></tr></table>';
-           _[100].buff_enus = '';
-           _[100].spells_enus = {"58377": [["", "and 2 additional nearby targets "]], "103828": [["1 sec", "3 sec and reducing movement speed by 50% for 15 sec"]]};
-           _[100].buffspells_enus = {};
-
-           Turns the Shaman into a Ghost Wolf, increasing speed by $s2%$?s59289[ and regenerating $59289s1% of your maximum health every 5 sec][].
-           Lasts 5 min. $?$gte($pl,68)[][Cannot be used on items level 138 and higher.]
+           only case a) can be used for KNOW-parameter
        */
 
-        // \1: full pattern match; \2: any sequence, that may include an aura/spell-ref; \3: any other sequence, between "?$" and "["
-        while (preg_match('/\$\?(([\W\D]*[as]\d+)|([^\[]*))/i', $data, $matches))
-        {
-            $condBrktCnt = 0;
-            $targetPart  = 3;                               // we usually want the second pair of brackets
-            $curPart     = 0;                               // parts: $? 0 [ 1 ] 2 [ 3 ] 4
-            $relSpells   = [];                              // see spells_enus
-
-            $condOutStr  = '';
-
-            if (!empty($matches[3]))                        // we can do this! -> eval
-            {
-                $cnd = $this->resolveEvaluation($matches[3]);
-                if ((is_numeric($cnd) || is_bool($cnd)) && $cnd) // only case, deviating from normal; positive result -> use [true]
-                    $targetPart = 1;
-
-                $condStartPos = strpos($data, $matches[3]) - 2;
-                $condCurPos   = $condStartPos;
-
-            }
-
-            else if (!empty($matches[2]))
-            {
-                $condStartPos = strpos($data, $matches[2]) - 2;
-                $condCurPos   = $condStartPos;
-            }
-            else                                            // empty too? WTF?! GTFO!
-                die('what a terrible failure');
-
-            while ($condCurPos <= strlen($data))            // only hard-exit condition, we'll hit those breaks eventually^^
-            {
-                // we're through with this condition. replace with found result and continue
-                if ($curPart == 4 || $condCurPos == strlen($data))
-                {
-                    $data = substr_replace($data, $condOutStr, $condStartPos, ($condCurPos - $condStartPos));
-                    break;
-                }
-
-                $char = $data[$condCurPos];
-
-                // advance position
-                $condCurPos++;
-
-                if ($char == '[')
-                {
-                    if (!$condBrktCnt)
-                        $curPart++;
-
-                    $condBrktCnt++;
-
-                    if ($condBrktCnt == 1)
-                        continue;
-                }
-                else if ($char == ']')
-                {
-                    if ($condBrktCnt == 1)
-                        $curPart++;
-
-                    $condBrktCnt--;
-
-                    if (!$condBrktCnt)
-                        continue;
-                }
-
-                // we got an elseif .. since they are self-containing we can just remove everything we've got up to here and restart the iteration
-                if ($curPart == 2 && $char == '?')
-                {
-                    $replace = $targetPart == 1 ? $condOutStr.' $' : '$';
-                    $data = substr_replace($data, $replace, $condStartPos, ($condCurPos - $condStartPos) - 1);
-                    break;
-                }
-
-                if ($curPart == $targetPart)
-                    $condOutStr .= $char;
-
-            }
-        }
+        $relSpells = [];
+        $data = $this->handleConditions($data, $scaling, $relSpells);
 
     // step 3: unpack formulas ${ .. }.X
+        $data = $this->handleFormulas($data, $scaling);
+
+    // step 4: find and eliminate regular variables
+        $data = $this->handleVariables($data, $scaling);
+
+    // step 5: variable-dependant variable-text
+        // special case $lONE:ELSE;
+        // todo (low): russian uses THREE (wtf?! oO) cases ($l[singular]:[plural1]:[plural2]) .. explode() chooses always the first plural option :/
+        while (preg_match('/([\d\.]+)([^\d]*)(\$l:*)([^:]*):([^;]*);/i', $data, $m))
+            $data = str_ireplace($m[1].$m[2].$m[3].$m[4].':'.$m[5].';', $m[1].$m[2].($m[1] == 1 ? $m[4] : explode(':', $m[5])[0]), $data);
+
+    // step 6: HTMLize
+        // colors
+        $data = preg_replace('/\|cff([a-f0-9]{6})(.+?)\|r/i', '<span style="color: #$1;">$2</span>', $data);
+
+        // line endings
+        $data = strtr($data, ["\r" => '', "\n" => '<br />']);
+
+        return [$data, $relSpells];
+    }
+
+    private function handleFormulas($data, &$scaling)
+    {
         // they are stacked recursively but should be balanced .. hf
         while (($formStartPos = strpos($data, '${')) !== false)
         {
@@ -1421,7 +1371,11 @@ class SpellList extends BaseType
             $data = substr_replace($data, $resolved, $formStartPos, ($formCurPos - $formStartPos));
         }
 
-    // step 4: find and eliminate regular variables
+        return $data;
+    }
+
+    private function handleVariables($data, &$scaling)
+    {
         $pos = 0;                                           // continue strpos-search from this offset
         $str = '';
         while (($npos = strpos($data, '$', $pos)) !== false)
@@ -1467,30 +1421,125 @@ class SpellList extends BaseType
         $str .= substr($data, $pos);
         $str = str_replace('#', '$', $str);                 // reset marker
 
-    // step 5: variable-dependant variable-text
-        // special case $lONE:ELSE;
-        // todo (low): russian uses THREE (wtf?! oO) cases ($l[singular]:[plural1]:[plural2]) .. explode() chooses always the first plural option :/
-        while (preg_match('/([\d\.]+)([^\d]*)(\$l:*)([^:]*):([^;]*);/i', $str, $m))
-            $str = str_ireplace($m[1].$m[2].$m[3].$m[4].':'.$m[5].';', $m[1].$m[2].($m[1] == 1 ? $m[4] : explode(':', $m[5])[0]), $str);
+        return $str;
+    }
 
-    // step 6: HTMLize
-        // colors
-        $str = preg_replace('/\|cff([a-f0-9]{6})(.+?)\|r/i', '<span style="color: #$1;">$2</span>', $str);
+    private function handleConditions($data, &$scaling, &$relSpells, $dontKnow = false)
+    {
+        while (($condStartPos = strpos($data, '$?')) !== false)
+        {
+            $condBrktCnt = 0;
+            $condCurPos  = $condStartPos + 2;               // after the '$?'
+            $targetPart  = 3;                               // we usually want the second pair of brackets
+            $curPart     = 0;                               // parts: $? 0 [ 1 ] 2 [ 3 ] 4 ...
+            $condParts   = [];
+            $isLastElse  = false;
 
-        // line endings
-        $str = strtr($str, ["\r" => '', "\n" => '<br />']);
+            while ($condCurPos <= strlen($data))            // only hard-exit condition, we'll hit those breaks eventually^^
+            {
+                $char = $data[$condCurPos];
 
-        return array($str, []/*$relSpells*/);
+                // advance position
+                $condCurPos++;
+
+                if ($char == '[')
+                {
+                    $condBrktCnt++;
+
+                    if ($condBrktCnt == 1)
+                        $curPart++;
+
+                    // previously there was no condition -> last else
+                    if ($condBrktCnt == 1)
+                        if (($curPart && ($curPart % 2)) && (!isset($condParts[$curPart - 1]) || empty(trim($condParts[$curPart - 1]))))
+                            $isLastElse = true;
+
+                    if (empty($condParts[$curPart]))
+                        continue;
+                }
+
+                if (empty($condParts[$curPart]))
+                    $condParts[$curPart] = $char;
+                else
+                    $condParts[$curPart] .= $char;
+
+                if ($char == ']')
+                {
+                    $condBrktCnt--;
+
+                    if (!$condBrktCnt)
+                    {
+                        $condParts[$curPart] = substr($condParts[$curPart], 0, -1);
+                        $curPart++;
+                    }
+
+                    if ($condBrktCnt)
+                        continue;
+
+                    if ($isLastElse)
+                        break;
+                }
+            }
+
+            // check if it is know-compatible
+            $know = 0;
+            if (preg_match('/\(?(\!?)[as](\d+)\)?$/i', $condParts[0], $m))
+            {
+                if (!strstr($condParts[1], '$?'))
+                    if (!strstr($condParts[3], '$?'))
+                        if (!isset($condParts[5]))
+                            $know = $m[2];
+
+                // found a negation -> switching condition target
+                if ($m[1] == '!')
+                    $targetPart = 1;
+            }
+            // if not, what part of the condition should be used?
+            else if (preg_match('/(([\W\D]*[as]\d+)|([^\[]*))/i', $condParts[0], $m) && !empty($m[3]))
+            {
+                $cnd = $this->resolveEvaluation($m[3]);
+                if ((is_numeric($cnd) || is_bool($cnd)) && $cnd) // only case, deviating from normal; positive result -> use [true]
+                    $targetPart = 1;
+            }
+
+            // recursive conditions
+            if (strstr($condParts[$targetPart], '$?'))
+                $condParts[$targetPart] = $this->handleConditions($condParts[$targetPart], $scaling, $relSpells, true);
+
+            if ($know && !$dontKnow)
+            {
+                foreach ([1, 3] as $pos)
+                {
+                    if (strstr($condParts[$pos], '${'))
+                        $condParts[$pos] = $this->handleFormulas($condParts[$pos], $scaling);
+
+                    if (strstr($condParts[$pos], '$'))
+                        $condParts[$pos] = $this->handleVariables($condParts[$pos], $scaling);
+                }
+
+                // false condition first
+                if (!isset($relSpells[$know]))
+                    $relSpells[$know] = [];
+
+                $relSpells[$know][] = [$condParts[3], $condParts[1]];
+
+                $data = substr_replace($data, '<!--sp'.$know.':0-->'.$condParts[$targetPart].'<!--sp'.$know.'-->', $condStartPos, ($condCurPos - $condStartPos));
+            }
+            else
+                $data = substr_replace($data, $condParts[$targetPart], $condStartPos, ($condCurPos - $condStartPos));
+        }
+
+        return $data;
     }
 
     public function renderBuff($level = MAX_LEVEL, $interactive = false)
     {
         if (!$this->curTpl)
-            return array();
+            return ['', []];
 
         // doesn't have a buff
         if (!$this->getField('buff', true))
-            return array();
+            return ['', []];
 
         $this->interactive = $interactive;
 
@@ -1521,13 +1570,13 @@ class SpellList extends BaseType
         // scaling information - spellId:min:max:curr
         $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
 
-        return array($x, $btt[1]);
+        return [$x, $btt[1]];
     }
 
     public function renderTooltip($level = MAX_LEVEL, $interactive = false)
     {
         if (!$this->curTpl)
-            return array();
+            return ['', []];
 
         $this->interactive = $interactive;
 
@@ -1670,7 +1719,7 @@ class SpellList extends BaseType
         // scaling information - spellId:min:max:curr
         $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
 
-        return array($x, $desc ? $desc[1] : null);
+        return [$x, $desc[1]];
     }
 
     public function getTalentHeadForCurrent()
@@ -1857,14 +1906,16 @@ class SpellList extends BaseType
 
             if ($addMask & GLOBALINFO_EXTRA)
             {
-/*
-spells / buffspells = {
-    "58377": [["", "and 2 additional nearby targets "]],
-    "103828": [["stunning", "rooting"], ["1 sec", "4 sec and reducing movement speed by 50% for 15 sec"]]
-};
-*/
                 $buff = $this->renderBuff(MAX_LEVEL, true);
                 $tTip = $this->renderTooltip(MAX_LEVEL, true);
+
+                foreach ($tTip[1] as $relId => $_)
+                    if (empty($data[TYPE_SPELL][$relId]))
+                        $data[TYPE_SPELL][$relId] = $relId;
+
+                foreach ($buff[1] as $relId => $_)
+                    if (empty($data[TYPE_SPELL][$relId]))
+                        $data[TYPE_SPELL][$relId] = $relId;
 
                 $extra[$id] = array(
                     'id'         => $id,

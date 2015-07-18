@@ -1489,7 +1489,7 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
 $WH.g_setTooltipSpells = function(tooltip, spells, spellData, position) {
     var
         known = {},
-        regex = '<!--sp([0-9]+):[01]-->.+?<!--sp\\1-->',
+        regex = '<!--sp([0-9]+):[01]-->.*?<!--sp\\1-->',
         effects;
 
     if (spells == null) {
@@ -1521,7 +1521,7 @@ $WH.g_setTooltipSpells = function(tooltip, spells, spellData, position) {
             }
 
             var effect = spellData[spellId][position[spellId]][known[spellId]];
-            effect = $WH.g_setTooltipSpells(effect, spells, spellData, position);
+            effect = $WH.g_setTooltipSpells(effect.toString(), spells, spellData, position);
 
             tooltip = tooltip.replace(effects[i], '<!--sp' + spellId + ':' + known[spellId] + '-->' + effect + '<!--sp' + spellId + '-->');
         }
