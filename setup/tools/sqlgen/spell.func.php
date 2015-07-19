@@ -353,7 +353,7 @@ function spell()
     }
 
     // fill learnedAt, trainingCost from trainer
-    if ($trainer = DB::World()->select('SELECT spell AS ARRAY_KEY, MIN(reqskillvalue) AS reqSkill, MIN(spellcost) AS cost, COUNT(*) as count FROM npc_trainer GROUP BY spell'))
+    if ($trainer = DB::World()->select('SELECT SpellID AS ARRAY_KEY, MIN(ReqSkillRank) AS reqSkill, MIN(MoneyCost) AS cost, COUNT(*) AS count FROM npc_trainer GROUP BY SpellID'))
     {
         $spells = DB::Aowow()->select('SELECT Id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE Id IN (?a)', array_keys($trainer));
         $links  = [];
@@ -489,7 +489,7 @@ function spell()
         201032 => 10658
     );
     foreach ($specs as $tt => $req)
-        if ($spells = DB::World()->selectCol('SELECT spell FROM npc_trainer WHERE entry = ?d', $tt))
+        if ($spells = DB::World()->selectCol('SELECT SpellID FROM npc_trainer WHERE ID = ?d', $tt))
             DB::Aowow()->query('UPDATE ?_spell SET reqSpellId = ?d WHERE id IN (?a)', $req, $spells);
 
     $itemReqs = DB::World()->selectCol('SELECT entry AS ARRAY_KEY, requiredSpell FROM item_template WHERE requiredSpell NOT IN (?a)', [0, 34090, 34091]); // not riding

@@ -1541,16 +1541,6 @@ class Util
         }
     }
 
-    public static function createShowOnMap()
-    {
-        /*
-            quest:          "Quest Givers",
-            daily:          "Quest Givers (Daily)",
-            alliancequests: "Quest Givers",
-            hordequests:    "Quest Givers",
-        */
-    }
-
     public static function getServerConditions($srcType, $srcGroup = null, $srcEntry = null)
     {
         if (!$srcGroup && !$srcEntry)

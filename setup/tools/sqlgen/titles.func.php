@@ -37,17 +37,17 @@ function titles()
 
     $questQuery = '
         SELECT
-             qt.RewardTitleId AS ARRAY_KEY,
+             qt.RewardTitle AS ARRAY_KEY,
              qt.RequiredRaces,
              ge.eventEntry
         FROM
             quest_template qt
         LEFT JOIN
-            game_event_seasonal_questrelation sq ON sq.questId = qt.id
+            game_event_seasonal_questrelation sq ON sq.questId = qt.ID
         LEFT JOIN
             game_event ge ON ge.eventEntry = sq.eventEntry
         WHERE
-             qt.RewardTitleId <> 0';
+             qt.RewardTitle <> 0';
 
     DB::Aowow()->query('REPLACE INTO ?_titles SELECT Id, 0, 0, 0, 0, 0, 0, 0, male_loc0, male_loc2, male_loc3, male_loc6, male_loc8, female_loc0, female_loc2, female_loc3, female_loc6, female_loc8 FROM dbc_chartitles');
 

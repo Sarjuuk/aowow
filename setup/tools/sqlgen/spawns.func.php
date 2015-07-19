@@ -134,7 +134,7 @@ function spawns()                                           // and waypoints
     /* offsets for transports */
     /**************************/
 
-    $transports = DB::World()->selectCol('SELECT data0 AS pathId, data6 AS ARRAY_KEY FROM gameobject_template WHERE type = 15 AND data6 <> 0');
+    $transports = DB::World()->selectCol('SELECT Data0 AS pathId, Data6 AS ARRAY_KEY FROM gameobject_template WHERE type = 15 AND Data6 <> 0');
     foreach ($transports as &$t)
         $t = DB::Aowow()->selectRow('SELECT posX, posY, mapId FROM dbc_taxipathnode tpn WHERE tpn.pathId = ?d AND nodeIdx = 0', $t);
 

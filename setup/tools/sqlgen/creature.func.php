@@ -72,7 +72,6 @@ function creature(array $ids = [])
             min.basearmor * ct.ArmorModifier AS armorMin,
             max.basearmor * ct.ArmorModifier AS armorMax,
             RacialLeader,
-            questItem1, questItem2, questItem3, questItem4, questItem5, questItem6,
             mechanic_immune_mask,
             flags_extra,
             ScriptName

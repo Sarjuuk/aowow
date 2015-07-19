@@ -206,9 +206,9 @@ class ObjectPage extends GenericPage
         {
             while ($next)
             {
-                if ($row = DB::World()->selectRow('SELECT *, text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.entry = lpt.entry WHERE pt.entry = ?d', $next))
+                if ($row = DB::World()->selectRow('SELECT *, Text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.ID = lpt.entry WHERE pt.ID = ?d', $next))
                 {
-                    $next = $row['next_page'];
+                    $next = $row['NextPageID'];
                     $pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
                 }
                 else

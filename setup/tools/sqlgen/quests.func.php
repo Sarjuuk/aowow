@@ -23,15 +23,15 @@ function quests(array $ids = [])
 {
     $baseQuery = '
         SELECT
-            q.Id,
+            q.ID,
             Method,
-            Level,
+            QuestLevel,
             MinLevel,
             MaxLevel,
-            ZoneOrSort,
-            ZoneOrSort AS zoneOrSortBak,                    -- ZoneOrSortBak
-            Type,
-            SuggestedPlayers,
+            QuestSortID,
+            QuestSortID AS zoneOrSortBak,                   -- ZoneOrSortBak
+            QuestType,
+            SuggestedGroupNum,
             LimitTime,
             IFNULL(gesqr.eventEntry, 0) AS eventId,
             PrevQuestId,
@@ -41,60 +41,60 @@ function quests(array $ids = [])
             Flags,
             SpecialFlags,
             0 AS cuFlags,                                   -- cuFlags
-            RequiredClasses,        RequiredRaces,
-            RequiredSkillId,        RequiredSkillPoints,
-            RequiredFactionId1,     RequiredFactionId2,
-            RequiredFactionValue1,  RequiredFactionValue2,
-            RequiredMinRepFaction,  RequiredMaxRepFaction,
-            RequiredMinRepValue,    RequiredMaxRepValue,
+            RequiredClasses,            RequiredRaces,
+            RequiredSkillId,            RequiredSkillPoints,
+            RequiredFactionId1,         RequiredFactionId2,
+            RequiredFactionValue1,      RequiredFactionValue2,
+            RequiredMinRepFaction,      RequiredMaxRepFaction,
+            RequiredMinRepValue,        RequiredMaxRepValue,
             RequiredPlayerKills,
-            SourceItemId,           SourceItemCount,
+            SourceItemId,               SourceItemCount,
             SourceSpellId,
             RewardXPId,                                     -- QuestXP.dbc x level
             RewardOrRequiredMoney,
             RewardMoneyMaxLevel,
-            RewardSpell,            RewardSpellCast,
+            RewardSpell,                RewardSpellCast,
             RewardHonor * 124 * RewardHonorMultiplier,      -- alt calculation in QuestDef.cpp -> Quest::CalculateHonorGain(playerLevel)
-            RewardMailTemplateId,   RewardMailDelay,
-            RewardTitleId,
+            RewardMailTemplateId,       RewardMailDelay,
+            RewardTitle,
             RewardTalents,
             RewardArenaPoints,
-            RewardItemId1,          RewardItemId2,          RewardItemId3,          RewardItemId4,
-            RewardItemCount1,       RewardItemCount2,       RewardItemCount3,       RewardItemCount4,
-            RewardChoiceItemId1,    RewardChoiceItemId2,    RewardChoiceItemId3,    RewardChoiceItemId4,    RewardChoiceItemId5,    RewardChoiceItemId6,
-            RewardChoiceItemCount1, RewardChoiceItemCount2, RewardChoiceItemCount3, RewardChoiceItemCount4, RewardChoiceItemCount5, RewardChoiceItemCount6,
-            RewardFactionId1,       RewardFactionId2,       RewardFactionId3,       RewardFactionId4,       RewardFactionId5,
-            IF (RewardFactionValueIdOverride1 <> 0, RewardFactionValueIdOverride1 / 100, RewardFactionValueId1),
-            IF (RewardFactionValueIdOverride2 <> 0, RewardFactionValueIdOverride2 / 100, RewardFactionValueId2),
-            IF (RewardFactionValueIdOverride3 <> 0, RewardFactionValueIdOverride3 / 100, RewardFactionValueId3),
-            IF (RewardFactionValueIdOverride4 <> 0, RewardFactionValueIdOverride4 / 100, RewardFactionValueId4),
-            IF (RewardFactionValueIdOverride5 <> 0, RewardFactionValueIdOverride5 / 100, RewardFactionValueId5),
-            Title,                  Title_loc2,             Title_loc3,             Title_loc6,             Title_loc8,
-            Objectives,             Objectives_loc2,        Objectives_loc3,        Objectives_loc6,        Objectives_loc8,
-            Details,                Details_loc2,           Details_loc3,           Details_loc6,           Details_loc8,
-            EndText,                EndText_loc2,           EndText_loc3,           EndText_loc6,           EndText_loc8,
-            OfferRewardText,        OfferRewardText_loc2,   OfferRewardText_loc3,   OfferRewardText_loc6,   OfferRewardText_loc8,
-            RequestItemsText,       RequestItemsText_loc2,  RequestItemsText_loc3,  RequestItemsText_loc6,  RequestItemsText_loc8,
-            CompletedText,          CompletedText_loc2,     CompletedText_loc3,     CompletedText_loc6,     CompletedText_loc8,
-            RequiredNpcOrGo1,       RequiredNpcOrGo2,       RequiredNpcOrGo3,       RequiredNpcOrGo4,
-            RequiredNpcOrGoCount1,  RequiredNpcOrGoCount2,  RequiredNpcOrGoCount3,  RequiredNpcOrGoCount4,
-            RequiredSourceItemId1,  RequiredSourceItemId2,  RequiredSourceItemId3,  RequiredSourceItemId4,
-            RequiredSourceItemCount1,RequiredSourceItemCount2,RequiredSourceItemCount3,RequiredSourceItemCount4,
-            RequiredItemId1,        RequiredItemId2,        RequiredItemId3,        RequiredItemId4,        RequiredItemId5,        RequiredItemId6,
-            RequiredItemCount1,     RequiredItemCount2,     RequiredItemCount3,     RequiredItemCount4,     RequiredItemCount5,     RequiredItemCount6,
-            ObjectiveText1,         ObjectiveText1_loc2,    ObjectiveText1_loc3,    ObjectiveText1_loc6,    ObjectiveText1_loc8,
-            ObjectiveText2,         ObjectiveText2_loc2,    ObjectiveText2_loc3,    ObjectiveText2_loc6,    ObjectiveText2_loc8,
-            ObjectiveText3,         ObjectiveText3_loc2,    ObjectiveText3_loc3,    ObjectiveText3_loc6,    ObjectiveText3_loc8,
-            ObjectiveText4,         ObjectiveText4_loc2,    ObjectiveText4_loc3,    ObjectiveText4_loc6,    ObjectiveText4_loc8
+            RewardItem1,                RewardItem2,                RewardItem3,                RewardItem4,
+            RewardAmount1,              RewardAmount2,              RewardAmount3,              RewardAmount4,
+            RewardChoiceItemID1,        RewardChoiceItemID2,        RewardChoiceItemID3,        RewardChoiceItemID4,        RewardChoiceItemID5,        RewardChoiceItemID6,
+            RewardChoiceItemQuantity1,  RewardChoiceItemQuantity2,  RewardChoiceItemQuantity3,  RewardChoiceItemQuantity4,  RewardChoiceItemQuantity5,  RewardChoiceItemQuantity6,
+            RewardFactionID1,           RewardFactionID2,           RewardFactionID3,           RewardFactionID4,           RewardFactionID5,
+            IF (RewardFactionOverride1 <> 0, RewardFactionOverride1 / 100, RewardFactionValue1),
+            IF (RewardFactionOverride2 <> 0, RewardFactionOverride2 / 100, RewardFactionValue2),
+            IF (RewardFactionOverride3 <> 0, RewardFactionOverride3 / 100, RewardFactionValue3),
+            IF (RewardFactionOverride4 <> 0, RewardFactionOverride4 / 100, RewardFactionValue4),
+            IF (RewardFactionOverride5 <> 0, RewardFactionOverride5 / 100, RewardFactionValue5),
+            LogTitle,                   Title_loc2,                 Title_loc3,                 Title_loc6,                 Title_loc8,
+            LogDescription,             Objectives_loc2,            Objectives_loc3,            Objectives_loc6,            Objectives_loc8,
+            QuestDescription,           Details_loc2,               Details_loc3,               Details_loc6,               Details_loc8,
+            EndText,                    EndText_loc2,               EndText_loc3,               EndText_loc6,               EndText_loc8,
+            OfferRewardText,            OfferRewardText_loc2,       OfferRewardText_loc3,       OfferRewardText_loc6,       OfferRewardText_loc8,
+            RequestItemsText,           RequestItemsText_loc2,      RequestItemsText_loc3,      RequestItemsText_loc6,      RequestItemsText_loc8,
+            QuestCompletionLog,         CompletedText_loc2,         CompletedText_loc3,         CompletedText_loc6,         CompletedText_loc8,
+            RequiredNpcOrGo1,           RequiredNpcOrGo2,           RequiredNpcOrGo3,           RequiredNpcOrGo4,
+            RequiredNpcOrGoCount1,      RequiredNpcOrGoCount2,      RequiredNpcOrGoCount3,      RequiredNpcOrGoCount4,
+            RequiredSourceItemId1,      RequiredSourceItemId2,      RequiredSourceItemId3,      RequiredSourceItemId4,
+            RequiredSourceItemCount1,   RequiredSourceItemCount2,   RequiredSourceItemCount3,   RequiredSourceItemCount4,
+            RequiredItemId1,            RequiredItemId2,            RequiredItemId3,            RequiredItemId4,            RequiredItemId5,            RequiredItemId6,
+            RequiredItemCount1,         RequiredItemCount2,         RequiredItemCount3,         RequiredItemCount4,         RequiredItemCount5,         RequiredItemCount6,
+            ObjectiveText1,             ObjectiveText1_loc2,        ObjectiveText1_loc3,        ObjectiveText1_loc6,        ObjectiveText1_loc8,
+            ObjectiveText2,             ObjectiveText2_loc2,        ObjectiveText2_loc3,        ObjectiveText2_loc6,        ObjectiveText2_loc8,
+            ObjectiveText3,             ObjectiveText3_loc2,        ObjectiveText3_loc3,        ObjectiveText3_loc6,        ObjectiveText3_loc8,
+            ObjectiveText4,             ObjectiveText4_loc2,        ObjectiveText4_loc3,        ObjectiveText4_loc6,        ObjectiveText4_loc8
         FROM
             quest_template q
         LEFT JOIN
-            locales_quest lq ON q.Id = lq.Id
+            locales_quest lq ON q.ID = lq.Id
         LEFT JOIN
-            game_event_seasonal_questrelation gesqr ON gesqr.questId = q.Id
+            game_event_seasonal_questrelation gesqr ON gesqr.questId = q.ID
         {
         WHERE
-            q.Id IN (?a)
+            q.ID IN (?a)
         }
         LIMIT
             ?d, ?d';
@@ -156,7 +156,7 @@ function quests(array $ids = [])
     for ($i = 1; $i < 6; $i++)
         DB::Aowow()->query($repQuery, $i, $i, $i, $i, $ids ?: DBSIMPLE_SKIP);
 
-    // update zoneOrSort .. well .. now "not documenting" bites me in the ass .. ~700 quests were changed, i don't know by what method
+    // update zoneOrSort/QuestSortID .. well .. now "not documenting" bites me in the ass .. ~700 quests were changed, i don't know by what method
     $eventSet = DB::World()->selectCol('SELECT holiday AS ARRAY_KEY, eventEntry FROM game_event WHERE holiday <> 0');
     $holidaySorts   = array(
         141 => -1001,       181 => -374,        201 => -1002,

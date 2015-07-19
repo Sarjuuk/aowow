@@ -49,7 +49,7 @@ class SqlGen
         'creature'                 => [null, null, null,                      ['creature_template', 'locales_creature', 'creature_classlevelstats', 'instance_encounters']],
         'currencies'               => [null, null, null,                      ['item_template', 'locales_item']],
         'events'                   => [null, null, null,                      ['game_event', 'game_event_prerequisite']],
-        'objects'                  => [null, null, null,                      ['gameobject_template', 'locales_gameobject']],
+        'objects'                  => [null, null, null,                      ['gameobject_template', 'locales_gameobject', 'gameobject_questitem']],
         'pet'                      => [null, null, null,                      ['creature_template', 'creature']],
         'quests'                   => [null, null, null,                      ['quest_template', 'locales_quest', 'game_event', 'game_event_seasonal_questrelation']],
         'quests_startend'          => [null, null, null,                      ['creature_queststarter', 'creature_questender', 'game_event_creature_quest', 'gameobject_queststarter', 'gameobject_questender', 'game_event_gameobject_quest', 'item_template']],
