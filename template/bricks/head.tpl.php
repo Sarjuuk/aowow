@@ -51,5 +51,5 @@ foreach ($this->js as $js):
 endforeach;
 ?>
     <script type="text/javascript">
-        var g_user = <?php echo json_encode($this->gUser, JSON_NUMERIC_CHECK); ?>;
+        var g_user = <?php echo Util::toJSON($this->gUser, JSON_UNESCAPED_UNICODE); ?>;
     </script>

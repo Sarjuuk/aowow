@@ -1687,9 +1687,9 @@ class Util
         header('Pragma: no-cache');
     }
 
-    public static function toJSON($data)
+    public static function toJSON($data, $forceFlags = 0)
     {
-        $flags = JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE;
+        $flags = $forceFlags ?: (JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
 
         if (CFG_DEBUG)
             $flags |= JSON_PRETTY_PRINT;
