@@ -105,8 +105,8 @@ function quests(array $ids = [])
             dbc_questxp xp
         SET
             rewardXP = (CASE rewardXP
-                WHEN 1 THEN xp.Field1   WHEN 2 THEN xp.Field2   WHEN 3 THEN xp.Field3   WHEN 4 THEN xp.Field4   WHEN  5 THEN xp.Field5
-                WHEN 6 THEN xp.Field6   WHEN 7 THEN xp.Field7   WHEN 8 THEN xp.Field8   WHEN 9 THEN xp.Field9   WHEN 10 THEN xp.Field10
+                WHEN 0 THEN xp.Field1   WHEN 1 THEN xp.Field2   WHEN 2 THEN xp.Field3   WHEN 3 THEN xp.Field4   WHEN 4 THEN xp.Field5
+                WHEN 5 THEN xp.Field6   WHEN 6 THEN xp.Field7   WHEN 7 THEN xp.Field8   WHEN 8 THEN xp.Field9   WHEN 9 THEN xp.Field10
                 ELSE 0
             END)
         WHERE
@@ -121,8 +121,9 @@ function quests(array $ids = [])
             dbc_questfactionreward rep ON rep.Id = IF(rewardFactionValue?d > 0, 1, 2)
         SET
             rewardFactionValue?d = (CASE ABS(rewardFactionValue?d)
-                WHEN 1 THEN rep.Field1   WHEN 2 THEN rep.Field2   WHEN 3 THEN rep.Field3   WHEN 4 THEN rep.Field4   WHEN  5 THEN rep.Field5
-                WHEN 6 THEN rep.Field6   WHEN 7 THEN rep.Field7   WHEN 8 THEN rep.Field8   WHEN 9 THEN rep.Field9   WHEN 10 THEN rep.Field10
+                WHEN 0 THEN rep.Field1   WHEN 1 THEN rep.Field2   WHEN 2 THEN rep.Field3   WHEN 3 THEN rep.Field4   WHEN 4 THEN rep.Field5
+                WHEN 5 THEN rep.Field6   WHEN 6 THEN rep.Field7   WHEN 7 THEN rep.Field8   WHEN 8 THEN rep.Field9   WHEN 9 THEN rep.Field10
+                ELSE 0
             END)
         WHERE
             ABS(rewardFactionValue?d) BETWEEN 1 AND 10 { AND
