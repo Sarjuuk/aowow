@@ -49,7 +49,7 @@ class Lang
     {
         if (!isset(self::$$prop))
         {
-            Util::logError('Lang - tried to use undefined property Lang::$'.$prop);
+            trigger_error('Lang - tried to use undefined property Lang::$'.$prop, E_USER_WARNING);
             return null;
         }
 
@@ -58,7 +58,7 @@ class Lang
         {
             if (!isset($var[$key]))
             {
-                Util::logError('Lang - undefined key "'.$key.'" in property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\']');
+                trigger_error('Lang - undefined key "'.$key.'" in property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\']', E_USER_WARNING);
                 return null;
             }
 
@@ -73,14 +73,14 @@ class Lang
 
         if (!isset(self::$$prop))
         {
-            Util::logError('Lang::sort - tried to use undefined property Lang::$'.$prop);
+            trigger_error('Lang::sort - tried to use undefined property Lang::$'.$prop, E_USER_WARNING);
             return null;
         }
 
         $var = &self::$$prop;
         if (!isset($var[$group]))
         {
-            Util::logError('Lang::sort - tried to use undefined property Lang::$'.$prop.'[\''.$group.'\']');
+            trigger_error('Lang::sort - tried to use undefined property Lang::$'.$prop.'[\''.$group.'\']', E_USER_WARNING);
             return null;
         }
 

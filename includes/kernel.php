@@ -73,7 +73,7 @@ foreach ($sets as $k => $v)
     // this should not have been possible
     if (!strlen($v['value']) && !($v['flags'] & CON_FLAG_TYPE_STRING) && !$php)
     {
-        Util::logError('Aowow config value CFG_'.strtoupper($k).' is empty - config will not be used!', E_USER_ERROR);
+        trigger_error('Aowow config value CFG_'.strtoupper($k).' is empty - config will not be used!', E_USER_ERROR);
         continue;
     }
 
@@ -87,12 +87,12 @@ foreach ($sets as $k => $v)
         $val = preg_replace('/[^\p{L}0-9~\s_\-\'\/\.:,]/ui', '', $v['value']);
     else if ($php)
     {
-        Util::logError('PHP config value '.strtolower($k).' has no type set - config will not be used!', E_USER_ERROR);
+        trigger_error('PHP config value '.strtolower($k).' has no type set - config will not be used!', E_USER_ERROR);
         continue;
     }
     else // if (!$php)
     {
-        Util::logError('Aowow config value CFG_'.strtoupper($k).' has no type set - value forced to 0!', E_USER_ERROR);
+        trigger_error('Aowow config value CFG_'.strtoupper($k).' has no type set - value forced to 0!', E_USER_ERROR);
         $val = 0;
     }
 
@@ -120,8 +120,10 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine) {
     else if ($errNo == E_USER_WARNING)                      // 0x0200
         $errName = 'E_USER_WARNING';
     else if ($errNo == E_USER_NOTICE)                       // 0x0400
+    {
         $errName = 'E_USER_NOTICE';
         $uGroup  = U_GROUP_STAFF;
+    }
     else if ($errNo == E_RECOVERABLE_ERROR)                 // 0x1000
         $errName = 'E_RECOVERABLE_ERROR';
 
@@ -151,7 +153,7 @@ if (!CLI)
 
     // Setup Session
     if (CFG_SESSION_CACHE_DIR && Util::checkOrCreateDirectory(CFG_SESSION_CACHE_DIR))
-        session_save_path(CFG_SESSION_CACHE_DIR);
+        session_save_path(getcwd().'/'.CFG_SESSION_CACHE_DIR);
 
     session_set_cookie_params(15 * YEAR, '/', '', $secure, true);
     session_cache_limiter('private');

@@ -698,12 +698,6 @@ class Util
     public static $wowheadLink              = '';
     private static $notes                   = [];
 
-    public static function logError($errStr, $mode = E_USER_WARNING)
-    {
-        // handled by set_error_handler
-        trigger_error($errStr, $mode);
-    }
-
     public static function addNote($uGroupMask, $str)
     {
         self::$notes[] = [$uGroupMask, $str];
@@ -1712,9 +1706,9 @@ class Util
         $path = preg_replace('|/+|', '/', $path);
 
         if (!is_dir($path) && !@mkdir($path, self::FILE_ACCESS, true))
-            self::logError('Could not create directory: '.$path, E_USER_ERROR);
+            trigger_error('Could not create directory: '.$path, E_USER_ERROR);
         else if (!is_writable($path) && !@chmod($path, self::FILE_ACCESS))
-            self::logError('Cannot write into directory: '.$path, E_USER_ERROR);
+            trigger_error('Cannot write into directory: '.$path, E_USER_ERROR);
         else
             return true;
 

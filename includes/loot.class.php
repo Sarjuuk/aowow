@@ -175,7 +175,7 @@ class Loot
             }
             else                                            // shouldn't have happened
             {
-                Util::logError('Unhandled case in calculating chance for item '.$entry['Item'].'!');
+                trigger_error('Unhandled case in calculating chance for item '.$entry['Item'].'!', E_USER_WARNING);
                 continue;
             }
 
@@ -189,7 +189,7 @@ class Loot
                 $sum = 0;
             else if ($sum >= 100.01)
             {
-                Util::logError('Loot entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!');
+                trigger_error('Loot entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!', E_USER_WARNING);
                 $sum = 100;
             }
 
@@ -378,13 +378,13 @@ class Loot
             {
                 // check for possible database inconsistencies
                 if (!$ref['chance'] && !$ref['isGrouped'])
-                    Util::logError('Loot by Item: Ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!');
+                    trigger_error('Loot by Item: Ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!', E_USER_WARNING);
 
                 if ($ref['isGrouped'] && $ref['sumChance'] > 100)
-                    Util::logError('Loot by Item: Group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!');
+                    trigger_error('Loot by Item: Group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!', E_USER_WARNING);
 
                 if ($ref['isGrouped'] && $ref['sumChance'] >= 100 && !$ref['chance'])
-                    Util::logError('Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!');
+                    trigger_error('Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!', E_USER_WARNING);
 
                 $chance = abs($ref['chance'] ?: (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
 

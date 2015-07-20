@@ -190,7 +190,7 @@ class CommunityContent
             }
             else
             {
-                Util::logError('Comment '.$c['id'].' belongs to nonexistant subject.', E_USER_NOTICE);
+                trigger_error('Comment '.$c['id'].' belongs to nonexistant subject.', E_USER_NOTICE);
                 unset($comments[$idx]);
             }
         }
@@ -341,7 +341,7 @@ class CommunityContent
             {
                 if (empty($p['name']))
                 {
-                    Util::logError('Screenshot linked to nonexistant type/typeId combination: '.$p['type'].'/'.$p['typeId'], E_USER_NOTICE);
+                    trigger_error('Screenshot linked to nonexistant type/typeId combination: '.$p['type'].'/'.$p['typeId'], E_USER_NOTICE);
                     unset($p);
                 }
                 else

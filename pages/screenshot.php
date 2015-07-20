@@ -35,7 +35,7 @@ class ScreenshotPage extends GenericPage
 
         if ($this->minSize <= 0)
         {
-            Util::logError('config error: dimensions for uploaded screenshots equal or less than zero. Value forced to 200');
+            trigger_error('config error: dimensions for uploaded screenshots equal or less than zero. Value forced to 200', E_USER_WARNING);
             $this->minSize = 200;
         }
 
@@ -276,26 +276,26 @@ class ScreenshotPage extends GenericPage
         switch ($_FILES['screenshotfile']['error'])
         {
             case 1:
-                Util::logError('validateScreenshot - the file exceeds the maximum size of '.ini_get('upload_max_filesize'));
+                trigger_error('validateScreenshot - the file exceeds the maximum size of '.ini_get('upload_max_filesize'), E_USER_WARNING);
             return Lang::screenshot('error', 'selectSS');
             case 3:
-                Util::logError('validateScreenshot - upload was interrupted');
+                trigger_error('validateScreenshot - upload was interrupted');
             return Lang::screenshot('error', 'selectSS');
             case 4:
-                 Util::logError('validateScreenshot() - no file was received');
+                trigger_error('validateScreenshot() - no file was received', E_USER_WARNING);
             return Lang::screenshot('error', 'selectSS');
             case 6:
-                Util::logError('validateScreenshot - temporary upload directory is not set');
+                trigger_error('validateScreenshot - temporary upload directory is not set', E_USER_WARNING);
                 return Lang::main('intError');
             case 7:
-                Util::logError('validateScreenshot - could not write temporary file to disk');
+                trigger_error('validateScreenshot - could not write temporary file to disk', E_USER_WARNING);
                 return Lang::main('intError');
         }
 
         // points to invalid file (hack attempt)
         if (!is_uploaded_file($_FILES['screenshotfile']['tmp_name']))
         {
-            Util::logError('validateScreenshot - uploaded file not in upload directory');
+            trigger_error('validateScreenshot - uploaded file not in upload directory', E_USER_WARNING);
             return Lang::main('intError');
         }
 
