@@ -457,6 +457,9 @@ class QuestListFilter extends Filter
             case  1:                                        // increasesrepwith
                 if ($this->isSaneNumeric($cr[1]) && $cr[1] > 0)
                 {
+                    if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE id = ?d', $cr[1]))
+                        $this->formData['reputationCols'][] = [$cr[1], Util::localizedString($_, 'name')];
+
                     return [
                         'OR',
                         ['AND', ['rewardFactionId1', $cr[1]], ['rewardFactionValue1', 0, '>']],
@@ -470,6 +473,9 @@ class QuestListFilter extends Filter
             case 10:                                        // decreasesrepwith
                 if ($this->isSaneNumeric($cr[1]) && $cr[1] > 0)
                 {
+                    if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE id = ?d', $cr[1]))
+                        $this->formData['reputationCols'][] = [$cr[1], Util::localizedString($_, 'name')];
+
                     return [
                         'OR',
                         ['AND', ['rewardFactionId1', $cr[1]], ['rewardFactionValue1', 0, '<']],

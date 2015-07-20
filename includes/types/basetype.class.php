@@ -667,10 +667,11 @@ abstract class Filter
 
     protected       $fiData    = ['c' => [], 'v' =>[]];
     protected       $formData  =  array(                    // data to fill form fields
-                        'form'        => [],                // base form - unsanitized
-                        'setCriteria' => [],                // dynamic criteria list - index checked
-                        'setWeights'  => [],                // dynamic weights list  - index checked
-                        'extraCols'   => []                 // extra columns for LV  - added as required
+                        'form'           => [],             // base form - unsanitized
+                        'setCriteria'    => [],             // dynamic criteria list             - index checked
+                        'setWeights'     => [],             // dynamic weights list              - index checked
+                        'extraCols'      => [],             // extra columns for LV              - added as required
+                        'reputationCols' => []              // simlar and exclusive to extraCols - added as required
                     );
 
     // parse the provided request into a usable format; recall self with GET-params if nessecary
@@ -856,6 +857,7 @@ abstract class Filter
                     $form[$name] = $raw ? $data : 'fi_setWeights('.Util::toJSON($data).', 0, 1, 1);';
                     break;
                 case 'form':
+                case 'reputationCols':
                     if ($key == $name)                      // only if explicitely specified
                         $form[$name] = $data;
                     break;

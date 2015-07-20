@@ -60,7 +60,9 @@ class QuestsPage extends GenericPage
             'params' => []
         );
 
-        if (!empty($this->filter['fi']['extraCols']))
+        if ($_ = $this->filterObj->getForm('reputationCols'))
+            $lv['params']['extraCols'] = '$fi_getReputationCols('.Util::toJSON($_).')';
+        else if (!empty($this->filter['fi']['extraCols']))
             $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         // create note if search limit was exceeded

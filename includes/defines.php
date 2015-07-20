@@ -183,6 +183,7 @@ define('ITEMINFO_MODEL',                    0x20);
 
 define('NPCINFO_TAMEABLE',                  0x1);
 define('NPCINFO_MODEL',                     0x2);
+define('NPCINFO_REP',                       0x4);
 
 define('ACHIEVEMENTINFO_PROFILE',           0x1);
 

@@ -161,9 +161,21 @@ class CreatureList extends BaseType
         *
         * NPCINFO_TAMEABLE (0x1): include texture & react
         * NPCINFO_MODEL    (0x2):
+        * NPCINFO_REP      (0x4): include repreward
         */
 
-        $data = [];
+        $data   = [];
+        $rewRep = [];
+
+        if ($addInfoMask & NPCINFO_REP)
+        {
+            $rewRep = DB::World()->selectCol('
+                SELECT creature_id AS ARRAY_KEY, RewOnKillRepFaction1 AS ARRAY_KEY2, RewOnKillRepValue1 FROM creature_onkill_reputation WHERE creature_id IN (?a) AND RewOnKillRepFaction1 > 0 UNION
+                SELECT creature_id AS ARRAY_KEY, RewOnKillRepFaction2 AS ARRAY_KEY2, RewOnKillRepValue2 FROM creature_onkill_reputation WHERE creature_id IN (?a) AND RewOnKillRepFaction2 > 0',
+                $this->getFoundIDs(),
+                $this->getFoundIDs()
+            );
+        }
 
         foreach ($this->iterate() as $__)
         {
@@ -215,6 +227,14 @@ class CreatureList extends BaseType
 
                 if ($addInfoMask & NPCINFO_TAMEABLE)        // only first skin of first model ... we're omitting potentially 11 skins here .. but the lv accepts only one .. w/e
                     $data[$this->id]['skin'] = $this->curTpl['textureString'];
+
+                if ($addInfoMask & NPCINFO_REP)
+                {
+                    $data[$this->id]['reprewards'] = [];
+                    if ($rewRep[$this->id])
+                        foreach ($rewRep[$this->id] as $fac => $val)
+                            $data[$this->id]['reprewards'][] = [$fac, $val];
+                }
             }
         }
 
@@ -427,6 +447,9 @@ class CreatureListFilter extends Filter
             case 42:                                        // increasesrepwith [enum]
                 if (in_array($cr[1], $this->enums[3]))      // reuse
                 {
+                    if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE id = ?d', $cr[1]))
+                        $this->formData['reputationCols'][] = [$cr[1], Util::localizedString($_, 'name')];
+
                     if ($cIds = DB::World()->selectCol('SELECT creature_id FROM creature_onkill_reputation WHERE (RewOnKillRepFaction1 = ?d AND RewOnKillRepValue1 > 0) OR (RewOnKillRepFaction2 = ?d AND RewOnKillRepValue2 > 0)', $cr[1], $cr[1]))
                         return ['id', $cIds];
                     else
@@ -437,6 +460,9 @@ class CreatureListFilter extends Filter
             case 43:                                        // decreasesrepwith [enum]
                 if (in_array($cr[1], $this->enums[3]))      // reuse
                 {
+                    if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE id = ?d', $cr[1]))
+                        $this->formData['reputationCols'][] = [$cr[1], Util::localizedString($_, 'name')];
+
                     if ($cIds = DB::World()->selectCol('SELECT creature_id FROM creature_onkill_reputation WHERE (RewOnKillRepFaction1 = ?d AND RewOnKillRepValue1 < 0) OR (RewOnKillRepFaction2 = ?d AND RewOnKillRepValue2 < 0)', $cr[1], $cr[1]))
                         return ['id', $cIds];
                     else

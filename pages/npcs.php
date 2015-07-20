@@ -57,13 +57,17 @@ class NpcsPage extends GenericPage
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
         $this->filter['fi']    =  $this->filterObj->getForm();
 
+        $repCols = $this->filterObj->getForm('reputationCols');
+
         $lv = array(
             'file'   => 'creature',
-            'data'   => $npcs->getListviewData(),           // listview content
+            'data'   => $npcs->getListviewData($repCols ? NPCINFO_REP : 0x0),
             'params' => []
         );
 
-        if (!empty($this->filter['fi']['extraCols']))
+        if ($repCols)
+            $lv['params']['extraCols'] = '$fi_getReputationCols('.Util::toJSON($repCols).')';
+        else if (!empty($this->filter['fi']['extraCols']))
             $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         if ($this->category)
