@@ -173,6 +173,8 @@ $lang = array(
         'difficulty'    => "Modus",
         'dispelType'    => "Bannart",
         'duration'      => "Dauer",
+        'emote'         => "Emote",
+        'emotes'        => "Emotes",
         'object'        => "Objekt",
         'objects'       => "Objekte",
         'glyphType'     => "Glyphenart",
@@ -378,8 +380,17 @@ $lang = array(
         'recoverUser'   => ["Benutzernamenanfrage", "Folgt diesem Link um euch anzumelden.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
         'resetPass'     => ["Kennwortreset",        "Folgt diesem Link um euer Kennwort zurückzusetzen.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."]
     ),
+    'emote' => array(
+        'notFound'      => "Dieses Emote existiert nicht.",
+        'self'          => "An Euch selbst",
+        'target'        => "An Andere mit Ziel",
+        'noTarget'      => "An Andere ohne Ziel",
+        'isAnimated'    => "Besitzt eine Animation",
+        'aliases'       => "Aliasse",
+        'noText'        => "Dieses Emote besitzt keinen Text.",
+    ),
     'gameObject' => array(
-        'notFound'      => "Dieses Objekt existiert nicht .",
+        'notFound'      => "Dieses Objekt existiert nicht.",
         'cat'           => [0 => "Anderes", 9 => "Bücher", 3 => "Behälter", -5 => "Truhen", 25 => "Fischschwärme", -3 => "Kräuter", -4 => "Erzadern",     -2 => "Quest", -6 => "Werkzeuge"],
         'type'          => [                9 => "Buch",   3 => "Behälter", -5 => "Truhe",  25 => "",              -3 => "Kraut",   -4 => "Erzvorkommen", -2 => "Quest", -6 => ""],
         'unkPosition'   => "Der Standort dieses Objekts ist nicht bekannt.",

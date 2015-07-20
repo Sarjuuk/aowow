@@ -52,6 +52,7 @@ class SearchPage extends GenericPage
         ['_searchProficiency'], ['_searchProfession'],  ['_searchCompanion'], ['_searchMount'],           ['_searchCreature'],
         ['_searchQuest'],       ['_searchAchievement'], ['_searchStatistic'], ['_searchZone'],            ['_searchObject'],
         ['_searchFaction'],     ['_searchSkill'],       ['_searchPet'],       ['_searchCreatureAbility'], ['_searchSpell'],
+        ['_searchEmote']
     );
 
     public function __construct($pageCall, $pageParam)
@@ -1409,9 +1410,30 @@ class SearchPage extends GenericPage
         return $result;
     }
 
-    // private function _searchCharacter($cndBase) { }      // 25 Characters $searchMask & 0x2000000
-    // private function _searchGuild($cndBase) { }          // 26 Guilds $searchMask & 0x4000000
-    // private function _searchArenaTeam($cndBase) { }      // 27 Arena Teams $searchMask & 0x8000000
+    private function _searchEmote($cndBase)                 // 25 Emotes $searchMask & 0x2000000
+    {
+        $result = [];
+        $cnd    = array_merge($cndBase, [$this->createLookup(['cmd', 'self_loc'.User::$localeId, 'target_loc'.User::$localeId, 'noTarget_loc'.User::$localeId])]);
+        $emote  = new EmoteList($cnd);
+
+        if ($data = $emote->getListviewData())
+        {
+            $result = array(
+                'type'     => TYPE_EMOTE,
+                'appendix' => ' (Emote)',
+                'matches'  => $emote->getMatches(),
+                'file'     => EmoteList::$brickFile,
+                'data'     => $data,
+                'params'   => []
+            );
+        }
+
+        return $result;
+    }
+
+    // private function _searchCharacter($cndBase) { }      // 26 Characters $searchMask & 0x4000000
+    // private function _searchGuild($cndBase) { }          // 27 Guilds $searchMask & 0x8000000
+    // private function _searchArenaTeam($cndBase) { }      // 28 Arena Teams $searchMask & 0x10000000
 }
 
 ?>

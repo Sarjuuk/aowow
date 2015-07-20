@@ -24,7 +24,9 @@ define('TYPE_CLASS',                        13);
 define('TYPE_RACE',                         14);
 define('TYPE_SKILL',                        15);
 define('TYPE_CURRENCY',                     17);
-define('TYPE_USER',                         100);           // internal use only
+// internal types (not published to js)
+define('TYPE_USER',                         500);
+define('TYPE_EMOTE',                        501);
 
 define('CACHE_TYPE_NONE',                   0);             // page will not be cached
 define('CACHE_TYPE_PAGE',                   1);
@@ -711,7 +713,7 @@ define('ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION',                     46);
 // define('ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT',               51);
 define('ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS',                            52);
 define('ACHIEVEMENT_CRITERIA_TYPE_HK_RACE',                             53);
-// define('ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE',                         54);
+define('ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE',                            54);
 // define('ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE',                     55);
 // define('ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS',                56);
 define('ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM',                          57);

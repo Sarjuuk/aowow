@@ -45,6 +45,7 @@ class SqlGen
         'races'                    => [null, null,                             null, null],
         'shapeshiftforms'          => [null, null,                             null, null],
         'skillline'                => [null, null,                             null, null],
+        'emotes'                   => [null, null,                             null, null],
         'achievement'              => [null, null, null,                      ['dbc_achievement']],
         'creature'                 => [null, null, null,                      ['creature_template', 'locales_creature', 'creature_classlevelstats', 'instance_encounters']],
         'currencies'               => [null, null, null,                      ['item_template', 'locales_item']],

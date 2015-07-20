@@ -173,6 +173,8 @@ $lang = array(
         'difficulty'    => "Difficulté",
         'dispelType'    => "Type de dissipation",
         'duration'      => "Durée",
+        'emote'         => "Emote",
+        'emotes'        => "Emotes",
         'object'        => "entité",
         'objects'       => "Entités",
         'glyphType'     => "Type de glyphe",
@@ -377,6 +379,15 @@ $lang = array(
         'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
         'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
         'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+    ),
+    'emote' => array(
+        'notFound'      => "[This Emote doesn't exist.]",
+        'self'          => "[To Yourself]",
+        'target'        => "[To others with a target]",
+        'noTarget'      => "[To others without a target]",
+        'isAnimated'    => "[Uses an animation]",
+        'aliases'       => "[Aliases]",
+        'noText'        => "[This Emote has no text.]",
     ),
     'gameObject' => array(
         'notFound'      => "Cette entité n'existe pas.",

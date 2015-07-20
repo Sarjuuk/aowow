@@ -174,7 +174,7 @@ if ($g = $this->gains):
     echo "                    <ul>\n";
 
     if (!empty($g['xp'])):
-        echo '                        <li><div>'.number_format($g['xp']).' '.Lang::quest('experience')."</div></li>\n";
+        echo '                        <li><div>'.Lang::nf($g['xp']).' '.Lang::quest('experience')."</div></li>\n";
     endif;
 
     if (!empty($g['rep'])):

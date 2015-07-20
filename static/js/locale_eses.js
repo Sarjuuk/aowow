@@ -835,7 +835,8 @@ var mn_database = [
     [1,"Hechizos","?spells",mn_spells],
     [10,"Títulos","?titles",mn_titles],
     [11,"Eventos del mundo","?events",mn_holidays],
-    [6,"Zonas","?zones",mn_zones]
+    [6,"Zonas","?zones",mn_zones],
+    [100,"Emociones","?emotes",null]
 ];
 var mn_tools = [
     [0,"Calculadora de talentos","?talent",mn_talentCalc],

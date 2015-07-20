@@ -835,7 +835,8 @@ var mn_database = [
     [1,"Заклинания","?spells",mn_spells],
     [10,"Звания","?titles",mn_titles],
     [11,"Игровые события","?events",mn_holidays],
-    [6,"Местности","?zones",mn_zones]
+    [6,"Местности","?zones",mn_zones],
+    [100,"Эмоции", "?emotes", null]
 ];
 var mn_tools = [
     [0,"Расчёт талантов","?talent",mn_talentCalc],

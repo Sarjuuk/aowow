@@ -29,6 +29,8 @@ class Lang
     private static $title;
     private static $zone;
 
+    private static $emote;
+
     public static function load($loc)
     {
         if (!file_exists('localization/locale_'.$loc.'.php'))

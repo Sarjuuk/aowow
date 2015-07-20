@@ -418,6 +418,13 @@ class AchievementPage extends GenericPage
                         'text' => $crtName,
                     );
                     break;
+                // link to emote
+                case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
+                    $tmp['link'] = array(
+                        'href' => '?emote='.$obj,
+                        'text' => $crtName,
+                    );
+                    break;
                 default:
                     // Add a gold coin icon if required
                     $tmp['extraText'] = $displayMoney ? Util::formatMoney($qty) : $crtName;

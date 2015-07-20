@@ -836,6 +836,7 @@ var mn_database = [
     [15,"Währungen","?currencies",mn_currencies],
     [11,"Weltereignisse","?events",mn_holidays],
     [1,"Zauber","?spells",mn_spells],
+    [100,"Emotes","?emotes",null]
 ];
 var mn_tools = [
     [0,"Talentrechner","?talent",mn_talentCalc],

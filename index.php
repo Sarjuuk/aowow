@@ -29,6 +29,8 @@ switch ($pageCall)
     case 'currency':
     case 'currencies':
     case 'compare':                                         // tool: item comparison
+    case 'emote':
+    case 'emotes':
     case 'event':
     case 'events':
     case 'faction':

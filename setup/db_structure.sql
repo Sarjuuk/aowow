@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: sarjuuk_aowow
 -- ------------------------------------------------------
--- Server version	5.5.30-30.1
+-- Server version  5.5.30-30.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -515,6 +515,52 @@ CREATE TABLE `aowow_currencies` (
   `name_loc6` varchar(64) NOT NULL,
   `name_loc8` varchar(64) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_emotes`
+--
+
+DROP TABLE IF EXISTS `aowow_emotes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_emotes` (
+  `id` smallint(5) unsigned NOT NULL,
+  `cmd` varchar(15) NOT NULL,
+  `isAnimated` tinyint(1) unsigned NOT NULL,
+  `target_loc0` varchar(65) NULL DEFAULT NULL,
+  `target_loc2` varchar(70) NULL DEFAULT NULL,
+  `target_loc3` varchar(95) NULL DEFAULT NULL,
+  `target_loc6` varchar(90) NULL DEFAULT NULL,
+  `target_loc8` varchar(70) NULL DEFAULT NULL,
+  `noTarget_loc0` varchar(65) NULL DEFAULT NULL,
+  `noTarget_loc2` varchar(110) NULL DEFAULT NULL,
+  `noTarget_loc3` varchar(85) NULL DEFAULT NULL,
+  `noTarget_loc6` varchar(75) NULL DEFAULT NULL,
+  `noTarget_loc8` varchar(60) NULL DEFAULT NULL,
+  `self_loc0` varchar(65) NULL DEFAULT NULL,
+  `self_loc2` varchar(115) NULL DEFAULT NULL,
+  `self_loc3` varchar(85) NULL DEFAULT NULL,
+  `self_loc6` varchar(75) NULL DEFAULT NULL,
+  `self_loc8` varchar(70) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_emotes_aliasses`
+--
+
+DROP TABLE IF EXISTS `aowow_emotes_aliasses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_emotes_aliasses` (
+  `id` smallint(6) unsigned NOT NULL,
+  `locales` smallint(6) unsigned NOT NULL,
+  `command` varchar(15) NOT NULL,
+  UNIQUE INDEX `id_command` (`id`, `command`),
+  INDEX `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2234,7 +2280,7 @@ CREATE TABLE `aowow_zones` (
 --
 -- Host: localhost    Database: sarjuuk_aowow
 -- ------------------------------------------------------
--- Server version	5.5.30-30.1
+-- Server version  5.5.30-30.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
