@@ -4,8 +4,8 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 8: Pets     g_initPath()
-//  tabid 0: Database g_initHeader()
+// menuId 100: Emotes   g_initPath()
+//  tabid   0: Database g_initHeader()
 class EmotesPage extends GenericPage
 {
     use ListPage;

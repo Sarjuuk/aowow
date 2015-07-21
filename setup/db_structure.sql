@@ -529,6 +529,7 @@ CREATE TABLE `aowow_emotes` (
   `id` smallint(5) unsigned NOT NULL,
   `cmd` varchar(15) NOT NULL,
   `isAnimated` tinyint(1) unsigned NOT NULL,
+  `cuFlags` int(10) unsigned NOT NULL,
   `target_loc0` varchar(65) NULL DEFAULT NULL,
   `target_loc2` varchar(70) NULL DEFAULT NULL,
   `target_loc3` varchar(95) NULL DEFAULT NULL,

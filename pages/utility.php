@@ -65,7 +65,7 @@ class UtilityPage extends GenericPage
         switch ($this->page)
         {
             case 'random':
-                $type   = array_rand(array_keys(array_filter(Util::$typeClasses)));
+                $type   = array_rand(array_filter(Util::$typeClasses));
                 $typeId = (new Util::$typeClasses[$type](null))->getRandomId();
 
                 header('Location: ?'.Util::$typeStrings[$type].'='.$typeId, true, 302);

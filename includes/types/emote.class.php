@@ -6,8 +6,6 @@ if (!defined('AOWOW_REVISION'))
 
 class EmoteList extends BaseType
 {
-    use ListviewHelper;
-
     public static $type      = TYPE_EMOTE;
     public static $brickFile = 'emote';
 

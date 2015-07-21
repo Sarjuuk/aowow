@@ -39,13 +39,16 @@ class Util
     public static $typeClasses              = array(
         null,               'CreatureList',     'GameObjectList',   'ItemList',         'ItemsetList',      'QuestList',        'SpellList',
         'ZoneList',         'FactionList',      'PetList',          'AchievementList',  'TitleList',        'WorldEventList',   'CharClassList',
-        'CharRaceList',     'SkillList',        null,               'CurrencyList'
+        'CharRaceList',     'SkillList',        null,               'CurrencyList',
+        TYPE_EMOTE => 'EmoteList'
     );
 
     public static $typeStrings              = array(        // zero-indexed
         null,           'npc',          'object',       'item',         'itemset',      'quest',        'spell',        'zone',         'faction',
         'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency',
-        TYPE_USER => 'user'
+        TYPE_USER  => 'user',
+        TYPE_EMOTE => 'emote'
+
     );
 
     public static $combatRatingToItemMod    = array(        // zero-indexed idx:CR; val:Mod

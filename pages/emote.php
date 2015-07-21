@@ -4,8 +4,8 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 8: Pets     g_initPath()
-//  tabid 0: Database g_initHeader()
+// menuId 100: Emotes   g_initPath()
+//  tabid   0: Database g_initHeader()
 class EmotePage extends GenericPage
 {
     use DetailPage;
@@ -43,7 +43,7 @@ class EmotePage extends GenericPage
         /* Infobox */
         /***********/
 
-        $infobox = [];
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // has Animation
         if ($this->subject->getField('isAnimated'))
