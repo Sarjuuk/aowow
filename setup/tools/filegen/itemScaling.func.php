@@ -83,12 +83,19 @@ if (!CLI)
 
     function itemScalingSV()
     {
-        $data = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM dbc_scalingstatvalues');
-        foreach ($data as &$row)
-        {
-            $row = array_values($row);
-            array_splice($row, 0, 1);
-        }
+        /* so the javascript expects a slightly different structure, than the dbc provides .. f*** it
+           e.g.
+           dbc      - 80:    97   97   56        41  210  395  878  570  120  156   86  112  108  220  343        131   73  140  280  527 1171 2093
+           expected - 80:    97   97   56  131   41  210  395  878 1570  120  156   86  112  108  220  343     0    0   73  140  280  527 1171 2093
+        */
+        $fields = Util::$ssdMaskFields;
+        array_walk($fields, function(&$v, $k) {
+            $v = $v ?: '0 AS idx'.$k;                       // NULL => 0 (plus some index so we can have 2x 0)
+        });
+
+        $data = DB::Aowow()->select('SELECT Id AS ARRAY_KEY, '.implode(', ', $fields).'  FROM dbc_scalingstatvalues');
+        foreach ($data as &$d)
+            $d = array_values($d);                          // strip indizes
 
         return CFG_DEBUG ? debugify($data) : Util::toJSON($data);
     }

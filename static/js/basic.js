@@ -1266,7 +1266,7 @@ $WH.g_setJsonItemLevel = function (json, level) {
         scaleMask    = 0x04001F,
         armorMask    = 0xF801E0,
         damageMask   = 0x007E00,
-        spelPwrMask  = 0x008000,
+        splPwrMask   = 0x008000,
         meleeMask    = 0x001400;
 
     for (var i = 0; i < 24; ++i) {
@@ -1281,7 +1281,7 @@ $WH.g_setJsonItemLevel = function (json, level) {
             else if (mask & damageMask && damageColumn < 0) {
                 damageColumn = i;
             }
-            else if (mask & spelPwrMask && splPwrColumn < 0) {
+            else if (mask & splPwrMask && splPwrColumn < 0) {
                 splPwrColumn = i;
             }
         }
@@ -1306,7 +1306,7 @@ $WH.g_setJsonItemLevel = function (json, level) {
     if (damageColumn >= 0) {
         var
             damageRange = (json.scaflags & meleeMask ? 0.2 : 0.3),
-            damageType  = (json.mledps ? "mle": "rgd");
+            damageType  = (json.scaflags & meleeMask ? "mle": "rgd");
 
         json.dps    = json[damageType + "dps"]    = $WH.g_convertScalingFactor(level, damageColumn);
         json.dmgmin = json[damageType + "dmgmin"] = Math.floor(json.dps * json.speed * (1 - damageRange));
