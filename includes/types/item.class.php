@@ -593,14 +593,14 @@ class ItemList extends BaseType
         $dps     = $speed ? ($dmgmin1 + $dmgmax1) / (2 * $speed) : 0;
 
         if ($_class == ITEM_CLASS_AMMUNITION && $dmgmin1 && $dmgmax1)
-            $x .= Lang::item('addsDps').' '.Lang::nf(($dmgmin1 + $dmgmax1) / 2, 1).' '.Lang::item('dps2').'<br />';
+            $x .= Lang::item('addsDps').' '.number_format(($dmgmin1 + $dmgmax1) / 2, 1).' '.Lang::item('dps2').'<br />';
         else if ($dps)
         {
             if ($_class == ITEM_CLASS_WEAPON)
             {
                 $x .= '<table width="100%"><tr>';
                 $x .= '<td><!--dmg-->'.sprintf($this->curTpl['dmgType1'] ? Lang::item('damageMagic') : Lang::item('damagePhys'), $this->curTpl['dmgMin1'].' - '.$this->curTpl['dmgMax1'], Lang::game('sc', $this->curTpl['dmgType1'])).'</td>';
-                $x .= '<th>'.Lang::item('speed').' <!--spd-->'.Lang::nf($speed, 2).'</th>';
+                $x .= '<th>'.Lang::item('speed').' <!--spd-->'.number_format($speed, 2).'</th>'; // do not use localized format here!
                 $x .= '</tr></table>';
             }
             else
@@ -611,7 +611,7 @@ class ItemList extends BaseType
                 $x .= '+'.sprintf($this->curTpl['dmgType2'] ? Lang::item('damageMagic') : Lang::item('damagePhys'), $this->curTpl['dmgMin2'].' - '.$this->curTpl['dmgMax2'], Lang::game('sc', $this->curTpl['dmgType2'])).'<br />';
 
             if ($_class == ITEM_CLASS_WEAPON)
-                $x .= '<!--dps-->('.Lang::nf($dps, 1).' '.Lang::item('dps').')<br />';
+                $x .= '<!--dps-->('.number_format($dps, 1).' '.Lang::item('dps').')<br />'; // do not use localized format here!
 
             // display FeralAttackPower if set
             if ($fap = $this->getFeralAP())
@@ -1329,12 +1329,12 @@ class ItemList extends BaseType
             if ($mask & (1 << $i))
                 $field = Util::$ssdMaskFields[$i];
 
-        return $field ? DB::Aowow()->selectCell("SELECT ?# FROM ?_scalingstatvalues WHERE id = ?", $field, $this->ssd[$this->id]['maxLevel']) : 0;
+        return $field ? DB::Aowow()->selectCell('SELECT ?# FROM ?_scalingstatvalues WHERE id = ?d', $field, $this->ssd[$this->id]['maxLevel']) : 0;
     }
 
     private function initScalingStats()
     {
-        $this->ssd[$this->id] = DB::Aowow()->selectRow("SELECT * FROM ?_scalingstatdistribution WHERE id = ?", $this->curTpl['scalingStatDistribution']);
+        $this->ssd[$this->id] = DB::Aowow()->selectRow('SELECT * FROM ?_scalingstatdistribution WHERE id = ?d', $this->curTpl['scalingStatDistribution']);
 
         if (!$this->ssd[$this->id])
             return;
@@ -1358,12 +1358,15 @@ class ItemList extends BaseType
         if ($ssvArmor = $this->getSSDMod('armor'))
             $this->templates[$this->id]['armor'] = $ssvArmor;
 
-        // if set dpsMod in ScalingStatValue use it for min (70% from average), max (130% from average) damage
+        // if set dpsMod in ScalingStatValue use it for min/max damage
+        // mle: 20% range / rgd: 30% range
         if ($extraDPS = $this->getSSDMod('dps'))            // dmg_x2 not used for heirlooms
         {
+            $range   = isset($this->json[$this->id]['rgddps']) ? 0.3 : 0.2;
             $average = $extraDPS * $this->curTpl['delay'] / 1000;
-            $this->templates[$this->id]['dmgMin1'] = Lang::nf(0.7 * $average);
-            $this->templates[$this->id]['dmgMax1'] = Lang::nf(1.3 * $average);
+
+            $this->templates[$this->id]['dmgMin1'] = floor((1 - $range) * $average);
+            $this->templates[$this->id]['dmgMax1'] = floor((1 + $range) * $average);
         }
 
         // apply Spell Power from ScalingStatValue if set
@@ -1519,8 +1522,8 @@ class ItemList extends BaseType
             $json['dmgtype1'] = $this->curTpl['dmgType1'];
             $json['dmgmin1']  = $this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'];
             $json['dmgmax1']  = $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2'];
-            $json['speed']    = Lang::nf($this->curTpl['delay'] / 1000, 2);
-            $json['dps']      = !floatVal($json['speed']) ? 0 : Lang::nf(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1);
+            $json['speed']    = number_format($this->curTpl['delay'] / 1000, 2);
+            $json['dps']      = !floatVal($json['speed']) ? 0 : number_format(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1);
 
             if (in_array($json['subclass'], [2, 3, 18, 19]))
             {

@@ -204,8 +204,8 @@ class AjaxHandler
     */
     private function handleCookie()
     {
-        if (User::$id && $this->params && !empty($this->get[$this->params[0]]))
-            if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $this->params[0], $this->get[$this->params[0]]))
+        if (User::$id && $this->params && $this->get($this->params[0]))
+            if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $this->params[0], $this->get($this->params[0])))
                 return 0;
 
         return null;
@@ -552,7 +552,7 @@ class AjaxHandler
 
                 break;
             case 'flag-reply':
-                if (!User::$id || $this->post('id'))
+                if (!User::$id || !$this->post('id'))
                     break;
 
                 DB::Aowow()->query(
@@ -633,11 +633,11 @@ class AjaxHandler
                 // should probably occur in g_user.excludegroups (dont forget to also set g_users.settings = {})
                 return '';
             case 'weightscales':
-                if (!$this->post('save'))
+                if ($this->post('save'))
                 {
-                    if (!isset($this->post['id']))
+                    if (!$this->post('id'))
                     {
-                        $res = DB::Aowow()->selectRow('SELECT max(id) as max, count(id) as num FROM ?_account_weightscales WHERE userId = ?d', User::$id);
+                        $res = DB::Aowow()->selectRow('SELECT MAX(id) AS max, count(id) AS num FROM ?_account_weightscales WHERE userId = ?d', User::$id);
                         if ($res['num'] < 5)            // more or less hard-defined in LANG.message_weightscalesaveerror
                             $this->post['id'] = ++$res['max'];
                         else

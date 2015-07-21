@@ -1067,7 +1067,8 @@ class Util
             else
                 $c = 2 / 52;
 
-            $result = Lang::nf($val / Util::$gtCombatRatings[$type] / $c, 2);
+            // do not use localized number format here!
+            $result = number_format($val / Util::$gtCombatRatings[$type] / $c, 2);
         }
 
         if (!in_array($type, array(ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_EXPERTISE_RATING)))
