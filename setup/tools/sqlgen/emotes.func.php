@@ -40,10 +40,11 @@ function emotes(/*array $ids = [] */)
         $allOK = false;
     }
 
-    DB::Aowow()->query('REPLACE INTO ?_emotes SELECT
+    $_= DB::Aowow()->query('REPLACE INTO ?_emotes SELECT
             et.Id,
             LOWER(et.command),
             IF(e.animationId, 1, 0),
+            0,                                              -- cuFlags
             etdT.text_loc0,  etdT.text_loc2,  etdT.text_loc3,  etdT.text_loc6,  etdT.text_loc8,
             etdNT.text_loc0, etdNT.text_loc2, etdNT.text_loc3, etdNT.text_loc6, etdNT.text_loc8,
             etdS.text_loc0,  etdS.text_loc2,  etdS.text_loc3,  etdS.text_loc6,  etdS.text_loc8
@@ -58,6 +59,9 @@ function emotes(/*array $ids = [] */)
         LEFT JOIN
             dbc_emotestextdata etdS  ON etdS.Id  = et.selfId'
     );
+
+    if (!$_)
+        $allOK = false;
 
     // i have no idea, how the indexing in this file works.
     // sometimes the \d+ after EMOTE is the emoteTextId, but not nearly often enough
