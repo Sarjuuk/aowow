@@ -9,7 +9,7 @@ class WorldEventList extends BaseType
     public static $type      = TYPE_WORLDEVENT;
     public static $brickFile = 'event';
 
-    protected     $queryBase = 'SELECT *, e.id as id, e.id AS ARRAY_KEY FROM ?_events e';
+    protected     $queryBase = 'SELECT e.*, h.*, e.description AS nameINT, e.id AS id, e.id AS ARRAY_KEY FROM ?_events e';
     protected     $queryOpts = array(
                                    'e' => [['h']],
                                    'h' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']
@@ -45,14 +45,13 @@ class WorldEventList extends BaseType
             {
                 $this->curTpl['name'] = $this->getField('name', true);
                 $replace[$this->id]   = $this->curTpl;
-                unset($this->curTpl['description']);
             }
             else                                            // set a name if holiday is missing
             {
                 // template
-                $this->curTpl['name_loc0']  = $this->curTpl['description'];
+                $this->curTpl['name_loc0']  = $this->curTpl['nameINT'];
                 $this->curTpl['iconString'] = 'trade_engineering';
-                $this->curTpl['name']       = '(SERVERSIDE) '.$this->getField('description', true);
+                $this->curTpl['name']       = '(SERVERSIDE) '.$this->getField('nameINT', true);
                 $replace[$this->id]         = $this->curTpl;
             }
         }
@@ -66,10 +65,21 @@ class WorldEventList extends BaseType
 
     public static function getName($id)
     {
-        if ($id > 0)
-            $row = DB::Aowow()->SelectRow('SELECT * FROM ?_holidays WHERE Id = ?d', intVal($id));
-        else
-            $row = DB::Aowow()->SelectRow('SELECT description as name FROM ?_events WHERE Id = ?d', intVal(-$id));
+        $row = DB::Aowow()->SelectRow('
+            SELECT
+                IFNULL(h.name_loc0, e.description) AS name_loc0,
+                h.name_loc2,
+                h.name_loc3,
+                h.name_loc6,
+                h.name_loc8
+            FROM
+                ?_events e
+            LEFT JOIN
+                ?_holidays h ON e.holidayId = h.id
+            WHERE
+                e.id = ?d',
+            $id
+        );
 
         return Util::localizedString($row, 'name');
     }
@@ -155,7 +165,31 @@ class WorldEventList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip()
+    {
+        if (!$this->curTpl)
+            return null;
+
+        $x = '<table><tr><td>';
+
+        // head                 v that extra % is nesecary because we are using sprintf later on
+        $x .= '<table width="100%%"><tr><td><b>'.Util::jsEscape($this->getField('name', true)).'</b></td><th><b class="q0">'.Lang::event('category', $this->getField('category')).'</b></th></tr></table>';
+
+        // use string-placeholder for dates
+        // start
+        $x .= Lang::event('start').Lang::main('colon').'%s<br>';
+        // end
+        $x .= Lang::event('end').Lang::main('colon').'%s';
+
+        $x .= '</td></tr></table>';
+
+        // desc
+        if ($this->getField('holidayId'))
+            if ($_ = $this->getField('description', true))
+                $x .= '<table><tr><td><span class="q">'.Util::jsEscape($_).'</span></td></tr></table>';
+
+        return $x;
+    }
 }
 
 ?>

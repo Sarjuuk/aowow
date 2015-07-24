@@ -21,7 +21,7 @@ class Markup
 
     public function parseGlobalsFromText(&$jsg = [])
     {
-        if (preg_match_all('/(?<!\\\\)\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|statistic|title|event|class|race|skill|currency)=(\d+)[^\]]*\]/i', $this->text, $matches, PREG_SET_ORDER))
+        if (preg_match_all('/(?<!\\\\)\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|statistic|title|event|class|race|skill|currency)=(-?\d+)[^\]]*\]/i', $this->text, $matches, PREG_SET_ORDER))
         {
             foreach ($matches as $match)
             {

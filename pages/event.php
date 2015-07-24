@@ -4,8 +4,8 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 11: Object   g_initPath()
-//  tabId  0: Database g_initHeader()
+// menuId 11: Worldevent g_initPath()
+//  tabId  0: Database   g_initHeader()
 class EventPage extends GenericPage
 {
     use DetailPage;
@@ -24,16 +24,25 @@ class EventPage extends GenericPage
     {
         parent::__construct($pageCall, $id);
 
+        // temp locale
+        if ($this->mode == CACHE_TYPE_TOOLTIP && isset($_GET['domain']))
+            Util::powerUseLocale($_GET['domain']);
+
         $this->typeId = intVal($id);
 
         $this->subject = new WorldEventList(array(['id', $this->typeId]));
         if ($this->subject->error)
             $this->notFound(Lang::game('event'), Lang::event('notFound'));
 
-        $this->hId = $this->subject->getField('holidayId');
-        $this->eId = $this->typeId;
-
-        $this->name = $this->subject->getField('name', true);
+        $this->hId   = $this->subject->getField('holidayId');
+        $this->eId   = $this->typeId;
+        $this->name  = $this->subject->getField('name', true);
+        $this->dates = array(
+            'firstDate' => $this->subject->getField('startTime'),
+            'lastDate'  => $this->subject->getField('endTime'),
+            'length'    => $this->subject->getField('length'),
+            'rec'       => $this->subject->getField('occurence')
+        );
     }
 
     protected function generatePath()
@@ -78,16 +87,13 @@ class EventPage extends GenericPage
         /* Main Content */
         /****************/
 
+        if ($this->hId)
+            $this->extraText = Util::jsEscape($this->subject->getField('description', true));
+
         $this->headIcons  = [$this->subject->getField('iconString')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => $this->hId > 0,
             BUTTON_LINKS   => true
-        );
-        $this->dates      = array(
-            'firstDate' => $this->subject->getField('startTime'),
-            'lastDate'  => $this->subject->getField('endTime'),
-            'length'    => $this->subject->getField('length'),
-            'rec'       => $this->subject->getField('occurence')
         );
 
         /**************/
@@ -259,53 +265,107 @@ class EventPage extends GenericPage
 
     protected function postCache()
     {
-        if ($this->hId)
-            Util::$wowheadLink = 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/event='.$this->hId;
-
-        /********************/
-        /* finalize infobox */
-        /********************/
-
         // update dates to now()
         $updated = WorldEventList::updateDates($this->dates);
 
-        // start
-        if ($updated['start'])
-            array_push($this->infobox, Lang::event('start').Lang::main('colon').date(Lang::main('dateFmtLong'), $updated['start']));
-
-        // end
-        if ($updated['end'])
-            array_push($this->infobox, Lang::event('end').Lang::main('colon').date(Lang::main('dateFmtLong'), $updated['end']));
-
-        // occurence
-        if ($updated['rec'] > 0)
-            array_push($this->infobox, Lang::event('interval').Lang::main('colon').Util::formatTime($updated['rec'] * 1000));
-
-        // in progress
-        if ($updated['start'] < time() && $updated['end'] > time())
-            array_push($this->infobox, '[span class=q2]'.Lang::event('inProgress').'[/span]');
-
-        $this->infobox = '[ul][li]'.implode('[/li][li]', $this->infobox).'[/li][/ul]';
-
-        /***************************/
-        /* finalize related events */
-        /***************************/
-
-        foreach ($this->lvTabs as &$view)
+        if ($this->mode == CACHE_TYPE_TOOLTIP)
         {
-            if ($view['file'] !=  WorldEventList::$brickFile)
-                continue;
-
-            foreach ($view['data'] as &$data)
-            {
-                $updated = WorldEventList::updateDates($data['_date']);
-                unset($data['_date']);
-                $data['startDate'] = $updated['start'] ? date(Util::$dateFormatInternal, $updated['start']) : false;
-                $data['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
-                $data['rec']       = $updated['rec'];
-            }
-
+            return array(
+                date(Lang::main('dateFmtLong'), $updated['start']),
+                date(Lang::main('dateFmtLong'), $updated['end'])
+            );
         }
+        else
+        {
+            if ($this->hId)
+                Util::$wowheadLink = 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/event='.$this->hId;
+
+            /********************/
+            /* finalize infobox */
+            /********************/
+
+            // start
+            if ($updated['start'])
+                array_push($this->infobox, Lang::event('start').Lang::main('colon').date(Lang::main('dateFmtLong'), $updated['start']));
+
+            // end
+            if ($updated['end'])
+                array_push($this->infobox, Lang::event('end').Lang::main('colon').date(Lang::main('dateFmtLong'), $updated['end']));
+
+            // occurence
+            if ($updated['rec'] > 0)
+                array_push($this->infobox, Lang::event('interval').Lang::main('colon').Util::formatTime($updated['rec'] * 1000));
+
+            // in progress
+            if ($updated['start'] < time() && $updated['end'] > time())
+                array_push($this->infobox, '[span class=q2]'.Lang::event('inProgress').'[/span]');
+
+            $this->infobox = '[ul][li]'.implode('[/li][li]', $this->infobox).'[/li][/ul]';
+
+            /***************************/
+            /* finalize related events */
+            /***************************/
+
+            foreach ($this->lvTabs as &$view)
+            {
+                if ($view['file'] !=  WorldEventList::$brickFile)
+                    continue;
+
+                foreach ($view['data'] as &$data)
+                {
+                    $updated = WorldEventList::updateDates($data['_date']);
+                    unset($data['_date']);
+                    $data['startDate'] = $updated['start'] ? date(Util::$dateFormatInternal, $updated['start']) : false;
+                    $data['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
+                    $data['rec']       = $updated['rec'];
+                }
+
+            }
+        }
+    }
+
+    protected function generateTooltip($asError = false)
+    {
+        if ($asError)
+            return '$WowheadPower.registerHoliday('.$this->typeId.', '.User::$localeId.', {});';
+
+        $x = '$WowheadPower.registerHoliday('.$this->typeId.', '.User::$localeId.", {\n";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
+
+        if ($this->subject->getField('iconString') != 'trade_engineering')
+            $x .= "\ticon: '".urlencode($this->subject->getField('iconString'))."',\n";
+
+        $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
+        $x .= "});";
+
+        return $x;
+    }
+
+    public function display($override = '')
+    {
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
+            return parent::display($override);
+
+        if (!$this->loadCache($tt))
+        {
+            $tt = $this->generateTooltip();
+            $this->saveCache($tt);
+        }
+
+        list($start, $end) = $this->postCache();
+
+        header('Content-type: application/x-javascript; charset=utf-8');
+        die(sprintf($tt, $start, $end));
+    }
+
+    public function notFound()
+    {
+        if ($this->mode != CACHE_TYPE_TOOLTIP)
+            return parent::notFound(Lang::game('event'), Lang::event('notFound'));
+
+        header('Content-type: application/x-javascript; charset=utf-8');
+        echo $this->generateTooltip(true);
+        exit();
     }
 }
 

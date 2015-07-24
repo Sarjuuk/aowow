@@ -206,10 +206,12 @@ class AchievementList extends BaseType
                     break;
             }
 
+            $criteria .= '<!--cr'.$crt['id'].':'.$crt['type'].':'.$crt['value1'].'-->- '.Util::jsEscape($crtName);
+
             if ($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER)
-                $criteria .= '- '.Util::jsEscape($crtName).' <span class="moneygold">'.Lang::nf($crt['value2' ] / 10000).'</span><br />';
-            else
-                $criteria .= '- '.Util::jsEscape($crtName).'<br />';
+                $criteria .= '&nbsp;<span class="moneygold">'.Lang::nf($crt['value2' ] / 10000).'</span>';
+
+            $criteria .= '<br />';
 
             if (++$i == round(count($rows)/2))
                 $criteria .= '</small></td><th class="q0" style="white-space: nowrap; text-align: left"><small>';

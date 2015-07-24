@@ -230,7 +230,7 @@ class CurrencyPage extends GenericPage
         }
     }
 
-   protected function generateTooltip($asError = false)
+    protected function generateTooltip($asError = false)
     {
         if ($asError)
             return '$WowheadPower.registerCurrency('.$this->typeId.', '.User::$localeId.', {});';
@@ -268,7 +268,6 @@ class CurrencyPage extends GenericPage
         echo $this->generateTooltip(true);
         exit();
     }
-
 }
 
 ?>

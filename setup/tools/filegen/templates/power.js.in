@@ -33,6 +33,7 @@ if (typeof $WowheadPower == "undefined") {
             quests       = {},
             spells       = {},
             achievements = {},
+            holidays     = {},
             itemsets     = {},
             currencies   = {},
             profiles     = {},
@@ -57,6 +58,7 @@ if (typeof $WowheadPower == "undefined") {
             TYPE_QUEST       = 5,
             TYPE_SPELL       = 6,
             TYPE_ACHIEVEMENT = 10,
+            TYPE_HOLIDAY     = 12,
             TYPE_CURRENCY    = 17,
             TYPE_PROFILE     = 100,
 
@@ -76,6 +78,7 @@ if (typeof $WowheadPower == "undefined") {
                   5: [quests,       "quest",       "Quest"      ],
                   6: [spells,       "spell",       "Spell"      ],
                  10: [achievements, "achievement", "Achievement"],
+                 12: [holidays,     "event",       "Holiday"    ],
                  17: [currencies,   "currency",    "Currency"   ],
                 100: [profiles,     "profile",     "Profile"    ]
             },
@@ -215,11 +218,26 @@ if (typeof $WowheadPower == "undefined") {
                 return -2323;
             }
 
-            if (!t.href.length && !t.rel) {
+            var rel = t.rel;
+            try {
+                if (t.dataset && t.dataset.hasOwnProperty("wowhead")) {
+                    rel = t.dataset.wowhead;
+                }
+                else if (t.getAttribute && t.getAttribute("data-wowhead")) {
+                    rel = t.getAttribute("data-wowhead");
+                }
+            }
+            catch(e) { void(0); }
+
+            if (!t.href.length && !rel) {
                 return;
             }
 
-            if (t.rel && t.rel.indexOf("np") != -1 && t.rel.indexOf("np") != t.rel.indexOf("npc=")) {
+            if (rel && /^np\b/.test(rel)) {
+                return;
+            }
+
+            if (t.getAttribute("data-disable-wowhead-tooltip") == "true") {
                 return;
             }
 
@@ -239,7 +257,7 @@ if (typeof $WowheadPower == "undefined") {
                 else  if (k == "rand" || k == "ench" || k == "lvl" || k == "c") {
                     params[k] = parseInt(v);
                 }
-                else if (k == "gems" || k == "pcs" || k == "know") {
+                else if (k == "gems" || k == "pcs" || k == "know" || k == "cri") {
                     params[k] = v.split(":");
                 }
                 else if (k == "who" || k == "domain") {
@@ -261,8 +279,8 @@ if (typeof $WowheadPower == "undefined") {
                 i2 = 3;
                 if (t.href.indexOf("http://") == 0 || t.href.indexOf("https://") == 0) {
                     i0 = 1;
-                    // url = t.href.match(/^https?:\/\/(.+?)?\.?wowhead\.com(?:\:\d+)?\/\??(item|quest|spell|achievement|npc|object|itemset|currency)=(-?[0-9]+)/);
-                    url = t.href.match(/^https?:\/\/(.*)\/?\??(item|quest|spell|achievement|npc|object|itemset|currency)=(-?[0-9]+)/);
+                    // url = t.href.match(/^https?:\/\/(.+?)?\.?wowhead\.com(?:\:\d+)?\/\??(item|quest|spell|achievement|event|npc|object|itemset|currency)=(-?[0-9]+)/);
+                    url = t.href.match(/^https?:\/\/(.*)\/?\??(item|quest|spell|achievement|event|npc|object|itemset|currency)=(-?[0-9]+)/);
                     if (url == null) {
                         // url = t.href.match(/^http:\/\/(.+?)?\.?wowhead\.com\/\?(profile)=([^&#]+)/)
                         url = t.href.match(/^https?:\/\/(.*)\/?\??(profile)=([^&#]+)/);
@@ -271,7 +289,7 @@ if (typeof $WowheadPower == "undefined") {
                     showLogo = 0;
                 }
                 else {
-                    url = t.href.match(/()\?(item|quest|spell|achievement|npc|object|itemset|currency)=(-?[0-9]+)/);
+                    url = t.href.match(/()\?(item|quest|spell|achievement|event|npc|object|itemset|currency)=(-?[0-9]+)/);
                     if (url == null) {
                         url = t.href.match(/()\?(profile)=([^&#]+)/);
                     }
@@ -280,20 +298,20 @@ if (typeof $WowheadPower == "undefined") {
                 }
             }
 
-            if (url == null && t.rel && (opt.applyto & 2)) {
+            if (url == null && rel && (opt.applyto & 2)) {
                 i0 = 0;
                 i1 = 1;
                 i2 = 2;
-                url = t.rel.match(/(item|quest|spell|achievement|npc|object|itemset|currency).?(-?[0-9]+)/);
+                url = rel.match(/(item|quest|spell|achievement|event|npc|object|itemset|currency).?(-?[0-9]+)/);
                 // if (url == null) {                       // sarjuuk: also matches 'profiler' and 'profiles' which screws with the language-menu workaround
-                    // url = t.rel.match(/(profile).?([^&#]+)/);
+                    // url = rel.match(/(profile).?([^&#]+)/);
                 // }
                 showLogo = 1;
             }
 
             t.href.replace(/([a-zA-Z]+)=?([a-zA-Z0-9:-]*)/g, p);
-            if (t.rel) {
-                t.rel.replace(/([a-zA-Z]+)=?([a-zA-Z0-9:-]*)/g, p);
+            if (rel) {
+                rel.replace(/([a-zA-Z]+)=?([a-zA-Z0-9:-]*)/g, p);
             }
 
             if (params.gems && params.gems.length > 0) {
@@ -606,6 +624,11 @@ if (typeof $WowheadPower == "undefined") {
                         html = html.replace("<table><tr><td><br />", '<table><tr><td><br /><span class="q2">' + $WH.sprintf(_LANG.achievementcomplete, currentParams.who, currentParams.when.getMonth() + 1, currentParams.when.getDate(), currentParams.when.getFullYear()) + "</span><br /><br />");
                         html = html.replace(/class="q0"/g, 'class="r3"');
                     }
+                    if ((currentType == TYPE_ACHIEVEMENT) && currentParams.cri) {
+                        for (var i = 0; i < currentParams.cri.length; i++) {
+                            html = html.replace(new RegExp("<!--cr" + parseInt(currentParams.cri[i]) + ":[^<]+", "g"), '<span class="q2">$&</span>')
+                        }
+                    }
                 }
             }
 
@@ -723,6 +746,10 @@ if (typeof $WowheadPower == "undefined") {
 
         this.registerItem = function (id, locale, json) {
             this.register(TYPE_ITEM, id, locale, json);
+        };
+
+        this.registerHoliday = function (id, locale, json) {
+            this.register(TYPE_HOLIDAY, id, locale, json);
         };
 
         this.registerItemSet = function (id, locale, json) {
