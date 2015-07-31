@@ -40,15 +40,16 @@ class Util
         null,               'CreatureList',     'GameObjectList',   'ItemList',         'ItemsetList',      'QuestList',        'SpellList',
         'ZoneList',         'FactionList',      'PetList',          'AchievementList',  'TitleList',        'WorldEventList',   'CharClassList',
         'CharRaceList',     'SkillList',        null,               'CurrencyList',
-        TYPE_EMOTE => 'EmoteList'
+        TYPE_EMOTE       => 'EmoteList',
+        TYPE_ENCHANTMENT => 'EnchantmentList'
     );
 
     public static $typeStrings              = array(        // zero-indexed
         null,           'npc',          'object',       'item',         'itemset',      'quest',        'spell',        'zone',         'faction',
         'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency',
-        TYPE_USER  => 'user',
-        TYPE_EMOTE => 'emote'
-
+        TYPE_USER        => 'user',
+        TYPE_EMOTE       => 'emote',
+        TYPE_ENCHANTMENT => 'enchantment'
     );
 
     public static $combatRatingToItemMod    = array(        // zero-indexed idx:CR; val:Mod
@@ -1094,131 +1095,6 @@ class Util
             User::useLocale(LOCALE_EN);
             Lang::load(User::$localeString);
         }
-    }
-
-    // EnchantmentTypes
-    // 0 => TYPE_NONE               dnd stuff; (ignore)
-    // 1 => TYPE_COMBAT_SPELL       proc spell from ObjectX (amountX == procChance?; ignore)
-    // 2 => TYPE_DAMAGE             +AmountX damage
-    // 3 => TYPE_EQUIP_SPELL        Spells from ObjectX (amountX == procChance?)
-    // 4 => TYPE_RESISTANCE         +AmountX resistance for ObjectX School
-    // 5 => TYPE_STAT               +AmountX for Statistic by type of ObjectX
-    // 6 => TYPE_TOTEM              Rockbiter AmountX as Damage (ignore)
-    // 7 => TYPE_USE_SPELL          Engineering gadgets
-    // 8 => TYPE_PRISMATIC_SOCKET   Extra Sockets AmountX as socketCount (ignore)
-    public static function parseItemEnchantment($ench, $raw = false, &$misc = null)
-    {
-        if (!$ench)
-            return [];
-
-        if (is_numeric($ench))
-            $ench = [$ench];
-
-        if (!is_array($ench))
-            return [];
-
-        $enchants = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM ?_itemenchantment WHERE id IN (?a)', $ench);
-        if (!$enchants)
-            return [];
-
-        $result = [];
-        foreach ($enchants as $eId => $e)
-        {
-            $misc[$eId] = array(
-                'name' => self::localizedString($e, 'text'),
-                'text' => array(
-                    'text_loc0' => $e['text_loc0'],
-                    'text_loc2' => $e['text_loc2'],
-                    'text_loc3' => $e['text_loc3'],
-                    'text_loc6' => $e['text_loc6'],
-                    'text_loc8' => $e['text_loc8']
-                )
-            );
-
-            if ($e['skillLine'] > 0)
-                $misc[$eId]['reqskill'] = $e['skillLine'];
-
-            if ($e['skillLevel'] > 0)
-                $misc[$eId]['reqskillrank'] = $e['skillLevel'];
-
-            if ($e['requiredLevel'] > 0)
-                $misc[$eId]['reqlevel'] = $e['requiredLevel'];
-
-            // parse stats
-            $jsonStats = [];
-            for ($h = 1; $h <= 3; $h++)
-            {
-                $obj = (int)$e['object'.$h];
-                $val = (int)$e['amount'.$h];
-
-                switch ($e['type'.$h])
-                {
-                    case 2:
-                        $obj = ITEM_MOD_WEAPON_DMG;
-                        break;
-                    case 3:
-                    case 7:
-                        $spl = new SpellList(array(['s.id', $obj]));
-                        if (!$spl->error)
-                            Util::arraySumByKey($jsonStats, $spl->getStatGain()[$obj]);
-
-                        $obj = null;
-                        break;
-                    case 4:
-                        switch ($obj)
-                        {
-                            case 0:                         // Physical
-                                $obj = ITEM_MOD_ARMOR;
-                                break;
-                            case 1:                         // Holy
-                                $obj = ITEM_MOD_HOLY_RESISTANCE;
-                                break;
-                            case 2:                         // Fire
-                                $obj = ITEM_MOD_FIRE_RESISTANCE;
-                                break;
-                            case 3:                         // Nature
-                                $obj = ITEM_MOD_NATURE_RESISTANCE;
-                                break;
-                            case 4:                         // Frost
-                                $obj = ITEM_MOD_FROST_RESISTANCE;
-                                break;
-                            case 5:                         // Shadow
-                                $obj = ITEM_MOD_SHADOW_RESISTANCE;
-                                break;
-                            case 6:                         // Arcane
-                                $obj = ITEM_MOD_ARCANE_RESISTANCE;
-                                break;
-                            default:
-                                $obj = null;
-                        }
-                        break;
-                    case 5:
-                        break;
-                    default:                                // skip assignment below
-                        $obj = null;
-                }
-
-                if ($obj)
-                {
-                    if (!isset($jsonStats[$obj]))
-                        $jsonStats[$obj] = 0;
-
-                    $jsonStats[$obj] += $val;
-                }
-            }
-
-            if ($raw)
-                $result[$eId] = $jsonStats;
-            else
-            {
-                $result[$eId] = [];
-                foreach ($jsonStats as $k => $v)            // check if we use these mods
-                    if ($str = Util::$itemMods[$k])
-                        $result[$eId][$str] = $v;
-            }
-        }
-
-        return $result;
     }
 
     // default ucFirst doesn't convert UTF-8 chars

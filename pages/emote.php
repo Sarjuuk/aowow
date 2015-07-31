@@ -10,7 +10,7 @@ class EmotePage extends GenericPage
 {
     use DetailPage;
 
-    protected $type          = TYPE_PET;
+    protected $type          = TYPE_EMOTE;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 100];
@@ -80,7 +80,7 @@ class EmotePage extends GenericPage
                 $text .= '[pad][b]'.$h.'[/b][ul][li][span class=s4]'.preg_replace('/%\d?\$?s/', '<'.Util::ucFirst(Lang::main('name')).'>', $t).'[/span][/li][/ul]';
 
         $this->extraText = $text;
-        $this->infobox   = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
+        $this->infobox   = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
 
         /**************/
         /* Extra Tabs */

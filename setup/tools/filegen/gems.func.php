@@ -52,8 +52,13 @@ if (!CLI)
         foreach ($gems as $pop)
             $enchIds[] = $pop['enchId'];
 
-        $enchMisc = [];
-        $enchJSON = Util::parseItemEnchantment($enchIds, false, $enchMisc);
+        $enchantments = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
+        if ($enchantments->error)
+        {
+            CLISetup::log('Required table ?_itemenchantment seems to be empty! Leaving gems()...', CLISetup::LOG_ERROR);
+            CLISetup::log();
+            return false;
+        }
 
         foreach (CLISetup::$localeIds as $lId)
         {
@@ -65,12 +70,18 @@ if (!CLI)
             $gemsOut = [];
             foreach ($gems as $pop)
             {
+                if (!$enchantments->getEntry($pop['enchId']))
+                {
+                    CLISetup::log(' * could not find enchantment #'.$pop['enchId'].' referenced by item #'.$gem['itemId'], CLISetup::LOG_WARN);
+                    continue;
+                }
+
                 $gemsOut[$pop['itemId']] = array(
                     'name'        => Util::localizedString($pop, 'name'),
                     'quality'     => $pop['quality'],
                     'icon'        => strToLower($pop['icon']),
-                    'enchantment' => Util::localizedString(@$enchMisc[$pop['enchId']]['text'] ?: [], 'text'),
-                    'jsonequip'   => @$enchJSON[$pop['enchId']] ?: [],
+                    'enchantment' => $enchantments->getField('name', true),
+                    'jsonequip'   => $enchantments->getStatGain(),
                     'colors'      => $pop['colors'],
                     'expansion'   => $pop['expansion']
                 );

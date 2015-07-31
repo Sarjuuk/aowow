@@ -156,8 +156,16 @@ class SpellList extends BaseType
                 // Enchant Item Permanent (53) / Temporary (54)
                 if (in_array($this->curTpl['effect'.$i.'Id'], [53, 54]))
                 {
-                    if ($mv && ($_ = Util::parseItemEnchantment($mv, true)))
-                        Util::arraySumByKey($stats, $_[$mv]);
+                    if ($mv && ($json = DB::Aowow()->selectRow('SELECT * FROM ?_item_stats WHERE `type` = ?d AND `typeId` = ?d', TYPE_ENCHANTMENT, $mv)))
+                    {
+                        $mods = [];
+                        foreach ($json as $str => $val)
+                            if ($val && ($idx = array_search($str, Util::$itemMods)))
+                                $mods[$idx] = $val;
+
+                        if ($mods)
+                            Util::arraySumByKey($stats, $mods);
+                    }
 
                     continue;
                 }
@@ -165,7 +173,6 @@ class SpellList extends BaseType
                 switch ($au)
                 {
                     case 29:                                // ModStat MiscVal:type
-                    {
                         if ($mv < 0)                        // all stats
                         {
                             for ($j = 0; $j < 5; $j++)
@@ -175,16 +182,12 @@ class SpellList extends BaseType
                             Util::arraySumByKey($stats, [(ITEM_MOD_AGILITY + $mv) => $pts]);
 
                         break;
-                    }
                     case 34:                                // Increase Health
                     case 230:
                     case 250:
-                    {
                         Util::arraySumByKey($stats, [ITEM_MOD_HEALTH => $pts]);
                         break;
-                    }
                     case 13:                                // damage splpwr + physical (dmg & any)
-                    {
                         // + weapon damage
                         if ($mv == (1 << SPELL_SCHOOL_NORMAL))
                         {
@@ -226,14 +229,10 @@ class SpellList extends BaseType
                         }
 
                         break;
-                    }
                     case 135:                               // healing splpwr (healing & any) .. not as a mask..
-                    {
                         Util::arraySumByKey($stats, [ITEM_MOD_SPELL_HEALING_DONE => $pts]);
                         break;
-                    }
                     case 35:                                // ModPower - MiscVal:type see defined Powers only energy/mana in use
-                    {
                         if ($mv == POWER_HEALTH)
                             Util::arraySumByKey($stats, [ITEM_MOD_HEALTH      => $pts]);
                         if ($mv == POWER_ENERGY)
@@ -244,7 +243,6 @@ class SpellList extends BaseType
                             Util::arraySumByKey($stats, [ITEM_MOD_RUNIC_POWER => $pts]);
 
                         break;
-                    }
                     case 189:                               // CombatRating MiscVal:ratingMask
                     case 220:
                         if ($mod = Util::itemModByRatingMask($mv))
@@ -309,6 +307,10 @@ class SpellList extends BaseType
                         break;
                     case 240:                               // ModExpertise
                         Util::arraySumByKey($stats, [ITEM_MOD_EXPERTISE_RATING    => $pts]);
+                        break;
+                    case 123:                               // Mod Target Resistance
+                        if ($mv == 0x7C && $pts < 0)
+                            Util::arraySumByKey($stats, [ITEM_MOD_SPELL_PENETRATION => -$pts]);
                         break;
                 }
             }
@@ -1411,7 +1413,7 @@ class SpellList extends BaseType
 
             if (isset($var[1]) && $var[0] != $var[1] && !isset($var[4]))
             {
-                $_ = is_numeric($var[0]) ? abs($var[0]) : $var[0];
+                $_ = is_numeric($var[1]) ? abs($var[1]) : $var[1];
                 $resolved .= Lang::game('valueDelim');
                 $resolved .= isset($var[3]) ? sprintf($var[3], $_) : $_;
             }

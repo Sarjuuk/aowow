@@ -173,8 +173,10 @@ $lang = array(
         'difficulty'    => "Dificultad",
         'dispelType'    => "Tipo de disipación",
         'duration'      => "Duración",
-        'emote'         => "Emoción",
+        'emote'         => "emoción",
         'emotes'        => "Emociones",
+        'enchantment'   => "encantamiento",
+        'enchantments'  => "Encantamientos",
         'object'        => "entidad",
         'objects'       => "Entidades",
         'glyphType'     => "Tipo de glifo",
@@ -389,6 +391,14 @@ $lang = array(
         'isAnimated'    => "[Uses an animation]",
         'aliases'       => "[Aliases]",
         'noText'        => "[This Emote has no text.]",
+    ),
+    'enchantment' => array(
+        'details'       => "Detalles",
+        'activation'    => "Activación",
+        'types'         => array(
+            1 => "[Proc Spell]",            3 => "[Equip Spell]",           7 => "[Use Spell]",             8 => "Ranura prismática",
+            5 => "Atributos",               2 => "Daño de arma",            6 => "DPS",                     4 => "Defensa"
+        )
     ),
     'gameObject' => array(
         'notFound'      => "Este entidad no existe.",

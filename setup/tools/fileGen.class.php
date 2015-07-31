@@ -40,9 +40,9 @@ class FileGen
         'pets'        => [['spawns', 'creature'], null],
         'talentIcons' => [null, null],
         'glyphs'      => [['items', 'spell'], null],
-        'itemsets'    => [['itemset'], null],
-        'enchants'    => [['items'], null],
-        'gems'        => [['items'], null],
+        'itemsets'    => [['itemset', 'spell'], null],
+        'enchants'    => [['items', 'spell', 'itemenchantment'], null],
+        'gems'        => [['items', 'spell', 'itemenchantment'], null],
         'profiler'    => [['quests', 'quests_startend', 'spell', 'currencies', 'achievement', 'titles'], null]
     );
 
@@ -82,6 +82,8 @@ class FileGen
         self::$subScripts = array_merge(array_keys(self::$tplFiles), array_keys(self::$datasets));
         if ($doScripts)
             self::$subScripts = array_intersect($doScripts, self::$subScripts);
+        else if ($doScripts === null)
+            self::$subScripts = [];
 
         if (!CLISetup::$localeIds /* todo: && this script has localized text */)
         {
@@ -127,7 +129,7 @@ class FileGen
                     $doScripts[] = $name;
             }
 
-            $doScripts = array_unique($doScripts);
+            $doScripts = $doScripts ? array_unique($doScripts) : null;
         }
         else if (!empty($_['build']))
             $doScripts = explode(',', $_['build']);

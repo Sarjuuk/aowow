@@ -215,7 +215,7 @@ foreach ($this->effects as $i => $e):
                                 <?php echo '$WH.ge(\'icontab-icon'.$i.'\').appendChild('.(isset($e['icon']['quality']) ? 'g_items' : 'g_spells').'.createIcon('.$e['icon']['id'].', 1, '.$e['icon']['count']."));\n"; ?>
                             </script>
 <?php
-endif;
+    endif;
 ?>
                         </td>
                     </tr>

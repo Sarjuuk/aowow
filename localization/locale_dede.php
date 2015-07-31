@@ -175,6 +175,8 @@ $lang = array(
         'duration'      => "Dauer",
         'emote'         => "Emote",
         'emotes'        => "Emotes",
+        'enchantment'   => "Verzauberung",
+        'enchantments'  => "Verzauberungen",
         'object'        => "Objekt",
         'objects'       => "Objekte",
         'glyphType'     => "Glyphenart",
@@ -388,6 +390,14 @@ $lang = array(
         'isAnimated'    => "Besitzt eine Animation",
         'aliases'       => "Aliasse",
         'noText'        => "Dieses Emote besitzt keinen Text.",
+    ),
+    'enchantment' => array(
+        'details'       => "Details",
+        'activation'    => "Aktivierung",
+        'types'         => array(
+            1 => "Zauber (Auslösung)",      3 => "Zauber (Anlegen)",        7 => "Zauber (Benutzen)",       8 => "Prismatischer Sockel",
+            5 => "Statistik",               2 => "Waffenschaden",           6 => "DPS",                     4 => "Verteidigung"
+        )
     ),
     'gameObject' => array(
         'notFound'      => "Dieses Objekt existiert nicht.",

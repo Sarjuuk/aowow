@@ -23,7 +23,6 @@ class SqlGen
         'achievementcategory'      => ['achievement_category',          false, null, null],
         'achievementcriteria'      => ['achievement_criteria',          false, null, null],
         'glyphproperties'          => ['glyphproperties',               true,  null, null],
-        'itemenchantment'          => ['spellitemenchantment',          false, null, null],
         'itemenchantmentcondition' => ['spellitemenchantmentcondition', false, null, null],
         'itemextendedcost'         => ['itemextendedcost',              false, null, null],
         'itemlimitcategory'        => ['itemlimitcategory',             false, null, null],
@@ -46,6 +45,7 @@ class SqlGen
         'shapeshiftforms'          => [null, null,                             null, null],
         'skillline'                => [null, null,                             null, null],
         'emotes'                   => [null, null,                             null, null],
+        'itemenchantment'          => [null, null, null,                      ['spell_enchant_proc_data']],
         'achievement'              => [null, null, null,                      ['dbc_achievement']],
         'creature'                 => [null, null, null,                      ['creature_template', 'locales_creature', 'creature_classlevelstats', 'instance_encounters']],
         'currencies'               => [null, null, null,                      ['item_template', 'locales_item']],
@@ -62,8 +62,8 @@ class SqlGen
         'spawns' /* + waypoints */ => [null, null, null,                      ['creature', 'creature_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'script_waypoint', 'waypoints', 'waypoint_data']],
         'zones'                    => [null, null, null,                      ['access_requirement']],
         'itemset'                  => [null, null, ['spell'],                 ['item_template', 'game_event']],
-        'item_stats'               => [null, null, ['items', 'spell'],        null],
-        'source'                   => [null, null, ['spell', 'achievements'], ['npc_vendor', 'game_event_npc_vendor', 'creature', 'quest_template', 'playercreateinfo_item', 'npc_trainer', 'skill_discovery_template', 'playercreateinfo_spell', 'achievement_reward']]
+        'item_stats' /* + ench */  => [null, null, ['items', 'spell'],        null],
+        'source'                   => [null, null, ['spell', 'achievement'],  ['npc_vendor', 'game_event_npc_vendor', 'creature', 'quest_template', 'playercreateinfo_item', 'npc_trainer', 'skill_discovery_template', 'playercreateinfo_spell', 'achievement_reward']]
     );
 
     public  static $cliOpts   = [];
@@ -92,6 +92,8 @@ class SqlGen
         self::$subScripts = array_keys(self::$tables);
         if ($doScripts)
             self::$subScripts = array_intersect($doScripts, self::$subScripts);
+        else if ($doScripts === null)
+            self::$subScripts = [];
 
         if (!CLISetup::$localeIds /* && this script has localized text */)
         {
@@ -124,7 +126,7 @@ class SqlGen
                 if (!empty($info[2]) && array_intersect($doTbls, $info[2]))
                     $doTbls[] = $name;
 
-            $doTbls = array_unique($doTbls);
+            $doTbls = $doTbls ? array_unique($doTbls) : null;
         }
         else if (!empty($_['sql']))
             $doTbls = explode(',', $_['sql']);

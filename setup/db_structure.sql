@@ -262,8 +262,8 @@ DROP TABLE IF EXISTS `aowow_articles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_articles` (
-  `type` tinyint(4) NOT NULL,
-  `typeId` int(11) NOT NULL,
+  `type` smallint(5) NOT NULL,
+  `typeId` mediumint(9) NOT NULL,
   `locale` tinyint(4) NOT NULL,
   `article` text COMMENT 'Markdown formated',
   `quickInfo` text COMMENT 'Markdown formated',
@@ -330,8 +330,8 @@ DROP TABLE IF EXISTS `aowow_comments`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_comments` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Comment ID',
-  `type` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Type of Page',
-  `typeId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'ID Of Page',
+  `type` smallint(5) unsigned NOT NULL COMMENT 'Type of Page',
+  `typeId` mediumint(9) NOT NULL COMMENT 'ID Of Page',
   `userId` int(10) unsigned NOT NULL COMMENT 'User ID',
   `roles` smallint(5) unsigned NOT NULL,
   `body` text NOT NULL COMMENT 'Comment text',
@@ -718,7 +718,8 @@ DROP TABLE IF EXISTS `aowow_item_stats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_item_stats` (
-  `id` mediumint(8) unsigned NOT NULL,
+  `type` smallint(5) unsigned NOT NULL,
+  `typeId` mediumint(9) unsigned NOT NULL,
   `nsockets` tinyint(3) unsigned NOT NULL,
   `dmgmin1` smallint(5) unsigned NOT NULL,
   `dmgmax1` smallint(5) unsigned NOT NULL,
@@ -798,8 +799,7 @@ CREATE TABLE `aowow_item_stats` (
   `shasplpwr` smallint(6) NOT NULL,
   `natsplpwr` smallint(6) NOT NULL,
   `arcsplpwr` smallint(6) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `item` (`id`)
+  PRIMARY KEY (`typeId`, `type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -812,6 +812,10 @@ DROP TABLE IF EXISTS `aowow_itemenchantment`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_itemenchantment` (
   `id` smallint(5) unsigned NOT NULL,
+  `charges` tinyint(4) unsigned NOT NULL,
+  `cuFlags` int(10) unsigned NOT NULL,
+  `procChance` tinyint(3) unsigned NOT NULL,
+  `ppmRate` float NOT NULL,
   `type1` tinyint(4) unsigned NOT NULL,
   `type2` tinyint(4) unsigned NOT NULL,
   `type3` tinyint(4) unsigned NOT NULL,
@@ -821,12 +825,11 @@ CREATE TABLE `aowow_itemenchantment` (
   `object1` mediumint(9) unsigned NOT NULL,
   `object2` mediumint(9) unsigned NOT NULL,
   `object3` smallint(6) unsigned NOT NULL,
-  `text_loc0` varchar(65) NOT NULL,
-  `text_loc2` varchar(91) NOT NULL,
-  `text_loc3` varchar(84) NOT NULL,
-  `text_loc6` varchar(89) NOT NULL,
-  `text_loc8` varchar(96) NOT NULL,
-  `gemReference` mediumint(8) unsigned NOT NULL,
+  `name_loc0` varchar(65) NOT NULL,
+  `name_loc2` varchar(91) NOT NULL,
+  `name_loc3` varchar(84) NOT NULL,
+  `name_loc6` varchar(89) NOT NULL,
+  `name_loc8` varchar(96) NOT NULL,
   `conditionId` tinyint(3) unsigned NOT NULL,
   `skillLine` smallint(5) unsigned NOT NULL,
   `skillLevel` smallint(5) unsigned NOT NULL,
@@ -1688,7 +1691,7 @@ DROP TABLE IF EXISTS `aowow_screenshots`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_screenshots` (
   `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `type` tinyint(4) unsigned NOT NULL,
+  `type` smallint(5) unsigned NOT NULL,
   `typeId` mediumint(9) NOT NULL,
   `uploader` int(16) unsigned NOT NULL,
   `date` int(32) unsigned NOT NULL,
@@ -2214,8 +2217,8 @@ DROP TABLE IF EXISTS `aowow_videos`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_videos` (
   `id` int(16) NOT NULL,
-  `type` int(8) NOT NULL,
-  `typeId` int(16) NOT NULL,
+  `type` smallint(5) unsigned NOT NULL,
+  `typeId` mediumint(9) NOT NULL,
   `uploader` int(16) NOT NULL,
   `date` int(32) NOT NULL,
   `videoId` varchar(12) NOT NULL,

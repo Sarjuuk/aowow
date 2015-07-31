@@ -770,6 +770,17 @@ var mn_currencies = [
     [2,"Spieler gegen Spieler","?currencies=2"],
     [1,"Verschiedenes","?currencies=1"]
 ];
+var mn_enchantments = [
+    [1,"Zauber (Auslösung)","?enchantments&filter=ty=1"],
+    [3,"Zauber (Anlegen)","?enchantments&filter=ty=3"],
+    [7,"Zauber (Benutzen)","?enchantments&filter=ty=7"],
+    [8,"Prismatischer Sockel","?enchantments&filter=ty=8"],
+    [5,"Statistik","?enchantments&filter=ty=5"],
+    [2,"Waffenschaden","?enchantments&filter=ty=2"],
+    [6,"DPS","?enchantments&filter=ty=6"],
+    [4,"Verteidigung","?enchantments&filter=ty=4"]
+];
+
 var mn_talentCalc = [
     [6,"Todesritter","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druide","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -836,7 +847,8 @@ var mn_database = [
     [15,"Währungen","?currencies",mn_currencies],
     [11,"Weltereignisse","?events",mn_holidays],
     [1,"Zauber","?spells",mn_spells],
-    [100,"Emotes","?emotes",null]
+    [100,"Emotes","?emotes",null],
+    [101,"Verzauberungen","?enchantments",mn_enchantments]
 ];
 var mn_tools = [
     [0,"Talentrechner","?talent",mn_talentCalc],
@@ -2604,6 +2616,7 @@ var LANG = {
     lvnote_arenateamsfound:   "Insgesamt $1 Arena-Teams",
     lvnote_arenateamsfound2:  "Insgesamt $1 Arena-Teams, $2 passende",
     lvnote_currenciesfound:   "$1 Währungen gefunden ($2 angezeigt)",
+    lvnote_enchantmentsfound: "$1 Verzauberungen gefunden ($2 angezeigt)",
 
     lvnote_createafilter:  '<small><a href="$1">Filter erstellen</a></small>',
     lvnote_filterresults:  '<small><a href="$1">Diese Ergebnisse filtern</a></small>',
@@ -3175,23 +3188,25 @@ var LANG = {
     myaccount_purgesuccess:  "Bekanntmachungsdaten wurden erfolgreich gelöscht!",
 
     types: {
-         1: ["NPC",             "NPC" ,             "NPCs",             "NPCs"],
-         2: ["Objekt",          "Objekt",           "Objekte",          "Objekte"],
-         3: ["Gegenstand",      "Gegenstand",       "Gegenstände",      "Gegenstände"],
-         4: ["Ausrüstungsset",  "Ausrüstungsset",   "Ausrüstungssets",  "Ausrüstungssets"],
-         5: ["Quest",           "Quest",            "Quests",           "Quests"],
-         6: ["Zauber",          "Zauber",           "Zauber",           "Zauber"],
-         7: ["Zone",            "Zone",             "Gebiete",          "Gebiete"],
-         8: ["Fraktion",        "Fraktion",         "Fraktionen",       "Fraktionen"],
-         9: ["Begleiter",       "Begleiter",        "Begleiter",        "Begleiter"],
-        10: ["Erfolg",          "Erfolg",           "Erfolge",          "Erfolge"],
-        11: ["Titel",           "Titel",            "Titel",            "Titel"],
-        12: ["Weltereignis",    "Weltereignis",     "Weltereignisse",   "Weltereignisse"],
-        13: ["Klasse",          "Klasse",           "Klassen",          "Klassen"],
-        14: ["Volk",            "Volk",             "Völker",           "Völker"],
-        15: ["Fertigkeit",      "Fertigkeit",       "Fertigkeiten",     "Fertigkeiten"],
-        16: ["Statistik",       "Statistik",        "Statistiken",      "Statistiken"],
-        17: ["Währung",         "Währung",          "Währungen",        "Währungen"]
+          1: ["NPC",             "NPC" ,             "NPCs",             "NPCs"],
+          2: ["Objekt",          "Objekt",           "Objekte",          "Objekte"],
+          3: ["Gegenstand",      "Gegenstand",       "Gegenstände",      "Gegenstände"],
+          4: ["Ausrüstungsset",  "Ausrüstungsset",   "Ausrüstungssets",  "Ausrüstungssets"],
+          5: ["Quest",           "Quest",            "Quests",           "Quests"],
+          6: ["Zauber",          "Zauber",           "Zauber",           "Zauber"],
+          7: ["Zone",            "Zone",             "Gebiete",          "Gebiete"],
+          8: ["Fraktion",        "Fraktion",         "Fraktionen",       "Fraktionen"],
+          9: ["Begleiter",       "Begleiter",        "Begleiter",        "Begleiter"],
+         10: ["Erfolg",          "Erfolg",           "Erfolge",          "Erfolge"],
+         11: ["Titel",           "Titel",            "Titel",            "Titel"],
+         12: ["Weltereignis",    "Weltereignis",     "Weltereignisse",   "Weltereignisse"],
+         13: ["Klasse",          "Klasse",           "Klassen",          "Klassen"],
+         14: ["Volk",            "Volk",             "Völker",           "Völker"],
+         15: ["Fertigkeit",      "Fertigkeit",       "Fertigkeiten",     "Fertigkeiten"],
+         16: ["Statistik",       "Statistik",        "Statistiken",      "Statistiken"],
+         17: ["Währung",         "Währung",          "Währungen",        "Währungen"],
+        501: ["Emote",           "Emote",            "Emotes",           "Emotes"],
+        502: ["Verzauberung",    "Verzauberung",     "Verzauberungen",   "Verzauberungen"]
     },
 
     timeunitssg: ["Jahr", "Monat", "Woche", "Tag", "Stunde", "Minute", "Sekunde"],
@@ -3863,6 +3878,18 @@ var LANG = {
         teamname5v5:          "5v5 Arena-Teamname",
         teamrtng5v5:          "5v5 Arena-Teamwertung",
         teamcontrib5v5:       "5v5 Arena-Teambeteiligung"
+    },
+
+    // custom
+    fienchantments: {
+        id:             "ID",
+        hascondition:   "Benötigt Edelsteinkombination",
+        requiresprof:   "Benötigt einen Beruf",
+
+        sepcommunity:   "Community",
+        hascomments:    "Has comments",
+        hasscreenshots: "Has screenshots",
+        hasvideos:      "Has videos"
     },
 
     pr_notice:     'Zum ersten Mal hier? &ndash; Seid nicht schüchtern! Schaut ruhig mal auf unserer <a href="?help=profiler" target="_blank">Hilfeseite</a> (zurzeit noch unübersetzt) nach! &nbsp; <small class="q0"><a href="javascript:;">Schließen</a></small>',

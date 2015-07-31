@@ -2256,7 +2256,7 @@ function ss_appendSticky() {
             th = sections[sections.length - (lv_videos && lv_videos.length ? 2 : 1)];
         }
 
-        $WH.ae(a, $WH.ct(th.innerText + ' (' + lv_screenshots.length + ')'));
+        $WH.ae(a, $WH.ct(th.textContent + ' (' + lv_screenshots.length + ')'));
         a.href = '#screenshots'
         a.title = $WH.sprintf(LANG.infobox_showall, lv_screenshots.length);
         a.onclick = function() {
@@ -2876,12 +2876,13 @@ function vi_appendSticky() {
 
         var th = $WH.ge('infobox-videos');
         var a = $WH.ce('a');
+
         if (!th) {
             var sections = $('th', _.parentNode);
             th = sections[sections.length - (lv_videos && lv_videos.length ? 2 : 1)];
         }
 
-        $WH.ae(a, $WH.ct(th.innerText + ' (' + lv_videos.length + ')'));
+        $WH.ae(a, $WH.ct(th.textContent + ' (' + lv_videos.length + ')'));
         a.href = '#videos'
         a.title = $WH.sprintf(LANG.infobox_showall, lv_videos.length);
         a.onclick = function() {
@@ -21102,25 +21103,29 @@ var
     g_classes            = {},
     g_races              = {},
     g_skills             = {},
-    g_gatheredcurrencies = {};
+    g_gatheredcurrencies = {},
+    g_enchantments       = {},
+    g_emotes             = {};
 
 var g_types = {
-     1: 'npc',
-     2: 'object',
-     3: 'item',
-     4: 'itemset',
-     5: 'quest',
-     6: 'spell',
-     7: 'zone',
-     8: 'faction',
-     9: 'pet',
-    10: 'achievement',
-    11: 'title',
-    12: 'event',
-    13: 'class',
-    14: 'race',
-    15: 'skill',
-    17: 'currency'
+      1: 'npc',
+      2: 'object',
+      3: 'item',
+      4: 'itemset',
+      5: 'quest',
+      6: 'spell',
+      7: 'zone',
+      8: 'faction',
+      9: 'pet',
+     10: 'achievement',
+     11: 'title',
+     12: 'event',
+     13: 'class',
+     14: 'race',
+     15: 'skill',
+     17: 'currency',
+    501: 'emote',
+    502: 'enchantment'
 };
 
 // Items

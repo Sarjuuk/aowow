@@ -11,8 +11,6 @@ if (!CLI)
     // this script requires the following dbc-files to be parsed and available
     // Spells, SkillLineAbility, SpellItemEnchantment
 
-    // todo (high): restructure to work more efficiently (outer loop: spells, inner loop: locales)
-
     /* Examples
         15: {
             name:'Leichtes Rüstungsset',
@@ -72,8 +70,13 @@ if (!CLI)
         foreach ($enchantSpells->iterate() as $__)
             $enchIds[] = $enchantSpells->getField('effect1MiscValue');
 
-        $enchMisc = [];
-        $enchJSON = Util::parseItemEnchantment($enchIds, false, $enchMisc);
+        $enchantments = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
+        if ($enchantments->error)
+        {
+            CLISetup::log('Required table ?_itemenchantment seems to be empty! Leaving enchants()...', CLISetup::LOG_ERROR);
+            CLISetup::log();
+            return false;
+        }
 
         foreach (CLISetup::$localeIds as $lId)
         {
@@ -85,6 +88,13 @@ if (!CLI)
             $enchantsOut = [];
             foreach ($enchantSpells->iterate() as $__)
             {
+                $eId = $enchantSpells->getField('effect1MiscValue');
+                if (!$enchantments->getEntry($eId))
+                {
+                    CLISetup::log(' * could not find enchantment #'.$eId.' referenced by spell #'.$enchantSpells->id, CLISetup::LOG_WARN);
+                    continue;
+                }
+
                 // slots have to be recalculated
                 $slot = 0;
                 if ($enchantSpells->getField('equippedItemClass') == 4)   // armor
@@ -111,7 +121,6 @@ if (!CLI)
                     }
                 }
 
-                $eId = $enchantSpells->getField('effect1MiscValue');
 
                 // defaults
                 $ench = array(
@@ -121,20 +130,20 @@ if (!CLI)
                     'source'      => [],                    // <0: item; >0:spell
                     'skill'       => -1,                    // modified if skill
                     'slots'       => [],                    // determined per spell but set per item
-                    'enchantment' => Util::localizedString($enchMisc[$eId]['text'], 'text'),
-                    'jsonequip'   => @$enchJSON[$eId] ?: [],
+                    'enchantment' => $enchantments->getField('name', true),
+                    'jsonequip'   => $enchantments->getStatGain(),
                     'temp'        => 0,                     // always 0
                     'classes'     => 0,                     // modified by item
                 );
 
-                if (isset($enchMisc[$eId]['reqskill']))
-                    $ench['jsonequip']['reqskill'] = $enchMisc[$eId]['reqskill'];
+                if ($_ = $enchantments->getField('skillLine'))
+                    $ench['jsonequip']['reqskill'] = $_;
 
-                if (isset($enchMisc[$eId]['reqskillrank']))
-                    $ench['jsonequip']['reqskill'] = $enchMisc[$eId]['reqskillrank'];
+                if ($_ = $enchantments->getField('skillLevel'))
+                    $ench['jsonequip']['reqskillrank'] = $_;
 
-                if (isset($enchMisc[$eId]['requiredLevel']))
-                    $ench['jsonequip']['requiredLevel'] = $enchMisc[$eId]['requiredLevel'];
+                if (($_ = $enchantments->getField('requiredLevel')) && $_ > 1)
+                    $ench['jsonequip']['reqlevel'] = $_;
 
                 // check if the spell has an entry in skill_line_ability -> Source:Profession
                 if ($skills = $enchantSpells->getField('skillLines'))

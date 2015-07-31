@@ -180,7 +180,7 @@ class SpellPage extends GenericPage
                 {
                     $this->extendGlobalData($rSkill->getJSGlobals());
 
-                    $bar = sprintf(Lang::game('requires'), '[skill='.$rSkill->id.']');
+                    $bar = sprintf(Lang::game('requires'), '&nbsp;[skill='.$rSkill->id.']');
                     if ($_ = $this->subject->getField('learnedAt'))
                         $bar .= ' ('.$_.')';
 
@@ -1585,7 +1585,7 @@ class SpellPage extends GenericPage
             }
 
             // Effect Name
-            $foo['name'] = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'EffectId: '.$effId, Util::$spellEffectStrings[$effId]) : Util::$spellEffectStrings[$effId];
+            $foo['name'] = (User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'EffectId: '.$effId, Util::$spellEffectStrings[$effId]) : Util::$spellEffectStrings[$effId]).Lang::main('colon');
 
             if ($this->subject->getField('effect'.$i.'RadiusMax') > 0)
                 $foo['radius'] = $this->subject->getField('effect'.$i.'RadiusMax');
@@ -1631,9 +1631,9 @@ class SpellPage extends GenericPage
                     break;
                 case 16:                                    // QuestComplete
                     if ($_ = QuestList::getName($effMV))
-                        $foo['name'] .= Lang::main('colon').'(<a href="?quest='.$effMV.'">'.$_.'</a>)';
+                        $foo['name'] .= '(<a href="?quest='.$effMV.'">'.$_.'</a>)';
                     else
-                        $foo['name'] .= Lang::main('colon').Util::ucFirst(Lang::game('quest')).' #'.$effMV;;
+                        $foo['name'] .= Util::ucFirst(Lang::game('quest')).' #'.$effMV;;
                     break;
                 case 28:                                    // Summon
                 case 90:                                    // Kill Credit
@@ -1645,7 +1645,7 @@ class SpellPage extends GenericPage
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon['displayId']];
                     }
 
-                    $foo['name'] .= Lang::main('colon').$_;
+                    $foo['name'] .= $_;
                     break;
                 case 33:                                    // Open Lock
                     $_ = Lang::spell('lockType', $effMV);
@@ -1658,9 +1658,10 @@ class SpellPage extends GenericPage
                     break;
                 case 53:                                    // Enchant Item Perm
                 case 54:                                    // Enchant Item Temp
+                case 92:                                    // Enchant Held Item
                 case 156:                                   // Enchant Item Prismatic
                     if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE id = ?d', $effMV))
-                        $foo['name'] .= ' <span class="q2">'.Util::localizedString($_, 'text').'</span> ('.$effMV.')';
+                        $foo['name'] .= ' (<a href="?enchantment='.$effMV.'" class="q2">'.Util::localizedString($_, 'name').'</a>)';
                     else
                         $foo['name'] .= ' #'.$effMV;
                     break;
@@ -1697,15 +1698,15 @@ class SpellPage extends GenericPage
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_OBJECT, 'displayId' => $summon['displayId']];
                     }
 
-                    $foo['name'] .= Lang::main('colon').$_;
+                    $foo['name'] .= $_;
                     break;
                 case 74:                                    // Apply Glyph
                     if ($_ = DB::Aowow()->selectCell('SELECT spellId FROM ?_glyphproperties WHERE id = ?d', $effMV))
                     {
                         if ($n = SpellList::getName($_))
-                            $foo['name'] .= Lang::main('colon').'(<a href="?spell='.$_.'">'.$n.'</a>)';
+                            $foo['name'] .= '(<a href="?spell='.$_.'">'.$n.'</a>)';
                         else
-                            $foo['name'] .= Lang::main('colon').Util::ucFirst(Lang::game('spell')).' #'.$effMV;
+                            $foo['name'] .= Util::ucFirst(Lang::game('spell')).' #'.$effMV;
                     }
                     else
                         $foo['name'] .= ' #'.$effMV;;
@@ -1737,9 +1738,9 @@ class SpellPage extends GenericPage
                     break;
                 case 118:                                   // Require Skill
                     if ($_ = SkillList::getName($effMV))
-                        $foo['name'] .= Lang::main('colon').'(<a href="?skill='.$effMV.'">'.$_.'</a>)';
+                        $foo['name'] .= '(<a href="?skill='.$effMV.'">'.$_.'</a>)';
                     else
-                        $foo['name'] .= Lang::main('colon').Util::ucFirst(Lang::game('skill')).' #'.$effMV;;
+                        $foo['name'] .= Util::ucFirst(Lang::game('skill')).' #'.$effMV;;
                     break;
                 case 146:                                   // Activate Rune
                     $_ = Lang::spell('powerRunes', $effMV);
@@ -1768,7 +1769,7 @@ class SpellPage extends GenericPage
                 {
                     if ($effAura > 0 && isset(Util::$spellAuraStrings[$effAura]))
                     {
-                        $foo['name'] .= User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'AuraId: '.$effAura, Lang::main('colon').Util::$spellAuraStrings[$effAura]) : Lang::main('colon').Util::$spellAuraStrings[$effAura];
+                        $foo['name'] .= User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'AuraId: '.$effAura, Util::$spellAuraStrings[$effAura]) : Util::$spellAuraStrings[$effAura];
 
                         $bar = $effMV;
                         switch ($effAura)
@@ -1888,6 +1889,7 @@ class SpellPage extends GenericPage
                             case 22:                        // Mod Resistance
                             case 39:                        // School Immunity
                             case 40:                        // Damage Immunity
+                            case 50:                        // Mod Critical Healing Amount
                             case 57:                        // Mod Spell Crit Chance
                             case 69:                        // School Absorb
                             case 71:                        // Mod Spell Crit Chance School
@@ -1949,6 +1951,9 @@ class SpellPage extends GenericPage
                                 break;
                             case 168:                       // Mod Damage Done Versus
                             case 59:                        // Mod Damage Done Versus Creature
+                            case 102:                       // Mod Melee Attack Power Versus
+                            case 131:                       // Mod Ranged Attack Power Versus
+                            case 180:                       // Mod Spell Damage Versus
                                 $_ = [];
                                 foreach (Lang::game('ct') as $k => $str)
                                     if ($effMV & (1 << $k - 1))

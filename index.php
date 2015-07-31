@@ -31,6 +31,8 @@ switch ($pageCall)
     case 'compare':                                         // tool: item comparison
     case 'emote':
     case 'emotes':
+    case 'enchantment':
+    case 'enchantments':
     case 'event':
     case 'events':
     case 'faction':

@@ -30,6 +30,7 @@ class Lang
     private static $zone;
 
     private static $emote;
+    private static $enchantment;
 
     public static function load($loc)
     {

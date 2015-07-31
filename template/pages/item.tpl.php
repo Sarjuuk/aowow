@@ -43,8 +43,13 @@ if (!empty($this->subItems)):
 <?php
         foreach ($this->subItems['data'] as $k => $i):
             if ($k < (count($this->subItems['data']) / 2)):
+                $eText = [];
+                foreach ($i['enchantment'] as $eId => $txt):
+                    $eText[] = '<a style="text-decoration:none; color:#CCCCCC;" href="?enchantment='.$eId.'">'.$txt.'</a>';
+                endforeach;
+
                 echo '                        <li><div><span class="q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
-                echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.$i['enchantment'].'</div></li>';
+                echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.implode(', ', $eText).'</div></li>';
             endif;
         endforeach;
 ?>
@@ -58,8 +63,13 @@ if (!empty($this->subItems)):
 <?php
         foreach ($this->subItems['data'] as $k => $i):
             if ($k >= (count($this->subItems['data']) / 2)):
+                $eText = [];
+                foreach ($i['enchantment'] as $eId => $txt):
+                    $eText[] = '<a style="text-decoration:none; color:#CCCCCC;" href="?enchantment='.$eId.'">'.$txt.'</a>';
+                endforeach;
+
                 echo '                        <li><div><span class="q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
-                echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.$i['enchantment'].'</div></li>';
+                echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.implode(', ', $eText).'</div></li>';
             endif;
         endforeach;
 ?>

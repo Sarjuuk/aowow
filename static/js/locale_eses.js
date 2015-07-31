@@ -770,6 +770,16 @@ var mn_currencies = [
     [1,"Miscelánea","?currencies=1"],
     [2,"Jugador contra Jugador","?currencies=2"]
 ];
+var mn_enchantments = [
+    [1,"[Proc Spell]","?enchantments&filter=ty=1"],
+    [3,"[Equip Spell]","?enchantments&filter=ty=3"],
+    [7,"[Use Spell]","?enchantments&filter=ty=7"],
+    [8,"Ranura prismática","?enchantments&filter=ty=8"],
+    [5,"Atributos","?enchantments&filter=ty=5"],
+    [2,"Daño de arma","?enchantments&filter=ty=2"],
+    [6,"DPS","?enchantments&filter=ty=6"],
+    [4,"Defensa","?enchantments&filter=ty=4"]
+];
 var mn_talentCalc = [
     [6,"Caballero de la muerte","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druida","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -836,7 +846,8 @@ var mn_database = [
     [10,"Títulos","?titles",mn_titles],
     [11,"Eventos del mundo","?events",mn_holidays],
     [6,"Zonas","?zones",mn_zones],
-    [100,"Emociones","?emotes",null]
+    [100,"Emociones","?emotes",null],
+    [101,"Encantamientos","?enchantments",mn_enchantments]
 ];
 var mn_tools = [
     [0,"Calculadora de talentos","?talent",mn_talentCalc],
@@ -2607,6 +2618,7 @@ var LANG = {
     lvnote_arenateamsfound:   "$1 equipos de arena en total",
     lvnote_arenateamsfound2:  "$1 equipos de arena en total, $2 coincidente(s)",
     lvnote_currenciesfound:   "$1 monedas encontradas ($2 mostradas)",
+    lvnote_enchantmentsfound: "$1 encantamientos encontrados (mostrados $2)",
 
     lvnote_createafilter:  '<small><a href="$1">Crea un filtro</a></small>',
     lvnote_filterresults:  '<small><a href="$1">Filtrar estos resultados</a></small>',
@@ -3178,23 +3190,25 @@ var LANG = {
     myaccount_purgesuccess:  "¡Se han purgado los datos de los anuncios correctamente!",
 
     types: {
-         1: ["PNJ",                 "PNJ" ,                 "PNJs",                 "PNJs"],
-         2: ["Entidad",             "entidad",              "Entidades",            "entidades"],
-         3: ["Objeto",              "objeto",               "Objetos",              "objetos"],
-         4: ["Conjunto de objetos", "conjunto de objetos",  "Conjuntos de objetos", "conjuntos de objetos"],
-         5: ["Misión",              "misión",               "Misiones",             "misiones"],
-         6: ["Hechizo",             "hechizo",              "Hechizos",             "hechizos"],
-         7: ["Zona",                "zona",                 "Zonas",                "zonas"],
-         8: ["Facción",             "facción",              "Facciones",            "facciones"],
-         9: ["Mascota",             "mascota",              "Mascotas",             "mascotas"],
-        10: ["Logro",               "logro",                "Logros",               "logros"],
-        11: ["Título",              "título",               "Títulos",              "títulos"],
-        12: ["Suceso mundial",      "evento del mundo",     "Eventos del mundo",    "eventos del mundo"],
-        13: ["Clase",               "Clase",                "Clases",               "Clases"],
-        14: ["Raza",                "raza",                 "Razas",                "razas"],
-        15: ["Habilidad",           "habilidad",            "Habilidades",          "habilidades"],
-        16: ["Atributo",            "atributo",             "Atributos",            "atributos"],
-        17: ["Monedas",             "monedas",              "Monedas",              "monedas"]
+          1: ["PNJ",                 "PNJ" ,                 "PNJs",                 "PNJs"],
+          2: ["Entidad",             "entidad",              "Entidades",            "entidades"],
+          3: ["Objeto",              "objeto",               "Objetos",              "objetos"],
+          4: ["Conjunto de objetos", "conjunto de objetos",  "Conjuntos de objetos", "conjuntos de objetos"],
+          5: ["Misión",              "misión",               "Misiones",             "misiones"],
+          6: ["Hechizo",             "hechizo",              "Hechizos",             "hechizos"],
+          7: ["Zona",                "zona",                 "Zonas",                "zonas"],
+          8: ["Facción",             "facción",              "Facciones",            "facciones"],
+          9: ["Mascota",             "mascota",              "Mascotas",             "mascotas"],
+         10: ["Logro",               "logro",                "Logros",               "logros"],
+         11: ["Título",              "título",               "Títulos",              "títulos"],
+         12: ["Suceso mundial",      "evento del mundo",     "Eventos del mundo",    "eventos del mundo"],
+         13: ["Clase",               "Clase",                "Clases",               "Clases"],
+         14: ["Raza",                "raza",                 "Razas",                "razas"],
+         15: ["Habilidad",           "habilidad",            "Habilidades",          "habilidades"],
+         16: ["Atributo",            "atributo",             "Atributos",            "atributos"],
+         17: ["Monedas",             "monedas",              "Monedas",              "monedas"],
+        501: ["Emoción",             "emoción",              "Emociones",            "emociones"],
+        502: ["Encantamiento",       "encantamiento",        "Encantamientos",       "encantamientos"]
     },
 
     timeunitssg: ["año", "mes", "semana", "día", "hora", "minuto", "segundo"],
@@ -3868,6 +3882,18 @@ var LANG = {
         teamname5v5:          "Nombre de equipo de arena 5v5",
         teamrtng5v5:          "Puntuación de equipo de arena 5v5",
         teamcontrib5v5:       "Contribución de equipo de arena 5v5"
+    },
+
+    // custom
+    fienchantments: {
+        id:             "ID",
+        hascondition:   "[Requires a combination of gems]",
+        requiresprof:   "Requiere una profesión",
+
+        sepcommunity:   "Comunidad",
+        hascomments:    "Tiene comentarios",
+        hasscreenshots: "Tiene capturas de pantalla",
+        hasvideos:      "Tiene vídeos",
     },
 
     pr_notice:     '¿La primera vez? &ndash; ¡No temas! ¡Visita nuestra <a href="?help=profiler" target="_blank">página de ayuda</a>! &nbsp; <small class="q0"><a href="javascript:;">cerrar</a></small>',

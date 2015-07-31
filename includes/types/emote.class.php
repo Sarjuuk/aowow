@@ -11,6 +11,18 @@ class EmoteList extends BaseType
 
     protected     $queryBase = 'SELECT *, e.id AS ARRAY_KEY FROM ?_emotes e';
 
+    public function __construct($conditions = [])
+    {
+        parent::__construct($conditions);
+
+        // post processing
+        foreach ($this->iterate() as &$curTpl)
+        {
+            // remap for generic access
+            $curTpl['name'] = $curTpl['cmd'];
+        }
+    }
+
     public function getListviewData()
     {
         $data = [];
@@ -31,7 +43,12 @@ class EmoteList extends BaseType
 
     public function getJSGlobals($addMask = GLOBALINFO_ANY)
     {
-        return [];
+        $data = [];
+
+        foreach ($this->iterate() as $__)
+            $data[TYPE_EMOTE][$this->id] = ['name' => $this->getField('cmd')];
+
+        return $data;
     }
 
     public function renderTooltip() { }

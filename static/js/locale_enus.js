@@ -816,6 +816,16 @@ var mn_currencies = [
     [1,"Miscellaneous","?currencies=1"],
     [2,"Player vs. Player","?currencies=2"]
 ];
+var mn_enchantments = [
+    [1,"Proc Spell","?enchantments&filter=ty=1"],
+    [3,"Equip Spell","?enchantments&filter=ty=3"],
+    [7,"Use Spell","?enchantments&filter=ty=7"],
+    [8,"Prismatic Socket","?enchantments&filter=ty=8"],
+    [5,"Statistics","?enchantments&filter=ty=5"],
+    [2,"Weapon Damage","?enchantments&filter=ty=2"],
+    [6,"DPS","?enchantments&filter=ty=6"],
+    [4,"Defense","?enchantments&filter=ty=4"]
+];
 var mn_talentCalc = [
     [6,"Death Knight","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druid","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -882,7 +892,8 @@ var mn_database = [
     [10,"Titles","?titles",mn_titles],
     [11,"World Events","?events",mn_holidays],
     [6,"Zones","?zones",mn_zones],
-    [100,"Emotes","?emotes",null]
+    [100,"Emotes","?emotes",null],
+    [101,"Enchantments","?enchantments",mn_enchantments]
 ];
 var mn_tools = [
     [0,"Talent Calculator","?talent",mn_talentCalc],
@@ -2652,6 +2663,7 @@ var LANG = {
     lvnote_arenateamsfound:   "$1 total arena teams",
     lvnote_arenateamsfound2:  "$1 total arena teams, $2 matching",
     lvnote_currenciesfound:   "$1 currencies found ($2 displayed)",
+    lvnote_enchantmentsfound: "$1 enchantments found ($2 displayed)",
 
     lvnote_createafilter:  '<small><a href="$1">Create a filter</a></small>',
     lvnote_filterresults:  '<small><a href="$1">Filter these results</a></small>',
@@ -3223,23 +3235,25 @@ var LANG = {
     myaccount_purgesuccess:  "Announcement data has been successfully purged!",
 
     types: {
-         1: ["NPC",         "NPC" ,         "NPCs",         "NPCs"],
-         2: ["Object",      "object",       "Objects",      "objects"],
-         3: ["Item",        "item",         "Items",        "items"],
-         4: ["Item Set",    "item set",     "Item Sets",    "item sets"],
-         5: ["Quest",       "quest",        "Quests",       "quests"],
-         6: ["Spell",       "spell",        "Spells",       "spells"],
-         7: ["Zone",        "zone",         "Zones",        "zones"],
-         8: ["Faction",     "faction",      "Factions",     "factions"],
-         9: ["Pet",         "pet",          "Pets",         "pets"],
-        10: ["Achievement", "achievement",  "Achievements", "achievements"],
-        11: ["Title",       "title",        "Titles",       "titles"],
-        12: ["World Event", "world event",  "World Events", "world events"],
-        13: ["Class",       "class",        "Classes",      "classes"],
-        14: ["Race",        "race",         "Races",        "races"],
-        15: ["Skill",       "skill",        "Skills",       "skills"],
-        16: ["Statistic",   "statistic",    "Statistics",   "statistics"],
-        17: ["Currency",    "currency",     "Currencies",   "currencies"]
+          1: ["NPC",         "NPC" ,         "NPCs",         "NPCs"],
+          2: ["Object",      "object",       "Objects",      "objects"],
+          3: ["Item",        "item",         "Items",        "items"],
+          4: ["Item Set",    "item set",     "Item Sets",    "item sets"],
+          5: ["Quest",       "quest",        "Quests",       "quests"],
+          6: ["Spell",       "spell",        "Spells",       "spells"],
+          7: ["Zone",        "zone",         "Zones",        "zones"],
+          8: ["Faction",     "faction",      "Factions",     "factions"],
+          9: ["Pet",         "pet",          "Pets",         "pets"],
+         10: ["Achievement", "achievement",  "Achievements", "achievements"],
+         11: ["Title",       "title",        "Titles",       "titles"],
+         12: ["World Event", "world event",  "World Events", "world events"],
+         13: ["Class",       "class",        "Classes",      "classes"],
+         14: ["Race",        "race",         "Races",        "races"],
+         15: ["Skill",       "skill",        "Skills",       "skills"],
+         16: ["Statistic",   "statistic",    "Statistics",   "statistics"],
+         17: ["Currency",    "currency",     "Currencies",   "currencies"],
+        501: ["Emote",       "emote",        "Emotes",       "emotes"],
+        502: ["Enchantment", "enchantment",  "Enchantments", "enchantments"]
     },
 
     timeunitssg: ["year", "month", "week", "day", "hour", "minute", "second"],
@@ -3910,6 +3924,18 @@ var LANG = {
         teamname5v5:          "5v5 arena team name",
         teamrtng5v5:          "5v5 arena team rating",
         teamcontrib5v5:       "5v5 arena team contribution"
+    },
+
+    // custom
+    fienchantments: {
+        id:             "ID",
+        hascondition:   "Requires a combination of gems",
+        requiresprof:   "Requires a profession",
+
+        sepcommunity:   "Community",
+        hascomments:    "Has comments",
+        hasscreenshots: "Has screenshots",
+        hasvideos:      "Has videos"
     },
 
     pr_notice:     'First time? &ndash; Don\'t be shy! Just check out our <a href="?help=profiler" target="_blank">Help page</a>! &nbsp; <small class="q0"><a href="javascript:;">close</a></small>',

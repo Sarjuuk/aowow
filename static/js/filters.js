@@ -401,8 +401,83 @@ var fi_filters = {
         { id: 18,  name: 'teamname5v5',         type: 'str' },
         { id: 19,  name: 'teamrtng5v5',         type: 'num' },
         { id: 20,  name: 'teamcontrib5v5',      type: 'num' }
-    ]
+    ],
 
+    // custom
+    enchantments: [
+        { id: 1,   name: 'sepgeneral' },
+        { id: 2,   name: 'id',                  type: 'num', before: 'name' },
+        { id: 3,   name: 'requiresprof',        type: 'profession' },
+        { id: 4,   name: 'reqskillrank',        type: 'num' },
+        { id: 5,   name: 'hascondition',        type: 'yn' },
+
+        { id: 19,  name: 'sepbasestats' },
+        { id: 21,  name: 'agi',                 type: 'num' },
+        { id: 23,  name: 'int',                 type: 'num' },
+        { id: 22,  name: 'sta',                 type: 'num' },
+        { id: 24,  name: 'spi',                 type: 'num' },
+        { id: 20,  name: 'str',                 type: 'num' },
+        { id: 115, name: 'health',              type: 'num' },
+        { id: 116, name: 'mana',                type: 'num' },
+        { id: 60,  name: 'healthrgn',           type: 'num' },
+        { id: 61,  name: 'manargn',             type: 'num' },
+
+        { id: 120, name: 'sepdefensivestats' },
+        { id: 41,  name: 'armor',               type: 'num' },
+        { id: 44,  name: 'blockrtng',           type: 'num' },
+        { id: 43,  name: 'block',               type: 'num' },
+        { id: 42,  name: 'defrtng',             type: 'num' },
+        { id: 45,  name: 'dodgertng',           type: 'num' },
+        { id: 46,  name: 'parryrtng',           type: 'num' },
+        { id: 79,  name: 'resirtng',            type: 'num' },
+
+        { id: 31,  name: 'sepoffensivestats' },
+        { id: 32,  name: 'dps',                 type: 'num' },
+        { id: 34,  name: 'dmg',                 type: 'num' },
+        { id: 77,  name: 'atkpwr',              type: 'num' },
+        { id: 97,  name: 'feratkpwr',           type: 'num', indent: 1 },
+        { id: 114, name: 'armorpenrtng',        type: 'num' },
+        { id: 96,  name: 'critstrkrtng',        type: 'num' },
+        { id: 117, name: 'exprtng',             type: 'num' },
+        { id: 103, name: 'hastertng',           type: 'num' },
+        { id: 119, name: 'hitrtng',             type: 'num' },
+        { id: 94,  name: 'splpen',              type: 'num' },
+        { id: 123, name: 'splpwr',              type: 'num' },
+        { id: 52,  name: 'arcsplpwr',           type: 'num', indent: 1 },
+        { id: 53,  name: 'firsplpwr',           type: 'num', indent: 1 },
+        { id: 54,  name: 'frosplpwr',           type: 'num', indent: 1 },
+        { id: 55,  name: 'holsplpwr',           type: 'num', indent: 1 },
+        { id: 56,  name: 'natsplpwr',           type: 'num', indent: 1 },
+        { id: 57,  name: 'shasplpwr',           type: 'num', indent: 1 },
+
+        { id: 121, name: 'sepresistances' },
+        { id: 25,  name: 'arcres',              type: 'num' },
+        { id: 26,  name: 'firres',              type: 'num' },
+        { id: 28,  name: 'frores',              type: 'num' },
+        { id: 30,  name: 'holres',              type: 'num' },
+        { id: 27,  name: 'natres',              type: 'num' },
+        { id: 29,  name: 'shares',              type: 'num' },
+
+        { id: 47,  name: 'sepindividualstats' },
+        { id: 37,  name: 'mleatkpwr',           type: 'num' },
+        { id: 84,  name: 'mlecritstrkrtng',     type: 'num' },
+        { id: 78,  name: 'mlehastertng',        type: 'num' },
+        { id: 95,  name: 'mlehitrtng',          type: 'num' },
+        { id: 38,  name: 'rgdatkpwr',           type: 'num' },
+        { id: 40,  name: 'rgdcritstrkrtng',     type: 'num' },
+        { id: 101, name: 'rgdhastertng',        type: 'num' },
+        { id: 39,  name: 'rgdhitrtng',          type: 'num' },
+        { id: 49,  name: 'splcritstrkrtng',     type: 'num' },
+        { id: 102, name: 'splhastertng',        type: 'num' },
+        { id: 48,  name: 'splhitrtng',          type: 'num' },
+        { id: 51,  name: 'spldmg',              type: 'num' },
+        { id: 50,  name: 'splheal',             type: 'num' },
+
+        { id: 9999,name: 'sepcommunity' },
+        { id: 10,  name: 'hascomments',         type: 'yn' },
+        { id: 11,  name: 'hasscreenshots',      type: 'yn' },
+        { id: 12,  name: 'hasvideos',           type: 'yn' }
+    ]
 };
 
 function fi_toggle() {

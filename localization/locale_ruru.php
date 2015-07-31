@@ -175,6 +175,8 @@ $lang = array(
         'duration'      => "Длительность",
         'emote'         => "Эмоция",
         'emotes'        => "Эмоции",
+        'enchantment'   => "улучшение",
+        'enchantments'  => "Улучшения",
         'object'        => "объект",
         'objects'       => "Объекты",
         'glyphType'     => "Тип символа",
@@ -388,6 +390,14 @@ $lang = array(
         'isAnimated'    => "[Uses an animation]",
         'aliases'       => "[Aliases]",
         'noText'        => "[This Emote has no text.]",
+    ),
+    'enchantment' => array(
+        'details'       => "Подробности",
+        'activation'    => "Активации",
+        'types'         => array(
+            1 => "[Proc Spell]",            3 => "[Equip Spell]",           7 => "[Use Spell]",             8 => "Бесцветное гнездо",
+            5 => "Характеристики",          2 => "Урон оружия",             6 => "УВС",                     4 => "Защита"
+        )
     ),
     'gameObject' => array(
         'notFound'      => "Такой объект не существует.",

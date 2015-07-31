@@ -52,7 +52,7 @@ class SearchPage extends GenericPage
         ['_searchProficiency'], ['_searchProfession'],  ['_searchCompanion'], ['_searchMount'],           ['_searchCreature'],
         ['_searchQuest'],       ['_searchAchievement'], ['_searchStatistic'], ['_searchZone'],            ['_searchObject'],
         ['_searchFaction'],     ['_searchSkill'],       ['_searchPet'],       ['_searchCreatureAbility'], ['_searchSpell'],
-        ['_searchEmote']
+        ['_searchEmote'],       ['_searchEnchantment']
     );
 
     public function __construct($pageCall, $pageParam)
@@ -1431,9 +1431,44 @@ class SearchPage extends GenericPage
         return $result;
     }
 
-    // private function _searchCharacter($cndBase) { }      // 26 Characters $searchMask & 0x4000000
-    // private function _searchGuild($cndBase) { }          // 27 Guilds $searchMask & 0x8000000
-    // private function _searchArenaTeam($cndBase) { }      // 28 Arena Teams $searchMask & 0x10000000
+    private function _searchEnchantment($cndBase)           // 26 Enchantments $searchMask & 0x4000000
+    {
+        $result      = [];
+        $cnd         = array_merge($cndBase, [$this->createLookup(['name_loc'.User::$localeId])]);
+        $enchantment = new EnchantmentList($cnd);
+
+        if ($data = $enchantment->getListviewData())
+        {
+            $this->extendGlobalData($enchantment->getJSGlobals());
+
+            $result = array(
+                'type'     => TYPE_ENCHANTMENT,
+                'appendix' => ' (Enchantment)',
+                'matches'  => $enchantment->getMatches(),
+                'file'     => EnchantmentList::$brickFile,
+                'data'     => $data,
+                'params'   => []
+            );
+
+            if (array_filter(array_column($result['data'], 'spells')))
+                $result['params']['visibleCols'] = '$[\'trigger\']';
+
+            if (!$enchantment->hasSetFields(['skillLine']))
+                $result['params']['hiddenCols'] = '$[\'skill\']';
+
+            if ($enchantment->getMatches() > $this->maxResults)
+            {
+                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_enchantmentsfound', $enchantment->getMatches(), $this->maxResults);
+                $result['params']['_truncated'] = 1;
+            }
+        }
+
+        return $result;
+    }
+
+    // private function _searchCharacter($cndBase) { }      // 27 Characters $searchMask & 0x8000000
+    // private function _searchGuild($cndBase) { }          // 28 Guilds $searchMask & 0x10000000
+    // private function _searchArenaTeam($cndBase) { }      // 29 Arena Teams $searchMask & 0x20000000
 }
 
 ?>

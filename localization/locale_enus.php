@@ -168,8 +168,10 @@ $lang = array(
         'difficulty'    => "Difficulty",
         'dispelType'    => "Dispel type",
         'duration'      => "Duration",
-        'emote'         => "Emote",
+        'emote'         => "emote",
         'emotes'        => "Emotes",
+        'enchantment'   => "enchantment",
+        'enchantments'  => "Enchantments",
         'object'        => "object",
         'objects'       => "Objects",
         'glyphType'     => "Glyph type",
@@ -383,6 +385,14 @@ $lang = array(
         'isAnimated'    => "Uses an animation",
         'aliases'       => "Aliases",
         'noText'        => "This Emote has no text.",
+    ),
+    'enchantment' => array(
+        'details'       => "Details",
+        'activation'    => "Activation",
+        'types'         => array(
+            1 => "Proc Spell",              3 => "Equip Spell",             7 => "Use Spell",               8 => "Prismatic Socket",
+            5 => "Statistics",              2 => "Weapon Damage",           6 => "DPS",                     4 => "Defense"
+        )
     ),
     'gameObject' => array(
         'notFound'      => "This object doesn't exist.",

@@ -570,6 +570,86 @@ var Markup = {
                 return str;
             }
         },
+        emote:
+        {
+            empty: true,
+            allowInReplies: true,
+            attr:
+            {
+                unnamed: { req: true, valid: /^[0-9]+$/ },
+                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
+                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+            },
+            validate: function(attr)
+            {
+                if((attr.domain || attr.site) && Markup.dbpage)
+                    return false;
+                return true;
+            },
+            toHtml: function(attr)
+            {
+                var id = attr.unnamed;
+                var domainInfo = Markup._getDatabaseDomainInfo(attr);
+                var url = domainInfo[0];
+                var nameCol = domainInfo[1];
+
+                if(g_emotes[id] && g_emotes[id][nameCol])
+                {
+                    return '<a href="' + url + '?emote=' + id + '"' + Markup._addGlobalAttributes(attr) + '>' + Markup._safeHtml(g_emotes[id][nameCol]) + '</a>';
+                }
+                return '<a href="' + url + '?emote=' + id + '"' + Markup._addGlobalAttributes(attr) + '>(' + LANG.types[501][0] + ' #' + id + ')</a>';
+            },
+            toText: function(attr)
+            {
+                var id = attr.unnamed;
+                var domainInfo = Markup._getDatabaseDomainInfo(attr);
+                var nameCol = domainInfo[1];
+
+                if(g_emotes[id] && g_emotes[id][nameCol])
+                    return Markup._safeHtml(g_emotes[id][nameCol]);
+                return LANG.types[501][0] + ' #' + id;
+            }
+        },
+        enchantment:
+        {
+            empty: true,
+            allowInReplies: true,
+            attr:
+            {
+                unnamed: { req: true, valid: /^[0-9]+$/ },
+                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
+                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+            },
+            validate: function(attr)
+            {
+                if((attr.domain || attr.site) && Markup.dbpage)
+                    return false;
+                return true;
+            },
+            toHtml: function(attr)
+            {
+                var id = attr.unnamed;
+                var domainInfo = Markup._getDatabaseDomainInfo(attr);
+                var url = domainInfo[0];
+                var nameCol = domainInfo[1];
+
+                if(g_enchantments[id] && g_enchantments[id][nameCol])
+                {
+                    return '<a href="' + url + '?enchantment=' + id + '"' + Markup._addGlobalAttributes(attr) + '>' + Markup._safeHtml(g_enchantments[id][nameCol]) + '</a>';
+                }
+                return '<a href="' + url + '?enchantment=' + id + '"' + Markup._addGlobalAttributes(attr) + '>(' + LANG.types[502][0] + ' #' + id + ')</a>';
+            },
+            toText: function(attr)
+            {
+                var id = attr.unnamed;
+                var domainInfo = Markup._getDatabaseDomainInfo(attr);
+                var nameCol = domainInfo[1];
+
+                if(g_enchantments[id] && g_enchantments[id][nameCol])
+                    return Markup._safeHtml(g_enchantments[id][nameCol]);
+                return LANG.types[502][0] + ' #' + id;
+            }
+        },
         event:
         {
             empty: true,

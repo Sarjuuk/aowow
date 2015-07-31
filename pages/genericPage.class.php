@@ -620,6 +620,8 @@ class GenericPage
             case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['g_gatheredcurrencies', [], []]; break;
             // well, this is awkward
             case TYPE_USER:        $jsg[TYPE_USER]        = ['g_users',              [], []]; break;
+            case TYPE_EMOTE:       $jsg[TYPE_EMOTE]       = ['g_emotes',             [], []]; break;
+            case TYPE_ENCHANTMENT: $jsg[TYPE_ENCHANTMENT] = ['g_enchantments',       [], []]; break;
         }
     }
 
@@ -658,6 +660,8 @@ class GenericPage
                 case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
                 // "um, eh":, he ums and ehs.
                 case TYPE_USER:        $obj = new UserList($cnd);        break;
+                case TYPE_EMOTE:       $obj = new EmoteList($cnd);       break;
+                case TYPE_ENCHANTMENT: $obj = new EnchantmentList($cnd); break;
                 default: continue;
             }
 

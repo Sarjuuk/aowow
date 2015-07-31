@@ -770,6 +770,16 @@ var mn_currencies = [
     [1,"Divers","?currencies=1"],
     [2,"JcJ","?currencies=2"]
 ];
+var mn_enchantments = [
+    [1,"[Proc Spell]","?enchantments&filter=ty=1"],
+    [3,"[Equip Spell]","?enchantments&filter=ty=3"],
+    [7,"[Use Spell]","?enchantments&filter=ty=7"],
+    [8,"Châsse prismatique","?enchantments&filter=ty=8"],
+    [5,"Statistiques","?enchantments&filter=ty=5"],
+    [2,"Dégâts d'arme","?enchantments&filter=ty=2"],
+    [6,"DPS","?enchantments&filter=ty=6"],
+    [4,"Défense","?enchantments&filter=ty=4"]
+];
 var mn_talentCalc = [
     [6,"Chevalier de la mort","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druide","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -836,7 +846,8 @@ var mn_database = [
     [10,"Titres","?titles",mn_titles],
     [11,"Évènements mondiaux","?events",mn_holidays],
     [6,"Zones","?zones",mn_zones],
-    [100,"Emotes","?emotes",null]
+    [100,"Emotes","?emotes",null],
+    [101,"Enchantements","?enchantments",mn_enchantments]
 ];
 var mn_tools = [
     [0,"Calculateur de talents","?talent",mn_talentCalc],
@@ -2595,6 +2606,7 @@ var LANG = {
     lvnote_arenateamsfound:   "Total de $1 équipes d'aréna",
     lvnote_arenateamsfound2:  "Total de $1 équipes d'aréna, $2 qui coïncides",
     lvnote_currenciesfound:   "$1 monnaies trouvées ($2 affichées)",
+    lvnote_enchantmentsfound: "$1 enchantements trouvés ($2 affichés)",
 
     lvnote_createafilter:  '<small><a href="$1">Créer un filtre</a></small>',
     lvnote_filterresults:  '<small><a href="$1">Filtrer ces résultats</a></small>',
@@ -3166,23 +3178,25 @@ var LANG = {
     myaccount_purgesuccess:  "Les données d'annonce ont été purgées correctement!",
 
     types: {
-         1: ["PNJ",               "PNJ" ,              "PNJs",                "PNJs"],
-         2: ["Entité",            "entité",            "Entités",             "entités"],
-         3: ["Objet",              "objet",            "Objets",              "objets"],
-         4: ["Ensemble d'objets", "ensemble d'objets", "Ensembles d'objets",  "ensembles d'objets"],
-         5: ["Quête",             "quête",             "Quêtes",              "quêtes"],
-         6: ["Sort",              "sort",              "Sorts",               "sorts"],
-         7: ["Zone",              "zone",              "Zones",               "zones"],
-         8: ["Faction",           "faction",           "Factions",            "factions"],
-         9: ["Familier",          "familier",          "Familiers",           "familiers"],
-        10: ["Haut fait",         "haut fait",         "Hauts faits",         "hauts faits"],
-        11: ["Titre",             "titre",             "Titres",              "titres"],
-        12: ["Événement mondial", "évènement mondial", "Évènements mondiaux", "évènements mondiaux"],
-        13: ["Classe",            "classe",            "Classes",             "classes"],
-        14: ["Race",              "race",              "Races",               "races"],
-        15: ["Compétence",        "compétence",        "Compétences",         "compétences"],
-        16: ["Statistique",       "statistique",       "Statistiques",        "statistiques"],
-        17: ["Monnaies",          "monnaie",           "Monnaies",            "monnaies"]
+          1: ["PNJ",               "PNJ" ,              "PNJs",                "PNJs"],
+          2: ["Entité",            "entité",            "Entités",             "entités"],
+          3: ["Objet",              "objet",            "Objets",              "objets"],
+          4: ["Ensemble d'objets", "ensemble d'objets", "Ensembles d'objets",  "ensembles d'objets"],
+          5: ["Quête",             "quête",             "Quêtes",              "quêtes"],
+          6: ["Sort",              "sort",              "Sorts",               "sorts"],
+          7: ["Zone",              "zone",              "Zones",               "zones"],
+          8: ["Faction",           "faction",           "Factions",            "factions"],
+          9: ["Familier",          "familier",          "Familiers",           "familiers"],
+         10: ["Haut fait",         "haut fait",         "Hauts faits",         "hauts faits"],
+         11: ["Titre",             "titre",             "Titres",              "titres"],
+         12: ["Événement mondial", "évènement mondial", "Évènements mondiaux", "évènements mondiaux"],
+         13: ["Classe",            "classe",            "Classes",             "classes"],
+         14: ["Race",              "race",              "Races",               "races"],
+         15: ["Compétence",        "compétence",        "Compétences",         "compétences"],
+         16: ["Statistique",       "statistique",       "Statistiques",        "statistiques"],
+         17: ["Monnaies",          "monnaie",           "Monnaies",            "monnaies"],
+        501: ["Emote",             "emote",             "Emotes",              "emotes"],
+        502: ["Enchantement",      "enchantement",      "Enchantements",       "enchantements"]
     },
 
     timeunitssg: ["année", "mois", "semaine", "jour", "heure", "minute", "seconde"],
@@ -3855,6 +3869,18 @@ var LANG = {
         teamname5v5:          "Nom d'équipe d'aréna 5v5",
         teamrtng5v5:          "Score d'équipe d'aréna 5v5",
         teamcontrib5v5:       "Contribution d'un équipe d'aréna 5v5"
+    },
+
+    // custom
+    fienchantments: {
+        id:             "ID",
+        hascondition:   "[Requires a combination of gems]",
+        requiresprof:   "Requiert un métier",
+
+        sepcommunity:   "Communauté",
+        hascomments:    "A des commentaires",
+        hasscreenshots: "A des captures d'écrans",
+        hasvideos:      "A des vidéos",
     },
 
     pr_notice:     'Première fois? Ne soyez pas gêné! Visitez notre <a href="?help=profiler" target="_blank">page d\'aide</a>! &nbsp; <small class="q0"><a href="javascript:;">close</a></small>',
