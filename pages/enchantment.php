@@ -179,11 +179,27 @@ class EnchantmentPage extends GenericPage
                 'data'   => $gemList->getListviewData(),
                 'params' => array(
                     'name' => '$LANG.tab_usedby + \' \' + LANG.gems',
-                    'id'   => 'used-by-gems',
+                    'id'   => 'used-by-gem',
                 )
             );
 
             $this->extendGlobalData($gemList->getJsGlobals());
+        }
+
+        // used by socket bonus
+        $socketsList = new ItemList(array(['socketBonus', $this->typeId]));
+        if (!$socketsList->error)
+        {
+            $this->lvTabs[] = array(
+                'file'   => 'item',
+                'data'   => $socketsList->getListviewData(),
+                'params' => array(
+                    'name' => '$LANG.tab_usedby + \' \' + \''.Lang::item('socketBonus').'\'',
+                    'id'   => 'used-by-socketbonus',
+                )
+            );
+
+            $this->extendGlobalData($socketsList->getJsGlobals());
         }
 
         // used by spell
@@ -216,7 +232,10 @@ class EnchantmentPage extends GenericPage
                 $this->lvTabs[] = array(
                     'file'   => 'item',
                     'data'   => $ubItems->getListviewData(),
-                    'params' => []
+                    'params' => array(
+                        'name' => '$LANG.tab_usedby + \' \' + LANG.types[3][0]',
+                        'id'   => 'used-by-item',
+                    )
                 );
 
                 $this->extendGlobalData($ubItems->getJSGlobals(GLOBALINFO_SELF));
@@ -249,7 +268,10 @@ class EnchantmentPage extends GenericPage
             $this->lvTabs[] = array(
                 'file'   => 'spell',
                 'data'   => $spellData,
-                'params' => []
+                'params' => array(
+                    'name' => '$LANG.tab_usedby + \' \' + LANG.types[6][0]',
+                    'id'   => 'used-by-spell',
+                )
             );
         }
 
@@ -285,7 +307,7 @@ class EnchantmentPage extends GenericPage
                         'data'   => $data,
                         'params' => array(
                             'id'        => 'used-by-rand',
-                            'name'      => Lang::item('_rndEnchants'),
+                            'name'      => '$LANG.tab_usedby + \' \' + \''.Lang::item('_rndEnchants').'\'',
                             'extraCols' => '$[Listview.extraCols.percent]'
                         )
                     );

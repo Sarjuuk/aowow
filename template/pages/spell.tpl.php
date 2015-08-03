@@ -181,7 +181,7 @@ foreach ($this->effects as $i => $e):
         echo '<br>';
 
         if ($e['procData'][0] < 0):
-            echo sprintf(Lang::spell('ppm'), -$e['procData'][0]);
+            echo sprintf(Lang::spell('ppm'), Lang::nf(-$e['procData'][0], 1));
         elseif ($e['procData'][0] < 100.0):
             echo Lang::spell('procChance').Lang::main('colon').$e['procData'][0].'%';
         endif;
