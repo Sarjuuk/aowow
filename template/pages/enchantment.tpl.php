@@ -38,7 +38,7 @@ if (!empty($this->activateCondition)):
                         <th><?php echo Lang::enchantment('activation'); ?></th>
                         <td colspan="2"><?php echo $this->activateCondition; ?></td>
                     </tr>
-<?
+<?php
 endif;
 
 foreach ($this->effects as $i => $e):

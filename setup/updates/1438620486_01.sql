@@ -35,7 +35,9 @@ ALTER TABLE `aowow_item_stats`
   CHANGE COLUMN `id` `typeId` mediumint(9) unsigned NOT NULL AFTER `type`,
   DROP INDEX `item`,
   DROP PRIMARY KEY,
-  ADD PRIMARY KEY (`typeId`, `type`)
+  ADD PRIMARY KEY (`typeId`, `type`);
+
+UPDATE `aowow_item_stats` SET `type` = 3;
 
 ALTER TABLE `aowow_articles`
   ALTER `type` DROP DEFAULT,
