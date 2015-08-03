@@ -214,7 +214,7 @@ class UtilityPage extends GenericPage
                         continue;
 
                     $comments = DB::Aowow()->selectCol('
-                        SELECT   `typeId` AS ARRAY_KEY, count(1) AS ncomments FROM ?_comments
+                        SELECT   `typeId` AS ARRAY_KEY, count(1) FROM ?_comments
                         WHERE    `replyTo` = 0 AND (`flags` & ?d) = 0 AND `type`= ?d AND `date` > (UNIX_TIMESTAMP() - ?d)
                         GROUP BY `type`, `typeId`
                         LIMIT    100',
@@ -238,14 +238,14 @@ class UtilityPage extends GenericPage
                                     'title'       => [true,  [], htmlentities(Util::$typeStrings[$type] == 'item' ? substr($d['name'], 1) : $d['name'])],
                                     'type'        => [false, [], Util::$typeStrings[$type]],
                                     'link'        => [false, [], HOST_URL.'/?'.Util::$typeStrings[$type].'='.$d['id']],
-                                    'ncomments'   => [false, [], $comments[$typeId]['ncomments']]
+                                    'ncomments'   => [false, [], $comments[$typeId]]
                                 );
                             }
                         }
                         else
                         {
                             foreach ($data as $typeId => &$d)
-                                $d['ncomments'] = $comments[$typeId]['ncomments'];
+                                $d['ncomments'] = $comments[$typeId];
 
                             $this->extendGlobalData($typeClass->getJSGlobals(GLOBALINFO_ANY));
                             $this->lvTabs[] = array(
