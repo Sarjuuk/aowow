@@ -95,9 +95,10 @@ class EnchantmentPage extends GenericPage
                 case 7:
                     $sArr = $this->subject->getField('spells')[$i];
                     $spl  = $this->subject->getRelSpell($sArr[0]);
-                    $this->effects[$i]['name'] = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'Type: '.$_ty, Lang::item('trigger', $sArr[1])) : Lang::item('trigger', $sArr[1]);
-                    $this->effects[$i]['proc'] = $sArr[3];
-                    $this->effects[$i]['icon'] = array(
+                    $this->effects[$i]['name']  = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'Type: '.$_ty, Lang::item('trigger', $sArr[1])) : Lang::item('trigger', $sArr[1]);
+                    $this->effects[$i]['proc']  = $sArr[3];
+                    $this->effects[$i]['value'] = $_qty ?: null;
+                    $this->effects[$i]['icon']  = array(
                         'name'  => !$spl ? Util::ucFirst(Lang::game('spell')).' #'.$sArr[0] : Util::localizedString($spl, 'name'),
                         'id'    => $sArr[0],
                         'count' => $sArr[2]

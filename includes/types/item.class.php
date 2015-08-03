@@ -569,7 +569,8 @@ class ItemList extends BaseType
             $x .= '<table width="100%"><tr>';
 
             // Class
-            $x .= '<td>'.Lang::item('inventoryType', $_slot).'</td>';
+            if ($_slot)
+                $x .= '<td>'.Lang::item('inventoryType', $_slot).'</td>';
 
             // Subclass
             if ($_class == ITEM_CLASS_ARMOR && $_subClass > 0)

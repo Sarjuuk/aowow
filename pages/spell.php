@@ -1124,6 +1124,25 @@ class SpellPage extends GenericPage
             $this->extendGlobalData($tbItem->getJSGlobals(GLOBALINFO_SELF));
         }
 
+        // tab: enchantments
+        $conditions = array(
+            'OR',
+            ['AND', ['type1', [1, 3, 7]], ['object1', $this->typeId]],
+            ['AND', ['type2', [1, 3, 7]], ['object2', $this->typeId]],
+            ['AND', ['type3', [1, 3, 7]], ['object3', $this->typeId]]
+        );
+        $enchList = new EnchantmentList($conditions);
+        if (!$enchList->error)
+        {
+            $this->lvTabs[] = array(
+                'file'   => 'enchantment',
+                'data'   => $enchList->getListviewData(),
+                'params' => []
+            );
+
+            $this->extendGlobalData($enchList->getJSGlobals());
+        }
+
         // find associated NPC, Item and merge results
         // taughtbypets (unused..?)
         // taughtbyquest (usually the spell casted as quest reward teaches something; exclude those seplls from taughtBySpell)

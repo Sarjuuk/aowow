@@ -389,6 +389,7 @@ $lang = array(
     'enchantment' => array(
         'details'       => "Details",
         'activation'    => "Activation",
+        'notFound'      => "This enchantment doesn't exist.",
         'types'         => array(
             1 => "Proc Spell",              3 => "Equip Spell",             7 => "Use Spell",               8 => "Prismatic Socket",
             5 => "Statistics",              2 => "Weapon Damage",           6 => "DPS",                     4 => "Defense"

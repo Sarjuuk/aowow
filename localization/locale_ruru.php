@@ -394,6 +394,7 @@ $lang = array(
     'enchantment' => array(
         'details'       => "Подробности",
         'activation'    => "Активации",
+        'notFound'      => "Такой улучшение не существует.",
         'types'         => array(
             1 => "[Proc Spell]",            3 => "[Equip Spell]",           7 => "[Use Spell]",             8 => "Бесцветное гнездо",
             5 => "Характеристики",          2 => "Урон оружия",             6 => "УВС",                     4 => "Защита"

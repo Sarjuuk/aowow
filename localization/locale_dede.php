@@ -394,6 +394,7 @@ $lang = array(
     'enchantment' => array(
         'details'       => "Details",
         'activation'    => "Aktivierung",
+        'notFound'      => "Diese Verzauberung existiert nicht.",
         'types'         => array(
             1 => "Zauber (Auslösung)",      3 => "Zauber (Anlegen)",        7 => "Zauber (Benutzen)",       8 => "Prismatischer Sockel",
             5 => "Statistik",               2 => "Waffenschaden",           6 => "DPS",                     4 => "Verteidigung"

@@ -395,6 +395,7 @@ $lang = array(
     'enchantment' => array(
         'details'       => "Detalles",
         'activation'    => "Activación",
+        'notFound'      => "Este encantamiento no existe.",
         'types'         => array(
             1 => "[Proc Spell]",            3 => "[Equip Spell]",           7 => "[Use Spell]",             8 => "Ranura prismática",
             5 => "Atributos",               2 => "Daño de arma",            6 => "DPS",                     4 => "Defensa"
