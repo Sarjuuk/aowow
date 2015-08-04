@@ -25,6 +25,10 @@ class ItemsetPage extends GenericPage
     {
         parent::__construct($pageCall, $id);
 
+        // temp locale
+        if ($this->mode == CACHE_TYPE_TOOLTIP && isset($_GET['domain']))
+            Util::powerUseLocale($_GET['domain']);
+
         $this->typeId = intVal($id);
 
         $this->subject = new ItemsetList(array(['id', $this->typeId]));
