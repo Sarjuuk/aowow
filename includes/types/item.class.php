@@ -439,6 +439,17 @@ class ItemList extends BaseType
         interactive (set to place javascript/anchors to manipulate level and ratings or link to filters (static tooltips vs popup tooltip))
         subOf (tabled layout doesn't work if used as sub-tooltip in other item or spell tooltips; use line-break instead)
     */
+    public function getField($field, $localized = false, $enhance = [])
+    {
+        $res = parent::getField($field, $localized);
+
+        if ($field == 'name' && !empty($enhance['r']))
+            if ($this->getRandEnchantForItem($enhance['r']))
+                $res .= ' '.Util::localizedString($this->enhanceR, 'name');
+
+        return $res;
+    }
+
     public function renderTooltip($interactive = false, $subOf = 0, $enhance = [])
     {
         if ($this->error)
@@ -455,20 +466,20 @@ class ItemList extends BaseType
 
         if (!empty($enhance['r']))
         {
-            if ($rndEnch = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE Id = ?d', $enhance['r']))
+            if ($this->getRandEnchantForItem($enhance['r']))
             {
-                $_name      .= ' '.Util::localizedString($rndEnch, 'name');
+                $_name      .= ' '.Util::localizedString($this->enhanceR, 'name');
                 $randEnchant = '';
 
                 for ($i = 1; $i < 6; $i++)
                 {
-                    if ($rndEnch['enchantId'.$i] <= 0)
+                    if ($this->enhanceR['enchantId'.$i] <= 0)
                         continue;
 
-                    $enchant = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $rndEnch['enchantId'.$i]);
-                    if ($rndEnch['allocationPct'.$i] > 0)
+                    $enchant = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $this->enhanceR['enchantId'.$i]);
+                    if ($this->enhanceR['allocationPct'.$i] > 0)
                     {
-                        $amount = intVal($rndEnch['allocationPct'.$i] * $this->generateEnchSuffixFactor());
+                        $amount = intVal($this->enhanceR['allocationPct'.$i] * $this->generateEnchSuffixFactor());
                         $randEnchant .= '<span>'.str_replace('$i', $amount, Util::localizedString($enchant, 'name')).'</span><br />';
                     }
                     else
@@ -1078,6 +1089,17 @@ class ItemList extends BaseType
         }
 
         return $x;
+    }
+
+    private function getRandEnchantForItem($randId)
+    {
+        // is it available for this item? .. does it even exist?!
+        if (empty($this->enhanceR))
+            if (DB::World()->selectCell('SELECT 1 FROM item_enchantment_template WHERE entry = ?d AND ench = ?d', abs($this->getField('randomEnchant')), abs($randId)))
+                if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE Id = ?d', $randId))
+                    $this->enhanceR = $_;
+
+        return !empty($this->enhanceR);
     }
 
     // from Trinity

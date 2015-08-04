@@ -1378,7 +1378,8 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
                 }
 
                 // Always keep the base armor type
-                return prefix + g_itemset_types[_];
+                return $WH.isset('g_itemset_types') ? prefix + g_itemset_types[_] : _all;   // sarjuuk: LANG is not available if the tooltip is included externaly
+                // return prefix + g_itemset_types[_];
             });
 
             // Update min-max damage
