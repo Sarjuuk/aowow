@@ -83,7 +83,8 @@ if (typeof $WowheadPower == "undefined") {
                 100: [profiles,     "profile",     "Profile"    ]
             },
             SCALES = {
-                3: { url: "?data=item-scaling" }
+                3: { url: "?data=item-scaling" },
+                6: { url: "?data=item-scaling" }
             },
             LOCALES = {
                 0: "enus",

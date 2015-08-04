@@ -931,7 +931,6 @@ a.dialog-right {
 .icontinyr { padding-right: 18px !important; background: right center no-repeat; }
 .icontinyl { padding-left:  18px !important; background: left  center no-repeat; }
 a.icontiny { text-decoration: none; }
-a.icontiny span /* span */ { text-decoration:underline; }
 span.icontiny, a.tinyspecial { padding-left:18px !important; background:left center no-repeat; }
 
 /*
