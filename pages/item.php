@@ -377,10 +377,12 @@ class ItemPage extends genericPage
             uaSort($this->subject->subItems[$this->typeId], function($a, $b) { return strcmp($a['name'], $b['name']); });
             $this->subItems = array(
                 'data'    => array_values($this->subject->subItems[$this->typeId]),
+                'randIds' => array_keys($this->subject->subItems[$this->typeId]),
                 'quality' => $this->subject->getField('quality')
             );
 
             // merge identical stats and names for normal users (e.g. spellPower of a specific school became generel spellPower with 3.0)
+
             if (!User::isInGroup(U_GROUP_EMPLOYEE))
             {
                 for ($i = 1; $i < count($this->subItems['data']); $i++)
@@ -391,6 +393,7 @@ class ItemPage extends genericPage
                     {
                         $prev['chance'] += $cur['chance'];
                         array_splice($this->subItems['data'], $i , 1);
+                        array_splice($this->subItems['randIds'], $i , 1);
                         $i = 1;
                     }
                 }

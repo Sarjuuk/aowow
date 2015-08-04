@@ -48,7 +48,7 @@ if (!empty($this->subItems)):
                     $eText[] = '<a style="text-decoration:none; color:#CCCCCC;" href="?enchantment='.$eId.'">'.$txt.'</a>';
                 endforeach;
 
-                echo '                        <li><div><span class="q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
+                echo '                        <li><div><span title="ID'.Lang::main('colon').$this->subItems['randIds'][$k].'" class="q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
                 echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.implode(', ', $eText).'</div></li>';
             endif;
         endforeach;
@@ -68,7 +68,7 @@ if (!empty($this->subItems)):
                     $eText[] = '<a style="text-decoration:none; color:#CCCCCC;" href="?enchantment='.$eId.'">'.$txt.'</a>';
                 endforeach;
 
-                echo '                        <li><div><span class="q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
+                echo '                        <li><div><span title="ID'.Lang::main('colon').$this->subItems['randIds'][$k].'" class="q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
                 echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.implode(', ', $eText).'</div></li>';
             endif;
         endforeach;
