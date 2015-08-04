@@ -195,23 +195,31 @@ class FactionPage extends GenericPage
         if ($this->subject->getField('reputationIndex') != -1)        // only if you can actually gain reputation by kills
         {
             // inherit siblings/children from $spillover
-            $cIds = DB::World()->selectCol('SELECT DISTINCT creature_id FROM creature_onkill_reputation WHERE
-                (RewOnKillRepValue1 > 0 AND (RewOnKillRepFaction1 = ?d{ OR (RewOnKillRepFaction1 IN (?a) AND IsTeamAward1 <> 0)})) OR
-                (RewOnKillRepValue2 > 0 AND (RewOnKillRepFaction2 = ?d{ OR (RewOnKillRepFaction2 IN (?a) AND IsTeamAward2 <> 0)}))',
+            $cRep = DB::World()->selectCol('SELECT DISTINCT creature_id AS ARRAY_KEY, qty FROM (
+                    SELECT creature_id, RewOnKillRepValue1 as qty FROM creature_onkill_reputation WHERE RewOnKillRepValue1 > 0 AND (RewOnKillRepFaction1 = ?d{ OR (RewOnKillRepFaction1 IN (?a) AND IsTeamAward1 <> 0)}) UNION
+                    SELECT creature_id, RewOnKillRepValue2 as qty FROM creature_onkill_reputation WHERE RewOnKillRepValue2 > 0 AND (RewOnKillRepFaction2 = ?d{ OR (RewOnKillRepFaction2 IN (?a) AND IsTeamAward2 <> 0)})
+                ) x',
                 $this->typeId, $spillover->getFoundIDs() ?: DBSIMPLE_SKIP,
                 $this->typeId, $spillover->getFoundIDs() ?: DBSIMPLE_SKIP
             );
 
-            if ($cIds)
+            if ($cRep)
             {
-                $killCreatures = new CreatureList(array(['id', $cIds]));
+                $killCreatures = new CreatureList(array(['id', array_keys($cRep)]));
                 if (!$killCreatures->error)
                 {
+                    $data = $killCreatures->getListviewData();
+                    foreach ($data as $id => &$d)
+                        $d['reputation'] = $cRep[$id];
+
                     $tab = array(
                         'file'    => 'creature',
-                        'data'    => $killCreatures->getListviewData(),
+                        'data'    => $data,
                         'showRep' => true,
-                        'params'  => []
+                        'params'  => array(
+                            'extraCols' => '$_',
+                            'sort'      => "$['-reputation', 'name']"
+                        )
                     );
 
                     if ($killCreatures->getMatches() > CFG_SQL_LIMIT_DEFAULT)

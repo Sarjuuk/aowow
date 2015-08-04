@@ -1,5 +1,5 @@
 <?php
-if (!empty($lv['showRep'])):
+if (!empty($params['extraCols']) && strpos($params['extraCols'], '_')):
 ?>
 var _ = [
     {
