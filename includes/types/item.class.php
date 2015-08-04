@@ -1410,6 +1410,22 @@ class ItemList extends BaseType
             return;
 
         $randEnchants = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_itemrandomenchant WHERE id IN (?a)', $randIds);
+        $enchIds = array_unique(array_merge(
+            array_column($randEnchants, 'enchantId1'),
+            array_column($randEnchants, 'enchantId2'),
+            array_column($randEnchants, 'enchantId3'),
+            array_column($randEnchants, 'enchantId4'),
+            array_column($randEnchants, 'enchantId5')
+        ));
+
+        $enchants = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
+        foreach ($enchants->iterate() as $eId => $_)
+        {
+            $this->rndEnchIds[$eId] = array(
+                'text'  => $enchants->getField('name', true),
+                'stats' => $enchants->getStatGain()
+            );
+        }
 
         foreach ($this->iterate() as $mstItem => $__)
         {
@@ -1427,28 +1443,6 @@ class ItemList extends BaseType
                 $data      = array_merge($randEnchants[$subId], $data);
                 $jsonEquip = [];
                 $jsonText  = [];
-                $enchIds   = [];
-
-                for ($i = 1; $i < 6; $i++)
-                {
-                    $enchId = $data['enchantId'.$i];
-                    if ($enchId <= 0)
-                        continue;
-
-                    if (isset($this->rndEnchIds[$enchId]))
-                        continue;
-
-                    $enchIds[] = $enchId;
-                }
-
-                $enchants = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
-                foreach ($enchants->iterate() as $eId => $_)
-                {
-                    $this->rndEnchIds[$eId] = array(
-                        'text'  => $enchants->getField('name', true),
-                        'stats' => $enchants->getStatGain()
-                    );
-                }
 
                 for ($i = 1; $i < 6; $i++)
                 {

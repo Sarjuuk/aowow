@@ -1123,10 +1123,7 @@ class Util
 
             if (is_numeric($data))
             {
-                $_int   = intVal($data);
-                $_float = floatVal($data);
-
-                $data = ($_int == $_float) ? $_int : $_float;
+                $data += 0;
                 return true;
             }
             else if (preg_match('/^\d*,\d+$/', $data))

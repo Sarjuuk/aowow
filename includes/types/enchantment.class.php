@@ -53,7 +53,8 @@ class EnchantmentList extends BaseType
             }
 
             // floats are fetched as string from db :<
-            Util::checkNumeric($curTpl);
+            $curTpl['dmg'] = floatVal($curTpl['dmg']);
+            $curTpl['dps'] = floatVal($curTpl['dps']);
 
             // remove zero-stats
             foreach (Util::$itemMods as $str)

@@ -312,14 +312,9 @@ abstract class BaseType
             return Util::localizedString($this->curTpl, $field, $silent);
 
         $value = $this->curTpl[$field];
-        if (Util::checkNumeric($value))
-        {
-            $intVal   = intVal($value);
-            $floatVal = floatVal($value);
-            return $intVal == $floatVal ? $intVal : $floatVal;
-        }
-        else
-            return $value;
+        Util::checkNumeric($value);
+
+        return $value;
     }
 
     public function getRandomId()
