@@ -37,7 +37,7 @@ foreach ($this->criteria['data'] as $i => $cr):
         echo '<ul><li><var>&nbsp;</var></li></ul>';
     endif;
 
-    echo '</th><td>';
+    echo '</th><td><span class="tip" title="ID'.Lang::main('colon').$cr['id'].'">';
 
     if (!empty($cr['link'])):
         echo '<a href="'.$cr['link']['href'].'"'.(isset($cr['link']['quality']) ? ' class="q'.$cr['link']['quality'].'"' : null).'>'.Util::htmlEscape($cr['link']['text']).'</a>';
@@ -51,11 +51,7 @@ foreach ($this->criteria['data'] as $i => $cr):
         echo ' '.$cr['extraText'];
     endif;
 
-    if (User::isInGroup(U_GROUP_STAFF)):
-        echo ' <small title="'.Lang::achievement('criteriaType').' '.$cr['type'].'" class="q0">['.$cr['id'].']</small>';
-    endif;
-
-    echo '</td></tr>';
+    echo '</span></td></tr>';
 
     // every odd number of elements
     if ($i + 1 == round(count($this->criteria['data']) / 2)):
