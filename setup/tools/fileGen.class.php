@@ -10,6 +10,10 @@ if (!CLI)
 
 class FileGen
 {
+    const MODE_NORMAL   = 0;
+    const MODE_FIRSTRUN = 1;
+    const MODE_UPDATE   = 2;
+
     public  static $tplPath = 'setup/tools/filegen/templates/';
 
     public  static $cliOpts   = [];
@@ -65,14 +69,14 @@ class FileGen
         'STATIC_URL'     => STATIC_URL
     );
 
-    public static function init($firstrun = false)
+    public static function init($mode = self::MODE_NORMAL, array $updScripts = [])
     {
         self::$defaultExecTime = ini_get('max_execution_time');
-        $doScripts = [];
+        $doScripts = null;
 
-        if (getopt(self::$shortOpts, self::$longOpts) || $firstrun)
+        if (getopt(self::$shortOpts, self::$longOpts) || $mode == self::MODE_FIRSTRUN)
             self::handleCLIOpts($doScripts);
-        else
+        else if ($mode != self::MODE_UPDATE)
         {
             self::printCLIHelp();
             exit;
@@ -80,8 +84,8 @@ class FileGen
 
         // check passed subscript names; limit to real scriptNames
         self::$subScripts = array_merge(array_keys(self::$tplFiles), array_keys(self::$datasets));
-        if ($doScripts)
-            self::$subScripts = array_intersect($doScripts, self::$subScripts);
+        if ($doScripts || $updScripts)
+            self::$subScripts = array_intersect($doScripts ?: $updScripts, self::$subScripts);
         else if ($doScripts === null)
             self::$subScripts = [];
 

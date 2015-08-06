@@ -11,12 +11,13 @@ if (!CLI)
 /* Create content from world tables / dbc files */
 /************************************************/
 
-function sql($syncMe = [])
+function sql($syncMe = null)
 {
     require_once 'setup/tools/sqlGen.class.php';
 
-    SqlGen::init();
+    SqlGen::init($syncMe !== null ? SqlGen::MODE_UPDATE : SqlGen::MODE_NORMAL, $syncMe);
 
+    $done = [];
     if (SqlGen::$subScripts)
     {
         $allOk = true;
@@ -30,9 +31,10 @@ function sql($syncMe = [])
             $syncIds = [];                                  // todo: fetch what exactly must be regenerated
 
             $ok = SqlGen::generate($tbl, $syncIds);
-
             if (!$ok)
                 $allOk = false;
+            else
+                $done[] = $tbl;
 
             CLISetup::log(' - subscript \''.$tbl.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLISetup::LOG_OK : CLISetup::LOG_ERROR);
             set_time_limit(SqlGen::$defaultExecTime);      // reset to default for the next script
@@ -47,6 +49,8 @@ function sql($syncMe = [])
     }
     else
         CLISetup::log('no valid script names supplied', CLISetup::LOG_ERROR);
+
+    return $done;
 }
 
 ?>

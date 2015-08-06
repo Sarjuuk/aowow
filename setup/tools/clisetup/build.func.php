@@ -11,12 +11,13 @@ if (!CLI)
 /* Create required files */
 /*************************/
 
-function build()
+function build($syncMe = null)
 {
     require_once 'setup/tools/fileGen.class.php';
 
-    FileGen::init();
+    FileGen::init($syncMe !== null ? FileGen::MODE_UPDATE : FileGen::MODE_NORMAL, $syncMe);
 
+    $done = [];
     if (FileGen::$subScripts)
     {
         $allOk = true;
@@ -46,9 +47,10 @@ function build()
             $syncIds = [];                                  // todo: fetch what exactly must be regenerated
 
             $ok = FileGen::generate($name, $syncIds);
-
             if (!$ok)
                 $allOk = false;
+            else
+                $done[] = $name;
 
             CLISetup::log(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLISetup::LOG_OK : CLISetup::LOG_ERROR);
             set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
@@ -63,9 +65,10 @@ function build()
             $syncIds = [];                                  // todo: fetch what exactly must be regenerated
 
             $ok = FileGen::generate($file, $syncIds);
-
             if (!$ok)
                 $allOk = false;
+            else
+                $done[] = $file;
 
             CLISetup::log(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLISetup::LOG_OK : CLISetup::LOG_ERROR);
             set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
@@ -80,6 +83,8 @@ function build()
     }
     else
         CLISetup::log('no valid script names supplied', CLISetup::LOG_ERROR);
+
+    return $done;
 }
 
 ?>

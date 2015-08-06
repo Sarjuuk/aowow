@@ -21,6 +21,10 @@ if (!CLI)
 
 class SqlGen
 {
+    const MODE_NORMAL   = 0;
+    const MODE_FIRSTRUN = 1;
+    const MODE_UPDATE   = 2;
+
     private static $tables = array(                         // [dbcName, saveDbc, AowowDeps, TCDeps]
         'achievementcategory'      => ['achievement_category',          false, null, null],
         'achievementcriteria'      => ['achievement_criteria',          false, null, null],
@@ -77,14 +81,14 @@ class SqlGen
     public static $defaultExecTime = 30;
     public static $stepSize        = 1000;
 
-    public static function init($firstrun = false)
+    public static function init($mode = self::MODE_NORMAL, array $updScripts = [])
     {
         self::$defaultExecTime = ini_get('max_execution_time');
-        $doScripts = [];
+        $doScripts = null;
 
-        if (getopt(self::$shortOpts, self::$longOpts) || $firstrun)
+        if (getopt(self::$shortOpts, self::$longOpts) || $mode == self::MODE_FIRSTRUN)
             self::handleCLIOpts($doScripts);
-        else
+        else if ($mode != self::MODE_UPDATE)
         {
             self::printCLIHelp();
             exit;
@@ -92,8 +96,8 @@ class SqlGen
 
         // check passed subscript names; limit to real scriptNames
         self::$subScripts = array_keys(self::$tables);
-        if ($doScripts)
-            self::$subScripts = array_intersect($doScripts, self::$subScripts);
+        if ($doScripts || $updScripts)
+            self::$subScripts = array_intersect($doScripts ?: $updScripts, self::$subScripts);
         else if ($doScripts === null)
             self::$subScripts = [];
 

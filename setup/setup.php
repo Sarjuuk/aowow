@@ -58,6 +58,8 @@ else
     CLISetup::init();
 
 $cmd = array_pop(array_keys($opt));
+$s   = [];
+$b   = [];
 switch ($cmd)                                               // we accept only one main parameter
 {
     case 'firstrun':
@@ -77,13 +79,26 @@ switch ($cmd)                                               // we accept only on
         finish();
     case 'update':
         require_once 'setup/tools/clisetup/update.func.php';
-        if (update())                                       // return true if we do not rebuild stuff
+        list($s, $b) = update();                            // return true if we do not rebuild stuff
+        if (!$s && !$b)
             return;
     case 'sync':
         require_once 'setup/tools/clisetup/sql.func.php';
         require_once 'setup/tools/clisetup/build.func.php';
-        sql();
-        build();
+        $_s = sql($s);
+        $_b = build($b);
+
+        if ($s)
+        {
+            $_ = array_diff($s, $_s);
+            DB::Aowow()->query('UPDATE ?_dbversion SET `sql` = ?', $_ ? implode(' ', $_) : '');
+        }
+
+        if ($b)
+        {
+            $_ = array_diff($b, $_b);
+            DB::Aowow()->query('UPDATE ?_dbversion SET `build` = ?', $_ ? implode(' ', $_) : '');
+        }
 
         finish();
 }
