@@ -8,12 +8,14 @@ if (!CLI)
 
 
 /*  provide these with basic content
-    aowow_announcements             1 P
-    aowow_articles                  1 P
-    aowow_config                    1 P
-    aowow_news                      1 P
-    aowow_news_overlay              1 E
-    aowow_sourcestrings             2 P
+    aowow_announcements
+    aowow_articles
+    aowow_config
+    aowow_home_featuredbox
+    aowow_home_featuredbox_overlay
+    aowow_home_oneliners
+    aowow_home_titles
+    aowow_sourcestrings
 */
 
 

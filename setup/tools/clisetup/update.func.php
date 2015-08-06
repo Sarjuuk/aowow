@@ -13,20 +13,7 @@ if (!CLI)
 
 function update()
 {
-    $createQuery = "
-        CREATE TABLE `aowow_dbversion` (
-            `date` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-            `part` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0'
-        ) ENGINE=MyISAM";
-
-    $date = $part = 0;
-    if (!DB::Aowow()->selectCell('SHOW TABLES LIKE "%dbversion"'))
-    {
-        DB::Aowow()->query($createQuery);
-        DB::Aowow()->query('INSERT INTO ?_dbversion VALUES (0, 0)');
-    }
-    else
-        list($date, $part) = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ?_dbversion'));
+    list($date, $part) = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ?_dbversion'));
 
     CLISetup::log('checking sql updates');
 
@@ -68,6 +55,8 @@ function update()
     }
 
     CLISetup::log($nFiles ? 'applied '.$nFiles.' update(s)' : 'db is already up to date', CLISetup::LOG_OK);
+
+    return true;
 }
 
 ?>

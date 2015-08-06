@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: sarjuuk_aowow
 -- ------------------------------------------------------
--- Server version  5.5.30-30.1
+-- Server version	5.5.30-30.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -48,7 +48,7 @@ CREATE TABLE `aowow_account` (
   `token` varchar(40) NOT NULL COMMENT 'creation & recovery',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user` (`user`)
-) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -60,14 +60,16 @@ DROP TABLE IF EXISTS `aowow_account_banned`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_account_banned` (
   `id` int(16) unsigned NOT NULL,
-  `userId` int(11) unsigned NOT NULL COMMENT 'affected accountId',
-  `staffId` int(11) unsigned NOT NULL COMMENT 'executive accountId',
+  `userId` int(10) unsigned NOT NULL COMMENT 'affected accountId',
+  `staffId` int(10) unsigned NOT NULL COMMENT 'executive accountId',
   `typeMask` tinyint(4) unsigned NOT NULL COMMENT 'ACC_BAN_*',
   `start` int(10) unsigned NOT NULL COMMENT 'unixtime',
   `end` int(10) unsigned NOT NULL COMMENT 'automatic unban @ unixtime',
   `reason` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `FK_acc_banned` (`userId`),
+  CONSTRAINT `FK_acc_banned` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -98,8 +100,9 @@ CREATE TABLE `aowow_account_cookies` (
   `name` varchar(127) NOT NULL,
   `data` text NOT NULL,
   PRIMARY KEY (`userId`),
-  UNIQUE KEY `userId_name` (`userId`,`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  UNIQUE KEY `userId_name` (`userId`,`name`),
+  CONSTRAINT `FK_acc_cookies` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -117,8 +120,9 @@ CREATE TABLE `aowow_account_reputation` (
   `sourceB` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'e.g. upvoted commentId',
   `date` int(10) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `userId_action_source` (`userId`,`action`,`sourceA`,`sourceB`),
-  KEY `userId` (`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='reputation log';
+  KEY `userId` (`userId`),
+  CONSTRAINT `FK_acc_rep` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='reputation log';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -129,12 +133,14 @@ DROP TABLE IF EXISTS `aowow_account_weightscales`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_account_weightscales` (
-  `id` int(32) NOT NULL AUTO_INCREMENT,
-  `account` int(32) NOT NULL,
+  `id` int(32) NOT NULL,
+  `userId` int(10) unsigned NOT NULL,
   `name` varchar(32) NOT NULL,
   `weights` text NOT NULL,
-  PRIMARY KEY (`id`,`account`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`,`userId`),
+  KEY `FK_acc_weights` (`userId`),
+  CONSTRAINT `FK_acc_weights` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -155,7 +161,7 @@ CREATE TABLE `aowow_achievement` (
   `points` tinyint(3) unsigned NOT NULL,
   `orderInGroup` tinyint(3) unsigned NOT NULL,
   `iconId` mediumint(8) unsigned NOT NULL,
-  `flags` tinyint(3) unsigned NOT NULL,
+  `flags` smallint(5) unsigned NOT NULL,
   `reqCriteriaCount` tinyint(3) unsigned NOT NULL,
   `refAchievement` smallint(5) unsigned NOT NULL,
   `itemExtra` mediumint(8) unsigned NOT NULL,
@@ -251,7 +257,7 @@ CREATE TABLE `aowow_announcements` (
   `text_loc6` text NOT NULL,
   `text_loc8` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -347,8 +353,8 @@ CREATE TABLE `aowow_comments` (
   `responseBody` text,
   `responseRoles` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  INDEX `type_typeId` (`type`, `typeId`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+  KEY `type_typeId` (`type`,`typeId`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -472,7 +478,10 @@ CREATE TABLE `aowow_creature` (
   `flagsExtra` int(10) unsigned NOT NULL DEFAULT '0',
   `scriptName` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
-  KEY `idx_name` (`name_loc0`)
+  KEY `idx_name` (`name_loc0`),
+  KEY `difficultyEntry1` (`difficultyEntry1`),
+  KEY `difficultyEntry2` (`difficultyEntry2`),
+  KEY `difficultyEntry3` (`difficultyEntry3`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -514,7 +523,27 @@ CREATE TABLE `aowow_currencies` (
   `name_loc3` varchar(64) NOT NULL,
   `name_loc6` varchar(64) NOT NULL,
   `name_loc8` varchar(64) NOT NULL,
+  `description_loc0` varchar(256) NOT NULL,
+  `description_loc2` varchar(256) NOT NULL,
+  `description_loc3` varchar(256) NOT NULL,
+  `description_loc6` varchar(256) NOT NULL,
+  `description_loc8` varchar(256) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_dbversion`
+--
+
+DROP TABLE IF EXISTS `aowow_dbversion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_dbversion` (
+  `date` int(10) unsigned NOT NULL DEFAULT '0',
+  `part` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `sql` text,
+  `build` text
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -530,21 +559,21 @@ CREATE TABLE `aowow_emotes` (
   `cmd` varchar(15) NOT NULL,
   `isAnimated` tinyint(1) unsigned NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL,
-  `target_loc0` varchar(65) NULL DEFAULT NULL,
-  `target_loc2` varchar(70) NULL DEFAULT NULL,
-  `target_loc3` varchar(95) NULL DEFAULT NULL,
-  `target_loc6` varchar(90) NULL DEFAULT NULL,
-  `target_loc8` varchar(70) NULL DEFAULT NULL,
-  `noTarget_loc0` varchar(65) NULL DEFAULT NULL,
-  `noTarget_loc2` varchar(110) NULL DEFAULT NULL,
-  `noTarget_loc3` varchar(85) NULL DEFAULT NULL,
-  `noTarget_loc6` varchar(75) NULL DEFAULT NULL,
-  `noTarget_loc8` varchar(60) NULL DEFAULT NULL,
-  `self_loc0` varchar(65) NULL DEFAULT NULL,
-  `self_loc2` varchar(115) NULL DEFAULT NULL,
-  `self_loc3` varchar(85) NULL DEFAULT NULL,
-  `self_loc6` varchar(75) NULL DEFAULT NULL,
-  `self_loc8` varchar(70) NULL DEFAULT NULL,
+  `target_loc0` varchar(65) DEFAULT NULL,
+  `target_loc2` varchar(70) DEFAULT NULL,
+  `target_loc3` varchar(95) DEFAULT NULL,
+  `target_loc6` varchar(90) DEFAULT NULL,
+  `target_loc8` varchar(70) DEFAULT NULL,
+  `noTarget_loc0` varchar(65) DEFAULT NULL,
+  `noTarget_loc2` varchar(110) DEFAULT NULL,
+  `noTarget_loc3` varchar(85) DEFAULT NULL,
+  `noTarget_loc6` varchar(75) DEFAULT NULL,
+  `noTarget_loc8` varchar(60) DEFAULT NULL,
+  `self_loc0` varchar(65) DEFAULT NULL,
+  `self_loc2` varchar(115) DEFAULT NULL,
+  `self_loc3` varchar(85) DEFAULT NULL,
+  `self_loc6` varchar(75) DEFAULT NULL,
+  `self_loc8` varchar(70) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -560,8 +589,8 @@ CREATE TABLE `aowow_emotes_aliasses` (
   `id` smallint(6) unsigned NOT NULL,
   `locales` smallint(6) unsigned NOT NULL,
   `command` varchar(15) NOT NULL,
-  UNIQUE INDEX `id_command` (`id`, `command`),
-  INDEX `id` (`id`)
+  UNIQUE KEY `id_command` (`id`,`command`),
+  KEY `id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -697,6 +726,99 @@ CREATE TABLE `aowow_holidays` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_home_featuredbox`
+--
+
+DROP TABLE IF EXISTS `aowow_home_featuredbox`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_home_featuredbox` (
+  `id` smallint(5) unsigned NOT NULL,
+  `editorId` int(10) unsigned DEFAULT NULL,
+  `editDate` int(10) unsigned NOT NULL,
+  `active` tinyint(1) unsigned NOT NULL,
+  `extraWide` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `bgImgUrl` varchar(150) NOT NULL DEFAULT '',
+  `text_loc0` text NOT NULL,
+  `text_loc2` text NOT NULL,
+  `text_loc3` text NOT NULL,
+  `text_loc6` text NOT NULL,
+  `text_loc8` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_acc_hFBox` (`editorId`),
+  CONSTRAINT `FK_acc_hFBox` FOREIGN KEY (`editorId`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_home_featuredbox_overlay`
+--
+
+DROP TABLE IF EXISTS `aowow_home_featuredbox_overlay`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_home_featuredbox_overlay` (
+  `featureId` smallint(5) unsigned NOT NULL,
+  `left` smallint(5) unsigned NOT NULL,
+  `width` smallint(5) unsigned NOT NULL,
+  `url` varchar(150) NOT NULL,
+  `title_loc0` varchar(100) NOT NULL DEFAULT '',
+  `title_loc2` varchar(100) NOT NULL DEFAULT '',
+  `title_loc3` varchar(100) NOT NULL DEFAULT '',
+  `title_loc6` varchar(100) NOT NULL DEFAULT '',
+  `title_loc8` varchar(100) NOT NULL DEFAULT '',
+  KEY `FK_home_featurebox` (`featureId`),
+  CONSTRAINT `FK_home_featurebox` FOREIGN KEY (`featureId`) REFERENCES `aowow_home_featuredbox` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_home_oneliner`
+--
+
+DROP TABLE IF EXISTS `aowow_home_oneliner`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_home_oneliner` (
+  `id` smallint(5) unsigned NOT NULL,
+  `editorId` int(10) unsigned DEFAULT NULL,
+  `editDate` int(10) unsigned NOT NULL,
+  `active` tinyint(1) unsigned NOT NULL,
+  `text_loc0` varchar(200) NOT NULL,
+  `text_loc2` varchar(200) NOT NULL,
+  `text_loc3` varchar(200) NOT NULL,
+  `text_loc6` varchar(200) NOT NULL,
+  `text_loc8` varchar(200) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_acc_hOneliner` (`editorId`),
+  CONSTRAINT `FK_acc_hOneliner` FOREIGN KEY (`editorId`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_home_titles`
+--
+
+DROP TABLE IF EXISTS `aowow_home_titles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_home_titles` (
+  `id` smallint(5) unsigned NOT NULL,
+  `editorId` int(10) unsigned DEFAULT NULL,
+  `editDate` int(10) unsigned NOT NULL,
+  `active` tinyint(1) unsigned NOT NULL,
+  `title_loc0` varchar(100) NOT NULL,
+  `title_loc2` varchar(100) NOT NULL,
+  `title_loc3` varchar(100) NOT NULL,
+  `title_loc6` varchar(100) NOT NULL,
+  `title_loc8` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_acc_hTitles` (`editorId`),
+  CONSTRAINT `FK_acc_hTitles` FOREIGN KEY (`editorId`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_icons`
 --
 
@@ -719,7 +841,7 @@ DROP TABLE IF EXISTS `aowow_item_stats`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_item_stats` (
   `type` smallint(5) unsigned NOT NULL,
-  `typeId` mediumint(9) unsigned NOT NULL,
+  `typeId` mediumint(8) unsigned NOT NULL,
   `nsockets` tinyint(3) unsigned NOT NULL,
   `dmgmin1` smallint(5) unsigned NOT NULL,
   `dmgmax1` smallint(5) unsigned NOT NULL,
@@ -799,7 +921,7 @@ CREATE TABLE `aowow_item_stats` (
   `shasplpwr` smallint(6) NOT NULL,
   `natsplpwr` smallint(6) NOT NULL,
   `arcsplpwr` smallint(6) NOT NULL,
-  PRIMARY KEY (`typeId`, `type`)
+  PRIMARY KEY (`typeId`,`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1197,7 +1319,7 @@ CREATE TABLE `aowow_itemset` (
   `quality` tinyint(4) NOT NULL,
   `type` smallint(6) NOT NULL COMMENT 'g_itemset_types',
   `contentGroup` smallint(6) NOT NULL COMMENT 'g_itemset_notes',
-  `eventId` smallint(5) unsigned NOT NULL,
+  `eventId` smallint(3) unsigned NOT NULL,
   `skillId` smallint(3) unsigned NOT NULL,
   `skillLevel` smallint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`)
@@ -1252,47 +1374,6 @@ CREATE TABLE `aowow_mailtemplate` (
   `text_loc6` text NOT NULL,
   `text_loc8` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `aowow_news`
---
-
-DROP TABLE IF EXISTS `aowow_news`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `aowow_news` (
-  `id` int(16) unsigned NOT NULL,
-  `active` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `extraWide` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `bgImgUrl` varchar(150) NOT NULL DEFAULT '',
-  `text_loc0` text NOT NULL,
-  `text_loc2` text NOT NULL,
-  `text_loc3` text NOT NULL,
-  `text_loc6` text NOT NULL,
-  `text_loc8` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `aowow_news_overlay`
---
-
-DROP TABLE IF EXISTS `aowow_news_overlay`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `aowow_news_overlay` (
-  `newsId` int(11) unsigned NOT NULL,
-  `left` smallint(5) unsigned NOT NULL,
-  `width` smallint(5) unsigned NOT NULL,
-  `url` varchar(150) NOT NULL,
-  `title_loc0` varchar(100) NOT NULL DEFAULT '',
-  `title_loc2` varchar(100) NOT NULL DEFAULT '',
-  `title_loc3` varchar(100) NOT NULL DEFAULT '',
-  `title_loc6` varchar(100) NOT NULL DEFAULT '',
-  `title_loc8` varchar(100) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1388,7 +1469,7 @@ CREATE TABLE `aowow_quests` (
   `type` smallint(5) unsigned NOT NULL DEFAULT '0',
   `suggestedPlayers` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `timeLimit` int(10) unsigned NOT NULL DEFAULT '0',
-  `eventId` smallint(5) unsigned NOT NULL,
+  `eventId` smallint(5) unsigned NOT NULL DEFAULT '0',
   `prevQuestId` mediumint(8) NOT NULL DEFAULT '0',
   `nextQuestId` mediumint(8) NOT NULL DEFAULT '0',
   `exclusiveGroup` mediumint(8) NOT NULL DEFAULT '0',
@@ -1536,7 +1617,8 @@ CREATE TABLE `aowow_quests` (
   `objectiveText4_loc3` text,
   `objectiveText4_loc6` text,
   `objectiveText4_loc8` text,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `nextQuestIdChain` (`nextQuestIdChain`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1609,7 +1691,7 @@ CREATE TABLE `aowow_reports` (
   `email` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userId` (`userId`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1655,7 +1737,6 @@ DROP TABLE IF EXISTS `aowow_scalingstatvalues`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_scalingstatvalues` (
   `id` tinyint(3) unsigned NOT NULL,
-  `charLevel` tinyint(3) unsigned NOT NULL,
   `shoulderMultiplier` tinyint(3) unsigned NOT NULL,
   `trinketMultiplier` tinyint(3) unsigned NOT NULL,
   `weaponMultiplier` tinyint(3) unsigned NOT NULL,
@@ -1693,17 +1774,19 @@ CREATE TABLE `aowow_screenshots` (
   `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
   `type` smallint(5) unsigned NOT NULL,
   `typeId` mediumint(9) NOT NULL,
-  `uploader` int(16) unsigned NOT NULL,
+  `userIdOwner` int(10) unsigned DEFAULT NULL,
   `date` int(32) unsigned NOT NULL,
   `width` smallint(5) unsigned NOT NULL,
   `height` smallint(5) unsigned NOT NULL,
   `caption` varchar(250) DEFAULT NULL,
   `status` tinyint(3) unsigned NOT NULL COMMENT 'see defines.php - CC_FLAG_*',
-  `approvedBy` int(16) unsigned DEFAULT NULL,
-  `deletedBy` int(16) unsigned DEFAULT NULL,
+  `userIdApprove` int(10) unsigned DEFAULT NULL,
+  `userIdDelete` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `type` (`type`,`typeId`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  KEY `type` (`type`,`typeId`),
+  KEY `FK_acc_ss` (`userIdOwner`),
+  CONSTRAINT `FK_acc_ss` FOREIGN KEY (`userIdOwner`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2216,18 +2299,21 @@ DROP TABLE IF EXISTS `aowow_videos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_videos` (
-  `id` int(16) NOT NULL,
+  `id` int(16) NOT NULL AUTO_INCREMENT,
   `type` smallint(5) unsigned NOT NULL,
   `typeId` mediumint(9) NOT NULL,
-  `uploader` int(16) NOT NULL,
+  `userIdOwner` int(10) unsigned DEFAULT NULL,
   `date` int(32) NOT NULL,
   `videoId` varchar(12) NOT NULL,
   `caption` text,
   `status` int(8) NOT NULL,
-  `approvedBy` int(16) DEFAULT NULL,
+  `userIdApprove` int(10) unsigned DEFAULT NULL,
+  `userIdeDelete` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `type` (`type`,`typeId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  KEY `type` (`type`,`typeId`),
+  KEY `FK_acc_vi` (`userIdOwner`),
+  CONSTRAINT `FK_acc_vi` FOREIGN KEY (`userIdOwner`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2328,23 +2414,33 @@ INSERT INTO `aowow_config` VALUES ('sql_limit_search','500',0,129,'default: 500 
 UNLOCK TABLES;
 
 --
--- Dumping data for table `aowow_news`
+-- Dumping data for table `aowow_dbversion`
 --
 
-LOCK TABLES `aowow_news` WRITE;
-/*!40000 ALTER TABLE `aowow_news` DISABLE KEYS */;
-INSERT INTO `aowow_news` VALUES (1,1,0,'','[pad]Welcome to [b][span class=q5]AoWoW[/span][/b]!','[pad]Bienvenue à [b][span class=q5]AoWoW[/span][/b]!','[pad]Willkommen bei [b][span class=q5]AoWoW[/span][/b]!','','Добро[pad] пожаловать на [b][span class=q5]AoWoW[/span][/b]!'),(2,0,1,'STATIC_URL/images/logos/newsbox-explained.png','[ul]\n[li][i]just demoing the newsbox here..[/i][/li]\n[li][b][url=http://www.example.com]..with urls[/url][/b][/li]\n[li][b]..typeLinks [item=45533][/b][/li]\n[li][b]..also, over there to the right is an overlay-trigger =>[/b][/li]\n[/ul]\n\n[ul]\n[li][tooltip name=demotip]hey, it hints you stuff![/tooltip][b][span class=tip tooltip=demotip]..hover me[/span][/b][/li]\n[/ul]','','','','');
-/*!40000 ALTER TABLE `aowow_news` ENABLE KEYS */;
+LOCK TABLES `aowow_dbversion` WRITE;
+/*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
+INSERT INTO `aowow_dbversion` VALUES (1438878038,0,NULL,NULL);
+/*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Dumping data for table `aowow_news_overlay`
+-- Dumping data for table `aowow_home_featuredbox`
 --
 
-LOCK TABLES `aowow_news_overlay` WRITE;
-/*!40000 ALTER TABLE `aowow_news_overlay` DISABLE KEYS */;
-INSERT INTO `aowow_news_overlay` VALUES (2,405,100,'http://example.com','example overlay','','','','');
-/*!40000 ALTER TABLE `aowow_news_overlay` ENABLE KEYS */;
+LOCK TABLES `aowow_home_featuredbox` WRITE;
+/*!40000 ALTER TABLE `aowow_home_featuredbox` DISABLE KEYS */;
+INSERT INTO `aowow_home_featuredbox` VALUES (1,NULL,0,1,0,'','[pad]Welcome to [b][span class=q5]AoWoW[/span][/b]!','[pad]Bienvenue à [b][span class=q5]AoWoW[/span][/b]!','[pad]Willkommen bei [b][span class=q5]AoWoW[/span][/b]!','','Добро[pad] пожаловать на [b][span class=q5]AoWoW[/span][/b]!'),(2,NULL,0,0,1,'STATIC_URL/images/logos/newsbox-explained.png','[ul]\n[li][i]just demoing the newsbox here..[/i][/li]\n[li][b][url=http://www.example.com]..with urls[/url][/b][/li]\n[li][b]..typeLinks [item=45533][/b][/li]\n[li][b]..also, over there to the right is an overlay-trigger =>[/b][/li]\n[/ul]\n\n[ul]\n[li][tooltip name=demotip]hey, it hints you stuff![/tooltip][b][span class=tip tooltip=demotip]..hover me[/span][/b][/li]\n[/ul]','','','','');
+/*!40000 ALTER TABLE `aowow_home_featuredbox` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `aowow_home_featuredbox_overlay`
+--
+
+LOCK TABLES `aowow_home_featuredbox_overlay` WRITE;
+/*!40000 ALTER TABLE `aowow_home_featuredbox_overlay` DISABLE KEYS */;
+INSERT INTO `aowow_home_featuredbox_overlay` VALUES (2,405,100,'http://example.com','example overlay','','','','');
+/*!40000 ALTER TABLE `aowow_home_featuredbox_overlay` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -2366,4 +2462,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-05-10 14:11:18
+-- Dump completed on 2015-08-06 17:51:15

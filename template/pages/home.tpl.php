@@ -4,7 +4,7 @@
 <?php $this->brick('head'); ?>
 
 </head>
-<body class="home<?php echo User::isPremium() ? ' premium-logo' : null; ?>">
+<body class="home<?=(User::isPremium() ? ' premium-logo' : null); ?>">
     <div id="layers"></div>
     <div class="home-wrapper">
         <h1>Aowow</h1>
@@ -20,10 +20,20 @@
 
         <div class="home-menu" id="home-menu"></div>
 
-<?php if ($this->news): ?>
-        <div class="pad"></div>
+<?php if ($this->oneliner): ?>
+<p class="home-oneliner text" id="home-oneliner"></p>
 
-        <div class="home-featuredbox<?php echo empty($this->news['extraWide']) ? null : ' home-featuredbox-extended';?>" style="background-image: url(<?php echo $this->news['bgImgUrl'];?>);" id="home-featuredbox">
+<script type="text/javascript">//<![CDATA[
+Markup.printHtml('<?=$this->oneliner;?>', 'home-oneliner');
+//]]></script>
+<?php elseif ($this->news): ?>
+       <div class="pad"></div>
+<?php
+endif;
+
+if ($this->news):
+?>
+        <div class="home-featuredbox<?=(empty($this->news['extraWide']) ? null : ' home-featuredbox-extended'); ?>" style="background-image: url(<?=$this->news['bgImgUrl']; ?>);" id="home-featuredbox">
 <?php if ($this->news['overlays']): ?>
             <div class="home-featuredbox-links">
 <?php
@@ -44,7 +54,7 @@
     endif;
     echo $this->writeGlobalVars();
 ?>
-            Markup.printHtml(<?php echo json_encode($this->news['text']); ?>, 'news-generic', { allow: Markup.CLASS_ADMIN });
+            Markup.printHtml(<?=json_encode($this->news['text']); ?>, 'news-generic', { allow: Markup.CLASS_ADMIN });
         //]]></script>
 <?php endif; ?>
     </div>
@@ -53,14 +63,14 @@
 
     <div class="footer">
         <div class="footer-links linklist">
-            <a href="?aboutus"><?php echo Lang::main('aboutUs'); ?></a>|
-            <a href="#" id="footer-links-language"><?php echo Lang::main('language'); ?></a>
+            <a href="?aboutus"><?=Lang::main('aboutUs'); ?></a>|
+            <a href="#" id="footer-links-language"><?=Lang::main('language'); ?></a>
         </div>
         <div class="footer-copy">&#12484; 2015 Aowow</div>
     </div>
 
 <?php $this->brick('pageTemplate'); ?>
 
-    <noscript><div id="noscript-bg"></div><div id="noscript-text"><b><?php echo Lang::main('jsError'); ?></div></noscript>
+    <noscript><div id="noscript-bg"></div><div id="noscript-text"><b><?=Lang::main('jsError'); ?></div></noscript>
 </body>
 </html>

@@ -11,9 +11,9 @@ var mn_content = [
 
     [,   'Homepage'],
     [13, 'Featured Box',             '?admin=home-featuredbox',               null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Featured Box'}],
-//  [14, 'Oneliners',                '?admin=home-oneliners',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Oneliners'}],
+    [14, 'Oneliners',                '?admin=home-oneliners',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Oneliners'}],
 //  [15, 'Skins',                    '?admin=home-skins',                     null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SALESAGENT, breadcrumb: 'Homepage Skins'}],
-//  [16, 'Titles',                   '?admin=home-titles',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Titles'}],
+    [16, 'Titles',                   '?admin=home-titles',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Titles'}],
 
 //  [,   'Articles'],
 //  [8,  'List',                     '?admin=articles',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_EDITOR | U_GROUP_LOCALIZER, breadcrumb: 'List of Articles'}],

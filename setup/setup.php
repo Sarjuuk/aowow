@@ -58,13 +58,8 @@ else
     CLISetup::init();
 
 $cmd = array_pop(array_keys($opt));
-switch ($cmd)                  // we accept only one main parameter
+switch ($cmd)                                               // we accept only one main parameter
 {
-    case 'update':
-        require_once 'setup/tools/clisetup/update.func.php';
-        update();
-
-        return;
     case 'firstrun':
     case 'resume':
         require_once 'setup/tools/clisetup/firstrun.func.php';
@@ -80,6 +75,10 @@ switch ($cmd)                  // we accept only one main parameter
         $cmd();
 
         finish();
+    case 'update':
+        require_once 'setup/tools/clisetup/update.func.php';
+        if (update())                                       // return true if we do not rebuild stuff
+            return;
     case 'sync':
         require_once 'setup/tools/clisetup/sql.func.php';
         require_once 'setup/tools/clisetup/build.func.php';
