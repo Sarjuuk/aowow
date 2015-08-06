@@ -326,7 +326,7 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function nf($number, $decimals = 0)
+    public static function nf($number, $decimals = 0, $no1k = false)
     {
         //               [decimal, thousand]
         $seps = array(
@@ -337,7 +337,7 @@ class Lang
             LOCALE_RU => [' ', ',']
         );
 
-        return number_format($number, $decimals, $seps[User::$localeId][1], $seps[User::$localeId][0]);
+        return number_format($number, $decimals, $seps[User::$localeId][1], $no1k ? '' : $seps[User::$localeId][0]);
     }
 }
 

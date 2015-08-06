@@ -789,7 +789,7 @@ class SpellList extends BaseType
 
         // since this function may be called recursively, there are cases, where the already evaluated string is tried to be evaled again, throwing parse errors
         // todo (med): also quit, if we replaced vars with non-interactive text
-        if (strstr($formula, '</dfn>'))
+        if (strstr($formula, '</dfn>') || strstr($formula, '<!--'))
             return $formula;
 
         // hm, minor eval-issue. eval doesnt understand two operators without a space between them (eg. spelll: 18126)
@@ -1162,7 +1162,7 @@ class SpellList extends BaseType
         // step 3: try to evaluate result
         $evaled = $this->resolveEvaluation($str);
 
-        $return = is_numeric($evaled) ? Lang::nf($evaled, $precision) : $evaled;
+        $return = is_numeric($evaled) ? Lang::nf($evaled, $precision, true) : $evaled;
 
         return [$return, $fSuffix, $fRating];
     }
@@ -1298,13 +1298,13 @@ class SpellList extends BaseType
        */
 
         $relSpells = [];
-        $data = $this->handleConditions($data, $scaling, $relSpells);
+        $data = $this->handleConditions($data, $scaling, $relSpells, true);
 
     // step 3: unpack formulas ${ .. }.X
-        $data = $this->handleFormulas($data, $scaling);
+        $data = $this->handleFormulas($data, $scaling, true);
 
     // step 4: find and eliminate regular variables
-        $data = $this->handleVariables($data, $scaling);
+        $data = $this->handleVariables($data, $scaling/*, true*/);
 
     // step 5: variable-dependant variable-text
         // special case $lONE:ELSE;
@@ -1322,7 +1322,7 @@ class SpellList extends BaseType
         return [$data, $relSpells];
     }
 
-    private function handleFormulas($data, &$scaling)
+    private function handleFormulas($data, &$scaling, $topLevel = false)
     {
         // they are stacked recursively but should be balanced .. hf
         while (($formStartPos = strpos($data, '${')) !== false)
@@ -1361,7 +1361,7 @@ class SpellList extends BaseType
                 $formPrecision = $data[$formCurPos + 1];
                 $formCurPos += 2;
             }
-            list($formOutVal, $formOutStr, $ratingId) = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
+            list($formOutVal, $formOutStr, $ratingId) = $this->resolveFormulaString($formOutStr, $formPrecision ?: ($topLevel ? 0 : 10), $scaling);
 
             if ($ratingId && is_numeric($formOutVal) && $this->interactive)
                 $resolved = sprintf($formOutStr, $ratingId, abs($formOutVal), sprintf(Util::$setRatingLevelString, $this->charLevel, $ratingId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $ratingId, abs($formOutVal))));
@@ -1376,7 +1376,7 @@ class SpellList extends BaseType
         return $data;
     }
 
-    private function handleVariables($data, &$scaling)
+    private function handleVariables($data, &$scaling/*, $topLevel = false*/)
     {
         $pos = 0;                                           // continue strpos-search from this offset
         $str = '';
@@ -1426,7 +1426,7 @@ class SpellList extends BaseType
         return $str;
     }
 
-    private function handleConditions($data, &$scaling, &$relSpells, $dontKnow = false)
+    private function handleConditions($data, &$scaling, &$relSpells, $topLevel = false)
     {
         while (($condStartPos = strpos($data, '$?')) !== false)
         {
@@ -1506,9 +1506,9 @@ class SpellList extends BaseType
 
             // recursive conditions
             if (strstr($condParts[$targetPart], '$?'))
-                $condParts[$targetPart] = $this->handleConditions($condParts[$targetPart], $scaling, $relSpells, true);
+                $condParts[$targetPart] = $this->handleConditions($condParts[$targetPart], $scaling, $relSpells);
 
-            if ($know && !$dontKnow)
+            if ($know && $topLevel)
             {
                 foreach ([1, 3] as $pos)
                 {
