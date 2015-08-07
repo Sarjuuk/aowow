@@ -133,8 +133,8 @@ class SpellPage extends GenericPage
 
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
-       // level
-       if (!in_array($_cat, [-5, -6]))                      // not mount or vanity pet
+        // level
+        if (!in_array($_cat, [-5, -6]))                     // not mount or vanity pet
         {
             if ($_ = $this->subject->getField('talentLevel'))
                 $infobox[] = (in_array($_cat, [-2, 7, -13]) ? sprintf(Lang::game('reqLevel'), $_) : Lang::game('level').Lang::main('colon').$_);

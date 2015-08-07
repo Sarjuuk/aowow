@@ -825,6 +825,8 @@ class SpellList extends BaseType
             $this->refSpells[$lookup] = new SpellList(array(['s.id', $lookup]));
 
         $srcSpell = $lookup ? $this->refSpells[$lookup] : $this;
+        if ($srcSpell->error)
+            return $result;
 
         switch ($var)
         {
@@ -1116,6 +1118,12 @@ class SpellList extends BaseType
             $formula = substr_replace($formula, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
 
+        // note: broken tooltip on this one
+        // ${58644m1/-10} gets matched as a formula (ok), 58644m1 has no $ prefixed (not ok)
+        // the client scraps the m1 and prints -5864
+        if ($this->id == 58644)
+            $formula = '$'.$formula;
+
         // step 2: resolve variables
         $pos    = 0;                                        // continue strpos-search from this offset
         $str    = '';
@@ -1304,7 +1312,7 @@ class SpellList extends BaseType
         $data = $this->handleFormulas($data, $scaling, true);
 
     // step 4: find and eliminate regular variables
-        $data = $this->handleVariables($data, $scaling/*, true*/);
+        $data = $this->handleVariables($data, $scaling, true);
 
     // step 5: variable-dependant variable-text
         // special case $lONE:ELSE;
@@ -1376,7 +1384,7 @@ class SpellList extends BaseType
         return $data;
     }
 
-    private function handleVariables($data, &$scaling/*, $topLevel = false*/)
+    private function handleVariables($data, &$scaling, $topLevel = false)
     {
         $pos = 0;                                           // continue strpos-search from this offset
         $str = '';
@@ -1417,6 +1425,9 @@ class SpellList extends BaseType
                 $resolved .= Lang::game('valueDelim');
                 $resolved .= isset($var[3]) ? sprintf($var[3], $_) : $_;
             }
+
+            if ($var[0] === null && $topLevel)              // {Unknown}
+                $resolved .= '{'.Lang::game('sources', 0).'}';
 
             $str .= $resolved;
         }
