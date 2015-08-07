@@ -51,7 +51,7 @@ $lang = array(
         'or'            => " oder ",
         'back'          => "Zurück",
         'reputationTip' => "Rufpunkte",
-        'byUserTimeAgo' => "Von <a href=\"".HOST_URL."/?user=%s\">%1s</a> vor %s",
+        'byUserTimeAgo' => 'Von <a href="'.HOST_URL.'/?user=%s">%1$s</a> vor %s',
 
         // filter
         'extSearch'     => "Erweiterte Suche",
@@ -470,7 +470,7 @@ $lang = array(
         'titleReward'   => 'Euch wird der Titel "<a href="?title=%d">%s</a>" verliehen',
         'slain'         => "getötet",
         'reqNumCrt'     => "Benötigt",
-        'rfAvailable'   => "Verfügbar auf Realm:",
+        'rfAvailable'   => "Verfügbar auf Realm: ",
         '_transfer'     => 'Dieser Erfolg wird mit <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
     ),
     'chrClass' => array(

@@ -103,13 +103,13 @@ class AchievementPage extends GenericPage
         if ($this->subject->getField('flags') & 0x100 && DB::isConnectable(DB_AUTH))
         {
             $avlb = [];
-            foreach (DB::Auth()->selectCol('SELECT id AS ARRAY_KEY, name FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_VERSION) AS $rId => $name)
+            foreach (DB::Auth()->selectCol('SELECT id AS ARRAY_KEY, name FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_BUILD) AS $rId => $name)
             {
                 if (!DB::isConnectable(DB_CHARACTERS . $rId))
                     continue;
 
                 if (!DB::Characters($rId)->selectCell('SELECT 1 FROM character_achievement WHERE achievement = ?d LIMIT 1', $this->typeId))
-                    $avlb[] = $name;
+                    $avlb[] = Util::ucWords($name);
             }
 
             if ($avlb)

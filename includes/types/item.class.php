@@ -653,7 +653,7 @@ class ItemList extends BaseType
             $x .= '<span class="q1"><a href="?enchantment='.$geId.'">'.Util::localizedString($gemEnch, 'name').'</a></span><br />';
 
             // activation conditions for meta gems
-            if ($gemEnch['conditionId'])
+            if (!empty($gemEnch['conditionId']))
             {
                 if ($gemCnd = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantmentcondition WHERE id = ?d', $gemEnch['conditionId']))
                 {
@@ -1469,7 +1469,7 @@ class ItemList extends BaseType
                 for ($i = 1; $i < 6; $i++)
                 {
                     $enchId = $data['enchantId'.$i];
-                    if ($enchId <= 0)
+                    if ($enchId <= 0 || empty($this->rndEnchIds[$enchId]))
                         continue;
 
                     if ($data['allocationPct'.$i] > 0)      // RandomSuffix: scaling Enchantment; enchId < 0

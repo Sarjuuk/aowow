@@ -51,7 +51,7 @@ $lang = array(
         'or'            => " или ",
         'back'          => "Назад",
         'reputationTip' => "Очки репутации",
-        'byUserTimeAgo' => "От <a href=\"".HOST_URL."/?user=%s\">%1s</a> %s назад",
+        'byUserTimeAgo' => 'От <a href="'.HOST_URL.'/?user=%s">%1s</a> %s назад',
 
         // filter
         'extSearch'     => "Расширенный поиск",
@@ -468,7 +468,7 @@ $lang = array(
         'titleReward'   => 'Наградное звание: "<a href="?title=%d">%s</a>"',
         'slain'         => "убито",
         'reqNumCrt'     => "Требуется",
-        'rfAvailable'   => "[Available on realm]:",
+        'rfAvailable'   => "[Available on realm]: ",
         '_transfer'     => 'Этот предмет превратится в <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
     ),
     'chrClass' => array(

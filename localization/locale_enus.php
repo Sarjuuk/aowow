@@ -46,7 +46,7 @@ $lang = array(
         'or'            => " or ",
         'back'          => "Back",
         'reputationTip' => "Reputation points",
-        'byUserTimeAgo' => "By <a href=\"".HOST_URL."/?user=%s\">%1s</a> %s ago",
+        'byUserTimeAgo' => 'By <a href="'.HOST_URL.'/?user=%s">%1$s</a> %s ago',
 
         // filter
         'extSearch'     => "Extended search",
@@ -465,7 +465,7 @@ $lang = array(
         'titleReward'   => 'You shall be granted the title "<a href="?title=%d">%s</a>"',
         'slain'         => "slain",
         'reqNumCrt'     => "Requires",
-        'rfAvailable'   => "Available on realm:",
+        'rfAvailable'   => "Available on realm: ",
         '_transfer'     => 'This achievement will be converted to <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
     ),
     'chrClass' => array(

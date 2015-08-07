@@ -888,7 +888,7 @@ abstract class Filter
 
     protected function modularizeString(array $fields, $string = '')
     {
-        if (!$string)
+        if (!$string && !empty($this->fiData['v']['na']))
             $string = $this->fiData['v']['na'];
 
         $qry   = [];

@@ -92,8 +92,9 @@ class GameObjectList extends BaseType
 
         $x  = '<table>';
         $x .= '<tr><td><b class="q">'.$this->getField('name', true).'</b></td></tr>';
-        if ($_ = Lang::gameObject('type', $this->curTpl['typeCat']))
-            $x .= '<tr><td>'.$_.'</td></tr>';
+        if ($this->curTpl['typeCat'])
+            if ($_ = Lang::gameObject('type', $this->curTpl['typeCat']))
+                $x .= '<tr><td>'.$_.'</td></tr>';
 
         if (isset($this->curTpl['lockId']))
             if ($locks = Lang::getLocks($this->curTpl['lockId']))

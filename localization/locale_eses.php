@@ -51,7 +51,7 @@ $lang = array(
         'or'            => " o ",
         'back'          => "Arrière",
         'reputationTip' => "Puntos de reputación",
-        'byUserTimeAgo' => "Por <a href=\"".HOST_URL."/?user=%s\">%1s</a> hace %s",
+        'byUserTimeAgo' => 'Por <a href="'.HOST_URL.'/?user=%s">%1$s</a> hace %s',
 
         // filter
         'extSearch'     => "Extender búsqueda",
@@ -469,7 +469,7 @@ $lang = array(
         'titleReward'   => 'Deberías obtener el título "<a href="?title=%d">%s</a>"',
         'slain'         => "matado",
         'reqNumCrt'     => "Requiere",
-        'rfAvailable'   => "Disponible en reino:",
+        'rfAvailable'   => "Disponible en reino: ",
         '_transfer'     => 'Este logro será convertido a <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
     ),
     'chrClass' => array(

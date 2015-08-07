@@ -1022,7 +1022,7 @@ class SpellPage extends GenericPage
                         SELECT    IF(t1.ID > 200000, t2.ID, t1.ID)
                         FROM      npc_trainer t1
                         LEFT JOIN npc_trainer t2 ON t2.SpellID = -t1.ID
-                        WHERE     t1.SpellID IN (?a)',
+                        WHERE     t1.SpellID = ?d',
                         $this->typeId
                     );
                 }
@@ -1667,7 +1667,7 @@ class SpellPage extends GenericPage
                     $foo['name'] .= $_;
                     break;
                 case 33:                                    // Open Lock
-                    $_ = Lang::spell('lockType', $effMV);
+                    $_ = $effMV ? Lang::spell('lockType', $effMV) : $effMV;
                     if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
                         $_ = sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_);
                     else if (!$_)

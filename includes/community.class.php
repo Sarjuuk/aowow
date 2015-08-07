@@ -121,6 +121,8 @@ class CommunityContent
                 case TYPE_RACE:        $obj = new CharRaceList($cnd);    break;
                 case TYPE_SKILL:       $obj = new SkillList($cnd);       break;
                 case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
+                case TYPE_EMOTE:       $obj = new EmoteList($cnd);       break;
+                case TYPE_ENCHANTMENT: $obj = new EnchantmentList($cnd); break;
                 default: continue;
             }
 

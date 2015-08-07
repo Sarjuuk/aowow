@@ -100,6 +100,8 @@ class SearchPage extends GenericPage
         if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE) && !($this->searchMask & SEARCH_TYPE_REGULAR))
             $this->notFound();
 
+        parent::__construct($pageCall, $pageParam);         // just to set g_user and g_locale
+
         // fill include, exclude and ignore
         $this->tokenizeQuery();
 
@@ -109,8 +111,6 @@ class SearchPage extends GenericPage
             $this->mode = CACHE_TYPE_NONE;
             $this->notFound();
         }
-
-        parent::__construct($pageCall, $pageParam);         // just to set g_user and g_locale
     }
 
     private function tokenizeQuery()

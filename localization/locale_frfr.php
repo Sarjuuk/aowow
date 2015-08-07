@@ -51,7 +51,7 @@ $lang = array(
         'or'            => " ou ",
         'back'          => "Redro",
         'reputationTip' => "Points de réputation",
-        'byUserTimeAgo' => "Par <a href=\"".HOST_URL."/?user=%s\">%1s</a> il y a %s",
+        'byUserTimeAgo' => 'Par <a href="'.HOST_URL.'/?user=%s">%1$s</a> il y a %s',
 
         // filter
         'extSearch'     => "Recherche avancée",

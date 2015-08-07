@@ -74,8 +74,9 @@ class ComparePage extends GenericPage
             if (empty($data[$itemId]))
                 continue;
 
-            foreach ($data[$itemId]['subitems'] as &$si)
-                $si['enchantment'] = implode(', ', $si['enchantment']);
+            if (!empty($data[$itemId]['subitems']))
+                foreach ($data[$itemId]['subitems'] as &$si)
+                    $si['enchantment'] = implode(', ', $si['enchantment']);
 
             $this->cmpItems[] = [
                 $itemId,
