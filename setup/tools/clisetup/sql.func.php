@@ -15,7 +15,7 @@ function sql($syncMe = null)
 {
     require_once 'setup/tools/sqlGen.class.php';
 
-    SqlGen::init($syncMe !== null ? SqlGen::MODE_UPDATE : SqlGen::MODE_NORMAL, $syncMe);
+    SqlGen::init($syncMe !== null ? SqlGen::MODE_UPDATE : SqlGen::MODE_NORMAL, $syncMe ?: []);
 
     $done = [];
     if (SqlGen::$subScripts)

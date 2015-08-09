@@ -53,6 +53,7 @@ function firstrun($resume)
         ['SqlGen::generate',  'races',                    null, null, null],
         ['SqlGen::generate',  'shapeshiftforms',          null, null, null],
         ['SqlGen::generate',  'skillline',                null, null, null],
+        ['SqlGen::generate',  'emotes',                   null, null, null],
         ['SqlGen::generate',  'achievement',              null, null, null],
         ['SqlGen::generate',  'creature',                 null, null, null],
         ['SqlGen::generate',  'currencies',               null, null, null],

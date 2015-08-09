@@ -48,7 +48,7 @@ if (!CLI)
 
         if (DB::isConnectable(DB_AUTH))
         {
-            $rows = DB::Auth()->select('SELECT name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_VERSION);
+            $rows = DB::Auth()->select('SELECT name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_BUILD);
 
             foreach ($rows as $row)
             {

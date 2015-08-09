@@ -15,7 +15,7 @@ function build($syncMe = null)
 {
     require_once 'setup/tools/fileGen.class.php';
 
-    FileGen::init($syncMe !== null ? FileGen::MODE_UPDATE : FileGen::MODE_NORMAL, $syncMe);
+    FileGen::init($syncMe !== null ? FileGen::MODE_UPDATE : FileGen::MODE_NORMAL, $syncMe ?: []);
 
     $done = [];
     if (FileGen::$subScripts)

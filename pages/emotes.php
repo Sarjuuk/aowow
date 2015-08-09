@@ -25,16 +25,11 @@ class EmotesPage extends GenericPage
 
     protected function generateContent()
     {
-        $emotes = new EmoteList();
-        if (!$emotes->error)
-        {
-
-            $this->lvTabs[] = array(
-                'file'   => 'emote',
-                'data'   => $emotes->getListviewData(),
-                'params' => []
-            );
-        };
+        $this->lvTabs[] = array(
+            'file'   => 'emote',
+            'data'   => (new EmoteList())->getListviewData(),
+            'params' => []
+        );
     }
 
     protected function generateTitle()
