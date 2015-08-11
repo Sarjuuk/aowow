@@ -11,8 +11,9 @@ abstract class BaseType
 
     protected $templates = [];
     protected $curTpl    = [];                              // lets iterate!
-    protected $matches   = null;                            // total matches unaffected by sqlLimit in config
+    protected $matches   = 0;                               // total matches unaffected by sqlLimit in config
 
+    protected $dbNames   = ['Aowow'];                       // multiple DBs in profiler
     protected $queryBase = '';
     protected $queryOpts = [];
 
@@ -68,7 +69,7 @@ abstract class BaseType
         if ($miscData && !empty($miscData['extraOpts']))
             $this->extendQueryOpts($miscData['extraOpts']);
 
-        $resolveCondition = function ($c, $supLink) use (&$resolveCondition, &$prefixes)
+        $resolveCondition = function ($c, $supLink) use (&$resolveCondition, &$prefixes, $miscData)
         {
             $subLink = '';
 
@@ -168,6 +169,9 @@ abstract class BaseType
                 }
                 else if (is_string($c[1]))
                 {
+                    if (!empty($miscData['forceCiCollate']))
+                        $field .= ' COLLATE utf8_general_ci';
+
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
                     $val = DB::Aowow()->escape($c[1]);
                 }
@@ -219,6 +223,10 @@ abstract class BaseType
             if (!in_array($k, $prefixes))
                 unset($this->queryOpts[$k]);
 
+        // prepare usage of guids if using multiple DBs
+        if (count($this->dbNames) > 1)
+            $this->queryBase = preg_replace('/\s([^\s]+)\sAS\sARRAY_KEY/i', ' CONCAT("DB_IDX", ":", \1) AS ARRAY_KEY', $this->queryBase);
+
         // insert additional selected fields
         if ($s = array_column($this->queryOpts, 's'))
             $this->queryBase = str_replace('ARRAY_KEY', 'ARRAY_KEY '.implode('', $s), $this->queryBase);
@@ -248,9 +256,27 @@ abstract class BaseType
         if ($limit)
             $this->queryBase .= ' LIMIT '.$limit;
 
-        // execure query (finally)
-        $rows = DB::Aowow()->SelectPage($this->matches, $this->queryBase);
-        if (!$rows)
+        // execute query (finally)
+        $mtch = 0;
+        // this is purely because of multiple realms per server
+        foreach ($this->dbNames as $dbIdx => $n)
+        {
+            $query = str_replace('DB_IDX', $dbIdx, $this->queryBase);
+
+            if ($rows = DB::{$n}($dbIdx)->SelectPage($mtch, $query))
+            {
+                $this->matches += $mtch;
+                foreach ($rows as $id => $row)
+                {
+                    if (isset($this->templates[$id]))
+                        trigger_error('guid for List already in use #'.$id, E_USER_WARNING);
+                    else
+                        $this->templates[$id] = $row;
+                }
+            }
+        }
+
+        if (!$this->templates)
             return;
 
         // assign query results to template
@@ -886,23 +912,23 @@ abstract class Filter
         }
     }
 
-    protected function modularizeString(array $fields, $string = '')
+    protected function modularizeString(array $fields, $string = '', $exact = false)
     {
         if (!$string && !empty($this->fiData['v']['na']))
             $string = $this->fiData['v']['na'];
 
-        $qry   = [];
+        $qry  = [];
+        $exPH = $exact ? '%s' : '%%%s%%';
         foreach ($fields as $n => $f)
         {
-            $sub = [];
+            $sub   = [];
             $parts = array_filter(explode(' ', $string));
-
             foreach ($parts as $p)
             {
                 if ($p[0] == '-' && strlen($p) > 3)
-                    $sub[] = [$f, '%'.substr($p, 1).'%', '!'];
+                    $sub[] = [$f, sprintf($exPH, substr($p, 1)), '!'];
                 else if ($p[0] != '-' && strlen($p) > 2)
-                    $sub[] = [$f, '%'.$p.'%'];
+                    $sub[] = [$f, sprintf($exPH, $p)];
             }
 
             // single cnd?

@@ -42,36 +42,32 @@ if (!CLI)
         $subUS = [];
         $set   = 0x0;
         $menu  = [
-            ['us', 'US & Oceanic', null,[[Util::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subEU]]],
-            ['eu', 'Europe',       null,[[Util::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subUS]]]
+            ['us', 'US & Oceanic', null,[[Util::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subUS]]],
+            ['eu', 'Europe',       null,[[Util::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subEU]]]
         ];
 
-        if (DB::isConnectable(DB_AUTH))
+        foreach (Util::getRealms() as $row)
         {
-            $rows = DB::Auth()->select('SELECT name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_BUILD);
-
-            foreach ($rows as $row)
+            if ($row['region'] == 'eu')
             {
-                if ($row['region'] == 'eu')
-                {
-                    $set |= 0x1;
-                    $subEU[] = [Util::urlize($row['name']), $row['name']];
-                }
-                else if ($row['region'] == 'us')
-                {
-                    $set |= 0x2;
-                    $subUS[] = [Util::urlize($row['name']), $row['name']];
-                }
+                $set |= 0x1;
+                $subEU[] = [Util::urlize($row['name']), $row['name']];
+            }
+            else if ($row['region'] == 'us')
+            {
+                $set |= 0x2;
+                $subUS[] = [Util::urlize($row['name']), $row['name']];
             }
         }
-        else
+
+        if (!$set)
             CLISetup::log(' - realmMenu: Auth-DB not set up .. menu will be empty', CLISetup::LOG_WARN);
 
         if (!($set & 0x1))
-            array_shift($menu);
+            array_pop($menu);
 
         if (!($set & 0x2))
-            array_pop($menu);
+            array_shift($menu);
 
         return Util::toJSON($menu);
     }

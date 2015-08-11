@@ -41,6 +41,7 @@ class SqlGen
         'spellrange'               => ['spellrange',                    false, null, null],
         'spellvariables'           => ['spelldescriptionvariables',     false, null, null],
         'totemcategory'            => ['totemcategory',                 false, null, null],
+        'talents'                  => [null, null,                             null, null],
         'classes'                  => [null, null,                             null, null],
         'factions'                 => [null, null,                             null, null],
         'factiontemplate'          => [null, null,                             null, null],

@@ -28,11 +28,12 @@ if (!CLI)
 
     function realms()
     {
-        $realms = [];
-        if (DB::isConnectable(DB_AUTH))
-            $realms = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, ? AS battlegroup, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', CFG_BATTLEGROUP, WOW_BUILD);
-        else
+        $realms = Util::getRealms();
+        if (!$realms)
             CLISetup::log(' - realms: Auth-DB not set up .. static data g_realms will be empty', CLISetup::LOG_WARN);
+        else
+            foreach ($realms as &$r)
+                $r['battlegroup'] = CFG_BATTLEGROUP;
 
         $toFile = "var g_realms = ".Util::toJSON($realms).";";
         $file   = 'datasets/realms';

@@ -44,6 +44,7 @@ function firstrun($resume)
         ['SqlGen::generate',  'spellrange',               null, null, null],
         ['SqlGen::generate',  'spellvariables',           null, null, null],
         ['SqlGen::generate',  'totemcategory',            null, null, null],
+        ['SqlGen::generate',  'talents',                  null, null, null],
         ['SqlGen::generate',  'classes',                  null, null, null],
         ['SqlGen::generate',  'factions',                 null, null, null],
         ['SqlGen::generate',  'factiontemplate',          null, null, null],

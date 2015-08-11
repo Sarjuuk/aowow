@@ -2202,6 +2202,27 @@ CREATE TABLE `aowow_spellvariables` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_talents`
+--
+
+DROP TABLE IF EXISTS `aowow_talents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_talents` (
+  `id` smallint(5) unsigned NOT NULL,
+  `class` tinyint(3) unsigned NOT NULL,
+  `tab` tinyint(3) unsigned NOT NULL,
+  `row` tinyint(3) unsigned NOT NULL,
+  `col` tinyint(3) unsigned NOT NULL,
+  `spell` mediumint(8) unsigned NOT NULL,
+  `rank` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`id`, `rank`),
+  INDEX `spell` (`spell`),
+  INDEX `class` (`class`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_taxinodes`
 --
 

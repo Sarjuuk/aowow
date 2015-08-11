@@ -1591,6 +1591,15 @@ class Util
 
         return false;
     }
+
+    private static $realms;
+    public static function getRealms()
+    {
+        if (DB::isConnectable(DB_AUTH) && !self::$realms)
+            self::$realms = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_BUILD);
+
+        return self::$realms;
+    }
 }
 
 ?>

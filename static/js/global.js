@@ -15059,13 +15059,13 @@ Listview.templates = {
                         $WH.ae(a, $WH.ct(profile.region.toUpperCase()));
                         $WH.ae(s, a);
 
-                        if (profile.subregion) {
+                        if (profile.battlegroup) {
                             $WH.ae(s, $WH.ct(LANG.hyphen));
 
                             a = $WH.ce('a');
                             a.className = 'q1';
-                            a.href = '?profiles=' + profile.region + '.' + profile.subregion;
-                            $WH.ae(a, $WH.ct(profile.subregionname));
+                            a.href = '?profiles=' + profile.region + '.' + profile.battlegroup;
+                            $WH.ae(a, $WH.ct(profile.battlegroupname));
                             $WH.ae(s, a);
                         }
 
@@ -15077,8 +15077,8 @@ Listview.templates = {
                     if (profile.region) {
                         buff += ' ' + profile.region;
                     }
-                    if (profile.subregion) {
-                        buff += ' ' + profile.subregion;
+                    if (profile.battlegroup) {
+                        buff += ' ' + profile.battlegroup;
                     }
                     if (profile.realm) {
                         buff += ' ' + profile.realm;
@@ -15090,8 +15090,8 @@ Listview.templates = {
                     if (a.region != b.region) {
                         return $WH.strcmp(a.region, b.region);
                     }
-                    if (a.subregion != b.subregion) {
-                        return $WH.strcmp(a.subregion, b.subregion);
+                    if (a.battlegroup != b.battlegroup) {
+                        return $WH.strcmp(a.battlegroup, b.battlegroup);
                     }
                     return $WH.strcmp(a.realm, b.realm);
                 }
