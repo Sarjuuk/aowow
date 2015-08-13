@@ -1,6 +1,6 @@
 [submodule "includes/tools/MPQExtractor"]
 	path = includes/tools/MPQExtractor
-	url = https://github.com/iamcal/MPQExtractor.git
+	url = https://github.com/Kanma/MPQExtractor.git
 [submodule "includes/tools/BLPConverter"]
 	path = includes/tools/BLPConverter
 	url = https://github.com/Kanma/BLPConverter.git
