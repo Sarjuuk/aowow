@@ -169,9 +169,6 @@ abstract class BaseType
                 }
                 else if (is_string($c[1]))
                 {
-                    if (!empty($miscData['forceCiCollate']))
-                        $field .= ' COLLATE utf8_general_ci';
-
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT LIKE' : 'LIKE';
                     $val = DB::Aowow()->escape($c[1]);
                 }
@@ -1031,10 +1028,10 @@ abstract class Filter
 
     private function genericString($field, $value, $localized)
     {
-        if (!$localized)
-            return [$field, (string)$value];
+        if ($localized)
+            $field .= '_loc'.User::$localeId;
 
-        return $this->modularizeString([$field.'_loc'.User::$localeId], $value);
+        return $this->modularizeString([$field], (string)$value);
     }
 
     private function genericNumeric($field, &$value, $op, $castInt)

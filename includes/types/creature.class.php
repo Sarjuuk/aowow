@@ -76,7 +76,8 @@ class CreatureList extends BaseType
         if ($type)
             $row3[] = Lang::game('ct', $type);
 
-        $row3[] = '('.Lang::npc('rank', $this->curTpl['rank']).')';
+        if ($_ = Lang::npc('rank', $this->curTpl['rank']))
+            $row3[] = '('.$_.')';
 
         $x  = '<table>';
         $x .= '<tr><td><b class="q">'.$this->getField('name', true).'</b></td></tr>';

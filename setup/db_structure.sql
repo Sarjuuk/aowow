@@ -2278,6 +2278,7 @@ CREATE TABLE `aowow_titles` (
   `expansion` tinyint(3) unsigned NOT NULL,
   `src12Ext` mediumint(9) unsigned NOT NULL,
   `eventId` smallint(5) unsigned NOT NULL,
+  `bitIdx` tinyint(3) unsigned NOT NULL,
   `male_loc0` varchar(33) NOT NULL,
   `male_loc2` varchar(35) NOT NULL,
   `male_loc3` varchar(37) NOT NULL,
@@ -2288,7 +2289,8 @@ CREATE TABLE `aowow_titles` (
   `female_loc3` varchar(39) NOT NULL,
   `female_loc6` varchar(35) NOT NULL,
   `female_loc8` varchar(41) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `bitIdx` (`bitIdx`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -1112,6 +1112,11 @@ class Util
         return mb_convert_case($str, MB_CASE_TITLE, 'UTF-8');
     }
 
+    public static function lower($str)
+    {
+        return mb_strtolower($str, 'UTF-8');
+    }
+
     // note: valid integer > 32bit are returned as float
     public static function checkNumeric(&$data)
     {
@@ -1592,7 +1597,7 @@ class Util
         return false;
     }
 
-    private static $realms;
+    private static $realms = [];
     public static function getRealms()
     {
         if (DB::isConnectable(DB_AUTH) && !self::$realms)
