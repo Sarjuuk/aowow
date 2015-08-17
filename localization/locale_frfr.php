@@ -940,8 +940,8 @@ $lang = array(
             "Épique",               "Légendaire",       "Artefact",             "Héritage"
         ),
         'trigger'       => array(
-            "Utilise : ",           "Équipé : ",        "Chances quand vous touchez : ", null,                  null,
-            null,                   null
+            "Utilise : ",           "Équipé : ",        "Chances quand vous touchez : ", "",                    "",
+            "",                     ""
         ),
         'bonding'       => array(
             "Lié au compte",                            "Lié quand ramassé",                                    "Lié quand équipé",

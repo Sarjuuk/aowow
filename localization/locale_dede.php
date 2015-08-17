@@ -943,8 +943,8 @@ $lang = array(
             "Episch",               "Legendär",         "Artefakt",             "Erbstücke",
         ),
         'trigger'       => array(
-            "Benutzen: ",           "Anlegen: ",        "Chance bei Treffer: ", null,                           null,
-            null,                   null
+            "Benutzen: ",           "Anlegen: ",        "Chance bei Treffer: ", "",                             "",
+            "",                     ""
         ),
         'bonding'       => array(
             "Accountgebunden",                          "Wird beim Aufheben gebunden",                          "Wird beim Anlegen gebunden",

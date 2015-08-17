@@ -938,8 +938,8 @@ $lang = array(
             "Epic",                 "Legendary",        "Artifact",             "Heirloom"
         ),
         'trigger'       => array(
-            "Use: ",                "Equip: ",          "Chance on hit: ",      null,                           null,
-            null,                   null
+            "Use: ",                "Equip: ",          "Chance on hit: ",      "",                             "",
+            "",                     ""
         ),
         'bonding'       => array(
             "Binds to account",                         "Binds when picked up",                                 "Binds when equipped",
