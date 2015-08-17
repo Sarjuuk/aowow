@@ -175,11 +175,21 @@ class SpellList extends BaseType
                     case 29:                                // ModStat MiscVal:type
                         if ($mv < 0)                        // all stats
                         {
-                            for ($j = 0; $j < 5; $j++)
-                                Util::arraySumByKey($stats, [(ITEM_MOD_AGILITY + $j) => $pts]);
+                            for ($iMod = ITEM_MOD_AGILITY; $iMod <= ITEM_MOD_STAMINA; $iMod++)
+                                Util::arraySumByKey($stats, [iMod => $pts]);
                         }
-                        else                                // one stat
-                            Util::arraySumByKey($stats, [(ITEM_MOD_AGILITY + $mv) => $pts]);
+                        else if ($mv == STAT_STRENGTH)      // one stat
+                            Util::arraySumByKey($stats, [ITEM_MOD_STRENGTH => $pts]);
+                        else if ($mv == STAT_AGILITY)
+                            Util::arraySumByKey($stats, [ITEM_MOD_AGILITY => $pts]);
+                        else if ($mv == STAT_STAMINA)
+                            Util::arraySumByKey($stats, [ITEM_MOD_STAMINA => $pts]);
+                        else if ($mv == STAT_INTELLECT)
+                            Util::arraySumByKey($stats, [ITEM_MOD_INTELLECT => $pts]);
+                        else if ($mv == ITEM_MOD_SPIRIT)
+                            Util::arraySumByKey($stats, [ITEM_MOD_SPIRIT => $pts]);
+                        else                                // one bullshit
+                            trigger_error('AuraId 29 of spell #'.$this->id.' has wrong statId #'.$mv, E_USER_WARNING);
 
                         break;
                     case 34:                                // Increase Health

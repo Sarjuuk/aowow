@@ -1825,7 +1825,7 @@ class ItemListFilter extends Filter
 
         if ($select)
         {
-            $this->extraOpts['is']['s'][] = ', IF(is.id IS NULL, 0, ('.implode(' + ', $select).') / '.$wtSum.') AS score';
+            $this->extraOpts['is']['s'][] = ', IF(is.typeId IS NULL, 0, ('.implode(' + ', $select).') / '.$wtSum.') AS score';
             $this->extraOpts['is']['o'][] = 'score DESC';
             $this->extraOpts['i']['o'][]  = null;           // remove default ordering
         }
