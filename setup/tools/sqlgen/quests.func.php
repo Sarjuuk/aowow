@@ -41,14 +41,16 @@ function quests(array $ids = [])
             Flags,
             SpecialFlags,
             0 AS cuFlags,                                   -- cuFlags
-            RequiredClasses,            RequiredRaces,
+            AllowableClasses AS RequiredClasses,
+            RequiredRaces,
             RequiredSkillId,            RequiredSkillPoints,
             RequiredFactionId1,         RequiredFactionId2,
             RequiredFactionValue1,      RequiredFactionValue2,
             RequiredMinRepFaction,      RequiredMaxRepFaction,
             RequiredMinRepValue,        RequiredMaxRepValue,
             RequiredPlayerKills,
-            SourceItemId,               SourceItemCount,
+            SourceItemId,
+            ProvidedItemCount AS SourceItemCount,
             SourceSpellId,
             RewardXPId,                                     -- QuestXP.dbc x level
             RewardOrRequiredMoney,
@@ -88,6 +90,8 @@ function quests(array $ids = [])
             ObjectiveText4,             ObjectiveText4_loc2,        ObjectiveText4_loc3,        ObjectiveText4_loc6,        ObjectiveText4_loc8
         FROM
             quest_template q
+        LEFT JOIN
+            quest_template_addon qa ON q.ID = qa.ID
         LEFT JOIN
             locales_quest lq ON q.ID = lq.Id
         LEFT JOIN
