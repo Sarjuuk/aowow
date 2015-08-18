@@ -30,7 +30,11 @@ function objects(array $ids = [])
                 IF(`type` IN (3, 9, 25), `type`, 0)))),                                         -- regular chests, books, pools
             0 AS event,                                                                         -- linked worldevent
             displayId,
-            name, name_loc2, name_loc3, name_loc6, name_loc8,
+            go.name, 
+            IF(`locale` = "frFR", gtl.`name`, null) name_loc2, 
+            IF(`locale` = "deDE", gtl.`name`, null) name_loc3, 
+            IF(`locale` = "esES", gtl.`name`, null) name_loc6, 
+            IF(`locale` = "ruRU", gtl.`name`, null) name_loc8, 
             faction,
             flags,
             0 AS cuFlags,                                                                       -- custom Flags
@@ -62,7 +66,7 @@ function objects(array $ids = [])
         FROM
             gameobject_template go
         LEFT JOIN
-            locales_gameobject lgo ON go.entry = lgo.entry
+            gameobject_template_locale gtl ON go.entry = gtl.entry
         LEFT JOIN
             gameobject_questitem gqi ON gqi.GameObjectEntry = go.entry
         {
