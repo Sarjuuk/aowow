@@ -186,7 +186,7 @@ class SpellList extends BaseType
                             Util::arraySumByKey($stats, [ITEM_MOD_STAMINA => $pts]);
                         else if ($mv == STAT_INTELLECT)
                             Util::arraySumByKey($stats, [ITEM_MOD_INTELLECT => $pts]);
-                        else if ($mv == ITEM_MOD_SPIRIT)
+                        else if ($mv == STAT_SPIRIT)
                             Util::arraySumByKey($stats, [ITEM_MOD_SPIRIT => $pts]);
                         else                                // one bullshit
                             trigger_error('AuraId 29 of spell #'.$this->id.' has wrong statId #'.$mv, E_USER_WARNING);
