@@ -1206,6 +1206,7 @@ class ItemList extends BaseType
         if ($enchantments)
         {
             $eStats = DB::Aowow()->select('SELECT *, typeId AS ARRAY_KEY FROM ?_item_stats WHERE `type` = ?d AND typeId IN (?a)', TYPE_ENCHANTMENT, array_keys($enchantments));
+            Util::checkNumeric($eStats);
 
             // and merge enchantments back
             foreach ($enchantments as $eId => $items)
@@ -1227,8 +1228,6 @@ class ItemList extends BaseType
             foreach ($json as $k => $v)
                 if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side']))
                     unset($this->json[$item][$k]);
-
-        Util::checkNumeric($this->json);
     }
 
     public function getOnUseStats()
