@@ -116,7 +116,7 @@ function spawns()                                           // and waypoints
                  '((abs(IF(dm.Id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)) - 50) / 50) * ' .
                  ' (abs(IF(dm.Id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)) - 50) / 50)) AS quality ' .
                  'FROM dbc_worldmaparea wma ' .
-                 'LEFT JOIN dbc_dungeonmap dm ON dm.mapId = IF(?d AND wma.mapId NOT IN (0, 1, 530), wma.mapId, -1) ' .
+                 'LEFT JOIN dbc_dungeonmap dm ON dm.mapId = IF(?d AND (wma.mapId NOT IN (0, 1, 530, 571) OR wma.areaId = 4395), wma.mapId, -1) ' .
                  'WHERE wma.mapId = ?d AND IF(?d, wma.areaId = ?d, wma.areaId <> 0) ' .
                  'HAVING (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9) AND (dm.Id IS NULL OR ?d) ' .
                  'ORDER BY quality ASC';
