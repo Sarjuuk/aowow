@@ -31,7 +31,7 @@ if (!CLI)
  * creature
 
  * playercreateinfo_item
- * playercreateinfo_spell
+ * playercreateinfo_skill
  * achievement_reward
  * skill_discovery_template
 */
@@ -1149,14 +1149,12 @@ function source(array $ids = [])
     CLISetup::log('   * #10 Starter');
     /* acquireMethod
         ABILITY_LEARNED_ON_GET_PROFESSION_SKILL     = 1,        learnedAt = 1 && source10 = 1
-        ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2         not used for now
+        ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2
     */
 
-    $subSkills = DB::Aowow()->subquery('SELECT ?d, spellId, 1, NULL AS m, NULL AS mt FROM dbc_skilllineability WHERE acquireMethod = 1 AND (reqSkillLevel = 1 OR skillLineId = 129) GROUP BY spellId', TYPE_SPELL);
+    $pcis = DB::World()->selectCol('SELECT DISTINCT skill FROM playercreateinfo_skills');
+    $subSkills = DB::Aowow()->subquery('SELECT ?d, spellId, 1, NULL AS m, NULL AS mt FROM dbc_skilllineability WHERE {(skillLineId IN (?a) AND acquireMethod = 2) OR} (acquireMethod = 1 AND (reqSkillLevel = 1 OR skillLineId = 129)) GROUP BY spellId', $pcis ?: DBSIMPLE_SKIP, TYPE_SPELL);
     DB::Aowow()->query($insSub, 10, $subSkills, 10, 10);
-
-    if ($pcis = DB::World()->select('SELECT ?d, Spell, 1 FROM playercreateinfo_spell', TYPE_SPELL))
-        DB::Aowow()->query(queryfy('[V]', $pcis, $insBasic), 10, 10, 10);
 
 
     /**********/

@@ -70,7 +70,7 @@ class SqlGen
         'zones'                    => [null, null, null,                      ['access_requirement']],
         'itemset'                  => [null, null, ['spell'],                 ['item_template', 'game_event']],
         'item_stats' /* + ench */  => [null, null, ['items', 'spell'],        null],
-        'source'                   => [null, null, ['spell', 'achievement'],  ['npc_vendor', 'game_event_npc_vendor', 'creature', 'quest_template', 'playercreateinfo_item', 'npc_trainer', 'skill_discovery_template', 'playercreateinfo_spell', 'achievement_reward']]
+        'source'                   => [null, null, ['spell', 'achievement'],  ['npc_vendor', 'game_event_npc_vendor', 'creature', 'quest_template', 'playercreateinfo_item', 'npc_trainer', 'skill_discovery_template', 'playercreateinfo_skill', 'achievement_reward']]
     );
 
     public  static $cliOpts   = [];
