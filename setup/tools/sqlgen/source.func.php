@@ -24,6 +24,7 @@ if (!CLI)
  * creature_template
  * gameobject_template
  * quest_template
+ * quest_template_addon
 
  * npc_trainer
  * npc_vendor
@@ -420,11 +421,13 @@ function source(array $ids = [])
         FROM
             mail_loot_template mlt
         JOIN
-            quest_template qt ON qt.RewardMailTemplateId = mlt.entry
+            quest_template_addon qta ON qta.RewardMailTemplateId = mlt.entry
+        JOIN
+            quest_template qt ON qt.ID = qta.ID
         LEFT JOIN
             item_template it ON it.entry = mlt.Item AND mlt.Reference <= 0
         WHERE
-            qt.RewardMailTemplateId > 0
+            qta.RewardMailTemplateId > 0
         GROUP BY
             ARRAY_KEY
     ');
@@ -1047,7 +1050,7 @@ function source(array $ids = [])
         SELECT spell AS ARRAY_KEY, id, SUM(qty) AS qty, BIT_OR(side) AS side FROM (
             SELECT IF(rewardSpellCast = 0, rewardSpell, rewardSpellCast) AS spell, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE IF(rewardSpellCast = 0, rewardSpell, rewardSpellCast) > 0 GROUP BY spell
             UNION
-            SELECT SourceSpellId AS spell, ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE SourceSpellId > 0 GROUP BY spell
+            SELECT qta.SourceSpellId AS spell, qt.ID, COUNT(1) AS qty, IF(RequiredRaces & 0x2B2 AND !(RequiredRaces & 0x44D), 2, IF(RequiredRaces & 0x44D AND !(RequiredRaces & 0x2B2), 1, 3)) AS side FROM quest_template qt JOIN quest_template_addon qta ON qta.ID = qt.ID WHERE qta.SourceSpellId > 0 GROUP BY spell
         ) t GROUP BY spell');
 
     if ($quests)

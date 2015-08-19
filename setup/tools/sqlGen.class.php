@@ -57,9 +57,9 @@ class SqlGen
         'creature'                 => [null, null, null,                      ['creature_template', 'locales_creature', 'creature_classlevelstats', 'instance_encounters']],
         'currencies'               => [null, null, null,                      ['item_template', 'locales_item']],
         'events'                   => [null, null, null,                      ['game_event', 'game_event_prerequisite']],
-        'objects'                  => [null, null, null,                      ['gameobject_template', 'locales_gameobject', 'gameobject_questitem']],
+        'objects'                  => [null, null, null,                      ['gameobject_template', 'gameobject_template_locale', 'gameobject_questitem']],
         'pet'                      => [null, null, null,                      ['creature_template', 'creature']],
-        'quests'                   => [null, null, null,                      ['quest_template', 'locales_quest', 'game_event', 'game_event_seasonal_questrelation']],
+        'quests'                   => [null, null, null,                      ['quest_template', 'quest_template_addon', 'locales_quest', 'game_event', 'game_event_seasonal_questrelation']],
         'quests_startend'          => [null, null, null,                      ['creature_queststarter', 'creature_questender', 'game_event_creature_quest', 'gameobject_queststarter', 'gameobject_questender', 'game_event_gameobject_quest', 'item_template']],
         'spell'                    => [null, null, null,                      ['skill_discovery_template', 'item_template', 'creature_template', 'creature_template_addon', 'smart_scripts', 'npc_trainer', 'disables', 'spell_ranks', 'spell_dbc']],
         'spelldifficulty'          => [null, null, null,                      ['spelldifficulty_dbc']],
@@ -70,7 +70,7 @@ class SqlGen
         'zones'                    => [null, null, null,                      ['access_requirement']],
         'itemset'                  => [null, null, ['spell'],                 ['item_template', 'game_event']],
         'item_stats' /* + ench */  => [null, null, ['items', 'spell'],        null],
-        'source'                   => [null, null, ['spell', 'achievement'],  ['npc_vendor', 'game_event_npc_vendor', 'creature', 'quest_template', 'playercreateinfo_item', 'npc_trainer', 'skill_discovery_template', 'playercreateinfo_skill', 'achievement_reward']]
+        'source'                   => [null, null, ['spell', 'achievement'],  ['npc_vendor', 'game_event_npc_vendor', 'creature', 'quest_template', 'quest_template_addon', 'playercreateinfo_item', 'npc_trainer', 'skill_discovery_template', 'playercreateinfo_skills', 'achievement_reward']]
     );
 
     public  static $cliOpts   = [];

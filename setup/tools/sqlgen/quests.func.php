@@ -9,6 +9,7 @@ if (!CLI)
 
 /* deps:
  * quest_template
+ * quest_template_addon
  * locales_quest
  * game_event
  * game_event_seasonal_questrelation

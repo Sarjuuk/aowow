@@ -9,7 +9,7 @@ if (!CLI)
 
 /* deps:
  * gameobject_template
- * locales_gameobject
+ * gameobject_template_locale
  * gameobject_questitem
 */
 
@@ -30,11 +30,11 @@ function objects(array $ids = [])
                 IF(`type` IN (3, 9, 25), `type`, 0)))),                                         -- regular chests, books, pools
             0 AS event,                                                                         -- linked worldevent
             displayId,
-            go.name, 
-            gtl2.`name` AS name_loc2, 
-            gtl3.`name` AS name_loc3, 
-            gtl6.`name` AS name_loc6, 
-            gtl8.`name` AS name_loc8, 
+            go.name,
+            gtl2.`name` AS name_loc2,
+            gtl3.`name` AS name_loc3,
+            gtl6.`name` AS name_loc6,
+            gtl8.`name` AS name_loc8,
             faction,
             flags,
             0 AS cuFlags,                                                                       -- custom Flags
