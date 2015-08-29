@@ -1156,7 +1156,7 @@ function source(array $ids = [])
     */
 
     $pcis = DB::World()->selectCol('SELECT DISTINCT skill FROM playercreateinfo_skills');
-    $subSkills = DB::Aowow()->subquery('SELECT ?d, spellId, 1, NULL AS m, NULL AS mt FROM dbc_skilllineability WHERE {(skillLineId IN (?a) AND acquireMethod = 2) OR} (acquireMethod = 1 AND (reqSkillLevel = 1 OR skillLineId = 129)) GROUP BY spellId', $pcis ?: DBSIMPLE_SKIP, TYPE_SPELL);
+    $subSkills = DB::Aowow()->subquery('SELECT ?d, spellId, 1, NULL AS m, NULL AS mt FROM dbc_skilllineability WHERE {(skillLineId IN (?a) AND acquireMethod = 2) OR} (acquireMethod = 1 AND (reqSkillLevel = 1 OR skillLineId = 129)) GROUP BY spellId', TYPE_SPELL, $pcis ?: DBSIMPLE_SKIP);
     DB::Aowow()->query($insSub, 10, $subSkills, 10, 10);
 
 
