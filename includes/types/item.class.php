@@ -2075,20 +2075,21 @@ class ItemListFilter extends Filter
                 else
                     return [0];
             case 90:                                        // avgbuyout [op] [int]
-                if (!DB::isConnectable(DB_CHARACTERS))
-                    return [1];
-
                 if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
                     break;
 
-        /* no no no .. for each realm!
-                // todo (med): get the avgbuyout into the listview
-                if ($_ = DB::Characters()->select('SELECT ii.itemEntry AS ARRAY_KEY, AVG(ah.buyoutprice / ii.count) AS buyout FROM auctionhouse ah JOIN item_instance ii ON ah.itemguid = ii.guid GROUP BY ii.itemEntry HAVING avgbuyout '.$cr[1].' ?f', $c[1]))
-                    return ['i.id', array_keys($_)];
-                else
-                    return [0];
-        */
-                    return [0];
+                foreach (Util::getRealms() as $rId => $__)
+                {
+                    // todo: do something sensible..
+                    // // todo (med): get the avgbuyout into the listview
+                    // if ($_ = DB::Characters()->select('SELECT ii.itemEntry AS ARRAY_KEY, AVG(ah.buyoutprice / ii.count) AS buyout FROM auctionhouse ah JOIN item_instance ii ON ah.itemguid = ii.guid GROUP BY ii.itemEntry HAVING avgbuyout '.$cr[1].' ?f', $c[1]))
+                        // return ['i.id', array_keys($_)];
+                    // else
+                        // return [0];
+                    return [1];
+                }
+
+                return [0];
             case 65:                                        // avgmoney [op] [int]
                 if (!$this->isSaneNumeric($cr[2]) || !$this->int2Op($cr[1]))
                     break;

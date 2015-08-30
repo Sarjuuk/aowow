@@ -1601,7 +1601,17 @@ class Util
     public static function getRealms()
     {
         if (DB::isConnectable(DB_AUTH) && !self::$realms)
+        {
             self::$realms = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_BUILD);
+            foreach (self::$realms as $rId => $rData)
+            {
+                if (DB::isConnectable(DB_CHARACTERS . $rId))
+                    continue;
+
+                unset(self::$realms[$rId]);
+                trigger_error('Realm #'.$rId.' ('.$rData['name'].') has no connection info set.', E_USER_NOTICE);
+            }
+        }
 
         return self::$realms;
     }
