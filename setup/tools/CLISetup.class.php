@@ -369,9 +369,6 @@ class CLISetup
                     if ($keyId == self::CHR_TAB)            // ignore this one
                         continue;
 
-                    if ($keyId == self::CHR_CR)             // also ignore this bastard!
-                        continue;
-
                     if ($keyId == self::CHR_ESC)            // will not be send on WIN .. other ways of returning from setup? (besides ctrl + c)
                     {
                         echo chr(self::CHR_BELL);
@@ -385,7 +382,7 @@ class CLISetup
                         $charBuff = substr($charBuff, 0, -1);
                         echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
                     }
-                    else if ($keyId == self::CHR_LF)
+                    else if ($keyId == self::CHR_LF || $keyId == self::CHR_CR)
                     {
                         $fields[$name] = $charBuff;
                         break;
