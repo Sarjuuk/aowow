@@ -454,7 +454,7 @@ class AdminPage extends GenericPage
         else if (!empty($_GET['user']))
         {
             $name = urldecode($_GET['user']);
-            if (strlen($name) > 3)
+            if (mb_strlen($name) >= 3)
             {
                 if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', ucFirst($name)))
                 {

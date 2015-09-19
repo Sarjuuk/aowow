@@ -175,7 +175,7 @@ class CommunityContent
                 // limit whitespaces to one at a time
                 $c['preview'] = preg_replace('/\s+/', ' ', $c['preview']);
                 // limit previews to 100 chars + whatever it takes to make the last word full
-                if (strlen($c['preview']) > 100)
+                if (mb_strlen($c['preview']) > 100)
                 {
                     $n = 0;
                     $b = [];
@@ -183,7 +183,7 @@ class CommunityContent
                     while ($n < 100 && $parts)
                     {
                         $_   = array_shift($parts);
-                        $n  += strlen($_);
+                        $n  += mb_strlen($_);
                         $b[] = $_;
                     }
 

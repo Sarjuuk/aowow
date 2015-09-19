@@ -108,7 +108,7 @@ class GenericPage
         $this->time = microtime(true);
 
         if (CFG_CACHE_DIR && Util::checkOrCreateDirectory(CFG_CACHE_DIR))
-            $this->cacheDir = substr(CFG_CACHE_DIR, -1) != '/' ? CFG_CACHE_DIR.'/' : CFG_CACHE_DIR;
+            $this->cacheDir = mb_substr(CFG_CACHE_DIR, -1) != '/' ? CFG_CACHE_DIR.'/' : CFG_CACHE_DIR;
 
         // force page refresh
         if (isset($_GET['refresh']) && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV))

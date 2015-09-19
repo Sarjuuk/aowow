@@ -370,7 +370,7 @@ class User
     {
         $errCode = 0;
 
-        if (strlen($name) < 4 || strlen($name) > 16)
+        if (mb_strlen($name) < 4 || mb_strlen($name) > 16)
             $errCode = 1;
         else if (preg_match('/[^\w\d]/i', $name))
             $errCode = 2;

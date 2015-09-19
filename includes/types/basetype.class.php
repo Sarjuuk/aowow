@@ -922,9 +922,9 @@ abstract class Filter
             $parts = array_filter(explode(' ', $string));
             foreach ($parts as $p)
             {
-                if ($p[0] == '-' && strlen($p) > 3)
-                    $sub[] = [$f, sprintf($exPH, substr($p, 1)), '!'];
-                else if ($p[0] != '-' && strlen($p) > 2)
+                if ($p[0] == '-' && mb_strlen($p) > 3)
+                    $sub[] = [$f, sprintf($exPH, mb_substr($p, 1)), '!'];
+                else if ($p[0] != '-' && mb_strlen($p) > 2)
                     $sub[] = [$f, sprintf($exPH, $p)];
             }
 

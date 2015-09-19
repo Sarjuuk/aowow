@@ -24,7 +24,7 @@ class ProfilePage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $_ = strlen($pageParam) ? explode('.', $pageParam) : null;
+        $_ = $pageParam ? explode('.', $pageParam) : null;
         $this->getCategoryFromUrl($pageParam);
 
         $this->typeId &= $this->profileId;

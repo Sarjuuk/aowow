@@ -36,7 +36,7 @@ function dbconfig()
                 $errStr = '['.mysqli_connect_errno().'] '.mysqli_connect_error();
 
             $buff .= $errStr ? CLISetup::red('ERR   ') : CLISetup::green('OK    ');
-            $buff .= 'mysqli://'.$dbInfo['user'].':'.str_pad('', strlen($dbInfo['pass']), '*').'@'.$dbInfo['host'].'/'.$dbInfo['db'];
+            $buff .= 'mysqli://'.$dbInfo['user'].':'.str_pad('', mb_strlen($dbInfo['pass']), '*').'@'.$dbInfo['host'].'/'.$dbInfo['db'];
             $buff .= ($dbInfo['prefix'] ? '    table prefix: '.$dbInfo['prefix'] : null).'    '.$errStr;
         }
         else

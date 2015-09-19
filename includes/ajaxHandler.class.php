@@ -307,7 +307,7 @@ class AjaxHandler
 
                 // trim to max length
                 if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->post('commentbody')) > $_maxCmt)
-                    $this->post['body'] = substr($this->post('body'), 0, $_maxCmt);
+                    $this->post['body'] = mb_substr($this->post('body'), 0, $_maxCmt);
 
                 if (User::canComment() && !empty($this->post('commentbody')) && mb_strlen($this->post('commentbody')) >= $_minCmt)
                 {
@@ -335,7 +335,7 @@ class AjaxHandler
 
                 // trim to max length
                 if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->post('body')) > $_maxCmt)
-                    $this->post['body'] = substr($this->post('body'), 0, $_maxCmt);
+                    $this->post['body'] = mb_substr($this->post('body'), 0, $_maxCmt);
 
                 $update = array(
                     'body'       => $this->post('body'),
@@ -965,7 +965,7 @@ class AjaxHandler
                     }
                 }
 
-                $buff .= 'g_spells.add('.$id.", {id:".$id.", name:'".Util::jsEscape(substr($data['name'], 1))."', icon:'".$data['icon']."', modifier:".Util::toJSON($mods)."});\n";
+                $buff .= 'g_spells.add('.$id.", {id:".$id.", name:'".Util::jsEscape(mb_substr($data['name'], 1))."', icon:'".$data['icon']."', modifier:".Util::toJSON($mods)."});\n";
             }
             $buff .= "\n";
         }
@@ -1130,7 +1130,7 @@ class AjaxHandler
 
         if ($this->get('type') && intVal($this->get('type')) && $this->get('typeid') && intVal($this->get('typeid')))
             $res = CommunityContent::getScreenshotsForManager($this->get('type'), $this->get('typeid'));
-        else if ($this->get('user') && strlen(urldecode($this->get('user'))) > 2)
+        else if ($this->get('user') && mb_strlen(urldecode($this->get('user'))) > 2)
             if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', strtolower(urldecode($this->get('user')))))
                 $res = CommunityContent::getScreenshotsForManager(0, 0, $uId);
 

@@ -235,7 +235,7 @@ class UtilityPage extends GenericPage
                             foreach ($data as $typeId => &$d)
                             {
                                 $this->feedData[] = array(
-                                    'title'       => [true,  [], htmlentities(Util::$typeStrings[$type] == 'item' ? substr($d['name'], 1) : $d['name'])],
+                                    'title'       => [true,  [], htmlentities(Util::$typeStrings[$type] == 'item' ? mb_substr($d['name'], 1) : $d['name'])],
                                     'type'        => [false, [], Util::$typeStrings[$type]],
                                     'link'        => [false, [], HOST_URL.'/?'.Util::$typeStrings[$type].'='.$d['id']],
                                     'ncomments'   => [false, [], $comments[$typeId]]

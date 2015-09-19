@@ -124,14 +124,14 @@ class SearchPage extends GenericPage
                 continue;
             else if ($p[0] == '-')
             {
-                if (strlen($p) < 4)
-                    $this->invalid[] = substr($p, 1);
+                if (mb_strlen($p) < 4)
+                    $this->invalid[] = mb_substr($p, 1);
                 else
-                    $this->excluded[] = substr($p, 1);
+                    $this->excluded[] = mb_substr($p, 1);
             }
             else if ($p !== '')
             {
-                if (strlen($p) < 3)
+                if (mb_strlen($p) < 3)
                     $this->invalid[] = $p;
                 else
                     $this->included[] = $p;
@@ -311,7 +311,7 @@ class SearchPage extends GenericPage
                     break;
 
                 $hasQ        = is_numeric($data['name'][0]) || $data['name'][0] == '@';
-                $result[1][] = ($hasQ ? substr($data['name'], 1) : $data['name']).$set['appendix'];
+                $result[1][] = ($hasQ ? mb_substr($data['name'], 1) : $data['name']).$set['appendix'];
                 $result[3][] = HOST_URL.'/?'.Util::$typeStrings[$set['type']].'='.$data['id'];
                 $extra       = [$set['type'], $data['id']];
 

@@ -100,13 +100,13 @@ class CLISetup
         $setupDirs = glob('setup/*');
         foreach ($setupDirs as $sd)
         {
-            if (substr(self::$srcDir, -1) == '/')
-                self::$srcDir = substr(self::$srcDir, 0, -1);
+            if (mb_substr(self::$srcDir, -1) == '/')
+                self::$srcDir = mb_substr(self::$srcDir, 0, -1);
 
-            if (substr($sd, -1) == '/')
-                $sd = substr($sd, 0, -1);
+            if (mb_substr($sd, -1) == '/')
+                $sd = mb_substr($sd, 0, -1);
 
-            if (strtolower($sd) == strtolower(self::$srcDir))
+            if (Util::lower($sd) == Util::lower(self::$srcDir))
             {
                 self::$srcDir = $sd.'/';
                 break;
@@ -147,8 +147,8 @@ class CLISetup
         $_ = strtolower(str_replace('\\', '/', $file));
 
         // remove trailing slash
-        if (substr($_, -1, 1) == '/')
-            $_ = substr($_, 0, -1);
+        if (mb_substr($_, -1, 1) == '/')
+            $_ = mb_substr($_, 0, -1);
 
         if (isset(self::$mpqFiles[$_]))
         {
@@ -387,7 +387,7 @@ class CLISetup
                         if (!$charBuff)
                             continue;
 
-                        $charBuff = substr($charBuff, 0, -1);
+                        $charBuff = mb_substr($charBuff, 0, -1);
                         echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
                     }
                     else if ($keyId == self::CHR_LF)

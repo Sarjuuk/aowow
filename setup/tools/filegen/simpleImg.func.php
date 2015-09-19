@@ -21,8 +21,8 @@ if (!CLI)
         {
             $result = null;
 
-            if (in_array(substr($path, -4, 4), ['.png', '.blp', '.BLP', '.PNG']))
-                $path = substr($path, 0, strlen($path) - 4);
+            if (in_array(mb_substr($path, -4, 4), ['.png', '.blp', '.BLP', '.PNG']))
+                $path = mb_substr($path, 0, mb_strlen($path) - 4);
 
             $file = $path.'.png';
             if (CLISetup::fileExists($file))

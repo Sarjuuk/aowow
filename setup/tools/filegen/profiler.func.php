@@ -163,7 +163,7 @@ if (!CLI)
                 foreach ($mountz->getListviewData(ITEMINFO_MODEL) as $id => $data)
                 {
                     $data['quality'] = $data['name'][0];
-                    $data['name']    = substr($data['name'], 1);
+                    $data['name']    = mb_substr($data['name'], 1);
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
 
@@ -198,7 +198,7 @@ if (!CLI)
                 foreach ($companionz->getListviewData(ITEMINFO_MODEL) as $id => $data)
                 {
                     $data['quality'] = $data['name'][0];
-                    $data['name']    = substr($data['name'], 1);
+                    $data['name']    = mb_substr($data['name'], 1);
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
 
