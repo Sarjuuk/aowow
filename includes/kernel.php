@@ -9,6 +9,8 @@ if (file_exists('config/config.php'))
 else
     $AoWoWconf = [];
 
+mb_internal_encoding('UTF-8');
+
 require_once 'includes/defines.php';
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
 require_once 'includes/utilities.php';                      // misc™ data 'n func

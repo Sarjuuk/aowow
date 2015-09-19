@@ -1100,21 +1100,21 @@ class Util
     // default ucFirst doesn't convert UTF-8 chars
     public static function ucFirst($str)
     {
-        $len   = mb_strlen($str, 'UTF-8') - 1;
-        $first = mb_substr($str, 0, 1, 'UTF-8');
-        $rest  = mb_substr($str, 1, $len, 'UTF-8');
+        $len   = mb_strlen($str) - 1;
+        $first = mb_substr($str, 0, 1);
+        $rest  = mb_substr($str, 1, $len);
 
-        return mb_strtoupper($first, 'UTF-8').$rest;
+        return mb_strtoupper($first).$rest;
     }
 
     public static function ucWords($str)
     {
-        return mb_convert_case($str, MB_CASE_TITLE, 'UTF-8');
+        return mb_convert_case($str, MB_CASE_TITLE);
     }
 
     public static function lower($str)
     {
-        return mb_strtolower($str, 'UTF-8');
+        return mb_strtolower($str);
     }
 
     // note: valid integer > 32bit are returned as float
