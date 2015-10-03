@@ -24,19 +24,24 @@ function dbconfig()
     );
     $testDB    = function($idx, $name, $dbInfo)
     {
-        $buff   = '['.CLISetup::bold($idx).'] '.str_pad($name, 17);
-        $errStr = '';
+        $buff    = '['.CLISetup::bold($idx).'] '.str_pad($name, 17);
+        $errStr  = '';
+        $defPort = ini_get('mysqli.default_port');
+        $port    = 0;
+
+        if (strstr($dbInfo['host'], ':'))
+            list($dbInfo['host'], $port) = explode(':', $dbInfo['host']);
 
         if ($dbInfo['host'])
         {
             // test DB
-            if ($link = @mysqli_connect($dbInfo['host'], $dbInfo['user'], $dbInfo['pass'], $dbInfo['db']))
+            if ($link = @mysqli_connect($dbInfo['host'], $dbInfo['user'], $dbInfo['pass'], $dbInfo['db'], $port ?: $defPort))
                 mysqli_close($link);
             else
                 $errStr = '['.mysqli_connect_errno().'] '.mysqli_connect_error();
 
             $buff .= $errStr ? CLISetup::red('ERR   ') : CLISetup::green('OK    ');
-            $buff .= 'mysqli://'.$dbInfo['user'].':'.str_pad('', mb_strlen($dbInfo['pass']), '*').'@'.$dbInfo['host'].'/'.$dbInfo['db'];
+            $buff .= 'mysqli://'.$dbInfo['user'].':'.str_pad('', mb_strlen($dbInfo['pass']), '*').'@'.$dbInfo['host'].($port ? ':'.$port : null).'/'.$dbInfo['db'];
             $buff .= ($dbInfo['prefix'] ? '    table prefix: '.$dbInfo['prefix'] : null).'    '.$errStr;
         }
         else
