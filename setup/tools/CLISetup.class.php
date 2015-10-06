@@ -188,27 +188,27 @@ class CLISetup
 
     public static function red($str)
     {
-        return "\e[31m".$str."\e[0m";
+        return self::$win ? $str : "\e[31m".$str."\e[0m";
     }
 
     public static function green($str)
     {
-        return "\e[32m".$str."\e[0m";
+        return self::$win ? $str : "\e[32m".$str."\e[0m";
     }
 
     public static function yellow($str)
     {
-        return "\e[33m".$str."\e[0m";
+        return self::$win ? $str : "\e[33m".$str."\e[0m";
     }
 
     public static function blue($str)
     {
-        return "\e[36m".$str."\e[0m";
+        return self::$win ? $str : "\e[36m".$str."\e[0m";
     }
 
     public static function bold($str)
     {
-        return "\e[1m".$str."\e[0m";
+        return self::$win ? $str : "\e[1m".$str."\e[0m";
     }
 
     public static function log($txt = '', $lvl = -1)
@@ -255,13 +255,10 @@ class CLISetup
             $msg .= $txt."\n";
         }
 
-        // remove highlights for logging & win
-        $raw = preg_replace(["/\e\[\d+m/", "/\e\[0m/"], '', $msg);
+        echo $msg;
 
-        echo self::$win ? $raw : $msg;
-
-        if (self::$logHandle)
-            fwrite(self::$logHandle, $raw);
+        if (self::$logHandle)                               // remove highlights for logging
+            fwrite(self::$logHandle, preg_replace(["/\e\[\d+m/", "/\e\[0m/"], '', $msg));
 
         flush();
     }

@@ -116,13 +116,19 @@ function firstrun($resume)
     {
         require 'config/config.php';
 
-        $error = [];
+        $error   = [];
+        $defPort = ini_get('mysqli.default_port');
+
         foreach (['world', 'aowow', 'auth'] as $what)
         {
             if ($what == 'auth' && (empty($AoWoWconf['auth']) || empty($AoWoWconf['auth']['host'])))
                 continue;
 
-            if ($link = @mysqli_connect($AoWoWconf[$what]['host'], $AoWoWconf[$what]['user'], $AoWoWconf[$what]['pass'], $AoWoWconf[$what]['db']))
+            $port = 0;
+            if (strstr($AoWoWconf[$what]['host'], ':'))
+                list($AoWoWconf[$what]['host'], $port) = explode(':', $AoWoWconf[$what]['host']);
+
+            if ($link = @mysqli_connect($AoWoWconf[$what]['host'], $AoWoWconf[$what]['user'], $AoWoWconf[$what]['pass'], $AoWoWconf[$what]['db'], $port ?: $defPort))
                 mysqli_close($link);
             else
                 $error[] = ' * '.$what.': '.'['.mysqli_connect_errno().'] '.mysqli_connect_error();
