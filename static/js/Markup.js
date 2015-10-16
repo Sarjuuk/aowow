@@ -85,6 +85,34 @@ var Markup = {
         title: { req: false, valid: /[\S ]+/ },
         'class': { req: false, valid: /\S+/ }
     },
+    youtube: {
+        players: [],
+        APIIsReady: false,
+        readyTimeout: undefined,
+        APIReady: function () {
+            var UNK_INITED = false;
+            Markup.youtube.readyTimeout = undefined;
+            Markup.youtube.APIIsReady = true;
+            for (var i in Markup.youtube.players) {
+                if (!Markup.youtube.players.hasOwnProperty(i))
+                    continue;
+
+                if (Markup.youtube.players[i].loaded)
+                    continue;
+
+                if ($WH.ge(Markup.youtube.players[i].containerId))
+                {
+                    Markup.youtube.players[i].loaded = true;
+                    Markup.youtube.players[i].player = new YT.Player(Markup.youtube.players[i].containerId, Markup.youtube.players[i].yt);
+                }
+                else
+                    UNK_INITED = true;
+            }
+
+            if (UNK_INITED)
+                Markup.youtube.readyTimeout = window.setTimeout(Markup.youtube.APIReady, 500);
+        }
+    },
     IsLinkAllowed: function(link)
     {
         var matches = link.match('[a-z]+:\/\/([a-z0-9\.\-]+)');
@@ -3011,17 +3039,56 @@ var Markup = {
             allowedClass: MARKUP_CLASS_STAFF,
             toHtml: function(attr)
             {
-                var url = 'http://www.youtube.com/v/' + attr.unnamed + '&fs=1&rel=0' + (attr.autoplay ? '&autoplay=1' : '');
                 var width = attr.width ? attr.width : 640;
                 var height = attr.height ? attr.height : 385;
+                if (window.outerWidth && window.outerWidth - 20 < width) {
+                    width = window.outerWidth - 20;
+                    height = Math.floor(width * 0.6015625);
+                }
 
-                var html = '';
-                html += '<object width="' + width + '" height="' + height + '"' + Markup._addGlobalAttributes(attr) + '><param name="movie" value="' + url + '">';
-                html += '<param name="allowfullscreen" value="true"></param>';
-                html += '<param name="allowscriptaccess" value="always"></param>';
-                html += '<param name="wmode" value="opaque"></param>';
-                html += '<embed width="' + width + '" height="' + height + '" src="' + url + '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="opaque"></embed>';
-                html += '</object>';
+                var ytVars = {
+                    height:     height,
+                    width:      width,
+                    videoId:    attr.unnamed,
+                    playerVars: { autoplay: (attr.autoplay ? 1 : 0) }
+                };
+
+                if (Markup.youtube.players.length == 0)
+                {
+                    var onYTReady;
+                    if ($WH.isset('onYouTubeIframeAPIReady') && (typeof window.onYouTubeIframeAPIReady == 'function'))
+                        onYTReady = window.onYouTubeIframeAPIReady;
+                    else
+                        onYTReady = function () {};
+
+                    window.onYouTubeIframeAPIReady = function ()
+                    {
+                        Markup.youtube.APIReady();
+                        onYTReady();
+                    };
+
+                    if (!$WH.isset('YT'))
+                    {
+                        window.YT = {};
+                        $WH.g_ajaxIshRequest('https://www.youtube.com/iframe_api', true);
+                    }
+                }
+                var idx = Markup.youtube.players.length;
+                var player = {
+                    id:          idx,
+                    containerId: 'yt-markup-container-' + idx,
+                    yt:          ytVars,
+                    loaded:      false
+                };
+
+                Markup.youtube.players.push(player);
+                if (Markup.youtube.APIIsReady || ($WH.isset('YT') && YT.hasOwnProperty('Player')))
+                {
+                    if (typeof Markup.youtube.readyTimeout == 'undefined')
+                        Markup.youtube.readyTimeout = window.setTimeout(Markup.youtube.APIReady, 10);
+                }
+
+                var html = '<div class="yt-markup-container" id="yt-markup-container-' + idx + '" style="width: ' + width + "px; height: " + height + 'px;"></div>';
 
                 return html;
             },
