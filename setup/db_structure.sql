@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.30, for Linux (x86_64)
+-- MySQL dump 10.16  Distrib 10.1.8-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: sarjuuk_aowow
 -- ------------------------------------------------------
--- Server version	5.5.30-30.1
+-- Server version	10.1.8-MariaDB-1~trusty
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -133,7 +133,7 @@ DROP TABLE IF EXISTS `aowow_account_weightscales`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_account_weightscales` (
-  `id` int(32) NOT NULL,
+  `id` int(32) NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned NOT NULL,
   `name` varchar(32) NOT NULL,
   `weights` text NOT NULL,
@@ -542,8 +542,8 @@ DROP TABLE IF EXISTS `aowow_dbversion`;
 CREATE TABLE `aowow_dbversion` (
   `date` int(10) unsigned NOT NULL DEFAULT '0',
   `part` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `sql` text,
-  `build` text
+  `sql` text NOT NULL,
+  `build` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1351,6 +1351,21 @@ CREATE TABLE `aowow_lock` (
   `reqSkill4` mediumint(11) unsigned NOT NULL,
   `reqSkill5` mediumint(11) unsigned NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_loot_link`
+--
+
+DROP TABLE IF EXISTS `aowow_loot_link`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_loot_link` (
+  `npcId` mediumint(8) NOT NULL,
+  `objectId` mediumint(8) unsigned NOT NULL,
+  UNIQUE KEY `npcId` (`npcId`),
+  KEY `objectId` (`objectId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2216,9 +2231,9 @@ CREATE TABLE `aowow_talents` (
   `col` tinyint(3) unsigned NOT NULL,
   `spell` mediumint(8) unsigned NOT NULL,
   `rank` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`id`, `rank`),
-  INDEX `spell` (`spell`),
-  INDEX `class` (`class`)
+  PRIMARY KEY (`id`,`rank`),
+  KEY `spell` (`spell`),
+  KEY `class` (`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2290,7 +2305,7 @@ CREATE TABLE `aowow_titles` (
   `female_loc6` varchar(35) NOT NULL,
   `female_loc8` varchar(41) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `bitIdx` (`bitIdx`)
+  KEY `bitIdx` (`bitIdx`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2388,12 +2403,12 @@ CREATE TABLE `aowow_zones` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-05-10 14:03:11
--- MySQL dump 10.13  Distrib 5.5.30, for Linux (x86_64)
+-- Dump completed on 2015-10-31 13:22:27
+-- MySQL dump 10.16  Distrib 10.1.8-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: sarjuuk_aowow
 -- ------------------------------------------------------
--- Server version  5.5.30-30.1
+-- Server version	10.1.8-MariaDB-1~trusty
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -2401,7 +2416,6 @@ CREATE TABLE `aowow_zones` (
 /*!40101 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
@@ -2432,7 +2446,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_config` WRITE;
 /*!40000 ALTER TABLE `aowow_config` DISABLE KEYS */;
-INSERT INTO `aowow_config` VALUES ('sql_limit_search','500',0,129,'default: 500 - max results for search'),('sql_limit_default','300',0,129,'default: 300 - max results for listviews'),('sql_limit_quicksearch','10',0,129,'default: 10  - max results for suggestions'),('sql_limit_none','0',0,129,'default: 0 - unlimited results (i wouldn\'t change that mate)'),('ttl_rss','60',0,129,'default: 60 - time to live for RSS (in seconds)'),('name','Aowow Database Viewer (ADV)',0,136,' - website title'),('name_short','Aowow',0,136,' - feed title'),('board_url','http://www.wowhead.com/forums?board=',0,136,' - another halfbaked  javascript thing..'),('contact_email','feedback@aowow.org',0,136,' - displayed sender for auth-mails, ect'),('battlegroup','Pure Pwnage',0,136,' - pretend, we belong to a battlegroup to satisfy profiler-related Jscripts'),('debug','0',0,132,'default: 0 - disable cache, enable sql-errors, enable error_reporting'),('maintenance','1',0,132,'default: 0 - display brb gnomes and block access for non-staff'),('user_max_votes','50',0,129,'default: 50 - vote limit per day'),('force_ssl','0',0,132,'default: 0 - enforce SSL, if the server is behind a load balancer'),('locales','333',0,161,'default: 0x14D - allowed locales - 0:English, 2:French, 3:German, 6:Spanish, 8:Russian'),('screenshot_min_size','200',0,129,'default: 200 - minimum dimensions of uploaded screenshots in px (yes, it\'s square)'),('site_host','',0,136,' - points js to executable files'),('static_host','',0,136,' - points js to images & scripts'),('cache_decay','25200',1,129,'default: 60 * 60 * 7 - time to keep cache in seconds'),('cache_mode','1',1,161,'default: 1 - set cache method - 0:filecache, 1:memcached'),('cache_dir','',1,136,'default: cache/template - generated pages are saved here (requires CACHE_MODE: filecache)'),('acc_failed_auth_block','900',2,129,'default: 15 * 60 - how long an account is closed after exceeding FAILED_AUTH_COUNT (in seconds)'),('acc_failed_auth_count','5',2,129,'default: 5 - how often invalid passwords are tolerated'),('acc_allow_register','1',2,132,'default: 1 - allow/disallow account creation (requires AUTH_MODE: aowow)'),('acc_auth_mode','0',2,145,'default: 0 - source to auth against - 0:aowow, 1:TC auth-table, 2:external script'),('acc_create_save_decay','604800',2,129,'default: 604800 - time in wich an unconfirmed account cannot be overwritten by new registrations'),('acc_recovery_decay','300',2,129,'default: 300 - time to recover your account and new recovery requests are blocked'),('session_timeout_delay','3600',3,129,'default: 60 * 60 - non-permanent session times out in time() + X'),('session.gc_maxlifetime','604800',3,200,'default: 7*24*60*60 - lifetime of session data'),('session.gc_probability','1',3,200,'default: 0 - probability to remove session data on garbage collection'),('session.gc_divisor', 100, 3, 200, 'default: 100 - probability to remove session data on garbage collection'),('session_cache_dir','',3,136,'default:  - php sessions are saved here. Leave empty to use php default directory.'),('rep_req_upvote','125',4,129,'default: 125 - required reputation to upvote comments'),('rep_req_downvote','250',4,129,'default: 250 -  required reputation to downvote comments'),('rep_req_comment','75',4,129,'default: 75 - required reputation to write a comment / reply'),('rep_req_supervote','2500',4,129,'default: 2500 - required reputation for double vote effect'),('rep_req_votemore_base','2000',4,129,'default: 2000 - gains more votes past this threshold'),('rep_reward_register','100',4,129,'default: 100 - activated an account'),('rep_reward_upvoted','5',4,129,'default: 5 - comment received upvote'),('rep_reward_downvoted','0',4,129,'default: 0 - comment received downvote'),('rep_reward_good_report','10',4,129,'default: 10 - filed an accepted report'),('rep_reward_bad_report','0',4,129,'default: 0 - filed a rejected report'),('rep_reward_dailyvisit','5',4,129,'default: 5 - daily visit'),('rep_reward_user_warned','-50',4,129,'default: -50 - moderator imposed a warning'),('rep_reward_comment','1',4,129,'default: 1 - created a comment (not a reply) '),('rep_req_premium','25000',4,129,'default: 25000 - required reputation for premium status through reputation'),('rep_reward_upload','10',4,129,'default: 10 - suggested / uploaded video / screenshot was approved'),('rep_reward_article','100',4,129,'default: 100 - submitted an approved article/guide'),('rep_reward_user_suspended','-200',4,129,'default: -200 - moderator revoked rights'),('rep_req_votemore_add','250',4,129,'default: 250 - required reputation per additional vote past threshold'),('serialize_precision','4',5,65,' - some derelict code, probably unused'),('memory_limit','2048M',5,200,'default: 2048M - parsing spell.dbc is quite intense'),('default_charset','UTF-8',5,72,'default: UTF-8'),('analytics_user','',6,136,'default:  - enter your GA-user here to track site stats');
+INSERT INTO `aowow_config` VALUES ('sql_limit_search','500',0,129,'default: 500 - max results for search'),('sql_limit_default','300',0,129,'default: 300 - max results for listviews'),('sql_limit_quicksearch','10',0,129,'default: 10  - max results for suggestions'),('sql_limit_none','0',0,129,'default: 0 - unlimited results (i wouldn\'t change that mate)'),('ttl_rss','60',0,129,'default: 60 - time to live for RSS (in seconds)'),('name','Aowow Database Viewer (ADV)',0,136,' - website title'),('name_short','Aowow',0,136,' - feed title'),('board_url','http://www.wowhead.com/forums?board=',0,136,' - another halfbaked  javascript thing..'),('contact_email','feedback@aowow.org',0,136,' - displayed sender for auth-mails, ect'),('battlegroup','Pure Pwnage',0,136,' - pretend, we belong to a battlegroup to satisfy profiler-related Jscripts'),('debug','0',0,132,'default: 0 - disable cache, enable sql-errors, enable error_reporting'),('maintenance','1',0,132,'default: 0 - display brb gnomes and block access for non-staff'),('user_max_votes','50',0,129,'default: 50 - vote limit per day'),('force_ssl','0',0,132,'default: 0 - enforce SSL, if the server is behind a load balancer'),('locales','333',0,161,'default: 0x14D - allowed locales - 0:English, 2:French, 3:German, 6:Spanish, 8:Russian'),('screenshot_min_size','200',0,129,'default: 200 - minimum dimensions of uploaded screenshots in px (yes, it\'s square)'),('site_host','',0,136,' - points js to executable files'),('static_host','',0,136,' - points js to images & scripts'),('cache_decay','25200',1,129,'default: 60 * 60 * 7 - time to keep cache in seconds'),('cache_mode','1',1,161,'default: 1 - set cache method - 0:filecache, 1:memcached'),('cache_dir','',1,136,'default: cache/template - generated pages are saved here (requires CACHE_MODE: filecache)'),('acc_failed_auth_block','900',2,129,'default: 15 * 60 - how long an account is closed after exceeding FAILED_AUTH_COUNT (in seconds)'),('acc_failed_auth_count','5',2,129,'default: 5 - how often invalid passwords are tolerated'),('acc_allow_register','1',2,132,'default: 1 - allow/disallow account creation (requires AUTH_MODE: aowow)'),('acc_auth_mode','0',2,145,'default: 0 - source to auth against - 0:aowow, 1:TC auth-table, 2:external script'),('acc_create_save_decay','604800',2,129,'default: 604800 - time in wich an unconfirmed account cannot be overwritten by new registrations'),('acc_recovery_decay','300',2,129,'default: 300 - time to recover your account and new recovery requests are blocked'),('session_timeout_delay','3600',3,129,'default: 60 * 60 - non-permanent session times out in time() + X'),('session.gc_maxlifetime','604800',3,200,'default: 7*24*60*60 - lifetime of session data'),('session.gc_probability','1',3,200,'default: 0 - probability to remove session data on garbage collection'),('session.gc_divisor',100,3,200,'default: 100 - probability to remove session data on garbage collection'),('session_cache_dir','',3,136,'default:  - php sessions are saved here. Leave empty to use php default directory.'),('rep_req_upvote','125',4,129,'default: 125 - required reputation to upvote comments'),('rep_req_downvote','250',4,129,'default: 250 -  required reputation to downvote comments'),('rep_req_comment','75',4,129,'default: 75 - required reputation to write a comment / reply'),('rep_req_supervote','2500',4,129,'default: 2500 - required reputation for double vote effect'),('rep_req_votemore_base','2000',4,129,'default: 2000 - gains more votes past this threshold'),('rep_reward_register','100',4,129,'default: 100 - activated an account'),('rep_reward_upvoted','5',4,129,'default: 5 - comment received upvote'),('rep_reward_downvoted','0',4,129,'default: 0 - comment received downvote'),('rep_reward_good_report','10',4,129,'default: 10 - filed an accepted report'),('rep_reward_bad_report','0',4,129,'default: 0 - filed a rejected report'),('rep_reward_dailyvisit','5',4,129,'default: 5 - daily visit'),('rep_reward_user_warned','-50',4,129,'default: -50 - moderator imposed a warning'),('rep_reward_comment','1',4,129,'default: 1 - created a comment (not a reply) '),('rep_req_premium','25000',4,129,'default: 25000 - required reputation for premium status through reputation'),('rep_reward_upload','10',4,129,'default: 10 - suggested / uploaded video / screenshot was approved'),('rep_reward_article','100',4,129,'default: 100 - submitted an approved article/guide'),('rep_reward_user_suspended','-200',4,129,'default: -200 - moderator revoked rights'),('rep_req_votemore_add','250',4,129,'default: 250 - required reputation per additional vote past threshold'),('serialize_precision','4',5,65,' - some derelict code, probably unused'),('memory_limit','2048M',5,200,'default: 2048M - parsing spell.dbc is quite intense'),('default_charset','UTF-8',5,72,'default: UTF-8'),('analytics_user','',6,136,'default:  - enter your GA-user here to track site stats');
 /*!40000 ALTER TABLE `aowow_config` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2442,7 +2456,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1438878038,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1446293928,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2467,6 +2481,16 @@ INSERT INTO `aowow_home_featuredbox_overlay` VALUES (2,405,100,'http://example.c
 UNLOCK TABLES;
 
 --
+-- Dumping data for table `aowow_loot_link`
+--
+
+LOCK TABLES `aowow_loot_link` WRITE;
+/*!40000 ALTER TABLE `aowow_loot_link` DISABLE KEYS */;
+INSERT INTO `aowow_loot_link` VALUES (17537,185168),(18434,185169),(17536,185168),(18432,185169),(19218,184465),(21525,184849),(19710,184465),(21526,184849),(28234,190586),(-28234,193996),(27656,191349),(31561,193603),(26533,190663),(31217,193597),(16064,181366),(30603,193426),(16065,181366),(30601,193426),(30549,181366),(30600,193426),(16063,181366),(30602,193426),(28859,193905),(31734,193967),(32930,195046),(33909,195047),(32865,194313),(33147,194315),(33350,194957),(-33350,194958),(32845,194200),(32846,194201),(32906,194324),(33360,194325),(32871,194821),(33070,194822),(35119,195374),(35518,195375),(34928,195323),(35517,195324),(34705,195709),(36088,195710),(34702,195709),(36082,195710),(34701,195709),(36083,195710),(34657,195709),(36086,195710),(34703,195709),(36087,195710),(35572,195709),(36089,195710),(35569,195709),(36085,195710),(35571,195709),(36090,195710),(35570,195709),(36091,195710),(35617,195709),(36084,195710),(34441,195631),(34442,195632),(34443,195633),(-34443,195635),(34444,195631),(35740,195632),(35741,195633),(-35741,195635),(34445,195631),(35705,195632),(35706,195633),(-35706,195635),(34447,195631),(35683,195632),(35684,195633),(-35684,195635),(34448,195631),(35724,195632),(35725,195633),(-35725,195635),(34449,195631),(35689,195632),(35690,195633),(-35690,195635),(34450,195631),(35695,195632),(35696,195633),(-35696,195635),(34451,195631),(35671,195632),(35672,195633),(-35672,195635),(34453,195631),(35718,195632),(35719,195633),(-35719,195635),(34454,195631),(35711,195632),(35712,195633),(-35712,195635),(34455,195631),(35680,195632),(35681,195633),(-35681,195635),(34456,195631),(35708,195632),(35709,195633),(-35709,195635),(34458,195631),(35692,195632),(35693,195633),(-35693,195635),(34459,195631),(35686,195632),(35687,195633),(-35687,195635),(34460,195631),(35702,195632),(35703,195633),(-35703,195635),(34461,195631),(35743,195632),(35744,195633),(-35744,195635),(34463,195631),(35734,195632),(35735,195633),(-35735,195635),(34465,195631),(35746,195632),(35747,195633),(-35747,195635),(34466,195631),(35665,195632),(35666,195633),(-35666,195635),(34467,195631),(35662,195632),(35663,195633),(-35663,195635),(34468,195631),(35721,195632),(35722,195633),(-35722,195635),(34469,195631),(35714,195632),(35715,195633),(-35715,195635),(34470,195631),(35728,195632),(35729,195633),(-35729,195635),(34471,195631),(35668,195632),(35669,195633),(-35669,195635),(34472,195631),(35699,195632),(35700,195633),(-35700,195635),(34473,195631),(35674,195632),(35675,195633),(-35675,195635),(34474,195631),(35731,195632),(35732,195633),(-35732,195635),(34475,195631),(35737,195632),(35738,195633),(-35738,195635),(37226,201710),(-37226,202336),(36948,202178),(38157,202180),(38639,202177),(38640,202179),(36939,202178),(38156,202180),(38637,202177),(38638,202179);
+/*!40000 ALTER TABLE `aowow_loot_link` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Dumping data for table `aowow_sourcestrings`
 --
 
@@ -2479,10 +2503,9 @@ UNLOCK TABLES;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-08-06 17:51:15
+-- Dump completed on 2015-10-31 13:22:30

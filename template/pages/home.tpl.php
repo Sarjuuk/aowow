@@ -47,16 +47,21 @@ if ($this->news):
             <div class="home-featuredbox-inner text" id="news-generic"></div>
         </div>
 
+<?php
+endif;
+?>
         <script type="text/javascript">//<![CDATA[
 <?php
-    if (User::$localeId):
-        echo "            Locale.set(".User::$localeId.");\n";
-    endif;
-    echo $this->writeGlobalVars();
+if (User::$localeId):
+    echo "            Locale.set(".User::$localeId.");\n";
+endif;
+echo $this->writeGlobalVars();
+
+if ($this->news):
+    echo "            Markup.printHtml(".json_encode($this->news['text']).", 'news-generic', { allow: Markup.CLASS_ADMIN });\n";
+endif;
 ?>
-            Markup.printHtml(<?=json_encode($this->news['text']); ?>, 'news-generic', { allow: Markup.CLASS_ADMIN });
         //]]></script>
-<?php endif; ?>
     </div>
 
     <div class="toplinks linklist"><?php $this->brick('headerMenu'); ?></div>

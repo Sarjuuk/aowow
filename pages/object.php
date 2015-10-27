@@ -18,13 +18,6 @@ class ObjectPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['swfobject.js'];
 
-    /*  NOTE
-
-        much like items GOs should have difficulty versions of itself, that are spawned for bosses, but this data is mostly contained in scripts
-        also certain chests/caches/ect should be linked to their boss mob
-
-        all of this has to be done manually
-    */
     public function __construct($pageCall, $id)
     {
         parent::__construct($pageCall, $id);
@@ -235,12 +228,26 @@ class ObjectPage extends GenericPage
                 $map['extra'][$areaId] = ZoneList::getName($areaId);
         }
 
-        // consider pooled spawns
 
-        $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
-        $this->pageText   = $pageText;
-        $this->map        = $map;
-        $this->redButtons = array(
+        // todo (low): consider pooled spawns
+
+
+        $relBoss = null;
+        if ($_ = DB::Aowow()->selectCell('SELECT ABS(npcId) FROM ?_loot_link WHERE objectId = ?d', $this->typeId))
+        {
+            // difficulty dummy
+            if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE difficultyEntry1 = ?d OR difficultyEntry2 = ?d OR difficultyEntry3 = ?d', $_, $_, $_))
+                $relBoss = [$c['id'], Util::localizedString($c, 'name')];
+            // base creature
+            else if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE id = ?d', $_))
+                $relBoss = [$c['id'], Util::localizedString($c, 'name')];
+        }
+
+        $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
+        $this->pageText    = $pageText;
+        $this->map         = $map;
+        $this->relBoss     = $relBoss;
+        $this->redButtons  = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => true,
             BUTTON_VIEW3D  => ['displayId' => $this->subject->getField('displayId'), 'type' => TYPE_OBJECT, 'typeId' => $this->typeId]
@@ -384,8 +391,9 @@ class ObjectPage extends GenericPage
             $goLoot = new Loot();
             if ($goLoot->getByContainer(LOOT_GAMEOBJECT, $_))
             {
-                $extraCols  = $goLoot->extraCols;
-                $hiddenCols = ['source', 'side', 'slot', 'reqlevel'];
+                $extraCols   = $goLoot->extraCols;
+                $extraCols[] = 'Listview.extraCols.percent';
+                $hiddenCols  = ['source', 'side', 'slot', 'reqlevel'];
 
                 $this->extendGlobalData($goLoot->jsGlobals);
 
@@ -400,13 +408,9 @@ class ObjectPage extends GenericPage
                         continue;
 
                     $extraCols[] = 'Listview.extraCols.condition';
-
                     $reqQuest[$lv['id']] = 0;
-
                     $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
                 }
-
-                $extraCols[] = 'Listview.extraCols.percent';
 
                 $this->lvTabs[] = array(
                     'file'   => 'item',
@@ -415,7 +419,8 @@ class ObjectPage extends GenericPage
                         'name'       => '$LANG.tab_contains',
                         'id'         => 'contains',
                         'extraCols'  => "$[".implode(', ', array_unique($extraCols))."]",
-                        'hiddenCols' => $hiddenCols ? '$'.Util::toJSON(array_values($hiddenCols)) : null
+                        'hiddenCols' => $hiddenCols ? '$'.Util::toJSON(array_values($hiddenCols)) : null,
+                        'sort'       => "$['-percent', 'name']"
                     )
                 );
             }

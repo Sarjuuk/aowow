@@ -405,6 +405,7 @@ $lang = array(
         'cat'           => [0 => "Другое", 9 => "Книги", 3 => "Контейнеры", -5 => "Сундуки", 25 => "Рыболовные лунки",-3 => "Травы",    -4 => "Полезные ископаемые", -2 => "Задания", -6 => "Инструменты"],
         'type'          => [               9 => "Книга", 3 => "Контейнер",  -5 => "Сундук",  25 => "",                -3 => "Растение", -4 => "Полезное ископаемое", -2 => "Задание", -6 => ""],
         'unkPosition'   => "Местонахождение этого объекта неизвестно.",
+        'npcLootPH'     => '[The <b>%s</b> contains the loot from the fight against <a href="?npc=%d">%s</a>. It spawns after his death.]',
         'key'           => "Ключ",
         'focus'         => "[Spell Focus]",
         'focusDesc'     => "[Spells requiring this Focus can be cast near this Object]",

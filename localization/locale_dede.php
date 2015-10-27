@@ -405,6 +405,7 @@ $lang = array(
         'cat'           => [0 => "Anderes", 9 => "Bücher", 3 => "Behälter", -5 => "Truhen", 25 => "Fischschwärme", -3 => "Kräuter", -4 => "Erzadern",     -2 => "Quest", -6 => "Werkzeuge"],
         'type'          => [                9 => "Buch",   3 => "Behälter", -5 => "Truhe",  25 => "",              -3 => "Kraut",   -4 => "Erzvorkommen", -2 => "Quest", -6 => ""],
         'unkPosition'   => "Der Standort dieses Objekts ist nicht bekannt.",
+        'npcLootPH'     => 'Der Behälter <b>%s</b> beinhaltet die Beute vom Kampf gegen <a href="?npc=%d">%s</a>. Er erscheint nach seinem Tod.',
         'key'           => "Schlüssel",
         'focus'         => "Zauberfokus",
         'focusDesc'     => "Zauber, die diesen Fokus benötigen, können an diesem Objekt gewirkt werden.",

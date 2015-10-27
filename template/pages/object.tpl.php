@@ -20,6 +20,11 @@
 <?php
 $this->brick('article');
 
+if ($this->relBoss):
+    echo "                <div>".sprintf(Lang::gameObject('npcLootPH'), $this->name, $this->relBoss[0], $this->relBoss[1])."</div>\n";
+    echo '                <div class="pad"></div>';
+endif;
+
 if (!empty($this->map)):
     $this->brick('mapper');
 else:

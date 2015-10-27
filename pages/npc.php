@@ -53,15 +53,15 @@ class NpcPage extends GenericPage
     {
         $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
 
-        $_typeFlags = $this->subject->getField('typeFlags');
-        $_altIds    = [];
-        $_altNPCs   = null;
-        $position   = null;
-        $accessory  = [];
+        $_typeFlags  = $this->subject->getField('typeFlags');
+        $_altIds     = [];
+        $_altNPCs    = null;
+        $placeholder = null;
+        $accessory   = [];
 
         // difficulty entries of self
         if ($this->subject->getField('cuFlags') & NPC_CU_DIFFICULTY_DUMMY)
-            $position = [$this->subject->getField('parentId'), $this->subject->getField('parent', true)];
+            $placeholder = [$this->subject->getField('parentId'), $this->subject->getField('parent', true)];
         else
         {
             for ($i = 1; $i < 4; $i++)
@@ -85,7 +85,7 @@ class NpcPage extends GenericPage
         {
             if (count($maps) == 1)                          // should only exist in one instance
             {
-                switch ((new ZoneList(array(['id', $maps], 1)))->getField('type'))
+                switch (DB::Aowow()->selectCell('SELECT `type` FROM ?_zones WHERE id = ?d', $maps[0]))
                 {
                     case 2:
                     case 5: $mapType = 1; break;
@@ -317,7 +317,7 @@ class NpcPage extends GenericPage
 
         $this->map          = $map;
         $this->infobox      = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
-        $this->position     = $position;
+        $this->placeholder  = $placeholder;
         $this->accessory    = $accessory;
         $this->quotes       = $this->getQuotes();
         $this->reputation   = $this->getOnKillRep($_altIds, $mapType);
@@ -571,9 +571,9 @@ class NpcPage extends GenericPage
     */
 
         $sourceFor = array(
-             [LOOT_CREATURE,    $this->subject->getField('lootId'),           '$LANG.tab_drops',         'drops',         ['Listview.extraCols.percent'], []                          , []],
-             [LOOT_PICKPOCKET,  $this->subject->getField('pickpocketLootId'), '$LANG.tab_pickpocketing', 'pickpocketing', ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
-             [LOOT_SKINNING,    $this->subject->getField('skinLootId'),       '$LANG.'.$skinTab[0],      $skinTab[1],     ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []]
+             [LOOT_CREATURE,   $this->subject->getField('lootId'),           '$LANG.tab_drops',         'drops',         []                          ],
+             [LOOT_PICKPOCKET, $this->subject->getField('pickpocketLootId'), '$LANG.tab_pickpocketing', 'pickpocketing', ['side', 'slot', 'reqlevel']],
+             [LOOT_SKINNING,   $this->subject->getField('skinLootId'),       '$LANG.'.$skinTab[0],      $skinTab[1],     ['side', 'slot', 'reqlevel']]
         );
 
         // temp: manually add loot for difficulty-versions
@@ -588,13 +588,20 @@ class NpcPage extends GenericPage
 
         if ($_altIds)
         {
-            $sourceFor[0][2] = $langref[1];
+            $sourceFor[0][2] = $mapType == 1 ? $langref[-1] : $langref[1];
             foreach ($_altNPCs->iterate() as $id => $__)
             {
-                $mode = $_altIds[$id];
-                array_splice($sourceFor, 1, 0, [[LOOT_CREATURE, $_altNPCs->getField('lootId'), $langref[$mode + 1], 'drops-'.$mode, ['Listview.extraCols.percent'], [], []]]);
+                $mode = ($_altIds[$id] + 1) * ($mapType == 1 ? -1 : 1);
+                if ($lootGO = DB::Aowow()->selectRow('SELECT o.id, o.lootId, o.name_loc0, o.name_loc2, o.name_loc3, o.name_loc6, o.name_loc8 FROM ?_loot_link l JOIN ?_objects o ON o.id = l.objectId WHERE l.npcId = ?d', $id))
+                    array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lootGO['lootId'], $langref[$mode], 'drops-object-'.abs($mode), [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lootGO['id'].', \''.Util::jsEscape(Util::localizedString($lootGO, 'name')).'\')']]);
+                if ($lootId = $_altNPCs->getField('lootId'))
+                    array_splice($sourceFor, 1, 0, [[LOOT_CREATURE,   $lootId,           $langref[$mode], 'drops-'.abs($mode), []]]);
             }
         }
+
+        if ($lootGOs = DB::Aowow()->select('SELECT o.id, IF(npcId < 0, 1, 0) AS modeDummy, o.lootId, o.name_loc0, o.name_loc2, o.name_loc3, o.name_loc6, o.name_loc8 FROM ?_loot_link l JOIN ?_objects o ON o.id = l.objectId WHERE ABS(l.npcId) = ?d', $this->typeId))
+            foreach ($lootGOs as $idx => $lgo)
+                array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lgo['lootId'], $mapType ? $langref[($mapType == 1 ? -1 : 1) + ($lgo['modeDummy'] ? 1 : 0)] : '$LANG.tab_drops', 'drops-object-'.$idx, [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', \''.Util::jsEscape(Util::localizedString($lgo, 'name')).'\')']]);
 
         $reqQuest = [];
         foreach ($sourceFor as $sf)
@@ -602,8 +609,8 @@ class NpcPage extends GenericPage
             $creatureLoot = new Loot();
             if ($creatureLoot->getByContainer($sf[0], $sf[1]))
             {
-                if ($_ = $creatureLoot->extraCols)
-                    $sf[4] = array_merge($sf[4], $_);
+                $extraCols   = $creatureLoot->extraCols;
+                $extraCols[] = 'Listview.extraCols.percent';
 
                 $this->extendGlobalData($creatureLoot->jsGlobals);
 
@@ -612,23 +619,27 @@ class NpcPage extends GenericPage
                     if (!$lv['quest'])
                         continue;
 
-                    $sf[4][] = 'Listview.extraCols.condition';
+                    $extraCols[] = 'Listview.extraCols.condition';
                     $reqQuest[$lv['id']] = 0;
                     $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
                 }
 
-                $this->lvTabs[] = array(
+                $lootTab = array(
                     'file'   => 'item',
                     'data'   => $creatureLoot->getResult(),
                     'params' => array(
                         'name'        => $sf[2],
                         'id'          => $sf[3],
-                        'extraCols'   => $sf[4] ? "$[".implode(', ', array_unique($sf[4]))."]" : null,
-                        'hiddenCols'  => $sf[5] ? "$".Util::toJSON($sf[5]) : null,
-                        'visibleCols' => $sf[6] ? '$'.Util::toJSON($sf[6]) : null,
+                        'extraCols'   => "$[".implode(', ', array_unique($extraCols))."]",
+                        'hiddenCols'  => $sf[4] ? "$".Util::toJSON($sf[4]) : null,
                         'sort'        => "$['-percent', 'name']",
                     )
                 );
+
+                if (!empty($sf['note']))
+                    $lootTab['params']['note'] = $sf['note'];
+
+                $this->lvTabs[] = $lootTab;
             }
         }
 
