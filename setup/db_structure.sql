@@ -542,8 +542,8 @@ DROP TABLE IF EXISTS `aowow_dbversion`;
 CREATE TABLE `aowow_dbversion` (
   `date` int(10) unsigned NOT NULL DEFAULT '0',
   `part` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `sql` text NOT NULL,
-  `build` text NOT NULL
+  `sql` text NULL,
+  `build` text NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2456,7 +2456,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1446293928,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1446917082,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
