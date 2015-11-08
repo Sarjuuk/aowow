@@ -277,13 +277,13 @@ class ScreenshotPage extends GenericPage
         {
             case 1:
                 trigger_error('validateScreenshot - the file exceeds the maximum size of '.ini_get('upload_max_filesize'), E_USER_WARNING);
-            return Lang::screenshot('error', 'selectSS');
+                return Lang::screenshot('error', 'selectSS');
             case 3:
-                trigger_error('validateScreenshot - upload was interrupted');
-            return Lang::screenshot('error', 'selectSS');
+                trigger_error('validateScreenshot - upload was interrupted', E_USER_WARNING);
+                return Lang::screenshot('error', 'selectSS');
             case 4:
                 trigger_error('validateScreenshot() - no file was received', E_USER_WARNING);
-            return Lang::screenshot('error', 'selectSS');
+                return Lang::screenshot('error', 'selectSS');
             case 6:
                 trigger_error('validateScreenshot - temporary upload directory is not set', E_USER_WARNING);
                 return Lang::main('intError');

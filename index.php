@@ -75,17 +75,40 @@ switch ($pageCall)
     case 'video':
     case 'zone':
     case 'zones':
-        if (in_array($pageCall, ['admin', 'account', 'profile']))
+    /* called by script */
+    case 'data':                                            // tool: dataset-loader
+    case 'cookie':                                          // lossless cookies and user settings
+    case 'contactus':
+    case 'comment':
+    // case 'filter':                                       // just a note: this would be accessed from filtrable pages as ?filter=typeStr (with POST-data) and forwards back to page with GET-data .. why? Hell if i know..
+    case 'go-to-comment':                                   // find page the comment is on and forward
+    case 'locale':                                          // subdomain-workaround, change the language
+        $cleanName = str_replace(['-', '_'], '', ucFirst($altClass ?: $pageCall));
+        try                                                 // can it be handled as ajax?
         {
-            if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
+            $class = 'Ajax'.$cleanName;
+            $ajax  = new $class(explode('.', $pageParam));
+            if ($ajax->handle($out))
             {
-                header('Content-type: application/x-javascript; charset=utf-8');
-                die((string)$_);
+                Util::sendNoCacheHeader();
+
+                if ($ajax->doRedirect)
+                    header('Location: '.$out, true, 302);
+                else
+                {
+                    header('Content-type: '.$ajax->getContentType());
+                    die($out);
+                }
             }
+            else
+                throw new Exception('not handled as ajax');
+        }
+        catch (Exception $e)                                // no, apparently not..
+        {
+            $class = $cleanName.'Page';
+            (new $class($pageCall, $pageParam))->display();
         }
 
-        $_ = ($altClass ?: $pageCall).'Page';
-        (new $_($pageCall, $pageParam))->display();
         break;
     /* other pages */
     case 'whats-new':
@@ -107,20 +130,6 @@ switch ($pageCall)
     case 'most-comments':
     case 'random':
         (new UtilityPage($pageCall, $pageParam))->display();
-        break;
-    /* called by script */
-    case 'data':                                            // tool: dataset-loader
-    case 'cookie':                                          // lossless cookies and user settings
-    case 'contactus':
-    case 'comment':
-    // case 'filter':                                       // just a note: this would be accessed from filtrable pages as ?filter=typeStr (with POST-data) and forwards back to page with GET-data .. why? Hell if i know..
-    case 'go-to-comment':                                   // find page the comment is on and forward
-    case 'locale':                                          // subdomain-workaround, change the language
-        if (($_ = (new AjaxHandler($pageParam))->handle($pageCall)) !== null)
-        {
-            header('Content-type: application/x-javascript; charset=utf-8');
-            die((string)$_);
-        }
         break;
     default:                                                // unk parameter given -> ErrorPage
         if (isset($_GET['power']))
