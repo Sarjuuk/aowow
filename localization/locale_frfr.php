@@ -68,10 +68,10 @@ $lang = array(
 
         // infobox
         'unavailable'   => "Non disponible aux joueurs",
-        'disabled'      => "[Disabled]",
-        'disabledHint'  => "[Cannot be attained or completed]",
-        'serverside'    => "[Serverside]",
-        'serversideHint'=> "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
+        'disabled'      => "Désactivé",
+        'disabledHint'  => "Ne peux pas être atteint ou complété",
+        'serverside'    => "Côté serveur",
+        'serversideHint'=> "Ces informations ne sont pas contenues dans le client et ont été obtenues via sniff ou ont été devinées.",
 
         // red buttons
         'links'         => "Liens",
@@ -160,7 +160,7 @@ $lang = array(
             'unkFormat'   => "Format d'image inconnu.",
             'tooSmall'    => "Votre capture est bien trop petite. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
             'selectSS'    => "Veuillez sélectionner la capture d'écran à envoyer.",
-            'notAllowed'  => "[You are not allowed to upload screenshots!]",
+            'notAllowed'  => "Vous n'êtes pas autorisés à exporter des captures d'écran.",
         )
     ),
     'game' => array(
@@ -317,46 +317,46 @@ $lang = array(
         // recovery
         'recoverUser'   => "Demande de nom d'utilisateur",
         'recoverPass'   => "Changement de mot de passe : Étape %s de 2",
-        'newPass'       => "New Password",
+        'newPass'       => "Nouveau mot de passe",
 
         // creation
         'register'      => "Enregistrement : Étape %s de 2",
         'passConfirm'   => "Confirmez",
 
         // dashboard
-        'ipAddress'     => "IP-Adress",
-        'lastIP'        => "last used IP",
-        'myAccount'     => "My Account",
-        'editAccount'   => "Simply use the forms below to update your account information",
-        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+        'ipAddress'     => "Addresse IP",
+        'lastIP'        => "Dernière IP utilisée",
+        'myAccount'     => "Mon compte",
+        'editAccount'   => "Utilisez les formulaires ci-dessous pour mettre à jour vos informations.",
+        'viewPubDesc'   => 'Voyez vos informations publiques dans votre <a href="?user=%s">Profile  Page</a>',
 
         // bans
-        'accBanned'     => "This Account was closed",
-        'bannedBy'      => "Banned by",
-        'ends'          => "Ends on",
-        'permanent'     => "The ban is permanent",
-        'reason'        => "Reason",
-        'noReason'      => "No reason was given.",
+        'accBanned'     => "Ce compte a été fermé.",
+        'bannedBy'      => "Banni par",
+        'ends'          => "Termine le",
+        'permanent'     => "Ce bannissement est permanent",
+        'reason'        => "Raison",
+        'noReason'      => "Aucune raison donnée.",
 
         // form-text
         'emailInvalid'  => "Cette adresse courriel est invalide.", // message_emailnotvalid
-        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
-        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
-        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
-        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
-        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
-        'userNotFound'  => "The username you entered does not exists.",
-        'wrongPass'     => "That password is not vaild.",
-        'accInactive'   => "That account has not yet been confirmed active.",
-        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
-        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+        'emailNotFound' => "L'address email que vous avez entrée n'est pas associée à un compte.<br><br>Si vous avez oublié l'address email avec laquelle vous avez enregistré votre compte".CFG_CONTACT_EMAIL." pour obtenir de l'aide.",
+        'createAccSent' => "Un email a été envoyé à <b>%s</b>. Suivez les instructions pour créer votre compte.",
+        'recovUserSent' => "Un email a été envoyé à <b>%s</b>. Suivez les instructions pour récupérer votre nom d'utilisateur.",
+        'recovPassSent' => "Un email a été envoyé à <b>%s</b>. Suivez les instructions pour réinitialiser votre mot de passe.",
+        'accActivated'  => 'Votre compte a été activé.<br>Vous pouvez maintenant <a href="?account=signin&token=%s">vous connecter</a>',
+        'userNotFound'  => "Le nom d'utilisateur que vous avez saisi n'éxiste pas.",
+        'wrongPass'     => "Ce mot de passe est invalide.",
+        'accInactive'   => "Ce compte n'a pas encore été activé.",
+        'loginExceeded' => "Le nombre maximum de connections depuis cette IP a été dépassé. Essayez de nouevau dans %s.",
+        'signupExceeded'=> "Le nombre maximum d'inscriptions depuis cette IP a été dépassé. Essayez de nouveau dans %s.",
         'errNameLength' => "Votre nom d'utilisateur doit faire au moins 4 caractères de long.", // message_usernamemin
         'errNameChars'  => "Votre nom d'utilisateur doit contenir seulement des lettres et des chiffres.", // message_usernamenotvalid
         'errPassLength' => "Votre mot de passe doit faire au moins 6 caractères de long.", // message_passwordmin
-        'passMismatch'  => "The passwords you entered do not match.",
-        'nameInUse'     => "That username is already taken.",
-        'mailInUse'     => "That email is already registered to an account.",
-        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
+        'passMismatch'  => "Les mots de passe que vous avez saisis ne correspondent pas.",
+        'nameInUse'     => "Ce nom d'utilisateur est déjà utilisé.",
+        'mailInUse'     => "Cette addresse email est déjà liée à un compte.",
+        'isRecovering'  => "Ce compte est déjà en train d'être récupéré. Suivez les instruction dans l'email reçu ou attendez %s pour que le token expire.",
         'passCheckFail' => "Les mots de passe ne correspondent pas.", // message_passwordsdonotmatch
         'newPassDiff'   => "Votre nouveau mot de passe doit être différent de l'ancien." // message_newpassdifferent
     ),
@@ -378,25 +378,25 @@ $lang = array(
     ),
     'mail' => array(
         'tokenExpires'  => "This token expires in %s.",
-        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+        'accConfirm'    => ["Activation de compte",             "Bienvenue sur ".CFG_NAME_SHORT."!\r\n\r\nCliquez sur le lien ci-dessous pour activer votre compte.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
+        'recoverUser'   => ["Récupération d'utilisateur",       "Suivez ce lien pour vous connecter.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
+        'resetPass'     => ["Réinitialisation du mot de passe", "Suivez ce lien pour réinitialiser votre mot de passe.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nSi vous n'avez pas fait de demande de réinitialisation, ignorez cet email."]
     ),
     'emote' => array(
         'notFound'      => "[This Emote doesn't exist.]",
-        'self'          => "[To Yourself]",
-        'target'        => "[To others with a target]",
-        'noTarget'      => "[To others without a target]",
-        'isAnimated'    => "[Uses an animation]",
-        'aliases'       => "[Aliases]",
-        'noText'        => "[This Emote has no text.]",
+        'self'          => "Vers vous-même",
+        'target'        => "Vers les autres avec une cible",
+        'noTarget'      => "Vers les autres sans cible",
+        'isAnimated'    => "Utilise une animation",
+        'aliases'       => "Alias",
+        'noText'        => "Cette émote n'a pas de texte.",
     ),
     'enchantment' => array(
         'details'       => "En détail",
         'activation'    => "Activation",
         'notFound'      => "Cet enchantement n'existe pas.",
         'types'         => array(
-            1 => "[Proc Spell]",            3 => "[Equip Spell]",           7 => "[Use Spell]",             8 => "Châsse prismatique",
+            1 => "Sort proc",               3 => "Sort équipé",             7 => "Sort utilisé",            8 => "Châsse prismatique",
             5 => "Statistiques",            2 => "Dégâts d'arme",           6 => "DPS",                     4 => "Défense"
         )
     ),
@@ -405,14 +405,14 @@ $lang = array(
         'cat'           => [0 => "Autre", 9 => "Livres", 3 => "Conteneurs", -5 => "Coffres", 25 => "Bancs de poissons", -3 => "Herbes", -4 => "Filons de minerai", -2 => "Quêtes", -6 => "Outils"],
         'type'          => [              9 => "Livre",  3 => "Conteneur",  -5 => "Coffre",  25 => "",                  -3 => "Herbe",  -4 => "Filon de minerai",  -2 => "Quête",  -6 => ""],
         'unkPosition'   => "L'emplacement de cette entité est inconnu.",
-        'npcLootPH'     => '[The <b>%s</b> contains the loot from the fight against <a href="?npc=%d">%s</a>. It spawns after his death.]',
+        'npcLootPH'     => 'Le <b>%s</b> contient les récompenses du combat contre <a href="?npc=%d">%s</a>. Il apparaît après sa mort.',
         'key'           => "Clé",
-        'focus'         => "[Spell Focus]",
-        'focusDesc'     => "[Spells requiring this Focus can be cast near this Object]",
+        'focus'         => "Focus de sort",
+        'focusDesc'     => "Les sorts nécessitant ce focus peuvent être lancés près de cet entité.",
         'trap'          => "Piège",
         'triggeredBy'   => "Déclenché par",
         'capturePoint'  => "Point de capture",
-        'restock'       => "[Restocks every %s.]"
+        'restock'       => "Se remplit toutes les %s.]"
     ),
     'npc' => array(
         'notFound'      => "Ce PNJ n'existe pas.",
@@ -421,10 +421,10 @@ $lang = array(
         'react'         => "Réaction",
         'worth'         => "Vaut",
         'unkPosition'   => "L'emplacement de ce PNJ est inconnu.",
-        'difficultyPH'  => "[Ce PNJ est un espace réservé pour un autre mode de]",
-        'seat'          => "[Seat]",
-        'accessory'     => "[Accessory]",
-        'accessoryFor'  => "[This creature is an accessory for vehicle]",
+        'difficultyPH'  => "Ce PNJ est un espace réservé pour un autre mode de difficulté.",
+        'seat'          => "Siège",
+        'accessory'     => "Passager",
+        'accessoryFor'  => "Ce PNJ est un passager pour un véhicule.",
         'quotes'        => "Citations",
         'gainsDesc'     => "Après avoir tué ce PNJ vous allez obtenir",
         'repWith'       => "points de réputation avec",
@@ -678,12 +678,12 @@ $lang = array(
     ),
     'faction' => array(
         'notFound'      => "Cette faction n'existe pas.",
-        'spillover'     => "[Reputation Spillover]",
-        'spilloverDesc' => "[Gaining reputation with this faction also yields a proportional gain with the factions listed below.]",
+        'spillover'     => "Partage de réputations",
+        'spilloverDesc' => "Gagner de la réputation avec cette faction fourni une réputation proportionnelle avec les factions ci-dessous.",
         'maxStanding'   => "Niveau maximum",
         'quartermaster' => "Intendant",
-        'customRewRate' => "[Custom Reward Rate]",
-        '_transfer'     => '[The reputation with this faction will be converted to <a href="?faction=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.]',
+        'customRewRate' => "Taux de récompense personnalisé",
+        '_transfer'     => 'La réputation de cette faction sera convertie en <a href="?faction=%d" class="q1">%s</a> si vous transférez vers <span class="icon-%s">%s</span>.]',
         'cat'           => array(
             1118 => ["Classique", 469 => "Alliance", 169 => "Cartel Gentepression", 67 => "Horde", 891 => "Forces de l'Alliance", 892 => "Forces de la Horde"],
             980  => ["The Burning Crusade", 936 => "Shattrath"],
@@ -760,8 +760,8 @@ $lang = array(
         'costPerLevel'  => ", plus %s par niveau",
         '_scaling'      => "[Scaling]",
         'scaling'       => array(
-            'directSP' => "[+%.2f%% of spell power to direct component]",        'directAP' => "[+%.2f%% of attack power to direct component]",
-            'dotSP'    => "[+%.2f%% of spell power per tick]",                   'dotAP'    => "[+%.2f%% of attack power per tick]"
+            'directSP' => "+%.2f%% de la puissance des sorts directe",        'directAP' => "+%.2f%% de la puissance d'attaque directe",
+            'dotSP'    => "+%.2f%% de la puissance des sorts par tick",       'dotAP'    => "+%.2f%% de la puissance d'attaque par tick"
         ),
         'powerRunes'    => ["Givre", "Impie", "Sang", "Mort"],
         'powerTypes'    => array(
@@ -909,7 +909,7 @@ $lang = array(
         'cost'          => "Coût",
         'content'       => "Contenu",
         '_transfer'     => 'Cet objet sera converti en <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
-        '_unavailable'  => "Este objeto no está disponible para los jugadores.",
+        '_unavailable'  => "Cet objet n'est pas disponible pour les joueurs.",
         '_rndEnchants'  => "Enchantements aléatoires",
         '_chance'       => "(%s%% de chance)",
         'slot'          => "Emplacement",
