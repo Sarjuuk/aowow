@@ -422,6 +422,34 @@ class ItemPage extends genericPage
         /* Extra Tabs */
         /**************/
 
+        // tab: createdBy (perfect item specific)
+        if ($perfItem = DB::World()->select('SELECT *, spellId AS ARRAY_KEY FROM skill_perfect_item_template WHERE perfectItemType = ?d', $this->typeId))
+        {
+            $perfSpells = new SpellList(array(['id', array_column($perfItem, 'spellId')]));
+            if (!$perfSpells->error)
+            {
+                $lvData = $perfSpells->getListviewData();
+                $this->extendGlobalData($perfSpells->getJSGlobals(GLOBALINFO_RELATED));
+
+                foreach ($lvData as $sId => &$data)
+                {
+                    $data['percent'] = $perfItem[$sId]['perfectCreateChance'];
+                    $data['condition'][0][$this->typeId] = [[[CND_SPELL, $perfItem[$sId]['requiredSpecialization']]]];
+                    $this->extendGlobalIDs(TYPE_SPELL, $perfItem[$sId]['requiredSpecialization']);
+                }
+
+                $this->lvTabs[] = array(
+                    'file'   => 'spell',
+                    'data'   => $lvData,
+                    'params' => [
+                        'name'       => '$LANG.tab_createdby',
+                        'id'         => 'created-by',       // should by exclusive with created-by from spell_loot
+                        'extraCols'  => '$[Listview.extraCols.percent, Listview.extraCols.condition]'
+                    ]
+                );
+            }
+        }
+
         // tabs: this item is contained in..
         $lootTabs  = new Loot();
         $createdBy = [];

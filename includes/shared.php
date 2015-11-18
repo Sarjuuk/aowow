@@ -1,6 +1,6 @@
 <?php
 
-define('AOWOW_REVISION', 14);
+define('AOWOW_REVISION', 15);
 define('CLI', PHP_SAPI === 'cli');
 
 

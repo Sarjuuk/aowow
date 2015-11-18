@@ -67,7 +67,7 @@ class SpellList extends BaseType
             return;
 
         // post processing
-        $foo = [];
+        $foo = DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE spellId IN (?a)', $this->getFoundIDs());
         foreach ($this->iterate() as &$_curTpl)
         {
             // required for globals

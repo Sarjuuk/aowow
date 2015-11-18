@@ -1546,6 +1546,7 @@ class SpellPage extends GenericPage
         $effects  = [];
         $spellIdx = array_unique(array_merge($this->subject->canTriggerSpell(), $this->subject->canTeachSpell()));
         $itemIdx  = $this->subject->canCreateItem();
+        $perfItem = DB::World()->selectRow('SELECT * FROM skill_perfect_item_template WHERE spellId = ?d', $this->typeId);
 
         // Iterate through all effects:
         for ($i = 1; $i < 4; $i++)
@@ -1580,6 +1581,24 @@ class SpellPage extends GenericPage
                     );
 
                     break;
+                }
+
+                // perfect Items
+                if ($perfItem && $this->subject->relItems->getEntry($perfItem['perfectItemType']))
+                {
+                    $cndSpell = new SpellList(array(['id', $perfItem['requiredSpecialization']]));
+                    if (!$cndSpell->error)
+                    {
+                        $foo['perfItem'] = array(
+                            'icon'          => $cndSpell->getField('iconString'),
+                            'quality'       => $this->subject->relItems->getField('quality'),
+                            'cndSpellId'    => $perfItem['requiredSpecialization'],
+                            'cndSpellName'  => $cndSpell->getField('name', true),
+                            'chance'        => $perfItem['perfectCreateChance'],
+                            'itemId'        => $perfItem['perfectItemType'],
+                            'itemName'      => $this->subject->relItems->getField('name', true)
+                        );
+                    }
                 }
 
                 if ($effDS > 1)
