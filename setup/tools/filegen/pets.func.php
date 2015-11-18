@@ -26,7 +26,7 @@ if (!CLI)
         },
     */
 
-    $reqDBC = ['creatureFamily'];
+    $reqDBC = ['creaturefamily'];
 
     function pets()
     {

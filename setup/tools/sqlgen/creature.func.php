@@ -31,8 +31,8 @@ function creature(array $ids = [])
             "" AS textureString,                            -- textureString
             0 AS modelId,                                   -- modelId
             "" AS iconString,                               -- iconString
-            name, IFNULL(name_loc2, ""), IFNULL(name_loc3, ""), IFNULL(name_loc6, ""), IFNULL(name_loc8, ""),
-            subname, IFNULL(subname_loc2, ""), IFNULL(subname_loc3, ""), IFNULL(subname_loc6, ""), IFNULL(subname_loc8, ""),
+            ct.name, ctl2.`Name`  AS n2, ctl3.`Name`  AS n3, ctl6.`Name`  AS n6, ctl8.`Name`  AS n8,
+            subname, ctl2.`Title` AS t2, ctl3.`Title` AS t3, ctl6.`Title` AS t6, ctl8.`Title` AS t8,
             minLevel, maxLevel,
             exp,
             faction,
@@ -82,7 +82,13 @@ function creature(array $ids = [])
         JOIN
             creature_classlevelstats max ON ct.unit_class = max.class AND ct.maxlevel = max.level
         LEFT JOIN
-            locales_creature lc ON lc.entry = ct.entry
+            creature_template_locale ctl2 ON ct.entry = ctl2.entry AND ctl2.`locale` = "frFR"
+        LEFT JOIN
+            creature_template_locale ctl3 ON ct.entry = ctl3.entry AND ctl3.`locale` = "deDE"
+        LEFT JOIN
+            creature_template_locale ctl6 ON ct.entry = ctl6.entry AND ctl6.`locale` = "esES"
+        LEFT JOIN
+            creature_template_locale ctl8 ON ct.entry = ctl8.entry AND ctl8.`locale` = "ruRU"
         LEFT JOIN
             instance_encounters ie ON ie.creditEntry = ct.entry AND ie.creditType = 0
         {

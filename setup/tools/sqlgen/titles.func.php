@@ -38,7 +38,7 @@ function titles()
     $questQuery = '
         SELECT
              qt.RewardTitle AS ARRAY_KEY,
-             qt.RequiredRaces,
+             qt.AllowableRaces,
              ge.eventEntry
         FROM
             quest_template qt
@@ -80,7 +80,7 @@ function titles()
         if ($data['eventEntry'])
             DB::Aowow()->query('UPDATE ?_titles SET eventId = ?d WHERE id = ?d', $data['eventEntry'], $tId);
 
-        $side = Util::sideByRaceMask($data['RequiredRaces']);
+        $side = Util::sideByRaceMask($data['AllowableRaces']);
         if ($side == 3)
             continue;
 

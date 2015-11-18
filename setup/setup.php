@@ -28,7 +28,7 @@ function finish()
     die("\n");
 }
 
-$opt = getopt('h', ['help', 'account', 'dbconfig', 'siteconfig', 'sql', 'build', 'sync', 'update', 'firstrun', 'resume']);
+$opt = getopt('h', ['help', 'account', 'dbconfig', 'siteconfig', 'sql', 'build', 'sync', 'update', 'firstrun']);
 if (!$opt || ((isset($opt['help']) || isset($opt['h'])) && (isset($opt['firstrun']) || isset($opt['resume']))))
 {
     echo "\nAowow Setup\n";
@@ -39,7 +39,7 @@ if (!$opt || ((isset($opt['help']) || isset($opt['h'])) && (isset($opt['firstrun
     echo "--build                  : create server specific files\n";
     echo "--sync=<tabelList,>      : regenerate tables/files that depend on given world-table\n";
     echo "--update                 : apply new sql updates fetched from github\n";
-    echo "--firstrun               : goes through the nessecary hoops of the initial setup. Can be interrupted and --resume'd\n";
+    echo "--firstrun               : goes through the nessecary hoops of the initial setup.\n";
     echo "additional options\n";
     echo "--log logfile            : write ouput to file\n";
     echo "--locales=<regionCodes,> : limit setup to enUS, frFR, deDE, esES and/or ruRU (does not override config settings)\n";
@@ -57,9 +57,8 @@ $b   = [];
 switch ($cmd)                                               // we accept only one main parameter
 {
     case 'firstrun':
-    case 'resume':
         require_once 'setup/tools/clisetup/firstrun.func.php';
-        firstrun($cmd == 'resume');
+        firstrun();
 
         finish();
     case 'account':

@@ -11,7 +11,7 @@ if (!CLI)
 /* string setup steps together for first use */
 /*********************************************/
 
-function firstrun($resume)
+function firstrun()
 {
     require_once 'setup/tools/sqlGen.class.php';
     require_once 'setup/tools/fileGen.class.php';
@@ -191,34 +191,30 @@ function firstrun($resume)
     /********************/
 
     $startStep = 0;
-    if ($resume)
+    if (file_exists('cache/firstrun'))
     {
-        if (file_exists('cache/firstrun'))
-        {
-            $rows = file('cache/firstrun');
-            if ((int)$rows[0] == AOWOW_REVISION)
-                $startStep = (int)$rows[1];
-            else
-                CLISetup::log('firstrun info is outdated! Starting from scratch.', CLISetup::LOG_WARN);
-        }
+        $rows = file('cache/firstrun');
+        if ((int)$rows[0] == AOWOW_REVISION)
+            $startStep = (int)$rows[1];
+    }
 
-        if (!$startStep)
-        {
-            CLISetup::log('no usable info found.', CLISetup::LOG_WARN);
-            $inp = ['x' => ['start from scratch? (y/n)', true, '/y|n/i']];
-            if (!CLISetup::readInput($inp, true) || !$inp || strtolower($inp['x']) == 'n')
-            {
-                CLISetup::log();
-                return;
-            }
+    if ($startStep)
+    {
 
-            CLISetup::log();
+        CLISetup::log('Found firstrun progression info. (Halted on subscript '.($steps[$startStep][1] ?: $steps[$startStep][0]).')', CLISetup::LOG_INFO);
+        $inp = ['x' => ['continue setup? (y/n)', true, '/y|n/i']];
+        $msg = '';
+        if (!CLISetup::readInput($inp, true) || !$inp || strtolower($inp['x']) == 'n')
+        {
+            $msg = 'Starting setup from scratch...';
+            $startStep = 0;
         }
         else
-        {
-            CLISetup::log('Resuming setup from step '.$startStep);
-            sleep(1);
-        }
+            $msg = 'Resuming setup from step '.$startStep.'...';
+
+        CLISetup::log();
+        CLISetup::log($msg);
+        sleep(1);
     }
 
     /*******/
@@ -270,16 +266,15 @@ function firstrun($resume)
             $inp = ['x' => ['['.CLISetup::bold('c').']ontinue anyway? ['.CLISetup::bold('r').']etry? ['.CLISetup::bold('a').']bort?', true, '/c|r|a/i']];
             if (CLISetup::readInput($inp, true) && $inp)
             {
+                CLISetup::log();
                 switch(strtolower($inp['x']))
                 {
                     case 'c':
                         $saveProgress($idx);
                         break 2;
                     case 'r':
-                        CLISetup::log();
                         break;
                     case 'a':
-                        CLISetup::log();
                         return;
                 }
             }
