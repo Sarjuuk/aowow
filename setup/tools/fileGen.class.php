@@ -40,7 +40,7 @@ class FileGen
         'statistics'  => [null, ['player_levelstats', 'player_classlevelstats']],
         'simpleImg'   => [null, null],
         'complexImg'  => [null, null],
-        'talents'     => [null, null],
+        'talentCalc'  => [null, null],
         'pets'        => [['spawns', 'creature'], null],
         'talentIcons' => [null, null],
         'glyphs'      => [['items', 'spell'], null],

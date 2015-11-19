@@ -28,7 +28,7 @@ if (!CLI)
     // this script requires the following dbc-files to be available
     $reqDBC = ['talenttab', 'talent', 'spell', 'creaturefamily', 'spellicon'];
 
-    function talents()
+    function talentCalc()
     {
         $success   = true;
         $buildTree = function ($class) use (&$petFamIcons, &$tSpells)
