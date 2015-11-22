@@ -107,7 +107,7 @@ function spawns()                                           // and waypoints
                  ' - assembling waypoints from '.CLISetup::bold('waypoints')];
 
     $query[5] = ['SELECT c.guid, -w.id AS "npcOrPath", w.point, c.zoneId AS areaId, c.map, w.delay AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
-                 'FROM creature c JOIN creature_addon ca ON ca.guid = c.guid JOIN waypoint_data w ON w.id = ca.path_id',
+                 'FROM creature c JOIN creature_addon ca ON ca.guid = c.guid JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.path_id <> 0',
                  ' - assembling waypoints from '.CLISetup::bold('waypoint_data')];
 
     $queryPost = 'SELECT dm.Id, wma.areaId, IFNULL(dm.floor, 0) AS floor, ' .

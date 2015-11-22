@@ -85,7 +85,7 @@ function firstrun()
         ['FileGen::generate', 'realms',                   null, null, null],
         ['FileGen::generate', 'statistics',               null, null, null],
         ['FileGen::generate', 'simpleImg',                null, null, null],
-        ['FileGen::generate', 'talents',                  null, null, null],
+        ['FileGen::generate', 'talentCalc',               null, null, null],
         ['FileGen::generate', 'pets',                     null, null, null],
         ['FileGen::generate', 'talentIcons',              null, null, null],
         ['FileGen::generate', 'glyphs',                   null, null, null],
