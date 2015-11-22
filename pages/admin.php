@@ -339,28 +339,47 @@ class AdminPage extends GenericPage
         // eof (end of fuckup)
 
         $head = '<table class="grid"><tr><th><b>Key</b></th><th><b>Value</b></th><th style="width:150px;"><b>Options</b></th></tr>';
-
-        foreach (Util::$configCats as $id => $catName)
-        if ($rows = DB::Aowow()->select('SELECT * FROM ?_config WHERE cat = ?d ORDER BY `flags`DESC, `key` ASC', $id))
+        $mainTab = [];
+        $miscTab = [];
+        foreach (Util::$configCats as $idx => $catName)
         {
-            $buff = $head;
-            foreach ($rows as $r)
-                $buff .= $this->configAddRow($r);
+            if ($rows = DB::Aowow()->select('SELECT * FROM ?_config WHERE cat = ?d ORDER BY `flags` DESC, `key` ASC', $idx))
+            {
+                $buff = $head;
+                foreach ($rows as $r)
+                    $buff .= $this->configAddRow($r);
 
-            if ($id == 5)                                   //cat: misc
-                $buff .= '<tr><td colspan="3"><a class="icon-add" onclick="cfg_add(this)">new configuration</a></td></tr>';
+                if (!$idx)                                  //cat: misc
+                    $buff .= '<tr><td colspan="3"><a class="icon-add" onclick="cfg_add(this)">new configuration</a></td></tr>';
 
-            $buff .= '</table>';
+                $buff .= '</table>';
 
+                if ($idx)
+                    $mainTab[$catName] = $buff;
+                else
+                    $miscTab[$catName] = $buff;
+            }
+        }
+
+        foreach ($mainTab as $n => $t)
             $this->lvTabs[] = array(
                 'file'   => null,
-                'data'   => $buff,
+                'data'   => $t,
                 'params' => array(
-                    'name' => $catName,
-                    'id'   => Util::urlize($catName)
+                    'name' => $n,
+                    'id'   => Util::urlize($n)
                 )
             );
-        }
+
+        foreach ($miscTab as $n => $t)
+            $this->lvTabs[] = array(
+                'file'   => null,
+                'data'   => $t,
+                'params' => array(
+                    'name' => $n,
+                    'id'   => Util::urlize($n)
+                )
+            );
     }
 
     private function handlePhpInfo()

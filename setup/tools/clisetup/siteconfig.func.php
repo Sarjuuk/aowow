@@ -30,9 +30,16 @@ function siteconfig()
         $sumNum   = 0;
         $cfgList  = [];
         $hasEmpty = false;
+        $mainBuff = [];
+        $miscBuff = [];                                     // catg 'misc' should come last
+
         foreach (Util::$configCats as $idx => $cat)
         {
-            CLISetup::log('=====  '.$cat.'  =====');
+            if ($idx)
+                $mainBuff[] = '=====  '.$cat.'  =====';
+            else
+                $miscBuff[] = '=====  '.$cat.'  =====';
+
             $results  = DB::Aowow()->select('SELECT *, (flags & ?d) AS php FROM ?_config WHERE `cat` = ?d ORDER BY `key` ASC', CON_FLAG_PHP, $idx);
 
             foreach ($results as $num => $data)
@@ -79,11 +86,21 @@ function siteconfig()
                         $buff .= "[int]  ".intVal($data['value']);
                 }
 
-                CLISetup::log($buff);
+                if ($idx)
+                    $mainBuff[] = $buff;
+                else
+                    $miscBuff[] = $buff;
+
             }
 
             $sumNum += count($results);
         }
+
+        foreach ($mainBuff as $b)
+            CLISetup::log($b);
+
+        foreach ($miscBuff as $b)
+            CLISetup::log($b);
 
         CLISetup::log(str_pad("[".CLISetup::bold($sumNum)."]", 21)."add another php configuration");
 

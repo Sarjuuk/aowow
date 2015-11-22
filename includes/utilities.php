@@ -695,7 +695,7 @@ class Util
     );
 
     public static $configCats               = array(
-        'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Other', 'Google Analytics'
+        'Other', 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics'
     );
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
