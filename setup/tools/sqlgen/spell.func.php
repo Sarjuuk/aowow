@@ -473,10 +473,18 @@ function spell()
         SPELL_CU_TRIGGERED);
 
     // altIcons and quality for craftSpells
-    $items = DB::Aowow()->selectCol('SELECT Id AS ARRAY_KEY, effect1CreateItemId FROM dbc_spell WHERE effect1CreateItemId > 0 AND effect1Id <> 53');    // no enchant-spells!
-    $info  = DB::World()->select('SELECT entry AS ARRAY_KEY, displayId AS d, Quality AS q FROM item_template WHERE entry IN (?a)', $items);
-    foreach ($info as $id => $data)
-        DB::Aowow()->query('UPDATE ?_spell SET iconIdAlt = ?d, cuFlags = cuFlags | ?d WHERE effect1CreateItemId = ?', -$data['d'], ((7 - $data['q']) << 8), $id);
+    $itemSpells = DB::Aowow()->selectCol('
+        SELECT    s.Id AS ARRAY_KEY, effect1CreateItemId
+        FROM      dbc_spell s
+        LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
+        LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
+        LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
+        WHERE     effect1CreateItemId > 0 AND effect1Id <> 53 AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL
+    ');                                                     // no enchant-spells & no talents!
+    $itemInfo   = DB::World()->select('SELECT entry AS ARRAY_KEY, displayId AS d, Quality AS q FROM item_template WHERE entry IN (?a)', $itemSpells);
+    foreach ($itemSpells as $sId => $itemId)
+        if (isset($itemInfo[$itemId]))
+            DB::Aowow()->query('UPDATE ?_spell SET iconIdAlt = ?d, cuFlags = cuFlags | ?d WHERE id = ?d', -$itemInfo[$itemId]['d'], ((7 - $itemInfo[$itemId]['q']) << 8), $sId);
 
     // apply specializations [trainerTemplate => reqSpell]
     $specs = array(
