@@ -11,15 +11,15 @@ class AjaxComment extends AjaxHandler
     const REPLY_LENGTH_MAX   = 600;
 
     protected $_post = array(
-        'id'          => [FILTER_CALLBACK,                    ['options' => 'AjaxComment::checkId']],
-        'body'        => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES],
-        'commentbody' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES],
-        'response'    => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES],
-        'reason'      => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES],
-        'remove'      => [FILTER_SANITIZE_NUMBER_INT,         null],
-        'commentId'   => [FILTER_SANITIZE_NUMBER_INT,         null],
-        'replyId'     => [FILTER_SANITIZE_NUMBER_INT,         null],
-     // 'username'    => [FILTER_SANITIZE_STRING,            0xC] // FILTER_FLAG_STRIP_LOW | *_HIGH
+        'id'          => [FILTER_CALLBACK,            ['options' => 'AjaxComment::checkId']],
+        'body'        => [FILTER_UNSAFE_RAW,          null],// escaped by json_encode
+        'commentbody' => [FILTER_UNSAFE_RAW,          null],// escaped by json_encode
+        'response'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
+        'reason'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
+        'remove'      => [FILTER_SANITIZE_NUMBER_INT, null],
+        'commentId'   => [FILTER_SANITIZE_NUMBER_INT, null],
+        'replyId'     => [FILTER_SANITIZE_NUMBER_INT, null],
+     // 'username'    => [FILTER_SANITIZE_STRING,     0xC]  // FILTER_FLAG_STRIP_LOW | *_HIGH
     );
 
     protected $_get  = array(
