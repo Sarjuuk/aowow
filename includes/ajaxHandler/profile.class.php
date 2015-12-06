@@ -304,7 +304,7 @@ class AjaxProfile extends AjaxHandler
     {
         // expecting id-list
         if (preg_match('/\d+(,\d+)*/', $val))
-            return array_map('intVal', explode(', ', $val));
+            return array_map('intVal', explode(',', $val));
 
         return null;
     }

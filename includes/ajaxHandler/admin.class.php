@@ -172,6 +172,9 @@ class AjaxAdmin extends AjaxHandler
         if (!$this->_get['id'])
             return '';
 
+        // approve soon to be sticky screenshots
+        $this->ssApprove();
+
         // this one is a bit strange: as far as i've seen, the only thing a 'sticky' screenshot does is show up in the infobox
         // this also means, that only one screenshot per page should be sticky
         // so, handle it one by one and the last one affecting one particular type/typId-key gets the cake
@@ -179,9 +182,6 @@ class AjaxAdmin extends AjaxHandler
         {
             // reset all others
             DB::Aowow()->query('UPDATE ?_screenshots a, ?_screenshots b SET a.status = a.status & ~?d WHERE a.type = b.type AND a.typeId = b.typeId AND a.id <> b.id AND b.id = ?d', CC_FLAG_STICKY, $id);
-
-            // approve this one (if not already)
-            $this->ssApprove([$id]);
 
             // toggle sticky status
             DB::Aowow()->query('UPDATE ?_screenshots SET `status` = IF(`status` & ?d, `status` & ~?d, `status` | ?d) WHERE id = ?d AND `status` & ?d', CC_FLAG_STICKY, CC_FLAG_STICKY, CC_FLAG_STICKY, $id, CC_FLAG_APPROVED);
@@ -312,7 +312,7 @@ class AjaxAdmin extends AjaxHandler
         if ($this->params[0] == 'screenshots')
         {
             if (preg_match('/\d+(,\d+)*/', $val))
-                return array_map('intVal', explode(', ', $val));
+                return array_map('intVal', explode(',', $val));
 
             return null;
         }
