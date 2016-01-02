@@ -30,7 +30,7 @@ if (!CLI)
         // Id < 36'000 || ilevel < 70 ? BC : WOTLK
         $gems   = DB::Aowow()->Select(
            'SELECT    i.id AS itemId,
-                      i.name_loc0, i.name_loc2, i.name_loc3, i.name_loc6, i.name_loc8,
+                      i.name_loc0, i.name_loc2, i.name_loc3, i.name_loc4, i.name_loc6, i.name_loc8,
                       IF (i.id < 36000 OR i.itemLevel < 70, 1 , 2) AS expansion,
                       i.quality,
                       ic.iconString AS icon,
