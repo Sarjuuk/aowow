@@ -2650,7 +2650,7 @@ var LANG = {
     lvpage_next:     "Siguiente ",
     lvpage_last:     "Última ",
 
-    lvsearchresults: "Buscar en resultados",
+    lvsearchresults:          "Buscar en resultados",
     lvsearchdisplayedresults: "Buscar en los resultados mostrados",
 
     lvscreenshot_submit: "Envia una captura de pantalla",

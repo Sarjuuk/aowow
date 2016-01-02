@@ -44,9 +44,9 @@ function achievement(array $ids = [])
                 a.refAchievement,
                 0,
                 0,
-                a.name_loc0,        a.name_loc2,        a.name_loc3,        a.name_loc6,        a.name_loc8,
-                a.description_loc0, a.description_loc2, a.description_loc3, a.description_loc6, a.description_loc8,
-                a.reward_loc0,      a.reward_loc2,      a.reward_loc3,      a.reward_loc6,      a.reward_loc8
+                a.name_loc0,        a.name_loc2,        a.name_loc3,        a.name_loc4,        a.name_loc6,        a.name_loc8,
+                a.description_loc0, a.description_loc2, a.description_loc3, a.description_loc4, a.description_loc6, a.description_loc8,
+                a.reward_loc0,      a.reward_loc2,      a.reward_loc3,      a.reward_loc4,      a.reward_loc6,      a.reward_loc8
             FROM
                 dbc_achievement a
             LEFT JOIN
@@ -63,9 +63,9 @@ function achievement(array $ids = [])
         $ids ?: DBSIMPLE_SKIP
     );
     foreach ($serverAchievements as $sa)
-        DB::Aowow()->query('REPLACE INTO ?_achievement (id, faction, map, points, flags, reqCriteriaCount, refAchievement, cuFlags, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8) VALUES (?d, ?d, ?d, ?d, ?d, ?d, ?d, ?d, ?, ?, ?, ?, ?)',
+        DB::Aowow()->query('REPLACE INTO ?_achievement (id, faction, map, points, flags, reqCriteriaCount, refAchievement, cuFlags, name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8) VALUES (?d, ?d, ?d, ?d, ?d, ?d, ?d, ?d, ?, ?, ?, ?, ?, ?)',
             $sa['ID'], $sa['faction'], $sa['mapID'], $sa['points'], $sa['flags'], $sa['count'], $sa['refAchievement'], CUSTOM_SERVERSIDE,
-            'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID']
+            'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID']
         );
 
     if ($ids)

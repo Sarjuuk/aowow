@@ -32,7 +32,7 @@ function currencies(array $ids = [])
     $moneyItems = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, itemId FROM dbc_currencytypes{ WHERE id IN (?a)}', $ids ?: DBSIMPLE_SKIP);
 
     // apply names & cap
-    $moneyNames = DB::World()->select('SELECT it.entry AS ARRAY_KEY, name AS name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, it.maxCount AS cap FROM item_template it LEFT JOIN locales_item li ON li.entry = it.entry WHERE it.entry IN (?a)', $moneyItems);
+    $moneyNames = DB::World()->select('SELECT it.entry AS ARRAY_KEY, name AS name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8, it.maxCount AS cap FROM item_template it LEFT JOIN locales_item li ON li.entry = it.entry WHERE it.entry IN (?a)', $moneyItems);
     foreach ($moneyItems as $cId => $itemId)
     {
         if (!empty($moneyNames[$itemId]))
