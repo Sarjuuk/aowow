@@ -54,7 +54,7 @@ class AjaxAccount extends AjaxHandler
             {
                 $res = DB::Aowow()->selectRow('SELECT MAX(id) AS max, count(id) AS num FROM ?_account_weightscales WHERE userId = ?d', User::$id);
                 if ($res['num'] < 5)            // more or less hard-defined in LANG.message_weightscalesaveerror
-                    $this->post['id'] = ++$res['max'];
+                    $this->_post['id'] = ++$res['max'];
                 else
                     return 0;
             }

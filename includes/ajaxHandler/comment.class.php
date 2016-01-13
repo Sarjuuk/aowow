@@ -26,6 +26,7 @@ class AjaxComment extends AjaxHandler
         'id'     => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkInt']],
         'type'   => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkInt']],
         'typeid' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkInt']],
+        'rating' => [FILTER_SANITIZE_NUMBER_INT, null]
     );
 
     public function __construct(array $params)

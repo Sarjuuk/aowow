@@ -26,7 +26,6 @@ $reqDBC = ['itemset'];
 
 function itemset()
 {
-    $locales      = [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU];
     $setToHoliday = array (
         761 => 141,                                             // Winterveil
         762 => 372,                                             // Brewfest
@@ -285,7 +284,7 @@ function itemset()
         /* get name & description */
         /**************************/
 
-        foreach ($locales as $loc)
+        foreach (array_keys(array_filter(Util::$localeStrings)) as $loc)
         {
             User::useLocale($loc);
 

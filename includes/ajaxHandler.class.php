@@ -42,8 +42,8 @@ class AjaxHandler
                 return false;
         }
 
-        $h = $this->handler;
-        $out = $this->$h();
+        $h   = $this->handler;
+        $out = (string)$this->$h();
 
         return true;
     }
@@ -55,7 +55,7 @@ class AjaxHandler
 
     protected function checkLocale($val)
     {
-        if (preg_match('/^'.implode('|', [LOCALE_EN, LOCALE_FR, LOCALE_DE, LOCALE_ES, LOCALE_RU]).'$/', $val))
+        if (preg_match('/^'.implode('|', array_keys(array_filter(Util::$localeStrings))).'$/', $val))
             return intVal($val);
 
         return null;

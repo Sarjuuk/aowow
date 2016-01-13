@@ -1329,7 +1329,7 @@ class ItemList extends BaseType
             if ($interactive)
                 $js = '&nbsp;<small>('.sprintf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</small>';
             else
-                $js = "&nbsp;<small>(".Util::setRatingLevel($level, $type, $value).")</small>";
+                $js = '&nbsp;<small>('.Util::setRatingLevel($level, $type, $value).')</small>';
 
             return Lang::item('trigger', 1).str_replace('%d', '<!--rtg'.$type.'-->'.$value.$js, Lang::item('statType', $type));
         }
