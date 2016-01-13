@@ -23,7 +23,7 @@ class ItemList extends BaseType
     private       $vendors    = [];
     private       $jsGlobals  = [];                         // getExtendedCost creates some and has no access to template
 
-    protected     $queryBase  = 'SELECT i.*, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
+    protected     $queryBase  = 'SELECT i.*, i.block AS tplBlock, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
     protected     $queryOpts  = array(                      // 3 => TYPE_ITEM
                       'i'   => [['is', 'src', 'ic'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
                       'ic'  => ['j' => ['?_icons      `ic`  ON `ic`.`id` = -`i`.`displayId`', true], 's' => ', ic.iconString'],
@@ -642,9 +642,9 @@ class ItemList extends BaseType
         else if (($this->curTpl['armor'] + $this->curTpl['armorDamageModifier']) > 0)
             $x .= '<span><!--amr-->'.sprintf(Lang::item('armor'), intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])).'</span><br />';
 
-        // Block
-        if ($this->curTpl['block'])
-            $x .= '<span>'.sprintf(Lang::item('block'), $this->curTpl['block']).'</span><br />';
+        // Block (note: block value from field block and from field stats or parsed from itemSpells are displayed independently)
+        if ($this->curTpl['tplBlock'])
+            $x .= '<span>'.sprintf(Lang::item('block'), $this->curTpl['tplBlock']).'</span><br />';
 
         // Item is a gem (don't mix with sockets)
         if ($geId = $this->curTpl['gemEnchantmentId'])

@@ -1054,8 +1054,8 @@ class ItemPage extends genericPage
             $this->subject->extendJsonStats();
 
             // json
-            $fields = ["classs", "displayid", "dps", "id", "level", "name", "reqlevel", "slot", "slotbak", "source", "sourcemore", "speed", "subclass"];
-            $json   = '';
+            $fields = ['classs', 'displayid', 'dps', 'id', 'level', 'name', 'reqlevel', 'slot', 'slotbak', 'source', 'sourcemore', 'speed', 'subclass'];
+            $json   = [];
             foreach ($fields as $f)
             {
                 if (isset($this->subject->json[$this->subject->id][$f]))
@@ -1064,33 +1064,33 @@ class ItemPage extends genericPage
                     if ($f == 'name')
                         $_ = (7 - $this->subject->getField('quality')).$_;
 
-                    $json .= ',"'.$f.'":'.$_;
+                    $json[$f] = $_;
                 }
             }
-            $xml->addChild('json')->addCData(substr($json, 1));
+            $xml->addChild('json')->addCData(substr(json_encode($json), 1, -1));
 
             // jsonEquip missing: avgbuyout, cooldown, source, sourcemore
-            $json = '';
+            $json = [];
             if ($_ = $this->subject->getField('sellPrice'))          // sellprice
-                $json .= ',"sellprice":'.$_;
+                $json['sellprice'] = $_;
 
             if ($_ = $this->subject->getField('requiredLevel'))      // reqlevel
-                $json .= ',"reqlevel":'.$_;
+                $json['reqlevel'] = $_;
 
             if ($_ = $this->subject->getField('requiredSkill'))      // reqskill
-                $json .= ',"reqskill":'.$_;
+                $json['reqskill'] = $_;
 
             if ($_ = $this->subject->getField('requiredSkillRank'))  // reqskillrank
-                $json .= ',"reqskillrank":'.$_;
+                $json['reqskillrank'] = $_;
 
             foreach ($this->subject->itemMods[$this->subject->id] as $mod => $qty)
-                $json .= ',"'.$mod.'":'.$qty;
+                $json[$mod] = $qty;
 
-            foreach ($_ = $this->subject->json[$this->subject->id] as $name => $qty)
+            foreach ($this->subject->json[$this->subject->id] as $name => $qty)
                 if (in_array($name, Util::$itemFilter))
-                    $json .= ',"'.$name.'":'.$qty;
+                    $json[$name] = $qty;
 
-            $xml->addChild('jsonEquip')->addCData(substr($json, 1));
+            $xml->addChild('jsonEquip')->addCData(substr(json_encode($json), 1, -1));
 
             // jsonUse
             if ($onUse = $this->subject->getOnUseStats())

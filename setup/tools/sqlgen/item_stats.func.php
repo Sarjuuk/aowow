@@ -49,6 +49,10 @@ class ItemStatSetup extends ItemList
         {
             $this->itemMods[$this->id] = [];
 
+            // also occurs as seperate field (gets summed in calculation but not in tooltip)
+            if ($_ = $this->getField('block'))
+                $this->itemMods[$this->id][ITEM_MOD_BLOCK_VALUE] = $_;
+
             // convert itemMods to stats
             for ($h = 1; $h <= 10; $h++)
             {
