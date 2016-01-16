@@ -146,7 +146,7 @@ function dbconfig()
             else
             {
                 CLISetup::log();
-                CLISetup::log("db setup aborted", CLISetup::LOG_INFO);
+                CLISetup::log("leaving db setup...", CLISetup::LOG_INFO);
                 break 2;
             }
         }

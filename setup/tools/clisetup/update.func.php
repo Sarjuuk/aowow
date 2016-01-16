@@ -13,7 +13,7 @@ if (!CLI)
 
 function update()
 {
-    list($date, $part, $sql, $build) = array_values(DB::Aowow()->selectRow('SELECT `date`, `part`, `sql`, `build` FROM ?_dbversion'));
+    list($date, $part) = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ?_dbversion'));
 
     CLISetup::log('checking sql updates');
 
@@ -56,8 +56,19 @@ function update()
 
     CLISetup::log($nFiles ? 'applied '.$nFiles.' update(s)' : 'db is already up to date', CLISetup::LOG_OK);
 
-    $sql   = trim($sql)   ? explode(' ', trim($sql))   : [];
-    $build = trim($build) ? explode(' ', trim($build)) : [];
+    // fetch sql/build after applying updates, as they may contain sync-prompts
+    list($sql, $build) = array_values(DB::Aowow()->selectRow('SELECT `sql`, `build` FROM ?_dbversion'));
+
+    sleep(1);
+
+    $sql   = array_unique(explode(' ', trim($sql)));
+    $build = array_unique(explode(' ', trim($build)));
+
+    if ($sql)
+        CLISetup::log('The following table(s) require syncing: '.implode(', ', $sql));
+
+    if ($build)
+        CLISetup::log('The following file(s) require syncing: '.implode(', ', $build));
 
     return [$sql, $build];
 }
