@@ -382,7 +382,7 @@ class User
     {
         $errCode = 0;
 
-        if (strlen($pass) < 6 || strlen($pass) > 16)
+        if (mb_strlen($pass) < 6)
             $errCode = 1;
      // else if (preg_match('/[^\w\d!"#\$%]/', $pass))    // such things exist..? :o
          // $errCode = 2;
