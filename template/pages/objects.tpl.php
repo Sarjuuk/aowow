@@ -19,8 +19,7 @@ $this->brick('pageTemplate', ['fi' => empty($f['query']) ? null : ['query' => $f
                         <tr><td><?php echo Util::ucFirst(Lang::main('name')).Lang::main('colon'); ?></td><td>&nbsp;<input type="text" name="na" size="30" <?php echo isset($f['na']) ? 'value="'.Util::htmlEscape($f['na']).'" ' : null; ?>/></td></tr>
                     </table>
 
-                    <div id="fi_criteria" class="padded criteria"><div></div></div>
-                    <div><a href="javascript:;" id="fi_addcriteria" onclick="fi_addCriterion(this); return false"><?php echo Lang::main('addFilter'); ?></a></div>
+                    <div id="fi_criteria" class="padded criteria"><div></div></div><div><a href="javascript:;" id="fi_addcriteria" onclick="fi_addCriterion(this); return false"><?php echo Lang::main('addFilter'); ?></a></div>
 
                     <div class="padded2 clear">
                         <div style="float: right"><?php echo Lang::main('refineSearch'); ?></div>
