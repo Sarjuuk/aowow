@@ -426,13 +426,15 @@ class DBC
             return false;
         }
 
+        // l -   signed long (always 32 bit, machine byte order)
+        // V - unsigned long (always 32 bit, little endian byte order)
         $unpackStr = '';
         $unpackFmt = array(
             'x' => 'x/x/x/x',
             'X' => 'x',
             's' => 'V',
             'f' => 'f',
-            'i' => 'V',                                     // maybe use 'l' [signed long; 32bit; machine dependent byte order]
+            'i' => 'l',                                     // not sure if 'l' or 'V' should be used here
             'u' => 'V',
             'b' => 'C',
             'd' => 'x4',
@@ -504,18 +506,12 @@ class DBC
 
                         $row[] = &$strings[$val];
                         continue 2;
-                    case 'i':
-                        if ($rec['f'.$j] & 0x80000000)      // i suspect this will not work on 32bit machines
-                            $row[] = $rec['f'.$j] - 0x100000000;
-                        else
-                            $row[] = $rec['f'.$j];
-                        break;
                     case 'f':
                         $row[] = round($rec['f'.$j], 8);
                         break;
                     case 'n':                               // DO NOT BREAK!
                         $idx = $rec['f'.$j];
-                    default:                                // nothing special .. 'u' and the likes
+                    default:                                // nothing special .. 'i', 'u' and the likes
                         $row[] = $rec['f'.$j];
                 }
             }
