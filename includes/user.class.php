@@ -382,7 +382,8 @@ class User
     {
         $errCode = 0;
 
-        if (mb_strlen($pass) < 6)
+        // only enforce for own passwords
+        if (mb_strlen($pass) < 6 && CFG_ACC_AUTH_MODE == AUTH_MODE_SELF)
             $errCode = 1;
      // else if (preg_match('/[^\w\d!"#\$%]/', $pass))    // such things exist..? :o
          // $errCode = 2;
