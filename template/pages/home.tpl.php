@@ -68,10 +68,11 @@ endif;
 
     <div class="footer">
         <div class="footer-links linklist">
-            <a href="?aboutus"><?=Lang::main('aboutUs'); ?></a>|
-            <a href="#" id="footer-links-language"><?=Lang::main('language'); ?></a>
+            <a href="?aboutus"><?=Lang::main('aboutUs'); ?></a>|<a href="#" id="footer-links-language"><?=Lang::main('language'); ?></a>
         </div>
-        <div class="footer-copy">&#12484; 2015 Aowow</div>
+        <div class="footer-copy">
+            &#12484; 2016 Aowow<br />rev. <?=AOWOW_REVISION; ?>
+        </div>
     </div>
 
 <?php $this->brick('pageTemplate'); ?>
