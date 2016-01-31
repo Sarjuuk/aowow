@@ -9,6 +9,7 @@ class AjaxAdmin extends AjaxHandler
     protected $_get        = array(
         'action' => [FILTER_SANITIZE_STRING,     0xC],          // FILTER_FLAG_STRIP_LOW | *_HIGH
         'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkId']],
+        'key'    => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkKey']],
         'all'    => [FILTER_UNSAFE_RAW,          null],
         'type'   => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']],
         'typeid' => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']],
@@ -248,7 +249,7 @@ class AjaxAdmin extends AjaxHandler
 
     protected function confAdd()
     {
-        $key = $this->_get['id'];
+        $key = $this->_get['key'];
         $val = $this->_get['val'];
 
         if ($key === null)
@@ -269,10 +270,10 @@ class AjaxAdmin extends AjaxHandler
 
     protected function confRemove()
     {
-        if (!$this->_get['id'])
+        if (!$this->_get['key'])
             return 'invalid configuration option given';
 
-        if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $this->_get['id'], CON_FLAG_PERSISTENT))
+        if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $this->_get['key'], CON_FLAG_PERSISTENT))
             return '';
         else
             return 'option name is either protected or was not found';
@@ -280,7 +281,7 @@ class AjaxAdmin extends AjaxHandler
 
     protected function confUpdate()
     {
-        $key = trim($this->_get['id']);
+        $key = trim($this->_get['key']);
         $val = trim($this->_get['val']);
 
         if (!strlen($key))
@@ -305,28 +306,20 @@ class AjaxAdmin extends AjaxHandler
 
     protected function checkId($val)
     {
-        if (!$this->params)
-            return null;
-
         // expecting id-list
-        if ($this->params[0] == 'screenshots')
-        {
-            if (preg_match('/\d+(,\d+)*/', $val))
-                return array_map('intVal', explode(',', $val));
-
-            return null;
-        }
-
-        // expecting string
-        if ($this->params[0] == 'siteconfig')
-        {
-            if (preg_match('/[^a-z0-9_\.\-]/i', $val))
-                return '';
-
-            return strtolower($val);
-        }
+        if (preg_match('/\d+(,\d+)*/', $val))
+            return array_map('intVal', explode(',', $val));
 
         return null;
+    }
+
+    protected function checkKey($val)
+    {
+        // expecting string
+        if (preg_match('/[^a-z0-9_\.\-]/i', $val))
+            return '';
+
+        return strtolower($val);
     }
 
     protected function checkUser($val)

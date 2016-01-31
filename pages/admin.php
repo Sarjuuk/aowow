@@ -172,7 +172,7 @@ class AdminPage extends GenericPage
 
         $(_status).append(CreateAjaxLoader());
 
-        new Ajax('?admin=siteconfig&action=add&id=' + key + '&val=' + value, {
+        new Ajax('?admin=siteconfig&action=add&key=' + key + '&val=' + value, {
             method: 'get',
             onSuccess: function(xhr) {
                 $WH.ee(_status);
@@ -273,7 +273,7 @@ class AdminPage extends GenericPage
 
         $(_status).append(CreateAjaxLoader());
 
-        new Ajax('?admin=siteconfig&action=update&id=' + id + '&val=' + value, {
+        new Ajax('?admin=siteconfig&action=update&key=' + id + '&val=' + value, {
             method: 'get',
             onSuccess: function(xhr) {
                 $WH.ee(_status);
@@ -319,7 +319,7 @@ class AdminPage extends GenericPage
 
         $(_status).append(CreateAjaxLoader());
 
-        new Ajax('?admin=siteconfig&action=remove&id=' + id, {
+        new Ajax('?admin=siteconfig&action=remove&key=' + id, {
             method: 'get',
             onSuccess: function(xhr) {
                 if (!xhr.responseText)
