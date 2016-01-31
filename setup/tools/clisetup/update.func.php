@@ -61,8 +61,8 @@ function update()
 
     sleep(1);
 
-    $sql   = array_unique(explode(' ', trim($sql)));
-    $build = array_unique(explode(' ', trim($build)));
+    $sql   = trim($sql)   ? array_unique(explode(' ', trim($sql)))   : [];
+    $build = trim($build) ? array_unique(explode(' ', trim($build))) : [];
 
     if ($sql)
         CLISetup::log('The following table(s) require syncing: '.implode(', ', $sql));
