@@ -1211,10 +1211,10 @@ class SpellPage extends GenericPage
         die($tt);
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Lang::game('spell'), Lang::spell('notFound'));
+            return parent::notFound($title ?: Lang::game('spell'), $msg ?: Lang::spell('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

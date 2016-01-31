@@ -122,10 +122,10 @@ class ProfilePage extends GenericPage
         die($this->generateTooltip());
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Util::ucFirst(Lang::game('profile')), '[NNF]profile or char doesn\'t exist');
+            return parent::notFound($title ?: Util::ucFirst(Lang::game('profile')), $msg ?: '[NNF]profile or char doesn\'t exist');
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

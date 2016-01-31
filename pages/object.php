@@ -498,10 +498,10 @@ class ObjectPage extends GenericPage
         die($tt);
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Lang::game('object'), Lang::gameObject('notFound'));
+            return parent::notFound($title ?: Lang::game('object'), $msg ?: Lang::gameObject('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

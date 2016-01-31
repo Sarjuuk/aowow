@@ -1182,7 +1182,7 @@ class ItemPage extends genericPage
             return parent::display($override);
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode == CACHE_TYPE_TOOLTIP)
         {
@@ -1197,7 +1197,7 @@ class ItemPage extends genericPage
             exit();
         }
         else
-            return parent::notFound(Lang::game('item'), Lang::item('notFound'));
+            return parent::notFound($title ?: Lang::game('item'), $msg ?: Lang::item('notFound'));
     }
 }
 

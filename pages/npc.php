@@ -817,10 +817,10 @@ class NpcPage extends GenericPage
         die($tt);
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Lang::game('npc'), Lang::npc('notFound'));
+            return parent::notFound($title ?: Lang::game('npc'), $msg ?: Lang::npc('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

@@ -210,7 +210,7 @@ class FileGen
                     // check for required auxiliary DBC files
                     foreach ($reqDBC as $req)
                         if (!CLISetup::loadDBC($req))
-                            continue 2;
+                            continue;
 
                     // must generate content
                     // PH format: /*setup:<setupFunc>*/

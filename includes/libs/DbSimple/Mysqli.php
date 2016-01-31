@@ -30,7 +30,7 @@ class DbSimple_Mysqli extends DbSimple_Database
      * constructor(string $dsn)
      * Connect to MySQL server.
      */
-    function DbSimple_Mysqli($dsn)
+    function __construct($dsn)
     {
 
         if (!is_callable("mysqli_connect"))
@@ -178,7 +178,7 @@ class DbSimple_Mysqli extends DbSimple_Database
     protected function _performFetch($result)
     {
         $row = mysqli_fetch_assoc($result);
-        if (mysql_error()) return $this->_setDbError($this->_lastQuery);
+        if (mysqli_error($this->link)) return $this->_setDbError($this->_lastQuery);
         if ($row === false) return null;
         return $row;
     }

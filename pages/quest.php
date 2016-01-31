@@ -696,10 +696,10 @@ class QuestPage extends GenericPage
         die($tt);
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Lang::game('quest'), Lang::quest('notFound'));
+            return parent::notFound($title ?: Lang::game('quest'), $msg ?: Lang::quest('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

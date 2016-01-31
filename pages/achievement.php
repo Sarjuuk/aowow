@@ -466,10 +466,10 @@ class AchievementPage extends GenericPage
         die($tt);
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Lang::game('achievement'), Lang::achievement('notFound'));
+            return parent::notFound($title ?: Lang::game('achievement'), $msg ?: Lang::achievement('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

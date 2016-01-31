@@ -29,7 +29,7 @@ class CurrencyPage extends GenericPage
 
         $this->subject = new CurrencyList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('currency'), Lang::currency('notFound'));
+            $this->notFound();
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -259,10 +259,10 @@ class CurrencyPage extends GenericPage
         die($tt);
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Lang::game('currency'), Lang::currency('notFound'));
+            return parent::notFound($title ?: Lang::game('currency'), $msg ?: Lang::currency('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

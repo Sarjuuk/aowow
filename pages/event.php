@@ -32,7 +32,7 @@ class EventPage extends GenericPage
 
         $this->subject = new WorldEventList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('event'), Lang::event('notFound'));
+            $this->notFound();
 
         $this->hId   = $this->subject->getField('holidayId');
         $this->eId   = $this->typeId;
@@ -358,10 +358,10 @@ class EventPage extends GenericPage
         die(sprintf($tt, $start, $end));
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Lang::game('event'), Lang::event('notFound'));
+            return parent::notFound($title ?: Lang::game('event'), $msg ?: Lang::event('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

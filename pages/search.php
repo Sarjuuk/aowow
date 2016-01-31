@@ -196,7 +196,7 @@ class SearchPage extends GenericPage
         $this->performSearch();
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->searchMask & SEARCH_TYPE_REGULAR)
         {

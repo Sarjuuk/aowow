@@ -33,7 +33,7 @@ class ItemsetPage extends GenericPage
 
         $this->subject = new ItemsetList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('itemset'), Lang::itemset('notFound'));
+            $this->notFound();
 
         $this->name = $this->subject->getField('name', true);
         $this->extendGlobalData($this->subject->getJSGlobals());
@@ -260,10 +260,10 @@ class ItemsetPage extends GenericPage
         die($tt);
     }
 
-    public function notFound()
+    public function notFound($title = '', $msg = '')
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound(Lang::game('itemset'), Lang::itemset('notFound'));
+            return parent::notFound($title ?: Lang::game('itemset'), $msg ?: Lang::itemset('notFound'));
 
         header('Content-type: application/x-javascript; charset=utf-8');
         echo $this->generateTooltip(true);

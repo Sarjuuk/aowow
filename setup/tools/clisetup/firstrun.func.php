@@ -110,7 +110,7 @@ function firstrun()
         fclose($h);
     };
 
-    $testDB = function(&$error)
+    function testDB(&$error)
     {
         require 'config/config.php';
 
@@ -133,9 +133,9 @@ function firstrun()
         }
 
         return empty($error);
-    };
+    }
 
-    $testSelf = function(&$error)
+    function testSelf(&$error)
     {
         $error = [];
         $test  = function($url, &$rCode)
@@ -171,13 +171,13 @@ function firstrun()
             $error[] = ' * STATIC_HOST is empty';
 
         return empty($error);
-    };
+    }
 
-    $testAcc = function(&$error)
+    function testAcc(&$error)
     {
         $error = [];
         return !!DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE userPerms = 1');
-    };
+    }
 
     function endSetup()
     {
@@ -243,7 +243,7 @@ function firstrun()
             // check script result
             if ($step[2])
             {
-                if (!$$step[2]($errors))
+                if (!$step[2]($errors))
                 {
                     CLISetup::log($step[4], CLISetup::LOG_ERROR);
                     foreach ($errors as $e)
