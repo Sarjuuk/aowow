@@ -631,6 +631,11 @@ class SearchPage extends GenericPage
                 }
             }
 
+            foreach ($items->iterate() as $itemId => $__)
+                if (!empty($data[$itemId]['subitems']))
+                    foreach ($data[$itemId]['subitems'] as &$si)
+                        $si['enchantment'] = implode(', ', $si['enchantment']);
+
             $result = array(
                 'type'     => TYPE_ITEM,
                 'appendix' => ' (Item)',

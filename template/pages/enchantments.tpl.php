@@ -10,7 +10,7 @@ $f = $this->filter;                                         // shorthand
 <?php
 $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fi' => empty($f['query']) ? null : ['query' => $f['query'], 'menuItem' => 1]]);
+$this->brick('pageTemplate', ['fi' => empty($f['query']) ? null : ['query' => $f['query'], 'menuItem' => 101]]);
 ?>
 
             <div id="fi" style="display: <?php echo empty($f['query']) ? 'none' : 'block' ?>;">

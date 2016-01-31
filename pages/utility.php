@@ -29,7 +29,9 @@ class UtilityPage extends GenericPage
 
         $this->page = $pageCall;
         $this->rss  = isset($_GET['rss']);
-        $this->name = Lang::main('utilities', array_search($pageCall, $this->validPages));
+
+        if ($this->page != 'random')
+            $this->name = Lang::main('utilities', array_search($pageCall, $this->validPages));
 
         if ($this->page == 'most-comments')
         {
@@ -316,7 +318,7 @@ class UtilityPage extends GenericPage
                 array_unshift($this->title, Lang::main('mostComments', 0));
         }
 
-        array_unshift($this->title, Lang::main('utilities', array_search($this->page, $this->validPages)));
+        array_unshift($this->title, $this->name);
     }
 
     protected function generatePath()

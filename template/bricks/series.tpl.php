@@ -6,7 +6,8 @@
 foreach ($list as $idx => $itr):
     echo '            <tr><th>'.($idx + 1).'</th><td><div>';
 
-    $end = array_pop(array_keys($itr));
+    $_   = array_keys($itr);
+    $end = array_pop($_);
     foreach ($itr as $k => $i):                             // itemItr
         switch ($i['side']):
             case 1:  $wrap = '<span class="icon-alliance-padded">%s</span>'; break;

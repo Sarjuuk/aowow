@@ -123,7 +123,7 @@ class EnchantmentList extends BaseType
         return $data;
     }
 
-    public function getStatGain()
+    public function getStatGain($addScalingKeys = false)
     {
         $data = [];
 
@@ -133,6 +133,70 @@ class EnchantmentList extends BaseType
 
         if (isset($this->curTpl['dps']))
             $data['dps'] = $this->curTpl['dps'];
+
+        // scaling enchantments are saved as 0 to item_stats, thus return empty
+        if ($addScalingKeys)
+        {
+            $spellStats = [];
+            if ($this->relSpells)
+                $spellStats = $this->relSpells->getStatGain();
+
+            for ($h = 1; $h <= 3; $h++)
+            {
+                $obj = (int)$this->curTpl['object'.$h];
+
+                switch ($this->curTpl['type'.$h])
+                {
+                    case 3:                                 // TYPE_EQUIP_SPELL         Spells from ObjectX (use of amountX?)
+                        if (!empty($spellStats[$obj]))
+                            foreach ($spellStats[$obj] as $mod => $_)
+                                if ($str = Util::$itemMods[$mod])
+                                    Util::arraySumByKey($data, [$str => 0]);
+
+                        $obj = null;
+                        break;
+                    case 4:                                 // TYPE_RESISTANCE          +AmountX resistance for ObjectX School
+                        switch ($obj)
+                        {
+                            case 0:                         // Physical
+                                $obj = ITEM_MOD_ARMOR;
+                                break;
+                            case 1:                         // Holy
+                                $obj = ITEM_MOD_HOLY_RESISTANCE;
+                                break;
+                            case 2:                         // Fire
+                                $obj = ITEM_MOD_FIRE_RESISTANCE;
+                                break;
+                            case 3:                         // Nature
+                                $obj = ITEM_MOD_NATURE_RESISTANCE;
+                                break;
+                            case 4:                         // Frost
+                                $obj = ITEM_MOD_FROST_RESISTANCE;
+                                break;
+                            case 5:                         // Shadow
+                                $obj = ITEM_MOD_SHADOW_RESISTANCE;
+                                break;
+                            case 6:                         // Arcane
+                                $obj = ITEM_MOD_ARCANE_RESISTANCE;
+                                break;
+                            default:
+                                $obj = null;
+                        }
+                        break;
+                    case 5:                                 // TYPE_STAT                +AmountX for Statistic by type of ObjectX
+                        if ($obj < 2)                       // [mana, health] are on [0, 1] respectively and are expected on [1, 2] ..
+                            $obj++;                         // 0 is weaponDmg .. ehh .. i messed up somewhere
+
+                        break;                              // stats are directly assigned below
+                    default:                                // TYPE_NONE                dnd stuff; skip assignment below
+                        $obj = null;
+                }
+
+                if ($obj !== null)
+                    if ($str = Util::$itemMods[$obj])       // check if we use these mods
+                        Util::arraySumByKey($data, [$str => 0]);
+            }
+        }
 
         return $data;
     }

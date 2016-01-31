@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 if (!defined('AOWOW_REVISION'))
     die('invalid access');

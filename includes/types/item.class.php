@@ -1444,7 +1444,7 @@ class ItemList extends BaseType
         {
             $this->rndEnchIds[$eId] = array(
                 'text'  => $enchants->getField('name', true),
-                'stats' => $enchants->getStatGain()
+                'stats' => $enchants->getStatGain(true)
             );
         }
 
