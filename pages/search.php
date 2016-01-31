@@ -47,12 +47,12 @@ class SearchPage extends GenericPage
     private   $included      = [];
     private   $excluded      = [];
     private   $searches      = array(
-        ['_searchCharClass'],   ['_searchCharRace'],    ['_searchTitle'],     ['_searchWorldEvent'],      ['_searchCurrency'],
-        ['_searchItemset'],     ['_searchItem'],        ['_searchAbility'],   ['_searchTalent'],          ['_searchGlyph'],
-        ['_searchProficiency'], ['_searchProfession'],  ['_searchCompanion'], ['_searchMount'],           ['_searchCreature'],
-        ['_searchQuest'],       ['_searchAchievement'], ['_searchStatistic'], ['_searchZone'],            ['_searchObject'],
-        ['_searchFaction'],     ['_searchSkill'],       ['_searchPet'],       ['_searchCreatureAbility'], ['_searchSpell'],
-        ['_searchEmote'],       ['_searchEnchantment']
+        '_searchCharClass',   '_searchCharRace',    '_searchTitle',     '_searchWorldEvent',      '_searchCurrency',
+        '_searchItemset',     '_searchItem',        '_searchAbility',   '_searchTalent',          '_searchGlyph',
+        '_searchProficiency', '_searchProfession',  '_searchCompanion', '_searchMount',           '_searchCreature',
+        '_searchQuest',       '_searchAchievement', '_searchStatistic', '_searchZone',            '_searchObject',
+        '_searchFaction',     '_searchSkill',       '_searchPet',       '_searchCreatureAbility', '_searchSpell',
+        '_searchEmote',       '_searchEnchantment'
     );
 
     public function __construct($pageCall, $pageParam)
@@ -376,7 +376,7 @@ class SearchPage extends GenericPage
         $shared = [];
         foreach ($this->searches as $idx => $ref)
             if ($this->searchMask & (1 << $idx))
-                if ($_ = $this->$ref[0]($cndBase, $shared))
+                if ($_ = $this->$ref($cndBase, $shared))
                     $this->lvTabs[$idx] = $_;
     }
 
