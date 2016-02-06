@@ -182,7 +182,7 @@ class AjaxComment extends AjaxHandler
         if (!$this->_get['id'])
             return Util::toJSON(['success' => 0]);
 
-        if ($votes = DB::Aowow()->selectRow('SELECT 1 AS success, SUM(IF(value > 0, value, 0)) AS up, SUM(IF(value < 0, -value, 0)) AS down FROM ?_comments_rates WHERE commentId = ?d GROUP BY commentId', $this->_get['id']))
+        if ($votes = DB::Aowow()->selectRow('SELECT 1 AS success, SUM(IF(value > 0, value, 0)) AS up, SUM(IF(value < 0, -value, 0)) AS down FROM ?_comments_rates WHERE commentId = ?d and userId <> 0 GROUP BY commentId', $this->_get['id']))
             return Util::toJSON($votes);
         else
             return Util::toJSON(['success' => 1, 'up' => 0, 'down' => 0]);

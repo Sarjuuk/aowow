@@ -71,7 +71,7 @@ class CommunityContent
         JOIN
             ?_account a ON c.userId = a.id
         LEFT JOIN
-            ?_comments_rates cr ON cr.commentId = c.id
+            ?_comments_rates cr ON cr.commentId = c.id AND cr.userId <> 0
         LEFT JOIN
             ?_comments c2 ON c.replyTo = c2.id
         WHERE
