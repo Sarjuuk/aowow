@@ -137,7 +137,7 @@ class ZonePage extends GenericPage
         /* Main Content */
         /****************/
 
-        $addToMap = function ($what, $entry) use (&$som)
+        $addToSOM = function ($what, $entry) use (&$som)
         {
             // entry always contains: type, id, name, level, coords[]
             if (!isset($som[$what][$entry['name']]))        // not found yet
@@ -152,7 +152,7 @@ class ZonePage extends GenericPage
 
                     // found existing floor, ammending coords
                     $byFloor['coords'][] = $entry['coords'][0];
-                    break;
+                    return;
                 }
 
                 // floor not used yet, create it
@@ -221,7 +221,7 @@ class ZonePage extends GenericPage
                 }
 
                 if ($what)
-                    $addToMap($what, array(
+                    $addToSOM($what, array(
                         'coords' => [[$spawn['posX'], $spawn['posY']]],
                         'level'  => $spawn['floor'],
                         'name'   => $n,
@@ -250,7 +250,7 @@ class ZonePage extends GenericPage
                         $this->extendGlobalData($started->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
                         if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToMap('alliancequests', array(
+                            $addToSOM('alliancequests', array(
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
                                 'name'   => $n,
@@ -261,7 +261,7 @@ class ZonePage extends GenericPage
                             ));
 
                         if (($tpl['H'] != -1) & ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToMap('hordequests', array(
+                            $addToSOM('hordequests', array(
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
                                 'name'   => $n,
@@ -315,7 +315,7 @@ class ZonePage extends GenericPage
                     $what = 'rare';
 
                 if ($what)
-                    $addToMap($what, array(
+                    $addToSOM($what, array(
                         'coords'        => [[$spawn['posX'], $spawn['posY']]],
                         'level'         => $spawn['floor'],
                         'name'          => $n,
@@ -345,7 +345,7 @@ class ZonePage extends GenericPage
                         }
 
                         if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToMap('alliancequests', array(
+                            $addToSOM('alliancequests', array(
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
                                 'name'          => $n,
@@ -358,7 +358,7 @@ class ZonePage extends GenericPage
                             ));
 
                         if (($tpl['H'] != -1) & ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToMap('hordequests', array(
+                            $addToSOM('hordequests', array(
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
                                 'name'          => $n,
@@ -434,7 +434,7 @@ class ZonePage extends GenericPage
             if (in_array($this->subject->getField('type'), [2, 3, 4, 5, 7, 8]))
                 $som['instance'] = true;
 
-            $this->map        = array(
+            $this->map = array(
                 'data' => ['parent' => 'mapper-generic', 'zone' => $this->typeId],
                 'som'  => $som
             );
