@@ -312,10 +312,10 @@ class Loot
                     break;
             }
 
-            $this->extraCols[] = "Listview.funcBox.createSimpleCol('group', 'Group', '7%', 'group')";
+            $this->extraCols[] = "\$Listview.funcBox.createSimpleCol('group', 'Group', '7%', 'group')";
             foreach ($fields as $idx => $field)
                 if ($set & (1 << $idx))
-                    $this->extraCols[] = "Listview.funcBox.createSimpleCol('".$field."', '".Util::ucFirst($field)."', '7%', '".$field."')";
+                    $this->extraCols[] = "\$Listview.funcBox.createSimpleCol('".$field."', '".Util::ucFirst($field)."', '7%', '".$field."')";
         }
 
         return true;
@@ -505,7 +505,7 @@ class Loot
                         }
 
                         $tabsFinal[$tabId][1][] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField('lootId')]);
-                        $tabsFinal[$tabId][4][] = 'Listview.extraCols.percent';
+                        $tabsFinal[$tabId][4][] = '$Listview.extraCols.percent';
                         if ($tabId != 15)
                             $tabsFinal[$tabId][6][] = 'skill';
                     }
@@ -563,7 +563,7 @@ class Loot
                         $srcData = $srcObj->getListviewData();
 
                         if (!empty($result))
-                            $tabsFinal[16][4][] = 'Listview.extraCols.percent';
+                            $tabsFinal[16][4][] = '$Listview.extraCols.percent';
 
                         if ($srcObj->hasSetFields(['reagent1']))
                             $tabsFinal[16][6][] = 'reagents';
@@ -601,14 +601,33 @@ class Loot
                                 $tabId = abs($tabId);       // general case (skinning)
 
                             $tabsFinal[$tabId][1][] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField($field)]);
-                            $tabsFinal[$tabId][4][] = 'Listview.extraCols.percent';
+                            $tabsFinal[$tabId][4][] = '$Listview.extraCols.percent';
                         }
                     }
                     break;
             }
         }
 
-        $this->results = $tabsFinal;
+        foreach ($tabsFinal as $tabId => $data)
+        {
+            $tabData = array(
+                'data' => $data[1],
+                'name' => $data[2],
+                'id'   => $data[3]
+            );
+
+            if ($data[4])
+                $tabData['extraCols']   = array_unique($data[4]);
+
+            if ($data[5])
+                $tabData['hiddenCols']  = array_unique($data[5]);
+
+            if ($data[6])
+                $tabData['visibleCols'] = array_unique($data[6]);
+
+            $this->results[$tabId] = [$data[0], $tabData];
+        }
+
 
         return true;
     }

@@ -41,15 +41,16 @@ class PetsPage extends GenericPage
         {
             $this->extendGlobalData($pets->getJSGlobals(GLOBALINFO_RELATED));
 
-            $params = ['visibleCols' => "$['abilities']"];
-            if (!$pets->hasDiffFields(['type']))
-                $params['hiddenCols'] = "$['type']";
-
-            $this->lvTabs[] = array(
-                'file'   => 'pet',
-                'data'   => $pets->getListviewData(),
-                'params' => $params
+            $data = array(
+                'data'            => array_values($pets->getListviewData()),
+                'visibleCols'     => ['abilities'],
+                'computeDataFunc' => '$_'
             );
+
+            if (!$pets->hasDiffFields(['type']))
+                $data['hiddenCols'] = ['type'];
+
+            $this->lvTabs[] = ['pet', $data, 'petFoodCol'];
         };
     }
 

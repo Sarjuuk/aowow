@@ -3,6 +3,8 @@ $relTabs  = !empty($relTabs);
 $tabVar   = $relTabs || !empty($this->user) ? 'tabsRelated' : 'myTabs';
 $isTabbed = !empty($this->forceTabs) || $relTabs || count($this->lvTabs) > 1;
 
+// lvTab: [file, data, extraInclude]
+
 if ($isTabbed):
 ?>
             <div class="clear"></div>
@@ -10,17 +12,17 @@ if ($isTabbed):
 <?php endif; ?>
             <div id="lv-generic" class="listview"><?php
 foreach ($this->lvTabs as $lv):
-    if ($lv['file']):
+    if ($lv[0]):
         continue;
     endif;
 
-    echo '<div class="text tabbed-contents" id="tab-'.$lv['params']['id'].'" style="display:none;">'.$lv['data'].'</div>';
+    echo '<div class="text tabbed-contents" id="tab-'.$lv[1]['id'].'" style="display:none;">'.$lv[1]['data'].'</div>';
 endforeach;
             ?></div>
             <script type="text/javascript">//<![CDATA[
 <?php
 if (!empty($this->gemScores)):                              // inherited from items.tpl.php
-    echo "                var fi_gemScores = ".json_encode($this->gemScores, JSON_NUMERIC_CHECK).";\n";
+    echo "                var fi_gemScores = ".Util::toJSON($this->gemScores).";\n";
 endif;
 
 if ($isTabbed):
@@ -28,16 +30,26 @@ if ($isTabbed):
 endif;
 
 foreach ($this->lvTabs as $lv):
-    if (!empty($lv['data']) || (count($this->lvTabs) == 1 && !$relTabs)):
+    if (!empty($lv[1]['data']) || (count($this->lvTabs) == 1 && !$relTabs)):
         if ($isTabbed):
-            $lv['params']['tabs'] = '$'.$tabVar;
+            $lv[1]['tabs'] = '$'.$tabVar;
         endif;
 
-        if ($lv['file']):
-            $this->lvBrick($lv['file'], ['data' => $lv['data'], 'params' => $lv['params']]);
+        if ($lv[0]):
+            // extra functions on top of lv
+            if (isset($lv[2])):
+                $this->lvBrick($lv[2]);
+            endif;
+
+            if (isset($this->lvTemplates[$lv[0]])):
+                echo "new Listview(".Util::toJSON(array_merge($this->lvTemplates[$lv[0]], $lv[1])).");\n";
+            else:
+                // does not appear as announcement, those have already been handled at this point
+                trigger_error('requested undefined listview: '.$lv[0], E_USER_ERROR);
+            endif;
         elseif ($isTabbed):
-            $n = $lv['params']['name'][0] == '$' ? substr($lv['params']['name'], 1) : "'".$lv['params']['name']."'";
-            echo $tabVar.".add(".$n.", { id: '".$lv['params']['id']."' });\n";
+            $n = $lv[1]['name'][0] == '$' ? substr($lv[1]['name'], 1) : "'".$lv[1]['name']."'";
+            echo $tabVar.".add(".$n.", { id: '".$lv[1]['id']."' });\n";
         endif;
     endif;
 endforeach;
@@ -51,10 +63,10 @@ if (!empty($this->user)):
     endif;
 elseif ($relTabs):
 ?>
-                new Listview({template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: <?php echo $tabVar; ?>, parent: 'lv-generic', data: lv_comments});
-                new Listview({template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: <?php echo $tabVar; ?>, parent: 'lv-generic', data: lv_screenshots});
+                new Listview({template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: <?=$tabVar; ?>, parent: 'lv-generic', data: lv_comments});
+                new Listview({template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: <?=$tabVar; ?>, parent: 'lv-generic', data: lv_screenshots});
                 if (lv_videos.length || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)))
-                    new Listview({template: 'video', id: 'videos', name: LANG.tab_videos, tabs: <?php echo $tabVar; ?>, parent: 'lv-generic', data: lv_videos});
+                    new Listview({template: 'video', id: 'videos', name: LANG.tab_videos, tabs: <?=$tabVar; ?>, parent: 'lv-generic', data: lv_videos});
 <?php
 endif;
 

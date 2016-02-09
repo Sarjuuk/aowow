@@ -362,24 +362,18 @@ class AdminPage extends GenericPage
         }
 
         foreach ($mainTab as $n => $t)
-            $this->lvTabs[] = array(
-                'file'   => null,
-                'data'   => $t,
-                'params' => array(
-                    'name' => $n,
-                    'id'   => Util::urlize($n)
-                )
-            );
+            $this->lvTabs[] = [null, array(
+                'data' => $t,
+                'name' => $n,
+                'id'   => Util::urlize($n)
+            )];
 
         foreach ($miscTab as $n => $t)
-            $this->lvTabs[] = array(
-                'file'   => null,
-                'data'   => $t,
-                'params' => array(
-                    'name' => $n,
-                    'id'   => Util::urlize($n)
-                )
-            );
+            $this->lvTabs[] = [null, array(
+                'data' => $t,
+                'name' => $n,
+                'id'   => Util::urlize($n)
+            )];
     }
 
     private function handlePhpInfo()
@@ -428,26 +422,20 @@ class AdminPage extends GenericPage
                     else
                         $name .= $p[0];
 
-                    $this->lvTabs[] = array(
-                        'file'   => null,
-                        'data'   => $body,
-                        'params' => array(
-                            'id'   => strtolower(strtr($name, [' ' => ''])),
-                            'name' => $name
-                        )
-                    );
+                    $this->lvTabs[] = [null, array(
+                        'data' => $body,
+                        'id'   => strtolower(strtr($name, [' ' => ''])),
+                        'name' => $name
+                    )];
                 }
             }
             else
             {
-                $this->lvTabs[] = array(
-                    'file'   => null,
-                    'data'   => $buff,
-                    'params' => array(
-                        'id'   => strtolower($names[$i]),
-                        'name' => $names[$i]
-                    )
-                );
+                $this->lvTabs[] = [null, array(
+                    'data' => $buff,
+                    'id'   => strtolower($names[$i]),
+                    'name' => $names[$i]
+                )];
             }
         }
     }

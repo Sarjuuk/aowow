@@ -576,6 +576,7 @@ $lang = array(
         'spellLearn'    => "Вы изучите",
         'bonusTalents'  => "очков талантов",
         'spellDisplayed'=> ' (показано: <a href="?spell=%d">%s</a>)',
+        'attachment'    => "[Attachment]",
         'questInfo'     => array(
               0 => "Обычный",            1 => "Группа",             21 => "Жизнь",              41 => "PvP",                62 => "Рейд",               81 => "Подземелье",         82 => "Игровое событие",
              83 => "Легенда",           84 => "Сопровождение",      85 => "Героическое",        88 => "Рейд (10)",          89 => "Рейд (25)"
@@ -760,6 +761,8 @@ $lang = array(
         'pctCostOf'     => "от базовой %s",
         'costPerSec'    => ", плюс %s в секунду",
         'costPerLevel'  => ", плюс %s за уровень",
+        'stackGroup'    => "[Stack Group]",
+        'linkedWith'    => "[Linked with]",
         '_scaling'      => "[Scaling]",
         'scaling'       => array(
             'directSP' => "[+%.2f%% of spell power to direct component]",        'directAP' => "[+%.2f%% of attack power to direct component]",

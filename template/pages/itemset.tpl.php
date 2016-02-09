@@ -28,24 +28,26 @@ echo $this->description;
 ?>
                 <script type="text/javascript">//<![CDATA[
 <?php
-foreach ($this->pieces as $p):
-    echo "                    g_items.add(".$p['id'].", {name_".User::$localeString.":'".Util::jsEscape($p['name'])."', quality:".$p['quality'].", icon:'".$p['icon']."', jsonequip:".json_encode($p['json'])."});\n";
+foreach ($this->pieces as $iId => $piece):
+    echo "                    g_items.add(".$iId.", ".Util::toJSON($piece).");\n";
 endforeach;
 ?>
                 //]]></script>
 
                 <table class="iconlist">
 <?php
-foreach ($this->pieces as $i => $p):
-    echo '                    <tr><th align="right" id="iconlist-icon'.($i + 1).'"></th><td><span class="q'.$p['quality'].'"><a href="?item='.$p['id'].'">'.$p['name']."</a></span></td></tr>\n";
+$idx = 0;
+foreach ($this->pieces as $iId => $piece):
+    echo '                    <tr><th align="right" id="iconlist-icon'.(++$idx).'"></th><td><span class="q'.$piece['quality'].'"><a href="?item='.$iId.'">'.$piece['name_'.User::$localeString]."</a></span></td></tr>\n";
 endforeach;
 ?>
                 </table>
 
                 <script type="text/javascript">//<![CDATA[
 <?php
-foreach ($this->pieces as $i => $p):
-    echo "                    \$WH.ge('iconlist-icon".($i + 1)."').appendChild(g_items.createIcon(".$p['id'].", 0, 0));\n";
+$idx = 0;
+foreach ($this->pieces as $iId => $__):
+    echo "                    \$WH.ge('iconlist-icon".(++$idx)."').appendChild(g_items.createIcon(".$iId.", 0, 0));\n";
 endforeach;
 ?>
                 //]]></script>
@@ -54,12 +56,12 @@ endforeach;
 if ($this->unavailable):
 ?>
                 <div class="pad"></div>
-                <b style="color: red"><?php echo Lang::itemset('_unavailable'); ?></b>
+                <b style="color: red"><?=Lang::itemset('_unavailable'); ?></b>
 <?php endif; ?>
 
-                <h3><?php echo Lang::itemset('_setBonuses').$this->bonusExt; ?></h3>
+                <h3><?=Lang::itemset('_setBonuses').$this->bonusExt; ?></h3>
 
-<?php echo "                ".Lang::itemset('_conveyBonus')."\n"; ?>
+<?="                ".Lang::itemset('_conveyBonus')."\n"; ?>
                 <ul>
 <?php
 foreach ($this->spells as $i => $s):
@@ -68,14 +70,14 @@ endforeach;
 ?>
                 </ul>
 
-                <h2 class="clear"><?php echo Lang::itemset('summary'); ?></h2>
+                <h2 class="clear"><?=Lang::itemset('summary'); ?></h2>
 
                 <div id="summary-generic"></div>
                 <script type="text/javascript">//<![CDATA[
-                    new Summary({ id: 'itemset', template: 'itemset', parent: 'summary-generic', groups: <?php echo json_encode($this->compare['items'], JSON_NUMERIC_CHECK).', level: '.$this->compare['level']; ?>});
+                    new Summary(<?=Util::toJSON($this->summary); ?>);
                 //]]></script>
 
-                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
+                <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 
 <?php

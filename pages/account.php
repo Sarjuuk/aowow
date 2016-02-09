@@ -218,7 +218,6 @@ class AccountPage extends GenericPage
         /* Listview */
         /************/
 
-        $this->lvTabs = [];
         $this->forceTabs = true;
 
         // Reputation changelog (params only for comment-events)
@@ -227,11 +226,7 @@ class AccountPage extends GenericPage
             foreach ($repData as &$r)
                 $r['when'] = date(Util::$dateFormatInternal, $r['when']);
 
-            $this->lvTabs[] = array(
-                'file'   => 'reputationhistory',
-                'data'   => $repData,
-                'params' => []
-            );
+            $this->lvTabs[] = ['reputationhistory', ['data' => $repData]];
         }
 
         // comments
@@ -241,14 +236,11 @@ class AccountPage extends GenericPage
             // _totalCount: 377,
             // note: $WH.sprintf(LANG.lvnote_usercomments, 377),
 
-            $this->lvTabs[] = array(
-                'file'   => 'commentpreview',
-                'data'   => $_,
-                'params' => array(
-                    'hiddenCols'     => "$['author']",
-                    'onBeforeCreate' =>  '$Listview.funcBox.beforeUserComments'
-                )
-            );
+            $this->lvTabs[] = ['commentpreview', array(
+                'data'           => $_,
+                'hiddenCols'     => ['author'],
+                'onBeforeCreate' => '$Listview.funcBox.beforeUserComments'
+            )];
         }
 
         // replies
@@ -259,13 +251,10 @@ class AccountPage extends GenericPage
             // _totalCount: 377,
             // note: $WH.sprintf(LANG.lvnote_usercomments, 377),
 
-            $this->lvTabs[] = array(
-                'file'   => 'replypreview',
-                'data'   => $_,
-                'params' => array(
-                    'hiddenCols' => "$['author']"
-                )
-            );
+            $this->lvTabs[] = ['replypreview', array(
+                'data'       => $_,
+                'hiddenCols' => ['author']
+            )];
         }
 
 /*

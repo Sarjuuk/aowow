@@ -578,6 +578,7 @@ $lang = array(
         'spellLearn'    => "Ihr erlernt",
         'bonusTalents'  => "Talentpunkte",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> wird angezeigt)',
+        'attachment'    => "Anlage",
         'questInfo'     => array(
               0 => "Normal",             1 => "Gruppe",             21 => "Leben",              41 => "PvP",                62 => "Schlachtzug",        81 => "Dungeon",            82 => "Weltereignis",
              83 => "Legendär",          84 => "Eskorte",            85 => "Heroisch",           88 => "Schlachtzug (10)",   89 => "Schlachtzug (25)"
@@ -761,6 +762,8 @@ $lang = array(
         'pctCostOf'     => "vom Grund%s",
         'costPerSec'    => ", plus %s pro Sekunde",
         'costPerLevel'  => ", plus %s pro Stufe",
+        'stackGroup'    => "Stack Gruppierung",
+        'linkedWith'    => "Verknüpft mit",
         '_scaling'      => "Skalierung",
         'scaling'       => array(
             'directSP' => "+%.2f%% der Zaubermacht zum direkten Effekt",         'directAP' => "+%.2f%% der Angriffskraft zum direkten Effekt",

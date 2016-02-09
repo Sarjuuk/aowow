@@ -175,20 +175,16 @@ class FactionPage extends GenericPage
         {
             $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
 
-            $tab = array(
-                'file'    => 'item',
-                'data'    => $items->getListviewData(),
-                'showRep' => true,
-                'params'  => array(
-                    'extraCols' => '$_',
-                    'sort'      => "$['standing', 'name']"
-                )
+            $tabData = array(
+                'data'      => array_values($items->getListviewData()),
+                'extraCols' => '$_',
+                'sort'      => ['standing', 'name']
             );
 
             if ($items->getMatches() > CFG_SQL_LIMIT_DEFAULT)
-                $tab['params']['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
+                $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
 
-            $this->lvTabs[] = $tab;
+            $this->lvTabs[] = ['item', $tabData, 'itemStandingCol'];
         }
 
         // tab: creatures with onKill reputation
@@ -212,20 +208,16 @@ class FactionPage extends GenericPage
                     foreach ($data as $id => &$d)
                         $d['reputation'] = $cRep[$id];
 
-                    $tab = array(
-                        'file'    => 'creature',
-                        'data'    => $data,
-                        'showRep' => true,
-                        'params'  => array(
-                            'extraCols' => '$_',
-                            'sort'      => "$['-reputation', 'name']"
-                        )
+                    $tabData = array(
+                        'data'      => array_values($data),
+                        'extraCols' => '$_',
+                        'sort'      => ['-reputation', 'name']
                     );
 
                     if ($killCreatures->getMatches() > CFG_SQL_LIMIT_DEFAULT)
-                        $tab['params']['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
+                        $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
 
-                    $this->lvTabs[] = $tab;
+                    $this->lvTabs[] = ['creature', $tabData, 'npcRepCol'];
                 }
             }
         }
@@ -236,20 +228,16 @@ class FactionPage extends GenericPage
             $members = new CreatureList(array(['faction', $_]));
             if (!$members->error)
             {
-                $tab = array(
-                    'file'    => 'creature',
-                    'data'    => $members->getListviewData(),
-                    'showRep' => true,
-                    'params'  => array(
-                        'id'   => 'member',
-                        'name' => '$LANG.tab_members'
-                    )
+                $tabData = array(
+                    'data' => array_values($members->getListviewData()),
+                    'id'   => 'member',
+                    'name' => '$LANG.tab_members'
                 );
 
                 if ($members->getMatches() > CFG_SQL_LIMIT_DEFAULT)
-                    $tab['params']['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
+                    $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
 
-                $this->lvTabs[] = $tab;
+                $this->lvTabs[] = ['creature', $tabData];
             }
         }
 
@@ -258,13 +246,7 @@ class FactionPage extends GenericPage
         {
             $objects = new GameObjectList(array(['faction', $_]));
             if (!$objects->error)
-            {
-                $this->lvTabs[] = array(
-                    'file'    => 'object',
-                    'data'    => $objects->getListviewData(),
-                    'params'  => []
-                );
-            }
+                $this->lvTabs[] = ['object', ['data' => array_values($objects->getListviewData())]];
         }
 
         // tab: quests
@@ -281,17 +263,15 @@ class FactionPage extends GenericPage
         {
             $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_ANY));
 
-            $tab = array(
-                'file'    => 'quest',
-                'data'    => $quests->getListviewData($this->typeId),
-                'showRep' => true,
-                'params'  => ['extraCols' => '$_']
+            $tabData = array(
+                'data'      => array_values($quests->getListviewData($this->typeId)),
+                'extraCols' => '$_'
             );
 
             if ($quests->getMatches() > CFG_SQL_LIMIT_DEFAULT)
-                $tab['params']['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
+                $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
 
-            $this->lvTabs[] = $tab;
+            $this->lvTabs[] = ['quest', $tabData, 'questRepCol'];
         }
 
         // tab: achievements
@@ -304,15 +284,12 @@ class FactionPage extends GenericPage
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_ANY));
 
-            $this->lvTabs[] = array(
-                'file'   => 'achievement',
-                'data'   => $acvs->getListviewData(),
-                'params' => array(
-                    'id'          => 'criteria-of',
-                    'name'        => '$LANG.tab_criteriaof',
-                    'visibleCols' => "$['category']"
-                )
-            );
+            $this->lvTabs[] = ['achievement', array(
+                'data'        => array_values($acvs->getListviewData()),
+                'id'          => 'criteria-of',
+                'name'        => '$LANG.tab_criteriaof',
+                'visibleCols' => ['category']
+            )];
         }
     }
 }

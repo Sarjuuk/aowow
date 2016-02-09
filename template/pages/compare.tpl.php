@@ -14,11 +14,11 @@
                 <div id="compare-generic"></div>
                 <script type="text/javascript">//<![CDATA[
 <?php
-foreach ($this->cmpItems as $item):
-    echo '                        g_items.add('.$item[0].', {name_'.User::$localeString.':\''.Util::jsEscape($item[1]).'\', quality:'.$item[2].', icon:\''.$item[3].'\', jsonequip:'.json_encode($item[4], JSON_NUMERIC_CHECK)."});\n";
+foreach ($this->cmpItems as $iId => $iData):
+    echo '                        g_items.add('.$iId.', '.Util::toJSON($iData).");\n";
 endforeach;
 ?>
-                    new Summary({template:'compare',id:'compare',parent:'compare-generic',groups:<?php echo json_encode($this->summary, JSON_NUMERIC_CHECK); ?>});
+                    new Summary(<?=Util::toJSON($this->summary); ?>);
                 //]]></script>
             </div>
 

@@ -13,27 +13,27 @@ $this->brick('infobox');
 
 ?>
             <div class="text">
-                <h1><?php echo $this->name; ?></h1>
+                <h1><?=$this->name; ?></h1>
 
-                <span><?php echo Lang::screenshot('cropHint'); ?></span>
+                <span><?=Lang::screenshot('cropHint'); ?></span>
                 <div class="pad"></div>
                 <div id="ss-container"></div><script type="text/javascript">//<![CDATA[
-                    var myCropper = new Cropper(<?php echo json_encode($this->cropper, JSON_NUMERIC_CHECK); ?>);
+                    var myCropper = new Cropper(<?=Util::toJSON($this->cropper); ?>);
                 //]]></script>
 
                 <div class="pad"></div>
-                <button style="margin:4px 0 0 5px" onclick="myCropper.selectAll()"><?php echo Lang::screenshot('selectAll'); ?></button>
+                <button style="margin:4px 0 0 5px" onclick="myCropper.selectAll()"><?=Lang::screenshot('selectAll'); ?></button>
                 <div class="clear"></div>
 
                 <div class="pad3"></div>
 
-                <form action="?screenshot=complete&amp;<?php echo $this->destType.'.'.$this->destTypeId.'.'.$this->imgHash; ?>" method="post" onsubmit="this.elements['coords'].value = myCropper.getCoords()">
-                    <?php echo Lang::screenshot('caption').Lang::main('colon'); ?><input type="text" name="screenshotalt" style="width: 55%" maxlength="200" /> <small> <?php echo Lang::screenshot('charLimit'); ?></small><br />
+                <form action="?screenshot=complete&amp;<?=$this->destType.'.'.$this->destTypeId.'.'.$this->imgHash; ?>" method="post" onsubmit="this.elements['coords'].value = myCropper.getCoords()">
+                    <?=Lang::screenshot('caption').Lang::main('colon'); ?><input type="text" name="screenshotalt" style="width: 55%" maxlength="200" /> <small> <?=Lang::screenshot('charLimit'); ?></small><br />
                     <div class="pad"></div>
 
 <?php $this->localizedBrick('ssReminder', User::$localeId); ?>
 
-                    <input type="submit" value="<?php echo Lang::main('submit'); ?>" />
+                    <input type="submit" value="<?=Lang::main('submit'); ?>" />
                     <input type="hidden" name="coords" />
                 </form>
 

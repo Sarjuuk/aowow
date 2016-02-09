@@ -36,7 +36,7 @@ class SearchPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_SEARCH;
     protected $js            = ['swfobject.js'];
-    protected $lvTabs        = [];
+    protected $lvTabs        = [];                          // [file, data, extraInclude, osInfo]       // osInfo:[type, appendix, nMatches, param1, param2]
     protected $search        = '';                          // output
     protected $invalid       = [];
 
@@ -153,7 +153,7 @@ class SearchPage extends GenericPage
         if (!empty($this->lvTabs[3]))                       // has world events
         {
             // update WorldEvents to date()
-            foreach ($this->lvTabs[3]['data'] as &$d)
+            foreach ($this->lvTabs[3][1]['data'] as &$d)
             {
                 $updated = WorldEventList::updateDates($d['_date']);
                 unset($d['_date']);
@@ -166,14 +166,14 @@ class SearchPage extends GenericPage
         if ($this->searchMask & SEARCH_TYPE_REGULAR)
         {
             $foundTotal = 0;
-            foreach ($this->lvTabs as $_)
-                $foundTotal += count($_['data']);
+            foreach ($this->lvTabs as list($file, $tabData, $_, $osInfo))
+                $foundTotal += count($tabData['data']);
 
             if ($foundTotal == 1)                           // only one match -> redirect to find
             {
-                $_      = array_pop($this->lvTabs);
-                $type   = Util::$typeStrings[$_['type']];
-                $typeId = key($_['data']);
+                $tab    = array_pop($this->lvTabs);
+                $type   = Util::$typeStrings[$tab[3][0]];
+                $typeId = array_pop($tab[1]['data'])['id'];
 
                 header('Location: ?'.$type.'='.$typeId, true, 302);
                 exit();
@@ -254,20 +254,20 @@ class SearchPage extends GenericPage
         if (!$asError)
         {
             // items
-            if (!empty($this->lvTabs[6]['data']))
+            if (!empty($this->lvTabs[6][1]['data']))
             {
                 $items = [];
-                foreach ($this->lvTabs[6]['data'] as $k => $v)
+                foreach ($this->lvTabs[6][1]['data'] as $k => $v)
                     $items[] = Util::toJSON($v);
 
                 $outItems = "\t".implode(",\n\t", $items)."\n";
             }
 
-            // sets
-            if (!empty($this->lvTabs[5]['data']))
+            // item sets
+            if (!empty($this->lvTabs[5][1]['data']))
             {
                 $sets = [];
-                foreach ($this->lvTabs[5]['data'] as $k => $v)
+                foreach ($this->lvTabs[5][1]['data'] as $k => $v)
                 {
                     unset($v['quality']);
                     if (!$v['heroic'])
@@ -293,33 +293,34 @@ class SearchPage extends GenericPage
             [], [], [], [], [], [], []
         );
 
-        foreach ($this->lvTabs as $_)
-            $foundTotal += $_['matches'];
+        foreach ($this->lvTabs as list($_, $_, $_, $osInfo))
+            $foundTotal += $osInfo[2];
 
         if (!$foundTotal || $asError)
             return '["'.Util::jsEscape($this->search).'", []]';
 
-        foreach ($this->lvTabs as $idx => $set)
+        foreach ($this->lvTabs as list($_, $tabData, $_, $osInfo))
         {
-            $max = max(1, intVal($limit * $set['matches'] / $foundTotal));
+            $max = max(1, intVal($limit * $osInfo[2] / $foundTotal));
             $limit -= $max;
 
             for ($i = 0; $i < $max; $i++)
             {
-                $data = array_shift($set['data']);
+                $data = array_shift($tabData['data']);
                 if (!$data)
                     break;
 
                 $hasQ        = is_numeric($data['name'][0]) || $data['name'][0] == '@';
-                $result[1][] = ($hasQ ? mb_substr($data['name'], 1) : $data['name']).$set['appendix'];
-                $result[3][] = HOST_URL.'/?'.Util::$typeStrings[$set['type']].'='.$data['id'];
-                $extra       = [$set['type'], $data['id']];
+                $result[1][] = ($hasQ ? mb_substr($data['name'], 1) : $data['name']).$osInfo[1];
+                $result[3][] = HOST_URL.'/?'.Util::$typeStrings[$osInfo[0]].'='.$data['id'];
 
-                if (isset($data['param1']))
-                    $extra[] = $data['param1'];
+                $extra       = [$osInfo[0], $data['id']];   // type, typeId
 
-                if (isset($data['param2']))
-                    $extra[] = $data['param2'];
+                if (isset($osInfo[3][$data['id']]))
+                    $extra[] = $osInfo[3][$data['id']];     // param1
+
+                if (isset($osInfo[4][$data['id']]))
+                    $extra[] = $osInfo[4][$data['id']];     // param2
 
                 $result[7][] = $extra;
             }
@@ -382,100 +383,84 @@ class SearchPage extends GenericPage
 
     private function _searchCharClass($cndBase)             // 0 Classes: $searchMask & 0x00000001
     {
-        $result  = [];
         $cnd     = array_merge($cndBase, [$this->createLookup()]);
         $classes = new CharClassList($cnd);
 
         if ($data = $classes->getListviewData())
         {
-            if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($classes->iterate() as $__)
-                    $data[$classes->id]['param1'] = 'class_'.strToLower($classes->getField('fileString'));
+            $result['data'] = array_values($data);
+            $osInfo         = [TYPE_CLASS, ' (Class)', $classes->getMatches(), []];
 
-            $result = array(
-                'type'     => TYPE_CLASS,
-                'appendix' => ' (Class)',
-                'matches'  => $classes->getMatches(),
-                'file'     => CharClassList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($classes->iterate() as $id => $__)
+                    $osInfo[3][$id] = 'class_'.strToLower($classes->getField('fileString'));
 
             if ($classes->getMatches() > $this->maxResults)
             {
-                // $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $classes->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                // $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $classes->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['class', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchCharRace($cndBase)              // 1 Races: $searchMask & 0x00000002
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, [$this->createLookup()]);
-        $races  = new CharRaceList($cnd);
+        $cnd   = array_merge($cndBase, [$this->createLookup()]);
+        $races = new CharRaceList($cnd);
 
         if ($data = $races->getListviewData())
         {
-            if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($races->iterate() as $__)
-                    $data[$races->id]['param1'] = '"race_'.strToLower($races->getField('fileString')).'_male"';
+            $result['data'] = array_values($data);
+            $osInfo         = [TYPE_RACE, ' (Race)', $races->getMatches(), []];
 
-            $result = array(
-                'type'     => TYPE_RACE,
-                'appendix' => ' (Race)',
-                'matches'  => $races->getMatches(),
-                'file'     => CharRaceList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($races->iterate() as $id => $__)
+                    $osInfo[3][$id] = 'race_'.strToLower($races->getField('fileString')).'_male';
 
             if ($races->getMatches() > $this->maxResults)
             {
-                // $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $races->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                // $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $races->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['race', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchTitle($cndBase)                 // 2 Titles: $searchMask & 0x00000004
     {
-        $result = [];
         $cnd    = array_merge($cndBase, [$this->createLookup(['male_loc'.User::$localeId, 'female_loc'.User::$localeId])]);
         $titles = new TitleList($cnd);
 
         if ($data = $titles->getListviewData())
         {
+            $result['data'] = array_values($data);
+            $osInfo         = [TYPE_TITLE, ' (Title)', $titles->getMatches(), []];
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($titles->iterate() as $id => $__)
-                    $data[$id]['param1'] = $titles->getField('side');
-
-            $result = array(
-                'type'     => TYPE_TITLE,
-                'appendix' => ' (Title)',
-                'matches'  => $titles->getMatches(),
-                'file'     => TitleList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+                    $osInfo[3][$id] = $titles->getField('side');
 
             if ($titles->getMatches() > $this->maxResults)
             {
-                // $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $titles->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                // $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $titles->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['title', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchWorldEvent($cndBase)            // 3 World Events: $searchMask & 0x00000008
     {
-        $result  = [];
         $cnd     = array_merge($cndBase, array(
             array(
                 'OR',
@@ -490,102 +475,87 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($wEvents->getJSGlobals());
 
-            // as allways: dates are updated in postCache-step
+            $result['data'] = array_values($data);
+            $osInfo         = [TYPE_WORLDEVENT, ' (World Event)', $wEvents->getMatches()];
 
-            $result = array(
-                'type'     => TYPE_WORLDEVENT,
-                'appendix' => ' (World Event)',
-                'matches'  => $wEvents->getMatches(),
-                'file'     => WorldEventList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+            // as allways: dates are updated in postCache-step
 
             if ($wEvents->getMatches() > $this->maxResults)
             {
-                // $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $wEvents->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                // $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_', $wEvents->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['event', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchCurrency($cndBase)              // 4 Currencies $searchMask & 0x0000010
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, [$this->createLookup()]);
-        $money  = new CurrencyList($cnd);
+        $cnd   = array_merge($cndBase, [$this->createLookup()]);
+        $money = new CurrencyList($cnd);
 
         if ($data = $money->getListviewData())
         {
-            if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($money->iterate() as $__)
-                    $data[$money->id]['param1'] = strToLower($money->getField('iconString'));
+            $result['data'] = array_values($data);
+            $osInfo         = [TYPE_CURRENCY, ' (Currency)', $money->getMatches()];
 
-            $result = array(
-                'type'     => TYPE_CURRENCY,
-                'appendix' => ' (Currency)',
-                'matches'  => $money->getMatches(),
-                'file'     => CurrencyList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($money->iterate() as $id => $__)
+                    $osInfo[3][$id] = strToLower($money->getField('iconString'));
 
             if ($money->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_currenciesfound', $money->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_currenciesfound', $money->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['currency', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchItemset($cndBase, &$shared)     // 5 Itemsets $searchMask & 0x0000020
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, [is_int($this->query) ? ['id', $this->query] : $this->createLookup()]);
-        $sets   = new ItemsetList($cnd);
+        $cnd  = array_merge($cndBase, [is_int($this->query) ? ['id', $this->query] : $this->createLookup()]);
+        $sets = new ItemsetList($cnd);
 
         if ($data = $sets->getListviewData())
         {
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($sets->getJSGlobals(GLOBALINFO_SELF));
 
-            if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($sets->iterate() as $__)
-                    $data[$sets->id]['param1'] = $sets->getField('quality');
+            $result['data'] = array_values($data);
+            $osInfo         = [TYPE_ITEMSET, ' (Item Set)', $sets->getMatches()];
 
-            $result = array(
-                'type'     => TYPE_ITEMSET,
-                'appendix' => ' (Item Set)',
-                'matches'  => $sets->getMatches(),
-                'file'     => ItemsetList::$brickFile,
-                'data'     => $data,
-                'params'   => [],
-            );
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+                foreach ($sets->iterate() as $id => $__)
+                    $osInfo[3][$id] = $sets->getField('quality');
 
             $shared['pcsToSet'] = $sets->pieceToSet;
 
             if ($sets->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsetsfound', $sets->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsetsfound', $sets->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->search).'\')';
+
+            return ['itemset', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchItem($cndBase, &$shared)        // 6 Items $searchMask & 0x0000040
     {
-        $result   = [];
         $miscData = [];
         $cndAdd   = empty($this->query) ? [] : (is_int($this->query) ? ['id', $this->query] : $this->createLookup());
 
@@ -622,48 +592,43 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($items->getJSGlobals());
 
-            if ($this->searchMask & SEARCH_TYPE_OPEN)
-            {
-                foreach ($items->iterate() as $__)
-                {
-                    $data[$items->id]['param1'] = $items->getField('iconString');
-                    $data[$items->id]['param2'] = $items->getField('quality');
-                }
-            }
-
             foreach ($items->iterate() as $itemId => $__)
                 if (!empty($data[$itemId]['subitems']))
                     foreach ($data[$itemId]['subitems'] as &$si)
                         $si['enchantment'] = implode(', ', $si['enchantment']);
 
-            $result = array(
-                'type'     => TYPE_ITEM,
-                'appendix' => ' (Item)',
-                'matches'  => $items->getMatches(),
-                'file'     => ItemList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+            $osInfo         = [TYPE_ITEM, ' (Item)', $items->getMatches(), [], []];
+            $result['data'] = array_values($data);
+
+            if ($this->searchMask & SEARCH_TYPE_OPEN)
+            {
+                foreach ($items->iterate() as $id => $__)
+                {
+                    $osInfo[3][$id] = $items->getField('iconString');
+                    $osInfo[4][$id] = $items->getField('quality');
+                }
+            }
 
             if ($items->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsfound', $items->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_itemsfound', $items->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->search).'\')';
+
+            return ['item', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchAbility($cndBase)               // 7 Abilities (Player + Pet) $searchMask & 0x0000080
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(              // hmm, inclued classMounts..?
+        $cnd       = array_merge($cndBase, array(              // hmm, inclued classMounts..?
             ['s.typeCat', [7, -2, -3]],
             [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT), '&'], 0],
             [['s.attributes0', 0x80, '&'], 0],
@@ -680,47 +645,43 @@ class SearchPage extends GenericPage
             if ($abilities->hasSetFields(['reagent1']))
                 $vis[] = 'reagents';
 
+            $osInfo = [TYPE_SPELL, ' (Ability)', $abilities->getMatches(), [], []];
+            $result = array(
+                'data'        => array_values($data),
+                'id'          => 'abilities',
+                'name'        => '$LANG.tab_abilities',
+                'visibleCols' => $vis
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
             {
-                foreach ($abilities->iterate() as $__)
+                foreach ($abilities->iterate() as $id => $__)
                 {
-                    $data[$abilities->id]['param1'] = strToLower($abilities->getField('iconString'));
-                    $data[$abilities->id]['param2'] = $abilities->ranks[$abilities->id];
+                    $osInfo[3][$id] = strToLower($abilities->getField('iconString'));
+                    $osInfo[4][$id] = $abilities->ranks[$id];
                 }
             }
 
-            $result = array(
-                'type'     => TYPE_SPELL,
-                'appendix' => ' (Ability)',
-                'matches'  => $abilities->getMatches(),
-                'file'     => SpellList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'id'          => 'abilities',
-                    'name'        => '$LANG.tab_abilities',
-                    'visibleCols' => '$'.Util::toJSON($vis)
-                ]
-            );
-
             if ($abilities->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_abilitiesfound', $abilities->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_abilitiesfound', $abilities->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->search).'\')';
+
+            return ['spell', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchTalent($cndBase)                // 8 Talents (Player + Pet) $searchMask & 0x0000100
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(
+        $cnd     = array_merge($cndBase, array(
             ['s.typeCat', [-7, -2]],
             $this->createLookup()
         ));
@@ -735,46 +696,42 @@ class SearchPage extends GenericPage
             if ($talents->hasSetFields(['reagent1']))
                 $vis[] = 'reagents';
 
+            $osInfo = [TYPE_SPELL, ' (Talent)', $talents->getMatches(), [], []];
+            $result = array(
+                'data'        => array_values($data),
+                'id'          => 'talents',
+                'name'        => '$LANG.tab_talents',
+                'visibleCols' => $vis
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
             {
                 foreach ($talents->iterate() as $__)
                 {
-                    $data[$talents->id]['param1'] = strToLower($talents->getField('iconString'));
-                    $data[$talents->id]['param2'] = $talents->ranks[$talents->id];
+                    $osInfo[3][$id] = strToLower($talents->getField('iconString'));
+                    $osInfo[4][$id] = $talents->ranks[$talents->id];
                 }
             }
 
-            $result = array(
-                'type'     => TYPE_SPELL,
-                'appendix' => ' (Talent)',
-                'matches'  => $talents->getMatches(),
-                'file'     => SpellList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'id'          => 'talents',
-                    'name'        => '$LANG.tab_talents',
-                    'visibleCols' => '$'.Util::toJSON($vis)
-                ]
-            );
-
             if ($talents->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_talentsfound', $talents->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_talentsfound', $talents->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->search).'\')';
+
+            return ['spell', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchGlyph($cndBase)                 // 9 Glyphs $searchMask & 0x0000200
     {
-        $result = [];
         $cnd    = array_merge($cndBase, array(
             ['s.typeCat', -13],
             $this->createLookup()
@@ -786,42 +743,38 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($glyphs->getJSGlobals(GLOBALINFO_SELF));
 
+            $osInfo = [TYPE_SPELL, ' (Glyph)', $glyphs->getMatches(), []];
+            $result = array(
+                'data'        => array_values($data),
+                'id'          => 'glyphs',
+                'name'        => '$LANG.tab_glyphs',
+                'visibleCols' => ['singleclass', 'glyphtype']
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($glyphs->iterate() as $__)
-                    $data[$glyphs->id]['param1'] = strToLower($glyphs->getField('iconString'));
-
-            $result = array(
-                'type'     => TYPE_SPELL,
-                'appendix' => ' (Glyph)',
-                'matches'  => $glyphs->getMatches(),
-                'file'     => SpellList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'id'          => 'glyphs',
-                    'name'        => '$LANG.tab_glyphs',
-                    'visibleCols' => "$['singleclass', 'glyphtype']"
-                ]
-            );
+                    $osInfo[3][$id] = strToLower($glyphs->getField('iconString'));
 
             if ($glyphs->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_glyphsfound', $glyphs->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_glyphsfound', $glyphs->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->search).'\')';
+
+            return ['spell', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchProficiency($cndBase)           // 10 Proficiencies $searchMask & 0x0000400
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(
+        $cnd  = array_merge($cndBase, array(
             ['s.typeCat', -11],
             $this->createLookup()
         ));
@@ -832,42 +785,38 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($prof->getJSGlobals(GLOBALINFO_SELF));
 
+            $osInfo = [TYPE_SPELL, ' (Proficiency)', $prof->getMatches(), []];
+            $result = array(
+                'data'        => array_values($data),
+                'id'          => 'proficiencies',
+                'name'        => '$LANG.tab_proficiencies',
+                'visibleCols' => ['classes']
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($prof->iterate() as $__)
-                    $data[$prof->id]['param1'] = strToLower($prof->getField('iconString'));
-
-            $result = array(
-                'type'     => TYPE_SPELL,
-                'appendix' => ' (Proficiency)',
-                'matches'  => $prof->getMatches(),
-                'file'     => SpellList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'id'          => 'proficiencies',
-                    'name'        => '$LANG.tab_proficiencies',
-                    'visibleCols' => "$['classes']"
-                ]
-            );
+                    $osInfo[3][$id] = strToLower($prof->getField('iconString'));
 
             if ($prof->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $prof->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $prof->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->search).'\')';
+
+            return ['spell', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchProfession($cndBase)            // 11 Professions (Primary + Secondary) $searchMask & 0x0000800
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(
+        $cnd  = array_merge($cndBase, array(
             ['s.typeCat', [9, 11]],
             $this->createLookup()
         ));
@@ -878,42 +827,38 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($prof->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
+            $osInfo = [TYPE_SPELL, ' (Profession)', $prof->getMatches()];
+            $result = array(
+                'data'        => array_values($data),
+                'id'          => 'professions',
+                'name'        => '$LANG.tab_professions',
+                'visibleCols' => ['source', 'reagents']
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($prof->iterate() as $__)
-                    $data[$prof->id]['param1'] = strToLower($prof->getField('iconString'));
-
-            $result = array(
-                'type'     => TYPE_SPELL,
-                'appendix' => ' (Profession)',
-                'matches'  => $prof->getMatches(),
-                'file'     => SpellList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'id'          => 'professions',
-                    'name'        => '$LANG.tab_professions',
-                    'visibleCols' => "$['source', 'reagents']"
-                ]
-            );
+                    $osInfo[3][$id] = strToLower($prof->getField('iconString'));
 
             if ($prof->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_professionfound', $prof->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_professionfound', $prof->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->search).'\')';
+
+            return ['spell', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchCompanion($cndBase)             // 12 Companions $searchMask & 0x0001000
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(
+        $cnd   = array_merge($cndBase, array(
             ['s.typeCat', -6],
             $this->createLookup()
         ));
@@ -924,41 +869,37 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($vPets->getJSGlobals());
 
+            $osInfo = [TYPE_SPELL, ' (Companion)', $vPets->getMatches(), []];
+            $result = array(
+                'data'        => array_values($data),
+                'id'          => 'companions',
+                'name'        => '$LANG.tab_companions',
+                'visibleCols' => ['reagents']
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($vPets->iterate() as $__)
-                    $data[$vPets->id]['param1'] = strToLower($vPets->getField('iconString'));
-
-            $result = array(
-                'type'     => TYPE_SPELL,
-                'appendix' => ' (Companion)',
-                'matches'  => $vPets->getMatches(),
-                'file'     => SpellList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'id'          => 'companions',
-                    'name'        => '$LANG.tab_companions',
-                    'visibleCols' => "$['reagents']"
-                ]
-            );
+                    $osInfo[3][$id] = strToLower($vPets->getField('iconString'));
 
             if ($vPets->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_companionsfound', $vPets->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_companionsfound', $vPets->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->search).'\')';
+
+            return ['spell', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchMount($cndBase)                 // 13 Mounts $searchMask & 0x0002000
     {
-        $result = [];
         $cnd    = array_merge($cndBase, array(
             ['s.typeCat', -5],
             $this->createLookup()
@@ -970,41 +911,37 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($mounts->getJSGlobals(GLOBALINFO_SELF));
 
+            $osInfo = [TYPE_SPELL, ' (Mount)', $mounts->getMatches(), []];
+            $result = array(
+                'data' => array_values($data),
+                'id'   => 'mounts',
+                'name' => '$LANG.tab_mounts',
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($mounts->iterate() as $__)
-                    $data[$mounts->id]['param1'] = strToLower($mounts->getField('iconString'));
-
-            $result = array(
-                'type'     => TYPE_SPELL,
-                'appendix' => ' (Mount)',
-                'matches'  => $mounts->getMatches(),
-                'file'     => SpellList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'id'   => 'mounts',
-                    'name' => '$LANG.tab_mounts',
-                ]
-            );
+                    $osInfo[3][$id] = strToLower($mounts->getField('iconString'));
 
             if ($mounts->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_mountsfound', $mounts->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_mountsfound', $mounts->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->search).'\')';
+
+            return ['spell', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchCreature($cndBase)              // 14 NPCs $searchMask & 0x0004000
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(
+        $cnd  = array_merge($cndBase, array(
             [['flagsExtra', 0x80], 0],                      // exclude trigger creatures
         //  [['cuFlags', MASK, '&'], 0],                    // todo (med): exclude difficulty entries
             $this->createLookup()
@@ -1013,36 +950,32 @@ class SearchPage extends GenericPage
 
         if ($data = $npcs->getListviewData())
         {
+            $osInfo = [TYPE_NPC, ' (NPC)', $npcs->getMatches()];
             $result = array(
-                'type'     => TYPE_NPC,
-                'appendix' => ' (NPC)',
-                'matches'  => $npcs->getMatches(),
-                'file'     => CreatureList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'id'   => 'npcs',
-                    'name' => '$LANG.tab_npcs',
-                ]
+                'data' => array_values($data),
+                'id'   => 'npcs',
+                'name' => '$LANG.tab_npcs',
             );
 
             if ($npcs->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->search).'\')';
+
+            return ['creature', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchQuest($cndBase)                 // 15 Quests $searchMask & 0x0008000
     {
-        $result = [];
         $cnd    = array_merge($cndBase, array(
         //  [['cuFlags', MASK, '&'], 0],                    // todo (med): identify disabled quests
             $this->createLookup()
@@ -1051,37 +984,32 @@ class SearchPage extends GenericPage
 
         if ($data = $quests->getListviewData())
         {
+            $osInfo         = [TYPE_QUEST, ' (Quest)', $quests->getMatches()];
+            $result['data'] = array_values($data);
+
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($quests->getJSGlobals());
 
-            $result = array(
-                'type'     => TYPE_QUEST,
-                'appendix' => ' (Quest)',
-                'matches'  => $quests->getMatches(),
-                'file'     => QuestList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
-
             if ($quests->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_questsfound', $quests->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_questsfound', $quests->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->search).'\')';
+
+            return ['quest', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchAchievement($cndBase)           // 16 Achievements $searchMask & 0x0010000
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(
+        $cnd  = array_merge($cndBase, array(
             [['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], 0],  // not a statistic
             $this->createLookup()
         ));
@@ -1092,40 +1020,36 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($acvs->getJSGlobals());
 
+            $osInfo = [TYPE_ACHIEVEMENT, ' (Achievement)', $acvs->getMatches(), []];
+            $result = array(
+                'data'        => array_values($data),
+                'visibleCols' => ['category']
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($acvs->iterate() as $__)
-                    $data[$acvs->id]['param1'] = strToLower($acvs->getField('iconString'));
-
-            $result = array(
-                'type'     => TYPE_ACHIEVEMENT,
-                'appendix' => ' (Achievement)',
-                'matches'  => $acvs->getMatches(),
-                'file'     => AchievementList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'visibleCols' => "$['category']"
-                ]
-            );
+                    $osInfo[3][$id] = strToLower($acvs->getField('iconString'));
 
             if ($acvs->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_achievementsfound', $acvs->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_achievementsfound', $acvs->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?achieveemnts&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?achieveemnts&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->search).'\')';
+
+            return ['achievement', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchStatistic($cndBase)             // 17 Statistics $searchMask & 0x0020000
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(
+        $cnd   = array_merge($cndBase, array(
             ['flags', ACHIEVEMENT_FLAG_COUNTER, '&'],       // is a statistic
             $this->createLookup()
         ));
@@ -1136,37 +1060,34 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($stats->getJSGlobals(GLOBALINFO_SELF));
 
+            $osInfo = [TYPE_ACHIEVEMENT, ' (Statistic)', $stats->getMatches()];
             $result = array(
-                'type'     => TYPE_ACHIEVEMENT,
-                'matches'  => $stats->getMatches(),
-                'file'     => AchievementList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'visibleCols' => "$['category']",
-                    'hiddenCols'  => "$['side', 'points', 'rewards']",
-                    'name'        => '$LANG.tab_statistics',
-                    'id'          => 'statistics'
-                ]
+                'data'        => array_values($data),
+                'visibleCols' => ['category'],
+                'hiddenCols'  => ['side', 'points', 'rewards'],
+                'name'        => '$LANG.tab_statistics',
+                'id'          => 'statistics'
             );
 
             if ($stats->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_statisticsfound', $stats->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_statisticsfound', $stats->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->search).'\')';
+
+            return ['achievement', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchZone($cndBase)                  // 18 Zones $searchMask & 0x0040000
     {
-        $result = [];
         $cnd    = array_merge($cndBase, [$this->createLookup()]);
         $zones  = new ZoneList($cnd);
 
@@ -1175,28 +1096,23 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($zones->getJSGlobals());
 
-            $result = array(
-                'type'     => TYPE_ZONE,
-                'appendix' => ' (Zone)',
-                'matches'  => $zones->getMatches(),
-                'file'     => ZoneList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+            $osInfo         = [TYPE_ZONE, ' (Zone)', $zones->getMatches()];
+            $result['data'] = array_values($data);
 
             if ($zones->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_zonesfound', $zones->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_zonesfound', $zones->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['zone', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchObject($cndBase)                // 19 Objects $searchMask & 0x0080000
     {
-        $result  = [];
         $cnd     = array_merge($cndBase, [$this->createLookup()]);
         $objects = new GameObjectList($cnd);
 
@@ -1205,123 +1121,106 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($objects->getJSGlobals());
 
-            $result = array(
-                'type'     => TYPE_OBJECT,
-                'appendix' => ' (Object)',
-                'matches'  => $objects->getMatches(),
-                'file'     => GameObjectList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+            $osInfo         = [TYPE_OBJECT, ' (Object)', $objects->getMatches()];
+            $result['data'] = array_values($data);
 
             if ($objects->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_objectsfound', $objects->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_objectsfound', $objects->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->search).'\')';
+
+            return ['object', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchFaction($cndBase)               // 20 Factions $searchMask & 0x0100000
     {
-        $result   = [];
         $cnd      = array_merge($cndBase, [$this->createLookup()]);
         $factions = new FactionList($cnd);
 
         if ($data = $factions->getListviewData())
         {
-            $result = array(
-                'type'     => TYPE_FACTION,
-                'appendix' => ' (Faction)',
-                'matches'  => $factions->getMatches(),
-                'file'     => FactionList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+            $osInfo         = [TYPE_FACTION, ' (Faction)', $factions->getMatches()];
+            $result['data'] = array_values($data);
 
             if ($factions->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_factionsfound', $factions->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_factionsfound', $factions->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['faction', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchSkill($cndBase)                 // 21 Skills $searchMask & 0x0200000
     {
-        $result = [];
         $cnd    = array_merge($cndBase, [$this->createLookup()]);
         $skills = new SkillList($cnd);
 
         if ($data = $skills->getListviewData())
         {
+            $osInfo         = [TYPE_SKILL, ' (Skill)', $skills->getMatches(), []];
+            $result['data'] = array_values($data);
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($skills->iterate() as $id => $__)
-                    $data[$id]['param1'] = $skills->getField('iconString');
-
-            $result = array(
-                'type'     => TYPE_SKILL,
-                'appendix' => ' (Skill)',
-                'matches'  => $skills->getMatches(),
-                'file'     => SkillList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+                    $osInf[3][$id] = $skills->getField('iconString');
 
             if ($skills->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_skillsfound', $skills->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_skillsfound', $skills->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['skill', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchPet($cndBase)                   // 22 Pets $searchMask & 0x0400000
     {
-        $result = [];
         $cnd    = array_merge($cndBase, [$this->createLookup()]);
         $pets   = new PetList($cnd);
 
         if ($data = $pets->getListviewData())
         {
+            $osInfo         = [TYPE_PET, ' (Pet)', $pets->getMatches(), []];
+            $result = array(
+                'data'            => array_values($data),
+                'computeDataFunc' => '$_'
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($pets->iterate() as $__)
-                    $data[$pets->id]['param1'] = $pets->getField('iconString');
-
-            $result = array(
-                'type'     => TYPE_PET,
-                'appendix' => ' (Pet)',
-                'matches'  => $pets->getMatches(),
-                'file'     => PetList::$brickFile,
-                'data'     => $data,
-                'params'   => []
-            );
+                    $osInfo[3][$id] = $pets->getField('iconString');
 
             if ($pets->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_petsfound', $pets->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_petsfound', $pets->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['pet', $result, 'petFoodCol', $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchCreatureAbility($cndBase)       // 23 NPCAbilities $searchMask & 0x0800000
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(
+        $cnd          = array_merge($cndBase, array(
             ['s.typeCat', -8],
             $this->createLookup()
         ));
@@ -1332,43 +1231,39 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($npcAbilities->getJSGlobals(GLOBALINFO_SELF));
 
+            $osInfo = [TYPE_SPELL, ' (Spell)', $npcAbilities->getMatches(), []];
+            $result = array(
+                'data'        => array_values($data),
+                'id'          => 'npc-abilities',
+                'name'        => '$LANG.tab_npcabilities',
+                'visibleCols' => ['level'],
+                'hiddenCols'  => ['skill']
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($npcAbilities->iterate() as $__)
-                    $data[$npcAbilities->id]['param1'] = strToLower($npcAbilities->getField('iconString'));
-
-            $result = array(
-                'type'     => TYPE_SPELL,
-                'appendix' => ' (Spell)',
-                'matches'  => $npcAbilities->getMatches(),
-                'file'     => SpellList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'id'          => 'npc-abilities',
-                    'name'        => '$LANG.tab_npcabilities',
-                    'visibleCols' => "$['level']",
-                    'hiddenCols'  => "$['skill']"
-                ]
-            );
+                    $osInfo[3][$id] = strToLower($npcAbilities->getField('iconString'));
 
             if ($npcAbilities->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $npcAbilities->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $npcAbilities->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->search).'\')';
+
+            return ['spell', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchSpell($cndBase)                 // 24 Spells (Misc + GM + triggered abilities) $searchMask & 0x1000000
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, array(
+        $cnd  = array_merge($cndBase, array(
             [
                 'OR',
                 ['s.typeCat', [0, -9]],
@@ -1383,62 +1278,56 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($misc->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
+            $osInfo = [TYPE_SPELL, ' (Spell)', $misc->getMatches(), []];
+            $result = array(
+                'data'        => array_values($data),
+                'name'        => '$LANG.tab_uncategorizedspells',
+                'visibleCols' => ['level'],
+                'hiddenCols'  => ['skill']
+            );
+
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($misc->iterate() as $__)
-                    $data[$misc->id]['param1'] = strToLower($misc->getField('iconString'));
-
-            $result = array(
-                'type'     => TYPE_SPELL,
-                'appendix' => ' (Spell)',
-                'matches'  => $misc->getMatches(),
-                'file'     => SpellList::$brickFile,
-                'data'     => $data,
-                'params'   => [
-                    'name'        => '$LANG.tab_uncategorizedspells',
-                    'visibleCols' => "$['level']",
-                    'hiddenCols'  => "$['skill']",
-                ]
-            );
+                    $osInfo[3][$id] = strToLower($misc->getField('iconString'));
 
             if ($misc->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $misc->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $misc->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
 
-            if (isset($result['params']['note']))
-                $result['params']['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->search).'\')';
+            if (isset($result['note']))
+                $result['note'] .= ' + LANG.dash + $WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->search).'\')';
             else
-                $result['params']['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->search).'\')';
+                $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->search).'\')';
+
+            return ['spell', $result, null, $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchEmote($cndBase)                 // 25 Emotes $searchMask & 0x2000000
     {
-        $result = [];
-        $cnd    = array_merge($cndBase, [$this->createLookup(['cmd', 'self_loc'.User::$localeId, 'target_loc'.User::$localeId, 'noTarget_loc'.User::$localeId])]);
-        $emote  = new EmoteList($cnd);
+        $cnd   = array_merge($cndBase, [$this->createLookup(['cmd', 'self_loc'.User::$localeId, 'target_loc'.User::$localeId, 'noTarget_loc'.User::$localeId])]);
+        $emote = new EmoteList($cnd);
 
         if ($data = $emote->getListviewData())
         {
+            $osInfo = [TYPE_EMOTE, ' (Emote)', $emote->getMatches()];
             $result = array(
-                'type'     => TYPE_EMOTE,
-                'appendix' => ' (Emote)',
-                'matches'  => $emote->getMatches(),
-                'file'     => EmoteList::$brickFile,
-                'data'     => $data,
-                'params'   => []
+                'data' => array_values($data),
+                'name' => Util::ucFirst(Lang::game('emotes'))
             );
+
+            return ['emote', $result, 'emote', $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     private function _searchEnchantment($cndBase)           // 26 Enchantments $searchMask & 0x4000000
     {
-        $result      = [];
         $cnd         = array_merge($cndBase, [$this->createLookup(['name_loc'.User::$localeId])]);
         $enchantment = new EnchantmentList($cnd);
 
@@ -1446,29 +1335,28 @@ class SearchPage extends GenericPage
         {
             $this->extendGlobalData($enchantment->getJSGlobals());
 
+            $osInfo = [TYPE_ENCHANTMENT, ' (Enchantment)', $enchantment->getMatches()];
             $result = array(
-                'type'     => TYPE_ENCHANTMENT,
-                'appendix' => ' (Enchantment)',
-                'matches'  => $enchantment->getMatches(),
-                'file'     => EnchantmentList::$brickFile,
-                'data'     => $data,
-                'params'   => []
+                'data' => array_values($data),
+                'name' => Util::ucFirst(Lang::game('enchantments'))
             );
 
             if (array_filter(array_column($result['data'], 'spells')))
-                $result['params']['visibleCols'] = '$[\'trigger\']';
+                $result['visibleCols'] = ['trigger'];
 
             if (!$enchantment->hasSetFields(['skillLine']))
-                $result['params']['hiddenCols'] = '$[\'skill\']';
+                $result['hiddenCols'] = ['skill'];
 
             if ($enchantment->getMatches() > $this->maxResults)
             {
-                $result['params']['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_enchantmentsfound', $enchantment->getMatches(), $this->maxResults);
-                $result['params']['_truncated'] = 1;
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_enchantmentsfound', $enchantment->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
             }
+
+            return ['enchantment', $result, 'enchantment', $osInfo];
         }
 
-        return $result;
+        return false;
     }
 
     // private function _searchCharacter($cndBase) { }      // 27 Characters $searchMask & 0x8000000

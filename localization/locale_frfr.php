@@ -576,6 +576,7 @@ $lang = array(
         'spellLearn'    => "Vous apprendrez",
         'bonusTalents'  => "points de talent",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> affichés)',
+        'attachment'    => "[Attachment]",
         'questInfo'     => array(
              0 => "Standard",            1 => "Groupe",             21 => "Vie",                41 => "JcJ",                62 => "Raid",               81 => "Donjon",             82 => "Évènement mondial",
             83 => "Légendaire",         84 => "Escorte",            85 => "Héroïque",           88 => "Raid (10)",          89 => "Raid (25)"
@@ -758,6 +759,8 @@ $lang = array(
         'pctCostOf'     => "de la %s de base",
         'costPerSec'    => ", plus %s par seconde",
         'costPerLevel'  => ", plus %s par niveau",
+        'stackGroup'    => "[Stack Group]",
+        'linkedWith'    => "[Linked with]",
         '_scaling'      => "[Scaling]",
         'scaling'       => array(
             'directSP' => "+%.2f%% de la puissance des sorts directe",        'directAP' => "+%.2f%% de la puissance d'attaque directe",

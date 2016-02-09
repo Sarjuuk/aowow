@@ -38,11 +38,7 @@ class SkillsPage extends GenericPage
 
         $skills = new SkillList($conditions);
 
-        $this->lvTabs[] = array(
-            'file'   => 'skill',
-            'data'   => $skills->getListviewData(),         // listview content
-            'params' => []
-        );
+        $this->lvTabs[] = ['skill', ['data' => array_values($skills->getListviewData())]];
     }
 
     protected function generateTitle()

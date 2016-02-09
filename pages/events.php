@@ -52,19 +52,16 @@ class EventsPage extends GenericPage
             if ($d = $events->getField('requires'))
                 $this->deps[$events->id] = $d;
 
-        $this->lvTabs[] = array(
-            'file'   => 'event',
-            'data'   => $events->getListviewData(),
-            'params' => []
-        );
+        $data = array_values($events->getListviewData());
 
-        if ($_ = array_filter($events->getListviewData(), function($x) {return $x['id'] > 0;}))
+        $this->lvTabs[] = ['event', ['data' => $data]];
+
+        if ($_ = array_filter($data, function($x) {return $x['id'] > 0;}))
         {
-            $this->lvTabs[] = array(
-                'file'   => 'calendar',
-                'data'   => $_,
-                'params' => ['hideCount' => 1]
-            );
+            $this->lvTabs[] = ['calendar', array(
+                'data'      => $_,
+                'hideCount' => 1
+            )];
         }
     }
 
@@ -86,7 +83,7 @@ class EventsPage extends GenericPage
         // recalculate dates with now()
         foreach ($this->lvTabs as &$views)
         {
-            foreach ($views['data'] as &$data)
+            foreach ($views[1]['data'] as &$data)
             {
                 // is a followUp-event
                 if (!empty($this->deps[$data['id']]))

@@ -1576,10 +1576,13 @@ class Util
         if (CFG_DEBUG)
             $flags |= JSON_PRETTY_PRINT;
 
-        // just a thought: .. about prefixing variables with $ to mark them as function code and retroactively stripping escapes from them
-        // like it's done already in with listviews for example
+        $json = json_encode($data, $flags);
 
-        return json_encode($data, $flags);
+        // handle strings prefixed with $ as js-variables
+        // literal: match everything (lazy) between first pair of unescaped double quotes. First character must be $.
+        $json = preg_replace_callback('/(?<!\\\\)"\$(.+?)(?<!\\\\)"/i', function($m) { return str_replace('\"', '"', $m[1]); }, $json);
+
+        return $json;
     }
 
     public static function checkOrCreateDirectory($path)

@@ -47,26 +47,22 @@ class ItemsetsPage extends GenericPage
 
         $this->addJS('?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
 
-        $lv = array(
-            'file'   => 'itemset',
-            'data'   => $itemsets->getListviewData(),       // listview content
-            'params' => []
-        );
+        $tabData = ['data' => array_values($itemsets->getListviewData())];
 
         if (!empty($this->filter['fi']['extraCols']))
-            $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+            $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         // create note if search limit was exceeded
         if ($itemsets->getMatches() > CFG_SQL_LIMIT_DEFAULT)
         {
-            $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsetsfound', $itemsets->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-            $lv['params']['_truncated'] = 1;
+            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsetsfound', $itemsets->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $tabData['_truncated'] = 1;
         }
 
         if ($this->filterObj->error)
-            $lv['params']['_errors'] = '$1';
+            $tabData['_errors'] = 1;
 
-        $this->lvTabs[] = $lv;
+        $this->lvTabs[] = ['itemset', $tabData];
 
         // sort for dropdown-menus
         Lang::sort('itemset', 'notes', SORT_NATURAL);

@@ -47,31 +47,26 @@ class ObjectsPage extends GenericPage
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
-        $params = $data = [];
+        $tabData = ['data' => []];
         $objects = new GameObjectList($conditions, ['extraOpts' => $this->filterObj->extraOpts]);
         if (!$objects->error)
         {
-            $data = $objects->getListviewData();
+            $tabData['data'] = array_values($objects->getListviewData());
             if ($objects->hasSetFields(['reqSkill']))
-                $params['visibleCols'] = "$['skill']";
-
+                $tabData['visibleCols'] = ['skill'];
 
             // create note if search limit was exceeded
             if ($objects->getMatches() > CFG_SQL_LIMIT_DEFAULT)
             {
-                $params['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_objectsfound', $objects->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-                $params['_truncated'] = 1;
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_objectsfound', $objects->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+                $tabData['_truncated'] = 1;
             }
 
             if ($this->filterObj->error)
-                $params['_errors'] = '$1';
+                $tabData['_errors'] = 1;
         }
 
-        $this->lvTabs[] = array(
-            'file'   => 'object',
-            'data'   => $data,
-            'params' => $params
-        );
+        $this->lvTabs[] = ['object', $tabData];
     }
 
     protected function generateTitle()

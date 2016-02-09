@@ -104,16 +104,13 @@ class TitlePage extends GenericPage
         {
             $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_REWARDS));
 
-            $this->lvTabs[] = array(
-                'file'   => 'quest',
-                'data'   => $quests->getListviewData(),
-                'params' => array(
-                    'id'          => 'reward-from-quest',
-                    'name'        => '$LANG.tab_rewardfrom',
-                    'hiddenCols'  => "$['experience', 'money']",
-                    'visibleCols' => "$['category']"
-                )
-            );
+            $this->lvTabs[] = ['quest', array(
+                'data'        => array_values($quests->getListviewData()),
+                'id'          => 'reward-from-quest',
+                'name'        => '$LANG.tab_rewardfrom',
+                'hiddenCols'  => ['experience', 'money'],
+                'visibleCols' => ['category']
+            )];
         }
 
         // tab: achievement source
@@ -124,16 +121,13 @@ class TitlePage extends GenericPage
             {
                 $this->extendGlobalData($acvs->getJSGlobals());
 
-                $this->lvTabs[] = array(
-                    'file'   => 'achievement',
-                    'data'   => $acvs->getListviewData(),
-                    'params' => array(
-                        'id'          => 'reward-from-achievement',
-                        'name'        => '$LANG.tab_rewardfrom',
-                        'visibleCols' => "$['category']",
-                        'sort'        => "$['reqlevel', 'name']"
-                    )
-                );
+                $this->lvTabs[] = ['achievement', array(
+                    'data'        => array_values($acvs->getListviewData()),
+                    'id'          => 'reward-from-achievement',
+                    'name'        => '$LANG.tab_rewardfrom',
+                    'visibleCols' => ['category'],
+                    'sort'        => ['reqlevel', 'name']
+                )];
             }
         }
 

@@ -47,7 +47,6 @@ class Lang
         self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
     }
 
-    // todo: make static props private and access through this
     public static function __callStatic($prop, $args)
     {
         if (!isset(self::$$prop))

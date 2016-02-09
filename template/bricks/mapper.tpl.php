@@ -53,14 +53,14 @@ elseif (!empty($this->map['data'])):
     if (!empty($this->map['data']['zone'])):
         echo "                ".(!empty($this->gPageInfo) ? "$.extend(g_pageInfo, {id: ".$this->map['data']['zone']."})" : "var g_pageInfo = {id: ".$this->map['data']['zone']."}").";\n";
     elseif (!empty($this->map['mapperData'])):
-        echo "                var g_mapperData = ".json_encode($this->map['mapperData'], JSON_NUMERIC_CHECK).";\n";
+        echo "                var g_mapperData = ".Util::toJSON($this->map['mapperData']).";\n";
     endif;
 
     // dont forget to set "parent: 'mapper-generic'"
-    echo "                var myMapper = new Mapper(".json_encode($this->map['data'], JSON_NUMERIC_CHECK).");\n";
+    echo "                var myMapper = new Mapper(".Util::toJSON($this->map['data']).");\n";
 
     if (isset($this->map['som'])):
-        echo "                new ShowOnMap(".json_encode($this->map['som'], JSON_NUMERIC_CHECK).");\n";
+        echo "                new ShowOnMap(".Util::toJSON($this->map['som']).");\n";
     endif;
 
     if ($this->type != TYPE_ZONE):

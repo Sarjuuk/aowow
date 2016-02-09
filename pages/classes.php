@@ -27,13 +27,7 @@ class ClassesPage extends GenericPage
     {
         $classes = new CharClassList();
         if (!$classes->error)
-        {
-            $this->lvTabs[] = array(
-                'file'   => 'class',
-                'data'   => $classes->getListviewData(),
-                'params' => []
-            );
-        }
+            $this->lvTabs[] = ['class', ['data' => array_values($classes->getListviewData())]];
     }
 
     protected function generateTitle()

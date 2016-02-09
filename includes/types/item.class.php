@@ -1318,11 +1318,19 @@ class ItemList extends BaseType
         $reqLvl = $this->curTpl['requiredLevel'] > 1 ? $this->curTpl['requiredLevel'] : MAX_LEVEL;
         $level  = min(max($reqLvl, $ssdLvl), MAX_LEVEL);
 
-        if (!Lang::item('statType', $type))                 // unknown rating
-            return sprintf(Lang::item('statType', count(Lang::item('statType')) - 1), $type, $value);
-        else if (in_array($type, Util::$lvlIndepRating))    // level independant Bonus
+         // unknown rating
+        if (in_array($type, [2, 8, 9, 10, 11]) || $type > ITEM_MOD_BLOCK_VALUE || $type < 0)
+        {
+            if (User::isInGroup(U_GROUP_EMPLOYEE))
+                return sprintf(Lang::item('statType', count(Lang::item('statType')) - 1), $type, $value);
+            else
+                return null;
+        }
+        // level independant Bonus
+        else if (in_array($type, Util::$lvlIndepRating))
             return Lang::item('trigger', 1).str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::item('statType', $type));
-        else                                                // rating-Bonuses
+        // rating-Bonuses
+        else
         {
             $scaling = true;
 

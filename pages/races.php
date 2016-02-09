@@ -32,13 +32,7 @@ class RacesPage extends GenericPage
 
         $races = new CharRaceList($conditions);
         if (!$races->error)
-        {
-            $this->lvTabs[] = array(
-                'file'   => 'race',
-                'data'   => $races->getListviewData(),
-                'params' => []
-            );
-        }
+            $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
     }
 
     protected function generateTitle()
