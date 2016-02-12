@@ -249,7 +249,7 @@ $lang = array(
         'resistances'   => [null, '神圣抗性', '火焰抗性', '自然抗性', '冰霜抗性', '暗影抗性', '奥术抗性'],
         'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"],
         'sc'            => ["Physical", "Holy", "Fire", "Nature", "Frost", "暗影", "Arcane"],
-        'cl'            => [null, "战士", "圣骑士", "猎人", "盗贼", "牧师", "死亡骑士", "萨满祭司", "法师", "术士", null, "德鲁伊"],
+        'cl'            => [null, "战士", "圣骑士", "猎人", "潜行者", "牧师", "死亡骑士", "萨满祭司", "法师", "术士", null, "德鲁伊"],
         'ra'            => [-2 => "部落", -1 => "联盟", "双方", "人类", "兽人", "矮人", "暗夜精灵", "亡灵", "牛头人", "侏儒", "巨魔", null, "血精灵", "德莱尼"],
         'rep'           => ["仇恨", "敌对", "冷淡", "中立", "友好", "尊敬", "崇敬", "崇拜"],
         'st'            => array(
@@ -620,12 +620,12 @@ $lang = array(
                 3959 => "Black Temple",                 2677 => "Blackwing Lair",               3923 => "Gruul's Lair",                 3606 => "Hyjal Summit",                 4812 => "Icecrown Citadel",
                 3457 => "卡拉赞",                     3836 => "Magtheridon's Lair",           2717 => "Molten Core",                  3456 => "纳克萨玛斯",                    2159 => "Onyxia's Lair",
                 3429 => "Ruins of Ahn'Qiraj",           3607 => "Serpentshrine Cavern",         4075 => "Sunwell Plateau",              3428 => "Temple of Ahn'Qiraj",          3842 => "The Eye",
-                4500 => "The Eye of Eternity",          4493 => "The Obsidian Sanctum",         4722 => "Trial of the Crusader",        4273 => "奥杜尔",                       4603 => "Vault of Archavon",
+                4500 => "The Eye of Eternity",          4493 => "The Obsidian Sanctum",         4722 => "Trial of the Crusader",        4273 => "奥杜尔",                       4603 => "阿尔卡冯的宝库",
                 3805 => "祖阿曼",                     1977 => "祖尔格拉布"
             ),
             4 => array( "职业",
                 -372 => "死亡骑士",                 -263 => "德鲁伊",                        -261 => "猎人",                       -161 => "法师",                         -141 => "圣骑士",
-                -262 => "牧师",                       -162 => "盗贼",                         -82 => "萨满祭司",                        -61 => "术士",                       -81 => "战士"
+                -262 => "牧师",                       -162 => "潜行者",                         -82 => "萨满祭司",                        -61 => "术士",                       -81 => "战士"
                     ),
             5 => array( "专业",
                 -181 => "炼金术",                      -121 => "Blacksmithing",                -304 => "Cooking",                      -201 => "Engineering",                  -324 => "First Aid",
