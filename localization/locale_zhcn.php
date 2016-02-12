@@ -573,6 +573,7 @@ $lang = array(
         'spellLearn'    => "你将学会",
         'bonusTalents'  => "天赋点数",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
+		'attachment'    => "Attachment",
         'questInfo'     => array(
              0 => "Normal",              1 => "Group",              21 => "Life",               41 => "PvP",                62 => "Raid",               81 => "Dungeon",            82 => "World Event",
             83 => "Legendary",          84 => "Escort",             85 => "Heroic",             88 => "Raid (10)",          89 => "Raid (25)"
@@ -756,6 +757,8 @@ $lang = array(
         'pctCostOf'     => "of base %s",
         'costPerSec'    => ", plus %s per sec",
         'costPerLevel'  => ", plus %s per level",
+		'stackGroup'    => "Stack Group",
+		'linkedWith'    => "Linked with",
         '_scaling'      => "Scaling",
         'scaling'       => array(
             'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
