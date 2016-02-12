@@ -135,19 +135,16 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($genSpells->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = array(
-                'file'   => 'spell',
-                'data'   => $genSpells->getListviewData(),
-                'params' => array(
-                    'id'              => 'spells',
-                    'name'            => '$LANG.tab_spells',
-                    'visibleCols'     => "$['level', 'schools', 'type', 'classes']",
-                    'hiddenCols'      => "$['reagents', 'skill']",
-                    'sort'            => "$['-level', 'type', 'name']",
-                    'computeDataFunc' => '$Listview.funcBox.initSpellFilter',
-                    'onAfterCreate'   => '$Listview.funcBox.addSpellIndicator'
-                )
-            );
+            $this->lvTabs[] = ['spell', array(
+                'data'            => array_values($genSpells->getListviewData()),
+                'id'              => 'spells',
+                'name'            => '$LANG.tab_spells',
+                'visibleCols'     => ['level', 'schools', 'type', 'classes'],
+                'hiddenCols'      => ['reagents', 'skill'],
+                'sort'            => ['-level', 'type', 'name'],
+                'computeDataFunc' => '$Listview.funcBox.initSpellFilter',
+                'onAfterCreate'   => '$Listview.funcBox.addSpellIndicator'
+            )];
         }
 
         // Tab: Items (grouped)
@@ -156,7 +153,7 @@ class ClassPage extends GenericPage
             ['requiredClass', $_mask, '&'],
             [['requiredClass', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!'],
             ['itemset', 0],                                     // hmm, do or dont..?
-            0
+            CFG_SQL_LIMIT_NONE
         );
 
         $items = new ItemList($conditions);
@@ -164,23 +161,21 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($items->getJSGlobals());
 
-            if (!$items->hasDiffFields(['requiredRace']))
-                $hidden = "$['side']";
+            $hiddenCols = null;
+            if ($items->hasDiffFields(['requiredRace']))
+                $hiddenCols = ['side'];
 
-            $this->lvTabs[] = array(
-                'file'   => 'item',
-                'data'   => $items->getListviewData(),
-                'params' => array(
-                    'id'              => 'items',
-                    'name'            => '$LANG.tab_items',
-                    'visibleCols'     => "$['dps', 'armor', 'slot']",
-                    'hiddenCols'      => isset($hidden) ? $hidden : null,
-                    'computeDataFunc' => '$Listview.funcBox.initSubclassFilter',
-                    'onAfterCreate'   => '$Listview.funcBox.addSubclassIndicator',
-                    'note'            => sprintf(Util::$filterResultString, '?items&filter=cr=152;crs='.$this->typeId.';crv=0'),
-                    '_truncated'      => 1
-                )
-            );
+            $this->lvTabs[] = ['item', array(
+                'data'            => array_values($items->getListviewData()),
+                'id'              => 'items',
+                'name'            => '$LANG.tab_items',
+                'visibleCols'     => ['dps', 'armor', 'slot'],
+                'hiddenCols'      => $hiddenCols,
+                'computeDataFunc' => '$Listview.funcBox.initSubclassFilter',
+                'onAfterCreate'   => '$Listview.funcBox.addSubclassIndicator',
+                'note'            => sprintf(Util::$filterResultString, '?items&filter=cr=152;crs='.$this->typeId.';crv=0'),
+                '_truncated'      => 1
+            )];
         }
 
         // Tab: Quests
@@ -194,11 +189,10 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($quests->getJSGlobals());
 
-            $this->lvTabs[] = array(
-                'file'   => 'quest',
-                'data'   => $quests->getListviewData(),
-                'params' => ['sort' => "$['reqlevel', 'name']"]
-            );
+            $this->lvTabs[] = ['quest', array(
+                'data' => array_values($quests->getListviewData()),
+                'sort' => ['reqlevel', 'name']
+            )];
         }
 
         // Tab: Itemsets
@@ -207,15 +201,12 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($sets->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = array(
-                'file'   => 'itemset',
-                'data' => $sets->getListviewData(),
-                'params' => array(
-                    'note'       => sprintf(Util::$filterResultString, '?itemsets&filter=cl='.$this->typeId),
-                    'hiddenCols' => "$['classes']",
-                    'sort'       => "$['-level', 'name']"
-                )
-            );
+            $this->lvTabs[] = ['itemset', array(
+                'data'       => array_values($sets->getListviewData()),
+                'note'       => sprintf(Util::$filterResultString, '?itemsets&filter=cl='.$this->typeId),
+                'hiddenCols' => ['classes'],
+                'sort'       => ['-level', 'name']
+            )];
         }
 
         // Tab: Trainer
@@ -228,26 +219,17 @@ class ClassPage extends GenericPage
         $trainer = new CreatureList($conditions);
         if (!$trainer->error)
         {
-            $this->lvTabs[] = array(
-                'file'   => 'creature',
-                'data'   => $trainer->getListviewData(),
-                'params' => array(
-                    'id'   => 'trainers',
-                    'name' => '$LANG.tab_trainers'
-                )
-            );
+            $this->lvTabs[] = ['creature', array(
+                'data' => array_values($trainer->getListviewData()),
+                'id'   => 'trainers',
+                'name' => '$LANG.tab_trainers'
+            )];
         }
 
         // Tab: Races
         $races = new CharRaceList(array(['classMask', $_mask, '&']));
         if (!$races->error)
-        {
-            $this->lvTabs[] = array(
-                'file'   => 'race',
-                'data'   => $races->getListviewData(),
-                'params' => []
-            );
-        }
+            $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
     }
 }
 

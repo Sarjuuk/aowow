@@ -25,11 +25,12 @@ class EmotesPage extends GenericPage
 
     protected function generateContent()
     {
-        $this->lvTabs[] = array(
-            'file'   => 'emote',
-            'data'   => (new EmoteList())->getListviewData(),
-            'params' => []
+        $tabData = array(
+            'data' => array_values((new EmoteList())->getListviewData()),
+            'name' => Util::ucFirst(Lang::game('emotes'))
         );
+
+        $this->lvTabs[] = ['emote', $tabData, 'emote'];
     }
 
     protected function generateTitle()

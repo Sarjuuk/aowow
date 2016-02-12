@@ -91,13 +91,8 @@ class UtilityPage extends GenericPage
                     }
                 }
                 else
-                {
-                    $this->lvTabs[] = array(
-                        'file'   => 'commentpreview',
-                        'data'   => $data,
-                        'params' => []
-                    );
-                }
+                    $this->lvTabs[] = ['commentpreview', ['data' => $data]];
+
                 break;
             case 'latest-screenshots':                      // rss
                 $data = CommunityContent::getScreenshots();
@@ -124,13 +119,8 @@ class UtilityPage extends GenericPage
                     }
                 }
                 else
-                {
-                    $this->lvTabs[] = array(
-                        'file'   => 'screenshot',
-                        'data'   => $data,
-                        'params' => []
-                    );
-                }
+                    $this->lvTabs[] = ['screenshot', ['data' => $data]];
+
                 break;
             case 'latest-videos':                           // rss
                 $data = CommunityContent::getVideos();
@@ -157,13 +147,8 @@ class UtilityPage extends GenericPage
                     }
                 }
                 else
-                {
-                    $this->lvTabs[] = array(
-                        'file'   => 'video',
-                        'data'   => $data,
-                        'params' => []
-                    );
-                }
+                    $this->lvTabs[] = ['video', ['data' => $data]];
+
                 break;
             case 'latest-articles':                         // rss
                 $this->lvTabs = [];
@@ -172,11 +157,7 @@ class UtilityPage extends GenericPage
                 $extraText = '';
                 break;
             case 'unrated-comments':
-                $this->lvTabs[] = array(
-                    'file'   => 'commentpreview',
-                    'data'   => [],
-                    'params' => []
-                );
+                $this->lvTabs[] = ['commentpreview', ['data' => []]];
                 break;
             case 'missing-screenshots':
                 // limit to 200 entries each (it generates faster, consumes less memory and should be enough options)
@@ -193,11 +174,7 @@ class UtilityPage extends GenericPage
                     if (!$typeObj->error)
                     {
                         $this->extendGlobalData($typeObj->getJSGlobals(GLOBALINFO_ANY));
-                        $this->lvTabs[] = array(
-                            'file'   => $typeObj::$brickFile,
-                            'data'   => $typeObj->getListviewData(),
-                            'params' => []
-                        );
+                        $this->lvTabs[] = [$typeObj::$brickFile, ['data' => array_values($typeObj->getListviewData())]];
                     }
                 }
                 break;
@@ -205,9 +182,9 @@ class UtilityPage extends GenericPage
                 if ($this->category && !in_array($this->category[0], [1, 7, 30]))
                     header('Location: ?most-comments=1'.($this->rss ? '&rss' : null), true, 302);
 
-                $params = array(
-                    'extraCols' => '$[Listview.funcBox.createSimpleCol(\'ncomments\', \'tab_comments\', \'10%\', \'ncomments\')]',
-                    'sort'      => '$[\'-ncomments\']'
+                $tabBase = array(
+                    'extraCols' => ["\$Listview.funcBox.createSimpleCol('ncomments', 'tab_comments', '10%', 'ncomments')"],
+                    'sort'      => ['-ncomments']
                 );
 
                 foreach (Util::$typeClasses as $type => $classStr)
@@ -250,11 +227,7 @@ class UtilityPage extends GenericPage
                                 $d['ncomments'] = $comments[$typeId];
 
                             $this->extendGlobalData($typeClass->getJSGlobals(GLOBALINFO_ANY));
-                            $this->lvTabs[] = array(
-                                'file'   => $typeClass::$brickFile,
-                                'data'   => $data,
-                                'params' => $params
-                            );
+                            $this->lvTabs[] = [$typeClass::$brickFile, array_merge($tabBase, ['data' => array_values($data)])];
                         }
                     }
                 }
@@ -263,14 +236,9 @@ class UtilityPage extends GenericPage
         }
 
         // found nothing => set empty content
+        // tpl: commentpreview - anything, doesn't matter what
         if (!$this->lvTabs && !$this->rss)
-        {
-            $this->lvTabs[] = array(
-                'file'   => 'commentpreview',               // anything, doesn't matter what
-                'data'   => [],
-                'params' => []
-            );
-        }
+            $this->lvTabs[] = ['commentpreview', ['data' => []]];
     }
 
     protected function generateRSS()

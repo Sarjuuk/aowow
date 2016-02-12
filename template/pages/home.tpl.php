@@ -58,7 +58,7 @@ endif;
 echo $this->writeGlobalVars();
 
 if ($this->news):
-    echo "            Markup.printHtml(".json_encode($this->news['text']).", 'news-generic', { allow: Markup.CLASS_ADMIN });\n";
+    echo "            Markup.printHtml(".Util::toJSON($this->news['text']).", 'news-generic', { allow: Markup.CLASS_ADMIN });\n";
 endif;
 ?>
         //]]></script>

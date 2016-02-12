@@ -138,95 +138,79 @@ class UserPage extends GenericPage
             foreach ($repData as &$r)
                 $r['when'] = date(Util::$dateFormatInternal, $r['when']);
 
-            $this->lvTabs[] = array(
-                'file'   => 'reputationhistory',
-                'data'   => $repData,
-                'params' => []
-            );
+            $this->lvTabs[] = ['reputationhistory', ['data' => $repData]];
         }
 
         // Comments
         if ($_ = CommunityContent::getCommentPreviews(['user' => $this->user['id'], 'replies' => false], $nFound))
         {
-            $lvData = array(
-                'file'   => 'commentpreview',
-                'data'   => $_,
-                'params' => array(
-                    'hiddenCols'     => "$['author']",
-                    'onBeforeCreate' => '$Listview.funcBox.beforeUserComments',
-                    '_totalCount'    => $nFound
-                )
+            $tabData = array(
+                'data'           => $_,
+                'hiddenCols'     => ['author'],
+                'onBeforeCreate' => '$Listview.funcBox.beforeUserComments',
+                '_totalCount'    => $nFound
             );
 
             if ($nFound > CFG_SQL_LIMIT_DEFAULT)
             {
-                $lvData['params']['name'] = '$LANG.tab_latestcomments';
-                $lvData['params']['note'] = '$$WH.sprintf(LANG.lvnote_usercomments, '.$nFound.')';
+                $tabData['name'] = '$LANG.tab_latestcomments';
+                $tabData['note'] = '$$WH.sprintf(LANG.lvnote_usercomments, '.$nFound.')';
             }
 
-            $this->lvTabs[] = $lvData;
+            $this->lvTabs[] = ['commentpreview', $tabData];
         }
 
         // Comment Replies
         if ($_ = CommunityContent::getCommentPreviews(['user' => $this->user['id'], 'replies' => true], $nFound))
         {
-            $lvData = array(
-                'file'   => 'replypreview',
-                'data'   => $_,
-                'params' => array(
-                    'hiddenCols'     => "$['author']",
-                    'onBeforeCreate' => '$Listview.funcBox.beforeUserComments',
-                    '_totalCount'    => $nFound
-                )
+            $tabData = array(
+                'data'           => $_,
+                'hiddenCols'     => ['author'],
+                'onBeforeCreate' => '$Listview.funcBox.beforeUserComments',
+                '_totalCount'    => $nFound
             );
 
             if ($nFound > CFG_SQL_LIMIT_DEFAULT)
             {
-                $lvData['params']['name'] = '$LANG.tab_latestreplies';
-                $lvData['params']['note'] = '$$WH.sprintf(LANG.lvnote_userreplies, '.$nFound.')';
+                $tabData['name'] = '$LANG.tab_latestreplies';
+                $tabData['note'] = '$$WH.sprintf(LANG.lvnote_userreplies, '.$nFound.')';
             }
 
-            $this->lvTabs[] = $lvData;
+            $this->lvTabs[] = ['replypreview', $tabData];
         }
 
         // Screenshots
         if ($_ = CommunityContent::getScreenshots(-$this->user['id'], 0, $nFound))
         {
-            $lvData = array(
-                'file'   => 'screenshot',
-                'data'   => $_,
-                'params' => array(
-                    '_totalCount' => $nFound
-                )
+            $tabData = array(
+                'data'        => $_,
+                '_totalCount' => $nFound
             );
 
             if ($nFound > CFG_SQL_LIMIT_DEFAULT)
             {
-                $lvData['params']['name'] = '$LANG.tab_latestscreenshots';
-                $lvData['params']['note'] = '$$WH.sprintf(LANG.lvnote_userscreenshots, '.$nFound.')';
+                $tabData['name'] = '$LANG.tab_latestscreenshots';
+                $tabData['note'] = '$$WH.sprintf(LANG.lvnote_userscreenshots, '.$nFound.')';
             }
 
-            $this->lvTabs[] = $lvData;
+            $this->lvTabs[] = ['screenshot', $tabData];
         }
 
         // Videos
         if ($_ = CommunityContent::getVideos(-$this->user['id'], 0, $nFound))
         {
-            $lvData = array(
-                'file'   => 'video',
-                'data'   => $_,
-                'params' => array(
-                    '_totalCount' => $nFound
-                )
+            $tabData = array(
+                'data'        => $_,
+                '_totalCount' => $nFound
             );
 
             if ($nFound > CFG_SQL_LIMIT_DEFAULT)
             {
-                $lvData['params']['name'] = '$LANG.tab_latestvideos';
-                $lvData['params']['note'] = '$$WH.sprintf(LANG.lvnote_uservideos, '.$nFound.')';
+                $tabData['name'] = '$LANG.tab_latestvideos';
+                $tabData['note'] = '$$WH.sprintf(LANG.lvnote_uservideos, '.$nFound.')';
             }
 
-            $this->lvTabs[] = $lvData;
+            $this->lvTabs[] = ['video', $tabData];
         }
 
         // forum -> latest topics  [unused]
@@ -235,6 +219,34 @@ class UserPage extends GenericPage
 
         // Characters [todo]
         $this->user['characterData'] = [];
+        /*
+            us_addCharactersTab([
+                {
+                    id:763,
+                    "name":"Lilywhite",
+                    "achievementpoints":"0",
+                    "guild":"whatever",
+                    "guildrank":"0",
+                    "realm":"draenor",
+                    "realmname":"Draenor",
+                    "battlegroup":"cyclone",
+                    "battlegroupname":"Cyclone",
+                    "region":"us",
+                    "level":"10",
+                    "race":"7",
+                    "gender":"0",
+                    "classs":"1",
+                    "faction":"0",
+                    "gearscore":"0",
+                    "talenttree1":"0",
+                    "talenttree2":"0",
+                    "talenttree3":"0",
+                    "talentspec":0,
+                    "published":1,
+                    "pinned":0
+                }
+            ]);
+        */
 
         // Profiles [todo]
         $this->user['profileData'] = [];

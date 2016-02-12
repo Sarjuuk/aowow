@@ -88,37 +88,33 @@ class AchievementsPage extends GenericPage
             $acvList = new AchievementList($conditions);
         }
 
-        $params = $data = [];
+        $tabData = [];
         if (!$acvList->error)
         {
-            $data = $acvList->getListviewData();
+            $tabData['data'] = array_values($acvList->getListviewData());
 
             // fill g_items, g_titles, g_achievements
             $this->extendGlobalData($acvList->getJSGlobals());
 
             // if we are have different cats display field
             if ($acvList->hasDiffFields(['category']))
-                $params['visibleCols'] = "$['category']";
+                $tabData['visibleCols'] = ['category'];
 
             if (!empty($this->filter['fi']['extraCols']))
-                $params['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+                $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
             // create note if search limit was exceeded
             if ($acvList->getMatches() > CFG_SQL_LIMIT_DEFAULT)
             {
-                $params['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-                $params['_truncated'] = 1;
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+                $tabData['_truncated'] = 1;
             }
 
             if ($this->filterObj->error)
-                $params['_errors'] = '$1';
+                $tabData['_errors'] = 1;
         }
 
-        $this->lvTabs[] = array(
-            'file'   => 'achievement',
-            'data'   => $data,
-            'params' => $params
-        );
+        $this->lvTabs[] = ['achievement', $tabData];
 
         // sort for dropdown-menus in filter
         Lang::sort('game', 'si');

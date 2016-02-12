@@ -54,30 +54,26 @@ class QuestsPage extends GenericPage
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
         $this->filter['fi']    =  $this->filterObj->getForm();
 
-        $lv = array(
-            'file'   => 'quest',
-            'data'   => $quests->getListviewData(),
-            'params' => []
-        );
+        $tabData = ['data' => array_values($quests->getListviewData())];
 
         if ($_ = $this->filterObj->getForm('reputationCols'))
-            $lv['params']['extraCols'] = '$fi_getReputationCols('.Util::toJSON($_).')';
+            $tabData['extraCols'] = '$fi_getReputationCols('.json_encode($_, JSON_NUMERIC_CHECK).')';
         else if (!empty($this->filter['fi']['extraCols']))
-            $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+            $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         // create note if search limit was exceeded
         if ($quests->getMatches() > CFG_SQL_LIMIT_DEFAULT)
         {
-            $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_questsfound', $quests->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-            $lv['params']['_truncated'] = 1;
+            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_questsfound', $quests->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $tabData['_truncated'] = 1;
         }
         else if (isset($this->category[1]) && $this->category[1] > 0)
-            $lv['params']['note'] = '$$WH.sprintf(LANG.lvnote_questgivers, '.$this->category[1].', g_zones['.$this->category[1].'], '.$this->category[1].')';
+            $tabData['note'] = '$$WH.sprintf(LANG.lvnote_questgivers, '.$this->category[1].', g_zones['.$this->category[1].'], '.$this->category[1].')';
 
         if ($this->filterObj->error)
-            $lv['params']['_errors'] = '$1';
+            $tabData['_errors'] = 1;
 
-        $this->lvTabs[] = $lv;
+        $this->lvTabs[] = ['quest', $tabData];
     }
 
     protected function generateTitle()

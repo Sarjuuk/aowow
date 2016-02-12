@@ -10,7 +10,7 @@ $this->brick('announcement');
 $this->brick('pageTemplate');
 ?>
             <div class="text">
-                <h1><?php echo $this->name; ?></h1>
+                <h1><?=$this->name; ?></h1>
 
                   <table>
                     <tr>
@@ -40,7 +40,7 @@ endforeach;
                 <thead><tr><th style="width:135px;"><div>Menu</div></th><th style="width:400px;">Pages</th><th>Screenshots: <span id="screenshotTotal"></span></th></tr></thead>
                 <tbody><tr>
                     <td id="menu-container" style="vertical-align: top;">
-                        <div id="show-all-pages"><?php echo $this->ssNFound ? ' &ndash; <a href="?admin=screenshots&all">Show All</a> ('.$this->ssNFound.')' : null; ?></div>
+                        <div id="show-all-pages"><?=($this->ssNFound ? ' &ndash; <a href="?admin=screenshots&all">Show All</a> ('.$this->ssNFound.')' : null); ?></div>
                         <h4>Mass Select</h4>
                              &ndash; <a href="#" onClick="ssm_MassSelect(1);">Select All</a><br>
                              &ndash; <a href="#" onClick="ssm_MassSelect(0);">Deselect All</a><br>
@@ -122,10 +122,10 @@ if ($this->getAll):
     echo "                    var ss_getAll = true;\n";
 endif;
 if ($this->ssPages):
-    echo "                    var ssm_screenshotPages = ".json_encode($this->ssPages, JSON_NUMERIC_CHECK).";\n";
+    echo "                    var ssm_screenshotPages = ".Util::toJSON($this->ssPages).";\n";
     echo "                    ssm_UpdatePages();\n";
 elseif ($this->ssData):
-    echo "                    var ssm_screenshotData = ".json_encode($this->ssData, JSON_NUMERIC_CHECK).";\n";
+    echo "                    var ssm_screenshotData = ".Util::toJSON($this->ssData).";\n";
     echo "                    ssm_UpdateList();\n";
 endif;
 ?>

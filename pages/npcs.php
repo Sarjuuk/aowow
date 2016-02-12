@@ -59,31 +59,29 @@ class NpcsPage extends GenericPage
 
         $repCols = $this->filterObj->getForm('reputationCols');
 
-        $lv = array(
-            'file'   => 'creature',
-            'data'   => $npcs->getListviewData($repCols ? NPCINFO_REP : 0x0),
-            'params' => []
+        $tabData = array(
+            'data' => array_values($npcs->getListviewData($repCols ? NPCINFO_REP : 0x0)),
         );
 
         if ($repCols)
-            $lv['params']['extraCols'] = '$fi_getReputationCols('.Util::toJSON($repCols).')';
+            $tabData['extraCols'] = '$fi_getReputationCols('.Util::toJSON($repCols).')';
         else if (!empty($this->filter['fi']['extraCols']))
-            $lv['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+            $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         if ($this->category)
-            $lv['params']['hiddenCols'] = "$['type']";
+            $tabData['hiddenCols'] = ['type'];
 
         // create note if search limit was exceeded
         if ($npcs->getMatches() > CFG_SQL_LIMIT_DEFAULT)
         {
-            $lv['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-            $lv['params']['_truncated'] = 1;
+            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $tabData['_truncated'] = 1;
         }
 
         if ($this->filterObj->error)
-            $lv['params']['_errors'] = '$1';
+            $tabData['_errors'] = 1;
 
-        $this->lvTabs[] = $lv;
+        $this->lvTabs[] = ['creature', $tabData];
 
         // sort for dropdown-menus
         Lang::sort('game', 'fa');

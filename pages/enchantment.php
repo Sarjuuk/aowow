@@ -175,14 +175,11 @@ class EnchantmentPage extends GenericPage
         $gemList = new ItemList(array(['gemEnchantmentId', $this->typeId]));
         if (!$gemList->error)
         {
-            $this->lvTabs[] = array(
-                'file'   => 'item',
-                'data'   => $gemList->getListviewData(),
-                'params' => array(
-                    'name' => '$LANG.tab_usedby + \' \' + LANG.gems',
-                    'id'   => 'used-by-gem',
-                )
-            );
+            $this->lvTabs[] = ['item', array(
+                'data' => array_values($gemList->getListviewData()),
+                'name' => '$LANG.tab_usedby + \' \' + LANG.gems',
+                'id'   => 'used-by-gem',
+            )];
 
             $this->extendGlobalData($gemList->getJsGlobals());
         }
@@ -191,14 +188,11 @@ class EnchantmentPage extends GenericPage
         $socketsList = new ItemList(array(['socketBonus', $this->typeId]));
         if (!$socketsList->error)
         {
-            $this->lvTabs[] = array(
-                'file'   => 'item',
-                'data'   => $socketsList->getListviewData(),
-                'params' => array(
-                    'name' => '$LANG.tab_usedby + \' \' + \''.Lang::item('socketBonus').'\'',
-                    'id'   => 'used-by-socketbonus',
-                )
-            );
+            $this->lvTabs[] = ['item', array(
+                'data' => array_values($socketsList->getListviewData()),
+                'name' => '$LANG.tab_usedby + \' \' + \''.Lang::item('socketBonus').'\'',
+                'id'   => 'used-by-socketbonus',
+            )];
 
             $this->extendGlobalData($socketsList->getJsGlobals());
         }
@@ -230,14 +224,11 @@ class EnchantmentPage extends GenericPage
             $ubItems = new ItemList($conditions);
             if (!$ubItems->error)
             {
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $ubItems->getListviewData(),
-                    'params' => array(
-                        'name' => '$LANG.tab_usedby + \' \' + LANG.types[3][0]',
-                        'id'   => 'used-by-item',
-                    )
-                );
+                $this->lvTabs[] = ['item', array(
+                    'data' => array_values($ubItems->getListviewData()),
+                    'name' => '$LANG.tab_usedby + \' \' + LANG.types[3][0]',
+                    'id'   => 'used-by-item',
+                )];
 
                 $this->extendGlobalData($ubItems->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -266,14 +257,11 @@ class EnchantmentPage extends GenericPage
                 }
             }
 
-            $this->lvTabs[] = array(
-                'file'   => 'spell',
-                'data'   => $spellData,
-                'params' => array(
-                    'name' => '$LANG.tab_usedby + \' \' + LANG.types[6][0]',
-                    'id'   => 'used-by-spell',
-                )
-            );
+            $this->lvTabs[] = ['spell', array(
+                'data' => array_values($spellData),
+                'name' => '$LANG.tab_usedby + \' \' + LANG.types[6][0]',
+                'id'   => 'used-by-spell',
+            )];
         }
 
         // used by randomAttrItem
@@ -303,15 +291,12 @@ class EnchantmentPage extends GenericPage
                         $data[$iId]['name']   .= ' '.Util::localizedString($ire[$iet[abs($re)]['ench']], 'name');
                     }
 
-                    $this->lvTabs[] = array(
-                        'file'   => 'item',
-                        'data'   => $data,
-                        'params' => array(
-                            'id'        => 'used-by-rand',
-                            'name'      => '$LANG.tab_usedby + \' \' + \''.Lang::item('_rndEnchants').'\'',
-                            'extraCols' => '$[Listview.extraCols.percent]'
-                        )
-                    );
+                    $this->lvTabs[] = ['item', array(
+                        'data'      => array_values($data),
+                        'id'        => 'used-by-rand',
+                        'name'      => '$LANG.tab_usedby + \' \' + \''.Lang::item('_rndEnchants').'\'',
+                        'extraCols' => ['$Listview.extraCols.percent']
+                    )];
 
                     $this->extendGlobalData($randItems->getJSGlobals(GLOBALINFO_SELF));
                 }

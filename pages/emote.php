@@ -93,11 +93,7 @@ class EmotePage extends GenericPage
         );
         $acv = new AchievementList($condition);
 
-        $this->lvTabs[] = array(
-            'file'   => 'achievement',
-            'data'   => $acv->getListviewData(),
-            'params' => []
-        );
+        $this->lvTabs[] = ['achievement', ['data' => array_values($acv->getListviewData())]];
 
         $this->extendGlobalData($acv->getJsGlobals());
     }

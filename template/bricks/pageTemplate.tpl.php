@@ -1,13 +1,13 @@
             <script type="text/javascript">//<![CDATA[
 <?php
 if (!empty($this->hasComContent)):
-    echo "                var lv_comments = ".json_encode($this->community['co'], JSON_NUMERIC_CHECK).";\n";
-    echo "                var lv_screenshots = ".json_encode($this->community['sc'], JSON_NUMERIC_CHECK).";\n";
-    echo "                var lv_videos = ".json_encode($this->community['vi'], JSON_NUMERIC_CHECK).";\n";
+    echo "                var lv_comments = ".Util::toJSON($this->community['co']).";\n";
+    echo "                var lv_screenshots = ".Util::toJSON($this->community['sc']).";\n";
+    echo "                var lv_videos = ".Util::toJSON($this->community['vi']).";\n";
 endif;
 
 if (!empty($this->gPageInfo)):
-    echo "                var g_pageInfo = ".json_encode($this->gPageInfo, JSON_NUMERIC_CHECK).";\n";
+    echo "                var g_pageInfo = ".Util::toJSON($this->gPageInfo).";\n";
 
     // only used by item.php
     if (User::$id > 0 && isset($this->redButtons[BUTTON_EQUIP]) && $this->redButtons[BUTTON_EQUIP]):
@@ -20,7 +20,7 @@ if (!empty($this->pageTemplate)):
         echo "                Locale.set(".User::$localeId.");\n";
     endif;
 
-    echo "                PageTemplate.set(".json_encode($this->pageTemplate, JSON_NUMERIC_CHECK).");\n";
+    echo "                PageTemplate.set(".Util::toJSON($this->pageTemplate).");\n";
     echo "                PageTemplate.init();\n";
 endif;
 

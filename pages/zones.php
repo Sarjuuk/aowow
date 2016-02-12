@@ -32,7 +32,6 @@ class ZonesPage extends GenericPage
         $conditions  = [CFG_SQL_LIMIT_NONE];
         $visibleCols = [];
         $hiddenCols  = [];
-        $params      = [];
         $mapFile     = 0;
         $spawnMap    = -1;
 
@@ -75,18 +74,16 @@ class ZonesPage extends GenericPage
         if (!$zones->hasSetFields(['type']))
             $hiddenCols[] = 'instancetype';
 
+        $tabData = ['data' => array_values($zones->getListviewData())];
+
         if ($visibleCols)
-            $params['visibleCols'] = "$['".implode("', '", $visibleCols)."']";
+            $tabData['visibleCols'] = $visibleCols;
 
         if ($hiddenCols)
-            $params['hiddenCols'] = "$['".implode("', '", $hiddenCols)."']";
+            $tabData['hiddenCols'] = $hiddenCols;
 
         $this->map      = null;
-        $this->lvTabs[] = array(
-            'file'   => 'zone',
-            'data'   => $zones->getListviewData(),
-            'params' => $params
-        );
+        $this->lvTabs[] = ['zone', $tabData];
 
         // create flight map
         if ($mapFile)

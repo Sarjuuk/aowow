@@ -438,15 +438,12 @@ class ItemPage extends genericPage
                     $this->extendGlobalIDs(TYPE_SPELL, $perfItem[$sId]['requiredSpecialization']);
                 }
 
-                $this->lvTabs[] = array(
-                    'file'   => 'spell',
-                    'data'   => $lvData,
-                    'params' => [
-                        'name'       => '$LANG.tab_createdby',
-                        'id'         => 'created-by',       // should by exclusive with created-by from spell_loot
-                        'extraCols'  => '$[Listview.extraCols.percent, Listview.extraCols.condition]'
-                    ]
-                );
+                $this->lvTabs[] = ['spell', array(
+                    'data'      => array_values($lvData),
+                    'name'      => '$LANG.tab_createdby',
+                    'id'        => 'created-by',            // should by exclusive with created-by from spell_loot
+                    'extraCols' => ['$Listview.extraCols.percent', '$Listview.extraCols.condition']
+                )];
             }
         }
 
@@ -457,34 +454,24 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($lootTabs->jsGlobals);
 
-            foreach ($lootTabs->iterate() as $idx => $tab)
+            foreach ($lootTabs->iterate() as $idx => list($file, $tabData))
             {
-                if (!$tab[1])
+                if (!$tabData['data'])
                     continue;
 
                 if ($idx == 16)
-                    $createdBy = array_column($tab[1], 'id');
+                    $createdBy = array_column($tabData['data'], 'id');
 
-                $this->lvTabs[] = array(
-                    'file'   => $tab[0],
-                    'data'   => $tab[1],
-                    'params' => [
-                        'name'        => $tab[2],
-                        'id'          => $tab[3],
-                        'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
-                        'hiddenCols'  => $tab[5] ? '$ '.Util::toJSON( array_unique($tab[5]))     : null,
-                        'visibleCols' => $tab[6] ? '$'. Util::toJSON( array_unique($tab[6]))     : null
-                    ]
-                );
+                $this->lvTabs[] = [$file, $tabData];
             }
         }
 
         // tabs: this item contains..
         $sourceFor = array(
-             [LOOT_ITEM,        $this->subject->id,                       '$LANG.tab_contains',      'contains',      ['Listview.extraCols.percent'], []                          , []],
-             [LOOT_PROSPECTING, $this->subject->id,                       '$LANG.tab_prospecting',   'prospecting',   ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
-             [LOOT_MILLING,     $this->subject->id,                       '$LANG.tab_milling',       'milling',       ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
-             [LOOT_DISENCHANT,  $this->subject->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []]
+             [LOOT_ITEM,        $this->subject->id,                       '$LANG.tab_contains',      'contains',      ['$Listview.extraCols.percent'], []                          , []],
+             [LOOT_PROSPECTING, $this->subject->id,                       '$LANG.tab_prospecting',   'prospecting',   ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
+             [LOOT_MILLING,     $this->subject->id,                       '$LANG.tab_milling',       'milling',       ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
+             [LOOT_DISENCHANT,  $this->subject->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []]
         );
 
         $reqQuest = [];
@@ -508,17 +495,22 @@ class ItemPage extends genericPage
                     $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
                 }
 
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $lootTab->getResult(),
-                    'params' => [
-                        'name'        => $sf[2],
-                        'id'          => $sf[3],
-                        'extraCols'   => $sf[4] ? "$[".implode(', ', array_unique($sf[4]))."]" : null,
-                        'hiddenCols'  => $sf[5] ? "$".Util::toJSON($sf[5]) : null,
-                        'visibleCols' => $sf[6] ? '$'.Util::toJSON($sf[6]) : null
-                    ]
+                $tabData = array(
+                    'data' => array_values($lootTab->getResult()),
+                    'name' => $sf[2],
+                    'id'   => $sf[3],
                 );
+
+                if ($sf[4])
+                    $tabData['extraCols']   = array_unique($sf[4]);
+
+                if ($sf[5])
+                    $tabData['hiddenCols']  = array_unique($sf[5]);
+
+                if ($sf[6])
+                    $tabData['visibleCols'] = array_unique($sf[6]);
+
+                $this->lvTabs[] = ['item', $tabData];
             }
         }
 
@@ -558,15 +550,12 @@ class ItemPage extends genericPage
                 if (!$contains->hasSetFields(['slot']))
                     $hCols[] = 'slot';
 
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $contains->getListviewData(),
-                    'params' => [
-                        'name'       => '$LANG.tab_cancontain',
-                        'id'         => 'can-contain',
-                        'hiddenCols' => '$'.Util::toJSON($hCols)
-                    ]
-                );
+                $this->lvTabs[] = ['item', array(
+                    'data'       => array_values($contains->getListviewData()),
+                    'name'       => '$LANG.tab_cancontain',
+                    'id'         => 'can-contain',
+                    'hiddenCols' => $hCols
+                )];
             }
         }
 
@@ -578,15 +567,12 @@ class ItemPage extends genericPage
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $contains->getListviewData(),
-                    'params' => [
-                        'name'       => '$LANG.tab_canbeplacedin',
-                        'id'         => 'can-be-placed-in',
-                        'hiddenCols' => "$['side']"
-                    ]
-                );
+                $this->lvTabs[] = ['item', array(
+                    'data'       => array_values($contains->getListviewData()),
+                    'name'       => '$LANG.tab_canbeplacedin',
+                    'id'         => 'can-be-placed-in',
+                    'hiddenCols' => ['side']
+                )];
             }
         }
 
@@ -599,22 +585,19 @@ class ItemPage extends genericPage
         $criteriaOf = new AchievementList($conditions);
         if (!$criteriaOf->error)
         {
-                $this->extendGlobalData($criteriaOf->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+            $this->extendGlobalData($criteriaOf->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-                $hCols = [];
-                if (!$criteriaOf->hasSetFields(['reward_loc0']))
-                    $hCols = ['rewards'];
+            $tabData = array(
+                'data'        => array_values($criteriaOf->getListviewData()),
+                'name'        => '$LANG.tab_criteriaof',
+                'id'          => 'criteria-of',
+                'visibleCols' => ['category']
+            );
 
-                $this->lvTabs[] = array(
-                    'file'   => 'achievement',
-                    'data'   => $criteriaOf->getListviewData(),
-                    'params' => [
-                        'name'        => '$LANG.tab_criteriaof',
-                        'id'          => 'criteria-of',
-                        'visibleCols' => "$['category']",
-                        'hiddenCols'  => '$'.Util::toJSON($hCols)
-                    ]
-                );
+            if (!$criteriaOf->hasSetFields(['reward_loc0']))
+                $tabData['hiddenCols'] = ['rewards'];
+
+            $this->lvTabs[] = ['achievement', $tabData];
         }
 
         // tab: reagent for
@@ -629,15 +612,12 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($reagent->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvTabs[] = array(
-                'file'   => 'spell',
-                'data'   => $reagent->getListviewData(),
-                'params' => [
-                    'name'        => '$LANG.tab_reagentfor',
-                    'id'          => 'reagent-for',
-                    'visibleCols' => "$['reagents']"
-                ]
-            );
+            $this->lvTabs[] = ['spell', array(
+                'data'        => array_values($reagent->getListviewData()),
+                'name'        => '$LANG.tab_reagentfor',
+                'id'          => 'reagent-for',
+                'visibleCols' => ['reagents']
+            )];
         }
 
         // tab: unlocks (object or item)
@@ -654,14 +634,11 @@ class ItemPage extends genericPage
             $lockedObj = new GameObjectList(array(['lockId', $lockIds]));
             if (!$lockedObj->error)
             {
-                $this->lvTabs[] = array(
-                    'file'   => 'object',
-                    'data'   => $lockedObj->getListviewData(),
-                    'params' => [
-                        'name' => '$LANG.tab_unlocks',
-                        'id'   => 'unlocks-object'
-                    ]
-                );
+                $this->lvTabs[] = ['object', array(
+                    'data' => array_values($lockedObj->getListviewData()),
+                    'name' => '$LANG.tab_unlocks',
+                    'id'   => 'unlocks-object'
+                )];
             }
 
             // items (generally unused. It's the spell on the item, that unlocks stuff)
@@ -670,14 +647,11 @@ class ItemPage extends genericPage
             {
                 $this->extendGlobalData($lockedItm->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $lockedItm->getListviewData(),
-                    'params' => [
-                        'name' => '$LANG.tab_unlocks',
-                        'id'   => 'unlocks-item'
-                    ]
-                );
+                $this->lvTabs[] = ['item', array(
+                    'data' => array_values($lockedItm->getListviewData()),
+                    'name' => '$LANG.tab_unlocks',
+                    'id'   => 'unlocks-item'
+                )];
             }
         }
 
@@ -705,14 +679,11 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($saItems->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = array(
-                'file'   => 'item',
-                'data'   => $saItems->getListviewData(),
-                'params' => [
-                    'name' => '$LANG.tab_seealso',
-                    'id'   => 'see-also'
-                ]
-            );
+            $this->lvTabs[] = ['item', array(
+                'data' => array_values($saItems->getListviewData()),
+                'name' => '$LANG.tab_seealso',
+                'id'   => 'see-also'
+            )];
         }
 
         // tab: starts (quest)
@@ -723,14 +694,11 @@ class ItemPage extends genericPage
             {
                 $this->extendGlobalData($starts->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-                $this->lvTabs[] = array(
-                    'file'   => 'quest',
-                    'data'   => $starts->getListviewData(),
-                    'params' => [
-                        'name' => '$LANG.tab_starts',
-                        'id'   => 'starts-quest'
-                    ]
-                );
+                $this->lvTabs[] = ['quest', array(
+                    'data' => array_values($starts->getListviewData()),
+                    'name' => '$LANG.tab_starts',
+                    'id'   => 'starts-quest'
+                )];
             }
         }
 
@@ -745,14 +713,11 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($objective->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-            $this->lvTabs[] = array(
-                'file'   => 'quest',
-                'data'   => $objective->getListviewData(),
-                'params' => [
-                    'name' => '$LANG.tab_objectiveof',
-                    'id'   => 'objective-of-quest'
-                ]
-            );
+                $this->lvTabs[] = ['quest', array(
+                'data' => array_values($objective->getListviewData()),
+                'name' => '$LANG.tab_objectiveof',
+                'id'   => 'objective-of-quest'
+            )];
         }
 
         // tab: provided for (quest)
@@ -766,14 +731,11 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($provided->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-            $this->lvTabs[] = array(
-                'file'   => 'quest',
-                'data'   => $provided->getListviewData(),
-                'params' => [
-                    'name' => '$LANG.tab_providedfor',
-                    'id'   => 'provided-for-quest'
-                ]
-            );
+                $this->lvTabs[] = ['quest', array(
+                'data' => array_values($provided->getListviewData()),
+                'name' => '$LANG.tab_providedfor',
+                'id'   => 'provided-for-quest'
+            )];
         }
 
         // tab: same model as
@@ -785,15 +747,12 @@ class ItemPage extends genericPage
             {
                 $this->extendGlobalData($sameModel->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->lvTabs[] = array(
-                    'file'   => 'genericmodel',
-                    'data'   => $sameModel->getListviewData(ITEMINFO_MODEL),
-                    'params' => [
-                        'name'            => '$LANG.tab_samemodelas',
-                        'id'              => 'same-model-as',
-                        'genericlinktype' => 'item'
-                    ]
-                );
+                $this->lvTabs[] = ['genericmodel', array(
+                    'data'            => array_values($sameModel->getListviewData(ITEMINFO_MODEL)),
+                    'name'            => '$LANG.tab_samemodelas',
+                    'id'              => 'same-model-as',
+                    'genericlinktype' => 'item'
+                )];
             }
         }
 
@@ -807,7 +766,7 @@ class ItemPage extends genericPage
                 $sbData = $soldBy->getListviewData();
                 $this->extendGlobalData($soldBy->getJSGlobals(GLOBALINFO_SELF));
 
-                $extraCols = ['Listview.extraCols.stock', "Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
+                $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
 
                 $holidays = [];
                 foreach ($sbData as $k => &$row)
@@ -837,7 +796,7 @@ class ItemPage extends genericPage
                     if ($e = $vendors[$k]['event'])
                     {
                         if (count($extraCols) == 3)
-                            $extraCols[] = 'Listview.extraCols.condition';
+                            $extraCols[] = '$Listview.extraCols.condition';
 
                         $this->extendGlobalIds(TYPE_WORLDEVENT, $e);
                         $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $e]];
@@ -860,16 +819,13 @@ class ItemPage extends genericPage
                 }
 
 
-                $this->lvTabs[] = array(
-                    'file'   => 'creature',
-                    'data'   => $sbData,
-                    'params' => [
-                        'name'       => '$LANG.tab_soldby',
-                        'id'         => 'sold-by-npc',
-                        'extraCols'  => '$['.implode(', ', $extraCols).']',
-                        'hiddenCols' => "$['level', 'type']"
-                    ]
-                );
+                $this->lvTabs[] = ['creature', array(
+                    'data'       => array_values($sbData),
+                    'name'       => '$LANG.tab_soldby',
+                    'id'         => 'sold-by-npc',
+                    'extraCols'  => $extraCols,
+                    'hiddenCols' => ['level', 'type']
+                )];
             }
         }
 
@@ -898,22 +854,21 @@ class ItemPage extends genericPage
             $boughtBy = new ItemList(array(['id', $boughtBy]));
             if (!$boughtBy->error)
             {
-                if ($boughtBy->getMatches() <= CFG_SQL_LIMIT_DEFAULT)
-                    $n = null;
-
                 $iCur   = new CurrencyList(array(['itemId', $this->typeId]));
                 $filter = $iCur->error ? [TYPE_ITEM => $this->typeId] : [TYPE_CURRENCY => $iCur->id];
 
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $boughtBy->getListviewData(ITEMINFO_VENDOR, $filter),
-                    'params' => [
-                        'name'      => '$LANG.tab_currencyfor',
-                        'id'        => 'currency-for',
-                        'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack'), Listview.extraCols.cost]",
-                        'note'      => $n ? sprintf(Util::$filterResultString, $n) : null
-                    ]
+                $tabData = array(
+                    'data'      => array_values($boughtBy->getListviewData(ITEMINFO_VENDOR, $filter)),
+                    'name'      => '$LANG.tab_currencyfor',
+                    'id'        => 'currency-for',
+                    'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'],
                 );
+
+                if ($boughtBy->getMatches() > CFG_SQL_LIMIT_DEFAULT && $n)
+                    $tabData['note'] = sprintf(Util::$filterResultString, $n);
+
+                $this->lvTabs[] = ['item', $tabData];
+
                 $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_ANY));
             }
         }
@@ -951,15 +906,12 @@ class ItemPage extends genericPage
                 if ($taughtSpells->hasSetFields(['reagent1']))
                     $visCols[] = 'reagents';
 
-                $this->lvTabs[] = array(
-                    'file'   => 'spell',
-                    'data'   => $taughtSpells->getListviewData(),
-                    'params' => [
-                        'name'        => '$LANG.tab_teaches',
-                        'id'          => 'teaches',
-                        'visibleCols' => '$'.Util::toJSON($visCols)
-                    ]
-                );
+                $this->lvTabs[] = ['spell', array(
+                    'data'        => array_values($taughtSpells->getListviewData()),
+                    'name'        => '$LANG.tab_teaches',
+                    'id'          => 'teaches',
+                    'visibleCols' => $visCols
+                )];
             }
         }
 
@@ -982,14 +934,11 @@ class ItemPage extends genericPage
             $cdItems = new ItemList($conditions);
             if (!$cdItems->error)
             {
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $cdItems->getListviewData(),
-                    'params' => [
-                        'name' => '$LANG.tab_sharedcooldown',
-                        'id'   => 'shared-cooldown'
-                    ]
-                );
+                $this->lvTabs[] = ['item', array(
+                    'data' => array_values($cdItems->getListviewData()),
+                    'name' => '$LANG.tab_sharedcooldown',
+                    'id'   => 'shared-cooldown'
+                )];
 
                 $this->extendGlobalData($cdItems->getJSGlobals(GLOBALINFO_SELF));
             }

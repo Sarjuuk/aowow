@@ -87,20 +87,8 @@ class CurrencyPage extends GenericPage
             {
                 $this->extendGlobalData($lootTabs->jsGlobals);
 
-                foreach ($lootTabs->iterate() as $tab)
-                {
-                    $this->lvTabs[] = array(
-                        'file'   => $tab[0],
-                        'data'   => $tab[1],
-                        'params' => [
-                            'name'        => $tab[2],
-                            'id'          => $tab[3],
-                            'extraCols'   => $tab[4] ? '$['.implode(', ', array_unique($tab[4])).']' : null,
-                            'hiddenCols'  => $tab[5] ? '$['.implode(', ', array_unique($tab[5])).']' : null,
-                            'visibleCols' => $tab[6] ? '$'. Util::toJSON( array_unique($tab[6]))     : null
-                        ]
-                    );
-                }
+                foreach ($lootTabs->iterate() as list($file, $tabData))
+                    $this->lvTabs[] = [$file, $tabData];
             }
 
             // tab: sold by
@@ -114,7 +102,7 @@ class CurrencyPage extends GenericPage
                 if (!$soldBy->error)
                 {
                     $sbData    = $soldBy->getListviewData();
-                    $extraCols = ['Listview.extraCols.stock', "Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
+                    $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
                     $holidays  = [];
 
                     foreach ($sbData as $k => &$row)
@@ -135,7 +123,7 @@ class CurrencyPage extends GenericPage
                         if ($vendors[$k]['event'])
                         {
                             if (count($extraCols) == 3)             // not already pushed
-                                $extraCols[] = 'Listview.extraCols.condition';
+                                $extraCols[] = '$Listview.extraCols.condition';
 
                             $this->extendGlobalIds(TYPE_WORLDEVENT, $vendors[$k]['event']);
                             $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $vendors[$k]['event']]];
@@ -150,16 +138,13 @@ class CurrencyPage extends GenericPage
                         );
                     }
 
-                    $this->lvTabs[] = array(
-                        'file'   => 'creature',
-                        'data'   => $sbData,
-                        'params' => [
-                            'name'       => '$LANG.tab_soldby',
-                            'id'         => 'sold-by-npc',
-                            'extraCols'  => '$['.implode(', ', $extraCols).']',
-                            'hiddenCols' => "$['level', 'type']"
-                        ]
-                    );
+                    $this->lvTabs[] = ['creature', array(
+                        'data'       => array_values($sbData),
+                        'name'       => '$LANG.tab_soldby',
+                        'id'         => 'sold-by-npc',
+                        'extraCols'  => $extraCols,
+                        'hiddenCols' => ['level', 'type']
+                    )];
                 }
             }
         }
@@ -172,18 +157,16 @@ class CurrencyPage extends GenericPage
             {
                 $this->extendGlobalData($createdBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                if ($createdBy->hasSetFields(['reagent1']))
-                    $visCols = ['reagents'];
-
-                $this->lvTabs[] = array(
-                    'file'   => 'spell',
-                    'data'   => $createdBy->getListviewData(),
-                    'params' => [
-                        'name'        => '$LANG.tab_createdby',
-                        'id'          => 'created-by',
-                        'visibleCols' => isset($visCols) ? '$'.Util::toJSON($visCols) : null
-                    ]
+                $tabData = array(
+                    'data' => array_values($createdBy->getListviewData()),
+                    'name' => '$LANG.tab_createdby',
+                    'id'   => 'created-by',
                 );
+
+                if ($createdBy->hasSetFields(['reagent1']))
+                    $tabData['visibleCols'] = ['reagents'];
+
+                $this->lvTabs[] = ['spell', $tabData];
             }
         }
 
@@ -211,19 +194,17 @@ class CurrencyPage extends GenericPage
             $boughtBy = new ItemList(array(['id', $boughtBy]));
             if (!$boughtBy->error)
             {
-                if ($boughtBy->getMatches() <= CFG_SQL_LIMIT_DEFAULT)
-                    $n = null;
-
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $boughtBy->getListviewData(ITEMINFO_VENDOR, [TYPE_CURRENCY => $this->typeId]),
-                    'params' => [
-                        'name'      => '$LANG.tab_currencyfor',
-                        'id'        => 'currency-for',
-                        'extraCols' => "$[Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')]",
-                        'note'      => $n ? sprintf(Util::$filterResultString, $n) : null
-                    ]
+                $tabData = array(
+                    'data'      => array_values($boughtBy->getListviewData(ITEMINFO_VENDOR, [TYPE_CURRENCY => $this->typeId])),
+                    'name'      => '$LANG.tab_currencyfor',
+                    'id'        => 'currency-for',
+                    'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')"],
                 );
+
+                if ($boughtBy->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                    $tabData['note'] = sprintf(Util::$filterResultString, $n);
+
+                $this->lvTabs[] = ['item', $tabData];
 
                 $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }

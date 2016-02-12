@@ -36,22 +36,20 @@ class TitlesPage extends GenericPage
         if ($this->category)
             $conditions[] = ['category', $this->category[0]];
 
-        $titles = new TitleList($conditions);
+        $tabData = ['data' => []];
+        $titles  = new TitleList($conditions);
         if (!$titles->error)
         {
-            $params = [];
+            $tabData['data'] = array_values($titles->getListviewData());
+
             if ($titles->hasDiffFields(['category']))
-                $params['visibleCols'] = "$['category']";
+                $tabData['visibleCols'] = ['category'];
 
             if (!$titles->hasAnySource())
-                $params['hiddenCols'] = "$['source']";
-
-            $this->lvTabs[] = array(
-                'file'   => 'title',
-                'data'   => $titles->getListviewData(),
-                'params' => $params
-            );
+                $tabData['hiddenCols'] = ['source'];
         }
+
+        $this->lvTabs[] = ['title', $tabData];
     }
 
     protected function generateTitle()

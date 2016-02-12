@@ -93,20 +93,17 @@ class ProfilesPage extends GenericPage
         // dont send ID for real chars unless they have some kind of custom avatar
         // on second thought .. ids are required for resync, but the function that generates the icon is faulty
 
-        $this->lvTabs[] = array(
-            'file'   => 'profile',
-            'data'   => [$exampleRow],
-            'params' => [
-                'id'          => 'characters',
-                'name'        => '$LANG.tab_characters',
-                'hideCount'   => 1,
-                '_truncated'  => 1,
-                'roster'      => 3,
-                'visibleCols' => "$['race','classs','level','talents','achievementpoints']",
-                'note'        => '$$WH.sprintf(LANG.lvnote_charactersfound, \'20,592,390\', 200) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')',
-                'onBeforeCreate' => '$pr_initRosterListview'        // $_GET['roster'] = 1|2|3|4 .. 2,3,4 arenateam-size (4 => 5-man), 1 guild .. it puts a resync button on the lv...
-            ]
-        );
+        $this->lvTabs[] = ['profile', array(
+            'data'           => [$exampleRow],
+            'id'             => 'characters',
+            'name'           => '$LANG.tab_characters',
+            'hideCount'      => 1,
+            '_truncated'     => 1,
+            'roster'         => 3,
+            'visibleCols'    => ['race','classs','level','talents','achievementpoints'],
+            'note'           => '$$WH.sprintf(LANG.lvnote_charactersfound, \'20,592,390\', 200) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')',
+            'onBeforeCreate' => '$pr_initRosterListview'        // $_GET['roster'] = 1|2|3|4 .. 2,3,4 arenateam-size (4 => 5-man), 1 guild .. it puts a resync button on the lv...
+        )];
 
 
 

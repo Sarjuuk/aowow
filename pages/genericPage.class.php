@@ -103,6 +103,36 @@ class GenericPage
     private   $memcached    = null;
     private   $mysql        = ['time' => 0, 'count' => 0];
 
+    private   $lvTemplates  = array(
+        'achievement'       => ['template' => 'achievement',       'id' => 'achievements',    'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_achievements'  ],
+        'calendar'          => ['template' => 'holidaycal',        'id' => 'calendar',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_calendar'      ],
+        'class'             => ['template' => 'classs',            'id' => 'classes',         'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_classes'       ],
+        'commentpreview'    => ['template' => 'commentpreview',    'id' => 'comments',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_comments'      ],
+        'creature'          => ['template' => 'npc',               'id' => 'npcs',            'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_npcs'          ],
+        'currency'          => ['template' => 'currency',          'id' => 'currencies',      'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_currencies'    ],
+        'emote'             => ['template' => 'emote',             'id' => 'emotes',          'parent' => 'lv-generic', 'data' => []                                      ],
+        'enchantment'       => ['template' => 'enchantment',       'id' => 'enchantments',    'parent' => 'lv-generic', 'data' => []                                      ],
+        'event'             => ['template' => 'holiday',           'id' => 'holidays',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_holidays'      ],
+        'faction'           => ['template' => 'faction',           'id' => 'factions',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_factions'      ],
+        'genericmodel'      => ['template' => 'genericmodel',      'id' => 'same-model-as',   'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_samemodelas'   ],
+        'item'              => ['template' => 'item',              'id' => 'items',           'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_items'         ],
+        'itemset'           => ['template' => 'itemset',           'id' => 'itemsets',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_itemsets'      ],
+        'model'             => ['template' => 'model',             'id' => 'gallery',         'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_gallery'       ],
+        'object'            => ['template' => 'object',            'id' => 'objects',         'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_objects'       ],
+        'pet'               => ['template' => 'pet',               'id' => 'hunter-pets',     'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_pets'          ],
+        'profile'           => ['template' => 'profile',           'id' => 'profiles',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_profiles'      ],
+        'quest'             => ['template' => 'quest',             'id' => 'quests',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_quests'        ],
+        'race'              => ['template' => 'race',              'id' => 'races',           'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_races'         ],
+        'replypreview'      => ['template' => 'replypreview',      'id' => 'comment-replies', 'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_commentreplies'],
+        'reputationhistory' => ['template' => 'reputationhistory', 'id' => 'reputation',      'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_reputation'    ],
+        'screenshot'        => ['template' => 'screenshot',        'id' => 'screenshots',     'parent' => 'lv-generic', 'data' => []                                      ],
+        'skill'             => ['template' => 'skill',             'id' => 'skills',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_skills'        ],
+        'spell'             => ['template' => 'spell',             'id' => 'spells',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_spells'        ],
+        'title'             => ['template' => 'title',             'id' => 'titles',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_titles'        ],
+        'video'             => ['template' => 'video',             'id' => 'videos',          'parent' => 'lv-generic', 'data' => [],                                     ],
+        'zone'              => ['template' => 'zone',              'id' => 'zones',           'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_zones'         ]
+    );
+
     public function __construct($pageCall/*, $pageParam */)
     {
         $this->time = microtime(true);
@@ -518,18 +548,15 @@ class GenericPage
             $$n = $v;
 
         if (!$this->isSaneInclude('template/bricks/', $file))
-            echo User::isInGroup(U_GROUP_EMPLOYEE) ? "\n\nError: nonexistant template requested: template/bricks/".$file.".tpl.php\n\n" : null;
+            trigger_error("Nonexistant template requested: template/bricks/".$file.".tpl.php");
         else
             include('template/bricks/'.$file.'.tpl.php');
     }
 
-    public function lvBrick($file, array $localVars = [])   // load listview
+    public function lvBrick($file)                          // load listview addIns
     {
-        foreach ($localVars as $n => $v)
-            $$n = $v;
-
         if (!$this->isSaneInclude('template/listviews/', $file))
-            echo User::isInGroup(U_GROUP_EMPLOYEE) ? "\n\nError: nonexistant template requested: template/listviews/".$file.".tpl.php\n\n" : null;
+            trigger_error('Nonexistant Listview addin requested: template/listviews/'.$file.'.tpl.php');
         else
             include('template/listviews/'.$file.'.tpl.php');
     }
@@ -539,7 +566,7 @@ class GenericPage
         if (!$this->isSaneInclude('template/localized/', $file.'_'.$loc))
         {
             if ($loc == LOCALE_EN || !$this->isSaneInclude('template/localized/', $file.'_'.LOCALE_EN))
-                echo User::isInGroup(U_GROUP_EMPLOYEE) ? "\n\nError: nonexistant template requested: template/localized/".$file.'_'.$loc.".tpl.php\n\n" : null;
+                trigger_error("Nonexistant template requested: template/localized/".$file.'_'.$loc.".tpl.php");
             else
                 include('template/localized/'.$file.'_'.LOCALE_EN.'.tpl.php');
         }

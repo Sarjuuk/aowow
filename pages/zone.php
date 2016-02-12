@@ -137,7 +137,7 @@ class ZonePage extends GenericPage
         /* Main Content */
         /****************/
 
-        $addToMap = function ($what, $entry) use (&$som)
+        $addToSOM = function ($what, $entry) use (&$som)
         {
             // entry always contains: type, id, name, level, coords[]
             if (!isset($som[$what][$entry['name']]))        // not found yet
@@ -152,7 +152,7 @@ class ZonePage extends GenericPage
 
                     // found existing floor, ammending coords
                     $byFloor['coords'][] = $entry['coords'][0];
-                    break;
+                    return;
                 }
 
                 // floor not used yet, create it
@@ -221,7 +221,7 @@ class ZonePage extends GenericPage
                 }
 
                 if ($what)
-                    $addToMap($what, array(
+                    $addToSOM($what, array(
                         'coords' => [[$spawn['posX'], $spawn['posY']]],
                         'level'  => $spawn['floor'],
                         'name'   => $n,
@@ -250,7 +250,7 @@ class ZonePage extends GenericPage
                         $this->extendGlobalData($started->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
                         if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToMap('alliancequests', array(
+                            $addToSOM('alliancequests', array(
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
                                 'name'   => $n,
@@ -261,7 +261,7 @@ class ZonePage extends GenericPage
                             ));
 
                         if (($tpl['H'] != -1) & ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToMap('hordequests', array(
+                            $addToSOM('hordequests', array(
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
                                 'name'   => $n,
@@ -315,7 +315,7 @@ class ZonePage extends GenericPage
                     $what = 'rare';
 
                 if ($what)
-                    $addToMap($what, array(
+                    $addToSOM($what, array(
                         'coords'        => [[$spawn['posX'], $spawn['posY']]],
                         'level'         => $spawn['floor'],
                         'name'          => $n,
@@ -345,7 +345,7 @@ class ZonePage extends GenericPage
                         }
 
                         if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToMap('alliancequests', array(
+                            $addToSOM('alliancequests', array(
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
                                 'name'          => $n,
@@ -358,7 +358,7 @@ class ZonePage extends GenericPage
                             ));
 
                         if (($tpl['H'] != -1) & ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToMap('hordequests', array(
+                            $addToSOM('hordequests', array(
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
                                 'name'          => $n,
@@ -434,7 +434,7 @@ class ZonePage extends GenericPage
             if (in_array($this->subject->getField('type'), [2, 3, 4, 5, 7, 8]))
                 $som['instance'] = true;
 
-            $this->map        = array(
+            $this->map = array(
                 'data' => ['parent' => 'mapper-generic', 'zone' => $this->typeId],
                 'som'  => $som
             );
@@ -460,45 +460,42 @@ class ZonePage extends GenericPage
         // tab: NPCs
         if ($cSpawns && !$creatureSpawns->error)
         {
-            $lvData = array(
-                'file'   => 'creature',
-                'data'   => $creatureSpawns->getListviewData(),
-                'params' => ['note' => sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0')]
+            $tabData = array(
+                'data' => array_values($creatureSpawns->getListviewData()),
+                'note' => sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0')
             );
 
             if ($creatureSpawns->getMatches() > CFG_SQL_LIMIT_DEFAULT)
-                $lvData['params']['_truncated'] = 1;
+                $tabData['_truncated'] = 1;
 
             $this->extendGlobalData($creatureSpawns->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = $lvData;
+            $this->lvTabs[] = ['creature', $tabData];
         }
 
         // tab: Objects
         if ($oSpawns && !$objectSpawns->error)
         {
-            $lvData = array(
-                'file'   => 'object',
-                'data'   => $objectSpawns->getListviewData(),
-                'params' => ['note' => sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0')]
+            $tabData = array(
+                'data' => array_values($objectSpawns->getListviewData()),
+                'note' => sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0')
             );
 
             if ($objectSpawns->getMatches() > CFG_SQL_LIMIT_DEFAULT)
-                $lvData['params']['_truncated'] = 1;
+                $tabData['_truncated'] = 1;
 
             $this->extendGlobalData($objectSpawns->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = $lvData;
+            $this->lvTabs[] = ['object', $tabData];
         }
 
         // tab: Quests [data collected by SOM-routine]
         if ($questsLV)
         {
-            $this->lvTabs[] = array(
-                'file'   => 'quest',
-                'data'   => $questsLV,
-                'params' => ['note' => '$$WH.sprintf(LANG.lvnote_zonequests, '.$this->subject->getField('mapId').', '.$this->typeId.', \''.Util::jsEscape($this->subject->getField('name', true)).'\', '.$this->typeId.')']
-            );
+            $this->lvTabs[] = ['quest', array(
+                'data' => array_values($questsLV),
+                'note' => '$$WH.sprintf(LANG.lvnote_zonequests, '.$this->subject->getField('mapId').', '.$this->typeId.', \''.Util::jsEscape($this->subject->getField('name', true)).'\', '.$this->typeId.')'
+            )];
         }
 
         // tab: item-quest starter
@@ -517,14 +514,11 @@ class ZonePage extends GenericPage
             $qsiList = new ItemList(array(['id', array_keys($questStartItem)]));
             if (!$qsiList->error)
             {
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $qsiList->getListviewData(),
-                    'params' => [
-                        'name' => '$LANG.tab_startsquest',
-                        'id'   => 'starts-quest'
-                    ]
-                );
+                $this->lvTabs[] = ['item', array(
+                    'data' => array_values($qsiList->getListviewData()),
+                    'name' => '$LANG.tab_startsquest',
+                    'id'   => 'starts-quest'
+                )];
 
                 $this->extendGlobalData($qsiList->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -536,15 +530,12 @@ class ZonePage extends GenericPage
             $rewards = new ItemList(array(['id', array_unique($rewardsLV)]));
             if (!$rewards->error)
             {
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $rewards->getListviewData(),
-                    'params' => [
-                        'name' => '$LANG.tab_questrewards',
-                        'id'   => 'quest-rewards',
-                        'note' => sprintf(Util::$filterResultString, '?items&filter=cr=126;crs='.$this->typeId.';crv=0')
-                    ]
-                );
+                $this->lvTabs[] = ['item', array(
+                    'data' => array_values($rewards->getListviewData()),
+                    'name' => '$LANG.tab_questrewards',
+                    'id'   => 'quest-rewards',
+                    'note' => sprintf(Util::$filterResultString, '?items&filter=cr=126;crs='.$this->typeId.';crv=0')
+                )];
 
                 $this->extendGlobalData($rewards->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -557,30 +548,27 @@ class ZonePage extends GenericPage
         if ($fish->getByContainer(LOOT_FISHING, $this->typeId))
         {
             $this->extendGlobalData($fish->jsGlobals);
-            $xCols = array_merge(['Listview.extraCols.percent'], $fish->extraCols);
+            $xCols = array_merge(['$Listview.extraCols.percent'], $fish->extraCols);
 
             foreach ($fish->iterate() as $lv)
             {
                 if (!$lv['quest'])
                     continue;
 
-                $xCols = array_merge($xCols, ['Listview.extraCols.condition']);
+                $xCols = array_merge($xCols, ['$Listview.extraCols.condition']);
 
                 $reqQuest[$lv['id']] = 0;
 
                 $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
             }
 
-            $this->lvTabs[] = array(
-                'file'   => 'item',
-                'data'   => $fish->getResult(),
-                'params' => [
-                    'name'        => '$LANG.tab_fishing',
-                    'id'          => 'fishing',
-                    'extraCols'   => $xCols ? "$[".implode(', ', array_unique($xCols))."]" : null,
-                    'hiddenCols'  => "$['side']"
-                ]
-            );
+            $this->lvTabs[] = ['item', array(
+                'data'       => array_values($fish->getResult()),
+                'name'       => '$LANG.tab_fishing',
+                'id'         => 'fishing',
+                'extraCols'  => array_unique($xCols),
+                'hiddenCols' => ['side']
+            )];
         }
 
         // tab: spells
@@ -672,14 +660,15 @@ class ZonePage extends GenericPage
                     }
                 }
 
-                $this->lvTabs[] = array(
-                    'file'   => 'spell',
-                    'data'   => $lvSpells,
-                    'params' => array(
-                        'extraCols'  => $extra ? '$[Listview.extraCols.condition]' : null,
-                        'hiddenCols' => "$['skill']"
-                    )
+                $tabData = array(
+                    'data'       => array_values($lvSpells),
+                    'hiddenCols' => ['skill']
                 );
+
+                if ($extra)
+                    $tabData['extraCols'] = ['$Listview.extraCols.condition'];
+
+                $this->lvTabs[] = ['spell', $tabData];
             }
         }
 
@@ -687,15 +676,12 @@ class ZonePage extends GenericPage
         $subZones = new ZoneList(array(['parentArea', $this->typeId]));
         if (!$subZones->error)
         {
-            $this->lvTabs[] = array(
-                'file'   => 'zone',
-                'data'   => $subZones->getListviewData(),
-                'params' => [
-                    'name'        => '$LANG.tab_zones',
-                    'id'          => 'subzones',
-                    'hiddenCols'  => "$['territory', 'instancetype']"
-                ]
-            );
+            $this->lvTabs[] = ['zone', array(
+                'data'       => array_values($subZones->getListviewData()),
+                'name'       => '$LANG.tab_zones',
+                'id'         => 'subzones',
+                'hiddenCols' => ['territory', 'instancetype']
+            )];
 
             $this->extendGlobalData($subZones->getJSGlobals(GLOBALINFO_SELF));
         }

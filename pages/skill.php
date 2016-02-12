@@ -76,16 +76,13 @@ class SkillPage extends GenericPage
             {
                 $this->extendGlobalData($recipes->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                $this->lvTabs[] = array(
-                    'file'   => 'spell',
-                    'data'   => $recipes->getListviewData(),
-                    'params' => array(
-                        'id'          => 'recipes',
-                        'name'        => '$LANG.tab_recipes',
-                        'visibleCols' => "$['reagents', 'source']",
-                        'note'        =>  sprintf(Util::$filterResultString, '?spells='.$this->cat.'.'.$this->typeId.'&filter=cr=20;crs=1;crv=0')
-                    )
-                );
+                $this->lvTabs[] = ['spell', array(
+                    'data'        => array_values($recipes->getListviewData()),
+                    'id'          => 'recipes',
+                    'name'        => '$LANG.tab_recipes',
+                    'visibleCols' => ['reagents', 'source'],
+                    'note'        =>  sprintf(Util::$filterResultString, '?spells='.$this->cat.'.'.$this->typeId.'&filter=cr=20;crs=1;crv=0')
+                )];
             }
 
             // tab: recipe Items [items] (Books)
@@ -101,18 +98,16 @@ class SkillPage extends GenericPage
             {
                 $this->extendGlobalData($recipeItems->getJSGlobals(GLOBALINFO_SELF));
 
-                if ($_ = array_search($this->typeId, $filterRecipe))
-                    $_ = sprintf(Util::$filterResultString, "?items=9.".$_);
-
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $recipeItems->getListviewData(),
-                    'params' => array(
-                        'id'   => 'recipe-items',
-                        'name' => '$LANG.tab_recipeitems',
-                        'note' => $_
-                    )
+                $tabData = array(
+                    'data' => array_values($recipeItems->getListviewData()),
+                    'id'   => 'recipe-items',
+                    'name' => '$LANG.tab_recipeitems',
                 );
+
+                if ($_ = array_search($this->typeId, $filterRecipe))
+                    $tabData['note'] = sprintf(Util::$filterResultString, "?items=9.".$_);
+
+                $this->lvTabs[] = ['item', $tabData];
             }
 
             // tab: crafted items [items]
@@ -130,18 +125,16 @@ class SkillPage extends GenericPage
                 {
                     $this->extendGlobalData($created->getJSGlobals(GLOBALINFO_SELF));
 
-                    if ($_ = array_search($this->typeId, $filterItem))
-                        $_ = sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=".$_.";crv=0");
-
-                    $this->lvTabs[] = array(
-                        'file'   => 'item',
-                        'data'   => $created->getListviewData(),
-                        'params' => array(
-                            'id'   => 'crafted-items',
-                            'name' => '$LANG.tab_crafteditems',
-                            'note' => $_
-                        )
+                    $tabData = array(
+                        'data' => array_values($created->getListviewData()),
+                        'id'   => 'crafted-items',
+                        'name' => '$LANG.tab_crafteditems',
                     );
+
+                    if ($_ = array_search($this->typeId, $filterItem))
+                        $tabData['note'] = sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=".$_.";crv=0");
+
+                    $this->lvTabs[] = ['item', $tabData];
                 }
             }
 
@@ -157,18 +150,16 @@ class SkillPage extends GenericPage
             {
                 $this->extendGlobalData($reqBy->getJSGlobals(GLOBALINFO_SELF));
 
-                if ($_ = array_search($this->typeId, $filterItem))
-                    $_ = sprintf(Util::$filterResultString, "?items&filter=cr=99:168;crs=".$_.":2;crv=0:0");
-
-                $this->lvTabs[] = array(
-                    'file'   => 'item',
-                    'data'   => $reqBy->getListviewData(),
-                    'params' => array(
-                        'id'   => 'required-by',
-                        'name' => '$LANG.tab_requiredby',
-                        'note' => $_
-                    )
+                $tabData = array(
+                    'data' => array_values($reqBy->getListviewData()),
+                    'id'   => 'required-by',
+                    'name' => '$LANG.tab_requiredby',
                 );
+
+                if ($_ = array_search($this->typeId, $filterItem))
+                    $tabData['note'] = sprintf(Util::$filterResultString, "?items&filter=99:168;crs=".$_.":2;crv=0:0");
+
+                $this->lvTabs[] = ['item', $tabData];
             }
 
             // tab: required by [itemset]
@@ -182,14 +173,11 @@ class SkillPage extends GenericPage
             {
                 $this->extendGlobalData($reqBy->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->lvTabs[] = array(
-                    'file'   => 'itemset',
-                    'data'   => $reqBy->getListviewData(),
-                    'params' => array(
-                        'id'   => 'required-by-set',
-                        'name' => '$LANG.tab_requiredby'
-                    )
-                );
+                $this->lvTabs[] = ['itemset', array(
+                    'data' => array_values($reqBy->getListviewData()),
+                    'id'   => 'required-by-set',
+                    'name' => '$LANG.tab_requiredby'
+                )];
             }
         }
 
@@ -221,28 +209,27 @@ class SkillPage extends GenericPage
 
             $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
 
-            $lv = array(
-                'file'   => 'spell',
-                'data'   => $spells->getListviewData(),
-                'params' => ['visibleCols' => "$['source']"]
+            $tabData = array(
+                'data'        => array_values($spells->getListviewData()),
+                'visibleCols' => ['source']
             );
 
             switch ($this->cat)
             {
                 case -4:
-                    $lv['params']['note'] = sprintf(Util::$filterResultString, '?spells=-4');
+                    $tabData['note'] = sprintf(Util::$filterResultString, '?spells=-4');
                     break;
                 case  7:
                     if ($this->typeId != 769)               // Internal
-                        $lv['params']['note'] = sprintf(Util::$filterResultString, '?spells='.$this->cat.'.'.(log($reqClass, 2) + 1).'.'.$this->typeId);  // doesn't matter what spell; reqClass should be identical for all Class Spells
+                        $tabData['note'] = sprintf(Util::$filterResultString, '?spells='.$this->cat.'.'.(log($reqClass, 2) + 1).'.'.$this->typeId);  // doesn't matter what spell; reqClass should be identical for all Class Spells
                     break;
                 case  9:
                 case 11:
-                    $lv['params']['note'] = sprintf(Util::$filterResultString, '?spells='.$this->cat.'.'.$this->typeId);
+                    $tabData['note'] = sprintf(Util::$filterResultString, '?spells='.$this->cat.'.'.$this->typeId);
                     break;
             }
 
-            $this->lvTabs[] = $lv;
+            $this->lvTabs[] = ['spell', $tabData];
         }
 
         // tab: trainers [npcs]
@@ -284,14 +271,11 @@ class SkillPage extends GenericPage
                 {
                     $this->extendGlobalData($trainer->getJSGlobals());
 
-                    $this->lvTabs[] = array(
-                        'file'   => 'creature',
-                        'data'   => $trainer->getListviewData(),
-                        'params' => array(
-                            'id'   => 'trainer',
-                            'name' => '$LANG.tab_trainers',
-                        )
-                    );
+                    $this->lvTabs[] = ['creature', array(
+                        'data' => array_values($trainer->getListviewData()),
+                        'id'   => 'trainer',
+                        'name' => '$LANG.tab_trainers',
+                    )];
                 }
             }
         }
@@ -321,11 +305,7 @@ class SkillPage extends GenericPage
                 if (!$quests->error)
                 {
                     $this->extendGlobalData($quests->getJSGlobals());
-                    $this->lvTabs[] = array(
-                        'file'   => 'quest',
-                        'data'   => $quests->getListviewData(),
-                        'params' => []
-                    );
+                    $this->lvTabs[] = ['quest', ['data' => array_values($quests->getListviewData())]];
                 }
             }
         }
@@ -340,13 +320,7 @@ class SkillPage extends GenericPage
         {
             $classes = new CharClassList(array(['id', $class]));
             if (!$classes->error)
-            {
-                $this->lvTabs[] = array(
-                    'file'   => 'class',
-                    'data'   => $classes->getListviewData(),
-                    'params' => []
-                );
-            }
+                $this->lvTabs[] = ['class', ['data' => array_values($classes->getListviewData())]];
         }
 
         // tab: related races (apply races from [spells])
@@ -359,13 +333,7 @@ class SkillPage extends GenericPage
         {
             $races = new CharRaceList(array(['id', $race]));
             if (!$races->error)
-            {
-                $this->lvTabs[] = array(
-                    'file'   => 'race',
-                    'data'   => $races->getListviewData(),
-                    'params' => []
-                );
-            }
+                $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
         }
     }
 }

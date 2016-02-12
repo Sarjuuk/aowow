@@ -30,10 +30,9 @@ class EnchantmentsPage extends GenericPage
 
     protected function generateContent()
     {
-        $tab = array(
-            'file'   => 'enchantment',
-            'data'   => [],
-            'params' => []
+        $tabData = array(
+            'data' => [],
+            'name' => Util::ucFirst(Lang::game('enchantments'))
         );
 
         $conditions = [];
@@ -46,7 +45,7 @@ class EnchantmentsPage extends GenericPage
 
         $ench = new EnchantmentList($conditions);
 
-        $tab['data'] = $ench->getListviewData();
+        $tabData['data'] = array_values($ench->getListviewData());
         $this->extendGlobalData($ench->getJSGlobals());
 
         // recreate form selection
@@ -56,34 +55,34 @@ class EnchantmentsPage extends GenericPage
 
         $xCols = $this->filterObj->getForm('extraCols', true);
         foreach (Util::$itemFilter as $fiId => $str)
-            if (array_column($tab['data'], $str))
+            if (array_column($tabData['data'], $str))
                 $xCols[] = $fiId;
 
-        if (array_column($tab['data'], 'dmg'))
+        if (array_column($tabData['data'], 'dmg'))
             $xCols[] = 34;
 
         if ($xCols)
             $this->filter['fi']['extraCols'] =  "fi_extraCols = ".Util::toJSON(array_values(array_unique($xCols))).";";
 
         if (!empty($this->filter['fi']['extraCols']))
-            $tab['params']['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+            $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         if ($ench->getMatches() > CFG_SQL_LIMIT_DEFAULT)
         {
-            $tab['params']['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_enchantmentsfound', $ench->getMatches(), CFG_SQL_LIMIT_DEFAULT);
-            $tab['params']['_truncated'] = 1;
+            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_enchantmentsfound', $ench->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $tabData['_truncated'] = 1;
         }
 
-        if (array_filter(array_column($tab['data'], 'spells')))
-            $tab['params']['visibleCols'] = '$[\'trigger\']';
+        if (array_filter(array_column($tabData['data'], 'spells')))
+            $tabData['visibleCols'] = ['trigger'];
 
         if (!$ench->hasSetFields(['skillLine']))
-            $tab['params']['hiddenCols'] = '$[\'skill\']';
+            $tabData['hiddenCols'] = ['skill'];
 
         if ($this->filterObj->error)
-            $tab['params']['_errors'] = '$1';
+            $tabData['_errors'] = '$1';
 
-        $this->lvTabs[] = $tab;
+        $this->lvTabs[] = ['enchantment', $tabData, 'enchantment'];
     }
 
     protected function generateTitle()

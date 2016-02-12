@@ -591,14 +591,11 @@ class QuestPage extends GenericPage
         if (!$seeAlso->error)
         {
             $this->extendGlobalData($seeAlso->getJSGlobals());
-            $this->lvTabs[] = array(
-                'file'   => 'quest',
-                'data'   => $seeAlso->getListviewData(),
-                'params' => array(
-                    'name' => '$LANG.tab_seealso',
-                    'id'   => 'see-also'
-                )
-            );
+            $this->lvTabs[] = ['quest', array(
+                'data' => array_values($seeAlso->getListviewData()),
+                'name' => '$LANG.tab_seealso',
+                'id'   => 'see-also'
+            )];
         }
 
         // tab: criteria of
@@ -606,14 +603,11 @@ class QuestPage extends GenericPage
         if (!$criteriaOf->error)
         {
             $this->extendGlobalData($criteriaOf->getJSGlobals());
-            $this->lvTabs[] = array(
-                'file'   => 'achievement',
-                'data'   => $criteriaOf->getListviewData(),
-                'params' => array(
-                    'name' => '$LANG.tab_criteriaof',
-                    'id'   => 'criteria-of'
-                )
-            );
+            $this->lvTabs[] = ['achievement', array(
+                'data' => array_values($criteriaOf->getListviewData()),
+                'name' => '$LANG.tab_criteriaof',
+                'id'   => 'criteria-of'
+            )];
         }
 
         // tab: conditions
@@ -655,14 +649,11 @@ class QuestPage extends GenericPage
                    "Markup.printHtml(markup, 'tab-conditions', { allow: Markup.CLASS_STAFF })" .
                    "</script>";
 
-            $this->lvTabs[] = array(
-                'file'   => null,
+            $this->lvTabs[] = [null, array(
                 'data'   => $tab,
-                'params' => array(
-                    'id'   => 'conditions',
-                    'name' => '$LANG.requires'
-                )
-            );
+                'id'   => 'conditions',
+                'name' => '$LANG.requires'
+            )];
         }
     }
 
@@ -891,29 +882,26 @@ class QuestPage extends GenericPage
                 if (!($se['method'] & 0x2) || $se['type'] != TYPE_NPC)
                     continue;
 
-                if ($_ = CreatureList::getName($se['typeId']))
+                if ($ti = CreatureList::getName($se['typeId']))
                 {
-                    $mail['sender'] = sprintf(Lang::quest('mailBy'), $se['typeId'], $_);
+                    $mail['sender'] = sprintf(Lang::quest('mailBy'), $se['typeId'], $ti);
                     break;
                 }
             }
 
-            $extraCols = ['Listview.extraCols.percent'];
+            $extraCols = ['$Listview.extraCols.percent'];
             $mailLoot = new Loot();
 
             if ($mailLoot->getByContainer(LOOT_MAIL, $_))
             {
                 $this->extendGlobalData($mailLoot->jsGlobals);
-                $attachmentTab = array(
-                    'file'   => 'item',
-                    'data'   => $mailLoot->getResult(),
-                    'params' => array(
-                        'name'        => '[Mail Attachments]',
-                        'id'          => 'mail-attachments',
-                        'extraCols'   => "$[".implode(', ', array_merge($extraCols, $mailLoot->extraCols))."]",
-                        'hiddenCols'  => "$['side', 'slot', 'reqlevel']"
-                    )
-                );
+                $attachmentTab = ['item', array(
+                    'data'       => array_values($mailLoot->getResult()),
+                    'name'       => Lang::quest('attachment'),
+                    'id'         => 'mail-attachments',
+                    'extraCols'  => array_merge($extraCols, $mailLoot->extraCols),
+                    'hiddenCols' => ['side', 'slot', 'reqlevel']
+                )];
             }
         }
 

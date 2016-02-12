@@ -53,13 +53,9 @@ class FactionsPage extends GenericPage
         $data = [];
         $factions = new FactionList($conditions);
         if (!$factions->error)
-            $data = $factions->getListviewData();
+            $data = array_values($factions->getListviewData());
 
-        $this->lvTabs[] = array(
-            'file'   => 'faction',
-            'data'   => $data,
-            'params' => []
-        );
+        $this->lvTabs[] = ['faction', ['data' => $data]];
     }
 
     protected function generateTitle()

@@ -400,10 +400,8 @@ class QuestList extends BaseType
 
                 // currencies
                 if (!empty($this->rewards[$this->id][TYPE_CURRENCY]))
-                {
-                    $_ = $this->rewards[$this->id][TYPE_CURRENCY];
-                    $data[TYPE_CURRENCY] = array_combine(array_keys($_), array_keys($_));
-                }
+                    foreach ($this->rewards[$this->id][TYPE_CURRENCY] as $id => $__)
+                        $data[TYPE_CURRENCY][$id] = $id;
             }
 
             if ($addMask & GLOBALINFO_SELF)
