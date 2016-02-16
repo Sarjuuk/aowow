@@ -132,8 +132,8 @@ define('U_GROUP_LOCALIZER',                 0x0200);
 define('U_GROUP_SALESAGENT',                0x0400);
 define('U_GROUP_SCREENSHOT',                0x0800);
 define('U_GROUP_VIDEO',                     0x1000);
-// define('U_GROUP_APIONLY,                 0x2000);        // the heck..?
-// define('U_GROUP_PENDING,                 0x4000);        // would restrict some markup like urls
+define('U_GROUP_APIONLY',                   0x2000);        // not used
+define('U_GROUP_PENDING',                   0x4000);        // restricts usage of urls in comments
 
 define('U_GROUP_STAFF',                     (U_GROUP_ADMIN|U_GROUP_EDITOR|U_GROUP_MOD|U_GROUP_BUREAU|U_GROUP_DEV|U_GROUP_BLOGGER|U_GROUP_LOCALIZER|U_GROUP_SALESAGENT));
 define('U_GROUP_EMPLOYEE',                  (U_GROUP_ADMIN|U_GROUP_BUREAU|U_GROUP_DEV));

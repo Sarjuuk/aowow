@@ -2208,7 +2208,9 @@ var g_user_roles = {
     10: 'Traductor',
     11: 'Agente de ventas',
     12: 'Gestor de Capturas de pantalla',
-    13: 'Gestor de vídeos'
+    13: 'Gestor de vídeos',
+    14: 'Partner de API',
+    15: 'Pendiente'
 };
 
 var g_gem_colors = {
@@ -2318,8 +2320,11 @@ var g_conditions = {
 /* end custom */
 
 var LANG = {
+    linkremoved:     "enlace eliminado",
+    linkremoved_tip: "Los nuevos usuarios no pueden enlazar a<br />webs que no estén aprobadas.",
+
     and:      " y ",
-    or:       " o ",
+    or:       " o ",                                        // custom
     comma:    ", ",
     ellipsis: "…",
     dash:     " – ",

@@ -44,7 +44,8 @@ var Markup = {
     CLASS_USER:    MARKUP_CLASS_USER,
     CLASS_PENDING: MARKUP_CLASS_PENDING,
 
-    whitelistedWebsites: [/(.*\.)?wowhead.com/i, /(.*\.)?thottbot.com/i, /(.*\.)?torhead.com/i, /(.*\.)?mmoui.com/i, /(.*\.)?tankspot.com/i, /(.*\.)?guildfans.com/i, /(.*\.)?allakhazam.com/i, /(.*\.)?zam.com/i, /(.*\.)?blizzard.com/i, /(.*\.)?worldofwarcraft.com/i, /(.*\.)?wow-europe.com/i, /(.*\.)?battle.net/i, /(.*\.)?sc2ranks.com/i, /(.*\.)?torchlightarmory.com/i, /(.*\.)?vindictusdb.com/i, /(.*\.)?wowinterface.com/i, /(.*\.)?vginterface.com/i, /(.*\.)?lotrointerface.com/i, /(.*\.)?eq2interface.com/i, /(.*\.)?eqinterface.com/i, /(.*\.)?mmo-champion.com/i, /(.*\.)?joystiq.com/i, /(.*\.)?wow-heroes.com/i, /(.*\.)?be-imba.hu/i, /(.*\.)?wowpedia.org/i, /(.*\.)?curse.com/i, /(.*\.)?elitistjerks.com/i, /(.*\.)?wowwiki.com/i, /(.*\.)?worldoflogs.com/i, /(.*\.)?wowinsider.com/i, /(.*\.)?guildwork.com/i],
+    /* aowow custom: first element */
+    whitelistedWebsites: [new RegExp('(.*\\.)?' + location.hostname, 'i'), /(.*\.)?wowhead.com/i, /(.*\.)?thottbot.com/i, /(.*\.)?torhead.com/i, /(.*\.)?mmoui.com/i, /(.*\.)?tankspot.com/i, /(.*\.)?guildfans.com/i, /(.*\.)?allakhazam.com/i, /(.*\.)?zam.com/i, /(.*\.)?blizzard.com/i, /(.*\.)?worldofwarcraft.com/i, /(.*\.)?wow-europe.com/i, /(.*\.)?battle.net/i, /(.*\.)?sc2ranks.com/i, /(.*\.)?torchlightarmory.com/i, /(.*\.)?vindictusdb.com/i, /(.*\.)?wowinterface.com/i, /(.*\.)?vginterface.com/i, /(.*\.)?lotrointerface.com/i, /(.*\.)?eq2interface.com/i, /(.*\.)?eqinterface.com/i, /(.*\.)?mmo-champion.com/i, /(.*\.)?joystiq.com/i, /(.*\.)?wow-heroes.com/i, /(.*\.)?be-imba.hu/i, /(.*\.)?wowpedia.org/i, /(.*\.)?curse.com/i, /(.*\.)?elitistjerks.com/i, /(.*\.)?wowwiki.com/i, /(.*\.)?worldoflogs.com/i, /(.*\.)?wowinsider.com/i, /(.*\.)?guildwork.com/i],
 
     rolesToClass: function(roles)
     {
@@ -3483,14 +3484,16 @@ var Markup = {
 
     _fixUrl: function(url)
     {
-        if(!url) return '';
+        if (!url)
+            return '';
 
         // Make local URLs absolute
         var firstChar = url.charAt(0);
-        if(firstChar == '/' || firstChar == '?')
+        if (firstChar == '/' || firstChar == '?')
         {
             url = url.replace(/^[\/\?]+/, '');
 
+            // aowow custom
             // url = '/' + url;
             url = '?' + url;
         }
@@ -3500,9 +3503,12 @@ var Markup = {
 
     _isUrlExternal: function(str)
     {
-        if(!str)
+        if (!str)
             return false;
-        return (str.indexOf('wowhead.com') == -1 && str.match(/^([^:\\./]+):/i));
+
+        // aowow custom
+        // return (str.indexOf('wowhead.com') == -1 && str.match(/^([^:\\./]+):/i));
+        return g_isExternalUrl(str);
     },
 
     _nodeSearch: function(node, name, depth)

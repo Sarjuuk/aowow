@@ -2207,7 +2207,9 @@ var g_user_roles = {
     10: 'Übersetzer',
     11: 'Handelsvertreter',
     12: 'Screenshot-Verwalter',
-    13: 'Video-Verwalter'
+    13: 'Video-Verwalter',
+    14: 'API-Partner',
+    15: 'Ausstehend'
 };
 
 var g_gem_colors = {
@@ -2316,6 +2318,9 @@ var g_conditions = {
 /* end custom */
 
 var LANG = {
+    linkremoved:     "Link entfernt",
+    linkremoved_tip: "Neue Benutzer können nicht<br />zu nicht-weißgelisteten Seiten verlinken.",
+
     and:      " und ",
     or:       " oder ",                                     // custom
     comma:    ", ",

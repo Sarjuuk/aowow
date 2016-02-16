@@ -1526,7 +1526,7 @@ Summary.prototype = {
                     var o = $WH.ce('option');
                     o.value = p;
                     o._weights = weights[p];
-                    $WH.ae(o, $WH.ct(weights[p].name ? weights[p].name :LANG.presets[p]));
+                    $WH.ae(o, $WH.ct(weights[p].name ? weights[p].name : LANG.presets[p]));
                     $WH.ae(group, o);
                 }
 

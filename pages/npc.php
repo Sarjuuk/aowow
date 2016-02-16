@@ -702,7 +702,7 @@ class NpcPage extends GenericPage
             $this->extendGlobalData($objectiveOf->getJSGlobals());
 
             $this->lvTabs[] = ['quest', array(
-                'data' => aray_values($objectiveOf->getListviewData()),
+                'data' => array_values($objectiveOf->getListviewData()),
                 'name' => '$LANG.tab_objectiveof',
                 'id'   => 'objective-of'
             )];

@@ -112,7 +112,7 @@ class User
                 );
 
                 // gain rep for daily visit
-                if (!(self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM)))
+                if (!(self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM)) && !self::isInGroup(U_GROUP_PENDING))
                     Util::gainSiteReputation(self::$id, SITEREP_ACTION_DAILYVISIT);
 
                 // increment consecutive visits (next day or first of new month and not more than 48h)
@@ -244,9 +244,6 @@ class User
                 self::$passHash = $query['passHash'];
                 if (!self::verifyCrypt($pass))
                     return AUTH_WRONGPASS;
-
-                if ($query['status'] & ACC_STATUS_NEW)
-                    return AUTH_ACC_INACTIVE;
 
                 // successfull auth; clear bans for this IP
                 DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE type = 0 AND ip = ?', self::$ip);
